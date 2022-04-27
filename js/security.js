@@ -793,22 +793,6 @@ security.register = {
     sendEmailRequestParams: {},
 
     /**
-     * Checks if the new secure registration method is enabled
-     * @returns {Boolean} Returns true if enabled, false if not
-     */
-    newRegistrationEnabled: function() {
-
-        'use strict';
-
-        // Check localStorage testing flag which takes priority
-        if (localStorage.getItem('newRegistrationEnabled') !== null) {
-            return localStorage.getItem('newRegistrationEnabled') === '1' ? true : false;
-        }
-
-        return mega.flags.nsre;
-    },
-
-    /**
      * Create new account registration
      * @param {String} firstName The user's first name
      * @param {String} lastName The user's last name
@@ -940,17 +924,15 @@ security.register = {
 
         'use strict';
 
-        // If the new registration method is enabled, remove password from the object so it doesn't get saved to
-        // localStorage for the resend process. The old style registrations still requires the password as it is
-        // hashed with the email address.
-        if (security.register.newRegistrationEnabled()) {
-            delete registerData.password;
-        }
+        // Remove password from the object so it doesn't get saved to
+        // localStorage for the resend process.
+
+        delete registerData.password;
 
         localStorage.awaitingConfirmationAccount = JSON.stringify(registerData);
 
         if (localStorage.voucher) {
-            var data = [localStorage.voucher, localStorage[localStorage.voucher] || -1];
+            const data = [localStorage.voucher, localStorage[localStorage.voucher] || -1];
             mega.attr.set('promocode', JSON.stringify(data), -2, true).dump();
         }
     },

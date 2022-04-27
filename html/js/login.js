@@ -19,27 +19,14 @@ var signin = {
 
             'use strict';
 
-            if (confirmok) {
-                doConfirm(email, password, function() {
-                    loadingDialog.show();
-                    postLogin(email, password, pinCode, rememberMe, function(result) {
 
-                        loadingDialog.hide();
+            postLogin(email, password, pinCode, rememberMe, (result) => {
 
-                        // Proceed with login
-                        signin.proceedWithLogin(result);
-                    });
-                });
-            }
-            else {
-                postLogin(email, password, pinCode, rememberMe, function(result) {
+                loadingDialog.hide();
 
-                    loadingDialog.hide();
-
-                    // Otherwise proceed with regular login
-                    signin.proceedWithLogin(result);
-                });
-            }
+                // Otherwise proceed with regular login
+                signin.proceedWithLogin(result);
+            });
         }
     },
 
@@ -146,68 +133,6 @@ var signin = {
 var login_txt = false;
 var login_email = false;
 
-function doConfirm(email, password, callback) {
-    'use strict';
-
-    var $formWrapper = $('.main-mid-pad.login form');
-
-    if (u_signupenck) {
-        if (checksignuppw(password)) {
-            if (d) {
-                console.log('u_handle', u_handle);
-            }
-            var passwordaes = new sjcl.cipher.aes(prepare_key_pw(password));
-            api_updateuser({
-                callback2: callback,
-                callback: function(res, ctx) {
-                    loadingDialog.hide();
-                    if (res[0] === EACCESS) {
-                        if (m) {
-                            alert(l[732]);
-                        }
-                        else {
-                            msgDialog('warninga', l[135], l[732]);
-                        }
-                    }
-                    else if (typeof res[0] === 'string') {
-                        confirmok = false;
-                        if (ctx.callback2) {
-                            ctx.callback2();
-                        }
-                    }
-                    else if ((typeof res === 'number') && (res === -11)) {
-                        if (u_type === 0) {// Ephemeral session
-                            msgDialog("warninga", l[2480], l[12439]);
-                        }
-                        else {
-                            msgDialog("warninga", l[2480], l[12440]);
-                        }
-                    }
-                    else {
-                        alert(l[200]);
-                    }
-                }
-            }, {
-                uh: stringhash(email.toLowerCase(), passwordaes),
-                c: confirmcode
-            });
-        }
-        else {
-            loadingDialog.hide();
-
-            if (is_mobile) {
-                mobile.messageOverlay.show(l[201]);
-                $('.mobile.signin-register-block .signin-button').removeClass('loading');
-            }
-            else {
-                $('#login-password2', $formWrapper).val('');
-                $('#login-password2', $formWrapper).megaInputsHideError();
-                $('#login-name2', $formWrapper).megaInputsHideError();
-                msgDialog('warninga', l[135], l[201]);
-            }
-        }
-    }
-}
 
 function postLogin(email, password, pinCode, remember, loginCompletionCallback) {
     'use strict';

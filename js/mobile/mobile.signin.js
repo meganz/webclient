@@ -214,33 +214,7 @@ mobile.signin.old = {
 
         'use strict';
 
-        // If email confirm code is ok
-        if (confirmok) {
-            doConfirm(email, password, function() {
-                postLogin(email, password, pinCode, rememberMe, function(result) {
-
-                    // Hide the loading spinner
-                    mobile.signin.$screen.find('.signin-button').removeClass('loading');
-
-                    // Check they are not locked out
-                    if (result === EBLOCKED) {
-                        mobile.messageOverlay.show(l[730]);
-                    }
-                    else if (result !== false && result >= 0) {
-                        u_type = result;
-                        loadSubPage('key');
-                    }
-                    else {
-                        // Otherwise they used an incorrect email or password so show an error
-                        mobile.messageOverlay.show(l[16349], l[16350]);
-                    }
-                });
-            });
-        }
-        else {
-            // Run the regular login process
             postLogin(email, password, pinCode, rememberMe, mobile.signin.old.completeLogin);
-        }
     },
 
     /**

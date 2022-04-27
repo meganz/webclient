@@ -2802,6 +2802,14 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     -webkit-padding-end: 0;
     padding-inline-end: 0;
 }
+.megacmd .megaapp-linux .bottom-page.radio-buttons label {
+    -webkit-padding-end: 0;
+    padding-inline-end: 0;
+}
+.megacmd .megaapp-linux .bottom-page.radio-buttons .architecture-checkbox:last-child {
+    -webkit-padding-start: 16px;
+    padding-inline-start: 16px;
+}
 
 .download-sprite {
     background-image: url(../images/mega/download-sprite.png);

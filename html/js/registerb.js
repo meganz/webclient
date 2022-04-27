@@ -722,27 +722,29 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
 
     var mySelf = this;
 
-    var finalizePayment = function(st, res, saleIds) {
+    const finalizePayment = (st, res, saleIds) => {
         if (st === 0) {
-            msgDialog('warninga', '', l[19511], '', function() {
+            msgDialog('warninga', '', l[19511], '', () => {
                 loadingDialog.hide();
                 addressDialog.closeDialog();
             });
             return;
         }
 
-        var redirectToPaymentGateway = function() {
-            var url = res.EUR['url'];
-            window.location = url + '?lang=' + lang;
+        const redirectToPaymentGateway = () => {
+            const isStrip = businessPlan.usedGatewayId ?
+                (businessPlan.usedGatewayId | 0) === addressDialog.gatewayId_stripe : false;
+
+            addressDialog.processUtcResult(res, isStrip, saleIds);
         };
 
-        var showWarnDialog = false;
-        var payMethod = '';
+        let showWarnDialog = false;
+        let payMethod = '';
 
         if (mySelf.hasAppleOrGooglePay) {
 
-            var purchases = M.account.purchases;
-            for (var p in purchases) {
+            const purchases = M.account.purchases;
+            for (let p in purchases) {
                 if (purchases[p][4] === 2) {
                     showWarnDialog = true;
                     payMethod = 'Apple';
@@ -767,12 +769,8 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
             msgDialog('warninga', l[6859], l[20429].replace('{0}', payMethod), '', redirectToPaymentGateway);
         }
         else {
-            // redirectToPaymentGateway();
-            const isStrip = businessPlan.usedGatewayId ?
-                (businessPlan.usedGatewayId | 0) === addressDialog.gatewayId_stripe : false;
-            addressDialog.processUtcResult(res, isStrip, saleIds);
+            redirectToPaymentGateway();
         }
-
 
     };
 

@@ -672,15 +672,23 @@ var notify = {
         this.$popup.find('.notification-item.nt-incoming-share, .notification-item.nt-new-files').rebind('click', function() {
 
             // Get the folder ID from the HTML5 data attribute
-            var folderId = $(this).attr('data-folder-id');
+            const $this = $(this);
+            const folderId = $this.attr('data-folder-id');
+            const notificationID = $this.attr('id');
 
             // Mark all notifications as seen and close the popup
             // (because they clicked on a notification within the popup)
             notify.closePopup();
 
+
+
             // Open the folder
             M.openFolder(folderId)
-                .always(function() {
+                .always(() => {
+
+                    const notificationData = notify.notifications.find(elem => elem.id === notificationID);
+                    $.selected = notificationData.data.f && notificationData.data.f.map((elem) => elem.h);
+
                     reselect(true);
                 });
         });

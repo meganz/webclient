@@ -850,7 +850,7 @@ class ArchivedConversationsList extends MegaRenderMixin {
                                 <tbody>
                                     <tr>
                                         <th className="calculated-width" onClick={self.onSortNameClicked}>
-                                            <div className="is-chat name">
+                                            <div className="is-chat arrow name">
                                                 {l[86] /* `Name` */}
                                                 <i
                                                     className={

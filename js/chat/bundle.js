@@ -16021,7 +16021,7 @@ class ArchivedConversationsList extends mixins.wl {
       className: "calculated-width",
       onClick: self.onSortNameClicked
     }, conversations_React.createElement("div", {
-      className: "is-chat name"
+      className: "is-chat arrow name"
     }, l[86], conversations_React.createElement("i", {
       className: nameOrderClass ? `sprite-fm-mono icon-arrow-${nameOrderClass}` : ''
     }))), conversations_React.createElement("th", {

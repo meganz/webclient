@@ -1488,6 +1488,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         onCallExpand={() => {
                             return this.state.callMinimized &&
                                 this.setState({ callMinimized: false }, () => {
+                                    $.hideTopMenu();
                                     loadSubPage('fm/chat');
                                     room.show();
                                     this.toggleExpandedFlag();

@@ -979,11 +979,8 @@ function init_page() {
             });
         }
         else {
-            // Verify the confirm code using the old process
-            verifysignupcode(confirmcode, {
-                signupcodeok: signUpSucceededCallback,
-                signupcodebad: signUpFailedCallback
-            });
+            console.error("Unsupported verification code.");
+            signUpFailedCallback(EINCOMPLETE);
         }
     }
     else if (page.startsWith('emailverify')) {

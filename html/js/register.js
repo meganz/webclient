@@ -138,30 +138,25 @@ function registeraccount() {
     rv.email = $.trim($('#register-email-registerpage2').val());
     rv.name = rv.first + ' ' + rv.last;
 
-    var signup = null;
-    var fromProPage = false;
+    // Support of old registration is removed in ticket WEB-15124
 
-    // Set the signup function to start the new secure registration process
-    if (security.register.newRegistrationEnabled()) {
-        signup = function() {
-            security.register.startRegistration(rv.first, rv.last, rv.email, rv.password, fromProPage,
-                                                continueNewRegistration);
-        };
-    }
-    else {
-        // Set the signup function to use the legacy registration process
-        signup = function() {
-            sendsignuplink(rv.name, rv.email, rv.password, { callback: continueOldRegistration }, fromProPage);
-        };
-    }
+    const signup = () => {
+        security.register.startRegistration(
+            rv.first,
+            rv.last,
+            rv.email,
+            rv.password,
+            false,
+            continueNewRegistration);
+    };
 
     if (u_type === 0) {
         // An ephemeral account is registering, save the cloud nodes in case we need to migrate later
-        var names = Object.create(null);
+        const names = Object.create(null);
         names[M.RootID] = 'ephemeral-account';
 
         M.getCopyNodes([M.RootID], null, names)
-            .done(function(nodes) {
+            .done((nodes) => {
                 if (Array.isArray(nodes) && nodes.length) {
                     $.ephNodes = nodes;
                     $.ephNodes[0].t = 1; // change RootID's t2 to t1
@@ -172,49 +167,6 @@ function registeraccount() {
     }
     else {
         signup();
-    }
-}
-
-/**
- * Continue the old method registration
- * @param {Number} result The result of the 'uc' API request
- */
-function continueOldRegistration(result) {
-
-    'use strict';
-
-    loadingDialog.hide();
-
-    if (result === 0) {
-        var ops = {
-            a: 'up'
-        };
-
-        passwordManager($('#register_form'));
-
-        $('.mega-dialog.registration-page-success').off('click');
-
-        mega.ui.sendSignupLinkDialog(rv);
-
-        ops.terms = 'Mq';
-        ops.firstname = base64urlencode(to8(rv.first));
-        ops.lastname = base64urlencode(to8(rv.last));
-        ops.name2 = base64urlencode(to8(rv.name));
-        u_attr.terms = 1;
-
-        security.register.cacheRegistrationData(rv);
-
-        if (mega.affid) {
-            ops.aff = mega.affid;
-        }
-
-        api_req(ops);
-    }
-    else if (result === EACCESS || result === EEXIST) {
-        loginFromEphemeral.init();
-    }
-    else {
-        msgDialog('warninga', l[1578], l[200], result);
     }
 }
 

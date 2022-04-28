@@ -1,7 +1,7 @@
 // libs
 import { hot } from 'react-hot-loader/root';
 var React = require("react");
-import utils, { Emoji, ParsedHTML } from './../../ui/utils.jsx';
+import utils, {Emoji, OFlowEmoji, ParsedHTML} from './../../ui/utils.jsx';
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
 import {MegaRenderMixin, timing} from './../mixins';
 import {Button} from './../../ui/buttons.jsx';
@@ -250,8 +250,7 @@ class ConversationsListItem extends MegaRenderMixin {
         if (chatRoom.type !== "public") {
             nameClassString += " privateChat";
         }
-
-        var roomTitle = <Emoji>{chatRoom.getRoomTitle()}</Emoji>;
+        var roomTitle = <OFlowEmoji>{chatRoom.getRoomTitle()}</OFlowEmoji>;
         if (chatRoom.type === "private") {
             roomTitle = <ContactAwareName contact={this.props.contact}>{roomTitle}</ContactAwareName>;
         }
@@ -851,7 +850,7 @@ class ArchivedConversationsList extends MegaRenderMixin {
                                 <tbody>
                                     <tr>
                                         <th className="calculated-width" onClick={self.onSortNameClicked}>
-                                            <div className="is-chat name">
+                                            <div className="is-chat arrow name">
                                                 {l[86] /* `Name` */}
                                                 <i
                                                     className={

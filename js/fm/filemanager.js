@@ -876,10 +876,11 @@ FileManager.prototype.initFileManagerUI = function() {
                 prev: null,
                 subpages: [M.InboxID, M.RubbishID, 'recents', 'shares', 'out-shares', 'public-links']
             },
-            'gallery':         {root: 'photos',    prev: null, subpages: ['photos', 'images', 'videos']},
+            'gallery':         {root: 'photos',    prev: null, subpages: ['photos', 'images', 'videos', 'favourites']},
             'photos':          {root: 'photos',    prev: null},
             'images':          {root: 'images',    prev: null},
             'videos':          {root: 'videos',    prev: null},
+            'favourites':      {root: 'favourites',prev: null},
             'folder-link':     {root: M.RootID,    prev: null},
             'conversations':   {root: 'chat',      prev: null, subpages: ['contacts']},
             'transfers':       {root: 'transfers', prev: null},
@@ -1984,7 +1985,8 @@ FileManager.prototype.initContextUI = function() {
 
         const target = M.d[$.selected[0]];
 
-        if (M.currentdirid === 'photos' || M.currentdirid === 'images' || M.currentdirid === 'videos') {
+        if (M.currentdirid === 'photos' || M.currentdirid === 'images' ||
+            M.currentdirid === 'videos' || M.currentdirid === 'favourites') {
             M.fmTabState.gallery.prev = M.currentdirid;
         }
 
@@ -4073,6 +4075,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         case 'photos':
         case 'images':
         case 'videos':
+        case 'favourites':
         case 'discovery':
             tmpId = 'gallery';
             break;
@@ -4295,7 +4298,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     if ((id === 'cloud-drive' && !folderlink) || id === 'shared-with-me' || id === 'out-shares' ||
         id === 'public-links' || id === 'inbox' || id === 'rubbish-bin' || id === 'recents' ||
-        id === "photos" || id === "images" || id === "videos" || id === 'discovery') {
+        id === "photos" || id === "images" || id === "videos" || id === 'favourites' || id === 'discovery') {
         M.initLeftPanel();
     }
     else if (id === 'cloud-drive' || id === 'dashboard' || id === 'account') {

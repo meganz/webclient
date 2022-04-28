@@ -366,15 +366,13 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
     }
 
     var results = {
-        CONTACTS_AND_CHATS: new MegaDataSortedMap("resultId", function(a, b) {
-            var aChat = a && a.room;
-            var bChat = b && b.room;
-            var aLastActivity = aChat && aChat.lastActivity || 0;
-            var bLastActivity = bChat && bChat.lastActivity || 0;
-            return aLastActivity > bLastActivity ? -1 : (aLastActivity < bLastActivity ? 1 : 0);
+        CONTACTS_AND_CHATS: new MegaDataSortedMap('resultId', (a, b) => {
+            const aLastActivity = a.lastActivity || 0;
+            const bLastActivity = b.lastActivity || 0;
+            return aLastActivity > bLastActivity ? -1 : a.nameRef < b.nameRef ? -1 : 1;
         }),
-        MESSAGES: new MegaDataSortedMap("resultId", function(a, b) {
-            return a.data.delay < b.data.delay ? 1 : (a.data.delay > b.data.delay ? -1 : 0);
+        MESSAGES: new MegaDataSortedMap('resultId', (a, b) => {
+            return a.data.delay < b.data.delay ? 1 : a.data.delay > b.data.delay ? -1 : 0;
         })
     };
 
@@ -389,6 +387,8 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
             resultMeta.room = room;
             resultMeta.chatId = room.chatId;
             resultMeta.data = resultMeta.data || room.chatId;
+            resultMeta.lastActivity = room.lastActivity;
+            resultMeta.nameRef = room.nameRef;
             resultMeta.resultId = resultId++;
 
             if (resultMeta.type === SearchResultType.kMessage) {
@@ -407,7 +407,6 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
         }),
         'onComplete': function(reason) {
             delete ChatSearch.doSearch.cs;
-            contactHandleCache = undefined;
 
             if (reason === SearchState.kDestroying) {
                 reject(SearchState.kDestroying);
@@ -488,24 +487,27 @@ ChatSearch.prototype.setupLogger = function() {
 ChatSearch.prototype.resume = function() {
     "use strict";
 
-    // match contacts
-    if (this._matchedContacts !== true) {
-        for (var userid in M.u) {
-            if (!M.u.hasOwnProperty(userid) || userid === u_handle || M.u[userid].c !== 1) {
-                continue;
-            }
-            this._match(M.getNameByHandle(userid), SearchResultType.kMember, userid, {'chatId': userid});
-
-            if (this.originalSearchString.length > 2 && M.u[userid].m) {
-                this._match(M.u[userid].m, SearchResultType.kMember, userid, {'chatId': userid});
-            }
-        }
-        this._matchedContacts = true;
-    }
     var len = this.roomSearches.length;
     for (var i = 0; i < len; i++) {
         this.roomSearches[i].resume();
     }
+
+    // match contacts
+    if (this._matchedContacts !== true) {
+        for (const userid in M.u) {
+            if (!M.u.hasOwnProperty(userid) || userid === u_handle || M.u[userid].c !== 1) {
+                continue;
+            }
+            const nameRef = M.getNameByHandle(userid);
+            this._match(nameRef, SearchResultType.kMember, userid, { chatId: userid, nameRef });
+
+            if (this.originalSearchString.length > 2 && M.u[userid].m) {
+                this._match(M.u[userid].m, SearchResultType.kMember, userid, { chatId: userid, nameRef });
+            }
+        }
+        this._matchedContacts = true;
+    }
+
     if (len === 0) {
         // no room searches, mark as completed.
         this.handler.onComplete();

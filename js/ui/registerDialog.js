@@ -30,8 +30,8 @@
 
     function doProRegister($dialog) {
 
-        var rv = {};
-        var hideOverlay = function() {
+        const rv = {};
+        const hideOverlay = () => {
             loadingDialog.hide();
             $dialog.removeClass('arrange-to-back');
         };
@@ -48,16 +48,16 @@
             return false;
         }
 
-        var registrationDone = function(login) {
+        const registrationDone = (login) => {
 
-            var onAccountCreated = options.onAccountCreated && options.onAccountCreated.bind(options);
+            const onAccountCreated = options.onAccountCreated && options.onAccountCreated.bind(options);
 
             hideOverlay();
             closeRegisterDialog($dialog);
             $('.mega-dialog.registration-page-success').off('click');
 
             if (login) {
-                Soon(function() {
+                Soon(() => {
                     showToast('megasync', l[8745]);
                     $('.fm-avatar img').attr('src', useravatar.mine());
                 });
@@ -80,7 +80,7 @@
          * @param {Number} result The result of the 'uc' API request
          * @param {Boolean} oldMethod Using old registration method.
          */
-        var continueProRegistration = function(result, oldMethod) {
+        const continueProRegistration = (result, oldMethod) => {
             if (result === 0) {
                 if (oldMethod) {
                     var ops = {
@@ -111,7 +111,7 @@
                     options.$dialog.find('input.email').megaInputsShowError(l[1297]);
                 }
                 else {
-                    msgDialog('warninga', l[1578], l[200], api_strerror(result), function() {
+                    msgDialog('warninga', l[1578], l[200], api_strerror(result), () => {
                         if ($('.mega-dialog:visible').removeClass('arrange-to-back').length) {
                             fm_showoverlay();
                         }
@@ -124,22 +124,14 @@
          * Continue the new method registration
          * @param {Number} result The result of the 'uc2' API request
          */
-        var continueOldProRegistration = function(result) {
-            continueProRegistration(result, true);
-        };
-
-        /**
-         * Continue the new method registration
-         * @param {Number} result The result of the 'uc2' API request
-         */
-        var continueNewProRegistration = function(result) {
+        const continueNewProRegistration = (result) => {
             continueProRegistration(result, false);
         };
 
         /**
          * The main function to register the account
          */
-        var registeraccount = function() {
+        const registeraccount = function() {
 
             rv.password = $('input.pass', $dialog).val();
             rv.first = $.trim($('input.f-name', $dialog).val());
@@ -148,35 +140,34 @@
             rv.name = rv.first + ' ' + rv.last;
 
             // Set a flag that the registration came from the Pro page
-            var fromProPage = localStorage.getItem('proPageContinuePlanNum') !== null;
+            const fromProPage = localStorage.getItem('proPageContinuePlanNum') !== null;
 
             // Set the signup function to start the new secure registration process
-            if (security.register.newRegistrationEnabled()) {
-                security.register.startRegistration(rv.first, rv.last, rv.email, rv.password,
-                                                    fromProPage, continueNewProRegistration);
-            }
-            else {
-                // Set the signup function to use the legacy registration process
-                sendsignuplink(rv.name, rv.email, rv.password, { callback: continueOldProRegistration }, fromProPage);
-            }
+            security.register.startRegistration(
+                rv.first,
+                rv.last,
+                rv.email,
+                rv.password,
+                fromProPage,
+                continueNewProRegistration);
         };
 
-        var err = false;
-        var $formWrapper = $dialog.find('form');
-        var $firstName = $('input.f-name', $formWrapper);
-        var $lastName = $('input.l-name', $formWrapper);
-        var $email = $('input.email', $formWrapper);
-        var $password = $('input.pass', $formWrapper);
-        var $confirmPassword = $('input.confirm-pass', $formWrapper);
+        let err = false;
+        const $formWrapper = $('form', $dialog);
+        const $firstName = $('input.f-name', $formWrapper);
+        const $lastName = $('input.l-name', $formWrapper);
+        const $email = $('input.email', $formWrapper);
+        const $password = $('input.pass', $formWrapper);
+        const $confirmPassword = $('input.confirm-pass', $formWrapper);
 
-        var firstName = $.trim($firstName.val());
-        var lastName = $.trim($lastName.val());
-        var email = $.trim($email.val());
-        var password = $password.val();
-        var confirmPassword = $confirmPassword.val();
+        const firstName = $.trim($firstName.val());
+        const lastName = $.trim($lastName.val());
+        const email = $.trim($email.val());
+        const password = $password.val();
+        const confirmPassword = $confirmPassword.val();
 
         // Check if the entered passwords are valid or strong enough
-        var passwordValidationResult = security.isValidPassword(password, confirmPassword);
+        const passwordValidationResult = security.isValidPassword(password, confirmPassword);
 
         // If bad result
         if (passwordValidationResult !== true) {
@@ -192,13 +183,13 @@
             $confirmPassword.megaInputsShowError();
 
             // Make These two error disappear together
-            $password.rebind('input.hideError', function() {
+            $password.rebind('input.hideError', () => {
                 $confirmPassword.megaInputsHideError();
                 $password.off('input.hideError');
                 $confirmPassword.off('input.hideError');
             });
 
-            $confirmPassword.rebind('input.hideError', function() {
+            $confirmPassword.rebind('input.hideError', () => {
                 $password.megaInputsHideError();
                 $password.off('input.hideError');
                 $confirmPassword.off('input.hideError');
@@ -219,13 +210,13 @@
             $firstName.focus();
 
             // Make These two error disappear together
-            $firstName.rebind('input.hideError', function() {
+            $firstName.rebind('input.hideError', () => {
                 $lastName.megaInputsHideError();
                 $firstName.off('input.hideError');
                 $lastName.off('input.hideError');
             });
 
-            $lastName.rebind('input.hideError', function() {
+            $lastName.rebind('input.hideError', () => {
                 $firstName.megaInputsHideError();
                 $firstName.off('input.hideError');
                 $lastName.off('input.hideError');
@@ -403,9 +394,9 @@
      * @param {Function} onCloseCallback Optional callback to invoke on close
      */
     function sendSignupLinkDialog(accountData, onCloseCallback) {
-        var $dialog = $('.mega-dialog.registration-page-success').removeClass('hidden');
-        var $changeEmailLink = $('.reg-success-change-email-btn', $dialog);
-        var $resendEmailButton = $('.resend-email-button', $dialog);
+        const $dialog = $('.mega-dialog.registration-page-success').removeClass('hidden');
+        const $changeEmailLink = $('.reg-success-change-email-btn', $dialog);
+        const $resendEmailButton = $('.resend-email-button', $dialog);
 
         if (page && page.indexOf("chat/") > -1  || page === "chat") {
             $dialog.addClass('chatlink');
@@ -417,9 +408,11 @@
             $('.reg-success-icon-chat', $dialog).addClass('hidden');
             $('.reg-success-icon', $dialog).removeClass('hidden');
         }
-        $('.reg-resend-email-txt', $dialog).text(accountData.email);
 
-        $changeEmailLink.rebind('click', function(event) {
+        const $resendEmailTxt = $('.reg-resend-email-txt', $dialog);
+        $resendEmailTxt.text(accountData.email).attr('data-simpletip', accountData.email);
+
+        $changeEmailLink.rebind('click', (event) => {
             event.preventDefault();
             $('.reg-resend-email-txt', $dialog).addClass('hidden');
             $('footer', $dialog).addClass('hidden');
@@ -435,7 +428,7 @@
         });
 
         $resendEmailButton.rebind('click', function _click() {
-            var ctx = {
+            const ctx = {
                 callback: function(res) {
                     loadingDialog.hide();
 
@@ -449,8 +442,8 @@
                         $resendEmailButton.addClass('disabled');
                         $resendEmailButton.off('click');
 
-                        var tick = 26;
-                        var timer = setInterval(function() {
+                        let tick = 26;
+                        var timer = setInterval(() => {
                             if (--tick === 0) {
                                 clearInterval(timer);
                                 $resendEmailButton.text(l[8744]);
@@ -474,7 +467,7 @@
             };
             loadingDialog.show();
 
-            var newEmail = $.trim($('input', $dialog).val());
+            const newEmail = $.trim($('input', $dialog).val());
 
             // Verify the new email address is in valid format
             if (!isValidEmail(newEmail)) {
@@ -486,23 +479,16 @@
                 return false;
             }
 
-            // If the new registration method is enabled, re-send the signup link using the new method
-            if (security.register.newRegistrationEnabled()) {
-                security.register.repeatSendSignupLink(accountData.first, accountData.last, newEmail, ctx.callback);
-            }
-            else {
-                // Otherwise use the old method
-                sendsignuplink(accountData.name, newEmail, accountData.password, ctx, true);
-            }
+            security.register.repeatSendSignupLink(accountData.first, accountData.last, newEmail, ctx.callback);
         });
 
         if (typeof onCloseCallback === 'function') {
             // Show dialog close button
             $('button.js-close', $dialog).removeClass('hidden');
 
-            $('button.js-close', $dialog).rebind('click', function _click() {
+            $('button.js-close', $dialog).rebind('click', () => {
 
-                msgDialog('confirmation', l[1334], l[5710], false, function(ev) {
+                msgDialog('confirmation', l[1334], l[5710], false, (ev) => {
 
                     // Confirm abort registration
                     if (ev) {
@@ -526,7 +512,7 @@
         if (onCloseCallback === true) {
             // we just want the close button to be show and to not trigger anything closing it.
             $('button.js-close', $dialog).removeClass('hidden');
-            $('button.js-close', $dialog).rebind('click', function() {
+            $('button.js-close', $dialog).rebind('click', () => {
                 // TODO: Move this to safeShowDialog();
                 $dialog.addClass('hidden');
                 fm_hideoverlay();
@@ -538,6 +524,13 @@
         $('.content-block', $dialog).removeClass('dialog-bottom');
         $('footer', $dialog).removeClass('hidden');
         $dialog.addClass('special').show();
+
+        if ($resendEmailTxt[0].scrollWidth > $resendEmailTxt[0].offsetWidth) {
+            $resendEmailTxt.addClass('simpletip').attr("data-simpletip-class", "no-max-width");
+        }
+        else {
+            $resendEmailTxt.removeClass('simpletip').removeAttr('data-simpletip-class');
+        }
     }
 
     // export

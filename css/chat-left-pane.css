@@ -696,7 +696,6 @@ li.active .call-duration i {
 
 .result-table .result-table-row .user-card span {
     overflow: hidden;
-    float: left;
     min-width: 16px;
     max-width: 100%;
     max-width: -webkit-calc(100% - 25px);
@@ -709,6 +708,8 @@ li.active .call-duration i {
 
 .result-table .result-table-row .user-card .graphic {
     overflow: hidden;
+    display: flex;
+    align-items: center;
 }
 
 .result-table .result-table-row .user-card .graphic span:nth-child(1) {
@@ -736,10 +737,6 @@ li.active .call-duration i {
     color: var(--text-color-medium);
 }
 
-.result-table .result-table-row .user-card .user-card-presence {
-    margin: 0 0 1px 8px;
-}
-
 /* --- Result Row: Messages --- */
 
 .result-table .result-table-row.message {
@@ -761,8 +758,7 @@ li.active .call-duration i {
 }
 
 .result-table .result-table-row.message span {
-    display: block;
-    max-width: 100%;
+    /* [...] */
 }
 
 .result-table .result-table-row.message span.title {

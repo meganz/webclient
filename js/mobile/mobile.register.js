@@ -152,30 +152,30 @@ mobile.register = {
 
         'use strict';
 
-        var $firstNameField = this.$registerScreen.find('.first-name input');
-        var $lastNameField = this.$registerScreen.find('.last-name input');
-        var $emailField = this.$registerScreen.find('.email-address input');
-        var $passwordField = this.$registerScreen.find('.password input');
-        var $confirmPasswordField = this.$registerScreen.find('.password-confirm input');
-        var $confirmTermsCheckbox = this.$registerScreen.find('.confirm-terms input');
-        var $tncCheckbox = $('.confirm-terms input', this.$registerScreen);
-        var $registerButton = this.$registerScreen.find('.register-button');
-        var $containerFields = $emailField.parent().add($passwordField.parent()).add($confirmPasswordField.parent());
-        var registerInfo = this.registerInfo;
+        const $firstNameField = this.$registerScreen.find('.first-name input');
+        const $lastNameField = this.$registerScreen.find('.last-name input');
+        const $emailField = this.$registerScreen.find('.email-address input');
+        const $passwordField = this.$registerScreen.find('.password input');
+        const $confirmPasswordField = this.$registerScreen.find('.password-confirm input');
+        const $confirmTermsCheckbox = this.$registerScreen.find('.confirm-terms input');
+        const $tncCheckbox = $('.confirm-terms input', this.$registerScreen);
+        const $registerButton = this.$registerScreen.find('.register-button');
+        const $containerFields = $emailField.parent().add($passwordField.parent()).add($confirmPasswordField.parent());
+        const registerInfo = this.registerInfo;
 
         // Add click/tap handler to login button
-        $registerButton.off('tap').on('tap', function() {
+        $registerButton.rebind('tap', () => {
 
             // Get the current text field values
-            var firstName = $.trim($firstNameField.val());
-            var lastName = $.trim($lastNameField.val());
-            var email = $.trim($emailField.val());
-            var password = $passwordField.val();
-            var confirmPassword = $confirmPasswordField.val();
+            const firstName = $.trim($firstNameField.val());
+            const lastName = $.trim($lastNameField.val());
+            const email = $.trim($emailField.val());
+            const password = $passwordField.val();
+            const confirmPassword = $confirmPasswordField.val();
 
             // If the fields are not completed, the button should not do anything and looks disabled anyway
             if (firstName.length < 1 || lastName.length < 1 || email.length < 1 ||
-                    password.length < 1 || confirmPassword.length < 1 || $tncCheckbox[0].checked === false) {
+                password.length < 1 || confirmPassword.length < 1 || $tncCheckbox[0].checked === false) {
 
                 return false;
             }
@@ -265,19 +265,18 @@ mobile.register = {
             }
             else {
                 // If they came from the Pro page, set the flag
-                var fromProPage = localStorage.getItem('proPageContinuePlanNum') || false;
+                const fromProPage = localStorage.getItem('proPageContinuePlanNum') || false;
 
-                // If the flag has been set to use the new registration method
-                var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
+                // Support of old registration is removed in ticket WEB-15124
 
                 // Start the registration process
-                mobile.register[method].startRegistration(
+                mobile.register.new.startRegistration(
                     firstName,
                     lastName,
                     email,
                     password,
                     fromProPage,
-                    mobile.register[method].completeRegistration     // Complete callback
+                    mobile.register.new.completeRegistration     // Complete callback
                 );
             }
 
@@ -366,8 +365,7 @@ mobile.register = {
                 return false;
             }
 
-            // If the flag has been set to use the new registration method
-            var method = (security.register.newRegistrationEnabled()) ? 'new' : 'old';
+            // Support of old registration is removed in ticket WEB-15124
 
             // Update the email to the new email address
             registrationVars.email = $.trim($changeEmailInput.val());
@@ -376,7 +374,7 @@ mobile.register = {
             loadingDialog.show();
 
             // Resend the email to the new address
-            mobile.register[method].processResendEmail(registrationVars);
+            mobile.register.new.processResendEmail(registrationVars);
 
             // Only let them send once (until they change email again)
             $resendButton.removeClass('active');
@@ -459,172 +457,6 @@ mobile.register = {
         api_req({ a: 'ucr' });
         delete localStorage.awaitingConfirmationAccount;
         init_page();
-    }
-};
-
-
-/**
- * Functions for the old registration process. ToDo: remove this code once the new process is enabled across all apps.
- **/
-mobile.register.old = {
-
-    /**
-     * Start the registration process
-     * @param {String} firstName The user's first name
-     * @param {String} lastName The user's last name
-     * @param {String} email The user's email address
-     * @param {String} password The user's password
-     * @param {Boolean} fromProPage Whether the registration started on the Pro page or not
-     * @param {Function} completeCallback A function to run when the registration is complete
-     */
-    startRegistration: function(firstName, lastName, email, password, fromProPage, completeCallback) {
-
-        'use strict';
-
-        // Show loading dialog
-        loadingDialog.show();
-
-        // Set a flag to check at the end of the registration process
-        localStorage.signUpStartedInMobileWeb = '1';
-
-        u_storage = init_storage(localStorage);
-
-        var userContext = {
-            checkloginresult: function(context, result) {
-
-                // Set the user type
-                u_type = result;
-
-                // Register the account
-                completeCallback(firstName, lastName, email, password, fromProPage);
-            }
-        };
-
-        // Create anonymous account
-        u_checklogin(userContext, true);
-    },
-
-    /**
-     * Send the signup link via email
-     * @param {String} firstName The user's first name
-     * @param {String} lastName The user's last name
-     * @param {String} email The user's email address
-     * @param {String} password The user's password
-     * @param {Boolean} fromProPage Whether the registration started on the Pro page or not
-     */
-    completeRegistration: function(firstName, lastName, email, password, fromProPage) {
-
-        'use strict';
-        loadingDialog.hide();
-        var registrationVars = {
-            password: password,
-            first: firstName,
-            last: lastName,
-            email: email,
-            name: firstName + ' ' + lastName
-        };
-        var context = {
-            callback: function(result) {
-
-                loadingDialog.hide();
-
-                // If successful result
-                if (result === 0) {
-                    var ops = {
-                        a: 'up',
-                        terms: 'Mq',
-                        firstname: base64urlencode(to8(registrationVars.first)),
-                        lastname: base64urlencode(to8(registrationVars.last)),
-                        name2: base64urlencode(to8(registrationVars.name))
-                    };
-
-                    u_attr.terms = 1;
-
-                    security.register.cacheRegistrationData(registrationVars);
-
-                    if (mega.affid) {
-                        ops.aff = mega.affid;
-                    }
-
-                    api_req(ops);
-
-                    // Try getting the plan number they selected on Pro page
-                    var planNum = localStorage.getItem('proPageContinuePlanNum');
-
-                    // If they did come from the Pro page, continue to Pro page Step 2 and skip email confirmation
-                    if (planNum !== null) {
-
-                        // Remove the flag as it's no longer needed
-                        localStorage.removeItem('proPageContinuePlanNum');
-
-                        // Continue to the Pro payment page
-                        loadSubPage('propay_' + planNum);
-                    }
-                    else {
-                        // Otherwise show the signup email confirmation screen
-                        mobile.register.showConfirmEmailScreen(registrationVars);
-                    }
-                }
-
-                // Show an error if the email is already in use
-                else if (result === EEXIST) {
-                    mobile.messageOverlay.show(l[9000]);    // Error. This email address is already in use.
-                }
-                else {
-                    // Show an error
-                    mobile.messageOverlay.show(l[47], result);      // Oops, something went wrong.
-                }
-            }
-        };
-
-        // Run the old password key derivation function, encrypt the Master Key and send the confirmation email
-        sendsignuplink(registrationVars.name, registrationVars.email, registrationVars.password, context, fromProPage);
-    },
-
-    /**
-     * Initialises the Resend button on the email confirmation screen to send the confirmation link again
-     * Uses the old registration process. ToDo: Remove in future when old registrations are no longer used.
-     * @param {Object} registrationVars The registration form variables i.e. name, email etc
-     */
-    processResendEmail: function(registrationVars) {
-
-        'use strict';
-
-        // Send the confirmation email
-        sendsignuplink(registrationVars.name, registrationVars.email, registrationVars.password, {
-            callback: function(result) {
-
-                loadingDialog.hide();
-
-                // If successful result
-                if (result === 0) {
-                    var ops = {
-                        a: 'up',
-                        terms: 'Mq',
-                        firstname: base64urlencode(to8(registrationVars.first)),
-                        lastname: base64urlencode(to8(registrationVars.last)),
-                        name2: base64urlencode(to8(registrationVars.name))
-                    };
-
-                    u_attr.terms = 1;
-
-                    security.register.cacheRegistrationData(registrationVars);
-
-                    if (mega.affid) {
-                        ops.aff = mega.affid;
-                    }
-
-                    api_req(ops);
-
-                    // Show a dialog success
-                    mobile.messageOverlay.show(l[16351]);     // The email was sent successfully.
-                }
-                else {
-                    // Show an error
-                    mobile.messageOverlay.show(l[47]);     // Oops, something went wrong. Sorry about that!
-                }
-            }
-        });
     }
 };
 

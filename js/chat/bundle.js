@@ -5816,6 +5816,7 @@ __webpack_require__.d(__webpack_exports__, {
 "ContactCard": () => (ContactCard),
 "ContactFingerprint": () => (ContactFingerprint),
 "ContactItem": () => (ContactItem),
+"ContactPickerDialog": () => (ContactPickerDialog),
 "ContactPickerWidget": () => (ContactPickerWidget),
 "ContactPresence": () => (ContactPresence),
 "ContactVerified": () => (ContactVerified),
@@ -5824,7 +5825,7 @@ __webpack_require__.d(__webpack_exports__, {
 "MAX_FREQUENTS": () => (MAX_FREQUENTS),
 "MembersAmount": () => (MembersAmount)
 });
-var _extends7__ = __webpack_require__(462);
+var _extends8__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
 var _mixins1__ = __webpack_require__(503);
@@ -5833,6 +5834,8 @@ var _ui_perfectScrollbar_jsx3__ = __webpack_require__(285);
 var _ui_buttons_jsx4__ = __webpack_require__(204);
 var _ui_dropdowns_jsx5__ = __webpack_require__(78);
 var _contactsPanel_contactsPanel_jsx6__ = __webpack_require__(105);
+var _ui_modalDialogs7__ = __webpack_require__(904);
+
 
 
 
@@ -5904,7 +5907,7 @@ class ContactButton extends _mixins1__._p {
     var contact = self.props.contact;
     var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
     var moreDropdowns = [];
-    var username = react0().createElement(_ui_utils_jsx2__.Emoji, null, M.getNameByHandle(contact.u));
+    const username = react0().createElement(_ui_utils_jsx2__.OFlowEmoji, null, M.getNameByHandle(contact.u));
 
     var onContactClicked = function () {
       if (contact.c === 2) {
@@ -6393,7 +6396,7 @@ class Avatar extends _mixins1__._p {
     }
 
     if (avatarMeta.type === "image") {
-      displayedAvatar = react0().createElement("div", (0,_extends7__.Z)({
+      displayedAvatar = react0().createElement("div", (0,_extends8__.Z)({
         className: classes,
         style: this.props.style
       }, extraProps, {
@@ -6413,7 +6416,7 @@ class Avatar extends _mixins1__._p {
         classes += " default-bg";
       }
 
-      displayedAvatar = react0().createElement("div", (0,_extends7__.Z)({
+      displayedAvatar = react0().createElement("div", (0,_extends8__.Z)({
         className: classes,
         style: this.props.style
       }, extraProps, {
@@ -6485,7 +6488,7 @@ class ContactCard extends _mixins1__._p {
       username += " (" + escapeHTML(l[8885]) + ")";
     }
 
-    var escapedUsername = react0().createElement(_ui_utils_jsx2__.Emoji, null, username);
+    var escapedUsername = react0().createElement(_ui_utils_jsx2__.OFlowEmoji, null, username);
     var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
     var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
     var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
@@ -7291,6 +7294,47 @@ ContactPickerWidget.defaultProps = {
   newNoContact: false,
   emailTooltips: false
 };
+class ContactPickerDialog extends _mixins1__.wl {
+  render() {
+    const {
+      active,
+      allowEmpty,
+      className,
+      exclude,
+      megaChat,
+      multiple,
+      multipleSelectedButtonLabel,
+      name,
+      nothingSelectedButtonLabel,
+      selectFooter,
+      showTopButtons,
+      singleSelectedButtonLabel,
+      onClose,
+      onSelectDone
+    } = this.props;
+    return react0().createElement(_ui_modalDialogs7__.Z.ModalDialog, {
+      name: name,
+      className: `${className} contact-picker-dialog contacts-search`,
+      onClose: onClose
+    }, react0().createElement(ContactPickerWidget, {
+      active: active,
+      allowEmpty: allowEmpty,
+      className: 'popup contacts-search small-footer',
+      contacts: M.u,
+      exclude: exclude,
+      megaChat: megaChat,
+      multiple: multiple,
+      multipleSelectedButtonLabel: multipleSelectedButtonLabel,
+      nothingSelectedButtonLabel: nothingSelectedButtonLabel,
+      selectFooter: selectFooter,
+      showTopButtons: showTopButtons,
+      singleSelectedButtonLabel: singleSelectedButtonLabel,
+      onClose: onClose,
+      onSelectDone: onSelectDone
+    }));
+  }
+
+}
 
 /***/ }),
 
@@ -7384,11 +7428,18 @@ var genericNodePropsComponent = __webpack_require__(297);
 
 
 class ColumnContactName extends genericNodePropsComponent.L {
+  constructor() {
+    super(...arguments);
+    this.Mail = (0,utils.withOverflowObserver)(() => external_React_default().createElement("span", {
+      className: "contact-item-email"
+    }, this.props.nodeAdapter.props.node.m));
+  }
+
   render() {
-    let {
+    const {
       nodeAdapter
     } = this.props;
-    let {
+    const {
       node
     } = nodeAdapter.props;
     return external_React_default().createElement("td", null, external_React_default().createElement(contacts.Avatar, {
@@ -7398,9 +7449,7 @@ class ColumnContactName extends genericNodePropsComponent.L {
       className: "contact-item"
     }, external_React_default().createElement("div", {
       className: "contact-item-user"
-    }, external_React_default().createElement(utils.Emoji, null, nodeAdapter.nodeProps.title)), external_React_default().createElement("div", {
-      className: "contact-item-email"
-    }, node.m)), external_React_default().createElement("div", {
+    }, external_React_default().createElement(utils.OFlowEmoji, null, nodeAdapter.nodeProps.title)), external_React_default().createElement(this.Mail, null)), external_React_default().createElement("div", {
       className: "clear"
     }));
   }
@@ -12694,6 +12743,13 @@ class JoinCallNotification extends mixins.wl {
 
 }
 class ConversationRightArea extends mixins.wl {
+  constructor(props) {
+    super(props);
+    this.state = {
+      contactPickerDialog: false
+    };
+  }
+
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
   }
@@ -12838,22 +12894,13 @@ class ConversationRightArea extends mixins.wl {
       className: "link-button light",
       icon: "sprite-fm-mono icon-add-small",
       label: l[8007],
-      disabled: call.ZP.isGuest() || !(!room.isReadOnly() && room.iAmOperator() && !self.allContactsInChat(excludedParticipants))
-    }, external_React_default().createElement(dropdowns.DropdownContactsSelector, {
-      contacts: this.props.contacts,
-      chatRoom: room,
-      exclude: excludedParticipants,
-      multiple: true,
-      className: "popup add-participant-selector",
-      singleSelectedButtonLabel: l[8869],
-      multipleSelectedButtonLabel: l[8869],
-      nothingSelectedButtonLabel: l[8870],
-      onSelectDone: this.props.onAddParticipantSelected.bind(this),
-      positionMy: "center top",
-      positionAt: "left bottom",
-      arrowHeight: -32,
-      selectFooter: true
-    }));
+      disabled: call.ZP.isGuest() || !(!room.isReadOnly() && room.iAmOperator() && !self.allContactsInChat(excludedParticipants)),
+      onClick: () => {
+        this.setState({
+          contactPickerDialog: true
+        });
+      }
+    });
     const {
       pushSettingsValue,
       onPushSettingsToggled,
@@ -13130,7 +13177,27 @@ class ConversationRightArea extends mixins.wl {
       key: "incomingShares",
       title: l[5542],
       chatRoom: room
-    }) : null))));
+    }) : null))), this.state.contactPickerDialog && external_React_default().createElement(ui_contacts.ContactPickerDialog, {
+      exclude: excludedParticipants,
+      megaChat: room.megaChat,
+      multiple: true,
+      className: 'popup add-participant-selector',
+      singleSelectedButtonLabel: l[8869],
+      multipleSelectedButtonLabel: l[8869],
+      nothingSelectedButtonLabel: l[8870],
+      onSelectDone: selected => {
+        this.props.onAddParticipantSelected(selected);
+        this.setState({
+          contactPickerDialog: false
+        });
+      },
+      onClose: () => {
+        this.setState({
+          contactPickerDialog: false
+        });
+      },
+      selectFooter: true
+    }));
   }
 
 }
@@ -14349,7 +14416,7 @@ class MessageRow extends mixins.wl {
       className: "title"
     }, external_React_default().createElement(ui_contacts.ContactAwareName, {
       contact: M.u[contact]
-    }, external_React_default().createElement(utils.Emoji, null, room.getRoomTitle()))), isGroup ? null : external_React_default().createElement(ui_contacts.ContactPresence, {
+    }, external_React_default().createElement(utils.OFlowEmoji, null, room.getRoomTitle()))), isGroup ? null : external_React_default().createElement(ui_contacts.ContactPresence, {
       contact: M.u[contact]
     }), external_React_default().createElement("div", {
       className: "clear"
@@ -14357,7 +14424,7 @@ class MessageRow extends mixins.wl {
       className: "message-result-info"
     }, external_React_default().createElement("div", {
       className: "summary"
-    }, external_React_default().createElement(utils.ParsedHTML, {
+    }, external_React_default().createElement(utils.OFlowParsedHTML, {
       content: megaChat.highlight(summary, matches, true)
     })), external_React_default().createElement("div", {
       className: "result-separator"
@@ -14392,7 +14459,7 @@ class ChatRow extends mixins.wl {
       className: USER_CARD_CLASS
     }, external_React_default().createElement("div", {
       className: "graphic"
-    }, external_React_default().createElement(utils.ParsedHTML, null, result))), external_React_default().createElement("div", {
+    }, external_React_default().createElement(utils.OFlowParsedHTML, null, result))), external_React_default().createElement("div", {
       className: "clear"
     }));
   }
@@ -14416,14 +14483,14 @@ class MemberRow extends mixins.wl {
     const userCard = {
       graphic: external_React_default().createElement("div", {
         className: "graphic"
-      }, isGroup ? external_React_default().createElement(utils.ParsedHTML, null, megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.ParsedHTML, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
+      }, isGroup ? external_React_default().createElement(utils.OFlowParsedHTML, null, megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.OFlowParsedHTML, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
         contact: contact
       }))),
       textual: external_React_default().createElement("div", {
         className: "textual"
-      }, isGroup ? external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("span", null, external_React_default().createElement(utils.Emoji, null, room.topic || room.getRoomTitle())), external_React_default().createElement(ui_contacts.MembersAmount, {
+      }, isGroup ? external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("span", null, external_React_default().createElement(utils.OFlowEmoji, null, room.topic || room.getRoomTitle())), external_React_default().createElement(ui_contacts.MembersAmount, {
         room: room
-      })) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.Emoji, null, nicknames.getNickname(data)), external_React_default().createElement(ui_contacts.LastActivity, {
+      })) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.OFlowEmoji, null, nicknames.getNickname(data)), external_React_default().createElement(ui_contacts.LastActivity, {
         contact: contact,
         showLastGreen: true
       })))
@@ -14451,6 +14518,7 @@ const NilRow = _ref => {
     onSearchMessages,
     isFirstQuery
   } = _ref;
+  const label = LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>');
   return external_React_default().createElement("div", {
     className: `${SEARCH_ROW_CLASS} nil`
   }, external_React_default().createElement("div", {
@@ -14460,9 +14528,9 @@ const NilRow = _ref => {
   }), external_React_default().createElement("span", null, LABEL.NO_RESULTS), isFirstQuery && external_React_default().createElement("div", {
     className: "search-messages",
     onClick: onSearchMessages
-  }, external_React_default().createElement(utils.ParsedHTML, {
+  }, external_React_default().createElement(utils.OFlowParsedHTML, {
     tag: "div",
-    content: LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>')
+    content: label
   }))));
 };
 
@@ -15357,7 +15425,7 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
       nameClassString += " privateChat";
     }
 
-    var roomTitle = conversations_React.createElement(utils.Emoji, null, chatRoom.getRoomTitle());
+    var roomTitle = conversations_React.createElement(utils.OFlowEmoji, null, chatRoom.getRoomTitle());
 
     if (chatRoom.type === "private") {
       roomTitle = conversations_React.createElement(ui_contacts.ContactAwareName, {
@@ -15953,7 +16021,7 @@ class ArchivedConversationsList extends mixins.wl {
       className: "calculated-width",
       onClick: self.onSortNameClicked
     }, conversations_React.createElement("div", {
-      className: "is-chat name"
+      className: "is-chat arrow name"
     }, l[86], conversations_React.createElement("i", {
       className: nameOrderClass ? `sprite-fm-mono icon-arrow-${nameOrderClass}` : ''
     }))), conversations_React.createElement("th", {
@@ -23387,14 +23455,14 @@ class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationM
       className: "message richpreview title"
     }, l[18679])), metaRichpreviewConfirmation_React.createElement("div", {
       className: "message richpreview desc"
-    }, l[18680]), metaRichpreviewConfirmation_React.createElement("div", {
+    }, l[18680])), metaRichpreviewConfirmation_React.createElement("div", {
       className: "buttons-block"
     }, metaRichpreviewConfirmation_React.createElement("button", {
       className: "mega-button right positive",
-      onClick: function () {
+      onClick: () => {
         self.doAllow();
       }
-    }, metaRichpreviewConfirmation_React.createElement("span", null, l[18681])), notNowButton, neverButton))), metaRichpreviewConfirmation_React.createElement("div", {
+    }, metaRichpreviewConfirmation_React.createElement("span", null, l[18681])), notNowButton, neverButton)), metaRichpreviewConfirmation_React.createElement("div", {
       className: "clear"
     })));
   }
@@ -29308,7 +29376,16 @@ class FMView extends mixins.wl {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.currentlyViewedEntry !== this.props.currentlyViewedEntry) {
+    const {
+      currentlyViewedEntry: currEntry,
+      searchValue: currSearch
+    } = this.props;
+    const {
+      currentlyViewedEntry: prevEntry,
+      searchValue: prevSearch
+    } = prevProps;
+
+    if (prevEntry !== currEntry || currSearch !== prevSearch) {
       var _this$dataSource3;
 
       let newState = {
@@ -29320,7 +29397,7 @@ class FMView extends mixins.wl {
         this.addOrUpdRawListener();
       }
 
-      var handle = this.props.currentlyViewedEntry;
+      const handle = currEntry;
 
       if (handle === 'shares') {
         newState.isLoading = true;
@@ -30829,8 +30906,11 @@ const __WEBPACK_DEFAULT_EXPORT__ = ({
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
 "Emoji": () => (Emoji),
+"OFlowEmoji": () => (OFlowEmoji),
+"OFlowParsedHTML": () => (OFlowParsedHTML),
 "ParsedHTML": () => (ParsedHTML),
-"default": () => (__WEBPACK_DEFAULT_EXPORT__)
+"default": () => (__WEBPACK_DEFAULT_EXPORT__),
+"withOverflowObserver": () => (withOverflowObserver)
 });
 var _chat_mixins0__ = __webpack_require__(503);
 var React = __webpack_require__(363);
@@ -31041,6 +31121,48 @@ class RenderTo extends React.Component {
 
 }
 
+const withOverflowObserver = Component => class extends _chat_mixins0__._p {
+  constructor() {
+    super(...arguments);
+    this.displayName = 'OverflowObserver';
+    this.ref = React.createRef();
+    this.state = {
+      overflowed: false
+    };
+
+    this.handleMouseEnter = () => {
+      const element = this.ref && this.ref.current;
+
+      if (element) {
+        this.setState({
+          overflowed: element.scrollWidth > element.offsetWidth
+        });
+      }
+    };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextState.overflowed !== this.state.overflowed || nextProps.children !== this.props.children || nextProps.content !== this.props.content;
+  }
+
+  render() {
+    const {
+      simpletip
+    } = this.props;
+    return React.createElement("div", {
+      ref: this.ref,
+      className: `
+                        overflow-observer
+                        ${this.state.overflowed ? 'simpletip simpletip-tc' : ''}
+                    `,
+      "data-simpletipposition": (simpletip == null ? void 0 : simpletip.position) || 'top',
+      "data-simpletipoffset": simpletip == null ? void 0 : simpletip.offset,
+      "data-simpletip-class": simpletip == null ? void 0 : simpletip.className,
+      onMouseEnter: this.handleMouseEnter
+    }, React.createElement(Component, this.props));
+  }
+
+};
 const Emoji = _ref => {
   let {
     children
@@ -31103,11 +31225,15 @@ class ParsedHTML extends React.Component {
   }
 
 }
+const OFlowEmoji = withOverflowObserver(Emoji);
+const OFlowParsedHTML = withOverflowObserver(ParsedHTML);
 const __WEBPACK_DEFAULT_EXPORT__ = ({
   JScrollPane,
   RenderTo,
   schedule: _chat_mixins0__.Os,
-  SoonFcWrap: _chat_mixins0__.M9
+  SoonFcWrap: _chat_mixins0__.M9,
+  OFlowEmoji,
+  OFlowParsedHTML
 });
 
 /***/ }),

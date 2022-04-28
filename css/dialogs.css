@@ -9351,6 +9351,10 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.registration-page-success .reg-resend-email-txt {
         font: var(--text-h3);
+        max-width: 540px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
 /* end registration-page-success */

@@ -762,6 +762,7 @@ function fmtopUI() {
     var $contactsTabBlock = $('.contacts-tabs-bl');
     var $sharesTabBlock = $('.shares-tabs-bl');
     var $galleryTabBlock = $('.gallery-tabs-bl');
+    const $galleryTabLink = $('.gallery-tab-lnk');
 
     $contactsTabBlock.add($sharesTabBlock).add($galleryTabBlock).addClass('hidden');
     $('.contacts-tab-lnk.active', $contactsTabBlock).removeClass('active');
@@ -864,6 +865,13 @@ function fmtopUI() {
         else if (M.currentCustomView.type === 'gallery') {
 
             $galleryTabBlock.removeClass('hidden');
+
+            if (M.currentdirid === 'favourites') {
+                $galleryTabLink.addClass('hidden');
+            }
+            else {
+                $galleryTabLink.removeClass('hidden');
+            }
 
             if (mega.gallery[M.currentdirid]) {
                 $('.gallery-tab-lnk', $galleryTabBlock).removeClass('active');

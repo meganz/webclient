@@ -650,7 +650,7 @@ def pruning():
                     elif prod in content and 'ok' in content[prod]:
                         if content[prod]['ok']:
                             if content[prod]['pruned'] > 0:
-                                print('Removed ' + content[prod]['pruned'] + ' unused strings')
+                                print('Removed ' + str(content[prod]['pruned']) + ' unused strings')
                                 print('Backup located in server directory ' + content[prod]['backup'])
                             else:
                                 print('Nothing to remove')
@@ -665,7 +665,7 @@ def pruning():
                         print('Error: Unexpected result')
                         return False
                 except:
-                    print('Error: ' + content)
+                    print('Error: ' + str(content))
                     return False
         print('Error: Pruning timed out')
     else:

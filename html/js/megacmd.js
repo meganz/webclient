@@ -133,24 +133,55 @@ function changeLinuxCMD(linuxClients, i) {
     var $page = $('.bottom-page.megacmd', '.fmholder');
 
     if (linuxClients[i]) {
-        var $linux32 = $('.linux32', $page);
-        var $linux64 = $('.linux64', $page);
+        const $linux32 = $('.linux32', $page);
+        const $linux64 = $('.linux64', $page);
+        const $parent32 = $linux32.parent();
+        const $parent64 = $linux64.parent();
 
-        if (linuxClients[i]['32']) {
-            $linux32.parent().removeClass('hidden');
-            $('.radio-txt.32', $page).removeClass('hidden');
-        }
-        else {
-            $linux32.parent().addClass('hidden');
-            $('.radio-txt.32', $page).addClass('hidden');
-            $linux32.prop('checked', false).parent().switchClass('radioOn', 'radioOff');
-            $linux64.prop('checked', true).parent().switchClass('radioOff', 'radioOn');
+        const is64 = !!linuxClients[i][64];
+        const is32 = !!linuxClients[i][32];
+        const hidden32 = $parent32.hasClass('hidden');
+        const hidden64 = $parent64.hasClass('hidden');
 
-            if (platformsel === '32') {
-                platformsel = '64';
-                $linux64.trigger('click');
+        // If we need to change which radio buttons are visible/selected
+        if (
+            !(is32 && !hidden32 && is64 && !hidden64)    // The 32bit + 64bit options are not both shown
+            && !(is32 && !hidden32 && !is64 && hidden64) // The 32bit option is not shown alone
+            && !(!is32 && hidden32 && is64 && !hidden64) // The 64bit option is not shown alone
+        ) {
+            $parent32.addClass('hidden');
+            $parent64.addClass('hidden');
+            $('.radio-txt.32, .radio-txt.64', $page).addClass('hidden');
+
+            if (is32) {
+                $parent32.removeClass('hidden');
+            }
+            if (is64) {
+                $parent64.removeClass('hidden');
+            }
+            if (is32 && is64) {
+                $linux64.prop('checked', true);
+                $parent64.removeClass('radioOff').addClass('radioOn');
+                $linux32.prop('checked', false);
+                $parent32.removeClass('radioOn').addClass('radioOff');
+                $('.radio-txt.32, .radio-txt.64', $page).removeClass('hidden');
+            }
+            else if (!is32 && is64) {
+                $linux64.prop('checked', true);
+                $parent64.removeClass('radioOff').addClass('radioOn');
+                $linux32.prop('checked', false);
+                $parent32.removeClass('radioOn').addClass('radioOff');
+                $('.radio-txt.64', $page).removeClass('hidden');
+            }
+            else {
+                $linux32.prop('checked', true);
+                $parent32.removeClass('radioOff').addClass('radioOn');
+                $linux64.prop('checked', false);
+                $parent64.removeClass('radioOn').addClass('radioOff');
+                $('.radio-txt.32', $page).removeClass('hidden');
             }
         }
+        // Handle setting the link correctly
 
         $('.linux-bit-radio', $page).removeClass('hidden');
 
@@ -195,7 +226,7 @@ function linuxMegacmdDropdown() {
 
                 icon = (icon === 'red') ? 'redhat' : icon;
 
-                if (val[platform] && platform === platformsel &&
+                if (val[platform] &&
                     $('div.option[data-client="' + val.name + '"]', $list).length === 0) {
                     itemNode = mCreateElement('div', {
                         'class': 'option',
@@ -211,6 +242,7 @@ function linuxMegacmdDropdown() {
         // Dropdown item click event
         $('.option', $dropdown).rebind('click.selectapp', function() {
             cmdsel = linuxnameindex[$(this).text()];
+            platformsel = linuxClients[cmdsel][64] ? '64' : '32';
             changeLinuxCMD(linuxClients, cmdsel);
         });
 

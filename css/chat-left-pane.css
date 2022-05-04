@@ -230,6 +230,10 @@
     float: left;
     width: calc(100% - 42px);
 }
+.conversations-pane .conversation-data .user-card-wrapper {
+    float: left;
+    width: 100%;
+}
 .user-card-name.conversation-name {
     float: left;
     max-width: calc(100% - 25px);

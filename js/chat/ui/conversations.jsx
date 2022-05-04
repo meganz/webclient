@@ -1,7 +1,7 @@
 // libs
 import { hot } from 'react-hot-loader/root';
 var React = require("react");
-import utils, {Emoji, OFlowEmoji, ParsedHTML} from './../../ui/utils.jsx';
+import utils, { Emoji, OFlowEmoji, OFlowParsedHTML, ParsedHTML } from './../../ui/utils.jsx';
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
 import {MegaRenderMixin, timing} from './../mixins';
 import {Button} from './../../ui/buttons.jsx';
@@ -250,9 +250,15 @@ class ConversationsListItem extends MegaRenderMixin {
         if (chatRoom.type !== "public") {
             nameClassString += " privateChat";
         }
-        var roomTitle = <OFlowEmoji>{chatRoom.getRoomTitle()}</OFlowEmoji>;
+        let roomTitle = <OFlowEmoji>{chatRoom.getRoomTitle()}</OFlowEmoji>;
         if (chatRoom.type === "private") {
-            roomTitle = <ContactAwareName contact={this.props.contact}>{roomTitle}</ContactAwareName>;
+            roomTitle =
+                <ContactAwareName contact={this.props.contact}>
+                    <div className="user-card-wrapper">
+                        <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>
+                    </div>
+                    <span className={`user-card-presence ${presenceClass}`} />
+                </ContactAwareName>;
         }
 
         var self = this;
@@ -271,12 +277,6 @@ class ConversationsListItem extends MegaRenderMixin {
                 <div className="conversation-data">
                     <div className={nameClassString}>
                         {roomTitle}
-                        {
-                            chatRoom.type === "private" ?
-                                <span className={"user-card-presence " + presenceClass}></span>
-                                :
-                                undefined
-                        }
                     </div>
                     {
                         chatRoom.type === "group" || chatRoom.type === "private" ?

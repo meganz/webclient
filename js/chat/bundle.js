@@ -15425,12 +15425,16 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
       nameClassString += " privateChat";
     }
 
-    var roomTitle = conversations_React.createElement(utils.OFlowEmoji, null, chatRoom.getRoomTitle());
+    let roomTitle = conversations_React.createElement(utils.OFlowEmoji, null, chatRoom.getRoomTitle());
 
     if (chatRoom.type === "private") {
       roomTitle = conversations_React.createElement(ui_contacts.ContactAwareName, {
         contact: this.props.contact
-      }, roomTitle);
+      }, conversations_React.createElement("div", {
+        className: "user-card-wrapper"
+      }, conversations_React.createElement(utils.OFlowParsedHTML, null, megaChat.html(chatRoom.getRoomTitle()))), conversations_React.createElement("span", {
+        className: `user-card-presence ${presenceClass}`
+      }));
     }
 
     var self = this;
@@ -15454,9 +15458,7 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
       className: "conversation-data"
     }, conversations_React.createElement("div", {
       className: nameClassString
-    }, roomTitle, chatRoom.type === "private" ? conversations_React.createElement("span", {
-      className: "user-card-presence " + presenceClass
-    }) : undefined), chatRoom.type === "group" || chatRoom.type === "private" ? conversations_React.createElement("i", {
+    }, roomTitle), chatRoom.type === "group" || chatRoom.type === "private" ? conversations_React.createElement("i", {
       className: "sprite-fm-uni icon-ekr-key simpletip",
       "data-simpletip": l[20935]
     }) : undefined, archivedDiv, notificationItems.length > 0 ? conversations_React.createElement("div", {
@@ -23682,9 +23684,9 @@ class MetaRichpreviewMegaLinks extends mixin.y {
           if (megaLinkInfo.hadLoaded()) {
             if (window.sfuClient && megaLinkInfo.is_chatlink) {
               const {
-                chatRoom: room
+                chatRoom: callRoom
               } = megaChat.activeCall;
-              const peers = room ? room.getParticipantsExceptMe(room.getCallParticipants()).map(h => M.getNameByHandle(h)) : [];
+              const peers = callRoom ? callRoom.getParticipantsExceptMe(callRoom.getCallParticipants()).map(h => M.getNameByHandle(h)) : [];
               const body = peers.length ? mega.utils.trans.listToString(peers, l.cancel_with_to_join) : l.cancel_to_join;
               return msgDialog('confirmation', undefined, l.call_in_progress, body, e => e && window.open(url, '_blank', 'noopener,noreferrer'));
             }

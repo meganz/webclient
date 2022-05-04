@@ -625,10 +625,10 @@ AccountRecoveryControl.prototype.startRecovery = function _startRecovery(email, 
                 }
                 else if (res === 0) {
                     if (!is_mobile) {
-                        handleResetSuccessDialogs('.reset-success', l[735], 'resetsuccess');
+                        handleResetSuccessDialogs('.reset-success', l.check_email_inbox, 'resetsuccess');
                     }
                     else {
-                        msgDialog('info', '', l[735]);
+                        msgDialog('info', '', l.check_email_inbox);
                     }
                 } else {
                     msgDialog('warningb', l[135], l[200]);

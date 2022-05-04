@@ -14001,6 +14001,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
         return this.state.callMinimized && this.setState({
           callMinimized: false
         }, () => {
+          $.hideTopMenu();
           loadSubPage('fm/chat');
           room.show();
           this.toggleExpandedFlag();

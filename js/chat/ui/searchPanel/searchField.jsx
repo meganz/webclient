@@ -35,10 +35,6 @@ export default class SearchField extends MegaRenderMixin {
         hovered: false
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         super.componentDidMount();
         SearchField.focus();

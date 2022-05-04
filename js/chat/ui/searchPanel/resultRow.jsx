@@ -6,8 +6,8 @@ import { OFlowEmoji, OFlowParsedHTML } from '../../../ui/utils.jsx';
 import { ContactAwareName } from '../contacts.jsx';
 import { EVENTS } from './searchPanel.jsx';
 
-const SEARCH_ROW_CLASS = `result-table-row`;
-const USER_CARD_CLASS = `user-card`;
+const RESULT_ROW_CLASS = 'result-table-row';
+const USER_CARD_CLASS = 'user-card';
 
 /**
  * roomIsGroup
@@ -26,13 +26,14 @@ const roomIsGroup = room => room && room.type === 'group' || room.type === 'publ
  * @param {ChatRoom|String} room room or userId
  * @param {String} [messageId]
  * @param {Number} [index]
+ * @param {Function} [callback]
  */
 
-const openResult = (room, messageId, index) => {
+const openResult = ({ room, messageId, index }, callback) => {
     document.dispatchEvent(new Event(EVENTS.RESULT_OPEN));
 
     if (isString(room)) {
-        loadSubPage('fm/chat/p/' + room);
+        loadSubPage(`fm/chat/p/${room}`);
     }
     else if (room && room.chatId && !messageId) {
         // Chat room matched -> open chat room
@@ -51,6 +52,8 @@ const openResult = (room, messageId, index) => {
             room.scrollToMessageId(messageId, index);
         }
     }
+
+    return callback && typeof callback === 'function' && callback();
 };
 
 //
@@ -58,20 +61,24 @@ const openResult = (room, messageId, index) => {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class MessageRow extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
-        const { data, matches, room, index } = this.props;
+        const { data, matches, room, index, onResultOpen } = this.props;
         const isGroup = room && roomIsGroup(room);
         const contact = room.getParticipantsExceptMe();
         const summary = data.renderableSummary || room.messagesBuff.getRenderableSummary(data);
 
         return (
             <div
-                className={`${SEARCH_ROW_CLASS} message`}
-                onClick={() => openResult(room, data.messageId, index)}>
+                ref={node => {
+                    this.nodeRef = node;
+                }}
+                className={`
+                    ${RESULT_ROW_CLASS}
+                    message
+                `}
+                onClick={() =>
+                    openResult({ room, messageId: data.messageId, index }, () => onResultOpen(this.nodeRef))
+                }>
                 <div className="message-result-avatar">
                     {isGroup ?
                         <div className="chat-topic-icon">
@@ -109,18 +116,17 @@ class MessageRow extends MegaRenderMixin {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class ChatRow extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
-        const { room, matches } = this.props;
+        const { room, matches, onResultOpen } = this.props;
         const result = megaChat.highlight(megaChat.html(room.topic), matches, true);
 
         return (
             <div
-                className={SEARCH_ROW_CLASS}
-                onClick={() => openResult(room)}>
+                ref={node => {
+                    this.nodeRef = node;
+                }}
+                className={RESULT_ROW_CLASS}
+                onClick={() => openResult({ room }, () => onResultOpen(this.nodeRef))}>
                 <div className="chat-topic-icon">
                     <i className="sprite-fm-uni icon-chat-group"/>
                 </div>
@@ -140,12 +146,8 @@ class ChatRow extends MegaRenderMixin {
 // ---------------------------------------------------------------------------------------------------------------------
 
 class MemberRow extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
-        const { data, matches, room, contact } = this.props;
+        const { data, matches, room, contact, onResultOpen } = this.props;
         const hasHighlight = matches && !!matches.length;
         const isGroup = room && roomIsGroup(room);
         const userCard = {
@@ -186,8 +188,11 @@ class MemberRow extends MegaRenderMixin {
 
         return (
             <div
-                className={SEARCH_ROW_CLASS}
-                onClick={() => openResult(room ? room : contact.h)}>
+                ref={node => {
+                    this.nodeRef = node;
+                }}
+                className={RESULT_ROW_CLASS}
+                onClick={() => openResult({ room: room || contact.h }, () => onResultOpen(this.nodeRef))}>
                 {isGroup ?
                     <div className="chat-topic-icon">
                         <i className="sprite-fm-uni icon-chat-group"/>
@@ -205,7 +210,11 @@ class MemberRow extends MegaRenderMixin {
 const NilRow = ({ onSearchMessages, isFirstQuery }) => {
     const label = LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>');
     return (
-        <div className={`${SEARCH_ROW_CLASS} nil`}>
+        <div
+            className={`
+                ${RESULT_ROW_CLASS}
+                nil
+            `}>
             <div className="nil-container">
                 <i className="sprite-fm-mono icon-preview-reveal"/>
                 <span>{LABEL.NO_RESULTS}</span>
@@ -227,40 +236,40 @@ const NilRow = ({ onSearchMessages, isFirstQuery }) => {
 // ---------------------------------------------------------------------------------------------------------------------
 
 export default class ResultRow extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
+    setActive = nodeRef => {
+        if (nodeRef) {
+            const activeClass = 'active';
+            const elements = document.querySelectorAll(`.${RESULT_ROW_CLASS}.${activeClass}`);
+            for (let i = elements.length; i--;) {
+                elements[i].classList.remove(activeClass);
+            }
+            nodeRef.classList.add(activeClass);
+        }
+    };
 
     render() {
         const { type, result, children, onSearchMessages, isFirstQuery } = this.props;
 
-        switch (type) {
-            case TYPE.MESSAGE:
-                return (
-                    <MessageRow
-                        data={result.data}
-                        index={result.index}
-                        matches={result.matches}
-                        room={result.room}/>
-                );
-            case TYPE.CHAT:
-                return <ChatRow room={result.room} matches={result.matches}/>;
-            case TYPE.MEMBER:
-                return (
-                    <MemberRow
-                        data={result.data}
-                        matches={result.matches}
-                        room={result.room}
-                        contact={M.u[result.data]}/>
-                );
-            case TYPE.NIL:
-                return <NilRow onSearchMessages={onSearchMessages} isFirstQuery={isFirstQuery}/>;
-            default:
-                return (
-                    <div className={SEARCH_ROW_CLASS}>
-                        {children}
-                    </div>
-                );
+        if (result) {
+            const { data, index, matches, room } = result;
+            const PROPS = { data, index, matches, room, onResultOpen: this.setActive };
+
+            switch (type) {
+                case TYPE.MESSAGE:
+                    return <MessageRow {...PROPS} />;
+                case TYPE.CHAT:
+                    return <ChatRow {...PROPS} />;
+                case TYPE.MEMBER:
+                    return <MemberRow {...PROPS} contact={M.u[data]} />;
+                default:
+                    return (
+                        <div className={RESULT_ROW_CLASS}>
+                            {children}
+                        </div>
+                    );
+            }
         }
+
+        return <NilRow onSearchMessages={onSearchMessages} isFirstQuery={isFirstQuery} />;
     }
 }

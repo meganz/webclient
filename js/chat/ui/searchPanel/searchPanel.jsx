@@ -30,13 +30,8 @@ export default class SearchPanel extends MegaRenderMixin {
         searching: false,
         status: undefined,
         isFirstQuery: true,
-        recents: [],
         results: []
     };
-
-    constructor(props) {
-        super(props);
-    }
 
     componentDidMount() {
         super.componentDidMount();
@@ -52,7 +47,7 @@ export default class SearchPanel extends MegaRenderMixin {
         if (this.pageChangeListener) {
             mBroadcaster.removeListener(this.pageChangeListener);
         }
-        document.removeEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
+        document.removeEventListener(EVENTS.RESULT_OPEN, this.doPause);
         document.removeEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
         megaChat.plugins.chatdIntegration.chatd.off('onClose.search');
         megaChat.plugins.chatdIntegration.chatd.off('onOpen.search');
@@ -60,21 +55,23 @@ export default class SearchPanel extends MegaRenderMixin {
 
     bindEvents = () => {
         // Pause on page change
-        this.pageChangeListener = mBroadcaster.addListener('pagechange', () => this.doToggle(ACTIONS.PAUSE));
+        this.pageChangeListener = mBroadcaster.addListener('pagechange', this.doPause);
 
         // Clicked on search result
-        document.addEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
+        document.addEventListener(EVENTS.RESULT_OPEN, this.doPause);
         document.addEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
-        megaChat.plugins.chatdIntegration.chatd.rebind(
-            'onClose.search', () => this.state.searching && this.doToggle(ACTIONS.PAUSE)
+        megaChat.plugins.chatdIntegration.chatd.rebind('onClose.search', () =>
+            this.state.searching && this.doToggle(ACTIONS.PAUSE)
         );
-        megaChat.plugins.chatdIntegration.chatd.rebind(
-            'onOpen.search', () => this.state.searching && this.doToggle(ACTIONS.RESUME)
+        megaChat.plugins.chatdIntegration.chatd.rebind('onOpen.search', () =>
+            this.state.searching && this.doToggle(ACTIONS.RESUME)
         );
     };
 
-    toggleMinimize = () => {
-        this.doToggle(ACTIONS.PAUSE);
+    doPause = () => {
+        if (this.state.status === STATUS.IN_PROGRESS) {
+            this.doToggle(ACTIONS.PAUSE);
+        }
     };
 
     doSearch = (s, searchMessages) => {
@@ -111,8 +108,8 @@ export default class SearchPanel extends MegaRenderMixin {
     handleKeyDown = ev => {
         const { keyCode } = ev;
         if (keyCode && keyCode === 27 /* ESC */) {
-            // Clear the text on the first `ESC` press; minimize on the second
-            return SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
+            // Clear the text on the first `ESC` press; pause on the second
+            return SearchField.hasValue() ? this.handleReset() : this.doPause();
         }
     };
 
@@ -170,7 +167,7 @@ export default class SearchPanel extends MegaRenderMixin {
         );
 
     render() {
-        const { value, searching, status, isFirstQuery, recents, results } = this.state;
+        const { value, searching, status, isFirstQuery, results } = this.state;
 
         //
         // `SearchPanel`
@@ -197,10 +194,6 @@ export default class SearchPanel extends MegaRenderMixin {
                         this.wrapperRef = wrapper;
                     }}
                     options={{ 'suppressScrollX': true }}>
-                    {!!recents.length && !searching && (
-                        <ResultContainer recents={recents} />
-                    )}
-
                     {searching && (
                         <ResultContainer
                             status={status}

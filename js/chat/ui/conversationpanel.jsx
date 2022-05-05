@@ -54,7 +54,7 @@ export class JoinCallNotification extends MegaRenderMixin {
                 <i className="sprite-fm-mono icon-phone"/>
                 <ParsedHTML
                     onClick={() =>
-                        inProgressAlert()
+                        inProgressAlert(true)
                             .then(() => chatRoom.joinCall())
                             .catch((ex) => d && console.warn('Already in a call.', ex))
                     }>
@@ -1488,6 +1488,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         onCallExpand={() => {
                             return this.state.callMinimized &&
                                 this.setState({ callMinimized: false }, () => {
+                                    $.hideTopMenu();
                                     loadSubPage('fm/chat');
                                     room.show();
                                     this.toggleExpandedFlag();

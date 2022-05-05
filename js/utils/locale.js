@@ -133,7 +133,7 @@ function setDateTimeFormat(locales, format) {
     if (format < 10) {
         options.year = 'numeric';
         options.month = format >= 2 ? 'long' : 'numeric';
-        options.day = format === 3 ? undefined : 'numeric';
+        options.day = format === 3 || format === 6 ? undefined : 'numeric';
         options.weekday = format === 4 || format === 5 ? 'long' : undefined;
 
         if (format === 0 || format === 5) {
@@ -145,6 +145,9 @@ function setDateTimeFormat(locales, format) {
             }
         }
 
+        if (format === 6) {
+            options.month = 'short';
+        }
     }
     // Set non full date format
     else {
@@ -166,6 +169,9 @@ function setDateTimeFormat(locales, format) {
                 break;
             case 15:
                 options.month = 'short';
+                options.day = 'numeric';
+                break;
+            case 16:
                 options.day = 'numeric';
         }
     }
@@ -205,6 +211,7 @@ function setDateTimeFormat(locales, format) {
  *       4: Monday, yyyy fmn dd (fmn: Full month name, based on the locale) (Long Date format with weekday)
  *       5: Monday, yyyy fmn dd hh:mm:ss TZ (fmn: Full month name, based on the locale)
  *                                                                  (Long Date format with weekday, time, and timezone)
+ *       6: yyyy mm (Short Date format without day and time)
  *
  * Non full date formats:
  *       10: Mon (Only day of the week long version)
@@ -213,6 +220,7 @@ function setDateTimeFormat(locales, format) {
  *       13: January (Only month long version)
  *       14: 2021 (Only year)
  *       15: dd mm (Date format with short month and without time and year)
+ *       16: yyyy (Only year)
  */
 function time2date(unixTime, format) {
     'use strict';

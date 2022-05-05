@@ -12737,7 +12737,7 @@ class JoinCallNotification extends mixins.wl {
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-phone"
     }), external_React_default().createElement(utils.ParsedHTML, {
-      onClick: () => (0,call.xt)().then(() => chatRoom.joinCall()).catch(ex => d && console.warn('Already in a call.', ex))
+      onClick: () => (0,call.xt)(true).then(() => chatRoom.joinCall()).catch(ex => d && console.warn('Already in a call.', ex))
     }, (l[20460] || 'There is an active group call. [A]Join[/A]').replace('[A]', '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>')));
   }
 
@@ -14001,6 +14001,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
         return this.state.callMinimized && this.setState({
           callMinimized: false
         }, () => {
+          $.hideTopMenu();
           loadSubPage('fm/chat');
           room.show();
           this.toggleExpandedFlag();
@@ -14333,19 +14334,16 @@ function isStartCallDisabled(room) {
 
 
 class ResultTable extends mixins.wl {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const {
-      heading
+      heading,
+      children
     } = this.props;
     return external_React_default().createElement("div", {
       className: `result-table ${heading ? '' : 'nil'}`
     }, heading ? external_React_default().createElement("div", {
       className: "result-table-heading"
-    }, heading) : null, this.props.children);
+    }, heading) : null, children);
   }
 
 }
@@ -14357,16 +14355,22 @@ class ResultTable extends mixins.wl {
 
 
 
-const SEARCH_ROW_CLASS = `result-table-row`;
-const USER_CARD_CLASS = `user-card`;
+
+const RESULT_ROW_CLASS = 'result-table-row';
+const USER_CARD_CLASS = 'user-card';
 
 const roomIsGroup = room => room && room.type === 'group' || room.type === 'public';
 
-const openResult = (room, messageId, index) => {
+const openResult = (_ref, callback) => {
+  let {
+    room,
+    messageId,
+    index
+  } = _ref;
   document.dispatchEvent(new Event(EVENTS.RESULT_OPEN));
 
   if (isString(room)) {
-    loadSubPage('fm/chat/p/' + room);
+    loadSubPage(`fm/chat/p/${room}`);
   } else if (room && room.chatId && !messageId) {
     const chatRoom = megaChat.getChatById(room.chatId);
 
@@ -14382,26 +14386,35 @@ const openResult = (room, messageId, index) => {
       room.scrollToMessageId(messageId, index);
     }
   }
+
+  return callback && typeof callback === 'function' && callback();
 };
 
 class MessageRow extends mixins.wl {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const {
       data,
       matches,
       room,
-      index
+      index,
+      onResultOpen
     } = this.props;
     const isGroup = room && roomIsGroup(room);
     const contact = room.getParticipantsExceptMe();
     const summary = data.renderableSummary || room.messagesBuff.getRenderableSummary(data);
     return external_React_default().createElement("div", {
-      className: `${SEARCH_ROW_CLASS} message`,
-      onClick: () => openResult(room, data.messageId, index)
+      ref: node => {
+        this.nodeRef = node;
+      },
+      className: `
+                    ${RESULT_ROW_CLASS}
+                    message
+                `,
+      onClick: () => openResult({
+        room,
+        messageId: data.messageId,
+        index
+      }, () => onResultOpen(this.nodeRef))
     }, external_React_default().createElement("div", {
       className: "message-result-avatar"
     }, isGroup ? external_React_default().createElement("div", {
@@ -14438,19 +14451,21 @@ class MessageRow extends mixins.wl {
 }
 
 class ChatRow extends mixins.wl {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const {
       room,
-      matches
+      matches,
+      onResultOpen
     } = this.props;
     const result = megaChat.highlight(megaChat.html(room.topic), matches, true);
     return external_React_default().createElement("div", {
-      className: SEARCH_ROW_CLASS,
-      onClick: () => openResult(room)
+      ref: node => {
+        this.nodeRef = node;
+      },
+      className: RESULT_ROW_CLASS,
+      onClick: () => openResult({
+        room
+      }, () => onResultOpen(this.nodeRef))
     }, external_React_default().createElement("div", {
       className: "chat-topic-icon"
     }, external_React_default().createElement("i", {
@@ -14467,16 +14482,13 @@ class ChatRow extends mixins.wl {
 }
 
 class MemberRow extends mixins.wl {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const {
       data,
       matches,
       room,
-      contact
+      contact,
+      onResultOpen
     } = this.props;
     const hasHighlight = matches && !!matches.length;
     const isGroup = room && roomIsGroup(room);
@@ -14496,8 +14508,13 @@ class MemberRow extends mixins.wl {
       })))
     };
     return external_React_default().createElement("div", {
-      className: SEARCH_ROW_CLASS,
-      onClick: () => openResult(room ? room : contact.h)
+      ref: node => {
+        this.nodeRef = node;
+      },
+      className: RESULT_ROW_CLASS,
+      onClick: () => openResult({
+        room: room || contact.h
+      }, () => onResultOpen(this.nodeRef))
     }, isGroup ? external_React_default().createElement("div", {
       className: "chat-topic-icon"
     }, external_React_default().createElement("i", {
@@ -14513,14 +14530,17 @@ class MemberRow extends mixins.wl {
 
 }
 
-const NilRow = _ref => {
+const NilRow = _ref2 => {
   let {
     onSearchMessages,
     isFirstQuery
-  } = _ref;
+  } = _ref2;
   const label = LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>');
   return external_React_default().createElement("div", {
-    className: `${SEARCH_ROW_CLASS} nil`
+    className: `
+                ${RESULT_ROW_CLASS}
+                nil
+            `
   }, external_React_default().createElement("div", {
     className: "nil-container"
   }, external_React_default().createElement("i", {
@@ -14535,8 +14555,20 @@ const NilRow = _ref => {
 };
 
 class ResultRow extends mixins.wl {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super(...arguments);
+
+    this.setActive = nodeRef => {
+      if (nodeRef) {
+        const elements = document.querySelectorAll(`.${RESULT_ROW_CLASS}.${"active"}`);
+
+        for (let i = elements.length; i--;) {
+          elements[i].classList.remove('active');
+        }
+
+        nodeRef.classList.add("active");
+      }
+    };
   }
 
   render() {
@@ -14548,40 +14580,44 @@ class ResultRow extends mixins.wl {
       isFirstQuery
     } = this.props;
 
-    switch (type) {
-      case TYPE.MESSAGE:
-        return external_React_default().createElement(MessageRow, {
-          data: result.data,
-          index: result.index,
-          matches: result.matches,
-          room: result.room
-        });
+    if (result) {
+      const {
+        data,
+        index,
+        matches,
+        room
+      } = result;
+      const PROPS = {
+        data,
+        index,
+        matches,
+        room,
+        onResultOpen: this.setActive
+      };
 
-      case TYPE.CHAT:
-        return external_React_default().createElement(ChatRow, {
-          room: result.room,
-          matches: result.matches
-        });
+      switch (type) {
+        case TYPE.MESSAGE:
+          return external_React_default().createElement(MessageRow, PROPS);
 
-      case TYPE.MEMBER:
-        return external_React_default().createElement(MemberRow, {
-          data: result.data,
-          matches: result.matches,
-          room: result.room,
-          contact: M.u[result.data]
-        });
+        case TYPE.CHAT:
+          return external_React_default().createElement(ChatRow, PROPS);
 
-      case TYPE.NIL:
-        return external_React_default().createElement(NilRow, {
-          onSearchMessages: onSearchMessages,
-          isFirstQuery: isFirstQuery
-        });
+        case TYPE.MEMBER:
+          return external_React_default().createElement(MemberRow, (0,esm_extends.Z)({}, PROPS, {
+            contact: M.u[data]
+          }));
 
-      default:
-        return external_React_default().createElement("div", {
-          className: SEARCH_ROW_CLASS
-        }, children);
+        default:
+          return external_React_default().createElement("div", {
+            className: RESULT_ROW_CLASS
+          }, children);
+      }
     }
+
+    return external_React_default().createElement(NilRow, {
+      onSearchMessages: onSearchMessages,
+      isFirstQuery: isFirstQuery
+    });
   }
 
 }
@@ -14601,7 +14637,6 @@ const LABEL = {
   MESSAGES: l[6868],
   CONTACTS_AND_CHATS: l[20174],
   NO_RESULTS: l[8674],
-  RECENT: l[20141],
   SEARCH_MESSAGES_CTA: l[23547],
   SEARCH_MESSAGES_INLINE: l[23548],
   DECRYPTING_RESULTS: l[23543],
@@ -14610,16 +14645,8 @@ const LABEL = {
   SEARCH_COMPLETE: l[23546]
 };
 class ResultContainer extends mixins.wl {
-  constructor(props) {
-    super(props);
-
-    this.renderRecents = recents => external_React_default().createElement(ResultTable, {
-      heading: LABEL.RECENT
-    }, recents.map(recent => external_React_default().createElement(ResultRow, {
-      key: recent.data,
-      type: TYPE.MEMBER,
-      result: recent
-    })));
+  constructor() {
+    super(...arguments);
 
     this.renderResults = (results, status, isFirstQuery, onSearchMessages) => {
       if (status === STATUS.COMPLETED && results.length < 1) {
@@ -14635,26 +14662,28 @@ class ResultContainer extends mixins.wl {
         MESSAGES: []
       };
 
-      for (let resultTypeGroup in results) {
-        let len = results[resultTypeGroup].length;
+      for (const resultTypeGroup in results) {
+        if (results.hasOwnProperty(resultTypeGroup)) {
+          const len = results[resultTypeGroup].length;
 
-        for (let i = 0; i < len; i++) {
-          const result = results[resultTypeGroup].getItem(i);
-          const {
-            MESSAGE,
-            MEMBER,
-            CHAT
-          } = TYPE;
-          const {
-            type: resultType,
-            resultId
-          } = result;
-          const table = resultType === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
-          RESULT_TABLE[table] = [...RESULT_TABLE[table], external_React_default().createElement(ResultRow, {
-            key: resultId,
-            type: resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT,
-            result: result
-          })];
+          for (let i = 0; i < len; i++) {
+            const result = results[resultTypeGroup].getItem(i);
+            const {
+              MESSAGE,
+              MEMBER,
+              CHAT
+            } = TYPE;
+            const {
+              resultId,
+              type
+            } = result;
+            const table = type === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
+            RESULT_TABLE[table] = [...RESULT_TABLE[table], external_React_default().createElement(ResultRow, {
+              key: resultId,
+              type: type === MESSAGE ? MESSAGE : type === MEMBER ? MEMBER : CHAT,
+              result: result
+            })];
+          }
         }
       }
 
@@ -14693,13 +14722,12 @@ class ResultContainer extends mixins.wl {
 
   render() {
     const {
-      recents,
       results,
       status,
       isFirstQuery,
       onSearchMessages
     } = this.props;
-    return recents && recents.length ? this.renderRecents(recents) : this.renderResults(results, status, isFirstQuery, onSearchMessages);
+    return this.renderResults(results, status, isFirstQuery, onSearchMessages);
   }
 
 }
@@ -14711,8 +14739,8 @@ class ResultContainer extends mixins.wl {
 const SEARCH_STATUS_CLASS = 'search-field-status';
 const BASE_ICON_CLASS = 'sprite-fm-mono';
 class SearchField extends mixins.wl {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super(...arguments);
     this.state = {
       hovered: false
     };
@@ -14856,15 +14884,14 @@ const ACTIONS = {
 };
 const SEARCH_PANEL_CLASS = `search-panel`;
 class SearchPanel extends mixins.wl {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super(...arguments);
     this.wrapperRef = null;
     this.state = {
       value: '',
       searching: false,
       status: undefined,
       isFirstQuery: true,
-      recents: [],
       results: []
     };
 
@@ -14873,22 +14900,24 @@ class SearchPanel extends mixins.wl {
         mBroadcaster.removeListener(this.pageChangeListener);
       }
 
-      document.removeEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
+      document.removeEventListener(EVENTS.RESULT_OPEN, this.doPause);
       document.removeEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
       megaChat.plugins.chatdIntegration.chatd.off('onClose.search');
       megaChat.plugins.chatdIntegration.chatd.off('onOpen.search');
     };
 
     this.bindEvents = () => {
-      this.pageChangeListener = mBroadcaster.addListener('pagechange', () => this.doToggle(ACTIONS.PAUSE));
-      document.addEventListener(EVENTS.RESULT_OPEN, this.toggleMinimize);
+      this.pageChangeListener = mBroadcaster.addListener('pagechange', this.doPause);
+      document.addEventListener(EVENTS.RESULT_OPEN, this.doPause);
       document.addEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
       megaChat.plugins.chatdIntegration.chatd.rebind('onClose.search', () => this.state.searching && this.doToggle(ACTIONS.PAUSE));
       megaChat.plugins.chatdIntegration.chatd.rebind('onOpen.search', () => this.state.searching && this.doToggle(ACTIONS.RESUME));
     };
 
-    this.toggleMinimize = () => {
-      this.doToggle(ACTIONS.PAUSE);
+    this.doPause = () => {
+      if (this.state.status === STATUS.IN_PROGRESS) {
+        this.doToggle(ACTIONS.PAUSE);
+      }
     };
 
     this.doSearch = (s, searchMessages) => {
@@ -14928,7 +14957,7 @@ class SearchPanel extends mixins.wl {
       } = ev;
 
       if (keyCode && keyCode === 27) {
-        return SearchField.hasValue() ? this.handleReset() : this.toggleMinimize();
+        return SearchField.hasValue() ? this.handleReset() : this.doPause();
       }
     };
 
@@ -14997,7 +15026,6 @@ class SearchPanel extends mixins.wl {
       searching,
       status,
       isFirstQuery,
-      recents,
       results
     } = this.state;
     return external_React_default().createElement("div", {
@@ -15020,9 +15048,7 @@ class SearchPanel extends mixins.wl {
       options: {
         'suppressScrollX': true
       }
-    }, !!recents.length && !searching && external_React_default().createElement(ResultContainer, {
-      recents: recents
-    }), searching && external_React_default().createElement(ResultContainer, {
+    }, searching && external_React_default().createElement(ResultContainer, {
       status: status,
       results: results,
       isFirstQuery: isFirstQuery,
@@ -15425,12 +15451,16 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
       nameClassString += " privateChat";
     }
 
-    var roomTitle = conversations_React.createElement(utils.OFlowEmoji, null, chatRoom.getRoomTitle());
+    let roomTitle = conversations_React.createElement(utils.OFlowEmoji, null, chatRoom.getRoomTitle());
 
     if (chatRoom.type === "private") {
       roomTitle = conversations_React.createElement(ui_contacts.ContactAwareName, {
         contact: this.props.contact
-      }, roomTitle);
+      }, conversations_React.createElement("div", {
+        className: "user-card-wrapper"
+      }, conversations_React.createElement(utils.OFlowParsedHTML, null, megaChat.html(chatRoom.getRoomTitle()))), conversations_React.createElement("span", {
+        className: `user-card-presence ${presenceClass}`
+      }));
     }
 
     var self = this;
@@ -15454,9 +15484,7 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
       className: "conversation-data"
     }, conversations_React.createElement("div", {
       className: nameClassString
-    }, roomTitle, chatRoom.type === "private" ? conversations_React.createElement("span", {
-      className: "user-card-presence " + presenceClass
-    }) : undefined), chatRoom.type === "group" || chatRoom.type === "private" ? conversations_React.createElement("i", {
+    }, roomTitle), chatRoom.type === "group" || chatRoom.type === "private" ? conversations_React.createElement("i", {
       className: "sprite-fm-uni icon-ekr-key simpletip",
       "data-simpletip": l[20935]
     }) : undefined, archivedDiv, notificationItems.length > 0 ? conversations_React.createElement("div", {
@@ -21609,15 +21637,25 @@ Ephemeral.NAMESPACE = 'ephemeral-dialog';
 
 
 const EXPANDED_FLAG = 'in-call';
-const inProgressAlert = () => {
+const inProgressAlert = isJoin => {
   return new Promise((resolve, reject) => {
     if (megaChat.haveAnyActiveCall()) {
       if (window.sfuClient) {
-        msgDialog('warningb', null, l.call_in_progress, l.finish_call, null, 1);
+        const {
+          chatRoom
+        } = megaChat.activeCall;
+        const peers = chatRoom ? chatRoom.getParticipantsExceptMe(chatRoom.getCallParticipants()).map(h => M.getNameByHandle(h)) : [];
+        let body = isJoin ? l.cancel_to_join : l.cancel_to_start;
+
+        if (peers.length) {
+          body = mega.utils.trans.listToString(peers, isJoin ? l.cancel_with_to_join : l.cancel_with_to_start);
+        }
+
+        msgDialog('warningb', null, l.call_in_progress, body, null, 1);
         return reject();
       }
 
-      return msgDialog(`warningb:!^${l[82]}!${l.join_anyway}`, null, l.call_in_progress, l.multiple_calls, join => {
+      return msgDialog(`warningb:!^${l[2005]}!${isJoin ? l.join_call_anyway : l.start_call_anyway}`, null, isJoin ? l.join_multiple_calls_title : l.start_multiple_calls_title, isJoin ? l.join_multiple_calls_text : l.start_multiple_calls_text, join => {
         if (join) {
           return resolve();
         }
@@ -23671,7 +23709,12 @@ class MetaRichpreviewMegaLinks extends mixin.y {
         onClick: function (url, megaLinkInfo) {
           if (megaLinkInfo.hadLoaded()) {
             if (window.sfuClient && megaLinkInfo.is_chatlink) {
-              return msgDialog('confirmation', undefined, l.call_in_progress, l.multiple_calls, e => e && window.open(url, '_blank', 'noopener,noreferrer'));
+              const {
+                chatRoom: callRoom
+              } = megaChat.activeCall;
+              const peers = callRoom ? callRoom.getParticipantsExceptMe(callRoom.getCallParticipants()).map(h => M.getNameByHandle(h)) : [];
+              const body = peers.length ? mega.utils.trans.listToString(peers, l.cancel_with_to_join) : l.cancel_to_join;
+              return msgDialog('confirmation', undefined, l.call_in_progress, body, e => e && window.open(url, '_blank', 'noopener,noreferrer'));
             }
 
             window.open(url, '_blank', 'noopener,noreferrer');

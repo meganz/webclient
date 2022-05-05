@@ -20,7 +20,6 @@ export const LABEL = {
     MESSAGES: l[6868],
     CONTACTS_AND_CHATS: l[20174],
     NO_RESULTS: l[8674],
-    RECENT: l[20141],
 
     SEARCH_MESSAGES_CTA: l[23547],
     SEARCH_MESSAGES_INLINE: l[23548],
@@ -36,22 +35,6 @@ export const LABEL = {
 };
 
 export default class ResultContainer extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
-
-    renderRecents = recents => (
-
-        //
-        // `Recent` table
-        // ----------------------------------------------------------------------
-
-        <ResultTable heading={LABEL.RECENT}>
-            {recents.map(recent =>
-                <ResultRow key={recent.data} type={TYPE.MEMBER} result={recent} />
-            )}
-        </ResultTable>
-    );
 
     renderResults = (results, status, isFirstQuery, onSearchMessages) => {
 
@@ -65,7 +48,8 @@ export default class ResultContainer extends MegaRenderMixin {
                     <ResultRow
                         type={TYPE.NIL}
                         isFirstQuery={isFirstQuery}
-                        onSearchMessages={onSearchMessages} />
+                        onSearchMessages={onSearchMessages}
+                    />
                 </ResultTable>
             );
         }
@@ -75,21 +59,24 @@ export default class ResultContainer extends MegaRenderMixin {
             MESSAGES: [],
         };
 
-        for (let resultTypeGroup in results) {
-            let len = results[resultTypeGroup].length;
-            for (let i = 0; i < len; i++) {
-                const result = results[resultTypeGroup].getItem(i);
-                const { MESSAGE, MEMBER, CHAT } = TYPE;
-                const { type: resultType, resultId } = result;
-                const table = resultType === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
+        for (const resultTypeGroup in results) {
+            if (results.hasOwnProperty(resultTypeGroup)) {
+                const len = results[resultTypeGroup].length;
+                for (let i = 0; i < len; i++) {
+                    const result = results[resultTypeGroup].getItem(i);
+                    const { MESSAGE, MEMBER, CHAT } = TYPE;
+                    const { resultId, type } = result;
+                    const table = type === MESSAGE ? 'MESSAGES' : 'CONTACTS_AND_CHATS';
 
-                RESULT_TABLE[table] = [
-                    ...RESULT_TABLE[table],
-                    <ResultRow
-                        key={resultId}
-                        type={resultType === MESSAGE ? MESSAGE : resultType === MEMBER ? MEMBER : CHAT}
-                        result={result} />
-                ];
+                    RESULT_TABLE[table] = [
+                        ...RESULT_TABLE[table],
+                        <ResultRow
+                            key={resultId}
+                            type={type === MESSAGE ? MESSAGE : type === MEMBER ? MEMBER : CHAT}
+                            result={result}
+                        />
+                    ];
+                }
             }
         }
 
@@ -124,7 +111,8 @@ export default class ResultContainer extends MegaRenderMixin {
                         <ResultRow
                             type={TYPE.NIL}
                             isFirstQuery={isFirstQuery}
-                            onSearchMessages={onSearchMessages} />;
+                            onSearchMessages={onSearchMessages}
+                        />;
 
                     return (
                         <ResultTable {...table.props}>
@@ -139,9 +127,7 @@ export default class ResultContainer extends MegaRenderMixin {
     };
 
     render() {
-        const { recents, results, status, isFirstQuery, onSearchMessages } = this.props;
-        return recents && recents.length ?
-            this.renderRecents(recents) :
-            this.renderResults(results, status, isFirstQuery, onSearchMessages);
+        const { results, status, isFirstQuery, onSearchMessages } = this.props;
+        return this.renderResults(results, status, isFirstQuery, onSearchMessages);
     }
 }

@@ -67,7 +67,7 @@
   "devDependencies": {
     "@babel/eslint-parser": "7.17.0",
     "chai": "4.3.6",
-    "eslint": "8.13.0",
+    "eslint": "8.14.0",
     "eslint-plugin-compat": "4.0.2",
     "eslint-plugin-es": "4.1.0",
     "eslint-plugin-jquery": "1.5.1",
@@ -90,10 +90,10 @@
     "karma-sinon": "1.0.5",
     "mocha": "9.2.2",
     "react-hot-loader": "4.13.0",
-    "sass": "1.50.1",
+    "sass": "1.51.0",
     "sass-loader": "12.6.0",
     "sinon": "13.0.2",
-    "stylelint": "14.7.1",
+    "stylelint": "14.8.0",
     "stylelint-config-standard": "25.0.0",
     "stylelint-no-unsupported-browser-features": "5.0.3",
     "webpack-dev-server": "4.8.1"

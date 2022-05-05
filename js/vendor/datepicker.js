@@ -1,3 +1,6 @@
+/**
+ * Air Datepicker
+ */
 ;(function (window, $, undefined) { ;(function () {
     var VERSION = '2.2.3',
         pluginName = 'datepicker',
@@ -369,6 +372,21 @@
 
         formatDate: function (string, date) {
             date = date || this.date;
+
+            if (string === this.opts.navTitles.days) {
+                return time2date(date.getTime() / 1000, 3);
+            }
+            else if (string === this.opts.navTitles.months) {
+                return time2date(date.getTime() / 1000, 15);
+            }
+            else if (string === this.opts.navTitles.years) {
+
+                var decade = datepicker.getDecade(date);
+                var date1 = (new Date()).setYear(decade[0]);
+                var date2 = (new Date()).setYear(decade[1]);
+                return l[22899].replace('%d1', time2date(date1 / 1000, 15)).replace('%d2', time2date(date2 / 1000, 15));
+            }
+
             var result = string,
                 boundary = this._getWordBoundaryRegExp,
                 locale = this.loc,
@@ -1563,6 +1581,11 @@
 
             switch (type) {
                 case 'day':
+
+                    if (locale === 'ar') {
+                        html = time2date(date.getTime() / 1000, 16);
+                    }
+
                     if (parent.isWeekend(d.day)) classes += " -weekend-";
                     if (d.month != this.d.parsedDate.month) {
                         classes += " -other-month-";
@@ -1578,6 +1601,11 @@
                 case 'year':
                     var decade = parent.curDecade;
                     html = d.year;
+
+                    if (locale === 'ar') {
+                        html = time2date(date.getTime() / 1000, 14);
+                    }
+                    
                     if (d.year < decade[0] || d.year > decade[1]) {
                         classes += ' -other-decade-';
                         if (!opts.selectOtherYears) {

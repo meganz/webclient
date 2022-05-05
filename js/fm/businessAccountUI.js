@@ -1763,11 +1763,9 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
 
     // Private function to populate the month dropdown list into the storage and transfer analytics chart
     const populateMonthDropDownList = function($targetContainer) {
-        const monthNames = [
-            l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]
-        ];
         const adminCreationDate = new Date(u_attr.since * 1000);
         const nowDate = new Date();
+        const nowTime = nowDate.getTime();
         const monthLimit = 12; // 1 year back max
 
         const $monthDropdown = $('.chart-month-selector', $targetContainer);
@@ -1777,13 +1775,13 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         $dropdownLabel.text('');
 
         for (var m = 0; m < monthLimit; m++) {
-            const label = `${monthNames[nowDate.getUTCMonth()]} ${nowDate.getUTCFullYear()}`;
+            const label = time2date(nowTime / 1000, 3);
             var itemNode;
 
             itemNode = mCreateElement('div', {
                 'class': 'option',
                 'data-state': m === 0 ? 'active' : '',
-                'data-value': nowDate.getTime()
+                'data-value': nowTime
             }, $dropdownScroll[0]);
             mCreateElement('span', undefined, itemNode).textContent = label;
 

@@ -102,12 +102,18 @@ var aboutus = {
                 $timelineNavigation: [],
                 eventsContent: [],
             };
+
             // cache timeline components
             timelineComponents.$timelineWrapper = $('.events-wrapper', $timeline);
             timelineComponents.eventsWrapper = timelineComponents.$timelineWrapper.children('.events');
             timelineComponents.$timelineEvents = $('a', timelineComponents.eventsWrapper);
             timelineComponents.$timelineNavigation = $('.cd-timeline-navigation', $timeline);
             timelineComponents.eventsContent = $timeline.children('.events-content');
+
+            // Setup locale formmat date for carousel
+            $('.carousel-date', timelineComponents.eventsContent).text(function() {
+                return time2date(this.dataset.unix, 3);
+            });
 
             const widthsArray = aboutus.setTimelineWidth(timelineComponents);
             const timelineTotWidth = widthsArray[0];
@@ -364,6 +370,8 @@ var aboutus = {
 
         // event is the event we are going to
         // currEvent is the event we are currently on.
+        const currentYear = currEvent.attr('data-date').split('/')[2];
+        const nextYear = event.attr('data-date').split('/')[2];
 
         // $visibleContent is content we currently on
         // $selectedContent is next content.
@@ -373,17 +381,14 @@ var aboutus = {
         $selectedContent.prev().addClass('left');
         $selectedContent.next().addClass('right');
 
-
+        if (nextYear === '2013') {
+            $('p', event).text(time2date(event.data('unix'), 6));
+        }
 
         // TODO super hacky css tricks for the timeline dates -> will fix & generalise
-        if (currEvent.attr('data-date').split('/')[2] !== '2013') {
-            if (!event.hasClass('small-dot') && step === 'prev' && event.attr('data-date').split('/')[2] === '2013') {
-                $('p', event).text(`${l[24035]}, 2013`);
-                $('p', event).css('right', 45);
-            }
-        }
-        else if (currEvent.attr('data-date').split('/')[2] === '2013') {
+        if (currentYear === '2013') {
             $('p', event).css('right', 45);
+
             if (step === 'prev') {
                 currEvent.addClass('small-dot');
                 event.removeClass('small-dot');
@@ -399,6 +404,9 @@ var aboutus = {
                     $('p', event).css('right', 23);
                 }
             }
+        }
+        else if (!event.hasClass('small-dot') && step === 'prev' && nextYear === '2013') {
+            $('p', event).css('right', 45);
         }
     },
 

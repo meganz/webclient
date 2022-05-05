@@ -9,18 +9,22 @@ var __webpack_exports__ = {};
 ;// CONCATENATED MODULE: ../shared/termCodes.ts
 var TermCode;
 (function (TermCode) {
+    // Normal conditions
     TermCode[TermCode["kFlagError"] = 128] = "kFlagError";
     TermCode[TermCode["kFlagDisconn"] = 64] = "kFlagDisconn";
     TermCode[TermCode["kUserHangup"] = 0] = "kUserHangup";
     TermCode[TermCode["kTooManyParticipants"] = 1] = "kTooManyParticipants";
     TermCode[TermCode["kLeavingRoom"] = 2] = "kLeavingRoom";
-    //====
+    TermCode[TermCode["kEndedByModerator"] = 3] = "kEndedByModerator";
+    TermCode[TermCode["kEndedByApi"] = 4] = "kEndedByApi";
+    TermCode[TermCode["kPeerJoinTimeout"] = 5] = "kPeerJoinTimeout";
+    // Disconnects
     TermCode[TermCode["kRtcDisconn"] = 64] = "kRtcDisconn";
     TermCode[TermCode["kSigDisconn"] = 65] = "kSigDisconn";
     TermCode[TermCode["kSfuShuttingDown"] = 66] = "kSfuShuttingDown";
     TermCode[TermCode["kChatDisconn"] = 67] = "kChatDisconn";
     TermCode[TermCode["kNoMediaPath"] = 68] = "kNoMediaPath";
-    //====
+    // Errors (abnormal conditions)
     TermCode[TermCode["kErrSignaling"] = 128] = "kErrSignaling";
     TermCode[TermCode["kErrNoCall"] = 129] = "kErrNoCall";
     TermCode[TermCode["kErrAuth"] = 130] = "kErrAuth";
@@ -354,7 +358,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '595f38299d';
+const COMMIT_ID = '4277e2d379';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -767,13 +771,6 @@ class SfuClient {
         this.onWsClose();
         return true;
     }
-    modEndCall(anon) {
-        let cmd = { a: "MOD_ENDCALL" };
-        if (anon) {
-            cmd.anon = 1;
-        }
-        this.send(cmd);
-    }
     async createAllTransceivers() {
         /* uplink track map:
         mid=0: uplink video thumbnail track
@@ -895,12 +892,12 @@ class SfuClient {
                 .then(function (stream) {
                 let atrack = self._audioTrack = stream.getAudioTracks()[0];
                 if (!atrack) {
-                    return Promise.reject("Error getting audio track");
+                    return Promise.reject("Local audio stream has no audio track");
                 }
             })
                 .catch(function (err) {
                 errAv |= Av.Audio;
-                console.error("Error getting local mic:", err);
+                self.logError("Error getting local mic:", err);
                 return Promise.reject(err);
             }));
         }
@@ -909,12 +906,12 @@ class SfuClient {
                 .then(function (stream) {
                 let vtrack = self._cameraTrack = stream.getVideoTracks()[0];
                 if (!vtrack) {
-                    return Promise.reject("Error getting camera video track");
+                    return Promise.reject("Local camera stream has no video track");
                 }
             })
                 .catch(function (err) {
                 errAv |= Av.Camera;
-                console.error("Error getting local camera:", err);
+                self.logError("Error getting local camera:", err);
                 return Promise.reject(err);
             }));
         }
@@ -922,7 +919,9 @@ class SfuClient {
             promises.push(navigator.mediaDevices.getDisplayMedia(SfuClient.kScreenCaptureOptions)
                 .then(function (stream) {
                 let strack = self._screenTrack = stream.getVideoTracks()[0];
-                assert(strack);
+                if (!strack) {
+                    return Promise.reject("Local screen stream has no video track");
+                }
                 strack.onended = function () {
                     self.onScreenSharingStoppedByUser();
                 };
@@ -930,7 +929,7 @@ class SfuClient {
                 .catch(function (err) {
                 self._isSharingScreen = false;
                 errAv |= Av.Screen;
-                console.error("Error getting screen video track:", err);
+                self.logError("Error getting local screen video:", err);
                 return Promise.reject(err);
             }));
         }
@@ -1793,7 +1792,7 @@ class SfuClient {
                     rtcStats.vtxw = stat.frameWidth;
                     rtcStats.vtxh = stat.frameHeight;
                     rtcStats._vtxkfps = (stat.keyFramesEncoded - prev.keyFramesEncoded) / period;
-                    const pktSent = stat.packetsSent - prev.packetsSent;
+                    let pktSent = stat.packetsSent - prev.packetsSent;
                     rtcStats.vtxdly = pktSent
                         ? Math.round((stat.totalPacketSendDelay - prev.totalPacketSendDelay) * 1000 / pktSent)
                         : -1;
@@ -2613,6 +2612,7 @@ class RequestBarrier {
 }
 class SvcDriver {
     constructor(client) {
+        this.hasBadNetwork = false;
         this.client = client;
         this.lowestRttSeen = 10000; // force recalculation on first stat sample
         this.currRxQuality = SvcDriver.kMaxRxQualityIndex - 1; // start a little lower
@@ -2704,6 +2704,25 @@ class SvcDriver {
                     this.switchTxQuality(delta, "scr");
                 }
             }
+        }
+        // handle "bad network" notification
+        let txBad;
+        if (adaptScrnTx) {
+            txBad = this.currTxQuality < 1;
+        }
+        else if (stats.vtxh) {
+            this._maVideoTxHeight = !isNaN(this._maVideoTxHeight) ? (this._maVideoTxHeight * 3 + stats.vtxh) / 4 : stats.vtxh;
+            txBad = this._maVideoTxHeight < 360;
+        }
+        if (txBad || this.currRxQuality < 1 || rtt > this.rttUpper || stats.vtxdly > 1500) {
+            if (!this.hasBadNetwork) {
+                this.hasBadNetwork = true;
+                this.client._fire("onBadNetwork", true);
+            }
+        }
+        else if (this.hasBadNetwork) {
+            this.hasBadNetwork = false;
+            this.client._fire("onBadNetwork", false);
         }
     }
     switchRxQuality(delta) {

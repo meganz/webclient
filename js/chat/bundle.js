@@ -15428,18 +15428,20 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
         }), l[20789]);
       }
 
+      const timeString = todayOrYesterday(lastMessage.delay * 1000) ? getTimeMarker(lastMessage.delay) : time2date(lastMessage.delay, 16);
       lastMessageDatetimeDiv = conversations_React.createElement("div", {
         className: "date-time"
-      }, getTimeMarker(lastMessage.delay, true));
+      }, timeString);
     } else {
       lastMsgDivClasses = "conversation-message";
       const emptyMessage = this.loadingShown ? l[7006] : l[8000];
       lastMessageDiv = conversations_React.createElement("div", null, conversations_React.createElement("div", {
         className: lastMsgDivClasses
       }, emptyMessage));
+      const timeString = todayOrYesterday(chatRoom.ctime * 1000) ? getTimeMarker(chatRoom.ctime) : time2date(chatRoom.ctime, 16);
       lastMessageDatetimeDiv = conversations_React.createElement("div", {
         className: "date-time"
-      }, l[19077].replace("%s1", getTimeMarker(chatRoom.ctime, true)));
+      }, timeString);
     }
 
     this.lastMessageId = lastMessage && lastMessage.messageId;
@@ -15458,20 +15460,16 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
         contact: this.props.contact
       }, conversations_React.createElement("div", {
         className: "user-card-wrapper"
-      }, conversations_React.createElement(utils.OFlowParsedHTML, null, megaChat.html(chatRoom.getRoomTitle()))), conversations_React.createElement("span", {
-        className: `user-card-presence ${presenceClass}`
-      }));
+      }, conversations_React.createElement(utils.OFlowParsedHTML, null, megaChat.html(chatRoom.getRoomTitle()))));
     }
 
-    var self = this;
+    nameClassString += chatRoom.type === "private" || chatRoom.type === "group" ? ' badge-pad' : '';
     return conversations_React.createElement("li", {
-      className: classString,
       id: id,
+      className: classString,
       "data-room-id": roomId,
       "data-jid": contactId,
-      onClick: e => {
-        self.props.onConversationClicked(e);
-      }
+      onClick: ev => this.props.onConversationClicked(ev)
     }, conversations_React.createElement("div", {
       className: "conversation-avatar"
     }, chatRoom.type === 'group' || chatRoom.type === 'public' ? conversations_React.createElement("div", {
@@ -15483,23 +15481,25 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
     })), conversations_React.createElement("div", {
       className: "conversation-data"
     }, conversations_React.createElement("div", {
-      className: nameClassString
-    }, roomTitle), chatRoom.type === "group" || chatRoom.type === "private" ? conversations_React.createElement("i", {
+      className: "conversation-data-top"
+    }, conversations_React.createElement("div", {
+      className: `conversation-data-name ${nameClassString}`
+    }, roomTitle), conversations_React.createElement("div", {
+      className: "conversation-data-badges"
+    }, chatRoom.type === "private" && conversations_React.createElement("span", {
+      className: `user-card-presence ${presenceClass}`
+    }), (chatRoom.type === "group" || chatRoom.type === "private") && conversations_React.createElement("i", {
       className: "sprite-fm-uni icon-ekr-key simpletip",
       "data-simpletip": l[20935]
-    }) : undefined, archivedDiv, notificationItems.length > 0 ? conversations_React.createElement("div", {
-      className: "unread-messages-container"
-    }, conversations_React.createElement("div", {
-      className: "unread-messages items-" + notificationItems.length
-    }, notificationItems)) : null, conversations_React.createElement("div", {
+    }), archivedDiv), lastMessageDatetimeDiv), conversations_React.createElement("div", {
       className: "clear"
     }), conversations_React.createElement("div", {
       className: "conversation-message-info"
-    }, lastMessageDiv, conversations_React.createElement("div", {
-      className: "conversations-separator"
-    }, conversations_React.createElement("i", {
-      className: "sprite-fm-mono icon-dot"
-    })), lastMessageDatetimeDiv)));
+    }, lastMessageDiv, notificationItems.length > 0 ? conversations_React.createElement("div", {
+      className: "unread-messages-container"
+    }, conversations_React.createElement("div", {
+      className: `unread-messages items-${notificationItems.length}`
+    }, notificationItems)) : null)));
   }
 
 }, ((0,applyDecoratedDescriptor.Z)(conversations_class.prototype, "eventuallyScrollTo", [conversations_dec], Object.getOwnPropertyDescriptor(conversations_class.prototype, "eventuallyScrollTo"), conversations_class.prototype), (0,applyDecoratedDescriptor.Z)(conversations_class.prototype, "render", [conversations_dec2], Object.getOwnPropertyDescriptor(conversations_class.prototype, "render"), conversations_class.prototype)), conversations_class));

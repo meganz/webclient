@@ -173,6 +173,12 @@ function setDateTimeFormat(locales, format) {
                 break;
             case 16:
                 options.day = 'numeric';
+                break;
+            case 17:
+                options.year = '2-digit';
+                options.month = 'numeric';
+                options.day = 'numeric';
+                break;
         }
     }
 

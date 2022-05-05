@@ -213,8 +213,9 @@ class ConversationsListItem extends MegaRenderMixin {
                         {l[20789]}
                     </div>;
             }
-
-            lastMessageDatetimeDiv = <div className="date-time">{getTimeMarker(lastMessage.delay, true)}</div>;
+            const timeString = todayOrYesterday(lastMessage.delay * 1000)
+                ? getTimeMarker(lastMessage.delay) : time2date(lastMessage.delay, 17);
+            lastMessageDatetimeDiv = <div className="date-time">{timeString}</div>;
         }
         else {
             lastMsgDivClasses = "conversation-message";
@@ -234,9 +235,9 @@ class ConversationsListItem extends MegaRenderMixin {
                         {emptyMessage}
                     </div>
                 </div>;
-
-            lastMessageDatetimeDiv =
-                <div className="date-time">{l[19077].replace("%s1", getTimeMarker(chatRoom.ctime, true))}</div>;
+            const timeString = todayOrYesterday(chatRoom.ctime * 1000)
+                ? getTimeMarker(chatRoom.ctime) : time2date(chatRoom.ctime, 17);
+            lastMessageDatetimeDiv = <div className="date-time">{timeString}</div>;
         }
 
         this.lastMessageId = lastMessage && lastMessage.messageId;
@@ -257,16 +258,17 @@ class ConversationsListItem extends MegaRenderMixin {
                     <div className="user-card-wrapper">
                         <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>
                     </div>
-                    <span className={`user-card-presence ${presenceClass}`} />
                 </ContactAwareName>;
         }
+        nameClassString += chatRoom.type === "private" || chatRoom.type === "group" ? ' badge-pad' : '';
 
-        var self = this;
         return (
-            <li className={classString} id={id} data-room-id={roomId} data-jid={contactId}
-                onClick={(e) => {
-                    self.props.onConversationClicked(e);
-                }}>
+            <li
+                id={id}
+                className={classString}
+                data-room-id={roomId}
+                data-jid={contactId}
+                onClick={ev => this.props.onConversationClicked(ev)}>
                 <div className="conversation-avatar">
                     {chatRoom.type === 'group' || chatRoom.type === 'public' ?
                         <div className="chat-topic-icon">
@@ -275,27 +277,27 @@ class ConversationsListItem extends MegaRenderMixin {
                         <Avatar contact={chatRoom.getParticipantsExceptMe()[0]} />}
                 </div>
                 <div className="conversation-data">
-                    <div className={nameClassString}>
-                        {roomTitle}
+                    <div className="conversation-data-top">
+                        <div className={`conversation-data-name ${nameClassString}`}>
+                            {roomTitle}
+                        </div>
+                        <div className="conversation-data-badges">
+                            {chatRoom.type === "private" && <span className={`user-card-presence ${presenceClass}`} />}
+                            {(chatRoom.type === "group" || chatRoom.type === "private") &&
+                                <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} />}
+                            {archivedDiv}
+                        </div>
+                        {lastMessageDatetimeDiv}
                     </div>
-                    {
-                        chatRoom.type === "group" || chatRoom.type === "private" ?
-                            <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} /> : undefined
-                    }
-                    {archivedDiv}
-                    {notificationItems.length > 0 ?
-                        <div className="unread-messages-container">
-                            <div className={"unread-messages items-" + notificationItems.length}>
-                                {notificationItems}
-                            </div>
-                        </div> : null}
                     <div className="clear" />
                     <div className="conversation-message-info">
                         {lastMessageDiv}
-                        <div className="conversations-separator">
-                            <i className="sprite-fm-mono icon-dot" />
-                        </div>
-                        {lastMessageDatetimeDiv}
+                        {notificationItems.length > 0 ?
+                            <div className="unread-messages-container">
+                                <div className={`unread-messages items-${notificationItems.length}`}>
+                                    {notificationItems}
+                                </div>
+                            </div> : null}
                     </div>
                 </div>
             </li>

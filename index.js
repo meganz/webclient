@@ -3177,7 +3177,7 @@ function loadSubPage(tpage, event) {
 
     if (M.chat && megaChatIsReady) {
         // navigating within the chat, skip the bloatware
-        if (tpage !== 'securechat' && tpage.indexOf('chat') > -1) {
+        if (tpage !== 'securechat' && !tpage.startsWith('fm/search') && tpage.indexOf('chat') > -1) {
             if (fminitialized && tpage.startsWith("chat/") && megaChatIsReady) {
                 // tried to navigate internally to a chat link, do a force redirect.
                 // Can be triggered by the back button.

@@ -15428,7 +15428,7 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
         }), l[20789]);
       }
 
-      const timeString = todayOrYesterday(lastMessage.delay * 1000) ? getTimeMarker(lastMessage.delay) : time2date(lastMessage.delay, 16);
+      const timeString = todayOrYesterday(lastMessage.delay * 1000) ? getTimeMarker(lastMessage.delay) : time2date(lastMessage.delay, 17);
       lastMessageDatetimeDiv = conversations_React.createElement("div", {
         className: "date-time"
       }, timeString);
@@ -15438,7 +15438,7 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
       lastMessageDiv = conversations_React.createElement("div", null, conversations_React.createElement("div", {
         className: lastMsgDivClasses
       }, emptyMessage));
-      const timeString = todayOrYesterday(chatRoom.ctime * 1000) ? getTimeMarker(chatRoom.ctime) : time2date(chatRoom.ctime, 16);
+      const timeString = todayOrYesterday(chatRoom.ctime * 1000) ? getTimeMarker(chatRoom.ctime) : time2date(chatRoom.ctime, 17);
       lastMessageDatetimeDiv = conversations_React.createElement("div", {
         className: "date-time"
       }, timeString);

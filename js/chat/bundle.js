@@ -22807,7 +22807,7 @@ class Attachment extends AbstractGenericMessage {
             }
 
             if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-              dbfetch.get(v.h).always(function () {
+              dbfetch.acquire(v.h).always(() => {
                 if (!M.d[v.h]) {
                   NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
                   dd.doRerender();
@@ -22892,6 +22892,10 @@ class Attachment extends AbstractGenericMessage {
           disabled: mega.paywall,
           onClick: () => this.props.onAddToCloudDrive(v, true)
         }))));
+      }
+
+      if (M.getNodeShare(v.h).down) {
+        dropdown = null;
       }
 
       var preview = external_React_default().createElement("div", {

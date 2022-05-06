@@ -382,6 +382,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             delete items['.add-star-item'];
             delete items['.colour-label-items'];
             delete items['.download-item'];
+            delete items['.play-item'];
+            delete items['.preview-item'];
+            delete items['.edit-file-item'];
+            delete items['.open-gallery'];
+            delete items['.open-item'];
             items['.dispute-item'] = 1;
         }
     }

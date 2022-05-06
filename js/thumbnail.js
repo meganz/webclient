@@ -509,6 +509,22 @@ class ThumbManager extends LRUMap {
         }
     }
 
+    replace(h, value) {
+        const n = M.getNodeByHandle(h);
+
+        this.add(n.fa, value || self.noThumbURI);
+
+        if (M.megaRender) {
+            const domNode = M.megaRender.revokeDOMNode(n.h);
+            if (domNode) {
+                const img = domNode.querySelector('img');
+                if (img) {
+                    img.src = super.get(n.fa);
+                }
+            }
+        }
+    }
+
     async query(handles, each, loadend) {
         if (this.loading) {
             await this.loading;

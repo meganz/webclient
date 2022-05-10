@@ -943,7 +943,9 @@ accountUI.account = {
                 var formatClass = '.' + $.dateTimeFormat.structure + ' .bmonth';
                 var $input = $('.mega-input.title-ontop.birth' + formatClass, accountUI.$contentBlock);
                 $input.val(u_attr.birthmonth).trigger('input');
-                this.zerofill($input[0]);
+                if ($input.length) {
+                    this.zerofill($input[0]);
+                }
             }
         },
 
@@ -955,7 +957,9 @@ accountUI.account = {
                 var formatClass = '.' + $.dateTimeFormat.structure + ' .bdate';
                 var $input = $('.mega-input.title-ontop.birth' + formatClass, accountUI.$contentBlock);
                 $input.val(u_attr.birthday).trigger('input');
-                this.zerofill($input[0]);
+                if ($input.length) {
+                    this.zerofill($input[0]);
+                }
             }
         },
 

@@ -21,6 +21,7 @@ var BABEL_LOADER_OPTIONS = {
         ['@babel/preset-env',  {
             "loose": true,
             "exclude": [
+                "@babel/plugin-transform-parameters",
                 "@babel/plugin-transform-typeof-symbol",
                 "@babel/plugin-transform-template-literals"
             ]
@@ -101,8 +102,8 @@ var webpackConfigs = {
             app: entryPoints
         },
         performance: {
-            maxAssetSize: 999000,
-            maxEntrypointSize: 999000
+            maxAssetSize: 1222333,
+            maxEntrypointSize: 1222333
         },
         output: {
             path: __dirname + "/",

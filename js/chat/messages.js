@@ -299,6 +299,11 @@ Message.prototype._onAttachmentReceived = function(data) {
         n.ch = n.m + '!' + n.h;
         n.co = this.orderValue;
 
+        if (M.getNodeShare(n.h).down) {
+            this.chatRoom.logger.warn(`Taken-down node ${n.h}`, n);
+            delete n.fa;
+        }
+
         if (M.chd[n.ch]) {
             // if the message got flushed from history and re-shown later
             Object.assign(n, M.chd[n.ch]);

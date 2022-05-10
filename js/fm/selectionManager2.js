@@ -847,18 +847,18 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         const allButtons = selectionLinkWrapper.querySelectorAll('.js-statusbarbtn:not(.options)');
 
-        for (var i = allButtons.length; i--;) {
+        for (let i = allButtons.length; i--;) {
             allButtons[i].classList.add('hidden');
         }
 
         const isSearch = page.startsWith('fm/search');
-
-        let selNode = M.d[$.selected[0]] || false;
-        let showGetLink;
+        const selNode = M.getNodeByHandle($.selected[0]);
         const sourceRoot = M.getSelectedSourceRoot(isSearch);
-        const __showBtn = (className) => {
 
-            const button = selectionLinkWrapper.querySelector('.js-statusbarbtn.' + className);
+        let showGetLink;
+        let __showBtn = (className) => {
+
+            const button = selectionLinkWrapper.querySelector(`.js-statusbarbtn.${className}`);
 
             if (button) {
                 button.classList.remove('hidden');
@@ -867,12 +867,12 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         if (sourceRoot === M.RootID && !folderlink) {
 
-            let cl = new mega.Share.ExportLink();
+            const cl = new mega.Share.ExportLink();
 
             // If any of selected items is taken down we do not need to proceed futher
             if (cl.isTakenDown($.selected)) {
                 __showBtn('delete');
-                return false;
+                __showBtn = nop;
             }
 
             showGetLink = 1;

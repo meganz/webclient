@@ -18,20 +18,9 @@ mobile.cloud.contextMenu = {
         $openContextMenuButtons.off('tap').on('tap', function() {
 
             var $selectedRow = $(this).parents('.fm-item');
-            var $itemImage = $selectedRow.find('.fm-item-img');
-            var $itemInfo = $selectedRow.find('.fm-item-info');
-            var $contextMenuItemInfo = $('.context-menu-container .item-info');
 
             // Get the node handle for this row
             var nodeHandle = $selectedRow.data('handle');
-
-            // Clear any selections.
-            mobile.cloud.deselect();
-
-            // Show the file info inside the context menu
-            $contextMenuItemInfo.empty()
-                .append($itemImage.clone())
-                .append($itemInfo.clone());
 
             // Show the relevant context menu
             mobile.cloud.contextMenu.show(nodeHandle);
@@ -46,7 +35,6 @@ mobile.cloud.contextMenu = {
      * @param {String} nodeHandle The internal node handle of the folder/file to show the context menu for
      */
     show: function(nodeHandle) {
-
         'use strict';
 
         var $folderContextMenu = $('.context-menu-container.folder');
@@ -58,6 +46,22 @@ mobile.cloud.contextMenu = {
         var nodeType = M.d[nodeHandle].t;
         var share = M.getNodeShare(nodeHandle);
         var sourceRoot = M.getNodeRoot(nodeHandle);
+
+        // Clear any selections.
+        mobile.cloud.deselect();
+
+        const domNode = document.getElementById(nodeHandle);
+        if (domNode) {
+            const $contextMenuItemInfo = $('.context-menu-container .item-info');
+            const $itemImage = $('.fm-item-img', domNode);
+            const $itemInfo = $('.fm-item-info', domNode);
+
+            // Show the file info inside the context menu
+            // eslint-disable-next-line local-rules/jquery-replacements
+            $contextMenuItemInfo.empty()
+                .append($itemImage.clone())
+                .append($itemInfo.clone());
+        }
 
         // Show overlay
         $overlay.removeClass('hidden');
@@ -124,17 +128,17 @@ mobile.cloud.contextMenu = {
         else {
 
             // Initialise buttons
-            mobile.cloud.contextMenu.initPreviewButton($fileContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initRenameButton($fileContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDeleteButton($fileContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initCloseButton($fileContextMenu);
             mobile.cloud.contextMenu.initOverlayTap($folderContextMenu);
 
             if (share && share.down) {
-                $fileContextMenu.find('.download-file-button, .link-button').addClass('hidden');
+                $('.download-file-button, .link-button, .preview-file-button', $fileContextMenu).addClass('hidden');
             } else {
-                $fileContextMenu.find('.download-file-button, .link-button').removeClass('hidden');
+                $('.download-file-button, .link-button, .preview-file-button', $fileContextMenu).removeClass('hidden');
                 mobile.cloud.contextMenu.initDownloadButton($fileContextMenu, nodeHandle);
+                mobile.cloud.contextMenu.initPreviewButton($fileContextMenu, nodeHandle);
                 mobile.cloud.contextMenu.initLinkButton($fileContextMenu, nodeHandle);
             }
 

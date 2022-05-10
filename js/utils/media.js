@@ -2552,7 +2552,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             for (var i = entries.length; i--;) {
                 var entry = new MediaAttribute(entries[i]);
-                var size = entry.s || entry.size || 0;
+                var size = M.getNodeShare(entry).down ? -1 : entry.s || entry.size || 0;
 
                 if (size > 16 && MediaInfoLib.isFileSupported(entry) && entry.weak) {
                     parse(entry);
@@ -3103,6 +3103,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 });
         }, 4e3);
     };
+
     mBroadcaster.addListener('mega:openfolder', miCollectProcess);
     mBroadcaster.addListener('mediainfo:collect', miCollectProcess);
 

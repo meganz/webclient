@@ -8270,7 +8270,7 @@ ColumnSharedFolderName.megatype = "name";
 
 class ColumnSharedFolderAccess extends genericNodePropsComponent.L {
   render() {
-    let {
+    const {
       nodeAdapter
     } = this.props;
     return external_React_default().createElement("td", {
@@ -8279,15 +8279,18 @@ class ColumnSharedFolderAccess extends genericNodePropsComponent.L {
     }, external_React_default().createElement("div", {
       className: "shared-folder-access"
     }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono " + nodeAdapter.nodeProps.incomingShareData.accessIcon
+      className: `
+                            sprite-fm-mono
+                            ${nodeAdapter.nodeProps.incomingShareData.accessIcon}
+                        `
     }), external_React_default().createElement("span", null, nodeAdapter.nodeProps.incomingShareData.accessLabel)));
   }
 
 }
 ColumnSharedFolderAccess.sortable = true;
-ColumnSharedFolderAccess.id = "r";
+ColumnSharedFolderAccess.id = 'access';
 ColumnSharedFolderAccess.label = l[5906];
-ColumnSharedFolderAccess.megatype = "share-access";
+ColumnSharedFolderAccess.megatype = 'access';
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx
 
 
@@ -29341,10 +29344,10 @@ class FMView extends mixins.wl {
       sortFunc = M.getSortByStatusFn();
     } else if (sortBy[0] === "interaction") {
       sortFunc = M.getSortByInteractionFn();
-    } else if (sortBy[0] === "status") {
-      sortFunc = M.getSortByStatusFn();
     } else if (sortBy[0] === "email") {
       sortFunc = M.getSortByEmail();
+    } else if (sortBy[0] === 'access') {
+      sortFunc = (a, b, o) => typeof a.r !== 'undefined' && typeof b.r !== 'undefined' && (a.r < b.r ? -1 : 1) * o;
     } else {
         sortFunc = M.sortByFavFn(order);
       }

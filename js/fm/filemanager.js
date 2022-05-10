@@ -3511,6 +3511,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     // enable add star on first column click (make favorite)
     $('.grid-table.shared-with-me tr td:first-child').add('.grid-table.out-shares tr td:first-child')
         .add('.grid-table.fm tr td:nth-child(2)').rebind('click', function() {
+            $.hideContextMenu();
             if (M.isInvalidUserStatus()) {
                 return;
             }

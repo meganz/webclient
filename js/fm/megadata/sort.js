@@ -676,13 +676,15 @@ MegaData.prototype.getSortBySharedWithFn = function() {
         var bShareNames = [];
 
         for (var i in a.shares) {
-            if (a.shares[i]) {
-                aShareNames.push(M.getNameByHandle(i));
+            const aShareName = M.getNameByHandle(i); // 'EXP' could get an empty name as returned
+            if (a.shares[i] && aShareName) {
+                aShareNames.push(aShareName);
             }
         }
         for (var j in b.shares) {
-            if (b.shares[j]) {
-                bShareNames.push(M.getNameByHandle(j));
+            const bShareName = M.getNameByHandle(j); // 'EXP' could get an empty name as returned
+            if (b.shares[j] && bShareName) {
+                bShareNames.push(bShareName);
             }
         }
         aShareNames = aShareNames.sort().join();

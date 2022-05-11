@@ -446,6 +446,12 @@ def string_validation(new_strings):
         elif 'developer_comment' not in data:
             print('ERROR: String with key {} has no developer comment.'.format(key))
             valid_strings = False
+        elif re.sub('\s', '', key) == '':
+            print('ERROR: A string key is empty')
+            valid_strings = False
+        elif re.sub('\s', '', data['string']) == '':
+            print('ERROR: String with key {} has no string content'.format(key))
+            valid_strings = False
         else:
             new_strings[key]['string'] = sanitise_string(data['string'], True, False)
             print('Accepted: String with key {} is valid.'.format(key))

@@ -669,7 +669,7 @@ sms.verifySuccess = {
         var $successMessage = $page.find('.js-body-text');
         var $storageAmount = $page.find('.js-storage-quota');
         var $transferAmount = $page.find('.js-transfer-quota');
-        var $validDaysText = $page.find('.js-valid-days');
+        var $validDaysText = $('.valid-days-title span', $page);
 
         // Fetch all account data from the API
         M.accountData(function() {
@@ -701,7 +701,7 @@ sms.verifySuccess = {
                 $successMessage.text(l[20404]);             // Congratulations! You've just unlocked:
                 $storageAmount.text(storageQuotaFormatted);
                 $transferAmount.text(transferQuotaFormatted);
-                $validDaysText.text(days);
+                $validDaysText.text(l[20407].replace("%1", days));
             }
             $page.removeClass('hidden');
         }, true); // Show loading spinner

@@ -1346,6 +1346,7 @@
   margin: 0;
   padding: 0;
   background: transparent;
+  z-index: 21;
 }
 .local-stream.minimized button.expand i {
   --icon-size: 24px;

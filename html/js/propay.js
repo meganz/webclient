@@ -1293,8 +1293,10 @@ pro.propay = {
                 else if (pro.propay.proPaymentMethod.indexOf('astropay') > -1) {
                     pro.lastPaymentProviderId = astroPayDialog.gatewayId;
                     extra.bank = astroPayDialog.selectedProvider.extra.code;
-                    extra.cpf = astroPayDialog.taxNumber;
                     extra.name = astroPayDialog.fullName;
+                    extra.address = astroPayDialog.address;
+                    extra.city = astroPayDialog.city;
+                    extra.cpf = astroPayDialog.taxNumber;
                 }
 
                 // If Ecomprocessing, send extra details

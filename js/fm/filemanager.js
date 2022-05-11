@@ -2647,8 +2647,11 @@ FileManager.prototype.addTransferPanelUI = function() {
         var file;
         var tclear;
 
-        $('.dropdown.body.files-menu .dropdown-item').addClass('hidden');
-        var $menuitems = $('.dropdown.body.files-menu .dropdown-item');
+        // Please be aware that menu items are all hyperlink elements with the dropdown-item classname.
+        // Here only hide all menu items and display correct ones,
+        // which should not include any ones under submenu with the span tag.
+        var $menuitems = $('.dropdown.body.files-menu a.dropdown-item');
+        $menuitems.addClass('hidden');
 
         $menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear').removeClass('hidden');
 

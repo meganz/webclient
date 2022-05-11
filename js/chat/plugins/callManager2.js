@@ -253,6 +253,8 @@
             this.viewMode = CALL_VIEW_MODES.GRID;
             chatRoom.activeCall = this;
             megaChat.activeCall = this;
+            // Peer is alone in a group call after 1 min -> mute mic
+            delay('call:init', this.muteIfAlone.bind(this), 6e4);
         }
         get isPublic() {
             const type = this.chatRoom && this.chatRoom.type;
@@ -321,6 +323,8 @@
             }
             this.chatRoom.trigger('onCallPeerLeft', peer.userId);
             this.left = true;
+            // Peer is left alone in a group call -> mute mic
+            this.muteIfAlone();
         }
         onJoined() {
             this.chatRoom.trigger('onCallIJoined');
@@ -372,8 +376,8 @@
                 }
             }
         }
-        toggleAudio() {
-            this.sfuApp.sfuClient.muteAudio(!!(this.av & SfuClient.Av.Audio));
+        toggleAudio(mute) {
+            this.sfuApp.sfuClient.muteAudio(mute || !!(this.av & SfuClient.Av.Audio));
             // when we are not a speaker, local audio track is never obtained, so the event is never fired
             this.onLocalMediaChange(SfuClient.Av.Audio);
         }
@@ -402,6 +406,12 @@
         }
         hangUp(reason) {
             this.sfuApp.destroy(reason);
+        }
+        muteIfAlone() {
+            if (this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
+                return this.toggleAudio(true);
+            }
+            return false;
         }
     }
 

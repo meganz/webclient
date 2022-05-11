@@ -2852,6 +2852,7 @@ FileManager.prototype.addTransferPanelUI = function() {
             }
             else {
                 var domNode = domTable.querySelector('tr');
+                $.hideContextMenu();
                 if (e.shiftKey && domNode) {
                     var start = domNode;
                     var end = this;

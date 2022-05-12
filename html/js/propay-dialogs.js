@@ -23,6 +23,12 @@ var astroPayDialog = {
     // The provider details
     selectedProvider: null,
 
+    // Cached details to be sent on submit
+    fullName: '',
+    address: '',
+    city: '',
+    taxNumber: '',
+
     /**
      * Initialise
      * @param {Object} selectedProvider
@@ -97,6 +103,15 @@ var astroPayDialog = {
         // Change the tax labels
         this.$dialog.find('.astropay-label.tax').text(taxLabel + ':');
         this.$dialog.find('.astropay-tax-field').attr('placeholder', taxPlaceholder);
+
+        // If the provider doesn't support extra address information, hide it.
+        // Currently only India needs Address and City, but others may need them in future.
+        if (!this.selectedProvider.supportsExtraAddressInfo) {
+            this.$dialog.find('.astropay-label.address').addClass('hidden');
+            this.$dialog.find('.astropay-address-field').parent().addClass('hidden');
+            this.$dialog.find('.astropay-label.city').addClass('hidden');
+            this.$dialog.find('.astropay-city-field').parent().addClass('hidden');
+        }
     },
 
     /**
@@ -165,6 +180,8 @@ var astroPayDialog = {
 
             // Store the full name and tax number entered
             astroPayDialog.fullName = $.trim(astroPayDialog.$dialog.find('#astropay-name-field').val());
+            astroPayDialog.address = $.trim(astroPayDialog.$dialog.find('#astropay-address-field').val());
+            astroPayDialog.city = $.trim(astroPayDialog.$dialog.find('#astropay-city-field').val());
             astroPayDialog.taxNumber = $.trim(astroPayDialog.$dialog.find('#astropay-tax-field').val());
 
             // Make sure they entered something
@@ -232,6 +249,16 @@ var astroPayDialog = {
 
         // Check for Chile (between 8 and 9)
         else if (taxLabel === 'RUT' && taxNumLength >= 8 && taxNumLength <= 9) {
+            return true;
+        }
+
+        // Check for India
+        else if (taxLabel === 'PAN' && taxNumLength === 10) {
+            return true;
+        }
+
+        // Check for Indonesia and Vietnam (no tax requirement), just collect anyway if they do enter something
+        else if (taxLabel === 'NPWP' || taxLabel === 'TIN') {
             return true;
         }
 

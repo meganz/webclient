@@ -3583,6 +3583,14 @@ lazy(MegaData.prototype, 'nodeShare', () => {
             // update tree node flags
             ufsc.addTreeNode(n);
         }
+        else if (n.fa && s.u === 'EXP' && s.down) {
+            debug('cleaning fa for taken-down node...', n.fa, [n], s);
+            if (thumbnails.has(n.fa)) {
+                thumbnails.replace(n.h, null);
+            }
+            delete n.fa;
+            M.nodeUpdated(n);
+        }
 
         if (fmdb && !ignoreDB && !pfkey) {
             fmdb.add('s', { o_t: h + '*' + s.u, d: s });
@@ -3961,6 +3969,11 @@ MegaData.prototype.nodeRemovalUIRefresh = function(handle, parent) {
 MegaData.prototype.getMediaProperties = function(node) {
     'use strict';
     node = typeof node === 'string' ? this.getNodeByHandle(node) : node;
+
+    if (this.getNodeShare(node).down) {
+        // File is taken down.
+        return {icon: fileIcon(node)};
+    }
 
     var isText = false;
     var isImage = is_image2(node);

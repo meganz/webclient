@@ -103,8 +103,8 @@ export default class Attachment extends AbstractGenericMessage {
                             }
 
                             if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-                                dbfetch.get(v.h)
-                                    .always(function() {
+                                dbfetch.acquire(v.h)
+                                    .always(() => {
                                         if (!M.d[v.h]) {
                                             NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
                                             dd.doRerender();
@@ -120,7 +120,7 @@ export default class Attachment extends AbstractGenericMessage {
                                     icon="sprite-fm-mono icon-download-small"
                                     label={l[1187] /* `Download` */}
                                     disabled={mega.paywall}
-                                    onClick={() => this.props.onDownloadStart(v)} />;
+                                    onClick={() => this.props.onDownloadStart(v)}/>;
 
                                 if (M.getNodeRoot(v.h) !== M.RubbishID) {
                                     this.props.onAddLinkButtons(v.h, linkButtons);
@@ -229,12 +229,15 @@ export default class Attachment extends AbstractGenericMessage {
                 </Button>;
             }
 
+            if (M.getNodeShare(v.h).down) {
+                dropdown = null;
+            }
 
             var attachmentClasses = "message shared-data";
             var preview =
                 <div
                     className={"data-block-view medium " + noThumbPrev}
-                    onClick={({ target, currentTarget }) => {
+                    onClick={({target, currentTarget}) => {
                         if (isPreviewable && target === currentTarget) {
                             this.props.onPreviewStart(v);
                         }

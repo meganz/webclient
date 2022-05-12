@@ -672,6 +672,13 @@ mobile.cloud = {
             var node = M.d[nodeHandle];
             var isVideo = is_video(node);
 
+            if (!node || M.getNodeShare(node).down) {
+                if (node) {
+                    mobile.cloud.contextMenu.show(node.h);
+                }
+                return false;
+            }
+
             // Clear selection
             mobile.cloud.deselect();
 

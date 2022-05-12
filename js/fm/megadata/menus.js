@@ -382,6 +382,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             delete items['.add-star-item'];
             delete items['.colour-label-items'];
             delete items['.download-item'];
+            delete items['.play-item'];
+            delete items['.preview-item'];
+            delete items['.edit-file-item'];
+            delete items['.open-gallery'];
+            delete items['.open-item'];
             items['.dispute-item'] = 1;
         }
     }
@@ -641,7 +646,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
     }
     else if (ll === 7) { // Columns selection menu
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
-            var $currMenuItems = $('.files-menu.context .dropdown-item')
+            // Please be aware that have to hide all hyperlink dropdown items that are options in context menu,
+            // not including any ones under submenu with the span tag.
+            // Then filter them with the classname of visible-col-select
+            // and display correct ones based on the visible columns list.
+            var $currMenuItems = $('.files-menu.context a.dropdown-item')
                 .addClass('hidden').filter('.visible-col-select');
             for (var col in M.columnsWidth.cloud) {
                 if (M.columnsWidth.cloud[col] && M.columnsWidth.cloud[col].disabled) {

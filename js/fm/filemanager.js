@@ -2528,7 +2528,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             && !$('.fm-new-folder').hasClass('active')
             && !$('.top-search-bl').hasClass('active')
         ) {
-            $.selected = s;
+            $.selected = s.filter(h => !M.getNodeShare(h).down);
 
             if ($.selected && $.selected.length > 0) {
                 var n = M.d[$.selected[0]];
@@ -2647,8 +2647,11 @@ FileManager.prototype.addTransferPanelUI = function() {
         var file;
         var tclear;
 
-        $('.dropdown.body.files-menu .dropdown-item').addClass('hidden');
-        var $menuitems = $('.dropdown.body.files-menu .dropdown-item');
+        // Please be aware that menu items are all hyperlink elements with the dropdown-item classname.
+        // Here only hide all menu items and display correct ones,
+        // which should not include any ones under submenu with the span tag.
+        var $menuitems = $('.dropdown.body.files-menu a.dropdown-item');
+        $menuitems.addClass('hidden');
 
         $menuitems.filter('.transfer-pause,.transfer-play,.move-up,.move-down,.transfer-clear').removeClass('hidden');
 
@@ -3511,6 +3514,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     // enable add star on first column click (make favorite)
     $('.grid-table.shared-with-me tr td:first-child').add('.grid-table.out-shares tr td:first-child')
         .add('.grid-table.fm tr td:nth-child(2)').rebind('click', function() {
+            $.hideContextMenu();
             if (M.isInvalidUserStatus()) {
                 return;
             }
@@ -3878,7 +3882,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         $ddUIgrid.trigger('selectablereinitialized');
     }
 
-    $ddUIitem.rebind('contextmenu.filemanager', function(e) {
+    const contextMenuHandler = function(e) {
         $.hideContextMenu(e);
 
         if (e.shiftKey) {
@@ -3910,7 +3914,8 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         M.hideClickHint();
 
         return !!M.contextMenuUI(e, 1);
-    });
+    };
+    $ddUIitem.rebind('contextmenu.filemanager', contextMenuHandler);
 
     $ddUIitem.rebind('click', function(e) {
         if ($.gridDragging) {
@@ -3961,6 +3966,14 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
         let h = $(e.currentTarget).attr('id');
         const n = M.getNodeByHandle(h);
+
+        if (!n || M.getNodeShare(n).down) {
+            // Prevent to preview any kind of taken down files
+            if (n) {
+                contextMenuHandler.call(e.currentTarget, e);
+            }
+            return false;
+        }
 
         // Emulate dblclick on tablet devices
         if (e.type === 'touchend' && tappedItemId !== h) {

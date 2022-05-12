@@ -8270,7 +8270,7 @@ ColumnSharedFolderName.megatype = "name";
 
 class ColumnSharedFolderAccess extends genericNodePropsComponent.L {
   render() {
-    let {
+    const {
       nodeAdapter
     } = this.props;
     return external_React_default().createElement("td", {
@@ -8279,15 +8279,18 @@ class ColumnSharedFolderAccess extends genericNodePropsComponent.L {
     }, external_React_default().createElement("div", {
       className: "shared-folder-access"
     }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono " + nodeAdapter.nodeProps.incomingShareData.accessIcon
+      className: `
+                            sprite-fm-mono
+                            ${nodeAdapter.nodeProps.incomingShareData.accessIcon}
+                        `
     }), external_React_default().createElement("span", null, nodeAdapter.nodeProps.incomingShareData.accessLabel)));
   }
 
 }
 ColumnSharedFolderAccess.sortable = true;
-ColumnSharedFolderAccess.id = "r";
+ColumnSharedFolderAccess.id = 'access';
 ColumnSharedFolderAccess.label = l[5906];
-ColumnSharedFolderAccess.megatype = "share-access";
+ColumnSharedFolderAccess.megatype = 'access';
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx
 
 
@@ -15428,18 +15431,20 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
         }), l[20789]);
       }
 
+      const timeString = todayOrYesterday(lastMessage.delay * 1000) ? getTimeMarker(lastMessage.delay) : time2date(lastMessage.delay, 17);
       lastMessageDatetimeDiv = conversations_React.createElement("div", {
         className: "date-time"
-      }, getTimeMarker(lastMessage.delay, true));
+      }, timeString);
     } else {
       lastMsgDivClasses = "conversation-message";
       const emptyMessage = this.loadingShown ? l[7006] : l[8000];
       lastMessageDiv = conversations_React.createElement("div", null, conversations_React.createElement("div", {
         className: lastMsgDivClasses
       }, emptyMessage));
+      const timeString = todayOrYesterday(chatRoom.ctime * 1000) ? getTimeMarker(chatRoom.ctime) : time2date(chatRoom.ctime, 17);
       lastMessageDatetimeDiv = conversations_React.createElement("div", {
         className: "date-time"
-      }, l[19077].replace("%s1", getTimeMarker(chatRoom.ctime, true)));
+      }, timeString);
     }
 
     this.lastMessageId = lastMessage && lastMessage.messageId;
@@ -15458,20 +15463,16 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
         contact: this.props.contact
       }, conversations_React.createElement("div", {
         className: "user-card-wrapper"
-      }, conversations_React.createElement(utils.OFlowParsedHTML, null, megaChat.html(chatRoom.getRoomTitle()))), conversations_React.createElement("span", {
-        className: `user-card-presence ${presenceClass}`
-      }));
+      }, conversations_React.createElement(utils.OFlowParsedHTML, null, megaChat.html(chatRoom.getRoomTitle()))));
     }
 
-    var self = this;
+    nameClassString += chatRoom.type === "private" || chatRoom.type === "group" ? ' badge-pad' : '';
     return conversations_React.createElement("li", {
-      className: classString,
       id: id,
+      className: classString,
       "data-room-id": roomId,
       "data-jid": contactId,
-      onClick: e => {
-        self.props.onConversationClicked(e);
-      }
+      onClick: ev => this.props.onConversationClicked(ev)
     }, conversations_React.createElement("div", {
       className: "conversation-avatar"
     }, chatRoom.type === 'group' || chatRoom.type === 'public' ? conversations_React.createElement("div", {
@@ -15483,23 +15484,25 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
     })), conversations_React.createElement("div", {
       className: "conversation-data"
     }, conversations_React.createElement("div", {
-      className: nameClassString
-    }, roomTitle), chatRoom.type === "group" || chatRoom.type === "private" ? conversations_React.createElement("i", {
+      className: "conversation-data-top"
+    }, conversations_React.createElement("div", {
+      className: `conversation-data-name ${nameClassString}`
+    }, roomTitle), conversations_React.createElement("div", {
+      className: "conversation-data-badges"
+    }, chatRoom.type === "private" && conversations_React.createElement("span", {
+      className: `user-card-presence ${presenceClass}`
+    }), (chatRoom.type === "group" || chatRoom.type === "private") && conversations_React.createElement("i", {
       className: "sprite-fm-uni icon-ekr-key simpletip",
       "data-simpletip": l[20935]
-    }) : undefined, archivedDiv, notificationItems.length > 0 ? conversations_React.createElement("div", {
-      className: "unread-messages-container"
-    }, conversations_React.createElement("div", {
-      className: "unread-messages items-" + notificationItems.length
-    }, notificationItems)) : null, conversations_React.createElement("div", {
+    }), archivedDiv), lastMessageDatetimeDiv), conversations_React.createElement("div", {
       className: "clear"
     }), conversations_React.createElement("div", {
       className: "conversation-message-info"
-    }, lastMessageDiv, conversations_React.createElement("div", {
-      className: "conversations-separator"
-    }, conversations_React.createElement("i", {
-      className: "sprite-fm-mono icon-dot"
-    })), lastMessageDatetimeDiv)));
+    }, lastMessageDiv, notificationItems.length > 0 ? conversations_React.createElement("div", {
+      className: "unread-messages-container"
+    }, conversations_React.createElement("div", {
+      className: `unread-messages items-${notificationItems.length}`
+    }, notificationItems)) : null)));
   }
 
 }, ((0,applyDecoratedDescriptor.Z)(conversations_class.prototype, "eventuallyScrollTo", [conversations_dec], Object.getOwnPropertyDescriptor(conversations_class.prototype, "eventuallyScrollTo"), conversations_class.prototype), (0,applyDecoratedDescriptor.Z)(conversations_class.prototype, "render", [conversations_dec2], Object.getOwnPropertyDescriptor(conversations_class.prototype, "render"), conversations_class.prototype)), conversations_class));
@@ -22807,7 +22810,7 @@ class Attachment extends AbstractGenericMessage {
             }
 
             if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-              dbfetch.get(v.h).always(function () {
+              dbfetch.acquire(v.h).always(() => {
                 if (!M.d[v.h]) {
                   NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
                   dd.doRerender();
@@ -22892,6 +22895,10 @@ class Attachment extends AbstractGenericMessage {
           disabled: mega.paywall,
           onClick: () => this.props.onAddToCloudDrive(v, true)
         }))));
+      }
+
+      if (M.getNodeShare(v.h).down) {
+        dropdown = null;
       }
 
       var preview = external_React_default().createElement("div", {
@@ -29341,10 +29348,10 @@ class FMView extends mixins.wl {
       sortFunc = M.getSortByStatusFn();
     } else if (sortBy[0] === "interaction") {
       sortFunc = M.getSortByInteractionFn();
-    } else if (sortBy[0] === "status") {
-      sortFunc = M.getSortByStatusFn();
     } else if (sortBy[0] === "email") {
       sortFunc = M.getSortByEmail();
+    } else if (sortBy[0] === 'access') {
+      sortFunc = (a, b, o) => typeof a.r !== 'undefined' && typeof b.r !== 'undefined' && (a.r < b.r ? -1 : 1) * o;
     } else {
         sortFunc = M.sortByFavFn(order);
       }

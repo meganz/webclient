@@ -246,6 +246,33 @@
 .provider-icon.sabadellMC {
     background-position: 0 -1980px;
 }
+.provider-icon.astropayRU { /* RuPay */
+    background-position: 0 -4140px;
+}
+.provider-icon.astropayPW { /* PayTm Wallet */
+    background-position: 0 -4200px;
+}
+.provider-icon.astropayVT { /* VTCPay */
+    background-position: 0 -4260px;
+}
+.provider-icon.astropayUI { /* UPI */
+    background-position: 0 -4320px;
+}
+.provider-icon.astropayOV { /* eWallet Ovo */
+    background-position: 0 -4380px;
+}
+.provider-icon.astropayXW { /* Xendit Wallet */
+    background-position: 0 -4440px;
+}
+.provider-icon.astropayNB { /* Net Banking India */
+    background-position: 0 -4500px;
+}
+.provider-icon.astropayDN { /* eWallet Dana */
+    background-position: 0 -4560px;
+}
+.provider-icon.astropayIO { /* Bank Transfer */
+    background-position: 0 -4620px;
+}
 .provider-icon.stripeAE {
     background-image: url("../images/mega/Amex.svg");
     background-size: unset;

@@ -167,11 +167,12 @@ export default class FMView extends MegaRenderMixin {
         else if (sortBy[0] === "interaction") {
             sortFunc = M.getSortByInteractionFn();
         }
-        else if (sortBy[0] === "status") {
-            sortFunc = M.getSortByStatusFn();
-        }
         else if (sortBy[0] === "email") {
             sortFunc = M.getSortByEmail();
+        }
+        else if (sortBy[0] === 'access') {
+            sortFunc = (a, b, o) =>
+                typeof a.r !== 'undefined' && typeof b.r !== 'undefined' && (a.r < b.r ? -1 : 1) * o;
         }
         else /* if(self.state.sortBy[0] === "grid-header-star") */ {
             sortFunc = M.sortByFavFn(order);

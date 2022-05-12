@@ -3216,6 +3216,9 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         else if ($me.hasClass('sort-sharecreated')) {
             sortType = 'date';
         }
+        else if ($me.hasClass('sort-versions')) {
+            sortType = 'versions';
+        }
 
         var classToAdd = 'selected';
         var iconClassToAdd = 'icon-up';

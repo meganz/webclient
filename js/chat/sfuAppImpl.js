@@ -78,8 +78,8 @@
         this.callManagerCall.onPeerJoined(peer);
     };
 
-    SfuApp.prototype.onPeerLeft = function(peer) {
-        this.callManagerCall.onPeerLeft(peer);
+    SfuApp.prototype.onPeerLeft = function(peer, reason) {
+        this.callManagerCall.onPeerLeft(peer, reason);
     };
 
     SfuApp.prototype.onJoined = function() {

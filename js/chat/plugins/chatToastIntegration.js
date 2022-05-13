@@ -24,7 +24,7 @@ class ChatToastIntegration {
                             ChatToastIntegration.DEFAULT_OPTS
                         );
                     })
-                    .rebind('onCallPeerLeft.cTI', (e, userHandle) => {
+                    .rebind('onCallPeerLeft.cTI', (e, { userHandle }) => {
                         if (megaRoom.activeCall && megaRoom.activeCall.sfuApp.isDestroyed) {
                             // Don't show leaving toasts if we are leaving.
                             return;

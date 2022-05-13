@@ -316,12 +316,13 @@
             // thumb is already loaded, only uncomment if we want HD by default?
             // this.sfuApp.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
         }
-        onPeerLeft(peer) {
+        onPeerLeft(peer, reason) {
             this.peers.remove(peer.cid);
             if (this.activeStream && this.activeStream === peer.cid) {
                 this.activeStream = null;
             }
-            this.chatRoom.trigger('onCallPeerLeft', peer.userId);
+            console.warn("onPeerLeft: reason", SfuClient.TermCode[reason]);
+            this.chatRoom.trigger('onCallPeerLeft', { userHandle: peer.userId, reason });
             this.left = true;
             // Peer is left alone in a group call -> mute mic
             this.muteIfAlone();
@@ -543,6 +544,25 @@
                 if (newState === ChatRoom.STATE.LEFT && chatRoom.activeCall) {
                     chatRoom.activeCall.hangUp(SfuClient.TermCode.kLeavingRoom);
                 }
+            });
+            chatRoom.rebind('onCallPeerLeft.callManager', (e, { reason }) => {
+                const { peers, callId, sfuApp } = chatRoom.activeCall;
+
+                if (
+                    sfuApp.isDestroyed ||
+                    peers.length ||
+                    SfuClient.isTermCodeRetriable(reason)
+                ) {
+                    return;
+                }
+
+                return (
+                    delay(
+                        'onCallEnd',
+                        () => peers.length ? null : chatRoom.trigger('onCallEnd', { callId, removeActive: true }),
+                        chatRoom.type !== 'private' && 12e4
+                    )
+                );
             });
 
             chatRoom.rebind('onMeAdded', (e, addedBy) => {

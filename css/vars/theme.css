@@ -17,54 +17,61 @@
   *
   * Themes can be forced so that they are always on using the `-forced` suffix, for example the nav bar is always
   * dark mode.
+  *
+  * Color must be in RGBA format. e.g. rgba(0, 0, 0, 1)
+  *
+  * Custom Alpha Level can be added to override the alpha level when required.
+  * (ONLY for Label, icon, avatar, navbar, secondary, surface, stroke)
+  * Custom alpha var name must be starts with color var {type}. e.g. --label-black: rgba(0, 0, 0, var(--label-alpha, 1))
   */
 
 
 /*** Section 1: constants that will not vary by theme, but may only be used by one theme at the moment ***/
 
-body {
+body,
+.custom-alpha {
 
     /* colors */
 
         /* left main navbar */
-            --navbar-background: #333333;
+            --navbar-background: rgba(51, 51, 51, var(--navbar-alpha, 1));
 
         /* icons */
 
-            --icon-agnostic: #000;
+            --icon-agnostic: rgba(0, 0, 0, var(--icon-alpha, 1));
 
         /* labels */
 
-            --label-red: #ff625c;
-            --label-orange: #f9a646;
-            --label-yellow: #f4ce4a;
-            --label-green: #6dcc50;
-            --label-blue: #4bb8f3;
-            --label-purple: #d088e1;
-            --label-grey: #a4a4a7;
+            --label-red: rgba(255, 97, 92, var(--label-alpha, 1));
+            --label-orange: rgba(249, 166, 70, var(--label-alpha, 1));
+            --label-yellow: rgba(244, 206, 74, var(--label-alpha, 1));
+            --label-green: rgba(109, 204, 80, var(--label-alpha, 1));
+            --label-blue: rgba(75, 184, 243, var(--label-alpha, 1));
+            --label-purple: rgba(208, 136, 225, var(--label-alpha, 1));
+            --label-grey: rgba(164, 164, 167, var(--label-alpha, 1));
 
-            --label-red-hover: rgba(255, 98, 92, 0.6);
-            --label-orange-hover: rgba(249, 166, 70, 0.6);
-            --label-yellow-hover: rgba(244, 206, 74, 0.6);
-            --label-green-hover: rgba(109, 204, 80, 0.6);
-            --label-blue-hover: rgba(75, 184, 243, 0.6);
-            --label-purple-hover: rgba(208, 136, 225, 0.6);
-            --label-grey-hover: rgba(164, 164, 167, 0.6);
+            --label-red-hover: rgba(255, 98, 92, var(--label-alpha, 0.6));
+            --label-orange-hover: rgba(249, 166, 70, var(--label-alpha, 0.6));
+            --label-yellow-hover: rgba(244, 206, 74, var(--label-alpha, 0.6));
+            --label-green-hover: rgba(109, 204, 80, var(--label-alpha, 0.6));
+            --label-blue-hover: rgba(75, 184, 243, var(--label-alpha, 0.6));
+            --label-purple-hover: rgba(208, 136, 225, var(--label-alpha, 0.6));
+            --label-grey-hover: rgba(164, 164, 167, var(--label-alpha, 0.6));
 
         /* avatars */
 
-            --avatar-blue: linear-gradient(225deg, rgba(85, 210, 240, 1) 0%, rgba(43, 166, 222, 1) 100%);
-            --avatar-eggplant: linear-gradient(225deg, rgba(188, 32, 134, 1) 0%, rgba(136, 14, 79, 1) 100%);
-            --avatar-gold: linear-gradient(225deg, rgba(255, 210, 0, 1) 0%, rgba(255, 165, 0, 1) 100%);
-            --avatar-green: linear-gradient(225deg, rgba(95, 219, 0, 1) 0%, rgba(49, 181, 0, 1) 100%);
-            --avatar-jade: linear-gradient(225deg, rgba(0, 189, 178, 1) 0%, rgba(0, 137, 123, 1) 100%);
-            --avatar-orange: linear-gradient(225deg, rgba(255, 167, 0, 1) 0%, rgba(255, 111, 0, 1) 100%);
-            --avatar-purple: linear-gradient(225deg, rgba(228, 38, 155, 1) 0%, rgba(197, 17, 98, 1) 100%);
-            --avatar-red: linear-gradient(225deg, rgba(255, 98, 108, 1) 0%, rgba(255, 51, 58, 1) 100%);
-            --avatar-salmon: linear-gradient(225deg, rgba(255, 137, 137, 1) 0%, rgba(255, 82, 82, 1) 100%);
-            --avatar-sky: linear-gradient(225deg, rgba(154, 234, 255, 1) 0%, rgba(97, 210, 255, 1) 100%);
-            --avatar-teal: linear-gradient(225deg, rgba(0, 213, 226, 1) 0%, rgba(0, 172, 193, 1) 100%);
-            --avatar-yellow: linear-gradient(225deg, rgba(255, 235, 0, 1) 0%, rgba(255, 211, 0, 1) 100%);
+            --avatar-blue: linear-gradient(225deg, rgba(85, 210, 240, var(--avatar-alpha, 1)) 0%, rgba(43, 166, 222, var(--avatar-alpha, 1)) 100%);
+            --avatar-eggplant: linear-gradient(225deg, rgba(188, 32, 134, var(--avatar-alpha, 1)) 0%, rgba(136, 14, 79, var(--avatar-alpha, 1)) 100%);
+            --avatar-gold: linear-gradient(225deg, rgba(255, 210, 0, var(--avatar-alpha, 1)) 0%, rgba(255, 165, 0, var(--avatar-alpha, 1)) 100%);
+            --avatar-green: linear-gradient(225deg, rgba(95, 219, 0, var(--avatar-alpha, 1)) 0%, rgba(49, 181, 0, var(--avatar-alpha, 1)) 100%);
+            --avatar-jade: linear-gradient(225deg, rgba(0, 189, 178, var(--avatar-alpha, 1)) 0%, rgba(0, 137, 123, var(--avatar-alpha, 1)) 100%);
+            --avatar-orange: linear-gradient(225deg, rgba(255, 167, 0, var(--avatar-alpha, 1)) 0%, rgba(255, 111, 0, var(--avatar-alpha, 1)) 100%);
+            --avatar-purple: linear-gradient(225deg, rgba(228, 38, 155, var(--avatar-alpha, 1)) 0%, rgba(197, 17, 98, var(--avatar-alpha, 1)) 100%);
+            --avatar-red: linear-gradient(225deg, rgba(255, 98, 108, var(--avatar-alpha, 1)) 0%, rgba(255, 51, 58, var(--avatar-alpha, 1)) 100%);
+            --avatar-salmon: linear-gradient(225deg, rgba(255, 137, 137, var(--avatar-alpha, 1)) 0%, rgba(255, 82, 82, var(--avatar-alpha, 1)) 100%);
+            --avatar-sky: linear-gradient(225deg, rgba(154, 234, 255, var(--avatar-alpha, 1)) 0%, rgba(97, 210, 255, var(--avatar-alpha, 1)) 100%);
+            --avatar-teal: linear-gradient(225deg, rgba(0, 213, 226, var(--avatar-alpha, 1)) 0%, rgba(0, 172, 193, var(--avatar-alpha, 1)) 100%);
+            --avatar-yellow: linear-gradient(225deg, rgba(255, 235, 0, var(--avatar-alpha, 1)) 0%, rgba(255, 211, 0, var(--avatar-alpha, 1)) 100%);
 
         /* Transparent images background */
 
@@ -76,15 +83,15 @@ body {
 
             /* black */
 
-                --text-color-black-higher: #333;
-                --text-color-black-high: #333;
+                --text-color-black-higher: rgba(51, 51, 51, 1);
+                --text-color-black-high: rgba(51, 51, 51, 1);
                 --text-color-black-medium: rgba(51, 51, 51, 0.7);
                 --text-color-black-low: rgba(51, 51, 51, 0.4);
 
             /* white */
 
-                --text-color-white-higher: #fff;
-                --text-color-white-high: #fff;
+                --text-color-white-higher: rgba(255, 255, 255, 1);
+                --text-color-white-high: rgba(255, 255, 255, 1);
                 --text-color-white-medium: rgba(255, 255, 255, 0.7);
                 --text-color-white-low: rgba(255, 255, 255, 0.4);
 
@@ -157,66 +164,66 @@ html .theme-light-forced {
 
     /* secondary colors */
 
-        --secondary-blue: #2ba6de;
-        --secondary-green: #1db07b;
-        --secondary-orange: #ffa500;
-        --secondary-red: #fd3e38;
-        --secondary-white: #fff;
-        --secondary-grey: #ccc;
+        --secondary-blue: rgba(43, 166, 222, var(--secondary-alpha, 1));
+        --secondary-green: rgba(29, 176, 123, var(--secondary-alpha, 1));
+        --secondary-orange: rgba(255, 166, 0, var(--secondary-alpha, 1));
+        --secondary-red: rgba(253, 62, 56, var(--secondary-alpha, 1));
+        --secondary-white: rgba(255, 255, 255, var(--secondary-alpha, 1));
+        --secondary-grey: rgba(204, 204, 204, var(--secondary-alpha, 1));
 
     /* surfaces */
 
-        --surface-main: #ffffff;
-        --surface-grey-1: #fafafa;
-        --surface-grey-2: #eee;
+        --surface-main: rgba(255, 255, 255, var(--surface-alpha, 1));
+        --surface-grey-1: rgba(250, 250, 250, var(--surface-alpha, 1));
+        --surface-grey-2: rgba(237, 237, 237, var(--surface-alpha, 1));
         --surface-grey-3: var(--surface-grey-1);
         --surface-grey-4: rgba(238, 238, 238, var(--surface-alpha, 1));
         --surface-grey-5: var(--surface-main);
         --surface-grey-6: var(--surface-grey-2);
         --surface-light-grey: /* not present in this theme */;
-        --surface-mid-grey: #ccc;
-        --surface-dark-grey: linear-gradient(180deg, rgba(85, 85, 85, 1) 0%, rgba(68, 68, 68, 1) 100%);
-        --surface-black: #000;
-        --surface-black-bar: rgba(0, 0, 0, 0.7);
-        --surface-scrim: rgba(255, 255, 255, 0.32);
-        --surface-warning: linear-gradient(180deg, rgba(255, 210, 0, 1) 0%, rgba(255, 165, 0, 1) 100%);
-        --surface-error: linear-gradient(180deg, rgba(255, 113, 105, 1) 0%, rgba(253, 62, 56, 1) 100%);
-        --surface-error-hover: linear-gradient(180deg, rgba(255, 95, 85, 1) 0%, rgba(252, 48, 42, 1) 100%);
-        --surface-error-active: linear-gradient(180deg, rgba(255, 132, 123, 1) 0%, rgba(253, 76, 69, 1) 100%);
-        --surface-progress-background: linear-gradient(180deg, rgba(85, 85, 85, 0.3) 0%, rgba(68, 68, 68, 0.3) 100%);
+        --surface-mid-grey: rgba(204, 204, 204, var(--surface-alpha, 1));
+        --surface-dark-grey: linear-gradient(180deg, rgba(85, 85, 85, var(--surface-alpha, 1)) 0%, rgba(68, 68, 68, var(--surface-alpha, 1)) 100%);
+        --surface-black: rgba(0, 0, 0, var(--surface-alpha, 1));
+        --surface-black-bar: rgba(0, 0, 0, var(--surface-alpha, 0.7));
+        --surface-scrim: rgba(255, 255, 255, var(--surface-alpha, 0.32));
+        --surface-warning: linear-gradient(180deg, rgba(255, 210, 0, var(--surface-alpha, 1)) 0%, rgba(255, 165, 0, var(--surface-alpha, 1)) 100%);
+        --surface-error: linear-gradient(180deg, rgba(255, 113, 105, var(--surface-alpha, 1)) 0%, rgba(253, 62, 56, var(--surface-alpha, 1)) 100%);
+        --surface-error-hover: linear-gradient(180deg, rgba(255, 95, 85, var(--surface-alpha, 1)) 0%, rgba(252, 48, 42, var(--surface-alpha, 1)) 100%);
+        --surface-error-active: linear-gradient(180deg, rgba(255, 132, 123, var(--surface-alpha, 1)) 0%, rgba(253, 76, 69, var(--surface-alpha, 1)) 100%);
+        --surface-progress-background: linear-gradient(180deg, rgba(85, 85, 85, var(--surface-alpha, 0.3)) 0%, rgba(68, 68, 68, var(--surface-alpha, 0.3)) 100%);
         --surface-overlay: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.1) 0%, rgba(20, 20, 20, 0.3) 100%);
-        --surface-highlight-1: rgba(250, 250, 250, 0.8);
-        --surface-highlight-2: rgba(250, 250, 250, 0.4);
-        --surface-inner-shadow: rgba(250, 250, 250, 0.6);
+        --surface-highlight-1: rgba(250, 250, 250, var(--surface-alpha, 0.8));
+        --surface-highlight-2: rgba(250, 250, 250, var(--surface-alpha, 0.4));
+        --surface-inner-shadow: rgba(250, 250, 250, var(--surface-alpha, 0.6));
 
     /* strokes */
 
-        --stroke-main: #fff;
-        --stroke-grey-1: #fafafa;
-        --stroke-grey-2: #eee;
-        --stroke-grey-3: #fafafa;
-        --stroke-grey-4: #eee;
-        --stroke-grey-6: #eee;
-        --stroke-dark-grey: #555555;
-        --stroke-mid-grey: #ccc;
-        --stroke-black: #000;
-        --stroke-info: #2ba6de;
-        --stroke-success: #00bfa5;
-        --stroke-warning: #ff9924;
-        --stroke-error: #fd3e38;
-        --stroke-highlight: #fafafa;
-        --stroke-scrim: rgba(255, 255, 255, 0.32);
-        --stroke-overlay-background: rgba(204, 204, 204, 0.9);
+        --stroke-main: rgba(255, 255, 255, var(--stroke-alpha, 1));
+        --stroke-grey-1: rgba(250, 250, 250, var(--stroke-alpha, 1));
+        --stroke-grey-2: rgba(238, 238, 238, var(--stroke-alpha, 1));
+        --stroke-grey-3: rgba(250, 250, 250, var(--stroke-alpha, 1));
+        --stroke-grey-4: rgba(238, 238, 238, var(--stroke-alpha, 1));
+        --stroke-grey-6: rgba(238, 238, 238, var(--stroke-alpha, 1));
+        --stroke-dark-grey: rgba(85, 85, 85, var(--stroke-alpha, 1));
+        --stroke-mid-grey: rgba(204, 204, 204, var(--stroke-alpha, 1));
+        --stroke-black: rgba(0, 0, 0, var(--stroke-alpha, 1));
+        --stroke-info: rgba(43, 166, 222, var(--stroke-alpha, 1));
+        --stroke-success: rgba(0, 191, 165, var(--stroke-alpha, 1));
+        --stroke-warning: rgba(255, 153, 36, var(--stroke-alpha, 1));
+        --stroke-error: rgba(253, 62, 56, var(--stroke-alpha, 1));
+        --stroke-highlight: rgba(250, 250, 250, var(--stroke-alpha, 1));
+        --stroke-scrim: rgba(255, 255, 255, var(--stroke-alpha, 0.32));
+        --stroke-overlay-background: rgba(204, 204, 204, var(--stroke-alpha, 0.9));
 
     /* icons */
 
-        --icon-rest: rgba(51, 51, 51, 0.7);
-        --icon-inactive: rgba(51, 51, 51, 0.3);
-        --icon-active: #333;
+        --icon-rest: rgba(51, 51, 51, var(--icon-alpha, 0.7));
+        --icon-inactive: rgba(51, 51, 51, var(--icon-alpha, 0.3));
+        --icon-active: rgba(51, 51, 51, var(--icon-alpha, 1));
 
     /* table */
 
-        --table-border: #f1f1f1;
+        --table-border: rgba(241, 241, 241, 1);
 
     /* text */
 
@@ -224,10 +231,10 @@ html .theme-light-forced {
         --text-color-high: var(--text-color-black-high);
         --text-color-medium: var(--text-color-black-medium);
         --text-color-low: var(--text-color-black-low);
-        --text-color-info: #2ba6de;
-        --text-color-success: #00bfa5;
-        --text-color-warning: #ff9924;
-        --text-color-error: #fd3e38;
+        --text-color-info: rgba(43, 166, 222, 1);
+        --text-color-success: rgba(0, 191, 165, 1);
+        --text-color-warning: rgba(255, 153, 36, 1);
+        --text-color-error: rgba(253, 62, 56, 1);
 
     /* button */
 
@@ -244,10 +251,10 @@ html .theme-light-forced {
 
     /* banner */
 
-        --banner-text-error: #e33832;
-        --banner-text-info: #299cd1;
-        --banner-text-success: #06b17a;
-        --banner-text-warning: #e59400;
+        --banner-text-error: rgba(227, 56, 50, 1);
+        --banner-text-info: rgba(41, 156, 209, 1);
+        --banner-text-success: rgba(6, 177, 122, 1);
+        --banner-text-warning: rgba(229, 148, 0, 1);
 
         --banner-border-error: rgba(253, 62, 56, 0.5);
         --banner-border-info: rgba(43, 166, 222, 0.5);
@@ -261,36 +268,36 @@ html .theme-light-forced {
 
     /* input border */
 
-        --input-text-underline-active: #2ba6de;
-        --input-text-underline-hover: #2ba6de;
-        --input-text-underline-error: #ff333a;
+        --input-text-underline-active: rgba(43, 166, 222, 1);
+        --input-text-underline-hover: rgba(43, 166, 222, 1);
+        --input-text-underline-error: rgba(255, 51, 58, 1);
 
     /* checkbox */
 
-        --checkbox-fill-active: linear-gradient(180deg, #0ed9b1 0%, #06b17a 100%);
-        --checkbox-fill-inactive: linear-gradient(180deg, #f2f2f2 0%, #ededed 100%);
+        --checkbox-fill-active: linear-gradient(180deg, rgba(14, 217, 177, 1) 0%, rgba(6, 177, 122, 1) 100%);
+        --checkbox-fill-inactive: linear-gradient(180deg, rgba(242, 242, 242, 1) 0%, rgba(237, 237, 237, 1) 100%);
 
         --checkbox-border-inactive: rgba(0, 0, 0, 0.05);
 
     /* radio */
 
-        --radio-fill-active: linear-gradient(180deg, #3ed8b2 0%, #1db07b 100%);
+        --radio-fill-active: linear-gradient(180deg, rgba(62, 216, 178, 1) 0%, rgba(29, 176, 123, 1) 100%);
         --radio-fill-inactive: rgba(182, 188, 191, 0.1);
 
-        --radio-border-active: #3ed8b2;
-        --radio-border-inactive: #b6bcbf;
+        --radio-border-active: rgba(62, 216, 178, 1);
+        --radio-border-inactive: rgba(182, 188, 191, 1);
 
         --radio-oval-fill: rgba(34, 34, 34, 0.1);
 
     /* switch */
 
-        --switch-fill-active: linear-gradient(180deg, #0ed9b1 0%, #06b17a 100%);
+        --switch-fill-active: linear-gradient(180deg, rgba(14, 217, 177, 1) 0%, rgba(6, 177, 122, 1) 100%);
         --switch-fill-inactive: rgba(182, 191, 189, 0.3);
 
         --switch-border-active: rgba(0, 0, 0, 0.05);
         --switch-border-inactive: rgba(182, 191, 189, 0.5);
 
-        --switch-handle-fill: linear-gradient(180deg, #fff 0%, #fcfcfc 100%);
+        --switch-handle-fill: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(252, 252, 252, 1) 100%);
         --switch-handle-border: rgba(0, 0, 0, 0.05);
 
     /* dialog */
@@ -300,7 +307,7 @@ html .theme-light-forced {
     /* dropdown */
 
         --dropdown-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
-        --dropdown-border: 1px solid #eee;
+        --dropdown-border: 1px solid rgba(238, 238, 238, 1);
 
     /* toast */
 
@@ -308,56 +315,56 @@ html .theme-light-forced {
 
     /* dropdowns */
 
-        --dropdown-arrow-color: #fff;
+        --dropdown-arrow-color: rgba(255, 255, 255, 1);
 
     /* context/dropdown menus */
 
-        --context-menu-border: 1px solid #eee;
-        --context-menu-background: #ffffff;
-        --context-menu-shadow: rgba(0,0,0,0.3);
+        --context-menu-border: 1px solid rgba(238, 238, 238, 1);
+        --context-menu-background: rgba(255, 255, 255, 1);
+        --context-menu-shadow: rgba(0, 0, 0, 0.3);
 
     /* divider */
 
-        --divider-color: #eee;
+        --divider-color: rgba(238, 238, 238, 1);
 
     /* progress bars */
 
-        --progress-bar-fill1: #d90007;
-        --progress-bar-fill2: #ff333a;
-        --progress-bar-fill3: #ffa500;
+        --progress-bar-fill1: rgba(217, 0, 7, 1);
+        --progress-bar-fill2: rgba(255, 51, 58, 1);
+        --progress-bar-fill3: rgba(255, 165, 0, 1);
         --progress-bar-background: rgba(0, 0, 0, 0.2);
 
     /* scroll bar */
         --scroll-bar-background: rgba(0, 0, 0, 0.1);
-        --scroll-bar-handle: rgb(0, 0, 0);
+        --scroll-bar-handle: rgba(0, 0, 0, 1);
 
     /* Initial loading screen bars fill */
-        --progress-bar-fill4: #1d1d1d;
+        --progress-bar-fill4: rgba(29, 29, 29, 1);
 
     /* inverted */
-        --stroke-main-inverted: #333;
-        --stroke-grey-1-inverted: #222;
-        --stroke-link-inverted: #676767;
+        --stroke-main-inverted: rgba(51, 51, 51, var(--stroke-alpha, 1));
+        --stroke-grey-1-inverted: rgba(34, 34, 34, var(--stroke-alpha, 1));
+        --stroke-link-inverted: rgba(103, 103, 103, var(--stroke-alpha, 1));
 
     /* TODO: remove this once the library is updated */
-        --surface-overlay-background: rgba(204, 204, 204, 0.9);
-        --surface-main-inverted: #333;
-        --surface-link-inverted: #676767;
-        --surface-grey-1-inverted: #222;
-        --stroke-grey-2-inverted: #444;
+        --surface-overlay-background: rgba(204, 204, 204, var(--surface-alpha, 0.9));
+        --surface-main-inverted: rgba(51, 51, 51, var(--surface-alpha, 1));
+        --surface-link-inverted: rgba(103, 103, 103, var(--surface-alpha, 1));
+        --surface-grey-1-inverted: rgba(34, 34, 34, var(--surface-alpha, 1));
+        --stroke-grey-2-inverted: rgba(68, 68, 68, var(--stroke-alpha, 1));
         --text-color-higher-inverted: var(--text-color-white-higher);
         --text-color-high-inverted: var(--text-color-white-high);
         --text-color-medium-inverted: var(--text-color-white-medium);
         --text-color-low-inverted: var(--text-color-white-low);
-        --text-color-success-inverted: #5afee8;
-        --text-color-error-inverted: #ff7e79;
-        --icon-rest-inverted: #ccc;
-        --icon-active-inverted: #fff;
+        --text-color-success-inverted: rgba(90, 254, 232, 1);
+        --text-color-error-inverted: rgba(255, 126, 121, 1);
+        --icon-rest-inverted: rgba(204, 204, 204, var(--icon-alpha, 1));
+        --icon-active-inverted: rgba(255, 255, 255, var(--icon-alpha, 1));
 
-        --secondary-blue-inverted: #6fd7ff;
-        --secondary-green-inverted: #81cfb3;
-        --secondary-orange-inverted: #ffbe00;
-        --secondary-red-inverted: #ff6560;
+        --secondary-blue-inverted: rgba(111, 215, 255, var(--secondary-alpha, 1));
+        --secondary-green-inverted: rgba(129, 207, 179, var(--secondary-alpha, 1));
+        --secondary-orange-inverted: rgba(255, 190, 0, var(--secondary-alpha, 1));
+        --secondary-red-inverted: rgba(255, 101, 96, var(--secondary-alpha, 1));
 
     /* TEMP: variables */
         --button-hover: rgba(0, 0, 0, 0.05);
@@ -376,66 +383,66 @@ html .theme-dark-forced {
 
     /* secondary colors */
 
-        --secondary-blue: #6fd7ff;
-        --secondary-green: #81cfb3;
-        --secondary-orange: #ffbe00;
-        --secondary-white: #fff;
-        --secondary-red: #ff6560;
-        --secondary-grey: #ccc;
+        --secondary-blue: rgba(111, 215, 255, var(--secondary-alpha, 1));
+        --secondary-green: rgba(129, 207, 179, var(--secondary-alpha, 1));
+        --secondary-orange: rgba(255, 190, 0, var(--secondary-alpha, 1));
+        --secondary-white: rgba(255, 255, 255, var(--secondary-alpha, 1));
+        --secondary-red: rgba(255, 102, 97, var(--secondary-alpha, 1));
+        --secondary-grey: rgba(204, 204, 204, var(--secondary-alpha, 1));
 
     /* surfaces */
 
-        --surface-main: #333;
-        --surface-grey-1: #222;
-        --surface-grey-2: #444;
+        --surface-main: rgba(51, 51, 51, var(--surface-alpha, 1));
+        --surface-grey-1: rgba(34, 34, 34, var(--surface-alpha, 1));
+        --surface-grey-2: rgba(68, 68, 68, var(--surface-alpha, 1));
         --surface-grey-3: var(--surface-grey-2);
         --surface-grey-4: rgba(34, 34, 34, var(--surface-alpha, 1));
         --surface-grey-5: var(--surface-grey-2);
         --surface-grey-6: var(--surface-black);
-        --surface-light-grey: linear-gradient(180deg, rgba(230, 230, 230, 1) 0%, rgba(204, 204, 204, 1) 100%);
-        --surface-mid-grey: #666;
-        --surface-dark-grey: linear-gradient(180deg, #e6e6e6 0%, #ccc 100%);
-        --surface-black: #000;
-        --surface-black-bar: rgba(0, 0, 0, 0.7);
-        --surface-scrim: rgba(0, 0, 0, 0.32);
-        --surface-warning: linear-gradient(0deg, rgba(255, 235, 0, 1) 0%, rgba(255, 211, 0, 1) 100%);
-        --surface-error: linear-gradient(180deg, rgba(255, 158, 154, 1) 0%, rgba(255, 101, 96, 1) 100%);
-        --surface-error-hover: linear-gradient(180deg, rgba(255, 174, 171, 1) 0%, rgba(255, 119, 113, 1) 100%);
-        --surface-error-active: linear-gradient(180deg, rgba(255, 139, 134, 1) 0%, rgba(255, 83, 79, 1) 100%);
-        --surface-progress-background: linear-gradient(180deg, rgba(230, 230, 230, 0.3) 0%, rgba(204, 204, 204, 0.3) 100%);
+        --surface-light-grey: linear-gradient(180deg, rgba(230, 230, 230, var(--surface-alpha, 1)) 0%, rgba(204, 204, 204, var(--surface-alpha, 1)) 100%);
+        --surface-mid-grey: rgba(102, 102, 102, var(--surface-alpha, 1));
+        --surface-dark-grey: linear-gradient(180deg, rgba(230, 230, 230, var(--surface-alpha, 1)) 0%, rgba(204, 204, 204, var(--surface-alpha, 1)) 100%);
+        --surface-black: rgba(0, 0, 0, var(--surface-alpha, 1));
+        --surface-black-bar: rgba(0, 0, 0, var(--surface-alpha, 0.7));
+        --surface-scrim: rgba(0, 0, 0, var(--surface-alpha, 0.32));
+        --surface-warning: linear-gradient(0deg, rgba(255, 235, 0, var(--surface-alpha, 1)) 0%, rgba(255, 211, 0, var(--surface-alpha, 1)) 100%);
+        --surface-error: linear-gradient(180deg, rgba(255, 158, 154, var(--surface-alpha, 1)) 0%, rgba(255, 101, 96, var(--surface-alpha, 1)) 100%);
+        --surface-error-hover: linear-gradient(180deg, rgba(255, 174, 171, var(--surface-alpha, 1)) 0%, rgba(255, 119, 113, var(--surface-alpha, 1)) 100%);
+        --surface-error-active: linear-gradient(180deg, rgba(255, 139, 134, var(--surface-alpha, 1)) 0%, rgba(255, 83, 79, var(--surface-alpha, 1)) 100%);
+        --surface-progress-background: linear-gradient(180deg, rgba(230, 230, 230, var(--surface-alpha, 0.3)) 0%, rgba(204, 204, 204, var(--surface-alpha, 0.3)) 100%);
         --surface-overlay: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.7) 100%);
-        --surface-highlight-1: rgba(34, 34, 34, 0.8);
-        --surface-highlight-2: rgba(34, 34, 34, 0.4);
-        --surface-inner-shadow: rgba(34, 34, 34, 0.6);
+        --surface-highlight-1: rgba(34, 34, 34, var(--surface-alpha, 0.8));
+        --surface-highlight-2: rgba(34, 34, 34, var(--surface-alpha, 0.4));
+        --surface-inner-shadow: rgba(34, 34, 34, var(--surface-alpha, 0.6));
 
     /* strokes */
 
-        --stroke-main: #333;
-        --stroke-grey-1: #222;
-        --stroke-grey-2: #444;
-        --stroke-grey-3: #444;
-        --stroke-grey-4: #222;
-        --stroke-grey-6: #000;
-        --stroke-dark-grey: #e6e6e6;
-        --stroke-mid-grey: #666;
-        --stroke-black: #000;
-        --stroke-info: #6fd7ff;
-        --stroke-success: #5afee8;
-        --stroke-warning: #fec35a;
-        --stroke-error: #ff7e79;
-        --stroke-highlight: #111;
-        --stroke-scrim: rgba(0, 0, 0, 0.32);
-        --stroke-overlay-background: rgba(0, 0, 0, 0.8);
+        --stroke-main: rgba(51, 51, 51, var(--stroke-alpha, 1));
+        --stroke-grey-1: rgba(34, 34, 34, var(--stroke-alpha, 1));
+        --stroke-grey-2: rgba(68, 68, 68, var(--stroke-alpha, 1));
+        --stroke-grey-3: rgba(68, 68, 68, var(--stroke-alpha, 1));
+        --stroke-grey-4: rgba(34, 34, 34, var(--stroke-alpha, 1));
+        --stroke-grey-6: rgba(0, 0, 0, var(--stroke-alpha, 1));
+        --stroke-dark-grey: rgba(230, 230, 230, var(--stroke-alpha, 1));
+        --stroke-mid-grey: rgba(102, 102, 102, var(--stroke-alpha, 1));
+        --stroke-black: rgba(0, 0, 0, var(--stroke-alpha, 1));
+        --stroke-info: rgba(111, 215, 255, var(--stroke-alpha, 1));
+        --stroke-success: rgba(90, 254, 232, var(--stroke-alpha, 1));
+        --stroke-warning: rgba(254, 195, 90, var(--stroke-alpha, 1));
+        --stroke-error: rgba(255, 126, 121, var(--stroke-alpha, 1));
+        --stroke-highlight: rgba(17, 17, 17, var(--stroke-alpha, 1));
+        --stroke-scrim: rgba(0, 0, 0, var(--stroke-alpha, 0.32));
+        --stroke-overlay-background: rgba(0, 0, 0, var(--stroke-alpha, 0.8));
 
     /* icons */
 
-        --icon-rest: #ccc;
-        --icon-inactive: rgba(255, 255, 255, 0.3);
-        --icon-active: #fff;
+        --icon-rest: rgba(204, 204, 204, var(--icon-alpha, 1));
+        --icon-inactive: rgba(255, 255, 255, var(--icon-alpha, 0.3));
+        --icon-active: rgba(255, 255, 255, var(--icon-alpha, 1));
 
     /* table */
 
-        --table-border: #444;
+        --table-border: rgba(68, 68, 68, 1);
 
     /* text */
 
@@ -443,10 +450,10 @@ html .theme-dark-forced {
         --text-color-high: var(--text-color-white-high);
         --text-color-medium: var(--text-color-white-medium);
         --text-color-low: var(--text-color-white-low);
-        --text-color-info: #6fd7ff;
-        --text-color-success: #5afee8;
-        --text-color-warning: #fec35a;
-        --text-color-error: #ff7e79;
+        --text-color-info: rgba(111, 215, 255, 1);
+        --text-color-success: rgba(90, 254, 232, 1);
+        --text-color-warning: rgba(254, 195, 90, 1);
+        --text-color-error: rgba(255, 126, 121, 1);
 
     /* button */
 
@@ -460,14 +467,14 @@ html .theme-dark-forced {
 
     /* banner */
 
-        --banner-text-error: #fff;
-        --banner-text-info: #fff;
-        --banner-text-success: #fff;
-        --banner-text-warning: #fff;
-        --banner-border-error: #fd3e38;
-        --banner-border-info: #2ba6de;
-        --banner-border-success: #1db07b;
-        --banner-border-warning: #ffa500;
+        --banner-text-error: rgba(255, 255, 255, 1);
+        --banner-text-info: rgba(255, 255, 255, 1);
+        --banner-text-success: rgba(255, 255, 255, 1);
+        --banner-text-warning: rgba(255, 255, 255, 1);
+        --banner-border-error: rgba(253, 62, 56, 1);
+        --banner-border-info: rgba(43, 166, 222, 1);
+        --banner-border-success: rgba(29, 176, 123, 1);
+        --banner-border-warning: rgba(255, 165, 0, 1);
         --banner-background-error: rgba(253, 62, 56, 0.5);
         --banner-background-info: rgba(43, 166, 222, 0.5);
         --banner-background-success: rgba(29, 176, 123, 0.5);
@@ -476,34 +483,34 @@ html .theme-dark-forced {
 
     /* input border */
 
-        --input-text-underline-active: #6fd7ff;
-        --input-text-underline-hover: #6fd7ff;
-        --input-text-underline-error: #ff333a;
+        --input-text-underline-active: rgba(111, 215, 255, 1);
+        --input-text-underline-hover: rgba(111, 215, 255, 1);
+        --input-text-underline-error: rgba(255, 51, 58, 1);
 
 
     /* checkbox */
 
-        --checkbox-fill-active: linear-gradient(180deg, #08e7c0 0%, #03ca8b 100%);
-        --checkbox-fill-inactive: linear-gradient(180deg, #9f9f9f 0%, #666 100%);
+        --checkbox-fill-active: linear-gradient(180deg, rgba(8, 231, 192, 1) 0%, rgba(3, 202, 139, 1) 100%);
+        --checkbox-fill-inactive: linear-gradient(180deg, rgba(159, 159, 159, 1) 0%, rgba(102, 102, 102, 1) 100%);
         --checkbox-border-inactive: rgba(255, 255, 255, 0.1);
 
 
     /* radio */
 
-        --radio-fill-active: linear-gradient(180deg, #0ed9b1 0%, #06b17a 100%);
-        --radio-fill-inactive: linear-gradient(180deg, #9f9f9f 0%, #666 100%);
-        --radio-border-active: #0ed9b1;
+        --radio-fill-active: linear-gradient(180deg, rgba(14, 217, 177, 1) 0%, rgba(6, 177, 122, 1) 100%);
+        --radio-fill-inactive: linear-gradient(180deg, rgba(159, 159, 159, 1) 0%, rgba(102, 102, 102, 1) 100%);
+        --radio-border-active: rgba(14, 217, 177, 1);
         --radio-border-inactive: rgba(255, 255, 255, 0.1);
         --radio-oval-fill: rgba(255, 255, 255, 0.3);
 
 
     /* switch */
 
-        --switch-fill-active: linear-gradient(180deg, #08e7c0 0%, #03ca8b 100%);
+        --switch-fill-active: linear-gradient(180deg, rgba(8, 231, 192, 1) 0%, rgba(3, 202, 139, 1) 100%);
         --switch-fill-inactive: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.2) 100%);
         --switch-border-active: rgba(255, 255, 255, 0.1);
         --switch-border-inactive: rgba(255, 255, 255, 0.1);
-        --switch-handle-fill: linear-gradient(180deg, #fff 0%, #fcfcfc 100%);
+        --switch-handle-fill: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(252, 252, 252, 1) 100%);
         --switch-handle-border: rgba(0, 0, 0, 0.05);
 
 
@@ -516,7 +523,7 @@ html .theme-dark-forced {
     /* dropdown/tooltip */
 
         --dropdown-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.7);
-        --dropdown-border: 1px solid #444;
+        --dropdown-border: 1px solid rgba(68, 68, 68, 1);
 
     /* toast */
 
@@ -524,13 +531,13 @@ html .theme-dark-forced {
 
     /* dropdowns */
 
-        --dropdown-arrow-color: #333;
+        --dropdown-arrow-color: rgba(51, 51, 51, 1);
 
     /* context/dropdown menus */
 
-        --context-menu-border: 1px solid #444;
-        --context-menu-background: #444444;
-        --context-menu-shadow: rgba(0,0,0,0.3);
+        --context-menu-border: 1px solid rgba(68, 68, 68, 1);
+        --context-menu-background: rgba(68, 68, 68, 1);
+        --context-menu-shadow: rgba(0, 0, 0, 0.3);
 
     /* divider */
 
@@ -538,44 +545,44 @@ html .theme-dark-forced {
 
     /* progress bars */
 
-        --progress-bar-fill1: #d90007;
-        --progress-bar-fill2: #ff333a;
-        --progress-bar-fill3: #ffa500;
+        --progress-bar-fill1: rgba(217, 0, 7, 1);
+        --progress-bar-fill2: rgba(255, 51, 58, 1);
+        --progress-bar-fill3: rgba(255, 165, 0, 1);
         --progress-bar-background: rgba(255, 255, 255, 0.2);
 
     /* scroll bar */
         --scroll-bar-background: rgba(0, 0, 0, 0.2);
-        --scroll-bar-handle: rgb(255, 255, 255);
+        --scroll-bar-handle: rgba(255, 255, 255, 1);
 
     /* Initial loading screen bars fill */
 
-        --progress-bar-fill4: #1d1d1d;
+        --progress-bar-fill4: rgba(29, 29, 29, 1);
 
     /* inverted */
-        --stroke-main-inverted: #fff;
-        --stroke-grey-1-inverted: #fafafa;
-        --stroke-link-inverted: #c7c7c7;
+        --stroke-main-inverted: rgba(255, 255, 255, var(--stroke-alpha, 1));
+        --stroke-grey-1-inverted: rgba(250, 250, 250, var(--stroke-alpha, 1));
+        --stroke-link-inverted: rgba(199, 199, 199, var(--stroke-alpha, 1));
 
     /* TODO: remove this once the library is updated */
 
-        --surface-overlay-background: rgba(0, 0, 0, 0.8);
-        --surface-main-inverted: #fff;
-        --surface-link-inverted: #C7C7C7;
-        --surface-grey-1-inverted: #fafafa;
-        --stroke-grey-2-inverted: #eee;
+        --surface-overlay-background: rgba(0, 0, 0, var(--surface-alpha, 0.8));
+        --surface-main-inverted: rgba(255, 255, 255, var(--surface-alpha, 1));
+        --surface-link-inverted: rgba(199, 199, 199, var(--surface-alpha, 1));
+        --surface-grey-1-inverted: rgba(250, 250, 250, var(--surface-alpha, 1));
+        --stroke-grey-2-inverted: rgba(238, 238, 238, var(--stroke-alpha, 1));
         --text-color-higher-inverted: var(--text-color-black-higher);
         --text-color-high-inverted: var(--text-color-black-high);
         --text-color-medium-inverted: var(--text-color-black-medium);
         --text-color-low-inverted: var(--text-color-black-low);
-        --text-color-success-inverted: #00bfa5;
-        --text-color-error-inverted: #fd3e38;
-        --icon-rest-inverted: rgba(51, 51, 51, 70);
-        --icon-active-inverted: #333;
+        --text-color-success-inverted: rgba(0, 191, 165, 1);
+        --text-color-error-inverted: rgba(253, 62, 56, 1);
+        --icon-rest-inverted: rgba(51, 51, 51, var(--icon-rest-alpha, 0.7));
+        --icon-active-inverted: rgba(51, 51, 51, var(--icon-active-alpha, 1));
 
-        --secondary-blue-inverted: #2ba6de;
-        --secondary-green-inverted: #1db07b;
-        --secondary-orange-inverted: #ffa500;
-        --secondary-red-inverted: #fd3e38;
+        --secondary-blue-inverted: rgba(43, 166, 222, var(--secondary-alpha, 1));
+        --secondary-green-inverted: rgba(29, 176, 123, var(--secondary-alpha, 1));
+        --secondary-orange-inverted: rgba(255, 165, 0, var(--secondary-alpha, 1));
+        --secondary-red-inverted: rgba(253, 62, 56, var(--secondary-alpha, 1));
 
     /* TEMP: variables */
 

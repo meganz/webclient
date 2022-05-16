@@ -13,7 +13,7 @@ Secure Boot
 and verifies its authenticity by checking the cryptographic hash.
 
 **Note:** This is not the exact same ``secureboot.js`` as we have
-  online at https://mega.nz/``secureboot.js``. We have an automatic
+  online at ``https://mega.nz/secureboot.js``. We have an automatic
   process that generates ``secureboot.js`` with its cryptographic
   hashes and all the versioned resource files
   (``file_X.js``/``file_X.html``) as needed based on this repository

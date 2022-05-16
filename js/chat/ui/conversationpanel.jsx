@@ -1767,7 +1767,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         {
                             !is_chatlink &&
                             room.state != ChatRoom.STATE.LEFT &&
-                            (room.havePendingGroupCall() || room.havePendingCall()) ?
+                            (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ?
                                 <JoinCallNotification chatRoom={room} /> : null
                         }
 

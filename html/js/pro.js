@@ -225,9 +225,9 @@ var pro = {
             case 4:
                 return l[8413];     // PRO LITE
             case 100:
-                return 'Business';    // product name should not be translated
+                return l[19530];    // Business
             default:
-                return l[1150];      // FREE
+                return l[1150];     // FREE
         }
     },
 

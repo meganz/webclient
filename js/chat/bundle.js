@@ -178,15 +178,7 @@ class ChatRouting {
     });
   }
 
-  reinitAndOpenExistingChat(chatId, publicChatHandle, cbBeforeOpen) {
-    if (publicChatHandle === void 0) {
-      publicChatHandle = false;
-    }
-
-    if (cbBeforeOpen === void 0) {
-      cbBeforeOpen = undefined;
-    }
-
+  reinitAndOpenExistingChat(chatId, publicChatHandle = false, cbBeforeOpen = undefined) {
     const chatUrl = "fm/chat/c/" + chatId;
     publicChatHandle = publicChatHandle || megaChat.initialPubChatHandle;
     const meetingDialogClosed = megaChat.meetingDialogClosed;
@@ -597,10 +589,9 @@ Chat.prototype._syncDnd = function () {
   const chats = this.chats;
 
   if (chats && chats.length > 0) {
-    chats.forEach(_ref => {
-      let {
-        chatId
-      } = _ref;
+    chats.forEach(({
+      chatId
+    }) => {
       const dnd = pushNotificationSettings.getDnd(chatId);
 
       if (dnd && dnd < unixtime()) {
@@ -1124,7 +1115,6 @@ Chat.prototype._renderMyStatus = function () {
 Chat.prototype.renderMyStatus = SoonFc(Chat.prototype._renderMyStatus, 100);
 
 Chat.prototype.reorderContactTree = function () {
-  this;
   var folders = M.getContacts({
     'h': 'contacts'
   });
@@ -1933,7 +1923,6 @@ Chat.prototype.createAndStartMeeting = function (topic, audio, video) {
 };
 
 Chat.prototype._destroyAllChatsFromChatd = function () {
-  this;
   asyncApiReq({
     'a': 'mcf',
     'v': Chatd.VERSION
@@ -2225,10 +2214,9 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes, noOpen) {
     var attachFolders = roomId => {
       return new MegaPromise((resolve, reject) => {
         var createPublicLink = (nodeId, room) => {
-          M.createPublicLink(nodeId).then(_ref2 => {
-            let {
-              link
-            } = _ref2;
+          M.createPublicLink(nodeId).then(({
+            link
+          }) => {
             room.sendMessage(link);
             resolve(room);
           }).catch(reject);
@@ -3066,11 +3054,7 @@ ChatRoom.MembersSet.PRIVILEGE_STATE = {
   'LEFT': -1
 };
 
-ChatRoom.encryptTopic = function (protocolHandler, newTopic, participants, isPublic) {
-  if (isPublic === void 0) {
-    isPublic = false;
-  }
-
+ChatRoom.encryptTopic = function (protocolHandler, newTopic, participants, isPublic = false) {
   if (protocolHandler instanceof strongvelope.ProtocolHandler && participants.size > 0) {
     const topic = protocolHandler.embeddedEncryptTo(newTopic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, undefined, isPublic);
 
@@ -3553,7 +3537,9 @@ ChatRoom.prototype.leave = function (triggerLeaveRequest) {
     if (self.state !== ChatRoom.STATE.LEFT) {
       self.setState(ChatRoom.STATE.LEAVING);
       self.setState(ChatRoom.STATE.LEFT);
-    } else {}
+    } else {
+      return;
+    }
   } else {
     self.setState(ChatRoom.STATE.LEFT);
   }
@@ -3561,6 +3547,7 @@ ChatRoom.prototype.leave = function (triggerLeaveRequest) {
 
 ChatRoom.prototype.archive = function () {
   var self = this;
+  var mask = 0x01;
   var flags = ChatRoom.ARCHIVED;
   asyncApiReq({
     'a': 'mcsf',
@@ -3577,6 +3564,8 @@ ChatRoom.prototype.archive = function () {
 
 ChatRoom.prototype.unarchive = function () {
   var self = this;
+  var mask = 0x01;
+  var flags = 0x00;
   asyncApiReq({
     'a': 'mcsf',
     'id': self.chatId,
@@ -4157,12 +4146,13 @@ ChatRoom.prototype.recover = function () {
 };
 
 ChatRoom._fnRequireParticipantKeys = function (fn, scope) {
+  var origFn = fn;
   return function () {
     var self = scope || this;
     var args = toArray.apply(null, arguments);
     var participants = self.protocolHandler.getTrackedParticipants();
     return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).done(function () {
-      fn.apply(self, args);
+      origFn.apply(self, args);
     }).fail(function () {
       self.logger.error("Failed to retr. keys.");
     });
@@ -4977,9 +4967,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
       if (node) {
         this.__intersectionVisibility = false;
         setTimeout(() => {
-          this.__intersectionObserverInstance = new IntersectionObserver(_ref => {
-            let [entry] = _ref;
-
+          this.__intersectionObserverInstance = new IntersectionObserver(([entry]) => {
             if (entry.intersectionRatio < 0.2 && !entry.isIntersecting) {
               this.__intersectionVisibility = false;
             } else {
@@ -5368,7 +5356,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
     }
   }
 
-  componentWillReceiveProps() {
+  componentWillReceiveProps(nextProps, nextContext) {
     if (localStorageProfileRenderFns) {
       var self = this;
       var componentName = self.constructor ? self.constructor.name : "unknown";
@@ -5857,8 +5845,8 @@ const closeDropdowns = () => {
 };
 
 class ContactsListItem extends _mixins1__._p {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.attachRerenderCallback = _attchRerenderCbContacts;
   }
 
@@ -5889,8 +5877,8 @@ ContactsListItem.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class ContactButton extends _mixins1__._p {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
   }
 
@@ -6288,7 +6276,6 @@ class ContactFingerprint extends _mixins1__.wl {
   }
 
   render() {
-    this;
     var contact = this.props.contact;
 
     if (!contact || !contact.u || is_chatlink) {
@@ -6342,8 +6329,8 @@ ContactFingerprint.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class Avatar extends _mixins1__._p {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
   }
 
@@ -6624,8 +6611,8 @@ ContactCard.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class ContactItem extends _mixins1__._p {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
   }
 
@@ -7428,8 +7415,8 @@ var genericNodePropsComponent = __webpack_require__(297);
 
 
 class ColumnContactName extends genericNodePropsComponent.L {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.Mail = (0,utils.withOverflowObserver)(() => external_React_default().createElement("span", {
       className: "contact-item-email"
     }, this.props.nodeAdapter.props.node.m));
@@ -7489,8 +7476,8 @@ ColumnContactStatus.megatype = "status";
 
 
 class ColumnContactLastInteraction extends genericNodePropsComponent.L {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
 
     this.getLastInteractionIcon = handle => {
       const {
@@ -7547,8 +7534,8 @@ ColumnContactLastInteraction.label = l[5904];
 ColumnContactLastInteraction.megatype = "interaction";
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 var dropdowns = __webpack_require__(78);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
-var call = __webpack_require__(939);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(332);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
@@ -7985,8 +7972,8 @@ ColumnContactRequestsTs.megatype = "ts";
 
 
 class ColumnContactRequestsRcvdBtns extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
 
     this.reinviteAllowed = rts => {
       const UTC_DATE_NOW = Math.floor(Date.now() / 1000);
@@ -8111,8 +8098,8 @@ class ReceivedRequests extends mixins.wl {
 
 
 class ColumnContactRequestsSentBtns extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
 
     this.reinviteAllowed = rts => {
       const UTC_DATE_NOW = Math.floor(Date.now() / 1000);
@@ -8359,8 +8346,8 @@ var ui_link = __webpack_require__(941);
 
 
 class ContactProfile extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.state = {
       selected: [],
       loading: true
@@ -8622,11 +8609,9 @@ class ContactsPanel extends mixins.wl {
       receivedRequestsCount: 0
     };
 
-    this.handleToggle = _ref => {
-      let {
-        keyCode
-      } = _ref;
-
+    this.handleToggle = ({
+      keyCode
+    }) => {
       if (keyCode === 27) {
         const HAS_DIALOG_OPENED = $.dialog || ['.contact-nickname-dialog', '.fingerprint-dialog', '.context'].some(selector => {
           const dialog = document.querySelector(selector);
@@ -9417,12 +9402,9 @@ class CloudBrowserDialog extends mixins.wl {
           this.props.onClose();
           onIdle(() => {
             const createPublicLink = () => {
-              M.createPublicLink(highlightedNode).then(_ref => {
-                let {
-                  link
-                } = _ref;
-                return this.props.room.sendMessage(link);
-              });
+              M.createPublicLink(highlightedNode).then(({
+                link
+              }) => this.props.room.sendMessage(link));
             };
 
             return mega.megadrop.isDropExist(highlightedNode).length ? msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(highlightedNode.name)), l[18229], e => {
@@ -9572,8 +9554,8 @@ const LIMIT = {
   MONTHS: 12
 };
 class HistoryRetentionDialog extends external_React_.Component {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.inputRef = external_React_default().createRef();
     this.state = {
       selectedTimeFormat: HistoryRetentionDialog.labels.timeFormats.labelPlural.hours,
@@ -9829,14 +9811,13 @@ HistoryRetentionDialog.timeFrame = {
   [l[6788]]: 30
 };
 
-function CustomRadioButton(_ref) {
-  let {
-    checked = false,
-    label,
-    name,
-    value,
-    onChange
-  } = _ref;
+function CustomRadioButton({
+  checked = false,
+  label,
+  name,
+  value,
+  onChange
+}) {
   return external_React_default().createElement("label", {
     key: value,
     className: "radio-txt"
@@ -12024,8 +12005,8 @@ PushSettingsDialog.options = {
   Infinity: l[22011]
 };
 PushSettingsDialog.default = PushSettingsDialog.options[PushSettingsDialog.options.length - 1];
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
-var call = __webpack_require__(939);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(332);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
 var historyPanel = __webpack_require__(192);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
@@ -12059,12 +12040,9 @@ class Loading extends mixins.wl {
     closeDialog == null ? void 0 : closeDialog();
     (_notify = notify) == null ? void 0 : _notify.closePopup();
     (_alarm = alarm) == null ? void 0 : _alarm.hideAllWarningPopups();
-    document.querySelectorAll('.js-dropdown-account').forEach(_ref => {
-      let {
-        classList
-      } = _ref;
-      return classList.contains('show') && classList.remove('show');
-    });
+    document.querySelectorAll('.js-dropdown-account').forEach(({
+      classList
+    }) => classList.contains('show') && classList.remove('show'));
   }
 
   render() {
@@ -12344,12 +12322,11 @@ class Join extends mixins.wl {
       ephemeralDialog: false
     };
 
-    this.handleKeyDown = _ref => {
+    this.handleKeyDown = ({
+      key
+    }) => {
       var _this$props$onClose, _this$props;
 
-      let {
-        key
-      } = _ref;
       return key && key === 'Escape' ? (_this$props$onClose = (_this$props = this.props).onClose) == null ? void 0 : _this$props$onClose.call(_this$props) : true;
     };
 
@@ -12423,14 +12400,11 @@ class Join extends mixins.wl {
     };
 
     this.Intro = () => {
-      const $$CONTAINER = _ref2 => {
-        let {
-          children
-        } = _ref2;
-        return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
-          className: `${Join.NAMESPACE}-content`
-        }, children), this.Chat());
-      };
+      const $$CONTAINER = ({
+        children
+      }) => external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
+        className: `${Join.NAMESPACE}-content`
+      }, children), this.Chat());
 
       if (isEphemeral()) {
         return external_React_default().createElement($$CONTAINER, null, external_React_default().createElement(meetings_button.Z, {
@@ -12505,33 +12479,29 @@ class Join extends mixins.wl {
       }))));
     };
 
-    this.Card = _ref3 => {
-      let {
-        children
-      } = _ref3;
-      return external_React_default().createElement("div", {
-        className: "card"
-      }, external_React_default().createElement("div", {
-        className: "card-body"
-      }, children, external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
-        to: "/securechat"
-      }, l.how_meetings_work))), external_React_default().createElement("div", {
-        className: "card-preview"
-      }, external_React_default().createElement(Preview, {
-        onToggle: (audio, video) => this.setState({
-          previewAudio: audio,
-          previewVideo: video
-        })
-      })));
-    };
+    this.Card = ({
+      children
+    }) => external_React_default().createElement("div", {
+      className: "card"
+    }, external_React_default().createElement("div", {
+      className: "card-body"
+    }, children, external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
+      to: "/securechat"
+    }, l.how_meetings_work))), external_React_default().createElement("div", {
+      className: "card-preview"
+    }, external_React_default().createElement(Preview, {
+      onToggle: (audio, video) => this.setState({
+        previewAudio: audio,
+        previewVideo: video
+      })
+    })));
 
-    this.Field = _ref4 => {
+    this.Field = ({
+      name,
+      children
+    }) => {
       var _this$state$name;
 
-      let {
-        name,
-        children
-      } = _ref4;
       return external_React_default().createElement("div", {
         className: `
                     mega-input
@@ -12758,8 +12728,6 @@ class ConversationRightArea extends mixins.wl {
   }
 
   allContactsInChat(participants) {
-    this;
-
     if (participants.length === 0) {
       return false;
     }
@@ -14204,7 +14172,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
         this.historyPanel = historyPanel;
       },
       onDeleteClicked: this.handleDeleteDialog
-    })), !is_chatlink && room.state != ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) ? external_React_default().createElement(JoinCallNotification, {
+    })), !is_chatlink && room.state != ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ? external_React_default().createElement(JoinCallNotification, {
       chatRoom: room
     }) : null, room.isAnonymous() ? external_React_default().createElement("div", {
       className: "join-chat-block"
@@ -14364,12 +14332,11 @@ const USER_CARD_CLASS = 'user-card';
 
 const roomIsGroup = room => room && room.type === 'group' || room.type === 'public';
 
-const openResult = (_ref, callback) => {
-  let {
-    room,
-    messageId,
-    index
-  } = _ref;
+const openResult = ({
+  room,
+  messageId,
+  index
+}, callback) => {
   document.dispatchEvent(new Event(EVENTS.RESULT_OPEN));
 
   if (isString(room)) {
@@ -14533,11 +14500,10 @@ class MemberRow extends mixins.wl {
 
 }
 
-const NilRow = _ref2 => {
-  let {
-    onSearchMessages,
-    isFirstQuery
-  } = _ref2;
+const NilRow = ({
+  onSearchMessages,
+  isFirstQuery
+}) => {
   const label = LABEL.SEARCH_MESSAGES_INLINE.replace('[A]', '<a>').replace('[/A]', '</a>');
   return external_React_default().createElement("div", {
     className: `
@@ -14558,8 +14524,8 @@ const NilRow = _ref2 => {
 };
 
 class ResultRow extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
 
     this.setActive = nodeRef => {
       if (nodeRef) {
@@ -14648,8 +14614,8 @@ const LABEL = {
   SEARCH_COMPLETE: l[23546]
 };
 class ResultContainer extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
 
     this.renderResults = (results, status, isFirstQuery, onSearchMessages) => {
       if (status === STATUS.COMPLETED && results.length < 1) {
@@ -14742,8 +14708,8 @@ class ResultContainer extends mixins.wl {
 const SEARCH_STATUS_CLASS = 'search-field-status';
 const BASE_ICON_CLASS = 'sprite-fm-mono';
 class SearchField extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.state = {
       hovered: false
     };
@@ -14887,8 +14853,8 @@ const ACTIONS = {
 };
 const SEARCH_PANEL_CLASS = `search-panel`;
 class SearchPanel extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.wrapperRef = null;
     this.state = {
       value: '',
@@ -15110,11 +15076,9 @@ class Start extends mixins.wl {
       if (this.state.editing && !ev.target.classList.contains(Start.CLASS_NAMES.EDIT) && !ev.target.classList.contains(Start.CLASS_NAMES.INPUT)) {
         this.toggleEdit();
       }
-    }).rebind(`keyup.${Start.NAMESPACE}`, _ref => {
-      let {
-        keyCode
-      } = _ref;
-
+    }).rebind(`keyup.${Start.NAMESPACE}`, ({
+      keyCode
+    }) => {
       if (this.state.editing) {
         const [ENTER, ESCAPE] = [13, 27];
         return keyCode === ENTER ? this.toggleEdit() : keyCode === ESCAPE ? this.doReset() : null;
@@ -16713,25 +16677,19 @@ const NODE_CLASS = 'node';
 const RESULT_CONTAINER_CLASS = 'gif-panel-results';
 const RESULTS_END_CLASS = 'results-end';
 
-const Nil = _ref => {
-  let {
-    children
-  } = _ref;
-  return external_React_default().createElement("div", {
-    className: "no-results-container"
-  }, external_React_default().createElement("div", {
-    className: "no-results-content"
-  }, external_React_default().createElement("i", {
-    className: "huge-icon sad-smile"
-  }), external_React_default().createElement("span", null, children)));
-};
+const Nil = ({
+  children
+}) => external_React_default().createElement("div", {
+  className: "no-results-container"
+}, external_React_default().createElement("div", {
+  className: "no-results-content"
+}, external_React_default().createElement("i", {
+  className: "huge-icon sad-smile"
+}), external_React_default().createElement("span", null, children)));
 
 class ResultContainer extends mixins.wl {
   constructor(props) {
-    var _this;
-
     super(props);
-    _this = this;
     this.intersectionObserver = null;
 
     this.initializeIntersectionObserver = () => {
@@ -16755,13 +16713,9 @@ class ResultContainer extends mixins.wl {
       }
     };
 
-    this.toggleIntersectionObserver = function (node, action) {
-      if (action === void 0) {
-        action = 'observe';
-      }
-
-      if (node && _this.intersectionObserver) {
-        _this.intersectionObserver[action](node);
+    this.toggleIntersectionObserver = (node, action = 'observe') => {
+      if (node && this.intersectionObserver) {
+        this.intersectionObserver[action](node);
       }
     };
   }
@@ -16824,14 +16778,13 @@ class ResultContainer extends mixins.wl {
     if (results.length) {
       return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
         className: RESULT_CONTAINER_CLASS
-      }, results.map((_ref2, index) => {
-        let {
-          slug,
-          images: {
-            fixed_width_downsampled
-          },
-          title
-        } = _ref2;
+      }, results.map(({
+        slug,
+        images: {
+          fixed_width_downsampled
+        },
+        title
+      }, index) => {
         return external_React_default().createElement(Result, {
           key: `${slug}--${index}`,
           image: fixed_width_downsampled,
@@ -16924,11 +16877,9 @@ class GifPanel extends mixins.wl {
         if (this.clickedOutsideComponent(ev)) {
           this.props.onToggle();
         }
-      }).rebind('keydown.gifPanel', _ref => {
-        let {
-          keyCode
-        } = _ref;
-
+      }).rebind('keydown.gifPanel', ({
+        keyCode
+      }) => {
         if (keyCode && keyCode === 27) {
           return SearchField.hasValue() ? this.doReset() : this.props.onToggle();
         }
@@ -16952,10 +16903,9 @@ class GifPanel extends mixins.wl {
         this.controllerRef = typeof AbortController === 'function' && new AbortController();
         this.fetchRef = fetch(this.getFormattedPath(path), {
           signal: this.controllerRef.signal
-        }).then(response => response.json()).then(_ref2 => {
-          let {
-            data
-          } = _ref2;
+        }).then(response => response.json()).then(({
+          data
+        }) => {
           this.fetchRef = this.pathRef = null;
 
           if (this.isMounted()) {
@@ -17661,8 +17611,8 @@ class RetentionChange extends mixin.y {
   }
 
 }
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
-var call = __webpack_require__(939);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(332);
 ;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
 
@@ -17688,10 +17638,9 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
     this.$container = null;
     this.$messages = null;
 
-    this.onKeyboardScroll = _ref => {
-      let {
-        keyCode
-      } = _ref;
+    this.onKeyboardScroll = ({
+      keyCode
+    }) => {
       const scrollbar = this.messagesListScrollable;
       const domNode = scrollbar == null ? void 0 : scrollbar.domNode;
 
@@ -17943,11 +17892,7 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
     }
   }
 
-  onMessagesScrollUserScroll(ps, offset) {
-    if (offset === void 0) {
-      offset = 5;
-    }
-
+  onMessagesScrollUserScroll(ps, offset = 5) {
     var self = this;
     var scrollPositionY = ps.getScrollPositionY();
     var isAtTop = ps.isAtTop();
@@ -18447,19 +18392,16 @@ var _mixins1__ = __webpack_require__(503);
 
 
 class Group extends _mixins1__.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.containerRef = react0().createRef();
     this.state = {
       expanded: false
     };
 
-    this.toggleEvents = () => this.state.expanded ? $(document).rebind(`mousedown.${Group.NAMESPACE}`, ev => !this.containerRef.current.contains(ev.target) && this.doToggle()).rebind(`keydown.${Group.NAMESPACE}`, _ref => {
-      let {
-        keyCode
-      } = _ref;
-      return keyCode && keyCode === 27 && this.doToggle();
-    }) : $(document).unbind(`.${Group.NAMESPACE}`);
+    this.toggleEvents = () => this.state.expanded ? $(document).rebind(`mousedown.${Group.NAMESPACE}`, ev => !this.containerRef.current.contains(ev.target) && this.doToggle()).rebind(`keydown.${Group.NAMESPACE}`, ({
+      keyCode
+    }) => keyCode && keyCode === 27 && this.doToggle()) : $(document).unbind(`.${Group.NAMESPACE}`);
 
     this.doToggle = () => this.setState(state => ({
       expanded: !state.expanded
@@ -18565,7 +18507,7 @@ const __WEBPACK_DEFAULT_EXPORT__ = (Button);
 
 /***/ }),
 
-/***/ 939:
+/***/ 332:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -18594,28 +18536,24 @@ var meetings_button = __webpack_require__(193);
 
 
 class ModeSwitch extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.containerRef = external_React_default().createRef();
     this.state = {
       expanded: false
     };
 
-    this.handleMousedown = _ref => {
+    this.handleMousedown = ({
+      target
+    }) => {
       var _this$containerRef;
 
-      let {
-        target
-      } = _ref;
       return (_this$containerRef = this.containerRef) != null && _this$containerRef.current.contains(target) ? null : this.doClose();
     };
 
-    this.handleKeydown = _ref2 => {
-      let {
-        keyCode
-      } = _ref2;
-      return keyCode && keyCode === 27 && this.doClose();
-    };
+    this.handleKeydown = ({
+      keyCode
+    }) => keyCode && keyCode === 27 && this.doClose();
 
     this.doClose = () => this.setState({
       expanded: false
@@ -18652,11 +18590,10 @@ class ModeSwitch extends mixins.wl {
       }));
     };
 
-    this.Option = _ref3 => {
-      let {
-        label,
-        mode
-      } = _ref3;
+    this.Option = ({
+      label,
+      mode
+    }) => {
       return external_React_default().createElement("div", {
         className: `
                     ${ModeSwitch.BASE_CLASS}-option
@@ -18754,11 +18691,9 @@ class StreamHead extends mixins.wl {
       banner: !state.banner
     }), () => callback && callback());
 
-    this.handleDialogClose = _ref => {
-      let {
-        target
-      } = _ref;
-
+    this.handleDialogClose = ({
+      target
+    }) => {
       if (this.state.dialog) {
         const {
           topicRef,
@@ -19190,14 +19125,11 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
         userHandle
       } = stream;
 
-      const $$CONTAINER = _ref => {
-        let {
-          children
-        } = _ref;
-        return external_React_default().createElement("div", {
-          className: "stream-node-status theme-dark-forced"
-        }, children);
-      };
+      const $$CONTAINER = ({
+        children
+      }) => external_React_default().createElement("div", {
+        className: "stream-node-status theme-dark-forced"
+      }, children);
 
       const onHoldLabel = l[23542].replace('%s', M.getNameByHandle(userHandle));
 
@@ -19228,11 +19160,7 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
     this.updateVideoStream();
   }
 
-  triggerFakeResize(currentVisibility) {
-    if (currentVisibility === void 0) {
-      currentVisibility = 0xDEAD;
-    }
-
+  triggerFakeResize(currentVisibility = 0xDEAD) {
     if (currentVisibility === true || currentVisibility === 0xDEAD && this.isComponentVisible()) {
       var node = this.findDOMNode();
       this.onResizeObserved(node.offsetWidth, node.offsetHeight);
@@ -19465,8 +19393,8 @@ class SidebarControls extends mixins.wl {
 
 
 class StreamExtendedControls extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
 
     this.isActive = type => {
       return !!(this.props.call.av & type);
@@ -19526,8 +19454,8 @@ class StreamExtendedControls extends mixins.wl {
 
 
 const withMicObserver = Component => class extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.namespace = `SO-${Component.NAMESPACE}`;
     this.signalObserver = `onMicSignalDetected.${this.namespace}`;
     this.inputObserver = `onNoMicInput.${this.namespace}`;
@@ -19537,14 +19465,11 @@ const withMicObserver = Component => class extends mixins.wl {
 
     this.unbindObservers = () => [this.signalObserver, this.inputObserver].map(observer => this.props.chatRoom.unbind(observer));
 
-    this.bindObservers = () => this.props.chatRoom.rebind(this.signalObserver, _ref => {
-      let {
-        data: signal
-      } = _ref;
-      return this.setState({
-        signal
-      });
-    }).rebind(this.inputObserver, () => this.setState({
+    this.bindObservers = () => this.props.chatRoom.rebind(this.signalObserver, ({
+      data: signal
+    }) => this.setState({
+      signal
+    })).rebind(this.inputObserver, () => this.setState({
       signal: false
     }));
 
@@ -19590,8 +19515,8 @@ const withMicObserver = Component => class extends mixins.wl {
 
 
 class StreamControls extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
 
     this.renderDebug = () => {
       const SIMPLETIP = {
@@ -19906,11 +19831,9 @@ class Stream extends mixins.wl {
       }
     };
 
-    this.handleOptionsClose = _ref => {
-      let {
-        target
-      } = _ref;
-
+    this.handleOptionsClose = ({
+      target
+    }) => {
       if (this.state.options && !target.classList.contains('icon-options')) {
         this.setState({
           options: false
@@ -20106,12 +20029,9 @@ class Stream extends mixins.wl {
                     ${this.state.options ? 'active' : ''}
                     ${sidebar && !minimized ? POSITION_MODIFIER : ''}
                 `,
-      onClick: _ref2 => {
-        let {
-          target
-        } = _ref2;
-        return minimized && target.classList.contains(`${NAMESPACE}-overlay`) && onCallExpand();
-      }
+      onClick: ({
+        target
+      }) => minimized && target.classList.contains(`${NAMESPACE}-overlay`) && onCallExpand()
     }, IS_MINI_MODE && this.renderMiniMode(), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.Z)({}, this.props, {
       onOptionsToggle: this.handleOptionsToggle
     })));
@@ -20350,11 +20270,8 @@ const PAGINATION = {
 };
 const MOUSE_OUT_DELAY = 2500;
 class stream_Stream extends mixins.wl {
-  constructor() {
-    var _this;
-
-    super(...arguments);
-    _this = this;
+  constructor(...args) {
+    super(...args);
     this.wrapperRef = external_React_default().createRef();
     this.containerRef = external_React_default().createRef();
     this.nodeRefs = [];
@@ -20439,19 +20356,15 @@ class stream_Stream extends mixins.wl {
       return null;
     };
 
-    this.scaleNodes = function (columns, forced) {
-      if (forced === void 0) {
-        forced = false;
-      }
-
+    this.scaleNodes = (columns, forced = false) => {
       const {
         streams,
         isOnHold,
         minimized,
         mode
-      } = _this.props;
-      const container = _this.containerRef.current;
-      _this.lastRescaledCache = forced ? null : _this.lastRescaledCache;
+      } = this.props;
+      const container = this.containerRef.current;
+      this.lastRescaledCache = forced ? null : this.lastRescaledCache;
 
       if (minimized || !container) {
         return;
@@ -20460,14 +20373,14 @@ class stream_Stream extends mixins.wl {
       const parentRef = container.parentNode;
       const containerWidth = parentRef.offsetWidth;
       const containerHeight = parentRef.offsetHeight - 100;
-      const streamsInUI = streams.length > MAX_STREAMS_PER_PAGE ? _this.chunks[_this.state.page] : streams;
+      const streamsInUI = streams.length > MAX_STREAMS_PER_PAGE ? this.chunks[this.state.page] : streams;
 
       if (streamsInUI) {
         const streamCountInUI = streamsInUI.length;
         let rows;
 
         if (mode === Call.MODE.THUMBNAIL) {
-          columns = typeof columns === 'number' ? columns : _this.getColumns(streamCountInUI);
+          columns = typeof columns === 'number' ? columns : this.getColumns(streamCountInUI);
           rows = Math.ceil(streamCountInUI / columns);
         } else {
           rows = 1;
@@ -20482,13 +20395,12 @@ class stream_Stream extends mixins.wl {
           targetWidth = targetHeight / 9 * 16;
         }
 
-        const nodeRefs = _this.nodeRefs.flat();
-
+        const nodeRefs = this.nodeRefs.flat();
         const nodeRefsLength = nodeRefs.length;
         const viewMode = mode || Call.MODE.SPEAKER;
 
         if (viewMode === Call.MODE.THUMBNAIL && columns !== 4 && (targetWidth < 160 || targetHeight < 120)) {
-          return _this.scaleNodes(4);
+          return this.scaleNodes(4);
         }
 
         let cache = `${viewMode}:${targetWidth}:${targetHeight}:${nodeRefsLength}:${rows}:${streamCountInUI}:${columns}`;
@@ -20497,11 +20409,11 @@ class stream_Stream extends mixins.wl {
           cache += `${nodeRefs[i].cacheKey}:`;
         }
 
-        if (_this.lastRescaledCache === cache) {
+        if (this.lastRescaledCache === cache) {
           return;
         }
 
-        _this.lastRescaledCache = cache;
+        this.lastRescaledCache = cache;
 
         for (let i = 0; i < nodeRefsLength; i++) {
           const node = nodeRefs[i];
@@ -21601,8 +21513,8 @@ End.NAMESPACE = 'end-dialog';
 
 
 class Ephemeral extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.buttons = [{
       key: 'ok',
       label: 'Ok',
@@ -21630,7 +21542,41 @@ class Ephemeral extends mixins.wl {
 
 }
 Ephemeral.NAMESPACE = 'ephemeral-dialog';
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/offline.jsx
+
+
+
+class Offline extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.buttons = [{
+      key: 'ok',
+      label: l[82],
+      onClick: this.props.onClose
+    }, {
+      key: 'leave',
+      label: l[5883],
+      className: 'negative',
+      onClick: this.props.onCallEnd
+    }];
+  }
+
+  render() {
+    return external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+      name: Offline.NAMESPACE,
+      dialogType: "message",
+      icon: "sprite-fm-uni icon-warning",
+      title: "No internet",
+      noCloseOnClickOutside: true,
+      buttons: this.buttons,
+      onClose: this.props.onClose
+    }, external_React_default().createElement("p", null, "Please check your network cables, modem, and router and try reconnecting to Wi-Fi."));
+  }
+
+}
+Offline.NAMESPACE = 'reconnect-dialog';
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/call.jsx
+
 
 
 
@@ -21682,9 +21628,18 @@ class Call extends mixins.wl {
       invite: false,
       end: false,
       ephemeral: false,
+      offline: false,
       ephemeralAccounts: [],
       guest: Call.isGuest()
     };
+
+    this.handleCallOffline = () => delay('callOffline', () => navigator.onLine ? null : this.setState({
+      offline: true
+    }), 20000);
+
+    this.handleCallOnline = () => this.setState({
+      offline: false
+    });
 
     this.customIsEventuallyVisible = () => true;
 
@@ -21856,6 +21811,8 @@ class Call extends mixins.wl {
       mBroadcaster.removeListener(this.ephemeralAddListener);
     }
 
+    window.removeEventListener('offline', this.handleCallOffline);
+    window.removeEventListener('online', this.handleCallOnline);
     this.unbindLocalEvents();
   }
 
@@ -21867,7 +21824,10 @@ class Call extends mixins.wl {
     }
 
     this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle => this.handleEphemeralAdd(handle));
+    window.addEventListener('offline', this.handleCallOffline);
+    window.addEventListener('online', this.handleCallOnline);
     this.bindLocalEvents();
+    ion.sound.preload('hang_out');
   }
 
   render() {
@@ -21889,7 +21849,8 @@ class Call extends mixins.wl {
       end,
       ephemeral,
       ephemeralAccounts,
-      guest
+      guest,
+      offline
     } = this.state;
     const STREAM_PROPS = {
       mode,
@@ -21946,6 +21907,11 @@ class Call extends mixins.wl {
       onClose: () => this.setState({
         ephemeral: false
       })
+    }), offline && external_React_default().createElement(Offline, {
+      onClose: () => this.setState({
+        offline: false
+      }),
+      onCallEnd: this.handleCallEnd
     }));
   }
 
@@ -22711,8 +22677,8 @@ class Contact extends AbstractGenericMessage {
 
 
 class Attachment extends AbstractGenericMessage {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
 
     this._isRevoked = node => !M.chd[node.ch] || node.revoked;
   }
@@ -22903,12 +22869,10 @@ class Attachment extends AbstractGenericMessage {
 
       var preview = external_React_default().createElement("div", {
         className: "data-block-view medium " + noThumbPrev,
-        onClick: _ref => {
-          let {
-            target,
-            currentTarget
-          } = _ref;
-
+        onClick: ({
+          target,
+          currentTarget
+        }) => {
           if (isPreviewable && target === currentTarget) {
             this.props.onPreviewStart(v);
           }
@@ -23204,10 +23168,9 @@ class AudioContainer extends (external_React_default()).Component {
         return false;
       }
 
-      M.gfsfetch(h, 0, -1).then(_ref => {
-        let {
-          buffer
-        } = _ref;
+      M.gfsfetch(h, 0, -1).then(({
+        buffer
+      }) => {
         this.setState(() => {
           return {
             audioBlobUrl: mObjectURL([buffer], 'audio/mp4'),
@@ -23754,8 +23717,8 @@ var typingArea = __webpack_require__(825);
 
 
 class Text extends AbstractGenericMessage {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
 
     this.isRichPreview = message => message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW;
 
@@ -28604,8 +28567,8 @@ class GenericTable extends genericNodePropsComponent.L {
 
 
 class GenericListAdapter extends mixins.wl {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.customIsEventuallyVisible = true;
   }
 
@@ -28688,8 +28651,8 @@ var tooltips = __webpack_require__(988);
 
 
 class ColumnNodeName extends genericNodePropsComponent.L {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.state = {
       src: null
     };
@@ -29973,11 +29936,9 @@ class ModalDialog extends _chat_mixins1__.wl {
         convApp.addEventListener('click', this.onBlur);
       }
 
-      $('.fm-modal-dialog').rebind('click.modalDialogOv' + this.getUniqueId(), _ref => {
-        let {
-          target
-        } = _ref;
-
+      $('.fm-modal-dialog').rebind('click.modalDialogOv' + this.getUniqueId(), ({
+        target
+      }) => {
         if ($(target).is('.fm-modal-dialog')) {
           this.onBlur();
         }
@@ -29991,11 +29952,9 @@ class ModalDialog extends _chat_mixins1__.wl {
       });
     }
 
-    $(document).rebind('keyup.modalDialog' + this.getUniqueId(), _ref2 => {
-      let {
-        keyCode
-      } = _ref2;
-
+    $(document).rebind('keyup.modalDialog' + this.getUniqueId(), ({
+      keyCode
+    }) => {
       if (!this.props.stopKeyPropagation && keyCode === 27) {
         this.onBlur();
       }
@@ -30834,7 +30793,6 @@ class Tooltip extends _chat_mixins0__.wl {
   }
 
   repositionTooltip() {
-    this;
     var elLeftPos, elTopPos, elWidth, elHeight;
     var tooltipLeftPos, tooltipTopPos, tooltipWidth, tooltipHeight;
     var docHeight;
@@ -31172,8 +31130,8 @@ class RenderTo extends React.Component {
 }
 
 const withOverflowObserver = Component => class extends _chat_mixins0__._p {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.displayName = 'OverflowObserver';
     this.ref = React.createRef();
     this.state = {
@@ -31213,17 +31171,16 @@ const withOverflowObserver = Component => class extends _chat_mixins0__._p {
   }
 
 };
-const Emoji = _ref => {
-  let {
-    children
-  } = _ref;
+const Emoji = ({
+  children
+}) => {
   return React.createElement(ParsedHTML, {
     content: megaChat.html(children)
   });
 };
 class ParsedHTML extends React.Component {
-  constructor() {
-    super(...arguments);
+  constructor(...args) {
+    super(...args);
     this.ref = React.createRef();
 
     this.updateInternalState = () => {

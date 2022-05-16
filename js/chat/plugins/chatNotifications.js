@@ -195,7 +195,7 @@ var ChatNotifications = function(megaChat, options) {
                                 'from': room.getRoomTitle()
                             }
                         },
-                        !mega.active
+                        true
                     );
 
                     n.on('onClick', function() {
@@ -208,6 +208,18 @@ var ChatNotifications = function(megaChat, options) {
                     n.setUnread(false);
 
                     megaChat.updateSectionUnreadCount();
+                })
+                .rebind('ChatDisconnected.chatNotifications', ev => {
+                    const chatRoom = ev.data;
+                    self.disconnectNotification = new Notification(chatRoom.getRoomTitle(), { body: l.chat_offline });
+                    ion.sound.play('hang_out');
+                    if (chatRoom.activeCall.isSharingScreen()) {
+                        chatRoom.activeCall.toggleScreenSharing();
+                    }
+                    self.disconnectNotification.onclick = () => {
+                        window.focus();
+                        self.disconnectNotification.close();
+                    };
                 });
         })
         .rebind('onIncomingCall.chatNotifications', function(e, room, callId, userId, callManager) {

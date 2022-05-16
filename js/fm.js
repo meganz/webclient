@@ -1558,7 +1558,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                     <button class="mega-button cancel">
                         <span>@@</span>
                     </button>
-                    <button class="mega-button positive confirm">
+                    <button class="mega-button ${doneButton === l[23737] ? 'negative' : 'positive'} confirm">
                         <span>@@</span>
                     </button>
                 </div>`,
@@ -2570,11 +2570,15 @@ function initShareDialog() {
 
     $('.remove-share', $dialog).rebind('click', function() {
         if (!$(this).is('.disabled')) {
-            loadingDialog.show();
-            new mega.Share().removeSharesFromSelected().always(() => {
-                loadingDialog.hide();
-                closeDialog();
-            });
+            msgDialog(`remove:!^${l[23737]}!${l[82]}`, '', l.remove_share_title, l.remove_share_msg, res => {
+                if (res) {
+                    loadingDialog.show();
+                    new mega.Share().removeSharesFromSelected().always(() => {
+                        loadingDialog.hide();
+                        closeDialog();
+                    });
+                }
+            }, 1);
         }
         return false;
     });

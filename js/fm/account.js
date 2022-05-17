@@ -3399,7 +3399,7 @@ accountUI.transfers = {
                         }
                     });
 
-                megasync.isInstalled(function(err, is) {
+                megasync.isInstalled((err, is) => {
 
                     if (!err && is) {
                         $('.mega-banner', $section).addClass('hidden');

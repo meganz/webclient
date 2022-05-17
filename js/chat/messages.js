@@ -2516,7 +2516,7 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
             else {
                 var name = megaChat.html(M.getNameByHandle(author.u));
                 if (name) {
-                    renderableSummary = `${name}: ${renderableSummary}`;
+                    renderableSummary = l.user_message_preview.replace('%NAME', name).replace('%s', renderableSummary);
                 }
             }
         }

@@ -763,6 +763,14 @@ body.de .mega-dialog.new-group-chat {
 .create-folder-input-bl input {
     float: right;
 }
+.create-folder-input-bl input:-webkit-autofill,
+.create-folder-input-bl input:-webkit-autofill:hover,
+.create-folder-input-bl input:-webkit-autofill:focus {
+    caret-color: var(--text-color-high);
+    -webkit-text-fill-color: var(--text-color-high);
+    box-shadow: 0 0 0 1000px var(--surface-grey-1) inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
 .duplicate .create-folder-input-bl {
     border: 1px solid var(--input-text-underline-error);
 }

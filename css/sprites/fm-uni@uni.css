@@ -479,6 +479,9 @@
 .sprite-fm-uni.icon-pdf-90, .sprite-fm-uni-before.icon-pdf-90-before::before, .sprite-fm-uni-after.icon-pdf-90-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pdf-90");
 }
+.sprite-fm-uni.icon-pending-euro, .sprite-fm-uni-before.icon-pending-euro-before::before, .sprite-fm-uni-after.icon-pending-euro-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pending-euro");
+}
 .sprite-fm-uni.icon-phone, .sprite-fm-uni-before.icon-phone-before::before, .sprite-fm-uni-after.icon-phone-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-phone");
 }

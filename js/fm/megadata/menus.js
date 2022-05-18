@@ -300,7 +300,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite"></i>@@', l[5871]);
             }
 
-            M.colourLabelcmUpdate(selNode);
+            M.colourLabelcmUpdate(selNode.h);
 
             if (items['.edit-file-item']) {
                 $('.dropdown-item.edit-file-item span').text(l[865]);
@@ -309,6 +309,29 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         else if (items['.edit-file-item']) {
             $('.dropdown-item.edit-file-item span').text(l[16797]);
         }
+    }
+
+    // Allow to mark as Favourite/Labeled from multi-selection
+    if ($.selected.length > 1) {
+        items['.add-star-item'] = 1;
+        items['.colour-label-items'] = 1;
+        let allAreFavourite = true;
+
+        for (let i = 0; i < $.selected.length; i++) {
+            if (!M.isFavourite($.selected[i])) {
+                allAreFavourite = false;
+                break;
+            }
+        }
+
+        if (allAreFavourite) {
+            $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@', l[5872]);
+        }
+        else {
+            $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite"></i>@@', l[5871]);
+        }
+
+        M.colourLabelcmUpdate($.selected);
     }
 
     if (M.checkSendToChat(isSearch, sourceRoot)) {
@@ -420,6 +443,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
 
         let removeItemFlag = true;
         let clearVersioned = false;
+        let favouriteFlag = true;
+        let labelFlag = true;
 
         for (var g = 0; g < $.selected.length; g++) {
 
@@ -428,6 +453,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
 
                 removeItemFlag = false;
                 clearVersioned = false;
+                favouriteFlag = false;
+                labelFlag = false;
 
                 break;
             }
@@ -447,6 +474,14 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         if (!removeItemFlag) {
             delete items['.remove-item'];
             delete items['.move-item'];
+        }
+
+        if (!favouriteFlag) {
+            delete items['.add-star-item'];
+        }
+
+        if (!labelFlag) {
+            delete items['.colour-label-items'];
         }
 
         // if there is no folder selected, selected file nodes are versioned, user has right to clear it.

@@ -1844,7 +1844,16 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
-        var newFavState = Number(!M.isFavourite($.selected));
+
+        let newFavState;
+
+        if ($.selected.length > 1) {
+            // Determine the new fav state value from multiselection
+            newFavState = Number($('i', $(this)).hasClass('icon-favourite'));
+        }
+        else {
+            newFavState = Number(!M.isFavourite($.selected));
+        }
 
         M.favourite($.selected, newFavState);
     });
@@ -1857,11 +1866,16 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
-        var labelId = parseInt(this.dataset.labelId);
 
-        if (labelId && (M.getNodeRights($.selected[0]) > 1)) {
-            M.labeling($.selected, labelId);
+        const classList = this.classList;
+        let labelId = parseInt(this.dataset.labelId);
+
+        // Remove the existing label from nodes
+        if (classList.contains('active') && !classList.contains('update-to')) {
+            labelId = 0;
         }
+
+        M.labeling($.selected, labelId);
     });
 
     $('.colour-sorting-menu .filter-by .dropdown-colour-item').rebind('click', function(e) {
@@ -1904,7 +1918,32 @@ FileManager.prototype.initContextUI = function() {
 
     $('.submenu.labels .dropdown-colour-item').rebind('mouseover.clrSort', function() {
         var labelTxt = this.dataset.labelTxt;
-        if ($(this).hasClass('active')) {
+        if ($(this).hasClass('update-to')) {
+            switch (labelTxt) {
+                case "Red":
+                    labelTxt = l.update_to_red;
+                    break;
+                case "Orange":
+                    labelTxt = l.update_to_orange;
+                    break;
+                case "Yellow":
+                    labelTxt = l.update_to_yellow;
+                    break;
+                case "Green":
+                    labelTxt = l.update_to_green;
+                    break;
+                case "Blue":
+                    labelTxt = l.update_to_blue;
+                    break;
+                case "Purple":
+                    labelTxt = l.update_to_purple;
+                    break;
+                case "Grey":
+                    labelTxt = l.update_to_grey;
+                    break;
+            }
+        }
+        else if ($(this).hasClass('active')) {
             switch (labelTxt) {
                 case "Red":
                     labelTxt = l[19569];

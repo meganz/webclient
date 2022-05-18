@@ -1996,24 +1996,60 @@ MegaData.prototype.rename = function(itemHandle, newItemName) {
     }
 };
 
-
-/* Colour Label context menu update
+/**
+ * Colour Label context menu update
  *
- * @param {String} node Selected Node
+ * @param {Array | string} handles Selected nodes handles
  */
-MegaData.prototype.colourLabelcmUpdate = function(node) {
+MegaData.prototype.colourLabelcmUpdate = function(handles) {
 
-    var $items = $('.files-menu .dropdown-colour-item');
-    var value;
+    'use strict';
 
-    value = node.lbl | 0;
+    if (fminitialized && handles) {
+        if (!Array.isArray(handles)) {
+            handles = [handles];
+        }
 
-    // Reset label submenu
-    $items.removeClass('active');
+        const $items = $('.files-menu .dropdown-colour-item');
+        const values = [];
+        let hasLabelCnt = 0;
 
-    // Add active state label`
-    if (value) {
-        $items.filter('[data-label-id=' + value + ']').addClass('active');
+        for (let i = handles.length; i--;) {
+            const node = M.d[handles[i]];
+            if (!node) {
+                if (d) {
+                    console.warn('Node not found.', handles[i]);
+                }
+                continue;
+            }
+
+            if (node.lbl) {
+                hasLabelCnt++;
+                if (!values.includes(node.lbl)) {
+                    values.push(node.lbl);
+                }
+            }
+        }
+
+        // Determine all nodes have the same label
+        const isUnifiedLabel = values.length === 1 && handles.length === hasLabelCnt;
+
+        // Reset label submenu
+        $items.removeClass('active update-to');
+
+        // Add active state label
+        if (values.length > 0) {
+            $items.addClass('update-to');
+
+            for (let j = values.length; j--;) {
+                $items.filter('[data-label-id=' + values[j] + ']').addClass('active');
+            }
+
+            if (isUnifiedLabel) {
+                // Remove the 'update-to' classname since all nodes have the same label
+                $items.filter('[data-label-id=' + values[0] + ']').removeClass('update-to');
+            }
+        }
     }
 };
 
@@ -2104,13 +2140,14 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
     }
 };
 
-/*
- * labeling Handles colour labeling of nodes updates DOM and API
+/**
+ * Labeling of nodes updates DOM and API
  *
  * @param {Array | string} handles Selected nodes handles
- * @param {Integer} labelId Numeric value of label
+ * @param {Integer} newLabelState Numeric value of the new label
  */
-MegaData.prototype.labeling = function(handles, labelId) {
+MegaData.prototype.labeling = function(handles, newLabelState) {
+
     'use strict';
 
     if (fminitialized && handles) {
@@ -2118,10 +2155,16 @@ MegaData.prototype.labeling = function(handles, labelId) {
             handles = [handles];
         }
 
-        for (var i = handles.length; i--;) {
-            var newLabelState = labelId | 0;
-            var handle = handles[i];
-            var node = M.d[handle];
+        newLabelState = newLabelState || 0;
+
+        for (let i = handles.length; i--;) {
+            const handle = handles[i];
+
+            if (M.getNodeRights(handle) < 2) {
+                continue;
+            }
+
+            const node = M.d[handle];
             if (!node) {
                 if (d) {
                     console.warn('Node not found.', handle);
@@ -2129,9 +2172,6 @@ MegaData.prototype.labeling = function(handles, labelId) {
                 continue;
             }
 
-            if (node.lbl === newLabelState) {
-                newLabelState = 0;
-            }
             node.lbl = newLabelState;
             if (!node.lbl) {
                 delete node.lbl;
@@ -2145,7 +2185,7 @@ MegaData.prototype.labeling = function(handles, labelId) {
 
             // sync with global tree
             if (node.t > 0) {
-                var tn = M.tree[node.p][node.h];
+                const tn = M.tree[node.p][node.h];
 
                 tn.lbl = node.lbl;
                 if (!tn.lbl) {

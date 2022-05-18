@@ -668,9 +668,8 @@
             }
 
             if (!DYNLIST_ENABLED || this.section !== 'cloud-drive') {
-                for (var idx = aNodeList.length; idx--;) {
+                for (var idx = 0; idx < aNodeList.length; idx++) {
                     var node = this.nodeList[idx];
-
                     if (node && node.h) {
                         var handle = node.h;
                         var domNode = this.getDOMNode(handle, node);

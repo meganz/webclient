@@ -24,18 +24,20 @@ class ChatToastIntegration {
                             ChatToastIntegration.DEFAULT_OPTS
                         );
                     })
-                    .rebind('onCallPeerLeft.cTI', (e, userHandle) => {
-                        if (megaRoom.activeCall && megaRoom.activeCall.sfuApp.isDestroyed) {
-                            // Don't show leaving toasts if we are leaving.
-                            return;
+                    .rebind('onCallPeerLeft.cTI', (e, { userHandle }) => {
+                        if (navigator.onLine) {
+                            if (megaRoom.activeCall && megaRoom.activeCall.sfuApp.isDestroyed) {
+                                // Don't show leaving toasts if we are leaving.
+                                return;
+                            }
+                            const name = nicknames.getNickname(userHandle);
+                            window.toaster.alerts.low(
+                                // `%NAME left the call`
+                                l[24154].replace("%NAME", this.getTrimmedName(name)),
+                                'sprite-fm-mono icon-chat-filled',
+                                ChatToastIntegration.DEFAULT_OPTS
+                            );
                         }
-                        const name = nicknames.getNickname(userHandle);
-                        window.toaster.alerts.low(
-                            // `%NAME left the call`
-                            l[24154].replace("%NAME", this.getTrimmedName(name)),
-                            'sprite-fm-mono icon-chat-filled',
-                            ChatToastIntegration.DEFAULT_OPTS
-                        );
                     })
                     .rebind('onCallIJoined.cTI', () => {
                         const initialPriv = megaRoom.members[u_handle];
@@ -74,24 +76,37 @@ class ChatToastIntegration {
                             );
                         }
                     })
-                    .rebind('onCallEnd.cTI', () => megaRoom.unbind('onMembersUpdated.cTI'))
-                    .rebind('onRoomDisconnected.cTI', () => megaRoom.activeCall && this.eventHandlerOffline())
-                    .rebind('onRoomConnected', () => megaRoom.activeCall && this.eventHandlerOnline());
+                    .rebind('onCallEnd.cTI', () => megaRoom.unbind('onMembersUpdated.cTI'));
             });
     }
     eventHandlerOffline() {
-        window.toaster.alerts.medium(
-            l.chat_offline /* `Chat is now offline` */,
-            'sprite-fm-mono icon-chat-filled',
-            ChatToastIntegration.DEFAULT_OPTS
-        );
+        if (!this.reconnecting) {
+            this.reconnecting = true;
+            window.toaster.alerts.medium(
+                l.chat_offline /* `Chat is now offline` */,
+                'sprite-fm-mono icon-chat-filled',
+                ChatToastIntegration.DEFAULT_OPTS
+            );
+            window.toaster.alerts.show({
+                content: l.reconnecting,
+                icons: ['sprite-fm-mono icon-call-offline'],
+                classes: ['medium'],
+                timeout: 9e5
+            });
+        }
     }
     eventHandlerOnline() {
+        this.reconnecting = false;
+        window.toaster.alerts.hideAll();
         window.toaster.alerts.low(
             l.chat_online /* `Chat is now back online` */,
             'sprite-fm-mono icon-chat-filled',
             ChatToastIntegration.DEFAULT_OPTS
         );
+        const { disconnectNotification } = megaChat.plugins.chatNotifications;
+        if (disconnectNotification) {
+            disconnectNotification.close();
+        }
     }
     getTrimmedName(name) {
         const { MAX_NAME_CHARS } = ChatToastIntegration;

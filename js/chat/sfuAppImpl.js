@@ -78,8 +78,8 @@
         this.callManagerCall.onPeerJoined(peer);
     };
 
-    SfuApp.prototype.onPeerLeft = function(peer) {
-        this.callManagerCall.onPeerLeft(peer);
+    SfuApp.prototype.onPeerLeft = function(peer, reason) {
+        this.callManagerCall.onPeerLeft(peer, reason);
     };
 
     SfuApp.prototype.onJoined = function() {
@@ -118,9 +118,14 @@
         callManagerPeer.onAvChange(av);
     };
 
-    SfuApp.prototype.onDisconnect = function(termCode, willReconnect) {
+    SfuApp.prototype.onDisconnect = function(termCode, willReconnect, removeActive) {
         if (!willReconnect) {
-            this.room.trigger('onCallEnd', { callId: this.callId, chatId: this.room.chatId, showCallFeedback: true });
+            this.room.trigger('onCallEnd', {
+                callId: this.callId,
+                chatId: this.room.chatId,
+                showCallFeedback: true,
+                removeActive
+            });
             if (termCode === SfuClient.TermCode.kTooManyParticipants) {
                 msgDialog('warningb', '', l[20200]);
             }
@@ -177,8 +182,11 @@
             return;
         }
         this.isDestroyed = true;
-        this.sfuClient.disconnect(reason);
+        const wasConnected = this.sfuClient.disconnect(reason);
         delete window.sfuClient;
+        if (!wasConnected) {
+            this.onDisconnect(reason, false, true);
+        }
     };
 
     // proxy SFUClient events to the call.

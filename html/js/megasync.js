@@ -733,7 +733,7 @@ var megasync = (function() {
     };
 
     ns.isInstalled = function (next) {
-        if ((!fmconfig.dlThroughMEGAsync && page !== "download")
+        if ((!fmconfig.dlThroughMEGAsync && page !== "download" && page !== 'fm/account/transfers')
             || (!is_livesite && !usemsync)) {
             next(true, false, true); // next with error=true and isworking=false, off=true
         }

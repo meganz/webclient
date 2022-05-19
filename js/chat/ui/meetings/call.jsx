@@ -5,6 +5,7 @@ import Sidebar from './sidebar.jsx';
 import Invite from './workflow/invite/invite.jsx';
 import End from './workflow/end.jsx';
 import Ephemeral from './workflow/ephemeral.jsx';
+import Offline from './offline.jsx';
 
 export const EXPANDED_FLAG = 'in-call';
 export const inProgressAlert = (isJoin) => {
@@ -118,6 +119,7 @@ export default class Call extends MegaRenderMixin {
         invite: false,
         end: false,
         ephemeral: false,
+        offline: false,
         ephemeralAccounts: [],
         guest: Call.isGuest()
     };
@@ -158,6 +160,24 @@ export default class Call extends MegaRenderMixin {
         this.state.mode = props.call.viewMode;
         this.state.sidebar = props.chatRoom.type === 'public';
     }
+
+    /**
+     * handleCallOffline
+     * @description Invoked on `offline` event, handles the offline state. If the user have been ~20 seconds offline,
+     * displays a dialog w/ relevant copy and actions.
+     * @see Offline
+     */
+
+    handleCallOffline = () =>
+        delay('callOffline', () => navigator.onLine ? null : this.setState({ offline: true }), 20000);
+
+    /**
+     * handleCallOnline
+     * @description Invoked after coming back online. Resets the `offline` state if it was already set.
+     * @see Offline
+     */
+
+    handleCallOnline = () => this.setState({ offline: false });
 
     // Force as always visible.
     customIsEventuallyVisible = () => true;
@@ -397,6 +417,8 @@ export default class Call extends MegaRenderMixin {
         if (this.ephemeralAddListener) {
             mBroadcaster.removeListener(this.ephemeralAddListener);
         }
+        window.removeEventListener('offline', this.handleCallOffline);
+        window.removeEventListener('online', this.handleCallOnline);
         this.unbindLocalEvents();
     }
 
@@ -408,24 +430,22 @@ export default class Call extends MegaRenderMixin {
         this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle =>
             this.handleEphemeralAdd(handle)
         );
+        window.addEventListener('offline', this.handleCallOffline);
+        window.addEventListener('online', this.handleCallOnline);
         this.bindLocalEvents();
+        ion.sound.preload('hang_out');
     }
 
     render() {
         const { minimized, streams, call, chatRoom, parent, sfuApp, onDeleteMessage } = this.props;
-        const { mode, view, sidebar, forcedLocal, invite, end, ephemeral, ephemeralAccounts, guest } = this.state;
+        const {
+            mode, view, sidebar, forcedLocal, invite, end, ephemeral, ephemeralAccounts,
+            guest, offline
+        } = this.state;
         const STREAM_PROPS = {
-            mode,
-            streams,
-            sidebar,
-            forcedLocal,
-            call,
-            view,
-            chatRoom,
-            parent,
+            mode, streams, sidebar, forcedLocal, call, view, chatRoom, parent,
             isOnHold: sfuApp.sfuClient.isOnHold(),
-            onSpeakerChange: this.handleSpeakerChange,
-            onInviteToggle: this.handleInviteToggle
+            onSpeakerChange: this.handleSpeakerChange, onInviteToggle: this.handleInviteToggle
         };
 
         //
@@ -482,6 +502,13 @@ export default class Call extends MegaRenderMixin {
                     <Ephemeral
                         ephemeralAccounts={ephemeralAccounts}
                         onClose={() => this.setState({ ephemeral: false })}
+                    />
+                )}
+
+                {offline && (
+                    <Offline
+                        onClose={() => this.setState({ offline: false })}
+                        onCallEnd={this.handleCallEnd}
                     />
                 )}
             </div>

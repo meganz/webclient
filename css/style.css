@@ -6977,6 +6977,9 @@ table {
 .account.referrals button.referral-program {
     flex: 0 0 auto;
 }
+.account.referrals button.referral-program {
+    flex-shrink: 1;
+}
 .account.bonuses-icon i {
     width: 32px;
     height: 32px;

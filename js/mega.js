@@ -2621,6 +2621,10 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                 $('.mega-dialog.share-dialog').removeClass('hidden');
             }
             loadingDialog.hide();
+            // Render the outgoing shares page after set the new share node
+            if (M.currentrootid === 'out-shares') {
+                M.openFolder(M.currentdirid, true);
+            }
             M.renderShare(nodeId);
 
             masterPromise.resolve();

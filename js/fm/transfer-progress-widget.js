@@ -1045,7 +1045,7 @@ mega.tpw = new function TransferProgressWidget() {
         }
         $finishedAction = $transferActionTemplate.clone(true).addClass('cancel');
         $('i.transfer-progress-icon', $finishedAction).addClass('cancel icon-close-component')
-            .attr('data-simpletip', l[6992]);
+            .attr('data-simpletip', l.tfw_transfer_cancel);
         $actionsRow.append($finishedAction);
 
         if (unHide) {

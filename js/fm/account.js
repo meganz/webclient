@@ -333,8 +333,7 @@ accountUI.general = {
             var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
             var usedB = bytesToSize(account.tfsq.used);
             $('.chart.data .size-txt', $bandwidthChart).text(usedB);
-            $('.chart.data .pecents-txt', $bandwidthChart).text(b2[0]);
-            $('.chart.data .gb-txt', $bandwidthChart).text(b2[1]);
+            $('.chart.data .pecents-txt', $bandwidthChart).text(bytesToSize(account.tfsq.max, 0));
             $('.chart.data .of-txt', $bandwidthChart).text('/');
             $('.account.chart.data', $bandwidthChart).removeClass('hidden');
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
@@ -412,9 +411,7 @@ accountUI.general = {
             }
 
             // Maximum disk space
-            var b2 = bytesToSize(account.space, 0).split(' ');
-            $('.chart.data .pecents-txt', $storageChart).text(b2[0]);
-            $('.chart.data .gb-txt', $storageChart).text(b2[1]);
+            $('.chart.data .pecents-txt', $storageChart).text(bytesToSize(account.space, 0));
             $('.chart .perc-txt', $storageChart).text(formatPercentage(usedPercentage / 100));
             $('.chart.data .size-txt', $storageChart).text(bytesToSize(account.space_used));
             $('.account.chart.data', $storageChart).removeClass('hidden');

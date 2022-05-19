@@ -392,6 +392,13 @@ function Chat() {
           'body': function (notificationObj, params) {
             return l[5889].replace('[X]', params.from);
           }
+        },
+        'screen-share-error': {
+          title: l.screenshare_failed_notif || 'You are no longer sharing your screen',
+          icon: notificationObj => {
+            return notificationObj.options.icon;
+          },
+          body: ''
         }
       },
       'sounds': ['alert_info_message', 'error_message', 'incoming_chat_message', 'incoming_contact_request', 'incoming_file_transfer', 'incoming_voice_video_call', 'hang_out']

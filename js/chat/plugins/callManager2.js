@@ -414,6 +414,9 @@
             }
             return false;
         }
+        onLocalMediaError(errAv) {
+            this.chatRoom.trigger('onLocalMediaError', errAv);
+        }
     }
 
     /**

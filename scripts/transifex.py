@@ -449,7 +449,7 @@ def string_validation(new_strings):
         elif re.sub('\s', '', key) == '':
             print('ERROR: A string key is empty')
             valid_strings = False
-        elif re.sub('\s', '', data['string']) == '':
+        elif re.sub('\s', '', data['string']) == '' and re.sub('\s', '', data['developer_comment']) != '':
             print('ERROR: String with key {} has no string content'.format(key))
             valid_strings = False
         else:

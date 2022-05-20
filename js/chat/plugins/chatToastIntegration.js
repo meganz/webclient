@@ -14,14 +14,39 @@ class ChatToastIntegration {
 
         megaChat
             .rebind('onRoomInitialized.cTI', (e, megaRoom) => {
+                let playingSound = false;
                 megaRoom
                     .rebind('onCallPeerJoined.cTI', (e, userHandle) => {
                         const name = nicknames.getNickname(userHandle);
-                        window.toaster.alerts.low(
-                            // `%NAME joined the call`
-                            l[24152].replace("%NAME", this.getTrimmedName(name)),
-                            'sprite-fm-mono icon-chat-filled',
-                            ChatToastIntegration.DEFAULT_OPTS
+                        window.toaster.alerts.batch(
+                            'onCallPeerJoined',
+                            this.getTrimmedName(name),
+                            {
+                                level: 'low',
+                                icon: 'sprite-fm-mono icon-chat-filled',
+                                overrideOptions: ChatToastIntegration.DEFAULT_OPTS,
+                                cb: () => {
+                                    if (!playingSound) {
+                                        ion.sound.stop('user_join_call');
+                                        ion.sound.play('user_join_call');
+                                    }
+                                },
+                                joiner: (arr) => {
+                                    if (arr.length === 1) {
+                                        /* `%s joined the call` */
+                                        return l[24152].replace('%s', arr[0]);
+                                    }
+                                    else if (arr.length === 2) {
+                                        /* `%s1 and %s2 joined the call` */
+                                        return l[24153].replace('%s1', arr[0]).replace('%s2', arr[1]);
+                                    }
+                                    return mega.icu.format(
+                                        /* `%s and # other(s) joined the call` */
+                                        l.chat_call_joined_multi,
+                                        arr.length - 1
+                                    ).replace('%s', arr[0]);
+                                }
+                            }
                         );
                     })
                     .rebind('onCallPeerLeft.cTI', (e, { userHandle }) => {
@@ -31,11 +56,42 @@ class ChatToastIntegration {
                                 return;
                             }
                             const name = nicknames.getNickname(userHandle);
-                            window.toaster.alerts.low(
-                                // `%NAME left the call`
-                                l[24154].replace("%NAME", this.getTrimmedName(name)),
-                                'sprite-fm-mono icon-chat-filled',
-                                ChatToastIntegration.DEFAULT_OPTS
+                            if (megaRoom.type === 'private') {
+                                // 1-1 call will show disconnect instead of showing peer left message.
+                                return;
+                            }
+                            window.toaster.alerts.batch(
+                                'onCallPeerLeft',
+                                this.getTrimmedName(name),
+                                {
+                                    level: 'low',
+                                    icon: 'sprite-fm-mono icon-chat-filled',
+                                    overrideOptions: ChatToastIntegration.DEFAULT_OPTS,
+                                    cb: () => {
+                                        playingSound = true;
+                                        ion.sound.stop('user_join_call');
+                                        ion.sound.stop('user_left_call');
+                                        ion.sound.play('user_left_call');
+                                        onIdle(() => {
+                                            playingSound = false;
+                                        });
+                                    },
+                                    joiner: (arr) => {
+                                        if (arr.length === 1) {
+                                            /* `%s left the call` */
+                                            return l[24154].replace('%s', arr[0]);
+                                        }
+                                        else if (arr.length === 2) {
+                                            /* `%s1 and %s2 left the call` */
+                                            return l[24155].replace('%s1', arr[0]).replace('%s2', arr[1]);
+                                        }
+                                        return mega.icu.format(
+                                            /* `%s and # other(s) left the call` */
+                                            l.chat_call_left_multi,
+                                            arr.length - 1
+                                        ).replace('%s', arr[0]);
+                                    }
+                                }
                             );
                         }
                     })

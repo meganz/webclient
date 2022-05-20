@@ -336,6 +336,9 @@
         onMicSignalDetected(signal) {
             this.chatRoom.trigger('onMicSignalDetected', signal);
         }
+        onBadNetwork() {
+            this.chatRoom.trigger('onBadNetwork');
+        }
         registerPlayer(player) {
             var peer = this.peers[player.peer.cid];
             assert(peer, 'registerPlayer: peer not found.');

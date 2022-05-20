@@ -401,7 +401,7 @@ function Chat() {
           body: ''
         }
       },
-      'sounds': ['alert_info_message', 'error_message', 'incoming_chat_message', 'incoming_contact_request', 'incoming_file_transfer', 'incoming_voice_video_call', 'hang_out']
+      'sounds': ['alert_info_message', 'error_message', 'incoming_chat_message', 'incoming_contact_request', 'incoming_file_transfer', 'incoming_voice_video_call', 'hang_out', 'reconnecting', 'end_call']
     },
     'chatStoreOptions': {
       'autoPurgeMaxMessagesPerRoom': 1024
@@ -14179,7 +14179,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
         this.historyPanel = historyPanel;
       },
       onDeleteClicked: this.handleDeleteDialog
-    })), !is_chatlink && room.state != ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ? external_React_default().createElement(JoinCallNotification, {
+    })), !is_chatlink && room.state !== ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ? external_React_default().createElement(JoinCallNotification, {
       chatRoom: room
     }) : null, room.isAnonymous() ? external_React_default().createElement("div", {
       className: "join-chat-block"
@@ -21633,6 +21633,7 @@ class Call extends mixins.wl {
       sidebar: true,
       forcedLocal: false,
       invite: false,
+      offline: false,
       end: false,
       ephemeral: false,
       offline: false,
@@ -21640,9 +21641,17 @@ class Call extends mixins.wl {
       guest: Call.isGuest()
     };
 
+    this.handleRetryTimeout = () => {
+      if (!navigator.onLine) {
+        this.handleCallEnd();
+        this.props.chatRoom.trigger('onRetryTimeout');
+        ion.sound.play('end_call');
+      }
+    };
+
     this.handleCallOffline = () => delay('callOffline', () => navigator.onLine ? null : this.setState({
       offline: true
-    }), 20000);
+    }), 3e4);
 
     this.handleCallOnline = () => this.setState({
       offline: false
@@ -21834,7 +21843,7 @@ class Call extends mixins.wl {
     window.addEventListener('offline', this.handleCallOffline);
     window.addEventListener('online', this.handleCallOnline);
     this.bindLocalEvents();
-    ion.sound.preload('hang_out');
+    ['reconnecting', 'end_call'].map(sound => ion.sound.preload(sound));
   }
 
   render() {
@@ -21915,10 +21924,12 @@ class Call extends mixins.wl {
         ephemeral: false
       })
     }), offline && external_React_default().createElement(Offline, {
-      onClose: () => this.setState({
-        offline: false
-      }),
-      onCallEnd: this.handleCallEnd
+      onClose: () => {
+        this.setState({
+          offline: false
+        }, () => delay('call:timeout', this.handleRetryTimeout, 3e4));
+      },
+      onCallEnd: this.handleRetryTimeout
     }));
   }
 

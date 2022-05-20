@@ -147,6 +147,8 @@ function Chat() {
                 'incoming_file_transfer',
                 'incoming_voice_video_call',
                 'hang_out',
+                'reconnecting',
+                'end_call'
             ]
         },
         'chatStoreOptions': {

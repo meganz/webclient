@@ -76,6 +76,21 @@ class ChatToastIntegration {
                             );
                         }
                     })
+                    .rebind('onBadNetwork.cTI', () =>
+                        window.toaster.alerts.medium(
+                            l.poor_connection /* `Poor connection` */,
+                            'sprite-fm-mono icon-call-offline',
+                            ChatToastIntegration.DEFAULT_OPTS
+                        )
+                    )
+                    .rebind('onRetryTimeout.cTI', () => {
+                        window.toaster.alerts.hideAll();
+                        window.toaster.alerts.high(
+                            'Unable to reconnect',
+                            'sprite-fm-mono icon-call-offline',
+                            { ...ChatToastIntegration.DEFAULT_OPTS, timeout: 9e5 }
+                        );
+                    })
                     .rebind('onCallEnd.cTI', () => megaRoom.unbind('onMembersUpdated.cTI'));
             });
     }

@@ -1765,9 +1765,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
     const populateMonthDropDownList = function($targetContainer) {
         const adminCreationDate = new Date(u_attr.since * 1000);
         const nowDate = new Date();
-        const nowTime = nowDate.getTime();
         const monthLimit = 12; // 1 year back max
-
         const $monthDropdown = $('.chart-month-selector', $targetContainer);
         const $dropdownScroll = $('.dropdown-scroll', $monthDropdown);
         const $dropdownLabel = $('> span', $monthDropdown);
@@ -1775,6 +1773,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         $dropdownLabel.text('');
 
         for (var m = 0; m < monthLimit; m++) {
+            const nowTime = nowDate.getTime();
             const label = time2date(nowTime / 1000, 3);
             var itemNode;
 

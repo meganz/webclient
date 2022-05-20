@@ -744,6 +744,24 @@ window.toastRack = (() => {
     }
 
     /**
+     * Create and display a toast notification from a batch
+     *
+     * @param {object} data - Configuration data
+     * @param {HTMLElement} rack - The rack to display the toast on
+     * @returns {string} - The ID of the new toast slot
+     */
+    function dispatchBatch(data, rack) {
+        const opts = Object.create(null);
+        if (data.level !== 'neutral') {
+            opts.classes = [data.level];
+        }
+        opts.content = data.joiner(data.content);
+        opts.icons = data.icon;
+        opts.hasClose = true;
+        return show(rack, Object.assign(opts, data.overrideOptions));
+    }
+
+    /**
      * Create the toast rack (container), attach it to the DOM and return methods to control it.
      *
      * @private
@@ -754,6 +772,7 @@ window.toastRack = (() => {
     return (parentElement, parentElementClass, addTo) => {
         // Create a new rack, or connect to an existing one
         let rack = createRack(parentElement, addTo);
+        const batches = Object.create(null);
 
         return {
             /**
@@ -911,6 +930,75 @@ window.toastRack = (() => {
                     icons: [icon],
                     hasClose: true
                 }, overrideOptions));
+            },
+
+            /**
+             * Batch similar toasts into a single toast.
+             *
+             * Batches based on level as well
+             * e.g: `batch('a', 'a', 'neutral');` is a different batch than `batch('a', 'a', 'high');`
+             *
+             * @param {string} batchId              - The base id for the batch
+             * @param {string} content              - The text/HTML to add to the toast
+             * @param {string} [level]              - The toast level. One of: [neutral (default), low, medium, high]
+             * @param {function} [joiner]           - Optional function to join the batched values.
+             *                                        Receives an array of strings then return a string combining them
+             *                                        Default: ['a', 'b'] => 'a and b'; ['a', 'b', 'c'] => 'a, b and c';
+             * @param {string} [icon]               - The icon name (class) to use for the toast
+             * @param {object} [overrideOptions]    - An options object to override the defaults @see show
+             * @param {function} [cb]               - Optional call back that is called when the toast is dispatched.
+             *                                        A promise with the ID of the new toast slot is provided as
+             *                                        the first argument
+             * @returns {void} void
+             */
+            batch: (batchId, content, {level, joiner, icon, overrideOptions, cb} = {}) => {
+                level = level || 'neutral';
+                batchId = `${batchId}${level}`;
+                if (typeof batches[batchId] === 'undefined') {
+                    batches[batchId] = Object.create(null);
+                    batches[batchId].content = [];
+                    batches[batchId].joiner = (arr) => {
+                        return mega.utils.trans.listToString(arr, '[X]');
+                    };
+                    batches[batchId].level = level;
+                }
+                batches[batchId].content.push(content);
+                if (icon) {
+                    batches[batchId].icon = [icon];
+                }
+                if (overrideOptions) {
+                    batches[batchId].overrideOptions = overrideOptions;
+                }
+                if (typeof joiner === 'function') {
+                    batches[batchId].joiner = joiner;
+                }
+                if (typeof cb === 'function') {
+                    batches[batchId].cb = cb;
+                }
+                const now = Date.now();
+                if (typeof batches[batchId].maxTime === 'undefined') {
+                    batches[batchId].maxTime = now + 2000;
+                }
+                const dsp = () => {
+                    rack = testRack(rack, parentElementClass);
+                    const id = dispatchBatch(batches[batchId], rack);
+                    if (typeof batches[batchId].cb === 'function') {
+                        batches[batchId].cb(id);
+                    }
+                    delete batches[batchId];
+                };
+                if (typeof batches[batchId].listener === 'undefined') {
+                    batches[batchId].listener = setTimeout(dsp, 1000);
+                    batches[batchId].dispTime = now + 1000;
+                }
+                else if (batches[batchId].dispTime !== batches[batchId].maxTime) {
+                    clearTimeout(batches[batchId].listener);
+                    batches[batchId].listener = setTimeout(
+                        dsp,
+                        batches[batchId].maxTime - batches[batchId].dispTime
+                    );
+                    batches[batchId].dispTime = batches[batchId].maxTime;
+                }
             },
 
             /**

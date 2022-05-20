@@ -401,7 +401,7 @@ function Chat() {
           body: ''
         }
       },
-      'sounds': ['alert_info_message', 'error_message', 'incoming_chat_message', 'incoming_contact_request', 'incoming_file_transfer', 'incoming_voice_video_call', 'hang_out', 'reconnecting', 'end_call']
+      'sounds': ['alert_info_message', 'error_message', 'incoming_chat_message', 'incoming_contact_request', 'incoming_file_transfer', 'incoming_voice_video_call', 'hang_out', 'user_join_call', 'user_left_call', 'reconnecting', 'end_call']
     },
     'chatStoreOptions': {
       'autoPurgeMaxMessagesPerRoom': 1024

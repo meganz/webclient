@@ -182,10 +182,7 @@
         // Cancel button listener
         $(self.opt.fbDlgClass + ' .cancel').rebind('click', function() {
 
-            self.opt.feedbackText = self._prepareJsonString("User did NOT provide feedback.");
-            api_req({ 'a': 'clog', 't': self.opt.fbType, 'd': self.opt.feedbackText });
-
-            self._initAccountClosure();
+            loadSubPage('start');
         });
 
 

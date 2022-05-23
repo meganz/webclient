@@ -2103,14 +2103,10 @@ function topbarUITogglePresence(topbar) {
         element.classList.add('hidden');
 
         // ActivityStatus Code
-        // If the chat is disabled don't show the green status icon in the header
-        if (!pfid && !megaChatIsDisabled) {
-
+        // If the chat is disabled, or the presence lib isn't loading, don't show the green status icon in the header.
+        if (!pfid && megaChatIsReady && megaChat.userPresence !== undefined) {
             element.classList.remove('hidden');
-
-            if (megaChatIsReady) {
-                megaChat._renderMyStatus();
-            }
+            megaChat._renderMyStatus();
         }
     }
 }
@@ -2299,6 +2295,7 @@ function topmenuUI() {
     var $headerAchievements = $('.js-accountbtn.achievements', $topHeader);
     var $headerDownloadMega = $('.js-accountbtn.downloadmega', $topHeader);
     const $topBarAvatar = $('.js-topbaravatar', $topBar);
+    const $topMenuActivityBlock = $('.activity-status-block', $menuUserinfo);
 
     if (u_type === 0) {
         $('span', $loginButton).text(l[967]);
@@ -2317,6 +2314,7 @@ function topmenuUI() {
     $menuUsername.addClass('hidden');
     $menuUpgradeAccount.removeClass('hidden');
     $menuAvatar.removeClass('presence');
+    $topMenuActivityBlock.addClass('hidden');
 
     $headerActivityBlock.addClass('hidden');
     $headerIndividual.removeClass('hidden'); // try Mega Business
@@ -2487,14 +2485,13 @@ function topmenuUI() {
             $menuRefreshItem.removeClass('hidden');
         }
 
-        // If the chat is disabled don't show the green status icon in the header
-        if (!pfid && !megaChatIsDisabled) {
+        // If the chat is disabled, or the presence lib isn't loading, don't show the green status icon in the header.
+        if (!pfid && megaChatIsReady && megaChat.userPresence !== undefined) {
             $headerActivityBlock.removeClass('hidden');
             $headerSetStatus.removeClass('hidden');
             $menuAvatar.addClass('presence');
-            if (megaChatIsReady) {
-                megaChat._renderMyStatus();
-            }
+            $topMenuActivityBlock.removeClass('hidden');
+            megaChat._renderMyStatus();
         }
 
         // if this is a business account sub-user

@@ -358,21 +358,21 @@ function Chat() {
     'chatNotificationOptions': {
       'textMessages': {
         'incoming-chat-message': {
-          'title': "Incoming chat message",
+          title: l.notif_title_incoming_msg,
           'icon': function (notificationObj) {
             return notificationObj.options.icon;
           },
           'body': function (notificationObj, params) {
-            return "You have new incoming chat message from: " + params.from;
+            return l.notif_body_incoming_msg.replace('%s', params.from);
           }
         },
         'incoming-attachment': {
-          'title': "Incoming attachment",
+          title: l.notif_title_incoming_attch,
           'icon': function (notificationObj) {
             return notificationObj.options.icon;
           },
           'body': function (notificationObj, params) {
-            return params.from + " shared " + (params.attachmentsCount > 1 ? params.attachmentsCount + " files" : "a file");
+            return mega.icu.format(l.notif_body_incoming_attch, params.attachmentsCount).replace('%s', params.from);
           }
         },
         'incoming-voice-video-call': {
@@ -385,7 +385,7 @@ function Chat() {
           }
         },
         'call-terminated': {
-          'title': "Call terminated",
+          title: l.notif_title_call_term,
           'icon': function (notificationObj) {
             return notificationObj.options.icon;
           },

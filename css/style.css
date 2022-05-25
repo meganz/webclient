@@ -6360,7 +6360,7 @@ span.orange {
     justify-content: space-between;
 }
 .account.widget .medium.account.progress-list .item-wrapper {
-    width: 20%;
+    flex-shrink: 1;
 }
 .account.widget .medium.account.progress-list .item-wrapper .pr-item {
     width: max-content;

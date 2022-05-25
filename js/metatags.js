@@ -586,25 +586,6 @@ mega.metatags = new function() {
             mTags.mega_title = 'Business Signup - MEGA';
             stopBots(metaRobots);
         }
-        else if (page === 'blog' || page.substr(0, 9) === 'blog/date') {
-            mTags.en_title = 'Blog - MEGA';
-            mTags.en_desc = 'The latest news, releases and company announcements for MEGA.';
-            mTags.mega_title = l[24019] || mTags.en_title;
-            mTags.mega_desc = l[24020] || mTags.en_desc;
-            if (blogmonth || blogsearch) {
-                stopBots(metaRobots, true);
-            }
-        }
-        else if (page.substr(0, 11) === 'blog/search') {
-            mTags.mega_title = 'Blog search - MEGA';
-            mTags.mega_desc = 'MEGA\'s Blog';
-            stopBots(metaRobots, true);
-        }
-        else if (page === 'blogarticle') {
-            mTags.mega_title = 'Blog article - MEGA';
-            mTags.mega_desc = 'Blog article from MEGA';
-            stopBots(metaRobots, true);
-        }
         else if (page === 'achievements') {
             mTags.en_title = 'Achievements - MEGA';
             mTags.en_desc = 'Free additional cloud storage - 5 GB per achievement, valid for 365 days.';
@@ -616,23 +597,6 @@ mega.metatags = new function() {
             mTags.en_desc = 'Get support';
             mTags.mega_title = l.support_meta_tag || mTags.en_title;
             mTags.mega_desc = l[516] || mTags.en_desc;
-        }
-        else if (page.substr(0, 5) === 'blog/') {
-            var notSet = true;
-            if (blogHeaders && blogposts) {
-                var bHeader = page.substr(page.lastIndexOf('/') + 1);
-                if (blogHeaders[bHeader]) {
-                    var post = blogposts[blogHeaders[bHeader]];
-                    mTags.mega_title = post.h + ' - MEGA';
-                    mTags.mega_desc = post.introtxt;
-                    notSet = false;
-                }
-            }
-            if (notSet) {
-                mTags.mega_title = 'Blog article - MEGA';
-                mTags.mega_desc = 'Blog article from MEGA';
-                stopBots(metaRobots, true);
-            }
         }
         else if (page === 'help') {
             mTags.en_title = 'Help - MEGA';

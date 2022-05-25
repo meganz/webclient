@@ -17,7 +17,6 @@ const pages = [
     "storage",
     "collaboration",
     "securechat",
-    "blog",
     "security",
     "credits",
     "terms",

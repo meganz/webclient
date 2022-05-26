@@ -130,6 +130,13 @@ function Chat() {
                     'body': function(notificationObj, params) {
                         return l[5889].replace('[X]', params.from); // Call with [X] ended.
                     }
+                },
+                'screen-share-error': {
+                    title: l.screenshare_failed_notif || 'You are no longer sharing your screen',
+                    icon: (notificationObj) => {
+                        return notificationObj.options.icon;
+                    },
+                    body: '',
                 }
             },
             'sounds': [
@@ -140,6 +147,10 @@ function Chat() {
                 'incoming_file_transfer',
                 'incoming_voice_video_call',
                 'hang_out',
+                'user_join_call',
+                'user_left_call',
+                'reconnecting',
+                'end_call'
             ]
         },
         'chatStoreOptions': {

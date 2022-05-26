@@ -355,12 +355,15 @@ mBroadcaster.once('boot_done', function radSetup() {
         return;
     }
 
-    const rad = parseInt(sessionStorage.rad || mega.flags.rad);
+    const rad = parseInt(mega.flags.rad || sessionStorage.rad);
 
     if (!rad) {
-        if (rad === 0) {
+        if (mega.flags.rad === 0) {
             delete localStorage.d;
             delete localStorage.minLogLevel;
+        }
+        if (!window.u_sid) {
+            mBroadcaster.once('login2', radSetup);
         }
         return;
     }

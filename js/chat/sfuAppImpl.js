@@ -194,7 +194,8 @@
         'onLocalMediaChange',
         'onLocalMediaError',
         'onNoMicInput',
-        'onMicSignalDetected'
+        'onMicSignalDetected',
+        'onBadNetwork'
     ].forEach((k) => {
         SfuApp.prototype[k] = function() {
             return this.callManagerCall[k].apply(this.callManagerCall, arguments);

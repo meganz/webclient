@@ -117,6 +117,7 @@ export default class Call extends MegaRenderMixin {
         sidebar: true,
         forcedLocal: false,
         invite: false,
+        offline: false,
         end: false,
         ephemeral: false,
         offline: false,
@@ -162,14 +163,29 @@ export default class Call extends MegaRenderMixin {
     }
 
     /**
+     * handleReconnectTimeout
+     * @description Invoked after the call have been retrying to reconnect for ~30 seconds.
+     * @see render
+     * @see Offline
+     */
+
+    handleRetryTimeout = () => {
+        if (!navigator.onLine) {
+            this.handleCallEnd();
+            this.props.chatRoom.trigger('onRetryTimeout');
+            ion.sound.play('end_call');
+        }
+    };
+
+    /**
      * handleCallOffline
-     * @description Invoked on `offline` event, handles the offline state. If the user have been ~20 seconds offline,
+     * @description Invoked on `offline` event, handles the offline state. If the user have been ~30 seconds offline,
      * displays a dialog w/ relevant copy and actions.
      * @see Offline
      */
 
     handleCallOffline = () =>
-        delay('callOffline', () => navigator.onLine ? null : this.setState({ offline: true }), 20000);
+        delay('callOffline', () => navigator.onLine ? null : this.setState({ offline: true }), 3e4);
 
     /**
      * handleCallOnline
@@ -433,7 +449,7 @@ export default class Call extends MegaRenderMixin {
         window.addEventListener('offline', this.handleCallOffline);
         window.addEventListener('online', this.handleCallOnline);
         this.bindLocalEvents();
-        ion.sound.preload('hang_out');
+        ['reconnecting', 'end_call'].map(sound => ion.sound.preload(sound));
     }
 
     render() {
@@ -444,8 +460,8 @@ export default class Call extends MegaRenderMixin {
         } = this.state;
         const STREAM_PROPS = {
             mode, streams, sidebar, forcedLocal, call, view, chatRoom, parent,
-            isOnHold: sfuApp.sfuClient.isOnHold(),
-            onSpeakerChange: this.handleSpeakerChange, onInviteToggle: this.handleInviteToggle
+            isOnHold: sfuApp.sfuClient.isOnHold(), onSpeakerChange: this.handleSpeakerChange,
+            onInviteToggle: this.handleInviteToggle
         };
 
         //
@@ -507,8 +523,12 @@ export default class Call extends MegaRenderMixin {
 
                 {offline && (
                     <Offline
-                        onClose={() => this.setState({ offline: false })}
-                        onCallEnd={this.handleCallEnd}
+                        onClose={() => {
+                            this.setState({ offline: false }, () =>
+                                delay('call:timeout', this.handleRetryTimeout, 3e4)
+                            );
+                        }}
+                        onCallEnd={this.handleRetryTimeout}
                     />
                 )}
             </div>

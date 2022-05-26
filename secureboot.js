@@ -1098,7 +1098,7 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
-window.redirect = ['about', 'achievements', 'android', 'bird', 'blog', 'business', 'chrome', 'cmd',
+window.redirect = ['about', 'achievements', 'android', 'bird', 'business', 'chrome', 'cmd',
                    'contact', 'collaboration', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
                    'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
                    'mobile', 'nas', 'objectstorage', 'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat', 'security',
@@ -2116,7 +2116,6 @@ var showLegacyMobilePage = m && (
 if (showLegacyMobilePage) {
 
     var app;
-    var mobileblog;
     var android;
     var intent;
     var link = document.createElement('link');
@@ -2154,9 +2153,6 @@ if (showLegacyMobilePage) {
                             + '</div><iframe src="" width="1" height="1" frameborder="0" style="width:1px; '
                             + 'height:1px; border:none;" id="m_iframe"></iframe></div></div></div>';
 
-    if (page.substr(0, 4) === 'blog') {
-        mobileblog = 1;
-    }
     if (is_windowsphone) {
         app = 'zune://navigate/?phoneappID=1b70a4ef-8b9c-4058-adca-3b9ac8cc194a';
         document.body.className = 'wp full-mode supported';
@@ -2177,7 +2173,7 @@ if (showLegacyMobilePage) {
                 intent = 'intent://#' + page + '/#Intent;scheme=mega;package=mega.privacy.android.app;end';
             }
         }
-        if (intent && !mobileblog) {
+        if (intent) {
             if (is_huawei) {
                 intent = intent.replace('.app;', '.app.huawei;');
             }
@@ -2207,35 +2203,28 @@ if (showLegacyMobilePage) {
                                                     + 'desktop/laptop browser.';
     }
 
-    if (mobileblog) {
-        document.body.innerHTML = '';
-        mCreateElement('script', {type: 'text/javascript'}, 'head')
-            .src = ((location.host === 'mega.nz' || location.host === 'smoketest.mega.nz') ? '/blog.js' : 'html/js/blog.js');
+    var prechar = '#';
+    if (ua.indexOf('windows phone') > -1) {
+        prechar = '';
+    }
+    if (ua.indexOf('chrome') > -1) {
+        window.location = 'mega://' + prechar + page;
+    }
+    else if (is_ios > 8) {
+        setTimeout(function() {
+            var text = 'This link should be opened in the MEGA app. '
+                + 'Click OK if you already have the MEGA app installed';
+            if (confirm(text)) {
+                document.location = 'mega://#' + page;
+            }
+        }, 1500);
     }
     else {
-        var prechar = '#';
-        if (ua.indexOf('windows phone') > -1) {
-            prechar = '';
-        }
-        if (ua.indexOf('chrome') > -1) {
-            window.location = 'mega://' + prechar + page;
-        }
-        else if (is_ios > 8) {
-            setTimeout(function() {
-                var text = 'This link should be opened in the MEGA app. '
-                         + 'Click OK if you already have the MEGA app installed';
-                if (confirm(text)) {
-                    document.location = 'mega://#' + page;
-                }
-            }, 1500);
-        }
-        else {
-            document.getElementById('m_iframe').src = 'mega://' + prechar + page;
-        }
-        if (intent) {
-            document.getElementById('m_title').innerHTML
-                += '<br/><em>If you already have the app installed, <a href="' + intent + '">click here!</a></em>';
-        }
+        document.getElementById('m_iframe').src = 'mega://' + prechar + page;
+    }
+    if (intent) {
+        document.getElementById('m_title').innerHTML
+            += '<br/><em>If you already have the app installed, <a href="' + intent + '">click here!</a></em>';
     }
 }
 else if (!browserUpdate) {
@@ -3277,10 +3266,6 @@ else if (!browserUpdate) {
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
         'affiliate': {f:'html/affiliate.html', n: 'affiliate', j:0},
         'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:1},
-        'blog': {f:'html/blog.html', n: 'blog', j:0},
-        'blog_js': {f:'html/js/blog.js', n: 'blog_js', j:1},
-        'blogarticle': {f:'html/blogarticle.html', n: 'blogarticle', j:0},
-        'blogarticle_js': {f:'html/js/blogarticle.js', n: 'blogarticle_js', j:1},
         'register': {f:'html/register.html', n: 'register', j:0},
         'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
@@ -3449,7 +3434,6 @@ else if (!browserUpdate) {
         'reset': ['reset', 'reset_js'],
         'verify': ['change_email', 'change_email_js'],
         'cancel': ['cancel', 'cancel_js'],
-        'blog': ['blog', 'blog_js', 'blogarticle', 'blogarticle_js'],
         'register': ['register', 'register_js', 'zxcvbn_js'],
         'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],

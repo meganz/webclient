@@ -9,16 +9,12 @@ import { Emoji } from '../../../ui/utils.jsx';
 class Participant extends MegaRenderMixin {
     baseIconClass = 'sprite-fm-mono';
 
-    constructor(props) {
-        super(props);
-    }
-
     audioMuted = () => {
         const { call, stream } = this.props;
 
         // Local stream (me)
         if (call) {
-            return call.localAudioMuted === null || !!call.localAudioMuted;
+            return !(call.av & SfuClient.Av.Audio);
         }
 
         // Participant streams
@@ -70,10 +66,6 @@ class Participant extends MegaRenderMixin {
 }
 
 export default class Participants extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const { streams, call, guest, chatRoom } = this.props;
         return (

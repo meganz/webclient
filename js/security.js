@@ -31,10 +31,13 @@ var security = {
     isValidPassword: function(password, confirmPassword) {
 
         'use strict';
-
+        // Check for a password
+        if (!password) {
+            return l.err_no_pass;   // Enter a password
+        }
         // Check if the passwords are not the same
         if (password !== confirmPassword) {
-            return l[9066];         // The passwords are not the same, please check that you entered them correctly.
+            return l[9066];         // Passwords don't match. Check and try again.
         }
 
         // Check if there is whitespace at the start or end of the password
@@ -54,7 +57,9 @@ var security = {
 
         // Check for minimum password strength score from ZXCVBN library
         if ((zxcvbn(password).score < security.minPasswordScore)) {
-            return l[1104];         // Please strengthen your password.
+            // Your password needs to be stronger.
+            // Make it longer, add special characters or use uppercase and lowercase letters.
+            return l[1104];
         }
 
         return true;

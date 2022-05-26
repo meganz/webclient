@@ -91,7 +91,7 @@ body.rtl .feature-page * {
     font-size: 42px;
     line-height: 52px;
     font-family: var(--text-font-family-second-bold);
-    font-weight: 800;
+    font-weight: 900;
 }
 
 .feature-page h3 {

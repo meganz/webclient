@@ -134,6 +134,7 @@
             padding: 5px 0;
             position: absolute;
             top: 50%;
+            transition: var(--transition-all);
             z-index: 10;
         }
         .media-viewer button.gallery-btn:hover {
@@ -541,7 +542,8 @@
         .mouse-idle.fullscreen .viewer-bars,
         .mouse-idle.video-theatre-mode .viewer-bars,
         .mouse-idle .viewer-bars.slideshow-controls,
-        .mouse-idle .media-viewer .gallery-btn {
+        .mouse-idle.fullscreen .media-viewer .gallery-btn,
+        .mouse-idle.video .media-viewer .gallery-btn {
             opacity: 0;
             visibility: hidden;
         }

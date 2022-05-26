@@ -450,7 +450,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
 
                     // Show error for password field, clear the value and refocus it
                     $passInput.val('').focus().trigger('input');
-                    $passInput.megaInputsShowError(l[1102] + ' ' + passwordValidationResult);
+                    $passInput.megaInputsShowError(passwordValidationResult);
 
                     // Show error for confirm password field and clear the value
                     $rPassInput.val('');
@@ -462,14 +462,14 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         }
         if (!$element || $element.is($emailInput)) {
             if (!$emailInput.val().trim() || !isValidEmail($emailInput.val())) {
-                emailMegaInput.showError(l[7415]);
+                emailMegaInput.showError($emailInput.val().trim() ? l[7415] : l.err_no_email);
                 $emailInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($lnameInput)) {
             if (!$lnameInput.val().trim()) {
-                fnameMegaInput.showError(l[1098] + ' ' + l[1099]);
+                fnameMegaInput.showError(l.err_missing_name);
                 lnameMegaInput.showError();
                 $lnameInput.focus();
                 passed = false;
@@ -477,15 +477,16 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         }
         if (!$element || $element.is($fnameInput)) {
             if (!$fnameInput.val().trim()) {
-                fnameMegaInput.showError(l[1098] + ' ' + l[1099]);
+                fnameMegaInput.showError(l.err_missing_name);
                 lnameMegaInput.showError();
                 $fnameInput.focus();
                 passed = false;
             }
         }
         if (!$element || $element.is($telInput)) {
-            if (!$telInput.val().trim()) {
-                telMegaInput.showError(l[8814]);
+            const telVal = $telInput.val().trim();
+            if (!telVal || telVal.length < 2) {
+                telMegaInput.showError(telVal ? l.err_invalid_ph : l.err_no_ph);
                 $telInput.focus();
                 passed = false;
             }

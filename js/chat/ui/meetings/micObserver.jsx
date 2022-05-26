@@ -19,6 +19,11 @@ export const withMicObserver = Component =>
                 .rebind(this.signalObserver, ({ data: signal }) => this.setState({ signal }))
                 .rebind(this.inputObserver, () => this.setState({ signal: false }));
 
+        renderSignalDialog = () => {
+            // TODO: add translation strings
+            return msgDialog('warningb', null, 'Microphone not working', l.chat_mic_off_tooltip, null, 1);
+        };
+
         renderSignalWarning = () =>
             <div
                 className={`
@@ -26,12 +31,11 @@ export const withMicObserver = Component =>
                     meetings-signal-issue
                     simpletip
                 `}
-                data-simpletip={
-                    l.chat_mic_off_tooltip /* Check your system settings to unmute your mic and adjust its level */
-                }
+                data-simpletip="Show more info"
                 data-simpletipposition="top"
                 data-simpletipoffset="5"
-                data-simpletip-class="theme-dark-forced">
+                data-simpletip-class="theme-dark-forced"
+                onClick={() => this.renderSignalDialog()}>
                 <i className="sprite-fm-mono icon-exclamation-filled" />
             </div>;
 

@@ -3,6 +3,12 @@
     right: 1px;
     bottom: -4px;
     border-radius: 200px;
+    cursor: pointer;
+
+    .button-group-item & {
+        bottom: 3px;
+        right: -6px;
+    }
 
     i {
         --icon-size: 24px;

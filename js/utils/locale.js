@@ -1054,10 +1054,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
     l[8441] = l[8441].replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>');
-    l[8441] = l[8441].replace('[A2]', `<a href="${getBaseUrl()}/blog/vulnerability-rewards-the-first-week">`)
+    l[8441] = l[8441]
+        .replace('[A2]', `<a href="https://blog.mega.io/vulnerability-rewards-the-first-week"  target="_blank">`)
         .replace('[/A2]', '</a>');
     l[19310] = l[19310]
-        .replace('[A]', `<a href="${getBaseUrl()}/blog/the-mega-vulnerability-reward-program" target="_blank">`)
+        .replace('[A]', `<a href="https://blog.mega.io/the-mega-vulnerability-reward-program" target="_blank">`)
         .replace('[/A]', '</a>');
 
 
@@ -1248,8 +1249,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20015] = l[20015].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
         + '/keybackup">')
         .replace('[/A]', '</a>');
-    l[20016] = l[20016].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
-        + '/blog/mega-adds-two-factor-authentication" >')
+    l[20016] = l[20016].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="'
+        + 'https://blog.mega.io/mega-adds-two-factor-authentication" >')
         .replace('[/A]', '</a>')
         .replace('[Br]', '<br><br>');
     l[20022] = l[20022].replace('[Br]', '<br><br>');
@@ -1453,7 +1454,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[23449] = escapeHTML(l[23449]).replace(/\[R\/]/g, '<sup>&reg;</sup>');
     l[24074] = escapeHTML(l[24074]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[24141] = escapeHTML(l[24141])
-        .replace('[A]', `<a class="red" href="${getBaseUrl()}/blog/mega-adds-two-factor-authentication">`)
+        .replace(
+            '[A]',
+            `<a class="red" href="https://blog.mega.io/mega-adds-two-factor-authentication" target="_blank">`)
         .replace('[/A]', '</a>');
     l[24431] = escapeHTML(l[24431]).replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>')
         .replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -1471,7 +1474,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[24708] = escapeHTML(l[24708]).replace('[LT]', '<').replace('[GT]', '>');
     l[24852] = escapeHTML(l[24852])
-        .replace('[A]', '<a target="_blank" class="green-link clickurl" href="/blog">')
+        .replace('[A]', '<a target="_blank" class="green-link" href="https://blog.mega.io">')
         .replace('[/A]', '</a>');
     l.achievem_dialogfootertext = escapeHTML(l.achievem_dialogfootertext)
         .replace('[A]', '<a href="/pro" class="clickurl">')

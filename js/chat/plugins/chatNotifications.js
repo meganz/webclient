@@ -212,7 +212,7 @@ var ChatNotifications = function(megaChat, options) {
                 .rebind('ChatDisconnected.chatNotifications', ev => {
                     const chatRoom = ev.data;
                     self.disconnectNotification = new Notification(chatRoom.getRoomTitle(), { body: l.chat_offline });
-                    ion.sound.play('hang_out');
+                    ion.sound.play('reconnecting');
                     if (chatRoom.activeCall.isSharingScreen()) {
                         chatRoom.activeCall.toggleScreenSharing();
                     }
@@ -220,6 +220,17 @@ var ChatNotifications = function(megaChat, options) {
                         window.focus();
                         self.disconnectNotification.close();
                     };
+                })
+                .rebind('onLocalMediaError.chatNotifications', (e, errAv) => {
+                    if (errAv & SfuClient.Av.Screen) {
+                        self.notifications.notify(
+                            'screen-share-error',
+                            {
+                                anfFlag: 'chat_enabled',
+                            },
+                            true
+                        );
+                    }
                 });
         })
         .rebind('onIncomingCall.chatNotifications', function(e, room, callId, userId, callManager) {

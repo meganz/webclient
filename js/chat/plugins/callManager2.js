@@ -336,6 +336,9 @@
         onMicSignalDetected(signal) {
             this.chatRoom.trigger('onMicSignalDetected', signal);
         }
+        onBadNetwork() {
+            this.chatRoom.trigger('onBadNetwork');
+        }
         registerPlayer(player) {
             var peer = this.peers[player.peer.cid];
             assert(peer, 'registerPlayer: peer not found.');
@@ -377,6 +380,9 @@
                 }
             }
         }
+        onLocalMediaError(errAv) {
+            this.chatRoom.trigger('onLocalMediaError', errAv);
+        }
         toggleAudio(mute) {
             this.sfuApp.sfuClient.muteAudio(mute || !!(this.av & SfuClient.Av.Audio));
             // when we are not a speaker, local audio track is never obtained, so the event is never fired
@@ -413,6 +419,9 @@
                 return this.toggleAudio(true);
             }
             return false;
+        }
+        onLocalMediaError(errAv) {
+            this.chatRoom.trigger('onLocalMediaError', errAv);
         }
     }
 

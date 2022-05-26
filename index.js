@@ -20,7 +20,6 @@ var confirmok = false;
 var hash = window.location.hash;
 var chrome_msg = false;
 var init_anoupload = false;
-var blogid = false;
 var pwchangecode = false;
 var resetpwcode = false;
 var resetpwemail = '';
@@ -28,8 +27,6 @@ var mobileparsed = false;
 var mobilekeygen = false;
 var subdirid = false;
 var subsubdirid = false;
-var blogmonth = false;
-var blogsearch = false;
 var unread;
 var account = false;
 var register_txt = false;
@@ -700,9 +697,6 @@ function init_page() {
         return location.replace(getAppBaseUrl());
     }
 
-    blogmonth = false;
-    blogsearch = false;
-
     if (!$.mcImport && $.dialog !== 'cookies-dialog' && typeof closeDialog === 'function') {
         closeDialog();
     }
@@ -791,7 +785,7 @@ function init_page() {
         }
     }
     else if (page.substr(0, 4) === 'blog') {
-        loadBlog();
+        location.replace('https://blog.mega.io');
     }
     else if (page.substr(0, 6) == 'verify') {
         if (is_mobile) {
@@ -2830,7 +2824,7 @@ function topmenuUI() {
                 var subpage;
                 /*  TODO: Add bird when its done */
                 var subPages = [
-                    'about', 'account', 'keybackup', 'blog', 'cmd', 'contact',
+                    'about', 'account', 'keybackup', 'cmd', 'contact',
                     'copyright', 'corporate', 'credits', 'desktop', 'doc', 'extensions',
                     'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
                     'mobile', 'register', 'resellers', 'sdk', 'sitemap', 'sourcecode',
@@ -2881,6 +2875,9 @@ function topmenuUI() {
                 }
                 else if (className.includes('help')) {
                     window.open('https://help.mega.io');
+                }
+                else if (className.includes('blog')) {
+                    window.open('https://blog.mega.io');
                 }
             }
             return false;

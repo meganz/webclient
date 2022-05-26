@@ -1519,10 +1519,14 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(`${c}.removeshare-item`).rebind('click', () => {
-        loadingDialog.show();
-        new mega.Share().removeSharesFromSelected().always(() => {
-            loadingDialog.hide();
-        });
+        msgDialog(`remove:!^${l[23737]}!${l[82]}`, '', l.remove_share_title, l.remove_share_msg, res => {
+            if (res) {
+                loadingDialog.show();
+                new mega.Share().removeSharesFromSelected().always(() => {
+                    loadingDialog.hide();
+                });
+            }
+        }, 1);
     });
 
     // Move Dialog

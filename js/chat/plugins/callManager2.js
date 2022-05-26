@@ -315,6 +315,7 @@
             // Force high res for now:
             // thumb is already loaded, only uncomment if we want HD by default?
             // this.sfuApp.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
+            this.callTimeoutDone();
         }
         onPeerLeft(peer, reason) {
             this.peers.remove(peer.cid);
@@ -413,6 +414,7 @@
         }
         hangUp(reason) {
             this.sfuApp.destroy(reason);
+            this.callTimeoutDone(true);
         }
         muteIfAlone() {
             if (this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
@@ -422,6 +424,71 @@
         }
         onLocalMediaError(errAv) {
             this.chatRoom.trigger('onLocalMediaError', errAv);
+        }
+        callTimeoutDone(leaveCallActive) {
+            if (typeof leaveCallActive === 'undefined') {
+                leaveCallActive = this.peers.length;
+            }
+            clearInterval(this.callToutInt);
+            delete this.callToutInt;
+            delete this.callToutEnd;
+            if ($('.stay-dlg-subtext').is(':visible')) {
+                closeDialog();
+            }
+            if (this.callToutId) {
+                window.toaster.alerts.hide(this.callToutId);
+                delete this.callToutId;
+            }
+            if (!leaveCallActive) {
+                this.chatRoom.trigger('onCallEnd', { callId: this.callId, removeActive: true});
+            }
+        }
+        initCallTimeout(long) {
+            this.callTimeoutDone(true); // Cleanup previous state without ending the call
+            if (mega.config.get('callemptytout')) {
+                return;
+            }
+            if (long) {
+                // If we want the long timeout specifically or if the user has the setting to leave after 24hours
+                // Use an interval as the timer could be affected if the tab is in the background over this time
+                this.callToutEnd = unixtime() + 86400;
+                this.callToutInt = setInterval(() => {
+                    if (this.callToutEnd <= unixtime()) {
+                        this.callTimeoutDone();
+                    }
+                }, 3e5);
+                window.toaster.alerts.medium(l.call_timeout_day);
+            }
+            else {
+                // Otherwise setup the 2 minute timeout
+                window.toaster.alerts.medium(
+                    l.call_timeout_remain.replace('%s', secondsToTime(120).substring(3)),
+                    undefined,
+                    {
+                        hasClose: false,
+                        timeout: -1,
+                    }
+                ).then(id => {
+                    const $toast = $('span.message',`#${id}`);
+                    this.callToutId = id;
+                    this.callToutEnd = unixtime() + 120;
+                    this.callToutInt = setInterval(() => {
+                        let timeRemain = this.callToutEnd - unixtime();
+                        if (timeRemain <= 0) {
+                            this.callTimeoutDone();
+                        }
+                        else {
+                            timeRemain = secondsToTime(timeRemain).substring(3);
+                            $toast.text(l.call_timeout_remain.replace('%s', timeRemain));
+                            // Check if the dialog is shown then update the counter on it.
+                            const $dlgText = $('.stay-dlg-counter', '.mega-dialog');
+                            if ($dlgText.length && $dlgText.is(':visible')) {
+                                $dlgText.text(timeRemain);
+                            }
+                        }
+                    }, 1000);
+                });
+            }
         }
     }
 
@@ -547,14 +614,10 @@
                 ) {
                     return;
                 }
-
-                return (
-                    delay(
-                        'onCallEnd',
-                        () => peers.length ? null : chatRoom.trigger('onCallEnd', { callId, removeActive: true }),
-                        chatRoom.type !== 'private' && 12e4
-                    )
-                );
+                if (chatRoom.type === 'private') {
+                    return chatRoom.trigger('onCallEnd', { callId, removeActive: true });
+                }
+                return chatRoom.activeCall.initCallTimeout();
             });
 
             chatRoom.rebind('onMeAdded', (e, addedBy) => {

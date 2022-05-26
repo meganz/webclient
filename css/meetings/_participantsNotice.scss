@@ -7,6 +7,16 @@
 
     &.user-alone {
         margin-top: -140px;
+        .notice-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 24px;
+            width: 100%;
+            button {
+                margin-inline-start: 10px;
+                -webkit-margin-start: 10px;
+            }
+        }
     }
 
     &-heading {
@@ -15,9 +25,14 @@
         text-align: center;
         background: var(--surface-highlight-1);
 
-        h1 {
+        h1, h3 {
             margin: 0;
             color: var(--secondary-white);
+        }
+        &.user-alone {
+            box-sizing: border-box;
+            margin: 0 auto;
+            width: 478px;
         }
     }
 
@@ -42,6 +57,23 @@
             hr {
                 border: 0 none;
                 border-top: 1px solid #444;
+            }
+        }
+        &.user-alone {
+            margin-top: 32px;
+            padding: 24px;
+            width: 478px;
+            h3 {
+                margin: 0 0 12px;
+            }
+            p {
+                color: var(--text-color-medium);
+                text-align: start;
+            }
+            div.stay-dlg-subtext {
+                color: var(--text-color-low);
+                font: var(--text-body2);
+                margin-top: 12px;
             }
         }
     }

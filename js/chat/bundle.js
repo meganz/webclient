@@ -20255,19 +20255,30 @@ const __Minimized = (0,mixins.qC)(withMicObserver, withPermissionsObserver)(Mini
 
 
 
+
 class ParticipantsNotice extends mixins.wl {
   constructor(props) {
     super(props);
 
-    this.renderUserAlone = () => external_React_default().createElement("div", {
+    this.renderUserAlone = () => !this.props.stayOnEnd && external_React_default().createElement("div", {
       className: `
                 ${ParticipantsNotice.NAMESPACE}
                 theme-dark-forced
                 user-alone
             `
     }, external_React_default().createElement("div", {
-      className: `${ParticipantsNotice.NAMESPACE}-heading`
-    }, external_React_default().createElement("h1", null, l.only_one_here)));
+      className: `${ParticipantsNotice.NAMESPACE}-content user-alone`
+    }, external_React_default().createElement("h3", null, l.only_one_here), external_React_default().createElement("p", {
+      className: "theme-dark-forced"
+    }, external_React_default().createElement(utils.ParsedHTML, null, l.empty_call_dlg_text.replace('%s', '2'))), external_React_default().createElement("div", {
+      className: "notice-footer"
+    }, external_React_default().createElement(meetings_button.Z, {
+      className: "mega-button large stay-on-call",
+      onClick: this.props.onStayConfirm
+    }, external_React_default().createElement("span", null, l.empty_call_stay_button)), external_React_default().createElement(meetings_button.Z, {
+      className: "mega-button positive large stay-on-call",
+      onClick: this.props.onCallEnd
+    }, external_React_default().createElement("span", null, l.empty_call_dlg_end)))));
 
     this.renderUserWaiting = () => {
       const {
@@ -20638,7 +20649,10 @@ class stream_Stream extends mixins.wl {
         call,
         chatRoom,
         streams,
-        onInviteToggle
+        stayOnEnd,
+        onInviteToggle,
+        onStayConfirm,
+        onCallEnd
       } = this.props;
 
       const streamContainer = content => external_React_default().createElement("div", {
@@ -20656,7 +20670,10 @@ class stream_Stream extends mixins.wl {
           chatRoom: chatRoom,
           streamContainer: streamContainer,
           link: this.state.link,
-          onInviteToggle: onInviteToggle
+          stayOnEnd: stayOnEnd,
+          onInviteToggle: onInviteToggle,
+          onStayConfirm: onStayConfirm,
+          onCallEnd: onCallEnd
         });
       }
 
@@ -21700,11 +21717,11 @@ class Call extends mixins.wl {
       sidebar: true,
       forcedLocal: false,
       invite: false,
-      offline: false,
       end: false,
       ephemeral: false,
       offline: false,
       ephemeralAccounts: [],
+      stayOnEnd: !!mega.config.get('callemptytout'),
       guest: Call.isGuest()
     };
 
@@ -21726,31 +21743,54 @@ class Call extends mixins.wl {
 
     this.customIsEventuallyVisible = () => true;
 
-    this.bindLocalEvents = () => {
+    this.bindCallEvents = () => {
       const {
         chatRoom
       } = this.props;
-      ['onCallPeerLeft.local', 'onCallPeerJoined.local'].forEach(event => {
-        chatRoom.rebind(event, () => {
-          const {
-            minimized,
-            streams,
-            call
-          } = this.props;
+      chatRoom.rebind('onCallPeerLeft.callComp', () => {
+        const {
+          minimized,
+          streams,
+          call
+        } = this.props;
 
-          if (minimized) {
-            this.setState({
-              mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI
-            }, () => {
-              call.setViewMode(this.state.mode);
-            });
+        if (minimized) {
+          this.setState({
+            mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI
+          }, () => {
+            call.setViewMode(this.state.mode);
+          });
+
+          if (call.peers.length === 0) {
+            this.showTimeoutDialog();
           }
-        });
+        }
       });
-      chatRoom.rebind('onCallEnd.local', () => this.props.minimized && this.props.onCallEnd());
+      chatRoom.rebind('onCallPeerJoined.callComp', () => {
+        const {
+          minimized,
+          streams,
+          call
+        } = this.props;
+
+        if (minimized) {
+          this.setState({
+            mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI
+          }, () => {
+            call.setViewMode(this.state.mode);
+          });
+        }
+
+        if (this.state.stayOnEnd !== !!mega.config.get('callemptytout')) {
+          this.setState({
+            stayOnEnd: !!mega.config.get('callemptytout')
+          });
+        }
+      });
+      chatRoom.rebind('onCallEnd.callComp', () => this.props.minimized && this.props.onCallEnd());
     };
 
-    this.unbindLocalEvents = () => ['onCallPeerLeft.local', 'onCallPeerJoined.local', 'onCallEnd.local'].map(event => this.props.chatRoom.off(event));
+    this.unbindCallEvents = () => ['onCallPeerLeft.callComp', 'onCallPeerJoined.callComp', 'onCallEnd.callComp'].map(event => this.props.chatRoom.off(event));
 
     this.handleCallMinimize = () => {
       const {
@@ -21761,20 +21801,30 @@ class Call extends mixins.wl {
       const {
         mode,
         sidebar,
-        view
+        view,
+        stayOnEnd
       } = this.state;
       Call.STATE.PREVIOUS = mode !== Call.MODE.MINI ? {
         mode,
         sidebar,
         view
       } : Call.STATE.PREVIOUS;
+
+      const noPeers = () => {
+        onCallMinimize();
+
+        if (typeof call.callToutInt !== 'undefined' && !stayOnEnd) {
+          this.showTimeoutDialog();
+        }
+      };
+
       return streams.length > 0 ? this.setState({
         mode: Call.MODE.MINI,
         sidebar: false
       }, () => {
         onCallMinimize();
         call.setViewMode(Call.MODE.MINI);
-      }) : onCallMinimize();
+      }) : noPeers();
     };
 
     this.handleCallExpand = async () => {
@@ -21879,8 +21929,25 @@ class Call extends mixins.wl {
       ephemeralAccounts: [...state.ephemeralAccounts, handle]
     }));
 
+    this.handleStayConfirm = () => {
+      this.setState({
+        stayOnEnd: true
+      });
+      this.props.call.initCallTimeout(true);
+    };
+
     this.state.mode = props.call.viewMode;
     this.state.sidebar = props.chatRoom.type === 'public';
+  }
+
+  showTimeoutDialog() {
+    msgDialog(`warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`, 'stay-on-call', l.empty_call_dlg_title, l.empty_call_dlg_text.replace('%s', '02:00'), res => {
+      if (res === null) {
+        return;
+      }
+
+      return res ? this.handleStayConfirm() : this.handleCallEnd();
+    }, 1);
   }
 
   componentWillUnmount() {
@@ -21896,7 +21963,7 @@ class Call extends mixins.wl {
 
     window.removeEventListener('offline', this.handleCallOffline);
     window.removeEventListener('online', this.handleCallOnline);
-    this.unbindLocalEvents();
+    this.unbindCallEvents();
   }
 
   componentDidMount() {
@@ -21909,7 +21976,7 @@ class Call extends mixins.wl {
     this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle => this.handleEphemeralAdd(handle));
     window.addEventListener('offline', this.handleCallOffline);
     window.addEventListener('online', this.handleCallOnline);
-    this.bindLocalEvents();
+    this.bindCallEvents();
     ['reconnecting', 'end_call'].map(sound => ion.sound.preload(sound));
   }
 
@@ -21933,7 +22000,8 @@ class Call extends mixins.wl {
       ephemeral,
       ephemeralAccounts,
       guest,
-      offline
+      offline,
+      stayOnEnd
     } = this.state;
     const STREAM_PROPS = {
       mode,
@@ -21944,9 +22012,11 @@ class Call extends mixins.wl {
       view,
       chatRoom,
       parent,
+      stayOnEnd,
       isOnHold: sfuApp.sfuClient.isOnHold(),
       onSpeakerChange: this.handleSpeakerChange,
-      onInviteToggle: this.handleInviteToggle
+      onInviteToggle: this.handleInviteToggle,
+      onStayConfirm: this.handleStayConfirm
     };
     return external_React_default().createElement("div", {
       className: `meetings-call ${minimized ? 'minimized' : ''}`

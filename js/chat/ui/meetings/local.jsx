@@ -1,11 +1,12 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
+import { compose, MegaRenderMixin } from '../../mixins';
 import utils from '../../../ui/utils.jsx';
 import Button from './button.jsx';
 import Call from './call.jsx';
 import StreamNode from './streamNode.jsx';
 import StreamExtendedControls from './streamExtendedControls.jsx';
 import { withMicObserver } from './micObserver';
+import { withPermissionsObserver } from './permissionsObserver';
 
 export default class Local extends MegaRenderMixin {
     collapseListener = null;
@@ -375,6 +376,7 @@ class Stream extends MegaRenderMixin {
                     minimized={minimized}
                     stream={this.getStreamSource()}
                     onLoadedData={onLoadedData}
+                    localAudioMuted={!(call.av & SfuClient.Av.Audio)}
                 />
                 <div className={`${Local.NAMESPACE}-self-overlay`}>
                     <Button
@@ -515,8 +517,10 @@ class Minimized extends MegaRenderMixin {
 
     render() {
         const { unread } = this.state;
-        const { call, signal, renderSignalWarning, onCallExpand, onCallEnd, onAudioClick, onVideoClick,
-                onScreenSharingClick, onHoldClick } = this.props;
+        const {
+            call, signal, errAv, renderSignalWarning, renderPermissionsWarning, onCallExpand, onCallEnd,
+            onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick
+        } = this.props;
         const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] /* `Mute` */ : l[16708] /* `Mute` */;
         const videoLabel =
             this.isActive(SfuClient.Av.Camera) ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
@@ -555,31 +559,39 @@ class Minimized extends MegaRenderMixin {
                                 <span>{audioLabel}</span>
                             </Button>
                             {signal ? null : renderSignalWarning()}
+                            {errAv & Av.Audio ? renderPermissionsWarning(Av.Audio) : null}
                         </div>
-                        <Button
-                            simpletip={{ ...SIMPLETIP_PROPS, label: videoLabel }}
-                            className={`
-                                mega-button
-                                theme-light-forced
-                                round
-                                large
-                                ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
-                                ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
-                            `}
-                            icon={`
-                                ${this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off'}
-                            `}
-                            onClick={ev => {
-                                ev.stopPropagation();
-                                onVideoClick();
-                            }}>
-                            <span>{videoLabel}</span>
-                        </Button>
-                        <StreamExtendedControls
-                            call={call}
-                            onScreenSharingClick={onScreenSharingClick}
-                            onHoldClick={onHoldClick}
-                        />
+                        <div className="meetings-signal-container">
+                            <Button
+                                simpletip={{ ...SIMPLETIP_PROPS, label: videoLabel }}
+                                className={`
+                                    mega-button
+                                    theme-light-forced
+                                    round
+                                    large
+                                    ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
+                                    ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
+                                `}
+                                icon={`
+                                    ${this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off'}
+                                `}
+                                onClick={ev => {
+                                    ev.stopPropagation();
+                                    onVideoClick();
+                                }}>
+                                <span>{videoLabel}</span>
+                            </Button>
+                            {errAv & Av.Camera ? renderPermissionsWarning(Av.Camera) : null}
+                        </div>
+                        <div className="meetings-signal-container">
+                            <StreamExtendedControls
+                                call={call}
+                                errAv={errAv}
+                                onScreenSharingClick={onScreenSharingClick}
+                                onHoldClick={onHoldClick}
+                            />
+                            {errAv & Av.Screen ? renderPermissionsWarning(Av.Screen) : null}
+                        </div>
                         <Button
                             simpletip={{ ...SIMPLETIP_PROPS, label: l[5884] /* `End call` */ }}
                             className="mega-button theme-dark-forced round large end-call"
@@ -606,4 +618,4 @@ class Minimized extends MegaRenderMixin {
         );
     }
 }
-const __Minimized = withMicObserver(Minimized);
+const __Minimized = compose(withMicObserver, withPermissionsObserver)(Minimized);

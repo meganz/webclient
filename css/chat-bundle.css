@@ -156,15 +156,30 @@
 .meetings-call .stream .participants-notice.user-alone {
   margin-top: -140px;
 }
+.meetings-call .stream .participants-notice.user-alone .notice-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+  width: 100%;
+}
+.meetings-call .stream .participants-notice.user-alone .notice-footer button {
+  margin-inline-start: 10px;
+  -webkit-margin-start: 10px;
+}
 .meetings-call .stream .participants-notice-heading {
   padding: 12px 48px;
   border-radius: 34px;
   text-align: center;
   background: var(--surface-highlight-1);
 }
-.meetings-call .stream .participants-notice-heading h1 {
+.meetings-call .stream .participants-notice-heading h1, .meetings-call .stream .participants-notice-heading h3 {
   margin: 0;
   color: var(--secondary-white);
+}
+.meetings-call .stream .participants-notice-heading.user-alone {
+  box-sizing: border-box;
+  margin: 0 auto;
+  width: 478px;
 }
 .meetings-call .stream .participants-notice-content {
   width: 460px;
@@ -187,6 +202,23 @@
 .meetings-call .stream .participants-notice-content .peers-invite hr {
   border: 0 none;
   border-top: 1px solid #444;
+}
+.meetings-call .stream .participants-notice-content.user-alone {
+  margin-top: 32px;
+  padding: 24px;
+  width: 478px;
+}
+.meetings-call .stream .participants-notice-content.user-alone h3 {
+  margin: 0 0 12px;
+}
+.meetings-call .stream .participants-notice-content.user-alone p {
+  color: var(--text-color-medium);
+  text-align: start;
+}
+.meetings-call .stream .participants-notice-content.user-alone div.stay-dlg-subtext {
+  color: var(--text-color-low);
+  font: var(--text-body2);
+  margin-top: 12px;
 }
 .meetings-call .stream-container {
   margin: auto;

@@ -423,7 +423,7 @@ window.toastRack = (() => {
         await openItem(toastSlot);
         await showToast(toast);
 
-        return toast.id;
+        return toastSlot.id;
     }
 
     /**

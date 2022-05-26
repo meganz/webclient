@@ -1605,6 +1605,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[BR]', '<br>');
     l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
         .replace('[BR]', '<br>');
+
+    l.empty_call_dlg_text = l.empty_call_dlg_text
+        .replace('[S1]', '<span class="stay-dlg-counter">').replace('[/S1]', '</span>')
+        .replace('[S2]', '<div class="stay-dlg-subtext">').replace('[/S2]', '</div>');
+    l.meeting_empty_call_desc_1 = escapeHTML(l.meeting_empty_call_desc_1)
+        .replace(/\[P]/g, '<div>')
+        .replace(/\[\/P]/g, '</div>');
+
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
         16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444, 18268,

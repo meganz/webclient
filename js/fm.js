@@ -1723,7 +1723,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     $('#msgDialog button.js-close').rebind('click', function() {
         closeMsg();
         if ($.warningCallback) {
-            $.warningCallback(false);
+            $.warningCallback(null);
             $.warningCallback = null;
         }
     });

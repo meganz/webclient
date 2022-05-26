@@ -1382,6 +1382,7 @@
 }
 .stream-controls .button-group-menu .button-group-item,
 .local-stream-controls .button-group-menu .button-group-item {
+  position: relative;
   margin: 0 0 10px 0;
 }
 .stream-controls .button-group .info-indicator,
@@ -1412,6 +1413,11 @@
   right: 1px;
   bottom: -4px;
   border-radius: 200px;
+  cursor: pointer;
+}
+.button-group-item .meetings-signal-issue {
+  bottom: 3px;
+  right: -6px;
 }
 .meetings-signal-issue i {
   --icon-size: 24px;
@@ -2086,3 +2092,5 @@ body.theme-dark .start-meeting-preview .preview-meeting {
     left: 400px;
   }
 }
+
+/*# sourceMappingURL=chat-bundle.css.map */

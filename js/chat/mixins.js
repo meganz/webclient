@@ -189,6 +189,8 @@ export const schedule = (local, debug) => {
     };
 };
 
+export const compose = (...funcs) => funcs.reduce((a, b) => (...args) => a(b(...args)), arg => arg);
+
 export const SoonFcWrap = (milliseconds, local) => {
     return function(target, propertyKey, descriptor) {
         descriptor.value = SoonFc(descriptor.value, !local, milliseconds);

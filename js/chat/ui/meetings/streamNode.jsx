@@ -245,10 +245,13 @@ export default class StreamNode extends MegaRenderMixin {
     };
 
     renderStatus = () => {
-        const { mode, stream, chatRoom } = this.props;
+        const { mode, stream, chatRoom, localAudioMuted } = this.props;
         const { audioMuted, hasSlowNetwork, isOnHold, userHandle } = stream;
         const $$CONTAINER = ({ children }) => <div className="stream-node-status theme-dark-forced">{children}</div>;
         const onHoldLabel = l[23542].replace('%s', M.getNameByHandle(userHandle)); /* `%s has put the call on hold` */
+        // Determine `muted` depending on whether the current stream that is being rendered is local audio track or
+        // a remote peer stream. See `renderSelfView@Stream`.
+        const muted = userHandle === u_handle && localAudioMuted || audioMuted;
 
         if (isOnHold) {
             return <$$CONTAINER>{this.getStatusIcon('icon-pause', onHoldLabel)}</$$CONTAINER>;
@@ -263,9 +266,9 @@ export default class StreamNode extends MegaRenderMixin {
                     this.getStatusIcon('icon-admin call-role-icon', l[8875] /* `Moderator` */)
                 }
                 <$$CONTAINER>
-                    {audioMuted && this.getStatusIcon('icon-audio-off', l.muted /* `Muted` */)}
-                    {hasSlowNetwork &&
-                        this.getStatusIcon('icon-weak-signal', l.poor_connection /* `Poor connection` */)}
+                    {muted ? this.getStatusIcon('icon-audio-off', l.muted /* `Muted` */) : null}
+                    {hasSlowNetwork ?
+                        this.getStatusIcon('icon-weak-signal', l.poor_connection /* `Poor connection` */) : null}
                 </$$CONTAINER>
             </>
         );

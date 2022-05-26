@@ -4599,6 +4599,7 @@ __webpack_require__.d(__webpack_exports__, {
 "Os": () => (schedule),
 "_p": () => (ContactAwareComponent),
 "py": () => (rAFWrap),
+"qC": () => (compose),
 "wl": () => (MegaRenderMixin)
 });
 
@@ -4778,6 +4779,7 @@ const schedule = (local, debug) => {
     return descriptor;
   };
 };
+const compose = (...funcs) => funcs.reduce((a, b) => (...args) => a(b(...args)), arg => arg);
 const SoonFcWrap = (milliseconds, local) => {
   return function (target, propertyKey, descriptor) {
     descriptor.value = SoonFc(descriptor.value, !local, milliseconds);
@@ -7541,8 +7543,8 @@ ColumnContactLastInteraction.label = l[5904];
 ColumnContactLastInteraction.megatype = "interaction";
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 var dropdowns = __webpack_require__(78);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
-var call = __webpack_require__(332);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 23 modules
+var call = __webpack_require__(357);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
@@ -12012,8 +12014,8 @@ PushSettingsDialog.options = {
   Infinity: l[22011]
 };
 PushSettingsDialog.default = PushSettingsDialog.options[PushSettingsDialog.options.length - 1];
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
-var call = __webpack_require__(332);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 23 modules
+var call = __webpack_require__(357);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
 var historyPanel = __webpack_require__(192);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
@@ -17618,8 +17620,8 @@ class RetentionChange extends mixin.y {
   }
 
 }
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
-var call = __webpack_require__(332);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 23 modules
+var call = __webpack_require__(357);
 ;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
 
@@ -18514,7 +18516,7 @@ const __WEBPACK_DEFAULT_EXPORT__ = (Button);
 
 /***/ }),
 
-/***/ 332:
+/***/ 357:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -19123,7 +19125,8 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
       const {
         mode,
         stream,
-        chatRoom
+        chatRoom,
+        localAudioMuted
       } = this.props;
       const {
         audioMuted,
@@ -19139,12 +19142,13 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
       }, children);
 
       const onHoldLabel = l[23542].replace('%s', M.getNameByHandle(userHandle));
+      const muted = userHandle === u_handle && localAudioMuted || audioMuted;
 
       if (isOnHold) {
         return external_React_default().createElement($$CONTAINER, null, this.getStatusIcon('icon-pause', onHoldLabel));
       }
 
-      return external_React_default().createElement((external_React_default()).Fragment, null, mode === Call.MODE.SPEAKER && Call.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin call-role-icon', l[8875]), external_React_default().createElement($$CONTAINER, null, audioMuted && this.getStatusIcon('icon-audio-off', l.muted), hasSlowNetwork && this.getStatusIcon('icon-weak-signal', l.poor_connection)));
+      return external_React_default().createElement((external_React_default()).Fragment, null, mode === Call.MODE.SPEAKER && Call.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin call-role-icon', l[8875]), external_React_default().createElement($$CONTAINER, null, muted ? this.getStatusIcon('icon-audio-off', l.muted) : null, hasSlowNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null));
     };
 
     this.videoRef = external_React_default().createRef();
@@ -19480,16 +19484,21 @@ const withMicObserver = Component => class extends mixins.wl {
       signal: false
     }));
 
+    this.renderSignalDialog = () => {
+      return msgDialog('warningb', null, 'Microphone not working', l.chat_mic_off_tooltip, null, 1);
+    };
+
     this.renderSignalWarning = () => external_React_default().createElement("div", {
       className: `
                     ${this.namespace}
                     meetings-signal-issue
                     simpletip
                 `,
-      "data-simpletip": l.chat_mic_off_tooltip,
+      "data-simpletip": "Show more info",
       "data-simpletipposition": "top",
       "data-simpletipoffset": "5",
-      "data-simpletip-class": "theme-dark-forced"
+      "data-simpletip-class": "theme-dark-forced",
+      onClick: () => this.renderSignalDialog()
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-exclamation-filled"
     }));
@@ -19513,7 +19522,65 @@ const withMicObserver = Component => class extends mixins.wl {
   }
 
 };
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/permissionsObserver.jsx
+
+
+
+const withPermissionsObserver = Component => class extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.namespace = `PO-${Component.NAMESPACE}`;
+    this.permissionsObserver = `onLocalMediaError.${this.namespace}`;
+    this.state = {
+      errAv: null
+    };
+
+    this.renderPermissionsDialog = av => {
+      const CONTENT = {
+        [Av.Audio]: [l.no_mic_title, l.no_mic_info],
+        [Av.Camera]: [l.no_camera_title, l.no_camera_info]
+      };
+      return msgDialog('warningb', null, ...CONTENT[av], null, 1);
+    };
+
+    this.renderPermissionsWarning = av => external_React_default().createElement("div", {
+      className: `
+                    ${this.namespace}
+                    meetings-signal-issue
+                    simpletip
+                `,
+      "data-simpletip": "Show more info",
+      "data-simpletipposition": "top",
+      "data-simpletipoffset": "5",
+      "data-simpletip-class": "theme-dark-forced",
+      onClick: () => this.renderPermissionsDialog(av)
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-exclamation-filled"
+    }));
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    this.props.chatRoom.unbind(this.permissionsObserver);
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    this.props.chatRoom.rebind(this.permissionsObserver, (e, errAv) => this.setState({
+      errAv
+    }));
+  }
+
+  render() {
+    return external_React_default().createElement(Component, (0,esm_extends.Z)({}, this.props, {
+      errAv: this.state.errAv,
+      renderPermissionsWarning: this.renderPermissionsWarning
+    }));
+  }
+
+};
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamControls.jsx
+
 
 
 
@@ -19556,8 +19623,8 @@ class StreamControls extends mixins.wl {
 
   render() {
     const avFlags = this.props.call.av;
-    const audioLabel = avFlags & SfuClient.Av.Audio ? l[16214] : l[16708];
-    const videoLabel = avFlags & SfuClient.Av.Camera ? l[22894] : l[22893];
+    const audioLabel = avFlags & Av.Audio ? l[16214] : l[16708];
+    const videoLabel = avFlags & Av.Camera ? l[22894] : l[22893];
     const SIMPLETIP = {
       position: 'top',
       offset: 8,
@@ -19574,12 +19641,12 @@ class StreamControls extends mixins.wl {
                                 theme-light-forced
                                 round
                                 large
-                                ${avFlags & SfuClient.Av.onHold ? 'disabled' : ''}
-                                ${avFlags & SfuClient.Av.Audio ? '' : 'inactive'}
+                                ${avFlags & Av.onHold ? 'disabled' : ''}
+                                ${avFlags & Av.Audio ? '' : 'inactive'}
                             `,
-      icon: `${avFlags & SfuClient.Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`,
+      icon: `${avFlags & Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`,
       onClick: this.props.onAudioClick
-    }, external_React_default().createElement("span", null, audioLabel)), this.props.signal ? null : this.props.renderSignalWarning()), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, audioLabel)), this.props.signal ? null : this.props.renderSignalWarning(), this.props.errAv & Av.Audio ? this.props.renderPermissionsWarning(Av.Audio) : null), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP,
         label: videoLabel
       },
@@ -19588,12 +19655,12 @@ class StreamControls extends mixins.wl {
                                 theme-light-forced
                                 round
                                 large
-                                ${avFlags & SfuClient.Av.onHold ? 'disabled' : ''}
-                                ${avFlags & SfuClient.Av.Camera ? '' : 'inactive'}
+                                ${avFlags & Av.onHold ? 'disabled' : ''}
+                                ${avFlags & Av.Camera ? '' : 'inactive'}
                             `,
-      icon: `${avFlags & SfuClient.Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`,
+      icon: `${avFlags & Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`,
       onClick: this.props.onVideoClick
-    }, external_React_default().createElement("span", null, videoLabel))), external_React_default().createElement("li", null, external_React_default().createElement(StreamExtendedControls, {
+    }, external_React_default().createElement("span", null, videoLabel)), this.props.errAv & Av.Camera ? this.props.renderPermissionsWarning(Av.Camera) : null), external_React_default().createElement("li", null, external_React_default().createElement(StreamExtendedControls, {
       call: this.props.call,
       onScreenSharingClick: this.props.onScreenSharingClick,
       onHoldClick: this.props.onHoldClick
@@ -19610,8 +19677,9 @@ class StreamControls extends mixins.wl {
 }
 
 StreamControls.NAMESPACE = 'stream-controls';
-const streamControls = (withMicObserver(StreamControls));
+const streamControls = ((0,mixins.qC)(withMicObserver, withPermissionsObserver)(StreamControls));
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/local.jsx
+
 
 
 
@@ -19954,7 +20022,8 @@ class Stream extends mixins.wl {
         className: call.isSharingScreen() ? '' : 'local-stream-mirrored',
         minimized: minimized,
         stream: this.getStreamSource(),
-        onLoadedData: onLoadedData
+        onLoadedData: onLoadedData,
+        localAudioMuted: !(call.av & SfuClient.Av.Audio)
       }), external_React_default().createElement("div", {
         className: `${Local.NAMESPACE}-self-overlay`
       }, external_React_default().createElement(meetings_button.Z, {
@@ -20084,7 +20153,9 @@ class Minimized extends mixins.wl {
     const {
       call,
       signal,
+      errAv,
       renderSignalWarning,
+      renderPermissionsWarning,
       onCallExpand,
       onCallEnd,
       onAudioClick,
@@ -20132,30 +20203,35 @@ class Minimized extends mixins.wl {
         ev.stopPropagation();
         onAudioClick();
       }
-    }, external_React_default().createElement("span", null, audioLabel)), signal ? null : renderSignalWarning()), external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, audioLabel)), signal ? null : renderSignalWarning(), errAv & Av.Audio ? renderPermissionsWarning(Av.Audio) : null), external_React_default().createElement("div", {
+      className: "meetings-signal-container"
+    }, external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: videoLabel
       },
       className: `
-                                mega-button
-                                theme-light-forced
-                                round
-                                large
-                                ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
-                                ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
-                            `,
+                                    mega-button
+                                    theme-light-forced
+                                    round
+                                    large
+                                    ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
+                                    ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
+                                `,
       icon: `
-                                ${this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off'}
-                            `,
+                                    ${this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off'}
+                                `,
       onClick: ev => {
         ev.stopPropagation();
         onVideoClick();
       }
-    }, external_React_default().createElement("span", null, videoLabel)), external_React_default().createElement(StreamExtendedControls, {
+    }, external_React_default().createElement("span", null, videoLabel)), errAv & Av.Camera ? renderPermissionsWarning(Av.Camera) : null), external_React_default().createElement("div", {
+      className: "meetings-signal-container"
+    }, external_React_default().createElement(StreamExtendedControls, {
       call: call,
+      errAv: errAv,
       onScreenSharingClick: onScreenSharingClick,
       onHoldClick: onHoldClick
-    }), external_React_default().createElement(meetings_button.Z, {
+    }), errAv & Av.Screen ? renderPermissionsWarning(Av.Screen) : null), external_React_default().createElement(meetings_button.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: l[5884]
       },
@@ -20178,7 +20254,7 @@ class Minimized extends mixins.wl {
 Minimized.NAMESPACE = 'local-stream-minimized';
 Minimized.UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
 
-const __Minimized = withMicObserver(Minimized);
+const __Minimized = (0,mixins.qC)(withMicObserver, withPermissionsObserver)(Minimized);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsNotice.jsx
 
 
@@ -20770,8 +20846,8 @@ var perfectScrollbar = __webpack_require__(285);
 
 
 class Participant extends mixins.wl {
-  constructor(props) {
-    super(props);
+  constructor(...args) {
+    super(...args);
     this.baseIconClass = 'sprite-fm-mono';
 
     this.audioMuted = () => {
@@ -20781,7 +20857,7 @@ class Participant extends mixins.wl {
       } = this.props;
 
       if (call) {
-        return call.localAudioMuted === null || !!call.localAudioMuted;
+        return !(call.av & SfuClient.Av.Audio);
       }
 
       return stream && stream.audioMuted;
@@ -20831,10 +20907,6 @@ class Participant extends mixins.wl {
 }
 
 class Participants extends mixins.wl {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const {
       streams,
@@ -20979,6 +21051,7 @@ class Sidebar extends mixins.wl {
           label: l[8885]
         },
         isCallOnHold: isOnHold,
+        localAudioMuted: !(call.av & SfuClient.Av.Audio),
         className: `
                                     ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
                                     ${forcedLocal ? 'active' : ''}

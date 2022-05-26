@@ -465,7 +465,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
         // 3- on clicking on a sub-user to view his info (from left pane or row)
         $('.grid-table-user-management .view-icon, .content-panel.user-management .nw-user-management-item,' +
-            '.grid-table-user-management tr')
+            '.grid-table-user-management tbody tr')
             .rebind('click.subuser', function subUserViewInfoClickHandler() {
 
                 $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
@@ -3809,7 +3809,9 @@ BusinessAccountUI.prototype.URLchanger = function (subLocation) {
         window.mega.ui.searchbar.closeMiniSearch();
         pushHistoryState(newSubPage);
         page = newSubPage;
-        M.currentdirid = page;
+
+        // remove fm/ in front for M.currentdirid
+        M.currentdirid = page.startsWith('fm/') ? page.slice(3) : page;
     }
 };
 

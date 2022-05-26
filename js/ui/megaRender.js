@@ -10,7 +10,7 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td></td>' +
+                    '<td class="space-maintainer-start"></td>' +
                     '<td megatype="fav">' +
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
@@ -31,7 +31,7 @@
                         '</span>' +
                         '<i class="sprite-fm-mono icon-link"></i>' +
                     '</td>' +
-                    '<td megatype="empty"></td>' +
+                    '<td class="space-maintainer-end" megatype="empty"></td>' +
                 '</tr>' +
             '</table>',
 
@@ -60,7 +60,7 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="30">' +
+                    '<td>' +
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td>' +
@@ -70,7 +70,7 @@
                             '<div class="shared-folder-info"></div>' +
                         '</div>' +
                     '</td>' +
-                    '<td width="240">' +
+                    '<td>' +
                         '<div class="fm-chat-user-info todo-star ustatus">' +
                             '<div class="todo-fm-chat-user-star"></div>' +
                             '<div class="fm-chat-user"></div>' +
@@ -79,10 +79,10 @@
                             '<div class="clear"></div>' +
                         '</div>' +
                     '</td>' +
-                    '<td width="100">' +
+                    '<td>' +
                         '<div class="shared-folder-size"></div>' +
                     '</td>' +
-                    '<td width="200">' +
+                    '<td>' +
                         '<div class="shared-folder-access"><i class="sprite-fm-mono"></i><span></span></div>' +
                     '</td>' +
                     '<td class="grid-url-header-nw">' +
@@ -476,7 +476,7 @@
                 // initOpcGridScrolling();
                 // initIpcGridScrolling();
 
-                $('.grid-table:not(.arc-chat-messages-block) tr').remove();
+                $('.grid-table:not(.arc-chat-messages-block) tbody tr').remove();
                 $('.file-block-scrolling a').remove();
                 $('.shared-blocks-scrolling a').remove();
                 $('.out-shared-blocks-scrolling a').remove();
@@ -648,9 +648,14 @@
 
             if (this.container.nodeName === 'TABLE') {
                 var tbody = this.container.querySelector('tbody');
+                var thead = this.container.querySelector('thead');
 
                 if (tbody) {
                     this.container = tbody;
+                }
+
+                if (thead) {
+                    this.header = thead;
                 }
             }
 
@@ -702,30 +707,39 @@
 
         setDOMColumnsWidth: function(nodeDOM) {
             var sectionName = 'cloud';
+
             if (this.section !== 'cloud-drive') {
                 sectionName = this.section;
             }
+
             // setting widths
             if (M && M.columnsWidth && M.columnsWidth[sectionName]) {
-                var knownColumnsWidths = Object.keys(M.columnsWidth[sectionName]) || [];
-                for (var col = 0; col < knownColumnsWidths.length; col++) {
-                    var tCol = nodeDOM.querySelector('[megatype="' + knownColumnsWidths[col] + '"]');
-                    if (tCol) {
-                        if (typeof M.columnsWidth[sectionName][knownColumnsWidths[col]].curr === 'number') {
-                            tCol.style.width = M.columnsWidth[sectionName][knownColumnsWidths[col]].curr + 'px';
-                        }
-                        else if (M.columnsWidth[sectionName][knownColumnsWidths[col]].currpx) {
-                            tCol.style.width = M.columnsWidth[sectionName][knownColumnsWidths[col]].currpx + 'px';
-                        }
-                        else {
-                            tCol.style.width = M.columnsWidth[sectionName][knownColumnsWidths[col]].curr || '';
-                        }
 
-                        if (M.columnsWidth[sectionName][knownColumnsWidths[col]].viewed) {
-                            tCol.style.display = "";
+                const knownColumnsWidths = Object.keys(M.columnsWidth[sectionName]) || [];
+
+                for (let col = 0; col < knownColumnsWidths.length; col++) {
+
+                    const tCol = nodeDOM.querySelector('[megatype="' + knownColumnsWidths[col] + '"]');
+                    const colWidths = M.columnsWidth[sectionName][knownColumnsWidths[col]];
+
+                    if (tCol && tCol.nodeName === 'TH') {
+
+                        if (typeof colWidths.curr === 'number') {
+                            tCol.style.width = colWidths.curr + 'px';
                         }
                         else {
-                            tCol.style.display = "none";
+                            tCol.style.width = colWidths.curr || '';
+
+                            const headerWidth = getComputedStyle(tCol).width.replace('px', '') | 0;
+                            const colMin = colWidths.min;
+                            const colMax = colWidths.max;
+
+                            if (headerWidth < colMin) {
+                                tCol.style.width = `${colMin}px`;
+                            }
+                            else if (headerWidth > colMax) {
+                                tCol.style.width = `${colMax}px`;
+                            }
                         }
                     }
                 }
@@ -1507,6 +1521,8 @@
                             megaListOptions.extraRows = 4;
                             megaListOptions.itemWidth = false;
                             megaListOptions.itemHeight = 32;
+                            megaListOptions.headerHeight = 34;
+                            megaListOptions.bottomSpacing = 6;
                             megaListOptions.appendTo = 'tbody';
                             megaListOptions.renderAdapter = new MegaList.RENDER_ADAPTERS.Table();
                             megaListContainer = this.container.parentNode.parentNode.parentNode;
@@ -1592,6 +1608,12 @@
                         }
 
                         this.megaList.batchReplace(aNodeList.map(String));
+
+                        if (!this.viewmode && !this._headersReady) {
+
+                            this._headersReady = true;
+                            this.setDOMColumnsWidth(this.container.parentElement.querySelector('thead tr'));
+                        }
                         this.megaList.initialRender();
                     }
                     else if (aUserData && aUserData.newNodeList && aUserData.newNodeList.length > 0) {

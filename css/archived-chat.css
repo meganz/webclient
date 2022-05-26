@@ -3,7 +3,7 @@
 	position: relative;
 }
 
-.archived-chat-view .grid-table-header th {
+.archived-chat-view .grid-table th {
 	margin-top: 12px;
 	color: #999;
 }

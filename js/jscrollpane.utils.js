@@ -22,6 +22,7 @@ function jScrollFade(id) {
         $(this).find('.jspContainer').uniqueId();
         var id = $(this).find('.jspContainer').attr('id');
         jScrollFadeOut(id);
+        $(this).toggleClass('jsp-sticky-fix');
     });
 }
 
@@ -52,14 +53,31 @@ function deleteScrollPanel(from, data) {
 
 
 function initGridScrolling() {
-    $('.grid-scrolling-table:visible')
-        .filter(":not(.megaList,.megaListContainer)")
+
+    const $scoller = $('.grid-scrolling-table:visible');
+    const jsp = $scoller.data('jsp');
+
+    // Some manual reset to top position for avoid jsp bug
+    if (jsp && !jsp.getIsScrollableV()) {
+        $('.jspPane', $scoller).css('top', 0);
+    }
+
+    $scoller.filter(":not(.megaList,.megaListContainer)")
         .jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
 
     jScrollFade('.grid-scrolling-table:not(.megaList,.megaListContainer)');
 }
 
 function initFileblocksScrolling() {
+
+    const $scoller = $('.file-block-scrolling:visible');
+    const jsp = $scoller.data('jsp');
+
+    // Some manual reset to top position for avoid jsp bug
+    if (jsp && !jsp.getIsScrollableV()) {
+        $('.jspPane', $scoller).css('top', 0);
+    }
+
     $('.file-block-scrolling:visible')
         .filter(":not(.megaList)")
         .jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
@@ -85,19 +103,24 @@ function initSelectScrolling(scrollBlock) {
         return false;
     }
 
-    // Remember current position of scroll
-    var currentPos = $scrollBlock.data('jsp') ? $scrollBlock.data('jsp').getContentPositionY() : 0;
-    deleteScrollPanel(scrollBlock, 'jsp');
+    const jsp = $scrollBlock.data('jsp');
 
-    // Need to reselect scrollblock due to update.
-    $scrollBlock = $(scrollBlock);
-    $scrollBlock.jScrollPane({
-        enableKeyboardNavigation: false,
-        showArrows: true,
-        arrowSize: 5,
-        contentWidth: 0
-    });
-    $scrollBlock.data('jsp').scrollToY(currentPos);
+    if (jsp) {
+        // Remember current position of scroll
+        var currentPos = jsp.getContentPositionY();
+
+        // Need to reselect scrollblock due to update.
+        jsp.reinitialise();
+        jsp.scrollToY(currentPos);
+    }
+    else {
+        $scrollBlock.jScrollPane({
+            enableKeyboardNavigation: false,
+            showArrows: true,
+            arrowSize: 5,
+            contentWidth: 0
+        });
+    }
     jScrollFade(scrollBlock);
 }
 
@@ -156,16 +179,6 @@ function initOutShareBlocksScrolling() {
         return;
     }
     initSelectScrolling(scroll);
-}
-
-function initTransferScroll() {
-    $('.transfer-scrolling-table').jScrollPane({
-        enableKeyboardNavigation: false,
-        showArrows: true,
-        arrowSize: 5,
-        verticalDragMinHeight: 20
-    });
-    jScrollFade('.transfer-scrolling-table');
 }
 
 function dialogScroll(s) {

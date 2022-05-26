@@ -1188,7 +1188,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');
 
-    var linktohelp = `${getBaseUrl()}/help/s/59f13b42f1b7093a7f8b4589`;
+    var linktohelp = `https://help.mega.io/files-folders/restore-delete/file-version-history`;
     l[17097] =  l[17097]
                 .replace('[A]', '<a id="versionhelp" href="' + linktohelp + '" target="_blank" class="red">')
                 .replace('[/A]', '</a>');

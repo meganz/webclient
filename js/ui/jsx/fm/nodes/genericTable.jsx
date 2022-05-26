@@ -22,6 +22,9 @@ export class GenericTableHeader extends MegaRenderMixin {
                     const ordClass = sortBy[1] === "desc" ? "icon-arrow-down" : "icon-arrow-up";
                     classes = `${classes} ${ordClass}`;
                 }
+                if (col.id === 'fav') {
+                    classes += ' hidden';
+                }
                 sortable = <i className={`sprite-fm-mono ${col.id} ${classes}`} />;
             }
 
@@ -44,11 +47,11 @@ export class GenericTableHeader extends MegaRenderMixin {
             );
         }
 
-        return <table width="100%" className={"fm-fmview-table " +
-            (this.props.headerContainerClassName || "grid-table-header fm-dialog-table")
-        }>
-            <tbody><tr>{columnsRendered}</tr></tbody>
-        </table>;
+        return <thead>
+            <tr>
+                {columnsRendered}
+            </tr>
+        </thead>;
     }
 }
 export default class GenericTable extends GenericNodePropsComponent {
@@ -107,7 +110,6 @@ export default class GenericTable extends GenericNodePropsComponent {
         key={index + "_" + node[keyProp]}
         >
             {columns}
-            <td className="column-hover" />
         </tr>;
     }
 }

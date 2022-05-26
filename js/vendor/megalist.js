@@ -99,6 +99,16 @@
         'itemHeight': false,
 
         /**
+         * Static, fixed height of the header if exist
+         */
+        'headerHeight': 0,
+
+        /**
+         * Static, fixed spacing height on bottom of wrapper for x-axis scroller to not overlap item on bottom end
+         */
+        'bottomSpacing': 0,
+
+        /**
          * Oredered list of item IDs
          */
         'items': false,
@@ -575,7 +585,7 @@
      */
     MegaList.prototype.isAtBottom = function() {
         this._recalculate();
-        return this._calculated['isAtTop'];
+        return this._calculated['isAtBottom'];
     };
 
     /**
@@ -668,8 +678,11 @@
             scrollToY = itemOffsetTop;
         }
         // check if the item is below the visible viewport
-        else if (itemOffsetTopPlusHeight > (this._calculated['scrollTop'] + this._calculated['scrollHeight'])) {
-            scrollToY = itemOffsetTopPlusHeight - this._calculated['scrollHeight'];
+        else if (itemOffsetTopPlusHeight + this.options.itemHeight >
+            (this._calculated['scrollTop'] + this._calculated['scrollHeight'])) {
+
+            scrollToY = itemOffsetTopPlusHeight - this._calculated['scrollHeight'] +
+                this.options.headerHeight + this.options.bottomSpacing;
         }
 
         // have to scroll
@@ -817,7 +830,7 @@
 
         lazy(calculated, 'itemWidth', function() {
             if (self.options.itemWidth === false) {
-                return this.scrollWidth;
+                return this.contentWidth;
             }
             return self.options.itemWidth;
         });
@@ -827,7 +840,7 @@
             if (contentWidth) {
                 return contentWidth;
             }
-            return this.itemWidth;
+            return this.scrollWidth;
         });
 
         lazy(calculated, 'itemsPerRow', function() {
@@ -839,7 +852,8 @@
         });
 
         lazy(calculated, 'contentHeight', function() {
-            return Math.ceil(self.items.length / this.itemsPerRow) * self.options.itemHeight;
+            return Math.ceil(self.items.length / this.itemsPerRow) * self.options.itemHeight +
+                self.options.headerHeight + self.options.bottomSpacing;
         });
 
         lazy(calculated, 'scrollLeft', function() {
@@ -858,7 +872,7 @@
             return this.scrollTop === 0;
         });
         lazy(calculated, 'isAtBottom', function() {
-            return self.listContainer.scrollTop === this.scrollHeight;
+            return self.listContainer.scrollTop === this.contentHeight - this.scrollHeight;
         });
         lazy(calculated, 'itemsPerPage', function() {
             return Math.ceil(this.scrollHeight / self.options.itemHeight) * this.itemsPerRow;
@@ -925,14 +939,13 @@
 
             if (this._lastContentHeight !== this._calculated['contentHeight']) {
                 this._lastContentHeight = this._calculated['contentHeight'];
-                this.content.style.height = this._calculated['contentHeight'] + "px";
+                this.content.style.height = this._calculated.contentHeight -
+                    this.options.headerHeight - this.options.bottomSpacing + "px";
             }
 
             // scrolled out of the viewport if the last item in the list was removed? scroll back a little bit...
             if (this._calculated['scrollHeight'] + this._calculated['scrollTop'] > this._calculated['contentHeight']) {
-                this.scrollToY(
-                    this._calculated['contentHeight'] - this._calculated['scrollHeight']
-                );
+                this.scrollToBottom();
             }
         }
     };
@@ -1335,7 +1348,8 @@
 
     MegaList.RENDER_ADAPTERS.Table.prototype._rendered = function() {
         var megaList = this.megaList;
-        megaList.content.style.height = megaList._calculated['contentHeight'] + "px";
+        megaList.content.style.height = megaList._calculated['contentHeight'] -
+            megaList.options.headerHeight - megaList.options.bottomSpacing + "px";
         Ps.update(megaList.listContainer);
     };
 

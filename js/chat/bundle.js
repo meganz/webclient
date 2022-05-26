@@ -16015,33 +16015,27 @@ class ArchivedConversationsList extends mixins.wl {
       className: "chat-content-block archived-chats"
     }, conversations_React.createElement(conversations_React.Fragment, null, currConvsList.length ? conversations_React.createElement("div", {
       className: "files-grid-view archived-chat-view"
-    }, conversations_React.createElement("table", {
-      className: "grid-table-header",
-      width: "100%",
-      cellSpacing: "0",
-      cellPadding: "0",
-      border: "0"
-    }, conversations_React.createElement("tbody", null, conversations_React.createElement("tr", null, conversations_React.createElement("th", {
-      className: "calculated-width",
-      onClick: self.onSortNameClicked
     }, conversations_React.createElement("div", {
-      className: "is-chat arrow name"
-    }, l[86], conversations_React.createElement("i", {
-      className: nameOrderClass ? `sprite-fm-mono icon-arrow-${nameOrderClass}` : ''
-    }))), conversations_React.createElement("th", {
-      width: "330",
-      onClick: self.onSortTimeClicked
-    }, conversations_React.createElement("div", {
-      className: `is-chat arrow interaction ${timerOrderClass}`
-    }, l[5904], conversations_React.createElement("i", {
-      className: timerOrderClass ? `sprite-fm-mono icon-arrow-${timerOrderClass}` : ''
-    })))))), conversations_React.createElement("div", {
       className: "grid-scrolling-table archive-chat-list"
     }, conversations_React.createElement("div", {
       className: "grid-wrapper"
     }, conversations_React.createElement("table", {
       className: "grid-table arc-chat-messages-block table-hover"
-    }, conversations_React.createElement("tbody", null, currConvsList))))) : conversations_React.createElement(nil.Z, {
+    }, conversations_React.createElement("thead", null, conversations_React.createElement("tr", null, conversations_React.createElement("th", {
+      className: "calculated-width",
+      onClick: self.onSortNameClicked
+    }, conversations_React.createElement("div", {
+      className: "is-chat arrow name"
+    }, conversations_React.createElement("i", {
+      className: nameOrderClass ? `sprite-fm-mono icon-arrow-${nameOrderClass}` : ''
+    }), l[86])), conversations_React.createElement("th", {
+      width: "330",
+      onClick: self.onSortTimeClicked
+    }, conversations_React.createElement("div", {
+      className: `is-chat arrow interaction ${timerOrderClass}`
+    }, conversations_React.createElement("i", {
+      className: timerOrderClass ? `sprite-fm-mono icon-arrow-${timerOrderClass}` : ''
+    }), l[5904])))), conversations_React.createElement("tbody", null, currConvsList))))) : conversations_React.createElement(nil.Z, {
       title: l.archived_nil
     })), confirmUnarchiveDialog);
   }
@@ -28061,7 +28055,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
     assert(props.nodeAdapter, 'missing `nodeAdapter` for MegaList2');
     assert(props.entries, 'missing `entries` for MegaList2');
     this.options = {
-      extraRows: 4,
+      extraRows: 8,
       batchPages: 0,
       perfectScrollOptions: {
         'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
@@ -28105,7 +28099,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       return this.ps.getClientWidth();
     });
     lazy(calculated, 'scrollHeight', () => {
-      return this.ps.getClientHeight();
+      return this.ps.getClientHeight() - 36;
     });
     lazy(calculated, 'itemWidth', () => {
       if (this.props.listAdapter.itemWidth === false) {
@@ -28309,6 +28303,8 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       delay('chat:mega-list2:thumb-loader', () => this.enqueueThumbnailRetrieval(), 20);
     }
 
+    this._firstRender = this._firstRender || this.props.viewmode !== M.viewmode;
+
     if (this._firstRender && this.ps) {
       this._firstRender = false;
       Ps.update(this.ps.findDOMNode());
@@ -28428,7 +28424,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
     }
 
     let listAdapterName = listAdapter.prototype.constructor.name;
-    return external_React_default().createElement((external_React_default()).Fragment, null, header, external_React_default().createElement(perfectScrollbar.F, {
+    return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(perfectScrollbar.F, {
       key: "ps_" + listAdapterName + "_" + viewMode,
       options: this.options.perfectScrollOptions,
       onUserScroll: this.onPsUserScroll,
@@ -28448,6 +28444,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       listContentRef: listContent => {
         this.listContent = listContent;
       },
+      header: header,
       megaList: this,
       calculated: this._calculated
     }, listAdapterOpts), nodes)));
@@ -28568,6 +28565,10 @@ class GenericTableHeader extends mixins.wl {
           classes = `${classes} ${ordClass}`;
         }
 
+        if (col.id === 'fav') {
+          classes += ' hidden';
+        }
+
         sortable = external_React_default().createElement("i", {
           className: `sprite-fm-mono ${col.id} ${classes}`
         });
@@ -28589,10 +28590,7 @@ class GenericTableHeader extends mixins.wl {
       }), sortable));
     }
 
-    return external_React_default().createElement("table", {
-      width: "100%",
-      className: "fm-fmview-table " + (this.props.headerContainerClassName || "grid-table-header fm-dialog-table")
-    }, external_React_default().createElement("tbody", null, external_React_default().createElement("tr", null, columnsRendered)));
+    return external_React_default().createElement("thead", null, external_React_default().createElement("tr", null, columnsRendered));
   }
 
 }
@@ -28647,9 +28645,7 @@ class GenericTable extends genericNodePropsComponent.L {
         this.props.onDoubleClick(e, this.props.node);
       },
       key: index + "_" + node[keyProp]
-    }, columns, external_React_default().createElement("td", {
-      className: "column-hover"
-    }));
+    }, columns);
   }
 
 }
@@ -28714,7 +28710,7 @@ class Table extends GenericListAdapter {
     return external_React_default().createElement("table", {
       width: "100%",
       className: this.props.containerClassName || "grid-table table-hover fm-dialog-table"
-    }, external_React_default().createElement("tbody", {
+    }, this.props.header, external_React_default().createElement("tbody", {
       ref: this.props.listContentRef
     }, external_React_default().createElement("tr", {
       className: "megalist-pusher top",

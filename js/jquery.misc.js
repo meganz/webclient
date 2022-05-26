@@ -241,3 +241,18 @@ $.fn.noTransition = function(action) {
         }, 0);
     });
 };
+
+// JQuery Show/Hide alternative version to avoid hidden class importancy side effect
+$.fn.show = function() {
+
+    'use strict';
+
+    return this.removeClass('hidden');
+};
+
+$.fn.hide = function() {
+
+    'use strict';
+
+    return this.addClass('hidden');
+};

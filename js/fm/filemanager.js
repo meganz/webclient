@@ -9,7 +9,7 @@ function FileManager() {
     };
 
     this.columnsWidth.cloud.fav = { max: 50, min: 50, curr: 50, viewed: true };
-    this.columnsWidth.cloud.fname = { max: 5000, min: 180, curr: 'calc(100% - 560px)', viewed: true };
+    this.columnsWidth.cloud.fname = { max: 5000, min: 180, curr: '100%', viewed: true };
     this.columnsWidth.cloud.label = { max: 130, min: 80, curr: 80, viewed: false };
     this.columnsWidth.cloud.size = { max: 160, min: 100, curr: 100, viewed: true };
     this.columnsWidth.cloud.type = { max: 180, min: 130, curr: 130, viewed: true };
@@ -19,20 +19,75 @@ function FileManager() {
     this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
 
     this.columnsWidth.makeNameColumnStatic = function() {
-        var $header = $('.files-grid-view.fm .grid-table-header th[megatype="fname"]');
-        // check if it's still dynamic
-        var colStyle = $header.attr('style');
 
-        if (colStyle && colStyle.indexOf('calc(100% -') !== -1) {
-            var currWidth = $header.outerWidth();
-            M.columnsWidth.cloud['fname'].curr = currWidth;
-            $(".grid-table td[megatype='fname']").
-                outerWidth(currWidth);
-            $('.files-grid-view.fm .grid-table-header th[megatype="fname"]').
-                outerWidth(currWidth);
+        const header = document.querySelector('.files-grid-view.fm .grid-table thead th[megatype="fname"]');
+        if (!header) {
+            console.assert(false);
+            return;
+        }
+
+        // check if it's still dynamic
+        if (header.style.width.startsWith('calc(') || header.style.width === '100%') {
+
+            var currWidth = getComputedStyle(header).width;
+
+            M.columnsWidth.cloud.fname.curr = currWidth.replace('px', '') | 0;
+            header.style.width = currWidth;
         }
     };
 
+    this.columnsWidth.updateColumnStyle = function() {
+
+        for (var col in M.columnsWidth.cloud) {
+
+            const header = document.querySelector(`.files-grid-view.fm th[megatype="${col}"]`);
+
+            if (!header) {
+                continue;
+            }
+
+            if (M.columnsWidth.cloud[col]) {
+
+                if (typeof M.columnsWidth.cloud[col].curr !== 'number') {
+
+                    if (col === 'fname') {
+
+                        // This is large screen, lets show full table
+                        if (document.body.offsetWidth > 1800) {
+                            M.columnsWidth.cloud[col].curr = header.style.width = '100%';
+                        }
+                        else {
+                            // hardcoded spacing values due to performance.
+                            // Width of .nw-fm-left-icons-panel = 64px;
+                            // Width of .grid-wrapper margin left and right = 52px;
+                            // Width of spacing want to achieve = 560px on small screen or depends on active column;
+                            // =================
+                            // Sum of above = 676px on small screen or depends on active column
+
+                            M.columnsWidth.cloud[col].curr = header.style.width =
+                                `calc(100vw - ${$.leftPaneResizable.element.outerWidth() + 676}px)`;
+                        }
+                    }
+
+                    const headerWidth = getComputedStyle(header).width.replace('px', '') | 0;
+
+                    if (headerWidth < M.columnsWidth.cloud[col].min) {
+                        header.style.width = `${M.columnsWidth.cloud[col].min}px`;
+                    }
+                    else if (headerWidth > M.columnsWidth.cloud[col].max) {
+                        header.style.width = `${M.columnsWidth.cloud[col].max}px`;
+                    }
+                }
+
+                if (M.columnsWidth.cloud[col].viewed) {
+                    $('.grid-table.fm').addClass(`v-${col}`);
+                }
+                else {
+                    $('.grid-table.fm').removeClass(`v-${col}`);
+                }
+            }
+        }
+    };
 }
 FileManager.prototype.constructor = FileManager;
 
@@ -618,16 +673,15 @@ FileManager.prototype.initFileManagerUI = function() {
     });
 
     var $fmholder = $('#fmholder');
-    $('.grid-table-header .grid-view-resize').rebind('mousedown.colresize', function(col) {
+    $('.grid-table .grid-view-resize').rebind('mousedown.colresize', function(col) {
         var $me = $(this);
         var th = $me.closest('th');
-        var thElm = th;
         var startOffset = th.outerWidth() - col.pageX;
 
         $fmholder.rebind('mousemove.colresize', function(col) {
             var newWidth = startOffset + col.pageX;
 
-            var colType = thElm.attr('megatype');
+            var colType = th.attr('megatype');
             if (colType) {
                 if (newWidth < M.columnsWidth.cloud[colType].min) {
                     return;
@@ -635,10 +689,8 @@ FileManager.prototype.initFileManagerUI = function() {
                 if (newWidth > M.columnsWidth.cloud[colType].max) {
                     return;
                 }
-                thElm.outerWidth(newWidth);
-                M.columnsWidth.cloud[colType].curr = thElm.outerWidth();
-                $(".grid-table td[megatype='" + colType + "']").
-                    outerWidth(M.columnsWidth.cloud[colType].curr);
+                th.outerWidth(newWidth);
+                M.columnsWidth.cloud[colType].curr = newWidth;
 
                 if (M.megaRender && M.megaRender.megaList) {
                     if (M.megaRender.megaList._scrollIsInitialized) {
@@ -650,7 +702,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
             }
             else {
-                thElm.outerWidth(newWidth);
+                th.outerWidth(newWidth);
             }
 
             $('#fmholder').css('cursor', 'col-resize');
@@ -676,16 +728,6 @@ FileManager.prototype.initFileManagerUI = function() {
             if (!$target.hasClass('grid-scrolling-table megaListContainer')) {
                 return;
             }
-
-            const $scroller = $('.files-grid-view.fm .grid-table-header');
-            if ($('body').hasClass('rtl')) {
-                $scroller.css('right', -1 *
-                    ($scroller[0].scrollWidth - (e.target.scrollLeft + $scroller[0].clientWidth) + 1));
-            }
-            else {
-                $scroller.css('left', -1 * e.target.scrollLeft);
-            }
-
         });
 
     $('.fm-files-view-icon').rebind('click', function() {
@@ -754,7 +796,7 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
         $('.data-block-view .file-settings-icon').removeClass('active');
-        $('.grid-table-header-container-sc .column-settings.overlap').removeClass('c-opened');
+        $('.column-settings.overlap').removeClass('c-opened');
         $('.js-statusbarbtn.options').removeClass('c-opened');
 
         const $jqe = $('.shared-details-info-block .fm-share-download');
@@ -1086,14 +1128,6 @@ FileManager.prototype.initFileManagerUI = function() {
         $(window).rebind('focus.ps-unfocus', function() {
 
             $(document).off('ps-scroll-y.ps-unfocus');
-        });
-    }
-
-    // Set the table header columns to the correct position on opening the folder in an RTL language
-    if ($('body').hasClass('rtl')) {
-        mBroadcaster.once('mega:openfolder', () => {
-            const $scroller = $('.files-grid-view.fm .grid-table-header');
-            $scroller.css('right', -1 * ($scroller[0].scrollWidth - $scroller[0].clientWidth + 1));
         });
     }
 
@@ -2789,7 +2823,6 @@ FileManager.prototype.addTransferPanelUI = function() {
     $.transferHeader = function(tfse) {
         tfse = tfse || M.getTransferElements();
         var domTableEmptyTxt = tfse.domTableEmptyTxt;
-        var domTableHeader = tfse.domTableHeader;
         var domScrollingTable = tfse.domScrollingTable;
         var domTable = tfse.domTable;
         tfse = undefined;
@@ -2798,12 +2831,10 @@ FileManager.prototype.addTransferPanelUI = function() {
         if (domTable.querySelector('tr')) {
             domTableEmptyTxt.classList.add('hidden');
             domScrollingTable.style.display = '';
-            domTableHeader.style.display = '';
         }
         else {
             domTableEmptyTxt.classList.remove('hidden');
             domScrollingTable.style.display = 'none';
-            domTableHeader.style.display = 'none';
         }
 
         $(domScrollingTable).rebind('click.tst contextmenu.tst', function(e) {
@@ -2932,7 +2963,6 @@ FileManager.prototype.addTransferPanelUI = function() {
         });
         $tmp = undefined;
 
-        // initTransferScroll(domScrollingTable);
         delay('tfs-ps-update', function() {
             // XXX: This update will fire ps-y-reach-end, set a flag to ignore it...
 
@@ -2957,7 +2987,7 @@ FileManager.prototype.addTransferPanelUI = function() {
             $('#fmholder').addClass('transfer-panel-opened');
             var domScrollingTable = M.getTransferElements().domScrollingTable;
             if (!domScrollingTable.classList.contains('ps')) {
-                Ps.initialize(domScrollingTable, {suppressScrollX: true});
+                Ps.initialize(domScrollingTable);
             }
             fm_tfsupdate(); // this will call $.transferHeader();
         }
@@ -2969,7 +2999,6 @@ FileManager.prototype.addTransferPanelUI = function() {
             $('.transfer-clear-all-icon').addClass('disabled');
             $('.transfer-pause-icon').addClass('disabled');
             $('.transfer-clear-completed').addClass('disabled');
-            obj.domTableHeader.style.display = 'hidden';
             obj.domTableEmptyTxt.classList.remove('hidden');
             obj.domUploadBlock.classList.add('hidden');
             obj.domDownloadBlock.classList.add('hidden');
@@ -3024,7 +3053,7 @@ FileManager.prototype.addTransferPanelUI = function() {
                 uldl_hold = true;
                 time('dlm:abort', () => dlmanager.abort(null));
                 time('ulm:abort', () => ulmanager.abort(null));
-                time('tfs:abort', () => $.removeTransferItems($('.transfer-table tr')));
+                time('tfs:abort', () => $.removeTransferItems($('.transfer-table tbody tr')));
 
                 later(function() {
                     if (uldl_hold) {
@@ -3183,13 +3212,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     else if (this.currentrootid === 'shares' && !this.v.length) {
         const viewModeClass = (M.viewmode ? '.fm-blocks-view' : '.files-grid-view') + '.fm.shared-folder-content';
 
-        if (M.viewmode) {
-            $(viewModeClass).removeClass('hidden');
-        }
-        else {
-            $('.grid-table-header-container-sc', viewModeClass).addClass('hidden');
-            $(viewModeClass).removeClass('hidden');
-        }
+        $(viewModeClass).removeClass('hidden');
     }
     // user management ui update is handled in Business Account classes.
     else if (this.v.length && this.currentdirid.substr(0, 15) !== 'user-management' &&
@@ -3323,13 +3346,13 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     // Change title for Public link page
     if (page === 'fm/public-links') {
-        $('.fm .grid-table-header .ts').text(l[20694]);
-        $('.fm .grid-table-header .date').text(l[20694]);
+        $('.fm .grid-table thead .ts').text(l[20694]);
+        $('.fm .grid-table thead .date').text(l[20694]);
         $('.dropdown.body.files-menu .dropdown-item.visible-col-select[megatype="timeAd"] span').text(l[20694]);
     }
     else {
-        $('.fm .grid-table-header .ts').text(l[17445]);
-        $('.fm .grid-table-header .date').text(l[17445]);
+        $('.fm .grid-table thead .ts').text(l[17445]);
+        $('.fm .grid-table thead .date').text(l[17445]);
         $('.dropdown.body.files-menu .dropdown-item.visible-col-select[megatype="timeAd"] span').text(l[17445]);
     }
 
@@ -3376,47 +3399,8 @@ FileManager.prototype.addGridUI = function(refresh) {
 
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
 
-            // fname is special since it might be dynamic width
-            var $fnameCol = $('.files-grid-view.fm .grid-table.fm td[megatype="fname"]').first();
+            M.columnsWidth.updateColumnStyle();
 
-            // check if it's still dynamic
-            var colStyle = $fnameCol.attr('style');
-            if (colStyle && colStyle.indexOf('calc(100% -') !== -1) {
-                M.columnsWidth.cloud['fname'].max = Math.max($fnameCol.outerWidth(), 5000);
-            }
-
-            for (var col in M.columnsWidth.cloud) {
-                var $header = $('.files-grid-view.fm .grid-table-header th[megatype="' + col + '"]');
-                if (!$header) {
-                    continue;
-                }
-
-                if (M.columnsWidth.cloud[col]) {
-                    if (M.columnsWidth.cloud[col].curr) {
-                        if (typeof M.columnsWidth.cloud[col].curr === 'number') {
-                            if (M.columnsWidth.cloud[col].curr !== $header.outerWidth()) {
-                                $header.outerWidth(M.columnsWidth.cloud[col].curr);
-                            }
-                        }
-                        else {
-                            $header.outerWidth(M.columnsWidth.cloud[col].curr);
-                            M.columnsWidth.cloud[col].currpx = $header.outerWidth();
-                            if ($header.outerWidth() < M.columnsWidth.cloud[col].min) {
-                                $header.outerWidth(M.columnsWidth.cloud[col].min);
-                            }
-                        }
-                    }
-
-                    if (!M.columnsWidth.cloud[col].viewed && $header.is(':visible')) {
-                        $header.hide();
-                        $('.grid-table.fm td[megatype="' + col + '"]').hide();
-                    }
-                    else if (M.columnsWidth.cloud[col].viewed && !$header.is(':visible')) {
-                        $header.show();
-                        $('.grid-table.fm td[megatype="' + col + '"]').show();
-                    }
-                }
-            }
             if (M.megaRender && M.megaRender.megaList) {
                 if (!M.megaRender.megaList._scrollIsInitialized) {
                     M.megaRender.megaList.resized();
@@ -3426,49 +3410,6 @@ FileManager.prototype.addGridUI = function(refresh) {
                 }
             }
         }
-    };
-
-
-    $.detailsGridHeader = function() {
-        $('.contact-details-view .grid-table tr:first-child td').each(function(i, e) {
-            var headerColumn = $('.contact-details-view .grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
-        });
-    };
-
-    $.contactGridHeader = function() {
-        $('.files-grid-view.contacts-view .grid-scrolling-table tr:first-child td').each(function(i, e) {
-            var headerColumn = $('.files-grid-view.contacts-view .grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
-        });
-    };
-
-    $.opcGridHeader = function() {
-        $('.sent-requests-grid .grid-scrolling-table tr:first-child td').each(function(i, e) {
-            var headerColumn = $('.sent-requests-grid .grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
-        });
-    };
-
-    $.ipcGridHeader = function() {
-        $('.contact-requests-grid .grid-scrolling-table tr:first-child td').each(function(i, e) {
-            var headerColumn = $('.contact-requests-grid .grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
-        });
-    };
-
-    $.sharedGridHeader = function() {
-        $('.shared-grid-view .grid-scrolling-table tr:first-child td').each(function(i, e) {
-            var headerColumn = $('.shared-grid-view .grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
-        });
-    };
-
-    $.outSharedGridHeader = function() {
-        $('.out-shared-grid-view .grid-scrolling-table tr:first-child td').each(function(i, e) {
-            var headerColumn = $('.out-shared-grid-view .grid-table-header th').get(i);
-            $(headerColumn).width($(e).width());
-        });
     };
 
     $('.fm-blocks-view.fm').addClass('hidden');
@@ -3487,21 +3428,11 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     if (this.currentdirid === 'shares') {
         $('.shared-grid-view').removeClass('hidden');
-        $.sharedGridHeader();
         initGridScrolling();
     }
     else if (this.currentdirid === 'out-shares') {
         $('.out-shared-grid-view').removeClass('hidden');
-        $.outSharedGridHeader();
         initGridScrolling();
-    }
-    else if (String(this.currentdirid).length === 11 && this.currentrootid === 'contacts') {// Cloud-drive/File manager
-        $('.contacts-details-block').removeClass('hidden');
-        if (this.v.length > 0) {
-            $('.files-grid-view.contact-details-view').removeClass('hidden');
-            $.detailsGridHeader();
-            initGridScrolling();
-        }
     }
     else if (this.currentdirid === 'user-management') {
         $('.files-grid-view.user-management-view').removeClass('hidden');
@@ -3510,13 +3441,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     else if (this.currentrootid === 'shares' && !this.v.length) {
         const viewModeClass = (M.viewmode ? '.fm-blocks-view' : '.files-grid-view') + '.fm.shared-folder-content';
 
-        if (M.viewmode) {
-            $(viewModeClass).removeClass('hidden');
-        }
-        else {
-            $('.grid-table-header-container-sc', viewModeClass).addClass('hidden');
-            $(viewModeClass).removeClass('hidden');
-        }
+        $(viewModeClass).removeClass('hidden');
     }
     else if (M.currentCustomView.type === 'gallery') {
         initGridScrolling();
@@ -3524,7 +3449,6 @@ FileManager.prototype.addGridUI = function(refresh) {
     else if (this.v.length) {
 
         $('.files-grid-view.fm').removeClass('hidden');
-        $('.grid-table-header-container-sc', '.files-grid-view.fm').removeClass('hidden');
         if (this.currentCustomView) {
             $('.files-grid-view.fm').addClass(this.currentCustomView.type + '-view');
         }
@@ -3538,14 +3462,11 @@ FileManager.prototype.addGridUI = function(refresh) {
         fm_resize_handler();
     }
 
-
-
     $('.grid-url-arrow').show();
     $('.grid-url-header').text('');
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,' +
-        '.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content,' +
-        '.files-grid-view.contacts-view').rebind('contextmenu.fm', function(e) {
+        '.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content').rebind('contextmenu.fm', e => {
             if (page === "fm/links") { // Remove context menu option from filtered view
                 return false;
             }
@@ -3575,7 +3496,7 @@ FileManager.prototype.addGridUI = function(refresh) {
             }
         });
 
-    $('.grid-table-header .arrow').rebind('click', function(e) {
+    $('.grid-table .arrow').rebind('click', function(e) {
         // this grid-table is used in the chat - in Archived chats. It won't work there, so - skip doing anything.
         if (M.chat) {
             return;
@@ -3584,7 +3505,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         var dir = 1;
 
         // Excludes colour sorting dialog for contacts
-        if (cls.includes('name') && $(this).parents('.files-grid-view.contacts-view').length === 0 && !pfid) {
+        if (cls.includes('name') && !pfid) {
             return M.labelSortMenuUI(e);
         }
         else {
@@ -3604,19 +3525,8 @@ FileManager.prototype.addGridUI = function(refresh) {
                         }
                     }
 
-                    var scrollVal = 0;
-                    if (M.megaRender && M.megaRender.megaList) {
-                        scrollVal = M.megaRender.megaList.getScrollLeft();
-                    }
-
                     M.doSort(sortBy, dir);
                     M.renderMain();
-
-                    if (scrollVal) {
-                        M.megaRender.megaList.scrollTo(0, scrollVal);
-                        var tableHeader = $('.files-grid-view.fm .grid-table-header');
-                        tableHeader.css('left', -1 * scrollVal);
-                    }
 
                     break;
                 }
@@ -3633,11 +3543,9 @@ FileManager.prototype.addGridUI = function(refresh) {
         return false;
     };
 
-    $('.grid-table-header').rebind('contextmenu', function(e) {
-        return showColumnsContextMenu(e);
-    });
+    $('.grid-table th').rebind('contextmenu', e => showColumnsContextMenu(e));
 
-    $('.grid-table-header-container-sc .column-settings.overlap').rebind('click',
+    $('.column-settings.overlap').rebind('click',
         function(e) {
             var $me = $(this);
             if ($me.hasClass('c-opened')) {
@@ -3661,18 +3569,15 @@ FileManager.prototype.addGridUI = function(refresh) {
             $me.removeAttr('isviewed');
             $('i', $me).removeClass('icon-check').addClass('icon-add');
             M.columnsWidth.cloud[targetCol].viewed = false;
-            $('.grid-table-header th[megatype="' + targetCol + '"]').hide();
-            $('.grid-table.fm td[megatype="' + targetCol + '"]').hide();
         }
         else {
             $me.attr('isviewed', 'y');
             $('i', $me).removeClass('icon-add').addClass('icon-check');
             M.columnsWidth.cloud[targetCol].viewed = true;
-            $('.grid-table-header th[megatype="' + targetCol + '"]').show();
-            $('.grid-table.fm td[megatype="' + targetCol + '"]').show();
         }
 
-        M.columnsWidth.makeNameColumnStatic();
+        M.columnsWidth.cloud.fname.lastOffsetWidth = null;
+        M.columnsWidth.updateColumnStyle();
 
         var columnPreferences = mega.config.get('fmColPrefs');
         if (columnPreferences === undefined) {
@@ -3746,7 +3651,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         $.selectddUIgrid = '.files-grid-view.fm .grid-scrolling-table';
     }
 
-    $.selectddUIitem = 'tr';
+    $.selectddUIitem = 'tbody tr';
     this.addSelectDragDropUIDelayed(refresh);
 
     if (d) {
@@ -3915,7 +3820,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     if (this.currentdirid && this.currentdirid.substr(0, 8) !== 'contacts') {
         $ddUIgrid.selectable({
             filter: $.selectddUIitem,
-            cancel: '.ps__scrollbar-y-rail, .ps__scrollbar-x-rail',
+            cancel: '.ps__scrollbar-y-rail, .ps__scrollbar-x-rail, thead',
             start: function (e, u) {
                 $.hideContextMenu(e);
                 $.hideTopMenu();

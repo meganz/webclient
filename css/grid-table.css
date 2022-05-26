@@ -21,6 +21,7 @@
 }
 .files-grid-view.archived-chat-view {
     top: 0;
+    padding-top: 20px;
 }
 
 .files-grid-view.contact-details-view {
@@ -40,10 +41,6 @@
     margin-top: -1px;
     position: relative;
     white-space: nowrap;
-}
-
-.grid-url-header-nw {
-    width: 53px;
 }
 
 /* ============================ *\
@@ -70,9 +67,26 @@
 
 .shared-grid-view .grid-table {
     table-layout: fixed;
+    min-width: 1000px;
 }
 
+.shared-grid-view .grid-table th:first-child,
+.shared-grid-view .grid-table td:first-child,
+.out-shared-grid-view .grid-table th:first-child,
+.out-shared-grid-view .grid-table td:first-child {
+    text-align: center;
+    -webkit-padding-start: 0;
+    padding-inline-start: 0;
+    padding-top: 3px;
+}
 
+.shared-grid-view .grid-table th:last-child,
+.shared-grid-view .grid-table td:last-child,
+.out-shared-grid-view .grid-table th:last-child,
+.out-shared-grid-view .grid-table td:last-child {
+    -webkit-padding-end: 0;
+    padding-inline-end: 0;
+}
 /* ============================ *\
     out-shared-grid-view - Wrapper
 \* ============================ */
@@ -85,6 +99,7 @@
 }
 .out-shared-grid-view .grid-table {
     table-layout: fixed;
+    min-width: 1000px;
 }
 
 /* ============================ *\
@@ -94,21 +109,10 @@
 .transfer-table-wrapper {
     box-sizing: border-box;
     height: 100%;
-    height: calc(100% - 36px);
+    height: calc(100% - 48px);
     overflow: hidden;
     position: relative;
     top: -1px;
-}
-
-.transfer-table-wrapper th:hover::before {
-    content: '';
-    position: absolute;
-    right: 7px;
-    bottom: 1px;
-    height: 20px;
-    width: 1px;
-    background: var(--surface-grey-2);
-    cursor: col-resize;
 }
 
 .transfer-table-wrapper th:last-child::before,
@@ -128,17 +132,15 @@
 /* ======================================== *\
    grid-scrolling-table
 \* ======================================== */
+
 .grid-wrapper {
     box-sizing: content-box;
-    display: inline-block;
-    margin: 0 16px;
-    min-height: calc(100% - 6px);
-    min-width: calc(100% - 32px);
-    outline: 10px;
-    outline-color: var(--stroke-main);
-    outline-offset: -10px;
-    outline-style: solid;
+    margin: 0 26px;
+    min-height: 100%;
+    min-width: calc(100% - 52px);
     position: relative;
+    display: inline-block;
+    vertical-align: top; /* do not remove this is for prevent mysterious spacing from inline-block */
 }
 
 .grid-scrolling-table .jspPane {
@@ -155,20 +157,28 @@
     min-width: 100%;
 }
 
+.grid-scrolling-table .jspContainer,
+.contacts-grid-scrolling-table .jspContainer,
+.grid-scrolling-table .jspPane,
+.contacts-grid-scrolling-table .jspPane {
+    z-index: 119;
+}
+
+.grid-scrolling-table .jspCapTop,
+.contacts-grid-scrolling-table .jspCapTop {
+    height: 34px;
+    display: block;
+}
+
+.grid-scrolling-table.archive-chat-list .jspCapTop {
+    height: 35px;
+}
+
 .grid-scrolling-table,
 .contacts-grid-scrolling-table,
-.transfer-scrolling-table {
-    height: 100%;
-    height: calc(100% - 34px);
-}
-
+.transfer-scrolling-table,
 .archived-chats .grid-scrolling-table {
     height: 100%;
-    height: calc(100% - 36px);
-}
-
-.archived-chats .grid-table-header {
-    margin: 10px 0 0;
 }
 
 .transfer-scrolling-table {
@@ -183,6 +193,7 @@ table {
     display: table;
     border-collapse: separate;
     border-spacing: 0;
+    table-layout: fixed;
 }
 
 table tr td:first-child::after {
@@ -198,10 +209,6 @@ table tr td:last-child::after {
 /* ======================================== *\
    table-hover
 \* ======================================== */
-.table-hover tr td {
-    z-index: 0;
-}
-
 .table-hover tr:hover td::before,
 .table-hover tr.ui-selected td::before {
     content: '';
@@ -230,6 +237,7 @@ table tr td:last-child::after {
     background-size: 2px calc(100% - 8px);
     background-repeat: no-repeat;
     background-position: 4px;
+    border-left: 1px solid var(--stroke-grey-4);
 }
 .rtl .table-hover tr.ui-selected td:first-child::before {
     background-position: calc(100% - 4px);
@@ -238,45 +246,32 @@ table tr td:last-child::after {
 .table-hover tr:hover td:first-child::before,
 .table-hover tr.ui-selected td:first-child::before {
     right: -2px;
-    left: 0;
+    left: -10px;
     border-radius: 4px 0 0 4px;
 }
 
 .rtl .table-hover tr:hover td:first-child::before,
 .rtl .table-hover tr.ui-selected td:first-child::before {
     left: -2px;
-    right: 0;
+    right: -10px;
     border-radius: 0 4px 4px 0;
-}
-
-.table-hover tr:hover td:first-child::before {
-    border-left: 1px solid var(--grid-hover-border);
-}
-
-.rtl .table-hover tr:hover td:first-child::before {
-    border-left: none;
-    border-right: 1px solid var(--grid-hover-border);
-}
-
-.table-hover tr.ui-selected td:first-child::before {
-    border-left: 1px solid var(--stroke-grey-4);
-}
-
-.rtl .table-hover tr.ui-selected td:first-child::before {
-    border-left: none;
-    border-right: 1px solid var(--stroke-grey-4);
 }
 
 .table-hover tr:hover td:last-child::before,
-.table-hover tr.ui-selected td:last-child::before {
+.table-hover tr.ui-selected td:last-child::before,
+.transfer-table tr:hover td:nth-child(8)::before,
+.transfer-table tr.ui-selected td:nth-child(8)::before {
     border-radius: 0 4px 4px 0;
-    right: 0;
+    right: -10px;
 }
+
 .rtl .table-hover tr:hover td:last-child::before,
-.rtl .table-hover tr.ui-selected td:last-child::before {
+.rtl .table-hover tr.ui-selected td:last-child::before,
+.rtl .transfer-table tr:hover td:nth-child(8)::before,
+.rtl .transfer-table tr.ui-selected td:nth-child(8)::before {
     border-radius: 4px 0 0 4px;
     right: 0;
-    left: 0;
+    left: -10px;
 }
 
 .table-hover tr:hover td:last-child::before {
@@ -306,61 +301,23 @@ table tr.ui-selected .link-transfer-status {
 }
 
 /* ======================================== *\
-   .grid-table-header - Wrapper & table
+   .grid-table header - Wrapper & table
 \* ======================================== */
 
-.grid-table-header-container-sc {
-    position: relative;
-    background-color: var(--stroke-main);
-}
-
-.grid-table-header-container-sc::after {
-    content: '';
-    width: calc(100% - 48px);
-    height: 1px;
-    bottom: 0;
-    left: 24px;
-    background-color: var(--stroke-grey-2);
-    position: absolute;
-}
-
-.grid-table-header {
+.grid-table thead tr {
     width: 100%;
     background-color: var(--stroke-main);
     position: relative;
     font-size: 0;
     white-space: nowrap;
-    padding: 10px 16px 0;
 }
 
-.grid-table-header::after {
-    content: '';
-    width: calc(100% - 24px);
-    height: 1px;
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    background:
-        linear-gradient(
-            90deg,
-            var(--surface-main) 0,
-            var(--surface-main) 24px,
-            var(--surface-grey-2) 0,
-            var(--surface-grey-2) calc(100% - 24px),
-            var(--surface-main) calc(100% - 24px),
-            var(--surface-main) 100%
-        );
-}
-
-.grid-table-header .filter-block.body {
+.grid-table thead .filter-block.body {
     margin: 3px 0 0 0;
     -webkit-margin-end: 18px;
     margin-inline-end: 18px;
 }
-
-.grid-table-header th {
-    display: inline-block;
-    float: none;
+.grid-table th {
     box-sizing: border-box;
     height: 24px;
     font: var(--text-body2);
@@ -369,40 +326,70 @@ table tr.ui-selected .link-transfer-status {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    position: relative;
     -webkit-padding-start: 5px;
     padding-inline-start: 5px;
     -webkit-padding-end: 13px;
     padding-inline-end: 13px;
+    padding-top: 9px;
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    background: var(--surface-main);
+    z-index: 1;
 }
-
-.grid-table-header .grid-view-resize {
+.grid-scrolling-table.jsp-sticky-fix th {
+    top: 0.1px; /* hack fix for sticky header delay rendering on FF with jsp, remove after deprecate jsp */
+}
+.grid-table th:first-child {
+    -webkit-padding-start: 16px;
+    padding-inline-start: 16px;
+}
+.grid-table th:last-child {
+    -webkit-padding-end: 16px;
+    padding-inline-end: 16px;
+}
+.grid-table th:first-child::after,
+.grid-table th:last-child::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: -20px;
+    right: 0;
+    bottom: 0;
+    background-color: var(--stroke-main);
+    z-index: -1;
+}
+.grid-table th:last-child::before {
+    left: 0;
+    right: -20px;
+}
+.grid-table thead .grid-view-resize {
     cursor: col-resize;
     width: 16px;
     position: absolute;
     right: 0;
 }
-.rtl .grid-table-header .grid-view-resize {
+.rtl .grid-table thead .grid-view-resize {
     right: auto;
     left: 0;
 }
 
-.grid-table-header:not(.fm-fmview-table) th:not(:first-child, :last-child, .grid-url-header, .grid-first-th):hover::before {
+.grid-table.fm thead th:not(:first-child):not(:last-child):not(.grid-url-header):not(.grid-first-th):hover::before {
     content: '';
     position: absolute;
     right: 7px;
-    bottom: 1px;
     height: 20px;
     width: 1px;
     background-color: var(--stroke-mid-grey);
     cursor: col-resize;
+    bottom: 0;
 }
-.rtl .grid-table-header th:not(.grid-url-header):hover::before {
+.rtl .grid-table th:not(.grid-url-header):hover::before {
     right: auto;
     left: 7px;
 }
 
-.grid-table-header th.grid-first-th {
+.grid-table th.grid-first-th {
     width: 75px;
     padding: 0;
     -webkit-padding-start: 12px;
@@ -412,26 +399,51 @@ table tr.ui-selected .link-transfer-status {
     cursor: pointer;
 }
 
-.grid-table-header.fm th.grid-first-th {
-    -webkit-padding-start: 5px;
-    padding-inline-start: 5px;
-    -webkit-padding-end: 0;
-    padding-inline-end: 0;
+.grid-table.fm th.grid-first-th {
     cursor: pointer;
 }
-.grid-table-header.fm th:first-child {
-    padding: 0 6px;
+.grid-table.fm th:first-child {
+    padding: 0;
 }
-.grid-table-header th:last-child::after {
+
+.grid-table.fm th,
+.grid-table.fm td {
     display: none;
 }
-.grid-table-header th span.grid-header-star i,
-.grid-table-header th.grid-first-th i {
+
+.grid-table.fm th:first-child,
+.grid-table.fm th.grid-empty-spacer,
+.grid-table.fm td.space-maintainer-start,
+.grid-table.fm td.space-maintainer-end,
+.grid-table.fm.v-fav [megatype="fav"],
+.grid-table.fm.v-fname [megatype="fname"],
+.grid-table.fm.v-label [megatype="label"],
+.grid-table.fm.v-size [megatype="size"],
+.grid-table.fm.v-type [megatype="type"],
+.grid-table.fm.v-timeAd [megatype="timeAd"],
+.grid-table.fm.v-timeMd [megatype="timeMd"],
+.grid-table.fm.v-versions [megatype="versions"],
+.grid-table.fm.v-extras [megatype="extras"] {
+    display: table-cell;
+}
+
+.grid-table th:last-child::after {
+    display: none;
+}
+.grid-table th span.grid-header-star {
+    height: 16px;
+    line-height: 16px;
+}
+.grid-table th span.grid-header-star i,
+.grid-table th.grid-first-th i {
     --icon-size: 16px;
     --mask-color: var(--icon-rest);
-    -webkit-margin-start: 7px;
-    margin-inline-start: 7px;
     display: inline-block;
+}
+
+.files-grid-view .grid-scrolling-table {
+    padding-bottom: 6px;
+    box-sizing: border-box;
 }
 
 .files-grid-view.fm .column-settings {
@@ -446,11 +458,16 @@ table tr.ui-selected .link-transfer-status {
     z-index: 9;
     cursor: pointer;
 }
+.shared-details-block .files-grid-view.fm .column-settings {
+    top: 14px;
+}
 .rtl .files-grid-view.fm .column-settings {
     right: auto;
     left: 0;
 }
-
+.emptied .files-grid-view.fm .column-settings {
+    display: none;
+}
 .files-grid-view.fm .column-settings i {
     --icon-size: 24px;
     -webkit-margin-start: 8px;
@@ -475,7 +492,7 @@ table tr.ui-selected .link-transfer-status {
     border-right: 1px solid var(--stroke-grey-2);
 }
 
-.out-shared-grid-view > .grid-table-header::after {
+.out-shared-grid-view > .grid-table thead::after {
     width: calc(100% - 32px);
 }
 
@@ -486,18 +503,23 @@ table tr.ui-selected .link-transfer-status {
 table.grid-table {
     width: 100%;
     margin: 0 auto;
-    border-collapse: collapse;
-}
-
-table.grid-table tr {
-    border-bottom: 1px solid var(--stroke-grey-2);
+    border-collapse: separate;
+    table-layout: fixed;
 }
 
 table.grid-table th:first-child,
 table.grid-table td:first-child {
-    padding-top: 3px;
     -webkit-padding-start: 12px;
     padding-inline-start: 12px;
+}
+table.grid-table th:first-child,
+table.grid-table th:last-child,
+table.grid-table td:first-child,
+table.grid-table td:last-child,
+table.grid-table td.space-maintainer-start,
+table.grid-table td.space-maintainer-end,
+.transfer-table tr td:nth-child(8) {
+    overflow: visible;
 }
 
 table.grid-table td {
@@ -510,7 +532,10 @@ table.grid-table td {
     text-overflow: ellipsis;
     position: relative;
 }
-
+table.grid-table th,
+table.grid-table td {
+    border-bottom: 1px solid var(--stroke-grey-2);
+}
 table.grid-table .tranfer-filetype-txt {
     left: 0;
     white-space: nowrap;
@@ -519,7 +544,6 @@ table.grid-table .tranfer-filetype-txt {
     width: 100%;
     -webkit-padding-start: 38px;
     padding-inline-start: 38px;
-    padding-top: 7px;
     box-sizing: border-box;
     display: block;
 }
@@ -542,7 +566,12 @@ table.grid-table .undecryptable .tranfer-filetype-txt,
 .undecryptable .propreties-dark-txt {
     color: var(--secondary-orange);
 }
-
+table.grid-table .ver-col-container {
+    line-height: 30px;
+}
+table.grid-table .ver-col-container > div {
+    vertical-align: middle;
+}
 table.grid-table .ver-col-container .ver-nb {
     height: 18px;
     color: var(--grid-text);
@@ -553,11 +582,12 @@ table.grid-table .ver-col-container .ver-nb {
 }
 table.grid-table .ver-col-container .ver-icon.versioning {
     display: inline-block;
+    height: 26px;
 }
 table.grid-table .ver-col-container .ver-icon.versioning .versioning-indicator {
     position: relative;
     display: inline-block;
-    line-height: 24px;
+    height: 100%;
 }
 table.grid-table .ver-col-container .ver-size {
     -webkit-margin-start: 8px;
@@ -565,7 +595,6 @@ table.grid-table .ver-col-container .ver-size {
     height: 15px;
     border-radius: 8px;
     background-color: var(--stroke-mid-grey);
-    margin-top: 4px;
     display: inline-block;
 }
 table.grid-table .ver-col-container .ver-size .ver-size-nb {
@@ -624,10 +653,9 @@ table.grid-table tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read
 table.grid-table .grid-status-icon {
     --icon-size: 16px;
     --mask-color: var(--icon-rest);
-    -webkit-margin-start: 7px;
-    margin-inline-start: 7px;
-    margin-top: 5px;
     display: inline-block;
+    margin: 0 0 1px;
+    vertical-align: middle;
 }
 
 table.grid-table .grid-status-icon.icon-info {
@@ -638,20 +666,24 @@ table.grid-table .grid-status-icon.icon-takedown {
     --mask-color: var(--secondary-red);
 }
 
-table.grid-table i:not(.verified-user-icon):not(.icon-dot) {
+table.grid-table tbody i:not(.verified-user-icon):not(.icon-dot) {
     --mask-color: var(--icon-rest);
     --icon-size: 24px;
     display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 1px;
 }
 
-table.grid-table tr:not(.linked) .icon-link {
+table.grid-table tbody .versioning-indicator i.icon-versions-previous {
+    display: block;
+}
+
+table.grid-table tbody tr:not(.linked) .icon-link {
     display: none;
 }
 
-table.grid-table tr.linked .icon-link,
-table.grid-table td.linked .icon-link {
+table.grid-table tbody .linked .icon-link {
     display: inline-block;
-    margin-top: 4px;
 }
 
 /* ======================================== *\
@@ -661,13 +693,10 @@ table.grid-table td.linked .icon-link {
 .rtl table.fm {
     direction: rtl;
 }
-
 table.fm td {
-    display: inline-block;
-    float: none;
     z-index: 0;
     box-sizing: border-box;
-    height: 31px;
+    height: 32px;
     font: var(--text-body2);
     line-height: 31px;
     padding: 0;
@@ -682,17 +711,23 @@ table.fm td {
     text-overflow: ellipsis;
     position: relative;
 }
-
+table.fm [megatype="fav"] {
+    text-align: center;
+    -webkit-padding-start: 5px;
+    padding-inline-start: 5px;
+    -webkit-padding-end: 13px;
+    padding-inline-end: 13px;
+}
 table.fm td[megatype="fname"] {
     min-width: 180px;
 }
-
 table.fm td[megatype="empty"] {
     display: table-cell;
     width: 100%;
 }
-
+table.fm th:first-child,
 table.fm td:first-child {
+    width: 0;
     -webkit-padding-start: 0;
     padding-inline-start: 0;
 }
@@ -703,15 +738,13 @@ table.fm tr {
 }
 
 table.fm .transfer-filetype-icon,
-table.fm .grid-url-arrow,
 table.fm .data-item-icon,
-table.fm .versioning-indicator
-{
-    margin-top: 4px;
-    line-height: 32px;
+table.fm .versioning-indicator {
+    top: 50%;
+    transform: translateY(-50%);
 }
-table.fm .grid-status-icon {
-    margin-top: 8px;
+table.fm .grid-url-arrow {
+    margin-top: 0;
 }
 
 /* ======================================== *\
@@ -827,9 +860,9 @@ table.fm .grid-status-icon {
 }
 
 /* ======================================== *\
-   contacts-view grid-table-header
+   contacts-view grid-table header
 \* ======================================== */
-.contacts-view .grid-table-header th:first-child {
+.contacts-view .grid-table th:first-child {
     padding: 0 10px 0 16px;
 }
 
@@ -926,10 +959,94 @@ table.contacts tr.ui-selected .ustatus {
 /* ======================================== *\
    grid-table-user-management
 \* ======================================== */
-/* TODO: need to move from style.css */
+.user-management-view .table-user-management table {
+    border: none;
+    margin: 0 24px;
+    width: calc(100% - 48px);
+    table-layout: fixed;
+}
+.user-management-view .table-user-management .data-table tr .name .fm-user-management-user {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+.user-management-view .table-user-management .data-table tr .status {
+    white-space: nowrap;
+    width: 14%;
+}
+.user-management-view .table-user-management .data-table tr .used-storage {
+    width: 14%;
+}
+.user-management-view .table-user-management .data-table tr .used-transfer {
+    width: 14%;
+}
+.user-management-view .table-user-management .data-table tr .last-active {
+    width: 14%;
+}
+.user-management-view .table-user-management .data-table tr .actions {
+    width: 140px;
+}
+.user-management-view .grid-table-user-management tbody tr {
+    height: 64px;
+}
+.user-management-view .grid-table-user-management td {
+    cursor: pointer;
+}
+.user-management-view .grid-table-user-management th {
+    box-sizing: border-box;
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.user-management-view .user-management-list-table tr .icon-wrapper {
+    opacity: 0;
+    vertical-align: middle;
+    transition: var(--transition-opacity);
+}
+.files-grid-view.user-management-view .user-management-list-table tbody tr:hover .icon-wrapper {
+    opacity: 1;
+}
+.files-grid-view.user-management-view .user-management-list-table tbody tr .icon-wrapper.disabled i {
+    --mask-color: var(--icon-inactive);
+}
+.files-grid-view.user-management-view .user-management-list-table tbody tr .icon-wrapper:not(.disabled) i {
+    --mask-color: var(--icon-rest);
+}
+.files-grid-view.user-management-view .user-management-list-table tbody tr .icon-wrapper:not(.disabled):hover i {
+    --mask-color: var(--icon-active);
+}
+.files-grid-view.user-management-view .user-management-list-table tbody tr td .icon-wrapper {
+    display: inline-block;
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+    position: relative;
+    cursor: pointer;
+}
+.user-management-list-table tr td .user-management-name {
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+}
+.user-management-list-table tr td .user-management-email {
+    color: var(--text-color-low);
+    font: var(--text-body2);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+.user-management-list-table tr td .user-management-email.warning,
+.user-management-list-table tr td .user-management-email.pending-email {
+    color: var(--text-color-warning);
+}
 
 /* ======================================== *\
-   grid-table-header contact-requests
+   grid-table header contact-requests
 \* ======================================== */
 .contact-requests-grid .grid-table tr td:first-child,
 .contact-requests-grid tr th:first-child {
@@ -943,7 +1060,6 @@ table.contacts tr.ui-selected .ustatus {
 .contact-requests-grid tr th:first-child {
     padding: 0 12px 0 16px;
 }
-
 .grid-table.contact-requests td,
 .grid-table.sent-requests td {
     height: 64px;
@@ -1020,7 +1136,6 @@ table.contacts tr.ui-selected .ustatus {
 table.shared-with-me td {
     z-index: 0;
 }
-
 table.shared-with-me td {
     vertical-align: middle;
     height: 56px;
@@ -1199,19 +1314,16 @@ table.out-shares .fm-chat-users {
 }
 
 /* ======================================== *\
-   transfer-table-header
+   transfer-table header
 \* ======================================== */
 
-.transfer-table-header {
+.transfer-table thead {
     width: calc(100% - 32px);
-    position: relative;
-    font-size: 0;
     white-space: nowrap;
-    background-color: var(--stroke-main);
     margin: 0 16px;
     min-width: 1152px;
 }
-.transfer-table-header th {
+.transfer-table th {
     box-sizing: border-box;
     height: 24px;
     font: var(--text-body2);
@@ -1221,15 +1333,15 @@ table.out-shares .fm-chat-users {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    position: relative;
+    position: sticky;
+    position: -webkit-sticky;
     display: table-cell;
     float: none;
+    top: 0;
+    background-color: var(--stroke-main);
+    z-index: 1;
 }
-.transfer-table-header tr th {
-    position: relative;
-    display: inline-block;
-}
-.transfer-table-header th:first-child span {
+.transfer-table th:first-child span {
     display: block;
     background-image: url(../images/mega/fm-main-sprite.png);
     background-repeat: no-repeat;
@@ -1241,17 +1353,7 @@ table.out-shares .fm-chat-users {
    transfer-table
 \* ======================================== */
 
-.transfer-table-header::after {
-    content: '';
-    width: calc(100% - 16px);
-    height: 1px;
-    bottom: 0;
-    left: 8px;
-    background-color: var(--stroke-grey-2);
-    position: absolute;
-}
-.fm-transfers-block td
- {
+.fm-transfers-block td {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -1269,7 +1371,6 @@ table.out-shares .fm-chat-users {
     position: relative;
 }
 .transfer-table {
-    border-collapse: collapse;
     min-width: 1152px;
 }
 .transfer-table,
@@ -1294,12 +1395,13 @@ table.out-shares .fm-chat-users {
     margin: 4px 0 0 -1px;
 }
 .transfer-table .transfer-type {
-    margin: 6px 0 0 24px;
+    margin: 0 auto;
 }
 .transfer-table .transfer-type::before {
     background-image: none;
 }
-.transfer-table tr {
+.transfer-table td,
+.transfer-table th {
     border-bottom: 1px solid var(--stroke-grey-2);
 }
 .transfer-table td {
@@ -1310,11 +1412,8 @@ table.out-shares .fm-chat-users {
     cursor: default;
     box-sizing: border-box;
     position: relative;
-}
-.transfer-table tr td {
-    position: relative;
-    display: inline-block;
     line-height: 32px;
+    z-index: 0;
 }
 .transfer-table td object {
     position: absolute;
@@ -1326,53 +1425,27 @@ table.out-shares .fm-chat-users {
     opacity: 0;
 }
 .transfer-table td:nth-child(1),
-.transfer-table-header th:nth-child(1) {
-    width: 60px;
+.transfer-table th:nth-child(1) {
     background-image: none;
     padding: 0;
-}
-.transfer-table td:nth-child(2),
-.transfer-table-header th:nth-child(2) {
-    width: 100%;
-    width: calc(100% - 992px);
-    padding-left: 0;
+    overflow: visible;
 }
 .transfer-table td:nth-child(2) {
     vertical-align: top;
 }
-.transfer-table td:nth-child(3),
-.transfer-table-header th:nth-child(3) {
-    width: 288px;
-}
-.transfer-table td:nth-child(4),
-.transfer-table-header th:nth-child(4) {
-    width: 96px;
-}
-.transfer-table td:nth-child(5),
-.transfer-table-header th:nth-child(5) {
-    width: 96px;
-}
-.transfer-table td:nth-child(6),
-.transfer-table-header th:nth-child(6) {
-    width: 192px;
-}
 .transfer-table td:nth-child(7),
-.transfer-table-header th:nth-child(7) {
-    width: 192px;
+.transfer-table th:nth-child(7) {
     background-image: none;
-}
-.transfer-table td:nth-child(8),
-.transfer-table-header th:nth-child(8) {
-    width: 69px;
 }
 .transfer-table td:nth-child(8)::before {
     border-radius: 0 4px 4px 0;
 }
 .transfer-table td:nth-child(9),
-.transfer-table-header th:nth-child(9) {
+.transfer-table th:nth-child(9) {
     width: 0;
+    overflow: visible;
 }
-.transfer-table-header th:nth-child(9),
+.transfer-table th:nth-child(9),
 .transfer-table td:nth-child(9),
 .dndc-sort .transfer-table td:nth-child(9) {
     display: none;
@@ -1392,18 +1465,14 @@ table.out-shares .fm-chat-users {
 }
 
 @media only screen and (max-width: 1260px) {
-    .transfer-table td:nth-child(2),
-    .transfer-table-header th:nth-child(2) {
-        width: 100%;
-        width: calc(100% - 896px);
+    .transfer-table th:nth-child(3) {
+        width: 192px;
     }
 }
 
 @media only screen and (max-width: 1100px) {
-    .transfer-table td:nth-child(2),
-    .transfer-table-header th:nth-child(2) {
-        width: 100%;
-        width: calc(100% - 866px);
+    .transfer-table th:nth-child(6) {
+        width: 162px;
     }
 }
 
@@ -1422,7 +1491,6 @@ table.out-shares .fm-chat-users {
 /* ======================================== *\
    grid-table arc-chat-messages-block
 \* ======================================== */
-
 .archived-chat-view table th,
 table.arc-chat-messages-block td {
     padding-left: 5px;
@@ -1431,11 +1499,20 @@ table.arc-chat-messages-block td {
     font: var(--text-body2);
     cursor: default;
     box-sizing: border-box;
-    position: relative;
 }
-.archived-chat-view table th:first-child {
-    -webkit-padding-start: 20px;
-    padding-inline-start: 20px;
+.archived-chat-view table th:first-child,
+.archived-chat-view table td:first-child {
+    -webkit-padding-start: 10px;
+    padding-inline-start: 10px;
+    width: 100%;
+}
+.archived-chat-view table th:last-child,
+.archived-chat-view table td:last-child {
+    -webkit-padding-end: 10px;
+    padding-inline-end: 10px;
+}
+.archived-chat-view table.table-hover tbody tr td::before {
+    z-index: auto;
 }
 
 /* ======================================== *\
@@ -1465,9 +1542,20 @@ table.arc-chat-messages-block td {
     padding: 0;
 }
 
+/* ======================================== *\
+   Scroller customisation for sticky header
+\* ======================================== */
 
-/* =============== OLD implementation ================= */
-.shared-details-block .shared-folder-content .grid-table-header-container-sc {
-    z-index: 2;
-    position: relative;
+.grid-scrolling-table.ps > .ps__scrollbar-y-rail,
+.user-management-scroll.ps > .ps__scrollbar-y-rail {
+    margin-top: 36px;
+}
+.contacts-list .grid-scrolling-table.ps > .ps__scrollbar-y-rail {
+    margin-top: 24px;
+}
+.add-from-cloud-dialog .grid-scrolling-table.ps > .ps__scrollbar-y-rail {
+    margin-top: 34px;
+}
+.transfer-scrolling-table.ps > .ps__scrollbar-y-rail {
+    margin-top: 26px;
 }

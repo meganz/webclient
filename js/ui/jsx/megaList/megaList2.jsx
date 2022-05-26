@@ -21,7 +21,7 @@ export class MegaList2 extends MegaRenderMixin {
         assert(props.entries, 'missing `entries` for MegaList2');
 
         this.options = {
-            extraRows: 4,
+            extraRows: 8,
             batchPages: 0,
             perfectScrollOptions: {
                 'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
@@ -72,7 +72,7 @@ export class MegaList2 extends MegaRenderMixin {
         });
 
         lazy(calculated, 'scrollHeight', () => {
-            return this.ps.getClientHeight();
+            return this.ps.getClientHeight() - 36;
         });
 
         lazy(calculated, 'itemWidth', () => {
@@ -306,6 +306,8 @@ export class MegaList2 extends MegaRenderMixin {
             delay('chat:mega-list2:thumb-loader', () => this.enqueueThumbnailRetrieval(), 20);
         }
 
+        this._firstRender = this._firstRender || this.props.viewmode !== M.viewmode;
+
         if (this._firstRender && this.ps) {
             this._firstRender = false;
             Ps.update(this.ps.findDOMNode());
@@ -431,7 +433,6 @@ export class MegaList2 extends MegaRenderMixin {
         let listAdapterName = listAdapter.prototype.constructor.name;
 
         return <>
-            {header}
             <PerfectScrollbar
                 key={"ps_" + listAdapterName + "_" + viewMode}
                 options={this.options.perfectScrollOptions}
@@ -452,6 +453,7 @@ export class MegaList2 extends MegaRenderMixin {
                     listContentRef={(listContent) => {
                         this.listContent = listContent;
                     }}
+                    header={header}
                     megaList={this}
                     calculated={this._calculated}
                     {...listAdapterOpts}

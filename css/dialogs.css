@@ -294,7 +294,7 @@ body.de .mega-dialog.new-group-chat {
     z-index: 1;
 }
 .mega-dialog.add-from-cloud .megaList2.megaListContainer {
-    height: 400px !important;
+    height: 434px !important;
 }
 .mega-dialog.add-from-cloud .megaListContainer .data-block-bg {
     width: 192px;
@@ -304,9 +304,6 @@ body.de .mega-dialog.new-group-chat {
     margin-bottom: 0;
     margin-top: 5px;
     margin-left: 5px;
-}
-.mega-dialog.add-from-cloud .tooltip-handler {
-    z-index: 10;
 }
 .mega-dialog .fm-breadcrumbs-wrapper {
     max-width: calc(100% - 152px);
@@ -375,16 +372,9 @@ body.de .mega-dialog.new-group-chat {
 }
 
 /* Add From Cloud -- bottom breadcrumbs */
-.fm-dialog-scroll.grid, .add-from-cloud .grid-table-header + .dialog-empty-block {
-    height: 538px !important;
-}
 .mega-dialog.add-from-cloud.has-breadcrumbs-bottom .fm-dialog-scroll {
     height: 572px !important;
 }
-.mega-dialog.add-from-cloud.has-breadcrumbs-bottom .grid-table-header + .fm-dialog-scroll {
-    height: 499px !important;
-}
-
 .mega-dialog .fm-breadcrumbs-wrapper.breadcrumbs-bottom {
     position: relative;
     width: 100%;
@@ -444,29 +434,17 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog .properties-breadcrumb .breadcrumb-dropdown.ps--active-y a {
     margin-right: 4px;
 }
-.fm-dialog-table.grid-table-header th.grid-first-th i {
+.fm-dialog-table.grid-table th.grid-first-th i {
     float: none;
+    margin: 0 auto;
 }
 .fm-dialog-table.grid-table {
-    width: calc(100% - 16px);
-    margin: 0 auto 0;
-    outline: var(--stroke-main) solid 8px;
-    outline-offset: -8px;
-}
-.fm-dialog-table.grid-table td {
-    display: flex;
-    align-items: center;
+    width: calc(100% - 32px);
+    margin: 0 24px 0 8px;
 }
 .fm-dialog-table.grid-table td.extras-column {
     width: 24px;
     padding-inline: 0;
-}
-.fm-dialog-table.grid-table td {
-    display: flex;
-    align-items: center;
-}
-.fm-dialog-table.grid-table tr {
-    display: inline-flex;
 }
 .fm-dialog-table.grid-table .tranfer-filetype-txt {
     padding-top: 0;
@@ -480,32 +458,42 @@ body.de .mega-dialog.new-group-chat {
 .fm-dialog-table.grid-table td .tooltip-handler-container {
     height: 24px;
 }
-.fm-dialog-table.grid-table-header th:nth-child(1),
-.fm-dialog-table.grid-table td:nth-child(1) {
-    width: 50px;
-    padding: 0 0 0 3px;
+.fm-dialog-table.grid-table th {
+    padding-top: 3px;
 }
-.fm-dialog-table.grid-table-header th:nth-child(1) {
+.fm-dialog-table.grid-table th:nth-child(1) {
     width: 40px;
+    padding: 0;
 }
-.fm-dialog-table.grid-table-header th:nth-child(2), .fm-dialog-table.grid-table td:nth-child(2) {
-    width: calc(100% - 300px);
+.fm-dialog-table.grid-table th:nth-child(2) {
+    width: 100%;
 }
-.fm-dialog-table.grid-table-header th:nth-child(2) {
-    width: calc(100% - 300px);
-}
-.fm-dialog-table.grid-table-header th:nth-child(3), .fm-dialog-table.grid-table td:nth-child(3) {
+.fm-dialog-table.grid-table th:nth-child(3) {
     width: 95px;
     background-image: none;
 }
-.fm-dialog-table.grid-table-header th:nth-child(4), .fm-dialog-table.grid-table td:nth-child(4) {
+.fm-dialog-table.grid-table th:nth-child(4) {
     width: 148px;
 }
-.fm-dialog-table.grid-table-header th i {
+.fm-dialog-table.grid-table th:nth-child(5) {
+    width: 24px;
+}
+.fm-dialog-table.grid-table th span {
+    float: left;
+}
+.fm-dialog-table.grid-table th i {
     display: block;
     float: right;
     --icon-size: 18px;
     --mask-color: var(--icon-rest);
+}
+.fm-dialog-table.grid-table tr:hover td:first-child::before,
+.fm-dialog-table.grid-table tr.ui-selected td:first-child::before {
+    left: -7px;
+}
+.fm-dialog-table.grid-table tr:hover td:last-child::before,
+.fm-dialog-table.grid-table tr.ui-selected td:last-child::before {
+    right: -7px;
 }
 .fm-files-search {
     position: relative;
@@ -640,14 +628,8 @@ body.de .mega-dialog.new-group-chat {
     .fm-dialog-scroll, .add-from-cloud .dialog-empty-block {
         height: 434px !important;
     }
-    .fm-dialog-scroll.grid, .add-from-cloud .grid-table-header + .dialog-empty-block {
-        height: 388px !important;
-    }
     .mega-dialog.add-from-cloud.has-breadcrumbs-bottom .fm-dialog-scroll {
         height: 372px !important;
-    }
-    .mega-dialog.add-from-cloud.has-breadcrumbs-bottom .grid-table-header + .fm-dialog-scroll {
-        height: 348px !important;
     }
 }
 @media only screen and (max-width: 1280px) {
@@ -665,10 +647,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.add-from-cloud .tranfer-filetype-txt {
         max-width: 250px;
     }
-}
-
-.add-from-cloud .tooltip-handler {
-    z-index: 50;
 }
 /* End of Add From Cloud Dialog */
 

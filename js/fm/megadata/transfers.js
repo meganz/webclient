@@ -909,7 +909,7 @@ MegaData.prototype.getTransferTableLengths = function() {
         return false;
     }
     var used = te.domTable.querySelectorAll('tr').length;
-    var size = (Math.ceil(parseInt(te.domScrollingTable.style.height) / 32) | 0) + 1;
+    var size = (Math.ceil(te.domScrollingTable.offsetHeight / 32) | 0) + 1;
 
     return { size: size, used: used, left: size - used };
 };
@@ -928,9 +928,8 @@ MegaData.prototype.getTransferElements = function() {
     obj.domDownloadBlock = obj.domPanelTitle.querySelector('.download');
     obj.domDownloadProgressText = obj.domDownloadBlock.querySelector('.transfer-progress-txt');
     obj.domTableEmptyTxt = obj.domTableWrapper.querySelector('.transfer-panel-empty-txt');
-    obj.domTableHeader = obj.domTableWrapper.querySelector('.transfer-table-header');
     obj.domScrollingTable = obj.domTableWrapper.querySelector('.transfer-scrolling-table');
-    obj.domTable = obj.domScrollingTable.querySelector('.transfer-table');
+    obj.domTable = obj.domScrollingTable.querySelector('.transfer-table tbody');
 
     this.getTransferElements = function() {
         return obj;
@@ -997,8 +996,6 @@ MegaData.prototype.addToTransferTable = function(gid, ttl, elem) {
 
     if (T.left > 0) {
         addToTransferTable(gid, elem, true);
-        // In some cases UI is not yet initialized, nor transferHeader()
-        $('.transfer-table-header').show(0);
     }
     else {
         var fit;
@@ -2313,7 +2310,7 @@ function fm_tfsupdate() {
         var ttl    = M.getTransferTableLengths();
         var parent = domCompleted[0].parentNode;
 
-        if (completedLen + 4 > ttl.size || M.pendingTransfers > 50 + ttl.used * 4) {
+        if (ttl.used > 10 && completedLen + 4 > ttl.size || M.pendingTransfers > 50 + ttl.used * 4) {
             // Remove completed transfers filling the whole table
             while (completedLen--) {
                 parent.removeChild(domCompleted[completedLen]);
@@ -2331,13 +2328,6 @@ function fm_tfsupdate() {
         $.transferHeader(tfse);
     }
 
-    /*$('.transfer-table span.row-number').each(function() {
-        var $this = $(this);
-        $this.text(++i);
-        if ($this.closest('tr').find('.transfer-type.upload').length) {
-            ++u;
-        }
-    });*/
     var $trs = domTable.querySelectorAll('tr:not(.transfer-completed)');
     i = $trs.length;
     while (i--) {

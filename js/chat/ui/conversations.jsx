@@ -843,44 +843,37 @@ class ArchivedConversationsList extends MegaRenderMixin {
                 <>
                     {currConvsList && currConvsList.length ?
                         <div className="files-grid-view archived-chat-view">
-                            <table
-                                className="grid-table-header"
-                                width="100%"
-                                cellSpacing="0"
-                                cellPadding="0"
-                                border="0">
-                                <tbody>
-                                    <tr>
-                                        <th className="calculated-width" onClick={self.onSortNameClicked}>
-                                            <div className="is-chat arrow name">
-                                                {l[86] /* `Name` */}
-                                                <i
-                                                    className={
-                                                        nameOrderClass ?
-                                                            `sprite-fm-mono icon-arrow-${nameOrderClass}` :
-                                                            ''
-                                                    }
-                                                />
-                                            </div>
-                                        </th>
-                                        <th width="330" onClick={self.onSortTimeClicked}>
-                                            <div className={`is-chat arrow interaction ${timerOrderClass}`}>
-                                                {l[5904] /* `Last interaction` */}
-                                                <i
-                                                    className={
-                                                        timerOrderClass ?
-                                                            `sprite-fm-mono icon-arrow-${timerOrderClass}` :
-                                                            ''
-                                                    }
-                                                />
-                                            </div>
-                                        </th>
-                                    </tr>
-                                </tbody>
-                            </table>
                             <div className="grid-scrolling-table archive-chat-list">
                                 <div className="grid-wrapper">
                                     <table className="grid-table arc-chat-messages-block table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th className="calculated-width" onClick={self.onSortNameClicked}>
+                                                    <div className="is-chat arrow name">
+                                                        <i
+                                                            className={
+                                                                nameOrderClass ?
+                                                                    `sprite-fm-mono icon-arrow-${nameOrderClass}` :
+                                                                    ''
+                                                            }
+                                                        />
+                                                        {l[86] /* `Name` */}
+                                                    </div>
+                                                </th>
+                                                <th width="330" onClick={self.onSortTimeClicked}>
+                                                    <div className={`is-chat arrow interaction ${timerOrderClass}`}>
+                                                        <i
+                                                            className={
+                                                                timerOrderClass ?
+                                                                    `sprite-fm-mono icon-arrow-${timerOrderClass}` :
+                                                                    ''
+                                                            }
+                                                        />
+                                                        {l[5904] /* `Last interaction` */}
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
                                         <tbody>
                                             {currConvsList}
                                         </tbody>

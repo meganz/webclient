@@ -58,38 +58,13 @@ function removeUInode(h, parent) {
             if (!hasItems) {
 
                 __markEmptied();
-                $('.files-grid-view .grid-table-header tr').remove();
                 $('.fm-empty-incoming').removeClass('hidden');
-            }
-            break;
-        case "contacts":
-
-            //Clear left panel:
-            $('#contact_' + h).fadeOut('slow', function() {
-                $(this).remove();
-            });
-
-            //Clear right panel:
-            $('.grid-table.contacts tr#' + h + ', .contacts-blocks-scrolling a#' + h)
-                .fadeOut('slow', function() {
-                    $(this).remove();
-                });
-
-            // clear the contacts grid:
-            $('.contacts-grid-view #' + h).remove();
-            if (!hasItems) {
-
-                __markEmptied();
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
-                $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
-                $('.fm-empty-contacts').removeClass('hidden');
             }
             break;
         case "chat":
             if (!hasItems) {
 
                 __markEmptied();
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
                 $('.fm-empty-chat').removeClass('hidden');
             }
             break;
@@ -106,7 +81,6 @@ function removeUInode(h, parent) {
             if (!hasItems) {
 
                 __markEmptied();
-                $('.contacts-grid-view .contacts-grid-header tr').remove();
                 $('.fm-empty-trashbin').removeClass('hidden');
                 $('.fm-clearbin-button').addClass('hidden');
             }
@@ -171,7 +145,7 @@ function removeUInode(h, parent) {
                         $('.fm-empty-folder').removeClass('hidden');
                     }
                 }
-                $('.grid-table.fm tr').remove();
+                $('.grid-table.fm tbody tr').remove();
             }
             break;
     }

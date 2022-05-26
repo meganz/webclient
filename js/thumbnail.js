@@ -152,7 +152,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
                 imagedata = await Streamer.getThumbnail(file).catch(nop) || imagedata;
             }
         }
-        else if (isRawImage && exifFromImage) {
+        else if (isRawImage && exifFromImage && webgl.doesSupport('worker')) {
             // We don't need to rotate images ourselves, so we will decode it into a worker.
             if (d) {
                 debug('Leaving %s image decoding to worker...', isRawImage);

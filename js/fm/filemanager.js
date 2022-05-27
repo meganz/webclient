@@ -255,7 +255,7 @@ FileManager.prototype.initFileManagerUI = function() {
     if (folderlink) {
         $('.nw-fm-left-icons-panel .logo').removeClass('hidden');
         $('.fm-main').addClass('active-folder-link');
-        $('.activity-status-block').hide();
+        $('.activity-status-block').addClass('hidden');
 
         var $prodNav = $('.fm-products-nav').text('');
         if (!u_type) {

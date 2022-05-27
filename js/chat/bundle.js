@@ -473,7 +473,7 @@ Chat.prototype.init = promisify(function (resolve, reject) {
   self.$container = $('.fm-chat-block');
 
   if (!is_chatlink) {
-    $('.activity-status-block, .activity-status').show();
+    $('.activity-status-block, .activity-status').removeClass('hidden');
   }
 
   self.on('onRoomInitialized', function (e, room) {

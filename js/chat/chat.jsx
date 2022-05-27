@@ -94,23 +94,24 @@ function Chat() {
         'chatNotificationOptions':  {
             'textMessages': {
                 'incoming-chat-message': {
-                    'title': "Incoming chat message",
+                    title: l.notif_title_incoming_msg, /* `Incoming chat message` */
                     'icon': function(notificationObj, params) {
                         return notificationObj.options.icon;
                     },
                     'body': function(notificationObj, params) {
-                        return "You have new incoming chat message from: " + params.from;
+                        /* `You have new incoming chat message from: %s` */
+                        return l.notif_body_incoming_msg.replace('%s', params.from);
                     }
                 },
                 'incoming-attachment': {
-                    'title': "Incoming attachment",
+                    title: l.notif_title_incoming_attch, /* `Incoming attachment` */
                     'icon': function(notificationObj, params) {
                         return notificationObj.options.icon;
                     },
                     'body': function(notificationObj, params) {
-                        return params.from + " shared " + (
-                                params.attachmentsCount > 1 ? params.attachmentsCount +" files" : "a file"
-                            );
+                        /* `%s shared (a/#) file(s)`*/
+                        return mega.icu.format(l.notif_body_incoming_attch, params.attachmentsCount)
+                            .replace('%s', params.from);
                     }
                 },
                 'incoming-voice-video-call': {
@@ -123,7 +124,7 @@ function Chat() {
                     }
                 },
                 'call-terminated': {
-                    'title': "Call terminated",
+                    title: l.notif_title_call_term, /* `Call terminated` */
                     'icon': function(notificationObj, params) {
                         return notificationObj.options.icon;
                     },

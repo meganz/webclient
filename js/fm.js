@@ -3352,7 +3352,12 @@ function fm_resize_handler(force) {
             delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
         }
         if (M.viewmode) {
-            Ps.update($('.file-block-scrolling.megaList:visible').get(0));
+
+            const $v = $('.file-block-scrolling.megaList:visible');
+
+            if ($v.length) {
+                Ps.update($v.get(0));
+            }
         }
         else {
             initGridScrolling();

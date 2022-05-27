@@ -28177,9 +28177,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
     lazy(calculated, 'scrollWidth', () => {
       return this.ps.getClientWidth();
     });
-    lazy(calculated, 'scrollHeight', () => {
-      return this.ps.getClientHeight() - 36;
-    });
+    lazy(calculated, 'scrollHeight', () => this.ps.getClientHeight() - calculated.headerHeight);
     lazy(calculated, 'itemWidth', () => {
       if (this.props.listAdapter.itemWidth === false) {
         return calculated.scrollWidth;
@@ -28190,6 +28188,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
     lazy(calculated, 'itemHeight', () => {
       return this.props.itemHeight || this.props.listAdapter.itemHeight;
     });
+    lazy(calculated, 'headerHeight', () => this.props.headerHeight || 0);
     lazy(calculated, 'contentWidth', () => {
       var contentWidth = this.ps.getContentWidth();
 
@@ -29294,6 +29293,7 @@ class BrowserEntries extends mixins.wl {
       listAdapterOpts: listAdapterOpts,
       entries: this.props.entries,
       itemHeight: this.props.megaListItemHeight,
+      headerHeight: 36,
       header: !viewMode && external_React_default().createElement(GenericTableHeader, {
         columns: listAdapterOpts.columns,
         sortBy: this.state.sortBy,
@@ -31473,7 +31473,7 @@ __webpack_require__.d(__webpack_exports__, {
 "Z": () => (_extends)
 });
 function _extends() {
-  _extends = Object.assign || function (target) {
+  _extends = Object.assign ? Object.assign.bind() : function (target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i];
 
@@ -31486,7 +31486,6 @@ function _extends() {
 
     return target;
   };
-
   return _extends.apply(this, arguments);
 }
 

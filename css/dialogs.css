@@ -1295,7 +1295,7 @@ body.de .mega-dialog.new-group-chat {
     color: var(--text-color-low);
 }
 .fm-versioning.file-icon {
-    width: 32px;
+    width: 62px;
 }
 .fm-versioning.file-data {
     width: auto;
@@ -1312,7 +1312,7 @@ body.de .mega-dialog.new-group-chat {
     width: 380px;
 }
 .fm-versioning.button-container {
-    width: 104px;
+    width: 176px;
 }
 .fm-versioning.file-info .size {
     position: relative;

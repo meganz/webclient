@@ -253,6 +253,20 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     // stats[groups[i]].nodes = [];
                 }
 
+                // Add pending out-shares that has no user on cstrgn variable
+                const ps = Object.keys(M.ps || {});
+                if (ps.length) {
+                    cstrgn = {
+                        ...cstrgn,
+                        ...ps
+                            .map(h => M.getNodeByHandle(h))
+                            .reduce((o, n) => {
+                                o[n.h] = [n.tb || 0, n.tf || 0, n.td || 0, n.tvb || 0, n.tvf || 0];
+                                return o;
+                            }, {})
+                    };
+                }
+
                 for (var handle in cstrgn) {
                     var data = cstrgn[handle];
                     var target = 'outshares';

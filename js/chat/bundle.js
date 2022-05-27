@@ -6859,9 +6859,12 @@ class ContactPickerWidget extends _mixins1__.wl {
           self.setState({
             'selected': selected
           });
-          self.setState({
-            'searchValue': ''
-          });
+
+          if (self.props.selectCleanSearchRes) {
+            self.setState({
+              'searchValue': ''
+            });
+          }
 
           if (self.props.autoFocusSearchField) {
             self.contactSearchField.focus();
@@ -6965,9 +6968,12 @@ class ContactPickerWidget extends _mixins1__.wl {
           self.setState({
             'selected': selected
           });
-          self.setState({
-            'searchValue': ''
-          });
+
+          if (self.props.selectCleanSearchRes) {
+            self.setState({
+              'searchValue': ''
+            });
+          }
 
           if (self.props.autoFocusSearchField) {
             self.contactSearchField.focus();
@@ -7284,7 +7290,8 @@ ContactPickerWidget.defaultProps = {
   allowEmpty: false,
   disableFrequents: false,
   notSearchInEmails: false,
-  autoFocusSearchField: false,
+  autoFocusSearchField: true,
+  selectCleanSearchRes: true,
   disableDoubleClick: false,
   newEmptySearchResult: false,
   newNoContact: false,
@@ -25685,6 +25692,7 @@ class StartGroupChatWizard extends mixins.wl {
       disableFrequents: self.props.disableFrequents,
       notSearchInEmails: self.props.notSearchInEmails,
       autoFocusSearchField: self.props.autoFocusSearchField,
+      selectCleanSearchRes: self.props.selectCleanSearchRes,
       disableDoubleClick: self.props.disableDoubleClick,
       selectedWidthSize: self.props.selectedWidthSize,
       emptySelectionMsg: self.props.emptySelectionMsg,
@@ -25707,6 +25715,7 @@ StartGroupChatWizard.defaultProps = {
   'disableFrequents': false,
   'notSearchInEmails': false,
   'autoFocusSearchField': true,
+  'selectCleanSearchRes': true,
   'disableDoubleClick': false,
   'newEmptySearchResult': false,
   'newNoContact': false,

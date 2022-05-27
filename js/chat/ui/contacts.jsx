@@ -879,7 +879,8 @@ export class ContactPickerWidget extends MegaRenderMixin {
         allowEmpty: false,
         disableFrequents: false,
         notSearchInEmails: false,
-        autoFocusSearchField: false,
+        autoFocusSearchField: true,
+        selectCleanSearchRes: true,
         disableDoubleClick: false,
         newEmptySearchResult: false,
         newNoContact: false,
@@ -1080,7 +1081,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
                             }
                         }
                         self.setState({'selected': selected});
-                        self.setState({'searchValue': ''});
+                        if (self.props.selectCleanSearchRes) {
+                            self.setState({'searchValue': ''});
+                        }
                         if (self.props.autoFocusSearchField) {
                             self.contactSearchField.focus();
                         }
@@ -1185,7 +1188,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         }
                     }
                     self.setState({'selected': selected});
-                    self.setState({'searchValue': ''});
+                    if (self.props.selectCleanSearchRes) {
+                        self.setState({'searchValue': ''});
+                    }
                     if (self.props.autoFocusSearchField) {
                         self.contactSearchField.focus();
                     }

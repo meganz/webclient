@@ -24,6 +24,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         'disableFrequents': false,
         'notSearchInEmails': false,
         'autoFocusSearchField': true,
+        'selectCleanSearchRes': true,
         'disableDoubleClick': false,
         'newEmptySearchResult': false,
         'newNoContact': false,
@@ -305,34 +306,35 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                 triggerResizeOnUpdate={true}
                 buttons={buttons}>
 
-				<div className="content-block">
-                	{chatInfoElements}
-                	<ContactPickerWidget
-                    	changedHashProp={self.state.step}
-                    	exclude={self.props.exclude}
-                    	contacts={contacts}
-                    	selectableContacts="true"
-                    	onSelectDone={self.onSelectClicked}
-                    	onSelected={self.onSelected}
-                    	selected={self.state.selected}
-                    	headerClasses="left-aligned"
-                    	multiple={true}
-                    	readOnly={self.state.step !== 0}
-                    	allowEmpty={true}
-                    	showMeAsSelected={self.state.step === 1}
-                    	className={self.props.pickerClassName}
-                    	disableFrequents={self.props.disableFrequents}
-                    	notSearchInEmails={self.props.notSearchInEmails}
-                    	autoFocusSearchField={self.props.autoFocusSearchField}
-                    	disableDoubleClick={self.props.disableDoubleClick}
-                    	selectedWidthSize={self.props.selectedWidthSize}
-                    	emptySelectionMsg={self.props.emptySelectionMsg}
-                    	newEmptySearchResult={self.props.newEmptySearchResult}
-                    	newNoContact={self.props.newNoContact}
-                    	highlightSearchValue={self.props.highlightSearchValue}
-                    	emailTooltips={self.props.emailTooltips}
-                	/>
-				</div>
+                <div className="content-block">
+                    {chatInfoElements}
+                    <ContactPickerWidget
+                        changedHashProp={self.state.step}
+                        exclude={self.props.exclude}
+                        contacts={contacts}
+                        selectableContacts="true"
+                        onSelectDone={self.onSelectClicked}
+                        onSelected={self.onSelected}
+                        selected={self.state.selected}
+                        headerClasses="left-aligned"
+                        multiple={true}
+                        readOnly={self.state.step !== 0}
+                        allowEmpty={true}
+                        showMeAsSelected={self.state.step === 1}
+                        className={self.props.pickerClassName}
+                        disableFrequents={self.props.disableFrequents}
+                        notSearchInEmails={self.props.notSearchInEmails}
+                        autoFocusSearchField={self.props.autoFocusSearchField}
+                        selectCleanSearchRes={self.props.selectCleanSearchRes}
+                        disableDoubleClick={self.props.disableDoubleClick}
+                        selectedWidthSize={self.props.selectedWidthSize}
+                        emptySelectionMsg={self.props.emptySelectionMsg}
+                        newEmptySearchResult={self.props.newEmptySearchResult}
+                        newNoContact={self.props.newNoContact}
+                        highlightSearchValue={self.props.highlightSearchValue}
+                        emailTooltips={self.props.emailTooltips}
+                    />
+                </div>
                 {extraContent}
             </ModalDialogsUI.ModalDialog>
         );

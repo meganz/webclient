@@ -557,7 +557,6 @@ async function chunkedfetch(xhr, uri, body) {
 function api_proc(q) {
     "use strict";
 
-    var logger = d && MegaLogger.getLogger('crypt');
     if (q.setimmediate) {
         clearTimeout(q.setimmediate);
         q.setimmediate = false;
@@ -665,7 +664,7 @@ function api_proc(q) {
                     }
 
                     if (d) {
-                        logger.debug('API response:', response);
+                        console.debug('API response:', response);
                     }
 
                     try {
@@ -678,14 +677,14 @@ function api_proc(q) {
                     } catch (e) {
                         // bogus response, try again
                         if (d) {
-                            logger.debug("Bad JSON data in response: " + response);
+                            console.debug(`Bad JSON data in response: ${response}`);
                         }
                         t = EAGAIN;
                     }
                 }
                 else {
                     if (d) {
-                        logger.debug('API server connection failed (error ' + status + ')');
+                        console.debug(`API server connection failed (error ${status})`);
                     }
                     t = ERATELIMIT;
                 }
@@ -702,7 +701,7 @@ function api_proc(q) {
                             if (res && res.err < 0) {
                                 // eslint-disable-next-line max-depth
                                 if (d) {
-                                    logger.debug('APIv2 Custom Error Detail', res, this.q.cmdsBuffer[i]);
+                                    console.debug('APIv2 Custom Error Detail', res, this.q.cmdsBuffer[i]);
                                 }
                                 ctx.v2APIError = res;
                                 res = res.err;
@@ -723,8 +722,8 @@ function api_proc(q) {
                 }
                 else {
                     if (ev && ev.type === 'error') {
-                        if (logger) {
-                            logger.debug("API request error - retrying");
+                        if (d) {
+                            console.debug("API request error - retrying");
                         }
                     }
                     api_reqerror(this.q, t, status);
@@ -761,19 +760,19 @@ function api_proc(q) {
 function api_send(q) {
     "use strict";
 
-    const logger = d && MegaLogger.getLogger('crypt');
     q.timer = false;
 
     if (q.xhr === false) {
-        if (logger) {
-            logger.debug("API request aborted: " + q.rawreq + " to " + q.url);
+        if (d) {
+            console.debug(`API request aborted: ${q.rawreq} to ${q.url}`);
         }
         return;
     }
 
-    if (logger) {
-        logger.debug('Sending API request: %s', q.rawreq || q.cmdsBuffer[0],
-                     String(q.url).replace(/sid=[\w-]+/, 'sid=\u2026'));
+    if (d) {
+        console.debug(
+            'Sending API request: %s', q.rawreq || q.cmdsBuffer[0],
+            String(q.url).replace(/sid=[\w-]+/, 'sid=\u2026'));
     }
 
     // reset number of bytes received and response size
@@ -789,8 +788,8 @@ function api_send(q) {
         chunkedfetch(q.xhr, q.url, q.rawreq)
             .then(() => q.xhr && q.xhr.onloadend())
             .catch(ex => {
-                if (logger) {
-                    logger.error('Fetch error.', ex);
+                if (d) {
+                    console.error('Fetch error.', ex);
                 }
 
                 if (q.xhr) {
@@ -2954,11 +2953,10 @@ function api_updfkey(h) {
     }
 }
 function api_updfkeysync(sn) {
-    var logger = d && MegaLogger.getLogger('crypt');
     var nk     = [];
 
     if (d) {
-        logger.debug('api_updfkey', sn);
+        console.debug('api_updfkey', sn);
     }
 
     for (var i = sn.length; i--; ) {
@@ -2970,7 +2968,7 @@ function api_updfkeysync(sn) {
 
     if (nk.length) {
         if (d) {
-            logger.debug('api_updfkey.r', nk);
+            console.debug('api_updfkey.r', nk);
         }
         api_req({
             a: 'k',

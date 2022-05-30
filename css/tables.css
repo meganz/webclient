@@ -477,7 +477,7 @@
     background: var(--surface-main);
     position: sticky;   /* Shouldn't be changed as sticky isn't working on thead and tr on Chrome! */
     top: 0;
-    z-index: 9999;
+    z-index: 1119;
 }
 .sticky-header-table-container.ps-container .ps-scrollbar-y-rail {
     margin: 36px 0 2px;

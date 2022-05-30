@@ -71,9 +71,7 @@ export class MegaList2 extends MegaRenderMixin {
             return this.ps.getClientWidth();
         });
 
-        lazy(calculated, 'scrollHeight', () => {
-            return this.ps.getClientHeight() - 36;
-        });
+        lazy(calculated, 'scrollHeight', () => this.ps.getClientHeight() - calculated.headerHeight);
 
         lazy(calculated, 'itemWidth', () => {
             if (this.props.listAdapter.itemWidth === false) {
@@ -84,6 +82,8 @@ export class MegaList2 extends MegaRenderMixin {
         lazy(calculated, 'itemHeight', () => {
             return this.props.itemHeight || this.props.listAdapter.itemHeight;
         });
+
+        lazy(calculated, 'headerHeight', () => this.props.headerHeight || 0);
 
         lazy(calculated, 'contentWidth', () => {
             var contentWidth = this.ps.getContentWidth();

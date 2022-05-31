@@ -2952,7 +2952,7 @@ function createFolderDialog(close) {
 
     M.safeShowDialog('createfolder', function() {
         $dialog.removeClass('hidden');
-        $('.create-folder-input-bl input').trigger("focus");
+        $('.create-folder-wrapper input', $dialog).focus();
         $dialog.removeClass('active');
         return $dialog;
     });
@@ -3131,7 +3131,7 @@ function createFileDialog(close, action, params) {
 
     M.safeShowDialog('createfile', function() {
         $dialog.removeClass('hidden');
-        $('.create-folder-input-bl input', $dialog).focus();
+        $('.create-file-wrapper input', $dialog).focus();
         $dialog.removeClass('active');
         return $dialog;
     });

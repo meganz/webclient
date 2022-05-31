@@ -13,7 +13,7 @@ class MMenuSelectItem extends MComponent {
             });
         }
         else { // This is just a label
-            this.el.classList.add('m-px-sm');
+            this.el.classList.add('px-2');
             this.el.classList.add('m-dropdown-item-label');
         }
 

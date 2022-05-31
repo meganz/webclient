@@ -1,31 +1,36 @@
-// libs
-import { Emoji } from '../../ui/utils';
-
-var React = require("react");
-var ReactDOM = require("react-dom");
-import { MegaRenderMixin, SoonFcWrap } from './../mixins';
-import { DropdownEmojiSelector } from './../../ui/emojiDropdown.jsx';
-import { Button } from './../../ui/buttons.jsx';
+import React from 'react';
+import { Emoji } from '../../ui/utils.jsx';
+import { MegaRenderMixin, SoonFcWrap } from '../mixins.js';
+import { DropdownEmojiSelector } from '../../ui/emojiDropdown.jsx';
+import { Button } from '../../ui/buttons.jsx';
 import { EmojiAutocomplete } from './emojiAutocomplete.jsx';
 import GifPanel from './gifPanel/gifPanel.jsx';
 
 export class TypingArea extends MegaRenderMixin {
-    static defaultProps = {
-        'textareaMaxHeight': "40%"
+    typingAreaRef = React.createRef();
+
+    state = {
+        emojiSearchQuery: false,
+        typedMessage: '',
+        textareaHeight: 20,
+        gifPanelActive: false
     };
 
     constructor(props) {
         super(props);
-
-        var initialText = this.props.initialText;
-
-        this.state = {
-            emojiSearchQuery: false,
-            typedMessage: initialText ? initialText : "",
-            textareaHeight: 20,
-            gifPanelActive: false
-        };
+        // TODO: deprecate `bind` in favor of arrow functions
+        this.onEmojiClicked = this.onEmojiClicked.bind(this);
+        this.onTypeAreaKeyUp = this.onTypeAreaKeyUp.bind(this);
+        this.onTypeAreaKeyDown = this.onTypeAreaKeyDown.bind(this);
+        this.onTypeAreaBlur = this.onTypeAreaBlur.bind(this);
+        this.onTypeAreaChange = this.onTypeAreaChange.bind(this);
+        this.onTypeAreaSelect = this.onTypeAreaSelect.bind(this);
+        this.onCopyCapture = this.onCopyCapture.bind(this);
+        this.onPasteCapture = this.onPasteCapture.bind(this);
+        this.onCutCapture = this.onCutCapture.bind(this);
+        this.state.typedMessage = this.props.initialText || '';
     }
+
     onEmojiClicked(e, slug) {
         if (this.props.disabled) {
             e.preventDefault();
@@ -35,7 +40,7 @@ export class TypingArea extends MegaRenderMixin {
 
         slug = slug[0] === ':' || slug.substr(-1) === ':' ? slug : `:${slug}:`;
 
-        const textarea = $('.messages-textarea', this.$container)[0];
+        const textarea = $('.messages-textarea', this.typingAreaRef.current)[0];
         const cursorPosition = this.getCursorPosition(textarea);
 
         this.setState({
@@ -48,6 +53,7 @@ export class TypingArea extends MegaRenderMixin {
             textarea.selectionEnd = cursorPosition + slug.length;
         });
     }
+
     stoppedTyping() {
         if (this.props.disabled || !this.props.chatRoom) {
             return;
@@ -56,6 +62,7 @@ export class TypingArea extends MegaRenderMixin {
         this.iAmTyping = false;
         this.props.chatRoom.trigger('stoppedTyping');
     }
+
     typing() {
         if (this.props.disabled || !this.props.chatRoom) {
             return;
@@ -101,7 +108,8 @@ export class TypingArea extends MegaRenderMixin {
             self.props.onUpdate();
         }
     }
-    onCancelClicked(e) {
+
+    onCancelClicked() {
         var self = this;
         self.setState({typedMessage: ""});
         if (self.props.chatRoom && self.iAmTyping) {
@@ -110,7 +118,8 @@ export class TypingArea extends MegaRenderMixin {
         self.onConfirmTrigger(false);
         self.triggerOnUpdate();
     }
-    onSaveClicked(e) {
+
+    onSaveClicked() {
         var self = this;
 
         if (self.props.disabled || !self.isMounted()) {
@@ -127,28 +136,29 @@ export class TypingArea extends MegaRenderMixin {
         }
         self.triggerOnUpdate();
     }
+
     onConfirmTrigger(val) {
-        var result = this.props.onConfirm(val);
+        const { onConfirm, persist, chatRoom } = this.props;
+        const result = onConfirm(val);
 
         if (val !== false && result !== false) {
             // scroll To 0 after sending a message.
-            var $node = $(this.findDOMNode());
-            var $textareaScrollBlock = $('.textarea-scroll', $node);
-            var jsp = $textareaScrollBlock.data('jsp');
+            const $textareaScrollBlock = $('.textarea-scroll', this.typingAreaRef.current);
+            const jsp = $textareaScrollBlock.data('jsp');
             jsp.scrollToY(0);
-            $('.jspPane', $textareaScrollBlock).css({'top': 0});
+            $('.jspPane', $textareaScrollBlock).css({ top: 0 });
         }
 
-        if (this.props.persist) {
-            var megaChat = this.props.chatRoom.megaChat;
+        if (persist) {
+            const { megaChat } = chatRoom;
             if (megaChat.plugins.persistedTypeArea) {
-                megaChat.plugins.persistedTypeArea.removePersistedTypedValue(
-                    this.props.chatRoom
-                );
+                megaChat.plugins.persistedTypeArea.removePersistedTypedValue(chatRoom);
             }
         }
+
         return result;
     }
+
     onTypeAreaKeyDown(e) {
         if (this.props.disabled) {
             e.preventDefault();
@@ -181,6 +191,7 @@ export class TypingArea extends MegaRenderMixin {
             return;
         }
     }
+
     onTypeAreaKeyUp(e) {
         if (this.props.disabled) {
             e.preventDefault();
@@ -312,6 +323,7 @@ export class TypingArea extends MegaRenderMixin {
 
         self.updateScroll(true);
     }
+
     onTypeAreaBlur(e) {
         if (this.props.disabled) {
             e.preventDefault();
@@ -335,6 +347,7 @@ export class TypingArea extends MegaRenderMixin {
             }, 300);
         }
     }
+
     onTypeAreaChange(e) {
         if (this.props.disabled) {
             e.preventDefault();
@@ -379,46 +392,40 @@ export class TypingArea extends MegaRenderMixin {
         //     self.props.onUpdate();
         // }
     }
+
     focusTypeArea() {
         if (this.props.disabled) {
             return;
         }
 
         if (
-            $('.chat-textarea:visible textarea:visible', this.$container).length > 0 &&
-            !$('.chat-textarea:visible textarea:visible:first', this.$container).is(":focus")
+            $('.chat-textarea:visible textarea:visible', this.typingAreaRef.current).length > 0 &&
+            !$('.chat-textarea:visible textarea:visible:first', this.typingAreaRef.current).is(":focus")
         ) {
-            moveCursortoToEnd($('.chat-textarea:visible:first textarea', this.$container)[0]);
+            moveCursortoToEnd($('.chat-textarea:visible:first textarea', this.typingAreaRef.current)[0]);
         }
     }
+
     componentDidMount() {
         super.componentDidMount();
-        var self = this;
-        this.$container = $(ReactDOM.findDOMNode(this));
+        this._lastTextareaHeight = 20;
+        this.lastTypedMessage = this.props.initialText || this.lastTypedMessage;
 
-        chatGlobalEventManager.addEventListener(
-            'resize',
-            'typingArea' + self.getUniqueId(),
-            () => self.handleWindowResize()
+        chatGlobalEventManager.addEventListener('resize', `typingArea${this.getUniqueId()}`, () =>
+            this.handleWindowResize()
         );
 
-        // initTextareaScrolling($('.chat-textarea-scroll textarea', $container), 100, true);
-        self._lastTextareaHeight = 20;
-        if (self.props.initialText) {
-            self.lastTypedMessage = this.props.initialText;
-        }
-
-        $('.jScrollPaneContainer', self.$container).rebind('forceResize.typingArea' + self.getUniqueId(), function() {
-            self.updateScroll(false);
-        });
+        $('.jScrollPaneContainer', this.typingAreaRef.current)
+            .rebind(`forceResize.typingArea${this.getUniqueId()}`, () => this.updateScroll(false));
 
         if (!this.scrollingInitialised) {
             this.initScrolling();
         }
 
-        self.triggerOnUpdate(true);
-        self.updateScroll(false);
+        this.triggerOnUpdate(true);
+        this.updateScroll(false);
     }
+
     componentWillMount() {
         var self = this;
         var chatRoom = self.props.chatRoom;
@@ -460,6 +467,7 @@ export class TypingArea extends MegaRenderMixin {
             );
         }
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         var self = this;
@@ -467,6 +475,7 @@ export class TypingArea extends MegaRenderMixin {
         // window.removeEventListener('resize', self.handleWindowResize);
         chatGlobalEventManager.removeEventListener('resize', 'typingArea' + self.getUniqueId());
     }
+
     componentDidUpdate() {
         var self = this;
 
@@ -493,47 +502,39 @@ export class TypingArea extends MegaRenderMixin {
             self.onUpdateCursorPosition = false;
         }
     }
-    initScrolling() {
-        var self = this;
-        self.scrollingInitialised = true;
-        var $node = $(self.findDOMNode());
-        var $textarea = $('textarea:first', $node);
-        self.textareaLineHeight = parseInt($textarea.css('line-height'));
-        var $textareaScrollBlock = $('.textarea-scroll', $node);
-        $textareaScrollBlock.jScrollPane({
-            enableKeyboardNavigation: false,
-            showArrows: true,
-            arrowSize: 5,
-            animateScroll: false,
-            maintainPosition: false
-        });
-    }
-    getTextareaMaxHeight() {
-        var self = this;
-        var textareaMaxHeight = self.props.textareaMaxHeight;
 
-        if (String(textareaMaxHeight).indexOf("%") > -1) {
-            textareaMaxHeight = (parseInt(textareaMaxHeight.replace("%", "")) || 0) /100;
-            if (textareaMaxHeight === 0) {
-                textareaMaxHeight = 100;
-            }
-            else {
-                if (!self.props.chatRoom.$rConversationPanel) {
-                    return 100;
-                }
-                var $messagesContainer = $(
-                    '.messages-block',
-                    /* trick to minimize the :visible damange */
-                    self.props.chatRoom.$rConversationPanel.findDOMNode()
-                );
-                textareaMaxHeight = $messagesContainer.height() * textareaMaxHeight;
-            }
+    initScrolling = () => {
+        if (this.typingAreaRef && this.typingAreaRef.current) {
+            this.scrollingInitialised = true;
+            const $textarea = $('textarea:first', this.typingAreaRef.current);
+            const $textareaScrollBlock = $('.textarea-scroll', this.typingAreaRef.current);
+            this.textareaLineHeight = parseInt($textarea.css('line-height'));
+            $textareaScrollBlock.jScrollPane({
+                enableKeyboardNavigation: false,
+                showArrows: true,
+                arrowSize: 5,
+                animateScroll: false,
+                maintainPosition: false
+            });
         }
-        return textareaMaxHeight;
-    }
+    };
+
+    /**
+     * getTextareaMaxHeight
+     * @description Returns the max height allowed for the textarea element based on the current viewport size.
+     * @returns {number} the textarea max height
+     */
+
+    getTextareaMaxHeight = () => {
+        const { containerRef } = this.props;
+        if (containerRef && containerRef.current) {
+            return this.isMounted() ? containerRef.current.offsetHeight * 0.4 : 100;
+        }
+        return 100;
+    };
 
     @SoonFcWrap(60)
-    updateScroll(keyEvents) {
+    updateScroll() {
         var self = this;
 
         // DONT update if not visible...
@@ -541,7 +542,7 @@ export class TypingArea extends MegaRenderMixin {
             return;
         }
 
-        var $node = self.$node = self.$node || $(self.findDOMNode());
+        var $node = self.$node = self.$node || this.typingAreaRef.current;
 
         var $textarea = self.$textarea = self.$textarea || $('textarea:first', $node);
         var $textareaClone = self.$textareaClone = self.$textareaClone || $('.message-preview', $node);
@@ -675,6 +676,7 @@ export class TypingArea extends MegaRenderMixin {
             self.handleWindowResize();
         }
     }
+
     getCursorPosition(el) {
         var pos = 0;
         if ('selectionStart' in el) {
@@ -690,7 +692,7 @@ export class TypingArea extends MegaRenderMixin {
         return pos;
     }
 
-    onTypeAreaSelect(e) {
+    onTypeAreaSelect() {
         this.updateScroll(true);
     }
 
@@ -714,18 +716,23 @@ export class TypingArea extends MegaRenderMixin {
     isActive() {
         return document.hasFocus() && this.$messages && this.$messages.is(":visible");
     }
+
     resetPrefillMode() {
         this.prefillMode = false;
     }
-    onCopyCapture(e) {
+
+    onCopyCapture() {
         this.resetPrefillMode();
     }
-    onCutCapture(e) {
+
+    onCutCapture() {
         this.resetPrefillMode();
     }
-    onPasteCapture(e) {
+
+    onPasteCapture() {
         this.resetPrefillMode();
     }
+
     render() {
         var self = this;
 
@@ -864,71 +871,83 @@ export class TypingArea extends MegaRenderMixin {
 
         var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
 
-        return <div className={"typingarea-component " + self.props.className}>
-            {this.state.gifPanelActive &&
-                <GifPanel
-                    chatRoom={this.props.chatRoom}
-                    onToggle={() =>
-                        this.setState({ gifPanelActive: false })
-                    }
-                />
-            }
-            <div className={"chat-textarea " + self.props.className}>
-                {emojiAutocomplete}
-                {self.props.children}
-                {self.props.editing ? null : (
-                    <Button
-                        className={`
-                            popup-button
-                            gif-button
-                            ${this.state.gifPanelActive ? 'active' : ''}
-                        `}
-                        icon="small-icon gif"
-                        disabled={this.props.disabled}
-                        onClick={() =>
-                            this.setState(state => ({ gifPanelActive: !state.gifPanelActive }))
+        return (
+            <div
+                ref={this.typingAreaRef}
+                className={`
+                    typingarea-component
+                    ${this.props.className}
+                `}>
+                {this.state.gifPanelActive &&
+                    <GifPanel
+                        chatRoom={this.props.chatRoom}
+                        onToggle={() =>
+                            this.setState({ gifPanelActive: false })
                         }
                     />
-                )}
-                <Button
-                    className="popup-button emoji-button"
-                    icon="sprite-fm-theme icon-emoji"
-                    iconHovered="sprite-fm-theme icon-emoji-active"
-                    disabled={this.props.disabled}>
-                    <DropdownEmojiSelector
-                        className="popup emoji"
-                        vertOffset={17}
-                        onClick={self.onEmojiClicked.bind(self)} />
-                </Button>
-                <hr />
+                }
                 <div
-                    className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
-                    style={textareaScrollBlockStyles}>
-                    <div className="messages-textarea-placeholder">
-                        {self.state.typedMessage ? null : <Emoji>{placeholder}</Emoji>}
+                    className={`
+                        chat-textarea
+                        ${this.props.className}
+                    `}>
+                    {emojiAutocomplete}
+                    {self.props.children}
+                    {self.props.editing ? null : (
+                        <Button
+                            className={`
+                                popup-button
+                                gif-button
+                                ${this.state.gifPanelActive ? 'active' : ''}
+                            `}
+                            icon="small-icon gif"
+                            disabled={this.props.disabled}
+                            onClick={() =>
+                                this.setState(state => ({ gifPanelActive: !state.gifPanelActive }))
+                            }
+                        />
+                    )}
+                    <Button
+                        className="popup-button emoji-button"
+                        icon="sprite-fm-theme icon-emoji"
+                        iconHovered="sprite-fm-theme icon-emoji-active"
+                        disabled={this.props.disabled}>
+                        <DropdownEmojiSelector
+                            className="popup emoji"
+                            vertOffset={17}
+                            onClick={this.onEmojiClicked}
+                        />
+                    </Button>
+                    <hr />
+                    <div
+                        className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
+                        style={textareaScrollBlockStyles}>
+                        <div className="messages-textarea-placeholder">
+                            {self.state.typedMessage ? null : <Emoji>{placeholder}</Emoji>}
+                        </div>
+                        <textarea
+                            className={`
+                                ${messageTextAreaClasses}
+                                ${disabledTextarea ? 'disabled' : ''}
+                            `}
+                            onKeyUp={this.onTypeAreaKeyUp}
+                            onKeyDown={this.onTypeAreaKeyDown}
+                            onBlur={this.onTypeAreaBlur}
+                            onChange={this.onTypeAreaChange}
+                            onSelect={this.onTypeAreaSelect}
+                            onCopyCapture={this.onCopyCapture}
+                            onPasteCapture={this.onPasteCapture}
+                            onCutCapture={this.onCutCapture}
+                            value={self.state.typedMessage}
+                            style={textareaStyles}
+                            disabled={disabledTextarea}
+                            readOnly={disabledTextarea}
+                        />
+                        <div className="message-preview" />
                     </div>
-                    <textarea
-                        className={`
-                            ${messageTextAreaClasses}
-                            ${disabledTextarea ? 'disabled' : ''}
-                        `}
-                        onKeyUp={self.onTypeAreaKeyUp.bind(self)}
-                        onKeyDown={self.onTypeAreaKeyDown.bind(self)}
-                        onBlur={self.onTypeAreaBlur.bind(self)}
-                        onChange={self.onTypeAreaChange.bind(self)}
-                        onSelect={self.onTypeAreaSelect.bind(self)}
-                        value={self.state.typedMessage}
-                        style={textareaStyles}
-                        disabled={disabledTextarea}
-                        readOnly={disabledTextarea}
-                        onCopyCapture={self.onCopyCapture.bind(self)}
-                        onPasteCapture={self.onPasteCapture.bind(self)}
-                        onCutCapture={self.onCutCapture.bind(self)}
-                    />
-                    <div className="message-preview" />
                 </div>
+                {buttons}
             </div>
-            {buttons}
-        </div>
+        );
     }
-};
+}

@@ -11,6 +11,7 @@ import { PerfectScrollbar } from '../../../ui/perfectScrollbar';
 import Guest from './guest.jsx';
 
 export default class Sidebar extends MegaRenderMixin {
+    containerRef = React.createRef();
     historyPanel = null;
 
     constructor(props) {
@@ -115,7 +116,7 @@ export default class Sidebar extends MegaRenderMixin {
                     className="in-call"
                     onDeleteClicked={onDeleteMessage}
                 />
-                <ComposedTextArea chatRoom={chatRoom} parent={this} />
+                <ComposedTextArea chatRoom={chatRoom} parent={this} containerRef={this.containerRef} />
             </>
         );
     };
@@ -141,6 +142,7 @@ export default class Sidebar extends MegaRenderMixin {
 
         return (
             <div
+                ref={this.containerRef}
                 className={`
                     sidebar
                     ${view === Call.VIEW.CHAT ? 'chat-opened' : 'theme-dark-forced'}

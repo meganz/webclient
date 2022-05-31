@@ -651,6 +651,7 @@ export class ConversationRightArea extends MegaRenderMixin {
 }
 
 export class ConversationPanel extends MegaRenderMixin {
+    containerRef = React.createRef();
     $container = null;
     $messages = null;
 
@@ -1751,7 +1752,12 @@ export class ConversationPanel extends MegaRenderMixin {
                         {topicInfo}
                     </div>
 
-                    <div className={"messages-block " + additionalClass}>
+                    <div
+                        className={`
+                            messages-block
+                            ${additionalClass}
+                        `}
+                        ref={this.containerRef}>
 
                         <HistoryPanel
                             {...this.props}
@@ -1813,7 +1819,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             </div>
                         </div>
                         ) :
-                        <ComposedTextArea chatRoom={room} parent={this} />
+                        <ComposedTextArea chatRoom={room} parent={this} containerRef={this.containerRef} />
                     }
                     </div>
                 </div>

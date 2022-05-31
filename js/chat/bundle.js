@@ -15,8 +15,8 @@ var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: external "ReactDOM"
 var external_ReactDOM_ = __webpack_require__(533);
 var external_ReactDOM_default = __webpack_require__.n(external_ReactDOM_);
-// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 22 modules
-var conversations = __webpack_require__(387);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 23 modules
+var conversations = __webpack_require__(592);
 ;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
 class ChatRouting {
   constructor(megaChatInstance) {
@@ -4170,27 +4170,24 @@ ChatRoom.prototype.showMissingUnifiedKeyDialog = function () {
   return msgDialog(`warningb:!^${l[82]}!${l[23433]}`, null, l[200], "An error occurred while trying to join this call. Reloading MEGAchat may fix the problem. If the problem persists, please contact support@mega.nz", reload => reload ? M.reload() : null, 1);
 };
 
-ChatRoom.prototype.unifiedKeyAssert = function () {
-  const {
-    chatMode,
-    unifiedKey
-  } = this.protocolHandler;
-
-  if (chatMode !== strongvelope.CHAT_MODE.PUBLIC) {
-    return true;
-  }
-
-  if (!unifiedKey || unifiedKey && unifiedKey.length !== 16 || !this.ck || this.ck && this.ck.length !== 32) {
-    console.error('Error instantiating a call -- missing `unifiedKey`/malformed `ck` for public chat.');
+ChatRoom.prototype.hasInvalidKeys = function () {
+  if (!is_chatlink && this.type === 'public') {
     const {
-      master,
-      slaves
-    } = mBroadcaster.crossTab;
-    eventlog(99751, JSON.stringify([1, buildVersion.version || 'dev', String(this.chatId).length | 0, this.type | 0, this.isMeeting | 0, typeof unifiedKey, String(unifiedKey || '').length | 0, typeof this.ck, String(this.ck).length | 0, !!master | 0, Object(slaves).length | 0]));
-    return false;
+      unifiedKey
+    } = this.protocolHandler || {};
+
+    if (!unifiedKey || unifiedKey && unifiedKey.length !== 16 || !this.ck || this.ck && this.ck.length !== 32) {
+      console.error('Error instantiating room/call -- missing `unifiedKey`/malformed `ck` for public chat.');
+      const {
+        master,
+        slaves
+      } = mBroadcaster.crossTab;
+      eventlog(99751, JSON.stringify([1, buildVersion.version || 'dev', String(this.chatId).length | 0, this.type | 0, this.isMeeting | 0, typeof unifiedKey, String(unifiedKey || '').length | 0, typeof this.ck, String(this.ck).length | 0, !!master | 0, Object(slaves).length | 0]));
+      return true;
+    }
   }
 
-  return true;
+  return false;
 };
 
 ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio, video, callId) {
@@ -4206,7 +4203,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     return;
   }
 
-  if (!this.unifiedKeyAssert()) {
+  if (this.hasInvalidKeys()) {
     return this.showMissingUnifiedKeyDialog();
   }
 
@@ -4288,7 +4285,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
     return;
   }
 
-  if (!this.unifiedKeyAssert()) {
+  if (this.hasInvalidKeys()) {
     return this.showMissingUnifiedKeyDialog();
   }
 
@@ -8861,7 +8858,7 @@ class Nil extends _mixins2__.wl {
 
 /***/ }),
 
-/***/ 387:
+/***/ 592:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -12669,11 +12666,49 @@ Join.VIEW = {
   ACCOUNT: 2,
   UNSUPPORTED: 4
 };
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/alert.jsx
+
+
+const NAMESPACE = 'meetings-alert';
+class Alert extends mixins.wl {
+  render() {
+    const {
+      type,
+      content,
+      onClose
+    } = this.props;
+
+    if (content) {
+      return external_React_default().createElement("div", {
+        className: `
+                        ${NAMESPACE}
+                        ${type ? `${NAMESPACE}-${type}` : ''}
+                    `
+      }, external_React_default().createElement("div", {
+        className: `${NAMESPACE}-content`
+      }, content), onClose && external_React_default().createElement("span", {
+        className: `${NAMESPACE}-close`,
+        onClick: onClose
+      }, external_React_default().createElement("i", {
+        className: "sprite-fm-mono icon-close-component"
+      })));
+    }
+
+    return null;
+  }
+
+}
+Alert.TYPE = {
+  NEUTRAL: 'neutral',
+  MEDIUM: 'medium',
+  HIGH: 'high'
+};
 ;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
 
 var conversationpanel_dec, _dec2, conversationpanel_class;
+
 
 
 
@@ -13199,6 +13234,27 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
     this.containerRef = external_React_default().createRef();
     this.$container = null;
     this.$messages = null;
+    this.state = {
+      startCallPopupIsActive: false,
+      localVideoIsMinimized: false,
+      isFullscreenModeEnabled: false,
+      mouseOverDuringCall: false,
+      attachCloudDialog: false,
+      messagesToggledInCall: false,
+      sendContactDialog: false,
+      confirmDeleteDialog: false,
+      pasteImageConfirmDialog: false,
+      nonLoggedInJoinChatDialog: false,
+      pushSettingsDialog: false,
+      pushSettingsValue: null,
+      messageToBeDeleted: null,
+      callMinimized: false,
+      editing: false,
+      showHistoryRetentionDialog: false,
+      setNonLoggedInJoinChatDlgTrue: null,
+      hasInvalidKeys: null,
+      invalidKeysBanner: null
+    };
 
     this.handleDeleteDialog = msg => {
       if (msg) {
@@ -13224,28 +13280,15 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       return type === call.ZP.TYPE.AUDIO ? chatRoom.startAudioCall() : chatRoom.startVideoCall();
     };
 
-    this.state = {
-      startCallPopupIsActive: false,
-      localVideoIsMinimized: false,
-      isFullscreenModeEnabled: false,
-      mouseOverDuringCall: false,
-      attachCloudDialog: false,
-      messagesToggledInCall: false,
-      sendContactDialog: false,
-      confirmDeleteDialog: false,
-      pasteImageConfirmDialog: false,
-      nonLoggedInJoinChatDialog: false,
-      pushSettingsDialog: false,
-      pushSettingsValue: null,
-      messageToBeDeleted: null,
-      callMinimized: false,
-      editing: false,
-      showHistoryRetentionDialog: false,
-      setNonLoggedInJoinChatDlgTrue: null
-    };
+    const {
+      chatRoom: _chatRoom
+    } = this.props;
+
+    _chatRoom.rebind(`openAttachCloudDialog.${this.getUniqueId()}`, () => this.openAttachCloudDialog());
+
+    _chatRoom.rebind(`openSendContactDialog.${this.getUniqueId()}`, () => this.openSendContactDialog());
+
     this.handleKeyDown = SoonFc(120, ev => this._handleKeyDown(ev));
-    this.props.chatRoom.rebind("openAttachCloudDialog." + this.getUniqueId(), () => this.openAttachCloudDialog());
-    this.props.chatRoom.rebind("openSendContactDialog." + this.getUniqueId(), () => this.openSendContactDialog());
   }
 
   customIsEventuallyVisible() {
@@ -13350,6 +13393,14 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
     self.props.chatRoom._uiIsMounted = true;
     self.props.chatRoom.$rConversationPanel = self;
     self.props.chatRoom.trigger('onComponentDidMount');
+    const hasInvalidKeys = this.props.chatRoom.hasInvalidKeys();
+
+    if (hasInvalidKeys) {
+      this.setState({
+        hasInvalidKeys,
+        invalidKeysBanner: hasInvalidKeys
+      }, () => this.safeForceUpdate());
+    }
   }
 
   eventuallyInit() {
@@ -14182,12 +14233,20 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       icon: "sprite-fm-mono icon-phone",
       onClick: () => startCallDisabled ? false : (0,call.xt)().then(() => this.startCall(call.ZP.TYPE.AUDIO)).catch(() => d && console.warn('Already in a call.'))
     })), topicInfo), external_React_default().createElement("div", {
+      ref: this.containerRef,
       className: `
                             messages-block
                             ${""}
-                        `,
-      ref: this.containerRef
-    }, external_React_default().createElement(historyPanel.Z, (0,esm_extends.Z)({}, this.props, {
+                        `
+    }, this.state.hasInvalidKeys && this.state.invalidKeysBanner && external_React_default().createElement(Alert, {
+      type: Alert.TYPE.HIGH,
+      content: external_React_default().createElement((external_React_default()).Fragment, null, "An error occurred while trying to join this chat. Reloading MEGAchat may fix the problem. ", external_React_default().createElement("a", {
+        onClick: () => M.reload()
+      }, "Reload account")),
+      onClose: () => this.setState({
+        invalidKeysBanner: false
+      })
+    }), external_React_default().createElement(historyPanel.Z, (0,esm_extends.Z)({}, this.props, {
       onMessagesListScrollableMount: mls => {
         this.messagesListScrollable = mls;
       },
@@ -31578,7 +31637,7 @@ function _extends() {
 /******/ 	// Load entry module and return exports
 /******/ 	__webpack_require__(662);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__(387);
+/******/ 	var __webpack_exports__ = __webpack_require__(592);
 /******/ 	
 /******/ })()
 ;

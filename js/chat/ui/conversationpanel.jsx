@@ -22,6 +22,7 @@ import HistoryPanel from "./historyPanel.jsx";
 import ComposedTextArea from "./composedTextArea.jsx";
 import Loading from "./meetings/workflow/loading.jsx";
 import Join from "./meetings/workflow/join.jsx";
+import Alert from './meetings/workflow/alert';
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -655,33 +656,34 @@ export class ConversationPanel extends MegaRenderMixin {
     $container = null;
     $messages = null;
 
+    state = {
+        startCallPopupIsActive: false,
+        localVideoIsMinimized: false,
+        isFullscreenModeEnabled: false,
+        mouseOverDuringCall: false,
+        attachCloudDialog: false,
+        messagesToggledInCall: false,
+        sendContactDialog: false,
+        confirmDeleteDialog: false,
+        pasteImageConfirmDialog: false,
+        nonLoggedInJoinChatDialog: false,
+        pushSettingsDialog: false,
+        pushSettingsValue: null,
+        messageToBeDeleted: null,
+        callMinimized: false,
+        editing: false,
+        showHistoryRetentionDialog: false,
+        setNonLoggedInJoinChatDlgTrue: null,
+        hasInvalidKeys: null,
+        invalidKeysBanner: null
+    };
+
     constructor(props) {
         super(props);
-        this.state = {
-            startCallPopupIsActive: false,
-            localVideoIsMinimized: false,
-            isFullscreenModeEnabled: false,
-            mouseOverDuringCall: false,
-            attachCloudDialog: false,
-            messagesToggledInCall: false,
-            sendContactDialog: false,
-            confirmDeleteDialog: false,
-            pasteImageConfirmDialog: false,
-            nonLoggedInJoinChatDialog: false,
-            pushSettingsDialog: false,
-            pushSettingsValue: null,
-            messageToBeDeleted: null,
-            callMinimized: false,
-            editing: false,
-            showHistoryRetentionDialog: false,
-            setNonLoggedInJoinChatDlgTrue: null
-        };
-
+        const { chatRoom } = this.props;
+        chatRoom.rebind(`openAttachCloudDialog.${this.getUniqueId()}`, () => this.openAttachCloudDialog());
+        chatRoom.rebind(`openSendContactDialog.${this.getUniqueId()}`, () => this.openSendContactDialog());
         this.handleKeyDown = SoonFc(120, (ev) => this._handleKeyDown(ev));
-
-        this.props.chatRoom.rebind("openAttachCloudDialog." + this.getUniqueId(), () => this.openAttachCloudDialog());
-        this.props.chatRoom.rebind("openSendContactDialog." + this.getUniqueId(), () => this.openSendContactDialog());
-
     }
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
@@ -797,6 +799,11 @@ export class ConversationPanel extends MegaRenderMixin {
         self.props.chatRoom._uiIsMounted = true;
         self.props.chatRoom.$rConversationPanel = self;
         self.props.chatRoom.trigger('onComponentDidMount');
+
+        const hasInvalidKeys = this.props.chatRoom.hasInvalidKeys();
+        if (hasInvalidKeys) {
+            this.setState({ hasInvalidKeys, invalidKeysBanner: hasInvalidKeys }, () => this.safeForceUpdate());
+        }
     }
     eventuallyInit(doResize) {
         var self = this;
@@ -1753,11 +1760,23 @@ export class ConversationPanel extends MegaRenderMixin {
                     </div>
 
                     <div
+                        ref={this.containerRef}
                         className={`
                             messages-block
                             ${additionalClass}
-                        `}
-                        ref={this.containerRef}>
+                        `}>
+                        {this.state.hasInvalidKeys && this.state.invalidKeysBanner && (
+                            <Alert
+                                type={Alert.TYPE.HIGH}
+                                content={
+                                    <>
+                                        An error occurred while trying to join this chat. Reloading MEGAchat may fix
+                                        the problem. <a onClick={() => M.reload()}>Reload account</a>
+                                    </>
+                                }
+                                onClose={() => this.setState({ invalidKeysBanner: false })}
+                            />
+                        )}
 
                         <HistoryPanel
                             {...this.props}
@@ -1773,54 +1792,52 @@ export class ConversationPanel extends MegaRenderMixin {
                         {
                             !is_chatlink &&
                             room.state !== ChatRoom.STATE.LEFT &&
-                            (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ?
-                                <JoinCallNotification chatRoom={room} /> : null
+                            (room.havePendingGroupCall() || room.havePendingCall()) &&
+                            navigator.onLine ?
+                                <JoinCallNotification chatRoom={room}/> :
+                                null
                         }
 
-                        {
-                            (
-                                room.isAnonymous()
-                            ) ?
-                        (
-                        <div className="join-chat-block">
-                            <div className="mega-button large positive"
-                                onClick={() => {
-                                    const join = () => {
-                                        megaChat.routing.reinitAndJoinPublicChat(
-                                            room.chatId,
-                                            room.publicChatHandle,
-                                            room.publicChatKey
-                                        ).then(
-                                            () => delete megaChat.initialPubChatHandle,
-                                            ex => console.error("Failed to join room:", ex)
-                                        );
-                                    };
+                        {room.isAnonymous() ?
+                            <div className="join-chat-block">
+                                <div
+                                    className="mega-button large positive"
+                                    onClick={() => {
+                                        const join = () => {
+                                            megaChat.routing.reinitAndJoinPublicChat(
+                                                room.chatId,
+                                                room.publicChatHandle,
+                                                room.publicChatKey
+                                            ).then(
+                                                () => delete megaChat.initialPubChatHandle,
+                                                ex => console.error("Failed to join room:", ex)
+                                            );
+                                        };
 
-                                    if (u_type === 0) {
-                                        return loadSubPage('register');
-                                    }
+                                        if (u_type === 0) {
+                                            return loadSubPage('register');
+                                        }
 
-                                    if (u_type === false) {
+                                        if (u_type === false) {
+                                            clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
+                                            megaChat.loginOrRegisterBeforeJoining(
+                                                room.publicChatHandle,
+                                                false,
+                                                false,
+                                                false,
+                                                join
+                                            );
+                                            return;
+                                        }
+
                                         clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
-                                        megaChat.loginOrRegisterBeforeJoining(
-                                            room.publicChatHandle,
-                                            false,
-                                            false,
-                                            false,
-                                            join
-                                        );
-                                        return;
-                                    }
-
-                                    clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
-                                    join();
-                                }}>
-                                {l[20597] /* `Join Group` */}
-                            </div>
-                        </div>
-                        ) :
-                        <ComposedTextArea chatRoom={room} parent={this} containerRef={this.containerRef} />
-                    }
+                                        join();
+                                    }}>
+                                    {l[20597] /* `Join Group` */}
+                                </div>
+                            </div> :
+                            <ComposedTextArea chatRoom={room} parent={this} containerRef={this.containerRef}/>
+                        }
                     </div>
                 </div>
             </div>

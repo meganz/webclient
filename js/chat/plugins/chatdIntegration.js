@@ -111,8 +111,13 @@ var ChatdIntegration = function(megaChat) {
                     'p': 2
                 };
                 if (chatMode === strongvelope.CHAT_MODE.PUBLIC) {
-                    var chatkey = protocolHandler.packKeyTo([protocolHandler.unifiedKey], contactHash);
-                    entry['ck'] = base64urlencode(chatkey);
+                    const key = protocolHandler.packKeyTo([protocolHandler.unifiedKey], contactHash);
+                    const keyEncoded = base64urlencode(key);
+                    assert(
+                        keyEncoded && keyEncoded.length === 32,
+                        'onNewGroupChatRequest: invalid chat key passed.'
+                    );
+                    entry.ck = keyEncoded;
                 }
                 invited_users.push(entry);
             });
@@ -148,7 +153,9 @@ var ChatdIntegration = function(megaChat) {
             }
 
             if (chatMode === strongvelope.CHAT_MODE.PUBLIC) {
-                mccPacket['ck'] = base64urlencode(myKey);
+                const keyEncoded = base64urlencode(myKey);
+                assert(keyEncoded && keyEncoded.length === 32, 'onNewGroupChatRequest: invalid chat key passed.');
+                mccPacket.ck = keyEncoded;
             }
             megaChat._chatsAwaitingAps[reqi] = opts;
             asyncApiReq(mccPacket)
@@ -1235,14 +1242,20 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
                         if (topic) {
                             if (chatRoom.type === 'public') {
-                                var chatkey = chatRoom.protocolHandler.packKeyTo([chatRoom.protocolHandler.unifiedKey], h);
+                                const chatKey =
+                                    chatRoom.protocolHandler.packKeyTo([chatRoom.protocolHandler.unifiedKey], h);
+                                const chatKeyEncoded = base64urlencode(chatKey);
+                                assert(
+                                    chatKeyEncoded && chatKeyEncoded.length === 32,
+                                    'onAddUserRequest: invalid chat key passed.'
+                                );
                                 asyncApiReq({
                                     "a":"mci",
                                     "id":chatRoom.chatId,
                                     "u": h,
                                     "p": 2,
                                     "ct":base64urlencode(topic),
-                                    "ck":base64urlencode(chatkey),
+                                    "ck":chatKeyEncoded,
                                     "v": Chatd.VERSION
                                 });
                             }
@@ -1274,11 +1287,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     };
 
                     if (chatRoom.type === 'public') {
-                        var chatkey = chatRoom.protocolHandler.packKeyTo(
-                            [chatRoom.protocolHandler.unifiedKey],
-                            h
+                        const chatKey = chatRoom.protocolHandler.packKeyTo([chatRoom.protocolHandler.unifiedKey], h);
+                        const chatKeyEncoded = base64urlencode(chatKey);
+                        assert(
+                            chatKeyEncoded && chatKeyEncoded.length === 32,
+                            'onAddUserRequest: invalid chat key passed.'
                         );
-                        req['ck'] = base64urlencode(chatkey);
+                        req.ck = chatKeyEncoded;
                     }
 
                     asyncApiReq(req);

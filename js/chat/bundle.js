@@ -5705,7 +5705,8 @@ class ComposedTextArea extends mixins.wl {
   render() {
     const {
       chatRoom: room,
-      parent
+      parent,
+      containerRef
     } = this.props;
     return external_React_default().createElement("div", {
       className: "chat-textarea-block"
@@ -5714,6 +5715,7 @@ class ComposedTextArea extends mixins.wl {
     }), external_React_default().createElement(typingArea.j, {
       chatRoom: room,
       className: "main-typing-area",
+      containerRef: containerRef,
       disabled: room.isReadOnly(),
       persist: true,
       onUpEditPressed: () => {
@@ -13194,6 +13196,7 @@ ConversationRightArea.defaultProps = {
 let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360), _dec2 = (0,mixins.LY)(0.7, 9), (conversationpanel_class = class ConversationPanel extends mixins.wl {
   constructor(props) {
     super(props);
+    this.containerRef = external_React_default().createRef();
     this.$container = null;
     this.$messages = null;
 
@@ -14179,7 +14182,11 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       icon: "sprite-fm-mono icon-phone",
       onClick: () => startCallDisabled ? false : (0,call.xt)().then(() => this.startCall(call.ZP.TYPE.AUDIO)).catch(() => d && console.warn('Already in a call.'))
     })), topicInfo), external_React_default().createElement("div", {
-      className: "messages-block "
+      className: `
+                            messages-block
+                            ${""}
+                        `,
+      ref: this.containerRef
     }, external_React_default().createElement(historyPanel.Z, (0,esm_extends.Z)({}, this.props, {
       onMessagesListScrollableMount: mls => {
         this.messagesListScrollable = mls;
@@ -14214,7 +14221,8 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       }
     }, l[20597])) : external_React_default().createElement(composedTextArea.Z, {
       chatRoom: room,
-      parent: this
+      parent: this,
+      containerRef: this.containerRef
     }))));
   }
 
@@ -21005,6 +21013,7 @@ class Guest extends mixins.wl {
 class Sidebar extends mixins.wl {
   constructor(props) {
     super(props);
+    this.containerRef = external_React_default().createRef();
     this.historyPanel = null;
 
     this.renderHead = () => {
@@ -21108,7 +21117,8 @@ class Sidebar extends mixins.wl {
         onDeleteClicked: onDeleteMessage
       }), external_React_default().createElement(composedTextArea.Z, {
         chatRoom: chatRoom,
-        parent: this
+        parent: this,
+        containerRef: this.containerRef
       }));
     };
 
@@ -21136,6 +21146,7 @@ class Sidebar extends mixins.wl {
       onGuestClose
     } = this.props;
     return external_React_default().createElement("div", {
+      ref: this.containerRef,
       className: `
                     sidebar
                     ${view === Call.VIEW.CHAT ? 'chat-opened' : 'theme-dark-forced'}
@@ -25743,6 +25754,9 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
 var applyDecoratedDescriptor = __webpack_require__(229);
+// EXTERNAL MODULE: external "React"
+var external_React_ = __webpack_require__(363);
+var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 var utils = __webpack_require__(79);
 // EXTERNAL MODULE: ./js/chat/mixins.js
@@ -26008,29 +26022,64 @@ var gifPanel = __webpack_require__(722);
 ;// CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
 
 
-var _dec, _dec2, _class, _class2;
-
-
-
-var typingArea_React = __webpack_require__(363);
-
-var typingArea_ReactDOM = __webpack_require__(533);
+var _dec, _dec2, _class;
 
 
 
 
 
 
-let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_class = (_class2 = class TypingArea extends mixins.wl {
+
+
+let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_class = class TypingArea extends mixins.wl {
   constructor(props) {
     super(props);
-    var initialText = this.props.initialText;
+    this.typingAreaRef = external_React_default().createRef();
     this.state = {
       emojiSearchQuery: false,
-      typedMessage: initialText ? initialText : "",
+      typedMessage: '',
       textareaHeight: 20,
       gifPanelActive: false
     };
+
+    this.initScrolling = () => {
+      if (this.typingAreaRef && this.typingAreaRef.current) {
+        this.scrollingInitialised = true;
+        const $textarea = $('textarea:first', this.typingAreaRef.current);
+        const $textareaScrollBlock = $('.textarea-scroll', this.typingAreaRef.current);
+        this.textareaLineHeight = parseInt($textarea.css('line-height'));
+        $textareaScrollBlock.jScrollPane({
+          enableKeyboardNavigation: false,
+          showArrows: true,
+          arrowSize: 5,
+          animateScroll: false,
+          maintainPosition: false
+        });
+      }
+    };
+
+    this.getTextareaMaxHeight = () => {
+      const {
+        containerRef
+      } = this.props;
+
+      if (containerRef && containerRef.current) {
+        return this.isMounted() ? containerRef.current.offsetHeight * 0.4 : 100;
+      }
+
+      return 100;
+    };
+
+    this.onEmojiClicked = this.onEmojiClicked.bind(this);
+    this.onTypeAreaKeyUp = this.onTypeAreaKeyUp.bind(this);
+    this.onTypeAreaKeyDown = this.onTypeAreaKeyDown.bind(this);
+    this.onTypeAreaBlur = this.onTypeAreaBlur.bind(this);
+    this.onTypeAreaChange = this.onTypeAreaChange.bind(this);
+    this.onTypeAreaSelect = this.onTypeAreaSelect.bind(this);
+    this.onCopyCapture = this.onCopyCapture.bind(this);
+    this.onPasteCapture = this.onPasteCapture.bind(this);
+    this.onCutCapture = this.onCutCapture.bind(this);
+    this.state.typedMessage = this.props.initialText || '';
   }
 
   onEmojiClicked(e, slug) {
@@ -26041,7 +26090,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     }
 
     slug = slug[0] === ':' || slug.substr(-1) === ':' ? slug : `:${slug}:`;
-    const textarea = $('.messages-textarea', this.$container)[0];
+    const textarea = $('.messages-textarea', this.typingAreaRef.current)[0];
     const cursorPosition = this.getCursorPosition(textarea);
     this.setState({
       typedMessage: this.state.typedMessage.slice(0, cursorPosition) + slug + this.state.typedMessage.slice(cursorPosition)
@@ -26144,23 +26193,29 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
   }
 
   onConfirmTrigger(val) {
-    var result = this.props.onConfirm(val);
+    const {
+      onConfirm,
+      persist,
+      chatRoom
+    } = this.props;
+    const result = onConfirm(val);
 
     if (val !== false && result !== false) {
-      var $node = $(this.findDOMNode());
-      var $textareaScrollBlock = $('.textarea-scroll', $node);
-      var jsp = $textareaScrollBlock.data('jsp');
+      const $textareaScrollBlock = $('.textarea-scroll', this.typingAreaRef.current);
+      const jsp = $textareaScrollBlock.data('jsp');
       jsp.scrollToY(0);
       $('.jspPane', $textareaScrollBlock).css({
-        'top': 0
+        top: 0
       });
     }
 
-    if (this.props.persist) {
-      var megaChat = this.props.chatRoom.megaChat;
+    if (persist) {
+      const {
+        megaChat
+      } = chatRoom;
 
       if (megaChat.plugins.persistedTypeArea) {
-        megaChat.plugins.persistedTypeArea.removePersistedTypedValue(this.props.chatRoom);
+        megaChat.plugins.persistedTypeArea.removePersistedTypedValue(chatRoom);
       }
     }
 
@@ -26366,32 +26421,24 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
       return;
     }
 
-    if ($('.chat-textarea:visible textarea:visible', this.$container).length > 0 && !$('.chat-textarea:visible textarea:visible:first', this.$container).is(":focus")) {
-      moveCursortoToEnd($('.chat-textarea:visible:first textarea', this.$container)[0]);
+    if ($('.chat-textarea:visible textarea:visible', this.typingAreaRef.current).length > 0 && !$('.chat-textarea:visible textarea:visible:first', this.typingAreaRef.current).is(":focus")) {
+      moveCursortoToEnd($('.chat-textarea:visible:first textarea', this.typingAreaRef.current)[0]);
     }
   }
 
   componentDidMount() {
     super.componentDidMount();
-    var self = this;
-    this.$container = $(typingArea_ReactDOM.findDOMNode(this));
-    chatGlobalEventManager.addEventListener('resize', 'typingArea' + self.getUniqueId(), () => self.handleWindowResize());
-    self._lastTextareaHeight = 20;
-
-    if (self.props.initialText) {
-      self.lastTypedMessage = this.props.initialText;
-    }
-
-    $('.jScrollPaneContainer', self.$container).rebind('forceResize.typingArea' + self.getUniqueId(), function () {
-      self.updateScroll(false);
-    });
+    this._lastTextareaHeight = 20;
+    this.lastTypedMessage = this.props.initialText || this.lastTypedMessage;
+    chatGlobalEventManager.addEventListener('resize', `typingArea${this.getUniqueId()}`, () => this.handleWindowResize());
+    $('.jScrollPaneContainer', this.typingAreaRef.current).rebind(`forceResize.typingArea${this.getUniqueId()}`, () => this.updateScroll(false));
 
     if (!this.scrollingInitialised) {
       this.initScrolling();
     }
 
-    self.triggerOnUpdate(true);
-    self.updateScroll(false);
+    this.triggerOnUpdate(true);
+    this.updateScroll(false);
   }
 
   componentWillMount() {
@@ -26459,44 +26506,6 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     }
   }
 
-  initScrolling() {
-    var self = this;
-    self.scrollingInitialised = true;
-    var $node = $(self.findDOMNode());
-    var $textarea = $('textarea:first', $node);
-    self.textareaLineHeight = parseInt($textarea.css('line-height'));
-    var $textareaScrollBlock = $('.textarea-scroll', $node);
-    $textareaScrollBlock.jScrollPane({
-      enableKeyboardNavigation: false,
-      showArrows: true,
-      arrowSize: 5,
-      animateScroll: false,
-      maintainPosition: false
-    });
-  }
-
-  getTextareaMaxHeight() {
-    var self = this;
-    var textareaMaxHeight = self.props.textareaMaxHeight;
-
-    if (String(textareaMaxHeight).indexOf("%") > -1) {
-      textareaMaxHeight = (parseInt(textareaMaxHeight.replace("%", "")) || 0) / 100;
-
-      if (textareaMaxHeight === 0) {
-        textareaMaxHeight = 100;
-      } else {
-        if (!self.props.chatRoom.$rConversationPanel) {
-          return 100;
-        }
-
-        var $messagesContainer = $('.messages-block', self.props.chatRoom.$rConversationPanel.findDOMNode());
-        textareaMaxHeight = $messagesContainer.height() * textareaMaxHeight;
-      }
-    }
-
-    return textareaMaxHeight;
-  }
-
   updateScroll() {
     var self = this;
 
@@ -26504,7 +26513,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
       return;
     }
 
-    var $node = self.$node = self.$node || $(self.findDOMNode());
+    var $node = self.$node = self.$node || this.typingAreaRef.current;
     var $textarea = self.$textarea = self.$textarea || $('textarea:first', $node);
     var $textareaClone = self.$textareaClone = self.$textareaClone || $('.message-preview', $node);
     var textareaMaxHeight = self.getTextareaMaxHeight();
@@ -26662,12 +26671,12 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     var buttons = null;
 
     if (self.props.showButtons === true) {
-      buttons = [typingArea_React.createElement(ui_buttons.Button, {
+      buttons = [external_React_default().createElement(ui_buttons.Button, {
         key: "save",
         className: `${"mega-button right"} positive`,
         label: l[776],
         onClick: self.onSaveClicked.bind(self)
-      }), typingArea_React.createElement(ui_buttons.Button, {
+      }), external_React_default().createElement(ui_buttons.Button, {
         key: "cancel",
         className: "mega-button right",
         label: l[1718],
@@ -26688,7 +26697,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     var emojiAutocomplete = null;
 
     if (self.state.emojiSearchQuery) {
-      emojiAutocomplete = typingArea_React.createElement(EmojiAutocomplete, {
+      emojiAutocomplete = external_React_default().createElement(EmojiAutocomplete, {
         emojiSearchQuery: self.state.emojiSearchQuery,
         emojiStartPos: self.state.emojiStartPos,
         emojiEndPos: self.state.emojiEndPos,
@@ -26769,65 +26778,70 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
 
     placeholder = placeholder.replace("%s", roomTitle);
     var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
-    return typingArea_React.createElement("div", {
-      className: "typingarea-component " + self.props.className
-    }, this.state.gifPanelActive && typingArea_React.createElement(gifPanel.ZP, {
+    return external_React_default().createElement("div", {
+      ref: this.typingAreaRef,
+      className: `
+                    typingarea-component
+                    ${this.props.className}
+                `
+    }, this.state.gifPanelActive && external_React_default().createElement(gifPanel.ZP, {
       chatRoom: this.props.chatRoom,
       onToggle: () => this.setState({
         gifPanelActive: false
       })
-    }), typingArea_React.createElement("div", {
-      className: "chat-textarea " + self.props.className
-    }, emojiAutocomplete, self.props.children, self.props.editing ? null : typingArea_React.createElement(ui_buttons.Button, {
+    }), external_React_default().createElement("div", {
       className: `
-                            popup-button
-                            gif-button
-                            ${this.state.gifPanelActive ? 'active' : ''}
-                        `,
+                        chat-textarea
+                        ${this.props.className}
+                    `
+    }, emojiAutocomplete, self.props.children, self.props.editing ? null : external_React_default().createElement(ui_buttons.Button, {
+      className: `
+                                popup-button
+                                gif-button
+                                ${this.state.gifPanelActive ? 'active' : ''}
+                            `,
       icon: "small-icon gif",
       disabled: this.props.disabled,
       onClick: () => this.setState(state => ({
         gifPanelActive: !state.gifPanelActive
       }))
-    }), typingArea_React.createElement(ui_buttons.Button, {
+    }), external_React_default().createElement(ui_buttons.Button, {
       className: "popup-button emoji-button",
       icon: "sprite-fm-theme icon-emoji",
       iconHovered: "sprite-fm-theme icon-emoji-active",
       disabled: this.props.disabled
-    }, typingArea_React.createElement(emojiDropdown.l, {
+    }, external_React_default().createElement(emojiDropdown.l, {
       className: "popup emoji",
       vertOffset: 17,
-      onClick: self.onEmojiClicked.bind(self)
-    })), typingArea_React.createElement("hr", null), typingArea_React.createElement("div", {
+      onClick: this.onEmojiClicked
+    })), external_React_default().createElement("hr", null), external_React_default().createElement("div", {
       className: "chat-textarea-scroll textarea-scroll jScrollPaneContainer",
       style: textareaScrollBlockStyles
-    }, typingArea_React.createElement("div", {
+    }, external_React_default().createElement("div", {
       className: "messages-textarea-placeholder"
-    }, self.state.typedMessage ? null : typingArea_React.createElement(utils.Emoji, null, placeholder)), typingArea_React.createElement("textarea", {
+    }, self.state.typedMessage ? null : external_React_default().createElement(utils.Emoji, null, placeholder)), external_React_default().createElement("textarea", {
       className: `
-                            ${"messages-textarea"}
-                            ${disabledTextarea ? 'disabled' : ''}
-                        `,
-      onKeyUp: self.onTypeAreaKeyUp.bind(self),
-      onKeyDown: self.onTypeAreaKeyDown.bind(self),
-      onBlur: self.onTypeAreaBlur.bind(self),
-      onChange: self.onTypeAreaChange.bind(self),
-      onSelect: self.onTypeAreaSelect.bind(self),
+                                ${"messages-textarea"}
+                                ${disabledTextarea ? 'disabled' : ''}
+                            `,
+      onKeyUp: this.onTypeAreaKeyUp,
+      onKeyDown: this.onTypeAreaKeyDown,
+      onBlur: this.onTypeAreaBlur,
+      onChange: this.onTypeAreaChange,
+      onSelect: this.onTypeAreaSelect,
+      onCopyCapture: this.onCopyCapture,
+      onPasteCapture: this.onPasteCapture,
+      onCutCapture: this.onCutCapture,
       value: self.state.typedMessage,
       style: textareaStyles,
       disabled: disabledTextarea,
-      readOnly: disabledTextarea,
-      onCopyCapture: self.onCopyCapture.bind(self),
-      onPasteCapture: self.onPasteCapture.bind(self),
-      onCutCapture: self.onCutCapture.bind(self)
-    }), typingArea_React.createElement("div", {
+      readOnly: disabledTextarea
+    }), external_React_default().createElement("div", {
       className: "message-preview"
     }))), buttons);
   }
 
-}, _class2.defaultProps = {
-  'textareaMaxHeight': "40%"
-}, _class2), ((0,applyDecoratedDescriptor.Z)(_class.prototype, "updateScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "updateScroll"), _class.prototype), (0,applyDecoratedDescriptor.Z)(_class.prototype, "handleWindowResize", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "handleWindowResize"), _class.prototype)), _class));
+}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "updateScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "updateScroll"), _class.prototype), (0,applyDecoratedDescriptor.Z)(_class.prototype, "handleWindowResize", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "handleWindowResize"), _class.prototype)), _class));
 
 /***/ }),
 

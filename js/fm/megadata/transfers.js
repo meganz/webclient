@@ -887,9 +887,9 @@ MegaData.prototype.doFlushTransfersDynList = function(aNumNodes) {
 
 MegaData.prototype.tfsResizeHandler = SoonFc(function() {
 
-    // if (M.currentdirid === 'transfers')
-    if (M.getTransferElements()) {
-        var T = M.getTransferTableLengths();
+    const T = M.getTransferTableLengths();
+
+    if (T) {
 
         if (d) {
             console.log('resize.tfsdynlist', JSON.stringify(T));
@@ -909,8 +909,7 @@ MegaData.prototype.getTransferTableLengths = function() {
         return false;
     }
     var used = te.domTable.querySelectorAll('tr').length;
-    var size = (Math.ceil(te.domScrollingTable.offsetHeight / 32) | 0) + 1;
-
+    var size = (Math.ceil(te.domScrollingTable.offsetHeight / 32) || 27) + 1;
     return { size: size, used: used, left: size - used };
 };
 

@@ -1960,38 +1960,34 @@ ChatRoom.prototype.showMissingUnifiedKeyDialog = function() {
     );
 };
 
-ChatRoom.prototype.unifiedKeyAssert = function() {
-    const { chatMode, unifiedKey } = this.protocolHandler;
-
-    if (chatMode !== strongvelope.CHAT_MODE.PUBLIC) {
-        return true;
+ChatRoom.prototype.hasInvalidKeys = function() {
+    if (!is_chatlink && this.type === 'public') {
+        const { unifiedKey } = this.protocolHandler || {};
+        if (
+            !unifiedKey || (unifiedKey && unifiedKey.length !== 16) ||
+            !this.ck || (this.ck && this.ck.length !== 32)
+        ) {
+            console.error('Error instantiating room/call -- missing `unifiedKey`/malformed `ck` for public chat.');
+            const { master, slaves } = mBroadcaster.crossTab;
+            eventlog(
+                99751,
+                JSON.stringify([
+                    1,
+                    buildVersion.version || 'dev',
+                    String(this.chatId).length | 0,
+                    this.type | 0,
+                    this.isMeeting | 0,
+                    typeof unifiedKey,
+                    String(unifiedKey || '').length | 0,
+                    typeof this.ck,
+                    String(this.ck).length | 0,
+                    (!!master) | 0,
+                    Object(slaves).length | 0])
+            );
+            return true;
+        }
     }
-
-    if (
-        !unifiedKey || (unifiedKey && unifiedKey.length !== 16) ||
-        !this.ck || (this.ck && this.ck.length !== 32)
-    ) {
-        console.error('Error instantiating a call -- missing `unifiedKey`/malformed `ck` for public chat.');
-        const { master, slaves } = mBroadcaster.crossTab;
-        eventlog(
-            99751,
-            JSON.stringify([
-                1,
-                buildVersion.version || 'dev',
-                String(this.chatId).length | 0,
-                this.type | 0,
-                this.isMeeting | 0,
-                typeof unifiedKey,
-                String(unifiedKey || '').length | 0,
-                typeof this.ck,
-                String(this.ck).length | 0,
-                (!!master) | 0,
-                Object(slaves).length | 0])
-        );
-        return false;
-    }
-
-    return true;
+    return false;
 };
 
 ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio, video, callId) {
@@ -2004,7 +2000,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
     if (this.meetingsLoading) {
         return;
     }
-    if (!this.unifiedKeyAssert()) {
+    if (this.hasInvalidKeys()) {
         return this.showMissingUnifiedKeyDialog();
     }
 
@@ -2106,7 +2102,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
         return;
     }
 
-    if (!this.unifiedKeyAssert()) {
+    if (this.hasInvalidKeys()) {
         return this.showMissingUnifiedKeyDialog();
     }
 

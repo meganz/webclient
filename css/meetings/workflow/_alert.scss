@@ -1,0 +1,38 @@
+.meetings-alert {
+    position: absolute;
+    top: 5px;
+    left: 8px;
+    width: calc(100% - 22px);
+    border-radius: 12px;
+    background: var(--secondary-orange);
+    z-index: 15;
+
+    &-neutral { background: var(--secondary-grey); }
+    &-medium { background: var(--secondary-orange); }
+    &-high { background: var(--secondary-red); }
+
+    &-content {
+        padding: 12px 40px 12px 12px;
+        font: var(--text-body1);
+        color: var(--secondary-white);
+
+        a {
+            color: var(--secondary-white);
+            text-decoration: underline;
+        }
+    }
+
+    &-close {
+        position: absolute;
+        top: 50%;
+        right: 14px;
+        transform: translateY(-50%);
+        cursor: pointer;
+
+        i {
+            display: block;
+            --icon-size: 24px;
+            --mask-color: var(--secondary-white);
+        }
+    }
+}

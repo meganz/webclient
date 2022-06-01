@@ -13393,14 +13393,16 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
     self.props.chatRoom._uiIsMounted = true;
     self.props.chatRoom.$rConversationPanel = self;
     self.props.chatRoom.trigger('onComponentDidMount');
-    const hasInvalidKeys = this.props.chatRoom.hasInvalidKeys();
 
-    if (hasInvalidKeys) {
-      this.setState({
-        hasInvalidKeys,
-        invalidKeysBanner: hasInvalidKeys
-      }, () => this.safeForceUpdate());
-    }
+    ChatdIntegration._waitForProtocolHandler(this.props.chatRoom, () => {
+      if (this.isMounted()) {
+        const hasInvalidKeys = this.props.chatRoom.hasInvalidKeys();
+        this.setState({
+          hasInvalidKeys,
+          invalidKeysBanner: hasInvalidKeys
+        }, () => this.safeForceUpdate());
+      }
+    });
   }
 
   eventuallyInit() {

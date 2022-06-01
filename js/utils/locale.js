@@ -770,7 +770,9 @@ function formatCurrency(value, currency, display, noDecimals) {
 
     // Polyfill for narrow symbol format as lacking support on Safari and old browers
     if (narrowSymbol) {
-        result = result.replace(/([A-Z]{2})/, '');
+
+        // Cover NZ$, $NZ kinds case to just $ and not change something like NZD
+        result = result.replace(/\b[A-Z]{2}\b/, '');
     }
 
     // If this is number only, remove currency code

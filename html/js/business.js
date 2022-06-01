@@ -161,12 +161,18 @@ const businessProductPage = {
                 $('.euro-price', $businessCard).text('');
             }
 
+
+
             $('.js-min-price span', $businessCard).addClass('big').text(
                 formatCurrency(minPrice, currency) + asterisk
             );
             $('.js-min-users span', $businessCard).text(minUsers);
-            $('.js-min-storage span', $businessCard).text(`${this.businessPlanData.bd.ba.s / 1024} ${l[20160]}`);
-            $('.js-min-transfer span', $businessCard).text(`${this.businessPlanData.bd.ba.t / 1024} ${l[20160]}`);
+            $('.js-min-storage span', $businessCard).text(
+                `${bytesToSize(this.businessPlanData.bd.ba.s * 1024 * 1024 * 1024, 0)}`
+            );
+            $('.js-min-transfer span', $businessCard).text(
+                `${bytesToSize(this.businessPlanData.bd.ba.t * 1024 * 1024 * 1024, 0)}`
+            );
             $('.js-price-per-user strong', $businessCard).text(formatCurrency(userPrice, currency));
             $('.js-price-per-storage strong', $businessCard).text(formatCurrency(storagePrice, currency));
             $('.js-price-per-transfer strong', $businessCard).text(formatCurrency(transferPrice, currency));

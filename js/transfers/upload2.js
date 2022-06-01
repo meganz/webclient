@@ -1095,12 +1095,9 @@ var ulmanager = {
         var n;
         var uq = File.ul;
 
-        // @todo finally deprecate around the codebase?
-        if (fmconfig.ul_skipIdentical !== undefined) {
-            mega.config.remove('ul_skipIdentical');
-        }
-
-        if (identical && fmconfig.ul_skipIdentical) {
+        const skipIdentical = fmconfig.ul_skipIdentical || File.file.chatid;
+        if (identical && skipIdentical) {
+            // If attaching to chat apply apps behaviour and use the existing node.
             n = identical;
         }
         else if ((!M.h[uq.hash] || !M.h[uq.hash].size) && !identical) {
@@ -1116,7 +1113,9 @@ var ulmanager = {
                 eventlog(99749, JSON.stringify([1, parseInt(uq.size), parseInt(n.s)]));
                 return ulmanager.ulStart(File);
             }
-            // identical = n;
+            if (skipIdentical) {
+                identical = n;
+            }
         }
         if (!n) {
             return ulmanager.ulStart(File);
@@ -1132,7 +1131,7 @@ var ulmanager = {
         }, {
             uq: uq,
             n: n,
-            skipfile: (fmconfig.ul_skipIdentical && identical),
+            skipfile: skipIdentical && identical,
             callback: function(res, ctx) {
                 if (d) {
                     ulmanager.logger.info('[%s] deduplication result:', ctx.n.h, res.e, res, ctx.skipfile);
@@ -1148,9 +1147,9 @@ var ulmanager = {
                     ulmanager.ulStart(File);
                 }
                 else if (ctx.skipfile) {
-                    uq.skipfile = true;
+                    uq.skipfile = !File.file.chatid;
                     ulmanager.ulIDToNode[ulmanager.getGID(uq)] = ctx.n.h;
-                    M.ulcomplete(uq);
+                    M.ulcomplete(uq, ctx.n.h);
                     File.file.ul_failed = false;
                     File.file.retries = 0;
                     File.file.done_starting();

@@ -2087,6 +2087,14 @@ function showShareDialogPermMenu($this, x, y) {
     onIdle(() => {
         $permissionMenu.removeClass('o-hidden');
     });
+
+    $permissionMenu.rebind('mouseover.showTipMsg', () => {
+        $('.share-dialog-bottom-msg span', $shareDialog).removeClass('v-hidden');
+    });
+
+    $permissionMenu.rebind('mouseout.hideTipMsg', () => {
+        $('.share-dialog-bottom-msg span', $shareDialog).addClass('v-hidden');
+    });
 }
 
 /**

@@ -1117,7 +1117,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20193] = l[20193].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20194] = l[20194].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20195] = l[20195].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[23708] = l[23708].replace('[B]', '').replace('[/B]', '');
+    l[23708] = l[23708].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[23709] = l[23709].replace('[B]', '').replace('[/B]', '');
     l['23789.s'] = escapeHTML(l[23789]).replace('%1', '<span></span>');
     l['23790.s'] = escapeHTML(l[23790]).replace('%1', '<span></span>');

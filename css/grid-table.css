@@ -135,7 +135,7 @@
 
 .grid-wrapper {
     box-sizing: content-box;
-    margin: 0 26px;
+    margin: 0;
     min-height: 100%;
     min-width: calc(100% - 52px);
     position: relative;
@@ -483,6 +483,7 @@ table tr.ui-selected .link-transfer-status {
 }
 
 .files-grid-view.fm .column-settings.overlap {
+    margin-top: 5px;
     border-left: 1px solid var(--stroke-grey-2);
 }
 

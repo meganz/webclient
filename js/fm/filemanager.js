@@ -2525,6 +2525,22 @@ FileManager.prototype.initUIKeyEvents = function() {
          * other day :)
          */
         if (
+            page === 'fm/recents' &&
+            !slideshowid &&
+            !$.dialog
+        ) {
+            // left or right
+            if (e.keyCode === 37 || e.keyCode === 39) {
+                M.recentsRender.keySelectPrevNext(e.keyCode === 39 | 0 || -1, e.shiftKey);
+            }
+            // up or down
+            else if (e.keyCode === 38 || e.keyCode === 40) {
+                M.recentsRender.keySelectUpDown(e.keyCode === 40 | 0 || -1, e.shiftKey);
+            }
+
+            return;
+        }
+        else if (
             is_selection_manager_available &&
             !is_transfers_or_accounts &&
             !$.dialog &&
@@ -2548,7 +2564,6 @@ FileManager.prototype.initUIKeyEvents = function() {
                 else {
                     selectionManager.select_grid_down(e.shiftKey, true);
                 }
-
             }
         }
 

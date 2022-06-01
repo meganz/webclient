@@ -20250,13 +20250,15 @@ class ParticipantsNotice extends mixins.wl {
   constructor(props) {
     super(props);
 
-    this.renderUserAlone = () => !this.props.stayOnEnd && external_React_default().createElement("div", {
+    this.renderUserAlone = () => external_React_default().createElement("div", {
       className: `
                 ${ParticipantsNotice.NAMESPACE}
                 theme-dark-forced
                 user-alone
             `
-    }, external_React_default().createElement("div", {
+    }, this.props.stayOnEnd ? external_React_default().createElement("div", {
+      className: `${ParticipantsNotice.NAMESPACE}-heading`
+    }, external_React_default().createElement("h1", null, this.props.everHadPeers ? l.only_one_here : l.waiting_for_others)) : external_React_default().createElement("div", {
       className: `${ParticipantsNotice.NAMESPACE}-content user-alone`
     }, external_React_default().createElement("h3", null, l.only_one_here), external_React_default().createElement("p", {
       className: "theme-dark-forced"
@@ -20306,10 +20308,19 @@ class ParticipantsNotice extends mixins.wl {
     };
   }
 
+  specShouldComponentUpdate(newProps) {
+    const {
+      stayOnEnd,
+      hasLeft
+    } = this.props;
+    return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft;
+  }
+
   render() {
     const {
       sfuApp,
       call,
+      hasLeft,
       streamContainer
     } = this.props;
 
@@ -20320,7 +20331,7 @@ class ParticipantsNotice extends mixins.wl {
     return external_React_default().createElement((external_React_default()).Fragment, null, call.isSharingScreen() ? null : external_React_default().createElement(StreamNode, {
       className: "local-stream-mirrored",
       stream: call.getLocalStream()
-    }), streamContainer(call.left ? this.renderUserAlone() : this.renderUserWaiting()));
+    }), streamContainer(hasLeft ? this.renderUserAlone() : this.renderUserWaiting()));
   }
 
 }
@@ -20640,6 +20651,7 @@ class stream_Stream extends mixins.wl {
         chatRoom,
         streams,
         stayOnEnd,
+        everHadPeers,
         onInviteToggle,
         onStayConfirm,
         onCallEnd
@@ -20657,7 +20669,9 @@ class stream_Stream extends mixins.wl {
         return external_React_default().createElement(ParticipantsNotice, {
           sfuApp: sfuApp,
           call: call,
+          hasLeft: call.left,
           chatRoom: chatRoom,
+          everHadPeers: everHadPeers,
           streamContainer: streamContainer,
           link: this.state.link,
           stayOnEnd: stayOnEnd,
@@ -21715,6 +21729,7 @@ class Call extends mixins.wl {
       offline: false,
       ephemeralAccounts: [],
       stayOnEnd: !!mega.config.get('callemptytout'),
+      everHadPeers: false,
       guest: Call.isGuest()
     };
 
@@ -21778,6 +21793,17 @@ class Call extends mixins.wl {
           this.setState({
             stayOnEnd: !!mega.config.get('callemptytout')
           });
+        }
+
+        if (!this.state.everHadPeers) {
+          this.setState({
+            everHadPeers: true
+          });
+        }
+
+        if (this.callStartTimeout) {
+          clearTimeout(this.callStartTimeout);
+          delete this.callStartTimeout;
         }
       });
       chatRoom.rebind('onCallEnd.callComp', () => this.props.minimized && this.props.onCallEnd());
@@ -21957,6 +21983,10 @@ class Call extends mixins.wl {
     window.removeEventListener('offline', this.handleCallOffline);
     window.removeEventListener('online', this.handleCallOnline);
     this.unbindCallEvents();
+
+    if (this.callStartTimeout) {
+      clearTimeout(this.callStartTimeout);
+    }
   }
 
   componentDidMount() {
@@ -21971,6 +22001,29 @@ class Call extends mixins.wl {
     window.addEventListener('online', this.handleCallOnline);
     this.bindCallEvents();
     ['reconnecting', 'end_call'].map(sound => ion.sound.preload(sound));
+    this.callStartTimeout = setTimeout(() => {
+      const {
+        call
+      } = this.props;
+
+      if (!mega.config.get('callemptytout') && !call.peers.length) {
+        call.left = true;
+        call.initCallTimeout();
+
+        if (!Call.isExpanded()) {
+          this.showTimeoutDialog();
+        }
+      }
+
+      delete this.callStartTimeout;
+    }, 300000);
+    setTimeout(() => {
+      if (this.props.call.peers.length) {
+        this.setState({
+          everHadPeers: true
+        });
+      }
+    }, 2000);
   }
 
   render() {
@@ -21994,7 +22047,8 @@ class Call extends mixins.wl {
       ephemeralAccounts,
       guest,
       offline,
-      stayOnEnd
+      stayOnEnd,
+      everHadPeers
     } = this.state;
     const STREAM_PROPS = {
       mode,
@@ -22006,6 +22060,7 @@ class Call extends mixins.wl {
       chatRoom,
       parent,
       stayOnEnd,
+      everHadPeers,
       isOnHold: sfuApp.sfuClient.isOnHold(),
       onSpeakerChange: this.handleSpeakerChange,
       onInviteToggle: this.handleInviteToggle,

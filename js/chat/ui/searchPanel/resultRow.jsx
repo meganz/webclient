@@ -148,43 +148,7 @@ class ChatRow extends MegaRenderMixin {
 class MemberRow extends MegaRenderMixin {
     render() {
         const { data, matches, room, contact, onResultOpen } = this.props;
-        const hasHighlight = matches && !!matches.length;
         const isGroup = room && roomIsGroup(room);
-        const userCard = {
-            graphic: (
-                // `Graphic` result of member type -- the last activity status is shown as graphic icon
-                <div className="graphic">
-                    {isGroup ?
-                        <OFlowParsedHTML>
-                            {megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)}
-                        </OFlowParsedHTML> :
-                        <>
-                            <OFlowParsedHTML>
-                                {megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)}
-                            </OFlowParsedHTML>
-                            <ContactPresence contact={contact}/>
-                        </>
-                    }
-                </div>
-            ),
-            textual: (
-                // `Textual` result of member type -- last activity as plain text
-                <div className="textual">
-                    {isGroup ?
-                        <>
-                            <span>
-                                <OFlowEmoji>{room.topic || room.getRoomTitle()}</OFlowEmoji>
-                            </span>
-                            <MembersAmount room={room}/>
-                        </> :
-                        <>
-                            <OFlowEmoji>{nicknames.getNickname(data)}</OFlowEmoji>
-                            <LastActivity contact={contact} showLastGreen={true}/>
-                        </>
-                    }
-                </div>
-            )
-        };
 
         return (
             <div
@@ -199,7 +163,19 @@ class MemberRow extends MegaRenderMixin {
                     </div> :
                     <Avatar contact={contact}/>}
                 <div className={USER_CARD_CLASS}>
-                    {userCard[hasHighlight ? 'graphic' : 'textual']}
+                    <div className="graphic">
+                        {isGroup ?
+                            <OFlowParsedHTML>
+                                {megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)}
+                            </OFlowParsedHTML> :
+                            <>
+                                <OFlowParsedHTML>
+                                    {megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)}
+                                </OFlowParsedHTML>
+                                <ContactPresence contact={contact}/>
+                            </>
+                        }
+                    </div>
                 </div>
                 <div className="clear"/>
             </div>

@@ -83,6 +83,16 @@ class ConversationsListItem extends MegaRenderMixin {
         }
     }
 
+    getConversationTimestamp = () => {
+        const { chatRoom } = this.props;
+        if (chatRoom) {
+            const lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
+            const timestamp = lastMessage && lastMessage.delay || chatRoom.ctime;
+            return todayOrYesterday(timestamp * 1000) ? getTimeMarker(timestamp) : time2date(timestamp, 17);
+        }
+        return null;
+    };
+
     @timing(0.7, 8)
     render() {
         var classString = "";
@@ -158,14 +168,12 @@ class ConversationsListItem extends MegaRenderMixin {
         var inCallDiv = null;
 
         var lastMessageDiv = null;
-        var lastMessageDatetimeDiv = null;
 
         var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
         var lastMsgDivClasses;
         if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
             lastMsgDivClasses = this._lastMsgDivClassesCache;
             lastMessageDiv = this._lastMessageDivCache;
-            lastMessageDatetimeDiv = this._lastMessageDatetimeDivCache;
             lastMsgDivClasses += (isUnread ? " unread" : "");
             if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
                 lastMsgDivClasses += " call";
@@ -213,9 +221,6 @@ class ConversationsListItem extends MegaRenderMixin {
                         {l[20789]}
                     </div>;
             }
-            const timeString = todayOrYesterday(lastMessage.delay * 1000)
-                ? getTimeMarker(lastMessage.delay) : time2date(lastMessage.delay, 17);
-            lastMessageDatetimeDiv = <div className="date-time">{timeString}</div>;
         }
         else {
             lastMsgDivClasses = "conversation-message";
@@ -235,9 +240,6 @@ class ConversationsListItem extends MegaRenderMixin {
                         {emptyMessage}
                     </div>
                 </div>;
-            const timeString = todayOrYesterday(chatRoom.ctime * 1000)
-                ? getTimeMarker(chatRoom.ctime) : time2date(chatRoom.ctime, 17);
-            lastMessageDatetimeDiv = <div className="date-time">{timeString}</div>;
         }
 
         this.lastMessageId = lastMessage && lastMessage.messageId;
@@ -245,7 +247,6 @@ class ConversationsListItem extends MegaRenderMixin {
             .replace(" call-exists", "")
             .replace(" unread", "");
         this._lastMessageDivCache = lastMessageDiv;
-        this._lastMessageDatetimeDivCache = lastMessageDatetimeDiv;
 
 
         if (chatRoom.type !== "public") {
@@ -287,7 +288,7 @@ class ConversationsListItem extends MegaRenderMixin {
                                 <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} />}
                             {archivedDiv}
                         </div>
-                        {lastMessageDatetimeDiv}
+                        <div className="date-time">{this.getConversationTimestamp()}</div>
                     </div>
                     <div className="clear" />
                     <div className="conversation-message-info">
@@ -303,7 +304,7 @@ class ConversationsListItem extends MegaRenderMixin {
             </li>
         );
     }
-};
+}
 
 class ArchConversationsListItem extends MegaRenderMixin {
     componentWillMount() {
@@ -532,151 +533,71 @@ class ConversationsHead extends MegaRenderMixin {
 }
 
 class ConversationsList extends MegaRenderMixin {
+    backgroundUpdateInterval = null;
+    conversations = megaChat.chats.toJS();
+
     static defaultProps = {
-        'manualDataChangeTracking': true
-    }
+        manualDataChangeTracking: true
+    };
+
+    state = {
+        updated: 0
+    };
+
     customIsEventuallyVisible() {
         return M.chat;
     }
+
     attachRerenderCallbacks() {
         this._megaChatsListener = megaChat.chats.addChangeListener(() => this.onPropOrStateUpdated());
     }
+
     detachRerenderCallbacks() {
         if (super.detachRerenderCallbacks) {
             super.detachRerenderCallbacks();
         }
         megaChat.chats.removeChangeListener(this._megaChatsListener);
     }
-    constructor (props) {
-        super(props);
-        this.currentCallClicked = this.currentCallClicked.bind(this);
-        this.endCurrentCall = this.endCurrentCall.bind(this);
-    }
-    componentDidUpdate() {
-        super.componentDidUpdate && super.componentDidUpdate();
+
+    doUpdate = () =>
+        this.isComponentVisible() &&
+        document.visibilityState === 'visible' &&
+        this.setState(state => ({ updated: ++state.updated }), () => this.forceUpdate());
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        clearInterval(this.backgroundUpdateInterval);
+        document.removeEventListener('visibilitychange', this.doUpdate);
     }
 
-    conversationClicked(room, e) {
-        loadSubPage(room.getRoomUrl());
-        e.stopPropagation();
+    componentDidMount() {
+        super.componentDidMount();
+        this.backgroundUpdateInterval = setInterval(this.doUpdate, 6e4 * 10 /* 10 min */);
+        document.addEventListener('visibilitychange', this.doUpdate);
     }
-    currentCallClicked(e) {
-        var activeCallSession = megaChat.activeCallSession;
-        if (activeCallSession) {
-            this.conversationClicked(activeCallSession.room, e);
-        }
-    }
-    contactClicked(contact, e) {
-        loadSubPage("fm/chat/p/" + contact.u);
-        e.stopPropagation();
-    }
-    endCurrentCall(e) {
-        var activeCallSession = megaChat.activeCallSession;
-        if (activeCallSession) {
-            activeCallSession.endCall('hangup');
-            this.conversationClicked(activeCallSession.room, e);
-        }
-    }
+
     render() {
-        var self = this;
-
-        var currentCallingContactStatusProps = {
-            'className': "nw-conversations-item current-calling",
-            'data-jid': ''
-        };
-
-        var activeCallSession = megaChat.activeCallSession;
-        if (activeCallSession && activeCallSession.room && megaChat.activeCallSession.isActive()) {
-            var room = activeCallSession.room;
-            var user = room.getParticipantsExceptMe()[0];
-
-            if (user) {
-                currentCallingContactStatusProps.className += " " + user.u +
-                    " " + megaChat.userPresenceToCssClass(user.presence);
-                currentCallingContactStatusProps['data-jid'] = room.roomId;
-
-                if (room.roomId == megaChat.currentlyOpenedChat) {
-                    currentCallingContactStatusProps.className += " selected";
-                }
-            }
-            else {
-                currentCallingContactStatusProps.className += ' hidden';
-            }
-        }
-        else {
-            currentCallingContactStatusProps.className += ' hidden';
-        }
-
-
-        var currConvsList = [];
-
-        var sortedConversations = obj_values(megaChat.chats.toJS());
-
-        sortedConversations.sort(M.sortObjFn(function(room) {
-            return !room.lastActivity ? room.ctime : room.lastActivity;
-        }, -1));
-
-        sortedConversations.forEach((chatRoom) => {
-            var contact;
-            if (!chatRoom || !chatRoom.roomId) {
-                return;
-            }
-            if (!chatRoom.isDisplayable()) {
-                return;
-            }
-            if (self.props.quickSearchText) {
-                var s1 = String(chatRoom.getRoomTitle()).toLowerCase();
-                var s2 = String(self.props.quickSearchText).toLowerCase();
-                if (s1.indexOf(s2) === -1) {
-                    return;
-                }
-            }
-
-            if (chatRoom.type === "private") {
-                contact = chatRoom.getParticipantsExceptMe()[0];
-                if (!contact) {
-                    return;
-                }
-                contact = M.u[contact];
-
-                if (contact) {
-                    if (!chatRoom.privateReadOnlyChat && !contact.c) {
-                        // a non-contact conversation, e.g. contact removed - mark as read only
-                        Soon(() => {
-                            chatRoom.privateReadOnlyChat = true;
-                        });
-                    }
-                    else if (chatRoom.privateReadOnlyChat && contact.c) {
-                        // a non-contact conversation, e.g. contact removed - mark as read only
-                        Soon(() => {
-                            chatRoom.privateReadOnlyChat = false;
-                        });
-                    }
-                }
-            }
-
-            currConvsList.push(
-                <ConversationsListItem
-                    key={chatRoom.roomId}
-                    chatRoom={chatRoom}
-                    contact={contact}
-                    messages={chatRoom.messagesBuff}
-                    onConversationClicked={(e) => {
-                        self.conversationClicked(chatRoom, e);
-                }} />
-            );
-        });
-
-
         return (
-            <div className="conversationsList">
-                <ul className="conversations-pane">
-                    {currConvsList}
-                </ul>
-            </div>
+            <ul className="conversations-pane">
+                {Object.values(this.conversations).sort(M.sortObjFn(room => room.lastActivity || room.ctime, -1))
+                    .map(chatRoom => {
+                        if (chatRoom.roomId && chatRoom.isDisplayable()) {
+                            return (
+                                <ConversationsListItem
+                                    key={chatRoom.roomId}
+                                    chatRoom={chatRoom}
+                                    contact={M.u[chatRoom.getParticipantsExceptMe()[0]] || null}
+                                    messages={chatRoom.messagesBuff}
+                                    onConversationClicked={() => loadSubPage(chatRoom.getRoomUrl(false))}
+                                />
+                            );
+                        }
+                        return null;
+                    })}
+            </ul>
         );
     }
-};
+}
 
 class ArchivedConversationsList extends MegaRenderMixin {
     constructor (props) {
@@ -1088,11 +1009,6 @@ class ConversationsApp extends MegaRenderMixin {
             megaChat.$leftPane.removeClass('hidden');
         }
         this.handleWindowResize();
-
-        $('.conversations .nw-fm-tree-header input.chat-quick-search').rebind('cleared.jq', function(e) {
-            self.setState({'quickSearchText': ''});
-            treesearch = false;
-        });
     }
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -1408,7 +1324,7 @@ class ConversationsApp extends MegaRenderMixin {
                                     active
                                 `}>
                                 <span className="heading">{l.contacts_and_groups}</span>
-                                <ConversationsList quickSearchText={this.state.quickSearchText}/>
+                                <ConversationsList />
                             </div>
                         }
                     </PerfectScrollbar>

@@ -122,6 +122,7 @@ export default class Call extends MegaRenderMixin {
         offline: false,
         ephemeralAccounts: [],
         stayOnEnd: !!mega.config.get('callemptytout'),
+        everHadPeers: false,
         guest: Call.isGuest()
     };
 
@@ -230,6 +231,13 @@ export default class Call extends MegaRenderMixin {
             }
             if (this.state.stayOnEnd !== !!mega.config.get('callemptytout')) {
                 this.setState({ stayOnEnd: !!mega.config.get('callemptytout') });
+            }
+            if (!this.state.everHadPeers) {
+                this.setState({everHadPeers: true});
+            }
+            if (this.callStartTimeout) {
+                clearTimeout(this.callStartTimeout);
+                delete this.callStartTimeout;
             }
         });
         chatRoom.rebind('onCallEnd.callComp', () => this.props.minimized && this.props.onCallEnd());
@@ -487,6 +495,9 @@ export default class Call extends MegaRenderMixin {
         window.removeEventListener('offline', this.handleCallOffline);
         window.removeEventListener('online', this.handleCallOnline);
         this.unbindCallEvents();
+        if (this.callStartTimeout) {
+            clearTimeout(this.callStartTimeout);
+        }
     }
 
     componentDidMount() {
@@ -501,16 +512,33 @@ export default class Call extends MegaRenderMixin {
         window.addEventListener('online', this.handleCallOnline);
         this.bindCallEvents();
         ['reconnecting', 'end_call'].map(sound => ion.sound.preload(sound));
+        this.callStartTimeout = setTimeout(() => {
+            const { call } = this.props;
+            if (!mega.config.get('callemptytout') && !call.peers.length) {
+                call.left = true;
+                call.initCallTimeout();
+                if (!Call.isExpanded()) {
+                    this.showTimeoutDialog();
+                }
+            }
+            delete this.callStartTimeout;
+        }, 300 * 1000);
+        setTimeout(() => {
+            if (this.props.call.peers.length) {
+                this.setState({everHadPeers: true});
+            }
+        }, 2000);
     }
 
     render() {
         const { minimized, streams, call, chatRoom, parent, sfuApp, onDeleteMessage } = this.props;
         const {
             mode, view, sidebar, forcedLocal, invite, end, ephemeral, ephemeralAccounts, guest,
-            offline, stayOnEnd
+            offline, stayOnEnd, everHadPeers
         } = this.state;
         const STREAM_PROPS = {
             mode, streams, sidebar, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
+            everHadPeers,
             isOnHold: sfuApp.sfuClient.isOnHold(), onSpeakerChange: this.handleSpeakerChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm,
         };

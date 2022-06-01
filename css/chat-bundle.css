@@ -112,8 +112,8 @@
   color: var(--text-color-high);
 }
 .meetings-call .stream .sidebar-controls ul li button.selected, .meetings-call .stream .sidebar-controls ul li button.selected:hover {
-  background: #9be5f7;
-  background: linear-gradient(90deg, #9be5f7 0%, #4fc0ee 100%);
+  background: rgb(155, 229, 247);
+  background: linear-gradient(90deg, rgb(155, 229, 247) 0%, rgb(79, 192, 238) 100%);
 }
 .meetings-call .stream .sidebar-controls ul li button i {
   margin: 0 auto;
@@ -1326,8 +1326,8 @@
   --mask-color: var(--icon-active);
 }
 .local-stream.minimized .local-stream-overlay .local-stream-controls button.end-call {
-  background: #ff6863;
-  background: linear-gradient(0deg, #ff6863 0%, #ff9c97 100%);
+  background: rgb(255, 104, 99);
+  background: linear-gradient(0deg, rgb(255, 104, 99) 0%, rgb(255, 156, 151) 100%);
 }
 .local-stream.minimized .local-stream-overlay .local-stream-controls .button-group {
   /* [...] */
@@ -1345,8 +1345,8 @@
   bottom: 8px;
 }
 .local-stream.minimized .local-stream-notifications .chat-control {
-  background: #9be5f7;
-  background: linear-gradient(90deg, #9be5f7 0%, #4fc0ee 100%);
+  background: rgb(155, 229, 247);
+  background: linear-gradient(90deg, rgb(155, 229, 247) 0%, rgb(79, 192, 238) 100%);
 }
 .local-stream.minimized .local-stream-notifications .chat-control i {
   --icon-size: 32px;

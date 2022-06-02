@@ -315,7 +315,9 @@ RecentsRender.prototype.markSelected = function($elms) {
     'use strict';
 
     this.clearSelected();
-    $elms.addClass('ui-selected');
+    if ($elms) {
+        $elms.addClass('ui-selected');
+    }
 };
 
 RecentsRender.prototype.appendSelected = function($elms) {

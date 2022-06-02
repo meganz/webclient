@@ -5888,6 +5888,217 @@ class ContactButton extends _mixins1__._p {
   constructor(...args) {
     super(...args);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
+
+    this.loadAccount = () => loadSubPage('fm/account');
+
+    this.dropdownItemGenerator = () => {
+      let {
+        contact,
+        dropdowns,
+        chatRoom,
+        dropdownRemoveButton
+      } = this.props;
+      dropdowns = dropdowns ? dropdowns : [];
+      const moreDropdowns = [];
+      const username = react0().createElement(_ui_utils_jsx2__.OFlowEmoji, null, M.getNameByHandle(contact.u));
+
+      const onContactClicked = () => {
+        if (contact.c === 2) {
+          this.loadAccount();
+        }
+
+        if (contact.c === 1) {
+          loadSubPage('fm/chat/contacts/' + contact.u);
+        }
+      };
+
+      moreDropdowns.push(react0().createElement("div", {
+        className: "dropdown-avatar rounded",
+        key: "mainContactInfo"
+      }, react0().createElement(Avatar, {
+        className: "avatar-wrapper context-avatar",
+        chatRoom: chatRoom,
+        contact: contact,
+        hideVerifiedBadge: "true",
+        onClick: onContactClicked
+      }), react0().createElement("div", {
+        className: "dropdown-user-name",
+        onClick: onContactClicked
+      }, react0().createElement("div", {
+        className: "name"
+      }, username, react0().createElement(ContactPresence, {
+        className: "small",
+        contact: contact
+      })), contact && (megaChat.FORCE_EMAIL_LOADING || contact.c === 1 || contact.c === 2) && react0().createElement("span", {
+        className: "email"
+      }, contact.m))));
+      moreDropdowns.push(react0().createElement(ContactFingerprint, {
+        key: "fingerprint",
+        contact: contact
+      }));
+
+      if (dropdowns.length && contact.c !== 2) {
+        moreDropdowns.push(dropdowns);
+        moreDropdowns.push(react0().createElement("hr", {
+          key: "top-separator"
+        }));
+      }
+
+      if (contact.u === u_handle) {
+        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          key: "view0",
+          icon: "sprite-fm-mono icon-user-filled",
+          label: l[187],
+          onClick: this.loadAccount
+        }));
+      }
+
+      if (contact.c === 1) {
+        const startAudioCall = () => {
+          megaChat.createAndShowPrivateRoom(contact.u).then(room => {
+            room.setActive();
+            room.startAudioCall();
+          });
+        };
+
+        if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
+          moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+            key: "startCall",
+            className: "sprite-fm-mono-before icon-arrow-right-before",
+            icon: "sprite-fm-mono icon-phone",
+            submenu: true,
+            label: l[19125],
+            onClick: startAudioCall
+          }));
+          moreDropdowns.push(react0().createElement("div", {
+            className: "dropdown body submenu",
+            key: "dropdownGroup"
+          }, react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+            key: "startAudio",
+            icon: "sprite-fm-mono icon-phone",
+            disabled: !megaChat.hasSupportForCalls,
+            label: l[1565],
+            onClick: startAudioCall
+          })), react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+            key: "startVideo",
+            icon: "sprite-fm-mono icon-video-call-filled",
+            disabled: !megaChat.hasSupportForCalls,
+            label: l[1566],
+            onClick: () => {
+              megaChat.createAndShowPrivateRoom(contact.u).then(room => {
+                room.setActive();
+                room.startVideoCall();
+              });
+            }
+          }))));
+        } else {
+          moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+            key: "startChat",
+            icon: "sprite-fm-mono icon-chat",
+            label: l[5885],
+            onClick: () => {
+              loadSubPage('fm/chat/p/' + contact.u);
+            }
+          }));
+        }
+
+        moreDropdowns.push(react0().createElement("hr", {
+          key: "files-separator"
+        }));
+        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          key: "send-files-item",
+          icon: "sprite-fm-mono icon-send-files",
+          label: l[6834],
+          disabled: mega.paywall,
+          onClick: () => {
+            megaChat.openChatAndSendFilesDialog(contact.u);
+          }
+        }));
+        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          key: "share-item",
+          icon: "sprite-fm-mono icon-folder-outgoing-share",
+          label: l[6775],
+          onClick: () => {
+            openCopyShareDialog(contact.u);
+          }
+        }));
+      } else if (!is_chatlink && !is_eplusplus && (!contact.c || contact.c === 2 && contact.u !== u_handle)) {
+        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          key: "view2",
+          icon: "sprite-fm-mono icon-add",
+          label: l[101],
+          onClick: () => {
+            const isAnonymousUser = !u_handle || u_type !== 3;
+            const ADD_CONTACT = 'addContact';
+
+            if (is_chatlink && isAnonymousUser) {
+              megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+
+              if (localStorage.getItem(ADD_CONTACT) === null) {
+                localStorage.setItem(ADD_CONTACT, JSON.stringify({
+                  u: contact.u,
+                  unixTime: unixtime()
+                }));
+              }
+            } else {
+              loadingDialog.show();
+              M.syncContactEmail(contact.u, new MegaPromise(), true).done(email => {
+                if (Object.values(M.opc || {}).some(cr => cr.m === email)) {
+                  closeDialog();
+                  msgDialog('warningb', '', l[17545]);
+                } else {
+                  M.inviteContact(M.u[u_handle].m, email);
+                  const title = l[150];
+                  const msg = l[5898].replace('[X]', email);
+                  closeDialog();
+                  msgDialog('info', title, msg.replace('[X]', email));
+                }
+              }).always(() => loadingDialog.hide()).catch(() => {
+                const {
+                  chatRoom
+                } = this.props;
+                const {
+                  u: userHandle
+                } = contact;
+
+                if (chatRoom.sfuApp) {
+                  return mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle);
+                }
+
+                const name = M.getNameByHandle(userHandle);
+                return msgDialog('info', '', l.ephemeral_title ? l.ephemeral_title.replace('%1', name) : `${name} is using an ephemeral session.`, l.ephemeral_info);
+              });
+            }
+          }
+        }));
+      }
+
+      if (u_attr && contact.u !== u_handle) {
+        if (moreDropdowns.length > 0 && !(moreDropdowns.length === 2 && moreDropdowns[1] && moreDropdowns[1].key === "fingerprint")) {
+          moreDropdowns.push(react0().createElement("hr", {
+            key: "nicknames-separator"
+          }));
+        }
+
+        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          key: "set-nickname",
+          icon: "sprite-fm-mono icon-rename",
+          label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
+          onClick: () => {
+            nicknames.setNicknameDialog.init(contact.u);
+          }
+        }));
+      }
+
+      if (dropdownRemoveButton && dropdownRemoveButton.length) {
+        moreDropdowns.push(react0().createElement("hr", {
+          key: "remove-separator"
+        }));
+        moreDropdowns.push(dropdownRemoveButton);
+      }
+
+      return moreDropdowns;
+    };
   }
 
   customIsEventuallyVisible() {
@@ -5898,262 +6109,50 @@ class ContactButton extends _mixins1__._p {
     return -1;
   }
 
-  dropdownItemGenerator() {
-    var self = this;
-    var contact = self.props.contact;
-    var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
-    var moreDropdowns = [];
-    const username = react0().createElement(_ui_utils_jsx2__.OFlowEmoji, null, M.getNameByHandle(contact.u));
-
-    var onContactClicked = function () {
-      if (contact.c === 2) {
-        loadSubPage('fm/account');
-      }
-
-      if (contact.c === 1) {
-        loadSubPage('fm/chat/contacts/' + contact.u);
-      }
-    };
-
-    moreDropdowns.push(react0().createElement("div", {
-      className: "dropdown-avatar rounded",
-      key: "mainContactInfo"
-    }, react0().createElement(Avatar, {
-      className: "avatar-wrapper context-avatar",
-      chatRoom: this.props.chatRoom,
-      contact: contact,
-      hideVerifiedBadge: "true",
-      onClick: onContactClicked
-    }), react0().createElement("div", {
-      className: "dropdown-user-name",
-      onClick: onContactClicked
-    }, react0().createElement("div", {
-      className: "name"
-    }, username, react0().createElement(ContactPresence, {
-      className: "small",
-      contact: contact
-    })), contact && (megaChat.FORCE_EMAIL_LOADING || contact.c === 1 || contact.c === 2) && react0().createElement("span", {
-      className: "email"
-    }, contact.m))));
-    moreDropdowns.push(react0().createElement(ContactFingerprint, {
-      key: "fingerprint",
-      contact: contact
-    }));
-
-    if (dropdowns.length && contact.c !== 2) {
-      moreDropdowns.push(dropdowns);
-      moreDropdowns.push(react0().createElement("hr", {
-        key: "top-separator"
-      }));
-    }
-
-    if (contact.u === u_handle) {
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-        key: "view0",
-        icon: "sprite-fm-mono icon-user-filled",
-        label: l[187],
-        onClick: () => {
-          loadSubPage('fm/account');
-        }
-      }));
-    }
-
-    if (contact.c === 1) {
-      var startAudioCall = function () {
-        megaChat.createAndShowPrivateRoom(contact.u).then(function (room) {
-          room.setActive();
-          room.startAudioCall();
-        });
-      };
-
-      if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
-        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-          key: "startCall",
-          className: "sprite-fm-mono-before icon-arrow-right-before",
-          icon: "sprite-fm-mono icon-phone",
-          submenu: true,
-          label: l[19125],
-          onClick: startAudioCall
-        }));
-        moreDropdowns.push(react0().createElement("div", {
-          className: "dropdown body submenu",
-          key: "dropdownGroup"
-        }, react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-          key: "startAudio",
-          icon: "sprite-fm-mono icon-phone",
-          disabled: !megaChat.hasSupportForCalls,
-          label: l[1565],
-          onClick: startAudioCall
-        })), react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-          key: "startVideo",
-          icon: "sprite-fm-mono icon-video-call-filled",
-          disabled: !megaChat.hasSupportForCalls,
-          label: l[1566],
-          onClick: () => {
-            megaChat.createAndShowPrivateRoom(contact.u).then(function (room) {
-              room.setActive();
-              room.startVideoCall();
-            });
-          }
-        }))));
-      } else {
-        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-          key: "startChat",
-          icon: "sprite-fm-mono icon-chat",
-          label: l[5885],
-          onClick: () => {
-            loadSubPage('fm/chat/p/' + contact.u);
-          }
-        }));
-      }
-
-      moreDropdowns.push(react0().createElement("hr", {
-        key: "files-separator"
-      }));
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-        key: "send-files-item",
-        icon: "sprite-fm-mono icon-send-files",
-        label: l[6834],
-        disabled: mega.paywall,
-        onClick: () => {
-          megaChat.openChatAndSendFilesDialog(contact.u);
-        }
-      }));
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-        key: "share-item",
-        icon: "sprite-fm-mono icon-folder-outgoing-share",
-        label: l[6775],
-        onClick: () => {
-          openCopyShareDialog(contact.u);
-        }
-      }));
-    } else if (!is_chatlink && !is_eplusplus && (!contact.c || contact.c === 2 && contact.u !== u_handle)) {
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-        key: "view2",
-        icon: "sprite-fm-mono icon-add",
-        label: l[101],
-        onClick: () => {
-          const isAnonymousUser = !u_handle || u_type !== 3;
-          const ADD_CONTACT = 'addContact';
-
-          if (is_chatlink && isAnonymousUser) {
-            megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
-
-            if (localStorage.getItem(ADD_CONTACT) === null) {
-              localStorage.setItem(ADD_CONTACT, JSON.stringify({
-                u: contact.u,
-                unixTime: unixtime()
-              }));
-            }
-          } else {
-            loadingDialog.show();
-            M.syncContactEmail(contact.u, new MegaPromise(), true).done(email => {
-              let exists = false;
-              const opcKeys = Object.keys(M.opc);
-
-              for (let i = 0; i < opcKeys.length; i++) {
-                if (!exists && M.opc[opcKeys[i]].m === email) {
-                  exists = true;
-                  break;
-                }
-              }
-
-              if (exists) {
-                closeDialog();
-                msgDialog('warningb', '', l[17545]);
-              } else {
-                M.inviteContact(M.u[u_handle].m, email);
-                const title = l[150];
-                const msg = l[5898].replace('[X]', email);
-                closeDialog();
-                msgDialog('info', title, msg.replace('[X]', email));
-              }
-            }).always(() => loadingDialog.hide()).catch(() => {
-              const {
-                chatRoom
-              } = this.props;
-              const {
-                u: userHandle
-              } = contact;
-
-              if (chatRoom.sfuApp) {
-                return mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle);
-              }
-
-              const name = M.getNameByHandle(userHandle);
-              const {
-                ephemeral_title: title,
-                ephemeral_info: info
-              } = l;
-              return msgDialog('info', '', title ? title.replace('%1', name) : `${name} is using an ephemeral session.`, info);
-            });
-          }
-        }
-      }));
-    }
-
-    if (u_attr && contact.u !== u_handle) {
-      if (moreDropdowns.length > 0 && !(moreDropdowns.length === 2 && moreDropdowns[1] && moreDropdowns[1].key === "fingerprint")) {
-        moreDropdowns.push(react0().createElement("hr", {
-          key: "nicknames-separator"
-        }));
-      }
-
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-        key: "set-nickname",
-        icon: "sprite-fm-mono icon-rename",
-        label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
-        onClick: () => {
-          nicknames.setNicknameDialog.init(contact.u);
-        }
-      }));
-    }
-
-    if (self.props.dropdownRemoveButton && self.props.dropdownRemoveButton.length) {
-      moreDropdowns.push(react0().createElement("hr", {
-        key: "remove-separator"
-      }));
-      moreDropdowns.push(self.props.dropdownRemoveButton);
-    }
-
-    return moreDropdowns;
-  }
-
   render() {
-    var self = this;
-    var label = self.props.label ? self.props.label : "";
-    var classes = self.props.className ? self.props.className : "";
-    var contact = self.props.contact;
-    var icon = self.props.dropdownIconClasses ? self.props.dropdownIconClasses : [];
-    var dropdownPosition = "left top";
-    var vertOffset = 0;
-    var horizOffset = -30;
+    let {
+      label = '',
+      className = '',
+      contact,
+      dropdownIconClasses = [],
+      verticalOffset,
+      dropdownDisabled,
+      noLoading,
+      noContextMenu
+    } = this.props;
+    let dropdownPosition = "left top";
+    let vertOffset = 0;
+    let horizOffset = -30;
 
     if (!contact) {
       return null;
     }
 
     if (label) {
-      classes = `user-card-name ${classes}`;
-      icon = "";
-      dropdownPosition = "left bottom";
+      className = `user-card-name ${className}`;
+      dropdownIconClasses = '';
+      dropdownPosition = 'left bottom';
       vertOffset = 25;
       horizOffset = 0;
     }
 
-    if (!contact.name && !contact.m && !self.props.noLoading && this.isLoadingContactInfo()) {
+    if (typeof verticalOffset !== 'undefined') {
+      vertOffset = verticalOffset;
+    }
+
+    if (!contact.name && !contact.m && !noLoading && this.isLoadingContactInfo()) {
       label = react0().createElement("em", {
         className: "contact-name-loading"
       });
-      classes = `contact-button-loading ${classes}`;
+      className = `contact-button-loading ${className}`;
     }
 
-    return this.props.noContextMenu ? react0().createElement("div", {
+    return noContextMenu ? react0().createElement("div", {
       className: "user-card-name light"
     }, label) : react0().createElement(_ui_buttons_jsx4__.Button, {
-      className: classes,
-      icon: icon,
-      disabled: self.props.dropdownDisabled,
+      className: className,
+      icon: dropdownIconClasses,
+      disabled: dropdownDisabled,
       label: label
     }, react0().createElement(_ui_dropdowns_jsx5__.Dropdown, {
       className: "context contact-card-dropdown",
@@ -6161,7 +6160,7 @@ class ContactButton extends _mixins1__._p {
       positionAt: dropdownPosition,
       vertOffset: vertOffset,
       horizOffset: horizOffset,
-      dropdownItemGenerator: self.dropdownItemGenerator.bind(this),
+      dropdownItemGenerator: this.dropdownItemGenerator,
       noArrow: true
     }));
   }
@@ -6502,7 +6501,8 @@ class ContactCard extends _mixins1__._p {
         className: "light",
         label: escapedUsername,
         chatRoom: this.props.chatRoom,
-        dropdownRemoveButton: dropdownRemoveButton
+        dropdownRemoveButton: dropdownRemoveButton,
+        verticalOffset: 0
       });
     } else {
       if (highlightSearchValue && searchValue.length > 0) {
@@ -6606,7 +6606,8 @@ class ContactCard extends _mixins1__._p {
       className: self.props.dropdownButtonClasses,
       dropdownRemoveButton: dropdownRemoveButton,
       noLoading: self.props.noLoading,
-      chatRoom: self.props.chatRoom
+      chatRoom: self.props.chatRoom,
+      verticalOffset: 0
     }), selectionTick, userCard);
   }
 

@@ -1172,6 +1172,7 @@ table.shared-with-me .shared-folder-info-block .shared-folder-name {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    padding-inline-end: 24px;
 }
 
 table.shared-with-me .shared-folder-info-block .shared-folder-info {
@@ -1280,6 +1281,7 @@ table.out-shares .shared-folder-info-block .shared-folder-name {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    padding-inline-end: 24px;
 }
 
 table.out-shares .shared-folder-info-block .shared-folder-info {

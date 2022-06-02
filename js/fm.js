@@ -3343,7 +3343,8 @@ function fm_resize_handler(force) {
         // Init dashboard content scrolling
         initDashboardScroll();
     }
-    else if (M.currentdirid && M.currentdirid.startsWith('user-management')) {
+    else if (M.currentdirid && M.currentdirid.startsWith('user-management') &&
+        typeof initBusinessAccountScroll === 'function') {
         initBusinessAccountScroll($('.user-management-view .ps:visible', fmholder));
     }
     else if (!M.chat) {

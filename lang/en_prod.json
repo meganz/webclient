@@ -4937,7 +4937,7 @@
     "no_camera_info": "We can\u2019t access your camera. Go to your browser settings and allow MEGA to access your camera.",
     "no_camera_title": "Camera access needed",
     "no_mic_info": "We can\u2019t access your microphone. Go to your browser settings and allow MEGA to access your microphone.",
-    "no_mic_title": "Microphone access needed",
+    "no_mic_title": "Microphone access needed ",
     "no_payment_providers": "Payment providers not supported in your region. If you believe this is an error please contact support on support@mega.nz",
     "not_supported": "Not available",
     "notif_body_incoming_attch": "{count, plural, one {%s shared a file with you on chat.} other {%s shared # files with you on chat.}}",

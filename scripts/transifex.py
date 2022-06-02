@@ -785,6 +785,7 @@ def main():
             print("Failed to fetch branch language files.")
         print("")
     else:
+        merge_language(lang, lang)
         has_locked_msgs(is_prod or branch_resource_name == "prod")
 
     print("Creating Translation Files... ")

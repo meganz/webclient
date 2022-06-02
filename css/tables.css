@@ -462,3 +462,25 @@
 .table-user-management .rtl .data-table.medium-list tr td:last-child::before {
     left: 4px;
 }
+
+/* Sticky header data table */
+
+.sticky-header-table-container {
+    overflow: hidden;
+}
+.sticky-header-table-container .data-table {
+    border: none;
+    padding: 0 0 2px;
+    overflow: auto;
+}
+.sticky-header-table-container .data-table th {
+    background: var(--surface-main);
+    position: sticky;   /* Shouldn't be changed as sticky isn't working on thead and tr on Chrome! */
+    top: 0;
+    z-index: 1119;
+}
+.sticky-header-table-container.ps-container .ps-scrollbar-y-rail {
+    margin: 36px 0 2px;
+}
+
+/* End: Sticky header data table */

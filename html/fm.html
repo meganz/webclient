@@ -928,6 +928,16 @@
                             <div class="sub-title" data-scrollto="voucher-history">[$20231]</div>
                         </div>
                     </div>
+                    <div class="settings-button slide-in-out ts-500 closed meeting">
+                        <div class="head-title">
+                            <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                            <i class="sprite-fm-mono icon-video-call-filled"></i>
+                            <span>[$setting_meeting_title]</span>
+                        </div>
+                        <div class="sub-menu slide-item">
+                            <div class="sub-title" data-scrollto="leave-empty">[$sub_setting_meeting_empty_call]</div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
@@ -1450,57 +1460,54 @@
             </div>
 
             <div class="files-grid-view fm hidden">
-                <div class="grid-table-header-container-sc">
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header fm">
-                        <div class="column-settings overlap">
-                            <i class="sprite-fm-theme icon-settings"></i>
-                        </div>
-                        <tr>
-                            <th></th>
-                            <th megatype="fav" class="grid-first-th">
-                                <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
-                            </th>
-                            <th megatype="fname">
-                                <div class="arrow name label asc sprite-fm-mono icon-dropdown">[$86]</div>
-                                <div class="grid-view-resize">&nbsp;</div>
-                            </th>
-                            <th megatype="label">
-                                <div class="arrow label sprite-fm-mono icon-dropdown">[$17398]</div>
-                                <div class="grid-view-resize">&nbsp;</div>
-                            </th>
-                            <th megatype="size">
-                                <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
-                                <div class="grid-view-resize">&nbsp;</div>
-                            </th>
-                            <th megatype="type">
-                                <div class="arrow type sprite-fm-mono icon-dropdown">[$93]</div>
-                                <div class="grid-view-resize">&nbsp;</div>
-                            </th>
-                            <th megatype="timeAd">
-                                <div class="arrow date sprite-fm-mono icon-dropdown">[$17445]</div>
-                                <div class="grid-view-resize">&nbsp;</div>
-                            </th>
-                            <th megatype="timeMd">
-                                <div class="arrow mtime sprite-fm-mono icon-dropdown">[$94]</div>
-                                <div class="grid-view-resize">&nbsp;</div>
-                            </th>
-                            <th megatype="versions">
-                                <div class="arrow versions sprite-fm-mono icon-dropdown">[$17150]</div>
-                                <div class="grid-view-resize">&nbsp;</div>
-                            </th>
-                            <!--<th megatype="extras">
-                        <div class="arrow ">[$17150]</div>
-                        <div class="grid-view-resize">&nbsp;</div>
-                    </th>-->
-                            <th megatype="extras" class="grid-url-header"></th>
-                            <th></th>
-                        </tr>
-                    </table>
+                <div class="column-settings overlap">
+                    <i class="sprite-fm-theme icon-settings"></i>
                 </div>
-
                 <div class="grid-scrolling-table megaListContainer">
                     <div class="grid-wrapper">
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table table-hover fm">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th megatype="fav" class="grid-first-th">
+                                        <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
+                                    </th>
+                                    <th megatype="fname">
+                                        <div class="arrow name label asc sprite-fm-mono icon-dropdown">[$86]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="label">
+                                        <div class="arrow label sprite-fm-mono icon-dropdown">[$17398]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="size">
+                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="type">
+                                        <div class="arrow type sprite-fm-mono icon-dropdown">[$93]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="timeAd">
+                                        <div class="arrow date sprite-fm-mono icon-dropdown">[$17445]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="timeMd">
+                                        <div class="arrow mtime sprite-fm-mono icon-dropdown">[$94]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="versions">
+                                        <div class="arrow versions sprite-fm-mono icon-dropdown">[$17150]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <!--<th megatype="extras">
+                                        <div class="arrow ">[$17150]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>-->
+                                    <th megatype="extras" class="grid-url-header"></th>
+                                    <th class="grid-empty-spacer"></th>
+                                </tr>
+                            </thead>
                             <tr class="clone-of-header">
                                 <th class="grid-first-th">
                                     <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
@@ -1519,34 +1526,6 @@
             <div class="fm-blocks-view fm hidden">
                 <div class="file-block-scrolling"></div>
                 <div class="blocks-view-data"></div>
-            </div>
-
-            <div class="files-grid-view contacts-view hidden">
-                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
-                    <tr>
-                        <th>
-                            <div class="arrow name desc sprite-fm-mono icon-dropdown">[$86]</div>
-                        </th>
-                        <th>
-                            <div class="arrow status sprite-fm-mono icon-dropdown">[$89]</div>
-                        </th>
-                        <th>
-                            <div class="arrow interaction sprite-fm-mono icon-dropdown">[$5904]</div>
-                        </th>
-                        <th class="grid-url-header-nw"></th>
-                    </tr>
-                </table>
-                <div class="grid-scrolling-table contacts">
-                    <!-- <div class="grid-wrapper"> -->
-                    <div class="add-new-contact">
-                        <div class="avatar-wrapper small-rounded-avatar">
-                            <i class="small-icon fm-s green-plus"></i>
-                        </div>
-                        <div class="contact-green-info">[$19106]</div>
-                    </div>
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table table-hover contacts"></table>
-                    <!-- </div> -->
-                </div>
             </div>
 
             <!-- USERS managment right block -->
@@ -1605,65 +1584,67 @@
                     </div>
                     <div class="table-user-management">
                         <div class="view-title">[$bsn_compare_users]</div>
-                        <table class="grid-table-user-management-header data-table medium-list">
-                            <tr>
-                                <th class="name">
-                                    [$86]
-                                </th>
-                                <th class="status">
-                                    [$89]
-                                </th>
-                                <th class="used-storage">
-                                    [$18760]
-                                </th>
-                                <th class="used-transfer">
-                                    [$19091]
-                                </th>
-                                <th class="last-active">
-                                    [$19749]
-                                </th>
-                                <th class="actions"></th>
-                            </tr>
-                        </table>
-                        <div class="user-management-scroll">
+                        <div class="user-management-scroll sticky-header-table-container">
                             <table class="grid-table-user-management data-table medium-list">
-                                <tr>
-                                    <td class="name">
-                                        <div class="fm-user-management-user">
-                                            <span class="user-management-name"></span>
-                                            <div class="admin-icon hidden">
-                                                <i class="sprite-fm-mono icon-admin simpletip" data-simpletip="[$19610]"></i>
+                                <thead>
+                                    <tr>
+                                        <th class="name">
+                                            [$86]
+                                        </th>
+                                        <th class="status">
+                                            [$89]
+                                        </th>
+                                        <th class="used-storage">
+                                            [$18760]
+                                        </th>
+                                        <th class="used-transfer">
+                                            [$19091]
+                                        </th>
+                                        <th class="last-active">
+                                            [$19749]
+                                        </th>
+                                        <th class="actions"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="name">
+                                            <div class="fm-user-management-user">
+                                                <span class="user-management-name"></span>
+                                                <div class="admin-icon hidden">
+                                                    <i class="sprite-fm-mono icon-admin simpletip" data-simpletip="[$19610]"></i>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="user-management-email"> </div>
-                                    </td>
-                                    <td class="status">
-                                        <div class="user-management-status enabled">
-                                            <i class="enabled sprite-fm-mono icon-active"></i>
-                                            <i class="pending sprite-fm-mono icon-info-filled"></i>
-                                            <i class="disabled sprite-fm-mono icon-disabled-filled"></i>
-                                        </div>
-                                        <span class="user-management-status-txt"> </span>
-                                    </td>
-                                    <td class="used-storage business-sub-storage-use"><span> </span></td>
-                                    <td class="used-transfer business-sub-transfer-use"><span> </span></td>
-                                    <td class="last-active business-sub-last-active"><span> </span></td>
-                                    <td class="actions">
-                                        <button class="mega-button action icon view-icon icon-wrapper simpletip" data-simpletip="[$19093]" data-simpletipwrapper=".table-user-management">
-                                            <i class="sprite-fm-mono icon-eye-reveal"></i>
-                                        </button>
-                                        <button class="mega-button action icon edit-icon icon-wrapper simpletip" data-simpletip="[$16735]" data-simpletipwrapper=".table-user-management">
-                                            <i class="sprite-fm-mono icon-account-edit"></i>
-                                        </button>
-                                        <button class="mega-button action icon disabled-icon icon-wrapper dis-en-icon simpletip" data-simpletip="[$19092]" data-simpletipwrapper=".table-user-management">
-                                            <i class="sprite-fm-mono icon-disable"></i>
-                                        </button>
-                                        <button class="mega-button action icon enabled-icon icon-wrapper dis-en-icon simpletip hidden" data-simpletip="[$19094]" data-simpletipwrapper=".table-user-management">
-                                            <i class="sprite-fm-mono icon-enabled"></i>
-                                        </button>
+                                            <div class="user-management-email"> </div>
+                                        </td>
+                                        <td class="status">
+                                            <div class="user-management-status enabled">
+                                                <i class="enabled sprite-fm-mono icon-active"></i>
+                                                <i class="pending sprite-fm-mono icon-info-filled"></i>
+                                                <i class="disabled sprite-fm-mono icon-disabled-filled"></i>
+                                            </div>
+                                            <span class="user-management-status-txt"> </span>
+                                        </td>
+                                        <td class="used-storage business-sub-storage-use"><span> </span></td>
+                                        <td class="used-transfer business-sub-transfer-use"><span> </span></td>
+                                        <td class="last-active business-sub-last-active"><span> </span></td>
+                                        <td class="actions">
+                                            <button class="mega-button action icon view-icon icon-wrapper simpletip" data-simpletip="[$19093]" data-simpletipwrapper=".table-user-management">
+                                                <i class="sprite-fm-mono icon-eye-reveal"></i>
+                                            </button>
+                                            <button class="mega-button action icon edit-icon icon-wrapper simpletip" data-simpletip="[$16735]" data-simpletipwrapper=".table-user-management">
+                                                <i class="sprite-fm-mono icon-account-edit"></i>
+                                            </button>
+                                            <button class="mega-button action icon disabled-icon icon-wrapper dis-en-icon simpletip" data-simpletip="[$19092]" data-simpletipwrapper=".table-user-management">
+                                                <i class="sprite-fm-mono icon-disable"></i>
+                                            </button>
+                                            <button class="mega-button action icon enabled-icon icon-wrapper dis-en-icon simpletip hidden" data-simpletip="[$19094]" data-simpletipwrapper=".table-user-management">
+                                                <i class="sprite-fm-mono icon-enabled"></i>
+                                            </button>
 
-                                    </td>
-                                </tr>
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -2127,8 +2108,6 @@
             </div>
             <!-- End of USERS managment right block -->
 
-
-
             <div class="fm-blocks-view contacts-view hidden">
                 <div class="contacts-blocks-scrolling">
                     <div class="data-block-view semi-big add-new-contact">
@@ -2142,68 +2121,32 @@
                 <div class="blocks-view-data"></div>
             </div>
 
-            <!-- Contact requests grid, received requests !-->
-            <div class="contact-requests-grid hidden">
-                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header contact-requests">
-                    <tr>
-                        <th><div class="email arrow desc">[$95]</div></th>
-                        <th><div class="ts arrow">[$19505]</div></th>
-                        <th></th>
-                    </tr>
-                </table>
-                <div class="grid-scrolling-table ipc">
-                    <div class="grid-wrapper">
-                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table contact-requests table-hover"></table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sent requests grid !-->
-            <div class="sent-requests-grid hidden">
-                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header sent-requests">
-                    <tr>
-                        <th><div class="email arrow desc">[$95]</div></th>
-                        <th><div class="rTimeStamp arrow">[$19506]</div></th>
-                        <th></th>
-                    </tr>
-                </table>
-                <div class="grid-scrolling-table opc">
-                    <div class="grid-wrapper">
-                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table sent-requests table-hover"></table>
-                    </div>
-                </div>
-            </div>
-
-
-
-
             <div class="shared-grid-view hidden">
-
-                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
-                    <tr>
-                        <th class="grid-first-th">
-                            <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
-                        </th>
-                        <th>
-                            <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
-                        </th>
-                        <th>
-                            <div class="arrow owner sprite-fm-mono icon-dropdown">[$5905]</div>
-                        </th>
-                        <th>
-                            <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
-                        </th>
-                        <th>
-                            <div class="arrow access sprite-fm-mono icon-dropdown">[$5906]</div>
-                        </th>
-                        <th class="grid-url-header-nw"></th>
-                    </tr>
-                </table>
-
-
                 <div class="grid-scrolling-table">
                     <div class="grid-wrapper">
-                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table shared-with-me table-hover"></table>
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table shared-with-me table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="45">
+                                        <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
+                                    </th>
+                                    <th>
+                                        <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                    </th>
+                                    <th width="258">
+                                        <div class="arrow owner sprite-fm-mono icon-dropdown">[$5905]</div>
+                                    </th>
+                                    <th width="118">
+                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                    </th>
+                                    <th width="218">
+                                        <div class="arrow access sprite-fm-mono icon-dropdown">[$5906]</div>
+                                    </th>
+                                    <th class="grid-url-header-nw" width="60"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -2215,30 +2158,31 @@
             </div>
 
             <div class="out-shared-grid-view hidden">
-                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
-                    <tr>
-                        <th class="grid-first-th">
-                            <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
-                        </th>
-                        <th>
-                            <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
-                        </th>
-                        <th>
-                            <div class="arrow sharedwith sprite-fm-mono icon-dropdown">[$1036]</div>
-                        </th>
-                        <th>
-                            <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
-                        </th>
-                        <th>
-                            <div class="arrow date sprite-fm-mono icon-dropdown">[$20670]</div>
-                        </th>
-                        <th class="grid-url-header-nw"></th>
-                    </tr>
-                </table>
-
                 <div class="grid-scrolling-table">
                     <div class="grid-wrapper">
-                        <table width="50%" border="0" cellspacing="0" cellpadding="0" class="grid-table out-shares table-hover"></table>
+                        <table width="50%" border="0" cellspacing="0" cellpadding="0" class="grid-table out-shares table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="45">
+                                        <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
+                                    </th>
+                                    <th>
+                                        <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                    </th>
+                                    <th width="258">
+                                        <div class="arrow sharedwith sprite-fm-mono icon-dropdown">[$1036]</div>
+                                    </th>
+                                    <th width="118">
+                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                    </th>
+                                    <th width="218">
+                                        <div class="arrow date sprite-fm-mono icon-dropdown">[$20670]</div>
+                                    </th>
+                                    <th class="grid-url-header-nw" width="60"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -2247,106 +2191,6 @@
                 <div class="out-shared-blocks-scrolling">
                 </div>
                 <div class="blocks-view-data"></div>
-            </div>
-
-
-            <div class="contacts-details-block hidden">
-                <div class="contact-top-details">
-
-                    <div class="nw-contact-block-avatar">
-                        A
-                    </div>
-                    <div class="contact-fingerprint-block">
-                        <div class="contact-fingerprint-title">[$6872]</div>
-                        <div class="contact-fingerprint-txt">
-                        </div>
-                        <div class="verify-buttons">
-                            <button class="mega-button small fm-verify">
-                                <span>[$1960]</span>
-                            </button>
-                            <button class="mega-button small fm-reset-stored-fingerprint">
-                                <span>[$742]</span>
-                            </button>
-                        </div>
-                        <div class="clear"></div>
-                    </div>
-
-                    <div class="contact-details-pad">
-                        <div class="contact-details-user-name"></div>
-                        <div class="clear"></div>
-                        <div class="contact-details-email"></div>
-                        <div class="onlinestatus away">
-                            <div class="nw-contact-status"></div>
-                            <div class="fm-chat-user-status"></div>
-                            <div class="clear"></div>
-                        </div>
-                        <button class="mega-button fm-start-conversation">
-                            <span>[$5885]</span>
-                        </button>
-
-                        <!-- Remove hidden class when P2P file sharing is ready -->
-                        <button class="mega-button fm-send-files hidden">
-                            <span class="fm-chatbutton-arrow">[$6834]</span>
-                        </button>
-
-                        <button class="mega-button fm-share-folders">
-                            <a>
-                                <span>[$6775]</span>
-                            </a>
-                        </button>
-
-                        <button class="mega-button fm-set-nickname">[$20828]</button>
-
-                        <button class="mega-button negative fm-remove-contact">[$1001]</button>
-
-                        <div class="clear"></div>
-                    </div>
-                    <div class="clear"></div>
-
-                    <!-- Please add "hidden" class if there is no shared folders !-->
-                    <div class="contact-share-notification hidden">
-                    </div>
-
-                </div>
-
-                <div class="fm-empty-section fm-empty-incoming contact-details-view hidden">
-                    <div class="fm-empty-pad">
-                        <i class="section-icon sprite-fm-mono icon-folder-incoming-share-filled"></i>
-                        <div class="fm-empty-cloud-txt">[$6787]</div>
-                    </div>
-                </div>
-
-                <div class="files-grid-view contact-details-view hidden">
-
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table-header">
-                        <tbody>
-                            <tr>
-                                <th class="grid-first-th">
-                                    <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
-                                </th>
-                                <th>
-                                    <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
-                                </th>
-                                <th style="width: 270px;">
-                                    <div class="arrow type sprite-fm-mono icon-dropdown">[$5906]</div>
-                                </th>
-                                <th class="grid-url-header-nw"></th>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="grid-scrolling-table">
-                        <div class="grid-wrapper">
-                            <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table shared-with-me"></table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="fm-blocks-view contact-details-view hidden">
-                    <div class="file-block-scrolling">
-                    </div>
-                    <div class="blocks-view-data"></div>
-                </div>
             </div>
 
             <div class="gallery-view hidden" id="gallery-view">
@@ -2456,22 +2300,23 @@
                         <div class="fm-empty-cloud-txt">[$6089]</div>
                     </div>
                 </div>
-                <table width="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table-header">
-                    <tr>
-                        <th></th>
-                        <th>[$86]</th>
-                        <th>[$93]</th>
-                        <th>[$87]</th>
-                        <th>[$19134]</th>
-                        <th>[$12441]</th>
-                        <th>[$89]</th>
-                        <th class="grid-url-header"></th>
-                        <th></th>
-                    </tr>
-                </table>
                 <div class="transfer-scrolling-table">
                     <div class="grid-wrapper">
                         <table width="100%" height="100%" border="0" cellspacing="0" cellpadding="0" class="transfer-table table-hover">
+                            <thead>
+                                <tr>
+                                    <th width="60"></th>
+                                    <th>[$86]</th>
+                                    <th width="288">[$93]</th>
+                                    <th width="96">[$87]</th>
+                                    <th width="96">[$19134]</th>
+                                    <th width="192">[$12441]</th>
+                                    <th width="192">[$89]</th>
+                                    <th width="69" class="grid-url-header"></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </div>
@@ -2519,8 +2364,7 @@
                                     <div class="fm-account-header"><span>[$16119]</span></div>
                                     <span class="size-txt">2.93 GB</span>
                                     <span class="of-txt">/</span>
-                                    <span class="pecents-txt">15</span>
-                                    <span class="gb-txt">GB</span>
+                                    <span class="pecents-txt">15 GB</span>
                                 </div>
                             </div>
                         </div>
@@ -2539,8 +2383,7 @@
                                     <div class="fm-account-header"><span>[$16120]</span></div>
                                     <span class="size-txt">2.93 GB</span>
                                     <span class="of-txt">/</span>
-                                    <span class="pecents-txt">15</span>
-                                    <span class="gb-txt">GB</span>
+                                    <span class="pecents-txt">15 GB</span>
                                 </div>
                             </div>
                         </div>
@@ -3764,6 +3607,22 @@
                         </div>
                     </div>
                 </div>
+                <div class="fm-account-meeting fm-account-sections hidden">
+                    <div class="account data-block leave-empty">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$sub_setting_meeting_empty_call]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$meeting_empty_call_lbl]</div>
+                                <div class="mega-switch" id="callemptytout">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                                <div class="content-txt">[$meeting_empty_call_desc_1]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -4133,8 +3992,7 @@
                                         <div class="fm-account-header"><span>[$16119]</span></div>
                                         <span class="size-txt">2.93 GB</span>
                                         <span class="of-txt">/</span>
-                                        <span class="pecents-txt">15</span>
-                                        <span class="gb-txt">GB</span>
+                                        <span class="pecents-txt">15 GB</span>
                                     </div>
                                 </div>
                             </div>
@@ -4153,8 +4011,7 @@
                                         <div class="fm-account-header"><span>[$16120]</span></div>
                                         <span class="size-txt">2.93 GB</span>
                                         <span class="of-txt">/</span>
-                                        <span class="pecents-txt">15</span>
-                                        <span class="gb-txt">GB</span>
+                                        <span class="pecents-txt">15 GB</span>
                                     </div>
                                 </div>
                             </div>

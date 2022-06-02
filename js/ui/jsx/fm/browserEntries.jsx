@@ -426,6 +426,7 @@ export default class BrowserEntries extends MegaRenderMixin {
             listAdapterOpts={listAdapterOpts}
             entries={this.props.entries}
             itemHeight={this.props.megaListItemHeight}
+            headerHeight={36}
             header={!viewMode && <GenericTableHeader
                 columns={listAdapterOpts.columns}
                 sortBy={this.state.sortBy}

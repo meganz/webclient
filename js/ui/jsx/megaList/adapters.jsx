@@ -59,6 +59,7 @@ export class Table extends GenericListAdapter {
     render() {
         return <table width="100%"
             className={this.props.containerClassName || "grid-table table-hover fm-dialog-table"}>
+            {this.props.header}
             <tbody ref={this.props.listContentRef}>
                 <tr className="megalist-pusher top"
                     ref={(r) => {

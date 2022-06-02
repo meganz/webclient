@@ -182,8 +182,34 @@ RecentsRender.prototype._initialRender = function(actions) {
             'perfectScrollOptions': {
                 'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
                 'minScrollbarLength': 20
-            }
+            },
+            'viewPortBuffer': 50
         });
+
+        this._dynamicList.getItemHeight = function(position) {
+            return this._heights[this.items[position]];
+        };
+
+        this._dynamicList.getItemOffsets = function(position) {
+            return this._offsets[this.items[position]];
+        };
+
+        this._dynamicList.scrollToItemPosition = function(position, toBottom) {
+
+            var newPosition = this._offsets[this.items[position]];
+
+            if (toBottom) {
+                newPosition += this.options.viewPortBuffer * 2;
+                newPosition -= this._calculated.scrollHeight - this.getItemHeight(position);
+            }
+            else {
+                newPosition -= this.options.viewPortBuffer * 2;
+            }
+
+            this.listContainer.scrollTop = newPosition;
+
+            this._viewChanged(true);
+        };
 
         if (!actions[0].id) {
             this._fillActionIds(actions);
@@ -284,22 +310,119 @@ RecentsRender.prototype._injectDates = function(actions) {
  * Mark UI elements as selected.
  * Note: Call with no arguments to clear selection.
  */
-RecentsRender.prototype.markSelected = function () {
+RecentsRender.prototype.markSelected = function($elms) {
+
     'use strict';
+
     this.clearSelected();
-    this.appendSelected.apply(this, arguments);
+    $elms.addClass('ui-selected');
 };
 
-RecentsRender.prototype.appendSelected = function() {
+RecentsRender.prototype.appendSelected = function($elms) {
+
     'use strict';
-    for (var i = 0; i < arguments.length; i++) {
-        $(arguments[i]).addClass('ui-selected');
-    }
+
+    $elms.addClass('ui-selected');
 };
 
 RecentsRender.prototype.clearSelected = function() {
     'use strict';
     this.$container.find('.ui-selected').removeClass('ui-selected');
+};
+
+RecentsRender.prototype.keySelectPrevNext = function(dir, shift) {
+
+    'use strict';
+
+    var $selectedAction = $('.MegaDynamicListItem.ui-selected', this.$container);
+    var $selectedFile = $('.data-block-view.ui-selected', $selectedAction);
+
+    if (!$selectedFile.length) {
+        return false;
+    }
+
+    var $nextFileToSelect = $selectedFile[dir < 0 ? 'prev' : 'next']()[dir < 0 ? 'first' : 'last']();
+
+    if ($nextFileToSelect.length) {
+
+        var nextNodeId = $nextFileToSelect.prop('id');
+
+        if (shift) {
+            this.appendSelected($nextFileToSelect);
+            $.selected.push(nextNodeId);
+        }
+        else {
+            this.markSelected($nextFileToSelect.add($nextFileToSelect.parents('.MegaDynamicListItem')));
+            $.selected = [nextNodeId];
+        }
+    }
+};
+
+RecentsRender.prototype.keySelectUpDown = function(dir, shift) {
+
+    'use strict';
+
+    var $selectedAction = $('.MegaDynamicListItem.ui-selected', this.$container);
+
+    var _getNextToSelect = function() {
+
+        var $action;
+
+        if (dir < 0) {
+
+            $action = $selectedAction.first().prev();
+            $action = $action.hasClass('date') ? $action.prev() : $action;
+        }
+        else {
+            $action = $selectedAction.last().next();
+            $action = $action.hasClass('date') ? $action.next() : $action;
+        }
+
+        return $action;
+    };
+
+    var $nextActionToSelect = _getNextToSelect();
+
+    if ($nextActionToSelect.hasClass('pre-pusher')) {
+
+        var currentItemIndex = this._dynamicList.items.indexOf($selectedAction.data('action'));
+
+        this._dynamicList.scrollToItemPosition(--currentItemIndex);
+    }
+
+    var nextID = $nextActionToSelect.prop('id');
+
+    nextID = nextID || $('.data-block-view', $nextActionToSelect).first().prop('id');
+
+    if (!nextID) {
+        return false;
+    }
+
+    var $nextItem = $(`#${nextID}`);
+
+    if (shift) {
+
+        this.appendSelected($nextItem.add($nextActionToSelect));
+        $.selected.push(nextID);
+    }
+    else {
+        this.markSelected($nextItem);
+
+        if ($nextItem.hasClass('data-block-view')) {
+            this.appendSelected($nextItem.parents('.MegaDynamicListItem'));
+        }
+        $.selected = [nextID];
+    }
+
+    var itemIndex = this._dynamicList.items.indexOf($nextActionToSelect.data('action'));
+
+    if (dir < 0 && this._dynamicList.getScrollTop() >= this._dynamicList.getItemOffsets(itemIndex)) {
+        this._dynamicList.scrollToItemPosition(itemIndex);
+    }
+    else if (dir > 0 && this._dynamicList.getScrollTop() + this._dynamicList.listContainer.offsetHeight <=
+        this._dynamicList.getItemOffsets(itemIndex) + this._dynamicList.getItemHeight(itemIndex)) {
+        this._dynamicList.scrollToItemPosition(itemIndex, true);
+    }
 };
 
 /**
@@ -320,7 +443,7 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
                 return false;
             })
             .rebind("contextmenu", function(e) {
-                self.markSelected($breadCrumb, $breadCrumb.closest('.content-row'));
+                self.markSelected($breadCrumb.add($breadCrumb.closest('.content-row')));
                 selectionManager.clear_selection();
                 selectionManager.add_to_selection(node.h);
                 $.hideTopMenu();
@@ -399,7 +522,7 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
     $userNameContainer
         .attr('id', user.h)
         .rebind("contextmenu", function(e) {
-            self.markSelected($userNameContainer, $newRow);
+            self.markSelected($userNameContainer.add($newRow));
             selectionManager.clear_selection();
             selectionManager.add_to_selection(user.h);
             $.hideTopMenu();
@@ -734,56 +857,54 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
 
     // Create & append new image container, fire async method to collect thumbnail.
     var renderThumb = function(i) {
-            var $newThumb = $thumbTemplate.clone().removeClass("template");
-            var node = action[i];
-            $newThumb
-                .attr('id', node.h)
-                .attr('title', node.name)
-                .rebind('dblclick', function() {
-                    self.markSelected();
-                    $.hideContextMenu();
-                    slideshow(node.h);
-                    $.autoplay = node.h;
-                    return false;
-                })
-                .rebind('click', function (e) {
-                    return self._handleSelectionClick(e, node.h, [$newThumb, $newRow]);
-                })
-                .rebind('contextmenu', function(e) {
-                    if (selectionManager.selected_list.indexOf(node.h) === -1) {
-                        selectionManager.clear_selection();
-                        self.clearSelected();
-                    }
-                    self.appendSelected($newThumb, $newRow);
-                    selectionManager.add_to_selection(node.h);
-                    $.hideTopMenu();
-                    return M.contextMenuUI(e, 1) ? true : false;
-                });
-
-            if (M.d[node.h]) {
-                M.d[node.h].seen = true;
-
-                if (M.d[node.h].shares && M.d[node.h].shares.EXP) {
-                    $newThumb.addClass('linked');
+        var $newThumb = $thumbTemplate.clone().removeClass("template");
+        var node = action[i];
+        $newThumb
+            .attr('id', node.h)
+            .attr('title', node.name)
+            .rebind('dblclick', () => {
+                self.markSelected();
+                $.hideContextMenu();
+                slideshow(node.h);
+                $.autoplay = node.h;
+                return false;
+            })
+            .rebind('click', e => self._handleSelectionClick(e, node.h, $newThumb.add($newRow)))
+            .rebind('contextmenu', e => {
+                if (!selectionManager.selected_list.includes(node.h)) {
+                    selectionManager.clear_selection();
+                    self.clearSelected();
                 }
-            }
+                self.appendSelected($newThumb.add($newRow));
+                selectionManager.add_to_selection(node.h);
+                $.hideTopMenu();
+                return Boolean(M.contextMenuUI(e, 1));
+            });
 
-            if (!node.t && node.tvf) {
-                $newThumb.addClass('versioning');
-            }
-            node.seen = true;
+        if (M.d[node.h]) {
+            M.d[node.h].seen = true;
 
-            if (is_video(node)) {
-                $newThumb.find(".block-view-file-type").removeClass("image").addClass("video");
-                $newThumb.find(".data-block-bg").addClass("video");
-                node = MediaAttribute(node, node.k);
-                if (node && node.data && node.data.playtime) {
-                    $newThumb.find('.video-thumb-details span').text(secondsToTimeShort(node.data.playtime));
-                }
+            if (M.d[node.h].shares && M.d[node.h].shares.EXP) {
+                $newThumb.addClass('linked');
             }
-            else if (fileIcon(node) === 'pdf') {
-                $(".block-view-file-type", $newThumb).removeClass("image").addClass("pdf");
+        }
+
+        if (!node.t && node.tvf) {
+            $newThumb.addClass('versioning');
+        }
+        node.seen = true;
+
+        if (is_video(node)) {
+            $(".block-view-file-type", $newThumb).removeClass("image").addClass("video");
+            $(".data-block-bg", $newThumb).addClass("video");
+            node = MediaAttribute(node, node.k);
+            if (node && node.data && node.data.playtime) {
+                $('.video-thumb-details span', $newThumb).text(secondsToTimeShort(node.data.playtime));
             }
+        }
+        else if (fileIcon(node) === 'pdf') {
+            $(".block-view-file-type", $newThumb).removeClass("image").addClass("pdf");
+        }
 
         if (node.fav) {
             $('.file-status-icon', $newThumb).addClass('sprite-fm-mono icon-favourite-filled');
@@ -794,21 +915,21 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         }
 
         var $contextMenuHandle = $(".file-settings-icon", $newThumb);
-            $contextMenuHandle
-                .attr('id', node.h)
-                .rebind("contextmenu", function(e) {
-                    self.markSelected($newThumb, $newRow);
-                    selectionManager.clear_selection();
-                    selectionManager.add_to_selection(node.h);
-                    $.hideTopMenu();
-                    return M.contextMenuUI(e, 1) ? true : false;
-                })
-                .rebind('click', function(e) {
-                    $contextMenuHandle.trigger({
-                        type: 'contextmenu',
-                        originalEvent: e.originalEvent
-                    });
+        $contextMenuHandle
+            .attr('id', node.h)
+            .rebind("contextmenu", e => {
+                self.markSelected($newThumb.add($newRow));
+                selectionManager.clear_selection();
+                selectionManager.add_to_selection(node.h);
+                $.hideTopMenu();
+                Boolean(M.contextMenuUI(e, 1));
+            })
+            .rebind('click', e => {
+                $contextMenuHandle.trigger({
+                    type: 'contextmenu',
+                    originalEvent: e.originalEvent
                 });
+            });
 
             $previewBody.append($newThumb);
             renderedThumbs[i] = $newThumb;
@@ -1111,7 +1232,7 @@ RecentsRender.prototype._handleSelectionClick = function(e, handle, $element) {
     'use strict';
     $.hideContextMenu();
     if (e.ctrlKey !== false || e.metaKey !== false) {
-        this.appendSelected.apply(this, $element);
+        this.appendSelected($element);
     }
     else {
         selectionManager.clear_selection();

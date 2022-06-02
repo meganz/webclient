@@ -757,8 +757,17 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     .replace('%3', itemsTotalSize);
             }
             this.showSelectionBar(notificationText);
-            if (M.currentdirid === 'shared') {
-                fm_resize_handler(); // Run custom resizing
+
+            const container = this._get_selectable_container();
+
+            if (container.data('jsp') || container.closest('.jspContainer').length) {
+
+                if (M.viewmode) {
+                    initShareBlocksScrolling();
+                }
+                else {
+                    initGridScrolling();
+                }
             }
             else if (M.megaRender && M.megaRender.megaList) {
                 M.megaRender.megaList.resized();
@@ -803,7 +812,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 '.file-block-scrolling.ps--active-y' : '.grid-scrolling-table.ps--active-y';
             var scrollBarY = document.querySelector(scrollBarYClass);
             if (scrollBarY && (scrollBarY.scrollHeight - scrollBarY.scrollTop - scrollBarY.clientHeight) < 37) {
-                scrollBarY.scrollTop = scrollBarY.scrollHeight - scrollBarY.clientHeight;
+                scrollBarY.scrollTop = scrollBarY.scrollHeight;
             }
         }
         if (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0) {
@@ -828,6 +837,21 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
         this.selected_totalSize = 0;
         this.vSelectionBar = null;
+
+        const container = this._get_selectable_container();
+
+        if (container.data('jsp') || container.closest('.jspContainer').length) {
+
+            if (M.viewmode) {
+                initShareBlocksScrolling();
+            }
+            else {
+                initGridScrolling();
+            }
+        }
+        else if (M.megaRender && M.megaRender.megaList) {
+            M.megaRender.megaList.resized();
+        }
     }
 
     /**

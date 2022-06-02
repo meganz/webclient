@@ -428,7 +428,7 @@
     position: relative;
 }
 
-.archived-chat-view .grid-table-header th i {
+.archived-chat-view .grid-table th i {
     float: right;
     --icon-size: 24px;
     --mask-color: var(--icon-rest);
@@ -449,7 +449,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    margin: 0 0 0 7px;
+    margin: 0;
     padding: 0;
     width: calc(100% - 160px);
 }
@@ -503,15 +503,16 @@
     height: 14px;
 }
 .arc-chat-messages-block .archived-badge {
-    float: right;
     height: 18px;
-    margin-top: 25px;
+    margin-top: 27px;
     margin-right: 10px;
     padding: 0 8px;
     border-radius: 32px;
     background-color: var(--surface-grey-2);
     font: var(--text-body2);
     color: var(--text-color-high);
+    position: absolute;
+    right: 0;
 }
 table.arc-chat-messages-block {
     table-layout: fixed;

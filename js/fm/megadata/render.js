@@ -363,12 +363,9 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
         }
         return false;
     }
-    var fnameWidth = $('td[megatype="fname"]', node).outerWidth();
 
-    if (!node.__hasMegaColumnsWidth ||
-        fnameWidth !== M.columnsWidth.cloud.fname.curr ||
-        fnameWidth !== M.columnsWidth.cloud.fname.currpx) {
-        node.__hasMegaColumnsWidth = true;
+    if (!node.__hasMCV) {
+        node.__hasMCV = true;
         megaRender.setDOMColumnsWidth(node);
     }
 

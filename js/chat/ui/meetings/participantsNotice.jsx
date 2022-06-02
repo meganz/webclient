@@ -3,12 +3,25 @@ import { MegaRenderMixin } from '../../mixins';
 import Button from './button';
 import Call from './call';
 import StreamNode from './streamNode';
+import {ParsedHTML} from "../../../ui/utils";
 
 export default class ParticipantsNotice extends MegaRenderMixin {
     static NAMESPACE = 'participants-notice';
 
     constructor(props) {
         super(props);
+    }
+
+    /**
+     * specShouldComponentUpdate
+     * @description Determine if the component should update based on props/new props.
+     * @see MegaRenderMixin.shouldComponentUpdate
+     * @param {object} newProps The incoming props
+     * @returns {boolean} If the component should updated
+     */
+    specShouldComponentUpdate(newProps) {
+        const { stayOnEnd, hasLeft } = this.props;
+        return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft;
     }
 
     /**
@@ -25,9 +38,35 @@ export default class ParticipantsNotice extends MegaRenderMixin {
                 theme-dark-forced
                 user-alone
             `}>
-            <div className={`${ParticipantsNotice.NAMESPACE}-heading`}>
-                <h1>{l.only_one_here /* `You are the only one here...` */}</h1>
-            </div>
+            {this.props.stayOnEnd
+                ? <div className={`${ParticipantsNotice.NAMESPACE}-heading`}>
+                    <h1>
+                        {this.props.everHadPeers
+                            ? l.only_one_here /* `You are the only one here...` */
+                            : l.waiting_for_others /* `Waiting for others to join...` */}
+                    </h1>
+                </div>
+                : <div className={`${ParticipantsNotice.NAMESPACE}-content user-alone`}>
+                    <h3>{l.only_one_here /* `You are the only one here...` */}</h3>
+                    <p className="theme-dark-forced">
+                        <ParsedHTML>
+                            {l.empty_call_dlg_text.replace('%s', '2')}
+                        </ParsedHTML>
+                    </p>
+                    <div className="notice-footer">
+                        <Button
+                            className="mega-button large stay-on-call"
+                            onClick={this.props.onStayConfirm}>
+                            <span>{l.empty_call_stay_button /* `Stay on call` */}</span>
+                        </Button>
+                        <Button
+                            className="mega-button positive large stay-on-call"
+                            onClick={this.props.onCallEnd}>
+                            <span>{l.empty_call_dlg_end /* `End call now` */}</span>
+                        </Button>
+                    </div>
+                </div>
+            }
         </div>;
 
     /**
@@ -79,7 +118,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
 
     render() {
-        const { sfuApp, call, streamContainer } = this.props;
+        const { sfuApp, call, hasLeft, streamContainer } = this.props;
 
         if (sfuApp.isDestroyed) {
             return null;
@@ -93,7 +132,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
                         stream={call.getLocalStream()}
                     />
                 )}
-                {streamContainer(call.left ? this.renderUserAlone() : this.renderUserWaiting())}
+                {streamContainer(hasLeft ? this.renderUserAlone() : this.renderUserWaiting())}
             </>
         );
     }

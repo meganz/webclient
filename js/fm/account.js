@@ -203,6 +203,12 @@ accountUI.renderAccountPage = function(account) {
             accountUI.notifications.init(account);
             break;
 
+        case '/fm/account/meeting':
+            $('.fm-account-meeting').removeClass('hidden');
+            sectionClass = 'meeting';
+
+            accountUI.meeting.init(account);
+            break;
         default:
 
             // This is the main entry point for users who just had upgraded their accounts
@@ -327,8 +333,7 @@ accountUI.general = {
             var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
             var usedB = bytesToSize(account.tfsq.used);
             $('.chart.data .size-txt', $bandwidthChart).text(usedB);
-            $('.chart.data .pecents-txt', $bandwidthChart).text(b2[0]);
-            $('.chart.data .gb-txt', $bandwidthChart).text(b2[1]);
+            $('.chart.data .pecents-txt', $bandwidthChart).text(bytesToSize(account.tfsq.max, 0));
             $('.chart.data .of-txt', $bandwidthChart).text('/');
             $('.account.chart.data', $bandwidthChart).removeClass('hidden');
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
@@ -406,9 +411,7 @@ accountUI.general = {
             }
 
             // Maximum disk space
-            var b2 = bytesToSize(account.space, 0).split(' ');
-            $('.chart.data .pecents-txt', $storageChart).text(b2[0]);
-            $('.chart.data .gb-txt', $storageChart).text(b2[1]);
+            $('.chart.data .pecents-txt', $storageChart).text(bytesToSize(account.space, 0));
             $('.chart .perc-txt', $storageChart).text(formatPercentage(usedPercentage / 100));
             $('.chart.data .size-txt', $storageChart).text(bytesToSize(account.space_used));
             $('.account.chart.data', $storageChart).removeClass('hidden');
@@ -704,6 +707,8 @@ accountUI.leftPane = {
                 return 'fm/account/contact-chats';
             case $section.hasClass('reseller'):
                 return 'fm/account/reseller';
+            case $section.hasClass('meeting'):
+                return 'fm/account/meeting';
             default:
                 return 'fm/account';
         }
@@ -4063,4 +4068,27 @@ accountUI.reseller = {
             });
         }
     }
+};
+
+accountUI.meeting = {
+    init: function() {
+        'use strict';
+        this.emptyCall.render();
+    },
+    emptyCall: {
+        render: function() {
+            'use strict';
+            const switchSelector = '#callemptytout';
+            // undefined === 2min wait, 0 === 2min wait, 1 === 24hour wait
+            const curr = mega.config.get('callemptytout');
+            accountUI.inputs.switch.init(
+                switchSelector,
+                $(switchSelector).parent(),
+                typeof curr === 'undefined' ? 1 : Math.abs(curr - 1),
+                val => {
+                    mega.config.setn('callemptytout', Math.abs(val - 1));
+                }
+            );
+        }
+    },
 };

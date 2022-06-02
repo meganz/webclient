@@ -770,7 +770,9 @@ function formatCurrency(value, currency, display, noDecimals) {
 
     // Polyfill for narrow symbol format as lacking support on Safari and old browers
     if (narrowSymbol) {
-        result = result.replace(/([A-Z]{2})/, '');
+
+        // Cover NZ$, $NZ kinds case to just $ and not change something like NZD
+        result = result.replace(/\b[A-Z]{2}\b/, '');
     }
 
     // If this is number only, remove currency code
@@ -1188,7 +1190,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');
 
-    var linktohelp = `${getBaseUrl()}/help/s/59f13b42f1b7093a7f8b4589`;
+    var linktohelp = `https://help.mega.io/files-folders/restore-delete/file-version-history`;
     l[17097] =  l[17097]
                 .replace('[A]', '<a id="versionhelp" href="' + linktohelp + '" target="_blank" class="red">')
                 .replace('[/A]', '</a>');
@@ -1605,6 +1607,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[BR]', '<br>');
     l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
         .replace('[BR]', '<br>');
+
+    l.empty_call_dlg_text = l.empty_call_dlg_text
+        .replace('[S1]', '<span class="stay-dlg-counter">').replace('[/S1]', '</span>')
+        .replace('[S2]', '<div class="stay-dlg-subtext">').replace('[/S2]', '</div>');
+    l.meeting_empty_call_desc_1 = escapeHTML(l.meeting_empty_call_desc_1)
+        .replace(/\[P]/g, '<div>')
+        .replace(/\[\/P]/g, '</div>');
+
     var common = [
         15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
         16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444, 18268,

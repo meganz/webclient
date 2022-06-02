@@ -1723,7 +1723,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     $('#msgDialog button.js-close').rebind('click', function() {
         closeMsg();
         if ($.warningCallback) {
-            $.warningCallback(false);
+            $.warningCallback(null);
             $.warningCallback = null;
         }
     });
@@ -2952,7 +2952,7 @@ function createFolderDialog(close) {
 
     M.safeShowDialog('createfolder', function() {
         $dialog.removeClass('hidden');
-        $('.create-folder-input-bl input').trigger("focus");
+        $('.create-folder-wrapper input', $dialog).focus();
         $dialog.removeClass('active');
         return $dialog;
     });
@@ -3131,7 +3131,7 @@ function createFileDialog(close, action, params) {
 
     M.safeShowDialog('createfile', function() {
         $dialog.removeClass('hidden');
-        $('.create-folder-input-bl input', $dialog).focus();
+        $('.create-file-wrapper input', $dialog).focus();
         $dialog.removeClass('active');
         return $dialog;
     });
@@ -3298,62 +3298,16 @@ function fm_resize_handler(force) {
         console.time('fm_resize_handler');
     }
 
-    if (ulmanager.isUploading || dlmanager.isDownloading) {
-        var tfse = M.getTransferElements();
-
-        if (tfse) {
-            tfse.domScrollingTable.style.height = (
-                    $(tfse.domTransfersBlock).outerHeight() -
-                    $(tfse.domTableHeader).outerHeight() -
-                    $(tfse.domTransferHeader).outerHeight()
-                ) + "px";
-        }
-    }
-
     if (M.currentdirid !== 'transfers') {
-        $('.files-grid-view .grid-scrolling-table, .file-block-scrolling,' +
-            ' .contacts-grid-view .contacts-grid-scrolling-table')
-            .css({
-                'width': $(document.body).outerWidth() - $('.fm-left-panel').outerWidth() - 46 /* margins of icons */
-            });
-
-        // Lets make manually matching width of the header table with the contents table, due to width mismatching bug.
-        var $fNameTh = $('.files-grid-view .grid-table-header:visible th[megatype="fname"]');
-        var fNameThStyle = $fNameTh.length && $fNameTh.attr('style') || '';
-
-        if (fNameThStyle.indexOf('calc(100% -') === -1) {
-            delete M.columnsWidth.cloud.fname.currpx;
-        }
-        else {
-            var fNameThWidth = $fNameTh.outerWidth();
-
-            $('.files-grid-view .grid-table:visible td[megatype="fname"]').css('width', fNameThWidth);
-            M.columnsWidth.cloud.fname.currpx = fNameThWidth;
-        }
-
         initTreeScroll();
     }
 
-    if (M.currentdirid === 'contacts') {
-        if (M.viewmode) {
-            initContactsBlocksScrolling();
-        }
-        else {
-            if ($.contactGridHeader) {
-                $.contactGridHeader();
-            }
-            initContactsGridScrolling();
-        }
-    }
-    else if (M.currentdirid === 'shares') {
+    if (M.currentdirid === 'shares') {
         if (M.viewmode) {
             initShareBlocksScrolling();
         }
         else {
             initGridScrolling();
-            if ($.sharedGridHeader) {
-                $.sharedGridHeader();
-            }
         }
     }
     else if (M.currentdirid === 'out-shares') {
@@ -3362,9 +3316,6 @@ function fm_resize_handler(force) {
         }
         else {
             initGridScrolling();
-            if ($.outSharedGridHeader) {
-                $.outSharedGridHeader();
-            }
         }
     }
     else if (M.currentdirid === 'transfers') {
@@ -3392,19 +3343,26 @@ function fm_resize_handler(force) {
         // Init dashboard content scrolling
         initDashboardScroll();
     }
+    else if (M.currentdirid && M.currentdirid.startsWith('user-management')) {
+        initBusinessAccountScroll($('.user-management-view .ps:visible', fmholder));
+    }
     else if (!M.chat) {
         // Resize the search breadcrumbs
         if (M.currentdirid && M.currentdirid.includes('search/')) {
             delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
         }
         if (M.viewmode) {
-            initFileblocksScrolling();
+
+            const $v = $('.file-block-scrolling.megaList:visible');
+
+            if ($v.length) {
+                Ps.update($v.get(0));
+            }
         }
         else {
             initGridScrolling();
             if ($.gridHeader) {
                 $.gridHeader();
-                $.detailsGridHeader();
             }
         }
         // Resize the cloud drive breadcrumbs

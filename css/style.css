@@ -265,30 +265,6 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
     z-index: 1000;
 }
 
-.new-notification-top::after,
-div:not(.grid-table-header-container-sc) > .grid-table-header::after,
-.grid-table-header-container-sc::after,
-.transfer-table-header::after,
-.contact-top-details::after {
-    content: '';
-    width: calc(100% - 16px);
-    height: 1px;
-    bottom: 0;
-    left: 8px;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-}
-
-.rtl .fm-right-header::after,
-.rtl .new-notification-top::after,
-.rtl .fm-transfers-header::after,
-.rtl div:not(.grid-table-header-container-sc) > .grid-table-header::after,
-.rtl .grid-table-header-container-sc::after,
-.rtl .transfer-table-header::after,
-.rtl .contact-top-details::after {
-    left: auto;
-    right: 0;
-}
 .bottom-pages .top-head::after {
     background-color: rgba(0,0,0,0.05);
 }
@@ -3330,9 +3306,6 @@ button.l-pane-visibility {
     background-repeat: no-repeat;
     background-position: -8px -4790px;
 }
-tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
-    cursor: pointer;
-}
 .arrow.grid-header-star {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
@@ -5027,8 +5000,6 @@ div .fm-tree-folder.dragover {
 .versioning-indicator {
     display: none;
     position: absolute;
-    /* left: 4px; */
-    /* top: 3px; */
 }
 .dialog.versioning-indicator {
     left: 14px;
@@ -5722,31 +5693,6 @@ span.orange {
     background-image: url(../images/mega/fm-main-sprite.png);
     color: rgba(255,255,255,1);
 }
-table {
-    display: table;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-.transfer-table-header th, .grid-table-header th, .contacts-grid-table th {
-    display: inline-block;
-    float: none;
-}
-.grid-table-header, .transfer-table-header, .contacts-grid-table {
-    width: 100%;
-    position: relative;
-    font-size: 0;
-    white-space: nowrap;
-}
-.conversations .grid-table-header th {
-    margin-top: 12px;
-}
-.transfer-table-header th:first-child span {
-    display: block;
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-repeat: no-repeat;
-    background-position: -6px -4019px;
-    height: 24px;
-}
 .left-points-position .context-menu-points,
 .right-points-position .context-menu-points,
 .top-points-position .context-menu-points,
@@ -6414,7 +6360,7 @@ table {
     justify-content: space-between;
 }
 .account.widget .medium.account.progress-list .item-wrapper {
-    width: 20%;
+    flex-shrink: 1;
 }
 .account.widget .medium.account.progress-list .item-wrapper .pr-item {
     width: max-content;
@@ -11501,18 +11447,6 @@ div.camera-bottom-txt {
     }
 }
 
-@media only screen and (max-width: 1260px) {
-    .transfer-table td:nth-child(3), .transfer-table-header th:nth-child(3) {
-        width: 192px;
-    }
-    .transfer-table td:nth-child(2), .transfer-table-header th:nth-child(2) {
-        width: 100%;
-        width: -webkit-calc(100% - 876px);
-        width: -moz-calc(100% - 876px);
-        width: calc(100% - 876px);
-    }
-}
-
 @media only screen and (max-width: 1133px) {
     .conversations-block {
         width: 50%;
@@ -11533,15 +11467,6 @@ div.camera-bottom-txt {
         float: none;
         width: auto;
         margin: 0 -15px;
-    }
-    .transfer-table td:nth-child(6), .transfer-table-header th:nth-child(6) {
-        width: 162px;
-    }
-    .transfer-table td:nth-child(2), .transfer-table-header th:nth-child(2) {
-        width: 100%;
-        width: -webkit-calc(100% - 846px);
-        width: -moz-calc(100% - 846px);
-        width: calc(100% - 846px);
     }
 }
 
@@ -13931,110 +13856,9 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
 .user-management-view .table-user-management .view-title {
     padding-left: 48px;
 }
-.user-management-view .table-user-management table {
-    border: none;
-    margin: 0 24px;
-    width: calc(100% - 48px);
-    table-layout: fixed;
-}
-.user-management-view .table-user-management .grid-table-user-management-header {
-    flex-grow: 0;
-    flex-shrink: 0;
-    table-layout: fixed;
-}
 .user-management-view .table-user-management .user-management-scroll {
     position: relative;
-    height: calc(100% - 105px);
 }
-.user-management-view .table-user-management .data-table tr .name .fm-user-management-user {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-}
-.user-management-view .table-user-management .data-table tr .status {
-    white-space: nowrap;
-    width: 14%;
-}
-.user-management-view .table-user-management .data-table tr .used-storage {
-    width: 14%;
-}
-.user-management-view .table-user-management .data-table tr .used-transfer {
-    width: 14%;
-}
-.user-management-view .table-user-management .data-table tr .last-active {
-    width: 14%;
-}
-.user-management-view .table-user-management .data-table tr .actions {
-    width: 140px;
-}
-.user-management-view .grid-table-user-management tr {
-    height: 64px;
-}
-.user-management-view .grid-table-user-management td {
-    cursor: pointer;
-}
-.user-management-view .grid-table-user-management-header th {
-    box-sizing: border-box;
-    color: var(--text-color-medium);
-    font: var(--text-body2);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.user-management-view .user-management-list-table tr .icon-wrapper {
-    opacity: 0;
-    vertical-align: middle;
-    transition: var(--transition-opacity);
-}
-
-.files-grid-view.user-management-view .user-management-list-table tr:hover .icon-wrapper {
-    opacity: 1;
-}
-
-.files-grid-view.user-management-view .user-management-list-table tr .icon-wrapper.disabled i {
-    --mask-color: var(--icon-inactive);
-}
-
-.files-grid-view.user-management-view .user-management-list-table tr .icon-wrapper:not(.disabled) i {
-    --mask-color: var(--icon-rest);
-}
-
-.files-grid-view.user-management-view .user-management-list-table tr .icon-wrapper:not(.disabled):hover i {
-    --mask-color: var(--icon-active);
-}
-
-.files-grid-view.user-management-view .user-management-list-table tr td .icon-wrapper {
-    display: inline-block;
-    -webkit-margin-start: 8px;
-    margin-inline-start: 8px;
-    position: relative;
-    cursor: pointer;
-}
-
-.user-management-list-table tr td .user-management-name {
-    font: var(--text-body1);
-    color: var(--text-color-high);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    vertical-align: bottom;
-}
-
-.user-management-list-table tr td .user-management-email {
-    color: var(--text-color-low);
-    font: var(--text-body2);
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    margin-top: 2px;
-}
-
-.user-management-list-table tr td .user-management-email.warning,
-.user-management-list-table tr td .user-management-email.pending-email {
-    color: var(--text-color-warning);
-}
-
 .user-management-view .icon-admin {
     --icon-size: 24px;
     --mask-color: var(--icon-rest);
@@ -14047,8 +13871,6 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     margin-inline-start: 16px;
     vertical-align: middle;
 }
-
-
 .user-management-account-settings {
     background: var(--surface-grey-1);
     height:100%;
@@ -14077,19 +13899,19 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     overflow: visible;
 }
 
-.user-management-account-settings .invoice .invoice-table td:first-child{
+.user-management-account-settings .invoice .invoice-table th:first-child {
     width: 20%;
 }
 
-.user-management-account-settings .invoice .invoice-table td:nth-child(2){
+.user-management-account-settings .invoice .invoice-table th:nth-child(2) {
     width: 40%;
 }
 
-.user-management-account-settings .invoice .invoice-table td:nth-child(3) {
+.user-management-account-settings .invoice .invoice-table th:nth-child(3) {
     width: 20%;
 }
 
-.user-management-account-settings .invoice .invoice-table td:nth-child(4){
+.user-management-account-settings .invoice .invoice-table th:nth-child(4) {
     width: 20%;
     height: 100%;
 }
@@ -14790,3 +14612,9 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     left: 24px;
 }
 /* end corner toasts and transfer popup */
+
+.mega-dialog div.stay-dlg-subtext {
+    color: var(--text-color-low);
+    font: var(--text-body2);
+    margin-top: 12px;
+}

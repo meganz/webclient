@@ -985,10 +985,8 @@ li.active .call-duration i {
     --mask-color: var(--secondary-green);
 }
 
-.contacts-table tr {
+.contacts-table tbody tr {
     overflow: hidden;
-    display: block;
-    padding: 7px 0;
 }
 
 .contacts-table tr:hover .contact-item-controls,
@@ -997,30 +995,23 @@ li.active .call-duration i {
     display: block;
     margin: 0 10px 0 0;
 }
-.contacts-table th,
-.contacts-table td {
+.contacts-table th {
     position: relative;
-    display: block;
-    float: left;
-    width: calc(23% - 2px);
+    width: 23%;
 }
-.contacts-table th.name,
-.contacts-table td:first-child {
-    width: calc(30% - 2px);
+.contacts-table th.name {
+    width: 31%;
 }
-.contacts-table.requests-table th,
-.contacts-table.requests-table td {
-    width: calc(20% - 2px);
+.contacts-table.requests-table th {
+    width: 20%;
 }
-.contacts-table.requests-table td.contact-controls-container {
+.contacts-table.requests-table th.contact-controls-container {
     width: 49%;
 }
-.contacts-table.requests-table th:first-child,
-.contacts-table.requests-table td:first-child {
-    width: calc(30% - 2px);
+.contacts-table.requests-table th:first-child {
+    width: 31%;
 }
-.contacts-table.contact-requests th,
-.contacts-table.contact-requests td {
+.contacts-table.contact-requests th {
     width: 33%;
 }
 
@@ -1030,8 +1021,13 @@ li.active .call-duration i {
     flex-direction: column;
     max-width: 350px;
     height: 100%;
+    vertical-align: middle;
+    width: calc(100% - 48px);
 }
-
+.contacts-table .avatar-wrapper + .contact-item,
+.contacts-table span + .contact-item {
+    display: inline-flex;
+}
 .contacts-table .contact-item-user {
     font: var(--text-body1);
     color: var(--text-color-high);
@@ -1052,6 +1048,7 @@ li.active .call-duration i {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    width: 100%;
 }
 
 .contacts-table .contact-item-status,
@@ -1103,7 +1100,7 @@ li.active .call-duration i {
     --mask-color: var(--icon-rest);
 }
 
-.contacts-table-head {
+.contacts-table thead {
     border-bottom: 1px solid var(--stroke-grey-2);
     margin: 0 24px;
     max-width: calc(100% - 48px);
@@ -1114,46 +1111,69 @@ li.active .call-duration i {
     max-width: calc(100% - 48px);
 }
 
-.contacts-table-head tr {
-    padding: 0 0 3px 0;
+.contacts-table thead th {
+    padding-bottom: 3px;
+    box-shadow: 0 1px 0 0 var(--stroke-grey-2);
+    z-index: 1;
+    background: var(--surface-main);
 }
 
 .contacts-table-results tr {
     position: relative;
     border-top: 3px solid var(--stroke-main);
     border-bottom: 4px solid var(--stroke-main);
-    box-shadow: 0 -1px 0 0 var(--stroke-grey-2);
 }
 
-.contacts-table-results tr .column-hover {
-    display: block;
+.contacts-table-results tr td::before {
     content: '';
     position: absolute;
-    top: 0;
+    top: 4px;
     left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 6px;
+    right: 0;
+    bottom: 4px;
     box-sizing: border-box;
     z-index: -1;
+    display: none;
 }
 
-.contacts-table-results tr.ui-selected .column-hover {
+.contacts-table-results tr td:first-child::before {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+.contacts-table-results tr td:last-child::before {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+.contacts-table-results tr.ui-selected td::before {
+    display: block;
     background: var(--surface-grey-4);
 }
 
-.contacts-table-results tr:not(tr.ui-selected):hover .column-hover {
-    border: 1px solid var(--stroke-grey-2);
+.contacts-table-results tr:not(tr.ui-selected):hover td::before {
+    display: block;
+    border: 1px solid var(--stroke-grey-3);
+    border-top-color: var(--stroke-grey-2);
+    border-bottom-color: var(--stroke-grey-2);
     background: var(--surface-grey-3);
+}
+.contacts-table-results tr:not(tr.ui-selected):hover td:first-child::before {
+    border-left-color: var(--stroke-grey-2);
+}
+.contacts-table-results tr:not(tr.ui-selected):hover td:last-child::before {
+    border-right-color: var(--stroke-grey-2);
 }
 
 .contacts-table-results td {
-    height: 36px;
+    height: 55px;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    border-bottom: 1px solid var(--stroke-grey-2);
+    padding-top: 1px;
 }
 
 .contacts-table th {
-    display: flex;
-    padding: 0 0 0 10px;
+    padding: 0 0 0 8px;
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
@@ -1161,17 +1181,9 @@ li.active .call-duration i {
     color: var(--text-color-medium);
     text-align: left;
     cursor: pointer;
-}
-
-.contacts-table th:not(:last-child):hover::before {
-    content: "";
-    position: absolute;
-    right: 0;
-    bottom: -3px;
-    height: 21px;
-    width: 1px;
-    background-color: var(--stroke-mid-grey);
-    cursor: col-resize;
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
 }
 
 .contacts-table th i {
@@ -1188,13 +1200,13 @@ li.active .call-duration i {
 .contacts-table .box-avatar,
 .contacts-table .sprite-fm-uni.icon-send-requests {
     position: relative;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    float: left;
     width: 32px;
     height: 32px;
-    margin: 2px 8px 0 8px;
+    margin: 0 8px;
+    vertical-align: middle;
 }
 
 .contacts-table .box-avatar {
@@ -1279,6 +1291,7 @@ li.active .call-duration i {
     flex: 1 1 auto;
     flex-direction: column;
     overflow: hidden;
+    height: calc(100% - 48px);
 }
 
 .profile-head {
@@ -1377,6 +1390,7 @@ li.active .call-duration i {
 .profile-shared-folders {
     flex: 1 1 auto;
     overflow: hidden;
+    height: 100%;
 }
 
 .profile-shared-folders .colour-label .shared-folder-info-block::after {
@@ -1417,17 +1431,19 @@ li.active .call-duration i {
 .profile-shared-folders .contact-details-view td.grid-url-header-nw {
     width: 64px !important;
 }
-.profile-shared-folders .shared-with-me tr {
+.profile-shared-folders .shared-with-me tbody tr {
     display: block;
     position: relative;
-    border-radius: 4px;
     border-top: 3px solid var(--stroke-main);
     border-bottom: 4px solid var(--stroke-main);
     box-shadow: 0 -1px 0 0 var(--stroke-grey-2);
 
 }
-.profile-shared-folders .shared-with-me tr:hover::before,
-.profile-shared-folders .shared-with-me tr.ui-selected::before {
+.profile-shared-folders .shared-with-me tbody tr:nth-last-child(2) {
+    box-shadow: 0 -1px 0 0 var(--stroke-grey-2), 0 1px 0 0 var(--stroke-grey-2);
+}
+.profile-shared-folders .shared-with-me tbody tr:hover::before,
+.profile-shared-folders .shared-with-me tbody tr.ui-selected::before {
     display: block;
     content: '';
     position: absolute;
@@ -1439,7 +1455,7 @@ li.active .call-duration i {
     box-sizing: border-box;
     background: var(--surface-grey-4);
 }
-.profile-shared-folders .shared-with-me tr:not(tr.ui-selected):hover::before {
+.profile-shared-folders .shared-with-me tbody tr:not(tr.ui-selected):hover::before {
     border: 1px solid var(--stroke-grey-2);
     background: var(--surface-grey-3);
 }
@@ -1453,59 +1469,82 @@ li.active .call-duration i {
     height: 100%;
     background: var(--secondary-blue);
 }
-.profile-shared-folders table.grid-table-header {
-    margin: 10px 0 0;
+.profile-shared-folders table.grid-table {
+    display: block;
 }
-.profile-shared-folders table.shared-with-me tr:not(.ui-selected):hover {
+.profile-shared-folders table.grid-table thead {
+    display: block;
+    padding-top: 10px;
+    margin: 0;
+    border-bottom: 1px solid var(--stroke-grey-2);
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface-main);
+}
+.profile-shared-folders table.grid-table thead tr {
+    display: block;
+}
+.profile-shared-folders table.grid-table th {
+    border: 0;
+    padding: 0 0 3px;
+}
+.profile-shared-folders table.shared-with-me tbody {
+    display: block;
+}
+.profile-shared-folders table.shared-with-me tbody tr:not(.ui-selected):hover {
     background: var(--surface-grey-1);
 }
-.profile-shared-folders table.grid-table-header th,
+.profile-shared-folders table.grid-table th,
 .profile-shared-folders table.shared-with-me td {
     display: inline-block;
     height: auto;
 }
-.profile-shared-folders table.grid-table-header th {
-    padding: 0 0 3px 0;
-}
 .profile-shared-folders table.shared-with-me td {
     padding: 10px 0 10px 0;
+    border-bottom: 0;
 }
-.profile-shared-folders table.grid-table-header th.name,
-.profile-shared-folders table.grid-table-header th.share-access {
+.profile-shared-folders table.grid-table.shared-with-me tr:last-child td,
+.profile-shared-folders .megaList table.grid-table.shared-with-me tr:nth-last-child(2) td {
+    border-bottom: 0;
+}
+.profile-shared-folders table.grid-table th.name,
+.profile-shared-folders table.grid-table th.share-access {
     display: inline-flex;
     justify-content: space-between;
     padding-right: 15px;
     cursor: pointer;
 }
-.profile-shared-folders table.grid-table-header th.name,
+.profile-shared-folders table.grid-table th.name,
 .profile-shared-folders table.shared-with-me td.name {
     width: 39%;
 }
-.profile-shared-folders table.grid-table-header th.share-access,
+.profile-shared-folders table.grid-table th.share-access,
 .profile-shared-folders table.shared-with-me td.share-access {
     width: 39%;
 }
 @media only screen and (max-width: 1368px) and (min-width: 320px)  {
-    .profile-shared-folders table.grid-table-header th.name,
+    .profile-shared-folders table.grid-table th.name,
     .profile-shared-folders table.shared-with-me td.name {
         width: 240px;
     }
-    .profile-shared-folders table.grid-table-header th.name span,
+    .profile-shared-folders table.grid-table th.name span,
     .profile-shared-folders table.shared-with-me td.name span {
         display: block;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-    .profile-shared-folders table.grid-table-header th.share-access,
+    .profile-shared-folders table.grid-table th.share-access,
     .profile-shared-folders table.shared-with-me td.share-access {
         width: 150px;
     }
 }
-.profile-shared-folders table.grid-table-header th.fav {
-    width: 87px;
+.profile-shared-folders table.grid-table th.fav {
+    width: 75px;
     margin: 0 auto;
-    padding: 0 0 0 32px;
+    padding: 0 0 3px 32px;
 }
 .profile-shared-folders table.shared-with-me td.fav {
     width: 75px;

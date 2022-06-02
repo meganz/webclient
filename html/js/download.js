@@ -884,7 +884,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
         $('.dark', $sizeBlock).add($('.green', $topbarSizeBlock)).text(bytesToSize(bytesloaded));
 
-        megatitle(' ' + perc + '%');
+        megatitle(' ' + Math.round(perc) + '%');
     }
 
     // XXX: ^

@@ -7,7 +7,7 @@ import { MegaRenderMixin } from "../mixins";
 
 export default class ComposedTextArea extends MegaRenderMixin {
     render() {
-        const { chatRoom: room, parent } = this.props;
+        const { chatRoom: room, parent, containerRef } = this.props;
 
         return (
             <div className="chat-textarea-block">
@@ -16,6 +16,7 @@ export default class ComposedTextArea extends MegaRenderMixin {
                 <TypingArea
                     chatRoom={room}
                     className="main-typing-area"
+                    containerRef={containerRef}
                     disabled={room.isReadOnly()}
                     persist={true}
                     onUpEditPressed={() => {

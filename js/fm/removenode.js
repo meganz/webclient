@@ -99,7 +99,7 @@ function removeUInode(h, parent) {
 
                 __markEmptied();
                 $('.files-grid-view').addClass('hidden');
-                $('.grid-table.fm tr').remove();
+                $('.grid-table.fm tbody tr').remove();
 
                 if (folderlink) {
                     $('.fm-empty-folder').removeClass('hidden');
@@ -118,7 +118,7 @@ function removeUInode(h, parent) {
 
                 __markEmptied();
                 $('.files-grid-view').addClass('hidden');
-                $('.grid-table.fm tr').remove();
+                $('.grid-table.fm tbody tr').remove();
 
                 $(`.fm-empty-${M.currentdirid.startsWith('discovery/') ? 'discovery' : M.currentdirid}`)
                     .removeClass('hidden');

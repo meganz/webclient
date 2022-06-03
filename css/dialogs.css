@@ -4687,7 +4687,8 @@ body.de .mega-dialog.new-group-chat {
 /* wire-transfer-dialog */
 
     .mega-dialog.wire-transfer-dialog {
-        width: 1145px;
+        /*width: 1145px;*/
+        width: 800px; /* temporaray smaller dialog as Wise is disalbed */
         max-width: 100vw;
     }
     .mega-dialog.wire-transfer-dialog .content-block {
@@ -4708,7 +4709,8 @@ body.de .mega-dialog.new-group-chat {
         float: left;
         margin-bottom: 20px;
         padding: 15px;
-        width: 49%;
+        /*width: 49%;*/
+        width: 100%;
     }
     .mega-dialog.wire-transfer-dialog .wire-transfer-details:last-child {
         float: right;

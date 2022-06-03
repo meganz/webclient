@@ -3928,13 +3928,13 @@ accountUI.reseller = {
                 .find('span').text(l[9106].replace('%1', email));
 
             // Use 'All' or 'Last 10/100/250' for the dropdown text
-            var buttonText = ($.voucherlimit === 'all') ? l[7557] : l['466a'].replace('[X]', $.voucherlimit);
+            var buttonText = $.voucherlimit === 'all' ? l[7557] : l[466].replace('[X]', $.voucherlimit);
 
             $('span', $vouchersSelect).text(buttonText);
             $('.balance span', $resellerSection).safeHTML('@@ &euro; ', account.balance[0][0]);
-            $('.voucher10-', $vouchersSelect).text(l['466a'].replace('[X]', 10));
-            $('.voucher100-', $vouchersSelect).text(l['466a'].replace('[X]', 100));
-            $('.voucher250-', $vouchersSelect).text(l['466a'].replace('[X]', 250));
+            $('.voucher10-', $vouchersSelect).text(l[466].replace('[X]', 10));
+            $('.voucher100-', $vouchersSelect).text(l[466].replace('[X]', 100));
+            $('.voucher250-', $vouchersSelect).text(l[466].replace('[X]', 250));
 
             // Sort vouchers by most recently created at the top
             M.account.vouchers.sort(function(a, b) {

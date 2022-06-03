@@ -343,7 +343,7 @@
             + `<div class="properties-breadcrumb"><div class="properties-small-gray path">${l.path_lbl}</div>`
             + '<div class="fm-breadcrumbs-wrapper info">'
             +                    '<div class="crumb-overflow-link dropdown">'
-            +                       '<a class="breadcrumb-dropdown-link">'
+            +                       '<a class="breadcrumb-dropdown-link info-dlg">'
             +                            '<i class="menu-icon sprite-fm-mono icon-options icon24"></i>'
             +                        '</a>'
             +                        '<i class="sprite-fm-mono icon-arrow-right icon16"></i>'
@@ -376,11 +376,16 @@
         }
 
         $('.properties-body', $dialog).rebind('click', function() {
-
             // Clicking anywhere in the dialog will close the context-menu, if open
             var $fsi = $('.file-settings-icon', $dialog);
             if ($fsi.hasClass('active')) {
                 $fsi.click();
+            }
+
+            // Clicking anywhere in the dialog would close the path breadcrumb dropdown if exists and open
+            const $pathBreadcrumb = $('.breadcrumb-dropdown', $dialog);
+            if ($pathBreadcrumb && $pathBreadcrumb.hasClass('active')) {
+                $pathBreadcrumb.removeClass('active');
             }
         });
 

@@ -170,6 +170,7 @@ sms.phoneInput = {
         $warningMessage.removeClass('visible');
         $verifyIcon.removeClass('hidden');
         $verifySuccessIcon.addClass('hidden');
+        $('aside.js-verify-success-page', $dialog).addClass('hidden');
         loadingInitDialog.hide();
         loadingDialog.hide('force');
     },
@@ -633,9 +634,6 @@ sms.verifySuccess = {
         this.$background = $('.fm-dialog-overlay');
         this.$page = $('.js-verify-success-page');
 
-        // Cache the page
-        this.$page = $('.js-verify-success-page');
-
         // Init functionality
         this.initDisplay();
         this.renderAchievementDetails();
@@ -676,6 +674,8 @@ sms.verifySuccess = {
 
             // Hide the loading dialog after request completes
             loadingDialog.hide();
+
+            $page.removeClass('non-achievement-account');
 
             // If this is a non-achievements account
             if (typeof M.account.maf === 'undefined' || sms.achievementUsed) {

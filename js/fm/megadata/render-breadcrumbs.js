@@ -295,7 +295,11 @@
      */
     function applyBreadcrumbEventHandlers(scope, dropdown, clickAction) {
         $('.breadcrumb-dropdown-link', scope)
-            .rebind('click.breadcrumb-dropdown', () => {
+            .rebind('click.breadcrumb-dropdown', function(e) {
+                if ($(this).hasClass('info-dlg')) {
+                    e.stopPropagation();
+                }
+
                 dropdown.classList.toggle('active');
 
                 if (dropdown.classList.contains('active')) {

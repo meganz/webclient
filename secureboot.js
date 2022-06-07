@@ -1741,6 +1741,7 @@ function mObjectURL(data, type)
                         localStorage.ctInstances = (this.slaves.length + 1);
                     }
 
+                    mBroadcaster.sendMessage('crossTab:slave', strg.origin);
                     this.notify('pong');
                     break;
                 case 'leaving':

@@ -193,7 +193,6 @@ table {
     display: table;
     border-collapse: separate;
     border-spacing: 0;
-    table-layout: fixed;
 }
 
 table tr td:first-child::after {

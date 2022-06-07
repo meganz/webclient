@@ -237,6 +237,16 @@
     display: none;
 }
 
+.mega-dialog.dialog-template-main.share-dialog > footer .footer-container {
+    padding: 16px 48px;
+}
+
+.mega-dialog.share-dialog .share-dialog-bottom-msg {
+    background: var(--surface-grey-1);
+    text-align: center;
+    padding: 8px 0 16px;
+}
+
 .mega-dialog.share-add-dialog {
     background: var(--surface-main);
     border-radius: var(--border-radius);

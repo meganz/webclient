@@ -14545,23 +14545,7 @@ class MemberRow extends mixins.wl {
       contact,
       onResultOpen
     } = this.props;
-    const hasHighlight = matches && !!matches.length;
     const isGroup = room && roomIsGroup(room);
-    const userCard = {
-      graphic: external_React_default().createElement("div", {
-        className: "graphic"
-      }, isGroup ? external_React_default().createElement(utils.OFlowParsedHTML, null, megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.OFlowParsedHTML, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
-        contact: contact
-      }))),
-      textual: external_React_default().createElement("div", {
-        className: "textual"
-      }, isGroup ? external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("span", null, external_React_default().createElement(utils.OFlowEmoji, null, room.topic || room.getRoomTitle())), external_React_default().createElement(ui_contacts.MembersAmount, {
-        room: room
-      })) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.OFlowEmoji, null, nicknames.getNickname(data)), external_React_default().createElement(ui_contacts.LastActivity, {
-        contact: contact,
-        showLastGreen: true
-      })))
-    };
     return external_React_default().createElement("div", {
       ref: node => {
         this.nodeRef = node;
@@ -14578,7 +14562,11 @@ class MemberRow extends mixins.wl {
       contact: contact
     }), external_React_default().createElement("div", {
       className: USER_CARD_CLASS
-    }, userCard[hasHighlight ? 'graphic' : 'textual']), external_React_default().createElement("div", {
+    }, external_React_default().createElement("div", {
+      className: "graphic"
+    }, isGroup ? external_React_default().createElement(utils.OFlowParsedHTML, null, megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.OFlowParsedHTML, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
+      contact: contact
+    })))), external_React_default().createElement("div", {
       className: "clear"
     }));
   }

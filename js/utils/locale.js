@@ -1023,6 +1023,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[12487] = l[12487].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
     l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
     l[12488] = l[12488].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
+    l[16116] = l[16116].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
 
     l.bus_acc_delete_msg = l.bus_acc_delete_msg.replace('[S]', '<span class="red">').replace('[/S]', '</span>');
 

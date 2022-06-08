@@ -194,7 +194,7 @@ function is_text(node) {
     }
 
     var fType = filetype(node, true)[0];
-    if (fType === 'text' || fType === 'web-data' || fType === 'web-lang') {
+    if (fType === 'text' || fType === 'web-data' || fType === 'web-lang' || fType === 'mega') {
         return true;
     }
 

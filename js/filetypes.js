@@ -14,6 +14,7 @@ var extensions = {
     'image': [['gif', 'tiff', 'tif', 'bmp', 'png', 'tga', 'jpg', 'jpeg', 'heic', 'webp', 'avif'], 'Image'],
     'indesign': [['indd'], 'Adobe InDesign'],
     'keynote': [['key'], 'Apple Keynote'],
+    'mega': [['megaignore'], 'Mega Ignore'],
     'numbers': [['numbers'], 'Apple Numbers'],
     'openoffice': [['sxw', 'stw', 'sxc', 'stc', 'sxi', 'sti', 'sxd', 'std', 'sxm'], 'OpenOffice'],
     'pages': [['pages'], 'Apple Pages'],
@@ -675,8 +676,8 @@ function fileext(name, upper, iknowwhatimdoing) {
             .replace(/<[^>]*>/g, '')
             .replace(/[^\w+]/g, '');
 
-        if (ext.length > 9) {
-            ext = ext.substr(0, 9);
+        if (ext.length > 10) {
+            ext = ext.substr(0, 10);
         }
     }
 

@@ -77,22 +77,27 @@ function RoomSearch(parentSearch, room) {
 
 RoomSearch.prototype._matchMembers = function(members) {
     'use strict';
-    var self = this;
+    for (const userId in members) {
+        if (members.hasOwnProperty(userId) && userId !== u_handle && M.u[userId]) {
+            const regExps = this.parentSearch.searchRegExps;
+            const matches = [];
 
-    for (var userid in members) {
-        if (userid === u_handle) {
-            continue;
+            for (let i = regExps.length; i--;) {
+                const regExp = regExps[i];
+                let match;
+                while ((match = regExp.exec(M.getNameByHandle(userId))) !== null) {
+                    matches.push({ idx: match.index, str: match[0] });
+                }
+            }
+
+            if (matches && matches.length) {
+                this.parentSearch.handler.onResult(this.room, {
+                    type: SearchResultType.kMember,
+                    data: this.room.type === 'private' ? userId : this.room.chatId,
+                    matches
+                });
+            }
         }
-        if (!M.u[userid]) {
-            self.logger.error("Unknown user handle", userid);
-            continue;
-        }
-        self.parentSearch._match(
-            M.getNameByHandle(userid),
-            SearchResultType.kMember,
-            self.room.type === "private" ? userid : self.room.chatId,
-            self
-        );
     }
 };
 
@@ -569,38 +574,41 @@ ChatSearch.prototype.dumpRoomSearchesStates = function() {
  * Do string matching
  *
  * @internal
- * @param str {String}
+ * @param text {String}
  * @param type {SearchResultType}
  * @param data {Object}
  * @param roomSearch {RoomSearch|String}
  * @param [index] {Number}
  */
-ChatSearch.prototype._match = function(str, type, data, roomSearch, index) {
-    "use strict";
-    var matches = [];
-    str = ChatSearch._normalize_str(str);
-    var words = this.searchRegExps;
-    for (var i = 0; i < words.length; i++) {
-        var rx = words[i];
-        rx.lastIndex = 0;
-        var m = rx.exec(str);
-        if (!m) {
-            return;
-        }
-        do {
-            matches.push({idx: m.index, str: m[0]});
-        } while ((m = rx.exec(str)));
-    }
-    var result = {type: type, text: str, matches: matches, index: index};
-    if (data) {
-        result.data = data;
-    }
 
-    var stop = this.handler.onResult(roomSearch && roomSearch.room ? roomSearch.room : roomSearch, result);
-    if (roomSearch && roomSearch._setComplete && stop) {
-        roomSearch._setComplete();
+ChatSearch.prototype._match = function(text, type, data, roomSearch, index) {
+    'use strict';
+    if (text && text.length) {
+        text = ChatSearch._normalize_str(text);
+        const matches = [];
+
+        for (let i = this.searchRegExps.length; i--;) {
+            const regExp = this.searchRegExps[i];
+            regExp.lastIndex = 0;
+            let m = regExp.exec(text);
+            if (!m) {
+                return;
+            }
+            do {
+                matches.push({ idx: m.index, str: m[0] });
+            } while ((m = regExp.exec(text)));
+        }
+
+        this.handler.onResult(roomSearch && roomSearch.room || roomSearch, {
+            index,
+            type,
+            text,
+            matches,
+            data: data || {}
+        });
     }
 };
+
 /**
  * Completely aborts the search. No callbacks will be called after call to this method.
  *

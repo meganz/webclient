@@ -940,40 +940,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     if ((lang === 'es') || (lang === 'pt') || (lang === 'sk')) {
         l[0] = 'MEGA';
     }
-    l[1] = l[398];
-    if (lang === 'en') {
-        l[1] = 'Go PRO';
-    }
 
-    if (lang == 'en') {
-        l[509] = 'The Privacy Company';
-    }
-    else {
-        l[509] = l[509].toLowerCase();
-        l[509] = l[509].charAt(0).toUpperCase() + l[509].slice(1);
-    }
-
-    l[122] = l[122].replace('five or six hours', '<span class="red">five or six hours</span>');
-    l[8634] = l[8634].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
-    l[438] = l[438].replace('[X]', '');
-    l['439a'] = l[439];
-    l[439] = l[439].replace('[X1]', '').replace('[X2]', '');
-    l['466a'] = l[466];
-    l[466] = l[466].replace('[X]', '');
-    l[543] = l[543].replace('[X]', '');
-    l[456] = l[456].replace(':', '');
-    l['471a'] = l[471].replace('[X]', 10);
-    l['471b'] = l[471].replace('[X]', 100);
-    l['471c'] = l[471].replace('[X]', 250);
-    l['471d'] = l[471].replace('[X]', 500);
-    l['471e'] = l[471].replace('[X]', 1000);
-    l['469a'] = l[469].replace('[X]', 10);
-    l['469b'] = l[469].replace('[X]', 100);
-    l['469c'] = l[469].replace('[X]', 250);
-    l['472a'] = l[472].replace('[X]', 10);
-    l['472b'] = l[472].replace('[X]', 100);
-    l['472c'] = l[472].replace('[X]', 250);
     l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl" tabindex="-1">');
     l['208a'] = l['208a'].replace('[/A]', '</a>');
     l['208.a2'] = l[208].replace('[A]', '<a href="/terms" tabindex="-1">');
@@ -986,53 +954,14 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
     l[208] = l[208].replace('[/A]', '</a>');
     l[517] = l[517].replace('[A]', '<a href="/help" class="help-center-link clickurl">').replace('[/A]', '</a>');
-    l[521] = l[521].replace('[A]', '<a href="/copyright" class="clickurl">').replace('[/A]', '</a>');
-    l[553] = l[553].replace('[A]', '<a href="mailto:resellers@mega.nz">').replace('[/A]', '</a>');
-    l[555] = l[555].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
-    l[754] = l[754].replace('[A]',
-        '<a href="http://www.google.com/chrome" target="_blank" rel="noopener noreferrer" style="color:#D9290B;">');
-    l[754] = l[754].replace('[/A]', '</a>');
-    l[871] = l[871].replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>')
-        .replace('[A]', '<a href="/pro" class="clickurl">').replace('[/A]', '</a>');
-    l[924] = l[924].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[501] = l[501].replace('17', '').replace('%', '');
-    l[1066] = l[1066].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
-    l[1067] = l[1067].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[1094] = l[1094].replace('[A]', '<a href="/extensions" class="clickurl">').replace('[/A]', '</a>');
     l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1133] = l[1133].replace('[A]',
-        '<a href="http://en.wikipedia.org/wiki/Entropy" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
-    l[1134] = l[1134].replace('[A]',
-        '<a href="http://en.wikipedia.org/wiki/Public-key_cryptography" target="_blank" rel="noopener noreferrer">').replace('[/A]',
-        '</a>');
-    l[6978] = l[6978].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1151] = l[1151].replace('[A]', '<span>').replace('[/A]', '</span>');
     l[731] = l[731].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
-    if (lang === 'en') {
-        l[965] = 'Legal & policies';
-    }
-    l[1159] = l[1159].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1171] = l[1171].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1185] = l[1185].replace('[X]', '<strong>MEGA.crx</strong>');
-    l[1212] = l[1212].replace('[A]', '<a href="/sdk" class="red clickurl">').replace('[/A]', '</a>');
     l[1274] = l[1274].replace('[A]', '<a href="/takedown" class="clickurl">').replace('[/A]', '</a>');
     l[1275] = l[1275].replace('[A]', '<a href="/copyright" class="clickurl">').replace('[/A]', '</a>');
-    l[1201] = l[1201].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1208] = l[1208].replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[1389] = l[1389].replace('[B]', '').replace('[/B]', '').replace('[A]', '<span>').replace('[/A]', '</span>');
-    l[1915] = l[1915].replace('[A]',
-        '<a class="red" href="https://chrome.google.com/webstore/detail/mega/bigefpfhnfcobdlfbedofhhaibnlghod" target="_blank" rel="noopener noreferrer">')
-        .replace('[/A]', '</a>');
-    l[1936] = l[1936].replace('[A]', '<a href="/keybackup" class="clickurl">').replace('[/A]', '</a>');
     l[1942] = l[1942].replace('[A]', '<a href="/keybackup" class="clickurl">').replace('[/A]', '</a>');
     l[1943] = l[1943].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
-    l[1948] = l[1948].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
-    l[1957] = l[1957].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
-    l[1965] = l[1965].replace('[A]', '<a href="/recovery" class="clickurl">').replace('[/A]', '</a>');
     l[1982] = l[1982].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[1993] = l[1993].replace('[A]', '<a href="/register" class="clickurl">').replace('[/A]', '</a>');
-
     l[5931] = l[5931].replace('[A]', '<a href="/fm/account" class="clickurl">').replace('[/A]', '</a>');
     l[6216] = l[6216]
         .replace('[A1]', '<a href="/fm/account/security/change-email" class="clickurl">')
@@ -1041,7 +970,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A2]', '</a>');
     l[6976] = l[6976].replace('%1', '<span class="plan-name"></span>');
     l[7156] = l[7156].replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');
-    l[7002] = l[7002].replace('[A]', '<a href="/contact" class="clickurl">').replace('[/A]', '</a>');
     l[7202] = l[7202].replace('[A]', '<a href="/resellers" class="voucher-reseller-link clickurl">')
                      .replace('[/A]', '</a>');
     l[7709] = l[7709].replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
@@ -1049,9 +977,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[7991] = l[7991].replace('%1', '<span class="provider-icon"></span><span class="provider-name"></span>');
     l[7996] = l[7996].replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
 
-    l[8426] = l[8426].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
-    l[8427] = l[8427].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
-    l[8428] = l[8428].replace('[A]', '<a class="red">').replace('[/A]', '</a>');
     l[8436] = l[8436].replace('[/A]', '</a>').replace('[A]', '<a class="red" href="mailto:support@mega.nz">');
     l[8440] = l[8440].replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>');
     l[8440] = l[8440].replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
@@ -1073,23 +998,16 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[8653] = l[8653].replace('%4', '<span class="gateway-name"></span>');
     l[8654] = l[8654].replace('[S]', '<span class="choose-text">').replace('[/S]', '</span>');
 
-    l[8535] = l[8535].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[8752] = l[8752].replace('{0}', '</span><div><i class="sprite-fm-uni icon-mega-logo"></i></div><span>');
     l[8833] = l[8833].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[8850] = l[8850].replace('%1', '<span class="release-version"></span>');
     l[8851] = l[8851].replace('%1', '<span class="release-date-time"></span>');
-    l[8843] = l[8843].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8855] = l[8855].replace('[BR]', '<br>');
-    l[8848] = l[8848].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[8849] = l[8849].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8912] = l[8912].replace('[B]', '<span>').replace('[/B]', '</span>');
     l[8846] = l[8846].replace('[S]', '').replace('[/S]', '');
     l[8847] = l[8847].replace('[S]', '').replace('[/S]', '');
     l[8950] = l[8950].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8951] = l[8951].replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = l[8952].replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[9030] = l[9030].replace('[S]', '<strong>').replace('[/S]', '</strong>');
-    l[9036] = l[9036].replace('[S]', '<strong>').replace('[/S]', '</strong>');
 
     l[10631] = l[10631].replace('[A]',
         '<a href="https://mega.nz/terms/refunds" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
@@ -1099,27 +1017,16 @@ mBroadcaster.once('boot_done', function populate_l() {
                        .replace('[/A]', '</a>');
 
     l[10635] = l[10635].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[10644] = l[10644].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
-    l[10646] = l[10646].replace('[A]', '<a href="/account" class="clickurl">').replace('[/A]', '</a>');
-    l[10650] = l[10650].replace('[A]', '<a href="/account" class="clickurl">').replace('[/A]', '</a>');
-    l[10656] = l[10656].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
-    l[10658] = l[10658].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
 
     l[12482] = l[12482].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[12483] = l[12483].replace('[BR]', '<br>');
-    l[12485] = l[12485].replace('[A1]', '<a href="" class="red a1 mac">').replace('[/A1]', '</a>');
-    l[12485] = l[12485].replace('[A2]', '<a href="" class="red a2 linux">').replace('[/A2]', '</a>');
-    l[12486] = l[12486].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
-    l[12486] = l[12486].replace('[A2]', '<a href="" class="red mac">').replace('[/A2]', '</a>');
     l[12487] = l[12487].replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>');
     l[12487] = l[12487].replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
     l[12488] = l[12488].replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
-    l[12489] = l[12489].replace('[I]', '<i>').replace('[/I]', '</i>').replace('[I]', '<i>').replace('[/I]', '</i>');
-
     l[16116] = l[16116].replace('[S]', '<span class="red">').replace('[/S]', '</span>');
+
     l.bus_acc_delete_msg = l.bus_acc_delete_msg.replace('[S]', '<span class="red">').replace('[/S]', '</span>');
 
-    l[16165] = l[16165].replace('[S]', '<a class="red">').replace('[/S]', '</a>').replace('[BR]', '<br/>');
     l[16167] = l[16167].replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');
     l[16301] = l[16301].replace('[S]', '<span class="quota-info-pr-txt-used">').replace('[/S]', '</span>');
     l[16306] = escapeHTML(l[16306])
@@ -1127,26 +1034,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[16310] = escapeHTML(l[16310])
         .replace('[A]', '<a href="/fm/dashboard" class="clickurl dashboard-link">').replace('[/A]', '</a>');
     l[16317] = escapeHTML(l[16317]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
-    l[16389] = escapeHTML(l[16389]).replace(
-        '%1',
-            '<span class="checkdiv checkboxOn autoaway">' +
-            '<input type="checkbox" name="set-auto-away" id="set-auto-away" class="checkboxOn" checked="">' +
-            '</span>'
-        )
-        .replace(
-            '%2',
-            '<span class="account-counter-number short">' +
-            '<input type="text" value="5" id="autoaway" />' +
-            '</span>'
-        );
-    l[16390] = escapeHTML(l[16390]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
-    l[16391] = escapeHTML(l[16391]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
-    l[16392] = escapeHTML(l[16392]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
-    l[16393] = escapeHTML(l[16393])
-        .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[16494] = escapeHTML(l[16494]).replace('[S]2[/S]', '%1');
-    l[22670] = escapeHTML(l[22670])
-        .replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[25048] = escapeHTML(l[25048])
         .replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[25050] = escapeHTML(l[25050])
@@ -1163,20 +1051,9 @@ mBroadcaster.once('boot_done', function populate_l() {
             `accounts#how-does-mega-pro-account-subscription-work-with-apple-in-app-purchases` +
             `-57732e9f886688e7028b45bd">`)
         .replace('[/A3]', '</a>');
-    l[16596] = escapeHTML(l[16596])
-        .replace('[A]', '<a class="red" href="mailto:uwp.alpha@mega.nz">').replace('[/A]', '</a>').replace('uwp@', 'uwp.alpha@');
-	l[16598] = escapeHTML(l[16598])
-        .replace('[A]', '<a href="https://github.com/meganz/megacmd" target="_blank" class="red">')
-        .replace('[/A]', '</a>')
-        .replace('[B]', '<a href="https://github.com/meganz/MEGAcmd/blob/master/README.md" target="_blank" class="red">')
-        .replace('[/B]', '</a>');
-    l[16609] = escapeHTML(l[16609]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[16614] = escapeHTML(l[16614])
         .replace('[A]', '<a class="red" href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
-
-    l[12439] = l[12439].replace('[A1]', '').replace('[/A1]', '').replace('[A2]', '').replace('[/A2]', '');
-
     l[16865] = escapeHTML(l[16865]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
     l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
     l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
@@ -1197,9 +1074,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[17690] = l[17690].replace('[A]', '<a href="https://mega.nz/recovery" target="_blank" class="red">')
                        .replace('[/A]', '</a>');
     l[17701] = l[17701].replace('[B]', '<b>').replace('[/B]', '</b>');
-    if (l[17742]) {
-        l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
-    }
+    l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[17805] = l[17805].replace('[A]', '<a class="mobile red-email" href="mailto:support@mega.nz">')
                        .replace('[/A]', '</a>');
     l[18301] = l[18301].replace(/\[B\]/g, '<b class="megasync-logo">')
@@ -1209,13 +1084,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[18312] = l[18312].replace(/\[B\]/g, '<strong class="warning-text">')
         .replace(/\[\/B\]/g, '</strong>');
 
-    l[18446] = l[18446].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
-    l[18447] = l[18447].replace(/\[A\]/g, '<a href="/terms" class="clickurl">').replace(/\[\/A\]/g, '</a>');
-    l[18448] = l[18448].replace('[A1]', '<a href="/terms" class="clickurl">').replace('[/A1]', '</a>')
-                       .replace(/\[A2\]/g, '<a href="/privacy" class="clickurl">').replace(/\[\/A2\]/g, '</a>');
-    l[18465] = l[18465].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
-    l[18490] = l[18490].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
-    l[18491] = l[18491].replace('[A]', '<a href="mailto:gdpr@mega.nz">').replace('[/A]', '</a>');
     l[18638] = l[18638].replace(/\[+[B1-9]+\]/g, '<b>').replace(/\[\/+[B1-9]+\]/g, '</b>');
     l[18787] = l[18787]
         .replace('[A]', '<a href="https://github.com/meganz/MEGAcmd" rel="noreferrer" target="_blank">')
@@ -1230,7 +1098,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
     l[19514] = l[19514].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2)
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[19628] = l[19628].replace('[A]', '<a href="mailto:copyright@mega.nz">').replace('[/A]', '</a>');
     l[19661] = l[19661].replace('[A]', '<a href="/help/client/megasync/" class="clickurl" rel="noreferrer">')
         .replace('[/A]', '</a>');
     l[19685] = l[19685].replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
@@ -1243,30 +1110,15 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[19849] = l[19849].replace('[A]', '<a class="red clickurl" href="/recovery">').replace('[/A]', '</a>');
     l[19851] = l[19851].replace('[B]', '<strong class="warning-text">').replace('[/B]', '</strong>');
     l[19857] = l[19857] ? l[19857].replace('[BR]', '<br>') : l[19857];
-    l[20011] = l[20011]
-        .replace('[A]', '<a class="red" target="_blank" rel="noopener noreferrer"  href="https://www.lastpass.com/'
-            + 'password-generator">')
-        .replace('[/A]', '</a>');
-    l[20013] = l[20013].replace('[Br]', '<br><br>');
     l[20015] = l[20015].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
         + '/keybackup">')
         .replace('[/A]', '</a>');
-    l[20016] = l[20016].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="'
-        + 'https://blog.mega.io/mega-adds-two-factor-authentication" >')
-        .replace('[/A]', '</a>')
-        .replace('[Br]', '<br><br>');
-    l[20022] = l[20022].replace('[Br]', '<br><br>');
-    l[20022] = l[20022].replace('[Br]', '<br><br>');
-    l[20132] = l[20132].replace('[A]', '<span class="os-mac-windows-toggle">').replace('[/A]', '</span>')
-                       .replace('[B]', '<span class="os-linux-toggle">').replace('[/B]', '</span>');
-    l[20137] = l[20137].replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz'
-        + '/mobile">').replace('[/A]', '</a>');
     l[20189] = l[20189].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20192] = l[20192].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20193] = l[20193].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20194] = l[20194].replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20195] = l[20195].replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[23708] = l[23708].replace('[B]', '').replace('[/B]', '');
+    l[23708] = l[23708].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[23709] = l[23709].replace('[B]', '').replace('[/B]', '');
     l['23789.s'] = escapeHTML(l[23789]).replace('%1', '<span></span>');
     l['23790.s'] = escapeHTML(l[23790]).replace('%1', '<span></span>');
@@ -1299,25 +1151,16 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20592] = l[20592].replace('[A1]', '').replace('[/A1]', '');
     l[20592] = l[20592].replace('[A2]', '<a target="_blank" rel="noopener noreferrer"'
         + 'href="https://mega.nz/SecurityWhitepaper.pdf">').replace('[/A2]', '</a>');
-    l[20607] = l[20607].replace('[A1]', '<a class="clickurl" href="/mobile">')
-        .replace('[/A1]', '</a>');
-    l[20607] = l[20607].replace('[A2]', '<a class="clickurl" href="/desktop">')
-        .replace('[/A2]', '</a>');
     l[20609] = l[20609].replace('[A]', '<a class="clickurl" href="/desktop">').replace('[/A]', '</a>');
     l[20846] = l[20846]
         .replace('[A]', '<a href="https://mega.nz/linux/repo/" target="_blank" class="download-all-link">')
         .replace('[/A]', '</a>');
     l['20635.a'] = escapeHTML(l[20635]).replace('[A]', '<a class="clickurl" href="/register">').replace('[/A]', '</a>');
     l[20635] = escapeHTML(l[20635]).replace('[A]', '<a>').replace('[/A]', '</a>');
-    l[20707] = escapeHTML(l[20707]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[20708] = escapeHTML(l[20708]).replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[20709] = escapeHTML(l[20709]).replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[20710] = escapeHTML(l[20710]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20713] = escapeHTML(l[20713]).replace('[B]%1[/B]', '<b>%1</b>');
     l[20714] = escapeHTML(l[20714])
         .replace('[B1]%1[/B1]', '<b class="plan-time">%1</b>')
         .replace('[B2]%2[/B2]', '<b class="plan-name">%2</b>');
-    l[20750] = escapeHTML(l[20750]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20756] = escapeHTML(l[20756]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20757] = escapeHTML(l[20757]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20759] = escapeHTML(l[20759]).replace('[B]%1[/B]', '<b>%1</b>');
@@ -1344,29 +1187,17 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S]', '<span class="no-buisness">').replace('[/S]', '</span>');
     l[22700] = l[22700].replace('[S]', '<i class="sprite-fm-mono icon-up"></i><span>')
         .replace('[/S]', '</span>').replace('%1', '');
-    l['22723.a'] = l[22723].replace('[B]', '').replace('[/B]', '');
     l[22723] = l[22723].replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l['22724.a'] = l[22724].replace('[B]', '').replace('[/B]', '');
-    l[22724] = l[22724].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l['22725.m'] = l[22725].replace('[B]', '<strong>').replace('[/B]', '*</strong>');
     l[22725] = l[22725].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l['22726.m'] = l[22726].replace('[B]', '<strong>').replace('[/B]', '*</strong>');
     l[22726] = l[22726].replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l['22731.a'] = l[22731].replace('[B]', '').replace('[/B]', '');
-    l[22731] = l[22731].replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l['22732.a'] = l[22732].replace('[B]', '').replace('[/B]', '');
-    l[22732] = l[22732].replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22734] = l[22734].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
-    l[22736] = l[22736].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[22764] = l[22764].replace('[S]', '<span class="calc-price-week">').replace('[/S]', '</span>').replace('%1', '');
     l['22771.a'] = l[22771].replace('[B]', '').replace('[/B]', '');
     l[22771] = l[22771].replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l['22772.a'] = l[22772].replace('[B]', '').replace('[/B]', '');
     l[22772] = l[22772].replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l['22773.a'] = l[22773].replace('[B]', '').replace('[/B]', '');
-    l[22773] = l[22773].replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l['22774.a'] = l[22774].replace('[B]', '').replace('[/B]', '');
-    l[22774] = l[22774].replace('[B]', '<strong>').replace('[/B]', '</strong>');
+    l[22773] = l[22773].replace('[B]', '').replace('[/B]', '');
     l[22786] = l[22786].replace('[A]', '<a href="/pro" class="clickurl">').replace('[/A]', '</a>');
     l[22791] = l[22791].replace('[A]', '<a class="to-aff-dash">').replace('[/A]', '</a>');
     l[22793] = l[22793].replace('[A1]', '<a class="clickurl" href="/business">').replace('[/A1]', '</a>')
@@ -1381,8 +1212,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[BR]', '<br>');
     l[22900] = l[22900].replace('[A]', '<a class="reg-success-change-email-btn">').replace('[/A]', '</a>');
     l['23062.k'] = l[23062].replace('[%s]', l[7049]);
-    l[23066] = l[23066].replace('[A]', '<a class="clickurl" href="/security" '
-        + 'target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
     l[23067] = l[23067].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
         .replace('%1', '<span></span>');
     l[23068] = l[23068].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
@@ -1392,45 +1221,31 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.about_countries_info_text = l.about_countries_info_text
         .replace('[S]', '<span class="num">').replace('[/S]', '</span>')
         .replace('%1', '<span></span>');
-    l[23075] = l[23075].replace('[A1]', '<a class="clickurl" href="/terms" '
-        + 'target="_blank" rel="noopener noreferrer">').replace('[/A1]', '</a>')
-        .replace('[A2]', '<a class="clickurl" href="/takedown" '
-            + 'target="_blank" rel="noopener noreferrer">').replace('[/A2]', '</a>')
-        .replace('[A3]', `<a href="https://mega.io/Mega_Transparency_Report_September_2021.pdf" `
-            + 'target="_blank" rel="noopener noreferrer">').replace('[/A3]', '</a>');
     l[23120] = escapeHTML(l[23120].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"');
     l[23126] = escapeHTML(l[23126].replace(/&quot;|"/g, '%1')).replace(/\[BR]/g, '<br/>').replace(/%1/g, '"');
-    l['23181.d'] = escapeHTML(l[23181].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"')
+    l[23181] = escapeHTML(l[23181].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"')
+        .replace('[A]', '<a class="clickurl" href="/terms" target="_blank">')
+        .replace('[/A]', '</a>');
+    l['23181.d'] = l[23181]
         .replace(/\[P]/g, '').replace(/\[\/P]/g, '')
         .replace(/\[L]/g, '<i class="sprite-fm-mono icon-check"></i><div class="affiliate-guide info">')
-        .replace(/\[\/L]/g, '</div>').replace('[A]', '<a class="clickurl" href="/terms" target="_blank">')
-        .replace('[/A]', '</a>')
+        .replace(/\[\/L]/g, '</div>')
         .replace(/\[BLOCK]/g, '').replace(/\[\/BLOCK]/g, '').replace(/\[BR]/g, '<br>');
-    l['23181.m'] = escapeHTML(l[23181].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"')
+    l['23181.m'] = l[23181]
         .replace(/\[P]/g, '<div class="mobile button-block no-bg"><div class="mobile label-info no-icon">')
         .replace(/\[\/P]/g, '</div></div>')
         .replace(/\[L]/g, '<div class="mobile button-block no-bg"><div class="mobile fm-icon green-tick">' +
             '</div><div class="mobile label-info">').replace(/\[\/L]/g, '</div></div>')
-        .replace('[A]', '<a href="/terms" class="clickurl" target="_blank">').replace('[/A]', '</a>')
         .replace(/\[BLOCK]/g, '').replace(/\[\/BLOCK]/g, '').replace(/\[BR]/g, '');
-    l[23181] = escapeHTML(l[23181].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"')
+    l[23181] = l[23181]
         .replace(/\[P]/g, '').replace(/\[\/P]/g, '')
         .replace(/\[L]/g, '<div class="bottom-page list-item">' +
             '<i class="bottom-page icon x12 new-pages-sprite tick"></i>').replace(/\[\/L]/g, '</div>')
-        .replace('[A]', '<a class="clickurl" href="/terms" target="_blank">').replace('[/A]', '</a>')
         .replace(/\[BR]/g, '<br>')
         .replace(/\[BLOCK]/g, '<div class="inline-block col-2 affiliate-list"><div class="bottom-page fadein list">')
         .replace(/\[\/BLOCK]/g, '</div></div>');
     l[23214] = escapeHTML(l[23214]).replace('[A]', '<a class="fm-affiliate guide-dialog to-rules">')
         .replace('[/A]', '</a>');
-    l[23200] = l[23200].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
-        .replace('%1', '<span></span>');
-    l[23201] = l[23201].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
-        .replace('%1', '<span></span>');
-    l[23202] = l[23202].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
-        .replace('%1', '<span></span>');
-    l[23203] = l[23203].replace('[S]', '<span class="num">').replace('[/S]', '</span>')
-        .replace('%1', '<span></span>');
     l[23243] = escapeHTML(l[23243]).replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
     l[23263] = escapeHTML(l[23263]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[23332] = escapeHTML(l[23332]).replace('[A1]', '<a href="/cmd" target="_blank" class="clickurl">')
@@ -1449,11 +1264,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[23373] = l[23373].replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[23376] = escapeHTML(l[23376]).replace('[A]', '<a href="/security" class="clickurl" target="_blank">')
         .replace('[/A]', '</a>');
-    l[23446] = escapeHTML(l[23446]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
-    l[23447] = escapeHTML(l[23447]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
-    l[23448] = escapeHTML(l[23448]).replace('[A1]', '<a href="" class="red a1"></a>')
-        .replace('[A2]', '<a href="" class="red a2"></a>');
-    l[23449] = escapeHTML(l[23449]).replace(/\[R\/]/g, '<sup>&reg;</sup>');
     l[24074] = escapeHTML(l[24074]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[24141] = escapeHTML(l[24141])
         .replace(
@@ -1471,9 +1281,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A2]', '</a>')
         .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
         .replace(/\[BR]/g, '<br/>');
-    l[24642] = escapeHTML(l[24642])
-        .replace('[A]', '<a href="/cookie" class="green clickurl" target="_blank">')
-        .replace('[/A]', '</a>');
     l[24708] = escapeHTML(l[24708]).replace('[LT]', '<').replace('[GT]', '>');
     l[24852] = escapeHTML(l[24852])
         .replace('[A]', '<a target="_blank" class="green-link" href="https://blog.mega.io">')
@@ -1607,7 +1414,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[BR]', '<br>');
     l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
         .replace('[BR]', '<br>');
-
     l.empty_call_dlg_text = l.empty_call_dlg_text
         .replace('[S1]', '<span class="stay-dlg-counter">').replace('[/S1]', '</span>')
         .replace('[S2]', '<div class="stay-dlg-subtext">').replace('[/S2]', '</div>');
@@ -1615,15 +1421,13 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[P]/g, '<div>')
         .replace(/\[\/P]/g, '</div>');
 
-    var common = [
-        15536, 16106, 16107, 16119, 16120, 16123, 16124, 16135, 16136, 16137, 16138, 16304, 16313, 16315, 16316,
-        16341, 16358, 16359, 16360, 16361, 16375, 16382, 16383, 16384, 16394, 18228, 18423, 18425, 18444, 18268,
-        18282, 18283, 18284, 18285, 18286, 18287, 18289, 18290, 18291, 18292, 18293, 18294, 18295, 18296, 18297,
-        18298, 18302, 18303, 18304, 18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813,
-        19814, 19854, 19821, 19930, 20402, 20462, 20966, 20967, 20969, 20970, 20971, 20973, 22117, 22667, 22668,
-        22674, 22669, 22671, 22672, 22784, 22789, 22881, 22883, 23098, 23351, 23521, 23522, 23523, 23524, 23532,
-        23533, 23534, 23296, 23299, 23304, 23819, 24077, 24097, 24098, 24099, 24139, 24540, 24542, 24543, 24544,
-        24546, 24680, 24849, 24850,
+    const common = [
+        15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,
+        18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,
+        18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813, 19814, 19854, 19821, 20402,
+        20462, 20969, 20970, 20971, 20973, 22667, 22668, 22674, 22669, 22671, 22672, 22784, 22789, 22881, 22883,
+        23351, 23524, 23534, 23296, 23299, 23304, 23819, 24077, 24097, 24099, 24139, 24540, 24542, 24543, 24544,
+        24680, 24849, 24850,
 
         // Non numeric ids
         'bsn_calc_min_users'
@@ -1641,7 +1445,7 @@ mBroadcaster.once('boot_done', function populate_l() {
             .replace(/\[A\]/g, '<a href="/pro" class="clickurl">').replace(/\[\/A\]/g, '</a>');
     }
 
-    l['year'] = new Date().getFullYear();
+    l.year = new Date().getFullYear();
     date_months = [
         l[408], l[409], l[410], l[411], l[412], l[413],
         l[414], l[415], l[416], l[417], l[418], l[419]

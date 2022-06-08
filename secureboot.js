@@ -273,6 +273,11 @@ function getCleanSitePath(path) {
         path = [''].concat(path[0].split('=')).concat(path.slice(1));
     }
 
+    // Allow search the folder with '=' symbol
+    if (path[0] === 'fm/search' && path.length > 1) {
+        path = [path.join('')];
+    }
+
     if (path.length > 1) {
         for (var s = 1; s < path.length; s += 2) {
             var v = mURIDecode(path[s + 1]);
@@ -1741,6 +1746,7 @@ function mObjectURL(data, type)
                         localStorage.ctInstances = (this.slaves.length + 1);
                     }
 
+                    mBroadcaster.sendMessage('crossTab:slave', strg.origin);
                     this.notify('pong');
                     break;
                 case 'leaving':

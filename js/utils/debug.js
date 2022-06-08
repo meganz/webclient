@@ -376,17 +376,28 @@ mBroadcaster.once('boot_done', function radSetup() {
     const buffer = new Set();
     const jsonp = tryCatch((...o) => JSON.stringify(...o), false);
 
+    const toString = (v) => (v = Object(v)) && Reflect.has(v, 'toString') && v.toString() || 'Object';
     const toStringTag = (v) => v && (v[Symbol.toStringTag] || v.name);
-    const toPropertyName = (v) => toStringTag(v) || v && toStringTag(v.constructor) || v;
+    const toPropertyName = (v) => toStringTag(v) || v && toStringTag(v.constructor) || toString(v);
     const toPropertyValue = (name, v) => {
         if (name === 'Event') {
             return `{${v.type},${toPropertyName(v.target)}}`;
         }
         const num = Number('byteLength' in v ? v.byteLength : 'length' in v ? v.length : 'size' in v ? v.size : NaN);
-        return num >= 0 ? num : Object(v).toString();
+        return num >= 0 ? num : toString(v);
     };
+    const serialize = tryCatch((value, name) => {
+        name = String(name || toPropertyName(value));
+        if (name) {
+            value = String(toPropertyValue(name, value));
+            if (value[0] === '[') {
+                value = value.replace(/^\[object\s*|]$/g, '');
+            }
+            return name === value ? name : `${name}(${value})`;
+        }
+    }, false);
 
-    const stringify = (value) => {
+    const stringify = tryCatch((value) => {
         const type = typeof value;
 
         if (type !== 'string') {
@@ -401,7 +412,7 @@ mBroadcaster.once('boot_done', function radSetup() {
                     value = `Array[${value.map(stringify).join(';')}]`;
                 }
                 else if (name === 'Object') {
-                    let max = 4;
+                    let max = 7;
                     const srz = [];
                     for (const p in value) {
                         if (!--max) {
@@ -410,12 +421,12 @@ mBroadcaster.once('boot_done', function radSetup() {
                         }
                         const v = value[p];
                         const t = typeof v;
-                        srz.push(`${p}:${t === 'object' && toPropertyName(v) || (t === 'function' ? v.name : v)}`);
+                        srz.push(`${p}:${t === 'object' && serialize(v) || (t === 'function' ? v.name : v)}`);
                     }
                     value = `Object{${srz.join(';')}}`;
                 }
                 else {
-                    value = `${name}(${toPropertyValue(name, value)})`;
+                    value = serialize(value, name) || '\u2753';
                 }
             }
             else if (type === 'function') {
@@ -427,7 +438,7 @@ mBroadcaster.once('boot_done', function radSetup() {
         }
 
         return value;
-    };
+    }, false);
 
     const argp = (args = [], name = null) => {
         args = [...args];
@@ -551,7 +562,8 @@ mBroadcaster.once('boot_done', function radSetup() {
 
     mBroadcaster.once('crossTab:setup', (master) => {
         if (!master) {
-            pfx = (Math.random() * Date.now() >>> 5).toString(36);
+            const {ctID} = mBroadcaster.crossTab;
+            pfx = (ctID >>> 0).toString(36);
 
             const buf = [...buffer];
             buffer.clear();
@@ -562,6 +574,28 @@ mBroadcaster.once('boot_done', function radSetup() {
                 buffer.add(p.join(''));
             }
         }
+    });
+
+    mBroadcaster.addListener('crossTab:master', () => {
+        if (pfx) {
+            const pid = pfx;
+            const {master, slaves} = mBroadcaster.crossTab;
+            pfx = null;
+            log('CROSSTAB', `Ownership (was '${pid}'), ${master}<>${slaves.map(s => (s >>> 0).toString(36))}`);
+            flush().catch(dump);
+        }
+    });
+
+    mBroadcaster.addListener('crossTab:slave', (id) => {
+        const {master, slaves} = mBroadcaster.crossTab;
+        id = (id >>> 0).toString(36);
+        log('CROSSTAB', `New tab with id:${id}, ${master}<>${slaves.map(s => (s >>> 0).toString(36))}`);
+        flush().catch(dump);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        log('VSBY', `${new Date().toISOString()} ${document.visibilityState}`);
+        flush().catch(dump);
     });
 
     window.addEventListener('error', (ev) => {

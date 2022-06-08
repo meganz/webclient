@@ -8377,7 +8377,7 @@ body.de .mega-dialog.new-group-chat {
         text-align: start;
         font-family: var(--text-font-family-semibold);
     }
-    .mega-dialog.verify-phone .verify-success-page.non-achievement-account .verify-ph-bonus-valid-days {
+    .mega-dialog.verify-phone aside.js-verify-success-page.non-achievement-account {
         display: none;
     }
     .mega-dialog.verify-phone .verify-ph-bonus-valid-days .valid-days-title {

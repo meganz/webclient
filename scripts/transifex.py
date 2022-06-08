@@ -38,6 +38,8 @@ organisation_id = os.getenv('TRANSIFEX_ORGANISATION')
 project_id = os.getenv('TRANSIFEX_PROJECT')
 resource_slug = os.getenv('TRANSIFEX_RESOURCE')
 transifex_token = os.getenv('TRANSIFEX_TOKEN')
+transifex_bot_token = os.getenv('TRANSIFEX_BOT_TOKEN')
+transifex_bot_url = os.getenv('TRANSIFEX_BOT_URL')
 
 config_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), "transifex.json")
 if not os.path.exists(config_file):
@@ -54,6 +56,8 @@ if os.path.exists(config_file):
     project_id = transifex_config.get('PROJECT') or project_id
     resource_slug = transifex_config.get('RESOURCE') or resource_slug
     transifex_token = transifex_config.get('TRANSIFEX_TOKEN') or transifex_token
+    transifex_bot_token = transifex_config.get('TRANSIFEX_BOT_TOKEN') or transifex_bot_token
+    transifex_bot_url = transifex_config.get('TRANSIFEX_BOT_URL') or transifex_bot_url
 
 if not base_url or not organisation_id or not project_id or not resource_slug or not transifex_token:
      print("ERROR: Incomplete Transifex settings.")
@@ -620,13 +624,13 @@ def lock_resource(branch_resource_name, keys):
                 url = content["links"]["next"]
 
 def pruning():
-    url = os.getenv('TRANSIFEX_BOT_URL')
-    token = os.getenv('TRANSIFEX_BOT_TOKEN')
+    global transifex_bot_token
+    global transifex_bot_url
     prod = PROJECT_ID + ':r:' + RESOURCE
-    if url and token:
+    if transifex_bot_token and transifex_bot_url:
         i = 30
         while i > 0:
-            request = Request(url + '?o=prune&pid=55&token=' + token)
+            request = Request(transifex_bot_url + '?o=prune&pid=55&token=' + transifex_bot_token)
             try:
                 response = urlopen(request)
             except HTTPError as ex:

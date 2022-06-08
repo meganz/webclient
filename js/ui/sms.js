@@ -701,7 +701,7 @@ sms.verifySuccess = {
                 $successMessage.text(l[20404]);             // Congratulations! You've just unlocked:
                 $storageAmount.text(storageQuotaFormatted);
                 $transferAmount.text(transferQuotaFormatted);
-                $validDaysText.text(l[20407].replace("%1", days));
+                $validDaysText.text(mega.icu.format(l[20407], days));
             }
             $page.removeClass('hidden');
         }, true); // Show loading spinner

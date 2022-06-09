@@ -344,7 +344,20 @@ function ChatSearch(megaChat, chatId, searchExpr, handler, searchMessages) {
 ChatSearch._normalize_str = function(s) {
     "use strict";
     if (s && s.normalize) {
-        return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        return s.normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\u00f8/g, "o")
+            .replace(/\u00d8/g, "O")
+            .replace(/\u00e6/g, "ae")
+            .replace(/\u00c6/g, "AE")
+            .replace(/\u0259/g, "e")
+            .replace(/\u0152/g, "OE")
+            .replace(/\u0153/g, "oe")
+            .replace(/\u00df/g, "ss")
+            .replace(/[\u0131\u0142]/g, "l")
+            .replace(/\u0111/g, "d")
+            .replace(/\u0110/g, "D")
+            .replace(/\u00fe/g, "p");
     }
     else {
         return s;

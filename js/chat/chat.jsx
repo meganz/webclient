@@ -11,6 +11,7 @@ require("./chatRoom.jsx");
 require("./ui/meetings/workflow/incoming.jsx");
 
 import ChatRouting from "./chatRouting.jsx";
+import { replaceAt } from './mixins.js';
 
 const EMOJI_DATASET_VERSION = 4;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
@@ -2796,34 +2797,30 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(
  */
 
 Chat.prototype.highlight = (text, matches, dontEscape) => {
-    if (!text) {
-        return;
-    }
-
-    text = dontEscape ? text : escapeHTML(text);
-
-    if (matches) {
+    if (text && matches) {
+        text = dontEscape ? text : escapeHTML(text);
         // extract HTML tags
-        let tags = [];
-        text = text.replace(/<[^>]+>/g, match => {
-            return "@@!" + (tags.push(match) - 1) + "!@@";
-        });
-        let regexes = [];
-        const cb = word => `<strong>${word}</strong>`;
+        const tags = [];
+        text = text.replace(/<[^>]+>/g, match => "@@!" + (tags.push(match) - 1) + "!@@").split(' ');
         for (let i = 0; i < matches.length; i++) {
-            regexes.push(RegExpEscape(matches[i].str));
+            const match = matches[i].str;
+            for (let j = 0; j < text.length; j++) {
+                const word = text[j];
+                const wordNormalized = ChatSearch._normalize_str(word);
+                if (wordNormalized.includes(match)) {
+                    const matchIndex = wordNormalized.indexOf(match);
+                    text[j] = replaceAt(matchIndex, word, word.slice(matchIndex, matchIndex + match.length));
+                }
+            }
         }
-        regexes = regexes.join('|');
-        text = text.replace(new RegExp(regexes, 'g'), cb);
-
         // add back the HTML tags
         // eslint-disable-next-line optimize-regex/optimize-regex,no-useless-escape
-        text = text.replace(/\@\@\!\d+\!\@\@/g, match => {
+        text = text.join(' ').replace(/\@\@\!\d+\!\@\@/g, match => {
             return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
         });
+        return text;
     }
-
-    return text;
+    return null;
 };
 
 /**

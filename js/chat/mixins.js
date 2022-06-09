@@ -191,6 +191,8 @@ export const schedule = (local, debug) => {
 
 export const compose = (...funcs) => funcs.reduce((a, b) => (...args) => a(b(...args)), arg => arg);
 
+export const replaceAt = (i, o, n) => `${o.slice(0, i)}<strong>${n}</strong>${o.slice(i + n.length)}`;
+
 export const SoonFcWrap = (milliseconds, local) => {
     return function(target, propertyKey, descriptor) {
         descriptor.value = SoonFc(descriptor.value, !local, milliseconds);

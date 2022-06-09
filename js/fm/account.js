@@ -203,11 +203,11 @@ accountUI.renderAccountPage = function(account) {
             accountUI.notifications.init(account);
             break;
 
-        case '/fm/account/meeting':
-            $('.fm-account-meeting').removeClass('hidden');
-            sectionClass = 'meeting';
+        case '/fm/account/calls':
+            $('.fm-account-calls').removeClass('hidden');
+            sectionClass = 'calls';
 
-            accountUI.meeting.init(account);
+            accountUI.calls.init(account);
             break;
         default:
 
@@ -707,8 +707,8 @@ accountUI.leftPane = {
                 return 'fm/account/contact-chats';
             case $section.hasClass('reseller'):
                 return 'fm/account/reseller';
-            case $section.hasClass('meeting'):
-                return 'fm/account/meeting';
+            case $section.hasClass('calls'):
+                return 'fm/account/calls';
             default:
                 return 'fm/account';
         }
@@ -4070,12 +4070,12 @@ accountUI.reseller = {
     }
 };
 
-accountUI.meeting = {
+accountUI.calls = {
     init: function() {
         'use strict';
-        this.emptyCall.render();
+        this.emptyGroupCall.render();
     },
-    emptyCall: {
+    emptyGroupCall: {
         render: function() {
             'use strict';
             const switchSelector = '#callemptytout';

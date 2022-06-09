@@ -2868,7 +2868,7 @@ function topmenuUI() {
                     mLogout();
                 }
                 else if (className.indexOf('transparency') > -1) {
-                    window.open('https://mega.io/Mega_Transparency_Report_September_2021.pdf', '_blank');
+                    window.open('https://transparency.mega.io', '_blank', 'noopener,noreferrer');
                 }
                 else if (className.includes('help')) {
                     window.open('https://help.mega.io');

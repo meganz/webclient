@@ -751,10 +751,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     .replace('%2', itemsTotalSize);
             }
             else { // Multiple items here
-                notificationText = l[24672]
-                    .replace('%1', itemsNum)
-                    .replace('%2', totalNodes)
-                    .replace('%3', itemsTotalSize);
+                notificationText = mega.icu.format(l[24672], totalNodes)
+                    .replace('%1', mega.icu.format(l.selected_count, itemsNum))
+                    .replace('%2', itemsTotalSize);
             }
             this.showSelectionBar(notificationText);
 

@@ -2285,10 +2285,10 @@ accountUI.plan = {
                 $.purchaselimit = 10;
             }
 
-            $('span', $purchaseSelect).text(l[469].replace('[X]', $.purchaselimit));
-            $('.purchase10-', $purchaseSelect).text(l[469].replace('[X]', 10));
-            $('.purchase100-', $purchaseSelect).text(l[469].replace('[X]', 100));
-            $('.purchase250-', $purchaseSelect).text(l[469].replace('[X]', 250));
+            $('span', $purchaseSelect).text(mega.icu.format(l[469], $.purchaselimit));
+            $('.purchase10-', $purchaseSelect).text(mega.icu.format(l[469], 10));
+            $('.purchase100-', $purchaseSelect).text(mega.icu.format(l[469], 100));
+            $('.purchase250-', $purchaseSelect).text(mega.icu.format(l[469], 250));
 
             M.account.purchases.sort(function(a, b) {
                 if (a[1] < b[1]) {
@@ -2363,10 +2363,10 @@ accountUI.plan = {
                 $.transactionlimit = 10;
             }
 
-            $('span', $transactionSelect).text(l[471].replace('[X]', $.transactionlimit));
-            $('.transaction10-', $transactionSelect).text(l[471].replace('[X]', 10));
-            $('.transaction100-', $transactionSelect).text(l[471].replace('[X]', 100));
-            $('.transaction250-', $transactionSelect).text(l[471].replace('[X]', 250));
+            $('span', $transactionSelect).text(mega.icu.format(l[471], $.transactionlimit));
+            $('.transaction10-', $transactionSelect).text(mega.icu.format(l[471], 10));
+            $('.transaction100-', $transactionSelect).text(mega.icu.format(l[471], 100));
+            $('.transaction250-', $transactionSelect).text(mega.icu.format(l[471], 250));
 
             M.account.transactions.sort(function(a, b) {
                 if (a[1] < b[1]) {
@@ -2676,10 +2676,10 @@ accountUI.security = {
                 $.sessionlimit = 10;
             }
 
-            $('span', $sessionSelect).text(l[472].replace('[X]', $.sessionlimit));
-            $('.session10-', $sessionSelect).text(l[472].replace('[X]', 10));
-            $('.session100-', $sessionSelect).text(l[472].replace('[X]', 100));
-            $('.session250-', $sessionSelect).text(l[472].replace('[X]', 250));
+            $('span', $sessionSelect).text(mega.icu.format(l[472], $.sessionlimit));
+            $('.session10-', $sessionSelect).text(mega.icu.format(l[472], 10));
+            $('.session100-', $sessionSelect).text(mega.icu.format(l[472], 100));
+            $('.session250-', $sessionSelect).text(mega.icu.format(l[472], 250));
 
             M.account.sessions.sort(function(a, b) {
                 if (a[7] !== b[7]) {
@@ -3928,13 +3928,13 @@ accountUI.reseller = {
                 .find('span').text(l[9106].replace('%1', email));
 
             // Use 'All' or 'Last 10/100/250' for the dropdown text
-            var buttonText = $.voucherlimit === 'all' ? l[7557] : l[466].replace('[X]', $.voucherlimit);
+            const buttonText = $.voucherlimit === 'all' ? l[7557] : mega.icu.format(l[466], $.voucherlimit);
 
             $('span', $vouchersSelect).text(buttonText);
             $('.balance span', $resellerSection).safeHTML('@@ &euro; ', account.balance[0][0]);
-            $('.voucher10-', $vouchersSelect).text(l[466].replace('[X]', 10));
-            $('.voucher100-', $vouchersSelect).text(l[466].replace('[X]', 100));
-            $('.voucher250-', $vouchersSelect).text(l[466].replace('[X]', 250));
+            $('.voucher10-', $vouchersSelect).text(mega.icu.format(l[466], 10));
+            $('.voucher100-', $vouchersSelect).text(mega.icu.format(l[466], 100));
+            $('.voucher250-', $vouchersSelect).text(mega.icu.format(l[466], 250));
 
             // Sort vouchers by most recently created at the top
             M.account.vouchers.sort(function(a, b) {

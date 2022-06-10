@@ -506,7 +506,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
                 passed = false;
             }
             else if (nbUsersTrimmed && nbUsersTrimmed > mySelf.maxUsers) {
-                nbUsersMegaInput.showError(l[20425].replace('%1', mySelf.maxUsers));
+                nbUsersMegaInput.showError(mega.icu.format(l[20425], mySelf.maxUsers));
                 $nbUsersInput.focus();
                 passed = false;
             }

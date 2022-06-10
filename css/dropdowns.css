@@ -1195,6 +1195,7 @@
 }
 
 .gif-panel .gif-panel-results .node-container .node {
+    display: inline-block;
     position: relative;
     width: 100%;
     height: 100%;

@@ -12023,8 +12023,8 @@ PushSettingsDialog.options = {
 PushSettingsDialog.default = PushSettingsDialog.options[PushSettingsDialog.options.length - 1];
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 23 modules
 var call = __webpack_require__(357);
-// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
-var historyPanel = __webpack_require__(192);
+// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
+var historyPanel = __webpack_require__(638);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 var composedTextArea = __webpack_require__(813);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/loading.jsx
@@ -17050,7 +17050,7 @@ class GifPanel extends mixins.wl {
 
 /***/ }),
 
-/***/ 192:
+/***/ 638:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -17060,6 +17060,16 @@ __webpack_require__.d(__webpack_exports__, {
   "Z": () => (HistoryPanel)
 });
 
+;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/initializerDefineProperty.js
+function _initializerDefineProperty(target, property, descriptor, context) {
+  if (!descriptor) return;
+  Object.defineProperty(target, property, {
+    enumerable: descriptor.enumerable,
+    configurable: descriptor.configurable,
+    writable: descriptor.writable,
+    value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+  });
+}
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
 var applyDecoratedDescriptor = __webpack_require__(229);
 // EXTERNAL MODULE: external "React"
@@ -17600,7 +17610,9 @@ var call = __webpack_require__(357);
 ;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
 
-var _dec, _dec2, _class;
+
+
+var _dec, _dec2, _class, _descriptor;
 
 
 
@@ -17621,6 +17633,10 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
     super(props);
     this.$container = null;
     this.$messages = null;
+    this.state = {
+      editing: false,
+      toast: false
+    };
 
     this.onKeyboardScroll = ({
       keyCode
@@ -17652,9 +17668,94 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
       }
     };
 
-    this.state = {
-      editing: false
+    _initializerDefineProperty(this, "onMessagesScrollReinitialise", _descriptor, this);
+
+    this.onMessagesScrollUserScroll = (ps, offset = 5) => {
+      const {
+        chatRoom
+      } = this.props;
+      const {
+        messagesBuff
+      } = chatRoom;
+      const scrollPositionY = ps.getScrollPositionY();
+
+      if (messagesBuff.messages.length === 0) {
+        chatRoom.scrolledToBottom = true;
+        return;
+      }
+
+      if (ps.isCloseToBottom(30) === true) {
+        if (!chatRoom.scrolledToBottom) {
+          messagesBuff.detachMessages();
+        }
+
+        chatRoom.scrolledToBottom = true;
+      } else {
+        chatRoom.scrolledToBottom = false;
+      }
+
+      if (!this.scrollPullHistoryRetrieval && !messagesBuff.isRetrievingHistory && (ps.isAtTop() || scrollPositionY < offset && ps.getScrollHeight() > 500) && messagesBuff.haveMoreHistory()) {
+        ps.disable();
+        this.scrollPullHistoryRetrieval = true;
+        this.lastScrollPosition = scrollPositionY;
+        let msgAppended = 0;
+        const scrYOffset = ps.getScrollHeight();
+        chatRoom.one('onMessagesBuffAppend.pull', () => {
+          msgAppended++;
+        });
+        chatRoom.off('onHistoryDecrypted.pull');
+        chatRoom.one('onHistoryDecrypted.pull', () => {
+          chatRoom.off('onMessagesBuffAppend.pull');
+
+          if (msgAppended > 0) {
+            this._reposOnUpdate = scrYOffset;
+          }
+
+          this.scrollPullHistoryRetrieval = -1;
+        });
+        messagesBuff.retrieveChatHistory();
+      }
+
+      if (this.lastScrollPosition !== scrollPositionY) {
+        this.lastScrollPosition = scrollPositionY;
+      }
+
+      delay('chat-toast', this.initToast, 200);
     };
+
+    this.initToast = () => {
+      const {
+        chatRoom
+      } = this.props;
+      this.setState({
+        toast: !chatRoom.scrolledToBottom && !this.messagesListScrollable.isCloseToBottom(30)
+      }, () => this.state.toast ? null : chatRoom.trigger('onChatIsFocused'));
+    };
+
+    this.renderToast = () => {
+      const {
+        chatRoom
+      } = this.props;
+      const unreadCount = chatRoom.messagesBuff.getUnreadCount();
+      return external_React_default().createElement("div", {
+        className: `
+                    theme-dark-forced
+                    messages-toast
+                    ${this.state.toast ? 'active' : ''}
+                `,
+        onClick: () => {
+          this.setState({
+            toast: false
+          }, () => {
+            this.messagesListScrollable.scrollToBottom();
+            chatRoom.scrolledToBottom = true;
+          });
+        }
+      }, external_React_default().createElement("i", {
+        className: "sprite-fm-mono icon-down"
+      }), unreadCount > 0 && external_React_default().createElement("span", null, unreadCount > 9 ? '9+' : unreadCount));
+    };
+
     this.handleWindowResize = SoonFc(80, ev => this._handleWindowResize(ev));
   }
 
@@ -17840,88 +17941,6 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
           this.messagesListScrollable.reinitialise(true, true);
         }, 30);
       }
-    }
-  }
-
-  onMessagesScrollReinitialise(ps, $elem, forced, scrollPositionYPerc, scrollToElement) {
-    var self = this;
-    var chatRoom = self.props.chatRoom;
-    var mb = chatRoom.messagesBuff;
-
-    if (self.scrollPullHistoryRetrieval || mb.isRetrievingHistory) {
-      return;
-    }
-
-    if (forced) {
-      if (!scrollPositionYPerc && !scrollToElement) {
-        if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
-          ps.scrollToBottom(true);
-          return true;
-        }
-      } else {
-        return;
-      }
-    }
-
-    if (self.isComponentEventuallyVisible() && !self.editDomElement && !self.props.chatRoom.isScrollingToMessageId) {
-      if (self.props.chatRoom.scrolledToBottom) {
-        ps.scrollToBottom(true);
-        return true;
-      }
-
-      if (self.lastScrollPosition && self.lastScrollPosition !== ps.getScrollPositionY()) {
-        ps.scrollToY(self.lastScrollPosition, true);
-        return true;
-      }
-    }
-  }
-
-  onMessagesScrollUserScroll(ps, offset = 5) {
-    var self = this;
-    var scrollPositionY = ps.getScrollPositionY();
-    var isAtTop = ps.isAtTop();
-    var chatRoom = self.props.chatRoom;
-    var mb = chatRoom.messagesBuff;
-
-    if (mb.messages.length === 0) {
-      self.props.chatRoom.scrolledToBottom = true;
-      return;
-    }
-
-    if (ps.isCloseToBottom(30) === true) {
-      if (!self.props.chatRoom.scrolledToBottom) {
-        mb.detachMessages();
-      }
-
-      self.props.chatRoom.scrolledToBottom = true;
-    } else {
-      self.props.chatRoom.scrolledToBottom = false;
-    }
-
-    if (!self.scrollPullHistoryRetrieval && !mb.isRetrievingHistory && (isAtTop || scrollPositionY < offset && ps.getScrollHeight() > 500) && mb.haveMoreHistory()) {
-      ps.disable();
-      self.scrollPullHistoryRetrieval = true;
-      self.lastScrollPosition = scrollPositionY;
-      let msgAppended = 0;
-      const scrYOffset = ps.getScrollHeight();
-      chatRoom.one('onMessagesBuffAppend.pull', function () {
-        msgAppended++;
-      });
-      chatRoom.off('onHistoryDecrypted.pull');
-      chatRoom.one('onHistoryDecrypted.pull', function () {
-        chatRoom.off('onMessagesBuffAppend.pull');
-
-        if (msgAppended > 0) {
-          self._reposOnUpdate = scrYOffset;
-        }
-
-        self.scrollPullHistoryRetrieval = -1;
-      });
-      mb.retrieveChatHistory();
-    }
-
-    if (self.lastScrollPosition !== scrollPositionY) {
-      self.lastScrollPosition = scrollPositionY;
     }
   }
 
@@ -18224,8 +18243,12 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
       }
     }
 
-    return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
-      className: `messages scroll-area ${this.props.className ? this.props.className : ''}`
+    return external_React_default().createElement("div", {
+      className: `
+                    messages
+                    scroll-area
+                    ${this.props.className ? this.props.className : ''}
+                `
     }, external_React_default().createElement("div", {
       className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden"
     }, external_React_default().createElement("i", {
@@ -18247,8 +18270,8 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
         ps.scrollToBottom(true);
         this.props.chatRoom.scrolledToBottom = 1;
       },
-      onReinitialise: this.onMessagesScrollReinitialise.bind(this),
-      onUserScroll: this.onMessagesScrollUserScroll.bind(this),
+      onReinitialise: this.onMessagesScrollReinitialise,
+      onUserScroll: this.onMessagesScrollUserScroll,
       className: "js-messages-scroll-area perfectScrollbarContainer",
       messagesToggledInCall: this.state.messagesToggledInCall,
       ref: ref => {
@@ -18279,9 +18302,12 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
         top: "50%"
       },
       className: `
-                                                        loading-spinner js-messages-loading light manual-management
-                                                        ${this.loadingShown ? '' : 'hidden'}
-                                                    `
+                                    loading-spinner
+                                    js-messages-loading
+                                    light
+                                    manual-management
+                                    ${this.loadingShown ? '' : 'hidden'}
+                                `
     }, external_React_default().createElement("div", {
       className: "main-loader",
       style: {
@@ -18289,10 +18315,48 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
         'top': '50%',
         'left': '50%'
       }
-    })), messagesList)))));
+    })), messagesList))), this.renderToast());
   }
 
-}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "onMessagesScrollReinitialise", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "onMessagesScrollReinitialise"), _class.prototype), (0,applyDecoratedDescriptor.Z)(_class.prototype, "enableScrollbar", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype)), _class));
+}, (_descriptor = (0,applyDecoratedDescriptor.Z)(_class.prototype, "onMessagesScrollReinitialise", [_dec], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return (ps, $elem, forced, scrollPositionYPerc, scrollToElement) => {
+      const {
+        chatRoom
+      } = this.props;
+
+      if (this.scrollPullHistoryRetrieval || chatRoom.messagesBuff.isRetrievingHistory) {
+        return;
+      }
+
+      if (forced) {
+        if (!scrollPositionYPerc && !scrollToElement) {
+          if (chatRoom.scrolledToBottom && !this.editDomElement) {
+            ps.scrollToBottom(true);
+            return true;
+          }
+        } else {
+          return;
+        }
+      }
+
+      if (this.isComponentEventuallyVisible() && !this.editDomElement && !chatRoom.isScrollingToMessageId) {
+        if (chatRoom.scrolledToBottom) {
+          ps.scrollToBottom(true);
+          return true;
+        }
+
+        if (this.lastScrollPosition && this.lastScrollPosition !== ps.getScrollPositionY()) {
+          ps.scrollToY(this.lastScrollPosition, true);
+          return true;
+        }
+      }
+    };
+  }
+}), (0,applyDecoratedDescriptor.Z)(_class.prototype, "enableScrollbar", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype)), _class));
 
 
 /***/ }),
@@ -20799,8 +20863,8 @@ class stream_Stream extends mixins.wl {
 }
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 var composedTextArea = __webpack_require__(813);
-// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
-var historyPanel = __webpack_require__(192);
+// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
+var historyPanel = __webpack_require__(638);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/collapse.jsx
 
 

@@ -1646,8 +1646,9 @@ function MessagesBuff(chatRoom, chatdInt) {
                 if (
                     (v.isManagement && v.isManagement() === true && v.isRenderableManagement() === false) ||
                     v.revoked === true ||
-                    /* dont add to the unread newCounter if the current user is not a part of the chat */
-                    (Object.keys(self.chatRoom.members).indexOf(u_handle) === -1)
+                    /* Don't increment the unread messages counter if the current user is not a part of the chat, but do
+                    increment when previewing chat links */
+                    (Object.keys(self.chatRoom.members).indexOf(u_handle) === -1) && !self.chatRoom.isAnonymous()
                 ) {
                     shouldRender = false;
                 }

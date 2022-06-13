@@ -25,6 +25,7 @@ var ChatNotifications = function(megaChat, options) {
                     var uiElement = document.querySelector(cnSel);
 
                     if (
+                        !megaRoom.scrolledToBottom ||
                         // Meetings call w/o chat sidebar opened
                         document.querySelector('body.in-call') && !document.querySelector('.chat-opened') ||
                         // Regular call w/o messages area opened

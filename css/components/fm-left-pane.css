@@ -48,10 +48,11 @@
 }
 .active-folder-link .section-title {
     padding: 4px 8px 0 8px;
-    display: inline;
+    display: inline-block;
 }
 .lp-myfiles .cloud-drive-panel,
-.lp-gallery .library-panel {
+.lp-gallery .library-panel,
+.active-folder-link .content-panel.cloud-drive {
     padding: 4px 8px 0 8px;
 }
 .lp-myfiles .ps--active-y .cloud-drive-panel {

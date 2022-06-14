@@ -2948,7 +2948,6 @@ else if (!browserUpdate) {
 
 
         jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
-
     } // !is_mobile
 
     // do not change the order...
@@ -3362,6 +3361,7 @@ else if (!browserUpdate) {
         'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2},
         'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
         'object_storage': {f:'html/objectstorage.html', n: 'object_storage', j:0},
+        'folderlink_css':{f:'css/folder-link.css', n: 'folderlink_css', j: 2, w: 5, c: 1, d: 1, cache: 1}
     };
 
     /* eslint-disable max-len */
@@ -3444,8 +3444,9 @@ else if (!browserUpdate) {
         'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],
         'resellers': ['resellers'],
-        '!': ['download', 'download_js'],
+        '!': ['download', 'download_js', 'folderlink_css'],
         'file': ['download', 'download_js'],
+        'folder': ['folderlink_css'],
         'dispute': ['dispute'],
         'disputenotice': ['disputenotice', 'copyright_js'],
         'copyright': ['copyright'],

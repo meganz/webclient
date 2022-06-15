@@ -5921,16 +5921,15 @@ class ContactButton extends _mixins1__._p {
 
       moreDropdowns.push(react0().createElement("div", {
         className: "dropdown-avatar rounded",
-        key: "mainContactInfo"
+        key: "mainContactInfo",
+        onClick: onContactClicked
       }, react0().createElement(Avatar, {
         className: "avatar-wrapper context-avatar",
         chatRoom: chatRoom,
         contact: contact,
-        hideVerifiedBadge: "true",
-        onClick: onContactClicked
+        hideVerifiedBadge: "true"
       }), react0().createElement("div", {
-        className: "dropdown-user-name",
-        onClick: onContactClicked
+        className: "dropdown-user-name"
       }, react0().createElement("div", {
         className: "name"
       }, username, react0().createElement(ContactPresence, {

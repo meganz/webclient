@@ -89,15 +89,17 @@ export class ContactButton extends ContactAwareComponent {
         };
 
         moreDropdowns.push(
-            <div className="dropdown-avatar rounded" key="mainContactInfo">
+            <div
+                className="dropdown-avatar rounded"
+                key="mainContactInfo"
+                onClick={onContactClicked}>
                 <Avatar
                     className="avatar-wrapper context-avatar"
                     chatRoom={chatRoom}
                     contact={contact}
                     hideVerifiedBadge="true"
-                    onClick={onContactClicked}
                 />
-                <div className="dropdown-user-name" onClick={onContactClicked}>
+                <div className="dropdown-user-name" >
                     <div className="name">
                         {username}
                         <ContactPresence className="small" contact={contact} />

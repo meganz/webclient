@@ -17,13 +17,13 @@ export default class HistoryPanel extends MegaRenderMixin {
     $container = null;
     $messages = null;
 
+    state = {
+        editing: false,
+        toast: false
+    };
+
     constructor(props) {
         super(props);
-
-        this.state = {
-            editing: false,
-        };
-
         this.handleWindowResize = SoonFc(80, (ev) => this._handleWindowResize(ev));
     }
     customIsEventuallyVisible() {
@@ -251,112 +251,102 @@ export default class HistoryPanel extends MegaRenderMixin {
             }
         }
     }
+
     @utils.SoonFcWrap(50)
-    onMessagesScrollReinitialise(
-        ps,
-        $elem,
-        forced,
-        scrollPositionYPerc,
-        scrollToElement
-    ) {
-        var self = this;
-        var chatRoom = self.props.chatRoom;
-        var mb = chatRoom.messagesBuff;
+        onMessagesScrollReinitialise = (ps, $elem, forced, scrollPositionYPerc, scrollToElement) => {
+            const { chatRoom } = this.props;
 
-        // don't do anything if history is being retrieved at the moment.
-        if (self.scrollPullHistoryRetrieval || mb.isRetrievingHistory) {
-            return;
-        }
+            // don't do anything if history is being retrieved at the moment.
+            if (this.scrollPullHistoryRetrieval || chatRoom.messagesBuff.isRetrievingHistory) {
+                return;
+            }
 
-        if (forced) {
-            if (!scrollPositionYPerc && !scrollToElement) {
-                if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
-                    // wait for the DOM update, if such.
+            if (forced) {
+                if (!scrollPositionYPerc && !scrollToElement) {
+                    if (chatRoom.scrolledToBottom && !this.editDomElement) {
+                        // wait for the DOM update, if such.
+                        ps.scrollToBottom(true);
+                        return true;
+                    }
+                }
+                else {
+                    // don't do anything if the UI was forced to scroll to a specific pos.
+                    return;
+                }
+            }
+
+            if (this.isComponentEventuallyVisible()
+                && !this.editDomElement && !chatRoom.isScrollingToMessageId) {
+
+                if (chatRoom.scrolledToBottom) {
                     ps.scrollToBottom(true);
                     return true;
                 }
+
+                if (this.lastScrollPosition && this.lastScrollPosition !== ps.getScrollPositionY()) {
+                    ps.scrollToY(this.lastScrollPosition, true);
+                    return true;
+                }
             }
-            else {
-                // don't do anything if the UI was forced to scroll to a specific pos.
-                return;
-            }
-        }
+        };
 
-        if (self.isComponentEventuallyVisible()
-            && !self.editDomElement && !self.props.chatRoom.isScrollingToMessageId) {
+    onMessagesScrollUserScroll = (ps, offset = 5) => {
+        const { chatRoom } = this.props;
+        const { messagesBuff } = chatRoom;
+        const scrollPositionY = ps.getScrollPositionY();
 
-            if (self.props.chatRoom.scrolledToBottom) {
-                ps.scrollToBottom(true);
-                return true;
-            }
-
-            if (self.lastScrollPosition && self.lastScrollPosition !== ps.getScrollPositionY()) {
-                ps.scrollToY(self.lastScrollPosition, true);
-                return true;
-            }
-        }
-    }
-
-
-    onMessagesScrollUserScroll(ps, offset = 5) {
-        var self = this;
-
-        var scrollPositionY = ps.getScrollPositionY();
-        var isAtTop = ps.isAtTop();
-        var chatRoom = self.props.chatRoom;
-        var mb = chatRoom.messagesBuff;
-
-        if (mb.messages.length === 0) {
-            self.props.chatRoom.scrolledToBottom = true;
+        if (messagesBuff.messages.length === 0) {
+            chatRoom.scrolledToBottom = true;
             return;
         }
 
         // turn on/off auto scroll to bottom.
         if (ps.isCloseToBottom(30) === true) {
-            if (!self.props.chatRoom.scrolledToBottom) {
-                mb.detachMessages();
+            if (!chatRoom.scrolledToBottom) {
+                messagesBuff.detachMessages();
             }
-            self.props.chatRoom.scrolledToBottom = true;
+            chatRoom.scrolledToBottom = true;
         }
         else {
-            self.props.chatRoom.scrolledToBottom = false;
+            chatRoom.scrolledToBottom = false;
         }
 
-        if (!self.scrollPullHistoryRetrieval && !mb.isRetrievingHistory
-            && (isAtTop || scrollPositionY < offset && ps.getScrollHeight() > 500)
-            && mb.haveMoreHistory()) {
+        if (!this.scrollPullHistoryRetrieval && !messagesBuff.isRetrievingHistory
+            && (ps.isAtTop() || scrollPositionY < offset && ps.getScrollHeight() > 500)
+            && messagesBuff.haveMoreHistory()) {
 
             ps.disable();
-            self.scrollPullHistoryRetrieval = true;
-            self.lastScrollPosition = scrollPositionY;
+            this.scrollPullHistoryRetrieval = true;
+            this.lastScrollPosition = scrollPositionY;
 
             let msgAppended = 0;
             const scrYOffset = ps.getScrollHeight();
 
-            chatRoom.one('onMessagesBuffAppend.pull', function() {
+            chatRoom.one('onMessagesBuffAppend.pull', () => {
                 msgAppended++;
             });
 
             // wait for all msgs to be rendered.
             chatRoom.off('onHistoryDecrypted.pull');
-            chatRoom.one('onHistoryDecrypted.pull', function() {
+            chatRoom.one('onHistoryDecrypted.pull', () => {
                 chatRoom.off('onMessagesBuffAppend.pull');
 
                 if (msgAppended > 0) {
-                    self._reposOnUpdate = scrYOffset;
+                    this._reposOnUpdate = scrYOffset;
                 }
 
-                self.scrollPullHistoryRetrieval = -1;
-                // self.eventuallyUpdate();
+                this.scrollPullHistoryRetrieval = -1;
             });
 
-            mb.retrieveChatHistory();
+            messagesBuff.retrieveChatHistory();
         }
 
-        if (self.lastScrollPosition !== scrollPositionY) {
-            self.lastScrollPosition = scrollPositionY;
+        if (this.lastScrollPosition !== scrollPositionY) {
+            this.lastScrollPosition = scrollPositionY;
         }
-    }
+
+        delay('chat-toast', this.initToast, 200);
+    };
 
     isLoading() {
         const chatRoom = this.props.chatRoom;
@@ -367,10 +357,10 @@ export default class HistoryPanel extends MegaRenderMixin {
             || mb.joined === false || mb.isDecrypting;
     }
 
-
     specShouldComponentUpdate() {
         return !this.loadingShown && this.isComponentEventuallyVisible();
     }
+
     @SoonFcWrap(450, true)
     enableScrollbar() {
         const ps = this.messagesListScrollable;
@@ -379,11 +369,13 @@ export default class HistoryPanel extends MegaRenderMixin {
         this._reposOnUpdate = undefined;
         this.lastScrollPosition = ps.__prevPosY | 0;
     }
+
     editMessage(messageId) {
         var self = this;
         self.setState({'editing': messageId});
         self.props.chatRoom.scrolledToBottom = false;
     }
+
     onMessageEditDone(v, messageContents) {
         var self = this;
         var room = this.props.chatRoom;
@@ -451,6 +443,37 @@ export default class HistoryPanel extends MegaRenderMixin {
             $('.chat-textarea-block:visible textarea').focus();
         }, 300);
     }
+
+    initToast = () => {
+        const { chatRoom } = this.props;
+        this.setState({ toast: !chatRoom.scrolledToBottom && !this.messagesListScrollable.isCloseToBottom(30) }, () =>
+            this.state.toast ? null : chatRoom.trigger('onChatIsFocused')
+        );
+    };
+
+    renderToast = () => {
+        const { chatRoom } = this.props;
+        const unreadCount = chatRoom.messagesBuff.getUnreadCount();
+
+        return (
+            <div
+                className={`
+                    theme-dark-forced
+                    messages-toast
+                    ${this.state.toast ? 'active' : ''}
+                `}
+                onClick={() => {
+                    this.setState({ toast: false }, () => {
+                        this.messagesListScrollable.scrollToBottom();
+                        chatRoom.scrolledToBottom = true;
+                    });
+                }}>
+                <i className="sprite-fm-mono icon-down" />
+                {unreadCount > 0 && <span>{unreadCount > 9 ? '9+' : unreadCount}</span>}
+            </div>
+        );
+    };
+
     // eslint-disable-next-line complexity
     render() {
         var self = this;
@@ -725,77 +748,84 @@ export default class HistoryPanel extends MegaRenderMixin {
         }
 
         return (
-            <>
-                <div className={`messages scroll-area ${this.props.className ? this.props.className : ''}`}>
-                    <div
-                        className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden">
-                        <i className="dropdown-white-arrow"></i>
-                        <div className="dropdown notification-text">
-                            <i className="small-icon conversations"></i>
-                            {l[8883]}
-                        </div>
+            <div
+                className={`
+                    messages
+                    scroll-area
+                    ${this.props.className ? this.props.className : ''}
+                `}>
+                <div
+                    className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden">
+                    <i className="dropdown-white-arrow" />
+                    <div className="dropdown notification-text">
+                        <i className="small-icon conversations" />
+                        {l[8883] /* `Message not sent. Click here if you want to resend it.` */}
                     </div>
-
-                    <div
-                        className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden">
-                        <i className="dropdown-white-arrow"></i>
-                        <div className="dropdown notification-text">
-                            <i className="small-icon conversations"></i>
-                            {l[8884]}
-                        </div>
-                    </div>
-
-                    <PerfectScrollbar
-                        onFirstInit={ps => {
-                            ps.scrollToBottom(true);
-                            this.props.chatRoom.scrolledToBottom = 1;
-                        }}
-                        onReinitialise={this.onMessagesScrollReinitialise.bind(this)}
-                        onUserScroll={this.onMessagesScrollUserScroll.bind(this)}
-                        className="js-messages-scroll-area perfectScrollbarContainer"
-                        messagesToggledInCall={this.state.messagesToggledInCall}
-                        ref={(ref) => {
-                            this.messagesListScrollable = ref;
-                            $(document).rebind(
-                                'keydown.keyboardScroll_' + this.props.chatRoom.roomId,
-                                this.onKeyboardScroll
-                            );
-                            if (this.props.onMessagesListScrollableMount) {
-                                this.props.onMessagesListScrollableMount(ref);
-                            }
-                        }}
-                        chatRoom={this.props.chatRoom}
-                        messagesBuff={this.props.chatRoom.messagesBuff}
-                        editDomElement={this.state.editDomElement}
-                        editingMessageId={this.state.editing}
-                        confirmDeleteDialog={this.state.confirmDeleteDialog}
-                        renderedMessagesCount={messagesList.length}
-                        isLoading={
-                            this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() ||
-                            this.props.chatRoom.activeSearches > 0 ||
-                            this.loadingShown
-                        }
-                        options={{ 'suppressScrollX': true }}>
-                        <div className="messages main-pad">
-                            <div className="messages content-area">
-                                <div
-                                    key="loadingSpinner" style={{ top: "50%" }}
-                                    className={`
-                                                        loading-spinner js-messages-loading light manual-management
-                                                        ${this.loadingShown ? '' : 'hidden'}
-                                                    `}>
-                                    <div
-                                        className="main-loader"
-                                        style={{ 'position': 'fixed', 'top': '50%', 'left': '50%' }} />
-                                </div>
-                                {/* add a naive pre-pusher that would eventually keep the the scrollbar
-                                                realistic */}
-                                {messagesList}
-                            </div>
-                        </div>
-                    </PerfectScrollbar>
                 </div>
-            </>
+
+                <div
+                    className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-cancel hidden">
+                    <i className="dropdown-white-arrow" />
+                    <div className="dropdown notification-text">
+                        <i className="small-icon conversations" />
+                        {l[8884] /* `Message not sent. Click here if you want to cancel it.` */}
+                    </div>
+                </div>
+
+                <PerfectScrollbar
+                    onFirstInit={ps => {
+                        ps.scrollToBottom(true);
+                        this.props.chatRoom.scrolledToBottom = 1;
+                    }}
+                    onReinitialise={this.onMessagesScrollReinitialise}
+                    onUserScroll={this.onMessagesScrollUserScroll}
+                    className="js-messages-scroll-area perfectScrollbarContainer"
+                    messagesToggledInCall={this.state.messagesToggledInCall}
+                    ref={(ref) => {
+                        this.messagesListScrollable = ref;
+                        $(document).rebind(
+                            'keydown.keyboardScroll_' + this.props.chatRoom.roomId,
+                            this.onKeyboardScroll
+                        );
+                        if (this.props.onMessagesListScrollableMount) {
+                            this.props.onMessagesListScrollableMount(ref);
+                        }
+                    }}
+                    chatRoom={this.props.chatRoom}
+                    messagesBuff={this.props.chatRoom.messagesBuff}
+                    editDomElement={this.state.editDomElement}
+                    editingMessageId={this.state.editing}
+                    confirmDeleteDialog={this.state.confirmDeleteDialog}
+                    renderedMessagesCount={messagesList.length}
+                    isLoading={
+                        this.props.chatRoom.messagesBuff.messagesHistoryIsLoading() ||
+                        this.props.chatRoom.activeSearches > 0 ||
+                        this.loadingShown
+                    }
+                    options={{ 'suppressScrollX': true }}>
+                    <div className="messages main-pad">
+                        <div className="messages content-area">
+                            <div
+                                key="loadingSpinner" style={{ top: "50%" }}
+                                className={`
+                                    loading-spinner
+                                    js-messages-loading
+                                    light
+                                    manual-management
+                                    ${this.loadingShown ? '' : 'hidden'}
+                                `}>
+                                <div
+                                    className="main-loader"
+                                    style={{ 'position': 'fixed', 'top': '50%', 'left': '50%' }}
+                                />
+                            </div>
+                            {/* add a naive pre-pusher that would eventually keep the the scrollbar realistic */}
+                            {messagesList}
+                        </div>
+                    </div>
+                </PerfectScrollbar>
+                {this.renderToast()}
+            </div>
         );
     }
 }

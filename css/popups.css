@@ -197,6 +197,9 @@ body.tl .dropdown.body.popup.contacts-search {
     height: 24px;
     font: var(--text-body1);
 }
+.rtl .contacts-search-list .contacts-info.body.contacts-search .avatar-wrapper {
+    right: 12px;
+}
 .contacts-search-list .contacts-info.body.contacts-search img {
     width: 24px;
     height: 24px;

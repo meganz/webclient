@@ -922,6 +922,7 @@ export class TypingArea extends MegaRenderMixin {
                     <div
                         className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
                         style={textareaScrollBlockStyles}>
+
                         <div className="messages-textarea-placeholder">
                             {self.state.typedMessage ? null : <Emoji>{placeholder}</Emoji>}
                         </div>

@@ -971,6 +971,7 @@ body.theme-dark .message .audio-player {
 }
 .reactions-bar {
     display: flex;
+    flex-wrap: wrap;
     line-height: 20px;
     clear: both;
     margin: 2px 0 4px 0;
@@ -1015,7 +1016,7 @@ body.theme-dark .message .audio-player {
     display: flex;
     align-items: center;
     padding-inline: 4px;
-    margin-left: 2px;
+    margin: 4px 0 0 2px;
     width: auto;
     height: 23px;
     border-radius: 11px;

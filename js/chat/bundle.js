@@ -9749,6 +9749,7 @@ class HistoryRetentionDialog extends external_React_.Component {
     } = this.props;
     const hasInput = this.hasInput();
     const selectedTimeFormat = this.state.selectedTimeFormat;
+    const parsedLabel = this.getParsedLabel(selectedTimeFormat, this.state.timeRange);
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       chatRoom: chatRoom,
       onClose: onClose,
@@ -9767,7 +9768,7 @@ class HistoryRetentionDialog extends external_React_.Component {
       className: "form-section"
     }, external_React_default().createElement("span", {
       className: "form-section-placeholder"
-    }, this.getParsedLabel(selectedTimeFormat, this.state.timeRange).split(" ")[1]), external_React_default().createElement("input", {
+    }, parsedLabel && parsedLabel.split(" ")[1]), external_React_default().createElement("input", {
       type: "number",
       min: "0",
       step: "1",

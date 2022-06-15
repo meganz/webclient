@@ -292,6 +292,8 @@ class ChatRouting {
   }
 
 }
+// EXTERNAL MODULE: ./js/chat/mixins.js
+var mixins = __webpack_require__(503);
 ;// CONCATENATED MODULE: ./js/chat/chat.jsx
 
 
@@ -302,6 +304,7 @@ __webpack_require__(62);
 __webpack_require__(778);
 
 __webpack_require__(336);
+
 
 
 const EMOJI_DATASET_VERSION = 4;
@@ -2539,31 +2542,33 @@ Chat.prototype.loginOrRegisterBeforeJoining = function (chatHandle, forceRegiste
 };
 
 Chat.prototype.highlight = (text, matches, dontEscape) => {
-  if (!text) {
-    return;
-  }
-
-  text = dontEscape ? text : escapeHTML(text);
-
-  if (matches) {
-    let tags = [];
-    text = text.replace(/<[^>]+>/g, match => {
-      return "@@!" + (tags.push(match) - 1) + "!@@";
-    });
-    let regexes = [];
+  if (text && matches) {
+    text = dontEscape ? text : escapeHTML(text);
+    const tags = [];
+    text = text.replace(/<[^>]+>/g, match => "@@!" + (tags.push(match) - 1) + "!@@").split(' ');
 
     for (let i = 0; i < matches.length; i++) {
-      regexes.push(RegExpEscape(matches[i].str));
+      const match = matches[i].str;
+
+      for (let j = 0; j < text.length; j++) {
+        const word = text[j];
+
+        const wordNormalized = ChatSearch._normalize_str(word);
+
+        if (wordNormalized.includes(match)) {
+          const matchIndex = wordNormalized.indexOf(match);
+          text[j] = (0,mixins.Rc)(matchIndex, word, word.slice(matchIndex, matchIndex + match.length));
+        }
+      }
     }
 
-    regexes = regexes.join('|');
-    text = text.replace(new RegExp(regexes, 'g'), word => `<strong>${word}</strong>`);
-    text = text.replace(/\@\@\!\d+\!\@\@/g, match => {
+    text = text.join(' ').replace(/\@\@\!\d+\!\@\@/g, match => {
       return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
     });
+    return text;
   }
 
-  return text;
+  return null;
 };
 
 Chat.prototype.html = function (content) {
@@ -4594,6 +4599,7 @@ __webpack_require__.d(__webpack_exports__, {
 "LY": () => (timing),
 "M9": () => (SoonFcWrap),
 "Os": () => (schedule),
+"Rc": () => (replaceAt),
 "_p": () => (ContactAwareComponent),
 "py": () => (rAFWrap),
 "qC": () => (compose),
@@ -4777,6 +4783,7 @@ const schedule = (local, debug) => {
   };
 };
 const compose = (...funcs) => funcs.reduce((a, b) => (...args) => a(b(...args)), arg => arg);
+const replaceAt = (i, o, n) => `${o.slice(0, i)}<strong>${n}</strong>${o.slice(i + n.length)}`;
 const SoonFcWrap = (milliseconds, local) => {
   return function (target, propertyKey, descriptor) {
     descriptor.value = SoonFc(descriptor.value, !local, milliseconds);

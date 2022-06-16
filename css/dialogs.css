@@ -272,7 +272,7 @@ body.de .mega-dialog.new-group-chat {
 
 /* Add From Cloud Dialog */
 .mega-dialog.add-from-cloud {
-    width: 1394px;
+    width: 800px;
 }
 .mega-dialog.add-from-cloud .content {
     border-bottom: 1px solid var(--stroke-grey-2);
@@ -618,7 +618,7 @@ body.de .mega-dialog.new-group-chat {
 }
 @media only screen and (max-width: 1440px) {
     .mega-dialog.add-from-cloud {
-        width: 1219px;
+        width: 800px;
     }
     .mega-dialog.add-from-cloud .tranfer-filetype-txt {
         max-width: 770px;
@@ -634,7 +634,7 @@ body.de .mega-dialog.new-group-chat {
 }
 @media only screen and (max-width: 1280px) {
     .mega-dialog.add-from-cloud {
-        width: 1047px;
+        width: 800px;
     }
     .mega-dialog.add-from-cloud .tranfer-filetype-txt {
         max-width: 600px;

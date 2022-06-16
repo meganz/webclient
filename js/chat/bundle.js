@@ -9374,23 +9374,6 @@ class CloudBrowserDialog extends mixins.wl {
       }
     }];
 
-    if (!folderIsHighlighted || this.props.folderSelectable) {
-      buttons.push({
-        "label": this.props.selectLabel,
-        "key": "select",
-        "className": "positive " + (this.state.selected.length === 0 || share && share.down ? "disabled" : ""),
-        "onClick": e => {
-          if (this.state.selected.length > 0) {
-            this.props.onSelected(this.state.selected.filter(node => !M.getNodeShare(node).down));
-            this.props.onAttachClicked();
-          }
-
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
-    }
-
     if (folderIsHighlighted) {
       const {
         highlighted
@@ -9440,6 +9423,23 @@ class CloudBrowserDialog extends mixins.wl {
           });
         }
       } : null);
+    }
+
+    if (!folderIsHighlighted || this.props.folderSelectable) {
+      buttons.push({
+        "label": this.props.selectLabel,
+        "key": "select",
+        "className": "positive " + (this.state.selected.length === 0 || share && share.down ? "disabled" : ""),
+        "onClick": e => {
+          if (this.state.selected.length > 0) {
+            this.props.onSelected(this.state.selected.filter(node => !M.getNodeShare(node).down));
+            this.props.onAttachClicked();
+          }
+
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
     }
 
     var clearSearchBtn = null;

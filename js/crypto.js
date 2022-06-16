@@ -1559,17 +1559,49 @@ function api_getsid2(res, ctx) {
                         Soon(function() {
                             msgDialog('warninga', l[135], l[8853]);
                         });
+
+                        return false;
                     }
 
-                    if (privk) {
-                        // TODO: check remaining padding for added early wrong password detection likelihood
-                        r = [k, base64urlencode(crypto_rsadecrypt(t, privk).substr(0, 43)), privk];
-                    }
-                    else {
+                    if (!privk) {
                         // Bad decryption of RSA is an indication that the password was wrong
                         ctx.checkloginresult(ctx, false);
                         return false;
                     }
+
+                    // Decrypt the Session ID
+                    var decryptedSessionId = crypto_rsadecrypt(t, privk);
+
+                    // Check that the decrypted sid and res.u aren't shorter than usual before making the comparison.
+                    // Otherwise, we could construct an oracle based on shortened csids with single-byte user handles.
+                    if (decryptedSessionId.length !== 255 || res.u.length !== 11) {
+
+                        console.error("Incorrect length of Session ID or user handle in the 'us' response");
+
+                        Soon(() => {
+                            msgDialog('warninga', l[135], l[8853]);
+                        });
+
+                        return false;
+                    }
+
+                    // Get the user handle from the decrypted Session ID (11 bytes starting at offset 16 bytes)
+                    var sessionIdUserHandle = decryptedSessionId.substring(16, 27);
+
+                    // Check the user handle included in the Session ID matches the one sent in the 'us' response
+                    if (sessionIdUserHandle !== res.u) {
+
+                        console.error("User handle in Session ID did not match user handle from the 'us' request");
+
+                        Soon(() => {
+                            msgDialog('warninga', l[135], l[8853]);
+                        });
+
+                        return false;
+                    }
+
+                    // TODO: check remaining padding for added early wrong password detection likelihood
+                    r = [k, base64urlencode(decryptedSessionId.substr(0, 43)), privk];
                 }
             }
         }
@@ -2004,6 +2036,24 @@ function crypto_decodeprivkey(privk) {
         e = new asmCrypto.Modulus(p1.multiply(q1)).inverse(d),
         dp = d.divide(p1).remainder,
         dq = d.divide(q1).remainder;
+
+    // Calculate inverse modulo of q under p
+    var inv = new asmCrypto.Modulus(p).inverse(q);
+
+    // Convert Uint32Arrays to hex for comparison
+    var hexInv = asmCrypto.bytes_to_hex(inv.toBytes());
+    var hexU = asmCrypto.bytes_to_hex(u.toBytes());
+
+    // Detect private key blob corruption - prevent API-exploitable RSA oracle requiring 500+ logins.
+    // Ensure the bit length being at least 1000 and that u is indeed the inverse modulo of q under p.
+    if (!(p.bitLength > 1000 &&
+        q.bitLength > 1000 &&
+        d.bitLength > 2000 &&
+        u.bitLength > 1000 &&
+        hexU === hexInv)) {
+
+        return false;
+    }
 
     privkey = [m, e, d, p, q, dp, dq, u];
     for (i = 0; i < privkey.length; i++) {

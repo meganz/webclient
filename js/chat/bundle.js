@@ -292,6 +292,8 @@ class ChatRouting {
   }
 
 }
+// EXTERNAL MODULE: ./js/chat/mixins.js
+var mixins = __webpack_require__(503);
 ;// CONCATENATED MODULE: ./js/chat/chat.jsx
 
 
@@ -302,6 +304,7 @@ __webpack_require__(62);
 __webpack_require__(778);
 
 __webpack_require__(336);
+
 
 
 const EMOJI_DATASET_VERSION = 4;
@@ -2539,31 +2542,33 @@ Chat.prototype.loginOrRegisterBeforeJoining = function (chatHandle, forceRegiste
 };
 
 Chat.prototype.highlight = (text, matches, dontEscape) => {
-  if (!text) {
-    return;
-  }
-
-  text = dontEscape ? text : escapeHTML(text);
-
-  if (matches) {
-    let tags = [];
-    text = text.replace(/<[^>]+>/g, match => {
-      return "@@!" + (tags.push(match) - 1) + "!@@";
-    });
-    let regexes = [];
+  if (text && matches) {
+    text = dontEscape ? text : escapeHTML(text);
+    const tags = [];
+    text = text.replace(/<[^>]+>/g, match => "@@!" + (tags.push(match) - 1) + "!@@").split(' ');
 
     for (let i = 0; i < matches.length; i++) {
-      regexes.push(RegExpEscape(matches[i].str));
+      const match = matches[i].str;
+
+      for (let j = 0; j < text.length; j++) {
+        const word = text[j];
+
+        const wordNormalized = ChatSearch._normalize_str(word);
+
+        if (wordNormalized.includes(match)) {
+          const matchIndex = wordNormalized.indexOf(match);
+          text[j] = (0,mixins.Rc)(matchIndex, word, word.slice(matchIndex, matchIndex + match.length));
+        }
+      }
     }
 
-    regexes = regexes.join('|');
-    text = text.replace(new RegExp(regexes, 'g'), word => `<strong>${word}</strong>`);
-    text = text.replace(/\@\@\!\d+\!\@\@/g, match => {
+    text = text.join(' ').replace(/\@\@\!\d+\!\@\@/g, match => {
       return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
     });
+    return text;
   }
 
-  return text;
+  return null;
 };
 
 Chat.prototype.html = function (content) {
@@ -4594,6 +4599,7 @@ __webpack_require__.d(__webpack_exports__, {
 "LY": () => (timing),
 "M9": () => (SoonFcWrap),
 "Os": () => (schedule),
+"Rc": () => (replaceAt),
 "_p": () => (ContactAwareComponent),
 "py": () => (rAFWrap),
 "qC": () => (compose),
@@ -4777,6 +4783,7 @@ const schedule = (local, debug) => {
   };
 };
 const compose = (...funcs) => funcs.reduce((a, b) => (...args) => a(b(...args)), arg => arg);
+const replaceAt = (i, o, n) => `${o.slice(0, i)}<strong>${n}</strong>${o.slice(i + n.length)}`;
 const SoonFcWrap = (milliseconds, local) => {
   return function (target, propertyKey, descriptor) {
     descriptor.value = SoonFc(descriptor.value, !local, milliseconds);
@@ -5888,6 +5895,216 @@ class ContactButton extends _mixins1__._p {
   constructor(...args) {
     super(...args);
     this.attachRerenderCallbacks = _attchRerenderCbContacts;
+
+    this.loadAccount = () => loadSubPage('fm/account');
+
+    this.dropdownItemGenerator = () => {
+      let {
+        contact,
+        dropdowns,
+        chatRoom,
+        dropdownRemoveButton
+      } = this.props;
+      dropdowns = dropdowns ? dropdowns : [];
+      const moreDropdowns = [];
+      const username = react0().createElement(_ui_utils_jsx2__.OFlowEmoji, null, M.getNameByHandle(contact.u));
+
+      const onContactClicked = () => {
+        if (contact.c === 2) {
+          this.loadAccount();
+        }
+
+        if (contact.c === 1) {
+          loadSubPage('fm/chat/contacts/' + contact.u);
+        }
+      };
+
+      moreDropdowns.push(react0().createElement("div", {
+        className: "dropdown-avatar rounded",
+        key: "mainContactInfo",
+        onClick: onContactClicked
+      }, react0().createElement(Avatar, {
+        className: "avatar-wrapper context-avatar",
+        chatRoom: chatRoom,
+        contact: contact,
+        hideVerifiedBadge: "true"
+      }), react0().createElement("div", {
+        className: "dropdown-user-name"
+      }, react0().createElement("div", {
+        className: "name"
+      }, username, react0().createElement(ContactPresence, {
+        className: "small",
+        contact: contact
+      })), contact && (megaChat.FORCE_EMAIL_LOADING || contact.c === 1 || contact.c === 2) && react0().createElement("span", {
+        className: "email"
+      }, contact.m))));
+      moreDropdowns.push(react0().createElement(ContactFingerprint, {
+        key: "fingerprint",
+        contact: contact
+      }));
+
+      if (dropdowns.length && contact.c !== 2) {
+        moreDropdowns.push(dropdowns);
+        moreDropdowns.push(react0().createElement("hr", {
+          key: "top-separator"
+        }));
+      }
+
+      if (contact.u === u_handle) {
+        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          key: "view0",
+          icon: "sprite-fm-mono icon-user-filled",
+          label: l[187],
+          onClick: this.loadAccount
+        }));
+      }
+
+      if (contact.c === 1) {
+        const startAudioCall = () => {
+          megaChat.createAndShowPrivateRoom(contact.u).then(room => {
+            room.setActive();
+            room.startAudioCall();
+          });
+        };
+
+        if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
+          moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+            key: "startCall",
+            className: "sprite-fm-mono-before icon-arrow-right-before",
+            icon: "sprite-fm-mono icon-phone",
+            submenu: true,
+            label: l[19125],
+            onClick: startAudioCall
+          }));
+          moreDropdowns.push(react0().createElement("div", {
+            className: "dropdown body submenu",
+            key: "dropdownGroup"
+          }, react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+            key: "startAudio",
+            icon: "sprite-fm-mono icon-phone",
+            disabled: !megaChat.hasSupportForCalls,
+            label: l[1565],
+            onClick: startAudioCall
+          })), react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+            key: "startVideo",
+            icon: "sprite-fm-mono icon-video-call-filled",
+            disabled: !megaChat.hasSupportForCalls,
+            label: l[1566],
+            onClick: () => {
+              megaChat.createAndShowPrivateRoom(contact.u).then(room => {
+                room.setActive();
+                room.startVideoCall();
+              });
+            }
+          }))));
+        } else {
+          moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+            key: "startChat",
+            icon: "sprite-fm-mono icon-chat",
+            label: l[5885],
+            onClick: () => {
+              loadSubPage('fm/chat/p/' + contact.u);
+            }
+          }));
+        }
+
+        moreDropdowns.push(react0().createElement("hr", {
+          key: "files-separator"
+        }));
+        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          key: "send-files-item",
+          icon: "sprite-fm-mono icon-send-files",
+          label: l[6834],
+          disabled: mega.paywall,
+          onClick: () => {
+            megaChat.openChatAndSendFilesDialog(contact.u);
+          }
+        }));
+        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          key: "share-item",
+          icon: "sprite-fm-mono icon-folder-outgoing-share",
+          label: l[6775],
+          onClick: () => {
+            openCopyShareDialog(contact.u);
+          }
+        }));
+      } else if (!is_chatlink && !is_eplusplus && (!contact.c || contact.c === 2 && contact.u !== u_handle)) {
+        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          key: "view2",
+          icon: "sprite-fm-mono icon-add",
+          label: l[101],
+          onClick: () => {
+            const isAnonymousUser = !u_handle || u_type !== 3;
+            const ADD_CONTACT = 'addContact';
+
+            if (is_chatlink && isAnonymousUser) {
+              megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
+
+              if (localStorage.getItem(ADD_CONTACT) === null) {
+                localStorage.setItem(ADD_CONTACT, JSON.stringify({
+                  u: contact.u,
+                  unixTime: unixtime()
+                }));
+              }
+            } else {
+              loadingDialog.show();
+              M.syncContactEmail(contact.u, new MegaPromise(), true).done(email => {
+                if (Object.values(M.opc || {}).some(cr => cr.m === email)) {
+                  closeDialog();
+                  msgDialog('warningb', '', l[17545]);
+                } else {
+                  M.inviteContact(M.u[u_handle].m, email);
+                  const title = l[150];
+                  const msg = l[5898].replace('[X]', email);
+                  closeDialog();
+                  msgDialog('info', title, msg.replace('[X]', email));
+                }
+              }).always(() => loadingDialog.hide()).catch(() => {
+                const {
+                  chatRoom
+                } = this.props;
+                const {
+                  u: userHandle
+                } = contact;
+
+                if (chatRoom.sfuApp) {
+                  return mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle);
+                }
+
+                const name = M.getNameByHandle(userHandle);
+                return msgDialog('info', '', l.ephemeral_title ? l.ephemeral_title.replace('%1', name) : `${name} is using an ephemeral session.`, l.ephemeral_info);
+              });
+            }
+          }
+        }));
+      }
+
+      if (u_attr && contact.u !== u_handle) {
+        if (moreDropdowns.length > 0 && !(moreDropdowns.length === 2 && moreDropdowns[1] && moreDropdowns[1].key === "fingerprint")) {
+          moreDropdowns.push(react0().createElement("hr", {
+            key: "nicknames-separator"
+          }));
+        }
+
+        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          key: "set-nickname",
+          icon: "sprite-fm-mono icon-rename",
+          label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
+          onClick: () => {
+            nicknames.setNicknameDialog.init(contact.u);
+          }
+        }));
+      }
+
+      if (dropdownRemoveButton && dropdownRemoveButton.length) {
+        moreDropdowns.push(react0().createElement("hr", {
+          key: "remove-separator"
+        }));
+        moreDropdowns.push(dropdownRemoveButton);
+      }
+
+      return moreDropdowns;
+    };
   }
 
   customIsEventuallyVisible() {
@@ -5898,262 +6115,50 @@ class ContactButton extends _mixins1__._p {
     return -1;
   }
 
-  dropdownItemGenerator() {
-    var self = this;
-    var contact = self.props.contact;
-    var dropdowns = self.props.dropdowns ? self.props.dropdowns : [];
-    var moreDropdowns = [];
-    const username = react0().createElement(_ui_utils_jsx2__.OFlowEmoji, null, M.getNameByHandle(contact.u));
-
-    var onContactClicked = function () {
-      if (contact.c === 2) {
-        loadSubPage('fm/account');
-      }
-
-      if (contact.c === 1) {
-        loadSubPage('fm/chat/contacts/' + contact.u);
-      }
-    };
-
-    moreDropdowns.push(react0().createElement("div", {
-      className: "dropdown-avatar rounded",
-      key: "mainContactInfo"
-    }, react0().createElement(Avatar, {
-      className: "avatar-wrapper context-avatar",
-      chatRoom: this.props.chatRoom,
-      contact: contact,
-      hideVerifiedBadge: "true",
-      onClick: onContactClicked
-    }), react0().createElement("div", {
-      className: "dropdown-user-name",
-      onClick: onContactClicked
-    }, react0().createElement("div", {
-      className: "name"
-    }, username, react0().createElement(ContactPresence, {
-      className: "small",
-      contact: contact
-    })), contact && (megaChat.FORCE_EMAIL_LOADING || contact.c === 1 || contact.c === 2) && react0().createElement("span", {
-      className: "email"
-    }, contact.m))));
-    moreDropdowns.push(react0().createElement(ContactFingerprint, {
-      key: "fingerprint",
-      contact: contact
-    }));
-
-    if (dropdowns.length && contact.c !== 2) {
-      moreDropdowns.push(dropdowns);
-      moreDropdowns.push(react0().createElement("hr", {
-        key: "top-separator"
-      }));
-    }
-
-    if (contact.u === u_handle) {
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-        key: "view0",
-        icon: "sprite-fm-mono icon-user-filled",
-        label: l[187],
-        onClick: () => {
-          loadSubPage('fm/account');
-        }
-      }));
-    }
-
-    if (contact.c === 1) {
-      var startAudioCall = function () {
-        megaChat.createAndShowPrivateRoom(contact.u).then(function (room) {
-          room.setActive();
-          room.startAudioCall();
-        });
-      };
-
-      if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
-        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-          key: "startCall",
-          className: "sprite-fm-mono-before icon-arrow-right-before",
-          icon: "sprite-fm-mono icon-phone",
-          submenu: true,
-          label: l[19125],
-          onClick: startAudioCall
-        }));
-        moreDropdowns.push(react0().createElement("div", {
-          className: "dropdown body submenu",
-          key: "dropdownGroup"
-        }, react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-          key: "startAudio",
-          icon: "sprite-fm-mono icon-phone",
-          disabled: !megaChat.hasSupportForCalls,
-          label: l[1565],
-          onClick: startAudioCall
-        })), react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-          key: "startVideo",
-          icon: "sprite-fm-mono icon-video-call-filled",
-          disabled: !megaChat.hasSupportForCalls,
-          label: l[1566],
-          onClick: () => {
-            megaChat.createAndShowPrivateRoom(contact.u).then(function (room) {
-              room.setActive();
-              room.startVideoCall();
-            });
-          }
-        }))));
-      } else {
-        moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-          key: "startChat",
-          icon: "sprite-fm-mono icon-chat",
-          label: l[5885],
-          onClick: () => {
-            loadSubPage('fm/chat/p/' + contact.u);
-          }
-        }));
-      }
-
-      moreDropdowns.push(react0().createElement("hr", {
-        key: "files-separator"
-      }));
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-        key: "send-files-item",
-        icon: "sprite-fm-mono icon-send-files",
-        label: l[6834],
-        disabled: mega.paywall,
-        onClick: () => {
-          megaChat.openChatAndSendFilesDialog(contact.u);
-        }
-      }));
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-        key: "share-item",
-        icon: "sprite-fm-mono icon-folder-outgoing-share",
-        label: l[6775],
-        onClick: () => {
-          openCopyShareDialog(contact.u);
-        }
-      }));
-    } else if (!is_chatlink && !is_eplusplus && (!contact.c || contact.c === 2 && contact.u !== u_handle)) {
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-        key: "view2",
-        icon: "sprite-fm-mono icon-add",
-        label: l[101],
-        onClick: () => {
-          const isAnonymousUser = !u_handle || u_type !== 3;
-          const ADD_CONTACT = 'addContact';
-
-          if (is_chatlink && isAnonymousUser) {
-            megaChat.loginOrRegisterBeforeJoining(undefined, undefined, undefined, true);
-
-            if (localStorage.getItem(ADD_CONTACT) === null) {
-              localStorage.setItem(ADD_CONTACT, JSON.stringify({
-                u: contact.u,
-                unixTime: unixtime()
-              }));
-            }
-          } else {
-            loadingDialog.show();
-            M.syncContactEmail(contact.u, new MegaPromise(), true).done(email => {
-              let exists = false;
-              const opcKeys = Object.keys(M.opc);
-
-              for (let i = 0; i < opcKeys.length; i++) {
-                if (!exists && M.opc[opcKeys[i]].m === email) {
-                  exists = true;
-                  break;
-                }
-              }
-
-              if (exists) {
-                closeDialog();
-                msgDialog('warningb', '', l[17545]);
-              } else {
-                M.inviteContact(M.u[u_handle].m, email);
-                const title = l[150];
-                const msg = l[5898].replace('[X]', email);
-                closeDialog();
-                msgDialog('info', title, msg.replace('[X]', email));
-              }
-            }).always(() => loadingDialog.hide()).catch(() => {
-              const {
-                chatRoom
-              } = this.props;
-              const {
-                u: userHandle
-              } = contact;
-
-              if (chatRoom.sfuApp) {
-                return mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle);
-              }
-
-              const name = M.getNameByHandle(userHandle);
-              const {
-                ephemeral_title: title,
-                ephemeral_info: info
-              } = l;
-              return msgDialog('info', '', title ? title.replace('%1', name) : `${name} is using an ephemeral session.`, info);
-            });
-          }
-        }
-      }));
-    }
-
-    if (u_attr && contact.u !== u_handle) {
-      if (moreDropdowns.length > 0 && !(moreDropdowns.length === 2 && moreDropdowns[1] && moreDropdowns[1].key === "fingerprint")) {
-        moreDropdowns.push(react0().createElement("hr", {
-          key: "nicknames-separator"
-        }));
-      }
-
-      moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
-        key: "set-nickname",
-        icon: "sprite-fm-mono icon-rename",
-        label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
-        onClick: () => {
-          nicknames.setNicknameDialog.init(contact.u);
-        }
-      }));
-    }
-
-    if (self.props.dropdownRemoveButton && self.props.dropdownRemoveButton.length) {
-      moreDropdowns.push(react0().createElement("hr", {
-        key: "remove-separator"
-      }));
-      moreDropdowns.push(self.props.dropdownRemoveButton);
-    }
-
-    return moreDropdowns;
-  }
-
   render() {
-    var self = this;
-    var label = self.props.label ? self.props.label : "";
-    var classes = self.props.className ? self.props.className : "";
-    var contact = self.props.contact;
-    var icon = self.props.dropdownIconClasses ? self.props.dropdownIconClasses : [];
-    var dropdownPosition = "left top";
-    var vertOffset = 0;
-    var horizOffset = -30;
+    let {
+      label = '',
+      className = '',
+      contact,
+      dropdownIconClasses = [],
+      verticalOffset,
+      dropdownDisabled,
+      noLoading,
+      noContextMenu
+    } = this.props;
+    let dropdownPosition = "left top";
+    let vertOffset = 0;
+    let horizOffset = -30;
 
     if (!contact) {
       return null;
     }
 
     if (label) {
-      classes = `user-card-name ${classes}`;
-      icon = "";
-      dropdownPosition = "left bottom";
+      className = `user-card-name ${className}`;
+      dropdownIconClasses = '';
+      dropdownPosition = 'left bottom';
       vertOffset = 25;
       horizOffset = 0;
     }
 
-    if (!contact.name && !contact.m && !self.props.noLoading && this.isLoadingContactInfo()) {
+    if (typeof verticalOffset !== 'undefined') {
+      vertOffset = verticalOffset;
+    }
+
+    if (!contact.name && !contact.m && !noLoading && this.isLoadingContactInfo()) {
       label = react0().createElement("em", {
         className: "contact-name-loading"
       });
-      classes = `contact-button-loading ${classes}`;
+      className = `contact-button-loading ${className}`;
     }
 
-    return this.props.noContextMenu ? react0().createElement("div", {
+    return noContextMenu ? react0().createElement("div", {
       className: "user-card-name light"
     }, label) : react0().createElement(_ui_buttons_jsx4__.Button, {
-      className: classes,
-      icon: icon,
-      disabled: self.props.dropdownDisabled,
+      className: className,
+      icon: dropdownIconClasses,
+      disabled: dropdownDisabled,
       label: label
     }, react0().createElement(_ui_dropdowns_jsx5__.Dropdown, {
       className: "context contact-card-dropdown",
@@ -6161,7 +6166,7 @@ class ContactButton extends _mixins1__._p {
       positionAt: dropdownPosition,
       vertOffset: vertOffset,
       horizOffset: horizOffset,
-      dropdownItemGenerator: self.dropdownItemGenerator.bind(this),
+      dropdownItemGenerator: this.dropdownItemGenerator,
       noArrow: true
     }));
   }
@@ -6502,7 +6507,8 @@ class ContactCard extends _mixins1__._p {
         className: "light",
         label: escapedUsername,
         chatRoom: this.props.chatRoom,
-        dropdownRemoveButton: dropdownRemoveButton
+        dropdownRemoveButton: dropdownRemoveButton,
+        verticalOffset: 0
       });
     } else {
       if (highlightSearchValue && searchValue.length > 0) {
@@ -6606,7 +6612,8 @@ class ContactCard extends _mixins1__._p {
       className: self.props.dropdownButtonClasses,
       dropdownRemoveButton: dropdownRemoveButton,
       noLoading: self.props.noLoading,
-      chatRoom: self.props.chatRoom
+      chatRoom: self.props.chatRoom,
+      verticalOffset: 0
     }), selectionTick, userCard);
   }
 
@@ -9749,6 +9756,7 @@ class HistoryRetentionDialog extends external_React_.Component {
     } = this.props;
     const hasInput = this.hasInput();
     const selectedTimeFormat = this.state.selectedTimeFormat;
+    const parsedLabel = this.getParsedLabel(selectedTimeFormat, this.state.timeRange);
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       chatRoom: chatRoom,
       onClose: onClose,
@@ -9767,7 +9775,7 @@ class HistoryRetentionDialog extends external_React_.Component {
       className: "form-section"
     }, external_React_default().createElement("span", {
       className: "form-section-placeholder"
-    }, this.getParsedLabel(selectedTimeFormat, this.state.timeRange).split(" ")[1]), external_React_default().createElement("input", {
+    }, parsedLabel && parsedLabel.split(" ")[1]), external_React_default().createElement("input", {
       type: "number",
       min: "0",
       step: "1",
@@ -12022,8 +12030,8 @@ PushSettingsDialog.options = {
 PushSettingsDialog.default = PushSettingsDialog.options[PushSettingsDialog.options.length - 1];
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 23 modules
 var call = __webpack_require__(357);
-// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
-var historyPanel = __webpack_require__(192);
+// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
+var historyPanel = __webpack_require__(638);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 var composedTextArea = __webpack_require__(813);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/loading.jsx
@@ -17049,7 +17057,7 @@ class GifPanel extends mixins.wl {
 
 /***/ }),
 
-/***/ 192:
+/***/ 638:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -17059,6 +17067,16 @@ __webpack_require__.d(__webpack_exports__, {
   "Z": () => (HistoryPanel)
 });
 
+;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/initializerDefineProperty.js
+function _initializerDefineProperty(target, property, descriptor, context) {
+  if (!descriptor) return;
+  Object.defineProperty(target, property, {
+    enumerable: descriptor.enumerable,
+    configurable: descriptor.configurable,
+    writable: descriptor.writable,
+    value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+  });
+}
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
 var applyDecoratedDescriptor = __webpack_require__(229);
 // EXTERNAL MODULE: external "React"
@@ -17599,7 +17617,9 @@ var call = __webpack_require__(357);
 ;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
 
-var _dec, _dec2, _class;
+
+
+var _dec, _dec2, _class, _descriptor;
 
 
 
@@ -17620,6 +17640,10 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
     super(props);
     this.$container = null;
     this.$messages = null;
+    this.state = {
+      editing: false,
+      toast: false
+    };
 
     this.onKeyboardScroll = ({
       keyCode
@@ -17651,9 +17675,94 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
       }
     };
 
-    this.state = {
-      editing: false
+    _initializerDefineProperty(this, "onMessagesScrollReinitialise", _descriptor, this);
+
+    this.onMessagesScrollUserScroll = (ps, offset = 5) => {
+      const {
+        chatRoom
+      } = this.props;
+      const {
+        messagesBuff
+      } = chatRoom;
+      const scrollPositionY = ps.getScrollPositionY();
+
+      if (messagesBuff.messages.length === 0) {
+        chatRoom.scrolledToBottom = true;
+        return;
+      }
+
+      if (ps.isCloseToBottom(30) === true) {
+        if (!chatRoom.scrolledToBottom) {
+          messagesBuff.detachMessages();
+        }
+
+        chatRoom.scrolledToBottom = true;
+      } else {
+        chatRoom.scrolledToBottom = false;
+      }
+
+      if (!this.scrollPullHistoryRetrieval && !messagesBuff.isRetrievingHistory && (ps.isAtTop() || scrollPositionY < offset && ps.getScrollHeight() > 500) && messagesBuff.haveMoreHistory()) {
+        ps.disable();
+        this.scrollPullHistoryRetrieval = true;
+        this.lastScrollPosition = scrollPositionY;
+        let msgAppended = 0;
+        const scrYOffset = ps.getScrollHeight();
+        chatRoom.one('onMessagesBuffAppend.pull', () => {
+          msgAppended++;
+        });
+        chatRoom.off('onHistoryDecrypted.pull');
+        chatRoom.one('onHistoryDecrypted.pull', () => {
+          chatRoom.off('onMessagesBuffAppend.pull');
+
+          if (msgAppended > 0) {
+            this._reposOnUpdate = scrYOffset;
+          }
+
+          this.scrollPullHistoryRetrieval = -1;
+        });
+        messagesBuff.retrieveChatHistory();
+      }
+
+      if (this.lastScrollPosition !== scrollPositionY) {
+        this.lastScrollPosition = scrollPositionY;
+      }
+
+      delay('chat-toast', this.initToast, 200);
     };
+
+    this.initToast = () => {
+      const {
+        chatRoom
+      } = this.props;
+      this.setState({
+        toast: !chatRoom.scrolledToBottom && !this.messagesListScrollable.isCloseToBottom(30)
+      }, () => this.state.toast ? null : chatRoom.trigger('onChatIsFocused'));
+    };
+
+    this.renderToast = () => {
+      const {
+        chatRoom
+      } = this.props;
+      const unreadCount = chatRoom.messagesBuff.getUnreadCount();
+      return external_React_default().createElement("div", {
+        className: `
+                    theme-dark-forced
+                    messages-toast
+                    ${this.state.toast ? 'active' : ''}
+                `,
+        onClick: () => {
+          this.setState({
+            toast: false
+          }, () => {
+            this.messagesListScrollable.scrollToBottom();
+            chatRoom.scrolledToBottom = true;
+          });
+        }
+      }, external_React_default().createElement("i", {
+        className: "sprite-fm-mono icon-down"
+      }), unreadCount > 0 && external_React_default().createElement("span", null, unreadCount > 9 ? '9+' : unreadCount));
+    };
+
     this.handleWindowResize = SoonFc(80, ev => this._handleWindowResize(ev));
   }
 
@@ -17839,88 +17948,6 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
           this.messagesListScrollable.reinitialise(true, true);
         }, 30);
       }
-    }
-  }
-
-  onMessagesScrollReinitialise(ps, $elem, forced, scrollPositionYPerc, scrollToElement) {
-    var self = this;
-    var chatRoom = self.props.chatRoom;
-    var mb = chatRoom.messagesBuff;
-
-    if (self.scrollPullHistoryRetrieval || mb.isRetrievingHistory) {
-      return;
-    }
-
-    if (forced) {
-      if (!scrollPositionYPerc && !scrollToElement) {
-        if (self.props.chatRoom.scrolledToBottom && !self.editDomElement) {
-          ps.scrollToBottom(true);
-          return true;
-        }
-      } else {
-        return;
-      }
-    }
-
-    if (self.isComponentEventuallyVisible() && !self.editDomElement && !self.props.chatRoom.isScrollingToMessageId) {
-      if (self.props.chatRoom.scrolledToBottom) {
-        ps.scrollToBottom(true);
-        return true;
-      }
-
-      if (self.lastScrollPosition && self.lastScrollPosition !== ps.getScrollPositionY()) {
-        ps.scrollToY(self.lastScrollPosition, true);
-        return true;
-      }
-    }
-  }
-
-  onMessagesScrollUserScroll(ps, offset = 5) {
-    var self = this;
-    var scrollPositionY = ps.getScrollPositionY();
-    var isAtTop = ps.isAtTop();
-    var chatRoom = self.props.chatRoom;
-    var mb = chatRoom.messagesBuff;
-
-    if (mb.messages.length === 0) {
-      self.props.chatRoom.scrolledToBottom = true;
-      return;
-    }
-
-    if (ps.isCloseToBottom(30) === true) {
-      if (!self.props.chatRoom.scrolledToBottom) {
-        mb.detachMessages();
-      }
-
-      self.props.chatRoom.scrolledToBottom = true;
-    } else {
-      self.props.chatRoom.scrolledToBottom = false;
-    }
-
-    if (!self.scrollPullHistoryRetrieval && !mb.isRetrievingHistory && (isAtTop || scrollPositionY < offset && ps.getScrollHeight() > 500) && mb.haveMoreHistory()) {
-      ps.disable();
-      self.scrollPullHistoryRetrieval = true;
-      self.lastScrollPosition = scrollPositionY;
-      let msgAppended = 0;
-      const scrYOffset = ps.getScrollHeight();
-      chatRoom.one('onMessagesBuffAppend.pull', function () {
-        msgAppended++;
-      });
-      chatRoom.off('onHistoryDecrypted.pull');
-      chatRoom.one('onHistoryDecrypted.pull', function () {
-        chatRoom.off('onMessagesBuffAppend.pull');
-
-        if (msgAppended > 0) {
-          self._reposOnUpdate = scrYOffset;
-        }
-
-        self.scrollPullHistoryRetrieval = -1;
-      });
-      mb.retrieveChatHistory();
-    }
-
-    if (self.lastScrollPosition !== scrollPositionY) {
-      self.lastScrollPosition = scrollPositionY;
     }
   }
 
@@ -18223,8 +18250,12 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
       }
     }
 
-    return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
-      className: `messages scroll-area ${this.props.className ? this.props.className : ''}`
+    return external_React_default().createElement("div", {
+      className: `
+                    messages
+                    scroll-area
+                    ${this.props.className ? this.props.className : ''}
+                `
     }, external_React_default().createElement("div", {
       className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification-manual hidden"
     }, external_React_default().createElement("i", {
@@ -18246,8 +18277,8 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
         ps.scrollToBottom(true);
         this.props.chatRoom.scrolledToBottom = 1;
       },
-      onReinitialise: this.onMessagesScrollReinitialise.bind(this),
-      onUserScroll: this.onMessagesScrollUserScroll.bind(this),
+      onReinitialise: this.onMessagesScrollReinitialise,
+      onUserScroll: this.onMessagesScrollUserScroll,
       className: "js-messages-scroll-area perfectScrollbarContainer",
       messagesToggledInCall: this.state.messagesToggledInCall,
       ref: ref => {
@@ -18278,9 +18309,12 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
         top: "50%"
       },
       className: `
-                                                        loading-spinner js-messages-loading light manual-management
-                                                        ${this.loadingShown ? '' : 'hidden'}
-                                                    `
+                                    loading-spinner
+                                    js-messages-loading
+                                    light
+                                    manual-management
+                                    ${this.loadingShown ? '' : 'hidden'}
+                                `
     }, external_React_default().createElement("div", {
       className: "main-loader",
       style: {
@@ -18288,10 +18322,48 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
         'top': '50%',
         'left': '50%'
       }
-    })), messagesList)))));
+    })), messagesList))), this.renderToast());
   }
 
-}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "onMessagesScrollReinitialise", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "onMessagesScrollReinitialise"), _class.prototype), (0,applyDecoratedDescriptor.Z)(_class.prototype, "enableScrollbar", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype)), _class));
+}, (_descriptor = (0,applyDecoratedDescriptor.Z)(_class.prototype, "onMessagesScrollReinitialise", [_dec], {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  initializer: function () {
+    return (ps, $elem, forced, scrollPositionYPerc, scrollToElement) => {
+      const {
+        chatRoom
+      } = this.props;
+
+      if (this.scrollPullHistoryRetrieval || chatRoom.messagesBuff.isRetrievingHistory) {
+        return;
+      }
+
+      if (forced) {
+        if (!scrollPositionYPerc && !scrollToElement) {
+          if (chatRoom.scrolledToBottom && !this.editDomElement) {
+            ps.scrollToBottom(true);
+            return true;
+          }
+        } else {
+          return;
+        }
+      }
+
+      if (this.isComponentEventuallyVisible() && !this.editDomElement && !chatRoom.isScrollingToMessageId) {
+        if (chatRoom.scrolledToBottom) {
+          ps.scrollToBottom(true);
+          return true;
+        }
+
+        if (this.lastScrollPosition && this.lastScrollPosition !== ps.getScrollPositionY()) {
+          ps.scrollToY(this.lastScrollPosition, true);
+          return true;
+        }
+      }
+    };
+  }
+}), (0,applyDecoratedDescriptor.Z)(_class.prototype, "enableScrollbar", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype)), _class));
 
 
 /***/ }),
@@ -20798,8 +20870,8 @@ class stream_Stream extends mixins.wl {
 }
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 var composedTextArea = __webpack_require__(813);
-// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
-var historyPanel = __webpack_require__(192);
+// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
+var historyPanel = __webpack_require__(638);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/collapse.jsx
 
 

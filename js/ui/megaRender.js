@@ -1069,6 +1069,7 @@
                 props.userNames = [];
                 props.userHandles = [];
                 props.avatars = [];
+
                 for (var i in aNode.shares) {
                     if (i !== 'EXP') {
                         props.lastSharedAt = Math.max(props.lastSharedAt, aNode.shares[i].ts);
@@ -1303,6 +1304,10 @@
 
                     aTemplate.querySelector('.shared-folder-info')
                         .textContent = l[17590].replace('%1', aProperties.userName);
+
+                    if (String(aProperties.name).length > 20) {
+                        aTemplate.setAttribute('title', aProperties.name);
+                    }
                 }
                 else {
 
@@ -1324,6 +1329,11 @@
                     aTemplate.querySelector('.fm-chat-user').textContent = aProperties.userName;
                     aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
                     aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
+
+                    if (String(aProperties.name).length > 78) {
+                        aTemplate.setAttribute('title', aProperties.name);
+                    }
+
                 }
 
                 return aTemplate;
@@ -1369,6 +1379,10 @@
                         aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);
                     }
 
+                    if (String(aProperties.name).length > 20) {
+                        aTemplate.setAttribute('title', aProperties.name);
+                    }
+
                     var shareContactInfo = aTemplate.querySelector('.shared-contact-info');
                     shareContactInfo.textContent = mega.icu.format(l.contact_count, aProperties.userNames.length);
                     shareContactInfo.classList += ' simpletip';
@@ -1392,6 +1406,10 @@
                     aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
                     aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
                     aTemplate.querySelector('.last-shared-time').textContent = aProperties.lastSharedAt;
+
+                    if (String(aProperties.name).length > 78) {
+                        aTemplate.setAttribute('title', aProperties.name);
+                    }
                 }
 
                 return aTemplate;

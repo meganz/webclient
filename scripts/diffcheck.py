@@ -170,7 +170,7 @@ def reduce_eslint(file_line_mapping, **extra):
     warnings = 0
     output = None
     try:
-        output = subprocess.check_output(command.split())
+        output = subprocess.check_output(command.split(), stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as ex:
         # ESlint found something, so it has returned an error code.
         # But we still want the output in the same fashion.
@@ -183,6 +183,9 @@ def reduce_eslint(file_line_mapping, **extra):
             logging.error('Error calling ESLint: {}'.format(ex))
         return '*** ESLint: {} ***'.format(ex), 0
     output = output.decode('utf8').replace(PROJECT_PATH + os.path.sep, '').split('\n')
+
+    if output[1] == u'Oops! Something went wrong! :(':
+        return '\n'.join(output), 1
 
     # Go through output and collect only relevant lines to the result.
     result = ['\nESLint output:\n==============\n']

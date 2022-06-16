@@ -979,35 +979,26 @@
     };
 
     CallManager2.prototype.onCallState = function(eventData, chatRoom) {
-        if (eventData.userId === u_handle) {
-            // caller is me and call was locally initiated (web) -> ring locally for 1on1s
-            if (chatRoom.type === 'private' && this.calls[`${eventData.chatId}_${eventData.callId}`]) {
-                if (eventData.arg) {
-                    chatRoom.megaChat.trigger('onOutgoingCallRinging', [
-                        chatRoom,
-                        eventData.callId,
-                        eventData.userId,
-                        this
-                    ]);
-                }
-                else {
-                    this.trigger('onRingingStopped', {
-                        chatRoom: chatRoom,
-                        callId: eventData.callId,
-                        callManager: this
-                    });
+        // Caller is me and the call was locally initiated from the web client -> ring for 1-on-1s; don't ring if
+        // the user had initiated the call from another client/device.
+        if (eventData.userId === u_handle && chatRoom.type === 'private' && megaChat.activeCall) {
+            if (eventData.arg) {
+                megaChat.trigger('onOutgoingCallRinging', [chatRoom, eventData.callId, eventData.userId, this]);
+            }
+            else {
+                // Hang-up the if the other participant didn't already join the 1-on-1 call; excl. current user joining
+                // from another client/device.
+                const { peers } = megaChat.activeCall;
+                if (!peers.length || peers.length === 1 && peers.getItem(0).userHandle === u_handle) {
+                    chatRoom.trigger('onCallEnd', { callId: eventData.callId, removeActive: true });
                 }
             }
             return;
         }
 
-        if (!megaChat.hasSupportForCalls) {
+        if (!megaChat.hasSupportForCalls || chatRoom.fakedLocalRing) {
             return;
         }
-        if (chatRoom.fakedLocalRing) {
-            return;
-        }
-
 
         if (eventData.arg) {
 

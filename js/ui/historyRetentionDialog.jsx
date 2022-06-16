@@ -216,6 +216,7 @@ export class HistoryRetentionDialog extends Component {
         const { chatRoom, onClose } = this.props;
         const hasInput = this.hasInput();
         const selectedTimeFormat = this.state.selectedTimeFormat;
+        const parsedLabel = this.getParsedLabel(selectedTimeFormat, this.state.timeRange);
 
         return (
             <ModalDialogsUI.ModalDialog
@@ -237,7 +238,7 @@ export class HistoryRetentionDialog extends Component {
                     <div className="content-block form">
                         <div className="form-section">
                             <span className="form-section-placeholder">
-                                {this.getParsedLabel(selectedTimeFormat, this.state.timeRange).split(" ")[1]}
+                                {parsedLabel && parsedLabel.split(" ")[1]}
                             </span>
                             <input
                                 type="number"

@@ -4137,21 +4137,35 @@ MegaData.prototype.deletePendingShare = function(nodeHandle, pendingContactId) {
     }
 };
 
-MegaData.prototype.emptySharefolderUI = function(lSel) {
+MegaData.prototype.emptySharefolderUI = tryCatch(function(lSel) {
     "use strict";
 
-    if (!lSel) {
-        lSel = this.fsViewSel;
+    const contentBlock = document.querySelector('.shared-folder-content');
+    let selectedView = null;
+    let emptyBlock = null;
+    let clonedEmptyBlock = null;
+
+    if (!contentBlock) {
+        return;
     }
 
-    $(lSel).before($('.fm-empty-folder').clone()
-        .removeClass('hidden').addClass('fm-empty-sharef'));
-    $(lSel).hide().parent().children('table').hide();
+    selectedView = contentBlock.querySelector(lSel || this.fsViewSel);
+    emptyBlock = contentBlock.querySelector('.fm-empty-sharef');
 
-    $('.files-grid-view.fm.shared-folder-content').removeClass('hidden');
+    if (!selectedView || emptyBlock) {
+        return;
+    }
+
+    clonedEmptyBlock = document.querySelector('.fm-empty-folder').cloneNode(true);
+    clonedEmptyBlock.classList.remove('hidden');
+    clonedEmptyBlock.classList.add('fm-empty-sharef');
+
+    selectedView.classList.add('hidden');
+    selectedView.parentNode.insertBefore(clonedEmptyBlock, selectedView);
+    contentBlock.classList.remove('hidden');
 
     $.tresizer();
-};
+});
 
 
 /**

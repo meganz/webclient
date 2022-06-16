@@ -358,7 +358,7 @@ function time2last(timestamp, skipSeconds) {
         return l[880];
     }
     else if (sec < 59) {
-        return l[873].replace('[X]', Math.ceil(sec));
+        return mega.icu.format(l.second_last_count, Math.ceil(sec));
     }
     else if (sec < 3540) {
         return mega.icu.format(l.minute_last_count, Math.ceil(sec / 60));

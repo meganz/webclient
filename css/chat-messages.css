@@ -111,6 +111,45 @@
     height: 100%;
     display: table;
 }
+.messages.scroll-area .messages-toast {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 200px;
+    background: var(--surface-mid-grey);
+    z-index: -1;
+    transition: all 50ms ease-in-out;
+    opacity: 0;
+}
+.messages.scroll-area .messages-toast.active {
+    bottom: 10px;
+    opacity: 1;
+    cursor: pointer;
+    z-index: 100;
+}
+.messages.scroll-area .messages-toast i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    --mask-color: var(--icon-active);
+}
+.messages.scroll-area .messages-toast span {
+    display: block;
+    position: absolute;
+    top: -4px;
+    left: -3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 200px;
+    font: var(--text-caption);
+    text-align: center;
+    line-height: 14px;
+    color: var(--secondary-white);
+    background: var(--secondary-blue);
+}
 .messages.main-pad {
     display: table;
     width: 100%;
@@ -932,6 +971,7 @@ body.theme-dark .message .audio-player {
 }
 .reactions-bar {
     display: flex;
+    flex-wrap: wrap;
     line-height: 20px;
     clear: both;
     margin: 2px 0 4px 0;
@@ -976,7 +1016,7 @@ body.theme-dark .message .audio-player {
     display: flex;
     align-items: center;
     padding-inline: 4px;
-    margin-left: 2px;
+    margin: 4px 0 0 2px;
     width: auto;
     height: 23px;
     border-radius: 11px;

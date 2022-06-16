@@ -5624,9 +5624,6 @@ div.checkboxOn {
     display: inline-block;
 }
 .mobile.my-account-page .user-phone-verified-icon {
-    background: url(../images/mobile/mobile-sprite.png);
-    background-position: -81px -2274px;
-    background-repeat: no-repeat;
     display: inline-block;
     height: 16px;
     margin-left: 5px;
@@ -5634,6 +5631,7 @@ div.checkboxOn {
     position: absolute;
     top: 2px;
     width: 16px;
+    color: var(--text-color-success);
 }
 .mobile.my-account-page .account-type-block {
     background-color: #fff;

@@ -147,7 +147,14 @@
         height: 12px;
         opacity: 0.7;
         overflow: hidden;
-        width: 0;
+        width: 100%;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 300ms;
+        transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+    }
+    .loader-percents.delay-loader {
+        transition-duration: 150s;
     }
 
 /* Media viewer pending spinner */

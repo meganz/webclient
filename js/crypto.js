@@ -1155,6 +1155,10 @@ function getsc(force) {
             api_ready(apixs[5]);
             api_req('sn=' + currsn, {}, 5);
 
+            if (window.loadingInitDialog.progress) {
+                window.loadingInitDialog.step3(loadfm.fromapi ? 40 : 1, 55);
+            }
+
             if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
                 mega.loadReport.scSent = Date.now();
             }

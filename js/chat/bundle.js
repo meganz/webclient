@@ -19426,7 +19426,7 @@ class SidebarControls extends mixins.wl {
       onClick: onChatToggle
     }, external_React_default().createElement("span", null, l.chats)), notifications > 0 && external_React_default().createElement("span", {
       className: "notifications-count"
-    }, notifications)), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+    }, notifications > 9 ? '9+' : notifications)), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
       className: `
                                 mega-button
                                 theme-dark-forced
@@ -20292,7 +20292,7 @@ class Minimized extends mixins.wl {
     }, external_React_default().createElement(meetings_button.Z, {
       className: "mega-button round large chat-control",
       icon: "icon-chat-filled"
-    }, external_React_default().createElement("span", null, l.chats)), external_React_default().createElement("span", null, unread)) : null);
+    }, external_React_default().createElement("span", null, l.chats)), external_React_default().createElement("span", null, unread > 9 ? '9+' : unread)) : null);
   }
 
 }

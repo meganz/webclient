@@ -125,6 +125,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    z-index: -1;
 }
 .chat-textarea-scroll textarea, .chat-textarea-scroll textarea + div, .message.textarea-scroll textarea,  .message.textarea-block textarea + div {
     font: var(--text-body1);
@@ -217,6 +218,7 @@
 }
 .chat-textarea-scroll.textarea-scroll.jspScrollable .messages-textarea {
     max-width: 100%; /* don't overlap other elements in case of left pane resize.. */
+    background: transparent;
 }
 
 .edit-typing-area {

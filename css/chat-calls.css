@@ -443,13 +443,13 @@ button.call:hover i {
     padding: 5px 0 0 0;
 }
 .in-call-notif span {
-    display: block;
-    float: left;
+    vertical-align: top;
+    display: inline-block;
     margin: 3px 0 0 0;
 }
 .in-call-notif i {
-    display: block;
-    float: left;
+    vertical-align: top;
+    display: inline-block;
     --icon-size: 24px;
     margin: 1px 7px 0 7px;
     --mask-color: var(--icon-rest);
@@ -466,6 +466,7 @@ button.call:hover i {
 }
 
 .in-call-notif.neutral {
+    white-space: nowrap;
     min-width: 254px;
     box-sizing: border-box;
     height: 36px;
@@ -490,8 +491,7 @@ button.call:hover i {
     -o-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
     -ms-transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
     transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
-    display: inline;
-    float: right;
+    display: inline-block;
     height: 24px;
     margin: -2px 7px 0 24px;
 }

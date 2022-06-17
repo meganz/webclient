@@ -1038,7 +1038,6 @@ body.theme-dark .message .audio-player {
 
 .reactions-bar > div.reactions-button {
     position: relative;
-    margin-top: 0;
     height: 24px;
     border-radius: 11px;
     background-color: var(--stroke-grey-2);

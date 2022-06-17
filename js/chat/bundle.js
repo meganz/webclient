@@ -20465,14 +20465,13 @@ class stream_Stream extends mixins.wl {
 
     this.getPublicLink = () => {
       const {
-        call,
         chatRoom
       } = this.props;
 
-      if (call.isPublic) {
-        chatRoom.updatePublicHandle(undefined, () => this.setState({
+      if (chatRoom && chatRoom.isMeeting) {
+        chatRoom.updatePublicHandle(undefined, () => this.isMounted() ? this.setState({
           link: chatRoom.publicLink ? `${getBaseUrl()}/${chatRoom.publicLink}` : l[20660]
-        }));
+        }) : null);
       }
 
       return null;

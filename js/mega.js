@@ -238,25 +238,73 @@ if (typeof loadingInitDialog === 'undefined') {
             }
         }
         if (progress) {
-            $('.loader-percents').width(progress + '%');
-
-            if (progress > 99) {
-                onIdle(function() {
-                    loadingInitDialog.step3();
-                });
-            }
+            $('.loader-percents').css('transform', `scaleX(${progress * 0.5 / 100})`);
         }
         this.progress = true;
     };
-    loadingInitDialog.step3 = function() {
+    loadingInitDialog.step3 = function(progress, delayStep) {
+
+        'use strict';
+
         if (this.progress) {
 
             // Don't show step 3 loading if on mobile
-            if (!is_mobile) {
+            if (progress === 1 && !is_mobile) {
+
                 $('.loading-info li.loading').addClass('loaded').removeClass('loading');
                 $('.loading-info li.step3').addClass('loading');
             }
-            $('.loader-progressbar').removeClass('active').css('bottom', 0);
+
+            if (this.progress === true) {
+
+                this.loader = document.getElementsByClassName('loader-percents')[0];
+                this.progress = 0;
+            }
+
+            // This trying moving backward, nope sorry you cannot do this.
+            if (this.progress > progress) {
+                return;
+            }
+
+            // only update UI with 0.5% step
+            if (this.progress + 1 <= progress) {
+
+                this.progress = progress | 0;
+
+
+                this.loader.classList.remove('delay-loader');
+                this.loader.style.transform = `scaleX(${(this.progress * 0.5 + 50) / 100})`;
+
+                if (delayStep) {
+
+                    queueMicrotask(() => {
+
+                        if (progress > 99) {
+                            return;
+                        }
+
+                        if (this.progress < delayStep) {
+
+                            this.loader.classList.add('delay-loader');
+                            this.loader.style.transform = `scaleX(${(delayStep * 0.5 + 50) / 100})`;
+                        }
+                    });
+                }
+
+                if (progress >= 99) {
+
+                    setTimeout(() => {
+
+                        const elm = document.getElementsByClassName('loader-progressbar')[0];
+
+                        if (elm) {
+                            elm.classList.remove('active');
+                            elm.style.bottom = 0;
+                        }
+                    }, 301);
+                }
+
+            }
         }
     };
     loadingInitDialog.hide = function() {
@@ -2294,9 +2342,9 @@ function dbfetchfm() {
         mega.loadReport.stepTimeStamp = now;
     };
     const finish = () => {
-        window.loadingInitDialog.step3();
 
         if (isFromAPI) {
+            window.loadingInitDialog.step3(1, 20);
             setTimeout(loadfm_callback, 420, residualfm);
             residualfm = false;
         }
@@ -3413,7 +3461,7 @@ function loadfm_callback(res) {
 
     if ((parseInt(res) | 0) < 0 || res === undefined) {
         loadingDialog.hide();
-        loadingInitDialog.hide();
+        window.loadingInitDialog.hide();
 
         // tell the user we were unable to retrieve the cloud drive contents, upon clicking OK redirect to /support
         msgDialog('warninga', l[1311], l[16892], api_strerror(res), loadSubPage.bind(null, 'support'));
@@ -3497,7 +3545,7 @@ function loadfm_callback(res) {
         // Check if the key for a folderlink was correct
         if (folderlink && missingkeys[M.RootID]) {
             loadingDialog.hide();
-            loadingInitDialog.hide();
+            window.loadingInitDialog.hide();
 
             loadfm.loaded = false;
             loadfm.loading = false;
@@ -3560,6 +3608,8 @@ function loadfm_callback(res) {
         mega.loadReport.procNodes     = Date.now() - mega.loadReport.stepTimeStamp;
         mega.loadReport.stepTimeStamp = Date.now();
 
+        window.loadingInitDialog.step3(20, 35);
+
         // Time to save the ufs-size-cache, from which M.tree nodes will be created and being
         // those dependant on in-memory-nodes from the initial load to set flags such SHARED.
         (async() => ufsc.save())().catch(dump)
@@ -3567,6 +3617,8 @@ function loadfm_callback(res) {
                 // commit transaction and set sn
                 setsn(res.sn);
                 currsn = res.sn;
+
+                window.loadingInitDialog.step3(35, 40);
 
                 // retrieve initial batch of action packets, if any
                 // we'll then complete the process using loadfm_done
@@ -3580,6 +3632,9 @@ function loadfm_callback(res) {
  * being the nodes loaded from either server or local cache.
  */
 function loadfm_done(mDBload) {
+
+    window.loadingInitDialog.step3(56, 85);
+
     mDBload = mDBload || !loadfm.fromapi;
 
     loadfm.loaded = Date.now();
@@ -3622,6 +3677,9 @@ function loadfm_done(mDBload) {
 
     // This function is invoked once the M.openFolder()'s promise (through renderfm()) is fulfilled.
     var _completion = function() {
+
+        window.loadingInitDialog.step3(100);
+
         var hideLoadingDialog = !is_mobile && !CMS.isLoading();
 
         if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
@@ -3673,8 +3731,10 @@ function loadfm_done(mDBload) {
         }
 
         if (hideLoadingDialog) {
-            loadingDialog.hide();
-            loadingInitDialog.hide();
+            setTimeout(() => {
+                window.loadingDialog.hide();
+                window.loadingInitDialog.hide();
+            }, 301);
             // Reposition UI elements right after hiding the loading overlay,
             // without waiting for the lazy $.tresizer() triggered by MegaRender
             fm_resize_handler(true);
@@ -3750,6 +3810,9 @@ function loadfm_done(mDBload) {
     };
 
     var _onConfigReady = function() {
+
+        window.loadingInitDialog.step3(85, 100);
+
         var promise = MegaPromise.resolve();
 
         mega.loadReport.fmConfigFetch = Date.now() - mega.loadReport.stepTimeStamp;

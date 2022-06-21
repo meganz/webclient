@@ -2715,3 +2715,32 @@ MegaUtils.prototype.validateDate = function(day, month, year) {
     // it is valid
     return 0;
 };
+
+/**
+ * Validate raw phone number
+ *
+ * @param {string} phoneNumber Phone number
+ * @param {string} countryCode Country calling code
+ * @returns {string|Boolean} returns the cleaned phone number otherwise false
+ */
+MegaUtils.prototype.validatePhoneNumber = function(phoneNumber, countryCode) {
+    'use strict';
+
+    if (typeof phoneNumber !== 'string') {
+        return false;
+    }
+
+    if (typeof countryCode === 'string') {
+        countryCode = countryCode.trim();
+        phoneNumber = `${countryCode}${phoneNumber}`;
+    }
+
+    phoneNumber = phoneNumber.trim().replace(/[^\w+]/g, '');
+
+    var simplePhoneNumberPattern = /^\+?\d{4,}$/;
+    if (!simplePhoneNumberPattern.test(phoneNumber)) {
+        return false;
+    }
+
+    return phoneNumber;
+};

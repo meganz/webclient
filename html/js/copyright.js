@@ -397,12 +397,8 @@ copyright.init_cn = function() {
 
 copyright.validatePhoneNumber = function(phoneNumber) {
     'use strict';
-
-    var p = /\d[^\d]*\d[^\d]*\d[^\d]*\d/;
-    var match = p.exec(phoneNumber);
-
     // if not at least 4 numbers, what is this thing?
-    return match !== null;
+    return M.validatePhoneNumber(phoneNumber);
 };
 
 copyright.validateDisputeForm = function() {
@@ -539,6 +535,7 @@ copyright.init_cndispute = function() {
             // as we have already validated them
             var url = $('input.contenturl', '.dn-form').val();
             var handles = copyright.validateUrl(url);
+            var validatedPhoneNumber = M.validatePhoneNumber($('input.phonenumber', '.dn-form').val());
 
             var requestParameters = {
                 a: 'cnd',
@@ -547,7 +544,7 @@ copyright.init_cndispute = function() {
                 desc: $('input.copyrightwork', '.dn-form').val(),
                 comments: $('input.copyrightexplanation', '.dn-form').val(),
                 name: $('input.copyrightowner', '.dn-form').val(),
-                phonenumber: $('input.phonenumber', '.dn-form').val(),
+                phonenumber: validatedPhoneNumber,
                 email: $('input.email', '.dn-form').val(),
                 company: $('input.company', '.dn-form').val(),
                 address1: $('input.address', '.dn-form').val(),

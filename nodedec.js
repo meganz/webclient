@@ -211,6 +211,16 @@ function crypto_decryptnode(n) {
                 // check for permitted key lengths (4 == folder, 8 == file)
                 if (k.length === 4 || k.length === 8) {
                     k = decrypt_key(id === u_handle ? u_k_aes : u_sharekeys[id][1], k);
+
+                    // Don't decrypt the file if the first half of the key is identical to the second half. Creating
+                    // such a key enables the attacker to leverage the deobfuscation step (XORing the second half into
+                    // the first half) to provoke an all-0 AES key.
+                    if (k.length === 8 && k[0] === k[4] && k[1] === k[5] && k[2] === k[6] && k[3] === k[7]) {
+                        if (d) {
+                            console.error(`First half of file key matches second half of key (${k.length}): ${n.h}`);
+                        }
+                        k = false;
+                    }
                 }
                 else {
                     if (d) {

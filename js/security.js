@@ -1171,6 +1171,7 @@ security.login = {
                     var encryptedSessionIdBase64 = result.csid;
                     var encryptedMasterKeyBase64 = result.k;
                     var encryptedPrivateRsaKey = result.privk;
+                    var userHandle = result.u;
 
                     // Decrypt the Master Key
                     var encryptedMasterKeyArray32 = base64_to_a32(encryptedMasterKeyBase64);
@@ -1184,7 +1185,7 @@ security.login = {
                     else {
                         // Otherwise continue a regular login
                         security.login.decryptRsaKeyAndSessionId(decryptedMasterKeyArray32, encryptedSessionIdBase64,
-                                                                 encryptedPrivateRsaKey);
+                                                                 encryptedPrivateRsaKey, userHandle);
                     }
                 }
                 else {
@@ -1225,8 +1226,10 @@ security.login = {
      * @param {Array} masterKeyArray32 The raw unencrypted Master Key
      * @param {String} encryptedSessionIdBase64 The encrypted session ID as a Base64 string
      * @param {String} encryptedPrivateRsaKeyBase64 The private RSA key as a Base64 string
+     * @param {String} userHandle The encrypted user handle from the 'us' response
      */
-    decryptRsaKeyAndSessionId: function(masterKeyArray32, encryptedSessionIdBase64, encryptedPrivateRsaKeyBase64) {
+    decryptRsaKeyAndSessionId: function(masterKeyArray32, encryptedSessionIdBase64,
+                                        encryptedPrivateRsaKeyBase64, userHandle) {
 
         'use strict';
 
@@ -1246,12 +1249,26 @@ security.login = {
             var decryptedSessionIdSubstring = decryptedSessionId.substr(0, 43);
             var decryptedSessionIdBase64 = base64urlencode(decryptedSessionIdSubstring);
 
+            // Add a check that the decrypted sid and res.u aren't shorter than usual before making the comparison.
+            // Otherwise, we could construct an oracle based on shortened csids with single-byte user handles.
+            if (decryptedSessionId.length !== 255 || userHandle.length !== 11) {
+                throw new Error("Incorrect length of Session ID or user handle in the 'us' response");
+            }
+
+            // Get the user handle from the decrypted Session ID (11 bytes starting at offset 16 bytes)
+            var sessionIdUserHandle = decryptedSessionId.substring(16, 27);
+
+            // Check that the user handle included in the Session ID matches the one sent in the 'us' response
+            if (sessionIdUserHandle !== userHandle) {
+                throw new Error("User handle in Session ID did not match the user handle from the 'us' request");
+            }
+
             // Set the data
             keyAndSessionData = [masterKeyArray32, decryptedSessionIdBase64, decodedPrivateRsaKey];
         }
         catch (exception) {
 
-            console.error('Error decoding private RSA key!', exception);
+            console.error('Error decrypting or decoding the private RSA key or Session ID!', exception);
 
             // Show an error dialog
             Soon(function() {

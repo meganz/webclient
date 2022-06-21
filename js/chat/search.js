@@ -611,14 +611,16 @@ ChatSearch.prototype._match = function(text, type, data, roomSearch, index) {
                 matches.push({ idx: m.index, str: m[0] });
             } while ((m = regExp.exec(text)));
         }
-
-        this.handler.onResult(roomSearch && roomSearch.room || roomSearch, {
+        const result = {
             index,
             type,
             text,
             matches,
-            data: data || {}
-        });
+        };
+        if (data) {
+            result.data = data;
+        }
+        this.handler.onResult(roomSearch && roomSearch.room || roomSearch, result);
     }
 };
 

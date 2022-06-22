@@ -86,11 +86,16 @@ export default class Stream extends MegaRenderMixin {
      */
 
     getPublicLink = () => {
-        const { call, chatRoom } = this.props;
-        if (call.isPublic) {
+        const { chatRoom } = this.props;
+        if (chatRoom && chatRoom.isMeeting) {
             chatRoom.updatePublicHandle(
                 undefined,
-                () => this.setState({ link: chatRoom.publicLink ? `${getBaseUrl()}/${chatRoom.publicLink}` : l[20660] })
+                () =>
+                    this.isMounted() ?
+                        this.setState({
+                            link: chatRoom.publicLink ? `${getBaseUrl()}/${chatRoom.publicLink}` : l[20660]
+                        }) :
+                        null
             );
         }
         return null;

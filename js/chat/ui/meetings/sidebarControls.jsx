@@ -34,7 +34,8 @@ export default class SidebarControls extends MegaRenderMixin {
                             onClick={onChatToggle}>
                             <span>{l.chats /* `Chats` */}</span>
                         </Button>
-                        {notifications > 0 && <span className="notifications-count">{notifications}</span>}
+                        {notifications > 0 &&
+                        <span className="notifications-count">{notifications > 9 ? '9+' : notifications }</span>}
                     </li>
                     <li>
                         <Button

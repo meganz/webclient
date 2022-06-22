@@ -6,21 +6,18 @@ var useravatar = (function() {
     'use strict';
 
     var _colors = [
-        "#69F0AE",
-        "#13E03C",
-        "#31B500",
-        "#00897B",
-        "#00ACC1",
-        "#61D2FF",
-        "#2BA6DE",
-        "#FFD300",
-        "#FFA500",
-        "#FF6F00",
-        "#E65100",
-        "#FF5252",
-        "#FF1A53",
-        "#C51162",
-        "#880E4F"
+        "#55D2F0",
+        "#BC2086",
+        "#FFD200",
+        "#5FDB00",
+        "#00BDB2",
+        "#FFA700",
+        "#E4269B",
+        "#FF626C",
+        "#FF8989",
+        "#9AEAFF",
+        "#00D5E2",
+        "#FFEB00"
     ];
 
     var logger = MegaLogger.getLogger('useravatar');

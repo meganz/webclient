@@ -185,15 +185,8 @@ function addNewContact($addButton, cd) {
             // after all process is done, and there is added email(s), show invitation sent dialog.
             MegaPromise.allDone(promises).always(function() {
                 if (addedEmails.length > 0) {
-                    // Singular or plural
-                    if (addedEmails.length === 1) {
-                        title = l[150];
-                        msg = l[5898];
-                    }
-                    else {
-                        title = l[165] + ' ' + l[5859];
-                        msg = l[5899];
-                    }
+                    title = mega.icu.format(l.contacts_invited_title, addedEmails.length);
+                    msg = addedEmails.length === 1 ? l[5898] : l[5899];
                     contactsInfoDialog(title, addedEmails[0], msg);
                 }
                 else {

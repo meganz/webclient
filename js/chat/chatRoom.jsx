@@ -2060,6 +2060,17 @@ ChatRoom.prototype.rejectCall = function(callId) {
     return Promise.resolve();
 };
 
+ChatRoom.prototype.endCallForAll = function(callId) {
+    if (this.activeCallIds.length && this.type !== 'private') {
+        callId = callId || this.activeCallIds.keys()[0];
+        asyncApiReq({
+            'a': 'mcme',
+            'cid': this.chatId,
+            'mid': callId
+        });
+    }
+};
+
 /**
  * Used in "chat link" pages to join the user before joining the call if needed.
  *

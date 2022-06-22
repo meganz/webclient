@@ -92,6 +92,13 @@ class Button extends MegaRenderMixin {
         }
     }
 
+    componentDidMount() {
+        super.componentDidMount();
+        if (this.props.didMount) {
+            this.props.didMount(this);
+        }
+    }
+
     render() {
         const { children, className, style, simpletip, icon, onClick } = this.props;
 

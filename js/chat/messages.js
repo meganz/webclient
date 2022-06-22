@@ -176,6 +176,9 @@ Message._getTextContentsForDialogType = function(message) {
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.FAILED) {
                 textMessage = mega.ui.chat.getMessageString("call-failed", isGroupOrPublic);
             }
+            else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CALL_ENDED_BY_MODERATOR) {
+                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic);
+            }
             else {
                 if (d) {
                     console.error("Unknown (remote) CALL_ENDED reason: ", meta.reason, meta);

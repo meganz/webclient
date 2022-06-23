@@ -1233,15 +1233,41 @@ security.login = {
 
         'use strict';
 
+        const errobj = {};
         var keyAndSessionData = false;
 
         try {
+
+            if (typeof userHandle !== 'string' || userHandle.length !== 11) {
+                eventlog(99752, JSON.stringify([1, 11, userHandle]));
+
+                console.error("Incorrect user handle in the 'us' response", userHandle);
+
+                Soon(() => {
+                    msgDialog('warninga', l[135], l[8853], userHandle);
+                });
+
+                return false;
+            }
+
             // Decrypt and decode the RSA Private Key
             var cipherObject = new sjcl.cipher.aes(masterKeyArray32);
             var encryptedPrivateRsaKeyArray32 = base64_to_a32(encryptedPrivateRsaKeyBase64);
             var decryptedPrivateRsaKey = decrypt_key(cipherObject, encryptedPrivateRsaKeyArray32);
             var decryptedPrivateRsaKeyBigEndianString = a32_to_str(decryptedPrivateRsaKey);
-            var decodedPrivateRsaKey = crypto_decodeprivkey(decryptedPrivateRsaKeyBigEndianString);
+
+            const decodedPrivateRsaKey = crypto_decodeprivkey(decryptedPrivateRsaKeyBigEndianString, errobj);
+            if (!decodedPrivateRsaKey) {
+                console.error('RSA key decoding failed (%o)..', errobj);
+
+                eventlog(99752, JSON.stringify([1, 10, errobj]));
+
+                Soon(() => {
+                    msgDialog('warninga', l[135], l[8853], JSON.stringify(errobj));
+                });
+
+                return false;
+            }
 
             // Decrypt the Session ID using the RSA Private Key
             var encryptedSessionIdBytes = base64urldecode(encryptedSessionIdBase64);
@@ -1249,30 +1275,37 @@ security.login = {
             var decryptedSessionIdSubstring = decryptedSessionId.substr(0, 43);
             var decryptedSessionIdBase64 = base64urlencode(decryptedSessionIdSubstring);
 
+            // Get the user handle from the decrypted Session ID (11 bytes starting at offset 16 bytes)
+            const sessionIdUserHandle = decryptedSessionId.substring(16, 27);
+
             // Add a check that the decrypted sid and res.u aren't shorter than usual before making the comparison.
             // Otherwise, we could construct an oracle based on shortened csids with single-byte user handles.
-            if (decryptedSessionId.length !== 255 || userHandle.length !== 11) {
-                throw new Error("Incorrect length of Session ID or user handle in the 'us' response");
-            }
+            if (decryptedSessionId.length !== 255) {
+                eventlog(99752, JSON.stringify([1, 13, userHandle, decryptedSessionId.length]));
 
-            // Get the user handle from the decrypted Session ID (11 bytes starting at offset 16 bytes)
-            var sessionIdUserHandle = decryptedSessionId.substring(16, 27);
+                throw new Error(`Incorrect length of Session ID ${decryptedSessionId.length}`);
+            }
 
             // Check that the user handle included in the Session ID matches the one sent in the 'us' response
             if (sessionIdUserHandle !== userHandle) {
-                throw new Error("User handle in Session ID did not match the user handle from the 'us' request");
+                eventlog(99752, JSON.stringify([1, 14, userHandle]));
+
+                throw new Error(`User handle mismatch! us-req:"${userHandle}" != session:"${sessionIdUserHandle}"`);
             }
 
             // Set the data
             keyAndSessionData = [masterKeyArray32, decryptedSessionIdBase64, decodedPrivateRsaKey];
         }
-        catch (exception) {
+        catch (ex) {
+            if (!eventlog.sent['99752']) {
+                eventlog(99752, JSON.stringify([1, 12, userHandle, errobj, String(ex).split('\n')[0]]));
+            }
 
-            console.error('Error decrypting or decoding the private RSA key or Session ID!', exception);
+            console.error('Error decrypting or decoding the private RSA key or Session ID!', ex);
 
             // Show an error dialog
-            Soon(function() {
-                msgDialog('warninga', l[135], l[8853]);
+            Soon(() => {
+                msgDialog('warninga', l[135], l[8853], `${ex}`);
             });
 
             return false;

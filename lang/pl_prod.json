@@ -4941,7 +4941,7 @@
     "no_mic_title": "Microphone access needed ",
     "no_payment_providers": "Dostawcy p\u0142atno\u015bci nie s\u0105 obs\u0142ugiwani w Twoim regionie. Je\u015bli uwa\u017casz, \u017ce jest to b\u0142\u0105d, skontaktuj si\u0119 z obs\u0142ug\u0105 pod adresem support@mega.nz.",
     "not_supported": "Nie dost\u0119pne",
-    "notif_body_incoming_attch": "{count, plural, one {%s shared a file with you on chat.} other {%s shared # files with you on chat.}}",
+    "notif_body_incoming_attch": "{count, plural, one {%s udost\u0119pni\u0142 plik na czacie.} few {%s udost\u0119pni\u0142 # pliki na czacie.} many {%s udost\u0119pni\u0142 # pliki na czacie.} other {%s udost\u0119pni\u0142 # pliki na czacie.}}",
     "notif_body_incoming_msg": "%s wys\u0142al Ci wiadomo\u015b\u0107",
     "notif_title_call_term": "Call terminated",
     "notif_title_incoming_attch": "File shared with you",

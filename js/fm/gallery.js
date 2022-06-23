@@ -1486,11 +1486,6 @@ class MegaGallery {
                         mega.gallery.thumb_requested[n.fa].push(nid);
                     }
                 }
-                else if (previews[nid]) {
-
-                    const buffer = await M.toArrayBuffer(previews[nid].blob);
-                    this._createThumb(nid, buffer);
-                }
                 else if (String(n.fa).includes(':1*')) {
 
                     nodeList[nid] = {fa: n.fa, k: n.k};

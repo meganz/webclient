@@ -611,7 +611,7 @@ class Minimized extends MegaRenderMixin {
                             icon="icon-chat-filled">
                             <span>{l.chats /* `Chats` */}</span>
                         </Button>
-                        <span>{unread}</span>
+                        <span>{unread > 9 ? '9+' : unread}</span>
                     </div>
                 ) : null}
             </>

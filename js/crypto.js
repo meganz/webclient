@@ -1155,6 +1155,10 @@ function getsc(force) {
             api_ready(apixs[5]);
             api_req('sn=' + currsn, {}, 5);
 
+            if (window.loadingInitDialog.progress) {
+                window.loadingInitDialog.step3(loadfm.fromapi ? 40 : 1, 55);
+            }
+
             if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
                 mega.loadReport.scSent = Date.now();
             }
@@ -1546,18 +1550,34 @@ function api_getsid2(res, ctx) {
                         r = [k, res.tsid];
                     }
                 }
+                else if (typeof res.u !== 'string' || res.u.length !== 11) {
+
+                    eventlog(99752, JSON.stringify([1, 1, res.u]));
+
+                    console.error("Incorrect user handle in the 'us' response", res.u);
+
+                    Soon(() => {
+                        msgDialog('warninga', l[135], l[8853], res.u);
+                    });
+
+                    return false;
+                }
                 else if (typeof res.csid === 'string') {
-                    var t = base64urldecode(res.csid);
-                    var privk = null;
+                    let privk = null;
+                    const errobj = {};
+                    const t = base64urldecode(res.csid);
 
                     try {
-                        privk = crypto_decodeprivkey(a32_to_str(decrypt_key(aes, base64_to_a32(res.privk))));
+                        privk = crypto_decodeprivkey(a32_to_str(decrypt_key(aes, base64_to_a32(res.privk))), errobj);
                     }
                     catch (ex) {
-                        console.error('Error decoding private RSA key!', ex);
 
-                        Soon(function() {
-                            msgDialog('warninga', l[135], l[8853]);
+                        eventlog(99752, JSON.stringify([1, 2, res.u, errobj, String(ex).split('\n')[0]]));
+
+                        console.error('Error decoding private RSA key! %o', errobj, ex);
+
+                        Soon(() => {
+                            msgDialog('warninga', l[135], l[8853], JSON.stringify(errobj));
                         });
 
                         return false;
@@ -1565,6 +1585,11 @@ function api_getsid2(res, ctx) {
 
                     if (!privk) {
                         // Bad decryption of RSA is an indication that the password was wrong
+                        console.error('RSA key decoding failed (%o)', errobj);
+                        // eslint-disable-next-line max-depth
+                        if ('pl' in errobj) {
+                            eventlog(99752, JSON.stringify([1, 5, errobj]));
+                        }
                         ctx.checkloginresult(ctx, false);
                         return false;
                     }
@@ -1572,29 +1597,36 @@ function api_getsid2(res, ctx) {
                     // Decrypt the Session ID
                     var decryptedSessionId = crypto_rsadecrypt(t, privk);
 
+                    // Get the user handle from the decrypted Session ID (11 bytes starting at offset 16 bytes)
+                    var sessionIdUserHandle = decryptedSessionId.substring(16, 27);
+
                     // Check that the decrypted sid and res.u aren't shorter than usual before making the comparison.
                     // Otherwise, we could construct an oracle based on shortened csids with single-byte user handles.
-                    if (decryptedSessionId.length !== 255 || res.u.length !== 11) {
+                    if (decryptedSessionId.length !== 255) {
 
-                        console.error("Incorrect length of Session ID or user handle in the 'us' response");
+                        eventlog(99752, JSON.stringify([1, 3, res.u, decryptedSessionId.length]));
+
+                        console.error("Incorrect length of Session ID", decryptedSessionId.length, sessionIdUserHandle);
 
                         Soon(() => {
-                            msgDialog('warninga', l[135], l[8853]);
+                            msgDialog('warninga', l[135], l[8853], decryptedSessionId.length);
                         });
 
                         return false;
                     }
 
-                    // Get the user handle from the decrypted Session ID (11 bytes starting at offset 16 bytes)
-                    var sessionIdUserHandle = decryptedSessionId.substring(16, 27);
-
                     // Check the user handle included in the Session ID matches the one sent in the 'us' response
                     if (sessionIdUserHandle !== res.u) {
 
-                        console.error("User handle in Session ID did not match user handle from the 'us' request");
+                        eventlog(99752, JSON.stringify([1, 4, res.u, sessionIdUserHandle]));
+
+                        console.error(
+                            "User handle in Session ID did not match user handle from the 'us' request",
+                            res.u, sessionIdUserHandle
+                        );
 
                         Soon(() => {
-                            msgDialog('warninga', l[135], l[8853]);
+                            msgDialog('warninga', l[135], l[8853], `${res.u} / ${sessionIdUserHandle}`);
                         });
 
                         return false;
@@ -2000,16 +2032,24 @@ function crypto_encodeprivkey(privk) {
     return t;
 }
 
-function crypto_decodeprivkey(privk) {
-    var privkey = [];
+/**
+ * Decode private RSA key.
+ * @param {String} privk the key to decode.
+ * @param {Object} [errobj] Optional object to put the details of a failure, if any
+ * @returns {Array|Boolean} decoded private key, or boolean(false) if failure.
+ */
+function crypto_decodeprivkey(privk, errobj) {
+    'use strict';
+    let i, l;
+    let privkey = [];
 
     // decompose private key
-    for (var i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         if (privk.length < 2) {
             break;
         }
 
-        var l = (privk.charCodeAt(0) * 256 + privk.charCodeAt(1) + 7) >> 3;
+        l = (privk.charCodeAt(0) * 256 + privk.charCodeAt(1) + 7) >> 3;
         if (l > privk.length - 2) {
             break;
         }
@@ -2026,23 +2066,23 @@ function crypto_decodeprivkey(privk) {
     // TODO: check remaining padding for added early wrong password detection likelihood
 
     // restore privkey components via the known ones
-    var q = privkey[0],
-        p = privkey[1],
-        d = privkey[2],
-        u = privkey[3],
-        q1 = q.subtract(1),
-        p1 = p.subtract(1),
-        m = new asmCrypto.Modulus(p.multiply(q)),
-        e = new asmCrypto.Modulus(p1.multiply(q1)).inverse(d),
-        dp = d.divide(p1).remainder,
-        dq = d.divide(q1).remainder;
+    const q = privkey[0];
+    const p = privkey[1];
+    const d = privkey[2];
+    const u = privkey[3];
+    const q1 = q.subtract(1);
+    const p1 = p.subtract(1);
+    const m = new asmCrypto.Modulus(p.multiply(q));
+    const e = new asmCrypto.Modulus(p1.multiply(q1)).inverse(d);
+    const dp = d.divide(p1).remainder;
+    const dq = d.divide(q1).remainder;
 
     // Calculate inverse modulo of q under p
-    var inv = new asmCrypto.Modulus(p).inverse(q);
+    const inv = new asmCrypto.Modulus(p).inverse(q);
 
     // Convert Uint32Arrays to hex for comparison
-    var hexInv = asmCrypto.bytes_to_hex(inv.toBytes());
-    var hexU = asmCrypto.bytes_to_hex(u.toBytes());
+    const hexInv = asmCrypto.bytes_to_hex(inv.toBytes()).replace(/^0+/, '');
+    const hexU = asmCrypto.bytes_to_hex(u.toBytes()).replace(/^0+/, '');
 
     // Detect private key blob corruption - prevent API-exploitable RSA oracle requiring 500+ logins.
     // Ensure the bit length being at least 1000 and that u is indeed the inverse modulo of q under p.
@@ -2051,7 +2091,6 @@ function crypto_decodeprivkey(privk) {
         d.bitLength > 2000 &&
         u.bitLength > 1000 &&
         hexU === hexInv)) {
-
         return false;
     }
 

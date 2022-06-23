@@ -7108,12 +7108,16 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.duplicate-conflict .info-txt.light-grey {
         color: var(--text-color-low);
     }
+    .mega-dialog.duplicate-conflict .info-txt.light-grey .red {
+        white-space: nowrap;
+    }
     .mega-dialog.duplicate-conflict .red-header {
         font-size: 17px;
         line-height: 26px;
         color: var(--text-color-error);
     }
     .mega-dialog.duplicate-conflict .action-block {
+        box-sizing: border-box;
         border: none;
         text-align: start;
         background: none;

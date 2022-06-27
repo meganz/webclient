@@ -1420,6 +1420,16 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.meeting_empty_call_desc_1 = escapeHTML(l.meeting_empty_call_desc_1)
         .replace(/\[P]/g, '<div>')
         .replace(/\[\/P]/g, '</div>');
+    l.backup_download_recovery_key = escapeHTML(l.backup_setup_2fa_recovery_key)
+        .replace('[D1]', '')
+        .replace('[/D1]', ' ')
+        .replace('[D2]', '(')
+        .replace('[/D2]', ')');
+    l.backup_setup_2fa_recovery_key = escapeHTML(l.backup_setup_2fa_recovery_key)
+        .replace('[D1]', '<div class="recovery-key-name">')
+        .replace('[/D1]', '</div>')
+        .replace('[D2]', '<div class="recovery-key-size">')
+        .replace('[/D2]', '</div>');
 
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,

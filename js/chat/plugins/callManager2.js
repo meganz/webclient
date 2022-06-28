@@ -337,8 +337,8 @@
         onMicSignalDetected(signal) {
             this.chatRoom.trigger('onMicSignalDetected', signal);
         }
-        onBadNetwork() {
-            this.chatRoom.trigger('onBadNetwork');
+        onBadNetwork(e) {
+            this.chatRoom.trigger('onBadNetwork', e);
         }
         registerPlayer(player) {
             var peer = this.peers[player.peer.cid];
@@ -422,21 +422,20 @@
             }
             return false;
         }
-        onLocalMediaError(errAv) {
-            this.chatRoom.trigger('onLocalMediaError', errAv);
-        }
         callTimeoutDone(leaveCallActive) {
             if (typeof leaveCallActive === 'undefined') {
                 leaveCallActive = this.peers.length;
             }
-            clearInterval(this.callToutInt);
-            delete this.callToutInt;
-            delete this.callToutEnd;
+            if (this.callToutInt) {
+                clearInterval(this.callToutInt);
+                delete this.callToutInt;
+                delete this.callToutEnd;
+            }
             if ($('.stay-dlg-subtext').is(':visible')) {
                 closeDialog();
             }
             if (this.callToutId) {
-                window.toaster.alerts.hide(this.callToutId);
+                this.callToutId.setUpdater(ChatToast.clearValue);
                 delete this.callToutId;
             }
             if (!leaveCallActive) {
@@ -457,37 +456,42 @@
                         this.callTimeoutDone();
                     }
                 }, 3e5);
-                window.toaster.alerts.medium(l.call_timeout_day);
+                ChatToast.quick(l.call_timeout_day); /* `Call will stay active for 24 hours` */
             }
             else {
                 // Otherwise setup the 2 minute timeout
-                window.toaster.alerts.medium(
-                    l.call_timeout_remain.replace('%s', secondsToTime(120).substring(3)),
-                    undefined,
-                    {
-                        hasClose: false,
-                        timeout: -1,
-                    }
-                ).then(id => {
-                    const $toast = $('span.message',`#${id}`);
-                    this.callToutId = id;
-                    this.callToutEnd = unixtime() + 120;
-                    this.callToutInt = setInterval(() => {
-                        let timeRemain = this.callToutEnd - unixtime();
+                this.callToutId = new ChatToast(
+                    l.call_timeout_remain /* `Call will end in %s` */
+                        .replace('%s', secondsToTime(120).substring(3)),
+                    { timeout: 130000 } // Show for longer that 120s in case of slight timing discrepancies
+                );
+                const done = () => {
+                    delay('calltoutend', this.callTimeoutDone.bind(this), 100);
+                };
+                ChatToast.flush(); // We don't want this toast to be held up by any other toasts so clear them out.
+                this.callToutId
+                    .setOnShown(function() {
+                        this.callToutEnd = unixtime() + 120;
+                    })
+                    .setUpdater(function() {
+                        let timeRemain = (this.callToutEnd || unixtime() + 120) - unixtime();
                         if (timeRemain <= 0) {
-                            this.callTimeoutDone();
+                            this.content = '';
+                            done();
                         }
                         else {
                             timeRemain = secondsToTime(timeRemain).substring(3);
-                            $toast.text(l.call_timeout_remain.replace('%s', timeRemain));
+                            this.content = l.call_timeout_remain /* `Call will end in %s` */
+                                .replace('%s', timeRemain);
                             // Check if the dialog is shown then update the counter on it.
                             const $dlgText = $('.stay-dlg-counter', '.mega-dialog');
                             if ($dlgText.length && $dlgText.is(':visible')) {
                                 $dlgText.text(timeRemain);
                             }
                         }
-                    }, 1000);
-                });
+                    })
+                    .setClose(false)
+                    .dispatch();
             }
         }
     }
@@ -617,7 +621,10 @@
                 if (chatRoom.type === 'private') {
                     return chatRoom.trigger('onCallEnd', { callId, removeActive: true });
                 }
-                return chatRoom.activeCall.initCallTimeout();
+                // Wait for the peer left notifications to process before triggering.
+                setTimeout(() => {
+                    chatRoom.activeCall.initCallTimeout();
+                }, 3000);
             });
 
             chatRoom.rebind('onMeAdded', (e, addedBy) => {

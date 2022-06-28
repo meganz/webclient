@@ -16,6 +16,7 @@ import {Start as StartMeetingDialog} from "./meetings/workflow/start.jsx";
 import MeetingsCallEndedDialog from "./meetings/meetingsCallEndedDialog.jsx";
 import { inProgressAlert } from './meetings/call.jsx';
 import Nil from './contactsPanel/nil.jsx';
+import ChatToaster from "./chatToaster";
 
 var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
@@ -1255,6 +1256,7 @@ class ConversationsApp extends MegaRenderMixin {
             is_chatlink ? " chatlink" : ""
         }`} style={rightPaneStyles}>
             {loadingOrEmpty}
+            {!isLoading && <ChatToaster isRootToaster={true}/>}
             {
                 !isLoading && megaChat.routingSection === "archived" &&
                 <ArchivedConversationsList key="archivedchats" />

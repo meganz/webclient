@@ -7,6 +7,7 @@ import SidebarControls  from './sidebarControls.jsx';
 import StreamControls from './streamControls.jsx';
 import Local from './local.jsx';
 import ParticipantsNotice from './participantsNotice.jsx';
+import ChatToaster from "../chatToaster";
 
 export const STREAM_ACTIONS = { ADD: 1, REMOVE: 2 };
 export const MAX_STREAMS = 19; // 19 + me -> 20
@@ -31,7 +32,8 @@ export default class Stream extends MegaRenderMixin {
     state = {
         page: 0,
         hovered: false,
-        link: undefined
+        link: undefined,
+        overlayed: false,
     };
 
     /**
@@ -473,7 +475,7 @@ export default class Stream extends MegaRenderMixin {
     }
 
     render() {
-        const { hovered, link } = this.state;
+        const { hovered, link, overlayed } = this.state;
         const {
             mode, call, chatRoom, minimized, streams, sidebar, forcedLocal, view, isOnHold, onCallMinimize,
             onCallExpand, onStreamToggle, onModeChange, onChatToggle, onParticipantsToggle, onAudioClick, onVideoClick,
@@ -502,7 +504,7 @@ export default class Stream extends MegaRenderMixin {
                             onModeChange={onModeChange}
                         />
 
-                        {isOnHold ? this.renderOnHold() : null}
+                        {isOnHold ? this.renderOnHold() : overlayed && <div className="call-overlay"/>}
                         {this.renderStreamContainer()}
 
                         <StreamControls
@@ -528,7 +530,20 @@ export default class Stream extends MegaRenderMixin {
                         />
                     </>
                 )}
-
+                <ChatToaster
+                    showDualNotifications={true}
+                    hidden={minimized}
+                    onShownToast={t => {
+                        if (t.options && t.options.persistent) {
+                            this.setState({overlayed: true});
+                        }
+                    }}
+                    onHideToast={t => {
+                        if (this.state.overlayed && t.options && t.options.persistent) {
+                            this.setState({overlayed: false});
+                        }
+                    }}
+                />
                 <Local
                     call={call}
                     streams={streams}

@@ -6215,6 +6215,7 @@ span.orange {
 }
 .account.bonuses-title,
 .account.referral-title {
+    white-space: nowrap;
     font: var(--text-body1);
     font-family: var(--text-font-family-semibold);
 }

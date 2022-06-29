@@ -992,6 +992,7 @@ class MegaGallery {
             this.dynamicList.destroy();
             this.dynamicList = false;
         }
+
         this.render();
 
         onIdle(this.renderThumbs.bind(this));
@@ -1187,8 +1188,7 @@ class MegaGallery {
 
         $(window).rebind('popstate.galleryview', e => {
 
-            if (e.originalEvent.state.galleryMode) {
-
+            if (e.originalEvent.state.galleryMode && this.id === M.currentdirid) {
                 this.setMode(e.originalEvent.state.galleryMode);
                 this.render();
             }

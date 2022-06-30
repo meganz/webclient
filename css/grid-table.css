@@ -143,6 +143,11 @@
     vertical-align: top; /* do not remove this is for prevent mysterious spacing from inline-block */
 }
 
+.grid-scrolling-table {
+    background: no-repeat center 33px linear-gradient(90deg, var(--stroke-grey-2), var(--stroke-grey-2));
+    background-size: auto 1px;
+}
+
 .grid-scrolling-table .jspPane {
     min-height: 100%;
 }
@@ -184,6 +189,8 @@
 .transfer-scrolling-table {
     /* do not remove, needed for perfect-scrollbar */
     position: relative !important;
+    background: no-repeat center 24px linear-gradient(90deg, var(--stroke-grey-2), var(--stroke-grey-2));
+    background-size: auto 1px;
 }
 
 /* ======================================== *\
@@ -483,7 +490,10 @@ table tr.ui-selected .link-transfer-status {
 }
 
 .files-grid-view.fm .column-settings.overlap {
+    padding-top: 5px;
+    padding-bottom: 4px;
     border-left: 1px solid var(--stroke-grey-2);
+    background-color: var(--stroke-main);
 }
 
 .rtl .files-grid-view.fm .column-settings.overlap {
@@ -531,7 +541,7 @@ table.grid-table td {
     text-overflow: ellipsis;
     position: relative;
 }
-table.grid-table th,
+
 table.grid-table td {
     border-bottom: 1px solid var(--stroke-grey-2);
 }
@@ -1401,8 +1411,8 @@ table.out-shares .fm-chat-users {
 .transfer-table .transfer-type::before {
     background-image: none;
 }
-.transfer-table td,
-.transfer-table th {
+
+.transfer-table td {
     border-bottom: 1px solid var(--stroke-grey-2);
 }
 .transfer-table td {

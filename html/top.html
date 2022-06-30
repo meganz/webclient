@@ -609,19 +609,39 @@
         </div>
         <div class="transfer-progress-widget expand">
             <div class="transfer-progress-head">
-                <!-- add download/upload/error/complete/overquota/almost-overquota to transfer-progress-widget -->
+                <div class="transfer-progress-type upload">
+                    <div class="status-indicator">
+                        <div class="progress-chart">
+                            <div class="transfer-progress charts">
+                                <div class="right-chart low-percent-clip">
+                                    <span></span>
+                                </div>
+                                <div class="left-chart low-percent-clip">
+                                    <span></span>
+                                </div>
+                            </div>
+                            <i class="sprite-fm-mono icon-up"></i>
+                        </div>
+                    </div>
+                    <div class="transfer-progress-txt">[$20808]</div>
+                </div>
                 <div class="transfer-progress-type download">
                     <div class="status-indicator">
-                        <div class="transfer-progress-pct sprite-fm-mono icon-down">90%</div>
+                        <div class="progress-chart">
+                            <div class="transfer-progress charts">
+                                <div class="right-chart low-percent-clip">
+                                    <span></span>
+                                </div>
+                                <div class="left-chart low-percent-clip">
+                                    <span></span>
+                                </div>
+                            </div>
+                            <i class="sprite-fm-mono icon-down"></i>
+                        </div>
                     </div>
-                    <div class="transfer-progress-txt">3 items left</div>
+                    <div class="transfer-progress-txt">[$20808]</div>
                 </div>
-                <div class="transfer-progress-type upload"> <!--error almost-overquota-->
-                    <div class="status-indicator">
-                        <div class="transfer-progress-pct sprite-fm-mono icon-up">83%</div>
-                    </div>
-                    <div class="transfer-progress-txt">Over transfer quota</div>
-                </div>
+                <div class="transfer-progress-spacing"></div>
                 <div class="transfer-control-panel">
                     <button class="btn-icon transfer-progress-icon tpw-c-e expand">
                         <i class="sprite-fm-mono icon-arrow-up"></i>
@@ -629,12 +649,20 @@
                     <button class="btn-icon transfer-progress-icon tpw-c-e collapse">
                         <i class="sprite-fm-mono icon-arrow-down"></i>
                     </button>
+                    <button class="btn-icon transfer-progress-icon js-tpm-open">
+                        <i class="sprite-fm-mono icon-expand-window"></i>
+                    </button>
                     <button class="btn-icon transfer-progress-icon tpw-close close">
                         <i class="sprite-fm-mono icon-close-component"></i>
                     </button>
                 </div>
             </div>
-            <div class="transfer-section-button process-list hidden">[$22158]</div>
+            <div class="transfer-progress-tabs-head">
+                <div class="transfer-tabs-panel">
+                    <button class="tab-lnk js-tab-active active">[$tfw_tab_active]</button>
+                    <button class="tab-lnk js-tab-completed inactive">[$tfw_tab_completed]</button>
+                </div>
+            </div>
             <div class="widget-body-container">
                 <div class="transfer-progress-widget-body">
 
@@ -642,7 +670,6 @@
                     <div class="transfer-task-row upload sprite-fm-mono progress">
                         <span class="transfer-filetype-icon image"></span>
                         <div class="transfer-filetype-txt">example image name loooo oooo.png</div>
-                        <div class="transfer-file-size">200 MB</div>
                         <div class="transfer-task-status">1.3 MB/s</div>
                         <div class="transfer-task-actions">
                             <button class="btn-icon transfer-progress-btn pause">
@@ -656,7 +683,20 @@
                     </div>
                 </div>
             </div>
-            <div class="transfer-section-button complete-list hidden">[$22159]</div>
+            <div class="transfer-widget-footer">
+                <button class="mega-button action transfer-clear-all-icon right">
+                    <div>
+                        <i class="sprite-fm-mono icon-close-component"></i>
+                    </div>
+                    <span>[$6991]</span>
+                </button>
+                <button class="mega-button action transfer-pause-icon right">
+                    <div>
+                        <i class="sprite-fm-mono icon-pause"></i>
+                    </div>
+                    <span>[$6993]</span>
+                </button>
+            </div>
         </div>
     </div>
 </section>

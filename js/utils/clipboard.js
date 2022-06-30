@@ -28,9 +28,10 @@ function selectText(elementId) {
  * @param {String} content The content to copy to the clipboard
  * @param {String} [toastText] Optional toast notification message
  * @param {String} [classname] Optional toast notification addition classname
+ * @param {Number} [timeout] Optional toast notification time (millis) until dismiss
  * @returns {Boolean} Whether the operation was successful
  */
-function copyToClipboard(content, toastText, classname) {
+function copyToClipboard(content, toastText, classname, timeout) {
     'use strict';
     var success = true;
 
@@ -60,7 +61,14 @@ function copyToClipboard(content, toastText, classname) {
     }
 
     if (success && toastText) {
-        showToast(classname ? classname : 'clipboard', toastText);
+        showToast(
+            classname ? classname : 'clipboard',
+            toastText,
+            "",
+            "",
+            null,
+            null,
+            timeout);
     }
 
     return success;

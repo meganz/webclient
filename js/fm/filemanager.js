@@ -2155,6 +2155,7 @@ FileManager.prototype.initContextUI = function() {
         ulmanager.abort(toabort);
         $.clearTransferPanel();
         fm_tfsupdate();
+        tfsheadupdate({c: toabort});
         mega.tpw.removeRow(toabort);
 
         onIdle(function() {
@@ -2898,6 +2899,7 @@ FileManager.prototype.addTransferPanelUI = function() {
                 }
                 target.fadeOut(function() {
                     $(this).remove();
+                    tfsheadupdate({c: target.attr('id')});
                     mega.tpw.removeRow(target.attr('id'));
                     $.clearTransferPanel();
                     fm_tfsupdate();
@@ -3017,6 +3019,10 @@ FileManager.prototype.addTransferPanelUI = function() {
             obj.domTableEmptyTxt.classList.remove('hidden');
             obj.domUploadBlock.classList.add('hidden');
             obj.domDownloadBlock.classList.add('hidden');
+            obj.domUploadBlock.classList.remove('overquota', 'error');
+            obj.domDownloadBlock.classList.remove('overquota', 'error');
+            obj.domUploadProgressText.textContent = l[1418];
+            obj.domDownloadProgressText.textContent = l[1418];
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
             if (M.currentdirid === 'transfers') {
                 fm_tfsupdate();
@@ -3032,6 +3038,10 @@ FileManager.prototype.addTransferPanelUI = function() {
             type = mega.tpw.DONE;
         }
         var $len = $trs.length;
+        const ids = [];
+        for (let i = 0; i < $trs.length; i++) {
+            ids.push($trs.eq(i).prop('id'));
+        }
         if ($len && $len < 100) {
             $trs.fadeOut(function() {
                 $(this).remove();
@@ -3044,113 +3054,14 @@ FileManager.prototype.addTransferPanelUI = function() {
             $trs.remove();
             Soon($.clearTransferPanel);
         }
+        tfsheadupdate({c: ids});
         mega.tpw.clearRows(type);
     };
-
-    $('.transfer-clear-all-icon').rebind('click', function() {
-        if (!$(this).hasClass('disabled')) {
-            msgDialog('confirmation', 'clear all transfers', l[7225], '', function(e) {
-                if (!e) {
-                    return;
-                }
-
-                const time = (tag, cb) => {
-                    if (d) {
-                        console.time(tag);
-                    }
-                    cb();
-
-                    if (d) {
-                        console.timeEnd(tag);
-                    }
-                };
-
-                uldl_hold = true;
-                time('dlm:abort', () => dlmanager.abort(null));
-                time('ulm:abort', () => ulmanager.abort(null));
-                time('tfs:abort', () => $.removeTransferItems($('.transfer-table tbody tr')));
-
-                later(function() {
-                    if (uldl_hold) {
-                        uldl_hold = false;
-                        ulQueue.resume();
-                        dlQueue.resume();
-                        let $icon = $('.transfer-pause-icon').removeClass('active');
-                        $('span', $icon).text(l[6993]);
-                        $('i', $icon).removeClass('icon-play-small').addClass('icon-pause');
-                    }
-                });
-            });
-        }
-    });
+    bindTransfersMassEvents('.fm-transfers-header');
 
     $('.transfer-clear-completed').rebind('click', function() {
         if (!$(this).hasClass('disabled')) {
             $.removeTransferItems();
-        }
-    });
-
-    $('.transfer-pause-icon').rebind('click', function() {
-
-        if ($(this).hasClass('active')) {
-            if (dlmanager.isOverQuota) {
-                return dlmanager.showOverQuotaDialog();
-            }
-
-            if (ulmanager.ulOverStorageQuota) {
-                ulmanager.ulShowOverStorageQuotaDialog();
-                return false;
-            }
-        }
-
-        if (!$(this).hasClass('disabled')) {
-
-            let $elm;
-
-            if ($(this).hasClass('active')) {
-                // terms of service
-                if (u_type || folderlink || Object(u_attr).terms) {
-                    [dlQueue, ulQueue].forEach(function(queue) {
-                        Object.keys(queue._qpaused).map(fm_tfsresume);
-                    });
-                    uldl_hold = false;
-                    ulQueue.resume();
-                    dlQueue.resume();
-
-                    $(this).removeClass('active').find('span').text(l[6993]);
-                    $('i', this).addClass('icon-pause').removeClass('icon-play-small');
-
-                    $elm = $('.transfer-table-wrapper tr').removeClass('transfer-paused');
-                    $elm = $('.link-transfer-status', $elm).removeClass('transfer-play').addClass('transfer-pause');
-                    $('i', $elm).removeClass('icon-play-small').addClass('icon-pause');
-                    $('.nw-fm-left-icon').removeClass('paused');
-                }
-                else {
-                    alert(l[214]);
-                    if (d) {
-                        console.debug(l[214]);
-                    }
-                }
-            }
-            else {
-                var $trs = $('.transfer-table tr:not(.transfer-completed)');
-
-                $trs.attrs('id')
-                    .concat(Object.keys(M.tfsdomqueue))
-                    .map(fm_tfspause);
-
-                dlQueue.pause();
-                ulQueue.pause();
-                uldl_hold = true;
-
-                $(this).addClass('active').find('span').text(l[7101]);
-                $('i', this).removeClass('icon-pause').addClass('icon-play-small');
-
-                $trs.addClass('transfer-paused');
-                $elm = $('.link-transfer-status', $trs).removeClass('transfer-pause').addClass('transfer-play');
-                $('i', $elm).removeClass('icon-pause').addClass('icon-play-small');
-                $('.nw-fm-left-icon').addClass('paused');
-            }
         }
     });
 };

@@ -140,10 +140,16 @@ function dl_g(res, ctx) {
             if (!$(this).hasClass('active')) {
                 fm_tfspause('dl_' + fdl_queue_var.ph);
                 $('.download .pause-transfer').addClass('active');
+                if (mega.tpw && mega.tpw.initialized) {
+                    mega.tpw.pauseDownloadUpload(mega.tpw.DOWNLOAD, { id: fdl_queue_var.ph });
+                }
             }
             else {
                 $('.download .pause-transfer').removeClass('active');
                 fm_tfsresume('dl_' + fdl_queue_var.ph);
+                if (mega.tpw && mega.tpw.initialized) {
+                    mega.tpw.resumeDownloadUpload(mega.tpw.DOWNLOAD, { id: fdl_queue_var.ph });
+                }
             }
         });
         var key = dlpage_key;
@@ -790,7 +796,9 @@ function dlPageStartDownload(isDlWithMegaSync) {
 
     if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
         dlmanager.isDownloading = true;
-
+        if (mega.tpw && !mega.tpw.initialized) {
+            mega.tpw.showWidget(); // Doesn't show the widget but prepares it for static pages.
+        }
         if (dlResumeInfo) {
             fdl_queue_var.byteOffset = dlResumeInfo.byteLength;
         }
@@ -924,7 +932,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         if (bytestotal) {
             $.transferprogress["dl_" + fileid] = [bytesloaded, bytestotal, kbps * 1000];
         }
-
+        tfsheadupdate({t: `dl_${fileid}`});
         if (mega.tpw) {
             mega.tpw.updateDownloadUpload(
                 mega.tpw.DOWNLOAD,
@@ -937,7 +945,6 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
                 dl_queue[dl_queue_num].st
             );
         }
-
         if (is_mobile) {
             $('.mobile.download-speed', $dowloadWrapper).text(Math.round(speed.size) + speed.unit);
         }
@@ -1052,6 +1059,7 @@ function dlcomplete(dl) {
     }
     Soon(M.resetUploadDownload);
     $('.download.download-page').removeClass('downloading').addClass('download-complete');
+    tfsheadupdate({f: `dl_${id}`});
     if (mega.tpw) {
         mega.tpw.finishDownloadUpload(mega.tpw.DOWNLOAD, dl);
     }

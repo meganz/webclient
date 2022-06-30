@@ -735,6 +735,17 @@ var slideshowid;
         slideshow_zoomSlider(imgWidth / origImgWidth * 100 * devicePixelRatio);
     }
 
+    function sendToChatHandler() {
+        $(document).fullScreen(false);
+        const $wrapper = $('.media-viewer-container', 'body');
+        const video = $('video', $wrapper).get(0);
+        if (video && !video.paused && !video.ended) {
+            video.pause();
+        }
+        $.noOpenChatFromPreview = true;
+        openCopyDialog('conversations');
+    }
+
     // Viewer Init
     // eslint-disable-next-line complexity
     function slideshow(id, close, hideCounter, filteredNodeArr) {
@@ -972,18 +983,18 @@ var slideshowid;
                 return false;
             });
 
-            if (u_type === 3 && megaChatIsReady && M.currentrootid !== M.RubbishID) {
+            if (fminitialized && !folderlink && u_type === 3 && M.currentrootid !== M.RubbishID) {
                 $sendToChat.removeClass('hidden');
             }
+
             $sendToChat.rebind('click.media-viewer', () => {
-                $(document).fullScreen(false);
-                const $wrapper = $('.media-viewer-container', 'body');
-                const video = $('video', $wrapper).get(0);
-                if (video && !video.paused && !video.ended) {
-                    video.pause();
+                if (megaChatIsReady) {
+                    sendToChatHandler();
                 }
-                $.noOpenChatFromPreview = true;
-                openCopyDialog('conversations');
+                else {
+                    showToast('send-chat', l[17794]);
+                    mBroadcaster.once('chat_initialized', () => sendToChatHandler());
+                }
             });
 
             // Close context menu

@@ -127,6 +127,7 @@ body,
             --text-h2-bold: bold 20px/30px var(--text-font-family-semibold);
             --text-h3-bold: bold 16px/24px var(--text-font-family-semibold);
             --text-body1-bold: bold 14px/20px var(--text-font-family-semibold);
+            --text-body2-bold: bold 12px/18px var(--text-font-family-semibold);
 
         /* this is temporary until bug bounty moves to wordpress */
 

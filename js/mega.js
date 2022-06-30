@@ -216,6 +216,7 @@ if (typeof loadingInitDialog === 'undefined') {
         $('.loading-info li.step1').addClass('loading');
     };
     loadingInitDialog.step2 = function(progress) {
+        'use strict';
         if (!this.active) {
             return;
         }
@@ -243,7 +244,6 @@ if (typeof loadingInitDialog === 'undefined') {
         this.progress = true;
     };
     loadingInitDialog.step3 = function(progress, delayStep) {
-
         'use strict';
 
         if (this.progress) {
@@ -255,14 +255,16 @@ if (typeof loadingInitDialog === 'undefined') {
                 $('.loading-info li.step3').addClass('loading');
             }
 
-            if (this.progress === true) {
-
+            if (!this.loader) {
                 this.loader = document.getElementsByClassName('loader-percents')[0];
+            }
+
+            if (typeof this.progress !== 'number') {
                 this.progress = 0;
             }
 
             // This trying moving backward, nope sorry you cannot do this.
-            if (this.progress > progress) {
+            if (this.progress > progress || !this.loader) {
                 return;
             }
 
@@ -271,25 +273,8 @@ if (typeof loadingInitDialog === 'undefined') {
 
                 this.progress = progress | 0;
 
-
                 this.loader.classList.remove('delay-loader');
                 this.loader.style.transform = `scaleX(${(this.progress * 0.5 + 50) / 100})`;
-
-                if (delayStep) {
-
-                    queueMicrotask(() => {
-
-                        if (progress > 99) {
-                            return;
-                        }
-
-                        if (this.progress < delayStep) {
-
-                            this.loader.classList.add('delay-loader');
-                            this.loader.style.transform = `scaleX(${(delayStep * 0.5 + 50) / 100})`;
-                        }
-                    });
-                }
 
                 if (progress >= 99) {
 
@@ -303,11 +288,23 @@ if (typeof loadingInitDialog === 'undefined') {
                         }
                     }, 301);
                 }
+                else if (delayStep) {
 
+                    queueMicrotask(() => {
+
+                        if (this.loader && this.progress < delayStep) {
+
+                            this.loader.classList.add('delay-loader');
+                            this.loader.style.transform = `scaleX(${(delayStep * 0.5 + 50) / 100})`;
+                        }
+                    });
+                }
             }
         }
     };
-    loadingInitDialog.hide = function() {
+    loadingInitDialog.hide = function(subject) {
+        'use strict';
+        this.loader = null;
         this.active = false;
         this.progress = false;
         $('.light-overlay').addClass('hidden');
@@ -318,6 +315,9 @@ if (typeof loadingInitDialog === 'undefined') {
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');
         $('.loader-percents').width('0%').removeAttr('style');
+
+        // Implicitly hide the former dialog, as per the linked dependency.
+        window.loadingDialog.hide(subject);
     };
 }
 
@@ -3343,7 +3343,6 @@ function folderreqerr(c, e) {
     var title = l[1043];
     var message = null;
 
-    loadingDialog.hide();
     loadingInitDialog.hide();
 
     loadfm.loaded = false;
@@ -3419,7 +3418,6 @@ function init_chat(action) {
             }
 
             if (!loadfm.loading) {
-                window.loadingDialog.hide();
                 window.loadingInitDialog.hide();
             }
 
@@ -3460,7 +3458,6 @@ function loadfm_callback(res) {
     'use strict';
 
     if ((parseInt(res) | 0) < 0 || res === undefined) {
-        loadingDialog.hide();
         window.loadingInitDialog.hide();
 
         // tell the user we were unable to retrieve the cloud drive contents, upon clicking OK redirect to /support
@@ -3544,7 +3541,6 @@ function loadfm_callback(res) {
 
         // Check if the key for a folderlink was correct
         if (folderlink && missingkeys[M.RootID]) {
-            loadingDialog.hide();
             window.loadingInitDialog.hide();
 
             loadfm.loaded = false;
@@ -3732,7 +3728,6 @@ function loadfm_done(mDBload) {
 
         if (hideLoadingDialog) {
             setTimeout(() => {
-                window.loadingDialog.hide();
                 window.loadingInitDialog.hide();
             }, 301);
             // Reposition UI elements right after hiding the loading overlay,

@@ -171,8 +171,7 @@ sms.phoneInput = {
         $verifyIcon.removeClass('hidden');
         $verifySuccessIcon.addClass('hidden');
         $('aside.js-verify-success-page', $dialog).addClass('hidden');
-        loadingInitDialog.hide();
-        loadingDialog.hide('force');
+        loadingInitDialog.hide('force');
     },
 
     /**

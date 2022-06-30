@@ -4322,6 +4322,7 @@ button.l-pane-visibility {
 .fm-transfers-header {
     -webkit-padding-end: 16px;
     padding-inline-end: 16px;
+    margin-bottom: 4px;
 }
 .fm-right-header,
 .new-notification-top,
@@ -6215,6 +6216,7 @@ span.orange {
 }
 .account.bonuses-title,
 .account.referral-title {
+    white-space: nowrap;
     font: var(--text-body1);
     font-family: var(--text-font-family-semibold);
 }

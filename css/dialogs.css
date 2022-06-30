@@ -4687,8 +4687,7 @@ body.de .mega-dialog.new-group-chat {
 /* wire-transfer-dialog */
 
     .mega-dialog.wire-transfer-dialog {
-        /*width: 1145px;*/
-        width: 800px; /* temporaray smaller dialog as Wise is disalbed */
+        width: 1145px;
         max-width: 100vw;
     }
     .mega-dialog.wire-transfer-dialog .content-block {
@@ -4709,8 +4708,7 @@ body.de .mega-dialog.new-group-chat {
         float: left;
         margin-bottom: 20px;
         padding: 15px;
-        /*width: 49%;*/
-        width: 100%;
+        width: 49%;
     }
     .mega-dialog.wire-transfer-dialog .wire-transfer-details:last-child {
         float: right;
@@ -7108,12 +7106,16 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.duplicate-conflict .info-txt.light-grey {
         color: var(--text-color-low);
     }
+    .mega-dialog.duplicate-conflict .info-txt.light-grey .red {
+        white-space: nowrap;
+    }
     .mega-dialog.duplicate-conflict .red-header {
         font-size: 17px;
         line-height: 26px;
         color: var(--text-color-error);
     }
     .mega-dialog.duplicate-conflict .action-block {
+        box-sizing: border-box;
         border: none;
         text-align: start;
         background: none;

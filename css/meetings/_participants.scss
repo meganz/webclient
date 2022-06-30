@@ -63,6 +63,12 @@
                         --icon-size: 24px;
                         --mask-color: var(--icon-rest);
                     }
+
+                    img.emoji.big {
+                        width: 20px;
+                        height: 20px;
+                        margin: 0;
+                    }
                 }
             }
 

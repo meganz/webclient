@@ -2103,7 +2103,7 @@ var exportExpiry = {
             }
 
             // Copy to clipboard
-            copyToClipboard(data, toastTxt);
+            copyToClipboard(data, toastTxt, null, 2000);
 
             return false;
         });

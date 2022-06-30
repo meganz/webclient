@@ -120,10 +120,8 @@ mobile.account = {
         M.accountData(
             function() {
 
-                loadingInitDialog.hide();
-
                 // Hide the loading dialog after request completes
-                loadingDialog.hide();
+                loadingInitDialog.hide();
 
                 // Display Pro account, plan & subscription details
                 mobile.account.displayAvatarAndNameDetails($page);

@@ -16,29 +16,27 @@
 }
 .transfer-progress-widget.collapse {
     display: inline-block;
+    min-width: 264px;
+    max-width: 396px;
 }
 .transfer-progress-widget.expand {
     width: 536px;
     background: var(--surface-main);
-    padding-bottom: 6px;
 }
 .transfer-progress-txt {
-    font: var(--text-body1);
-    letter-spacing: 0.8px;
-    color: var(--text-color-high-inverted);
+    font: var(--text-body1-bold);
+    color: var(--text-color-high);
     display: inline-block;
-    padding: 2px 0;
+    padding: 5px 0 4px;
     vertical-align: top;
-    margin-left: 6px;
+    margin-left: 8px;
 }
 .transfer-panel-title .transfer-progress-txt {
     color: var(--text-color-high);
 }
-.transfer-progress-type.error .transfer-progress-txt {
+.transfer-progress-type.error .transfer-progress-txt,
+.transfer-progress-type.overquota .transfer-progress-txt {
     font-family: var(--text-font-family);
-    color: var(--secondary-red);
-}
-.transfer-progress-type.error.overquota .transfer-progress-txt {
     color: var(--secondary-red);
 }
 .transfer-progress-type.error.almost-overquota .transfer-progress-txt {
@@ -46,50 +44,148 @@
 }
 /* Transfer tooltips - head */
 .transfer-progress-head {
+    display: flex;
+    min-width: 264px;
+    max-width: inherit;
     position: relative;
     width: auto;
     border-radius: 16px 16px 0 0;
-    background: var(--surface-main-inverted);
+    background: var(--surface-grey-1);
+    font-size: 0;
+}
+.transfer-progress-widget.expand .transfer-progress-head {
+    min-width: 536px;
 }
 .transfer-progress-widget.collapse .transfer-progress-head {
     border-radius: 8px;
 }
 .transfer-progress-type {
-    margin: 12px 12px 12px 14px;
+    margin: 10px 0;
     display: inline-block;
+    align-self: flex-start;
+}
+.transfer-progress-spacing {
+    flex-grow: 1;
+}
+.transfer-progress-widget.expand .transfer-progress-type.upload.hidden + .transfer-progress-type.download,
+.transfer-progress-widget.expand .transfer-progress-type.upload:not(.hidden) {
+    margin-left: 24px;
+}
+.transfer-progress-widget.collapse .transfer-progress-type.upload.hidden + .transfer-progress-type.download,
+.transfer-progress-widget.collapse .transfer-progress-type.upload:not(.hidden) {
+    margin-left: 16px;
+}
+.transfer-progress-type:nth-child(1) {
+    margin-right: 32px;
+}
+.transfer-progress-type .progress-chart {
+    width: 28px;
+    height: 28px;
+    transform: none;
+    display: inline-block;
+    float: none;
+    vertical-align: middle;
+    background: var(--surface-progress-background);
+    border-radius: 100%;
+    position: relative;
+}
+.transfer-progress-type .progress-chart .charts {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 100%;
+    position: absolute;
+}
+.transfer-progress-type .progress-chart i {
+    top: 6px;
+    left: 6px;
+    z-index: 11;
+    position: absolute;
+}
+.transfer-progress-type.download .progress-chart i {
+    --mask-color: var(--secondary-green);
+}
+.transfer-progress-type.upload .progress-chart i {
+    --mask-color: var(--secondary-blue);
+}
+.transfer-progress-type.error .progress-chart i,
+.transfer-progress-type.overquota .progress-chart i {
+    --mask-color: var(--stroke-error);
+}
+.transfer-progress-type .progress-chart::after {
+    width: 22px;
+    height: 22px;
+    margin: 3px;
+    content: "";
+    display: block;
+    position: absolute;
+    padding: 0;
+    border-radius: 100%;
+    z-index: 10;
+    background: var(--surface-main);
+}
+.transfer-progress-head .transfer-progress-type .progress-chart::after {
+    background: var(--surface-grey-1);
+}
+.transfer-progress-type .charts .right-chart {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    clip: rect(0, 50px, 100px, 0);
+}
+.transfer-progress-type .charts .left-chart {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    clip: rect(0, 50px, 100px, 0);
+}
+.transfer-progress-type .charts .right-chart.low-percent-clip {
+    clip: rect(0, 14px, 28px, 0);
+}
+.transfer-progress-type .charts .left-chart.low-percent-clip {
+    clip: rect(0, 28px, 28px, 14px);
+}
+.transfer-progress-type .charts span {
+    transform: rotate(180deg);
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: absolute;
+}
+.transfer-progress-type .charts span::before {
+    width: 50%;
+    height: 100%;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.transfer-progress-type.upload .charts span::before {
+    background: var(--secondary-blue);
+}
+.transfer-progress-type.download .charts span::before {
+    background: var(--secondary-green);
+}
+.transfer-progress-type .charts .left-chart span::before {
+    margin-left: 50%;
+}
+.transfer-progress-type.error .charts span::before,
+.transfer-progress-type.error .charts span::after,
+.transfer-progress-type.overquota .charts span::before,
+.transfer-progress-type.overquota .charts span::after {
+    background: var(--stroke-error);
 }
 .transfer-panel-title .transfer-progress-type {
-    margin: 0 14px;
+    margin: 0 16px;
  }
-.transfer-progress-type:nth-child(2) {
-    margin-right: 24px;
-}
 .status-indicator {
     width: auto;
-    height: 24px;
+    height: 28px;
     border-radius: 12px;
     box-sizing: border-box;
     display: inline-block;
     position: relative;
     vertical-align: top;
-}
-.transfer-progress-type.download .status-indicator {
-    background-color: var(--secondary-green-inverted);
-}
-.transfer-progress-type.upload .status-indicator {
-    background-color: var(--secondary-blue-inverted);
-}
-.transfer-progress-type.complete .status-indicator {
-    background-color: var(--secondary-blue-inverted);
-}
-.transfer-progress-type.error .status-indicator {
-    background-color: var(--secondary-red-inverted);
-}
-.transfer-progress-type.error.almost-overquota .status-indicator {
-    background-color: var(--secondary-orange-inverted);
-}
-.transfer-progress-type.error.overquota .status-indicator {
-    background-color: var(--secondary-red-inverted);
 }
 .transfer-progress-type.download .transfer-progress-pct::before,
 .transfer-progress-type.upload .transfer-progress-pct::before {
@@ -105,7 +201,8 @@
     display: none;
 }
 .transfer-progress-type.complete .transfer-progress-icon,
-.transfer-progress-type.error .transfer-progress-icon {
+.transfer-progress-type.error .transfer-progress-icon,
+.transfer-progress-type.overquota .transfer-progress-icon {
     display: inline-block;
     vertical-align: top;
 }
@@ -119,26 +216,27 @@
     width: auto;
     height: auto;
 }
-.transfer-control-panel {
-    position: absolute;
+.transfer-progress-widget .transfer-control-panel {
     display: inline-block;
-    right: 0;
-    top: 0;
-    min-width: 44px;
-    height: 100%;
+    align-self: flex-end;
     cursor: pointer;
 }
+.transfer-progress-widget.expand .transfer-control-panel {
+    margin-right: 16px;
+}
 .transfer-progress-widget.collapse .transfer-control-panel {
-    position: relative;
-    vertical-align: top;
+    margin-right: 8px;
+    margin-left: 32px;
 }
 .transfer-control-panel .transfer-progress-icon i {
     --icon-size: 24px;
-    --mask-color: var(--icon-rest-inverted);
+    --mask-color: var(--icon-rest);
+}
+.transfer-control-panel .transfer-progress-icon i:hover {
+    --mask-color: var(--icon-active);
 }
 .transfer-control-panel .transfer-progress-icon {
-    margin: 12px 0 12px 12px;
-    opacity: 0.7;
+    margin: 12px 8px 12px 0;
     transition: 0.2s;
     display: inline-block;
 }
@@ -146,11 +244,38 @@
 .transfer-progress-widget.collapse .transfer-progress-icon.collapse {
     display: none;
 }
-.transfer-control-panel .transfer-progress-icon:nth-child(3) {
-    margin-right: 16px;
-}
 .transfer-control-panel .transfer-progress-icon:hover {
     opacity: 1;
+}
+.transfer-progress-tabs-head {
+    background: var(--surface-main);
+    line-height: 32px;
+    border-bottom: var(--stroke-grey-2) solid 1px;
+}
+.transfer-progress-tabs-head .transfer-tabs-panel {
+    padding-left: 24px;
+}
+.transfer-progress-tabs-head .tab-lnk {
+    font: var(--text-body2-bold);
+    color: var(--text-color-high);
+    cursor: pointer;
+    background-color: transparent;
+    border: 0;
+    outline: 0;
+    padding: 0;
+    box-sizing: border-box;
+    height: 24px;
+    position: relative;
+    margin: 8px 36px 6px 0;
+}
+.transfer-progress-tabs-head .tab-lnk.active {
+    font: var(--text-body1-bold);
+    color: var(--text-color-info);
+}
+.transfer-progress-tabs-head .tab-lnk.inactive {
+    font: var(--text-body2);
+    color: var(--text-color-low);
+    cursor: default;
 }
 /* Transfer tooltips - body */
 .transfer-progress-widget.collapse .transfer-progress-widget-body {
@@ -191,7 +316,7 @@
 .transfer-task-row::before {
     content: "";
     position: absolute;
-    left: 24px;
+    left: 27px;
     top: 16px;
     width: 16px;
     height: 16px;
@@ -199,9 +324,9 @@
 }
 .transfer-task-row .transfer-filetype-txt {
     display: inline-block;
-    margin-left: 24px;
+    margin-left: 50px;
     margin-top: 2px;
-    max-width: 280px;
+    max-width: 282px;
     font: var(--text-body1);
     line-height: 24px;
     color: var(--text-color-high);
@@ -210,7 +335,7 @@
     white-space: nowrap;
 }
 .transfer-task-row.complete .transfer-filetype-txt {
-    max-width: 260px;
+    max-width: 282px;
 }
 .transfer-task-row .transfer-file-size {
     position: relative;
@@ -244,8 +369,10 @@
     white-space: nowrap;
     cursor: pointer;
     margin-left: auto;
+    margin-right: 8px;
     flex-shrink: 0;
     position: relative;
+    color: var(--text-color-high);
 }
 .transfer-task-row.paused .transfer-task-status i {
     --icon-size: 24px;
@@ -276,23 +403,22 @@
 }
 .transfer-task-actions button {
     display: inline-block;
-    margin-left: 12px;
     cursor: pointer;
     position: relative;
     outline: none;
 }
 .transfer-task-actions i {
-    opacity: 0.8;
+    --mask-color: var(--icon-rest);
 }
 .transfer-task-actions i:hover {
-    opacity: 1;
+    --mask-color: var(--icon-active);
 }
 .transfer-progress-bar,
 .transfer-progress-bar-pct {
     position: absolute;
     display: block;
     width: 488px;
-    height: 4px;
+    height: 2px;
     border-radius: 1.5px;
     background: var(--surface-progress-background);
     left: 24px;
@@ -319,18 +445,8 @@
 .transfer-complete-actions {
     display: none;
     position: absolute;
-    right: 64px;
+    right: 48px;
     z-index: 25;
-}
-.transfer-complete-actions::before {
-    content: '';
-    width: 2px;
-    height: 12px;
-    display: block;
-    position: absolute;
-    right: -8px;
-    top: 6px;
-    background-color: var(--stroke-mid-grey);
 }
 .transfer-task-row:hover .transfer-complete-actions {
     display: inline-block;
@@ -338,28 +454,29 @@
 .transfer-complete-actions button {
     display: inline-block;
     position: relative;
-    margin: 0 6px;
+    margin-right: 8px;
     cursor: pointer;
     outline: none;
 }
 .transfer-complete-actions i {
-    opacity: 0.8;
+    --mask-color: var(--icon-rest);
 }
 .transfer-complete-actions i:hover {
-    opacity: 1;
+    --mask-color: var(--icon-active);
 }
 .transfer-task-row.complete .transfer-progress-bar {
     display: none;
 }
 /* error mode */
-.transfer-task-row.upload.error .transfer-progress-bar-pct,
-.transfer-task-row.download.error .transfer-progress-bar-pct {
+.transfer-task-row.error .transfer-progress-bar-pct,
+.transfer-task-row.overquota .transfer-progress-bar-pct {
     width: 200px;
     background-color: var(--secondary-red);
     left: 0;
     z-index: 9;
 }
-.transfer-task-row.error .transfer-task-status {
+.transfer-task-row.error .transfer-task-status,
+.transfer-task-row.overquota .transfer-task-status {
     color: var(--secondary-red);
 }
 /* inqueue mode */
@@ -404,39 +521,49 @@
 button.btn-icon .transfer-progress-icon {
     --icon-size: 24px;
     display: inline-block;
-    --mask-color: var(--icon-rest);
 }
 .transfer-progress-type.upload .status-indicator::before {
     background-position: -8px -1804px;
 }
 .transfer-task-row.download::before {
     --mask-color: var(--secondary-green);
+    margin-right: 12px;
 }
 .transfer-task-row.upload::before {
     --mask-color: var(--secondary-blue);
+    margin-right: 15px;
+}
+.transfer-task-row .transfer-filetype-icon {
+    margin: 0 12px;
 }
 .transfer-task-row.complete .transfer-task-status::before {
     display: block;
     background-position: -160px -1696px;
 }
-.transfer-task-row.error .transfer-task-status::before {
+.transfer-task-row.error .transfer-task-status::before,
+.transfer-task-row.overquota .transfer-task-status::before {
     display: block;
     background-position: -159px -1804px;
 }
-.transfer-section-button {
-    font: var(--text-body2);
+.transfer-widget-footer {
     width: 100%;
-    height: 32px;
-    display: block;
-    text-align: center;
+    height: 24px;
+    padding: 6px 0;
     background-color: var(--stroke-grey-2);
-    color: var(--text-color-high);
-    line-height: 32px;
-    cursor: pointer;
 }
-.transfer-section-button.complete-list {
-    border-radius: 0 0 16px 16px;
-    margin-bottom: -6px;
+.transfer-widget-footer button {
+    height: 24px;
+    --height: 24px;
+}
+.transfer-widget-footer .transfer-clear-all-icon {
+    margin-right: 18px;
+    margin-left: 8px;
+}
+.transfer-widget-footer button i {
+    --mask-color: var(--icon-rest);
+}
+.transfer-widget-footer button:hover i {
+    --mask-color: var(--icon-active);
 }
 .transfer-progress-widget.collapse .transfer-section-button {
     display: none;
@@ -456,9 +583,8 @@ button.btn-icon .transfer-progress-icon {
     position: absolute;
     width: 24px;
     height: 24px;
-    top: 12px;
-    right: 12px;
-    opacity: 0.4;
+    top: 16px;
+    right: 16px;
     transition: 0.2s;
     cursor: pointer;
     z-index: 19;
@@ -508,21 +634,28 @@ button.btn-icon .transfer-progress-icon {
     font: var(--text-body1);
 }
 .quota-info-pr-txt.small-font {
-    font: var(--text-caption);
+    color: var(--text-color-medium);
 }
 .quota-info-pr-txt.small-font .quota-info-pr-txt-used {
-    font: var(--text-body2);
+    font: var(--text-body1);
 }
 .right-section.upgrade-block {
     width: calc(100% - 136px);
     display: inline-block;
 }
 .right-section.upgrade-block .head-title {
-    font-family: 'LatoWebBold', 'source_sans_prosemibold', Arial, sans-serif;
+    color: var(--text-color-high);
+    font: var(--text-h3-bold);
     left: 0;
     top: 0;
     padding: 0;
-    cursor: default;
+}
+.right-section.upgrade-block .head-title span.pct-used {
+    font: var(--text-h1-bold);
+    color: var(--text-color-error);
+}
+.almost-overquota .right-section.upgrade-block .head-title span.pct-used {
+    color: var(--text-color-warning);
 }
 .right-section.upgrade-block .head-title:hover {
     background-color: transparent;
@@ -531,10 +664,11 @@ button.btn-icon .transfer-progress-icon {
     display: none;
 }
 .right-section.upgrade-block .content-txt {
-    padding-top: 12px;
+    padding-top: 4px;
+    color: var(--text-color-medium);
 }
 .right-section.upgrade-block button {
-    margin-top: 20px;
+    margin-top: 16px;
     display: inline-block;
     z-index: 14;
 }

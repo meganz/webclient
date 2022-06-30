@@ -497,6 +497,11 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             tempEntry[e] = entries[e].entry;
         }
     }
+    tfsheadupdate({
+        a: z ? `dl_${entries[0].entry.zipid}` : Object.values(entries).map((e) => {
+            return `dl_${e.entry.zipid ? e.entry.zipid : e.entry.id}`;
+        })
+    });
     if (z) {
         mega.tpw.addDownloadUpload(mega.tpw.DOWNLOAD, entries[0].entry, zipsize);
     }
@@ -609,6 +614,7 @@ MegaData.prototype.dlprogress = function(id, perc, bl, bt, kbps, dl_queue_num, f
             return false;
         }
     }
+    tfsheadupdate({t: id});
     if (!dl_queue[dl_queue_num].preview) {
         mega.tpw.updateDownloadUpload(mega.tpw.DOWNLOAD, original_id, perc, bl, bt, kbps, dl_queue_num, st);
     }
@@ -695,7 +701,9 @@ MegaData.prototype.dlcomplete = function(dl) {
         dlmanager.remResumeInfo(dl).dump();
     }
 
+    tfsheadupdate({f: `dl_${z ? z : id}`});
     mega.tpw.finishDownloadUpload(mega.tpw.DOWNLOAD, dl);
+
 
     var slideshowid = slideshow_handle();
     if (slideshowid == id && !previews[slideshowid]) {
@@ -770,7 +778,7 @@ MegaData.prototype.dlerror = function(dl, error) {
         //     srvlog('onDownloadError :: ' + error + ' [' + hostname(dl.url) + '] ' + (dl.zipid ? 'isZIP' : ''));
         // }
     }
-
+    let overquota = false;
     switch (error) {
         case ETOOMANYCONNECTIONS:
             errorstr = l[18];
@@ -793,6 +801,7 @@ MegaData.prototype.dlerror = function(dl, error) {
             break;
         case EOVERQUOTA:
             errorstr = l[20666];
+            overquota = true;
             break;
         // case EAGAIN:               errorstr = l[233]; break;
         // case ETEMPUNAVAIL:         errorstr = l[233]; break;
@@ -800,7 +809,9 @@ MegaData.prototype.dlerror = function(dl, error) {
             errorstr = l[x = 233];
             break;
     }
-    mega.tpw.errorDownloadUpload(mega.tpw.DOWNLOAD, dl, errorstr);
+    tfsheadupdate(overquota ? {o: gid} : {e: gid});
+    mega.tpw.errorDownloadUpload(mega.tpw.DOWNLOAD, dl, errorstr, overquota);
+
 
     var slideshowid = slideshow_handle();
     if (slideshowid === dl.id && !previews[slideshowid]) {
@@ -929,6 +940,8 @@ MegaData.prototype.getTransferElements = function() {
     obj.domTableEmptyTxt = obj.domTableWrapper.querySelector('.transfer-panel-empty-txt');
     obj.domScrollingTable = obj.domTableWrapper.querySelector('.transfer-scrolling-table');
     obj.domTable = obj.domScrollingTable.querySelector('.transfer-table tbody');
+    obj.domDownloadChart = obj.domDownloadBlock.querySelector('.progress-chart');
+    obj.domUploadChart = obj.domUploadBlock.querySelector('.progress-chart');
 
     this.getTransferElements = function() {
         return obj;
@@ -1195,6 +1208,11 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
         // for (var ur = 0; ur < u.length; ur++) {
         //    mega.tpw.addDownloadUpload(mega.tpw.UPLOAD, u[ur]);
         // }
+        tfsheadupdate({
+            a: u.map((u) => {
+                return `ul_${u.id}`;
+            })
+        });
         mega.tpw.addDownloadUpload(mega.tpw.UPLOAD, u);
 
         if (!added) {
@@ -1573,7 +1591,7 @@ MegaData.prototype.ulprogress = function(ul, perc, bl, bt, bps) {
         ul._gotTransferError = false;
         domElement.classList.remove('transfer-error');
     }
-
+    tfsheadupdate({t: `ul_${id}`});
     mega.tpw.updateDownloadUpload(mega.tpw.UPLOAD, id, perc, bl, bt, bps, ul.pos, ul.starttime);
 };
 
@@ -1609,6 +1627,7 @@ MegaData.prototype.ulerror = function(ul, error) {
         var errStr = api_strerror(error);
 
         this.ulfinalize(ul, errStr);
+        tfsheadupdate(overquota ? {o: `ul_${id}`} : {e: `ul_${id}`});
         mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, ul, errStr, overquota);
 
 
@@ -1629,8 +1648,10 @@ MegaData.prototype.ulerror = function(ul, error) {
                     });
             }
             ulmanager.abort(null);
-            $("tr[id^='ul_']").addClass('transfer-error')
-                .removeClass('transfer-completed').find('.transfer-status').text(l[1010]);
+            const tfse = M.getTransferElements();
+            const $rows = $("tr[id^='ul_']", tfse.domTable);
+            $rows.addClass('transfer-error overquota').removeClass('transfer-completed');
+            $('.transfer-status', $rows).text(l[1010]);
 
             // Inform user that upload MEGAdrop is not available anymore
             if (page.substr(0, 8) === 'megadrop') {
@@ -1639,7 +1660,11 @@ MegaData.prototype.ulerror = function(ul, error) {
         }
         else {
             if (error < 0) {
-                $('#ul_' + id).addClass('transfer-error').removeClass('transfer-completed');
+                const $ulRow = $(`#ul_${id}`);
+                $ulRow.addClass('transfer-error').removeClass('transfer-completed');
+                if (error === EOVERQUOTA) {
+                    $ulRow.addClass('overquota');
+                }
             }
 
             // Inform user that upload MEGAdrop is not available anymore
@@ -1679,6 +1704,7 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
         showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
     }
 
+    tfsheadupdate({f: `ul_${ul.id}`});
     mega.tpw.finishDownloadUpload(mega.tpw.UPLOAD, ul, h);
 
     this.ulfinalize(ul, ul.skipfile ? l[1668] : l[1418], h);
@@ -1997,11 +2023,16 @@ function onUploadError(ul, errorstr, reason, xhr, isOverQuota) {
         ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hostname(ul.posturl));
     }
 
+    tfsheadupdate(isOverQuota ? {o: `ul_${ul.id}`} : {e: `ul_${ul.id}`});
     mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, { id: ul.id }, errorstr, isOverQuota);
 
     ul._gotTransferError = true;
-    $('#ul_' + ul.id).addClass('transfer-error');
-    $('#ul_' + ul.id + ' .transfer-status').text(errorstr);
+    const $ulRow = $(`#ul_${ul.id}`);
+    $ulRow.addClass('transfer-error');
+    $('.transfer-status', $ulRow).text(errorstr);
+    if (isOverQuota) {
+        $ulRow.addClass('overquota');
+    }
 }
 
 
@@ -2012,6 +2043,7 @@ function resetOverQuotaTransfers(ids) {
         .removeClass('overquota')
         .text(l[7227]);
 
+    tfsheadupdate({t: ids});
     mega && mega.tpw && mega.tpw.resetErrorsAndQuotasUI(mega.tpw.DOWNLOAD);
 }
 
@@ -2078,18 +2110,20 @@ function fm_tfspause(gid, overquota) {
 
             if (overquota === true) {
                 $tr.addClass('transfer-error');
+                if (gid[0] === 'u') {
+                    $tr.addClass('overquota');
+                }
                 $tr.find('.transfer-status').addClass('overquota').text(l[1673]);
-
+                tfsheadupdate({o: gid});
                 mega.tpw.errorDownloadUpload(transferType, { id: gid.split('_').pop() }, l[1673], overquota);
             }
             else {
                 $tr.addClass('transfer-queued');
                 $tr.removeClass('transfer-error');
                 $tr.find('.transfer-status').text(l[7227]);
+                tfsheadupdate({p: gid});
                 mega.tpw.pauseDownloadUpload(transferType, { id: gid.split('_').pop() });
             }
-
-
         }
         return true;
     }
@@ -2101,7 +2135,7 @@ function fm_tfsresume(gid) {
     if (ASSERT(typeof gid === 'string' && "zdu".indexOf(gid[0]) !== -1, 'Invalid GID to resume')) {
 
         var $tr = $('#' + gid);
-
+        tfsheadupdate({r: gid});
         if (gid[0] === 'u') {
             mega.tpw.resumeDownloadUpload(mega.tpw.UPLOAD, { id: gid.split('_').pop() });
 
@@ -2153,7 +2187,6 @@ function fm_tfsresume(gid) {
                 }
             }
         }
-
         if (uldl_hold) {
             dlQueue.resume();
             ulQueue.resume();
@@ -2345,20 +2378,225 @@ function fm_tfsupdate() {
     }
 
     M.pendingTransfers = i + u;
+    tfsheadupdate();
+}
 
-    if (u) {
-        tfse.domUploadProgressText.textContent = l[20808].replace('{0}', ((u > 999) ? '999+' : u));
+function tfsheadupdate(update) {
+    'use strict';
+    const processStats = function(tRemain, tBytes, tDoneBytes, tOq, tErr, blocks) {
+        if (tOq) {
+            blocks.block.classList.add('overquota');
+            blocks.text.textContent = l.tfw_header_overquota;
+        }
+        else if (tErr) {
+            blocks.block.classList.add('error');
+            blocks.text.textContent = l.tfw_header_error;
+        }
+        else if (tRemain) {
+            blocks.text.textContent = l[20808].replace('{0}', tRemain > 999 ? '999+' : tRemain);
+            blocks.block.classList.remove('error', 'overquota');
+        }
+        else {
+            blocks.text.textContent = l.tfw_header_complete;
+            blocks.block.classList.remove('error', 'overquota');
+        }
+        let perc = tDoneBytes / tBytes;
+        perc = isNaN(perc) ? 0 : Math.round(perc * 100);
+        const fullDeg = 360;
+        const deg = fullDeg * perc / 100;
+        const leftChart = blocks.chart.querySelector('.left-chart');
+        const rightChart = blocks.chart.querySelector('.right-chart');
+        const leftSpan = leftChart.getElementsByTagName('span')[0];
+        if (perc < 50) {
+            leftChart.classList.add('low-percent-clip');
+            rightChart.classList.add('low-percent-clip');
+            leftSpan.style.transform = `rotate(${180 + deg}deg)`;
+        }
+        else {
+            leftChart.classList.remove('low-percent-clip');
+            rightChart.classList.remove('low-percent-clip');
+            leftSpan.style.transform = `rotate(${deg - 180}deg)`;
+        }
+    };
+
+    if (!tfsheadupdate.stats) {
+        tfsheadupdate.stats = Object.create(null);
+        // Transfer ids by type
+        tfsheadupdate.stats.dl = Object.create(null);
+        tfsheadupdate.stats.ul = Object.create(null);
+        // Total transfers by type
+        tfsheadupdate.stats.adl = 0;
+        tfsheadupdate.stats.aul = 0;
+        // Total errored transfers by type
+        tfsheadupdate.stats.edl = 0;
+        tfsheadupdate.stats.eul = 0;
+        // Total overquota transfers by type
+        tfsheadupdate.stats.odl = 0;
+        tfsheadupdate.stats.oul = 0;
+        // Total finished transfers by type
+        tfsheadupdate.stats.fdl = 0;
+        tfsheadupdate.stats.ful = 0;
+        tfsheadupdate.checkState = (type, id, state) =>
+            tfsheadupdate.stats[type][id] && tfsheadupdate.stats[type][id] === state ? -1 : 0;
+    }
+    if (update) {
+        tfsheadcalc(update);
+    }
+
+    const tfse = M.getTransferElements();
+    if (!tfse) {
+        return;
+    }
+
+    const blocks = Object.create(null);
+    const { adl, aul, edl, eul, odl, oul, fdl, ful } = tfsheadupdate.stats;
+    let { dl_done, ul_done, dl_total, ul_total } = getTransfersPercent();
+    if (!dl_total && !dl_done) {
+        dl_total = 1;
+        dl_done = 1;
+    }
+    if (!ul_total && !ul_done) {
+        ul_total = 1;
+        ul_done = 1;
+    }
+    if (aul) {
+        blocks.block = tfse.domUploadBlock;
+        blocks.text = tfse.domUploadProgressText;
+        blocks.chart = tfse.domUploadChart;
+        processStats(
+            aul - ful,
+            ul_total,
+            ul_done,
+            oul,
+            eul,
+            blocks
+        );
         tfse.domUploadBlock.classList.remove('hidden');
     }
     else {
-        tfse.domUploadProgressText.textContent = l[1418];
+        tfse.domUploadBlock.classList.add('hidden');
     }
-
-    if (i) {
-        tfse.domDownloadProgressText.textContent = l[20808].replace('{0}', ((i > 999) ? '999+' : i));
+    if (adl) {
+        blocks.block = tfse.domDownloadBlock;
+        blocks.text = tfse.domDownloadProgressText;
+        blocks.chart = tfse.domDownloadChart;
+        processStats(
+            adl - fdl,
+            dl_total,
+            dl_done,
+            odl,
+            edl,
+            blocks
+        );
         tfse.domDownloadBlock.classList.remove('hidden');
     }
     else {
-        tfse.domDownloadProgressText.textContent = l[1418];
+        tfse.domDownloadBlock.classList.add('hidden');
+    }
+}
+
+function tfsheadcalc(update) {
+    'use strict';
+    const STATE = {
+        TEMP: 0,
+        INIT: 1,
+        PROGRESS: 2,
+        PAUSE: 3,
+        ERROR: 4,
+        OVERQUOTA: 5,
+        FINISH: 6,
+    };
+    const updateStats = (type, id, key, change, state) => {
+        if (state !== STATE.INIT && typeof tfsheadupdate.stats[type][id] === 'undefined') {
+            return;
+        }
+        tfsheadupdate.stats[type][id] = state;
+        if (typeof tfsheadupdate.stats[`${key}${type}`] !== 'undefined') {
+            tfsheadupdate.stats[`${key}${type}`] += change;
+        }
+    };
+
+    const key = Object.keys(update)[0];
+    if (Array.isArray(update[key])) {
+        for (const id of update[key]) {
+            const patch = Object.create(null);
+            patch[key] = id;
+            tfsheadcalc(patch);
+        }
+        return;
+    }
+    update[key] = update[key].replace('zip_', 'dl_');
+    const type = update[key].split('_')[0];
+    const o = tfsheadupdate.checkState(type, update[key], STATE.OVERQUOTA);
+    const e = tfsheadupdate.checkState(type, update[key], STATE.ERROR);
+    if (typeof tfsheadupdate.stats[type][update[key]] === 'undefined' && ['t', 'f', 'p', 'r'].includes(key)) {
+        // Update for an unknown transfer so add it first.
+        tfsheadcalc({a: update[key]});
+    }
+
+    switch (key) {
+        case 't': {
+            // Transfer transferring
+            updateStats(type, update.t, 'o', o, STATE.TEMP);
+            updateStats(type, update.t, 'e', e, STATE.TEMP);
+            updateStats(type, update.t, 'n', 1, STATE.PROGRESS);
+            break;
+        }
+        case 'f': {
+            // Finish transfer
+            updateStats(type, update.f, key, 1, STATE.FINISH);
+            break;
+        }
+        case 'e': {
+            // Error transfer
+            updateStats(type, update.e, 'o', o, STATE.TEMP);
+            updateStats(type, update.e, key, 1 + e, STATE.ERROR);
+            break;
+        }
+        case 'o': {
+            // Overquota transfer
+            updateStats(type, update.o, 'e', e, STATE.TEMP);
+            updateStats(type, update.o, key, 1 + o, STATE.OVERQUOTA);
+            break;
+        }
+        case 'p': {
+            // Pause transfer
+            updateStats(type, update.p, 'e', e, STATE.TEMP);
+            updateStats(type, update.p, 'o', o, STATE.TEMP);
+            updateStats(type, update.p, 'n', 1, STATE.PAUSE);
+            break;
+        }
+        case 'r': {
+            // Resume transfer
+            updateStats(type, update.r, 'n', 1, STATE.PROGRESS);
+            break;
+        }
+        case 'c': {
+            // Cancel transfer
+            const f = tfsheadupdate.checkState(type, update.c, STATE.FINISH);
+            updateStats(type, update.c, 'o', o, STATE.TEMP);
+            updateStats(type, update.c, 'e', e, STATE.TEMP);
+            updateStats(type, update.c, 'f', f, STATE.TEMP);
+            updateStats(type, update.c, 'a', -1, STATE.TEMP);
+            delete tfsheadupdate.stats[type][update.c];
+            break;
+        }
+        default: {
+            const id = update[key];
+            if (
+                typeof tfsheadupdate.stats[type][id] !== "undefined"
+                && tfsheadupdate.checkState(type, id, STATE.FINISH)
+            ) {
+                // If the user downloads the same finished download reset the stats and add it again.
+                updateStats(type, id, 'f', -1, STATE.TEMP);
+                updateStats(type, id, 'a', -1, STATE.TEMP);
+                delete tfsheadupdate.stats[type][id];
+                updateStats(type, id, key, 1, STATE.INIT);
+            }
+            else if (typeof tfsheadupdate.stats[type][id] === 'undefined') {
+                // If we haven't received an update for this transfer before add it.
+                updateStats(type, id, key, 1, STATE.INIT);
+            }
+        }
     }
 }

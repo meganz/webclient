@@ -1289,6 +1289,7 @@ var ulmanager = {
                 var gid = ulmanager.getGID(ul);
                 toAbort.push(gid);
                 $('.transfer-status', $('#' + gid).addClass('transfer-error')).text(l[20634]);
+                tfsheadupdate({e: gid});
                 mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, ul, l[20634]);
             }
         }

@@ -510,3 +510,139 @@ function setupTransferAnalysis() {
         });
     };
 })(self);
+
+function bindTransfersMassEvents(context) {
+    'use strict';
+    const pauseIconClass = 'icon-pause';
+    const playIconClass = 'icon-play-small';
+    $('.transfer-pause-icon', context).rebind('click.transfers', function() {
+        const $this = $(this);
+        if ($this.hasClass('active')) {
+            if (dlmanager.isOverQuota) {
+                return dlmanager.showOverQuotaDialog();
+            }
+            if (ulmanager.ulOverStorageQuota) {
+                ulmanager.ulShowOverStorageQuotaDialog();
+                return false;
+            }
+        }
+
+        if (!$this.hasClass('disabled')) {
+            let $elm;
+            if ($this.hasClass('active')) {
+                // terms of service
+                if (u_type || folderlink || Object(u_attr).terms || $('.transfer-table', '.fmholder').length === 0) {
+                    Object.keys(dlQueue._qpaused).map(fm_tfsresume);
+                    Object.keys(ulQueue._qpaused).map(fm_tfsresume);
+                    uldl_hold = false;
+                    ulQueue.resume();
+                    dlQueue.resume();
+
+                    $('span', $this.removeClass('active')).text(l[6993]);
+                    $('i', $this).addClass(pauseIconClass).removeClass(playIconClass);
+
+                    $elm = $('.transfer-table-wrapper tr', '.fmholder').removeClass('transfer-paused');
+                    $elm = $('.link-transfer-status', $elm).removeClass('transfer-play').addClass('transfer-pause');
+                    $('i', $elm).removeClass(playIconClass).addClass(pauseIconClass);
+                    $('.nw-fm-left-icon', '.fm-holder').removeClass('paused');
+                    const $otherButton =
+                        $this.parent().hasClass('transfer-widget-footer')
+                            ? $('.transfer-pause-icon', '.fm-transfers-header')
+                            : $('.transfer-pause-icon', '.transfer-widget-footer');
+                    $('span', $otherButton.removeClass('active')).text(l[6993]);
+                    $('i', $otherButton).addClass(pauseIconClass).removeClass(playIconClass);
+                }
+                else {
+                    msgDialog('error', 'terms', l[214]);
+                    if (d) {
+                        console.debug(l[214]);
+                    }
+                }
+            }
+            else {
+                var $trs = $('.transfer-table tr:not(.transfer-completed)', '.fmholder');
+                let ids;
+                if ($('.transfer-table', '.fmholder').length) {
+                    ids = [...Object.keys(M.tfsdomqueue), ...$trs.attrs('id')];
+                }
+                else {
+                    ids = $('.transfer-progress-widget .transfer-task-row:not(.completed)', '.fmholder').attrs('id');
+                    ids = ids.map((attr) => {
+                        return attr.substr(4);
+                    });
+                }
+                ids.map(fm_tfspause);
+
+                dlQueue.pause();
+                ulQueue.pause();
+                uldl_hold = true;
+
+                $('span', $this.addClass('active')).text(l[7101]);
+                $('i', $this).removeClass(pauseIconClass).addClass(playIconClass);
+
+                $trs.addClass('transfer-paused');
+                $elm = $('.link-transfer-status', $trs).removeClass('transfer-pause').addClass('transfer-play');
+                $('i', $elm).removeClass(pauseIconClass).addClass(playIconClass);
+                $('.nw-fm-left-icon', '.fmholder').addClass('paused');
+                const $otherButton =
+                    $this.parent().hasClass('transfer-widget-footer')
+                        ? $('.transfer-pause-icon', '.fm-transfers-header')
+                        : $('.transfer-pause-icon', '.transfer-widget-footer');
+                $('span', $otherButton.addClass('active')).text(l[7101]);
+                $('i', $otherButton).removeClass(pauseIconClass).addClass(playIconClass);
+            }
+        }
+    });
+
+    $('.transfer-clear-all-icon', context).rebind('click.transfers', function() {
+        if (!$(this).hasClass('disabled')) {
+            msgDialog('confirmation', 'clear all transfers', l.cancel_transfers_dlg_title, l[7225], (e) => {
+                if (!e) {
+                    return;
+                }
+
+                const time = (tag, cb) => {
+                    if (d) {
+                        console.time(tag);
+                    }
+                    cb();
+
+                    if (d) {
+                        console.timeEnd(tag);
+                    }
+                };
+
+                uldl_hold = true;
+                if (typeof $.removeTransferItems === 'function' && Object.keys(M.tfsdomqueue).length) {
+                    tfsheadupdate({
+                        c: Object.keys(M.tfsdomqueue),
+                    });
+                }
+                time('dlm:abort', () => dlmanager.abort(null));
+                time('ulm:abort', () => ulmanager.abort(null));
+                time('tfs:abort', () => {
+                    if (typeof $.removeTransferItems === 'function') {
+                        $.removeTransferItems($('.transfer-table tbody tr', '.fmholder'));
+                    }
+                    else {
+                        tfsheadupdate({
+                            c: [...Object.keys(tfsheadupdate.stats.dl), ...Object.keys(tfsheadupdate.stats.ul)]
+                        });
+                        mega.tpw.clearRows(null);
+                    }
+                });
+
+                later(() => {
+                    if (uldl_hold) {
+                        uldl_hold = false;
+                        ulQueue.resume();
+                        dlQueue.resume();
+                        const $icon = $('.transfer-pause-icon', context).removeClass('active');
+                        $('span', $icon).text(l[6993]);
+                        $('i', $icon).removeClass(playIconClass).addClass(pauseIconClass);
+                    }
+                });
+            });
+        }
+    });
+}

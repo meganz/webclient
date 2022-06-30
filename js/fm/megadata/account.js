@@ -799,6 +799,9 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         else if (quota.isAlmostFull || myOptions.custom) {
             if (quota.isAlmostFull) {
                 $('.fm-main').addClass('fm-notification almost-full');
+                if (mega.tpw.initialized && mega.tpw.isWidgetVisibile()) {
+                    mega.tpw.showAlmostOverquota();
+                }
             }
             $strgdlg.addClass('almost-full');
             $('header h2.almost-full', $strgdlg).text(myOptions.title || l[16312]);

@@ -4,7 +4,7 @@
 lazy(mega, 'icu', () => {
     'use strict';
 
-    const plural = tryCatch(() => {
+    let plural = tryCatch(() => {
         if (window.Intl && Intl.PluralRules !== undefined) {
             return new Intl.PluralRules(mega.intl.locale);
         }
@@ -17,11 +17,10 @@ lazy(mega, 'icu', () => {
     };
 
     if (!plural) {
-        reportError(`---- Parsing error, not expected Intl.PluralRules. value = ${plural}`);
-        return Object.freeze({
-            isICUPlural: () => false,
-            format: () => null
-        });
+        if (d) {
+            console.warn('Using own Intl.PluralRules adaptation as Intl.PluralRules is unavailable');
+        }
+        plural = getPlurals(mega.intl.locale);
     }
 
     /**
@@ -83,13 +82,13 @@ lazy(mega, 'icu', () => {
             }
             if (!mega.icu.isICUPlural(msg)) {
                 reportError(`---- Parsing error, not expected ICU message. value = ${msg}`);
-                return null;
+                return String(msg);
             }
             const icuBody = /({[^{}]*,\s*plural\s*,[^]+})/g.exec(msg);
 
             if (!icuBody || icuBody.length !== 2) {
                 reportError(`---- Parsing error, not expected ICU Body format. value = ${icuBody}`);
-                return null;
+                return String(msg);
             }
 
             // removing the brackets { }
@@ -99,7 +98,7 @@ lazy(mega, 'icu', () => {
 
             if (!token || token.length !== 1) {
                 reportError(`---- Parsing error, Failed to find Plural token. value = ${clearBody}`);
-                return null;
+                return String(msg);
             }
 
             const stringDic = Object.create(null);
@@ -111,7 +110,7 @@ lazy(mega, 'icu', () => {
 
                 if (!opts) {
                     reportError(`---- Parsing error, malformed Plural set. value = ${clearBody}`);
-                    return null;
+                    return String(msg);
                 }
 
                 const condition = opts.key.trim();
@@ -126,7 +125,7 @@ lazy(mega, 'icu', () => {
 
             if (!Object.keys(stringDic).length) {
                 reportError(`---- Parsing error, Plural values not found. value = ${icuBody}`);
-                return null;
+                return String(msg);
             }
 
             let val = stringDic[count] || stringDic[plural.select(count)] || stringDic['other'];
@@ -139,7 +138,162 @@ lazy(mega, 'icu', () => {
             reportError(`---- Parsing error, Plural values for count ${count} not found.`
                 + `value = ${JSON.stringify(stringDic)}`);
 
-            return null;
+            return String(msg);
         }
     });
+    function getPlurals(localeVal) {
+        const select = (number) => {
+            if (typeof number !== 'number') {
+                number = Number(number);
+            }
+            if (!isFinite(number)) {
+                return 'other';
+            }
+            const formatter = new Intl.NumberFormat('en');
+            const fmt = formatter.format(Math.abs(number));
+            return select._sel[select._locale](fmt);
+        };
+        const plurals_other = () => 'other';
+        select._sel = {
+            en: n => {
+                const s = String(n).split('.');
+                return n === 1 && !s[1] ? 'one' : 'other';
+            },
+            ar: n => {
+                const s = String(n).split('.');
+                const n100 = Number(s[0]) === n && s[0].slice(-2);
+                if (n === 0) {
+                    return 'zero';
+                }
+                if (n === 1) {
+                    return 'one';
+                }
+                if (n === 2) {
+                    return 'two';
+                }
+                if (n100 >= 3 && n100 <= 10) {
+                    return 'few';
+                }
+                if (n100 >= 11 && n100 <= 99) {
+                    return 'many';
+                }
+                return 'other';
+            },
+            de: n => {
+                const s = String(n).split('.');
+                return n === 1 && !s[1] ? 'one' : 'other';
+            },
+            fr: n => {
+                const s = String(n).split('.');
+                const i = s[0];
+                const i1000000 = i.slice(-6);
+                if (n >= 0 && n < 2) {
+                    return 'one';
+                }
+                if (i !== 0 && i1000000 === 0 && !s[1]) {
+                    return 'many';
+                }
+                return 'other';
+            },
+            pt: n => {
+                const s = String(n).split('.');
+                const i = s[0];
+                const i1000000 = i.slice(-6);
+                if (i === 0 || i === 1) {
+                    return 'one';
+                }
+                if (i !== 0 && i1000000 === 0 && !s[1]) {
+                    return 'many';
+                }
+                return 'other';
+            },
+            zh: plurals_other,
+            es: n => {
+                const s = String(n).split('.');
+                const i = s[0];
+                const i1000000 = i.slice(-6);
+                if (n === 1) {
+                    return 'one';
+                }
+                if (i !== 0 && i1000000 === 0 && !s[1]) {
+                    return 'many';
+                }
+                return 'other';
+            },
+            id: plurals_other,
+            it: n => {
+                const s = String(n).split('.');
+                const i = s[0];
+                const v0 = !s[1];
+                const i1000000 = i.slice(-6);
+                if (n === 1 && v0) {
+                    return 'one';
+                }
+                if (i !== 0 && i1000000 === 0 && v0) {
+                    return 'many';
+                }
+                return 'other';
+            },
+            ja: plurals_other,
+            ko: plurals_other,
+            nl: plurals_other,
+            pl: n => {
+                const s = String(n).split('.');
+                const i = s[0];
+                const v0 = !s[1];
+                const i10 = i.slice(-1);
+                const i100 = i.slice(-2);
+                if (v0) {
+                    if (n === 1) {
+                        return 'one';
+                    }
+                    if (i10 >= 2 && i10 <= 4 && (i100 < 12 || i100 > 14)) {
+                        return 'few';
+                    }
+                    if (i !== 1 && (i10 === 0 || i10 === 1) || i10 >= 5 && i10 <= 9 || i100 >= 12 && i100 <= 14) {
+                        return 'many';
+                    }
+                }
+                return 'other';
+            },
+            ro: n => {
+                const s = String(n).split('.');
+                const v0 = !s[1];
+                const t0 = Number(s[0]) === n;
+                const n100 = t0 && s[0].slice(-2);
+                if (n === 1 && v0) {
+                    return 'one';
+                }
+                if (!v0 || n === 0 || n100 >= 2 && n100 <= 19) {
+                    return 'few';
+                }
+                return 'other';
+            },
+            ru: n => {
+                const s = String(n).split('.');
+                const i = s[0];
+                const v0 = !s[1];
+                const i10 = i.slice(-1);
+                const i100 = i.slice(-2);
+                if (v0) {
+                    if (i10 === 1 && i100 !== 11) {
+                        return 'one';
+                    }
+                    if (i10 >= 2 && i10 <= 4 && (i100 < 12 || i100 > 14)) {
+                        return 'few';
+                    }
+                    if (i10 === 0 || i10 >= 5 && i10 <= 9 || i100 >= 11 && i100 <= 14) {
+                        return 'many';
+                    }
+                }
+                return 'other';
+            },
+            th: plurals_other,
+            vi: plurals_other
+        };
+        select._locale = String(localeVal).substring(0, 2);
+        return {
+            select
+        };
+    }
 });

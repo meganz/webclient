@@ -2484,7 +2484,6 @@ function getNumberColPrefs(colName) {
 
 function invalidLinkError() {
     'use strict';
-    loadingDialog.hide();
     loadingInitDialog.hide();
 
     loadfm.loaded = false;

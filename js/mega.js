@@ -302,7 +302,7 @@ if (typeof loadingInitDialog === 'undefined') {
             }
         }
     };
-    loadingInitDialog.hide = function() {
+    loadingInitDialog.hide = function(subject) {
         'use strict';
         this.loader = null;
         this.active = false;
@@ -315,6 +315,9 @@ if (typeof loadingInitDialog === 'undefined') {
         $('.loading-info li').removeClass('loading loaded');
         $('.loader-progressbar').removeClass('active');
         $('.loader-percents').width('0%').removeAttr('style');
+
+        // Implicitly hide the former dialog, as per the linked dependency.
+        window.loadingDialog.hide(subject);
     };
 }
 
@@ -3340,7 +3343,6 @@ function folderreqerr(c, e) {
     var title = l[1043];
     var message = null;
 
-    loadingDialog.hide();
     loadingInitDialog.hide();
 
     loadfm.loaded = false;
@@ -3416,7 +3418,6 @@ function init_chat(action) {
             }
 
             if (!loadfm.loading) {
-                window.loadingDialog.hide();
                 window.loadingInitDialog.hide();
             }
 
@@ -3457,7 +3458,6 @@ function loadfm_callback(res) {
     'use strict';
 
     if ((parseInt(res) | 0) < 0 || res === undefined) {
-        loadingDialog.hide();
         window.loadingInitDialog.hide();
 
         // tell the user we were unable to retrieve the cloud drive contents, upon clicking OK redirect to /support
@@ -3541,7 +3541,6 @@ function loadfm_callback(res) {
 
         // Check if the key for a folderlink was correct
         if (folderlink && missingkeys[M.RootID]) {
-            loadingDialog.hide();
             window.loadingInitDialog.hide();
 
             loadfm.loaded = false;
@@ -3729,7 +3728,6 @@ function loadfm_done(mDBload) {
 
         if (hideLoadingDialog) {
             setTimeout(() => {
-                window.loadingDialog.hide();
                 window.loadingInitDialog.hide();
             }, 301);
             // Reposition UI elements right after hiding the loading overlay,

@@ -24,7 +24,6 @@ mobile.cloud = {
             this.renderInitialFolderOverlay();
 
             // Hide the loading progress
-            loadingDialog.hide();
             loadingInitDialog.hide();
 
             // Don't render anything else for now
@@ -59,7 +58,6 @@ mobile.cloud = {
         mobile.cloud.actionBar.init();
 
         // Hide the loading progress
-        loadingDialog.hide();
         loadingInitDialog.hide();
 
         // Hide other pages that may be showing and show the Cloud Drive

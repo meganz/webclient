@@ -365,8 +365,10 @@ var versiondialogid;
                             <i class="sprite-fm-mono icon-versions-previous"></i>
                         </div>`;
                     // if the user does not have full access of the shared folder.
-                    if ((nodeData && (nodeData.r < 2)) || (fileversioning.dvState === 1) ||
-                    ((i === 0) && (fileversioning.getTopNodeSync(current_sel_version[0]) === v.h))) {
+                    if (nodeData && nodeData.r < 2
+                            || i === 0
+                                && fileversioning.getTopNodeSync(current_sel_version[0]) === v.h
+                    ) {
                         revertBtnHtml =
                             `<div class="mega-button small action revert-file disabled nonclickable simpletip"
                                 data-simpletip="${l[16475]}"
@@ -490,7 +492,7 @@ var versiondialogid;
 
                 if (current_sel_version.length > 1
                     || current_sel_version[0] === fileversioning.getTopNodeSync(fileHandle)
-                    || (nodeData && nodeData.r < 2) || fileversioning.dvState === 1) {
+                    || nodeData && nodeData.r < 2) {
 
                     $rvtBtn.addClass("disabled nonclickable");
                 }

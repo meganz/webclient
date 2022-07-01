@@ -14981,6 +14981,18 @@ const openResult = ({
   return callback && typeof callback === 'function' && callback();
 };
 
+const lastActivity = room => {
+  if (!room.lastActivity || !room.ctime) {
+    room = megaChat.getChatById(room.chatId);
+  }
+
+  if (room && room.lastActivity || room.ctime) {
+    return room.lastActivity ? todayOrYesterday(room.lastActivity * 1000) ? getTimeMarker(room.lastActivity) : time2date(room.lastActivity, 17) : todayOrYesterday(room.ctime * 1000) ? getTimeMarker(room.ctime) : time2date(room.ctime, 17);
+  }
+
+  return l[8000];
+};
+
 class MessageRow extends mixins.wl {
   render() {
     const {
@@ -15065,7 +15077,7 @@ class ChatRow extends mixins.wl {
       className: USER_CARD_CLASS
     }, external_React_default().createElement("div", {
       className: "graphic"
-    }, external_React_default().createElement(utils.OFlowParsedHTML, null, result))), external_React_default().createElement("div", {
+    }, external_React_default().createElement(utils.OFlowParsedHTML, null, result)), lastActivity(room)), external_React_default().createElement("div", {
       className: "clear"
     }));
   }
@@ -15102,7 +15114,7 @@ class MemberRow extends mixins.wl {
       className: "graphic"
     }, isGroup ? external_React_default().createElement(utils.OFlowParsedHTML, null, megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.OFlowParsedHTML, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
       contact: contact
-    })))), external_React_default().createElement("div", {
+    }))), lastActivity(room)), external_React_default().createElement("div", {
       className: "clear"
     }));
   }

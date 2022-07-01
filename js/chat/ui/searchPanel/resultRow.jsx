@@ -56,6 +56,29 @@ const openResult = ({ room, messageId, index }, callback) => {
     return callback && typeof callback === 'function' && callback();
 };
 
+/**
+ * lastActivity timeStamp
+ * @description Get the last activity timestamp for individual chatRow and memberRow to display it
+ * on the search results.
+ * @param {ChatRoom} room
+ * @returns {String}
+ */
+
+const lastActivity = room => {
+    if (!room.lastActivity || !room.ctime) {
+        room = megaChat.getChatById(room.chatId);
+    }
+
+    if (room && room.lastActivity || room.ctime) {
+        return room.lastActivity ?
+            todayOrYesterday(room.lastActivity * 1000) ?
+                getTimeMarker(room.lastActivity) : time2date(room.lastActivity, 17) :
+            todayOrYesterday(room.ctime * 1000) ? getTimeMarker(room.ctime) : time2date(room.ctime, 17);
+    }
+
+    return l[8000];
+};
+
 //
 // MessageRow
 // ---------------------------------------------------------------------------------------------------------------------
@@ -134,6 +157,7 @@ class ChatRow extends MegaRenderMixin {
                     <div className="graphic">
                         <OFlowParsedHTML>{result}</OFlowParsedHTML>
                     </div>
+                    {lastActivity(room)}
                 </div>
                 <div className="clear"/>
             </div>
@@ -176,6 +200,7 @@ class MemberRow extends MegaRenderMixin {
                             </>
                         }
                     </div>
+                    {lastActivity(room)}
                 </div>
                 <div className="clear"/>
             </div>

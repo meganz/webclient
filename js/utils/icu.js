@@ -141,6 +141,21 @@ lazy(mega, 'icu', () => {
             return String(msg);
         }
     });
+
+    /**
+     * Polyfill for Intl.PluralRules for MEGA Webclient languages
+     *
+     * Based on:
+     * https://www.npmjs.com/package/intl-pluralrules
+     * https://www.npmjs.com/package/make-plural
+     *
+     * Reference for plural rules:
+     * https://unicode-org.github.io/cldr-staging/charts/latest/supplemental/language_plural_rules.html
+     *
+     * @param {string} localeVal mega.intl.locale value. First two characters should be a valid key to select._sel
+     * @returns {{select: ((function(*): (string|*))|*)}} The constructed PluralRules object with the required
+     * select function.
+     */
     function getPlurals(localeVal) {
         const select = (number) => {
             if (typeof number !== 'number') {

@@ -619,6 +619,7 @@
   display: block;
   margin: 6px 0 0 0;
   padding: 0;
+  width: 100%;
 }
 .meetings-call .sidebar.chat-opened .in-call .message.richpreview.container .buttons-block {
   float: left;

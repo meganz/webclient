@@ -78,9 +78,6 @@
     float: none;
     border-left: 1px solid var(--divider-color);
 }
-.rtl .chat-right-pad {
-    padding: 48px 0 0 4px;
-}
 .chat-right-pad {
     padding: 48px 0 0 0;
     height: 100%;
@@ -582,9 +579,6 @@ table.arc-chat-messages-block {
 }
 .chat-dropdown.content.small-pad {
     padding: 0 10px 4px 12px;
-}
-.rtl .chat-contacts-list-inner {
-    padding-left: 4px;
 }
 @-webkit-keyframes fadeinslide {
     0% {

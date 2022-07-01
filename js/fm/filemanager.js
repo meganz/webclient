@@ -2154,7 +2154,6 @@ FileManager.prototype.initContextUI = function() {
         dlmanager.abort(toabort);
         ulmanager.abort(toabort);
         $.clearTransferPanel();
-        fm_tfsupdate();
         tfsheadupdate({c: toabort});
         mega.tpw.removeRow(toabort);
 
@@ -2902,8 +2901,6 @@ FileManager.prototype.addTransferPanelUI = function() {
                     tfsheadupdate({c: target.attr('id')});
                     mega.tpw.removeRow(target.attr('id'));
                     $.clearTransferPanel();
-                    fm_tfsupdate();
-                    $.tresizer();
                 });
             }
 
@@ -3024,10 +3021,11 @@ FileManager.prototype.addTransferPanelUI = function() {
             obj.domUploadProgressText.textContent = l[1418];
             obj.domDownloadProgressText.textContent = l[1418];
             $('.nw-fm-left-icon.transfers').removeClass('transfering').find('p').removeAttr('style');
-            if (M.currentdirid === 'transfers') {
-                fm_tfsupdate();
-                $.tresizer();
-            }
+        }
+
+        if (M.currentdirid === 'transfers') {
+            fm_tfsupdate();
+            $.tresizer();
         }
     };
 

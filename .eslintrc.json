@@ -209,6 +209,7 @@
         "unicorn/prefer-dom-node-dataset": 2,
         "unicorn/prefer-includes": 1,
         "unicorn/prefer-keyboard-event-key": 1,
+        "unicorn/prefer-logical-operator-over-ternary": 2,
         "unicorn/prefer-modern-dom-apis": 1,
         "unicorn/prefer-negative-index": 2,
         "unicorn/prefer-set-has": 1,

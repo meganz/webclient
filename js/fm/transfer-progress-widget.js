@@ -180,7 +180,6 @@ mega.tpw = new function TransferProgressWidget() {
         // close event handler
         $('.transfer-progress-icon.tpw-close', $rowsHeader).off('click').on('click',
             function tpw_CloseHandler() {
-                $widget.slideUp();
                 isHiddenByUser = true;
                 mega.tpw.hideWidget();
             });
@@ -1170,7 +1169,6 @@ mega.tpw = new function TransferProgressWidget() {
 
     this.hideWidget = function() {
         $widget.addClass('hidden');
-        $widget.hide();
     };
 
     this.clearRows = function(type) {
@@ -1240,7 +1238,6 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         const processStats = function(tRemain, tBytes, tDoneBytes, tOq, tErr, blocks) {
-            const initialText = blocks.$text.text();
             if (tOq) {
                 blocks.$block.addClass('overquota');
                 blocks.$text.text(l.tfw_header_overquota);
@@ -1259,19 +1256,6 @@ mega.tpw = new function TransferProgressWidget() {
             }
             if (tRemain) {
                 $widgetTabActive.removeClass('inactive');
-            }
-            else if (
-                initialText !== l.tfw_header_complete
-                && page !== 'securechat'
-                && page.includes('chat')
-                && (
-                    blocks.$otherBlock.hasClass('hidden')
-                    || $(textSelector, blocks.$otherBlock).text() === l.tfw_header_complete
-                    && $widgetHeadAndBody.is(':visible')
-                )
-            ) {
-                $('.transfer-progress-icon.tpw-close', $rowsHeader).click();
-                isHiddenByUser = true;
             }
             setProgressCircle(blocks.$chart, tBytes, tDoneBytes);
         };
@@ -1293,7 +1277,6 @@ mega.tpw = new function TransferProgressWidget() {
         const blocks = Object.create(null);
         blocks.$block = $('.transfer-progress-type.download', $rowsHeader);
         if (tfStats.dl) {
-            blocks.$otherBlock = $('.transfer-progress-type.upload', $rowsHeader);
             blocks.$text = $(textSelector, blocks.$block);
             blocks.$chart = $downloadChart;
             processStats(tfStats.dlRemain, tfStats.dlBytes, tfStats.dlDoneBytes, tfStats.dlOq, tfStats.dlErr, blocks);
@@ -1302,7 +1285,6 @@ mega.tpw = new function TransferProgressWidget() {
         else {
             blocks.$block.addClass('hidden');
         }
-        blocks.$otherBlock = blocks.$block;
         blocks.$block = $('.transfer-progress-type.upload', $rowsHeader);
         if (tfStats.ul) {
             blocks.$text = $(textSelector, blocks.$block);

@@ -3248,6 +3248,9 @@ button.l-pane-visibility {
     height: 100%;
     z-index: 499;
 }
+body.loading .light-overlay {
+    z-index: 1200;
+}
 .not-logged .top-search-bl, .not-logged .cloud-popup-icon, .not-logged .fm-add-user, .not-logged .nw-fm-left-icon.rubbish-bin {
     display: none !important;
 }

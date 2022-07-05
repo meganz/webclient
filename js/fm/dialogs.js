@@ -396,22 +396,29 @@
         if ($.nodeSaveAs) {
             items = [$.nodeSaveAs.h];
             names[$.nodeSaveAs.h] = $.nodeSaveAs.name || '';
-            $('.summary-title.summary-selected-title', $dialog).text(l[1764]);
 
+            $('.summary-title.summary-selected-title', $dialog).text(l[1764]);
             var rowHtml = '<div class="item-row">' +
                 '<div class="transfer-filetype-icon file text"></div>' +
                 '<input id="f-name-input" class="summary-ff-name" type="text" value="' + escapeHTML($.nodeSaveAs.name)
                 + '" placeholder="' + l[17506] + '" autocomplete="off"/> &nbsp; '
                 + '</div>'
+                + '<div class="whitespaces-input-warning"> <div class="arrow"></div> <span></span></div>'
                 + '<div class="duplicated-input-warning"> <div class="arrow"></div> <span>'
                 + l[17578] + '</span> </div>';
 
             $div.safeHTML(rowHtml);
 
+            const ltWSpaceWarning = new InputFloatWarning($dialog);
+            ltWSpaceWarning.check({type: 0, name: names[$.nodeSaveAs.h], ms: 0});
+
             $('#f-name-input', $div).rebind('keydown.saveas', function(e) {
                 if (e.which === 13 || e.keyCode === 13) {
                     $('.dialog-picker-button', $dialog).trigger('click');
                 }
+            });
+            $('#f-name-input', $div).rebind('keyup.saveas', () => {
+                ltWSpaceWarning.check({type: 0});
             });
             if ($.saveAsDialog) {
                 $('#f-name-input', $dialog).focus();
@@ -1207,6 +1214,9 @@
      */
     global.openSaveAsDialog = function(node, content, cb) {
         M.safeShowDialog('saveAs', function() {
+            const ltWSpaceWarning = new InputFloatWarning($dialog);
+            ltWSpaceWarning.hide();
+
             $.saveAsCallBack = cb;
             $.nodeSaveAs = typeof node === 'string' ? M.d[node] : node;
             $.saveAsContent = content;
@@ -1732,7 +1742,7 @@
 
             if ($.nodeSaveAs) {
                 var $nameInput = $('#f-name-input', $dialog);
-                var saveAsName = $.trim($nameInput.val());
+                var saveAsName = $nameInput.val();
                 var eventName = 'input.saveas';
 
                 var removeErrorStyling = function() {
@@ -1743,29 +1753,35 @@
 
                 removeErrorStyling();
 
-                if (!M.isSafeName(saveAsName)) {
-                    // ui things
-                    $nameInput.addClass('error');
+                var errMsg = '';
 
-                    $nameInput.rebind(eventName, function() {
-                        removeErrorStyling();
-                        return false;
-                    });
-
-                    return false;
+                if (!saveAsName.trim()) {
+                    errMsg = l[5744];
                 }
-                if (duplicated(saveAsName, $.mcselected)) {
-                    // ui things
-                    $nameInput.addClass('error');
+                else if (!M.isSafeName(saveAsName)) {
+                    errMsg = saveAsName.length > 250 ? l.LongName1 : l[24708];
+                }
+                else if (duplicated(saveAsName, $.mcselected)) {
+                    errMsg = l[23219];
+                }
+
+                if (errMsg) {
+                    $('.duplicated-input-warning span', $dialog).text(errMsg);
                     $dialog.addClass('duplicate');
+                    $nameInput.addClass('error');
 
                     $nameInput.rebind(eventName, function() {
                         removeErrorStyling();
                         return false;
                     });
 
+                    setTimeout(() => {
+                        removeErrorStyling();
+                    }, 2000);
+
                     return false;
                 }
+
                 $nameInput.rebind(eventName, function() {
                     removeErrorStyling();
                     return false;

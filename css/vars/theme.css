@@ -299,7 +299,10 @@ html .theme-light-forced {
         --switch-border-inactive: rgba(182, 191, 189, 0.5);
 
         --switch-handle-fill: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(252, 252, 252, 1) 100%);
-        --switch-handle-border: rgba(0, 0, 0, 0.05);
+        --switch-handle-border: rgba(0, 0, 0, 0.1);
+
+        --switch-handle-active-icon: rgba(11, 196, 153, 1);
+        --switch-handle-inactive-icon: rgba(126, 126, 126, 1);
 
     /* dialog */
 
@@ -513,6 +516,8 @@ html .theme-dark-forced {
         --switch-border-inactive: rgba(255, 255, 255, 0.1);
         --switch-handle-fill: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(252, 252, 252, 1) 100%);
         --switch-handle-border: rgba(0, 0, 0, 0.05);
+        --switch-handle-active-icon: rgba(11, 196, 153, 1);
+        --switch-handle-inactive-icon: rgba(126, 126, 126, 1);
 
 
     /* dialog */

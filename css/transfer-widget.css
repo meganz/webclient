@@ -17,7 +17,7 @@
 .transfer-progress-widget.collapse {
     display: inline-block;
     min-width: 264px;
-    max-width: 396px;
+    max-width: 446px;
 }
 .transfer-progress-widget.expand {
     width: 536px;
@@ -30,6 +30,8 @@
     padding: 5px 0 4px;
     vertical-align: top;
     margin-left: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .transfer-panel-title .transfer-progress-txt {
     color: var(--text-color-high);
@@ -61,7 +63,9 @@
 }
 .transfer-progress-type {
     margin: 10px 0;
-    display: inline-block;
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
     align-self: flex-start;
 }
 .transfer-progress-spacing {
@@ -217,7 +221,7 @@
     height: auto;
 }
 .transfer-progress-widget .transfer-control-panel {
-    display: inline-block;
+    display: flex;
     align-self: flex-end;
     cursor: pointer;
 }

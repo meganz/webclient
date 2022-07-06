@@ -3271,6 +3271,7 @@ button.l-pane-visibility {
     height: 193px;
 }
 .transfer-panel-title {
+    display: flex;
     padding: 11px 0 0 8px;
     float: left;
 }

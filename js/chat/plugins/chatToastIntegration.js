@@ -314,11 +314,13 @@ class ChatToastIntegration {
                     })
                     .rebind('onCallPrivilegeChange', (e, userHandle, privilege) => {
                         const name = nicknames.getNickname(userHandle);
-                        const role = privilege === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL ? l[8875] : l[8874];
+                        const role = privilege === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL
+                            ? l.chat_user_role_change_op
+                            : l.chat_user_role_change_std;
 
                         ChatToast.quick(
                             /* %NAME was changed to %ROLE */
-                            l.chat_user_role_change.replace('%NAME', this.getTrimmedName(name)).replace('%ROLE', role),
+                            role.replace('%NAME', this.getTrimmedName(name)),
                             'sprite-fm-mono icon-chat-filled'
                         );
                     })

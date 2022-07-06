@@ -126,11 +126,7 @@ export default class StreamHead extends MegaRenderMixin {
                 }
             }
 
-            return (
-                moderators.length > 1 ?
-                    l.meeting_moderators.replace('%s', moderators.join(', ')) :
-                    `${l[8875] /* `Moderator` */}: ${moderators[0]}`
-            );
+            return mega.utils.trans.listToString(moderators, mega.icu.format(l.meeting_moderators, moderators.length));
         }
     };
 

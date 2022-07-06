@@ -19180,7 +19180,7 @@ class StreamHead extends mixins.wl {
           }
         }
 
-        return moderators.length > 1 ? l.meeting_moderators.replace('%s', moderators.join(', ')) : `${l[8875]}: ${moderators[0]}`;
+        return mega.utils.trans.listToString(moderators, mega.icu.format(l.meeting_moderators, moderators.length));
       }
     };
 

@@ -94,6 +94,7 @@ export default class ChatRouting {
         const method = page === 'chat' || page === 'fm/chat' || page === location
         || event && event.type === 'popstate' ? 'replaceState' : 'pushState';
 
+        mBroadcaster.sendMessage('beforepagechange', location);
         M.currentdirid = String(page = location).replace('fm/', '');
         if (location.substr(0, 13) === "chat/contacts" || location.substr(0, 13) === "chat/archived") {
             // ensure that chat/contacts is always opened with fm/ prefix

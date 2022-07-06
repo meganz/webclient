@@ -103,6 +103,7 @@ class ChatRouting {
 
     megaChat.safeForceUpdate();
     const method = page === 'chat' || page === 'fm/chat' || page === location || event && event.type === 'popstate' ? 'replaceState' : 'pushState';
+    mBroadcaster.sendMessage('beforepagechange', location);
     M.currentdirid = String(page = location).replace('fm/', '');
 
     if (location.substr(0, 13) === "chat/contacts" || location.substr(0, 13) === "chat/archived") {
@@ -5531,6 +5532,395 @@ class ContactAwareComponent extends MegaRenderMixin {
 }
 ContactAwareComponent.unavailableAvatars = Object.create(null);
 ContactAwareComponent.unavailableNames = Object.create(null);
+
+/***/ }),
+
+/***/ 142:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+"Z": () => (ChatToaster)
+});
+var react0__ = __webpack_require__(363);
+var react0 = __webpack_require__.n(react0__);
+var _mixins1__ = __webpack_require__(503);
+var _meetings_call_jsx2__ = __webpack_require__(357);
+var _ui_buttons3__ = __webpack_require__(204);
+
+
+
+
+const NAMESPACE = 'chat-toast';
+class ChatToaster extends _mixins1__.wl {
+  constructor() {
+    super();
+    this.state = {
+      toast: null,
+      endTime: 0,
+      fmToastId: null,
+      persistentToast: null
+    };
+    this.toasts = [];
+    this.persistentToasts = [];
+  }
+
+  customIsEventuallyVisible() {
+    return M.chat;
+  }
+
+  enqueueToast(e) {
+    if (this.props.showDualNotifications && e.data.options && e.data.options.persistent) {
+      this.persistentToasts.push(e.data);
+    } else {
+      this.toasts.push(e.data);
+    }
+
+    this.pollToasts();
+  }
+
+  pollToasts() {
+    const {
+      toast: shownToast,
+      persistentToast: shownPersistentToast
+    } = this.state;
+    const {
+      isRootToaster,
+      showDualNotifications,
+      onShownToast
+    } = this.props;
+    const now = Date.now();
+
+    if (this.toasts.length + this.persistentToasts.length) {
+      if (this.isMounted() && (!isRootToaster && _meetings_call_jsx2__.ZP.isExpanded() || M.chat)) {
+        if (this.toasts.length && !shownToast) {
+          this.dispatchToast(this.toasts.shift(), now);
+        }
+
+        if (showDualNotifications && this.persistentToasts.length && !shownPersistentToast) {
+          const persistentToast = this.persistentToasts.shift();
+          this.setState({
+            persistentToast
+          }, () => this.pollToasts());
+
+          if (typeof onShownToast === 'function') {
+            onShownToast(persistentToast);
+          }
+        }
+      } else if (isRootToaster && this.toasts.length && !shownToast) {
+        const toast = this.toasts.shift();
+        this.dispatchToast(toast, now, {
+          fmToastId: 'tmp'
+        });
+        window.toaster.alerts.medium(...toast.renderFM()).then(fmToastId => {
+          toast.onShown(fmToastId);
+          this.setState({
+            fmToastId
+          });
+        });
+      }
+    }
+  }
+
+  dispatchToast(toast, now, options = {}) {
+    const {
+      fmToastId,
+      endTime,
+      silent
+    } = options;
+    const {
+      onShownToast,
+      onHideToast
+    } = this.props;
+    this.setState({
+      toast,
+      endTime: endTime || now + toast.getTTL(),
+      fmToastId
+    }, () => {
+      this.eventuallyUpdate();
+
+      if (!silent) {
+        toast.onShown();
+      }
+
+      this.timeout = setTimeout(() => {
+        delete this.timeout;
+        this.setState({
+          toast: null,
+          endTime: 0
+        }, () => this.pollToasts());
+
+        if (typeof toast.onEnd === 'function') {
+          toast.onEnd();
+        }
+
+        if (typeof onHideToast === 'function') {
+          onHideToast(toast);
+        }
+      }, endTime ? endTime - now : toast.getTTL());
+    });
+
+    if (typeof onShownToast === 'function') {
+      onShownToast(toast);
+    }
+  }
+
+  onClose(persistent) {
+    const {
+      showDualNotifications,
+      onHideToast
+    } = this.props;
+    const {
+      toast,
+      persistentToast
+    } = this.state;
+
+    if (showDualNotifications && persistent) {
+      if (typeof persistentToast.onEnd === 'function') {
+        persistentToast.onEnd();
+      }
+
+      this.setState({
+        persistentToast: null
+      }, () => this.pollToasts());
+
+      if (typeof onHideToast === 'function') {
+        onHideToast(persistentToast);
+      }
+
+      return;
+    }
+
+    clearTimeout(this.timeout);
+    delete this.timeout;
+
+    if (typeof toast.onEnd === 'function') {
+      toast.onEnd();
+    }
+
+    if (typeof onHideToast === 'function') {
+      onHideToast(toast);
+    }
+
+    this.setState({
+      toast: null,
+      endTime: 0
+    }, () => this.pollToasts());
+  }
+
+  flush() {
+    const {
+      toast,
+      persistentToast
+    } = this.state;
+    this.toasts = [];
+    this.persistentToasts = [];
+
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      delete this.timeout;
+    }
+
+    if (toast) {
+      this.onClose(toast.persistent);
+    }
+
+    if (persistentToast) {
+      this.onClose(true);
+    }
+
+    this.setState({
+      toast: null,
+      endTime: 0,
+      fmToastId: null,
+      persistentToast: null
+    });
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    megaChat.rebind(`onChatToast.toaster${this.getUniqueId()}`, e => this.enqueueToast(e));
+    megaChat.rebind(`onChatToastFlush.toaster${this.getUniqueId()}`, () => this.flush());
+    onIdle(() => this.pollToasts());
+
+    if (this.props.isRootToaster) {
+      this.bpcListener = mBroadcaster.addListener('beforepagechange', tpage => {
+        const {
+          toast,
+          endTime,
+          fmToastId
+        } = this.state;
+        const now = Date.now();
+
+        if (toast && endTime - 500 > now) {
+          const toChat = tpage.includes('chat') && tpage !== 'securechat';
+
+          if (toChat && !M.chat) {
+            clearTimeout(this.timeout);
+            window.toaster.alerts.hide(fmToastId);
+            this.dispatchToast(toast, now, {
+              endTime,
+              silent: true
+            });
+          } else if (!toChat && M.chat) {
+            clearTimeout(this.timeout);
+            this.dispatchToast(toast, now, {
+              fmToastId: 'tmp',
+              endTime,
+              silent: true
+            });
+            window.toaster.alerts.medium(...toast.renderFM()).then(id => {
+              this.setState({
+                fmToastId: id
+              });
+            });
+          }
+        } else if (toast && typeof toast.onEnd === 'function') {
+          toast.onEnd();
+        }
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    megaChat.off(`onChatToast.toaster${this.getUniqueId()}`);
+    megaChat.off(`onChatToastFlush.toaster${this.getUniqueId()}`);
+
+    if (this.bpcListener) {
+      mBroadcaster.removeListener(this.bpcListener);
+    }
+
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+  }
+
+  render() {
+    const {
+      hidden,
+      isRootToaster,
+      showDualNotifications
+    } = this.props;
+    const {
+      toast,
+      fmToastId,
+      persistentToast
+    } = this.state;
+    return !hidden && !fmToastId && react0().createElement("div", {
+      className: `chat-toast-bar ${isRootToaster ? 'toaster-root' : ''}`
+    }, toast && react0().createElement(ChatToastMsg, {
+      toast: toast,
+      isRootToaster: isRootToaster,
+      onClose: p => this.onClose(p)
+    }), showDualNotifications && persistentToast && react0().createElement(ChatToastMsg, {
+      toast: persistentToast,
+      isRootToaster: isRootToaster,
+      isDualToast: !!toast,
+      usePersistentStyle: true,
+      onClose: p => this.onClose(p)
+    }));
+  }
+
+}
+
+class ChatToastMsg extends _mixins1__.wl {
+  constructor(...args) {
+    super(...args);
+    this.state = {
+      value: ''
+    };
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    const {
+      toast,
+      onClose
+    } = this.props;
+
+    if (toast.updater && typeof toast.updater === 'function') {
+      toast.updater();
+      this.updateInterval = setInterval(() => {
+        toast.updater();
+        const value = toast.render();
+
+        if (!value) {
+          return onClose(toast.options && toast.options.persistent);
+        }
+
+        if (value !== this.state.value) {
+          this.setState({
+            value
+          });
+        }
+      }, 250);
+    }
+
+    const value = toast.render();
+
+    if (value) {
+      this.setState({
+        value
+      });
+    } else {
+      onClose(toast.options && toast.options.persistent);
+    }
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+    }
+  }
+
+  render() {
+    const {
+      toast,
+      isRootToaster,
+      isDualToast,
+      usePersistentStyle,
+      onClose
+    } = this.props;
+    const {
+      value
+    } = this.state;
+
+    if (usePersistentStyle && toast.options.persistent) {
+      return react0().createElement("div", {
+        className: `${NAMESPACE} chat-persistent-toast ${isDualToast ? 'dual-toast' : ''}`
+      }, value || toast.render());
+    }
+
+    const closeButton = toast.close && react0().createElement(_ui_buttons3__.Button, {
+      className: "chat-toast-close",
+      icon: "sprite-fm-mono icon-close-component",
+      onClick: onClose
+    });
+    const icon = toast.icon && react0().createElement("i", {
+      className: toast.icon
+    });
+
+    if (isRootToaster) {
+      return react0().createElement("div", {
+        className: `${NAMESPACE} chat-toast-wrapper root-toast`
+      }, react0().createElement("div", {
+        className: "toast-value-wrapper"
+      }, icon, react0().createElement("div", {
+        className: "toast-value"
+      }, value || toast.render())), closeButton);
+    }
+
+    return react0().createElement("div", {
+      className: `${NAMESPACE} chat-toast-wrapper theme-light-forced`
+    }, react0().createElement("div", {
+      className: "toast-value"
+    }, value || toast.render()));
+  }
+
+}
 
 /***/ }),
 
@@ -15265,6 +15655,8 @@ Start.STREAMS = {
 };
 // EXTERNAL MODULE: ./js/chat/ui/contactsPanel/nil.jsx
 var nil = __webpack_require__(479);
+// EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
+var chatToaster = __webpack_require__(142);
 ;// CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
 
 
@@ -15289,6 +15681,7 @@ var conversations_PerfectScrollbar = (__webpack_require__(285).F);
 
 
 var StartGroupChatWizard = (__webpack_require__(797).C);
+
 
 
 
@@ -16460,7 +16853,9 @@ let ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (_class3 = clas
     const rightPane = conversations_React.createElement("div", {
       className: `fm-right-files-block in-chat ${is_chatlink ? " chatlink" : ""}`,
       style: rightPaneStyles
-    }, loadingOrEmpty, !isLoading && megaChat.routingSection === "archived" && conversations_React.createElement(ArchivedConversationsList, {
+    }, loadingOrEmpty, !isLoading && conversations_React.createElement(chatToaster.Z, {
+      isRootToaster: true
+    }), !isLoading && megaChat.routingSection === "archived" && conversations_React.createElement(ArchivedConversationsList, {
       key: "archivedchats"
     }), !isLoading && megaChat.routingSection === "contacts" && conversations_React.createElement(contactsPanel.Z, {
       megaChat: megaChat,
@@ -20398,7 +20793,10 @@ class ParticipantsNotice extends mixins.wl {
 
 }
 ParticipantsNotice.NAMESPACE = 'participants-notice';
+// EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
+var chatToaster = __webpack_require__(142);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/stream.jsx
+
 
 
 
@@ -20433,7 +20831,8 @@ class stream_Stream extends mixins.wl {
     this.state = {
       page: 0,
       hovered: false,
-      link: undefined
+      link: undefined,
+      overlayed: false
     };
 
     this.movePage = direction => this.setState(state => ({
@@ -20780,7 +21179,8 @@ class stream_Stream extends mixins.wl {
   render() {
     const {
       hovered,
-      link
+      link,
+      overlayed
     } = this.state;
     const {
       mode,
@@ -20822,7 +21222,9 @@ class stream_Stream extends mixins.wl {
       link: link,
       onCallMinimize: onCallMinimize,
       onModeChange: onModeChange
-    }), isOnHold ? this.renderOnHold() : null, this.renderStreamContainer(), external_React_default().createElement(streamControls, {
+    }), isOnHold ? this.renderOnHold() : overlayed && external_React_default().createElement("div", {
+      className: "call-overlay"
+    }), this.renderStreamContainer(), external_React_default().createElement(streamControls, {
       call: call,
       streams: streams,
       chatRoom: chatRoom,
@@ -20840,7 +21242,24 @@ class stream_Stream extends mixins.wl {
       sidebar: sidebar,
       onChatToggle: onChatToggle,
       onParticipantsToggle: onParticipantsToggle
-    })), external_React_default().createElement(Local, {
+    })), external_React_default().createElement(chatToaster.Z, {
+      showDualNotifications: true,
+      hidden: minimized,
+      onShownToast: t => {
+        if (t.options && t.options.persistent) {
+          this.setState({
+            overlayed: true
+          });
+        }
+      },
+      onHideToast: t => {
+        if (this.state.overlayed && t.options && t.options.persistent) {
+          this.setState({
+            overlayed: false
+          });
+        }
+      }
+    }), external_React_default().createElement(Local, {
       call: call,
       streams: streams,
       mode: mode,
@@ -21893,7 +22312,7 @@ class Call extends mixins.wl {
       const noPeers = () => {
         onCallMinimize();
 
-        if (typeof call.callToutInt !== 'undefined' && !stayOnEnd) {
+        if (typeof call.callToutId !== 'undefined' && !stayOnEnd) {
           this.showTimeoutDialog();
         }
       };

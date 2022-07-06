@@ -264,7 +264,7 @@ export default class Call extends MegaRenderMixin {
         Call.STATE.PREVIOUS = mode !== Call.MODE.MINI ? { mode, sidebar, view } : Call.STATE.PREVIOUS;
         const noPeers = () => {
             onCallMinimize();
-            if (typeof call.callToutInt !== 'undefined' && !stayOnEnd) {
+            if (typeof call.callToutId !== 'undefined' && !stayOnEnd) {
                 this.showTimeoutDialog();
             }
         };

@@ -264,7 +264,7 @@ export default class Call extends MegaRenderMixin {
         Call.STATE.PREVIOUS = mode !== Call.MODE.MINI ? { mode, sidebar, view } : Call.STATE.PREVIOUS;
         const noPeers = () => {
             onCallMinimize();
-            if (typeof call.callToutInt !== 'undefined' && !stayOnEnd) {
+            if (typeof call.callToutId !== 'undefined' && !stayOnEnd) {
                 this.showTimeoutDialog();
             }
         };
@@ -334,7 +334,7 @@ export default class Call extends MegaRenderMixin {
             return;
         }
 
-        return action === STREAM_ACTIONS.ADD ? streams.addFakeDupStream() : streams.splice(-1, 1);
+        return action === STREAM_ACTIONS.ADD ? streams.addFakeDupStream() : streams.removeFakeDupStream();
     };
 
     /**
@@ -351,7 +351,7 @@ export default class Call extends MegaRenderMixin {
         if (streamNode) {
             this.handleModeChange(Call.MODE.SPEAKER);
             this.props.call.setForcedActiveStream(streamNode.clientId);
-            this.setState({ forcedLocal: streamNode.userHandle === u_handle });
+            this.setState({ forcedLocal: streamNode.isLocal });
         }
     };
 

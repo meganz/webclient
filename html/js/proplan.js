@@ -447,11 +447,10 @@ pro.proplan = {
         var $resultBlocks = $('.compare-cell', $resultWarpper);
         var $resultTip = $('.pricing-page.compare-tip .tip', $stepOne);
         var $dots = $('.slider-dot', $sliderWrap);
-        var separator = mega.intl.decimalSeparator;
         var compareDetails = [];
 
         // Set current exchange tip value in USD
-        $resultTip.text(l[24078].replace('%1', '1.17'));
+        $resultTip.text(l[24078].replace('%1', mega.intl.number.format('1.17')));
 
         // Set compare slider labels
         $dots.get().forEach(function(e) {
@@ -463,7 +462,7 @@ pro.proplan = {
             // Set storage value labels
             if (storageValue) {
 
-                $label.safeHTML(l[23789].replace('%1', '<span>' + storageValue + '</span>'));
+                $label.safeHTML(l[23789].replace('%1', '<span>' + bytesToSize(storageValue) + '</span>'));
             }
             // Set Free Storage label
             else {
@@ -473,26 +472,30 @@ pro.proplan = {
         });
 
         // Set compare MEGA/GoogleDrive/Dropbox data for FREE/2TB/8TB/16TB plans.
+
+        const gb = 1024 * 1024 * 1024;
+        const tb = gb * 1024;
+
         compareDetails = [
             [
-                ['20 ' + l[17696], '20 ' + l[17696], '', l[16362]],
-                ['20 ' + l[17696], '2 ' + l[17696], '' , l[24075]],
-                ['20 ' + l[17696], '15 ' + l[17696], '', l[24076]]
+                ['', bytesToSize(20 * gb), '', l[16362]],
+                ['', bytesToSize(2 * gb), '' , l[24075]],
+                ['', bytesToSize(15 * gb), '', l[24076]]
             ],
             [
-                ['2 ' + l[20160], '9' + separator + '99', 'EUR', l[23818].replace('%1', l[5819])],
-                ['2 ' + l[20160], '10' + separator + '27', 'EUR', l[23947]],
-                ['2 ' + l[20160], '9' + separator + '99', 'EUR', l[23818].replace('%1', '2 ' + l[20160])]
+                [bytesToSize(2 * tb), '9.99', 'EUR', l[23818].replace('%1', l[5819])],
+                [bytesToSize(2 * tb), '10.27', 'EUR', l[23947]],
+                [bytesToSize(2 * tb), '9.99', 'EUR', l[23818].replace('%1', bytesToSize(2 * tb))]
             ],
             [
-                ['8 ' + l[20160], '19' + separator + '99', 'EUR', l[23818].replace('%1', l[6125])],
-                ['8 ' + l[20160], '', '', ''],
-                ['8 ' + l[20160], '', '', '']
+                [bytesToSize(8 * tb), '19.99', 'EUR', l[23818].replace('%1', l[6125])],
+                [bytesToSize(8 * tb), '', '', ''],
+                [bytesToSize(8 * tb), '', '', '']
             ],
             [
-                ['16 ' + l[20160], '29' + separator + '99', 'EUR', l[23818].replace('%1', l[6126])],
-                ['16 ' + l[20160], '', '', ''],
-                ['16 ' + l[20160], '', '', '']
+                [bytesToSize(16 * tb), '29.99', 'EUR', l[23818].replace('%1', l[6126])],
+                [bytesToSize(16 * tb), '', '', ''],
+                [bytesToSize(16 * tb), '', '', '']
             ]
         ];
 

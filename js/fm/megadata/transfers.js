@@ -2437,7 +2437,9 @@ function tfsheadupdate(update) {
         tfsheadupdate.stats.fdl = 0;
         tfsheadupdate.stats.ful = 0;
         tfsheadupdate.checkState = (type, id, state) =>
-            tfsheadupdate.stats[type][id] && tfsheadupdate.stats[type][id] === state ? -1 : 0;
+            tfsheadupdate.stats[type]
+            && tfsheadupdate.stats[type][id]
+            && tfsheadupdate.stats[type][id] === state ? -1 : 0;
     }
     if (update) {
         tfsheadcalc(update);
@@ -2525,7 +2527,7 @@ function tfsheadcalc(update) {
         }
         return;
     }
-    update[key] = update[key].replace('zip_', 'dl_');
+    update[key] = update[key].replace('zip_', 'dl_').replace('LOCKed_', '');
     const type = update[key].split('_')[0];
     const o = tfsheadupdate.checkState(type, update[key], STATE.OVERQUOTA);
     const e = tfsheadupdate.checkState(type, update[key], STATE.ERROR);

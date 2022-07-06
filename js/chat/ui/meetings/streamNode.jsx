@@ -1,234 +1,260 @@
 import React from 'react';
-import { MegaRenderMixin, rAFWrap, SoonFcWrap } from '../../mixins';
+import { MegaRenderMixin } from '../../mixins';
 import { Avatar } from '../contacts.jsx';
 import Call from './call.jsx';
 import StreamNodeMenu from './streamNodeMenu.jsx';
 
 export default class StreamNode extends MegaRenderMixin {
     nodeRef = React.createRef();
-    videoRef = React.createRef();
-
-    static LOADING_STATE = {
-        INITIALIZED: 1,
-        LOADING: 1,
-        LOADED: 2
-    };
-
-    static isStreaming = stream => {
-        return (
-            stream &&
-            !stream.isOnHold &&
-            (stream.source && stream.source.srcObject !== null) &&
-            (!stream.videoMuted || stream.haveScreenshare)
-        );
-    };
-
+    contRef = React.createRef();
+    statsHudRef = React.createRef();
     constructor(props) {
         super(props);
-        this.videoRef = React.createRef();
-        this.state = {
-            loading: StreamNode.LOADING_STATE.INITIALIZED,
-        };
-        if (props.stream?.addChangeListener) {
-            // e.g. not a local/fake stream
-            this._streamListener = props.stream.addChangeListener((peer, data, key) => {
-                if ((key === "videoMuted" || key === "haveScreenshare") && data[key] === false) {
-                    // changed videoMuted to false (e.g. enabled video), clear resize cache to ensure a
-                    // video re-request would be sent
-                    this._cachedResizeKey = null;
-                }
-                this.triggerFakeResize();
-            });
+        this.state = { loading: false };
+        const { stream, externalVideo } = props;
+        if (!externalVideo) {
+            this.clonedVideo = document.createElement("video");
+            this.setupVideoElement(this.clonedVideo);
+        }
+        if (!stream.isFake) {
+            stream.registerConsumer(this);
+            if (stream instanceof CallManager2.Peer) {
+                this._streamListener = stream.addChangeListener((peer, data, key) => {
+                    // console.warn("change listener");
+                    if (key === "haveScreenshare") {
+                        this._lastResizeWidth = null;
+                    }
+                    this.requestVideo();
+                });
+            }
         }
     }
-
-    @SoonFcWrap(30, true)
-    @rAFWrap()
-    updateVideoStreamThrottled() {
-        this.updateVideoStream();
-    }
-
-    triggerFakeResize(currentVisibility = 0xDEAD) {
-        if (currentVisibility === true || currentVisibility === 0xDEAD && this.isComponentVisible()) {
+    requestVideo(forceVisible) {
+        if (this.isComponentVisible() || forceVisible) {
             var node = this.findDOMNode();
-            this.onResizeObserved(node.offsetWidth, node.offsetHeight);
+            this.requestVideoBySize(node.offsetWidth, node.offsetHeight);
         }
         else {
-            this.onResizeObserved(0, 0);
+            this.requestVideoBySize(0, 0);
         }
     }
-    updateVideoStream() {
-        if (!this.isMounted()) {
+    setupVideoElement(video) {
+        if (video._snSetup) {
+            return; // already done
+        }
+        video.autoplay = true;
+        video.controls = false;
+        video.muted = true;
+        video.ondblclick = (e) => {
+            if (this.props.onDoubleClick) {
+                this.props.onDoubleClick(e, this);
+            }
+        };
+        /*
+        video.onplaying = () => {
+            this.setLoading(false);
+        };
+        */
+        video.onloadeddata = (ev) => {
+            // Trigger fake onResize when video finishes loading
+            this.requestVideo();
+            if (this.props.onLoadedData) {
+                this.props.onLoadedData(ev);
+            }
+        };
+        video._snSetup = true;
+    }
+    setLoading(loading) {
+        if (this.isMounted()) {
+            this.setState({loading: loading});
+        }
+        else {
+            this.state.loading = loading;
+        }
+    }
+    updateVideoElem() {
+        // console.warn(`updateVideoElem[${this.props.stream.clientId}]`);
+        if (!this.isMounted() || !this.contRef.current) {
+            // console.warn(`...abort: mounted: ${this.isMounted()}, contRef: ${this.contRef.current}`);
             return;
         }
 
-        if (
-            this.props.stream?.source?.srcObject &&
-            this.videoRef.current &&
-            this.videoRef.current.srcObject !== this.props.stream.source.srcObject
-        ) {
-            this.videoRef.current.srcObject = this.props.stream.source.srcObject;
-        }
+        const currVideo = this.contRef.current.firstChild; // current video in the DOM
+        const { stream, externalVideo } = this.props;
+        const { source } = stream;
 
-        if (!this.props.stream?.source?.srcObject && this.videoRef.current) {
-            this.videoRef.current.srcObject = undefined;
+        if (externalVideo) {
+            if (currVideo === source) { // That video is in the DOM already, nothing to do
+                return;
+            }
+            if (source) {
+                this.setupVideoElement(source);
+                // insert/replace the video in the DOM
+                this.contRef.current.replaceChildren(source);
+                // this.setLoading(source.readyState < 2);
+            }
+            else {
+                this.contRef.current.replaceChildren();
+            }
         }
-        if (this.props.stream && this.props.stream instanceof CallManager2.Peer && !this.props.stream.isFake) {
-            this.triggerFakeResize();
+        else {
+            if (!currVideo) {
+                // insert our cloned video in the DOM
+                this.contRef.current.replaceChildren(this.clonedVideo);
+            }
+            if (source) {
+                if (this.clonedVideo.paused || this.clonedVideo.srcObject !== source.srcObject) {
+                    this.clonedVideo.srcObject = source.srcObject;
+                    this.clonedVideo.play().catch(()=>{});
+                }
+            }
+            else {
+                SfuClient.playerStop(this.clonedVideo);
+            }
         }
-
     }
-
+    displayStats(stats) {
+        const elem = this.statsHudRef.current;
+        if (!elem) {
+            return;
+        }
+        elem.textContent = `${stats} (${this.props.externalVideo ? "ref" : "cloned"})`;
+    }
     componentDidMount() {
         super.componentDidMount();
         if (this.props.didMount) {
             this.props.didMount(this.nodeRef?.current);
         }
-        this.updateVideoStream();
+        // this.updateVideoElem();
+        this.requestVideo(true);
     }
-
     onVisibilityChange(isVisible) {
-        this.triggerFakeResize(isVisible);
+        this.requestVideo(isVisible);
     }
     componentDidUpdate() {
         super.componentDidUpdate();
         if (this.props.didUpdate) {
             this.props.didUpdate(this.nodeRef?.current);
         }
-        this.updateVideoStreamThrottled();
+        this.requestVideo();
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        const videoRef = this.videoRef && this.videoRef.current;
-        if (videoRef) {
-            videoRef.srcObject = null;
-        }
-        if (this.props.stream && this.props.stream instanceof CallManager2.Peer && !this.props.stream.isFake) {
-            this.props.stream.deregisterConsumer(this.getUniqueId());
+        const peer = this.props.stream;
+        if (peer && !peer.isFake) {
+            this.props.stream.deregisterConsumer(this);
+            // prevent hd video removal from the DOM from stopping the video
+            if (this.props.externalVideo && peer.source) { // media html elements stop playing when removed from the DOM
+                const video = peer.source;
+                video.onpause = () => {
+                    if (!video.isDestroyed) {
+                        video.play().catch(()=>{});
+                    }
+                    delete video.onpause;
+                };
+            }
         }
         if (this._streamListener) {
-            this.props.stream?.removeChangeListener(this._streamListener);
+            peer.removeChangeListener(this._streamListener);
         }
 
         if (this.props.willUnmount) {
             this.props.willUnmount();
         }
     }
-
-    @SoonFcWrap(350, true)
-    @rAFWrap()
-    onResizeObserved(w, h) {
+    requestVideoBySize(w, h) {
         const { stream } = this.props;
+        // console.warn(`requestVideoBySize[${stream.clientId}]: ${w}x${h}(lastw: ${this._lastResizeWidth})`);
 
-        if (!(stream instanceof CallManager2.Peer) || stream.isFake) {
-            // local OR fake stream
+        if (stream.isFake) {
             return;
         }
-        if (stream.videoMuted && !stream.haveScreenshare) {
-            stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.NO_VIDEO);
+        if (!this.isMounted()) {
+            // console.warn("... abort: not mounted");
             return;
         }
-
-        const prop = 'width';
-
-        // const refNode = this.videoRef.current;
-        // because if the incoming video is in portrait mode, this causes duplicated GET_HIRES -> GET_VTHUMB, so
-        // disabling for now.
-        // if (w && h && refNode) {
-        //     const vw = refNode.videoWidth;
-        //     const vh = refNode.videoHeight;
-        //     if (vw && vh) {
-        //         prop = vw / vh >= 1 ? 'width' : 'height';
-        //     }
-        // }
-
-        // save some CPU cycles.
-        const cachedResizeKey = w + ":" + h + ":" + prop;
-        if (this._cachedResizeKey === cachedResizeKey) {
+        if (!stream.isStreaming()) {
+            stream.consumerGetVideo(this, CallManager2.CALL_QUALITY.NO_VIDEO);
             return;
         }
-        this._cachedResizeKey = cachedResizeKey;
-
-        const elemProps = { width: w, height: h };
-
-        if (elemProps[prop] > 400) {
-            stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.HIGH);
-        }
-        else if (elemProps[prop] > 200) {
-            stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.MEDIUM);
-        }
-        else if (elemProps[prop] > 180) {
-            stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.LOW);
-        }
-        else if (elemProps[prop] === 0) {
-            stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.NO_VIDEO);
+        if (this.contRef.current) {
+            // if we requested video, but are unable to display it right away, don't prevent
+            // re-requesting it, even with the same size. It makes sense to initiate the
+            // video request even before we are ready to display it, to save some time.
+            // The re-request will use the previous result
+            // save some CPU cycles.
+            if (this._lastResizeWidth === w) {
+                // console.warn("... abort: same size");
+                return;
+            }
+            this._lastResizeWidth = w;
         }
         else {
-            stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.THUMB);
+            this._lastResizeWidth = null;
         }
+        let newQ;
+        if (w > 400) {
+            newQ = CallManager2.CALL_QUALITY.HIGH;
+        }
+        else if (w > 200) {
+            newQ = CallManager2.CALL_QUALITY.MEDIUM;
+        }
+        else if (w > 180) {
+            newQ = CallManager2.CALL_QUALITY.LOW;
+        }
+        else if (w === 0) {
+            newQ = CallManager2.CALL_QUALITY.NO_VIDEO;
+        }
+        else {
+            newQ = CallManager2.CALL_QUALITY.THUMB;
+        }
+        stream.consumerGetVideo(this, newQ);
     }
 
     renderVideoDebugMode = () => {
-        const { stream } = this.props;
+        const { stream, isLocal } = this.props;
 
         if (stream.isFake) {
             return null;
         }
 
-        return stream instanceof CallManager2.Peer ?
-            <div
-                className="remote-video-rtc-stats"
-                id={`rtc-stats-${stream.clientId}`} /> :
-            <div
-                className="local-video-rtc-stats"
-                id="rtc-stats-local"
-                title={window.sfuClient && new URL(window.sfuClient.url).host} />;
+        let className = "video-rtc-stats";
+        let title;
+        if (isLocal) {
+            if (window.sfuClient) {
+                title = new URL(window.sfuClient.url).host;
+            }
+            if (this.props.isSelfOverlay) {
+                className += " video-rtc-stats-ralign";
+            }
+        }
+        if (!title) {
+            title = "";
+        }
+        return <div ref={this.statsHudRef} className={className} title={title} />;
     };
 
     renderContent = () => {
-        const { stream, isCallOnHold, onDoubleClick, onLoadedData } = this.props;
+        const { stream, isCallOnHold } = this.props;
         const { loading } = this.state;
 
-        if (StreamNode.isStreaming(stream) && !isCallOnHold) {
+        if (stream && stream.isStreaming() && !isCallOnHold) {
             return (
                 <>
-                    {loading !== StreamNode.LOADING_STATE.LOADED && (
-                        <i className="sprite-fm-theme icon-loading-spinner loading-icon" />
+                    {loading && (
+                        <i className="sprite-fm-theme icon-loading-spinner loading-icon"/>
                     )}
-                    <video
-                        ref={this.videoRef}
-                        onDoubleClick={(e) => {
-                            if (onDoubleClick) {
-                                onDoubleClick(e, this);
-                            }
-                        }}
-                        autoPlay={true}
-                        controls={false}
-                        muted={true}
-                        onLoadStart={() => {
-                            this.setState({ loading: StreamNode.LOADING_STATE.LOADING });
-                        }}
-                        onWaiting={() => {
-                            this.setState({ loading: StreamNode.LOADING_STATE.LOADING });
-                        }}
-                        onPlaying={() => {
-                            this.setState({ loading: StreamNode.LOADING_STATE.LOADED });
-                        }}
-                        onLoadedData={ev => {
-                            // Trigger fake onResize when video finishes loading
-                            this.triggerFakeResize();
-
-                            if (onLoadedData) {
-                                onLoadedData(ev);
-                            }
-                        }}
+                    <div
+                        ref={this.contRef}
+                        className="stream-node-holder"
                     />
                 </>
             );
         }
 
-        return <Avatar contact={M.u[stream.userHandle]} />;
+        delete this._lastResizeWidth;
+        return <Avatar contact={M.u[stream.userHandle]}/>;
     };
 
     getStatusIcon = (icon, label) => {
@@ -296,7 +322,7 @@ export default class StreamNode extends MegaRenderMixin {
                     stream-node
                     ${onClick ? 'clickable' : ''}
                     ${className ? className : ''}
-                    ${this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : ''}
+                    ${this.state.loading ? 'loading' : ''}
                     ${simpletip ? 'simpletip' : ''}
                 `}
                 data-simpletip={simpletip?.label}
@@ -317,7 +343,7 @@ export default class StreamNode extends MegaRenderMixin {
                             />
                         )}
                         <div className="stream-node-content">
-                            {SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : ''}
+                            {SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null}
                             {this.renderContent()}
                             {mode === Call.MODE.MINI || minimized ? null : this.renderStatus()}
                         </div>

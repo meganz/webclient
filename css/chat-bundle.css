@@ -285,6 +285,15 @@
   font: var(--text-h3);
   color: var(--secondary-white);
 }
+.meetings-call .stream .call-overlay {
+  background: rgba(0, 0, 0, 0.32);
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
 .meetings-call .stream .on-hold-overlay {
   z-index: 10;
   width: 100%;
@@ -513,6 +522,11 @@
   --icon-size: 24px;
   --mask-color: var(--icon-rest);
 }
+.meetings-call .sidebar .participants ul li .name span img.emoji.big {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+}
 .meetings-call .sidebar .participants ul li .status {
   float: right;
   margin: 5px 0 0 0;
@@ -614,6 +628,7 @@
   display: block;
   margin: 6px 0 0 0;
   padding: 0;
+  width: 100%;
 }
 .meetings-call .sidebar.chat-opened .in-call .message.richpreview.container .buttons-block {
   float: left;
@@ -1050,24 +1065,22 @@
   -webkit-animation: rotate 1s infinite linear;
   animation: rotate 1s infinite linear;
 }
-.stream-node-content .remote-video-rtc-stats {
+.stream-node-content .video-rtc-stats {
   position: absolute;
   color: #0f0;
   padding-left: 4px;
+  padding-right: 4px;
   padding-top: 0;
-  text-shadow: 0 0 4px black;
-  z-index: 20;
-}
-.stream-node-content .local-video-rtc-stats {
-  position: absolute;
-  color: #0f0;
-  padding-right: 10px;
-  right: 0;
   text-shadow: 0 0 4px black;
   z-index: 20;
   font-size: 6pt;
 }
-.stream-node-content video {
+.stream-node-content .video-rtc-stats-ralign {
+  width: 80%;
+  right: 0;
+}
+.stream-node-content video,
+.stream-node-content .stream-node-holder {
   width: 100%;
   height: 100%;
 }
@@ -1460,6 +1473,107 @@
   position: relative;
 }
 
+.chat-toast-bar {
+  position: absolute;
+  width: 100%;
+}
+.chat-toast-bar.toaster-root {
+  width: calc(100% - 256px);
+}
+.chat-toast-bar .chat-toast {
+  position: relative;
+  width: fit-content;
+  z-index: 10;
+}
+.chat-toast-bar .chat-toast.chat-toast-wrapper {
+  --surface-alpha: 0.95;
+  background: var(--surface-main);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-sizing: border-box;
+  display: flex;
+  font: var(--text-h3-bold);
+  height: 56px;
+  justify-content: space-between;
+  margin: 80px auto 0;
+  padding: 16px 32px;
+}
+.chat-toast-bar .chat-toast.chat-toast-wrapper.root-toast {
+  --surface-alpha: 1;
+  border: unset;
+  box-shadow: var(--dialog-shadow);
+  height: 64px;
+  left: 50%;
+  margin: 56px 0;
+  padding: 20px;
+  transform: translateX(-50%);
+  width: 640px;
+  z-index: 100;
+  -webkit-transform: translateX(-50%);
+}
+.chat-toast-bar .chat-toast.chat-toast-wrapper.root-toast .chat-toast-close {
+  height: 36px;
+  position: relative;
+  top: 4px;
+  width: 36px;
+}
+.chat-toast-bar .chat-toast.chat-toast-wrapper.root-toast .chat-toast-close div:hover {
+  background: var(--surface-grey-2);
+  border-radius: 4px;
+}
+.chat-toast-bar .chat-toast.chat-toast-wrapper.root-toast .chat-toast-close i {
+  margin: 6px;
+}
+.chat-toast-bar .chat-toast.chat-toast-wrapper .toast-value-wrapper {
+  align-self: flex-start;
+  display: flex;
+}
+.chat-toast-bar .chat-toast.chat-toast-wrapper i {
+  --icon-size: 24px;
+  margin-inline-end: 12px;
+  -webkit-margin-start: 12px;
+}
+.chat-toast-bar .chat-toast.chat-toast-wrapper .toast-value {
+  color: var(--text-color-high);
+  font: var(--text-body1);
+  margin: auto 0;
+}
+.chat-toast-bar .chat-toast.chat-toast-wrapper .chat-toast-close {
+  align-self: flex-end;
+}
+.chat-toast-bar .chat-toast.chat-persistent-toast {
+  animation: toastfadeinout 4s linear infinite;
+  color: #FFFFFF;
+  font: var(--text-h1-bold);
+  margin: 168px auto 0;
+  -webkit-animation: toastfadeinout 4s linear infinite;
+}
+.chat-toast-bar .chat-toast.chat-persistent-toast.dual-toast {
+  margin-top: 32px;
+}
+
+@keyframes toastfadeinout {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@-webkit-keyframes toastfadeinout {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
 .start-meeting {
   overflow: hidden;
   height: 520px;
@@ -2164,3 +2278,5 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   --icon-size: 24px;
   --mask-color: var(--secondary-white);
 }
+
+/*# sourceMappingURL=chat-bundle.css.map */

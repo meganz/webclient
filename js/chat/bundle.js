@@ -103,6 +103,7 @@ class ChatRouting {
 
     megaChat.safeForceUpdate();
     const method = page === 'chat' || page === 'fm/chat' || page === location || event && event.type === 'popstate' ? 'replaceState' : 'pushState';
+    mBroadcaster.sendMessage('beforepagechange', location);
     M.currentdirid = String(page = location).replace('fm/', '');
 
     if (location.substr(0, 13) === "chat/contacts" || location.substr(0, 13) === "chat/archived") {
@@ -4231,7 +4232,9 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     }, r.url.replace("https://", "wss://"));
     app.sfuClient.muteAudio(!audio);
     app.sfuClient.muteCamera(!video);
-    return app.sfuClient.connect(r.url, callId, this.type !== "private");
+    return app.sfuClient.connect(r.url, callId, {
+      isGroup: this.type !== "private"
+    });
   }, ex => {
     console.error('Failed to join call:', ex);
     this.meetingsLoading = false;
@@ -4317,7 +4320,9 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
         this.meetingsLoading = false;
       }
     });
-    sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, this.type !== "private");
+    sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, {
+      isGroup: this.type !== "private"
+    });
   }, ex => {
     console.error('Failed to start call:', ex);
     this.meetingsLoading = false;
@@ -4601,7 +4606,6 @@ __webpack_require__.d(__webpack_exports__, {
 "Os": () => (schedule),
 "Rc": () => (replaceAt),
 "_p": () => (ContactAwareComponent),
-"py": () => (rAFWrap),
 "qC": () => (compose),
 "wl": () => (MegaRenderMixin)
 });
@@ -5531,6 +5535,395 @@ class ContactAwareComponent extends MegaRenderMixin {
 }
 ContactAwareComponent.unavailableAvatars = Object.create(null);
 ContactAwareComponent.unavailableNames = Object.create(null);
+
+/***/ }),
+
+/***/ 142:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+"Z": () => (ChatToaster)
+});
+var react0__ = __webpack_require__(363);
+var react0 = __webpack_require__.n(react0__);
+var _mixins1__ = __webpack_require__(503);
+var _meetings_call_jsx2__ = __webpack_require__(357);
+var _ui_buttons3__ = __webpack_require__(204);
+
+
+
+
+const NAMESPACE = 'chat-toast';
+class ChatToaster extends _mixins1__.wl {
+  constructor() {
+    super();
+    this.state = {
+      toast: null,
+      endTime: 0,
+      fmToastId: null,
+      persistentToast: null
+    };
+    this.toasts = [];
+    this.persistentToasts = [];
+  }
+
+  customIsEventuallyVisible() {
+    return M.chat;
+  }
+
+  enqueueToast(e) {
+    if (this.props.showDualNotifications && e.data.options && e.data.options.persistent) {
+      this.persistentToasts.push(e.data);
+    } else {
+      this.toasts.push(e.data);
+    }
+
+    this.pollToasts();
+  }
+
+  pollToasts() {
+    const {
+      toast: shownToast,
+      persistentToast: shownPersistentToast
+    } = this.state;
+    const {
+      isRootToaster,
+      showDualNotifications,
+      onShownToast
+    } = this.props;
+    const now = Date.now();
+
+    if (this.toasts.length + this.persistentToasts.length) {
+      if (this.isMounted() && (!isRootToaster && _meetings_call_jsx2__.ZP.isExpanded() || M.chat)) {
+        if (this.toasts.length && !shownToast) {
+          this.dispatchToast(this.toasts.shift(), now);
+        }
+
+        if (showDualNotifications && this.persistentToasts.length && !shownPersistentToast) {
+          const persistentToast = this.persistentToasts.shift();
+          this.setState({
+            persistentToast
+          }, () => this.pollToasts());
+
+          if (typeof onShownToast === 'function') {
+            onShownToast(persistentToast);
+          }
+        }
+      } else if (isRootToaster && this.toasts.length && !shownToast) {
+        const toast = this.toasts.shift();
+        this.dispatchToast(toast, now, {
+          fmToastId: 'tmp'
+        });
+        window.toaster.alerts.medium(...toast.renderFM()).then(fmToastId => {
+          toast.onShown(fmToastId);
+          this.setState({
+            fmToastId
+          });
+        });
+      }
+    }
+  }
+
+  dispatchToast(toast, now, options = {}) {
+    const {
+      fmToastId,
+      endTime,
+      silent
+    } = options;
+    const {
+      onShownToast,
+      onHideToast
+    } = this.props;
+    this.setState({
+      toast,
+      endTime: endTime || now + toast.getTTL(),
+      fmToastId
+    }, () => {
+      this.eventuallyUpdate();
+
+      if (!silent) {
+        toast.onShown();
+      }
+
+      this.timeout = setTimeout(() => {
+        delete this.timeout;
+        this.setState({
+          toast: null,
+          endTime: 0
+        }, () => this.pollToasts());
+
+        if (typeof toast.onEnd === 'function') {
+          toast.onEnd();
+        }
+
+        if (typeof onHideToast === 'function') {
+          onHideToast(toast);
+        }
+      }, endTime ? endTime - now : toast.getTTL());
+    });
+
+    if (typeof onShownToast === 'function') {
+      onShownToast(toast);
+    }
+  }
+
+  onClose(persistent) {
+    const {
+      showDualNotifications,
+      onHideToast
+    } = this.props;
+    const {
+      toast,
+      persistentToast
+    } = this.state;
+
+    if (showDualNotifications && persistent) {
+      if (typeof persistentToast.onEnd === 'function') {
+        persistentToast.onEnd();
+      }
+
+      this.setState({
+        persistentToast: null
+      }, () => this.pollToasts());
+
+      if (typeof onHideToast === 'function') {
+        onHideToast(persistentToast);
+      }
+
+      return;
+    }
+
+    clearTimeout(this.timeout);
+    delete this.timeout;
+
+    if (typeof toast.onEnd === 'function') {
+      toast.onEnd();
+    }
+
+    if (typeof onHideToast === 'function') {
+      onHideToast(toast);
+    }
+
+    this.setState({
+      toast: null,
+      endTime: 0
+    }, () => this.pollToasts());
+  }
+
+  flush() {
+    const {
+      toast,
+      persistentToast
+    } = this.state;
+    this.toasts = [];
+    this.persistentToasts = [];
+
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      delete this.timeout;
+    }
+
+    if (toast) {
+      this.onClose(toast.persistent);
+    }
+
+    if (persistentToast) {
+      this.onClose(true);
+    }
+
+    this.setState({
+      toast: null,
+      endTime: 0,
+      fmToastId: null,
+      persistentToast: null
+    });
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    megaChat.rebind(`onChatToast.toaster${this.getUniqueId()}`, e => this.enqueueToast(e));
+    megaChat.rebind(`onChatToastFlush.toaster${this.getUniqueId()}`, () => this.flush());
+    onIdle(() => this.pollToasts());
+
+    if (this.props.isRootToaster) {
+      this.bpcListener = mBroadcaster.addListener('beforepagechange', tpage => {
+        const {
+          toast,
+          endTime,
+          fmToastId
+        } = this.state;
+        const now = Date.now();
+
+        if (toast && endTime - 500 > now) {
+          const toChat = tpage.includes('chat') && tpage !== 'securechat';
+
+          if (toChat && !M.chat) {
+            clearTimeout(this.timeout);
+            window.toaster.alerts.hide(fmToastId);
+            this.dispatchToast(toast, now, {
+              endTime,
+              silent: true
+            });
+          } else if (!toChat && M.chat) {
+            clearTimeout(this.timeout);
+            this.dispatchToast(toast, now, {
+              fmToastId: 'tmp',
+              endTime,
+              silent: true
+            });
+            window.toaster.alerts.medium(...toast.renderFM()).then(id => {
+              this.setState({
+                fmToastId: id
+              });
+            });
+          }
+        } else if (toast && typeof toast.onEnd === 'function') {
+          toast.onEnd();
+        }
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    megaChat.off(`onChatToast.toaster${this.getUniqueId()}`);
+    megaChat.off(`onChatToastFlush.toaster${this.getUniqueId()}`);
+
+    if (this.bpcListener) {
+      mBroadcaster.removeListener(this.bpcListener);
+    }
+
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+  }
+
+  render() {
+    const {
+      hidden,
+      isRootToaster,
+      showDualNotifications
+    } = this.props;
+    const {
+      toast,
+      fmToastId,
+      persistentToast
+    } = this.state;
+    return !hidden && !fmToastId && react0().createElement("div", {
+      className: `chat-toast-bar ${isRootToaster ? 'toaster-root' : ''}`
+    }, toast && react0().createElement(ChatToastMsg, {
+      toast: toast,
+      isRootToaster: isRootToaster,
+      onClose: p => this.onClose(p)
+    }), showDualNotifications && persistentToast && react0().createElement(ChatToastMsg, {
+      toast: persistentToast,
+      isRootToaster: isRootToaster,
+      isDualToast: !!toast,
+      usePersistentStyle: true,
+      onClose: p => this.onClose(p)
+    }));
+  }
+
+}
+
+class ChatToastMsg extends _mixins1__.wl {
+  constructor(...args) {
+    super(...args);
+    this.state = {
+      value: ''
+    };
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    const {
+      toast,
+      onClose
+    } = this.props;
+
+    if (toast.updater && typeof toast.updater === 'function') {
+      toast.updater();
+      this.updateInterval = setInterval(() => {
+        toast.updater();
+        const value = toast.render();
+
+        if (!value) {
+          return onClose(toast.options && toast.options.persistent);
+        }
+
+        if (value !== this.state.value) {
+          this.setState({
+            value
+          });
+        }
+      }, 250);
+    }
+
+    const value = toast.render();
+
+    if (value) {
+      this.setState({
+        value
+      });
+    } else {
+      onClose(toast.options && toast.options.persistent);
+    }
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+    }
+  }
+
+  render() {
+    const {
+      toast,
+      isRootToaster,
+      isDualToast,
+      usePersistentStyle,
+      onClose
+    } = this.props;
+    const {
+      value
+    } = this.state;
+
+    if (usePersistentStyle && toast.options.persistent) {
+      return react0().createElement("div", {
+        className: `${NAMESPACE} chat-persistent-toast ${isDualToast ? 'dual-toast' : ''}`
+      }, value || toast.render());
+    }
+
+    const closeButton = toast.close && react0().createElement(_ui_buttons3__.Button, {
+      className: "chat-toast-close",
+      icon: "sprite-fm-mono icon-close-component",
+      onClick: onClose
+    });
+    const icon = toast.icon && react0().createElement("i", {
+      className: toast.icon
+    });
+
+    if (isRootToaster) {
+      return react0().createElement("div", {
+        className: `${NAMESPACE} chat-toast-wrapper root-toast`
+      }, react0().createElement("div", {
+        className: "toast-value-wrapper"
+      }, icon, react0().createElement("div", {
+        className: "toast-value"
+      }, value || toast.render())), closeButton);
+    }
+
+    return react0().createElement("div", {
+      className: `${NAMESPACE} chat-toast-wrapper theme-light-forced`
+    }, react0().createElement("div", {
+      className: "toast-value"
+    }, value || toast.render()));
+  }
+
+}
 
 /***/ }),
 
@@ -9374,23 +9767,6 @@ class CloudBrowserDialog extends mixins.wl {
       }
     }];
 
-    if (!folderIsHighlighted || this.props.folderSelectable) {
-      buttons.push({
-        "label": this.props.selectLabel,
-        "key": "select",
-        "className": "positive " + (this.state.selected.length === 0 || share && share.down ? "disabled" : ""),
-        "onClick": e => {
-          if (this.state.selected.length > 0) {
-            this.props.onSelected(this.state.selected.filter(node => !M.getNodeShare(node).down));
-            this.props.onAttachClicked();
-          }
-
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
-    }
-
     if (folderIsHighlighted) {
       const {
         highlighted
@@ -9440,6 +9816,23 @@ class CloudBrowserDialog extends mixins.wl {
           });
         }
       } : null);
+    }
+
+    if (!folderIsHighlighted || this.props.folderSelectable) {
+      buttons.push({
+        "label": this.props.selectLabel,
+        "key": "select",
+        "className": "positive " + (this.state.selected.length === 0 || share && share.down ? "disabled" : ""),
+        "onClick": e => {
+          if (this.state.selected.length > 0) {
+            this.props.onSelected(this.state.selected.filter(node => !M.getNodeShare(node).down));
+            this.props.onAttachClicked();
+          }
+
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
     }
 
     var clearSearchBtn = null;
@@ -15265,6 +15658,8 @@ Start.STREAMS = {
 };
 // EXTERNAL MODULE: ./js/chat/ui/contactsPanel/nil.jsx
 var nil = __webpack_require__(479);
+// EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
+var chatToaster = __webpack_require__(142);
 ;// CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
 
 
@@ -15289,6 +15684,7 @@ var conversations_PerfectScrollbar = (__webpack_require__(285).F);
 
 
 var StartGroupChatWizard = (__webpack_require__(797).C);
+
 
 
 
@@ -16460,7 +16856,9 @@ let ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (_class3 = clas
     const rightPane = conversations_React.createElement("div", {
       className: `fm-right-files-block in-chat ${is_chatlink ? " chatlink" : ""}`,
       style: rightPaneStyles
-    }, loadingOrEmpty, !isLoading && megaChat.routingSection === "archived" && conversations_React.createElement(ArchivedConversationsList, {
+    }, loadingOrEmpty, !isLoading && conversations_React.createElement(chatToaster.Z, {
+      isRootToaster: true
+    }), !isLoading && megaChat.routingSection === "archived" && conversations_React.createElement(ArchivedConversationsList, {
       key: "archivedchats"
     }), !isLoading && megaChat.routingSection === "contacts" && conversations_React.createElement(contactsPanel.Z, {
       megaChat: megaChat,
@@ -18782,7 +19180,7 @@ class StreamHead extends mixins.wl {
           }
         }
 
-        return moderators.length > 1 ? l.meeting_moderators.replace('%s', moderators.join(', ')) : `${l[8875]}: ${moderators[0]}`;
+        return mega.utils.trans.listToString(moderators, mega.icu.format(l.meeting_moderators, moderators.length));
       }
     };
 
@@ -18934,8 +19332,6 @@ StreamHead.EVENTS = {
   SIMPLETIP: new Event('simpletipClose'),
   CLICK_DIALOG: 'click'
 };
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(229);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 var ui_contacts = __webpack_require__(13);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamNodeMenu.jsx
@@ -19067,89 +19463,69 @@ StreamNodeMenu.NAMESPACE = 'node-menu';
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamNode.jsx
 
 
-var _dec, _dec2, _dec3, _dec4, _class, _class2;
 
 
 
-
-
-
-let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3 = (0,mixins.M9)(350, true), _dec4 = (0,mixins.py)(), (_class = (_class2 = class StreamNode extends mixins.wl {
+class StreamNode extends mixins.wl {
   constructor(props) {
-    var _props$stream;
-
     super(props);
     this.nodeRef = external_React_default().createRef();
-    this.videoRef = external_React_default().createRef();
+    this.contRef = external_React_default().createRef();
+    this.statsHudRef = external_React_default().createRef();
 
     this.renderVideoDebugMode = () => {
       const {
-        stream
+        stream,
+        isLocal
       } = this.props;
 
       if (stream.isFake) {
         return null;
       }
 
-      return stream instanceof CallManager2.Peer ? external_React_default().createElement("div", {
-        className: "remote-video-rtc-stats",
-        id: `rtc-stats-${stream.clientId}`
-      }) : external_React_default().createElement("div", {
-        className: "local-video-rtc-stats",
-        id: "rtc-stats-local",
-        title: window.sfuClient && new URL(window.sfuClient.url).host
+      let className = "video-rtc-stats";
+      let title;
+
+      if (isLocal) {
+        if (window.sfuClient) {
+          title = new URL(window.sfuClient.url).host;
+        }
+
+        if (this.props.isSelfOverlay) {
+          className += " video-rtc-stats-ralign";
+        }
+      }
+
+      if (!title) {
+        title = "";
+      }
+
+      return external_React_default().createElement("div", {
+        ref: this.statsHudRef,
+        className: className,
+        title: title
       });
     };
 
     this.renderContent = () => {
       const {
         stream,
-        isCallOnHold,
-        onDoubleClick,
-        onLoadedData
+        isCallOnHold
       } = this.props;
       const {
         loading
       } = this.state;
 
-      if (StreamNode.isStreaming(stream) && !isCallOnHold) {
-        return external_React_default().createElement((external_React_default()).Fragment, null, loading !== StreamNode.LOADING_STATE.LOADED && external_React_default().createElement("i", {
+      if (stream && stream.isStreaming() && !isCallOnHold) {
+        return external_React_default().createElement((external_React_default()).Fragment, null, loading && external_React_default().createElement("i", {
           className: "sprite-fm-theme icon-loading-spinner loading-icon"
-        }), external_React_default().createElement("video", {
-          ref: this.videoRef,
-          onDoubleClick: e => {
-            if (onDoubleClick) {
-              onDoubleClick(e, this);
-            }
-          },
-          autoPlay: true,
-          controls: false,
-          muted: true,
-          onLoadStart: () => {
-            this.setState({
-              loading: StreamNode.LOADING_STATE.LOADING
-            });
-          },
-          onWaiting: () => {
-            this.setState({
-              loading: StreamNode.LOADING_STATE.LOADING
-            });
-          },
-          onPlaying: () => {
-            this.setState({
-              loading: StreamNode.LOADING_STATE.LOADED
-            });
-          },
-          onLoadedData: ev => {
-            this.triggerFakeResize();
-
-            if (onLoadedData) {
-              onLoadedData(ev);
-            }
-          }
+        }), external_React_default().createElement("div", {
+          ref: this.contRef,
+          className: "stream-node-holder"
         }));
       }
 
+      delete this._lastResizeWidth;
       return external_React_default().createElement(ui_contacts.Avatar, {
         contact: M.u[stream.userHandle]
       });
@@ -19197,53 +19573,128 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
       return external_React_default().createElement((external_React_default()).Fragment, null, mode === Call.MODE.SPEAKER && Call.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin call-role-icon', l[8875]), external_React_default().createElement($$CONTAINER, null, muted ? this.getStatusIcon('icon-audio-off', l.muted) : null, hasSlowNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null));
     };
 
-    this.videoRef = external_React_default().createRef();
     this.state = {
-      loading: StreamNode.LOADING_STATE.INITIALIZED
+      loading: false
     };
+    const {
+      stream: _stream,
+      externalVideo
+    } = props;
 
-    if ((_props$stream = props.stream) != null && _props$stream.addChangeListener) {
-      this._streamListener = props.stream.addChangeListener((peer, data, key) => {
-        if ((key === "videoMuted" || key === "haveScreenshare") && data[key] === false) {
-          this._cachedResizeKey = null;
-        }
+    if (!externalVideo) {
+      this.clonedVideo = document.createElement("video");
+      this.setupVideoElement(this.clonedVideo);
+    }
 
-        this.triggerFakeResize();
-      });
+    if (!_stream.isFake) {
+      _stream.registerConsumer(this);
+
+      if (_stream instanceof CallManager2.Peer) {
+        this._streamListener = _stream.addChangeListener((peer, data, key) => {
+          if (key === "haveScreenshare") {
+            this._lastResizeWidth = null;
+          }
+
+          this.requestVideo();
+        });
+      }
     }
   }
 
-  updateVideoStreamThrottled() {
-    this.updateVideoStream();
-  }
-
-  triggerFakeResize(currentVisibility = 0xDEAD) {
-    if (currentVisibility === true || currentVisibility === 0xDEAD && this.isComponentVisible()) {
+  requestVideo(forceVisible) {
+    if (this.isComponentVisible() || forceVisible) {
       var node = this.findDOMNode();
-      this.onResizeObserved(node.offsetWidth, node.offsetHeight);
+      this.requestVideoBySize(node.offsetWidth, node.offsetHeight);
     } else {
-      this.onResizeObserved(0, 0);
+      this.requestVideoBySize(0, 0);
     }
   }
 
-  updateVideoStream() {
-    var _this$props$stream, _this$props$stream$so, _this$props$stream2, _this$props$stream2$s;
-
-    if (!this.isMounted()) {
+  setupVideoElement(video) {
+    if (video._snSetup) {
       return;
     }
 
-    if ((_this$props$stream = this.props.stream) != null && (_this$props$stream$so = _this$props$stream.source) != null && _this$props$stream$so.srcObject && this.videoRef.current && this.videoRef.current.srcObject !== this.props.stream.source.srcObject) {
-      this.videoRef.current.srcObject = this.props.stream.source.srcObject;
+    video.autoplay = true;
+    video.controls = false;
+    video.muted = true;
+
+    video.ondblclick = e => {
+      if (this.props.onDoubleClick) {
+        this.props.onDoubleClick(e, this);
+      }
+    };
+
+    video.onloadeddata = ev => {
+      this.requestVideo();
+
+      if (this.props.onLoadedData) {
+        this.props.onLoadedData(ev);
+      }
+    };
+
+    video._snSetup = true;
+  }
+
+  setLoading(loading) {
+    if (this.isMounted()) {
+      this.setState({
+        loading: loading
+      });
+    } else {
+      this.state.loading = loading;
+    }
+  }
+
+  updateVideoElem() {
+    if (!this.isMounted() || !this.contRef.current) {
+      return;
     }
 
-    if (!((_this$props$stream2 = this.props.stream) != null && (_this$props$stream2$s = _this$props$stream2.source) != null && _this$props$stream2$s.srcObject) && this.videoRef.current) {
-      this.videoRef.current.srcObject = undefined;
+    const currVideo = this.contRef.current.firstChild;
+    const {
+      stream,
+      externalVideo
+    } = this.props;
+    const {
+      source
+    } = stream;
+
+    if (externalVideo) {
+      if (currVideo === source) {
+        return;
+      }
+
+      if (source) {
+        this.setupVideoElement(source);
+        this.contRef.current.replaceChildren(source);
+      } else {
+        this.contRef.current.replaceChildren();
+      }
+    } else {
+      if (!currVideo) {
+        this.contRef.current.replaceChildren(this.clonedVideo);
+      }
+
+      if (source) {
+        if (this.clonedVideo.paused || this.clonedVideo.srcObject !== source.srcObject) {
+          this.clonedVideo.srcObject = source.srcObject;
+          this.clonedVideo.play().catch(() => {});
+        }
+      } else {
+        SfuClient.playerStop(this.clonedVideo);
+      }
+    }
+  }
+
+  displayStats(stats) {
+    const elem = this.statsHudRef.current;
+
+    if (!elem) {
+      return;
     }
 
-    if (this.props.stream && this.props.stream instanceof CallManager2.Peer && !this.props.stream.isFake) {
-      this.triggerFakeResize();
-    }
+    elem.textContent = `${stats} (${this.props.externalVideo ? "ref" : "cloned"})`;
   }
 
   componentDidMount() {
@@ -19255,11 +19706,11 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
       this.props.didMount((_this$nodeRef = this.nodeRef) == null ? void 0 : _this$nodeRef.current);
     }
 
-    this.updateVideoStream();
+    this.requestVideo(true);
   }
 
   onVisibilityChange(isVisible) {
-    this.triggerFakeResize(isVisible);
+    this.requestVideo(isVisible);
   }
 
   componentDidUpdate() {
@@ -19271,25 +19722,31 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
       this.props.didUpdate((_this$nodeRef2 = this.nodeRef) == null ? void 0 : _this$nodeRef2.current);
     }
 
-    this.updateVideoStreamThrottled();
+    this.requestVideo();
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    const videoRef = this.videoRef && this.videoRef.current;
+    const peer = this.props.stream;
 
-    if (videoRef) {
-      videoRef.srcObject = null;
-    }
+    if (peer && !peer.isFake) {
+      this.props.stream.deregisterConsumer(this);
 
-    if (this.props.stream && this.props.stream instanceof CallManager2.Peer && !this.props.stream.isFake) {
-      this.props.stream.deregisterConsumer(this.getUniqueId());
+      if (this.props.externalVideo && peer.source) {
+        const video = peer.source;
+
+        video.onpause = () => {
+          if (!video.isDestroyed) {
+            video.play().catch(() => {});
+          }
+
+          delete video.onpause;
+        };
+      }
     }
 
     if (this._streamListener) {
-      var _this$props$stream3;
-
-      (_this$props$stream3 = this.props.stream) == null ? void 0 : _this$props$stream3.removeChangeListener(this._streamListener);
+      peer.removeChangeListener(this._streamListener);
     }
 
     if (this.props.willUnmount) {
@@ -19297,43 +19754,49 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
     }
   }
 
-  onResizeObserved(w, h) {
+  requestVideoBySize(w) {
     const {
       stream
     } = this.props;
 
-    if (!(stream instanceof CallManager2.Peer) || stream.isFake) {
+    if (stream.isFake) {
       return;
     }
 
-    if (stream.videoMuted && !stream.haveScreenshare) {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.NO_VIDEO);
+    if (!this.isMounted()) {
       return;
     }
 
-    const cachedResizeKey = w + ":" + h + ":" + "width";
-
-    if (this._cachedResizeKey === cachedResizeKey) {
+    if (!stream.isStreaming()) {
+      stream.consumerGetVideo(this, CallManager2.CALL_QUALITY.NO_VIDEO);
       return;
     }
 
-    this._cachedResizeKey = cachedResizeKey;
-    const elemProps = {
-      width: w,
-      height: h
-    };
+    if (this.contRef.current) {
+      if (this._lastResizeWidth === w) {
+        return;
+      }
 
-    if (elemProps["width"] > 400) {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.HIGH);
-    } else if (elemProps["width"] > 200) {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.MEDIUM);
-    } else if (elemProps["width"] > 180) {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.LOW);
-    } else if (elemProps["width"] === 0) {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.NO_VIDEO);
+      this._lastResizeWidth = w;
     } else {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.THUMB);
+      this._lastResizeWidth = null;
     }
+
+    let newQ;
+
+    if (w > 400) {
+      newQ = CallManager2.CALL_QUALITY.HIGH;
+    } else if (w > 200) {
+      newQ = CallManager2.CALL_QUALITY.MEDIUM;
+    } else if (w > 180) {
+      newQ = CallManager2.CALL_QUALITY.LOW;
+    } else if (w === 0) {
+      newQ = CallManager2.CALL_QUALITY.NO_VIDEO;
+    } else {
+      newQ = CallManager2.CALL_QUALITY.THUMB;
+    }
+
+    stream.consumerGetVideo(this, newQ);
   }
 
   render() {
@@ -19356,7 +19819,7 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
                     stream-node
                     ${onClick ? 'clickable' : ''}
                     ${className ? className : ''}
-                    ${this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : ''}
+                    ${this.state.loading ? 'loading' : ''}
                     ${simpletip ? 'simpletip' : ''}
                 `,
       "data-simpletip": simpletip == null ? void 0 : simpletip.label,
@@ -19373,17 +19836,10 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
       onSpeakerChange: onSpeakerChange
     }), external_React_default().createElement("div", {
       className: "stream-node-content"
-    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : '', this.renderContent(), mode === Call.MODE.MINI || minimized ? null : this.renderStatus())));
+    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null, this.renderContent(), mode === Call.MODE.MINI || minimized ? null : this.renderStatus())));
   }
 
-}, _class2.LOADING_STATE = {
-  INITIALIZED: 1,
-  LOADING: 1,
-  LOADED: 2
-}, _class2.isStreaming = stream => {
-  return stream && !stream.isOnHold && stream.source && stream.source.srcObject !== null && (!stream.videoMuted || stream.haveScreenshare);
-}, _class2), ((0,applyDecoratedDescriptor.Z)(_class.prototype, "updateVideoStreamThrottled", [_dec, _dec2], Object.getOwnPropertyDescriptor(_class.prototype, "updateVideoStreamThrottled"), _class.prototype), (0,applyDecoratedDescriptor.Z)(_class.prototype, "onResizeObserved", [_dec3, _dec4], Object.getOwnPropertyDescriptor(_class.prototype, "onResizeObserved"), _class.prototype)), _class));
-
+}
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebarControls.jsx
 
 
@@ -19970,7 +20426,8 @@ class Stream extends mixins.wl {
       stream: { ...this.props.call.getLocalStream(),
         source: null
       },
-      isCallOnHold: this.props.isOnHold
+      isCallOnHold: this.props.isOnHold,
+      isLocal: true
     });
 
     this.renderOptionsDialog = () => {
@@ -20044,6 +20501,7 @@ class Stream extends mixins.wl {
       return external_React_default().createElement(StreamNode, {
         className: forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : '',
         mode: mode,
+        isLocal: true,
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       });
@@ -20065,9 +20523,11 @@ class Stream extends mixins.wl {
       }
 
       return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
+        isSelfOverlay: true,
         className: call.isSharingScreen() ? '' : 'local-stream-mirrored',
         minimized: minimized,
         stream: this.getStreamSource(),
+        isLocal: true,
         onLoadedData: onLoadedData,
         localAudioMuted: !(call.av & SfuClient.Av.Audio)
       }), external_React_default().createElement("div", {
@@ -20145,7 +20605,7 @@ class Stream extends mixins.wl {
       ref: this.containerRef,
       className: `
                     ${NAMESPACE}
-                    ${StreamNode.isStreaming(this.getStreamSource()) ? ratioClass : ''}
+                    ${this.getStreamSource().isStreaming() ? ratioClass : ''}
                     ${IS_MINI_MODE ? 'mini' : ''}
                     ${minimized ? 'minimized' : ''}
                     ${this.state.options ? 'active' : ''}
@@ -20398,7 +20858,10 @@ class ParticipantsNotice extends mixins.wl {
 
 }
 ParticipantsNotice.NAMESPACE = 'participants-notice';
+// EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
+var chatToaster = __webpack_require__(142);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/stream.jsx
+
 
 
 
@@ -20433,7 +20896,8 @@ class stream_Stream extends mixins.wl {
     this.state = {
       page: 0,
       hovered: false,
-      link: undefined
+      link: undefined,
+      overlayed: false
     };
 
     this.movePage = direction => this.setState(state => ({
@@ -20601,6 +21065,7 @@ class stream_Stream extends mixins.wl {
             const cacheKey = (_stream$source = stream.source) == null ? void 0 : (_stream$source$srcObj = _stream$source.srcObject) == null ? void 0 : _stream$source$srcObj.id;
             $$STREAMS.push(external_React_default().createElement(StreamNode, {
               mode: mode,
+              externalVideo: true,
               chatRoom: chatRoom,
               menu: true,
               ephemeralAccounts: ephemeralAccounts,
@@ -20649,6 +21114,7 @@ class stream_Stream extends mixins.wl {
           }, chunk.map(stream => external_React_default().createElement(StreamNode, {
             key: stream.clientId,
             stream: stream,
+            externalVideo: true,
             chatRoom: chatRoom,
             menu: true,
             ephemeralAccounts: ephemeralAccounts,
@@ -20688,6 +21154,7 @@ class stream_Stream extends mixins.wl {
         key: targetStream.clientId,
         className: forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : '',
         stream: targetStream,
+        externalVideo: true,
         chatRoom: chatRoom,
         menu: true,
         ephemeralAccounts: ephemeralAccounts,
@@ -20780,7 +21247,8 @@ class stream_Stream extends mixins.wl {
   render() {
     const {
       hovered,
-      link
+      link,
+      overlayed
     } = this.state;
     const {
       mode,
@@ -20822,7 +21290,9 @@ class stream_Stream extends mixins.wl {
       link: link,
       onCallMinimize: onCallMinimize,
       onModeChange: onModeChange
-    }), isOnHold ? this.renderOnHold() : null, this.renderStreamContainer(), external_React_default().createElement(streamControls, {
+    }), isOnHold ? this.renderOnHold() : overlayed && external_React_default().createElement("div", {
+      className: "call-overlay"
+    }), this.renderStreamContainer(), external_React_default().createElement(streamControls, {
       call: call,
       streams: streams,
       chatRoom: chatRoom,
@@ -20840,7 +21310,24 @@ class stream_Stream extends mixins.wl {
       sidebar: sidebar,
       onChatToggle: onChatToggle,
       onParticipantsToggle: onParticipantsToggle
-    })), external_React_default().createElement(Local, {
+    })), external_React_default().createElement(chatToaster.Z, {
+      showDualNotifications: true,
+      hidden: minimized,
+      onShownToast: t => {
+        if (t.options && t.options.persistent) {
+          this.setState({
+            overlayed: true
+          });
+        }
+      },
+      onHideToast: t => {
+        if (this.state.overlayed && t.options && t.options.persistent) {
+          this.setState({
+            overlayed: false
+          });
+        }
+      }
+    }), external_React_default().createElement(Local, {
       call: call,
       streams: streams,
       mode: mode,
@@ -21124,15 +21611,13 @@ class Sidebar extends mixins.wl {
         mode: mode,
         chatRoom: chatRoom,
         stream: localStream,
+        isLocal: true,
         simpletip: { ...SIMPLE_TIP,
           label: l[8885]
         },
         isCallOnHold: isOnHold,
         localAudioMuted: !(call.av & SfuClient.Av.Audio),
-        className: `
-                                    ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
-                                    ${forcedLocal ? 'active' : ''}
-                                `,
+        className: (call.isSharingScreen() ? '' : 'local-stream-mirrored') + ' ' + (forcedLocal ? 'active' : ''),
         onClick: () => {
           mBroadcaster.sendMessage('meetings:collapse');
           onSpeakerChange(localStream);
@@ -21893,7 +22378,7 @@ class Call extends mixins.wl {
       const noPeers = () => {
         onCallMinimize();
 
-        if (typeof call.callToutInt !== 'undefined' && !stayOnEnd) {
+        if (typeof call.callToutId !== 'undefined' && !stayOnEnd) {
           this.showTimeoutDialog();
         }
       };
@@ -21926,7 +22411,7 @@ class Call extends mixins.wl {
         return;
       }
 
-      return action === STREAM_ACTIONS.ADD ? streams.addFakeDupStream() : streams.splice(-1, 1);
+      return action === STREAM_ACTIONS.ADD ? streams.addFakeDupStream() : streams.removeFakeDupStream();
     };
 
     this.handleSpeakerChange = streamNode => {
@@ -21934,7 +22419,7 @@ class Call extends mixins.wl {
         this.handleModeChange(Call.MODE.SPEAKER);
         this.props.call.setForcedActiveStream(streamNode.clientId);
         this.setState({
-          forcedLocal: streamNode.userHandle === u_handle
+          forcedLocal: streamNode.isLocal
         });
       }
     };

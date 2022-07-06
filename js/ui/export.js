@@ -2991,16 +2991,7 @@ var exportExpiry = {
 
         self.logger.debug('addExportLinkIcon', nodeId);
 
-        if ($nodeId.length) {
-
-            // Add link-icon to list view
-            $('.own-data', $nodeId).addClass('linked');
-
-            // Add link-icon to grid view
-            if ($nodeId.hasClass('data-block-view')) {
-                $nodeId.addClass('linked');
-            }
-        }
+        $nodeId.addClass('linked');
 
         if ($tree.length) {
 

@@ -5,22 +5,26 @@
     const FORCE_LOWQ = !!localStorage.forceLowQuality;
 
     const CALL_QUALITY = {
-        'NO_VIDEO': -2,
-        'THUMB': -1,
-        'LOW': 0,
-        'MEDIUM': 1,
-        'HIGH': 2
+        NO_VIDEO: -2,
+        THUMB: -1,
+        LOW: 0,
+        MEDIUM: 1,
+        HIGH: 2
     };
-
-    const DOWNGRADING_QUALITY_INTRVL = 75;
+    const RES_STATE = {
+        NO_VIDEO: 0,
+        THUMB: 1,
+        THUMB_PENDING: 2,
+        HD: 3,
+        HD_PENDING: 4
+    };
+    const DOWNGRADING_QUALITY_INTRVL = 2000;
 
     class Peer extends MegaDataObject {
-        constructor(call, userHandle, clientId, thumbSrcObject, hiSrcObject, av) {
+        constructor(call, userHandle, clientId, av) {
             super({
                 'clientId': null,
                 'userHandle': null,
-                'thumbSrcObject': null,
-                'hiSrcObject': null,
                 'audioMuted': null,
                 'videoMuted': null,
                 'haveScreenshare': null,
@@ -33,12 +37,20 @@
             this.call = call;
             this.userHandle = userHandle;
             this.clientId = clientId;
-            this.thumbSrcObject = thumbSrcObject;
-            this.hiSrcObject = hiSrcObject;
+            this.sfuPeer = call.sfuApp.sfuClient.peers.get(clientId);
             this.isActive = false;
-            this.consumers = new Map();
-            this._currentQuality = CALL_QUALITY.NO_VIDEO;
+            this.consumers = new Set();
+            this.currentQuality = CALL_QUALITY.NO_VIDEO;
+            this.resState = RES_STATE.NO_VIDEO;
+            this.source = null;
+            this.onHdReleaseTimer = this._onHdReleaseTimer.bind(this);
             this.onAvChange(av);
+            call.peers.push(this);
+        }
+        destroy() {
+            this.hdReleaseTimerStop();
+            this.call.peers.remove(this.clientId);
+            this.isDestroyed = true;
         }
         get name() {
             return M.getNameByHandle(this.userHandle);
@@ -46,8 +58,26 @@
         get contactObject() {
             return M.u[this.userHandle];
         }
-        get source() {
-            return this.hiSrcObject || this.thumbSrcObject;
+        setResState(newState, video) {
+            const oldSource = this.source;
+            this.resState = newState;
+            if (video) {
+                this.source = video;
+            }
+            else {
+                this.source = (newState === RES_STATE.HD || newState === RES_STATE.THUMB_PENDING)
+                    ? this.sfuPeer.hiResPlayer && this.sfuPeer.hiResPlayer.gui.video
+                    : this.sfuPeer.vThumbPlayer && this.sfuPeer.vThumbPlayer.gui.video;
+            }
+            // console.warn(`setResState[${this.clientId}]: ->`, newState, this.source);
+            if (this.source !== oldSource) {
+                this.updateConsumerVideos();
+            }
+        }
+        isStreaming() {
+            const { av } = this.sfuPeer;
+            // console.warn(`isStreaming[${this.clientId}]:`, !(av & Av.onHold) && (av & Av.Video));
+            return !(av & Av.onHold) && (av & Av.Video);
         }
         onAvChange(av) {
             this.audioMuted = !(av & SfuClient.Av.Audio);
@@ -55,146 +85,165 @@
             this.haveScreenshare = !!(av & SfuClient.Av.Screen);
             this.isOnHold = !!(av & SfuClient.Av.onHold);
         }
-        _garbageCollectConsumers() {
-            delay("gcc" + this.call.callId + "-" + this.clientId, () => {
-                // if (this.consumers.size === 0) {
-                //     // cleanup if no consumers.
-                //     if (this.hiSrcObject) {
-                //         tryCatch(() => this.hiSrcObject.player.destroy())();
-                //     }
-                //     if (this.thumbSrcObject) {
-                //         tryCatch(() => this.thumbSrcObject.player.destroy())();
-                //     }
-                // }
-
-                this._maxQRecalculate();
-            }, 1500);
+        registerConsumer(consumerGui) {
+            this.consumers.add(consumerGui);
         }
-        deregisterConsumer(consumerId) {
-            this.consumers.delete(consumerId);
-            this._garbageCollectConsumers();
+        deregisterConsumer(consumerGui) {
+            this.consumers.delete(consumerGui);
+            if (!this.isDestroyed) {
+                this.getVideoWithCommonQuality();
+            }
+        }
+        hdReleaseTimerStop() {
+            if (this.hdReleaseTimer) {
+                clearTimeout(this.hdReleaseTimer);
+                delete this.hdReleaseTimer;
+                delete this.targetQuality;
+            }
+        }
+        hdReleaseTimerRestart(targetQ) {
+            this.hdReleaseTimerStop();
+            this.targetQuality = targetQ;
+            this.hdReleaseTimer = setInterval(this.onHdReleaseTimer, DOWNGRADING_QUALITY_INTRVL);
+        }
+        _onHdReleaseTimer() {
+            if (isNaN(this.targetQuality) || this.currentQuality <= this.targetQuality) {
+                this.hdReleaseTimerStop();
+                console.warn("onHdReleaseTimer: BUG: Target quality is not set, or is higher than current");
+                return;
+            }
+            const newQ = this.currentQuality - 1;
+            if (newQ <= this.targetQuality) {
+                this.hdReleaseTimerStop();
+            }
+            this.doGetVideoWithQuality(newQ);
         }
         // centralize consumer decision and call those 2 diff methods from 1 place (used by UI)
-        requestQuality(consumerId, quality) {
+        consumerGetVideo(consumer, quality) {
+            // console.warn(`consumerGetVideo[${this.clientId}]:`, quality);
+            if (!this.consumers.has(consumer)) {
+                console.error(`consumerGetVideo(${quality}): Consumer not registered:`, consumer);
+                return;
+            }
             if (FORCE_LOWQ) {
                 quality = -1;
             }
-
             // UI-related interface for up/downgrading quality with a reference counter implementation
-            this.consumers.set(consumerId, quality);
-
-            this._maxQRecalculate(
+            consumer.requestedQ = quality;
+            delete this.consumersUpdated;
+            this.getVideoWithCommonQuality(
                 this.call.activeVideoStreamsCnt > SfuClient.kMaxInputVideoTracks - 2 /* 2 tracks buffer for race
                 conditions */
             );
+            if (!this.consumersUpdated) {
+                consumer.updateVideoElem();
+            }
         }
-        _maxQRecalculate(immediateDowngrade = false) {
+        getVideoWithCommonQuality(immediateDowngrade = false) {
             var maxQ = CALL_QUALITY.NO_VIDEO;
-            for (const [, value] of this.consumers) {
-                if (value > maxQ) {
-                    maxQ = value;
-                    if (value === 2) {
+            for (const { requestedQ } of this.consumers) {
+                if (requestedQ > maxQ) {
+                    maxQ = requestedQ;
+                    if (requestedQ === 2) {
                         break;
                     }
                 }
             }
 
-            if (maxQ !== this._currentQuality) {
-                if (!immediateDowngrade && maxQ < this._currentQuality) {
-                    // in case downgrading quality, force throttling to 15s
-                    delay('meet-quality-change-' + this.clientId, () => {
-                        this._forceRequestQuality(maxQ);
-                    }, DOWNGRADING_QUALITY_INTRVL);
-                }
-                else {
-                    delay.cancel('meet-quality-change-' + this.clientId);
-                    this._forceRequestQuality(maxQ);
-                }
+            if (maxQ === this.currentQuality) {
+                this.hdReleaseTimerStop();
+            }
+            else if (maxQ < this.currentQuality && !immediateDowngrade) {
+                // start gradual lowering of stream quality
+                this.hdReleaseTimerRestart(maxQ);
             }
             else {
-                // cancel if there are any newQ < currentQ
-                delay.cancel('meet-quality-change-' + this.clientId);
+                this.hdReleaseTimerStop();
+                this.doGetVideoWithQuality(maxQ); // immediately increase quality
             }
         }
-        _forceRequestQuality(newQuality) {
-            if (this._currentQuality === newQuality) {
+        doGetVideoWithQuality(newQuality) {
+            if (this.currentQuality === newQuality) {
                 return;
             }
-            this._currentQuality = newQuality;
+            this.currentQuality = newQuality;
 
             if (newQuality >= CALL_QUALITY.LOW) {
-                return this.requestHdQuality(2 - newQuality /* invert values */);
+                this.requestHdQuality(2 - newQuality /* invert values */);
             }
             else if (newQuality === CALL_QUALITY.THUMB) {
-                this._currentRequestedLayerOffset = undefined;
-                return this.requestThumbQuality();
+                this.requestThumbQuality();
             }
             else if (newQuality === CALL_QUALITY.NO_VIDEO) {
-                this._currentRequestedLayerOffset = undefined;
-                if (this.hiSrcObject) {
-                    tryCatch(() => this.hiSrcObject.player.destroy(), false)();
+                this.setResState(RES_STATE.NO_VIDEO);
+                const { sfuPeer } = this;
+                if (sfuPeer.hiResPlayer) {
+                    sfuPeer.hiResPlayer.destroy();
                 }
-                if (this.thumbSrcObject) {
-                    tryCatch(() => this.thumbSrcObject.player.destroy(), false)();
+                if (sfuPeer.vThumbPlayer) {
+                    sfuPeer.vThumbPlayer.destroy();
                 }
-                return Promise.resolve();
             }
         }
-        requestHdQuality(layerOffset) {
-            if (this.thumbSrcObject) {
-                tryCatch(() => this.thumbSrcObject.player.destroy(), false)();
+        updateConsumerVideos() {
+            for (const gui of this.consumers) {
+                gui.updateVideoElem();
             }
-
-            if (this._currentRequestedLayerOffset === layerOffset) {
+            this.consumersUpdated = true;
+        }
+        requestHdQuality(resDivider) {
+            const peer = this.sfuPeer;
+            // We are in hd mode and the video quality matches
+            const hdPlayer = peer.hiResPlayer;
+            if (hdPlayer) {
+                this.setResState(RES_STATE.HD);
+                if (resDivider !== hdPlayer.resDivider) {
+                    peer.setHiResDivider(resDivider);
+                }
                 return;
             }
-            else if (
-                this.hiSrcObject &&
-                this._currentRequestedLayerOffset !== layerOffset
-            ) {
-                this._currentRequestedLayerOffset = layerOffset;
-
-                this.call.sfuApp.sfuClient.peers.get(this.clientId).setHiResDivider(layerOffset);
-                return Promise.resolve();
-            }
-
-            if (!this.hiSrcObject) {
-                const peer = this.call.sfuApp.sfuClient.peers.get(this.clientId);
-                if (peer) {
-                    peer.requestHiResVideo(layerOffset);
-                    return createTimeoutPromise(() => {
-                        return !!this.hiSrcObject;
-                    }, 300, 15000);
+            // request hi-res stream
+            this.setResState(RES_STATE.HD_PENDING);
+            const gui = peer.requestHiResVideo(resDivider);
+            gui.onPlay = () => {
+                if (this.resState !== RES_STATE.HD_PENDING) {
+                    return false;
                 }
-                return MegaPromise.reject();
-            }
-            return MegaPromise.reject();
+                if (peer.vThumbPlayer) {
+                    peer.vThumbPlayer.destroy();
+                }
+                this.setResState(RES_STATE.HD);
+                return true;
+            };
         }
         requestThumbQuality() {
-            this._currentRequestedLayerOffset = undefined;
-
-            if (this.hiSrcObject) {
-                tryCatch(() => this.hiSrcObject.player.destroy(), false)();
-            }
-
-            if (!this.thumbSrcObject) {
-                const peer = this.call.sfuApp.sfuClient.peers.get(this.clientId);
-                if (peer) {
-                    peer.requestThumbnailVideo();
-                    return createTimeoutPromise(() => {
-                        return !!this.thumbSrcObject;
-                    }, 300, 15000);
+            const peer = this.sfuPeer;
+            if (peer.vThumbPlayer) {
+                this.setResState(RES_STATE.THUMB);
+                if (peer.hiResPlayer) {
+                    peer.hiResPlayer.destroy();
                 }
-                return MegaPromise.reject();
+                return;
             }
-
-            return MegaPromise.reject();
+            this.setResState(RES_STATE.THUMB_PENDING);
+            const gui = peer.requestThumbnailVideo();
+            gui.onPlay = () => {
+                if (this.resState !== RES_STATE.THUMB_PENDING) {
+                    if (this.resState === RES_STATE.HD && peer.vThumbPlayer) {
+                        // vthumb request aborted, hd re-used. Delete the vthumb stream
+                        peer.vThumbPlayer.destroy();
+                    }
+                    return;
+                }
+                if (peer.hiResPlayer) {
+                    peer.hiResPlayer.destroy();
+                }
+                this.setResState(RES_STATE.THUMB);
+            };
         }
     }
 
-
     class Peers extends MegaDataSortedMap {
-
         constructor(call) {
             super("clientId", undefined, call.chatRoom);
             this.call = call;
@@ -211,16 +260,24 @@
             var sCloned = new Peer(
                 this.call,
                 s.userHandle,
-                s.clientId,
-                s.thumbSrcObject,
-                s.hiSrcObject
+                s.clientId + rand_range(1, 20)
             );
+            sCloned.sfuPeer = s.sfuPeer;
+            sCloned.isFake = true;
+            /*
             Object.keys(s).forEach((k) => {
                 sCloned[k] = s[k];
             });
-            sCloned.clientId += rand_range(1, 20);
-            sCloned.isFake = true;
-            this.push(sCloned);
+            */
+        }
+        removeFakeDupStream() {
+            for (let i = this.length - 1; i >= 0; i--) {
+                const peer = this.getItem(i);
+                if (peer.isFake) {
+                    peer.destroy();
+                    return;
+                }
+            }
         }
     }
 
@@ -238,7 +295,6 @@
                 'callId': null,
                 'av': null,
                 'localVideoStream': null,
-                'localAudioMuted': null,
                 'viewMode': null,
                 'activeStream': null,
                 'forcedActiveStream': null,
@@ -250,6 +306,8 @@
             this.chatRoom = chatRoom;
             this.callId = callId;
             this.peers = new Peers(this);
+            // eslint-disable-next-line no-use-before-define
+            this.localPeerStream = new LocalPeerStream(this);
             this.viewMode = CALL_VIEW_MODES.GRID;
             chatRoom.activeCall = this;
             megaChat.activeCall = this;
@@ -297,17 +355,10 @@
             return this.peers.getItem(0);
         }
         getLocalStream() {
-            return {
-                userHandle: u_handle,
-                audioMuted: this.localAudioMuted === null || !!this.localAudioMuted,
-                hasSlowNetwork: false,
-                source: {
-                    srcObject: this.localVideoStream
-                }
-            };
+            return this.localPeerStream;
         }
         onPeerJoined(peer, isInitial) {
-            this.peers.push(new Peer(this, peer.userId, peer.cid, undefined, undefined, peer.av));
+            new Peer(this, peer.userId, peer.cid, peer.av);
             if (!isInitial) {
                 this.chatRoom.trigger('onCallPeerJoined', peer.userId);
             }
@@ -318,11 +369,11 @@
             this.callTimeoutDone();
         }
         onPeerLeft(peer, reason) {
-            this.peers.remove(peer.cid);
             if (this.activeStream && this.activeStream === peer.cid) {
                 this.activeStream = null;
             }
-            console.warn("onPeerLeft: reason", SfuClient.TermCode[reason]);
+            this.peers[peer.cid].destroy();
+            console.log("onPeerLeft: reason", SfuClient.TermCode[reason]);
             this.chatRoom.trigger('onCallPeerLeft', { userHandle: peer.userId, reason });
             this.left = true;
             // Peer is left alone in a group call -> mute mic
@@ -337,55 +388,36 @@
         onMicSignalDetected(signal) {
             this.chatRoom.trigger('onMicSignalDetected', signal);
         }
-        onBadNetwork() {
-            this.chatRoom.trigger('onBadNetwork');
+        onBadNetwork(e) {
+            this.chatRoom.trigger('onBadNetwork', e);
         }
-        registerPlayer(player) {
-            var peer = this.peers[player.peer.cid];
-            assert(peer, 'registerPlayer: peer not found.');
-            peer[player._isHiRes ? 'hiSrcObject' : 'thumbSrcObject'] = player.player;
-            peer[player._isHiRes ? 'hiSrcObject' : 'thumbSrcObject'].player = player;
+        registerPlayer() {
             this.activeVideoStreamsCnt++;
-            return peer;
         }
-        deregisterPlayer(player) {
-            var peer = this.peers[player.peer.cid];
-            assert(peer, 'deregisterPlayer: peer not found.');
-            peer[player._isHiRes ? 'hiSrcObject' : 'thumbSrcObject'] = undefined;
+        deregisterPlayer(playerData) {
             this.activeVideoStreamsCnt--;
-
+            const { appPeer } = playerData;
             // clean up cached quality, if there are no players
-            if (!peer.hiSrcObject && !peer.thumbSrcObject && peer._currentQuality !== CALL_QUALITY.NO_VIDEO) {
-                peer._currentQuality = CALL_QUALITY.NO_VIDEO;
+            if (
+                !appPeer.sfuPeer.hiResPlayer &&
+                !appPeer.sfuPeer.vThumbPlayer &&
+                appPeer.currentQuality !== CALL_QUALITY.NO_VIDEO
+            ) {
+                appPeer.currentQuality = CALL_QUALITY.NO_VIDEO;
+                // console.warn("No video from peer, setting quality to NO_VIDEO");
             }
         }
         onLocalMediaChange(diffFlag) {
+            if (diffFlag & SfuClient.Av.Video) {
+                this.localPeerStream.onVideoChange();
+            }
             this.av = this.sfuApp.sfuClient.availAv;
-
-            if (diffFlag & SfuClient.Av.Camera || diffFlag & SfuClient.Av.Screen) {
-                let vtrack = this.sfuApp.sfuClient.mainSentVtrack();
-                if (vtrack) {
-                    this.localVideoStream = new MediaStream([vtrack]);
-                    // this.localVideoStream.play();
-                }
-                else {
-                    this.localVideoStream  = null;
-                }
-            }
-            if (diffFlag & SfuClient.Av.Audio) {
-                if (this.sfuApp.sfuClient.localAudioMuted()) {
-                    this.localAudioMuted = true;
-                }
-                else {
-                    this.localAudioMuted = false;
-                }
-            }
         }
         onLocalMediaError(errAv) {
             this.chatRoom.trigger('onLocalMediaError', errAv);
         }
         toggleAudio(mute) {
-            this.sfuApp.sfuClient.muteAudio(mute || !!(this.av & SfuClient.Av.Audio));
+            this.sfuApp.sfuClient.muteAudio(!this.sfuApp.sfuClient.localAudioMuted());
             // when we are not a speaker, local audio track is never obtained, so the event is never fired
             this.onLocalMediaChange(SfuClient.Av.Audio);
         }
@@ -414,29 +446,36 @@
         }
         hangUp(reason) {
             this.sfuApp.destroy(reason);
+            const cids = this.peers.keys();
+            while (cids.length) {
+                const peer = this.peers[cids[cids.length - 1]];
+                if (peer.destroy) {
+                    peer.destroy();
+                }
+            }
+            delete this.peers;
             this.callTimeoutDone(true);
         }
         muteIfAlone() {
             if (this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
-                return this.toggleAudio(true);
+                return this.sfuApp.sfuClient.muteAudio(true);
             }
             return false;
-        }
-        onLocalMediaError(errAv) {
-            this.chatRoom.trigger('onLocalMediaError', errAv);
         }
         callTimeoutDone(leaveCallActive) {
             if (typeof leaveCallActive === 'undefined') {
                 leaveCallActive = this.peers.length;
             }
-            clearInterval(this.callToutInt);
-            delete this.callToutInt;
-            delete this.callToutEnd;
+            if (this.callToutInt) {
+                clearInterval(this.callToutInt);
+                delete this.callToutInt;
+                delete this.callToutEnd;
+            }
             if ($('.stay-dlg-subtext').is(':visible')) {
                 closeDialog();
             }
             if (this.callToutId) {
-                window.toaster.alerts.hide(this.callToutId);
+                this.callToutId.setUpdater(ChatToast.clearValue);
                 delete this.callToutId;
             }
             if (!leaveCallActive) {
@@ -457,41 +496,87 @@
                         this.callTimeoutDone();
                     }
                 }, 3e5);
-                window.toaster.alerts.medium(l.call_timeout_day);
+                ChatToast.quick(l.call_timeout_day); /* `Call will stay active for 24 hours` */
             }
             else {
                 // Otherwise setup the 2 minute timeout
-                window.toaster.alerts.medium(
-                    l.call_timeout_remain.replace('%s', secondsToTime(120).substring(3)),
-                    undefined,
-                    {
-                        hasClose: false,
-                        timeout: -1,
-                    }
-                ).then(id => {
-                    const $toast = $('span.message',`#${id}`);
-                    this.callToutId = id;
-                    this.callToutEnd = unixtime() + 120;
-                    this.callToutInt = setInterval(() => {
-                        let timeRemain = this.callToutEnd - unixtime();
+                this.callToutId = new ChatToast(
+                    l.call_timeout_remain /* `Call will end in %s` */
+                        .replace('%s', secondsToTime(120).substring(3)),
+                    { timeout: 130000 } // Show for longer that 120s in case of slight timing discrepancies
+                );
+                const done = () => {
+                    delay('calltoutend', this.callTimeoutDone.bind(this), 100);
+                };
+                ChatToast.flush(); // We don't want this toast to be held up by any other toasts so clear them out.
+                this.callToutId
+                    .setOnShown(function() {
+                        this.callToutEnd = unixtime() + 120;
+                    })
+                    .setUpdater(function() {
+                        let timeRemain = (this.callToutEnd || unixtime() + 120) - unixtime();
                         if (timeRemain <= 0) {
-                            this.callTimeoutDone();
+                            this.content = '';
+                            done();
                         }
                         else {
                             timeRemain = secondsToTime(timeRemain).substring(3);
-                            $toast.text(l.call_timeout_remain.replace('%s', timeRemain));
+                            this.content = l.call_timeout_remain /* `Call will end in %s` */
+                                .replace('%s', timeRemain);
                             // Check if the dialog is shown then update the counter on it.
                             const $dlgText = $('.stay-dlg-counter', '.mega-dialog');
                             if ($dlgText.length && $dlgText.is(':visible')) {
                                 $dlgText.text(timeRemain);
                             }
                         }
-                    }, 1000);
-                });
+                    })
+                    .setClose(false)
+                    .dispatch();
             }
         }
     }
-
+    class LocalPeerStream {
+        constructor(call) {
+            this.isLocal = true;
+            this.hasSlowNetwork = null;
+            this.source = null; // local video player
+            // call.sfuApp.sfuClient is not available at this time
+            this.call = call;
+            this.sfuApp = call.sfuApp;
+            this.userHandle = u_handle;
+            this.consumers = new Set();
+        }
+        onVideoChange() {
+            const vtrack = this.sfuApp.sfuClient.mainSentVtrack();
+            if (vtrack) {
+                if (!this.source) {
+                    this.source = document.createElement("video");
+                }
+                SfuClient.playerPlay(this.source, vtrack);
+            }
+            else {
+                if (this.source) {
+                    SfuClient.playerStop(this.source);
+                }
+                this.source = null;
+            }
+        }
+        get audioMuted() {
+            return this.sfuApp.sfuClient.localAudioMuted();
+        }
+        registerConsumer(consumer) {
+            this.consumers.add(consumer);
+        }
+        deregisterConsumer(consumer) {
+            this.consumers.delete(consumer);
+        }
+        isStreaming() {
+            return this.sfuApp.sfuClient.availAv & Av.Video;
+        }
+        consumerGetVideo(cons) {
+            cons.updateVideoElem();
+        }
+    }
     /**
      * Manages RTC <-> MegChat logic and mapping to UI
      *
@@ -617,7 +702,10 @@
                 if (chatRoom.type === 'private') {
                     return chatRoom.trigger('onCallEnd', { callId, removeActive: true });
                 }
-                return chatRoom.activeCall.initCallTimeout();
+                // Wait for the peer left notifications to process before triggering.
+                setTimeout(() => {
+                    chatRoom.activeCall.initCallTimeout();
+                }, 3000);
             });
 
             chatRoom.rebind('onMeAdded', (e, addedBy) => {
@@ -974,8 +1062,8 @@
     };
 
     CallManager2.prototype.registerCall = function(sfuApp, chatRoom, callId) {
-        this.calls[chatRoom.chatId + "_" + callId] = new Call(sfuApp, chatRoom, callId);
-        return this.calls[chatRoom.chatId + "_" + callId];
+        this.calls[`${chatRoom.chatId}_${callId}`] = new Call(sfuApp, chatRoom, callId);
+        return this.calls[`${chatRoom.chatId}_${callId}`];
     };
 
     CallManager2.prototype.onCallState = function(eventData, chatRoom) {

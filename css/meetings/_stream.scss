@@ -101,6 +101,15 @@
         }
     }
 
+    .call-overlay {
+        background: rgba(0, 0, 0, 0.32);
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 10;
+    }
     .on-hold-overlay {
         z-index: 10;
         width: 100%;

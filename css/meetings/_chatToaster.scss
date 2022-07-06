@@ -1,0 +1,88 @@
+.chat-toast-bar {
+    position: absolute;
+    width: 100%;
+    &.toaster-root {
+        width: calc(100% - 256px);
+    }
+    .chat-toast {
+        position: relative;
+        width: fit-content;
+        z-index: 10;
+        &.chat-toast-wrapper {
+            --surface-alpha: 0.95;
+            background: var(--surface-main);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            box-sizing: border-box;
+            display: flex;
+            font: var(--text-h3-bold);
+            height: 56px;
+            justify-content: space-between;
+            margin: 80px auto 0;
+            padding: 16px 32px;
+            &.root-toast {
+                --surface-alpha: 1;
+                border: unset;
+                box-shadow: var(--dialog-shadow);
+                height: 64px;
+                left: 50%;
+                margin: 56px 0;
+                padding: 20px;
+                transform: translateX(-50%);
+                width: 640px;
+                z-index: 100;
+                -webkit-transform: translateX(-50%);
+                .chat-toast-close {
+                    height: 36px;
+                    position: relative;
+                    top: 4px;
+                    width: 36px;
+                    div:hover {
+                        background: var(--surface-grey-2);
+                        border-radius: 4px;
+                    }
+                    i {
+                        margin: 6px;
+                    }
+                }
+            }
+            .toast-value-wrapper {
+                align-self: flex-start;
+                display: flex;
+            }
+            i {
+                --icon-size: 24px;
+                margin-inline-end: 12px;
+                -webkit-margin-start: 12px;
+            }
+            .toast-value {
+                color: var(--text-color-high);
+                font: var(--text-body1);
+                margin: auto 0;
+            }
+            .chat-toast-close {
+                align-self: flex-end;
+            }
+        }
+        &.chat-persistent-toast {
+            animation: toastfadeinout 4s linear infinite;
+            color: #FFFFFF;
+            font: var(--text-h1-bold);
+            margin: 168px auto 0;
+            -webkit-animation: toastfadeinout 4s linear infinite;
+            &.dual-toast {
+                margin-top: 32px;
+            }
+        }
+    }
+}
+@keyframes toastfadeinout {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+@-webkit-keyframes toastfadeinout {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}

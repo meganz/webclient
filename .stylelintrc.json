@@ -18,6 +18,7 @@
         "no-missing-end-of-source-newline": true,
         "max-empty-lines": 2,
         "property-disallowed-list": [ "text-transform" ],
+        "selector-not-notation": "simple",
         "length-zero-no-unit": [
             true,
             {

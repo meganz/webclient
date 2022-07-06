@@ -680,6 +680,11 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $fmholder.rebind('mousemove.colresize', function(col) {
             var newWidth = startOffset + col.pageX;
+            const min = th.attr('data-minwidth') | 0;
+
+            if (newWidth < min) {
+                newWidth = min;
+            }
 
             var colType = th.attr('megatype');
             if (colType) {

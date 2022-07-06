@@ -420,6 +420,13 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         }, 3e5);
     });
 
+    self.rebind('onRoomDisconnected', () => {
+        if (!self.activeCall) {
+            for (const activeCallId of self.activeCallIds.keys()) {
+                self.activeCallIds.remove(activeCallId);
+            }
+        }
+    });
 
     this.membersSetFromApi = new ChatRoom.MembersSet(this);
 

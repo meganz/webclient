@@ -2033,7 +2033,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
             );
             app.sfuClient.muteAudio(!audio);
             app.sfuClient.muteCamera(!video);
-            return app.sfuClient.connect(r.url, callId, this.type !== "private");
+            return app.sfuClient.connect(r.url, callId, {isGroup: this.type !== "private"});
         }, ex => {
             console.error('Failed to join call:', ex);
             this.meetingsLoading = false;
@@ -2138,7 +2138,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
                 }
             });
             // r.callId
-            sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, this.type !== "private");
+            sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, {isGroup: this.type !== "private"});
         }, ex => {
             console.error('Failed to start call:', ex);
             this.meetingsLoading = false;

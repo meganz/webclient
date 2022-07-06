@@ -4232,7 +4232,9 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     }, r.url.replace("https://", "wss://"));
     app.sfuClient.muteAudio(!audio);
     app.sfuClient.muteCamera(!video);
-    return app.sfuClient.connect(r.url, callId, this.type !== "private");
+    return app.sfuClient.connect(r.url, callId, {
+      isGroup: this.type !== "private"
+    });
   }, ex => {
     console.error('Failed to join call:', ex);
     this.meetingsLoading = false;
@@ -4318,7 +4320,9 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
         this.meetingsLoading = false;
       }
     });
-    sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, this.type !== "private");
+    sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, {
+      isGroup: this.type !== "private"
+    });
   }, ex => {
     console.error('Failed to start call:', ex);
     this.meetingsLoading = false;
@@ -4602,7 +4606,6 @@ __webpack_require__.d(__webpack_exports__, {
 "Os": () => (schedule),
 "Rc": () => (replaceAt),
 "_p": () => (ContactAwareComponent),
-"py": () => (rAFWrap),
 "qC": () => (compose),
 "wl": () => (MegaRenderMixin)
 });
@@ -19329,8 +19332,6 @@ StreamHead.EVENTS = {
   SIMPLETIP: new Event('simpletipClose'),
   CLICK_DIALOG: 'click'
 };
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(229);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 var ui_contacts = __webpack_require__(13);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamNodeMenu.jsx
@@ -19462,89 +19463,69 @@ StreamNodeMenu.NAMESPACE = 'node-menu';
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamNode.jsx
 
 
-var _dec, _dec2, _dec3, _dec4, _class, _class2;
 
 
 
-
-
-
-let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3 = (0,mixins.M9)(350, true), _dec4 = (0,mixins.py)(), (_class = (_class2 = class StreamNode extends mixins.wl {
+class StreamNode extends mixins.wl {
   constructor(props) {
-    var _props$stream;
-
     super(props);
     this.nodeRef = external_React_default().createRef();
-    this.videoRef = external_React_default().createRef();
+    this.contRef = external_React_default().createRef();
+    this.statsHudRef = external_React_default().createRef();
 
     this.renderVideoDebugMode = () => {
       const {
-        stream
+        stream,
+        isLocal
       } = this.props;
 
       if (stream.isFake) {
         return null;
       }
 
-      return stream instanceof CallManager2.Peer ? external_React_default().createElement("div", {
-        className: "remote-video-rtc-stats",
-        id: `rtc-stats-${stream.clientId}`
-      }) : external_React_default().createElement("div", {
-        className: "local-video-rtc-stats",
-        id: "rtc-stats-local",
-        title: window.sfuClient && new URL(window.sfuClient.url).host
+      let className = "video-rtc-stats";
+      let title;
+
+      if (isLocal) {
+        if (window.sfuClient) {
+          title = new URL(window.sfuClient.url).host;
+        }
+
+        if (this.props.isSelfOverlay) {
+          className += " video-rtc-stats-ralign";
+        }
+      }
+
+      if (!title) {
+        title = "";
+      }
+
+      return external_React_default().createElement("div", {
+        ref: this.statsHudRef,
+        className: className,
+        title: title
       });
     };
 
     this.renderContent = () => {
       const {
         stream,
-        isCallOnHold,
-        onDoubleClick,
-        onLoadedData
+        isCallOnHold
       } = this.props;
       const {
         loading
       } = this.state;
 
-      if (StreamNode.isStreaming(stream) && !isCallOnHold) {
-        return external_React_default().createElement((external_React_default()).Fragment, null, loading !== StreamNode.LOADING_STATE.LOADED && external_React_default().createElement("i", {
+      if (stream && stream.isStreaming() && !isCallOnHold) {
+        return external_React_default().createElement((external_React_default()).Fragment, null, loading && external_React_default().createElement("i", {
           className: "sprite-fm-theme icon-loading-spinner loading-icon"
-        }), external_React_default().createElement("video", {
-          ref: this.videoRef,
-          onDoubleClick: e => {
-            if (onDoubleClick) {
-              onDoubleClick(e, this);
-            }
-          },
-          autoPlay: true,
-          controls: false,
-          muted: true,
-          onLoadStart: () => {
-            this.setState({
-              loading: StreamNode.LOADING_STATE.LOADING
-            });
-          },
-          onWaiting: () => {
-            this.setState({
-              loading: StreamNode.LOADING_STATE.LOADING
-            });
-          },
-          onPlaying: () => {
-            this.setState({
-              loading: StreamNode.LOADING_STATE.LOADED
-            });
-          },
-          onLoadedData: ev => {
-            this.triggerFakeResize();
-
-            if (onLoadedData) {
-              onLoadedData(ev);
-            }
-          }
+        }), external_React_default().createElement("div", {
+          ref: this.contRef,
+          className: "stream-node-holder"
         }));
       }
 
+      delete this._lastResizeWidth;
       return external_React_default().createElement(ui_contacts.Avatar, {
         contact: M.u[stream.userHandle]
       });
@@ -19592,53 +19573,128 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
       return external_React_default().createElement((external_React_default()).Fragment, null, mode === Call.MODE.SPEAKER && Call.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin call-role-icon', l[8875]), external_React_default().createElement($$CONTAINER, null, muted ? this.getStatusIcon('icon-audio-off', l.muted) : null, hasSlowNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null));
     };
 
-    this.videoRef = external_React_default().createRef();
     this.state = {
-      loading: StreamNode.LOADING_STATE.INITIALIZED
+      loading: false
     };
+    const {
+      stream: _stream,
+      externalVideo
+    } = props;
 
-    if ((_props$stream = props.stream) != null && _props$stream.addChangeListener) {
-      this._streamListener = props.stream.addChangeListener((peer, data, key) => {
-        if ((key === "videoMuted" || key === "haveScreenshare") && data[key] === false) {
-          this._cachedResizeKey = null;
-        }
+    if (!externalVideo) {
+      this.clonedVideo = document.createElement("video");
+      this.setupVideoElement(this.clonedVideo);
+    }
 
-        this.triggerFakeResize();
-      });
+    if (!_stream.isFake) {
+      _stream.registerConsumer(this);
+
+      if (_stream instanceof CallManager2.Peer) {
+        this._streamListener = _stream.addChangeListener((peer, data, key) => {
+          if (key === "haveScreenshare") {
+            this._lastResizeWidth = null;
+          }
+
+          this.requestVideo();
+        });
+      }
     }
   }
 
-  updateVideoStreamThrottled() {
-    this.updateVideoStream();
-  }
-
-  triggerFakeResize(currentVisibility = 0xDEAD) {
-    if (currentVisibility === true || currentVisibility === 0xDEAD && this.isComponentVisible()) {
+  requestVideo(forceVisible) {
+    if (this.isComponentVisible() || forceVisible) {
       var node = this.findDOMNode();
-      this.onResizeObserved(node.offsetWidth, node.offsetHeight);
+      this.requestVideoBySize(node.offsetWidth, node.offsetHeight);
     } else {
-      this.onResizeObserved(0, 0);
+      this.requestVideoBySize(0, 0);
     }
   }
 
-  updateVideoStream() {
-    var _this$props$stream, _this$props$stream$so, _this$props$stream2, _this$props$stream2$s;
-
-    if (!this.isMounted()) {
+  setupVideoElement(video) {
+    if (video._snSetup) {
       return;
     }
 
-    if ((_this$props$stream = this.props.stream) != null && (_this$props$stream$so = _this$props$stream.source) != null && _this$props$stream$so.srcObject && this.videoRef.current && this.videoRef.current.srcObject !== this.props.stream.source.srcObject) {
-      this.videoRef.current.srcObject = this.props.stream.source.srcObject;
+    video.autoplay = true;
+    video.controls = false;
+    video.muted = true;
+
+    video.ondblclick = e => {
+      if (this.props.onDoubleClick) {
+        this.props.onDoubleClick(e, this);
+      }
+    };
+
+    video.onloadeddata = ev => {
+      this.requestVideo();
+
+      if (this.props.onLoadedData) {
+        this.props.onLoadedData(ev);
+      }
+    };
+
+    video._snSetup = true;
+  }
+
+  setLoading(loading) {
+    if (this.isMounted()) {
+      this.setState({
+        loading: loading
+      });
+    } else {
+      this.state.loading = loading;
+    }
+  }
+
+  updateVideoElem() {
+    if (!this.isMounted() || !this.contRef.current) {
+      return;
     }
 
-    if (!((_this$props$stream2 = this.props.stream) != null && (_this$props$stream2$s = _this$props$stream2.source) != null && _this$props$stream2$s.srcObject) && this.videoRef.current) {
-      this.videoRef.current.srcObject = undefined;
+    const currVideo = this.contRef.current.firstChild;
+    const {
+      stream,
+      externalVideo
+    } = this.props;
+    const {
+      source
+    } = stream;
+
+    if (externalVideo) {
+      if (currVideo === source) {
+        return;
+      }
+
+      if (source) {
+        this.setupVideoElement(source);
+        this.contRef.current.replaceChildren(source);
+      } else {
+        this.contRef.current.replaceChildren();
+      }
+    } else {
+      if (!currVideo) {
+        this.contRef.current.replaceChildren(this.clonedVideo);
+      }
+
+      if (source) {
+        if (this.clonedVideo.paused || this.clonedVideo.srcObject !== source.srcObject) {
+          this.clonedVideo.srcObject = source.srcObject;
+          this.clonedVideo.play().catch(() => {});
+        }
+      } else {
+        SfuClient.playerStop(this.clonedVideo);
+      }
+    }
+  }
+
+  displayStats(stats) {
+    const elem = this.statsHudRef.current;
+
+    if (!elem) {
+      return;
     }
 
-    if (this.props.stream && this.props.stream instanceof CallManager2.Peer && !this.props.stream.isFake) {
-      this.triggerFakeResize();
-    }
+    elem.textContent = `${stats} (${this.props.externalVideo ? "ref" : "cloned"})`;
   }
 
   componentDidMount() {
@@ -19650,11 +19706,11 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
       this.props.didMount((_this$nodeRef = this.nodeRef) == null ? void 0 : _this$nodeRef.current);
     }
 
-    this.updateVideoStream();
+    this.requestVideo(true);
   }
 
   onVisibilityChange(isVisible) {
-    this.triggerFakeResize(isVisible);
+    this.requestVideo(isVisible);
   }
 
   componentDidUpdate() {
@@ -19666,25 +19722,31 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
       this.props.didUpdate((_this$nodeRef2 = this.nodeRef) == null ? void 0 : _this$nodeRef2.current);
     }
 
-    this.updateVideoStreamThrottled();
+    this.requestVideo();
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    const videoRef = this.videoRef && this.videoRef.current;
+    const peer = this.props.stream;
 
-    if (videoRef) {
-      videoRef.srcObject = null;
-    }
+    if (peer && !peer.isFake) {
+      this.props.stream.deregisterConsumer(this);
 
-    if (this.props.stream && this.props.stream instanceof CallManager2.Peer && !this.props.stream.isFake) {
-      this.props.stream.deregisterConsumer(this.getUniqueId());
+      if (this.props.externalVideo && peer.source) {
+        const video = peer.source;
+
+        video.onpause = () => {
+          if (!video.isDestroyed) {
+            video.play().catch(() => {});
+          }
+
+          delete video.onpause;
+        };
+      }
     }
 
     if (this._streamListener) {
-      var _this$props$stream3;
-
-      (_this$props$stream3 = this.props.stream) == null ? void 0 : _this$props$stream3.removeChangeListener(this._streamListener);
+      peer.removeChangeListener(this._streamListener);
     }
 
     if (this.props.willUnmount) {
@@ -19692,43 +19754,49 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
     }
   }
 
-  onResizeObserved(w, h) {
+  requestVideoBySize(w) {
     const {
       stream
     } = this.props;
 
-    if (!(stream instanceof CallManager2.Peer) || stream.isFake) {
+    if (stream.isFake) {
       return;
     }
 
-    if (stream.videoMuted && !stream.haveScreenshare) {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.NO_VIDEO);
+    if (!this.isMounted()) {
       return;
     }
 
-    const cachedResizeKey = w + ":" + h + ":" + "width";
-
-    if (this._cachedResizeKey === cachedResizeKey) {
+    if (!stream.isStreaming()) {
+      stream.consumerGetVideo(this, CallManager2.CALL_QUALITY.NO_VIDEO);
       return;
     }
 
-    this._cachedResizeKey = cachedResizeKey;
-    const elemProps = {
-      width: w,
-      height: h
-    };
+    if (this.contRef.current) {
+      if (this._lastResizeWidth === w) {
+        return;
+      }
 
-    if (elemProps["width"] > 400) {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.HIGH);
-    } else if (elemProps["width"] > 200) {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.MEDIUM);
-    } else if (elemProps["width"] > 180) {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.LOW);
-    } else if (elemProps["width"] === 0) {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.NO_VIDEO);
+      this._lastResizeWidth = w;
     } else {
-      stream.requestQuality(this.getUniqueId(), CallManager2.CALL_QUALITY.THUMB);
+      this._lastResizeWidth = null;
     }
+
+    let newQ;
+
+    if (w > 400) {
+      newQ = CallManager2.CALL_QUALITY.HIGH;
+    } else if (w > 200) {
+      newQ = CallManager2.CALL_QUALITY.MEDIUM;
+    } else if (w > 180) {
+      newQ = CallManager2.CALL_QUALITY.LOW;
+    } else if (w === 0) {
+      newQ = CallManager2.CALL_QUALITY.NO_VIDEO;
+    } else {
+      newQ = CallManager2.CALL_QUALITY.THUMB;
+    }
+
+    stream.consumerGetVideo(this, newQ);
   }
 
   render() {
@@ -19751,7 +19819,7 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
                     stream-node
                     ${onClick ? 'clickable' : ''}
                     ${className ? className : ''}
-                    ${this.state.loading !== StreamNode.LOADING_STATE.LOADED ? 'loading' : ''}
+                    ${this.state.loading ? 'loading' : ''}
                     ${simpletip ? 'simpletip' : ''}
                 `,
       "data-simpletip": simpletip == null ? void 0 : simpletip.label,
@@ -19768,17 +19836,10 @@ let StreamNode = (_dec = (0,mixins.M9)(30, true), _dec2 = (0,mixins.py)(), _dec3
       onSpeakerChange: onSpeakerChange
     }), external_React_default().createElement("div", {
       className: "stream-node-content"
-    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : '', this.renderContent(), mode === Call.MODE.MINI || minimized ? null : this.renderStatus())));
+    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null, this.renderContent(), mode === Call.MODE.MINI || minimized ? null : this.renderStatus())));
   }
 
-}, _class2.LOADING_STATE = {
-  INITIALIZED: 1,
-  LOADING: 1,
-  LOADED: 2
-}, _class2.isStreaming = stream => {
-  return stream && !stream.isOnHold && stream.source && stream.source.srcObject !== null && (!stream.videoMuted || stream.haveScreenshare);
-}, _class2), ((0,applyDecoratedDescriptor.Z)(_class.prototype, "updateVideoStreamThrottled", [_dec, _dec2], Object.getOwnPropertyDescriptor(_class.prototype, "updateVideoStreamThrottled"), _class.prototype), (0,applyDecoratedDescriptor.Z)(_class.prototype, "onResizeObserved", [_dec3, _dec4], Object.getOwnPropertyDescriptor(_class.prototype, "onResizeObserved"), _class.prototype)), _class));
-
+}
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebarControls.jsx
 
 
@@ -20365,7 +20426,8 @@ class Stream extends mixins.wl {
       stream: { ...this.props.call.getLocalStream(),
         source: null
       },
-      isCallOnHold: this.props.isOnHold
+      isCallOnHold: this.props.isOnHold,
+      isLocal: true
     });
 
     this.renderOptionsDialog = () => {
@@ -20439,6 +20501,7 @@ class Stream extends mixins.wl {
       return external_React_default().createElement(StreamNode, {
         className: forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : '',
         mode: mode,
+        isLocal: true,
         stream: this.getStreamSource(),
         onLoadedData: onLoadedData
       });
@@ -20460,9 +20523,11 @@ class Stream extends mixins.wl {
       }
 
       return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamNode, {
+        isSelfOverlay: true,
         className: call.isSharingScreen() ? '' : 'local-stream-mirrored',
         minimized: minimized,
         stream: this.getStreamSource(),
+        isLocal: true,
         onLoadedData: onLoadedData,
         localAudioMuted: !(call.av & SfuClient.Av.Audio)
       }), external_React_default().createElement("div", {
@@ -20540,7 +20605,7 @@ class Stream extends mixins.wl {
       ref: this.containerRef,
       className: `
                     ${NAMESPACE}
-                    ${StreamNode.isStreaming(this.getStreamSource()) ? ratioClass : ''}
+                    ${this.getStreamSource().isStreaming() ? ratioClass : ''}
                     ${IS_MINI_MODE ? 'mini' : ''}
                     ${minimized ? 'minimized' : ''}
                     ${this.state.options ? 'active' : ''}
@@ -21000,6 +21065,7 @@ class stream_Stream extends mixins.wl {
             const cacheKey = (_stream$source = stream.source) == null ? void 0 : (_stream$source$srcObj = _stream$source.srcObject) == null ? void 0 : _stream$source$srcObj.id;
             $$STREAMS.push(external_React_default().createElement(StreamNode, {
               mode: mode,
+              externalVideo: true,
               chatRoom: chatRoom,
               menu: true,
               ephemeralAccounts: ephemeralAccounts,
@@ -21048,6 +21114,7 @@ class stream_Stream extends mixins.wl {
           }, chunk.map(stream => external_React_default().createElement(StreamNode, {
             key: stream.clientId,
             stream: stream,
+            externalVideo: true,
             chatRoom: chatRoom,
             menu: true,
             ephemeralAccounts: ephemeralAccounts,
@@ -21087,6 +21154,7 @@ class stream_Stream extends mixins.wl {
         key: targetStream.clientId,
         className: forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : '',
         stream: targetStream,
+        externalVideo: true,
         chatRoom: chatRoom,
         menu: true,
         ephemeralAccounts: ephemeralAccounts,
@@ -21543,15 +21611,13 @@ class Sidebar extends mixins.wl {
         mode: mode,
         chatRoom: chatRoom,
         stream: localStream,
+        isLocal: true,
         simpletip: { ...SIMPLE_TIP,
           label: l[8885]
         },
         isCallOnHold: isOnHold,
         localAudioMuted: !(call.av & SfuClient.Av.Audio),
-        className: `
-                                    ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
-                                    ${forcedLocal ? 'active' : ''}
-                                `,
+        className: (call.isSharingScreen() ? '' : 'local-stream-mirrored') + ' ' + (forcedLocal ? 'active' : ''),
         onClick: () => {
           mBroadcaster.sendMessage('meetings:collapse');
           onSpeakerChange(localStream);
@@ -22345,7 +22411,7 @@ class Call extends mixins.wl {
         return;
       }
 
-      return action === STREAM_ACTIONS.ADD ? streams.addFakeDupStream() : streams.splice(-1, 1);
+      return action === STREAM_ACTIONS.ADD ? streams.addFakeDupStream() : streams.removeFakeDupStream();
     };
 
     this.handleSpeakerChange = streamNode => {
@@ -22353,7 +22419,7 @@ class Call extends mixins.wl {
         this.handleModeChange(Call.MODE.SPEAKER);
         this.props.call.setForcedActiveStream(streamNode.clientId);
         this.setState({
-          forcedLocal: streamNode.userHandle === u_handle
+          forcedLocal: streamNode.isLocal
         });
       }
     };

@@ -15,9 +15,11 @@ var TermCode;
     TermCode[TermCode["kUserHangup"] = 0] = "kUserHangup";
     TermCode[TermCode["kTooManyParticipants"] = 1] = "kTooManyParticipants";
     TermCode[TermCode["kLeavingRoom"] = 2] = "kLeavingRoom";
-    TermCode[TermCode["kEndedByModerator"] = 3] = "kEndedByModerator";
-    TermCode[TermCode["kEndedByApi"] = 4] = "kEndedByApi";
+    TermCode[TermCode["kCallEndedByModerator"] = 3] = "kCallEndedByModerator";
+    TermCode[TermCode["kCallEndedByApi"] = 4] = "kCallEndedByApi";
     TermCode[TermCode["kPeerJoinTimeout"] = 5] = "kPeerJoinTimeout";
+    TermCode[TermCode["kPushedToWaitingRoom"] = 6] = "kPushedToWaitingRoom";
+    TermCode[TermCode["kKickedFromWaitingRoom"] = 7] = "kKickedFromWaitingRoom";
     // Disconnects
     TermCode[TermCode["kRtcDisconn"] = 64] = "kRtcDisconn";
     TermCode[TermCode["kSigDisconn"] = 65] = "kSigDisconn";
@@ -358,7 +360,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '714228643f';
+const COMMIT_ID = '4b8bd9a6c9';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -383,8 +385,9 @@ var ConnState;
     ConnState[ConnState["kDisconnected"] = 0] = "kDisconnected";
     ConnState[ConnState["kDisconnectedRetrying"] = 1] = "kDisconnectedRetrying";
     ConnState[ConnState["kConnecting"] = 2] = "kConnecting";
-    ConnState[ConnState["kJoining"] = 3] = "kJoining";
-    ConnState[ConnState["kJoined"] = 4] = "kJoined";
+    ConnState[ConnState["kInWaitingRoom"] = 3] = "kInWaitingRoom";
+    ConnState[ConnState["kCallJoining"] = 4] = "kCallJoining";
+    ConnState[ConnState["kCallJoined"] = 5] = "kCallJoined";
 })(ConnState || (ConnState = {}));
 var ScreenShareType;
 (function (ScreenShareType) {
@@ -393,10 +396,16 @@ var ScreenShareType;
     ScreenShareType[ScreenShareType["kWindow"] = 2] = "kWindow";
     ScreenShareType[ScreenShareType["kBrowserTab"] = 3] = "kBrowserTab";
 })(ScreenShareType || (ScreenShareType = {}));
+var CallJoinPermission;
+(function (CallJoinPermission) {
+    CallJoinPermission[CallJoinPermission["kUnknown"] = 0] = "kUnknown";
+    CallJoinPermission[CallJoinPermission["kAllow"] = 1] = "kAllow";
+    CallJoinPermission[CallJoinPermission["kDeny"] = 2] = "kDeny";
+})(CallJoinPermission || (CallJoinPermission = {}));
+;
 class SfuClient {
     constructor(userId, app, callKey, options, url) {
         this.peers = new Map();
-        this._isModerator = false;
         this._isSharingScreen = false;
         this._muteCamera = false;
         this._muteAudio = false;
@@ -452,14 +461,6 @@ class SfuClient {
         }
         fetch(url, { method: "POST", body: msg });
     }
-    reinit() {
-        this._sendKeyIdGen = -1;
-        this.peers.clear();
-        delete this._lastPeerJoinLeave;
-        this.cryptoWorker.postMessage(['r']); // reset crypto
-        this.statCtx = {};
-        this._statsRecorder.reset();
-    }
     onCryptoWorkerEvent(event) {
         let msg = event.data;
         console.debug("Message from crypto worker:", msg);
@@ -468,11 +469,17 @@ class SfuClient {
             delete this.keySetPromise;
         }
     }
+    isModerator() {
+        return this.moderators ? this.moderators.has(this.userId) : true;
+    }
     isJoining() {
-        return this._connState < ConnState.kJoined;
+        return this._connState < ConnState.kCallJoined;
     }
     get connState() {
         return this._connState;
+    }
+    get callJoinPermission() {
+        return this._callJoinPermission;
     }
     shouldReconnect() {
         if (this._forcedDisconnect) {
@@ -492,27 +499,31 @@ class SfuClient {
         }
         console.warn("SfuClient: Signaling connection closed");
         delete this.conn;
+        this.leaveCall(termCodes.kSigDisconn); // sets this.termCode
+        const shouldReconnect = this.shouldReconnect(); // decides based on this.termCode
+        if (shouldReconnect) {
+            this._setConnState(ConnState.kDisconnectedRetrying);
+            this.scheduleReconnect();
+        }
+        else {
+            this._setConnState(ConnState.kDisconnected);
+            this._stopLocalTracks();
+        }
+        this._fire("onDisconnect", this.termCode, shouldReconnect);
+    }
+    leaveCall(termCode) {
         if (this.termCode == null) {
-            this.termCode = termCodes.kSigDisconn;
+            this.termCode = termCode;
         }
         if (this.statTimer) {
             clearTimeout(this.statTimer);
         }
-        let shouldReconnect = this.shouldReconnect();
-        let prevState = this._connState;
-        this._setConnState(shouldReconnect ? ConnState.kDisconnectedRetrying : ConnState.kDisconnected);
         this.disableStats();
-        if (prevState == ConnState.kJoined) {
+        if (this._connState === ConnState.kCallJoined) {
             this._statsRecorder.submit(this.termCode);
         }
         this._closeMediaConnection();
         this._destroyAllPeers(this.termCode);
-        this._fire("onDisconnect", this.termCode, shouldReconnect);
-        if (shouldReconnect) {
-            this.scheduleReconnect();
-            return;
-        }
-        this._stopLocalTracks();
     }
     async scheduleReconnect() {
         let delay = this._joinRetries++ * 500;
@@ -543,7 +554,7 @@ class SfuClient {
             console.warn(`Unhandled event: ${evName}(${args.join(",")})`);
             return;
         }
-        console.log("fire [" + evName + "]");
+        console.log(`fire [${evName}](${args.join(',')})`);
         try {
             method.call(this.app, ...args);
         }
@@ -652,12 +663,13 @@ class SfuClient {
             self.cryptoWorker.postMessage(['dk', msg.from, id, key]);
         });
     }
-    async connect(url, callId, isGroup) {
+    async connect(url, callId, config) {
         if (url) { // for reconnect, we don't pass any parameters to connect()
             this.url = url;
             assert(callId);
+            assert(config);
             this.callId = callId;
-            this.isGroup = isGroup;
+            this.callConfig = config;
             this._joinRetries = 0;
             this._forcedDisconnect = false;
         }
@@ -665,11 +677,35 @@ class SfuClient {
             // this is reconnect - cancel it if user explicitly requested disconnect
             assert(!this._forcedDisconnect);
         }
-        delete this.termCode;
-        this.micMuteMonitor.reinit();
+        this.reinit();
         this._setConnState(ConnState.kConnecting);
         this._fire("onConnecting");
-        this.reinit();
+        const ws = this.conn = new WebSocket(this.url, "svc");
+        ws.onopen = this.onConnect.bind(this);
+        ws.onmessage = this.onPacket.bind(this);
+        ws.onclose = this.onWsClose.bind(this);
+    }
+    /** (re-)initializes all call-related state, but doesn't touch the local streams,
+     *  which may be kept running
+     **/
+    reinit() {
+        this._sendKeyIdGen = -1;
+        this.peers.clear();
+        this._sentAv = 0;
+        delete this._lastPeerJoinLeave;
+        delete this.termCode;
+        delete this.waitingRoomUsers;
+        delete this.moderators;
+        this.cryptoWorker.postMessage(['r']); // reset crypto
+        this.statCtx = {};
+        this._statsRecorder.reset();
+        this.micMuteMonitor.reinit();
+        if (this.callConfig.hasWaitingRoom) {
+            this.waitingRoomUsers = new Map();
+        }
+        this._callJoinPermission = this.callConfig.hasWaitingRoom
+            ? CallJoinPermission.kUnknown
+            : CallJoinPermission.kAllow;
         let pc = this.rtcConn = new RTCPeerConnection({
             encodedInsertableStreams: true,
             sdpSemantics: 'unified-plan'
@@ -717,10 +753,6 @@ class SfuClient {
                 this.handleRtcDisconnect();
             }
         };
-        let ws = this.conn = new WebSocket(this.url, "svc");
-        ws.onopen = this.onConnect.bind(this);
-        ws.onmessage = this.onPacket.bind(this);
-        ws.onclose = this.onWsClose.bind(this);
     }
     hasConnection() {
         return this.conn != null;
@@ -799,11 +831,22 @@ class SfuClient {
         console.log("tx:\n", JSON.stringify(msg, logReplacerFunc));
     }
     async onConnect() {
-        console.log("ws opened");
-        this._setConnState(ConnState.kJoining);
         this._fire("onConnected");
+        if (!this.callConfig.hasWaitingRoom) {
+            this.joinCall();
+        }
+        else {
+            this._setConnState(ConnState.kInWaitingRoom);
+        }
+    }
+    async joinCall() {
+        this._setConnState(ConnState.kCallJoining);
         // this._sendVthumb = true;
         await this._updateSentTracks();
+        if (this._connState !== ConnState.kCallJoining) {
+            // might have been disconnected while waiting for updateSentTracks
+            return;
+        }
         let pc = this.rtcConn;
         let offer = await pc.createOffer();
         let sdp = sdpCompress(offer.sdp);
@@ -855,8 +898,11 @@ class SfuClient {
         // first, determine which tracks we need
         let screen = self._isSharingScreen;
         let camera = !self._muteCamera;
-        // get audio track when active speaker, even if muted. This will spedd up unmuting
+        // get audio track when active speaker, even if muted. This will speed up unmuting
         let audio = (this._speakerState > SpeakerState.kNoSpeaker) ? true : false;
+        if (this._muteAudio && audio && this._audioGetFailedOnce) {
+            audio = false;
+        }
         // then, check what we have and what needs to change
         var camChange = camera != (!!self._cameraTrack);
         var screenChange = screen != (!!self._screenTrack);
@@ -865,7 +911,7 @@ class SfuClient {
             console.log("getLocalTracks: nothing to change");
             return false;
         }
-        let errAv = 0;
+        let errors = null;
         // delete the tracks we disable, and prepare options for getting the ones we enable
         let promises = [];
         if (audioChange && !audio) {
@@ -894,11 +940,21 @@ class SfuClient {
                 if (!atrack) {
                     return Promise.reject("Local audio stream has no audio track");
                 }
+                delete self._audioGetFailedOnce;
             })
                 .catch(function (err) {
-                errAv |= Av.Audio;
-                self.logError("Error getting local mic:", err);
-                return Promise.reject(err);
+                self._audioGetFailedOnce = true; // avoid re-retying to get audio in advance
+                // We may be requesting audio in advance, without being asked by the user
+                // In that case, don't report the error
+                if (!self._muteAudio) {
+                    self._muteAudio = true;
+                    errors = addNullObjProperty(errors, "mic", err);
+                    self.logError("Error getting local mic:", err);
+                    return Promise.reject(err);
+                }
+                else {
+                    self.logError("Error getting local mic (in advance):", err);
+                }
             }));
         }
         if (gettingCam) {
@@ -910,7 +966,8 @@ class SfuClient {
                 }
             })
                 .catch(function (err) {
-                errAv |= Av.Camera;
+                self._muteCamera = true;
+                errors = addNullObjProperty(errors, "camera", err);
                 self.logError("Error getting local camera:", err);
                 return Promise.reject(err);
             }));
@@ -928,14 +985,14 @@ class SfuClient {
             })
                 .catch(function (err) {
                 self._isSharingScreen = false;
-                errAv |= Av.Screen;
+                errors = addNullObjProperty(errors, "screen", err);
                 self.logError("Error getting local screen video:", err);
                 return Promise.reject(err);
             }));
         }
         await Promise.allSettled(promises);
-        if (errAv) {
-            self._fire("onLocalMediaError", errAv);
+        if (errors) {
+            self._fire("onLocalMediaError", errors);
         }
         return true;
     }
@@ -974,8 +1031,12 @@ class SfuClient {
             // first, determine which tracks we want to obtain, and null sender tracks that we want disabled
             if (self._speakerState === SpeakerState.kActive) {
                 if (!self._muteAudio && self._audioTrack) {
-                    promises.push(self.outASpeakerTrack.sendTrack(self._audioTrack));
-                    this.micMuteMonitor.restart();
+                    // do a check in advance here (unlike elsewhere) to avoid unneeded restarts of the micMuteMonitor
+                    const already = self.outASpeakerTrack.sentTrack === self._audioTrack;
+                    if (!already) {
+                        promises.push(self.outASpeakerTrack.sendTrack(self._audioTrack));
+                        this.micMuteMonitor.restart();
+                    }
                 }
                 else {
                     promises.push(self.outASpeakerTrack.sendTrack(null));
@@ -1115,7 +1176,7 @@ class SfuClient {
         return this._speakerState;
     }
     _sendAvState() {
-        if (this._connState !== ConnState.kJoined) {
+        if (this._connState !== ConnState.kCallJoined) {
             return;
         }
         this.send({ a: "AV", av: this.availAv });
@@ -1250,6 +1311,7 @@ class SfuClient {
     async onPacket(event) {
         //Get protocol message
         const msg = JSON.parse(event.data);
+        console.log("rx:\n", JSON.stringify(msg, logReplacerFunc));
         if (this.inputPacketQueue) {
             this.inputPacketQueue.push(msg);
         }
@@ -1259,18 +1321,13 @@ class SfuClient {
     }
     processMessage(msg) {
         if (msg.err != null) {
-            if (msg.err !== termCodes.kUserHangup) {
-                let strError = termCodes[msg.err];
-                let logMsg = "Server closed connection with error ";
-                logMsg += strError ? strError : `(${msg.err})`;
-                if (msg.msg) {
-                    logMsg += ": " + msg.msg;
-                }
-                console.warn(logMsg);
+            const strError = termCodes[msg.err];
+            let logMsg = "Server closed connection with error ";
+            logMsg += strError ? strError : `(${msg.err})`;
+            if (msg.msg) {
+                logMsg += ": " + msg.msg;
             }
-            else {
-                console.warn(`Call was ended by moderator ${msg.by || "<anonymous>"}`);
-            }
+            console.warn(logMsg);
             this.disconnect(msg.err, true); // may be retriable, i.e. kSvrShuttingDown
             return;
         }
@@ -1278,12 +1335,16 @@ class SfuClient {
             console.warn("SFU server WARNING:", msg.warn);
             return;
         }
+        if (msg.deny) {
+            this.handleDeny(msg);
+            return;
+        }
         let handler = SfuClient.msgHandlerMap[msg.a];
         if (handler) {
             handler.call(this, msg);
         }
         else {
-            console.warn("Ingoring unknown packet", msg.a);
+            console.warn("Ingoring unknown packet", msg.a || JSON.stringify(msg));
         }
     }
     processInputQueue() {
@@ -1316,9 +1377,8 @@ class SfuClient {
         this.inputPacketQueue = [];
         assert(msg.cid);
         this.assignCid(msg.cid);
-        if (msg.mod) {
-            this._isModerator = true;
-            this._fire("onModerator", this._isModerator);
+        if (msg.mods) {
+            this.moderators = new Set(msg.mods);
         }
         this._tsCallJoin = Date.now();
         this._tsCallStart = this._tsCallJoin - msg.t;
@@ -1349,7 +1409,7 @@ class SfuClient {
         // fire onJoined before any requests for tracks, otherwise - stream data is received BEFORE the client app even
         // knows that this user had joined
         this._joinRetries = 0;
-        this._setConnState(ConnState.kJoined);
+        this._setConnState(ConnState.kCallJoined);
         this._fire("onJoined");
         this.enableStats();
         this.setThumbVtrackResScale();
@@ -1586,7 +1646,7 @@ class SfuClient {
             this.addPeerSpeaker(msg.cid, msg);
         }
     }
-    async msgSpeakOff(msg) {
+    msgSpeakOff(msg) {
         if (!msg.cid) {
             this.onStopSpeaking();
         }
@@ -1631,19 +1691,118 @@ class SfuClient {
             peer.setSpeakReq();
         }
     }
-    msgMod(msg) {
-        if (!msg.cid) {
-            this._isModerator = msg.mod;
-            this._fire("onModerator", msg.mod);
+    msgModAdd(msg) {
+        assert(msg.user);
+        if (!this.moderators) {
+            console.error("BUG: msgModAdd: moderators list does not exist, creating it");
+            this.moderators = new Set();
+        }
+        this.moderators.add(msg.user);
+        this._fire("onModeratorAdd", msg.user);
+    }
+    msgModDel(msg) {
+        assert(msg.user);
+        if (!this.moderators) {
+            console.error("BUG: msgModDel: moderators list does not exist");
         }
         else {
-            let peer = this.peers.get(msg.cid);
-            if (!peer) {
-                console.warn("msgMod: Unknown peer cid", msg.cid);
+            this.moderators.delete(msg.user);
+        }
+        this._fire("onModeratorDel", msg.user);
+    }
+    // WaitingRoom list and permissions sync notifications, for moderators only
+    msgWrDump(msg) {
+        const users = msg.users;
+        for (const userId in users) {
+            this.waitingRoomUsers.set(userId, users[userId]);
+        }
+        this._fire("wrOnUsersEntered", users);
+    }
+    msgWrEnter(msg) {
+        assert(msg.users);
+        assert(this.waitingRoomUsers);
+        const users = msg.users;
+        for (let userId in users) {
+            this.waitingRoomUsers.set(userId, users[userId]);
+        }
+        this._fire("wrOnUsersEntered", users);
+    }
+    msgWrLeave(msg) {
+        assert(msg.user);
+        assert(this.waitingRoomUsers);
+        this.waitingRoomUsers.delete(msg.user);
+        this._fire("wrOnUserLeft", msg.user);
+    }
+    wrSetUserPermissions(users, allow) {
+        assert(this.waitingRoomUsers);
+        for (let userId of users) {
+            this.waitingRoomUsers.set(userId, allow);
+        }
+        this._fire(allow ? "wrOnUsersAllow" : "wrOnUsersDeny", users);
+    }
+    msgWrUsersAllow(msg) {
+        this.wrSetUserPermissions(msg.users, true);
+    }
+    msgWrUsersDeny(msg) {
+        this.wrSetUserPermissions(msg.users, false);
+    }
+    msgWrAllowReq(msg) {
+        this._fire("wrOnAllowRequest", msg.user);
+    }
+    // Waiting room greeting - allow or deny call access
+    msgWrAllow(msg) {
+        if (this._connState !== ConnState.kInWaitingRoom) {
+            return;
+        }
+        this._callJoinPermission = CallJoinPermission.kAllow;
+        if (msg.mods) {
+            this.moderators = new Set(msg.mods);
+        }
+        this._fire("wrOnJoinAllowed");
+    }
+    msgWrDeny(msg) {
+        if (this._connState !== ConnState.kInWaitingRoom) {
+            return;
+        }
+        this._callJoinPermission = CallJoinPermission.kDeny;
+        if (msg.mods) {
+            this.moderators = new Set(msg.mods);
+        }
+        this._fire("wrOnJoinNotAllowed");
+    }
+    // ====
+    msgBye(msg) {
+        if (msg.wr) { // pushed from call to waiting room
+            assert(this.callConfig.hasWaitingRoom);
+            console.warn("Leaving call and entering waiting room");
+            this.leaveCall(msg.rsn);
+            this._setConnState(ConnState.kInWaitingRoom);
+            this.reinit();
+            this._fire("wrOnPushedFromCall");
+        }
+        else { // completely disconnected
+            this.disconnect(msg.rsn, false);
+        }
+    }
+    handleDeny(msg) {
+        if (msg.deny === "JOIN") {
+            if (this._connState !== ConnState.kCallJoining) {
                 return;
             }
-            peer._fire("onPeerModerator", msg.mod);
+            this.leaveCall(termCodes.kPushedToWaitingRoom);
         }
+        else {
+            console.warn(`Operation ${msg.deny} denied: ${msg.msg}`);
+        }
+    }
+    wrAllowJoin(users) {
+        this.send({ a: "WR_ALLOW", users: users });
+    }
+    wrPush(users) {
+        this.send({ a: "WR_PUSH", users: users });
+    }
+    wrKickOut(users) {
+        this.send({ a: "WR_KICK", users: users });
     }
     enableStats() {
         if (this.statTimer) {
@@ -1692,8 +1851,8 @@ class SfuClient {
         }
     }
     async pollStats() {
-        if (this._connState !== ConnState.kJoined) {
-            console.warn("pollStats called while not in kJoined state");
+        if (this._connState !== ConnState.kCallJoined) {
+            console.warn("pollStats called while not in kCallJoined state");
             return;
         }
         let stats = this.rtcStats = { pl: 0, jtr: 1000000 };
@@ -1908,7 +2067,15 @@ SfuClient.msgHandlerMap = {
     "SPEAK_ON": SfuClient.prototype.msgSpeakOn,
     "SPEAK_OFF": SfuClient.prototype.msgSpeakOff,
     "KEY": SfuClient.prototype.msgKey,
-    "MOD": SfuClient.prototype.msgMod,
+    "BYE": SfuClient.prototype.msgBye,
+    "WR_ALLOW": SfuClient.prototype.msgWrAllow,
+    "WR_DENY": SfuClient.prototype.msgWrDeny,
+    "WR_DUMP": SfuClient.prototype.msgWrDump,
+    "WR_ENTER": SfuClient.prototype.msgWrEnter,
+    "WR_LEAVE": SfuClient.prototype.msgWrLeave,
+    "WR_USERS_ALLOW": SfuClient.prototype.msgWrUsersAllow,
+    "WR_USERS_DENY": SfuClient.prototype.msgWrUsersDeny,
+    "WR_ALLOW_REQ": SfuClient.prototype.msgWrAllowReq
 };
 class Slot {
     constructor(client, xponder, generateIv) {
@@ -2033,13 +2200,10 @@ class VideoSlot extends Slot {
         this.sentLayers = SfuClient.kSpatialLayerCount;
         this.isVideo = true;
     }
-    reassignV(fromCid, iv, isHiRes, noDetach, releaseCb) {
+    reassignV(fromCid, iv, isHiRes, trackReused, releaseCb) {
         this.isHiRes = isHiRes;
-        if (!noDetach) {
+        if (fromCid !== this.cid || !trackReused) {
             this._detachAllPlayers();
-        }
-        else { // track reusing can be done only for the same cid, for hires<->lowres interchange
-            assert(fromCid === this.cid);
         }
         this._releaseTrackCb = releaseCb;
         super.reassign(fromCid, iv);
@@ -2116,7 +2280,6 @@ class VideoPlayer {
     constructor(peer, isHiRes) {
         this.peer = peer;
         this._isHiRes = !!isHiRes;
-        this.player = document.createElement("video");
         this.gui = peer.client.app.onNewPlayer(this);
     }
     get isHiRes() {
@@ -2124,6 +2287,9 @@ class VideoPlayer {
     }
     get userId() {
         return this.peer.userId;
+    }
+    get track() {
+        return this.slot ? this.slot.inTrack : null;
     }
     attachToTrack(slot) {
         assert(slot);
@@ -2137,8 +2303,7 @@ class VideoPlayer {
         }
         this.slot = slot;
         slot._onAttachedToPlayer(this);
-        this.gui.onAttachedToTrack();
-        playerPlay(this.player, slot.inTrack);
+        this.gui.attachToTrack(slot.inTrack);
         if (this.gui.onRxStats) {
             slot.rxStatsCallbacks.set(this, this.gui.onRxStats.bind(this.gui));
         }
@@ -2152,7 +2317,7 @@ class VideoPlayer {
         if (!slot) {
             return;
         }
-        playerStop(this.player);
+        this.gui.detachFromTrack();
         slot.rxStatsCallbacks.delete(this);
         slot._onDetachedFromPlayer(this);
         delete this.slot;
@@ -2162,6 +2327,7 @@ class VideoPlayer {
         this._detachFromCurrentTrack();
         delete this.player;
         this.gui.onDestroy();
+        this.isDestroyed = true;
     }
 }
 class ThumbPlayer extends VideoPlayer {
@@ -2170,7 +2336,7 @@ class ThumbPlayer extends VideoPlayer {
         peer.vThumbPlayer = this;
     }
     destroy() {
-        if (!this.player) {
+        if (this.isDestroyed) {
             console.warn("ThumbPlayer.destroy: already destroyed");
             return;
         }
@@ -2191,8 +2357,7 @@ class HiResPlayer extends VideoPlayer {
         this.vThumbSlot = slot;
         slot._onAttachedToPlayer(this);
         this.vThumbPlayer = document.createElement("video");
-        this.gui.onVthumbAttach();
-        playerPlay(this.vThumbPlayer, slot.inTrack);
+        this.gui.vThumbAttachToTrack(slot.inTrack);
     }
     detachFromVthumbTrack() {
         if (!this.vThumbSlot) {
@@ -2213,11 +2378,11 @@ class HiResPlayer extends VideoPlayer {
         assert(this.vThumbPlayer);
         playerStop(this.vThumbPlayer);
         delete this.vThumbSlot;
-        this.gui.onVthumbDetach();
+        this.gui.vThumbDetachFromTrack();
         delete this.vThumbPlayer;
     }
     destroy() {
-        if (!this.player) {
+        if (this.isDestroyed) {
             console.warn("HiResPlayer.destroy: already destroyed");
             return;
         }
@@ -2272,6 +2437,10 @@ class Peer {
         if (!isInitialDump) {
             this._fire("onPeerJoined");
         }
+    }
+    get isModerator() {
+        let mods = this.client.moderators;
+        return mods ? mods.has(this.userId) : false;
     }
     get isSpeaker() { return this._isSpeaker; }
     get audioLevel() { return this._audioLevel; }
@@ -2336,7 +2505,9 @@ class Peer {
             playerStop(this.audioPlayer);
             delete this.audioPlayer;
         }
-        this._fire("onPeerLeft", reason);
+        if (this.client.termCode == null) {
+            this._fire("onPeerLeft", reason);
+        }
     }
     get hasThumbnailVideo() { return this.vThumbPlayer != null; }
     get hasHiresVideo() { return this.hiResPlayer != null; }
@@ -2349,7 +2520,7 @@ class Peer {
         this.client.send({ a: "GET_VTHUMBS", cids: [this.cid] });
         return player.gui;
     }
-    requestHiResVideo(resDivider) {
+    requestHiResVideo(resDivider, reuseVthumb) {
         let player = this.hiResPlayer;
         if (player) {
             if (player.resDivider != resDivider) {
@@ -2362,9 +2533,12 @@ class Peer {
             return player.gui;
         }
         player = new HiResPlayer(this, resDivider);
-        let cmd = { a: "GET_HIRES", cid: this.cid, r: 1 };
+        let cmd = { a: "GET_HIRES", cid: this.cid };
         if (resDivider) {
             cmd.lo = resDivider;
+        }
+        if (reuseVthumb) {
+            cmd.r = 1;
         }
         this.client.send(cmd);
         return player.gui;
@@ -2466,9 +2640,12 @@ class Peer {
                 // peer doesn't send cam + screen, but we have a vthumb in the hi-res player, remove it
                 this.hiResPlayer.detachFromVthumbTrack();
             }
+            /*
+            // disable because we may want hi and low res tracks at the same time (during resolution switching)
             if (this.vThumbPlayer && this.hiResSlot && this.vThumbPlayer.slot !== this.hiResSlot) {
                 this.vThumbPlayer.attachToTrack(this.hiResSlot);
             }
+            */
         }
     }
     sendsCameraAndScreen() {
@@ -2528,7 +2705,7 @@ class Peer {
             console.warn(`Peer: Unhandled event: ${evName}(${args.join(",")})`);
             return;
         }
-        console.log("fire [" + evName + "]");
+        console.log(`fire [${evName}](${args.join(',')})`);
         try {
             if (args) {
                 method.call(this.handler, this, ...args);
@@ -2890,6 +3067,10 @@ class SpeakerDetector {
         this.enable(false);
     }
     enable(enable) {
+        this.enabled = enable;
+        if (!this.peers.size) {
+            return;
+        }
         this.deleteTimer();
         let cb = enable ? this._onTimerTick_active.bind(this) : this._onTimerTick_passive.bind(this);
         this.timer = setInterval(cb, SfuClient.kAudioMonTickPeriod);
@@ -2903,6 +3084,9 @@ class SpeakerDetector {
     }
     registerPeer(peer) {
         this.peers.add(peer);
+        if (!this.timer) {
+            this.enable(this.enabled);
+        }
     }
     unregisterPeer(peer) {
         this.peers.delete(peer);
@@ -3035,7 +3219,7 @@ class StatsRecorder {
         if (!this.client.micInputSeen) {
             data.nomic = 1;
         }
-        if (this.client.isGroup) {
+        if (this.client.callConfig.isGroup) {
             data.grp = 1;
         }
         if (client.url) {
@@ -3075,6 +3259,15 @@ function msDelay(ms) {
     return new Promise(function (resolve, reject) {
         setTimeout(() => resolve(), ms);
     });
+}
+function addNullObjProperty(obj, name, val) {
+    if (!obj) {
+        return { [name]: val };
+    }
+    else {
+        obj[name] = val;
+        return obj;
+    }
 }
 if (!SfuClient.platformHasSupport()) {
     console.error("This browser does not support insertable streams");

@@ -265,6 +265,7 @@ export default class Stream extends MegaRenderMixin {
                     $$STREAMS.push(
                         <StreamNode
                             mode={mode}
+                            externalVideo={true}
                             chatRoom={chatRoom}
                             menu={true}
                             ephemeralAccounts={ephemeralAccounts}
@@ -316,6 +317,7 @@ export default class Stream extends MegaRenderMixin {
                                         <StreamNode
                                             key={stream.clientId}
                                             stream={stream}
+                                            externalVideo={true}
                                             chatRoom={chatRoom}
                                             menu={true}
                                             ephemeralAccounts={ephemeralAccounts}
@@ -372,6 +374,7 @@ export default class Stream extends MegaRenderMixin {
                     key={targetStream.clientId}
                     className={forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : ''}
                     stream={targetStream}
+                    externalVideo={true}
                     chatRoom={chatRoom}
                     menu={true}
                     ephemeralAccounts={ephemeralAccounts}

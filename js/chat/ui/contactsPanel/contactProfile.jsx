@@ -205,7 +205,12 @@ export default class ContactProfile extends MegaRenderMixin {
                                         className="mega-button round simpletip"
                                         icon="sprite-fm-mono icon-video-call-filled"
                                         disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
-                                        attrs={{ 'data-simpletip': l[5897] /* `Start Video Call` */ }}
+                                        attrs={{
+                                            'data-simpletipposition': 'top',
+                                            'data-simpletip': !megaChat.hasSupportForCalls ?
+                                                l.unsupported_browser_video : l[5897]
+                                            /* `Your browser doesn't support video calls. Please try a different one!`
+                                            : `Start Video Call` */ }}
                                         onClick={() => {
                                             if (M.isInvalidUserStatus()) {
                                                 return;

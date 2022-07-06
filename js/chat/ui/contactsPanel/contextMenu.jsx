@@ -94,49 +94,55 @@ export default class ContextMenu extends MegaRenderMixin {
                             )
                         }
                     />
-                    <DropdownItem
-                        submenu={true}
-                        icon="sprite-fm-mono icon-phone"
-                        className="sprite-fm-mono-before icon-arrow-right-before"
-                        label={l[19125] /* `Start call...` */}
-                    />
-                    <div className="dropdown body submenu">
+                    <div
+                        data-simpletipposition='top'
+                        className='simpletip'
+                        data-simpletip={!megaChat.hasSupportForCalls ? l.call_not_suported : ''}>
                         <DropdownItem
+                            submenu={megaChat.hasSupportForCalls}
+                            disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
                             icon="sprite-fm-mono icon-phone"
-                            disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
-                            label={l[5896] /* `Start Audio Call` */}
-                            onClick={() =>
-                                inProgressAlert()
-                                    .then(() =>
-                                        this.close(() =>
-                                            megaChat.createAndShowPrivateRoom(contact.u)
-                                                .then(room => {
-                                                    room.setActive();
-                                                    room.startAudioCall();
-                                                })
-                                        )
-                                    )
-                                    .catch(() => d && console.warn('Already in a call.'))
-                            }
+                            className="sprite-fm-mono-before icon-arrow-right-before"
+                            label={l[19125] /* `Start call...` */}
                         />
-                        <DropdownItem
-                            icon="sprite-fm-mono icon-video-call-filled"
-                            disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
-                            label={l[5897] /* `Start Video Call` */}
-                            onClick={() =>
-                                inProgressAlert()
-                                    .then(() =>
-                                        this.close(() =>
-                                            megaChat.createAndShowPrivateRoom(contact.u)
-                                                .then(room => {
-                                                    room.setActive();
-                                                    room.startVideoCall();
-                                                })
+                        <div className="dropdown body submenu">
+                            <DropdownItem
+                                icon="sprite-fm-mono icon-phone"
+                                disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
+                                label={l[5896] /* `Start Audio Call` */}
+                                onClick={() =>
+                                    inProgressAlert()
+                                        .then(() =>
+                                            this.close(() =>
+                                                megaChat.createAndShowPrivateRoom(contact.u)
+                                                    .then(room => {
+                                                        room.setActive();
+                                                        room.startAudioCall();
+                                                    })
+                                            )
                                         )
-                                    )
-                                    .catch(() => d && console.warn('Already in a call.'))
-                            }
-                        />
+                                        .catch(() => d && console.warn('Already in a call.'))
+                                }
+                            />
+                            <DropdownItem
+                                icon="sprite-fm-mono icon-video-call-filled"
+                                disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
+                                label={l[5897] /* `Start Video Call` */}
+                                onClick={() =>
+                                    inProgressAlert()
+                                        .then(() =>
+                                            this.close(() =>
+                                                megaChat.createAndShowPrivateRoom(contact.u)
+                                                    .then(room => {
+                                                        room.setActive();
+                                                        room.startVideoCall();
+                                                    })
+                                            )
+                                        )
+                                        .catch(() => d && console.warn('Already in a call.'))
+                                }
+                            />
+                        </div>
                     </div>
                     <hr />
                     {withProfile &&

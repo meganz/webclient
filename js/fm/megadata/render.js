@@ -409,7 +409,7 @@ MegaData.prototype.renderChatIsLoading = function() {
 
     $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
 
-    $('.fm-right-files-block, .fm-left-panel, .fm-transfers-block').addClass('hidden');
+    $('.fm-right-files-block, .fm-left-panel').addClass('hidden');
 
     $('.section.conversations').removeClass('hidden');
     $('.section.conversations .fm-chat-is-loading').removeClass('hidden');

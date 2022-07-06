@@ -1109,6 +1109,7 @@ li.active .call-duration i {
     margin: 0 24px;
     min-width: calc(100% - 48px);
     max-width: calc(100% - 48px);
+    background: none;
 }
 
 .contacts-table thead th {
@@ -1242,6 +1243,8 @@ li.active .call-duration i {
     display: flex;
     flex-direction: column;
     height: 100%;
+    background: no-repeat center 21px linear-gradient(90deg, var(--stroke-grey-2), var(--stroke-grey-2));
+    background-size: auto 1px;
 }
 
 .contacts-list {
@@ -1400,6 +1403,7 @@ li.active .call-duration i {
 
 .profile-shared-folders .content-container {
     padding: 0 16px 6px;
+    background-position-y: 34px;
 }
 
 .profile-shared-folders .dialog-empty-block {

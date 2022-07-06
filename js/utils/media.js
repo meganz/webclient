@@ -943,7 +943,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 if (!setIdle.value) {
                     videoTimingElement.textContent = secondsToTimeShort(offset, 1);
-                    progressBarElementStyle.setProperty('width', Math.round(100 * offset / length) + '%');
+                    progressBarElementStyle.setProperty('width', `${100 * offset / length}%`);
                 }
 
                 if (offset % 2) {
@@ -1485,7 +1485,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             onTimeUpdate = function(offset, length) {
                 offset = offset > length ? length : offset;
                 videoTimingElement.textContent = secondsToTimeShort(offset, 1);
-                $('.video-time-bar', $wrapper).css('width', Math.round(100 * offset / length) + '%');
+                $('.video-time-bar', $wrapper).css('width',  `${100 * offset / length}%`);
             };
         }
 

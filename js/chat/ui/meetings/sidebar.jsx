@@ -67,13 +67,14 @@ export default class Sidebar extends MegaRenderMixin {
                                 mode={mode}
                                 chatRoom={chatRoom}
                                 stream={localStream}
+                                isLocal={true}
                                 simpletip={{...SIMPLE_TIP, label: l[8885]}}
                                 isCallOnHold={isOnHold}
                                 localAudioMuted={!(call.av & SfuClient.Av.Audio)}
-                                className={`
-                                    ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
-                                    ${forcedLocal ? 'active' : ''}
-                                `}
+                                className={
+                                    (call.isSharingScreen() ? '' : 'local-stream-mirrored') + ' ' +
+                                    (forcedLocal ? 'active' : '')
+                                }
                                 onClick={() => {
                                     mBroadcaster.sendMessage('meetings:collapse');
                                     onSpeakerChange(localStream);

@@ -1,60 +1,33 @@
 (() => {
     "use strict";
 
-    const hexDigits = "0123456789abcdef";
-    if (!window.binToHex) {
-        window.binToHex = (arr) => {
-            var result = "";
-            if (!arr.getUint8) {
-                arr = new DataView(arr);
-            }
-            for (let i = 0; i < arr.byteLength; i++) {
-                const val = arr.getUint8(i);
-                result += hexDigits.charAt(val >> 4);
-                result += hexDigits.charAt(val & 0x0f);
-            }
-            return result;
-        };
-    }
-
-    if (!window.hexDigitVal) {
-        window.hexDigitVal = function(chCode) {
-            if (chCode <= 57) { // ascii code if '9'
-                return chCode - 48; // ascii code of '0'
-            }
-            else if (chCode >= 97) { // 'a'
-                return 10 + chCode - 97;
-            }
-            return 10 + chCode - 65; // 'A'
-        };
-    }
-
-    if (!window.hexToBin) {
-        window.hexToBin = function(hexStr) {
-            const bin = new Uint8Array(hexStr.length >> 1);
-            for (let pos = 0, binPos = 0; pos < hexStr.length; binPos++) {
-                bin[binPos] = (hexDigitVal(hexStr.charCodeAt(pos++)) << 4) | hexDigitVal(hexStr.charCodeAt(pos++));
-            }
-            return bin;
-        };
-    }
-
-    var SfuGui = function(app, player) {
+class PlayerData {
+    constructor(app, player) {
         this.app = app;
         this.player = player;
-        // this.peer = this.app.callManagerCall.registerPlayer(player);
-    };
+        this.appCall = app.callManagerCall;
+        this.appPeer = this.appCall.peers[player.peer.cid];
+        assert(this.appPeer);
+        this.video = document.createElement("video");
+    }
 
-    SfuGui.prototype.onAttachedToTrack = function() {
-        this.peer = this.app.callManagerCall.registerPlayer(this.player);
-    };
+    attachToTrack(track) { // we wait for player to sync and start, so nothing to do here
+        this.video.addEventListener("playing", () => {
+            if (this.onPlay()) {
+                this.appCall.registerPlayer(this);
+            }
+        });
+        SfuClient.playerPlay(this.video, track);
+    }
 
+    detachFromTrack() {
+        SfuClient.playerStop(this.video);
+    }
 
-    SfuGui.prototype.onDestroy = function() {
-        this.app.callManagerCall.deregisterPlayer(this.player);
-    };
-
-
+    onDestroy() {
+        this.app.callManagerCall.deregisterPlayer(this);
+    }
+}
 
     var SfuApp = function(room, callId) {
         this.room = room;
@@ -70,8 +43,8 @@
         console.error('onServerError!!!', errCode);
     };
 
-    SfuApp.prototype.onNewPlayer = function(playerObj) {
-        return new SfuGui(this, playerObj);
+    SfuApp.prototype.onNewPlayer = function(sfuPlayer) {
+        return new PlayerData(this, sfuPlayer);
     };
 
     SfuApp.prototype.onPeerJoined = function(peer) {
@@ -237,21 +210,17 @@
         'onAudioLevel',
         'onRxStats',
     ].forEach((fnName) => {
-        SfuGui.prototype[fnName] = function() {
+        PlayerData.prototype[fnName] = function() {
             // if (fnName === "onRxStats") {
             //     return;
             // }
-            // console.error('SfuGui', fnName, arguments);
+            // console.error('PlayerData', fnName, arguments);
         };
     });
 
     if (SfuApp.VIDEO_DEBUG_MODE) {
-        SfuGui.prototype.onRxStats = function(track, info, raw) {
+        PlayerData.prototype.onRxStats = function(track, info, raw) {
             if (!window.sfuClient) {
-                return;
-            }
-            const elem = document.getElementById(`rtc-stats-${track.cid}`);
-            if (!elem) {
                 return;
             }
             let text = `${track.cid}: `;
@@ -260,25 +229,26 @@
             }
             text += `${raw.framesPerSecond || 0}fps ${Math.round(info.keyfps)}kfs ${Math.round(info.kbps)
                 }kbps rtt: ${sfuClient.rtcStats.rtt}, pl: ${Math.round(info.plost)}, rxq: ${sfuClient.rxQuality}`;
-            elem.innerText = text;
+
+            for (const cons of this.appPeer.consumers) {
+                cons.displayStats(text);
+            }
         };
         SfuApp.prototype.onVideoTxStat = function(isHiRes, stats, raw) {
             if (!window.sfuClient) {
                 return;
             }
-            const elem = document.getElementById("rtc-stats-local");
-            if (!elem) {
-                return;
-            }
             let text = (isHiRes === null)
-                ? "" // onVideoTxStat(null) is called when there is no output video track
-                : `${stats.vtxw}x${stats.vtxh}:${sfuClient.sentTracksString()} ${Math.round(stats._vtxkbps)
+                ? "loc: <not sending>" // onVideoTxStat(null) is called when there is no output video track
+                : `loc: ${stats.vtxw}x${stats.vtxh}:${sfuClient.sentTracksString()} ${Math.round(stats._vtxkbps)
                     }kbps\n${stats.vtxfps || 0}fps ${Math.round(stats._vtxkfps)}kfs rtt: ${stats.rtt} dly: ${stats.vtxdly}`;
 
             if (sfuClient.isSendingScreenHiRes()) {
                 text += `\ntxq: ${sfuClient.txQuality}`;
             }
-            elem.innerText = text;
+            for (const cons of this.callManagerCall.localVideoConsumers) {
+                cons.displayStats(text);
+            }
         };
     }
 

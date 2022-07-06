@@ -270,6 +270,7 @@ class Stream extends MegaRenderMixin {
         <StreamNode
             stream={{ ...this.props.call.getLocalStream(), source: null }}
             isCallOnHold={this.props.isOnHold}
+            isLocal={true}
         />;
 
     renderOptionsDialog = () => {
@@ -355,6 +356,7 @@ class Stream extends MegaRenderMixin {
             <StreamNode
                 className={forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : ''}
                 mode={mode}
+                isLocal={true}
                 stream={this.getStreamSource()}
                 onLoadedData={onLoadedData}
             />
@@ -372,9 +374,11 @@ class Stream extends MegaRenderMixin {
         return (
             <>
                 <StreamNode
+                    isSelfOverlay={true}
                     className={call.isSharingScreen() ? '' : 'local-stream-mirrored'}
                     minimized={minimized}
                     stream={this.getStreamSource()}
+                    isLocal={true}
                     onLoadedData={onLoadedData}
                     localAudioMuted={!(call.av & SfuClient.Av.Audio)}
                 />
@@ -449,7 +453,7 @@ class Stream extends MegaRenderMixin {
                 ref={this.containerRef}
                 className={`
                     ${NAMESPACE}
-                    ${StreamNode.isStreaming(this.getStreamSource()) ? ratioClass : ''}
+                    ${this.getStreamSource().isStreaming() ? ratioClass : ''}
                     ${IS_MINI_MODE ? 'mini' : ''}
                     ${minimized ? 'minimized' : ''}
                     ${this.state.options ? 'active' : ''}

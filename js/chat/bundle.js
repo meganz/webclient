@@ -22111,8 +22111,8 @@ class Invite extends mixins.wl {
         searching
       } = this.state;
 
-      if (frequents.length === 0 && searching) {
-        return external_React_default().createElement(Nil, null);
+      if (frequents.length === 0) {
+        return false;
       }
 
       return frequents.map(userHandle => {
@@ -22171,6 +22171,8 @@ class Invite extends mixins.wl {
     };
 
     this.renderContent = () => {
+      var frequentContacts = this.getFilteredFrequents();
+
       if (HAS_CONTACTS()) {
         const {
           contacts,
@@ -22194,7 +22196,7 @@ class Invite extends mixins.wl {
           options: {
             'suppressScrollX': true
           }
-        }, $$RESULT_TABLE(l[20141], this.getFilteredFrequents()), $$RESULT_TABLE(l[165], this.getFilteredContacts()));
+        }, frequentContacts ? $$RESULT_TABLE(l[20141], frequentContacts) : '', $$RESULT_TABLE(l[165], this.getFilteredContacts()));
       }
 
       return external_React_default().createElement(Nil, null);

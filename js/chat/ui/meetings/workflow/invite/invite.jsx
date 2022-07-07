@@ -130,8 +130,8 @@ export default class Invite extends MegaRenderMixin {
     getFilteredFrequents = () => {
         const { frequents, selected, searching } = this.state;
 
-        if (frequents.length === 0 && searching) {
-            return <Nil />;
+        if (frequents.length === 0) {
+            return false;
         }
 
         return frequents.map(userHandle => {
@@ -186,6 +186,8 @@ export default class Invite extends MegaRenderMixin {
     };
 
     renderContent = () => {
+        var frequentContacts = this.getFilteredFrequents();
+
         if (HAS_CONTACTS()) {
             const { contacts, frequents } = this.state;
             const $$RESULT_TABLE = (header, children) =>
@@ -207,7 +209,7 @@ export default class Invite extends MegaRenderMixin {
                 <PerfectScrollbar
                     ref={this.wrapperRef}
                     options={{ 'suppressScrollX': true }}>
-                    {$$RESULT_TABLE(l[20141] /* `Recents` */, this.getFilteredFrequents())}
+                    {frequentContacts ? $$RESULT_TABLE(l[20141] /* `Recents` */, frequentContacts) : ''}
                     {$$RESULT_TABLE(l[165] /* `Contacts` */, this.getFilteredContacts())}
                 </PerfectScrollbar>
             );

@@ -70,17 +70,16 @@ Message._getTextContentsForDialogType = function(message) {
         }
 
         if (message.dialogType === "privilegeChange" && message.meta) {
-            textMessage = textMessage.replace("%2", contactName);
-            var newPrivilegeText = "";
             if (message.meta.privilege === 3) {
-                newPrivilegeText = l[8875];
+                textMessage = l.priv_change_to_op;
             }
             else if (message.meta.privilege === 2) {
-                newPrivilegeText = l[8874];
+                textMessage = l.priv_change_to_std;
             }
             else if (message.meta.privilege === 0) {
-                newPrivilegeText = l[8873];
+                textMessage = l.priv_change_to_ro;
             }
+            textMessage = textMessage.replace('[S]', '').replace('[/S]', '').replace('%s', contactName);
 
             contact = M.u[message.meta.targetUserId] ? M.u[message.meta.targetUserId] : {
                 'u': message.meta.targetUserId,
@@ -89,7 +88,6 @@ Message._getTextContentsForDialogType = function(message) {
             };
 
             contactName = htmlentities(M.getNameByHandle(contact.u));
-            textMessage = textMessage.replace("%1", newPrivilegeText);
         }
         else if (message.dialogType === "alterParticipants" && message.meta) {
             var otherContact;

@@ -4883,7 +4883,7 @@
     "meeting_empty_call_desc_1": "[P]Enable to receive prompts and automatically be removed from group calls, when all participants leave the call or when no one has joined a call.[/P][P]Disable if you don\u2019t want to receive prompts and want to remain active on group calls even if you\u2019re the only participant.[/P]",
     "meeting_empty_call_lbl": "Remove me from group calls when I\u2019m the only one on the call",
     "meeting_ended": "Meeting has ended.",
-    "meeting_moderators": "Hosts: %s",
+    "meeting_moderators": "{count, plural, one {Host: %s} other {Hosts: %s}}",
     "meetings_signup": "Enjoying your MEGA meeting experience? Sign up for a MEGA account and receive 20 GB of secure and private cloud storage for free.",
     "megadrop_delete_confirm_text": "Contacts with a link to the folder will no longer be able to access it.",
     "megadrop_delete_confirm_title": "Are you sure you want to remove this folder from MEGAdrop?",

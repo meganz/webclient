@@ -19516,7 +19516,7 @@ class StreamNode extends mixins.wl {
         loading
       } = this.state;
 
-      if (stream && stream.isStreaming() && !isCallOnHold) {
+      if (stream && stream.isStreaming && stream.isStreaming() && !isCallOnHold) {
         return external_React_default().createElement((external_React_default()).Fragment, null, loading && external_React_default().createElement("i", {
           className: "sprite-fm-theme icon-loading-spinner loading-icon"
         }), external_React_default().createElement("div", {
@@ -19587,7 +19587,9 @@ class StreamNode extends mixins.wl {
     }
 
     if (!_stream.isFake) {
-      _stream.registerConsumer(this);
+      if (!_stream.isLocal) {
+        _stream.registerConsumer(this);
+      }
 
       if (_stream instanceof CallManager2.Peer) {
         this._streamListener = _stream.addChangeListener((peer, data, key) => {
@@ -19730,7 +19732,9 @@ class StreamNode extends mixins.wl {
     const peer = this.props.stream;
 
     if (peer && !peer.isFake) {
-      this.props.stream.deregisterConsumer(this);
+      var _this$props$stream$de, _this$props$stream;
+
+      (_this$props$stream$de = (_this$props$stream = this.props.stream).deregisterConsumer) == null ? void 0 : _this$props$stream$de.call(_this$props$stream, this);
 
       if (this.props.externalVideo && peer.source) {
         const video = peer.source;
@@ -19767,7 +19771,7 @@ class StreamNode extends mixins.wl {
       return;
     }
 
-    if (!stream.isStreaming()) {
+    if (!stream.isLocal && !stream.isStreaming()) {
       stream.consumerGetVideo(this, CallManager2.CALL_QUALITY.NO_VIDEO);
       return;
     }
@@ -19796,7 +19800,7 @@ class StreamNode extends mixins.wl {
       newQ = CallManager2.CALL_QUALITY.THUMB;
     }
 
-    stream.consumerGetVideo(this, newQ);
+    stream.consumerGetVideo == null ? void 0 : stream.consumerGetVideo(this, newQ);
   }
 
   render() {

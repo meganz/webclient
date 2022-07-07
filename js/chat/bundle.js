@@ -9668,7 +9668,7 @@ class CloudBrowserDialog extends mixins.wl {
       'isActiveSearch': false,
       'searchValue': '',
       'searchText': '',
-      'currentlyViewedEntry': M.RootID
+      'currentlyViewedEntry': this.state.selectedTab === 'shares' ? 'shares' : M.RootID
     });
   }
 
@@ -9703,7 +9703,7 @@ class CloudBrowserDialog extends mixins.wl {
     }
 
     if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < 3)) {
-      newState.currentlyViewedEntry = M.RootID;
+      newState.currentlyViewedEntry = this.state.selectedTab === 'shares' ? 'shares' : M.RootID;
       newState.searchValue = undefined;
     }
 

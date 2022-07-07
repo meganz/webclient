@@ -17,7 +17,10 @@ export default class StreamNode extends MegaRenderMixin {
             this.setupVideoElement(this.clonedVideo);
         }
         if (!stream.isFake) {
-            stream.registerConsumer(this);
+            if (!stream.isLocal) {
+                stream.registerConsumer(this);
+            }
+
             if (stream instanceof CallManager2.Peer) {
                 this._streamListener = stream.addChangeListener((peer, data, key) => {
                     // console.warn("change listener");
@@ -143,7 +146,7 @@ export default class StreamNode extends MegaRenderMixin {
         super.componentWillUnmount();
         const peer = this.props.stream;
         if (peer && !peer.isFake) {
-            this.props.stream.deregisterConsumer(this);
+            this.props.stream.deregisterConsumer?.(this);
             // prevent hd video removal from the DOM from stopping the video
             if (this.props.externalVideo && peer.source) { // media html elements stop playing when removed from the DOM
                 const video = peer.source;
@@ -174,7 +177,7 @@ export default class StreamNode extends MegaRenderMixin {
             // console.warn("... abort: not mounted");
             return;
         }
-        if (!stream.isStreaming()) {
+        if (!stream.isLocal && !stream.isStreaming()) {
             stream.consumerGetVideo(this, CallManager2.CALL_QUALITY.NO_VIDEO);
             return;
         }
@@ -209,7 +212,7 @@ export default class StreamNode extends MegaRenderMixin {
         else {
             newQ = CallManager2.CALL_QUALITY.THUMB;
         }
-        stream.consumerGetVideo(this, newQ);
+        stream.consumerGetVideo?.(this, newQ);
     }
 
     renderVideoDebugMode = () => {
@@ -239,7 +242,7 @@ export default class StreamNode extends MegaRenderMixin {
         const { stream, isCallOnHold } = this.props;
         const { loading } = this.state;
 
-        if (stream && stream.isStreaming() && !isCallOnHold) {
+        if (stream && (stream.isStreaming && stream.isStreaming()) && !isCallOnHold) {
             return (
                 <>
                     {loading && (

@@ -1634,11 +1634,11 @@
 
             clearTimeout(dialogTooltipTimer);
             dialogTooltipTimer = setTimeout(function() {
+                $tooltip.removeClass('hidden');
                 $tooltip.css({
                     'left': itemLeftPos + $item.outerWidth() / 2 - $tooltip.outerWidth() / 2 + 'px',
                     'top': (itemTopPos - (note ? 120 : 75)) + 'px'
                 });
-                $tooltip.fadeIn(200);
             }, 200);
 
             return false;

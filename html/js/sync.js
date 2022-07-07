@@ -14,7 +14,7 @@ function renderLinuxOptions(linuxsync) {
 
     $('.architecture-checkbox input', $content).rebind('click', function() {
         var $this = $(this);
-        var $radioWrappers = $('.architecture-checkbox', $content);
+        var $radioWrappers = $('.architecture-checkbox', this.closest('.linux-bit-radio'));
 
         $radioWrappers.removeClass('radioOn').addClass('radioOff');
         $('input', $radioWrappers).removeClass('radioOn').addClass('radioOff')
@@ -199,6 +199,20 @@ function changeLinux(linuxsync, i) {
             if (platform === '32') {
                 platform = '64';
                 $('.architecture-checkbox input.linux64', $content).trigger('click');
+            }
+        }
+
+        if (linuxsync[i]['64']) {
+            $('.linux64', $content).parent().show();
+            $('.radio-txt.64', $content).show();
+        }
+        else {
+            $('.linux64', $content).parent().hide();
+            $('.radio-txt.64', $content).hide();
+
+            if (platform === '64') {
+                platform = '32';
+                $('.architecture-checkbox input.linux32', $content).trigger('click');
             }
         }
 

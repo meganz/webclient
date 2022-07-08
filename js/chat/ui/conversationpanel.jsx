@@ -713,22 +713,6 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         <span>{l[8633]}</span>
                                     </div>) : null
                             }
-                            {
-                                room._closing !== true && room.type === "public" &&
-                                !is_chatlink && (
-                                    !room.membersSetFromApi.members.hasOwnProperty(u_handle) ||
-                                    room.membersSetFromApi.members[u_handle] === -1
-                                ) ? (
-                                    <div className="link-button light red" onClick={() => {
-                                        if (self.props.onCloseClicked) {
-                                            self.props.onCloseClicked();
-                                        }
-                                    }}>
-                                        <i className="sprite-fm-mono icon-dialog-close" />
-                                        <span>{l[148]}</span>
-                                    </div>
-                                ) : null
-                                }
                             </div>
                         </AccordionPanel>
                         <SharedFilesAccordionPanel key="sharedFiles" title={l[19796] ? l[19796] : "Shared Files"} chatRoom={room}

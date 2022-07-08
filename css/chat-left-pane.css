@@ -716,12 +716,21 @@ li.active .call-duration i {
     border-radius: 4px;
 }
 
+.rtl .result-table .result-table-row .avatar-wrapper {
+    float: right;
+}
+
 .result-table .result-table-row .user-card {
     position: absolute;
     top: 50%;
     left: 46px;
     transform: translateY(-50%);
     width: calc(100% - 46px);
+}
+
+.rtl .result-table .result-table-row .user-card {
+    left: 0;
+    right: 46px;
 }
 
 .result-table .result-table-row .user-card span {
@@ -783,6 +792,10 @@ li.active .call-duration i {
     margin: 3px 0 0 0;
 }
 
+.rtl .result-table .result-table-row.message .message-result-avatar {
+    float: right;
+}
+
 .result-table .result-table-row.message:nth-child(odd) {
     /* [...] */
 }
@@ -797,6 +810,10 @@ li.active .call-duration i {
     max-width: calc(90% - 25px);
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.rtl .result-table .result-table-row.message span.title {
+    float: right;
 }
 
 .result-table .result-table-row.message span.title {
@@ -839,6 +856,10 @@ li.active .call-duration i {
     color: var(--text-color-medium);
     width: 40%;
     text-align: right;
+}
+
+.rtl .result-table .result-table-row.message span.date {
+    text-align: left;
 }
 
 .result-table .search-messages {

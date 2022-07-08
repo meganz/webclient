@@ -13400,6 +13400,11 @@ class ConversationRightArea extends mixins.wl {
             light
             ${call.ZP.isGuest() || room.isReadOnly() || !room.iAmOperator() ? 'disabled' : ''}
         `;
+    const getChatLinkClass = `
+            link-button
+            light
+            ${call.ZP.isGuest() || room.isReadOnly() ? 'disabled' : ''}
+        `;
     let participantsList = null;
 
     if (room.type === "group" || room.type === "public") {
@@ -13566,11 +13571,7 @@ class ConversationRightArea extends mixins.wl {
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-rename"
     }), external_React_default().createElement("span", null, l[9080])) : null, room.type === "public" ? external_React_default().createElement("div", {
-      className: `
-                                                link-button
-                                                light
-                                                ${call.ZP.isGuest() ? 'disabled' : ''}
-                                            `,
+      className: getChatLinkClass,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;

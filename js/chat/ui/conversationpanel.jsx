@@ -306,6 +306,12 @@ export class ConversationRightArea extends MegaRenderMixin {
             ${Call.isGuest() || room.isReadOnly() || !room.iAmOperator() ? 'disabled' : ''}
         `;
 
+        const getChatLinkClass = `
+            link-button
+            light
+            ${Call.isGuest() || room.isReadOnly() ? 'disabled' : ''}
+        `;
+
         let participantsList = null;
         if (room.type === "group" || room.type === "public") {
             participantsList = (
@@ -541,11 +547,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 room.type === "public" ?
                                     (
                                         <div
-                                            className={`
-                                                link-button
-                                                light
-                                                ${Call.isGuest() ? 'disabled' : ''}
-                                            `}
+                                            className={getChatLinkClass}
                                             onClick={e => {
                                                 if ($(e.target).closest('.disabled').length > 0) {
                                                     return false;

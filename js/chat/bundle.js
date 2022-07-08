@@ -13191,16 +13191,7 @@ class ConversationRightArea extends mixins.wl {
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-disabled-filled"
-    }), external_React_default().createElement("span", null, l[8633])) : null, room._closing !== true && room.type === "public" && !is_chatlink && (!room.membersSetFromApi.members.hasOwnProperty(u_handle) || room.membersSetFromApi.members[u_handle] === -1) ? external_React_default().createElement("div", {
-      className: "link-button light red",
-      onClick: () => {
-        if (self.props.onCloseClicked) {
-          self.props.onCloseClicked();
-        }
-      }
-    }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-dialog-close"
-    }), external_React_default().createElement("span", null, l[148])) : null)), external_React_default().createElement(SharedFilesAccordionPanel, {
+    }), external_React_default().createElement("span", null, l[8633])) : null)), external_React_default().createElement(SharedFilesAccordionPanel, {
       key: "sharedFiles",
       title: l[19796] ? l[19796] : "Shared Files",
       chatRoom: room,

@@ -391,6 +391,9 @@ body.tl .dropdown.body.popup.contacts-search {
     color: var(--text-color-high);
     background: var(--surface-grey-2);
 }
+.rtl .contacts-list-header {
+    text-align: right;
+}
 .new-group-chat .contacts-list-header {
     margin: 0;
 }

@@ -90,6 +90,33 @@
 .meetings-call .stream .stream-controls .stream-debug button span {
   text-indent: -9999px;
 }
+.meetings-call .stream .stream-controls .end-options {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -100%);
+}
+.meetings-call .stream .stream-controls .end-options-content {
+  padding: 24px;
+  min-width: 205px;
+  min-height: 130px;
+  margin: 0 0 13px 0;
+  box-sizing: border-box;
+  border-radius: 24px;
+  background: var(--surface-main);
+}
+.meetings-call .stream .stream-controls .end-options-content button {
+  display: block;
+  margin: 0 auto 8px;
+  min-width: 150px;
+}
+.meetings-call .stream .stream-controls .end-options-content button:last-child {
+  margin-bottom: 0;
+}
+.meetings-call .stream .stream-controls .end-options-content button span {
+  position: relative;
+  bottom: auto;
+  visibility: visible;
+}
 .meetings-call .stream .sidebar-controls {
   position: absolute;
   right: -250px;

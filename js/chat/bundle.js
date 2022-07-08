@@ -31436,7 +31436,7 @@ const withOverflowObserver = Component => class extends _chat_mixins0__._p {
                     `,
       "data-simpletipposition": (simpletip == null ? void 0 : simpletip.position) || 'top',
       "data-simpletipoffset": simpletip == null ? void 0 : simpletip.offset,
-      "data-simpletip-class": simpletip == null ? void 0 : simpletip.className,
+      "data-simpletip-class": (simpletip == null ? void 0 : simpletip.className) || 'medium-width center-align',
       onMouseEnter: this.handleMouseEnter
     }, React.createElement(Component, this.props));
   }

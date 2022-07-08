@@ -176,40 +176,6 @@ var ChatNotifications = function(megaChat, options) {
                 .rebind('onChatIsFocused.chatNotifications', function() {
                     onIdle(resetChatNotificationCounters);
                 })
-                .rebind('CallTerminated.chatNotifications', ev => {
-                    const room = ev.data;
-                    self.notifications.resetCounterGroup(room.chatId, "incoming-voice-video-call");
-
-                    if (!pushNotificationSettings.isAllowedForChatId(room.chatId)) {
-                        return;
-                    }
-
-                    var n = self.notifications.notify(
-                        'call-terminated',
-                        {
-                            'sound': 'hang_out',
-                            'group': room.chatId,
-                            'incrementCounter': false,
-                            'anfFlag': 'chat_enabled',
-                            'icon': false,
-                            'params': {
-                                'from': room.getRoomTitle()
-                            }
-                        },
-                        true
-                    );
-
-                    n.on('onClick', function() {
-                        window.focus();
-                        room.activateWindow();
-                        room.show();
-                    });
-
-
-                    n.setUnread(false);
-
-                    megaChat.updateSectionUnreadCount();
-                })
                 .rebind('ChatDisconnected.chatNotifications', ev => {
                     const chatRoom = ev.data;
                     self.disconnectNotification = new Notification(chatRoom.getRoomTitle(), { body: l.chat_offline });

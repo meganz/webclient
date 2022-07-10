@@ -401,7 +401,9 @@ class ChatToastIntegration {
         }
     }
     eventHandlerOnline() {
-        this.reconnecting.setUpdater(ChatToast.clearValue);
+        if (this.reconnecting) {
+            this.reconnecting.setUpdater(ChatToast.clearValue);
+        }
         ChatToast.quick(l.chat_online /* `Chat is now back online` */, 'sprite-fm-mono icon-chat-filled');
         const { disconnectNotification } = megaChat.plugins.chatNotifications;
         if (disconnectNotification) {

@@ -457,7 +457,7 @@
             this.callTimeoutDone(true);
         }
         muteIfAlone() {
-            if (this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
+            if (this.peers && this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
                 return this.sfuApp.sfuClient.muteAudio(true);
             }
             return false;

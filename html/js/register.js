@@ -370,9 +370,9 @@ function init_register() {
 
     $('.checkbox-block.register .radio-txt', $formWrapper).safeHTML(l['208s']);
 
-    $('.checkbox-block.register span', $formWrapper).rebind('click', function(e) {
+    $('.checkbox-block.register a', $formWrapper).rebind('click.tos', (e) => {
         e.preventDefault();
-        $.termsAgree = function() {
+        $.termsAgree = () => {
             $('.register-check', $formWrapper).removeClass('checkboxOff')
                 .addClass('checkboxOn');
         };

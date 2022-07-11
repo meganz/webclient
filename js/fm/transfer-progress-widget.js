@@ -220,6 +220,9 @@ mega.tpw = new function TransferProgressWidget() {
             $widgetTabActive.toggleClass('active');
             $widgetTabCompleted.toggleClass('active');
             $widgetFooter.toggleClass('hidden');
+
+            // This disables the propagation of the click to ancestors triggering the $.hideTopMenu
+            return false;
         };
         $widgetTabActive.rebind('click.tpw', openTransferSection);
         $widgetTabCompleted.rebind('click.tpw', openTransferSection);

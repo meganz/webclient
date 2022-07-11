@@ -507,6 +507,7 @@ body.de .mega-dialog.new-group-chat {
 }
 .mega-dialog.add-from-cloud .fm-header-buttons.active-search input {
     padding-left: 32px;
+    padding-right: 24px;
     margin-right: 11px;
 }
 

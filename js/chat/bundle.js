@@ -9593,6 +9593,7 @@ class CloudBrowserDialog extends mixins.wl {
   constructor(props) {
     super(props);
     this.state = {
+      'isActiveSearch': false,
       'selected': [],
       'highlighted': [],
       'currentlyViewedEntry': M.RootID,
@@ -9624,20 +9625,40 @@ class CloudBrowserDialog extends mixins.wl {
     this.forceUpdate();
   }
 
-  onSearchIconClick(e) {
-    var $parentBlock = $(e.target).closest(".fm-header-buttons");
+  getHeaderButtonsClass() {
+    const classes = ['fm-header-buttons'];
 
-    if ($parentBlock.hasClass("active-search")) {
-      $parentBlock.removeClass("active-search");
-    } else {
-      $parentBlock.addClass("active-search");
-      $('input', $parentBlock).trigger("focus");
+    if (this.state.isActiveSearch) {
+      classes.push('active-search');
+    }
+
+    return classes.join(' ');
+  }
+
+  getSearchIconClass() {
+    const classes = ['sprite-fm-mono', 'icon-preview-reveal'];
+
+    if (this.state.isActiveSearch && this.state.searchText.length > 0) {
+      classes.push('disabled');
+    }
+
+    return classes.join(' ');
+  }
+
+  onSearchIconClick() {
+    const isActiveSearch = !this.state.isActiveSearch;
+
+    if (isActiveSearch) {
+      this.searchInput.focus();
+      this.setState({
+        'isActiveSearch': isActiveSearch
+      });
     }
   }
 
   onClearSearchIconClick() {
-    var self = this;
-    self.setState({
+    this.setState({
+      'isActiveSearch': false,
       'searchValue': '',
       'searchText': '',
       'currentlyViewedEntry': M.RootID
@@ -9652,6 +9673,14 @@ class CloudBrowserDialog extends mixins.wl {
       searchText: '',
       isLoading: false
     });
+  }
+
+  onSearchBlur() {
+    if (this.state.searchText === '') {
+      this.setState({
+        'isActiveSearch': false
+      });
+    }
   }
 
   onSearchChange(e) {
@@ -9890,22 +9919,28 @@ class CloudBrowserDialog extends mixins.wl {
     })), external_React_default().createElement("div", {
       className: "fm-picker-header"
     }, external_React_default().createElement("div", {
-      className: "fm-header-buttons"
+      className: self.getHeaderButtonsClass()
     }, external_React_default().createElement(ViewModeSelector, {
       viewMode: viewMode,
       onChange: this.onViewModeSwitch
     }), external_React_default().createElement("div", {
       className: "fm-files-search"
     }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-preview-reveal",
-      onClick: e => {
-        self.onSearchIconClick(e);
+      className: self.getSearchIconClass(),
+      onClick: () => {
+        self.onSearchIconClick();
       }
     }), external_React_default().createElement("input", {
+      ref: input => {
+        this.searchInput = input;
+      },
       type: "search",
       placeholder: l[102],
       value: self.state.searchText,
-      onChange: self.onSearchChange
+      onChange: self.onSearchChange,
+      onBlur: () => {
+        self.onSearchBlur();
+      }
     }), clearSearchBtn), external_React_default().createElement("div", {
       className: "clear"
     })), !isSearch && external_React_default().createElement(Breadcrumbs, {

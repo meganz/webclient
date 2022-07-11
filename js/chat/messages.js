@@ -669,14 +669,25 @@ Message.prototype.getManagementMessageSummaryText = function() {
 
 Message.prototype.getMessageRetentionSummary = function() {
     'use strict';
-    var retentionTime = this.meta.retentionTime;
-    var retentionSummary = retentionTime === 0 ?
-        // `Disabled the message clearing`
-        l[23442] :
-        // `Changed the message clearing to [X] day/days`
-        l[23441].replace('[X]', this.chatRoom.getRetentionLabel(retentionTime));
-
-    return escapeHTML(retentionSummary);
+    const retentionTime = this.chatRoom.getRetentionTimeFormatted(this.meta.retentionTime);
+    if (retentionTime === 0) {
+        /* `Disabled message clearing` */
+        return escapeHTML(l[23442]);
+    }
+    switch (this.chatRoom.getRetentionFormat(this.meta.retentionTime)) {
+        case RETENTION_FORMAT.HOURS:
+            /* `Changed the message clearing time to # hour(s)` */
+            return escapeHTML(mega.icu.format(l.msg_retention_set_hours, retentionTime));
+        case RETENTION_FORMAT.DAYS:
+            /* `Changed the message clearing time to # day(s)` */
+            return escapeHTML(mega.icu.format(l.msg_retention_set_days, retentionTime));
+        case RETENTION_FORMAT.WEEKS:
+            /* `Changed the message clearing time to # week(s)` */
+            return escapeHTML(mega.icu.format(l.msg_retention_set_weeks, retentionTime));
+        case RETENTION_FORMAT.MONTHS:
+            /* `Changed the message clearing time to # month(s)` */
+            return escapeHTML(mega.icu.format(l.msg_retention_set_months, retentionTime));
+    }
 };
 
 Message.prototype.isEditable = function() {

@@ -1669,7 +1669,10 @@ accountUI.account = {
                                 msgDialog('warningb', l[1513], l[1946]);
                             }
                             else if (res === 0) {
-                                handleResetSuccessDialogs('.reset-success', l[735], 'deleteaccount');
+                                handleResetSuccessDialogs(
+                                    l.ac_closure_email_sent_msg.replace('%s', u_attr.email),
+                                    'deleteaccount'
+                                );
                             }
                             else {
                                 msgDialog('warningb', l[135], l[200]);

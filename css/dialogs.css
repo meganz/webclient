@@ -9330,10 +9330,33 @@ body.de .mega-dialog.new-group-chat {
 /* reset-success */
 
     .mega-dialog.reset-success {
-        width: 393px;
+        width: 400px;
+    }
+    .mega-dialog.reset-success .reset-success-title {
+        font: var(--text-h2-bold);
     }
     .mega-dialog.reset-success .content-block {
-        padding-bottom: 48px;
+        padding: 0 24px 16px;
+        text-align: center;
+    }
+    .mega-dialog.reset-success .reset-email-success-txt {
+        color: var(--text-color-medium);
+        font: var(--text-body1);
+    }
+    .mega-dialog.reset-success .reset-email-success-sub-txt {
+        color: var(--text-color-medium);
+        font: var(--text-body2);
+        margin-top: 16px;
+    }
+    .mega-dialog.reset-success .reset-email-success-sub-txt a {
+        text-decoration: none;
+    }
+    .mega-dialog.reset-success footer aside {
+        background-color: var(--surface-main);
+        padding: 8px 0 24px;
+    }
+    .mega-dialog.reset-success footer button.ok-btn {
+        font: var(--text-body1);
     }
 
 /* end reset-success */

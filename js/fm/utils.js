@@ -1501,6 +1501,7 @@ mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
         $('.fix-me-close', $bar).rebind('click.df', function() {
             $bar.removeClass('visible');
         });
+        reselect(1);
     }
 }));
 

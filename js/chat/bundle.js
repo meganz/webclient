@@ -22111,8 +22111,7 @@ class Invite extends mixins.wl {
     this.getFilteredFrequents = () => {
       const {
         frequents,
-        selected,
-        searching
+        selected
       } = this.state;
 
       if (frequents.length === 0) {
@@ -22142,8 +22141,7 @@ class Invite extends mixins.wl {
         contacts,
         frequents,
         excluded,
-        selected,
-        searching
+        selected
       } = this.state;
       const $$CONTACTS = [];
 
@@ -22171,11 +22169,12 @@ class Invite extends mixins.wl {
         }
       }
 
-      return $$CONTACTS.length === 0 && searching ? external_React_default().createElement(Nil, null) : $$CONTACTS;
+      return $$CONTACTS.length === 0 ? false : $$CONTACTS;
     };
 
     this.renderContent = () => {
-      var frequentContacts = this.getFilteredFrequents();
+      const frequentContacts = this.getFilteredFrequents();
+      const contactsFiltered = this.getFilteredContacts();
 
       if (HAS_CONTACTS()) {
         const {
@@ -22200,7 +22199,7 @@ class Invite extends mixins.wl {
           options: {
             'suppressScrollX': true
           }
-        }, frequentContacts ? $$RESULT_TABLE(l[20141], frequentContacts) : '', $$RESULT_TABLE(l[165], this.getFilteredContacts()));
+        }, frequentContacts ? $$RESULT_TABLE(l[20141], frequentContacts) : '', contactsFiltered ? $$RESULT_TABLE(l[165], contactsFiltered) : '');
       }
 
       return external_React_default().createElement(Nil, null);
@@ -22246,10 +22245,9 @@ class Invite extends mixins.wl {
       link,
       value,
       loading,
-      frequents,
-      contacts,
       selected,
-      field
+      field,
+      contactsInitial
     } = this.state;
     const {
       chatRoom,
@@ -22290,8 +22288,7 @@ class Invite extends mixins.wl {
       value: link
     })))), HAS_CONTACTS() && external_React_default().createElement(Search, {
       value: value,
-      contacts: contacts,
-      placeholder: contacts.length + frequents.length,
+      placeholder: contactsInitial.length,
       onChange: this.handleSearch
     })), external_React_default().createElement("div", {
       className: "fm-dialog-body"

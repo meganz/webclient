@@ -1557,3 +1557,21 @@ lazy(mega, 'intl', function _() {
 
     return ns;
 });
+
+/**
+ * Returns the remapped language code (correct for Transifex) for the users selected lang
+ *
+ * @returns {string} The language code.
+ */
+function getTransifexLangCode() {
+    'use strict';
+
+    switch (lang) {
+        case 'br': return 'pt';
+        case 'cn': return 'zh_CN';
+        case 'ct': return 'zh_TW';
+        case 'jp': return 'ja';
+        case 'kr': return 'ko';
+        default: return lang;
+    }
+}

@@ -72,6 +72,10 @@ function initMegacmd() {
             window.location = osxurl;
             resetMegacmd();
         }
+        else if (osData === 'linux' && is_mobile) {
+            window.open('https://mega.nz/linux/repo/', '_blank');
+            resetMegacmd();
+        }
         else if (osData === 'linux' && $tab.hasClass('active')) {
             resetMegacmd();
         }

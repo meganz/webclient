@@ -186,6 +186,7 @@
         "jquery/no-proxy": 2,
         "jquery/no-ready": 2,
 
+        "local-rules/classes": 2,
         "local-rules/hints": 2,
         "local-rules/jquery-replacements": 2,
         "local-rules/jquery-scopes": 1,
@@ -237,6 +238,7 @@
                 "plugin:es/restrict-to-es5"
             ],
             "rules": {
+                "unicorn/no-array-push-push": 0,
                 "prefer-arrow-callback": 0,
                 "prefer-const": 0,
                 "prefer-destructuring": 0,
@@ -259,6 +261,7 @@
             "rules": {
                 "complexity": [2, 28],
                 "es/no-optional-chaining": "off",
+                "local-rules/classes": "off",
                 "no-negated-condition": "off",
                 "react/jsx-closing-bracket-location": [1, { "nonEmpty": "after-props" }],
                 "react/jsx-curly-brace-presence": [

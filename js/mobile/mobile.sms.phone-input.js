@@ -288,7 +288,9 @@ mobile.sms.phoneInput = {
             $phoneInput.val(phoneCleaned);
 
             // If the fields are completed enable the button
-            if ($countryCallCodeInput.val().length > 1 && phoneCleaned.length > 1) {
+            if ($countryCallCodeInput.val().length > 1
+                && M.validatePhoneNumber(phoneCleaned, $countryCallCodeInput.attr('data-country-call-code'))
+            ) {
                 $sendButton.addClass('active');
             }
             else {
@@ -315,11 +317,10 @@ mobile.sms.phoneInput = {
 
         // On Send button click
         $sendButton.off('tap').on('tap', function() {
+            if (!$sendButton.hasClass('active')) {
+                return false;
+            }
 
-            // Get the phone number details
-            var countryName = $countryCallCodeInput.attr('data-country-name');
-            var countryIsoCode = $countryCallCodeInput.attr('data-country-iso-code');
-            var countryCallCode = $countryCallCodeInput.attr('data-country-call-code');
             var phoneNumber = $phoneInput.val();
 
             // Strip hyphens and whitespace, remove trunk code.
@@ -327,9 +328,20 @@ mobile.sms.phoneInput = {
             phoneNumber = M.stripPhoneNumber(countryCallCode, phoneNumber);
 
             const formattedPhoneNumber = `+${countryCallCode}${phoneNumber}`;
+            const validatedFormattedPhoneNumber = M.validatePhoneNumber(formattedPhoneNumber);
+
+            if (!validatedFormattedPhoneNumber) {
+                $sendButton.removeClass('active');
+                return false;
+            }
+
+            // Get the phone number details
+            var countryName = $countryCallCodeInput.attr('data-country-name');
+            var countryIsoCode = $countryCallCodeInput.attr('data-country-iso-code');
+            var countryCallCode = $countryCallCodeInput.attr('data-country-call-code');
 
             // Prepare the request
-            var request = { a: 'smss', n: formattedPhoneNumber };
+            var request = { a: 'smss', n: validatedFormattedPhoneNumber };
 
             // Add debug mode for testing to reset the phone number API side so you can re-use (only works on staging)
             if (localStorage.smsDebugMode) {

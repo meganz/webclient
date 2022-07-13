@@ -2194,14 +2194,15 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
                 }
             }
             if ($cTelInput.val().trim() !== cTel) {
-                if (!$cTelInput.val().trim()) {
+                const validatedPhoneNumber = M.validatePhoneNumber($cTelInput.val().trim());
+                if (validatedPhoneNumber) {
+                    $cTelInput.megaInputsHideError();
+                    attrsToChange.push({ key: '%phone', val: validatedPhoneNumber });
+                }
+                else {
                     $cTelInput.megaInputsShowError(l[8814]);
                     $cTelInput.focus();
                     valid = false;
-                }
-                else {
-                    $cTelInput.megaInputsHideError();
-                    attrsToChange.push({ key: '%phone', val: $cTelInput.val().trim() });
                 }
             }
             if ($cEmailInput.val().trim() !== cEmail) {

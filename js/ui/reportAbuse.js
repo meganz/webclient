@@ -549,13 +549,16 @@ class ReportAbuse {
                 return false;
             }
 
-            if (!this.validatePhoneNo(opts.phone)) {
+            const validatedPhoneNumber = this.validatePhoneNo(opts.phone);
+            if (!validatedPhoneNumber) {
                 this.$errormessage.text(l.ra_phonevalidation).removeClass('hidden');
                 $phone.addClass('error');
                 this.setScrollPosition();
                 return false;
             }
 
+            // validate/clean phone number before reporting
+            opts.phone = validatedPhoneNumber;
             this.submitAbuseReport(opts);
 
         });
@@ -673,8 +676,7 @@ class ReportAbuse {
     }
 
     validatePhoneNo(inputtxt) {
-        const phoneno = /^[\d+-]+$/;
-        return phoneno.test(inputtxt);
+        return M.validatePhoneNumber(inputtxt);
     }
 
     resetAbuseReport() {

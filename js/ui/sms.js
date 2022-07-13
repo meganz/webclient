@@ -275,7 +275,7 @@ sms.phoneInput = {
 
             // If the fields are completed enable the button
             if ($countrySelect.length && $countrySelect.attr('data-country-iso-code').length > 1
-                && $phoneInput.val().length > 1) {
+                && M.validatePhoneNumber($phoneInput.val(), $countrySelect.attr('data-country-call-code'))) {
 
                 $sendButton.removeClass('disabled');
             }
@@ -331,11 +331,6 @@ sms.phoneInput = {
                 return false;
             }
 
-            // Get the phone number details
-            var $selectedOption = $('.option[data-state="active"]', $countrySelector);
-            var countryName = $selectedOption.attr('data-country-name');
-            var countryCode = $selectedOption.attr('data-country-iso-code');
-            var countryCallingCode = $selectedOption.attr('data-country-call-code');
             var phoneNum = $phoneInput.val();
 
             // Strip hyphens and whitespace, remove trunk code.
@@ -343,9 +338,21 @@ sms.phoneInput = {
             phoneNum = M.stripPhoneNumber(countryCallingCode, phoneNum);
 
             const formattedPhoneNumber = `+${countryCallingCode}${phoneNum}`;
+            const validatedFormattedPhoneNumber = M.validatePhoneNumber(formattedPhoneNumber);
+
+            if (!validatedFormattedPhoneNumber) {
+                $sendButton.addClass('disabled');
+                return false;
+            }
+
+            // Get the phone number details
+            var $selectedOption = $('.option[data-state="active"]', $countrySelector);
+            var countryName = $selectedOption.attr('data-country-name');
+            var countryCode = $selectedOption.attr('data-country-iso-code');
+            var countryCallingCode = $selectedOption.attr('data-country-call-code');
 
             // Prepare request
-            var apiRequest = { a: 'smss', n: formattedPhoneNumber };
+            var apiRequest = { a: 'smss', n: validatedFormattedPhoneNumber };
 
             // Add debug mode to test reset of the phone number so can be re-used (staging API only)
             if (localStorage.smsDebugMode) {

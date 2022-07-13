@@ -485,7 +485,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         }
         if (!$element || $element.is($telInput)) {
             const telVal = $telInput.val().trim();
-            if (!telVal || telVal.length < 2) {
+            if (!M.validatePhoneNumber(telVal)) {
                 telMegaInput.showError(telVal ? l.err_invalid_ph : l.err_no_ph);
                 $telInput.focus();
                 passed = false;
@@ -556,7 +556,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
                 $cnameInput.val().trim(),
                 $fnameInput.val().trim(),
                 $lnameInput.val().trim(),
-                $telInput.val().trim(),
+                M.validatePhoneNumber($telInput.val().trim()),
                 $emailInput.val().trim(),
                 $passInput.val());
         }

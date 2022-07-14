@@ -19723,9 +19723,7 @@ class StreamNode extends mixins.wl {
     }
 
     if (!_stream.isFake) {
-      if (!_stream.isLocal) {
-        _stream.registerConsumer(this);
-      }
+      _stream.registerConsumer(this);
 
       if (_stream instanceof CallManager2.Peer) {
         this._streamListener = _stream.addChangeListener((peer, data, key) => {
@@ -19868,9 +19866,7 @@ class StreamNode extends mixins.wl {
     const peer = this.props.stream;
 
     if (peer && !peer.isFake) {
-      var _this$props$stream$de, _this$props$stream;
-
-      (_this$props$stream$de = (_this$props$stream = this.props.stream).deregisterConsumer) == null ? void 0 : _this$props$stream$de.call(_this$props$stream, this);
+      this.props.stream.deregisterConsumer(this);
 
       if (this.props.externalVideo && peer.source) {
         const video = peer.source;
@@ -20622,9 +20618,7 @@ class Stream extends mixins.wl {
     });
 
     this.renderOnHoldStreamNode = () => external_React_default().createElement(StreamNode, {
-      stream: { ...this.props.call.getLocalStream(),
-        source: null
-      },
+      stream: this.props.call.getLocalStream(),
       isCallOnHold: this.props.isOnHold,
       isLocal: true
     });

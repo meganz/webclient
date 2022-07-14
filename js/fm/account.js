@@ -207,7 +207,7 @@ accountUI.renderAccountPage = function(account) {
             $('.fm-account-calls').removeClass('hidden');
             sectionClass = 'calls';
 
-            accountUI.calls.init(account);
+            accountUI.calls.init();
             break;
         default:
 
@@ -4074,6 +4074,7 @@ accountUI.calls = {
     init: function() {
         'use strict';
         this.emptyGroupCall.render();
+        this.callNotifications.render();
     },
     emptyGroupCall: {
         render: function() {
@@ -4091,4 +4092,20 @@ accountUI.calls = {
             );
         }
     },
+    callNotifications: {
+        render: function() {
+            'use strict';
+            const switchSelector = '#callinout';
+            const curr = mega.config.get('callinout');
+
+            accountUI.inputs.switch.init(
+                switchSelector,
+                $(switchSelector).parent(),
+                typeof curr === 'undefined' ? 1 : Math.abs(curr - 1),
+                val => {
+                    mega.config.setn('callinout', Math.abs(val - 1));
+                }
+            );
+        }
+    }
 };

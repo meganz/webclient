@@ -17,9 +17,7 @@ export default class StreamNode extends MegaRenderMixin {
             this.setupVideoElement(this.clonedVideo);
         }
         if (!stream.isFake) {
-            if (!stream.isLocal) {
-                stream.registerConsumer(this);
-            }
+            stream.registerConsumer(this);
 
             if (stream instanceof CallManager2.Peer) {
                 this._streamListener = stream.addChangeListener((peer, data, key) => {
@@ -146,7 +144,7 @@ export default class StreamNode extends MegaRenderMixin {
         super.componentWillUnmount();
         const peer = this.props.stream;
         if (peer && !peer.isFake) {
-            this.props.stream.deregisterConsumer?.(this);
+            this.props.stream.deregisterConsumer(this);
             // prevent hd video removal from the DOM from stopping the video
             if (this.props.externalVideo && peer.source) { // media html elements stop playing when removed from the DOM
                 const video = peer.source;

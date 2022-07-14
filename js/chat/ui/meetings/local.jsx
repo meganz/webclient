@@ -268,7 +268,7 @@ class Stream extends MegaRenderMixin {
 
     renderOnHoldStreamNode = () =>
         <StreamNode
-            stream={{ ...this.props.call.getLocalStream(), source: null }}
+            stream={this.props.call.getLocalStream()}
             isCallOnHold={this.props.isOnHold}
             isLocal={true}
         />;

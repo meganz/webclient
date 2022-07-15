@@ -84,7 +84,17 @@ describe("MegaUtils validatePhoneNumber test", function() {
             {
                 phone: '12',
                 code: '63',
-                result: '6312'
+                result: false
+            },
+            {
+                phone: '12',
+                code: '63',
+                result: false
+            },
+            {
+                phone: '1234',
+                code: '63',
+                result: '631234'
             },
             {
                 phone: '12asd',
@@ -92,14 +102,24 @@ describe("MegaUtils validatePhoneNumber test", function() {
                 result: false
             },
             {
+                phone: '1234',
+                code: '+-63',
+                result: false
+            },
+            {
                 phone: '12',
                 code: '+-63',
-                result: '+6312'
+                result: false
             },
             {
                 phone: '12',
                 code: '-+63',
-                result: '+6312'
+                result: false
+            },
+            {
+                phone: '1234',
+                code: '-+63',
+                result: false
             },
         ];
 

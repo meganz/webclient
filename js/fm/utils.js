@@ -2730,14 +2730,18 @@ MegaUtils.prototype.validatePhoneNumber = function(phoneNumber, countryCode) {
         return false;
     }
 
+    let length = 4;
+
     if (typeof countryCode === 'string') {
         countryCode = countryCode.trim();
         phoneNumber = `${countryCode}${phoneNumber}`;
+        length = countryCode.length + 4;
     }
 
     phoneNumber = phoneNumber.trim().replace(/[^\w+]/g, '');
 
-    var simplePhoneNumberPattern = /^\+?\d{4,}$/;
+    var simplePhoneNumberPattern = new RegExp(`^\\+?\\d{${length},}$`);
+
     if (!simplePhoneNumberPattern.test(phoneNumber)) {
         return false;
     }

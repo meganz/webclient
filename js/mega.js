@@ -1814,8 +1814,14 @@ function fm_updated(n) {
 function initworkerpool() {
     "use strict";
 
+    // Allow all 0 keys to be used (for those users that used a bad client that want to retrieve their files)
+    const allowNullKeys = localStorage.getItem('allownullkeys') ? 1 : undefined;
+    if (allowNullKeys) {
+        self.allowNullKeys = allowNullKeys;
+    }
+
     // re/initialize workers (with state for a user account fetch, if applies)
-    decWorkerPool.init(worker_procmsg, 8, !pfid && {d, u_k, u_privk, u_handle, usk: u_attr['*~usk']});
+    decWorkerPool.init(worker_procmsg, 8, !pfid && {d, u_k, u_privk, u_handle, usk: u_attr['*~usk'], allowNullKeys});
 
     if (d) {
         console.debug('initworkerpool', decWorkerPool);
@@ -1982,7 +1988,7 @@ function tree_node(node) {
     if (pfkey && !M.RootID) {
         // set up the workers for folder link decryption
         if (decWorkerPool.ok) {
-            decWorkerPool.signal({d, n_h: node.h, pfkey});
+            decWorkerPool.signal({d, n_h: node.h, pfkey, allowNullKeys: self.allowNullKeys});
         }
         else {
             var key = base64_to_a32(pfkey);

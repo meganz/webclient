@@ -4,26 +4,37 @@ import Button from './button.jsx';
 import { STREAM_ACTIONS } from './stream.jsx';
 import StreamExtendedControls from './streamExtendedControls.jsx';
 import { withMicObserver } from './micObserver.jsx';
-import { withPermissionsObserver } from './permissionsObserver';
+import { withPermissionsObserver } from './permissionsObserver.jsx';
+import Call from './call.jsx';
 
 class StreamControls extends MegaRenderMixin {
     static NAMESPACE = 'stream-controls';
 
+    endContainerRef = React.createRef();
+    endButtonRef = React.createRef();
+    SIMPLETIP = { position: 'top', offset: 8, className: 'theme-dark-forced' };
+
+    state = {
+        options: false
+    };
+
+    handleMousedown = ({ target }) =>
+        this.endContainerRef?.current.contains(target) ? null : this.setState({ options: false });
+
     renderDebug = () => {
-        const SIMPLETIP = { position: 'top', offset: 5, className: 'theme-dark-forced' };
         return (
             <div
                 className="stream-debug"
                 style={{ position: 'absolute', left: 25, bottom: 36 }}>
                 <Button
                     className="mega-button round small theme-dark-forced positive"
-                    simpletip={{ ...SIMPLETIP, label: 'Add stream' }}
+                    simpletip={{ ...this.SIMPLETIP, label: 'Add stream' }}
                     onClick={() => this.props.onStreamToggle(STREAM_ACTIONS.ADD)}>
                     <span>Add</span>
                 </Button>
                 <Button
                     className="mega-button round small theme-dark-forced negative"
-                    simpletip={{ ...SIMPLETIP, label: 'Remove stream' }}
+                    simpletip={{ ...this.SIMPLETIP, label: 'Remove stream' }}
                     onClick={() => this.props.streams.length > 1 && this.props.onStreamToggle(STREAM_ACTIONS.REMOVE)}>
                     <span>Remove</span>
                 </Button>
@@ -31,11 +42,66 @@ class StreamControls extends MegaRenderMixin {
         );
     };
 
+    renderEndCall = () => {
+        const { chatRoom, streams, onCallEnd } = this.props;
+        return (
+            <div
+                ref={this.endContainerRef}
+                className="end-call-container">
+                {this.state.options && (
+                    <div className="end-options theme-dark-forced">
+                        <div className="end-options-content">
+                            <Button
+                                className="mega-button"
+                                onClick={onCallEnd}>
+                                <span>Leave</span>
+                            </Button>
+                            <Button
+                                className="mega-button positive"
+                                onClick={() => chatRoom.endCallForAll()}>
+                                <span>End for all</span>
+                            </Button>
+                        </div>
+                    </div>
+                )}
+                <Button
+                    simpletip={{ ...this.SIMPLETIP, label: l[5884] /* `End call` */ }}
+                    className="mega-button theme-dark-forced round large negative end-call"
+                    icon="icon-end-call"
+                    didMount={button => {
+                        this.endButtonRef = button.buttonRef;
+                    }}
+                    onClick={() =>
+                        chatRoom.type !== 'private' && streams.length && Call.isModerator(chatRoom, u_handle) ?
+                            this.setState(state => ({ options: !state.options }), () =>
+                                this.endButtonRef && $(this.endButtonRef.current).trigger('simpletipClose')
+                            ) :
+                            onCallEnd()
+                    }>
+                    <span>{l[5884] /* `End call` */}</span>
+                </Button>
+            </div>
+        );
+    };
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        document.removeEventListener('mousedown', this.handleMousedown);
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        document.addEventListener('mousedown', this.handleMousedown);
+    }
+
     render() {
-        const avFlags = this.props.call.av;
+        const {
+            call, signal, errAv, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick, renderSignalWarning,
+            renderPermissionsWarning
+        } = this.props;
+        const avFlags = call.av;
         const audioLabel = avFlags & Av.Audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */;
         const videoLabel = avFlags & Av.Camera ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
-        const SIMPLETIP = { position: 'top', offset: 8, className: 'theme-dark-forced' };
 
         //
         // `StreamControls`
@@ -47,7 +113,7 @@ class StreamControls extends MegaRenderMixin {
                 <ul>
                     <li>
                         <Button
-                            simpletip={{ ...SIMPLETIP, label: audioLabel }}
+                            simpletip={{ ...this.SIMPLETIP, label: audioLabel }}
                             className={`
                                 mega-button
                                 theme-light-forced
@@ -57,15 +123,15 @@ class StreamControls extends MegaRenderMixin {
                                 ${avFlags & Av.Audio ? '' : 'inactive'}
                             `}
                             icon={`${avFlags & Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`}
-                            onClick={this.props.onAudioClick}>
+                            onClick={onAudioClick}>
                             <span>{audioLabel}</span>
                         </Button>
-                        {this.props.signal ? null : this.props.renderSignalWarning()}
-                        {this.props.errAv & Av.Audio ? this.props.renderPermissionsWarning(Av.Audio) : null}
+                        {signal ? null : renderSignalWarning()}
+                        {errAv & Av.Audio ? renderPermissionsWarning(Av.Audio) : null}
                     </li>
                     <li>
                         <Button
-                            simpletip={{ ...SIMPLETIP, label: videoLabel }}
+                            simpletip={{ ...this.SIMPLETIP, label: videoLabel }}
                             className={`
                                 mega-button
                                 theme-light-forced
@@ -75,28 +141,20 @@ class StreamControls extends MegaRenderMixin {
                                 ${avFlags & Av.Camera ? '' : 'inactive'}
                             `}
                             icon={`${avFlags & Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`}
-                            onClick={this.props.onVideoClick}>
+                            onClick={onVideoClick}>
                             <span>{videoLabel}</span>
                         </Button>
-                        {this.props.errAv & Av.Camera ? this.props.renderPermissionsWarning(Av.Camera) : null}
+                        {errAv & Av.Camera ? renderPermissionsWarning(Av.Camera) : null}
                     </li>
                     <li>
                         <StreamExtendedControls
-                            call={this.props.call}
-                            onScreenSharingClick={this.props.onScreenSharingClick}
-                            onHoldClick={this.props.onHoldClick}
+                            call={call}
+                            onScreenSharingClick={onScreenSharingClick}
+                            onHoldClick={onHoldClick}
                         />
                     </li>
                     <li>
-                        <Button
-                            simpletip={{ ...SIMPLETIP, label: l[5884] /* `End call` */ }}
-                            className="mega-button theme-dark-forced round large negative end-call"
-                            icon="icon-end-call"
-                            onClick={this.props.onCallEnd}>
-                            <span>
-                                {l[5884] /* `End call` */}
-                            </span>
-                        </Button>
+                        {this.renderEndCall()}
                     </li>
                 </ul>
             </div>

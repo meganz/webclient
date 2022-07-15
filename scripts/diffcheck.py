@@ -184,7 +184,7 @@ def reduce_eslint(file_line_mapping, **extra):
         return '*** ESLint: {} ***'.format(ex), 0
     output = output.decode('utf8').replace(PROJECT_PATH + os.path.sep, '').split('\n')
 
-    if output[1] == u'Oops! Something went wrong! :(':
+    if len(output) > 1 and output[1] == u'Oops! Something went wrong! :(':
         return '\n'.join(output), 1
 
     # Go through output and collect only relevant lines to the result.

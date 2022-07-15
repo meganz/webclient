@@ -1067,7 +1067,7 @@ var fortumo = {
      */
     redirectToSite: function(utsResult) {
 
-        window.location = 'https://megapay.nz/?saleid=' + utsResult;
+        window.location = `https://megapay.nz/?saleid=${utsResult}&l=${getTransifexLangCode()}`;
     }
 };
 
@@ -1084,8 +1084,8 @@ var tpay = {
      */
     redirectToSite: function(utcResult) {
 
-        window.location = 'https://megapay.nz/gwtp.html?provider=tpay&saleid=' + utcResult['EUR']['saleids']
-                        + '&params=' + utcResult['EUR']['params'];
+        window.location = `https://megapay.nz/gwtp.html?provider=tpay&saleid=${utcResult.EUR.saleids}
+                           &params=${utcResult.EUR.params}&l=${getTransifexLangCode()}`;
     }
 };
 

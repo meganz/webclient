@@ -288,7 +288,7 @@ export const withOverflowObserver = Component =>
                     `}
                     data-simpletipposition={simpletip?.position || 'top'}
                     data-simpletipoffset={simpletip?.offset}
-                    data-simpletip-class={simpletip?.className}
+                    data-simpletip-class={simpletip?.className || 'medium-width center-align'}
                     onMouseEnter={this.handleMouseEnter}>
                     <Component {...this.props} />
                 </div>

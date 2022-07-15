@@ -327,10 +327,7 @@ a, a:link, a:visited, a:hover, a:active, a:focus img, a:focus img {
 .radio-txt a {
     color: var(--text-color-info);
 }
-.radio-txt span.red {
-    color: var(--text-color-error);
-}
-.radio-txt a:hover, .radio-txt span.red:hover {
+.radio-txt a:hover {
     text-decoration: underline;
 }
 label span.black {

@@ -1,20 +1,20 @@
 import React from 'react';
 import utils, { Emoji, ParsedHTML } from './../../ui/utils.jsx';
-import {MegaRenderMixin, timing} from './../mixins';
-import {Button} from './../../ui/buttons.jsx';
+import {MegaRenderMixin, timing} from '../mixins.js';
+import {Button} from '../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
-import { HistoryRetentionDialog } from './../../ui/historyRetentionDialog.jsx';
-import { Dropdown, DropdownItem } from './../../ui/dropdowns.jsx';
-import { ContactCard, ContactPickerDialog, MembersAmount } from './../ui/contacts.jsx';
-import { PerfectScrollbar } from './../../ui/perfectScrollbar.jsx';
-import { Accordion } from './../../ui/accordion.jsx';
-import { AccordionPanel } from './../../ui/accordion.jsx';
+import { HistoryRetentionDialog } from '../../ui/historyRetentionDialog.jsx';
+import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
+import { ContactCard, ContactPickerDialog, MembersAmount } from './contacts.jsx';
+import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
+import { Accordion } from '../../ui/accordion.jsx';
+import { AccordionPanel } from '../../ui/accordion.jsx';
 import { ParticipantsList } from './participantsList.jsx';
 import GenericConversationMessage  from './messages/generic.jsx';
 import { SharedFilesAccordionPanel } from './sharedFilesAccordionPanel.jsx';
 import { IncSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
-import { ChatlinkDialog } from './../ui/chatlinkDialog.jsx';
+import { ChatlinkDialog } from './chatlinkDialog.jsx';
 import { ConversationAVPanel } from './conversationaudiovideopanel.jsx';
 import PushSettingsDialog from './pushSettingsDialog.jsx';
 import Call, { EXPANDED_FLAG, inProgressAlert } from './meetings/call.jsx';
@@ -22,10 +22,129 @@ import HistoryPanel from "./historyPanel.jsx";
 import ComposedTextArea from "./composedTextArea.jsx";
 import Loading from "./meetings/workflow/loading.jsx";
 import Join from "./meetings/workflow/join.jsx";
-import Alert from './meetings/workflow/alert';
+import Alert from './meetings/workflow/alert.jsx';
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
+
+class EndCallButton extends MegaRenderMixin {
+    IS_MODERATOR = Call.isModerator(this.props.chatRoom, u_handle);
+
+    LABELS = {
+        // TODO:
+        //  - look into unifying the copy of all these variations
+        // - introduce translation strings
+        END_CALL: 'End call...',
+        END_FOR_ALL: 'End for all',
+        END_CALL_FOR_ALL: 'End call for all',
+        LEAVE: 'Leave',
+        LEAVE_CALL: 'Leave call',
+        DIALOG_TITLE: 'End call for all?',
+        DIALOG_BODY: 'This will end the call for all participants'
+    };
+
+    EVENTS = ['onCallPeerJoined.endCallButton', 'onCallPeerLeft.endCallButton'];
+
+    shouldComponentUpdate() {
+        return true;
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        this.EVENTS.map(ev => this.props.chatRoom.unbind(ev));
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        this.EVENTS.map(ev => this.props.chatRoom.rebind(ev, () => this.safeForceUpdate()));
+    }
+
+    renderButton({ label, onClick, children = null }) {
+        return (
+            <Button
+                className="link-button light red dropdown-element"
+                icon="small-icon colorized horizontal-red-handset"
+                label={label}
+                onClick={onClick}>
+                {children}
+            </Button>
+        );
+    }
+
+    render() {
+        const { chatRoom } = this.props;
+        const { type, activeCall } = chatRoom;
+
+        if (activeCall) {
+            const peers = activeCall.peers && activeCall.peers.length;
+
+            // 1-on-1 call -> `End call`
+            if (type === 'private') {
+                return this.renderButton({ label: this.LABELS.END_CALL, onClick: () => activeCall.hangUp() });
+            }
+
+            // Moderator in a public call: render `End call...` drop down w/ `Leave` and `End for all` options.
+            if (this.IS_MODERATOR) {
+                return this.renderButton({
+                    label: this.LABELS.END_CALL,
+                    onClick: peers ? null : () => activeCall.hangUp(),
+                    children: peers && (
+                        <Dropdown
+                            className="wide-dropdown send-files-selector light"
+                            noArrow="true"
+                            vertOffset={4}
+                            horizOffset={0}>
+                            <DropdownItem
+                                className="link-button"
+                                icon="sprite-fm-mono icon-leave-call"
+                                label={this.LABELS.LEAVE}
+                                onClick={() => activeCall.hangUp()}
+                            />
+                            <DropdownItem
+                                className="link-button"
+                                icon="sprite-fm-mono icon-contacts"
+                                label={this.LABELS.END_FOR_ALL}
+                                onClick={() => chatRoom.endCallForAll()}
+                            />
+                        </Dropdown>
+                    )
+                });
+            }
+
+            return (
+                // Public call w/o being a moderator:
+                // render `Leave call` if there are other call peers present or `End call...` if the current user is
+                // alone in the call.
+                this.renderButton({
+                    label: peers ? this.LABELS.LEAVE_CALL : this.LABELS.END_CALL,
+                    onClick: () => activeCall.hangUp()
+                })
+            );
+        }
+
+        // Public call currently ongoing, where the current user is not present within the call:
+        // `End call for all` if the current user is a moderator.
+        if (chatRoom.havePendingGroupCall()) {
+            return (
+                this.IS_MODERATOR ?
+                    this.renderButton({
+                        label: this.LABELS.END_CALL_FOR_ALL,
+                        onClick: () =>
+                            msgDialog(
+                                'confirmation',
+                                null,
+                                this.LABELS.DIALOG_TITLE,
+                                this.LABELS.DIALOG_BODY,
+                                cb => cb ? chatRoom.endCallForAll() : 0xDEAD
+                            )
+                    }) :
+                    null
+            );
+        }
+
+        return null;
+    }
+}
 
 export class JoinCallNotification extends MegaRenderMixin {
     customIsEventuallyVisible() {
@@ -119,13 +238,10 @@ export class ConversationRightArea extends MegaRenderMixin {
         var startCallButtonClass = startCallDisabled ? " disabled" : "";
         var startAudioCallButton;
         var startVideoCallButton;
-        var endCallButton;
 
         var isInCall = !!room.activeCall;
         if (isInCall) {
             startAudioCallButton = startVideoCallButton = null;
-        } else {
-            endCallButton = null;
         }
 
         if (room.type === "group" || room.type === "public") {
@@ -156,18 +272,6 @@ export class ConversationRightArea extends MegaRenderMixin {
                 </div>;
         }
         var AVseperator = <div className="chat-button-separator" />;
-        if (endCallButton !== null) {
-            endCallButton =
-                <div className={"link-button light red"} onClick={() => {
-                    if (room.activeCall) {
-                        room.activeCall.hangUp();
-                    }
-                }}>
-                <i className="small-icon colorized horizontal-red-handset"></i>
-                    <span>{room.type === "group" || room.type === "public"
-                        ? l[5883] /* Leave call */ : l[5884] /* End call */}</span>
-            </div>;
-        }
         var isReadOnlyElement = null;
 
         if (room.isReadOnly()) {
@@ -200,6 +304,12 @@ export class ConversationRightArea extends MegaRenderMixin {
             link-button
             light
             ${Call.isGuest() || room.isReadOnly() || !room.iAmOperator() ? 'disabled' : ''}
+        `;
+
+        const getChatLinkClass = `
+            link-button
+            light
+            ${Call.isGuest() || room.isReadOnly() ? 'disabled' : ''}
         `;
 
         let participantsList = null;
@@ -377,6 +487,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                         ${room.haveActiveCall() ? 'in-call' : ''}
                     `}>
                     <Accordion
+                        {...this.state}
                         chatRoom={room}
                         onToggle={SoonFc(20, function() {
                             // wait for animations.
@@ -411,6 +522,10 @@ export class ConversationRightArea extends MegaRenderMixin {
                             {addParticipantBtn}
                             {startAudioCallButton}
                             {startVideoCallButton}
+                                <EndCallButton
+                                    call={room.havePendingGroupCall() || room.haveActiveCall()}
+                                    chatRoom={room}
+                                />
                             {
                                 room.type == "group" || room.type == "public" ?
                                 (
@@ -432,11 +547,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 room.type === "public" ?
                                     (
                                         <div
-                                            className={`
-                                                link-button
-                                                light
-                                                ${Call.isGuest() ? 'disabled' : ''}
-                                            `}
+                                            className={getChatLinkClass}
                                             onClick={e => {
                                                 if ($(e.target).closest('.disabled').length > 0) {
                                                     return false;
@@ -503,7 +614,6 @@ export class ConversationRightArea extends MegaRenderMixin {
                             </Button>
 
                             {pushSettingsBtn}
-                            {endCallButton}
 
                             <Button
                                 className="link-button light clear-history-button"
@@ -603,22 +713,6 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         <span>{l[8633]}</span>
                                     </div>) : null
                             }
-                            {
-                                room._closing !== true && room.type === "public" &&
-                                !is_chatlink && (
-                                    !room.membersSetFromApi.members.hasOwnProperty(u_handle) ||
-                                    room.membersSetFromApi.members[u_handle] === -1
-                                ) ? (
-                                    <div className="link-button light red" onClick={() => {
-                                        if (self.props.onCloseClicked) {
-                                            self.props.onCloseClicked();
-                                        }
-                                    }}>
-                                        <i className="sprite-fm-mono icon-dialog-close" />
-                                        <span>{l[148]}</span>
-                                    </div>
-                                ) : null
-                                }
                             </div>
                         </AccordionPanel>
                         <SharedFilesAccordionPanel key="sharedFiles" title={l[19796] ? l[19796] : "Shared Files"} chatRoom={room}

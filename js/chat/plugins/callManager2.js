@@ -457,7 +457,7 @@
             this.callTimeoutDone(true);
         }
         muteIfAlone() {
-            if (this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
+            if (this.peers && this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
                 return this.sfuApp.sfuClient.muteAudio(true);
             }
             return false;
@@ -754,7 +754,8 @@
         "REJECTED": 0x02,
         "NO_ANSWER": 0x03,
         "FAILED": 0x04,
-        "CANCELED": 0x05
+        "CANCELED": 0x05,
+        "CALL_ENDED_BY_MODERATOR": 0x06
     };
 
 
@@ -1053,6 +1054,17 @@
                     meta: meta
                 });
             }
+        }
+        else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CALL_ENDED_BY_MODERATOR) {
+            result = new ChatDialogMessage({
+                messageId: `call-ended-${msgInstance.messageId}`,
+                type: 'call-ended',
+                authorContact,
+                showInitiatorAvatar: true,
+                delay,
+                cssClasses: [`fm-chat-call-reason-${meta.reason}`],
+                meta
+            });
         }
         else {
             self.logger.error("Unknown (remote) CALL_ENDED reason: ", meta.reason, meta);

@@ -654,7 +654,7 @@
                 groupElem += '<span class="nw-contact-name group">' +
                     megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(namesCombine)) +
                     '</span>';
-                groupElem += '<span class="nw-contact-group">' + l[24157].replace('%1', nb) + '</span>';
+                groupElem += '<span class="nw-contact-group">' + mega.icu.format(l[24157], nb) + '</span>';
                 groupElem = '<li id="cpy-dlg-chat-itm-' + handle + '">' + groupElem + '</li>';
                 return groupElem;
             }
@@ -1634,11 +1634,11 @@
 
             clearTimeout(dialogTooltipTimer);
             dialogTooltipTimer = setTimeout(function() {
+                $tooltip.removeClass('hidden');
                 $tooltip.css({
                     'left': itemLeftPos + $item.outerWidth() / 2 - $tooltip.outerWidth() / 2 + 'px',
                     'top': (itemTopPos - (note ? 120 : 75)) + 'px'
                 });
-                $tooltip.fadeIn(200);
             }, 200);
 
             return false;

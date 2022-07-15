@@ -70,17 +70,16 @@ Message._getTextContentsForDialogType = function(message) {
         }
 
         if (message.dialogType === "privilegeChange" && message.meta) {
-            textMessage = textMessage.replace("%2", contactName);
-            var newPrivilegeText = "";
             if (message.meta.privilege === 3) {
-                newPrivilegeText = l[8875];
+                textMessage = l.priv_change_to_op;
             }
             else if (message.meta.privilege === 2) {
-                newPrivilegeText = l[8874];
+                textMessage = l.priv_change_to_std;
             }
             else if (message.meta.privilege === 0) {
-                newPrivilegeText = l[8873];
+                textMessage = l.priv_change_to_ro;
             }
+            textMessage = textMessage.replace('[S]', '').replace('[/S]', '').replace('%s', contactName);
 
             contact = M.u[message.meta.targetUserId] ? M.u[message.meta.targetUserId] : {
                 'u': message.meta.targetUserId,
@@ -89,7 +88,6 @@ Message._getTextContentsForDialogType = function(message) {
             };
 
             contactName = htmlentities(M.getNameByHandle(contact.u));
-            textMessage = textMessage.replace("%1", newPrivilegeText);
         }
         else if (message.dialogType === "alterParticipants" && message.meta) {
             var otherContact;
@@ -175,6 +173,9 @@ Message._getTextContentsForDialogType = function(message) {
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.FAILED) {
                 textMessage = mega.ui.chat.getMessageString("call-failed", isGroupOrPublic);
+            }
+            else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CALL_ENDED_BY_MODERATOR) {
+                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic);
             }
             else {
                 if (d) {
@@ -2513,7 +2514,7 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
             else {
                 var name = megaChat.html(M.getNameByHandle(author.u));
                 if (name) {
-                    renderableSummary = `${name}: ${renderableSummary}`;
+                    renderableSummary = l.user_message_preview.replace('%NAME', name).replace('%s', renderableSummary);
                 }
             }
         }

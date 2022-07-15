@@ -54,21 +54,19 @@ class PrivilegeChange extends ConversationMessageMixin {
 
         var newPrivilegeText = "";
         if (message.meta.privilege === 3) {
-            newPrivilegeText = l[8875];
+            newPrivilegeText = l.priv_change_to_op;
         }
         else if (message.meta.privilege === 2) {
-            newPrivilegeText = l[8874];
+            newPrivilegeText = l.priv_change_to_std;
         }
         else if (message.meta.privilege === 0) {
-            newPrivilegeText = l[8873];
+            newPrivilegeText = l.priv_change_to_ro;
         }
 
-        var text = l[8915]
-            .replace("%1", `<strong>${newPrivilegeText}</strong>`)
-            .replace(
-                "%2",
-                `<strong>${megaChat.html(displayName)}</strong>`
-            );
+        const text = newPrivilegeText
+            .replace('[S]', '<strong>')
+            .replace('[/S]', '</strong>')
+            .replace('%s', `<strong>${megaChat.html(displayName)}</strong>`);
 
         messages.push(
             <div className="message body" data-id={"id" + message.messageId} key={message.messageId}>

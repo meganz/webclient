@@ -271,21 +271,25 @@ sms.phoneInput = {
         var $warningMessage = $('.js-warning-message', this.$page);
 
         var toggleButtonState = function() {
-            var $countrySelect = $('.option[data-state="active"]', $countrySelector);
+            let hideOldMessage = true;
+            const $countrySelect = $('.option[data-state="active"]', $countrySelector);
 
             // If the fields are completed enable the button
             if ($countrySelect.length && $countrySelect.attr('data-country-iso-code').length > 1
-                && $phoneInput.val().length > 1) {
-
+                && M.validatePhoneNumber($phoneInput.val(), $countrySelect.attr('data-country-call-code'))) {
                 $sendButton.removeClass('disabled');
             }
             else {
+                $warningMessage.addClass('visible').text(l.err_invalid_ph); // Phone format invalid
                 // Otherwise disable the button
                 $sendButton.addClass('disabled');
+                hideOldMessage = false;
             }
 
-            // Hide old error message
-            $warningMessage.removeClass('visible');
+            if (hideOldMessage) {
+                // Hide old error message
+                $warningMessage.removeClass('visible');
+            }
         };
 
         // Add handlers to enable/disable button
@@ -331,21 +335,29 @@ sms.phoneInput = {
                 return false;
             }
 
-            // Get the phone number details
-            var $selectedOption = $('.option[data-state="active"]', $countrySelector);
-            var countryName = $selectedOption.attr('data-country-name');
-            var countryCode = $selectedOption.attr('data-country-iso-code');
-            var countryCallingCode = $selectedOption.attr('data-country-call-code');
             var phoneNum = $phoneInput.val();
+            var $selectedOption = $('.option[data-state="active"]', $countrySelector);
+            var countryCallingCode = $selectedOption.attr('data-country-call-code');
 
             // Strip hyphens and whitespace, remove trunk code.
             // e.g. NZ 021-1234567 => 2112345567
             phoneNum = M.stripPhoneNumber(countryCallingCode, phoneNum);
 
             const formattedPhoneNumber = `+${countryCallingCode}${phoneNum}`;
+            const validatedFormattedPhoneNumber = M.validatePhoneNumber(formattedPhoneNumber);
+
+            if (!validatedFormattedPhoneNumber) {
+                $sendButton.addClass('disabled');
+                $warningMessage.addClass('visible').text(l.err_invalid_ph); // Phone format invalid
+                return false;
+            }
+
+            // Get the phone number details
+            var countryName = $selectedOption.attr('data-country-name');
+            var countryCode = $selectedOption.attr('data-country-iso-code');
 
             // Prepare request
-            var apiRequest = { a: 'smss', n: formattedPhoneNumber };
+            var apiRequest = { a: 'smss', n: validatedFormattedPhoneNumber };
 
             // Add debug mode to test reset of the phone number so can be re-used (staging API only)
             if (localStorage.smsDebugMode) {

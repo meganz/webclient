@@ -246,7 +246,7 @@ class PlayerData {
             if (sfuClient.isSendingScreenHiRes()) {
                 text += `\ntxq: ${sfuClient.txQuality}`;
             }
-            for (const cons of this.callManagerCall.localVideoConsumers) {
+            for (const cons of this.callManagerCall.localPeerStream.consumers) {
                 cons.displayStats(text);
             }
         };

@@ -946,8 +946,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l['208a'] = l['208a'].replace('[/A]', '</a>');
     l['208.a2'] = l[208].replace('[A]', '<a href="/terms" tabindex="-1">');
     l['208.a2'] = l['208.a2'].replace('[/A]', '</a>');
-    l['208s'] = l[208].replace('[A]', '<span class="red txt-bold">');
-    l['208s'] = l['208s'].replace('[/A]', '</span>');
+    l['208s'] = l[208].replace('[A]', '<a class="red txt-bold" href="#">').replace('[/A]', '</a>');
     l['208.g'] = l[208].replace('[A]', '<a class="green">').replace('[/A]', '</a>');
     l['208.g2'] = l[208].replace('[A]', '<a href="/terms" class="green clickurl" target="_blank">')
         .replace('[/A]', '</a>');
@@ -1558,3 +1557,21 @@ lazy(mega, 'intl', function _() {
 
     return ns;
 });
+
+/**
+ * Returns the remapped language code (correct for Transifex) for the users selected lang
+ *
+ * @returns {string} The language code.
+ */
+function getTransifexLangCode() {
+    'use strict';
+
+    switch (lang) {
+        case 'br': return 'pt';
+        case 'cn': return 'zh_CN';
+        case 'ct': return 'zh_TW';
+        case 'jp': return 'ja';
+        case 'kr': return 'ko';
+        default: return lang;
+    }
+}

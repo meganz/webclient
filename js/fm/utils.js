@@ -637,6 +637,7 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         var mcd = localStorage.testChatDisabled;
         var apipath = debug && localStorage.apipath;
         var cdlogger = debug && localStorage.chatdLogger;
+        const allowNullKeys = localStorage.allownullkeys;
 
         force = force || sessionStorage.fmAetherReload;
 
@@ -678,6 +679,9 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         }
         if (hashLogic) {
             localStorage.hashLogic = 1;
+        }
+        if (allowNullKeys) {
+            localStorage.allownullkeys = 1;
         }
 
         if (force) {
@@ -1501,6 +1505,7 @@ mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
         $('.fix-me-close', $bar).rebind('click.df', function() {
             $bar.removeClass('visible');
         });
+        reselect(1);
     }
 }));
 
@@ -2713,4 +2718,37 @@ MegaUtils.prototype.validateDate = function(day, month, year) {
 
     // it is valid
     return 0;
+};
+
+/**
+ * Validate raw phone number
+ *
+ * @param {string} phoneNumber Phone number
+ * @param {string} countryCode Country calling code
+ * @returns {string|Boolean} returns the cleaned phone number otherwise false
+ */
+MegaUtils.prototype.validatePhoneNumber = function(phoneNumber, countryCode) {
+    'use strict';
+
+    if (typeof phoneNumber !== 'string') {
+        return false;
+    }
+
+    let length = 4;
+
+    if (typeof countryCode === 'string') {
+        countryCode = countryCode.trim();
+        phoneNumber = `${countryCode}${phoneNumber}`;
+        length = countryCode.length + 4;
+    }
+
+    phoneNumber = phoneNumber.trim().replace(/[^\w+]/g, '');
+
+    var simplePhoneNumberPattern = new RegExp(`^\\+?\\d{${length},}$`);
+
+    if (!simplePhoneNumberPattern.test(phoneNumber)) {
+        return false;
+    }
+
+    return phoneNumber;
 };

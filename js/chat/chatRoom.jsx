@@ -420,6 +420,13 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         }, 3e5);
     });
 
+    self.rebind('onRoomDisconnected', () => {
+        if (!self.activeCall) {
+            for (const activeCallId of self.activeCallIds.keys()) {
+                self.activeCallIds.remove(activeCallId);
+            }
+        }
+    });
 
     this.membersSetFromApi = new ChatRoom.MembersSet(this);
 
@@ -2058,6 +2065,17 @@ ChatRoom.prototype.rejectCall = function(callId) {
         });
     }
     return Promise.resolve();
+};
+
+ChatRoom.prototype.endCallForAll = function(callId) {
+    if (this.activeCallIds.length && this.type !== 'private') {
+        callId = callId || this.activeCallIds.keys()[0];
+        asyncApiReq({
+            'a': 'mcme',
+            'cid': this.chatId,
+            'mid': callId
+        });
+    }
 };
 
 /**

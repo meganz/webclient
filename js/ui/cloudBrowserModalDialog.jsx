@@ -16,6 +16,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state = {
+            'isActiveSearch': false,
             'selected': [],
             'highlighted': [],
             'currentlyViewedEntry': M.RootID,
@@ -46,25 +47,39 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
         this.forceUpdate();
     }
-    onSearchIconClick(e, node) {
-        var $parentBlock = $(e.target).closest(".fm-header-buttons");
 
-        if ($parentBlock.hasClass("active-search")) {
-            $parentBlock.removeClass("active-search");
+    getHeaderButtonsClass() {
+        const classes = ['fm-header-buttons'];
+        if (this.state.isActiveSearch) {
+            classes.push('active-search');
         }
-        else {
-            $parentBlock.addClass("active-search");
-            $('input', $parentBlock).trigger("focus");
+        return classes.join(' ');
+    }
+
+    getSearchIconClass() {
+        const classes = ['sprite-fm-mono', 'icon-preview-reveal'];
+        if (this.state.isActiveSearch && this.state.searchText.length > 0) {
+            classes.push('disabled');
+        }
+        return classes.join(' ');
+    }
+
+    onSearchIconClick() {
+        const isActiveSearch = !this.state.isActiveSearch;
+
+        if (isActiveSearch) {
+            this.searchInput.focus();
+            this.setState({
+                'isActiveSearch': isActiveSearch
+            });
         }
     }
     onClearSearchIconClick() {
-        var self = this;
-
-
-        self.setState({
+        this.setState({
+            'isActiveSearch': false,
             'searchValue': '',
             'searchText': '',
-            'currentlyViewedEntry': M.RootID
+            'currentlyViewedEntry': this.state.selectedTab === 'shares' ? 'shares' : M.RootID
         });
     }
 
@@ -77,6 +92,15 @@ class CloudBrowserDialog extends MegaRenderMixin {
             isLoading: false
         });
     }
+
+    onSearchBlur() {
+        if (this.state.searchText === '') {
+            this.setState({
+                'isActiveSearch': false
+            });
+        }
+    }
+
     onSearchChange(e) {
         var searchValue = e.target.value;
         const newState = {
@@ -88,7 +112,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             return;
         }
         if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < 3)) {
-            newState.currentlyViewedEntry = M.RootID;
+            newState.currentlyViewedEntry = this.state.selectedTab === 'shares' ? 'shares' : M.RootID;
             newState.searchValue = undefined;
         }
 
@@ -329,16 +353,25 @@ class CloudBrowserDialog extends MegaRenderMixin {
                             <div className="clear"></div>
                         </div>
                         <div className="fm-picker-header">
-                            <div className="fm-header-buttons">
+                            <div className={self.getHeaderButtonsClass()}>
                                 <ViewModeSelector viewMode={viewMode} onChange={this.onViewModeSwitch} />
                                 <div className="fm-files-search">
-                                    <i className="sprite-fm-mono icon-preview-reveal"
-                                        onClick={(e) => {
-                                            self.onSearchIconClick(e);
-                                        }}>
-                                    </i>
-                                    <input type="search" placeholder={l[102]} value={self.state.searchText}
-                                        onChange={self.onSearchChange} />
+                                    <i
+                                        className={self.getSearchIconClass()}
+                                        onClick={() => {
+                                            self.onSearchIconClick();
+                                        }}
+                                    />
+                                    <input
+                                        ref={(input) => {
+                                            this.searchInput = input;
+                                        }}
+                                        type="search" placeholder={l[102]} value={self.state.searchText}
+                                        onChange={self.onSearchChange}
+                                        onBlur={() => {
+                                            self.onSearchBlur();
+                                        }}
+                                    />
                                     {clearSearchBtn}
                                 </div>
                                 <div className="clear"></div>

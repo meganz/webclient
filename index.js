@@ -2111,15 +2111,19 @@ function topbarUITogglePresence(topbar) {
 
     'use strict';
 
-    let element = topbar.querySelector('.js-activity-status');
+    const element = topbar.querySelector('.js-activity-status');
+    const setStatusElem = topbar.querySelector('.js-dropdown-account .status-dropdown');
 
     if (element) {
         element.classList.add('hidden');
+        setStatusElem.classList.add('hidden');
 
         // ActivityStatus Code
-        // If the chat is disabled, or the presence lib isn't loading, don't show the green status icon in the header.
+        // If the chat is disabled, or the presence lib isn't loading,
+        // don't show the green status icon and the Set Status option in the header.
         if (!pfid && megaChatIsReady && megaChat.userPresence !== undefined) {
             element.classList.remove('hidden');
+            setStatusElem.classList.remove('hidden');
             megaChat._renderMyStatus();
         }
     }
@@ -2305,7 +2309,7 @@ function topmenuUI() {
     var $headerButtons = $('.top-buttons', $topHeader);
     var $loginButton = $('.top-login-button', $headerButtons);
     var $headerRegisterBotton = $('.create-account-button', $headerButtons);
-    var $headerSetStatus = $('.js-accountbtn.setstatus', $topHeader).parent();
+    var $headerSetStatus = $('.js-dropdown-account .status-dropdown', $topHeader);
     var $headerAchievements = $('.js-accountbtn.achievements', $topHeader);
     var $headerDownloadMega = $('.js-accountbtn.downloadmega', $topHeader);
     const $topBarAvatar = $('.js-topbaravatar', $topBar);
@@ -2499,7 +2503,8 @@ function topmenuUI() {
             $menuRefreshItem.removeClass('hidden');
         }
 
-        // If the chat is disabled, or the presence lib isn't loading, don't show the green status icon in the header.
+        // If the chat is disabled, or the presence lib isn't loading,
+        // don't show the green status icon and the Set Status option in the header.
         if (!pfid && megaChatIsReady && megaChat.userPresence !== undefined) {
             $headerActivityBlock.removeClass('hidden');
             $headerSetStatus.removeClass('hidden');

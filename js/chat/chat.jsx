@@ -255,6 +255,7 @@ Chat.prototype.init = promisify(function(resolve, reject) {
 
     if (!is_chatlink) {
         $('.activity-status-block, .activity-status').removeClass('hidden');
+        $('.js-dropdown-account .status-dropdown').removeClass('hidden');
     }
 
     // contacts tab update

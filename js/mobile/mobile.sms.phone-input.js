@@ -322,6 +322,7 @@ mobile.sms.phoneInput = {
             }
 
             var phoneNumber = $phoneInput.val();
+            var countryCallCode = $countryCallCodeInput.attr('data-country-call-code');
 
             // Strip hyphens and whitespace, remove trunk code.
             // e.g. NZ 021-1234567 => 2112345567
@@ -338,7 +339,6 @@ mobile.sms.phoneInput = {
             // Get the phone number details
             var countryName = $countryCallCodeInput.attr('data-country-name');
             var countryIsoCode = $countryCallCodeInput.attr('data-country-iso-code');
-            var countryCallCode = $countryCallCodeInput.attr('data-country-call-code');
 
             // Prepare the request
             var request = { a: 'smss', n: validatedFormattedPhoneNumber };

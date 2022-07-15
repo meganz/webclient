@@ -637,6 +637,7 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         var mcd = localStorage.testChatDisabled;
         var apipath = debug && localStorage.apipath;
         var cdlogger = debug && localStorage.chatdLogger;
+        const allowNullKeys = localStorage.allownullkeys;
 
         force = force || sessionStorage.fmAetherReload;
 
@@ -678,6 +679,9 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         }
         if (hashLogic) {
             localStorage.hashLogic = 1;
+        }
+        if (allowNullKeys) {
+            localStorage.allownullkeys = 1;
         }
 
         if (force) {

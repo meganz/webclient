@@ -7,6 +7,7 @@ var u_k_aes;
 var missingkeys;
 var vkey = new Set();
 var ckey = new Set();
+var nkey = new Set();
 var u_sharekeys = Object.create(null);
 
 if (typeof importScripts !== 'undefined') {
@@ -15,13 +16,18 @@ if (typeof importScripts !== 'undefined') {
     self.postMessage = self.webkitPostMessage || self.postMessage;
 
     let jobs;
-    const init = function(debug) {
-        'use strict';
+    // eslint-disable-next-line strict
+    const init = ({d: debug, allowNullKeys} = false) => {
 
         jobs = 0;
         d = !!debug;
         u_sharekeys = Object.create(null);
         missingkeys = false;
+
+        // Set global to allow all-0 keys to be used (for those users that set localStorage flag)
+        if (allowNullKeys) {
+            self.allowNullKeys = allowNullKeys;
+        }
     };
 
     init();
@@ -70,7 +76,7 @@ if (typeof importScripts !== 'undefined') {
         }
         else if (req.u_k) {
             // setup for user account
-            init(req.d);
+            init(req);
 
             usk = req.usk;
             u_handle = req.u_handle;
@@ -79,7 +85,7 @@ if (typeof importScripts !== 'undefined') {
         }
         else if (req.n_h) {
             // setup folder link
-            init(req.d);
+            init(req);
 
             const key = base64_to_a32(req.pfkey);
             u_sharekeys[req.n_h] = [key, new sjcl.cipher.aes(key)];
@@ -214,12 +220,28 @@ function crypto_decryptnode(n) {
 
                     // Don't decrypt the file if the first half of the key is identical to the second half. Creating
                     // such a key enables the attacker to leverage the deobfuscation step (XORing the second half into
-                    // the first half) to provoke an all-0 AES key.
-                    if (k.length === 8 && k[0] === k[4] && k[1] === k[5] && k[2] === k[6] && k[3] === k[7]) {
-                        if (d) {
-                            console.error(`First half of file key matches second half of key (${k.length}): ${n.h}`);
+                    // the first half) to provoke an all-0 AES key. We have an override here (self.allowNullKeys) set by
+                    // localStorage.allownullkeys for users who were using a bad client and still need their files.
+                    if (!self.allowNullKeys) {
+                        const invalidFileKey =
+                            k.length === 8 && k[0] === k[4] && k[1] === k[5] && k[2] === k[6] && k[3] === k[7];
+
+                        if (invalidFileKey) {
+
+                            // @todo check for folders and revamp
+                            // eslint-disable-next-line max-depth
+                            if (d) {
+                                nkey.add(n.h);
+
+                                delay('nodedec:nkey:store', () => {
+                                    const hint = 'please enter localStorage.allownullkeys = 1 to override';
+                                    console.error(`All-0 AES key not allowed (${[...nkey]}), ${hint}.`);
+                                    nkey.clear();
+                                }, 6e3);
+                            }
+
+                            k = false;
                         }
-                        k = false;
                     }
                 }
                 else {

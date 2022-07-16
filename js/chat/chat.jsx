@@ -2671,7 +2671,7 @@ Chat.prototype.safeForceUpdate = SoonFc(60, function forceAppUpdate() {
 Chat.prototype.removeMessagesByRetentionTime = function(chatId) {
     if (this.chats.length > 0) {
         if (chatId) {
-            if (this.logger) {
+            if (this.logger && d > 3) {
                 this.logger.debug(`Chat.prototype.removeMessagesByRetentionTime chatId=${chatId}`);
             }
             var room = this.getChatById(chatId);
@@ -2684,7 +2684,7 @@ Chat.prototype.removeMessagesByRetentionTime = function(chatId) {
         for (var i = 0; i < chatIds.length; i++) {
             let chatRoom = this.chats[chatIds[i]];
             if (chatRoom.retentionTime > 0 && chatRoom.state === ChatRoom.STATE.READY) {
-                if (this.logger) {
+                if (this.logger && d > 3) {
                     this.logger.debug(`Chat.prototype.removeMessagesByRetentionTime roomId=${chatRoom.roomId}`);
                 }
                 chatRoom.removeMessagesByRetentionTime();

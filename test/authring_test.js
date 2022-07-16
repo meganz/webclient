@@ -841,11 +841,9 @@ describe("authring unit test", function() {
             it('works normally', function() {
                 mStub(ns, '_initialisingPromise', false);
                 var masterPromise = _stubMegaPromise(sinon);
-                var prefilledRsaKeysPromise = { linkDoneAndFailTo: sinon.stub() };
                 mStub(window, 'MegaPromise');
                 mStub(window, 'u_privk', 'private key');
                 MegaPromise.onCall(0).returns(masterPromise);
-                MegaPromise.onCall(1).returns(prefilledRsaKeysPromise);
                 mStub(MegaPromise, 'all').returns('combo');
                 var keyringPromise = { done: sinon.stub(),
                                        fail: sinon.stub() };
@@ -854,7 +852,6 @@ describe("authring unit test", function() {
                 mStub(ns, '_initKeyPair');
                 ns._initKeyPair.onCall(0).returns(rsaPromise);
                 ns._initKeyPair.onCall(1).returns('Cu25519');
-                mStub(ns, '_initAndPreloadRSAKeys');
 
                 var result = ns.initAuthenticationSystem();
                 assert.strictEqual(result, masterPromise);
@@ -872,12 +869,6 @@ describe("authring unit test", function() {
                 assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'combo');
                 assert.strictEqual(masterPromise.done.callCount, 1);
                 assert.strictEqual(masterPromise.fail.callCount, 1);
-                assert.strictEqual(rsaPromise.done.callCount, 1);
-
-                callback = rsaPromise.done.args[0][0];
-                callback();
-                assert.strictEqual(prefilledRsaKeysPromise.linkDoneAndFailTo.callCount, 1);
-                assert.strictEqual(ns._initAndPreloadRSAKeys.callCount, 1);
             });
 
             it('Ed25519 fails', function() {

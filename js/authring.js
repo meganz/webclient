@@ -743,14 +743,6 @@ var authring = (function () {
         keyringPromise.done(function __baseAuthSystemDone() {
             var rsaPromise = window.u_privk ? ns._initKeyPair('RSA') : MegaPromise.resolve();
             var cu25519Promise = ns._initKeyPair('Cu25519');
-
-            var prefilledRsaKeysPromise = new MegaPromise();
-            rsaPromise.done(function() {
-                prefilledRsaKeysPromise.linkDoneAndFailTo(
-                    ns._initAndPreloadRSAKeys()
-                );
-            });
-
             var comboPromise = MegaPromise.all([rsaPromise, cu25519Promise]);
 
             masterPromise.linkDoneAndFailTo(comboPromise);
@@ -773,27 +765,6 @@ var authring = (function () {
             });
 
         return masterPromise;
-    };
-
-
-    /**
-     * Preloads and fills the cache/data structures with all contacts' RSA keys.
-     *
-     * @returns {MegaPromise} promise that will be resolved after all keys are loaded/fetched.
-     * @private
-     */
-    ns._initAndPreloadRSAKeys = function() {
-        var loadingPromises = [];
-        // prefill keys required for a/v calls
-        Object.keys(M.u).forEach(function(h) {
-            var contact = M.u[h];
-            if (contact && contact.u && contact.c === 1) {
-                loadingPromises.push(
-                    crypt.getPubRSA(contact.u)
-                );
-            }
-        });
-        return MegaPromise.allDone(loadingPromises);
     };
 
     /**

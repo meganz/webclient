@@ -861,35 +861,5 @@ describe("crypto unit test", function() {
                                    'Got Ed25519 fingerprint for user "you456789xw": If4x36FUomFia_hUBG_SJxt77Us');
             });
         });
-
-        describe('RSA string en/decryption', function() {
-            describe('rsaEncryptString/rsaDecryptString round trips', function() {
-                it("binary values", function() {
-                    var messages = ['Spiegelei', ED25519_PUB_KEY];
-                    var ciphertext;
-                    var cleartext;
-                    for (var i = 0; i < messages.length; i++) {
-                        ciphertext = crypt.rsaEncryptString(messages[i], RSA_PUB_KEY);
-                        assert.strictEqual(ciphertext.length, 1024 / 8 + 2);
-                        cleartext = crypt.rsaDecryptString(ciphertext, RSA_PRIV_KEY);
-                        assert.strictEqual(cleartext, messages[i]);
-                    }
-                });
-
-                it("Unicode and string values", function() {
-                    var messages = ['42', "Don't panic!", 'Flying Spaghetti Monster',
-                                    "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
-                                    'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст'];
-                    var ciphertext;
-                    var cleartext;
-                    for (var i = 0; i < messages.length; i++) {
-                        ciphertext = crypt.rsaEncryptString(messages[i], RSA_PUB_KEY, true);
-                        assert.strictEqual(ciphertext.length, 1024 / 8 + 2);
-                        cleartext = crypt.rsaDecryptString(ciphertext, RSA_PRIV_KEY, true);
-                        assert.strictEqual(cleartext, messages[i]);
-                    }
-                });
-            });
-        });
     });
 });

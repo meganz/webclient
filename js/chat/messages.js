@@ -949,7 +949,7 @@ function MessagesBuff(chatRoom, chatdInt) {
         "messagesBuff[" + chatRoomId + "]",
         {
             minLogLevel: function() {
-                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.ERROR;
+                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.WARN;
             }
         },
         chatRoom.logger
@@ -2201,6 +2201,10 @@ MessagesBuff.prototype.getLatestTextMessage = function() {
 MessagesBuff.prototype.verifyMessageOrder = function(messageIdentity, references, messageOrdersSource) {
     messageOrdersSource = messageOrdersSource || this.messageOrders;
     var msgOrder = messageOrdersSource[messageIdentity];
+
+    if (d > 4) {
+        this.logger.warn('verifyMessageOrder', msgOrder, references, JSON.stringify({msgOrder, references}));
+    }
 
     for (var i = 0; i < references.length; i++) {
         // skip "" references, known bug of native MEGAchat sdk

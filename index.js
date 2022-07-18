@@ -2456,10 +2456,10 @@ function topmenuUI() {
         // Show the rocket icon if achievements are enabled
         mega.achievem.enabled()
             .done(function () {
-                $headerAchievements.parent().removeClass('hidden');
+                $headerAchievements.removeClass('hidden');
             })
             .fail(function () {
-                $headerAchievements.parent().addClass('hidden');
+                $headerAchievements.addClass('hidden');
             });
 
         if (u_attr.email) {

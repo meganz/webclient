@@ -3596,16 +3596,39 @@ FileManager.prototype.initMegaSwitchUI = function() {
 
     const $switches = $('.mega-switch');
 
+    const _setHandleIcon = ($handle, on) => {
+
+        if (on) {
+            $handle.removeClass('icon-minimise-after');
+            $handle.addClass('icon-check-after');
+        }
+        else {
+            $handle.addClass('icon-minimise-after');
+            $handle.removeClass('icon-check-after');
+        }
+    };
+
     $switches.attr({
         'role': 'switch',
         'aria-checked': function() {
-            return this.classList.contains('toggle-on');
+
+            const on = this.classList.contains('toggle-on');
+            const $handle = $('.mega-feature-switch', this).addClass('sprite-fm-mono-after');
+
+            _setHandleIcon($handle, on);
+
+            return on;
         },
         'tabindex': '0',
     });
 
     $(document).rebind('update.accessibility', '.mega-switch', e => {
-        e.target.setAttribute('aria-checked', e.target.classList.contains('toggle-on'));
+
+        const on = e.target.classList.contains('toggle-on');
+
+        e.target.setAttribute('aria-checked', on);
+
+        _setHandleIcon($(e.target.querySelector('.mega-feature-switch')), on);
     });
 };
 

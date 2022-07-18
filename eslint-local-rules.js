@@ -166,6 +166,76 @@ module.exports = {
             };
         }
     },
+    'classes': {
+        meta: {
+            docs: {
+                description: 'ESLint rules for es6+ classes and related.',
+                category: 'suggestion',
+                recommended: 'strict'
+            },
+            schema: []
+        },
+        create(context) {
+            return {
+                ClassBody(node) {
+                    // xxx: Based on typescript-eslint/no-extraneous-class.ts
+                    const {parent, body} = node;
+
+                    if (parent && !parent.superClass) {
+
+                        if (body.length === 0) {
+
+                            context.report(node, 'Unexpected empty class.');
+                        }
+                        else {
+                            let onlyStatic = true;
+                            let onlyConstructor = true;
+
+                            for (const prop of body) {
+
+                                if (prop.kind === 'constructor') {
+
+                                    if (prop.value.params.length) {
+                                        onlyStatic = false;
+                                        onlyConstructor = false;
+                                    }
+                                }
+                                else {
+                                    onlyConstructor = false;
+
+                                    if ('static' in prop && !prop.static) {
+                                        onlyStatic = false;
+                                    }
+                                }
+
+                                if (!(onlyStatic || onlyConstructor)) {
+                                    break;
+                                }
+                            }
+
+                            if (onlyConstructor) {
+                                context.report(node, 'Unexpected class with only a constructor.');
+                            }
+                            if (onlyStatic) {
+                                context.report(node, 'Unexpected class with only static properties.');
+                            }
+                        }
+                    }
+                },
+                VariableDeclaration(node) {
+                    // xxx: like no-implicit-globals, but only for const/let (aka, lexicalBindings)
+
+                    if (node.kind === "const" || node.kind === "let") {
+
+                        if (node.parent && node.parent.type === 'Program') {
+
+                            context.report(node, `Unexpected globally-scoped '${node.kind}' usage.`);
+                        }
+                    }
+                }
+            };
+        }
+    },
     'jquery-replacements': {
         meta: {
             docs: {

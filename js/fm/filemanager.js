@@ -4031,7 +4031,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.nw-fm-left-icon.gallery', $fmholder).addClass('hidden');
     }
 
-    $('.fm.fm-right-header, .fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).addClass('hidden');
+    $('.fm.fm-right-header, .fm-bottom-right-buttons', $fmholder).addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).off('click');
 
     $fmholder.removeClass('affiliate-program');
@@ -4066,24 +4066,27 @@ FileManager.prototype.onSectionUIOpen = function(id) {
                 });
             }
 
-            // remove this two buttons from search result.
+            // Remove import and download buttons from the search result.
             if (M.currentdirid.substr(0, 6) !== 'search') {
-                $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder)
-                    .removeClass('hidden')
-                    .rebind('click', function() {
-                        var c = $(this).attr('class');
+                $('.fm-import-to-cloudrive span', $fmholder)
+                    .text(M.currentdirid === M.RootID ? l.folder_link_import_all : l.folder_link_import);
+                $('.fm-download-as-zip span', $fmholder)
+                    .text(M.currentdirid === M.RootID ? l.folder_link_download_all : l.folder_link_download);
+                $('.fm-bottom-right-buttons', $fmholder).removeClass('hidden');
 
-                        if (c.indexOf('fm-import-to-cloudrive') > -1) {
-                            M.importFolderLinkNodes([M.currentdirid]);
-                        }
-                        else if (c.indexOf('fm-download-as-zip') > -1) {
-                            M.addDownload([M.currentdirid], true);
-                        }
-                    });
+                $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).rebind('click', function() {
+                    const c = $(this).attr('class');
+
+                    if (c.indexOf('fm-import-to-cloudrive') > -1) {
+                        // Import the current folder, could be the root or sub folder
+                        M.importFolderLinkNodes([M.currentdirid]);
+                    }
+                    else if (c.indexOf('fm-download-as-zip') > -1) {
+                        // Download the current folder, could be the root or sub folder
+                        M.addDownload([M.currentdirid], true);
+                    }
+                });
             }
-            // if (!u_type) {
-            // $('.fm-import-to-cloudrive').addClass('hidden');
-            // }
         }
     }
 

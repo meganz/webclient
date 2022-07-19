@@ -4461,7 +4461,11 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
     if (sel.length) {
         var FLRootID = M.RootID;
 
-        mega.ui.showLoginRequiredDialog().then(() => {
+        mega.ui.showLoginRequiredDialog({
+            title: l.login_signup_dlg_title,
+            textContent: l.login_signup_dlg_msg,
+            showRegister: true
+        }).then(() => {
             loadingDialog.show();
 
             tryCatch(() => {

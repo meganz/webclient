@@ -814,9 +814,15 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 scrollBarY.scrollTop = scrollBarY.scrollHeight;
             }
         }
+
         if (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0) {
+            if (folderlink) {
+                $('.fm-bottom-right-buttons', fmholder).addClass('hidden');
+            }
+
             $selectionBar.removeClass('hidden');
         }
+
         this.showRequiredLinks();
     }
 
@@ -850,6 +856,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
         else if (M.megaRender && M.megaRender.megaList) {
             M.megaRender.megaList.resized();
+        }
+
+        if (this.currentdirid.substr(0, 7) !== 'search/' && folderlink) {
+            $('.fm-bottom-right-buttons', fmholder).removeClass('hidden');
         }
     }
 

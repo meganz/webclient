@@ -1371,6 +1371,7 @@ function showLoginDialog(email, password) {
     var $dialog = $('.pro-login-dialog');
     var $inputs = $('input', $dialog);
     var $button = $('.top-dialog-login-button', $dialog);
+    $('aside', $dialog).addClass('hidden');
 
     var closeLoginDialog = function() {
         $('.fm-dialog-overlay').unbind('click.proDialog');
@@ -1548,7 +1549,8 @@ function completeProLogin(result) {
     }
 }
 
-function showRegisterDialog() {
+function showRegisterDialog(aPromise) {
+    'use strict';
 
     if (typeof page !== 'undefined' && page !== 'chat') {
         megaAnalytics.log("pro", "regDialog");
@@ -1596,7 +1598,7 @@ function showRegisterDialog() {
                 fm_showoverlay();
             }
         }
-    });
+    }, aPromise);
 }
 
 var signupPromptDialog = null;

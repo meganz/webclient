@@ -895,6 +895,7 @@ function initTreeScroll() {
 
     if (folderlink || M.currentTreeType !== 'cloud-drive') {
         treeClass = 'js-other-tree-panel';
+        $('.js-other-tree-panel .section-title', fmholder).text(folderlink ? l.folderlink_lp_title : l[24682]);
     }
 
     scrollBlock = document.getElementsByClassName(treeClass).item(0);

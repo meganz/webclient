@@ -1,0 +1,86 @@
+.transfer-panel-opened .active-folder-link .nw-fm-left-icons-panel {
+    box-shadow: 1px 0 0 0 rgba(0, 0, 0, 0.1);
+}
+.active-folder-link .fm-left-panel {
+    box-shadow: inset 1px 0 0 0 rgba(0, 0, 0, 0.1);
+}
+.active-folder-link .nw-fm-left-icons-panel .logo {
+    --icon-size: 48px;
+    background: none;
+    display: block;
+    height: auto;
+    margin: 8px;
+    width: auto;
+}
+.active-folder-link .l-pane-control {
+    float: left;
+    height: 100%;
+    position: relative;
+    z-index: 21;
+}
+.active-folder-link .l-pane-visibility {
+    display: inline-flex;
+}
+.active-folder-link .file-block-scrolling {
+    padding-left: 6px;
+}
+.active-folder-link .nw-tree-panel-header {
+    height: 16px;
+    overflow: visible;
+    z-index: 20;
+    display: block;
+}
+.active-folder-link .nw-tree-panel-header span {
+    display: none;
+}
+.active-folder-link .nw-tree-panel-arrows {
+    top: 17px;
+    display: inline-block;
+    display: none; /* temporary leave as hide, will either remove it or revive it depends on public feedback */
+}
+.active-folder-link.nw-tree-panel-header + .nw-tree-panel-filter-tag.hidden + .fm-tree-panel {
+    height: calc(100% - 12px);
+}
+.active-folder-link .fm-bottom-right-buttons {
+    display: block;
+    background: var(--surface-grey-5);
+    border-radius: 24px;
+    box-shadow: var(--dialog-shadow);
+    width: auto;
+    height: 80px;
+    position: fixed;
+    bottom: 32px;
+    right: 36px;
+    z-index: 999;
+}
+.active-folder-link .folder-link-btns-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 22px;
+    gap: 10px;
+}
+.active-folder-link .folder-link-btns-container .mega-button {
+    -webkit-margin-end: 0;
+    margin-inline-end: 0;
+}
+.active-folder-link .folder-link-btns-container .mega-button > span {
+    font: var(--text-body1);
+    white-space: nowrap;
+}
+.active-folder-link .nw-fm-tree-item .nw-fm-tree-arrow {
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+}
+.active-folder-link .nw-fm-tree-item .nw-fm-tree-folder {
+    -webkit-margin-start: 28px;
+    margin-inline-start: 28px;
+    max-width: calc(100% - 30px);
+}
+/**
+ * hide sections of the site if the current visited link is a folder share link
+ */
+.active-folder-link .nw-fm-left-icon:not(.transfers) {
+    display: none;
+}

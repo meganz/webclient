@@ -669,9 +669,6 @@
 .meetings-call .sidebar.chat-opened .in-call .reactions-bar {
   flex-wrap: wrap;
 }
-.meetings-call .sidebar.chat-opened .in-call .reactions-bar .reactions-bar__reaction {
-  margin: 0 0 2px 0;
-}
 .meetings-call .sidebar.chat-opened .in-call .geolocation-container {
   padding: 0 27px 0 0;
 }

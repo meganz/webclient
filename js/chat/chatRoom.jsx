@@ -1,4 +1,5 @@
-export const RETENTION_FORMAT = { HOURS: l[7132], DAYS: l[16290], WEEKS: l[16293], MONTHS: l[6788], DISABLED: l[7070] };
+export const RETENTION_FORMAT = { HOURS: 'hour', DAYS: 'day', WEEKS: 'week', MONTHS: 'month', DISABLED: 'none' };
+window.RETENTION_FORMAT = RETENTION_FORMAT;
 
 /**
  * Class used to represent a MUC Room in which the current user is present
@@ -616,6 +617,30 @@ ChatRoom.prototype.getRetentionFormat = function(retentionTime) {
             return RETENTION_FORMAT.DAYS;
         default:
             return RETENTION_FORMAT.HOURS;
+    }
+};
+
+/**
+ * Convert the retention time into a number based on the retention format. If no `retentionTime` parameter
+ * is passed, the value is based on the `retentionTime` set for the given chat room.
+ * @see RETENTION_FORMAT
+ * @see ChatRoom.getRetentionFormat
+ * @param {number} [retentionTime] The retention time timestamp
+ * @returns {number} The converted retention time value
+ */
+ChatRoom.prototype.getRetentionTimeFormatted = function(retentionTime) {
+    retentionTime = retentionTime || this.retentionTime;
+    switch (this.getRetentionFormat(retentionTime)) {
+        case RETENTION_FORMAT.MONTHS:
+            return Math.floor(secondsToDays(retentionTime) / 30);
+        case RETENTION_FORMAT.WEEKS:
+            return secondsToDays(retentionTime) / 7;
+        case RETENTION_FORMAT.DAYS:
+            return secondsToDays(retentionTime);
+        case RETENTION_FORMAT.HOURS:
+            return secondsToHours(retentionTime);
+        case RETENTION_FORMAT.DISABLED:
+            return 0;
     }
 };
 

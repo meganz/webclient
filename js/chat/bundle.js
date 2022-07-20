@@ -22522,7 +22522,7 @@ class Call extends mixins.wl {
           if (call.peers.length === 0) {
             this.showTimeoutDialog();
           }
-        } else if (!(call.forcedActiveStream || call.activeStream) && this.state.mode === Call.MODE.SPEAKER && !streams[call.forcedActiveStream]) {
+        } else if (this.state.mode === Call.MODE.SPEAKER && call.forcedActiveStream && !streams[call.forcedActiveStream]) {
           this.setState({
             mode: Call.MODE.THUMBNAIL
           }, () => {

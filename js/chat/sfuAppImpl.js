@@ -63,6 +63,7 @@ class PlayerData {
         this.room.meetingsLoading = false;
 
         this.room.unbind("onCallEnd.start");
+        this.room.megaChat.trigger('sfuConnOpen');
     };
 
     SfuApp.prototype.enableSpeakerDetector = function() {
@@ -92,7 +93,10 @@ class PlayerData {
     };
 
     SfuApp.prototype.onDisconnect = function(termCode, willReconnect, removeActive) {
-        if (!willReconnect) {
+        if (willReconnect) {
+            this.room.megaChat.trigger('sfuConnClose');
+        }
+        else {
             this.room.trigger('onCallEnd', {
                 callId: this.callId,
                 chatId: this.room.chatId,

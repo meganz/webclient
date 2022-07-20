@@ -22421,20 +22421,20 @@ class Call extends mixins.wl {
     };
 
     this.handleRetryTimeout = () => {
-      if (!navigator.onLine) {
+      if (this.props.sfuApp.sfuClient.connState === SfuClient.ConnState.kDisconnected) {
         this.handleCallEnd();
         this.props.chatRoom.trigger('onRetryTimeout');
         ion.sound.play('end_call');
       }
     };
 
-    this.handleCallOffline = () => delay('callOffline', () => navigator.onLine ? null : this.setState({
-      offline: true
-    }), 3e4);
-
-    this.handleCallOnline = () => this.setState({
-      offline: false
-    });
+    this.handleCallOnline = () => {
+      delay.cancel(this.offlineDelayed);
+      delete this.offlineDelayed;
+      this.setState({
+        offline: false
+      });
+    };
 
     this.customIsEventuallyVisible = () => true;
 
@@ -22652,6 +22652,18 @@ class Call extends mixins.wl {
     this.state.sidebar = props.chatRoom.type === 'public';
   }
 
+  handleCallOffline() {
+    if (this.offlineDelayed) {
+      return;
+    }
+
+    this.offlineDelayed = delay('callOffline', () => {
+      this.setState({
+        offline: true
+      });
+    }, 3e4);
+  }
+
   showTimeoutDialog() {
     msgDialog(`warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`, 'stay-on-call', l.empty_call_dlg_title, l.empty_call_dlg_text.replace('%s', '02:00'), res => {
       if (res === null) {
@@ -22664,34 +22676,45 @@ class Call extends mixins.wl {
 
   componentWillUnmount() {
     super.componentWillUnmount();
+    const {
+      minimized,
+      willUnmount,
+      chatRoom
+    } = this.props;
 
-    if (this.props.willUnmount) {
-      this.props.willUnmount(this.props.minimized);
+    if (willUnmount) {
+      willUnmount(minimized);
     }
 
     if (this.ephemeralAddListener) {
       mBroadcaster.removeListener(this.ephemeralAddListener);
     }
 
-    window.removeEventListener('offline', this.handleCallOffline);
-    window.removeEventListener('online', this.handleCallOnline);
+    chatRoom.megaChat.off('sfuConnClose.call');
+    chatRoom.megaChat.off('sfuConnOpen.call');
     this.unbindCallEvents();
 
     if (this.callStartTimeout) {
       clearTimeout(this.callStartTimeout);
     }
+
+    delay.cancel('callOffline');
   }
 
   componentDidMount() {
     super.componentDidMount();
+    const {
+      didMount,
+      chatRoom
+    } = this.props;
 
-    if (this.props.didMount) {
-      this.props.didMount();
+    if (didMount) {
+      didMount();
     }
 
     this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle => this.handleEphemeralAdd(handle));
-    window.addEventListener('offline', this.handleCallOffline);
-    window.addEventListener('online', this.handleCallOnline);
+    chatRoom.megaChat.rebind('sfuConnOpen.call', this.handleCallOnline);
+    chatRoom.megaChat.rebind('sfuConnClose.call', () => this.handleCallOffline());
     this.bindCallEvents();
     ['reconnecting', 'end_call'].map(sound => ion.sound.preload(sound));
     this.callStartTimeout = setTimeout(() => {

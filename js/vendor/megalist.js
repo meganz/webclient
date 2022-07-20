@@ -678,9 +678,8 @@
             scrollToY = itemOffsetTop;
         }
         // check if the item is below the visible viewport
-        else if (itemOffsetTopPlusHeight + this.options.itemHeight >
+        else if (itemOffsetTopPlusHeight + this.options.headerHeight >
             (this._calculated['scrollTop'] + this._calculated['scrollHeight'])) {
-
             scrollToY = itemOffsetTopPlusHeight - this._calculated['scrollHeight'] +
                 this.options.headerHeight + this.options.bottomSpacing;
         }

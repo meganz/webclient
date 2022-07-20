@@ -273,9 +273,14 @@ body.de .mega-dialog.new-group-chat {
 /* Add From Cloud Dialog */
 .mega-dialog.add-from-cloud {
     width: 800px;
+    height: 720px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: hidden;
 }
 .mega-dialog.add-from-cloud .content {
     border-bottom: 1px solid var(--stroke-grey-2);
+    overflow: hidden;
 }
 .mega-dialog.add-from-cloud .fm-dialog-tabs:after {
     display: block;

@@ -2303,7 +2303,7 @@ accountUI.plan = {
             var html = '<tr><th>' + l[476] + '</th><th>' + l[475] +
                 '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
             if (account.purchases.length) {
-                var intl = mega.intl.number;
+
                 // Render every purchase made into Purchase History on Account page
                 $(account.purchases).each(function(index, purchaseTransaction) {
 
@@ -2317,7 +2317,7 @@ accountUI.plan = {
 
                     // Set Date/Time, Item (plan purchased), Amount, Payment Method
                     const dateTime = time2date(purchaseTransaction[1]);
-                    const price = purchaseTransaction[2];
+                    const price = formatCurrency(purchaseTransaction[2], 'EUR', 'narrowSymbol');
                     const proNum = purchaseTransaction[5];
                     let planIcon;
                     const numOfMonths = purchaseTransaction[6];
@@ -2341,7 +2341,7 @@ accountUI.plan = {
                         + '<span> ' + item + '</span>'
                         + '</div></td>'
                         + '<td><span>' + dateTime + '</span></td>'
-                        + '<td><span>&euro;' + escapeHTML(intl.format(price)) + '</span></td>'
+                        + '<td><span>' + escapeHTML(price) + '</span></td>'
                         + '<td><span>' + paymentMethod + '</span></td>'
                         + '</tr>';
                 });

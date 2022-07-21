@@ -361,7 +361,7 @@ html.gbot {
 
 .bottom-page.top-bl {
     table-layout: fixed;
-    padding-top: 128px;
+    padding-top: 118px;
     box-sizing: border-box;
 }
 .mobile .bottom-page.top-bl {
@@ -5553,7 +5553,7 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
         line-height: 24px;
     }
     .bottom-page.top-bl {
-        padding-top: 36px;
+        padding-top: 46px;
     }
     .top-bl .top-title, .top .top-title {
         padding-top: 60px;

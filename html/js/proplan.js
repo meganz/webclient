@@ -1519,15 +1519,18 @@ function completeProLogin(result) {
 
         u_type = result;
 
-        // Find the plan they clicked on before the login/register prompt popped up
-        var proNum = $('.pricing-page.plan.selected').data('payment');
-
         if (page === "chat") {
             var chatHash = getSitePath().replace("/chat/", "").split("#")[0];
             megaChat.loginOrRegisterBeforeJoining(chatHash);
         }
         else {
-            // Load the Pro payment page (step 2)
+            // If no value was set on the discount promo page, find the plan they clicked on
+            // before the login/register prompt popped up. Otherwise use the discount plan number.
+            const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
+            const proNum = continuePlanNum === null ?
+                $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
+
+            // Load the Pro payment page (step 2) now that they have logged in
             loadSubPage('propay_' + proNum);
         }
     }
@@ -1587,10 +1590,13 @@ function showRegisterDialog(aPromise) {
                     security.register.cacheRegistrationData(registerData);
                 }
 
-                // Find the plan they clicked on before the login/register prompt popped up
-                var proNum = $('.pricing-page.plan.selected').data('payment');
+                // If no value was set on the discount promo page, find the plan they clicked on
+                // before the login/register prompt popped up. Otherwise use the discount plan number.
+                const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
+                var proNum = continuePlanNum === null ?
+                    $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
 
-                // Load the Pro payment page (step 2)
+                // Load the Pro payment page (step 2) now that the account has been created
                 loadSubPage('propay_' + proNum);
             }
             else {

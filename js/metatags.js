@@ -13,8 +13,8 @@ mega.metatags = new function() {
             'discount', 'download', 'emailverify', 'key', 'megadrop', 'payment', 'recover',
             'recoverybykey', 'recoverybypark', 'recoveryenterkey',
             'recoverykeychangepass', 'recoveryparkchangepass',
-            'redeem', 'repay', 'reset', 'sms', 'start', 'test', 'thanks', 'twofactor',
-            'unsub', 'verify', 'voucher', 'wiretransfer', 'special'
+            'redeem', 'repay', 'reset', 'sms', 'special', 'start', 'test', 'thanks', 'twofactor',
+            'unsub', 'verify', 'voucher', 'wiretransfer'
         ];
 
         if (!page) {

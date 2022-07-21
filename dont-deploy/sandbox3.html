@@ -40,12 +40,17 @@
         // Add ?apipath=staging to the end of the URL if you want to
         // use the staging API, apipath=prod for the live API servers,
         // or leave blank for Sandbox 3.
-        if (window.location.search.indexOf('apipath=staging') > -1) {
-            localStorage.apipath = 'https://staging.api.mega.co.nz/';
-            localStorage.enableAllPaymentGateways = '1';
-        }
-        else if (window.location.search.indexOf('apipath=prod') > -1) {
+        if (window.location.search.indexOf('apipath=prod') > -1) {
             localStorage.apipath = 'https://g.api.mega.co.nz/';
+        }
+        // For payments to work properly on Staging API, you need to be on the company network or MEGA VPN. If you
+        // have an IPv6 address from your ISP, often it will _not_ be routed via the VPN. Staging4 only works on
+        // IPv4 so all MEGA API traffic will be forced to go through the VPN and thus payments will work properly.
+        else if (window.location.search.indexOf('apipath=staging4') > -1) {
+            localStorage.apipath = 'https://staging4.api.mega.co.nz/';
+        }
+        else if (window.location.search.indexOf('apipath=staging') > -1) {
+            localStorage.apipath = 'https://staging.api.mega.co.nz/';
         }
         else if (window.location.search.indexOf('apipath=sandbox4') > -1) {
             localStorage.apipath = 'https://api-sandbox4.developers.mega.co.nz/';
@@ -53,8 +58,35 @@
         else if (window.location.search.indexOf('apipath=sandbox2') > -1) {
             localStorage.apipath = 'https://api-sandbox2.developers.mega.co.nz/';
         }
+        // Servers nz{1-5}-api-sandbox3 are used by different API developers for testing
+        else if (window.location.search.indexOf('apipath=nz1') > -1) {
+            localStorage.apipath = 'https://nz1-api-sandbox3.developers.mega.co.nz/';
+        }
+        else if (window.location.search.indexOf('apipath=nz2') > -1) {
+            localStorage.apipath = 'https://nz2-api-sandbox3.developers.mega.co.nz/';
+        }
+        else if (window.location.search.indexOf('apipath=nz3') > -1) {
+            localStorage.apipath = 'https://nz3-api-sandbox3.developers.mega.co.nz/';
+        }
+        else if (window.location.search.indexOf('apipath=nz4') > -1) {
+            localStorage.apipath = 'https://nz4-api-sandbox3.developers.mega.co.nz/';
+        }
+        else if (window.location.search.indexOf('apipath=nz5') > -1) {
+            localStorage.apipath = 'https://nz5-api-sandbox3.developers.mega.co.nz/';
+        }
         else {
+            // Not actually working/decommissioned
             localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
+        }
+
+        // Show all payment gateways regardless of country selection
+        if (window.location.search.indexOf('allpaygates=1') > -1) {
+            localStorage.enableAllPaymentGateways = '1';
+        }
+
+        // Use MEGA Pay test domain (Stripe card dialog iframe on the Pro Payment page)
+        if (window.location.search.indexOf('testmegapay=1') > -1) {
+            localStorage.megaPay = 'https://test.megapay.nz/index.html';
         }
 
         // Force the new secure registration method on or off for testing

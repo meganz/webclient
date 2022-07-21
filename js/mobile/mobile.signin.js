@@ -253,13 +253,13 @@ mobile.signin.old = {
             u_type = result;
 
             // Try getting the plan number they selected on Pro page
-            var planNum = localStorage.getItem('proPageContinuePlanNum');
+            const planNum = sessionStorage.getItem('proPageContinuePlanNum');
 
             // If they did come from the Pro page, continue to Pro page Step 2
             if (planNum !== null) {
 
                 // Remove the flag as it's no longer needed
-                localStorage.removeItem('proPageContinuePlanNum');
+                sessionStorage.removeItem('proPageContinuePlanNum');
 
                 // Continue to the Pro payment page
                 loadSubPage('propay_' + planNum);
@@ -269,7 +269,7 @@ mobile.signin.old = {
             else if (login_next) {
 
                 if (typeof login_next === 'function') {
-                    return login_next();                    
+                    return login_next();
                 }
 
                 // Store the page temporarily
@@ -365,13 +365,13 @@ mobile.signin.new = {
                 u_type = result;
 
                 // Try getting the plan number they selected on Pro page
-                var planNum = localStorage.getItem('proPageContinuePlanNum');
+                const planNum = sessionStorage.getItem('proPageContinuePlanNum');
 
                 // If they did come from the Pro page, continue to Pro page Step 2
                 if (planNum !== null) {
 
                     // Remove the flag as it's no longer needed
-                    localStorage.removeItem('proPageContinuePlanNum');
+                    sessionStorage.removeItem('proPageContinuePlanNum');
 
                     // Continue to the Pro payment page
                     loadSubPage('propay_' + planNum);
@@ -381,9 +381,9 @@ mobile.signin.new = {
                 else if (login_next) {
 
                     if (typeof login_next === 'function') {
-                        return login_next();                    
+                        return login_next();
                     }
-                    
+
                     // Store the page temporarily
                     var nextPageAfterLogin = login_next;
 

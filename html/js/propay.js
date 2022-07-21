@@ -31,6 +31,9 @@ pro.propay = {
     /** Overlays for loading/processing/redirecting */
     $loadingOverlay: null,
 
+    /** Selector for the Pro Pay page (step 2 of the process) */
+    $page: null,
+
     paymentStatusChecker: null,
 
     /** The user's subscription payment gateway id */
@@ -51,9 +54,11 @@ pro.propay = {
             return;
         }
 
-        var $stepTwo = $('.payment-section', '.fmholder');
-        var $selectedPlanName = $('.top-header.plan-title .plan-name', $stepTwo);
-        var $purchaseButton = $('button.purchase', $stepTwo);
+        // Cache current Pro Payment page selector
+        this.$page = $('.payment-section', '.fmholder');
+
+        const $selectedPlanName = $('.top-header.plan-title .plan-name', this.$page);
+        const $purchaseButton = $('button.purchase', this.$page);
 
         // Preload loading/transferring/processing animation
         pro.propay.preloadAnimation();
@@ -84,10 +89,10 @@ pro.propay = {
         if (discountInfo && discountInfo.pd && !discountInfo.used) {
             const discountTitle = discountInfo.m === 12 ? l[24680]
                 : (discountInfo.m === 1 ? l[24849] : l[24850]);
-            $('.top-header.plan-title', $stepTwo).safeHTML(discountTitle
+            $('.top-header.plan-title', this.$page).safeHTML(discountTitle
                 .replace('%1', pro.propay.planName)
                 .replace('%2', formatPercentage(discountInfo.pd / 100)));
-            $('.stores-desc', $stepTwo).addClass('hidden');
+            $('.stores-desc', this.$page).addClass('hidden');
             discountInfo.used = 1;
         }
         else if (discountInfo && discountInfo.used) {
@@ -198,9 +203,8 @@ pro.propay = {
         api_req({ a: 'ufpqfull', t: 0, d: enableAllPaymentGateways }, {
             callback: function(gatewayOptions) {
 
-                var $stepTwo = $('.payment-section', '.fmholder');
-                var $placeholderText = $('.loading-placeholder-text', $stepTwo);
-                var $pricingBox = $('.pricing-page.plan', $stepTwo);
+                const $placeholderText = $('.loading-placeholder-text', pro.propay.$page);
+                const $pricingBox = $('.pricing-page.plan', pro.propay.$page);
 
                 // If an API error (negative number) exit early
                 if ((typeof gatewayOptions === 'number') && (gatewayOptions < 0)) {
@@ -221,7 +225,7 @@ pro.propay = {
                 const testGateway = localStorage.testGateway;
                 if (discountInfo) {
                     tempGatewayOptions = tempGatewayOptions.filter(gate => {
-                        if (gate.supportsDiscountCodes && gate.supportsDiscountCodes === 1) {
+                        if (gate.supportsMultiDiscountCodes && gate.supportsMultiDiscountCodes === 1) {
                             return true;
                         }
                         return testGateway;
@@ -260,14 +264,14 @@ pro.propay = {
                 // Show payment duration (e.g. month or year) and renewal option radio options
                 pro.propay.renderPlanDurationOptions(discountInfo);
                 pro.propay.initPlanDurationClickHandler();
-                pro.propay.initRenewalOptionClickHandler();
+                pro.propay.initRenewalOptionClickHandler(discountInfo);
 
                 // Hide/show Argentian warning message depending on ipcc
                 if (u_attr.ipcc === 'AR') {
-                    $('.argentina-only', $stepTwo).removeClass('hidden');
+                    $('.argentina-only', pro.propay.$page).removeClass('hidden');
                 }
                 else {
-                    $('.argentina-only', $stepTwo).addClass('hidden');
+                    $('.argentina-only', pro.propay.$page).addClass('hidden');
                 }
 
                 // If mobile, show all supported options at once and they can scroll vertically
@@ -306,11 +310,12 @@ pro.propay = {
      */
     renderPlanDurationOptions: function(discountInfo) {
         'use strict';
+
         // Sort plan durations by lowest number of months first
         pro.propay.sortMembershipPlans();
 
         // Clear the radio options, in case they revisted the page
-        $('.duration-options-list .payment-duration').not('.template').remove();
+        $('.duration-options-list .payment-duration', this.$page).not('.template').remove();
 
         // Loop through the available plan durations for the current membership plan
         for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
@@ -320,6 +325,28 @@ pro.propay = {
             // If match on the membership plan, display that pricing option in the dropdown
             if (currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === parseInt(pro.propay.planNum)) {
 
+                // If this is a new multi discount code, follow rendering logic for that
+                if (discountInfo && discountInfo.md && discountInfo.pd) {
+
+                    // Calculate if the plan renews yearly (will renew yearly if it is a clean multiple of 12 months)
+                    // e.g. 12, 24, 36. Mixed months e.g. 18 months, 32 months etc will renew monthly as per the API.
+                    const discountMonths = discountInfo.m;
+                    const willRenewYearly = discountMonths % 12 === 0;
+
+                    // If the plan will renew yearly, and the current plan's number of months is 12 (yearly), then
+                    // render the single option only. Or if the plan will renew monthly, and the current plan's number
+                    // of months is 1, then also render. We want the plan index number (i) to be corresponding to the
+                    // plan that will be used on renewal so correct renewal text is shown.
+                    if (willRenewYearly && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 12 ||
+                        !willRenewYearly && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 1) {
+                        pro.propay.renderNewMutiDiscountRadio(discountInfo, currentPlan, i);
+                        break;
+                    }
+
+                    // Try find the correct plan in the next loop iteration
+                    continue;
+                }
+
                 // Get the price and number of months duration
                 var numOfMonths = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
                 var price = currentPlan[pro.UTQA_RES_INDEX_PRICE];
@@ -328,6 +355,7 @@ pro.propay = {
                 var discountedPriceM = '';
                 var discountSaveY = '';
                 var discountSaveM = '';
+
                 if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
                     price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
                     currency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
@@ -364,7 +392,7 @@ pro.propay = {
                 }
 
                 // Build select option
-                var $durationOption = $('.payment-duration.template').first().clone();
+                const $durationOption = $('.payment-duration.template', this.$page).first().clone();
 
                 // Update months and price
                 $durationOption.removeClass('template');
@@ -451,6 +479,55 @@ pro.propay = {
         $('.membership-radio-label', $selectedOption).addClass('checked');
     },
     /* eslint-enable complexity */
+
+    /**
+     * Renders the single option for the new discount scheme which can be redeemed by multiple users
+     * @param {Object} discountInfo The discount information cached from the 'dci' API request
+     * @param {Array} currentPlan The current plan data
+     * @param {Number} dataPlanIndex The array index of the plan in pro.membershipPlans
+     */
+    renderNewMutiDiscountRadio: function(discountInfo, currentPlan, dataPlanIndex) {
+
+        'use strict';
+
+        // Change wording depending on number of months
+        let monthsWording = l[922];     // 1 month
+        const numOfMonths = discountInfo.m;
+
+        if (numOfMonths > 1) {
+            monthsWording = l[6803].replace('%1', numOfMonths);     // x months
+        }
+
+        let currencyCode = 'EUR';
+        let discountedTotalPrice = discountInfo.edtp;   // Euro Discounted Total Price
+        let discountAmount = discountInfo.eda;          // Euro Discount Amount
+
+        // Get local amounts if applicable
+        if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+            currencyCode = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+            discountedTotalPrice = discountInfo.ldtp;   // Local Discounted Total Price
+            discountAmount = discountInfo.lda;          // Local Discount Amount
+        }
+
+        // Format for webclient styled currency
+        const formattedDiscountAmount = formatCurrency(discountAmount, currencyCode);
+        const formattedDiscountedTotalPrice = formatCurrency(discountedTotalPrice, currencyCode);
+
+        // Build select option
+        const $durationOption = $('.payment-duration.template', this.$page).first().clone();
+        const $saveContainer = $('.save-money', $durationOption).removeClass('hidden');
+
+        // Update months and price
+        $durationOption.removeClass('template');
+        $durationOption.attr('data-plan-index', dataPlanIndex);
+        $durationOption.attr('data-plan-months', numOfMonths);
+        $('.amount', $saveContainer).text(formattedDiscountAmount);
+        $('.duration', $durationOption).text(monthsWording);
+        $('.price', $durationOption).text(formattedDiscountedTotalPrice);
+
+        // Update the list of duration options
+        $durationOption.appendTo('.duration-options-list');
+    },
 
     /**
      * Sorts plan durations by lowest number of months first
@@ -543,43 +620,41 @@ pro.propay = {
         var bandwidthValue = bandwidthSizeRounded + ' ' + bandwidthFormatted.unit;
 
         // Set selectors
-        var $step2 = $('.payment-section', '.fmholder');
-        var $pricingBox = $('.pricing-page.plan', $step2);
-        var $planName = $('.plan-title', $pricingBox);
-        var $priceNum = $('.plan-price .price', $pricingBox);
-        var $pricePeriod = $('.plan-period', $pricingBox);
-        var $storageAmount = $('.plan-feature.storage', $pricingBox);
-        var $storageTip = $('i', $storageAmount);
-        var $bandwidthAmount = $('.plan-feature.transfer', $pricingBox);
-        var $bandwidthTip = $('i', $bandwidthAmount);
-        var $euroPrice = $('.euro-price', $pricingBox);
-        var $currncyAbbrev = $('.plan-currency', $pricingBox);
+        const $pricingBox = $('.pricing-page.plan', this.$page);
+        const $planName = $('.plan-title', $pricingBox);
+        const $priceNum = $('.plan-price .price', $pricingBox);
+        const $pricePeriod = $('.plan-period', $pricingBox);
+        const $storageAmount = $('.plan-feature.storage', $pricingBox);
+        const $storageTip = $('i', $storageAmount);
+        const $bandwidthAmount = $('.plan-feature.transfer', $pricingBox);
+        const $bandwidthTip = $('i', $bandwidthAmount);
+        const $euroPrice = $('.euro-price', $pricingBox);
+        const $currncyAbbrev = $('.plan-currency', $pricingBox);
 
-        var euroSign = '\u20ac';
         var localPrice;
 
         if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-            $step2.addClass('local-currency');
+            this.$page.addClass('local-currency');
             $currncyAbbrev.text(localCurrency);
             $euroPrice.text(euroPrice);
             localPrice = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE], localCurrency, 'narrowSymbol');
-            $('.local-currency-tip', $step2).removeClass('hidden');
+            $('.local-currency-tip', this.$page).removeClass('hidden');
         }
         else {
-            $step2.removeClass('local-currency');
-            $('.local-currency-tip', $step2).addClass('hidden');
+            this.$page.removeClass('local-currency');
+            $('.local-currency-tip', this.$page).addClass('hidden');
         }
 
         // If mobile, name at the top
         if (is_mobile) {
-            var $mobilePlanName = $('.payment-options .plan-name', $step2);
+            const $mobilePlanName = $('.payment-options .plan-name', this.$page);
 
             $mobilePlanName.text(pro.propay.planName);
         }
 
         // Update the style of the dialog to be Pro I-III or Lite, also change the plan name
         $pricingBox.addClass('pro' + pro.propay.planNum);
-        $('.plan-icon:not(.alarm)', $step2).addClass('pro' + pro.propay.planNum);
+        $('.plan-icon:not(.alarm)', this.$page).addClass('pro' + pro.propay.planNum);
         $pricingBox.attr('data-payment', pro.propay.planNum);
         $planName.text(pro.propay.planName);
 
@@ -607,8 +682,45 @@ pro.propay = {
 
         discountInfo = discountInfo || pro.propay.getDiscount();
 
-        if (discountInfo && discountInfo.al && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
-            const $discountHeader = $('.payment-page.discount-header', $step2);
+        // Handle new multi-use discounts
+        if (discountInfo && discountInfo.md && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
+            const $discountHeader = $('.payment-page.discount-header', this.$page);
+
+            $('.discount-header-text', $discountHeader)
+                .text(l[24670].replace('$1', formatPercentage(discountInfo.pd / 100)));
+            $discountHeader.removeClass('hidden');
+
+            let currency = 'EUR';
+            const euroDiscountedTotalPrice = formatCurrency(discountInfo.edtp); // Euro Discounted Total Price
+            let discountedTotalPrice = discountInfo.edtp;       // Euro Discounted Total Price
+            let normalTotalPrice = discountInfo.etp;            // Euro Total Price (undiscounted)
+
+            // Get local amounts if applicable
+            if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                currency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+                discountedTotalPrice = discountInfo.ldtp;   // Local Discounted Total Price
+                normalTotalPrice = discountInfo.ltp;        // Local Total Price (undiscounted)
+            }
+
+            // Format for webclient styled currency
+            const formattedDiscountedTotalPrice = formatCurrency(discountedTotalPrice, currency);
+            const formattedNormalTotalPrice = formatCurrency(normalTotalPrice, currency);
+
+            // Only show Euro price if there is a local price shown (no point showing Euro price in 2 places)
+            if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                $('.euro-price', $pricingBox).text(euroDiscountedTotalPrice);
+            }
+
+            $('.old-plan-price', $pricingBox).text(formattedNormalTotalPrice).removeClass('hidden');
+            $('.cross-line', $pricingBox).removeClass('hidden');
+            $('.plan-period', $pricingBox).addClass('hidden');
+            $priceNum.parent('.pricing-page.plan-price').addClass('discounted');
+            $priceNum.text(formattedDiscountedTotalPrice);
+        }
+
+        // Handle old style discounts
+        else if (discountInfo && discountInfo.al && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
+            const $discountHeader = $('.payment-page.discount-header', this.$page);
 
             $('.discount-header-text', $discountHeader)
                 .text(l[24670].replace('$1', formatPercentage(discountInfo.pd / 100)));
@@ -659,15 +771,14 @@ pro.propay = {
             return false;
         }
 
-        var $step2 = $('.payment-section', '.fmholder');
         var $paymentDialog = $('.payment-dialog', 'body');
         var $paymentAddressDialog = $('.payment-address-dialog', 'body');
         var $numbers;
 
         // Update whether this selected option is recurring or one-time
-        var $selectDurationOption = $('.duration-options-list .membership-radio.checked', $step2);
-        var selectedGatewayName = $('.payment-options-list input:checked', $step2).val();
-        var selectedProvider = pro.propay.allGateways.filter(function(val) {
+        const $selectDurationOption = $('.duration-options-list .membership-radio.checked', this.$page);
+        const selectedGatewayName = $('.payment-options-list input:checked', this.$page).val();
+        const selectedProvider = pro.propay.allGateways.filter(val => {
             return (val.gatewayName === selectedGatewayName);
         })[0];
 
@@ -683,8 +794,8 @@ pro.propay = {
         }
 
         // Get the value for whether the user wants the plan to renew automatically
-        var recurringEnabled = false;
-        var autoRenewCheckedValue = $('.renewal-options-list input:checked', $step2).val();
+        let recurringEnabled = false;
+        const autoRenewCheckedValue = $('.renewal-options-list input:checked', this.$page).val();
 
         // If the provider supports recurring payments and the user wants the plan to renew automatically
         if (selectedProvider.supportsRecurring && (autoRenewCheckedValue === 'yes')) {
@@ -700,27 +811,62 @@ pro.propay = {
         var chargeInfoDuration = l[10642].replace('%1', price);
 
         // Find the pricing period in the pricing box and the plan duration options
-        var $sidePanelPeriod = $('.pricing-page.plan .period', $step2);
+        const $sidePanelPeriod = $('.pricing-page.plan .period', this.$page);
         const discountInfo = pro.propay.getDiscount();
 
+        // Otherwise if new multi-use discount code
+        if (discountInfo && discountInfo.md) {
+
+            // If it's a compulsory subscription after the discount offer ends, show text "You will be
+            // charged the normal plan price of 0.00 after the first month when the subscription renews.
+            if (discountInfo.cs || recurringEnabled) {
+                chargeInfoDuration = pro.propay.getDiscountRecurringWording(currentPlan, discountInfo);
+            }
+            else {
+                let discountedTotalPrice = formatCurrency(mega.discountInfo.edtp);    // Euro Discounted Total Price
+                const perMonthLocalPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+
+                // Get the local discounted per month price and discounted total price
+                if (perMonthLocalPrice) {
+                    const localCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+
+                    // Get the Local Discounted Total Price and add * on the end (links to note about billed in Euros)
+                    discountedTotalPrice = mega.discountInfo.ldtp;
+                    discountedTotalPrice = formatCurrency(discountedTotalPrice, localCurrency, 'narrowSymbol', false);
+                    discountedTotalPrice += '*';
+                }
+
+                // Set text "You will be charged x.xx one time."
+                chargeInfoDuration = l[10642].replace('%1', discountedTotalPrice);
+            }
+        }
+
         // Change the charge information below the recurring yes/no question
-        if ((recurringEnabled) && (numOfMonths === 1)) {
+        else if ((recurringEnabled) && (numOfMonths === 1)) {
             chargeInfoDuration = l[10640].replace('%1', price);     // You will be charged 0.00 monthly.
             if (discountInfo && (discountInfo.lmp || discountInfo.emp)) {
+
+                // You will be charged the normal plan price of 0.00 after the first month when the subscription renews.
                 chargeInfoDuration = l[24699].replace('%1', price);
             }
         }
         else if ((recurringEnabled) && (numOfMonths === 12)) {
             chargeInfoDuration = l[10641].replace('%1', price);     // You will be charged 0.00 annually.
             if (discountInfo && (discountInfo.lyp || discountInfo.eyp)) {
+
+                // You will be charged the full plan price of 0.00 after the first year when the subscription renews.
                 chargeInfoDuration = l[24698].replace('%1', price);
             }
         }
         else if (discountInfo && (discountInfo.lmp || discountInfo.emp) && !recurringEnabled && numOfMonths === 1) {
+
+            // You will be charged 0.00 one time.
             chargeInfoDuration = l[10642]
                 .replace('%1', (discountInfo.lmp ? discountInfo.lmp + '*' : discountInfo.emp));
         }
         else if (discountInfo && (discountInfo.lyp || discountInfo.eyp) && !recurringEnabled && numOfMonths === 12) {
+
+            // You will be charged 0.00 one time.
             chargeInfoDuration = l[10642]
                 .replace('%1', (discountInfo.lyp ? discountInfo.lyp + '*' : discountInfo.eyp));
         }
@@ -746,53 +892,157 @@ pro.propay = {
         // Always show the extra Question 3 recurring option section if the provider supports recurring.
         // The user can then toggle whether they want a recurring plan or not with the radio buttons.
         if (selectedProvider.supportsRecurring) {
-            $('.renewal-option', $step2).removeClass('hidden');
+            $('.renewal-option', this.$page).removeClass('hidden');
         }
         else {
             // Otherwise it's a one off only provider, hide the extra information
-            $('.renewal-option', $step2).addClass('hidden');
+            $('.renewal-option', this.$page).addClass('hidden');
         }
 
-        $numbers = $('.number:visible', $step2);
+        $numbers = $('.number:visible', this.$page);
 
         // Reorder options numbering
         for (var i = 0, length = $numbers.length; i < length; i++) {
             $($numbers[i]).text(i + 1);
         }
 
-        // Show recurring info box next to Purchase button and update dialog text for recurring
-        if (recurringEnabled) {
-            $('.subscription-instructions', $step2).removeClass('hidden');
-            $('.subscription-instructions', $step2).rebind('click', function() {
-                bottomPageDialog(false, 'terms', false, true);
-            });
-            $('.payment-note-first.recurring', $paymentAddressDialog).removeClass('hidden');
-            $('.payment-note-first.one-time', $paymentAddressDialog).addClass('hidden');
+        const $planTextStandard = $('.payment-plan-txt.js-plan-txt-normal', $paymentAddressDialog);
+        const $planTextRecurringDiscount = $('.payment-plan-txt.js-plan-txt-discount', $paymentAddressDialog);
+        const $noteDiscountRecurring = $('.payment-note-first.js-multi-discount-recurring', $paymentAddressDialog);
+        const $noteStandardRecurring = $('.payment-note-first.recurring', $paymentAddressDialog);
+        const $noteOneTime = $('.payment-note-first.one-time', $paymentAddressDialog);
+        const $subscriptionInstructions = $('.subscription-instructions', this.$page);
+
+        // By default, hide all address dialog notes
+        $planTextStandard.add($planTextRecurringDiscount).addClass('hidden');
+        $noteDiscountRecurring.add($noteStandardRecurring).add($noteOneTime).addClass('hidden');
+
+        // If there is a percent discount and if using the new multi-discount system
+        if (mega.discountInfo && mega.discountInfo.pd && mega.discountInfo.md) {
+
+            // If recurring subscription, update dialog text below the
+            // Pro plan name, show only the recurring discount text
+            if (recurringEnabled) {
+                recurringOrNonRecurring = l.promotion_recurring_subscription_monthly;
+
+                // If the number of months is cleanly divisible by 12 then it will renew yearly after the promo
+                if (discountInfo.m % 12 === 0) {
+                    recurringOrNonRecurring = l.promotion_recurring_subscription_yearly;
+                }
+
+                $noteDiscountRecurring.removeClass('hidden');
+            }
+            else {
+                // Otherwise update text below the Pro plan name and show only the standard one-off payment text
+                recurringOrNonRecurring = l.promotion_one_off_subscription_text;
+                $noteOneTime.removeClass('hidden');
+            }
+
+            // Show the discount recurring/non-recurring text block below the Pro plan name
+            $planTextRecurringDiscount.removeClass('hidden').text(recurringOrNonRecurring);
         }
         else {
-            // Hide recurring info box next to Purchase button and update dialog text for one-time
-            $('.subscription-instructions', $step2).addClass('hidden');
-            $('.payment-note-first.recurring', $paymentAddressDialog).addClass('hidden');
-            $('.payment-note-first.one-time', $paymentAddressDialog).removeClass('hidden');
+            // If recurring subscription is chosen, show only the standard recurring text in the dialog
+            if (recurringEnabled) {
+                $noteStandardRecurring.removeClass('hidden');
+                $('.duration', $noteStandardRecurring).text(recurringMonthlyOrAnnuallyMessage);
+            }
+            else {
+                // Show only the standard one-off payment text
+                $noteOneTime.removeClass('hidden');
+            }
+
+            // Show the standard 1 month/year (recurring/non-recurring) text block below the Pro plan name
+            $planTextStandard.removeClass('hidden');
+            $('.recurring', $planTextStandard).text(recurringOrNonRecurring);
+        }
+
+        // If recurring, always show recurring info box above the Pro pay page Purchase button and init click handler
+        if (recurringEnabled) {
+            $subscriptionInstructions.removeClass('hidden');
+            $subscriptionInstructions.rebind('click.subscriptioninstructions', () => {
+                bottomPageDialog(false, 'terms', false, true);
+            });
+        }
+        else {
+            // Otherwise hide it
+            $subscriptionInstructions.addClass('hidden');
+        }
+
+        // If compulsory subscription, hide the No option
+        if (discountInfo && discountInfo.cs) {
+            $('.renewal-options-list .renewal-option', this.$page).last().addClass('hidden');
         }
 
         // Update depending on recurring or one off payment
-        $('button.purchase span', $step2).text(subscribeOrPurchase);
-        $(is_mobile ? '.payment-info' : '.payment-instructions', $step2).safeHTML(subscribeOrPurchaseInstruction);
-        $('.choose-renewal .duration-text', $step2).text(autoRenewMonthOrYearQuestion);
-        $('.charge-information', $step2).text(chargeInfoDuration);
+        $('button.purchase span', this.$page).text(subscribeOrPurchase);
+        $(is_mobile ? '.payment-info' : '.payment-instructions', this.$page).safeHTML(subscribeOrPurchaseInstruction);
+        $('.choose-renewal .duration-text', this.$page).text(autoRenewMonthOrYearQuestion);
+        $('.charge-information', this.$page).text(chargeInfoDuration);
         $('.payment-buy-now span', $paymentDialog).text(subscribeOrPurchase);
         $('.payment-buy-now span', $paymentAddressDialog).text(subscribeOrPurchase);
-        $('.payment-note-first.recurring .duration', $paymentAddressDialog)
-            .text(recurringMonthlyOrAnnuallyMessage);
-        $('.payment-plan-txt .recurring', $paymentAddressDialog).text(recurringOrNonRecurring);
     },
     /* jshint +W074 */
 
     /**
+     * Gets the recurring wording for the new multi-discount system, used in a few places
+     * @param {Array} currentPlan The array from the 'utqa' response with the details of the selected Pro plan
+     * @param {Object} discountInfo The discount information from the 'dci' response
+     * @returns {String} Returns the wording for when the plan renews and at what monthly/yearly rate
+     */
+    getDiscountRecurringWording: function(currentPlan, discountInfo) {
+
+        'use strict';
+
+        const numOfMonths = discountInfo.m;
+
+        // Default to monthly recurring subscription wording
+        let monthsOrYears = numOfMonths;
+        let discountRecurringText = l.promotion_recurring_info_text_monthly;
+
+        // If the number of months is cleanly divisible by 12 the subscription will recur yearly after the promo
+        if (numOfMonths % 12 === 0) {
+            monthsOrYears = numOfMonths / 12;
+            discountRecurringText = l.promotion_recurring_info_text_yearly;
+        }
+
+        // Default to Euros
+        let price = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_PRICE]);
+
+        // Get the local price if available
+        if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+            const localPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+            const localCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+
+            // Get the Local Discounted Total Price and add * on the end (links to note about billed in Euros)
+            price = formatCurrency(localPrice, localCurrency, 'narrowSymbol', false);
+            price += '*';
+        }
+
+        // Set the date to current date e.g. 3 May 2022 (will be converted to local language wording/format)
+        const date = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        date.setMonth(date.getMonth() + numOfMonths);
+
+        // Get the selected Pro plan name
+        const proPlanName = pro.getProPlanName(discountInfo.al);
+
+        // Update text for "When the #-month/year promotion ends on 26 April, 2024 you will start a
+        // recurring monthly/yearly subscription for Pro I of EUR9.99 and your card will be billed monthly/yearly."
+        discountRecurringText = mega.icu.format(discountRecurringText, monthsOrYears);
+        discountRecurringText = discountRecurringText.replace('%1', date.toLocaleDateString(undefined, options));
+        discountRecurringText = discountRecurringText.replace('%2', proPlanName);
+        discountRecurringText = discountRecurringText.replace('%3', price);
+
+        return discountRecurringText;
+    },
+
+    /**
      * Add click handler for the radio buttons which are used for selecting the plan/subscription duration
      */
-    initRenewalOptionClickHandler: function() {
+    initRenewalOptionClickHandler: function(discountInfo) {
+
+        'use strict';
 
         var $renewalOptions = $('.renewal-options-list .renewal-option', 'body');
 
@@ -812,7 +1062,7 @@ pro.propay = {
             $('input', $this).prop('checked', true);
 
             // Update the wording for one-time or recurring
-            pro.propay.updateTextDependingOnRecurring();
+            pro.propay.updateTextDependingOnRecurring(discountInfo);
         });
     },
 
@@ -1123,9 +1373,8 @@ pro.propay = {
     startPurchaseProcess: function() {
 
         // Get the selected payment duration and gateway
-        var $step2 = $('.payment-section',  'body');
-        var $selectedPaymentDuration = $('.duration-options-list .membership-radio.checked', $step2);
-        var $selectedPaymentGateway = $('.payment-options-list input:checked', $step2);
+        const $selectedPaymentDuration = $('.duration-options-list .membership-radio.checked', this.$page);
+        const $selectedPaymentGateway = $('.payment-options-list input:checked', this.$page);
 
         // Selected payment method and package
         var selectedPaymentGatewayName = $selectedPaymentGateway.val();
@@ -1236,6 +1485,11 @@ pro.propay = {
             utsRequest.fr = 1;
         }
 
+        // Add the discount information to the User Transaction Sale request
+        if (mega.discountInfo && mega.discountInfo.dc) {
+            utsRequest.dc = mega.discountInfo.dc;
+        }
+
         // Setup the 'uts' API request
         api_req(utsRequest, {
             callback: function (utsResult) {
@@ -1249,9 +1503,20 @@ pro.propay = {
                 // Show an error
                 if ((typeof saleId === 'number') && (saleId < 0)) {
 
+                    // Default error is "Something went wrong. Try again later..."
+                    let errorMessage = l[200] + ' ' + l[253];
+
+                    // Handle specific discount errors
+                    if (saleId === EEXPIRED) {
+                        errorMessage = l[24675];    // The discount code has expired.
+                    }
+                    else if (saleId === EEXIST) {
+                        errorMessage = l[24678];    // This discount code has already been redeemed.
+                    }
+
                     // Hide the loading overlay and show an error
                     pro.propay.hideLoadingOverlay();
-                    msgDialog('warninga', l[7235], l[200] + ' ' + l[253]);  // Something went wrong. Try again later...
+                    msgDialog('warninga', l[7235], errorMessage);
                     return false;
                 }
 
@@ -1320,10 +1585,13 @@ pro.propay = {
                     pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
                 }
 
+                // If saleId is already an array of sale IDs use that, otherwise add to an array
+                const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
+
                 // Complete the transaction
                 let utcReqObj = {
                     a: 'utc',                       // User Transaction Complete
-                    s: [saleId],                    // Sale ID
+                    s: saleIdArray,                 // Array of Sale IDs
                     m: pro.lastPaymentProviderId,   // Gateway number
                     bq: fromBandwidthDialog,        // Log for bandwidth quota triggered
                     extra: extra                    // Extra information for the specific gateway

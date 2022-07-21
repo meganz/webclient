@@ -143,7 +143,7 @@
             rv.name = rv.first + ' ' + rv.last;
 
             // Set a flag that the registration came from the Pro page
-            const fromProPage = localStorage.getItem('proPageContinuePlanNum') !== null;
+            const fromProPage = sessionStorage.getItem('proPageContinuePlanNum') !== null;
 
             // Set the signup function to start the new secure registration process
             security.register.startRegistration(
@@ -360,6 +360,12 @@
         }
         else {
             $('header p', $dialog).safeHTML(l[20757]);
+
+            // Hide the "Create an account and get x GB of free storage on MEGA"
+            // text if coming from the discount promotion page
+            if (sessionStorage.getItem('discountPromoContinuePlanNum')) {
+                $('header p', $dialog).addClass('hidden');
+            }
         }
 
         $inputs.rebind('keydown.proRegister', function(e) {

@@ -3450,16 +3450,17 @@
     </div>
 </div>
 
-<!-- Credit card payment dialog for ECP -->
+<!-- Credit card payment address dialog for ECP/Stripe -->
 <div class="mobile fm-block main-block full-page-scrollable payment-address-dialog hidden">
     <div class="mobile header-scroll-suggester"></div>
     <div class="pro-plan-details">
         <div class="pricing-sprite plan-icon x32"></div>
         <div class="payment-plan-info">
             <div class="payment-plan-title"></div>
-            <div class="payment-plan-txt">
-                <span class="duration"></span> <span class="recurring">([$6965])</span>
+            <div class="payment-plan-txt js-plan-txt-normal hidden">
+                <span class="duration">[$922]</span> <span class="recurring">([$6965])</span>
             </div>
+            <div class="payment-plan-txt js-plan-txt-discount hidden"></div>
         </div>
         <div class="payment-plan-price">
             <span class="price"></span>
@@ -3474,7 +3475,10 @@
                     <div class="mobile content-cell">
                         <div class="payment-address-dialog-body">
                             <div class="main-title">[$6963]</div>
-                            <div class="payment-note-first recurring">
+                            <div class="payment-note-first js-multi-discount-recurring hidden">
+                                <span class="js-discount-text"></span> [$10630]
+                            </div>
+                            <div class="payment-note-first recurring hidden">
                                 <span class="duration">[$10628]</span> [$10630]
                             </div>
                             <div class="payment-note-first one-time hidden">

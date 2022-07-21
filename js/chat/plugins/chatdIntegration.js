@@ -18,11 +18,7 @@ var ChatdIntegration = function(megaChat) {
         {
             onCritical: function(msg) {
                 if (msg.indexOf("order tampering") > -1) {
-                    api_req({
-                        a: 'log',
-                        e: 99616,
-                        m: 'order tampering'
-                    }, {});
+                    eventlog(99616, true);
                 }
             },
             minLogLevel: function() {
@@ -166,11 +162,12 @@ var ChatdIntegration = function(megaChat) {
                     );
                 });
         };
-        MegaPromise.allDone(promises).done(
-            function () {
-                _createChat();
-            }
-        );
+
+        Promise.allSettled(promises).then(_createChat).catch(dump);
+
+        if (d) {
+            console.assert(!protocolHandler.error, protocolHandler.error);
+        }
     });
     return self;
 };
@@ -279,17 +276,23 @@ ChatdIntegration.prototype.requiresUpdate = function() {
 };
 
 ChatdIntegration._waitForProtocolHandler = function(chatRoom, cb) {
+
     if (chatRoom.protocolHandler) {
+        return cb();
+    }
+
+    const done = () => {
+        assert(chatRoom.protocolHandler instanceof strongvelope.ProtocolHandler);
         cb();
+    };
+    const fail = dump.bind(null, `waitForProtocolHandler(${chatRoom.roomId})`);
+
+    if (chatRoom.strongvelopeSetupPromises) {
+        return chatRoom.strongvelopeSetupPromises.then(done).catch(fail);
     }
-    else if (chatRoom.strongvelopeSetupPromises) {
-        chatRoom.strongvelopeSetupPromises.always(cb);
-    }
-    else {
-        createTimeoutPromise(function() {
-            return !!chatRoom.protocolHandler;
-        }, 500, 5000).always(cb);
-    }
+
+    createTimeoutPromise(() => !!chatRoom.protocolHandler, 500, 5000).then(done).catch(fail);
+
 };
 
 ChatdIntegration.prototype.getMciphRequest = function(chatRoom) {
@@ -325,6 +328,10 @@ ChatdIntegration.prototype.getMciphReqFromHandleAndKey = function(publicChatHand
         false
     );
     protocolHandler.unifiedKey = base64urldecode(key);
+
+    if (d) {
+        console.assert(protocolHandler.unifiedKey, 'Invalid key provided..', key);
+    }
 
     var myKey = protocolHandler.packKeyTo([protocolHandler.unifiedKey], u_handle);
 
@@ -622,9 +629,6 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                 chatRoom.ck = chatInfo.ck;
             }
 
-
-            self.decryptTopic(chatRoom);
-
             // handler of the same room was cached before, then restore the keys.
             if (self._cachedHandlers[chatId] && chatRoom.protocolHandler) {
                 chatRoom.protocolHandler.participantKeys = self._cachedHandlers[chatId].participantKeys;
@@ -684,9 +688,6 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
             if (chatInfo.callId && !chatRoom.activeCallIds.exists(chatInfo.callId)) {
                 chatRoom.activeCallIds.set(chatInfo.callId, []);
             }
-            ChatdIntegration._waitForProtocolHandler(chatRoom, () => {
-                self.decryptTopic(chatRoom);
-            });
         }
         else {
             if (chatRoom.ct !== chatInfo.ct) {
@@ -707,11 +708,6 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                     }
                 }
             }
-
-            ChatdIntegration._waitForProtocolHandler(chatRoom, () => {
-                self.decryptTopic(chatRoom);
-            });
-
 
             chatRoom.isMeeting = chatInfo.mr === 1;
 
@@ -813,6 +809,7 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
 
             chatRoom.trackMemberUpdatesFromActionPacket(chatInfo, isMcf);
         }
+        self.decryptTopic(chatRoom);
 
         if (d) {
             console.timeEnd('chatdint:openchat:finish:' + chatId);
@@ -1359,7 +1356,7 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                         }
                     })
                     .catch(function(ex) {
-                        self.logger.error('Failed to decrypt message!', ex);
+                        chatRoom.logger.error('Failed to decrypt message!', ex);
                     });
             }
         });
@@ -1406,15 +1403,24 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                     );
                 }
 
+                if (d && !chatRoom.ck && chatRoom.type === "public") {
+                    chatRoom.logger.warn('chat-key missing at protocol-handler installation..', chatRoom);
+                }
+
+                chatRoom.protocolHandler.setAssocChatRoom(chatRoom);
+
                 Object.keys(chatRoom.members).forEach(function(member) {
                     chatRoom.protocolHandler.addParticipant(member);
                 });
 
-                chatRoom.protocolHandler.chatRoom = chatRoom;
                 if (chatRoom.ck && (chatRoom.type === "public")) {
-                    self.decryptUnifiedkey(chatRoom).done(function () {
-                        self.decryptTopic(chatRoom);
-                    });
+
+                    if (!chatRoom.protocolHandler.gotRsaFailure) {
+                        // @todo what's the point of this decryptUnifiedkey() ?
+                        // i.e. the unifiedKey should have been set already at ProtocolHandler instance creation,
+                        // this function additionally does wait for _ensureKeysAreLoaded() which we did here already.
+                        self.decryptUnifiedkey(chatRoom).then(() => self.decryptTopic(chatRoom)).catch(nop);
+                    }
                 }
                 else if (chatRoom.publicChatKey && (chatRoom.type === "public")) {
                     chatRoom.protocolHandler.unifiedKey = base64urldecode(chatRoom.publicChatKey);
@@ -1628,10 +1634,20 @@ ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
                 chatRoom.topic = decryptedCT.payload;
                 resolve();
             })
-            .catch(function(ex) {
-                if (d) {
-                    self.logger.warn("Could not decrypt topic in root %s",
-                        chatRoom.chatId, ex, localStorage.debugSignatureInvalid && parsedMessage);
+            .catch((ex) => {
+                const {logger, gotRsaFailure} = chatRoom.protocolHandler.setError(ex);
+
+                if (d && !gotRsaFailure || d > 2) {
+                    if (gotRsaFailure) {
+                        logger.debug('Could not decrypt topic.', ex);
+                    }
+                    else {
+                        self.logger.warn(
+                            `Could not decrypt topic in room ${chatRoom.chatId}`,
+                            localStorage.debugSignatureInvalid && parsedMessage,
+                            ex
+                        );
+                    }
                 }
                 reject(ex);
             });

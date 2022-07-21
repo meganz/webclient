@@ -889,54 +889,5 @@ var crypt = (function() {
         logger.error(keyType + ' signature does not verify for user ' + userHandle + '!');
     };
 
-
-    /**
-     * Encrypts a cleartext string with the supplied public key.
-     *
-     * @param {String} cleartext
-     *     Clear text to encrypt.
-     * @param {Array} pubkey
-     *     Public encryption key (in the usual internal format used).
-     * @param {Boolean} utf8convert
-     *     Convert cleartext from unicode to UTF-8 before encryption
-     *     (default: false).
-     * @return {String}
-     *     Encrypted cipher text.
-     */
-    ns.rsaEncryptString = function(cleartext, pubkey, utf8convert) {
-
-        cleartext = utf8convert ? to8(cleartext) : cleartext;
-        var lengthString = String.fromCharCode(cleartext.length >> 8) + String.fromCharCode(cleartext.length & 0xff);
-
-        return crypto_rsaencrypt(lengthString + cleartext, pubkey);
-    };
-
-    /**
-     * Decrypts a ciphertext string with the supplied private key.
-     *
-     * @param {String} ciphertext
-     *     Cipher text to decrypt.
-     * @param {Array} privkey
-     *     Private encryption key (in the usual internal format used).
-     * @param {Boolean} utf8convert
-     *     Convert cleartext from UTF-8 to unicode after decryption
-     *     (default: false).
-     * @return {String}
-     *     Decrypted clear text or false in case of an error
-     */
-    ns.rsaDecryptString = function(ciphertext, privkey, utf8convert) {
-
-        var cleartext = crypto_rsadecrypt(ciphertext, privkey);
-        if (cleartext === false) {
-            return false;
-        }
-
-        var length = (cleartext.charCodeAt(0) << 8) | cleartext.charCodeAt(1);
-        cleartext = cleartext.substring(2, length + 2);
-
-        return utf8convert ? from8(cleartext) : cleartext;
-    };
-
-
     return ns;
 }());

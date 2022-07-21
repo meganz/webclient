@@ -14,189 +14,138 @@ export class HistoryRetentionDialog extends Component {
     inputRef = React.createRef();
 
     state = {
-        selectedTimeFormat: HistoryRetentionDialog.labels.timeFormats.labelPlural.hours,
-        prevTimeRange: undefined,
+        selectedTimeFormat: RETENTION_FORMAT.HOURS,
         timeRange: undefined
     }
-
-    static keydown = 'keydown.historyRetentionDialog';
-
-    static labels = {
-        timeFormats: {
-            labelPlural: {
-                // hours
-                [l[7132]]: l[7132],
-                // days
-                [l[16290]]: l[16290],
-                // weeks
-                [l[16293]]: l[16293],
-                // months
-                [l[6788]]: l[6788]
-            },
-            inputs: {
-                // hour
-                [l[7132]]: l.hours_chat_history_plural,
-                // day
-                [l[16290]]: l.days_chat_history_plural,
-                // week
-                [l[16293]]: l.weeks_chat_history_plural,
-                // month
-                [l[6788]]: l.months_chat_history_plural
-            }
-        },
-        copy: {
-            title: l[23434],
-            subtitle: l[23435],
-            cancel: l[82],
-            done: l[726]
+    constructor(props) {
+        super(props);
+        const { chatRoom } = props;
+        this.state.timeRange = chatRoom.getRetentionTimeFormatted();
+        if (this.state.timeRange === 0) {
+            this.state.timeRange = '';
         }
-    };
-
-    static timeFrame = {
-        // hours
-        [l[7132]]: 1,
-        // days
-        [l[16290]]: 1,
-        // weeks
-        [l[16293]]: 7,
-        // months
-        [l[6788]]: 30
+        this.state.selectedTimeFormat = chatRoom.getRetentionFormat();
+        this.state.selectedTimeFormat =
+            this.state.selectedTimeFormat === RETENTION_FORMAT.DISABLED
+                ? RETENTION_FORMAT.HOURS
+                : this.state.selectedTimeFormat;
     }
 
-    setInitialState = () => {
-        const { chatRoom } = this.props;
-        const retentionTime = chatRoom && chatRoom.retentionTime;
-        if (retentionTime) {
-            const selectedTimeFormat = chatRoom.getRetentionFormat(retentionTime);
-            const timeRange = () => {
-                switch (selectedTimeFormat) {
-                    case RETENTION_FORMAT.DISABLED:
-                        return 0;
-                    case RETENTION_FORMAT.MONTHS:
-                        return Math.floor(secondsToDays(retentionTime) / 30);
-                    case RETENTION_FORMAT.WEEKS:
-                        return secondsToDays(retentionTime) / 7;
-                    case RETENTION_FORMAT.DAYS:
-                        return secondsToDays(retentionTime);
-                    case RETENTION_FORMAT.HOURS:
-                        return secondsToHours(retentionTime);
-                }
-            };
-
-            this.setState({
-                selectedTimeFormat,
-                timeRange: timeRange()
-            }, () =>
-                onIdle(() => {
-                    this.inputRef.current.value = this.state.timeRange;
-                })
-            );
-        }
+    hasInput() {
+        return this.state.timeRange && parseInt(this.state.timeRange, 10) >= 1;
     };
 
-    hasInput = () => !!this.state.timeRange && !!this.state.timeRange.toString().length &&
-        parseInt(this.state.timeRange, 10) >= 1;
-
-    getDefaultValue = selectedTimeFormat => {
-        const { timeFormats } = HistoryRetentionDialog.labels;
-        switch (true) {
-            case selectedTimeFormat === timeFormats.labelPlural[l[7132]]:
+    getDefaultValue(selectedTimeFormat) {
+        switch (selectedTimeFormat) {
+            case RETENTION_FORMAT.HOURS:
                 return LIMIT.HOURS;
-            case selectedTimeFormat === timeFormats.labelPlural[l[16290]]:
+            case RETENTION_FORMAT.DAYS:
                 return LIMIT.DAYS;
-            case selectedTimeFormat === timeFormats.labelPlural[l[16293]]:
+            case RETENTION_FORMAT.WEEKS:
                 return LIMIT.WEEKS;
-            case selectedTimeFormat === timeFormats.labelPlural[l[6788]]:
+            case RETENTION_FORMAT.MONTHS:
                 return LIMIT.MONTHS;
         }
-    };
+    }
 
-    getParsedLabel = (label, timeRange, radioBut) => {
-        timeRange = !timeRange ? this.getDefaultValue(label) : parseInt(timeRange, 10);
-        if (radioBut === true) {
-            return HistoryRetentionDialog.labels.timeFormats.labelPlural[label];
+    getParsedLabel(label, timeRange) {
+        timeRange = timeRange ? parseInt(timeRange, 10) : this.getDefaultValue(label);
+        switch (label) {
+            case RETENTION_FORMAT.HOURS:
+                /* `hour(s)` || `# hour(s)` */
+                return mega.icu.format(l.plural_hour, timeRange);
+            case RETENTION_FORMAT.DAYS:
+                /* `day(s)` || `# day(s)` */
+                return mega.icu.format(l.plural_day, timeRange);
+            case RETENTION_FORMAT.WEEKS:
+                /* `week(s)` || `# week(s)` */
+                return mega.icu.format(l.plural_week, timeRange);
+            case RETENTION_FORMAT.MONTHS:
+                /* `month(s)` || `# month(s)` */
+                return mega.icu.format(l.plural_month, timeRange);
         }
-        return mega.icu.format(HistoryRetentionDialog.labels.timeFormats.inputs[label], timeRange);
-    };
+    }
 
-    handleOnChange = e => {
+    handleRadioChange = e => {
         const selectedTimeFormat = e.target.value;
-        const input = this.inputRef.current;
-        const value = this.filterTimeRange(input.value, selectedTimeFormat);
-
-        this.setState({
+        this.setState(prevState => ({
             selectedTimeFormat,
-            timeRange: value
-        }, () => {
-            input.value = this.state.timeRange;
-        });
+            timeRange: this.filterTimeRange(prevState.timeRange, selectedTimeFormat)
+        }));
     };
 
-    filterTimeRange = (timeRange, selectedTimeFormat) => {
-        const IS_FLOAT = !!timeRange.match(/(\d*\.\d+),?/);
-
-        // Values allowed -- integers, <= 4 characters, 8765 hours, 365 days, 52 weeks, 12 months
-        switch (true) {
-            case IS_FLOAT:
-                return parseInt(timeRange);
-            case timeRange.length > LIMIT.CHARS:
-                return timeRange.substr(0, LIMIT.CHARS);
-            case selectedTimeFormat === RETENTION_FORMAT.HOURS && parseInt(timeRange) > LIMIT.HOURS:
-                return LIMIT.HOURS;
-            case selectedTimeFormat === RETENTION_FORMAT.DAYS && parseInt(timeRange) > LIMIT.DAYS:
-                return LIMIT.DAYS;
-            case selectedTimeFormat === RETENTION_FORMAT.WEEKS && parseInt(timeRange) > LIMIT.WEEKS:
-                return LIMIT.WEEKS;
-            case selectedTimeFormat === RETENTION_FORMAT.MONTHS && parseInt(timeRange) > LIMIT.MONTHS:
-                return LIMIT.MONTHS;
+    filterTimeRange(timeRange, selectedTimeFormat) {
+        // Values allowed -- integers, <= 2 characters, e.g.: 13 hours, 28 days, 4 weeks, 12 months
+        if (timeRange.length > LIMIT.CHARS) {
+            return timeRange.substring(0, LIMIT.CHARS);
         }
-
+        timeRange = parseInt(timeRange, 10);
+        if (timeRange === 0 || isNaN(timeRange)) {
+            return '';
+        }
+        switch (selectedTimeFormat) {
+            case RETENTION_FORMAT.HOURS:
+                return timeRange > LIMIT.HOURS ? LIMIT.HOURS : timeRange;
+            case RETENTION_FORMAT.DAYS:
+                return timeRange > LIMIT.DAYS ? LIMIT.DAYS : timeRange;
+            case RETENTION_FORMAT.WEEKS:
+                return timeRange > LIMIT.WEEKS ? LIMIT.WEEKS : timeRange;
+            case RETENTION_FORMAT.MONTHS:
+                return timeRange > LIMIT.MONTHS ? LIMIT.MONTHS : timeRange;
+        }
         return timeRange;
     }
 
     handleOnTimeChange = e => {
-        const value = this.inputRef.current.value = this.filterTimeRange(e.target.value, this.state.selectedTimeFormat);
-        this.setState({
-            timeRange: value
-        });
+        const timeValue = e.target.value;
+        this.setState(prevState => ({
+            timeRange: this.filterTimeRange(timeValue, prevState.selectedTimeFormat)
+        }));
     };
 
-    handleOnClick = e => {
+    handleOnSubmit(e) {
+        if (!this.hasInput()) {
+            return;
+        }
         e.preventDefault();
         e.stopPropagation();
 
         const { chatRoom, onClose } = this.props;
-        const { selectedTimeFormat } = this.state;
-        const time = HistoryRetentionDialog.timeFrame[selectedTimeFormat] * Number(this.state.timeRange);
-        const IS_HOURS = selectedTimeFormat === HistoryRetentionDialog.labels.timeFormats.labelPlural[l[7132]];
+        const { selectedTimeFormat, timeRange } = this.state;
+        let time = 0;
+        switch (selectedTimeFormat) {
+            case RETENTION_FORMAT.HOURS:
+                time = hoursToSeconds(Number(timeRange));
+                break;
+            case RETENTION_FORMAT.DAYS:
+                time = daysToSeconds(Number(timeRange));
+                break;
+            case RETENTION_FORMAT.WEEKS:
+                time = daysToSeconds(Number(timeRange) * 7);
+                break;
+            case RETENTION_FORMAT.MONTHS:
+                time = daysToSeconds(Number(timeRange) * 30);
+                break;
+        }
 
-        // TODO: remove IS_HOURS, temp re: testing
-        chatRoom.setRetention(IS_HOURS ? hoursToSeconds(time) : daysToSeconds(time), IS_HOURS);
+        chatRoom.setRetention(time);
         onClose();
-    };
+    }
 
-    unbindEvents = () => {
-        $(document.body).off(HistoryRetentionDialog.keydown);
-    };
-
-    bindEvents = () => {
-        $(document.body).rebind(HistoryRetentionDialog.keydown, e => {
-            const key = e.keyCode ? e.keyCode : e.which;
-            if (key === 13 && this.hasInput()) {
-                this.handleOnClick(e);
-            }
-        });
-    };
-
-    renderCustomRadioButton = () => {
-        return Object.values(HistoryRetentionDialog.labels.timeFormats.labelPlural).map(label => {
+    renderCustomRadioButton() {
+        return [
+            RETENTION_FORMAT.HOURS,
+            RETENTION_FORMAT.DAYS,
+            RETENTION_FORMAT.WEEKS,
+            RETENTION_FORMAT.MONTHS,
+        ].map(label => {
             return (
                 <CustomRadioButton
                     checked={this.state.selectedTimeFormat === label}
-                    label={this.getParsedLabel(label, this.state.timeRange, true)}
+                    label={this.getParsedLabel(label, this.state.timeRange)}
                     name="time-selector"
                     value={label}
-                    onChange={this.handleOnChange}
+                    onChange={this.handleRadioChange}
                     key={label}
                 />
             );
@@ -204,20 +153,21 @@ export class HistoryRetentionDialog extends Component {
     };
 
     componentDidMount() {
-        this.bindEvents();
-        this.setInitialState();
+        $(document.body).rebind('keydown.historyRetentionDialog', e => {
+            const key = e.keyCode || e.which;
+            if (key === 13) {
+                this.handleOnSubmit(e);
+            }
+        });
     }
 
     componentWillUnmount() {
-        this.unbindEvents();
+        $(document.body).off('keydown.historyRetentionDialog');
     }
 
     render() {
         const { chatRoom, onClose } = this.props;
-        const hasInput = this.hasInput();
-        const selectedTimeFormat = this.state.selectedTimeFormat;
-        const parsedLabel = this.getParsedLabel(selectedTimeFormat, this.state.timeRange);
-
+        const { selectedTimeFormat, timeRange } = this.state;
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
@@ -228,17 +178,17 @@ export class HistoryRetentionDialog extends Component {
                 onClick={() => this.inputRef.current.focus()}>
 
                 <header>
-                    <h2 id="msg-retention-dialog-title">{HistoryRetentionDialog.labels.copy.title}</h2>
+                    <h2 id="msg-retention-dialog-title">{l[23434] /* `Schedule History Clearing` */}</h2>
                 </header>
 
                 <section className="content">
                     <div className="content-block">
-                        <p>{HistoryRetentionDialog.labels.copy.subtitle}</p>
+                        <p>{l[23435] /* `Automatically delete messages older than:` */}</p>
                     </div>
                     <div className="content-block form">
                         <div className="form-section">
                             <span className="form-section-placeholder">
-                                {parsedLabel && parsedLabel.split(" ")[1]}
+                                {this.getParsedLabel(selectedTimeFormat, timeRange)}
                             </span>
                             <input
                                 type="number"
@@ -248,6 +198,7 @@ export class HistoryRetentionDialog extends Component {
                                 placeholder={this.getDefaultValue(selectedTimeFormat)}
                                 ref={this.inputRef}
                                 autoFocus={true}
+                                value={timeRange}
                                 onChange={this.handleOnTimeChange}
                                 onKeyDown={e => (e.key === '-' || e.key === '+' || e.key === 'e') && e.preventDefault()}
                             />
@@ -264,16 +215,16 @@ export class HistoryRetentionDialog extends Component {
                     <div className="footer-container">
                         <button
                             className="mega-button"
-                            onClick={this.props.onClose}>
-                            <span>{HistoryRetentionDialog.labels.copy.cancel}</span>
+                            onClick={onClose}>
+                            <span>{l[82] /* `Cancel` */}</span>
                         </button>
                         <button
                             className={`
                                 mega-button positive
-                                ${hasInput ? '' : 'disabled'}
+                                ${this.hasInput() ? '' : 'disabled'}
                             `}
-                            onClick={e => hasInput ? this.handleOnClick(e) : false}>
-                            <span>{HistoryRetentionDialog.labels.copy.done}</span>
+                            onClick={e => this.handleOnSubmit(e)}>
+                            <span>{l[726] /* `Done` */}</span>
                         </button>
                     </div>
                 </footer>

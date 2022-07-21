@@ -701,10 +701,14 @@ function init_page() {
         closeDialog();
     }
 
+    // Pages that can be viewed while being logged in and registered but not yet email confirmed
     if ((page.substr(0, 1) !== '!')
         && (page.substr(0, 3) !== 'pro')
         && (page.substr(0, 5) !== 'start' || is_fm())
         && (page.substr(0, 4) !== 'help')
+        && (page.substr(0, 13) !== 'discountpromo') // Discount Promo with regular discount code on the end
+        && (page.substr(0, 2) !== 's/')       // Discount Promo short URL e.g. /s/blackfriday
+        && (page.substr(0, 8) !== 'payment-') // Payment URLs e.g. /payment-ecp-success, /payment-sabadell-failure etc
         && (page !== 'refer')
         && (page !== 'contact')
         && (page !== 'mobileapp')
@@ -1199,7 +1203,7 @@ function init_page() {
 
         if (is_mobile) {
             if (window.pickedPlan) {
-                localStorage.proPageContinuePlanNum = window.pickedPlan;
+                sessionStorage.proPageContinuePlanNum = window.pickedPlan;
                 delete window.pickedPlan;
             }
             mobile.initDOM();
@@ -1772,7 +1776,17 @@ function init_page() {
     else if (page.substr(0, 4) === 'test') {
         test(page.substr(4));
     }
+
+    // New multi-discount handling with discount promotion page e.g.
+    // /discountpromoJ2iPNEWqiTM-yhsuGkOToh or short sale URLs e.g. /s/blackfriday
+    else if (page.substr(0, 13) === 'discountpromo' || page.substr(0, 2) === 's/') {
+        parsepage(pages.discountpromo);
+        return new DiscountPromo();
+    }
+
+    // Existing discount handling system, redirects straight into the Pro Payment page showing the discount
     else if (page.substr(0, 8) === 'discount') {
+
         // discount code from URL #discountxR7xVwBkNjcerUKpjqO6bQ
         if (is_mobile) {
             parsepage(pages.mobile);

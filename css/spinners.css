@@ -26,6 +26,9 @@
         width: 100%;
         z-index: 1112;
     }
+    body.loading .loading-spinner {
+        z-index: 1212;
+    }
     .loading-spinner .main-loader {
         background: center / 100% no-repeat url(../images/mega/loader-dark.gif);
         background-color: var(--progress-bar-fill4);

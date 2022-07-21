@@ -273,9 +273,14 @@ body.de .mega-dialog.new-group-chat {
 /* Add From Cloud Dialog */
 .mega-dialog.add-from-cloud {
     width: 800px;
+    height: 720px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: hidden;
 }
 .mega-dialog.add-from-cloud .content {
     border-bottom: 1px solid var(--stroke-grey-2);
+    overflow: hidden;
 }
 .mega-dialog.add-from-cloud .fm-dialog-tabs:after {
     display: block;
@@ -4344,6 +4349,7 @@ body.de .mega-dialog.new-group-chat {
         vertical-align: middle;
         -webkit-padding-start: 15px;
         padding-inline-start: 15px;
+        max-width: 485px;
     }
     .mega-dialog.payment-address-dialog .payment-form-header {
         margin-top: 20px;
@@ -4610,20 +4616,29 @@ body.de .mega-dialog.new-group-chat {
         width: 490px;
     }
     .mega-dialog.pro-login-dialog header {
-        margin-bottom: 10px;
+        padding: 32px 48px 0;
     }
-    .mega-dialog.pro-login-dialog header p {
-        font-size: 13px;
-        letter-spacing: normal;
-    }
-    .mega-dialog.pro-login-dialog header p a {
-        color: var(--text-color-error);
+    .mega-dialog.pro-login-dialog header h1 {
+        text-align: center;
     }
     .mega-dialog.pro-login-dialog .login-page-forgot-bl {
-        padding: 0;
+        padding: 0 0 24px;
+    }
+    .mega-dialog.pro-login-dialog footer .footer-container {
+        justify-content: space-between;
+    }
+    .mega-dialog.pro-login-dialog .footer-container .checkbox-block {
+        flex-grow: 1;
+        align-items: center;
     }
     .mega-dialog.pro-login-dialog aside {
-        text-align: start;
+        color: var(--text-color-medium);
+        background: var(--surface-grey-3);
+        text-align: center;
+    }
+    .mega-dialog.pro-login-dialog aside p a {
+        color: var(--text-color-high);
+        font-family: var(--text-font-family-semibold);
     }
 
 /* end pro-login-dialog */

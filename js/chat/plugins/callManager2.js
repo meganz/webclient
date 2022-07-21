@@ -281,7 +281,6 @@
         }
     }
 
-
     const CALL_VIEW_MODES = {
         'GRID': 1,
         'SPEAKER': 2,
@@ -372,12 +371,16 @@
             if (this.activeStream && this.activeStream === peer.cid) {
                 this.activeStream = null;
             }
+
             this.peers[peer.cid].destroy();
             console.log("onPeerLeft: reason", SfuClient.TermCode[reason]);
             this.chatRoom.trigger('onCallPeerLeft', { userHandle: peer.userId, reason });
             this.left = true;
             // Peer is left alone in a group call -> mute mic
             this.muteIfAlone();
+            if (this.forcedActiveStream && this.forcedActiveStream === peer.cid) {
+                this.forcedActiveStream = null;
+            }
         }
         onJoined() {
             this.chatRoom.trigger('onCallIJoined');

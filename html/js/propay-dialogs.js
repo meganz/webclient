@@ -1224,6 +1224,7 @@ var addressDialog = {
     $dialog: null,
     $backgroundOverlay: null,
     $pendingOverlay: null,
+    $propayPage: null,
 
     /** The gateway ID for Ecomprocessing */
     gatewayId: 16,
@@ -1277,6 +1278,7 @@ var addressDialog = {
         // Cache DOM reference for lookup in other functions
         this.$dialog = $('.payment-address-dialog');
         this.$backgroundOverlay = $('.fm-dialog-overlay');
+        this.$propayPage = $('.payment-section', '.fmholder');
 
         var selectedPlanIndex;
         var selectedPackage;
@@ -1312,6 +1314,10 @@ var addressDialog = {
             }
         }
 
+        // Get discount information if available
+        const discountInfo = pro.propay.getDiscount();
+
+
         // in case we are coming from normal users sign ups (PRO)
         if (!this.businessPlan || !this.userInfo) {
             // Get the selected package
@@ -1326,7 +1332,7 @@ var addressDialog = {
             this.proNum = proNum;
             this.numOfMonths = numOfMonths;
             proNum = 'pro' + proNum;
-            const discountInfo = pro.propay.getDiscount();
+
             if (discountInfo &&
                 ((numOfMonths === 1 && discountInfo.emp) || (numOfMonths === 12 && discountInfo.eyp))) {
                 proPrice = numOfMonths === 1 ? mega.intl.number.format(discountInfo.emp)
@@ -1361,6 +1367,54 @@ var addressDialog = {
             this.$dialog.find('.payment-plan-txt .recurring').text(`(${l[6965]})`);
         }
         monthsWording = pro.propay.getNumOfMonthsWording(numOfMonths);
+
+        // If using new multi discount system
+        if (discountInfo && discountInfo.pd && discountInfo.md) {
+
+            const $promotionTextSelector = $('.js-multi-discount-recurring .js-discount-text', this.$dialog);
+            const $selectedDuration = $('.duration-options-list .membership-radio.checked', this.$propayPage);
+            const selectedPlanIndex = $selectedDuration.parent().attr('data-plan-index');
+
+            // Show the Euro Total Discount Price
+            proPrice = discountInfo.edtp;
+            numOfMonths = discountInfo.m;
+
+            // For text to show months or years when applicable
+            let monthsOrYears = numOfMonths;
+
+            // Default to monthly recurring subscription wording
+            let discountRecurringText = l.promotion_recurring_info_text_monthly;
+
+            // If the number of months is cleanly divisible by 12 the subscription will recur yearly after the promo
+            if (numOfMonths % 12 === 0) {
+                monthsOrYears = numOfMonths / 12;
+                discountRecurringText = l.promotion_recurring_info_text_yearly;
+            }
+
+            // Set the date to current date e.g. 3 May 2022 (will be converted to local language wording/format)
+            const date = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            date.setMonth(date.getMonth() + numOfMonths);
+
+            // Get the selected Pro plan name
+            const proPlanName = pro.getProPlanName(discountInfo.al);
+
+            // Get the selected package
+            const selectedPackage = pro.membershipPlans[selectedPlanIndex];
+            const regularMonthlyPrice = selectedPackage[pro.UTQA_RES_INDEX_PRICE];
+
+            // Update text for "When the #-month/year promotion ends on 26 April, 2024 you will start a
+            // recurring monthly/yearly subscription for Pro I of EUR9.99 and your card will be billed monthly/yearly."
+            discountRecurringText = mega.icu.format(discountRecurringText, monthsOrYears);
+            discountRecurringText = discountRecurringText.replace('%1', date.toLocaleDateString(undefined, options));
+            discountRecurringText = discountRecurringText.replace('%2', proPlanName);
+            discountRecurringText = discountRecurringText.replace('%3', formatCurrency(regularMonthlyPrice));
+
+            // Update the text (if the recurring option is selected, it
+            // will be shown in the payment address dialog when opened)
+            $promotionTextSelector.text(discountRecurringText);
+        }
+
 
         // Update template
         this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 business')
@@ -2061,7 +2115,11 @@ var addressDialog = {
         const shift = 500;
         const base = 3000; // 3sec
         const nextTick = addressDialog.stripeCheckerCounter * shift + base;
-        api_req({ a: 'utd', s: [saleId] }, {
+
+        // If saleId is already an array of sale IDs use that, otherwise add to an array
+        const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
+
+        api_req({ a: 'utd', s: saleIdArray }, {
             callback: (res) => {
 
                 if (typeof res === 'string') {
@@ -2280,7 +2338,16 @@ var addressDialog = {
                     if (this.extraDetails.recurring) {
                         iframeSrc += '&r=1';
                     }
-                    iframeSrc += `&m=${this.numOfMonths}`;
+
+                    // If new multi-discount promotion, add the discount number of months & turn the promo flag on
+                    if (mega.discountInfo && mega.discountInfo.md) {
+                        iframeSrc += `&m=${mega.discountInfo.m}`;
+                        iframeSrc += `&promo=1`;
+                    }
+                    else {
+                        // Otherwise use the selected number of months and turn the promo flag off
+                        iframeSrc += `&m=${this.numOfMonths}`;
+                    }
 
                     this.stripeSaleId = saleId;
 
@@ -2290,7 +2357,6 @@ var addressDialog = {
                         iframeSrc += `&g=${b64encode(gate)}`;
                     }
                 }
-
 
                 const locale = addressDialog.stripeLocal();
                 if (locale) {

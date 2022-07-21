@@ -3128,28 +3128,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-left-icon.folder-link {
     display: none;
 }
-/* Folder fink section */
-.transfer-panel-opened .active-folder-link .nw-fm-left-icons-panel {
-    box-shadow: 1px 0 0 0 rgba(0,0,0,0.1);
-}
-.active-folder-link .fm-left-panel {
-    box-shadow: inset 1px 0 0 0 rgba(0,0,0,0.1);
-}
-.active-folder-link .nw-fm-left-icons-panel .logo {
-    --icon-size: 48px;
-    background: none;
-    display: block;
-    height: auto;
-    margin: 8px;
-    width: auto;
-}
-
-.active-folder-link .l-pane-control {
-    float: left;
-    height: 100%;
-    position: relative;
-    z-index: 21;
-}
 button.l-pane-visibility {
     display: none;
     position: absolute;
@@ -3158,53 +3136,16 @@ button.l-pane-visibility {
     right: -10px;
     z-index: 19;
 }
-.active-folder-link .l-pane-visibility {
-    display: inline-flex;
-}
-.active-folder-link .file-block-scrolling {
-    padding-left: 6px;
-}
-.active-folder-link .nw-tree-panel-header {
-    height: 16px;
-    overflow: visible;
-    z-index: 20;
-    display: block;
-}
-.active-folder-link .nw-tree-panel-header span {
-    display: none;
-}
-.active-folder-link .nw-tree-panel-arrows {
-    top: 17px;
-    display: inline-block;
-    display: none; /* temporary leave as hide, will either remove it or revive it depends on public feedback */
-}
-.not-logged .fm-main.active-folder-link {
-    height: 100%;
-    height: -webkit-calc(100% - 70px);
-    height: -moz-calc(100% - 70px);
-    height: calc(100% - 70px);
-}
-.active-folder-link.nw-tree-panel-header + .nw-tree-panel-filter-tag.hidden + .fm-tree-panel {
-    height: -webkit-calc(100% - 12px);
-    height: -moz-calc(100% - 12px);
-    height: calc(100% - 12px);
-}
 .l-pane-collapsed .fm-left-panel {
     width: 6px !important;
 }
-.l-pane-collapsed .fm-tree-panel, .l-pane-collapsed .nw-tree-panel-header, .l-pane-collapsed .nw-tree-panel-filter-tag {
+.l-pane-collapsed .fm-tree-panel,
+.l-pane-collapsed .nw-tree-panel-header,
+.l-pane-collapsed .nw-tree-panel-filter-tag {
     display: none;
 }
 .l-pane-collapsed .fm-right-files-block {
     margin-left: 54px !important;
-}
-/* end of Folder fink secion */
-
-/**
- * hide sections of the site if the current visited link is a folder share link
- */
-.active-folder-link .nw-fm-left-icon:not(.transfers) {
-    display: none;
 }
 .nw-fm-left-icon .beta-text {
     left: 6px;
@@ -3247,6 +3188,9 @@ button.l-pane-visibility {
     background-color: rgba(255, 255, 255, 0.5);
     height: 100%;
     z-index: 499;
+}
+body.loading .light-overlay {
+    z-index: 1200;
 }
 .not-logged .top-search-bl, .not-logged .cloud-popup-icon, .not-logged .fm-add-user, .not-logged .nw-fm-left-icon.rubbish-bin {
     display: none !important;
@@ -14604,8 +14548,8 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     left: 72px;
     z-index: 121;
 }
-.not-logged .active-folder-link .corner-messages {
-    bottom: 66px;
+.active-folder-link .corner-messages {
+    bottom: 24px;
 }
 .in-call .corner-messages {
     bottom: 24px;

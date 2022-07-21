@@ -36,7 +36,6 @@
                 $('header h2', this.$dialog)
                     .text(this.options.title);
 
-                // custom buttons, because of the styling
                 $('header p', this.$dialog)
                     .text(options.textContent || l[7679]);
 
@@ -48,12 +47,24 @@
                         return false;
                     });
 
-                $('button.pro-register', this.$dialog)
-                    .rebind('click.loginrequired', function() {
-                        promise.reject();
-                        return false;
-                    });
-                $('button.pro-register span', this.$dialog).text(l[82]);
+                if (options.showRegister) {
+                    $('button.pro-register', this.$dialog)
+                        .rebind('click.loginrequired', () => {
+                            loginRequiredDialog.hide();
+                            showRegisterDialog(promise);
+                            promise = undefined;
+                            return false;
+                        });
+                    $('button.pro-register span', this.$dialog).text(l.sign_up_btn);
+                }
+                else {
+                    $('button.pro-register', this.$dialog)
+                        .rebind('click.loginrequired', () => {
+                            promise.reject();
+                            return false;
+                        });
+                    $('button.pro-register span', this.$dialog).text(l[82]);
+                }
             });
 
             loginRequiredDialog.show();
@@ -75,19 +86,19 @@
         var $button = $('.top-dialog-login-button', $dialog);
 
         if (M.chat) {
-            $('header > p', $dialog).removeClass('hidden');
-            $('header > p > a', $dialog).rebind('click.doSignup', function() {
+            $('aside', $dialog).removeClass('hidden');
+            $('aside > p > a', $dialog).rebind('click.doSignup', () => {
                 closeDialog();
                 megaChat.loginOrRegisterBeforeJoining(undefined, true, false, false, options.onLoginSuccessCb);
             });
         }
         else if (options.showRegister) {
-            $('header > p', $dialog).removeClass('hidden');
-            $('header > p > a', $dialog).rebind('click.doSignup', function() {
+            $('aside', $dialog).removeClass('hidden');
+            $('aside > p > a', $dialog).rebind('click.doSignup', () => {
                 closeDialog();
                 mega.ui.showRegisterDialog({
-                    showLogin: true,
-                    body: options.showRegister,
+                    showLogin: !folderlink,
+                    title: l[5840],
                     onAccountCreated: function(gotLoggedIn, accountData) {
                         if (gotLoggedIn) {
                             completeLogin(u_type);
@@ -100,11 +111,11 @@
                             }
                         }
                     }
-                });
+                }, folderlink ? aPromise : null);
             });
         }
         else {
-            $('header > p', $dialog).addClass('hidden');
+            $('aside', $dialog).addClass('hidden');
         }
 
         M.safeShowDialog('pro-login-dialog', function() {

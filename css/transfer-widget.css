@@ -483,18 +483,16 @@
 .transfer-task-row.overquota .transfer-task-status {
     color: var(--secondary-red);
 }
+.transfer-task-row .transfer-task-status + i {
+    display: none;
+}
 /* inqueue mode */
-.transfer-task-row.inqueue .transfer-task-status::before {
-    content: '';
-    width: 18px;
-    height: 18px;
+.transfer-task-row.inqueue .transfer-task-status + i {
+    animation: rotate 1s infinite linear;
     display: block;
-    position: absolute;
-    right: 10px;
-    top: 3px;
-    background-image: url(../images/mega/dual-spinner-small.svg);
-    background-repeat: no-repeat;
+    margin: 4px 12px 0 0;
     opacity: 0.6;
+    --icon-size: 22px;
 }
 /* deploy icons */
 .transfer-task-row.paused .transfer-task-status::before {

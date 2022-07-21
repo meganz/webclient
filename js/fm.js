@@ -895,6 +895,7 @@ function initTreeScroll() {
 
     if (folderlink || M.currentTreeType !== 'cloud-drive') {
         treeClass = 'js-other-tree-panel';
+        $('.js-other-tree-panel .section-title', fmholder).text(folderlink ? l.folderlink_lp_title : l[24682]);
     }
 
     scrollBlock = document.getElementsByClassName(treeClass).item(0);
@@ -3396,8 +3397,7 @@ function fm_resize_handler(force) {
             'height': `calc(100% - ${sharedHeaderHeight}px)`,
         });
     }
-
-    if (M.currentrootid === 'discovery') {
+    else if (M.currentrootid === 'discovery') {
         const $galleryTabsBl = $('.gallery-tabs-bl', 'body');
         const pos = $('.gallery-tab-lnk-y', $galleryTabsBl).position();
         $('.gallery-section-title', $galleryTabsBl).css('max-width', pos.left - 10);

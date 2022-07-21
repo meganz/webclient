@@ -272,13 +272,12 @@ if (typeof loadingInitDialog === 'undefined') {
             if (this.progress + 1 <= progress) {
 
                 this.progress = progress | 0;
-
                 this.loader.classList.remove('delay-loader');
                 this.loader.style.transform = `scaleX(${(this.progress * 0.5 + 50) / 100})`;
 
-                if (progress >= 99) {
+                requestAnimationFrame(() => {
 
-                    setTimeout(() => {
+                    if (this.progress >= 99 || this.progress === false) {
 
                         const elm = document.getElementsByClassName('loader-progressbar')[0];
 
@@ -286,19 +285,13 @@ if (typeof loadingInitDialog === 'undefined') {
                             elm.classList.remove('active');
                             elm.style.bottom = 0;
                         }
-                    }, 301);
-                }
-                else if (delayStep) {
+                    }
+                    else if (this.loader && delayStep && this.progress < delayStep) {
 
-                    queueMicrotask(() => {
-
-                        if (this.loader && this.progress < delayStep) {
-
-                            this.loader.classList.add('delay-loader');
-                            this.loader.style.transform = `scaleX(${(delayStep * 0.5 + 50) / 100})`;
-                        }
-                    });
-                }
+                        this.loader.classList.add('delay-loader');
+                        this.loader.style.transform = `scaleX(${(delayStep * 0.5 + 50) / 100})`;
+                    }
+                });
             }
         }
     };
@@ -3733,12 +3726,13 @@ function loadfm_done(mDBload) {
         }
 
         if (hideLoadingDialog) {
-            setTimeout(() => {
+            onIdle(() => {
                 window.loadingInitDialog.hide();
-            }, 301);
-            // Reposition UI elements right after hiding the loading overlay,
-            // without waiting for the lazy $.tresizer() triggered by MegaRender
-            fm_resize_handler(true);
+
+                // Reposition UI elements right after hiding the loading overlay,
+                // without waiting for the lazy $.tresizer() triggered by MegaRender
+                fm_resize_handler(true);
+            });
         }
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded

@@ -265,7 +265,7 @@ mobile.register = {
             }
             else {
                 // If they came from the Pro page, set the flag
-                const fromProPage = localStorage.getItem('proPageContinuePlanNum') || false;
+                const fromProPage = sessionStorage.getItem('proPageContinuePlanNum') || false;
 
                 // Support of old registration is removed in ticket WEB-15124
 
@@ -537,13 +537,13 @@ mobile.register.new = {
             security.register.cacheRegistrationData(registrationVars);
 
             // Try getting the plan number they selected on Pro page
-            var planNum = localStorage.getItem('proPageContinuePlanNum');
+            const planNum = sessionStorage.getItem('proPageContinuePlanNum');
 
             // If they did come from the Pro page, continue to Pro page Step 2 and skip email confirmation
             if (planNum !== null) {
 
                 // Remove the flag as it's no longer needed
-                localStorage.removeItem('proPageContinuePlanNum');
+                sessionStorage.removeItem('proPageContinuePlanNum');
 
                 // Continue to the Pro payment page
                 loadSubPage('propay_' + planNum);

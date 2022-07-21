@@ -1371,6 +1371,7 @@ function showLoginDialog(email, password) {
     var $dialog = $('.pro-login-dialog');
     var $inputs = $('input', $dialog);
     var $button = $('.top-dialog-login-button', $dialog);
+    $('aside', $dialog).addClass('hidden');
 
     var closeLoginDialog = function() {
         $('.fm-dialog-overlay').unbind('click.proDialog');
@@ -1518,15 +1519,18 @@ function completeProLogin(result) {
 
         u_type = result;
 
-        // Find the plan they clicked on before the login/register prompt popped up
-        var proNum = $('.pricing-page.plan.selected').data('payment');
-
         if (page === "chat") {
             var chatHash = getSitePath().replace("/chat/", "").split("#")[0];
             megaChat.loginOrRegisterBeforeJoining(chatHash);
         }
         else {
-            // Load the Pro payment page (step 2)
+            // If no value was set on the discount promo page, find the plan they clicked on
+            // before the login/register prompt popped up. Otherwise use the discount plan number.
+            const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
+            const proNum = continuePlanNum === null ?
+                $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
+
+            // Load the Pro payment page (step 2) now that they have logged in
             loadSubPage('propay_' + proNum);
         }
     }
@@ -1548,7 +1552,8 @@ function completeProLogin(result) {
     }
 }
 
-function showRegisterDialog() {
+function showRegisterDialog(aPromise) {
+    'use strict';
 
     if (typeof page !== 'undefined' && page !== 'chat') {
         megaAnalytics.log("pro", "regDialog");
@@ -1585,10 +1590,13 @@ function showRegisterDialog() {
                     security.register.cacheRegistrationData(registerData);
                 }
 
-                // Find the plan they clicked on before the login/register prompt popped up
-                var proNum = $('.pricing-page.plan.selected').data('payment');
+                // If no value was set on the discount promo page, find the plan they clicked on
+                // before the login/register prompt popped up. Otherwise use the discount plan number.
+                const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
+                var proNum = continuePlanNum === null ?
+                    $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
 
-                // Load the Pro payment page (step 2)
+                // Load the Pro payment page (step 2) now that the account has been created
                 loadSubPage('propay_' + proNum);
             }
             else {
@@ -1596,7 +1604,7 @@ function showRegisterDialog() {
                 fm_showoverlay();
             }
         }
-    });
+    }, aPromise);
 }
 
 var signupPromptDialog = null;

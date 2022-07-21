@@ -2435,7 +2435,7 @@ Chat.prototype.safeForceUpdate = SoonFc(60, function forceAppUpdate() {
 Chat.prototype.removeMessagesByRetentionTime = function (chatId) {
   if (this.chats.length > 0) {
     if (chatId) {
-      if (this.logger) {
+      if (this.logger && d > 3) {
         this.logger.debug(`Chat.prototype.removeMessagesByRetentionTime chatId=${chatId}`);
       }
 
@@ -2454,7 +2454,7 @@ Chat.prototype.removeMessagesByRetentionTime = function (chatId) {
       let chatRoom = this.chats[chatIds[i]];
 
       if (chatRoom.retentionTime > 0 && chatRoom.state === ChatRoom.STATE.READY) {
-        if (this.logger) {
+        if (this.logger && d > 3) {
           this.logger.debug(`Chat.prototype.removeMessagesByRetentionTime roomId=${chatRoom.roomId}`);
         }
 
@@ -2702,12 +2702,13 @@ __webpack_require__.d(__webpack_exports__, {
 "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 });
 const RETENTION_FORMAT = {
-  HOURS: l[7132],
-  DAYS: l[16290],
-  WEEKS: l[16293],
-  MONTHS: l[6788],
-  DISABLED: l[7070]
+  HOURS: 'hour',
+  DAYS: 'day',
+  WEEKS: 'week',
+  MONTHS: 'month',
+  DISABLED: 'none'
 };
+window.RETENTION_FORMAT = RETENTION_FORMAT;
 
 var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI, publicChatHandle, publicChatKey, ck, isMeeting, retentionTime) {
   var self = this;
@@ -3185,6 +3186,27 @@ ChatRoom.prototype.getRetentionFormat = function (retentionTime) {
 
     default:
       return RETENTION_FORMAT.HOURS;
+  }
+};
+
+ChatRoom.prototype.getRetentionTimeFormatted = function (retentionTime) {
+  retentionTime = retentionTime || this.retentionTime;
+
+  switch (this.getRetentionFormat(retentionTime)) {
+    case RETENTION_FORMAT.MONTHS:
+      return Math.floor(secondsToDays(retentionTime) / 30);
+
+    case RETENTION_FORMAT.WEEKS:
+      return secondsToDays(retentionTime) / 7;
+
+    case RETENTION_FORMAT.DAYS:
+      return secondsToDays(retentionTime);
+
+    case RETENTION_FORMAT.HOURS:
+      return secondsToHours(retentionTime);
+
+    case RETENTION_FORMAT.DISABLED:
+      return 0;
   }
 };
 
@@ -10022,177 +10044,172 @@ const LIMIT = {
   MONTHS: 12
 };
 class HistoryRetentionDialog extends external_React_.Component {
-  constructor(...args) {
-    super(...args);
+  constructor(props) {
+    super(props);
     this.inputRef = external_React_default().createRef();
     this.state = {
-      selectedTimeFormat: HistoryRetentionDialog.labels.timeFormats.labelPlural.hours,
-      prevTimeRange: undefined,
+      selectedTimeFormat: chat_chatRoom.RETENTION_FORMAT.HOURS,
       timeRange: undefined
     };
 
-    this.setInitialState = () => {
-      const {
-        chatRoom
-      } = this.props;
-      const retentionTime = chatRoom && chatRoom.retentionTime;
-
-      if (retentionTime) {
-        const selectedTimeFormat = chatRoom.getRetentionFormat(retentionTime);
-        this.setState({
-          selectedTimeFormat,
-          timeRange: (() => {
-            switch (selectedTimeFormat) {
-              case chat_chatRoom.RETENTION_FORMAT.DISABLED:
-                return 0;
-
-              case chat_chatRoom.RETENTION_FORMAT.MONTHS:
-                return Math.floor(secondsToDays(retentionTime) / 30);
-
-              case chat_chatRoom.RETENTION_FORMAT.WEEKS:
-                return secondsToDays(retentionTime) / 7;
-
-              case chat_chatRoom.RETENTION_FORMAT.DAYS:
-                return secondsToDays(retentionTime);
-
-              case chat_chatRoom.RETENTION_FORMAT.HOURS:
-                return secondsToHours(retentionTime);
-            }
-          })()
-        }, () => onIdle(() => {
-          this.inputRef.current.value = this.state.timeRange;
-        }));
-      }
-    };
-
-    this.hasInput = () => !!this.state.timeRange && !!this.state.timeRange.toString().length && parseInt(this.state.timeRange, 10) >= 1;
-
-    this.getDefaultValue = selectedTimeFormat => {
-      const {
-        timeFormats
-      } = HistoryRetentionDialog.labels;
-
-      switch (true) {
-        case selectedTimeFormat === timeFormats.labelPlural[l[7132]]:
-          return LIMIT.HOURS;
-
-        case selectedTimeFormat === timeFormats.labelPlural[l[16290]]:
-          return LIMIT.DAYS;
-
-        case selectedTimeFormat === timeFormats.labelPlural[l[16293]]:
-          return LIMIT.WEEKS;
-
-        case selectedTimeFormat === timeFormats.labelPlural[l[6788]]:
-          return LIMIT.MONTHS;
-      }
-    };
-
-    this.getParsedLabel = (label, timeRange, radioBut) => {
-      timeRange = !timeRange ? this.getDefaultValue(label) : parseInt(timeRange, 10);
-
-      if (radioBut === true) {
-        return HistoryRetentionDialog.labels.timeFormats.labelPlural[label];
-      }
-
-      return mega.icu.format(HistoryRetentionDialog.labels.timeFormats.inputs[label], timeRange);
-    };
-
-    this.handleOnChange = e => {
+    this.handleRadioChange = e => {
       const selectedTimeFormat = e.target.value;
-      const input = this.inputRef.current;
-      const value = this.filterTimeRange(input.value, selectedTimeFormat);
-      this.setState({
+      this.setState(prevState => ({
         selectedTimeFormat,
-        timeRange: value
-      }, () => {
-        input.value = this.state.timeRange;
-      });
-    };
-
-    this.filterTimeRange = (timeRange, selectedTimeFormat) => {
-      const IS_FLOAT = !!timeRange.match(/(\d*\.\d+),?/);
-
-      switch (true) {
-        case IS_FLOAT:
-          return parseInt(timeRange);
-
-        case timeRange.length > LIMIT.CHARS:
-          return timeRange.substr(0, LIMIT.CHARS);
-
-        case selectedTimeFormat === chat_chatRoom.RETENTION_FORMAT.HOURS && parseInt(timeRange) > LIMIT.HOURS:
-          return LIMIT.HOURS;
-
-        case selectedTimeFormat === chat_chatRoom.RETENTION_FORMAT.DAYS && parseInt(timeRange) > LIMIT.DAYS:
-          return LIMIT.DAYS;
-
-        case selectedTimeFormat === chat_chatRoom.RETENTION_FORMAT.WEEKS && parseInt(timeRange) > LIMIT.WEEKS:
-          return LIMIT.WEEKS;
-
-        case selectedTimeFormat === chat_chatRoom.RETENTION_FORMAT.MONTHS && parseInt(timeRange) > LIMIT.MONTHS:
-          return LIMIT.MONTHS;
-      }
-
-      return timeRange;
+        timeRange: this.filterTimeRange(prevState.timeRange, selectedTimeFormat)
+      }));
     };
 
     this.handleOnTimeChange = e => {
-      const value = this.inputRef.current.value = this.filterTimeRange(e.target.value, this.state.selectedTimeFormat);
-      this.setState({
-        timeRange: value
+      const timeValue = e.target.value;
+      this.setState(prevState => ({
+        timeRange: this.filterTimeRange(timeValue, prevState.selectedTimeFormat)
+      }));
+    };
+
+    const {
+      chatRoom
+    } = props;
+    this.state.timeRange = chatRoom.getRetentionTimeFormatted();
+
+    if (this.state.timeRange === 0) {
+      this.state.timeRange = '';
+    }
+
+    this.state.selectedTimeFormat = chatRoom.getRetentionFormat();
+    this.state.selectedTimeFormat = this.state.selectedTimeFormat === chat_chatRoom.RETENTION_FORMAT.DISABLED ? chat_chatRoom.RETENTION_FORMAT.HOURS : this.state.selectedTimeFormat;
+  }
+
+  hasInput() {
+    return this.state.timeRange && parseInt(this.state.timeRange, 10) >= 1;
+  }
+
+  getDefaultValue(selectedTimeFormat) {
+    switch (selectedTimeFormat) {
+      case chat_chatRoom.RETENTION_FORMAT.HOURS:
+        return LIMIT.HOURS;
+
+      case chat_chatRoom.RETENTION_FORMAT.DAYS:
+        return LIMIT.DAYS;
+
+      case chat_chatRoom.RETENTION_FORMAT.WEEKS:
+        return LIMIT.WEEKS;
+
+      case chat_chatRoom.RETENTION_FORMAT.MONTHS:
+        return LIMIT.MONTHS;
+    }
+  }
+
+  getParsedLabel(label, timeRange) {
+    timeRange = timeRange ? parseInt(timeRange, 10) : this.getDefaultValue(label);
+
+    switch (label) {
+      case chat_chatRoom.RETENTION_FORMAT.HOURS:
+        return mega.icu.format(l.plural_hour, timeRange);
+
+      case chat_chatRoom.RETENTION_FORMAT.DAYS:
+        return mega.icu.format(l.plural_day, timeRange);
+
+      case chat_chatRoom.RETENTION_FORMAT.WEEKS:
+        return mega.icu.format(l.plural_week, timeRange);
+
+      case chat_chatRoom.RETENTION_FORMAT.MONTHS:
+        return mega.icu.format(l.plural_month, timeRange);
+    }
+  }
+
+  filterTimeRange(timeRange, selectedTimeFormat) {
+    if (timeRange.length > LIMIT.CHARS) {
+      return timeRange.substring(0, LIMIT.CHARS);
+    }
+
+    timeRange = parseInt(timeRange, 10);
+
+    if (timeRange === 0 || isNaN(timeRange)) {
+      return '';
+    }
+
+    switch (selectedTimeFormat) {
+      case chat_chatRoom.RETENTION_FORMAT.HOURS:
+        return timeRange > LIMIT.HOURS ? LIMIT.HOURS : timeRange;
+
+      case chat_chatRoom.RETENTION_FORMAT.DAYS:
+        return timeRange > LIMIT.DAYS ? LIMIT.DAYS : timeRange;
+
+      case chat_chatRoom.RETENTION_FORMAT.WEEKS:
+        return timeRange > LIMIT.WEEKS ? LIMIT.WEEKS : timeRange;
+
+      case chat_chatRoom.RETENTION_FORMAT.MONTHS:
+        return timeRange > LIMIT.MONTHS ? LIMIT.MONTHS : timeRange;
+    }
+
+    return timeRange;
+  }
+
+  handleOnSubmit(e) {
+    if (!this.hasInput()) {
+      return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+    const {
+      chatRoom,
+      onClose
+    } = this.props;
+    const {
+      selectedTimeFormat,
+      timeRange
+    } = this.state;
+    let time = 0;
+
+    switch (selectedTimeFormat) {
+      case chat_chatRoom.RETENTION_FORMAT.HOURS:
+        time = hoursToSeconds(Number(timeRange));
+        break;
+
+      case chat_chatRoom.RETENTION_FORMAT.DAYS:
+        time = daysToSeconds(Number(timeRange));
+        break;
+
+      case chat_chatRoom.RETENTION_FORMAT.WEEKS:
+        time = daysToSeconds(Number(timeRange) * 7);
+        break;
+
+      case chat_chatRoom.RETENTION_FORMAT.MONTHS:
+        time = daysToSeconds(Number(timeRange) * 30);
+        break;
+    }
+
+    chatRoom.setRetention(time);
+    onClose();
+  }
+
+  renderCustomRadioButton() {
+    return [chat_chatRoom.RETENTION_FORMAT.HOURS, chat_chatRoom.RETENTION_FORMAT.DAYS, chat_chatRoom.RETENTION_FORMAT.WEEKS, chat_chatRoom.RETENTION_FORMAT.MONTHS].map(label => {
+      return external_React_default().createElement(CustomRadioButton, {
+        checked: this.state.selectedTimeFormat === label,
+        label: this.getParsedLabel(label, this.state.timeRange),
+        name: "time-selector",
+        value: label,
+        onChange: this.handleRadioChange,
+        key: label
       });
-    };
-
-    this.handleOnClick = e => {
-      e.preventDefault();
-      e.stopPropagation();
-      const {
-        chatRoom,
-        onClose
-      } = this.props;
-      const {
-        selectedTimeFormat
-      } = this.state;
-      const time = HistoryRetentionDialog.timeFrame[selectedTimeFormat] * Number(this.state.timeRange);
-      const IS_HOURS = selectedTimeFormat === HistoryRetentionDialog.labels.timeFormats.labelPlural[l[7132]];
-      chatRoom.setRetention(IS_HOURS ? hoursToSeconds(time) : daysToSeconds(time), IS_HOURS);
-      onClose();
-    };
-
-    this.unbindEvents = () => {
-      $(document.body).off(HistoryRetentionDialog.keydown);
-    };
-
-    this.bindEvents = () => {
-      $(document.body).rebind(HistoryRetentionDialog.keydown, e => {
-        const key = e.keyCode ? e.keyCode : e.which;
-
-        if (key === 13 && this.hasInput()) {
-          this.handleOnClick(e);
-        }
-      });
-    };
-
-    this.renderCustomRadioButton = () => {
-      return Object.values(HistoryRetentionDialog.labels.timeFormats.labelPlural).map(label => {
-        return external_React_default().createElement(CustomRadioButton, {
-          checked: this.state.selectedTimeFormat === label,
-          label: this.getParsedLabel(label, this.state.timeRange, true),
-          name: "time-selector",
-          value: label,
-          onChange: this.handleOnChange,
-          key: label
-        });
-      });
-    };
+    });
   }
 
   componentDidMount() {
-    this.bindEvents();
-    this.setInitialState();
+    $(document.body).rebind('keydown.historyRetentionDialog', e => {
+      const key = e.keyCode || e.which;
+
+      if (key === 13) {
+        this.handleOnSubmit(e);
+      }
+    });
   }
 
   componentWillUnmount() {
-    this.unbindEvents();
+    $(document.body).off('keydown.historyRetentionDialog');
   }
 
   render() {
@@ -10200,9 +10217,10 @@ class HistoryRetentionDialog extends external_React_.Component {
       chatRoom,
       onClose
     } = this.props;
-    const hasInput = this.hasInput();
-    const selectedTimeFormat = this.state.selectedTimeFormat;
-    const parsedLabel = this.getParsedLabel(selectedTimeFormat, this.state.timeRange);
+    const {
+      selectedTimeFormat,
+      timeRange
+    } = this.state;
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       chatRoom: chatRoom,
       onClose: onClose,
@@ -10211,17 +10229,17 @@ class HistoryRetentionDialog extends external_React_.Component {
       onClick: () => this.inputRef.current.focus()
     }), external_React_default().createElement("header", null, external_React_default().createElement("h2", {
       id: "msg-retention-dialog-title"
-    }, HistoryRetentionDialog.labels.copy.title)), external_React_default().createElement("section", {
+    }, l[23434])), external_React_default().createElement("section", {
       className: "content"
     }, external_React_default().createElement("div", {
       className: "content-block"
-    }, external_React_default().createElement("p", null, HistoryRetentionDialog.labels.copy.subtitle)), external_React_default().createElement("div", {
+    }, external_React_default().createElement("p", null, l[23435])), external_React_default().createElement("div", {
       className: "content-block form"
     }, external_React_default().createElement("div", {
       className: "form-section"
     }, external_React_default().createElement("span", {
       className: "form-section-placeholder"
-    }, parsedLabel && parsedLabel.split(" ")[1]), external_React_default().createElement("input", {
+    }, this.getParsedLabel(selectedTimeFormat, timeRange)), external_React_default().createElement("input", {
       type: "number",
       min: "0",
       step: "1",
@@ -10229,6 +10247,7 @@ class HistoryRetentionDialog extends external_React_.Component {
       placeholder: this.getDefaultValue(selectedTimeFormat),
       ref: this.inputRef,
       autoFocus: true,
+      value: timeRange,
       onChange: this.handleOnTimeChange,
       onKeyDown: e => (e.key === '-' || e.key === '+' || e.key === 'e') && e.preventDefault()
     })), external_React_default().createElement("div", {
@@ -10239,46 +10258,17 @@ class HistoryRetentionDialog extends external_React_.Component {
       className: "footer-container"
     }, external_React_default().createElement("button", {
       className: "mega-button",
-      onClick: this.props.onClose
-    }, external_React_default().createElement("span", null, HistoryRetentionDialog.labels.copy.cancel)), external_React_default().createElement("button", {
+      onClick: onClose
+    }, external_React_default().createElement("span", null, l[82])), external_React_default().createElement("button", {
       className: `
                                 mega-button positive
-                                ${hasInput ? '' : 'disabled'}
+                                ${this.hasInput() ? '' : 'disabled'}
                             `,
-      onClick: e => hasInput ? this.handleOnClick(e) : false
-    }, external_React_default().createElement("span", null, HistoryRetentionDialog.labels.copy.done)))));
+      onClick: e => this.handleOnSubmit(e)
+    }, external_React_default().createElement("span", null, l[726])))));
   }
 
 }
-HistoryRetentionDialog.keydown = 'keydown.historyRetentionDialog';
-HistoryRetentionDialog.labels = {
-  timeFormats: {
-    labelPlural: {
-      [l[7132]]: l[7132],
-      [l[16290]]: l[16290],
-      [l[16293]]: l[16293],
-      [l[6788]]: l[6788]
-    },
-    inputs: {
-      [l[7132]]: l.hours_chat_history_plural,
-      [l[16290]]: l.days_chat_history_plural,
-      [l[16293]]: l.weeks_chat_history_plural,
-      [l[6788]]: l.months_chat_history_plural
-    }
-  },
-  copy: {
-    title: l[23434],
-    subtitle: l[23435],
-    cancel: l[82],
-    done: l[726]
-  }
-};
-HistoryRetentionDialog.timeFrame = {
-  [l[7132]]: 1,
-  [l[16290]]: 1,
-  [l[16293]]: 7,
-  [l[6788]]: 30
-};
 
 function CustomRadioButton({
   checked = false,
@@ -22532,6 +22522,12 @@ class Call extends mixins.wl {
           if (call.peers.length === 0) {
             this.showTimeoutDialog();
           }
+        } else if (this.state.mode === Call.MODE.SPEAKER && call.forcedActiveStream && !streams[call.forcedActiveStream]) {
+          this.setState({
+            mode: Call.MODE.THUMBNAIL
+          }, () => {
+            call.setViewMode(this.state.mode);
+          });
         }
       });
       chatRoom.rebind('onCallPeerJoined.callComp', () => {

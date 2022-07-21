@@ -28,8 +28,7 @@
         options = {};
     }
 
-    function doProRegister($dialog) {
-
+    function doProRegister($dialog, aPromise) {
         const rv = {};
         const hideOverlay = () => {
             loadingDialog.hide();
@@ -72,6 +71,10 @@
                 // fm_showoverlay();
                 // ^ legacy confirmation dialog, with no email change option
                 sendSignupLinkDialog(rv);
+            }
+
+            if (aPromise) {
+                aPromise.resolve();
             }
         };
 
@@ -140,7 +143,7 @@
             rv.name = rv.first + ' ' + rv.last;
 
             // Set a flag that the registration came from the Pro page
-            const fromProPage = localStorage.getItem('proPageContinuePlanNum') !== null;
+            const fromProPage = sessionStorage.getItem('proPageContinuePlanNum') !== null;
 
             // Set the signup function to start the new secure registration process
             security.register.startRegistration(
@@ -255,14 +258,14 @@
         }
     }
 
-    function showRegisterDialog(opts) {
+    function showRegisterDialog(opts, aPromise) {
         if ($.len(options)) {
             closeRegisterDialog(options.$dialog, true);
         }
         options = Object(opts);
         var $dialog = options.$wrapper || $('.mega-dialog.pro-register-dialog');
         var $inputs = $('input', $dialog);
-        var $button = $('button', $dialog);
+        var $button = $('button:not(.js-close)', $dialog);
         var $password = $('input[type="password"]', $dialog);
 
         // Controls events, close button etc
@@ -272,12 +275,18 @@
         else {
             // controls
             $('button.js-close', $dialog).rebind('click.registerDialog', function() {
+                if (aPromise) {
+                    aPromise.reject();
+                }
                 closeRegisterDialog($dialog, true);
                 return false;
             });
 
             // close dialog by click on overlay
             $('.fm-dialog-overlay').rebind('click.registerDialog', function() {
+                if (aPromise) {
+                    aPromise.reject();
+                }
                 if ($.registerDialog === $.dialog) {
                     closeRegisterDialog($dialog, true);
                 }
@@ -319,6 +328,7 @@
                 });
         }
         else if (options.showLogin) {
+            $('aside', $dialog).removeClass('no-padding');
             $('aside .login-text', $dialog).removeClass('hidden');
             $('aside .login-text a, .register-side-pane.header a', $dialog)
                 .rebind('click.doSignup', function() {
@@ -346,32 +356,37 @@
 
         $('header h2', $dialog).text(options.title || l[20755]);
         if (options.body) {
-            $('header p', $dialog)
-                .safeHTML(options.body);
+            $('header p', $dialog).safeHTML(options.body);
         }
         else {
             $('header p', $dialog).safeHTML(l[20757]);
+
+            // Hide the "Create an account and get x GB of free storage on MEGA"
+            // text if coming from the discount promotion page
+            if (sessionStorage.getItem('discountPromoContinuePlanNum')) {
+                $('header p', $dialog).addClass('hidden');
+            }
         }
 
         $inputs.rebind('keydown.proRegister', function(e) {
             if (e.keyCode === 13) {
-                doProRegister($dialog);
+                doProRegister($dialog, aPromise);
             }
         });
 
-        $button.rebind('click.proRegister', function(e) {
+        $button.rebind('click.proRegister', function() {
             var $this = $(this);
             if ($this.hasClass('disabled')) {
                 return false;
             }
             $this.addClass('disabled');
-            doProRegister($dialog);
+            doProRegister($dialog, aPromise);
             return false;
         });
 
         $button.rebind('keydown.proRegister', function (e) {
             if (e.keyCode === 13  && !$(this).hasClass('disabled')) {
-                doProRegister($dialog);
+                doProRegister($dialog, aPromise);
                 return false;
             }
         });

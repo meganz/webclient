@@ -2674,8 +2674,7 @@
         </button>
 
         <header>
-            <h2 id="pro-login-dialog-title">[$190]</h2>
-            <p class="hidden">[$20635]</p>
+            <h1 id="pro-login-dialog-title">[$190]</h1>
         </header>
 
         <section class="content">
@@ -2697,18 +2696,19 @@
 
         <footer>
             <div class="footer-container">
-                <button class="mega-button positive inline top-dialog-login-button" tabindex="0" type="button">
-                    <span>[$16345]</span>
-                </button>
-            </div>
-
-            <aside>
                 <div class="account checkbox-block">
                     <div class="login-check checkboxOn checkbox">
                         <input class="checkboxOn" type="checkbox" name="login-check3" id="login-check3" checked="checked">
                     </div>
                     <label class="radio-txt">[$192]</label>
                 </div>
+                <button class="mega-button positive inline top-dialog-login-button" tabindex="0" type="button">
+                    <span>[$16345]</span>
+                </button>
+            </div>
+
+            <aside class="hidden">
+                <p>[$20635]</p>
             </aside>
         </footer>
     </div>
@@ -3172,7 +3172,10 @@
                 </div>
                 <div class="payment-plan-info">
                     <div id="payment-address-dialog-title" class="payment-plan-title">PRO I</div>
-                    <div class="payment-plan-txt"><span class="duration">[$922]</span> <span class="recurring">([$6965])</span></div>
+                    <div class="payment-plan-txt js-plan-txt-normal hidden">
+                        <span class="duration">[$922]</span> <span class="recurring">([$6965])</span>
+                    </div>
+                    <div class="payment-plan-txt js-plan-txt-discount hidden"></div>
                 </div>
             </div>
             <div class="payment-plan-price"><span class="price">9.99</span></div>
@@ -3180,7 +3183,10 @@
 
         <section class="content">
             <div class="content-block payment-address-dialog-body">
-                <div class="payment-note-first recurring">
+                <div class="payment-note-first js-multi-discount-recurring hidden">
+                    <span class="js-discount-text"></span> [$10630]
+                </div>
+                <div class="payment-note-first recurring hidden">
                     <span class="duration">[$10628]</span> [$10630]
                 </div>
                 <div class="payment-note-first one-time hidden">

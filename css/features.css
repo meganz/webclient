@@ -55,12 +55,15 @@ body.rtl .feature-page * {
     text-decoration: none;
 }
 
-.feature-page.objectstorage .header-block {
+.feature-page .header-block.colored-bg {
     background-color: rgba(240, 240, 240, 0.22);
     background-image:
-        radial-gradient(at top left, #FEF1EA 15%, rgba(255, 255, 255, 0) 35%, transparent),
-        radial-gradient(closest-corner circle at 110%, #F5E9FF 5%, rgba(255, 255, 255, 0) 100%),
-        radial-gradient(at bottom right, #E6EEFF 0%, rgba(255, 255, 255, 0) 30%);
+        radial-gradient(at top left, rgba(254, 241, 234, 1) 15%, rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, 0)),
+        radial-gradient(closest-corner circle at 110%, rgba(245, 233, 255, 1) 5%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(at bottom right, rgba(230, 238, 255, 1) 0%, rgba(255, 255, 255, 0) 30%);
+}
+
+.feature-page.objectstorage .header-block {
     padding-bottom: 70px;
     padding-top: 100px;
 }
@@ -288,13 +291,10 @@ body.rtl .feature-page * {
     }
 
     .feature-page .header-block .text {
+        box-sizing: border-box;
         padding: 0 50px;
         width: 50%;
         z-index: 2;
-    }
-
-    .feature-page.objectstorage .header-block .text {
-        padding: 0 40px 0 60px;
     }
 
     .feature-page .header-block .image {
@@ -387,19 +387,8 @@ body.rtl .feature-page * {
     @media only screen and (max-width: 1220px) {
 
         .feature-page .header-block .image {
-            padding-right: 25px;
-        }
-        .feature-page.objectstorage .header-block .image {
-            padding-right: 18px;
-        }
-
-        .feature-page.objectstorage .header-block .text {
-            padding: 0 56px 0 92px;
-        }
-
-        .rtl .feature-page .header-block .image {
-            padding-left: 25px;
-            padding-right: 0;
+            -webkit-padding-end: 25px;
+            padding-inline-end: 25px;
         }
     }
 

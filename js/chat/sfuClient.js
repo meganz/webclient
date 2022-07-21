@@ -360,7 +360,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '4b8bd9a6c9';
+const COMMIT_ID = 'fee752cc59';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -2887,7 +2887,7 @@ class SvcDriver {
         if (adaptScrnTx) {
             txBad = this.currTxQuality < 1;
         }
-        else if (stats.vtxh) {
+        else if (stats._vtxIsHiRes && stats.vtxh) {
             this._maVideoTxHeight = !isNaN(this._maVideoTxHeight) ? (this._maVideoTxHeight * 3 + stats.vtxh) / 4 : stats.vtxh;
             txBad = this._maVideoTxHeight < 360;
         }
@@ -3229,6 +3229,8 @@ class StatsRecorder {
         fetch(SfuClient.kStatServerUrl + "/stats", {
             method: "POST",
             body: JSON.stringify(data)
+        }).catch((err) => {
+            console.warn("Failed to post stats:", err.message);
         });
     }
     static compressArray(arr) {

@@ -2541,6 +2541,15 @@ body.de .mega-dialog.new-group-chat {
         align-items: center;
         justify-content: space-between;
     }
+    .mega-dialog.fm-picker-dialog.whitespaces.duplicate .summary-row.summary-selected {
+        height: 100px;
+    }
+    .mega-dialog.fm-picker-dialog.whitespaces:not(.duplicate) .summary-row.summary-selected {
+        height: 80px;
+    }
+    .mega-dialog.fm-picker-dialog.duplicate:not(.whitespaces) .summary-row.summary-selected {
+        height: 50px;
+    }
     .mega-dialog.fm-picker-dialog .summary-row.unfold {
         align-items: flex-start;
     }

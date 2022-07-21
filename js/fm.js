@@ -1267,6 +1267,83 @@ function duplicated(value, target) {
     }
 }
 
+/**
+ * Helper to handle validation of Input elements tied to floating warnings.
+ * e.g. leading/trailing (LT) white-spaces warning message lifecycle
+ * @param {Object} $container Element having input to check
+ * @param {Object} [options] the
+ * @constructor
+ */
+function InputFloatWarning($container, options) {
+    "use strict";
+
+    if (!(this instanceof InputFloatWarning)) {
+        return new InputFloatWarning($container, options);
+    }
+
+    this.$container = $container;
+    this.id = `IFW.${makeUUID()}`;
+
+    this.options = Object.assign({
+        namespace: 'whitespaces'
+    }, options);
+
+    /**
+     * Show warning
+     * @param {String} msg Message to show
+     * @returns {InputFloatWarning} this instance
+     */
+    this.show = (msg) => {
+        $(`.${this.options.namespace}-input-warning span`, this.$container).text(msg);
+        this.$container.addClass(this.options.namespace);
+        return this;
+    };
+
+    /**
+     * Hide warning
+     * @returns {InputFloatWarning} this instance
+     */
+    this.hide = () => {
+        this.$container.removeClass(this.options.namespace);
+        return this;
+    };
+
+    /**
+     * Display e.g. LT white-spaces warning if input value contains leading/trailing white-spaces
+     * @param {Number} type file: 0, folder: 1
+     * @param {String} name {optional} Name to check, if not provided, container input value will used
+     * @param {Number} ms {optional} Timeout in milliseconds. If not provided, default timeout
+     * @returns {InputFloatWarning} this instance
+     */
+    this.check = ({type, name, ms = 300}) => {
+        // delay function sets default value if given timeout is 0. Workaround: set "ms" to 1 when 0 is given
+        delay(this.id, () => {
+            const validator = InputFloatWarning.validator[this.options.namespace];
+            const msg = validator(name || $('input', this.$container).val(), type);
+            return msg ? this.show(msg) : this.hide();
+        }, ms > 0 ? ms : 1);
+
+        return this;
+    };
+
+    Object.freeze(this);
+}
+
+/** @property InputFloatWarning.validator */
+lazy(InputFloatWarning, 'validator', () => {
+    'use strict';
+    const obj = {
+        'whitespaces': (value, type) => {
+            if (typeof value !== 'undefined' && value.length !== value.trim().length) {
+                return type ? l.whitespaces_on_foldername : l.whitespaces_on_filename;
+            }
+            return false;
+        }
+    };
+    Object.setPrototypeOf(obj, null);
+    return Object.freeze(obj);
+});
+
 function renameDialog() {
     "use strict";
 
@@ -1283,6 +1360,9 @@ function renameDialog() {
             $input.trigger("focus");
             return $dialog;
         });
+
+        const ltWSpaceWarning = new InputFloatWarning($dialog);
+        ltWSpaceWarning.hide().check({type: nodeType, name: n.name, ms: 0});
 
         $('button.js-close, .rename-dialog-button.cancel', $dialog).rebind('click', closeDialog);
 
@@ -1305,12 +1385,7 @@ function renameDialog() {
                         }
                     }
                     else if (value.length > 250) {
-                        if (nodeType === 1) {
-                            errMsg = l.LongName;
-                        }
-                        else if (nodeType === 0) {
-                            errMsg = l.LongName1;
-                        }
+                        errMsg = nodeType === 1 ? l.LongName : l.LongName1;
                     }
                     else {
                         errMsg = l[24708];
@@ -1378,6 +1453,10 @@ function renameDialog() {
                 $dialog.removeClass('duplicate').addClass('active');
                 $input.removeClass('error');
             }
+        });
+
+        $input.rebind('keyup.rename-f', () => {
+            ltWSpaceWarning.check({type: nodeType});
         });
     }
 }
@@ -2838,6 +2917,8 @@ function createFolderDialog(close) {
     var $input = $('input', $dialog);
     $input.val('');
 
+    const ltWSpaceWarning = InputFloatWarning($dialog).hide();
+
     if (close) {
         if ($.cftarget) {
             delete $.cftarget;
@@ -2927,6 +3008,7 @@ function createFolderDialog(close) {
     });
 
     $input.rebind('keyup', function(e) {
+        ltWSpaceWarning.check({type: 1});
         if ($input.val() === '' || $input.val() === l[157]) {
             $dialog.removeClass('active');
         }
@@ -3058,10 +3140,11 @@ function createFileDialog(close, action, params) {
     var $input = $('input', $dialog);
     $input.val('.txt')[0].setSelectionRange(0, 0);
 
+    const ltWSpaceWarning = InputFloatWarning($dialog).hide();
+
     var doCreateFile = function(v) {
         var target = $.cftarget = $.cftarget || M.currentdirid;
 
-        v = $.trim(v);
         var errorMsg = '';
 
         if (v === '' || v === l[17506]) {
@@ -3098,6 +3181,7 @@ function createFileDialog(close, action, params) {
     });
 
     $input.rebind('keyup.fileDialog', function() {
+        ltWSpaceWarning.check({type: 0});
         if ($input.val() === '' || $input.val() === l[17506]) {
             $dialog.removeClass('active');
         }

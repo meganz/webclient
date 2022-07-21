@@ -2172,8 +2172,10 @@ FileManager.prototype.initContextUI = function() {
 FileManager.prototype.createFolderUI = function() {
     "use strict";
 
+    const $inputWrapper = $('.fm-dialog-body', '.create-new-folder.popup');
+    const ltWSpaceWarning = new InputFloatWarning($inputWrapper);
+
     var doCreateFolder = function() {
-        var $inputWrapper = $('.create-new-folder.popup .fm-dialog-body');
         var $input = $('input', $inputWrapper);
         var name = $input.val();
         var errorMsg = '';
@@ -2224,6 +2226,8 @@ FileManager.prototype.createFolderUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
+
+        ltWSpaceWarning.hide();
 
         var $me = $(this);
         var $nFolderDialog = $('.create-new-folder', 'body').removeClass('filled-input');
@@ -2288,6 +2292,7 @@ FileManager.prototype.createFolderUI = function() {
     });
 
     $('.create-new-folder input').rebind('keyup.create-new-f', function(e) {
+        ltWSpaceWarning.check({type: 1});
         $('.create-new-folder').addClass('filled-input');
         if ($(this).val() === '') {
             $('.create-new-folder').removeClass('filled-input');

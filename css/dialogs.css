@@ -4349,6 +4349,7 @@ body.de .mega-dialog.new-group-chat {
         vertical-align: middle;
         -webkit-padding-start: 15px;
         padding-inline-start: 15px;
+        max-width: 485px;
     }
     .mega-dialog.payment-address-dialog .payment-form-header {
         margin-top: 20px;

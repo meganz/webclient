@@ -59,7 +59,7 @@ mobile.proSignupPrompt = {
         $closeButton.off('tap').on('tap', function() {
 
             // They don't want to continue with the Registration/Login so remove the flag
-            localStorage.removeItem('proPageContinuePlanNum');
+            sessionStorage.removeItem('proPageContinuePlanNum');
 
             // Hide the dialog
             $dialog.addClass('hidden').removeClass('overlay');
@@ -85,7 +85,7 @@ mobile.proSignupPrompt = {
         // Add click/tap handler
         $registerButton.off('tap').on('tap', function() {
 
-            // Set the plan number they selected into localStorage for use after Registration/Login
+            // Set the plan number they selected into sessionStorage for use after Registration/Login
             self.setSelectedPlanNum();
 
             // Hide the dialog
@@ -115,7 +115,7 @@ mobile.proSignupPrompt = {
         // Add click/tap handler
         $loginButton.off('tap').on('tap', function() {
 
-            // Set the plan number they selected into localStorage for use after Registration/Login
+            // Set the plan number they selected into sessionStorage for use after Registration/Login
             self.setSelectedPlanNum();
 
             // Hide the dialog
@@ -133,16 +133,22 @@ mobile.proSignupPrompt = {
     },
 
     /**
-     * Sets the selected Pro plan number from what the user selected on the page into localStorage
+     * Sets the selected Pro plan number from what the user selected on the page into sessionStorage
      */
     setSelectedPlanNum: function() {
 
         'use strict';
 
+        // If the continue plan number is already set (e.g. on discount promo page)
+        // we can skip trying to set it from the Pro page selected item
+        if (sessionStorage.getItem('proPageContinuePlanNum')) {
+            return;
+        }
+
         // Get the selected Pro card's data-payment attribute value
         var selectedPlanNum = $('.pricing-page.plan.selected').data('payment');
 
         // Set the selected plan number so when they've completed Login and Registration they can proceed to pay
-        localStorage.setItem('proPageContinuePlanNum', selectedPlanNum);
+        sessionStorage.setItem('proPageContinuePlanNum', selectedPlanNum);
     }
 };

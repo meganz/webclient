@@ -53,6 +53,8 @@ var ChatNotifications = function(megaChat, options) {
 
             megaRoom
                 .rebind('onMessagesBuffAppend.chatNotifications', function(e, message) {
+                    megaChat.updateSectionUnreadCount();
+
                     var fromContact = null;
                     if (message.userId) {
                         // contact not found.

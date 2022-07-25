@@ -85,8 +85,17 @@ RoomSearch.prototype._matchMembers = function(members) {
             for (let i = regExps.length; i--;) {
                 const regExp = regExps[i];
                 let match;
+
+                //  match names
                 while ((match = regExp.exec(M.getNameByHandle(userId))) !== null) {
                     matches.push({ idx: match.index, str: match[0] });
+                }
+
+                if (!match) {
+                    // match email
+                    while ((match = regExp.exec(M.u[userId].m)) !== null) {
+                        matches.push({ idx: match.index, str: match[0] });
+                    }
                 }
             }
 
@@ -405,7 +414,7 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
             resultMeta.room = room;
             resultMeta.chatId = room.chatId;
             resultMeta.data = resultMeta.data || room.chatId;
-            resultMeta.lastActivity = room.lastActivity;
+            resultMeta.lastActivity = room.lastActivity || room.ctime;
             resultMeta.nameRef = room.nameRef;
             resultMeta.resultId = resultId++;
 

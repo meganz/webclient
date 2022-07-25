@@ -111,7 +111,7 @@ class MessageRow extends MegaRenderMixin {
                 </div>
                 <div className="user-card">
                     <span className="title">
-                        <ContactAwareName contact={M.u[contact]}>
+                        <ContactAwareName contact={isGroup || M.u[contact]}>
                             <OFlowEmoji>{room.getRoomTitle()}</OFlowEmoji>
                         </ContactAwareName>
                     </span>

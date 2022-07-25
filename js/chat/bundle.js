@@ -15021,7 +15021,7 @@ class MessageRow extends mixins.wl {
     }, external_React_default().createElement("span", {
       className: "title"
     }, external_React_default().createElement(ui_contacts.ContactAwareName, {
-      contact: M.u[contact]
+      contact: isGroup || M.u[contact]
     }, external_React_default().createElement(utils.OFlowEmoji, null, room.getRoomTitle()))), isGroup ? null : external_React_default().createElement(ui_contacts.ContactPresence, {
       contact: M.u[contact]
     }), external_React_default().createElement("div", {

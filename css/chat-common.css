@@ -336,7 +336,7 @@
 }
 .group-chat .contacts-info .user-card-data {
     padding-left: 10px;
-    overflow: auto;
+    overflow: hidden;
     height: 32px;
 }
 .chat-heading-area {

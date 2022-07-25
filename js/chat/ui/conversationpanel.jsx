@@ -30,19 +30,6 @@ const MAX_USERS_CHAT_PRIVATE = 100;
 class EndCallButton extends MegaRenderMixin {
     IS_MODERATOR = Call.isModerator(this.props.chatRoom, u_handle);
 
-    LABELS = {
-        // TODO:
-        //  - look into unifying the copy of all these variations
-        // - introduce translation strings
-        END_CALL: 'End call...',
-        END_FOR_ALL: 'End for all',
-        END_CALL_FOR_ALL: 'End call for all',
-        LEAVE: 'Leave',
-        LEAVE_CALL: 'Leave call',
-        DIALOG_TITLE: 'End call for all?',
-        DIALOG_BODY: 'This will end the call for all participants'
-    };
-
     EVENTS = ['onCallPeerJoined.endCallButton', 'onCallPeerLeft.endCallButton'];
 
     shouldComponentUpdate() {
@@ -80,13 +67,13 @@ class EndCallButton extends MegaRenderMixin {
 
             // 1-on-1 call -> `End call`
             if (type === 'private') {
-                return this.renderButton({ label: this.LABELS.END_CALL, onClick: () => activeCall.hangUp() });
+                return this.renderButton({ label: l[5884], onClick: () => activeCall.hangUp() });
             }
 
             // Moderator in a public call: render `End call...` drop down w/ `Leave` and `End for all` options.
             if (this.IS_MODERATOR) {
                 return this.renderButton({
-                    label: this.LABELS.END_CALL,
+                    label: l[5884],
                     onClick: peers ? null : () => activeCall.hangUp(),
                     children: peers && (
                         <Dropdown
@@ -97,13 +84,13 @@ class EndCallButton extends MegaRenderMixin {
                             <DropdownItem
                                 className="link-button"
                                 icon="sprite-fm-mono icon-leave-call"
-                                label={this.LABELS.LEAVE}
+                                label={l.leave}
                                 onClick={() => activeCall.hangUp()}
                             />
                             <DropdownItem
                                 className="link-button"
                                 icon="sprite-fm-mono icon-contacts"
-                                label={this.LABELS.END_FOR_ALL}
+                                label={l.end_for_all}
                                 onClick={() => chatRoom.endCallForAll()}
                             />
                         </Dropdown>
@@ -116,7 +103,7 @@ class EndCallButton extends MegaRenderMixin {
                 // render `Leave call` if there are other call peers present or `End call...` if the current user is
                 // alone in the call.
                 this.renderButton({
-                    label: peers ? this.LABELS.LEAVE_CALL : this.LABELS.END_CALL,
+                    label: peers ? l[5883] : l[5884],
                     onClick: () => activeCall.hangUp()
                 })
             );
@@ -128,13 +115,13 @@ class EndCallButton extends MegaRenderMixin {
             return (
                 this.IS_MODERATOR ?
                     this.renderButton({
-                        label: this.LABELS.END_CALL_FOR_ALL,
+                        label: l.end_call_for_all,
                         onClick: () =>
                             msgDialog(
                                 'confirmation',
                                 null,
-                                this.LABELS.DIALOG_TITLE,
-                                this.LABELS.DIALOG_BODY,
+                                l.end_call_for_all_title,
+                                l.end_call_for_all_text,
                                 cb => cb ? chatRoom.endCallForAll() : 0xDEAD
                             )
                     }) :

@@ -883,7 +883,8 @@ mega.tpw = new function TransferProgressWidget() {
             var $finishedActionsRow = $actionsRow.clone();
             $targetedRow.find('.transfer-complete-actions').remove();
             $finishedActionsRow.removeClass('transfer-task-actions').addClass('transfer-complete-actions');
-            if (M.getNodeRoot(handle || dId) !== 'shares') {
+            const root = M.getNodeRoot(handle || dId);
+            if (root && root !== 'shares') {
                 $('i.transfer-progress-icon', $finishedAction).removeClass('sprite-fm-mono')
                     .addClass('sprite-fm-mono link icon-link').attr('data-simpletip', l.tfw_transfer_get_link);
                 $finishedActionsRow.append($finishedAction);

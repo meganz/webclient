@@ -5589,7 +5589,7 @@ __webpack_require__.d(__webpack_exports__, {
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
 var _mixins1__ = __webpack_require__(503);
-var _meetings_call_jsx2__ = __webpack_require__(357);
+var _meetings_call_jsx2__ = __webpack_require__(486);
 var _ui_buttons3__ = __webpack_require__(204);
 
 
@@ -7990,8 +7990,8 @@ ColumnContactLastInteraction.label = l[5904];
 ColumnContactLastInteraction.megatype = "interaction";
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 var dropdowns = __webpack_require__(78);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 23 modules
-var call = __webpack_require__(357);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(486);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
@@ -12465,8 +12465,8 @@ PushSettingsDialog.options = {
   Infinity: l[22011]
 };
 PushSettingsDialog.default = PushSettingsDialog.options[PushSettingsDialog.options.length - 1];
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 23 modules
-var call = __webpack_require__(357);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(486);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
 var historyPanel = __webpack_require__(638);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
@@ -13186,15 +13186,6 @@ class EndCallButton extends mixins.wl {
   constructor(...args) {
     super(...args);
     this.IS_MODERATOR = call.ZP.isModerator(this.props.chatRoom, u_handle);
-    this.LABELS = {
-      END_CALL: 'End call...',
-      END_FOR_ALL: 'End for all',
-      END_CALL_FOR_ALL: 'End call for all',
-      LEAVE: 'Leave',
-      LEAVE_CALL: 'Leave call',
-      DIALOG_TITLE: 'End call for all?',
-      DIALOG_BODY: 'This will end the call for all participants'
-    };
     this.EVENTS = ['onCallPeerJoined.endCallButton', 'onCallPeerLeft.endCallButton'];
   }
 
@@ -13239,14 +13230,14 @@ class EndCallButton extends mixins.wl {
 
       if (type === 'private') {
         return this.renderButton({
-          label: this.LABELS.END_CALL,
+          label: l[5884],
           onClick: () => activeCall.hangUp()
         });
       }
 
       if (this.IS_MODERATOR) {
         return this.renderButton({
-          label: this.LABELS.END_CALL,
+          label: l[5884],
           onClick: peers ? null : () => activeCall.hangUp(),
           children: peers && external_React_default().createElement(dropdowns.Dropdown, {
             className: "wide-dropdown send-files-selector light",
@@ -13256,27 +13247,27 @@ class EndCallButton extends mixins.wl {
           }, external_React_default().createElement(dropdowns.DropdownItem, {
             className: "link-button",
             icon: "sprite-fm-mono icon-leave-call",
-            label: this.LABELS.LEAVE,
+            label: l.leave,
             onClick: () => activeCall.hangUp()
           }), external_React_default().createElement(dropdowns.DropdownItem, {
             className: "link-button",
             icon: "sprite-fm-mono icon-contacts",
-            label: this.LABELS.END_FOR_ALL,
+            label: l.end_for_all,
             onClick: () => chatRoom.endCallForAll()
           }))
         });
       }
 
       return this.renderButton({
-        label: peers ? this.LABELS.LEAVE_CALL : this.LABELS.END_CALL,
+        label: peers ? l[5883] : l[5884],
         onClick: () => activeCall.hangUp()
       });
     }
 
     if (chatRoom.havePendingGroupCall()) {
       return this.IS_MODERATOR ? this.renderButton({
-        label: this.LABELS.END_CALL_FOR_ALL,
-        onClick: () => msgDialog('confirmation', null, this.LABELS.DIALOG_TITLE, this.LABELS.DIALOG_BODY, cb => cb ? chatRoom.endCallForAll() : 0xDEAD)
+        label: l.end_call_for_all,
+        onClick: () => msgDialog('confirmation', null, l.end_call_for_all_title, l.end_call_for_all_text, cb => cb ? chatRoom.endCallForAll() : 0xDEAD)
       }) : null;
     }
 
@@ -18148,8 +18139,8 @@ class RetentionChange extends mixin.y {
   }
 
 }
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 23 modules
-var call = __webpack_require__(357);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(486);
 ;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
 
@@ -19106,7 +19097,7 @@ const __WEBPACK_DEFAULT_EXPORT__ = (Button);
 
 /***/ }),
 
-/***/ 357:
+/***/ 486:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -20272,16 +20263,16 @@ class StreamControls extends mixins.wl {
       }, external_React_default().createElement(meetings_button.Z, {
         className: "mega-button round small theme-dark-forced positive",
         simpletip: { ...this.SIMPLETIP,
-          label: 'Add stream'
+          label: l.add_stream
         },
         onClick: () => this.props.onStreamToggle(STREAM_ACTIONS.ADD)
-      }, external_React_default().createElement("span", null, "Add")), external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement("span", null, l.add)), external_React_default().createElement(meetings_button.Z, {
         className: "mega-button round small theme-dark-forced negative",
         simpletip: { ...this.SIMPLETIP,
-          label: 'Remove stream'
+          label: l.remove_stream
         },
         onClick: () => this.props.streams.length > 1 && this.props.onStreamToggle(STREAM_ACTIONS.REMOVE)
-      }, external_React_default().createElement("span", null, "Remove")));
+      }, external_React_default().createElement("span", null, l[83])));
     };
 
     this.renderEndCall = () => {
@@ -20300,10 +20291,10 @@ class StreamControls extends mixins.wl {
       }, external_React_default().createElement(meetings_button.Z, {
         className: "mega-button",
         onClick: onCallEnd
-      }, external_React_default().createElement("span", null, "Leave")), external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement("span", null, l.leave)), external_React_default().createElement(meetings_button.Z, {
         className: "mega-button positive",
         onClick: () => chatRoom.endCallForAll()
-      }, external_React_default().createElement("span", null, "End for all")))), external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement("span", null, l.end_for_all)))), external_React_default().createElement(meetings_button.Z, {
         simpletip: { ...this.SIMPLETIP,
           label: l[5884]
         },
@@ -22303,56 +22294,6 @@ class Invite extends mixins.wl {
 
 }
 Invite.NAMESPACE = 'invite-meeting';
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/end.jsx
-
-
-
-
-
-class End extends mixins.wl {
-  constructor(props) {
-    super(props);
-    this.buttons = [{
-      key: 'cancel',
-      label: 'Cancel',
-      onClick: this.props.onClose
-    }, {
-      key: 'leave',
-      label: 'Leave call',
-      className: 'negative',
-      onClick: () => this.props.sfuApp.destroy()
-    }];
-    this.state = {
-      contacts: false
-    };
-
-    this.toggleContacts = () => this.setState({
-      contacts: !this.state.contacts
-    });
-  }
-
-  render() {
-    const {
-      NAMESPACE
-    } = End;
-    const {
-      contacts
-    } = this.state;
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
-      name: NAMESPACE,
-      dialogType: "message",
-      icon: "sprite-fm-uni icon-question",
-      title: "Please choose if you want ot end the call for all participants or just you",
-      buttons: this.buttons,
-      noCloseOnClickOutside: true,
-      onClose: this.props.onClose
-    }), external_React_default().createElement((external_React_default()).Fragment, null, "If you want to keep this call open with full function, please assign a new moderator. \xA0", external_React_default().createElement(ui_link.Z, {
-      onClick: this.toggleContacts
-    }, "Assign new moderator"), contacts && null));
-  }
-
-}
-End.NAMESPACE = 'end-dialog';
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/ephemeral.jsx
 
 
@@ -22412,17 +22353,16 @@ class Offline extends mixins.wl {
       name: Offline.NAMESPACE,
       dialogType: "message",
       icon: "sprite-fm-uni icon-warning",
-      title: "No internet",
+      title: l.no_internet,
       noCloseOnClickOutside: true,
       buttons: this.buttons,
       onClose: this.props.onClose
-    }, external_React_default().createElement("p", null, "Please check your network cables, modem, and router and try reconnecting to Wi-Fi."));
+    }, external_React_default().createElement("p", null, l.no_connection));
   }
 
 }
 Offline.NAMESPACE = 'reconnect-dialog';
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/call.jsx
-
 
 
 
@@ -22472,7 +22412,6 @@ class Call extends mixins.wl {
       sidebar: true,
       forcedLocal: false,
       invite: false,
-      end: false,
       ephemeral: false,
       offline: false,
       ephemeralAccounts: [],
@@ -22796,7 +22735,6 @@ class Call extends mixins.wl {
       sidebar,
       forcedLocal,
       invite,
-      end,
       ephemeral,
       ephemeralAccounts,
       guest,
@@ -22851,11 +22789,6 @@ class Call extends mixins.wl {
       chatRoom: chatRoom,
       onClose: () => this.setState({
         invite: false
-      })
-    }), end && external_React_default().createElement(End, {
-      sfuApp: sfuApp,
-      onClose: () => this.setState({
-        end: false
       })
     }), ephemeral && external_React_default().createElement(Ephemeral, {
       ephemeralAccounts: ephemeralAccounts,

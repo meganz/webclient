@@ -16,11 +16,11 @@ export default class Offline extends MegaRenderMixin {
                 name={Offline.NAMESPACE}
                 dialogType="message"
                 icon="sprite-fm-uni icon-warning"
-                title="No internet"
+                title={l.no_internet}
                 noCloseOnClickOutside={true}
                 buttons={this.buttons}
                 onClose={this.props.onClose}>
-                <p>Please check your network cables, modem, and router and try reconnecting to Wi-Fi.</p>
+                <p>{l.no_connection}</p>
             </ModalDialogsUI.ModalDialog>
         );
     }

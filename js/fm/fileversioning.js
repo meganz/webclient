@@ -650,7 +650,7 @@ var versiondialogid;
                             }
 
                             $('.fm-versioning.overlay').addClass('arrange-to-back');
-                            msgDialog('remove', l[1003], l[13749], l[1007], function(e) {
+                            msgDialog('remove', l[1003], mega.icu.format(l[13750], 1), l[1007], e => {
                                 if (e) {
                                     apiReq(self.id.substring(4));
                                     current_sel_version = [];

@@ -229,7 +229,7 @@ class ChatToastIntegration {
                             {
                                 close: true,
                                 cb: () => {
-                                    if (!playingSound) {
+                                    if (!playingSound && !mega.config.get('callinout')) {
                                         ion.sound.stop('user_join_call');
                                         ion.sound.play('user_join_call');
                                     }
@@ -269,10 +269,13 @@ class ChatToastIntegration {
                                 {
                                     close: true,
                                     cb: () => {
-                                        playingSound = true;
-                                        ion.sound.stop('user_join_call');
-                                        ion.sound.stop('user_left_call');
-                                        ion.sound.play('user_left_call');
+                                        if (!mega.config.get('callinout')) {
+                                            playingSound = true;
+                                            ion.sound.stop('user_join_call');
+                                            ion.sound.stop('user_left_call');
+                                            ion.sound.play('user_left_call');
+                                        }
+
                                         onIdle(() => {
                                             playingSound = false;
                                         });

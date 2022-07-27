@@ -541,6 +541,7 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .dark-direct-tooltip.simpletip-tooltip.medium-width {
     max-width: 220px;
+    overflow-wrap: break-word;
 }
 .dark-direct-tooltip.simpletip-tooltip.bluetip {
     background: var(--label-blue);

@@ -15013,7 +15013,7 @@ const openResult = ({
     if (chatRoom) {
       loadSubPage(chatRoom.getRoomUrl());
     } else {
-      megaChat.openChat([u_handle, room.chatId], 'private', undefined, undefined, undefined, true);
+      loadSubPage(`/fm/chat/contacts/${room.chatId}`);
     }
   } else {
     loadSubPage(room.getRoomUrl());

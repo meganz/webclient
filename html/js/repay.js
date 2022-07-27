@@ -45,28 +45,32 @@ RepayPage.prototype.initPage = function() {
         return false;
     }
 
-    var $repaySection = $('.main-mid-pad.bus-repay').removeClass('hidden');
-    var $leftSection = $('.main-left-block', $repaySection);
-    var $paymentBlock = $('.bus-reg-radio-block', $leftSection);
+    const $repaySection = $('.main-mid-pad.bus-repay');
+    const $leftSection = $('.main-left-block', $repaySection);
+    const $paymentBlock = $('.bus-reg-radio-block', $leftSection);
 
-    var $repayBtn = $repaySection.find('.repay-btn').addClass('disabled');
+    const $repayBtn = $('.repay-btn', $repaySection).addClass('disabled');
 
-    $leftSection.find('.bus-reg-agreement.mega-terms .bus-reg-txt').safeHTML(l['208s']);
+    $('.bus-reg-agreement.mega-terms .bus-reg-txt', $leftSection).safeHTML(l['208s']);
 
     // event handler for repay button
-    $repayBtn.off('click').on('click',
-        function repayButtonHandler() {
-            if ($(this).hasClass('disabled')) {
-                return false;
-            }
-
-            if (is_mobile) {
-                parsepage(pages['mobile']);
-            }
-
-            addressDialog.init(mySelf.planInfo, mySelf.userInfo, new BusinessRegister());
+    $repayBtn.rebind('click', function repayButtonHandler() {
+        if ($(this).hasClass('disabled')) {
             return false;
-        });
+        }
+
+        if (is_mobile) {
+            parsepage(pages.mobile);
+        }
+
+        const $selectedProvider = $('.bus-reg-radio-option .bus-reg-radio.radioOn', $repaySection);
+
+        mySelf.planInfo.usedGatewayId = $selectedProvider.attr('prov-id');
+        mySelf.planInfo.usedGateName = $selectedProvider.attr('gate-n');
+
+        addressDialog.init(mySelf.planInfo, mySelf.userInfo, new BusinessRegister());
+        return false;
+    });
 
     // event handler for radio buttons
     $('.bus-reg-radio-option', $paymentBlock)
@@ -124,6 +128,75 @@ RepayPage.prototype.initPage = function() {
                 }
             }
         });
+
+    const fillPaymentGateways = function(status, list) {
+
+        const failureExit = msg => {
+            loadingDialog.hide();
+            msgDialog('warninga', '', msg || l[19342], '', loadSubPage.bind(null, 'start'));
+        };
+
+        if (!status) { // failed result from API
+            return failureExit();
+        }
+
+        // clear the payment block
+        const $paymentBlock = $('.bus-reg-radio-block', $repaySection).empty();
+
+        const icons = {
+            ecpVI: 'sprite-fm-uni icon-visa-border',
+            ecpMC: 'sprite-fm-uni icon-mastercard-border',
+            Stripe2: 'sprite-fm-theme icon-stripe',
+            stripeVI: 'sprite-fm-uni icon-visa-border',
+            stripeMC: 'sprite-fm-uni icon-mastercard-border',
+            stripeAE: 'sprite-fm-uni icon-amex',
+            stripeJC: 'sprite-fm-uni icon-jcb',
+            stripeUP: 'sprite-fm-uni icon-union-pay',
+            stripeDD: 'provider-icon stripeDD'
+        };
+
+        const radioHtml = '<div class="bus-reg-radio-option"> ' +
+            '<div class="bus-reg-radio payment-[x] radioOff" prov-id="[Y]" gate-n="[Z]"></div>';
+        const textHtml = '<div class="provider">[x]</div>';
+        const iconHtml = `<div class="payment-icon">
+                            <i class="[x]"></i>
+                        </div></div>`;
+
+        if (!list.length) {
+            return failureExit(l[20431]);
+        }
+
+        let paymentGatewayToAdd = '';
+        for (let k = 0; k < list.length; k++) {
+            const payRadio = radioHtml.replace('[x]', list[k].gatewayName).replace('[Y]', list[k].gatewayId).
+                replace('[Z]', list[k].gatewayName);
+            const payText = textHtml.replace('[x]', list[k].displayName);
+            const payIcon = iconHtml.replace('[x]', icons[list[k].gatewayName]);
+            paymentGatewayToAdd += payRadio + payText + payIcon;
+        }
+        if (paymentGatewayToAdd) {
+            $paymentBlock.safeAppend(paymentGatewayToAdd);
+        }
+
+        // setting the first payment provider as chosen
+        $('.bus-reg-radio-block .bus-reg-radio', $repaySection).first().removeClass('radioOff')
+            .addClass('radioOn');
+
+        // event handler for radio buttons
+        $('.bus-reg-radio-option', $paymentBlock)
+            .rebind('click.suba', function businessRegCheckboxClick() {
+                const $me = $('.bus-reg-radio', $(this));
+                if ($me.hasClass('radioOn')) {
+                    return;
+                }
+                $('.bus-reg-radio', $paymentBlock).removeClass('radioOn').addClass('radioOff');
+                $me.removeClass('radioOff').addClass('radioOn');
+            });
+
+        // view the page
+        loadingDialog.hide();
+        $repaySection.removeClass('hidden');
+    };
 
     M.require('businessAcc_js').done(function() {
         var business = new BusinessAccount();
@@ -225,7 +298,6 @@ RepayPage.prototype.initPage = function() {
                 }
             }
 
-            loadingDialog.hide();
 
             if (!totalAmount || !dueAmount) {
                 console.error(`Fatal error in invoice, we dont have essential attributes ${JSON.stringify(res)}`);
@@ -324,11 +396,12 @@ RepayPage.prototype.initPage = function() {
             }
             $('#repay-business-nb-users', $leftSection).text(nbUsersText);
 
+            business.getListOfPaymentGateways(false).always(fillPaymentGateways);
+
             business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
                 mySelf.planInfo = info;
                 mySelf.planInfo.pastInvoice = res.inv[0];
                 mySelf.planInfo.currInvoice = { et: res.et || 0, t: res.t };
-                mySelf.planInfo.usedGatewayId = res.gw;
                 mySelf.userInfo = {
                     fname: '',
                     lname: '',

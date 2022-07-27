@@ -28,15 +28,15 @@ class StreamControls extends MegaRenderMixin {
                 style={{ position: 'absolute', left: 25, bottom: 36 }}>
                 <Button
                     className="mega-button round small theme-dark-forced positive"
-                    simpletip={{ ...this.SIMPLETIP, label: 'Add stream' }}
+                    simpletip={{ ...this.SIMPLETIP, label: l.add_stream }}
                     onClick={() => this.props.onStreamToggle(STREAM_ACTIONS.ADD)}>
-                    <span>Add</span>
+                    <span>{l.add}</span>
                 </Button>
                 <Button
                     className="mega-button round small theme-dark-forced negative"
-                    simpletip={{ ...this.SIMPLETIP, label: 'Remove stream' }}
+                    simpletip={{ ...this.SIMPLETIP, label: l.remove_stream }}
                     onClick={() => this.props.streams.length > 1 && this.props.onStreamToggle(STREAM_ACTIONS.REMOVE)}>
-                    <span>Remove</span>
+                    <span>{l[83]}</span>
                 </Button>
             </div>
         );
@@ -54,12 +54,12 @@ class StreamControls extends MegaRenderMixin {
                             <Button
                                 className="mega-button"
                                 onClick={onCallEnd}>
-                                <span>Leave</span>
+                                <span>{l.leave}</span>
                             </Button>
                             <Button
                                 className="mega-button positive"
                                 onClick={() => chatRoom.endCallForAll()}>
-                                <span>End for all</span>
+                                <span>{l.end_for_all}</span>
                             </Button>
                         </div>
                     </div>

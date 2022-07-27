@@ -350,6 +350,11 @@ class MegaGallery {
         const keys = Object.keys(this.nodes);
         for (const h of keys) {
             const n = M.d[h];
+
+            if (!n) {
+                continue;
+            }
+
             const timestamp = n.mtime || n.ts;
             if (start <= timestamp && timestamp <= end) {
                 const res = this.getGroup(n);
@@ -364,6 +369,11 @@ class MegaGallery {
         const keys = Object.keys(this.nodes);
         for (const h of keys) {
             const n = M.d[h];
+
+            if (!n) {
+                continue;
+            }
+
             const timestamp = n.mtime || n.ts;
             if (start <= timestamp && timestamp <= end) {
                 const res = this.getGroup(n);
@@ -525,6 +535,11 @@ class MegaGallery {
     removeFromMonthGroup(h, ts, dts) {
 
         let group = this.groups.m[ts];
+
+        if (!group) {
+            return;
+        }
+
         const compareGroup = clone(group);
         const sts = `${ts}`;
 
@@ -897,7 +912,6 @@ class MegaGallery {
 
     // Special operation for d action packet which may lost node data already when reaching here
     removeNodeByHandle(h) {
-
         if (!this.nodes[h]) {
             return;
         }
@@ -1557,7 +1571,9 @@ class MegaGallery {
             }
         }
 
-        delete mega.gallery.thumb_requested[M.d[nid].fa];
+        if (M.d[nid]) {
+            delete mega.gallery.thumb_requested[M.d[nid].fa];
+        }
     }
     // Temporary solution for memory leak, potentially can be removed once lru cache for this is introduced
     revokeThumbs() {
@@ -1686,14 +1702,18 @@ class MegaTargetGallery extends MegaGallery {
     }
 
     checkGalleryUpdate(n) {
-
         if (!n.t && is_photo(n)) {
 
             const cameraTree = M.getTreeHandles(this.isDiscovery ? this.id : M.CameraId).includes(n.p);
+            const rubTree = M.getTreeHandles(M.RubbishID);
 
             // If it is target Camera folder and it is not in gallery view now add the node to gallery.
-            if (cameraTree && !this.nodes[n.h]) {
+            if (cameraTree && !this.nodes[n.h] && !rubTree.includes(n.p)) {
                 this.addNodeToGroups(n);
+            }
+            // Checking if this item in rubbish bin
+            else if (cameraTree && rubTree.includes(n.p)) {
+                this.removeNodeFromGroups(n);
             }
             // If it is not target Camera folder but it is in gallery view now remove the node from gallery view.
             else if (!cameraTree && this.nodes[n.h]) {

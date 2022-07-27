@@ -1089,8 +1089,8 @@
                 megaChat.trigger('onOutgoingCallRinging', [chatRoom, eventData.callId, eventData.userId, this]);
             }
             else {
-                // Hang-up the if the other participant didn't already join the 1-on-1 call; excl. current user joining
-                // from another client/device.
+                // Hang-up the call if the other participant didn't already join the 1-on-1 call; excl.
+                // current user joining from another client/device.
                 const { peers } = megaChat.activeCall;
                 if (!peers.length || peers.length === 1 && peers.getItem(0).userHandle === u_handle) {
                     chatRoom.trigger('onCallEnd', { callId: eventData.callId, removeActive: true });

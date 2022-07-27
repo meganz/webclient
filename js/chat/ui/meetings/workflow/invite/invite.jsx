@@ -128,7 +128,7 @@ export default class Invite extends MegaRenderMixin {
             });
 
     getFilteredFrequents = () => {
-        const { frequents, selected, searching } = this.state;
+        const { frequents, selected } = this.state;
 
         if (frequents.length === 0) {
             return false;
@@ -155,7 +155,7 @@ export default class Invite extends MegaRenderMixin {
     };
 
     getFilteredContacts = () => {
-        const { contacts, frequents, excluded, selected, searching } = this.state;
+        const { contacts, frequents, excluded, selected } = this.state;
         const $$CONTACTS = [];
 
         for (let i = 0; i < contacts.length; i++) {
@@ -182,11 +182,12 @@ export default class Invite extends MegaRenderMixin {
             }
         }
 
-        return $$CONTACTS.length === 0 && searching ? <Nil /> : $$CONTACTS;
+        return $$CONTACTS.length === 0 ? false : $$CONTACTS;
     };
 
     renderContent = () => {
-        var frequentContacts = this.getFilteredFrequents();
+        const frequentContacts = this.getFilteredFrequents();
+        const contactsFiltered = this.getFilteredContacts();
 
         if (HAS_CONTACTS()) {
             const { contacts, frequents } = this.state;
@@ -210,7 +211,7 @@ export default class Invite extends MegaRenderMixin {
                     ref={this.wrapperRef}
                     options={{ 'suppressScrollX': true }}>
                     {frequentContacts ? $$RESULT_TABLE(l[20141] /* `Recents` */, frequentContacts) : ''}
-                    {$$RESULT_TABLE(l[165] /* `Contacts` */, this.getFilteredContacts())}
+                    {contactsFiltered ? $$RESULT_TABLE(l[165] /* `Contacts` */, contactsFiltered) : ''}
                 </PerfectScrollbar>
             );
         }
@@ -251,7 +252,7 @@ export default class Invite extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE } = Invite;
-        const { link, value, loading, frequents, contacts, selected, field } = this.state;
+        const { link, value, loading, selected, field, contactsInitial } = this.state;
         const { chatRoom, onClose } = this.props;
         const IS_MEETING = chatRoom && chatRoom.isMeeting;
 
@@ -296,8 +297,7 @@ export default class Invite extends MegaRenderMixin {
                     {HAS_CONTACTS() && (
                         <Search
                             value={value}
-                            contacts={contacts}
-                            placeholder={contacts.length + frequents.length}
+                            placeholder={contactsInitial.length}
                             onChange={this.handleSearch}
                         />
                     )}

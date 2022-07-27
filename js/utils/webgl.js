@@ -550,7 +550,7 @@ class MEGACanvasElement extends MEGAImageElement {
         }
         // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=801176
         if (self.supOffscreenCanvas) {
-            this.ctx = new OffscreenCanvas(width, height).getContext(ctx, options);
+            this.ctx = new OffscreenCanvas(width, height).getContext(ctx, options || undefined);
         }
         else {
             if (typeof document === 'undefined') {

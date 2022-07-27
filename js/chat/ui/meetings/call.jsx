@@ -3,7 +3,6 @@ import { MegaRenderMixin } from '../../mixins';
 import Stream, { STREAM_ACTIONS, MAX_STREAMS } from './stream.jsx';
 import Sidebar from './sidebar.jsx';
 import Invite from './workflow/invite/invite.jsx';
-import End from './workflow/end.jsx';
 import Ephemeral from './workflow/ephemeral.jsx';
 import Offline from './offline.jsx';
 
@@ -117,7 +116,6 @@ export default class Call extends MegaRenderMixin {
         sidebar: true,
         forcedLocal: false,
         invite: false,
-        end: false,
         ephemeral: false,
         offline: false,
         ephemeralAccounts: [],
@@ -539,7 +537,7 @@ export default class Call extends MegaRenderMixin {
     render() {
         const { minimized, streams, call, chatRoom, parent, sfuApp, onDeleteMessage } = this.props;
         const {
-            mode, view, sidebar, forcedLocal, invite, end, ephemeral, ephemeralAccounts, guest,
+            mode, view, sidebar, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
             offline, stayOnEnd, everHadPeers
         } = this.state;
         const STREAM_PROPS = {
@@ -589,13 +587,6 @@ export default class Call extends MegaRenderMixin {
                         contacts={M.u}
                         chatRoom={chatRoom}
                         onClose={() => this.setState({ invite: false })}
-                    />
-                )}
-
-                {end && (
-                    <End
-                        sfuApp={sfuApp}
-                        onClose={() => this.setState({ end: false })}
                     />
                 )}
 

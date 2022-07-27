@@ -918,6 +918,10 @@ li.active .call-duration i {
     text-decoration: underline;
 }
 
+.result-table.nil .result-table-row .search-messages .overflow-observer {
+    white-space: normal;
+}
+
 /*
  * Contacts Panel
  * TODO: move into separate file/s

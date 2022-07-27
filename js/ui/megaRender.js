@@ -1534,6 +1534,7 @@
                             megaListOptions.itemWidth = 192 + 4 + 4 + 16 /* 16 = margin-left */;
                             megaListOptions.itemHeight = 192 + 4 + 4 + 16 /* 16 = margin-top */;
                             megaListContainer = this.container;
+                            megaListOptions.bottomSpacing = 24;
                         }
                         else {
                             megaListOptions.extraRows = 4;

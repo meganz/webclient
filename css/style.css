@@ -9690,10 +9690,28 @@ ul.token-input-list-mega {
     z-index: 100;
     display: none;
 }
+.whitespaces-input-warning {
+    min-height: 24px;
+    position: relative;
+    background-color: var(--banner-background-warning);
+    border: 1px solid var(--banner-border-warning);
+    padding: 2px 12px;
+    width: 100%;
+    color: var(--banner-text-warning);
+    font: var(--text-body1);
+    margin-top: 6px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    z-index: 100;
+    display: none;
+}
 .add-user-popup .multiple-input-warning {
     text-align: center;
 }
-.error .multiple-input-warning, .duplicate .duplicated-input-warning, .error .reg-resend-email-meg {
+.error .multiple-input-warning,
+.duplicate .duplicated-input-warning,
+.whitespaces .whitespaces-input-warning,
+.error .reg-resend-email-meg {
     display: block;
 }
 .multiple-input .jspContainer, .multiple-input .jspPane {

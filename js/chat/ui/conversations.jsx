@@ -253,7 +253,7 @@ class ConversationsListItem extends MegaRenderMixin {
         if (chatRoom.type !== "public") {
             nameClassString += " privateChat";
         }
-        let roomTitle = <OFlowEmoji>{chatRoom.getRoomTitle()}</OFlowEmoji>;
+        let roomTitle = <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>;
         if (chatRoom.type === "private") {
             roomTitle =
                 <ContactAwareName contact={this.props.contact}>

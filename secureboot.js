@@ -3447,8 +3447,9 @@ else if (!browserUpdate) {
         'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],
         'resellers': ['resellers'],
-        '!': ['download', 'download_js', 'folderlink_css'],
+        '!': ['download', 'download_js'],
         'file': ['download', 'download_js'],
+        'F!': ['folderlink_css'],
         'folder': ['folderlink_css'],
         'discountpromo': ['discountpromo', 'discountpromo_js', 'discountpromo_css'],
         's': ['discountpromo', 'discountpromo_js', 'discountpromo_css'], // Short URL for 'sale' e.g. /sale/blackfriday

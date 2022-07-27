@@ -16032,7 +16032,7 @@ let ConversationsListItem = (conversations_dec = utils["default"].SoonFcWrap(40,
       nameClassString += " privateChat";
     }
 
-    let roomTitle = conversations_React.createElement(utils.OFlowEmoji, null, chatRoom.getRoomTitle());
+    let roomTitle = conversations_React.createElement(utils.OFlowParsedHTML, null, megaChat.html(chatRoom.getRoomTitle()));
 
     if (chatRoom.type === "private") {
       roomTitle = conversations_React.createElement(ui_contacts.ContactAwareName, {

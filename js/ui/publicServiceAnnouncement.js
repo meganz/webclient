@@ -32,36 +32,8 @@ var psa = {
     /**
      * Show the dialog if they have not seen the announcement yet
      */
-    init: function() {
-
+    async init() {
         'use strict';
-
-        // Get the last announcement number they have seen from localStorage
-        Promise.allSettled([
-            M.getPersistentData('lastSeenPsaId'),
-            u_handle && u_handle !== 'AAAAAAAAAAA' && mega.attr.get(u_handle, 'lastPsa', -2, true)
-        ]).then((res) => {
-            psa.lastSeenPsaId = res[1].value || res[0].value;
-
-            // Request current PSA number from API
-            psa.requestCurrentPsaAndShowAnnouncement();
-        }).catch(dump);
-    },
-
-    /**
-     * Get the PSA number manually from the API. This is a public API call so it's available for not logged in users.
-     */
-    requestCurrentPsaAndShowAnnouncement: function() {
-
-        'use strict';
-
-        // If we already know the current announce number in local state
-        if (psa.currentPsa !== null) {
-
-            // Show the announcement and return early so the API request is not repeated for each page view
-            psa.configureAndShowAnnouncement();
-            return false;
-        }
 
         // Already tried fetching the announcement this session
         if (psa.fetchedPsa) {
@@ -69,33 +41,28 @@ var psa = {
         }
         psa.fetchedPsa = true;
 
+        // Get the last announcement number they have seen from localStorage
+        const seen = await Promise.allSettled([
+            M.getPersistentData('lastSeenPsaId'),
+            u_handle && u_handle !== 'AAAAAAAAAAA' && mega.attr.get(u_handle, 'lastPsa', -2, true)
+        ]);
+        psa.lastSeenPsaId = parseInt(seen[1].value || seen[0].value) | 0;
+
         // Make Get PSA (gpsa) API request
-        M.req({a: 'gpsa', n: psa.lastSeenPsaId})
-            .then(function(result) {
+        const result = await Promise.resolve(M.req({a: 'gpsa', n: psa.lastSeenPsaId})).catch(echo);
 
-                // If there is no current announcement, set a flag so we don't repeat API requests this session
-                if (result === -9) {
-                    psa.fetchedPsa = true;
-                }
+        // If there is an announcement to be shown
+        if (typeof result === 'object' && 'id' in result) {
 
-                // If there is an announcement to be shown
-                else if (typeof result === 'object') {
+            // Cache the current announcement
+            psa.currentPsa = result;
 
-                    // Set a flag so we don't repeat API requests
-                    psa.fetchedPsa = true;
-
-                    // Cache the current announcement
-                    psa.currentPsa = result;
-
-                    // Show the announcement
-                    psa.configureAndShowAnnouncement();
-                }
-            })
-            .catch(ex => {
-                if (typeof ex !== 'number') {
-                    console.warn(ex);
-                }
-            });
+            // Show the announcement
+            psa.configureAndShowAnnouncement();
+        }
+        else if (parseInt(result) !== ENOENT) {
+            throw new Error(`Unexpected GPSA result, ${result}`);
+        }
     },
 
     /**
@@ -141,7 +108,9 @@ var psa = {
         var $psa = $('.public-service-anouncement');
         $psa.find('.title').text(title);
         $psa.find('.messageA').text(description);
-        $psa.find('.view-more-info').attr('data-continue-link', psa.currentPsa.l);
+        if (psa.currentPsa.l) {
+            $('.view-more-info', $psa).attr('data-continue-link', psa.currentPsa.l);
+        }
         $psa.find('.view-more-info .text').text(buttonLabel);
         $psa.find('.display-icon').attr('src', imagePath).on('error', function() {
 
@@ -184,6 +153,10 @@ var psa = {
             // Hide the banner and save the PSA as seen
             psa.hideAnnouncement();
             psa.saveLastPsaSeen();
+
+            if (!pageLink) {
+                return;
+            }
 
             // Open a new tab (and hopefully don't trigger popup blocker)
             window.open(pageLink, '_blank', 'noopener,noreferrer');

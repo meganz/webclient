@@ -48,7 +48,8 @@ body.tl .dropdown.body.popup.contacts-search {
     background: var(--divider-color);
 }
 .rtl .contacts-search-header {
-    margin: 0 12px 0 12px;
+    margin: auto;
+    width: 80%;
 }
 .new-group-chat .contacts-search-header {
     padding: 0;
@@ -157,14 +158,14 @@ body.tl .dropdown.body.popup.contacts-search {
     color: #666;
 }
 .rtl .contacts-search-list .contacts-info.body.contacts-search {
-    padding: 8px 12px;
+    padding: 4px 12px;
 }
 .contacts-search-list .contacts-info .user-card-data {
     max-width: 80%;
     padding-inline-start: 10px;
 }
 .contacts-search-list .user-card-data .user-card-name {
-    padding: 0 5px 0 0;
+    margin: 0 5px 0 0;
 }
 .contacts-search-list .user-card-data .user-card-status {
     display: inline;
@@ -381,7 +382,7 @@ body.tl .dropdown.body.popup.contacts-search {
     border-top: 1px solid var(--divider-color);
 }
 .rtl .contacts-search-bottom {
-    padding: 20px 12px;
+    padding-right: 38px;
 }
 .contacts-list-header {
     padding: 0 8px;

@@ -7,7 +7,7 @@
     .chat-toast {
         position: relative;
         width: fit-content;
-        z-index: 10;
+        z-index: 50;
         &.chat-toast-wrapper {
             --surface-alpha: 0.95;
             background: var(--surface-main);

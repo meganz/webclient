@@ -21,8 +21,7 @@ var sms = {
         }
         else {
             // On Close button tap
-            $closeButton.rebind('click', function() {
-
+            $closeButton.rebind('click', () => {
                 $dialog.addClass('hidden');
                 $background.addClass('hidden');
             });
@@ -68,6 +67,25 @@ var sms = {
             $textField.text(langString);
 
         }, true);
+    },
+
+    /**
+     * Reset the phone input form in the dialog if needs
+     * @param {Object} $dialog  The dialog of phone verification
+     * @returns {void}
+     */
+    resetPhoneInputForm: function($dialog) {
+
+        'use strict';
+
+        const $phoneInputPage = $('form.js-phone-input-page', $dialog);
+        if ($phoneInputPage.length > 0) {
+            // Reset the phone input page form
+            $('.verify-ph-country .js-country-list .option', $phoneInputPage).removeClass('active')
+                .attr('data-state', '');
+            $('.verify-ph-country span', $phoneInputPage).text(l[996]);
+            $('.js-phone-input', $phoneInputPage).val('');
+        }
     }
 };
 
@@ -113,6 +131,12 @@ sms.phoneInput = {
         // Set suspended flag
         if (isSuspended) {
             sms.isSuspended = true;
+        }
+
+        // Clear the phone input form if open the SMS dialog initially,
+        // exceptional case is back from clicking back button on the verify code page.
+        if (this.$dialog.hasClass('hidden')) {
+            sms.resetPhoneInputForm(this.$dialog);
         }
 
         // Init functionality
@@ -273,10 +297,15 @@ sms.phoneInput = {
         var toggleButtonState = function() {
             let hideOldMessage = true;
             const $countrySelect = $('.option[data-state="active"]', $countrySelector);
+            const phoneInputEntered = $phoneInput.val();
+            const countryCallCode = $countrySelect.attr('data-country-call-code');
+            const stripedPhNum = M.stripPhoneNumber(countryCallCode, phoneInputEntered);
+            const formattedPhoneNumber = `+${countryCallCode}${stripedPhNum}`;
 
             // If the fields are completed enable the button
             if ($countrySelect.length && $countrySelect.attr('data-country-iso-code').length > 1
-                && M.validatePhoneNumber($phoneInput.val(), $countrySelect.attr('data-country-call-code'))) {
+                && M.validatePhoneNumber(phoneInputEntered, countryCallCode)
+                && formattedPhoneNumber !== u_attr.smsv) {
                 $sendButton.removeClass('disabled');
             }
             else {
@@ -327,14 +356,7 @@ sms.phoneInput = {
         var $sendButton = $('.js-send-sms-button', this.$page);
         var $warningMessage = $('.js-warning-message', this.$page);
 
-        // On Send button click
-        $sendButton.rebind('click', function() {
-
-            // Do not proceed the country code/phone is not selected/entered and the button is not active
-            if ($sendButton.hasClass('disabled')) {
-                return false;
-            }
-
+        var sendSMSToPhone = function() {
             var phoneNum = $phoneInput.val();
             var $selectedOption = $('.option[data-state="active"]', $countrySelector);
             var countryCallingCode = $selectedOption.attr('data-country-call-code');
@@ -400,6 +422,25 @@ sms.phoneInput = {
                     }
                 }
             });
+        };
+
+        // On Send button click
+        $sendButton.rebind('click', () => {
+
+            // Do not proceed the country code/phone is not selected/entered and the button is not active
+            if ($sendButton.hasClass('disabled')) {
+                return false;
+            }
+
+            if (u_attr.smsv === undefined) {
+                sendSMSToPhone();
+            }
+            else {
+                // If it's to modify the phone number, have to remove the existing one firstly
+                accountUI.account.profiles.removePhoneNumber(false).then(() => {
+                    sendSMSToPhone();
+                }).catch(dump);
+            }
         });
     }
 };

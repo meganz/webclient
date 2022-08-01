@@ -1315,7 +1315,7 @@ function InputFloatWarning($container, options) {
      * @param {Number} ms {optional} Timeout in milliseconds. If not provided, default timeout
      * @returns {InputFloatWarning} this instance
      */
-    this.check = ({type, name, ms = 300}) => {
+    this.check = ({type, name, ms = 1000}) => {
         // delay function sets default value if given timeout is 0. Workaround: set "ms" to 1 when 0 is given
         delay(this.id, () => {
             const validator = InputFloatWarning.validator[this.options.namespace];

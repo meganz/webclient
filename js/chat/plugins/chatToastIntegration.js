@@ -214,9 +214,28 @@ class ChatToastIntegration {
      */
 
     constructor(megaChat) {
-        window.addEventListener('offline', e => this.eventHandlerOffline(e));
-        window.addEventListener('online', e => this.eventHandlerOnline(e));
-
+        const { chatd } = megaChat.plugins.chatdIntegration;
+        if (chatd) {
+            chatd.rebind('onOpen.cTI', () => {
+                if (!megaChat.allChatsHadInitialLoadedHistory()) {
+                    return;
+                }
+                delay(
+                    'chatdOpen.cTI',
+                    /* `Chat is now back online` */
+                    () => ChatToast.quick(l.chat_online, 'sprite-fm-mono icon-chat-filled'),
+                    300
+                );
+            });
+            chatd.rebind('onClose.cTI', () => {
+                delay(
+                    'chatdClose.cTI',
+                    /* `Chat is now offline` */
+                    () => ChatToast.quick(l.chat_offline, 'sprite-fm-mono icon-chat-filled'),
+                    300
+                );
+            });
+        }
         megaChat
             .rebind('onRoomInitialized.cTI', (e, megaRoom) => {
                 let playingSound = false;
@@ -366,9 +385,9 @@ class ChatToastIntegration {
                         }
                     })
                     .rebind('onRetryTimeout.cTI', () => {
-                        if (this.reconnecting && this.reconnecting.updater === nop) {
+                        if (this.reconnectingSfu && this.reconnectingSfu.updater === nop) {
                             // Reconnecting toast is present and has the default updater so clear it
-                            this.reconnecting.setUpdater(ChatToast.clearValue);
+                            this.reconnectingSfu.setUpdater(ChatToast.clearValue);
                         }
                         const retryFailToast = new ChatToast(
                             l.reconnect_failed /* `Unable to reconnect` */,
@@ -380,34 +399,38 @@ class ChatToastIntegration {
                         );
                         retryFailToast.dispatch();
                     })
-                    .rebind('onCallEnd.cTI', () => megaRoom.unbind('onMembersUpdated.cTI'));
-            });
+                    .rebind('onCallEnd.cTI', () => {
+                        megaRoom.unbind('onMembersUpdated.cTI');
+                        // If the call ends (sfuConnections are terminated) check for the reconnecting notif & close it.
+                        this.sfuConnOpen();
+                    });
+            })
+            .rebind('sfuConnOpen.cTI', () => this.sfuConnOpen())
+            .rebind('sfuConnClose.cTI', () => this.sfuConnClose());
     }
-    eventHandlerOffline() {
-        if (!this.reconnecting) {
-            ChatToast.quick(l.chat_offline /* `Chat is now offline` */, 'sprite-fm-mono icon-chat-filled');
-            this.reconnecting = new ChatToast(
+    sfuConnClose() {
+        if (!this.reconnectingSfu) {
+            this.reconnectingSfu = new ChatToast(
                 l.reconnecting /* `Reconnecting...` */,
                 {
                     icon: 'sprite-fm-uni icon-hazard',
                     persistent: true,
                     onEnd: () => {
-                        if (this.reconnecting) {
+                        if (this.reconnectingSfu) {
                             // Propagate close to everywhere else and remove the reference
-                            this.reconnecting.setUpdater(ChatToast.clearValue);
-                            delete this.reconnecting;
+                            this.reconnectingSfu.setUpdater(ChatToast.clearValue);
+                            delete this.reconnectingSfu;
                         }
                     },
                 }
             );
-            this.reconnecting.dispatch();
+            this.reconnectingSfu.dispatch();
         }
     }
-    eventHandlerOnline() {
-        if (this.reconnecting) {
-            this.reconnecting.setUpdater(ChatToast.clearValue);
+    sfuConnOpen() {
+        if (this.reconnectingSfu) {
+            this.reconnectingSfu.setUpdater(ChatToast.clearValue);
         }
-        ChatToast.quick(l.chat_online /* `Chat is now back online` */, 'sprite-fm-mono icon-chat-filled');
         const { disconnectNotification } = megaChat.plugins.chatNotifications;
         if (disconnectNotification) {
             disconnectNotification.close();

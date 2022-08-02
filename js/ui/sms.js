@@ -295,27 +295,31 @@ sms.phoneInput = {
         var $warningMessage = $('.js-warning-message', this.$page);
 
         var toggleButtonState = function() {
-            let hideOldMessage = true;
+            let hideErrorMsg = true;
             const $countrySelect = $('.option[data-state="active"]', $countrySelector);
             const phoneInputEntered = $phoneInput.val();
             const countryCallCode = $countrySelect.attr('data-country-call-code');
             const stripedPhNum = M.stripPhoneNumber(countryCallCode, phoneInputEntered);
             const formattedPhoneNumber = `+${countryCallCode}${stripedPhNum}`;
+            const validateResult = M.validatePhoneNumber(phoneInputEntered, countryCallCode);
 
             // If the fields are completed enable the button
             if ($countrySelect.length && $countrySelect.attr('data-country-iso-code').length > 1
-                && M.validatePhoneNumber(phoneInputEntered, countryCallCode)
+                && validateResult
                 && formattedPhoneNumber !== u_attr.smsv) {
                 $sendButton.removeClass('disabled');
             }
             else {
-                $warningMessage.addClass('visible').text(l.err_invalid_ph); // Phone format invalid
                 // Otherwise disable the button
                 $sendButton.addClass('disabled');
-                hideOldMessage = false;
+
+                if (phoneInputEntered.length && !validateResult) {
+                    $warningMessage.addClass('visible').text(l.err_invalid_ph); // Phone format invalid
+                    hideErrorMsg = false;
+                }
             }
 
-            if (hideOldMessage) {
+            if (hideErrorMsg) {
                 // Hide old error message
                 $warningMessage.removeClass('visible');
             }

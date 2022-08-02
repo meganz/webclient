@@ -508,13 +508,13 @@ def has_locked_msgs(is_prod):
     print("Started checking for Locked strings in PROD in past 3 weeks ..... " + checkDateStr)
 
     url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:prod&filter[tags][all]=*"
-    url+= "filter[strings_date_modified][gte]=" + checkDateStr
+    url += "&filter[strings_date_modified][gte]=" + checkDateStr
 
     languages = get_languages()
 
-    lockingTag= ["locked"];
+    lockingTag = []
     for language in languages:
-            lockingTag.append("locked_" + language["attributes"]["code"])
+        lockingTag.append("locked_" + language["attributes"]["code"])
 
     print("Locking tags we are checking are: ", lockingTag)
     nextPage = url

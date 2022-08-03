@@ -1413,9 +1413,13 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[BR]', '<br>');
     l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
         .replace('[BR]', '<br>');
-    l.empty_call_dlg_text = l.empty_call_dlg_text
-        .replace('[S1]', '<span class="stay-dlg-counter">').replace('[/S1]', '</span>')
-        .replace('[S2]', '<div class="stay-dlg-subtext">').replace('[/S2]', '</div>');
+    ['empty_call_dlg_text', 'empty_call_dlg_text_min', 'empty_call_dlg_text_sec'].forEach(s => {
+        l[s] = l[s]
+            .replace(/\[S1]/g, '<span class="stay-dlg-counter">')
+            .replace(/\[\/S1]/g, '</span>')
+            .replace(/\[S2]/g, '<div class="stay-dlg-subtext">')
+            .replace(/\[\/S2]/g, '</div>');
+    });
     l.meeting_empty_call_desc_1 = escapeHTML(l.meeting_empty_call_desc_1)
         .replace(/\[P]/g, '<div>')
         .replace(/\[\/P]/g, '</div>');

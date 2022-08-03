@@ -305,7 +305,7 @@ export default class Call extends MegaRenderMixin {
             `warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`,
             'stay-on-call',
             l.empty_call_dlg_title,
-            l.empty_call_dlg_text.replace('%s', '02:00'),
+            mega.icu.format(l.empty_call_dlg_text_min, 2).replace('%s', '02:00'),
             res => {
                 if (res === null) {
                     return;

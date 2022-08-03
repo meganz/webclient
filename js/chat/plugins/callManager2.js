@@ -523,13 +523,20 @@
                             done();
                         }
                         else {
-                            timeRemain = secondsToTime(timeRemain).substring(3);
+                            const timeString = secondsToTime(timeRemain).substring(3);
+                            let string = l.empty_call_dlg_text_sec;
                             this.content = l.call_timeout_remain /* `Call will end in %s` */
-                                .replace('%s', timeRemain);
+                                .replace('%s', timeString);
+                            if (timeRemain >= 60) {
+                                timeRemain = Math.ceil(timeRemain / 60);
+                                string = l.empty_call_dlg_text_min;
+                            }
                             // Check if the dialog is shown then update the counter on it.
                             const $dlgText = $('.stay-dlg-counter', '.mega-dialog');
                             if ($dlgText.length && $dlgText.is(':visible')) {
-                                $dlgText.text(timeRemain);
+                                $dlgText.parent().empty().safeHTML(
+                                    mega.icu.format(string, timeRemain).replace('%s', timeString)
+                                );
                             }
                         }
                     })

@@ -658,7 +658,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                 else {
                     $(menuCMI).filter('.fileupload-item,.newfolder-item').removeClass('hidden');
 
-                    if (nodeRights > 1) {
+                    if (nodeRights > 0) {
                         $(menuCMI).filter('.newfile-item').removeClass('hidden');
                     }
 

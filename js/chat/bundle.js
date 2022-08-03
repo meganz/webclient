@@ -5656,14 +5656,38 @@ class ChatToaster extends _mixins1__.wl {
         this.dispatchToast(toast, now, {
           fmToastId: 'tmp'
         });
-        window.toaster.alerts.medium(...toast.renderFM()).then(fmToastId => {
-          toast.onShown(fmToastId);
-          this.setState({
-            fmToastId
-          });
-        });
+        this.dispatchFMToast(toast);
       }
     }
+  }
+
+  dispatchFMToast(toast, redraw) {
+    window.toaster.alerts.medium(...toast.renderFM()).then(fmToastId => {
+      if (!redraw) {
+        toast.onShown(fmToastId);
+      }
+
+      this.setState({
+        fmToastId
+      });
+
+      if (toast.updater && typeof toast.updater === 'function') {
+        toast.updater();
+        toast.updateInterval = setInterval(() => {
+          toast.updater();
+          const value = toast.render();
+
+          if (!value) {
+            window.toaster.alerts.hide(fmToastId);
+            return this.onClose(toast.options && toast.options.persistent);
+          }
+
+          if (value !== $('span', `#${fmToastId}`).text()) {
+            $('span', `#${fmToastId}`).text(value);
+          }
+        }, 250);
+      }
+    });
   }
 
   dispatchToast(toast, now, options = {}) {
@@ -5701,6 +5725,11 @@ class ChatToaster extends _mixins1__.wl {
         if (typeof onHideToast === 'function') {
           onHideToast(toast);
         }
+
+        if (toast.updateInterval) {
+          clearInterval(toast.updateInterval);
+          delete toast.updateInterval;
+        }
       }, endTime ? endTime - now : toast.getTTL());
     });
 
@@ -5735,6 +5764,11 @@ class ChatToaster extends _mixins1__.wl {
       return;
     }
 
+    if (toast.updateInterval) {
+      clearInterval(toast.updateInterval);
+      delete toast.updateInterval;
+    }
+
     clearTimeout(this.timeout);
     delete this.timeout;
 
@@ -5755,8 +5789,15 @@ class ChatToaster extends _mixins1__.wl {
   flush() {
     const {
       toast,
-      persistentToast
+      persistentToast,
+      fmToastId
     } = this.state;
+    this.endToastIntervals();
+
+    if (fmToastId && fmToastId !== 'tmp') {
+      window.toaster.alerts.hide(fmToastId);
+    }
+
     this.toasts = [];
     this.persistentToasts = [];
 
@@ -5781,6 +5822,24 @@ class ChatToaster extends _mixins1__.wl {
     });
   }
 
+  endToastIntervals() {
+    if (!this.props.isRootToaster) {
+      return;
+    }
+
+    for (const toast of this.toasts) {
+      if (toast.updateInterval) {
+        clearInterval(toast.updateInterval);
+      }
+    }
+
+    for (const toast of this.persistentToasts) {
+      if (toast.updateInterval) {
+        clearInterval(toast.updateInterval);
+      }
+    }
+  }
+
   componentDidMount() {
     super.componentDidMount();
     megaChat.rebind(`onChatToast.toaster${this.getUniqueId()}`, e => this.enqueueToast(e));
@@ -5802,6 +5861,12 @@ class ChatToaster extends _mixins1__.wl {
           if (toChat && !M.chat) {
             clearTimeout(this.timeout);
             window.toaster.alerts.hide(fmToastId);
+
+            if (toast.updateInterval) {
+              clearInterval(toast.updateInterval);
+              delete toast.updateInterval;
+            }
+
             this.dispatchToast(toast, now, {
               endTime,
               silent: true
@@ -5813,11 +5878,7 @@ class ChatToaster extends _mixins1__.wl {
               endTime,
               silent: true
             });
-            window.toaster.alerts.medium(...toast.renderFM()).then(id => {
-              this.setState({
-                fmToastId: id
-              });
-            });
+            this.dispatchFMToast(toast, true);
           }
         } else if (toast && typeof toast.onEnd === 'function') {
           toast.onEnd();
@@ -5838,6 +5899,8 @@ class ChatToaster extends _mixins1__.wl {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
+
+    this.endToastIntervals();
   }
 
   render() {

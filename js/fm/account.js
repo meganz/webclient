@@ -1027,56 +1027,20 @@ accountUI.account = {
                     $buttonsContainer.removeClass('hidden');
                     $phoneNumber.removeClass('hidden').text(u_attr.smsv);
 
-                    /**
-                     * Send remove command to API, and update UI if needed
-                     * @param {String} msg                  Message dialog's text to show for confirmation
-                     * @param {String} desc                 Message dialog's description to show for confirmation
-                     * @param {Boolean} showSuccessMsg      Show message dialog on success
-                     */
-                    var removeNumber = function(msg, desc, showSuccessMsg) {
-
-                        msgDialog('confirmation', '', msg, desc, function(answer) {
+                    $removeNumberButton.rebind('click.gsmremove', () => {
+                        msgDialog('confirmation', '', l[23425], l[23426], answer => {
                             if (answer) {
-                                // lock UI
-                                loadingDialog.show();
-
-                                api_req(
-                                    { a: 'smsr' },
-                                    {
-                                        callback: tryCatch(function(res) {
-                                            // Unlock UI regardless of the result
-                                            loadingDialog.hide();
-                                            if (res === 0) {
-                                                // success
-                                                // no APs, we need to rely on this response.
-                                                delete u_attr.smsv;
-
-                                                // update only relevant sections in UI
-                                                accountUI.account.profiles.renderPhoneBanner();
-                                                accountUI.account.profiles.renderPhoneDetails();
-
-                                                if (showSuccessMsg) {
-                                                    msgDialog('info', '', l[23427]);
-                                                }
-                                                else {
-                                                    sms.phoneInput.init();
-                                                }
-                                            }
-                                            else {
-                                                msgDialog('warningb', '', l[23428]);
-                                            }
-                                        }, function() {
-                                            loadingDialog.hide();
-                                            msgDialog('warningb', '', l[23428]);
-                                        })
-                                    }
-                                );
+                                accountUI.account.profiles.removePhoneNumber(true).catch(dump);
                             }
                         });
-                    };
-
-                    $removeNumberButton.rebind('click.gsmremove', removeNumber.bind(null, l[23425], l[23426], true));
-                    $modifyNumberButton.rebind('click.gsmmodify', removeNumber.bind(null, l[23429], l[23430], false));
+                    });
+                    $modifyNumberButton.rebind('click.gsmmodify', () => {
+                        msgDialog('confirmation', '', l[23429], l[23430], answer => {
+                            if (answer) {
+                                sms.phoneInput.init();
+                            }
+                        });
+                    });
                 }
                 else {
                     $addNumberButton.removeClass('hidden');
@@ -1104,6 +1068,50 @@ accountUI.account = {
                 elem.value = '0' + elem.value;
             }
         },
+
+        /**
+         * Send remove command to API, and update UI if needed
+         * @param {Boolean} showSuccessMsg      Show message dialog on success
+         */
+        removePhoneNumber: promisify((resolve, reject, showSuccessMsg) => {
+
+            'use strict';
+
+            // lock UI
+            loadingDialog.show();
+
+            api_req(
+                { a: 'smsr' },
+                {
+                    callback: tryCatch(res => {
+                        // Unlock UI regardless of the result
+                        loadingDialog.hide();
+                        if (res === 0) {
+                            // success
+                            // no APs, we need to rely on this response.
+                            delete u_attr.smsv;
+
+                            // update only relevant sections in UI
+                            accountUI.account.profiles.renderPhoneBanner();
+                            accountUI.account.profiles.renderPhoneDetails();
+
+                            if (showSuccessMsg) {
+                                msgDialog('info', '', l[23427]);
+                            }
+                            resolve();
+                        }
+                        else {
+                            msgDialog('warningb', '', l[23428]);
+                            reject(res);
+                        }
+                    }, () => {
+                        loadingDialog.hide();
+                        msgDialog('warningb', '', l[23428]);
+                        reject('Failed to remove the phone number.');
+                    })
+                }
+            );
+        }),
 
         resetProfileForm: function() {
 

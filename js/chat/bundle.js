@@ -5656,14 +5656,38 @@ class ChatToaster extends _mixins1__.wl {
         this.dispatchToast(toast, now, {
           fmToastId: 'tmp'
         });
-        window.toaster.alerts.medium(...toast.renderFM()).then(fmToastId => {
-          toast.onShown(fmToastId);
-          this.setState({
-            fmToastId
-          });
-        });
+        this.dispatchFMToast(toast);
       }
     }
+  }
+
+  dispatchFMToast(toast, redraw) {
+    window.toaster.alerts.medium(...toast.renderFM()).then(fmToastId => {
+      if (!redraw) {
+        toast.onShown(fmToastId);
+      }
+
+      this.setState({
+        fmToastId
+      });
+
+      if (toast.updater && typeof toast.updater === 'function') {
+        toast.updater();
+        toast.updateInterval = setInterval(() => {
+          toast.updater();
+          const value = toast.render();
+
+          if (!value) {
+            window.toaster.alerts.hide(fmToastId);
+            return this.onClose(toast.options && toast.options.persistent);
+          }
+
+          if (value !== $('span', `#${fmToastId}`).text()) {
+            $('span', `#${fmToastId}`).text(value);
+          }
+        }, 250);
+      }
+    });
   }
 
   dispatchToast(toast, now, options = {}) {
@@ -5701,6 +5725,11 @@ class ChatToaster extends _mixins1__.wl {
         if (typeof onHideToast === 'function') {
           onHideToast(toast);
         }
+
+        if (toast.updateInterval) {
+          clearInterval(toast.updateInterval);
+          delete toast.updateInterval;
+        }
       }, endTime ? endTime - now : toast.getTTL());
     });
 
@@ -5735,6 +5764,11 @@ class ChatToaster extends _mixins1__.wl {
       return;
     }
 
+    if (toast.updateInterval) {
+      clearInterval(toast.updateInterval);
+      delete toast.updateInterval;
+    }
+
     clearTimeout(this.timeout);
     delete this.timeout;
 
@@ -5755,8 +5789,15 @@ class ChatToaster extends _mixins1__.wl {
   flush() {
     const {
       toast,
-      persistentToast
+      persistentToast,
+      fmToastId
     } = this.state;
+    this.endToastIntervals();
+
+    if (fmToastId && fmToastId !== 'tmp') {
+      window.toaster.alerts.hide(fmToastId);
+    }
+
     this.toasts = [];
     this.persistentToasts = [];
 
@@ -5781,6 +5822,24 @@ class ChatToaster extends _mixins1__.wl {
     });
   }
 
+  endToastIntervals() {
+    if (!this.props.isRootToaster) {
+      return;
+    }
+
+    for (const toast of this.toasts) {
+      if (toast.updateInterval) {
+        clearInterval(toast.updateInterval);
+      }
+    }
+
+    for (const toast of this.persistentToasts) {
+      if (toast.updateInterval) {
+        clearInterval(toast.updateInterval);
+      }
+    }
+  }
+
   componentDidMount() {
     super.componentDidMount();
     megaChat.rebind(`onChatToast.toaster${this.getUniqueId()}`, e => this.enqueueToast(e));
@@ -5802,6 +5861,12 @@ class ChatToaster extends _mixins1__.wl {
           if (toChat && !M.chat) {
             clearTimeout(this.timeout);
             window.toaster.alerts.hide(fmToastId);
+
+            if (toast.updateInterval) {
+              clearInterval(toast.updateInterval);
+              delete toast.updateInterval;
+            }
+
             this.dispatchToast(toast, now, {
               endTime,
               silent: true
@@ -5813,11 +5878,7 @@ class ChatToaster extends _mixins1__.wl {
               endTime,
               silent: true
             });
-            window.toaster.alerts.medium(...toast.renderFM()).then(id => {
-              this.setState({
-                fmToastId: id
-              });
-            });
+            this.dispatchFMToast(toast, true);
           }
         } else if (toast && typeof toast.onEnd === 'function') {
           toast.onEnd();
@@ -5838,6 +5899,8 @@ class ChatToaster extends _mixins1__.wl {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
+
+    this.endToastIntervals();
   }
 
   render() {
@@ -22421,20 +22484,20 @@ class Call extends mixins.wl {
     };
 
     this.handleRetryTimeout = () => {
-      if (!navigator.onLine) {
+      if (this.props.sfuApp.sfuClient.connState === SfuClient.ConnState.kDisconnected) {
         this.handleCallEnd();
         this.props.chatRoom.trigger('onRetryTimeout');
         ion.sound.play('end_call');
       }
     };
 
-    this.handleCallOffline = () => delay('callOffline', () => navigator.onLine ? null : this.setState({
-      offline: true
-    }), 3e4);
-
-    this.handleCallOnline = () => this.setState({
-      offline: false
-    });
+    this.handleCallOnline = () => {
+      delay.cancel(this.offlineDelayed);
+      delete this.offlineDelayed;
+      this.setState({
+        offline: false
+      });
+    };
 
     this.customIsEventuallyVisible = () => true;
 
@@ -22652,6 +22715,18 @@ class Call extends mixins.wl {
     this.state.sidebar = props.chatRoom.type === 'public';
   }
 
+  handleCallOffline() {
+    if (this.offlineDelayed) {
+      return;
+    }
+
+    this.offlineDelayed = delay('callOffline', () => {
+      this.setState({
+        offline: true
+      });
+    }, 3e4);
+  }
+
   showTimeoutDialog() {
     msgDialog(`warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`, 'stay-on-call', l.empty_call_dlg_title, l.empty_call_dlg_text.replace('%s', '02:00'), res => {
       if (res === null) {
@@ -22664,34 +22739,45 @@ class Call extends mixins.wl {
 
   componentWillUnmount() {
     super.componentWillUnmount();
+    const {
+      minimized,
+      willUnmount,
+      chatRoom
+    } = this.props;
 
-    if (this.props.willUnmount) {
-      this.props.willUnmount(this.props.minimized);
+    if (willUnmount) {
+      willUnmount(minimized);
     }
 
     if (this.ephemeralAddListener) {
       mBroadcaster.removeListener(this.ephemeralAddListener);
     }
 
-    window.removeEventListener('offline', this.handleCallOffline);
-    window.removeEventListener('online', this.handleCallOnline);
+    chatRoom.megaChat.off('sfuConnClose.call');
+    chatRoom.megaChat.off('sfuConnOpen.call');
     this.unbindCallEvents();
 
     if (this.callStartTimeout) {
       clearTimeout(this.callStartTimeout);
     }
+
+    delay.cancel('callOffline');
   }
 
   componentDidMount() {
     super.componentDidMount();
+    const {
+      didMount,
+      chatRoom
+    } = this.props;
 
-    if (this.props.didMount) {
-      this.props.didMount();
+    if (didMount) {
+      didMount();
     }
 
     this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle => this.handleEphemeralAdd(handle));
-    window.addEventListener('offline', this.handleCallOffline);
-    window.addEventListener('online', this.handleCallOnline);
+    chatRoom.megaChat.rebind('sfuConnOpen.call', this.handleCallOnline);
+    chatRoom.megaChat.rebind('sfuConnClose.call', () => this.handleCallOffline());
     this.bindCallEvents();
     ['reconnecting', 'end_call'].map(sound => ion.sound.preload(sound));
     this.callStartTimeout = setTimeout(() => {

@@ -1327,9 +1327,9 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     const cv = M.isCustomView(id);
     var id_r = this.getNodeRoot(id);
     var id_s = id.split('/')[0];
-    var $e;
+    var target;
     var scrollTo = false;
-    var stickToTop = false;
+    var stickToTop;
     if (d) {
         console.group('onTreeUIOpen', id);
         console.time('onTreeUIOpen');
@@ -1426,36 +1426,65 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     $('.fm-tree-panel .nw-fm-tree-item').removeClass('selected on-gallery');
 
     if (cv) {
-        $e = $(`#treea_${cv.prefixTree}${id.split('/')[1]}`);
+        target = document.querySelector(`#treea_${cv.prefixTree}${id.split('/')[1]}`);
 
-        if (id.startsWith('discovery')) {
-            $e.addClass('on-gallery');
+        if (target && id.startsWith('discovery')) {
+            target.classList.add('on-gallery');
         }
     }
     else {
-        $e = $('#treea_' + id_s);
+        target = document.getElementById(`treea_${id_s}`);
     }
 
-    $e.addClass('selected');
+    if (target) {
+        target.classList.add('selected');
+    }
 
     if (!ignoreScroll) {
 
-        if (!folderlink && id === this.RootID || id === 'shares' || id === 'chat') {
+        if (!folderlink && id === this.RootID) {
+            stickToTop = false;
+            scrollTo = document.querySelector('.js-clouddrive-btn');
+        }
+        else if (id === id_r || id === 'recents') {
             stickToTop = true;
-            scrollTo = '.nw-tree-panel-header';
-            if (id === this.RootID) {
-                scrollTo = '.js-clouddrive-btn';
-            }
+            scrollTo = document.querySelector('.js-lpbtn.active');
         }
-        else if ($e.length) {
-            scrollTo = $e;
+        else if (target) {
+            scrollTo = target;
         }
-        // if (d) console.log('scroll to element?',ignoreScroll,scrollTo,stickToTop);
 
-        var jsp = scrollTo && $(scrollTo).closest('.jspScrollable').data('jsp');
-        if (jsp) {
+        const ps = scrollTo && scrollTo.closest('.ps--active-y');
+        let isVisible = true;
+
+        if (ps) {
+            const t = ps.scrollTop;
+            const b = t + ps.offsetHeight;
+            let et = scrollTo.offsetTop;
+
+            if (!scrollTo.classList.contains('js-lpbtn')) {
+
+                let p = scrollTo.parentElement;
+
+                while (p && !p.classList.contains('fm-tree-panel')) {
+
+                    if (p.tagName === 'LI') {
+                        et += p.offsetTop;
+                    }
+
+                    p = p.parentElement;
+                }
+            }
+
+            const eb = et + scrollTo.offsetHeight;
+
+            stickToTop = stickToTop === undefined ? et < t : stickToTop;
+            isVisible = eb <= b && et >= t;
+        }
+
+        if (ps && !isVisible) {
             setTimeout(function() {
-                jsp.scrollToElement(scrollTo, stickToTop);
+                scrollTo.scrollIntoView(stickToTop);
             }, 50);
         }
     }

@@ -64,13 +64,41 @@ export default class ChatToaster extends MegaRenderMixin {
             else if (isRootToaster && this.toasts.length && !shownToast) {
                 const toast = this.toasts.shift();
                 this.dispatchToast(toast, now, { fmToastId: 'tmp' });
-                window.toaster.alerts.medium(...toast.renderFM()).then(fmToastId => {
-                    toast.onShown(fmToastId);
-                    this.setState({ fmToastId });
-                });
+                this.dispatchFMToast(toast);
             }
         }
     }
+
+    /**
+     * Show a toast with the FM toaster. Set up the updater function if required
+     *
+     * @param {ChatToast} toast The toast to show
+     * @param {boolean} redraw If this isn't the first time the toast is shown
+     * @returns {void} void
+     */
+    dispatchFMToast(toast, redraw) {
+        window.toaster.alerts.medium(...toast.renderFM()).then(fmToastId => {
+            if (!redraw) {
+                toast.onShown(fmToastId);
+            }
+            this.setState({ fmToastId });
+            if (toast.updater && typeof toast.updater === 'function') {
+                toast.updater();
+                toast.updateInterval = setInterval(() => {
+                    toast.updater();
+                    const value = toast.render();
+                    if (!value) {
+                        window.toaster.alerts.hide(fmToastId);
+                        return this.onClose(toast.options && toast.options.persistent);
+                    }
+                    if (value !== $('span', `#${fmToastId}`).text()) {
+                        $('span', `#${fmToastId}`).text(value);
+                    }
+                }, 250);
+            }
+        });
+    }
+
     /**
      * Updates the state to show the given toast for the amount of time.
      *
@@ -96,12 +124,17 @@ export default class ChatToaster extends MegaRenderMixin {
                 if (typeof onHideToast === 'function') {
                     onHideToast(toast);
                 }
+                if (toast.updateInterval) {
+                    clearInterval(toast.updateInterval);
+                    delete toast.updateInterval;
+                }
             }, endTime ? endTime - now : toast.getTTL());
         });
         if (typeof onShownToast === 'function') {
             onShownToast(toast);
         }
     }
+
     /**
      * Called to dismiss the rendered toast
      *
@@ -121,6 +154,10 @@ export default class ChatToaster extends MegaRenderMixin {
             }
             return;
         }
+        if (toast.updateInterval) {
+            clearInterval(toast.updateInterval);
+            delete toast.updateInterval;
+        }
         clearTimeout(this.timeout);
         delete this.timeout;
         if (typeof toast.onEnd === 'function') {
@@ -131,13 +168,18 @@ export default class ChatToaster extends MegaRenderMixin {
         }
         this.setState({toast: null, endTime: 0}, () => this.pollToasts());
     }
+
     /**
      * Empty the toast queue + shown toasts due to the `onChatToastFlush` event
      *
      * @returns {void} void
      */
     flush() {
-        const { toast, persistentToast } = this.state;
+        const { toast, persistentToast, fmToastId } = this.state;
+        this.endToastIntervals();
+        if (fmToastId && fmToastId !== 'tmp') {
+            window.toaster.alerts.hide(fmToastId);
+        }
         this.toasts = [];
         this.persistentToasts = [];
         if (this.timeout) {
@@ -157,6 +199,29 @@ export default class ChatToaster extends MegaRenderMixin {
             persistentToast: null,
         });
     }
+
+    /**
+     * Clear any update intervals from FM toasts
+     *
+     * @returns {void} void
+     */
+    endToastIntervals() {
+        if (!this.props.isRootToaster) {
+            // If the call ChatToaster unmounts we don't want to clear these
+            return;
+        }
+        for (const toast of this.toasts) {
+            if (toast.updateInterval) {
+                clearInterval(toast.updateInterval);
+            }
+        }
+        for (const toast of this.persistentToasts) {
+            if (toast.updateInterval) {
+                clearInterval(toast.updateInterval);
+            }
+        }
+    }
+
     componentDidMount() {
         super.componentDidMount();
         megaChat.rebind(`onChatToast.toaster${this.getUniqueId()}`, e => this.enqueueToast(e));
@@ -171,14 +236,16 @@ export default class ChatToaster extends MegaRenderMixin {
                     if (toChat && !M.chat) {
                         clearTimeout(this.timeout);
                         window.toaster.alerts.hide(fmToastId);
+                        if (toast.updateInterval) {
+                            clearInterval(toast.updateInterval);
+                            delete toast.updateInterval;
+                        }
                         this.dispatchToast(toast, now, { endTime, silent: true });
                     }
                     else if (!toChat && M.chat) {
                         clearTimeout(this.timeout);
                         this.dispatchToast(toast, now, { fmToastId: 'tmp', endTime, silent: true });
-                        window.toaster.alerts.medium(...toast.renderFM()).then(id => {
-                            this.setState({fmToastId: id});
-                        });
+                        this.dispatchFMToast(toast, true);
                     }
                 }
                 else if (toast && typeof toast.onEnd === 'function') {
@@ -187,6 +254,7 @@ export default class ChatToaster extends MegaRenderMixin {
             });
         }
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         megaChat.off(`onChatToast.toaster${this.getUniqueId()}`);
@@ -197,7 +265,9 @@ export default class ChatToaster extends MegaRenderMixin {
         if (this.timeout) {
             clearTimeout(this.timeout);
         }
+        this.endToastIntervals();
     }
+
     render() {
         const { hidden, isRootToaster, showDualNotifications } = this.props;
         const { toast, fmToastId, persistentToast } = this.state;
@@ -259,6 +329,7 @@ class ChatToastMsg extends MegaRenderMixin {
             onClose(toast.options && toast.options.persistent);
         }
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         if (this.updateInterval) {

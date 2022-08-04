@@ -245,6 +245,40 @@ mBroadcaster.once('boot_done', function() {
     Object.defineProperty(mega, 'es2019', {value: mg && mg.length === 2 && mg[0] === 'm1' && mg[1] === 'm2'});
 });
 
+mBroadcaster.once('startMega', tryCatch(() => {
+    'use strict';
+    const {buildOlderThan10Days, eventlog} = window;
+
+    if (buildOlderThan10Days || !eventlog || sessionStorage.mecmatst) {
+        return;
+    }
+    sessionStorage.mecmatst = 1;
+
+    scriptTest(
+        'megaecmastest = window.foo?.bar ?? -1',
+        (error) => {
+            if (error || window.megaecmastest !== -1) {
+                return eventlog(99777, JSON.stringify([1, 1]));
+            }
+
+            delete window.megaecmastest;
+            Object.defineProperty(mega, 'es2020', {value: true});
+        });
+
+    if (typeof BigInt === 'undefined') {
+        eventlog(99778, JSON.stringify([1, 2]));
+    }
+    else {
+        scriptTest(
+            'megaecmabitest = BigInt(Math.pow(2, 48)) << 16n === 18446744073709551616n',
+            (error) => {
+                if (error || window.megaecmabitest !== true) {
+                    eventlog(99778, JSON.stringify([1, 3]));
+                }
+                delete window.megaecmabitest;
+            });
+    }
+}));
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

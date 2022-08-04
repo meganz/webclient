@@ -57,21 +57,18 @@ var SearchResultType = Object.freeze({
 
 
 function RoomSearch(parentSearch, room) {
-    "use strict";
-    var self = this;
-    self.parentSearch = parentSearch;
-    self.room = room;
-    self.logger = MegaLogger.getLogger(
-        "ChatSearch[" + room.chatId + "]",
+    'use strict';
+    this.parentSearch = parentSearch;
+    this.room = room;
+    this.logger = MegaLogger.getLogger(
+        `ChatSearch[${room.chatId}]`,
         parentSearch.logger._myOpts,
         parentSearch.logger
     );
     room.attachSearch();
-    self._setState(SearchState.kNew);
-    self.room.rebind(CS_HISTDECRYPTED_EVENTNAME, function() {
-        setTimeout(function() {
-            self.onHistoryFetched();
-        }, 0);
+    this._setState(SearchState.kNew);
+    this.room.rebind(CS_HISTDECRYPTED_EVENTNAME, () => {
+        onIdle(() => this.onHistoryFetched());
     });
 }
 
@@ -85,8 +82,17 @@ RoomSearch.prototype._matchMembers = function(members) {
             for (let i = regExps.length; i--;) {
                 const regExp = regExps[i];
                 let match;
+
+                //  match names
                 while ((match = regExp.exec(M.getNameByHandle(userId))) !== null) {
                     matches.push({ idx: match.index, str: match[0] });
+                }
+
+                if (!match) {
+                    // match email
+                    while ((match = regExp.exec(M.u[userId].m)) !== null) {
+                        matches.push({ idx: match.index, str: match[0] });
+                    }
                 }
             }
 
@@ -102,37 +108,37 @@ RoomSearch.prototype._matchMembers = function(members) {
 };
 
 RoomSearch.prototype.resume = function() {
-    "use strict";
-    var self = this;
-    if (self.state >= SearchState.kInProgress) {
+    'use strict';
+    if (this.state >= SearchState.kInProgress) {
         return;
     }
 
-    var room = self.room;
-    if (self.state === SearchState.kNew) {
+    const { room, state, parentSearch, logger } = this;
+    if (state === SearchState.kNew) {
         // match chat topic
         if (room.topic) {
-            self.parentSearch._match(room.topic, SearchResultType.kChatTopic, undefined, self);
+            parentSearch._match(room.topic, SearchResultType.kChatTopic, undefined, this);
         }
         // match room member names
-        var members = room.members;
+        const { members } = room;
         if (members) {
-            self._matchMembers(members);
+            this._matchMembers(members);
         }
 
         // match messages that are already loaded
-        if (self.parentSearch.searchMessages) {
-            var messages = room.messagesBuff.messages;
-            self._lastMsgCount = messages.length;
-            self.logger.debug("Initial message count:", self._lastMsgCount);
-            for (var i = messages.length - 1; i >= 0; i--) {
-                var msg = messages.getItem(i);
+        if (parentSearch.searchMessages) {
+            const { messagesBuff } = room;
+            const { messages } = messagesBuff;
+            this._lastMsgCount = messages.length;
+            logger.debug('Initial message count:', messages.length);
+            for (let i = messages.length - 1; i >= 0; i--) {
+                const msg = messages.getItem(i);
                 if (msg && msg.textContents && msg.textContents.length > 0) {
-                    self.parentSearch._match(
+                    parentSearch._match(
                         msg.textContents,
                         SearchResultType.kMessage,
                         msg,
-                        self,
+                        this,
                         messages.length - i
                     );
                 }
@@ -140,97 +146,95 @@ RoomSearch.prototype.resume = function() {
         }
     }
 
-    if (room.messagesBuff.haveMoreHistory() && self.parentSearch.searchMessages) {
-        self._setState(SearchState.kInProgress); // in case it was paused or new
-        self.fetchMoreHistory(); // will set state to kInProgress and attach handler if needed
+    if (room.messagesBuff.haveMoreHistory() && parentSearch.searchMessages) {
+        this._setState(SearchState.kInProgress); // in case it was paused or new
+        this.fetchMoreHistory(); // will set state to kInProgress and attach handler if needed
     }
     else {
-        self._setComplete();
+        this._setComplete();
     }
 };
 
 RoomSearch.prototype.fetchMoreHistory = function() {
-    "use strict";
-    var self = this;
-    assert(self.state === SearchState.kInProgress);
-    self._isFetchingHistory = true;
+    'use strict';
+    assert(this.state === SearchState.kInProgress);
+    this._isFetchingHistory = true;
     // console.warn(self.room.chatId +": Requesting more history");
-    setTimeout(function() {
-        self.room.messagesBuff.retrieveChatHistory(64);
+    setTimeout(() => {
+        this.room.messagesBuff.retrieveChatHistory(64);
     }, 128 /* give some CPU time for the main UI thread to do "real-time"-like updates */);
 };
 
 RoomSearch.prototype.onHistoryFetched = function() {
-    "use strict";
-    var self = this;
-    if (self.state === SearchState.kComplete) {
+    'use strict';
+    if (this.state === SearchState.kComplete) {
         return;
     }
-    var msgBuf = self.room.messagesBuff;
-    var messages = msgBuf.messages;
-    var newCount = messages.length;
-    var haveMoreHistory = msgBuf.haveMoreHistory();
+    const msgBuf = this.room.messagesBuff;
+    const { messages } = msgBuf;
+    const newCount = messages.length;
+    const haveMoreHistory = msgBuf.haveMoreHistory();
 
-    var numFetched = newCount - self._lastMsgCount;
-    if (numFetched > 0 && self.state !== SearchState.kDestroying) {
-        self.logger.debug("onHistoryFetched: Fetched", numFetched, "messages");
-        self._lastMsgCount = newCount;
-        for (var i = 0; i < numFetched; i++) {
-            var msg = messages.getItem(i);
+    const numFetched = newCount - this._lastMsgCount;
+    if (numFetched > 0 && this.state !== SearchState.kDestroying) {
+        this.logger.debug('onHistoryFetched:', `Fetched ${numFetched} messages`);
+        this._lastMsgCount = newCount;
+        for (let i = 0; i < numFetched; i++) {
+            const msg = messages.getItem(i);
             if (msg.textContents) {
-                self.parentSearch._match(
+                this.parentSearch._match(
                     msg.textContents,
                     SearchResultType.kMessage,
                     msg,
-                    self,
+                    this,
                     newCount - i
                 );
             }
         }
-        if (haveMoreHistory && self.state === SearchState.kInProgress) {
-            self.fetchMoreHistory();
+        if (haveMoreHistory && this.state === SearchState.kInProgress) {
+            this.fetchMoreHistory();
         }
     }
     else {
         // we may receive a dummy event, then numFetched will be 0
-        self.logger.debug("onHistoryFetched: No new messages fetched");
+        this.logger.debug('onHistoryFetched: No new messages fetched');
     }
-    if (self.state === SearchState.kDestroying || !haveMoreHistory && self.state !== SearchState.kPaused) {
-        self._setComplete();
+    if (this.state === SearchState.kDestroying || !haveMoreHistory && this.state !== SearchState.kPaused) {
+        this._setComplete();
     }
 };
 
 RoomSearch.prototype._destroy = function() {
-    "use strict";
+    'use strict';
     this._setState(this.state === SearchState.kComplete ? this.state : SearchState.kDestroying);
     this.room.detachSearch();
     this.room.unbind(CS_HISTDECRYPTED_EVENTNAME);
 };
 
 RoomSearch.prototype.pause = function() {
-    "use strict";
+    'use strict';
     if (this.state === SearchState.kInProgress) {
         this._setState(SearchState.kPaused);
     }
 };
 
 RoomSearch.prototype._setState = function(newState) {
-    "use strict";
+    'use strict';
     // todo: validate state transitions
     this.state = newState;
 };
 
 RoomSearch.prototype._setComplete = function() {
-    "use strict";
+    'use strict';
     if (this.state === SearchState.kComplete) {
         return;
     }
     delete this._isFetchingHistory;
     this._setState(SearchState.kComplete);
     this.room.unbind(CS_HISTDECRYPTED_EVENTNAME);
-    this.logger.log("Fetch and search complete", "(total", this.room.messagesBuff.messages.length, "messages)");
+    this.logger.log('Fetch and search complete', `(total ${this.room.messagesBuff.messages.length} messages)`);
     this.room.detachSearch();
-    this.parentSearch.onRoomSearchComplete(this);
+    this.parentSearch.onRoomSearchComplete();
 };
 
 /**
@@ -257,82 +261,68 @@ RoomSearch.prototype._setComplete = function() {
  * @returns {ChatSearch} ChatSearch instance
  */
 function ChatSearch(megaChat, chatId, searchExpr, handler, searchMessages) {
-    "use strict";
-    var self = this;
-    self.megaChat = megaChat;
-    self.allChats = megaChat.chats;
-    self.searchMessages = searchMessages;
+    'use strict';
+    this.megaChat = megaChat;
+    this.allChats = megaChat.chats;
+    this.searchMessages = searchMessages;
 
     // normalize
     searchExpr = ChatSearch._normalize_str(searchExpr);
 
-    self.originalSearchString = searchExpr;
-    self.searchRegExps = [];
+    this.originalSearchString = searchExpr;
+    this.searchRegExps = [];
 
-    var searchWords = searchExpr.split(" ");
-    for (var i = 0; i < searchWords.length; i++) {
-        var word = searchWords[i];
+    for (const word of searchExpr.split(' ')) {
         if (word !== '') {
-            // prepend ^ if the searchExpr is <= 2 chars length and only one word
-            self.searchRegExps.push(
-                new RegExp((searchWords.length === 1 && searchExpr.length <= 2 ? "^" : "") + RegExpEscape(word), 'gi')
-            );
+            this.searchRegExps.push(new RegExp(RegExpEscape(word), 'gi'));
         }
     }
 
-    self.setupLogger();
-    var searches = self.roomSearches = [];
+    this.setupLogger();
+    this.roomSearches = [];
     if (handler) {
-        self.handler = handler;
+        this.handler = handler;
     }
     else { // default, dummy handler
-        self.handler = {
-            onResult: function(room, result) {
-                var data = result.data;
-                if (data && typeof data === 'object') { // may not be JSON-friendly
-                    var ctor = data.constructor;
-                    if (ctor && ctor.name) {
-                        result.data = "<" + ctor.name + " object>";
-                    }
-                    else {
-                        result.data = "<object with unknown type>";
-                    }
-                }
-                var msg = "onResult(" + room.chatId +
-                    ", {type: " + constStateToText(SearchResultType, result.type) +
-                    ", text: \"" + result.text + "\", matches: " + JSON.stringify(result.matches);
-                if (result.data) {
-                    msg += ", data: " + result.data;
-                }
-                msg += "})";
-                console.warn(msg);
-            },
-            onComplete: function() {
-                console.warn("Chat search complete!");
-            }
+        this.handler = {
+            onResult: this.defaultOnResult,
+            onComplete: () => console.warn('Chat search complete!'),
         };
     }
     if (chatId) { // search a specific chatroom
-        for (var roomId in megaChat.chats) {
-            var room = megaChat.chats[roomId];
-            if (megaChat.chats.hasOwnProperty(roomId) && room.chatId === chatId) {
-                searches.push(new RoomSearch(self, room));
+        for (const roomId in megaChat.chats) {
+            if (megaChat.chats.hasOwnProperty(roomId) && roomId === chatId) {
+                this.roomSearches.push(new RoomSearch(this, megaChat.chats[roomId]));
             }
         }
 
-        if (searches.length < 1) {
-            throw new Error("Could not find a room for chatid " + chatId);
+        if (!this.roomSearches.length) {
+            throw new Error(`Could not find a room for chatid ${chatId}`);
         }
     }
     else { // search all chatrooms
-        for (var roomId2 in self.allChats) {
-            if (self.allChats.hasOwnProperty(roomId2)) {
-                var room2 = self.allChats[roomId2];
-                searches.push(new RoomSearch(self, room2));
+        for (const roomId in this.allChats) {
+            if (this.allChats.hasOwnProperty(roomId)) {
+                this.roomSearches.push(new RoomSearch(this, this.allChats[roomId]));
             }
         }
     }
 }
+
+ChatSearch.prototype.defaultOnResult = function(room, result) {
+    'use strict';
+    const { data, type, matches, text } = result;
+    const { chatId } = room;
+    if (typeof data === 'object') { // may not be JSON-friendly
+        const ctor = data.constructor;
+        result.data = ctor && ctor.name ? `<${ctor.name} object>` : '<object with unknown type>';
+    }
+    const pType = constStateToText(SearchResultType, type);
+    const pMatches = JSON.stringify(matches);
+    const pData = data ? `, data: ${data}` : '';
+    const msg = `onResult(${chatId}, {type: ${pType}, text: "${text}", matches: ${pMatches}${pData}})`;
+    console.warn(msg);
+};
 
 /**
  * Alias for String.prototype.normalize + replace
@@ -342,7 +332,7 @@ function ChatSearch(megaChat, chatId, searchExpr, handler, searchMessages) {
  * @private
  */
 ChatSearch._normalize_str = function(s) {
-    "use strict";
+    'use strict';
     if (s && s.normalize) {
         return s.normalize("NFD")
             .replace(/[\u0300-\u036f]/g, "")
@@ -359,9 +349,7 @@ ChatSearch._normalize_str = function(s) {
             .replace(/\u0110/g, "D")
             .replace(/\u00fe/g, "p");
     }
-    else {
-        return s;
-    }
+    return s;
 };
 
 /**
@@ -374,7 +362,7 @@ ChatSearch._normalize_str = function(s) {
  * @returns {Promise}
  */
 ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMessages) {
-    "use strict";
+    'use strict';
 
     if (ChatSearch.doSearch.cs) {
         if (d) {
@@ -383,7 +371,7 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
         ChatSearch.doSearch.cs.destroy(SearchState.kDestroying);
     }
 
-    var results = {
+    const results = {
         CONTACTS_AND_CHATS: new MegaDataSortedMap('resultId', (a, b) => {
             const aLastActivity = a.lastActivity || 0;
             const bLastActivity = b.lastActivity || 0;
@@ -396,34 +384,31 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
 
     ChatSearch.doSearch.currentResults = results;
 
-    var resultId = 0;
-
-    var contactHandleCache = {};
-    var stime = unixtime();
-    var handler = {
-        'onResult': tryCatch(function(room, resultMeta) {
+    let resultId = 0;
+    const contactHandleCache = {};
+    const stime = performance.now();
+    const handler = {
+        onResult: tryCatch((room, resultMeta) => {
             resultMeta.room = room;
             resultMeta.chatId = room.chatId;
             resultMeta.data = resultMeta.data || room.chatId;
-            resultMeta.lastActivity = room.lastActivity;
+            resultMeta.lastActivity = room.lastActivity || room.ctime;
             resultMeta.nameRef = room.nameRef;
             resultMeta.resultId = resultId++;
 
             if (resultMeta.type === SearchResultType.kMessage) {
                 results.MESSAGES.push(resultMeta);
             }
-            else {
-                if (!contactHandleCache[resultMeta.data]) {
-                    results.CONTACTS_AND_CHATS.push(resultMeta);
-                    contactHandleCache[resultMeta.data] = true;
-                }
+            else if (!contactHandleCache[resultMeta.data]) {
+                results.CONTACTS_AND_CHATS.push(resultMeta);
+                contactHandleCache[resultMeta.data] = true;
             }
 
             if (typeof onResult === 'function') {
                 onResult(room.chatId, resultMeta, results);
             }
         }),
-        'onComplete': function(reason) {
+        onComplete: function(reason) {
             delete ChatSearch.doSearch.cs;
 
             if (reason === SearchState.kDestroying) {
@@ -432,22 +417,23 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
             else {
                 resolve(results);
             }
-            eventlog(99734, JSON.stringify([1, s.length, reason | 0, resultId, unixtime() - stime]));
+            eventlog(99734, JSON.stringify([
+                1, s.length, reason | 0, resultId, Math.ceil(performance.now() - stime)
+            ]));
 
             // @todo indicate whether chats and/or messages (?)
             mBroadcaster.sendMessage('treesearch', s, 'chat', resultId);
         },
-        'onDestroy': function(ex) {
+        onDestroy: function(ex) {
             delete ChatSearch.doSearch.cs;
             reject(ex);
         }
     };
 
-
     ChatSearch.doSearch.cs = new ChatSearch(megaChat, false, s, handler, searchMessages);
 
     results.dump = function() {
-        for (var r in results) {
+        for (const r in results) {
             if (results.hasOwnProperty(r)) {
                 console.error(r.data && r.data.messageId ? r.data.messageId : null, r.chatId, r.type, r);
             }
@@ -459,16 +445,15 @@ ChatSearch.doSearch = promisify(function(resolve, reject, s, onResult, searchMes
 });
 
 ChatSearch.prototype.setupLogger = function() {
-    "use strict";
+    'use strict';
 
-    var self = this;
-    var opts = {
+    const opts = {
         minLogLevel: function() {
             return MegaLogger.LEVELS.DEBUG;
         },
         transport: function(level, args) {
-            var fn;
-            var levels = MegaLogger.LEVELS;
+            let fn;
+            const levels = MegaLogger.LEVELS;
             switch (level) {
                 case levels.ERROR:
                 case levels.CRITICAL:
@@ -493,8 +478,8 @@ ChatSearch.prototype.setupLogger = function() {
             console[fn].apply(console, args);
         }
     };
-    self.logger = new MegaLogger('ChatSearch', opts);
-    self.logger._myOpts = opts;
+    this.logger = new MegaLogger('ChatSearch', opts);
+    this.logger._myOpts = opts;
 };
 
 /**
@@ -503,10 +488,10 @@ ChatSearch.prototype.setupLogger = function() {
  * @returns {undefined}
  */
 ChatSearch.prototype.resume = function() {
-    "use strict";
+    'use strict';
 
-    var len = this.roomSearches.length;
-    for (var i = 0; i < len; i++) {
+    const len = this.roomSearches.length;
+    for (let i = 0; i < len; i++) {
         this.roomSearches[i].resume();
     }
 
@@ -540,10 +525,10 @@ ChatSearch.prototype.resume = function() {
  * @returns {undefined}
  */
 ChatSearch.prototype.pause = function() {
-    "use strict";
+    'use strict';
 
-    var len = this.roomSearches.length;
-    for (var i = 0; i < len; i++) {
+    const len = this.roomSearches.length;
+    for (let i = 0; i < len; i++) {
         this.roomSearches[i].pause();
     }
 };
@@ -554,12 +539,10 @@ ChatSearch.prototype.pause = function() {
  * @returns {undefined}
  */
 ChatSearch.prototype.onRoomSearchComplete = function() {
-    "use strict";
-
-    var searches = this.roomSearches;
-    var len = searches.length;
-    for (var i = 0; i < len; i++) {
-        if (searches[i].state < SearchState.kComplete) {
+    'use strict';
+    const len = this.roomSearches.length;
+    for (let i = 0; i < len; i++) {
+        if (this.roomSearches[i].state < SearchState.kComplete) {
             return;
         }
     }
@@ -573,9 +556,9 @@ ChatSearch.prototype.onRoomSearchComplete = function() {
  * @returns {undefined}
  */
 ChatSearch.prototype.dumpRoomSearchesStates = function() {
-    "use strict";
+    'use strict';
 
-    for (var rs in this.roomSearches) {
+    for (let rs in this.roomSearches) {
         if (this.roomSearches.hasOwnProperty(rs)) {
             rs = this.roomSearches[rs];
             console.error(constStateToText(SearchState, rs.state), rs);
@@ -630,12 +613,11 @@ ChatSearch.prototype._match = function(text, type, data, roomSearch, index) {
  * @returns {undefined}
  */
 ChatSearch.prototype.destroy = function(reason) {
-    "use strict";
+    'use strict';
 
-    var searches = this.roomSearches;
-    var len = searches.length;
-    for (var i = 0; i < len; i++) {
-        searches[i]._destroy();
+    const len = this.roomSearches.length;
+    for (let i = 0; i < len; i++) {
+        this.roomSearches[i]._destroy();
     }
 
     if (ChatSearch._instance === this) {

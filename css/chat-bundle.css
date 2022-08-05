@@ -1314,6 +1314,8 @@
   z-index: 1125;
   width: 320px;
   height: 240px;
+  bottom: 80px;
+  border: 1px solid rgb(33, 33, 33);
 }
 .local-stream.minimized.ratio-16-9 {
   width: 334px;

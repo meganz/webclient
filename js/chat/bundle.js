@@ -20789,15 +20789,15 @@ class Stream extends mixins.wl {
         localAudioMuted: !(call.av & SfuClient.Av.Audio)
       }), external_React_default().createElement("div", {
         className: `${Local.NAMESPACE}-self-overlay`
-      }, external_React_default().createElement(meetings_button.Z, {
+      }, minimized ? null : external_React_default().createElement(meetings_button.Z, {
         className: `
-                        mega-button
-                        theme-light-forced
-                        action
-                        small
-                        local-stream-options-control
-                        ${options ? 'active' : ''}
-                    `,
+                                mega-button
+                                theme-light-forced
+                                action
+                                small
+                                local-stream-options-control
+                                ${options ? 'active' : ''}
+                            `,
         icon: "sprite-fm-mono icon-options",
         onClick: () => this.handleOptionsToggle()
       }), options && this.renderOptionsDialog()));

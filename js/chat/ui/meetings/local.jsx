@@ -383,18 +383,21 @@ class Stream extends MegaRenderMixin {
                     localAudioMuted={!(call.av & SfuClient.Av.Audio)}
                 />
                 <div className={`${Local.NAMESPACE}-self-overlay`}>
-                    <Button
-                        className={`
-                        mega-button
-                        theme-light-forced
-                        action
-                        small
-                        local-stream-options-control
-                        ${options ? 'active' : ''}
-                    `}
-                        icon="sprite-fm-mono icon-options"
-                        onClick={() => this.handleOptionsToggle()}
-                    />
+                    {minimized ?
+                        null :
+                        <Button
+                            className={`
+                                mega-button
+                                theme-light-forced
+                                action
+                                small
+                                local-stream-options-control
+                                ${options ? 'active' : ''}
+                            `}
+                            icon="sprite-fm-mono icon-options"
+                            onClick={() => this.handleOptionsToggle()}
+                        />
+                    }
                     {options && this.renderOptionsDialog()}
                 </div>
             </>

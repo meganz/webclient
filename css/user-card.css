@@ -191,7 +191,7 @@ button.user-card-name:hover {
     display:  none;
 }
 .contacts-info .user-card-tick-wrap + .user-card-data {
-    padding-right: 40px;
+    padding-right: 20px;
 }
 .selected .user-card-tick-wrap {
     background: var(--checkbox-fill-active);

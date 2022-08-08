@@ -175,14 +175,6 @@ export default class ContactsPanel extends MegaRenderMixin {
                                 <span>{l[19062] /* `Accept all` */}</span>
                             </button>
                         )}
-                        {ContactsPanel.hasContacts() && (
-                            <button
-                                className="mega-button action"
-                                onClick={() => contactAddDialog()}>
-                                <i className="sprite-fm-mono icon-add-circle" />
-                                <span>{l[71] /* `Add contact` */}</span>
-                            </button>
-                        )}
                     </div>
                 )}
 

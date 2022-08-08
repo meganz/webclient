@@ -49,16 +49,6 @@ export default class Navigation extends MegaRenderMixin {
                         })}
                     </ul>
                 </div>
-                {ContactsPanel.hasContacts() ? null : (
-                    <div className="back-to-landing">
-                        <Button
-                            className="mega-button action"
-                            icon="sprite-fm-mono icon-left"
-                            onClick={() => loadSubPage('fm/chat')}>
-                            {l.back_to_chat_landing_page}
-                        </Button>
-                    </div>
-                )}
             </>
         );
     }

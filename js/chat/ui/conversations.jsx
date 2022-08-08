@@ -1,22 +1,20 @@
 // libs
 import { hot } from 'react-hot-loader/root';
-var React = require("react");
+import React from 'react';
 import utils, { Emoji, OFlowEmoji, OFlowParsedHTML, ParsedHTML } from './../../ui/utils.jsx';
-var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
-import {MegaRenderMixin, timing} from './../mixins';
-import {Button} from './../../ui/buttons.jsx';
-import {DropdownContactsSelector} from './../../ui/dropdowns.jsx';
-import {ConversationPanels} from "./../ui/conversationpanel.jsx";
-import SearchPanel from './searchPanel/searchPanel.jsx';
+import { MegaRenderMixin, timing } from '../mixins.js';
+import { Button } from '../../ui/buttons.jsx';
+import { ConversationPanels, EmptyConvPanel } from "./conversationpanel.jsx";
 import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import { Avatar, ContactAwareName } from "./contacts.jsx";
-var StartGroupChatWizard = require('./startGroupChatWizard.jsx').StartGroupChatWizard;
-import {Start as StartMeetingDialog} from "./meetings/workflow/start.jsx";
+import { Start as StartMeetingDialog } from "./meetings/workflow/start.jsx";
+import { StartGroupChatWizard } from './startGroupChatWizard.jsx';
 import MeetingsCallEndedDialog from "./meetings/meetingsCallEndedDialog.jsx";
 import { inProgressAlert } from './meetings/call.jsx';
 import Nil from './contactsPanel/nil.jsx';
 import ChatToaster from "./chatToaster";
+import LeftPanel from './leftPanel/leftPanel';
 
 var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
@@ -270,13 +268,24 @@ class ConversationsListItem extends MegaRenderMixin {
                 className={classString}
                 data-room-id={roomId}
                 data-jid={contactId}
-                onClick={ev => this.props.onConversationClicked(ev)}>
+                onClick={ev => this.props.onConversationClick(ev)}>
                 <div className="conversation-avatar">
-                    {chatRoom.type === 'group' || chatRoom.type === 'public' ?
-                        <div className="chat-topic-icon">
-                            <i className="sprite-fm-uni icon-chat-group" />
-                        </div> :
-                        <Avatar contact={chatRoom.getParticipantsExceptMe()[0]} />}
+                    {(chatRoom.type === 'group' || chatRoom.type === 'public') &&
+                        <div
+                            className={`
+                                chat-topic-icon
+                                ${chatRoom.isMeeting ? 'meeting-icon' : ''}
+                            `}>
+                            <i
+                                className={
+                                    chatRoom.isMeeting ?
+                                        'sprite-fm-mono icon-video-call-filled' :
+                                        'sprite-fm-uni icon-chat-group'
+                                }
+                            />
+                        </div>
+                    }
+                    {chatRoom.type === 'private' && <Avatar contact={chatRoom.getParticipantsExceptMe()[0]} />}
                 </div>
                 <div className="conversation-data">
                     <div className="conversation-data-top">
@@ -321,7 +330,7 @@ class ArchConversationsListItem extends MegaRenderMixin {
         chatRoom.removeChangeListener(this.chatRoomChangeListener);
     }
     render() {
-        const { chatRoom, onConversationSelected, onConversationClicked, onUnarchiveClicked } = this.props;
+        const { chatRoom, onConversationSelected, onConversationClick, onUnarchiveClicked } = this.props;
         let classString = 'arc-chat-list ui-droppable ui-draggable ui-draggable-handle';
 
         if (!chatRoom || !chatRoom.chatId) {
@@ -416,7 +425,7 @@ class ArchConversationsListItem extends MegaRenderMixin {
                 data-room-id={roomId}
                 data-jid={contactId}
                 onClick={onConversationSelected}
-                onDoubleClick={onConversationClicked}>
+                onDoubleClick={onConversationClick}>
                 <td>
                     <div className="fm-chat-user-info todo-star">
                         <div className={nameClassString}>
@@ -453,89 +462,8 @@ class ArchConversationsListItem extends MegaRenderMixin {
     }
 }
 
-class ConversationsHead extends MegaRenderMixin {
-    requestReceivedListener = null;
-
-    state = {
-        receivedRequestsCount: 0
-    };
-
-    constructor(props) {
-        super(props);
-        this.state.receivedRequestsCount = Object.keys(M.ipc).length;
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        if (this.requestReceivedListener) {
-            mBroadcaster.removeListener(this.requestReceivedListener);
-        }
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
-        this.requestReceivedListener = mBroadcaster.addListener('fmViewUpdate:ipc', () =>
-            this.setState({ receivedRequestsCount: Object.keys(M.ipc).length })
-        );
-    }
-
-    render() {
-        const { contactsActive, showTopButtons, showAddContact, onSelectDone } = this.props;
-        const { receivedRequestsCount } = this.state;
-        const ROUTES = { CHAT: 'fm/chat', CONTACTS: 'fm/chat/contacts' };
-        const CONTACTS_ACTIVE = window.location.pathname.includes(ROUTES.CONTACTS);
-
-        return (
-            <div className="lp-header">
-                <span>{l[5902] /* `Conversations` */}</span>
-                {!is_eplusplus && !is_chatlink && (
-                    <div className="conversations-head-buttons">
-                        <div className="contacts-toggle">
-                            <Button
-                                receivedRequestCount={receivedRequestsCount}
-                                className={`
-                                    mega-button
-                                    round
-                                    branded-blue
-                                    contacts-toggle-button
-                                    ${contactsActive ? 'active' : ''}
-                                    ${receivedRequestsCount > 0 ? 'requests' : ''}
-                                `}
-                                icon={`
-                                    sprite-fm-mono
-                                    icon-contacts
-                                    ${CONTACTS_ACTIVE ? '' : 'active'}
-                                `}
-                                onClick={() => loadSubPage(CONTACTS_ACTIVE ? ROUTES.CHAT : ROUTES.CONTACTS)}>
-                                {!!receivedRequestsCount && (
-                                    <div className="notifications-count">
-                                        <span>{receivedRequestsCount > 9 ? '9+' : receivedRequestsCount }</span>
-                                    </div>
-                                )}
-                            </Button>
-                        </div>
-                        <Button
-                            group="conversationsListing"
-                            className="mega-button round positive"
-                            icon="sprite-fm-mono icon-add">
-                            <DropdownContactsSelector
-                                className="main-start-chat-dropdown"
-                                onSelectDone={onSelectDone}
-                                multiple={false}
-                                showTopButtons={showTopButtons}
-                                showAddContact={showAddContact}
-                            />
-                        </Button>
-                    </div>
-                )}
-            </div>
-        );
-    }
-}
-
-class ConversationsList extends MegaRenderMixin {
+export class ConversationsList extends MegaRenderMixin {
     backgroundUpdateInterval = null;
-    conversations = megaChat.chats.toJS();
 
     static defaultProps = {
         manualDataChangeTracking: true
@@ -578,29 +506,48 @@ class ConversationsList extends MegaRenderMixin {
     }
 
     render() {
-        return (
-            <ul className="conversations-pane">
-                {Object.values(this.conversations).sort(M.sortObjFn(room => room.lastActivity || room.ctime, -1))
-                    .map(chatRoom => {
-                        if (chatRoom.roomId && chatRoom.isDisplayable()) {
-                            return (
-                                <ConversationsListItem
-                                    key={chatRoom.roomId}
-                                    chatRoom={chatRoom}
-                                    contact={M.u[chatRoom.getParticipantsExceptMe()[0]] || null}
-                                    messages={chatRoom.messagesBuff}
-                                    onConversationClicked={() => loadSubPage(chatRoom.getRoomUrl(false))}
-                                />
-                            );
-                        }
-                        return null;
-                    })}
-            </ul>
-        );
+        const { conversations, view, views, onConversationClick } = this.props;
+
+        if (conversations && conversations.length) {
+            return (
+                <ul className="conversations-pane">
+                    {conversations.sort(M.sortObjFn(room => room.lastActivity || room.ctime, -1))
+                        .map(chatRoom => {
+                            if (chatRoom.roomId) {
+                                return (
+                                    <ConversationsListItem
+                                        key={chatRoom.roomId}
+                                        chatRoom={chatRoom}
+                                        contact={M.u[chatRoom.getParticipantsExceptMe()[0]] || null}
+                                        messages={chatRoom.messagesBuff}
+                                        onConversationClick={() => {
+                                            loadSubPage(chatRoom.getRoomUrl(false));
+                                            if (onConversationClick) {
+                                                onConversationClick(chatRoom);
+                                            }
+                                        }}
+                                    />
+                                );
+                            }
+                            return null;
+                        })}
+                </ul>
+            );
+        }
+
+        if (view === views.CHATS) {
+            return <span className="empty-conversations">{l.no_chats_lhp}</span>;
+        }
+
+        if (view === views.MEETINGS) {
+            return <span className="empty-conversations">{l.no_meetings_lhp}</span>;
+        }
+
+        return null;
     }
 }
 
-class ArchivedConversationsList extends MegaRenderMixin {
+export class ArchivedConversationsList extends MegaRenderMixin {
     constructor (props) {
         super(props);
         this.state = this.getInitialState();
@@ -668,6 +615,7 @@ class ArchivedConversationsList extends MegaRenderMixin {
         });
     }
     render() {
+        const { view, views } = this.props;
         var self = this;
         var currConvsList = [];
 
@@ -694,6 +642,12 @@ class ArchivedConversationsList extends MegaRenderMixin {
                 return;
             }
             if (!chatRoom.isArchived()) {
+                return;
+            }
+            if (
+                view === views.MEETINGS && !chatRoom.isMeeting
+                || view === views.CHATS && chatRoom.isMeeting
+            ) {
                 return;
             }
 
@@ -726,7 +680,7 @@ class ArchivedConversationsList extends MegaRenderMixin {
                     chatRoom={chatRoom}
                     contact={contact}
                     messages={chatRoom.messagesBuff}
-                    onConversationClicked={(e) => {
+                    onConversationClick={(e) => {
                         self.conversationClicked(chatRoom, e);
                 }}
                     onConversationSelected={(e) => {
@@ -813,19 +767,28 @@ class ArchivedConversationsList extends MegaRenderMixin {
 }
 
 class ConversationsApp extends MegaRenderMixin {
+    requestReceivedListener = null;
+
+    VIEWS = {
+        CHATS: 0x00,
+        MEETINGS: 0x01,
+        LOADING: 0x02
+    };
+
+    state = {
+        leftPaneWidth: mega.config.get('leftPaneWidth'),
+        startGroupChatDialog: false,
+        startMeetingDialog: false,
+        view: this.VIEWS.LOADING
+    };
+
     constructor(props) {
         super(props);
-        this.state = {
-            leftPaneWidth: mega.config.get('leftPaneWidth'),
-            startGroupChatDialogShown: false,
-            startMeetingDialog: false
-        };
         this.handleWindowResize = this.handleWindowResize.bind(this);
-
         this._cacheRouting();
-
         megaChat.rebind('onStartNewMeeting.convApp', () => this.startMeeting());
     }
+
     startMeeting() {
         if (megaChat.hasSupportForCalls) {
             return inProgressAlert()
@@ -834,11 +797,13 @@ class ConversationsApp extends MegaRenderMixin {
         }
         return showToast('warning', l[7211] /* `Your browser does not have the required audio/video capabilities` */);
     }
+
     _cacheRouting() {
         this.routingSection = this.props.megaChat.routingSection;
         this.routingSubSection = this.props.megaChat.routingSubSection;
         this.routingParams = this.props.megaChat.routingParams;
     }
+
     specShouldComponentUpdate() {
         // Since this is a root component, there are issues with it (or the hotreload) causing it to not properly
         // update when needed, so we need to cache important root re-updates in here.
@@ -851,25 +816,10 @@ class ConversationsApp extends MegaRenderMixin {
             return true;
         }
     }
-    startChatClicked(selected) {
-        if (selected.length === 1) {
-            megaChat.createAndShowPrivateRoom(selected[0])
-                .then(function(room) {
-                    room.setActive();
-                });
-        }
-        else {
-            megaChat.createAndShowGroupRoomFor(selected);
-        }
-    }
+
     componentDidMount() {
         super.componentDidMount();
         var self = this;
-
-        $(document.body).rebind('startNewChatLink.conversations', function(e) {
-            self.startGroupChatFlow = 2;
-            self.setState({'startGroupChatDialogShown': true});
-        });
 
         window.addEventListener('resize', this.handleWindowResize);
         $(document).rebind('keydown.megaChatTextAreaFocus', function(e) {
@@ -1011,6 +961,7 @@ class ConversationsApp extends MegaRenderMixin {
         }
         this.handleWindowResize();
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         window.removeEventListener('resize', this.handleWindowResize);
@@ -1053,60 +1004,34 @@ class ConversationsApp extends MegaRenderMixin {
                 });
         }
     }
+
     initArchivedChatsScrolling() {
         var scroll = '.archive-chat-list';
         deleteScrollPanel(scroll, 'jsp');
         $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
         jScrollFade(scroll);
     }
-    archiveChatsClicked = () => {
-        loadSubPage('fm/chat/archived');
-    };
-    calcArchiveChats() {
-        var count = 0;
+
+    getArchivedCount() {
+        let count = 0;
+        const { view } = this.state;
         megaChat.chats.forEach((chatRoom) => {
             if (!chatRoom || !chatRoom.roomId) {
                 return;
             }
-            if (chatRoom.isArchived()) {
+            if (!chatRoom.isArchived()) {
+                return;
+            }
+            if (
+                view === this.VIEWS.MEETINGS && chatRoom.isMeeting
+                || view === this.VIEWS.CHATS && !chatRoom.isMeeting
+            ) {
                 count++;
             }
         });
         return count;
     }
-    getContactsPickerButtons() {
-        if (!this._topButtonsContactsPicker) {
-            this._topButtonsContactsPicker = [
-                {
-                    key: 'newGroupChat',
-                    title: l[19483],
-                    icon: 'sprite-fm-mono icon-chat-filled',
-                    onClick: () => {
-                        this.startGroupChatFlow = 1;
-                        this.setState({ startGroupChatDialogShown: true });
-                    }
-                },
-                {
-                    key: 'newMeeting',
-                    className: 'new-meeting',
-                    title: l.new_meeting,
-                    icon: 'sprite-fm-mono icon-video-call-filled',
-                    onClick: () => this.startMeeting()
-                },
-                {
-                    key: 'newChatLink',
-                    className: 'new-chatlink',
-                    title: l[20638],
-                    icon: 'sprite-fm-mono icon-channel-new',
-                    onClick: () => {
-                        this.startGroupChatFlow = 2;
-                        this.setState({ startGroupChatDialogShown: true });
-                    }
-                }
-            ];
-        }
-        return this._topButtonsContactsPicker;
-    }
+
     createMeetingEndDlgIfNeeded() {
         if (megaChat.initialPubChatHandle || megaChat.initialChatId) {
 
@@ -1144,206 +1069,128 @@ class ConversationsApp extends MegaRenderMixin {
         }
         return null;
     }
+
+    getConversations() {
+        return Object.values(megaChat.chats).filter(c => {
+            return c.isDisplayable() && (this.state.view === this.VIEWS.MEETINGS ? c.isMeeting : !c.isMeeting);
+        });
+    }
+
+    renderView(view) {
+        this.setState({ view }, () => {
+            const { $chatTreePanePs, routingSection } = megaChat;
+            $chatTreePanePs.reinitialise();
+            if (routingSection !== 'chat') {
+                loadSubPage('fm/chat');
+            }
+        });
+    }
+
     render() {
-        var self = this;
-
-        var startGroupChatDialog = null;
-        if (self.state.startGroupChatDialogShown === true) {
-            startGroupChatDialog = <StartGroupChatWizard
-                    name="start-group-chat"
-                    flowType={self.startGroupChatFlow}
-                    onClose={() => {
-                        self.setState({'startGroupChatDialogShown': false});
-                        delete self.startGroupChatFlow;
-                    }}
-                    onConfirmClicked={() => {
-                        self.setState({'startGroupChatDialogShown': false});
-                        delete self.startGroupChatFlow;
-                    }}
-                />;
-        }
-
-        var startMeetingDialog = null;
-        if (self.state.startMeetingDialog === true) {
-            startMeetingDialog = (
-                <StartMeetingDialog
-                    onStart={(topic, audio, video) => {
-                        megaChat.createAndStartMeeting(topic, audio, video);
-                        this.setState({ startMeetingDialog: false });
-                    }}
-                    onClose={() => this.setState({ startMeetingDialog: false })}
-                />
-            );
-        }
-
-        var leftPanelStyles = {};
-        if (self.state.leftPaneWidth) {
-            leftPanelStyles.width = self.state.leftPaneWidth;
-        }
-
-        var loadingOrEmpty = null;
-        var isLoading = false;
-
-        var nonArchivedChats = megaChat.chats.map(function(r) { return !r.isArchived() ? r : undefined; });
-        if (nonArchivedChats.length === 0) {
-            loadingOrEmpty = <div className="fm-empty-messages hidden">
-                <div className="fm-empty-pad">
-                    <div className="fm-empty-messages-bg"></div>
-                    <div className="fm-empty-cloud-txt">{l[6870]}</div>
-                    <div className="fm-not-logged-text">
-                        <div className="fm-not-logged-description">
-                            <ParsedHTML>
-                                {l[8762].replace("[S]", "<span className='red'>").replace("[/S]", "</span>")}
-                            </ParsedHTML>
-                        </div>
-                        <div className="fm-not-logged-button create-account">
-                            {l[968]}
-                        </div>
-                    </div>
-                </div>
-            </div>;
-        }
-        else if (
-            !megaChat.currentlyOpenedChat &&
+        const { CHATS, MEETINGS } = this.VIEWS;
+        const { routingSection, chatUIFlags, currentlyOpenedChat } = megaChat;
+        const { view, startGroupChatDialog, startMeetingDialog, leftPaneWidth } = this.state;
+        const conversations = this.getConversations();
+        const isEmpty =
+            conversations &&
+            conversations.length === 0 &&
+            routingSection === 'chat' &&
+            !currentlyOpenedChat &&
+            !is_chatlink;
+        const isLoading =
+            !currentlyOpenedChat &&
             megaChat.allChatsHadInitialLoadedHistory() === false &&
-            megaChat.routingSection !== "archived"
-        ) {
-            loadingOrEmpty = <div className="fm-empty-messages">
-                <div className="loading-spinner js-messages-loading light manual-management" style={{"top":"50%"}}>
-                    <div className="main-loader" style={{
-                        "position":"fixed",
-                        "top": "50%",
-                        "left": "50%",
-                        "marginLeft": "72px"
-                    }}></div>
-                </div>
-            </div>;
-            isLoading = true;
-        }
-        else if (
-            /* is chat link scenario, where we want to delay the loading until hist had finished loading */
-            is_chatlink && (
-                !megaChat.getCurrentRoom() || /* not initialized the chat link room */
-                megaChat.getCurrentRoom().initialMessageHistLoaded === false /* haven't loaded the history yet */
-            )
-        ) {
-            loadingOrEmpty = <div className="fm-empty-messages">
-                <div className="loading-spinner js-messages-loading light manual-management" style={{"top":"50%"}}>
-                    <div className="main-loader" style={{
-                        "position":"fixed",
-                        "top": "50%",
-                        "left": "50%",
-                    }}></div>
-                </div>
-            </div>;
+            routingSection !== 'archived' &&
+            routingSection !== 'contacts';
 
-            const currentChatRoom = megaChat.getCurrentRoom();
-            if (currentChatRoom) {
-                // if we are waiting for messages to be loaded, trigger a force update once thats done.
-                currentChatRoom.one('onMessagesHistoryDone.loadingStop', () => this.safeForceUpdate());
-            }
-            isLoading = true;
-        }
-
-        var rightPaneStyles = {};
-        if (is_chatlink && !is_eplusplus) {
-            rightPaneStyles = {'marginLeft': 0};
-        }
-
-        let meetingsCallEndedDialog = this.createMeetingEndDlgIfNeeded();
-
-        const rightPane = <div className={`fm-right-files-block in-chat ${
-            is_chatlink ? " chatlink" : ""
-        }`} style={rightPaneStyles}>
-            {loadingOrEmpty}
-            {!isLoading && <ChatToaster isRootToaster={true}/>}
-            {
-                !isLoading && megaChat.routingSection === "archived" &&
-                <ArchivedConversationsList key="archivedchats" />
-            }
-            {!isLoading && megaChat.routingSection === "contacts" &&
-                <ContactsPanel megaChat={megaChat} contacts={M.u} received={M.ipc} sent={M.opc} />
-            }
-            {!isLoading && megaChat.routingSection === "notFound" &&
-                <span><center>Section not found</center></span>
-            }
-            {!isLoading && meetingsCallEndedDialog}
-            {!isLoading ?
-                <ConversationPanels
-                    {...this.props}
-                    chatUIFlags={megaChat.chatUIFlags}
-                    displayArchivedChats={megaChat.routingSection === "archived"}
-                    className={megaChat.routingSection !== "chat" ? 'hidden' : ''}
-                    currentlyOpenedChat={megaChat.currentlyOpenedChat}
-                    chats={megaChat.chats}
-                /> : null
-            }
-        </div>;
-
-        var archivedChatsCount = this.calcArchiveChats();
-        var arcBtnClass = "left-pane-button archived";
-        var arcIconClass = "small-icon archive colorized";
-
-        if (megaChat.routingSection === "archived") {
-            arcBtnClass += ' active';
-            arcIconClass = arcIconClass.replace('colorized', 'white');
-        }
+        const rightPane = (
+            <div
+                className={`
+                    fm-right-files-block
+                    in-chat
+                    ${is_chatlink ? 'chatlink' : ''}
+                `}>
+                {!isLoading && <ChatToaster isRootToaster={true}/>}
+                {!isLoading && routingSection === 'archived' && (
+                    <ArchivedConversationsList
+                        key="archivedchats"
+                        view={view}
+                        views={this.VIEWS}
+                    />
+                )}
+                {!isLoading && routingSection === 'contacts' && (
+                    <ContactsPanel megaChat={megaChat} contacts={M.u} received={M.ipc} sent={M.opc}/>
+                )}
+                {!isLoading && routingSection === 'notFound' && <span><center>Section not found</center></span>}
+                {!isLoading && this.createMeetingEndDlgIfNeeded()}
+                {!isLoading && isEmpty &&
+                    <EmptyConvPanel
+                        isMeeting={view === MEETINGS}
+                        onNewClick={() =>
+                            view === MEETINGS ?
+                                this.startMeeting() :
+                                this.setState({ startGroupChatDialog: true })
+                        }
+                    />
+                }
+                {!isLoading && (
+                    <ConversationPanels
+                        {...this.props}
+                        className={routingSection === 'chat' ? '' : 'hidden'}
+                        conversations={conversations}
+                        routingSection={routingSection}
+                        currentlyOpenedChat={currentlyOpenedChat}
+                        displayArchivedChats={routingSection === 'archived'}
+                        chatUIFlags={chatUIFlags}
+                        onMount={() => {
+                            const chatRoom = megaChat.getCurrentRoom();
+                            return chatRoom ?
+                                this.setState({ view: chatRoom.isMeeting ? MEETINGS : CHATS }) :
+                                this.setState({ view: CHATS });
+                        }}
+                    />
+                )}
+            </div>
+        );
 
         return (
             <div
                 key="conversationsApp"
                 className="conversationsApp">
-                {startGroupChatDialog}
-                {startMeetingDialog}
-                <div
-                    className={`
-                        fm-left-panel
-                        chat-lp-body
-                        ${is_chatlink && 'hidden' || ''}
-                        ${megaChat._joinDialogIsShown && 'hidden' || ''}
-                    `}
-                    style={leftPanelStyles}>
-                    <div className="left-pane-drag-handle" />
-                    <ConversationsHead
-                        megaChat={megaChat}
-                        contactsActive={megaChat.routingSection === "contacts"}
-                        onSelectDone={this.startChatClicked.bind(this)}
-                        showTopButtons={self.getContactsPickerButtons()}
-                        showAddContact={ContactsPanel.hasContacts()}
+                {startGroupChatDialog && (
+                    <StartGroupChatWizard
+                        name="start-group-chat"
+                        flowType={1}
+                        onClose={() => this.setState({ startGroupChatDialog: false })}
+                        onConfirmClicked={() => this.setState({ startGroupChatDialog: false })}
                     />
-                    <SearchPanel />
-                    <PerfectScrollbar
-                        className="chat-lp-scroll-area"
-                        chats={megaChat.chats}
-                        ref={ref => {
-                            megaChat.$chatTreePanePs = ref;
-                        }}>
-                        {megaChat.chats.length > 0 &&
-                            <div
-                                className={`
-                                    content-panel
-                                    conversations
-                                    active
-                                `}>
-                                <span className="heading">{l.contacts_and_groups}</span>
-                                <ConversationsList />
-                            </div>
-                        }
-                    </PerfectScrollbar>
-                    {megaChat.chats.length > 0 && (
-                        <div
-                            className={arcBtnClass}
-                            onClick={this.archiveChatsClicked}>
-                            <div className="heading">{l[19066] /* `Archived chats` */}</div>
-                            <div className="indicator">{archivedChatsCount}</div>
-                        </div>
-                    )}
-                </div>
+                )}
+
+                {startMeetingDialog && (
+                    <StartMeetingDialog
+                        onStart={(topic, audio, video) => {
+                            megaChat.createAndStartMeeting(topic, audio, video);
+                            this.setState({ startMeetingDialog: false });
+                        }}
+                        onClose={() => this.setState({ startMeetingDialog: false })}
+                    />
+                )}
+
+                <LeftPanel
+                    view={view}
+                    views={this.VIEWS}
+                    conversations={conversations}
+                    leftPaneWidth={leftPaneWidth}
+                    renderView={view => this.renderView(view)}
+                    startMeeting={() => this.startMeeting()}
+                    createGroupChat={() => this.setState({ startGroupChatDialog: true })}
+                />
+
                 {rightPane}
             </div>
         );
     }
-};
+}
 
 
 if (module.hot) {
@@ -1352,7 +1199,5 @@ if (module.hot) {
 }
 
 export default {
-    ConversationsList,
-    ArchivedConversationsList,
     ConversationsApp: ConversationsApp
 };

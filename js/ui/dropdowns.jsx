@@ -307,6 +307,7 @@ export class DropdownContactsSelector extends MegaRenderMixin {
             positionMy={this.props.positionMy}
             positionAt={this.props.positionAt}
             arrowHeight={this.props.arrowHeight}
+            horizOffset={this.props.horizOffset}
             vertOffset={this.props.vertOffset}
             noArrow={true}
         >
@@ -323,7 +324,7 @@ export class DropdownContactsSelector extends MegaRenderMixin {
                 exclude={this.props.exclude}
                 allowEmpty={this.props.allowEmpty}
                 multiple={this.props.multiple}
-                showTopButtons={this.props.showTopButtons}
+                topButtons={this.props.topButtons}
                 showAddContact={this.props.showAddContact}
                 onSelectDone={this.props.onSelectDone}
                 multipleSelectedButtonLabel={this.props.multipleSelectedButtonLabel}

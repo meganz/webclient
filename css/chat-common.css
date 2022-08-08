@@ -1097,6 +1097,16 @@ button.fm-empty-button {
     margin-bottom: 50px;
 }
 
+.main-start-chat-dropdown.lhp-contact-selector .button-wrapper {
+    display: flex;
+    align-items: baseline;
+    text-align: start;
+    cursor: pointer;
+}
+.main-start-chat-dropdown.lhp-contact-selector .button-wrapper .button-title {
+    padding: 0 0 0 8px;
+}
+
 .dropdown.body.popup.contacts-search > div {
     position: relative;
     z-index: 100;

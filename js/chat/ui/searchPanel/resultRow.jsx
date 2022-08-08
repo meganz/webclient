@@ -42,8 +42,8 @@ const openResult = ({ room, messageId, index }, callback) => {
             loadSubPage(chatRoom.getRoomUrl());
         }
         else {
-            // No chat room -> instantiate new chat room
-            megaChat.openChat([u_handle, room.chatId], 'private', undefined, undefined, undefined, true);
+            // No chat room -> contact details
+            loadSubPage(`/fm/chat/contacts/${room.chatId}`);
         }
     }
     else {

@@ -155,9 +155,6 @@
         margin: 75px auto 0 auto;
         padding-top: 27px;
     }
-    .bottom-pages a.logo {
-        display: none;
-    }
     .bottom-pages .download a.logo {
         display: block;
     }

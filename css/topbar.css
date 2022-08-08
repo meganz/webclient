@@ -272,18 +272,20 @@
  * Should have common wrappper with element, whicch are separated
 */
 
+.topbar :not(.topbar-links) hr {
+    display: none;
+}
 .topbar hr {
     background-color: var(--divider-color);
     border: 0;
     content: '';
-    display: none;
     height: calc(100% - 8px);
     margin: 0;
     -webkit-margin-end: 20px;
     margin-inline-end: 20px;
     width: 1px;
 }
-.topbar *:not(.hidden) ~ hr {
+.topbar :not(.topbar-links) *:not(.hidden) ~ hr {
     display: block;
 }
 
@@ -636,4 +638,11 @@
 .bottom-page.download .topbar .logo,
 .bottom-page.download .topbar .logo-wrapper button {
     display: none;
+}
+
+@media only screen and (max-width: 625px) {
+    .topbar {
+        align-items: center;
+        height: 64px;
+    }
 }

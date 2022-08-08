@@ -3,6 +3,7 @@ import {Dropdown} from "../../../../dropdowns.jsx";
 import ContextMenu from "../../../../../chat/ui/contactsPanel/contextMenu.jsx";
 import React from "react";
 import {GenericNodePropsComponent} from "../genericNodePropsComponent";
+import { inProgressAlert } from '../../../../../chat/ui/meetings/call';
 
 export class ColumnContactButtons extends GenericNodePropsComponent {
     static sortable = true;
@@ -11,13 +12,49 @@ export class ColumnContactButtons extends GenericNodePropsComponent {
     static megatype = "grid-url-header-nw";
 
     render() {
-        let {nodeAdapter} = this.props;
-        let {node, selected} = nodeAdapter.props;
-        let handle = node.h;
+        const { nodeAdapter } = this.props;
+        const { node, selected } = nodeAdapter.props;
+        const handle = node.h;
 
         return <td megatype={ColumnContactButtons.megatype} className={ColumnContactButtons.megatype}>
             <div className="contact-item">
                 <div className="contact-item-controls">
+                    <Button
+                        className="mega-button action simpletip"
+                        icon="sprite-fm-mono icon-phone"
+                        attrs={{ 'data-simpletip': l[5896] }}
+                        disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
+                        onClick={() =>
+                            inProgressAlert()
+                                .then(() =>
+                                    megaChat.createAndShowPrivateRoom(handle)
+                                        .then(room => {
+                                            room.setActive();
+                                            room.startAudioCall();
+                                        })
+                                )
+                                .catch(() => d && console.warn('Already in a call.'))
+
+                        }
+                    />
+                    <Button
+                        className="mega-button action simpletip"
+                        icon="sprite-fm-mono icon-video-call-filled"
+                        attrs={{ 'data-simpletip': l[5897] /* `Start Video Call` */ }}
+                        disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
+                        onClick={() =>
+                            inProgressAlert()
+                                .then(() =>
+                                    megaChat.createAndShowPrivateRoom(handle)
+                                        .then(room => {
+                                            room.setActive();
+                                            room.startVideoCall();
+                                        })
+                                )
+                                .catch(() => d && console.warn('Already in a call.'))
+
+                        }
+                    />
                     <Button
                         className="mega-button action simpletip"
                         icon="sprite-fm-mono icon-chat"

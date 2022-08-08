@@ -711,23 +711,23 @@ export class ConversationRightArea extends MegaRenderMixin {
                     </Accordion>
                 </div>
             </PerfectScrollbar>
-            {this.state.contactPickerDialog && <ContactPickerDialog
-                exclude={excludedParticipants}
-                megaChat={room.megaChat}
-                multiple={true}
-                className={'popup add-participant-selector'}
-                singleSelectedButtonLabel={l[8869]}
-                multipleSelectedButtonLabel={l[8869]}
-                nothingSelectedButtonLabel={l[8870]}
-                onSelectDone={(selected) => {
-                    this.props.onAddParticipantSelected(selected);
-                    this.setState({contactPickerDialog: false});
-                }}
-                onClose={() => {
-                    this.setState({contactPickerDialog: false});
-                }}
-                selectFooter={true}
-            />}
+            {this.state.contactPickerDialog && (
+                <ContactPickerDialog
+                    exclude={excludedParticipants}
+                    megaChat={room.megaChat}
+                    multiple={true}
+                    className="popup add-participant-selector"
+                    singleSelectedButtonLabel={l[8869] /* `Add to Group Conversation` */}
+                    multipleSelectedButtonLabel={l[8869] /* `Add to Group Conversation` */}
+                    nothingSelectedButtonLabel={l[8870] /* `Select one or more contacts to continue` */}
+                    onSelectDone={selected => {
+                        this.props.onAddParticipantSelected(selected);
+                        this.setState({contactPickerDialog: false});
+                    }}
+                    onClose={() => this.setState({contactPickerDialog: false})}
+                    selectFooter={true}
+                />
+            )}
         </div>;
     }
 }
@@ -1926,100 +1926,64 @@ export class ConversationPanel extends MegaRenderMixin {
             </div>
         );
     }
-};
+}
 
 export class ConversationPanels extends MegaRenderMixin {
+    componentDidMount() {
+        super.componentDidMount();
+        this.props.onMount?.();
+    }
+
     render() {
-        var self = this;
-        var now = Date.now();
-        var conversations = [];
-        let ringingDialogs = [];
-
-        // eslint-disable-next-line local-rules/misc-warnings
-        megaChat.chats.forEach(function(chatRoom) {
-            if (chatRoom.isCurrentlyActive || now - chatRoom.lastShownInUI < 15 * 60 * 1000) {
-                conversations.push(
-                    <ConversationPanel
-                        chatUIFlags={self.props.chatUIFlags}
-                        isExpanded={chatRoom.megaChat.chatUIFlags['convPanelCollapse']}
-                        chatRoom={chatRoom}
-                        roomType={chatRoom.type}
-                        isActive={chatRoom.isCurrentlyActive}
-                        messagesBuff={chatRoom.messagesBuff}
-                        key={chatRoom.roomId + "_" + chatRoom.instanceIndex}
-                    />
-                );
-            }
-        });
-
-        if (self._MuChangeListener) {
-            console.assert(M.u.removeChangeListener(self._MuChangeListener));
-            delete self._MuChangeListener;
-        }
-
-        if (megaChat.chats.length === 0) {
-            if (megaChat.routingSection !== "chat") {
-                return null;
-            }
-            self._MuChangeListener = M.u.addChangeListener(() => self.safeForceUpdate());
-            var contactsList = [];
-            var contactsListOffline = [];
-
-            var lim = Math.min(10, M.u.length);
-            var userHandles = M.u.keys();
-            for (var i = 0; i < lim; i++) {
-                var contact = M.u[userHandles[i]];
-                if (contact.u !== u_handle && contact.c === 1) {
-                    var pres = megaChat.userPresenceToCssClass(contact.presence);
-
-                    (pres === "offline" ? contactsListOffline : contactsList).push(
-                        <ContactCard contact={contact} key={contact.u} chatRoom={false}/>
-                    );
-                }
-            }
-            let emptyMessage = escapeHTML(l[8008]).replace("[P]", "<span>").replace("[/P]", "</span>");
-            let button = <button className="mega-button positive large new-chat-link"
-                onClick={() => $(document.body).trigger('startNewChatLink')}><span>{l[20638]}</span></button>;
-
-            if (is_chatlink) {
-                button = null;
-                emptyMessage = '';
-            }
-
-            const hasContacts = !!contactsList.length || !!contactsListOffline.length;
-            return (
-                <div>
-                    {hasContacts && (
-                        <div className="chat-right-area">
-                            <div className="chat-right-area contacts-list-scroll">
-                                <div className="chat-right-pad">
-                                    {contactsList}
-                                    {contactsListOffline}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    <div
-                        className={`
-                            fm-empty-section
-                            ${hasContacts ? 'empty-messages' : 'empty-conversations'}
-                        `}>
-                        <div className="fm-empty-pad">
-                            <i className="section-icon sprite-fm-mono icon-chat-filled"/>
-                            <div className="fm-empty-cloud-txt small">
-                                <ParsedHTML>{emptyMessage}</ParsedHTML>
-                            </div>
-                            {button}
-                        </div>
-                    </div>
-                </div>
-            );
-        }
+        const { className, chatUIFlags } = this.props;
+        const now = Date.now();
 
         return (
-            <div className={"conversation-panels " + self.props.className}>
-                {ringingDialogs}
-                {conversations}
+            <div
+                className={`
+                    conversation-panels
+                    ${className || ''}
+                `}>
+                {megaChat.chats.map(chatRoom => {
+                    if (chatRoom.isCurrentlyActive || now - chatRoom.lastShownInUI < 15 * 60 * 1000) {
+                        return (
+                            <ConversationPanel
+                                key={`${chatRoom.roomId}_${chatRoom.instanceIndex}`}
+                                chatRoom={chatRoom}
+                                roomType={chatRoom.type}
+                                isExpanded={chatRoom.megaChat.chatUIFlags.convPanelCollapse}
+                                isActive={chatRoom.isCurrentlyActive}
+                                messagesBuff={chatRoom.messagesBuff}
+                                chatUIFlags={chatUIFlags}
+                            />
+                        );
+                    }
+                    return null;
+                })}
+            </div>
+        );
+    }
+}
+
+export class EmptyConvPanel extends MegaRenderMixin {
+    render() {
+        const { isMeeting, onNewClick } = this.props;
+        return (
+            <div className="conversations-empty">
+                <div className="conversations-empty-content">
+                    <i className="sprite-fm-mono icon-chat-filled" />
+                    <h1>
+                        {isMeeting ? l.start_meeting /* `Start a meeting` */ : l.start_chat /* `Start chatting now` */}
+                    </h1>
+                    <p>
+                        {isMeeting ? l.onboard_megachat_dlg3_text : l.onboard_megachat_dlg2_text}
+                    </p>
+                    <Button
+                        className="mega-button large positive"
+                        label={isMeeting ? l.new_meeting /* `New meeting` */ : l.add_chat /* `New chat` */}
+                        onClick={onNewClick}
+                    />
+                </div>
             </div>
         );
     }

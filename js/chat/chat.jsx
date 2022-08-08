@@ -753,6 +753,10 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
     }
     // update the "global" conversation tab unread counter
     var unreadCount = 0;
+    const notifications = {
+        chats: 0,
+        meetings: 0
+    };
 
 
     var havePendingCall = false;
@@ -768,6 +772,9 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
         var c = parseInt(megaRoom.messagesBuff.getUnreadCount(), 10);
         unreadCount += c;
+        if (c) {
+            notifications[megaRoom.isMeeting ? 'meetings' : 'chats'] += c;
+        }
         if (!havePendingCall) {
             if (megaRoom.havePendingCall() && megaRoom.uniqueCallParts && !megaRoom.uniqueCallParts[u_handle]) {
                 havePendingCall = true;
@@ -798,11 +805,11 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
             .removeClass("call-exists");
     }
 
-    if (self._lastUnreadCount != unreadCount) {
+    if (self._lastUnreadCount !== unreadCount) {
         if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
             $('.new-messages-indicator .chat-unread-count')
                 .removeClass('hidden')
-                .text(unreadCount)
+                .text(unreadCount);
         }
         else {
             $('.new-messages-indicator .chat-unread-count')
@@ -810,14 +817,23 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
         }
         self._lastUnreadCount = unreadCount;
 
-        delay('notifFavicoUpd', function () {
+        delay('notifFavicoUpd', () => {
             self.favico.reset();
             self.favico.badge(unreadCount);
         });
 
-
         self.updateDashboard();
     }
+
+    if (
+        !this._lastNotifications ||
+        this._lastNotifications.chats !== notifications.chats ||
+        this._lastNotifications.meetings !== notifications.meetings
+    ) {
+        this._lastNotifications = notifications;
+        megaChat.trigger('onUnreadCountUpdate', notifications);
+    }
+
     if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
         haveContents = true;
     }
@@ -828,7 +844,6 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
     else {
         $('.new-messages-indicator').removeClass('hidden');
     }
-
 }, 100);
 
 /**

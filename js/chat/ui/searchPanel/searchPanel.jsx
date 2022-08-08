@@ -95,10 +95,9 @@ export default class SearchPanel extends MegaRenderMixin {
                 return delay('chat-toggle', () => this.doToggle(action), 600);
             }
 
-            this.setState({
-                status: action === ACTIONS.PAUSE ? PAUSED : action === ACTIONS.RESUME ? IN_PROGRESS : COMPLETED
-            }, () =>
-                chatSearch[action]()
+            this.setState(
+                { status: action === ACTIONS.PAUSE ? PAUSED : action === ACTIONS.RESUME ? IN_PROGRESS : COMPLETED },
+                () => chatSearch[action]()
             );
         }
     };

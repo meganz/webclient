@@ -190,7 +190,7 @@ export class Button extends MegaRenderMixin {
             <TagName
                 className={`
                     button
-                    ${className ? className : ''}
+                    ${className || ''}
                     ${disabled ? 'disabled' : ''}
                     ${this.state.focused ? 'active active-dropdown' : ''}
                 `}

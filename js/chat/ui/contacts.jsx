@@ -1126,7 +1126,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
         var contactsSelected = [];
 
         var multipleContacts = null;
-        var topButtons = null;
         var selectableContacts = false;
         var selectFooter = null;
         var selectedContacts = false;
@@ -1280,36 +1279,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     </button>
                 </footer>;
             }
-        }
-
-        const { showTopButtons } = this.props;
-        if (showTopButtons) {
-            topButtons =
-                <div className="contacts-search-buttons">
-                    {showTopButtons.map(button => {
-                        const { key, icon, className, title, onClick } = button;
-                        return (
-                            <div
-                                key={key}
-                                className="button-wrapper">
-                                <Button
-                                    className={`
-                                        ${className || ''}
-                                        ${key === 'newChatLink' ? 'branded-blue' : ''}
-                                        mega-button
-                                        round
-                                    `}
-                                    icon={icon}
-                                    onClick={e => {
-                                        closeDropdowns();
-                                        onClick(e);
-                                    }}
-                                />
-                                <span className="button-title">{title}</span>
-                            </div>
-                        );
-                    })}
-                </div>;
         }
 
         var alreadyAdded = {};
@@ -1475,7 +1444,34 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     ${this.props.className || ''}
                     ${extraClasses}
                 `}>
-                {topButtons}
+                {this.props.topButtons && (
+                    <div className="contacts-search-buttons">
+                        {this.props.topButtons.map(button => {
+                            const { key, icon, className, title, onClick } = button;
+                            return (
+                                <div
+                                    key={key}
+                                    className="button-wrapper"
+                                    onClick={e => {
+                                        closeDropdowns();
+                                        onClick(e);
+                                    }}>
+                                    <Button
+                                        className={`
+                                            ${className || ''}
+                                            ${key === 'newChatLink' ? 'branded-blue' : ''}
+                                            mega-button
+                                            round
+                                            positive
+                                        `}
+                                        icon={icon}
+                                    />
+                                    <span className="button-title">{title}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
                 {multipleContacts}
                 {!this.props.readOnly && haveContacts && (
                     <>
@@ -1518,7 +1514,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         <Button
                             className="mega-button action positive"
                             icon="sprite-fm-mono icon-add-circle"
-                            label={l[18759]}
+                            label={l[71] /* `Add contact` */}
                             onClick={() => {
                                 contactAddDialog();
                                 closeDropdowns();
@@ -1543,7 +1539,6 @@ export class ContactPickerDialog extends MegaRenderMixin {
             name,
             nothingSelectedButtonLabel,
             selectFooter,
-            showTopButtons,
             singleSelectedButtonLabel,
             onClose,
             onSelectDone,
@@ -1564,7 +1559,6 @@ export class ContactPickerDialog extends MegaRenderMixin {
                 multipleSelectedButtonLabel={multipleSelectedButtonLabel}
                 nothingSelectedButtonLabel={nothingSelectedButtonLabel}
                 selectFooter={selectFooter}
-                showTopButtons={showTopButtons}
                 singleSelectedButtonLabel={singleSelectedButtonLabel}
                 onClose={onClose}
                 onSelectDone={onSelectDone}

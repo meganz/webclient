@@ -74,6 +74,7 @@ export default class LeftPanel extends MegaRenderMixin {
                     className={`
                         ${this.NAMESPACE}-nav-container
                         ${view === CHATS && megaChat.routingSection === 'chat' ? 'active' : ''}
+                        lhp-chats-tab
                     `}
                     onClick={() => renderView(CHATS)}>
                     <Button
@@ -92,6 +93,7 @@ export default class LeftPanel extends MegaRenderMixin {
                     className={`
                         ${this.NAMESPACE}-nav-container
                         ${view === MEETINGS && megaChat.routingSection === 'chat' ? 'active' : ''}
+                        lhp-meetings-tab
                     `}
                     onClick={() => renderView(MEETINGS)}>
                     <Button
@@ -111,6 +113,7 @@ export default class LeftPanel extends MegaRenderMixin {
                         className={`
                             ${this.NAMESPACE}-nav-container
                             ${megaChat.routingSection === 'contacts' ? 'active' : ''}
+                            lhp-contacts-tab
                         `}
                         onClick={() => loadSubPage('fm/chat/contacts')}>
                         <Button

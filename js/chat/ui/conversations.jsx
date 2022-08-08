@@ -975,6 +975,30 @@ class ConversationsApp extends MegaRenderMixin {
         if (megaChat.routingSection === "archived") {
             this.initArchivedChatsScrolling();
         }
+        delay('mcob-update', () => this.handleOnboardingStep(), 1000);
+    }
+
+    handleOnboardingStep() {
+        if (
+            M.chat
+            && mega.ui.onboarding
+            && mega.ui.onboarding.sections.chat
+            && !mega.ui.onboarding.sections.chat.isComplete
+            && (!this.$obDialog || !this.$obDialog.is(':visible'))
+        ) {
+            const { chat : obChat } = mega.ui.onboarding.sections;
+            const nextIdx = obChat.searchNextOpenStep();
+            if (
+                obChat.steps
+                && obChat.steps[nextIdx]
+                && obChat.steps[nextIdx].isComplete
+            ) {
+                // If the next section is done skip until the next update with the correct step.
+                return;
+            }
+            mega.ui.onboarding.sections.chat.startNextOpenSteps(nextIdx);
+            this.$obDialog = $('#obDialog');
+        }
     }
 
     @utils.SoonFcWrap(80)

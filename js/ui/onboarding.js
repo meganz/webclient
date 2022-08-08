@@ -3,8 +3,8 @@ mBroadcaster.addListener('fm:initialized', () => {
 
     'use strict';
 
-    // If user is visiting folderlink, not complete registration, or old user do not show Onboarding V4.
-    if (folderlink || u_type < 3 || !(u_attr.since > 1631664000 || localStorage.obv4test)) {
+    // If user is visiting folderlink, or not complete registration do not show Onboarding V4.
+    if (folderlink || u_type < 3) {
         return;
     }
 
@@ -76,8 +76,90 @@ mBroadcaster.addListener('fm:initialized', () => {
                     ]
                 }
             ]
+        },
+        chat: {
+            title: 'MEGA Chat',
+            flag: 'obmc',
+            dismissNoConfirm: true,
+            steps: [
+                {
+                    name: 'MEGA Chat Left Pane',
+                    flag: 'obmclp',
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'mcob',
+                            dialogTitle: l.onboard_megachat_dlg1_title,
+                            dialogDesc: l.onboard_megachat_dlg1_text,
+                            dialogNext: l.onboard_megachat_dlg1_btn,
+                            targetElmClass: '.conversationsApp .lhp-nav',
+                            targetElmPosition: 'right bottom',
+                            markComplete: true,
+                            ignoreBgClick: true,
+                        }
+                    ]
+                },
+                {
+                    name: 'Chats',
+                    flag: 'obmccp',
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'mcob',
+                            dialogTitle: l.onboard_megachat_dlg2_title,
+                            dialogDesc: l.onboard_megachat_dlg2_text,
+                            targetElmClass: '.conversationsApp .chat-lp-scroll-area .heading',
+                            targetElmPosition: 'right',
+                            markComplete: true,
+                            ignoreBgClick: true,
+                        }
+                    ]
+                },
+                {
+                    name: 'Meetings',
+                    flag: 'obmcmp',
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'mcob',
+                            dialogTitle: l.onboard_megachat_dlg3_title,
+                            dialogDesc: l.onboard_megachat_dlg3_text,
+                            targetElmClass: '.conversationsApp .lhp-nav .lhp-meetings-tab',
+                            targetElmPosition: 'bottom right',
+                            markComplete: true,
+                            ignoreBgClick: true,
+                        }
+                    ]
+                },
+                {
+                    name: 'Contacts',
+                    flag: 'obmcco',
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'mcob',
+                            dialogTitle: l.onboard_megachat_dlg4_title,
+                            dialogDesc: l.onboard_megachat_dlg4_text,
+                            dialogNext: l[726],
+                            targetElmClass: '.conversationsApp .lhp-nav .lhp-contacts-tab',
+                            targetElmPosition: 'bottom right',
+                            markComplete: true,
+                            skipHidden: true,
+                            ignoreBgClick: true,
+                        }
+                    ]
+                }
+            ]
         }
     };
+    // If this is an old user don't show them the cloud-drive onboarding v4
+    if (!(u_attr.since > 1631664000 || localStorage.obv4test)) {
+        delete obMap['cloud-drive'];
+    }
+    // If new user then we can ignore the first chat step
+    if (u_attr.since >= 1658102400 && !localStorage.obv4test) {
+        mega.config.set('obmclp', 1);
+    }
 
     // Main controller level of whole OBv4 include section start, reset, initialising.
     class OnboardV4 {
@@ -118,7 +200,10 @@ mBroadcaster.addListener('fm:initialized', () => {
                 return;
             }
 
-            let obflags = ['obcd', 'obcduf', 'obcdmyf', 'obcdda'];
+            let obflags = [
+                'obcd', 'obcduf', 'obcdmyf', 'obcdda',
+                'obmc', 'obmclp', 'obmccp', 'obmcmp', 'obmcco',
+            ];
 
             if (prefix) {
                 obflags = obflags.filter(flag => flag.startsWith(prefix));
@@ -135,6 +220,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 case M.RootID: return 'cloud-drive';
                 case M.InboxID: return 'inbox';
                 case M.RubbishID: return 'rubbish-bin';
+                case 'chat': return 'chat';
                 default: return M.currentrootid === undefined ? M.currentdirid : M.currentrootid;
             }
         }
@@ -244,6 +330,9 @@ mBroadcaster.addListener('fm:initialized', () => {
 
             this.hotspotNextStep();
             this.currentStepIndex = undefined;
+            if (this.map.dismissNoConfirm) {
+                return this.markSectionComplete();
+            }
 
             $('.onboarding-control-panel-dismiss', this.$obControlPanel).removeClass('hidden');
             $('.onboarding-control-panel-content', this.$obControlPanel).addClass('hidden');
@@ -493,10 +582,12 @@ mBroadcaster.addListener('fm:initialized', () => {
             this.$dialog = $('#obDialog');
 
             M.safeShowDialog('onboardingDialog', () => {
-
+                this.$dialog.removeClass('mcob').addClass(this.map.dialogClass || '');
                 // Fill contents for the dialog
                 $('#obDialog-title').text(this.map.dialogTitle);
                 $('#obDialog-text').text(this.map.dialogDesc);
+                $('.js-next span', this.$dialog).text(this.map.dialogNext || l[556]);
+                $('.js-skip', this.$dialog).removeClass('hidden').addClass(this.map.skipHidden ? 'hidden' : '');
 
                 this.positionDialog();
                 this.bindDialogEvents();
@@ -534,6 +625,16 @@ mBroadcaster.addListener('fm:initialized', () => {
                     at = 'left-6 bottom-2';
                     arrowAt = false;
                     break;
+                case 'right bottom':
+                    my = 'left center';
+                    at = 'right+6 bottom';
+                    arrowAt = 'left';
+                    break;
+                case 'bottom right':
+                    my = 'left-42 bottom-8';
+                    at = 'right-42 top';
+                    arrowAt = 'top-left';
+                    break;
             }
 
             if (this.map.targetHotSpot) {
@@ -556,7 +657,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 collision: 'flipfit',
                 using: (obj, info) => {
 
-                    if (arrowAt) {
+                    if (arrowAt && arrowAt !== 'top-left') {
                         // Dialog position is moved due to collision on viewport swap arrow position
                         if (info.horizontal === 'right' && obj.left < info.target.left) {
                             arrowAt = 'right';
@@ -577,10 +678,11 @@ mBroadcaster.addListener('fm:initialized', () => {
             });
 
             if (arrowAt) {
-                $('#obDialog-arrow', this.$dialog).removeClass('hidden top bottom left right').addClass(arrowAt);
+                $('#obDialog-arrow', this.$dialog)
+                    .removeClass('hidden top bottom left right top-left').addClass(arrowAt);
             }
             else {
-                $('#obDialog-arrow', this.$dialog).addClass('hidden').removeClass('top bottom left right');
+                $('#obDialog-arrow', this.$dialog).addClass('hidden').removeClass('top bottom left right top-left');
             }
 
             // If it was temporary bug fixing hidden removal, add hidden back
@@ -645,9 +747,14 @@ mBroadcaster.addListener('fm:initialized', () => {
             $('#fmholder').rebind('mouseup.onboarding', e => {
 
                 // If there is nextActionTrigger, let that handle close dialog.
-                if (!this.map.nextActionTrigger ||
-                    !($(e.target).is(this.map.targetElmClass) ||
-                    $(e.target).parents(this.map.targetElmClass).length)) {
+                if (
+                    !this.map.ignoreBgClick
+                    && (
+                        !this.map.nextActionTrigger
+                        || !($(e.target).is(this.map.targetElmClass)
+                        || $(e.target).parents(this.map.targetElmClass).length)
+                    )
+                ) {
 
                     __closeDialogAction();
                     this.parentStep.parentSection.hotspotNextStep();
@@ -657,7 +764,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             // Event for block view empty space, to not conflict with selection manger multi-selection event.
             $('.fm-right-files-block .ui-selectable:visible:not(.hidden)').rebind('mousedown.onboarding', e => {
 
-                if (e.which === 1) {
+                if (e.which === 1 && !this.map.ignoreBgClick) {
 
                     __closeDialogAction();
                     this.parentStep.parentSection.hotspotNextStep();

@@ -16419,6 +16419,7 @@ class LeftPanel extends mixins.wl {
       className: `
                         ${this.NAMESPACE}-nav-container
                         ${view === CHATS && megaChat.routingSection === 'chat' ? 'active' : ''}
+                        lhp-chats-tab
                     `,
       onClick: () => renderView(CHATS)
     }, external_React_default().createElement(buttons.Button, {
@@ -16431,6 +16432,7 @@ class LeftPanel extends mixins.wl {
       className: `
                         ${this.NAMESPACE}-nav-container
                         ${view === MEETINGS && megaChat.routingSection === 'chat' ? 'active' : ''}
+                        lhp-meetings-tab
                     `,
       onClick: () => renderView(MEETINGS)
     }, external_React_default().createElement(buttons.Button, {
@@ -16443,6 +16445,7 @@ class LeftPanel extends mixins.wl {
       className: `
                             ${this.NAMESPACE}-nav-container
                             ${megaChat.routingSection === 'contacts' ? 'active' : ''}
+                            lhp-contacts-tab
                         `,
       onClick: () => loadSubPage('fm/chat/contacts')
     }, external_React_default().createElement(buttons.Button, {
@@ -17475,6 +17478,24 @@ let ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (_class3 = clas
 
     if (megaChat.routingSection === "archived") {
       this.initArchivedChatsScrolling();
+    }
+
+    delay('mcob-update', () => this.handleOnboardingStep(), 1000);
+  }
+
+  handleOnboardingStep() {
+    if (M.chat && mega.ui.onboarding && mega.ui.onboarding.sections.chat && !mega.ui.onboarding.sections.chat.isComplete && (!this.$obDialog || !this.$obDialog.is(':visible'))) {
+      const {
+        chat: obChat
+      } = mega.ui.onboarding.sections;
+      const nextIdx = obChat.searchNextOpenStep();
+
+      if (obChat.steps && obChat.steps[nextIdx] && obChat.steps[nextIdx].isComplete) {
+        return;
+      }
+
+      mega.ui.onboarding.sections.chat.startNextOpenSteps(nextIdx);
+      this.$obDialog = $('#obDialog');
     }
   }
 

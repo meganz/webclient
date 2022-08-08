@@ -39,6 +39,11 @@
     left: calc(50% - 12px);
     bottom: -8px;
 }
+#obDialog-arrow.top-left {
+    transform: rotate(180deg);
+    left: 48px;
+    top: -8px;
+}
 #obDialog .link-button {
     color: var(--text-color-white-high);
     margin-right: auto;
@@ -74,6 +79,22 @@
 }
 .context .onboarding-highlight-dot::after {
     animation-delay: 500ms;
+}
+#obDialog.mcob {
+    z-index: 121;
+}
+.in-call #obDialog.mcob {
+    z-index: 100;
+}
+#obDialog.mcob header {
+    padding-inline-end: 24px;
+    -webkit-padding-end: 24px;
+}
+#obDialog.mcob #obDialog-title {
+    font: var(--text-h2-bold);
+}
+#obDialog.mcob #obDialog-text {
+    font: var(--text-body1);
 }
 
 @keyframes onboarding-hotspot-rect {

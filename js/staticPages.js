@@ -319,6 +319,7 @@ function clickURLs() {
         $(nodeList).rebind('click', function() {
             var $this = $(this);
             var url = $this.attr('href') || $this.data('fxhref');
+            const redirect = $this.attr('redirect');
 
             if (url) {
                 var target = $this.attr('target');
@@ -334,6 +335,12 @@ function clickURLs() {
                         loadingDialog.quiet = false;
                     });
                 }
+
+                if (redirect) {
+                    const redirectPage = redirect;
+                    login_next = redirectPage === "1" ? `/${page}` : `/${redirectPage}`;
+                }
+
                 loadSubPage(url.substr(1));
                 return false;
             }

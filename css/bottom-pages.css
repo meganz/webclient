@@ -4571,6 +4571,9 @@ body:not(.mobile) .affiliate.faq-block .affiliate.expand-faq:hover i {
     -moz-box-shadow: 0 1px 0 0 #EEEEEE;
     box-shadow: 0 1px 0 0 #EEEEEE;
 }
+.bottom-page.affiliate-page .bottom-page.dropdown.time .dropdown-item {
+    text-transform: none;
+}
 .bottom-page.dropdown .dropdown-item:last-child {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;

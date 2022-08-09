@@ -989,7 +989,8 @@ class ConversationsApp extends MegaRenderMixin {
             const { chat : obChat } = mega.ui.onboarding.sections;
             const nextIdx = obChat.searchNextOpenStep();
             if (
-                obChat.steps
+                nextIdx === false
+                || obChat.steps
                 && obChat.steps[nextIdx]
                 && obChat.steps[nextIdx].isComplete
             ) {

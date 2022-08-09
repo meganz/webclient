@@ -103,7 +103,10 @@
 
     shrink.bitdef = Object.assign(Object.create(null), {
         v04: ['rvonbrddl', 'rvonbrdfd', 'rvonbrdas'],
-        obv4:['obcd', 'obcduf', 'obcdmyf', 'obcdda', 'obmc', 'obmclp', 'obmccp', 'obmcmp', 'obmcco'],
+        obv4: [
+            'obcd', 'obcduf', 'obcdmyf', 'obcdda', 'obmc', 'obmclp', 'obmccp', 'obmcmp',
+            'obmcco', 'obmcnw'
+        ],
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
             'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',

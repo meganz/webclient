@@ -157,8 +157,30 @@ mBroadcaster.addListener('fm:initialized', () => {
         delete obMap['cloud-drive'];
     }
     // If new user then we can ignore the first chat step
-    if (u_attr.since >= 1658102400 && !localStorage.obv4test) {
+    if (u_attr.since >= 1659398400) {
+        const megaChatNewUserFlag = 'obmcnw';
+
         mega.config.set('obmclp', 1);
+        mBroadcaster.once('chat_initialized', () => {
+            // Show the new user onboarding dot when chat is ready.
+            const $mcNavDot = $('.nw-fm-left-icon.conversations .onboarding-highlight-dot', fmholder);
+
+            if (!fmconfig[megaChatNewUserFlag] && !M.chat) {
+                $('.dark-tooltip', $mcNavDot.parent().addClass('w-onboard')).addClass('hidden');
+                $mcNavDot.removeClass('hidden');
+            }
+
+            mBroadcaster.addListener('pagechange', () => {
+
+                if (M.chat) {
+                    mega.config.set(megaChatNewUserFlag, 1);
+                    $mcNavDot.addClass('hidden');
+                    $('.dark-tooltip', $mcNavDot.parent().removeClass('w-onboard')).removeClass('hidden');
+
+                    return 0xDEAD;
+                }
+            });
+        });
     }
 
     // Main controller level of whole OBv4 include section start, reset, initialising.
@@ -202,7 +224,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 
             let obflags = [
                 'obcd', 'obcduf', 'obcdmyf', 'obcdda',
-                'obmc', 'obmclp', 'obmccp', 'obmcmp', 'obmcco',
+                'obmc', 'obmclp', 'obmccp', 'obmcmp', 'obmcco', 'obmcnw'
             ];
 
             if (prefix) {

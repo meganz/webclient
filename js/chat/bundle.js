@@ -17490,7 +17490,7 @@ let ConversationsApp = (_dec3 = utils["default"].SoonFcWrap(80), (_class3 = clas
       } = mega.ui.onboarding.sections;
       const nextIdx = obChat.searchNextOpenStep();
 
-      if (obChat.steps && obChat.steps[nextIdx] && obChat.steps[nextIdx].isComplete) {
+      if (nextIdx === false || obChat.steps && obChat.steps[nextIdx] && obChat.steps[nextIdx].isComplete) {
         return;
       }
 

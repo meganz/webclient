@@ -1009,20 +1009,28 @@
          aria-labelledby="reset-success-title"
          aria-modal="true">
 
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
         <header>
             <div class="graphic sprite-fm-illustration img-dialog-email"></div>
-            <h2 id="reset-success-title">[$1585]</h2>
+            <h2 class="reset-success-title">[$pwd_link_sent]</h2>
         </header>
 
         <section class="content">
             <div class="content-block">
-                <div class="reg-success-txt"> [$6214]  <strong>[$6215]</strong>.</div>
+                <div class="reset-email-success-txt"></div>
+                <div class="reset-email-success-sub-txt">
+                    [$no_email_try_again]<br>
+                    [$contact_support_email]
+                </div>
             </div>
         </section>
 
         <footer>
             <aside>
-                <div>[$6216]</div>
+                <button class="mega-button positive ok-btn"><span>[$81]</span></button>
             </aside>
         </footer>
     </div>

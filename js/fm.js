@@ -958,21 +958,31 @@ function doClearbin(all) {
     });
 }
 
-function handleResetSuccessDialogs(dialog, txt, dlgString) {
+/**
+ * To show the password reset link / the account closure link sent dialog, and its related event handlers
+ * @param {String} dialogText   The main message displays in the dialog
+ * @param {String} dlgString    The dialog name
+ * @returns {void}
+ */
+function handleResetSuccessDialogs(dialogText, dlgString) {
+    'use strict';
 
-    $('.mega-dialog' + dialog + ' .reg-success-txt').text(txt);
+    const $resetSuccessDlg = $('.mega-dialog.reset-success');
 
-    $('.mega-dialog' + dialog + ' button.cancel').rebind('click', function() {
+    $('.reset-success-title', $resetSuccessDlg)
+        .text(dlgString === 'deleteaccount' ? l.ac_closure_link_sent : l.pwd_link_sent);
+    $('.reset-email-success-txt', $resetSuccessDlg).safeHTML(dialogText);
+
+    $('a.try-again, button.js-close, button.ok-btn', $resetSuccessDlg).rebind('click.close-dlg', () => {
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
-        $('.mega-dialog' + dialog).addClass('hidden');
+        $resetSuccessDlg.addClass('hidden');
         delete $.dialog;
     });
 
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    $('.mega-dialog' + dialog).removeClass('hidden');
-
+    $resetSuccessDlg.removeClass('hidden');
     $.dialog = dlgString;
 }
 

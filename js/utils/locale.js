@@ -1280,7 +1280,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A2]', '</a>')
         .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
         .replace(/\[BR]/g, '<br/>');
-    l[24708] = escapeHTML(l[24708]).replace('[LT]', '<').replace('[GT]', '>');
+    l[24708] = escapeHTML(l[24708]).replace('%s', '" * / : < > ? \\ |');
     l[24852] = escapeHTML(l[24852])
         .replace('[A]', '<a target="_blank" class="green-link" href="https://blog.mega.io">')
         .replace('[/A]', '</a>');

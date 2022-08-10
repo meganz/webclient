@@ -281,8 +281,9 @@ mega.textEditorUI = new function TextEditorUI() {
 
                         bindEventsListner();
 
-                        selectionManager.clear_selection();
-                        selectionManager.add_to_selection(fh);
+                        if (fh) {
+                            selectionManager.resetTo(fh, true);
+                        }
 
                         loadingDialog.hide();
                         if (cb && typeof cb === 'function') {

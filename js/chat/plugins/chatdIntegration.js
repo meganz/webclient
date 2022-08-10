@@ -36,11 +36,13 @@ var ChatdIntegration = function(megaChat) {
     self.mcUrlInflightRequest = Object.create(null);
 
     // chat events
-    megaChat.rebind("onRoomInitialized.chatdInt", function(e, chatRoom) {
+    megaChat.rebind("onRoomInitialized.chatdInt", (e, chatRoom, resolve = nop, reject = dump) => {
         console.assert(chatRoom.type, 'missing room type');
-        if (chatRoom.type) {
-            self._attachToChatRoom(chatRoom);
+
+        if (!chatRoom.type) {
+            return reject(EINCOMPLETE);
         }
+        self._attachToChatRoom(chatRoom).then(resolve).catch(reject);
     });
 
     megaChat.rebind("onDestroy.chatdInt", function(e) {
@@ -1063,7 +1065,7 @@ ChatdIntegration.prototype._parseMessage = function(chatRoom, message) {
     }
 };
 
-ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
+ChatdIntegration.prototype._attachToChatRoom = promisify(function(resolve, reject, chatRoom) {
     var self = this;
 
     var chatRoomId = chatRoom.roomId;
@@ -1110,7 +1112,10 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
     });
 
-    if (!chatRoom.messagesBuff) {
+    if (chatRoom.messagesBuff) {
+        resolve();
+    }
+    else {
         chatRoom.pubCu25519KeyIsMissing = false;
 
         chatRoom.messagesBuff = new MessagesBuff(chatRoom, self);
@@ -1375,7 +1380,13 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
 
 
         chatRoom.strongvelopeSetupPromises = Promise.allSettled(waitingForPromises)
-            .then(function() {
+            .then((res) => {
+                for (let i = res.length; i--;) {
+                    if (res[i].status !== 'fulfilled') {
+                        throw res[i].reason;
+                    }
+                }
+
                 // after all dependencies (data) is initialised, lets init the protocol handler and others
                 if (is_chatlink) {
                     chatRoom.protocolHandler = new strongvelope.ProtocolHandler(
@@ -1430,22 +1441,24 @@ ChatdIntegration.prototype._attachToChatRoom = function(chatRoom) {
                 }
                 self.join(chatRoom);
                 delete chatRoom.strongvelopeSetupPromises;
+                resolve(chatRoom);
             })
-            .catch(function(ex) {
-                self.logger.error(
-                    "Failed to pre-load keys before initialising strongvelope. " +
-                    "Can't initialise strongvelope for this chat: ",
-                    chatRoom.roomId,
-                    waitingForPromises,
-                    ex
-                );
+            .catch((ex) => {
+                if (d && ex instanceof Error) {
+                    self.logger.error(
+                        "Failed to pre-load keys before initialising strongvelope. " +
+                        "Can't initialise strongvelope for this chat: ",
+                        chatRoom.roomId,
+                        waitingForPromises,
+                        ex
+                    );
+                }
+                reject(ex);
             });
     }
 
-
     chatRoom.trigger('onChatdIntegrationReady');
-
-};
+});
 
 ChatdIntegration.prototype._processDecryptedMessage = function(
     chatRoom,

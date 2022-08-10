@@ -135,6 +135,10 @@ class ChatRouting {
       room.show();
       location = room.getRoomUrl();
     } else if (sectionName === 'p') {
+      if (roomId === u_handle) {
+        return loadSubPage('/fm/chat');
+      }
+
       megaChat.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, true).then(resolve).catch(reject);
       resolve = null;
     } else {
@@ -153,7 +157,7 @@ class ChatRouting {
           });
         } else {
           if (String(location).startsWith('chat')) {
-            location = location === 'chat' ? 'fm' : 'chat';
+            location = 'fm/chat';
           }
 
           M.currentdirid = M.chat = page = false;
@@ -1296,19 +1300,19 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
   }
 
   room.showAfterCreation = setAsActive !== false;
-  this.trigger('onRoomInitialized', [room]);
-  room.setState(ChatRoom.STATE.JOINING);
+  return [roomId, room, new Promise((resolve, reject) => {
+    this.trigger('onRoomInitialized', [room, resolve, reject]);
+    room.setState(ChatRoom.STATE.JOINING);
 
-  if (this._queuedChatRoomEvents[chatId]) {
-    for (const event of this._queuedChatRoomEvents[chatId]) {
-      room.trigger(event[0], event[1]);
+    if (this._queuedChatRoomEvents[chatId]) {
+      for (const event of this._queuedChatRoomEvents[chatId]) {
+        room.trigger(event[0], event[1]);
+      }
+
+      delete this._queuedChatRoomEvents[chatId];
+      delete this._queuedChatRoomEvents[`${chatId}_timer`];
     }
-
-    delete this._queuedChatRoomEvents[chatId];
-    delete this._queuedChatRoomEvents[chatId + "_timer"];
-  }
-
-  return [roomId, room, MegaPromise.resolve(roomId, self.chats[roomId])];
+  })];
 };
 
 Chat.prototype.smartOpenChat = function () {
@@ -1366,13 +1370,15 @@ Chat.prototype.smartOpenChat = function () {
       var roomId = result[0];
       var promise = result[2];
 
-      if (!(promise instanceof MegaPromise)) {
+      if (!(promise instanceof Promise)) {
         self.logger.error('Unexpected openChat() response...');
         return reject(EINTERNAL);
       }
 
       self.logger.debug('Waiting for chat "%s" to be ready...', roomId, [room]);
-      promise.then(function (aRoomId, aRoom) {
+      promise.then(aRoom => {
+        const aRoomId = aRoom && aRoom.roomId;
+
         if (aRoomId !== roomId || room && room !== aRoom || !(aRoom instanceof ChatRoom)) {
           self.logger.error('Unexpected openChat() procedure...', aRoomId, [aRoom]);
           return reject(EINTERNAL);
@@ -1543,11 +1549,12 @@ Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve,
   $('.nw-conversations-item').removeClass('selected');
   $('.fm-empty-conversations').removeClass('hidden');
   M.onSectionUIOpen('conversations');
+  let room;
 
   if (!location && this.chats.length) {
     var valid = room => room && room._leaving !== true && room.isDisplayable() && room;
 
-    var room = valid(this.chats[this.lastOpenedChat]);
+    room = valid(this.chats[this.lastOpenedChat]);
 
     if (!room) {
       var idx = 0;
@@ -1566,7 +1573,21 @@ Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve,
 
   if (location) {
     $('.fm-empty-conversations').addClass('hidden');
-    return this.navigate(location, undefined, isInitial).then(resolve).catch(reject);
+    this.navigate(location, undefined, isInitial).catch(ex => {
+      if (d) {
+        this.logger.warn('Failed to navigate to %s...', location, room, ex);
+      }
+
+      if (!room) {
+        return this.renderListing(null);
+      }
+
+      onIdle(() => {
+        room.destroy();
+      });
+      throw ex;
+    }).then(resolve).catch(reject);
+    return;
   }
 
   resolve(ENOENT);
@@ -1907,7 +1928,7 @@ Chat.prototype.allChatsHadInitialLoadedHistory = function () {
   for (var i = chatIds.length; i--;) {
     var room = self.chats[chatIds[i]];
 
-    if (room.initialMessageHistLoaded === false) {
+    if (room.chatId && room.initialMessageHistLoaded === false) {
       return false;
     }
   }

@@ -1759,7 +1759,9 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
         }
     };
     var fail = function(ex) {
-        console.error(ex);
+        if (d) {
+            _.logger.error(ex);
+        }
         done();
     };
 
@@ -1823,7 +1825,34 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
                     if (!Array.isArray(res)) {
                         return fail(res);
                     }
-                    attach([].concat(rem, res)).then(done).catch(fail);
+                    const [h] = res;
+                    res = [...rem, ...res];
+
+                    if (!res.length) {
+                        // Something went wrong with copyNodes()?..
+                        return fail('Nothing to attach...?!');
+                    }
+
+                    for (let i = res.length; i--;) {
+                        const n = M.getNodeByHandle(res[i]);
+
+                        if (n.fv) {
+
+                            if (d) {
+                                _.logger.info('Skipping file-version %s', n.h, n);
+                            }
+                            res.splice(i, 1);
+                        }
+                    }
+
+                    if (h && !res.length) {
+                        if (d) {
+                            _.logger.info('Adding nothing but a file-version?..', h);
+                        }
+                        res = [h];
+                    }
+
+                    attach(res).then(done).catch(fail);
                 };
 
                 if (copy.length) {

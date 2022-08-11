@@ -1,13 +1,12 @@
 // libs
 import { hot } from 'react-hot-loader/root';
 import React from 'react';
-import utils, { Emoji, OFlowEmoji, OFlowParsedHTML, ParsedHTML } from './../../ui/utils.jsx';
-import { MegaRenderMixin, timing } from '../mixins.js';
+import utils, { Emoji, ParsedHTML } from './../../ui/utils.jsx';
+import { MegaRenderMixin } from '../mixins.js';
 import { Button } from '../../ui/buttons.jsx';
 import { ConversationPanels, EmptyConvPanel } from "./conversationpanel.jsx";
 import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
-import { Avatar, ContactAwareName } from "./contacts.jsx";
 import { Start as StartMeetingDialog } from "./meetings/workflow/start.jsx";
 import { StartGroupChatWizard } from './startGroupChatWizard.jsx';
 import MeetingsCallEndedDialog from "./meetings/meetingsCallEndedDialog.jsx";
@@ -19,302 +18,6 @@ import LeftPanel from './leftPanel/leftPanel';
 var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
 };
-
-class ConversationsListItem extends MegaRenderMixin {
-    isLoading() {
-        const mb = this.props.chatRoom.messagesBuff;
-
-        if (mb.haveMessages) {
-            return false;
-        }
-        return mb.messagesHistoryIsLoading() || mb.joined === false && mb.isDecrypting;
-    }
-
-    specShouldComponentUpdate() {
-        return !this.loadingShown;
-    }
-
-    componentWillMount() {
-        var self = this;
-        self.chatRoomChangeListener = SoonFc(200 + Math.random() * 400 | 0, () => {
-            if (d > 2) {
-                console.debug('%s: loading:%s', self.getReactId(), self.loadingShown, self.isLoading(), [self]);
-            }
-            self.safeForceUpdate();
-        });
-        self.props.chatRoom.rebind('onUnreadCountUpdate.convlistitem', function() {
-            delete self.lastMessageId;
-            self.safeForceUpdate();
-        });
-        self.props.chatRoom.addChangeListener(self.chatRoomChangeListener);
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        var self = this;
-        self.props.chatRoom.removeChangeListener(self.chatRoomChangeListener);
-        self.props.chatRoom.unbind('onUnreadCountUpdate.convlistitem');
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
-        this.eventuallyScrollTo();
-    }
-
-    componentDidUpdate() {
-        super.componentDidUpdate();
-
-        this.eventuallyScrollTo();
-    }
-
-    @utils.SoonFcWrap(40, true)
-    eventuallyScrollTo() {
-        const chatRoom = this.props.chatRoom || false;
-
-        if (chatRoom._scrollToOnUpdate) {
-
-            if (chatRoom.isCurrentlyActive) {
-                chatRoom.scrollToChat();
-            }
-            else {
-                chatRoom._scrollToOnUpdate = false;
-            }
-        }
-    }
-
-    getConversationTimestamp = () => {
-        const { chatRoom } = this.props;
-        if (chatRoom) {
-            const lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
-            const timestamp = lastMessage && lastMessage.delay || chatRoom.ctime;
-            return todayOrYesterday(timestamp * 1000) ? getTimeMarker(timestamp) : time2date(timestamp, 17);
-        }
-        return null;
-    };
-
-    @timing(0.7, 8)
-    render() {
-        var classString = "";
-        var chatRoom = this.props.chatRoom;
-        if (!chatRoom || !chatRoom.chatId) {
-            return null;
-        }
-
-        var roomId = chatRoom.chatId;
-
-        // selected
-        if (chatRoom.isCurrentlyActive) {
-            classString += " active";
-        }
-
-        var nameClassString = "user-card-name conversation-name";
-        var archivedDiv = "";
-        if (chatRoom.isArchived()) {
-            archivedDiv = <div className="archived-badge">{l[19067]}</div>;
-        }
-
-        var contactId;
-        var presenceClass;
-        var id;
-
-        if (chatRoom.type === "private") {
-            let handle = chatRoom.getParticipantsExceptMe()[0];
-            if (!handle || !(handle in M.u)) {
-                return null;
-            }
-            let contact = M.u[handle];
-            id = 'conversation_' + htmlentities(contact.u);
-
-            presenceClass = chatRoom.megaChat.userPresenceToCssClass(
-                contact.presence
-            );
-        }
-        else if (chatRoom.type === "group") {
-            contactId = roomId;
-            id = 'conversation_' + contactId;
-            presenceClass = 'group';
-            classString += ' groupchat';
-        }
-        else if (chatRoom.type === "public") {
-            contactId = roomId;
-            id = 'conversation_' + contactId;
-            presenceClass = 'group';
-            classString += ' groupchat public';
-        }
-        else {
-            return "unknown room type: " + chatRoom.roomId;
-        }
-        this.loadingShown = this.isLoading();
-
-        var unreadCount = chatRoom.messagesBuff.getUnreadCount();
-        var isUnread = false;
-
-        var notificationItems = [];
-        if (chatRoom.havePendingCall() && chatRoom.state != ChatRoom.STATE.LEFT) {
-            notificationItems.push(<i
-                className={"tiny-icon " + (chatRoom.isCurrentlyActive ? "blue" : "white") + "-handset"}
-                key="callIcon"/>);
-        }
-        if (unreadCount > 0) {
-            notificationItems.push(<span key="unreadCounter">
-                {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-            );
-            isUnread = true;
-        }
-
-
-        var inCallDiv = null;
-
-        var lastMessageDiv = null;
-
-        var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
-        var lastMsgDivClasses;
-        if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
-            lastMsgDivClasses = this._lastMsgDivClassesCache;
-            lastMessageDiv = this._lastMessageDivCache;
-            lastMsgDivClasses += (isUnread ? " unread" : "");
-            if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
-                lastMsgDivClasses += " call";
-                classString += " call-exists";
-            }
-        }
-        else if (lastMessage) {
-            lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
-            // safe some CPU cycles...
-            var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(
-                lastMessage
-            );
-            lastMessage.renderableSummary = renderableSummary;
-
-            if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
-                lastMsgDivClasses += " call";
-                classString += " call-exists";
-            }
-            lastMessageDiv =
-                <div className={lastMsgDivClasses}>
-                    <ParsedHTML>
-                        {renderableSummary}
-                    </ParsedHTML>
-                </div>;
-            const voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
-
-            if (
-                lastMessage.textContents &&
-                lastMessage.textContents[1] === voiceClipType &&
-                lastMessage.getAttachmentMeta()[0]
-            ) {
-                const playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
-                lastMessageDiv = (
-                    <div className={lastMsgDivClasses}>
-                        <i className="sprite-fm-mono icon-audio-filled voice-message-icon" />
-                        {playTime}
-                    </div>
-                );
-            }
-
-            if (lastMessage.metaType && lastMessage.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION) {
-                lastMessageDiv =
-                    <div className={lastMsgDivClasses}>
-                        <i className="sprite-fm-mono icon-location geolocation-icon" />
-                        {l[20789]}
-                    </div>;
-            }
-        }
-        else {
-            lastMsgDivClasses = "conversation-message";
-
-            /**
-             * Show "Loading" until:
-             * 1. I'd fetched chats from the API.
-             * 2. I'm retrieving history at the moment.
-             * 3. I'd connected to chatd and joined the room.
-             */
-
-            const emptyMessage = this.loadingShown ? l[7006] : l[8000];
-
-            lastMessageDiv =
-                <div>
-                    <div className={lastMsgDivClasses}>
-                        {emptyMessage}
-                    </div>
-                </div>;
-        }
-
-        this.lastMessageId = lastMessage && lastMessage.messageId;
-        this._lastMsgDivClassesCache = lastMsgDivClasses
-            .replace(" call-exists", "")
-            .replace(" unread", "");
-        this._lastMessageDivCache = lastMessageDiv;
-
-
-        if (chatRoom.type !== "public") {
-            nameClassString += " privateChat";
-        }
-        let roomTitle = <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>;
-        if (chatRoom.type === "private") {
-            roomTitle =
-                <ContactAwareName contact={this.props.contact}>
-                    <div className="user-card-wrapper">
-                        <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>
-                    </div>
-                </ContactAwareName>;
-        }
-        nameClassString += chatRoom.type === "private" || chatRoom.type === "group" ? ' badge-pad' : '';
-
-        return (
-            <li
-                id={id}
-                className={classString}
-                data-room-id={roomId}
-                data-jid={contactId}
-                onClick={ev => this.props.onConversationClick(ev)}>
-                <div className="conversation-avatar">
-                    {(chatRoom.type === 'group' || chatRoom.type === 'public') &&
-                        <div
-                            className={`
-                                chat-topic-icon
-                                ${chatRoom.isMeeting ? 'meeting-icon' : ''}
-                            `}>
-                            <i
-                                className={
-                                    chatRoom.isMeeting ?
-                                        'sprite-fm-mono icon-video-call-filled' :
-                                        'sprite-fm-uni icon-chat-group'
-                                }
-                            />
-                        </div>
-                    }
-                    {chatRoom.type === 'private' && <Avatar contact={chatRoom.getParticipantsExceptMe()[0]} />}
-                </div>
-                <div className="conversation-data">
-                    <div className="conversation-data-top">
-                        <div className={`conversation-data-name ${nameClassString}`}>
-                            {roomTitle}
-                        </div>
-                        <div className="conversation-data-badges">
-                            {chatRoom.type === "private" && <span className={`user-card-presence ${presenceClass}`} />}
-                            {(chatRoom.type === "group" || chatRoom.type === "private") &&
-                                <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} />}
-                            {archivedDiv}
-                        </div>
-                        <div className="date-time">{this.getConversationTimestamp()}</div>
-                    </div>
-                    <div className="clear" />
-                    <div className="conversation-message-info">
-                        {lastMessageDiv}
-                        {notificationItems.length > 0 ?
-                            <div className="unread-messages-container">
-                                <div className={`unread-messages items-${notificationItems.length}`}>
-                                    {notificationItems}
-                                </div>
-                            </div> : null}
-                    </div>
-                </div>
-            </li>
-        );
-    }
-}
 
 class ArchConversationsListItem extends MegaRenderMixin {
     componentWillMount() {
@@ -459,91 +162,6 @@ class ArchConversationsListItem extends MegaRenderMixin {
                 </td>
             </tr>
         );
-    }
-}
-
-export class ConversationsList extends MegaRenderMixin {
-    backgroundUpdateInterval = null;
-
-    static defaultProps = {
-        manualDataChangeTracking: true
-    };
-
-    state = {
-        updated: 0
-    };
-
-    customIsEventuallyVisible() {
-        return M.chat;
-    }
-
-    attachRerenderCallbacks() {
-        this._megaChatsListener = megaChat.chats.addChangeListener(() => this.onPropOrStateUpdated());
-    }
-
-    detachRerenderCallbacks() {
-        if (super.detachRerenderCallbacks) {
-            super.detachRerenderCallbacks();
-        }
-        megaChat.chats.removeChangeListener(this._megaChatsListener);
-    }
-
-    doUpdate = () =>
-        this.isComponentVisible() &&
-        document.visibilityState === 'visible' &&
-        this.setState(state => ({ updated: ++state.updated }), () => this.forceUpdate());
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        clearInterval(this.backgroundUpdateInterval);
-        document.removeEventListener('visibilitychange', this.doUpdate);
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
-        this.backgroundUpdateInterval = setInterval(this.doUpdate, 6e4 * 10 /* 10 min */);
-        document.addEventListener('visibilitychange', this.doUpdate);
-    }
-
-    render() {
-        const { conversations, view, views, onConversationClick } = this.props;
-
-        if (conversations && conversations.length) {
-            return (
-                <ul className="conversations-pane">
-                    {conversations.sort(M.sortObjFn(room => room.lastActivity || room.ctime, -1))
-                        .map(chatRoom => {
-                            if (chatRoom.roomId) {
-                                return (
-                                    <ConversationsListItem
-                                        key={chatRoom.roomId}
-                                        chatRoom={chatRoom}
-                                        contact={M.u[chatRoom.getParticipantsExceptMe()[0]] || null}
-                                        messages={chatRoom.messagesBuff}
-                                        onConversationClick={() => {
-                                            loadSubPage(chatRoom.getRoomUrl(false));
-                                            if (onConversationClick) {
-                                                onConversationClick(chatRoom);
-                                            }
-                                        }}
-                                    />
-                                );
-                            }
-                            return null;
-                        })}
-                </ul>
-            );
-        }
-
-        if (view === views.CHATS) {
-            return <span className="empty-conversations">{l.no_chats_lhp}</span>;
-        }
-
-        if (view === views.MEETINGS) {
-            return <span className="empty-conversations">{l.no_meetings_lhp}</span>;
-        }
-
-        return null;
     }
 }
 
@@ -1097,7 +715,8 @@ class ConversationsApp extends MegaRenderMixin {
 
     getConversations() {
         return Object.values(megaChat.chats).filter(c => {
-            return c.isDisplayable() && (this.state.view === this.VIEWS.MEETINGS ? c.isMeeting : !c.isMeeting);
+            // return c.isDisplayable() && (this.state.view === this.VIEWS.MEETINGS ? c.isMeeting : !c.isMeeting);
+            return this.state.view === this.VIEWS.MEETINGS ? c.isMeeting : !c.isMeeting;
         });
     }
 
@@ -1204,6 +823,7 @@ class ConversationsApp extends MegaRenderMixin {
                 <LeftPanel
                     view={view}
                     views={this.VIEWS}
+                    routingSection={routingSection}
                     conversations={conversations}
                     leftPaneWidth={leftPaneWidth}
                     renderView={view => this.renderView(view)}

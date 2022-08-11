@@ -1,14 +1,15 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
+import { compose, MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
+import { withPermissionsObserver } from './permissionsObserver';
 
-export default class StreamExtendedControls extends MegaRenderMixin {
+class StreamExtendedControls extends MegaRenderMixin {
     isActive = type => {
         return !!(this.props.call.av & type);
     };
 
     render() {
-        const { onScreenSharingClick, onHoldClick } = this.props;
+        const { onScreenSharingClick, onHoldClick, resetError } = this.props;
         const SIMPLETIP = { position: 'top', offset: 8, className: 'theme-dark-forced' };
         const screenSharingLabel = this.isActive(SfuClient.Av.Screen)
             ? l[22890] /* `End screen sharing` */ : l[22889] /* `Start screen sharing` */;
@@ -30,9 +31,15 @@ export default class StreamExtendedControls extends MegaRenderMixin {
                     icon={`
                         ${this.isActive(SfuClient.Av.Screen) ? 'icon-end-screenshare' : 'icon-screen-share'}
                     `}
-                    onClick={onScreenSharingClick}>
+                    onClick={() => {
+                        resetError(SfuClient.Av.Screen);
+                        onScreenSharingClick();
+                    }}>
                     <span>{screenSharingLabel}</span>
                 </Button>
+                {this.props.hasToRenderPermissionsWarning(SfuClient.Av.Screen) ?
+                    this.props.renderPermissionsWarning(SfuClient.Av.Screen) :
+                    null}
                 <Button
                     simpletip={{ ...SIMPLETIP, label: callHoldLabel, position: 'left' }}
                     className={`
@@ -50,3 +57,5 @@ export default class StreamExtendedControls extends MegaRenderMixin {
         );
     }
 }
+
+export default compose(withPermissionsObserver)(StreamExtendedControls);

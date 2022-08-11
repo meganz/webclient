@@ -625,7 +625,10 @@ AccountRecoveryControl.prototype.startRecovery = function _startRecovery(email, 
                 }
                 else if (res === 0) {
                     if (!is_mobile) {
-                        handleResetSuccessDialogs('.reset-success', l.check_email_inbox, 'resetsuccess');
+                        handleResetSuccessDialogs(
+                            l.reset_pwd_email_sent_msg.replace('%s', email),
+                            'resetsuccess'
+                        );
                     }
                     else {
                         msgDialog('info', '', l.check_email_inbox);

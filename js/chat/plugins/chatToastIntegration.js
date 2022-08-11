@@ -273,7 +273,7 @@ class ChatToastIntegration {
                     })
                     .rebind('onCallPeerLeft.cTI', (e, { userHandle }) => {
                         if (navigator.onLine) {
-                            if (megaRoom.activeCall && megaRoom.activeCall.sfuApp.isDestroyed) {
+                            if (window.sfuClient && window.sfuClient.isLeavingCall()) {
                                 // Don't show leaving toasts if we are leaving.
                                 return;
                             }
@@ -399,7 +399,7 @@ class ChatToastIntegration {
                         );
                         retryFailToast.dispatch();
                     })
-                    .rebind('onCallEnd.cTI', () => {
+                    .rebind('onCallLeft.cTI', () => {
                         megaRoom.unbind('onMembersUpdated.cTI');
                         // If the call ends (sfuConnections are terminated) check for the reconnecting notif & close it.
                         this.sfuConnOpen();

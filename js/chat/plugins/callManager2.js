@@ -371,15 +371,16 @@
             if (this.activeStream && this.activeStream === peer.cid) {
                 this.activeStream = null;
             }
+            if (this.forcedActiveStream && this.forcedActiveStream === peer.cid) {
+                this.forcedActiveStream = null;
+            }
 
             this.peers[peer.cid].destroy();
-            console.log("onPeerLeft: reason", SfuClient.TermCode[reason]);
             this.chatRoom.trigger('onCallPeerLeft', { userHandle: peer.userId, reason });
             this.left = true;
             // Peer is left alone in a group call -> mute mic
-            this.muteIfAlone();
-            if (this.forcedActiveStream && this.forcedActiveStream === peer.cid) {
-                this.forcedActiveStream = null;
+            if (peer.client.isLeavingCall()) {
+                this.muteIfAlone();
             }
         }
         onJoined() {
@@ -449,15 +450,13 @@
         }
         hangUp(reason) {
             this.sfuApp.destroy(reason);
-            const cids = this.peers.keys();
-            while (cids.length) {
-                const peer = this.peers[cids[cids.length - 1]];
-                if (peer.destroy) {
-                    peer.destroy();
-                }
+            if (!this.peers) {
+                return;
             }
+            assert(this.peers.size() === 0);
             delete this.peers;
             this.callTimeoutDone(true);
+            this.chatRoom.callParticipantsUpdated(); // av: I have added it just in case, but do we need this?
         }
         muteIfAlone() {
             if (this.peers && this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
@@ -482,7 +481,7 @@
                 delete this.callToutId;
             }
             if (!leaveCallActive) {
-                this.chatRoom.trigger('onCallEnd', { callId: this.callId, removeActive: true});
+                this.chatRoom.trigger('onCallLeft', { callId: this.callId });
             }
         }
         initCallTimeout(long) {
@@ -523,13 +522,20 @@
                             done();
                         }
                         else {
-                            timeRemain = secondsToTime(timeRemain).substring(3);
+                            const timeString = secondsToTime(timeRemain).substring(3);
+                            let string = l.empty_call_dlg_text_sec;
                             this.content = l.call_timeout_remain /* `Call will end in %s` */
-                                .replace('%s', timeRemain);
+                                .replace('%s', timeString);
+                            if (timeRemain >= 60) {
+                                timeRemain = Math.ceil(timeRemain / 60);
+                                string = l.empty_call_dlg_text_min;
+                            }
                             // Check if the dialog is shown then update the counter on it.
                             const $dlgText = $('.stay-dlg-counter', '.mega-dialog');
                             if ($dlgText.length && $dlgText.is(':visible')) {
-                                $dlgText.text(timeRemain);
+                                $dlgText.parent().empty().safeHTML(
+                                    mega.icu.format(string, timeRemain).replace('%s', timeString)
+                                );
                             }
                         }
                     })
@@ -603,7 +609,7 @@
             assert(chatRoom.type, 'missing room type');
 
 
-            chatRoom.rebind("onJoinCall.callManager", function(e, data) {
+            chatRoom.rebind("onChatdPeerJoinedCall.callManager", (e, data) => {
                 if (!chatRoom.activeCallIds.exists(data.callId)) {
                     chatRoom.activeCallIds.set(data.callId, []);
                 }
@@ -630,7 +636,7 @@
 
                 chatRoom.callParticipantsUpdated();
             });
-            chatRoom.rebind("onLeftCall.callManager", function(e, data) {
+            chatRoom.rebind("onChatdPeerLeftCall.callManager", (e, data) => {
                 if (!chatRoom.activeCallIds[data.callId]) {
                     return;
                 }
@@ -650,24 +656,24 @@
 
                 chatRoom.callParticipantsUpdated();
             });
-            chatRoom.rebind("onCallEnd.callManager", function(e, data) {
-                if (data.removeActive) {
-                    chatRoom.activeCallIds.remove(data.callId);
+            chatRoom.rebind("onCallLeft.callManager", (e, data) => {
+                console.warn("onCallLeft:", JSON.stringify(data));
+                const activeCall = chatRoom.activeCall;
+                if (!activeCall || activeCall.callId !== data.callId) {
+                    if (d) {
+                        console.warn("... no active call or event not for it");
+                    }
+                    return;
                 }
-
-                if (chatRoom.activeCall && chatRoom.activeCall.callId === data.callId) {
-                    chatRoom.activeCall.hangUp(data.reason);
-                    megaChat.activeCall = chatRoom.activeCall = null;
+                activeCall.hangUp(data.reason);
+                megaChat.activeCall = chatRoom.activeCall = null;
+            });
+            chatRoom.rebind("onChatdCallEnd.callManager", (e, data) => {
+                if (d) {
+                    console.warn("onChatdCallEnd:", JSON.stringify(data));
                 }
-
-                if (chatRoom.ringingCalls.exists(data.callId)) {
-                    chatRoom.ringingCalls.remove(data.callId);
-                }
-                self.trigger("onRingingStopped", {
-                    callId: data.callId,
-                    chatRoom: chatRoom
-                });
-
+                chatRoom.activeCallIds.remove(data.callId);
+                chatRoom.stopRinging(data.callId);
                 chatRoom.callParticipantsUpdated();
             });
             chatRoom.rebind('onCallState.callManager', function(e, data) {
@@ -676,6 +682,7 @@
                 chatRoom.callParticipantsUpdated();
             });
             chatRoom.rebind('onRoomDisconnected.callManager', function() {
+                this.activeCallIds.clear(); // av: Added this to complement the explicit handling of chatd call events
                 // Keep the current call active when online, but chatd got disconnected
                 if (navigator.onLine) {
                     return;
@@ -693,7 +700,8 @@
                 }
             });
             chatRoom.rebind('onCallPeerLeft.callManager', (e, { reason }) => {
-                const { peers, callId, sfuApp } = chatRoom.activeCall;
+                const activeCall = chatRoom.activeCall;
+                const { peers, callId, sfuApp } = activeCall;
 
                 if (
                     sfuApp.isDestroyed ||
@@ -703,11 +711,14 @@
                     return;
                 }
                 if (chatRoom.type === 'private') {
-                    return chatRoom.trigger('onCallEnd', { callId, removeActive: true });
+                    return chatRoom.trigger('onCallLeft', { callId });
                 }
                 // Wait for the peer left notifications to process before triggering.
                 setTimeout(() => {
-                    chatRoom.activeCall.initCallTimeout();
+                    // make sure we still have that call as active
+                    if (chatRoom.activeCall === activeCall) {
+                        chatRoom.activeCall.initCallTimeout();
+                    }
                 }, 3000);
             });
 
@@ -1093,7 +1104,7 @@
                 // current user joining from another client/device.
                 const { peers } = megaChat.activeCall;
                 if (!peers.length || peers.length === 1 && peers.getItem(0).userHandle === u_handle) {
-                    chatRoom.trigger('onCallEnd', { callId: eventData.callId, removeActive: true });
+                    chatRoom.trigger('onCallLeft', { callId: eventData.callId });
                 }
             }
             return;

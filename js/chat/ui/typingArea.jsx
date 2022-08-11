@@ -5,6 +5,7 @@ import { DropdownEmojiSelector } from '../../ui/emojiDropdown.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { EmojiAutocomplete } from './emojiAutocomplete.jsx';
 import GifPanel from './gifPanel/gifPanel.jsx';
+import { PerfectScrollbar } from './../../ui/perfectScrollbar.jsx';
 
 export class TypingArea extends MegaRenderMixin {
     typingAreaRef = React.createRef();
@@ -24,7 +25,6 @@ export class TypingArea extends MegaRenderMixin {
         this.onTypeAreaKeyDown = this.onTypeAreaKeyDown.bind(this);
         this.onTypeAreaBlur = this.onTypeAreaBlur.bind(this);
         this.onTypeAreaChange = this.onTypeAreaChange.bind(this);
-        this.onTypeAreaSelect = this.onTypeAreaSelect.bind(this);
         this.onCopyCapture = this.onCopyCapture.bind(this);
         this.onPasteCapture = this.onPasteCapture.bind(this);
         this.onCutCapture = this.onCutCapture.bind(this);
@@ -94,7 +94,7 @@ export class TypingArea extends MegaRenderMixin {
         }
 
         if (!shouldTriggerUpdate) {
-            var $textarea = $('.chat-textarea:visible textarea:visible', self.$container);
+            var $textarea = $('.chat-textarea:visible textarea:visible', self.typingAreaRef.current);
             if (!self._lastTextareaHeight || self._lastTextareaHeight !== $textarea.height()) {
                 self._lastTextareaHeight = $textarea.height();
                 shouldTriggerUpdate = true;
@@ -126,7 +126,7 @@ export class TypingArea extends MegaRenderMixin {
             return;
         }
 
-        var val = $.trim($('.chat-textarea:visible textarea:visible', self.$container).val());
+        var val = $.trim($('.chat-textarea:visible textarea:visible', this.typingAreaRef.current).val());
 
         if (self.onConfirmTrigger(val) !== true) {
             self.setState({typedMessage: ""});
@@ -143,10 +143,7 @@ export class TypingArea extends MegaRenderMixin {
 
         if (val !== false && result !== false) {
             // scroll To 0 after sending a message.
-            const $textareaScrollBlock = $('.textarea-scroll', this.typingAreaRef.current);
-            const jsp = $textareaScrollBlock.data('jsp');
-            jsp.scrollToY(0);
-            $('.jspPane', $textareaScrollBlock).css({ top: 0 });
+            $('.textarea-scroll', this.typingAreaRef.current).scrollTop(0);
         }
 
         if (persist) {
@@ -320,8 +317,6 @@ export class TypingArea extends MegaRenderMixin {
                 self.setState({'emojiSearchQuery': false});
             }
         }
-
-        self.updateScroll(true);
     }
 
     onTypeAreaBlur(e) {
@@ -386,7 +381,7 @@ export class TypingArea extends MegaRenderMixin {
             }
         }
 
-        self.updateScroll(true);
+        self.updateScroll();
 
         // if (self.props.onUpdate) {
         //     self.props.onUpdate();
@@ -415,15 +410,8 @@ export class TypingArea extends MegaRenderMixin {
             this.handleWindowResize()
         );
 
-        $('.jScrollPaneContainer', this.typingAreaRef.current)
-            .rebind(`forceResize.typingArea${this.getUniqueId()}`, () => this.updateScroll(false));
-
-        if (!this.scrollingInitialised) {
-            this.initScrolling();
-        }
-
         this.triggerOnUpdate(true);
-        this.updateScroll(false);
+        this.updateScroll();
     }
 
     componentWillMount() {
@@ -477,47 +465,22 @@ export class TypingArea extends MegaRenderMixin {
     }
 
     componentDidUpdate() {
-        var self = this;
 
-        if (self.isComponentEventuallyVisible()) {
-            if ($(
+        if (this.isComponentEventuallyVisible() && $(
                 document.querySelector('textarea:focus,select:focus,input:focus')
             ).filter(":visible").length === 0) {
-                // no other element is focused...
-                this.focusTypeArea();
-            }
-
-            self.handleWindowResize();
+            // no other element is focused...
+            this.focusTypeArea();
         }
 
-        if (!this.scrollingInitialised) {
-            this.initScrolling();
-        }
-        else {
-            this.updateScroll();
-        }
-        if (self.onUpdateCursorPosition) {
-            var el = $('.chat-textarea:visible:first textarea:visible', self.$container)[0];
+        this.updateScroll();
+
+        if (this.onUpdateCursorPosition) {
+            var el = $('.chat-textarea:visible:first textarea:visible', this.typingAreaRef.current)[0];
             el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
-            self.onUpdateCursorPosition = false;
+            this.onUpdateCursorPosition = false;
         }
     }
-
-    initScrolling = () => {
-        if (this.typingAreaRef && this.typingAreaRef.current) {
-            this.scrollingInitialised = true;
-            const $textarea = $('textarea:first', this.typingAreaRef.current);
-            const $textareaScrollBlock = $('.textarea-scroll', this.typingAreaRef.current);
-            this.textareaLineHeight = parseInt($textarea.css('line-height'));
-            $textareaScrollBlock.jScrollPane({
-                enableKeyboardNavigation: false,
-                showArrows: true,
-                arrowSize: 5,
-                animateScroll: false,
-                maintainPosition: false
-            });
-        }
-    };
 
     /**
      * getTextareaMaxHeight
@@ -533,149 +496,45 @@ export class TypingArea extends MegaRenderMixin {
         return 100;
     };
 
-    @SoonFcWrap(60)
     updateScroll() {
-        var self = this;
 
         // DONT update if not visible...
-        if (!this.isComponentEventuallyVisible()) {
+        if (!this.isComponentEventuallyVisible()
+            || !this.$node && !this.typingAreaRef && !this.typingAreaRef.current) {
+
             return;
         }
 
-        var $node = self.$node = self.$node || this.typingAreaRef.current;
+        var $node = this.$node = this.$node || this.typingAreaRef.current;
+        const $textarea = this.$textarea = this.$textarea || $('textarea:first', $node);
+        const $scrollBlock = this.$scrollBlock = this.$scrollBlock || $textarea.closest('.textarea-scroll');
+        const $preview = $('.message-preview', $scrollBlock)
+            .safeHTML(`${$textarea.val().replace(/\n/g, '<br />')} <br>`);
+        const textareaHeight = $preview.height();
 
-        var $textarea = self.$textarea = self.$textarea || $('textarea:first', $node);
-        var $textareaClone = self.$textareaClone = self.$textareaClone || $('.message-preview', $node);
-        var textareaMaxHeight = self.getTextareaMaxHeight();
-
-        var $textareaScrollBlock = self.$textareaScrollBlock = self.$textareaScrollBlock ||
-            $('.textarea-scroll', $node);
-
-
-        var textareaContent = $textarea.val();
-        var cursorPosition = self.getCursorPosition($textarea[0]);
-        var $textareaCloneSpan;
-
-        var viewLimitTop = 0;
-        var scrPos = 0;
-        var viewRatio = 0;
-
-        // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
-        if (
-            self.lastContent === textareaContent &&
-            self.lastPosition === cursorPosition
-        ) {
-            return;
-        }
-        else {
-            self.lastContent = textareaContent;
-            self.lastPosition = cursorPosition;
-
-            // Set textarea height according to  textarea clone height
-            textareaContent = '@[!'+textareaContent.substr(0, cursorPosition) +
-                '!]@' + textareaContent.substr(cursorPosition, textareaContent.length);
-
-            // prevent self-xss
-            textareaContent = htmlentities(textareaContent);
-
-            // convert the cursor position/selection markers to html tags
-            textareaContent = textareaContent.replace(/@\[!/g, '<span>');
-            textareaContent = textareaContent.replace(/!\]@/g, '</span>');
-
-
-            textareaContent = textareaContent.replace(/\n/g, '<br />');
-            $textareaClone.html(textareaContent + '<br />');
-        }
-
-        var textareaCloneHeight = $textareaClone.height();
-        $textarea.height(textareaCloneHeight);
-        $textareaCloneSpan = $textareaClone.children('span');
-        var textareaCloneSpanHeight = $textareaCloneSpan.height();
-
-        var jsp = $textareaScrollBlock.data('jsp');
-
-        if (!jsp) {
-            $textareaScrollBlock.jScrollPane(
-                {
-                    enableKeyboardNavigation: false, showArrows: true, arrowSize: 5, animateScroll: false
-                }
-            );
-            var textareaIsFocused = $textarea.is(":focus");
-            jsp = $textareaScrollBlock.data('jsp');
-
-            if (!textareaIsFocused) {
-                moveCursortoToEnd($textarea[0]);
-            }
-        }
-
-        scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
-        viewRatio = Math.round(textareaCloneSpanHeight + scrPos);
-
-        $textareaScrollBlock.height(
+        $scrollBlock.height(
             Math.min(
-                textareaCloneHeight,
-                textareaMaxHeight
+                textareaHeight,
+                this.getTextareaMaxHeight()
             )
         );
 
-        var textareaWasFocusedBeforeReinit = $textarea.is(":focus");
-        var selectionPos = false;
-        if (textareaWasFocusedBeforeReinit) {
-            selectionPos = [$textarea[0].selectionStart, $textarea[0].selectionEnd];
-        }
+        if (textareaHeight !== this._lastTextareaHeight) {
 
-        jsp.reinitialise();
+            this._lastTextareaHeight = textareaHeight;
 
-        // requery to get the new <textarea/> that JSP had just replaced in the DOM.
-        $textarea = $('textarea:first', $node);
-
-        if (textareaWasFocusedBeforeReinit) {
-            // restore selection after JSP.reinit!
-            $textarea[0].selectionStart = selectionPos[0];
-            $textarea[0].selectionEnd = selectionPos[1];
-        }
-
-
-        // Scrolling according cursor position
-        if (textareaCloneHeight > textareaMaxHeight && textareaCloneSpanHeight < textareaMaxHeight) {
-            jsp.scrollToY(0);
-        }
-        else if (viewRatio > self.textareaLineHeight || viewRatio < viewLimitTop) {
-            if (
-                textareaCloneSpanHeight > 0 &&
-                jsp &&
-                textareaCloneSpanHeight > textareaMaxHeight
-            ) {
-                jsp.scrollToY(textareaCloneSpanHeight - self.textareaLineHeight);
-            } else if (jsp) {
-                jsp.scrollToY(0);
-
-                // because jScrollPane may think that there is no scrollbar, it would NOT scroll back to 0?!
-                if (scrPos < 0) {
-                    $textareaScrollBlock.find('.jspPane').css('top', 0);
-                }
-            }
-        }
-
-
-        if (textareaCloneHeight < textareaMaxHeight) {
-            $textareaScrollBlock.addClass('noscroll');
-        }
-        else {
-            $textareaScrollBlock.removeClass('noscroll');
-        }
-        if (textareaCloneHeight !== self.state.textareaHeight) {
-            self.setState({
-                'textareaHeight': textareaCloneHeight
+            this.setState({
+                'textareaHeight': textareaHeight
             });
-            if (self.props.onResized) {
-                self.props.onResized();
+            if (this.props.onResized) {
+                this.props.onResized();
             }
+            $textarea.height(textareaHeight);
         }
-        else {
-            self.handleWindowResize();
-        }
+
+        this.textareaScroll.reinitialise();
     }
+
 
     getCursorPosition(el) {
         var pos = 0;
@@ -692,10 +551,6 @@ export class TypingArea extends MegaRenderMixin {
         return pos;
     }
 
-    onTypeAreaSelect() {
-        this.updateScroll(true);
-    }
-
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
     }
@@ -707,7 +562,7 @@ export class TypingArea extends MegaRenderMixin {
         }
 
         if (e) {
-            this.updateScroll(false);
+            this.updateScroll();
         }
         this.triggerOnUpdate();
 
@@ -919,10 +774,14 @@ export class TypingArea extends MegaRenderMixin {
                         />
                     </Button>
                     <hr />
-                    <div
-                        className="chat-textarea-scroll textarea-scroll jScrollPaneContainer"
-                        style={textareaScrollBlockStyles}>
-
+                    <PerfectScrollbar
+                        chatRoom={self.props.chatRoom}
+                        className="chat-textarea-scroll textarea-scroll"
+                        options={{ 'suppressScrollX': true }}
+                        style={textareaScrollBlockStyles}
+                        ref={(ref) => {
+                            self.textareaScroll = ref;
+                        }}>
                         <div className="messages-textarea-placeholder">
                             {self.state.typedMessage ? null : <Emoji>{placeholder}</Emoji>}
                         </div>
@@ -935,7 +794,6 @@ export class TypingArea extends MegaRenderMixin {
                             onKeyDown={this.onTypeAreaKeyDown}
                             onBlur={this.onTypeAreaBlur}
                             onChange={this.onTypeAreaChange}
-                            onSelect={this.onTypeAreaSelect}
                             onCopyCapture={this.onCopyCapture}
                             onPasteCapture={this.onPasteCapture}
                             onCutCapture={this.onCutCapture}
@@ -945,7 +803,7 @@ export class TypingArea extends MegaRenderMixin {
                             readOnly={disabledTextarea}
                         />
                         <div className="message-preview" />
-                    </div>
+                    </PerfectScrollbar>
                 </div>
                 {buttons}
             </div>

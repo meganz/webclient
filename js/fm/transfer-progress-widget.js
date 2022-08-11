@@ -85,12 +85,7 @@ mega.tpw = new function TransferProgressWidget() {
 
     var initScrolling = function() {
         delay('tpw:initScrolling', () => {
-            if ($bodyContainer.hasClass('ps')) {
-                Ps.update($bodyContainer[0]);
-            }
-            else {
-                Ps.initialize($bodyContainer[0]);
-            }
+            initPerfectScrollbar($bodyContainer);
         }, 250);
     };
 

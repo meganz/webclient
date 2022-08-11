@@ -49,8 +49,6 @@ export default class ComposedTextArea extends MegaRenderMixin {
                     }}
                     onResized={() => {
                         parent.historyPanel.handleWindowResize();
-                        $('.js-messages-scroll-area', parent.findDOMNode())
-                            .trigger('forceResize', [true]);
                     }}
                     onConfirm={(messageContents) => {
                         const { messagesListScrollable } = parent.historyPanel;

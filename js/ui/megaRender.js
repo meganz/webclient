@@ -467,14 +467,6 @@
                 $.tresizer();
 
                 sharedFolderUI();
-                deleteScrollPanel('.contacts-blocks-scrolling', 'jsp');
-                deleteScrollPanel('.contacts-details-block .file-block-scrolling', 'jsp');
-                deleteScrollPanel('.file-block-scrolling', 'jsp');
-                deleteScrollPanel('.shared-blocks-scrolling', 'jsp');
-                deleteScrollPanel('.out-shared-blocks-scrolling', 'jsp');
-                // @todo deprecate/remove the left behind html/code since we moved opc/ipc to chat
-                // initOpcGridScrolling();
-                // initIpcGridScrolling();
 
                 $('.grid-table:not(.arc-chat-messages-block) tbody tr').remove();
                 $('.file-block-scrolling a').remove();

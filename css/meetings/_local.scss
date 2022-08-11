@@ -155,6 +155,8 @@
         z-index: 1125;
         width: 320px;
         height: 240px;
+        bottom: 80px;
+        border: 1px solid rgba(33, 33, 33, 1);
 
         &.ratio-16-9 { width: 334px; height: 188px; }
 

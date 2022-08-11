@@ -193,14 +193,14 @@ var QuickFinder = function(searchable_elements, containers) {
 
                     $target_elm.parents(".ui-selectee, .ui-draggable").addClass("ui-selected");
 
-                    var $jsp = $target_elm.getParentJScrollPane();
-                    if ($jsp) {
-                        var $scrolled_elm = $target_elm.parent("a");
+                    const $scrollBlock = $target_elm.closest('.ps');
+                    if ($scrollBlock.length) {
+                        let $scrolled_elm = $target_elm.parent('a');
 
                         if (!$scrolled_elm.length) { // not in icon view, its a list view, search for a tr
                             $scrolled_elm = $target_elm.parents('tr:first');
                         }
-                        $jsp.scrollToElement($scrolled_elm);
+                        $scrollBlock.scrollTop($scrolled_elm.position().top + $scrollBlock.scrollTop());
                     }
 
                     $(self).trigger('search');
@@ -230,23 +230,23 @@ var QuickFinder = function(searchable_elements, containers) {
                         break;
                 }
             }
-            else if ($(elem + ':visible').length) {
+            else if ($(`${elem}:visible`).length) {
                 elem = $('.grid-scrolling-table:visible, .file-block-scrolling:visible');
-                var jsp = elem.data('jsp');
+                const $scrollBlock = elem.closest('.ps');
 
-                if (jsp) {
+                if ($scrollBlock.length) {
                     switch (charCode) {
                         case 33: /* Page Up   */
-                            jsp.scrollByY(-elem.height(), !0);
+                            $scrollBlock.scrollTop($scrollBlock.scrollTop() - elem.height());
                             break;
                         case 34: /* Page Down */
-                            jsp.scrollByY(elem.height(), !0);
+                            $scrollBlock.scrollTop($scrollBlock.scrollTop() + elem.height());
                             break;
                         case 35: /* End       */
-                            jsp.scrollToBottom(!0);
+                            $scrollBlock.scrollTop($scrollBlock.prop('scrollHeight'));
                             break;
                         case 36: /* Home      */
-                            jsp.scrollToY(0, !0);
+                            $scrollBlock.scrollTop(0);
                             break;
                     }
                 }

@@ -1,101 +1,4 @@
 /**
- * initTextareaScrolling
- *
- * @param {Object} $textarea. DOM textarea element.
- * @param {Number} textareaMaxHeight Textarea max height. Default is 100
- * @param {Boolean} resizeEvent If we need to bind window resize event
- */
-function initTextareaScrolling($textarea, textareaMaxHeight, resizeEvent) {
-    var textareaWrapperClass = $textarea.parent().attr('class'),
-          $textareaClone,
-          textareaLineHeight = parseInt($textarea.css('line-height'));
-          textareaMaxHeight = textareaMaxHeight ? textareaMaxHeight: 100;
-
-    // Textarea Clone block to define height of autoresizeable textarea
-    if (!$textarea.next('div').length) {
-        $('<div></div>').insertAfter($textarea);
-    }
-    $textareaClone = $textarea.next('div');
-
-    const textareaScrolling = (keyEvents) => {
-        const $textareaScrollBlock = $textarea.closest('.textarea-scroll') || $textarea.parent();
-        const cursorPosition = $textarea.getCursorPosition();
-        const viewLimitTop = 0;
-        let $textareaCloneSpan = {};
-        let textareaContent = $textarea.val();
-        let scrPos = 0;
-        let viewRatio = 0;
-        let textareaCloneHeight = 0;
-        let textareaCloneSpanHeight = 0;
-
-        // Set textarea height according to  textarea clone height
-        textareaContent = `<span>${textareaContent.substr(0, cursorPosition)}</span>
-            ${textareaContent.substr(cursorPosition, textareaContent.length)}`;
-
-        // try NOT to update the DOM twice if nothing had changed (and this is NOT a resize event).
-        if (keyEvents && $textareaClone.data('lastContent') === textareaContent) {
-            return;
-        }
-        else {
-            $textareaClone.data('lastContent', textareaContent);
-            textareaContent = textareaContent.replace(/\n/g, '<br />');
-            $textareaClone.safeHTML(textareaContent + '<br />');
-        }
-
-        textareaCloneHeight = $textareaClone.outerHeight();
-        $textarea.outerHeight(textareaCloneHeight);
-        $textareaCloneSpan = $('span', $textareaClone);
-        textareaCloneSpanHeight = $textareaCloneSpan.outerHeight();
-        scrPos = $textareaScrollBlock.scrollTop();
-        viewRatio = Math.round(textareaCloneSpanHeight + scrPos);
-
-        // Textarea wrapper scrolling init
-        if (textareaCloneHeight > textareaMaxHeight) {
-
-            if ($textareaScrollBlock.is('.ps')) {
-                Ps.update($textareaScrollBlock[0]);
-            }
-            else {
-                Ps.initialize($textareaScrollBlock[0]);
-            }
-        }
-        else if ($textareaScrollBlock.is('.ps')){
-            Ps.destroy($textareaScrollBlock[0]);
-            $textareaScrollBlock.scrollTop(0);
-        }
-
-        // Scrolling according cursor position
-        if (viewRatio > textareaLineHeight || viewRatio < viewLimitTop) {
-            if (textareaCloneSpanHeight > 0 && $textareaScrollBlock.is('.ps')) {
-                $textareaScrollBlock.scrollTop(textareaCloneSpanHeight - textareaLineHeight);
-            }
-            else if ($textareaScrollBlock.is('.ps')) {
-                $textareaScrollBlock.scrollTop(0);
-            }
-        }
-        $textarea.trigger('autoresized');
-    }
-
-    // Init textarea scrolling
-    textareaScrolling();
-
-    // Reinit scrolling after keyup/keydown/paste events
-    $textarea.off('keyup keydown paste');
-    $textarea.on('keyup keydown paste', function() {
-        textareaScrolling(1);
-    });
-
-    // Bind window resize if textarea is resizeable
-    if (resizeEvent) {
-        var eventName = textareaWrapperClass.replace(/[_\s]/g, '');
-        $(window).rebind('resize.' + eventName, function () {
-            textareaScrolling();
-        });
-    }
-}
-
-
-/**
  * addNewContact
  *
  * User adding new contact/s from add contact dialog.
@@ -689,7 +592,9 @@ function contactAddDialog(close, dontWarnBusiness) {
 
     $textarea.val('');
     $d.find('.multiple-input .token-input-token-mega').remove();
-    initTokenInputsScroll($('.multiple-input', $d));
+
+    initPerfectScrollbar($('.multiple-input', $d));
+
     Soon(function() {
         $('.add-contact-multiple-input input', $d).trigger("focus");
     });
@@ -704,7 +609,7 @@ function contactAddDialog(close, dontWarnBusiness) {
         $('.hidden-achievement-info', $d).removeClass('hidden');
     }
 
-    initTextareaScrolling($textarea, 72);
+    initTextareaScrolling($textarea);
     $('input.add-contact-multiple-input', $d).trigger("focus");
     focusOnInput();
 
@@ -958,21 +863,31 @@ function doClearbin(all) {
     });
 }
 
-function handleResetSuccessDialogs(dialog, txt, dlgString) {
+/**
+ * To show the password reset link / the account closure link sent dialog, and its related event handlers
+ * @param {String} dialogText   The main message displays in the dialog
+ * @param {String} dlgString    The dialog name
+ * @returns {void}
+ */
+function handleResetSuccessDialogs(dialogText, dlgString) {
+    'use strict';
 
-    $('.mega-dialog' + dialog + ' .reg-success-txt').text(txt);
+    const $resetSuccessDlg = $('.mega-dialog.reset-success');
 
-    $('.mega-dialog' + dialog + ' button.cancel').rebind('click', function() {
+    $('.reset-success-title', $resetSuccessDlg)
+        .text(dlgString === 'deleteaccount' ? l.ac_closure_link_sent : l.pwd_link_sent);
+    $('.reset-email-success-txt', $resetSuccessDlg).safeHTML(dialogText);
+
+    $('a.try-again, button.js-close, button.ok-btn', $resetSuccessDlg).rebind('click.close-dlg', () => {
         $('.fm-dialog-overlay').addClass('hidden');
         $('body').removeClass('overlayed');
-        $('.mega-dialog' + dialog).addClass('hidden');
+        $resetSuccessDlg.addClass('hidden');
         delete $.dialog;
     });
 
     $('.fm-dialog-overlay').removeClass('hidden');
     $('body').addClass('overlayed');
-    $('.mega-dialog' + dialog).removeClass('hidden');
-
+    $resetSuccessDlg.removeClass('hidden');
     $.dialog = dlgString;
 }
 
@@ -1933,7 +1848,7 @@ function shareDialogContentCheck() {
     var $removeBtn = $('.remove-share', dc);
 
     // Taking care about the sharing access list scrolling
-    handleDialogScroll(itemsNum, dc);
+    initPerfectScrollbar($('.share-dialog-access-list', dc));
 
     // Taking care about the Remove Share button enabled/disabled
     if (itemsNum > 1) {
@@ -2187,7 +2102,7 @@ function shareDialogAccessListBinds() {
             return false;
         }
 
-        var $scrollBlock = $('.share-dialog-access-list .jspPane', $shareDialog);
+        var $scrollBlock = $('.share-dialog-access-list', $shareDialog);
         var scrollPos = 0;
         var x = 0;
         var y = 0;
@@ -2257,7 +2172,7 @@ function shareDialogAccessListBinds() {
     });
 
     // Hide the permission menu once scrolling
-    $('.share-dialog-access-list', $shareDialog).rebind('jsp-scroll-y.closeMenu', function() {
+    $('.share-dialog-access-list', $shareDialog).rebind('scroll.closeMenu', () => {
         hideShareDialogPermMenu();
     });
 }
@@ -2424,13 +2339,13 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
         onAdd: function(email) {
             if (listedContacts.indexOf(email.id) > -1) {
                 // If the entered email is one of existing contacts in the picker, select it automatically for users
-                var $listedItemHandle = M.getUserByEmail(email.id).h;
-                var $listedItemEle = $('.contacts-search-subsection .' + $listedItemHandle, $scope);
+                const $listedItemHandle = M.getUserByEmail(email.id).h;
+                const $listedItemEle = $(`.contacts-search-subsection .${$listedItemHandle}`, $scope);
+                const $scrollBlock = $('.contacts-search-scroll', $scope);
 
-                if ($('.contacts-search-scroll', $scope).is('.jspScrollable') && !window.safari) {
-                    // Auto-scroll to the selected element except for Safari since the graphic glitch issue
-                    $('.contacts-search-scroll.jspScrollable', $scope)
-                        .data('jsp').scrollToElement($listedItemEle.parent());
+                if ($scrollBlock.is('.ps')) {
+                    // Auto-scroll to the selected element
+                    scrollToElement($scrollBlock, $listedItemEle);
                 }
 
                 if ($.contactPickerSelected.indexOf($listedItemHandle) === -1) {
@@ -2444,7 +2359,7 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
                 if (typeof M.findOutgoingPendingContactIdByEmail(email.id) === 'undefined') {
                     // Show a text area where the user can add a custom message to the pending share request
                     $('.share-message', $scope).removeClass('hidden');
-                    initTextareaScrolling($('.share-message-textarea textarea', $scope), 72);
+                    initTextareaScrolling($('.share-message-textarea textarea', $scope));
                 }
 
                 $('.add-share', $scope).removeClass('disabled');
@@ -2494,9 +2409,6 @@ function renderShareDialogAccessList() {
 
     // Remove all contacts from the access list
     $('.share-dialog-access-node').remove();
-
-    // Clear the scroll panel in access list
-    clearScrollPanel($('.share-dialog-access-list', $shareDialog));
 
     // Fill the shared folder's access list
     fillShareDialogWithContent();
@@ -3096,13 +3008,12 @@ function createFileDialog(close, action, params) {
                         var $grid = $($.selectddUIgrid);
                         var $newElement = $('#' + nh, $grid);
 
-                        var jsp = $grid.data('jsp');
-                        if (jsp) {
-                            jsp.scrollToElement($newElement);
-                        }
-                        else if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
+                        if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
                             M.megaRender.megaList.scrollToItem(nh);
                             $newElement = $('#' + nh, $grid);
+                        }
+                        else if ($grid.length && $newElement.length && $grid.hasClass('ps')) {
+                            scrollToElement($grid, $newElement);
                         }
 
                         // now let's select the item. we can not use the click handler due
@@ -3237,10 +3148,8 @@ function bottomPageDialog(close, pp, hh, tickbox) {
     var closeDialog = function() {
         $dialog.off('dialog-closed');
         // reset scroll position to top for re-open
-        var jsp = $dialog.find('.bp-body').data('jsp');
-        if (jsp) {
-            jsp.scrollToY(0);
-        }
+        $dialog.scrollTop(0);
+
         window.closeDialog();
         delete $.termsAgree;
         delete $.termsDeny;
@@ -3322,17 +3231,11 @@ function bottomPageDialog(close, pp, hh, tickbox) {
             .replace('main-mid-pad new-bottom-pages', ''))
         );
 
-        $('.bp-body', $dialog).jScrollPane({
-            showArrows: true,
-            arrowSize: 5,
-            animateScroll: true,
-            verticalDragMinHeight: 50
-        });
+        initPerfectScrollbar($('.bp-body', $dialog));
 
         if (pp === 'terms') {
             $('a[href]', $bottomPageDialogMain).attr('target', '_blank');
         }
-        jScrollFade('.bp-body');
         clickURLs();
         scrollToURLs();
         return $dialog;
@@ -3390,18 +3293,18 @@ function fm_resize_handler(force) {
 
     if (M.currentdirid === 'shares') {
         if (M.viewmode) {
-            initShareBlocksScrolling();
+            initPerfectScrollbar($('.shared-blocks-scrolling', '.shared-blocks-view'));
         }
         else {
-            initGridScrolling();
+            initPerfectScrollbar($('.grid-scrolling-table', '.shared-grid-view'));
         }
     }
     else if (M.currentdirid === 'out-shares') {
         if (M.viewmode) {
-            initOutShareBlocksScrolling();
+            initPerfectScrollbar($('.out-shared-blocks-scrolling', '.out-shared-blocks-view'));
         }
         else {
-            initGridScrolling();
+            initPerfectScrollbar($('.grid-scrolling-table', '.out-shared-grid-view'));
         }
     }
     else if (M.currentdirid === 'transfers') {
@@ -3440,14 +3343,11 @@ function fm_resize_handler(force) {
         }
         if (M.viewmode) {
 
-            const $v = $('.file-block-scrolling.megaList:visible');
-
-            if ($v.length) {
-                Ps.update($v.get(0));
-            }
+            initPerfectScrollbar($('.file-block-scrolling:visible'));
         }
         else {
-            initGridScrolling();
+
+            initPerfectScrollbar($('.grid-scrolling-table:visible'));
             if ($.gridHeader) {
                 $.gridHeader();
             }

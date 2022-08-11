@@ -1215,6 +1215,22 @@ div.bottom-page.slider-controls {
     }
 }
 
+@media only screen and (max-width: 1050px) {
+    .bottom-page .mega-button.individual {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 1300px) {
+    .bottom-page .top-change-language,
+    .bottom-page .top-buttons,
+    .bottom-page .top-login-button,
+    .bottom-page .fmdb-loader.sprite-fm-uni,
+    .bottom-page .topbar-links hr {
+        display: none;
+    }
+}
+
 @media only screen and (max-width: 720px) {
     .business-cell .cell-bg::before,
     .business-cell .cell-bg::after,
@@ -1429,8 +1445,6 @@ div.bottom-page.slider-controls {
     .bottom-page .slide5 .slider-top-wrap {
         left: -400%;
     }
-    .bottom-page .top-change-language,
-    .bottom-page .top-buttons,
     .bottom-page .activity-status-block,
     .bottom-page .fm-avatar,
     .bottom-page .user-name,
@@ -1488,6 +1502,10 @@ div.bottom-page.slider-controls {
     .business-page .bottom-page.big-header.top.dark {
         margin: 0 auto;
         padding: 47px 0 4px 0;
+    }
+
+    .bottom-page .create-account-button {
+        display: none;
     }
 }
 

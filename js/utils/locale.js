@@ -1280,7 +1280,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A2]', '</a>')
         .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
         .replace(/\[BR]/g, '<br/>');
-    l[24708] = escapeHTML(l[24708]).replace('[LT]', '<').replace('[GT]', '>');
+    l[24708] = escapeHTML(l[24708]).replace('%s', '" * / : < > ? \\ |');
     l[24852] = escapeHTML(l[24852])
         .replace('[A]', '<a target="_blank" class="green-link" href="https://blog.mega.io">')
         .replace('[/A]', '</a>');
@@ -1413,9 +1413,13 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[BR]', '<br>');
     l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
         .replace('[BR]', '<br>');
-    l.empty_call_dlg_text = l.empty_call_dlg_text
-        .replace('[S1]', '<span class="stay-dlg-counter">').replace('[/S1]', '</span>')
-        .replace('[S2]', '<div class="stay-dlg-subtext">').replace('[/S2]', '</div>');
+    ['empty_call_dlg_text', 'empty_call_dlg_text_min', 'empty_call_dlg_text_sec'].forEach(s => {
+        l[s] = l[s]
+            .replace(/\[S1]/g, '<span class="stay-dlg-counter">')
+            .replace(/\[\/S1]/g, '</span>')
+            .replace(/\[S2]/g, '<div class="stay-dlg-subtext">')
+            .replace(/\[\/S2]/g, '</div>');
+    });
     l.meeting_empty_call_desc_1 = escapeHTML(l.meeting_empty_call_desc_1)
         .replace(/\[P]/g, '<div>')
         .replace(/\[\/P]/g, '</div>');
@@ -1429,6 +1433,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/D1]', '</div>')
         .replace('[D2]', '<div class="recovery-key-size">')
         .replace('[/D2]', '</div>');
+    l.no_email_try_again = l.no_email_try_again.replace('[A]', '<a class="try-again">').replace('[/A]', '</a>');
+    l.contact_support_email = l.contact_support_email
+        .replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
+        .replace('[/A]', '</a>');
 
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,

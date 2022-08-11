@@ -54,6 +54,7 @@
 /* Dark overlay close buttons */
 .payment-close,
 .overlay-close {
+    min-width: 56px;
     position: absolute;
     z-index: 2300;
     top: 14px;
@@ -1181,9 +1182,6 @@ body.de .mega-dialog.new-group-chat {
 .fm-versioning.top-column.versioning-buttons {
     flex-shrink: 0;
 }
-.fm-versioning .jspVerticalBar {
-    width: 6px;
-}
 .fm-versioning.settings,
 .fm-versioning.close {
     position: absolute;
@@ -1610,9 +1608,6 @@ body.de .mega-dialog.new-group-chat {
 .share-dialog-tree-panel {
     overflow: hidden;
     margin: 0 -12px 12px -12px;
-}
-.share-dialog-tree-panel .jspVerticalBar {
-    width: 22px;
 }
 .share-dialog-tree-panel .nw-fm-tree-item {
     padding-right: 28px;
@@ -2634,9 +2629,6 @@ body.de .mega-dialog.new-group-chat {
         height: 280px;
         position: relative;
     }
-    .mega-dialog.fm-picker-dialog .jspDrag {
-        min-height: 16px !important;
-    }
     .mega-dialog.fm-picker-dialog .user-card-email.small.note {
         color: var(--text-color-high);
         font: var(--text-body2);
@@ -2879,10 +2871,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.fm-picker-dialog .search-bar input::placeholder {
         color: var(--text-color-low);
     }
-    .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll {
-        margin: 8px 0 0 0;
-        position: relative;
-    }
     .mega-dialog.fm-picker-dialog .search-bar .icon {
         position: absolute;
         right: 0;
@@ -2898,12 +2886,10 @@ body.de .mega-dialog.new-group-chat {
         opacity: 0.7;
     }
     .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll {
-        margin-top: 8px;
-        margin-bottom: 8px;
-        -webkit-margin-start: 8px;
-        -webkit-margin-end: 4px;
-        margin-inline-start: 8px;
-        margin-inline-end: 4px;
+        box-sizing: border-box;
+        margin: 8px 0 0;
+        overflow: hidden;
+        padding: 0 8px;
         position: relative;
     }
     .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll span {
@@ -3300,10 +3286,6 @@ body.de .mega-dialog.new-group-chat {
         position: relative;
         overflow: hidden;
         padding: 0;
-    }
-    .mega-dialog.fm-picker-dialog .summary-row .summary-input .item-row-group .jsPane {
-        top: 0;
-        bottom: 0;
     }
     .mega-dialog.fm-picker-dialog .fm-breadcrumbs .right-arrow-bg {
         font: var(--text-body1);
@@ -4422,8 +4404,9 @@ body.de .mega-dialog.new-group-chat {
         float: right;
     }
     .mega-dialog.payment-address-dialog .remember-billing-info-wrapper {
-        margin-top: 20px;
-        padding-left: 48px;
+        padding: 20px 0;
+        -webkit-padding-start: 48px;
+        padding-inline-start: 48px;
     }
     .mega-dialog.payment-address-dialog .fm-account-input {
         border-radius: 4px;
@@ -4550,7 +4533,10 @@ body.de .mega-dialog.new-group-chat {
         margin-bottom: 20px;
     }
     .mega-dialog.payment-address-dialog .states .mega-input-dropdown .dropdown-scroll {
-        max-height: 152px;
+        max-height: 160px;
+    }
+    .mega-dialog.payment-address-dialog > footer .footer-container {
+        padding-top: 0;
     }
 
 /* end payment-address-dialog */
@@ -4579,12 +4565,6 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.bottom-pages-dialog .bp-main p {
         padding: 19px 0 0 0;
-    }
-    .mega-dialog.bottom-pages-dialog .jspContainer,
-    .mega-dialog.bottom-pages-dialog .jspContainer,
-    .mega-dialog.bottom-pages-dialog .jspPane {
-        max-width: 100%;
-        min-width: 100%;
     }
 
 /* end bottom-pages-dialog */
@@ -5387,11 +5367,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog .active .achievement-dialog.input-field {
         background: var(--surface-grey-1);
     }
-    .mega-dialog .achievement-dialog.input-field .jspContainer,
-    .mega-dialog .achievement-dialog.input-field .jspPane {
-        min-height: 32px;
-        min-width: 100%;
-    }
     .mega-dialog .achievement-dialog.input-field ul {
         padding: 0 10px;
         font-size: 0;
@@ -5402,14 +5377,13 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog .achievement-dialog.input-field li {
         overflow: hidden;
-        height: 32px;
         margin: 0;
         cursor: default;
-        padding: 7px 0;
+        padding: 6px 4px;
         -webkit-padding-end: 18px;
         padding-inline-end: 18px;
-        -webkit-padding-start: 4px;
-        padding-inline-start: 4px;
+        -webkit-margin-end: 6px;
+        margin-inline-end: 6px;
         float: left;
         position: relative;
         max-width: 100%;
@@ -5424,9 +5398,9 @@ body.de .mega-dialog.new-group-chat {
         top: 6px;
     }
     .mega-dialog .achievement-dialog.input-field input {
+        box-sizing: border-box;
         width: 100px;
-        padding: 8px 12px;
-        height:  32px;
+        padding: 6px 0;
         float: left;
         margin: 0;
         color: var(--text-color-high);
@@ -9330,10 +9304,33 @@ body.de .mega-dialog.new-group-chat {
 /* reset-success */
 
     .mega-dialog.reset-success {
-        width: 393px;
+        width: 400px;
+    }
+    .mega-dialog.reset-success .reset-success-title {
+        font: var(--text-h2-bold);
     }
     .mega-dialog.reset-success .content-block {
-        padding-bottom: 48px;
+        padding: 0 24px 16px;
+        text-align: center;
+    }
+    .mega-dialog.reset-success .reset-email-success-txt {
+        color: var(--text-color-medium);
+        font: var(--text-body1);
+    }
+    .mega-dialog.reset-success .reset-email-success-sub-txt {
+        color: var(--text-color-medium);
+        font: var(--text-body2);
+        margin-top: 16px;
+    }
+    .mega-dialog.reset-success .reset-email-success-sub-txt a {
+        text-decoration: none;
+    }
+    .mega-dialog.reset-success footer aside {
+        background-color: var(--surface-main);
+        padding: 8px 0 24px;
+    }
+    .mega-dialog.reset-success footer button.ok-btn {
+        font: var(--text-body1);
     }
 
 /* end reset-success */
@@ -9459,63 +9456,21 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.feedback-dialog .rating {
         padding: 31px 0 24px 0;
     }
-    .mega-dialog.feedback-dialog .feedback-dialog-textarea,
-    .mega-dialog.feedback-dialog .feedback-dialog-input {
+    .mega-dialog.feedback-dialog .feedback-dialog-textarea {
         background: var(--surface-black);
         border-radius: 4px;
-        font-size: 0;
-        height: 32px;
-        line-height: 0;
         margin: 20px 0 8px 0;
     }
-    .mega-dialog.feedback-dialog .feedback-dialog-textarea {
-        box-sizing: border-box;
-        height: 96px;
-        padding: 8px 0;
-        position: relative;
-    }
-    .mega-dialog.feedback-dialog .feedback-dialog-textarea .jspPane {
-        min-width: 0;
-    }
-    .mega-dialog.feedback-dialog .feedback-dialog-textarea textarea,
-    .mega-dialog.feedback-dialog .feedback-dialog-hidden {
-        background-color: transparent;
-        border: 0;
-        color: var(--text-color-medium);
-        font-size: 14px;
-        height: 80px;
-        line-height: 20px;
-        margin: 0;
-        min-height: 80px;
-        overflow: hidden;
-        padding: 0 12px;
-        position: relative;
-        resize: none;
-        width: 100%;
-    }
     .mega-dialog.feedback-dialog .feedback-dialog-textarea textarea {
+        background-color: transparent;
+        color: var(--text-color-medium);
         z-index: 1;
-    }
-    .mega-dialog.feedback-dialog .feedback-dialog-textarea textarea::selection {
-        background: rgba(255, 255, 255, 0.15);
-    }
-    .mega-dialog.feedback-dialog .feedback-dialog-scr {
-        height: 80px;
-        position: relative;
-    }
-    .mega-dialog.feedback-dialog .feedback-dialog-textarea .jspDrag {
-        background-color: rgba(255, 255, 255, 1);
-    }
-    .mega-dialog.feedback-dialog .feedback-dialog-textarea .jspVerticalBar {
-        width: 12px;
-    }
-    .mega-dialog.feedback-dialog .feedback-dialog-textarea .jspArrow {
-        height: 6px;
     }
     .mega-dialog.feedback-dialog .overlay-close span {
         position: absolute;
-        right: 18px;
+        right: 0;
         top: 35px;
+        width: 100%;
     }
     .mega-dialog.feedback-dialog .rating a {
         cursor: pointer;

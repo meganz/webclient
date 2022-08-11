@@ -40,7 +40,7 @@
     align-items: center;
     background: #2ba6de;
     background: linear-gradient(45deg, #2ba6de 0%,#55d2f0 100%);
-    border-radius: 4px;
+    border-radius: 2px;
     display: flex;
     justify-content: center;
     height: 32px;
@@ -49,8 +49,15 @@
     position: relative;
     width: 32px;
 }
+.chat-topic-icon.meeting-icon {
+    background: #00BDB2;
+    background: linear-gradient(225deg, #00BDB2 0%, #00897B 100%);
+}
 .chat-topic-icon i {
     --icon-size: 24px;
+}
+.chat-topic-icon.meeting-icon i {
+    --mask-color: var(--secondary-white);
 }
 .chat-topic-text {
     color: var(--text-color-high);
@@ -103,13 +110,6 @@
 }
 .messages.error.scroll-area {
     height: 100%;
-}
-.messages.scroll-area .jspVerticalBar {
-    width: 10px;
-}
-.messages.scroll-area .jspPane {
-    height: 100%;
-    display: table;
 }
 .messages.scroll-area .messages-toast {
     position: absolute;

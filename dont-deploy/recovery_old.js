@@ -115,7 +115,10 @@
                     if (res === ENOENT) {
                         msgDialog('warningb', l[1513], l[1946]);
                     } else if (res === 0) {
-                        handleResetSuccessDialogs('.reset-success', l.check_email_inbox, 'resetsuccess');
+                        handleResetSuccessDialogs(
+                            l.reset_pwd_email_sent_msg.replace('%s', email),
+                            'resetsuccess'
+                        );
                     } else {
                         msgDialog('warningb', l[135], l[200]);
                     }

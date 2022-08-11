@@ -39,6 +39,11 @@
     left: calc(50% - 12px);
     bottom: -8px;
 }
+#obDialog-arrow.top-left {
+    transform: rotate(180deg);
+    left: 48px;
+    top: -8px;
+}
 #obDialog .link-button {
     color: var(--text-color-white-high);
     margin-right: auto;
@@ -50,7 +55,10 @@
 }
 .context .onboarding-highlight-dot,
 .context .onboarding-highlight-dot::before,
-.context .onboarding-highlight-dot::after {
+.context .onboarding-highlight-dot::after,
+.nw-fm-left-icon.conversations .onboarding-highlight-dot,
+.nw-fm-left-icon.conversations .onboarding-highlight-dot::before,
+.nw-fm-left-icon.conversations .onboarding-highlight-dot::after {
     content: '';
     width: 10px;
     height: 10px;
@@ -65,7 +73,9 @@
     left: 8px;
 }
 .context .onboarding-highlight-dot::before,
-.context .onboarding-highlight-dot::after {
+.context .onboarding-highlight-dot::after,
+.nw-fm-left-icon.conversations .onboarding-highlight-dot::before,
+.nw-fm-left-icon.conversations .onboarding-highlight-dot::after {
     right: 0;
     left: 0;
     top: 0;
@@ -74,6 +84,22 @@
 }
 .context .onboarding-highlight-dot::after {
     animation-delay: 500ms;
+}
+#obDialog.mcob {
+    z-index: 121;
+}
+.in-call #obDialog.mcob {
+    z-index: 100;
+}
+#obDialog.mcob header {
+    padding-inline-end: 24px;
+    -webkit-padding-end: 24px;
+}
+#obDialog.mcob #obDialog-title {
+    font: var(--text-h2-bold);
+}
+#obDialog.mcob #obDialog-text {
+    font: var(--text-body1);
 }
 
 @keyframes onboarding-hotspot-rect {
@@ -360,6 +386,45 @@
     vertical-align: middle;
     text-decoration: underline;
     color: var(--text-color-white-high);
+}
+
+.nw-fm-left-icon.conversations .onboarding-highlight-dot + .onboarding-mc-nv {
+    background: var(--surface-main);
+    border-radius: 20px;
+    box-shadow: var(--dialog-shadow);
+    box-sizing: border-box;
+    display: none;
+    left: 56px;
+    max-width: 316px;
+    padding: 24px;
+    position: relative;
+    top: -32px;
+    width: 316px;
+}
+.nw-fm-left-icon.conversations.w-onboard:hover .onboarding-highlight-dot + .onboarding-mc-nv,
+.nw-fm-left-icon.conversations.w-onboard .onboarding-highlight-dot + .onboarding-mc-nv:hover {
+    display: block;
+}
+.nw-fm-left-icon.conversations .onboarding-mc-nv div {
+    color: var(--text-color-high);
+    font: var(--text-h3-bold);
+    margin: 16px 0 8px;
+}
+.nw-fm-left-icon.conversations .onboarding-mc-nv span {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+}
+.nw-fm-left-icon.conversations .onboarding-mc-nv img {
+    max-width: 100%;
+}
+.nw-fm-left-icon.conversations .onboarding-mc-nv i {
+    height: 16px;
+    left: -12px;
+    position: absolute;
+    top: 48px;
+    transform: rotate(90deg);
+    --icon-size: 24px;
+    --mask-color: var(--stroke-main);
 }
 
 /* Small width view for control panel */

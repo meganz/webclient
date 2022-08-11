@@ -197,28 +197,21 @@
 /* MegaInput textarea with box-style */
 .mega-input.box-style.textarea {
     height: auto;
+    line-height: 0;
 }
-.mega-input.box-style.textarea textarea,
-.mega-input.box-style.textarea .textarea-clone {
+.mega-input.box-style.textarea textarea {
     box-sizing: border-box;
-    min-height: 116px;
-    padding: 8px;
+    min-height: 100px;
+    padding: 0 8px;
     position: relative;
     z-index: 1;
 }
 .mega-input.box-style.textarea .textarea-scroll {
     box-sizing: border-box;
-    height: 116px;
+    height: 100px;
+    margin: 8px 0;
     overflow: hidden;
     position: relative;
-    width: 100%;
-}
-.mega-input.box-style.textarea .textarea-clone {
-    font: var(--text-body1);
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    z-index: 0;
     width: 100%;
 }
 
@@ -564,4 +557,48 @@
 }
 .mega-input .register-loading-icon img {
     width: 16px;
+}
+
+/*
+  * Scrollable textarea, old style. Used in cancel subscriptio/feedback
+  * TODO: replace with default component
+ */
+.mega-textarea {
+    background: var(--surface-grey-1);
+    border: 1px solid var(--stroke-grey-2);
+    border-radius: 2px;
+    box-sizing: border-box;
+    margin-top: 16px;
+    padding: 0;
+}
+.mega-textarea textarea,
+.mega-textarea .textarea-clone {
+    color: var(--text-color-medium);
+    background: var(--surface-grey-1);
+    border: 0;
+    box-sizing: border-box;
+    display: block;
+    font: var(--text-body1);
+    height: 80px;
+    margin: 0;
+    min-height: 80px;
+    overflow: hidden;
+    padding: 0 12px;
+    position: relative;
+    resize: none;
+    width: 100%;
+    word-break: break-word;
+    z-index: 1;
+}
+.mega-textarea .textarea-clone {
+    height: auto;
+    opacity: 0;
+    position: absolute;
+    visibility: hidden;
+    top: 0;
+}
+.mega-textarea .textarea-scroll {
+    line-height: 0;
+    margin: 8px 0;
+    max-height: 80px;
 }

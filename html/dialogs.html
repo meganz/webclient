@@ -209,7 +209,7 @@
                                 <div class="megasync-feature">
                                     <div class="bottom-page big-icon up-down"></div>
                                     <div class="megasync-feature-txt">
-                                        [$megasync_dialog_browser_accelerator]
+                                        [$desktop_dialog_faster_browser]
                                     </div>
                                 </div>
 
@@ -1009,20 +1009,28 @@
          aria-labelledby="reset-success-title"
          aria-modal="true">
 
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
         <header>
             <div class="graphic sprite-fm-illustration img-dialog-email"></div>
-            <h2 id="reset-success-title">[$1585]</h2>
+            <h2 class="reset-success-title">[$pwd_link_sent]</h2>
         </header>
 
         <section class="content">
             <div class="content-block">
-                <div class="reg-success-txt"> [$6214]  <strong>[$6215]</strong>.</div>
+                <div class="reset-email-success-txt"></div>
+                <div class="reset-email-success-sub-txt">
+                    [$no_email_try_again]<br>
+                    [$contact_support_email]
+                </div>
             </div>
         </section>
 
         <footer>
             <aside>
-                <div>[$6216]</div>
+                <button class="mega-button positive ok-btn"><span>[$81]</span></button>
             </aside>
         </footer>
     </div>
@@ -2395,12 +2403,9 @@
                 </div>
                 <div class="hidden-textarea-info"><span>[$19109]</span></div>
 
-                <div class="add-user-notification">
-                    <div class="add-user-nt-scrolling">
-                        <div class="add-user-textarea textarea-scroll">
-                            <textarea placeholder="[$19110]"></textarea>
-                            <div class="add-contact-hidden">[$17738]</div>
-                        </div>
+                <div class="add-user-notification mega-textarea">
+                    <div class="add-user-textarea textarea-scroll">
+                        <textarea placeholder="[$19110]"></textarea>
                     </div>
                 </div>
             </div>
@@ -2599,12 +2604,9 @@
             <div class="multiple-input-warning">
                 <span>[$5918]</span>
             </div>
-            <div class="share-message hidden">
-                <div class="share-message-scrolling">
-                    <div class="share-message-textarea textarea-scroll">
-                        <textarea placeholder="[$19110]"></textarea>
-                        <div class="share-message-hidden"></div>
-                    </div>
+            <div class="share-message mega-textarea hidden">
+                <div class="share-message-textarea textarea-scroll">
+                    <textarea placeholder="[$19110]"></textarea>
                 </div>
             </div>
             <div class="share-add-dialog-buttons-wrapper">
@@ -2835,10 +2837,9 @@
                         </a>
                         <div class="clear"></div>
                     </div>
-                    <div class="feedback-dialog-textarea">
+                    <div class="feedback-dialog-textarea mega-textarea">
                         <div class="feedback-dialog-scr textarea-scroll">
                             <textarea name="feedback" placeholder="[$17700]"></textarea>
-                            <div class="feedback-dialog-hidden"></div>
                         </div>
                     </div>
                     <div class="reply">
@@ -3418,12 +3419,9 @@
                 </div>
                 <div class="reset-small-txt">[$7005]:</div>
                 <form>
-                    <div class="cancel-textarea-bl">
-                        <div class="cancel-textarea-scroll">
-                            <div class="cancel-textarea textarea-scroll">
-                                <textarea></textarea>
-                                <div class="cancel-hidden"></div>
-                            </div>
+                    <div class="cancel-textarea-bl mega-textarea">
+                        <div class="cancel-textarea textarea-scroll">
+                            <textarea></textarea>
                         </div>
                     </div>
                 </form>

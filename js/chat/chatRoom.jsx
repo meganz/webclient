@@ -2038,7 +2038,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
 
     this.meetingsLoading = l.joining /* `Joining` */;
 
-    this.rebind("onCallEnd.start", (e, data) => {
+    this.rebind("onCallLeft.start", (e, data) => {
         if (data.callId === callId) {
             // ensure that the Loading/Joining/Starting overlay is removed if the call ended
             // (or had failed to start)
@@ -2069,7 +2069,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
         }, ex => {
             console.error('Failed to join call:', ex);
             this.meetingsLoading = false;
-            this.unbind("onCallEnd.start");
+            this.unbind("onCallLeft.start");
         });
 
 });
@@ -2175,7 +2175,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
             app.sfuClient.muteAudio(!audio);
             app.sfuClient.muteCamera(!video);
 
-            this.rebind("onCallEnd.start", (e, data) => {
+            this.rebind("onCallLeft.start", (e, data) => {
                 if (data.callId === r.callId) {
                     this.meetingsLoading = false;
                 }
@@ -2185,7 +2185,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
         }, ex => {
             console.error('Failed to start call:', ex);
             this.meetingsLoading = false;
-            this.unbind("onCallEnd.start");
+            this.unbind("onCallLeft.start");
         });
 });
 
@@ -2364,7 +2364,15 @@ ChatRoom.prototype.getActiveCallMessageId = function(ignoreActive) {
     }
 };
 
-
+ChatRoom.prototype.stopRinging = function(callId) {
+    if (this.ringingCalls.exists(callId)) {
+        this.ringingCalls.remove(callId);
+    }
+    megaChat.plugins.callManager2.trigger("onRingingStopped", {
+        callId: callId,
+        chatRoom: this
+    });
+};
 ChatRoom.prototype.callParticipantsUpdated = function(
     /* e, userid, clientid, participants */
 ) {

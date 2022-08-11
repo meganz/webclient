@@ -129,7 +129,7 @@
                 .next()
                 .text('');
 
-            initTextareaScrolling($('.feedback-dialog-scr textarea'), 80);
+            initTextareaScrolling($('.feedback-dialog-scr textarea', self.$dialog));
 
             $('.collected-data', self.$dialog)
                 .html('');
@@ -216,13 +216,7 @@
 
             // Content render fix for correct scrolling
             var renderTimer = setInterval(function(){
-                $('.collected-data-textarea').jScrollPane({
-                    enableKeyboardNavigation: false,
-                    showArrows: true,
-                    arrowSize: 5,
-                    animateScroll: true,
-                    verticalDragMinHeight: 40
-                });
+                initPerfectScrollbar($('.collected-data-textarea'));
                 clearInterval(renderTimer);
             }, 200);
 

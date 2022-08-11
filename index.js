@@ -2080,11 +2080,6 @@ function init_page() {
         location.assign('/');
     }
 
-    // Initialise the Public Service Announcement system if loaded
-    if (typeof psa !== 'undefined') {
-        psa.init();
-    }
-
     // Initialise the update check system
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
@@ -2456,10 +2451,10 @@ function topmenuUI() {
         // Show the rocket icon if achievements are enabled
         mega.achievem.enabled()
             .done(function () {
-                $headerAchievements.parent().removeClass('hidden');
+                $headerAchievements.removeClass('hidden');
             })
             .fail(function () {
-                $headerAchievements.parent().addClass('hidden');
+                $headerAchievements.addClass('hidden');
             });
 
         if (u_attr.email) {
@@ -3355,6 +3350,13 @@ window.onunload = function () {
 mBroadcaster.once('boot_done', function() {
     'use strict';
     M = new MegaData();
+
+    onIdle(() => {
+        // Initialise the Public Service Announcement system if loaded
+        if (typeof psa !== 'undefined') {
+            psa.init().catch(dump.bind(null, 'psa'));
+        }
+    });
 
     if (d) {
         if (!window.crossOriginIsolated) {

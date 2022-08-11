@@ -3351,9 +3351,6 @@
         max-height: 380px;
         background-color: #F44;
     }
-    .main-scroll-block .jspPane {
-        min-width: 376px;
-    }
     #help2-main #container {
         width: 100%;
         min-width: 100%;

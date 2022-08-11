@@ -96,8 +96,8 @@ class StreamControls extends MegaRenderMixin {
 
     render() {
         const {
-            call, signal, errAv, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick, renderSignalWarning,
-            renderPermissionsWarning
+            call, chatRoom, signal, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick, renderSignalWarning,
+            hasToRenderPermissionsWarning, renderPermissionsWarning, resetError,
         } = this.props;
         const avFlags = call.av;
         const audioLabel = avFlags & Av.Audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */;
@@ -123,11 +123,16 @@ class StreamControls extends MegaRenderMixin {
                                 ${avFlags & Av.Audio ? '' : 'inactive'}
                             `}
                             icon={`${avFlags & Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`}
-                            onClick={onAudioClick}>
+                            onClick={() => {
+                                resetError(Av.Audio);
+                                onAudioClick();
+                            }}>
                             <span>{audioLabel}</span>
                         </Button>
                         {signal ? null : renderSignalWarning()}
-                        {errAv & Av.Audio ? renderPermissionsWarning(Av.Audio) : null}
+                        {hasToRenderPermissionsWarning(Av.Audio) ?
+                            renderPermissionsWarning(Av.Audio) :
+                            null}
                     </li>
                     <li>
                         <Button
@@ -141,14 +146,20 @@ class StreamControls extends MegaRenderMixin {
                                 ${avFlags & Av.Camera ? '' : 'inactive'}
                             `}
                             icon={`${avFlags & Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`}
-                            onClick={onVideoClick}>
+                            onClick={() => {
+                                resetError(Av.Camera);
+                                onVideoClick();
+                            }}>
                             <span>{videoLabel}</span>
                         </Button>
-                        {errAv & Av.Camera ? renderPermissionsWarning(Av.Camera) : null}
+                        {hasToRenderPermissionsWarning(Av.Camera) ?
+                            renderPermissionsWarning(Av.Camera) :
+                            null}
                     </li>
                     <li>
                         <StreamExtendedControls
                             call={call}
+                            chatRoom={chatRoom}
                             onScreenSharingClick={onScreenSharingClick}
                             onHoldClick={onHoldClick}
                         />

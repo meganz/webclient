@@ -360,7 +360,7 @@ function compressedSdpToString(sdp) {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'fee752cc59';
+const COMMIT_ID = '120834781e';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -475,13 +475,16 @@ class SfuClient {
     isJoining() {
         return this._connState < ConnState.kCallJoined;
     }
+    isLeavingCall() {
+        return !isNaN(this.termCode);
+    }
     get connState() {
         return this._connState;
     }
     get callJoinPermission() {
         return this._callJoinPermission;
     }
-    shouldReconnect() {
+    willReconnect() {
         if (this._forcedDisconnect) {
             return false;
         }
@@ -500,8 +503,8 @@ class SfuClient {
         console.warn("SfuClient: Signaling connection closed");
         delete this.conn;
         this.leaveCall(termCodes.kSigDisconn); // sets this.termCode
-        const shouldReconnect = this.shouldReconnect(); // decides based on this.termCode
-        if (shouldReconnect) {
+        const willReconnect = this.willReconnect(); // decides based on this.termCode
+        if (willReconnect) {
             this._setConnState(ConnState.kDisconnectedRetrying);
             this.scheduleReconnect();
         }
@@ -509,7 +512,7 @@ class SfuClient {
             this._setConnState(ConnState.kDisconnected);
             this._stopLocalTracks();
         }
-        this._fire("onDisconnect", this.termCode, shouldReconnect);
+        this._fire("onDisconnect", this.termCode, willReconnect);
     }
     leaveCall(termCode) {
         if (this.termCode == null) {
@@ -1980,6 +1983,11 @@ class SfuClient {
     parseConnStats(stat) {
         let s = this.rtcStats;
         s.rtt = stat.currentRoundTripTime * 1000;
+        // DEBUG
+        if (window.rttOffset) {
+            s.rtt += window.rttOffset;
+        }
+        //====
         let txBwe = stat.availableOutgoingBitrate;
         if (txBwe != null) {
             s.txBwe = Math.round(txBwe / 1024);
@@ -2505,9 +2513,7 @@ class Peer {
             playerStop(this.audioPlayer);
             delete this.audioPlayer;
         }
-        if (this.client.termCode == null) {
-            this._fire("onPeerLeft", reason);
-        }
+        this._fire("onPeerLeft", reason);
     }
     get hasThumbnailVideo() { return this.vThumbPlayer != null; }
     get hasHiresVideo() { return this.hiResPlayer != null; }
@@ -2789,11 +2795,12 @@ class RequestBarrier {
 }
 class SvcDriver {
     constructor(client) {
+        this.currRxQuality = SvcDriver.kMaxRxQualityIndex - 1; // start a little lower;
+        this.currTxQuality = SvcDriver.kDefaultTxQuality;
+        // rtt window
+        this.lowestRttSeen = 10000; // force recalculation on first stat sample
         this.hasBadNetwork = false;
         this.client = client;
-        this.lowestRttSeen = 10000; // force recalculation on first stat sample
-        this.currRxQuality = SvcDriver.kMaxRxQualityIndex - 1; // start a little lower
-        this.currTxQuality = SvcDriver.kDefaultTxQuality;
     }
     async onStats() {
         let stats = this.client.rtcStats;
@@ -2803,23 +2810,27 @@ class SvcDriver {
             return;
         }
         if (plost == null) {
-            plost = 0;
+            plost = stats.pl = 0;
         }
-        else if (plost > SvcDriver.kPlostCap) { // we shouldn't care so much about the magnitude of loss bursts, only about their occurrence
-            plost = SvcDriver.kPlostCap;
-        }
+        let plostCapped = (plost > SvcDriver.kPlostCap) ? SvcDriver.kPlostCap : plost;
         if (this.maRtt == null) {
             this.maRtt = rtt;
-            this.maPlost = plost;
+            this.smaPlost = plostCapped;
+            this.fmaPlost = plost;
             return; // intentionally skip first sample for lower/upper range calculation
         }
+        rtt = this.maRtt = (this.maRtt + rtt) / 2;
         if (rtt < this.lowestRttSeen) {
-            this.lowestRttSeen = rtt;
-            this.rttLower = rtt + SvcDriver.kRttLowerHeadroom;
-            this.rttUpper = rtt + SvcDriver.kRttUpperHeadroom;
+            this.setRttWindow(rtt);
         }
-        rtt = this.maRtt = (this.maRtt * 3 + rtt) / 4;
-        plost = this.maPlost = (this.maPlost * 3 + plost) / 4;
+        this.smaPlost = (this.smaPlost * 29 + plostCapped) / 30;
+        this.setPlostWindow(this.smaPlost);
+        plost = this.fmaPlost = (this.fmaPlost * 2 + plost) / 3;
+        /*
+        console.log("rtt:", rtt.toFixed(1), "rttLower:", this.rttLower.toFixed(1), "rttUpper:", this.rttUpper.toFixed(1),
+            "plost:", plost.toFixed(1), "fmaPlost:", this.fmaPlost.toFixed(1),
+            "plostLower", this.plostLower.toFixed(1), "plostUpper:", this.plostUpper.toFixed(1));
+        */
         let tsNow = Date.now();
         if (!this.tsLastSwitch) {
             this.tsLastSwitch = tsNow - SvcDriver.kMinTimeBetweenSwitches;
@@ -2840,11 +2851,17 @@ class SvcDriver {
         if (tsNow - this.tsLastSwitch < SvcDriver.kMinTimeBetweenSwitches) {
             return; // too early
         }
-        if (rtt > this.rttUpper || plost > SvcDriver.kPlostUpper) { // rtt or packet loss increased above thresholds
-            this.switchRxQuality(-1);
+        if (plost > this.plostUpper) {
+            if (window.d) {
+                console.warn("Decreasing rxQ due to packet loss of", plost.toFixed(1));
+            }
+            this.decRxQuality();
         }
-        else if (rtt < this.rttLower && plost < SvcDriver.kPlostLower) {
-            this.switchRxQuality(+1);
+        else if (rtt > this.rttUpper) { // rtt or packet loss increased above thresholds
+            this.decRxQualityDueToRtt(stats);
+        }
+        else if (rtt < this.rttLower && plost < this.plostLower) {
+            this.incRxQuality();
         }
         let txQs = SvcDriver.TxQuality;
         if (adaptScrnTx) {
@@ -2883,15 +2900,16 @@ class SvcDriver {
             }
         }
         // handle "bad network" notification
-        let txBad;
+        let txBad = !isNaN(stats.vtxdly) && (stats.vtxdly > 1500);
         if (adaptScrnTx) {
-            txBad = this.currTxQuality < 1;
+            txBad = txBad || this.currTxQuality < 1;
         }
         else if (stats._vtxIsHiRes && stats.vtxh) {
             this._maVideoTxHeight = !isNaN(this._maVideoTxHeight) ? (this._maVideoTxHeight * 3 + stats.vtxh) / 4 : stats.vtxh;
-            txBad = this._maVideoTxHeight < 360;
+            txBad = txBad || (this._maVideoTxHeight < 200);
         }
-        if (txBad || this.currRxQuality < 1 || rtt > this.rttUpper || stats.vtxdly > 1500) {
+        const rxBad = rtt > 1500 || plost > 20;
+        if (txBad || rxBad) {
             if (!this.hasBadNetwork) {
                 this.hasBadNetwork = true;
                 this.client._fire("onBadNetwork", true);
@@ -2902,24 +2920,92 @@ class SvcDriver {
             this.client._fire("onBadNetwork", false);
         }
     }
-    switchRxQuality(delta) {
-        let newQ = this.currRxQuality + delta;
-        if (newQ > SvcDriver.kMaxRxQualityIndex) {
-            newQ = SvcDriver.kMaxRxQualityIndex;
+    setRttWindow(rtt) {
+        this.lowestRttSeen = rtt;
+        this.rttLower = rtt + SvcDriver.kRttLowerHeadroom;
+        this.rttUpper = rtt + SvcDriver.kRttUpperHeadroom;
+        if (window.d) {
+            console.warn("Rtt floor set to", rtt.toFixed(2));
         }
-        else if (newQ < 0) {
-            newQ = 0;
-        }
-        if (newQ === this.currRxQuality) {
+    }
+    setPlostWindow(plost) {
+        this.plostLower = plost + SvcDriver.kPlostLowerHeadroom;
+        this.plostUpper = plost + SvcDriver.kPlostUpperHeadroom;
+    }
+    decRxQuality(critical) {
+        if (this.currRxQuality <= 0) {
             return false;
         }
+        let newQ;
+        if (critical) {
+            newQ = this.currRxQuality - 2;
+            if (newQ < 0) {
+                newQ = 0;
+            }
+        }
+        else {
+            newQ = this.currRxQuality - 1;
+        }
+        this.setRxQuality(newQ);
+        return true;
+    }
+    incRxQuality() {
+        delete this.rxRttDowngr;
+        if (this.currRxQuality >= SvcDriver.kMaxRxQualityIndex) {
+            return false;
+        }
+        this.setRxQuality(this.currRxQuality + 1);
+        return true;
+    }
+    setRxQuality(newQ) {
         let params = SvcDriver.RxQuality[newQ];
         assert(params);
         this.tsLastSwitch = Date.now();
-        console.warn(`Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: %o`, params);
+        if (window.d) {
+            console.warn(`Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: %o`, params);
+        }
         this.currRxQuality = newQ;
         this.client.requestSvcLayers(params[0], params[1], params[2]);
         return true;
+    }
+    decRxQualityDueToRtt(stats) {
+        if (!this.rxRttDowngr) {
+            if (this.currRxQuality > 0) {
+                if (window.d) {
+                    console.warn(`Decreasing rxQ due to high rtt of ${this.maRtt.toFixed()}, saving checkpoint`);
+                }
+                this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
+                this.decRxQuality();
+            }
+            return;
+        }
+        // we have rxRttDowngr, see if the downgrade is affecting rtt
+        const nSteps = this.rxRttDowngr.startQ - this.currRxQuality;
+        if (nSteps > 0) {
+            // we have stepped down at least once:
+            // If rtt did not really decrease, is not too big (to be influenced by our q step down), and there is no extraordinary
+            // packet loss, then assume the high rtt is not due to network congestion
+            if ((this.fmaPlost <= this.plostLower) && (stats.rtt < 1000) && (Math.abs(stats.rtt - this.rxRttDowngr.lastRtt) < 16)) {
+                // rtt did not change
+                if (window.d) {
+                    console.warn(`Decreased rxQ by ${nSteps} steps: rtt didn't change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
+                }
+                this.setRttWindow(this.maRtt);
+                // reset the checkpoint as well - otherwise we may ignore a future rtt decrease
+                // on top of the current increase
+                this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
+                return; // dont decrease quality
+            }
+            else if (this.currRxQuality > 0) {
+                // rtt changed - could be decreasing from the quality downgrade, or still rising
+                // because of network conditions. Either way, we should further downgrade quality
+                if (window.d) {
+                    console.warn(`Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
+                }
+                this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
+            }
+        }
+        this.decRxQuality();
     }
     switchTxQuality(delta, mode) {
         let newQ = this.currTxQuality + delta;
@@ -2948,15 +3034,21 @@ class SvcDriver {
             let res = track.getSettings();
             if (res.width && res.height) {
                 ar = this.client.screenAspectRatio = res.width / res.height;
-                console.warn(`Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
+                if (window.d) {
+                    console.warn(`Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
+                }
             }
             else {
                 ar = 1.78;
-                console.warn("setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
+                if (window.d) {
+                    console.warn("setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
+                }
             }
         }
         params.width = Math.round(params.height * ar);
-        console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: %o (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`, params);
+        if (window.d) {
+            console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: %o (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`, params);
+        }
         this.currTxQuality = newQ;
         track.applyConstraints(params);
         return true;
@@ -2968,11 +3060,11 @@ class SvcDriver {
         }
     }
 }
-SvcDriver.kPlostUpper = 20;
-SvcDriver.kPlostLower = 14;
-SvcDriver.kPlostCap = 10;
-SvcDriver.kRttLowerHeadroom = 30;
-SvcDriver.kRttUpperHeadroom = 250;
+SvcDriver.kRttLowerHeadroom = 20;
+SvcDriver.kRttUpperHeadroom = 100;
+SvcDriver.kPlostUpperHeadroom = 3;
+SvcDriver.kPlostLowerHeadroom = 0.01;
+SvcDriver.kPlostCap = 3; // cap on adaptive continuous packet loss reference
 SvcDriver.kMinTimeBetweenSwitches = 6000;
 // (427)x240 - sends only one spatial layer, i.e. receiver can't get lower resolution than 240
 // (640)x360 - 2 spatial layers: receiver can get x180 or x360
@@ -3029,7 +3121,9 @@ class MicMuteMonitor {
             delete this.timer;
             this.fireWarning();
         }, MicMuteMonitor.kWarningTimeoutMs);
-        console.log("Started mic muted monitor");
+        if (window.d) {
+            console.log("Started mic muted monitor");
+        }
     }
     fireWarning() {
         this.muteIndicatorActive = true;
@@ -3131,11 +3225,15 @@ class SpeakerDetector {
         let prev = this.currSpeaker;
         this.currSpeaker = maxPeer;
         if (maxPeer) {
-            console.warn("Active speaker changed to", maxPeer.userId);
+            if (window.d) {
+                console.warn("Active speaker changed to", maxPeer.userId);
+            }
             assert(this.client.peers.get(maxPeer.cid));
         }
         else {
-            console.warn("Active speaker changed to us");
+            if (window.d) {
+                console.warn("Active speaker changed to us");
+            }
         }
         this.client.app.onActiveSpeakerChange(maxPeer, prev);
     }

@@ -4935,10 +4935,6 @@ div.checkboxOn {
 .top-menu-content .not-mobile-ready {
     display: none;
 }
-/* Prevent jspPane setting a style to put the margin out so the page indicator is no longer flush with the margin */
-.top-menu-popup .top-menu-scroll .jspPane {
-    margin-left: 0 !important;
-}
 /* Language menu */
 .language-template {
     display: none;
@@ -5096,6 +5092,49 @@ div.checkboxOn {
     z-index: 1;
     border-top: 1px solid #eee;
 }
+
+/* New Slideshow */
+.mobile.new-slideshow-buttons {
+    background: transparent;
+    position: fixed;
+    bottom: 80px;
+    width: 100%;
+}
+.landscape .mobile.new-slideshow-buttons {
+    bottom: 24px;
+}
+.mobile.slideshow-trigger-btn {
+    display: inline-block;
+    width: 60px;
+    height: auto;
+    text-align: center;
+    vertical-align: middle;
+}
+.mobile.slideshow-ctr-btns-bar {
+    margin: 0 auto;
+    width: 208px;
+    z-index: 1;
+}
+.mobile.new-slideshow-icon-btn {
+    border-radius: 100%;
+    margin: 6px 12px;
+    padding: 0;
+    --mask-color: var(--icon-rest-inverted);
+    appearance: none;
+    background: transparent;
+    border: 0;
+    outline: none;
+}
+.mobile.new-slideshow-icon-btn.sl-start {
+    --mask-color: var(--icon-rest);
+}
+.mobile.new-slideshow-icon-btn i {
+    --icon-size: 24px;
+    color: var(--mask-color);
+}
+
+/* End: New Slideshow */
+
 /* Download Page Image Viewer */
 .download-previewer .mobile.slideshow-header .slideshow-file-number-and-total,
 .download-previewer .mobile.slideshow-buttons,

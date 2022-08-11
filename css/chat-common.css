@@ -153,7 +153,7 @@
     max-width: 100%;
 }
 .short .user-card-data {
-    padding: 0 30px 0 44px;
+    padding: 0 30px 0 5px;
 }
 .chat-topic-block .contacts-info.body.short {
     align-items: center;
@@ -199,7 +199,7 @@
     font-size: 14px;
     line-height: 17px;
     vertical-align: top;
-    max-width: 94%;
+    max-width: 91%;
 }
 .short .user-card-status span {
     display: inline-block;
@@ -229,7 +229,8 @@
     padding-right: 15px;
 }
 .rtl .contacts-info .user-card-data {
-    padding-right: 40px;
+    padding-right: 20px;
+    max-width: 74%;
 }
 .chat-right-area .buttons-block {
     border-top: 1px solid rgba(0,0,0,0.1);
@@ -1096,6 +1097,16 @@ button.fm-empty-button {
     margin-bottom: 50px;
 }
 
+.main-start-chat-dropdown.lhp-contact-selector .button-wrapper {
+    display: flex;
+    align-items: baseline;
+    text-align: start;
+    cursor: pointer;
+}
+.main-start-chat-dropdown.lhp-contact-selector .button-wrapper .button-title {
+    padding: 0 0 0 8px;
+}
+
 .dropdown.body.popup.contacts-search > div {
     position: relative;
     z-index: 100;
@@ -1198,7 +1209,8 @@ button.fm-empty-button {
     overflow: hidden;
 }
 .conversationsApp .overflow-observer,
-.dropdown.body .overflow-observer {
+.dropdown.body .overflow-observer,
+.overflow-observer {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

@@ -27,6 +27,15 @@ mobile.slideshow = {
     /** Define Array of file types required to load in full size */
     requiredFullSizeImgTypes: {'gif': 3e6, 'png': 4e5},
 
+    /** The timeout setting for the image slideshow */
+    slideshowTimer: null,
+
+    /** The flag for the image slideshow is in progress */
+    slideshowplay: false,
+
+    /** The flag for the image slideshow is playing or paused */
+    slideshowIsPaused: null,
+
     /**
      * Initialise the preview slideshow
      * @param {String} nodeHandle The handle of the image to load first
@@ -57,6 +66,9 @@ mobile.slideshow = {
             mobile.slideshow.initPreviousImageFunctionality();
             mobile.slideshow.initNextImageFunctionality();
             mobile.initOverlayPopstateHandler(mobile.slideshow.$overlay);
+
+            // Initialise the image slideshow
+            mobile.slideshow.initImageSlideshow(nodeHandle);
         }
 
         mobile.slideshow.initLandscapeView(nodeHandle);
@@ -64,6 +76,184 @@ mobile.slideshow = {
         mobile.slideshow.initHideShowToggleForHeaderAndButtons(nodeHandle);
 
         mobile.slideshow.fetchImageFromApi(nodeHandle, mobile.slideshow.displayImage, 'mid', true);
+    },
+
+    /**
+     * Switch to the next image in slideshow
+     * @returns {void}
+     */
+    imageSlideshow_next: function() {
+
+        'use strict';
+
+        let nextImageHandle;
+        let count = 0;
+        const stopCount = mobile.slideshow.imagesInCurrentViewArray.length; // Avoid the dead loop just in case
+
+        do {
+            // Get the next image to be displayed
+            nextImageHandle = mobile.slideshow.findNextImage();
+            mobile.slideshow.currentImageHandle = nextImageHandle;
+            count++;
+        }
+        while (!is_image3(M.d[nextImageHandle]) && count <= stopCount);
+
+        // Fetch the image and then display it
+        mobile.slideshow.fetchImageFromApi(nextImageHandle, mobile.slideshow.displayImage, 'right');
+    },
+
+    /**
+     * Switch to the previous image in slideshow
+     * @returns {void}
+     */
+    imageSlideshow_prev: function() {
+
+        'use strict';
+
+        let nextImageHandle;
+        let count = 0;
+        const stopCount = mobile.slideshow.imagesInCurrentViewArray.length; // Avoid the dead loop just in case
+
+        do {
+            // Get the previous image to be displayed
+            nextImageHandle = mobile.slideshow.findPreviousImage();
+            mobile.slideshow.currentImageHandle = nextImageHandle;
+            count++;
+        }
+        while (!is_image3(M.d[nextImageHandle]) && count <= stopCount);
+
+        // Fetch the image and then display it
+        mobile.slideshow.fetchImageFromApi(nextImageHandle, mobile.slideshow.displayImage, 'left');
+    },
+
+    /**
+     * The function to reset the timeout of the image slideshow
+     * @returns {void}
+     */
+    slideshow_timereset: function() {
+
+        'use strict';
+
+        if (mobile.slideshow.slideshowplay && !mobile.slideshow.slideshowIsPaused) {
+            clearTimeout(mobile.slideshow.slideshowTimer);
+            mobile.slideshow.slideshowTimer = setTimeout(mobile.slideshow.imageSlideshow_next, 4000);
+        }
+    },
+
+    /**
+     * Initialise the image slideshow
+     * @param {String} nodeHandle The handle of the image to load first
+     * @returns {void}
+     */
+    initImageSlideshow: function(nodeHandle) {
+
+        'use strict';
+
+        mobile.slideshow.slideshowplay = false;
+
+        const $triggerBtn = $('.slideshow-trigger-btn', mobile.slideshow.$overlay).addClass('hidden');
+        const $ctrBtnsBar = $('.slideshow-ctr-btns-bar', mobile.slideshow.$overlay).addClass('hidden');
+
+        if (!is_image3(M.d[nodeHandle])) {
+            // Slideshow is only available for images
+            $triggerBtn.removeClass('hidden');
+        }
+
+        const $startButton = $('.sl-start', $triggerBtn);
+        const $playPauseButton = $('.sl-playpause', $ctrBtnsBar);
+        const $prevButton = $('.sl-previous', $ctrBtnsBar);
+        const $nextButton = $('.sl-next', $ctrBtnsBar);
+        const $closeButton = $('.sl-close', $ctrBtnsBar);
+
+        $startButton.rebind('tap.pSlideshow', () => {
+            mobile.slideshow.slideshowplay = true;
+            mobile.slideshow.slideshowIsPaused = false;
+            mobile.slideshow.hideHFFlag = true;
+            mobile.slideshow.toggleForHeaderAndButtons();
+            $triggerBtn.addClass('hidden');
+            $ctrBtnsBar.removeClass('hidden');
+            $playPauseButton.attr('data-state', 'play');
+            $('i', $playPauseButton).removeClass('icon-play').addClass('icon-pause');
+
+            mobile.slideshow.slideshow_timereset();
+
+            return false;
+        });
+
+        // Bind Slideshow Play/Pause button
+        $playPauseButton.rebind('tap.pSlideshow', function() {
+            const $this = $(this);
+
+            clearTimeout(mobile.slideshow.slideshowTimer);
+            if ($this.attr('data-state') === 'pause') {
+                $this.attr('data-state', 'play');
+                $('i', $this).removeClass('icon-play').addClass('icon-pause');
+                mobile.slideshow.slideshowIsPaused = false;
+                mobile.slideshow.slideshow_timereset();
+            }
+            else {
+                $this.attr('data-state', 'pause');
+                $('i', $this).removeClass('icon-pause').addClass('icon-play');
+                mobile.slideshow.slideshowIsPaused = true;
+            }
+
+            return false;
+        });
+
+        // Bind Slideshow Previous button
+        $prevButton.rebind('tap.pSlideshow', () => {
+            mobile.slideshow.imageSlideshow_prev();
+
+            return false;
+        });
+
+        // Bind Slideshow Next button
+        $nextButton.rebind('tap.pSlideshow', () => {
+            mobile.slideshow.imageSlideshow_next();
+
+            return false;
+        });
+
+        // Bind Slideshow Close button
+        $closeButton.rebind('tap.pSlideshow', () => {
+            mobile.slideshow.slideshowplay = false;
+            mobile.slideshow.slideshowIsPaused = null;
+            mobile.slideshow.hideHFFlag = false;
+            mobile.slideshow.toggleForHeaderAndButtons();
+            $triggerBtn.removeClass('hidden');
+            $ctrBtnsBar.addClass('hidden');
+            $playPauseButton.attr('data-state', 'pause');
+            $('i', $playPauseButton).removeClass('icon-pause').addClass('icon-play');
+
+            clearTimeout(mobile.slideshow.slideshowTimer);
+            return false;
+        });
+
+        // Add the event listener to detect if focus off the tab
+        document.addEventListener("visibilitychange", mobile.slideshow.focusOffTabSSHandle);
+    },
+
+    /**
+     * The image slideshow handle if focus off or back the tab
+     * @returns {void}
+     */
+    focusOffTabSSHandle: function() {
+
+        'use strict';
+
+        if (mobile.slideshow.slideshowplay) {
+            clearTimeout(mobile.slideshow.slideshowTimer);
+
+            if (document.hidden) {
+                // If focus off the tab, pause the time of the image slideshow
+                mobile.slideshow.slideshowIsPaused = true;
+            }
+            else {
+                // If back focus on the tab, reset the timer of the image slideshow
+                mobile.slideshow.slideshowIsPaused = false;
+                mobile.slideshow.slideshow_timereset();
+            }
+        }
     },
 
     /**
@@ -81,6 +271,12 @@ mobile.slideshow = {
 
         $(window).rebind('orientationchange.slideshow', function() {
             mobile.slideshow.isLandscape = !mobile.slideshow.isLandscape;
+
+            if (mobile.slideshow.slideshowplay) {
+                // If the image slideshow is in progress, disable the orientation change function
+                return false;
+            }
+
             if (is_video(M.d[nodeHandle])) {
                 if (mobile.slideshow.isLandscape
                     && $('.viewer-button.fs .icons-img', mobile.slideshow.$overlay).hasClass('fullscreen')
@@ -136,7 +332,7 @@ mobile.slideshow = {
 
         // On clicking the image or black background of the slideshow
         $slideShowBackground.off().on('tap', SoonFc(function() {
-            if (!is_video(M.d[nodeHandle])) {
+            if (!is_video(M.d[nodeHandle]) && !mobile.slideshow.slideshowplay) {
                 mobile.slideshow.hideHFFlag = !mobile.slideshow.hideHFFlag;
                 mobile.slideshow.toggleForHeaderAndButtons();
             }
@@ -291,6 +487,7 @@ mobile.slideshow = {
             var videoHtmlTemplate = $('.mobile-video-template');
             var videoHtmlDiv = videoHtmlTemplate.html();
 
+            $('.slideshow-trigger-btn', mobile.slideshow.$overlay).addClass('hidden');
             $image.addClass('hidden');
             mobile.slideshow.$overlay.find('.slides.mid').html(videoHtmlDiv);
             $videoDiv.removeClass('hidden');
@@ -322,9 +519,14 @@ mobile.slideshow = {
                 });
         }
         else {
+            $('.slideshow-trigger-btn', mobile.slideshow.$overlay).removeClass('hidden');
             const store = mobile.slideshow.previews[nodeHandle];
             if (store) {
                 $image.attr('src', store.src);
+            }
+            if (mobile.slideshow.slideshowplay) {
+                // If the image slideshow is in progress, reset its timeout.
+                mobile.slideshow.slideshow_timereset();
             }
             $image.removeClass('hidden');
             $videoDiv.addClass('hidden');
@@ -405,6 +607,12 @@ mobile.slideshow = {
 
         // On swipe left
         mobile.slideshow.$overlay.find('.content-row').off('swipeleft').on('swipeleft', function() {
+
+            if (mobile.slideshow.slideshowplay) {
+                // Trigger tap forward button if swipe when the image slideshow is in progress
+                $('.slideshow-ctr-btns-bar .sl-next', mobile.slideshow.$overlay).trigger('tap');
+                return false;
+            }
 
             // Get the next image to be displayed
             var nextImageHandle = mobile.slideshow.findNextImage();
@@ -493,6 +701,12 @@ mobile.slideshow = {
 
         // On swipe right
         mobile.slideshow.$overlay.find('.content-row').off('swiperight').on('swiperight', function() {
+
+            if (mobile.slideshow.slideshowplay) {
+                // Trigger tap backward button if swipe when the image slideshow is in progress
+                $('.slideshow-ctr-btns-bar .sl-previous', mobile.slideshow.$overlay).trigger('tap');
+                return false;
+            }
 
             // Get the next image to be displayed
             var nextImageHandle = mobile.slideshow.findPreviousImage();
@@ -585,6 +799,13 @@ mobile.slideshow = {
             // was not opened
             return;
         }
+
+        document.removeEventListener("visibilitychange", mobile.slideshow.focusOffTabSSHandle);
+
+        // Cleanup all the image slideshow variables
+        mobile.slideshow.slideshowplay = false;
+        mobile.slideshow.slideshowIsPaused = null;
+        clearTimeout(mobile.slideshow.slideshowTimer);
 
         // Hide the dialog
         mobile.slideshow.$overlay.addClass('hidden');

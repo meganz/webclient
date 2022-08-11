@@ -405,7 +405,6 @@ MegaData.prototype.renderChatIsLoading = function() {
     $('.fm-blocks-view').addClass('hidden');
     $('.files-grid-view').addClass('hidden');
     $('.fm-right-account-block').addClass('hidden');
-    $('.contacts-details-block').addClass('hidden');
 
     $('.shared-grid-view,.shared-blocks-view').addClass('hidden');
 

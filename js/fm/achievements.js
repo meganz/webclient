@@ -491,8 +491,7 @@ mega.achievem.inviteFriendDialog = function inviteFriendDialog(close) {
             mega.achievem.initInviteDialogMultiInputPlugin();
         }
         else {
-            $('.jspContainer', $dialog).removeAttr('style');
-            initTokenInputsScroll($('.multiple-input', $dialog));
+            initPerfectScrollbar($('.multiple-input', $dialog));
             Soon(function() {
                 $('.token-input-input-token-mega input', $dialog).trigger("focus");
             });
@@ -665,7 +664,7 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
         // Disable Send button
         $('button.send', $dialog).addClass('disabled');
 
-        initTokenInputsScroll($('.multiple-input', $dialog));
+        initPerfectScrollbar($('.multiple-input', $dialog));
         Soon(function() {
             $('.token-input-input-token-mega input', $dialog).trigger("focus");
         });
@@ -905,14 +904,7 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
     M.safeShowDialog('invitations', $dialog);
 
     // Init scroll
-    var $contentBlock = $dialog.find('.table-bg');
-
-    if ($contentBlock.height() > 384) {// ToDo: how 384 is calculated?
-        $table.jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-    }
-    else {
-        deleteScrollPanel($scrollBlock, 'jsp');
-    }
+    initPerfectScrollbar($table);
 
     $('button.invite-more', $dialog).rebind('click', function() {
         closeDialog();

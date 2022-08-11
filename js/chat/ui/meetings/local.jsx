@@ -383,18 +383,21 @@ class Stream extends MegaRenderMixin {
                     localAudioMuted={!(call.av & SfuClient.Av.Audio)}
                 />
                 <div className={`${Local.NAMESPACE}-self-overlay`}>
-                    <Button
-                        className={`
-                        mega-button
-                        theme-light-forced
-                        action
-                        small
-                        local-stream-options-control
-                        ${options ? 'active' : ''}
-                    `}
-                        icon="sprite-fm-mono icon-options"
-                        onClick={() => this.handleOptionsToggle()}
-                    />
+                    {minimized ?
+                        null :
+                        <Button
+                            className={`
+                                mega-button
+                                theme-light-forced
+                                action
+                                small
+                                local-stream-options-control
+                                ${options ? 'active' : ''}
+                            `}
+                            icon="sprite-fm-mono icon-options"
+                            onClick={() => this.handleOptionsToggle()}
+                        />
+                    }
                     {options && this.renderOptionsDialog()}
                 </div>
             </>
@@ -522,8 +525,9 @@ class Minimized extends MegaRenderMixin {
     render() {
         const { unread } = this.state;
         const {
-            call, signal, errAv, renderSignalWarning, renderPermissionsWarning, onCallExpand, onCallEnd,
-            onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick
+            call, signal, chatRoom, renderSignalWarning, resetError, hasToRenderPermissionsWarning,
+            renderPermissionsWarning, onCallExpand, onCallEnd, onAudioClick, onVideoClick, onScreenSharingClick,
+            onHoldClick
         } = this.props;
         const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] /* `Mute` */ : l[16708] /* `Mute` */;
         const videoLabel =
@@ -558,12 +562,13 @@ class Minimized extends MegaRenderMixin {
                                 icon={`${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`}
                                 onClick={ev => {
                                     ev.stopPropagation();
+                                    resetError(Av.Audio);
                                     onAudioClick();
                                 }}>
                                 <span>{audioLabel}</span>
                             </Button>
                             {signal ? null : renderSignalWarning()}
-                            {errAv & Av.Audio ? renderPermissionsWarning(Av.Audio) : null}
+                            {hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null}
                         </div>
                         <div className="meetings-signal-container">
                             <Button
@@ -581,20 +586,25 @@ class Minimized extends MegaRenderMixin {
                                 `}
                                 onClick={ev => {
                                     ev.stopPropagation();
+                                    resetError(Av.Camera);
                                     onVideoClick();
                                 }}>
                                 <span>{videoLabel}</span>
                             </Button>
-                            {errAv & Av.Camera ? renderPermissionsWarning(Av.Camera) : null}
+                            {hasToRenderPermissionsWarning(Av.Camera) ?
+                                renderPermissionsWarning(Av.Camera) :
+                                null}
                         </div>
                         <div className="meetings-signal-container">
                             <StreamExtendedControls
                                 call={call}
-                                errAv={errAv}
+                                chatRoom={chatRoom}
                                 onScreenSharingClick={onScreenSharingClick}
                                 onHoldClick={onHoldClick}
                             />
-                            {errAv & Av.Screen ? renderPermissionsWarning(Av.Screen) : null}
+                            {hasToRenderPermissionsWarning(Av.Screen) ?
+                                renderPermissionsWarning(Av.Screen) :
+                                null}
                         </div>
                         <Button
                             simpletip={{ ...SIMPLETIP_PROPS, label: l[5884] /* `End call` */ }}

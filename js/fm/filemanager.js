@@ -710,7 +710,6 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $fmholder.rebind('mouseup.colresize', function() {
             M.columnsWidth.makeNameColumnStatic();
-            initGridScrolling();
             $('#fmholder').css('cursor', '');
             $fmholder.off('mouseup.colresize');
             $fmholder.off('mousemove.colresize');
@@ -833,7 +832,6 @@ FileManager.prototype.initFileManagerUI = function() {
         $('#csb_' + M.RootID).empty();
 
         $(window).off('resize.ccmui');
-        $('.jspContainer', '#bodyel').off('mousewheel.context');
 
         // enable scrolling
         if ($.disabledContianer) {
@@ -1014,10 +1012,6 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             else {
                 loadSubPage('fm/account');
-                const accountPageJsp = $('.fm-account-main').data('jsp');
-                if (accountPageJsp) {
-                    $accountPageJsp.scrollToY(0, false);
-                }
             }
             return false;
         }
@@ -2724,12 +2718,12 @@ FileManager.prototype.initUIKeyEvents = function() {
 
         if (sl && String($.selectddUIgrid).indexOf('.grid-scrolling-table') > -1) {
             // if something is selected, scroll to that item
-            var jsp = $($.selectddUIgrid).data('jsp');
-            if (jsp) {
-                jsp.scrollToElement(sl);
-            }
-            else if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
+            const $scrollBlock = sl.closest('.ps');
+            if (M.megaRender && M.megaRender.megaList && M.megaRender.megaList._wasRendered) {
                 M.megaRender.megaList.scrollToItem(sl.data('id'));
+            }
+            else if ($scrollBlock.length) {
+                scrollToElement($scrollBlock, sl);
             }
         }
 
@@ -3106,42 +3100,26 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     $('.out-shared-grid-view').addClass('hidden');
     $('.files-grid-view.fm').addClass('hidden');
     $('.fm-blocks-view.fm').addClass('hidden');
-    $('.fm-blocks-view.contacts-view').addClass('hidden');
-    $('.files-grid-view.contacts-view').addClass('hidden');
-    $('.contacts-details-block').addClass('hidden');
-    $('.files-grid-view.contact-details-view').addClass('hidden');
-    $('.fm-blocks-view.contact-details-view').addClass('hidden');
 
-    if (this.currentdirid === 'contacts') {
-        $('.fm-blocks-view.contacts-view').removeClass('hidden');
-        initContactsBlocksScrolling();
-    }
-    else if (this.currentdirid === 'shares') {
+    if (this.currentdirid === 'shares') {
         $('.shared-blocks-view').removeClass('hidden');
-        initShareBlocksScrolling();
+        initPerfectScrollbar($('.shared-blocks-scrolling', '.shared-blocks-view'));
     }
     else if (this.currentdirid === 'out-shares') {
         $('.out-shared-blocks-view').removeClass('hidden');
-        initOutShareBlocksScrolling();
-    }
-    else if (String(this.currentdirid).length === 11 && this.currentrootid === 'contacts') {
-        $('.contacts-details-block').removeClass('hidden');
-        if (this.v.length > 0) {
-            $('.fm-blocks-view.contact-details-view').removeClass('hidden');
-            initFileblocksScrolling2();
-        }
+        initPerfectScrollbar($('.out-shared-blocks-scrolling', '.out-shared-blocks-view'));
     }
     else if (this.currentdirid !== 'user-management' &&
         (this.currentdirid === this.InboxID || this.getNodeRoot(this.currentdirid) === this.InboxID)) {
         if (this.v.length > 0) {
             $('.fm-blocks-view.fm').removeClass('hidden');
-            initFileblocksScrolling();
         }
     }
     else if (this.currentrootid === 'shares' && !this.v.length) {
         const viewModeClass = (M.viewmode ? '.fm-blocks-view' : '.files-grid-view') + '.fm.shared-folder-content';
 
         $(viewModeClass).removeClass('hidden');
+        initPerfectScrollbar($(viewModeClass));
     }
     // user management ui update is handled in Business Account classes.
     else if (this.v.length && this.currentdirid.substr(0, 15) !== 'user-management' &&
@@ -3155,7 +3133,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
             $('.fm-blocks-view.fm').removeClass('out-shares-view public-links-view');
         }
         if (!aQuiet) {
-            initFileblocksScrolling();
+            initPerfectScrollbar($('.file-block-scrolling', '.fm-blocks-view.fm'));
         }
     }
 
@@ -3348,32 +3326,20 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.out-shared-blocks-view').addClass('hidden');
     $('.out-shared-grid-view').addClass('hidden');
     $('.files-grid-view.fm').addClass('hidden');
-    $('.fm-blocks-view.contacts-view').addClass('hidden');
-    $('.files-grid-view.contacts-view').addClass('hidden');
-    $('.contacts-details-block').addClass('hidden');
-    $('.files-grid-view.contact-details-view').addClass('hidden');
-    $('.fm-blocks-view.contact-details-view').addClass('hidden');
-    $('.files-grid-view.user-management-view').addClass('hidden');
 
     if (this.currentdirid === 'shares') {
         $('.shared-grid-view').removeClass('hidden');
-        initGridScrolling();
+        initPerfectScrollbar($('.grid-scrolling-table', '.shared-grid-view'));
     }
     else if (this.currentdirid === 'out-shares') {
         $('.out-shared-grid-view').removeClass('hidden');
-        initGridScrolling();
-    }
-    else if (this.currentdirid === 'user-management') {
-        $('.files-grid-view.user-management-view').removeClass('hidden');
-        initGridScrolling();
+        initPerfectScrollbar($('.grid-scrolling-table', '.out-shared-grid-view'));
     }
     else if (this.currentrootid === 'shares' && !this.v.length) {
         const viewModeClass = (M.viewmode ? '.fm-blocks-view' : '.files-grid-view') + '.fm.shared-folder-content';
 
         $(viewModeClass).removeClass('hidden');
-    }
-    else if (M.currentCustomView.type === 'gallery') {
-        initGridScrolling();
+        initPerfectScrollbar($(viewModeClass, '.shared-details-block'));
     }
     else if (this.v.length) {
 
@@ -3384,7 +3350,6 @@ FileManager.prototype.addGridUI = function(refresh) {
         else {
             $('.files-grid-view.fm').removeClass('out-shares-view public-links-view');
         }
-        initGridScrolling();
         $.gridHeader();
 
         // if there is any node that already rendered before getting correct value, update with resize handler.

@@ -553,11 +553,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
         $(window).rebind('resize.ccmui', SoonFc(findNewPosition));
 
-        $('.jspContainer','#bodyel').rebind('mousewheel.context', function() {
-            $(this).off('mousewheel.context');
-            $.hideContextMenu();
-        });
-
         // disable scrolling
         var $psContainer = $(e.currentTarget).closest('.ps');
         if ($psContainer.length) {

@@ -44,11 +44,12 @@ body.tl .dropdown.body.popup.contacts-search {
     content: '';
     width: 100%;
     height: 1px;
-    margin: 5px 0 0 0;
+    margin: 12px 0 0;
     background: var(--divider-color);
 }
 .rtl .contacts-search-header {
-    margin: 0 12px 0 12px;
+    margin: auto;
+    width: 80%;
 }
 .new-group-chat .contacts-search-header {
     padding: 0;
@@ -132,22 +133,17 @@ body.tl .dropdown.body.popup.contacts-search {
     overflow: hidden;
 }
 .main-start-chat-dropdown .contacts-search-scroll {
-    position: relative;
+    box-sizing: border-box;
     margin: 0;
-    padding: 7px 0 0 0;
     max-height: 366px;
     min-height: 366px;
+    padding: 8px 0 0;
+    position: relative;
 }
 .contacts-search-scroll .contacts-search-subsection {
     padding: 0 48px;
 }
-.contacts-search-scroll .jspPane {
-    min-height: 70%;
-}
-.contacts-search-scroll .jspContainer {
-    max-height: 426px;
-}
-.contacts-search-scroll .jspPane em {
+.contacts-search-scroll em {
     text-align: center;
     display: block;
     height: 48px;
@@ -157,14 +153,14 @@ body.tl .dropdown.body.popup.contacts-search {
     color: #666;
 }
 .rtl .contacts-search-list .contacts-info.body.contacts-search {
-    padding: 8px 12px;
+    padding: 4px 12px;
 }
 .contacts-search-list .contacts-info .user-card-data {
     max-width: 80%;
     padding-inline-start: 10px;
 }
 .contacts-search-list .user-card-data .user-card-name {
-    padding: 0 5px 0 0;
+    margin: 0 5px 0 0;
 }
 .contacts-search-list .user-card-data .user-card-status {
     display: inline;
@@ -381,7 +377,7 @@ body.tl .dropdown.body.popup.contacts-search {
     border-top: 1px solid var(--divider-color);
 }
 .rtl .contacts-search-bottom {
-    padding: 20px 12px;
+    padding-right: 38px;
 }
 .contacts-list-header {
     padding: 0 8px;

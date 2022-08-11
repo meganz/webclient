@@ -123,6 +123,9 @@ export default class ChatRouting {
             location = room.getRoomUrl();
         }
         else if (sectionName === 'p') {
+            if (roomId === u_handle) {
+                return loadSubPage('/fm/chat');
+            }
             megaChat.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, true)
                 .then(resolve)
                 .catch(reject);
@@ -147,7 +150,7 @@ export default class ChatRouting {
                     }
                     else {
                         if (String(location).startsWith('chat')) {
-                            location = location === 'chat' ? 'fm' : 'chat';
+                            location = 'fm/chat';
                         }
                         M.currentdirid = M.chat = page = false;
                         loadSubPage(location, event);

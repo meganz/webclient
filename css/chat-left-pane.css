@@ -146,8 +146,31 @@
 }
 .conversations-pane {
     margin: 0;
-    padding: 0;
+    padding: 6px 0 0;
     list-style-type: none;
+}
+.conversations-pane.loading-sketch {
+    animation: fadeInOutLoopSubtle 2s linear infinite;
+}
+.conversations-pane.loading-sketch li:hover {
+    background: none;
+    box-shadow: none;
+}
+.conversations-pane.loading-sketch .conversation-data {
+    margin: 6px 0 0;
+}
+.conversations-pane.loading-sketch .conversation-avatar .chat-topic-icon {
+    background: #CBCBCB;
+}
+.conversations-pane.loading-sketch .conversation-data-top,
+.conversations-pane.loading-sketch .conversation-message {
+    height: 13px;
+    margin: 0 0 4px;
+    border-radius: 3px;
+    background: #CBCBCB;
+}
+.conversations-pane.loading-sketch .conversation-message {
+    height: 7px;
 }
 .chat-lp-body {
 
@@ -163,12 +186,15 @@
 }
 .content-panel.conversations,
 .archived-chats .archive-chat-list {
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
     background-color: var(--stroke-grey-2);
 }
-.content-panel.conversations span.heading {
+.content-panel.conversations span.empty-conversations {
     display: block;
-    margin: 5px 0 5px 12px;
+    margin: 5px 0 5px 40px;
     font: var(--text-body2);
     color: var(--text-color-medium);
 }
@@ -505,18 +531,20 @@ li.active .call-duration i {
  * ------------------------------------------------------------------------------------------------------------------ */
 
 .search-panel {
-    background: var(--surface-grey-2);
-    box-sizing: border-box;
     display: flex;
-    flex-direction: column;
-    height: 36px;
     position: relative;
-    z-index: 130;
+    padding: 16px 0 0;
     width: 100%;
+    height: 36px;
+    flex-direction: column;
+    box-sizing: border-box;
+    z-index: 130;
+    background: var(--surface-grey-2);
 }
 
 .search-panel.expanded {
     flex: 1 1 auto;
+    position: absolute;
     height: 100%;
     overflow: hidden;
 }
@@ -939,10 +967,6 @@ li.active .call-duration i {
     top: 16px;
     width: 100%;
     z-index: 120;
-}
-
-.contacts-panel .back-to-landing {
-    margin: 15px 0 15px 32px;
 }
 
 .contacts-navigation {
@@ -1621,3 +1645,163 @@ li.active .call-duration i {
 .dropdown .dropdown-profile .user-card-presence {
     margin-bottom: 1px;
 }
+
+/* -- */
+
+.conversationsApp .lhp-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    margin: 26px 0 8px;
+    text-align: center;
+}
+
+.conversationsApp .lhp-nav-container {
+    position: relative;
+    font: var(--text-body2);
+    color: var(--text-color-medium);
+    cursor: pointer;
+}
+
+.conversationsApp .lhp-nav-container:hover {
+    color: var(--text-color-high);
+}
+
+.conversationsApp .lhp-nav-container.active .lhp-nav-button,
+.conversationsApp .lhp-nav-container.active span {
+    color: var(--secondary-green);
+}
+
+.conversationsApp .lhp-nav-container span {
+    display: block;
+    margin: 2px 0 0;
+}
+
+.conversationsApp .lhp-nav-button {
+    position: relative;
+    width: 24px;
+    margin: 0 auto;
+}
+
+.conversationsApp .lhp-nav-button i {
+    --icon-size: 24px;
+}
+
+.conversationsApp .lhp-nav-container .notifications-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 200px;
+    box-sizing: border-box;
+    background: var(--secondary-red);
+}
+
+.conversationsApp .lhp-nav-container .notifications-count span {
+    display: block;
+    margin: 0;
+    font: var(--text-caption);
+    color: var(--text-color-white-high);
+}
+
+.conversationsApp .lhp-action-buttons {
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    margin: 0 0 4px 10px;
+}
+
+.conversationsApp .lhp-action-buttons button.loading-sketch {
+    margin: 0 0 10px 6px;
+    animation: fadeInOutLoopSubtle 2s linear infinite;
+}
+
+.conversationsApp .lhp-action-buttons button.loading-sketch i {
+    width: 24px;
+    height: 24px;
+    border-radius: 200px;
+    background: #CBCBCB;
+}
+
+.conversationsApp .lhp-action-buttons button.loading-sketch span {
+    display: block;
+    width: 34px;
+    height: 7px;
+    margin: 0 0 0 14px;
+    border-radius: 3px;
+    background: #CBCBCB;
+}
+
+.conversationsApp .lhp-action-buttons button span {
+    text-align: start;
+}
+
+.conversationsApp .lhp-action-buttons i {
+    --icon-size: 24px;
+    --mask-color: var(--secondary-green);
+}
+
+.conversationsApp .conversations-empty {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font: var(--text-body1);
+    z-index: 120;
+    background: var(--surface-main);
+}
+
+.conversationsApp .conversations-empty-content {
+    overflow: hidden;
+    width: 400px;
+}
+
+.conversationsApp .conversations-empty-content i {
+    --icon-size: 120px;
+    --mask-color: var(--icon-inactive);
+}
+
+.lhp-conversations.scrollable .toggle-panel.expanded {
+    max-height: calc(100% - 35px);
+}
+
+.lhp-conversations.scrollable .toggle-panel.expanded .toggle-panel-content {
+    max-height: calc(100% - 25px);
+    height: 100%;
+}
+
+.lhp-conversations .toggle-panel {
+    overflow: hidden;
+    width: 100%;
+}
+
+.lhp-conversations .toggle-panel .toggle-panel-heading {
+    display: flex;
+    align-items: center;
+    padding: 0 0 0 10px;
+    font: var(--text-body2);
+    cursor: pointer;
+}
+
+.lhp-conversations .toggle-panel .toggle-panel-heading i {
+    margin: 1px 0 0;
+    --icon-size: 24px;
+    --mask-color: var(--icon-rest);
+    transform: rotate(-90deg);
+    transition: transform 100ms ease-in-out;
+}
+
+.lhp-conversations .toggle-panel.expanded .toggle-panel-heading i {
+    transform: rotate(0deg);
+}
+
+.lhp-conversations .toggle-panel .toggle-panel-heading span {
+    display: block;
+    padding: 0 0 0 4px;
+}
+

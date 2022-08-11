@@ -590,8 +590,9 @@ var notify = {
         notify.$popup.removeClass('empty loading');
 
         // Add scrolling for the notifications
-        notify.setHeightForNotifications();
-        notify.initPopupScrolling();
+        Soon(() => {
+            initPerfectScrollbar($('.notification-scroll', notify.$popup));
+        });
 
         // Add click handlers for various notifications
         notify.initFullContactClickHandler();
@@ -601,46 +602,6 @@ var notify = {
         notify.initPaymentReminderClickHandler();
         notify.initAcceptContactClickHandler();
         notify.initSettingsClickHander();
-    },
-
-    /**
-     * Sets the height of the notification dialog so it shows all the notifications
-     * that it can. If there are only a few notifications the height will only be
-     * as high as those few notifications.
-     */
-    setHeightForNotifications: function () {
-
-        var $jspContainer = notify.$popup.find('.jspContainer');
-        var $notificationScrollList = notify.$popup.find('.notification-scr-list');
-
-        // Get the heights
-        var heightOfAllNotifications = $notificationScrollList.height();
-        var maxNotificationsHeight = $jspContainer.css('max-height');
-
-        // Set the initial height
-        var newHeight = heightOfAllNotifications;
-
-        // If the limit is exceeded, set it to the maximum
-        if (newHeight > maxNotificationsHeight) {
-            newHeight = maxNotificationsHeight;
-        }
-
-        // Set the height
-        $jspContainer.css('height', newHeight);
-    },
-
-    /**
-     * Initialise scrolling on the notifications popup
-     */
-    initPopupScrolling: function() {
-
-        // Initialise scrolling on the popup
-        $('.notification-scroll').jScrollPane({
-            showArrows: true,
-            arrowSize: 5
-        });
-
-        jScrollFade('.notification-scroll');
     },
 
     /**
@@ -735,9 +696,11 @@ var notify = {
             // Redirect to payment history
             loadSubPage('fm/account/plan');
             mBroadcaster.once('settingPageReady', function () {
-                const jsp = $('.fm-account-main').data('jsp');
-                if (jsp) {
-                    jsp.scrollToElement($target, true, false);
+                const $scrollBlock = $('.fm-right-account-block.ps');
+                if ($scrollBlock.length) {
+                    $scrollBlock.scrollTop(
+                        $target.offset().top - $scrollBlock.offset().top + $scrollBlock.scrollTop()
+                    );
                 }
             });
         });

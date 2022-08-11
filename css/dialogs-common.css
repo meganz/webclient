@@ -146,9 +146,6 @@
     background-image: url(../images/mega/dialog-sprite.png);
     background-repeat:  no-repeat;
 }
-.mobile .verify-email-login-to-account .cancel-email-verify {
-    margin-right: 12px;
-}
 .fm-dialog-title {
     font-size: 20px;
     line-height: 30px;
@@ -568,3 +565,9 @@ h3.verify-email.header-txt {
     }
 
 /* end verify-email-set-new-pass */
+
+@media only screen and (max-height: 600px) {
+    .mega-dialog > section {
+        flex-shrink: 0;
+    }
+}

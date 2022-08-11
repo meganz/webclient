@@ -108,7 +108,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogClass: 'mcob',
                             dialogTitle: l.onboard_megachat_dlg2_title,
                             dialogDesc: l.onboard_megachat_dlg2_text,
-                            targetElmClass: '.conversationsApp .chat-lp-scroll-area .heading',
+                            targetElmClass: '.conversationsApp .toggle-panel-heading',
                             targetElmPosition: 'right',
                             markComplete: true,
                             ignoreBgClick: true,

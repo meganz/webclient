@@ -146,7 +146,7 @@
 }
 .conversations-pane {
     margin: 0;
-    padding: 0;
+    padding: 6px 0 0;
     list-style-type: none;
 }
 .conversations-pane.loading-sketch {
@@ -186,23 +186,17 @@
 }
 .content-panel.conversations,
 .archived-chats .archive-chat-list {
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
     background-color: var(--stroke-grey-2);
 }
-.content-panel.conversations span.heading,
 .content-panel.conversations span.empty-conversations {
     display: block;
-    margin: 5px 0 5px 12px;
+    margin: 5px 0 5px 40px;
     font: var(--text-body2);
     color: var(--text-color-medium);
-}
-.content-panel.conversations span.heading.loading-sketch {
-    width: 78px;
-    height: 7px;
-    margin: 8px 0 5px 16px;
-    border-radius: 3px;
-    background: #cbcbcb;
-    animation: fadeInOutLoopSubtle 2s linear infinite;
 }
 .archived-chats .archive-chat-list {
     min-height: initial;
@@ -1714,11 +1708,11 @@ li.active .call-duration i {
 .conversationsApp .lhp-action-buttons {
     font: var(--text-body1);
     color: var(--text-color-high);
-    margin: 0 0 0 8px;
+    margin: 0 0 4px 10px;
 }
 
 .conversationsApp .lhp-action-buttons button.loading-sketch {
-    margin: 0 0 3px 6px;
+    margin: 0 0 10px 6px;
     animation: fadeInOutLoopSubtle 2s linear infinite;
 }
 
@@ -1770,5 +1764,44 @@ li.active .call-duration i {
 .conversationsApp .conversations-empty-content i {
     --icon-size: 120px;
     --mask-color: var(--icon-inactive);
+}
+
+.lhp-conversations.scrollable .toggle-panel.expanded {
+    max-height: calc(100% - 35px);
+}
+
+.lhp-conversations.scrollable .toggle-panel.expanded .toggle-panel-content {
+    max-height: calc(100% - 25px);
+    height: 100%;
+}
+
+.lhp-conversations .toggle-panel {
+    overflow: hidden;
+    width: 100%;
+}
+
+.lhp-conversations .toggle-panel .toggle-panel-heading {
+    display: flex;
+    align-items: center;
+    padding: 0 0 0 10px;
+    font: var(--text-body2);
+    cursor: pointer;
+}
+
+.lhp-conversations .toggle-panel .toggle-panel-heading i {
+    margin: 1px 0 0;
+    --icon-size: 24px;
+    --mask-color: var(--icon-rest);
+    transform: rotate(-90deg);
+    transition: transform 100ms ease-in-out;
+}
+
+.lhp-conversations .toggle-panel.expanded .toggle-panel-heading i {
+    transform: rotate(0deg);
+}
+
+.lhp-conversations .toggle-panel .toggle-panel-heading span {
+    display: block;
+    padding: 0 0 0 4px;
 }
 

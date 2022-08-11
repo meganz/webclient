@@ -703,7 +703,7 @@ const businessProductPage = {
             bindDropdownEvents($storageSelect);
 
             // Init textarea scroll
-            initTextareaScrolling($message, 116);
+            initTextareaScrolling($message);
         }
 
         // Clear filled values

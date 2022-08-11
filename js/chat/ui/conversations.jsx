@@ -513,8 +513,6 @@ class ConversationsApp extends MegaRenderMixin {
                 megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
                 delay('CoApp:fmc:thr', function() {
                     self.setState({leftPaneWidth: value});
-                    $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
-                    $('.jScrollPaneContainer:visible').trigger('forceResize');
                 }, 75);
                 megaChat.$leftPane.width(value);
                 $('.fm-tree-panel', megaChat.$leftPane).width(value);
@@ -543,16 +541,12 @@ class ConversationsApp extends MegaRenderMixin {
                 } else {
                     $('.left-pane-drag-handle').css('cursor', 'we-resize')
                 }
-
-                $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
             });
 
             $($.leftPaneResizableChat).on('resizestop', function() {
                 $('.fm-left-panel').width(
                     megaChat.$leftPane.width()
                 );
-
-                $('.jScrollPaneContainer:visible').trigger('forceResize');
 
                 setTimeout(function() {
                     $('.hiden-when-dragging').removeClass('hiden-when-dragging');
@@ -649,10 +643,18 @@ class ConversationsApp extends MegaRenderMixin {
     }
 
     initArchivedChatsScrolling() {
-        var scroll = '.archive-chat-list';
-        deleteScrollPanel(scroll, 'jsp');
-        $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-        jScrollFade(scroll);
+        const scrollBlock = document.querySelector('.conversationsApp .archive-chat-list');
+
+        if (!scrollBlock) {
+            return false;
+        }
+
+        if (scrollBlock.classList.contains('ps')) {
+            Ps.update(scrollBlock);
+        }
+        else {
+            Ps.initialize(scrollBlock);
+        }
     }
 
     getArchivedCount() {

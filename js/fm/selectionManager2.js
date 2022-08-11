@@ -559,16 +559,13 @@ class SelectionManager2_DOM extends SelectionManager2Base {
     }
 
     scrollToElementProxyMethod(nodeHandle) {
-        let $selectable = this._get_selectable_container();
-        var $element = $('#' + nodeHandle, $selectable);
-        var $jsp = $element.getParentJScrollPane();
-        if ($jsp) {
-            var jspXPosition = $jsp.getContentPositionX();
-            $jsp.scrollToElement($element);
-            $jsp.scrollToX(jspXPosition); // Keep the element remain the horizontal position after scrolling
-        }
-        else if (M.megaRender && M.megaRender.megaList) {
+
+        if (M.megaRender && M.megaRender.megaList) {
             M.megaRender.megaList.scrollToItem(nodeHandle);
+        }
+        else {
+            const $el = $('#' + nodeHandle, this._get_selectable_container());
+            scrollToElement($el.closest('.ps'), $el);
         }
     }
 
@@ -757,19 +754,11 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
             this.showSelectionBar(notificationText);
 
-            const container = this._get_selectable_container();
-
-            if (container.data('jsp') || container.closest('.jspContainer').length) {
-
-                if (M.viewmode) {
-                    initShareBlocksScrolling();
-                }
-                else {
-                    initGridScrolling();
-                }
-            }
-            else if (M.megaRender && M.megaRender.megaList) {
+            if (M.megaRender && M.megaRender.megaList) {
                 M.megaRender.megaList.resized();
+            }
+            else {
+                initPerfectScrollbar($(this._get_selectable_container()).closest('.ps'));
             }
             this.scrollToElementProxyMethod(this.last_selected);
         }
@@ -782,37 +771,28 @@ class SelectionManager2_DOM extends SelectionManager2Base {
     showSelectionBar(notificationText) {
 
         var $selectionBar = $('.selection-status-bar');
-        var jsp;
+        let scrollBarYClass = '';
 
         $selectionBar.find('.selection-bar-col').safeHTML(notificationText);
 
         this.vSelectionBar = $('b', $selectionBar).get(0);
 
         if (this.currentdirid === "out-shares") {
-            jsp = M.viewmode ? $('.out-shared-blocks-scrolling').data('jsp') :
-                $('.out-shared-grid-view .grid-scrolling-table').data('jsp');
+            scrollBarYClass = M.viewmode ? '.out-shared-blocks-scrolling.ps--active-y' :
+                '.out-shared-grid-view .grid-scrolling-table.ps--active-y';
         }
         else if (this.currentdirid === "shares") {
-            jsp = M.viewmode ? $('.shared-blocks-scrolling').data('jsp') :
-                $('.shared-grid-view .grid-scrolling-table').data('jsp');
-        }
-
-        if (jsp) {
-            var jspPercentY = jsp.getPercentScrolledY();
-            jsp.reinitialise();
-
-            // If this is scrolled to bottom, keep it stick on bottom
-            if (jspPercentY === 1) {
-                jsp.scrollToBottom();
-            }
+            scrollBarYClass = M.viewmode ? '.shared-blocks-scrolling.ps--active-y' :
+                '.shared-grid-view .grid-scrolling-table.ps--active-y';
         }
         else {
-            var scrollBarYClass = (M.viewmode === 1) ?
+            scrollBarYClass = (M.viewmode === 1) ?
                 '.file-block-scrolling.ps--active-y' : '.grid-scrolling-table.ps--active-y';
-            var scrollBarY = document.querySelector(scrollBarYClass);
-            if (scrollBarY && (scrollBarY.scrollHeight - scrollBarY.scrollTop - scrollBarY.clientHeight) < 37) {
-                scrollBarY.scrollTop = scrollBarY.scrollHeight;
-            }
+        }
+
+        const scrollBarY = document.querySelector(scrollBarYClass);
+        if (scrollBarY && (scrollBarY.scrollHeight - scrollBarY.scrollTop - scrollBarY.clientHeight) < 37) {
+            scrollBarY.scrollTop = scrollBarY.scrollHeight;
         }
 
         if (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0) {
@@ -843,19 +823,11 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         this.selected_totalSize = 0;
         this.vSelectionBar = null;
 
-        const container = this._get_selectable_container();
-
-        if (container.data('jsp') || container.closest('.jspContainer').length) {
-
-            if (M.viewmode) {
-                initShareBlocksScrolling();
-            }
-            else {
-                initGridScrolling();
-            }
-        }
-        else if (M.megaRender && M.megaRender.megaList) {
+        if (M.megaRender && M.megaRender.megaList) {
             M.megaRender.megaList.resized();
+        }
+        else {
+            initPerfectScrollbar($(this._get_selectable_container()).closest('.ps'));
         }
 
         if (this.currentdirid.substr(0, 7) !== 'search/' && folderlink) {

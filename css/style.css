@@ -631,7 +631,7 @@ label span.black {
     display: block;
 }
 .notification-scroll {
-    max-height: 480px;
+    max-height: 490px;
     overflow: hidden;
     box-sizing: border-box;
     width: 100%;
@@ -774,9 +774,6 @@ label span.black {
 .nt-takedown-notification .notification-icon .takedown-icon,
 .nt-takedown-reinstated-notification .notification-icon .reinstated-icon {
     display: block;
-}
-.notification-popup .jspDrag {
-    width: 6px;
 }
 .notification-avatar img {
     width: 48px;
@@ -971,160 +968,7 @@ a.nt-settings-button:hover {
 a.nt-settings-button:hover span {
     color: white;
 }
-.jScrollPaneTrack {
-    position: absolute;
-    cursor: pointer;
-    right: 4px;
-    top: 0;
-    height: 100%;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    width: 9px !important;
-}
-.jScrollPaneDrag {
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.39);
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
-    border-radius: 8px;
-    width: 8px !important;
-    cursor: pointer;
-    overflow: hidden;
-}
-.jspHorizontalBar .jScrollPaneDrag, .jspHorizontalBar .jspdrag {
-    background-color: #B8BCBF;
-}
-.jScrollPaneDragTop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-}
-.jScrollPaneDragBottom {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    overflow: hidden;
-}
-.jScrollPaneContainer {
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-    padding: 0;
-}
-.jspContainer {
-    overflow: hidden;
-    position: relative;
-    max-width: 100%;
-    min-height: 100%;
-    min-width: 100%;
-}
-.jspPane {
-    position: absolute;
-    min-width: 100%;
-    margin: 0 !important;
-    max-width: 100%;
-}
-.animateScroll .jspPane {
-    transition: top 300ms ease-in-out, left 300ms ease-in-out;
-}
-.jspVerticalBar {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 8px;
-    margin: 0 4px;
-    height: 100%;
-}
-.rtl .jspVerticalBar {
-    right: auto;
-    left: 0;
-}
-.jspHorizontalBar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 11px;
-}
-.jspVerticalBar *, .jspHorizontalBar * {
-    margin: 0;
-    padding: 0;
-}
-.jspCap {
-    display: none;
-}
-.jspHorizontalBar .jspCap {
-    float: left;
-}
-.jspTrack {
-    position: relative;
-    transition: opacity 250ms ease-in-out;
-    border-radius: 20px;
-    opacity: 0;
-}
-.jspDrag {
-    background-color: var(--stroke-main-inverted);
-    border-radius: 8px;
-    width: 8px;
-    position: relative;
-    top: 0;
-    left: 0;
-    cursor: pointer;
-}
-.theme-dark .jspDrag {
-    background-color: #fff;
-}
-.jspDrag::before {
-    position: absolute;
-    content: '';
-    width: calc(100% + 6px);
-    height: 100%;
-    left: -3px;
-    top: 0;
-}
-.jspScrollable:hover .jspTrack {
-    background-color: var(--scroll-bar-background);
-    opacity: 0.5;
-}
-.jspHorizontalBar .jspDrag {
-    height: 8px !important;
-}
-.jspHorizontalBar .jspTrack, .jspHorizontalBar .jspDrag {
-    float: left;
-    height: 100%;
-}
-.jspArrow {
-    text-indent: -20000px;
-    display: block;
-    cursor: pointer;
-}
-.jspArrow.jspDisabled {
-    cursor: default;
-}
-.jspVerticalBar .jspArrow {
-    height: 2px;
-}
-.jspHorizontalBar .jspArrow {
-    width: 2px;
-    float: left;
-    height: 100%;
-}
-.jspVerticalBar .jspArrow:focus {
-    outline: none;
-}
-.jspCorner {
-    float: left;
-    height: 100%;
-}
-* html .jspCorner {
-    margin: 0 -3px 0 0;
-}
-.jspHorizontalBar {
-    /* If you do require horizontal scrollbars, don't use jScrollPane - we're deprecating it anyway */
-    display: none !important;
-}
+
 .tagit-new {
     display: none;
 }
@@ -1741,10 +1585,6 @@ label.iPhoneCheckLabelOff span {
     overflow: hidden;
     display: none;
 }
-.conversations .fm-tree-panel .jspPane {
-    min-height: 100%;
-    background-image: url(../images/mega/nw-chat-bg.svg);
-}
 .fm-tree-panel ul {
     margin: 0;
     list-style: none;
@@ -2225,9 +2065,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .files-grid-view .nw-contact-status, .fm-blocks-view .nw-contact-status, .shared-grid-view .nw-contact-status, .shared-blocks-view .nw-contact-status {
     border: 0;
     margin: 21px 2px 0 12px;
-}
-.grid-scrolling-table.archive-chat-list .jspPane {
-    background-image: initial;
 }
 .nw-conversations-item .nw-contact-status, .fm-tree-panel .nw-contact-status {
     margin: 9px 0 0 14px;
@@ -4683,108 +4520,22 @@ body.loading .light-overlay {
 .dialog .add-user-size-icon.short-size {
     display: none;
 }
-.add-user-notification, .share-message, .cancel-textarea-bl {
-    border-radius: 2px;
-    border: 1px solid var(--stroke-grey-2);
-    background: var(--surface-grey-1);
-    height: 84px;
-    padding: 0;
-    box-sizing: border-box;
-    margin-top: 16px;
-}
 .add-user-notification {
     margin-top: 16px;
     margin-bottom: 16px;
 }
-.cancel-textarea-bl {
-    height: 144px;
-    padding: 0;
-    margin: -4px 0 0 0;
-}
 .cancel-subscription-txt {
     padding: 16px 8px 0 8px;
 }
-.cancel-textarea-scroll {
-    height: 140px;
-    box-sizing: border-box;
+.cancel-textarea-bl.mega-textarea {
+    margin: -4px 0 0;
 }
-.add-user-nt-scrolling,
-.share-message-scroll {
-    height: 50px;
-    box-sizing: border-box;
-    padding: 6px 0;
+.cancel-textarea-bl .cancel-textarea.textarea-scroll {
+    max-height: 140px;
+    margin: 12px 0;
 }
-.add-user-nt-scrolling .jspVerticalBar,
-.share-message-scrolling .jspVerticalBar,
-.cancel-textarea-scroll .jspVerticalBar {
-    width: 9px;
-}
-.add-user-nt-scrolling .jspDrag,
-.share-message-scrolling .jspDrag,
-.cancel-textarea-scroll .jspDrag {
-    width: 6px;
-}
-.add-user-nt-scrolling textarea,
-.add-contact-hidden,
-.share-message-scrolling textarea,
-.share-message-hidden,
-.feedback-hidden,
-.cancel-textarea-scroll textarea,
-.cancel-hidden {
-    border: 0;
-    box-sizing: border-box;
-    padding: 0;
-    background: var(--surface-grey-1);
-    font: var(--text-body1);
-    color: var(--text-color-medium);
-    width: 100%;
-    margin: 0;
-    height: 72px;
-    padding: 0 16px;
-    position: relative;
-    box-sizing: border-box;
-    resize: none;
-    overflow: hidden;
-    min-height: 72px;
-    z-index: 1;
-}
-.cancel-textarea {
-    height: 140px;
-    line-height: 0;
-    font-size: 0;
-    position: relative;
-}
-.cancel-textarea-scroll textarea,
-.cancel-hidden {
-    height: 138px;
-    padding: 12px 12px;
-    min-height: 138px;
-}
-.add-contact-hidden,
-.share-message-hidden,
-.feedback-hidden,
-.cancel-hidden,
-.mega-dialog.feedback-dialog .textarea-scroll .feedback-dialog-hidden {
-    position: absolute;
-    height: auto;
-    opacity: 0;
-    top: 0;
-    z-index: 0;
-}
-.share-message-scrolling {
-    padding: 6px 0 5px 0;
-    line-height: 0;
-    font-size: 0;
-}
-.add-user-textarea, .share-message-textarea {
-    height: 72px;
-    position: relative;
-    line-height: 0;
-    font-size: 0;
-}
-.add-user-nt-scrolling textarea::selection, .share-message-scrolling textarea::selection {
-    background-color: #333333;
-    color: white;
+.cancel-textarea-bl .cancel-textarea.textarea-scroll textarea {
+    min-height: 140px;
 }
 .rename-input-bl input {
     background-image: none;
@@ -5005,9 +4756,6 @@ div .fm-tree-folder.dragover {
     transition: background-color 200ms ease-in-out;
     flex-shrink: 0;
     flex-grow: 0;
-}
-.new-notifications-scroll .jspContainer {
-    height: 100% !important;
 }
 .read .notification-status {
     background: none;
@@ -8613,9 +8361,6 @@ h1.help-home-header {
 .help-listing:hover {
     color: #F0373B;
 }
-.jspVerticalBar {
-    z-index: 120;
-}
 .help-nw .dev-short-block.help-nw-short-blocks {
     margin: 0 -3px 0 -3px;
     padding-bottom: 20px;
@@ -9667,6 +9412,7 @@ ul.token-input-list-mega {
 .multiple-input {
     border-radius: 3px;
     border: 1px solid var(--stroke-grey-2);
+    box-sizing: border-box;
     background: var(--surface-grey-1);
     max-height: 144px;
     min-height: 40px;
@@ -9714,13 +9460,10 @@ ul.token-input-list-mega {
 .error .reg-resend-email-meg {
     display: block;
 }
-.multiple-input .jspContainer, .multiple-input .jspPane {
-    min-height: 36px;
-    min-width: 100%;
-}
 ul.token-input-list-mega li input,
 .multiple-input input {
     border: 0;
+    box-sizing: border-box;
     width: 100px;
     float: left;
     color: var(--text-color-high);
@@ -10132,18 +9875,6 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
     margin: -2px 0 0 10px;
 }
 
-.share-dialog-contacts .jspVerticalBar,
-.multiple-input .jspVerticalBar,
-.mega-dialog .content .jspVerticalBar,
-.fm-call-dialog .jspVerticalBar {
-    width: 8px;
-}
-.share-dialog-contacts .jspDrag,
-.multiple-input .jspDrag,
-.mega-dialog .content .jspDrag,
-.fm-call-dialog .jspDrag {
-    width: 8px;
-}
 .share-dialog-contacts .nw-fm-tree-item .data-item-icon,
 .mega-dialog .fm-picker-dialog-tree-panel .nw-fm-tree-item .data-item-icon {
     right: 11px;
@@ -11645,9 +11376,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations,
 body.megaChatDisabled .fm-start-conversation,
 body.megaChatDisabled .nw-contact-name button.start-chat-button {
     display: none;
-}
-.bp-main .jspPane {
-    min-width: auto;
 }
 .fadeinout {
     -webkit-animation: fadeinout 2s linear forwards;

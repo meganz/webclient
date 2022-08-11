@@ -161,9 +161,6 @@ class ConversationMessageMixin extends ContactAwareComponent {
         }
         return timestampInt;
     }
-    getParentJsp() {
-        return $(this.findDOMNode()).closest('.jScrollPaneContainer').data('jsp');
-    }
     componentDidUpdate() {
         var self = this;
         var chatRoom = self.props.message.chatRoom;

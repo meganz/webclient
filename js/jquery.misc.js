@@ -1,23 +1,4 @@
 /**
- * Helper function to get the jScrollPane container of this element
- *
- * @returns {*}
- */
-$.fn.getParentJScrollPane = function() {
-    "use strict";
-
-    var $scrollable_parent = $(this).closest('.jspScrollable');
-    if ($scrollable_parent.length) {
-        var $jsp = $scrollable_parent.data('jsp');
-        if ($jsp) {
-            return $jsp;
-        } else {
-            return false;
-        }
-    }
-};
-
-/**
  * Find jQuery Element in an jQuery array of elements and return its index OR -1 if not found.
  * Pretty similar to the $.inArray, but will match the object IDs.
  *

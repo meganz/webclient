@@ -127,7 +127,10 @@
     white-space: nowrap;
     z-index: -1;
 }
-.chat-textarea-scroll textarea, .chat-textarea-scroll textarea + div, .message.textarea-scroll textarea,  .message.textarea-block textarea + div {
+.chat-textarea-scroll textarea,
+.message.textarea-scroll textarea,
+.chat-textarea-scroll .message-preview,
+.message.textarea-scroll .message-preview {
     font: var(--text-body1);
     width: calc(100% - 14px);
     border: 0;
@@ -138,38 +141,30 @@
     word-wrap: break-word;
     height: 20px;
     min-height: 20px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     display: block;
     white-space: pre-wrap;
     background-color: var(--stroke-main);
 }
-.chat-textarea-scroll textarea[disabled="disabled"], .disabled .chat-textarea-scroll textarea {
-    /* TODO: add disabled state */
-}
-.chat-textarea-scroll textarea + div,  .message.textarea-block textarea + div {
-    position: absolute;
+.chat-textarea-scroll .message-preview,
+.message.textarea-scroll .message-preview {
     height: auto;
- filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
     opacity: 0;
+    position: absolute;
+    visibility: hidden;
+    top: 0;
 }
-.message.textarea-block textarea, .message.textarea-block textarea + div {
-    font-size: 13px;
-    margin: 0 0 2px 0;
+.chat-textarea-scroll textarea[disabled="disabled"],
+.disabled .chat-textarea-scroll textarea {
+    opacity: 0.7;
 }
-.chat-textarea-scroll, .message.textarea-scroll, .textarea-scroll .textarea-wrapper {
+.chat-textarea-scroll,
+.message.textarea-scroll,
+.textarea-scroll .textarea-wrapper {
     font-size: 0;
     line-height: 0;
     position: relative;
     min-height: 20px;
-    /* otherwise, JScrollPane may set width to 0! */
-    width: 100% !important;
-}
-.chat-textarea-scroll .jspPane, .message.textarea-scroll .jspPane, .textarea-scroll .textarea-wrapper .jspPane {
-	margin-left:  0 !important;
 }
 .chat-textarea-scroll textarea::-webkit-input-placeholder {
  color:#999999;
@@ -209,16 +204,9 @@
     right: 12px;
     top: 5px;
 }
-.textarea-scroll.noscroll .jspVerticalBar {
-    display: none;
-}
 .conversationsApp .fm-tree-panel.manual-tree-panel-scroll-management {
     overflow-x: hidden; /* don't allow child elements to be visible out of this container (happens when left pane is
     resized and the width is not yet updated, because of potential throttling */
-}
-.chat-textarea-scroll.textarea-scroll.jspScrollable .messages-textarea {
-    max-width: 100%; /* don't overlap other elements in case of left pane resize.. */
-    background: transparent;
 }
 
 .edit-typing-area {
@@ -226,9 +214,7 @@
     position: relative;
     top: 4px;
     margin: 0;
-    padding: 6px 46px 0 6px;
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
+    padding: 6px 46px 6px 6px;
     box-shadow: none;
 }
 .edit-typing-area button {

@@ -1497,18 +1497,6 @@ mega.megadrop = (function() {
             }
         };
 
-        var _queueScroll = function _uiQueueScroll(itemsNum) {
-            var SCROLL_TRIGGER = 5;
-            var queueDOM = uiOpts.window.class + ' ' + uiOpts.window.queueClass;
-
-            if (itemsNum > SCROLL_TRIGGER) {
-                dialogScroll(queueDOM);
-            }
-            else {
-                deleteScrollPanel(queueDOM, 'jsp');
-            }
-        };
-
         var generateCode = function uiGenerateCode(pupHandle) {
             var code = uiOpts.widgetCode;
             var width = 0;
@@ -1931,17 +1919,12 @@ mega.megadrop = (function() {
             var itemsNum = uiOpts.window.queueItems.number += 1;
             var prefix = is_mobile ? 'md_ul_' : 'ul_';
             var $tmpl = $('#md_ultmpl').clone().removeClass('hidden').attr('id', prefix + id);
+            const $scrollBlock = $(`${uiOpts.window.class} ${uiOpts.window.queueClass}`);
             $tmpl.find('.wu-queue-item-name').text(str_mtrunc(name, 37));
             $tmpl.find('.wu-queue-item-size').text(' | ' + sData.size + ' ' + sData.unit);
             $tmpl.find('.wu-queue-item-status').text(status);
 
-            // When scroll is added add items inside it
-            if (itemsNum > 6 && !is_mobile) {
-                $(uiOpts.window.queueClass + ' .jspPane').prepend($tmpl);
-            }
-            else {
-                $(uiOpts.window.queueClass).prepend($tmpl);
-            }
+            $scrollBlock.prepend($tmpl);
 
             $('.widget-upload .wu-upload-form').removeClass('hidden');
             $('.widget-upload .wu-empty-upload').addClass('hidden');
@@ -1950,7 +1933,7 @@ mega.megadrop = (function() {
 
             if (!is_mobile) {
                 _addToTotalStat(size);
-                _queueScroll(itemsNum);
+                initPerfectScrollbar($scrollBlock);
             }
         };
 

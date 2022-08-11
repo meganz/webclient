@@ -4935,10 +4935,6 @@ div.checkboxOn {
 .top-menu-content .not-mobile-ready {
     display: none;
 }
-/* Prevent jspPane setting a style to put the margin out so the page indicator is no longer flush with the margin */
-.top-menu-popup .top-menu-scroll .jspPane {
-    margin-left: 0 !important;
-}
 /* Language menu */
 .language-template {
     display: none;

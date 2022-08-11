@@ -1,7 +1,7 @@
 import React from 'react';
 import {ContactAwareComponent} from '../mixins';
 import {MegaRenderMixin} from '../mixins';
-import utils, { Emoji, ParsedHTML, OFlowEmoji } from '../../ui/utils.jsx';
+import { Emoji, ParsedHTML, OFlowEmoji } from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
@@ -925,6 +925,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
             self.scrollToLastSelected = false;
             self.psSelected.scrollToPercentX(100, false);
         }
+        if (self.searchContactsScroll) {
+            self.searchContactsScroll.reinitialise();
+        }
     }
     componentWillMount() {
         if (super.componentWillMount) {
@@ -1362,11 +1365,14 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 }
             }
             else {
-                contactsList = <utils.JScrollPane className="contacts-search-scroll"
+                contactsList = <PerfectScrollbar className="contacts-search-scroll"
                     selected={this.state.selected}
                     changedHashProp={this.props.changedHashProp}
                     contacts={contacts}
                     frequentContacts={frequentContacts}
+                    ref={(ref) => {
+                        self.searchContactsScroll = ref;
+                    }}
                     searchValue={this.state.searchValue}>
                     <div>
                         <div className="contacts-search-subsection"
@@ -1396,7 +1402,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                                 </div>
                             </div> : undefined}
                     </div>
-                </utils.JScrollPane>;
+                </PerfectScrollbar>;
             }
         }
         else if (self.props.newNoContact) {

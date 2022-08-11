@@ -3177,9 +3177,6 @@
         max-width: 480px;
         background-color: #F44;
     }
-    .main-scroll-block .jspPane {
-        min-width: 376px;
-    }
     #help2-main #container {
         width: 100%;
         min-width: 100%;
@@ -3549,9 +3546,6 @@
         min-width: 320px;
         margin: 0;
         padding: 0;
-    }
-    .main-scroll-block .jspPane {
-        min-width: 320px;
     }
     #help2-main {
         min-width: 320px;

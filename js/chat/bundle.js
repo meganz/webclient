@@ -6286,7 +6286,6 @@ class ComposedTextArea extends mixins.wl {
       },
       onResized: () => {
         parent.historyPanel.handleWindowResize();
-        $('.js-messages-scroll-area', parent.findDOMNode()).trigger('forceResize', [true]);
       },
       onConfirm: messageContents => {
         const {
@@ -7250,6 +7249,10 @@ class ContactPickerWidget extends _mixins1__.wl {
       self.scrollToLastSelected = false;
       self.psSelected.scrollToPercentX(100, false);
     }
+
+    if (self.searchContactsScroll) {
+      self.searchContactsScroll.reinitialise();
+    }
   }
 
   componentWillMount() {
@@ -7673,12 +7676,15 @@ class ContactPickerWidget extends _mixins1__.wl {
           }, l[19115]));
         }
       } else {
-        contactsList = react0().createElement(_ui_utils_jsx2__["default"].JScrollPane, {
+        contactsList = react0().createElement(_ui_perfectScrollbar_jsx3__.F, {
           className: "contacts-search-scroll",
           selected: this.state.selected,
           changedHashProp: this.props.changedHashProp,
           contacts: contacts,
           frequentContacts: frequentContacts,
+          ref: ref => {
+            self.searchContactsScroll = ref;
+          },
           searchValue: this.state.searchValue
         }, react0().createElement("div", null, react0().createElement("div", {
           className: "contacts-search-subsection",
@@ -17546,8 +17552,6 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
           self.setState({
             leftPaneWidth: value
           });
-          $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
-          $('.jScrollPaneContainer:visible').trigger('forceResize');
         }, 75);
         megaChat.$leftPane.width(value);
         $('.fm-tree-panel', megaChat.$leftPane).width(value);
@@ -17573,12 +17577,9 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
         } else {
           $('.left-pane-drag-handle').css('cursor', 'we-resize');
         }
-
-        $('.jspVerticalBar:visible').addClass('hiden-when-dragging');
       });
       $($.leftPaneResizableChat).on('resizestop', function () {
         $('.fm-left-panel').width(megaChat.$leftPane.width());
-        $('.jScrollPaneContainer:visible').trigger('forceResize');
         setTimeout(function () {
           $('.hiden-when-dragging').removeClass('hiden-when-dragging');
         }, 100);
@@ -17662,13 +17663,17 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
   }
 
   initArchivedChatsScrolling() {
-    deleteScrollPanel(".archive-chat-list", 'jsp');
-    $(".archive-chat-list").jScrollPane({
-      enableKeyboardNavigation: false,
-      showArrows: true,
-      arrowSize: 5
-    });
-    jScrollFade(".archive-chat-list");
+    const scrollBlock = document.querySelector('.conversationsApp .archive-chat-list');
+
+    if (!scrollBlock) {
+      return false;
+    }
+
+    if (scrollBlock.classList.contains('ps')) {
+      Ps.update(scrollBlock);
+    } else {
+      Ps.initialize(scrollBlock);
+    }
   }
 
   getArchivedCount() {
@@ -25469,7 +25474,10 @@ class MetaRichpreviewMegaLinks extends mixin.y {
 
 // EXTERNAL MODULE: ./js/chat/ui/typingArea.jsx + 1 modules
 var typingArea = __webpack_require__(825);
+// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
+var perfectScrollbar = __webpack_require__(285);
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/text.jsx
+
 
 
 
@@ -25746,7 +25754,7 @@ class Text extends AbstractGenericMessage {
       }
 
       if (this.props.initTextScrolling) {
-        messageDisplayBlock = external_React_default().createElement(utils["default"].JScrollPane, {
+        messageDisplayBlock = external_React_default().createElement(perfectScrollbar.F, {
           className: "message text-block scroll"
         }, external_React_default().createElement("div", {
           className: "message text-scroll"
@@ -26484,10 +26492,6 @@ class ConversationMessageMixin extends _mixins1__._p {
     return timestampInt;
   }
 
-  getParentJsp() {
-    return $(this.findDOMNode()).closest('.jScrollPaneContainer').data('jsp');
-  }
-
   componentDidUpdate() {
     var self = this;
     var chatRoom = self.props.message.chatRoom;
@@ -27092,10 +27096,12 @@ EmojiAutocomplete.defaultProps = {
 };
 // EXTERNAL MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx + 3 modules
 var gifPanel = __webpack_require__(722);
+// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
+var perfectScrollbar = __webpack_require__(285);
 ;// CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
 
 
-var _dec, _dec2, _class;
+var _dec, _class;
 
 
 
@@ -27104,7 +27110,8 @@ var _dec, _dec2, _class;
 
 
 
-let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_class = class TypingArea extends mixins.wl {
+
+let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea extends mixins.wl {
   constructor(props) {
     super(props);
     this.typingAreaRef = external_React_default().createRef();
@@ -27113,22 +27120,6 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
       typedMessage: '',
       textareaHeight: 20,
       gifPanelActive: false
-    };
-
-    this.initScrolling = () => {
-      if (this.typingAreaRef && this.typingAreaRef.current) {
-        this.scrollingInitialised = true;
-        const $textarea = $('textarea:first', this.typingAreaRef.current);
-        const $textareaScrollBlock = $('.textarea-scroll', this.typingAreaRef.current);
-        this.textareaLineHeight = parseInt($textarea.css('line-height'));
-        $textareaScrollBlock.jScrollPane({
-          enableKeyboardNavigation: false,
-          showArrows: true,
-          arrowSize: 5,
-          animateScroll: false,
-          maintainPosition: false
-        });
-      }
     };
 
     this.getTextareaMaxHeight = () => {
@@ -27148,7 +27139,6 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     this.onTypeAreaKeyDown = this.onTypeAreaKeyDown.bind(this);
     this.onTypeAreaBlur = this.onTypeAreaBlur.bind(this);
     this.onTypeAreaChange = this.onTypeAreaChange.bind(this);
-    this.onTypeAreaSelect = this.onTypeAreaSelect.bind(this);
     this.onCopyCapture = this.onCopyCapture.bind(this);
     this.onPasteCapture = this.onPasteCapture.bind(this);
     this.onCutCapture = this.onCutCapture.bind(this);
@@ -27212,7 +27202,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     }
 
     if (!shouldTriggerUpdate) {
-      var $textarea = $('.chat-textarea:visible textarea:visible', self.$container);
+      var $textarea = $('.chat-textarea:visible textarea:visible', self.typingAreaRef.current);
 
       if (!self._lastTextareaHeight || self._lastTextareaHeight !== $textarea.height()) {
         self._lastTextareaHeight = $textarea.height();
@@ -27250,7 +27240,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
       return;
     }
 
-    var val = $.trim($('.chat-textarea:visible textarea:visible', self.$container).val());
+    var val = $.trim($('.chat-textarea:visible textarea:visible', this.typingAreaRef.current).val());
 
     if (self.onConfirmTrigger(val) !== true) {
       self.setState({
@@ -27274,12 +27264,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     const result = onConfirm(val);
 
     if (val !== false && result !== false) {
-      const $textareaScrollBlock = $('.textarea-scroll', this.typingAreaRef.current);
-      const jsp = $textareaScrollBlock.data('jsp');
-      jsp.scrollToY(0);
-      $('.jspPane', $textareaScrollBlock).css({
-        top: 0
-      });
+      $('.textarea-scroll', this.typingAreaRef.current).scrollTop(0);
     }
 
     if (persist) {
@@ -27347,7 +27332,6 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
       e.preventDefault();
       e.stopPropagation();
-      return;
     } else if (key === 13) {
       if (self.state.emojiSearchQuery) {
         return;
@@ -27373,7 +27357,6 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
       if ($.trim(val).length === 0) {
         if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
           e.preventDefault();
-          return;
         }
       }
     } else if (key === 27) {
@@ -27384,7 +27367,6 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
       if (self.props.showButtons === true) {
         e.preventDefault();
         self.onCancelClicked(e);
-        return;
       }
     } else {
       if (self.prefillMode && (key === 8 || key === 32 || key === 186 || key === 13)) {
@@ -27426,8 +27408,6 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
         });
       }
     }
-
-    self.updateScroll(true);
   }
 
   onTypeAreaBlur(e) {
@@ -27486,7 +27466,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
       }
     }
 
-    self.updateScroll(true);
+    self.updateScroll();
   }
 
   focusTypeArea() {
@@ -27504,14 +27484,8 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     this._lastTextareaHeight = 20;
     this.lastTypedMessage = this.props.initialText || this.lastTypedMessage;
     chatGlobalEventManager.addEventListener('resize', `typingArea${this.getUniqueId()}`, () => this.handleWindowResize());
-    $('.jScrollPaneContainer', this.typingAreaRef.current).rebind(`forceResize.typingArea${this.getUniqueId()}`, () => this.updateScroll(false));
-
-    if (!this.scrollingInitialised) {
-      this.initScrolling();
-    }
-
     this.triggerOnUpdate(true);
-    this.updateScroll(false);
+    this.updateScroll();
   }
 
   componentWillMount() {
@@ -27556,130 +27530,45 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
   }
 
   componentDidUpdate() {
-    var self = this;
-
-    if (self.isComponentEventuallyVisible()) {
-      if ($(document.querySelector('textarea:focus,select:focus,input:focus')).filter(":visible").length === 0) {
-        this.focusTypeArea();
-      }
-
-      self.handleWindowResize();
+    if (this.isComponentEventuallyVisible() && $(document.querySelector('textarea:focus,select:focus,input:focus')).filter(":visible").length === 0) {
+      this.focusTypeArea();
     }
 
-    if (!this.scrollingInitialised) {
-      this.initScrolling();
-    } else {
-      this.updateScroll();
-    }
+    this.updateScroll();
 
-    if (self.onUpdateCursorPosition) {
-      var el = $('.chat-textarea:visible:first textarea:visible', self.$container)[0];
+    if (this.onUpdateCursorPosition) {
+      var el = $('.chat-textarea:visible:first textarea:visible', this.typingAreaRef.current)[0];
       el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
-      self.onUpdateCursorPosition = false;
+      this.onUpdateCursorPosition = false;
     }
   }
 
   updateScroll() {
-    var self = this;
-
-    if (!this.isComponentEventuallyVisible()) {
+    if (!this.isComponentEventuallyVisible() || !this.$node && !this.typingAreaRef && !this.typingAreaRef.current) {
       return;
     }
 
-    var $node = self.$node = self.$node || this.typingAreaRef.current;
-    var $textarea = self.$textarea = self.$textarea || $('textarea:first', $node);
-    var $textareaClone = self.$textareaClone = self.$textareaClone || $('.message-preview', $node);
-    var textareaMaxHeight = self.getTextareaMaxHeight();
-    var $textareaScrollBlock = self.$textareaScrollBlock = self.$textareaScrollBlock || $('.textarea-scroll', $node);
-    var textareaContent = $textarea.val();
-    var cursorPosition = self.getCursorPosition($textarea[0]);
-    var $textareaCloneSpan;
-    var scrPos = 0;
-    var viewRatio = 0;
+    var $node = this.$node = this.$node || this.typingAreaRef.current;
+    const $textarea = this.$textarea = this.$textarea || $('textarea:first', $node);
+    const $scrollBlock = this.$scrollBlock = this.$scrollBlock || $textarea.closest('.textarea-scroll');
+    const $preview = $('.message-preview', $scrollBlock).safeHTML(`${$textarea.val().replace(/\n/g, '<br />')} <br>`);
+    const textareaHeight = $preview.height();
+    $scrollBlock.height(Math.min(textareaHeight, this.getTextareaMaxHeight()));
 
-    if (self.lastContent === textareaContent && self.lastPosition === cursorPosition) {
-      return;
-    } else {
-      self.lastContent = textareaContent;
-      self.lastPosition = cursorPosition;
-      textareaContent = '@[!' + textareaContent.substr(0, cursorPosition) + '!]@' + textareaContent.substr(cursorPosition, textareaContent.length);
-      textareaContent = htmlentities(textareaContent);
-      textareaContent = textareaContent.replace(/@\[!/g, '<span>');
-      textareaContent = textareaContent.replace(/!\]@/g, '</span>');
-      textareaContent = textareaContent.replace(/\n/g, '<br />');
-      $textareaClone.html(textareaContent + '<br />');
-    }
-
-    var textareaCloneHeight = $textareaClone.height();
-    $textarea.height(textareaCloneHeight);
-    $textareaCloneSpan = $textareaClone.children('span');
-    var textareaCloneSpanHeight = $textareaCloneSpan.height();
-    var jsp = $textareaScrollBlock.data('jsp');
-
-    if (!jsp) {
-      $textareaScrollBlock.jScrollPane({
-        enableKeyboardNavigation: false,
-        showArrows: true,
-        arrowSize: 5,
-        animateScroll: false
-      });
-      var textareaIsFocused = $textarea.is(":focus");
-      jsp = $textareaScrollBlock.data('jsp');
-
-      if (!textareaIsFocused) {
-        moveCursortoToEnd($textarea[0]);
-      }
-    }
-
-    scrPos = jsp ? $textareaScrollBlock.find('.jspPane').position().top : 0;
-    viewRatio = Math.round(textareaCloneSpanHeight + scrPos);
-    $textareaScrollBlock.height(Math.min(textareaCloneHeight, textareaMaxHeight));
-    var textareaWasFocusedBeforeReinit = $textarea.is(":focus");
-    var selectionPos = false;
-
-    if (textareaWasFocusedBeforeReinit) {
-      selectionPos = [$textarea[0].selectionStart, $textarea[0].selectionEnd];
-    }
-
-    jsp.reinitialise();
-    $textarea = $('textarea:first', $node);
-
-    if (textareaWasFocusedBeforeReinit) {
-      $textarea[0].selectionStart = selectionPos[0];
-      $textarea[0].selectionEnd = selectionPos[1];
-    }
-
-    if (textareaCloneHeight > textareaMaxHeight && textareaCloneSpanHeight < textareaMaxHeight) {
-      jsp.scrollToY(0);
-    } else if (viewRatio > self.textareaLineHeight || viewRatio < 0) {
-      if (textareaCloneSpanHeight > 0 && jsp && textareaCloneSpanHeight > textareaMaxHeight) {
-        jsp.scrollToY(textareaCloneSpanHeight - self.textareaLineHeight);
-      } else if (jsp) {
-        jsp.scrollToY(0);
-
-        if (scrPos < 0) {
-          $textareaScrollBlock.find('.jspPane').css('top', 0);
-        }
-      }
-    }
-
-    if (textareaCloneHeight < textareaMaxHeight) {
-      $textareaScrollBlock.addClass('noscroll');
-    } else {
-      $textareaScrollBlock.removeClass('noscroll');
-    }
-
-    if (textareaCloneHeight !== self.state.textareaHeight) {
-      self.setState({
-        'textareaHeight': textareaCloneHeight
+    if (textareaHeight !== this._lastTextareaHeight) {
+      this._lastTextareaHeight = textareaHeight;
+      this.setState({
+        'textareaHeight': textareaHeight
       });
 
-      if (self.props.onResized) {
-        self.props.onResized();
+      if (this.props.onResized) {
+        this.props.onResized();
       }
-    } else {
-      self.handleWindowResize();
+
+      $textarea.height(textareaHeight);
     }
+
+    this.textareaScroll.reinitialise();
   }
 
   getCursorPosition(el) {
@@ -27698,10 +27587,6 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     return pos;
   }
 
-  onTypeAreaSelect() {
-    this.updateScroll(true);
-  }
-
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
   }
@@ -27712,7 +27597,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     }
 
     if (e) {
-      this.updateScroll(false);
+      this.updateScroll();
     }
 
     this.triggerOnUpdate();
@@ -27887,9 +27772,16 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
       className: "popup emoji",
       vertOffset: 17,
       onClick: this.onEmojiClicked
-    })), external_React_default().createElement("hr", null), external_React_default().createElement("div", {
-      className: "chat-textarea-scroll textarea-scroll jScrollPaneContainer",
-      style: textareaScrollBlockStyles
+    })), external_React_default().createElement("hr", null), external_React_default().createElement(perfectScrollbar.F, {
+      chatRoom: self.props.chatRoom,
+      className: "chat-textarea-scroll textarea-scroll",
+      options: {
+        'suppressScrollX': true
+      },
+      style: textareaScrollBlockStyles,
+      ref: ref => {
+        self.textareaScroll = ref;
+      }
     }, external_React_default().createElement("div", {
       className: "messages-textarea-placeholder"
     }, self.state.typedMessage ? null : external_React_default().createElement(utils.Emoji, null, placeholder)), external_React_default().createElement("textarea", {
@@ -27901,7 +27793,6 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
       onKeyDown: this.onTypeAreaKeyDown,
       onBlur: this.onTypeAreaBlur,
       onChange: this.onTypeAreaChange,
-      onSelect: this.onTypeAreaSelect,
       onCopyCapture: this.onCopyCapture,
       onPasteCapture: this.onPasteCapture,
       onCutCapture: this.onCutCapture,
@@ -27914,7 +27805,7 @@ let TypingArea = (_dec = (0,mixins.M9)(60), _dec2 = (0,mixins.M9)(54, true), (_c
     }))), buttons);
   }
 
-}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "updateScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "updateScroll"), _class.prototype), (0,applyDecoratedDescriptor.Z)(_class.prototype, "handleWindowResize", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "handleWindowResize"), _class.prototype)), _class));
+}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "handleWindowResize", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "handleWindowResize"), _class.prototype)), _class));
 
 /***/ }),
 
@@ -28068,17 +27959,15 @@ class Button extends _chat_mixins1__.wl {
         },
         onActiveChange: function (newVal) {
           var $element = $(self.findDOMNode());
-          var $scrollables = $element.parents('.jScrollPaneContainer, .perfectScrollbarContainer');
+          var $scrollables = $element.parents('.ps');
 
           if ($scrollables.length > 0) {
             if (newVal === true) {
-              $scrollables.attr('data-scroll-disabled', true);
-              $scrollables.filter('.perfectScrollbarContainer').each(function (k, element) {
+              $scrollables.each((k, element) => {
                 Ps.disable(element);
               });
             } else {
-              $scrollables.removeAttr('data-scroll-disabled');
-              $scrollables.filter('.perfectScrollbarContainer').each(function (k, element) {
+              $scrollables.each((k, element) => {
                 Ps.enable(element);
               });
             }
@@ -32181,150 +32070,6 @@ var ReactDOM = __webpack_require__(533);
 
 
 
-class JScrollPane extends _chat_mixins0__.wl {
-  componentDidMount() {
-    super.componentDidMount();
-    var self = this;
-    var $elem = $(ReactDOM.findDOMNode(self));
-    $elem.height('100%');
-    $elem.find('.jspContainer').replaceWith(function () {
-      var $children = $elem.find('.jspPane').children();
-
-      if ($children.length === 0 || $children.length > 1) {
-        console.error("JScrollPane on element: ", $elem, "encountered multiple (or zero) children nodes.", "Mean while, JScrollPane should always (!) have 1 children element.");
-      }
-
-      return $children;
-    });
-    var options = $.extend({}, {
-      enableKeyboardNavigation: false,
-      showArrows: true,
-      arrowSize: 8,
-      animateScroll: true,
-      container: $('.jspContainer', $elem),
-      pane: $('.jspPane', $elem)
-    }, self.props.options);
-    $elem.jScrollPane(options);
-
-    if (self.props.onFirstInit) {
-      self.props.onFirstInit($elem.data('jsp'), $elem);
-    }
-
-    $elem.rebind('jsp-will-scroll-y.jsp' + self.getUniqueId(), function (e) {
-      if ($elem.attr('data-scroll-disabled') === "true") {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
-    });
-    $elem.rebind('jsp-user-scroll-y.jsp' + self.getUniqueId(), function (e, scrollPositionY, isAtTop, isAtBottom) {
-      if (self.props.onUserScroll) {
-        if ($(e.target).is($elem)) {
-          self.props.onUserScroll($elem.data('jsp'), $elem, e, scrollPositionY, isAtTop, isAtBottom);
-        }
-      }
-    });
-    $elem.rebind('forceResize.jsp' + self.getUniqueId(), function (e, forced, scrollPositionYPerc, scrollToElement) {
-      self.onResize(forced, scrollPositionYPerc, scrollToElement);
-    });
-    chatGlobalEventManager.addEventListener('resize', 'jsp' + self.getUniqueId(), self.onResize.bind(self));
-    self.onResize();
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    var $elem = $(ReactDOM.findDOMNode(this));
-    $elem.off('jsp-will-scroll-y.jsp' + this.getUniqueId());
-    chatGlobalEventManager.removeEventListener('resize', 'jsp' + this.getUniqueId());
-  }
-
-  eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
-    var self = this;
-
-    if (!self.isMounted()) {
-      return;
-    }
-
-    if (!self.isComponentVisible()) {
-      return;
-    }
-
-    var $elem = $(ReactDOM.findDOMNode(self));
-    var currHeights = [$('.jspPane', $elem).outerHeight(), $elem.outerHeight()];
-
-    if (forced || self._lastHeights != currHeights) {
-      self._lastHeights = currHeights;
-
-      self._doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem);
-    }
-  }
-
-  _doReinit(scrollPositionYPerc, scrollToElement, currHeights, forced, $elem) {
-    var self = this;
-
-    if (!self.isMounted()) {
-      return;
-    }
-
-    if (!self.isComponentVisible()) {
-      return;
-    }
-
-    self._lastHeights = currHeights;
-    var $jsp = $elem.data('jsp');
-
-    if ($jsp) {
-      $jsp.reinitialise();
-      var manualReinitialiseControl = false;
-
-      if (self.props.onReinitialise) {
-        manualReinitialiseControl = self.props.onReinitialise($jsp, $elem, forced, scrollPositionYPerc, scrollToElement);
-      }
-
-      if (manualReinitialiseControl === false) {
-        if (scrollPositionYPerc) {
-          if (scrollPositionYPerc === -1) {
-            $jsp.scrollToBottom();
-          } else {
-            $jsp.scrollToPercentY(scrollPositionYPerc, false);
-          }
-        } else if (scrollToElement) {
-          $jsp.scrollToElement(scrollToElement);
-        }
-      }
-    }
-  }
-
-  onResize(forced, scrollPositionYPerc, scrollToElement) {
-    if (forced && forced.originalEvent) {
-      forced = true;
-      scrollPositionYPerc = undefined;
-    }
-
-    this.eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement);
-  }
-
-  componentDidUpdate() {
-    this.onResize();
-  }
-
-  render() {
-    return React.createElement("div", {
-      className: this.props.className
-    }, React.createElement("div", {
-      className: "jspContainer"
-    }, React.createElement("div", {
-      className: "jspPane"
-    }, this.props.children)));
-  }
-
-}
-
-JScrollPane.defaultProps = {
-  className: "jScrollPaneContainer",
-  requiresUpdateOnResize: true
-};
-
 class RenderTo extends React.Component {
   componentDidMount() {
     if (super.componentDidMount) {
@@ -32489,7 +32234,6 @@ class ParsedHTML extends React.Component {
 const OFlowEmoji = withOverflowObserver(Emoji);
 const OFlowParsedHTML = withOverflowObserver(ParsedHTML);
 const __WEBPACK_DEFAULT_EXPORT__ = ({
-  JScrollPane,
   RenderTo,
   schedule: _chat_mixins0__.Os,
   SoonFcWrap: _chat_mixins0__.M9,

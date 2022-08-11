@@ -44,7 +44,7 @@ body.tl .dropdown.body.popup.contacts-search {
     content: '';
     width: 100%;
     height: 1px;
-    margin: 5px 0 0 0;
+    margin: 12px 0 0;
     background: var(--divider-color);
 }
 .rtl .contacts-search-header {
@@ -133,22 +133,17 @@ body.tl .dropdown.body.popup.contacts-search {
     overflow: hidden;
 }
 .main-start-chat-dropdown .contacts-search-scroll {
-    position: relative;
+    box-sizing: border-box;
     margin: 0;
-    padding: 7px 0 0 0;
     max-height: 366px;
     min-height: 366px;
+    padding: 8px 0 0;
+    position: relative;
 }
 .contacts-search-scroll .contacts-search-subsection {
     padding: 0 48px;
 }
-.contacts-search-scroll .jspPane {
-    min-height: 70%;
-}
-.contacts-search-scroll .jspContainer {
-    max-height: 426px;
-}
-.contacts-search-scroll .jspPane em {
+.contacts-search-scroll em {
     text-align: center;
     display: block;
     height: 48px;

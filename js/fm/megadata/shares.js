@@ -313,7 +313,7 @@ MegaData.prototype.initAddByEmailComponent = function(alreadyAddedContacts) {
     initShareDialogMultiInput(alreadyAddedContacts);
 
     $('.multiple-input .token-input-token-mega', $shareAddDialog).remove();
-    initTokenInputsScroll($('.multiple-input', $shareAddDialog));
+    initPerfectScrollbar($('.multiple-input', $shareAddDialog));
 
     // Personal message
     $('.share-message textarea', $shareAddDialog).rebind('focus', function() {

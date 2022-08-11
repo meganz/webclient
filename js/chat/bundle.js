@@ -4278,7 +4278,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
   }
 
   this.meetingsLoading = l.joining;
-  this.rebind("onCallEnd.start", (e, data) => {
+  this.rebind("onCallLeft.start", (e, data) => {
     if (data.callId === callId) {
       this.meetingsLoading = false;
     }
@@ -4302,7 +4302,7 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
   }, ex => {
     console.error('Failed to join call:', ex);
     this.meetingsLoading = false;
-    this.unbind("onCallEnd.start");
+    this.unbind("onCallLeft.start");
   });
 });
 
@@ -4390,7 +4390,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
     }, r.sfu.replace("https://", "wss://"));
     app.sfuClient.muteAudio(!audio);
     app.sfuClient.muteCamera(!video);
-    this.rebind("onCallEnd.start", (e, data) => {
+    this.rebind("onCallLeft.start", (e, data) => {
       if (data.callId === r.callId) {
         this.meetingsLoading = false;
       }
@@ -4401,7 +4401,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
   }, ex => {
     console.error('Failed to start call:', ex);
     this.meetingsLoading = false;
-    this.unbind("onCallEnd.start");
+    this.unbind("onCallLeft.start");
   });
 });
 
@@ -4548,6 +4548,17 @@ ChatRoom.prototype.getActiveCallMessageId = function (ignoreActive) {
       return msg.messageId;
     }
   }
+};
+
+ChatRoom.prototype.stopRinging = function (callId) {
+  if (this.ringingCalls.exists(callId)) {
+    this.ringingCalls.remove(callId);
+  }
+
+  megaChat.plugins.callManager2.trigger("onRingingStopped", {
+    callId: callId,
+    chatRoom: this
+  });
 };
 
 ChatRoom.prototype.callParticipantsUpdated = function () {
@@ -23339,10 +23350,10 @@ class Call extends mixins.wl {
           delete this.callStartTimeout;
         }
       });
-      chatRoom.rebind('onCallEnd.callComp', () => this.props.minimized && this.props.onCallEnd());
+      chatRoom.rebind('onCallLeft.callComp', () => this.props.minimized && this.props.onCallEnd());
     };
 
-    this.unbindCallEvents = () => ['onCallPeerLeft.callComp', 'onCallPeerJoined.callComp', 'onCallEnd.callComp'].map(event => this.props.chatRoom.off(event));
+    this.unbindCallEvents = () => ['onCallPeerLeft.callComp', 'onCallPeerJoined.callComp', 'onCallLeft.callComp'].map(event => this.props.chatRoom.off(event));
 
     this.handleCallMinimize = () => {
       const {

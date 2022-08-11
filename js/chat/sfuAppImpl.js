@@ -62,7 +62,7 @@ class PlayerData {
         this.callManagerCall.onJoined();
         this.room.meetingsLoading = false;
 
-        this.room.unbind("onCallEnd.start");
+        this.room.unbind("onCallLeft.start");
         this.room.megaChat.trigger('sfuConnOpen');
     };
 
@@ -96,18 +96,21 @@ class PlayerData {
         if (willReconnect) {
             this.room.megaChat.trigger('sfuConnClose');
         }
-        else {
-            this.room.trigger('onCallEnd', {
-                callId: this.callId,
-                chatId: this.room.chatId,
-                showCallFeedback: true,
-                removeActive
-            });
-            if (termCode === SfuClient.TermCode.kTooManyParticipants) {
-                msgDialog('warningb', '', l[20200]);
-            }
-            this.room.sfuApp = null;
+        else if (!this.isDisconnecting) {
+            this.handleDisconnect(termCode);
         }
+    };
+    SfuApp.prototype.handleDisconnect = function(termCode) {
+        this.isDisconnecting = true;
+        this.room.trigger('onCallLeft', {
+            callId: this.callId,
+            chatId: this.room.chatId,
+            showCallFeedback: true
+        });
+        if (termCode === SfuClient.TermCode.kTooManyParticipants) {
+            msgDialog('warningb', '', l[20200]);
+        }
+        this.room.sfuApp = null;
     };
 
     SfuApp.preloadCryptoForPeer = async function(peerHandle) {
@@ -156,14 +159,14 @@ class PlayerData {
 
     SfuApp.prototype.destroy = function(reason) {
         if (this.isDestroyed) {
+            console.warn("SfuApp already destroyed");
             return;
         }
         this.isDestroyed = true;
-        const wasConnected = this.sfuClient.disconnect(reason);
-        delete window.sfuClient;
-        if (!wasConnected) {
-            this.onDisconnect(reason, false, true);
+        if (!this.isDisconnecting && !this.sfuClient.disconnect(reason)) {
+            this.handleDisconnect(reason);
         }
+        delete window.sfuClient;
     };
 
     // proxy SFUClient events to the call.

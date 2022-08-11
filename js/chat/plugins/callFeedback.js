@@ -17,7 +17,7 @@ const CallFeedback = function(megaChat, options) {
     megaChat
         .rebind('onRoomInitialized.CallFeedback', (e, megaRoom) => {
             megaRoom
-                .rebind('onCallEnd.CallFeedback', (e, { callId, chatId, showCallFeedback }) => {
+                .rebind('onCallLeft.CallFeedback', (e, { callId, chatId, showCallFeedback }) => {
                     // do append this after a while, so that the remote call ended would be shown first.
                     if (showCallFeedback) {
                         delay('callFeedbackDelay', () => {

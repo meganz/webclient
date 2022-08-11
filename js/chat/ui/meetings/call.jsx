@@ -254,11 +254,11 @@ export default class Call extends MegaRenderMixin {
                 delete this.callStartTimeout;
             }
         });
-        chatRoom.rebind('onCallEnd.callComp', () => this.props.minimized && this.props.onCallEnd());
+        chatRoom.rebind('onCallLeft.callComp', () => this.props.minimized && this.props.onCallEnd());
     };
 
     unbindCallEvents = () =>
-        ['onCallPeerLeft.callComp', 'onCallPeerJoined.callComp', 'onCallEnd.callComp'].map(event =>
+        ['onCallPeerLeft.callComp', 'onCallPeerJoined.callComp', 'onCallLeft.callComp'].map(event =>
             this.props.chatRoom.off(event)
         );
 

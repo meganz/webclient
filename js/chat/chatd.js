@@ -251,10 +251,10 @@ Chatd.prototype._proxyEventsToRooms = function() {
         'onDelReaction',
         'onReactionSn',
         'onAddDelReactionReject',
-        'onJoinCall',
-        'onLeftCall',
+        'onChatdPeerJoinedCall',
+        'onChatdPeerLeftCall',
         'onCallState',
-        'onCallEnd',
+        'onChatdCallEnd',
     ]
         .forEach((eventName) => {
             this.rebind(eventName + '.chatdProxy', (e, eventData) => {
@@ -1924,7 +1924,7 @@ Chatd.Shard.prototype.exec = function(a) {
                 }
 
                 self.chatd.trigger(
-                    cmd.charCodeAt(0) === Chatd.Opcode.JOINEDCALL ? 'onJoinCall' : 'onLeftCall',
+                    cmd.charCodeAt(0) === Chatd.Opcode.JOINEDCALL ? 'onChatdPeerJoinedCall' : 'onChatdPeerLeftCall',
                     {
                         chatId: base64urlencode(cmd.substr(1, 8)),
                         callId: base64urlencode(cmd.substr(9, 8)),
@@ -1952,12 +1952,11 @@ Chatd.Shard.prototype.exec = function(a) {
                 self.keepAlive.restart();
 
                 self.chatd.trigger(
-                    'onCallEnd',
+                    'onChatdCallEnd',
                     {
                         chatId: base64urlencode(cmd.substr(1, 8)),
                         callId: base64urlencode(cmd.substr(9, 8)),
-                        arg: cmd.charCodeAt(17),
-                        removeActive: true
+                        reason: cmd.charCodeAt(17)
                     });
                 len = 17;
                 break;
@@ -1965,12 +1964,11 @@ Chatd.Shard.prototype.exec = function(a) {
             case Chatd.Opcode.DELCALLREASON:
                 self.keepAlive.restart();
                 self.chatd.trigger(
-                    'onCallEnd',
+                    'onChatdCallEnd',
                     {
                         chatId: base64urlencode(cmd.substr(1, 8)),
                         callId: base64urlencode(cmd.substr(9, 8)),
-                        arg: cmd.charCodeAt(17),
-                        removeActive: true
+                        reason: cmd.charCodeAt(17)
                     });
                 len = 18;
                 break;

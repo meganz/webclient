@@ -568,6 +568,9 @@ function contactAddDialog(close, dontWarnBusiness) {
         closeDialog();
         return true;
     }
+    if (M.chat && $.dialog === 'onboardingDialog') {
+        closeDialog();
+    }
 
     // Check if this is a business master, then Warn him about the difference between Contact and User
     if (!dontWarnBusiness) {
@@ -1728,7 +1731,7 @@ function closeMsg() {
     var $dialog = $('#msgDialog').addClass('hidden');
     $dialog.parent().removeClass('msg-dialog-container');
 
-    if ($.dialog) {
+    if ($.dialog && !(M.chat && $.dialog === 'onboardingDialog')) {
         $('.mega-dialog').removeClass('arrange-to-back');
         $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
     }

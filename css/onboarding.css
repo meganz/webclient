@@ -88,8 +88,9 @@
 #obDialog.mcob {
     z-index: 121;
 }
+.overlayed #obDialog.mcob,
 .in-call #obDialog.mcob {
-    z-index: 100;
+    display: none;
 }
 #obDialog.mcob header {
     padding-inline-end: 24px;

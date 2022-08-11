@@ -46,15 +46,6 @@
     padding-right: 14px;
     box-sizing: border-box;
 }
-.file-block-scrolling .jspPane::after,
-.contacts-blocks-scrolling .jspPane::after,
-.shared-blocks-scrolling .jspPane::after,
-.out-shared-blocks-scrolling .jspPane::after {
-    clear: both;
-    display: block;
-    content: '';
-    height: 12px;
-}
 .file-block-scrolling .megaList-content {
     margin-bottom: 24px;
 }

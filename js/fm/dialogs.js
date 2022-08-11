@@ -330,22 +330,6 @@
 
         $('.summary-title.summary-selected-title', $dialog).text(l[19180]);
 
-        var jScrollPane = function() {
-            var jsp = $div.data('jsp');
-
-            if (items.length > 4) {
-                if (jsp) {
-                    jsp.reinitialise();
-                }
-                else {
-                    $div.jScrollPane({animateScroll: true});
-                }
-            }
-            else if (jsp) {
-                jsp.destroy();
-            }
-        };
-
         let title = mega.icu.format(l[19339], items.length);
         const setTitle = function() {
             title = mega.icu.format(l[19339], items.length);
@@ -475,7 +459,7 @@
             }
         }
         else {
-            jScrollPane();
+            initPerfectScrollbar($div);
             $icon.addClass('icon-arrow-up drop-up');
 
             $('.delete-item', $div).rebind('click', function() {
@@ -483,7 +467,7 @@
                 var data = $row.attr('data-node');
 
                 $row.remove();
-                jScrollPane();
+                initPerfectScrollbar($div);
 
                 if ($.copyToUpload) {
                     for (var i = items.length; i--;) {
@@ -878,9 +862,8 @@
         }
 
         disableFolders();
-        dialogScroll('.dialog-tree-panel-scroll');
-        onIdle(function() {
-            dialogScroll('.dialog-tree-panel-scroll');
+        onIdle(() => {
+            initPerfectScrollbar($('.right-pane.active .dialog-tree-panel-scroll', $dialog));
         });
     };
 
@@ -1113,7 +1096,7 @@
         delete $.openedDialogNodes;
 
         disableFolders($.moveDialog && 'move');
-        dialogScroll('.dialog-tree-panel-scroll');
+        initPerfectScrollbar($('.right-pane.active .dialog-tree-panel-scroll', $dialog));
     };
 
     /**
@@ -1445,7 +1428,7 @@
                 }
 
                 onIdle(function() {
-                    dialogScroll('.dialog-tree-panel-scroll');
+                    initPerfectScrollbar($('.right-pane.active .dialog-tree-panel-scroll', $dialog));
                 });
             }
             else {
@@ -1497,7 +1480,8 @@
         });
 
         $dialog.rebind('click', '.nw-contact-item', function() {
-            var $this = $(this);
+            const $this = $(this);
+            const $scrollBlock = $('.right-pane.active .dialog-tree-panel-scroll', $dialog);
 
             if ($this.hasClass('selected')) {
                 $this.removeClass('selected');
@@ -1508,19 +1492,17 @@
 
             setDialogBreadcrumb();
             setDialogButtonState($btn);
-            dialogScroll('.dialog-tree-panel-scroll');
+            initPerfectScrollbar($scrollBlock);
 
             // Scroll the element into view, only needed if element triggered.
-            var jsp = $(this).parents('.dialog-tree-panel-scroll').data('jsp');
-            if (jsp) {
-                jsp.scrollToElement($(this));
-            }
+            scrollToElement($scrollBlock, $this);
         });
 
         $dialog.rebind('click', '.nw-fm-tree-item', function(e) {
 
             var ts = treesearch;
             var old = $.mcselected;
+            const $scrollBlock = $('.right-pane.active .dialog-tree-panel-scroll', $dialog);
 
             setDialogBreadcrumb(String($(this).attr('id')).replace('mctreea_', ''));
 
@@ -1576,8 +1558,7 @@
                 setDialogBreadcrumb();
             }
 
-            // dialogScroll('.fm-picker-dialog-tree-panel .dialog-tree-panel-scroll');
-            dialogScroll('.dialog-tree-panel-scroll');
+            initPerfectScrollbar($scrollBlock);
 
             // Disable action button if there is no selected items
             setDialogButtonState($btn);
@@ -1587,10 +1568,7 @@
                 .prev('.nw-fm-tree-item').addClass('expanded');
 
             // Scroll the element into view, only needed if element triggered.
-            var jsp = $(this).parents('.dialog-tree-panel-scroll').data('jsp');
-            if (jsp) {
-                jsp.scrollToElement($(this), true);
-            }
+            scrollToElement($scrollBlock, $(this));
 
             // // If not copying from contacts tab (Ie, sharing)
             if (!(section === 'cloud-drive' &&

@@ -116,15 +116,6 @@
     position: relative;
 }
 
-.share-dialog-bottom-body .share-dialog-access-list .jspVerticalBar {
-    right: 6px;
-}
-
-.rtl .share-dialog-bottom-body .share-dialog-access-list .jspVerticalBar {
-    right: auto;
-    left: 6px;
-}
-
 .share-dialog-bottom-body .share-dialog-access-add {
     margin-left: -9px;
     margin-top: 12px;
@@ -306,10 +297,11 @@
     margin-top: 11px;
 }
 
-.share-add-dialog-bottom .share-message textarea {
+.share-add-dialog-bottom .share-message textarea,
+.share-add-dialog-bottom .share-message .textarea-clone {
     color: var(--text-color-high);
     font-size: 13px;
-    padding: 0 9px;
+    padding: 0 12px;
 }
 
 .share-add-dialog-bottom .share-message textarea::placeholder {
@@ -349,7 +341,7 @@
     border-radius: 8px;
     box-sizing: border-box;
     height: 80px;
-    margin: 0 48px 8px 48px;
+    margin: 0 48px 12px;
     padding: 0;
 }
 
@@ -522,7 +514,7 @@
 
 @media only screen and (max-height: 768px) {
     .share-add-dialog-bottom .multiple-input {
-        max-height: 72px;
+        max-height: 78px;
     }
 
     .mega-dialog.share-add-dialog .contacts-search-scroll {

@@ -1988,7 +1988,7 @@ accountUI.plan = {
                 this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
                 // Init textarea scrolling
-                initTextareaScrolling($('.cancel-textarea textarea'), 126);
+                initTextareaScrolling($('.cancel-textarea textarea', this.$dialog));
 
                 // Init functionality
                 this.enableButtonWhenReasonEntered();

@@ -24,9 +24,6 @@
 .fm-recents.scroll:empty {
     height: auto;
 }
-.fm-recents .scroll .jspDrag {
-    min-height: 15px;
-}
 .fm-recents.content-row {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;

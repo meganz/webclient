@@ -7,7 +7,8 @@ import { MetaRichpreviewMegaLinks } from './partials/metaRichpreviewMegaLinks.js
 import { TypingArea } from '../../typingArea.jsx';
 import { Dropdown, DropdownItem } from '../../../../ui/dropdowns.jsx';
 import { Button } from '../../../../ui/buttons.jsx';
-import utils, { ParsedHTML } from '../../../../ui/utils.jsx';
+import { ParsedHTML } from '../../../../ui/utils.jsx';
+import { PerfectScrollbar } from '../../../../ui/perfectScrollbar.jsx';
 
 export default class Text extends AbstractGenericMessage {
 
@@ -293,11 +294,11 @@ export default class Text extends AbstractGenericMessage {
             }
             if (this.props.initTextScrolling) {
                 messageDisplayBlock =
-                    <utils.JScrollPane className="message text-block scroll">
+                    <PerfectScrollbar className="message text-block scroll">
                         <div className="message text-scroll">
                             <ParsedHTML>{textMessage}</ParsedHTML>
                         </div>
-                    </utils.JScrollPane>;
+                    </PerfectScrollbar>;
             }
             else {
                 messageDisplayBlock =

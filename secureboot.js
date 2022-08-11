@@ -2647,8 +2647,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery-ui-touch.js', n: 'jqueryui_touch_js', j:1, w:10});
     jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
-    jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
-    jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
+    jsl.push({f:'js/scrolling.utils.js', n: 'scrolling_utils_js', j: 1});
     jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
@@ -3122,8 +3121,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
         jsl.push({f:'js/vendor/jquery-ui-touch.js', n: 'jqueryui_touch_js', j:1, w:10});
         jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
-        jsl.push({f:'js/vendor/jquery.jscrollpane.js', n: 'jscrollpane_js', j:1});
-        jsl.push({f:'js/jscrollpane.utils.js', n: 'jscrollpane_utils_js', j: 1});
+        jsl.push({f:'js/scrolling.utils.js', n: 'scrolling_utils_js', j: 1});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
         jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
         jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});

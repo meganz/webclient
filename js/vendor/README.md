@@ -112,11 +112,6 @@ Unless otherwise noted, they were released under a [MIT License].
 [jquery.fullscreen.js]: This jQuery plugin provides a simple to use mechanism to control the new fullscreen mode of modern browsers.
 
 ---
-[jquery.jscrollpane.js]: Pretty, customisable, cross browser replacement scrollbars
-
-> **This is a fork**, [Compare the changes](https://github.com/vitch/jScrollPane/compare/master...meganz:master)
-
----
 [jquery.mousewheel.js]: A jQuery plugin that adds cross-browser mouse wheel support.
 
 > **This is a fork**, [Compare the changes](https://github.com/jquery/jquery-mousewheel/compare/master...meganz:master)
@@ -261,7 +256,6 @@ characters were removed from the files
 [jquery.js]: <https://github.com/jquery/jquery/blob/3.6.0/dist/jquery.js>
 [jquery-ui.js]: <https://code.jquery.com/ui/1.12.1/jquery-ui.js>
 [jquery.fullscreen.js]: <https://github.com/meganz/jquery-fullscreen-plugin>
-[jquery.jscrollpane.js]: <https://github.com/meganz/jScrollPane>
 [jquery.mousewheel.js]: <https://github.com/meganz/jquery-mousewheel>
 [jquery.qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/jquery.qrcode.js>
 [jsbn.js]: <https://github.com/meganz/jsbn.js>

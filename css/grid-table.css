@@ -148,42 +148,15 @@
     background-size: auto 1px;
 }
 
-.grid-scrolling-table .jspPane {
-    min-height: 100%;
-}
-
-.grid-scrolling-table,
-.contacts-grid-scrolling-table,
-.grid-scrolling-table .jspContainer,
-.contacts-grid-scrolling-table .jspContainer,
-.grid-scrolling-table .jspPane,
-.contacts-grid-scrolling-table .jspPane {
-    max-width: 100%;
-    min-width: 100%;
-}
-
-.grid-scrolling-table .jspContainer,
-.contacts-grid-scrolling-table .jspContainer,
-.grid-scrolling-table .jspPane,
-.contacts-grid-scrolling-table .jspPane {
-    z-index: 119;
-}
-
-.grid-scrolling-table .jspCapTop,
-.contacts-grid-scrolling-table .jspCapTop {
-    height: 34px;
-    display: block;
-}
-
-.grid-scrolling-table.archive-chat-list .jspCapTop {
-    height: 35px;
-}
-
 .grid-scrolling-table,
 .contacts-grid-scrolling-table,
 .transfer-scrolling-table,
 .archived-chats .grid-scrolling-table {
     height: 100%;
+}
+
+.archived-chats .grid-table-header {
+    margin: 10px 0 0;
 }
 
 .transfer-scrolling-table {
@@ -342,9 +315,6 @@ table tr.ui-selected .link-transfer-status {
     top: 0;
     background: var(--surface-main);
     z-index: 1;
-}
-.grid-scrolling-table.jsp-sticky-fix th {
-    top: 0.1px; /* hack fix for sticky header delay rendering on FF with jsp, remove after deprecate jsp */
 }
 .grid-table th:first-child {
     -webkit-padding-start: 16px;

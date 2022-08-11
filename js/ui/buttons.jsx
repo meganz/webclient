@@ -88,19 +88,17 @@ export class Button extends MegaRenderMixin {
                 },
                 onActiveChange: function(newVal) {
                     var $element = $(self.findDOMNode());
-                    var $scrollables = $element.parents('.jScrollPaneContainer, .perfectScrollbarContainer');
+                    var $scrollables = $element.parents('.ps');
                     if ($scrollables.length > 0) {
                         if (newVal === true) {
                             // disable scrolling
-                            $scrollables.attr('data-scroll-disabled', true);
-                            $scrollables.filter('.perfectScrollbarContainer').each(function(k, element) {
+                            $scrollables.each((k, element) => {
                                 Ps.disable(element);
                             });
                         }
                         else {
                             // enable back scrolling
-                            $scrollables.removeAttr('data-scroll-disabled');
-                            $scrollables.filter('.perfectScrollbarContainer').each(function(k, element) {
+                            $scrollables.each((k, element) => {
                                 Ps.enable(element);
                             });
                         }

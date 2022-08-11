@@ -563,15 +563,12 @@ MegaData.prototype.onDownloadAdded = function(added, isPaused, isZIP, zipSize) {
         this.addDownloadToast = ['d', isZIP ? 1 : added, isPaused];
     }
     M.openTransfersPanel();
-    initGridScrolling();
-    initFileblocksScrolling();
     initTreeScroll();
 
     if ((dlmanager.isDownloading = Boolean(dl_queue.length))) {
         $('.transfer-pause-icon').removeClass('disabled');
         $('.transfer-clear-completed').removeClass('disabled');
         $('.transfer-clear-all-icon').removeClass('disabled');
-
     }
 };
 

@@ -103,16 +103,6 @@ var versiondialogid;
         },
 
         /**
-         * Initialize file versioning dialog scrolling bar.
-         */
-        initFileVersioningScrolling: function () {
-            var scroll = '.fm-versioning.scroll-bl';
-            deleteScrollPanel(scroll, 'jsp');
-            $(scroll).jScrollPane({enableKeyboardNavigation: false, showArrows: true, arrowSize: 5});
-            jScrollFade(scroll);
-        },
-
-        /**
          * Close file versioning dialog if it is open.
          * @param {hanlde} del file hanle of the file to delete.
          */
@@ -123,6 +113,7 @@ var versiondialogid;
                     current_sel_version = [];
                     versiondialogid = undefined;
                     $(document).off('keydown.fileversioningKeydown');
+                    $(window).unbind('resize.fileversioning');
                 }
                 else {
                     fileversioning.updateFileVersioningDialog();
@@ -581,6 +572,8 @@ var versiondialogid;
             fileversioning.getAllVersions(fh).done(
                 function(versions) {
                     var vh = fillVersionList(versions);
+                    const $scrollBlock = $('.fm-versioning.scroll-bl', '.fm-versioning .body');
+
                     $('.fm-versioning .body .scroll-bl .content').html(vh);
                     $('.fm-versioning .body .file-info-row').rebind('click', function(e) {
                         if (!e.shiftKey) {
@@ -678,7 +671,10 @@ var versiondialogid;
                     refreshHeader(fh);
                     pd.removeClass('hidden');
                     // Init scrolling
-                    fileversioning.initFileVersioningScrolling();
+                    initPerfectScrollbar($scrollBlock);
+                    $(window).rebind('resize.fileversioning', SoonFc(() => {
+                        initPerfectScrollbar($scrollBlock);
+                    }));
                     if (
                         !is_video(M.d[window.versiondialogid])
                         && !is_image2(M.d[window.versiondialogid])
@@ -688,9 +684,7 @@ var versiondialogid;
                         $('.action.preview-file', '.fm-versioning').addClass('hidden');
                     }
                 });
-            $(window).rebind('resize.fileversioning', SoonFc(function() {
-                fileversioning.initFileVersioningScrolling();
-            }));
+
             $(document).rebind('keydown.fileversioningKeydown', function(e) {
                 if (e.keyCode === 8) { // Backspace
                     e.stopPropagation();

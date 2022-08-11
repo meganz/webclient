@@ -75,17 +75,11 @@ function scrollToURLs() {
                         $toScroll = $(mobileClass);
                     }
                 }
+                else  if ($scrollTo.closest('.ps').length) {
+                    $toScroll = $scrollTo.closest('.ps');
+                }
                 else {
-                    $toScroll = $scrollTo.closest(".jspScrollable");
-                    if ($toScroll.length) {
-                        var jspInstance = $toScroll.data('jsp');
-                        if (jspInstance) {
-                            jspInstance.scrollToY(newOffset);
-                        }
-                        return false;
-                    } else {
-                        $toScroll = $('.fmholder');
-                    }
+                    $toScroll = $('.fmholder');
                 }
 
                 if ($toScroll) {
@@ -1154,6 +1148,12 @@ function percent_megatitle() {
 }
 
 function moveCursortoToEnd(el) {
+
+    'use strict';
+
+    const $el = $(el);
+    const $scrollBlock = $el.parent('.ps');
+
     if (typeof el.selectionStart === "number") {
         el.focus();
         el.selectionStart = el.selectionEnd = el.value.length;
@@ -1164,7 +1164,11 @@ function moveCursortoToEnd(el) {
         range.collapse(false);
         range.select();
     }
-    $(el).trigger("focus");
+    $el.trigger('focus');
+
+    if ($scrollBlock.length) {
+        $scrollBlock.scrollTop($el.height());
+    }
 }
 
 function asyncApiReq(data) {

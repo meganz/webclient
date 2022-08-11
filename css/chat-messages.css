@@ -111,13 +111,6 @@
 .messages.error.scroll-area {
     height: 100%;
 }
-.messages.scroll-area .jspVerticalBar {
-    width: 10px;
-}
-.messages.scroll-area .jspPane {
-    height: 100%;
-    display: table;
-}
 .messages.scroll-area .messages-toast {
     position: absolute;
     right: 20px;

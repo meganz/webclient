@@ -57,7 +57,7 @@
 }
 .chat-right-area {
     width: 256px;
-    height: 100%;
+    height: calc(100% - 48px);
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -77,9 +77,10 @@
 .chat-right-area .chat-right-area {
     float: none;
     border-left: 1px solid var(--divider-color);
+    top: 48px;
 }
 .chat-right-pad {
-    padding: 48px 0 0 0;
+    padding: 0;
     height: 100%;
     box-sizing: border-box;
 }

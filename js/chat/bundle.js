@@ -17624,7 +17624,8 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
   }
 
   handleOnboardingStep() {
-    if (M.chat && mega.ui.onboarding && mega.ui.onboarding.sections.chat && !mega.ui.onboarding.sections.chat.isComplete && (!this.$obDialog || !this.$obDialog.is(':visible'))) {
+    if (M.chat && mega.ui.onboarding && mega.ui.onboarding.sections.chat && !mega.ui.onboarding.sections.chat.isComplete && this.state.view !== this.VIEWS.LOADING && (!this.$obDialog || !this.$obDialog.is(':visible')) && (this.obToggleDrawn || $('.toggle-panel-heading', '.conversationsApp').length)) {
+      this.obToggleDrawn = true;
       const {
         chat: obChat
       } = mega.ui.onboarding.sections;

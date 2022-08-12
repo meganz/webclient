@@ -152,6 +152,22 @@ mBroadcaster.addListener('fm:initialized', () => {
             ]
         }
     };
+
+    if (!fmconfig.obrev) {
+        // Reverse existing flags
+        const toRev = ['obcd', 'obcduf', 'obcdmyf', 'obcdda', 'obmc', 'obmclp', 'obmccp', 'obmcmp', 'obmcco', 'obmcnw'];
+        for (const flag of toRev) {
+            if (fmconfig[flag]) { // Already completed
+                mega.config.set(flag, 0);
+            }
+            else { // Hasn't completed
+                mega.config.set(flag, 1);
+            }
+        }
+        // Don't do it again
+        mega.config.set('obrev', 1);
+    }
+
     // If this is an old user don't show them the cloud-drive onboarding v4
     if (!(u_attr.since > 1631664000 || localStorage.obv4test)) {
         delete obMap['cloud-drive'];
@@ -160,12 +176,12 @@ mBroadcaster.addListener('fm:initialized', () => {
     if (u_attr.since >= 1659398400) {
         const megaChatNewUserFlag = 'obmcnw';
 
-        mega.config.set('obmclp', 1);
+        mega.config.set('obmclp', 0);
         mBroadcaster.once('chat_initialized', () => {
             // Show the new user onboarding dot when chat is ready.
             const $mcNavDot = $('.nw-fm-left-icon.conversations .onboarding-highlight-dot', fmholder);
 
-            if (!fmconfig[megaChatNewUserFlag] && !M.chat) {
+            if (fmconfig[megaChatNewUserFlag] && !M.chat) {
                 $('.dark-tooltip', $mcNavDot.parent().addClass('w-onboard')).addClass('hidden');
                 $mcNavDot.removeClass('hidden');
             }
@@ -173,7 +189,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             mBroadcaster.addListener('pagechange', () => {
 
                 if (M.chat) {
-                    mega.config.set(megaChatNewUserFlag, 1);
+                    mega.config.set(megaChatNewUserFlag, 0);
                     $mcNavDot.addClass('hidden');
                     $('.dark-tooltip', $mcNavDot.parent().removeClass('w-onboard')).removeClass('hidden');
 
@@ -232,7 +248,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             }
 
             for (var i = obflags.length; i--;) {
-                delete fmconfig[obflags[i]];
+                mega.config.set(obflags[i], 1);
             }
         }
 
@@ -284,7 +300,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         get isComplete() {
 
-            return fmconfig[this.map.flag];
+            return !fmconfig[this.map.flag];
         }
 
         prepareControlPanel() {
@@ -456,7 +472,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         // set section completed on fmconfig
         setSectionComplete() {
-            mega.config.set(this.map.flag, 1);
+            mega.config.set(this.map.flag, 0);
         }
     }
 
@@ -549,7 +565,7 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
 
         get isComplete() {
-            return fmconfig[this.map.flag];
+            return !fmconfig[this.map.flag];
         }
 
         markHotspot() {
@@ -576,7 +592,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             $('.onboarding-step-link', this.$controlPanel).eq(this.index).removeClass('active').addClass('complete');
 
             // Setting it to user fmconfig
-            mega.config.set(this.map.flag, 1);
+            mega.config.set(this.map.flag, 0);
         }
     }
 

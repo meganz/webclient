@@ -105,7 +105,7 @@
         v04: ['rvonbrddl', 'rvonbrdfd', 'rvonbrdas'],
         obv4: [
             'obcd', 'obcduf', 'obcdmyf', 'obcdda', 'obmc', 'obmclp', 'obmccp', 'obmcmp',
-            'obmcco', 'obmcnw'
+            'obmcco', 'obmcnw', 'obrev'
         ],
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.

@@ -127,6 +127,9 @@
     white-space: nowrap;
     z-index: -1;
 }
+.chat-textarea-scroll {
+    z-index: 0;
+}
 .chat-textarea-scroll textarea,
 .message.textarea-scroll textarea,
 .chat-textarea-scroll .message-preview,
@@ -145,6 +148,9 @@
     display: block;
     white-space: pre-wrap;
     background-color: var(--stroke-main);
+}
+.chat-textarea-scroll.textarea-scroll .messages-textarea {
+    background-color: transparent;
 }
 .chat-textarea-scroll .message-preview,
 .message.textarea-scroll .message-preview {

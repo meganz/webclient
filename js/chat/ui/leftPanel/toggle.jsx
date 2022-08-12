@@ -3,6 +3,14 @@ import { MegaRenderMixin } from '../../mixins';
 import LeftPanel from './leftPanel';
 
 export class TogglePanel extends MegaRenderMixin {
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.loading === false) {
+            return true;
+        }
+        return super.shouldComponentUpdate(nextProps, nextState);
+    }
+
     componentDidUpdate() {
         super.componentDidUpdate();
         // TODO: look into adding throttling
@@ -51,6 +59,13 @@ export default class Toggle extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state.expanded = this.props.expanded || null;
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        if (this.props.loading !== nextProps.loading) {
+            return true;
+        }
+        return super.shouldComponentUpdate(nextProps, nextState);
     }
 
     render() {

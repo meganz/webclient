@@ -737,7 +737,7 @@ MegaUtils.prototype.getCountries = function() {
     'use strict';
 
     if (!this._countries) {
-        this._countries = (new RegionsCollection()).countries;
+        this._countries = new RegionsCollection().countries;
     }
     return this._countries;
 };
@@ -755,9 +755,27 @@ MegaUtils.prototype.sortObjFn = function(key, order, alternativeFn) {
             return o[k];
         };
     }
+    const bothUndefined = (a, b, lOrder, alternativeFn) => {
+        if (alternativeFn) {
+            return alternativeFn(a, b, lOrder);
+        }
+        return -1 * lOrder;
+    };
+    const bothNumber = (a, b, aVal, bVal, lOrder, alt) => {
+        if (aVal > bVal) {
+            return Number(lOrder);
+        }
+        if (aVal < bVal) {
+            return -1 * lOrder;
+        }
+        else if (alt) {
+            return alt(a, b, lOrder);
+        }
+        return 0;
+    };
 
     return function(a, b, tmpOrder) {
-        var currentOrder = tmpOrder ? tmpOrder : order;
+        var currentOrder = tmpOrder || order;
 
         var aVal = key(a);
         var bVal = key(b);
@@ -765,47 +783,16 @@ MegaUtils.prototype.sortObjFn = function(key, order, alternativeFn) {
         if (typeof aVal === 'string' && typeof bVal === 'string') {
             return aVal.localeCompare(bVal, locale) * currentOrder;
         }
-        else if (typeof aVal === 'string' && typeof bVal === 'undefined') {
-            return 1 * currentOrder;
-        }
-        else if (typeof aVal === 'undefined' && typeof bVal === 'string') {
-            return -1 * currentOrder;
-        }
-        else if (typeof aVal === 'number' && typeof bVal === 'undefined') {
-            return 1 * currentOrder;
-        }
-        else if (typeof aVal === 'undefined' && typeof bVal === 'number') {
-            return -1 * currentOrder;
-        }
         else if (typeof aVal === 'undefined' && typeof bVal === 'undefined') {
-            if (alternativeFn) {
-                return alternativeFn(a, b, currentOrder);
-            }
-            else {
-                return -1 * currentOrder;
-            }
+            return bothUndefined(a, b, currentOrder, alternativeFn);
+        }
+        else if (typeof aVal === 'undefined' || typeof bVal === 'undefined') {
+            return (typeof aVal === 'undefined' ? -1 : 1) * currentOrder;
         }
         else if (typeof aVal === 'number' && typeof bVal === 'number') {
-            var _a = aVal || 0;
-            var _b = bVal || 0;
-            if (_a > _b) {
-                return 1 * currentOrder;
-            }
-            if (_a < _b) {
-                return -1 * currentOrder;
-            }
-            else {
-                if (alternativeFn) {
-                    return alternativeFn(a, b, currentOrder);
-                }
-                else {
-                    return 0;
-                }
-            }
+            return bothNumber(a, b, aVal, bVal, currentOrder, alternativeFn);
         }
-        else {
-            return 0;
-        }
+        return 0;
     };
 };
 

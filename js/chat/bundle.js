@@ -6509,15 +6509,19 @@ class ContactButton extends _mixins1__._p {
         };
 
         if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
-          moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+          moreDropdowns.push(react0().createElement("div", {
+            key: "startAudioVideoCall",
+            "data-simpletipposition": "top",
+            className: "simpletip",
+            "data-simpletip": !megaChat.hasSupportForCalls ? l.call_not_suported : ''
+          }, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+            disabled: !megaChat.hasSupportForCalls,
             key: "startCall",
             className: "sprite-fm-mono-before icon-arrow-right-before",
             icon: "sprite-fm-mono icon-phone",
-            submenu: true,
-            label: l[19125],
-            onClick: startAudioCall
-          }));
-          moreDropdowns.push(react0().createElement("div", {
+            submenu: megaChat.hasSupportForCalls,
+            label: l[19125]
+          }), react0().createElement("div", {
             className: "dropdown body submenu",
             key: "dropdownGroup"
           }, react0().createElement("div", null, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
@@ -6537,7 +6541,7 @@ class ContactButton extends _mixins1__._p {
                 room.startVideoCall();
               });
             }
-          }))));
+          })))));
         } else {
           moreDropdowns.push(react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
             key: "startChat",
@@ -8168,8 +8172,13 @@ class ContextMenu extends mixins.wl {
         icon: "sprite-fm-mono icon-folder-outgoing-share",
         label: l[5631],
         onClick: () => this.close(() => openCopyShareDialog(contact.u))
-      }), external_React_default().createElement(dropdowns.DropdownItem, {
-        submenu: true,
+      }), external_React_default().createElement("div", {
+        "data-simpletipposition": "top",
+        className: "simpletip",
+        "data-simpletip": !megaChat.hasSupportForCalls ? l.call_not_suported : ''
+      }, external_React_default().createElement(dropdowns.DropdownItem, {
+        submenu: megaChat.hasSupportForCalls,
+        disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
         icon: "sprite-fm-mono icon-phone",
         className: "sprite-fm-mono-before icon-arrow-right-before",
         label: l[19125]
@@ -8191,7 +8200,7 @@ class ContextMenu extends mixins.wl {
           room.setActive();
           room.startVideoCall();
         }))).catch(() => d && console.warn('Already in a call.'))
-      })), external_React_default().createElement("hr", null), withProfile && external_React_default().createElement(dropdowns.DropdownItem, {
+      }))), external_React_default().createElement("hr", null), withProfile && external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-my-account",
         label: l[5868],
         onClick: () => loadSubPage(`fm/chat/contacts/${contact.u}`)
@@ -8263,7 +8272,7 @@ class ColumnContactButtons extends genericNodePropsComponent.L {
       className: "mega-button action simpletip",
       icon: "sprite-fm-mono icon-phone",
       attrs: {
-        'data-simpletip': l[5896]
+        'data-simpletip': !megaChat.hasSupportForCalls ? l.unsupported_browser_audio : l[5896]
       },
       disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
       onClick: () => (0,call.xt)().then(() => megaChat.createAndShowPrivateRoom(handle).then(room => {
@@ -8274,7 +8283,7 @@ class ColumnContactButtons extends genericNodePropsComponent.L {
       className: "mega-button action simpletip",
       icon: "sprite-fm-mono icon-video-call-filled",
       attrs: {
-        'data-simpletip': l[5897]
+        'data-simpletip': !megaChat.hasSupportForCalls ? l.unsupported_browser_video : l[5897]
       },
       disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
       onClick: () => (0,call.xt)().then(() => megaChat.createAndShowPrivateRoom(handle).then(room => {
@@ -9118,7 +9127,8 @@ class ContactProfile extends mixins.wl {
         icon: "sprite-fm-mono icon-video-call-filled",
         disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
         attrs: {
-          'data-simpletip': l[5897]
+          'data-simpletipposition': 'top',
+          'data-simpletip': !megaChat.hasSupportForCalls ? l.unsupported_browser_video : l[5897]
         },
         onClick: () => {
           if (M.isInvalidUserStatus()) {
@@ -13495,7 +13505,11 @@ class ConversationRightArea extends mixins.wl {
 
     if (startAudioCallButton !== null) {
       startAudioCallButton = external_React_default().createElement("div", {
-        className: `link-button light ${startCallButtonClass}`,
+        "data-simpletip": `${l.unsupported_browser_audio}`,
+        "data-simpletipposition": "top",
+        "data-simpletipoffset": "7",
+        className: `${!megaChat.hasSupportForCalls ? 'simpletip' : ''} 
+                        link-button light ${startCallButtonClass}`,
         onClick: () => onStartCall(call.ZP.TYPE.AUDIO)
       }, external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-phone"
@@ -13504,7 +13518,11 @@ class ConversationRightArea extends mixins.wl {
 
     if (startVideoCallButton !== null) {
       startVideoCallButton = external_React_default().createElement("div", {
-        className: `link-button light ${startCallButtonClass}`,
+        "data-simpletip": `${l.unsupported_browser_video}`,
+        "data-simpletipposition": "top",
+        "data-simpletipoffset": "7",
+        className: `${!megaChat.hasSupportForCalls ? 'simpletip' : ''} 
+                        link-button light ${startCallButtonClass}`,
         onClick: () => onStartCall(call.ZP.TYPE.VIDEO)
       }, external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-video-call-filled"
@@ -14852,23 +14870,31 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       disableCheckingVisibility: true,
       icon: "sprite-fm-mono icon-info-filled",
       onClick: () => room.megaChat.toggleUIFlag('convPanelCollapse')
-    }), external_React_default().createElement(buttons.Button, {
+    }), external_React_default().createElement("div", {
+      "data-simpletip": `${l.unsupported_browser_video}`,
+      "data-simpletipposition": "top",
+      "data-simpletipoffset": "5",
       className: `
-                                    button
+                                    ${!megaChat.hasSupportForCalls ? 'simpletip' : ''}
                                     right
                                     ${startCallDisabled ? 'disabled' : ''}
-                                `,
+                                `
+    }, external_React_default().createElement(buttons.Button, {
       icon: "sprite-fm-mono icon-video-call-filled",
       onClick: () => startCallDisabled ? false : (0,call.xt)().then(() => this.startCall(call.ZP.TYPE.VIDEO)).catch(() => d && console.warn('Already in a call.'))
-    }), external_React_default().createElement(buttons.Button, {
+    })), external_React_default().createElement("div", {
+      "data-simpletip": `${l.unsupported_browser_audio}`,
+      "data-simpletipposition": "top",
+      "data-simpletipoffset": "5",
       className: `
-                                    button
+                                    ${!megaChat.hasSupportForCalls ? 'simpletip' : ''}
                                     right
                                     ${startCallDisabled ? 'disabled' : ''}
-                                `,
+                                `
+    }, external_React_default().createElement(buttons.Button, {
       icon: "sprite-fm-mono icon-phone",
       onClick: () => startCallDisabled ? false : (0,call.xt)().then(() => this.startCall(call.ZP.TYPE.AUDIO)).catch(() => d && console.warn('Already in a call.'))
-    })), topicInfo), external_React_default().createElement("div", {
+    }))), topicInfo), external_React_default().createElement("div", {
       ref: this.containerRef,
       className: `
                             messages-block

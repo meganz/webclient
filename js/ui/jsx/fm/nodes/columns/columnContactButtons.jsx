@@ -22,7 +22,11 @@ export class ColumnContactButtons extends GenericNodePropsComponent {
                     <Button
                         className="mega-button action simpletip"
                         icon="sprite-fm-mono icon-phone"
-                        attrs={{ 'data-simpletip': l[5896] }}
+                        attrs={{
+                            'data-simpletip': !megaChat.hasSupportForCalls ?
+                                l.unsupported_browser_audio : l[5896]
+                            /* `Your browser doesn't support audio calls. Please try a different one!`
+                            : `Start Audio Call` */ }}
                         disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
                         onClick={() =>
                             inProgressAlert()
@@ -40,7 +44,11 @@ export class ColumnContactButtons extends GenericNodePropsComponent {
                     <Button
                         className="mega-button action simpletip"
                         icon="sprite-fm-mono icon-video-call-filled"
-                        attrs={{ 'data-simpletip': l[5897] /* `Start Video Call` */ }}
+                        attrs={{
+                            'data-simpletip': !megaChat.hasSupportForCalls ?
+                                l.unsupported_browser_video : l[5897]
+                                /* `Your browser doesn't support video calls. Please try a different one!`
+                                : `Start Video Call` */ }}
                         disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
                         onClick={() =>
                             inProgressAlert()

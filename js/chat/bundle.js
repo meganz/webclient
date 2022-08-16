@@ -21123,13 +21123,13 @@ class StreamControls extends mixins.wl {
       }, external_React_default().createElement(meetings_button.Z, {
         className: "mega-button round small theme-dark-forced positive",
         simpletip: { ...this.SIMPLETIP,
-          label: l.add_stream
+          label: 'Add Stream'
         },
         onClick: () => this.props.onStreamToggle(STREAM_ACTIONS.ADD)
       }, external_React_default().createElement("span", null, l.add)), external_React_default().createElement(meetings_button.Z, {
         className: "mega-button round small theme-dark-forced negative",
         simpletip: { ...this.SIMPLETIP,
-          label: l.remove_stream
+          label: 'Remove Stream'
         },
         onClick: () => this.props.streams.length > 1 && this.props.onStreamToggle(STREAM_ACTIONS.REMOVE)
       }, external_React_default().createElement("span", null, l[83])));

@@ -208,7 +208,8 @@
 }
 .conversations-pane li {
     overflow: hidden;
-    display: block;
+    display: flex;
+    align-items: center;
     position: relative;
     margin: 0 16px 5px 8px;
     padding: 4px 8px;
@@ -227,7 +228,6 @@
     background-color: var(--stroke-main);
 }
 .conversations-pane .conversation-avatar {
-    overflow: hidden;
     float: left;
     width: 32px;
     margin: 4px 10px 4px 0;
@@ -328,6 +328,9 @@
     --icon-size: 7px;
     --mask-color: var(--icon-rest);
 }
+.conversations-pane li .date-time-wrapper {
+   align-self: flex-start;
+}
 .conversations-pane li .date-time {
     padding-top: 2px;
     font: var(--text-body2);
@@ -352,7 +355,8 @@
     color: var(--text-color-higher);
 }
 .unread-messages-container {
-    /* [...] */
+    display: flex;
+    justify-content: end;
 }
 .unread-messages {
     width: 17px;

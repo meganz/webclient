@@ -18,7 +18,6 @@ import LeftPanel from './leftPanel/leftPanel';
 var getRoomName = function(chatRoom) {
     return chatRoom.getRoomTitle();
 };
-
 class ArchConversationsListItem extends MegaRenderMixin {
     componentWillMount() {
         const { chatRoom } = this.props;

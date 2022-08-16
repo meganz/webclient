@@ -190,8 +190,8 @@ var ChatNotifications = function(megaChat, options) {
                         self.disconnectNotification.close();
                     };
                 })
-                .rebind('onLocalMediaError.chatNotifications', (e, errAv) => {
-                    if (errAv & SfuClient.Av.Screen) {
+                .rebind('onLocalMediaError.chatNotifications', (e, errObj) => {
+                    if (errObj && errObj.screen) {
                         self.notifications.notify(
                             'screen-share-error',
                             {

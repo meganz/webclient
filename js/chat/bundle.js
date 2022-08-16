@@ -16686,7 +16686,8 @@ let ConversationsListItem = (conversationsListItem_dec = utils["default"].SoonFc
     }
 
     var lastMessageDiv = null;
-    var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
+    const showHideMsg = mega.config.get('showHideChat');
+    var lastMessage = showHideMsg ? '' : chatRoom.messagesBuff.getLatestTextMessage();
     var lastMsgDivClasses;
 
     if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
@@ -16731,10 +16732,9 @@ let ConversationsListItem = (conversationsListItem_dec = utils["default"].SoonFc
       }
     } else {
       lastMsgDivClasses = "conversation-message";
-      const emptyMessage = this.loadingShown ? l[7006] : l[8000];
-      lastMessageDiv = external_React_default().createElement("div", null, external_React_default().createElement("div", {
+      lastMessageDiv = showHideMsg ? '' : external_React_default().createElement("div", null, external_React_default().createElement("div", {
         className: lastMsgDivClasses
-      }, emptyMessage));
+      }, this.loadingShown ? l[7006] : l[8000]));
     }
 
     this.lastMessageId = lastMessage && lastMessage.messageId;
@@ -16786,17 +16786,19 @@ let ConversationsListItem = (conversationsListItem_dec = utils["default"].SoonFc
     }), (chatRoom.type === "group" || chatRoom.type === "private") && external_React_default().createElement("i", {
       className: "sprite-fm-uni icon-ekr-key simpletip",
       "data-simpletip": l[20935]
-    })), external_React_default().createElement("div", {
-      className: "date-time"
-    }, this.getConversationTimestamp())), external_React_default().createElement("div", {
+    }))), external_React_default().createElement("div", {
       className: "clear"
     }), external_React_default().createElement("div", {
       className: "conversation-message-info"
-    }, lastMessageDiv, notificationItems.length > 0 ? external_React_default().createElement("div", {
+    }, lastMessageDiv)), external_React_default().createElement("div", {
+      className: "date-time-wrapper"
+    }, external_React_default().createElement("div", {
+      className: "date-time"
+    }, this.getConversationTimestamp()), notificationItems.length > 0 ? external_React_default().createElement("div", {
       className: "unread-messages-container"
     }, external_React_default().createElement("div", {
       className: `unread-messages items-${notificationItems.length}`
-    }, notificationItems)) : null)));
+    }, notificationItems)) : null));
   }
 
 }, ((0,applyDecoratedDescriptor.Z)(conversationsListItem_class.prototype, "eventuallyScrollTo", [conversationsListItem_dec], Object.getOwnPropertyDescriptor(conversationsListItem_class.prototype, "eventuallyScrollTo"), conversationsListItem_class.prototype), (0,applyDecoratedDescriptor.Z)(conversationsListItem_class.prototype, "render", [conversationsListItem_dec2], Object.getOwnPropertyDescriptor(conversationsListItem_class.prototype, "render"), conversationsListItem_class.prototype)), conversationsListItem_class));

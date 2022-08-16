@@ -589,6 +589,46 @@ accountUI.inputs = {
         },
     },
 
+    radioCard: {
+        init(identifier, $container, currentValue, onChangeCb) {
+            'use strict';
+
+            var $radio = $(identifier, $container);
+            var $labels = $('.chat', $container);
+
+            if (String(currentValue)) {
+                this.set(identifier, $container, currentValue);
+            }
+
+            $('input', $radio).rebind('click.radio', (e, val) => {
+                this.set(identifier, $container, val, onChangeCb);
+            });
+
+            $labels.rebind('click.radioLabel', function() {
+                var newVal = $(this).prev(identifier).children('input', $radio).val();
+                $(this).prev(identifier).children('input', $radio).trigger('click', newVal);
+            });
+        },
+
+        set: function(identifier, $container, newVal, onChangeCb) {
+            'use strict';
+
+            var $input = $('input' + identifier + '[value="' + newVal + '"]', $container);
+
+            $(identifier + '.radioOn', $container).addClass('radioOff').removeClass('radioOn');
+            $(identifier + '.radioOff', $container).next().addClass('radioOff').removeClass('radioOn');
+            $(identifier + '.radioOff', $container).next().children('.chat-selected').removeClass('checked');
+            $input.removeClass('radioOff').addClass('radioOn').prop('checked', true);
+            $input.parent().addClass('radioOn').removeClass('radioOff');
+            $input.parent().next().addClass('radioOn').removeClass('radioOff');
+            $input.parent().next().children('.chat-selected').addClass('checked');
+
+            if (typeof onChangeCb === 'function') {
+                onChangeCb(newVal);
+            }
+        }
+    },
+
     switch: {
 
         init: function(identifier, $container, currentValue, onChangeCb, onClickCb) {
@@ -3499,6 +3539,7 @@ accountUI.contactAndChat = {
 
         this.status.render(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen);
         this.status.bindEvents(presenceInt, autoawaytimeout);
+        this.chatList.render();
         this.richURL.render();
         this.dnd.render();
     },
@@ -3616,6 +3657,23 @@ accountUI.contactAndChat = {
                     $(this).val(presenceInt.userPresence.autoawaytimeout / 60);
                 }).val(lastValidNumber);
             }
+        }
+    },
+
+    chatList: {
+
+        render: function() {
+            'use strict';
+            const curr = mega.config.get('showHideChat');
+
+            accountUI.inputs.radioCard.init(
+                '.card',
+                $('.card', accountUI.$contentBlock).parent(),
+                typeof curr === 'undefined' ? 0 : 1,
+                (val) => {
+                    mega.config.setn('showHideChat', val);
+                }
+            );
         }
     },
 

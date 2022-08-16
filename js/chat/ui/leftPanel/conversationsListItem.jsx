@@ -94,13 +94,14 @@ export default class ConversationsListItem extends MegaRenderMixin {
         var contactId;
         var presenceClass;
         var id;
+        let contact;
 
         if (chatRoom.type === "private") {
             const handle = chatRoom.getParticipantsExceptMe()[0];
             if (!handle || !(handle in M.u)) {
                 return null;
             }
-            const contact = M.u[handle];
+            contact = M.u[handle];
             id = 'conversation_' + htmlentities(contact.u);
 
             presenceClass = chatRoom.megaChat.userPresenceToCssClass(
@@ -261,7 +262,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
                             />
                         </div>
                     }
-                    {chatRoom.type === 'private' && <Avatar contact={chatRoom.getParticipantsExceptMe()[0]} />}
+                    {chatRoom.type === 'private' && contact && <Avatar contact={contact} />}
                 </div>
                 <div className="conversation-data">
                     <div className="conversation-data-top">

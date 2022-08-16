@@ -118,6 +118,10 @@ function initMegasync() {
             window.location = megasync.getMegaSyncUrl('mac');
             resetMegasync();
         }
+        else if (osData === 'linux' && is_mobile) {
+            window.open('https://mega.nz/linux/repo/', '_blank');
+            resetMegasync();
+        }
         else if (osData === 'linux' && $this.hasClass('active')) {
             resetMegasync();
         }

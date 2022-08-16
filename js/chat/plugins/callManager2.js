@@ -417,8 +417,8 @@
             }
             this.av = this.sfuApp.sfuClient.availAv;
         }
-        onLocalMediaError(errAv) {
-            this.chatRoom.trigger('onLocalMediaError', errAv);
+        onLocalMediaError(errObj) {
+            this.chatRoom.trigger('onLocalMediaError', errObj);
         }
         toggleAudio(mute) {
             this.sfuApp.sfuClient.muteAudio(!this.sfuApp.sfuClient.localAudioMuted());

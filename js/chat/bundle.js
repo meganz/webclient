@@ -16667,6 +16667,7 @@ let ConversationsListItem = (conversationsListItem_dec = utils["default"].SoonFc
     var contactId;
     var presenceClass;
     var id;
+    let contact;
 
     if (chatRoom.type === "private") {
       const handle = chatRoom.getParticipantsExceptMe()[0];
@@ -16675,7 +16676,7 @@ let ConversationsListItem = (conversationsListItem_dec = utils["default"].SoonFc
         return null;
       }
 
-      const contact = M.u[handle];
+      contact = M.u[handle];
       id = 'conversation_' + htmlentities(contact.u);
       presenceClass = chatRoom.megaChat.userPresenceToCssClass(contact.presence);
     } else if (chatRoom.type === "group") {
@@ -16797,8 +16798,8 @@ let ConversationsListItem = (conversationsListItem_dec = utils["default"].SoonFc
                             `
     }, external_React_default().createElement("i", {
       className: chatRoom.isMeeting ? 'sprite-fm-mono icon-video-call-filled' : 'sprite-fm-uni icon-chat-group'
-    })), chatRoom.type === 'private' && external_React_default().createElement(ui_contacts.Avatar, {
-      contact: chatRoom.getParticipantsExceptMe()[0]
+    })), chatRoom.type === 'private' && contact && external_React_default().createElement(ui_contacts.Avatar, {
+      contact: contact
     })), external_React_default().createElement("div", {
       className: "conversation-data"
     }, external_React_default().createElement("div", {

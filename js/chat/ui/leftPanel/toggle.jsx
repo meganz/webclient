@@ -17,7 +17,8 @@ export class TogglePanel extends MegaRenderMixin {
         const { $chatTreePanePs: content } = megaChat;
         if (content) {
             const container = document.querySelector(`.${LeftPanel.NAMESPACE}-conversations`);
-            container.classList[content.getContentHeight() > container.offsetHeight ? 'add' : 'remove']('scrollable');
+            const scrollable = content.getContentHeight() > container.offsetHeight - 40 /* offset */;
+            container.classList[scrollable ? 'add' : 'remove']('scrollable');
             content.reinitialise();
         }
     }

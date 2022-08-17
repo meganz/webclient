@@ -362,6 +362,10 @@ function api_setsid(sid) {
     apixs[4].sid = sid;
     apixs[5].sid = sid;
     apixs[6].sid = sid;
+
+    if (self.fetchStreamSupport) {
+        mega.requestStatusMonitor.init();
+    }
 }
 
 function api_setfolder(h) {

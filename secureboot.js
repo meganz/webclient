@@ -2674,6 +2674,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
+    jsl.push({f:'js/reqstatclient.js', n: 'reqstatclient_js', j:1,w:5});
 
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});

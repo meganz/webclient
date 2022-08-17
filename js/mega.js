@@ -179,6 +179,36 @@ if (typeof loadingDialog === 'undefined') {
         return !this.nest;
     };
     loadingDialog.quiet = false;
+    loadingDialog.showProgress = function(progress) {
+
+        'use strict';
+
+        const $spinner = $('.loading-spinner:not(.manual-management)').removeClass('hidden');
+
+        $('.loader-progressbar', $spinner).addClass('active');
+
+        if (progress) {
+            $('.loader-percents', $spinner).css('transform', `scaleX(${progress / 100})`);
+        }
+    };
+    loadingDialog.hideProgress = function() {
+
+        'use strict';
+
+        const $spinner = $('.loading-spinner:not(.manual-management)');
+
+        $('.loader-progressbar', $spinner).removeClass('active');
+
+        // awaiting 300 fadeout animation
+        setTimeout(() => {
+
+            // If there is no other active loadingDialog.show call.
+            if (!loadingDialog.active) {
+                $spinner.addClass('hidden');
+            }
+            $('.loader-percents', $spinner).css('transform', '');
+        }, 301);
+    };
 }
 if (typeof loadingInitDialog === 'undefined') {
     var loadingInitDialog = Object.create(null);

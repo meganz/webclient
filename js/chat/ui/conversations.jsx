@@ -717,13 +717,6 @@ class ConversationsApp extends MegaRenderMixin {
         return null;
     }
 
-    getConversations() {
-        return Object.values(megaChat.chats).filter(c => {
-            // return c.isDisplayable() && (this.state.view === this.VIEWS.MEETINGS ? c.isMeeting : !c.isMeeting);
-            return this.state.view === this.VIEWS.MEETINGS ? c.isMeeting : !c.isMeeting;
-        });
-    }
-
     renderView(view) {
         this.setState({ view }, () => {
             const { $chatTreePanePs, routingSection } = megaChat;
@@ -736,12 +729,11 @@ class ConversationsApp extends MegaRenderMixin {
 
     render() {
         const { CHATS, MEETINGS } = this.VIEWS;
-        const { routingSection, chatUIFlags, currentlyOpenedChat } = megaChat;
+        const { routingSection, chatUIFlags, currentlyOpenedChat, chats } = megaChat;
         const { view, startGroupChatDialog, startMeetingDialog, leftPaneWidth } = this.state;
-        const conversations = this.getConversations();
         const isEmpty =
-            conversations &&
-            conversations.length === 0 &&
+            chats &&
+            chats.length === 0 &&
             routingSection === 'chat' &&
             !currentlyOpenedChat &&
             !is_chatlink;
@@ -785,7 +777,6 @@ class ConversationsApp extends MegaRenderMixin {
                     <ConversationPanels
                         {...this.props}
                         className={routingSection === 'chat' ? '' : 'hidden'}
-                        conversations={conversations}
                         routingSection={routingSection}
                         currentlyOpenedChat={currentlyOpenedChat}
                         displayArchivedChats={routingSection === 'archived'}
@@ -828,7 +819,7 @@ class ConversationsApp extends MegaRenderMixin {
                     view={view}
                     views={this.VIEWS}
                     routingSection={routingSection}
-                    conversations={conversations}
+                    conversations={chats}
                     leftPaneWidth={leftPaneWidth}
                     renderView={view => this.renderView(view)}
                     startMeeting={() => this.startMeeting()}

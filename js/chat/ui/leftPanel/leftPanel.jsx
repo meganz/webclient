@@ -11,7 +11,13 @@ export default class LeftPanel extends MegaRenderMixin {
     static NAMESPACE = 'lhp';
 
     renderConversations(archived = false) {
-        const { view, views, conversations, renderView } = this.props;
+        const { view, views, renderView } = this.props;
+        const conversations = Object.values(this.props.conversations)
+            .filter(c =>
+                (view === views.MEETINGS ? c.isMeeting : !c.isMeeting) &&
+                c[archived ? 'isArchived' : 'isDisplayable']()
+            );
+
         return (
             <PerfectScrollbar
                 className="chat-lp-scroll-area"
@@ -23,9 +29,7 @@ export default class LeftPanel extends MegaRenderMixin {
                 <ConversationsList
                     view={view}
                     views={views}
-                    conversations={conversations.filter(c =>
-                        c[archived ? 'isArchived' : 'isDisplayable']()
-                    )}
+                    conversations={conversations}
                     onConversationClick={chatRoom => renderView(chatRoom.isMeeting ? views.MEETINGS : views.CHATS)}
                 />
             </PerfectScrollbar>
@@ -33,7 +37,17 @@ export default class LeftPanel extends MegaRenderMixin {
     }
 
     render() {
-        const { view, views, routingSection, leftPaneWidth, renderView, startMeeting, createGroupChat } = this.props;
+        const {
+            view,
+            views,
+            routingSection,
+            conversations,
+            leftPaneWidth,
+            renderView,
+            startMeeting,
+            createGroupChat
+        } = this.props;
+        const IS_LOADING = view === views.LOADING;
 
         return (
             <div
@@ -71,19 +85,17 @@ export default class LeftPanel extends MegaRenderMixin {
                     `}>
                     <Toggle
                         view={view}
-                        loading={view === views.LOADING}
+                        loading={IS_LOADING}
+                        conversations={conversations}
                         expanded="one">
                         <TogglePanel
                             key="one"
-                            heading={
-                                view !== views.LOADING &&
-                                l[view === views.CHATS ? 'contacts_and_groups' : 'past_meetings']
-                            }>
+                            heading={!IS_LOADING && (view === views.CHATS ? l.contacts_and_groups : l.past_meetings)}>
                             {this.renderConversations()}
                         </TogglePanel>
                         <TogglePanel
                             key="two"
-                            heading={view !== views.LOADING && l[19067] /* `Archived` */}>
+                            heading={!IS_LOADING && l[19067] /* `Archived` */}>
                             {this.renderConversations(true)}
                         </TogglePanel>
                     </Toggle>

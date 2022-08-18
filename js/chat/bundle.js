@@ -16958,14 +16958,6 @@ ConversationsList.defaultProps = {
 
 
 class TogglePanel extends mixins.wl {
-  shouldComponentUpdate(nextProps, nextState) {
-    if (nextProps.loading === false) {
-      return true;
-    }
-
-    return super.shouldComponentUpdate(nextProps, nextState);
-  }
-
   componentDidUpdate() {
     super.componentDidUpdate();
     const {
@@ -16978,6 +16970,10 @@ class TogglePanel extends mixins.wl {
       container.classList[scrollable ? 'add' : 'remove']('scrollable');
       content.reinitialise();
     }
+  }
+
+  specShouldComponentUpdate() {
+    return !this.props.loading;
   }
 
   render() {
@@ -17016,17 +17012,14 @@ class Toggle extends mixins.wl {
     this.state.expanded = this.props.expanded || null;
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.loading !== nextProps.loading) {
-      return true;
-    }
-
-    return super.shouldComponentUpdate(nextProps, nextState);
+  specShouldComponentUpdate() {
+    return !this.props.loading;
   }
 
   render() {
     const {
       loading,
+      shouldUpdate,
       children
     } = this.props;
 
@@ -17034,6 +17027,7 @@ class Toggle extends mixins.wl {
       return children.map(child => {
         return external_React_default().cloneElement(child, {
           loading,
+          shouldUpdate,
           expanded: this.state.expanded === child.key,
           onToggle: () => this.setState({
             expanded: child.key
@@ -17061,9 +17055,9 @@ class LeftPanel extends mixins.wl {
     const {
       view,
       views,
-      conversations,
       renderView
     } = this.props;
+    const conversations = Object.values(this.props.conversations).filter(c => (view === views.MEETINGS ? c.isMeeting : !c.isMeeting) && c[archived ? 'isArchived' : 'isDisplayable']());
     return external_React_default().createElement(perfectScrollbar.F, {
       className: "chat-lp-scroll-area",
       ref: ref => {
@@ -17074,7 +17068,7 @@ class LeftPanel extends mixins.wl {
     }, external_React_default().createElement(ConversationsList, {
       view: view,
       views: views,
-      conversations: conversations.filter(c => c[archived ? 'isArchived' : 'isDisplayable']()),
+      conversations: conversations,
       onConversationClick: chatRoom => renderView(chatRoom.isMeeting ? views.MEETINGS : views.CHATS)
     }));
   }
@@ -17084,11 +17078,13 @@ class LeftPanel extends mixins.wl {
       view,
       views,
       routingSection,
+      conversations,
       leftPaneWidth,
       renderView,
       startMeeting,
       createGroupChat
     } = this.props;
+    const IS_LOADING = view === views.LOADING;
     return external_React_default().createElement("div", (0,esm_extends.Z)({
       className: `
                     fm-left-panel
@@ -17120,14 +17116,15 @@ class LeftPanel extends mixins.wl {
                     `
     }, external_React_default().createElement(Toggle, {
       view: view,
-      loading: view === views.LOADING,
+      loading: IS_LOADING,
+      conversations: conversations,
       expanded: "one"
     }, external_React_default().createElement(TogglePanel, {
       key: "one",
-      heading: view !== views.LOADING && l[view === views.CHATS ? 'contacts_and_groups' : 'past_meetings']
+      heading: !IS_LOADING && (view === views.CHATS ? l.contacts_and_groups : l.past_meetings)
     }, this.renderConversations()), external_React_default().createElement(TogglePanel, {
       key: "two",
-      heading: view !== views.LOADING && l[19067]
+      heading: !IS_LOADING && l[19067]
     }, this.renderConversations(true)))));
   }
 
@@ -17775,12 +17772,6 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
     return null;
   }
 
-  getConversations() {
-    return Object.values(megaChat.chats).filter(c => {
-      return this.state.view === this.VIEWS.MEETINGS ? c.isMeeting : !c.isMeeting;
-    });
-  }
-
   renderView(view) {
     this.setState({
       view
@@ -17805,7 +17796,8 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
     const {
       routingSection,
       chatUIFlags,
-      currentlyOpenedChat
+      currentlyOpenedChat,
+      chats
     } = megaChat;
     const {
       view,
@@ -17813,8 +17805,7 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
       startMeetingDialog,
       leftPaneWidth
     } = this.state;
-    const conversations = this.getConversations();
-    const isEmpty = conversations && conversations.length === 0 && routingSection === 'chat' && !currentlyOpenedChat && !is_chatlink;
+    const isEmpty = chats && chats.length === 0 && routingSection === 'chat' && !currentlyOpenedChat && !is_chatlink;
     const isLoading = !currentlyOpenedChat && megaChat.allChatsHadInitialLoadedHistory() === false && routingSection !== 'archived' && routingSection !== 'contacts';
     const rightPane = external_React_default().createElement("div", {
       className: `
@@ -17840,7 +17831,6 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
       })
     }), !isLoading && external_React_default().createElement(ConversationPanels, (0,esm_extends.Z)({}, this.props, {
       className: routingSection === 'chat' ? '' : 'hidden',
-      conversations: conversations,
       routingSection: routingSection,
       currentlyOpenedChat: currentlyOpenedChat,
       displayArchivedChats: routingSection === 'archived',
@@ -17880,7 +17870,7 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
       view: view,
       views: this.VIEWS,
       routingSection: routingSection,
-      conversations: conversations,
+      conversations: chats,
       leftPaneWidth: leftPaneWidth,
       renderView: view => this.renderView(view),
       startMeeting: () => this.startMeeting(),

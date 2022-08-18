@@ -2100,6 +2100,7 @@ ChatRoom.prototype.endCallForAll = function(callId) {
             'cid': this.chatId,
             'mid': callId
         });
+        eventlog(99761, JSON.stringify([this.chatId, callId, this.isMeeting | 0]));
     }
 };
 

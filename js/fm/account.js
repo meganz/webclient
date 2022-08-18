@@ -4157,6 +4157,7 @@ accountUI.calls = {
                 typeof curr === 'undefined' ? 1 : Math.abs(curr - 1),
                 val => {
                     mega.config.setn('callemptytout', Math.abs(val - 1));
+                    eventlog(99758, JSON.stringify([Math.abs(val - 1)]));
                 }
             );
         }
@@ -4173,6 +4174,7 @@ accountUI.calls = {
                 typeof curr === 'undefined' ? 1 : Math.abs(curr - 1),
                 val => {
                     mega.config.setn('callinout', Math.abs(val - 1));
+                    eventlog(99759, JSON.stringify([Math.abs(val - 1)]));
                 }
             );
         }

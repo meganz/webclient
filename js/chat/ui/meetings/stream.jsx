@@ -439,7 +439,7 @@ export default class Stream extends MegaRenderMixin {
                     stayOnEnd={stayOnEnd}
                     onInviteToggle={onInviteToggle}
                     onStayConfirm={onStayConfirm}
-                    onCallEnd={onCallEnd}
+                    onCallEnd={() => onCallEnd(1)}
                 />
             );
         }

@@ -481,6 +481,7 @@
                 delete this.callToutId;
             }
             if (!leaveCallActive) {
+                eventlog(99762, JSON.stringify([this.callId]));
                 this.chatRoom.trigger('onCallLeft', { callId: this.callId });
             }
         }

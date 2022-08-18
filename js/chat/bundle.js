@@ -4332,6 +4332,7 @@ ChatRoom.prototype.endCallForAll = function (callId) {
       'cid': this.chatId,
       'mid': callId
     });
+    eventlog(99761, JSON.stringify([this.chatId, callId, this.isMeeting | 0]));
   }
 };
 
@@ -22292,7 +22293,7 @@ class stream_Stream extends mixins.wl {
           stayOnEnd: stayOnEnd,
           onInviteToggle: onInviteToggle,
           onStayConfirm: onStayConfirm,
-          onCallEnd: onCallEnd
+          onCallEnd: () => onCallEnd(1)
         });
       }
 
@@ -23523,10 +23524,19 @@ class Call extends mixins.wl {
       return call.toggleScreenSharing();
     };
 
-    this.handleCallEnd = () => {
-      var _this$props$chatRoom, _this$props$chatRoom$;
+    this.handleCallEnd = l => {
+      var _chatRoom$sfuApp;
 
-      return (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : (_this$props$chatRoom$ = _this$props$chatRoom.sfuApp) == null ? void 0 : _this$props$chatRoom$.destroy();
+      const {
+        chatRoom,
+        call
+      } = this.props;
+
+      if (l) {
+        eventlog(99760, JSON.stringify([call.callId, 0]));
+      }
+
+      chatRoom == null ? void 0 : (_chatRoom$sfuApp = chatRoom.sfuApp) == null ? void 0 : _chatRoom$sfuApp.destroy();
     };
 
     this.handleEphemeralAdd = handle => handle && this.setState(state => ({
@@ -23535,10 +23545,14 @@ class Call extends mixins.wl {
     }));
 
     this.handleStayConfirm = () => {
+      const {
+        call
+      } = this.props;
+      eventlog(99760, JSON.stringify([call.callId, 1]));
       this.setState({
         stayOnEnd: true
       });
-      this.props.call.initCallTimeout(true);
+      call.initCallTimeout(true);
     };
 
     this.state.mode = props.call.viewMode;
@@ -23563,7 +23577,7 @@ class Call extends mixins.wl {
         return;
       }
 
-      return res ? this.handleStayConfirm() : this.handleCallEnd();
+      return res ? this.handleStayConfirm() : this.handleCallEnd(1);
     }, 1);
   }
 

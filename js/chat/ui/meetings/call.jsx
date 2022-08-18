@@ -310,7 +310,7 @@ export default class Call extends MegaRenderMixin {
                 if (res === null) {
                     return;
                 }
-                return res ? this.handleStayConfirm() : this.handleCallEnd();
+                return res ? this.handleStayConfirm() : this.handleCallEnd(1);
             },
             1
         );
@@ -469,7 +469,13 @@ export default class Call extends MegaRenderMixin {
      * @returns {void}
      */
 
-    handleCallEnd = () => this.props.chatRoom?.sfuApp?.destroy();
+    handleCallEnd = l => {
+        const { chatRoom, call } = this.props;
+        if (l) {
+            eventlog(99760, JSON.stringify([call.callId, 0]));
+        }
+        chatRoom?.sfuApp?.destroy();
+    };
 
     /**
      * handleEphemeralAdd
@@ -494,8 +500,10 @@ export default class Call extends MegaRenderMixin {
      * @returns {void} void
      */
     handleStayConfirm = () => {
+        const { call } = this.props;
+        eventlog(99760, JSON.stringify([call.callId, 1]));
         this.setState({stayOnEnd: true});
-        this.props.call.initCallTimeout(true);
+        call.initCallTimeout(true);
     };
 
     componentWillUnmount() {

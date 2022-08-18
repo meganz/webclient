@@ -3152,11 +3152,16 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             var finalizeOperation = function (st,res,req) {
                 var $addContianer = $('.dialog-input-container', $dialog);
                 var $resultContianer = $('.verification-container', $dialog);
+                const $subUserEmail = $('.sub-e', $resultContianer);
 
                 if (st === 1) {
                     var subUserDefaultAvatar = useravatar.contact(res.u);
                     $('.new-sub-user', $resultContianer).safeHTML(subUserDefaultAvatar);
-                    $('.sub-e', $resultContianer).text(req.m);
+                    $subUserEmail.text(req.m).attr({
+                        'data-simpletip': req.m,
+                        'data-simpletipposition': 'top'
+                    });
+
                     if (res.lp) {
                         $('.verification-user-pw', $resultContianer).removeClass('hidden');
                         if (is_extension || M.execCommandUsable()) {
@@ -3206,6 +3211,14 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
                 loadingDialog.phide();
                 $dialog.removeClass('hidden');
+
+                if ($subUserEmail.prop('scrollWidth') > $subUserEmail.prop('offsetWidth')) {
+                    // If the sub user's email is too long, add the simpletip to display the full email address
+                    $subUserEmail.addClass('simpletip');
+                }
+                else {
+                    $subUserEmail.removeClass('simpletip');
+                }
             };
 
             subPromise.always(finalizeOperation);

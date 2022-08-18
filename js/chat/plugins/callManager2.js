@@ -966,7 +966,7 @@
 
         var result = false;
         var meta = msgInstance.meta;
-        var authorContact = M.u[meta.userId];
+        var authorContact = M.u[meta.userId] || {};
         var delay = msgInstance.delay;
         if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CALL_ENDED) {
             var msgId;

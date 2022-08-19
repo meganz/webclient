@@ -3,23 +3,20 @@ import { MegaRenderMixin } from '../../mixins';
 import LeftPanel from './leftPanel';
 
 export class TogglePanel extends MegaRenderMixin {
-
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.loading === false) {
-            return true;
-        }
-        return super.shouldComponentUpdate(nextProps, nextState);
-    }
-
     componentDidUpdate() {
         super.componentDidUpdate();
         // TODO: look into adding throttling
         const { $chatTreePanePs: content } = megaChat;
         if (content) {
             const container = document.querySelector(`.${LeftPanel.NAMESPACE}-conversations`);
-            container.classList[content.getContentHeight() > container.offsetHeight ? 'add' : 'remove']('scrollable');
+            const scrollable = content.getContentHeight() > container.offsetHeight - 40 /* offset */;
+            container.classList[scrollable ? 'add' : 'remove']('scrollable');
             content.reinitialise();
         }
+    }
+
+    specShouldComponentUpdate() {
+        return !this.props.loading;
     }
 
     render() {
@@ -61,20 +58,18 @@ export default class Toggle extends MegaRenderMixin {
         this.state.expanded = this.props.expanded || null;
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        if (this.props.loading !== nextProps.loading) {
-            return true;
-        }
-        return super.shouldComponentUpdate(nextProps, nextState);
+    specShouldComponentUpdate() {
+        return !this.props.loading;
     }
 
     render() {
-        const { loading, children } = this.props;
+        const { loading, shouldUpdate, children } = this.props;
 
         if (children) {
             return children.map(child => {
                 return React.cloneElement(child, {
                     loading,
+                    shouldUpdate,
                     expanded: this.state.expanded === child.key,
                     onToggle: () => this.setState({ expanded: child.key })
                 });

@@ -1885,7 +1885,7 @@ const dialogTest = {
     ['share-content']: () => {
         // on cloud drive home
         mega.ui.onboarding.renderDialog('share-content', {
-            customLinkUrl: `https://mega.nz/help/client/webclient/getting-started/how-can-i-share-data-without-requiring-the-recipient-to-register-with-mega-first-57885f6f886688d0168b45b6`
+            customLinkUrl: l.mega_help_host + '/files-folders/sharing'
         });
     },
 

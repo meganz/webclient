@@ -194,6 +194,10 @@ affiliateRedemption.__processBlock2 = function() {
     }
 
     this.requests.first.p = value;
+
+    if (method === 2) {
+        return M.affiliate.getRedeemAccountInfo();
+    }
 };
 
 affiliateRedemption.__processBlock3 = function() {
@@ -213,6 +217,7 @@ affiliateRedemption.__processBlock3 = function() {
 
             if (megaInput) {
                 megaInput.showError(l[23321]);
+                Ps.update(this.$step.children('.ps').get(0));
             }
             else {
                 msgDialog('warninga', '', l[23321]);
@@ -248,6 +253,10 @@ affiliateRedemption.__processBlock3 = function() {
     else {
         this.requests.first.cc = $('#affi-country .option.active', this.$step).data('type');
         this.requests.first.c = $('#affi-currency .option.active', this.$step).data('type');
+    }
+
+    if ($('#affi-save-bitcoin', this.$step).prop('checked')) {
+        this.updateAccInfo();
     }
 
     return Promise.all([
@@ -628,29 +637,45 @@ affiliateRedemption.updateAccInfo = function() {
     'use strict';
 
     var self = this;
+    let accInfo;
 
-    this.recordSecondReqValues();
+    if (this.requests.first.m === 1) {
+        this.recordSecondReqValues();
 
-    // Flatten account info
-    var accInfo = Object.assign(
-        {ccc: this.requests.first.cc + this.requests.first.c},
-        this.requests.second.extra
-    );
+        // Flatten account info
+        accInfo = Object.assign(
+            {ccc: this.requests.first.cc + this.requests.first.c},
+            this.requests.second.extra
+        );
 
-    var details = this.requests.second.extra.details;
+        const {details} = this.requests.second.extra;
 
-    for (var i = 0; i < details.length; i++) {
-        accInfo[details[i].k] = details[i].v;
+        for (var i = 0; i < details.length; i++) {
+            accInfo[details[i].k] = details[i].v;
+        }
+
+        delete accInfo.details;
+        delete accInfo.title;
     }
-
-    delete accInfo.details;
-    delete accInfo.title;
+    else if (this.requests.first.m === 2) {
+        accInfo = this.requests.second.extra;
+    }
 
     this.$rdmUI.addClass('arrange-to-back');
 
     M.affiliate.setRedeemAccountInfo(this.requests.first.m, accInfo).then(function() {
 
+        let toastMsg = '';
+
+        if (self.requests.first.m === 1) {
+            toastMsg = l[23363];
+        }
+        else if (self.requests.first.m === 2) {
+            toastMsg = l.referral_bitcoin_update_success;
+        }
+
         self.$rdmUI.removeClass('arrange-to-back');
-        showToast('settings', l[23363]);
+        showToast('settings', toastMsg);
+        $('#affi-save-bitcoin, #affi-save-info', self.$rdmUI).prop('checked', false);
     });
 };

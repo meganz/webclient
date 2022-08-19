@@ -36,7 +36,9 @@ body * {
     -webkit-touch-callout: none;
     user-select: none;
 }
-
+body *:not(input) {
+    -webkit-user-select: none;
+}
 .wait-cursor, .loading-cursor, .progress-cursor {
     cursor: progress !important;
 }
@@ -14307,4 +14309,8 @@ body.megaChatDisabled .nw-contact-name button.start-chat-button {
     color: var(--text-color-low);
     font: var(--text-body2);
     margin-top: 12px;
+}
+
+.vertical-align-top {
+    vertical-align: top;
 }

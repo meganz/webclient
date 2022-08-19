@@ -580,6 +580,7 @@ var mobile = {
      * @param {Object} $overlay target overlay
      */
     initOverlayPopstateHandler: function($overlay) {
+
         'use strict';
 
         pushHistoryState();
@@ -1158,9 +1159,19 @@ accountUI.account = {
     renderCountry: function() {},
     renderRubsched: function() {},
 };
+contextMenu = {
+    create: nop,
+    open: nop,
+    close: nop
+};
 
 function bindDropdownEvents() {}
-mega.gallery = {};
+mega.gallery = {
+    sections: {},
+    secKeys: {},
+    showEmpty: nop,
+    emptyBlock: null
+};
 
 /** Global function to be used in mobile mode, checking if the action can be taken by the user.
  * It checks the user validity (Expired business, or ODQ Paywall)
@@ -1188,13 +1199,3 @@ function validateUserAction(hideContext) {
     }
     return true;
 }
-
-// eslint-disable-next-line no-useless-concat
-window['slide' + 'show'] = function(h, close) {
-    if (close) {
-        mobile.slideshow.close();
-    }
-    else {
-        mobile.slideshow.init(h);
-    }
-};

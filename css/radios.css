@@ -130,3 +130,34 @@ div.radioOff.small::before {
     cursor: pointer;
     margin: 0;
 }
+.chat-settings div.radioOff.card,
+.chat-settings div.radioOn.card {
+    display: none;
+}
+.chat-settings div.radioOn.chat {
+    width: 100%;
+    border: 1px solid var(--secondary-green);
+    border-radius: 10px;
+    height: 110px;
+    background: var(--surface-grey-1);
+}
+.chat-settings div.radioOff.chat {
+    width: 100%;
+    border: 1px solid var(--surface-grey-2);
+    border-radius: 10px;
+    height: 110px;
+    box-shadow: none;
+    background: var(--surface-grey-1);
+}
+.chat-settings div.radioOn.chat::before {
+    display: none;
+}
+.chat-settings div.radioOn.chat::after {
+    display: none;
+}
+.chat-settings div.radioOff.chat::before {
+    display: none;
+}
+.chat-settings div.radioOff.chat::after {
+    display: none;
+}

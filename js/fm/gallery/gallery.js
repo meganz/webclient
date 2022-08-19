@@ -1,26 +1,157 @@
+class GalleryNodeBlock {
+    constructor(node) {
+        this.node = node;
+        this.el = document.createElement('a');
+        this.el.className = 'data-block-view';
+        this.el.id = node.h;
+
+        this.spanEl = document.createElement('span');
+        this.spanEl.className = 'data-block-bg content-visibility-auto';
+        this.el.append(this.spanEl);
+
+        this.el.nodeBlock = this;
+        this.isRendered = false;
+
+        this.isVideo = mega.gallery.isGalleryVideo(this.node);
+    }
+
+    setThumb(dataUrl) {
+        this.spanEl.classList.add('thumb');
+        this.thumb.src = dataUrl;
+
+        if (this.el.nextSibling && this.el.nextSibling.classList.contains('gallery-block-bg-wrap')) {
+            this.el.nextSibling.querySelector('img').src = dataUrl;
+        }
+    }
+
+    fill(mode) {
+        this.el.setAttribute('title', this.node.name);
+
+        const spanMedia = document.createElement('span');
+        this.spanEl.append(spanMedia);
+        spanMedia.className = 'block-view-file-type file sprite-fm-mono';
+        this.thumb = document.createElement('img');
+        spanMedia.append(this.thumb);
+
+        if (this.isVideo) {
+            spanMedia.classList.add('icon-videos', 'video');
+            this.spanEl.classList.add('video');
+
+            const div = document.createElement('div');
+            div.className = 'video-thumb-details';
+            this.spanEl.append(div);
+
+            const spanTime = document.createElement('span');
+            spanTime.textContent = secondsToTimeShort(MediaAttribute(this.node).data.playtime);
+            div.append(spanTime);
+        }
+        else {
+            spanMedia.classList.add('icon-images', 'image');
+        }
+
+        const spanFav = document.createElement('span');
+        spanFav.className = 'data-block-fav-icon sprite-fm-mono icon-favourite-filled';
+        this.spanEl.append(spanFav);
+
+        if (mode === 'm' || mode === 'y') {
+            this.el.dataset.ts = this.node.mtime || this.node.ts;
+            this.el.dataset.date = GalleryNodeBlock.getTimeString(
+                this.node.mtime || this.node.ts,
+                mode === 'y' ? 14 : 15
+            );
+        }
+
+        this.isRendered = true;
+    }
+}
+
+GalleryNodeBlock.dateKeyCache = Object.create(null);
+GalleryNodeBlock.maxGroupChunkSize = 60;
+GalleryNodeBlock.thumbCacheSize = 500;
+
+GalleryNodeBlock.revokeThumb = (fa) => {
+    'use strict';
+
+    if (GalleryNodeBlock.thumbCache && GalleryNodeBlock.thumbCache[fa]) {
+        URL.revokeObjectURL(GalleryNodeBlock.thumbCache[fa]);
+        delete GalleryNodeBlock.thumbCache[fa];
+    }
+};
+
+GalleryNodeBlock.getTimeString = (key, format) => {
+    'use strict';
+
+    const cacheKey = key + '-' + format;
+
+    if (!GalleryNodeBlock.dateKeyCache[cacheKey]) {
+        GalleryNodeBlock.dateKeyCache[cacheKey] = time2date(key, format);
+    }
+
+    return GalleryNodeBlock.dateKeyCache[cacheKey];
+};
+
 class MegaGallery {
-
     constructor(id) {
-
         this.id = id || M.currentdirid;
         this.isDiscovery = !!id;
         this.groups = {y: {}, m: {}, d: {}, a: {}};
-        this.renderCache = {};
         this.scrollPosCache = {y: 0, m: 0, d: 0, a: 0};
+        this.lastAddedKeys = {};
         this.galleryBlock = document.getElementById('gallery-view');
         this.contentRowTemplateNode = document.getElementById('gallery-cr-template');
-        this.blockTemplateNode = document.getElementById('gallery-dbv-template');
         this.updNode = {};
-        this.type = ['photo', 'images', 'videos', 'favourites'].includes(id) ? 'basic' : 'discovery';
+        this.type = mega.gallery.sections[id] ? 'basic' : 'discovery';
         this.shouldProcessScroll = true;
         this.inPreview = false;
+
+        this.clearRenderCache();
+        this.setObserver();
     }
 
     get onpage() {
         return this.id === M.currentCustomView.nodeID;
     }
 
-    setMode(type, pushHistory) {
+    setObserver() {
+        this.nodeBlockObserver = typeof IntersectionObserver === 'undefined'
+            ? null
+            : new IntersectionObserver(
+                (entries) => MegaGallery.handleIntersect(entries, this),
+                {
+                    root: this.galleryBlock,
+                    rootMargin: '1000px',
+                    threshold: 0.1
+                }
+            );
+    }
+
+    clearRenderCache(key) {
+        if (key) {
+            if (this.renderCache[key]) {
+                delete this.renderCache[key];
+            }
+        }
+        else {
+            this.renderCache = Object.create(null);
+            MegaGallery.revokeThumbs();
+        }
+    }
+
+    getCameraHandles() {
+        if (!M.CameraId) {
+            return [];
+        }
+
+        const cameraTree = M.getTreeHandles(M.CameraId);
+
+        if (M.SecondCameraId) {
+            cameraTree.push(...M.getTreeHandles(M.SecondCameraId));
+        }
+
+        return cameraTree;
+    }
+
+    setMode(type, pushHistory, changeRootMode) {
 
         if (type !== 'a' && type !== 'y' && type !== 'm' && type !== 'd') {
 
@@ -36,6 +167,13 @@ class MegaGallery {
         this.mode = type;
         this.galleryBlock.classList.remove('gallery-type-a', 'gallery-type-y', 'gallery-type-m', 'gallery-type-d');
         this.galleryBlock.classList.add(`gallery-type-${type}`);
+
+        if (changeRootMode === true
+            && mega.gallery.sections[M.currentdirid]
+            && mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root]
+        ) {
+            mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root] = this.mode;
+        }
 
         if (type === 'a') {
             this.setZoom(this.zoom || 2);
@@ -116,13 +254,6 @@ class MegaGallery {
 
         this.galleryBlock.classList.add(`zoom-${type}`);
 
-        // Update placeholder icon size
-        const noThumbNode = this.galleryBlock.querySelectorAll('.data-block-bg:not(.thumb)');
-
-        for (let i = noThumbNode.length; i--;) {
-            noThumbNode[i].style.setProperty('--block-height', `${noThumbNode[i].offsetHeight}px`);
-        }
-
         const zoomInBtn = this.galleryBlock.querySelector('.zoom-in');
         const zoomOutBtn = this.galleryBlock.querySelector('.zoom-out');
 
@@ -138,7 +269,6 @@ class MegaGallery {
     }
 
     setGroup(n) {
-
         const res = this.getGroup(n);
 
         this.setYearGroup(res[1], n.h);
@@ -150,13 +280,18 @@ class MegaGallery {
     }
 
     getGroup(n) {
+        const timestamp = n.mtime || n.ts || Date.now() / 1000;
+        const time = new Date(timestamp * 1000);
 
-        const timestamp = n.mtime || n.ts;
+        const year = time.getFullYear();
+        const month = time.getMonth();
+        const day = time.getDate();
+
         return [
             timestamp,
-            calculateCalendar('y', timestamp).start,
-            calculateCalendar('m', timestamp).start,
-            calculateCalendar('d', timestamp).start
+            parseInt(new Date(year, 0, 1) / 1000),
+            parseInt(new Date(year, month, 1) / 1000),
+            parseInt(new Date(year, month, day) / 1000),
         ];
     }
 
@@ -172,7 +307,6 @@ class MegaGallery {
 
     // For mega dynamic list, every 2 years should be merged as 1 group.
     mergeYearGroup() {
-
         const yearKeys = Object.keys(this.groups.y);
         const newStructure = {};
 
@@ -215,7 +349,6 @@ class MegaGallery {
     }
 
     addToYearGroup(n, ts) {
-
         const sts = `${ts}`;
 
         // This is existing year in view, nice.
@@ -229,7 +362,7 @@ class MegaGallery {
 
                 if (this.dynamicList && this.mode === 'y') {
 
-                    delete this.renderCache[`y${ts}`];
+                    this.clearRenderCache(`y${ts}`);
                     this.throttledListChange(sts);
                 }
             }
@@ -247,11 +380,11 @@ class MegaGallery {
 
                     if (this.nodes[n.h] > this.nodes[this.groups.y[yearGroups[i]].n[1]]) {
 
-                        this.groups.y[yearGroups[i]].n[1] = this.nodes[n.h];
+                        this.groups.y[yearGroups[i]].n[1] = n.h;
 
                         if (this.dynamicList && this.mode === 'y') {
 
-                            delete this.renderCache[`y${ts}`];
+                            this.clearRenderCache(`y${ts}`);
                             this.throttledListChange(sts);
                         }
                     }
@@ -272,7 +405,6 @@ class MegaGallery {
     }
 
     removeFromYearGroup(h, ts) {
-
         const sts = `${ts}`;
         let removeGroup = false;
 
@@ -285,7 +417,7 @@ class MegaGallery {
             else if (h === this.groups.y[ts].n[0]) {
                 this.groups.y[ts].n[0] = this.findYearCover(ts);
 
-                delete this.renderCache[`y${ts}`];
+                this.clearRenderCache(`y${ts}`);
                 this.throttledListChange(sts);
             }
         }
@@ -302,7 +434,7 @@ class MegaGallery {
                 }
                 else if (h === this.groups.y[yearGroups[i]].n[1]) {
                     this.groups.y[yearGroups[i]].n[1] = this.findYearCover(ts);
-                    delete this.renderCache[`y${yearGroups[i]}`];
+                    this.clearRenderCache(`y${yearGroups[i]}`);
                     this.throttledListChange(yearGroups[i]);
                 }
             }
@@ -310,7 +442,6 @@ class MegaGallery {
 
         // Damn this is delete an year from view we need to build year view again.
         if (removeGroup) {
-
             this.splitYearGroup();
             delete this.groups.y[ts];
             this.mergeYearGroup();
@@ -343,8 +474,8 @@ class MegaGallery {
     rebuildDayGroup(ts) {
         delete this.groups.d[ts];
         delete this.groups.d[ts - 0.5];
-        delete this.renderCache[`d${ts}`];
-        delete this.renderCache[`d${ts - 0.5}`];
+        this.clearRenderCache(`d${ts}`);
+        this.clearRenderCache(`d${ts - 0.5}`);
 
         const {start, end} = calculateCalendar('d', ts);
         const keys = Object.keys(this.nodes);
@@ -386,7 +517,14 @@ class MegaGallery {
     setMonthGroup(key, dayTs) {
 
         this.groups.m[key] = this.groups.m[key] ||
-            {l: time2date(key, 3), ml: time2date(key, 13), c: 0, n: [], dts: {}, ldts: 0};
+            {
+                l: GalleryNodeBlock.getTimeString(key, 3),
+                ml: GalleryNodeBlock.getTimeString(key, 13),
+                c: 0,
+                n: [],
+                dts: {},
+                ldts: 0
+            };
         this.groups.m[key].c++;
         this.groups.m[key].dts[dayTs] = 1;
         this.groups.m[key].ldts = Math.max(this.groups.m[key].ldts, dayTs);
@@ -502,7 +640,7 @@ class MegaGallery {
             if (this.dynamicList && this.mode === 'm' && (group.extn !== compareGroup.extn ||
                 !group.n.every(h => compareGroup.n.includes(h)))) {
 
-                delete this.renderCache[`m${ts}`];
+                this.clearRenderCache(`m${ts}`);
                 this.throttledListChange(sts);
             }
         }
@@ -511,9 +649,9 @@ class MegaGallery {
             this.groups.m[ts] = {
                 c: 1,
                 dts: {},
-                l: time2date(ts, 3),
+                l: GalleryNodeBlock.getTimeString(ts, 3),
                 ldts: dts,
-                ml: time2date(ts, 13),
+                ml: GalleryNodeBlock.getTimeString(ts, 13),
                 n: [n.h]
             };
 
@@ -560,7 +698,7 @@ class MegaGallery {
             delete this.groups.m[ts];
 
             this.updateMonthMaxAndOrder();
-            delete this.renderCache[`m${ts}`];
+            this.clearRenderCache(`m${ts}`);
             if (this.dynamicList) {
                 this.dynamicList.remove(sts, this.onpage);
             }
@@ -572,7 +710,7 @@ class MegaGallery {
             if (!_setExtraNode(dts)) {
                 delete group.extn;
             }
-            delete this.renderCache[`m${ts}`];
+            this.clearRenderCache(`m${ts}`);
             this.throttledListChange(sts);
         }
         else {
@@ -588,7 +726,7 @@ class MegaGallery {
 
             if (group.extn !== compareGroup.extn ||
                 !compareGroup.n.every(h => group.n.includes(h))) {
-                delete this.renderCache[`m${ts}`];
+                this.clearRenderCache(`m${ts}`);
                 this.throttledListChange(sts);
             }
         }
@@ -596,7 +734,7 @@ class MegaGallery {
 
     setDayGroup(key, h) {
 
-        this.groups.d[key] = this.groups.d[key] || {l: time2date(key, 2), c: 0, n: []};
+        this.groups.d[key] = this.groups.d[key] || {l: GalleryNodeBlock.getTimeString(key, 2), c: 0, n: []};
         this.groups.d[key].c++;
 
         if (this.groups.d[key].c <= 5) {
@@ -661,22 +799,22 @@ class MegaGallery {
             }
             else if (this.groups.d[ts].c === 5) {
 
-                delete this.renderCache[`d${ts - 0.5}`];
-                delete this.renderCache[`d${ts}`];
+                this.clearRenderCache(`d${ts - 0.5}`);
+                this.clearRenderCache(`d${ts}`);
 
                 this.throttledListChange(sts1);
                 this.dynamicList.insert(sts1, sts2, this.onpage);
             }
             else if (this.groups.d[ts].c > 5) {
 
-                delete this.renderCache[`d${ts - 0.5}`];
-                delete this.renderCache[`d${ts}`];
+                this.clearRenderCache(`d${ts - 0.5}`);
+                this.clearRenderCache(`d${ts}`);
 
                 this.throttledListChange(sts1);
                 this.throttledListChange(sts2);
             }
             else {
-                delete this.renderCache[`d${ts}`];
+                this.clearRenderCache(`d${ts}`);
                 this.throttledListChange(sts1);
             }
         }
@@ -692,26 +830,41 @@ class MegaGallery {
     }
 
     // lets Chunk block by 60 to optimise performance of dom rendering
-    setAllGroup(key, h, aRecur = 0) {
+    setGroupChunk(ts) {
+        let key = '';
+        let timeLabel = '';
 
-        let extendKey = key + aRecur;
-        const timeString = aRecur ? '' : time2date(key, 3);
-
-        extendKey = extendKey.toFixed(5);
-
-        this.groups.a[extendKey] = this.groups.a[extendKey] || {l: timeString, c: 0, n: []};
-        this.groups.a[key.toFixed(5)].c++;
-
-        if (this.groups.a[extendKey].n.length < 60) {
-
-            this.groups.a[extendKey].n.push(h);
-
-            return extendKey;
+        if (!this.lastAddedKeys[ts]) {
+            key = ts.toFixed(5);
+            this.lastAddedKeys[ts] = key;
+            timeLabel = GalleryNodeBlock.getTimeString(ts, 3);
+        }
+        else if (this.groups.a[this.lastAddedKeys[ts]]
+            && this.groups.a[this.lastAddedKeys[ts]].n.length >= GalleryNodeBlock.maxGroupChunkSize) {
+            key = (parseFloat(this.lastAddedKeys[ts]) - 0.00001).toFixed(5);
+            this.lastAddedKeys[ts] = key;
+        }
+        else {
+            key = this.lastAddedKeys[ts];
         }
 
-        return this.setAllGroup(key, h, aRecur - 0.00001);
+        if (!this.groups.a[key]) {
+            this.groups.a[key] = {l: timeLabel, c: 0, n: []};
+        }
 
+        return key;
     }
+
+    setAllGroup(ts, h) {
+        // Keep this one first, as setGroupChunk creates an initial chunk as well
+        const key = this.setGroupChunk(ts);
+
+        this.groups.a[ts.toFixed(5)].c++;
+
+        this.groups.a[key].n.push(h);
+        return key;
+    }
+
 
     flatTargetAllGroup(ts) {
 
@@ -723,7 +876,9 @@ class MegaGallery {
         }
 
         const nodes = [];
-        const groupKeys = Object.keys(this.groups.a).sort().reverse();
+        const groupKeys = Object.keys(this.groups.a);
+
+        groupKeys.sort().reverse();
 
         for (let i = 0; i < groupKeys.length; i++) {
 
@@ -731,19 +886,21 @@ class MegaGallery {
 
             if (ceiledKey === ts) {
                 nodes.push(...this.groups.a[groupKeys[i]].n);
+
                 delete this.groups.a[groupKeys[i]];
-                delete this.renderCache[`a${groupKeys[i]}`];
+                this.clearRenderCache(`a${groupKeys[i]}`);
             }
             else if (ceiledKey < ts) {
                 break;
             }
         }
 
+        this.lastAddedKeys = {};
+
         return nodes;
     }
 
     addToAllGroup(n, ts) {
-
         const flatNodes = this.flatTargetAllGroup(ts);
 
         flatNodes.push(n.h);
@@ -801,22 +958,21 @@ class MegaGallery {
     }
 
     removeFromAllGroup(h, ts) {
+        if (M.d[h] && M.d[h].fa) {
+            GalleryNodeBlock.revokeThumb(M.d[h].fa);
+        }
 
-        const flatNodes = this.flatTargetAllGroup(ts);
-        const flatIndex = flatNodes.indexOf(h);
-
-        flatNodes.splice(flatIndex, 1);
+        const flatNodes = this.flatTargetAllGroup(ts).filter(nh => nh !== h);
 
         const reGrouped = {};
 
-        flatNodes.forEach(h => {
-            reGrouped[this.setAllGroup(ts, h)] = 1;
+        flatNodes.forEach(nh => {
+            reGrouped[this.setAllGroup(ts, nh)] = 1;
         });
 
         if (this.dynamicList && this.mode === 'a') {
 
             if (flatNodes.length === 0) {
-
                 this.dynamicList.remove(ts.toFixed(5), this.onpage);
 
                 return;
@@ -846,7 +1002,6 @@ class MegaGallery {
     }
 
     async addNodeToGroups(n) {
-
         if (n.fv) {
             return;
         }
@@ -875,16 +1030,17 @@ class MegaGallery {
         this.addToYearGroup(n, updatedGroup[1]);
 
         if (this.dynamicList && M.currentCustomView.original === this.id) {
-            M.v = Object.keys(this.nodes).map(h => M.d[h]);
+            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
         }
 
         M.sortByModTime(-1);
 
         delete this.updNode[n.h];
+
+        this.throttledResize();
     }
 
     removeNodeFromGroups(n) {
-
         const updatedGroup = this.getGroup(n);
 
         delete this.nodes[n.h];
@@ -897,16 +1053,17 @@ class MegaGallery {
         this.removeFromYearGroup(n.h, updatedGroup[1]);
 
         if (this.dynamicList && M.currentCustomView.original === this.id) {
-            M.v = Object.keys(this.nodes).map(h => M.d[h]);
+            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
         }
 
         M.sortByModTime(-1);
 
         if (this.dynamicList && M.v.length === 0) {
-
             this.dynamicList.destroy();
             this.dynamicList = false;
             this.galleryBlock.classList.add('hidden');
+
+            mega.gallery.showEmpty(M.currentdirid);
         }
     }
 
@@ -964,7 +1121,6 @@ class MegaGallery {
             'contentContainerClasses': 'content',
             'itemRenderFunction': this.renderGroup.bind(this),
             'itemHeightCallback': this.getGroupHeight.bind(this),
-            'onNodeInjected': this.renderThumbs.bind(this),
             'onResize': this.throttledResize.bind(this),
             'onScroll': this.throttledOnScroll.bind(this),
             'perfectScrollOptions': {
@@ -974,9 +1130,31 @@ class MegaGallery {
         });
     }
 
-    render() {
+    render(rewriteModeByRoot, reset) {
+        if (rewriteModeByRoot !== false && mega.gallery.sections[M.currentdirid]) {
+            const modeResetIsNeeded = reset === true
+                && M.currentdirid === mega.gallery.sections[M.currentdirid].root
+                && (
+                    M.currentdirid === M.previousdirid
+                    || (
+                        mega.gallery.sections[M.previousdirid]
+                        && mega.gallery.sections[M.previousdirid].root === mega.gallery.sections[M.currentdirid].root
+                    )
+                );
+
+            if (modeResetIsNeeded) {
+                this.setMode('a', 2, true);
+            }
+            else if (mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root]
+                && this.mode !== mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root]) {
+                this.setMode(mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root], 2);
+            }
+        }
 
         if (M.v.length > 0) {
+            if (mega.gallery.emptyBlock) {
+                mega.gallery.emptyBlock.hide();
+            }
 
             this.initDynamicList();
 
@@ -987,29 +1165,26 @@ class MegaGallery {
             this.dynamicList.scrollToYPosition(this.scrollPosCache[this.mode].a);
         }
         else {
-            $('.fm-right-files-block').addClass('emptied');
-            $(`.fm-empty-${this.id}`).removeClass('hidden');
+            mega.gallery.showEmpty(M.currentdirid);
             this.galleryBlock.classList.add('hidden');
         }
     }
 
     resetAndRender() {
-
         if (this.dynamicList && M.currentCustomView.original === this.id) {
-            M.v = Object.keys(this.nodes).map(h => M.d[h]);
+            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
         }
 
         M.sortByModTime(-1);
 
-        this.renderCache = {};
+        this.clearRenderCache();
+
         if (this.dynamicList) {
             this.dynamicList.destroy();
             this.dynamicList = false;
         }
 
         this.render();
-
-        onIdle(this.renderThumbs.bind(this));
     }
 
     bindEvents() {
@@ -1047,7 +1222,7 @@ class MegaGallery {
 
             targetTs = this.groups.m[targetTs].ldts;
 
-            this.setMode('d', 1);
+            this.setMode('d', 1, true);
             this.render();
 
             onIdle(() => {
@@ -1070,7 +1245,12 @@ class MegaGallery {
                 const h = $eTarget.attr('id');
                 const n = M.d[h] || {};
 
-                if (is_video(n)) {
+                if (e.currentTarget.nodeBlock.isVideo) {
+                    if (!e.currentTarget.nodeBlock.isVideo.isPreviewable || !MediaAttribute.getMediaType(n)) {
+                        M.addDownload([h]);
+                        return;
+                    }
+
                     $.autoplay = h;
                 }
 
@@ -1083,7 +1263,7 @@ class MegaGallery {
 
                 clickedDate = calculateCalendar(this.mode === 'm' ? 'd' : 'm', Math.ceil(clickedDate)).start;
 
-                this.setMode(this.mode === 'd' ? 'a' : this.mode === 'm' ? 'd' : 'm', 1);
+                this.setMode(this.mode === 'd' ? 'a' : this.mode === 'm' ? 'd' : 'm', 1, true);
                 this.render();
 
                 onIdle(() => {
@@ -1104,9 +1284,13 @@ class MegaGallery {
                         }
 
                         this.dynamicList.scrollToItem(clickedDate);
-                        const nodeOffset = this.dynamicList.listContainer.scrollTop +
-                            document.getElementById(e.currentTarget.id).offsetTop - 8;
-                        this.dynamicList.scrollToYPosition(nodeOffset);
+
+                        const scrollTarget = document.getElementById(e.currentTarget.id);
+
+                        if (scrollTarget) {
+                            const nodeOffset = this.dynamicList.listContainer.scrollTop + scrollTarget.offsetTop - 8;
+                            this.dynamicList.scrollToYPosition(nodeOffset);
+                        }
                     }
                     else {
                         this.dynamicList.scrollToItem(clickedDate);
@@ -1127,8 +1311,8 @@ class MegaGallery {
                 return false;
             }
 
-            this.setMode(e.currentTarget.attributes['data-folder'].value, 1);
-            this.render();
+            this.setMode(e.currentTarget.attributes['data-folder'].value, 1, true);
+            this.render(false);
         });
 
         $('.gallery-view-zoom-control > button', this.galleryBlock).rebind('click.galleryZoom', e => {
@@ -1173,12 +1357,10 @@ class MegaGallery {
                 }
 
                 // Clear render cache for free memory
-                this.renderCache = {};
+                this.clearRenderCache();
 
                 // Clear thumbnails to free memory if target page is not gallery anymore
                 if (M.isCustomView(tpage).type !== 'gallery') {
-
-                    this.revokeThumbs();
                     mBroadcaster.removeListener(this.beforePageChangeListener);
                     delete this.beforePageChangeListener;
 
@@ -1201,10 +1383,13 @@ class MegaGallery {
         }
 
         $(window).rebind('popstate.galleryview', e => {
+            if (mega.gallery.titleControl) {
+                mega.gallery.titleControl.hide();
+            }
 
             if (e.originalEvent.state.galleryMode && this.id === M.currentdirid) {
-                this.setMode(e.originalEvent.state.galleryMode);
-                this.render();
+                this.setMode(e.originalEvent.state.galleryMode, undefined, true);
+                this.render(false);
             }
         });
 
@@ -1226,18 +1411,15 @@ class MegaGallery {
         const a = M.d[ah] || this.updNode[ah];
         const b = M.d[bh] || this.updNode[bh];
 
-        return M.sortByModTimeFn()(a, b, -1);
+        return M.sortByModTimeFn2()(a, b, -1);
     }
 
     renderGroup(id) {
-
         if (!this.renderCache[this.mode + id]) {
 
             const group = this.getGroupById(id);
             const groupWrap = this.contentRowTemplateNode.cloneNode(true);
             const contentBlock = groupWrap.querySelector('.content-block');
-
-            contentBlock.querySelector('#gallery-dbv-template').remove();
 
             groupWrap.classList.remove('template');
             groupWrap.id = `gallery-${id}`;
@@ -1365,37 +1547,23 @@ class MegaGallery {
     }
 
     renderNode(h) {
-
-        const elm = this.blockTemplateNode.cloneNode(true);
         const node = M.d[h] || new MegaNode(this.updNode[h]);
 
         if (!node) {
             return;
         }
 
-        elm.id = h;
-        elm.setAttribute('title', node.name);
-        elm.classList.remove('template');
+        const elm = new GalleryNodeBlock(node);
 
-        if (node) {
-
-            if (is_video(node)) {
-
-                elm.querySelector('.block-view-file-type').classList.replace('image', 'video');
-                elm.querySelector('.block-view-file-type').classList.replace('icon-images', 'icon-videos');
-                elm.querySelector('.data-block-bg').classList.add('video');
-                elm.querySelector('.video-thumb-details span').textContent =
-                    secondsToTimeShort(MediaAttribute(node).data.playtime);
-            }
-
-            if (this.mode === 'm' || this.mode === 'y') {
-
-                elm.dataset.ts = node.mtime || node.ts;
-                elm.dataset.date = time2date(node.mtime || node.ts, this.mode === 'y' ? 14 : 15);
-            }
+        if (this.nodeBlockObserver) {
+            this.nodeBlockObserver.observe(elm.el, this);
+        }
+        else {
+            elm.fill(this.mode);
+            MegaGallery.addThumbnails([elm]);
         }
 
-        return elm;
+        return elm.el;
     }
 
     getBlockTop(id) {
@@ -1459,137 +1627,7 @@ class MegaGallery {
         }
     }
 
-    _fetchDom(nid) {
-
-        const noThumbNode = document.getElementById(nid);
-
-        if (noThumbNode) {
-
-            noThumbNode.querySelector('img').src = mega.gallery.thumbnails[nid];
-            noThumbNode.querySelector('.data-block-bg').classList.add('thumb');
-        }
-    }
-
-    async renderThumbs() {
-
-        const noThumbNode = this.galleryBlock.querySelectorAll('.data-block-bg:not(.thumb)');
-        const nodeList = [];
-
-        for (let i = noThumbNode.length; i--;) {
-
-            const {parentNode} = noThumbNode[i];
-            const nid = parentNode.id;
-
-            if (nid && nid !== 'gallery-dbv-template') {
-
-                // Block size for placeholder icon.
-                noThumbNode[i].style.setProperty('--block-height', `${noThumbNode[i].offsetHeight}px`);
-
-                const n = M.d[nid] || this.updNode[nid];
-
-                if (!n) {
-                    continue;
-                }
-
-                // If there is already a thumbnail for it
-                if (mega.gallery.thumbnails[nid]) {
-                    this._fetchDom(nid);
-                }
-                else if (mega.gallery.thumb_requested[n.fa]) {
-                    if (!mega.gallery.thumb_requested[n.fa].includes(nid)) {
-                        mega.gallery.thumb_requested[n.fa].push(nid);
-                    }
-                }
-                else if (String(n.fa).includes(':1*')) {
-
-                    nodeList[nid] = {fa: n.fa, k: n.k};
-                    mega.gallery.thumb_requested[n.fa] = [nid];
-                }
-            }
-        }
-
-        this.requestThumb(nodeList);
-
-        // Special blurry background for day view single layout
-        if (this.mode === 'd') {
-
-            const thumb = this.galleryBlock.querySelectorAll('.layout-1 .data-block-view img');
-
-            for (let j = thumb.length; j--;) {
-
-                thumb[j].onload = () => {
-                    thumb[j].closest('.content-block').querySelector('.gallery-block-bg').src = thumb[j].src;
-                };
-            }
-        }
-    }
-
-    requestThumb(nodeList) {
-
-        api_getfileattr(nodeList, 1, async(ctx, nid, uint8) => {
-
-            if (uint8 === 0xDEAD) {
-
-                if (d) {
-                    console.log(`Aborted preview retrieval for ${nid}`);
-                }
-
-                delete mega.gallery.thumb_requested[M.d[nid].fa];
-
-                return;
-            }
-
-            this._createThumb(nid, uint8);
-        });
-    }
-
-    async _createThumb(nid, buffer) {
-
-        if (!this.workerBranch) {
-            this.workerBranch = await webgl.worker.attach();
-        }
-
-        const blob = await webgl.getDynamicThumbnail(buffer, 515, this.workerBranch).catch(nop);
-
-        // For the case user move to another page while getting thumbnails, check page is still gallery
-        if (M.currentCustomView.type === 'gallery' && M.d[nid] && blob) {
-
-            mega.gallery.thumbnails[nid] = URL.createObjectURL(blob);
-
-            this._fetchDom(nid);
-
-            const requested = mega.gallery.thumb_requested[M.d[nid].fa];
-
-            if (requested && requested.length > 1) {
-
-                for (let i = requested.length; i--;) {
-
-                    mega.gallery.thumbnails[requested[i]] = mega.gallery.thumbnails[nid];
-
-                    this._fetchDom(requested[i]);
-                }
-            }
-        }
-
-        if (M.d[nid]) {
-            delete mega.gallery.thumb_requested[M.d[nid].fa];
-        }
-    }
-    // Temporary solution for memory leak, potentially can be removed once lru cache for this is introduced
-    revokeThumbs() {
-
-        const keys = Object.keys(mega.gallery.thumbnails);
-
-        for (let i = keys.length; i--;) {
-            URL.revokeObjectURL(mega.gallery.thumbnails[keys[i]]);
-        }
-
-        mega.gallery.thumbnails = Object.create(null);
-        mega.gallery.thumb_requested = Object.create(null);
-    }
-
     throttledResize() {
-
         delay('gallery.resizeListener', () => {
             if (this.dynamicList) {
                 this.dynamicList.itemRenderChanged(false, true);
@@ -1600,7 +1638,6 @@ class MegaGallery {
     throttledOnScroll() {
 
         delay('gallery.onScroll', () => {
-
             if (!this.shouldProcessScroll) {
                 this.shouldProcessScroll = true;
                 return;
@@ -1621,7 +1658,6 @@ class MegaGallery {
     }
 
     throttledListChange(gid) {
-
         delay(`gallery.listUpdate-${gid}`, () => {
             if (this.dynamicList) {
                 this.dynamicList.itemChanged(gid);
@@ -1633,7 +1669,7 @@ class MegaGallery {
 
         if (this.nodes) {
 
-            M.v = Object.keys(this.nodes).map(h => M.d[h]);
+            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
 
             M.sortByModTime(-1);
 
@@ -1674,19 +1710,30 @@ class MegaTargetGallery extends MegaGallery {
             return false;
         }
 
-        const h = this.id === 'photos' ? mega.gallery.cufh[0] : this.id;
-        const handles = M.getTreeHandles(h);
+        const handles = this.id === 'photos' ? this.getCameraHandles() : M.getTreeHandles(this.id);
         let subs = [];
 
         await dbfetch.geta(handles).catch(nop);
 
         for (let i = handles.length; i--;) {
+            if (!M.c[handles[i]]) {
+                console.error('Gallery cannot find handle ' + handles[i]);
+                continue;
+            }
+
             subs = subs.concat(Object.keys(M.c[handles[i]]));
         }
 
+        const rubTree = MegaGallery.handlesArrToObj(M.getTreeHandles(M.RubbishID));
+
         subs = subs.filter(h => {
             const n = M.d[h];
-            return !n.t && !this.nodes[n.h] && !n.fv && is_photo(n);
+            return !n.t
+                && !this.nodes[n.h]
+                && !rubTree[h]
+                && !rubTree[n.p]
+                && !n.fv
+                && mega.gallery.isGalleryNode(n);
         }).sort(this.sortByMtime.bind(this));
 
         for (const h of subs) {
@@ -1702,13 +1749,21 @@ class MegaTargetGallery extends MegaGallery {
     }
 
     checkGalleryUpdate(n) {
-        if (!n.t && is_photo(n)) {
+        if (!n.t && mega.gallery.isGalleryNode(n)) {
+            const cameraTree = M.getTreeHandles(this.isDiscovery ? this.id : M.CameraId);
 
-            const cameraTree = M.getTreeHandles(this.isDiscovery ? this.id : M.CameraId).includes(n.p);
-            const rubTree = M.getTreeHandles(M.RubbishID);
+            if (!this.isDiscovery && M.SecondCameraId) {
+                cameraTree.push(...M.getTreeHandles(M.SecondCameraId));
+            }
 
+            const isInCameraTree = cameraTree.includes(n.p);
+
+            // Checking if this item in rubbish bin
+            if (M.getTreeHandles(M.RubbishID).includes(n.p)) {
+                this.removeNodeFromGroups(n);
+            }
             // If it is target Camera folder and it is not in gallery view now add the node to gallery.
-            if (cameraTree && !this.nodes[n.h] && !rubTree.includes(n.p)) {
+            else if (isInCameraTree && !this.nodes[n.h]) {
                 this.addNodeToGroups(n);
             }
             // Checking if this item in rubbish bin
@@ -1716,7 +1771,7 @@ class MegaTargetGallery extends MegaGallery {
                 this.removeNodeFromGroups(n);
             }
             // If it is not target Camera folder but it is in gallery view now remove the node from gallery view.
-            else if (!cameraTree && this.nodes[n.h]) {
+            else if (!isInCameraTree && this.nodes[n.h]) {
                 this.removeNodeFromGroups(n);
             }
             // Lets check this is name update
@@ -1729,21 +1784,12 @@ class MegaTargetGallery extends MegaGallery {
 
 class MegaMediaTypeGallery extends MegaGallery {
 
-    get typeFilter() {
-
-        let func;
-
-        if (this.id === 'images') {
-            func = n => is_image3(n);
-        }
-        else if (this.id === 'videos') {
-            func = n => is_video(n) === 1;
-        }
-        else if (this.id === 'favourites') {
-            func = n => is_image3(n) || is_video(n) === 1;
+    typeFilter(n, cameraTree) {
+        if (!mega.gallery.sections[this.id]) {
+            return false;
         }
 
-        return func;
+        return mega.gallery.sections[this.id].filterFn(n, cameraTree);
     }
 
     async setView() {
@@ -1752,17 +1798,53 @@ class MegaMediaTypeGallery extends MegaGallery {
             return false;
         }
 
-        const sharesTree = M.getTreeHandles('shares');
-        const rubTree = M.getTreeHandles(M.RubbishID);
+        let nodes = [];
+        const cameraTree = this.getCameraHandles();
+        const rubTree = MegaGallery.handlesArrToObj(M.getTreeHandles(M.RubbishID));
 
-        let handles = new Set();
+        if (MegaGallery.dbActionPassed) {
+            nodes = Object.values(M.d).filter((n) =>
+                n.fa
+                && !rubTree[n.p]
+                && n.s > 0
+                && this.typeFilter(n, cameraTree)
+            );
+        }
+        else {
+            const handles = [];
+            const dbNodes = await MegaGallery.dbAction()
+                .catch(() => { // Fetching all available nodes in case of DB failure
+                    console.warn('Local DB failed. Fetching existing FM nodes.');
+                    return Object.values(M.d);
+                });
 
-        var nodes = await this.dbAction().catch(() => Object.values(M.d));
+            for (let i = 0; i < dbNodes.length; i++) {
+                const n = dbNodes[i];
 
-        nodes = nodes.filter(n => n.t < 1).sort((a, b) => M.sortByModTimeFn()(a, b, -1));
+                if (!n.fa || !n.s || rubTree[n.p]) {
+                    continue;
+                }
+
+                handles.push(n.p);
+
+                if (this.typeFilter(n, cameraTree)) {
+                    nodes.push(n);
+                    this.updNode[n.h] = n;
+                }
+            }
+
+            dbfetch.geta(handles)
+                .then(() => {
+                    MegaGallery.dbActionPassed = true;
+                    this.updNode = {};
+                })
+                .catch(nop);
+        }
+
+        // This sort is needed for building groups, do not remove
+        nodes.sort((a, b) => M.sortByModTimeFn2()(a, b, -1));
 
         if (!Array.isArray(nodes)) {
-
             if (d) {
                 console.timeEnd(`MegaGallery: ${this.id}`);
             }
@@ -1770,30 +1852,21 @@ class MegaMediaTypeGallery extends MegaGallery {
             return;
         }
 
-        for (var i = 0; i < nodes.length; i++) {
+        const sharesTree = M.getTreeHandles('shares');
 
+        for (var i = 0; i < nodes.length; i++) {
             var n = nodes[i];
 
-            if (this.nodes[n.h] || n.t || sharesTree.includes(n.p) || rubTree.includes(n.p) ||
-                (this.id === 'favourites' && !n.fav)) {
+            if (this.nodes[n.h] || n.t || sharesTree.includes(n.p) || (this.id === 'favourites' && !n.fav)) {
                 continue;
             }
 
-            if (!n.fv && this.typeFilter(n)) {
-
+            if (!n.fv) {
                 this.nodes[n.h] = this.setGroup(n)[0];
-
-                if (!M.d[n.h]) {
-                    // Lets reduce number of query by handling parent instead
-                    handles.add(n.p);
-                }
             }
         }
 
-        handles = [...handles];
-        await dbfetch.geta(handles).catch(nop);
-
-        M.v = Object.keys(this.nodes).map(h => M.d[h]);
+        M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
 
         this.mergeYearGroup();
         this.filterMonthGroup();
@@ -1801,33 +1874,15 @@ class MegaMediaTypeGallery extends MegaGallery {
         super.setViewAfter();
     }
 
-    dbAction() {
-
-        if (fmdb && fmdb.crashed !== 666) {
-
-            const sharesTree = M.getTreeHandles('shares');
-            const rubTree = M.getTreeHandles(M.RubbishID);
-
-            var options = {
-                query: db => db.where('s').noneOf(fmdb.toStore(0), fmdb.toStore(-1), fmdb.toStore(-2)),
-                include: function(row) {
-                    return !sharesTree.includes(row.p) || !rubTree.includes(row.p);
-                }
-            };
-
-            return fmdb.getbykey('f', options);
-        }
-
-        return Promise.reject();
-    }
-
     checkGalleryUpdate(n) {
+        const cameraTree = this.getCameraHandles();
 
-        if (!n.t && this.typeFilter(n)) {
-
-            const sharesTree = M.getTreeHandles('shares');
-            const rubTree = M.getTreeHandles(M.RubbishID);
-            let toGallery = !(sharesTree.includes(n.p) || rubTree.includes(n.p));
+        if (!n.t && this.typeFilter(n, cameraTree)) {
+            const ignoreHandles = MegaGallery.handlesArrToObj([
+                ...M.getTreeHandles('shares'),
+                ...M.getTreeHandles(M.RubbishID)
+            ]);
+            let toGallery = !ignoreHandles[n.p];
 
             if (this.id === 'favourites') {
                 toGallery = toGallery && n.fav;
@@ -1855,28 +1910,57 @@ class MegaMediaTypeGallery extends MegaGallery {
             // Lets check this is name update
             else if (this.onpage && this.renderCache && this.nodes[n.h]) {
                 this.updateNodeName(n);
+
+                if (mega.gallery.pendingFaBlocks[n.h] && n.fa.includes(':1*')) {
+                    MegaGallery.addThumbnails([mega.gallery.pendingFaBlocks[n.h]]);
+                    delete mega.gallery.pendingFaBlocks[n.h];
+                }
             }
         }
     }
 }
 
 mega.gallery = Object.create(null);
-mega.gallery.thumbnails = Object.create(null);
-mega.gallery.thumb_requested = Object.create(null);
 mega.gallery.nodeUpdated = false;
+mega.gallery.titleControl = null;
+mega.gallery.emptyBlock = null;
+mega.gallery.rootMode = {photos: 'a', images: 'a', videos: 'a'};
+mega.gallery.pendingFaBlocks = {};
+
+/**
+ * Same as is_image3(), additionally checking whether the node meet requirements for photo/media gallery.
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+mega.gallery.isGalleryNode = (n, ext) => {
+    'use strict';
+
+    ext = ext || fileext(n && n.name || n, true, true);
+
+    return (ext !== 'PSD' && is_image3(n, ext)) || mega.gallery.isGalleryVideo(n);
+};
+
+/**
+ * Checks whether the node is a video, plus checks if thumbnail is available
+ * @param {Object} n ufs node
+ * @returns {Object.<String, Number>?} null or object
+ */
+mega.gallery.isGalleryVideo = (n) => {
+    'use strict';
+
+    if (!n || !n.fa) {
+        return false;
+    }
+
+    const p = M.getMediaProperties(n);
+
+    return p.showThumbnail && p.icon === 'video' ? p : false;
+};
 
 mega.gallery.checkEveryGalleryUpdate = n => {
 
     'use strict';
-
-    if (n.h === M.CameraId) {
-
-        delete mega.gallery.photos;
-
-        if (M.currentCustomView.original === 'photos') {
-            return galleryUI();
-        }
-    }
 
     // If there is discovery under gallery it means user is on discovery page.
     // And if user move/delete the folder, let's just reset gallery.
@@ -1901,17 +1985,15 @@ mega.gallery.checkEveryGalleryUpdate = n => {
     if (mega.gallery.discovery) {
         mega.gallery.discovery.checkGalleryUpdate(n);
     }
-    if (mega.gallery.photos) {
-        mega.gallery.photos.checkGalleryUpdate(n);
-    }
-    if (mega.gallery.images) {
-        mega.gallery.images.checkGalleryUpdate(n);
-    }
-    if (mega.gallery.videos) {
-        mega.gallery.videos.checkGalleryUpdate(n);
-    }
-    if (mega.gallery.favourites) {
-        mega.gallery.favourites.checkGalleryUpdate(n);
+
+    const sectionKeys = Object.keys(mega.gallery.sections);
+
+    for (let i = 0; i < sectionKeys.length; i++) {
+        const key = sectionKeys[i];
+
+        if (mega.gallery[key]) {
+            mega.gallery[key].checkGalleryUpdate(n);
+        }
     }
 };
 
@@ -1922,17 +2004,15 @@ mega.gallery.checkEveryGalleryDelete = h => {
     if (mega.gallery.discovery) {
         mega.gallery.discovery.removeNodeByHandle(h);
     }
-    if (mega.gallery.photos) {
-        mega.gallery.photos.removeNodeByHandle(h);
-    }
-    if (mega.gallery.images) {
-        mega.gallery.images.removeNodeByHandle(h);
-    }
-    if (mega.gallery.videos) {
-        mega.gallery.videos.removeNodeByHandle(h);
-    }
-    if (mega.gallery.favourites) {
-        mega.gallery.favourites.removeNodeByHandle(h);
+
+    const sectionKeys = Object.keys(mega.gallery.sections);
+
+    for (let i = 0; i < sectionKeys.length; i++) {
+        const key = sectionKeys[i];
+
+        if (mega.gallery[key]) {
+            mega.gallery[key].removeNodeByHandle(h);
+        }
     }
 };
 
@@ -1940,20 +2020,51 @@ mega.gallery.resetAll = () => {
 
     'use strict';
 
-    mega.gallery.modeBeforeReset = {
-        photos: mega.gallery.photos && mega.gallery.photos.mode,
-        images: mega.gallery.images && mega.gallery.images.mode,
-        videos: mega.gallery.videos && mega.gallery.videos.mode,
-        favourites: mega.gallery.favourites && mega.gallery.favourites.mode,
-    };
+    mega.gallery.modeBeforeReset = {};
 
-    delete mega.gallery.photos;
-    delete mega.gallery.images;
-    delete mega.gallery.videos;
     delete mega.gallery.discovery;
-    delete mega.gallery.favourites;
+
+    const sectionKeys = Object.keys(mega.gallery.sections);
+
+    for (let i = 0; i < sectionKeys.length; i++) {
+        const key = sectionKeys[i];
+
+        mega.gallery.modeBeforeReset[key] = mega.gallery[key] && mega.gallery[key].mode;
+
+        if (mega.gallery[key]) {
+            delete mega.gallery[key];
+        }
+    }
 
     mega.gallery.nodeUpdated = false;
+};
+
+mega.gallery.secKeys = {
+    cuphotos: 'camera-uploads-photos',
+    cdphotos: 'cloud-drive-photos',
+    cuimages: 'camera-uploads-images',
+    cdimages: 'cloud-drive-images',
+    cuvideos: 'camera-uploads-videos',
+    cdvideos: 'cloud-drive-videos'
+};
+
+mega.gallery.showEmpty = (type) => {
+    'use strict';
+
+    if (!mega.gallery.emptyBlock) {
+        mega.gallery.emptyBlock = new GalleryEmptyBlock('.fm-main.default > .fm-right-files-block');
+    }
+
+    mega.gallery.emptyBlock.type = type;
+    mega.gallery.emptyBlock.show();
+};
+
+mega.gallery.hideEmpty = () => {
+    'use strict';
+
+    if (mega.gallery.emptyBlock) {
+        mega.gallery.emptyBlock.hide();
+    }
 };
 
 async function galleryUI(id) {
@@ -1966,15 +2077,16 @@ async function galleryUI(id) {
         mega.gallery.resetAll();
     }
 
-    let title = l[`gallery_${M.currentdirid}`];
-    let icon = M.currentdirid;
     let gallery = mega.gallery[M.currentdirid];
 
     const $closeDiscovery = $('.gallery-close-discovery').addClass('hidden');
 
+    if (!mega.gallery.titleControl) {
+        mega.gallery.titleControl = new GalleryTitleControl('.gallery-tabs-bl .gallery-section-title');
+    }
+
     // This is media discovery
     if (id) {
-
         if (!M.getNodeByHandle(id) || M.getNodeRoot(id) === M.RubbishID) {
 
             M.openFolder(M.RootID);
@@ -1982,52 +2094,26 @@ async function galleryUI(id) {
             return loadingDialog.hide('MegaGallery');
         }
 
-        title = escapeHTML(M.d[id].name);
-        icon = 'photos';
+        mega.gallery.titleControl.title = M.d[id].name;
+        mega.gallery.titleControl.icon = 'images';
+        mega.gallery.titleControl.isClickable = false;
         gallery = mega.gallery.discovery;
 
         $closeDiscovery.removeClass('hidden');
     }
-
-    if (M.currentdirid === 'favourites') {
-        icon = 'favourite-filled';
+    else {
+        mega.gallery.titleControl.filterSection = M.currentdirid;
+        mega.gallery.titleControl.title = mega.gallery.sections[M.currentdirid].title;
+        mega.gallery.titleControl.icon = mega.gallery.sections[M.currentdirid].icon;
     }
 
-    $('.gallery-tabs-bl .gallery-section-title')
-        .safeHTML(`<i class="sprite-fm-mono icon-${icon}"></i>${title}`);
-
-
     if (!gallery) {
+        await M.getCameraUploads().catch(nop);
 
         if (id !== undefined) {
             gallery = mega.gallery.discovery = new MegaTargetGallery(id);
         }
-        else if (M.currentdirid === 'photos') {
-
-            mega.gallery.cufh = await M.getCameraUploads().catch(nop);
-
-            // If camera folder is not set do not render photo
-            if (!mega.gallery.cufh) {
-
-                loadingDialog.hide('MegaGallery');
-
-                return;
-            }
-
-            // If Camera folder is under deep tree.
-            await Promise.resolve(dbfetch.get(mega.gallery.cufh[0])).catch(nop);
-
-            // If camera folder is not exist anymore or in rubbish bin do not render photo
-            if (!M.getNodeByHandle(mega.gallery.cufh) || M.getNodeRoot(M.CameraId) === M.RubbishID) {
-
-                loadingDialog.hide('MegaGallery');
-
-                return;
-            }
-
-            gallery = mega.gallery.photos = new MegaTargetGallery();
-        }
-        else if (M.currentdirid === 'images' || M.currentdirid === 'videos' || M.currentdirid === 'favourites'){
+        else if (mega.gallery.sections[M.currentdirid]) {
             gallery = mega.gallery[M.currentdirid] = new MegaMediaTypeGallery();
         }
     }
@@ -2052,7 +2138,7 @@ async function galleryUI(id) {
         }
 
         gallery.setMode(gallery.mode || 'a', 2);
-        gallery.render();
+        gallery.render(true, true);
         gallery.bindEvents();
 
         M.viewmode = 1;
@@ -2063,3 +2149,254 @@ async function galleryUI(id) {
         loadingDialog.hide('MegaGallery');
     });
 }
+
+MegaGallery.addThumbnails = (nodeBlocks) => {
+    'use strict';
+
+    if (!GalleryNodeBlock.thumbCache) {
+        GalleryNodeBlock.thumbCache = Object.create(null);
+    }
+
+    const faKeys = [{}, {}];
+    const blocks = {};
+
+    for (let i = 0; i < nodeBlocks.length; i++) {
+        const {h, fa} = nodeBlocks[i].node;
+        let type = 1; // Default type for fetch is 1
+
+        // In case fa is not arrived yet, placing the node to the buffer
+        if (!fa) {
+            mega.gallery.pendingFaBlocks[h] = nodeBlocks[i];
+            continue;
+        }
+
+        if (!String(fa).includes(':1*')) {
+            type = 0; // Thumbnail is applying as a fallback when there is no preview available
+        }
+
+        if (GalleryNodeBlock.thumbCache[fa]) {
+            nodeBlocks[i].setThumb(GalleryNodeBlock.thumbCache[fa]);
+        }
+        else {
+            faKeys[type][fa] = nodeBlocks[i].node;
+
+            if (blocks[fa]) {
+                blocks[fa].push(nodeBlocks[i]);
+            }
+            else {
+                blocks[fa] = [nodeBlocks[i]];
+            }
+        }
+    }
+
+    faKeys.forEach((fk, type) => {
+        api_getfileattr(
+            fk,
+            type,
+            async(ctx, nodeFa, uint8) => {
+                // The image has been applied already
+                if (!blocks[nodeFa]) {
+                    return;
+                }
+
+                // Applying the cached image to the whole group
+                if (GalleryNodeBlock.thumbCache[nodeFa]) {
+                    for (let i = 0; i < blocks[nodeFa].length; i++) {
+                        blocks[nodeFa][i].setThumb(GalleryNodeBlock.thumbCache[nodeFa]);
+                    }
+
+                    delete blocks[nodeFa];
+                    return;
+                }
+
+                if (uint8 === 0xDEAD) {
+                    if (d) {
+                        console.log(`Aborted preview retrieval for ${nid}`);
+                    }
+
+                    return;
+                }
+
+                if (!MegaGallery.workerBranch) {
+                    MegaGallery.workerBranch = await webgl.worker.attach();
+                }
+
+                const blob = (type === 1)
+                    ? await webgl.getDynamicThumbnail(uint8, 515, MegaGallery.workerBranch).catch(nop)
+                    : new Blob([uint8]);
+
+                if (M.currentCustomView.type === 'gallery' && blob) {
+                    const url = URL.createObjectURL(blob);
+
+                    if (blocks[nodeFa]) {
+                        for (let i = 0; i < blocks[nodeFa].length; i++) {
+                            blocks[nodeFa][i].setThumb(url);
+                        }
+
+                        delete blocks[nodeFa];
+                    }
+
+                    if (!GalleryNodeBlock.thumbCache[nodeFa]) {
+                        GalleryNodeBlock.thumbCache[nodeFa] = url;
+
+                        const cachedKeys = Object.keys(GalleryNodeBlock.thumbCache);
+
+                        if (cachedKeys.length > GalleryNodeBlock.thumbCacheSize) {
+                            GalleryNodeBlock.revokeThumb(cachedKeys[0]);
+                        }
+                    }
+                }
+                else {
+                    delete blocks[nodeFa];
+                }
+            }
+        );
+    });
+};
+
+MegaGallery.revokeThumbs = () => {
+    'use strict';
+
+    if (!GalleryNodeBlock.thumbCache) {
+        return;
+    }
+
+    const keys = Object.keys(GalleryNodeBlock.thumbCache);
+
+    for (let i = 0; i < keys.length; i++) {
+        URL.revokeObjectURL(GalleryNodeBlock.thumbCache[keys[i]]);
+    }
+
+    GalleryNodeBlock.thumbCache = Object.create(null);
+};
+
+MegaGallery.handleIntersect = (entries, gallery) => {
+    'use strict';
+
+    const toFetchAttributes = [];
+
+    for (let i = 0; i < entries.length; i++) {
+        const entry = entries[i];
+
+        if (entry.isIntersecting && !entry.target.nodeBlock.isRendered) {
+            entry.target.nodeBlock.fill(gallery.mode);
+            toFetchAttributes.push(entry.target.nodeBlock);
+        }
+    }
+
+    if (toFetchAttributes.length) {
+        MegaGallery.addThumbnails(toFetchAttributes);
+    }
+};
+
+MegaGallery.dbAction = () => {
+    'use strict';
+
+    if (fmdb && fmdb.db !== null && fmdb.crashed !== 666) {
+        const ignoreHandles = MegaGallery.handlesArrToObj([
+            ...M.getTreeHandles('shares'),
+            ...M.getTreeHandles(M.RubbishID)
+        ]);
+
+        return fmdb.getbykey(
+            'f',
+            {
+                query: db => db.where('fa').notEqual(fmdb.toStore('')),
+                include: ({p}) => !ignoreHandles[p]
+            }
+        );
+    }
+
+    return Promise.reject();
+};
+
+MegaGallery.handlesArrToObj = (array) => {
+    'use strict';
+
+    const obj = Object.create(null);
+
+    for (let i = 0; i < array.length; i++) {
+        obj[array[i]] = true;
+    }
+
+    return obj;
+};
+
+lazy(mega.gallery, 'sections', () => {
+    'use strict';
+
+    return {
+        photos: {
+            path: 'photos',
+            icon: 'photos',
+            root: 'photos',
+            filterFn: n => mega.gallery.isGalleryNode(n),
+            title: l.gallery_all_locations
+        },
+        [mega.gallery.secKeys.cuphotos]: {
+            path: mega.gallery.secKeys.cuphotos,
+            icon: 'photos',
+            root: 'photos',
+            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p)
+                && (is_image3(n) || mega.gallery.isGalleryVideo(n)),
+            title: l.gallery_camera_uploads
+        },
+        [mega.gallery.secKeys.cdphotos]: {
+            path: mega.gallery.secKeys.cdphotos,
+            icon: 'photos',
+            root: 'photos',
+            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p))
+                && (is_image3(n) || mega.gallery.isGalleryVideo(n)),
+            title: l.gallery_from_cloud_drive
+        },
+        images: {
+            path: 'images',
+            icon: 'images',
+            root: 'images',
+            filterFn: n => is_image3(n),
+            title: l.gallery_all_locations
+        },
+        [mega.gallery.secKeys.cuimages]: {
+            path: mega.gallery.secKeys.cuimages,
+            icon: 'images',
+            root: 'images',
+            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && is_image3(n),
+            title: l.gallery_camera_uploads
+        },
+        [mega.gallery.secKeys.cdimages]: {
+            path: mega.gallery.secKeys.cdimages,
+            icon: 'images',
+            root: 'images',
+            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && is_image3(n),
+            title: l.gallery_from_cloud_drive
+        },
+        videos: {
+            path: 'videos',
+            icon: 'videos',
+            root: 'videos',
+            filterFn: n => mega.gallery.isGalleryVideo(n),
+            title: l.gallery_all_locations
+        },
+        [mega.gallery.secKeys.cuvideos]: {
+            path: mega.gallery.secKeys.cuvideos,
+            icon: 'videos',
+            root: 'videos',
+            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && mega.gallery.isGalleryVideo(n),
+            title: l.gallery_camera_uploads
+        },
+        [mega.gallery.secKeys.cdvideos]: {
+            path: mega.gallery.secKeys.cdvideos,
+            icon: 'videos',
+            root: 'videos',
+            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && mega.gallery.isGalleryVideo(n),
+            title: l.gallery_from_cloud_drive
+        },
+        favourites: {
+            path: 'favourites',
+            icon: 'favourite-filled',
+            root: 'favourites',
+            filterFn: n => is_image3(n) || mega.gallery.isGalleryVideo(n),
+            title: l.gallery_favourites
+        }
+    };
+});

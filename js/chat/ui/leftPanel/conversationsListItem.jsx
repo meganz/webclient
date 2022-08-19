@@ -94,13 +94,14 @@ export default class ConversationsListItem extends MegaRenderMixin {
         var contactId;
         var presenceClass;
         var id;
+        let contact;
 
         if (chatRoom.type === "private") {
             const handle = chatRoom.getParticipantsExceptMe()[0];
             if (!handle || !(handle in M.u)) {
                 return null;
             }
-            const contact = M.u[handle];
+            contact = M.u[handle];
             id = 'conversation_' + htmlentities(contact.u);
 
             presenceClass = chatRoom.megaChat.userPresenceToCssClass(
@@ -144,9 +145,11 @@ export default class ConversationsListItem extends MegaRenderMixin {
 
 
         var lastMessageDiv = null;
+        const showHideMsg  = mega.config.get('showHideChat');
 
-        var lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
+        var lastMessage = showHideMsg ? '' : chatRoom.messagesBuff.getLatestTextMessage();
         var lastMsgDivClasses;
+
         if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
             lastMsgDivClasses = this._lastMsgDivClassesCache;
             lastMessageDiv = this._lastMessageDivCache;
@@ -207,13 +210,10 @@ export default class ConversationsListItem extends MegaRenderMixin {
              * 2. I'm retrieving history at the moment.
              * 3. I'd connected to chatd and joined the room.
              */
-
-            const emptyMessage = this.loadingShown ? l[7006] : l[8000];
-
-            lastMessageDiv =
+            lastMessageDiv = showHideMsg ? '' :
                 <div>
                     <div className={lastMsgDivClasses}>
-                        {emptyMessage}
+                        {this.loadingShown ? l[7006] : l[8000]}
                     </div>
                 </div>;
         }
@@ -262,7 +262,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
                             />
                         </div>
                     }
-                    {chatRoom.type === 'private' && <Avatar contact={chatRoom.getParticipantsExceptMe()[0]} />}
+                    {chatRoom.type === 'private' && contact && <Avatar contact={contact} />}
                 </div>
                 <div className="conversation-data">
                     <div className="conversation-data-top">
@@ -274,18 +274,20 @@ export default class ConversationsListItem extends MegaRenderMixin {
                             {(chatRoom.type === "group" || chatRoom.type === "private") &&
                                 <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} />}
                         </div>
-                        <div className="date-time">{this.getConversationTimestamp()}</div>
                     </div>
                     <div className="clear" />
                     <div className="conversation-message-info">
                         {lastMessageDiv}
-                        {notificationItems.length > 0 ?
+                    </div>
+                </div>
+                <div className='date-time-wrapper'>
+                    <div className="date-time">{this.getConversationTimestamp()}</div>
+                    {notificationItems.length > 0 ?
                             <div className="unread-messages-container">
                                 <div className={`unread-messages items-${notificationItems.length}`}>
                                     {notificationItems}
                                 </div>
                             </div> : null}
-                    </div>
                 </div>
             </li>
         );

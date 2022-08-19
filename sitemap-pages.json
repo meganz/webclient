@@ -40,7 +40,6 @@
         ["cmd"],
         ["extensions", "chrome", "firefox", "edge"],
         ["nas"],
-        ["help"],
         ["about/main"],
         ["uwp"],
         ["about"],

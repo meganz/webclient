@@ -1190,3 +1190,54 @@
     text-decoration: underline;
 }
 
+/* Settings page > Contacts & chats > Chat Settings */
+.chat-settings .show-hide-wrap {
+    display: flex;
+    width: 100%;
+}
+.chat-settings .chat-show-wrapper {
+    padding: 16px 16px 0 0;
+    width: 100%;
+}
+.chat-settings .chat-hide-wrapper {
+    padding: 16px 0 0;
+    width: 100%;
+}
+.chat-settings .account-chat-avatar {
+    border-radius: 2px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    text-align: center;
+    box-sizing: border-box;
+    line-height: 32px;
+    font-family: var(--text-body1);
+    font-style: normal;
+    font-weight: 400;
+    color: #FFF;
+    display: inline;
+}
+.chat-settings .chat-row {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    gap: 8px;
+    height: 40px;
+}
+.chat-settings .chat-txt {
+    font: var(--text-body2);
+    font-size: 12px;
+    color: var(--text-color-medium);
+}
+.chat-settings .checked.chat-selected {
+    display: inline;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: #00BFA5;
+    width: 16px;
+    height: 16px;
+}
+.chat-settings .chat-selected {
+    display: none;
+}

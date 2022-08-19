@@ -685,7 +685,7 @@ mobile.cloud = {
                 if (isVideo) {
                     $.autoplay = nodeHandle;
                 }
-                mobile.slideshow.init(nodeHandle);
+                slideshow(nodeHandle);
             }
             else {
                 // Otherwise show the download overlay immediately

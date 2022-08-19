@@ -143,40 +143,44 @@ export class ContactButton extends ContactAwareComponent {
 
             if (megaChat.currentlyOpenedChat && megaChat.currentlyOpenedChat === contact.u) {
                 moreDropdowns.push(
-                    <DropdownItem
-                        key="startCall"
-                        className="sprite-fm-mono-before icon-arrow-right-before"
-                        icon="sprite-fm-mono icon-phone"
-                        submenu={true}
-                        label={l[19125]} /* `Start Call...` */
-                        onClick={startAudioCall}
-                    />
-                );
-                moreDropdowns.push(
-                    <div className="dropdown body submenu" key="dropdownGroup">
-                        <div>
-                            <DropdownItem
-                                key="startAudio"
-                                icon="sprite-fm-mono icon-phone"
-                                disabled={!megaChat.hasSupportForCalls}
-                                label={l[1565]} /* `Audio` */
-                                onClick={startAudioCall}
-                            />
-                        </div>
-                        <div>
-                            <DropdownItem
-                                key="startVideo"
-                                icon="sprite-fm-mono icon-video-call-filled"
-                                disabled={!megaChat.hasSupportForCalls}
-                                label={l[1566]} /* `Video` */
-                                onClick={() => {
-                                    megaChat.createAndShowPrivateRoom(contact.u)
-                                        .then(room => {
-                                            room.setActive();
-                                            room.startVideoCall();
-                                        });
-                                }}
-                            />
+                    <div
+                        key="startAudioVideoCall"
+                        data-simpletipposition='top'
+                        className='simpletip'
+                        data-simpletip={!megaChat.hasSupportForCalls ? l.call_not_suported : ''}>
+                        <DropdownItem
+                            disabled={!megaChat.hasSupportForCalls}
+                            key="startCall"
+                            className="sprite-fm-mono-before icon-arrow-right-before"
+                            icon="sprite-fm-mono icon-phone"
+                            submenu={megaChat.hasSupportForCalls}
+                            label={l[19125]} /* `Start Call...` */
+                        />
+                        <div className="dropdown body submenu" key="dropdownGroup">
+                            <div>
+                                <DropdownItem
+                                    key="startAudio"
+                                    icon="sprite-fm-mono icon-phone"
+                                    disabled={!megaChat.hasSupportForCalls}
+                                    label={l[1565]} /* `Audio` */
+                                    onClick={startAudioCall}
+                                />
+                            </div>
+                            <div>
+                                <DropdownItem
+                                    key="startVideo"
+                                    icon="sprite-fm-mono icon-video-call-filled"
+                                    disabled={!megaChat.hasSupportForCalls}
+                                    label={l[1566]} /* `Video` */
+                                    onClick={() => {
+                                        megaChat.createAndShowPrivateRoom(contact.u)
+                                            .then(room => {
+                                                room.setActive();
+                                                room.startVideoCall();
+                                            });
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
                 );

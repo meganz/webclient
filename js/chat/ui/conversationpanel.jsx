@@ -243,7 +243,11 @@ export class ConversationRightArea extends MegaRenderMixin {
         if (startAudioCallButton !== null) {
             startAudioCallButton =
                 <div
-                    className={`link-button light ${startCallButtonClass}`}
+                    data-simpletip={`${l.unsupported_browser_audio}`}
+                    data-simpletipposition="top"
+                    data-simpletipoffset="7"
+                    className={`${!megaChat.hasSupportForCalls ? 'simpletip' : ''} 
+                        link-button light ${startCallButtonClass}`}
                     onClick={() => onStartCall(Call.TYPE.AUDIO)}>
                     <i className="sprite-fm-mono icon-phone" />
                     <span>{l[5896] /* `Start Audio Call` */}</span>
@@ -252,7 +256,11 @@ export class ConversationRightArea extends MegaRenderMixin {
         if (startVideoCallButton !== null) {
             startVideoCallButton =
                 <div
-                    className={`link-button light ${startCallButtonClass}`}
+                    data-simpletip={`${l.unsupported_browser_video}`}
+                    data-simpletipposition="top"
+                    data-simpletipoffset="7"
+                    className={`${!megaChat.hasSupportForCalls ? 'simpletip' : ''} 
+                        link-button light ${startCallButtonClass}`}
                     onClick={() => onStartCall(Call.TYPE.VIDEO)}>
                     <i className="sprite-fm-mono icon-video-call-filled"/>
                     <span>{l[5897] /* `Start Video Call` */}</span>
@@ -1808,36 +1816,44 @@ export class ConversationPanel extends MegaRenderMixin {
                                 disableCheckingVisibility={true}
                                 icon="sprite-fm-mono icon-info-filled"
                                 onClick={() => room.megaChat.toggleUIFlag('convPanelCollapse')} />
-                            <Button
+                            <div data-simpletip={`${l.unsupported_browser_video}`}
+                                data-simpletipposition="top"
+                                data-simpletipoffset="5"
                                 className={`
-                                    button
+                                    ${!megaChat.hasSupportForCalls ? 'simpletip' : ''}
                                     right
                                     ${startCallDisabled ? 'disabled' : ''}
-                                `}
-                                icon="sprite-fm-mono icon-video-call-filled"
-                                onClick={() =>
-                                    startCallDisabled ?
-                                        false :
-                                        inProgressAlert()
-                                            .then(() => this.startCall(Call.TYPE.VIDEO))
-                                            .catch(() => d && console.warn('Already in a call.'))
-                                }
-                            />
-                            <Button
+                                `}>
+                                <Button
+                                    icon="sprite-fm-mono icon-video-call-filled"
+                                    onClick={() =>
+                                        startCallDisabled ?
+                                            false :
+                                            inProgressAlert()
+                                                .then(() => this.startCall(Call.TYPE.VIDEO))
+                                                .catch(() => d && console.warn('Already in a call.'))
+                                    }
+                                />
+                            </div>
+                            <div data-simpletip={`${l.unsupported_browser_audio}`}
+                                data-simpletipposition="top"
+                                data-simpletipoffset="5"
                                 className={`
-                                    button
+                                    ${!megaChat.hasSupportForCalls ? 'simpletip' : ''}
                                     right
                                     ${startCallDisabled ? 'disabled' : ''}
-                                `}
-                                icon="sprite-fm-mono icon-phone"
-                                onClick={() =>
-                                    startCallDisabled ?
-                                        false :
-                                        inProgressAlert()
-                                            .then(() => this.startCall(Call.TYPE.AUDIO))
-                                            .catch(() => d && console.warn('Already in a call.'))
-                                }
-                            />
+                                `}>
+                                <Button
+                                    icon="sprite-fm-mono icon-phone"
+                                    onClick={() =>
+                                        startCallDisabled ?
+                                            false :
+                                            inProgressAlert()
+                                                .then(() => this.startCall(Call.TYPE.AUDIO))
+                                                .catch(() => d && console.warn('Already in a call.'))
+                                    }
+                                />
+                            </div>
                         </div>
                         {topicInfo}
                     </div>

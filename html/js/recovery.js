@@ -55,7 +55,7 @@ function AccountRecoveryControl() {
         }
     });
     $('.content-highlight-block', this.$recoveryContents).rebind('click', function () {
-        window.open("https://mega.nz/help");
+        window.open(l.mega_help_host, '_blank', 'noopener,noreferrer');
     });
 
     if ($.prefillEmail) {

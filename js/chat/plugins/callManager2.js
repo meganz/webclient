@@ -417,8 +417,8 @@
             }
             this.av = this.sfuApp.sfuClient.availAv;
         }
-        onLocalMediaError(errAv) {
-            this.chatRoom.trigger('onLocalMediaError', errAv);
+        onLocalMediaError(errObj) {
+            this.chatRoom.trigger('onLocalMediaError', errObj);
         }
         toggleAudio(mute) {
             this.sfuApp.sfuClient.muteAudio(!this.sfuApp.sfuClient.localAudioMuted());
@@ -481,6 +481,7 @@
                 delete this.callToutId;
             }
             if (!leaveCallActive) {
+                eventlog(99762, JSON.stringify([this.callId]));
                 this.chatRoom.trigger('onCallLeft', { callId: this.callId });
             }
         }
@@ -966,7 +967,7 @@
 
         var result = false;
         var meta = msgInstance.meta;
-        var authorContact = M.u[meta.userId];
+        var authorContact = M.u[meta.userId] || {};
         var delay = msgInstance.delay;
         if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CALL_ENDED) {
             var msgId;

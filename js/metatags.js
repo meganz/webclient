@@ -598,53 +598,6 @@ mega.metatags = new function() {
             mTags.mega_title = l.support_meta_tag || mTags.en_title;
             mTags.mega_desc = l[516] || mTags.en_desc;
         }
-        else if (page === 'help') {
-            mTags.en_title = 'Help - MEGA';
-            mTags.en_desc = 'MEGA\'s Help Centre';
-            mTags.mega_title = l[24021] || mTags.en_title;
-            mTags.mega_desc = l[24022] || mTags.en_desc;
-        }
-        else if (page.substr(0, 11) === 'help/search') {
-            var term = ucFirst(page.substr(12)).replace(/\+/g, ' ');
-            mTags.en_title = term + ' - Search Help - MEGA';
-            mTags.en_desc = 'MEGA\'s Search - Help Centre - ' + term;
-            mTags.mega_title = l[24033].replace('$1', term).replace('$2', l[102]);
-            mTags.mega_desc = l[24034].replace('$1', l[102]).replace('$2', term);
-            mTags.section = 'help';
-        }
-        else if (page.indexOf('help/') > -1 && page.length > 5) {
-            var linkParts = page.split('/');
-            if (linkParts.length <= 2 || linkParts.length > 4) {
-                stopBots(metaRobots);
-            }
-            else if (linkParts.length === 3) {
-                var sectionTitle = (linkParts[2].charAt(0).toUpperCase() + linkParts[2].slice(1)).replace(/-/g, ' ');
-                mTags.en_title = sectionTitle + ' Help - MEGA';
-                mTags.en_desc = 'MEGA\'s ' + sectionTitle + ' Help Centre';
-                mTags.mega_title = (l[24027] ? l[24027].replace('$1', sectionTitle) : '') || mTags.en_title;
-                mTags.mega_desc = (l[24028] ? l[24028].replace('$1', sectionTitle) : '') || mTags.en_desc;
-            }
-            else if (linkParts.length === 4) {
-                var secTitle = (linkParts[2].charAt(0).toUpperCase() + linkParts[2].slice(1)).replace(/-/g, ' ');
-                var articleTitle = linkParts[3].charAt(0).toUpperCase() + linkParts[3].slice(1);
-                var hashPos = articleTitle.lastIndexOf('#');
-                if (hashPos > 0) {
-                    articleTitle = articleTitle.substring(0, hashPos);
-                }
-                articleTitle = articleTitle.replace(/-/g, ' ');
-                mTags.en_title = articleTitle + ' - ' + secTitle + ' Help - MEGA';
-                mTags.en_desc = 'MEGA\'s ' + secTitle + ' - Help Centre - ' + articleTitle;
-                mTags.mega_title = (l[24033] ? l[24033].replace('$1', articleTitle).replace('$2', secTitle) : '') ||
-                    mTags.en_title;
-                mTags.mega_desc = (l[24034] ? l[24034].replace('$1', secTitle).replace('$2', articleTitle) : '') ||
-                    mTags.en_desc;
-            }
-            else {
-                stopBots(metaRobots);
-            }
-
-            mTags.section = 'help';
-        }
         else if (page === 'start') {
             mTags.en_title = 'The Most Trusted, Best-Protected Cloud Storage - MEGA';
             mTags.en_desc = 'MEGA understands the importance of keeping data and conversations private. We provide ' +

@@ -168,6 +168,21 @@ MegaData.prototype.sortByModTimeFn = () => {
     };
 };
 
+MegaData.prototype.sortByModTimeFn2 = () => {
+    'use strict';
+
+    return (a, b, d) => {
+        const timeA = a.mtime || a.ts || 0;
+        const timeB = b.mtime || b.ts || 0;
+
+        if (timeA && timeB && timeA !== timeB) {
+            return timeA < timeB ? -d : d;
+        }
+
+        return M.doFallbackSortWithName(a, b, d);
+    };
+};
+
 MegaData.prototype.sortByDateTime = function(d) {
     this.sortfn = this.getSortByDateTimeFn();
     this.sortd = d;

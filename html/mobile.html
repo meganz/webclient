@@ -732,72 +732,254 @@
 </div>
 
 <!-- Photo preview overlay !-->
-<div class="mobile main-block slideshow-image-previewer hidden">
-    <div class="mobile content-row">
-        <div class="mobile content-cell">
-            <div class="mobile bottom-page scroll-block download" id="mobile-gallery-video-block">
-                <div class="mobile slideshow-wrapper">
-                    <div class="mobile slide-show-navigation">
-                        <div class="mobile viewer-pending">
-                            <div class="bounce1"></div>
-                            <div class="bounce2"></div>
-                            <div class="bounce3"></div>
-                        </div>
-                        <div class="mobile slideshow-back-arrow"></div>
-                        <div class="mobile slideshow-forward-arrow"></div>
+<div class="mobile main-block slideshow-image-previewer media-viewer-container hidden">
+    <div class="media-viewer">
+        <header>
+            <nav class="viewer-bars">
+                <ul class="bar">
+                     <li>
+                        <button class="v-btn close" aria-label="[$148]">
+                            <i class="sprite-fm-mono  icon-dialog-close"></i>
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="file-info">
+                    <div class="file-name"></div>
+                    <div class="counter">
+                        <span class="first">0</span>
+                        <span class="mid">[$5528]</span>
+                        <span class="last">0</span>
                     </div>
-                    <div class="mobile slideshow-header">
-                        <div class="mobile fm-dialog-close"></div>
-                        <div class="mobile slideshow-text-right-block">
-                            <div class="mobile slideshow-file-name"></div>
-                            <div class="mobile slideshow-file-number-and-total"></div>
-                        </div>
+                </div>
+            </nav>
+
+            <template id="media-viewer-options-menu">
+                <nav class="context-menu open-vertical options-menu avoid-bottom" aria-expanded="false">
+                    <ul>
+                        <li>
+                            <button class="info">
+                                <i class="sprite-fm-mono icon-info"></i>
+                                <span>[$6859]</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="favourite">
+                                <!-- Active state: .icon-favourite-removed !-->
+                                <i class="sprite-fm-mono icon-favourite"></i>
+                                <span>[$5871]</span>
+                            </button>
+                        </li>
+                        <li class="divider">
+                            <hr/>
+                        </li>
+                        <li>
+                            <button class="remove">
+                                <i class="sprite-fm-mono icon-bin"></i>
+                                <span>[$83]</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </template>
+        </header>
+
+        <section class="content" data-fullscreen="false" id="videoContainer">
+
+            <div class="img-wrap" data-count="">
+                <img alt="" class="img1" />
+                <img alt="" class="img2" />
+            </div>
+
+            <div class="video-block">
+                <video id="mobile-video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
+            </div>
+
+            <button class="gallery-btn previous" aria-label="[[previous]]"></button>
+            <button class="gallery-btn next" aria-label="[[next]]"></button>
+
+            <div class="play-video-button hidden">
+                <i class="sprite-fm-mono icon-play"></i>
+            </div>
+
+            <div class="mobile viewer-pending">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
+
+            <div class="viewer-error hidden">
+                <div class="viewer-error-header">
+                    [$135]
+                </div>
+                <div class="viewer-error-txt">
+                </div>
+                <div class="viewer-error-buttons">
+                    <div class="viewer-button viewer-refresh">
+                        <i class="medium-icon icons-img refresh"></i>
+                        [$85]
                     </div>
-                    <div class="mobile slides-bl">
-                        <div class="mobile slides left">
-                            <img alt="" />
-                        </div>
-                        <div class="mobile slides mid">
-                            <img alt="" />
-                        </div>
-                        <div class="mobile slides right">
-                            <img alt="" />
-                        </div>
-                    </div>
-                    <div class="mobile new-slideshow-buttons">
-                        <div class="mobile slideshow-ctr-btns-bar hidden">
-                            <button class="mobile new-slideshow-icon-btn sl-previous">
-                                <i class="sprite-fm-mono icon-skip-backward"></i>
-                            </button>
-                            <button class="mobile new-slideshow-icon-btn sl-playpause" data-state="play">
-                                <i class="sprite-fm-mono icon-pause"></i>
-                            </button>
-                            <button class="mobile new-slideshow-icon-btn sl-next">
-                                <i class="sprite-fm-mono icon-skip-forward"></i>
-                            </button>
-                            <button class="mobile new-slideshow-icon-btn sl-close">
-                                <i class="sprite-fm-mono icon-dialog-close"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="mobile slideshow-buttons">
-                        <div class="mobile left-buttons">
-                            <div class="mobile fm-icon delete delete-button"></div>
-                            <div class="mobile fm-icon rubbish-bin-highlight rubbishbin-delete-button hidden"></div>
-                        </div>
-                        <div class="mobile right-buttons">
-                            <div class="mobile slideshow-trigger-btn">
-                                <button class="mobile new-slideshow-icon-btn sl-start">
-                                    <i class="sprite-fm-mono icon-play-square"></i>
-                                </button>
-                            </div>
-                            <div class="mobile fm-icon download download-button"></div>
-                            <div class="mobile fm-icon manage-link manage-link-button"></div>
-                        </div>
+                    <div class="viewer-button viewer-error-close">
+                        <i class="medium-icon icons-img close"></i>
+                        [$1898]
                     </div>
                 </div>
             </div>
-        </div>
+
+            <div class="viewer-progress vo-hidden">
+                <ul>
+                    <li class="right-c"><p><span></span></p></li>
+                    <li class="left-c"><p><span></span></p></li>
+                </ul>
+            </div>
+
+            <div class="viewer-slideshow-controls hidden">
+                <div class="viewer-big-button prev">
+                    <i class="semi-big-icon icons-img prev"></i>
+                </div>
+                <div class="viewer-big-button pause" data-state="pause">
+                    <i class="semi-big-icon icons-img pause"></i>
+                </div>
+                <div class="viewer-big-button next">
+                    <i class="semi-big-icon icons-img next"></i>
+                </div>
+                <div class="viewer-big-button left-pad close">
+                    <i class="semi-big-icon icons-img cross"></i>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </section>
+
+        <footer>
+
+            <nav class="viewer-bars video-controls hidden" data-state="hidden">
+                <ul class="bar">
+                     <li>
+                        <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
+                            <!-- Active state: .icon-pause !-->
+                            <i class="sprite-fm-mono icon-play"></i>
+                        </button>
+                    </li>
+                    <li class="vol-wrapper">
+                        <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
+                            <!-- Active state: .icon-volume-muted !-->
+                            <i class="sprite-fm-mono icon-volume"></i>
+                        </button>
+                        <div class="video-vol-range">
+                            <div class="volume-bar"><span></span></div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="video-timing current">
+                            00:00
+                        </div>
+                    </li>
+                </ul>
+                <div class="video-progress-block">
+                    <div class="video-progress-bar">
+                        <div class="video-time-bar"></div>
+                    </div>
+                </div>
+                <ul class="bar">
+                    <li>
+                        <div class="video-timing duration">
+                            00:00
+                        </div>
+                    </li>
+                    <li>
+                        <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
+                            <!-- Active state: .icon-fullscreen-leave !-->
+                            <i class="sprite-fm-mono icon-fullscreen-enter"></i>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+
+            <nav class="viewer-bars image-controls">
+                <button class="v-btn browserscreen" aria-label="Expand">
+                    <i class="sprite-fm-mono icon-new-window"></i>
+                </button>
+                <ul class="bar">
+                     <li class="hidden">
+                        <button class="v-btn view" aria-label="[[grid view]]">
+                            <!-- Active state: .icon-image-grid-view-up !-->
+                            <i class="sprite-fm-mono icon-image-grid-view-up"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="v-btn remove mobile fm-icon delete delete-button" aria-label="[$83]">
+                            <i class="sprite-fm-mono icon-bin hidden"></i>
+                        </button>
+                    </li>
+                </ul>
+                <div class="zoom-slider-wrap">
+                    <button class="v-btn zoom-out" aria-label="[$24927]">
+                        <i class="sprite-fm-theme icon-image-zoom-out"></i>
+                    </button>
+                    <div class="zoom-slider"></div>
+                    <button class="v-btn zoom-in" aria-label="[$24928]">
+                        <i class="sprite-fm-theme icon-image-zoom-in"></i>
+                    </button>
+                </div>
+                <ul class="bar menu">
+                    <li>
+                        <button class="v-btn slideshow" aria-label="[$17802]">
+                            <i class="sprite-fm-mono icon-play-square"></i>
+                        </button>
+                    </li>
+                     <li>
+                        <button class="v-btn download" aria-label="[$58]">
+                            <i class="sprite-fm-mono icon-download-filled"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="v-btn getlink" aria-label="[$59]">
+                            <i class="sprite-fm-mono icon-link"></i>
+                        </button>
+                    </li>
+                    <li class="hidden">
+                        <button class="v-btn info" aria-label="[$6859]">
+                            <i class="sprite-fm-mono icon-info"></i>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+
+            <nav class="viewer-bars slideshow-controls hidden">
+                <div class="bar">
+                    <button class="sl-btn previous" aria-label="[previous]]">
+                        <i class="sprite-fm-mono icon-rwd"></i>
+                    </button>
+                    <button class="sl-btn playpause" aria-label="[[play pause]]" data-state="pause">
+                        <i class="sprite-fm-mono icon-pause"></i>
+                    </button>
+                    <button class="sl-btn next" aria-label="[[next]]">
+                        <i class="sprite-fm-mono icon-ff"></i>
+                    </button>
+                </div>
+                <div class="bar">
+                    <button class="sl-btn close" aria-label="[[close]]">
+                        <i class="sprite-fm-mono icon-dialog-close"></i>
+                    </button>
+                </div>
+            </nav>
+
+            <div class="viewer-vad-control lato hidden">
+                <div  class="thumb">
+                    <img alt="" />
+                </div>
+                <div class="counter">
+                    0
+                </div>
+                <div class="label">
+                    <span>[$22879]</span><i class="small-icon icons-sprite skip"></i>
+                </div>
+            </div>
+
+            <div class="video-progress-bar vad" title="">
+                <div class="video-time-bar"></div>
+            </div>
+        </footer>
     </div>
 </div>
 
@@ -1290,8 +1472,26 @@
 
         <!-- Bitcoin address input and tip !-->
         <div class="affiliate-redeem bitcoin-data">
+            <div class="affiliate-redeem bitcoin-fill-checkbox">
+                <div class="square checkboxOff">
+                    <input class="checkbox" id="affi-bitcoin-fill" name="affi-bitcoin-fill" type="checkbox">
+                </div>
+                <div class="checkbox-label small radio-txt" for="affi-bitcoin-fill">
+                    [$referral_bitcoin_autofill]
+                </div>
+                <div class="clear"></div>
+            </div>
             <div class="mobile default-input top-pad">
                 <input type="text" value="" name="affi-bitcoin-address" id="affi-bitcoin-address" placeholder="[$23361]">
+            </div>
+            <div class="affiliate-redeem save-bitcoin-checkbox">
+                <div class="square checkboxOff">
+                    <input class="checkbox" id="affi-save-bitcoin" name="affi-save-bitcoin" type="checkbox">
+                </div>
+                <div class="checkbox-label small radio-txt" for="affi-save-bitcoin">
+                    [$referral_bitcoin_save]
+                </div>
+                <div class="clear"></div>
             </div>
             <div class="mobile affiliate-bitcoin-tip">
                 <i>i</i>
@@ -2584,7 +2784,9 @@
                                 </div>
                             </div>
                             <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
-                            <div class="download play-video-button"></div>
+                            <div class="download play-video-button">
+                                <i class="sprite-fm-mono icon-play"></i>
+                            </div>
                             <div class="viewer-pending hidden">
                                 <div class="bounce1"></div>
                                 <div class="bounce2"></div>
@@ -3599,7 +3801,7 @@
                                     <!-- Bank name -->
                                     <td>
                                         <span class="wire-transfer-bold">[$939]</span>
-                                        <span>Bank of New Zealand</span>
+                                        <span>Bank of New Zealand, Wellington, New Zealand</span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -3627,7 +3829,8 @@
                                     <!-- Account number -->
                                     <td>
                                         <span class="wire-transfer-bold">[$6200]</span>
-                                        <span>885806-0000</span>
+                                        <p>752971-0000 (USD)</p>
+                                        <p>752971-0002 (EUR)</p>
                                     </td>
                                 </tr>
                                 <tr>
@@ -4129,7 +4332,7 @@
                     <p>
                         <span class="number">1</span>
                         <span class="text">
-                            Welcome to Mega. Mega Limited (&ldquo;<b>Mega</b>&rdquo;, &ldquo;<b>we</b>&rdquo;, &ldquo;<b>us</b>&rdquo;) provides cloud storage and communication services with user-controlled encryption. Using Mega, you and other users can encrypt your files and chats using user-controlled encryption (&ldquo;<b>UCE</b>&rdquo;), upload, access, store, manage, share, communicate, download and decrypt files, chats and any data (all of which we call &ldquo;<b>data</b>&rdquo; in these terms) and give access to that data to others (all together, &ldquo;<b>services</b>&rdquo; and each, a &ldquo;<b>service</b>&rdquo;). We provide our services ourselves and via our  <a class="clickurl" href="/contact">related or affiliated entities, payment processors and resellers</a> who act on our behalf, at our websites at <a href="https://mega.nz">https://mega.nz</a> and <a href="https://mega.io">https://mega.io</a>, subdomains and related sites (&ldquo;<b>websites</b>&rdquo;), using our mobile apps (&ldquo;<b>mobile apps</b>&rdquo;), our desktop apps (&ldquo;<b>desktop apps</b>&rdquo;), our command line tools (&ldquo;<b>cmd tools</b>&rdquo;), our browser extensions (&ldquo;<b>browser extensions</b>&rdquo;) and our application programming interface (&ldquo;<b>API</b>&rdquo;). If you have questions about how to use our services or the great things you can do with Mega, check our <a class="clickurl" href="/help">Help Centre</a> or, if you can't find the answer there, check our <a class="clickurl" href="/contact">contacts</a> page for details of who to contact.
+                            Welcome to Mega. Mega Limited (&ldquo;<b>Mega</b>&rdquo;, &ldquo;<b>we</b>&rdquo;, &ldquo;<b>us</b>&rdquo;) provides cloud storage and communication services with user-controlled encryption. Using Mega, you and other users can encrypt your files and chats using user-controlled encryption (&ldquo;<b>UCE</b>&rdquo;), upload, access, store, manage, share, communicate, download and decrypt files, chats and any data (all of which we call &ldquo;<b>data</b>&rdquo; in these terms) and give access to that data to others (all together, &ldquo;<b>services</b>&rdquo; and each, a &ldquo;<b>service</b>&rdquo;). We provide our services ourselves and via our  <a class="clickurl" href="/contact">related or affiliated entities, payment processors and resellers</a> who act on our behalf, at our websites at <a href="https://mega.nz">https://mega.nz</a> and <a href="https://mega.io">https://mega.io</a>, subdomains and related sites (&ldquo;<b>websites</b>&rdquo;), using our mobile apps (&ldquo;<b>mobile apps</b>&rdquo;), our desktop apps (&ldquo;<b>desktop apps</b>&rdquo;), our command line tools (&ldquo;<b>cmd tools</b>&rdquo;), our browser extensions (&ldquo;<b>browser extensions</b>&rdquo;) and our application programming interface (&ldquo;<b>API</b>&rdquo;). If you have questions about how to use our services or the great things you can do with Mega, check our <a class="clickurl" href="[$mega_help_host]" target="_blank">Help Centre</a> or, if you can't find the answer there, check our <a class="clickurl" href="/contact">contacts</a> page for details of who to contact.
                         </span>
                     </p>
                     <p>
@@ -5761,7 +5964,9 @@
 <!-- Video Block template -->
 <div class="mobile-video-template">
     <div class="download video-block hidden">
-        <div class="download play-video-button"></div>
+        <div class="download play-video-button">
+            <i class="sprite-fm-mono icon-play"></i>
+        </div>
         <video data-autoplayvideo="false" class="mobile-gallery" data-playvideoonclick="false"></video>
         <div class="viewer-vad-control lato hidden">
             <div class="thumb">

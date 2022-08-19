@@ -894,7 +894,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             __showBtn('sendto');
         }
 
-        if (selNode) {
+        if (M.getNodeRoot(M.currentdirid) !== M.RubbishID) {
             __showBtn('download');
         }
 

@@ -534,16 +534,7 @@ function dl_g(res, ctx) {
                         $('.mobile.slideshow-image-previewer').addClass('browserscreen')
                             .appendTo('.js-image-preview').removeClass('hidden');
 
-                        mobile.slideshow.init(dl_node.h);
-
-                        if (supported) {
-                            mobile.slideshow.hideHFFlag = true;
-                            $imageBlock.addClass('clickable ' + fileIcon(dl_node)).removeClass('hidden')
-                                .rebind('click', () => {
-                                    $('.mobile.slideshow-image-previewer').addClass('fullscreen')
-                                        .removeClass('browserscreen');
-                                });
-                        }
+                        slideshow(dl_node.h);
                     }
                     else {
                         window.mediaConIsDl = true;
@@ -901,7 +892,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
 
         $body
             .addClass('downloading')
-            .find('.bar').width(perc + '%');
+            .find('.download-progress .bar').width(perc + '%');
 
         $('.mobile.download-percents').text(perc + '%');
     }

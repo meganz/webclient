@@ -1,0 +1,151 @@
+.mobile .media-viewer header,
+.mobile .media-viewer footer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+}
+.mobile .media-viewer footer {
+    top: auto;
+    bottom: 0;
+}
+.mobile .download-page .media-viewer .img-wrap {
+    background: #fff;
+}
+.mobile .download-page .media-viewer header,
+.mobile .download-page .media-viewer footer {
+    display: none;
+}
+.mobile .download-page .fullscreen .media-viewer header,
+.mobile .download-page .fullscreen .media-viewer footer {
+    display: flex;
+}
+.mobile .download-page.image .fullscreen .viewer-bars {
+    opacity: 1;
+    visibility: visible;
+    background: #fff;
+}
+.mobile .media-viewer .viewer-bars:not(.video-controls) .bar {
+	flex: 1 1 0;
+	padding: 0;
+}
+.mobile .slideshow-image-previewer .media-viewer header .viewer-bars .bar {
+    flex: 0 0 0;
+}
+.mobile .media-viewer .bar.menu {
+    justify-content: flex-end;
+}
+.mobile .media-viewer .zoom-slider-wrap {
+    flex: 3 1 0;
+}
+.mobile .download-page .media-viewer .zoom-slider-wrap {
+    padding: 12px 0;
+}
+.mobile .media-viewer .zoom-slider-wrap button {
+    margin: 6px;
+}
+.mobile .media-viewer .ui-slider.ui-widget-content {
+    max-width: 160px;
+    width: 100%;
+    min-width: 48px;
+}
+.mobile .media-viewer button.gallery-btn {
+	background-color: rgba(0, 0, 0, 0.6);
+	height: 37px;
+	left: 0;
+	position: absolute;
+	top: 50%;
+	width: 36px;
+	margin: -18px 0 0;
+	background-image: url("../images/mobile/mobile-sprite.png");
+	background-position: -148px -1897px;
+	background-repeat: no-repeat;
+	z-index: 10;
+	border-radius: 0;
+}
+.mobile .media-viewer button.gallery-btn.next {
+    left: auto;
+    right: 0;
+    background-position: -205px -1897px;
+}
+.mobile .media-viewer .file-info {
+	text-align: start;
+	display: inline-block;
+	vertical-align: middle;
+}
+.mobile .media-viewer .file-name {
+    color: #222;
+    display: block;
+    font-size: 20px;
+    line-height: 25px;
+    margin: 0;
+    max-width: 233px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    vertical-align: middle;
+    white-space: nowrap;
+    padding: 0;
+}
+.mobile .media-viewer .counter {
+    line-height: 25px;
+    color: #a7a7a7;
+    font-size: 14px;
+    background: none;
+    padding: 0;
+}
+.mobile .media-viewer .counter .mid {
+	color: inherit;
+	font: inherit;
+}
+.mobile .media-viewer .bar > li > button {
+    margin: 0;
+    padding: 18px;
+}
+.mobile .download-page .media-viewer .bar > li > button.download {
+    display: none;
+}
+.mobile .media-viewer .bar > li > button.delete-button {
+    background-position: -194px -1817px;
+    width: 60px;
+    height: 60px;
+}
+.mobile .media-viewer .viewer-bars:not(.video-controls):not(.slideshow-controls) {
+    padding: 0;
+    position: static;
+    background: #fff;
+}
+.mobile .media-viewer .video-controls {
+    padding: 6px 8px;
+    position: static;
+}
+.mobile .media-viewer .video-controls .video-progress-block {
+    padding: 11px;
+}
+.mobile .media-viewer .video-controls .bar > li {
+    width: auto;
+    height: auto;
+}
+.mobile .media-viewer .video-controls button.v-btn {
+    --mask-color: #fff;
+    margin: 6px;
+    padding: 0;
+}
+.mobile .media-viewer .image-controls {
+    background: #fff;
+}
+.mobile .media-viewer .slideshow-controls button i {
+    --mask-color: #fff;
+}
+.mobile .video-theatre-mode .media-viewer header .viewer-bars {
+    background: var(--surface-grey-2);
+}
+.mobile .media-viewer .video-block video {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 3px;
+    max-height: 100vh;
+}

@@ -300,7 +300,7 @@ mobile.cloud.contextMenu = {
             }
 
             // Show the file preview overlay and hide the context menu
-            mobile.slideshow.init(nodeHandle);
+            slideshow(nodeHandle);
             mobile.cloud.contextMenu.hide();
             return false;
         });

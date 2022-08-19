@@ -2558,9 +2558,10 @@ var exportExpiry = {
         }
         else if (folderlink) {
             eventlog(99715); // Share public link from folder-link.
-
-            var exportLinkDialog = new mega.Dialog.ExportLink();
-            return exportLinkDialog.linksDialog();
+            if (!is_mobile) {
+                var exportLinkDialog = new mega.Dialog.ExportLink();
+                return exportLinkDialog.linksDialog();
+            }
         }
         else if (is_mobile) {
             eventlog(99634); // Created public link on mobile webclient

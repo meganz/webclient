@@ -2008,18 +2008,20 @@ FullScreenManager.prototype.enterFullscreen = function() {
      * @param $wrapper
      * @private
      */
-    var _initMobileVideoControlsToggle = function($wrapper) {
-        var $video = $wrapper.find('.video-block');
-        var $videoControl = $wrapper.find('.video-controls');
+    mega.initMobileVideoControlsToggle = function($wrapper) {
+        var $video = $('.video-block', $wrapper);
+        var $videoControl = $('.video-controls', $wrapper);
         var $adControl = $('.viewer-vad-control', $wrapper);
         var videoElement = $('video', $video).get(0);
 
-        $video.rebind('touchstart', function(ev) {
+        _initHideMobileVideoControls($wrapper);
+
+        $video.rebind('touchstart', ev => {
             if (videoElement && videoElement.ended) {
                 $('.play-video-button', $wrapper).trigger('click');
                 return false;
             }
-            if ($(ev.target).is('.mobile-gallery, #video')) {
+            if ($(ev.target).is('.mobile-gallery, #video, #mobile-video')) {
                 if ($videoControl.hasClass('invisible')) {
                     $adControl.removeClass('bottom');
                     $videoControl.removeClass('invisible');
@@ -2084,7 +2086,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         return new MegaPromise(function(resolve, reject) {
             MediaAttribute.canPlayMedia(node).then(function(yup) {
-                var $video = $('video',  $wrapper);
+                var $video = $('video', $wrapper);
                 var c = MediaAttribute.getCodecStrings(node);
                 if (c) {
                     $fn.attr('title', node.name + ' (' + c + ')');
@@ -2155,8 +2157,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     $videoControls.removeClass('hidden');
 
                     if (is_mobile) {
-                        _initHideMobileVideoControls($wrapper);
-                        _initMobileVideoControlsToggle($wrapper);
+                        requestAnimationFrame(() => mega.initMobileVideoControlsToggle($wrapper));
                     }
                 });
 

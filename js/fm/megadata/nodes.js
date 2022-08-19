@@ -230,10 +230,7 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'public-links')
             || (id === this.InboxID)
             || (id === 'contacts')
-            || (id === 'photos')
-            || (id === 'images')
-            || (id === 'videos')
-            || (id === 'favourites')
+            || (mega.gallery.sections[id])
         ) {
             result.push(id);
         }
@@ -314,7 +311,7 @@ MegaData.prototype.isCustomView = function(pathOrID) {
     result.original = pathOrID;
 
     // Basic gallery view
-    if (pathOrID === 'photos' || pathOrID === 'images' || pathOrID === 'videos' || pathOrID === 'favourites') {
+    if (mega.gallery.sections[pathOrID]) {
         result.type = 'gallery';
         result.nodeID = pathOrID;
         result.prefixTree = '';

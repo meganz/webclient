@@ -1304,7 +1304,7 @@
                 if (fminitialized) {
 
                     M.CameraId = base64urlencode(res.h);
-                    // M.SecondCameraId = base64urlencode(res.sh);
+                    M.SecondCameraId = base64urlencode(res.sh);
 
                     M.cameraUploadUI();
                     mega.gallery.nodeUpdated = true;

@@ -109,10 +109,7 @@ function removeUInode(h, parent) {
                 }
             }
             break;
-        case 'photos':
-        case 'images':
-        case 'videos':
-        case 'favourites':
+        case (mega.gallery.sections[M.currentdirid] ? mega.gallery.sections[M.currentdirid].path : null):
         case `discovery/${M.currentCustomView.nodeID}`:
             if (!hasItems) {
 
@@ -120,8 +117,7 @@ function removeUInode(h, parent) {
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tbody tr').remove();
 
-                $(`.fm-empty-${M.currentdirid.startsWith('discovery/') ? 'discovery' : M.currentdirid}`)
-                    .removeClass('hidden');
+                mega.gallery.showEmpty(M.currentdirid);
             }
             break;
         default:

@@ -2872,6 +2872,15 @@ else if (!browserUpdate) {
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
 
+        // MComponents
+        jsl.push({f:'css/ui/mcomponents.css', n: 'm_components_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MComponent.js', n: 'm_component_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MContextMenu.js', n: 'm_context_menu_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MMenuSelect.js', n: 'm_menu_select_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MMenuSelectItem.js', n: 'm_menu_select_item_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MOverlay.js', n: 'm_overlay_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MEmptyPad.js', n: 'm_empty_pad_js', j:1});
+
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2898,8 +2907,16 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
         jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
 
+        // Gallery helpers
+        jsl.push({f:'js/fm/gallery/helpers/GalleryTitleControl.js', n: 'fm_gallery_title_control_js', j:1});
+        jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyBlock.js', n: 'fm_gallery_empty_block_js', j:1});
+        jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyPhotos.js', n: 'fm_gallery_empty_photos_js', j:1});
+        jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyImages.js', n: 'fm_gallery_empty_images_js', j:1});
+        jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyVideos.js', n: 'fm_gallery_empty_videos_js', j:1});
+        jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyFavourites.js', n: 'fm_gallery_empty_favourites_js', j:1});
+
         jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/fm/gallery.js', n: 'fm_gallery_js', j:1});
+        jsl.push({f:'js/fm/gallery/gallery.js', n: 'fm_gallery_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
         jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});

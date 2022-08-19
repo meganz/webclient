@@ -2841,6 +2841,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/registerb.js', n: 'registerb_js', j:1});
     jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
     jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
+    jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
 
     // Variables which can be used across all stylesheets
     jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2862,6 +2863,8 @@ else if (!browserUpdate) {
     jsl.push({f:'css/radios.css', n: 'radios_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/mega-button.css', n: 'mega_button_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
+
+    jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
@@ -2888,7 +2891,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
-        jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
         jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
@@ -2915,7 +2917,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/share-dialog.css', n: 'share_dialog_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/megadrop.css', n: 'megadrop_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2994,6 +2995,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-megadrop.css', n: 'mobile_megadrop_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/mobile-toast.css', n: 'mobile_toast_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile-media-viewer.css', n: 'mobile_media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'html/mobile-megadrop.html', n: 'mobile-megadrop', j: 0, w: 1});
         jsl.push({f:'html/mobile-nomegadrop.html', n: 'mobile-nomegadrop', j: 0, w: 1});
@@ -3039,7 +3041,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.register.js', n: 'mobile_register_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rename-overlay.js', n: 'mobile_rename_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.slideshow.js', n: 'mobile_slideshow_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.support.js', n: 'mobile_support_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.takedown.js', n: 'mobile_takedown_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});

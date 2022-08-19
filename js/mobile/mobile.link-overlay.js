@@ -45,7 +45,7 @@ mobile.linkOverlay = {
         var tmpFn = function() {
 
             // If a link already exists for this, show the link and copy/remove buttons
-            if (node.ph) {
+            if (node.ph || folderlink) {
                 this.showPublicLinkAndEnableButtons(nodeHandle);
             }
             else {
@@ -96,7 +96,7 @@ mobile.linkOverlay = {
         this.$overlay.find('.copy').off('tap').on('tap', function() {
 
             // If the link is created (has a public handle), copy the public link to the clipboard
-            if (M.d[nodeHandle].ph) {
+            if (M.d[nodeHandle].ph || folderlink) {
                 mobile.linkOverlay.copyPublicLink(nodeHandle);
             }
 
@@ -203,35 +203,47 @@ mobile.linkOverlay = {
         var key = node.k;
         var type = '';
 
-        if (!node.ph) {
+        if (!node.ph && !folderlink) {
             if (d) {
                 console.warn('No public handle for node %s', nodeHandle);
             }
             return false;
         }
 
-        if (node.t) {
-            type = 'F';
-            key = u_sharekeys[node.h] && u_sharekeys[node.h][0];
-        }
-
         var nodeUrlWithPublicHandle;
         var nodeDecryptionKey;
+        var fileUrlNodeHandle = '';
 
-        if (mega.flags.nlfe) {
-            type = (type) ? '/folder/' : '/file/';
-            nodeUrlWithPublicHandle = getBaseUrl() + type + node.ph + '#';
-            nodeDecryptionKey = (key ? a32_to_base64(key) : '');
+        if (folderlink) {
+            if (mega.flags.nlfe) {
+                nodeUrlWithPublicHandle = getBaseUrl() + '/folder/' + pfid + '#';
+                nodeDecryptionKey = pfkey;
+                fileUrlNodeHandle = (node.t ? '/folder/' : '/file/') + node.h;
+            }
+            else {
+                nodeUrlWithPublicHandle = getBaseUrl() + '/#F!' + pfid;
+                nodeDecryptionKey = '!' + pfkey;
+                fileUrlNodeHandle = (node.t ? '!' : '?') + node.h;
+            }
         }
         else {
-            nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + node.ph;
-            nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
+            if (node.t) {
+                type = 'F';
+                key = u_sharekeys[node.h] && u_sharekeys[node.h][0];
+            }
+
+            if (mega.flags.nlfe) {
+                type = (type) ? '/folder/' : '/file/';
+                nodeUrlWithPublicHandle = getBaseUrl() + type + node.ph + '#';
+                nodeDecryptionKey = (key ? a32_to_base64(key) : '');
+            }
+            else {
+                nodeUrlWithPublicHandle = getBaseUrl() + '/#' + type + '!' + node.ph;
+                nodeDecryptionKey = key ? '!' + a32_to_base64(key) : '';
+            }
         }
 
-        // Create the URL
-        var publicUrl = nodeUrlWithPublicHandle + nodeDecryptionKey;
-
-        return nodeUrlWithPublicHandle + nodeDecryptionKey;
+        return nodeUrlWithPublicHandle + nodeDecryptionKey + fileUrlNodeHandle;
     },
 
     /**
@@ -261,8 +273,19 @@ mobile.linkOverlay = {
                 mega.config.remove('nowarnpl');
             }
         };
+
+        if (folderlink) {
+            onIdle(() => $('.remove', this.$overlay).addClass('disabled'));
+        }
+
         // On Remove Link button click/tap
-        this.$overlay.find('.remove').off('tap').on('tap', () => {
+        $('.remove', this.$overlay).rebind('tap', (ev) => {
+            if ($(ev.currentTarget).hasClass('disabled')) {
+                if (folderlink) {
+                    $('.fm-dialog-close', this.$overlay).trigger('tap');
+                }
+                return false;
+            }
             const media = is_video(M.d[nodeHandle]) === 1;
             const mediaRemoveLink = () => {
                 msgDialog('confirmation', l[882], l[17824], 0, removeLink);
@@ -319,29 +342,28 @@ mobile.linkOverlay = {
 
         var $closeButton = this.$overlay.find('.fm-dialog-close');
         var $closeTextButton = this.$overlay.find('.text-button');
+        const callback = e => {
+
+            // This is real touch, just trigger history back to clear history
+            if (e.originalEvent) {
+
+                history.back();
+
+                return false;
+            }
+
+            // Hide overlay
+            mobile.linkOverlay.$overlay.addClass('hidden');
+
+            // Re-show the file manager and re-enable scrolling
+            $('.mobile.file-manager-block').removeClass('hidden disable-scroll');
+
+            // Prevent clicking the menu button behind
+            return false;
+        };
 
         // Add tap handler
-        $closeButton.off('tap').on('tap', function() {
-
-            // Hide overlay
-            mobile.linkOverlay.$overlay.addClass('hidden');
-
-            // Re-show the file manager and re-enable scrolling
-            $('.mobile.file-manager-block').removeClass('hidden disable-scroll');
-
-            // Prevent clicking the menu button behind
-            return false;
-        });
-        $closeTextButton.off('tap').on('tap', function() {
-
-            // Hide overlay
-            mobile.linkOverlay.$overlay.addClass('hidden');
-
-            // Re-show the file manager and re-enable scrolling
-            $('.mobile.file-manager-block').removeClass('hidden disable-scroll');
-
-            // Prevent clicking the menu button behind
-            return false;
-        });
+        $closeButton.rebind('tap', callback);
+        $closeTextButton.rebind('tap', callback);
     }
 };

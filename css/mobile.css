@@ -4988,6 +4988,7 @@ div.checkboxOn {
     position: absolute;
     top: 0;
     z-index: 99;
+    display: block;
 }
 .mobile.slideshow-image-previewer .content-row {
     display: table-row;
@@ -5092,48 +5093,6 @@ div.checkboxOn {
     z-index: 1;
     border-top: 1px solid #eee;
 }
-
-/* New Slideshow */
-.mobile.new-slideshow-buttons {
-    background: transparent;
-    position: fixed;
-    bottom: 80px;
-    width: 100%;
-}
-.landscape .mobile.new-slideshow-buttons {
-    bottom: 24px;
-}
-.mobile.slideshow-trigger-btn {
-    display: inline-block;
-    width: 60px;
-    height: auto;
-    text-align: center;
-    vertical-align: middle;
-}
-.mobile.slideshow-ctr-btns-bar {
-    margin: 0 auto;
-    width: 208px;
-    z-index: 1;
-}
-.mobile.new-slideshow-icon-btn {
-    border-radius: 100%;
-    margin: 6px 12px;
-    padding: 0;
-    --mask-color: var(--icon-rest-inverted);
-    appearance: none;
-    background: transparent;
-    border: 0;
-    outline: none;
-}
-.mobile.new-slideshow-icon-btn.sl-start {
-    --mask-color: var(--icon-rest);
-}
-.mobile.new-slideshow-icon-btn i {
-    --icon-size: 24px;
-    color: var(--mask-color);
-}
-
-/* End: New Slideshow */
 
 /* Download Page Image Viewer */
 .download-previewer .mobile.slideshow-header .slideshow-file-number-and-total,
@@ -7074,17 +7033,9 @@ textarea.mobile.support-text-field {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
     border-radius: 3px;
+    max-height: 100vh;
 }
-/*.slideshow-image-previewer .mobile.video .download.video-block video {
-    object-fit: contain;
-    height: auto;
-}
-.mobile.video.video-theatre-mode .download.video-block video {
-    object-fit: contain;
-}*/
 .mobile.video .download.video-block img {
     margin: 0 auto;
     height: 100%;
@@ -7241,18 +7192,17 @@ textarea.mobile.support-text-field {
     position: absolute;
     width: 36px;
     height: 36px;
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
     border-radius: 100%;
-    left: 50%;
-    top: 50%;
-    margin: -18px 0 0 -18px;
     z-index: 10;
     cursor: pointer;
     background-color: #F52929;
-    background-image: url(../images/mega/download-sprite.png);
-    background-position: -32px -1142.5px;
-    background-size: 128.5px auto !important;
+    left: calc(50% - 18px);
+    top: calc(50% - 18px);
+}
+.mobile .play-video-button i {
+    --icon-size: 24px;
+    margin: 6px;
+    --mask-color: var(--secondary-white);
 }
 .mobile.video .viewer-image-bl {
     width: 100%;
@@ -7391,7 +7341,6 @@ textarea.mobile.support-text-field {
     visibility: hidden;
 }
 .mobile.video .video-controls {
-    display: block;
     opacity: 1;
     visibility: visible;
 }
@@ -7408,7 +7357,7 @@ textarea.mobile.support-text-field {
     visibility: hidden;
 }
 .mobile.video .video-progress-block {
-    padding: 11px 98px 20px 94px;
+     padding: 11px 98px 20px 94px;
 }
 .mobile.video .video-progress-bar {
     display: block;
@@ -7599,6 +7548,7 @@ textarea.mobile.support-text-field {
     height: 28px;
     line-height: 27px;
     width: 52px;
+    margin: 0;
 }
 .mobile.video.video-theatre-mode .viewer-button.fs {
     margin: 0;
@@ -13738,10 +13688,6 @@ body.landscape .upload-overlay .mobile.filetype-img {
  * New style should comes above on this.
  */
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
-    .mobile.video .play-video-button {
-        background-image: url(../images/mega/download-sprite@2x.png);
-        background-size: 257px auto;
-    }
     .mobile.tablet-img {
         background-image: url(../images/mobile/ipad-big@2x.png);
     }
@@ -13917,10 +13863,6 @@ body.landscape .upload-overlay .mobile.filetype-img {
     height: 100%;
     background-color: #f7f7f7;
     position: relative;
-}
-.download-page.image .image-block img {
-    max-width: 100%;
-    max-height: 100%;
 }
 .download-page.image .image-block.fullscreen {
     position: fixed;

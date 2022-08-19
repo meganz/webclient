@@ -2752,3 +2752,90 @@ MegaUtils.prototype.validatePhoneNumber = function(phoneNumber, countryCode) {
 
     return phoneNumber;
 };
+
+MegaUtils.prototype.noSleep = async function(stop, title) {
+    'use strict';
+    // Based on https://github.com/richtr/NoSleep.js
+
+    const store = this.noSleep;
+
+    if (store.canUseWakeLock === undefined) {
+        store.canUseWakeLock = 'wakeLock' in window.navigator;
+        store.tick = 0;
+    }
+
+    if (store.canUseWakeLock) {
+        const {wakeLock} = store;
+
+        if (stop) {
+
+            if (wakeLock && (--store.tick < 1 || stop > 1)) {
+                store.tick = 0;
+                store.wakeLock = null;
+                return (await wakeLock).release();
+            }
+        }
+        else {
+            store.tick++;
+
+            if (wakeLock) {
+                return wakeLock;
+            }
+            store.wakeLock = new Promise((resolve, reject) => {
+
+                navigator.wakeLock.request('screen')
+                    .then((res) => {
+                        if (store.tick > 0) {
+                            store.wakeLock = res;
+                        }
+                        return res;
+                    })
+                    .catch((ex) => {
+                        if (d) {
+                            console.error(ex);
+                        }
+                        delete store.wakeLock;
+                        store.canUseWakeLock = false;
+
+                        if (store.tick > 0) {
+                            return this.noSleep(false, title);
+                        }
+                    })
+                    .then(resolve)
+                    .catch(reject);
+            });
+        }
+
+        return store.wakeLock;
+    }
+
+    const vNode = store.node = store.node || document.createElement("video");
+    assert(vNode, 'Cannot apply no-sleep measures...');
+
+    if (!store.srcNode) {
+        vNode.setAttribute('playsinline', '');
+        vNode.setAttribute('title', title || 'MEGA');
+        vNode.addEventListener("timeupdate", () => {
+            if (vNode.currentTime > 0.5) {
+                vNode.currentTime = Math.random();
+            }
+        });
+
+        const sNode = store.srcNode = document.createElement("source");
+        sNode.src = `${staticpath}images/mega/no-sleep.mp4`;
+        sNode.type = "video/mp4";
+        vNode.appendChild(sNode);
+    }
+
+    if (stop) {
+
+        if (--store.tick < 1 || stop > 1) {
+            store.awake = false;
+            vNode.pause();
+        }
+    }
+    else {
+        store.awake = true;
+        return vNode.play();
+    }
+};

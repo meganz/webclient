@@ -261,11 +261,12 @@
                 border-radius: 32px;
                 bottom: 100%;
                 left: 50%;
-                margin: 0 0 16px -124px;
+                margin-bottom: 16px;
                 padding: 16px;
                 position: absolute;
                 width: auto;
                 z-index: 10;
+                transform: translateX(-50%);
             }
             .media-viewer .slideshow-controls button {
                 display: inline-flex;
@@ -305,10 +306,9 @@
                 background: var(--progress-bar-fill1);
                 border-radius: 100%;
                 cursor: pointer;
-                left: 50%;
-                margin: -36px 0 0 -36px;
+                left: calc(50% - 18px);
                 position: absolute;
-                top: 50%;
+                top: calc(50% - 18px);
                 z-index: 10;
             }
             .media-viewer .play-video-button i {

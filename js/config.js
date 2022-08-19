@@ -111,7 +111,7 @@
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
             'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
             'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'rsv1',
-            'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat'
+            'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents'
         ]
     });
 
@@ -522,6 +522,13 @@
     };
 
     refresh.ui = () => {
+        if (M.recentsRender && M.recentsRender.hasConfigChanged()) {
+            M.recentsRender.onConfigChange();
+            if (page.includes('fm/recents')) {
+                openRecents();
+            }
+        }
+
         if (M.account && page.indexOf('fm/account') > -1) {
             if (!is_mobile) {
                 accountUI.renderAccountPage(M.account);

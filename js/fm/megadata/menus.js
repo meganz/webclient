@@ -918,6 +918,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                                 $('span', $playItem).text(l[16275]);
                             }
                         }
+
+                        if (items['.remove-item']) {
+                            $('span', $menuCMI.filter('.remove-item')).text(M.getSelectedRemoveLabel($.selected));
+                        }
                     }
 
                     // Hide Info item if properties dialog is opened
@@ -1413,4 +1417,34 @@ MegaData.prototype.resetLabelSortMenuUI = function() {
 
     $('.colour-sorting-menu .dropdown-item').removeClass('active asc desc');
     return false;
+};
+
+MegaData.prototype.getSelectedRemoveLabel = (handlesArr) => {
+    'use strict';
+
+    let allAreRubbish = true;
+    let allAreNotRubbish = true;
+
+    for (let i = 0; i < handlesArr.length; i++) {
+        if (M.getNodeRoot(handlesArr[i]) === M.RubbishID) {
+            allAreNotRubbish = false;
+        }
+        else {
+            allAreRubbish = false;
+        }
+
+        if (!allAreRubbish && !allAreNotRubbish) {
+            break;
+        }
+    }
+
+    if (allAreRubbish) {
+        return l.delete_permanently;
+    }
+
+    if (allAreNotRubbish) {
+        return l.move_to_rubbish_bin;
+    }
+
+    return l[83];
 };

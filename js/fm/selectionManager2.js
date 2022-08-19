@@ -870,6 +870,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
         };
 
+        const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
+        dataset.simpletip = M.getSelectedRemoveLabel($.selected);
+
         if (sourceRoot === M.RootID && !folderlink) {
 
             const cl = new mega.Share.ExportLink();

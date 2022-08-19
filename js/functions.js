@@ -17,7 +17,7 @@ function clickURLs() {
                 var target = $this.attr('target');
 
                 if (target === '_blank') {
-                    open(getBaseUrl() + url);
+                    open(/^(https?:\/\/)/i.test(url) ? url : getBaseUrl() + url, '_blank', 'noopener,noreferrer');
                     return false;
                 }
 

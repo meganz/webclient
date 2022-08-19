@@ -2641,7 +2641,11 @@ FileManager.prototype.initUIKeyEvents = function() {
 
             if ($.selected && $.selected.length > 0) {
                 var n = M.d[$.selected[0]];
-                if (n && n.t) {
+
+                if (M.getNodeRoot(n.h) === M.RubbishID) {
+                    propertiesDialog();
+                }
+                else if (n && n.t) {
                     M.openFolder(n.h);
                 }
                 else if ($.selected.length < 2 && (is_image2(n) || is_video(n))) {
@@ -3894,6 +3898,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             // there's no jquery parent for this container.
             // eslint-disable-next-line local-rules/jquery-scopes
             $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
+        }
+        else if (M.getNodeRoot(n.h) === M.RubbishID) {
+            propertiesDialog();
         }
         else {
             M.addDownload([h]);

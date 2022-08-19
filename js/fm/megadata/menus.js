@@ -490,6 +490,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         }
     }
 
+    if (M.getNodeRoot(selNode.p) === M.RubbishID) {
+        delete items['.download-item'];
+        delete items['.zipdownload-item'];
+    }
+
     return items;
 };
 

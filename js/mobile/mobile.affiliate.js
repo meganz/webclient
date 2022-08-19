@@ -613,8 +613,10 @@ mobile.affiliate = {
                 }
                 else if (currentStep) {
 
+                    const isConfirmed = $(this).data('confirmUpdate');
+
                     if (currentStep === 4 && !$('.auto-fill-checkbox', this.$page).hasClass('hidden') &&
-                        $(this).data('confirmUpdate') && affiliateRedemption.validateDynamicAccInputs()) {
+                        isConfirmed && affiliateRedemption.validateDynamicAccInputs()) {
 
                         mobile.messageOverlay.show(
                             l[23374],
@@ -631,10 +633,33 @@ mobile.affiliate = {
                         );
                     }
 
-                    affiliateRedemption.processSteps().then(function(res) {
+                    affiliateRedemption.processSteps().then(async res => {
 
                         if (!res) {
                             return false;
+                        }
+
+                        if (currentStep === 3 && affiliateRedemption.requests.first.m === 2 && isConfirmed &&
+                            M.affiliate.redeemAccDefaultInfo && M.affiliate.redeemAccDefaultInfo.an &&
+                            M.affiliate.redeemAccDefaultInfo.an !== $('#affi-bitcoin-address', self.$page).val()) {
+
+                            await new Promise(resolve => {
+                                mobile.messageOverlay.show(
+                                    l[23374],
+                                    l.referral_bitcoin_update,
+                                    () => {
+
+                                        affiliateRedemption.updateAccInfo();
+
+                                        $('.redeem-button[data-step="3"]', self.$page).data('confirmUpdate', false);
+
+                                        resolve();
+                                    },
+                                    resolve,
+                                    false,
+                                    [l[79], l[78]]
+                                );
+                            });
                         }
 
                         if (currentStep === 3 && affiliateRedemption.requests.first.m === 2) {
@@ -823,6 +848,10 @@ mobile.affiliate = {
 
         'use strict';
 
+        const $step3 = $('.redeem-body.step3', this.$page);
+        const $bFillCheckbox = $('.bitcoin-fill-checkbox', $step3);
+        const $bSaveCheckbox = $('.save-bitcoin-checkbox', $step3);
+
         if (comeback) {
 
             // If arrive step 3 from step 4, clear country, currency, and dynamic inputs
@@ -835,10 +864,15 @@ mobile.affiliate = {
 
             $('.redeem-progress', this.$page).removeClass('with-timer');
 
+            if (M.affiliate.redeemAccDefaultInfo.an) {
+
+                $bFillCheckbox.removeClass('hidden');
+                $bSaveCheckbox.addClass('hidden');
+            }
+
             return;
         }
 
-        var $step3 = $('.redeem-body.step3', this.$page);
         var $bank = $('.bank-data', $step3).addClass('hidden');
         var $bitcoin = $('.bitcoin-data', $step3).addClass('hidden');
 
@@ -895,10 +929,37 @@ mobile.affiliate = {
 
         if (rdmReq.first.m === 2) {
             $bitcoin.removeClass('hidden');
+
+            if (M.affiliate.redeemAccDefaultInfo.an) {
+
+                $bFillCheckbox.removeClass('hidden');
+                $bSaveCheckbox.addClass('hidden');
+            }
+            else {
+                $bFillCheckbox.addClass('hidden');
+                $bSaveCheckbox.removeClass('hidden');
+            }
+
+            uiCheckboxes($bSaveCheckbox);
+            uiCheckboxes($bFillCheckbox, value => {
+
+                if (value) {
+                    $('#affi-bitcoin-address', $step3).val(M.affiliate.redeemAccDefaultInfo.an);
+                }
+                else {
+                    $('#affi-bitcoin-address', $step3).val('');
+                }
+                $('.redeem-button[data-step="3"]', self.$page).data('confirmUpdate', false);
+            });
+
+            $('#affi-bitcoin-address', $step3).rebind('input.saveBitcoin', () => {
+                $('.redeem-button[data-step="3"]', $step3).data('confirmUpdate', true);
+            });
         }
         else {
             $bank.removeClass('hidden');
         }
+
     },
 
     redeemStep4: function(comeback) {
@@ -1025,7 +1086,6 @@ mobile.affiliate = {
         // There is dynamic account info required for this.
         // But if there is already any dynamic input(i.e. it is from step 4) skip rendering
         if (rdm.req1res[0].data && !comeback) {
-
             $('.affi-dynamic-acc-info', this.$page).empty();
 
             var accTypes = rdm.req1res[0].data;

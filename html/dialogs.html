@@ -6324,7 +6324,7 @@
                 </div>
 
                 <!-- Step2. Withdraw details !-->
-                <div class="affiliate-redeem cells left step2 hidden">
+                <div class="affiliate-redeem cells left step2 scrollable hidden">
                     <div class="affiliate-redeem cell-content">
                         <div class="affiliate-redeem header">
                             [$23302]
@@ -6359,7 +6359,27 @@
 
                             <!-- Bitcoin address input and tip !-->
                             <div class="affiliate-redeem bitcoin-data hidden">
+                                <div class="affiliate-redeem bitcoin-fill-checkbox hidden">
+                                    <div class="checkdiv checkboxOn">
+                                        <input type="checkbox" id="affi-bitcoin-fill" />
+                                    </div>
+                                    <label for="affi-bitcoin-fill" class="radio-txt"> [$referral_bitcoin_autofill] </label>
+                                    <div class="clear"></div>
+                                </div>
                                 <input type="text" class="underlinedText" value="" title="[$23361]" name="affi-bitcoin-address" id="affi-bitcoin-address" />
+                                <div class="affiliate-redeem save-bitcoin-checkbox hidden">
+                                    <div class="checkdiv checkboxOn">
+                                        <input type="checkbox" id="affi-save-bitcoin" />
+                                    </div>
+                                    <label for="affi-save-bitcoin" class="radio-txt"> [$referral_bitcoin_save] </label>
+                                    <div class="clear"></div>
+                                </div>
+                                <div class="affiliate-redeem save-data-tip hidden">
+                                    <div>[$referral_bitcoin_update]</div>
+                                    <div class="right accept">[$78]</div>
+                                    <div class="right cancel">[$79]</div>
+                                    <div class="clear"></div>
+                                </div>
                                 <div class="warning bitcoin-tip">
                                     <i class="sprite-fm-uni icon-hazard"></i>
                                     <span>[$23304]</span>
@@ -6417,7 +6437,6 @@
                                 <div class="right cancel">[$79]</div>
                                 <div class="clear"></div>
                             </div>
-
                         </form>
                     </div>
                 </div>

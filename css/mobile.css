@@ -13048,7 +13048,9 @@ code, c {
     padding: 12px 0 2px 0;
     text-align: left;
 }
-.affiliate-redeem.save-data-checkbox {
+.affiliate-redeem.save-data-checkbox,
+.affiliate-redeem.save-bitcoin-checkbox,
+.affiliate-redeem.bitcoin-fill-checkbox {
     padding: 15px 0 0 0;
     text-align: left;
 }

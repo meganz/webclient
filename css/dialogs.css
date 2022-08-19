@@ -460,6 +460,7 @@ body.de .mega-dialog.new-group-chat {
 }
 .mega-dialog.add-from-cloud .tranfer-filetype-txt {
     max-width: 900px;
+    cursor: pointer;
 }
 .fm-dialog-table.grid-table td .tooltip-handler-container {
     height: 24px;

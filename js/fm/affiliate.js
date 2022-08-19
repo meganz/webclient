@@ -719,6 +719,8 @@ affiliateUI.redemptionDialog = {
         $('.next-btn', this.$dialog).addClass('disabled');
         $('#affi-bitcoin-address', this.$dialog).val('');
         // $('#affiliate-redemption-amount', this.$dialog).attr('data-currencyValue', M.affiliate.balance.available);
+        $('.checkdiv.checkboxOn', this.$dialog).removeClass('checkboxOn').addClass('checkboxOff');
+        $('.save-data-tip', this.$dialog).addClass('hidden');
 
         affiliateRedemption.reset();
     },
@@ -794,7 +796,12 @@ affiliateUI.redemptionDialog = {
             }
 
             if (affiliateRedemption.currentStep === 1) {
+
                 $('#affi-bitcoin-address', this.$dialog).val('');
+                const $checkbox = $('.step2 .checkdiv.checkboxOn', this.$dialog)
+                    .removeClass('checkboxOn').addClass('checkboxOff');
+                $('input[type="checkbox"]' ,$checkbox).prop('checked', false);
+                $('.save-data-tip', this.$dialog).addClass('hidden');
             }
         });
 
@@ -859,6 +866,7 @@ affiliateUI.redemptionDialog = {
 
         // Step 2
         var $step2 = $('.cells.step2', this.$dialog);
+        const $saveDataTipBitcoin = $('.save-data-tip', $step2);
 
         $('.withdraw-txt a', $step2).rebind('click.changeMethod', function() {
 
@@ -866,6 +874,29 @@ affiliateUI.redemptionDialog = {
             self.displaySteps();
 
             return false;
+        });
+
+        uiCheckboxes($('.save-bitcoin-checkbox', $step2));
+
+        uiCheckboxes($('.bitcoin-fill-checkbox', $step2), value => {
+
+            $('#affi-bitcoin-address', $step2).data('MegaInputs')
+                .setValue(value ? M.affiliate.redeemAccDefaultInfo.an : '');
+            $saveDataTipBitcoin.addClass('hidden');
+        });
+
+        $('#affi-bitcoin-address', $step2).rebind('input.changeBitcoinAddress', function() {
+
+            if (!this.value) {
+                $saveDataTipBitcoin.addClass('hidden');
+            }
+            else if (M.affiliate.redeemAccDefaultInfo && M.affiliate.redeemAccDefaultInfo.an &&
+                M.affiliate.redeemAccDefaultInfo.an !== this.value) {
+
+                $saveDataTipBitcoin.removeClass('hidden');
+            }
+
+            Ps.update($step2.children('.ps').get(0));
         });
 
         // Step 3
@@ -949,19 +980,45 @@ affiliateUI.redemptionDialog = {
 
         uiCheckboxes($('.save-data-checkbox', $step3));
 
-        $saveDataTip.rebind('click.updateAccData', function(e) {
+        $saveDataTip.add($saveDataTipBitcoin).rebind('click.updateAccData', function(e) {
 
+            var $this = $(this);
             var $target = $(e.target);
             var __hideSaveDataTip = function() {
 
-                $saveDataTip.addClass('hidden');
-                const scrollContainer = $step3[0].querySelector('.cell-content');
+                $this.addClass('hidden');
+                const scrollContainer = $this.closest('.cell-content').get(0);
                 Ps.update(scrollContainer);
                 scrollContainer.scrollTop = 0;
-                $('input', $step3).off('focus.jsp');
+                $('input', scrollContainer).off('focus.jsp');
             };
 
-            if ($target.hasClass('accept') && affiliateRedemption.validateDynamicAccInputs()) {
+            var _bitcoinValidation = function() {
+
+                const $input = $('#affi-bitcoin-address');
+                const megaInput = $input.data('MegaInputs');
+
+                if (validateBitcoinAddress($input.val())) {
+
+                    if (megaInput) {
+                        megaInput.showError(l[23322]);
+                    }
+                    else {
+                        msgDialog('warninga', '', l[23322]);
+                    }
+
+                    return false;
+                }
+
+                affiliateRedemption.requests.second.extra = {an: $input.val()};
+
+                return true;
+            };
+
+            const _validation = affiliateRedemption.requests.first.m === 2 ?
+                _bitcoinValidation : affiliateRedemption.validateDynamicAccInputs.bind(affiliateRedemption);
+
+            if ($target.hasClass('accept') && _validation()) {
 
                 affiliateRedemption.updateAccInfo();
                 __hideSaveDataTip();
@@ -1120,6 +1177,19 @@ affiliateUI.redemptionDialog = {
 
             $('.affi-withdraw-currency, .currency-tip', $currentStep).addClass('hidden');
             $('.bitcoin-data', $currentStep).removeClass('hidden');
+
+            if (M.affiliate.redeemAccDefaultInfo && M.affiliate.redeemAccDefaultInfo.an) {
+
+                // Autofill bitcoin address
+                $('.save-bitcoin-checkbox', $currentStep).addClass('hidden');
+                $('.bitcoin-fill-checkbox', $currentStep).removeClass('hidden');
+            }
+            else {
+
+                // Save bitcoin address
+                $('.save-bitcoin-checkbox', $currentStep).removeClass('hidden');
+                $('.bitcoin-fill-checkbox', $currentStep).addClass('hidden');
+            }
         }
         else {
             $('.affi-withdraw-currency, .currency-tip', $currentStep).removeClass('hidden');

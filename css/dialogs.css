@@ -8010,7 +8010,7 @@ body.de .mega-dialog.new-group-chat {
         border: 1px solid var(--stroke-grey-2);
         border-radius: 12px;
     }
-    .mega-dialog.affiliate-redeem .cells .ps .header {
+    .mega-dialog.affiliate-redeem .cells:not(.step2) .ps .header {
         padding: 20px 0 24px;
     }
     .mega-dialog.affiliate-redeem .cells.step3 {
@@ -8216,6 +8216,11 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.affiliate-redeem .bitcoin-data {
         position: relative;
+    }
+    .mega-dialog.affiliate-redeem .bitcoin-data .bitcoin-fill-checkbox,
+    .mega-dialog.affiliate-redeem .bitcoin-data .save-bitcoin-checkbox,
+    .mega-dialog.affiliate-redeem .bitcoin-data .save-data-tip {
+        margin-bottom: 16px;
     }
     .mega-dialog.affiliate-redeem button.back i {
         transform: rotate(180deg);

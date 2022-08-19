@@ -916,10 +916,22 @@ FileManager.prototype.initFileManagerUI = function() {
                 prev: null,
                 subpages: [M.InboxID, M.RubbishID, 'recents', 'shares', 'out-shares', 'public-links']
             },
-            'gallery':         {root: 'photos',    prev: null, subpages: ['photos', 'images', 'videos', 'favourites']},
-            'photos':          {root: 'photos',    prev: null},
-            'images':          {root: 'images',    prev: null},
-            'videos':          {root: 'videos',    prev: null},
+            'gallery':         {root: 'photos',    prev: null, subpages: Object.keys(mega.gallery.sections)},
+            'photos': {
+                root: 'photos',
+                prev: null,
+                subpages: ['cloud-drive-photos', 'camera-uploads-photos']
+            },
+            'images': {
+                root: 'images',
+                prev: null,
+                subpages: ['cloud-drive-images', 'camera-uploads-images']
+            },
+            'videos': {
+                root: 'videos',
+                prev: null,
+                subpages: ['cloud-drive-videos', 'camera-uploads-videos']
+            },
             'favourites':      {root: 'favourites',prev: null},
             'folder-link':     {root: M.RootID,    prev: null},
             'conversations':   {root: 'chat',      prev: null, subpages: ['contacts']},
@@ -970,7 +982,14 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        var activeClass = this.classList.contains('btn-myfiles') ? '.btn-myfiles' : '.js-fm-tab';
+        let activeClass = '.js-fm-tab';
+
+        if (this.classList.contains('btn-myfiles')) {
+            activeClass = '.btn-myfiles';
+        }
+        else if (this.classList.contains('btn-galleries')) {
+            activeClass = '.btn-galleries';
+        }
 
         activeClass = ('' + $(activeClass + '.active:visible')
             .attr('class')).split(" ").filter(function(c) {
@@ -2056,8 +2075,7 @@ FileManager.prototype.initContextUI = function() {
 
         const target = M.d[$.selected[0]];
 
-        if (M.currentdirid === 'photos' || M.currentdirid === 'images' ||
-            M.currentdirid === 'videos' || M.currentdirid === 'favourites') {
+        if (mega.gallery.sections[M.currentdirid]) {
             M.fmTabState.gallery.prev = M.currentdirid;
         }
 
@@ -3954,15 +3972,11 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         case 'affiliate':
             tmpId = 'dashboard';
             break;
-        case 'photos':
-        case 'images':
-        case 'videos':
-        case 'favourites':
         case 'discovery':
             tmpId = 'gallery';
             break;
         default:
-            tmpId = id;
+            tmpId = (mega.gallery.sections[id]) ? 'gallery' : id;
     }
 
     let fmLeftIconName = String(tmpId).replace(/[^\w-]/g, '');
@@ -4181,9 +4195,17 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     let panel;
 
-    if ((id === 'cloud-drive' && !folderlink) || id === 'shared-with-me' || id === 'out-shares' ||
-        id === 'public-links' || id === 'inbox' || id === 'rubbish-bin' || id === 'recents' ||
-        id === "photos" || id === "images" || id === "videos" || id === 'favourites' || id === 'discovery') {
+    if (
+        (id === 'cloud-drive' && !folderlink)
+        || id === 'shared-with-me'
+        || id === 'out-shares'
+        || id === 'public-links'
+        || id === 'inbox'
+        || id === 'rubbish-bin'
+        || id === 'recents'
+        || id === 'discovery'
+        || mega.gallery.sections[id]
+    ) {
         M.initLeftPanel();
     }
     else if (id === 'cloud-drive' || id === 'dashboard' || id === 'account') {
@@ -4349,10 +4371,9 @@ FileManager.prototype.initLeftPanel = function() {
     else if (M.currentrootid === M.RubbishID) {
         $('.js-lpbtn[data-link="bin"]').addClass('active');
     }
-    else if (isGallery) {
-        $(`.js-lpbtn[data-link="${M.currentdirid}"]`).addClass('active');
+    else if (isGallery && mega.gallery.sections[M.currentdirid]) {
+        $(`.js-lpbtn[data-link="${mega.gallery.sections[M.currentdirid].root}"]`).addClass('active');
     }
-
 
     $('.js-lpbtn').rebind('click.openSubTab', function(e) {
 
@@ -4420,13 +4441,12 @@ FileManager.prototype.getCameraUploads = async function() {
 
     this.cameraUploadUI();
 
-    // Currently not in use, enable it once requires it.
-    // handle = base64urlencode(res.sh);
+    const handle2 = base64urlencode(res.sh);
 
-    // if (handle) {
-    //     nodes.push(handle);
-    //     M.SecondCameraId = handle;
-    // }
+    if (handle2) {
+        nodes.push(handle2);
+        M.SecondCameraId = handle2;
+    }
 
     return nodes;
 };

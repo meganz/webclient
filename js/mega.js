@@ -3930,7 +3930,16 @@ lazy(fm_thumbnails, 'exclude', () => {
     'use strict';
     const res = {
         recents: 5,
-        photos: 7, images: 7, videos: 7, favourites: 7
+        photos: 7,
+        [mega.gallery.secKeys.cuphotos]: 7,
+        [mega.gallery.secKeys.cdphotos]: 7,
+        images: 7,
+        [mega.gallery.secKeys.cuimages]: 7,
+        [mega.gallery.secKeys.cdimages]: 7,
+        videos: 7,
+        [mega.gallery.secKeys.cuvideos]: 7,
+        [mega.gallery.secKeys.cdvideos]: 7,
+        favourites: 7
     };
     return Object.setPrototypeOf(res, null);
 });

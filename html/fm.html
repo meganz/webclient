@@ -442,7 +442,7 @@
             </div>
             <div class="nw-fm-left-icon gallery sprite-fm-uni-before icon-gallery-before js-fm-tab" aria-role="button" name="gallery">
                 <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$gallery_title]</div>
+                <div class="dark-tooltip">[$gallery_photos]</div>
             </div>
             <div class="nw-fm-left-icon conversations sprite-fm-uni-before icon-chat-before js-fm-tab" aria-role="button" name="conversations">
                 <div class="nw-fm-left-border"></div>
@@ -676,13 +676,13 @@
             <!-- Gallery Section Begin -->
             <section class="js-lp-gallery lp-gallery" >
                 <div class="lp-header">
-                    <span>[$gallery_title]</span>
+                    <span>[$gallery_photos]</span>
                 </div>
                 <div class="content-area js-gallery-panel">
                     <div class="library-panel">
                         <span class="section-title">[$gallery_subtitle]</span>
                         <button class="btn-galleries js-lpbtn photos js-fm-tab" data-link="photos">
-                            <i class="sprite-fm-mono icon-photos"></i>[$gallery_photos]
+                            <i class="sprite-fm-mono icon-photos"></i>[$gallery_all_media]
                         </button>
                         <button class="btn-galleries js-lpbtn images js-fm-tab" data-link="images">
                             <i class="sprite-fm-mono icon-images"></i>[$gallery_images]
@@ -1384,67 +1384,6 @@
                 <div class="fm-empty-pad">
                     <i class="section-icon sprite-fm-mono icon-link-filled"></i>
                     <div class="fm-empty-cloud-txt">[$20669]</div>
-                </div>
-            </div>
-
-            <div class="fm-empty-section fm-empty-photos hidden">
-                <div class="fm-empty-pad">
-                    <i class="section-icon sprite-fm-theme icon-gallery-photos"></i>
-                    <div class="fm-empty-cloud-txt">[$gallery_photos_welcome]</div>
-                    <div class="fm-empty-description">[$gallery_get_start]</div>
-                    <div class="fm-empty-options">
-                        <div class="fm-empty-options-item">
-                            <i class="sprite-fm-mono icon-mobile"></i>
-                            [$gallery_get_start_instruction_2]
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="fm-empty-section fm-empty-images hidden">
-                <div class="fm-empty-pad">
-                    <i class="section-icon sprite-fm-theme icon-gallery-photos"></i>
-                    <div class="fm-empty-cloud-txt">[$gallery_images_welcome]</div>
-                    <div class="fm-empty-description">[$gallery_get_start]</div>
-                    <div class="fm-empty-options">
-                        <div class="fm-empty-options-item">
-                            <i class="sprite-fm-mono icon-camera-uploads"></i>
-                            [$gallery_get_start_instruction_1]
-                        </div>
-                        <div class="fm-empty-options-item">
-                            <i class="sprite-fm-mono icon-pc"></i>
-                            [$gallery_get_start_instruction_3]
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="fm-empty-section fm-empty-videos hidden">
-                <div class="fm-empty-pad">
-                    <i class="section-icon sprite-fm-theme icon-gallery-photos"></i>
-                    <div class="fm-empty-cloud-txt">[$gallery_videos_welcome]</div>
-                    <div class="fm-empty-description">[$gallery_get_start]</div>
-                    <div class="fm-empty-options">
-                        <div class="fm-empty-options-item">
-                            <i class="sprite-fm-mono icon-camera-uploads"></i>
-                            [$gallery_get_start_instruction_1]
-                        </div>
-                        <div class="fm-empty-options-item">
-                            <i class="sprite-fm-mono icon-mobile"></i>
-                            [$gallery_get_start_instruction_2]
-                        </div>
-                        <div class="fm-empty-options-item">
-                            <i class="sprite-fm-mono icon-pc"></i>
-                            [$gallery_get_start_instruction_3]
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="fm-empty-section fm-empty-favourites hidden">
-                <div class="fm-empty-pad">
-                    <i class="section-icon sprite-fm-theme icon-empty-state-favourite"></i>
-                    <div class="fm-empty-cloud-txt">[$gallery_favourites_empty]</div>
                 </div>
             </div>
 
@@ -2197,17 +2136,7 @@
 
                 <!-- Templates for Gallery list -->
                 <div class="content-row template" id="gallery-cr-template">
-                    <div class="content-block">
-                        <a class="data-block-view template" id="gallery-dbv-template">
-                            <span class="data-block-bg">
-                                <span class="block-view-file-type image file sprite-fm-mono icon-images"><img/></span>
-                                <div class="video-thumb-details">
-                                    <span>00:00</span>
-                                </div>
-                                <span class="data-block-fav-icon sprite-fm-mono icon-favourite-filled"></span>
-                            </span>
-                        </a>
-                    </div>
+                    <div class="content-block"></div>
                 </div>
                 <!-- END Templates for Gallery list -->
             </div>

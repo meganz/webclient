@@ -1166,7 +1166,12 @@ contextMenu = {
 };
 
 function bindDropdownEvents() {}
-mega.gallery = {};
+mega.gallery = {
+    sections: {},
+    secKeys: {},
+    showEmpty: nop,
+    emptyBlock: null
+};
 
 /** Global function to be used in mobile mode, checking if the action can be taken by the user.
  * It checks the user validity (Expired business, or ODQ Paywall)

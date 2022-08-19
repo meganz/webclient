@@ -7,7 +7,6 @@ const pages = [
     "cmd",
     "extensions", "chrome", "firefox", "edge",
     "nas",
-    "help",
     "developers",
     "about",
     "pro",

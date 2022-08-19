@@ -15,7 +15,7 @@ var bottompage = {
         // Unbind sliders events
         $(window).unbind('resize.sliderResize');
 
-        if (page.substr(0, 4) === 'help' || page.substr(0, 9) === 'corporate' || page.substr(0, 9) === 'corporate') {
+        if (page.substr(0, 9) === 'corporate') {
             $('body').addClass('old');
             scrollMenu();
         }

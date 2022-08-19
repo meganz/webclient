@@ -1660,9 +1660,7 @@ var dlmanager = {
         $('.upgrade, .mobile.upgrade-to-pro, .plan-button', $dialog).rebind('click', onclick);
 
         $('.bottom-tips a', $dialog).rebind('click', function() {
-            open(getAppBaseUrl() +
-                '#help/client/webclient/cloud-drive/576ca738886688e7028b4599'
-            );
+            open(l.mega_help_host + '/plans-storage/space-storage/transfer-quota', '_blank', 'noopener,noreferrer');
         });
 
         if (flags & this.LMT_ISREGISTERED) {

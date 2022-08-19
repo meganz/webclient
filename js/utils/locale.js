@@ -941,6 +941,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         l[0] = 'MEGA';
     }
 
+    // MEGA static hosts
+    l.mega_help_host = 'https://help.mega.io';
+
     l[8762] = l[8762].replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl" tabindex="-1">');
     l['208a'] = l['208a'].replace('[/A]', '</a>');
@@ -952,7 +955,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
     l[208] = l[208].replace('[/A]', '</a>');
-    l[517] = l[517].replace('[A]', '<a href="/help" class="help-center-link clickurl">').replace('[/A]', '</a>');
+    l[517] = l[517].replace(
+        '[A]',
+        '<a href="' + l.mega_help_host + '" class="help-center-link clickurl" target="_blank">'
+    ).replace('[/A]', '</a>');
     l[1094] = l[1094].replace('[A]', '<a href="/extensions" class="clickurl">').replace('[/A]', '</a>');
     l[1095] = l[1095].replace('[A]', '<span class="red">').replace('[/A]', '</span>');
     l[731] = l[731].replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
@@ -1043,12 +1049,23 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l[16649] = l[16649].replace('%1', '<span class="amount">10.00</span>');
     l[16501] = l[16501].replace('[A1]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A1]', '</a>')
-        .replace('[A2]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/android/accounts-and-pro-` +
-            `accounts#how-can-i-cancel-the-renewal-of-my-mega-subscription-57733f8b886688e7028b45cf">`)
+        .replace(
+            '[A2]',
+            '<a class="red" target="_blank" href="'
+            + l.mega_help_host
+            + '/plans-storage/payments-billing/cancel-mobile-subscription'
+            + '#:~:text=with%20the%20Appstore-,Android%20/%20Google,-Learn%20here%20how'
+            + '">'
+        )
         .replace('[/A2]', '</a>')
-        .replace('[A3]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/ios/accounts-and-pro-` +
-            `accounts#how-does-mega-pro-account-subscription-work-with-apple-in-app-purchases` +
-            `-57732e9f886688e7028b45bd">`)
+        .replace(
+            '[A3]',
+            '<a class="red" target="_blank" href="'
+            + l.mega_help_host
+            + '/plans-storage/payments-billing/cancel-mobile-subscription'
+            + '#:~:text=your%20device%20type.-,iOS,-Learn%20here%20how'
+            + '">'
+        )
         .replace('[/A3]', '</a>');
     l[16614] = escapeHTML(l[16614])
         .replace('[A]', '<a class="red" href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
@@ -1066,7 +1083,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
         .replace('[/A]', '</a>');
 
-    var linktohelp = `https://help.mega.io/files-folders/restore-delete/file-version-history`;
+    var linktohelp = l.mega_help_host + '/files-folders/restore-delete/file-version-history';
     l[17097] =  l[17097]
                 .replace('[A]', '<a id="versionhelp" href="' + linktohelp + '" target="_blank" class="red">')
                 .replace('[/A]', '</a>');
@@ -1097,8 +1114,12 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
     l[19514] = l[19514].replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>').replace('%1', 2)
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[19661] = l[19661].replace('[A]', '<a href="/help/client/megasync/" class="clickurl" rel="noreferrer">')
-        .replace('[/A]', '</a>');
+    l[19661] = l[19661].replace(
+        '[A]',
+        '<a href="'
+        + l.mega_help_host
+        + '/installs-apps/desktop-syncing" class="clickurl" rel="noreferrer" target="_blank">'
+    ).replace('[/A]', '</a>');
     l[19685] = l[19685].replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
     l[19691] = l[19691].replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
     l[19834] = l[19834].replace('[A]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A]', '</a>');
@@ -1334,7 +1355,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[BR]', '<br>');
     l.onboard_v4_control_finished = escapeHTML(l.onboard_v4_control_finished)
         .replace('[S]', '<span>').replace('[/S]', '</span>')
-        .replace('[A]', '<a class="clickurl" href="/help">').replace('[/A]', '</a>');
+        .replace(
+            '[A]',
+            '<a class="clickurl" href="' + l.mega_help_host + '" target="_blank">'
+        ).replace('[/A]', '</a>');
     l.recovery_web_step_2 = escapeHTML(l.recovery_web_step_2)
         .replace('[B]', '<strong>')
         .replace('[/B]', '</strong>');
@@ -1343,12 +1367,23 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/B]', '</strong>');
     l.warning_has_subs_with_3p = l.warning_has_subs_with_3p
         .replace('[A1]', '<a class="red" href="mailto:support@mega.nz">').replace('[/A1]', '</a>')
-        .replace('[A2]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/android/accounts-and-pro-` +
-            `accounts#how-can-i-cancel-the-renewal-of-my-mega-subscription-57733f8b886688e7028b45cf">`)
+        .replace(
+            '[A2]',
+            '<a class="red" target="_blank" href="'
+            + l.mega_help_host
+            + '/plans-storage/payments-billing/cancel-mobile-subscription'
+            + '#:~:text=with%20the%20Appstore-,Android%20/%20Google,-Learn%20here%20how'
+            + '">'
+        )
         .replace('[/A2]', '</a>')
-        .replace('[A3]', `<a class="red" target="_blank" href="${getBaseUrl()}/help/client/ios/accounts-and-pro-` +
-            `accounts#how-does-mega-pro-account-subscription-work-with-apple-in-app-purchases` +
-            `-57732e9f886688e7028b45bd">`)
+        .replace(
+            '[A3]',
+            '<a class="red" target="_blank" href="'
+            + l.mega_help_host
+            + '/plans-storage/payments-billing/cancel-mobile-subscription'
+            + '#:~:text=your%20device%20type.-,iOS,-Learn%20here%20how'
+            + '">'
+        )
         .replace('[/A3]', '</a>');
     l.redeem_etoomany = l.redeem_etoomany
         .replace('[A]', `<a class="clickurl" href="/support">`)

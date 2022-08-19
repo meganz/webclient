@@ -240,8 +240,7 @@ function getSitePath() {
         }
     }
 
-    if (isPublickLinkV2(document.location.pathname)
-        || isHelpLink(document.location.pathname)) {
+    if (isPublickLinkV2(document.location.pathname)) {
         return document.location.pathname + document.location.hash;
     }
 
@@ -355,11 +354,6 @@ function isPublickLinkV2(page) {
 
     var types = {'file': 6, 'folder': 8, 'embed': 7};
     return page.length > types[page.split('/')[0]];
-}
-function isHelpLink(page) {
-    'use strict';
-    page = getCleanSitePath(page);
-    return page.indexOf('help/') === 0;
 }
 
 // Safer wrapper around decodeURIComponent
@@ -1155,10 +1149,6 @@ else if (isPublickLinkV2(document.location.pathname)) {
         page = page.split(/[#/]/);
         page = '!' + page[1] + '!' + page[2];
     }
-}
-else if (isHelpLink(document.location.pathname)) {
-    page = getCleanSitePath();
-    history.replaceState({ subpage: page }, "", '/' + page);
 }
 else {
     if (document.location.hash.length > 0) {
@@ -2921,7 +2911,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
 
-        jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/recovery.css', n: 'recovery_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3223,7 +3212,6 @@ else if (!browserUpdate) {
             jsl.push({f:'html/top.html', n: 'top', j:0});
             jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
             jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/help2.css', n: 'help_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
@@ -3297,10 +3285,6 @@ else if (!browserUpdate) {
         'dev': {f:'html/dev.html', n: 'dev', j:0},
         'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-        'lunr_js': {f:'js/vendor/elasticlunr.js', n: 'lunr_js', j:1},
-        'help2_welcome': {f:'html/help2_welcome.html', n: 'help2_welcome', j: 0},
-        'help2_page': {f:'html/help2_page.html', n: 'help2_page', j: 0},
-        'help_js': {f:'html/js/help2.js', n: 'help_js', j:1},
         'desktop': {f:'html/desktop.html', n: 'desktop', j:0},
         'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
         'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
@@ -3468,7 +3452,6 @@ else if (!browserUpdate) {
         'dev': ['dev','dev_js','sdkterms'],
         'sdk': ['dev','dev_js','sdkterms'],
         'doc': ['dev','dev_js','sdkterms'],
-        'help': ['lunr_js', 'help2_welcome', 'help2_page', 'help_js'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
         'plugin': ['browsers', 'browsers_js'],

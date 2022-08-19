@@ -13,13 +13,6 @@ var cachepages = [
     "doc",
     "firefox",
     "general",
-    "help",
-    "help/client/android",
-    "help/client/ios",
-    "help/client/megachat",
-    "help/client/megasync",
-    "help/client/webclient",
-    "help/client/windowsphone",
     "login",
     "mobile",
     "privacy",
@@ -46,7 +39,6 @@ var titles = {
 	'doc' : 'Developer Documentation - MEGA',
 	'firefox' : 'Firefox Extension - MEGA',
 	'general' : 'General Policy - MEGA',
-	'help' : 'Help Center - MEGA',
 	'login' : 'Login - MEGA',
 	'mobile' : 'Mobile Apps - MEGA',
 	'privacy' : 'Privacy Policy - MEGA',
@@ -60,13 +52,7 @@ var titles = {
 	'takedown' : 'Takedown Policy - MEGA',
 	'terms' : 'Terms of Service - MEGA',
 	'cmd' : 'MEGAcmd - MEGA',
-	'pro' : 'Upgrade to Pro - MEGA',
-	'help/client/android' : 'Android Help Center - MEGA',
-	'help/client/ios' : 'iOS Help Center - MEGA',
-	'help/client/megachat' : 'MEGAchat Help Center - MEGA',
-	'help/client/megasync' : 'MEGAsync Help Center - MEGA',
-	'help/client/webclient' : 'Webclient Help Center - MEGA',
-	'help/client/windowsphone' : 'Windows Phone Help Center - MEGA'
+	'pro' : 'Upgrade to Pro - MEGA'
 };
 
 
@@ -121,28 +107,11 @@ function cacheURLexists(url) {
 	return found;
 }
 
-function clearHelp()
-{
-	var removeIndex = [];
-	for (var i in cachepages) {
-		if (cachepages[i].substr(0,12) == 'help/client/' && cachepages[i].split('/').length > 3) removeIndex.push(i);
-	}
-	for (var i = removeIndex.length -1; i >= 0; i--) cachepages.splice(removeIndex[i],1);
-}
-
 function detectCacheReady() {
 	if ($('.loading-spinner').hasClass('hidden')) {
 		$('#hiddendiv').html('');
 		cachepage = cachepages[cacheindex];
 		console.log('cache page',cachelang + '/' + cachepage);
-		if (cachepage.substr(0,12) == 'help/client/' && cachepage.split('/').length < 4 && cachehelplanguages.indexOf(cachelang) > -1) {
-			// look for all direct help URLs for caching for specific languages:
-			$('.d-section-items li a').each(function(i,el) {
-				var url = $(el).attr('href');
-				if (url.substr(0,1) == '/') url = url.substr(1,url.length-1);
-				if (!cacheURLexists(url)) cachepages.push(url);
-			});
-		}
 		setTimeout(function() {
 			var tlang = '';
 			if (languages[cachelang] && languages[cachelang][0]) tlang =languages[cachelang][0];
@@ -153,24 +122,6 @@ function detectCacheReady() {
 			cacheindex++;
 			if (cachepages.length > cacheindex) {
 				makeCache();
-			}
-			else if (cachelanguages.length-1 > cachelangindex) {
-				clearHelp();
-				cacheindex=0;
-				cachelangindex++;
-				cachelang = cachelanguages[cachelangindex];
-				lang = cachelang;
-				loadSubPage('help');
-				loadingDialog.show();
-				if (typeof Help !== 'undefined') {
-					Help.loadfromCMS(function()
-					{
-						boot_done_makecache=true;
-						jsl.push({f:getLanguageFilePath(cachelang), n: 'lang', j:3});
-						jsl_start();
-					});
-				}
-				else makeCache();
 			}
 			else {
 
@@ -266,16 +217,6 @@ function cacheHTML() {
 		{
 			// look for Blog title in the HTML:
 			title = $('#hiddendiv #blogarticle_title').text() + ' - MEGA';
-		}
-		else if (cachepagevar.indexOf('help/') > -1)
-		{
-			// look for help subject in the HTML:
-			title = $('#hiddendiv .sidebar-menu-link.scrollTo.active').text().trim();
-			if (title == '') title = 'Help Center - MEGA';
-			else
-			{
-				title = title + ' - MEGA';
-			}
 		}
 		else
 		{

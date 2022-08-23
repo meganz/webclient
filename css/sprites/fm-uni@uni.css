@@ -143,8 +143,8 @@
 .sprite-fm-uni.icon-crest-pro-3, .sprite-fm-uni-before.icon-crest-pro-3-before::before, .sprite-fm-uni-after.icon-crest-pro-3-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crest-pro-3");
 }
-.sprite-fm-uni.icon-crest-pro-4, .sprite-fm-uni-before.icon-crest-pro-4-before::before, .sprite-fm-uni-after.icon-crest-pro-4-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crest-pro-4");
+.sprite-fm-uni.icon-crest-pro-flexi, .sprite-fm-uni-before.icon-crest-pro-flexi-before::before, .sprite-fm-uni-after.icon-crest-pro-flexi-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crest-pro-flexi");
 }
 .sprite-fm-uni.icon-crests-business-details, .sprite-fm-uni-before.icon-crests-business-details-before::before, .sprite-fm-uni-after.icon-crests-business-details-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crests-business-details");
@@ -164,8 +164,8 @@
 .sprite-fm-uni.icon-crests-pro-3-details, .sprite-fm-uni-before.icon-crests-pro-3-details-before::before, .sprite-fm-uni-after.icon-crests-pro-3-details-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crests-pro-3-details");
 }
-.sprite-fm-uni.icon-crests-pro-4-details, .sprite-fm-uni-before.icon-crests-pro-4-details-before::before, .sprite-fm-uni-after.icon-crests-pro-4-details-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crests-pro-4-details");
+.sprite-fm-uni.icon-crests-pro-flexi-details, .sprite-fm-uni-before.icon-crests-pro-flexi-details-before::before, .sprite-fm-uni-after.icon-crests-pro-flexi-details-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crests-pro-flexi-details");
 }
 .sprite-fm-uni.icon-disable, .sprite-fm-uni-before.icon-disable-before::before, .sprite-fm-uni-after.icon-disable-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-disable");

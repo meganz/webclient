@@ -137,7 +137,12 @@ class MegaGallery {
         }
     }
 
-    getCameraHandles() {
+    static sortViewNodes() {
+        const sortFn = M.sortByModTimeFn2();
+        M.v.sort((a, b) => sortFn(a, b, -1));
+    }
+
+    static getCameraHandles() {
         if (!M.CameraId) {
             return [];
         }
@@ -1033,7 +1038,7 @@ class MegaGallery {
             M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
         }
 
-        M.sortByModTime(-1);
+        MegaGallery.sortViewNodes();
 
         delete this.updNode[n.h];
 
@@ -1056,7 +1061,7 @@ class MegaGallery {
             M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
         }
 
-        M.sortByModTime(-1);
+        MegaGallery.sortViewNodes();
 
         if (this.dynamicList && M.v.length === 0) {
             this.dynamicList.destroy();
@@ -1175,7 +1180,7 @@ class MegaGallery {
             M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
         }
 
-        M.sortByModTime(-1);
+        MegaGallery.sortViewNodes();
 
         this.clearRenderCache();
 
@@ -1670,8 +1675,7 @@ class MegaGallery {
         if (this.nodes) {
 
             M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
-
-            M.sortByModTime(-1);
+            MegaGallery.sortViewNodes();
 
             return false;
         }
@@ -1685,8 +1689,7 @@ class MegaGallery {
     }
 
     setViewAfter() {
-
-        M.sortByModTime(-1);
+        MegaGallery.sortViewNodes();
 
         if (d) {
             console.timeEnd(`MegaGallery: ${this.id}`);
@@ -1710,7 +1713,7 @@ class MegaTargetGallery extends MegaGallery {
             return false;
         }
 
-        const handles = this.id === 'photos' ? this.getCameraHandles() : M.getTreeHandles(this.id);
+        const handles = this.id === 'photos' ? MegaGallery.getCameraHandles() : M.getTreeHandles(this.id);
         let subs = [];
 
         await dbfetch.geta(handles).catch(nop);
@@ -1799,7 +1802,7 @@ class MegaMediaTypeGallery extends MegaGallery {
         }
 
         let nodes = [];
-        const cameraTree = this.getCameraHandles();
+        const cameraTree = MegaGallery.getCameraHandles();
         const rubTree = MegaGallery.handlesArrToObj(M.getTreeHandles(M.RubbishID));
 
         if (MegaGallery.dbActionPassed) {
@@ -1842,7 +1845,8 @@ class MegaMediaTypeGallery extends MegaGallery {
         }
 
         // This sort is needed for building groups, do not remove
-        nodes.sort((a, b) => M.sortByModTimeFn2()(a, b, -1));
+        const sortFn = M.sortByModTimeFn2();
+        nodes.sort((a, b) => sortFn(a, b, -1));
 
         if (!Array.isArray(nodes)) {
             if (d) {
@@ -1875,7 +1879,7 @@ class MegaMediaTypeGallery extends MegaGallery {
     }
 
     checkGalleryUpdate(n) {
-        const cameraTree = this.getCameraHandles();
+        const cameraTree = MegaGallery.getCameraHandles();
 
         if (!n.t && this.typeFilter(n, cameraTree)) {
             const ignoreHandles = MegaGallery.handlesArrToObj([

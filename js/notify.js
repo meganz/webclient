@@ -396,9 +396,6 @@ var notify = {
 
         // Update page title
         megatitle();
-
-        // Update IPC indicator
-        delay('updateIpcRequests', updateIpcRequests);
     },
 
     /**
@@ -735,10 +732,7 @@ var notify = {
             var pendingContactId = $this.attr('data-pending-contact-id');
 
             // Send the User Pending Contact Action (upca) API 2.0 request to accept the request
-            M.acceptPendingContactRequest(pendingContactId).done(() => {
-                // Update IPC indicator
-                delay('updateIpcRequests', updateIpcRequests, 1000);
-            }).fail(() => {
+            M.acceptPendingContactRequest(pendingContactId).fail(() => {
                 notify.acceptedContactRequests.splice(notify.acceptedContactRequests.indexOf(pendingContactId), 1);
             });
 

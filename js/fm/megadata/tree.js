@@ -599,13 +599,6 @@ MegaData.prototype.initTreePanelSorting = function() {
     }
 };
 
-MegaData.prototype.getTreePanelSortingValue = function(column, property) {
-    'use strict';
-
-    column = M.sortTreePanel[column] || false;
-    return column[property || 'by'];
-};
-
 var treesearch = false;
 
 MegaData.prototype.treeSearchUI = function() {
@@ -792,22 +785,10 @@ MegaData.prototype.treeSortUI = function() {
                 type = M.lastActiveTab || 'cloud-drive';
             }
 
-            menu.find('.sorting-item-divider,.dropdown-item').removeClass('hidden');
-
-            // Show only contacts related sorting options
-            if (type === 'contacts') {
-                menu.find('*[data-by=fav],*[data-by=created],*[data-by=label]').addClass('hidden');
-                menu.find('.dropdown-section.labels').addClass('hidden');
-                menu.find('hr').addClass('hidden');
-                menu.find('.filter-by').addClass('hidden');
-
-            }
-            else { // Hide status and last-interaction sorting options in sort dialog
-                menu.find('*[data-by=status],*[data-by=last-interaction]').addClass('hidden');
-                menu.find('hr').removeClass('hidden');
-                menu.find('.dropdown-section.labels').removeClass('hidden');
-                menu.find('.filter-by').removeClass('hidden');
-            }
+            $('.dropdown-item', menu).removeClass('hidden');
+            $('hr', menu).removeClass('hidden');
+            $('.dropdown-section.labels', menu).removeClass('hidden');
+            $('.filter-by', menu).removeClass('hidden');
 
             if (type === 'shared-with-me') {
                 menu.find('*[data-by=created]').addClass('hidden');
@@ -990,7 +971,7 @@ MegaData.prototype.redrawTree = function(f) {
     $('.nw-fm-tree-item').noTransition(function() {
         M.onTreeUIOpen(M.currentdirid, false);
     });
-    M.redrawTreeFilterUI();
+    // M.redrawTreeFilterUI();
 };
 
 /**
@@ -1249,21 +1230,6 @@ MegaData.prototype.addTreeUI = function() {
         return false;
     });
 
-    $('.nw-contact-item', $treePanel).rebind('contextmenu.treeUI', function(e) {
-        var $self = $(this);
-
-        if (!$self.hasClass('selected')) {
-            $('.content-panel.contacts .nw-contact-item.selected').removeClass('selected');
-            $self.addClass('selected');
-        }
-
-        $.selected = [$self.attr('id').replace('contact_', '')];
-        delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
-        $.hideTopMenu();
-
-        return Boolean(M.contextMenuUI(e, 1));
-    });
-
     /**
      * Let's shoot two birds with a stone, when nodes are moved we need a resize
      * to let dynlist refresh - plus, we'll implicitly invoke initTreeScroll.
@@ -1372,8 +1338,6 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
         this.onSectionUIOpen(id_s);
     }
 
-
-
     if (!fminitialized) {
         if (d) {
             console.groupEnd();
@@ -1387,35 +1351,10 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
         let i = ids.length;
         while (i-- > 1) {
             if (this.d[ids[i]] && ids[i].length === 8) {
-                if (id_r === 'out-shares') {
-                    this.onTreeUIExpand('os_' + ids[i], 1);
-                }
-                else if (id_r === 'public-links') {
-                    this.onTreeUIExpand('pl_' + ids[i], 1);
-                }
-                else {
-                    this.onTreeUIExpand(ids[i], 1);
-                }
+                this.onTreeUIExpand(ids[i], 1);
             }
         }
-        if (
-            (ids[0] === 'contacts')
-            && this.currentdirid
-            && (String(this.currentdirid).length === 11)
-            && (this.currentrootid === 'contacts')
-        ) {
-            this.onSectionUIOpen('contacts');
-        }
-        else if (ids[0] === 'contacts') {
-            // XX: whats the goal of this? everytime when i'm in the contacts and I receive a share, it changes ONLY the
-            // UI tree -> Shared with me... its a bug from what i can see and i also don't see any points of automatic
-            // redirect in the UI when another user had sent me a shared folder.... its very bad UX. Plus, as a bonus
-            // sectionUIopen is already called with sectionUIopen('contacts') few lines before this (when this func
-            // is called by the renderNew()
-
-            // sectionUIopen('shared-with-me');
-        }
-        else if (ids[0] === this.RootID) {
+        if (ids[0] === this.RootID) {
             this.onSectionUIOpen('cloud-drive');
         }
     }

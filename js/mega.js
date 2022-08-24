@@ -668,7 +668,6 @@ scparser.$add('c', {
 
         // contact is deleted on remote computer, remove contact from contacts left panel
         if (fminitialized && a.u[0].c === 0) {
-            $('#contact_' + a.ou).remove();
 
             $.each(a.u, function(k, v) {
                 var userHandle = v.u;
@@ -687,8 +686,6 @@ scparser.$add('c', {
                     }
                 }
             });
-
-            M.handleEmptyContactGrid();
         }
     },
     l: function(a) {
@@ -2672,7 +2669,6 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             if (M.currentrootid === 'out-shares') {
                 M.openFolder(M.currentdirid, true);
             }
-            M.renderShare(nodeId);
 
             masterPromise.resolve();
         }
@@ -2850,11 +2846,6 @@ function processIPC(ipc, ignoreDB) {
             delete M.ipc[ipc[i].p];
 
             if (fminitialized) {
-                $(`#ipc_${ipc[i].p}`).remove();
-
-                if ($.len(M.ipc)) {
-                    updateIpcRequests();
-                }
 
                 // Update token.input plugin
                 removeFromMultiInputDDL('.share-multiple-input', {id: ipc[i].m, name: ipc[i].m});
@@ -2886,7 +2877,6 @@ function processOPC(opc, ignoreDB) {
             M.delOPC(opc[i].p);
 
             if (fminitialized) {
-                $(`#opc_${opc[i].p}`).remove();
 
                 // Update tokenInput plugin
                 removeFromMultiInputDDL('.share-multiple-input', {id: opc[i].m, name: opc[i].m});
@@ -2900,10 +2890,6 @@ function processOPC(opc, ignoreDB) {
             for (var k in M.opc) {
                 if (M.opc[k].dts && (M.opc[k].m === opc[i].m)) {
                     delete M.opc[k];
-
-                    if (fminitialized) {
-                        $(`#opc_${k}`).remove();
-                    }
                     break;
                 }
             }
@@ -3120,15 +3106,7 @@ function processUPCO(ap) {
                 // Update tokenInput plugin
                 removeFromMultiInputDDL('.share-multiple-input', {id: ap[i].m, name: ap[i].m});
                 removeFromMultiInputDDL('.add-contact-multiple-input', {id: ap[i].m, name: ap[i].m});
-                $('#opc_' + psid).remove();
                 mBroadcaster.sendMessage('fmViewUpdate:opc');
-
-                // Update sent contact request tab, set empty message with Add contact... button
-                if ((Object.keys(M.opc).length === 0) && (M.currentdirid === 'opc')) {
-                    $('.sent-requests-grid').addClass('hidden');
-                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[6196]); // No requests pending at this time
-                    $('.fm-empty-contacts').removeClass('hidden');
-                }
             }
         }
     }

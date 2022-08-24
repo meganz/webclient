@@ -53,18 +53,6 @@ MegaData.prototype.filterByParent = function(id) {
             }
         }
     }
-    else if (id === 'contacts') {
-        this.v = [];
-        var contacts = Object.keys(this.c.contacts || {});
-        for (i = contacts.length; i--;) {
-            node = this.d[contacts[i]] || false;
-
-            if (node.c === 1) {
-                // Fill M.v with active contacts only
-                this.v.push(node);
-            }
-        }
-    }
     // We should have a parent's childs into M.c, no need to traverse the whole M.d
     else if (id === 'public-links' || id === 'out-shares' || this.c[id]) {
         var list;

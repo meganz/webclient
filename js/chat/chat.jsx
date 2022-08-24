@@ -258,31 +258,6 @@ Chat.prototype.init = promisify(function(resolve, reject) {
         $('.js-dropdown-account .status-dropdown').removeClass('hidden');
     }
 
-    // contacts tab update
-    self.on('onRoomInitialized', function(e, room) {
-        if (room.type === "private") {
-            var c = M.u[room.getParticipantsExceptMe()[0]];
-            if (c) {
-                $('#contact_' + c.u + ' .start-chat-button').addClass("active");
-            }
-        }
-
-        room.rebind("onChatShown.chatMainList", function() {
-            $('.conversations-main-listing').addClass("hidden");
-        });
-
-        self.updateDashboard();
-    });
-
-    self.on('onRoomDestroy', function(e, room) {
-        if (room.type === "private") {
-            var c = M.u[room.getParticipantsExceptMe()[0]];
-            if (c) {
-                $('#contact_' + c.u + ' .start-chat-button').removeClass("active");
-            }
-        }
-    });
-
     $body.rebind('mouseover.notsentindicator', '.tooltip-trigger', function() {
         var $this = $(this);
         var $notification = $('.tooltip.' + $this.attr('data-tooltip')).removeClass('hidden');
@@ -821,8 +796,6 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
             self.favico.reset();
             self.favico.badge(unreadCount);
         });
-
-        self.updateDashboard();
     }
 
     if (
@@ -1545,26 +1518,6 @@ Chat.prototype.refreshConversations = function() {
     }
 };
 
-Chat.prototype.closeChatPopups = function() {
-    var activePopup = $('.chat-popup.active');
-    var activeButton = $('.chat-button.active');
-    activeButton.removeClass('active');
-    activePopup.removeClass('active');
-
-    if (activePopup.attr('class')) {
-        activeButton.removeClass('active');
-        activePopup.removeClass('active');
-        if (
-            activePopup.attr('class').indexOf('fm-add-contact-popup') === -1 &&
-            activePopup.attr('class').indexOf('fm-start-call-popup') === -1
-        ) {
-            activePopup.css('left', '-' + 10000 + 'px');
-        }
-        else activePopup.css('right', '-' + 10000 + 'px');
-    }
-};
-
-
 /**
  * Debug helper
  */
@@ -1607,14 +1560,9 @@ Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve,
     this.refreshConversations();
     this.hideAllChats();
 
-    //$('.fm-tree-panel > .jspContainer > .jspPane > .nw-tree-panel-header').hide();
-    //$('.fm-tree-panel > .nw-tree-panel-header').hide();
-
     $('.files-grid-view').addClass('hidden');
     $('.fm-blocks-view').addClass('hidden');
-    $('.contacts-grid-view').addClass('hidden');
     $('.fm-chat-block').addClass('hidden');
-    $('.fm-contacts-blocks-view').addClass('hidden');
     $('.fm-right-files-block').addClass('hidden');
     $('.fm-right-files-block.in-chat').removeClass('hidden');
     $('.nw-conversations-item').removeClass('selected');
@@ -2162,13 +2110,6 @@ Chat.prototype._leaveAllGroupChats = function() {
         })
     });
 };
-
-Chat.prototype.updateDashboard = function() {
-    if (M.currentdirid === 'dashboard') {
-        delay('dashboard:updchat', dashboardUI.updateChatWidget);
-    }
-};
-
 
 /**
  * Warning: The data returned by this function is loaded directly and not hash-checked like in the secureboot.js. So

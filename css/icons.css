@@ -1239,33 +1239,6 @@ button.active .semi-big-icon.nwse-resize,
     background-image: url(../images/mega/top-sprite.png);
     background-position: -10px -1266px;
 }
-.semi-small-icon.send-to-contact-menu {
-    background-image: url(../images/mega/send_to_contact_ico.svg);
-    background-position: 0px -4px;
-    width: 24px;
-    height: 24px;
-    background-size: auto;
-}
-/*.top-menu-item.send-contact-f:hover .semi-small-icon.send-to-contact-menu {
-    filter: drop-shadow(2px 4px 6px black);
-}*/
-.small-icon.dark-grey-plus {
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-position: -14px -11545px;
-    width: 24px;
-    height: 24px;
-    opacity: 0.65;
-}
-.small-icon.small-red-cross {
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-position: -14px -11625px;
-}
-.small-icon.file-upload {
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-position: -14px -11585px;
-    width: 24px;
-    height: 24px;
-}
 .small-icon.folder-upload {
     background-image: url(../images/mega/fm-main-sprite.png);
     background-position: -14px -11705px;
@@ -1390,9 +1363,6 @@ button.active .semi-big-icon.nwse-resize,
 }
 .small-icon.context.plus {
     background-position: -201px -391px;
-}
-.small-icon.context.file-upload {
-    background-position: -201px -429px;
 }
 .small-icon.context.folder-upload {
     background-position: -201px -461px;
@@ -1631,9 +1601,6 @@ body.theme-dark .dropdown-item .small-icon.context.labels {
 }
 .dropdown-item:hover .small-icon.context.plus {
     background-position: -241px -391px;
-}
-.dropdown-item:hover .small-icon.context.file-upload {
-    background-position: -241px -429px;
 }
 .dropdown-item:hover .small-icon.context.folder-upload {
     background-position: -241px -461px;

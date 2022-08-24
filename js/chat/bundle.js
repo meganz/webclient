@@ -485,29 +485,6 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     $('.js-dropdown-account .status-dropdown').removeClass('hidden');
   }
 
-  self.on('onRoomInitialized', function (e, room) {
-    if (room.type === "private") {
-      var c = M.u[room.getParticipantsExceptMe()[0]];
-
-      if (c) {
-        $('#contact_' + c.u + ' .start-chat-button').addClass("active");
-      }
-    }
-
-    room.rebind("onChatShown.chatMainList", function () {
-      $('.conversations-main-listing').addClass("hidden");
-    });
-    self.updateDashboard();
-  });
-  self.on('onRoomDestroy', function (e, room) {
-    if (room.type === "private") {
-      var c = M.u[room.getParticipantsExceptMe()[0]];
-
-      if (c) {
-        $('#contact_' + c.u + ' .start-chat-button').removeClass("active");
-      }
-    }
-  });
   $body.rebind('mouseover.notsentindicator', '.tooltip-trigger', function () {
     var $this = $(this);
     var $notification = $('.tooltip.' + $this.attr('data-tooltip')).removeClass('hidden');
@@ -976,7 +953,6 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
       self.favico.reset();
       self.favico.badge(unreadCount);
     });
-    self.updateDashboard();
   }
 
   if (!this._lastNotifications || this._lastNotifications.chats !== notifications.chats || this._lastNotifications.meetings !== notifications.meetings) {
@@ -1490,22 +1466,6 @@ Chat.prototype.refreshConversations = function () {
   }
 };
 
-Chat.prototype.closeChatPopups = function () {
-  var activePopup = $('.chat-popup.active');
-  var activeButton = $('.chat-button.active');
-  activeButton.removeClass('active');
-  activePopup.removeClass('active');
-
-  if (activePopup.attr('class')) {
-    activeButton.removeClass('active');
-    activePopup.removeClass('active');
-
-    if (activePopup.attr('class').indexOf('fm-add-contact-popup') === -1 && activePopup.attr('class').indexOf('fm-start-call-popup') === -1) {
-      activePopup.css('left', "-10000px");
-    } else activePopup.css('right', "-10000px");
-  }
-};
-
 Chat.prototype.getChatNum = function (idx) {
   return this.chats[this.chats.keys()[idx]];
 };
@@ -1541,9 +1501,7 @@ Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve,
   this.hideAllChats();
   $('.files-grid-view').addClass('hidden');
   $('.fm-blocks-view').addClass('hidden');
-  $('.contacts-grid-view').addClass('hidden');
   $('.fm-chat-block').addClass('hidden');
-  $('.fm-contacts-blocks-view').addClass('hidden');
   $('.fm-right-files-block').addClass('hidden');
   $('.fm-right-files-block.in-chat').removeClass('hidden');
   $('.nw-conversations-item').removeClass('selected');
@@ -2011,12 +1969,6 @@ Chat.prototype._leaveAllGroupChats = function () {
       }
     });
   });
-};
-
-Chat.prototype.updateDashboard = function () {
-  if (M.currentdirid === 'dashboard') {
-    delay('dashboard:updchat', dashboardUI.updateChatWidget);
-  }
 };
 
 Chat.prototype.getEmojiDataSet = function (name) {
@@ -3929,7 +3881,6 @@ ChatRoom.prototype.appendMessage = function (message) {
   self.trigger('onMessageAppended', message);
   self.messagesBuff.messages.push(message);
   self.shownMessages[message.messageId] = true;
-  self.megaChat.updateDashboard();
 };
 
 ChatRoom.prototype.getNavElement = function () {
@@ -9221,10 +9172,6 @@ class ContactsPanel extends mixins.wl {
         for (let i = 0; i < receivedKeys.length; i++) {
           promises.push(M.acceptPendingContactRequest(receivedKeys[i]));
         }
-
-        MegaPromise.allDone(promises).always(() => {
-          delay('updateIpcRequests', updateIpcRequests);
-        });
       }
     };
 

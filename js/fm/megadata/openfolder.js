@@ -49,7 +49,7 @@
         this.currentrootid = this.chat ? "chat" : this.getNodeRoot(id);
         this.currentLabelType = M.labelType();
         this.currentLabelFilter = M.filterLabel[this.currentLabelType];
-        this.fmsorting = (id === 'contacts' || id === 'shares' || id === 'out-shares' || id === 'public-links') ?
+        this.fmsorting = id === 'shares' || id === 'out-shares' || id === 'public-links' ?
             0 : fmconfig.uisorting | 0;
         this.currentCustomView = this.isCustomView(id);
 
@@ -181,9 +181,6 @@
             else if (fmconfig.sortmodes && fmconfig.sortmodes[id]) {
                 this.doSort(fmconfig.sortmodes[id].n, fmconfig.sortmodes[id].d);
             }
-            else if (this.currentdirid === 'contacts') {
-                this.doSort('status', 1);
-            }
             else {
                 this.doSort('name', 1);
             }
@@ -222,7 +219,7 @@
                     }
                 }
 
-                M.onTreeUIOpen(currentdirid, currentdirid === 'contacts');
+                M.onTreeUIOpen(currentdirid);
                 $('#treea_' + treeid).addClass('opened');
 
                 onIdle(() => {
@@ -266,11 +263,12 @@
         }
 
         delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
-        M.treeSearchUI();
-        M.treeSortUI();
-        M.treeFilterUI();
         M.initLabelFilter(this.v);
-        M.redrawTreeFilterUI();
+        // Potentially getting back?
+        // M.treeSearchUI();
+        // M.treeSortUI();
+        // M.treeFilterUI();
+        // M.redrawTreeFilterUI();
     };
 
     // ------------------------------------------------------------------------

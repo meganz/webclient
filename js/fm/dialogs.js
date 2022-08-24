@@ -964,8 +964,7 @@
         }
 
         // If copying from contacts tab (Ie, sharing)
-        if (!$.saveToDialog && section === 'cloud-drive'
-            && (M.currentrootid === 'contacts' || M.currentrootid === 'chat' || $.copyToShare)) {
+        if (!$.saveToDialog && section === 'cloud-drive' && (M.currentrootid === 'chat' || $.copyToShare)) {
 
             $('header h2', $dialog).text(l[1344]);
             $('.dialog-newfolder-button', $dialog).addClass('hidden');
@@ -1318,17 +1317,6 @@
                 $menu.css('left', p.left + 24 + 'px');
                 $menu.css('top', p.top - 8 + 'px');
 
-                if (section === 'contacts') {
-                    // Enable all menu items
-                    $menu.find('.sorting-item-divider,.sorting-menu-item').removeClass('hidden');
-                    $menu.find('*[data-by=label]').addClass('hidden');
-                }
-                else {
-                    // Hide sort by status and last-interaction items from menu
-                    $menu.find('*[data-by=status],*[data-by=last-interaction],*[data-by=fav]').addClass('hidden');
-                    $menu.find('*[data-by=label]').removeClass('hidden');
-                }
-
                 // @ToDo: Make sure .by is hadeled properly once when we have chat available
 
                 // Copy dialog key only
@@ -1571,9 +1559,7 @@
             scrollToElement($scrollBlock, $(this));
 
             // // If not copying from contacts tab (Ie, sharing)
-            if (!(section === 'cloud-drive' &&
-                (M.currentrootid === 'contacts' || M.currentrootid === 'chat' || $.copyToShare))
-            ) {
+            if (!(section === 'cloud-drive' && (M.currentrootid === 'chat' || $.copyToShare))) {
                 if ($.mcselected && M.getNodeRights($.mcselected) > 0) {
                     $('.dialog-newfolder-button', $dialog).removeClass('hidden');
                 }

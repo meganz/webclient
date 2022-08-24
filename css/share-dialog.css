@@ -5,7 +5,6 @@
     overflow: hidden;
     width: 560px;
 }
-
 .mega-dialog.share-dialog .share-dialog-bottom {
     background: var(--surface-grey-1);
     -webkit-padding-end: 0;
@@ -328,12 +327,16 @@
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
-
 .share-add-dialog-bottom .multiple-input i {
+    opacity: 0.74;
+    position: absolute;
+    margin: 7px 0 0 10px;
     --icon-size: 24px;
     --mask-color: var(--text-color-medium);
 }
-
+.multiple-input .share-added-contact i {
+    margin: -2px 0 0 10px;
+}
 /* Overwrite the style of elements in the contact picker rendered by react */
 .mega-dialog.share-add-dialog .horizontal-contacts-list {
     background: var(--surface-grey-1);

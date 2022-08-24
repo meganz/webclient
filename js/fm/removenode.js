@@ -279,7 +279,6 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
                         }
 
                         api_req({a: 'ur2', u: selected, l: '0', i: requesti});
-                        M.handleEmptyContactGrid();
                     }
                 }
             });

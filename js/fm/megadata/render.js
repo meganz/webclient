@@ -39,7 +39,6 @@ MegaData.prototype.renderMain = function(aUpdate) {
     // if there weren't new rendered nodes (Ie, they were cached)
     if (numRenderedNodes) {
         if (!aUpdate) {
-            M.addContactUI();
             if (this.viewmode) {
                 thumbnails.cleanup();
             }
@@ -254,51 +253,6 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
     }
 };
 
-/**
- * Render Share Dialog contents
- * @param {String} h Node handle
- */
-MegaData.prototype.renderShare = function(h) {
-    'use strict';
-    var html = '';
-    if (this.d[h].shares) {
-        for (var u in this.d[h].shares) {
-            if (this.u[u]) {
-                var rt = '';
-                var sr = {r0: '', r1: '', r2: ''};
-                if (this.d[h].shares[u].r == 0) {
-                    rt = l[55];
-                    sr.r0 = ' active';
-                }
-                else if (this.d[h].shares[u].r == 1) {
-                    rt = l[56];
-                    sr.r1 = ' active';
-                }
-                else if (this.d[h].shares[u].r == 2) {
-                    rt = l[57];
-                    sr.r2 = ' active';
-                }
-
-                html += '<div class="add-contact-item" id="' + u + '"><div class="add-contact-pad">'
-                    + useravatar.contact(u) + 'span class="add-contact-username">' + htmlentities(this.u[u].m)
-                    + '</span><div class="fm-share-dropdown">' + rt
-                    + '</div><div class="fm-share-permissions-block hidden"><div class="fm-share-permissions'
-                    + sr.r0 + '" id="rights_0">' + l[55] + '</div><div class="fm-share-permissions' + sr.r1
-                    + '" id="rights_1">' + l[56] + '</div><div class="fm-share-permissions' + sr.r2
-                    + '" id="rights_2">' + l[57] + '</div><div class="fm-share-permissions" id="rights_3">' + l[83]
-                    + '</div></div></div></div>';
-            }
-        }
-        $('.share-dialog .fm-shared-to').html(html);
-        $('.share-dialog .fm-share-empty').addClass('hidden');
-        $('.share-dialog .fm-shared-to').removeClass('hidden');
-    }
-    else {
-        $('.share-dialog .fm-share-empty').removeClass('hidden');
-        $('.share-dialog .fm-shared-to').addClass('hidden');
-    }
-};
-
 MegaData.prototype.renderTree = function() {
     'use strict';
     var build = tryCatch(function(h) {
@@ -313,7 +267,6 @@ MegaData.prototype.renderTree = function() {
     build(M.RubbishID);
     build(M.InboxID);
 
-    M.contacts();
     M.addTreeUIDelayed();
 
     // TODO: refactor this back to no-promises

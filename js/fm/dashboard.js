@@ -51,12 +51,6 @@ function dashboardUI(updProcess) {
         $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
     }
 
-    // Add-contact plus
-    $('.dashboard .contacts-widget .add-contacts').rebind('click', function() {
-        contactAddDialog();
-        return false;
-    });
-
     // Avatar dialog
     $('.fm-account-avatar').rebind('click', function(e) {
         avatarDialog();
@@ -377,8 +371,9 @@ function dashboardUI(updProcess) {
             }
 
             /* End of Used Bandwidth progressbar */
-            // Fill rest of widgets
-            dashboardUI.updateWidgets();
+
+            // Fill Cloud data widget
+            dashboardUI.updateCloudDataWidget();
         }
         else {
 
@@ -576,82 +571,7 @@ dashboardUI.renderReferralWidget = function() {
         });
     }
 };
-dashboardUI.updateWidgets = function(widget) {
-    /* Contacts block */
-    dashboardUI.updateContactsWidget();
 
-    /* Chat block */
-    dashboardUI.updateChatWidget();
-
-    // Cloud data block
-    dashboardUI.updateCloudDataWidget();
-};
-dashboardUI.updateContactsWidget = function() {
-    var contacts = M.getActiveContacts();
-    if (!contacts.length) {
-        $('.account.widget.text.contacts').removeClass('hidden');
-        $('.account.data-table.contacts').addClass('hidden');
-    }
-    else {
-        var recent = 0;
-        var now = unixtime();
-        contacts.forEach(function(handle) {
-            var user = M.getUserByHandle(handle);
-
-            if ((now - user.ts) < (7 * 86400)) {
-                recent++;
-            }
-        });
-        $('.account.widget.text.contacts').addClass('hidden');
-        $('.account.data-table.contacts').removeClass('hidden');
-        $('.data-right-td.all-contacts span').text(contacts.length);
-        $('.data-right-td.new-contacts span').text(recent);
-        $('.data-right-td.waiting-approval span').text(Object.keys(M.ipc || {}).length);
-        $('.data-right-td.sent-requests span').text(Object.keys(M.opc || {}).length);
-    }
-};
-dashboardUI.updateChatWidget = function() {
-    var allChats = 0;
-    var privateChats = 0;
-    var groupChats = 0;
-    var unreadMessages = $('.new-messages-indicator .chat-unread-count:visible').text();
-
-    if (!megaChatIsDisabled && typeof megaChat !== 'undefined') {
-        megaChat.chats.forEach(function(chatRoom) {
-            if (chatRoom.type === "group" || chatRoom.type === "public") {
-                groupChats++;
-            }
-            else {
-                privateChats++;
-            }
-            allChats++;
-        });
-    }
-    if (allChats === 0) {
-        $('.account.widget.text.chat').removeClass('hidden');
-        $('.account.icon-button.add-contacts').addClass('hidden');
-        $('.account.data-table.chat').addClass('hidden');
-    }
-    else {
-        $('.account.widget.text.chat').addClass('hidden');
-        $('.account.icon-button.add-contacts').removeClass('hidden');
-        $('.account.data-table.chat').removeClass('hidden');
-        $('.data-right-td.all-chats span').text(allChats);
-        $('.data-right-td.group-chats span').text(groupChats);
-        $('.data-right-td.private-chats span').text(privateChats);
-        $('.data-right-td.unread-messages-data span').text(unreadMessages | 0);
-    }
-    $('.chat-widget .account.data-item, .chat-widget .account.widget.title')
-        .rebind('click.chatlink', function() {
-            loadSubPage('fm/chat');
-        });
-    $('.chat-widget .add-contacts').rebind('click.chatlink', function() {
-        loadSubPage('fm/chat');
-        Soon(function() {
-            $('.conversations .small-icon.white-medium-plus').parent().trigger('click');
-        });
-    });
-};
 dashboardUI.updateCloudDataWidget = function() {
     const files = l.file_count;
     const folders = l.folder_count;

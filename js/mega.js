@@ -90,6 +90,8 @@ MegaLogger.rootLogger = new MegaLogger(
     false
 );
 
+var loadingInitDialog;
+
 if (typeof loadingDialog === 'undefined') {
     var loadingDialog = Object.create(null);
 
@@ -195,6 +197,10 @@ if (typeof loadingDialog === 'undefined') {
 
         'use strict';
 
+        if (loadingInitDialog && loadingInitDialog.active) {
+            return;
+        }
+
         const $spinner = $('.loading-spinner:not(.manual-management)');
 
         $('.loader-progressbar', $spinner).removeClass('active');
@@ -202,7 +208,7 @@ if (typeof loadingDialog === 'undefined') {
         // awaiting 300 fadeout animation
         setTimeout(() => {
 
-            // If there is no other active loadingDialog.show call.
+            // If there is another active loading dialog do not interrupt it.
             if (!loadingDialog.active) {
                 $spinner.addClass('hidden');
             }
@@ -210,8 +216,9 @@ if (typeof loadingDialog === 'undefined') {
         }, 301);
     };
 }
+
 if (typeof loadingInitDialog === 'undefined') {
-    var loadingInitDialog = Object.create(null);
+    loadingInitDialog = Object.create(null);
     loadingInitDialog.progress = false;
     loadingInitDialog.active = false;
     loadingInitDialog.show = function() {

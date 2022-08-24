@@ -3699,6 +3699,21 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         }
     });
 
+    $ddUIgrid.selectable({
+        filter: $.selectddUIitem,
+        cancel: '.ps__scrollbar-y-rail, .ps__scrollbar-x-rail, thead',
+        start: e => {
+            $.hideContextMenu(e);
+            $.hideTopMenu();
+        },
+        stop: () => {
+            M.renderSearchBreadcrumbs();
+        }
+    });
+    // Since selectablecreate is triggered only on first creation of the selectable widget, we need to find a way
+    // to notify any code (selectionManager) that it can now hook selectable events after the widget is created
+    $ddUIgrid.trigger('selectablereinitialized');
+
     $('.ui-selectable-helper').remove();
 
     const contextMenuHandler = function(e) {

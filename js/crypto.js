@@ -363,7 +363,7 @@ function api_setsid(sid) {
     apixs[5].sid = sid;
     apixs[6].sid = sid;
 
-    if (self.fetchStreamSupport) {
+    if (self.fetchStreamSupport && mega.requestStatusMonitor) {
         mega.requestStatusMonitor.init();
     }
 }

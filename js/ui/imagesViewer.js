@@ -1236,7 +1236,7 @@ var slideshowid;
             return false;
         });
 
-        if (n.p || M.chat || page === 'download') {
+        if ((n.p || M.chat || page === 'download') && M.getNodeRoot(n.p) !== M.RubbishID) {
             $dlBut.removeClass('hidden');
         }
         else {

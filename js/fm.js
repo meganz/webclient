@@ -367,65 +367,6 @@ function initAddDialogMultiInputPlugin() {
 }
 
 /**
- * newContactDialog
- *
- * Handle add new contact dialog UI
- * @param {String} ipcid ipc user id
- * @param {Boolean} close dialog parameter
- */
-function newContactDialog(ipcId, close) {
-    var $d = $('.mega-dialog.new-contact');
-    var $msg = $d.find('.new-user-message');
-    var ipc = M.ipc[ipcId];
-    var username = ipc.m;
-
-    // Hide
-    if (close) {
-        closeDialog();
-        return true;
-    }
-
-    M.safeShowDialog('new-contact', $d);
-
-    // Set default
-    $msg.addClass('hidden').find('span').text('');
-
-    $('.new-contact-info span', $d).text(username);
-
-    $('.new-contact-avatar', $d)
-        .safeHTML(useravatar.contact(username, 'semi-mid-avatar'));
-
-    if (ipc.msg) {
-        $msg.removeClass('hidden').find('span').text(ipc.msg);
-    }
-
-    $('.contact-request-button', $d).rebind('click', function() {
-        var $self = $(this);
-        var $reqRow = $('tr#ipc_' + ipcId);
-        const finish = (res) => {
-            if (res === 0) {
-                $reqRow.remove();
-            }
-        };
-        if ($self.is('.accept')) {
-            M.acceptPendingContactRequest(ipcId).always(finish);
-        }
-        else if ($self.is('.delete')) {
-            M.denyPendingContactRequest(ipcId).always(finish);
-        }
-        else if ($self.is('.ignore')) {
-            M.ignorePendingContactRequest(ipcId).always(finish);
-        }
-
-        newContactDialog(ipcId, 1);
-    });
-
-    $('button.js-close', $d).rebind('click', function() {
-        newContactDialog(ipcId, 1);
-    });
-}
-
-/**
  * contactsInfoDialog
  *
  * Handle add new contact dialog UI
@@ -568,6 +509,9 @@ function contactAddDialog(close, dontWarnBusiness) {
         closeDialog();
         return true;
     }
+    if (M.chat && $.dialog === 'onboardingDialog') {
+        closeDialog();
+    }
 
     // Check if this is a business master, then Warn him about the difference between Contact and User
     if (!dontWarnBusiness) {
@@ -655,15 +599,13 @@ function ephemeralDialog(msg) {
 }
 
 function fmtopUI() {
+
     "use strict";
 
-    var $contactsTabBlock = $('.contacts-tabs-bl');
     var $sharesTabBlock = $('.shares-tabs-bl');
     var $galleryTabBlock = $('.gallery-tabs-bl');
     const $galleryTabLink = $('.gallery-tab-lnk');
 
-    $contactsTabBlock.add($sharesTabBlock).add($galleryTabBlock).addClass('hidden');
-    $('.contacts-tab-lnk.active', $contactsTabBlock).removeClass('active');
     $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
     $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
 
@@ -671,7 +613,6 @@ function fmtopUI() {
         .add('.fm-new-shared-folder,.fm-new-link').addClass('hidden');
     $('.fm-new-folder').removeClass('filled-input');
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
-    $('.fm-right-header').removeClass('requests-panel');
     $('.fm-breadcrumbs-block').removeClass('hidden');
     $('button.link-button.accept-all').addClass('hidden');
 
@@ -701,26 +642,6 @@ function fmtopUI() {
             if (d) {
                 console.log('Inbox');
             }
-        }
-        else if (String(M.currentdirid).substr(0, 4) === "chat") {
-            // Update IPC indicator
-            delay('updateIpcRequests', updateIpcRequests);
-        }
-        else if (M.currentdirid === 'contacts'
-                || (String(M.currentdirid).length === 11
-                    && M.currentdirid.substr(0, 6) !== 'search')) {
-
-            M.contactsUI();
-
-            // Update IPC indicator
-            delay('updateIpcRequests', updateIpcRequests);
-
-            $('.fm-add-user').removeClass('hidden');
-            $contactsTabBlock.removeClass('hidden');
-
-            $('.fm-breadcrumbs-block').addClass('hidden');
-            $('.contacts', $contactsTabBlock).addClass('active');
-
         }
         else if (M.currentrootid === 'shares') {
 
@@ -1019,7 +940,7 @@ function FMShortcuts() {
     mBroadcaster.addListener('crossTab:fms!cut/copy', ev => (current_operation = ev.data));
 
     $(window).rebind('keydown.fmshortcuts', function(e) {
-        var isContactRootOrShareRoot = false;
+        var isShareRoot = false;
         if (
             !is_fm() ||
             !selectionManager ||
@@ -1029,8 +950,8 @@ function FMShortcuts() {
         ) {
             return true;
         }
-        else if (M.currentdirid === 'contacts' || M.currentdirid === 'shares') {
-            isContactRootOrShareRoot = true;
+        else if (M.currentdirid === 'shares') {
+            isShareRoot = true;
         }
 
         e = e || window.event;
@@ -1053,7 +974,7 @@ function FMShortcuts() {
         else if (
             (charTyped === "c" || charTyped === "x") &&
             (e.ctrlKey || e.metaKey) &&
-            !isContactRootOrShareRoot
+            !isShareRoot
         ) {
             var items = clone(selectionManager.get_selected());
             if (items.length === 0) {
@@ -1074,7 +995,7 @@ function FMShortcuts() {
         else if (
             charTyped === "v" &&
             (e.ctrlKey || e.metaKey) &&
-            !isContactRootOrShareRoot
+            !isShareRoot
         ) {
             if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
                 return false; // stop prop.
@@ -1095,7 +1016,7 @@ function FMShortcuts() {
         }
         else if (
             charCode === 8 &&
-            !isContactRootOrShareRoot
+            !isShareRoot
         ) {
             var remItems = selectionManager.get_selected();
             if (remItems.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2) {
@@ -1728,7 +1649,7 @@ function closeMsg() {
     var $dialog = $('#msgDialog').addClass('hidden');
     $dialog.parent().removeClass('msg-dialog-container');
 
-    if ($.dialog) {
+    if ($.dialog && !(M.chat && $.dialog === 'onboardingDialog')) {
         $('.mega-dialog').removeClass('arrange-to-back');
         $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
     }

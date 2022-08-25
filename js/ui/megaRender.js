@@ -88,6 +88,7 @@
                     '<td class="grid-url-header-nw">' +
                         '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                     '</td>' +
+                    '<td class="space-maintainer-end" megatype="empty"></td>' +
                 '</tr>' +
             '</table>',
 
@@ -141,6 +142,7 @@
                     '<td class="grid-url-header-nw">' +
                         '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                     '</td>' +
+                    '<td class="space-maintainer-end" megatype="empty"></td>' +
                 '</tr>' +
             '</table>',
 
@@ -162,122 +164,6 @@
                     '<span class="shared-contact-info"></span>' +
                 '</span>' +
             '</a>'
-        ],
-
-        'contacts': [
-            // List view mode
-            '<table>' +
-                '<tr>' +
-                    '<td>' +
-                        '<div class="fm-chat-user-info todo-star">' +
-                            '<div class="fm-chat-user"></div>' +
-                            '<div class="contact-email"></div>' +
-                        '</div>' +
-                    '</td>' +
-                    '<td width="240">' +
-                        '<div class="ustatus">' +
-                            '<div class="nw-contact-status"></div>' +
-                            '<div class="fm-chat-user-status"></div>' +
-                            '<div class="clear"></div>' +
-                        '</div>' +
-                        '<div class="contact-chat-buttons">' +
-                            '<button class="mega-button start-conversation">' +
-                                '<div>' +
-                                    '<i class="small-icon conversations"></i>' +
-                                '</div>' +
-                                '<span></span>' +
-                            '</button>' +
-                            '<button class="mega-button start-audio-call">' +
-                                '<div>' +
-                                    '<i class="small-icon audio-call"></i>' +
-                                '</div>' +
-                            '</button>' +
-                            '<button class="mega-button start-video-call">' +
-                                '<div>' +
-                                    '<i class="small-icon video-call"></i>' +
-                                '</div>' +
-                            '</button>' +
-                        '</div>' +
-                    '</td>' +
-                    '<td width="270">' +
-                        '<div class="contacts-interation"></div>' +
-                    '</td>' +
-                    '<td class="grid-url-header-nw">' +
-                        '<a class="grid-url-arrow"></a>' +
-                    '</td>' +
-                '</tr>' +
-            '</table>',
-
-            // Icon view mode
-            '<a class="data-block-view semi-big ustatus">' +
-                '<span class="file-settings-icon sprite-fm-mono"></span>' +
-                '<span class="shared-folder-info-block">' +
-                    '<span class="u-card-data overlayed">' +
-                        '<span class="shared-folder-name"></span>' +
-                        '<span class="nw-contact-status"></span>' +
-                    '</span>' +
-                    '<span class="shared-folder-info overlayed""></span>' +
-                    '<span class="contact-chat-buttons">' +
-                        '<button class="mega-button start-conversation">' +
-                            '<div>' +
-                                '<i class="small-icon conversations"></i>' +
-                            '</div>' +
-                            '<span></span>' +
-                        '</button>' +
-                        '<button class="mega-button start-audio-call">' +
-                            '<div>' +
-                                '<i class="small-icon audio-call"></i>' +
-                            '</div>' +
-                        '</button>' +
-                        '<button class="mega-button start-video-call">' +
-                            '<div>' +
-                                '<i class="small-icon video-call"></i>' +
-                            '</div>' +
-                        '</button>' +
-                    '</span>' +
-                '</span>' +
-            '</a>'
-        ],
-
-        'contact-shares': [
-            // List view mode
-            '<table>' +
-                '<tr>' +
-                    '<td width="50">' +
-                        '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
-                    '</td>' +
-                    '<td>' +
-                        '<div class="shared-folder-icon"></div>' +
-                        '<div class="shared-folder-info-block">' +
-                            '<div class="shared-folder-name"></div>' +
-                            '<div class="shared-folder-info"></div>' +
-                        '</div>' +
-                    '</td>' +
-                    '<td width="270">' +
-                        '<div class="shared-folder-access"></div>' +
-                    '</td>' +
-                    '<td class="grid-url-header-nw">' +
-                        '<a class="grid-url-arrow"></a>' +
-                    '</td>' +
-                '</tr>' +
-            '</table>',
-
-            // Icon view mode
-            '<a class="data-block-view folder">' +
-                '<span class="data-block-bg">' +
-                    '<span class="data-block-indicators">' +
-                       '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
-                       '<span class="shared-folder-access indicator"></span>' +
-                    '</span>' +
-                    '<span class="block-view-file-type folder-shared"><img/></span>' +
-                    '<span class="file-settings-icon"></span>' +
-                    '<div class="video-thumb-details">' +
-                        '<i class="sprite-fm-mono icon-play"></i>' +
-                        '<span>00:00</span>' +
-                    ' </div>' +
-                '</span>' +
-                '<span class="file-block-title"></span>' +
-            '</a>'
         ]
     };
 
@@ -286,10 +172,6 @@
             '.grid-table.fm',
             '.fm-blocks-view.fm .file-block-scrolling',
         ],
-        'contacts': [
-            '.grid-table.contacts',
-            '.contacts-blocks-scrolling .content'
-        ],
         'shares': [
             '.shared-grid-view .grid-table.shared-with-me',
             '.shared-blocks-scrolling'
@@ -297,10 +179,6 @@
         'out-shares': [
             '.out-shared-grid-view .grid-table.out-shares',
             '.out-shared-blocks-scrolling'
-        ],
-        'contact-shares': [
-            '.contacts-details-block .grid-table.shared-with-me',
-            '.fm-blocks-view.contact-details-view .file-block-scrolling'
         ]
     };
 
@@ -382,16 +260,6 @@
 
             section = 'out-shares';
         }
-        else if (M.currentrootid === 'contacts'
-                && M.currentdirid.length === 11) {
-
-            section = 'contact-shares';
-        }
-        else if (M.currentdirid === 'contacts') {
-
-            section = 'contacts';
-        }
-
         if (section === 'cloud-drive') {
 
             if (!DYNLIST_ENABLED) {
@@ -472,7 +340,6 @@
                 $('.file-block-scrolling a').remove();
                 $('.shared-blocks-scrolling a').remove();
                 $('.out-shared-blocks-scrolling a').remove();
-                $('.contacts-blocks-scrolling .content a').remove();
 
                 // eslint-disable-next-line local-rules/jquery-replacements
                 $(aListSelector).show().parent().children('table').show();
@@ -497,10 +364,6 @@
                 if (M.RubbishID && M.currentdirid === M.RubbishID) {
                     $('.fm-empty-trashbin').removeClass('hidden');
                     $('.fm-clearbin-button').addClass('hidden');
-                }
-                else if (M.currentdirid === 'contacts') {
-                    $('.fm-empty-contacts .fm-empty-cloud-txt').text(l[784]);
-                    $('.fm-empty-contacts').removeClass('hidden');
                 }
                 else if (String(M.currentdirid).substr(0, 7) === 'search/') {
                     $('.fm-empty-search').removeClass('hidden');
@@ -554,10 +417,6 @@
                     else {
                         M.emptySharefolderUI(aListSelector);
                     }
-                }
-                else if (M.currentrootid === 'contacts') {
-                    $('.fm-empty-incoming.contact-details-view').removeClass('hidden');
-                    $('.contact-share-notification').addClass('hidden');
                 }
                 else if (M.currentCustomView.type === 'gallery') {
 
@@ -973,15 +832,10 @@
                             props.time = aNode.shares.EXP.ts ? time2date(aNode.shares.EXP.ts) : '';
                             props.mTime = aNode.mtime ? time2date(aNode.mtime) : '';
                         }
-                        else if (aNode.p !== "contacts") {
+                        else {
                             // props.time = time2date(aNode[M.lastColumn] || aNode.ts);
                             props.time = time2date(aNode.ts);
                             props.mTime = aNode.mtime ? time2date(aNode.mtime) : '';
-                        }
-                        else {
-                            props.time = time2date(aNode.ts
-                                || (aNode.p === 'contacts' && M.contactstatus(aHandle).ts));
-                            props.mTime = '';
                         }
                     }
 
@@ -1101,45 +955,6 @@
                     props.classNames.push('colour-label');
                     props.classNames.push(colourLabel);
                 }
-
-                return props;
-            },
-            'contact-shares': function(aNode, aHandle, aExtendedInfo) {
-                return this.nodeProperties.shares.call(this, aNode, aHandle, false);
-            },
-            'contacts': function(aNode, aHandle, aExtendedInfo) {
-                var props = {classNames: []};
-                var avatar;
-
-                props.conversationText = l[7997];
-
-                if (this.logger) {
-                    // We only care about active contacts
-                    assert(Object(M.u[aHandle]).c === 1, 'Found non-active contact');
-                }
-
-                if (M.viewmode === 0) {
-                    avatar = useravatar.contact(aHandle);
-                }
-                else {
-                    avatar = useravatar.contact(aHandle, 'medium-avatar');
-                }
-
-                if (avatar) {
-                    props.avatar = parseHTML(avatar).firstChild;
-                }
-
-                if (this.chatIsReady) {
-                    props.onlineStatus = M.onlineStatusClass(aNode.presence ? aNode.presence : false);
-
-                    if (props.onlineStatus) {
-                        props.classNames.push(props.onlineStatus[1]);
-                    }
-
-                }
-
-                props.classNames.push(aHandle);
-                props.userName = M.getNameByHandle(aNode.u);
 
                 return props;
             }
@@ -1405,55 +1220,6 @@
                 }
 
                 return aTemplate;
-            },
-            'contact-shares': function(aNode, aProperties, aTemplate) {
-
-                var tmp = aTemplate.querySelector('.shared-folder-access');
-                tmp.classList.add(aProperties.accessRightsClass);
-
-                if (this.viewmode) {
-                    aTemplate.querySelector('.file-block-title').textContent = aProperties.name;
-                }
-                else {
-                    tmp.textContent = aProperties.accessRightsText;
-
-                    aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
-                    aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
-                }
-
-                return aTemplate;
-            },
-            'contacts': function(aNode, aProperties, aTemplate) {
-
-                aTemplate.querySelector('.start-conversation span').textContent = aProperties.conversationText;
-
-                if (aProperties.avatar) {
-                    var avatar = this.viewmode ? '.shared-folder-info-block' : '.fm-chat-user-info';
-                    avatar = aTemplate.querySelector(avatar);
-
-                    avatar.parentNode.insertBefore(aProperties.avatar, avatar);
-                }
-
-                if (this.viewmode) {
-                    aTemplate.querySelector('.shared-folder-name').textContent = nicknames.getNickname(aNode.u);
-                    aTemplate.querySelector('.shared-folder-info').textContent = aNode.m;
-                }
-                else {
-                    var tmp = aTemplate.querySelector('.fm-chat-user-status');
-
-                    tmp.classList.add(aNode.h);
-                    if (aProperties.onlineStatus) {
-                        tmp.textContent = aProperties.onlineStatus[0];
-                    }
-
-                    this.addClasses(aTemplate.querySelector('.ustatus'), aProperties.classNames);
-
-                    aTemplate.querySelector('.contact-email').textContent = aNode.m;
-                    aTemplate.querySelector('.fm-chat-user').textContent = aProperties.userName;
-                    aTemplate.querySelector('.contacts-interation').classList.add('li_' + aNode.h);
-                }
-
-                return aTemplate;
             }
         }),
 
@@ -1472,10 +1238,6 @@
                     this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate);
                 }
             },
-            'contacts': function(aNode, aHandle, aDOMNode, aNodeIndex, aUpdate, aUserData) {
-                this.renderer['*'].apply(this, arguments);
-                getLastInteractionWith(aHandle);
-            },
             'cloud-drive': function(aNode, aHandle, aDOMNode, aNodeIndex, aUpdate, aUserData) {
                 if (!DYNLIST_ENABLED || !this.megaList) {
                     this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate, cacheEntry);
@@ -1491,7 +1253,7 @@
              * @return {Array} a filtered list of nodes, if needed
              */
             '*': function(aUpdate, aNodeList) {
-                if (!aUpdate && this.section !== 'contacts') {
+                if (!aUpdate) {
                     M.setLastColumn(localStorage._lastColumn);
                 }
 
@@ -1583,18 +1345,6 @@
              * @param {Array}   aNodeList The list of ufs-nodes processed
              * @param {Object}  aUserData  Any data provided by initializers
              */
-            'contacts': function() {
-                M.contactsUI();
-            },
-            'contact-shares': function(aUpdate, aNodeList, aUserData) {
-                var contact = M.d[M.currentdirid];
-
-                if (contact) {
-                    $('.contact-share-notification')
-                        .text(l[20435].replace('%1', contact.name))
-                        .removeClass('hidden');
-                }
-            },
             'cloud-drive': function(aUpdate, aNodeList, aUserData) {
                 if (DYNLIST_ENABLED) {
                     if (!aUpdate) {

@@ -495,7 +495,6 @@ mega.textEditorUI = new function TextEditorUI() {
      */
     this.setupEditor = function(fName, txt, handle, isReadonly, $viewerContainer) {
         M.require('codemirror_js', 'codemirrorscroll_js').done(() => {
-
             if ($viewerContainer) {
                 this.cleanup();
                 init(txt, $viewerContainer);
@@ -526,11 +525,13 @@ mega.textEditorUI = new function TextEditorUI() {
                 init(txt);
                 mBroadcaster.sendMessage('textEditor:open');
 
+                const inRubbishBin = M.getNodeRoot(handle) === M.RubbishID;
+
                 // Without parentheses && will be applied first,
                 // I want JS to start from left and go in with first match
                 // eslint-disable-next-line no-extra-parens
                 if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1) ||
-                    M.currentrootid === M.RubbishID) {
+                    inRubbishBin) {
                     editor.options.readOnly = true;
 
                     if (is_mobile) {
@@ -539,11 +540,16 @@ mega.textEditorUI = new function TextEditorUI() {
 
                     $('header .file-btn', $editorContainer).addClass('disabled');
                     $('.save-btn', $editorContainer).addClass('hidden');
+
+                    if (inRubbishBin) {
+                        $('footer .download-btn', $editorContainer).addClass('hidden');
+                    }
                 }
                 else {
                     editor.options.readOnly = false;
                     $('header .file-btn', $editorContainer).removeClass('disabled');
                     $('footer .save-btn', $editorContainer).removeClass('hidden');
+                    $('footer .download-btn', $editorContainer).removeClass('hidden');
                 }
 
                 bindEventsListner();

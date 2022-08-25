@@ -743,7 +743,7 @@ var mega = {
         && String(window.webkitRTCPeerConnection).indexOf('native') > 0
     ),
     browserBrand: [
-        0, 'Torch', 'Epic'
+        0, 'Torch', 'Epic', 'Edgium'
     ],
     whoami: 'We make secure cloud storage simple. Create an account and get up to 50 GB ' +
             'free on MEGA\'s end-to-end encrypted cloud collaboration platform today!',
@@ -773,6 +773,10 @@ var mega = {
                 if (plugin.name === 'Epic Privacy Browser Installer') {
                     return Object(window.chrome).webstore ? 2 : 0;
                 }
+            }
+
+            if (this.chrome && !String(this.userAgentBrands).indexOf('MicrosoftEdge:')) {
+                return 3;
             }
         }
 
@@ -951,6 +955,38 @@ Object.defineProperty(mega, 'active', {
             return Date.now() - lastactive < THRESHOLD;
         };
     })()
+});
+
+(function(chrome) {
+    'use strict';
+    delete mega.chrome;
+
+    /** @property mega.chrome */
+    lazy(mega, 'chrome', function() {
+        return chrome || String(this.userAgentBrands).split(':').includes('Chromium');
+    });
+})(mega.chrome);
+
+/** @property mega.userAgentBrands */
+lazy(mega, 'userAgentBrands', function() {
+    'use strict';
+    var res = [];
+    var userAgentData = (window.navigator || !1).userAgentData;
+
+    if (userAgentData) {
+        var brands = userAgentData.brands;
+
+        if (Array.isArray(brands)) {
+
+            for (var i = brands.length; i--;) {
+                var brand = (brands[i] || !1).brand;
+
+                res.push(String(brand).replace(/[\s:]/g, ''));
+            }
+        }
+    }
+
+    return res.join(':');
 });
 
 if (window.crypto && typeof crypto.getRandomValues === 'function') {
@@ -2674,6 +2710,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
+    jsl.push({f:'js/reqstatclient.js', n: 'reqstatclient_js', j:1,w:5});
 
     jsl.push({f:'js/mDB.js', n: 'mDB_js', j:1});
     jsl.push({f:'js/mouse.js', n: 'mouse_js', j:1});

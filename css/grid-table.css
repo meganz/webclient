@@ -1,5 +1,3 @@
-.fm-right-files-block.emptied .contact-requests-grid,
-.fm-right-files-block.emptied .sent-requests-grid,
 .fm-right-files-block.emptied .shared-grid-view,
 .fm-right-files-block.emptied .files-grid-view:not(.shared-folder-content),
 .fm-right-files-block.emptied .out-shared-grid-view {
@@ -12,8 +10,7 @@
 .files-grid-view,
 .files-grid-view.shared-view,
 .files-grid-view.out-shares-view,
-.files-grid-view.public-links-view,
-.files-grid-view.contacts-view {
+.files-grid-view.public-links-view {
     box-sizing: border-box;
     height: 100%;
     overflow: hidden;
@@ -22,37 +19,6 @@
 .files-grid-view.archived-chat-view {
     top: 0;
     padding-top: 20px;
-}
-
-.files-grid-view.contact-details-view {
-    height: 100%;
-}
-
-.fm-empty-incoming.contact-details-view {
-    height: 100%;
-    height: calc(100% - 211px);
-}
-
-.contact-requests-grid,
-.sent-requests-grid {
-    box-sizing: border-box;
-    height: 100%;
-    height: calc(100% - 72px);
-    margin-top: -1px;
-    position: relative;
-    white-space: nowrap;
-}
-
-/* ============================ *\
-    contacts-grid-view - Wrapper
-\* ============================ */
-.contacts-grid-view {
-    box-sizing: border-box;
-    height: 100%;
-    height: calc(100% - 36px);
-    overflow: hidden;
-    position: relative;
-    top: -1px;
 }
 
 /* ============================ *\
@@ -122,14 +88,6 @@
 }
 
 /* ======================================== *\
-   contacts-details-view - Wrapper
-\* ======================================== */
-
-.contact-details-view .grid-table {
-    table-layout: fixed;
-}
-
-/* ======================================== *\
    grid-scrolling-table
 \* ======================================== */
 
@@ -149,7 +107,6 @@
 }
 
 .grid-scrolling-table,
-.contacts-grid-scrolling-table,
 .transfer-scrolling-table,
 .archived-chats .grid-scrolling-table {
     height: 100%;
@@ -350,7 +307,7 @@ table tr.ui-selected .link-transfer-status {
     left: 0;
 }
 
-.grid-table.fm thead th:not(:first-child):not(:last-child):not(.grid-url-header):not(.grid-first-th):hover::before {
+.grid-table thead th:not(:first-child):not(:last-child):not(.grid-url-header):not(.grid-first-th):hover::before {
     content: '';
     position: absolute;
     right: 7px;
@@ -359,6 +316,9 @@ table tr.ui-selected .link-transfer-status {
     background-color: var(--stroke-mid-grey);
     cursor: col-resize;
     bottom: 0;
+}
+.grid-table thead th.full-width-col {
+    width: 100%;
 }
 .rtl .grid-table th:not(.grid-url-header):hover::before {
     right: auto;
@@ -717,7 +677,6 @@ table.fm tr {
 }
 
 table.fm .transfer-filetype-icon,
-table.fm .data-item-icon,
 table.fm .versioning-indicator {
     top: 50%;
     transform: translateY(-50%);
@@ -839,105 +798,9 @@ table.fm .grid-url-arrow {
 }
 
 /* ======================================== *\
-   contacts-view grid-table header
-\* ======================================== */
-.contacts-view .grid-table th:first-child {
-    padding: 0 10px 0 16px;
-}
-
-/* ======================================== *\
-   contacts grid-table
-\* ======================================== */
-.contacts-view .grid-table {
-    table-layout: fixed;
-}
-
-table.contacts td {
-    z-index: 0;
-    height: 64px;
-    vertical-align: middle;
-}
-
-table.contacts td:first-child {
-    padding: 0 10px 0 16px;
-}
-
-table.contacts td .avatar-wrapper {
-    position: absolute;
-    top: 13px;
-    margin: 0;
-}
-
-table.contacts td .fm-chat-user-info {
-    float: none;
-    margin: 0 0 0 44px;
-    display: block;
-}
-
-table.contacts td .fm-chat-user {
-    font-size: 14px;
-    line-height: 18px;
-    color: #333;
-    margin-right: 20px;
-    font-family: 'source_sans_prosemibold', sans-serif;
-    display: block;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-
-table.contacts td .contact-email {
-    color: #777;
-    font-size: 13px;
-    line-height: 18px;
-    display: block;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-
-table.contacts td .nw-contact-status {
-    margin: 6px 6px 0 0;
-    border: 0;
-}
-
-table.contacts td {
-    vertical-align: middle;
-    height: 48px;
-}
-
-table.contacts tr:hover .ustatus {
-    transition: opacity 100ms ease-in-out;
-}
-
-table.contacts .contact-chat-buttons {
-    position: absolute;
-    left: 0;
-    top: 0;
-    padding: 15px 0 0 2px;
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
-    opacity: 0;
-    z-index: 10;
-}
-
-table.contacts tr:hover .ustatus {
-    transition: opacity 100ms ease-in-out;
-}
-
-table.contacts tr:hover .contact-chat-buttons,
-table.contacts tr.ui-selected .contact-chat-buttons {
-    opacity: 1;
-}
-
-table.contacts tr:hover .ustatus,
-table.contacts tr.ui-selected .ustatus {
-    opacity: 0;
-}
-
-/* ======================================== *\
    grid-table-user-management
 \* ======================================== */
+
 .user-management-view .table-user-management table {
     border: none;
     margin: 0 24px;
@@ -1022,80 +885,6 @@ table.contacts tr.ui-selected .ustatus {
 .user-management-list-table tr td .user-management-email.warning,
 .user-management-list-table tr td .user-management-email.pending-email {
     color: var(--text-color-warning);
-}
-
-/* ======================================== *\
-   grid-table header contact-requests
-\* ======================================== */
-.contact-requests-grid .grid-table tr td:first-child,
-.contact-requests-grid tr th:first-child {
-    padding: 0 12px 0 16px;
-}
-
-/* ======================================== *\
-   grid-table contact-requests
-\* ======================================== */
-.contact-requests-grid .grid-table tr td:first-child,
-.contact-requests-grid tr th:first-child {
-    padding: 0 12px 0 16px;
-}
-.grid-table.contact-requests td,
-.grid-table.sent-requests td {
-    height: 64px;
-}
-
-.grid-table.contact-requests td:last-child {
-    padding-right: 14px;
-}
-
-.contact-requests td:nth-child(2) {
-    width: 240px;
-}
-
-.contact-requests td:nth-child(3) {
-    width: 340px;
-}
-.contact-requests th:last-child::after {
-    display: none;
-}
-
-.contact-requests-grid .grid-table tr:hover .contact-request-button,
-.contact-requests-grid .grid-table tr.ui-selected .contact-request-button
-{
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
-}
-
-/* ======================================== *\
-   grid-table sent-requests
-\* ======================================== */
-
-.sent-requests-grid .grid-table tr td:first-child,
-.sent-requests-grid tr th:first-child {
-    padding: 0 12px 0 16px;
-}
-
-.grid-table.sent-requests td:last-child {
-    padding-right: 14px;
-}
-
-.sent-requests td:nth-child(2) {
-    width: 240px;
-}
-
-.sent-requests td:nth-child(3) {
-    width: 340px;
-}
-.sent-requests th:last-child::after {
-    display: none;
-}
-
-.sent-requests-grid .grid-table tr:hover .contact-request-button,
-.sent-requests-grid .grid-table tr.ui-selected .contact-request-button {
-    -moz-opacity: 1;
-    -khtml-opacity: 1;
-    opacity: 1;
 }
 
 /* ======================================== *\

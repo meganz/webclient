@@ -490,6 +490,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         }
     }
 
+    if (M.getNodeRoot(selNode.p) === M.RubbishID) {
+        delete items['.download-item'];
+        delete items['.zipdownload-item'];
+    }
+
     return items;
 };
 
@@ -721,13 +726,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
         if (id) {
 
-            // Contacts left panel click
-            if (id.indexOf('contact_') !== -1) {
-                id = id.replace('contact_', '');
-            }
-
             // File manager left panel click
-            else if (id.indexOf('treea_') !== -1) {
+            if (id.includes('treea_')) {
                 id = id.replace(/treea_+|(os_|pl_)/g, '');
             }
 
@@ -746,7 +746,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
         // In case that id belongs to contact, 11 char length
         if (id && (id.length === 11)) {
             var $contactDetails = m.find('.dropdown-contact-details');
-            var $contactBlock = $('#' + id).length ? $('#' + id) : $('#contact_' + id);
             var username = M.getNameByHandle(id) || '';
 
             flt = '.remove-contact, .share-folder-item, .set-nickname';
@@ -755,7 +754,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             if (!window.megaChatIsDisabled) {
                 flt += ',.startchat-item, .send-files-item';
                 if (megaChat && megaChat.hasSupportForCalls) {
-                    flt += ',startaudiovideo-item';
+                    flt += ',.startaudiovideo-item';
                 }
             }
             var $menuCmi = $(menuCMI);
@@ -816,22 +815,6 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                         fingerprintDialog(id);
                     });
             }
-
-            // Set onlinestatus
-            $contactDetails.removeClass('offline online busy away');
-            if ($contactBlock.hasClass('busy')) {
-                $contactDetails.addClass('busy');
-            }
-            if ($contactBlock.hasClass('away')) {
-                $contactDetails.addClass('away');
-            }
-            if ($contactBlock.hasClass('online')) {
-                $contactDetails.addClass('online');
-            }
-            // If selected contact is offline make sure that audio and video calls are forbiden (disabled)
-            else if ($contactBlock.hasClass('offline') || $.selected.length > 1) {
-                $contactDetails.addClass('offline');
-            }
         }
         else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1
             || currNodeClass.indexOf('folder-link') > -1)) {
@@ -867,9 +850,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
             return false;
         }
         else if (currNodeClass
-            && (currNodeClass.indexOf('data-block-view') > -1
-            || currNodeClass.indexOf('folder') > -1
-            || currNodeClass.indexOf('fm-tree-folder') > -1)
+            && (currNodeClass.includes('data-block-view') || currNodeClass.includes('folder'))
             || String(id).length === 8) {
 
             asyncShow = true;
@@ -917,6 +898,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                                 $('i', $playItem).removeClass('icon-play-small').addClass('icon-video-call-filled');
                                 $('span', $playItem).text(l[16275]);
                             }
+                        }
+
+                        if (items['.remove-item']) {
+                            $('span', $menuCMI.filter('.remove-item')).text(M.getSelectedRemoveLabel($.selected));
                         }
                     }
 
@@ -1413,4 +1398,34 @@ MegaData.prototype.resetLabelSortMenuUI = function() {
 
     $('.colour-sorting-menu .dropdown-item').removeClass('active asc desc');
     return false;
+};
+
+MegaData.prototype.getSelectedRemoveLabel = (handlesArr) => {
+    'use strict';
+
+    let allAreRubbish = true;
+    let allAreNotRubbish = true;
+
+    for (let i = 0; i < handlesArr.length; i++) {
+        if (M.getNodeRoot(handlesArr[i]) === M.RubbishID) {
+            allAreNotRubbish = false;
+        }
+        else {
+            allAreRubbish = false;
+        }
+
+        if (!allAreRubbish && !allAreNotRubbish) {
+            break;
+        }
+    }
+
+    if (allAreRubbish) {
+        return l.delete_permanently;
+    }
+
+    if (allAreNotRubbish) {
+        return l.move_to_rubbish_bin;
+    }
+
+    return l[83];
 };

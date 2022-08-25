@@ -1586,8 +1586,6 @@ ChatRoom.prototype.appendMessage = function(message) {
     self.messagesBuff.messages.push(message);
 
     self.shownMessages[message.messageId] = true;
-
-    self.megaChat.updateDashboard();
 };
 
 

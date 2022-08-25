@@ -261,7 +261,7 @@ function MegaData() {
         this['updFile' + 'ManagerUI'] = mobile.updFileManagerUI;
 
         var tf = [
-            "renderTree", "buildtree", "initTreePanelSorting", "treeSearchUI",
+            "renderTree", "buildtree", "initTreePanelSorting",
             "treePanelType", "addTreeUI", "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen",
             "treeSortUI", "treeFilterUI"
         ];

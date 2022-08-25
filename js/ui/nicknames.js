@@ -125,11 +125,6 @@ var nicknames = {
 
                     }
                 });
-
-                // Update left panel if it has been initialised
-                if (!is_mobile && M.currentrootid === 'contacts') {
-                    M.contacts();
-                }
             });
     },
 
@@ -323,11 +318,6 @@ var nicknames = {
                         // successfully)
                         delete nicknames._dirty[contactUserHandle];
                     });
-
-                    // Update left panel if it has been initialised
-                    if (!is_mobile && M.currentrootid === 'contacts') {
-                        M.contacts();
-                    }
                 }
 
                 // Hide the dialog

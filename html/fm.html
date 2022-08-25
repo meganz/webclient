@@ -1,13 +1,3 @@
-<div class="dropdown body sorting-menu hidden">
-    <a class="contacts-sorting-by name">[$86]</a>
-    <!--<a class="contacts-sorting-by active">Status</a>-->
-    <a class="contacts-sorting-by shares">[$1348]</a>
-    <!--<a class="contacts-sorting-by">Recent</a>-->
-    <hr />
-    <a class="contacts-sorting-type asc">[$6773]</a>
-    <a class="contacts-sorting-type desc">[$6774]</a>
-</div>
-
 <!-- Please add/remove "left-points-position/right-points-position/top-points-position/bottom-points-position" class to activate points and set its position !-->
 <div class="dropdown body download context hidden">
     <span class="dropdown-item download-standart-item">
@@ -378,7 +368,7 @@
         </a>
         <a class="dropdown-item remove-item">
             <i class="sprite-fm-mono icon-bin"></i>
-            <span>[$83]</span>
+            <span>[$move_to_rubbish_bin]</span>
         </a>
         <a class="dropdown-item leaveshare-item">
             <i class="sprite-fm-mono icon-logout"></i>
@@ -568,19 +558,9 @@
                         <i class="sprite-fm-mono icon-label"></i>
                         <span>[$17398]</span>
                     </a>
-                    <a data-by="status" class="dropdown-item">
-                        <i class="sprite-fm-mono icon-user"></i>
-                        <span>[$89]</span>
-                        <i class="sprite-fm-mono sort-arrow"></i>
-                    </a>
                     <a data-by="created" class="dropdown-item">
                         <i class="sprite-fm-mono icon-recents"></i>
                         <span>[$896]</span>
-                        <i class="sprite-fm-mono sort-arrow"></i>
-                    </a>
-                    <a data-by="last-interaction" class="dropdown-item">
-                        <i class="sprite-fm-mono icon-chat"></i>
-                        <span>[$5904]</span>
                         <i class="sprite-fm-mono sort-arrow"></i>
                     </a>
                     <a data-by="fav" class="dropdown-item">
@@ -611,28 +591,12 @@
                 </div>
             </div>
 
-            <div class="dropdown body fm-start-chat-dropdown hidden">
-                <div class="dropdown-item startchat-item">
-                    <i class="small-icon conversations"></i>
-                    <span>[$5885]</span>
-                </div>
-                <div class="dropdown-item startaudio-item">
-                    <i class="small-icon audio-call"></i>
-                    <span>[$5896]</span></div>
-                <div class="dropdown-item startvideo-item">
-                    <i class="small-icon video-call"></i>
-                    <span>[$5897]</span>
-                </div>
-            </div>
-
             <!-- My Files Section Begin -->
             <section class="js-lp-myfiles lp-myfiles" >
                 <div class="lp-header">
                     <span>[$24681]</span>
                 </div>
-
                 <div class="content-area js-myfiles-panel">
-
                     <div class="cloud-drive-panel">
                         <span class="section-title">[$24682]</span>
 
@@ -1325,30 +1289,6 @@
                 <div class="fm-empty-pad">
                     <i class="section-icon sprite-fm-mono icon-bin-filled"></i>
                     <div class="fm-empty-cloud-txt">[$7740]</div>
-                </div>
-            </div>
-            <div class="fm-empty-section fm-empty-contacts hidden">
-                <div class="fm-empty-pad">
-                    <i class="section-icon sprite-fm-mono icon-contacts"></i>
-                    <div class="fm-empty-cloud-txt">[$5737]</div>
-                    <div class="fm-empty-description">
-                        [$19114]
-                    </div>
-                    <button class="mega-button positive large fm-empty-button">
-                        <span>[$71]...</span>
-                    </button>
-                    <div class="empty-share-public">
-                        <i class="sprite-fm-mono icon-link-circle"></i>
-                        <span>[$19111]</span>
-                    </div>
-                    <div class="fm-not-logged-text">
-                        <div class="fm-not-logged-description">
-                            [$8762]
-                        </div>
-                        <button class="mega-button positive large fm-not-logged-button create-account">
-                            <span>[$968]</span>
-                        </button>
-                    </div>
                 </div>
             </div>
             <div class="fm-empty-section fm-empty-user-management hidden">
@@ -2059,19 +1999,24 @@
                                     <th width="45">
                                         <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
                                     </th>
-                                    <th>
+                                    <th class="full-width-col" data-minwidth="250">
                                         <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
                                     </th>
-                                    <th width="258">
+                                    <th width="258" data-minwidth="180">
                                         <div class="arrow owner sprite-fm-mono icon-dropdown">[$5905]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
                                     </th>
-                                    <th width="118">
+                                    <th width="118" data-minwidth="75">
                                         <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
                                     </th>
-                                    <th width="218">
+                                    <th width="218" data-minwidth="165">
                                         <div class="arrow access sprite-fm-mono icon-dropdown">[$5906]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th class="grid-url-header-nw" width="60"></th>
+                                    <th class="grid-empty-spacer"></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -2095,19 +2040,24 @@
                                     <th width="45">
                                         <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
                                     </th>
-                                    <th>
+                                    <th class="full-width-col" data-minwidth="250">
                                         <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
                                     </th>
-                                    <th width="258">
+                                    <th width="258" data-minwidth="180">
                                         <div class="arrow sharedwith sprite-fm-mono icon-dropdown">[$1036]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
                                     </th>
-                                    <th width="118">
+                                    <th width="118" data-minwidth="75">
                                         <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
                                     </th>
-                                    <th width="218">
+                                    <th width="218" data-minwidth="165">
                                         <div class="arrow date sprite-fm-mono icon-dropdown">[$20670]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <th class="grid-url-header-nw" width="60"></th>
+                                    <th class="grid-empty-spacer"></th>
                                 </tr>
                             </thead>
                             <tbody></tbody>

@@ -115,9 +115,6 @@ export default class ContactsPanel extends MegaRenderMixin {
             for (let i = 0; i < receivedKeys.length; i++) {
                 promises.push(M.acceptPendingContactRequest(receivedKeys[i]));
             }
-            MegaPromise.allDone(promises).always(() => {
-                delay('updateIpcRequests', updateIpcRequests);
-            });
         }
     };
 

@@ -1,5 +1,4 @@
 .search .file-block-scrolling,
-.search .fm-contacts-blocks-view,
 .select .file-block-scrolling,
 .select .shared-blocks-scrolling,
 .select .out-shared-blocks-scrolling {
@@ -7,15 +6,12 @@
 }
 
 .fm-blocks-view,
-.fm-contacts-blocks-view,
 .fm-blocks-view.shared-view,
 .shared-details-block,
 .shared-blocks-view,
 .out-shared-blocks-view,
 .fm-blocks-view.out-shares-view,
 .fm-blocks-view.public-links-view,
-.contacts-details-block,
-.contacts-blocks-view,
 .files-grid-view {
     box-sizing: border-box;
     height: 100%;
@@ -28,18 +24,14 @@
 }
 
 .fm-right-files-block.emptied .fm-blocks-view:not(.shared-folder-content),
-.fm-right-files-block.emptied .fm-contacts-blocks-view,
 .fm-right-files-block.emptied .fm-blocks-view.shared-view,
 .fm-right-files-block.emptied .shared-blocks-view,
 .fm-right-files-block.emptied .out-shared-blocks-view,
 .fm-right-files-block.emptied .fm-blocks-view.out-shares-view,
-.fm-right-files-block.emptied .fm-blocks-view.public-links-view,
-.fm-right-files-block.emptied .contacts-details-block,
-.fm-right-files-block.emptied .contacts-blocks-view {
+.fm-right-files-block.emptied .fm-blocks-view.public-links-view {
     display: none;
 }
 .file-block-scrolling,
-.contacts-blocks-scrolling,
 .shared-blocks-scrolling,
 .out-shared-blocks-scrolling {
     height: 100%;
@@ -52,14 +44,6 @@
 .rtl .file-block-scrolling .megaList-content {
     direction: rtl;
 }
-.fm-blocks-view.shared-view .file-icon-area,
-.shared-blocks-view .file-icon-area,
-.fm-blocks-view.contacts-view .file-icon-area,
-.contacts-blocks-view .file-icon-area {
-    width: 160px;
-    height: 160px;
-}
-
 .data-block-view {
     width: 192px;
     display: inline-block;
@@ -80,9 +64,6 @@
     border-radius: 5px;
     padding: 4px;
 }
-.contacts-view .data-block-view {
-    height: 220px;
-}
 .data-block-view.medium {
     width: 128px;
 }
@@ -92,10 +73,6 @@
     margin: 24px 0 0 24px;
 }
 
-.fm-blocks-view.contact-details-view {
-    height: 100%;
-    height: calc(100% - 207px);
-}
 .data-block-view:hover {
     box-shadow: 0 0 0 4px var(--stroke-grey-2);
 }
@@ -235,18 +212,6 @@
     margin-right: 4px;
     background-image: none;
 }
-.contacts-blocks-scrolling .nw-contact-status {
-    float: none;
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    display: block;
-    margin: 0;
-    z-index: 10;
-    right: 0;
-    margin: 6px 0 0 0;
-    top: 0;
-}
 .data-block-view:hover .file-settings-icon,
 .data-block-view.ui-selected .file-settings-icon,
 .properties-name-block:hover .file-settings-icon {
@@ -318,24 +283,6 @@
     float: left;
     margin-top: 1px;
     --mask-color: var(--icon-rest);
-}
-.data-block-view .contact-chat-buttons {
-    position: absolute;
-    left: 0;
-    top: 0;
-    padding: 11px 0 0 2px;
-    opacity: 0;
-    z-index: 10;
-}
-
-.data-block-view:hover .contact-chat-buttons,
-.data-block-view.ui-selected .contact-chat-buttons {
-    opacity: 1;
-}
-
-.contacts-view .data-block-view:hover .overlayed,
-.contacts-view .data-block-view.ui-selected .overlayed {
-    opacity: 0;
 }
 .shared-blocks-view .data-block-view .data-block-bg,
 .out-shared-blocks-view .data-block-view .data-block-bg {
@@ -490,10 +437,7 @@
 }
 .fm-blocks-view.shared-view .block-view-file-type.folder,
 .shared-blocks-view .block-view-file-type.folder,
-.fm-blocks-view.contacts-view .block-view-file-type.folder,
-.contacts-blocks-view .block-view-file-type.folder,
-.block-view-file-type.folder.inbound-share,
-.contact-details-view .block-view-file-type.folder-shared {
+.block-view-file-type.folder.inbound-share {
     background-position: 0 -4794px;
 }
 .block-view-file-type.folder-shared,

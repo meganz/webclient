@@ -88,13 +88,12 @@ function browserdetails(useragent) {
 
     if (mega.browserBrand[brand]) {
         browser = mega.browserBrand[brand];
+        brand = null;
     }
     else if (useragent.indexOf(' edge/') > 0) {
         browser = 'Edge';
     }
     else if (useragent.indexOf(' edg/') > 0) {
-        displayName = 'Edge (Chromium)';
-        icon = 'edgium.png';
         browser = 'Edgium';
         verTag = 'Edg';
     }
@@ -291,6 +290,12 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('msie') > 0
         || useragent.indexOf('trident') > 0) {
         browser = 'Internet Explorer';
+    }
+
+    if (browser === 'Edgium') {
+        icon = 'edgium.png';
+        verTag = verTag || 'Chrome';
+        displayName = 'Edge (Chromium)';
     }
 
     // Translate "%1 on %2" to "Chrome on Windows"

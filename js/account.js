@@ -994,11 +994,6 @@ function setLandingPage(page) {
             else {
                 $elem.text(l[1051]);
             }
-
-            if (M.getTreePanelSortingValue('contacts') === 'last-interaction') {
-                // we need to resort
-                M.contacts();
-            }
         };
 
         var _renderLastInteractionFail = noRender ? nop : function (r) {

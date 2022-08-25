@@ -288,7 +288,6 @@ var QuickFinder = function(searchable_elements, containers) {
 };
 
 var quickFinder = new QuickFinder(
-    '.tranfer-filetype-txt, .file-block-title, td span.contacts-username, li span.nw-fm-tree-folder',
-    '.files-grid-view, .fm-blocks-view.fm, .contacts-grid-table, .contacts-blocks-scrolling,' +
-    '.contact-requests-grid, .sent-requests-grid, .fm-picker-dialog .dialog-content-block'
+    '.tranfer-filetype-txt, .file-block-title, li span.nw-fm-tree-folder',
+    '.files-grid-view, .fm-blocks-view.fm, .fm-picker-dialog .dialog-content-block'
 );

@@ -72,6 +72,14 @@ mobile.downloadOverlay = {
 
         var n = M.d[nodeHandle];
         var $button = this.$overlay.find('.second.dl-browser');
+
+        if (M.getNodeRoot(nodeHandle) === M.RubbishID) {
+            $button.addClass('hidden');
+            return;
+        }
+
+        $button.removeClass('hidden');
+
         var $label = $button.find('span');
 
         if (dlMethod !== MemoryIO || !dlmanager.openInBrowser(n)) {

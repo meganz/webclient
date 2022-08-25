@@ -233,6 +233,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'discount-offer'
             || $.dialog === 'voucher-info-dlg'
             || $.dialog === "chat-incoming-call"
+            || $.dialog === 'onboardingDialog'
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {
 
@@ -333,9 +334,6 @@ FileManager.prototype.initFileManagerUI = function() {
             if (id.indexOf('treea_') > -1) {
                 ids = [id.replace('treea_', '')];
             }
-            else if (id.indexOf('contact_') > -1) {
-                ids = [id.replace('contact_', '')];
-            }
         }
         else {
             if ($.dragSelected && $.dragSelected.length > 0) {
@@ -405,12 +403,6 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
                 else if (t && t.indexOf('path_') > -1) {
                     t = t.replace('path_', '');
-                }
-                else if (t && t.indexOf('contact2_') > -1) {
-                    t = t.replace('contact2_', '');
-                }
-                else if (t && t.indexOf('contact_') > -1) {
-                    t = t.replace('contact_', '');
                 }
                 else if (M.currentdirid !== 'shares' || !M.d[t] || M.getNodeRoot(t) !== 'shares') {
                     t = undefined;
@@ -624,9 +616,9 @@ FileManager.prototype.initFileManagerUI = function() {
     };
     InitFileDrag();
     M.createFolderUI();
-    M.treeSearchUI();
-    M.treeFilterUI();
-    M.treeSortUI();
+    // M.treeSearchUI();
+    // M.treeFilterUI();
+    // M.treeSortUI();
     M.initTreePanelSorting();
     M.initContextUI();
     initShareDialog();
@@ -680,6 +672,11 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $fmholder.rebind('mousemove.colresize', function(col) {
             var newWidth = startOffset + col.pageX;
+            const min = th.attr('data-minwidth') | 0;
+
+            if (newWidth < min) {
+                newWidth = min;
+            }
 
             var colType = th.attr('megatype');
             if (colType) {
@@ -788,10 +785,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $('.nw-sorting-menu').addClass('hidden');
         $('.colour-sorting-menu').addClass('hidden');
-        $('.fm-start-chat-dropdown').addClass('hidden').removeClass('active');
-        $('.start-chat-button').removeClass('active');
         $('.nw-tree-panel-arrows').removeClass('active');
-        $('.dropdown-item.dropdown').removeClass('active');
         $('.nw-fm-tree-item').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
         $('.data-block-view .file-settings-icon').removeClass('active');
@@ -862,25 +856,6 @@ FileManager.prototype.initFileManagerUI = function() {
         }
     });
 
-    $('.fm-back-button').rebind('click', function() {
-
-        if (!M.currentdirid) {
-            return;
-        }
-
-        if (M.currentdirid === 'notifications'
-            || M.currentdirid.substr(0, 7) === 'search/'
-            || M.currentdirid.substr(0, 5) === 'chat/') {
-            window.history.back();
-        }
-        else {
-            var n = M.d[M.currentdirid];
-            if ((n && n.p && M.d[n.p]) || (n && n.p === 'contacts')) {
-                M.openFolder(n.p);
-            }
-        }
-    });
-
     if (page !== "chat") {
         $('.fm-right-header.fm').removeClass('hidden');
     }
@@ -934,7 +909,11 @@ FileManager.prototype.initFileManagerUI = function() {
             },
             'favourites':      {root: 'favourites',prev: null},
             'folder-link':     {root: M.RootID,    prev: null},
-            'conversations':   {root: 'chat',      prev: null, subpages: ['contacts']},
+            'conversations':   {
+                root: 'chat',
+                prev: null,
+                subpages: ['chat/contacts', 'chat/contacts/received', 'chat/contacts/sent']
+            },
             'transfers':       {root: 'transfers', prev: null},
             'account':         {root: 'account',   prev: null},
             'dashboard':       {root: 'dashboard', prev: null, subpages: ['refer']},
@@ -943,8 +922,7 @@ FileManager.prototype.initFileManagerUI = function() {
             'public-links':    {root: 'public-links',    prev: null},
             'recents':         {root: 'recents',   prev: null},
             'inbox':           {root: M.InboxID,   prev: null},
-            'rubbish-bin':     {root: M.RubbishID, prev: null},
-            'contacts':        {root: 'contacts',  prev: null}
+            'rubbish-bin':     {root: M.RubbishID, prev: null}
         };
     }
 
@@ -1316,8 +1294,6 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
     renderPromise.always(function() {
         if (newcontact) {
             M.avatars();
-            M.contacts();
-            M.addTreeUI();
 
             if (megaChatIsReady) {
                 megaChat.renderMyStatus();
@@ -1744,7 +1720,6 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
         var userHandle = $.selected && $.selected[0];
-        userHandle = userHandle.replace('contact_', '');
 
         $.hideContextMenu();
         nicknames.setNicknameDialog.init(userHandle);
@@ -1759,7 +1734,6 @@ FileManager.prototype.initContextUI = function() {
         }
         var user_handle = $.selected && $.selected[0];
 
-        user_handle =user_handle .replace('contact_', '');
         fmremove(user_handle);
     });
 
@@ -2641,7 +2615,11 @@ FileManager.prototype.initUIKeyEvents = function() {
 
             if ($.selected && $.selected.length > 0) {
                 var n = M.d[$.selected[0]];
-                if (n && n.t) {
+
+                if (M.getNodeRoot(n.h) === M.RubbishID) {
+                    propertiesDialog();
+                }
+                else if (n && n.t) {
                     M.openFolder(n.h);
                 }
                 else if ($.selected.length < 2 && (is_image2(n) || is_video(n))) {
@@ -2658,9 +2636,6 @@ FileManager.prototype.initUIKeyEvents = function() {
                 share.updateNodeShares();
                 $('.token-input-token-mega').remove();
             });
-        }
-        else if ((e.keyCode === 13) && ($.dialog === 'add-contact-popup')) {
-            addNewContact($('.add-user-popup-button'));
         }
         else if ((e.keyCode === 13) && ($.dialog === 'rename')) {
             $('.rename-dialog-button.rename').trigger('click');
@@ -3229,20 +3204,12 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         M.renderMain();
     });
 
-    if (this.currentdirid === 'contacts') {
-        $.selectddUIgrid = '.contacts-blocks-scrolling';
-        $.selectddUIitem = 'a';
-    }
-    else if (this.currentdirid === 'shares') {
+    if (this.currentdirid === 'shares') {
         $.selectddUIgrid = '.shared-blocks-scrolling';
         $.selectddUIitem = 'a';
     }
     else if (this.currentdirid === 'out-shares') {
         $.selectddUIgrid = '.out-shared-blocks-scrolling';
-        $.selectddUIitem = 'a';
-    }
-    else if (String(this.currentdirid).length === 11 && this.currentrootid === 'contacts') {
-        $.selectddUIgrid = '.contact-details-view .file-block-scrolling';
         $.selectddUIitem = 'a';
     }
     else if (M.currentCustomView.type === 'gallery') {
@@ -3553,9 +3520,6 @@ FileManager.prototype.addGridUI = function(refresh) {
     else if (this.currentdirid === 'out-shares') {
         $.selectddUIgrid = '.out-shared-grid-view .grid-scrolling-table';
     }
-    else if (String(this.currentdirid).length === 11 && this.currentrootid === 'contacts') {
-        $.selectddUIgrid = '.files-grid-view.contact-details-view .grid-scrolling-table';
-    }
     else if (M.currentCustomView.type === 'gallery') {
         $.selectddUIgrid = '.gallery-view';
     }
@@ -3652,9 +3616,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
     var mainSel = $.selectddUIgrid + ' ' + $.selectddUIitem;
     var dropSel = $.selectddUIgrid + ' ' + $.selectddUIitem + '.folder';
-    if (this.currentrootid === 'contacts') {
-        dropSel = mainSel;
-    }
 
     $(dropSel).droppable({
         tolerance: 'pointer',
@@ -3737,37 +3698,28 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             $('body').removeClass('dragging').removeClassWith("dndc-");
             var origin = $.draggerOrigin;
             setTimeout(function __onDragStop() {
-                if (M.currentdirid === 'contacts') {
-                    if (origin !== 'contacts') {
-                        M.openFolder(origin, true);
-                    }
-                }
-                else {
-                    M.onTreeUIOpen(M.currentdirid, false, true);
-                }
+                M.onTreeUIOpen(M.currentdirid, false, true);
             }, 200);
             delete $.dragSelected;
         }
     });
 
-    $('.ui-selectable-helper').remove();
+    $ddUIgrid.selectable({
+        filter: $.selectddUIitem,
+        cancel: '.ps__scrollbar-y-rail, .ps__scrollbar-x-rail, thead',
+        start: e => {
+            $.hideContextMenu(e);
+            $.hideTopMenu();
+        },
+        stop: () => {
+            M.renderSearchBreadcrumbs();
+        }
+    });
+    // Since selectablecreate is triggered only on first creation of the selectable widget, we need to find a way
+    // to notify any code (selectionManager) that it can now hook selectable events after the widget is created
+    $ddUIgrid.trigger('selectablereinitialized');
 
-    if (this.currentdirid && this.currentdirid.substr(0, 8) !== 'contacts') {
-        $ddUIgrid.selectable({
-            filter: $.selectddUIitem,
-            cancel: '.ps__scrollbar-y-rail, .ps__scrollbar-x-rail, thead',
-            start: function (e, u) {
-                $.hideContextMenu(e);
-                $.hideTopMenu();
-            },
-            stop: function (e, u) {
-                M.renderSearchBreadcrumbs();
-            }
-        });
-        // Since selectablecreate is triggered only on first creation of the selectable widget, we need to find a way
-        // to notify any code (selectionManager) that it can now hook selectable events after the widget is created
-        $ddUIgrid.trigger('selectablereinitialized');
-    }
+    $('.ui-selectable-helper').remove();
 
     const contextMenuHandler = function(e) {
         $.hideContextMenu(e);
@@ -3895,6 +3847,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             // eslint-disable-next-line local-rules/jquery-scopes
             $('.dropdown.body.context .dropdown-item.edit-file-item').trigger('click');
         }
+        else if (M.getNodeRoot(n.h) === M.RubbishID) {
+            propertiesDialog();
+        }
         else {
             M.addDownload([h]);
         }
@@ -3957,9 +3912,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     switch (id) {
         case 'opc':
         case 'ipc':
-        case 'contacts':
-            tmpId = 'conversations';
-            break;
         case 'recents':
         case 'search':
         case 'shared-with-me':
@@ -4022,7 +3974,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     $('.fm-main', $fmholder).removeClass('active-folder-link');
     $('.nw-fm-left-icons-panel .logo', $fmholder).addClass('hidden');
     $('.fm-products-nav', $fmholder).text('');
-    $('.nw-fm-tree-header.folder-link', $fmholder).addClass('hidden');
     $('.nw-fm-left-icon.folder-link', $fmholder).removeClass('active');
 
     // Prevent autofill prevent fake form to be submitted
@@ -4039,7 +3990,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             $('.nw-fm-left-icons-panel .logo', $fmholder).removeClass('hidden');
             $('.fm-main', $fmholder).addClass('active-folder-link');
             $('.fm-right-header', $fmholder).addClass('folder-link');
-            $('.nw-fm-tree-header.folder-link', $fmholder).removeClass('hidden');
 
             var $prodNav = $('.fm-products-nav').text('');
             if (!u_type) {
@@ -4107,11 +4057,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.fm-blocks-view.fm').addClass('hidden');
     }
 
-    if (id !== 'contacts') {
-        $('.contacts-details-block').addClass('hidden');
-        $('.files-grid-view.contacts-view').addClass('hidden');
-        $('.fm-blocks-view.contacts-view').addClass('hidden');
-    }
     if (id !== 'user-management') {
         $('.fm-left-panel').removeClass('user-management');
         $('.user-management-tree-panel-header').addClass('hidden');
@@ -4132,10 +4077,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     if (id !== 'shared-with-me' && id !== 'out-shares') {
         $('.shares-tabs-bl').addClass('hidden');
-    }
-
-    if (id !== 'contacts') {
-        $('.contacts-tabs-bl').addClass('hidden');
     }
 
     if (tmpId !== 'gallery') {
@@ -4315,21 +4256,12 @@ FileManager.prototype.initStatusBarLinks = function() {
                 $.hideContextMenu();
                 return false;
             }
-            showFilesOptionContextMenu(e);
+            M.contextMenuUI(e, 1);
             this.classList.add('c-opened');
         }
 
         return false;
     });
-
-    function showFilesOptionContextMenu(e) {
-
-        // These pages are not support file option context menu
-        if (Object.assign(Object.create(null), {'contacts': 1, 'ipc': 1, 'opc': 1})[M.currentdirid]) {
-            return false;
-        }
-        return !!M.contextMenuUI(e, 1);
-    }
 };
 
 FileManager.prototype.initLeftPanel = function() {

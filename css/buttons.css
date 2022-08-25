@@ -314,50 +314,6 @@ button:not(.mega-button) .icon {
     right: 4px;
     top: 4px;
 }
-.start-chat-button {
-    background-image: url(../images/mega/dialog-sprite.png);
-    position: absolute;
-    right: 13px;
-    top: 4px;
-    width: 32px;
-    height: 16px;
-    background-position: -2px -3669px;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    z-index: 10;
-    display: block;
-    opacity: 0;
-    transition: opacity 200ms ease-in-out;
-    cursor: pointer;
-    border-radius: 4px;
-    background-color: rgba(255,255,255,1);
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.15);
-}
-.start-chat-button::before {
-    content: '';
-    display:block;
-    position:absolute;
-    width:100%;
-    height: 100%;
-    border-radius: inherit;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
-}
-.start-chat-button span {
-    background-image: url(../images/mega/dialog-sprite.png);
-    display: block;
-    width: 32px;
-    height: 16px;
-    background-position: -122px -3719px;
-    background-repeat: no-repeat;
-}
-.nw-contact-item:hover .start-chat-button,
-.nw-contact-item.selected .start-chat-button,
-.start-chat-button.active {
-    opacity: 1;
-}
-.conversationsApp .nw-fm-tree-header .button {
-	display: block;
-}
 .conversationsApp .button:not(.disabled) > i,
 .conversationsApp .button:not(.disabled) > span {
 	cursor: pointer;

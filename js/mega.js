@@ -185,6 +185,11 @@ if (typeof loadingDialog === 'undefined') {
 
         'use strict';
 
+        // Do not interrupt init dialog
+        if (loadingInitDialog && loadingInitDialog.active) {
+            return;
+        }
+
         const $spinner = $('.loading-spinner:not(.manual-management)').removeClass('hidden');
 
         $('.loader-progressbar', $spinner).addClass('active');
@@ -197,6 +202,7 @@ if (typeof loadingDialog === 'undefined') {
 
         'use strict';
 
+        // Do not interrupt init dialog
         if (loadingInitDialog && loadingInitDialog.active) {
             return;
         }

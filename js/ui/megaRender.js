@@ -88,6 +88,7 @@
                     '<td class="grid-url-header-nw">' +
                         '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                     '</td>' +
+                    '<td class="space-maintainer-end" megatype="empty"></td>' +
                 '</tr>' +
             '</table>',
 
@@ -141,6 +142,7 @@
                     '<td class="grid-url-header-nw">' +
                         '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                     '</td>' +
+                    '<td class="space-maintainer-end" megatype="empty"></td>' +
                 '</tr>' +
             '</table>',
 

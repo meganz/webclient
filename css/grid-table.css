@@ -307,7 +307,7 @@ table tr.ui-selected .link-transfer-status {
     left: 0;
 }
 
-.grid-table.fm thead th:not(:first-child):not(:last-child):not(.grid-url-header):not(.grid-first-th):hover::before {
+.grid-table thead th:not(:first-child):not(:last-child):not(.grid-url-header):not(.grid-first-th):hover::before {
     content: '';
     position: absolute;
     right: 7px;
@@ -316,6 +316,9 @@ table tr.ui-selected .link-transfer-status {
     background-color: var(--stroke-mid-grey);
     cursor: col-resize;
     bottom: 0;
+}
+.grid-table thead th.full-width-col {
+    width: 100%;
 }
 .rtl .grid-table th:not(.grid-url-header):hover::before {
     right: auto;

@@ -1316,6 +1316,18 @@
             });
         };
 
+        uaPacketParserHandler['^!bak'] = (userHandle) => {
+
+            mega.attr.get(userHandle, 'bak', -2, 1, (res, ctx) => {
+
+                u_attr[ctx.ua] = base64urlencode(res);
+
+                if (fminitialized) {
+                    M.BackupsId = u_attr[ctx.ua];
+                }
+            });
+        };
+
         if (d) {
             global._uaPacketParserHandler = uaPacketParserHandler;
         }

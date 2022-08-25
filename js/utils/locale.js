@@ -1392,12 +1392,21 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.extensions_avbl_desktop = escapeHTML(l.extensions_avbl_desktop).replace('[A1]', '<a href="" class="red a1"></a>');
     l.extensions_avbl_mobile = escapeHTML(l.extensions_avbl_mobile).replace(/\[S]/g, '<strong>')
         .replace(/\[\/S]/g, '</strong>');
+    l.copy_to_my_backups = escapeHTML(l.copy_to_my_backups)
+        .replace('[A]', '<a>').replace('[/A]', '</a>');
+    l.backup_read_only_wrng = escapeHTML(l.backup_read_only_wrng)
+        .replace('[S]', '<span>')
+        .replace('[/S]', '</span>');
     l.cookie_banner_txt = escapeHTML(l.cookie_banner_txt)
         .replace('[A]', '<a href="/cookie" class="clickurl" target="_blank">')
         .replace('[/A]', '</a>');
     l.payment_card_almost_exp = l.payment_card_almost_exp
         .replace('[A]', '<a>').replace('[/A]', '</a>');
     l.payment_card_exp = l.payment_card_exp
+        .replace('[A]', '<a>').replace('[/A]', '</a>');
+    l.backup_pcs_info = l.backup_pcs_info
+        .replace('[A]', '<a>').replace('[/A]', '</a>');
+    l.backup_mobiles_info = l.backup_mobiles_info
         .replace('[A]', '<a>').replace('[/A]', '</a>');
 
     l.ri_s4_header = l.ri_s4_header

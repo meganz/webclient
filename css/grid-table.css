@@ -585,6 +585,14 @@ table.grid-table .grid-url-header-nw .grid-url-arrow {
     right: auto;
 }
 
+table.grid-table tr {
+    box-sizing: border-box;
+}
+
+table.grid-table tr:empty {
+    border: 0;
+}
+
 table.grid-table tr:not(.taken-down) .grid-status-icon:not(.read-only):not(.read-and-write) {
     cursor: pointer;
 }
@@ -911,18 +919,8 @@ table.shared-with-me td {
 
 table.shared-with-me .avatar-wrapper {
     position: absolute;
-    top: 11px;
+    top: 14px;
     margin: 0;
-}
-
-table.shared-with-me .shared-folder-icon {
-    background-image: url(../images/mega/files-icons.png);
-    background-position: -217px -4799px;
-    background-repeat: no-repeat;
-    width: 40px;
-    height: 37px;
-    position: absolute;
-    margin: -1px 0 0 0;
 }
 
 table.shared-with-me .shared-folder-info-block {
@@ -1009,27 +1007,6 @@ table.shared-with-me .shared-folder-access span {
 table.out-shares td {
     z-index: 0;
     height: 56px;
-}
-
-table.out-shares .shared-folder-icon {
-    background-image: url(../images/mega/files-icons.png);
-    background-position: -217px -4799px;
-    background-repeat: no-repeat;
-    width: 40px;
-    height: 37px;
-    position: absolute;
-    margin: -1px 0 0 0;
-}
-table.out-shares .medium-file-icon {
-    width: 38px;
-    height: 38px;
-    background-position: -216px -3239px;
-    background-image: url(../images/mega/files-icons.png);
-    background-repeat: no-repeat;
-}
-
-table.out-shares .medium-file-icon.folder-shared {
-    background-position: -216px -5039px;
 }
 
 table.out-shares .shared-folder-info-block {

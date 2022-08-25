@@ -40,9 +40,10 @@
     }
 
     function _propertiesDialog(action) {
-        var update = action === 3;
-        var close = !update && action;
-        var $dialog = $('.mega-dialog.properties-dialog');
+        const update = action === 3;
+        const close = !update && action;
+        const $dialog = $('.mega-dialog.properties-dialog', '.mega-dialog-container');
+        const $icon = $('.properties-file-icon', $dialog);
 
         $(document).off('MegaCloseDialog.Properties');
 
@@ -80,15 +81,23 @@
         var versioningFlag = false;
         var hasValid = false;
         var icons = [];
+        const selected = [];
 
         for (var i = $.selected.length; i--;) {
-            n = M.getNodeByHandle($.selected[i]);
-            if (!n) {
-                console.error('propertiesDialog: invalid node', $.selected[i]);
+            const node = M.getNodeByHandle($.selected[i]);
+
+            if (!node) {
+
+                if (d) {
+                    console.log('propertiesDialog: invalid node', $.selected[i]);
+                }
                 continue;
             }
+
+            n = node;
             hasValid = true;
             icons.push(fileIcon(n));
+            selected.push($.selected[i]);
 
             if (n.t) {
                 size += n.tb;// - (n.tvb || 0);
@@ -108,10 +117,12 @@
 
         if (!hasValid) {
             // $.selected had no valid nodes!
-            return propertiesDialog(1);
+            propertiesDialog(1);
+
+            return msgDialog('warninga', l[882], l[24196]);
         }
 
-        if ($.selected.length > 1) {
+        if (selected.length > 1) {
             n = Object.create(null); // empty n [multiple selection]
         }
 
@@ -127,7 +138,7 @@
             // node is not owned by current user on chat
             // (possible old shared file and no longer exist on cloud-drive, or shared by other user in the chat room),
             // don't display path
-            if (page === 'download' || (M.chat && n.u !== u_handle)) {
+            if (page === 'download' || M.chat && n.u !== u_handle || !n.h && !M.d[M.currentdirid]) {
                 $('.properties-breadcrumb', $dialog).addClass('hidden');
             }
             else {
@@ -141,7 +152,7 @@
         });
 
         var exportLink = new mega.Share.ExportLink({});
-        var isTakenDown = exportLink.isTakenDown($.selected);
+        var isTakenDown = exportLink.isTakenDown(selected);
         var isUndecrypted = missingkeys[n.h];
         var notificationText = '';
 
@@ -165,12 +176,19 @@
                 showToast('clipboard', notificationText);
             }
             var star = '';
-            if (n.fav && !folderlink && M.getNodeRoot(n.h) !== M.RubbishID) {
+            const rootHandle = M.getNodeRoot(n.h);
+
+            if (rootHandle === M.InboxID) {
+                versioningFlag = false;
+                $dialog.removeClass('versioning');
+            }
+
+            if (n.fav && !folderlink && rootHandle !== M.RubbishID) {
                 star = ' sprite-fm-mono icon-favourite-filled';
             }
             $dialog.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
 
-            if (fileIcon(n).indexOf('shared') > -1) {
+            if (icons.includes('outgoing')) {
                 $dialog.addClass('shared');
             }
 
@@ -218,6 +236,12 @@
             if (isUndecrypted) {
                 p.t2 = htmlentities(l[8649]);
             }
+            else if (mega.backupCenter.selectedSync
+                && mega.backupCenter.selectedSync.nodeHandle === n.h
+                && mega.backupCenter.selectedSync.localName) {
+
+                p.t2 = htmlentities(mega.backupCenter.selectedSync.localName);
+            }
             else if (n.name) {
                 p.t2 = htmlentities(n.name);
             }
@@ -225,7 +249,7 @@
                 p.t2 = htmlentities(l[164]);
             }
             else if (n.h === M.InboxID) {
-                p.t2 = htmlentities(l[166]);
+                p.t2 = htmlentities(l.restricted_folder_button);
             }
             else if (n.h === M.RubbishID) {
                 p.t2 = htmlentities(l[167]);
@@ -252,7 +276,7 @@
                 p.t7 = fm_contains(sfilecnt, sfoldercnt, true);
                 p.t15 = l[22148];
                 if ($dialog.hasClass('shared')) {
-                    users = M.getSharingUsers($.selected, true);
+                    users = M.getSharingUsers(selected, true);
 
                     // In case that user doesn't share with other
                     // Do NOT show contact informations in property dialog
@@ -287,10 +311,8 @@
                     p.t11 = fm_contains(sfilecnt, sfoldercnt, true);
                 }
             }
-            if (filecnt && versioningFlag) {
-                if (M.currentdirid !== M.RubbishID) {
-                    p.t14 = '<a id="previousversions">' + p.t14 + '</a>';
-                }
+            if (filecnt && versioningFlag && M.currentdirid !== M.RubbishID) {
+                p.t14 = '<a id="previousversions">' + p.t14 + '</a>';
             }
         }
         else {
@@ -434,7 +456,7 @@
         $(document).rebind('MegaCloseDialog.Properties', __fsi_close);
 
         if (p.hideContacts) {
-            $('.properties-txt-pad .contact-list-icon').hide();
+            $('.properties-txt-pad .contact-list-icon', $dialog).addClass('hidden');
         }
 
         if ($dialog.hasClass('shared')) {
@@ -495,47 +517,55 @@
             });
         }
 
+        $icon.text('');
+
         if (filecnt + foldercnt === 1) {
-            $('.properties-file-icon').html('<div class="' + fileIcon(n) + '"></div>');
+
+            mCreateElement('i', {
+                'class': icons[0]
+            }, $icon[0]);
         }
         else {
             if (filecnt + foldercnt === 2) {
                 $dialog.addClass('two-elements');
             }
-            $('.properties-elements-counter span').text(filecnt + foldercnt);
-            $('.properties-file-icon').html('');
+            $('.properties-elements-counter span', $dialog).text(filecnt + foldercnt);
 
             var iconsTypes = [];
+
             for (var j = 0; j < icons.length; j++) {
                 var ico = icons[j];
 
-                if (iconsTypes.indexOf(ico) === -1) {
-                    if (ico.indexOf('folder') === -1) {
+                if (!iconsTypes.includes(ico)) {
+                    if (!ico.includes('folder')) {
                         $dialog.removeClass('folders-only');
-                        iconsTypes.push('generic');
-                        break;// when we find generic --> all generic
                     }
-                    else {
-                        iconsTypes.push(ico);
-                    }
-                    if (iconsTypes.length === 3) { // we only need 3 icons types, so we stop
-                        break;
-                    }
+
+                    iconsTypes.push(ico);
                 }
             }
-            if (!$dialog.hasClass('folders-only')) {
-                for (var k1 = 0; k1 < 3; k1++) {
-                    $('.properties-file-icon').prepend('<div class="' + escapeHTML('generic') + '"></div>');
-                }
+
+            if (icons.length === 2) {
+                $dialog.addClass('two-elements');
             }
-            else {
-                for (var k = 0; k < iconsTypes.length; k++) {
-                    if (iconsTypes[k] === 'generic') {
-                        $('.properties-file-icon').prepend('<div class="' + escapeHTML(iconsTypes[k]) + '"></div>');
-                    }
-                    else {
-                        $('.properties-file-icon').append('<div class="' + escapeHTML(iconsTypes[k]) + '"></div>');
-                    }
+
+            for (var k = 0; k < icons.length; k++) {
+
+                if (filecnt && foldercnt || iconsTypes.length > 1) {
+
+                    mCreateElement('i', {
+                        'class': filecnt ? 'generic' : 'folder'
+                    }, $icon[0]);
+                }
+                else {
+
+                    mCreateElement('i', {
+                        'class': escapeHTML(iconsTypes[0])
+                    }, $icon[0]);
+                }
+
+                if (k === 2) {
+                    break;
                 }
             }
         }

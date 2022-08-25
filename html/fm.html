@@ -51,9 +51,17 @@
             <i class="sprite-fm-mono icon-preview-reveal"></i>
             <span>[$1899]</span>
         </a>
+        <a class="dropdown-item new-backup">
+            <i class="sprite-fm-mono icon-add-circle"></i>
+            <span>[$new_backup_btn]</span>
+        </a>
         <a class="dropdown-item open-item">
             <i class="sprite-fm-mono icon-folder-open"></i>
             <span>[$865]</span>
+        </a>
+       <a class="dropdown-item view-in-bc-item">
+            <i class="sprite-fm-mono icon-search-cloud"></i>
+            <span>[$view_in_bc]</span>
         </a>
         <a class="dropdown-item download-item contains-submenu sprite-fm-mono-after icon-arrow-right-after">
             <i class="sprite-fm-mono icon-download-small"></i>
@@ -204,6 +212,10 @@
         <hr />
     </div>
     <div class="dropdown-section">
+        <a class="dropdown-item get-more-quota">
+            <i class="sprite-fm-mono icon-transfer-quota"></i>
+            <span>[$get_more_quota]</span>
+        </a>
         <a class="dropdown-item properties-item">
             <i class="sprite-fm-mono icon-info"></i>
             <span>[$6859]</span>
@@ -370,9 +382,25 @@
             <i class="sprite-fm-mono icon-bin"></i>
             <span>[$move_to_rubbish_bin]</span>
         </a>
+        <a class="dropdown-item move-backup-item">
+            <i class="sprite-fm-mono icon-move"></i>
+            <span>[$62]</span>
+        </a>
+        <a class="dropdown-item remove-backup-item">
+            <i class="sprite-fm-mono icon-bin"></i>
+            <span>[$83]</span>
+        </a>
         <a class="dropdown-item leaveshare-item">
             <i class="sprite-fm-mono icon-logout"></i>
             <span>[$5866]</span>
+        </a>
+        <a class="dropdown-item stopbackup-item">
+            <i class="sprite-fm-mono icon-clear"></i>
+            <span>[$stop_backup_button]</span>
+        </a>
+        <a class="dropdown-item stopsync-item">
+            <i class="sprite-fm-mono icon-clear"></i>
+            <span>[$stop_syncing_button]</span>
         </a>
         <a class="dropdown-item clearbin-item red">
             <i class="sprite-fm-mono icon-close-component"></i>
@@ -449,6 +477,10 @@
                 </div>
                 <div class="dark-tooltip">[$5902]</div>
                 <div class="beta-text"></div>
+            </div>
+            <div class="nw-fm-left-icon backup-center sprite-fm-uni-before icon-backup-before js-fm-tab" aria-role="button" name="backup-center">
+                <div class="nw-fm-left-border"></div>
+                <div class="dark-tooltip">[$backup_centre]</div>
             </div>
             <div class="nw-fm-left-icon user-management sprite-fm-uni-before icon-business-before hidden js-fm-tab" aria-role="button" name="user-management">
                 <div class="nw-fm-left-border"></div>
@@ -597,17 +629,19 @@
                     <span>[$24681]</span>
                 </div>
                 <div class="content-area js-myfiles-panel">
-                    <div class="cloud-drive-panel">
+
+                    <div class="lp-content-wrap cloud-drive-panel">
                         <span class="section-title">[$24682]</span>
 
                         <div class="fm-tree-panel js-myfile-tree-panel">
                             <button class="btn-myfiles js-lpbtn js-clouddrive-btn cloud-drive collapse" data-link="clouddrive">
-                                <i class="sprite-fm-mono icon-arrow-down js-cloudtree-expander"></i>
+                                <i class="sprite-fm-mono icon-dropdown js-cloudtree-expander"></i>
                                 <i class="sprite-fm-mono icon-cloud-drive"></i>
                                 [$164]
                             </button>
 
                             <div class="content-panel cloud-drive active collapse">
+                                <div class="tree"></div>
                             </div>
                         </div>
                         <button class="btn-myfiles js-lpbtn recents js-fm-tab" data-link="recents">
@@ -615,7 +649,7 @@
                         </button>
 
                         <button class="btn-myfiles js-lpbtn js-inbox-btn inbox js-fm-tab" data-link="inbox">
-                            <i class="sprite-fm-mono icon-inbox-filled"></i>[$949]
+                            <i class="sprite-fm-mono icon-restricted-folder-filled"></i>[$restricted_folder_button]
                         </button>
 
                         <button class="btn-myfiles js-lpbtn rubbish-bin js-fm-tab" data-link="bin">
@@ -623,7 +657,7 @@
                         </button>
                     </div>
 
-                    <div class="shared-panel">
+                    <div class="lp-content-wrap shared-panel">
                         <span class="section-title">[$24684]</span>
 
                         <button class="btn-myfiles js-lpbtn shared-with-me js-fm-tab" data-link="shares">
@@ -643,7 +677,7 @@
                     <span>[$gallery_photos]</span>
                 </div>
                 <div class="content-area js-gallery-panel">
-                    <div class="library-panel">
+                    <div class="lp-content-wrap library-panel">
                         <span class="section-title">[$gallery_subtitle]</span>
                         <button class="btn-galleries js-lpbtn photos js-fm-tab" data-link="photos">
                             <i class="sprite-fm-mono icon-photos"></i>[$gallery_all_media]
@@ -716,10 +750,35 @@
             </div>
 
             <section class="fm-tree-panel fm-other-tree-panel js-other-tree-panel">
-                <span class="section-title">[$24682]</span>
-                <div class="content-panel cloud-drive active"></div> <!-- folder link -->
+
+                <!-- Folder link -->
+                <div class="content-panel cloud-drive active">
+                    <div class="lp-header">
+                        <span>[$808]</span>
+                    </div>
+                    <div class="lp-content-wrap">
+                        <span class="section-title">[$24682]</span>
+                        <div class="tree"></div>
+                    </div>
+                </div>
+
                 <div class="content-panel shared-with-me"></div>
+
+                <!-- Backup centre left pane -->
+                <div class="content-panel backup-center">
+                    <div class="lp-header">
+                        <span>[$backup_centre]</span>
+                    </div>
+                    <div class="lp-content-wrap">
+                        <button class="btn-myfiles backups js-fm-tab js-lpbtn" data-link="backups">
+                            <i class="sprite-fm-mono icon-pc-filled"></i>
+                            [$devices_button]
+                        </button>
+                    </div>
+                </div>
+
                 <div class="content-panel contacts"></div>
+
                 <div class="content-panel rubbish-bin"></div>
                 <div class="content-panel user-management">
                     <div class="nw-user-management-item selected">
@@ -796,120 +855,122 @@
                     <div class="lp-header">
                         <span>[$823]</span>
                     </div>
-                    <div class="settings-button slide-in-out ts-500 closed account-s active">
-                        <div class="head-title">
-                            <i class="sprite-fm-mono icon-arrow-right expand"></i>
-                            <i class="sprite-fm-mono icon-user-filled"></i>
-                            <span>[$403]</span>
+                    <div class="lp-content-wrap">
+                        <div class="settings-button slide-in-out ts-500 closed account-s active">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-user-filled"></i>
+                                <span>[$403]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="profile-form">[$984]</div>
+                                <div class="sub-title" data-scrollto="qr-settings">[$17754]</div>
+                                <div class="sub-title" data-scrollto="preferences">[$7026]</div>
+                                <div class="sub-title acc-setting-menu-cancel-acc" data-scrollto="cancel-account-block">[$16115]</div>
+                            </div>
                         </div>
-                        <div class="sub-menu slide-item">
-                            <div class="sub-title" data-scrollto="profile-form">[$984]</div>
-                            <div class="sub-title" data-scrollto="qr-settings">[$17754]</div>
-                            <div class="sub-title" data-scrollto="preferences">[$7026]</div>
-                            <div class="sub-title acc-setting-menu-cancel-acc" data-scrollto="cancel-account-block">[$16115]</div>
+                        <div class="settings-button slide-in-out ts-500 closed plan">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-plan-filled"></i>
+                                <span>[$16166]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="account-type">[$17022]</div>
+                                <div class="sub-title acc-setting-menu-balance-acc" data-scrollto="account-balance">[$449]</div>
+                                <div class="sub-title acc-setting-menu-card-info hidden" data-scrollto="account-card-info">[$payment_card]</div>
+                                <div class="sub-title" data-scrollto="purchase-history">[$430]</div>
+                                <div class="sub-title" data-scrollto="transaction-history">[$431]</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="settings-button slide-in-out ts-500 closed plan">
-                        <div class="head-title">
-                            <i class="sprite-fm-mono icon-arrow-right expand"></i>
-                            <i class="sprite-fm-mono icon-plan-filled"></i>
-                            <span>[$16166]</span>
+                        <div class="settings-button slide-in-out ts-500 closed notifications">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-notification-filled"></i>
+                                <span>[$862]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="account-notification">[$20900]</div>
+                                <div class="sub-title" data-scrollto="email-notification">[$20898]</div>
+                            </div>
                         </div>
-                        <div class="sub-menu slide-item">
-                            <div class="sub-title" data-scrollto="account-type">[$17022]</div>
-                            <div class="sub-title acc-setting-menu-balance-acc" data-scrollto="account-balance">[$449]</div>
-                            <div class="sub-title acc-setting-menu-card-info hidden" data-scrollto="account-card-info">[$payment_card]</div>
-                            <div class="sub-title" data-scrollto="purchase-history">[$430]</div>
-                            <div class="sub-title" data-scrollto="transaction-history">[$431]</div>
+                        <div class="settings-button slide-in-out ts-500 closed security">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-lock-filled"></i>
+                                <span>[$7337]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="change-password">[$23262]</div>
+                                <div class="sub-title acc-setting-menu-change-em" data-scrollto="change-email">[$7743]</div>
+                                <div class="sub-title" data-scrollto="backup-key">[$8839]</div>
+                                <div class="sub-title" data-scrollto="two-factor-authentication">[$19194]</div>
+                                <div class="sub-title" data-scrollto="personal-data-container">[$20167]</div>
+                                <div class="sub-title" data-scrollto="session-history">[$429]</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="settings-button slide-in-out ts-500 closed notifications">
-                        <div class="head-title">
-                            <i class="sprite-fm-mono icon-arrow-right expand"></i>
-                            <i class="sprite-fm-mono icon-notification-filled"></i>
-                            <span>[$862]</span>
+                        <div class="settings-button slide-in-out ts-500 closed file-management">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-folder-filled"></i>
+                                <span>[$16159]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="file-version">[$19475]</div>
+                                <div class="sub-title" data-scrollto="rubbish-cleaning">[$20229]</div>
+                                <div class="sub-title" data-scrollto="user-interface">[$16158]</div>
+                                <div class="sub-title" data-scrollto="dialog-options">[$20169]</div>
+                                <div class="sub-title" data-scrollto="link-options">[$setting_section_plink]</div>
+                            </div>
                         </div>
-                        <div class="sub-menu slide-item">
-                            <div class="sub-title" data-scrollto="account-notification">[$20900]</div>
-                            <div class="sub-title" data-scrollto="email-notification">[$20898]</div>
+                        <div class="settings-button slide-in-out ts-500 closed transfers">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-transfer-filled"></i>
+                                <span>[$1346]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="upload-and-download">[$20170]</div>
+                                <div class="sub-title" data-scrollto="transfer-tools">[$20171]</div>
+                                <div class="sub-title" data-scrollto="megadrop-folders">[$17401]</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="settings-button slide-in-out ts-500 closed security">
-                        <div class="head-title">
-                            <i class="sprite-fm-mono icon-arrow-right expand"></i>
-                            <i class="sprite-fm-mono icon-lock-filled"></i>
-                            <span>[$7337]</span>
+                        <div class="settings-button slide-in-out ts-500 closed contact-chats">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-chat-filled"></i>
+                                <span>[$20174]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="status-settings">[$20182]</div>
+                                <div class="sub-title" data-scrollto="chat-settings">[$chat_settings]</div>
+                                <div class="sub-title" data-scrollto="rich-url-preview">[$18696]</div>
+                                <div class="sub-title" data-scrollto="push-notification-settings">[$22121]</div>
+                            </div>
                         </div>
-                        <div class="sub-menu slide-item">
-                            <div class="sub-title" data-scrollto="change-password">[$23262]</div>
-                            <div class="sub-title acc-setting-menu-change-em" data-scrollto="change-email">[$7743]</div>
-                            <div class="sub-title" data-scrollto="backup-key">[$8839]</div>
-                            <div class="sub-title" data-scrollto="two-factor-authentication">[$19194]</div>
-                            <div class="sub-title" data-scrollto="personal-data-container">[$20167]</div>
-                            <div class="sub-title" data-scrollto="session-history">[$429]</div>
+                        <div class="settings-button slide-in-out ts-500 closed reseller hidden">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-reseller"></i>
+                                <span>[$391]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="create-voucher">[$20230]</div>
+                                <div class="sub-title" data-scrollto="voucher-history">[$20231]</div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="settings-button slide-in-out ts-500 closed file-management">
-                        <div class="head-title">
-                            <i class="sprite-fm-mono icon-arrow-right expand"></i>
-                            <i class="sprite-fm-mono icon-folder-filled"></i>
-                            <span>[$16159]</span>
-                        </div>
-                        <div class="sub-menu slide-item">
-                            <div class="sub-title" data-scrollto="file-version">[$19475]</div>
-                            <div class="sub-title" data-scrollto="rubbish-cleaning">[$20229]</div>
-                            <div class="sub-title" data-scrollto="user-interface">[$16158]</div>
-                            <div class="sub-title" data-scrollto="dialog-options">[$20169]</div>
-                            <div class="sub-title" data-scrollto="link-options">[$setting_section_plink]</div>
-                        </div>
-                    </div>
-                    <div class="settings-button slide-in-out ts-500 closed transfers">
-                        <div class="head-title">
-                            <i class="sprite-fm-mono icon-arrow-right expand"></i>
-                            <i class="sprite-fm-mono icon-transfer-filled"></i>
-                            <span>[$1346]</span>
-                        </div>
-                        <div class="sub-menu slide-item">
-                            <div class="sub-title" data-scrollto="upload-and-download">[$20170]</div>
-                            <div class="sub-title" data-scrollto="transfer-tools">[$20171]</div>
-                            <div class="sub-title" data-scrollto="megadrop-folders">[$17401]</div>
-                        </div>
-                    </div>
-                    <div class="settings-button slide-in-out ts-500 closed contact-chats">
-                        <div class="head-title">
-                            <i class="sprite-fm-mono icon-arrow-right expand"></i>
-                            <i class="sprite-fm-mono icon-chat-filled"></i>
-                            <span>[$20174]</span>
-                        </div>
-                        <div class="sub-menu slide-item">
-                            <div class="sub-title" data-scrollto="status-settings">[$20182]</div>
-                            <div class="sub-title" data-scrollto="chat-settings">[$chat_settings]</div>
-                            <div class="sub-title" data-scrollto="rich-url-preview">[$18696]</div>
-                            <div class="sub-title" data-scrollto="push-notification-settings">[$22121]</div>
-                        </div>
-                    </div>
-                    <div class="settings-button slide-in-out ts-500 closed reseller hidden">
-                        <div class="head-title">
-                            <i class="sprite-fm-mono icon-arrow-right expand"></i>
-                            <i class="sprite-fm-mono icon-reseller"></i>
-                            <span>[$391]</span>
-                        </div>
-                        <div class="sub-menu slide-item">
-                            <div class="sub-title" data-scrollto="create-voucher">[$20230]</div>
-                            <div class="sub-title" data-scrollto="voucher-history">[$20231]</div>
-                        </div>
-                    </div>
-                    <div class="settings-button slide-in-out ts-500 closed calls">
-                        <div class="head-title">
-                            <i class="sprite-fm-mono icon-arrow-right expand"></i>
-                            <i class="sprite-fm-mono icon-video-call-filled"></i>
-                            <span>[$setting_meeting_title]</span>
-                        </div>
-                        <div class="sub-menu slide-item">
-                            <div class="sub-title" data-scrollto="leave-empty">[$sub_setting_meeting_empty_call]</div>
-                        </div>
-                        <div class="sub-menu slide-item">
-                            <div class="sub-title" data-scrollto="sound-notifications">[$sound_notifications]</div>
+                        <div class="settings-button slide-in-out ts-500 closed calls">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-video-call-filled"></i>
+                                <span>[$setting_meeting_title]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="leave-empty">[$sub_setting_meeting_empty_call]</div>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="sound-notifications">[$sound_notifications]</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1721,6 +1782,18 @@
                                     </div>
                                     <div class="ff-occupy"> </div>
                                 </div>
+                                <div class="used-storage-info ba-backups">
+                                    <div class="used-storage-icon-cell">
+                                        <i class="sprite-fm-mono icon-database"></i>
+                                    </div>
+                                    <div class="ff-name">[$restricted_folder_button]</div>
+                                    <div class="ff-number">
+                                        <div class="folder-number"> </div>
+                                        <div>, </div>
+                                        <div class="file-number"> </div>
+                                    </div>
+                                    <div class="ff-occupy"> </div>
+                                </div>
                                 <div class="used-storage-info ba-rubbish empty">
                                     <div class="used-storage-icon-cell">
                                         <i class="sprite-fm-mono icon-bin"></i>
@@ -2213,7 +2286,7 @@
         </div>
 
         <!-- check if there is any other place using account qr-block -->
-        <div class="fm-right-account-block hidden">
+        <section class="fm-right-account-block hidden">
             <div class="fm-account-main">
                 <div class="account settings-banner add-phone-num-banner hidden">
                     <div class="settings-banner-cell first-block">
@@ -3586,9 +3659,80 @@
                 </div>
             </div>
             <!-- Hear a sound when someone joins or leaves a call. -->
-        </div>
+        </section>
 
-        <div class="fm-right-block dashboard hidden">
+        <!-- Backup center - Backups section !-->
+        <section class="fm-right-block full-size backup hidden">
+
+            <!-- Empty section !-->
+            <div class="backup-center empty-section hidden">
+                <div class="empty-wrap">
+                    <i class="sprite-fm-theme icon-empty-state-backup"></i>
+                    <h2>[$no_backups_header]</h2>
+                    <div class="new-backup-wrapper">
+                        <div class="new-backup mobile">
+                            <i class="sprite-fm-mono icon-mobile"></i>
+                            <div class="title">
+                                [$backup_mobiles_header]
+                            </div>
+                            <div class="info">
+                                [$backup_mobiles_info]
+                            </div>
+                        </div>
+                        <div class="new-backup desktop">
+                            <i class="sprite-fm-mono icon-pc"></i>
+                            <div class="title">
+                                [$backup_pcs_header]
+                            </div>
+                            <div class="info">
+                                [$backup_pcs_info]
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download mobile app banner !-->
+                <div class="apps-banner hidden">
+                    <i class="banner-icon sprite-fm-illustration img-dialog-backup-phone"></i>
+                    <div class="info">
+                        <div class="header">[$backup_banner_info]</div>
+                        <div class="apps">
+                            <a href="/mobile" class="ios clickurl">
+                                <i class="sprite-fm-mono icon-ios"></i>
+                                <span>[$ios]</span>
+                            </a>
+                            <a href="/mobile" class="android clickurl">
+                                <i class="sprite-fm-mono icon-android"></i>
+                                <span>[$android]</span>
+                            </a>
+                        </div>
+                    </div>
+                    <button class="close-btn" aria-label="[[close banner]]">
+                        <i class="sprite-fm-mono icon-close-component"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content block !-->
+            <div class="backup-center content-block hidden">
+                <div class="content-header">
+                    <button class="mega-button no-hover action js-backup-computer" title="[$new_backup_btn]">
+                        <div><i class="sprite-fm-mono icon-add-circle icon-green"></i></div>
+                        <span>[$new_backup_btn]</span>
+                    </button>
+                    <button class="mega-button no-hover action js-show-hidden hidden" title="[$hidden_backups_btn]">
+                        <div><i class="sprite-fm-mono icon-eye-reveal"></i></div>
+                        <span>[$hidden_backups_btn]</span>
+                    </button>
+                </div>
+
+                <div class="content-body">
+                    <div class="content-wrap"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="fm-right-block dashboard hidden">
             <div class="widgets content-block">
 
                 <!-- for business dashboard -->
@@ -3783,6 +3927,11 @@
                                         <div class="storage-division-name">[$16770]</div>
                                         <div class="storage-division-num">356 GB</div>
                                     </div>
+                                    <div class="storage-division-container backups-node">
+                                        <div class="storage-division-per backups-color"> </div>
+                                        <div class="storage-division-name">[$restricted_folder_button]</div>
+                                        <div class="storage-division-num"> </div>
+                                    </div>
                                     <div class="storage-division-container rubbish-node">
                                         <div class="storage-division-per rubbish-color"> </div>
                                         <div class="storage-division-name">[$167]</div>
@@ -3843,6 +3992,17 @@
                                         <td>
                                             <i class="sprite-fm-mono icon-share-outgoing"></i>
                                             <span>[$5543]</span>
+                                        </td>
+                                        <td>
+                                            <div class="folder-number"> </div>,
+                                            <div class="file-number"> </div>
+                                        </td>
+                                        <td class="ff-occupy"> </td>
+                                    </tr>
+                                    <tr class="account data-item used-storage-info ba-backups js-backups-el">
+                                        <td>
+                                            <i class="sprite-fm-mono icon-database"></i>
+                                            <span>[$restricted_folder_button]</span>
                                         </td>
                                         <td>
                                             <div class="folder-number"> </div>,
@@ -4003,6 +4163,19 @@
                                     </div>
                                 </div>
 
+                                <div class="account item-wrapper js-backups-el">
+                                    <div class="account pr-item backups">
+                                        <div class="account progress-perc pr2"></div>
+                                        <div class="account progress-size small backups">
+                                            0 MB
+                                        </div>
+                                        <div class="account progress-title">
+                                            <i class="sprite-fm-mono icon-selector"></i>
+                                            <span>[$restricted_folder_button]</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="account item-wrapper">
                                     <div class="account pr-item versions">
                                         <div class="account progress-perc pr3"></div>
@@ -4012,19 +4185,6 @@
                                         <div class="account progress-title">
                                             <i class="sprite-fm-mono icon-selector"></i>
                                             <span>[$17150]</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="account item-wrapper hidden">
-                                    <div class="account pr-item inbox">
-                                        <div class="account progress-perc pr2"></div>
-                                        <div class="account progress-size small inbox">
-                                            0 MB
-                                        </div>
-                                        <div class="account progress-title">
-                                            <i class="sprite-fm-mono icon-selector"></i>
-                                            <span>[$166]</span>
                                         </div>
                                     </div>
                                 </div>
@@ -4058,8 +4218,8 @@
                             <div class="account progress-bar">
                                 <div class="progress-bar-container">
                                     <div class="account progress-bar-section pr0 simpletip" data-simpletip="[$164]"></div>
+                                    <div class="account progress-bar-section pr2 simpletip" data-simpletip="[$restricted_folder_button]"></div>
                                     <div class="account progress-bar-section pr3 simpletip" data-simpletip="[$17150]"></div>
-                                    <div class="account progress-bar-section pr2 simpletip" data-simpletip="[$166]"></div>
                                     <div class="account progress-bar-section pr1 simpletip" data-simpletip="[$168]"></div>
                                 </div>
                             </div>
@@ -4205,6 +4365,18 @@
                                         0 MB
                                     </td>
                                 </tr>
+                                <tr class="account data-item js-backups-el">
+                                    <td class="account">
+                                        <i class="sprite-fm-mono icon-database"></i>
+                                        <span class="backups pointer-c">[$restricted_folder_button]</span>
+                                    </td>
+                                    <td class="account">
+                                        0 folders
+                                    </td>
+                                    <td class="account right-textalign">
+                                        0 MB
+                                    </td>
+                                </tr>
                                 <tr class="account data-item">
                                     <td class="account">
                                         <i class="sprite-fm-mono icon-link"></i>
@@ -4235,9 +4407,9 @@
                     </div>
             </div>
             </div>
-        </div>
+        </section>
 
-        <div class="fm-recents container hidden">
+        <section class="fm-recents container hidden">
             <div class="fm-recents header">[$20141]</div>
             <div class="fm-recents scroll"></div>
             <!--<div class="fm-recents content"></div>-->
@@ -4318,7 +4490,7 @@
                 </div>
             </div>
             <!-- END Templates for recents list -->
-        </div>
+        </section>
 
         <!-- Affiliate block. Init scrolling here !-->
         <div class="fm-affiliate body">

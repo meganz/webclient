@@ -1663,6 +1663,8 @@ function api_getuser(ctx) {
 
 /**
  * Send current node attributes to the API
+ * @param {Object} n Updated node
+ * @param {String} idtag mRandomToken
  * @return {MegaPromise}
  */
 function api_setattr(n, idtag) {
@@ -1690,11 +1692,15 @@ function api_setattr(n, idtag) {
 
     try {
         var at = ab_to_base64(crypto_makeattr(n));
+        const ops = {a: 'a', n: n.h, at: at, i: idtag};
+
+        if (M.getNodeRoot(n.h) === M.InboxID) {
+            mega.backupCenter.ackVaultWriteAccess(n.h, ops);
+        }
 
         logger.debug('Setting node attributes for "%s"...', n.h, idtag);
 
-        // we do not set i here, unless explicitly specified
-        api_req({a: 'a', n: n.h, at: at, i: idtag}, ctx);
+        api_req(ops, ctx);
 
         if (idtag) {
             M.scAckQueue[idtag] = Date.now();

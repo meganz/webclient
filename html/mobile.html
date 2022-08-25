@@ -291,8 +291,6 @@
                 <div class="mobile fm-item folder template">
                     <div class="mobile fm-item-img">
                         <img class="regular-folder" alt="" src="{staticpath}images/mobile/extensions/folder.png" />
-                        <img class="shared-folder hidden" alt="" src="{staticpath}images/mobile/extensions/outgoing-share-folder.png" />
-                        <img class="megadrop-folder hidden" alt="" src="{staticpath}images/mobile/extensions/puf-folder.png" />
                     </div>
                     <div class="mobile fm-icon open-context-menu right hidden"></div>
                     <div class="mobile fm-icon link right hidden"></div>
@@ -3163,10 +3161,13 @@
     <div class="mobile content-row first">
         <div class="mobile content-cell">
             <a class="mobile logo"></a>
+            <div class="mobile fm-dialog-close"></div>
             <div class="mobile white-block">
                 <div class="mobile error-messages">
                     <!-- If the dialog requires an icon, remove the hidden class from empty-icon and add another class, empty-icon classes can be found in mobile.css. Search for empty-icon to show the available icons -->
-                    <div class="mobile empty-icon clear-rubbish-bin hidden"></div>
+                    <div class="mobile empty-icon clear-rubbish-bin hidden">
+                        <img alt="" class="mobile filetype-img">
+                    </div>
                     <div class="mobile first-message"></div>
                     <div class="mobile optional-second-message"></div>
                 </div>

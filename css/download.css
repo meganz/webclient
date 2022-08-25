@@ -432,12 +432,14 @@ button.megasync-slider i {
     cursor: default;
 }
 button.megasync-slider.next {
-    right: 28px;
+    right: 16px;
     position: absolute;
+    top: calc(50% - 30px);
 }
 button.megasync-slider.prev {
-    left: 28px;
+    left: 16px;
     position: absolute;
+    top: calc(50% - 30px);
 }
 .megasync-overlay .mega-input.megasync-dropdown {
     min-width: 230px;

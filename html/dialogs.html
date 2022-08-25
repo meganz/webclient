@@ -159,6 +159,24 @@
                         </div>
 
                         <div class="megasync-slide slide1">
+                            <div class="megasync-backup-bg"></div>
+                            <div class="megasync-header">[$20758]</div>
+                            <div class="megasync-backup-img sprite-fm-illustration img-dialog-desktop-app"></div>
+
+                            <div class="megasync-slide-info">
+                                <div class="small-header">
+                                    [$19639]
+                                </div>
+                                <div class="big-header">
+                                    [$backup_tool_header]
+                                </div>
+                                <div class="txt">
+                                    [$backup_tool_info]
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="megasync-slide slide2">
                             <div class="megasync-header">[$20758]</div>
                             <div class="megasync-img img1">
                                 <div class="megasync-slide-info">
@@ -175,7 +193,7 @@
                             </div>
                         </div>
 
-                        <div class="megasync-slide slide2">
+                        <div class="megasync-slide slide3">
                             <div class="megasync-header">
                                 [$16863]
                             </div>
@@ -186,7 +204,7 @@
                             </div>
                         </div>
 
-                        <div class="megasync-slide slide3">
+                        <div class="megasync-slide slide4">
                             <div class="megasync-header">
                                 [$16864]
                             </div>
@@ -1747,7 +1765,7 @@
                 <i class="error sprite-fm-uni icon-error"></i>
                 <i class="confirmation sprite-fm-uni icon-question"></i>
             </div>
-            <div>
+            <div class="info-container">
                 <h3 id="msgDialog-title"></h3>
                 <p class="subtitle hidden"></p>
                 <p class="text hidden">[$15]</p>
@@ -2474,7 +2492,7 @@
             <div class="content-block share-dialog-top">
                 <div class="share-dialog-top-body">
                     <div class="share-dialog-shared-item">
-                        <div class="share-dialog-folder-icon sprite-fm-uni"></div>
+                        <i class="item-type-icon sprite-fm-uni"></i>
                         <div class="share-dialog-folder-info-block">
                             <div class="share-dialog-folder-name"></div>
                             <div class="share-dialog-folder-info"></div>
@@ -2519,6 +2537,7 @@
                         </div>
                         <span>[$23707]</span>
                     </button>
+                    <div class="mega-banner body warning-template"></div>
                 </div>
             </div>
         </section>
@@ -7198,6 +7217,68 @@
                     </button>
 
                 </div>
+            </div>
+        </footer>
+    </div>
+
+    <div class="mega-dialog dialog-template-main stop-backup hidden"
+         role="dialog"
+         aria-labelledby="stop-backup-title"
+         aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <h2 id="stop-backup-title">[$stop_backup_button]</h2>
+            <p>[$stop_backup_info]</p>
+        </header>
+
+        <section class="content">
+            <div class="content-block select-action-wrap">
+                <div class="select-action">
+                    <div class="radio-button radioOff"><input type="radio" name="stop-backup" id="stop-backup-a1" value="0"></div>
+                    <div>
+                        <label for="stop-backup-a1" class="action-label">
+                            [$move_folder_label]
+                        </label>
+                        <span class="action-info">
+                            [$move_folder_info]
+                        </span>
+                        <div class="path-wrap">
+                            <div class="move-label">[$move_to_label]</div>
+                            <div class="mega-input box-style disabled js-path-input">
+                                <input class="path" type="text" value="Cloud drive/" disabled>
+                            </div>
+                            <button class="mega-button positive small disabled js-change-path">
+                                <span>[$1776]</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-action">
+                    <div class="radio-button radioOff"><input type="radio" name="stop-backup" id="stop-backup-a2" value="1"></div>
+                    <div>
+                        <label for="stop-backup-a2" class="action-label">
+                            [$delete_folder_label]
+                        </label>
+                        <span class="action-info">
+                            [$delete_folder_info]
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-container">
+                 <button class="mega-button js-close">
+                    <span>[$1597]</span>
+                </button>
+                <button class="mega-button positive disabled js-confirm">
+                    <span>[$870]</span>
+                </button>
             </div>
         </footer>
     </div>

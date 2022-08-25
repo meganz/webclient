@@ -444,6 +444,12 @@
                 width: 64px;
             }
 
+            .mega-dialog.dialog-template-message > header .info-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
             .mega-dialog.dialog-template-message > header h3 {
                 text-align: start;
             }
@@ -452,8 +458,25 @@
                 margin-top: 12px;
             }
 
+            .mega-dialog.dialog-template-message > header h3.hidden ~ p {
+                color: var(--text-color-high);
+                margin-top: 0;
+            }
+
+            .mega-dialog.dialog-template-message > footer .align-end {
+                display: flex;
+                justify-content: flex-end;
+            }
+
             .mega-dialog.dialog-template-message > footer .footer-container {
                 padding: 24px;
+            }
+
+            .mega-dialog.dialog-template-message > footer.compound .footer-container {
+                background-color: var(--surface-grey-1);
+                border-radius: inherit;
+                flex-direction: column;
+                margin-top: 24px;
             }
 
             .mega-dialog.dialog-template-message > footer aside {

@@ -251,6 +251,7 @@
     function MegaRender(aViewMode) {
         var renderer;
         var section = 'cloud-drive';
+        var location = 'default';
 
         if (M.currentdirid === 'shares') {
 
@@ -266,6 +267,12 @@
 
                 renderer = this.renderer['*'];
             }
+
+            location =
+                M.currentdirid === 'public-links' ? 'mixed-content' :
+                    M.currentrootid === M.RubbishID ? 'trashcan' :
+                        M.currentrootid === M.InboxID ? 'backups' :
+                            location;
         }
         else {
             this.chatIsReady = megaChatIsReady;
@@ -292,6 +299,7 @@
         define(this, 'render',              renderer || this.renderer[section] || this.renderer['*']);
         define(this, 'getNodeProperties',   this.nodeProperties[section] || this.nodeProperties['*']);
         define(this, 'section',             section);
+        define(this, 'location',            location);
         this.versionColumnPrepare = versionColumnPrepare;
 
         if (scope.d) {
@@ -764,8 +772,8 @@
              * @param {Boolean} aExtendedInfo Include info needed by builders
              */
             '*': function(aNode, aHandle, aExtendedInfo) {
-                var props = {classNames: []};
-                var share = M.getNodeShare(aNode);
+                const props = {classNames: []};
+                const share = M.getNodeShare(aNode);
 
                 if (aNode.su) {
                     props.classNames.push('inbound-share');
@@ -773,7 +781,6 @@
 
                 if (aNode.t) {
                     props.type = l[1049];
-                    props.icon = 'folder';
                     props.classNames.push('folder');
                     props.size = bytesToSize(aNode.tb || 0);
                 }
@@ -787,7 +794,9 @@
                         props.codecs = MediaAttribute.getCodecStrings(aNode);
                     }
                 }
+
                 props.name = aNode.name;
+                props.icon = fileIcon(aNode);
 
                 if (missingkeys[aHandle] || share.down) {
                     props.icon = 'generic';
@@ -824,8 +833,6 @@
                         props.linked = true;
                         props.classNames.push('linked');
                     }
-
-                    props.icon = fileIcon(aNode);
 
                     if (!this.viewmode) {
                         if (M.currentCustomView.type === 'public-links' && aNode.shares && aNode.shares.EXP) {
@@ -971,12 +978,20 @@
                 var tmp;
                 var title = [];
                 let elm;
-                const root = M.getNodeRoot(aNode && aNode.h || false);
 
-                if (aNode.fav && !folderlink && root !== M.RubbishID) {
+                if (aNode.fav && !folderlink && this.location !== 'trashcan') {
                     elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
                     elm.classList.add('icon-favourite-filled');
                     elm.classList.remove('icon-dot');
+                }
+
+                if (this.location === 'backups'
+                    || this.location === 'mixed-content' && M.getNodeRoot(aNode.h) === M.InboxID) {
+
+                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
+                    if (elm) {
+                        elm.classList.add('read-only');
+                    }
                 }
 
                 if (!aNode.t && aNode.tvf) {
@@ -1041,7 +1056,10 @@
                     }
 
                     tmp = aTemplate.querySelector('.transfer-filetype-icon');
-                    tmp.classList.add(aProperties.icon);
+
+                    if (aProperties.icon) {
+                        tmp.classList.add(aProperties.icon);
+                    }
                 }
                 this.addClasses(tmp, aProperties.classNames);
 
@@ -1147,10 +1165,17 @@
             },
             'out-shares': function(aNode, aProperties, aTemplate) {
 
+                let elm;
+
                 if (aNode.fav && !folderlink) {
-                    let elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
+                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
                     elm.classList.add('icon-favourite-filled');
                     elm.classList.remove('icon-dot');
+                }
+
+                if (M.getNodeRoot(aNode.h) === M.InboxID) {
+                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
+                    elm.classList.add('read-only');
                 }
 
                 aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;

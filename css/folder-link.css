@@ -24,12 +24,6 @@
 .active-folder-link .file-block-scrolling {
     padding-left: 6px;
 }
-.active-folder-link .nw-tree-panel-header {
-    height: 16px;
-    overflow: visible;
-    z-index: 20;
-    display: block;
-}
 .active-folder-link .nw-tree-panel-header span {
     display: none;
 }

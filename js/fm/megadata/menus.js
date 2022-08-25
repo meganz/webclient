@@ -107,6 +107,7 @@ MegaData.prototype.menuItems = function menuItems() {
         var n = M.d[nodes[i]];
 
         if (n) {
+
             nodes.splice(i, 1);
 
             if (n.rr && M.getNodeRoot(n.h) === M.RubbishID) {
@@ -126,7 +127,8 @@ MegaData.prototype.menuItems = function menuItems() {
             $('.dropdown-item.download-item')
                 .removeClass('contains-submenu sprite-fm-mono-after icon-arrow-right-after');
             $('.dropdown-item.download-item').addClass('msync-found');
-            if (window.useMegaSync === 2 && $.selected.length === 1 && M.d[$.selected[0]].t === 1) {
+            if (window.useMegaSync === 2 && $.selected.length === 1 && M.d[$.selected[0]].t === 1
+                && M.getNodeRoot($.selected[0]) !== M.InboxID) {
                 var addItemAndResolvePromise = function _addItemAndResolvePromise(error, response) {
                     if (!error && response === 0) {
                         preparedItems['.syncmegasync-item'] = 1;
@@ -183,7 +185,7 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
             let n = M.d[$.selected[i]];
             let nRoot = isSearch ? (n.u === u_handle && M.getNodeRoot($.selected[i])) : sourceRoot;
 
-            if (!n || n.t && nRoot !== M.RootID || nRoot === M.RubbishID) {
+            if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID) || nRoot === M.RubbishID) {
                 return false;
             }
         }
@@ -204,6 +206,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     var selNode = M.d[$.selected[0]] || false;
     const isSearch = page.startsWith('fm/search');
     const sourceRoot = M.getSelectedSourceRoot(isSearch);
+    let restrictedFolders = false;
 
     if (selNode && selNode.su && !M.d[selNode.p]) {
         items['.leaveshare-item'] = 1;
@@ -227,7 +230,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 }
             }
 
-            if ((sourceRoot === M.RootID || sourceRoot === M.InboxID)
+            if (sourceRoot === M.RootID
                 && u_type === 3
                 && !M.getShareNodesSync(selNode.h).length
                 && !folderlink) {
@@ -318,9 +321,15 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         let allAreFavourite = true;
 
         for (let i = 0; i < $.selected.length; i++) {
-            if (!M.isFavourite($.selected[i])) {
+
+            if (allAreFavourite && !M.isFavourite($.selected[i])) {
                 allAreFavourite = false;
-                break;
+            }
+
+            if (!restrictedFolders
+                && (sourceRoot === M.InboxID || M.getNodeRoot($.selected[i]) === M.InboxID)) {
+
+                restrictedFolders = true;
             }
         }
 
@@ -495,6 +504,49 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.zipdownload-item'];
     }
 
+    if (restrictedFolders || $.selected.length === 1
+        && M.getNodeRoot($.selected[0]) === M.InboxID) {
+
+        delete items['.open-cloud-item'];
+        delete items['.move-item'];
+        delete items['.rename-item'];
+        delete items['.add-star-item'];
+        delete items['.colour-label-items'];
+        delete items['.embedcode-item'];
+        delete items['.properties-versions'];
+        delete items['.clearprevious-versions'];
+        delete items['.remove-item'];
+
+        let cl = new mega.Share.ExportLink();
+
+        if (folderlink || cl.isTakenDown($.selected)) {
+            return items;
+        }
+
+        cl = new mega.Share();
+
+        if (cl.hasExportLink($.selected)) {
+            items['.removelink-item'] = 1;
+        }
+
+        if (M.currentrootid === M.InboxID && $.selected.length === 1
+            && ((selNode.devid || selNode.drvid) && selNode.td > 0
+            || M.d[selNode.p].devid || M.d[selNode.p].drvid || selNode.h === M.BackupsId)) {
+
+            items['.view-in-bc-item'] = 1;
+        }
+
+        items['.getlink-item'] = 1;
+
+        if ($.selected.length === 1 && selNode.t) {
+            items['.sh4r1ng-item'] = 1;
+
+            if (M.getNodeShareUsers(selNode, 'EXP').length || M.ps[selNode]) {
+                items['.removeshare-item'] = 1;
+            }
+        }
+    }
+
     return items;
 };
 
@@ -502,8 +554,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
  * Show a context menu for the selected node.
  * @param {Event} e The event being dispatched
  * @param {Number} ll The type of context menu.
+ * @param {String} items Requested items classes, i.e '.properties-item, ...'
+ * @returns {void}
  */
-MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
+// eslint-disable-next-line complexity, sonarjs/cognitive-complexity
+MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
     "use strict";
 
     var flt;
@@ -592,7 +647,9 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
 
             const nodeRights = M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid);
 
-            if (nodeRights && (M.currentrootid !== M.RubbishID)) {
+            if (nodeRights && M.currentrootid !== M.RubbishID && M.currentrootid !== M.InboxID
+                && M.getNodeRoot(M.currentdirid.split('/').pop()) !== M.InboxID) {
+
                 if (M.currentrootid === 'contacts') {
                     $(menuCMI).filter('.addcontact-item').removeClass('hidden');
                     ignoreGrideExtras = true;
@@ -703,6 +760,19 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll) {
                 }
             }
         }
+    }
+    else if (ll === 8 && items) { // Passes requested items
+
+        $(menuCMI).addClass('hidden');
+
+        asyncShow = true;
+
+        M.menuItems().done(() => {
+
+            $(menuCMI).filter(items).removeClass('hidden');
+
+            onIdle(showContextMenu);
+        });
     }
     else if (ll) {// Click on item
 
@@ -982,11 +1052,13 @@ MegaData.prototype.setContextMenuShareText = function() {
     'use strict';
 
     const selectedNode = M.d[$.selected[0]] || false;
+    let getLinkText = M.currentrootid === M.InboxID
+        || M.getNodeRoot($.selected[0]) === M.InboxID ? l.read_only_share : l[5631];
 
     // If the node has shares or pending shares, set to 'Manage share', else, 'Share folder'
-    const getLinkText = selectedNode && M.getNodeShareUsers(selectedNode, 'EXP').length || M.ps[selectedNode]
-        ? l.manage_share
-        : l[5631];
+    if (selectedNode && M.getNodeShareUsers(selectedNode, 'EXP').length || M.ps[selectedNode]) {
+        getLinkText = l.manage_share;
+    }
 
     $('.sh4r1ng-item span', '.dropdown.body').text(getLinkText);
 };

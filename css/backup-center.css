@@ -1,0 +1,447 @@
+/* Backup center FM section */
+
+/* Empty section */
+
+.backup-center.empty-section {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 24px;
+}
+.rtl .backup-center.empty-section {
+    direction: rtl;
+}
+.backup-center .empty-wrap {
+    color: var(--text-color-high);
+    display: flex;
+    font: var(--text-body1);
+    flex: 1;
+    flex-flow: column wrap;
+    justify-content: center;
+    text-align: center;
+}
+.backup-center .empty-wrap i {
+    --icon-size: 240px;
+    margin: 0 auto;
+}
+.backup-center .empty-wrap h2 {
+    font: var(--text-h0-bold);
+    margin: 0 0 80px;
+}
+.backup-center .new-backup-wrapper {
+    display: flex;
+    justify-content: space-around;
+    margin: 0 auto;
+    max-width: 620px;
+    width: 100%;
+}
+.backup-center .new-backup {
+    margin: 0 auto;
+    max-width: 240px;
+}
+.backup-center .new-backup i {
+    --icon-size: 48px;
+    --mask-color: var(--secondary-blue);
+    margin: 0 auto 25px;
+}
+.backup-center .new-backup .title {
+    font: var(--text-h3-bold);
+}
+.backup-center .new-backup .info {
+    font: var(--text-body2);
+    padding: 10px 0 0;
+}
+.backup-center .new-backup .info a,
+.backup-center .new-backup .info a:visited {
+    color: var(--secondary-green);
+    cursor: pointer;
+    text-decoration: underline;
+}
+.backup-center .new-backup .info a:hover {
+    text-decoration: none;
+}
+
+@media only screen and (max-height: 640px) {
+
+    .backup-center .empty-wrap h2 {
+        margin: 0 0 20px;
+    }
+}
+
+/* Backups section Content block */
+
+.backup-center.content-block {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.rtl .backup-center.content-block {
+    direction: rtl;
+}
+.backup-center .content-header {
+    align-items: center;
+    display: flex;
+    flex: 0 0 48px;
+    justify-content: flex-end;
+    height: 48px;
+    -webkit-margin-end: 10px;
+    margin-inline-end: 10px;
+}
+.backup-center .content-body {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    overflow: hidden;
+    padding: 24px;
+}
+.backup-center .content-wrap {
+    margin: 0 auto;
+    max-width: 880px;
+}
+
+/* Backups section - Backup body */
+
+.backup-center .backup-body {
+    --mask-color: var(--icon-rest);
+    --icon-size: 24px;
+    background: var(--surface-main);
+    border: 1px solid var(--stroke-grey-2);
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin: 0 0 15px;
+    min-height: 40px;
+    overflow: hidden;
+    transition: var(--transition-border), var(--transition-shadow);
+}
+.backup-center .backup-body:hover {
+    box-shadow: 0 0 0 3px var(--stroke-grey-2);
+}
+.backup-center .backup-body.active {
+    border-color: var(--secondary-blue);
+    box-shadow: 0 0 0 3px var(--secondary-blue);
+}
+.backup-center .backup-body.expanded {
+    border-color: var(--stroke-grey-2);
+    box-shadow: none;
+}
+.backup-center .backup-body .success {
+    --mask-color: var(--text-color-success);
+    color: var(--text-color-success);
+}
+.backup-center .backup-body .error {
+    --mask-color: var(--text-color-error);
+    color: var(--text-color-error);
+}
+.backup-center .backup-body .warning {
+    --mask-color: var(--text-color-warning);
+    color: var(--text-color-warning);
+}
+.backup-center .backup-body .in-progress {
+    --mask-color: var(--secondary-blue);
+    color: var(--text-color-info);
+}
+.backup-center .backup-body .tip-icon {
+    --mask-color: var(--icon-inactive);
+    transition: var(--transition-color);
+}
+.backup-center .backup-body .tip-icon:hover {
+    --mask-color: var(--icon-rest);
+}
+.backup-center .backup-body .status {
+    align-items: center;
+    display: flex;
+    font: var(--text-body1);
+}
+.backup-center .backup-body .status span {
+    padding: 0 8px;
+}
+.backup-center .backup-body .percs {
+    align-items: center;
+    background: var(--secondary-blue);
+    border-radius: 12px;
+    color: var(--text-color-white-high);
+    display: inline-flex;
+    font: var(--text-body1);
+    padding: 2px 4px;
+}
+.backup-center .backup-body .percs span {
+    color: var(--text-color-white-high);
+    padding: 0;
+}
+.backup-center .backup-body .percs i {
+    --icon-size: 16px;
+    --mask-color: var(--text-color-white-high);
+    -webkit-margin-end: 2px;
+    margin-inline-end: 2px;
+}
+
+/* Backups section - Backup header */
+.backup-center .backup-body .header {
+    align-content: center;
+    display: flex;
+    height: 72px;
+    white-space: nowrap;
+}
+.backup-center .backup-body .header span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: inherit;
+}
+.backup-center .backup-body .header .name {
+    align-items: center;
+    background: var(--surface-grey-1);
+    box-sizing: border-box;
+    color: var(--text-color-high);
+    display: flex;
+    flex: 0 0 30%;
+    font: var(--text-h3-bold);
+    overflow: hidden;
+    padding: 0 5px;
+    -webkit-padding-end: 15px;
+    padding-inline-end: 15px;
+    text-overflow: ellipsis;
+}
+.backup-center .backup-body .header .name i {
+    --icon-size: 48px;
+    margin: 0 10px;
+}
+.backup-center .backup-body .header .info {
+    align-items: center;
+    color: var(--text-color-medium);
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 0 15px;
+}
+.backup-center .backup-body .header .high-color {
+    color: var(--text-color-high);
+}
+.backup-center .backup-body .header .folders-info span {
+    padding: 0 2px;
+}
+.backup-center .backup-body i.control {
+    --mask-color: var(--icon-inactive);
+    cursor: pointer;
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+    transition: var(--transition-opacity), var(--transition-color);
+}
+.backup-center .backup-body i.control:hover {
+    --mask-color: var(--icon-rest);
+}
+.backup-center .backup-body i.js-context {
+    opacity: 0;
+}
+.backup-center .backup-body:hover .info-cell i.js-context,
+.backup-center .backup-body.active .info-cell i.js-context,
+.backup-center .backup-body tr:hover i.js-context,
+.backup-center .backup-body tr.active i.js-context {
+    opacity: 1;
+}
+.backup-center .backup-body .header .info-cell {
+    align-items: center;
+    display: inline-flex;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.backup-center .backup-body .header .status-info {
+    flex: 0 0 auto;
+}
+.backup-center .backup-body .header .status {
+    padding: 0 8px;
+}
+.backup-center .backup-body .header hr {
+    background: var(--stroke-grey-2);
+    border: 0;
+    height: 14px;
+    margin: 0 8px;
+    padding: 0;
+    width: 1px;
+}
+
+/* Backupcenter section - Items list */
+
+.bc-item-list .data-table {
+    overflow: visible;
+    table-layout: fixed;
+}
+.bc-item-list .data-table th {
+    color: var(--text-color-medium);
+    padding: 6px 8px 4px;
+}
+.bc-item-list .data-table td {
+    padding: 4px 8px 3px;
+    white-space: nowrap;
+}
+.bc-item-list .data-table td span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.bc-item-list .data-table th:last-child,
+.bc-item-list .data-table td:last-child {
+    text-align: end;
+    width: 70px;
+}
+.bc-item-list .data-table .item-name {
+    align-items: center;
+    color: var(--text-color-high);
+    display: flex;
+    font: var(--text-body1);
+}
+.bc-item-list .data-table .arrow {
+    height: auto;
+}
+
+/* TODO: Fix margins once SVG sprite is implemented */
+
+.bc-item-list .data-table .item-name i {
+    --icon-size: 24px;
+    flex: 0 0 auto;
+    margin: 0 1px;
+    -webkit-margin-end: 9px;
+    margin-inline-end: 9px;
+    position: static;
+}
+.bc-item-list .data-table .folder .item-name i {
+    margin: 0 2px;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+}
+
+/* Customize items width for My backups section */
+
+.backup-center .data-table {
+    display: none;
+}
+.backup-center .data-table tr th:first-child {
+    width: 30%;
+}
+.backup-center .data-table tr th::after {
+    display: none;
+}
+.backup-center .data-table tr td:first-child::after,
+.backup-center .data-table tr td:last-child::after {
+    width: calc(100% - 15px);
+}
+.backup-center .data-table tr td:first-child::before {
+    left: 8px;
+}
+.backup-center .data-table tr td:last-child::before {
+    right: 8px;
+}
+
+/* Folder lists navigator */
+.backup-center .backup-body .nav {
+    align-items: center;
+    border-top: 1px solid var(--stroke-grey-2);
+    display: none;
+    justify-content: flex-end;
+    margin: 0 15px;
+    padding: 4px 0 3px;
+}
+.backup-center .backup-body .nav:empty {
+    display: none;
+}
+.backup-center .backup-body .nav span {
+    color: var(--text-color-medium);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    box-sizing: border-box;
+    display: inline-block;
+    font: var(--text-body1);
+    height: 24px;
+    margin: 2px 0 0;
+    -webkit-margin-start: 13px;
+    margin-inline-start: 13px;
+    transition: var(--transition-border), var(--transition-color);
+    vertical-align: top;
+}
+.backup-center .backup-body .nav span:hover {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+}
+.backup-center .backup-body .nav span.active {
+    color: var(--text-color-high);
+    border-color: var(--secondary-blue);
+    font: var(--text-body1-bold);
+}
+.backup-center .backup-body .nav i {
+    --mask-color: var(--icon-rest);
+    --icon-size: 16px;
+    cursor: pointer;
+    -webkit-margin-start: 13px;
+    margin-inline-start: 13px;
+}
+.backup-center .backup-body .nav i.prev {
+    transform: rotate(180deg);
+}
+.backup-center .backup-body .nav i:hover {
+    --mask-color: var(--icon-active);
+}
+
+/* Expanded backup */
+.backup-center .expanded .header {
+    background: var(--surface-grey-1);
+    height: 48px;
+}
+.backup-center .expanded .header .info-cell:first-child,
+.backup-center .expanded .header .status {
+    display: none;
+}
+.backup-center .expanded .header .name {
+    flex: initial;
+    flex: 1 1 auto;
+    font: var(--text-h3);
+}
+.backup-center .expanded .header .info {
+    flex: 0 0 auto;
+}
+.backup-center .expanded .js-expand {
+    transform: rotate(180deg);
+}
+.backup-center .expanded .data-table {
+    display: table;
+}
+.backup-center .expanded .nav {
+    display: flex;
+}
+
+/* Backups section - Backup tip */
+
+.backup-center .content-body .tip {
+    --icon-size: 24px;
+    align-items: center;
+    color: var(--text-color-low);
+    display: flex;
+    font: var(--text-body1);
+    justify-content: flex-end;
+    margin: 0 auto;
+    max-width: 880px;
+}
+.backup-center .content-body .tip::before {
+    height: 28px;
+    left: -2px;
+    position: absolute;
+    top: -2px;
+    width: 28px;
+}
+.backup-center .content-body .tip span {
+    padding: 0 8px;
+}
+.dark-direct-tooltip.backup-tip {
+    max-width: 276px;
+    text-align: center;
+}
+.dark-direct-tooltip.backup-tip.short {
+    max-width: 210px;
+}
+.dark-direct-tooltip.backup-tip a {
+    cursor: pointer;
+    color: var(--secondary-blue-inverted);
+    text-decoration: underline;
+}
+.dark-direct-tooltip.backup-tip a:hover {
+    text-decoration: none;
+}

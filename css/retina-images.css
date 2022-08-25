@@ -249,18 +249,20 @@
     .transfer-filetype-icon,
     .medium-file-icon,
     .shared-folder-icon,
+    table.shared-with-me .shared-folder-icon,
     .shared-details-icon,
     .contact-share-notification::before {
         background-image: url(../images/mega/files-icons@2x.png);
-        background-size: 399px 5575px;
+        background-size: 399px 7458px;
     }
     .download.big-icon, .fm-dialog-close.big, .megasync-img::before, button.megasync-slider::after {
         background-image: url(../images/mega/download-dialog@2x.png);
         background-size: 853px auto;
     }
-    .properties-file-icon div {
+    .properties-file-icon i,
+    .mega-dialog.properties-dialog .properties-file-icon i {
         background-image: url(../images/mega/properties-sprite@2x.png);
-        background-size: 589px 6320px;
+        background-size: 589px 8470px;
     }
     .drag-n-drop.header, .drag-n-drop hr, .drag-n-drop.info-block i {
         background-image: url(../images/mega/overlay-sprite@2x.png);

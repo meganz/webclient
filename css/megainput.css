@@ -178,6 +178,9 @@
     border-radius: 4px;
     border-width: 1px;
 }
+.mega-input.box-style.solid::before {
+    background: var(--surface-grey-2);
+}
 .mega-input.box-style > i {
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;

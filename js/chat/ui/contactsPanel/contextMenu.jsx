@@ -70,7 +70,10 @@ export default class ContextMenu extends MegaRenderMixin {
                         onClick={() =>
                             this.close(() => {
                                 if (selected && selected.length) {
-                                    return megaChat.createAndShowGroupRoomFor(selected, '', true, false);
+                                    return megaChat.createAndShowGroupRoomFor(selected, '', {
+                                        keyRotation: true,
+                                        createChatLink: false
+                                    });
                                 }
                                 return loadSubPage(`fm/chat/p/${contact.u}`);
                             })

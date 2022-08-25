@@ -254,6 +254,9 @@
 .chat-right-area .dropdown-item.link-button.light:not(.disabled):hover i {
     --mask-color: var(--icon-active);
 }
+.chat-right-area .link-button.open-invite-settings-button {
+    height: auto;
+}
 .chat-right-area .link-button .mega-switch {
     position: absolute;
     top: 4px;
@@ -269,6 +272,12 @@
     display: block;
     margin: -10px 0 0 0;
     color: var(--text-color-medium);
+}
+.chat-right-area .link-button.open-invite-settings-button span.label--green {
+    display: block;
+    padding-left: 0;
+    line-height: 18px;
+    color: var(--text-color-low);
 }
 .chat-right-area .link-button.push-settings-button span.label--green strong {
     color: var(--label-green);

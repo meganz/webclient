@@ -1,5 +1,7 @@
 export const RETENTION_FORMAT = { HOURS: 'hour', DAYS: 'day', WEEKS: 'week', MONTHS: 'month', DISABLED: 'none' };
+export const MCO_FLAGS = { OPEN_INVITE: 'oi', SPEAK_REQUEST: 'sr', WAITING_ROOM: 'w' };
 window.RETENTION_FORMAT = RETENTION_FORMAT;
+window.MCO_FLAGS = MCO_FLAGS;
 
 /**
  * Class used to represent a MUC Room in which the current user is present
@@ -10,14 +12,21 @@ window.RETENTION_FORMAT = RETENTION_FORMAT;
  * @param users {Array}
  * @param ctime {Integer} unix time
  * @param [lastActivity] {Integer} unix time
+ * @param {String} chatId  The chats id
+ * @param {Number} chatShard This rooms chat shard id
+ * @param {String} chatdUrl Websocket URL for chatd
+ * @param {*} noUI Unused
+ * @param {String} [publicChatHandle] the public chat handle
+ * @param {String} [publicChatKey] the public chat key
+ * @param {String} ck  the chat key
+ * @param {Boolean} isMeeting Is the chat a meeting
+ * @param {Number} retentionTime Message retention length (0 = forever)
+ * @param {Object} mcoFlags Flags related to calls/chat room (Open invite, speak request, waiting room)
  * @returns {ChatRoom}
  * @constructor
  */
 var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI,
-                         publicChatHandle, publicChatKey,
-                         ck,
-                         isMeeting,
-                         retentionTime
+                         publicChatHandle, publicChatKey, ck, isMeeting, retentionTime, mcoFlags
 ) {
     var self = this;
 
@@ -56,7 +65,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             retentionTime: 0,
             sfuApp: null,
             activeCallIds: null,
-            meetingsLoading: null
+            meetingsLoading: null,
+            options: {},
         }
     );
 
@@ -92,7 +102,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         megaChat.safeForceUpdate();
     });
 
-
     this.isMeeting = isMeeting;
 
     if (type === "private") {
@@ -107,29 +116,12 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         });
     }
 
+    this.options = {};
 
-
-
-    this.options = {
-
-        /**
-         * Don't resend any messages in the queue, if older then Xs
-         */
-        'dontResendAutomaticallyQueuedMessagesOlderThen': 1*60,
-
-        /**
-         * The maximum time allowed for plugins to set the state of the room to PLUGINS_READY
-         */
-        'pluginsReadyTimeout': 60000, // XX: Because of the middle earth's internet, this should have been increased :)
-
-        /**
-         * Default media options
-         */
-        'mediaOptions': {
-            audio: true,
-            video: true
-        }
-    };
+    mcoFlags = mcoFlags || {};
+    for (const flag of Object.values(MCO_FLAGS)) {
+        this.options[flag] = mcoFlags[flag] || 0;
+    }
 
     this.setState(ChatRoom.STATE.INITIALIZED);
 
@@ -2259,7 +2251,16 @@ ChatRoom.prototype.isReadOnly = function() {
     );
 };
 ChatRoom.prototype.iAmOperator = function() {
-    return this.type === "private" || this.members && this.members[u_handle] === 3;
+    return this.type === "private"
+        || this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL;
+};
+ChatRoom.prototype.iAmStandard = function() {
+    return this.type !== 'private'
+        && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
+};
+ChatRoom.prototype.iAmReadOnly = function() {
+    return this.type !== 'private'
+        && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
 };
 
 /**
@@ -2525,6 +2526,38 @@ ChatRoom.prototype.scrollToMessageId = function(msgId, index, retryActive) {
     else {
         self.isScrollingToMessageId = false;
     }
+};
+
+ChatRoom.prototype.setMcoFlags = function(flags) {
+    const req = {
+        a: 'mco',
+        cid: this.chatId,
+        ...flags
+    };
+    asyncApiReq(req).dump('roomSetCallFlags');
+};
+
+ChatRoom.prototype.toggleOpenInvite = function() {
+    if (this.type === 'private' || !this.iAmOperator()) {
+        return;
+    }
+    this.setMcoFlags({ [MCO_FLAGS.OPEN_INVITE]: Math.abs(this.options[MCO_FLAGS.OPEN_INVITE] - 1) });
+};
+
+ChatRoom.prototype.toggleWaitingRoom = function() {
+    // Not implemented yet.
+    // if (this.type === 'private' || !this.iAmOperator()) {
+    //     return;
+    // }
+    // this.setMcoFlags({ [MCO_FLAGS.WAITING_ROOM]: Math.abs(this.options[MCO_FLAGS.WAITING_ROOM] - 1) });
+};
+
+ChatRoom.prototype.toggleSpeakRequest = function() {
+    // Not implemented yet.
+    // if (this.type === 'private' || !this.iAmOperator()) {
+    //     return;
+    // }
+    // this.setMcoFlags({ [MCO_FLAGS.SPEAK_REQUEST]: Math.abs(this.options[MCO_FLAGS.SPEAK_REQUEST] - 1) });
 };
 
 window.ChatRoom = ChatRoom;

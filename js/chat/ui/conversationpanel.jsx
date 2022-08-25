@@ -246,7 +246,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                     data-simpletip={`${l.unsupported_browser_audio}`}
                     data-simpletipposition="top"
                     data-simpletipoffset="7"
-                    className={`${!megaChat.hasSupportForCalls ? 'simpletip' : ''} 
+                    className={`${megaChat.hasSupportForCalls ? '' : 'simpletip'}
                         link-button light ${startCallButtonClass}`}
                     onClick={() => onStartCall(Call.TYPE.AUDIO)}>
                     <i className="sprite-fm-mono icon-phone" />
@@ -259,7 +259,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                     data-simpletip={`${l.unsupported_browser_video}`}
                     data-simpletipposition="top"
                     data-simpletipoffset="7"
-                    className={`${!megaChat.hasSupportForCalls ? 'simpletip' : ''} 
+                    className={`${megaChat.hasSupportForCalls ? '' : 'simpletip'}
                         link-button light ${startCallButtonClass}`}
                     onClick={() => onStartCall(Call.TYPE.VIDEO)}>
                     <i className="sprite-fm-mono icon-video-call-filled"/>
@@ -334,7 +334,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                     /* Disable in case I don't have any more contacts to add ... */
                     !(
                         !room.isReadOnly() &&
-                        room.iAmOperator() &&
+                        (room.iAmOperator() || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE]) &&
                         !self.allContactsInChat(excludedParticipants)
                     )
                 }
@@ -390,6 +390,32 @@ export class ConversationRightArea extends MegaRenderMixin {
                     }}
                     onClick={() => Call.isGuest() ? null : onPushSettingsClicked()}>
                 </Button>
+                {AVseperator}
+            </div>
+        );
+
+        const openInviteBtn = room.type !== 'private' && (
+            <div className="open-invite-settings">
+                <Button
+                    className={`
+                        link-button
+                        light
+                        open-invite-settings-button
+                    `}
+                    disabled={!room.iAmOperator()}
+                    icon={`
+                        sprite-fm-mono
+                        icon-user-filled
+                    `}
+                    label={l.open_invite_label /* `Chat invitations` */}
+                    secondLabel={l.open_invite_desc /* `Non-host can add participants to the chat` */}
+                    secondLabelClass="label--green"
+                    toggle={{
+                        enabled: room.options[MCO_FLAGS.OPEN_INVITE],
+                        onClick: () => room.toggleOpenInvite()
+                    }}
+                    onClick={() => room.toggleOpenInvite()}
+                />
                 {AVseperator}
             </div>
         );
@@ -609,6 +635,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                             </Button>
 
                             {pushSettingsBtn}
+                                {openInviteBtn}
 
                             <Button
                                 className="link-button light clear-history-button"

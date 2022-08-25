@@ -130,6 +130,8 @@ var ChatdIntegration = function(megaChat) {
                     (chatMode === strongvelope.CHAT_MODE.PUBLIC)
                 );
             }
+            // Speak Request, Open Invite, Waiting room
+            const { sr, oi, w } = opts;
 
             const reqi = String(rand(6e10));
 
@@ -139,7 +141,10 @@ var ChatdIntegration = function(megaChat) {
                 'u': invited_users,
                 'm': chatMode === strongvelope.CHAT_MODE.PUBLIC ? 1 : 0,
                 'v': Chatd.VERSION,
-                'i': reqi
+                'i': reqi,
+                sr,
+                w,
+                oi,
             };
 
             if (opts.isMeeting) {
@@ -593,6 +598,10 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
         if (!chatRoom) {
             var setAsActive = megaChat._chatsAwaitingAps[chatInfo.i];
             delete megaChat._chatsAwaitingAps[chatInfo.i];
+            const mcoFlags = {};
+            for (const flag of Object.values(MCO_FLAGS)) {
+                mcoFlags[flag] = chatInfo[flag] || 0;
+            }
 
             var r = self.megaChat.openChat(
                 userHandles,
@@ -604,7 +613,8 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                 publicChatHandle ? publicChatHandle : undefined,
                 self.megaChat.publicChatKeys[publicChatHandle],
                 chatInfo.ck,
-                chatInfo.mr === 1
+                chatInfo.mr === 1,
+                mcoFlags
             );
             chatRoom = r[1];
             if (!chatRoom) {
@@ -715,6 +725,17 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
 
             if (chatInfo.callId && !chatRoom.activeCallIds.exists(chatInfo.callId)) {
                 chatRoom.activeCallIds.set(chatInfo.callId, []);
+            }
+            let mcoFlagChanged = false;
+            for (const key of Object.values(MCO_FLAGS)) {
+                const apKey = chatInfo[key] || 0;
+                if (chatRoom.options[key] !== apKey) {
+                    chatRoom.options[key] = apKey;
+                    mcoFlagChanged = true;
+                }
+            }
+            if (mcoFlagChanged) {
+                chatRoom.trackDataChange();
             }
 
             if (!chatRoom.chatId) {

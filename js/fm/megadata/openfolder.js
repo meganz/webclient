@@ -85,10 +85,11 @@
             // Force cleaning the current cloud contents and showing an empty msg
             this.renderMain();
         }
-        else if (id && (id.substr(0, 7) !== 'account')
-            && (id.substr(0, 9) !== 'dashboard')
-            && (id.substr(0, 15) !== 'user-management')
-            && (id.substr(0, 13) !== 'notifications')) {
+        else if (id && id.substr(0, 7) !== 'account'
+            && id.substr(0, 7) !== 'backups'
+            && id.substr(0, 9) !== 'dashboard'
+            && id.substr(0, 15) !== 'user-management'
+            && id.substr(0, 13) !== 'notifications') {
 
             $('.fm-right-files-block').removeClass('hidden');
 
@@ -308,7 +309,7 @@
             return MegaPromise.resolve(EEXIST);
         }
 
-        $('.fm-right-account-block, .fm-right-block.dashboard, .gallery-tabs-bl').addClass('hidden');
+        $('.fm-right-account-block, .fm-right-block, .gallery-tabs-bl').addClass('hidden');
 
         this.chat = false;
         this.search = false;
@@ -415,6 +416,12 @@
         }
         else if (id && id.substr(0, 7) === 'account') {
             M.onFileManagerReady(accountUI);
+        }
+        // TODO: Remove "localStorage.debugBackups" once new applications are ready
+        else if (id && id.substr(0, 7) === 'backups' && localStorage.debugBackups) {
+            M.onFileManagerReady(() => {
+                mega.backupCenter.openSection();
+            });
         }
         else if (id && id.substr(0, 9) === 'dashboard') {
             M.onFileManagerReady(() => dashboardUI());

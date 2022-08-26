@@ -859,8 +859,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         const isSearch = page.startsWith('fm/search');
         const selNode = M.getNodeByHandle($.selected[0]);
         const sourceRoot = M.getSelectedSourceRoot(isSearch);
+        const shareButton = selectionLinkWrapper.querySelector(`.js-statusbarbtn.share`);
 
         let showGetLink;
+        let restrictedFolders = false;
         let __showBtn = (className) => {
 
             const button = selectionLinkWrapper.querySelector(`.js-statusbarbtn.${className}`);
@@ -870,6 +872,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
         };
 
+        // Set default "Share folder" string
+        shareButton.dataset.simpletip = l[5631];
+
         const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
         dataset.simpletip = M.getSelectedRemoveLabel($.selected);
 
@@ -877,9 +882,18 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             const cl = new mega.Share.ExportLink();
 
+            for (let i = 0; i < $.selected.length; i++) {
+                if (M.getNodeRoot($.selected[i]) === M.InboxID) {
+                    restrictedFolders = true;
+                    break;
+                }
+            }
+
             // If any of selected items is taken down we do not need to proceed futher
             if (cl.isTakenDown($.selected)) {
-                __showBtn('delete');
+                if (!restrictedFolders) {
+                    __showBtn('delete');
+                }
                 __showBtn = nop;
             }
 
@@ -902,7 +916,17 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             __showBtn('link');
         }
 
-        if (!folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
+        if (sourceRoot === M.InboxID || restrictedFolders) {
+
+            // Set "Read-only share" string
+            shareButton.dataset.simpletip = l.read_only_share;
+
+            if (selNode.t && $.selected.length === 1) {
+                __showBtn('share');
+            }
+            __showBtn('link');
+        }
+        else if (!folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
             || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {
             __showBtn('delete');
         }

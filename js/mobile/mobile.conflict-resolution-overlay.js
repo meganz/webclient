@@ -75,17 +75,18 @@ mobile.conflictResolutionDialog = {
             return false;
         });
 
+        // Map the file extension back to the image icon
+        const iconName = fileIcon(file);
+        const iconPath = `${mobile.imagePath + iconName}.png`;
+
+        $('.action-icon img', this.$overlay).attr('src', iconPath);
+
         if (isFolder) {
             this.$overlay.find(".overlay-description-text")
                 .safeHTML(escapeHTML(l[17550]).replace('%1', '<strong>' + name + '</strong>'));
         } else {
             this.$overlay.find(".overlay-description-text")
                 .safeHTML(escapeHTML(l[16486]).replace('%1', '<strong>' + name + '</strong>'));
-
-            // Map the file extension back to the image icon
-            var iconName = fileIcon(file);
-            var iconPath = mobile.imagePath + iconName + '.png';
-            this.$overlay.find('.action-icon img').attr('src', iconPath);
 
             // File
             var newFileName = fileconflict.findNewName(file.name, target);

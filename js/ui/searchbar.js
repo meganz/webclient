@@ -124,7 +124,7 @@
 
         // Show the correct search bar
         if (u_type !== false || pfid) {
-            const rex = /\/(?:account|dashboard|user-management|refer)/;
+            const rex = /\/(?:account|dashboard|user-management|refer|backups|rewind)/;
             const isSearch = page.startsWith('fm/search');
 
             if (M.chat || !is_fm() || (rex.test(page) && !isSearch)) {

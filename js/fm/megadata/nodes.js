@@ -950,7 +950,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
             cleanEmptyMergedFolders();
 
             // finish operation removing dangling nodes, if any
-            M.safeRemoveNodes(todel).always(function() {
+            M.safeRemoveNodes(todel).always(() => {
                 if (!quiet) {
                     loadingDialog.phide();
                 }
@@ -995,9 +995,10 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
             var h = n.h;
             var p = n.p;
             var tn = [];
+            const rub = t === M.RubbishID && M.getNodeRoot(h);
 
             // allow to revert nodes sent to the rubbish bin
-            if (t === M.RubbishID && M.getNodeRoot(h) !== M.RubbishID) {
+            if (rub && rub !== M.RubbishID && rub !== M.InboxID) {
                 if (d) {
                     console.debug('Adding rr attribute...', n.rr, p);
                 }
@@ -1194,6 +1195,10 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
                     var n = M.d[h] || false;
                     var objj = {a: 'm', t: dd, n: h, i: requesti};
 
+                    if (M.getNodeRoot(h) === M.InboxID) {
+                        mega.backupCenter.ackVaultWriteAccess(h, objj);
+                    }
+
                     // Rename nodes before performing the move to prevent race conditions from other clients...
                     if (names[h] && n.name !== names[h]) {
                         M.rename(h, names[h]);
@@ -1389,8 +1394,9 @@ MegaData.prototype.safeRemoveNodes = function(handles) {
         for (i = handles.length; i--;) {
             var h = handles[i];
             var n = M.getNodeByHandle(h);
+            const fromtype = treetype(h);
 
-            if (treetype(h) === 'shares' || n.p === M.RubbishID) {
+            if (fromtype === 'shares' || fromtype === 'inbox' || n.p === M.RubbishID) {
                 toDel.push(h);
             }
             else {
@@ -1407,7 +1413,14 @@ MegaData.prototype.safeRemoveNodes = function(handles) {
             var delPromise = new MegaPromise();
 
             for (i = toDel.length; i--;) {
-                promises.push(M.req({a: 'd', n: toDel[i], i: i ? idtag.substr(-5) : idtag}));
+
+                const ops = {a: 'd', n: toDel[i], i: i ? idtag.substr(-5) : idtag};
+
+                if (M.getNodeRoot(toDel[i]) === M.InboxID) {
+                    mega.backupCenter.ackVaultWriteAccess(toDel[i], ops);
+                }
+
+                promises.push(M.req(ops));
             }
 
             M.scAckQueue[idtag] = function() {
@@ -2464,7 +2477,7 @@ MegaData.prototype.favourite = function(handles, newFavState) {
         $.each(handles, function(index, handle) {
             var node = M.getNodeByHandle(handle);
 
-            if (node && !exportLink.isTakenDown(handle)) {
+            if (node && !exportLink.isTakenDown(handle) && M.getNodeRoot(handle) !== M.InboxID) {
                 node.fav = newFavState | 0;
                 if (!node.fav) {
                     delete node.fav;
@@ -4091,6 +4104,12 @@ MegaData.prototype.getDashboardData = function() {
     res.rubbish = { cnt: s[this.RubbishID].files, size: s[this.RubbishID].bytes };
     res.ishares = { cnt: s.inshares.items, size: s.inshares.bytes, xfiles: s.inshares.files };
     res.oshares = { cnt: s.outshares.items, size: s.outshares.bytes };
+
+    res.backups = {
+        cnt: this.d[this.BackupsId] ? this.d[this.BackupsId].td : 0,
+        size: this.d[this.BackupsId] ? this.d[this.BackupsId].tb : 0,
+        xfiles: this.d[this.BackupsId] ? this.d[this.BackupsId].tf : 0
+    };
     res.links = { cnt: s.links.folders, size: s.links.bytes, xfiles: s.links.files };
     res.versions = { cnt: s[this.RootID].vfiles, size: s[this.RootID].vbytes };
 
@@ -4530,10 +4549,15 @@ lazy(MegaData.prototype, 'myChatFilesFolder', function() {
     ).change(function(handle) {
 
         if (handle) {
-            let target = document.querySelector('#treea_' + handle + ' .nw-fm-tree-folder');
+            const treeItem = document.querySelector(`[id="treea_${handle}"] .nw-fm-tree-folder`);
+            const fmItem = document.querySelector(`[id="${handle}"] .folder`);
 
-            if (target) {
-                target.classList.add('chat-folder');
+            if (treeItem) {
+                treeItem.classList.add('chat-folder');
+            }
+
+            if (fmItem) {
+                fmItem.classList.add('folder-chat');
             }
         }
     });

@@ -1390,7 +1390,6 @@ li.active .call-duration i {
     border-top: 3px solid var(--stroke-main);
     border-bottom: 4px solid var(--stroke-main);
     box-shadow: 0 -1px 0 0 var(--stroke-grey-2);
-
 }
 .profile-shared-folders .shared-with-me tbody tr:nth-last-child(2) {
     box-shadow: 0 -1px 0 0 var(--stroke-grey-2), 0 1px 0 0 var(--stroke-grey-2);

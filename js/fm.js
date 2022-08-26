@@ -175,17 +175,18 @@ function sharedUInode(nodeHandle) {
 
     // t === 1, folder
     if (M.d[nodeHandle] && M.d[nodeHandle].t) {
-        var icon = fileIcon(M.d[nodeHandle]);
+        const icon = fileIcon(M.d[nodeHandle]);
+        const className = M.viewmode ? 'block-view-file-type' : 'transfer-filetype-icon';
 
         target = document.getElementById(nodeHandle);
 
         if (target) {
 
             // Update right panel selected node with appropriate icon
-            target = target.querySelector(M.viewmode ? '.block-view-file-type' : '.transfer-filetype-icon');
+            target = target.querySelector(`.${className}`);
 
             if (target) {
-                target.classList.add(icon);
+                target.setAttribute('class', `${className} folder ${icon}`);
             }
         }
     }
@@ -617,6 +618,12 @@ function fmtopUI() {
     $('button.link-button.accept-all').addClass('hidden');
 
     var showUploadBlock = function _showUploadBlock() {
+
+        if (M.InboxID && (M.currentrootid === M.InboxID
+            || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)) {
+            return false;
+        }
+
         $('.fm-new-folder').removeClass('hidden');
         $('.fm-file-upload').removeClass('hidden');
         $('.fm-uploads').removeClass('hidden');
@@ -743,11 +750,9 @@ function fmLeftMenuUI() {
     "use strict";
 
     // handle the Inbox section use cases
-    if (M.hasInboxItems()) {
-        $('.nw-fm-left-icon.inbox').removeClass('hidden');
-    }
-    else {
-        $('.js-inbox-btn').addClass('hidden');
+    if (!M.hasInboxItems()) {
+
+        $('.js-lp-myfiles .js-inbox-btn', '.fmholder').addClass('hidden');
         if (M.InboxID && M.currentrootid === M.InboxID) {
             M.openFolder(M.RootID);
         }
@@ -1297,7 +1302,17 @@ function renameDialog() {
     }
 }
 
-/* eslint-disable-next-line complexity */
+/**
+ * Show message dialog
+ * @param {String} type Dialog type. May also contain button labels: "remove:!^$Cancel!Delete"
+ * @param {String} title Header text
+ * @param {String} msg Main information text
+ * @param {String} submsg Addition text (Optional)
+ * @param {Function} callback The function to invoke on button click
+ * @param {Boolean|String} checkboxSetting Show "Do not show again" block if True
+ * @returns {void}
+ */
+// eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     'use strict';
     var doneButton  = l[81];
@@ -1327,8 +1342,10 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     $.msgDialog = type;
     $.warningCallback = typeof callback === 'function' && ((res) => onIdle(callback.bind(null, res, null)));
 
+    // eslint-disable-next-line sonarjs/no-duplicate-string
     var $dialog = $('#msgDialog').removeClass('confirmation warning info error question ' +
         'delete-contact loginrequired-dialog multiple with-close-btn');
+
     $dialog.parent().addClass('msg-dialog-container');
     $('#msgDialog aside').addClass('hidden');
 
@@ -1457,7 +1474,8 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
             $('#msgDialog').addClass('error');
         }
     }
-    else if (type === 'confirmation' || type === 'remove') {
+    else if (type.includes('confirmation') || type.includes('remove')) {
+
         if (doneButton === l[81]) {
             doneButton = false;
         }
@@ -1618,7 +1636,13 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
 
     $('#msgDialog header p.subtitle').text(title);
 
-    $('#msgDialog header h3').safeHTML(msg);
+    if (msg) {
+        $('#msgDialog header h3').safeHTML(msg);
+    }
+    else {
+        $('#msgDialog header h3').addClass('hidden');
+    }
+
     clickURLs();
     if (submsg) {
         $('#msgDialog header p.text').safeHTML(submsg);
@@ -1848,18 +1872,27 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
     return html;
 }
 
-function fillShareDialogWithContent() {
-    var pendingShares = {};
-    var nodeHandle    = String($.selected[0]);
-    var node          = M.getNodeByHandle(nodeHandle);
-    var userHandles   = M.getNodeShareUsers(node, 'EXP');
+/**
+ * Generate the html content
+ *
+ * @param {Boolean} readonly Sets read-only for new users and doesn't allow to change it (Optional)
+ * @returns {void}
+ */
+function fillShareDialogWithContent(readonly) {
+
+    "use strict";
+
+    let pendingShares = {};
+    const nodeHandle = String($.selected[0]);
+    const node = M.getNodeByHandle(nodeHandle);
+    const seen = {};
+    let userHandles   = M.getNodeShareUsers(node, 'EXP');
     $.sharedTokens = [];// GLOBAL VARIABLE, Hold items currently visible in share folder content (above multi-input)
 
     if (M.ps[nodeHandle]) {
         pendingShares = Object(M.ps[nodeHandle]);
         userHandles   = userHandles.concat(Object.keys(pendingShares));
     }
-    var seen = Object.create(null);
 
     // Fill the owner of the folder on the top of the access list
     if (u_attr) {
@@ -1868,7 +1901,7 @@ function fillShareDialogWithContent() {
 
     // Remove items in the removed contacts list
     for (var rmContact in $.removedContactsFromShare) {
-        var rmContactIndex = userHandles.indexOf(rmContact);
+        const rmContactIndex = userHandles.indexOf(rmContact);
         if (rmContactIndex > -1) {
             userHandles.splice(rmContactIndex, 1);
         }
@@ -1876,24 +1909,37 @@ function fillShareDialogWithContent() {
 
     // Existing contacts in shares
     userHandles.forEach(function(handle) {
-        var user = M.getUser(handle) || Object(M.opc[handle]);
+        const user = M.getUser(handle) || Object(M.opc[handle]);
 
         if (!user.m) {
             console.warn('Unknown user "%s"!', handle);
         }
         else if (!seen[user.m]) {
-            var name  = M.getNameByHandle(handle) || user.m;
-            var share = M.getNodeShare(node, handle) || Object(pendingShares[handle]);
+            const name  = M.getNameByHandle(handle) || user.m;
+            const share = M.getNodeShare(node, handle) || Object(pendingShares[handle]);
 
-            generateShareDialogRow(name, user.m, share.r | 0, handle, handle in pendingShares);
+            generateShareDialogRow(
+                name,
+                user.m,
+                share.r | 0,
+                handle,
+                handle in pendingShares,
+                readonly
+            );
             seen[user.m] = 1;
         }
     });
 
     // New added contacts
     for (var newContact in $.addContactsToShare) {
-        var newContactName;
-        var newContactEmail = $.addContactsToShare[newContact].u;
+
+        let newContactName;
+        const newContactEmail = $.addContactsToShare[newContact].u;
+
+        // Backup folder can be only shared as Read-Only
+        if (readonly) {
+            $.addContactsToShare[newContact].r = 0;
+        }
 
         if (!seen[newContactEmail]) {
             let pendingContact;
@@ -1906,7 +1952,14 @@ function fillShareDialogWithContent() {
                 pendingContact = !!M.findOutgoingPendingContactIdByEmail(newContactEmail);
             }
             const shareRights = $.addContactsToShare[newContact].r;
-            generateShareDialogRow(newContactName, newContactEmail, shareRights, newContact, pendingContact);
+            generateShareDialogRow(
+                newContactName,
+                newContactEmail,
+                shareRights,
+                newContact,
+                pendingContact,
+                readonly
+            );
             seen[newContactEmail] = 1;
         }
     }
@@ -1919,8 +1972,9 @@ function fillShareDialogWithContent() {
  * @param {Number} shareRights
  * @param {String} userHandle Optional
  * @param {boolean} isPending if true, shows text 'contact request pending'
+ * @param {Boolean} disabled Doesn't not allow to change the permissions (Optional)
  */
-function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHandle, isPending) {
+function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHandle, isPending, disabled) {
     'use strict';
     var rowId = '',
         html = '',
@@ -1940,10 +1994,17 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     // Permission level
     if (permissionLevel === 1) {
         perm = 'read-and-write';
-    } else if (permissionLevel === 2) {
+    }
+    else if (permissionLevel === 2) {
         perm = 'full-access';
-    } else {
+    }
+    else {
         perm = 'read-only';
+    }
+
+    // Do not allow to change permissions
+    if (disabled) {
+        perm += ' disabled';
     }
 
     // Add contact
@@ -1984,10 +2045,17 @@ function hideShareDialogPermMenu() {
  * @param {Number} y        The y position of showing the menu
  */
 function showShareDialogPermMenu($this, x, y) {
+
     "use strict";
-    var $shareDialog = $('.mega-dialog.share-dialog');
-    var $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog).removeClass('hidden').addClass('o-hidden');
-    var permissionLevel = checkMultiInputPermission($this);
+
+    const $shareDialog = $('.mega-dialog.share-dialog', '.mega-dialog-container');
+    const $permissionMenu = $('.share-dialog-permissions-menu', $shareDialog)
+        .removeClass('hidden').addClass('o-hidden');
+    const permissionLevel = checkMultiInputPermission($this);
+
+    if ($this.is('.disabled')) {
+        return false;
+    }
 
     $('.option', $permissionMenu).removeClass('active');
     $('.option.' + permissionLevel[0], $permissionMenu).addClass('active');
@@ -2326,13 +2394,32 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
 function renderShareDialogAccessList() {
     "use strict";
 
-    var $shareDialog = $('.mega-dialog.share-dialog');
+    const $shareDialog = $('.mega-dialog.share-dialog', '.mega-dialog-container');
+    const $warning = $('.mega-banner', $shareDialog);
+    let readonly = false;
 
     // Remove all contacts from the access list
     $('.share-dialog-access-node').remove();
 
+    // Clear and hide warning
+    $warning.addClass('hidden').text('');
+
+    if (M.currentrootid === M.InboxID || M.getNodeRoot($.selected[0]) === M.InboxID) {
+
+        $warning.safeHTML(l.backup_read_only_wrng).removeClass('hidden');
+        $('span', $warning).text('').attr({
+            'class': 'sprite-fm-mono icon-info-filled simpletip',
+            'data-simpletip': l.backup_read_only_info,
+            'data-simpletip-class': 'backup-tip short',
+            'data-simpletipposition': 'top',
+            'data-simpletipoffset': 6
+        }).trigger('simpletipUpdated');
+
+        readonly = true;
+    }
+
     // Fill the shared folder's access list
-    fillShareDialogWithContent();
+    fillShareDialogWithContent(readonly);
 
     // Take care about share button enabled/disabled and the access list scrolling
     shareDialogContentCheck();
@@ -3286,7 +3373,7 @@ function fm_resize_handler(force) {
             megaChat.resized();
         }
 
-        $('.fm-right-files-block, .fm-right-account-block, .fm-right-block.dashboard').css({
+        $('.fm-right-files-block, .fm-right-account-block, .fm-right-block', '.fmholder').css({
             'margin-inline-start': margin,
             '-webkit-margin-start': margin
         });

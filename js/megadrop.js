@@ -1797,18 +1797,12 @@ mega.megadrop = (function() {
             loadingDialog.hide();
         };
 
-        var nodeIconMobile = function uiNodeIconMobile(nodeHandle, render) {
+        const nodeIconMobile = function uiNodeIconMobile(nodeHandle) {
 
-            var $node = $('.mobile.file-manager-block #' + nodeHandle);
+            const $node = $(`#${nodeHandle}`, '.mobile.file-manager-block');
+            const iconName = fileIcon(M.d[nodeHandle]);
 
-            $('.fm-item-img img', $node).addClass('hidden');
-
-            if (render) {
-                $('.megadrop-folder', $node).removeClass('hidden');
-            }
-            else {
-                $('.regular-folder', $node).removeClass('hidden');
-            }
+            $('.regular-folder', $node).attr('src',`${mobile.imagePath + iconName}.png`);
         };
 
         /**
@@ -1816,7 +1810,7 @@ mega.megadrop = (function() {
          * @param {String} nodeHandle Folder handle
          * @param {Boolean} render To draw or to delete
          */
-        var nodeIcon = function uiNodeIcon(nodeHandle, render) {
+        const nodeIcon = function uiNodeIcon(nodeHandle, render) {
 
             if (is_mobile) {
 

@@ -9454,7 +9454,7 @@ class Breadcrumbs extends mixins.wl {
         return 'recycle-item';
 
       case M.InboxID:
-        return 'inbox-item';
+        return 'restricted-item';
 
       case 'shares':
         return 'contacts-item';
@@ -9473,7 +9473,7 @@ class Breadcrumbs extends mixins.wl {
         return l[167];
 
       case M.InboxID:
-        return l[166];
+        return l.restricted_folder_button;
 
       case 'shares':
         return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : l[5589];
@@ -9492,6 +9492,10 @@ class Breadcrumbs extends mixins.wl {
       if (item.type === 'cloud-drive') {
         icon = external_React_default().createElement("i", {
           className: "sprite-fm-mono icon-cloud icon24"
+        });
+      } else if (item.type === 'restricted-item') {
+        icon = external_React_default().createElement("i", {
+          className: "sprite-fm-mono icon-restricted-folder-filled icon24"
         });
       } else if (item.type === 'folder') {
         icon = external_React_default().createElement("i", {

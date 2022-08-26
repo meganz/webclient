@@ -69,13 +69,11 @@
     vertical-align: middle;
 }
 
-.share-dialog-top-body .share-dialog-folder-icon {
+.share-dialog-top-body .item-type-icon {
     display: inline-block;
-    height: 48px;
-    -webkit-margin-end: 6px;
-    margin-inline-end: 6px;
+    -webkit-margin-end: 12px;
+    margin-inline-end: 12px;
     vertical-align: middle;
-    width: 48px;
 }
 
 .share-dialog-top-body .share-dialog-folder-info-block {
@@ -215,6 +213,28 @@
 .share-dialog-access-node:not(.owner):hover .access-node-remove {
     cursor: pointer;
     opacity: 1;
+}
+
+/* Warning banner */
+
+.mega-dialog.share-dialog .mega-banner {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin: 6px 0 0;
+    padding: 2px 8px;
+    text-align: center;
+    width: calc(100% - 48px);
+}
+
+.mega-dialog.share-dialog .warning-template span {
+    --icon-size: 24px;
+    --mask-color: var(--secondary-orange);
+    color: var(--secondary-orange);
+    display: inline-block;
+    -webkit-margin-start: 2px;
+    margin-inline-start: 2px;
+    vertical-align: middle;
 }
 
 .share-dialog-bottom-body .remove-share,

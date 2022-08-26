@@ -348,9 +348,28 @@
     margin-inline-start: 8px;
     --icon-size: 16px;
 }
+.dropdown-item > span + i.warning {
+    --icon-size: 24px;
+}
 .context .dropdown.submenu {
     border-radius: 12px;
     box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Dropdown warning notification */
+.dropdown-warning {
+    --icon-size: 24px;
+    color: var(--text-color-warning);
+    display: flex;
+    padding: 0 8px;
+}
+.dropdown-warning i {
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+}
+.dropdown-warning span {
+    min-width: 180px;
+    padding: 2px 0;
 }
 
 /* Sorting dropdowns */

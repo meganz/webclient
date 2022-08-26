@@ -2495,6 +2495,10 @@ function treetype(h) {
             return h;
         }
 
+        if (h === M.InboxID) {
+            return 'inbox';
+        }
+
         // root node reached?
         if (M.d[h].t > 1) {
             return 'cloud';
@@ -2563,6 +2567,11 @@ function ddtype(ids, toid, alt) {
         if (fromid === toid || !M.d[fromid]) return false;
 
         var fromtype = treetype(fromid);
+
+        if (fromtype === 'inbox' || treetype(toid) === 'inbox') {
+
+            return false;
+        }
 
         if (totype == 'cloud') {
             if (fromtype == 'cloud') {
@@ -3853,7 +3862,8 @@ function loadfm_done(mDBload) {
                     }
                 });
                 M.myChatFilesFolder.init();
-                M.getCameraUploads();
+                M.getMyBackups().catch(dump);
+                M.getCameraUploads().catch(dump);
             }
         }
         else {

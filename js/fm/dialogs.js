@@ -1231,6 +1231,25 @@
         return false;
     };
 
+    /**
+     * A version of the select a folder dialog used for selecting target folder
+     * @global
+     * @param {Function} cb     a callback to be called when the user "Select"
+     * @returns {Object}        The jquery object of the dialog
+     */
+    global.selectFolderDialog = function selectedFolderDialog(cb) {
+        if (isUserAllowedToOpenDialogs()) {
+            M.safeShowDialog('selectFolder', () => {
+
+                handleOpenDialog(0, M.RootID);
+                $.selectFolderCallback = cb;
+                return $dialog;
+            });
+        }
+
+        return false;
+    };
+
     mBroadcaster.addListener('fm:initialized', function copyMoveDialogs() {
         if (folderlink) {
             return false;

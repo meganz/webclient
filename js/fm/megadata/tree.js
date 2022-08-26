@@ -85,7 +85,8 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
         i = escapeHTML(n.h);
         if (typeof dialog === 'undefined') {
             if (rebuild || $('.content-panel.cloud-drive ul').length === 0) {
-                $(`${wrapperClass} .content-panel.cloud-drive`).html('<ul id="treesub_' + i + '"></ul>');
+                $(`${wrapperClass} .content-panel.cloud-drive .tree`)
+                    .safeHTML(`<ul id="treesub_${i}"></ul>`);
             }
         }
         else {
@@ -113,7 +114,11 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
     }
     else if (n.h === M.InboxID) {
         if (typeof dialog === 'undefined') {
-            $('.content-panel.inbox').html('<ul id="treesub_' + escapeHTML(M.InboxID) + '"></ul>');
+            const lPaneButton = document.querySelector('.js-lp-myfiles .js-inbox-btn');
+
+            if (lPaneButton.classList.contains('hidden') && M.hasInboxItems()) {
+                lPaneButton.classList.remove('hidden');
+            }
         }
         else {
             $('.' + dialog + ' .inbox .dialog-content-block')
@@ -355,6 +360,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 }
                 else if (curItemHandle === M.CameraId) {
                     node.classList.add('camera-folder');
+                }
+                else if (curItemHandle === M.cf.h) {
+                    node.classList.add('chat-folder');
                 }
                 node.textContent = name;
                 html = node.parentNode.parentNode;

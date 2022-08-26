@@ -75,8 +75,9 @@ function dashboardUI(updProcess) {
             else if (section.indexOf('incoming-shares') !== -1) {
                 section = 'shares';
             }
-            else if (section.indexOf('inbox') !== -1) {
-                section = M.InboxID;
+            else if (section.indexOf('backups') !== -1) {
+
+                section = M.BackupsId;
             }
             else if (section.indexOf('versions') === -1) {
                 section = null;
@@ -252,14 +253,16 @@ function dashboardUI(updProcess) {
 
         // left-panel responsive contents
         var maxwidth = 0;
-        for (var i = 0; i < $('.account.left-pane.small-txt:visible').length; i++){
+        for (var i = 0; i < $('.account.left-pane.small-txt:visible').length; i++) {
             var rowwidth = $('.account.left-pane.small-txt:visible').get(i).offsetWidth
                 + $('.account.left-pane.big-txt:visible').get(i).offsetWidth;
             maxwidth = Math.max(maxwidth, rowwidth);
         }
         $.leftPaneResizable.options.updateWidth = maxwidth;
-
         $($.leftPaneResizable).trigger('resize');
+
+        const mBackupsNode = M.getNodeByHandle(M.BackupsId);
+
         if (!u_attr.b) {
             accountUI.general.charts.init(account);
 
@@ -267,7 +270,7 @@ function dashboardUI(updProcess) {
             var percents = [
                 100 * account.stats[M.RootID].bytes / account.space,
                 100 * account.stats[M.RubbishID].bytes / account.space,
-                100 * account.stats[M.InboxID].bytes / account.space,
+                100 * (mBackupsNode.tb / account.space || 0),
                 100 * account.stats[M.RootID].vbytes / account.space,
                 Math.max(100 * (account.space - account.space_used) / account.space, 0),
             ];
@@ -287,17 +290,12 @@ function dashboardUI(updProcess) {
                 `(${bytesToSize(account.stats[M.RubbishID].bytes)})`
             );
 
-            // Hide the inbox if it is empty
-            const inboxSize = account.stats[M.InboxID].bytes;
-            if (inboxSize > 0) {
-                // Inbox
-                $('.account.progress-size.inbox').text(
-                    `(${bytesToSize(inboxSize)})`
-                );
-                $('.pr-item.inbox').parent().removeClass('hidden');
+            if (mBackupsNode) {
+                $('.account.progress-size.backups').text(`(${bytesToSize(mBackupsNode.tb)})`);
+                $('.js-backups-el', '.non-business-dashboard').removeClass('hidden');
             }
             else {
-                $('.pr-item.inbox').parent().addClass('hidden');
+                $('.js-backups-el', '.non-business-dashboard').addClass('hidden');
             }
 
             // Available
@@ -467,6 +465,19 @@ function dashboardUI(updProcess) {
             $('.ba-pub-links .folder-number', $dataStats).text(folderNumText);
             $('.ba-pub-links .file-number', $dataStats).text(fileNumText);
 
+            if (mBackupsNode) {
+                $('.js-backups-el', '.business-dashboard').removeClass('hidden');
+
+                fileNumText = ffNumText(mBackupsNode.tf | 0, 'file');
+                folderNumText = ffNumText(mBackupsNode.td | 0, 'folder');
+                $('.ba-backups .ff-occupy', $dataStats).text(bytesToSize(mBackupsNode.tb, 2));
+                $('.ba-backups .folder-number', $dataStats).text(folderNumText);
+                $('.ba-backups .file-number', $dataStats).text(fileNumText);
+            }
+            else {
+                $('.js-backups-el', '.business-dashboard').addClass('hidden');
+            }
+
             if (rubbishSize > 0) {
                 $('.ba-rubbish', $dataStats).removeClass('empty');
             }
@@ -576,8 +587,8 @@ dashboardUI.updateCloudDataWidget = function() {
     const files = l.file_count;
     const folders = l.folder_count;
     const data = M.getDashboardData();
-    const locale = [files, folders, files, folders, folders, folders];
-    const map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'versions'];
+    const locale = [files, folders, files, folders, folders, folders, folders];
+    const map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'backups', 'links', 'versions'];
     const intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
     $('.data-item .links-s').rebind('click', function() {
@@ -600,6 +611,15 @@ dashboardUI.updateCloudDataWidget = function() {
         return false;
     });
 
+    $('.backups', '.data-item').rebind('click.openBC', () => {
+
+        if (!M.BackupsId) {
+            return false;
+        }
+        M.openFolder(M.BackupsId);
+        return false;
+    });
+
     $('.account.data-item .versioning-settings').rebind('click', function() {
         loadSubPage('fm/account/file-management');
     });
@@ -613,9 +633,9 @@ dashboardUI.updateCloudDataWidget = function() {
                 xfiles = intl.format(xfiles || 0);
             }
 
-            let str = idx < 6 ? mega.icu.format(locale[idx], cnt) : cnt;
+            let str = idx < 7 ? mega.icu.format(locale[idx], cnt) : cnt;
 
-            if (props.xfiles > 1) {
+            if (props.xfiles > 0) {
                 str += `, ${mega.icu.format(files, xfiles)}`;
             }
 

@@ -1267,18 +1267,21 @@ strong.small-header {
 .properties-name-block {
     -webkit-padding-end: 39px;
     padding-inline-end: 39px;
+    -webkit-padding-start: 11px;
     padding-inline-start: 11px;
     position: relative;
     display: inline-block;
 }
+.properties-small-gray:empty + .properties-name-block {
+    -webkit-padding-start: 0;
+    padding-inline-start: 0;
+}
 .properties-breadcrumb {
     box-sizing: border-box;
     height: 60px;
-    width: 360px;
     border: 2px solid var(--stroke-grey-2);
     border-radius: 12px;
-    margin-left: -14px;
-    margin-bottom: 16px;
+    margin: 0 -18px 16px;
     background-color: var(--surface-grey-1);
 }
 .properties-breadcrumb .breadcrumb-dropdown {
@@ -1763,8 +1766,8 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: inline-block;
     -webkit-margin-start: 45px;
     margin-inline-start: 45px;
-    -webkit-padding-start: 30px;
-    padding-inline-start: 30px;
+    -webkit-padding-start: 32px;
+    padding-inline-start: 32px;
     max-width: calc(100% - 48px);
     box-sizing: border-box;
     white-space: nowrap;
@@ -1781,26 +1784,84 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -webkit-padding-end: 50px;
     padding-inline-end: 50px;
 }
-.transfer-filetype-icon.photo-folder {
-    background-position: -337px -757px;
-    margin: 0;
-}
 .transfer-filetype-icon.folder {
     background-position: -337px -717px;
     margin: 0;
 }
+.transfer-filetype-icon.rubbish-folder {
+    background-position: -297px -717px;
+}
+
+.transfer-filetype-icon.folder-sync {
+    background-position: -337px -1157px;
+}
+ .transfer-filetype-icon.rubbish-folder-sync {
+    background-position: -297px -1157px;
+}
+.transfer-filetype-icon.folder-backup {
+    background-position: -337px -1237px;
+}
+ .transfer-filetype-icon.rubbish-folder-backup {
+    background-position: -297px -1237px;
+}
+.transfer-filetype-icon.folder-chat {
+    background-position: -337px -1357px;
+}
+ .transfer-filetype-icon.rubbish-folder-chat {
+    background-position: -297px -757px;
+}
+.transfer-filetype-icon.folder-camera {
+    background-position: -337px -757px;
+}
+.transfer-filetype-icon.rubbish-folder-camera {
+    background-position: -297px -1357px;
+}
+
+.transfer-filetype-icon.backup {
+    background-position: -297px -1398px;
+}
+.transfer-filetype-icon.pc {
+    background-position: -297px -1437px;
+}
+.transfer-filetype-icon.pc-linux {
+    background-position: -377px -1397px;
+}
+.transfer-filetype-icon.pc-win {
+    background-position: -377px -1437px;
+}
+.transfer-filetype-icon.pc-mac {
+    background-position: -337px -1437px;
+}
+.transfer-filetype-icon.mobile {
+    background-position: -297px -1477px;
+}
+.transfer-filetype-icon.mobile-ios {
+    background-position: -337px -1477px;
+}
+.transfer-filetype-icon.mobile-android {
+    background-position: -377px -1477px;
+}
+.transfer-filetype-icon.ex-device {
+    background-position: -297px -1317px;
+}
+
 .transfer-filetype-icon.inbound-share {
     background-position: -337px -877px;
 }
 .transfer-filetype-icon.folder-shared {
     margin: 0;
 }
+.transfer-filetype-icon.rubbish-folder-shared {
+    background-position: -297px -957px;
+}
 
-.nw-fm-tree-item:hover .nw-fm-tree-folder, .nw-fm-tree-item.selected .nw-fm-tree-folder, .nw-fm-tree-item.dragover .nw-fm-tree-folder {
+.nw-fm-tree-item:hover .nw-fm-tree-folder,
+.nw-fm-tree-item.selected .nw-fm-tree-folder,
+.nw-fm-tree-item.dragover .nw-fm-tree-folder {
     color: white;
 }
+
 .rubbish-bin .nw-fm-tree-folder::before,
-.rubbish-bin .transfer-filetype-icon.folder,
 .transfer-filetype-icon.folder.dark {
     background-position: -297px -717px;
 }
@@ -1809,16 +1870,17 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .rubbish-bin .nw-fm-tree-folder.shared-folder::before,
 .rubbish-bin .nw-fm-tree-shared-folder::before,
-.rubbish-bin .transfer-filetype-icon.folder-shared  {
-    background-position: -297px -957px;
-}
-.rubbish-bin .nw-fm-tree-item.expanded .nw-fm-tree-folder.shared-folder::before, .rubbish-bin .nw-fm-tree-item.expanded .nw-fm-tree-shared-folder::before {
+.rubbish-bin .nw-fm-tree-item.expanded .nw-fm-tree-folder.shared-folder::before,
+.rubbish-bin .nw-fm-tree-item.expanded .nw-fm-tree-shared-folder::before {
     background-position: -297px -1037px;
 }
-.nw-fm-tree-folder.shared-folder::before, .nw-fm-tree-shared-folder::before, .transfer-filetype-icon.folder-shared {
+.nw-fm-tree-folder.shared-folder::before,
+.nw-fm-tree-shared-folder::before,
+.transfer-filetype-icon.folder-shared {
     background-position: -337px -957px;
 }
-.nw-fm-tree-item .nw-fm-tree-folder.shared-folder.expanded::before, .nw-fm-tree-item.nw-fm-tree-shared-folder.expanded::before {
+.nw-fm-tree-item .nw-fm-tree-folder.shared-folder.expanded::before,
+.nw-fm-tree-item.nw-fm-tree-shared-folder.expanded::before {
     background-position: -337px -997px;
 }
 .nw-fm-tree-item:hover .nw-fm-tree-folder::before, .nw-fm-tree-item.selected .nw-fm-tree-folder::before, .nw-fm-tree-item.dragover .nw-fm-tree-folder::before, .rubbish-bin .nw-fm-tree-item:hover .nw-fm-tree-folder::before, .rubbish-bin .nw-fm-tree-item.selected .nw-fm-tree-folder::before, .rubbish-bin .nw-fm-tree-item.dragover .nw-fm-tree-folder::before {
@@ -2063,9 +2125,13 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     transition: opacity 200ms ease-in-out;
     display: none;
 }
-.active-folder-link .fm-tree-panel ul:first-child > li:first-child > .nw-fm-tree-item {
-    -webkit-padding-end: 33px;
-    padding-inline-end: 33px;
+.active-folder-link .nw-fm-tree-item .nw-fm-tree-folder {
+    -webkit-margin-start: 24px;
+    margin-inline-start: 24px;
+}
+.active-folder-link .nw-fm-tree-item .nw-fm-tree-arrow {
+    -webkit-margin-start: 6px;
+    margin-inline-start: 6px;
 }
 .nw-tree-panel-arrows:hover, .nw-tree-panel-arrows.active {
     opacity: 1;
@@ -2624,8 +2690,8 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     width: 48px;
     height: 48px;
     content: '';
-    position: absolute;
     opacity: 0.5;
+    position: absolute;
     transition: opacity 200ms ease-in-out;
 }
 .nw-fm-left-icon:not(.photos).active {
@@ -3266,15 +3332,9 @@ body.loading .light-overlay {
     background-position: -216px -4319px;
 }
 .medium-file-icon.photo-folder {
-    background-position: -216px -4439px;
-}
-.rubbish-bin .medium-file-icon.folder {
-    background-position: -216px -4439px;
-}
-.medium-file-icon.photo-folder {
     background-position: -216px -4559px;
 }
-.rubbish-bin .medium-file-icon.photo-folder {
+.medium-file-icon.rubbish-folder {
     background-position: -216px -4679px;
 }
 .fm-blocks-view.shared-view .medium-file-icon.folder,
@@ -3282,21 +3342,64 @@ body.loading .light-overlay {
 .medium-file-icon.folder.inbound-share {
     background-position: -216px -4799px;
 }
-.medium-file-icon.folder-shared {
-    background-position: -216px -5039px;
+.medium-file-icon.folder-sync {
+    background-position: -216px -5879px;
 }
-.medium-file-icon.inbound-share {
-    background-position: -216px -4799px;
+.medium-file-icon.rubbish-folder-sync {
+    background-position: -216px -5999px;
 }
-.rubbish-bin .medium-file-icon.folder-shared {
-    background-position: -216px -5159px;
+.medium-file-icon.folder-backup {
+    background-position: -216px -6119px;
 }
-.medium-file-icon.puf-folder {
-    background-position: -216px -5279px;
+.medium-file-icon.rubbish-folder-backup {
+    background-position: -216px -6239px;
 }
-.rubbish-bin .medium-file-icon.folder-shared {
-    background-position: -216px -5399px;
+.medium-file-icon.folder-chat {
+    background-position: -216px -5639px;
 }
+.medium-file-icon.rubbish-folder-chat {
+    background-position: -216px -5759px;
+}
+.medium-file-icon.folder-camera {
+    background-position: -216px -4559px;
+}
+.medium-file-icon.rubbish-folder-camera {
+    background-position: -216px -4679px;
+}
+
+.medium-file-icon.backup {
+    background-position: -215px -6360px;
+    width: 40px;
+}
+.medium-file-icon.pc {
+    background-position: -215px -6481px;
+    width: 40px;
+}
+.medium-file-icon.pc-mac {
+    background-position: -215px -6721px;
+    width: 40px;
+}
+.medium-file-icon.pc-linux {
+    background-position: -215px -6841px;
+    width: 40px;
+}
+.medium-file-icon.pc-win {
+    background-position: -215px -6601px;
+    width: 40px;
+}
+.medium-file-icon.mobile {
+    background-position: -215px -6962px;
+}
+.medium-file-icon.mobile-ios {
+    background-position: -215px -7082px;
+}
+.medium-file-icon.mobile-android {
+    background-position: -215px -7202px;
+}
+.medium-file-icon.ex-device {
+    background-position: -215px -7322px;
+}
+
 .transfer-filetype-icon img {
     display: none;
 }
@@ -3545,27 +3648,108 @@ body.loading .light-overlay {
 .export-icon.folder, .export-icon.folderConflict, .share-folder-icon div.folder {
     background-position: -113px -4319px;
 }
-.export-icon.photo-folder, .share-folder-icon div.photo-folder {
-    background-position: -113px -4459px;
+
+.export-icon.folder-camera,
+.share-folder-icon div.folder-camera {
+    background-position: -113px -4559px;
 }
-.export-icon.inbound-share, .share-folder-icon div.inbound-share {
+.export-icon.rubbish-folder-camera,
+.share-folder-icon div.rubbish-folder-camera {
+    background-position: -113px -4679px;
+}
+.export-icon.folder-chat,
+.share-folder-icon div.folder-chat {
+    background-position: -113px -5639px;
+}
+.export-icon.folder-chat,
+.share-folder-icon div.rubbish-folder-chat {
+    background-position: -113px -5759px;
+}
+.export-icon.folder-sync,
+.share-folder-icon div.folder-sync {
+    background-position: -113px -5879px;
+}
+.export-icon.rubbish-folder-sync,
+.share-folder-icon div.rubbish-folder-sync {
+    background-position: -113px -5999px;
+}
+.export-icon.folder-backup,
+.share-folder-icon div.folder-backup {
+    background-position: -113px -6119px;
+}
+.export-icon.rubbish-folder-backup,
+.share-folder-icon div.rubbish-folder-backup {
+    background-position: -113px -6239px;
+}
+
+/* Backup/Device icons */
+.export-icon.backup,
+.share-folder-icon div.backup {
+    background-position: -111px -6359px;
+    width: 68px;
+}
+.export-icon.pc,
+.share-folder-icon div.pc {
+    background-position: -112px -6479px;
+    width: 68px;
+}
+.export-icon.pc-mac,
+.share-folder-icon div.pc-mac {
+    background-position: -112px -6719px;
+    width: 68px;
+}
+.export-icon.pc-win,
+.share-folder-icon div.pc-win {
+    background-position: -112px -6599px;
+    width: 68px;
+}
+.export-icon.pc-linux,
+.share-folder-icon div.pc-linux {
+    background-position: -112px -6839px;
+    width: 68px;
+}
+.export-icon.mobile,
+.share-folder-icon div.mobile {
+    background-position: -114px -6959px;
+}
+.export-icon.mobile-ios,
+.share-folder-icon div.mobile-ios {
+    background-position: -114px -7079px;
+}
+.export-icon.mobile-android,
+.share-folder-icon div.mobile-android {
+    background-position: -114px -7199px;
+}
+.export-icon.ex-device,
+.share-folder-icon div.ex-device {
+    background-position: -114px -7319px;
+}
+
+.export-icon.inbound-share,
+.share-folder-icon div.inbound-share {
     background-position: -113px -4919px;
 }
-.rubbish-bin .export-icon.inbound-share, .rubbish-bin .share-folder-icon div.inbound-share {
+.export-icon.rubbish-inbound-share,
+.share-folder-icon div.rubbish-inbound-share {
     background-position: -113px -4919px;
 }
-.export-icon.folder-shared, .share-folder-icon div.folder-shared {
+.export-icon.folder-shared,
+.share-folder-icon div.folder-shared {
     background-position: -113px -5039px;
 }
-.rubbish-bin .export-icon.folder-shared, .share-folder-icon div.folder-shared {
+.export-icon.rubbish-folder-shared,
+.share-folder-icon div.rubbish-folder-shared {
     background-position: -113px -5159px;
 }
-.export-icon.puf-folder, .share-folder-icon div.puf-folder {
+.export-icon.puf-folder,
+.share-folder-icon div.puf-folder {
     background-position: -113px -5279px;
 }
-.rubbish-bin .export-icon.puf-folder, .share-folder-icon div.puf-folder {
+.export-icon.rubbish-puf-folder,
+.share-folder-icon div.rubbish-puf-folder {
     background-position: -113px -5399px;
 }
+
 .thumb .block-view-file-type,
 .thumb .img-block,
 .img-block.thumb {
@@ -3835,8 +4019,8 @@ body.loading .light-overlay {
     height: 24px;
 }
 .properties-breadcrumb .fm-breadcrumbs-wrapper.info {
-    -webkit-padding-start: 10px;
-    padding-inline-start: 10px;
+    -webkit-padding-start: 8px;
+    padding-inline-start: 8px;
     margin-top: unset;
 }
 .fm-breadcrumbs-wrapper {
@@ -5621,6 +5805,7 @@ span.orange {
 .account.widget .medium.account.progress-list {
     margin-top: 12px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
 }
 .account.widget .medium.account.progress-list .item-wrapper {
@@ -8469,7 +8654,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     width: 40px;
     height: 37px;
     position: absolute;
-    margin: -1px 0 0 0;
 }
 .shared-folder-info-block {
     padding: 0 0 0 51px;
@@ -9290,7 +9474,9 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 }
 
 /* Main FM block */
-.overlayed .main-blur-block, .overlayed.mobile .bottom-page.scroll-block {
+.overlayed .main-blur-block,
+.overlayed .mega-dialog.arrange-to-back,
+.overlayed.mobile .bottom-page.scroll-block {
     filter: blur(0.25em);
     -webkit-filter: blur(0.25em);
     overflow: hidden;
@@ -9910,8 +10096,11 @@ div.camera-bottom-txt {
 .account.available .progress-title i {
     --mask-color: var(--label-grey);
 }
-.account.versions .progress-title i {
+.account.backups .progress-title i {
     --mask-color: var(--label-green);
+}
+.account.versions .progress-title i {
+    --mask-color: var(--label-orange);
 }
 .achieved:not(.disabled) .account.progress-title {
     opacity: 0.5;
@@ -9954,13 +10143,13 @@ div.camera-bottom-txt {
     background-color: var(--label-blue);
 }
 .account.progress-bar .progress-bar-section.pr2 {
-    background-color: var(--label-orange);
+    background-color: var(--label-green);
 }
 .account.progress-bar .progress-bar-section.pr1 {
     background-color: var(--label-red);
 }
 .account.progress-bar .progress-bar-section.pr3 {
-    background-color: var(--label-green);
+    background-color: var(--label-orange);
 }
 .account.progress-title.medium, .account.progress-size.medium {
     font-size: 16px;
@@ -11971,8 +12160,9 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 }
 
 .storage-analysis-pie-container .storage-big-chart-wrapper {
+    align-items: center;
     position: relative;
-    margin: 24px auto 16px;
+    margin: 24px auto;
     display: flex;
     flex-wrap: wrap;
 }
@@ -12081,7 +12271,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     width: auto;
     margin: 0 24px 0 24px;
     cursor: pointer;
-    padding: 8px 0;
+    padding: 6px 0;
     display: flex;
     align-items: center;
 }
@@ -12091,17 +12281,13 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     cursor: pointer !important;
 }
 
-.storage-division-container:last-child {
-    margin: 0 24px 24px 24px;
-}
-
 .storage-division-container .storage-division-per {
     position: relative;
     height: 18px;
     border-radius: 9px;
     color: #fff;
     font-size: 13px;
-    line-height: 20px;
+    line-height: 18px;
     display: inline-block;
     padding: 0 10px;
 }
@@ -12149,8 +12335,12 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     background-color: var(--label-purple);
 }
 
-.storage-division-per.rubbish-color {
+.storage-division-per.backups-color {
     background-color: var(--label-green);
+}
+
+.storage-division-per.rubbish-color {
+    background-color: var(--label-grey);
 }
 
 .storage-analysis-container {

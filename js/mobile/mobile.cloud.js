@@ -516,6 +516,10 @@ mobile.cloud = {
         var numOfFolders = node.td;
         var numOfFiles = node.tf;
 
+        // Map the file extension back to the image icon
+        var iconName = fileIcon(node);
+        var iconPath = `${mobile.imagePath + iconName}.png`;
+
         // Translate the text for 1 file/folder or x files/folders
         const foldersWording = mega.icu.format(l.folder_count, numOfFolders);
         const filesWording = mega.icu.format(l.file_count, numOfFiles);
@@ -523,8 +527,8 @@ mobile.cloud = {
         // Clone the template
         var $template = $templateSelector.clone().removeClass('template');
 
-        // Shared folder variable
-        var share = new mega.Share();
+        // Change folder icon
+        $('.regular-folder', $template).attr('src', iconPath);
 
         // Show the number of files in that folder
         $template.find('.num-files').text(foldersWording + ', ' + filesWording);
@@ -543,16 +547,6 @@ mobile.cloud = {
             // Show the link icon if it already has a public link
             if (typeof node.shares !== 'undefined' && typeof node.shares.EXP !== 'undefined') {
                 $template.find('.fm-icon.link').removeClass('hidden');
-            }
-
-            if (share.isShareExist([node.h], true, true, false)) {
-                $('.shared-folder', $template).removeClass('hidden');
-                $('.regular-folder', $template).addClass('hidden');
-            }
-
-            if (mega.megadrop.pufs[node.h]) {
-                $('.megadrop-folder', $template).removeClass('hidden');
-                $('.regular-folder', $template).addClass('hidden');
             }
         }
 

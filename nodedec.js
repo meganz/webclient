@@ -331,6 +331,15 @@ function crypto_makeattr(n, nn) {
     if (n.fav | 0) {
         ar.fav = n.fav | 0;
     }
+    if (typeof n.devid !== 'undefined') {
+        ar['dev-id'] = n.devid;
+    }
+    if (typeof n.drvid !== 'undefined') {
+        ar['drv-id'] = n.drvid;
+    }
+    if (typeof n.sds !== 'undefined') {
+        ar.sds = n.sds;
+    }
     if (n.lbl | 0) {
         ar.lbl = n.lbl | 0;
     }
@@ -352,7 +361,7 @@ function crypto_makeattr(n, nn) {
 // clear all node attributes, including derived ones
 function crypto_clearattr(n) {
     // derived node attr directory, see crypto_procattr()
-    const dattrs = ['ar', 'name', 'hash', 'mtime', 'fav', 'lbl', 'f', 'rr', 'gps'];
+    const dattrs = ['ar', 'name', 'hash', 'mtime', 'fav', 'lbl', 'f', 'rr', 'gps', 'devid', 'drvid', 'sds'];
     const old = {};
 
     for (let i = dattrs.length; i--;) {
@@ -370,7 +379,7 @@ function crypto_restoreattr(n, old) {
     Object.assign(n, old);
 }
 
-// if decryption of .a is successful, set .name, .hash, .mtime, .k and .ar and clear .a
+// if decryption of .a is successful, set .name, .hash, .mtime, .k, .sds, .devid/.drvid and .ar and clear .a
 function crypto_procattr(n, key) {
     var ab = base64_to_ab(n.a);
     var o = ab && dec_attr(ab, key);
@@ -407,6 +416,21 @@ function crypto_procattr(n, key) {
                     delete n.fav;
                 }
                 delete o.fav;
+            }
+
+            if (typeof o['dev-id'] !== 'undefined') {
+                n.devid = o['dev-id'];
+                delete o['dev-id'];
+            }
+
+            if (typeof o['drv-id'] !== 'undefined') {
+                n.drvid = o['drv-id'];
+                delete o['drv-id'];
+            }
+
+            if (typeof o.sds !== 'undefined') {
+                n.sds = o.sds;
+                delete o.sds;
             }
 
             if (typeof o.lbl != 'undefined') {

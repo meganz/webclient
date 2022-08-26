@@ -178,11 +178,15 @@
 
 /* Settings. Content. Main content wrappers */
 .fm-right-account-block,
-.fm-right-block.dashboard {
+.fm-right-block {
     height: calc(100% - 64px);
     position: relative;
     min-width: auto;
     top: 16px;
+}
+.fm-right-block.full-size {
+    height: calc(100% - 48px);
+    top: 0;
 }
 
 .fm-account-sections {
@@ -269,7 +273,7 @@
     cursor: pointer;
     font: var(--text-body1);
     position: relative;
-    margin: 0 2px 4px;
+    margin: 0 0 4px;
 }
 .content-panel .settings-button .head-title,
 .content-panel .settings-button .sub-title {

@@ -11,6 +11,9 @@
     padding: 3px 0;
     text-overflow: ellipsis;
 }
+.lp-content-wrap {
+    padding: 0 8px;
+}
 .lp-myfiles,
 .lp-gallery {
     background: var(--surface-grey-2);
@@ -42,18 +45,12 @@
     font: var(--text-body2);
     letter-spacing: 0;
     display: inline-block;
-    margin-bottom: 4px;
-    -webkit-padding-start: 6px;
-    padding-inline-start: 6px;
-}
-.active-folder-link .section-title {
-    padding: 4px 8px 0 8px;
-    display: inline-block;
+    margin: 0 4px 4px;
 }
 .lp-myfiles .cloud-drive-panel,
 .lp-gallery .library-panel,
-.active-folder-link .content-panel.cloud-drive {
-    padding: 4px 8px 0 8px;
+.active-folder-link .lp-content-wrap {
+    padding-top: 4px;
 }
 .lp-myfiles .ps--active-y .cloud-drive-panel {
     -webkit-padding-end: 16px;
@@ -62,28 +59,28 @@
 .lp-myfiles .content-panel.cloud-drive.collapse {
     display: none;
 }
-.lp-myfiles .btn-myfiles i.icon-arrow-down {
-    --icon-size: 20px;
-    margin-top: 6px;
+.lp-myfiles .btn-myfiles {
+    -webkit-padding-start: 24px;
+    padding-inline-start: 24px;
+}
+.lp-myfiles .btn-myfiles i.icon-dropdown {
+    margin-top: 4px;
     position: absolute;
-    left: 4px;
+    left: 2px;
 }
-.rtl .lp-myfiles .btn-myfiles i.icon-arrow-down {
+.rtl .lp-myfiles .btn-myfiles i.icon-dropdown {
     left: auto;
-    right: 4px; /* 4px is correct position for PS, as jSP is removed */
+    right: 2px;
 }
-.rtl .lp-myfiles .btn-myfiles i.icon-arrow-down {
-    left: auto;
-    right: 12px;
-}
-.lp-myfiles .btn-myfiles.collapse i.icon-arrow-down {
+.lp-myfiles .btn-myfiles.collapse i.icon-dropdown {
     transform: rotate(270deg);
 }
-.rtl .lp-myfiles .btn-myfiles.collapse i.icon-arrow-down {
+.rtl .lp-myfiles .btn-myfiles.collapse i.icon-dropdown {
     transform: rotate(90deg);
 }
 .lp-myfiles .shared-panel {
-    margin: 8px 8px 16px 8px;
+    padding-top: 8px;
+    padding-bottom: 16px;
 }
 .lp-storage-usage .storage-usage-panel {
     padding: 12px;

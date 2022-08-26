@@ -21441,7 +21441,8 @@ class Stream extends mixins.wl {
       const localEl = (_this$containerRef2 = this.containerRef) == null ? void 0 : _this$containerRef2.current;
 
       if (localEl.offsetLeft + localEl.offsetWidth > wrapperEl.offsetWidth) {
-        localEl.style.left = 'auto';
+        localEl.style.left = 'unset';
+        localEl.style.removeProperty("right");
       }
     };
 

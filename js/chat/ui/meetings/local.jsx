@@ -232,7 +232,8 @@ class Stream extends MegaRenderMixin {
         const localEl = this.containerRef?.current;
 
         if (localEl.offsetLeft + localEl.offsetWidth > wrapperEl.offsetWidth) {
-            localEl.style.left = 'auto';
+            localEl.style.left = 'unset';
+            localEl.style.removeProperty("right");
         }
     };
 

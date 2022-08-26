@@ -413,7 +413,7 @@ export default class Stream extends MegaRenderMixin {
 
     renderStreamContainer = () => {
         const {
-            sfuApp, call, chatRoom, streams, stayOnEnd, everHadPeers, onInviteToggle, onStayConfirm,
+            sfuApp, call, chatRoom, streams, stayOnEnd, everHadPeers, isOnHold, onInviteToggle, onStayConfirm,
             onCallEnd
         } = this.props;
         const streamContainer = content =>
@@ -437,6 +437,7 @@ export default class Stream extends MegaRenderMixin {
                     streamContainer={streamContainer}
                     link={this.state.link}
                     stayOnEnd={stayOnEnd}
+                    isOnHold={isOnHold}
                     onInviteToggle={onInviteToggle}
                     onStayConfirm={onStayConfirm}
                     onCallEnd={() => onCallEnd(1)}

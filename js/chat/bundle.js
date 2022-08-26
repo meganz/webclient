@@ -21872,9 +21872,10 @@ class ParticipantsNotice extends mixins.wl {
   specShouldComponentUpdate(newProps) {
     const {
       stayOnEnd,
-      hasLeft
+      hasLeft,
+      isOnHold
     } = this.props;
-    return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft;
+    return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft || newProps.isOnHold !== isOnHold;
   }
 
   render() {
@@ -21882,7 +21883,8 @@ class ParticipantsNotice extends mixins.wl {
       sfuApp,
       call,
       hasLeft,
-      streamContainer
+      streamContainer,
+      isOnHold
     } = this.props;
 
     if (sfuApp.isDestroyed) {
@@ -21891,6 +21893,7 @@ class ParticipantsNotice extends mixins.wl {
 
     return external_React_default().createElement((external_React_default()).Fragment, null, call.isSharingScreen() ? null : external_React_default().createElement(StreamNode, {
       className: "local-stream-mirrored",
+      isCallOnHold: isOnHold,
       stream: call.getLocalStream()
     }), streamContainer(hasLeft ? this.renderUserAlone() : this.renderUserWaiting()));
   }
@@ -22219,6 +22222,7 @@ class stream_Stream extends mixins.wl {
         streams,
         stayOnEnd,
         everHadPeers,
+        isOnHold,
         onInviteToggle,
         onStayConfirm,
         onCallEnd
@@ -22242,6 +22246,7 @@ class stream_Stream extends mixins.wl {
           streamContainer: streamContainer,
           link: this.state.link,
           stayOnEnd: stayOnEnd,
+          isOnHold: isOnHold,
           onInviteToggle: onInviteToggle,
           onStayConfirm: onStayConfirm,
           onCallEnd: () => onCallEnd(1)

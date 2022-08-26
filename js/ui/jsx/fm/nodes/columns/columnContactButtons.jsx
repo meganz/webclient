@@ -6,7 +6,7 @@ import {GenericNodePropsComponent} from "../genericNodePropsComponent";
 import { inProgressAlert } from '../../../../../chat/ui/meetings/call';
 
 export class ColumnContactButtons extends GenericNodePropsComponent {
-    static sortable = true;
+    static sortable = false;
     static id = "grid-url-header-nw";
     static label = "";
     static megatype = "grid-url-header-nw";

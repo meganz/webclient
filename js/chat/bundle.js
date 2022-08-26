@@ -8280,7 +8280,7 @@ class ColumnContactButtons extends genericNodePropsComponent.L {
   }
 
 }
-ColumnContactButtons.sortable = true;
+ColumnContactButtons.sortable = false;
 ColumnContactButtons.id = "grid-url-header-nw";
 ColumnContactButtons.label = "";
 ColumnContactButtons.megatype = "grid-url-header-nw";

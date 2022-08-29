@@ -8344,15 +8344,14 @@ class ContactList extends mixins.wl {
         return null;
       }
 
-      this.setState({
-        contextMenuPosition: ev.clientX
-      }, () => {
-        let ref = this.contextMenuRefs[handle];
+      const $$REF = this.contextMenuRefs[handle];
 
-        if (ref && ref.isMounted()) {
-          this.contextMenuRefs[handle].onClick(ev);
-        }
-      });
+      if ($$REF && $$REF.isMounted()) {
+        const refNodePosition = $$REF.domNode && $$REF.domNode.getBoundingClientRect().x;
+        this.setState({
+          contextMenuPosition: ev.clientX > refNodePosition ? null : ev.clientX
+        }, () => $$REF.onClick(ev));
+      }
     };
 
     this.onSelected = this.onSelected.bind(this);

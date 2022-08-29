@@ -2749,7 +2749,16 @@ FileManager.prototype.initUIKeyEvents = function() {
                     M.openFolder(n.h);
                 }
                 else if ($.selected.length < 2 && (is_image2(n) || is_video(n))) {
-                    slideshow($.selected[0]);
+                    const $elm = mega.gallery.sections[M.currentdirid]
+                        ? $(`#${n.h}.data-block-view`, '#gallery-view')
+                        : $('.dropdown-item.play-item');
+
+                    if ($elm.length) {
+                        $elm.trigger('click').trigger('dblclick');
+                    }
+                    else {
+                        slideshow($.selected[0]);
+                    }
                 }
                 else {
                     M.addDownload($.selected);

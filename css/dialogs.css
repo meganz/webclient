@@ -8872,19 +8872,18 @@ body.de .mega-dialog.new-group-chat {
         padding: 8px 12px;
         display: flex;
         justify-content: space-between;
+        align-items: center;
     }
     .mega-dialog.user-management-add-user-dialog .optional-input-container {
         display: none;
     }
     .mega-dialog.user-management-add-user-dialog .verification-container .verification-user-info {
         width: auto;
-        max-width: 340px;
         position: relative;
         display: inline-block;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        vertical-align: middle;
     }
     .mega-dialog.user-management-add-user-dialog .verification-container .verification-user-info * {
         color: var(--text-color-medium);
@@ -8892,12 +8891,23 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.user-management-add-user-dialog .verification-container .verification-user-info div {
         text-align: start;
     }
+    .mega-dialog.user-management-add-user-dialog .verification-container .verification-user-info .verification-user-email {
+        display: flex;
+    }
     .mega-dialog.user-management-add-user-dialog .verification-container .verification-user-info .verification-user-pw {
         margin-top: 12px;
+        display: flex;
     }
     .mega-dialog.user-management-add-user-dialog .verification-container .verification-user-info .verification-user-email.single-line {
         width: 468px;
         text-align: center;
+    }
+    .mega-dialog.user-management-add-user-dialog .verification-container .verification-user-info .verification-user-email .sub-e,
+    .mega-dialog.user-management-add-user-dialog .verification-container .verification-user-info .verification-user-pw .sub-p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
     }
     .mega-dialog.user-management-add-user-dialog .verification-container .verification-user-info b {
         color: var(--text-color-high);
@@ -8914,11 +8924,8 @@ body.de .mega-dialog.new-group-chat {
         left: 40px;
     }
     .mega-dialog.user-management-add-user-dialog .verification-container button {
-        vertical-align: middle;
-        position: absolute;
-        right: 16px;
-        top: 50%;
-        transform: translateY(-50%);
+        height: 36px;
+        flex: 0 0 auto;
     }
     .rtl .mega-dialog.user-management-add-user-dialog .verification-container button {
         right: auto;

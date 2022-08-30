@@ -1978,13 +1978,19 @@ mega.gallery.isGalleryNode = (n, ext) => {
 mega.gallery.isGalleryVideo = (n) => {
     'use strict';
 
-    if (!n || !n.fa) {
+    if (!n || !n.fa || !n.fa.includes(':8*')) {
         return false;
     }
 
     const p = M.getMediaProperties(n);
 
-    return p.showThumbnail && p.icon === 'video' ? p : false;
+    if (!p.showThumbnail || p.icon !== 'video') {
+        return false;
+    }
+
+    const props = MediaAttribute.prototype.fromAttributeString(n.fa, n.k);
+
+    return (props && props.width && props.height) ? p : false;
 };
 
 mega.gallery.checkEveryGalleryUpdate = n => {

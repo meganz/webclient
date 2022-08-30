@@ -78,12 +78,13 @@ export default class ContactList extends MegaRenderMixin {
             // Do not show the context menu if select multiple contacts
             return null;
         }
-        this.setState({ contextMenuPosition: ev.clientX }, () => {
-            let ref = this.contextMenuRefs[handle];
-            if (ref && ref.isMounted()) {
-                this.contextMenuRefs[handle].onClick(ev);
-            }
-        });
+        const $$REF = this.contextMenuRefs[handle];
+        if ($$REF && $$REF.isMounted()) {
+            const refNodePosition = $$REF.domNode && $$REF.domNode.getBoundingClientRect().x;
+            this.setState({ contextMenuPosition: ev.clientX > refNodePosition ? null : ev.clientX }, () =>
+                $$REF.onClick(ev)
+            );
+        }
     };
 
 

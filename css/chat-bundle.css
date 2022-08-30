@@ -1628,9 +1628,6 @@
   background: transparent;
   color: var(--text-color-high);
 }
-.start-meeting-title input::selection {
-  background: var(--surface-grey-2);
-}
 .start-meeting-title h2 {
   overflow: hidden;
   display: block;

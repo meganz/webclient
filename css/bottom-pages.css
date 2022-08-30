@@ -2995,11 +2995,6 @@ body:not(.mobile) .copy-line-icon:hover .dark-help-block {
     min-height: 480px;
 }
 
-.bottom-page .megaapp-linux-container .install-guide-text span.install-guide::selection {
-    background: rgba(129, 207, 179, 0.3);
-    color: white;
-}
-
 .bottom-page .megaapp-linux-container .install-guide-text {
     background-color: #222;
     border-radius: 4px;

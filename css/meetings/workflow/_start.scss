@@ -26,8 +26,6 @@
             border-bottom: 1px solid var(--input-text-underline-hover);
             background: transparent;
             color: var(--text-color-high);
-
-            &::selection { background: var(--surface-grey-2); }
         }
 
         h2 {

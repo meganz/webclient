@@ -3366,6 +3366,18 @@ body.loading .light-overlay {
 .medium-file-icon.rubbish-folder-camera {
     background-position: -216px -4679px;
 }
+.medium-file-icon.puf-folder {
+    background-position: -216px -5279px;
+}
+ .medium-file-icon.rubbish-puf-folder {
+    background-position: -216px -5399px;
+}
+.medium-file-icon.folder-shared {
+    background-position: -216px -5039px;
+}
+.medium-file-icon.rubbish-folder-shared {
+    background-position: -216px -5159px;
+}
 
 .medium-file-icon.backup {
     background-position: -215px -6360px;

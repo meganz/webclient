@@ -14648,6 +14648,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
           callMinimized: false
         }, () => {
           $.hideTopMenu();
+          closeDialog == null ? void 0 : closeDialog();
           loadSubPage('fm/chat');
           room.show();
           this.toggleExpandedFlag();

@@ -1503,8 +1503,10 @@ label.iPhoneCheckLabelOff span {
     position: relative;
 }
 .content-panel {
-    overflow: hidden;
     display: none;
+}
+.chat-lp-body .content-panel {
+    overflow: hidden;
 }
 .fm-tree-panel ul {
     margin: 0;
@@ -1658,42 +1660,14 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     padding-inline-start: 364px;
 }
 .nw-fm-tree-item {
-    display: block;
+    display: flex;
     line-height: 0;
     background-color: rgba(217,0,7,0);
     padding: 4px 0;
-    -webkit-padding-end: 13px;
-    padding-inline-end: 13px;
 }
-.nw-fm-tree-item.labeled {
-    -webkit-padding-end: 48px;
-    padding-inline-end: 48px;
-}
-.nw-fm-tree-item.on-gallery {
-    -webkit-padding-end: 30px;
-    padding-inline-end: 30px;
-}
-.nw-fm-tree-item.on-gallery.labeled {
-    -webkit-padding-end: 50px;
-    padding-inline-end: 50px;
-}
-.nw-fm-tree-item.linked,
-.nw-fm-tree-item.undecryptable {
-    -webkit-padding-end: 30px;
-    padding-inline-end: 30px;
-}
-.nw-fm-tree-item.linked.labeled,
-.nw-fm-tree-item.undecryptable.labeled {
-    -webkit-padding-end: 50px;
-    padding-inline-end: 50px;
-}
-.nw-fm-tree-item.linked.on-gallery {
-    -webkit-padding-end: 50px;
-    padding-inline-end: 50px;
-}
-.nw-fm-tree-item.linked.on-gallery.labeled {
-    -webkit-padding-end: 60px;
-    padding-inline-end: 60px;
+.nw-fm-tree-item .data-item-icon {
+    top: 2px;
+    right: 12px;
 }
 .nw-fm-tree-item:hover, .nw-fm-tree-item.hovered {
     background-color: rgba(217,0,7,0.2);
@@ -1768,21 +1742,18 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     margin-inline-start: 45px;
     -webkit-padding-start: 32px;
     padding-inline-start: 32px;
-    max-width: calc(100% - 48px);
     box-sizing: border-box;
     white-space: nowrap;
     font-size: 14px;
     line-height: 24px;
     color: var(--stroke-link-inverted);
     height: 24px;
-    text-overflow: ellipsis;
-    overflow: hidden;
     position: relative;
     width: auto;
 }
-.nw-fm-tree-item.labeled.linked {
-    -webkit-padding-end: 50px;
-    padding-inline-end: 50px;
+.transfer-filetype-icon.photo-folder {
+    background-position: -337px -757px;
+    margin: 0;
 }
 .transfer-filetype-icon.folder {
     background-position: -337px -717px;
@@ -2631,6 +2602,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: relative;
     width: 256px;
     z-index: 20;
+    max-width: calc(100% - 600px);
 }
 .rtl .fm-left-panel {
     direction: rtl;
@@ -11153,8 +11125,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 /* FM content block */
 
 .fm-right-files-block {
-    -webkit-margin-start: 304px;
-    margin-inline-start: 304px;
     display: flex;
     flex-direction: column;
 }

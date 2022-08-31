@@ -1064,25 +1064,31 @@ FileManager.prototype.initFileManagerUI = function() {
     }
 
     // chat can handle the left-panel resizing on its own
-    var lPane = $('.fm-left-panel').filter(":not(.chat-left-panel)");
+    const lPane = $('.fm-left-panel').filter(":not(.chat-lp-body)");
     $.leftPaneResizable = new FMResizablePane(lPane, {
         'direction': 'e',
         'minWidth': 200,
         'maxWidth': 400,
         'persistanceKey': 'leftPaneWidth',
-        'handle': '.left-pane-drag-handle'
+        'handle': '.left-pane-drag-handle',
+        'pagechange': () => {
+            let {'cloud-drive': {subpages: myFiles} = false} = this.fmTabState;
+            myFiles = myFiles ? array.to.object([M.RootID, ...myFiles]) : false;
+
+            return function() {
+                let maxWidth = null;
+
+                if (!myFiles[M.currentrootid]) {
+                    maxWidth = 400;
+                }
+                this.setOption('maxWidth', maxWidth);
+            };
+        }
     });
 
-    if (fmconfig.leftPaneWidth) {
-        lPane.width(Math.min(
-            $.leftPaneResizable.options.maxWidth,
-            Math.max($.leftPaneResizable.options.minWidth, fmconfig.leftPaneWidth)
-        ));
-    }
-
-    $($.leftPaneResizable).on('resize', function() {
+    $($.leftPaneResizable).rebind('resize.lhp', function() {
         var w = lPane.width();
-        if (w >= $.leftPaneResizable.options.maxWidth) {
+        if ($.leftPaneResizable.options.maxWidth && w >= $.leftPaneResizable.options.maxWidth) {
             $('.left-pane-drag-handle').css('cursor', 'w-resize');
             $('body').css('cursor', 'w-resize');
         }

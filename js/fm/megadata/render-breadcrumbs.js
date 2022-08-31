@@ -358,7 +358,7 @@
                 // if we won't have space, add it to the dropdown, but always render the current folder,
                 // and root if there are no extraItems
                 // for info block we show max 2 items in the in-view breadcrumb
-                if ((!isLastItem && !isRoot || isRoot && extraItems.length > 0) &&
+                if (!isLastItem &&
                     (currentPathLength > maxPathLength && !isInfoBlock) || (isInfoBlock && i > 1)) {
                     extraItems.push({
                         name,

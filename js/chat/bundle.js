@@ -9386,8 +9386,6 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
 var esm_extends = __webpack_require__(462);
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(229);
 // EXTERNAL MODULE: external "React"
 var external_React_ = __webpack_require__(363);
 var external_React_default = __webpack_require__.n(external_React_);
@@ -9397,6 +9395,8 @@ var utils = __webpack_require__(79);
 var mixins = __webpack_require__(503);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 var buttons = __webpack_require__(204);
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
+var applyDecoratedDescriptor = __webpack_require__(229);
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
 var modalDialogs = __webpack_require__(904);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/viewModeSelector.jsx
@@ -17086,10 +17086,6 @@ LeftPanel.NAMESPACE = 'lhp';
 
 
 
-var conversations_dec, conversations_class;
-
-
-
 
 
 
@@ -17448,7 +17444,8 @@ class ArchivedConversationsList extends mixins.wl {
   }
 
 }
-let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (conversations_class = class ConversationsApp extends mixins.wl {
+
+class ConversationsApp extends mixins.wl {
   constructor(props) {
     super(props);
     this.requestReceivedListener = null;
@@ -17458,12 +17455,11 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
       LOADING: 0x02
     };
     this.state = {
-      leftPaneWidth: mega.config.get('leftPaneWidth'),
+      leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
       startGroupChatDialog: false,
       startMeetingDialog: false,
       view: this.VIEWS.LOADING
     };
-    this.handleWindowResize = this.handleWindowResize.bind(this);
 
     this._cacheRouting();
 
@@ -17497,7 +17493,6 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
   componentDidMount() {
     super.componentDidMount();
     var self = this;
-    window.addEventListener('resize', this.handleWindowResize);
     $(document).rebind('keydown.megaChatTextAreaFocus', function (e) {
       if (!M.chat || e.megaChatHandled) {
         return;
@@ -17556,13 +17551,13 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
 
     var lPaneResizableInit = function () {
       megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-      $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, $.leftPaneResizable.options);
-
-      if (fmconfig.leftPaneWidth) {
-        megaChat.$leftPane.width(Math.min($.leftPaneResizableChat.options.maxWidth, Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)));
-      }
-
-      $($.leftPaneResizableChat).on('resize', function () {
+      $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, { ...$.leftPaneResizable.options,
+        maxWidth: 400,
+        pagechange: () => function () {
+          this.setWidth();
+        }
+      });
+      $($.leftPaneResizableChat).rebind('resize.clp', () => {
         var w = megaChat.$leftPane.width();
 
         if (w >= $.leftPaneResizableChat.options.maxWidth) {
@@ -17572,12 +17567,6 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
         } else {
           $('.left-pane-drag-handle').css('cursor', 'we-resize');
         }
-      });
-      $($.leftPaneResizableChat).on('resizestop', function () {
-        $('.fm-left-panel').width(megaChat.$leftPane.width());
-        setTimeout(function () {
-          $('.hiden-when-dragging').removeClass('hiden-when-dragging');
-        }, 100);
       });
     };
 
@@ -17596,21 +17585,16 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
     } else {
       megaChat.$leftPane.removeClass('hidden');
     }
-
-    this.handleWindowResize();
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    window.removeEventListener('resize', this.handleWindowResize);
     $(document).off('keydown.megaChatTextAreaFocus');
     mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
     delete this.props.megaChat.$conversationsAppInstance;
   }
 
   componentDidUpdate() {
-    this.handleWindowResize();
-
     if (megaChat.routingSection === "archived") {
       this.initArchivedChatsScrolling();
     }
@@ -17632,29 +17616,6 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
 
       mega.ui.onboarding.sections.chat.startNextOpenSteps(nextIdx);
       this.$obDialog = $('#obDialog');
-    }
-  }
-
-  handleWindowResize() {
-    if (!M.chat) {
-      return;
-    }
-
-    if (is_chatlink && !is_eplusplus) {
-      $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
-        'margin-left': "0px"
-      });
-    } else {
-      if (megaChat.$leftPane && megaChat.$leftPane.hasClass('resizable-pane-active')) {
-        return;
-      }
-
-      const lhpWidth = this.state.leftPaneWidth || $('.fm-left-panel').width();
-      const newMargin = `${lhpWidth + $('.nw-fm-left-icons-panel').width()}px`;
-      $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
-        'margin-inline-start': newMargin,
-        '-webkit-margin-start:': newMargin
-      });
     }
   }
 
@@ -17832,7 +17793,7 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
     }), rightPane);
   }
 
-}, ((0,applyDecoratedDescriptor.Z)(conversations_class.prototype, "handleWindowResize", [conversations_dec], Object.getOwnPropertyDescriptor(conversations_class.prototype, "handleWindowResize"), conversations_class.prototype)), conversations_class));
+}
 
 if (false) {}
 

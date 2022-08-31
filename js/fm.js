@@ -3373,11 +3373,6 @@ function fm_resize_handler(force) {
             megaChat.resized();
         }
 
-        $('.fm-right-files-block, .fm-right-account-block, .fm-right-block', '.fmholder').css({
-            'margin-inline-start': margin,
-            '-webkit-margin-start': margin
-        });
-
         $('.popup.transfer-widget').outerWidth(treePaneWidth - 9);
     }
 
@@ -3689,7 +3684,8 @@ function FMResizablePane(element, opts) {
      */
     var defaults = {
         'direction': 'n',
-        'persistanceKey': 'transferPanelHeight',
+        'persistanceKey': '',
+        'maxWidth': 400,
         'minHeight': undefined,
         'minWidth': undefined,
         'handle': '.transfer-drag-handle'
@@ -3701,32 +3697,59 @@ function FMResizablePane(element, opts) {
 
     self.options = opts; //expose as public
 
+    console.assert(opts.multiple || $element.length === 1, 'FMResizablePane: Invalid number of elements.');
+
     /**
      * Depending on the selected direction, pick which css attr should we be changing - width OR height
      */
     if (opts.direction === 'n' || opts.direction === 's') {
         size_attr = 'height';
-    } else if (opts.direction === 'e' || opts.direction === 'w') {
+    }
+    else if (opts.direction === 'e' || opts.direction === 'w') {
         size_attr = 'width';
-    } else if (opts.direction.length === 2) {
+    }
+    else if (opts.direction.length === 2) {
         size_attr = 'both';
     }
-
-    /**
-     * Already initialized.
-     */
-    if ($element.data('fmresizable')) {
-        return;
-    }
+    const broadcasts = [];
 
     self.destroy = function() {
-        // some optimizations can be done here in the future.
+        $element.data('fmresizable', null);
+
+        for (let i = broadcasts.length; i--;) {
+            mBroadcaster.removeListener(broadcasts[i]);
+        }
     };
+
+    this.setWidth = function(value) {
+
+        if (!value && opts.persistanceKey) {
+            const size = mega.config.get(opts.persistanceKey) | 0;
+            if (size) {
+                const {maxWidth, minWidth} = opts;
+                value = Math.min(maxWidth || size, Math.max(minWidth | 0, size));
+            }
+        }
+
+        if (value > 0) {
+            $element.width(value);
+        }
+    };
+
+    this.setOption = function(key, value) {
+        opts[key] = value;
+        this.element.resizable('option', key, value);
+        this.setWidth();
+    };
+
+    if (opts.persistanceKey) {
+        this.setWidth();
+    }
 
     /**
      * Basic init/constructor code
      */
-    {
+    if (!$element.data('fmresizable')) {
         var $handle = $(opts.handle, $element);
 
         if (d) {
@@ -3738,8 +3761,7 @@ function FMResizablePane(element, opts) {
         $handle.addClass('ui-resizable-handle ui-resizable-' + opts.direction);
 
         var resizable_opts = {
-            'handles': {
-            },
+            'handles': {},
             minHeight: opts.minHeight,
             minWidth: opts.minWidth,
             maxHeight: opts.maxHeight,
@@ -3788,6 +3810,20 @@ function FMResizablePane(element, opts) {
         $element.resizable(resizable_opts);
 
         $element.data('fmresizable', this);
+
+        if (opts.pagechange) {
+            const callback = tryCatch(opts.pagechange)();
+            delete opts.pagechange;
+
+            if (callback) {
+                const safeCallback = tryCatch(() => callback.call(self));
+
+                M.onFileManagerReady(() => {
+                    onIdle(safeCallback);
+                    broadcasts.push(mBroadcaster.addListener('pagechange', safeCallback));
+                });
+            }
+        }
     }
     return this;
 }

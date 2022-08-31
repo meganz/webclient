@@ -8518,61 +8518,72 @@ class ContactList extends mixins.wl {
       interactions: {},
       contextMenuPosition: null
     };
+    this.onSelected = this.onSelected.bind(this);
+    this.onHighlighted = this.onHighlighted.bind(this);
+    this.onExpand = this.onExpand.bind(this);
+    this.onAttachClicked = this.onAttachClicked.bind(this);
+  }
 
-    this.getLastInteractions = () => {
-      const {
-        contacts
-      } = this.props;
-      let interactions = {};
-      let promises = [];
+  getLastInteractions() {
+    const {
+      contacts
+    } = this.props;
+    const promises = [];
 
-      for (let handle in contacts) {
-        if (contacts.hasOwnProperty(handle)) {
-          promises.push(getLastInteractionWith(handle, true, true).done(timestamp => {
-            const [type, time] = timestamp.split(':');
-            interactions[handle] = {
-              'u': handle,
-              'type': type,
-              'time': time
-            };
-          }));
-        }
+    const push = handle => {
+      promises.push(Promise.resolve(getLastInteractionWith(handle, true, true)).then(ts => [ts, handle]));
+    };
+
+    for (const handle in contacts) {
+      if (contacts[handle].c === 1) {
+        push(handle);
       }
+    }
 
-      Promise.allSettled(promises).then(() => {
-        if (!this.isMounted()) {
-          return;
+    Promise.allSettled(promises).then(res => {
+      if (this.isMounted()) {
+        const interactions = {};
+
+        for (let i = res.length; i--;) {
+          if (res[i].status !== 'fulfilled') {
+            if (d && res[i].reason !== false) {
+              console.warn('getLastInteractions', res[i].reason);
+            }
+          } else {
+            const [ts, u] = res[i].value;
+            const [type, time] = ts.split(':');
+            interactions[u] = {
+              u,
+              type,
+              time
+            };
+          }
         }
 
         this.setState({
           'interactions': interactions
         });
-      }).catch(() => {
-        console.error("Failed to retrieve last interactions.");
-      });
-    };
-
-    this.handleContextMenu = (ev, handle) => {
-      ev.persist();
-
-      if (this.state.selected.length > 1) {
-        return null;
       }
+    }).catch(ex => {
+      console.error("Failed to handle last interactions!", ex);
+    });
+  }
 
-      const $$REF = this.contextMenuRefs[handle];
+  handleContextMenu(ev, handle) {
+    ev.persist();
 
-      if ($$REF && $$REF.isMounted()) {
-        const refNodePosition = $$REF.domNode && $$REF.domNode.getBoundingClientRect().x;
-        this.setState({
-          contextMenuPosition: ev.clientX > refNodePosition ? null : ev.clientX
-        }, () => $$REF.onClick(ev));
-      }
-    };
+    if (this.state.selected.length > 1) {
+      return null;
+    }
 
-    this.onSelected = this.onSelected.bind(this);
-    this.onHighlighted = this.onHighlighted.bind(this);
-    this.onExpand = this.onExpand.bind(this);
-    this.onAttachClicked = this.onAttachClicked.bind(this);
+    const $$REF = this.contextMenuRefs[handle];
+
+    if ($$REF && $$REF.isMounted()) {
+      const refNodePosition = $$REF.domNode && $$REF.domNode.getBoundingClientRect().x;
+      this.setState({
+        contextMenuPosition: ev.clientX > refNodePosition ? null : ev.clientX
+      }, () => $$REF.onClick(ev));
+    }
   }
 
   componentDidMount() {

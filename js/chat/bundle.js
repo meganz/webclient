@@ -23593,7 +23593,9 @@ class Call extends mixins.wl {
       delete this.callStartTimeout;
     }, 300000);
     setTimeout(() => {
-      if (this.props.call.peers.length) {
+      const peers = this.props.call.peers;
+
+      if (peers && peers.length) {
         this.setState({
           everHadPeers: true
         });

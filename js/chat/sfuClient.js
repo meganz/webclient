@@ -59,6 +59,7 @@ var TermCode;
     TermCode[TermCode["kErrAuth"] = 130] = "kErrAuth";
     TermCode[TermCode["kErrApiTimeout"] = 131] = "kErrApiTimeout";
     TermCode[TermCode["kErrSdp"] = 132] = "kErrSdp";
+    TermCode[TermCode["kErrTooManyClients"] = 133] = "kErrTooManyClients";
     TermCode[TermCode["kErrClientGeneral"] = 190] = "kErrClientGeneral";
     TermCode[TermCode["kErrSfuGeneral"] = 191] = "kErrSfuGeneral";
 })(TermCode || (TermCode = {}));
@@ -786,7 +787,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'c11bbfdc35';
+const COMMIT_ID = '360250a8c2';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1093,9 +1094,20 @@ class SfuClient {
             self.cryptoWorker.postMessage(['dk', msg.from, id, key]);
         });
     }
+    addVersionToUrl(url) {
+        let and;
+        if (url.endsWith("?")) {
+            and = "";
+        }
+        else {
+            let parsed = new URL(url);
+            and = (parsed.search) ? "&" : "?";
+        }
+        return `${url}${and}v=${SfuClient.kProtocolVersion}`;
+    }
     async connect(url, callId, config) {
         if (url) { // for reconnect, we don't pass any parameters to connect()
-            this.url = url;
+            this.url = this.addVersionToUrl(url);
             client_assert(callId);
             client_assert(config);
             this.callId = callId;
@@ -1104,13 +1116,17 @@ class SfuClient {
             this._forcedDisconnect = false;
         }
         else {
-            // this is reconnect - cancel it if user explicitly requested disconnect
+            // this is reconnect
             client_assert(!this._forcedDisconnect);
+            url = this.url;
+            if (!isNaN(this.cid)) {
+                url += "&cid=" + this.cid;
+            }
         }
         this.reinit();
         this._setConnState(ConnState.kConnecting);
         this._fire("onConnecting");
-        const ws = this.conn = new WebSocket(this.url, "svc");
+        const ws = this.conn = new WebSocket(url, "svc");
         ws.onopen = this.onConnect.bind(this);
         ws.onmessage = this.onPacket.bind(this);
         ws.onclose = this.onWsClose.bind(this);
@@ -2464,6 +2480,7 @@ class SfuClient {
         ];
     }
 }
+SfuClient.kProtocolVersion = 0;
 SfuClient.debugSdp = localStorage.debugSdp ? 1 : 0;
 SfuClient.kMaxActiveSpeakers = 20;
 SfuClient.kMaxInputVideoTracks = 20;

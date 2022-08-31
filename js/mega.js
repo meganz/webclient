@@ -127,6 +127,9 @@ if (typeof loadingDialog === 'undefined') {
             $spinner.removeClass('hidden').addClass('active');
             this.active = true;
 
+            // Even there is current on going loading pregress bar, if loading dialog is called show spinner
+            $('.main-loader', $spinner).removeClass('hidden');
+
             // Prevent scrolling for mobile web
             if (is_mobile && $overlay.length && $spinner.length) {
                 document.getElementById('loading-overlay').addEventListener('touchmove', function(e){
@@ -191,6 +194,11 @@ if (typeof loadingDialog === 'undefined') {
         }
 
         const $spinner = $('.loading-spinner:not(.manual-management)').removeClass('hidden');
+
+        // If there is no current loadingDialog, make spinner disapears
+        if (!loadingDialog.active) {
+            $('.main-loader', $spinner).addClass('hidden');
+        }
 
         $('.loader-progressbar', $spinner).addClass('active');
 

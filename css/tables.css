@@ -473,6 +473,7 @@
 .sticky-header-table-container .data-table th {
     background: var(--surface-main);
     position: sticky;   /* Shouldn't be changed as sticky isn't working on thead and tr on Chrome! */
+    position: -webkit-sticky;
     top: 0;
     z-index: 1119;
 }

@@ -2103,7 +2103,7 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
 
             $item.addClass(colourClass);
             $('a', $item).addClass(colourClass);
-            $treeElements.safeAppend(color.replace('%1', M.getLabelClassFromId(labelId)))
+            $('.nw-fm-tree-iconwrap', $treeElements).safePrepend(color.replace('%1', M.getLabelClassFromId(labelId)))
                 .addClass('labeled');
             if (M.megaRender) {
                 $('.label', $item).text(M.megaRender.labelsColors[lblColor]);
@@ -3085,7 +3085,9 @@ MegaData.prototype.getNodeRights = function(id) {
  */
 MegaData.prototype.getNodeRoot = function(id) {
     "use strict";
-
+    if (id === 'recents') {
+        return id;
+    }
     if (id) {
         id = id.replace('chat/', '');
     }

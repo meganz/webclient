@@ -393,7 +393,7 @@ class ConversationsApp extends MegaRenderMixin {
     };
 
     state = {
-        leftPaneWidth: mega.config.get('leftPaneWidth'),
+        leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
         startGroupChatDialog: false,
         startMeetingDialog: false,
         view: this.VIEWS.LOADING
@@ -401,7 +401,6 @@ class ConversationsApp extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
-        this.handleWindowResize = this.handleWindowResize.bind(this);
         this._cacheRouting();
         megaChat.rebind('onStartNewMeeting.convApp', () => this.startMeeting());
     }
@@ -438,7 +437,6 @@ class ConversationsApp extends MegaRenderMixin {
         super.componentDidMount();
         var self = this;
 
-        window.addEventListener('resize', this.handleWindowResize);
         $(document).rebind('keydown.megaChatTextAreaFocus', function(e) {
             // prevent recursion!
             if (!M.chat || e.megaChatHandled) {
@@ -522,34 +520,26 @@ class ConversationsApp extends MegaRenderMixin {
 
         var lPaneResizableInit = function() {
             megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-            $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, $.leftPaneResizable.options);
 
-            if (fmconfig.leftPaneWidth) {
-                megaChat.$leftPane.width(Math.min(
-                    $.leftPaneResizableChat.options.maxWidth,
-                    Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)
-                ));
-            }
-
-            $($.leftPaneResizableChat).on('resize', function() {
-                var w = megaChat.$leftPane.width();
-                if (w >= $.leftPaneResizableChat.options.maxWidth) {
-                    $('.left-pane-drag-handle').css('cursor', 'w-resize')
-                } else if (w <= $.leftPaneResizableChat.options.minWidth) {
-                    $('.left-pane-drag-handle').css('cursor', 'e-resize')
-                } else {
-                    $('.left-pane-drag-handle').css('cursor', 'we-resize')
+            $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, {
+                ...$.leftPaneResizable.options,
+                maxWidth: 400,
+                pagechange: () => function() {
+                    this.setWidth();
                 }
             });
 
-            $($.leftPaneResizableChat).on('resizestop', function() {
-                $('.fm-left-panel').width(
-                    megaChat.$leftPane.width()
-                );
-
-                setTimeout(function() {
-                    $('.hiden-when-dragging').removeClass('hiden-when-dragging');
-                }, 100);
+            $($.leftPaneResizableChat).rebind('resize.clp', () => {
+                var w = megaChat.$leftPane.width();
+                if (w >= $.leftPaneResizableChat.options.maxWidth) {
+                    $('.left-pane-drag-handle').css('cursor', 'w-resize');
+                }
+                else if (w <= $.leftPaneResizableChat.options.minWidth) {
+                    $('.left-pane-drag-handle').css('cursor', 'e-resize');
+                }
+                else {
+                    $('.left-pane-drag-handle').css('cursor', 'we-resize');
+                }
             });
         };
 
@@ -570,19 +560,16 @@ class ConversationsApp extends MegaRenderMixin {
         else {
             megaChat.$leftPane.removeClass('hidden');
         }
-        this.handleWindowResize();
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        window.removeEventListener('resize', this.handleWindowResize);
         $(document).off('keydown.megaChatTextAreaFocus');
         mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
         delete this.props.megaChat.$conversationsAppInstance;
     }
 
     componentDidUpdate() {
-        this.handleWindowResize();
         if (megaChat.routingSection === "archived") {
             this.initArchivedChatsScrolling();
         }
@@ -613,34 +600,6 @@ class ConversationsApp extends MegaRenderMixin {
             }
             mega.ui.onboarding.sections.chat.startNextOpenSteps(nextIdx);
             this.$obDialog = $('#obDialog');
-        }
-    }
-
-    @utils.SoonFcWrap(80)
-    handleWindowResize() {
-        if (!M.chat) {
-            return;
-        }
-        // small piece of what is done in fm_resize_handler...
-        if (is_chatlink && !is_eplusplus) {
-            $('.fm-right-files-block, .fm-right-account-block')
-                .filter(':visible')
-                .css({
-                    'margin-left': "0px"
-                });
-        }
-        else {
-            if (megaChat.$leftPane && megaChat.$leftPane.hasClass('resizable-pane-active')) {
-                return;
-            }
-            const lhpWidth = this.state.leftPaneWidth || $('.fm-left-panel').width();
-            const newMargin = `${lhpWidth + $('.nw-fm-left-icons-panel').width()}px`;
-            $('.fm-right-files-block, .fm-right-account-block')
-                .filter(':visible')
-                .css({
-                    'margin-inline-start': newMargin,
-                    '-webkit-margin-start:': newMargin
-                });
         }
     }
 

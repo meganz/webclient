@@ -70,7 +70,6 @@
 .active-folder-link .nw-fm-tree-item .nw-fm-tree-folder {
     -webkit-margin-start: 28px;
     margin-inline-start: 28px;
-    max-width: calc(100% - 30px);
 }
 /**
  * hide sections of the site if the current visited link is a folder share link

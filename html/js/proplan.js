@@ -150,13 +150,21 @@ pro.proplan = {
         // Initialise click handler for all the plan blocks
         $purchaseButtons.rebind('click', function() {
 
-            var $selectedPlan = $(this).closest('.plan');
+            const $selectedPlan = $(this).closest('.plan');
 
             $('.plan', $planBlocks).removeClass('selected');
             $selectedPlan.addClass('selected');
 
+            const planType = $selectedPlan.data('payment');
+
+            if (typeof planType === 'number' && planType > 0 && planType <= 4) {
+                // events log range from 99780 --> 99783
+                // Pro1, Pro2, Pro3, Lite
+                delay('pricing.plan', eventlog.bind(null, 99779 + planType));
+            }
+
             // Continue to Step 2
-            pro.proplan.continueToStepTwo($(this).closest('.plan'));
+            pro.proplan.continueToStepTwo($selectedPlan);
         });
     },
 
@@ -586,11 +594,21 @@ pro.proplan = {
 
         'use strict';
 
-        var $stepOne = $('.pricing-section', 'body');
-        var $getFreeButton = $('.free-button', $stepOne);
+        const $stepOne = $('.pricing-section', 'body');
+        const $getFreeButton = $('.free-button', $stepOne);
+        const $getStartedNow = $('#get-started-btn', $stepOne);
+
+        onIdle(() => {
+            // ugh, a race with clickURL
+            $getStartedNow.rebind('click.log', () => {
+                eventlog(99785);
+            });
+        });
 
         // Init button click
-        $getFreeButton.rebind('click', function() {
+        $getFreeButton.rebind('click', () => {
+
+            delay('pricing.plan', eventlog.bind(null, 99784));
 
             if (typeof u_attr === 'undefined') {
                 loadSubPage('register');
@@ -602,7 +620,7 @@ pro.proplan = {
             loadSubPage('fm');
 
             if (localStorage.gotOverquotaWithAchievements) {
-                onIdle(function() {
+                onIdle(() => {
                     mega.achievem.achievementsListDialog();
                 });
                 delete localStorage.gotOverquotaWithAchievements;
@@ -1080,6 +1098,19 @@ pro.proplan = {
         const $stepOne = $('.pricing-section', '.fmholder');
         let $businessCard = $('.js-business-card', $stepOne);
         const pricePerUser = this.businessPlanData.bd && this.businessPlanData.bd.us && this.businessPlanData.bd.us.p;
+
+        const $createBusinessBtn = $('#create-business-btn', $stepOne);
+        const $tryBusinessBtn = $('#try-business-btn', $stepOne);
+
+        onIdle(() => {
+            // ugh, a race with clickURL
+            $createBusinessBtn.rebind('click.log', () => {
+                eventlog(99786);
+            });
+            $tryBusinessBtn.rebind('click.log', () => {
+                eventlog(99787);
+            });
+        });
 
         // If new API values exist, populate new business card values
         if (this.businessPlanData.isValidBillingData) {

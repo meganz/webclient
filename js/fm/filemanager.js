@@ -4125,10 +4125,12 @@ FileManager.prototype.onSectionUIOpen = function(id) {
                     const c = $(this).attr('class');
 
                     if (c.indexOf('fm-import-to-cloudrive') > -1) {
+                        eventlog(99763);
                         // Import the current folder, could be the root or sub folder
                         M.importFolderLinkNodes([M.currentdirid]);
                     }
                     else if (c.indexOf('fm-download-as-zip') > -1) {
+                        eventlog(99764);
                         // Download the current folder, could be the root or sub folder
                         M.addDownload([M.currentdirid], true);
                     }

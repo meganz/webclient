@@ -253,7 +253,7 @@
     .shared-details-icon,
     .contact-share-notification::before {
         background-image: url(../images/mega/files-icons@2x.png);
-        background-size: 399px 7458px;
+        background-size: 399px 7652px;
     }
     .download.big-icon, .fm-dialog-close.big, .megasync-img::before, button.megasync-slider::after {
         background-image: url(../images/mega/download-dialog@2x.png);

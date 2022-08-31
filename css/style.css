@@ -3309,11 +3309,6 @@ body.loading .light-overlay {
 .medium-file-icon.rubbish-folder {
     background-position: -216px -4679px;
 }
-.fm-blocks-view.shared-view .medium-file-icon.folder,
-.shared-blocks-view .medium-file-icon.folder,
-.medium-file-icon.folder.inbound-share {
-    background-position: -216px -4799px;
-}
 .medium-file-icon.folder-sync {
     background-position: -216px -5879px;
 }
@@ -3349,6 +3344,11 @@ body.loading .light-overlay {
 }
 .medium-file-icon.rubbish-folder-shared {
     background-position: -216px -5159px;
+}
+.fm-blocks-view.shared-view .medium-file-icon.folder,
+.shared-blocks-view .medium-file-icon.folder,
+.medium-file-icon.inbound-share {
+    background-position: -216px -4799px;
 }
 
 .medium-file-icon.backup {

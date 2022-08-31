@@ -549,7 +549,8 @@ export default class Call extends MegaRenderMixin {
             delete this.callStartTimeout;
         }, 300 * 1000);
         setTimeout(() => {
-            if (this.props.call.peers.length) {
+            const peers = this.props.call.peers;
+            if (peers && peers.length) {
                 this.setState({everHadPeers: true});
             }
         }, 2000);

@@ -3656,12 +3656,18 @@ accountUI.contactAndChat = {
 
     status: {
 
+        AWAY_REFS: {
+            hours: 'autoaway-hours',
+            minutes: 'autoaway-minutes'
+        },
+
         render: function(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen) {
 
             'use strict';
 
             // Chat
             var $sectionContainerChat = $('.fm-account-contact-chats', accountUI.$contentBlock);
+
             // Status appearance radio buttons
             accountUI.inputs.radio.init(
                 '.chatstatus',
@@ -3695,24 +3701,29 @@ accountUI.contactAndChat = {
 
                 // Prevent changes to autoaway if autoawaylock is set
                 if (autoawaylock === true) {
-                    $('#auto-away-switch', $sectionContainerChat).addClass('diabled')
+                    $('#auto-away-switch', $sectionContainerChat).addClass('disabled')
                         .parent().addClass('hidden');
                 }
                 else {
-                    $('#auto-away-switch', $sectionContainerChat).removeClass('diabled')
+                    $('#auto-away-switch', $sectionContainerChat).removeClass('disabled')
                         .parent().removeClass('hidden');
                 }
 
                 // Auto-away input box
-                var autoAwayString = mega.icu.format(l[20206], autoawaytimeout / 60);
-                var autoAwayArray = autoAwayString.split(/\[A]|\[\/A]/);
+                const [hours, minutes] = [Math.floor(autoawaytimeout / 3600), autoawaytimeout % 3600 / 60];
+                const strArray = l.set_autoaway.split('[X]');
 
-                $('#autoaway_txt_1', $sectionContainerChat).text(autoAwayArray[0]);
-                $('input#autoaway', $sectionContainerChat).val(autoAwayArray[1]);
-                $('#autoaway_txt_2', $sectionContainerChat).text(autoAwayArray[2]);
+                $('#autoaway_txt_1', $sectionContainerChat).text(strArray[0]); // `Set status to Away after`
+                $(`input#${this.AWAY_REFS.hours}`, $sectionContainerChat).val(hours || '');
+                $('#autoaway_txt_2', $sectionContainerChat).text(mega.icu.format(l.plural_hour, hours));
+                $(`input#${this.AWAY_REFS.minutes}`, $sectionContainerChat).val(minutes || '');
+                $('#autoaway_txt_3', $sectionContainerChat).text(mega.icu.format(l.plural_minute, minutes));
+                $('#autoaway_txt_4', $sectionContainerChat).text(strArray[1]); // `of inactivity.`
 
                 // Always editable for user comfort -
-                accountUI.controls.enableElement($('input#autoaway', $sectionContainerChat));
+                accountUI.controls.enableElement(
+                    $(`input#${this.AWAY_REFS.hours}, input#${this.AWAY_REFS.minutes}`, $sectionContainerChat)
+                );
 
                 // Persist switch
                 accountUI.inputs.switch.init(
@@ -3726,48 +3737,41 @@ accountUI.contactAndChat = {
 
                 // Prevent changes to autoaway if autoawaylock is set
                 if (persistlock === true) {
-                    $('#persist-presence-switch', $sectionContainerChat).addClass('diabled')
+                    $('#persist-presence-switch', $sectionContainerChat).addClass('disabled')
                         .parent().addClass('hidden');
                 }
                 else {
-                    $('#persist-presence-switch', $sectionContainerChat).removeClass('diabled')
+                    $('#persist-presence-switch', $sectionContainerChat).removeClass('disabled')
                         .parent().removeClass('hidden');
                 }
             }
         },
 
         bindEvents: function(presenceInt, autoawaytimeout) {
-
             'use strict';
-
             if (autoawaytimeout !== false) {
-                var $sectionContainerChat = $('.fm-account-contact-chats', accountUI.$contentBlock);
-                var lastValidNumber = Math.floor(autoawaytimeout / 60);
+                const { AWAY_REFS } = this;
+                $(`input#${Object.values(AWAY_REFS).join(', input#')}`).rebind('change.dashboard', () =>
+                    presenceInt.userPresence.ui_setautoaway(
+                        true,
+                        Object.values(AWAY_REFS)
+                            .map(ref => {
+                                const el = document.getElementById(ref);
+                                let [value, max] = (({ value, max }) => [Math.max(0, value | 0), max | 0])(el);
 
-                // when value is changed, set checkmark
-                $('input#autoaway', $sectionContainerChat).rebind('change.dashboard', function() {
+                                if (value > max) {
+                                    el.value = value = max;
+                                }
 
-                    var val = parseInt($(this).val());
-
-                    if (val > 3505) {
-                        val = 3505;
-                    }
-                    else if (val < 0) {
-                        val = 5;
-                    }
-
-                    if (val > 0) {
-                        presenceInt.userPresence.ui_setautoaway(true, val * 60);
-                        lastValidNumber = val;
-                    }
-                }).rebind('blur.dashboard', function() {
-
-                    // the goal of the following line is to reset the value of the field if the entered data is invalid
-                    // after the user removes focus from it (and set the internally set value)
-                    $(this).val(presenceInt.userPresence.autoawaytimeout / 60);
-                }).val(lastValidNumber);
+                                // hours || minutes -> seconds
+                                return el.id === AWAY_REFS.hours ? value * 3600 : value * 60;
+                            })
+                            // hours + minutes -> seconds || default to 300 seconds as min
+                            .reduce((a, b) => a + b) || 300
+                    )
+                );
             }
-        }
+        },
     },
 
     chatList: {

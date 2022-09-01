@@ -36,7 +36,7 @@ body * {
     -webkit-touch-callout: none;
     user-select: none;
 }
-body *:not(input) {
+body *:not(input):not(textarea) {
     -webkit-user-select: none;
 }
 .wait-cursor, .loading-cursor, .progress-cursor {

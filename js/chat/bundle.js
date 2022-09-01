@@ -4004,7 +4004,10 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
   };
 
   var fail = function (ex) {
-    console.error(ex);
+    if (d) {
+      _.logger.error(ex);
+    }
+
     done();
   };
 
@@ -4071,7 +4074,34 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
           return fail(res);
         }
 
-        attach([].concat(rem, res)).then(done).catch(fail);
+        const [h] = res;
+        res = [...rem, ...res];
+
+        if (!res.length) {
+          return fail('Nothing to attach...?!');
+        }
+
+        for (let i = res.length; i--;) {
+          const n = M.getNodeByHandle(res[i]);
+
+          if (n.fv) {
+            if (d) {
+              _.logger.info('Skipping file-version %s', n.h, n);
+            }
+
+            res.splice(i, 1);
+          }
+        }
+
+        if (h && !res.length) {
+          if (d) {
+            _.logger.info('Adding nothing but a file-version?..', h);
+          }
+
+          res = [h];
+        }
+
+        attach(res).then(done).catch(fail);
       };
 
       if (copy.length) {
@@ -8280,7 +8310,7 @@ class ColumnContactButtons extends genericNodePropsComponent.L {
   }
 
 }
-ColumnContactButtons.sortable = true;
+ColumnContactButtons.sortable = false;
 ColumnContactButtons.id = "grid-url-header-nw";
 ColumnContactButtons.label = "";
 ColumnContactButtons.megatype = "grid-url-header-nw";
@@ -8344,15 +8374,14 @@ class ContactList extends mixins.wl {
         return null;
       }
 
-      this.setState({
-        contextMenuPosition: ev.clientX
-      }, () => {
-        let ref = this.contextMenuRefs[handle];
+      const $$REF = this.contextMenuRefs[handle];
 
-        if (ref && ref.isMounted()) {
-          this.contextMenuRefs[handle].onClick(ev);
-        }
-      });
+      if ($$REF && $$REF.isMounted()) {
+        const refNodePosition = $$REF.domNode && $$REF.domNode.getBoundingClientRect().x;
+        this.setState({
+          contextMenuPosition: ev.clientX > refNodePosition ? null : ev.clientX
+        }, () => $$REF.onClick(ev));
+      }
     };
 
     this.onSelected = this.onSelected.bind(this);
@@ -9387,8 +9416,6 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
 var esm_extends = __webpack_require__(462);
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(229);
 // EXTERNAL MODULE: external "React"
 var external_React_ = __webpack_require__(363);
 var external_React_default = __webpack_require__.n(external_React_);
@@ -9398,6 +9425,8 @@ var utils = __webpack_require__(79);
 var mixins = __webpack_require__(503);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 var buttons = __webpack_require__(204);
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
+var applyDecoratedDescriptor = __webpack_require__(229);
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx
 var modalDialogs = __webpack_require__(904);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/viewModeSelector.jsx
@@ -9454,7 +9483,7 @@ class Breadcrumbs extends mixins.wl {
         return 'recycle-item';
 
       case M.InboxID:
-        return 'inbox-item';
+        return 'restricted-item';
 
       case 'shares':
         return 'contacts-item';
@@ -9473,7 +9502,7 @@ class Breadcrumbs extends mixins.wl {
         return l[167];
 
       case M.InboxID:
-        return l[166];
+        return l.restricted_folder_button;
 
       case 'shares':
         return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : l[5589];
@@ -9492,6 +9521,10 @@ class Breadcrumbs extends mixins.wl {
       if (item.type === 'cloud-drive') {
         icon = external_React_default().createElement("i", {
           className: "sprite-fm-mono icon-cloud icon24"
+        });
+      } else if (item.type === 'restricted-item') {
+        icon = external_React_default().createElement("i", {
+          className: "sprite-fm-mono icon-restricted-folder-filled icon24"
         });
       } else if (item.type === 'folder') {
         icon = external_React_default().createElement("i", {
@@ -14645,6 +14678,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
           callMinimized: false
         }, () => {
           $.hideTopMenu();
+          closeDialog == null ? void 0 : closeDialog();
           loadSubPage('fm/chat');
           room.show();
           this.toggleExpandedFlag();
@@ -17082,10 +17116,6 @@ LeftPanel.NAMESPACE = 'lhp';
 
 
 
-var conversations_dec, conversations_class;
-
-
-
 
 
 
@@ -17444,7 +17474,8 @@ class ArchivedConversationsList extends mixins.wl {
   }
 
 }
-let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (conversations_class = class ConversationsApp extends mixins.wl {
+
+class ConversationsApp extends mixins.wl {
   constructor(props) {
     super(props);
     this.requestReceivedListener = null;
@@ -17454,12 +17485,11 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
       LOADING: 0x02
     };
     this.state = {
-      leftPaneWidth: mega.config.get('leftPaneWidth'),
+      leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
       startGroupChatDialog: false,
       startMeetingDialog: false,
       view: this.VIEWS.LOADING
     };
-    this.handleWindowResize = this.handleWindowResize.bind(this);
 
     this._cacheRouting();
 
@@ -17493,7 +17523,6 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
   componentDidMount() {
     super.componentDidMount();
     var self = this;
-    window.addEventListener('resize', this.handleWindowResize);
     $(document).rebind('keydown.megaChatTextAreaFocus', function (e) {
       if (!M.chat || e.megaChatHandled) {
         return;
@@ -17552,13 +17581,13 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
 
     var lPaneResizableInit = function () {
       megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-      $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, $.leftPaneResizable.options);
-
-      if (fmconfig.leftPaneWidth) {
-        megaChat.$leftPane.width(Math.min($.leftPaneResizableChat.options.maxWidth, Math.max($.leftPaneResizableChat.options.minWidth, fmconfig.leftPaneWidth)));
-      }
-
-      $($.leftPaneResizableChat).on('resize', function () {
+      $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, { ...$.leftPaneResizable.options,
+        maxWidth: 400,
+        pagechange: () => function () {
+          this.setWidth();
+        }
+      });
+      $($.leftPaneResizableChat).rebind('resize.clp', () => {
         var w = megaChat.$leftPane.width();
 
         if (w >= $.leftPaneResizableChat.options.maxWidth) {
@@ -17568,12 +17597,6 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
         } else {
           $('.left-pane-drag-handle').css('cursor', 'we-resize');
         }
-      });
-      $($.leftPaneResizableChat).on('resizestop', function () {
-        $('.fm-left-panel').width(megaChat.$leftPane.width());
-        setTimeout(function () {
-          $('.hiden-when-dragging').removeClass('hiden-when-dragging');
-        }, 100);
       });
     };
 
@@ -17592,21 +17615,16 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
     } else {
       megaChat.$leftPane.removeClass('hidden');
     }
-
-    this.handleWindowResize();
   }
 
   componentWillUnmount() {
     super.componentWillUnmount();
-    window.removeEventListener('resize', this.handleWindowResize);
     $(document).off('keydown.megaChatTextAreaFocus');
     mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
     delete this.props.megaChat.$conversationsAppInstance;
   }
 
   componentDidUpdate() {
-    this.handleWindowResize();
-
     if (megaChat.routingSection === "archived") {
       this.initArchivedChatsScrolling();
     }
@@ -17628,29 +17646,6 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
 
       mega.ui.onboarding.sections.chat.startNextOpenSteps(nextIdx);
       this.$obDialog = $('#obDialog');
-    }
-  }
-
-  handleWindowResize() {
-    if (!M.chat) {
-      return;
-    }
-
-    if (is_chatlink && !is_eplusplus) {
-      $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
-        'margin-left': "0px"
-      });
-    } else {
-      if (megaChat.$leftPane && megaChat.$leftPane.hasClass('resizable-pane-active')) {
-        return;
-      }
-
-      const lhpWidth = this.state.leftPaneWidth || $('.fm-left-panel').width();
-      const newMargin = `${lhpWidth + $('.nw-fm-left-icons-panel').width()}px`;
-      $('.fm-right-files-block, .fm-right-account-block').filter(':visible').css({
-        'margin-inline-start': newMargin,
-        '-webkit-margin-start:': newMargin
-      });
     }
   }
 
@@ -17828,7 +17823,7 @@ let ConversationsApp = (conversations_dec = utils["default"].SoonFcWrap(80), (co
     }), rightPane);
   }
 
-}, ((0,applyDecoratedDescriptor.Z)(conversations_class.prototype, "handleWindowResize", [conversations_dec], Object.getOwnPropertyDescriptor(conversations_class.prototype, "handleWindowResize"), conversations_class.prototype)), conversations_class));
+}
 
 if (false) {}
 
@@ -21437,7 +21432,8 @@ class Stream extends mixins.wl {
       const localEl = (_this$containerRef2 = this.containerRef) == null ? void 0 : _this$containerRef2.current;
 
       if (localEl.offsetLeft + localEl.offsetWidth > wrapperEl.offsetWidth) {
-        localEl.style.left = 'auto';
+        localEl.style.left = 'unset';
+        localEl.style.removeProperty("right");
       }
     };
 
@@ -21868,9 +21864,10 @@ class ParticipantsNotice extends mixins.wl {
   specShouldComponentUpdate(newProps) {
     const {
       stayOnEnd,
-      hasLeft
+      hasLeft,
+      isOnHold
     } = this.props;
-    return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft;
+    return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft || newProps.isOnHold !== isOnHold;
   }
 
   render() {
@@ -21878,7 +21875,8 @@ class ParticipantsNotice extends mixins.wl {
       sfuApp,
       call,
       hasLeft,
-      streamContainer
+      streamContainer,
+      isOnHold
     } = this.props;
 
     if (sfuApp.isDestroyed) {
@@ -21887,6 +21885,7 @@ class ParticipantsNotice extends mixins.wl {
 
     return external_React_default().createElement((external_React_default()).Fragment, null, call.isSharingScreen() ? null : external_React_default().createElement(StreamNode, {
       className: "local-stream-mirrored",
+      isCallOnHold: isOnHold,
       stream: call.getLocalStream()
     }), streamContainer(hasLeft ? this.renderUserAlone() : this.renderUserWaiting()));
   }
@@ -22215,6 +22214,7 @@ class stream_Stream extends mixins.wl {
         streams,
         stayOnEnd,
         everHadPeers,
+        isOnHold,
         onInviteToggle,
         onStayConfirm,
         onCallEnd
@@ -22238,6 +22238,7 @@ class stream_Stream extends mixins.wl {
           streamContainer: streamContainer,
           link: this.state.link,
           stayOnEnd: stayOnEnd,
+          isOnHold: isOnHold,
           onInviteToggle: onInviteToggle,
           onStayConfirm: onStayConfirm,
           onCallEnd: () => onCallEnd(1)
@@ -23588,7 +23589,9 @@ class Call extends mixins.wl {
       delete this.callStartTimeout;
     }, 300000);
     setTimeout(() => {
-      if (this.props.call.peers.length) {
+      const peers = this.props.call.peers;
+
+      if (peers && peers.length) {
         this.setState({
           everHadPeers: true
         });

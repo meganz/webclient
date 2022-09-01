@@ -2,9 +2,36 @@
 /* eslint-disable max-len, indent */
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/************************************************************************/
 var __webpack_exports__ = {};
 
-// UNUSED EXPORTS: SfuClient
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "S": () => (/* binding */ ConnState)
+});
+
+// UNUSED EXPORTS: CallJoinPermission, ScreenShareType, SfuClient, SpeakerState
 
 ;// CONCATENATED MODULE: ../shared/termCodes.ts
 var TermCode;
@@ -32,6 +59,7 @@ var TermCode;
     TermCode[TermCode["kErrAuth"] = 130] = "kErrAuth";
     TermCode[TermCode["kErrApiTimeout"] = 131] = "kErrApiTimeout";
     TermCode[TermCode["kErrSdp"] = 132] = "kErrSdp";
+    TermCode[TermCode["kErrTooManyClients"] = 133] = "kErrTooManyClients";
     TermCode[TermCode["kErrClientGeneral"] = 190] = "kErrClientGeneral";
     TermCode[TermCode["kErrSfuGeneral"] = 191] = "kErrSfuGeneral";
 })(TermCode || (TermCode = {}));
@@ -359,8 +387,407 @@ function compressedSdpToString(sdp) {
     return summary;
 }
 
+;// CONCATENATED MODULE: ./adaptation.ts
+
+
+class SvcDriver {
+    constructor(client) {
+        this.currRxQuality = 4; // start at half resolution, full fps
+        this.currTxQuality = 2;
+        // rtt window
+        this.lowestRttSeen = 10000; // force recalculation on first stat sample
+        this.rxqSwitchSeqNo = 0;
+        this.rxqUpSwitchHistory = new Array(SvcDriver.kMaxRxQualityIndex + 1);
+        this.hasBadNetwork = false;
+        this.client = client;
+    }
+    async onStats() {
+        const stats = this.client.rtcStats;
+        let { pl: plost, rtt } = stats;
+        if (isNaN(rtt)) {
+            return;
+        }
+        if (isNaN(plost)) {
+            plost = stats.pl = 0;
+        }
+        const plostCapped = (plost > SvcDriver.kPlostCap) ? SvcDriver.kPlostCap : plost;
+        if (isNaN(this.maRtt)) {
+            this.maRtt = rtt;
+            this.smaPlost = plostCapped;
+            this.fmaPlost = plost;
+            return; // intentionally skip first sample for lower/upper range calculation
+        }
+        rtt = this.maRtt = (this.maRtt * 2 + rtt) / 3;
+        if (rtt < this.lowestRttSeen) {
+            this.setRttWindow(rtt);
+        }
+        this.smaPlost = (this.smaPlost * 29 + plostCapped) / 30;
+        this.setPlostWindow(this.smaPlost);
+        plost = this.fmaPlost = (this.fmaPlost * 2 + plost) / 3;
+        /*
+        console.log("rtt:", rtt.toFixed(1), "rttLower:", this.rttLower.toFixed(1), "rttUpper:", this.rttUpper.toFixed(1),
+            "plost:", plost.toFixed(1), "fmaPlost:", this.fmaPlost.toFixed(1),
+            "plostLower", this.plostLower.toFixed(1), "plostUpper:", this.plostUpper.toFixed(1));
+        */
+        const tsNow = Date.now();
+        if (!this.tsNoSwitchUntil) {
+            this.tsNoSwitchUntil = tsNow;
+            return;
+        }
+        let maTxKbps;
+        const adaptScrnTx = stats._vtxIsHiRes && this.client.isSendingScreenHiRes();
+        if (adaptScrnTx) { // calculate tx average kbps
+            const txBwidth = (stats.txBwe > 0) ? stats.txBwe : stats._vtxkbps;
+            if (this.maTxKbps == null) {
+                maTxKbps = this.maTxKbps = txBwidth;
+            }
+            else {
+                maTxKbps = this.maTxKbps = (this.maTxKbps * 5 + txBwidth) / 6;
+            }
+            // console.log("scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
+        }
+        if (tsNow < this.tsNoSwitchUntil) {
+            return; // too early
+        }
+        if (plost > this.plostUpper) {
+            if (window.d) {
+                console.warn("Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
+            }
+            this.decRxQuality(plost > SvcDriver.kPlostCritical);
+        }
+        else if (rtt > this.rttUpper) { // rtt or packet loss increased above thresholds
+            this.decRxQualityDueToRtt(stats);
+        }
+        else if (rtt < this.rttLower && plost < this.plostLower) {
+            this.incRxQuality();
+        }
+        const txQs = SvcDriver.TxQuality;
+        if (adaptScrnTx) {
+            const currTxQ = SvcDriver.TxQuality[this.currTxQuality];
+            if (maTxKbps < currTxQ.minKbps) {
+                let q = this.currTxQuality;
+                while (maTxKbps < txQs[q].minKbps) {
+                    q--;
+                    if (q < 0) {
+                        q = 0;
+                        break;
+                    }
+                }
+                const delta = q - this.currTxQuality;
+                if (delta < 0) {
+                    this.switchTxQuality(delta, "scr");
+                }
+            }
+            else if (stats.vtxdly > 2500) {
+                if (window.d) {
+                    console.warn(`scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
+                }
+                this.switchTxQuality(-1, "scr");
+            }
+            else if (stats.vtxdly > 0 && stats.vtxdly < 1400) {
+                let q = this.currTxQuality;
+                while (maTxKbps > txQs[q].maxKbps) {
+                    q++;
+                    if (q >= txQs.length) {
+                        q--;
+                        break;
+                    }
+                }
+                const delta = q - this.currTxQuality;
+                if (delta > 0) {
+                    this.switchTxQuality(delta, "scr");
+                }
+            }
+        }
+        // handle "bad network" notification
+        let txBad = !isNaN(stats.vtxdly) && (stats.vtxdly > 1500);
+        if (adaptScrnTx) {
+            txBad = txBad || this.currTxQuality < 1;
+        }
+        else if (stats._vtxIsHiRes && stats.vtxh) {
+            this.maVideoTxHeight = !isNaN(this.maVideoTxHeight) ? (this.maVideoTxHeight * 3 + stats.vtxh) / 4 : stats.vtxh;
+            txBad = txBad || (this.maVideoTxHeight < 200);
+        }
+        const rxBad = rtt > 1500 || plost > 20;
+        if (txBad || rxBad) {
+            if (!this.hasBadNetwork) {
+                this.hasBadNetwork = true;
+                this.client._fire("onBadNetwork", true);
+            }
+        }
+        else if (this.hasBadNetwork) {
+            this.hasBadNetwork = false;
+            this.client._fire("onBadNetwork", false);
+        }
+    }
+    setRttWindow(rtt) {
+        this.lowestRttSeen = rtt;
+        this.rttLower = rtt + SvcDriver.kRttLowerHeadroom;
+        this.rttUpper = rtt + SvcDriver.kRttUpperHeadroom;
+        if (window.d) {
+            console.warn("Rtt floor set to", rtt.toFixed(2));
+        }
+    }
+    setPlostWindow(plost) {
+        this.plostLower = plost + SvcDriver.kPlostLowerHeadroom;
+        this.plostUpper = plost + SvcDriver.kPlostUpperHeadroom;
+    }
+    decRxQuality(critical) {
+        if (this.currRxQuality <= 0) {
+            return false;
+        }
+        const newQ = this.currRxQuality - 1;
+        const hist = this.rxqUpSwitchHistory[newQ];
+        const now = Date.now();
+        if (hist) {
+            const timeMatch = now <= hist.tsMonitorTill;
+            if ((hist.hiArea === this.rxTotalArea()) && (critical || timeMatch)) {
+                let span = SvcDriver.kRxUpFailDur;
+                if (hist.upFails) {
+                    if (critical && timeMatch) {
+                        span += SvcDriver.kRxUpFailMaxExtendPeriod; // critical decreases get maximum validity time
+                    }
+                    else {
+                        // extend the validity based on how recent the last fail was and how many total fails occurred
+                        let decay = hist.tsMonitorTill + SvcDriver.kRxUpFailMaxExtendPeriod - now;
+                        if (decay > 0) {
+                            decay = decay * hist.upFails * SvcDriver.kRxUpFailDurDecayMult;
+                            if (decay > SvcDriver.kRxUpFailMaxExtendPeriod) {
+                                decay = SvcDriver.kRxUpFailMaxExtendPeriod;
+                            }
+                        }
+                        span += decay;
+                    }
+                }
+                hist.upFails++;
+                hist.tsValidTill = now + span;
+                if (window.d) {
+                    console.warn(`decRxQuality[${this.currRxQuality} -> ${newQ}]: Marking rx quality switch up attempt as failed: critcal: ${!!critical}, for period: ${span}`);
+                }
+            }
+            else {
+                if (window.d) {
+                    console.warn(`decRxQuality[${this.currRxQuality} -> ${newQ}]: not marking as failed: areaMatch: ${hist.hiArea === this.rxTotalArea()}, timeMatch: ${Date.now() - hist.tsMonitorTill}`);
+                }
+            }
+        }
+        this.setRxQuality(newQ, SvcDriver.kQualityDecreaseSettleTime);
+        return true;
+    }
+    incRxQuality() {
+        delete this.rxRttDowngr;
+        if (this.currRxQuality >= SvcDriver.kMaxRxQualityIndex) {
+            return false;
+        }
+        const now = Date.now();
+        const stats = this.client.rtcStats;
+        let hist = this.rxqUpSwitchHistory[this.currRxQuality];
+        let histMatch;
+        if (hist) {
+            // positive matching is the conservative stragegy - by matching we block the rx quality increase
+            const kbpsMatch = stats.rx <= hist.kbps * 1.5;
+            const rttMatch = this.maRtt > hist.rtt - 50;
+            histMatch = hist.upFails && kbpsMatch && rttMatch && hist.lowArea <= this.rxTotalArea();
+            if (histMatch && (hist.tsValidTill - now) >= 0) {
+                if (window.d) {
+                    console.warn(`incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Not increasing rxQ, have failed recently`);
+                }
+                return;
+            }
+            else {
+                if (window.d) {
+                    console.warn(`incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: not failed(recently): upFails:${hist.upFails}, timeMatch: ${(hist.tsValidTill - now)}, kbpsMatch: ${kbpsMatch} (hist: ${hist.kbps}, curr: ${stats.rx}), rttMatch: ${rttMatch} (hist: ${hist.rtt.toFixed()}, curr: ${this.maRtt.toFixed()}), areaDiff: ${this.rxTotalArea() - hist.lowArea}`);
+                }
+            }
+        }
+        if (histMatch) {
+            hist.tsMonitorTill = now + SvcDriver.kRxUpFailMonitorDur;
+            hist.kbps = stats.rx;
+            hist.rtt = stats.rtt;
+            if (window.d) {
+                console.warn(`incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Same up-fail parameters, preserving fail descriptor`);
+            }
+        }
+        else {
+            hist = this.rxqUpSwitchHistory[this.currRxQuality] = {
+                upFails: 0, tsValidTill: 0,
+                tsMonitorTill: now + SvcDriver.kRxUpFailMonitorDur,
+                kbps: stats.rx, rtt: this.maRtt, lowArea: this.rxTotalArea()
+            };
+            if (window.d) {
+                console.warn(`incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Created new up-fail descriptor`);
+            }
+        }
+        // we can't know the area after quality increasing before the actual quality switch takes place, so we do it
+        // with a delay
+        this.setRxQuality(this.currRxQuality + 1, SvcDriver.kQualityIncreaseSettleTime);
+        setTimeout(() => {
+            if (this.client.connState === ConnState.kCallJoined) {
+                hist.hiArea = this.rxTotalArea();
+            }
+        }, SvcDriver.kQualityIncreaseSettleTime - 1000);
+        return true;
+    }
+    setRxQuality(newQ, deadTime) {
+        const params = SvcDriver.RxQuality[newQ];
+        assert(params);
+        this.tsNoSwitchUntil = Date.now() + deadTime;
+        this.rxqSwitchSeqNo++;
+        if (window.d) {
+            console.warn(`Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: %o`, params);
+        }
+        this.currRxQuality = newQ;
+        this.client.requestSvcLayers(params[0], params[1], params[2]);
+    }
+    decRxQualityDueToRtt(stats) {
+        if (!this.rxRttDowngr) {
+            if (this.currRxQuality > 0) {
+                if (window.d) {
+                    console.warn(`Decreasing rxQ due to HIGH RTT of ${this.maRtt.toFixed()}, saving checkpoint`);
+                }
+                this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
+                this.decRxQuality();
+            }
+            return;
+        }
+        // we have rxRttDowngr, see if the downgrade is affecting rtt
+        const nSteps = this.rxRttDowngr.startQ - this.currRxQuality;
+        if (nSteps > 0) {
+            // we have stepped down at least once:
+            // If rtt did not really decrease, is not too big (to be influenced by our q step down), and there is no extraordinary
+            // packet loss, then assume the high rtt is not due to network congestion
+            if ((this.fmaPlost <= this.plostLower) && (stats.rtt < 1000) && (Math.abs(stats.rtt - this.rxRttDowngr.lastRtt) < 16)) {
+                // rtt did not change
+                if (window.d) {
+                    console.warn(`Decreased rxQ by ${nSteps} steps: rtt didn't change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
+                }
+                this.setRttWindow(this.maRtt);
+                // reset the checkpoint as well - otherwise we may ignore a future rtt decrease
+                // on top of the current increase
+                this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
+                return; // dont decrease quality
+            }
+            else if (this.currRxQuality > 0) {
+                // rtt changed - could be decreasing from the quality downgrade, or still rising
+                // because of network conditions. Either way, we should further downgrade quality
+                if (window.d) {
+                    console.warn(`Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
+                }
+                this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
+            }
+        }
+        this.decRxQuality();
+    }
+    switchTxQuality(delta, mode) {
+        let newQ = this.currTxQuality + delta;
+        if (newQ < 0) {
+            newQ = 0;
+        }
+        else if (newQ > SvcDriver.kMaxTxQualityIndex) {
+            newQ = SvcDriver.kMaxTxQualityIndex;
+        }
+        if (newQ === this.currTxQuality) {
+            return false;
+        }
+        return this.setTxQuality(newQ, mode);
+    }
+    setTxQuality(newQ, mode) {
+        const track = this.client.outVSpeakerTrack.sentTrack;
+        if (!track) {
+            return false;
+        }
+        const info = SvcDriver.TxQuality[newQ];
+        assert(info);
+        this.tsNoSwitchUntil = Date.now() + SvcDriver.kQualityIncreaseSettleTime;
+        const params = info[mode];
+        let ar = this.client.screenAspectRatio;
+        if (!ar) {
+            const res = track.getSettings();
+            if (res.width && res.height) {
+                ar = this.client.screenAspectRatio = res.width / res.height;
+                if (window.d) {
+                    console.warn(`Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
+                }
+            }
+            else {
+                ar = 1.78;
+                if (window.d) {
+                    console.warn("setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
+                }
+            }
+        }
+        params.width = Math.round(params.height * ar);
+        if (window.d) {
+            console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: %o (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`, params);
+        }
+        this.currTxQuality = newQ;
+        track.applyConstraints(params);
+        return true;
+    }
+    rxTotalArea() {
+        let area = 0;
+        for (const peer of this.client.peers.values()) {
+            if ((peer.av & Av.onHold)) {
+                continue;
+            }
+            const player = peer.hiResPlayer;
+            if (player && player.slot) {
+                const props = player.slot.inTrack.getSettings();
+                area += props.width * props.height;
+            }
+        }
+        return area;
+    }
+    initTx() {
+        if (this.client.isSendingScreenHiRes()) {
+            // need small delay to have the track started
+            setTimeout(this.setTxQuality.bind(this, this.currTxQuality, "scr"), 100);
+        }
+    }
+}
+SvcDriver.kRttLowerHeadroom = 20;
+SvcDriver.kRttUpperHeadroom = 100;
+SvcDriver.kPlostUpperHeadroom = 3;
+SvcDriver.kPlostLowerHeadroom = 0.01;
+SvcDriver.kPlostCap = 3; // cap on adaptive continuous packet loss reference
+SvcDriver.kPlostCritical = 10;
+SvcDriver.kQualityDecreaseSettleTime = 6000;
+SvcDriver.kQualityIncreaseSettleTime = 4000;
+SvcDriver.kRxUpFailMonitorDur = 40000;
+SvcDriver.kRxUpFailDur = 40000;
+SvcDriver.kRxUpFailMaxExtendPeriod = 140000;
+SvcDriver.kRxUpFailDurDecayMult = 0.5;
+// (427)x240 - sends only one spatial layer, i.e. receiver can't get lower resolution than 240
+// (640)x360 - 2 spatial layers: receiver can get x180 or x360
+// (852)x480 - 2 spatial layers: 240 and 480
+// (960)x540 - 3 spatial layers: 136, 270 and 540. This is the camera capture resolution
+// anything above x540 is only for screen sharing, where there are no spatial layers
+// (1028)x578 - screen sharing
+// Array(spatial, temporal, screen-temporal)
+SvcDriver.RxQuality = [
+    [0, 0, 0],
+    [0, 1, 0],
+    [0, 2, 0],
+    [1, 1, 1],
+    [1, 2, 1],
+    [2, 1, 2],
+    [2, 2, 2],
+];
+SvcDriver.kMaxRxQualityIndex = SvcDriver.RxQuality.length - 1;
+// minKbps, maxKbps, scr: constraints for applyConstraints() on sent screen track
+SvcDriver.TxQuality = [
+    { minKbps: 0, maxKbps: 300, scr: { height: 540, frameRate: 4 } },
+    { minKbps: 280, maxKbps: 700, scr: { height: 720, frameRate: 4 } },
+    { minKbps: 680, maxKbps: 1000, scr: { height: 840, frameRate: 4 } },
+    { minKbps: 900, maxKbps: 1600, scr: { height: 1080, frameRate: 4 } },
+    { minKbps: 1500, maxKbps: 1800, scr: { height: 1080, frameRate: 8 } },
+    { minKbps: 1700, maxKbps: 2000, scr: { height: 1200, frameRate: 8 } },
+    { minKbps: 1900, maxKbps: 4000, scr: { height: 1440, frameRate: 8 } } // 6
+];
+SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
+
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '120834781e';
+const COMMIT_ID = '360250a8c2';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -369,7 +796,8 @@ const COMMIT_ID = '120834781e';
 
 
 
-function assert(cond) {
+
+function client_assert(cond) {
     if (!cond) {
         throw new Error("Assertion failed");
     }
@@ -429,7 +857,7 @@ class SfuClient {
         if (!SfuClient.platformHasSupport()) {
             throw new Error("This browser does not support insertable streams");
         }
-        assert(options);
+        client_assert(options);
         this.userId = userId;
         this.app = app;
         this._reqBarrier = new RequestBarrier;
@@ -584,7 +1012,7 @@ class SfuClient {
     */
     async newKeyImmediate() {
         let key = this.currKey = await this.generateKey();
-        assert(!this.keySetPromise); // previous calls must await for completion as well, which deletes the promise
+        client_assert(!this.keySetPromise); // previous calls must await for completion as well, which deletes the promise
         let pms = this.keySetPromise = createPromiseWithResolveMethods();
         pms.keyId = key.id;
         this.cryptoWorker.postMessage(['ek', key.id, key.keyObj, true]);
@@ -611,7 +1039,7 @@ class SfuClient {
         });
     }
     setCallKey(key) {
-        assert(key);
+        client_assert(key);
         var callKey = key instanceof ArrayBuffer ?
             new Uint32Array(key) :
             new Uint32Array(hexToBin(key).buffer);
@@ -619,14 +1047,14 @@ class SfuClient {
             this.logError("Invalid format of call key: length is not 16 bytes");
             return;
         }
-        assert(callKey.length === 4);
+        client_assert(callKey.length === 4);
         this.callKey = callKey;
     }
     xorWithCallKeyIfNeeded(key) {
         if (!this.callKey) {
             return;
         }
-        assert(key.byteLength === 16);
+        client_assert(key.byteLength === 16);
         let arr = new Uint32Array(key);
         let callKey = this.callKey;
         arr[0] ^= callKey[0];
@@ -659,31 +1087,46 @@ class SfuClient {
             return;
         }
         let id = msg.id;
-        assert(!isNaN(id) && (id >= 0) && (id < 256));
+        client_assert(!isNaN(id) && (id >= 0) && (id < 256));
         self.app.decryptKeyFrom(msg.key, peer.userId)
             .then(function (key) {
             self.xorWithCallKeyIfNeeded(key);
             self.cryptoWorker.postMessage(['dk', msg.from, id, key]);
         });
     }
+    addVersionToUrl(url) {
+        let and;
+        if (url.endsWith("?")) {
+            and = "";
+        }
+        else {
+            let parsed = new URL(url);
+            and = (parsed.search) ? "&" : "?";
+        }
+        return `${url}${and}v=${SfuClient.kProtocolVersion}`;
+    }
     async connect(url, callId, config) {
         if (url) { // for reconnect, we don't pass any parameters to connect()
-            this.url = url;
-            assert(callId);
-            assert(config);
+            this.url = this.addVersionToUrl(url);
+            client_assert(callId);
+            client_assert(config);
             this.callId = callId;
             this.callConfig = config;
             this._joinRetries = 0;
             this._forcedDisconnect = false;
         }
         else {
-            // this is reconnect - cancel it if user explicitly requested disconnect
-            assert(!this._forcedDisconnect);
+            // this is reconnect
+            client_assert(!this._forcedDisconnect);
+            url = this.url;
+            if (!isNaN(this.cid)) {
+                url += "&cid=" + this.cid;
+            }
         }
         this.reinit();
         this._setConnState(ConnState.kConnecting);
         this._fire("onConnecting");
-        const ws = this.conn = new WebSocket(this.url, "svc");
+        const ws = this.conn = new WebSocket(url, "svc");
         ws.onopen = this.onConnect.bind(this);
         ws.onmessage = this.onPacket.bind(this);
         ws.onclose = this.onWsClose.bind(this);
@@ -721,7 +1164,7 @@ class SfuClient {
             console.log(`onTrack: mid: ${xponder.mid}, kind: ${track.kind}, dir: ${xponder.direction}, slot: ${slot ? "has" : "none-yet"}`);
             if (track.kind === "video") {
                 if (!slot) {
-                    assert(xponder.direction === "recvonly");
+                    client_assert(xponder.direction === "recvonly");
                     slot = new VideoSlot(this, xponder);
                     slot.createDecryptor();
                 }
@@ -729,9 +1172,9 @@ class SfuClient {
                 this.inVideoTracks.set(slot.mid, slot);
             }
             else {
-                assert(track.kind === "audio");
+                client_assert(track.kind === "audio");
                 if (!slot) {
-                    assert(xponder.direction === "recvonly");
+                    client_assert(xponder.direction === "recvonly");
                     slot = new Slot(this, xponder);
                     slot.createDecryptor();
                 }
@@ -1241,7 +1684,7 @@ class SfuClient {
             if (!this._onHold) {
                 return;
             }
-            assert(this._availAv & Av.onHold);
+            client_assert(this._availAv & Av.onHold);
             let oh = this._onHold;
             this._muteCamera = oh.muteCamera;
             this._muteAudio = oh.muteAudio;
@@ -1351,7 +1794,7 @@ class SfuClient {
         }
     }
     processInputQueue() {
-        assert(this.inputPacketQueue);
+        client_assert(this.inputPacketQueue);
         for (;;) {
             let msg = this.inputPacketQueue.shift();
             if (!msg) {
@@ -1378,7 +1821,7 @@ class SfuClient {
     }
     async msgAnswer(msg) {
         this.inputPacketQueue = [];
-        assert(msg.cid);
+        client_assert(msg.cid);
         this.assignCid(msg.cid);
         if (msg.mods) {
             this.moderators = new Set(msg.mods);
@@ -1424,7 +1867,7 @@ class SfuClient {
             for (let strCid in speakers) {
                 let info = speakers[strCid];
                 let cid = parseInt(strCid);
-                assert(!isNaN(cid));
+                client_assert(!isNaN(cid));
                 this.addPeerSpeaker(cid, info);
             }
         }
@@ -1440,7 +1883,7 @@ class SfuClient {
                 height = SfuClient.kVideoCaptureOptions.height;
             }
         }
-        assert(height);
+        client_assert(height);
         let scale = height / SfuClient.kVthumbHeight;
         this.outVThumbTrack.setEncoderParams((params) => {
             params.scaleResolutionDownBy = scale;
@@ -1568,7 +2011,7 @@ class SfuClient {
         this._fire("onNoSpeaker");
     }
     addPeerSpeaker(cid, info) {
-        assert(cid !== this.cid);
+        client_assert(cid !== this.cid);
         let peer = this.peers.get(cid);
         if (!peer) {
             this.logError("addPeerSpeaker: Unknown cid", cid);
@@ -1668,7 +2111,7 @@ class SfuClient {
     }
     msgAv(msg) {
         let cid = msg.cid;
-        assert(cid);
+        client_assert(cid);
         if (cid === this.cid) {
             console.warn("msgAv: Received our own av flags");
             return;
@@ -1695,7 +2138,7 @@ class SfuClient {
         }
     }
     msgModAdd(msg) {
-        assert(msg.user);
+        client_assert(msg.user);
         if (!this.moderators) {
             console.error("BUG: msgModAdd: moderators list does not exist, creating it");
             this.moderators = new Set();
@@ -1704,7 +2147,7 @@ class SfuClient {
         this._fire("onModeratorAdd", msg.user);
     }
     msgModDel(msg) {
-        assert(msg.user);
+        client_assert(msg.user);
         if (!this.moderators) {
             console.error("BUG: msgModDel: moderators list does not exist");
         }
@@ -1722,8 +2165,8 @@ class SfuClient {
         this._fire("wrOnUsersEntered", users);
     }
     msgWrEnter(msg) {
-        assert(msg.users);
-        assert(this.waitingRoomUsers);
+        client_assert(msg.users);
+        client_assert(this.waitingRoomUsers);
         const users = msg.users;
         for (let userId in users) {
             this.waitingRoomUsers.set(userId, users[userId]);
@@ -1731,13 +2174,13 @@ class SfuClient {
         this._fire("wrOnUsersEntered", users);
     }
     msgWrLeave(msg) {
-        assert(msg.user);
-        assert(this.waitingRoomUsers);
+        client_assert(msg.user);
+        client_assert(this.waitingRoomUsers);
         this.waitingRoomUsers.delete(msg.user);
         this._fire("wrOnUserLeft", msg.user);
     }
     wrSetUserPermissions(users, allow) {
-        assert(this.waitingRoomUsers);
+        client_assert(this.waitingRoomUsers);
         for (let userId of users) {
             this.waitingRoomUsers.set(userId, allow);
         }
@@ -1776,7 +2219,7 @@ class SfuClient {
     // ====
     msgBye(msg) {
         if (msg.wr) { // pushed from call to waiting room
-            assert(this.callConfig.hasWaitingRoom);
+            client_assert(this.callConfig.hasWaitingRoom);
             console.warn("Leaving call and entering waiting room");
             this.leaveCall(msg.rsn);
             this._setConnState(ConnState.kInWaitingRoom);
@@ -1891,6 +2334,9 @@ class SfuClient {
         }
         this._statsRecorder.onStats(this.rtcStats);
         this._svcDriver.onStats();
+        if (this.app.onConnStats) {
+            this.app.onConnStats(this.rtcStats);
+        }
     }
     addNonRtcStats() {
         let stats = this.rtcStats;
@@ -1972,7 +2418,6 @@ class SfuClient {
         }
         if (this.app.onVideoTxStat) {
             if (txStat) {
-                // we may not have conn totals yet, so do the callback after returning
                 this.app.onVideoTxStat(isHiRes, rtcStats, txStat);
             }
             else {
@@ -1983,11 +2428,6 @@ class SfuClient {
     parseConnStats(stat) {
         let s = this.rtcStats;
         s.rtt = stat.currentRoundTripTime * 1000;
-        // DEBUG
-        if (window.rttOffset) {
-            s.rtt += window.rttOffset;
-        }
-        //====
         let txBwe = stat.availableOutgoingBitrate;
         if (txBwe != null) {
             s.txBwe = Math.round(txBwe / 1024);
@@ -2040,6 +2480,7 @@ class SfuClient {
         ];
     }
 }
+SfuClient.kProtocolVersion = 0;
 SfuClient.debugSdp = localStorage.debugSdp ? 1 : 0;
 SfuClient.kMaxActiveSpeakers = 20;
 SfuClient.kMaxInputVideoTracks = 20;
@@ -2300,7 +2741,7 @@ class VideoPlayer {
         return this.slot ? this.slot.inTrack : null;
     }
     attachToTrack(slot) {
-        assert(slot);
+        client_assert(slot);
         if (slot === this.slot) {
             console.warn("VideoPlayer.attachToTrack: Already attached to that slot");
             return;
@@ -2317,7 +2758,7 @@ class VideoPlayer {
         }
     }
     _onTrackGone(slot) {
-        assert(slot === this.slot);
+        client_assert(slot === this.slot);
         this.destroy(); //TODO: Maybe not destroy even if track is gone
     }
     _detachFromCurrentTrack() {
@@ -2348,7 +2789,7 @@ class ThumbPlayer extends VideoPlayer {
             console.warn("ThumbPlayer.destroy: already destroyed");
             return;
         }
-        assert(this.peer.vThumbPlayer === this);
+        client_assert(this.peer.vThumbPlayer === this);
         super.destroy();
         this.peer.onVthumbPlayerDestroy();
     }
@@ -2360,8 +2801,8 @@ class HiResPlayer extends VideoPlayer {
         peer.hiResPlayer = this;
     }
     attachToVThumbTrack(slot) {
-        assert(slot);
-        assert(!this.vThumbSlot);
+        client_assert(slot);
+        client_assert(!this.vThumbSlot);
         this.vThumbSlot = slot;
         slot._onAttachedToPlayer(this);
         this.vThumbPlayer = document.createElement("video");
@@ -2383,7 +2824,7 @@ class HiResPlayer extends VideoPlayer {
         }
     }
     _onVthumbTrackGone() {
-        assert(this.vThumbPlayer);
+        client_assert(this.vThumbPlayer);
         playerStop(this.vThumbPlayer);
         delete this.vThumbSlot;
         this.gui.vThumbDetachFromTrack();
@@ -2396,7 +2837,7 @@ class HiResPlayer extends VideoPlayer {
         }
         this.detachFromVthumbTrack();
         super.destroy();
-        assert(this.peer.hiResPlayer === this);
+        client_assert(this.peer.hiResPlayer === this);
         this.peer.onHiResPlayerDestroy();
     }
 }
@@ -2432,9 +2873,9 @@ class Peer {
         this._audioLevel = 0;
         this._speakReq = false;
         this.slowAudioLevel = 0;
-        assert(info.cid);
-        assert(info.userId);
-        assert(info.av != null);
+        client_assert(info.cid);
+        client_assert(info.userId);
+        client_assert(info.av != null);
         this.client = client;
         this.handler = client.app;
         this.cid = info.cid;
@@ -2502,11 +2943,11 @@ class Peer {
         this.client._removePeer(this);
         if (this.hiResPlayer) {
             this.hiResPlayer.destroy();
-            assert(!this.hiResPlayer);
+            client_assert(!this.hiResPlayer);
         }
         if (this.vThumbPlayer) {
             this.vThumbPlayer.destroy();
-            assert(!this.vThumbPlayer);
+            client_assert(!this.vThumbPlayer);
         }
         if (this.audioPlayer) {
             this.client._speakerDetector.unregisterPeer(this);
@@ -2566,7 +3007,7 @@ class Peer {
         });
         if (!this.vThumbPlayer) {
             new ThumbPlayer(this);
-            assert(this.vThumbPlayer);
+            client_assert(this.vThumbPlayer);
         }
         this.vThumbPlayer.attachToTrack(slot);
         this.handleSpecialCases();
@@ -2579,7 +3020,7 @@ class Peer {
         }
         this.hiResSlot = slot;
         if (this.vThumbSlot === slot) {
-            assert(info.r);
+            client_assert(info.r);
             delete this.vThumbSlot;
         }
         slot.reassignV(this.cid, info.iv, true, info.r, () => {
@@ -2592,7 +3033,7 @@ class Peer {
         });
         if (!this.hiResPlayer) {
             new HiResPlayer(this);
-            assert(this.hiResPlayer);
+            client_assert(this.hiResPlayer);
         }
         this.hiResPlayer.attachToTrack(slot);
         this.handleSpecialCases();
@@ -2793,308 +3234,6 @@ class RequestBarrier {
         return result;
     }
 }
-class SvcDriver {
-    constructor(client) {
-        this.currRxQuality = SvcDriver.kMaxRxQualityIndex - 1; // start a little lower;
-        this.currTxQuality = SvcDriver.kDefaultTxQuality;
-        // rtt window
-        this.lowestRttSeen = 10000; // force recalculation on first stat sample
-        this.hasBadNetwork = false;
-        this.client = client;
-    }
-    async onStats() {
-        let stats = this.client.rtcStats;
-        let plost = stats.pl;
-        let rtt = stats.rtt;
-        if (rtt == null) {
-            return;
-        }
-        if (plost == null) {
-            plost = stats.pl = 0;
-        }
-        let plostCapped = (plost > SvcDriver.kPlostCap) ? SvcDriver.kPlostCap : plost;
-        if (this.maRtt == null) {
-            this.maRtt = rtt;
-            this.smaPlost = plostCapped;
-            this.fmaPlost = plost;
-            return; // intentionally skip first sample for lower/upper range calculation
-        }
-        rtt = this.maRtt = (this.maRtt + rtt) / 2;
-        if (rtt < this.lowestRttSeen) {
-            this.setRttWindow(rtt);
-        }
-        this.smaPlost = (this.smaPlost * 29 + plostCapped) / 30;
-        this.setPlostWindow(this.smaPlost);
-        plost = this.fmaPlost = (this.fmaPlost * 2 + plost) / 3;
-        /*
-        console.log("rtt:", rtt.toFixed(1), "rttLower:", this.rttLower.toFixed(1), "rttUpper:", this.rttUpper.toFixed(1),
-            "plost:", plost.toFixed(1), "fmaPlost:", this.fmaPlost.toFixed(1),
-            "plostLower", this.plostLower.toFixed(1), "plostUpper:", this.plostUpper.toFixed(1));
-        */
-        let tsNow = Date.now();
-        if (!this.tsLastSwitch) {
-            this.tsLastSwitch = tsNow - SvcDriver.kMinTimeBetweenSwitches;
-            return;
-        }
-        let maTxKbps;
-        let adaptScrnTx = stats._vtxIsHiRes && this.client.isSendingScreenHiRes();
-        if (adaptScrnTx) { // calculate tx average kbps
-            const txBwidth = (stats.txBwe > 0) ? stats.txBwe : stats._vtxkbps;
-            if (this.maTxKbps == null) {
-                maTxKbps = this.maTxKbps = txBwidth;
-            }
-            else {
-                maTxKbps = this.maTxKbps = (this.maTxKbps * 5 + txBwidth) / 6;
-            }
-            // console.log("scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
-        }
-        if (tsNow - this.tsLastSwitch < SvcDriver.kMinTimeBetweenSwitches) {
-            return; // too early
-        }
-        if (plost > this.plostUpper) {
-            if (window.d) {
-                console.warn("Decreasing rxQ due to packet loss of", plost.toFixed(1));
-            }
-            this.decRxQuality();
-        }
-        else if (rtt > this.rttUpper) { // rtt or packet loss increased above thresholds
-            this.decRxQualityDueToRtt(stats);
-        }
-        else if (rtt < this.rttLower && plost < this.plostLower) {
-            this.incRxQuality();
-        }
-        let txQs = SvcDriver.TxQuality;
-        if (adaptScrnTx) {
-            let currTxQ = SvcDriver.TxQuality[this.currTxQuality];
-            if (maTxKbps < currTxQ.minKbps) {
-                let q = this.currTxQuality;
-                while (maTxKbps < txQs[q].minKbps) {
-                    q--;
-                    if (q < 0) {
-                        q = 0;
-                        break;
-                    }
-                }
-                let delta = q - this.currTxQuality;
-                if (delta < 0) {
-                    this.switchTxQuality(delta, "scr");
-                }
-            }
-            else if (stats.vtxdly > 2500) {
-                console.warn(`scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
-                this.switchTxQuality(-1, "scr");
-            }
-            else if (stats.vtxdly > 0 && stats.vtxdly < 1400) {
-                let q = this.currTxQuality;
-                while (maTxKbps > txQs[q].maxKbps) {
-                    q++;
-                    if (q >= txQs.length) {
-                        q--;
-                        break;
-                    }
-                }
-                let delta = q - this.currTxQuality;
-                if (delta > 0) {
-                    this.switchTxQuality(delta, "scr");
-                }
-            }
-        }
-        // handle "bad network" notification
-        let txBad = !isNaN(stats.vtxdly) && (stats.vtxdly > 1500);
-        if (adaptScrnTx) {
-            txBad = txBad || this.currTxQuality < 1;
-        }
-        else if (stats._vtxIsHiRes && stats.vtxh) {
-            this._maVideoTxHeight = !isNaN(this._maVideoTxHeight) ? (this._maVideoTxHeight * 3 + stats.vtxh) / 4 : stats.vtxh;
-            txBad = txBad || (this._maVideoTxHeight < 200);
-        }
-        const rxBad = rtt > 1500 || plost > 20;
-        if (txBad || rxBad) {
-            if (!this.hasBadNetwork) {
-                this.hasBadNetwork = true;
-                this.client._fire("onBadNetwork", true);
-            }
-        }
-        else if (this.hasBadNetwork) {
-            this.hasBadNetwork = false;
-            this.client._fire("onBadNetwork", false);
-        }
-    }
-    setRttWindow(rtt) {
-        this.lowestRttSeen = rtt;
-        this.rttLower = rtt + SvcDriver.kRttLowerHeadroom;
-        this.rttUpper = rtt + SvcDriver.kRttUpperHeadroom;
-        if (window.d) {
-            console.warn("Rtt floor set to", rtt.toFixed(2));
-        }
-    }
-    setPlostWindow(plost) {
-        this.plostLower = plost + SvcDriver.kPlostLowerHeadroom;
-        this.plostUpper = plost + SvcDriver.kPlostUpperHeadroom;
-    }
-    decRxQuality(critical) {
-        if (this.currRxQuality <= 0) {
-            return false;
-        }
-        let newQ;
-        if (critical) {
-            newQ = this.currRxQuality - 2;
-            if (newQ < 0) {
-                newQ = 0;
-            }
-        }
-        else {
-            newQ = this.currRxQuality - 1;
-        }
-        this.setRxQuality(newQ);
-        return true;
-    }
-    incRxQuality() {
-        delete this.rxRttDowngr;
-        if (this.currRxQuality >= SvcDriver.kMaxRxQualityIndex) {
-            return false;
-        }
-        this.setRxQuality(this.currRxQuality + 1);
-        return true;
-    }
-    setRxQuality(newQ) {
-        let params = SvcDriver.RxQuality[newQ];
-        assert(params);
-        this.tsLastSwitch = Date.now();
-        if (window.d) {
-            console.warn(`Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: %o`, params);
-        }
-        this.currRxQuality = newQ;
-        this.client.requestSvcLayers(params[0], params[1], params[2]);
-        return true;
-    }
-    decRxQualityDueToRtt(stats) {
-        if (!this.rxRttDowngr) {
-            if (this.currRxQuality > 0) {
-                if (window.d) {
-                    console.warn(`Decreasing rxQ due to high rtt of ${this.maRtt.toFixed()}, saving checkpoint`);
-                }
-                this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
-                this.decRxQuality();
-            }
-            return;
-        }
-        // we have rxRttDowngr, see if the downgrade is affecting rtt
-        const nSteps = this.rxRttDowngr.startQ - this.currRxQuality;
-        if (nSteps > 0) {
-            // we have stepped down at least once:
-            // If rtt did not really decrease, is not too big (to be influenced by our q step down), and there is no extraordinary
-            // packet loss, then assume the high rtt is not due to network congestion
-            if ((this.fmaPlost <= this.plostLower) && (stats.rtt < 1000) && (Math.abs(stats.rtt - this.rxRttDowngr.lastRtt) < 16)) {
-                // rtt did not change
-                if (window.d) {
-                    console.warn(`Decreased rxQ by ${nSteps} steps: rtt didn't change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
-                }
-                this.setRttWindow(this.maRtt);
-                // reset the checkpoint as well - otherwise we may ignore a future rtt decrease
-                // on top of the current increase
-                this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
-                return; // dont decrease quality
-            }
-            else if (this.currRxQuality > 0) {
-                // rtt changed - could be decreasing from the quality downgrade, or still rising
-                // because of network conditions. Either way, we should further downgrade quality
-                if (window.d) {
-                    console.warn(`Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
-                }
-                this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
-            }
-        }
-        this.decRxQuality();
-    }
-    switchTxQuality(delta, mode) {
-        let newQ = this.currTxQuality + delta;
-        if (newQ < 0) {
-            newQ = 0;
-        }
-        else if (newQ > SvcDriver.kMaxTxQualityIndex) {
-            newQ = SvcDriver.kMaxTxQualityIndex;
-        }
-        if (newQ === this.currTxQuality) {
-            return false;
-        }
-        return this.setTxQuality(newQ, mode);
-    }
-    setTxQuality(newQ, mode) {
-        let track = this.client.outVSpeakerTrack.sentTrack;
-        if (!track) {
-            return false;
-        }
-        let info = SvcDriver.TxQuality[newQ];
-        assert(info);
-        this.tsLastSwitch = Date.now();
-        let params = info[mode];
-        let ar = this.client.screenAspectRatio;
-        if (!ar) {
-            let res = track.getSettings();
-            if (res.width && res.height) {
-                ar = this.client.screenAspectRatio = res.width / res.height;
-                if (window.d) {
-                    console.warn(`Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
-                }
-            }
-            else {
-                ar = 1.78;
-                if (window.d) {
-                    console.warn("setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
-                }
-            }
-        }
-        params.width = Math.round(params.height * ar);
-        if (window.d) {
-            console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: %o (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`, params);
-        }
-        this.currTxQuality = newQ;
-        track.applyConstraints(params);
-        return true;
-    }
-    initTx() {
-        if (this.client.isSendingScreenHiRes()) {
-            // need small delay to have the track started
-            setTimeout(this.setTxQuality.bind(this, this.currTxQuality, "scr"), 100);
-        }
-    }
-}
-SvcDriver.kRttLowerHeadroom = 20;
-SvcDriver.kRttUpperHeadroom = 100;
-SvcDriver.kPlostUpperHeadroom = 3;
-SvcDriver.kPlostLowerHeadroom = 0.01;
-SvcDriver.kPlostCap = 3; // cap on adaptive continuous packet loss reference
-SvcDriver.kMinTimeBetweenSwitches = 6000;
-// (427)x240 - sends only one spatial layer, i.e. receiver can't get lower resolution than 240
-// (640)x360 - 2 spatial layers: receiver can get x180 or x360
-// (852)x480 - 2 spatial layers: 240 and 480
-// (960)x540 - 3 spatial layers: 136, 270 and 540. This is the camera capture resolution
-// anything above x540 is only for screen sharing, where there are no spatial layers
-// (1028)x578 - screen sharing
-// Array(spatial, temporal, screen-temporal)
-SvcDriver.RxQuality = [
-    [0, 0, 0],
-    [0, 1, 0],
-    [0, 2, 0],
-    [1, 1, 1],
-    [1, 2, 1],
-    [2, 1, 2],
-    [2, 2, 2],
-];
-SvcDriver.kMaxRxQualityIndex = SvcDriver.RxQuality.length - 1;
-// minKbps, maxKbps, scr: constraints for applyConstraints() on sent screen track
-SvcDriver.TxQuality = [
-    { minKbps: 0, maxKbps: 300, scr: { height: 540, frameRate: 4 } },
-    { minKbps: 280, maxKbps: 700, scr: { height: 720, frameRate: 4 } },
-    { minKbps: 680, maxKbps: 1000, scr: { height: 840, frameRate: 4 } },
-    { minKbps: 900, maxKbps: 1600, scr: { height: 1080, frameRate: 4 } },
-    { minKbps: 1500, maxKbps: 1800, scr: { height: 1080, frameRate: 8 } },
-    { minKbps: 1700, maxKbps: 2000, scr: { height: 1200, frameRate: 8 } },
-    { minKbps: 1900, maxKbps: 4000, scr: { height: 1440, frameRate: 8 } } // 6
-];
-SvcDriver.kDefaultTxQuality = 2;
-SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 class MicMuteMonitor {
     constructor(client) {
         this.micLevelAvg = 0;
@@ -3228,7 +3367,7 @@ class SpeakerDetector {
             if (window.d) {
                 console.warn("Active speaker changed to", maxPeer.userId);
             }
-            assert(this.client.peers.get(maxPeer.cid));
+            client_assert(this.client.peers.get(maxPeer.cid));
         }
         else {
             if (window.d) {
@@ -3327,8 +3466,8 @@ class StatsRecorder {
         fetch(SfuClient.kStatServerUrl + "/stats", {
             method: "POST",
             body: JSON.stringify(data)
-        }).catch((err) => {
-            console.warn("Failed to post stats:", err.message);
+        }).catch((ex) => {
+            console.warn("Failed to post stats:", ex.message);
         });
     }
     static compressArray(arr) {

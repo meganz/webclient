@@ -86,7 +86,9 @@
             .replace(/\[B\]/g, '<b>').replace(/\[\/B\]/g, '</b>')
             .replace(/\[U]/g, '<u>').replace(/\[\/U]/g, '</u>')
             .replace(/\[G]/g, '<span class="gray-text">')
-            .replace(/\[\/G]/g, '</span>');
+            .replace(/\[\/G]/g, '</span>')
+            .replace(/\[A]/g, '<a>')
+            .replace(/\[\/A]/g, '</a>');
     };
 
     var unmount = function() {

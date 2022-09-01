@@ -272,7 +272,8 @@
  * Should have common wrappper with element, whicch are separated
 */
 
-.topbar :not(.topbar-links) hr {
+.topbar :not(.topbar-links) hr,
+.topbar .top-change-language.hidden + hr {
     display: none;
 }
 .topbar hr {

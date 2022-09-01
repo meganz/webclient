@@ -19,7 +19,7 @@ export default class Breadcrumbs extends MegaRenderMixin {
             case M.RubbishID:
                 return 'recycle-item';
             case M.InboxID:
-                return 'inbox-item';
+                return 'restricted-item';
             case 'shares':
                 return 'contacts-item';
             default:
@@ -36,7 +36,7 @@ export default class Breadcrumbs extends MegaRenderMixin {
                 return l[167];
             case M.InboxID:
                 // `Inbox`
-                return l[166];
+                return l.restricted_folder_button;
             case 'shares':
                 // `username@mega.co.nz` || `Shared with me`
                 return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : l[5589];
@@ -53,6 +53,9 @@ export default class Breadcrumbs extends MegaRenderMixin {
 
             if (item.type === 'cloud-drive') {
                 icon = <i className="sprite-fm-mono icon-cloud icon24"></i>;
+            }
+            else if (item.type === 'restricted-item') {
+                icon = <i className="sprite-fm-mono icon-restricted-folder-filled icon24"></i>;
             }
             else if (item.type === 'folder') {
                 icon = <i className="sprite-fm-mono icon-folder-filled icon24"></i>;

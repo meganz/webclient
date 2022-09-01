@@ -4,13 +4,17 @@
 .colour-label .shared-folder-info-block::after {
     content: '';
     display: block;
-    position: absolute;
-    right: 6px;
-    top: 9px;
     background-color: var(--label-grey);
     border-radius: 100%;
     width: 8px;
     height: 8px;
+}
+.colour-label .file-block-title::after,
+.colour-label .tranfer-filetype-txt::after,
+.colour-label .shared-folder-info-block::after {
+    position: absolute;
+    right: 6px;
+    top: 9px;
 }
 .colour-label-ind.red,
 .colour-label.red .file-block-title::after,
@@ -63,8 +67,13 @@
     right: auto;
 }
 .nw-fm-tree-item .colour-label-ind {
-    right: 36px;
-    top: 12px;
+    display: inline-block;
+    vertical-align: middle;
+    margin: 8px 6px;
+}
+.nw-fm-tree-item:not(.linked):not(.on-gallery) .colour-label-ind {
+    -webkit-margin-end: 33px;
+    margin-inline-end: 33px;
 }
 .rtl .nw-fm-tree-item .colour-label-ind {
     left: 36px;
@@ -76,7 +85,7 @@
     box-shadow: 0 0 0 1px var(--stroke-main);
 }
 .nw-fm-tree-item.linked.on-gallery .colour-label-ind {
-    right: 52px;
+    right: 70px;
 }
 .nw-fm-tree-item.label {
     -webkit-padding-end: 46px;

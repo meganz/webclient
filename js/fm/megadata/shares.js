@@ -67,13 +67,15 @@ MegaData.prototype.openSharingDialog = function() {
 
         var shareKeys = Object.keys(shares || {});
 
+        // Temporary condition till all MIME icons are vector
+        // $('.item-type-icon', $dialog).attr('class', `item-type-icon sprite-fm-uni icon-${folderIcon}-90`);
+        $('.item-type-icon', $dialog).attr('class', `item-type-icon medium-file-icon ${fileIcon(M.d[h])}`);
+
         // This is shared folder, not just folder link
         if (shares && !(shares.EXP && shareKeys.length === 1) || M.ps[h]) {
-            $('.share-dialog-folder-icon', $dialog).removeClass('icon-folder-24').addClass('icon-folder-outgoing-24');
             $('.remove-share', $dialog).removeClass('disabled');
         }
         else {
-            $('.share-dialog-folder-icon', $dialog).removeClass('icon-folder-outgoing-24').addClass('icon-folder-24');
             $('.remove-share', $dialog).addClass('disabled');
         }
 

@@ -5,6 +5,11 @@
     border-radius: 3px;
     padding: 0 8px;
 }
+.mega-banner.body.warning-template {
+    background-color: var(--banner-background-warning);
+    box-shadow: 0 0 0 1px var(--banner-border-warning);
+    color: var(--banner-text-warning);
+}
 .mega-banner.with-btn {
     text-align: left;
     margin-top: 20px;

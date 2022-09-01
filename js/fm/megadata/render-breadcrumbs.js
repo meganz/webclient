@@ -48,11 +48,6 @@
         }
         let items = this.getPath(fileHandle || this.currentdirid);
 
-        if (items.length > 1 && isInfoBlock) {
-            // remove first element which is the target element
-            items.shift();
-        }
-
         const dictionary = handle => {
             let name = '';
             let typeClass = '';
@@ -101,8 +96,8 @@
                     name = l[166];
                 },
                 [this.InboxID]: () => {
-                    typeClass = 'messages';
-                    name = l[166];
+                    typeClass = 'restricted-item';
+                    name = l.restricted_folder_button;
                 }
             };
 
@@ -194,7 +189,7 @@
                     }
                     else if (handle === this.InboxID) {
                         id = this.InboxID;
-                        typeClass = 'inbox-item';
+                        typeClass = 'restricted-item';
                         name = l[166];
                     }
                     else {
@@ -250,6 +245,9 @@
 
             if (item.type === 'cloud-drive') {
                 icon = 'icon-cloud';
+            }
+            else if (item.type === 'restricted-item') {
+                icon = 'icon-restricted-folder-filled';
             }
             else if (item.type === 'folder' || item.type === 'folder-link') {
                 icon = 'icon-folder-filled';
@@ -360,7 +358,7 @@
                 // if we won't have space, add it to the dropdown, but always render the current folder,
                 // and root if there are no extraItems
                 // for info block we show max 2 items in the in-view breadcrumb
-                if ((!isLastItem && !isRoot || isRoot && extraItems.length > 0) &&
+                if (!isLastItem &&
                     (currentPathLength > maxPathLength && !isInfoBlock) || (isInfoBlock && i > 1)) {
                     extraItems.push({
                         name,

@@ -20,8 +20,8 @@ export default class ParticipantsNotice extends MegaRenderMixin {
      * @returns {boolean} If the component should updated
      */
     specShouldComponentUpdate(newProps) {
-        const { stayOnEnd, hasLeft } = this.props;
-        return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft;
+        const { stayOnEnd, hasLeft, isOnHold } = this.props;
+        return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft || newProps.isOnHold !== isOnHold;
     }
 
     /**
@@ -118,7 +118,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
 
     render() {
-        const { sfuApp, call, hasLeft, streamContainer } = this.props;
+        const { sfuApp, call, hasLeft, streamContainer, isOnHold } = this.props;
 
         if (sfuApp.isDestroyed) {
             return null;
@@ -129,6 +129,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
                 {call.isSharingScreen() ? null : (
                     <StreamNode
                         className="local-stream-mirrored"
+                        isCallOnHold={isOnHold}
                         stream={call.getLocalStream()}
                     />
                 )}

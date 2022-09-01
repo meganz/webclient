@@ -627,36 +627,127 @@ function filetype(n, getFullType, ik) {
     return fext.length ? l[20366].replace('%1', fext.toUpperCase()) : l[18055];
 }
 
-function fileIcon(node) {
+/**
+ * Get backed up device Icon
+ * @param {String} name Device name
+ * @param {Number} type Device type number, 3 and 4 are mobile
+ * @returns {String} Device Icon name
+ */
+function deviceIcon(name, type) {
+
     "use strict";
-    var icon;
+
+    // Mobile icon
+    // TODO: Change conditions to smth more clever
+    if (type === 3 || type === 4) {
+
+        return 'mobile';
+    }
+    if (name.includes('MacBook')) {
+
+        return 'pc-mac';
+    }
+    else if (name.includes('Windows')) {
+
+        return 'pc-win';
+    }
+    else if (name.includes('Linux')) {
+
+        return 'pc-linux';
+    }
+
+    return 'pc';
+}
+
+/**
+ * Get folder type Icon
+ * @param {Object} node A MEGA folder node
+ * @returns {String} Folder Icon name
+ */
+function folderIcon(node) {
+
+    'use strict';
+
+    let folderIcon = '';
+
+    if (M.getNodeRoot(node.h) === M.RubbishID) {
+
+        folderIcon = 'rubbish-';
+    }
+
+    // Outgoing share
+    if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
+
+        // folderIcon += 'folder-outgoing'; for vector icon
+        return `${folderIcon}folder-shared`;
+    }
+    // Public upload folder
+    else if (mega.megadrop.pufs[node.h] && mega.megadrop.pufs[node.h].s !== 1) {
+
+        // `${folderIcon}folder-public}` for vector icon
+        return `${folderIcon}puf-folder`;
+    }
+    // Incoming share
+    else if (node.su) {
+
+        // `${folderIcon}folder-incoming`; for vector icon
+        return `${folderIcon}inbound-share`;
+    }
+    // My chat files
+    else if (node.h === M.cf.h) {
+
+        return `${folderIcon}folder-chat`;
+    }
+    // Camera uploads
+    else if (node.h === M.CameraId) {
+
+        return `${folderIcon}folder-camera`;
+    }
+    // Backups
+    if (M.getNodeRoot(node.h) === M.InboxID) {
+
+        // Backed up device icon
+        if (node.devid) {
+
+            // Get OS icon
+            return deviceIcon(node.name);
+        }
+        // Backed up external device icon
+        if (node.drvid) {
+
+            // Ignore rubbish bin suffix
+            return 'ex-device';
+        }
+    }
+
+    return `${folderIcon}folder`;
+}
+
+/**
+ * Get filte type Icon
+ * @param {Object} node A MEGA folder node or just an Object with a 'name' key for files
+ * @returns {String} Folder Icon name
+ */
+function fileIcon(node) {
+
+    'use strict';
+
+    let icon = '';
 
     if (node.t) {
-        if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
-            icon = 'folder-shared';
 
-            if(is_mobile){
-                icon = 'outgoing-share-folder';
-            }
-        }
-        else if ( mega.megadrop.pufs[node.h] && mega.megadrop.pufs[node.h].s !== 1) {
-            icon = 'puf-folder';
-        }
-        else {
-            icon = 'folder';
-        }
+        return folderIcon(node);
     }
     else if (ext[fileext(node.name)]) {
-        icon = ext[fileext(node.name)][0];
+
+        return ext[fileext(node.name)][0];
     }
     else if ((icon = is_video(node)) > 0) {
-        icon = icon > 1 ? 'audio' : 'video';
-    }
-    else {
-        icon = 'generic';
+
+        return icon > 1 ? 'audio' : 'video';
     }
 
-    return icon;
+    return 'generic';
 }
 
 function fileext(name, upper, iknowwhatimdoing) {

@@ -2413,6 +2413,7 @@ var dlmanager = {
                 }
                 else {
                     open(megasync.getMegaSyncUrl() || (getAppBaseUrl() + '#sync'));
+                    hideOverlay();
                 }
             }
 

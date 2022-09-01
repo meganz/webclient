@@ -5,7 +5,7 @@
  *     <span>{Title}</span>
  *     <div class="mega-input dropdown-input text-style"></div>
  * </div>
- * <table class="data-table">
+ * <table class="data-table {minimal?}">
  *     <tr>
  *          <th class="{sortable?}">
  *              <span></span>
@@ -22,10 +22,14 @@
  * <div class="mega-data-header>
  *     <span>{Title}</span>
  * </div>
- * <table class="data-table">
+ * <table class="data-table {minimal?}">
  *     <tr><th></th></tr>
  *     <tr><td></td></tr>
  * </table>
+ *
+ *
+ * All ? classes are optional:
+ *     - minimal: Table doesn't have any border and padding. May be used in any wrapper which already has such styling
  *
  *
  * Data Box Table Structure:
@@ -98,6 +102,10 @@
     position: relative;
     overflow: hidden;
     width: 100%;
+}
+.data-table.minimal {
+    border: 0;
+    padding: 0;
 }
 .rtl .data-table {
     direction: rtl;
@@ -426,17 +434,6 @@
     left: auto;
 }
 
-.data-table tr td:first-child,
-.data-table tr th:first-child {
-    -webkit-padding-start: 16px;
-    padding-inline-start: 16px;
-}
-.data-table tr td:last-child,
-.data-table tr th:last-child {
-    -webkit-padding-end: 16px;
-    padding-inline-end: 16px;
-}
-
 .data-table.medium-list tr td:first-child::before {
     left: 0;
 }
@@ -476,6 +473,7 @@
 .sticky-header-table-container .data-table th {
     background: var(--surface-main);
     position: sticky;   /* Shouldn't be changed as sticky isn't working on thead and tr on Chrome! */
+    position: -webkit-sticky;
     top: 0;
     z-index: 1119;
 }

@@ -426,30 +426,81 @@
 .block-view-file-type.folder {
     background-position: 0 -4314px;
 }
-.rubbish-bin .block-view-file-type.folder {
+.block-view-file-type.rubbish-folder {
     background-position: 0 -4434px;
 }
-.block-view-file-type.photo-folder {
-    background-position: 0 -4554px;
-}
-.rubbish-bin .block-view-file-type.photo-folder {
-    background-position: 0 -4674px;
-}
+
 .fm-blocks-view.shared-view .block-view-file-type.folder,
 .shared-blocks-view .block-view-file-type.folder,
 .block-view-file-type.folder.inbound-share {
     background-position: 0 -4794px;
 }
+.block-view-file-type.folder-sync {
+    background-position: 0 -5874px;
+}
+.block-view-file-type.rubbish-folder-sync {
+    background-position: 0 -5994px;
+}
+.block-view-file-type.folder-backup {
+    background-position: 0 -6114px;
+}
+.block-view-file-type.rubbish-folder-backup {
+    background-position: 0 -6234px;
+}
+.block-view-file-type.folder-chat {
+    background-position: 0 -5634px;
+}
+.block-view-file-type.rubbish-folder-chat {
+    background-position: 0 -5754px;
+}
+.block-view-file-type.folder-camera {
+    background-position: 0 -4554px;
+}
+.block-view-file-type.rubbish-folder-camera {
+    background-position: 0 -4674px;
+}
+
+.block-view-file-type.backup {
+    background-position: -5px -6354px;
+}
+.block-view-file-type.pc {
+    background-position: -5px -6474px;
+}
+.block-view-file-type.pc-mac {
+    background-position: -5px -6714px;
+}
+.block-view-file-type.pc-win {
+    background-position: -5px -6594px;
+}
+.block-view-file-type.pc-linux {
+    background-position: -5px -6834px;
+}
+.block-view-file-type.mobile {
+    background-position: -5px -6954px;
+}
+.block-view-file-type.mobile-ios {
+    background-position: -5px -7074px;
+}
+.block-view-file-type.mobile-android {
+    background-position: -5px -7194px;
+}
+.block-view-file-type.ex-device {
+    background-position: -5px -7314px;
+}
+
 .block-view-file-type.folder-shared,
 .out-shared-blocks-view .block-view-file-type.folder {
     background-position: 0 -5034px;
 }
-.rubbish-bin .block-view-file-type.folder-shared {
+.block-view-file-type.rubbish-folder-shared {
     background-position: 0 -5154px;
 }
 .block-view-file-type.puf-folder {
     background-position: 0 -5274px;
 }
-.rubbish-bin .block-view-file-type.puf-folder {
+.block-view-file-type.rubbish-puf-folder {
     background-position: 0 -5394px;
+}
+ .block-view-file-type.inbound-share {
+    background-position: 0 -4794px;
 }

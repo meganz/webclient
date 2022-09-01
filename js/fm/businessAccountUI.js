@@ -1153,6 +1153,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var inshareExternalInfo = subUserStats["ise"] || emptyArray;
         var outshareInfo = subUserStats["ose"] || emptyArray;
         var outshareInternalInfo = subUserStats["osi"] || emptyArray;
+        const backupsInfo = subUserStats["3"] || emptyArray;
 
         totalStorage = subUserStats["ts"] || 0;
         totalBandwidth = subUserStats["dl"] || 0;
@@ -1171,9 +1172,10 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var inshareExternalTotalFormatted = numOfBytes(inshareExternalInfo[0], 2);
         var outshareTotalFormatted = numOfBytes(outshareInfo[0] - (outshareInfo[3] || 0), 2);
         var outshareTotalInternalFormatted = numOfBytes(outshareInternalInfo[0], 2);
+        const backupsTotalFormatted = numOfBytes(backupsInfo[0], 2);
 
         var versionsTotalFormatted = numOfBytes(rootInfo[3] + rubbishInfo[3]
-            + inshareInternalInfo[3] + inshareExternalInfo[3], 2);
+            + inshareInternalInfo[3] + inshareExternalInfo[3] + backupsInfo[3], 2);
 
         // fill in UI
         $('.user-management-view-data .user-management-storage .storage-transfer-data',
@@ -1191,6 +1193,8 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             ' .used-storage-info.ba-outshare', $subAccountContainer);
         var $outShareExternalSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-outshare-ex', $subAccountContainer);
+        var $backupsSection = $('.user-management-view-data .subaccount-view-used-data' +
+            ' .used-storage-info.ba-backups', $subAccountContainer);
         var $rubbishSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-rubbish', $subAccountContainer);
         var $versionsSection = $('.user-management-view-data .subaccount-view-used-data' +
@@ -1234,6 +1238,14 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             outshareTotalInternalFormatted.unit);
         $('.folder-number', $outShareSection).text(outShareInFolderNumText);
         $('.file-number', $outShareSection).text(outShareInFileNumText);
+
+        // TODO: Change "Inbox" to "My Backups" folder data once we get if from API
+        const backupsFolderNumText = ffNumText(backupsInfo[2] - 1 > 0 ? backupsInfo[2] - 1 : 0, 'folder');
+        const backupsFileNumText = ffNumText(backupsInfo[1], 'file');
+        $('.ff-occupy', $backupsSection).text(backupsTotalFormatted.size + ' ' +
+            backupsTotalFormatted.unit);
+        $('.folder-number', $backupsSection).text(backupsFolderNumText);
+        $('.file-number', $backupsSection).text(backupsFileNumText);
 
         var rubbishFolderNumText = ffNumText(rubbishInfo[2], 'folder');
         var rubbishFileNumText = ffNumText(rubbishInfo[1], 'file');
@@ -1288,32 +1300,37 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         let rootTotal = 0;
         let rubbishTotal = 0;
         let outshareTotal = 0;
+        let backupsTotal = 0;
 
         const emptyArray = [0, 0, 0, 0, 0];
         let currRoot;
         let currInhare;
         let currInhareEx;
         let currRubbish;
+        let currBackups;
 
         for (const sub in todayStats.u) {
             currRoot = todayStats.u[sub]["2"] || emptyArray;
             currInhare = todayStats.u[sub]["isi"] || emptyArray;
             currInhareEx = todayStats.u[sub]["ise"] || emptyArray;
             currRubbish = todayStats.u[sub]["4"] || emptyArray;
+            currBackups = todayStats.u[sub]["3"] || emptyArray;
 
             rootTotal += currRoot[0];
             rubbishTotal += currRubbish[0];
             outshareTotal += currInhareEx[0];
             inshareTotal += currInhare[0];
+            backupsTotal += currBackups[0];
         }
 
-        totalStorage = rootTotal + rubbishTotal + outshareTotal + inshareTotal;
+        totalStorage = rootTotal + rubbishTotal + outshareTotal + inshareTotal + backupsTotal;
 
         const totalStorageFormatted = numOfBytes(totalStorage, 2);
         const rootTotalFormatted = numOfBytes(rootTotal, 2);
         const rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
         const inshareTotalFormatted = numOfBytes(inshareTotal, 2);
         const outshareTotalFormatted = numOfBytes(outshareTotal, 2);
+        const backupsTotalFormatted = numOfBytes(backupsTotal, 2);
 
         let rootPercentage = rootTotal / totalStorage;
         rootPercentage = Math.round(Number.parseFloat(rootPercentage * 100).toFixed(2));
@@ -1323,12 +1340,15 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         rubbishPercentage = Math.round(Number.parseFloat(rubbishPercentage * 100).toFixed(2));
         let outsharePercentage = outshareTotal / totalStorage;
         outsharePercentage = Math.round(Number.parseFloat(outsharePercentage * 100).toFixed(2));
+        let backupsPercentage = backupsTotal / totalStorage;
+        backupsPercentage = Math.round(Number.parseFloat(backupsPercentage * 100).toFixed(2));
 
         const digitClassMap = ["one-digit", "two-digits", "three-digits"];
         const cloudNodeDigitClass = digitClassMap[String(rootPercentage).length - 1];
         const inshareNodeDigitClass = digitClassMap[String(insharePercentage).length - 1];
         const rubbishNodeDigitClass = digitClassMap[String(rubbishPercentage).length - 1];
-        const inboxNodeDigitClass = digitClassMap[String(outsharePercentage).length - 1];
+        const outshareNodeDigitClass = digitClassMap[String(outsharePercentage).length - 1];
+        const backupsNodeDigitClass = digitClassMap[String(backupsPercentage).length - 1];
 
         $('.storage-summary .total-storage-number', $storageAnalysisPie)
             .text(totalStorageFormatted.size + ' ' + totalStorageFormatted.unit);
@@ -1340,11 +1360,15 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         $('.storage-division-container.inbox-node .storage-division-num', $storageAnalysisPie)
             .text(outshareTotalFormatted.size + ' ' + outshareTotalFormatted.unit);
         $('.storage-division-container.inbox-node .storage-division-per', $storageAnalysisPie)
-            .text(`${outsharePercentage}%`).addClass(inboxNodeDigitClass);
+            .text(`${outsharePercentage}%`).addClass(outshareNodeDigitClass);
         $('.storage-division-container.inshare-node .storage-division-num', $storageAnalysisPie)
             .text(inshareTotalFormatted.size + ' ' + inshareTotalFormatted.unit);
         $('.storage-division-container.inshare-node .storage-division-per', $storageAnalysisPie)
             .text(`${insharePercentage}%`).addClass(inshareNodeDigitClass);
+        $('.storage-division-container.backups-node .storage-division-num', $storageAnalysisPie)
+            .text(backupsTotalFormatted.size + ' ' + backupsTotalFormatted.unit);
+        $('.storage-division-container.backups-node .storage-division-per', $storageAnalysisPie)
+            .text(`${backupsPercentage}%`).addClass(backupsNodeDigitClass);
         $('.storage-division-container.rubbish-node .storage-division-num', $storageAnalysisPie)
             .text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
         $('.storage-division-container.rubbish-node .storage-division-per', $storageAnalysisPie)
@@ -1377,19 +1401,21 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 style.getPropertyValue('--label-red').trim(),
                 style.getPropertyValue('--label-orange').trim(),
                 style.getPropertyValue('--label-purple').trim(),
-                style.getPropertyValue('--label-green').trim()
+                style.getPropertyValue('--label-green').trim(),
+                style.getPropertyValue('--label-grey').trim()
             ];
             const hoverColors = [
                 style.getPropertyValue('--label-red-hover').trim(),
                 style.getPropertyValue('--label-orange-hover').trim(),
                 style.getPropertyValue('--label-purple-hover').trim(),
-                style.getPropertyValue('--label-green-hover').trim()
+                style.getPropertyValue('--label-green-hover').trim(),
+                style.getPropertyValue('--label-grey-hover').trim()
             ];
             const usagePieChart = new Chart($pieChart, {
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [rootTotal, outshareTotal, inshareTotal, rubbishTotal],
+                        data: [rootTotal, outshareTotal, inshareTotal, backupsTotal, rubbishTotal],
                         backgroundColor: colors,
                         hoverBackgroundColor: hoverColors,
                         hoverBorderColor: 'rgb(0, 0, 0, 0.2)',
@@ -1400,6 +1426,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                         l[164],
                         l[19187],
                         l[16770],
+                        l.restricted_folder_button,
                         l[167]
                     ]
                 },
@@ -1432,8 +1459,11 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                     else if ($me.hasClass('inshare-node')) {
                         ix = 2;
                     }
-                    else if ($me.hasClass('rubbish-node')) {
+                    else if ($me.hasClass('backups-node')) {
                         ix = 3;
+                    }
+                    else if ($me.hasClass('rubbish-node')) {
+                        ix = 4;
                     }
 
                     if ($me.hasClass('disabled')) {
@@ -3122,11 +3152,16 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
             var finalizeOperation = function (st,res,req) {
                 var $addContianer = $('.dialog-input-container', $dialog);
                 var $resultContianer = $('.verification-container', $dialog);
+                const $subUserEmail = $('.sub-e', $resultContianer);
 
                 if (st === 1) {
                     var subUserDefaultAvatar = useravatar.contact(res.u);
                     $('.new-sub-user', $resultContianer).safeHTML(subUserDefaultAvatar);
-                    $('.sub-e', $resultContianer).text(req.m);
+                    $subUserEmail.text(req.m).attr({
+                        'data-simpletip': req.m,
+                        'data-simpletipposition': 'top'
+                    });
+
                     if (res.lp) {
                         $('.verification-user-pw', $resultContianer).removeClass('hidden');
                         if (is_extension || M.execCommandUsable()) {
@@ -3176,6 +3211,14 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
                 loadingDialog.phide();
                 $dialog.removeClass('hidden');
+
+                if ($subUserEmail.prop('scrollWidth') > $subUserEmail.prop('offsetWidth')) {
+                    // If the sub user's email is too long, add the simpletip to display the full email address
+                    $subUserEmail.addClass('simpletip');
+                }
+                else {
+                    $subUserEmail.removeClass('simpletip');
+                }
             };
 
             subPromise.always(finalizeOperation);

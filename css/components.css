@@ -76,25 +76,24 @@
 \* =============================== */
 .btn-myfiles,
 .btn-galleries {
+    background: transparent;
+    border: none;
     border-radius: 4px;
     box-sizing: border-box;
-    cursor: pointer;
-    opacity: 0.7;
     color: var(--stroke-main-inverted);
-    width: 100%;
-    margin: 2px 0;
-    border: none;
-    background: transparent;
-    text-align: start;
+    cursor: pointer;
     font: var(--text-body1);
-    line-height: 32px;
     height: 32px;
-    -webkit-padding-start: 24px;
-    padding-inline-start: 24px;
+    line-height: 32px;
+    margin: 2px 0;
+    opacity: 0.7;
     outline: 0;
     overflow: hidden;
+    padding: 0 6px;
+    text-align: start;
     text-overflow: ellipsis;
     white-space: nowrap;
+    width: 100%;
 }
 .btn-galleries {
     -webkit-padding-start: 4px;

@@ -11,6 +11,13 @@
 
         console.assert(page === 'start' || window.fminitialized, 'check this...');
 
+        if (M.InboxID && M.currentrootid && (M.currentrootid === M.InboxID
+            || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)) {
+
+            msgDialog('error', l[882], l.upload_to_restricted_folder, l.upload_to_backup_info);
+            return false;
+        }
+
         if (page === 'start' || straight) {
             M.addUpload(files, false, emptyFolders);
         }
@@ -193,6 +200,14 @@
         if (window.useMegaSync === 2) {
             e.preventDefault();
             e.stopPropagation();
+
+            if (M.InboxID && M.currentrootid && (M.currentrootid === M.InboxID
+                || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)) {
+
+                msgDialog('error', l[882], l.upload_to_restricted_folder, l.upload_to_backup_info);
+                return false;
+            }
+
             var target;
             if ($.onDroppedTreeFolder) {
                 target = $.onDroppedTreeFolder;
@@ -302,6 +317,13 @@
         ) {
             msgDialog('warningb', l[1676], l[1023]);
             return true;
+        }
+
+        if (M.InboxID && M.currentrootid && (M.currentrootid === M.InboxID
+            || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)) {
+
+            msgDialog('error', l[882], l.upload_to_restricted_folder, l.upload_to_backup_info);
+            return false;
         }
 
         if (page === 'start' && !is_mobile) {

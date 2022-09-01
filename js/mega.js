@@ -127,6 +127,9 @@ if (typeof loadingDialog === 'undefined') {
             $spinner.removeClass('hidden').addClass('active');
             this.active = true;
 
+            // Even there is current on going loading pregress bar, if loading dialog is called show spinner
+            $('.main-loader', $spinner).removeClass('hidden');
+
             // Prevent scrolling for mobile web
             if (is_mobile && $overlay.length && $spinner.length) {
                 document.getElementById('loading-overlay').addEventListener('touchmove', function(e){
@@ -191,6 +194,11 @@ if (typeof loadingDialog === 'undefined') {
         }
 
         const $spinner = $('.loading-spinner:not(.manual-management)').removeClass('hidden');
+
+        // If there is no current loadingDialog, make spinner disapears
+        if (!loadingDialog.active) {
+            $('.main-loader', $spinner).addClass('hidden');
+        }
 
         $('.loader-progressbar', $spinner).addClass('active');
 
@@ -2495,6 +2503,10 @@ function treetype(h) {
             return h;
         }
 
+        if (h === M.InboxID) {
+            return 'inbox';
+        }
+
         // root node reached?
         if (M.d[h].t > 1) {
             return 'cloud';
@@ -2563,6 +2575,11 @@ function ddtype(ids, toid, alt) {
         if (fromid === toid || !M.d[fromid]) return false;
 
         var fromtype = treetype(fromid);
+
+        if (fromtype === 'inbox' || treetype(toid) === 'inbox') {
+
+            return false;
+        }
 
         if (totype == 'cloud') {
             if (fromtype == 'cloud') {
@@ -3853,7 +3870,8 @@ function loadfm_done(mDBload) {
                     }
                 });
                 M.myChatFilesFolder.init();
-                M.getCameraUploads();
+                M.getMyBackups().catch(dump);
+                M.getCameraUploads().catch(dump);
             }
         }
         else {

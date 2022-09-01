@@ -24,12 +24,6 @@
 .active-folder-link .file-block-scrolling {
     padding-left: 6px;
 }
-.active-folder-link .nw-tree-panel-header {
-    height: 16px;
-    overflow: visible;
-    z-index: 20;
-    display: block;
-}
 .active-folder-link .nw-tree-panel-header span {
     display: none;
 }
@@ -76,7 +70,6 @@
 .active-folder-link .nw-fm-tree-item .nw-fm-tree-folder {
     -webkit-margin-start: 28px;
     margin-inline-start: 28px;
-    max-width: calc(100% - 30px);
 }
 /**
  * hide sections of the site if the current visited link is a folder share link

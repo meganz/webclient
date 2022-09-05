@@ -1730,7 +1730,10 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
-        fmremove();
+
+        for (let i = 0; i < $.selected.length; i++) {
+            M.leaveShare($.selected[i]).catch(dump);
+        }
     });
 
     // Bind Set Nickname context menu button

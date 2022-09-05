@@ -180,7 +180,7 @@
         "jquery/no-in-array": 2,
         "jquery/no-is-array": 2,
         "jquery/no-is-function": 2,
-        "jquery/no-map": 2,
+        "jquery/no-map": 1,
         "jquery/no-merge": 2,
         "jquery/no-parse-html": 2,
         "jquery/no-proxy": 2,

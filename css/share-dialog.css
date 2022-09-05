@@ -17,7 +17,7 @@
 }
 
 .mega-dialog.share-dialog .share-dialog-bottom-body {
-    padding-top: 24px;
+    margin-top: 24px;
     position: relative;
 }
 
@@ -123,6 +123,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    overflow: hidden;
 }
 
 .share-dialog-access-node .access-node-info-block {

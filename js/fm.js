@@ -1862,8 +1862,9 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
                     <button
                         class="mega-button action icon round access-node-permission ${permClass}
                         ${permClass === 'full-access' ? ' simpletip' : ''}"
-                        data-simpletip="${l[23709]}" data-simpletipposition="start"
-                        data-simpletip-class="medium-width center-align">
+                        data-simpletip="${l[23709]}" data-simpletipposition="top"
+                        data-simpletipwrapper=".mega-dialog-container"
+                        data-simpletipoffset="5" data-simpletip-class="medium-width center-align">
                         <i class="owner sprite-fm-uni icon-owner"></i>
                         <i class="full-access sprite-fm-mono icon-star"></i>
                         <i class="read-and-write sprite-fm-mono icon-permissions-write"></i>
@@ -2111,7 +2112,7 @@ function shareDialogAccessListBinds() {
         else {
             $('.share-dialog-access-node', $shareDialog).removeClass('active');
             x = 45;
-            y = $this.position().top + 84 + scrollPos;
+            y = $this.position().top + $this.outerHeight() + 5 + scrollPos;
 
             showShareDialogPermMenu($('.access-node-permission', $(this)), x, y);
             $selectedContact.addClass('active');

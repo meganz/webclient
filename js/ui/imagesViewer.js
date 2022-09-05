@@ -105,8 +105,7 @@ var slideshowid;
                     forward.push(index(ii[n + 1]));
                     backward.push(index(ii[n - 1]));
             }
-            $('.first', $counter).text(n + 1);
-            $('.last', $counter).text(len);
+            $counter.text(l.preview_counter.replace('%1', n + 1).replace('%2', len));
         }
 
         if (_hideCounter) {

@@ -13412,7 +13412,7 @@ class JoinCallNotification extends mixins.wl {
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-phone"
     }), external_React_default().createElement(utils.ParsedHTML, {
-      onClick: () => (0,call.xt)(true).then(() => chatRoom.joinCall()).catch(ex => d && console.warn('Already in a call.', ex))
+      onClick: () => (0,call.xt)(true, chatRoom).then(() => chatRoom.joinCall()).catch(ex => d && console.warn('Already in a call.', ex))
     }, (l[20460] || 'There is an active group call. [A]Join[/A]').replace('[A]', '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>')));
   }
 
@@ -23214,14 +23214,14 @@ Offline.NAMESPACE = 'reconnect-dialog';
 
 
 const EXPANDED_FLAG = 'in-call';
-const inProgressAlert = isJoin => {
+const inProgressAlert = (isJoin, chatRoom) => {
   return new Promise((resolve, reject) => {
     if (megaChat.haveAnyActiveCall()) {
       if (window.sfuClient) {
         const {
-          chatRoom
+          chatRoom: activeCallRoom
         } = megaChat.activeCall;
-        const peers = chatRoom ? chatRoom.getParticipantsExceptMe(chatRoom.getCallParticipants()).map(h => M.getNameByHandle(h)) : [];
+        const peers = activeCallRoom ? activeCallRoom.getParticipantsExceptMe(activeCallRoom.getCallParticipants()).map(h => M.getNameByHandle(h)) : [];
         let body = isJoin ? l.cancel_to_join : l.cancel_to_start;
 
         if (peers.length) {
@@ -23230,6 +23230,10 @@ const inProgressAlert = isJoin => {
 
         msgDialog('warningb', null, l.call_in_progress, body, null, 1);
         return reject();
+      }
+
+      if (chatRoom.getCallParticipants().includes(u_handle)) {
+        return resolve();
       }
 
       return msgDialog(`warningb:!^${l[2005]}!${isJoin ? l.join_call_anyway : l.start_call_anyway}`, null, isJoin ? l.join_multiple_calls_title : l.start_multiple_calls_title, isJoin ? l.join_multiple_calls_text : l.start_multiple_calls_text, join => {

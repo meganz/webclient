@@ -7,15 +7,16 @@ import Ephemeral from './workflow/ephemeral.jsx';
 import Offline from './offline.jsx';
 
 export const EXPANDED_FLAG = 'in-call';
-export const inProgressAlert = (isJoin) => {
+export const inProgressAlert = (isJoin, chatRoom) => {
     return new Promise((resolve, reject) => {
         if (megaChat.haveAnyActiveCall()) {
             if (window.sfuClient) {
-                // Active call w/  the current client
-                const { chatRoom } = megaChat.activeCall;
-                const peers = chatRoom
-                    ? chatRoom.getParticipantsExceptMe(chatRoom.getCallParticipants()).map(h => M.getNameByHandle(h))
-                    : [];
+                // Active call w/ the current client
+                const { chatRoom: activeCallRoom } = megaChat.activeCall;
+                const peers = activeCallRoom ?
+                    activeCallRoom.getParticipantsExceptMe(activeCallRoom.getCallParticipants())
+                        .map(h => M.getNameByHandle(h)) :
+                    [];
                 let body = isJoin ? l.cancel_to_join : l.cancel_to_start;
                 if (peers.length) {
                     body = mega.utils.trans.listToString(
@@ -26,6 +27,13 @@ export const inProgressAlert = (isJoin) => {
                 msgDialog('warningb', null, l.call_in_progress, body, null, 1);
                 return reject();
             }
+
+            // Active call on another client; incl. current user already being in the call ->
+            // skip warning notification
+            if (chatRoom.getCallParticipants().includes(u_handle)) {
+                return resolve();
+            }
+
             // Active call on another client
             return (
                 msgDialog(

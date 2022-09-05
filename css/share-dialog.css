@@ -506,10 +506,6 @@
 
 .mega-dialog.share-add-dialog .chat-contactspicker-no-contacts .fm-empty-description.small {
     padding: 1px 0 38px 0;
-    -webkit-padding-start: 20px;
-    padding-inline-start: 20px;
-    -webkit-padding-end: 32px;
-    padding-inline-end: 32px;
 }
 
 .mega-dialog.share-add-dialog .chat-contactspicker-no-contacts.searching {

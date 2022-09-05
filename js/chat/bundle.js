@@ -7682,7 +7682,7 @@ class ContactPickerWidget extends _mixins1__.wl {
       if (frequentContacts.length === 0 && noOtherContacts) {
         if (self.props.newEmptySearchResult) {
           contactsList = react0().createElement("div", {
-            className: "chat-contactspicker-no-contacts searching"
+            className: "chat-contactspicker-no-contacts flex flex-column flex-center searching mt-2"
           }, react0().createElement("div", {
             className: "section-icon sprite-fm-mono icon-contacts"
           }), react0().createElement("div", {
@@ -7690,16 +7690,18 @@ class ContactPickerWidget extends _mixins1__.wl {
           }, l[8674]));
         } else {
           contactsList = react0().createElement("div", {
-            className: "chat-contactspicker-no-contacts"
+            className: "chat-contactspicker-no-contacts flex flex-column mt-2"
           }, react0().createElement("div", {
             className: "contacts-list-header"
           }, l[165]), react0().createElement("div", {
+            className: "flex flex-1 flex-column flex-center"
+          }, react0().createElement("div", {
             className: "section-icon sprite-fm-mono icon-contacts"
           }), react0().createElement("div", {
             className: "fm-empty-cloud-txt small"
           }, l[784]), react0().createElement("div", {
             className: "fm-empty-description small"
-          }, l[19115]));
+          }, l[19115])));
         }
       } else {
         contactsList = react0().createElement(_ui_perfectScrollbar_jsx3__.F, {
@@ -7736,7 +7738,7 @@ class ContactPickerWidget extends _mixins1__.wl {
     } else if (self.props.newNoContact) {
       multipleContacts = "";
       contactsList = react0().createElement("div", {
-        className: "chat-contactspicker-no-contacts"
+        className: "chat-contactspicker-no-contacts flex flex-column flex-center mt-2"
       }, react0().createElement("div", {
         className: "section-icon sprite-fm-mono icon-contacts"
       }), react0().createElement("div", {
@@ -7747,7 +7749,7 @@ class ContactPickerWidget extends _mixins1__.wl {
       extraClasses += " no-contacts";
     } else {
       contactsList = react0().createElement("div", {
-        className: "chat-contactspicker-no-contacts"
+        className: "chat-contactspicker-no-contacts flex flex-column flex-center mt-16"
       }, react0().createElement("div", {
         className: "section-icon sprite-fm-mono icon-contacts"
       }), react0().createElement("div", {

@@ -224,7 +224,12 @@ export class Button extends MegaRenderMixin {
                                 this.props.toggle.onClick();
                             }
                         }}>
-                        <div className="mega-feature-switch" />
+                        <div
+                            className={
+                                `mega-feature-switch sprite-fm-mono-after
+                                ${toggle.enabled ? 'icon-check-after' : 'icon-minimise-after'}`
+                            }
+                        />
                     </div>
                 )}
                 {this.renderChildren()}

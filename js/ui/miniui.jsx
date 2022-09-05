@@ -28,7 +28,12 @@ class ToggleCheckbox extends MegaRenderMixin {
                 role="switch"
                 aria-checked={!!this.state.value}
                 onClick={this.onToggle}>
-                <div className="mega-feature-switch" />
+                <div
+                    className={
+                        `mega-feature-switch sprite-fm-mono-after
+                         ${this.state.value ? 'icon-check-after' : 'icon-minimise-after'}`
+                    }
+                />
             </div>
         );
     }

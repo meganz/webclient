@@ -188,9 +188,10 @@ body.de .mega-dialog.new-group-chat {
     font: var(--text-body1-bold);
     color: var(--text-color-high);
 }
-.group-chat-dialog .rotation-toggle {
+.group-chat-dialog .rotation-toggle,
+.group-chat-dialog .open-invite-toggle {
     float: right;
-    margin: 12px 0 0 0;
+    margin: 12px 0 0;
 }
 .group-chat-dialog.header {
     padding: 14px 12px 10px 0;
@@ -198,7 +199,7 @@ body.de .mega-dialog.new-group-chat {
 .group-chat-dialog.description {
     padding: 0 12px 0 0;
     font: var(--text-body1);
-    color: var(--text-color-medium);
+    color: var(--text-color-low);
 }
 .toggle-checkbox.right + .group-chat-dialog.header {
     padding-right: 80px;

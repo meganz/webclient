@@ -33,7 +33,15 @@ export default class Sidebar extends MegaRenderMixin {
                 {view !== Call.VIEW.CHAT && (
                     <>
                         <h2>{l[16217] /* `Participants` */}</h2>
-                        {call.isPublic && !is_eplusplus && Call.isModerator(chatRoom, u_handle) && (
+                        {
+                            call.isPublic
+                            && !is_eplusplus
+                            && (
+                                chatRoom.type !== 'private'
+                                && chatRoom.options[MCO_FLAGS.OPEN_INVITE]
+                                && !chatRoom.iAmReadOnly()
+                                || Call.isModerator(chatRoom, u_handle))
+                            && (
                             <Button
                                 className="mega-button round positive add"
                                 icon="icon-add"

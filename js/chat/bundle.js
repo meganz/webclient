@@ -1145,7 +1145,7 @@ Chat.prototype.reorderContactTree = function () {
   });
 };
 
-Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdUrl, setAsActive, chatHandle, publicChatKey, ck, isMeeting) {
+Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdUrl, setAsActive, chatHandle, publicChatKey, ck, isMeeting, mcoFlags) {
   var self = this;
   var room = false;
   type = type || "private";
@@ -1268,7 +1268,7 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
     self.currentlyOpenedChat = null;
   }
 
-  room = new ChatRoom(self, roomId, type, userHandles, unixtime(), undefined, chatId, chatShard, chatdUrl, null, chatHandle, publicChatKey, ck, isMeeting, 0);
+  room = new ChatRoom(self, roomId, type, userHandles, unixtime(), undefined, chatId, chatShard, chatdUrl, null, chatHandle, publicChatKey, ck, isMeeting, 0, mcoFlags);
   self.chats.set(room.roomId, room);
 
   if (setAsActive && !self.currentlyOpenedChat || self.currentlyOpenedChat === room.roomId) {
@@ -1908,17 +1908,19 @@ Chat.prototype.createAndShowPrivateRoom = promisify(function (resolve, reject, h
   }).catch(reject);
 });
 
-Chat.prototype.createAndShowGroupRoomFor = function (contactHashes, topic, keyRotation, createChatLink, isMeeting) {
+Chat.prototype.createAndShowGroupRoomFor = function (contactHashes, topic, opts = {}) {
   this.trigger('onNewGroupChatRequest', [contactHashes, {
     'topic': topic || "",
-    'keyRotation': keyRotation,
-    'createChatLink': createChatLink,
-    'isMeeting': isMeeting
+    ...opts
   }]);
 };
 
 Chat.prototype.createAndStartMeeting = function (topic, audio, video) {
-  megaChat.createAndShowGroupRoomFor([], topic, false, 2, true);
+  megaChat.createAndShowGroupRoomFor([], topic, {
+    keyRotation: false,
+    createChatLink: 2,
+    isMeeting: true
+  });
   megaChat.rebind('onRoomInitialized.meetingCreate', function (e, room) {
     room.rebind('onNewMeetingReady.meetingCreate', function () {
       room.startCall(audio, video);
@@ -2685,6 +2687,7 @@ const chat = ({
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
+"MCO_FLAGS": () => (MCO_FLAGS),
 "RETENTION_FORMAT": () => (RETENTION_FORMAT),
 "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 });
@@ -2695,9 +2698,15 @@ const RETENTION_FORMAT = {
   MONTHS: 'month',
   DISABLED: 'none'
 };
+const MCO_FLAGS = {
+  OPEN_INVITE: 'oi',
+  SPEAK_REQUEST: 'sr',
+  WAITING_ROOM: 'w'
+};
 window.RETENTION_FORMAT = RETENTION_FORMAT;
+window.MCO_FLAGS = MCO_FLAGS;
 
-var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI, publicChatHandle, publicChatKey, ck, isMeeting, retentionTime) {
+var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI, publicChatHandle, publicChatKey, ck, isMeeting, retentionTime, mcoFlags) {
   var self = this;
   this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
   this.megaChat = megaChat;
@@ -2730,7 +2739,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     retentionTime: 0,
     sfuApp: null,
     activeCallIds: null,
-    meetingsLoading: null
+    meetingsLoading: null,
+    options: {}
   });
   this.roomId = roomId;
   this.instanceIndex = ChatRoom.INSTANCE_INDEX++;
@@ -2769,14 +2779,13 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     });
   }
 
-  this.options = {
-    'dontResendAutomaticallyQueuedMessagesOlderThen': 60,
-    'pluginsReadyTimeout': 60000,
-    'mediaOptions': {
-      audio: true,
-      video: true
-    }
-  };
+  this.options = {};
+  mcoFlags = mcoFlags || {};
+
+  for (const flag of Object.values(MCO_FLAGS)) {
+    this.options[flag] = mcoFlags[flag] || 0;
+  }
+
   this.setState(ChatRoom.STATE.INITIALIZED);
   this.isCurrentlyActive = false;
 
@@ -4408,7 +4417,15 @@ ChatRoom.prototype.isReadOnly = function () {
 };
 
 ChatRoom.prototype.iAmOperator = function () {
-  return this.type === "private" || this.members && this.members[u_handle] === 3;
+  return this.type === "private" || this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL;
+};
+
+ChatRoom.prototype.iAmStandard = function () {
+  return this.type !== 'private' && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
+};
+
+ChatRoom.prototype.iAmReadOnly = function () {
+  return this.type !== 'private' && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
 };
 
 ChatRoom.prototype.didInteraction = function (user_handle, ts) {
@@ -4656,6 +4673,29 @@ ChatRoom.prototype.scrollToMessageId = function (msgId, index, retryActive) {
     self.isScrollingToMessageId = false;
   }
 };
+
+ChatRoom.prototype.setMcoFlags = function (flags) {
+  const req = {
+    a: 'mco',
+    cid: this.chatId,
+    ...flags
+  };
+  asyncApiReq(req).dump('roomSetCallFlags');
+};
+
+ChatRoom.prototype.toggleOpenInvite = function () {
+  if (this.type === 'private' || !this.iAmOperator()) {
+    return;
+  }
+
+  this.setMcoFlags({
+    [MCO_FLAGS.OPEN_INVITE]: Math.abs(this.options[MCO_FLAGS.OPEN_INVITE] - 1)
+  });
+};
+
+ChatRoom.prototype.toggleWaitingRoom = function () {};
+
+ChatRoom.prototype.toggleSpeakRequest = function () {};
 
 window.ChatRoom = ChatRoom;
 const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -8141,7 +8181,10 @@ class ContextMenu extends mixins.wl {
         label: l[8632],
         onClick: () => this.close(() => {
           if (selected && selected.length) {
-            return megaChat.createAndShowGroupRoomFor(selected, '', true, false);
+            return megaChat.createAndShowGroupRoomFor(selected, '', {
+              keyRotation: true,
+              createChatLink: false
+            });
           }
 
           return loadSubPage(`fm/chat/p/${contact.u}`);
@@ -13489,7 +13532,7 @@ class ConversationRightArea extends mixins.wl {
         "data-simpletip": `${l.unsupported_browser_audio}`,
         "data-simpletipposition": "top",
         "data-simpletipoffset": "7",
-        className: `${!megaChat.hasSupportForCalls ? 'simpletip' : ''} 
+        className: `${megaChat.hasSupportForCalls ? '' : 'simpletip'}
                         link-button light ${startCallButtonClass}`,
         onClick: () => onStartCall(call.ZP.TYPE.AUDIO)
       }, external_React_default().createElement("i", {
@@ -13502,7 +13545,7 @@ class ConversationRightArea extends mixins.wl {
         "data-simpletip": `${l.unsupported_browser_video}`,
         "data-simpletipposition": "top",
         "data-simpletipoffset": "7",
-        className: `${!megaChat.hasSupportForCalls ? 'simpletip' : ''} 
+        className: `${megaChat.hasSupportForCalls ? '' : 'simpletip'}
                         link-button light ${startCallButtonClass}`,
         onClick: () => onStartCall(call.ZP.TYPE.VIDEO)
       }, external_React_default().createElement("i", {
@@ -13563,7 +13606,7 @@ class ConversationRightArea extends mixins.wl {
       className: "link-button light",
       icon: "sprite-fm-mono icon-add-small",
       label: l[8007],
-      disabled: call.ZP.isGuest() || !(!room.isReadOnly() && room.iAmOperator() && !self.allContactsInChat(excludedParticipants)),
+      disabled: call.ZP.isGuest() || !(!room.isReadOnly() && (room.iAmOperator() || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE]) && !self.allContactsInChat(excludedParticipants)),
       onClick: () => {
         this.setState({
           contactPickerDialog: true
@@ -13601,6 +13644,28 @@ class ConversationRightArea extends mixins.wl {
         onClick: () => !pushSettingsValue && pushSettingsValue !== 0 ? onPushSettingsClicked() : onPushSettingsToggled()
       },
       onClick: () => call.ZP.isGuest() ? null : onPushSettingsClicked()
+    }), AVseperator);
+    const openInviteBtn = room.type !== 'private' && external_React_default().createElement("div", {
+      className: "open-invite-settings"
+    }, external_React_default().createElement(buttons.Button, {
+      className: `
+                        link-button
+                        light
+                        open-invite-settings-button
+                    `,
+      disabled: !room.iAmOperator(),
+      icon: `
+                        sprite-fm-mono
+                        icon-user-filled
+                    `,
+      label: l.open_invite_label,
+      secondLabel: l.open_invite_desc,
+      secondLabelClass: "label--green",
+      toggle: {
+        enabled: room.options[MCO_FLAGS.OPEN_INVITE],
+        onClick: () => room.toggleOpenInvite()
+      },
+      onClick: () => room.toggleOpenInvite()
     }), AVseperator);
     let retentionTime = room.retentionTime ? secondsToDays(room.retentionTime) : 0;
     const ICON_ACTIVE = external_React_default().createElement("i", {
@@ -13761,7 +13826,7 @@ class ConversationRightArea extends mixins.wl {
       onClick: () => {
         self.props.onAttachFromComputerClicked();
       }
-    }))), pushSettingsBtn, external_React_default().createElement(buttons.Button, {
+    }))), pushSettingsBtn, openInviteBtn, external_React_default().createElement(buttons.Button, {
       className: "link-button light clear-history-button",
       disabled: dontShowTruncateButton || !room.members.hasOwnProperty(u_handle),
       onClick: () => {
@@ -15194,7 +15259,8 @@ class ToggleCheckbox extends mixins.wl {
       "aria-checked": !!this.state.value,
       onClick: this.onToggle
     }, external_React_default().createElement("div", {
-      className: "mega-feature-switch"
+      className: `mega-feature-switch sprite-fm-mono-after
+                         ${this.state.value ? 'icon-check-after' : 'icon-minimise-after'}`
     }));
   }
 
@@ -15336,7 +15402,8 @@ class StartGroupChatWizard extends mixins.wl {
       'step': this.props.flowType === 2 || !haveContacts ? 1 : 0,
       'keyRotation': false,
       'createChatLink': this.props.flowType === 2 ? true : false,
-      'groupName': ''
+      'groupName': '',
+      openInvite: 1
     };
     this.onFinalizeClick = this.onFinalizeClick.bind(this);
     this.onSelectClicked = this.onSelectClicked.bind(this);
@@ -15360,19 +15427,24 @@ class StartGroupChatWizard extends mixins.wl {
   }
 
   onFinalizeClick(e) {
-    var self = this;
-
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
 
-    var groupName = self.state.groupName;
-    var handles = self.state.selected;
-    var keyRotation = self.state.keyRotation;
-    var createChatLink = keyRotation ? false : self.state.createChatLink;
-    megaChat.createAndShowGroupRoomFor(handles, groupName, keyRotation, createChatLink);
-    self.props.onClose(self);
+    const {
+      groupName,
+      selected,
+      keyRotation,
+      createChatLink,
+      openInvite
+    } = this.state;
+    megaChat.createAndShowGroupRoomFor(selected, groupName, {
+      keyRotation,
+      createChatLink: keyRotation ? false : createChatLink,
+      oi: openInvite
+    });
+    this.props.onClose(this);
   }
 
   render() {
@@ -15534,9 +15606,20 @@ class StartGroupChatWizard extends mixins.wl {
         }, () => this.inputRef.current.focus())
       }), startGroupChatWizard_React.createElement("div", {
         className: "group-chat-dialog header"
-      }, this.state.keyRotation ? l[20631] : l[20576]), startGroupChatWizard_React.createElement("div", {
+      }, l[20576]), startGroupChatWizard_React.createElement("div", {
         className: "group-chat-dialog description"
-      }, l[20484]), startGroupChatWizard_React.createElement("div", {
+      }, l[20484]), startGroupChatWizard_React.createElement(miniui.ToggleCheckbox, {
+        className: "open-invite-toggle",
+        checked: this.state.openInvite,
+        value: this.state.openInvite,
+        onToggle: openInvite => this.setState({
+          openInvite
+        }, () => this.inputRef.current.focus())
+      }), startGroupChatWizard_React.createElement("div", {
+        className: "group-chat-dialog header"
+      }, l.open_invite_label), startGroupChatWizard_React.createElement("div", {
+        className: "group-chat-dialog description"
+      }, l.open_invite_desc), startGroupChatWizard_React.createElement("div", {
         className: `
                                     group-chat-dialog checkbox
                                     ${this.state.keyRotation ? 'disabled' : ''}
@@ -22607,7 +22690,7 @@ class Sidebar extends mixins.wl {
         className: "mega-button action small left",
         icon: "icon-collapse-right",
         onClick: onSidebarClose
-      }, external_React_default().createElement("span", null, l.close_sidebar)), view === Call.VIEW.CHAT && external_React_default().createElement("h2", null, l.chats), view !== Call.VIEW.CHAT && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("h2", null, l[16217]), call.isPublic && !is_eplusplus && Call.isModerator(chatRoom, u_handle) && external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement("span", null, l.close_sidebar)), view === Call.VIEW.CHAT && external_React_default().createElement("h2", null, l.chats), view !== Call.VIEW.CHAT && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("h2", null, l[16217]), call.isPublic && !is_eplusplus && (chatRoom.type !== 'private' && chatRoom.options[MCO_FLAGS.OPEN_INVITE] && !chatRoom.iAmReadOnly() || Call.isModerator(chatRoom, u_handle)) && external_React_default().createElement(meetings_button.Z, {
         className: "mega-button round positive add",
         icon: "icon-add",
         onClick: onInviteToggle
@@ -28048,7 +28131,8 @@ class Button extends _chat_mixins1__.wl {
         }
       }
     }, react0().createElement("div", {
-      className: "mega-feature-switch"
+      className: `mega-feature-switch sprite-fm-mono-after
+                                ${toggle.enabled ? 'icon-check-after' : 'icon-minimise-after'}`
     })), this.renderChildren());
   }
 

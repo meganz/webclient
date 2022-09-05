@@ -1652,7 +1652,7 @@ FileManager.prototype.initContextUI = function() {
             }
         }
         else {
-            megaChat.createAndShowGroupRoomFor(user_handle, "", true, false);
+            megaChat.createAndShowGroupRoomFor(user_handle, "", {keyRotation: true, createChatLink: false});
         }
     });
 

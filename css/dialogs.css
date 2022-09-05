@@ -4603,9 +4603,6 @@ body.de .mega-dialog.new-group-chat {
         position: relative;
         height: 400px;
     }
-    .mega-dialog.collected-data-review-dialog .collected-data li::selection {
-        background: var(--surface-grey-1);
-    }
     .mega-dialog.collected-data-review-dialog .collected-data {
         border: 0;
         padding: 0;

@@ -143,13 +143,6 @@ body.mobile.bottom-pages {
 .lato-semibold {
     font-family: var(--text-font-family-semibold);
 }
-::selection {
-    background: var(--text-selection);
-    color: var(--text-color-high);
-}
-::-moz-selection {
-    background: var(--text-selection);
-}
 input[type='number'] {
     -moz-appearance: textfield;
 }

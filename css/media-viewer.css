@@ -110,12 +110,6 @@
             font: var(--text-body1);
             padding: 2px 12px;
         }
-        .media-viewer .counter .mid {
-            color: var(--text-color-medium);
-            font: var(--text-body2);
-            line-height: inherit;
-            padding: 0 8px;
-        }
 
     /* Content */
 

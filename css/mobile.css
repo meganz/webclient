@@ -11610,10 +11610,11 @@ Thank You dialog
 /**
  * Chatlink preview page styles
  */
- .mobile.chat-links-preview {
+.mobile.chat-links-preview {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: inherit;
 }
 .chatlink-mobile-header {
     display: flex;

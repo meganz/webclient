@@ -23352,7 +23352,7 @@ class Call extends mixins.wl {
     };
 
     this.handleRetryTimeout = () => {
-      if (this.props.sfuApp.sfuClient.connState === SfuClient.ConnState.kDisconnected) {
+      if (this.props.sfuApp.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
         this.handleCallEnd();
         this.props.chatRoom.trigger('onRetryTimeout');
         ion.sound.play('end_call');
@@ -23766,11 +23766,17 @@ class Call extends mixins.wl {
       })
     }), offline && external_React_default().createElement(Offline, {
       onClose: () => {
+        if (offline) {
+          this.setState({
+            offline: false
+          }, () => delay('call:timeout', this.handleRetryTimeout, 3e4));
+        }
+      },
+      onCallEnd: () => {
         this.setState({
           offline: false
-        }, () => delay('call:timeout', this.handleRetryTimeout, 3e4));
-      },
-      onCallEnd: this.handleRetryTimeout
+        }, () => this.handleRetryTimeout());
+      }
     }));
   }
 

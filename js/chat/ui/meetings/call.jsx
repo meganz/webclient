@@ -177,7 +177,7 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleRetryTimeout = () => {
-        if (this.props.sfuApp.sfuClient.connState === SfuClient.ConnState.kDisconnected) {
+        if (this.props.sfuApp.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
             this.handleCallEnd();
             this.props.chatRoom.trigger('onRetryTimeout');
             ion.sound.play('end_call');
@@ -630,11 +630,17 @@ export default class Call extends MegaRenderMixin {
                 {offline && (
                     <Offline
                         onClose={() => {
+                            if (offline) {
+                                this.setState({ offline: false }, () =>
+                                    delay('call:timeout', this.handleRetryTimeout, 3e4)
+                                );
+                            }
+                        }}
+                        onCallEnd={() => {
                             this.setState({ offline: false }, () =>
-                                delay('call:timeout', this.handleRetryTimeout, 3e4)
+                                this.handleRetryTimeout()
                             );
                         }}
-                        onCallEnd={this.handleRetryTimeout}
                     />
                 )}
             </div>

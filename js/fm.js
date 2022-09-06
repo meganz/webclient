@@ -498,6 +498,8 @@ function contactVsUserDialog() {
  * @param {Boolean} dontWarnBusiness    if true, then proceed to show the dialog
  */
 function contactAddDialog(close, dontWarnBusiness) {
+    'use strict';
+
     var $d = $('.add-user-popup');
 
     // not for ephemeral
@@ -1474,8 +1476,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
             $('#msgDialog').addClass('error');
         }
     }
-    else if (type.includes('confirmation') || type.includes('remove')) {
-
+    else if (type === 'confirmationa' || type === 'confirmation' || type === 'remove') {
         if (doneButton === l[81]) {
             doneButton = false;
         }
@@ -1520,6 +1521,9 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
         });
         if (type === 'remove') {
             $('#msgDialog').addClass('warning');
+        }
+        else if (type === 'confirmationa') {
+            $('#msgDialog').addClass('info');
         }
         else {
             $('#msgDialog').addClass('confirmation');

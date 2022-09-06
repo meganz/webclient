@@ -5,6 +5,7 @@ import Sidebar from './sidebar.jsx';
 import Invite from './workflow/invite/invite.jsx';
 import Ephemeral from './workflow/ephemeral.jsx';
 import Offline from './offline.jsx';
+import { allContactsInChat, excludedParticipants } from '../conversationpanel.jsx';
 
 export const EXPANDED_FLAG = 'in-call';
 export const inProgressAlert = (isJoin, chatRoom) => {
@@ -436,7 +437,41 @@ export default class Call extends MegaRenderMixin {
      * @returns {void}
      */
 
-    handleInviteToggle = () => this.setState({ invite: !this.state.invite });
+    handleInviteToggle = () => {
+        if (M.u.length > 1) {
+            const participants = excludedParticipants(this.props.chatRoom);
+
+            if (allContactsInChat(participants)) {
+                msgDialog(
+                    `confirmationa:!^${l[8726]}!${l[82]}`,
+                    null,
+                    `${l.all_contacts_added}`,
+                    `${l.all_contacts_added_to_chat}`,
+                    (res) => {
+                        if (res) {
+                            contactAddDialog(null, false);
+                        }
+                    }
+                );
+            }
+            else {
+                this.setState({ invite: !this.state.invite });
+            }
+        }
+        else {
+            msgDialog(// new user adding a partcipant
+                `confirmationa:!^${l[8726]}!${l[82]}`,
+                null,
+                `${l.no_contacts}`,
+                `${l.no_contacts_text}`,
+                (resp) => {
+                    if (resp) {
+                        contactAddDialog(null, false);
+                    }
+                }
+            );
+        }
+    };
 
     /**
      * handleHoldToggle
@@ -580,7 +615,6 @@ export default class Call extends MegaRenderMixin {
         //
         // `Call`
         // -------------------------------------------------------------------------
-
         return (
             <div className={`meetings-call ${minimized ? 'minimized' : ''}`}>
                 <Stream

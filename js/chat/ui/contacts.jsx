@@ -1040,7 +1040,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
             }
         }
 
-
         if (pres === "chat") {
             pres = "online";
         }

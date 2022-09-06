@@ -22,7 +22,7 @@ import HistoryPanel from "./historyPanel.jsx";
 import ComposedTextArea from "./composedTextArea.jsx";
 import Loading from "./meetings/workflow/loading.jsx";
 import Join from "./meetings/workflow/join.jsx";
-import Alert from './meetings/workflow/alert.jsx';
+import Alert from './meetings/workflow/alert';
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -174,6 +174,30 @@ export class JoinCallNotification extends MegaRenderMixin {
     }
 }
 
+export const allContactsInChat = (participants) => {
+    var currentContacts = M.u.keys();
+    for (var i = 0; i < currentContacts.length; i++) {
+        var k = currentContacts[i];
+        if (M.u[k].c === 1 && !participants.includes(k)) {
+            return false;
+        }
+    }
+    return true;
+};
+
+export const excludedParticipants = (room) => {
+    const excParticipants = room.type === "group" || room.type === "public" ?
+        room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) :
+            room.getParticipants()
+        :
+        room.getParticipants();
+
+    if (excParticipants.includes(u_handle)) {
+        array.remove(excParticipants, u_handle, false);
+    }
+    return excParticipants;
+};
+
 export class ConversationRightArea extends MegaRenderMixin {
     static defaultProps = {
         'requiresUpdateOnResize': true
@@ -187,21 +211,7 @@ export class ConversationRightArea extends MegaRenderMixin {
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
     }
-    allContactsInChat(participants) {
-        var self = this;
-        if (participants.length === 0) {
-            return false;
-        }
 
-        var currentContacts = M.u.keys();
-        for (var i = 0; i < currentContacts.length; i++) {
-            var k = currentContacts[i];
-            if (M.u[k].c === 1 && participants.indexOf(k) === -1) {
-                return false;
-            }
-        }
-        return true;
-    }
     setRetention(chatRoom, retentionTime) {
         chatRoom.setRetention(retentionTime);
         $(document).trigger('closeDropdowns');
@@ -272,16 +282,8 @@ export class ConversationRightArea extends MegaRenderMixin {
         if (room.isReadOnly()) {
             isReadOnlyElement = <center className="center" style={{margin: "6px"}}>{l.read_only_chat}</center>;
         }
-        var excludedParticipants = room.type === "group" || room.type === "public" ?
-            (
-                room.members && Object.keys(room.members).length > 0 ? Object.keys(room.members) :
-                    room.getParticipants()
-            )   :
-            room.getParticipants();
+        const exParticipants = excludedParticipants(room);
 
-        if (excludedParticipants.indexOf(u_handle) >= 0) {
-            array.remove(excludedParticipants, u_handle, false);
-        }
         var dontShowTruncateButton = false;
         if (
             !room.iAmOperator() ||
@@ -329,18 +331,33 @@ export class ConversationRightArea extends MegaRenderMixin {
                 className="link-button light"
                 icon="sprite-fm-mono icon-add-small"
                 label={l[8007]}
-                disabled={
-                    Call.isGuest() ||
-                    /* Disable in case I don't have any more contacts to add ... */
-                    !(
-                        !room.isReadOnly() &&
-                        (room.iAmOperator() || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE]) &&
-                        !self.allContactsInChat(excludedParticipants)
-                    )
+                disabled={Call.isGuest() || room.isReadOnly() || !(room.iAmOperator()
+                    || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE])}
+                onClick={() =>
+                    M.u.length > 1 ?
+                        !allContactsInChat(exParticipants)
+                            ? this.setState({ contactPickerDialog: true }) :
+                            msgDialog(
+                                `confirmationa:!^${l[8726]}!${l[82]}`,
+                                null,
+                                `${l.all_contacts_added}`,
+                                `${l.all_contacts_added_to_chat}`,
+                                (res) => {
+                                    if (res) {
+                                        contactAddDialog(null, false);
+                                    }
+                                }, 1) :
+                        msgDialog( // new user adding a partcipant
+                            `confirmationa:!^${l[8726]}!${l[82]}`,
+                            null,
+                            `${l.no_contacts}`,
+                            `${l.no_contacts_text}`,
+                            (resp) => {
+                                if (resp) {
+                                    contactAddDialog(null, false);
+                                }
+                            }, 1)
                 }
-                onClick={() => {
-                    this.setState({ contactPickerDialog: true });
-                }}
             >
             </Button>
         );
@@ -748,7 +765,7 @@ export class ConversationRightArea extends MegaRenderMixin {
             </PerfectScrollbar>
             {this.state.contactPickerDialog && (
                 <ContactPickerDialog
-                    exclude={excludedParticipants}
+                    exclude={exParticipants}
                     megaChat={room.megaChat}
                     multiple={true}
                     className="popup add-participant-selector"

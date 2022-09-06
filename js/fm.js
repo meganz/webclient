@@ -3331,6 +3331,9 @@ function fm_resize_handler(force) {
         if ($accountContent.width() < 780) {
             $accountContent.addClass('low-width');
         }
+
+        // Init account content scrolling
+        accountUI.initAccountScroll();
     }
     else if (M.currentdirid && M.currentdirid.substr(0, 9) === 'dashboard') {
         var $dashboardContent = $('.fm-right-block.dashboard', '.fm-main');

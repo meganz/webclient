@@ -53,18 +53,27 @@ function accountUI() {
         // instead or refactoring "accounts" page to return a promise in "rendering" a non noticeable
         // heuristic 300ms delay has been added. I believe this delay simulate the slowness which allowed
         // the previous logic to work.
-        delay('settings:scrollbarinit', () => {
-            if (accountUI.$contentBlock.is('.ps')) {
-                Ps.update(accountUI.$contentBlock[0]);
-            }
-            else {
-                Ps.initialize(accountUI.$contentBlock[0]);
-            }
-        }, 300);
+        delay('settings:scrollbarinit', accountUI.initAccountScroll, 300);
     }, 1);
-
-
 }
+
+accountUI.initAccountScroll = function() {
+
+    'use strict';
+
+    const $scrollBlock = accountUI.$contentBlock || $('.fm-right-account-block');
+
+    if (!$scrollBlock.length) {
+        return false;
+    }
+
+    if ($scrollBlock.is('.ps')) {
+        Ps.update($scrollBlock[0]);
+    }
+    else {
+        Ps.initialize($scrollBlock[0]);
+    }
+};
 
 accountUI.renderAccountPage = function(account) {
 

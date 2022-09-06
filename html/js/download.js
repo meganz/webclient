@@ -1171,4 +1171,10 @@ function dlPageCleanup() {
         $(container).appendTo(wrapper);
         delete window.mediaConIsDl;
     }
+    if (!is_mobile && typeof fdl_queue_var !== 'undefined') {
+        const $tpwRows = $('.transfer-task-row.complete', '.transfer-progress-widget-body');
+        if (mega.tpw && $tpwRows.length) {
+            mega.tpw.removeRow($tpwRows.toArray().map(a => String(a.id).replace('tpw_', '')), false);
+        }
+    }
 }

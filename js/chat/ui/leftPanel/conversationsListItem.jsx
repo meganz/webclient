@@ -210,11 +210,10 @@ export default class ConversationsListItem extends MegaRenderMixin {
              * 2. I'm retrieving history at the moment.
              * 3. I'd connected to chatd and joined the room.
              */
-            lastMessageDiv = showHideMsg ? '' :
-                <div>
-                    <div className={lastMsgDivClasses}>
-                        {this.loadingShown ? l[7006] : l[8000]}
-                    </div>
+            lastMessageDiv = showHideMsg
+                ? '' :
+                <div className={lastMsgDivClasses}>
+                    {this.loadingShown ? l[7006] : l[8000]}
                 </div>;
         }
 

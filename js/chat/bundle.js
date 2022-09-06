@@ -16826,9 +16826,9 @@ let ConversationsListItem = (conversationsListItem_dec = utils["default"].SoonFc
       }
     } else {
       lastMsgDivClasses = "conversation-message";
-      lastMessageDiv = showHideMsg ? '' : external_React_default().createElement("div", null, external_React_default().createElement("div", {
+      lastMessageDiv = showHideMsg ? '' : external_React_default().createElement("div", {
         className: lastMsgDivClasses
-      }, this.loadingShown ? l[7006] : l[8000]));
+      }, this.loadingShown ? l[7006] : l[8000]);
     }
 
     this.lastMessageId = lastMessage && lastMessage.messageId;

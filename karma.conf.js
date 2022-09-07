@@ -21,7 +21,6 @@ module.exports = function(config) {
         // == Basics ==
         'js/vendor/jquery.js',
         'js/vendor/jquery-ui.js',
-        'js/vendor/jquery.jscrollpane.js',
         'js/vendor/jquery.mousewheel.js',
         'js/vendor/jquery.fullscreen.js',
         'js/vendor/jquery.qrcode.js',
@@ -131,6 +130,7 @@ module.exports = function(config) {
         'js/keepAlive.js',
         'js/metatags.js',
         'js/utils/trans.js',
+        'js/time_checker.js',
 
         // Transfers
         'js/transfers/meths/filesystem.js',

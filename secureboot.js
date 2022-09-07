@@ -2923,6 +2923,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/backupsUI.js', n: 'fm_backups_ui_js', j:1, w:5});
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
+        jsl.push({f:'js/time_checker.js', n: 'time_checker_js', j:1});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/fm/account-change-password.js', n: 'fm_account_change_password_js', j:1});
         jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
@@ -3401,7 +3402,8 @@ else if (!browserUpdate) {
         'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2},
         'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
         'object_storage': {f:'html/objectstorage.html', n: 'object_storage', j:0},
-        'folderlink_css':{f:'css/folder-link.css', n: 'folderlink_css', j: 2, w: 5, c: 1, d: 1, cache: 1}
+        'folderlink_css':{f:'css/folder-link.css', n: 'folderlink_css', j: 2, w: 5, c: 1, d: 1, cache: 1},
+        'time_checker_js': {f:'js/time_checker.js', n:'time_checker_js', j:1}
     };
 
     /* eslint-disable max-len */

@@ -22467,7 +22467,6 @@ class Incoming extends _mixins1__.wl {
       return react0().createElement(_ui_modalDialogs_jsx3__.Z.ModalDialog, (0,_extends6__.Z)({}, this.state, {
         name: NAMESPACE,
         className: NAMESPACE,
-        noCloseOnClickOutside: true,
         onClose: () => onClose()
       }), react0().createElement("div", {
         className: "fm-dialog-body"

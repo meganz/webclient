@@ -103,7 +103,6 @@ export default class Incoming extends MegaRenderMixin {
                     {...this.state}
                     name={NAMESPACE}
                     className={NAMESPACE}
-                    noCloseOnClickOutside={true}
                     onClose={() => onClose()}>
                     <div className="fm-dialog-body">
                         <div className={`${NAMESPACE}-avatar`}>

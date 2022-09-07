@@ -5,7 +5,9 @@ import { Button } from '../../../../ui/buttons.jsx';
 
 export default class Attachment extends AbstractGenericMessage {
 
-    _isRevoked = node => !M.chd[node.ch] || node.revoked;
+    _isRevoked(node) {
+        return !M.chd[node.ch] || node.revoked;
+    }
 
     _isUserRegistered() {
         return typeof u_type !== 'undefined' && u_type > 2;

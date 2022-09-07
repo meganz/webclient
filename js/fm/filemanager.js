@@ -1037,9 +1037,11 @@ FileManager.prototype.initFileManagerUI = function() {
                     targetFolder = tab.root;
 
                     // special case handling for the chat, re-render current conversation
-                    if (tab.root === 'chat' && String(M.currentdirid).substr(0, 5) === 'chat/' &&
-                        !M.currentdirid.startsWith('chat/contacts') &&
-                        !M.currentdirid.startsWith('chat/archived')) {
+                    if (
+                        tab.root === 'chat' &&
+                        String(M.currentdirid).substr(0, 5) === 'chat/' &&
+                        !M.currentdirid.startsWith('chat/contacts')
+                    ) {
                         targetFolder = M.currentdirid;
                     }
                 }
@@ -4155,7 +4157,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         }
     }
 
-    if (id !== 'conversations' || id !== "archivedchats") {
+    if (id !== 'conversations') {
         if (id === 'user-management') {
             $('.fm-right-header').addClass('hidden');
             $('.fm-right-header-user-management').removeClass('hidden');

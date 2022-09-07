@@ -12,20 +12,27 @@ export const withPermissionsObserver = Component =>
             errScreen: null
         };
 
-        resetError = (av) => {
+        constructor(props) {
+            super(props);
+            this.resetError = this.resetError.bind(this);
+            this.hasToRenderPermissionsWarning = this.hasToRenderPermissionsWarning.bind(this);
+            this.renderPermissionsWarning = this.renderPermissionsWarning.bind(this);
+        }
+
+        resetError(av) {
             this.setState({
                 errMic: av === Av.Audio ? null : this.state.errMic,
                 errCamera: av === Av.Camera ? null : this.state.errCamera,
                 errScreen: av === Av.Screen ? null : this.state.errScreen,
             });
-        };
+        }
 
-        isUserActionError = (error) => {
+        isUserActionError(error) {
             const USER_ACTION_ERROR = "Permission denied";
             return error && error.message === USER_ACTION_ERROR;
-        };
+        }
 
-        hasToRenderPermissionsWarning = av => {
+        hasToRenderPermissionsWarning(av) {
             const CONFIG = {
                 [Av.Audio]: {
                     showOnUserActionError: true,
@@ -47,31 +54,34 @@ export const withPermissionsObserver = Component =>
             }
 
             return false;
-        };
+        }
 
-        renderPermissionsDialog = av => {
+        renderPermissionsDialog(av) {
             const CONTENT = {
                 [Av.Audio]: [l.no_mic_title, l.no_mic_info],
                 [Av.Camera]: [l.no_camera_title, l.no_camera_info],
                 [Av.Screen]: [l.no_screen_title, l.no_screen_info]
             };
             return msgDialog('warningb', null, ...CONTENT[av], null, 1);
-        };
+        }
 
-        renderPermissionsWarning = av =>
-            <div
-                className={`
+        renderPermissionsWarning(av) {
+            return (
+                <div
+                    className={`
                     ${this.namespace}
                     meetings-signal-issue
                     simpletip
                 `}
-                data-simpletip="Show more info"
-                data-simpletipposition="top"
-                data-simpletipoffset="5"
-                data-simpletip-class="theme-dark-forced"
-                onClick={() => this.renderPermissionsDialog(av)}>
-                <i className="sprite-fm-mono icon-exclamation-filled" />
-            </div>;
+                    data-simpletip="Show more info"
+                    data-simpletipposition="top"
+                    data-simpletipoffset="5"
+                    data-simpletip-class="theme-dark-forced"
+                    onClick={() => this.renderPermissionsDialog(av)}>
+                    <i className="sprite-fm-mono icon-exclamation-filled" />
+                </div>
+            );
+        }
 
         componentWillUnmount() {
             super.componentWillUnmount();

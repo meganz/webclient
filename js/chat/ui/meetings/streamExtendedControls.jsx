@@ -19,6 +19,7 @@ class StreamExtendedControls extends MegaRenderMixin {
         return (
             <Button.Group active={this.isActive(SfuClient.Av.Screen)}>
                 <Button
+                    key="screen-sharing"
                     simpletip={{ ...SIMPLETIP, label: screenSharingLabel }}
                     className={`
                         mega-button
@@ -41,6 +42,7 @@ class StreamExtendedControls extends MegaRenderMixin {
                     this.props.renderPermissionsWarning(SfuClient.Av.Screen) :
                     null}
                 <Button
+                    key="call-hold"
                     simpletip={{ ...SIMPLETIP, label: callHoldLabel, position: 'left' }}
                     className={`
                         mega-button

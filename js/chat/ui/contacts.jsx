@@ -64,16 +64,23 @@ export class ContactButton extends ContactAwareComponent {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
-    }
+    };
+
     attachRerenderCallbacks = _attchRerenderCbContacts;
+
+    constructor(props) {
+        super(props);
+        this.dropdownItemGenerator = this.dropdownItemGenerator.bind(this);
+    }
+
     customIsEventuallyVisible() {
         if (this.props.chatRoom) {
             return this.props.chatRoom.isCurrentlyActive;
         }
         return -1;
     }
-    loadAccount = () => loadSubPage('fm/account');
-    dropdownItemGenerator = () => {
+
+    dropdownItemGenerator() {
         let { contact, dropdowns, chatRoom, dropdownRemoveButton } = this.props;
         dropdowns = dropdowns ? dropdowns : [];
         const moreDropdowns = [];
@@ -81,7 +88,7 @@ export class ContactButton extends ContactAwareComponent {
 
         const onContactClicked = () => {
             if (contact.c === 2) {
-                this.loadAccount();
+                loadSubPage('fm/account');
             }
             if (contact.c === 1) {
                 loadSubPage('fm/chat/contacts/' + contact.u);
@@ -128,7 +135,7 @@ export class ContactButton extends ContactAwareComponent {
                     key="view0"
                     icon="sprite-fm-mono icon-user-filled"
                     label={l[187] /* `My Account` */}
-                    onClick={this.loadAccount}
+                    onClick={() => loadSubPage('fm/account')}
                 />
             );
         }
@@ -329,6 +336,7 @@ export class ContactButton extends ContactAwareComponent {
 
         return moreDropdowns;
     }
+
     render() {
         let {
             label = '', className = '', contact, dropdownIconClasses = [], verticalOffset,

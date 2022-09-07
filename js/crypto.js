@@ -1268,9 +1268,6 @@ mBroadcaster.once('startMega', function() {
 
     var invisibleTime;
     document.addEventListener('visibilitychange', function(ev) {
-        if (d) {
-            console.info(ev, document.hidden);
-        }
 
         if (document.hidden) {
             invisibleTime = Date.now();

@@ -29,9 +29,7 @@ var ChatNotifications = function(megaChat, options) {
                         // Meetings call w/o chat sidebar opened
                         document.querySelector('body.in-call') && !document.querySelector('.chat-opened') ||
                         // Regular call w/o messages area opened
-                        !uiElement ||
-                        uiElement.querySelector('.call-block') &&
-                        !uiElement.querySelector('.call-block.small-block')
+                        !uiElement
                     ) {
                         return;
                     }

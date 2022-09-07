@@ -11,20 +11,31 @@ class Group extends MegaRenderMixin {
         expanded: false
     };
 
-    //  TODO: Look into abstracting `doToggle` and `toggleEvents` with `ModeSwitch`
+    constructor(props) {
+        super(props);
+        this.doToggle = this.doToggle.bind(this);
+    }
 
-    toggleEvents = () =>
-        this.state.expanded ?
-            $(document)
-                .rebind(`mousedown.${Group.NAMESPACE}`, ev =>
-                    !this.containerRef.current.contains(ev.target) && this.doToggle()
-                )
-                .rebind(`keydown.${Group.NAMESPACE}`, ({ keyCode }) =>
-                    keyCode && keyCode === 27 /* ESC */ && this.doToggle()
-                ) :
-            $(document).unbind(`.${Group.NAMESPACE}`);
+    toggleEvents() {
+        return (
+            this.state.expanded ?
+                $(document)
+                    .rebind(`mousedown.${Group.NAMESPACE}`, ev =>
+                        !this.containerRef.current.contains(ev.target) && this.doToggle()
+                    )
+                    .rebind(`keydown.${Group.NAMESPACE}`, ({ keyCode }) =>
+                        keyCode && keyCode === 27 /* ESC */ && this.doToggle()
+                    ) :
+                $(document).unbind(`.${Group.NAMESPACE}`)
 
-    doToggle = () => this.setState(state => ({ expanded: !state.expanded }), () => this.toggleEvents());
+        );
+    }
+
+    doToggle() {
+        this.setState(state => ({ expanded: !state.expanded }), () =>
+            this.toggleEvents()
+        );
+    }
 
     render() {
         const { active, warn, onHold, screenSharing, children } = this.props;
@@ -40,13 +51,15 @@ class Group extends MegaRenderMixin {
                             ${this.state.expanded ? 'expanded' : ''}
                         `}
                         onClick={this.doToggle}>
-                        {children.map((item, index) =>
-                            <div
-                                key={index}
-                                className={`${Group.BASE_CLASS}-item`}>
-                                {item}
-                            </div>
-                        )}
+                        {children.map(item => {
+                            return item && (
+                                <div
+                                    key={item.key}
+                                    className={`${Group.BASE_CLASS}-item`}>
+                                    {item}
+                                </div>
+                            );
+                        })}
                     </div>
                     <button
                         className="mega-button theme-light-forced round large"

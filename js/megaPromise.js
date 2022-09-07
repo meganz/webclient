@@ -263,14 +263,11 @@ MegaPromise.prototype.pipe = function(resolve, reject) {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.wait = function(callback) {
-    // callback = tryCatch(callback);
+    'use strict';
 
-    this.$deferred.always(function() {
-        var args = toArray.apply(null, arguments);
+    this.$deferred.always((...args) => {
 
-        onIdle(function() {
-            callback.apply(null, args);
-        });
+        queueMicrotask(() => callback(...args));
     });
     return this;
 };
@@ -381,8 +378,21 @@ MegaPromise.prototype.linkFailTo = function(targetPromise) {
  * @returns {MegaPromise} current promise, helpful for js call chaining
  */
 MegaPromise.prototype.linkDoneAndFailTo = function(targetPromise) {
-    this.linkDoneTo(targetPromise);
-    this.linkFailTo(targetPromise);
+    'use strict';
+
+    if (targetPromise instanceof MegaPromise) {
+        this.linkDoneTo(targetPromise);
+        this.linkFailTo(targetPromise);
+    }
+    else {
+        if (!(targetPromise instanceof Promise)) {
+            targetPromise = Promise.resolve(targetPromise);
+        }
+        targetPromise.then((res) => this.resolve(res))
+            .catch((ex) => {
+                this.reject(ex);
+            });
+    }
     return this;
 };
 

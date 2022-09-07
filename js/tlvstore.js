@@ -3,7 +3,8 @@
  * Storage of key/value pairs in a "container".
  */
 
-var tlvstore = (function () {
+/** @property window.tlvstore */
+lazy(self, 'tlvstore', () => {
     "use strict";
 
     /**
@@ -21,9 +22,31 @@ var tlvstore = (function () {
      * (as a byte string). The payload *must* contain 8-bit values for each
      * character only!</p>
      */
-    var ns = {};
+    const ns = {
+        _logger: MegaLogger.getLogger('tlvstore')
+    };
 
-    ns._logger = MegaLogger.getLogger('tlvstore');
+    const getKey = (key) => {
+        if (Array.isArray(key)) {
+            // Key is in the form of an array of four 32-bit words.
+            key = new Uint32Array(key);
+            const u8 = new Uint8Array(key.byteLength);
+            const dv = new DataView(u8.buffer);
+
+            for (let i = 0; i < key.length; ++i) {
+                dv.setUint32(i * 4, key[i], false);
+            }
+            key = u8;
+        }
+        else if (typeof key === 'string') {
+            key = Uint8Array.from(key, ch => ch.charCodeAt(0));
+        }
+
+        return key;
+    };
+
+    const te = new TextEncoder();
+    const td = new TextDecoder();
 
     /**
      * Generates a binary encoded TLV record from a key-value pair.
@@ -32,14 +55,17 @@ var tlvstore = (function () {
      *     ASCII string label of record's key.
      * @param value {string}
      *     Byte string payload of record.
+     * @param {Boolean} utf8 Require UTF-8 conversion.
      * @returns {string}
      *     Single binary encoded TLV record.
      * @private
      */
-    ns.toTlvRecord = function(key, value) {
-        var length = String.fromCharCode(value.length >>> 8)
-                   + String.fromCharCode(value.length & 0xff);
-        return key + '\u0000' + length + value;
+    ns.toTlvRecord = function(key, value, utf8) {
+        if (utf8) {
+            value = asmCrypto.bytes_to_string(te.encode(value));
+        }
+        const length = String.fromCharCode(value.length >>> 8) + String.fromCharCode(value.length & 0xff);
+        return `${key}\u0000${length}${value}`;
     };
 
     /**
@@ -73,19 +99,21 @@ var tlvstore = (function () {
      * @param container {object}
      *     Object containing (non-nested) key-value pairs. The keys have to be ASCII
      *     strings, the values byte strings.
+     * @param {Boolean} [utf8] Require UTF-8 conversion.
      * @returns {string}
      *     Single binary encoded container of TLV records.
      */
-    ns.containerToTlvRecords = function(container) {
+    ns.containerToTlvRecords = function(container, utf8) {
         var result = '';
         for (var key in container) {
             if (container.hasOwnProperty(key)) {
-                if (typeof container[key] === "number") {
-                    console.error("Found element in container with key: ", key, " which value is a number. Only " +
-                        "strings are allowed!");
+                const type = typeof container[key];
+
+                if (type !== 'string') {
+                    console.error(`Invalid type for element '${key}'. Expected string but got ${type}.`);
                     return false;
                 }
-                result += ns.toTlvRecord(key, container[key]);
+                result += ns.toTlvRecord(key, container[key], utf8);
             }
         }
         return result;
@@ -242,7 +270,7 @@ var tlvstore = (function () {
      *
      * @param clearText {String}
      *     Clear text as byte string.
-     * @param key {String}
+     * @param {String|Array|ArrayBufferLike} key
      *     Encryption key as byte string.
      * @param mode {Number}
      *     Encryption mode as an integer. One of tlvstore.BLOCK_ENCRYPTION_SCHEME.
@@ -253,23 +281,13 @@ var tlvstore = (function () {
      */
     ns.blockEncrypt = function(clearText, key, mode, utf8Convert) {
 
-        var nonceSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].nonceSize;
-        var tagSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].macSize;
-        var cipher = asmCrypto[ns.BLOCK_ENCRYPTION_PARAMETERS[mode].cipher];
-        var nonceBytes = new Uint8Array(nonceSize);
-        asmCrypto.getRandomValues(nonceBytes);
-        if (Array.isArray(key)) {
-            // Key is in the form of an array of four 32-bit words.
-            key = a32_to_str(key);
-        }
-        var keyBytes = asmCrypto.string_to_bytes(key);
-        var clearBytes = asmCrypto.string_to_bytes(
-            utf8Convert ? to8(clearText) : clearText);
-        var cipherBytes = cipher.encrypt(clearBytes, keyBytes, nonceBytes,
-                                         undefined, tagSize);
+        const {nonceSize, macSize, cipher} = this.BLOCK_ENCRYPTION_PARAMETERS[mode];
+        const nonce = mega.getRandomValues(nonceSize);
 
-        return String.fromCharCode(mode) + asmCrypto.bytes_to_string(nonceBytes)
-               + asmCrypto.bytes_to_string(cipherBytes);
+        const clearBytes = asmCrypto.string_to_bytes(clearText, utf8Convert);
+        const cipherBytes = asmCrypto[cipher].encrypt(clearBytes, getKey(key), nonce, undefined, macSize);
+
+        return String.fromCharCode(mode) + asmCrypto.bytes_to_string(nonce) + asmCrypto.bytes_to_string(cipherBytes);
     };
 
 
@@ -294,18 +312,74 @@ var tlvstore = (function () {
         var cipherBytes = asmCrypto.string_to_bytes(cipherText.substring(nonceSize + 1));
         var tagSize = ns.BLOCK_ENCRYPTION_PARAMETERS[mode].macSize;
         var cipher = asmCrypto[ns.BLOCK_ENCRYPTION_PARAMETERS[mode].cipher];
-        if (Array.isArray(key)) {
-            // Key is in the form of an array of four 32-bit words.
-            key = a32_to_str(key);
-        }
-        var keyBytes = asmCrypto.string_to_bytes(key);
-        var clearBytes = cipher.decrypt(cipherBytes, keyBytes, nonceBytes,
-                                        undefined, tagSize);
-        var clearText = asmCrypto.bytes_to_string(clearBytes);
 
-        return utf8Convert ? from8(clearText) : clearText;
+        const clearBytes = cipher.decrypt(cipherBytes, getKey(key), nonceBytes, undefined, tagSize);
+        return asmCrypto.bytes_to_string(clearBytes, utf8Convert);
     };
 
+    /**
+     * Encrypts data to an authenticated ciphertext, armoured with encryption mode indicator and IV.
+     *
+     * @param {String|Object} payload plain string or key/value pairs to encrypt
+     * @param {Boolean} [utf8] Whether to take UTF-8 into account (default: true)
+     * @param {Array|String|Uint8Array} [key] Encryption key.
+     * @param {Number} [mode] Encryption scheme, AES GCM 12/16 by default.
+     * @returns {String} encrypted payload.
+     * @memberOf tlvstore
+     */
+    ns.encrypt = function(payload, utf8, key, mode) {
+        utf8 = utf8 !== false;
+        key = getKey(key || self.u_k);
+
+        if (mode === undefined) {
+            mode = this.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
+        }
+
+        if (typeof payload !== 'object') {
+            payload = {'': String(payload)};
+        }
+
+        return base64urlencode(this.blockEncrypt(this.containerToTlvRecords(payload, utf8), key, mode));
+    };
+
+    /**
+     * Decrypts an authenticated cipher text armoured with a mode indicator and IV.
+     *
+     * @param {String} payload Encrypted cipher text payload
+     * @param {Boolean} [utf8] Whether to take UTF-8 into account (default: true)
+     * @param {Array|String|Uint8Array} [key] Encryption key.
+     * @returns {String|Object} decrypted payload as initially provided, string or key/value pairs
+     * @memberOf tlvstore
+     */
+    ns.decrypt = function(payload, utf8, key) {
+        utf8 = utf8 !== false;
+        key = getKey(key || self.u_k);
+
+        const obj = {};
+        let rest = tlvstore.blockDecrypt(base64urldecode(payload), key);
+
+        while (rest.length > 0) {
+            const res = ns.splitSingleTlvRecord(rest);
+            if (!res) {
+                return false;
+            }
+            let [key, value] = res.record;
+
+            if (utf8) {
+                value = td.decode(Uint8Array.from(value, ch => ch.charCodeAt(0)));
+            }
+            obj[key] = value;
+
+            rest = res.rest;
+        }
+
+        return obj[''] || obj;
+    };
+
+    if (!window.is_karma) {
+        Object.setPrototypeOf(ns, null);
+        return Object.freeze(ns);
+    }
 
     return ns;
-}());
+});

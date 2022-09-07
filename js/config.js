@@ -23,7 +23,7 @@
      */
     const moveLegacySettings = function() {
         const prefs = [
-            'agreedToCopyrightWarning', 'chatAvPaneHeight', 'dl_maxSlots', 'font_size',
+            'agreedToCopyrightWarning', 'dl_maxSlots', 'font_size',
             'leftPaneWidth', 'mobileGridViewModeEnabled', 'ul_maxSlots', 'ul_maxSpeed'
         ];
         const replacements = {
@@ -192,7 +192,7 @@
         if (config.xs1) {
             config.font_size = config.xs1 >> 12 & 15;
             config.leftPaneWidth = config.xs1 & 0xfff;
-            config.chatAvPaneHeight = config.xs1 >> 20;
+            config.chatAvPaneHeight = 0;
         }
 
         if (config.xs2) {

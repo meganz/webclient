@@ -27,25 +27,24 @@ const MESSAGE_TYPE = {
 };
 
 export default class Local extends AbstractGenericMessage {
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         super.componentDidMount();
         this._setClassNames();
     }
 
-    // TODO: unify w/ roomIsGroup within resultRow.jsx
-    _roomIsGroup = () => this.props.message.chatRoom.type === 'group' || this.props.message.chatRoom.type === 'public';
+    _roomIsGroup() {
+        return this.props.message.chatRoom.type === 'group' || this.props.message.chatRoom.type === 'public';
+    }
 
-    _getParticipantNames = message => (
-        message.meta && message.meta.participants && !!message.meta.participants.length &&
-        message.meta.participants
-            .map(handle => `[[${megaChat.html(M.getNameByHandle(handle))}]]`)
-    );
+    _getParticipantNames(message) {
+        return (
+            message.meta && message.meta.participants && !!message.meta.participants.length &&
+            message.meta.participants
+                .map(handle => `[[${megaChat.html(M.getNameByHandle(handle))}]]`)
+        );
+    }
 
-    _getExtraInfo = message => {
+    _getExtraInfo(message) {
         const { meta, type } = message;
         const participantNames = this._getParticipantNames(message);
         const HAS_PARTICIPANTS = participantNames && !!participantNames.length && participantNames.length > 1;
@@ -70,7 +69,7 @@ export default class Local extends AbstractGenericMessage {
         return messageExtraInfo && messageExtraInfo.reduce((acc, cur) =>
             (acc + cur).replace(/\[\[/g, '<span class="bold">').replace(/]]/g, '</span>')
         );
-    };
+    }
 
     _setClassNames() {
         let cssClass;

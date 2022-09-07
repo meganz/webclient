@@ -2309,32 +2309,33 @@ var strongvelope = {};
      * @method
      * @param keys {Array}
      *     Key arrary from chatd.
-     * @returns {Boolean}
-     *     Always True even if there was an error when seeding some/all of the keys
+     * @returns {Array}
+     *     An 'userid-keyid' map of successfully seeded keys
      */
     strongvelope.ProtocolHandler.prototype.seedKeys = function(keys) {
+        const fill = tryCatch((key, keyid, userId) => {
+            const decryptedKeys = this._decryptKeysFrom(key, userId);
+            assert(decryptedKeys && decryptedKeys[0], `Invalid key from ${userId}`);
+
+            if (!this.participantKeys[userId]) {
+                this.participantKeys[userId] = {};
+            }
+            this.participantKeys[userId][a32_to_str([keyid])] = decryptedKeys[0];
+            return `${userId}-${keyid}`;
+        }, (ex) => {
+            this.logger.error('_decryptKeysFrom thrown an error:', ex);
+        });
+
+        const res = [];
         for (var i = 0; i < keys.length; i++) {
-
-            var keyidStr = a32_to_str([keys[i].keyid]);
-            var key = keys[i].key;
-            var isOwnKey = (keys[i].userId === this.ownHandle);
-
-            tryCatch(function(key, i, isOwnKey, keyidStr) {
-                var decryptedKeys = this._decryptKeysFrom(
-                    key,
-                    keys[i].userId,
-                    isOwnKey
-                );
-                if (!this.participantKeys[keys[i].userId]) {
-                    this.participantKeys[keys[i].userId] = {};
-                }
-                this.participantKeys[keys[i].userId][keyidStr] = decryptedKeys[0];
-
-            }.bind(this), function(e) {
-                console.error('_decryptKeysFrom thrown an error:', e);
-            })(key, i, isOwnKey, keyidStr);
+            const {key, keyid, userId} = keys[i];
+            const v = fill(key, keyid, userId);
+            if (v) {
+                res.push(v);
+            }
         }
-        return true;
+
+        return res;
     };
 
     /**
@@ -2348,7 +2349,12 @@ var strongvelope = {};
      */
     strongvelope.ProtocolHandler.prototype.restoreKeys = function(keyxid, keys) {
 
-        this.seedKeys(keys);
+        const res = this.seedKeys(keys);
+
+        if (d) {
+            console.assert(res.length === keys.length, 'Not all keys were restored..', keys, res);
+        }
+
         var keyCount = keyxid & 0x00ff;
         if (keyCount > this.counter) {
             this.counter = keyCount;

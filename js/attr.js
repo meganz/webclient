@@ -112,6 +112,8 @@
      * @param {Object} attribute An object with key/value pairs, the values being either ASCII strings or regular
      *                           JavaScript Strings with UTF-16 characters
      * @returns {Object} Returns the object with converted values
+     * @deprecated
+     * @see {@link tlvstore.encrypt} / {@link tlvstore.decrypt}
      */
     ns.encodeObjectValues = function(attribute) {
 
@@ -142,6 +144,8 @@
      * then converts that back to its normal JavaScript string representation
      * @param {Object} attribute An object with key/value pairs
      * @returns {Object} Returns the object with converted values
+     * @deprecated
+     * @see {@link tlvstore.encrypt} / {@link tlvstore.decrypt}
      */
     ns.decodeObjectValues = function(attribute) {
 
@@ -1063,6 +1067,8 @@
      * @param {MegaPromise} [thePromise] Promise to signal rejections.
      * @param {String} [attribute] Attribute name we're decrypting.
      * @returns {*} the actual res (if altered)
+     * @deprecated
+     * @see {@link tlvstore.encrypt} / {@link tlvstore.decrypt}
      */
     ns.handleLegacyCacheAndDecryption = function(res, thePromise, attribute) {
         if (typeof res !== 'object') {

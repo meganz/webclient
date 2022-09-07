@@ -5,9 +5,6 @@
 
  describe("time_checker unit test", function() {
     "use strict";
-    var assert = chai.assert;
-    var ns = stringcrypt;
-
     const WEEK_SECONDS = 7 * 24 * 60 * 60;
     const FORTNIGHT_SECONDS = 2 * WEEK_SECONDS; // 2 WEEKS
     const MONTH_SECONDS = 2 * FORTNIGHT_SECONDS;
@@ -291,12 +288,12 @@
             timeChecker.init().finally(() => {
                 expect(timeChecker.shouldShow()).to.be.true; // First
                 timeChecker.update();
-    
+
                 expect(timeChecker.getTimes()).to.eql(1);
                 expect(save).to.eql(1);
                 expect(timeChecker.getType()).to.eql(TYPE_MONTH);
                 expect(timeChecker.shouldShow()).to.be.false; // Second
-    
+
                 timeCheckerContext.save = oldSave;
                 done();
             });

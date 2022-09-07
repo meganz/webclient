@@ -237,7 +237,8 @@
         });
     });
 
-    describe('time_checker delay test', function() {
+     /**
+      describe('time_checker delay test', function() {
         it("saves within delay", function(done) {
             const timeCheckerContext = new mega.TimeChecker.Context('test10', null, 300);
             sinon.stub(timeCheckerContext, 'save').returns('');
@@ -268,6 +269,7 @@
             });
         });
     });
+      /**/
 
     describe('time_checker allow save callback test', function() {
         it("save on context", function(done) {

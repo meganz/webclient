@@ -291,12 +291,12 @@
             timeChecker.init().finally(() => {
                 expect(timeChecker.shouldShow()).to.be.true; // First
                 timeChecker.update();
-    
+
                 expect(timeChecker.getTimes()).to.eql(1);
                 expect(save).to.eql(1);
                 expect(timeChecker.getType()).to.eql(TYPE_MONTH);
                 expect(timeChecker.shouldShow()).to.be.false; // Second
-    
+
                 timeCheckerContext.save = oldSave;
                 done();
             });
@@ -330,7 +330,8 @@
         });
     });
 
-    describe('time_checker allow save callback with delay test', function() {
+     /**
+      describe('time_checker allow save callback with delay test', function() {
         it("save on context", function(done) {
             let updated = false;
             const timeCheckerContext = new mega.TimeChecker.Context('test13', () => {
@@ -372,6 +373,7 @@
             });
         });
     });
+      /**/
 
     describe('time_checker check hasUpdated', function() {
         it("save on context", function(done) {

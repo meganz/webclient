@@ -27745,7 +27745,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
 
     if (this.onUpdateCursorPosition) {
       var el = $('.chat-textarea:visible:first textarea:visible', this.typingAreaRef.current)[0];
-      el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
+      el.selectionStart = el.selectionEnd = this.onUpdateCursorPosition;
       this.onUpdateCursorPosition = false;
     }
   }

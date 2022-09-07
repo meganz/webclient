@@ -1020,14 +1020,6 @@ else if (is_karma) {
     bootstaticpath = 'base/';
 }
 
-if (String(location.pathname).indexOf('%') > 0) {
-    tmp = mURIDecode(location.pathname);
-    if (tmp.indexOf('%') < 0 && sessionStorage.uutmpl !== tmp) {
-        sessionStorage.uutmpl = tmp;
-        location.assign(tmp);
-    }
-}
-
 tmp = getCleanSitePath(location.hash || undefined);
 if (tmp.substr(0, 12) === 'sitetransfer') {
     try {

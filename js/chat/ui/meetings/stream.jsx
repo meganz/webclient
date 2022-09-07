@@ -164,10 +164,11 @@ export default class Stream extends MegaRenderMixin {
             return;
         }
 
-        const extraVerticalMargin = 100;
         const parentRef = container.parentNode;
-        const containerWidth = parentRef.offsetWidth;
-        const containerHeight = parentRef.offsetHeight - extraVerticalMargin;
+        const parentStyle = getComputedStyle(parentRef);
+        const extraVerticalMargin = parseInt(parentStyle.paddingTop) + parseInt(parentStyle.paddingBottom);
+        let containerWidth = parentRef.offsetWidth;
+        let containerHeight = parentRef.offsetHeight - extraVerticalMargin;
         const streamsInUI = streams.length > MAX_STREAMS_PER_PAGE ? this.chunks[this.state.page] : streams;
 
         if (streamsInUI) {
@@ -181,6 +182,11 @@ export default class Stream extends MegaRenderMixin {
                 rows = 1;
                 columns = 1;
             }
+
+            const marginNode = 2;
+            // Cannot take into account node margins for a correct aspect ratio
+            containerWidth -= columns * marginNode * 2;
+            containerHeight -= rows * marginNode * 2;
 
             let targetWidth = Math.floor(containerWidth / columns);
             let targetHeight = targetWidth / 16 * 9;
@@ -218,7 +224,7 @@ export default class Stream extends MegaRenderMixin {
                 }
             }
 
-            container.style.width = `${targetWidth * columns}px`;
+            container.style.width = `${(targetWidth + marginNode * 2) * columns}px`;
         }
     };
 
@@ -497,7 +503,9 @@ export default class Stream extends MegaRenderMixin {
                 onMouseMove={this.handleMouseMove}
                 onMouseOut={this.handleMouseOut}>
                 {minimized ? null : (
-                    <>
+                    <div className={`
+                    ${NAMESPACE}-wrapper
+                    `}>
                         <StreamHead
                             disableCheckingVisibility={true}
                             mode={mode}
@@ -532,7 +540,7 @@ export default class Stream extends MegaRenderMixin {
                             onChatToggle={onChatToggle}
                             onParticipantsToggle={onParticipantsToggle}
                         />
-                    </>
+                    </div>
                 )}
                 <ChatToaster
                     showDualNotifications={true}

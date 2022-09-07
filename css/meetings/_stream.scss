@@ -6,12 +6,20 @@
 
 
 .stream {
-    display: grid;
     position: relative;
     float: left;
     width: calc(100% - 300px);
     height: 100%;
     background: #222;
+
+    &-wrapper{
+        display: grid;
+        position: relative;
+        width: 100%;
+        height: calc(100% - 160px);
+        padding-top: 64px;
+        padding-bottom: 96px;
+    }
 
     &.full { width: 100%; }
 

@@ -23188,7 +23188,7 @@ class Contact extends AbstractGenericMessage {
 
     let contacts = [];
     attachmentMeta.forEach(v => {
-      const contact = M.u && v.u in M.u ? M.u[v.u] : v;
+      const contact = M.u && v.u in M.u && M.u[v.u].m ? M.u[v.u] : v;
       const contactEmail = contact.email ? contact.email : contact.m;
 
       if (!M.u[contact.u]) {

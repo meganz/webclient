@@ -21933,8 +21933,10 @@ class stream_Stream extends mixins.wl {
       }
 
       const parentRef = container.parentNode;
-      const containerWidth = parentRef.offsetWidth;
-      const containerHeight = parentRef.offsetHeight - 100;
+      const parentStyle = getComputedStyle(parentRef);
+      const extraVerticalMargin = parseInt(parentStyle.paddingTop) + parseInt(parentStyle.paddingBottom);
+      let containerWidth = parentRef.offsetWidth;
+      let containerHeight = parentRef.offsetHeight - extraVerticalMargin;
       const streamsInUI = streams.length > MAX_STREAMS_PER_PAGE ? this.chunks[this.state.page] : streams;
 
       if (streamsInUI) {
@@ -21949,6 +21951,8 @@ class stream_Stream extends mixins.wl {
           columns = 1;
         }
 
+        containerWidth -= columns * 2 * 2;
+        containerHeight -= rows * 2 * 2;
         let targetWidth = Math.floor(containerWidth / columns);
         let targetHeight = targetWidth / 16 * 9;
 
@@ -21986,7 +21990,7 @@ class stream_Stream extends mixins.wl {
           }
         }
 
-        container.style.width = `${targetWidth * columns}px`;
+        container.style.width = `${(targetWidth + 4) * columns}px`;
       }
     };
 
@@ -22232,7 +22236,11 @@ class stream_Stream extends mixins.wl {
                 `,
       onMouseMove: this.handleMouseMove,
       onMouseOut: this.handleMouseOut
-    }, minimized ? null : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(StreamHead, {
+    }, minimized ? null : external_React_default().createElement("div", {
+      className: `
+                    ${NAMESPACE}-wrapper
+                    `
+    }, external_React_default().createElement(StreamHead, {
       disableCheckingVisibility: true,
       mode: mode,
       call: call,

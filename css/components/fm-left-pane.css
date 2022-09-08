@@ -59,12 +59,14 @@
 .active-folder-link .lp-content-wrap {
     padding-top: 4px;
 }
-.lp-myfiles .ps--active-y .cloud-drive-panel {
-    -webkit-padding-end: 16px;
-    padding-inline-end: 16px;
+.lp-myfiles .cloud-drive-panel {
     display: inline-block;
     min-width: 100%;
     box-sizing: border-box;
+}
+.lp-myfiles .ps--active-y .cloud-drive-panel {
+    -webkit-padding-end: 16px;
+    padding-inline-end: 16px;
 }
 .lp-myfiles .content-panel.cloud-drive.collapse {
     display: none;

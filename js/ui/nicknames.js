@@ -69,13 +69,7 @@ var nicknames = {
 
         try {
             // Try decode, decrypt, convert from TLV into a JS object
-            var urlDecodedString = base64urldecode(privateAttribute);
-            var decryptedBlock = tlvstore.blockDecrypt(urlDecodedString, u_k);
-            var contactNicknames = tlvstore.tlvRecordsToContainer(decryptedBlock);
-            var decodedContactNicknames = mega.attr.decodeObjectValues(contactNicknames);
-
-            // Set
-            this.cache = decodedContactNicknames;
+            this.cache = tlvstore.decrypt(privateAttribute);
         }
         catch (ex) {
             this.cache = Object.create(null);

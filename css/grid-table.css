@@ -16,10 +16,6 @@
     overflow: hidden;
     position: relative;
 }
-.files-grid-view.archived-chat-view {
-    top: 0;
-    padding-top: 20px;
-}
 
 /* ============================ *\
     shared-grid-view - Wrapper
@@ -107,13 +103,8 @@
 }
 
 .grid-scrolling-table,
-.transfer-scrolling-table,
-.archived-chats .grid-scrolling-table {
+.transfer-scrolling-table {
     height: 100%;
-}
-
-.archived-chats .grid-table-header {
-    margin: 10px 0 0;
 }
 
 .transfer-scrolling-table {
@@ -1233,33 +1224,6 @@ table.out-shares .fm-chat-users {
 
 .grid-table.vouchers td:first-child {
     padding-left: 12px;
-}
-
-/* ======================================== *\
-   grid-table arc-chat-messages-block
-\* ======================================== */
-.archived-chat-view table th,
-table.arc-chat-messages-block td {
-    padding-left: 5px;
-    height: 24px;
-    vertical-align: top;
-    font: var(--text-body2);
-    cursor: default;
-    box-sizing: border-box;
-}
-.archived-chat-view table th:first-child,
-.archived-chat-view table td:first-child {
-    -webkit-padding-start: 10px;
-    padding-inline-start: 10px;
-    width: 100%;
-}
-.archived-chat-view table th:last-child,
-.archived-chat-view table td:last-child {
-    -webkit-padding-end: 10px;
-    padding-inline-end: 10px;
-}
-.archived-chat-view table.table-hover tbody tr td::before {
-    z-index: auto;
 }
 
 /* ======================================== *\

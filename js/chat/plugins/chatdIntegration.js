@@ -187,36 +187,35 @@ inherits(ChatdIntegration, MegaDataEmitter);
  * @param {ChatRoom} [chatRoom] the
  * @returns {Promise} result, the :P
  */
-ChatdIntegration.decryptMessageHelper = function(message, chatRoom) {
-    return new Promise(function(resolve, reject) {
-        chatRoom = chatRoom || message.chatRoom;
-        ChatdIntegration._ensureKeysAreLoaded([message], 0, chatRoom.publicChatHandle)
-            .then(function() {
-                var cacheKey = message.userId + "-" + message.keyid;
-                if (!Object(chatRoom.notDecryptedKeys).hasOwnProperty(cacheKey)) {
-                    return true;
-                }
+ChatdIntegration.decryptMessageHelper = async function(message, chatRoom) {
+    chatRoom = chatRoom || message.chatRoom;
 
-                return new Promise(function(resolve, reject) {
-                    ChatdIntegration._waitForProtocolHandler(chatRoom, tryCatch(function() {
-                        var ph = chatRoom.protocolHandler;
-                        var mk = [chatRoom.notDecryptedKeys[cacheKey]];
-                        ChatdIntegration._ensureKeysAreDecrypted(mk, ph).then(resolve).catch(reject);
-                    }, reject));
-                });
-            })
-            .then(function() {
-                return chatRoom.protocolHandler.decryptFrom(message.message, message.userId, message.keyid, false);
-            })
-            .then(function(decrypted) {
-                if (!decrypted) {
-                    throw new Error('Message can not be decrypted!');
-                }
-                return decrypted;
-            })
-            .then(resolve)
-            .catch(reject);
-    });
+    if (chatRoom._keysAreSeeding) {
+        await chatRoom._keysAreSeeding.catch(dump);
+    }
+
+    const {userId, keyid} = message;
+    const {notDecryptedKeys = {}, publicChatHandle, protocolHandler, logger, roomId} = chatRoom;
+
+    const ndk = `${userId}-${keyid}`;
+    const users = [userId];
+
+    if (notDecryptedKeys[ndk]) {
+        // users.push(notDecryptedKeys[ndk].userId);
+
+        if (d) {
+            logger.warn(`Required keys not seeded (@${userId}), trying to fixup...`, $.len(notDecryptedKeys));
+        }
+
+        const res = await chatRoom.seedRoomKeys(Object.values(notDecryptedKeys));
+        assert(res.includes(ndk), `Failed to seed key for ${roomId}:${userId}...`);
+    }
+    await ChatdIntegration._ensureKeysAreLoaded(0, users, publicChatHandle);
+
+    const decrypted = await Promise.resolve(protocolHandler.decryptFrom(message.message, userId, keyid, false));
+
+    assert(decrypted, `Message can not be decrypted! ${roomId}:${userId}`);
+    return decrypted;
 };
 
 ChatdIntegration.prototype.updateChatPublicHandle = function(h, d, callback) {
@@ -282,24 +281,27 @@ ChatdIntegration.prototype.requiresUpdate = function() {
     });
 };
 
-ChatdIntegration._waitForProtocolHandler = function(chatRoom, cb) {
+ChatdIntegration._waitForProtocolHandler = async function(chatRoom, cb = nop) {
 
     if (chatRoom.protocolHandler) {
         return cb();
     }
 
+    const name = `waitForProtocolHandler(${chatRoom.roomId})`;
     const done = () => {
-        assert(chatRoom.protocolHandler instanceof strongvelope.ProtocolHandler);
+        assert(chatRoom.protocolHandler instanceof strongvelope.ProtocolHandler, 'Unexpected PH-instance..');
         cb();
     };
-    const fail = dump.bind(null, `waitForProtocolHandler(${chatRoom.roomId})`);
+    const fail = (ex) => {
+        chatRoom.logger.error(name, ex);
+        throw ex;
+    };
 
     if (chatRoom.strongvelopeSetupPromises) {
         return chatRoom.strongvelopeSetupPromises.then(done).catch(fail);
     }
 
-    createTimeoutPromise(() => !!chatRoom.protocolHandler, 500, 5000).then(done).catch(fail);
-
+    return createTimeoutPromise(() => !!chatRoom.protocolHandler, 500, 15000, false, name).then(done).catch(fail);
 };
 
 ChatdIntegration.prototype.getMciphRequest = function(chatRoom) {
@@ -486,6 +488,10 @@ ChatdIntegration.prototype._retrieveShardUrl = function(isPublic, chatIdOrHandle
         }
     }
 
+    if (d > 2) {
+        this.logger.warn('Retrieving Shard URL...', apiReq);
+    }
+
     var req = asyncApiReq(apiReq);
 
     if (chatShard !== undefined) {
@@ -502,17 +508,20 @@ ChatdIntegration.prototype._retrieveShardUrl = function(isPublic, chatIdOrHandle
 /**
  * Core func for opening a chat.
  *
+ * @alias chatdIntegration.openChat
  * @param chatInfo {String|Object} can be either public chat handle (for pub chats) OR actionPacket from mcc/mcf
  * @param [isMcf] {undefined|bool}
  * @param [missingMcf] {undefined|bool}
  * @returns {Promise}
  */
-// eslint-disable-next-line complexity
 ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatInfo, isMcf, missingMcf) {
     var self = this;
     var publicChatHandle;
 
     if (isString(chatInfo)) {
+        if (chatInfo.length !== 8) {
+            return reject(ENOENT);
+        }
         publicChatHandle = chatInfo;
         chatInfo = {};
     }
@@ -852,24 +861,41 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
     }
 });
 
+ChatdIntegration._waitForShardToBeAvailable = function(name, fn) {
+    return async function(...args) {
+        const [chatRoom] = args;
+        const chatIdDecoded = base64urldecode(chatRoom.chatId);
 
-ChatdIntegration._waitUntilChatIdIsAvailable = function(fn) {
-    return function(chatRoom) {
-        if (chatRoom.chatId) {
-            return fn.apply(this, arguments);
+        if (!this.chatd.chatIdShard[chatIdDecoded]) {
+            assert(chatRoom instanceof ChatRoom && chatIdDecoded);
+
+            await createTimeoutPromise(() => !!this.chatd.chatIdShard[chatIdDecoded], 500, 1e4, 0, `wfShard.${name}`)
+                .catch((ex) => {
+                    chatRoom.logger.error(`Timed out waiting for shard to be available (${name})`, ex, args);
+                    throw ex;
+                });
         }
-        var self = this;
-        var masterPromise = new MegaPromise();
-        var args = toArray.apply(null, arguments);
-        self._retrieveChatdIdIfRequired(chatRoom)
-            .then(function() {
-                masterPromise.linkDoneAndFailToResult(fn, self, args);
-            })
-            .catch(function(ex) {
-                self.logger.error("Failed to retrieve chatId for chatRoom %s", chatRoom.roomId, ex);
-                masterPromise.reject(ex);
-            });
-        return masterPromise;
+
+        return fn.apply(this, args);
+    };
+};
+
+
+ChatdIntegration._waitUntilChatIdIsAvailable = function(name, fn) {
+    return async function(...args) {
+        const [chatRoom] = args;
+
+        if (!chatRoom.chatId) {
+            assert(chatRoom instanceof ChatRoom);
+
+            await this._retrieveChatdIdIfRequired(chatRoom)
+                .catch((ex) => {
+                    chatRoom.logger.error(`Failed to retrieve chatId while invoking '${name}'`, ex, args);
+                    throw ex;
+                });
+        }
+
+        return fn.apply(this, args);
     };
 };
 
@@ -917,74 +943,39 @@ ChatdIntegration.prototype._retrieveChatdIdIfRequired = function(chatRoom) {
     });
 };
 
-ChatdIntegration._waitForShardToBeAvailable = function(fn) {
-    return function(chatRoom) {
-        var chatIdDecoded = base64urldecode(chatRoom.chatId);
-
-        if (this.chatd.chatIdShard[chatIdDecoded]) {
-            return fn.apply(this, arguments);
-        }
-
-        var self = this;
-        var masterPromise = new MegaPromise();
-        var args = toArray.apply(null, arguments);
-
-        createTimeoutPromise(function() {
-            return !!self.chatd.chatIdShard[chatIdDecoded];
-        }, 500, 10000)
-            .then(function() {
-                masterPromise.linkDoneAndFailToResult(fn, self, args);
-            })
-            .catch(function(ex) {
-                console.error(ex);
-                masterPromise.reject(ex);
-            });
-        return masterPromise;
-    };
-};
-
-ChatdIntegration._ensureKeysAreDecrypted = function(keys, handler) {
-    var pms = new MegaPromise();
-    ChatdIntegration._ensureKeysAreLoaded(keys).done(
-        function() {
-            if (handler.seedKeys(keys)) {
-                pms.resolve();
-            }
-            else {
-                pms.reject();
-            }
-        }
-    );
-    return pms;
-};
-
-
-ChatdIntegration._ensureKeysAreLoaded = function(messages, users, chathandle) {
+ChatdIntegration._ensureKeysAreLoaded = async function(messages, users, chathandle) {
     if (chathandle) {
-        return MegaPromise.resolve();
+        return;
     }
     if (messages && messages.length === 0 && users && users.length === 0) {
         // speed up a little bit, by skipping the .isArray checks.
-        return MegaPromise.resolve();
+        return;
     }
 
-    var i;
-    var promises = [];
-    var queue = function(userId) {
-        if (userId && userId !== strongvelope.COMMANDER) {
-            promises.push(crypt.getPubCu25519(userId));
-            promises.push(crypt.getPubEd25519(userId));
+    const promises = [];
+    const seen = Object.create(null);
+    const queue = (userId) => {
+
+        if (userId && !seen[userId] && userId !== strongvelope.COMMANDER) {
+            seen[userId] = 1;
+
+            if (!pubCu25519[userId]) {
+                promises.push(crypt.getPubCu25519(userId));
+            }
+            if (!pubEd25519[userId]) {
+                promises.push(crypt.getPubEd25519(userId));
+            }
         }
     };
 
     if (Array.isArray(messages)) {
-        for (i = messages.length; i--;) {
+        for (let i = messages.length; i--;) {
             queue(messages[i].userId);
         }
     }
 
     if (Array.isArray(users)) {
-        for (i = users.length; i--;) {
+        for (let i = users.length; i--;) {
             queue(users[i]);
         }
     }
@@ -992,7 +983,7 @@ ChatdIntegration._ensureKeysAreLoaded = function(messages, users, chathandle) {
         users.forEach(queue);
     }
 
-    return MegaPromise.allDone(promises);
+    return promises.length && Promise.allSettled(promises);
 };
 
 
@@ -1753,15 +1744,11 @@ ChatdIntegration.prototype.sendNewKey = function(chatRoom, keyxid, keyBlob) {
     self.chatd.cmd(Chatd.Opcode.NEWKEY, base64urldecode(chatRoom.chatId), keybody);
 };
 
-ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
+ChatdIntegration.prototype.sendMessage = async function(chatRoom, messageObject) {
     // allocate transactionid for the new message (it must be shown with status "delivering" in the UI;
     // edits and cancellations at that stage must be applied to the locally queued version that gets
     // resent until confirmation and then to the confirmed msgid)
-    var self = this;
-
-    var messageContents = (messageObject.textContents ? messageObject.textContents : messageObject.message) || "";
-
-    var tmpPromise = new MegaPromise();
+    const messageContents = messageObject.textContents || messageObject.message || "";
 
     var promises = [];
     if (chatRoom.type !== "public") {
@@ -1775,7 +1762,11 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
         );
     }
 
-    var refs = self.chatd.msgreferencelist(base64urldecode(chatRoom.chatId));
+    // chatRoom.logger.warn('sendMessage', promises.length, !chatRoom.protocolHandler, messageObject);
+
+    await Promise.all([...promises, ChatdIntegration._waitForProtocolHandler(chatRoom)]);
+
+    var refs = this.chatd.msgreferencelist(base64urldecode(chatRoom.chatId));
     var refids = [];
     for (var i = 0; i < refs.length; i++) {
         var foundMessage = chatRoom.messagesBuff.getByInternalId(refs[i]);
@@ -1783,55 +1774,36 @@ ChatdIntegration.prototype.sendMessage = function(chatRoom, messageObject) {
             if (foundMessage.msgIdentity) {
                 refids.push(foundMessage.msgIdentity);
             }
-        } else if (chatRoom.messagesBuff.messages[refs[i]]) {
-            if (chatRoom.messagesBuff.messages[refs[i]].msgIdentity) {
-                refids.push(chatRoom.messagesBuff.messages[refs[i]].msgIdentity);
-            }
+        }
+        else if (chatRoom.messagesBuff.messages[refs[i]]
+            && chatRoom.messagesBuff.messages[refs[i]].msgIdentity) {
+
+            refids.push(chatRoom.messagesBuff.messages[refs[i]].msgIdentity);
         }
     }
 
-    var _runEncryption = function() {
+    const result = chatRoom.protocolHandler.encryptTo(messageContents, refids);
+    assert(Array.isArray(result) && result.length && 'type' in result[0], 'encryptTo() failed.');
 
-        try {
-            var result = chatRoom.protocolHandler.encryptTo(messageContents, refids);
-            if (result !== false) {
-                var keyid = chatRoom.protocolHandler.getKeyId();
+    const keyid = chatRoom.protocolHandler.getKeyId();
+    messageObject.encryptedMessageContents = [result, keyid];
+    messageObject.msgIdentity = result[result.length - 1].identity;
+    messageObject.references = refids;
 
-                messageObject.encryptedMessageContents = [result, keyid];
-                messageObject.msgIdentity = result[result.length - 1].identity;
-                messageObject.references = refids;
-                if (
-                    messageObject.message.charCodeAt(0) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT.charCodeAt(0)
-                    &&
-                    messageObject.message.charCodeAt(1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT.charCodeAt(0)
-                ) {
-                    messageObject.isPostedAttachment = true;
-                }
+    if (
+        messageObject.message.charCodeAt(0) === Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT.charCodeAt(0)
+        &&
+        messageObject.message.charCodeAt(1) === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT.charCodeAt(0)
+    ) {
+        messageObject.isPostedAttachment = true;
+    }
 
-                tmpPromise.resolve(
-                    self.chatd.submit(
-                        base64urldecode(chatRoom.chatId),
-                        result,
-                        keyid,
-                        messageObject.isPostedAttachment
-                    )
-                );
-            }
-            else {
-                tmpPromise.reject();
-            }
-        } catch(e) {
-            self.logger.error("Failed to encrypt stuff via strongvelope, because of uncaught exception: ", e);
-        }
-    };
-
-    ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
-        MegaPromise.allDone(promises).always(function() {
-            _runEncryption();
-        });
-    });
-
-    return tmpPromise;
+    return this.chatd.submit(
+        base64urldecode(chatRoom.chatId),
+        result,
+        keyid,
+        messageObject.isPostedAttachment
+    );
 };
 
 ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage) {
@@ -1850,59 +1822,47 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
     var foundMsg;
     if (!msg) {
         msg = chatMessages.sendingbuf[msgnum & 0xffffffff];
+
         if (!msg && self.chatd.chatdPersist) {
-            self.chatd.chatdPersist.getMessageByOrderValue(chatRoom.chatId, msgnum)
-                .then(function(r) {
-                    if (!r) {
-                        console.error(
-                            "Update message failed, msgNum  was not found in either .buf, .sendingbuf or messagesBuff",
-                            msgnum
-                        );
-                        return;
-                    }
-                    var msg = r[0];
+            return self.chatd.chatdPersist.getMessageByOrderValue(chatRoom.chatId, msgnum)
+                .then((r) => {
+                    assert(r && r.length, `Message not found..${r},${msgnum}`);
 
-                    self.chatd.chatdPersist.retrieveAndLoadKeysFor(chatRoom.chatId, msg.userId, msg.keyId)
-                        .then(function() {
+                    msg = r[0];
+                    assert(msg && msg.userId, `Invalid message ${msgnum}`, msg);
 
-                            chatMessages.buf[msgnum] = [
-                                // Chatd.MsgField.MSGID,
-                                base64urldecode(msg.msgId),
-                                // Chatd.MsgField.USERID,
-                                base64urldecode(msg.userId),
-                                // Chatd.MsgField.TIMESTAMP,
-                                msg.msgObject.delay,
-                                // message,
-                                "",
-                                // Chatd.MsgField.KEYID,
-                                msg.keyId,
-                                // mintimestamp - Chatd.MsgField.TIMESTAMP + 1,
-                                0,
-                                // Chatd.MsgType.EDIT
-                                0
-                            ];
-
-
-                            self.updateMessage(chatRoom, msgnum, newMessage);
-                        })
-                        .catch(function(ex) {
-                            self.logger.error("Failed to retrieve key for MSGUPD, ", msgnum, msg.keyId, ex);
-                        });
-
-
+                    return self.chatd.chatdPersist.retrieveAndLoadKeysFor(chatRoom.chatId, msg.userId, msg.keyId);
                 })
-                .catch(function() {
+                .then(() => {
+                    chatMessages.buf[msgnum] = [
+                        // Chatd.MsgField.MSGID,
+                        base64urldecode(msg.msgId),
+                        // Chatd.MsgField.USERID,
+                        base64urldecode(msg.userId),
+                        // Chatd.MsgField.TIMESTAMP,
+                        msg.msgObject.delay,
+                        // message,
+                        "",
+                        // Chatd.MsgField.KEYID,
+                        msg.keyId,
+                        // mintimestamp - Chatd.MsgField.TIMESTAMP + 1,
+                        0,
+                        // Chatd.MsgType.EDIT
+                        0
+                    ];
+
+                    return self.updateMessage(chatRoom, msgnum, newMessage);
+                })
+                .catch((ex) => {
                     console.error(
-                        "Update message failed, msgNum  was not found in either .buf, .sendingbuf or messagesBuff",
-                        msgnum
+                        "Update message failed, msgNum was not found in either .buf, .sendingbuf or messagesBuff",
+                        msgnum, ex
                     );
                 });
-            return;
         }
-        else {
-            foundMsg = chatRoom.messagesBuff.getByInternalId(msgnum);
-            msgnum = msgnum & 0xffffffff;
-        }
+
+        foundMsg = chatRoom.messagesBuff.getByInternalId(msgnum);
+        msgnum &= 0xffffffff;
     }
     else {
         var msgId = base64urlencode(msg[Chatd.MsgField.MSGID]);
@@ -1985,11 +1945,10 @@ ChatdIntegration.prototype.destroy = function() {
     'markMessageAsReceived',
     'sendMessage',
     'updateMessage'
-].forEach(function(fnName) {
-        ChatdIntegration.prototype[fnName] = ChatdIntegration._waitForShardToBeAvailable(
-            ChatdIntegration.prototype[fnName]
-        );
-    });
+].forEach((fnName) => {
+    ChatdIntegration.prototype[fnName] =
+        ChatdIntegration._waitForShardToBeAvailable(fnName, ChatdIntegration.prototype[fnName]);
+});
 
 
 // decorate ALL functions which require a valid chat ID
@@ -2000,11 +1959,10 @@ ChatdIntegration.prototype.destroy = function() {
     'markMessageAsReceived',
     'sendMessage',
     'updateMessage'
-].forEach(function(fnName) {
-        ChatdIntegration.prototype[fnName] = ChatdIntegration._waitUntilChatIdIsAvailable(
-            ChatdIntegration.prototype[fnName]
-        );
-    });
+].forEach((fnName) => {
+    ChatdIntegration.prototype[fnName] =
+        ChatdIntegration._waitUntilChatIdIsAvailable(fnName, ChatdIntegration.prototype[fnName]);
+});
 
 scope.ChatdIntegration = ChatdIntegration;
 })(window);

@@ -20,10 +20,13 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         this.state = {
             editing: this.props.editing
         };
+
         this.pid = '__geom_' + String(Math.random()).substr(2);
     }
 
-    isBeingEdited = () => this.state.editing === true || this.props.editing === true;
+    isBeingEdited() {
+        return this.state.editing === true || this.props.editing === true;
+    }
 
     componentDidUpdate(oldProps, oldState) {
         const isBeingEdited = this.isBeingEdited();
@@ -137,7 +140,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         });
     }
 
-    doDelete = (e, msg) => {
+    doDelete(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
 
@@ -149,7 +152,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         }
     }
 
-    doCancelRetry = (e, msg) => {
+    doCancelRetry(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
 
@@ -160,7 +163,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         chatRoom.megaChat.plugins.chatdIntegration.discardMessage(chatRoom, messageId);
     }
 
-    doRetry = (e, msg) => {
+    doRetry(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);
 
@@ -434,7 +437,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                 REVOKED: message.revoked
             },
             props: { ...this.props, additionalClasses },
-            isBeingEdited: this.isBeingEdited,
+            isBeingEdited: () => this.isBeingEdited(),
             onDelete: (e, message) => this.doDelete(e, message),
         };
 

@@ -1097,11 +1097,13 @@ function setLandingPage(page) {
 
         var isDone = false;
         var $promise = createTimeoutPromise(
-            function () {
+            () => {
                 return isDone === true;
             },
             500,
-            10000
+            10000,
+            false,
+            `SetLastInteraction(${u_h})`
         );
 
         $promise.always(function () {

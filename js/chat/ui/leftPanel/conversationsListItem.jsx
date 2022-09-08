@@ -64,7 +64,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
         }
     }
 
-    getConversationTimestamp = () => {
+    getConversationTimestamp() {
         const { chatRoom } = this.props;
         if (chatRoom) {
             const lastMessage = chatRoom.messagesBuff.getLatestTextMessage();
@@ -72,7 +72,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
             return todayOrYesterday(timestamp * 1000) ? getTimeMarker(timestamp) : time2date(timestamp, 17);
         }
         return null;
-    };
+    }
 
     @timing(0.7, 8)
     render() {

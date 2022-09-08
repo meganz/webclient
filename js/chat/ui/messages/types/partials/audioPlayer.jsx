@@ -1,6 +1,7 @@
 import React from 'react';
+import { MegaRenderMixin } from '../../../../mixins.js';
 
-export default class AudioPlayer extends React.Component {
+export default class AudioPlayer extends MegaRenderMixin {
     state = {
         currentTime: null,
         progressWidth: 0,
@@ -10,9 +11,11 @@ export default class AudioPlayer extends React.Component {
 
     constructor(props) {
         super(props);
+        this.handleOnTimeUpdate = this.handleOnTimeUpdate.bind(this);
+        this.handleOnMouseDown = this.handleOnMouseDown.bind(this);
     }
 
-    play = () => {
+    play() {
         const audio = this.audioEl;
 
         if (audio.paused) {
@@ -47,13 +50,9 @@ export default class AudioPlayer extends React.Component {
                 isPaused: true
             });
         }
-    };
+    }
 
-    handleOnPause = () => this.setState({ isPaused: true });
-
-    handleOnPlaying = () => this.setState({ isBeingPlayed: true });
-
-    handleOnTimeUpdate = () => {
+    handleOnTimeUpdate() {
         const { currentTime, duration } = this.audioEl;
         const percent = (currentTime / duration) * 100;
 
@@ -63,26 +62,19 @@ export default class AudioPlayer extends React.Component {
         });
     }
 
-    handleOnEnded = () => this.setState({ progressWidth: 0, isBeingPlayed: false, currentTime: 0 });
-
-    handleOnMouseDown = event => {
+    handleOnMouseDown(event) {
         event.preventDefault();
 
-        const self = this;
-        const sliderPin = this.sliderPin;
-        const slider = this.slider;
+        const { sliderPin, slider } = this;
         const shiftX = event.clientX - sliderPin.getBoundingClientRect().left;
 
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-
-        function onMouseMove(event) {
+        const onMouseMove = event => {
             let newLeft = event.clientX - shiftX - slider.getBoundingClientRect().left;
 
             if (newLeft < 0) {
                 newLeft = 0;
             }
-            let rightEdge = slider.offsetWidth - sliderPin.offsetWidth;
+            const rightEdge = slider.offsetWidth - sliderPin.offsetWidth;
             if (newLeft > rightEdge) {
                 newLeft = rightEdge;
             }
@@ -91,20 +83,23 @@ export default class AudioPlayer extends React.Component {
 
             const pinPosition = newLeft / slider.getBoundingClientRect().width;
 
-            const newTime = Math.ceil(self.props.playtime * pinPosition);
+            const newTime = Math.ceil(this.props.playtime * pinPosition);
             const newCurrentTime = secondsToTimeShort(newTime);
-            self.audioEl.currentTime = newTime;
+            this.audioEl.currentTime = newTime;
 
-            self.setState({
+            this.setState({
                 currentTime: newCurrentTime,
                 progressWidth: pinPosition > 1 ? 100 : pinPosition * 100
             });
-        }
+        };
 
         function onMouseUp() {
             document.removeEventListener('mouseup', onMouseUp);
             document.removeEventListener('mousemove', onMouseMove);
         }
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
 
         sliderPin.ondragstart = () => false;
     }
@@ -163,7 +158,7 @@ export default class AudioPlayer extends React.Component {
                     />
                 </div>
                 <span className="audio-player__time" style={playtimeStyles}>
-                    {currentTime ? currentTime : secondsToTimeShort(playtime)}
+                    {currentTime || secondsToTimeShort(playtime)}
                 </span>
                 <audio
                     src={source}
@@ -172,12 +167,11 @@ export default class AudioPlayer extends React.Component {
                     ref={(audio) => {
                         this.audioEl = audio;
                     }}
-                    onPlaying={this.handleOnPlaying}
-                    onPause={this.handleOnPause}
-                    onEnded={this.handleOnEnded}
+                    onPlaying={() => this.setState({ isBeingPlayed: true })}
+                    onPause={() => this.setState({ isPaused: true })}
+                    onEnded={() => this.setState({ progressWidth: 0, isBeingPlayed: false, currentTime: 0 })}
                     onTimeUpdate={this.handleOnTimeUpdate}
-                >
-                </audio>
+                />
             </div>
         );
     }

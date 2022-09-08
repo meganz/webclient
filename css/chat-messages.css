@@ -861,6 +861,13 @@
     position: relative;
     z-index: 1;
 }
+.message.call-inner-block .avatar-wrapper {
+    float: right;
+    margin: 0 0 0 -12px;
+}
+.in-call .message.call-inner-block .avatar-wrapper {
+    margin: 0 0 3px -14px;
+}
 
 .message .audio-player {
     display: flex;

@@ -9,9 +9,12 @@ export default class StreamNodeMenu extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
+        this.Contact = this.Contact.bind(this);
+        this.Pin = this.Pin.bind(this);
+        this.Privilege = this.Privilege.bind(this);
     }
 
-    Contact = () => {
+    Contact() {
         const { stream, ephemeralAccounts, onCallMinimize } = this.props;
         const { userHandle } = stream;
         const IS_GUEST = Call.isGuest() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
@@ -53,9 +56,9 @@ export default class StreamNodeMenu extends MegaRenderMixin {
                 <span>{l[24581] /* `Add Contact` */}</span>
             </Button>
         );
-    };
+    }
 
-    Pin = () => {
+    Pin() {
         const { stream, onSpeakerChange } = this.props;
         if (onSpeakerChange) {
             return (
@@ -67,9 +70,9 @@ export default class StreamNodeMenu extends MegaRenderMixin {
             );
         }
         return null;
-    };
+    }
 
-    Privilege = () => {
+    Privilege() {
         const { stream, chatRoom } = this.props;
         const { call, userHandle } = stream;
 
@@ -98,7 +101,7 @@ export default class StreamNodeMenu extends MegaRenderMixin {
         }
 
         return null;
-    };
+    }
 
     render() {
         const { NAMESPACE } = StreamNodeMenu;

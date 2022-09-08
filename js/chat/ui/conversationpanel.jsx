@@ -15,7 +15,6 @@ import GenericConversationMessage  from './messages/generic.jsx';
 import { SharedFilesAccordionPanel } from './sharedFilesAccordionPanel.jsx';
 import { IncSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
 import { ChatlinkDialog } from './chatlinkDialog.jsx';
-import { ConversationAVPanel } from './conversationaudiovideopanel.jsx';
 import PushSettingsDialog from './pushSettingsDialog.jsx';
 import Call, { EXPANDED_FLAG, inProgressAlert } from './meetings/call.jsx';
 import HistoryPanel from "./historyPanel.jsx";
@@ -813,17 +812,22 @@ export class ConversationPanel extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
+
         const { chatRoom } = this.props;
         chatRoom.rebind(`openAttachCloudDialog.${this.getUniqueId()}`, () => this.openAttachCloudDialog());
         chatRoom.rebind(`openSendContactDialog.${this.getUniqueId()}`, () => this.openSendContactDialog());
+
         this.handleKeyDown = SoonFc(120, (ev) => this._handleKeyDown(ev));
     }
+
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
     }
+
     openAttachCloudDialog() {
         this.setState({ 'attachCloudDialog': true });
     }
+
     openSendContactDialog() {
         this.setState({ 'sendContactDialog': true });
     }
@@ -844,15 +848,17 @@ export class ConversationPanel extends MegaRenderMixin {
         }
     }
 
-    handleDeleteDialog = msg => {
+    handleDeleteDialog(msg) {
         if (msg) {
             this.setState({ editing: false, confirmDeleteDialog: true, messageToBeDeleted: msg });
         }
-    };
+    }
 
-    toggleExpandedFlag = () => document.body.classList[Call.isExpanded() ? 'remove' : 'add'](EXPANDED_FLAG);
+    toggleExpandedFlag() {
+        return document.body.classList[Call.isExpanded() ? 'remove' : 'add'](EXPANDED_FLAG);
+    }
 
-    startCall = type => {
+    startCall(type) {
         const { chatRoom } = this.props;
 
         if (isStartCallDisabled(chatRoom)) {
@@ -860,7 +866,7 @@ export class ConversationPanel extends MegaRenderMixin {
         }
 
         return type === Call.TYPE.AUDIO ? chatRoom.startAudioCall() : chatRoom.startVideoCall();
-    };
+    }
 
     componentDidMount() {
         super.componentDidMount();
@@ -940,7 +946,8 @@ export class ConversationPanel extends MegaRenderMixin {
             }
         });
     }
-    eventuallyInit(doResize) {
+
+    eventuallyInit() {
         var self = this;
 
         // because..JSP would hijack some DOM elements, we need to wait with this...
@@ -966,13 +973,6 @@ export class ConversationPanel extends MegaRenderMixin {
                     self.forceUpdate();
                 }
             });
-
-        // var ns = ".convPanel";
-        // $container
-        //     .rebind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns, function(e) {
-        //         self.safeForceUpdate(true);
-        //         $.tresizer();
-        //     });
     }
 
     componentWillUnmount() {
@@ -996,6 +996,7 @@ export class ConversationPanel extends MegaRenderMixin {
         $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
         $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
     }
+
     componentDidUpdate(prevProps, prevState) {
         var self = this;
         var room = this.props.chatRoom;
@@ -1053,6 +1054,7 @@ export class ConversationPanel extends MegaRenderMixin {
     isActive() {
         return document.hasFocus() && this.$messages && this.$messages.is(":visible");
     }
+
     @timing(0.7, 9)
     render() {
         var self = this;
@@ -1632,20 +1634,20 @@ export class ConversationPanel extends MegaRenderMixin {
                             return this.state.callMinimized &&
                                 this.setState({ callMinimized: false }, () => {
                                     $.hideTopMenu();
-                                    closeDialog?.();
+                                    closeDialog();
                                     loadSubPage('fm/chat');
                                     room.show();
                                     this.toggleExpandedFlag();
                                 });
                         }}
-                        didMount={this.toggleExpandedFlag}
+                        didMount={() => this.toggleExpandedFlag()}
                         willUnmount={minimised =>
                             this.setState({ callMinimized: false }, () =>
                                 minimised ? null : this.toggleExpandedFlag()
                             )
                         }
                         onCallEnd={() => this.safeForceUpdate()}
-                        onDeleteMessage={this.handleDeleteDialog}
+                        onDeleteMessage={msg => this.handleDeleteDialog(msg)}
                         parent={this}
                     />
                 )}
@@ -1690,12 +1692,15 @@ export class ConversationPanel extends MegaRenderMixin {
                         }}
                         onJoinClick={(audioFlag, videoFlag) => {
                             const chatId = room.chatId;
+
                             if (room.members[u_handle]) {
                                 delete megaChat.initialPubChatHandle;
+
                                 megaChat.routing.reinitAndOpenExistingChat(chatId, room.publicChatHandle)
                                     .then(() => {
-                                        megaChat.getChatById(chatId).joinCall(audioFlag, videoFlag);
-                                    }, (ex) => {
+                                        return megaChat.getChatById(chatId).joinCall(audioFlag, videoFlag);
+                                    })
+                                    .catch((ex) => {
                                         console.error("Failed to open existing room and join call:", ex);
                                     });
                             }
@@ -1704,15 +1709,12 @@ export class ConversationPanel extends MegaRenderMixin {
                                     chatId,
                                     room.publicChatHandle,
                                     room.publicChatKey
-                                ).then(
-                                    () => {
-                                        delete megaChat.initialPubChatHandle;
-                                        megaChat.getChatById(chatId).joinCall(audioFlag, videoFlag);
-                                    },
-                                    (ex) => {
-                                        console.error("Failed to join room:", ex);
-                                    }
-                                );
+                                ).then(() => {
+                                    delete megaChat.initialPubChatHandle;
+                                    return megaChat.getChatById(chatId).joinCall(audioFlag, videoFlag);
+                                }).catch((ex) => {
+                                    console.error("Failed to join room:", ex);
+                                });
                             }
 
                         }}
@@ -1813,21 +1815,6 @@ export class ConversationPanel extends MegaRenderMixin {
                             }
                         }}
                     /> : null}
-                    {
-                        room.callManagerCall && room.callManagerCall.isStarted() ?
-                            <ConversationAVPanel
-                                chatRoom={this.props.chatRoom}
-                                unreadCount={this.props.chatRoom.messagesBuff.getUnreadCount()}
-                                onMessagesToggle={function(isActive) {
-                                    self.setState({
-                                        'messagesToggledInCall': isActive
-                                    }, function() {
-                                        $('.js-messages-scroll-area', self.findDOMNode())
-                                            .trigger('forceResize', [true]);
-                                    });
-                                }}
-                            /> : null
-                    }
 
                     {privateChatDialog}
                     {chatLinkDialog}
@@ -1930,7 +1917,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             ref={historyPanel => {
                                 this.historyPanel = historyPanel;
                             }}
-                            onDeleteClicked={this.handleDeleteDialog}
+                            onDeleteClicked={msg => this.handleDeleteDialog(msg)}
                         />
 
                         {

@@ -327,7 +327,6 @@
         else if (id && id.substr(0, 4) === 'chat') {
             if (is_mobile) {
                 // @todo implement the chat on mobile :)
-
                 id = this.RootID;
             }
             else {
@@ -474,10 +473,7 @@
         }
 
         if (!this.chat && megaChatIsReady) {
-            var room = megaChat.getCurrentRoom();
-            if (room) {
-                room.hide();
-            }
+            megaChat.cleanup();
         }
 
         let {promise} = mega;

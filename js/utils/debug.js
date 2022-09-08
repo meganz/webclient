@@ -361,6 +361,7 @@ mBroadcaster.once('boot_done', function radSetup() {
         if (mega.flags.rad === 0) {
             delete localStorage.d;
             delete localStorage.minLogLevel;
+            delete localStorage.chatdLogger;
         }
         if (!window.u_sid) {
             mBroadcaster.once('login2', radSetup);
@@ -370,6 +371,13 @@ mBroadcaster.once('boot_done', function radSetup() {
 
     localStorage.d = d |= 1;
     localStorage.minLogLevel |= 0;
+
+    if (Date.now() < 167198e7) {
+        localStorage.chatdLogger = 1;
+    }
+    else if (d) {
+        console.debug('%cKnock, knock... is this still needed?', 'font-size:20px');
+    }
 
     let idb, pfx;
     let indent = 0;
@@ -590,11 +598,6 @@ mBroadcaster.once('boot_done', function radSetup() {
         const {master, slaves} = mBroadcaster.crossTab;
         id = (id >>> 0).toString(36);
         log('CROSSTAB', `New tab with id:${id}, ${master}<>${slaves.map(s => (s >>> 0).toString(36))}`);
-        flush().catch(dump);
-    });
-
-    document.addEventListener('visibilitychange', () => {
-        log('VSBY', `${new Date().toISOString()} ${document.visibilityState}`);
         flush().catch(dump);
     });
 

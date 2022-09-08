@@ -556,8 +556,7 @@ MegaData.prototype.sortByInteraction = function(d) {
 
 MegaData.prototype.doSort = function(n, d) {
     "use strict";
-    // don't touch the .arrow's in Archived chats.
-    $('.grid-table thead .arrow:not(.is-chat)').removeClass('asc desc');
+    $('.grid-table thead .arrow').removeClass('asc desc');
     $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
 
     n = String(n).replace(/\W/g, '');

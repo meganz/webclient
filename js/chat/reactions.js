@@ -43,7 +43,8 @@ Reactions._allQueuedReactions = Object.create(null);
  */
 lazy(Reactions, '_db', function() {
     'use strict';
-    console.assert(ChatdPersist.isMasterTab());
+    console.assert(ChatdPersist.isMasterTab(), 'Reactions DB initialized not in master.');
+    Object.defineProperty(Reactions, 'ready', {value: true});
     return new SharedLocalKVStorage("reacts");
 });
 
@@ -82,17 +83,15 @@ Reactions.getSn = promisify(function(resolve, reject, chatId) {
  * @param {String} sn sn
  * @returns {Promise}
  */
-Reactions.setSn = promisify(function(resolve, reject, chatId, sn) {
+Reactions.setSn = async function(chatId, sn) {
     "use strict";
 
-    Reactions._allReactionSns[chatId] = sn;
-
     if (ChatdPersist.isMasterTab()) {
-        return Reactions._db.setItem(chatId + "_sn", sn).then(resolve).catch(reject);
+        await Promise.resolve(Reactions._db.setItem(`${chatId}_sn`, sn));
     }
 
-    resolve();
-});
+    Reactions._allReactionSns[chatId] = sn;
+};
 
 
 Reactions.prototype.lazyInit = promisify(function(resolve) {
@@ -216,9 +215,9 @@ Reactions._initIntrnlVarsForQueuedRctn = function(chatId, message) {
         message._queuedReactions = [];
     }
 
-    Reactions._allQueuedReactions[chatId] = Reactions._allQueuedReactions[chatId] || Object.create(null);
-    Reactions._allQueuedReactions[chatId][message.messageId] =
-        Reactions._allQueuedReactions[chatId][message.messageId] || [];
+    if (!Reactions._allQueuedReactions[chatId]) {
+        Reactions._allQueuedReactions[chatId] = Object.create(null);
+    }
     Reactions._allQueuedReactions[chatId][message.messageId] = message._queuedReactions;
 };
 
@@ -352,14 +351,15 @@ Reactions.flushQueuedReactionsForChat = function(chatId) {
 Reactions.clearQueuedReactionsForChat = function(chatId, targetMsgId) {
     "use strict";
 
-    var chatRoom = megaChat.getChatById(chatId);
-    assert(chatRoom);
+    const chatRoom = megaChat.getChatById(chatId);
+    const {chatdPersist} = megaChat.plugins.chatdIntegration.chatd;
+    console.assert(chatRoom, `${chatId} not found.`);
+
     var persist = function(msgIdToPersist) {
-        var cdp = megaChat.plugins.chatdIntegration.chatd.chatdPersist;
         var msg = chatRoom.getMessageById(msgIdToPersist);
-        msg._queuedReactions = undefined;
-        if (cdp && msg) {
-            cdp.persistMessageBatched("replace", chatRoom.chatId, [undefined, msg]);
+        if (msg) {
+            msg._queuedReactions = undefined;
+            chatdPersist.persistMessageBatched("replace", chatRoom.chatId, [undefined, msg]);
         }
     };
 
@@ -370,14 +370,17 @@ Reactions.clearQueuedReactionsForChat = function(chatId, targetMsgId) {
             var msgId = qKeys[i];
 
             if (typeof targetMsgId !== 'undefined' && msgId !== targetMsgId) {
-                return;
+                continue;
             }
 
             var qReacts = Reactions._allQueuedReactions[chatId][msgId];
             // check if clear is really needed
             if (qReacts && qReacts.length > 0) {
                 Reactions._allQueuedReactions[chatId][msgId] = [];
-                persist(msgId);
+
+                if (chatdPersist) {
+                    persist(msgId);
+                }
             }
         }
 

@@ -1,27 +1,53 @@
 export default class ChatRouting {
+    static gPageHandlers = {
+        async start({location}) {
+            // show last seen/active chat.
+            return megaChat.onChatsHistoryReady(15e3)
+                .then(() => {
+                    return page === location ? megaChat.renderListing() : EACCESS;
+                });
+        },
+        async redirect(target, path = 'fm/chat') {
+            target.location = path;
+            return ChatRouting.gPageHandlers.start(target);
+        },
+        async new_meeting(target) {
+            megaChat.trigger('onStartNewMeeting');
+            return ChatRouting.gPageHandlers.redirect(target);
+        },
+        async contacts({section, args}) {
+
+            this.openCustomView(section);
+
+            const [, target = ''] = args;
+
+            if (target.length === 11) {
+                megaChat.routingSubSection = "contact";
+                megaChat.routingParams = target;
+            }
+            else if (target === "received" || target === "sent") {
+                megaChat.routingSubSection = target;
+            }
+        }
+    };
+
     constructor(megaChatInstance) {
         this.megaChat = megaChatInstance;
     }
+
     openCustomView(sectionName) {
         const megaChat = this.megaChat;
         megaChat.routingSection = sectionName;
         megaChat.hideAllChats();
         delete megaChat.lastOpenedChat;
     }
+
     route(resolve, reject, location, event, isLandingPage) {
         if (!M.chat) {
             console.error('This function is meant to navigate within the chat...');
             return;
         }
-
-        let megaChat = this.megaChat;
-
-        if (isLandingPage) {
-            megaChat.eventuallyInitMeetingUI();
-        }
-
-
-        var args = String(location || '').split('/').map(String.trim).filter(String);
+        const args = String(location || '').split('/').map(String.trim).filter(String);
 
         if (args[0] === 'fm') {
             args.shift();
@@ -30,59 +56,93 @@ export default class ChatRouting {
             args.shift();
         }
 
+        const [section] = args;
+        const {megaChat} = this;
+
         if (d) {
             megaChat.logger.warn('navigate(%s)', location, args);
         }
+        args.route = {location, section, args};
 
-        var sectionName = args[0];
-        // TODO: this.displayArchivedChats = type === 'archived';
-        megaChat.routingSection = null;
+        if (isLandingPage) {
+            megaChat.eventuallyInitMeetingUI();
+        }
+        megaChat.routingSection = 'chat';
         megaChat.routingSubSection = null;
         megaChat.routingParams = null;
 
-        // Note: Order of if's should be kept as "Most commonly used -> Less commonly used"
-        if (sectionName === 'c' || sectionName === 'g' || sectionName === 'p') {
-            this.megaChat.routingSection = 'chat';
+        const handler = ChatRouting.gPageHandlers[section || 'start'];
 
-            [resolve, location] = this.routeChat(resolve, reject, location, sectionName, args);
-        }
-        else if (sectionName === "new_meeting") {
-            megaChat.trigger('onStartNewMeeting');
-            loadSubPage("/fm/chat");
-            return;
-        }
-        else if (!sectionName) {
-            this.megaChat.routingSection = 'chat';
-
-            // show last seen/active chat.
-            megaChat.onChatsHistoryReady(15e3)
-                .then(() => {
-                    return page === location ? megaChat.renderListing() : EACCESS;
-                })
-                .then(resolve)
-                .catch(reject);
+        if (handler) {
+            handler.call(this, args.route).then(resolve).catch(reject);
             resolve = null;
         }
-        else if (sectionName === 'contacts') {
-            this.openCustomView(sectionName);
-            if (args[1] === "received" || args[1] === "sent") {
-                megaChat.routingSubSection = args[1];
-            }
-            if (args[1] && args[1].length === 11) {
-                megaChat.routingSubSection = "contact";
-                megaChat.routingParams = args[1];
-            }
-        }
-        else if (sectionName === 'archived') {
-            this.openCustomView(sectionName);
-        }
         else {
-            let hasHashChar = sectionName.indexOf("#");
-            if (hasHashChar > -1 && sectionName.substr(0, hasHashChar).length === 8) {
-                [resolve, location] = this.routeChat(resolve, reject, location, sectionName, args);
+            let roomId = String(args[(section === 'c' || section === 'g' || section === 'p') | 0] || '');
+            if (roomId.includes('#')) {
+                let key = roomId.split('#');
+                roomId = key[0];
+                key = key[1];
+
+                megaChat.publicChatKeys[roomId] = key;
+                roomId = megaChat.handleToId[roomId] || roomId;
+            }
+
+            const room = megaChat.getChatById(roomId);
+            if (room) {
+                room.show();
+                args.route.location = room.getRoomUrl();
+            }
+            else if (!roomId || roomId === u_handle) {
+                ChatRouting.gPageHandlers.redirect(args.route, 'fm/chat').then(resolve).catch(reject);
+                resolve = null;
+            }
+            else if (section === 'p') {
+                megaChat.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, true)
+                    .then(resolve)
+                    .catch(reject);
+                resolve = null;
             }
             else {
-                this.openCustomView("notFound");
+                megaChat.plugins.chatdIntegration.openChat(roomId)
+                    .then(chatId => {
+                        megaChat.getChatById(chatId).show();
+                        return chatId;
+                    })
+                    .catch(ex => {
+                        if (d && ex !== ENOENT) {
+                            console.warn('If "%s" is a chat, something went wrong..', roomId, ex);
+                        }
+
+                        // did we move elsewhere meanwhile?
+                        if (page !== location) {
+                            // yep, another concurrent navigate() might be ongoing.
+                            return EEXPIRED;
+                        }
+                        megaChat.cleanup(true);
+
+
+                        // @todo could there be an endless redirection with the fm-side not picking this page/location
+                        // and this reached back again for it? if so, catch it and invoke openCustomView(notFound) (?)
+
+
+                        if (ex === ENOENT && megaChat.publicChatKeys[roomId]) {
+                            msgDialog('warninga', l[20641], l[20642], 0, () => {
+                                loadSubPage(is_chatlink ? 'start' : 'fm/chat', event);
+                            });
+                        }
+                        else {
+                            if (String(location).startsWith('chat')) {
+                                location = 'fm/chat';
+                            }
+                            loadSubPage(location, location.includes('chat') ? 'override' : event);
+                        }
+                        return EACCESS;
+                    })
+                    .then(resolve)
+                    .catch(reject);
+
+                resolve = null;
             }
         }
 
@@ -91,76 +151,23 @@ export default class ChatRouting {
         }
         megaChat.safeForceUpdate();
 
+        if (args.route.location !== location) {
+            location = args.route.location;
+        }
+
         const method = page === 'chat' || page === 'fm/chat' || page === location
         || event && event.type === 'popstate' ? 'replaceState' : 'pushState';
 
         mBroadcaster.sendMessage('beforepagechange', location);
         M.currentdirid = String(page = location).replace('fm/', '');
-        if (location.substr(0, 13) === "chat/contacts" || location.substr(0, 13) === "chat/archived") {
+
+        if (location.substr(0, 13) === "chat/contacts") {
             // ensure that chat/contacts is always opened with fm/ prefix
             location = "fm/" + location;
         }
+
         history[method]({subpage: location}, "", (hashLogic ? '#' : '/') + location);
         mBroadcaster.sendMessage('pagechange', page);
-    }
-    routeChat(resolve, reject, location, sectionName, args) {
-        let megaChat = this.megaChat;
-        megaChat.routingSection = 'chat';
-
-        var roomId = args[(sectionName === 'c' || sectionName === 'g' || sectionName === 'p') | 0];
-        if (roomId.indexOf('#') > 0) {
-            var key = roomId.split('#');
-            roomId = key[0];
-            key = key[1];
-
-            megaChat.publicChatKeys[roomId] = key;
-            roomId = megaChat.handleToId[roomId] || roomId;
-        }
-
-        var room = megaChat.getChatById(roomId);
-        if (room) {
-            room.show();
-            location = room.getRoomUrl();
-        }
-        else if (sectionName === 'p') {
-            if (roomId === u_handle) {
-                return loadSubPage('/fm/chat');
-            }
-            megaChat.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, true)
-                .then(resolve)
-                .catch(reject);
-            resolve = null;
-        }
-        else {
-            let done = resolve;
-            megaChat.plugins.chatdIntegration.openChat(roomId)
-                .then(chatId => {
-                    megaChat.getChatById(chatId).show();
-                    done(chatId);
-                })
-                .catch(ex => {
-                    if (d && ex !== ENOENT) {
-                        console.warn('If "%s" is a chat, something went wrong..', roomId, ex);
-                    }
-
-                    if (ex === ENOENT && megaChat.publicChatKeys[roomId]) {
-                        msgDialog('warninga', l[20641], l[20642], 0, () => {
-                            loadSubPage(is_chatlink ? 'start' : 'fm/chat', event);
-                        });
-                    }
-                    else {
-                        if (String(location).startsWith('chat')) {
-                            location = 'fm/chat';
-                        }
-                        M.currentdirid = M.chat = page = false;
-                        loadSubPage(location, event);
-                    }
-                    done(EACCESS);
-                });
-            resolve = null;
-        }
-
-        return [resolve, location];
     }
 
     initFmAndChat(targetChatId) {

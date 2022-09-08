@@ -55,10 +55,10 @@ class ConversationMessageMixin extends ContactAwareComponent {
         this.addContactListeners();
     }
 
-    haveMeetingsCall = () => {
+    haveMeetingsCall() {
         // Meetings call is currently ongoing and the `HistoryPanel` is active?
         return document.querySelector('.meetings-call') && document.querySelector('.chat-opened');
-    };
+    }
 
     removeContactListeners() {
         const users = this._contactChangeListeners;
@@ -140,9 +140,11 @@ class ConversationMessageMixin extends ContactAwareComponent {
 
         return Message.getContactForMessage(message);
     }
+
     getTimestampAsString() {
         return unixtimeToTimeString(this.getTimestamp());
     }
+
     getTimestamp() {
         var message = this.props.message;
         var timestampInt;
@@ -161,6 +163,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
         }
         return timestampInt;
     }
+
     componentDidUpdate() {
         var self = this;
         var chatRoom = self.props.message.chatRoom;
@@ -179,10 +182,10 @@ class ConversationMessageMixin extends ContactAwareComponent {
         }
     }
 
-    getCurrentUserReactions = () => {
+    getCurrentUserReactions() {
         const { reactions } = this.props.message.reacts;
         return Object.keys(reactions).filter(utf => reactions[utf]?.[u_handle]);
-    };
+    }
 
     emojiSelected(e, slug, meta) {
         const { chatRoom, message, onEmojiBarChange } = this.props;

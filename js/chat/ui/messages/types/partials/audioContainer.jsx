@@ -1,7 +1,8 @@
 import React from 'react';
 import AudioPlayer from './audioPlayer.jsx';
+import { MegaRenderMixin } from '../../../../mixins.js';
 
-export default class AudioContainer extends React.Component {
+export default class AudioContainer extends MegaRenderMixin {
     state = {
         audioBlobUrl: null,
         loading: false
@@ -9,9 +10,10 @@ export default class AudioContainer extends React.Component {
 
     constructor(props) {
         super(props);
+        this.getAudioFile = this.getAudioFile.bind(this);
     }
 
-    getAudioFile= () => {
+    getAudioFile() {
         const { mime, h } = this.props;
 
         this.setState({
@@ -55,7 +57,7 @@ export default class AudioContainer extends React.Component {
         return (
             <div className="audio-container">
                 <AudioPlayer
-                    source={(audioBlobUrl ? audioBlobUrl : null)}
+                    source={audioBlobUrl}
                     audioId={audioId}
                     loading={loading}
                     mime={mime}

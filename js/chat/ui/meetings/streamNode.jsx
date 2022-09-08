@@ -8,6 +8,7 @@ export default class StreamNode extends MegaRenderMixin {
     nodeRef = React.createRef();
     contRef = React.createRef();
     statsHudRef = React.createRef();
+
     constructor(props) {
         super(props);
         this.state = { loading: false };
@@ -30,6 +31,7 @@ export default class StreamNode extends MegaRenderMixin {
             }
         }
     }
+
     requestVideo(forceVisible) {
         if (this.isComponentVisible() || forceVisible) {
             var node = this.findDOMNode();
@@ -39,6 +41,7 @@ export default class StreamNode extends MegaRenderMixin {
             this.requestVideoBySize(0, 0);
         }
     }
+
     setupVideoElement(video) {
         if (video._snSetup) {
             return; // already done
@@ -51,11 +54,6 @@ export default class StreamNode extends MegaRenderMixin {
                 this.props.onDoubleClick(e, this);
             }
         };
-        /*
-        video.onplaying = () => {
-            this.setLoading(false);
-        };
-        */
         video.onloadeddata = (ev) => {
             // Trigger fake onResize when video finishes loading
             this.requestVideo();
@@ -65,6 +63,7 @@ export default class StreamNode extends MegaRenderMixin {
         };
         video._snSetup = true;
     }
+
     setLoading(loading) {
         if (this.isMounted()) {
             this.setState({loading: loading});
@@ -73,6 +72,7 @@ export default class StreamNode extends MegaRenderMixin {
             this.state.loading = loading;
         }
     }
+
     updateVideoElem() {
         // console.warn(`updateVideoElem[${this.props.stream.clientId}]`);
         if (!this.isMounted() || !this.contRef.current) {
@@ -114,6 +114,7 @@ export default class StreamNode extends MegaRenderMixin {
             }
         }
     }
+
     displayStats(stats) {
         const elem = this.statsHudRef.current;
         if (!elem) {
@@ -121,6 +122,7 @@ export default class StreamNode extends MegaRenderMixin {
         }
         elem.textContent = `${stats} (${this.props.externalVideo ? "ref" : "cloned"})`;
     }
+
     componentDidMount() {
         super.componentDidMount();
         if (this.props.didMount) {
@@ -129,9 +131,11 @@ export default class StreamNode extends MegaRenderMixin {
         // this.updateVideoElem();
         this.requestVideo(true);
     }
+
     onVisibilityChange(isVisible) {
         this.requestVideo(isVisible);
     }
+
     componentDidUpdate() {
         super.componentDidUpdate();
         if (this.props.didUpdate) {
@@ -164,7 +168,8 @@ export default class StreamNode extends MegaRenderMixin {
             this.props.willUnmount();
         }
     }
-    requestVideoBySize(w, h) {
+
+    requestVideoBySize(w) {
         const { stream } = this.props;
         // console.warn(`requestVideoBySize[${stream.clientId}]: ${w}x${h}(lastw: ${this._lastResizeWidth})`);
 
@@ -213,7 +218,7 @@ export default class StreamNode extends MegaRenderMixin {
         stream.consumerGetVideo?.(this, newQ);
     }
 
-    renderVideoDebugMode = () => {
+    renderVideoDebugMode() {
         const { stream, isLocal } = this.props;
 
         if (stream.isFake) {
@@ -234,9 +239,9 @@ export default class StreamNode extends MegaRenderMixin {
             title = "";
         }
         return <div ref={this.statsHudRef} className={className} title={title} />;
-    };
+    }
 
-    renderContent = () => {
+    renderContent() {
         const { stream, isCallOnHold } = this.props;
         const { loading } = this.state;
 
@@ -256,9 +261,9 @@ export default class StreamNode extends MegaRenderMixin {
 
         delete this._lastResizeWidth;
         return <Avatar contact={M.u[stream.userHandle]}/>;
-    };
+    }
 
-    getStatusIcon = (icon, label) => {
+    getStatusIcon(icon, label) {
         return (
             <span
                 className="simpletip"
@@ -269,9 +274,9 @@ export default class StreamNode extends MegaRenderMixin {
                 <i className={`sprite-fm-mono ${icon}`} />
             </span>
         );
-    };
+    }
 
-    renderStatus = () => {
+    renderStatus() {
         const { mode, stream, chatRoom, localAudioMuted } = this.props;
         const { audioMuted, hasSlowNetwork, isOnHold, userHandle } = stream;
         const $$CONTAINER = ({ children }) => <div className="stream-node-status theme-dark-forced">{children}</div>;
@@ -299,7 +304,7 @@ export default class StreamNode extends MegaRenderMixin {
                 </$$CONTAINER>
             </>
         );
-    };
+    }
 
     render() {
         const {

@@ -6,10 +6,6 @@ import { Button } from '../../../../ui/buttons.jsx';
 import { Emoji } from '../../../../ui/utils.jsx';
 
 export default class Contact extends AbstractGenericMessage {
-    constructor(props) {
-        super(props);
-    }
-
     DIALOG = {
         ADDED: addedEmail =>
             // `Contact invited`
@@ -20,9 +16,11 @@ export default class Contact extends AbstractGenericMessage {
             msgDialog('warningb', '', l[17545])
     };
 
-    _doAddContact = contactEmail => M.inviteContact(M.u[u_handle] ? M.u[u_handle].m : u_attr.email, contactEmail);
+    _doAddContact(contactEmail) {
+        return M.inviteContact(M.u[u_handle] ? M.u[u_handle].m : u_attr.email, contactEmail);
+    }
 
-    _handleAddContact = contactEmail => {
+    _handleAddContact(contactEmail) {
         // Anonymous view -> no `M.opc` available for this state; invoke directly contact request.
         // Render the resulting message dialog (`The user has been invited [...]` or `Invite already sent [...]`)
         // based on the actual API response.
@@ -39,15 +37,17 @@ export default class Contact extends AbstractGenericMessage {
                 this._doAddContact(contactEmail)
                     .done(addedEmail => this.DIALOG.ADDED(addedEmail))
         );
-    };
+    }
 
-    _getContactAvatar = (contact, className) => (
-        <Avatar
-            className={`avatar-wrapper ${className}`}
-            contact={M.u[contact.u]}
-            chatRoom={this.props.chatRoom}
-        />
-    );
+    _getContactAvatar(contact, className) {
+        return (
+            <Avatar
+                className={`avatar-wrapper ${className}`}
+                contact={M.u[contact.u]}
+                chatRoom={this.props.chatRoom}
+            />
+        );
+    }
 
     _getContactDeleteButton(message) {
         if (message.userId === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT) {

@@ -220,11 +220,9 @@ export default class HistoryPanel extends MegaRenderMixin {
         var scrollBlockHeight = (
             $('.chat-content-block', self.$container).outerHeight() -
             ($('.chat-topic-block', self.$container).outerHeight() || 0) -
-            ($('.call-block', self.$container).outerHeight() || 0) -
-            (
-                is_chatlink ? $('.join-chat-block', self.$container).outerHeight() :
-                    $('.messages-block .chat-textarea-block', self.$container).outerHeight()
-            )
+            (is_chatlink ?
+                $('.join-chat-block', self.$container).outerHeight() :
+                $('.messages-block .chat-textarea-block', self.$container).outerHeight())
         );
 
         if (scrollBlockHeight !== self.$messages.outerHeight()) {

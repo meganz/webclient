@@ -143,6 +143,10 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         if (newState === ChatRoom.STATE.READY && !self.isReadOnly()
             && self.chatd && self.isOnline() && self.chatIdBin) {
 
+            if (d > 2) {
+                self.logger.warn('Restoring persisted messages...', self.type, self.isCurrentlyActive);
+            }
+
             // this should never happen, but just in case...
             var cim = self.getChatIdMessages();
             cim.restore(true);
@@ -1645,10 +1649,18 @@ ChatRoom.prototype.sendMessage = function(message) {
 
     self.appendMessage(msgObject);
 
-    self._sendMessageToTransport(msgObject)
-        .done(function(internalId) {
+    return self._sendMessageToTransport(msgObject)
+        .then((internalId) => {
+            // @todo Chatd.prototype.submit() may returns false, shouldn't we handle this ?!
+            if (!internalId) {
+                this.logger.warn(`Got unexpected(?) 'sendingnum'...`, internalId);
+            }
             msgObject.internalId = internalId;
             msgObject.orderValue = internalId;
+            return internalId || -0xBADF;
+        })
+        .catch((ex) => {
+            this.logger.error(`sendMessage failed..`, msgObject, ex);
         });
 };
 
@@ -1981,18 +1993,15 @@ ChatRoom.prototype.recover = function() {
 };
 
 ChatRoom._fnRequireParticipantKeys = function(fn, scope) {
-    var origFn = fn;
-    return function() {
-        var self = scope || this;
-        var args = toArray.apply(null, arguments);
-        var participants = self.protocolHandler.getTrackedParticipants();
+    return function(...args) {
+        const participants = this.protocolHandler.getTrackedParticipants();
 
         return ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-            .done(function() {
-                origFn.apply(self, args);
+            .then(() => {
+                return fn.apply(scope || this, args);
             })
-            .fail(function() {
-                self.logger.error("Failed to retr. keys.");
+            .catch((ex) => {
+                this.logger.error("Failed to retrieve keys..", ex);
             });
     };
 };
@@ -2149,12 +2158,12 @@ ChatRoom.prototype.joinCallFromLink = function(audioFlag, videoFlag) {
     }
 };
 
-ChatRoom.prototype.startAudioCall = ChatRoom._fnRequireParticipantKeys(function() {
+ChatRoom.prototype.startAudioCall = function() {
     return this.startCall(true, false);
-});
-ChatRoom.prototype.startVideoCall = ChatRoom._fnRequireParticipantKeys(function() {
+};
+ChatRoom.prototype.startVideoCall = function() {
     return this.startCall(true, true);
-});
+};
 ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio, video) {
     if (!megaChat.hasSupportForCalls || this.meetingsLoading) {
         return;
@@ -2176,7 +2185,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
         opts.sfu = parseInt(localStorage.sfuId, 10);
     }
 
-    asyncApiReq(opts)
+    return asyncApiReq(opts)
         .then((r) => {
             var app = new SfuApp(this, r.callId);
             window.sfuClient = app.sfuClient = new SfuClient(
@@ -2294,6 +2303,58 @@ ChatRoom.prototype.retrieveAllHistory = function() {
             self.retrieveAllHistory();
         }
     });
+};
+
+/**
+ * Seed keys for this chat room as soon they are made available, e.g. through onMessageKeysDone
+ * @param {Array} keys An array of keys
+ * @returns {Promise<Array>} An 'userid-keyid' map of successfully seeded keys.
+ */
+ChatRoom.prototype.seedRoomKeys = async function(keys) {
+    assert(Array.isArray(keys) && keys.length, `Invalid keys parameter for seedRoomKeys.`, keys);
+
+    if (d > 2) {
+        this.logger.warn('Seeding room keys...', keys);
+    }
+
+    const promises = [
+        ChatdIntegration._ensureKeysAreLoaded(keys, undefined, this.publicChatHandle)
+    ];
+    if (!this.protocolHandler) {
+        promises.push(ChatdIntegration._waitForProtocolHandler(this));
+    }
+
+    if (!this.notDecryptedKeys) {
+        this.notDecryptedKeys = Object.create(null);
+    }
+
+    for (let i = keys.length; i--;) {
+        const {key, keyid, keylen, userId} = keys[i];
+        this.notDecryptedKeys[`${userId}-${keyid}`] = {userId, keyid, keylen, key};
+    }
+
+    const promise = this._keysAreSeeding = Promise.all(promises)
+        .then(() => {
+            const res = this.protocolHandler.seedKeys(keys);
+
+            for (let i = res.length; i--;) {
+                delete this.notDecryptedKeys[res[i]];
+            }
+
+            return res;
+        })
+        .catch((ex) => {
+            // @todo retry? evaluate possible exceptions..
+            this.logger.error('Failed to seed room keys!', ex, keys);
+            throw ex;
+        })
+        .finally(() => {
+            if (promise === this._keysAreSeeding) {
+                delete this._keysAreSeeding;
+            }
+        });
+
+    return promise;
 };
 
 

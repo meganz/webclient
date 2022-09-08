@@ -50,7 +50,8 @@ export class StartGroupChatWizard extends MegaRenderMixin {
             'step': this.props.flowType === 2 || !haveContacts ? 1 : 0,
             'keyRotation': false,
             'createChatLink': this.props.flowType === 2 ? true : false,
-            'groupName': ''
+            'groupName': '',
+            openInvite: 1,
         }
         this.onFinalizeClick = this.onFinalizeClick.bind(this);
         this.onSelectClicked = this.onSelectClicked.bind(this);
@@ -68,18 +69,18 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         }
     }
     onFinalizeClick(e) {
-        var self = this;
         if (e) {
             e.preventDefault();
             e.stopPropagation();
         }
+        const { groupName, selected, keyRotation, createChatLink, openInvite } = this.state;
 
-        var groupName = self.state.groupName;
-        var handles = self.state.selected;
-        var keyRotation = self.state.keyRotation;
-        var createChatLink = keyRotation ? false : self.state.createChatLink;
-        megaChat.createAndShowGroupRoomFor(handles, groupName, keyRotation, createChatLink);
-        self.props.onClose(self);
+        megaChat.createAndShowGroupRoomFor(selected, groupName, {
+            keyRotation,
+            createChatLink: keyRotation ? false : createChatLink,
+            oi: openInvite,
+        });
+        this.props.onClose(this);
     }
     render() {
         var self = this;
@@ -238,10 +239,27 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                                 }
                             />
                             <div className="group-chat-dialog header">
-                                {this.state.keyRotation ? l[20631] : l[20576]}
+                                {l[20576] /* `Encrypted key rotation` */}
                             </div>
                             <div className="group-chat-dialog description">
                                 {l[20484]}
+                            </div>
+
+                            <MiniUI.ToggleCheckbox
+                                className="open-invite-toggle"
+                                checked={this.state.openInvite}
+                                value={this.state.openInvite}
+                                onToggle={openInvite =>
+                                    this.setState({ openInvite }, () =>
+                                        this.inputRef.current.focus()
+                                    )
+                                }
+                            />
+                            <div className="group-chat-dialog header">
+                                {l.open_invite_label /* `Chat invitations` */}
+                            </div>
+                            <div className="group-chat-dialog description">
+                                {l.open_invite_desc /* `Non-host can add participants to the chat` */}
                             </div>
 
                             <div

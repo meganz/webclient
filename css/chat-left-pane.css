@@ -669,6 +669,9 @@ li.active .call-duration i {
     top: 50%;
     left: 46px;
     transform: translateY(-50%);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
     width: calc(100% - 46px);
 }
 

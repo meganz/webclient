@@ -1040,7 +1040,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
             }
         }
 
-
         if (pres === "chat") {
             pres = "online";
         }
@@ -1352,19 +1351,22 @@ export class ContactPickerWidget extends MegaRenderMixin {
         if (haveContacts) {
             if (frequentContacts.length === 0 && noOtherContacts) {
                 if (self.props.newEmptySearchResult) {
-                    contactsList = <div className="chat-contactspicker-no-contacts searching">
+                    contactsList = <div
+                        className="chat-contactspicker-no-contacts flex flex-column flex-center searching mt-2">
                         <div className="section-icon sprite-fm-mono icon-contacts"></div>
                         <div className="fm-empty-cloud-txt small">{l[8674]}</div>
                     </div>;
                 }
                 else {
-                    contactsList = <div className="chat-contactspicker-no-contacts">
+                    contactsList = <div className="chat-contactspicker-no-contacts flex flex-column mt-2">
                         <div className="contacts-list-header">
                             {l[165]}
                         </div>
-                        <div className="section-icon sprite-fm-mono icon-contacts"></div>
-                        <div className="fm-empty-cloud-txt small">{l[784]}</div>
-                        <div className="fm-empty-description small">{l[19115]}</div>
+                        <div className="flex flex-1 flex-column flex-center">
+                            <div className="section-icon sprite-fm-mono icon-contacts"></div>
+                            <div className="fm-empty-cloud-txt small">{l[784]}</div>
+                            <div className="fm-empty-description small">{l[19115]}</div>
+                        </div>
                     </div>;
                 }
             }
@@ -1411,7 +1413,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
         else if (self.props.newNoContact) {
             multipleContacts = "";
-            contactsList = <div className="chat-contactspicker-no-contacts">
+            contactsList = <div className="chat-contactspicker-no-contacts flex flex-column flex-center mt-2">
                 <div className="section-icon sprite-fm-mono icon-contacts"></div>
                 <div className="fm-empty-cloud-txt small">{l[784]}</div>
                 <div className="fm-empty-description small">{l[19115]}</div>
@@ -1420,7 +1422,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
             extraClasses += " no-contacts";
         }
         else {
-            contactsList = <div className="chat-contactspicker-no-contacts">
+            contactsList = <div className="chat-contactspicker-no-contacts flex flex-column flex-center mt-16">
                 <div className="section-icon sprite-fm-mono icon-contacts"></div>
                 <div className="fm-empty-cloud-txt small">{l[784]}</div>
                 <div className="fm-empty-description small">{l[19115]}</div>

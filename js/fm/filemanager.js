@@ -1442,10 +1442,16 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.download-standart-item').rebind('click', function() {
+        if (folderlink) {
+            eventlog(99768);
+        }
         M.addDownload($.selected);
     });
 
     $(c + '.zipdownload-item').rebind('click', function() {
+        if (folderlink) {
+            eventlog(99769);
+        }
         M.addDownload($.selected, true);
     });
 
@@ -1588,6 +1594,7 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
+        eventlog(99767);
         ASSERT(folderlink, 'Import needs to be used in folder links.');
 
         M.importFolderLinkNodes($.selected);
@@ -1652,7 +1659,7 @@ FileManager.prototype.initContextUI = function() {
             }
         }
         else {
-            megaChat.createAndShowGroupRoomFor(user_handle, "", true, false);
+            megaChat.createAndShowGroupRoomFor(user_handle, "", {keyRotation: true, createChatLink: false});
         }
     });
 
@@ -1730,7 +1737,10 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
-        fmremove();
+
+        for (let i = 0; i < $.selected.length; i++) {
+            M.leaveShare($.selected[i]).catch(dump);
+        }
     });
 
     // Bind Set Nickname context menu button
@@ -4131,12 +4141,12 @@ FileManager.prototype.onSectionUIOpen = function(id) {
                     const c = $(this).attr('class');
 
                     if (c.indexOf('fm-import-to-cloudrive') > -1) {
-                        eventlog(99763);
+                        eventlog(M.currentdirid === M.RootID ? 99765 : 99763);
                         // Import the current folder, could be the root or sub folder
                         M.importFolderLinkNodes([M.currentdirid]);
                     }
                     else if (c.indexOf('fm-download-as-zip') > -1) {
-                        eventlog(99764);
+                        eventlog(M.currentdirid === M.RootID ? 99766 : 99764);
                         // Download the current folder, could be the root or sub folder
                         M.addDownload([M.currentdirid], true);
                     }

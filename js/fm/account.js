@@ -132,7 +132,7 @@ accountUI.renderAccountPage = function(account) {
     showOrHideBanner(id);
 
     // Always hide the add-phone banner if it was shown by the account profile sub page
-    $('.add-phone-num-banner', accountUI.$contentBlock).addClass('hidden');
+    accountUI.account.profiles.hidePhoneBanner();
 
     switch (id) {
 
@@ -813,7 +813,7 @@ accountUI.account = {
 
         // Profile
         this.profiles.resetProfileForm();
-        this.profiles.renderPhoneBanner();
+        this.profiles.renderPhoneBanner().catch(dump);
         this.profiles.renderFirstName();
         this.profiles.renderLastName();
         this.profiles.renderBirth();
@@ -872,11 +872,16 @@ accountUI.account = {
 
     profiles: {
 
+        hidePhoneBanner: async function() {
+            'use strict';
+
+            $('.add-phone-num-banner', accountUI.$contentBlock).addClass('hidden');
+        },
         /**
          * Render a banner at the top of the My Account section for enticing a user to add their phone number
          * so that they can get an achievement bonus and link up with their phone contacts that might be on MEGA
          */
-        renderPhoneBanner: function() {
+        renderPhoneBanner: async function() {
 
             'use strict';
 
@@ -886,15 +891,12 @@ accountUI.account = {
             var $text = $('.add-phone-text', $addPhoneBanner);
             var $addPhoneButton = $('.js-add-phone-button', $addPhoneBanner);
             var $skipButton = $('.skip-button', $addPhoneBanner);
+            var $notAgainCheckbox = $('.notagain', $addPhoneBanner);
+
             // M.maf is cached in its getter, however, repeated gets will cause unnecessary checks.
             var ach = M.maf;
 
-            // If SMS verification enable is not on level 2 (Opt-in and unblock SMS allowed) then do nothing. Or if
-            // they already have already added a phone number then don't show this banner again. Or if they clicked the
-            // skip button then don't show the banner.
-            if (u_attr.flags.smsve !== 2 || typeof u_attr.smsv !== 'undefined' || fmconfig.skipsmsbanner
-                || (ach && ach[9] && ach[9].rwd)) {
-
+            const hideOrDisplayBanner = () => {
                 // If not a business account
                 if (typeof u_attr.b === 'undefined') {
 
@@ -907,30 +909,82 @@ accountUI.account = {
                     $usageBanner.addClass('hidden');
                     $addPhoneBanner.addClass('hidden');
                 }
+            };
 
+            // If SMS verification enable is not on level 2 (Opt-in and unblock SMS allowed) then do nothing. Or if
+            // they already have already added a phone number then don't show this banner again. Or if they clicked the
+            // skip button then don't show the banner.
+            if (u_attr.flags.smsve !== 2 || typeof u_attr.smsv !== 'undefined' || fmconfig.skipsmsbanner
+                || ach && ach[9] && ach[9].rwd) {
+                hideOrDisplayBanner();
+                return false;
+            }
+
+            const phoneBannerTimeChecker = await mega.TimeChecker.PhoneBanner.init(
+                () => {
+                    return !$addPhoneBanner.hasClass('hidden');
+                }
+            );
+
+            if (!phoneBannerTimeChecker ||
+                phoneBannerTimeChecker
+                    && !phoneBannerTimeChecker.shouldShow()
+                    && !phoneBannerTimeChecker.hasUpdated()
+            ) {
+                hideOrDisplayBanner();
                 return false;
             }
 
             // On click of the Add Number button load the add phone dialog
-            $addPhoneButton.rebind('click', function() {
-
+            $addPhoneButton.rebind('click.phonebanner', () => {
                 sms.phoneInput.init();
             });
 
-            // On click of the Skip button, hide the banner and don't show it again
-            $skipButton.rebind('click', function() {
+            $notAgainCheckbox.rebind('click.phonebanner', () => {
+                const $input = $('.checkinput', $notAgainCheckbox);
+                const $checkboxDiv = $('.checkdiv', $notAgainCheckbox);
 
-                // Hide the banner
-                $addPhoneBanner.addClass('hidden');
-
-                // Save in fmconfig so it is not shown again on reload or login on different machine
-                mega.config.set('skipsmsbanner', 1);
+                // If unticked, tick the box
+                if ($input.hasClass('checkboxOff')) {
+                    $input.removeClass('checkboxOff').addClass('checkboxOn').prop('checked', true);
+                    $checkboxDiv.removeClass('checkboxOff').addClass('checkboxOn');
+                }
+                else {
+                    // Otherwise untick the box
+                    $input.removeClass('checkboxOn').addClass('checkboxOff').prop('checked', false);
+                    $checkboxDiv.removeClass('checkboxOn').addClass('checkboxOff');
+                }
+                return false;
             });
 
             sms.renderAddPhoneText($text);
             // Show the phone banner, hide the storage/bandwidth usage banner
             $usageBanner.addClass('hidden');
             $addPhoneBanner.removeClass('hidden');
+
+            if (phoneBannerTimeChecker) {
+                if (!phoneBannerTimeChecker.hasUpdated()) {
+                    phoneBannerTimeChecker.update();
+                }
+
+                if (phoneBannerTimeChecker.isMoreThan10Times()) {
+                    $notAgainCheckbox.removeClass('hidden');
+                }
+
+                $skipButton.removeClass('hidden'); // Show the skip button
+                // On click of the Skip button, hide the banner and don't show it again
+                $skipButton.rebind('click.phonebanner', () => {
+                    phoneBannerTimeChecker.update();
+                    // Hide the banner
+                    $addPhoneBanner.addClass('hidden');
+
+                    // Save in fmconfig so it is not shown again on reload or login on different machine
+                    const notAgain = $('.checkinput', $notAgainCheckbox).prop('checked');
+                    if (notAgain) {
+                        mega.config.set('skipsmsbanner', 1);
+                    }
+                });
+            }
         },
 
         renderFirstName: function() {

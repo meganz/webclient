@@ -857,12 +857,6 @@
     margin-left: 5px;
 }
 
-.message.text-block::selection, .message.user-card-name::selection {
-    background-color: #D9D9D9;
-}
-.message.text-block::-moz-selection, .message.user-card-name::-moz-selection {
-    background-color: #D9D9D9;
-}
 .message.call-inner-block > .small-rounded-avatar {
     position: relative;
     z-index: 1;

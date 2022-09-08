@@ -5,17 +5,19 @@ import Sidebar from './sidebar.jsx';
 import Invite from './workflow/invite/invite.jsx';
 import Ephemeral from './workflow/ephemeral.jsx';
 import Offline from './offline.jsx';
+import { allContactsInChat, excludedParticipants } from '../conversationpanel.jsx';
 
 export const EXPANDED_FLAG = 'in-call';
-export const inProgressAlert = (isJoin) => {
+export const inProgressAlert = (isJoin, chatRoom) => {
     return new Promise((resolve, reject) => {
         if (megaChat.haveAnyActiveCall()) {
             if (window.sfuClient) {
-                // Active call w/  the current client
-                const { chatRoom } = megaChat.activeCall;
-                const peers = chatRoom
-                    ? chatRoom.getParticipantsExceptMe(chatRoom.getCallParticipants()).map(h => M.getNameByHandle(h))
-                    : [];
+                // Active call w/ the current client
+                const { chatRoom: activeCallRoom } = megaChat.activeCall;
+                const peers = activeCallRoom ?
+                    activeCallRoom.getParticipantsExceptMe(activeCallRoom.getCallParticipants())
+                        .map(h => M.getNameByHandle(h)) :
+                    [];
                 let body = isJoin ? l.cancel_to_join : l.cancel_to_start;
                 if (peers.length) {
                     body = mega.utils.trans.listToString(
@@ -26,6 +28,13 @@ export const inProgressAlert = (isJoin) => {
                 msgDialog('warningb', null, l.call_in_progress, body, null, 1);
                 return reject();
             }
+
+            // Active call on another client; incl. current user already being in the call ->
+            // skip warning notification
+            if (chatRoom.getCallParticipants().includes(u_handle)) {
+                return resolve();
+            }
+
             // Active call on another client
             return (
                 msgDialog(
@@ -169,7 +178,7 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleRetryTimeout = () => {
-        if (this.props.sfuApp.sfuClient.connState === SfuClient.ConnState.kDisconnected) {
+        if (this.props.sfuApp.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
             this.handleCallEnd();
             this.props.chatRoom.trigger('onRetryTimeout');
             ion.sound.play('end_call');
@@ -428,7 +437,41 @@ export default class Call extends MegaRenderMixin {
      * @returns {void}
      */
 
-    handleInviteToggle = () => this.setState({ invite: !this.state.invite });
+    handleInviteToggle = () => {
+        if (M.u.length > 1) {
+            const participants = excludedParticipants(this.props.chatRoom);
+
+            if (allContactsInChat(participants)) {
+                msgDialog(
+                    `confirmationa:!^${l[8726]}!${l[82]}`,
+                    null,
+                    `${l.all_contacts_added}`,
+                    `${l.all_contacts_added_to_chat}`,
+                    (res) => {
+                        if (res) {
+                            contactAddDialog(null, false);
+                        }
+                    }
+                );
+            }
+            else {
+                this.setState({ invite: !this.state.invite });
+            }
+        }
+        else {
+            msgDialog(// new user adding a partcipant
+                `confirmationa:!^${l[8726]}!${l[82]}`,
+                null,
+                `${l.no_contacts}`,
+                `${l.no_contacts_text}`,
+                (resp) => {
+                    if (resp) {
+                        contactAddDialog(null, false);
+                    }
+                }
+            );
+        }
+    };
 
     /**
      * handleHoldToggle
@@ -572,7 +615,6 @@ export default class Call extends MegaRenderMixin {
         //
         // `Call`
         // -------------------------------------------------------------------------
-
         return (
             <div className={`meetings-call ${minimized ? 'minimized' : ''}`}>
                 <Stream
@@ -622,11 +664,17 @@ export default class Call extends MegaRenderMixin {
                 {offline && (
                     <Offline
                         onClose={() => {
+                            if (offline) {
+                                this.setState({ offline: false }, () =>
+                                    delay('call:timeout', this.handleRetryTimeout, 3e4)
+                                );
+                            }
+                        }}
+                        onCallEnd={() => {
                             this.setState({ offline: false }, () =>
-                                delay('call:timeout', this.handleRetryTimeout, 3e4)
+                                this.handleRetryTimeout()
                             );
                         }}
-                        onCallEnd={this.handleRetryTimeout}
                     />
                 )}
             </div>

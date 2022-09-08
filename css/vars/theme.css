@@ -372,8 +372,6 @@ html .theme-light-forced {
 
     /* TEMP: variables */
         --button-hover: rgba(0, 0, 0, 0.05);
-        --text-selection: rgba(0, 0, 0, 0.1);
-        --text-selection-inverted: rgba(255, 255, 255, 0.1);
 
     /* Onboarding */
         --onboarding-step-border: rgba(0, 0, 0, 0.05);
@@ -598,8 +596,6 @@ html .theme-dark-forced {
     /* TEMP: variables */
 
         --button-hover: rgba(255, 255, 255, 0.1);
-        --text-selection: rgba(255, 255, 255, 0.1);
-        --text-selection-inverted: rgba(0, 0, 0, 0.1);
 
     /* Onboarding */
         --onboarding-step-border: rgba(0, 0, 0, 0.05);

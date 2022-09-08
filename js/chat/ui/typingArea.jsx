@@ -477,7 +477,7 @@ export class TypingArea extends MegaRenderMixin {
 
         if (this.onUpdateCursorPosition) {
             var el = $('.chat-textarea:visible:first textarea:visible', this.typingAreaRef.current)[0];
-            el.selectionStart = el.selectionEnd = self.onUpdateCursorPosition;
+            el.selectionStart = el.selectionEnd = this.onUpdateCursorPosition;
             this.onUpdateCursorPosition = false;
         }
     }

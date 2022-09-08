@@ -94,10 +94,6 @@
     background: none;
     padding: 0;
 }
-.mobile .media-viewer .counter .mid {
-	color: inherit;
-	font: inherit;
-}
 .mobile .media-viewer .bar > li > button {
     margin: 0;
     padding: 18px;

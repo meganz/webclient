@@ -562,6 +562,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree, qui
         }
         else if ($.onImportCopyNodes) {
             tree = $.onImportCopyNodes;
+            tree.isImporting = true;
         }
         else {
             // 1. get all nodes into memory
@@ -832,6 +833,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree, qui
         cn: cn,
         del: del,
         t: t,
+        imp: tree.isImporting,
         callback: function(res, ctx) {
 
             if (typeof res === 'number' && res < 0) {
@@ -862,7 +864,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree, qui
             }
 
             nodesCount = importNodes - Object.keys(res).length;
-            if (ctx.t && ctx.t.length === 11) {
+            if (ctx.imp || (ctx.t && ctx.t.length === 11)) {
                 getsc(true);
             }
         }

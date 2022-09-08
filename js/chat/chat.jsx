@@ -1089,10 +1089,16 @@ Chat.prototype.reorderContactTree = function() {
  * @param [chatShard]  {String}
  * @param [chatdUrl]  {String}
  * @param [setAsActive] {Boolean}
+ * @param {String} [chatHandle] the public chat handle
+ * @param {String} [publicChatKey] the public chat key
+ * @param {String} ck the chat key
+ * @param {Boolean} isMeeting Is the chat a meeting
+ * @param {Object} [mcoFlags] Flags set by mco requests for the room see MCO_FLAGS for options.
  * @returns [roomId {string}, room {MegaChatRoom}, {Deferred}]
  */
 Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUrl, setAsActive, chatHandle,
-                                   publicChatKey, ck, isMeeting) {
+                                   publicChatKey, ck, isMeeting, mcoFlags
+) {
     var self = this;
     var room = false;
     type = type || "private";
@@ -1248,7 +1254,8 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         publicChatKey,
         ck,
         isMeeting,
-        0
+        0,
+        mcoFlags
     );
 
     self.chats.set(room.roomId, room);
@@ -2041,23 +2048,25 @@ Chat.prototype.createAndShowPrivateRoom = promisify(function(resolve, reject, h)
         .catch(reject);
 });
 
-Chat.prototype.createAndShowGroupRoomFor = function(contactHashes, topic, keyRotation, createChatLink, isMeeting) {
+Chat.prototype.createAndShowGroupRoomFor = function(contactHashes, topic, opts = {}) {
     this.trigger(
         'onNewGroupChatRequest',
         [
             contactHashes,
             {
                 'topic': topic || "",
-                'keyRotation': keyRotation,
-                'createChatLink': createChatLink,
-                'isMeeting': isMeeting
+                ...opts
             }
         ]
     );
 };
 
 Chat.prototype.createAndStartMeeting = function(topic, audio, video) {
-    megaChat.createAndShowGroupRoomFor([], topic, false, 2, true);
+    megaChat.createAndShowGroupRoomFor([], topic, {
+        keyRotation: false,
+        createChatLink: 2,
+        isMeeting: true
+    });
     megaChat.rebind('onRoomInitialized.meetingCreate', function(e, room) {
         room.rebind('onNewMeetingReady.meetingCreate', function() {
             room.startCall(audio, video);

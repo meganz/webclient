@@ -254,6 +254,9 @@
 .chat-right-area .dropdown-item.link-button.light:not(.disabled):hover i {
     --mask-color: var(--icon-active);
 }
+.chat-right-area .link-button.open-invite-settings-button {
+    height: auto;
+}
 .chat-right-area .link-button .mega-switch {
     position: absolute;
     top: 4px;
@@ -269,6 +272,12 @@
     display: block;
     margin: -10px 0 0 0;
     color: var(--text-color-medium);
+}
+.chat-right-area .link-button.open-invite-settings-button span.label--green {
+    display: block;
+    padding-left: 0;
+    line-height: 18px;
+    color: var(--text-color-low);
 }
 .chat-right-area .link-button.push-settings-button span.label--green strong {
     color: var(--label-green);
@@ -892,17 +901,13 @@ filter: progid:DXImageTransform.Microsoft.Alpha(opacity=60);
 .chat-right-pad .link-button .small-icon.chat-lock {
     margin-top: 3px;
 }
-.chat-contactspicker-no-contacts .fm-empty-cloud-txt {
-    padding: 0 32px 0 20px;
-}
 .chat-contactspicker-no-contacts .section-icon {
     --icon-size: 120px;
     --mask-color: var(--secondary-grey);
     display: inline-block;
-    margin: 43px 12px 0 0;
 }
 .chat-contactspicker-no-contacts .fm-empty-description {
-    padding: 1px 32px 29px 20px;
+    padding: 1px 0 29px;
 }
 .group-chat-dialog.description.chatlinks-intermediate-msg {
     margin: 4px 48px 0 48px;
@@ -1071,7 +1076,6 @@ button.fm-empty-button {
     margin: 0;
 }
 .chat-contactspicker-no-contacts {
-    margin-top: 8px;
     text-align: center;
     padding: 0 48px;
 }

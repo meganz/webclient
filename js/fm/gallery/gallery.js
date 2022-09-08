@@ -538,26 +538,20 @@ class MegaGallery {
     filterOneMonthGroup(ts) {
         const dayKeys = Object.keys(this.groups.m[ts].dts);
 
-        dayKeys.sort((a, b) => {
-            return this.groups.d[b].c - this.groups.d[a].c;
-        });
+        dayKeys.sort((a, b) => b - a);
 
         this.groups.m[ts].n = dayKeys.slice(0, 4).map(k => this.groups.d[k].n[0]);
         this.groups.m[ts].dts = {};
     }
 
     filterMonthGroup() {
-
         const monthKeys = Object.keys(this.groups.m).sort((a, b) => b - a);
         let triEvenCount = 0;
 
         for (let i = 0; i < monthKeys.length; i++) {
-
             const dayKeys = Object.keys(this.groups.m[monthKeys[i]].dts);
 
-            dayKeys.sort((a, b) => {
-                return this.groups.d[b].c - this.groups.d[a].c;
-            });
+            dayKeys.sort((a, b) => b - a);
 
             const max = i % 3 === 2 ? 4 : 3;
 
@@ -601,7 +595,6 @@ class MegaGallery {
     // This function is rely on result from day group processing.
     // Therefore, day group has to be processed before execute this function.
     addToMonthGroup(n, ts, dts) {
-
         const group = this.groups.m[ts];
         const sts = `${ts}`;
 
@@ -2282,9 +2275,15 @@ MegaGallery.handleIntersect = (entries, gallery) => {
     for (let i = 0; i < entries.length; i++) {
         const entry = entries[i];
 
-        if (entry.isIntersecting && !entry.target.nodeBlock.isRendered) {
-            entry.target.nodeBlock.fill(gallery.mode);
-            toFetchAttributes.push(entry.target.nodeBlock);
+        if (entry.isIntersecting) {
+            if (!entry.target.nodeBlock.isRendered) {
+                entry.target.nodeBlock.fill(gallery.mode);
+                toFetchAttributes.push(entry.target.nodeBlock);
+            }
+
+            if (Array.isArray($.selected) && $.selected.includes(entry.target.nodeBlock.node.h)) {
+                entry.target.nodeBlock.el.classList.add('ui-selected');
+            }
         }
     }
 

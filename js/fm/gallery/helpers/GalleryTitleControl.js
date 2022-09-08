@@ -118,7 +118,7 @@ class GalleryTitleControl extends MComponent {
         }
 
         this._caret = document.createElement('span');
-        this._caret.setAttribute('class', 'nw-fm-tree-arrow rot-90 m-ml-xs');
+        this._caret.setAttribute('class', 'nw-fm-tree-arrow rot-90 ml-1');
         this.el.append(this._caret);
     }
 

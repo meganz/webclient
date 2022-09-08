@@ -61,11 +61,6 @@
     min-height: 48px;
     padding: 12px 48px;
 }
-.dialog-dark-bottom::selection,
-.dialog-dark-bottom a::selection {
-    background: var(--text-selection-inverted);
-    color: var(--text-color-high-inverted);
-}
 .main-left-block.confirm .account.login-form .dialog-dark-bottom.register,
 .main-left-block.businessSubAc .account.register-form .dialog-dark-bottom.login  {
     display: none;

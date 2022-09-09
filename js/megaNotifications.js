@@ -103,7 +103,7 @@
         sounds: [],
         soundsPath: staticpath + "sounds/",
         soundsPreload: true,
-        soundsVolume: 1,
+        soundsVolume: 0.07,
         showFaviconCounter: false,
         desktopNotifications: true,
         anfFlag: false

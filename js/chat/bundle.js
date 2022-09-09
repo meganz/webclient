@@ -20847,10 +20847,25 @@ class stream_Stream extends mixins.wl {
                 `,
       onMouseMove: this.handleMouseMove,
       onMouseOut: this.handleMouseOut
-    }, minimized ? null : external_React_default().createElement("div", {
-      className: `
-                    ${NAMESPACE}-wrapper
-                    `
+    }, external_React_default().createElement(chatToaster.Z, {
+      showDualNotifications: true,
+      hidden: minimized,
+      onShownToast: t => {
+        if (t.options && t.options.persistent) {
+          this.setState({
+            overlayed: true
+          });
+        }
+      },
+      onHideToast: t => {
+        if (this.state.overlayed && t.options && t.options.persistent) {
+          this.setState({
+            overlayed: false
+          });
+        }
+      }
+    }), minimized ? null : external_React_default().createElement("div", {
+      className: `${NAMESPACE}-wrapper`
     }, external_React_default().createElement(StreamHead, {
       disableCheckingVisibility: true,
       mode: mode,
@@ -20879,24 +20894,7 @@ class stream_Stream extends mixins.wl {
       sidebar: sidebar,
       onChatToggle: onChatToggle,
       onParticipantsToggle: onParticipantsToggle
-    })), external_React_default().createElement(chatToaster.Z, {
-      showDualNotifications: true,
-      hidden: minimized,
-      onShownToast: t => {
-        if (t.options && t.options.persistent) {
-          this.setState({
-            overlayed: true
-          });
-        }
-      },
-      onHideToast: t => {
-        if (this.state.overlayed && t.options && t.options.persistent) {
-          this.setState({
-            overlayed: false
-          });
-        }
-      }
-    }), external_React_default().createElement(Local, {
+    })), external_React_default().createElement(Local, {
       call: call,
       streams: streams,
       mode: mode,

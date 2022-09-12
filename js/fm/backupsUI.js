@@ -1159,7 +1159,8 @@ lazy(mega, 'backupCenter', () => {
                 mCreateElement('i', {
                     'class': 'sprite-fm-mono error icon-close-component'
                 }, statusParentNode);
-                mCreateElement('span', {'class': 'error'}, statusParentNode).textContent = l.stalled_sync_state;
+                mCreateElement('span', {'class': 'error'}, statusParentNode).textContent =
+                    mega.icu.format(l.stalled_sync_state, isDeviceCard ? syncData.stalledSyncs : 1);
             }
             // Show sync status: Up to date
             else if (syncData.upToDateSyncs) {
@@ -1288,7 +1289,7 @@ lazy(mega, 'backupCenter', () => {
 
                     mCreateElement('i', {
                         'class': 'sprite-fm-uni icon-hazard simpletip',
-                        'data-simpletip': l.device_attention_tip,
+                        'data-simpletip': mega.icu.format(l.device_attention_tip, syncStatuses.disabledSyncs),
                         'data-simpletipposition': 'top',
                         'data-simpletipoffset': 2
                     }, foldersInfoNode);

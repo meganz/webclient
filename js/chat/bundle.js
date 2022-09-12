@@ -15726,6 +15726,21 @@ class ConversationsList extends mixins.wl {
     })));
   }
 
+  renderEmptyState() {
+    const {
+      view,
+      views,
+      isArchived
+    } = this.props;
+    const messages = {
+      [views.CHATS]: isArchived ? l.no_archived_chats_lhp : l.no_chats_lhp,
+      [views.MEETINGS]: isArchived ? l.no_archived_meetings_lhp : l.no_meetings_lhp
+    };
+    return external_React_default().createElement("span", {
+      className: "empty-conversations"
+    }, messages[view]);
+  }
+
   renderConversations() {
     const {
       conversations,
@@ -15775,9 +15790,7 @@ class ConversationsList extends mixins.wl {
     } = this.props;
 
     if (conversations && conversations.length === 0) {
-      return external_React_default().createElement("span", {
-        className: "empty-conversations"
-      }, view === views.CHATS ? l.no_chats_lhp : l.no_meetings_lhp);
+      return this.renderEmptyState();
     }
 
     return view === views.LOADING ? this.renderLoading() : this.renderConversations();
@@ -15900,6 +15913,7 @@ class LeftPanel extends mixins.wl {
       view: view,
       conversations: conversations
     }, external_React_default().createElement(ConversationsList, {
+      isArchived: archived,
       view: view,
       views: views,
       conversations: conversations,

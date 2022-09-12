@@ -1855,7 +1855,7 @@ body.theme-dark .join-meeting .card-preview .preview {
   overflow: hidden;
   position: relative;
   width: 605px;
-  margin: 0 auto;
+  margin: 55px auto 0;
   box-sizing: border-box;
   box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.1);
   border-radius: 30px;
@@ -1871,7 +1871,8 @@ body.theme-dark .join-meeting .card-preview .preview {
   margin: 30px 0 25px 36px;
 }
 .join-meeting .unsupported-container .unsupported-info h3 {
-  font: var(--text-h3);
+  font: var(--text-h3-bold);
+  color: var(--text-color-high);
 }
 .join-meeting .unsupported-container .unsupported-info h3:first-child {
   margin: 0 0 20px 0;
@@ -2101,6 +2102,17 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   bottom: -9999px;
   visibility: hidden;
 }
+.incoming-dialog-unsupported {
+  margin: 16px -16px -16px -16px;
+  border-radius: 20px;
+  background: var(--secondary-orange);
+}
+.incoming-dialog-unsupported .unsupported-message {
+  padding: 12px;
+  text-align: left;
+  font: var(--text-body1);
+  color: var(--secondary-white);
+}
 
 .invite-meeting {
   width: 415px;
@@ -2276,4 +2288,41 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   }
 }
 
-/*# sourceMappingURL=chat-bundle.css.map */
+.meetings-alert {
+  position: absolute;
+  top: 5px;
+  left: 8px;
+  width: calc(100% - 22px);
+  border-radius: 12px;
+  background: var(--secondary-orange);
+  z-index: 15;
+}
+.meetings-alert-neutral {
+  background: var(--secondary-grey);
+}
+.meetings-alert-medium {
+  background: var(--secondary-orange);
+}
+.meetings-alert-high {
+  background: var(--secondary-red);
+}
+.meetings-alert-content {
+  padding: 12px 40px 12px 12px;
+  color: var(--secondary-white);
+}
+.meetings-alert-content a {
+  color: var(--secondary-white);
+  text-decoration: underline;
+}
+.meetings-alert-close {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+.meetings-alert-close i {
+  display: block;
+  --icon-size: 24px;
+  --mask-color: var(--secondary-white);
+}

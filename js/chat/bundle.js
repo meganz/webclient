@@ -11928,9 +11928,7 @@ class Join extends mixins.wl {
       className: "sprite-fm-uni icon-error"
     }), external_React_default().createElement("div", {
       className: "unsupported-info"
-    }, external_React_default().createElement("h3", null, "Your browser can't support MEGA meeting"), external_React_default().createElement("h3", null, "You can join meeting via the following approaches:"), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, "Open the link via Chrome version XXX"), external_React_default().createElement("li", null, "Join via Mobile apps ", external_React_default().createElement(ui_link.Z, {
-      to: "/mobile"
-    }, "Download Mobile App")))));
+    }, external_React_default().createElement("h3", null, l.heading_unsupported_browser), external_React_default().createElement("h3", null, l.join_meeting_methods), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, l.join_via_link), external_React_default().createElement("li", null, external_React_default().createElement(utils.ParsedHTML, null, l.join_via_mobile.replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>'))))));
 
     this.View = view => {
       switch (view) {
@@ -11967,6 +11965,12 @@ class Join extends mixins.wl {
     }
 
     sessionStorage.removeItem('guestForced');
+
+    if (!megaChat.hasSupportForCalls) {
+      this.setState({
+        view: Join.VIEW.UNSUPPORTED
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -12179,11 +12183,10 @@ class JoinCallNotification extends mixins.wl {
     }
 
     if (!megaChat.hasSupportForCalls) {
-      return external_React_default().createElement("div", {
-        className: "in-call-notif yellow join"
-      }, external_React_default().createElement("i", {
-        className: "sprite-fm-mono icon-phone"
-      }), l.active_call_not_supported);
+      return external_React_default().createElement(Alert, {
+        type: Alert.TYPE.MEDIUM,
+        content: l.active_call_not_supported
+      });
     }
 
     return external_React_default().createElement("div", {
@@ -13684,6 +13687,10 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       onClose: () => this.setState({
         invalidKeysBanner: false
       })
+    }), this.props.alert && !mega.config.get('aUIF') && !room.havePendingCall() && external_React_default().createElement(Alert, {
+      type: Alert.TYPE.MEDIUM,
+      content: call.ZP.getUnsupportedBrowserMessage(),
+      onClose: this.props.onAlertClose
     }), external_React_default().createElement(historyPanel.Z, (0,esm_extends.Z)({}, this.props, {
       onMessagesListScrollableMount: mls => {
         this.messagesListScrollable = mls;
@@ -13725,6 +13732,19 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
 
 }, ((0,applyDecoratedDescriptor.Z)(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), (0,applyDecoratedDescriptor.Z)(conversationpanel_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
 class ConversationPanels extends mixins.wl {
+  constructor(props) {
+    super(props);
+    this.state = {
+      alert: undefined
+    };
+
+    this.handleAlertClose = () => this.setState({
+      alert: false
+    }, () => mega.config.set('aUIF', 1));
+
+    this.state.alert = !megaChat.hasSupportForCalls;
+  }
+
   componentDidMount() {
     var _this$props$onMount, _this$props;
 
@@ -13752,7 +13772,9 @@ class ConversationPanels extends mixins.wl {
           isExpanded: chatRoom.megaChat.chatUIFlags.convPanelCollapse,
           isActive: chatRoom.isCurrentlyActive,
           messagesBuff: chatRoom.messagesBuff,
-          chatUIFlags: chatUIFlags
+          chatUIFlags: chatUIFlags,
+          alert: this.state.alert,
+          onAlertClose: this.handleAlertClose
         });
       }
 
@@ -22267,6 +22289,8 @@ Call.isModerator = (chatRoom, handle) => {
 
 Call.isExpanded = () => document.body.classList.contains(EXPANDED_FLAG);
 
+Call.getUnsupportedBrowserMessage = () => navigator.userAgent.match(/Chrom(e|ium)\/(\d+)\./) ? l.alert_unsupported_browser_version : l.alert_unsupported_browser;
+
 /***/ }),
 
 /***/ 238:
@@ -22364,14 +22388,16 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
 "default": () => (Incoming)
 });
-var _extends6__ = __webpack_require__(462);
+var _extends7__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
 var _mixins1__ = __webpack_require__(503);
 var _contacts_jsx2__ = __webpack_require__(13);
 var _ui_modalDialogs_jsx3__ = __webpack_require__(904);
 var _button_jsx4__ = __webpack_require__(193);
-var _ui_utils_jsx5__ = __webpack_require__(79);
+var _call_jsx5__ = __webpack_require__(486);
+var _ui_utils_jsx6__ = __webpack_require__(79);
+
 
 
 
@@ -22384,6 +22410,7 @@ class Incoming extends _mixins1__.wl {
     super(props);
     this.state = {
       video: false,
+      unsupported: undefined,
       hoveredSwitch: true
     };
 
@@ -22417,20 +22444,26 @@ class Incoming extends _mixins1__.wl {
 
     this.renderAnswerControls = () => {
       const {
-        video
+        video,
+        unsupported
       } = this.state;
       const {
         onAnswer,
         onToggleVideo
       } = this.props;
       return react0().createElement((react0().Fragment), null, react0().createElement(_button_jsx4__.Z, {
-        className: "mega-button positive answer",
+        className: `
+                        mega-button
+                        positive
+                        answer
+                        ${unsupported ? 'disabled' : ''}
+                    `,
         icon: "icon-phone",
-        simpletip: {
+        simpletip: unsupported ? null : {
           position: 'top',
           label: l[7205]
         },
-        onClick: onAnswer
+        onClick: unsupported ? null : onAnswer
       }, react0().createElement("span", null, l[7205])), react0().createElement(_button_jsx4__.Z, {
         className: `
                         mega-button
@@ -22438,17 +22471,20 @@ class Incoming extends _mixins1__.wl {
                         round
                         video
                         ${video ? '' : 'negative'}
+                        ${unsupported ? 'disabled' : ''}
                     `,
         icon: video ? 'icon-video-call-filled' : 'icon-video-off',
-        simpletip: {
+        simpletip: unsupported ? null : {
           position: 'top',
           label: video ? l[22894] : l[22893]
         },
-        onClick: () => this.setState({
+        onClick: () => unsupported ? null : this.setState({
           video: !video
         }, () => onToggleVideo(video))
       }, react0().createElement("span", null, video ? l[22894] : l[22893])));
     };
+
+    this.state.unsupported = !megaChat.hasSupportForCalls;
   }
 
   componentDidMount() {
@@ -22469,17 +22505,20 @@ class Incoming extends _mixins1__.wl {
 
     if (chatRoom) {
       const {
+        NAMESPACE
+      } = Incoming;
+      const {
         callerId,
         onClose,
         onReject
       } = this.props;
       const {
-        NAMESPACE
-      } = Incoming;
+        unsupported
+      } = this.state;
       const CALL_IN_PROGRESS = window.sfuClient;
       const isPrivateRoom = chatRoom.type === 'private';
       const rejectLabel = isPrivateRoom ? l[20981] : l[82];
-      return react0().createElement(_ui_modalDialogs_jsx3__.Z.ModalDialog, (0,_extends6__.Z)({}, this.state, {
+      return react0().createElement(_ui_modalDialogs_jsx3__.Z.ModalDialog, (0,_extends7__.Z)({}, this.state, {
         name: NAMESPACE,
         className: NAMESPACE,
         onClose: () => onClose()
@@ -22491,20 +22530,30 @@ class Incoming extends _mixins1__.wl {
         contact: M.u[callerId]
       })), react0().createElement("div", {
         className: `${NAMESPACE}-info`
-      }, react0().createElement("h1", null, react0().createElement(_ui_utils_jsx5__.Emoji, null, chatRoom.getRoomTitle())), react0().createElement("span", null, isPrivateRoom ? l[17878] : l[19995])), react0().createElement("div", {
+      }, react0().createElement("h1", null, react0().createElement(_ui_utils_jsx6__.Emoji, null, chatRoom.getRoomTitle())), react0().createElement("span", null, isPrivateRoom ? l[17878] : l[19995])), react0().createElement("div", {
         className: `
                                 ${NAMESPACE}-controls
                                 ${CALL_IN_PROGRESS ? 'call-in-progress' : ''}
                             `
       }, react0().createElement(_button_jsx4__.Z, {
-        className: "mega-button large round negative",
+        className: `
+                                    mega-button
+                                    large
+                                    round
+                                    negative
+                                    ${unsupported ? 'disabled' : ''}
+                                `,
         icon: "icon-end-call",
-        simpletip: {
+        simpletip: unsupported ? null : {
           position: 'top',
           label: rejectLabel
         },
-        onClick: onReject
-      }, react0().createElement("span", null, rejectLabel)), CALL_IN_PROGRESS ? this.renderSwitchControls() : this.renderAnswerControls())));
+        onClick: unsupported ? null : onReject
+      }, react0().createElement("span", null, rejectLabel)), CALL_IN_PROGRESS ? this.renderSwitchControls() : this.renderAnswerControls()), unsupported && react0().createElement("div", {
+        className: `${NAMESPACE}-unsupported`
+      }, react0().createElement("div", {
+        className: "unsupported-message"
+      }, _call_jsx5__.ZP.getUnsupportedBrowserMessage()))));
     }
 
     console.error('Incoming dialog received missing chatRoom prop.');

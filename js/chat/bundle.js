@@ -13687,7 +13687,7 @@ let ConversationPanel = (conversationpanel_dec = utils["default"].SoonFcWrap(360
       onClose: () => this.setState({
         invalidKeysBanner: false
       })
-    }), this.props.alert && !mega.config.get('aUIF') && !room.havePendingCall() && external_React_default().createElement(Alert, {
+    }), this.props.alert && !mega.config.get('nocallsup') && !room.havePendingCall() && external_React_default().createElement(Alert, {
       type: Alert.TYPE.MEDIUM,
       content: call.ZP.getUnsupportedBrowserMessage(),
       onClose: this.props.onAlertClose
@@ -13740,7 +13740,7 @@ class ConversationPanels extends mixins.wl {
 
     this.handleAlertClose = () => this.setState({
       alert: false
-    }, () => mega.config.set('aUIF', 1));
+    }, () => mega.config.set('nocallsup', 1));
 
     this.state.alert = !megaChat.hasSupportForCalls;
   }

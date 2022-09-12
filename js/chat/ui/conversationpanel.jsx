@@ -1902,7 +1902,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                 onClose={() => this.setState({ invalidKeysBanner: false })}
                             />
                         )}
-                        {this.props.alert && !mega.config.get('aUIF') && !room.havePendingCall() && (
+                        {this.props.alert && !mega.config.get('nocallsup') && !room.havePendingCall() && (
                             <Alert
                                 type={Alert.TYPE.MEDIUM}
                                 content={Call.getUnsupportedBrowserMessage()}
@@ -1987,7 +1987,7 @@ export class ConversationPanels extends MegaRenderMixin {
         this.state.alert = !megaChat.hasSupportForCalls;
     }
 
-    handleAlertClose = () => this.setState({ alert: false }, () => mega.config.set('aUIF', 1));
+    handleAlertClose = () => this.setState({ alert: false }, () => mega.config.set('nocallsup', 1));
 
     componentDidMount() {
         super.componentDidMount();

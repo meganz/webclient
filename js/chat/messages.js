@@ -1099,14 +1099,14 @@ function MessagesBuff(chatRoom, chatdInt) {
                 self.haveMoreSharedFiles = true;
             }
             else if (
-                self.expectedMessagesCount === requestedMessagesCount
+                self.expectedMessagesCount >= requestedMessagesCount
             ) {
-                // this is an empty/new chat.
+                // this is an empty/new chat/the last message is an attachment.
                 self.expectedMessagesCount = 0;
                 self.haveMoreSharedFiles = false;
             }
             else if (
-                self.expectedMessagesCount
+                self.expectedMessagesCount > 0
             ) {
                 // if the expectedMessagesCount is not 0 and < requested, then...chatd/idb returned < then the
                 // requested #, which means, that there is no more history.
@@ -1146,9 +1146,6 @@ function MessagesBuff(chatRoom, chatdInt) {
                 self.retrievedAllMessages = self.expectedMessagesCount < requestedMessagesCount;
             }
 
-
-
-
             delete self.expectedMessagesCount;
             delete self.requestedMessagesCount;
 
@@ -1177,6 +1174,7 @@ function MessagesBuff(chatRoom, chatdInt) {
             self.isRetrievingSharedFiles = true;
         }
         self.expectedMessagesCount = eventData.count === 0xDEAD ? null : Math.abs(eventData.count);
+
         self.trackDataChange();
     });
 
@@ -1214,15 +1212,12 @@ function MessagesBuff(chatRoom, chatdInt) {
             }
         }
 
-
         if (!eventData.isNew) {
-            // console.log('!eventData.isNew');
             if (typeof self.expectedMessagesCount !== 'undefined') {
                 self.expectedMessagesCount--;
             }
 
             if (!self.isRetrievingSharedFiles) {
-                // console.log('!self.isRetrievingSharedFiles');
                 if (eventData.userId !== u_handle) {
                     if (self.lastDeliveredMessageRetrieved === true) {
                         // received a message from history, which was NOT marked as received, e.g. was sent during
@@ -1231,7 +1226,6 @@ function MessagesBuff(chatRoom, chatdInt) {
 
                     }
                 }
-                // console.log('self.messagesBatchFromHistory.push(msgObject)');
                 self.messagesBatchFromHistory.push(msgObject);
             }
             else {
@@ -1935,7 +1929,7 @@ MessagesBuff.prototype.retrieveSharedFilesHistory = function(len) {
             self.$isDecryptingSharedFiles.reject();
         }
         else {
-            self.chatdInt.chatd._sendNodeHist(self.chatRoom.chatIdBin, base64urldecode(lastMsgId), len * -1);
+            self.chatdInt.chatd._sendNodeHist(self.chatRoom.chatIdBin, base64urldecode(lastMsgId), (len + 1) * -1);
 
             self.$sharedFilesLoading.always(function () {
                 delete self.$sharedFilesLoading;
@@ -2028,7 +2022,6 @@ MessagesBuff.prototype.haveMoreHistory = function() {
     }
 };
 
-
 MessagesBuff.prototype.markAllAsSeen = function() {
     var self = this;
     var lastToBeMarkedAsSeen = null;
@@ -2047,6 +2040,7 @@ MessagesBuff.prototype.markAllAsSeen = function() {
         self.setLastSeen(lastToBeMarkedAsSeen);
     }
 };
+
 MessagesBuff.prototype.markAllAsReceived = function() {
     var self = this;
 
@@ -2064,7 +2058,6 @@ MessagesBuff.prototype.markAllAsReceived = function() {
         self.setLastReceived(lastToBeMarkedAsReceived);
     }
 };
-
 
 /**
  * Get message by Id
@@ -2307,25 +2300,25 @@ MessagesBuff.prototype.detachMessages = SoonFc(70, function() {
         var deletedItems = self.messages.splice(0,  self.messages.length - detachCount);
 
         // detach attachments?
-        if (M.chc[self.chatRoom.roomId]) {
-            var attachmentsIndex = {};
-            var atts = M.chc[self.chatRoom.roomId];
-            for (var k in atts) {
-                attachmentsIndex[atts[k].m] = k;
-            }
+        // if (M.chc[self.chatRoom.roomId]) {
+        //     var attachmentsIndex = {};
+        //     var atts = M.chc[self.chatRoom.roomId];
+        //     for (var k in atts) {
+        //         attachmentsIndex[atts[k].m] = k;
+        //     }
 
-            for (var i = 0; i < deletedItems.length; i++) {
-                // cleanup the `messageId` index
-                delete M.chc[deletedItems[i]];
+        //     for (var i = 0; i < deletedItems.length; i++) {
+        //         // cleanup the `messageId` index
+        //         delete M.chc[deletedItems[i]];
 
-                // search and optionally cleanup the [roomId] index in M.chc (atts)
-                var foundKey = attachmentsIndex[deletedItems[i]];
+        //         // search and optionally cleanup the [roomId] index in M.chc (atts)
+        //         var foundKey = attachmentsIndex[deletedItems[i]];
 
-                if (typeof foundKey !== "undefined") {
-                    delete atts[foundKey];
-                }
-            }
-        }
+        //         if (typeof foundKey !== "undefined") {
+        //             delete atts[foundKey];
+        //         }
+        //     }
+        // }
 
         // self.logger.info(
         //     "messages detached from memory: ", lengthBefore - self.messages.length

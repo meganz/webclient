@@ -165,7 +165,8 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
                 </div>;
             }
             else if (mb.sharedFiles.length === 0) {
-                sharedNodesContainer =  <div className="chat-dropdown empty-txt">
+                mb.haveMoreSharedFiles = false;
+                sharedNodesContainer = <div className="chat-dropdown empty-txt">
                     {l[19985]}
                 </div>;
             }

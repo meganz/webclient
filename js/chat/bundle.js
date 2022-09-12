@@ -11100,6 +11100,7 @@ let SharedFilesAccordionPanel = (_dec = utils["default"].SoonFcWrap(350), (_clas
           className: "main-loader"
         })));
       } else if (mb.sharedFiles.length === 0) {
+        mb.haveMoreSharedFiles = false;
         sharedNodesContainer = sharedFilesAccordionPanel_React.createElement("div", {
           className: "chat-dropdown empty-txt"
         }, l[19985]);

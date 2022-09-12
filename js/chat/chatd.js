@@ -1140,6 +1140,7 @@ Chatd.Shard.prototype._sendHist = function(chatId, count) {
 
 // send NODEHIST
 Chatd.Shard.prototype._sendNodeHist = function(chatId, lastMsgId, count) {
+
     this.chatd.trigger('onMessagesHistoryRequest', {
         count: count,
         chatId: base64urlencode(chatId),

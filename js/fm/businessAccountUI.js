@@ -167,6 +167,12 @@ function BusinessAccountUI() {
 
         initTreeScroll();
 
+        const scrollBlock = $('.user-management-scroll', $subAccountsView);
+
+        if (scrollBlock.is('.ps')) {
+            Ps.update(scrollBlock[0]);
+        }
+
         const $listTable = $('.user-management-list-table', $subAccountsView);
         $('tr', $listTable).removeClass('last-row');
         $('tr:visible:last', $listTable).addClass('last-row');

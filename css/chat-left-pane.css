@@ -108,6 +108,10 @@
     margin: 5px 0 5px 40px;
     font: var(--text-body2);
     color: var(--text-color-medium);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: calc(100% - 46px);
 }
 .conversation-reduce-height {
     position: relative;

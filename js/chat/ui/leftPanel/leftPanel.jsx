@@ -27,6 +27,7 @@ export default class LeftPanel extends MegaRenderMixin {
                 view={view}
                 conversations={conversations}>
                 <ConversationsList
+                    isArchived={archived}
                     view={view}
                     views={views}
                     conversations={conversations}

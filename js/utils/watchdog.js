@@ -70,76 +70,84 @@ lazy(self, 'watchdog', () => Object.freeze({
     /**
      * Perform a query to other tabs and wait for reply through a Promise
      * @param {String} what Parameter
-     * @param {String} timeout ms
+     * @param {Number|String} timeout ms
      * @param {String} cache   preserve result
      * @param {Object} [data]   data to be sent with the query
      * @param {bool} [expectsSingleAnswer]   pass true if your query is expected to receive only single answer (this
      * would speed up and resolve the returned promise when the first answer is received and won't wait for the full
      * `timeout` to gather more replies)
-     * @return {MegaPromise}
+     * @return {Promise}
      */
     query: function(what, timeout, cache, data, expectsSingleAnswer) {
-        var self = this;
-        var token = (Math.random() * Date.now() << 4).toString(19);
-        var promise = new MegaPromise();
+        return new Promise((resolve, reject) => {
+            if (this.replyCache[what]) {
+                // a prior query was launched with the cache flag
+                cache = this.replyCache[what];
+                delete this.replyCache[what];
+                return resolve(cache);
+            }
+            const {master, slaves} = mBroadcaster.crossTab;
+            const tabs = slaves && slaves.length;
+            const canSignal = !master || tabs;
 
-        if (this.replyCache[what]) {
-            // a prior query was launched with the cache flag
-            cache = this.replyCache[what];
-            delete this.replyCache[what];
-            return MegaPromise.resolve(cache);
-        }
-
-        if (!mBroadcaster.crossTab.master
-            || Object(mBroadcaster.crossTab.slaves).length) {
+            if (!canSignal) {
+                // Nothing to do here.
+                return reject(EEXIST);
+            }
+            const token = (Math.random() * Date.now() << 4).toString(36);
 
             if (cache) {
                 this.replyCache[what] = [];
             }
             this.queryQueue[token] = [];
 
-            var tmpData;
-            if (!data) {
-                tmpData = {};
-            }
-            else {
-                tmpData = clone(data);
-            }
+            const tmpData = data ? clone(data) : {};
             tmpData['reply'] = token;
 
             queueMicrotask(() => {
-                self.notify('Q!' + what, tmpData);
+                this.notify(`Q!${what}`, tmpData);
             });
+            timeout = parseInt(timeout || 384) / 1e3;
 
-            if (!expectsSingleAnswer) {
-                // wait for reply and fullfil/reject the promise
-                setTimeout(function() {
-                    if (self.queryQueue[token].length) {
-                        promise.resolve(self.queryQueue[token]);
+            if (expectsSingleAnswer) {
+                let pokes = 0;
+                const ack = () => {
+                    if (pokes > 0) {
+                        // all tabs returned a falsy value
+                        resolve([false]);
                     }
                     else {
-                        promise.reject(EACCESS);
+                        reject(EACCESS);
                     }
-                    delete self.queryQueue[token];
-                }, timeout || 200);
+
+                    delete this.queryQueue[token];
+                    delete this.waitingQueries[token];
+                };
+                const timer = tSleep(timeout);
+
+                timer.poke = () => {
+                    if (!pokes++) {
+                        tSleep(0.3 * tabs).then(ack);
+                    }
+                };
+                timer.then(ack);
+
+                resolve.timer = timer;
+                this.waitingQueries[token] = resolve;
             }
             else {
-                promise.timer = setTimeout(function() {
-                    if (promise.state() === 'pending') {
-                        promise.reject(EACCESS);
-                        delete self.queryQueue[token];
-                        delete self.waitingQueries[token];
+                // wait for reply and fulfill/reject the promise
+                tSleep(timeout).then(() => {
+                    if (this.queryQueue[token].length) {
+                        resolve(this.queryQueue[token]);
                     }
-                }, timeout || 200);
-
-                self.waitingQueries[token] = promise;
+                    else {
+                        reject(EACCESS);
+                    }
+                    delete this.queryQueue[token];
+                });
             }
-        }
-        else {
-            promise = MegaPromise.reject(EEXIST);
-        }
-
-        return promise;
+        });
     },
 
     /**
@@ -197,29 +205,38 @@ lazy(self, 'watchdog', () => Object.freeze({
         }
 
         switch (msg) {
-            case 'Q!Rep!y':
-                if (this.queryQueue[strg.data.token]) {
-                    this.queryQueue[strg.data.token].push(strg.data.value);
+            case 'Q!Rep!y': {
+                const {query, token, value} = strg.data;
+
+                if (this.queryQueue[token]) {
+                    this.queryQueue[token].push(value);
                 }
-                if (this.replyCache[strg.data.query]) {
-                    this.replyCache[strg.data.query].push(strg.data.value);
+
+                if (this.replyCache[query]) {
+                    this.replyCache[query].push(value);
                 }
+
                 // if there is a promise in .waitingQueries, that means that this query is expecting only 1 response
                 // so we can resolve it immediately.
-                if (this.waitingQueries[strg.data.token]) {
-                    var self = this;
+                const resolver = this.waitingQueries[token];
+                if (resolver) {
+                    const {timer} = resolver;
 
-                    clearTimeout(this.waitingQueries[strg.data.token].timer);
-                    this.waitingQueries[strg.data.token]
-                        .always(function() {
-                            // cleanup after all other done/always/fail handlers...
-                            delete self.waitingQueries[strg.data.token];
-                            delete self.queryQueue[strg.data.token];
-                        })
-                        .resolve([strg.data.value]);
-
+                    if (value) {
+                        timer.abort();
+                        queueMicrotask(() => {
+                            delete this.queryQueue[token];
+                            delete this.waitingQueries[token];
+                        });
+                        resolver([value]);
+                    }
+                    else {
+                        // Got falsy value, wait for more
+                        timer.poke(value);
+                    }
                 }
                 break;
+            }
 
             case 'loadfm_done':
                 if (this.Strg.login === strg.origin) {

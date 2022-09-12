@@ -54,6 +54,8 @@ export class TypingArea extends MegaRenderMixin {
         }, () => {
             // `Sample |message` -> `Sample :smile:| message`
             textarea.selectionEnd = cursorPosition + slug.length;
+
+            this.onTypeAreaChange(e, this.state.typedMessage);
         });
     }
 
@@ -349,20 +351,19 @@ export class TypingArea extends MegaRenderMixin {
         }
     }
 
-    onTypeAreaChange(e) {
+    onTypeAreaChange(e, value) {
         if (this.props.disabled) {
             e.preventDefault();
             e.stopPropagation();
             return;
         }
         var self = this;
+        value = String(value || e.target.value || '').replace(/^\s+/, '');
 
-        if (self.state.typedMessage !== e.target.value) {
-            self.setState({typedMessage: e.target.value});
+        if (self.state.typedMessage !== value) {
+            self.setState({typedMessage: value});
             self.forceUpdate();
         }
-
-        const value = $.trim(e.target.value);
 
         if (value.length) {
             self.typing();

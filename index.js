@@ -1657,6 +1657,24 @@ function init_page() {
     }
     else if (page === 'nas') {
         parsepage(pages.nas);
+
+        // Qnap and Synology image/link locale update
+        const langMap = {
+            de: 'de-de', fr: 'fr-fr', nl: 'nl-nl', th: 'th-th', it: 'it-it',
+            pl: 'pl-pl', 'zh-Hans': 'zh-hk', 'zh-Hant': 'zh-tw', pt: 'pt-pt',
+            es: 'es-es', ja: 'ja-jp', ko: 'ko-kr', ru: 'ru-ru'
+        };
+        const langUse = langMap[window.locale];
+        if (langUse) {
+            const qnapLinks = document.querySelectorAll('a.link-qnap');
+            for (let i = qnapLinks.length; i--;) {
+                qnapLinks[i].href = qnapLinks[i].href.replace('/en/', `/${langUse}/`);
+            }
+            const synologyLinks = document.querySelectorAll('a.link-synology');
+            for (let j = synologyLinks.length; j--;) {
+                synologyLinks[j].href = synologyLinks[j].href.replace('/en-nz/', `/${langUse}/`);
+            }
+        }
     }
     else if (page === 'nzippmember' || page === 'nziphotographer') {
         parsepage(pages.nzipp);

@@ -1111,7 +1111,7 @@
             return;
         }
 
-        if (!megaChat.hasSupportForCalls || chatRoom.fakedLocalRing) {
+        if (chatRoom.fakedLocalRing) {
             return;
         }
 

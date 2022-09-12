@@ -132,7 +132,6 @@ export default class Join extends MegaRenderMixin {
 
         //
         // Ephemeral session, w/ `Join as guest` and `Create account` controls
-        // https://mega.nz/file/4EMzXaQY#g2HGbYKVj_nNk2HL8rwDfZ5gEZcePBSXP6yIn1sde04
         // -------------------------------------------------------------------------
 
         if (isEphemeral()) {
@@ -168,7 +167,6 @@ export default class Join extends MegaRenderMixin {
 
         //
         // Default state for guests, w/ `Join as guest`, `Login` and `Create account` controls
-        // https://mega.nz/file/QB9GiCLS#dRZxfZde231SHp_JHgyoN6kKIEbyzqWSSnkwOin_Fpc
         // -------------------------------------------------------------------------
 
         return (
@@ -333,11 +331,17 @@ export default class Join extends MegaRenderMixin {
         <div className="unsupported-container">
             <i className="sprite-fm-uni icon-error" />
             <div className="unsupported-info">
-                <h3>Your browser can&apos;t support MEGA meeting</h3>
-                <h3>You can join meeting via the following approaches:</h3>
+                <h3>{l.heading_unsupported_browser}</h3>
+                <h3>{l.join_meeting_methods}</h3>
                 <ul>
-                    <li>Open the link via Chrome version XXX</li>
-                    <li>Join via Mobile apps <Link to="/mobile">Download Mobile App</Link></li>
+                    <li>{l.join_via_link}</li>
+                    <li>
+                        <ParsedHTML>
+                            {l.join_via_mobile
+                                .replace('[A]', '<a href="/mobile" class="clickurl">')
+                                .replace('[/A]', '</a>')}
+                        </ParsedHTML>
+                    </li>
                 </ul>
             </div>
         </div>;
@@ -365,6 +369,9 @@ export default class Join extends MegaRenderMixin {
             closeDialog();
         }
         sessionStorage.removeItem('guestForced');
+        if (!megaChat.hasSupportForCalls) {
+            this.setState({ view: Join.VIEW.UNSUPPORTED });
+        }
     }
 
     componentWillUnmount() {

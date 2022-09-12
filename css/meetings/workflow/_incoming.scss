@@ -134,4 +134,17 @@
             }
         }
     }
+
+    &-unsupported {
+        margin: 16px -16px -16px -16px;
+        border-radius: 20px;
+        background: var(--secondary-orange);
+
+        .unsupported-message {
+            padding: 12px;
+            text-align: left;
+            font: var(--text-body1);
+            color: var(--secondary-white);
+        }
+    }
 }

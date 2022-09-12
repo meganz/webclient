@@ -145,14 +145,8 @@ export class JoinCallNotification extends MegaRenderMixin {
         }
 
         if (!megaChat.hasSupportForCalls) {
-            return (
-                <div className="in-call-notif yellow join">
-                    <i className="sprite-fm-mono icon-phone"/>
-                    {/* There is an active call in this room, but your browser does not support calls. */
-                        l.active_call_not_supported
-                    }
-                </div>
-            );
+            // `There is an active call in this room, but your browser does not support calls.`
+            return <Alert type={Alert.TYPE.MEDIUM} content={l.active_call_not_supported} />;
         }
 
         return (
@@ -1908,6 +1902,13 @@ export class ConversationPanel extends MegaRenderMixin {
                                 onClose={() => this.setState({ invalidKeysBanner: false })}
                             />
                         )}
+                        {this.props.alert && !mega.config.get('aUIF') && !room.havePendingCall() && (
+                            <Alert
+                                type={Alert.TYPE.MEDIUM}
+                                content={Call.getUnsupportedBrowserMessage()}
+                                onClose={this.props.onAlertClose}
+                            />
+                        )}
 
                         <HistoryPanel
                             {...this.props}
@@ -1977,6 +1978,17 @@ export class ConversationPanel extends MegaRenderMixin {
 }
 
 export class ConversationPanels extends MegaRenderMixin {
+    state = {
+        alert: undefined
+    };
+
+    constructor(props) {
+        super(props);
+        this.state.alert = !megaChat.hasSupportForCalls;
+    }
+
+    handleAlertClose = () => this.setState({ alert: false }, () => mega.config.set('aUIF', 1));
+
     componentDidMount() {
         super.componentDidMount();
         this.props.onMount?.();
@@ -2003,6 +2015,8 @@ export class ConversationPanels extends MegaRenderMixin {
                                 isActive={chatRoom.isCurrentlyActive}
                                 messagesBuff={chatRoom.messagesBuff}
                                 chatUIFlags={chatUIFlags}
+                                alert={this.state.alert}
+                                onAlertClose={this.handleAlertClose}
                             />
                         );
                     }

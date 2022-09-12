@@ -204,7 +204,7 @@
         overflow: hidden;
         position: relative;
         width: 605px;
-        margin: 0 auto;
+        margin: 55px auto 0;
         box-sizing: border-box;
         box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.10);
         border-radius: 30px;
@@ -221,7 +221,8 @@
             margin: 30px 0 25px 36px;
 
             h3 {
-                font: var(--text-h3);
+                font: var(--text-h3-bold);
+                color: var(--text-color-high);
 
                 &:first-child {
                     margin: 0 0 20px 0;

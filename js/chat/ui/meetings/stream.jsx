@@ -512,10 +512,22 @@ export default class Stream extends MegaRenderMixin {
                 `}
                 onMouseMove={this.handleMouseMove}
                 onMouseOut={this.handleMouseOut}>
+                <ChatToaster
+                    showDualNotifications={true}
+                    hidden={minimized}
+                    onShownToast={t => {
+                        if (t.options && t.options.persistent) {
+                            this.setState({overlayed: true});
+                        }
+                    }}
+                    onHideToast={t => {
+                        if (this.state.overlayed && t.options && t.options.persistent) {
+                            this.setState({overlayed: false});
+                        }
+                    }}
+                />
                 {minimized ? null : (
-                    <div className={`
-                    ${NAMESPACE}-wrapper
-                    `}>
+                    <div className={`${NAMESPACE}-wrapper`}>
                         <StreamHead
                             disableCheckingVisibility={true}
                             mode={mode}
@@ -552,20 +564,6 @@ export default class Stream extends MegaRenderMixin {
                         />
                     </div>
                 )}
-                <ChatToaster
-                    showDualNotifications={true}
-                    hidden={minimized}
-                    onShownToast={t => {
-                        if (t.options && t.options.persistent) {
-                            this.setState({overlayed: true});
-                        }
-                    }}
-                    onHideToast={t => {
-                        if (this.state.overlayed && t.options && t.options.persistent) {
-                            this.setState({overlayed: false});
-                        }
-                    }}
-                />
                 <Local
                     call={call}
                     streams={streams}

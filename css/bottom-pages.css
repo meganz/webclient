@@ -55,6 +55,10 @@
 #copyrights-dispute-bottom2 {
     margin-top: 8px;
 }
+.fmholder div.main-mid-pad.new-bottom-pages * {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
 .main-mid-pad.new-bottom-pages.copyrights-dispute-bottom {
     padding: 48px 15px 46px 15px;
 }

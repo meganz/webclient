@@ -92,7 +92,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                 <div className="message body" data-id={"id" + message.messageId} key={message.messageId + "_" + h}>
                     {avatar}
 
-                    <div className="message content-area small-info-txt">
+                    <div className="message content-area small-info-txt selectable-txt">
                         <ContactsUI.ContactButton
                             className="message"
                             contact={otherContact}
@@ -137,7 +137,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                 <div className="message body" data-id={"id" + message.messageId} key={message.messageId + "_" + h}>
                     {avatar}
 
-                    <div className="message content-area small-info-txt">
+                    <div className="message content-area small-info-txt selectable-txt">
                         <ContactsUI.ContactButton
                             className="message"
                             chatRoom={self.props.chatRoom}

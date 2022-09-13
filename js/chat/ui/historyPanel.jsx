@@ -579,7 +579,7 @@ export default class HistoryPanel extends MegaRenderMixin {
                     lastTimeMarker = curTimeMarker;
                     messagesList.push(
                         <div
-                            className="message date-divider"
+                            className="message date-divider selectable-txt"
                             key={v.messageId + "_marker"}
                             title={time2date(timestamp)}>{curTimeMarker}</div>
                     );

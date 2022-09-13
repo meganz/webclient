@@ -73,7 +73,7 @@ class MetaRichprevConfirmation extends ConversationMessageMixin {
                         />
                     </div>
                     <div className="message richpreview inner-wrapper">
-                        <div className="message richpreview data-title">
+                        <div className="message richpreview data-title selectable-txt">
                             <span className="message richpreview title">{l[18679]}</span>
                         </div>
                         <div className="message richpreview desc">

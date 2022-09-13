@@ -2151,7 +2151,8 @@ if (showLegacyMobilePage) {
 
     // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
     // jscs:disable
-    document.body.innerHTML = '<div class="bottom-page scroll-block"><div class="main-content-block">'
+    // eslint-disable-next-line no-unsanitized/property, no-restricted-properties
+    document.body.innerHTML = '<div class="bottom-page scroll-block selectable-txt"><div class="main-content-block">'
                             + '<div class="main-centered-bl">'
                             + '<div class="main-logo"></div><div class="main-head-txt" id="m_title"></div>'
                             + '<div class="main-head-txt" id="m_desc"></div><br /><br />'
@@ -2901,7 +2902,6 @@ else if (!browserUpdate) {
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3265,7 +3265,6 @@ else if (!browserUpdate) {
             jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
             jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-            jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
         }
 
         // end of staticPages

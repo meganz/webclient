@@ -89,7 +89,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
             classString += " active";
         }
 
-        var nameClassString = "user-card-name conversation-name";
+        var nameClassString = "user-card-name conversation-name selectable-txt";
 
         var contactId;
         var presenceClass;

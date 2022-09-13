@@ -2819,6 +2819,12 @@ body.loading .light-overlay {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
 }
+.active-folder-link .tranfer-filetype-txt,
+.active-folder-link .nw-fm-tree-folder,
+.active-folder-link .file-block-title {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
 .transfer-pause-icon.link-button.active .small-icon.pause-icon {
     background-position: -13px -11745px;
 }

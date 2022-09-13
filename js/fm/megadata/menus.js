@@ -470,8 +470,9 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
 
             const selected = M.getNodeByHandle($.selected[g]);
 
-            // If there is any folder selected, do not show clear version option
-            if (selected.t) {
+            // Do not show clear version option if there is any folder selected
+            // Or multi-select files including a versioned file and in rubbish bin
+            if (selected.t || M.currentrootid === M.RubbishID) {
                 clearVersioned = false;
                 break;
             }

@@ -39,7 +39,7 @@ class TopicChange extends ConversationMessageMixin {
             <div className="message body" data-id={"id" + message.messageId} key={message.messageId}>
                 {avatar}
 
-                <div className="message content-area small-info-txt">
+                <div className="message content-area small-info-txt selectable-txt">
                     <ContactsUI.ContactButton
                         className="message"
                         chatRoom={chatRoom}

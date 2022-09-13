@@ -2438,7 +2438,7 @@ var exportExpiry = {
              +          '</i>'
              +      '</div>'
              +      '<div class="transfer-filetype-icon ' + fileIcon(item) + '" ></div>'
-             +      '<div class="item-title">' + htmlentities(item.name) + '</div>'
+             +      '<div class="item-title selectable-txt">' + htmlentities(item.name) + '</div>'
              +      '<div class="item-size">' + fileSize + '</div>'
              +      '<div class="clear"></div>'
              +      '<div class="item-link link">'

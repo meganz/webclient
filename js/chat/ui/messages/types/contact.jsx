@@ -173,13 +173,13 @@ export default class Contact extends AbstractGenericMessage {
                 ...contacts,
                 <div key={contact.u}>
                     {!isAnonView ? <div className="message shared-info">
-                        <div className="message data-title">
+                        <div className="message data-title selectable-txt">
                             <Emoji>{M.getNameByHandle(contact.u)}</Emoji>
                         </div>
                         {M.u[contact.u] ?
                             <ContactVerified className="right-align" contact={M.u[contact.u]}/> :
                             null}
-                        <div className="user-card-email">{contactEmail}</div>
+                        <div className="user-card-email selectable-txt">{contactEmail}</div>
                     </div> : <div className="message shared-info"></div>}
                     <div className="message shared-data">
                         <div className="data-block-view semi-big">

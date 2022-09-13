@@ -283,7 +283,7 @@ FileManager.prototype.initFileManagerUI = function() {
                     if (M.currentdirid === M.RootID) {
                         $breadcrumbs.removeClass('deactivated')
                             .find('.folder-link .right-arrow-bg')
-                            .safeHTML('<span>@@</span>', M.getNameByHandle(M.RootID));
+                            .safeHTML('<span class="selectable-txt">@@</span>', M.getNameByHandle(M.RootID));
                     }
                 });
             }

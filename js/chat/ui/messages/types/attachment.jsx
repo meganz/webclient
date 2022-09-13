@@ -298,7 +298,7 @@ export default class Attachment extends AbstractGenericMessage {
             files.push(
                 <div className={attachmentClasses} key={'atch-' + v.ch}>
                     <div className="message shared-info">
-                        <div className="message data-title">
+                        <div className="message data-title selectable-txt">
                             {l[17669] /* `Uploaded this file:` */}
                             <span className="file-name">{v.name}</span>
                         </div>

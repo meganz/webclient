@@ -251,7 +251,11 @@
     word-wrap: break-word;
     min-height: 20px;
     position: relative;
+    user-select: text;
     white-space: pre-wrap;
+}
+.message.text-block a {
+    user-select: text;
 }
 .message.text-block.scroll {
     max-height: 60px;

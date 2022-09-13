@@ -49,7 +49,7 @@ class ChatHandleMessage extends ConversationMessageMixin {
             <div className={cssClasses} data-id={"id" + message.messageId} key={message.messageId}>
                 {avatar}
 
-                <div className="message content-area small-info-txt">
+                <div className="message content-area small-info-txt selectable-txt">
                     <div className="message user-card-name">
                         <Emoji>{displayName}</Emoji>
                     </div>

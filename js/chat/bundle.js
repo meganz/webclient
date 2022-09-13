@@ -6551,7 +6551,7 @@ class ContactsListItem extends _mixins1__._p {
     }), react0().createElement("div", {
       className: "nw-conversations-unread"
     }, "0"), react0().createElement("div", {
-      className: "nw-conversations-name"
+      className: "nw-conversations-name selectable-txt"
     }, M.getNameByHandle(contact.u))));
   }
 
@@ -6804,7 +6804,7 @@ class ContactButton extends _mixins1__._p {
     }
 
     if (label) {
-      className = `user-card-name ${className}`;
+      className = `user-card-name ${className}${className.includes('message') ? '' : ' selectable-txt'}`;
       dropdownIconClasses = '';
       dropdownPosition = 'left bottom';
       vertOffset = 25;
@@ -6823,7 +6823,7 @@ class ContactButton extends _mixins1__._p {
     }
 
     return noContextMenu ? react0().createElement("div", {
-      className: "user-card-name light"
+      className: "user-card-name light selectable-txt"
     }, label) : react0().createElement(_ui_buttons_jsx4__.Button, {
       className: className,
       icon: dropdownIconClasses,
@@ -6998,7 +6998,7 @@ class ContactFingerprint extends _mixins1__.wl {
       }, react0().createElement("div", {
         className: "contact-fingerprint-title"
       }, react0().createElement("span", null, l[6872])), react0().createElement("div", {
-        className: "contact-fingerprint-txt"
+        className: "contact-fingerprint-txt selectable-txt"
       }, infoBlocks), verifyButton);
     }
 
@@ -7199,13 +7199,13 @@ class ContactCard extends _mixins1__._p {
 
       if (emailTooltips) {
         usernameBlock = react0().createElement("div", {
-          className: "user-card-name light simpletip",
+          className: "user-card-name light simpletip selectable-txt",
           "data-simpletip": contact.m,
           "data-simpletipposition": "top"
         }, escapedUsername);
       } else {
         usernameBlock = react0().createElement("div", {
-          className: "user-card-name light"
+          className: "user-card-name light selectable-txt"
         }, escapedUsername);
       }
     }
@@ -7240,7 +7240,7 @@ class ContactCard extends _mixins1__._p {
       }, react0().createElement("i", {
         className: "sprite-fm-mono icon-phone"
       })) : null, react0().createElement("div", {
-        className: "user-card-email"
+        className: "user-card-email selectable-txt"
       }, contact.m));
     }
 
@@ -9809,7 +9809,9 @@ class Breadcrumbs extends mixins.wl {
             }, external_React_default().createElement("span", {
               className: `right-arrow-bg simpletip`,
               "data-simpletip": nodeName
-            }, external_React_default().createElement("span", null, nodeName)), k !== 0 && external_React_default().createElement("i", {
+            }, external_React_default().createElement("span", {
+              className: "selectable-txt"
+            }, nodeName)), k !== 0 && external_React_default().createElement("i", {
               className: "next-arrow sprite-fm-mono icon-arrow-right icon16"
             })));
           } else {
@@ -15519,7 +15521,7 @@ let ConversationsListItem = (_dec = utils["default"].SoonFcWrap(40, true), _dec2
       classString += " active";
     }
 
-    var nameClassString = "user-card-name conversation-name";
+    var nameClassString = "user-card-name conversation-name selectable-txt";
     var contactId;
     var presenceClass;
     var id;
@@ -16969,7 +16971,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
         "data-id": "id" + message.messageId,
         key: message.messageId + "_" + h
       }, avatar, React.createElement("div", {
-        className: "message content-area small-info-txt"
+        className: "message content-area small-info-txt selectable-txt"
       }, React.createElement(ContactsUI.ContactButton, {
         className: "message",
         contact: otherContact,
@@ -17007,7 +17009,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
         "data-id": "id" + message.messageId,
         key: message.messageId + "_" + h
       }, avatar, React.createElement("div", {
-        className: "message content-area small-info-txt"
+        className: "message content-area small-info-txt selectable-txt"
       }, React.createElement(ContactsUI.ContactButton, {
         className: "message",
         chatRoom: self.props.chatRoom,
@@ -17074,7 +17076,7 @@ class TruncatedMessage extends truncated_ConversationMessageMixin {
       "data-id": "id" + message.messageId,
       key: message.messageId
     }, avatar, truncated_React.createElement("div", {
-      className: "message content-area small-info-txt"
+      className: "message content-area small-info-txt selectable-txt"
     }, truncated_React.createElement(truncated_ContactsUI.ContactButton, {
       contact: contact,
       className: "message",
@@ -17159,7 +17161,7 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
       "data-id": "id" + message.messageId,
       key: message.messageId
     }, avatar, privilegeChange_React.createElement("div", {
-      className: "message content-area small-info-txt"
+      className: "message content-area small-info-txt selectable-txt"
     }, privilegeChange_React.createElement(privilegeChange_ContactsUI.ContactButton, {
       className: "message",
       chatRoom: self.props.chatRoom,
@@ -17216,7 +17218,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
       "data-id": "id" + message.messageId,
       key: message.messageId
     }, avatar, topicChange_React.createElement("div", {
-      className: "message content-area small-info-txt"
+      className: "message content-area small-info-txt selectable-txt"
     }, topicChange_React.createElement(topicChange_ContactsUI.ContactButton, {
       className: "message",
       chatRoom: chatRoom,
@@ -17283,7 +17285,7 @@ class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
       "data-id": "id" + message.messageId,
       key: message.messageId
     }, avatar, closeOpenMode_React.createElement("div", {
-      className: "message content-area small-info-txt"
+      className: "message content-area small-info-txt selectable-txt"
     }, closeOpenMode_React.createElement("div", {
       className: "message user-card-name"
     }, closeOpenMode_React.createElement(utils.Emoji, null, displayName)), datetime, closeOpenMode_React.createElement("div", {
@@ -17352,7 +17354,7 @@ class ChatHandleMessage extends chatHandle_ConversationMessageMixin {
       "data-id": "id" + message.messageId,
       key: message.messageId
     }, avatar, chatHandle_React.createElement("div", {
-      className: "message content-area small-info-txt"
+      className: "message content-area small-info-txt selectable-txt"
     }, chatHandle_React.createElement("div", {
       className: "message user-card-name"
     }, chatHandle_React.createElement(utils.Emoji, null, displayName)), datetime, chatHandle_React.createElement("div", {
@@ -17390,7 +17392,7 @@ class RetentionChange extends mixin.y {
       contact: contact,
       className: "message avatar-wrapper small-rounded-avatar"
     }), external_React_default().createElement("div", {
-      className: "message content-area small-info-txt"
+      className: "message content-area small-info-txt selectable-txt"
     }, external_React_default().createElement(contacts.ContactButton, {
       contact: contact,
       className: "message",
@@ -17896,7 +17898,7 @@ let HistoryPanel = (_dec = utils["default"].SoonFcWrap(50), _dec2 = (0,mixins.M9
         if (shouldRender === true && curTimeMarker && lastTimeMarker !== curTimeMarker) {
           lastTimeMarker = curTimeMarker;
           messagesList.push(external_React_default().createElement("div", {
-            className: "message date-divider",
+            className: "message date-divider selectable-txt",
             key: v.messageId + "_marker",
             title: time2date(timestamp)
           }, curTimeMarker));
@@ -22835,7 +22837,7 @@ class AbstractGenericMessage extends mixin.y {
                     body
                 `
     }, this.getAvatar && this.getAvatar(), external_React_default().createElement("div", {
-      className: "message content-area"
+      className: "message content-area selectable-txt"
     }, this.getName && this.getName(), this.getMessageTimestamp ? this.getMessageTimestamp() : grouped ? null : external_React_default().createElement("div", {
       className: "message date-time simpletip",
       "data-simpletip": time2date(this.getTimestamp())
@@ -23269,12 +23271,12 @@ class Contact extends AbstractGenericMessage {
       }, !isAnonView ? external_React_default().createElement("div", {
         className: "message shared-info"
       }, external_React_default().createElement("div", {
-        className: "message data-title"
+        className: "message data-title selectable-txt"
       }, external_React_default().createElement(utils.Emoji, null, M.getNameByHandle(contact.u))), M.u[contact.u] ? external_React_default().createElement(ui_contacts.ContactVerified, {
         className: "right-align",
         contact: M.u[contact.u]
       }) : null, external_React_default().createElement("div", {
-        className: "user-card-email"
+        className: "user-card-email selectable-txt"
       }, contactEmail)) : external_React_default().createElement("div", {
         className: "message shared-info"
       }), external_React_default().createElement("div", {
@@ -23551,7 +23553,7 @@ class Attachment extends AbstractGenericMessage {
       }, external_React_default().createElement("div", {
         className: "message shared-info"
       }, external_React_default().createElement("div", {
-        className: "message data-title"
+        className: "message data-title selectable-txt"
       }, l[17669], external_React_default().createElement("span", {
         className: "file-name"
       }, v.name)), external_React_default().createElement("div", {
@@ -23973,7 +23975,7 @@ class MetaRichpreview extends ConversationMessageMixin {
         })) : undefined, React.createElement("div", {
           className: "message richpreview inner-wrapper"
         }, React.createElement("div", {
-          className: "message richpreview data-title"
+          className: "message richpreview data-title selectable-txt"
         }, React.createElement("span", {
           className: "message richpreview title"
         }, meta.t)), React.createElement("div", {
@@ -24082,7 +24084,7 @@ class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationM
     })), metaRichpreviewConfirmation_React.createElement("div", {
       className: "message richpreview inner-wrapper"
     }, metaRichpreviewConfirmation_React.createElement("div", {
-      className: "message richpreview data-title"
+      className: "message richpreview data-title selectable-txt"
     }, metaRichpreviewConfirmation_React.createElement("span", {
       className: "message richpreview title"
     }, l[18679])), metaRichpreviewConfirmation_React.createElement("div", {
@@ -24218,12 +24220,12 @@ class MetaRichpreviewMegaLinks extends mixin.y {
         }, external_React_default().createElement("div", {
           className: "message shared-info"
         }, external_React_default().createElement("div", {
-          className: "message data-title"
+          className: "message data-title selectable-txt"
         }, contact.name), external_React_default().createElement(ui_contacts.ContactVerified, {
           className: "right-align",
           contact: contact
         }), external_React_default().createElement("div", {
-          className: "user-card-email"
+          className: "user-card-email selectable-txt"
         }, contact.m)), external_React_default().createElement("div", {
           className: "message shared-data"
         }, external_React_default().createElement("div", {
@@ -24273,7 +24275,7 @@ class MetaRichpreviewMegaLinks extends mixin.y {
         })), external_React_default().createElement("div", {
           className: "message richpreview inner-wrapper"
         }, external_React_default().createElement("div", {
-          className: "message richpreview data-title"
+          className: "message richpreview data-title selectable-txt"
         }, external_React_default().createElement("span", {
           className: "message richpreview title"
         }, external_React_default().createElement(utils.Emoji, null, megaLinkInfo.info.name || megaLinkInfo.info.topic || ""))), external_React_default().createElement("div", {

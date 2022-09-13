@@ -94,12 +94,12 @@ def sanitise_string(string, convert_quotes, escape_tag):
 
     # Quotes
     quotes = [
-        ['"(.+)"', "\u201c\g<1>\u201d"],               # Enclosing double quotes
-        ["(\W)'(.+)'", "\g<1>\u2018\g<2>\u2019"],      # Enclosing single quotes
-        ["(\w)'", "\g<1>\u2019"],                      # Remaining single quote
+        ['"(.+)"',       u"\u201c\g<1>\u201d"],           # Enclosing double quotes
+        ["(\W)'(.+)'",   u"\g<1>\u2018\g<2>\u2019"],      # Enclosing single quotes
+        ["(\w)'",        u"\g<1>\u2019"],                 # Remaining single quote
     ]
 
-    replacements = [["\.\.\.", "\u2026"]]
+    replacements = [["\.\.\.", u"\u2026"]]
 
     if convert_quotes:
         replacements = replacements + quotes

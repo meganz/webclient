@@ -634,7 +634,7 @@ var redeem = {
             $('.payment-result-txt .plan-name', redeem.$successOverlay).text(proPlanName);
             insertEmailToPayResult(redeem.$successOverlay);
 
-            $('.payment-result-header', redeem.$successOverlay).text((promo ? l[20430] : l[6961]) + '!');
+            $('.payment-result-header', redeem.$successOverlay).text(promo ? l[20430] : l[6961]);
 
             // Show PRO plan details
             $('.storage-amount', $voucherBlock)

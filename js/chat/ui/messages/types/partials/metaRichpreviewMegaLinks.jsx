@@ -57,9 +57,9 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
 
                 previewContainer = <div key={megaLinkInfo.info.h} className={"message shared-block contact-link"}>
                     <div className="message shared-info">
-                        <div className="message data-title">{contact.name}</div>
+                        <div className="message data-title selectable-txt">{contact.name}</div>
                         <ContactVerified className="right-align" contact={contact} />
-                        <div className="user-card-email">{contact.m}</div>
+                        <div className="user-card-email selectable-txt">{contact.m}</div>
                     </div>
                     <div className="message shared-data">
                         <div className="data-block-view semi-big">
@@ -117,7 +117,7 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                         </div>
                     }
                     <div className="message richpreview inner-wrapper">
-                        <div className="message richpreview data-title">
+                        <div className="message richpreview data-title selectable-txt">
                             <span className="message richpreview title">
                                 <Emoji>
                                     {megaLinkInfo.info.name || megaLinkInfo.info.topic || ""}

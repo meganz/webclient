@@ -12,8 +12,13 @@ import { PerfectScrollbar } from '../../../../ui/perfectScrollbar.jsx';
 
 export default class Text extends AbstractGenericMessage {
 
-    isRichPreview = message => message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW;
-    isGeoLocation = message => message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION;
+    isRichPreview(message) {
+        return message.metaType === Message.MESSAGE_META_TYPE.RICH_PREVIEW;
+    }
+
+    isGeoLocation(message) {
+        return message.metaType === Message.MESSAGE_META_TYPE.GEOLOCATION;
+    }
 
     getClassNames() {
         const { message, isBeingEdited, grouped } = this.props;

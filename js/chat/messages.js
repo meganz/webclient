@@ -919,7 +919,18 @@ function MessagesBuff(chatRoom, chatdInt) {
     self.chatRoom = chatRoom;
     self.chatdInt = chatdInt;
     self.chatd = chatdInt.chatd;
-    self.chatdPersist = self.chatd.chatdPersist;
+
+    Object.defineProperty(this, 'chatdPersist', {
+        get() {
+            const {chatdPersist} = self.chatd || false;
+
+            if (d) {
+                console.assert(self.chatd && self.chatdInt && self.chatdInt.chatd, 'MessagesBuff.chatd/broken..');
+                console.assert(!chatdPersist || ChatdPersist.isMasterTab(), 'MessagesBuff.chatd/master..');
+            }
+            return chatdPersist;
+        }
+    });
 
     self.messages = new MessageBuffSortedMap("messageId", MessagesBuff.orderFunc, this);
     self.messagesToBeRemoved = new Map();
@@ -954,13 +965,13 @@ function MessagesBuff(chatRoom, chatdInt) {
     self.sharedFilesMessageOrders = {};
 
     var chatRoomId = chatRoom.roomId;
-    var loggerIsEnabled = !!localStorage.messagesBuffLogger;
 
+    self.debug = (localStorage.messagesBuffLogger && window.d) | 0;
     self.logger = MegaLogger.getLogger(
-        "messagesBuff[" + chatRoomId + "]",
+        "MessagesBuff",
         {
             minLogLevel: function() {
-                return loggerIsEnabled ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.WARN;
+                return self.debug ? MegaLogger.LEVELS.DEBUG : MegaLogger.LEVELS.WARN;
             }
         },
         chatRoom.logger
@@ -1088,14 +1099,14 @@ function MessagesBuff(chatRoom, chatdInt) {
                 self.haveMoreSharedFiles = true;
             }
             else if (
-                self.expectedMessagesCount === requestedMessagesCount
+                self.expectedMessagesCount >= requestedMessagesCount
             ) {
-                // this is an empty/new chat.
+                // this is an empty/new chat/the last message is an attachment.
                 self.expectedMessagesCount = 0;
                 self.haveMoreSharedFiles = false;
             }
             else if (
-                self.expectedMessagesCount
+                self.expectedMessagesCount > 0
             ) {
                 // if the expectedMessagesCount is not 0 and < requested, then...chatd/idb returned < then the
                 // requested #, which means, that there is no more history.
@@ -1135,9 +1146,6 @@ function MessagesBuff(chatRoom, chatdInt) {
                 self.retrievedAllMessages = self.expectedMessagesCount < requestedMessagesCount;
             }
 
-
-
-
             delete self.expectedMessagesCount;
             delete self.requestedMessagesCount;
 
@@ -1166,6 +1174,7 @@ function MessagesBuff(chatRoom, chatdInt) {
             self.isRetrievingSharedFiles = true;
         }
         self.expectedMessagesCount = eventData.count === 0xDEAD ? null : Math.abs(eventData.count);
+
         self.trackDataChange();
     });
 
@@ -1203,15 +1212,12 @@ function MessagesBuff(chatRoom, chatdInt) {
             }
         }
 
-
         if (!eventData.isNew) {
-            // console.log('!eventData.isNew');
             if (typeof self.expectedMessagesCount !== 'undefined') {
                 self.expectedMessagesCount--;
             }
 
             if (!self.isRetrievingSharedFiles) {
-                // console.log('!self.isRetrievingSharedFiles');
                 if (eventData.userId !== u_handle) {
                     if (self.lastDeliveredMessageRetrieved === true) {
                         // received a message from history, which was NOT marked as received, e.g. was sent during
@@ -1220,7 +1226,6 @@ function MessagesBuff(chatRoom, chatdInt) {
 
                     }
                 }
-                // console.log('self.messagesBatchFromHistory.push(msgObject)');
                 self.messagesBatchFromHistory.push(msgObject);
             }
             else {
@@ -1301,7 +1306,7 @@ function MessagesBuff(chatRoom, chatdInt) {
                         });
                     }
                 }
-                else if (self.chatd.chatdPersist) {
+                else if (self.chatdPersist) {
                     var r = {
                         'messageId': eventData.messageId,
                         'userId': eventData.userId,
@@ -1315,7 +1320,7 @@ function MessagesBuff(chatRoom, chatdInt) {
                     if (eventData.ts) {
                         r.delay = eventData.ts;
                     }
-                    self.chatd.chatdPersist.modifyPersistedMessage(chatRoom.chatId, r);
+                    self.chatdPersist.modifyPersistedMessage(chatRoom.chatId, r);
                 }
                 return;
             }
@@ -1571,38 +1576,13 @@ function MessagesBuff(chatRoom, chatdInt) {
         }
     });
 
-    self.chatRoom.rebind('onMessageKeysDone.messagesBuff' + chatRoomId, function(e, eventData) {
-        var chatRoom = self.chatRoom;
-        var keys = eventData.keys;
-        if (!chatRoom.notDecryptedKeys) {
-            chatRoom.notDecryptedKeys = {};
+    self.chatRoom.rebind(`onMessageKeysDone.messagesBuff${chatRoomId}`, (e, eventData) => {
+        const {chatRoom} = self;
+        const {keys} = eventData;
+
+        if (keys && keys.length) {
+            chatRoom.seedRoomKeys(keys).catch(dump);
         }
-
-        for (var i=0;i < keys.length;i++) {
-            var cacheKey = keys[i].userId + "-" + keys[i].keyid;
-            chatRoom.notDecryptedKeys[cacheKey] = {
-                userId : keys[i].userId,
-                keyid  : keys[i].keyid,
-                keylen : keys[i].keylen,
-                key    : keys[i].key
-            };
-        }
-
-        chatRoom._keysAreSeeding = new MegaPromise();
-
-        var seedKeys = function() {
-            for (var i=0;i < keys.length;i++) {
-                if (chatRoom.protocolHandler.seedKeys([keys[i]])) {
-                    var cacheKey = keys[i].userId + "-" + keys[i].keyid;
-                    delete  chatRoom.notDecryptedKeys[cacheKey];
-                }
-            }
-            chatRoom._keysAreSeeding.resolve();
-        };
-
-        ChatdIntegration._waitForProtocolHandler(chatRoom, function() {
-            ChatdIntegration._ensureKeysAreLoaded(keys, undefined, chatRoom.publicChatHandle).always(seedKeys);
-        });
 
         self.trackDataChange();
     });
@@ -1678,15 +1658,15 @@ function MessagesBuff(chatRoom, chatdInt) {
     });
 
     self.chatRoom.rebind('onAddReaction.messagesBuff' + chatRoomId, function(e, eventData) {
-        self.onAddReaction(eventData);
+        self.onAddReaction(eventData).catch(dump.bind(null, 'onAddReaction'));
     });
 
     self.chatRoom.rebind('onDelReaction.messagesBuff' + chatRoomId, function(e, eventData) {
-        self.onDelReaction(eventData);
+        self.onDelReaction(eventData).catch(dump.bind(null, 'onDelReaction'));
     });
 
     self.chatRoom.rebind('onReactionSn.messagesBuff' + chatRoomId, function(e, eventData) {
-        self.onReactionSn(eventData);
+        self.onReactionSn(eventData).catch(dump.bind(null, 'onReactionSn'));
     });
     self.chatRoom.rebind('onAddDelReactionReject.messagesBuff' + chatRoomId, function(e, eventData) {
         self.onReactionReject(eventData);
@@ -1725,31 +1705,29 @@ MessagesBuff.orderFunc = function(a, b) {
 };
 
 MessagesBuff.prototype.initChatdPersistEvents = function() {
-    var self = this;
-    self.chatRoom.rebind('onMeJoined.mb', function() {
-        var cp = self.chatRoom.megaChat.plugins.chatdIntegration.chatd.chatdPersist;
+    'use strict';
 
-        if (cp) {
-            var r = self.chatRoom;
-            if (self.chatRoom.type === "public") {
-                if (self.lastSeen) {
-                    self.setLastSeen(self.lastSeen, false, true);
-                }
-                self.messages.forEach(function(msg) {
-                    cp.persistMessageBatched("push", r.chatId, [msg]);
-                });
+    this.chatRoom.rebind('onMeJoined.mb', () => {
+        if (d) {
+            console.assert(this.chatdPersist === this.chatRoom.megaChat.plugins.chatdIntegration.chatd.chatdPersist);
+        }
+        const {chatdPersist, chatRoom, lastSeen} = this;
+
+        if (chatdPersist && chatRoom.type === "public") {
+            if (lastSeen) {
+                this.setLastSeen(lastSeen, false, true);
             }
+            this.messages.forEach((msg) => {
+                chatdPersist.persistMessageBatched("push", chatRoom.chatId, [msg]);
+            });
         }
     });
 
-    self.chatRoom.rebind('onMeLeft.mb', function() {
+    this.chatRoom.rebind('onMeLeft.mb', () => {
+        const {chatdPersist, chatRoom} = this;
 
-        if (self.chatRoom.megaChat.plugins.chatdIntegration.chatd.chatdPersist) {
-            var r = self.chatRoom;
-            var cp = r.megaChat.plugins.chatdIntegration.chatd.chatdPersist;
-            if (self.chatRoom.type === "public") {
-                cp.deleteAllMessages(r.chatId).always(dump);
-            }
+        if (chatdPersist && chatRoom.type === "public") {
+            chatdPersist.deleteAllMessages(chatRoom.chatId).dump(`deleteAllMessages.${chatRoom.chatId}`);
         }
     });
 };
@@ -1824,9 +1802,9 @@ MessagesBuff.prototype.setLastSeen = function(msgId, isFromChatd, force) {
                 self.chatdInt.markMessageAsSeen(self.chatRoom, msgId);
             }, 200);
         }
-        if (ChatdPersist.isMasterTab() && self.chatdInt.chatd.chatdPersist) {
-            var chatdPersist = self.chatdInt.chatd.chatdPersist;
-            chatdPersist.setPointer(self.chatRoom.chatId, 'ls', msgId).always(nop);
+
+        if (self.chatdPersist) {
+            self.chatdPersist.setPointer(self.chatRoom.chatId, 'ls', msgId).always(nop);
         }
 
         // check if last recv needs to be updated
@@ -1951,7 +1929,7 @@ MessagesBuff.prototype.retrieveSharedFilesHistory = function(len) {
             self.$isDecryptingSharedFiles.reject();
         }
         else {
-            self.chatdInt.chatd._sendNodeHist(self.chatRoom.chatIdBin, base64urldecode(lastMsgId), len * -1);
+            self.chatdInt.chatd._sendNodeHist(self.chatRoom.chatIdBin, base64urldecode(lastMsgId), (len + 1) * -1);
 
             self.$sharedFilesLoading.always(function () {
                 delete self.$sharedFilesLoading;
@@ -2004,18 +1982,17 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
     self.trackDataChange();
 
 
-    var timeoutPromise = createTimeoutPromise(function() {
-        return !self.$msgsHistoryLoading;
-    }, 500, 6e4 * 5)
-        .catch(function() {
-            if (self.$msgsHistoryLoading) {
-                self.$msgsHistoryLoading.reject();
-                delete self.$msgsHistoryLoading;
-            }
-        })
-        .always(function() {
-            self.trackDataChange();
-        });
+    const name = `retrieveChatHistory(${self.chatRoom.roomId})`;
+    const timeoutPromise = createTimeoutPromise(() => !self.$msgsHistoryLoading, 500, 6e4 * 5, false, name);
+
+    timeoutPromise.catch(() => {
+        if (self.$msgsHistoryLoading) {
+            self.$msgsHistoryLoading.reject();
+            delete self.$msgsHistoryLoading;
+        }
+    }).finally(() => {
+        self.trackDataChange();
+    });
 
     self.$msgsHistoryLoading.catch(function(ex) {
         self.logger.error("HIST FAILED: ", ex);
@@ -2025,7 +2002,6 @@ MessagesBuff.prototype.retrieveChatHistory = function(isInitialRetrivalCall) {
     });
     self.$msgsHistoryLoading.always(function() {
         timeoutPromise.verify();
-        timeoutPromise = null;
     });
 
 
@@ -2046,7 +2022,6 @@ MessagesBuff.prototype.haveMoreHistory = function() {
     }
 };
 
-
 MessagesBuff.prototype.markAllAsSeen = function() {
     var self = this;
     var lastToBeMarkedAsSeen = null;
@@ -2065,6 +2040,7 @@ MessagesBuff.prototype.markAllAsSeen = function() {
         self.setLastSeen(lastToBeMarkedAsSeen);
     }
 };
+
 MessagesBuff.prototype.markAllAsReceived = function() {
     var self = this;
 
@@ -2082,7 +2058,6 @@ MessagesBuff.prototype.markAllAsReceived = function() {
         self.setLastReceived(lastToBeMarkedAsReceived);
     }
 };
-
 
 /**
  * Get message by Id
@@ -2301,7 +2276,7 @@ MessagesBuff.prototype.detachMessages = SoonFc(70, function() {
     // instead of causing potential different execution paths, by implementing a in-memory VS in iDB persistence
     // and detaching of messages from the UI, we would need to simply disable the detaching of messages for
     // indexedDB incompatible browsers
-    if (!room.megaChat.plugins.chatdIntegration.chatd.chatdPersist) {
+    if (!self.chatdPersist) {
         return false;
     }
     if (room.type === "public" && !is_chatlink && room.publicChatHandle && room.publicChatKey) {
@@ -2325,25 +2300,25 @@ MessagesBuff.prototype.detachMessages = SoonFc(70, function() {
         var deletedItems = self.messages.splice(0,  self.messages.length - detachCount);
 
         // detach attachments?
-        if (M.chc[self.chatRoom.roomId]) {
-            var attachmentsIndex = {};
-            var atts = M.chc[self.chatRoom.roomId];
-            for (var k in atts) {
-                attachmentsIndex[atts[k].m] = k;
-            }
+        // if (M.chc[self.chatRoom.roomId]) {
+        //     var attachmentsIndex = {};
+        //     var atts = M.chc[self.chatRoom.roomId];
+        //     for (var k in atts) {
+        //         attachmentsIndex[atts[k].m] = k;
+        //     }
 
-            for (var i = 0; i < deletedItems.length; i++) {
-                // cleanup the `messageId` index
-                delete M.chc[deletedItems[i]];
+        //     for (var i = 0; i < deletedItems.length; i++) {
+        //         // cleanup the `messageId` index
+        //         delete M.chc[deletedItems[i]];
 
-                // search and optionally cleanup the [roomId] index in M.chc (atts)
-                var foundKey = attachmentsIndex[deletedItems[i]];
+        //         // search and optionally cleanup the [roomId] index in M.chc (atts)
+        //         var foundKey = attachmentsIndex[deletedItems[i]];
 
-                if (typeof foundKey !== "undefined") {
-                    delete atts[foundKey];
-                }
-            }
-        }
+        //         if (typeof foundKey !== "undefined") {
+        //             delete atts[foundKey];
+        //         }
+        //     }
+        // }
 
         // self.logger.info(
         //     "messages detached from memory: ", lengthBefore - self.messages.length
@@ -2615,8 +2590,11 @@ MessagesBuff.prototype.encryptReaction = promisify(function(resolve, reject, msg
     );
 
     if (!key) {
-        var cdp = megaChat.plugins.chatdIntegration.chatd.chatdPersist;
+        var cdp = this.chatdPersist;
         if (!cdp) {
+            if (d) {
+                console.error("Cant encrypt reaction", msgId, meta, msg);
+            }
             return reject(EKEY);
         }
 
@@ -2683,17 +2661,31 @@ MessagesBuff.prototype.encryptReaction = promisify(function(resolve, reject, msg
  */
 MessagesBuff.prototype.decryptReaction = promisify(function(resolve, reject, msgId, s, key, isRetry, msg) {
     "use strict";
-    var self = this;
-    msg = msg || this.getMessageById(msgId);
-    if (msg === false && !isRetry && this.isRetrievingHistory) {
-        // in case the message is not yet decrypted and put into the msgs buff, wait and retry
-        self.chatRoom.one('onHistoryDecryptedDone', function() {
-            self.decryptReaction(msgId, s, key, true).then(resolve).catch(reject);
-        });
+    const {chatRoom, isRetrievingHistory, chatdPersist} = this;
+
+    if (!(msg = msg || this.getMessageById(msgId))) {
+
+        if (!isRetry && isRetrievingHistory) {
+            // in case the message is not yet decrypted and put into the msgs buff, wait and retry
+            chatRoom.one(`onHistoryDecryptedDone.decryptReaction${msgId}`, () => {
+                this.decryptReaction(msgId, s, key, true).then(resolve).catch(reject);
+            });
+        }
+        else {
+            megaChat.getMessageByMessageId(chatRoom.chatId, msgId)
+                .then((msg) => this.decryptReaction(msgId, s, key, true, msg))
+                .then(resolve)
+                .catch((ex) => {
+                    if (d) {
+                        this.logger.warn(`Unable to retrieve message ${msgId}, ${ex}`, [ex]);
+                    }
+                    reject(ex);
+                });
+        }
         return;
     }
 
-    var pk = this.chatRoom.protocolHandler.participantKeys;
+    const pk = chatRoom.protocolHandler.participantKeys;
     key = key || (
         msg.keyid
             ? pk[msg.userId] && pk[msg.userId][a32_to_str([msg.keyid])]
@@ -2701,15 +2693,18 @@ MessagesBuff.prototype.decryptReaction = promisify(function(resolve, reject, msg
     );
 
     if (!key) {
-        var cdp = megaChat.plugins.chatdIntegration.chatd.chatdPersist;
-        if (!cdp) {
-            console.error("Cant decrypt reaction", msgId, s, key, key);
+        if (!chatdPersist) {
+            if (d) {
+                console.error("Cant decrypt reaction", msgId, s, isRetry, msg);
+            }
             return reject(EKEY);
         }
 
-        cdp.getKey(self.chatRoom.chatId, msg.userId, msg.keyid)
-            .then(function(r) {
-                self.chatRoom.protocolHandler.seedKeys([
+        chatdPersist.getKey(chatRoom.chatId, msg.userId, msg.keyid)
+            .then((r) => {
+                const {protocolHandler} = chatRoom;
+
+                protocolHandler.seedKeys([
                     {
                         userId: msg.userId,
                         keyid: msg.keyid,
@@ -2717,18 +2712,14 @@ MessagesBuff.prototype.decryptReaction = promisify(function(resolve, reject, msg
                         key: r.key
                     }
                 ]);
-                var decryptedKey = self.chatRoom.protocolHandler.participantKeys[msg.userId][a32_to_str([msg.keyid])];
+                const decryptedKey = protocolHandler.participantKeys[msg.userId][a32_to_str([msg.keyid])];
 
-                if (decryptedKey) {
-                    self.decryptReaction(msgId, s, decryptedKey, undefined, msg).then(resolve).catch(reject);
-                }
-                else {
-                    reject(EKEY);
-                }
+                return this.decryptReaction(msgId, s, decryptedKey, undefined, msg);
             })
-            .catch(function(ex) {
+            .then(resolve)
+            .catch((ex) => {
                 if (d) {
-                    self.logger.warn("Retrieve and seedKeys failed [2]:", ex);
+                    this.logger.warn("Retrieve and seedKeys failed [2]:", ex);
                 }
                 reject(EKEY);
             });
@@ -2743,7 +2734,7 @@ MessagesBuff.prototype.decryptReaction = promisify(function(resolve, reject, msg
     MessagesBuff._XOR_ARR(key, msgId32);
 
     var res = a32_to_str(xxtea.decryptUint32Array(new Uint32Array(str_to_a32(s)), key));
-    resolve(from8(MessagesBuff._depadString(res.substr(4))));
+    resolve({msg, res: from8(MessagesBuff._depadString(res.substr(4)))});
 });
 
 
@@ -2842,64 +2833,42 @@ MessagesBuff.prototype.sendDelReaction = function(msgId, slug, meta, r) {
  *
  * @param {String} eventName
  * @param {Object} eventData
- * @param {Function} cb
- * @param {Boolean} isRetry
- * @param {Message} msgFromDb
  * @private
  */
-MessagesBuff.prototype._onReactionEvent = function(eventName, eventData, cb, isRetry, msgFromDb) {
+MessagesBuff.prototype._onReactionEvent = async function(eventName, eventData) {
     "use strict";
-    var msgId = eventData.msgId;
-    var msg = msgFromDb || this.getMessageById(msgId);
-    var self = this;
+    const {msgId, emoji, userId} = eventData;
+    assert(eventName === 'addReaction' || eventName === 'delReaction');
 
-    if (!msg) {
-        if (!isRetry && self.isRetrievingHistory) {
-            self.chatRoom.one('onHistoryDecrypted.' + eventName + eventData.msgId, function() {
-                self._onReactionEvent(eventName, eventData, cb,true);
-            });
-        }
-        else {
-            megaChat.getMessageByMessageId(self.chatRoom.chatId, eventData.msgId)
-                .then(function(r) {
-                    self._onReactionEvent(eventName, eventData, cb, true, r);
-                })
-                .catch(nop);
-        }
-        return;
-    }
+    return this.decryptReaction(msgId, emoji)
+        .then(({msg, res}) => {
 
-    this.decryptReaction(msgId, eventData.emoji, undefined, undefined, msg)
-        .then(function(r) {
-            msg[cb](eventData.userId, r);
+            msg[eventName](userId, res);
 
-            if (eventData.userId === u_handle) {
-                Reactions.deQueueOperation(self.chatRoom, msg, msg.messageId, cb, r);
+            if (userId === u_handle) {
+                Reactions.deQueueOperation(this.chatRoom, msg, msg.messageId, eventName, res);
             }
-        })
-        .catch(dump.bind(null, 'onReactionEvent'));
+        });
 };
 
 /**
  *
  * @param {Object} eventData the event data of the ADDREACTION opcode
- * @param {Boolean} isRetry
  * @returns {undefined}
  */
-MessagesBuff.prototype.onAddReaction = function(eventData, isRetry) {
+MessagesBuff.prototype.onAddReaction = function(eventData) {
     "use strict";
-    return this._onReactionEvent('onAddReaction', eventData, 'addReaction', isRetry);
+    return this._onReactionEvent('addReaction', eventData);
 };
 
 /**
  * Called on DELRECTION on chatd
  * @param {Object} eventData the event data of the DELREACTION opcode
- * @param {Boolean} isRetry
  * @returns {undefined}
  */
-MessagesBuff.prototype.onDelReaction = function(eventData, isRetry) {
+MessagesBuff.prototype.onDelReaction = function(eventData) {
     "use strict";
-    return this._onReactionEvent('onDelReaction', eventData, 'delReaction', isRetry);
+    return this._onReactionEvent('delReaction', eventData);
 };
 
 /**
@@ -2907,12 +2876,15 @@ MessagesBuff.prototype.onDelReaction = function(eventData, isRetry) {
  *
  * @param {Object} eventData the event data of the REACTIONSN opcode
  */
-MessagesBuff.prototype.onReactionSn = function(eventData) {
+MessagesBuff.prototype.onReactionSn = async function(eventData) {
     "use strict";
-    Reactions.setSn(eventData.chatId, eventData.sn)
-        .always(function() {
-            Reactions.flushQueuedReactionsForChat(eventData.chatId);
-        });
+    const {chatId, sn} = eventData;
+
+    // @todo ONLY set the 'sn' once we're sure the reactions are sent / persisted.
+
+    Reactions.flushQueuedReactionsForChat(chatId);
+
+    return Reactions.setSn(chatId, sn);
 };
 
 /**

@@ -1,7 +1,10 @@
+/* eslint-disable strict */
 /**
  * Cross-tab communication using WebStorage
+ * @name watchdog
+ * @memberOf window
  */
-var watchdog = Object.freeze({
+lazy(self, 'watchdog', () => Object.freeze({
     Strg: {},
     // Tag prepended to messages to identify watchdog-events
     eTag: '$WDE$!_',
@@ -104,7 +107,7 @@ var watchdog = Object.freeze({
             }
             tmpData['reply'] = token;
 
-            onIdle(function() {
+            queueMicrotask(() => {
                 self.notify('Q!' + what, tmpData);
             });
 
@@ -335,8 +338,10 @@ var watchdog = Object.freeze({
 
         delete localStorage[ev.key];
     }
-});
+}));
 
-mBroadcaster.once('boot_done', function() {
+mBroadcaster.once('boot_done', () => {
+    'use strict';
+
     watchdog.setup();
 });

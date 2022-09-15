@@ -39,7 +39,7 @@ var mega_title = 'MEGA';
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
 
-pages['placeholder'] = '<div class="bottom-page scroll-block placeholder">' +
+pages.placeholder = '<div class="bottom-page scroll-block placeholder selectable-txt">' +
     '((TOP))' +
     '<div class="main-pad-block">' +
     '<div class="main-mid-pad new-bottom-pages"></div>' +
@@ -1657,6 +1657,24 @@ function init_page() {
     }
     else if (page === 'nas') {
         parsepage(pages.nas);
+
+        // Qnap and Synology image/link locale update
+        const langMap = {
+            de: 'de-de', fr: 'fr-fr', nl: 'nl-nl', th: 'th-th', it: 'it-it',
+            pl: 'pl-pl', 'zh-Hans': 'zh-hk', 'zh-Hant': 'zh-tw', pt: 'pt-pt',
+            es: 'es-es', ja: 'ja-jp', ko: 'ko-kr', ru: 'ru-ru'
+        };
+        const langUse = langMap[window.locale];
+        if (langUse) {
+            const qnapLinks = document.querySelectorAll('a.link-qnap');
+            for (let i = qnapLinks.length; i--;) {
+                qnapLinks[i].href = qnapLinks[i].href.replace('/en/', `/${langUse}/`);
+            }
+            const synologyLinks = document.querySelectorAll('a.link-synology');
+            for (let j = synologyLinks.length; j--;) {
+                synologyLinks[j].href = synologyLinks[j].href.replace('/en-nz/', `/${langUse}/`);
+            }
+        }
     }
     else if (page === 'nzippmember' || page === 'nziphotographer') {
         parsepage(pages.nzipp);
@@ -3184,23 +3202,22 @@ function loadSubPage(tpage, event) {
 
     if (M.chat && megaChatIsReady) {
         // navigating within the chat, skip the bloatware
-        if (tpage !== 'securechat' && !tpage.startsWith('fm/search') && tpage.indexOf('chat') > -1) {
-            if (fminitialized && tpage.startsWith("chat/") && megaChatIsReady) {
+        // xxx: if there is a page containing "chat" but not belonging to chat, megaChat.navigate() should take care.
+        if (tpage.includes('chat')) {
+            if (fminitialized && tpage.startsWith("chat/")) {
                 // tried to navigate internally to a chat link, do a force redirect.
                 // Can be triggered by the back button.
-                assert(
-                    megaChat.initialChatId,
-                    'missing .initialChatId, did this page initialized from a standalone chat/meeting link?'
-                );
-                loadSubPage(`fm/chat/c/${megaChat.initialChatId}`);
-                return false;
+                tpage = `fm/chat/c/${megaChat.initialChatId || tpage.substr(5)}`;
             }
-            megaChat.navigate(tpage, event);
+            megaChat.navigate(tpage, event).catch(dump);
             return false;
         }
 
         // clear the flag if navigating to an static page..
         M.chat = tpage.substr(0, 2) === 'fm';
+        if (!M.chat) {
+            megaChat.cleanup();
+        }
     }
 
     // TODO: check what this was for and its relevance
@@ -3303,7 +3320,7 @@ window.addEventListener('popstate', function(event) {
     passive: true,
 });
 
-window.onbeforeunload = function () {
+window.addEventListener('beforeunload', () => {
     'use strict';
 
     if ('rad' in mega) {
@@ -3331,9 +3348,10 @@ window.onbeforeunload = function () {
         delete window.doUnloadLogOut;
     }
     mBroadcaster.crossTab.leave();
-};
 
-window.onunload = function () {
+}, {capture: true});
+
+window.addEventListener('unload', () => {
     'use strict';
     if (window.doUnloadLogOut) {
         u_logout();
@@ -3344,11 +3362,66 @@ window.onunload = function () {
         // Clear the download activity flag navigating away on the downloads page.
         dlmanager.dlClearActiveTransfer(dlpage_ph);
     }
-};
+}, {capture: true});
 
-mBroadcaster.once('boot_done', function() {
+mBroadcaster.once('startMega', () => {
+    'use strict';
+    // Based on https://github.com/GoogleChromeLabs/page-lifecycle
+
+    const getState = () => {
+        return document.visibilityState === 'hidden' ? 'hidden' : document.hasFocus() ? 'active' : 'passive';
+    };
+    let state = getState();
+
+    const onStateChange = (event) => {
+        const nextState = (
+            event.type === 'pagehide'
+                ? event.persisted ? 'frozen' : 'terminated'
+                : event.type === 'freeze' ? 'frozen' : getState()
+        );
+        const prevState = state;
+
+        if (nextState !== prevState) {
+            if (d) {
+                const date = new Date().toISOString();
+                console.info(`[${date}] Page state change from event ${event.type}, ${prevState} -> ${nextState}`);
+            }
+            state = nextState;
+
+            mBroadcaster.sendMessage('statechange', {prevState, state, event});
+
+            if ('rad' in mega) {
+                mega.rad.flush();
+            }
+        }
+    };
+
+    if (!self.is_karma) {
+        const EVENTS = ['blur', 'focus', 'freeze', 'pageshow', 'pagehide', 'resume', 'visibilitychange'];
+
+        for (let i = EVENTS.length; i--;) {
+            addEventListener(EVENTS[i], onStateChange, true);
+        }
+    }
+});
+
+mBroadcaster.once('boot_done', () => {
     'use strict';
     M = new MegaData();
+
+    if (!self.is_karma) {
+        tryCatch(() => {
+            Object.defineProperty(self, 'onbeforeunload', {
+                value: null,
+                writable: false
+            });
+
+            Object.defineProperty(self, 'onunload', {
+                value: null,
+                writable: false
+            });
+        })();
+    }
 
     onIdle(() => {
         // Initialise the Public Service Announcement system if loaded

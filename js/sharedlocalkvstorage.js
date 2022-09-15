@@ -31,48 +31,13 @@ var SharedLocalKVStorage = function(name, manualFlush, broadcaster) {
     self.name = name;
     self.manualFlush = manualFlush;
 
-    var loggerOpts = {};
-    if (localStorage.SharedLocalKVStorageDebug) {
-        loggerOpts['isEnabled'] = true;
-        loggerOpts['minLogLevel'] = function () {
-            return MegaLogger.LEVELS.DEBUG;
-        };
-        loggerOpts['transport'] = function (level, args) {
-            var fn = "log";
-            if (level === MegaLogger.LEVELS.DEBUG) {
-                fn = "debug";
-            }
-            else if (level === MegaLogger.LEVELS.LOG) {
-                fn = "log";
-            }
-            else if (level === MegaLogger.LEVELS.INFO) {
-                fn = "info";
-            }
-            else if (level === MegaLogger.LEVELS.WARN) {
-                fn = "warn";
-            }
-            else if (level === MegaLogger.LEVELS.ERROR) {
-                fn = "error";
-            }
-            else if (level === MegaLogger.LEVELS.CRITICAL) {
-                fn = "error";
-            }
-            args.push("[" + fn + "]");
-            console.warn.apply(console, args);
-        };
-    }
-    else {
-        loggerOpts['isEnabled'] = true;
-        loggerOpts['minLogLevel'] = function () {
-            return MegaLogger.LEVELS.WARN;
-        };
-    }
-
-    self.logger = new MegaLogger("SharedLocalKVStorage[" + name + ":" + broadcaster.id + "]", loggerOpts);
+    const id = broadcaster.id || broadcaster.crossTab && broadcaster.crossTab.ctID;
+    self.logger = new MegaLogger(`SharedLocalKVStorage[${name}:${id}]`);
+    self.debug = window.d > 0 && d;
 
     self.persistAdapter = null;
 
-    self._queuedSetOperations = {};
+    self._queuedSetOperations = Object.create(null);
 
     self._listeners = {};
     self._initPersistance();
@@ -105,6 +70,36 @@ SharedLocalKVStorage._replyToQuery = function(watchdog, token, query, value) {
     });
 };
 
+SharedLocalKVStorage._clearQueuedSetRecord = (self, key, target) => {
+    'use strict';
+    assert(self instanceof SharedLocalKVStorage);
+
+    if (self._queuedSetOperations[key]) {
+        const index = self._queuedSetOperations[key].indexOf(target);
+        if (d) {
+            console.assert(index >= 0, `Cannot find ${key}'s`, target);
+        }
+
+        if (index > -1) {
+            self._queuedSetOperations[key].splice(index, 1);
+
+            if (!self._queuedSetOperations[key].length) {
+                delete self._queuedSetOperations[key];
+
+                if (self.debug) {
+                    self.logger.debug(`SetQueue ran empty for ${key}`);
+                }
+            }
+
+            if (self.debug && !$.len(self._queuedSetOperations)) {
+                self.logger.debug(`SetQueue emptied.`);
+            }
+        }
+    }
+    else if (self.debug) {
+        self.logger.warn(`SetQueue is missing ${key}`);
+    }
+};
 
 SharedLocalKVStorage.prototype.triggerOnChange = function(k, v) {
     var self = this;
@@ -112,13 +107,18 @@ SharedLocalKVStorage.prototype.triggerOnChange = function(k, v) {
 };
 
 SharedLocalKVStorage.prototype._setupPersistance = function() {
+    'use strict';
     var self = this;
+    console.assert(!this.persistAdapter, 'a previous persist adapter exists ?!..');
 
     // clear any old/previously added event handlers in case this function is called after a master change
     [
         'watchdog:Q!slkv_get_' + self.name,
+        `watchdog:Q!slkv_getby_${this.name}`,
         'watchdog:Q!slkv_keys_' + self.name,
         'watchdog:Q!slkv_set_' + self.name,
+        `watchdog:Q!slkv_clear_${this.name}`,
+        `watchdog:Q!slkv_destroy_${this.name}`,
         'watchdog:slkv_mchanged_' + self.name,
         'crossTab:master'
     ].forEach(function(k) {
@@ -144,20 +144,57 @@ SharedLocalKVStorage.prototype._setupPersistance = function() {
             var token = args.data.reply;
             assert(token, 'token is missing for: ' + JSON.stringify(args));
 
-            self.keys(args.data.p).done(function (keys) {
+            self.keys(args.data.p).then((keys) => {
                 SharedLocalKVStorage._replyToQuery(self.wdog, token, "Q!slkv_keys_" + self.name, keys);
-            });
+            }).catch(dump);
+        };
+
+        listenersMap[`watchdog:Q!slkv_destroy_${this.name}`] = (args) => {
+            const token = args.data.reply;
+
+            this.destroy()
+                .catch(dump)
+                .finally(() => {
+                    SharedLocalKVStorage._replyToQuery(this.wdog, token, `Q!slkv_destroy_${this.name}`, 0xDEAD);
+                });
+        };
+
+        listenersMap[`watchdog:Q!slkv_clear_${this.name}`] = (args) => {
+            const token = args.data.reply;
+
+            this.clear()
+                .catch(dump)
+                .finally(() => {
+                    SharedLocalKVStorage._replyToQuery(this.wdog, token, `Q!slkv_clear_${this.name}`, 0xDEADBEEF);
+                });
         };
 
         listenersMap["watchdog:Q!slkv_get_" + self.name] = function(args) {
             var token = args.data.reply;
             self.getItem(args.data.k)
-                .done(function(response) {
-                    self.logger.debug("Sending slkv_get reply: ", args.data.k, response);
+                .then((response) => {
+                    if (self.debug > 1) {
+                        self.logger.debug("Sending slkv_get reply: ", args.data.k, response);
+                    }
                     SharedLocalKVStorage._replyToQuery(self.wdog, token, "Q!slkv_get_" + self.name, response);
                 })
-                .fail(function() {
+                .catch(() => {
                     SharedLocalKVStorage._replyToQuery(self.wdog, token, "Q!slkv_get_" + self.name, undefined);
+                });
+        };
+
+        listenersMap[`watchdog:Q!slkv_getby_${this.name}`] = (args) => {
+            const {reply: token, pfx} = args.data;
+
+            this.eachPrefixItem(pfx)
+                .then((response) => {
+                    SharedLocalKVStorage._replyToQuery(this.wdog, token, `Q!slkv_getby_${this.name}`, response);
+                })
+                .catch((ex) => {
+                    if (this.debug && ex !== ENOENT || this.debug > 1) {
+                        this.logger.warn(`slkv_getby_${this.name}:${pfx}`, ex);
+                    }
+                    SharedLocalKVStorage._replyToQuery(this.wdog, token, `Q!slkv_getby_${this.name}`, undefined);
                 });
         };
 
@@ -197,7 +234,9 @@ SharedLocalKVStorage.prototype._setupPersistance = function() {
 
         listenersMap['crossTab:master'] = function(args) {
             // .setMaster was locally called.
-            self._setupPersistance();
+            if (!self.persistAdapter) {
+                self._setupPersistance();
+            }
         };
     }
 
@@ -212,50 +251,53 @@ SharedLocalKVStorage.prototype._initPersistance = function() {
 
     self._setupPersistance();
 
-    if (d) {
+    if (this.debug) {
         self.rebind("onChange.logger" + self.name, function(e, k, v) {
             self.logger.debug("Got onChange event:", k, v);
         });
     }
 
-    self._leavingListener = self.broadcaster.addListener('crossTab:leaving', function slkv_crosstab_leaving(data) {
+    this._leavingListener = this.broadcaster.addListener('crossTab:leaving', ({origin, data}) => {
+        const {wasMaster, newMaster} = data;
+        const didMasterLeave = wasMaster && wasMaster !== -1;
+        const didBecomeMaster = didMasterLeave && newMaster === this.broadcaster.crossTab.ctID;
+
+        if (this.debug) {
+            const msg = `Tab '${(origin >>> 0).toString(36)}' leaved, checking ownership...`;
+            this.logger.log(msg, {didMasterLeave, didBecomeMaster, origin}, data);
+        }
+
         // master had changed?
-        if (data.data.wasMaster) {
-            self._setupPersistance();
-
-
-            if (data.data.newMaster !== -1) {
-                if (data.data.newMaster === self.broadcaster.crossTab.ctID) {
-                    self.logger.debug("I'd been elected as master.");
+        if (didMasterLeave) {
+            if (didBecomeMaster) {
+                console.assert(this.broadcaster.crossTab.master, 'I was expecting to be master...');
+                if (!this.persistAdapter) {
+                    this._setupPersistance();
                 }
-                else {
-                    self.logger.debug("New master found", data.data.newMaster);
+            }
+
+            const setItem = (k, data) => {
+                const {targetValue, resolve, reject} = data;
+
+                if (d) {
+                    this.logger.debug(`Re-setting value for '${k}'`, targetValue);
                 }
 
-                // master had changed, do I've any queued ops that were not executed? re-send them!
-                Object.keys(self._queuedSetOperations).forEach(function(k) {
-                    var ops = self._queuedSetOperations[k];
-                    ops.forEach(function(op) {
-                        if (op.state && op.state() === 'pending') {
-                            self.setItem(k, op.targetValue)
-                                .done(function() {
-                                    op.resolve();
-                                })
-                                .fail(function() {
-                                    op.reject();
-                                })
-                                .always(function() {
-                                    var index = self._queuedSetOperations[k].indexOf(op);
-                                    if (index > -1) {
-                                        self._queuedSetOperations[k].splice(index, 1);
-                                    }
-                                });
-
-                            self.logger.debug("Re-setting value for", k, "to", op.targetValue, "because a new " +
-                                "master had been elected.");
-                        }
+                this.setItem(k, targetValue)
+                    .then(resolve)
+                    .catch(reject)
+                    .finally(() => {
+                        SharedLocalKVStorage._clearQueuedSetRecord(this, k, data);
                     });
-                });
+            };
+
+            // master had changed, do I've any queued ops that were not executed? re-send them!
+            for (const k in this._queuedSetOperations) {
+                const pending = this._queuedSetOperations[k];
+
+                for (let i = 0; i < pending.length; ++i) {
+                    setItem(k, pending[i]);
+                }
             }
         }
     });
@@ -273,60 +315,52 @@ SharedLocalKVStorage.prototype.getItem = function(k) {
         var promise = new MegaPromise();
 
         self.wdog.query("slkv_get_" + self.name, SharedLocalKVStorage.DEFAULT_QUERY_TIMEOUT, false, {'k': k}, true)
-            .done(function(response) {
-                if (response && response[0] && typeof response[0] !== 'undefined') {
+            .then((response) => {
+                if (response && response[0]) {
                     promise.resolve(response[0]);
                 }
                 else {
-                    promise.reject(response[0]);
+                    promise.reject();
                 }
             })
-            .fail(function(e) {
-                self.logger.warn("getItem request failed: ", k, e);
-                promise.reject(e);
+            .catch((ex) => {
+                self.logger.warn("getItem request failed: ", k, ex);
+                promise.reject(ex);
             });
 
         return promise;
     }
 };
 
-SharedLocalKVStorage.prototype.eachPrefixItem = function __SLKVEachItem(prefix, cb) {
-    var self = this;
+SharedLocalKVStorage.prototype.eachPrefixItem = function __SLKVEachItem(pfx, each) {
+    'use strict';
 
-    if (self.broadcaster.crossTab.master) {
-        return self.persistAdapter.eachPrefixItem(prefix, cb);
+    if (this.broadcaster.crossTab.master) {
+        return this.persistAdapter.eachPrefixItem(pfx, each);
     }
-    else {
-        var masterPromise = new MegaPromise();
 
-        self.keys(prefix)
-            .fail(function(err) {
-                self.logger.warn("eachPrefixItem", prefix, "failed");
-                masterPromise.reject(err);
+    return new MegaPromise((resolve, reject) => {
+
+        this.wdog.query(`slkv_getby_${this.name}`, SharedLocalKVStorage.DEFAULT_QUERY_TIMEOUT, false, {pfx}, true)
+            .then(([res]) => {
+                if (!res) {
+                    return reject(ENOENT);
+                }
+                if (each) {
+                    for (const k in res) {
+                        each(res[k], k);
+                    }
+                }
+                resolve(res);
             })
-            .done(function(keys) {
-                var promises = [];
-                keys.forEach(function(k) {
-                    var promise = new MegaPromise();
-
-                    promises.push(promise);
-                    self.getItem(k)
-                        .done(function(v) {
-                            cb(v, k);
-                            promise.resolve();
-                        })
-                        .fail(function(err) {
-                            self.logger.warn("eachPrefixItem -> getItem", prefix, "failed");
-                            promise.reject(err);
-                        });
-                });
-                masterPromise.linkDoneAndFailTo(MegaPromise.allDone(promises));
-            });
-
-        return masterPromise;
-    }
+            .catch(reject);
+    });
 };
 
+SharedLocalKVStorage.prototype.dump = function(prefix) {
+    'use strict';
+    return this.eachPrefixItem(prefix || '', dump).dump(`${this.name}.dump(${prefix || ''})`);
+};
 
 SharedLocalKVStorage.prototype.keys = function(prefix) {
     var self = this;
@@ -346,18 +380,16 @@ SharedLocalKVStorage.prototype.keys = function(prefix) {
                 'p': prefix
             },
             true
-        )
-            .done(function(response) {
-                if (response && response[0] && typeof response[0] !== 'undefined') {
-                    promise.resolve(response[0]);
-                }
-                else {
-                    promise.reject(response[0]);
-                }
-            })
-            .fail(function() {
-                promise.reject(arguments[0]);
-            });
+        ).then((response) => {
+            if (response && response[0]) {
+                promise.resolve(response[0]);
+            }
+            else {
+                promise.reject(EINCOMPLETE);
+            }
+        }).catch((ex) => {
+            promise.reject(ex);
+        });
 
         return promise;
     }
@@ -366,6 +398,7 @@ SharedLocalKVStorage.prototype.keys = function(prefix) {
 
 
 SharedLocalKVStorage.prototype.setItem = function(k, v, meta) {
+    'use strict';
     var self = this;
     if (self.broadcaster.crossTab.master) {
         var fn = "setItem";
@@ -389,38 +422,22 @@ SharedLocalKVStorage.prototype.setItem = function(k, v, meta) {
 
         return self.persistAdapter[fn](k, v);
     }
-    else {
-        var promise = new MegaPromise();
-        if (typeof self._queuedSetOperations[k] === 'undefined') {
-            self._queuedSetOperations[k] = [];
-        }
-        self._queuedSetOperations[k].push(promise);
-        promise.targetValue = v;
 
-        self.wdog.query(
-            "slkv_set_" + self.name,
-            SharedLocalKVStorage.DEFAULT_QUERY_TIMEOUT,
-            false,
-            {
-                'k': k,
-                'v': v
-            },
-            true
-        )
-            .done(function() {
-                promise.resolve(v);
-            })
-            .fail(function() {
-                promise.reject();
-            })
-            .always(function() {
-                var index = self._queuedSetOperations[k].indexOf(promise);
-                if (index > -1) {
-                    self._queuedSetOperations[k].splice(index, 1);
-                }
+    return new MegaPromise((resolve, reject) => {
+
+        if (!this._queuedSetOperations[k]) {
+            this._queuedSetOperations[k] = [];
+        }
+        const op = {resolve, reject, targetValue: v};
+        this._queuedSetOperations[k].push(op);
+
+        this.wdog.query(`slkv_set_${this.name}`, SharedLocalKVStorage.DEFAULT_QUERY_TIMEOUT, false, {k, v}, true)
+            .then(resolve)
+            .catch(reject)
+            .finally(() => {
+                SharedLocalKVStorage._clearQueuedSetRecord(self, k, op);
             });
-        return promise;
-    }
+    });
 };
 
 SharedLocalKVStorage.prototype.removeItem = function(k, meta) {
@@ -451,37 +468,48 @@ SharedLocalKVStorage.prototype.removeItem = function(k, meta) {
 };
 
 SharedLocalKVStorage.prototype.clear = function() {
-    var self = this;
+    'use strict';
 
-    var promise = new MegaPromise();
-    var promises = [];
+    if (this.debug) {
+        this.logger.warn('Cleaning instance...', [this]);
+    }
 
-    (self.broadcaster.crossTab.master ? self.persistAdapter : self).keys().done(function(keys) {
-        keys.forEach(function(k) {
-            promises.push(
-                self.removeItem(k)
-            );
-        });
-        promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
-    })
-        .fail(function() {
-            promise.reject();
-        });
-    return promise;
+    if (this.broadcaster.crossTab.master) {
+        return this.persistAdapter.clear();
+    }
+
+    return new MegaPromise((resolve, reject) => {
+        this.wdog.query(`slkv_clear_${this.name}`, SharedLocalKVStorage.DEFAULT_QUERY_TIMEOUT, false, false, true)
+            .then(resolve)
+            .catch(reject);
+    });
 };
-SharedLocalKVStorage.prototype.destroy = function(onlyIfMaster) {
+
+SharedLocalKVStorage.prototype.destroy = function() {
+    'use strict';
     var self = this;
+
+    if (self.debug) {
+        self.logger.warn('Destroying instance...', [this]);
+    }
 
     if (self._leavingListener) {
         self.broadcaster.removeListener(self._leavingListener);
     }
 
+    if (self.debug) {
+        self.off(`onChange.logger${self.name}`);
+    }
+
     if (self.broadcaster.crossTab.master) {
         return this.persistAdapter.destroy();
     }
-    else if (!onlyIfMaster) {
-        return self.clear();
-    }
+
+    return new MegaPromise((resolve, reject) => {
+        self.wdog.query(`slkv_destroy_${this.name}`, SharedLocalKVStorage.DEFAULT_QUERY_TIMEOUT, false, false, true)
+            .then(resolve)
+            .catch(reject);
+    });
 };
 
 SharedLocalKVStorage.DB_MODE = {
@@ -872,6 +900,9 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.removeItem = function __SLKVRe
     'use strict';
     var self = this;
     expunge = expunge === true;
+    if (d) {
+        this.logger.debug(`removeItem(${JSON.stringify(k)})`, expunge, this.memoize, this.manualFlush);
+    }
 
     if (!expunge && self.memoize && this.newcache[k] === undefined && this.dbcache[k] === undefined) {
         return MegaPromise.reject();
@@ -902,41 +933,52 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.removeItem = function __SLKVRe
  *
  * Note: Case sensitive.
  *
- * @param prefix {String} prefix that would be used for filtering the data
- * @param cb {Function} cb(value, key)
+ * @param {String} prefix that would be used for filtering the data
+ * @param {Function} [each] callback(value, key)
  * @returns {MegaPromise} promise
  */
-SharedLocalKVStorage.Utils.DexieStorage.prototype.eachPrefixItem = function __SLKVEachItem(prefix, cb) {
+SharedLocalKVStorage.Utils.DexieStorage.prototype.eachPrefixItem = function __SLKVEachItem(prefix, each) {
     'use strict';
-    var self = this;
-    return new MegaPromise(function(resolve, reject) {
-        var feedback = function(store) {
-            var keys = Object.keys(store);
+    return new MegaPromise((resolve, reject) => {
 
-            var keyl = keys.length;
-            for (var i = 0; i < keyl; i++) {
-                var k = keys[i];
+        let count = 0;
+        const res = Object.create(null);
 
-                if (!self.delcache[k] && k.startsWith(prefix)) {
-                    cb(store[k], k);
+        if (this.memoize) {
+            Object.assign(res, this.dbcache, this.newcache);
+
+            for (const key in res) {
+                if (this.delcache[key] || !key.startsWith(prefix)) {
+                    delete res[key];
+                }
+                else {
+                    if (each) {
+                        each(res[key], key);
+                    }
+                    ++count;
                 }
             }
-        };
 
-        if (self.memoize) {
-            feedback(Object.assign({}, self.dbcache, self.newcache));
-            return resolve();
+            return count ? resolve(res) : reject(ENOENT);
         }
 
-        self.db.kv.toArray()
-            .then(function(r) {
-                var store = Object.create(null);
+        this.db.kv.toArray()
+            .then((r) => {
 
-                for (var i = r.length; i--;) {
-                    store[self._decryptKey(r[i].k)] = self._decryptValue(r[i].v);
+                for (let i = r.length; i--;) {
+                    const k = this._decryptKey(r[i].k);
+
+                    if (k.startsWith(prefix)) {
+                        res[k] = this._decryptValue(r[i].v);
+
+                        if (each) {
+                            each(res[k], k);
+                        }
+                        ++count;
+                    }
                 }
-                feedback(store);
-                resolve();
+
+                return count ? resolve(res) : reject(ENOENT);
             })
             .catch(reject);
     });
@@ -946,13 +988,14 @@ SharedLocalKVStorage.Utils.DexieStorage.prototype.eachPrefixItem = function __SL
  * Drops the local db
  */
 SharedLocalKVStorage.Utils.DexieStorage.prototype.destroy = function __SLKVDestroy() {
-    var self = this;
-    var promise = new MegaPromise();
+    'use strict';
+    return new MegaPromise((resolve, reject) => {
 
-    self._reinitCache();
-    self.dbState = SharedLocalKVStorage.DB_STATE.NOT_READY;
+        this._reinitCache();
+        this.dbState = SharedLocalKVStorage.DB_STATE.NOT_READY;
 
-    return promise.linkDoneAndFailTo(self.db.delete());
+        return 'db' in this ? this.db.delete().then(resolve).catch(reject) : resolve();
+    });
 };
 
 /**

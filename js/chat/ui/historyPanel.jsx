@@ -220,11 +220,9 @@ export default class HistoryPanel extends MegaRenderMixin {
         var scrollBlockHeight = (
             $('.chat-content-block', self.$container).outerHeight() -
             ($('.chat-topic-block', self.$container).outerHeight() || 0) -
-            ($('.call-block', self.$container).outerHeight() || 0) -
-            (
-                is_chatlink ? $('.join-chat-block', self.$container).outerHeight() :
-                    $('.messages-block .chat-textarea-block', self.$container).outerHeight()
-            )
+            (is_chatlink ?
+                $('.join-chat-block', self.$container).outerHeight() :
+                $('.messages-block .chat-textarea-block', self.$container).outerHeight())
         );
 
         if (scrollBlockHeight !== self.$messages.outerHeight()) {
@@ -581,7 +579,7 @@ export default class HistoryPanel extends MegaRenderMixin {
                     lastTimeMarker = curTimeMarker;
                     messagesList.push(
                         <div
-                            className="message date-divider"
+                            className="message date-divider selectable-txt"
                             key={v.messageId + "_marker"}
                             title={time2date(timestamp)}>{curTimeMarker}</div>
                     );

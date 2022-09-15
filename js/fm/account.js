@@ -3029,6 +3029,9 @@ accountUI.fileManagement = {
         // User Interface
         this.userInterface.render();
 
+        // Hide Recents
+        this.hideRecents.render();
+
         // Drag and Drop
         this.dragAndDrop.render();
 
@@ -3282,6 +3285,18 @@ accountUI.fileManagement = {
 
             this._initOption('uisorting');
             this._initOption('uiviewmode');
+        }
+    },
+
+    hideRecents: {
+        render: function() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#hide-recents',
+                $('#hide-recents', accountUI.$contentBlock).parent(),
+                !mega.config.get('showRecents'),
+                (val) => mega.config.setn('showRecents', val ? undefined : 1));
         }
     },
 

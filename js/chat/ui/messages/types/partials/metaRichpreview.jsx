@@ -58,7 +58,7 @@ class MetaRichpreview  extends ConversationMessageMixin {
                             <div className="message richpreview preview" style={previewCss}></div>
                         </div> : undefined}
                     <div className="message richpreview inner-wrapper">
-                        <div className="message richpreview data-title">
+                        <div className="message richpreview data-title selectable-txt">
                             <span className="message richpreview title">{meta.t}</span>
                         </div>
                         <div className="message richpreview desc">{ellipsis(meta.d, 'end', 82)}</div>

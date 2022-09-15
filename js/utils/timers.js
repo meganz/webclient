@@ -156,7 +156,51 @@ delay.abort = () => {
  */
 lazy(self, 'tSleep', function tSleep() {
     'use strict';
-    return (ts, data) => new Promise(resolve => setTimeout(resolve, ts * 1e3, data));
+    const RFP_THRESHOLD = 20;
+    const MIN_THRESHOLD = 100;
+    const MAX_THRESHOLD = 4e7;
+    const TID = `^^tSleep::scheduler~~`;
+
+    const pending = new Set();
+    let threshold = MAX_THRESHOLD;
+
+    const dispatcher = () => {
+        const tick = performance.now();
+
+        threshold = MAX_THRESHOLD;
+        for (const resolve of pending) {
+            const {ts, now, data} = resolve;
+            const elapsed = tick - now;
+
+            if (elapsed + RFP_THRESHOLD > ts) {
+                resolve(data);
+                pending.delete(resolve);
+            }
+            else {
+                threshold = Math.max(MIN_THRESHOLD, Math.min(ts - elapsed, threshold));
+            }
+        }
+
+        if (pending.size) {
+            delay(TID, dispatcher, threshold);
+        }
+    };
+
+    const schedule = (resolve, ts, data) => {
+        ts = Math.min(MAX_THRESHOLD - 1, Math.max(MIN_THRESHOLD, ts | 0));
+
+        resolve.ts = ts;
+        resolve.data = data;
+        resolve.now = performance.now();
+        pending.add(resolve);
+
+        if (ts < threshold || !delay.has(TID)) {
+            delay.cancel(TID);
+            delay(TID, dispatcher, threshold = ts);
+        }
+    };
+
+    return (ts, data) => new Promise(resolve => schedule(resolve, ts * 1e3, data));
 });
 
 /**
@@ -247,7 +291,11 @@ lazy(self, 'sleep', function sleep() {
         }
     };
 
-    mega.worklet.then((ctx) => {
+    Promise.race([
+        mega.worklet, tSleep(11).then(() => {
+            throw new SecurityError('Timed out.');
+        })
+    ]).then((ctx) => {
         // override as the only class instance.
         worklet = new worklet(ctx);
     }).catch(ex => {
@@ -262,6 +310,8 @@ lazy(self, 'sleep', function sleep() {
             tSleep(res.ts / 1e3, res.data).then(res);
         }
         pending.clear();
+    }).finally(() => {
+        delete mega.worklet;
     });
 
     return (ts, data) => new Promise(resolve => {
@@ -281,15 +331,39 @@ lazy(self, 'sleep', function sleep() {
     });
 });
 
-/** @property mega.worklet */
-lazy(mega, 'worklet', function worklet() {
+(() => {
     'use strict';
-    return Promise.resolve((async() => {
-        const ctx = new AudioContext();
-        if (ctx.state !== 'running') {
-            throw new SecurityError('The AudioContext was not allowed to start?');
-        }
-        await ctx.audioWorklet.addModule(`${is_extension ? '' : '/'}worklet.js?v=1`);
-        return ctx;
-    })());
-});
+
+    let ctx;
+    const onClick = tryCatch((ev) => {
+        window.removeEventListener('click', onClick, true);
+
+        tryCatch(() => {
+            ctx = ctx || new AudioContext();
+            Promise.resolve(ctx.resume()).catch(dump);
+        }, false)();
+
+        return ev.defaultPrevented;
+    });
+    window.addEventListener('click', onClick, true);
+
+    /** @property mega.worklet */
+    lazy(mega, 'worklet', function worklet() {
+        return Promise.resolve((async() => {
+            ctx = ctx || new AudioContext();
+
+            if (ctx.state !== 'running') {
+                if (d) {
+                    console.warn('[AudioWorklet] context state is %s...', ctx.state);
+                }
+                await Promise.resolve(ctx.resume()).catch(dump);
+
+                if (ctx.state !== 'running') {
+                    throw new SecurityError(`The AudioContext was not allowed to start (${ctx.state})`);
+                }
+            }
+            await ctx.audioWorklet.addModule(`${is_extension ? '' : '/'}worklet.js?v=1`);
+            return ctx;
+        })());
+    });
+})();

@@ -1270,10 +1270,10 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[23263] = escapeHTML(l[23263]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[23332] = escapeHTML(l[23332]).replace('[A1]', '<a href="/cmd" target="_blank" class="clickurl">')
         .replace('[/A1]', '</a>')
-        .replace('[A2]', '<a href="https://www.qnap.com/en/app_center/' +
+        .replace('[A2]', '<a class="link-qnap" href="https://www.qnap.com/en/app_center/' +
             '?qts=4.3&kw=megacmd&type_choose=&cat_choose=" target="_blank" rel="noopener noreferrer">')
         .replace('[/A2]', '</a>')
-        .replace('[A3]', '<a href="https://www.synology.com/en-nz/dsm/packages/MEGAcmd' +
+        .replace('[A3]', '<a class="link-synology" href="https://www.synology.com/en-nz/dsm/packages/MEGAcmd' +
             '" target="_blank" rel="noopener noreferrer">')
         .replace('[/A3]', '</a>');
     l[23354] = escapeHTML(l[23354]).replace('[A]', '<a href="/pro" class="clickurl">')

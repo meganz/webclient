@@ -64,7 +64,6 @@ module.exports = function(config) {
         'js/utils/locale.js',
         'js/utils/media.js',
         'js/utils/network.js',
-        'js/utils/stringcrypt.js',
         'js/utils/timers.js',
         'js/utils/watchdog.js',
         'js/utils/webgl.js',

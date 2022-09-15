@@ -51,7 +51,7 @@ export class ContactsListItem extends ContactAwareComponent {
                     onClick={this.props.onContactClicked.bind(this)}>
                     <div className="nw-contact-status"></div>
                     <div className="nw-conversations-unread">0</div>
-                    <div className="nw-conversations-name">
+                    <div className="nw-conversations-name selectable-txt">
                         {M.getNameByHandle(contact.u)}
                     </div>
                 </div>
@@ -64,16 +64,23 @@ export class ContactButton extends ContactAwareComponent {
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
-    }
+    };
+
     attachRerenderCallbacks = _attchRerenderCbContacts;
+
+    constructor(props) {
+        super(props);
+        this.dropdownItemGenerator = this.dropdownItemGenerator.bind(this);
+    }
+
     customIsEventuallyVisible() {
         if (this.props.chatRoom) {
             return this.props.chatRoom.isCurrentlyActive;
         }
         return -1;
     }
-    loadAccount = () => loadSubPage('fm/account');
-    dropdownItemGenerator = () => {
+
+    dropdownItemGenerator() {
         let { contact, dropdowns, chatRoom, dropdownRemoveButton } = this.props;
         dropdowns = dropdowns ? dropdowns : [];
         const moreDropdowns = [];
@@ -81,7 +88,7 @@ export class ContactButton extends ContactAwareComponent {
 
         const onContactClicked = () => {
             if (contact.c === 2) {
-                this.loadAccount();
+                loadSubPage('fm/account');
             }
             if (contact.c === 1) {
                 loadSubPage('fm/chat/contacts/' + contact.u);
@@ -128,7 +135,7 @@ export class ContactButton extends ContactAwareComponent {
                     key="view0"
                     icon="sprite-fm-mono icon-user-filled"
                     label={l[187] /* `My Account` */}
-                    onClick={this.loadAccount}
+                    onClick={() => loadSubPage('fm/account')}
                 />
             );
         }
@@ -329,6 +336,7 @@ export class ContactButton extends ContactAwareComponent {
 
         return moreDropdowns;
     }
+
     render() {
         let {
             label = '', className = '', contact, dropdownIconClasses = [], verticalOffset,
@@ -344,7 +352,7 @@ export class ContactButton extends ContactAwareComponent {
         }
 
         if (label) {
-            className = `user-card-name ${className}`;
+            className = `user-card-name ${className}${className.includes('message') ? '' : ' selectable-txt'}`;
             dropdownIconClasses = '';
             dropdownPosition = 'left bottom';
             vertOffset = 25;
@@ -361,7 +369,7 @@ export class ContactButton extends ContactAwareComponent {
 
         return (
             noContextMenu
-                ? <div className="user-card-name light">{label}</div>
+                ? <div className="user-card-name light selectable-txt">{label}</div>
                 : <Button
                     className={className}
                     icon={dropdownIconClasses}
@@ -553,7 +561,7 @@ export class ContactFingerprint extends MegaRenderMixin {
                 <div className="contact-fingerprint-title">
                     <span>{l[6872]}</span>
                 </div>
-                <div className="contact-fingerprint-txt">
+                <div className="contact-fingerprint-txt selectable-txt">
                     {infoBlocks}
                 </div>
                 {verifyButton}
@@ -755,12 +763,12 @@ export class ContactCard extends ContactAwareComponent {
             }
             if (emailTooltips) {
                 usernameBlock = <div
-                    className="user-card-name light simpletip"
+                    className="user-card-name light simpletip selectable-txt"
                     data-simpletip={contact.m}
                     data-simpletipposition="top">{escapedUsername}</div>;
             }
             else {
-                usernameBlock = <div className="user-card-name light">{escapedUsername}</div>;
+                usernameBlock = <div className="user-card-name light selectable-txt">{escapedUsername}</div>;
             }
         }
 
@@ -789,7 +797,7 @@ export class ContactCard extends ContactAwareComponent {
                         <i className="sprite-fm-mono icon-phone" />
                     </div> :
                     null}
-                <div className="user-card-email">{contact.m}</div>
+                <div className="user-card-email selectable-txt">{contact.m}</div>
             </div>
         }
 

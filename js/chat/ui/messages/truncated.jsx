@@ -44,7 +44,7 @@ class TruncatedMessage extends ConversationMessageMixin {
             <div className={cssClasses} data-id={"id" + message.messageId} key={message.messageId}>
                 {avatar}
 
-                <div className="message content-area small-info-txt">
+                <div className="message content-area small-info-txt selectable-txt">
                     <ContactsUI.ContactButton
                         contact={contact}
                         className="message"

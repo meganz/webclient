@@ -127,7 +127,7 @@
         // send data, if any
         if (chatIds.length) {
             self.data.cr = microtime() - self.initialized;
-            self.data.idb = typeof megaChat.plugins.chatdIntegration.chatd.chatdPersist === 'undefined' ? 0 : 1;
+            self.data.idb = megaChat.plugins.chatdIntegration.chatd.chatdPersist ? 1 : 0;
             self.data.tc = megaChat.chats.length;
 
             var totalMsgs = 0;

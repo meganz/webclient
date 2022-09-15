@@ -344,7 +344,7 @@
 
                 sharedFolderUI();
 
-                $('.grid-table:not(.arc-chat-messages-block) tbody tr').remove();
+                $('.grid-table tbody tr').remove();
                 $('.file-block-scrolling a').remove();
                 $('.shared-blocks-scrolling a').remove();
                 $('.out-shared-blocks-scrolling a').remove();

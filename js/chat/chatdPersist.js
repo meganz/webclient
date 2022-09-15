@@ -86,7 +86,12 @@
                     );
                 }
                 else {
-                    self.chatd.chatdPersist.persistKey(data.chatId, key.keyid, key.userId, key.key).always(nop);
+                    self.chatd.chatdPersist.persistKey(data.chatId, key.keyid, key.userId, key.key)
+                        .catch((ex) => {
+                            if (d && ex) {
+                                self.logger.warn(ex);
+                            }
+                        });
                 }
             });
         });
@@ -197,17 +202,17 @@
     });
 
     ChatdPersist.prototype.deleteAllMessages = mutex('chatdpersist:mutex', function(resolve, reject, chatId) {
-        var self = this;
-        self._expungeMessageActionsQueue(chatId);
+        this._expungeMessageActionsQueue(chatId);
 
-        self.transaction(function() {
-            return self._encryptedWhere('msgs', {'chatId': chatId})
-                .then(function(results) {
+        this.transaction(() => {
+            return this._encryptedWhere('msgs', {'chatId': chatId})
+                .then((results) => {
                     for (var i = results.length; i--;) {
-                        self.db.msgs.delete(results[i].id);
+                        this.db.msgs.delete(results[i].id);
                     }
-                });
-        }).always(resolve);
+                })
+                .catch(dump);
+        }).then(resolve).catch(reject);
     });
 
     /**
@@ -237,7 +242,13 @@
      * @memberOf ChatdPersist.prototype
      */
     lazy(ChatdPersist.prototype, 'db', function() {
-        return new MegaDexie('CHATD', this.dbName, 'ctdb_', true, {
+        // xxx: this ident will cause the DB to be created afresh monthly...
+        // i.e. meant as a quick&dirty workaround for some code inconsistencies around,
+        // such as the Reaction 'SN' being persisted on the DB without ensuring the reactions
+        // themselves have been already processed and persisted prior to doing that.
+        const ident = `ctdb${new Date().getMonth()}.`;
+
+        return new MegaDexie('CHATD', this.dbName, ident, true, {
             /* extra data fields, non indexed: msgObject */
             'msgs': "++id, chatId, msgId, userId, orderValue, &[chatId+msgId], [chatId+orderValue], keyId",
             'keys': "++chatId_userId_keyId, chatId, userId", /* extra data fields, non indexed: key */
@@ -271,23 +282,27 @@
         delete self.chatd.chatdPersist;
     };
 
-    ChatdPersist.prototype._reinitWithoutChardPersist = function() {
+    ChatdPersist.prototype._reinitWithoutChardPersist = async function() {
         // because we are not sure in what state the indexedDB crashed
         // we need to reinit and retrigger regular JOIN + HIST
-        var self = this;
-        var shards = self.chatd.shards;
+        const {shards} = this.chatd;
 
-        self.logger.warn('re-init without persistence.', shards);
+        if (d) {
+            this.logger.warn('re-init without persistence.', shards);
+        }
 
-        Object.keys(shards).forEach(function(shardId) {
-            var shard = shards[shardId];
-            var chatIds = shard.chatIds;
-            Object.keys(chatIds).forEach(function(chatIdBin) {
-                self.chatd._reinitChatIdHistory(base64urlencode(chatIdBin));
+        Object.keys(shards).forEach(tryCatch((shardId) => {
+            const shard = shards[shardId];
+            const {chatIds, s: webSocket} = shard;
+
+            Object.keys(chatIds).forEach((chatIdBin) => {
+                const chatId = base64urlencode(chatIdBin);
+
+                this.chatd._reinitChatIdHistory(chatId).dump(`(re)init.Without.ChardPersist.${chatId}`);
             });
-            shard.s.close();
-        });
 
+            webSocket.close();
+        }));
     };
 
 
@@ -306,7 +321,7 @@
         }
 
         self._destroy();
-        self._reinitWithoutChardPersist();
+        self._reinitWithoutChardPersist().dump('stopChatdPersist');
 
         if (ChatdPersist.isMasterTab()) {
             if (drop) {
@@ -340,17 +355,17 @@
      * @returns {Promise}
      * @private
      */
-    ChatdPersist.prototype._encryptedAdd = promisify(function(resolve, reject, table, data) {
-        var self = this;
-        var encryptedData = Object.assign({}, data);
-        Object.keys(encryptedData).forEach(function(k) {
-            if (ChatdPersist.DONT_ENCRYPT[table].indexOf(k) === -1) {
+    ChatdPersist.prototype._encryptedAdd = async function(table, data) {
+        const encryptedData = Object.assign({}, data);
+
+        Object.keys(encryptedData).forEach((k) => {
+            if (!ChatdPersist.DONT_ENCRYPT[table].includes(k)) {
                 encryptedData[k] = ChatdPersist.encrypt(encryptedData[k]);
             }
         });
 
-        self.db[table][table === "msgs" ? "put" : "add"](encryptedData).then(resolve).catch(reject);
-    });
+        return this.db[table][table === "msgs" ? "put" : "add"](encryptedData);
+    };
 
     /**
      * Internal method that retrieve data by key (`keyName`) with value of `keyValue` from `table` (and handles
@@ -362,31 +377,30 @@
      * @returns {Promise}
      * @private
      */
-    ChatdPersist.prototype._encryptedGet = promisify(function(resolve, reject, table, keyValue, keyName) {
-        var self = this;
-        var v = keyValue;
-        if (ChatdPersist.DONT_ENCRYPT[table].indexOf(keyName) === -1) {
+    ChatdPersist.prototype._encryptedGet = async function(table, keyValue, keyName) {
+        let v = keyValue;
+
+        if (!ChatdPersist.DONT_ENCRYPT[table].includes(keyName)) {
             v = ChatdPersist.encrypt(keyValue);
         }
 
-        self.db[table].get(v)
-            .then(function(result) {
+        return this.db[table].get(v)
+            .then((result) => {
                 if (!result) {
-                    return reject(result);
+                    throw new MEGAException(`${keyValue}@${table} not found.`, null, 'NotFoundError');
                 }
 
-                var decryptedData = Object.assign({}, result);
-                // eslint-disable-next-line local-rules/misc-warnings
-                Object.keys(decryptedData).forEach(function(k) {
-                    if (ChatdPersist.DONT_ENCRYPT[table].indexOf(k) === -1) {
+                const decryptedData = Object.assign({}, result);
+
+                Object.keys(decryptedData).forEach((k) => {
+                    if (!ChatdPersist.DONT_ENCRYPT[table].includes(k)) {
                         decryptedData[k] = ChatdPersist.decrypt(decryptedData[k]);
                     }
                 });
 
-                resolve(decryptedData);
-            })
-            .catch(reject);
-    });
+                return decryptedData;
+            });
+    };
 
     /**
      * Internal method that goes thru an array (`results`) and decrypt whatever was defined as encrypted initially (e.g
@@ -418,9 +432,8 @@
      * @returns {Promise}
      * @private
      */
-    ChatdPersist.prototype._encryptedWhere = promisify(function(resolve, reject, table, whereObj) {
-        var self = this;
-        var q = self.db[table];
+    ChatdPersist.prototype._encryptedWhere = async function(table, whereObj) {
+        let q = this.db[table];
 
         Object.keys(whereObj).forEach(function(k) {
             var v = whereObj[k];
@@ -430,17 +443,14 @@
             q = q.where(k).equals(v);
         });
 
-        q.toArray().then(
-            function(results) {
-                if (!results || results.length === 0) {
-                    reject(results);
-                }
-                else {
-                    resolve(self._decryptResultsArray(table, results));
-                }
-            })
-            .catch(reject);
-    });
+        const results = await q.toArray();
+
+        if (Array.isArray(results) && results.length) {
+            return this._decryptResultsArray(table, results);
+        }
+
+        throw new MEGAException(`'${JSON.stringify(whereObj)}' not found.`, null, 'NotFoundError');
+    };
 
 
     /**
@@ -451,19 +461,9 @@
      * @param keyId {String}
      * @returns {Promise}
      */
-    ChatdPersist.prototype.getKey = promisify(function(resolve, reject, chatId, userId, keyId) {
-        var self = this;
-        self._encryptedGet('keys', chatId + "_" + userId + "_" + keyId)
-            .then(function(value) {
-                if (value === undefined) {
-                    reject(value);
-                }
-                else {
-                    resolve(value);
-                }
-            })
-            .catch(reject);
-    });
+    ChatdPersist.prototype.getKey = function(chatId, userId, keyId) {
+        return this._encryptedGet('keys', `${chatId}_${userId}_${keyId}`);
+    };
 
     /**
      * Retrieve multiple keys by running on 1 query
@@ -616,28 +616,17 @@
         ['MessageId', 'msgId'],
         ['OrderValue', 'orderValue'],
     ].forEach(function(meta) {
-        ChatdPersist.prototype["getMessageBy" + meta[0]] = promisify(function(resolve, reject, chatId, val) {
-            var self = this;
-            var whereObj = {};
+        ChatdPersist.prototype[`getMessageBy${meta[0]}`] = async function(chatId, val) {
 
             if (
-                ChatdPersist.DONT_ENCRYPT["msgs"].indexOf(meta[1]) === -1 &&
-                ChatdPersist.DONT_ENCRYPT["msgs"].indexOf("[chatId+" + meta[1] + "]") === -1
+                !ChatdPersist.DONT_ENCRYPT.msgs.includes(meta[1]) &&
+                !ChatdPersist.DONT_ENCRYPT.msgs.includes(`[chatId+${meta[1]}]`)
             ) {
                 val = ChatdPersist.encrypt(val);
             }
 
-            whereObj["[chatId+" + meta[1] + "]"] = [ChatdPersist.encrypt(chatId), val];
-
-            self._encryptedWhere('msgs', whereObj)
-                .then(function(value) {
-                    if (value === undefined) {
-                        return reject(value);
-                    }
-                    resolve(value);
-                })
-                .catch(reject);
-        });
+            return this._encryptedWhere('msgs', {[`[chatId+${meta[1]}]`]: [ChatdPersist.encrypt(chatId), val]});
+        };
     });
 
     /**
@@ -674,13 +663,14 @@
     ChatdPersist.prototype.addMessage = function(
         chatId, msgId, userId, orderValue, keyId, msgObject
     ) {
-        var self = this;
-
         if (!(msgObject instanceof Message)) {
+            if (d) {
+                this.logger.warn(`This is not a Message-instance, ${msgId}@${chatId}`, msgObject);
+            }
             return Promise.resolve();
         }
 
-        return self._encryptedAdd(
+        return this._encryptedAdd(
             'msgs',
             {
                 'chatId': chatId,
@@ -702,66 +692,57 @@
      * @param isEdit {boolean} pass true if this is a message edit.
      * @returns {Promise}
      */
-    ChatdPersist.prototype.persistMessage = promisify(function(resolve, reject, chatId, msgObject, isEdit) {
-        var self = this;
+    ChatdPersist.prototype.persistMessage = function(chatId, msgObject, isEdit) {
 
         if (!ChatdPersist.isMasterTab()) {
             // don't do anything if this is not the master tab!
-            return reject(EACCESS);
+            return Promise.reject(EACCESS);
+        }
+        const {messageId, userId, orderValue, keyid} = msgObject;
+
+        if (keyid === true || ((keyid & 0xffff0000) >>> 0) === (0xffff0000 >>> 0)) {
+            this.logger.critical(".persistMessage, received a temp keyId");
+            return Promise.reject(EINTERNAL);
         }
 
-        var msgId = msgObject.messageId;
-        var userId = msgObject.userId;
-        var orderValue = msgObject.orderValue;
-        var keyId = msgObject.keyid;
-
-        if (keyId === true || ((keyId & 0xffff0000) >>> 0) === (0xffff0000 >>> 0)) {
-            self.logger.critical(".persistMessage, received a temp keyId");
-            return reject(EINTERNAL);
-        }
-
-        var args = toArray.apply(null, arguments).slice(2);
-
-        self.getMessageByMessageId(chatId, msgId)
-            .then(function(found) {
+        return this.getMessageByMessageId(chatId, messageId)
+            .then((found) => {
                 assert(found.length <= 1, 'Found duplicate msgs (by msgid) in chatdPersist index.');
 
                 found = found && found.length === 1 ? found[0] : false;
 
                 if (
-                    keyId !== 0 &&
+                    keyid !== 0 &&
                     base64urlencode(userId) !== mega.BID &&
                     found &&
                     found.userId !== userId
                 ) {
-                    self.logger.error("Message: ", chatId, msgId, "already exists, but its assigned to different " +
-                        "user:", userId, "!=", found.userId, "Halting.");
-                    reject();
+                    this.logger.error(
+                        `Message ${messageId}@${chatId} already exists, but its assigned to different user!`,
+                        userId, '!=', found.userId
+                    );
+
+                    throw new MEGAException(`${messageId}@${chatId} exists.`, found, 'NoModificationAllowedError');
                 }
-                else if (!isEdit) {
-                    self.logger.debug("Message: ", chatId, msgId, "already exists. Its ok, ignoring.");
-                    reject();
+
+                if (!isEdit) {
+                    this.logger.debug(`Message ${messageId}@${chatId} already exists. Its ok, ignoring.`);
+                    throw new MEGAException(`${messageId}@${chatId} exists.`, found, 'DataCloneError');
                 }
-                else {
-                    // this is an edit .persistMessage
-                    self.db.msgs.delete(found.id)
-                        .then(function() {
-                            return self.persistMessage.apply(self, args);
-                        })
-                        .then(resolve)
-                        .catch(reject);
-                }
+
+                // this is an edit .persistMessage
+                return this.db.msgs.delete(found.id)
+                    .then(() => this.persistMessage(chatId, msgObject, isEdit));
             })
-            .catch(function(ex) {
-                if (ex instanceof Dexie.DexieError) {
-                    self.logger.error("Found DexieError: ", ex);
-                    reject();
+            .catch((ex) => {
+                if (ex.name === 'NotFoundError') {
+                    return this.addMessage(chatId, messageId, userId, orderValue, keyid, msgObject);
                 }
-                else {
-                    self.addMessage(chatId, msgId, userId, orderValue, keyId, msgObject).then(resolve).catch(reject);
-                }
+
+                this.logger.error(ex);
+                throw ex;
             });
-    });
+    };
 
     /**
      * Delete a persisted message by id or key
@@ -770,8 +751,7 @@
      * @param msgIdOrObj {String|Object} ID or msgObject
      * @returns {Promise}
      */
-    ChatdPersist.prototype.unpersistMessage = promisify(function(resolve, reject, chatId, msgIdOrObj) {
-        var self = this;
+    ChatdPersist.prototype.unpersistMessage = function(chatId, msgIdOrObj) {
 
         if (!ChatdPersist.isMasterTab()) {
             // don't do anything if this is not the master tab!
@@ -780,13 +760,11 @@
 
         var msgId = typeof msgIdOrObj === "object" ? msgIdOrObj.messageId : msgIdOrObj;
 
-        self.getMessageByMessageId(chatId, msgId)
-            .then(function(r) {
-                return self.db.msgs.delete(r.id || r[0] && r[0].id);
-            })
-            .then(resolve)
-            .catch(reject);
-    });
+        return this.getMessageByMessageId(chatId, msgId)
+            .then((r) => {
+                return this.db.msgs.delete(r.id || r[0] && r[0].id);
+            });
+    };
 
 
     /**
@@ -839,8 +817,8 @@
         self._msgActionsQueuePerChat[chatId].push([action, args]);
 
         delay('chatdpersist:flush:' + chatId, function() {
-            self._flushMessageActionsQueue(chatId).always(nop);
-        }, 850);
+            self._flushMessageActionsQueue(chatId).dump(`flushMessageActionsQueue(${chatId})`);
+        }, 450);
     };
 
     /**
@@ -879,25 +857,35 @@
             return queueMicrotask(resolve);
         }
 
+        const qc = d > 0 && [...queue];
         var queueLength = queue.length;
+
+        const fail = (ex) => {
+            if (!(ex instanceof MEGAException) || d > 2) {
+                this.logger.warn(ex);
+            }
+        };
 
         (function next() {
             var queueEntry = queue.shift();
 
             if (!queueEntry) {
-                self.logger.debug("Flushed message actions queue for chat %s: %d items.", chatId, queueLength);
+                self.logger.debug("Flushed message actions queue for chat %s: %d items.", chatId, queueLength, qc);
                 return resolve();
             }
 
             if (queueEntry[0] === 'push') {
-                self.persistMessage.apply(self, [chatId].concat(queueEntry[1])).always(next);
+                self.persistMessage.apply(self, [chatId].concat(queueEntry[1]))
+                    .catch(fail).finally(next);
             }
             else if (queueEntry[0] === 'replace') {
-                self.persistMessage.apply(self, [chatId].concat(queueEntry[1][1]).concat([true])).always(next);
+                self.persistMessage.apply(self, [chatId].concat(queueEntry[1][1]).concat([true]))
+                    .catch(fail).finally(next);
             }
             else if (queueEntry[0] === 'remove') {
                 if (queueEntry[1][1] !== true) {
-                    self.unpersistMessage.apply(self, [chatId].concat(queueEntry[1])).always(next);
+                    self.unpersistMessage.apply(self, [chatId].concat(queueEntry[1]))
+                        .catch(fail).finally(next);
                 }
                 else {
                     // else, its a "soft remove" (e.g. don't persist!)
@@ -1326,8 +1314,8 @@
         }
 
         self.chatd.chatdPersist.getKey(chatId, userId, keyId)
-            .then(function(key) {
-                var keysArr = [
+            .then((key) => {
+                const keys = [
                     {
                         userId: key.userId,
                         keyid: keyId,
@@ -1336,23 +1324,29 @@
                     }
                 ];
 
-                self.chatd.trigger('onMessageKeysDone', {
-                    chatId: chatId,
-                    keys: keysArr,
-                    chatdPersist: true
-                });
+                self.chatd.trigger('onMessageKeysDone', {chatId, keys, chatdPersist: true});
 
-                resolve();
+                // Deal with Error: No cached chat key for user!
+                // at strongvelope.ProtocolHandler.encryptWithKeyId (strongvelope.js:1587:23)
+                // ...
+                // at ChatdIntegration.updateMessage (chatdIntegration.js:1821:34)
+                // @todo double-check other places where .trigger('onMessageKeysDone') is used..
+
+                const chatRoom = megaChat.getChatById(chatId);
+                if (chatRoom) {
+                    return chatRoom._keysAreSeeding;
+                }
             })
-            .catch(function() {
+            .then(resolve)
+            .catch((ex) => {
                 if (d) {
                     console.error("Failed to retrieve key for retrieveAndLoadKeysFor", [
                         chatId,
                         userId,
                         keyId
-                    ]);
+                    ], ex);
                 }
-                reject();
+                reject(ex);
             });
     });
 
@@ -1428,16 +1422,16 @@
      * @returns {Promise} whether succeeded
      */
     ChatdPersist.prototype.modifyPersistedReactions = function(message) {
-        var self = this;
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             assert(message instanceof Message, 'Not a message instance.');
-            const chatId = message.chatRoom.chatId;
-            self.getMessageByMessageId(chatId, message.messageId)
-                .then(function(r) {
+            const {chatId} = message.chatRoom;
+
+            this.getMessageByMessageId(chatId, message.messageId)
+                .then((r) => {
                     if (r && r[0]) {
                         assert(r[0].msgId === message.messageId, 'Unexpected message.');
                         r[0].msgObject._reactions = message._reactions;
-                        self.persistMessageBatched(
+                        this.persistMessageBatched(
                             "replace",
                             chatId,
                             [undefined, Message.fromPersistableObject(megaChat.getChatById(chatId), r[0])]
@@ -1446,13 +1440,13 @@
                     }
                 })
                 .then(resolve)
-                .catch(function(ex) {
-                    if (Array.isArray(ex) && !ex.length) {
-                        self.logger.debug('Message is not yet persisted, deferring saving reactions...', message);
+                .catch((ex) => {
+                    if (ex && ex.name === 'NotFoundError') {
+                        this.logger.debug(`Deferring message reactions under ${message.messageId}@${chatId}`, message);
                         return resolve();
                     }
 
-                    self.logger.error('Cannot persist message reactions...', ex);
+                    this.logger.error('Cannot persist message reactions...', ex);
                     reject(ex);
                 });
         });

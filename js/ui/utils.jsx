@@ -60,12 +60,17 @@ export const withOverflowObserver = Component =>
             overflowed: false
         };
 
-        handleMouseEnter = () => {
+        constructor(props) {
+            super(props);
+            this.handleMouseEnter = this.handleMouseEnter.bind(this);
+        }
+
+        handleMouseEnter() {
             const element = this.ref && this.ref.current;
             if (element) {
                 this.setState({ overflowed: element.scrollWidth > element.offsetWidth });
             }
-        };
+        }
 
         shouldComponentUpdate(nextProps, nextState) {
             return (
@@ -101,7 +106,7 @@ export const Emoji = ({ children }) => {
 export class ParsedHTML extends React.Component {
     ref = React.createRef();
 
-    updateInternalState = () => {
+    updateInternalState() {
         const { children, content } = this.props;
         const ref = this.ref && this.ref.current;
 
@@ -117,7 +122,7 @@ export class ParsedHTML extends React.Component {
             }
             ref.appendChild(parseHTML(children || content));
         }
-    };
+    }
 
     shouldComponentUpdate(nextProps) {
         return (

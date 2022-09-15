@@ -253,7 +253,7 @@
                 typeClass = typeClasses[handle];
             }
             else if (handle.length === 11) {
-                typeClass = 'contact';
+                typeClass = 'contact selectable-txt';
             }
 
             if (name === 'undefined') {
@@ -608,7 +608,7 @@
                 contactElem += '<i class="encrypted-icon sprite-fm-uni icon-ekr"></i>';
                 contactElem += '<span class="nw-contact-status"></span>';
                 contactElem +=
-                    '<span class="nw-contact-name">' +
+                    '<span class="nw-contact-name selectable-txt">' +
                         megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(name))
                     + '</span>';
                 contactElem += '<span class="nw-contact-email">' + escapeHTML(email) + '</span>';
@@ -642,7 +642,7 @@
                     namesCombine = namesCombine.substr(0, 37);
                     namesCombine += '...';
                 }
-                groupElem += '<span class="nw-contact-name group">' +
+                groupElem += '<span class="nw-contact-name group selectable-txt">' +
                     megaChat.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(namesCombine)) +
                     '</span>';
                 groupElem += '<span class="nw-contact-group">' + mega.icu.format(l[24157], nb) + '</span>';
@@ -1619,9 +1619,9 @@
                 .safeHTML(
                     avatar +
                     '<div class="user-card-data no-status">' +
-                    '  <div class="user-card-name small">@@<span class="grey">(@@)</span></div>' +
-                    '  <div class="user-card-email small">@@</div>' +
-                    '  <div class="user-card-email small @@">@@</div>' +
+                    '  <div class="user-card-name small selectable-txt">@@<span class="grey">(@@)</span></div>' +
+                    '  <div class="user-card-email selectable-txt small">@@</div>' +
+                    '  <div class="user-card-email selectable-txt small @@">@@</div>' +
                     '</div>', displayName || '', l[8664], user.m || '', note ? 'note' : '', note || ''
                 );
 

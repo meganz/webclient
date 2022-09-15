@@ -19,6 +19,9 @@ export class TypingArea extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
+        const {chatRoom} = props;
+        this.logger = d && MegaLogger.getLogger("TypingArea", {}, chatRoom && chatRoom.logger || megaChat.logger);
+
         // TODO: deprecate `bind` in favor of arrow functions
         this.onEmojiClicked = this.onEmojiClicked.bind(this);
         this.onTypeAreaKeyUp = this.onTypeAreaKeyUp.bind(this);
@@ -147,9 +150,12 @@ export class TypingArea extends MegaRenderMixin {
         }
 
         if (persist) {
-            const { megaChat } = chatRoom;
-            if (megaChat.plugins.persistedTypeArea) {
-                megaChat.plugins.persistedTypeArea.removePersistedTypedValue(chatRoom);
+            const {persistedTypeArea} = chatRoom.megaChat.plugins;
+            if (persistedTypeArea) {
+                if (d > 2) {
+                    this.logger.info('Removing persisted-typed value...');
+                }
+                persistedTypeArea.removePersistedTypedValue(chatRoom);
             }
         }
 
@@ -356,7 +362,9 @@ export class TypingArea extends MegaRenderMixin {
             self.forceUpdate();
         }
 
-        if ($.trim(e.target.value).length > 0) {
+        const value = $.trim(e.target.value);
+
+        if (value.length) {
             self.typing();
         }
         else {
@@ -365,18 +373,20 @@ export class TypingArea extends MegaRenderMixin {
 
         // persist typed values
         if (this.props.persist) {
-            var megaChat = self.props.chatRoom.megaChat;
-            if (megaChat.plugins.persistedTypeArea) {
-                if ($.trim(e.target.value).length > 0) {
-                    megaChat.plugins.persistedTypeArea.updatePersistedTypedValue(
-                        self.props.chatRoom,
-                        e.target.value
-                    );
+            const {chatRoom} = this.props;
+            const {megaChat} = chatRoom;
+            const {persistedTypeArea} = megaChat.plugins;
+
+            if (persistedTypeArea) {
+                if (d > 2) {
+                    this.logger.debug('%s persisted-typed value...', value.length ? 'Updating' : 'Removing');
+                }
+
+                if (value.length) {
+                    persistedTypeArea.updatePersistedTypedValue(chatRoom, value);
                 }
                 else {
-                    megaChat.plugins.persistedTypeArea.removePersistedTypedValue(
-                        self.props.chatRoom
-                    );
+                    persistedTypeArea.removePersistedTypedValue(chatRoom);
                 }
             }
         }
@@ -415,44 +425,35 @@ export class TypingArea extends MegaRenderMixin {
     }
 
     componentWillMount() {
-        var self = this;
-        var chatRoom = self.props.chatRoom;
-        var megaChat = chatRoom.megaChat;
-        var initialText = self.props.initialText;
+        const {chatRoom, initialText, persist} = this.props;
+        const {megaChat, roomId} = chatRoom;
+        const {persistedTypeArea} = megaChat.plugins;
 
+        if (persist && persistedTypeArea) {
 
-        if (this.props.persist && megaChat.plugins.persistedTypeArea) {
             if (!initialText) {
-                megaChat.plugins.persistedTypeArea.getPersistedTypedValue(chatRoom)
-                    .done(function (r) {
-                        if (typeof r != 'undefined') {
-                            if (!self.state.typedMessage && self.state.typedMessage !== r) {
-                                self.setState({
-                                    'typedMessage': r
-                                });
-                            }
+
+                persistedTypeArea.getPersistedTypedValue(chatRoom)
+                    .then((res) => {
+
+                        if (res && this.isMounted() && !this.state.typedMessage) {
+
+                            this.setState({'typedMessage': res});
                         }
                     })
-                    .fail(function(e) {
-                        if (d) {
-                            console.warn(
-                                "Failed to retrieve persistedTypeArea value for",
-                                chatRoom,
-                                "with error:",
-                                e
-                            );
+                    .catch((ex) => {
+                        if (this.logger && ex !== undefined) {
+                            this.logger.warn(`Failed to retrieve persistedTypeArea for ${roomId}: ${ex}`, [ex]);
                         }
                     });
             }
-            megaChat.plugins.persistedTypeArea.data.rebind(
-                'onChange.typingArea' + self.getUniqueId(),
-                function(e, k, v) {
-                    if (chatRoom.roomId == k) {
-                        self.setState({'typedMessage': v ? v : ""});
-                        self.triggerOnUpdate(true);
-                    }
+
+            persistedTypeArea.addChangeListener(this.getUniqueId(), (e, k, v) => {
+                if (roomId === k) {
+                    this.setState({'typedMessage': v || ''});
+                    this.triggerOnUpdate(true);
                 }
-            );
+            });
         }
     }
 
@@ -461,6 +462,9 @@ export class TypingArea extends MegaRenderMixin {
         var self = this;
         self.triggerOnUpdate();
         // window.removeEventListener('resize', self.handleWindowResize);
+        if (megaChat.plugins.persistedTypeArea) {
+            megaChat.plugins.persistedTypeArea.removeChangeListener(self.getUniqueId());
+        }
         chatGlobalEventManager.removeEventListener('resize', 'typingArea' + self.getUniqueId());
     }
 

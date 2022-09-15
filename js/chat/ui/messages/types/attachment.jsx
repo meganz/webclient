@@ -5,7 +5,9 @@ import { Button } from '../../../../ui/buttons.jsx';
 
 export default class Attachment extends AbstractGenericMessage {
 
-    _isRevoked = node => !M.chd[node.ch] || node.revoked;
+    _isRevoked(node) {
+        return !M.chd[node.ch] || node.revoked;
+    }
 
     _isUserRegistered() {
         return typeof u_type !== 'undefined' && u_type > 2;
@@ -296,7 +298,7 @@ export default class Attachment extends AbstractGenericMessage {
             files.push(
                 <div className={attachmentClasses} key={'atch-' + v.ch}>
                     <div className="message shared-info">
-                        <div className="message data-title">
+                        <div className="message data-title selectable-txt">
                             {l[17669] /* `Uploaded this file:` */}
                             <span className="file-name">{v.name}</span>
                         </div>

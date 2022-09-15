@@ -6,10 +6,6 @@ import { Button } from '../../../../ui/buttons.jsx';
 import { Emoji } from '../../../../ui/utils.jsx';
 
 export default class Contact extends AbstractGenericMessage {
-    constructor(props) {
-        super(props);
-    }
-
     DIALOG = {
         ADDED: addedEmail =>
             // `Contact invited`
@@ -20,9 +16,11 @@ export default class Contact extends AbstractGenericMessage {
             msgDialog('warningb', '', l[17545])
     };
 
-    _doAddContact = contactEmail => M.inviteContact(M.u[u_handle] ? M.u[u_handle].m : u_attr.email, contactEmail);
+    _doAddContact(contactEmail) {
+        return M.inviteContact(M.u[u_handle] ? M.u[u_handle].m : u_attr.email, contactEmail);
+    }
 
-    _handleAddContact = contactEmail => {
+    _handleAddContact(contactEmail) {
         // Anonymous view -> no `M.opc` available for this state; invoke directly contact request.
         // Render the resulting message dialog (`The user has been invited [...]` or `Invite already sent [...]`)
         // based on the actual API response.
@@ -39,15 +37,17 @@ export default class Contact extends AbstractGenericMessage {
                 this._doAddContact(contactEmail)
                     .done(addedEmail => this.DIALOG.ADDED(addedEmail))
         );
-    };
+    }
 
-    _getContactAvatar = (contact, className) => (
-        <Avatar
-            className={`avatar-wrapper ${className}`}
-            contact={M.u[contact.u]}
-            chatRoom={this.props.chatRoom}
-        />
-    );
+    _getContactAvatar(contact, className) {
+        return (
+            <Avatar
+                className={`avatar-wrapper ${className}`}
+                contact={M.u[contact.u]}
+                chatRoom={this.props.chatRoom}
+            />
+        );
+    }
 
     _getContactDeleteButton(message) {
         if (message.userId === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT) {
@@ -152,7 +152,7 @@ export default class Contact extends AbstractGenericMessage {
         let contacts = [];
 
         attachmentMeta.forEach((v) => {
-            const contact = M.u && v.u in M.u ? M.u[v.u] : v;
+            const contact = M.u && v.u in M.u && M.u[v.u].m ? M.u[v.u] : v;
             const contactEmail = contact.email ? contact.email : contact.m;
 
             if (!M.u[contact.u]) {
@@ -173,13 +173,13 @@ export default class Contact extends AbstractGenericMessage {
                 ...contacts,
                 <div key={contact.u}>
                     {!isAnonView ? <div className="message shared-info">
-                        <div className="message data-title">
+                        <div className="message data-title selectable-txt">
                             <Emoji>{M.getNameByHandle(contact.u)}</Emoji>
                         </div>
                         {M.u[contact.u] ?
                             <ContactVerified className="right-align" contact={M.u[contact.u]}/> :
                             null}
-                        <div className="user-card-email">{contactEmail}</div>
+                        <div className="user-card-email selectable-txt">{contactEmail}</div>
                     </div> : <div className="message shared-info"></div>}
                     <div className="message shared-data">
                         <div className="data-block-view semi-big">

@@ -9,10 +9,6 @@ export default class Giphy extends AbstractGenericMessage {
 
     state = { src: undefined };
 
-    constructor(props) {
-        super(props);
-    }
-
     onVisibilityChange(isIntersecting) {
         this.setState({ src: isIntersecting ? API.convert(this.props.message.meta.src) : undefined }, () => {
             this.gifRef?.current?.[isIntersecting ? 'load' : 'pause']();
@@ -20,10 +16,10 @@ export default class Giphy extends AbstractGenericMessage {
         });
     }
 
-    toggle = () => {
+    toggle() {
         const video = this.gifRef.current;
         video[video.paused ? 'play' : 'pause']();
-    };
+    }
 
     getMessageActionButtons() {
         const { onDelete, message } = this.props;
@@ -42,7 +38,8 @@ export default class Giphy extends AbstractGenericMessage {
                         <DropdownItem
                             icon="sprite-fm-mono icon-dialog-close"
                             label={l[1730]}
-                            onClick={e => onDelete(e, message)}/>
+                            onClick={e => onDelete(e, message)}
+                        />
                     </Dropdown>
                 </Button>
             ),

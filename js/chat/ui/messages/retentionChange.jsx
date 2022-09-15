@@ -11,7 +11,7 @@ export class RetentionChange extends ConversationMessageMixin {
         return (
             <div className="message body" data-id={"id" + message.messageId} key={message.messageId}>
                 <Avatar contact={contact} className="message avatar-wrapper small-rounded-avatar"/>
-                <div className="message content-area small-info-txt">
+                <div className="message content-area small-info-txt selectable-txt">
                     <ContactButton
                         contact={contact}
                         className="message"

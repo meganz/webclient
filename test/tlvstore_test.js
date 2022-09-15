@@ -111,10 +111,46 @@ describe("tlvstore unit test", function() {
             var test = atob('Zm9vAAADYmFycHVFZDI1NQAAIMOXWsKYAcKCwrEKwrfDlUvDvsOTw4lkBzoOw6Fyw7PDmsKmIyXCrwIaaMO3B1Ea');
             var expected = {'foo': 'bar', 'puEd255': ED25519_PUB_KEY};
             assert.deepEqual(ns.tlvRecordsToContainer(test, true), expected);
-            assert.strictEqual(ns._logger._log.args[0][0],
-                               'Inconsistent TLV decoding. Maybe content UTF-8 encoded?');
-            assert.strictEqual(ns._logger._log.args[1][0],
-                               'Retrying to decode TLV container legacy style ...');
+            assert.strictEqual(ns._logger._log.args[0][0], 'Inconsistent TLV decoding. Maybe content UTF-8 encoded?');
+            assert.strictEqual(ns._logger._log.args[1][0], 'Retrying to decode TLV container legacy style ...');
+        });
+
+        it("encrypt/decrypt UTF8-aware payloads per record, not at container)", function() {
+            const key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
+            const keya = [252579084, 185207048, 117835012, 50462976];
+
+            const tests = [
+                '42', "Don't panic!", 'Flying Spaghetti Monster', "Ph'nglui R'lyeh wgah'ñagl.",
+                'Tēnā koe', 'Hänsel & Gretel', 'Слартибартфаст', 'c\u0327a va', 'Boo \u{1f4a3}!'
+            ];
+            const ciphers = [
+                'EGbyV29oLIf__3DrXdd5XKEvksEYe6QNglUNelj5cU6v8A',
+                'EGbyMW8_LIf__xjrXRqJkiheoE7zxWHzPtn_MDoX62aaC80WUP3rEEQt43s',
+                'EGfyV28OLIf__yfrXbrp3LV-bUW2ZqQDEZKtVOnhbN_LQTNHE_RNkFc8V-kZVuFCnjmFksIgXxY',
+                'EGXyMG9ZLIf__ynrXY0WMvQyKJHY2kO9QKYkjCOuGVLLZZd5SCjJhdz-qNDOAGWmN_fx90MkMjoy4u0',
+                'EGbyVW9pLIf__3DrXZhASAG_Z-JwUm51uTFY9zNfVsMYSA_IbIkbDZsh',
+                'EGLyM288LIf__xnrXRNJz9dwXkYIBHTGvy2y9CwwKW_hdtWDnklFa5n7t6HPewzI',
+                'EGfyUW8PLIf__yXrXfehQJiMU0K-1J_YNYQk1THtjO73lOcqweExcylsNJWAxOL1qziK1EcebB0aKeiR',
+                'EGHyNm9eLIf__yrrXRqCWWTywMOCtqvnUQSGrt1tkcAN3_4WIcyL',
+                'EGbyV29oLIf__3TrXf6Pgf2NqYIPNST5WQRTDPjCKccCRv4Y1u08RYI'
+            ];
+            const nonce = new Uint8Array([110, 242, 49, 111, 63, 44, 135, 255, 255, 28, 235, 93]);
+            mStub(mega, 'getRandomValues').returns(nonce);
+
+            for (let i = tests.length; i--;) {
+                nonce[0] ^= i;
+                nonce[2] ^= nonce[0];
+                nonce[4] ^= nonce[2];
+                nonce[9] ^= nonce[4];
+
+                const cipher = ns.encrypt(tests[i], 0, key);
+                assert.strictEqual(cipher, ciphers[i]);
+
+                const plain = ns.decrypt(cipher, {}, keya);
+                assert.strictEqual(tests[i], plain);
+            }
+
+            mega.getRandomValues.restore();
         });
     });
 
@@ -180,24 +216,21 @@ describe("tlvstore unit test", function() {
                      [ns.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16, 12]];
         var iv = asmCrypto.hex_to_bytes('000102030405060708090a0b0c0d0e0f');
         var key = asmCrypto.bytes_to_string(asmCrypto.hex_to_bytes('0f0e0d0c0b0a09080706050403020100'));
+        var key2 = [252579084, 185207048, 117835012, 50462976];
 
         it("blockEncrypt", function() {
             for (var i = 0; i < modes.length; i++) {
                 var mode = modes[i][0];
                 // Make the correct nonce size and stub it in.
                 var nonce = new Uint8Array(iv.subarray(0, modes[i][1]));
-                var _copy = function(x) {
-                    for (var i = 0; i < x.length; i++) {
-                        x[i] = nonce[i];
-                    }
-                };
-                mStub(asmCrypto, 'getRandomValues').callsFake(_copy);
+                mStub(mega, 'getRandomValues').returns(nonce);
                 for (var j = 0; j < clearVectors.length; j++) {
                     var clear = clearVectors[j];
-                    assert.strictEqual(btoa(ns.blockEncrypt(clear, key, mode, true)),
-                                       cipherVectors[i * clearVectors.length + j]);
+                    var cip = cipherVectors[i * clearVectors.length + j];
+                    assert.strictEqual(btoa(ns.blockEncrypt(clear, key, mode, true)), cip);
+                    assert.strictEqual(btoa(ns.blockEncrypt(clear, key2, mode, true)), cip);
                 }
-                asmCrypto.getRandomValues.restore();
+                mega.getRandomValues.restore();
             }
         });
 

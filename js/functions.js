@@ -593,90 +593,169 @@ function fastHashFunction(val) {
  * @param validateFunction {Function}
  * @param tick {int}
  * @param timeout {int}
- * @param [resolveRejectArgs] {(Array|*)} args that will be used to call back .resolve/.reject
  * @param [waitForPromise] {(MegaPromise|$.Deferred)} Before starting the timer, we will wait for this promise to be rej/res first.
  * @param [name] {String} optional name for the debug output of the error/debug messages
- * @returns {Deferred}
+ * @returns {Promise}
  */
-function createTimeoutPromise(validateFunction, tick, timeout,
-                              resolveRejectArgs, waitForPromise, name) {
-    var tickInterval = false;
-    var timeoutTimer = false;
+function createTimeoutPromise(validateFunction, tick, timeout, waitForPromise, name) {
+    'use strict';
+    let _res, _rej;
+    let running = true;
+    let state = 'pending';
+    const debug = window.d > 2;
+    const tag = (m) => `[${name}] ${m}`;
+    const log = (m, ...args) => console.warn(tag(m), ...args);
 
-    var $promise = new MegaPromise();
-    resolveRejectArgs = resolveRejectArgs || [];
-    if (!Array.isArray(resolveRejectArgs)) {
-        resolveRejectArgs = [resolveRejectArgs];
-    }
+    const promise = new Promise((resolve, reject) => {
+        _rej = reject;
+        _res = resolve;
 
-    $promise.verify = SoonFc(20, function _ctpVerify() {
-        if (validateFunction()) {
-            if (window.d && typeof(window.promisesDebug) !== 'undefined') {
-                console.debug("Resolving timeout promise", name,
-                    timeout, "ms", "at", (new Date()).toISOString(),
-                    validateFunction, resolveRejectArgs);
-            }
-            $promise.resolve.apply($promise, resolveRejectArgs);
+        tick |= 0;
+        timeout = Math.max(0, timeout | 0);
+        name = `cTP.${name || makeUUID().slice(-17)}.${++mIncID}`;
+
+        if (debug) {
+            log('Creating timeout promise...', tick, timeout);
         }
-    });
+        let threshold = performance.now();
 
-    $promise.stopTimers = function() {
-        if (tickInterval !== false) {
-            clearInterval(tickInterval);
-        }
+        assert(typeof validateFunction === 'function', tag('Function expected'));
+        assert(tick > 100, tag(`at least 100ms are expected, ${tick} provided.`));
+        assert(timeout > tick && timeout < 6e5, tag(`Invalid timeout value (${timeout})`));
+        validateFunction = tryCatch(validateFunction);
 
-        if (timeoutTimer !== false) {
-            clearTimeout(timeoutTimer);
-        }
-    };
+        Promise.resolve(waitForPromise)
+            .then(async() => {
+                let duration = 0;
+                const int = tick / 1e3;
 
+                if (debug) {
+                    threshold -= performance.now();
 
-    var startTimerChecks = function() {
-        tickInterval = setInterval(function() {
-            $promise.verify();
-        }, tick);
+                    if (threshold > 10) {
+                        log('Begin took %sms%s', threshold, waitForPromise ? '' : ', tab throttled(?!)');
+                    }
 
-        timeoutTimer = setTimeout(function() {
-            if (validateFunction()) {
-                if (window.d && typeof(window.promisesDebug) !== 'undefined') {
-                    console.debug("Resolving timeout promise", name,
-                        timeout, "ms", "at", (new Date()).toISOString(),
-                        validateFunction, resolveRejectArgs);
+                    // @todo add threshold to duration if !waitForPromise (?)
                 }
-                $promise.resolve.apply($promise, resolveRejectArgs);
-            }
-            else {
-                console.error("Timed out after waiting", name,
-                    timeout, "ms", "at", (new Date()).toISOString(), $promise.state(),
-                    validateFunction, resolveRejectArgs);
-                $promise.reject.apply($promise, resolveRejectArgs);
-            }
-        }, timeout);
 
-        $promise.verify();
-    };
+                if (validateFunction()) {
+                    if (debug) {
+                        log('The validator resolved immediately...', waitForPromise);
+                    }
+                    state = 'placebo';
+                    return -1;
+                }
 
-    // stop any running timers and timeouts
-    $promise.always(function() {
-        $promise.stopTimers();
+                if (debug) {
+                    threshold = performance.now();
+                }
+
+                while (running) {
+                    await sleep(int);
+
+                    if (debug) {
+                        const now = performance.now();
+                        const diff = now - threshold;
+
+                        if (diff > tick * 1.8) {
+                            log('Tab throttled? did sleep for %sms while %sms were expected...', diff, tick);
+                        }
+                        threshold = now;
+                    }
+
+                    duration += tick;
+                    running = !validateFunction();
+
+                    if (duration > timeout) {
+                        break;
+                    }
+                }
+
+                if (running) {
+                    if (debug) {
+                        log(`Timed out after waiting ${duration}ms`, promise);
+                    }
+
+                    state = 'expired';
+                    throw new Error('Timed out.');
+                }
+
+                if (state === 'aborted') {
+                    // xxx: backward compatibility, but rather bogus leaving a dangling promise there..
+                    resolve = nop;
+                    Object.defineProperty(promise, 'aborted', {value: Date.now()});
+                    Object.freeze(promise);
+                    return;
+                }
+
+                if (debug) {
+                    log(`Resolved timeout promise after waiting ${duration}ms...`, promise);
+                }
+                state = 'fulfilled';
+
+            })
+            .then((a0) => resolve(a0))
+            .catch(reject);
+
+    }).finally(() => {
+        running = false;
+
+        if (debug) {
+            createTimeoutPromise.instances.delete(promise);
+        }
     });
 
-
-    if (!waitForPromise || !waitForPromise.done) {
-        startTimerChecks();
+    if (debug) {
+        promise.tick = tick;
+        promise.timeout = timeout;
+        createTimeoutPromise.instances.add(promise);
     }
-    else {
-        waitForPromise
-            .done(function() {
-                startTimerChecks();
+
+    return Object.defineProperties(promise, {
+        state: {
+            get() {
+                return state;
+            }
+        },
+
+        verify: {
+            value: queueMicrotask.bind(null, () => {
+                if (validateFunction()) {
+                    if (debug) {
+                        log("Resolving timeout promise", state, promise);
+                    }
+                    promise.resolve(0);
+                }
             })
-            .fail(function() {
-                $promise.reject();
-            });
-    }
+        },
 
-    return $promise;
+        stopTimers: {
+            value: () => {
+                running = false;
+                state = 'aborted';
+            }
+        },
+
+        name: {
+            value: name
+        },
+
+        resolve: {
+            value: _res
+        },
+
+        reject: {
+            value: _rej
+        }
+    });
 }
+
+/** @property createTimeoutPromise.instances */
+lazy(createTimeoutPromise, 'instances', () => {
+    'use strict';
+    return new WeakSet();
+});
 
 /**
  * Assertion exception.

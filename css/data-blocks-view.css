@@ -212,6 +212,13 @@
     margin-right: 4px;
     background-image: none;
 }
+.data-block-view .shared-folder-info {
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--text-color-medium);
+}
 .data-block-view:hover .file-settings-icon,
 .data-block-view.ui-selected .file-settings-icon,
 .properties-name-block:hover .file-settings-icon {

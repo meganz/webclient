@@ -251,7 +251,11 @@
     word-wrap: break-word;
     min-height: 20px;
     position: relative;
+    user-select: text;
     white-space: pre-wrap;
+}
+.message.text-block a {
+    user-select: text;
 }
 .message.text-block.scroll {
     max-height: 60px;
@@ -860,6 +864,13 @@
 .message.call-inner-block > .small-rounded-avatar {
     position: relative;
     z-index: 1;
+}
+.message.call-inner-block .avatar-wrapper {
+    float: right;
+    margin: 0 0 0 -12px;
+}
+.in-call .message.call-inner-block .avatar-wrapper {
+    margin: 0 0 3px -14px;
 }
 
 .message .audio-player {

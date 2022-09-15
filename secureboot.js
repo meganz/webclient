@@ -2151,7 +2151,8 @@ if (showLegacyMobilePage) {
 
     // AMO: Markup should not be passed to `innerHTML` dynamically. -- This isnt reached for the extension, anyway
     // jscs:disable
-    document.body.innerHTML = '<div class="bottom-page scroll-block"><div class="main-content-block">'
+    // eslint-disable-next-line no-unsanitized/property, no-restricted-properties
+    document.body.innerHTML = '<div class="bottom-page scroll-block selectable-txt"><div class="main-content-block">'
                             + '<div class="main-centered-bl">'
                             + '<div class="main-logo"></div><div class="main-head-txt" id="m_title"></div>'
                             + '<div class="main-head-txt" id="m_desc"></div><br /><br />'
@@ -2684,7 +2685,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
     jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
     jsl.push({f:'js/utils/splitter.js', n: 'js_utils_splitter_js', j: 1});
-    jsl.push({f:'js/utils/stringcrypt.js', n: 'js_utils_stringcrypt_js', j: 1});
     jsl.push({f:'js/utils/test.js', n: 'js_utils_test_js', j: 1});
     jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
     jsl.push({f:'js/utils/watchdog.js', n: 'js_utils_watchdog_js', j: 1});
@@ -2902,7 +2902,6 @@ else if (!browserUpdate) {
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3266,7 +3265,6 @@ else if (!browserUpdate) {
             jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
             jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
             jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-            jsl.push({f:'css/important.css', n: 'important_css', j:2, w:30, c:1, d:1, cache:1});
         }
 
         // end of staticPages
@@ -3414,7 +3412,6 @@ else if (!browserUpdate) {
             'chat_typing_css':{f:'css/chat-typing.css', n: 'chat_typing_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_left_pane_css':{f:'css/chat-left-pane.css', n: 'chat_left_pane_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_feedback_css':{f:'css/chat-feedback.css', n: 'chat_feedback_css', j:2,'w':5,'c':1,'cache':1,'d':1},
-            'chat_calls_css':{f:'css/chat-calls.css', n: 'chat_calls_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_common_css':{f:'css/chat-common.css', n: 'chat_common_css', j:2,'w':5,'c':1,'cache':1,'d':1},
             'chat_emoji_css':{f:'css/chat-emoji.css', n: 'chat_emoji_css', j:2,'w':2,'c':1,'cache':1,'d':1},
             'chat_history_retention_css':{f:'css/chat-history-retention.css', n: 'chat_history_retention_css', j:2,'w':2,'c':1,'cache':1,'d':1},

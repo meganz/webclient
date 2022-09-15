@@ -29,6 +29,14 @@
 .visible {
     opacity: 1 !important;
 }
+.selectable-txt,
+.selectable-txt *,
+input,
+textarea,
+.mega-dialog p {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
 
 /* Light mode */
 /* TEXT: */

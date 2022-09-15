@@ -115,7 +115,7 @@
                     }
                 }
                 if (handle.length === 11) {
-                    typeClass = 'contact';
+                    typeClass = 'contact selectable-txt';
 
                     // Contact should not appears on other than chat/contact pages
                     if (M.currentrootid !== 'chat') {
@@ -375,8 +375,7 @@
                             data-id="${item}" id="pathbc-${item}">
                             <span
                                 class="right-arrow-bg simpletip simpletip-tc">
-                                ${isRoot ?
-                                    `<span class="not-loading">
+                                ${isRoot ? `<span class="not-loading selectable-txt">
                                         ${name}
                                     </span>
                                     <i class="loading sprite-fm-theme icon-loading-spinner"></i>` : name}

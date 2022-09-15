@@ -3,6 +3,7 @@ import { MegaRenderMixin } from '../../../mixins';
 import { Avatar } from '../../contacts.jsx';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';
+import Call from '../call.jsx';
 import { Emoji } from '../../../../ui/utils.jsx';
 
 export default class Incoming extends MegaRenderMixin {
@@ -10,11 +11,13 @@ export default class Incoming extends MegaRenderMixin {
 
     state = {
         video: false,
+        unsupported: undefined,
         hoveredSwitch: true
     };
 
     constructor(props) {
         super(props);
+        this.state.unsupported = !megaChat.hasSupportForCalls;
     }
 
     componentDidMount() {
@@ -52,16 +55,21 @@ export default class Incoming extends MegaRenderMixin {
     };
 
     renderAnswerControls = () => {
-        const { video } = this.state;
+        const { video, unsupported } = this.state;
         const { onAnswer, onToggleVideo } = this.props;
 
         return (
             <>
                 <Button
-                    className="mega-button positive answer"
+                    className={`
+                        mega-button
+                        positive
+                        answer
+                        ${unsupported ? 'disabled' : ''}
+                    `}
                     icon="icon-phone"
-                    simpletip={{ position: 'top', label: l[7205] /* `Answer` */ }}
-                    onClick={onAnswer}>
+                    simpletip={unsupported ? null : { position: 'top', label: l[7205] /* `Answer` */ }}
+                    onClick={unsupported ? null : onAnswer}>
                     <span>{l[7205] /* `Answer` */}</span>
                 </Button>
                 <Button
@@ -71,15 +79,18 @@ export default class Incoming extends MegaRenderMixin {
                         round
                         video
                         ${video ? '' : 'negative'}
+                        ${unsupported ? 'disabled' : ''}
                     `}
                     icon={video ? 'icon-video-call-filled' : 'icon-video-off'}
-                    simpletip={{
-                        position: 'top',
-                        label: video ?
-                            l[22894] /* `Disable video` */ :
-                            l[22893] /* `Enable video` */
-                    }}
-                    onClick={() => this.setState({ video: !video }, () => onToggleVideo(video))}>
+                    simpletip={
+                        unsupported ?
+                            null :
+                            {
+                                position: 'top',
+                                label: video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */
+                            }
+                    }
+                    onClick={() => unsupported ? null : this.setState({ video: !video }, () => onToggleVideo(video))}>
                     <span>
                         {video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */}
                     </span>
@@ -92,8 +103,9 @@ export default class Incoming extends MegaRenderMixin {
         const { chatRoom } = this.props;
 
         if (chatRoom) {
-            const { callerId, onClose, onReject } = this.props;
             const { NAMESPACE } = Incoming;
+            const { callerId, onClose, onReject } = this.props;
+            const { unsupported } = this.state;
             const CALL_IN_PROGRESS = window.sfuClient;
             const isPrivateRoom = chatRoom.type === 'private';
             const rejectLabel = isPrivateRoom ? l[20981] /* `Reject` */ : l[82] /* `Cancel` */;
@@ -103,7 +115,6 @@ export default class Incoming extends MegaRenderMixin {
                     {...this.state}
                     name={NAMESPACE}
                     className={NAMESPACE}
-                    noCloseOnClickOutside={true}
                     onClose={() => onClose()}>
                     <div className="fm-dialog-body">
                         <div className={`${NAMESPACE}-avatar`}>
@@ -123,14 +134,25 @@ export default class Incoming extends MegaRenderMixin {
                                 ${CALL_IN_PROGRESS ? 'call-in-progress' : ''}
                             `}>
                             <Button
-                                className="mega-button large round negative"
+                                className={`
+                                    mega-button
+                                    large
+                                    round
+                                    negative
+                                    ${unsupported ? 'disabled' : ''}
+                                `}
                                 icon="icon-end-call"
-                                simpletip={{ position: 'top', label: rejectLabel }}
-                                onClick={onReject}>
+                                simpletip={unsupported ? null : { position: 'top', label: rejectLabel }}
+                                onClick={unsupported ? null : onReject}>
                                 <span>{rejectLabel}</span>
                             </Button>
                             {CALL_IN_PROGRESS ? this.renderSwitchControls() : this.renderAnswerControls()}
                         </div>
+                        {unsupported && (
+                            <div className={`${NAMESPACE}-unsupported`}>
+                                <div className="unsupported-message">{Call.getUnsupportedBrowserMessage()}</div>
+                            </div>
+                        )}
                     </div>
                 </ModalDialogsUI.ModalDialog>
             );

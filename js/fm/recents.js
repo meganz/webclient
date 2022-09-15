@@ -37,10 +37,13 @@ function RecentsRender() {
     this.scrollDiv = this.$scrollDiv[0];
     this.$content = this.$container.find(".fm-recents.content");
     this.$noContent = this.$container.find(".fm-recents.no-content");
+    this.$disabledContent = this.$container.find(".fm-recents.disabled-content");
+    this.$buttonEnableRecents = this.$disabledContent.find("button");
     this._$titleTemplate = this.getTemplate("title-template");
 
     this.currentLimit = false;
     this.currentUntil = false;
+    this._showRecents = this._getConfigShow();
     this._rendered = false;
     this._maxFitOnScreen = false;
     this._resizeListeners = [];
@@ -115,6 +118,7 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
     $('.fm-right-files-block').addClass('hidden');
     $('.top-head').find(".recents-tab-link").removeClass("hidden").addClass('active');
     this.$container.removeClass('hidden');
+
     M.viewmode = 1;
     M.v = this._view;
     if (!this._rendered) {
@@ -158,14 +162,27 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
 RecentsRender.prototype._initialRender = function(actions) {
     'use strict';
     var self = this;
-    if (actions.length === 0) {
+    if (!this._showRecents) {
+        this.recentActions = actions;
+        this._view = [];
+        M.v = this._view;
+        this.$disabledContent.removeClass('hidden');
+        this.$noContent.addClass('hidden');
+        this.$content.addClass('hidden');
+
+        this.$buttonEnableRecents
+            .rebind('click.enableRecents', () => this._setConfigShow(1));
+    }
+    else if (actions.length === 0) {
         this.recentActions = actions;
         this._view = [];
         M.v = this._view;
         this.$noContent.removeClass('hidden');
+        this.$disabledContent.addClass('hidden');
         this.$content.addClass('hidden');
     } else {
         self.$noContent.addClass('hidden');
+        self.$disabledContent.addClass('hidden');
         this.recentActions = actions;
         if (this._rendered) {
             this._dynamicList.destroy();
@@ -1168,6 +1185,46 @@ RecentsRender.prototype.reset = function() {
         this._dynamicList.destroy();
         this._dynamicList = false;
     }
+};
+
+/**
+ * @returns {boolean} true if recents config has changed
+ */
+RecentsRender.prototype.hasConfigChanged = function() {
+    'use strict';
+    return this._showRecents !== this._getConfigShow();
+};
+
+/**
+ * To be used on recents config change
+ * @returns {void}
+ */
+RecentsRender.prototype.onConfigChange = function() {
+    'use strict';
+    this._showRecents = this._getConfigShow();
+    this._rendered = false;
+    if (this._dynamicList) {
+        this._dynamicList.destroy();
+        this._dynamicList = false;
+    }
+};
+
+/**
+ * @returns {boolean} get show recents value from mega configuration
+ */
+RecentsRender.prototype._getConfigShow = function() {
+    'use strict';
+    return mega.config.get('showRecents');
+};
+
+/**
+ * set show recents value in mega configuration
+ * @param {boolean} val new value
+ * @returns {void}
+ */
+RecentsRender.prototype._setConfigShow = function(val) {
+    'use strict';
+    mega.config.setn('showRecents', val);
 };
 
 /**

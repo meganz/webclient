@@ -172,7 +172,6 @@ function Chat() {
         this,
         {
             "currentlyOpenedChat": null,
-            "displayArchivedChats": false,
             "activeCall": null,
             'routingSection': null,
             'routingSubSection': null,
@@ -342,28 +341,6 @@ Chat.prototype.init = promisify(function(resolve, reject) {
         })
         .then(resolve)
         .catch(reject);
-
-    const bpcListener = mBroadcaster.addListener("beforepagechange", (page) => {
-        // Reduce flickering when coming back to chat + ensure the ContactsPanel's components are properly destroyed
-
-        if (page.includes('chat') && page !== 'securechat') {
-            return;
-        }
-
-        if (megaChat.routingSection) {
-            if (String(M.currentdirid).substr(0, 4) === "chat") {
-                // We always want to hide the chat, when the user is not really in chat, so
-                // we need to reset M.currentdirid, so that on next M.openFolder, it would go and
-                // reinitialize/reroute the chat. This would solve potential issues with bugs in the type of
-                // Chat -> Static page -> Chat
-                delete M.currentdirid;
-            }
-            megaChat.routingParams = megaChat.routingSection = megaChat.routingSubSection = null;
-            // update immediately, otherwise the ConversationsApp may become invisible and no unmounts would be done
-            this.$conversationsAppInstance?.forceUpdate();
-        }
-    });
-    this.mbListeners.push(bpcListener);
 });
 
 Chat.prototype._syncDnd = function() {
@@ -402,6 +379,34 @@ Chat.prototype.loadChatUIFlagsFromConfig = function(val) {
     }
 
     return hadChanged;
+};
+
+/**
+ * Cleanup chat state when navigating away from it.
+ * @param {Boolean} [clean] full cleanup to reinitialize/reroute the chat if a loadSubPage() will follow.
+ * @returns {void}
+ */
+Chat.prototype.cleanup = function(clean) {
+    const room = this.getCurrentRoom();
+    if (room) {
+        room.hide();
+    }
+
+    const {$conversationsAppInstance: app} = this;
+    if (app) {
+        // update immediately, otherwise the app may become invisible and no unmounts would be done.
+        tryCatch(() => app.forceUpdate())();
+    }
+
+    M.chat = false;
+    this.routingParams = null;
+    this.routingSection = null;
+    this.routingSubSection = null;
+
+    if (clean) {
+        // a loadSubPage() will follow.
+        M.currentdirid = page = false;
+    }
 };
 
 /**
@@ -831,12 +836,16 @@ Chat.prototype.dropAllDatabases = promisify(function(resolve, reject) {
         promises.push(chatd.chatdPersist.drop());
     }
 
-    if (chatd.messagesQueueKvStorage) {
-        promises.push(chatd.messagesQueueKvStorage.clear());
+    if ('messagesQueueKvStorage' in chatd) {
+        promises.push(chatd.messagesQueueKvStorage.destroy());
     }
 
-    if (Reactions.hasOwnProperty('_db')) {
-        promises.push(Reactions._db.clear());
+    if (Reactions.ready) {
+        promises.push(Reactions._db.destroy());
+    }
+
+    if (PersistedTypeArea.ready) {
+        promises.push(PersistedTypeArea._db.destroy());
     }
 
     Promise.allSettled(promises).then(resolve).catch(reject);
@@ -1219,7 +1228,7 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
 
         if (type === "group") {
             // @todo couldn't this race?
-            ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle);
+            ChatdIntegration._ensureKeysAreLoaded([], userHandles, chatHandle).catch(dump);
         }
         ChatdIntegration._ensureContactExists(userHandles, chatHandle);
     }
@@ -1287,10 +1296,8 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
  * Wrapper around openChat() that does wait for the chat to be ready.
  * @see Chat.openChat
  */
-Chat.prototype.smartOpenChat = function() {
-    'use strict';
+Chat.prototype.smartOpenChat = function(...args) {
     var self = this;
-    var args = toArray.apply(null, arguments);
 
     if (typeof args[0] === 'string') {
         // Allow to provide a single argument which defaults to opening a private chat with such user
@@ -1300,7 +1307,7 @@ Chat.prototype.smartOpenChat = function() {
         }
     }
 
-    return new MegaPromise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
 
         // Helper function to actually wait for a room to be ready once we've got it.
         var waitForReadyState = function(aRoom, aShow) {
@@ -1319,7 +1326,8 @@ Chat.prototype.smartOpenChat = function() {
                 return ready();
             }
 
-            createTimeoutPromise(verify, 300, 3e4).then(ready).catch(reject);
+            const {roomId} = aRoom;
+            createTimeoutPromise(verify, 300, 3e4, false, `waitForReadyState(${roomId})`).then(ready).catch(reject);
         };
 
         // Check whether we can prevent the actual call to openChat()
@@ -1364,7 +1372,13 @@ Chat.prototype.smartOpenChat = function() {
 
                 waitForReadyState(aRoom);
 
-            }).catch(reject);
+            }).catch(ex => {
+                if (ex === EACCESS) {
+                    // API denied access to the room so discard it
+                    room.destroy();
+                }
+                reject(ex);
+            });
         }
     });
 };
@@ -1426,22 +1440,23 @@ Chat.prototype.hideChat = function(roomJid) {
  * @param val
  */
 Chat.prototype.sendMessage = function(roomJid, val) {
-    var self = this;
+    const fail = (ex) => {
+        this.logger.error(`sendMessage(${roomJid}) failed.`, ex);
+    };
 
     // queue if room is not ready.
-    if (!self.chats[roomJid]) {
-        self.logger.warn("Queueing message for room: ", roomJid, val);
+    if (!this.chats[roomJid]) {
+        this.logger.warn("Queueing message for room: ", roomJid, val);
 
-        createTimeoutPromise(function() {
-            return !!self.chats[roomJid]
-        }, 500, self.options.delaySendMessageIfRoomNotAvailableTimeout)
-            .done(function() {
-                self.chats[roomJid].sendMessage(val);
-            });
+        const timeout = this.options.delaySendMessageIfRoomNotAvailableTimeout;
+        return createTimeoutPromise(() => !!this.chats[roomJid], 500, timeout)
+            .then(() => {
+                return this.chats[roomJid].sendMessage(val);
+            })
+            .catch(fail);
     }
-    else {
-        self.chats[roomJid].sendMessage(val);
-    }
+
+    return this.chats[roomJid].sendMessage(val).catch(fail);
 };
 
 
@@ -1533,9 +1548,11 @@ Chat.prototype.getChatNum = function(idx) {
     return this.chats[this.chats.keys()[idx]];
 };
 
-Chat.prototype.navigate = promisify(function megaChatNavigate(resolve, reject, location, event, isLandingPage) {
-    this.routing.route(resolve, reject, location, event, isLandingPage);
-});
+Chat.prototype.navigate = function megaChatNavigate(location, event, isLandingPage) {
+    return new Promise((resolve, reject) => {
+        this.routing.route(resolve, reject, location, event, isLandingPage);
+    });
+};
 
 if (is_mobile) {
     Chat.prototype.navigate = function(location, event, isLandingPage) {
@@ -1558,10 +1575,10 @@ if (is_mobile) {
  *
  * @returns boolean true if room was automatically shown and false if the listing page is shown
  */
-Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve, reject, location, isInitial) {
+Chat.prototype.renderListing = async function megaChatRenderListing(location, isInitial) {
     if (!isInitial && !M.chat) {
         console.debug('renderListing: Not in chat.');
-        return reject(EACCESS);
+        throw EACCESS;
     }
     M.hideEmptyGrids();
     this.refreshConversations();
@@ -1600,7 +1617,7 @@ Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve,
     if (location) {
         $('.fm-empty-conversations').addClass('hidden');
 
-        this.navigate(location, undefined, isInitial)
+        return this.navigate(location, undefined, isInitial)
             .catch((ex) => {
                 if (d) {
                     this.logger.warn('Failed to navigate to %s...', location, room, ex);
@@ -1612,15 +1629,11 @@ Chat.prototype.renderListing = promisify(function megaChatRenderListing(resolve,
                     room.destroy();
                 });
                 throw ex;
-            })
-            .then(resolve)
-            .catch(reject);
-
-        return;
+            });
     }
 
-    resolve(ENOENT);
-});
+    return ENOENT;
+};
 
 /**
  * Inject the list of attachments for the current room into M.v
@@ -2324,23 +2337,26 @@ Chat.prototype.getChatById = function(chatdId) {
  * @returns {Promise}
  * @private
  */
-Chat.prototype.getMessageByMessageId = promisify(function(resolve, reject, chatId, messageId) {
-    var chatRoom = this.getChatById(chatId);
-    var msg = chatRoom.messagesBuff.getMessageById(messageId);
+Chat.prototype.getMessageByMessageId = async function(chatId, messageId) {
+    const chatRoom = this.getChatById(chatId);
+    const msg = chatRoom.messagesBuff.getMessageById(messageId);
     if (msg) {
-        return resolve(msg);
+        return msg;
     }
 
-    var cdp = this.plugins.chatdIntegration.chatd.chatdPersist;
-    if (!cdp) {
-        return reject();
+    const {chatdPersist} = this.plugins.chatdIntegration.chatd;
+    if (chatdPersist) {
+        const [msg] = await chatdPersist.getMessageByMessageId(chatId, messageId).catch(dump) || [];
+        if (msg) {
+            return Message.fromPersistableObject(chatRoom, msg);
+        }
     }
 
-    cdp.getMessageByMessageId(chatId, messageId)
-        .then(r => Message.fromPersistableObject(chatRoom, r[0]))
-        .then(resolve)
-        .catch(reject);
-});
+    if (d) {
+        this.logger.debug('getMessageByMessageId: Cannot find %s on %s', messageId, chatId);
+    }
+    return Promise.reject(ENOENT);
+};
 
 /**
  * Returns true if there is a chat room with an active (started/starting) call.
@@ -2598,19 +2614,20 @@ Chat.prototype.getFrequentContacts = function() {
         };
     };
 
-    // eslint-disable-next-line local-rules/misc-warnings
-    chats.forEach(function(chatRoom) {
+    chats.forEach((chatRoom) => {
+        const name = `getFrequentContacts(${chatRoom.roomId})`;
+
         if (chatRoom.isLoading()) {
             finishedLoadingChats[chatRoom.chatId] = false;
             chatRoom.rebind(CHAT_ONHISTDECR_RECNT, _histDecryptedCb);
-            promises.push(createTimeoutPromise(_checkFinished(chatRoom.chatId), 300, 10000));
+            promises.push(createTimeoutPromise(_checkFinished(chatRoom.chatId), 300, 10000, false, name));
         }
         else if (chatRoom.messagesBuff.messages.length < 32 && chatRoom.messagesBuff.haveMoreHistory()) {
             loadingMoreChats[chatRoom.chatId] = true;
             finishedLoadingChats[chatRoom.chatId] = false;
             chatRoom.messagesBuff.retrieveChatHistory(false);
             chatRoom.rebind(CHAT_ONHISTDECR_RECNT, _histDecryptedCb);
-            promises.push(createTimeoutPromise(_checkFinished(chatRoom.chatId), 300, 15000));
+            promises.push(createTimeoutPromise(_checkFinished(chatRoom.chatId), 300, 15000, false, name));
         }
         else {
             _calculateLastTsFor(chatRoom, 32);

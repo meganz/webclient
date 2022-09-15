@@ -199,7 +199,7 @@ export default class Breadcrumbs extends MegaRenderMixin {
                                     key={nodeId}
                                     onClick={(e) => this.onBreadcrumbNodeClick(e, nodeId)}>
                                     <span className={`right-arrow-bg simpletip`} data-simpletip={nodeName}>
-                                        <span>{nodeName}</span>
+                                        <span className="selectable-txt">{nodeName}</span>
                                     </span>
                                     {k !== 0 && <i className="next-arrow sprite-fm-mono icon-arrow-right icon16"></i>}
                                 </a>

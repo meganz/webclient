@@ -164,6 +164,21 @@ export default class Call extends MegaRenderMixin {
 
     static isExpanded = () => document.body.classList.contains(EXPANDED_FLAG);
 
+    /**
+     * getUnsupportedBrowserMessage
+     * @description Returns conditionally message for unsupported browser; used along w/ feature detection within
+     * `megaChat.hasSupportForCalls`. The two message variants concern a) outdated browser version (e.g. Chromium-based)
+     * or b) completely unsupported browsers, such as Safari/Firefox.
+     * @see megaChat.hasSupportForCalls
+     * @see Alert
+     * @returns {String}
+     */
+
+    static getUnsupportedBrowserMessage = () =>
+        navigator.userAgent.match(/Chrom(e|ium)\/(\d+)\./) ?
+            l.alert_unsupported_browser_version :
+            l.alert_unsupported_browser;
+
     constructor(props) {
         super(props);
         this.state.mode = props.call.viewMode;

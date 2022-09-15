@@ -66,6 +66,19 @@ export class ConversationsList extends MegaRenderMixin {
         );
     }
 
+    renderEmptyState() {
+        const { view, views, isArchived } = this.props;
+        const messages = {
+            [views.CHATS]: isArchived ? l.no_archived_chats_lhp : l.no_chats_lhp,
+            [views.MEETINGS]: isArchived ? l.no_archived_meetings_lhp : l.no_meetings_lhp
+        };
+        return (
+            <span className="empty-conversations">
+                {messages[view]}
+            </span>
+        );
+    }
+
     renderConversations() {
         const { conversations, onConversationClick } = this.props;
         return (
@@ -111,11 +124,7 @@ export class ConversationsList extends MegaRenderMixin {
         const { view, views, conversations } = this.props;
 
         if (conversations && conversations.length === 0) {
-            return (
-                <span className="empty-conversations">
-                    {view === views.CHATS ? l.no_chats_lhp : l.no_meetings_lhp}
-                </span>
-            );
+            return this.renderEmptyState();
         }
 
         return view === views.LOADING ? this.renderLoading() : this.renderConversations();

@@ -169,7 +169,7 @@
                     <i class="sprite-fm-uni icon-check verified-user-icon"></i>
                 </div>
             </div>
-            <div class="contact-fingerprint-txt">
+            <div class="contact-fingerprint-txt selectable-txt">
             </div>
             <div class="dropdown-verify">
                 <i class="sprite-fm-mono icon-key"></i>
@@ -248,9 +248,7 @@
                 <span class="dropdown-colour-item grey-colour-label" data-label-id="7" data-label-txt="Grey"></span>
                 <span class="clear"></span>
             </span>
-            <span class="dropdown-color-info">
-                [$16221]
-            </span>
+            <span class="dropdown-color-info"></span>
         </span>
         <a class="dropdown-item image-like-item">
             <span>[$5871]</span>
@@ -800,7 +798,7 @@
                         <div class="account usename-block">
                             <div class="membership-big-txt name"></div>
                         </div>
-                        <div class="membership-big-txt email"></div>
+                        <div class="membership-big-txt email selectable-txt"></div>
                         <div class="plan-icon">
                             <i class="free sprite-fm-uni icon-crests-free-details"></i>
                             <i class="pro1 sprite-fm-uni icon-crests-pro-1-details"></i>
@@ -2287,7 +2285,7 @@
 
         <!-- check if there is any other place using account qr-block -->
         <section class="fm-right-account-block hidden">
-            <div class="fm-account-main">
+            <div class="fm-account-main selectable-txt">
                 <div class="account settings-banner add-phone-num-banner hidden">
                     <div class="settings-banner-cell first-block">
                         <div class="account verify-icon">
@@ -3212,6 +3210,13 @@
                                         <div class="radio-txt">[$1385]</div>
                                    </div>
                                 </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$hide_recent_activity]</div>
+                                <div class="mega-switch toggle-on" id="hide-recents">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                                <div class="content-txt">[$hide_recent_activity_txt]</div>
                             </div>
                         </div>
                     </div>
@@ -4421,6 +4426,15 @@
                     <div class="fm-empty-cloud-txt">[$20152]</div>
                 </div>
             </div>
+            <div class="fm-empty-section fm-recents disabled-content hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-mono icon-recents-filled"></i>
+                    <div class="fm-empty-cloud-txt">[$recent_activity_hidden]</div>
+                    <button class="mega-button large positive upgrade-to-pro">
+                        <span>[$show_activity]</span>
+                    </button>
+                </div>
+            </div>
             <!-- Templates for recents list -->
             <div class="fm-recents date title-template template"></div>
             <div class="fm-recents content-row single content-row-template template">
@@ -4495,7 +4509,7 @@
         </section>
 
         <!-- Affiliate block. Init scrolling here !-->
-        <div class="fm-affiliate body">
+        <div class="fm-affiliate body selectable-txt">
             <div class="breadcrumbs">
                 <div class="item active">
                     [$16668]

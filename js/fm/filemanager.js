@@ -283,7 +283,7 @@ FileManager.prototype.initFileManagerUI = function() {
                     if (M.currentdirid === M.RootID) {
                         $breadcrumbs.removeClass('deactivated')
                             .find('.folder-link .right-arrow-bg')
-                            .safeHTML('<span>@@</span>', M.getNameByHandle(M.RootID));
+                            .safeHTML('<span class="selectable-txt">@@</span>', M.getNameByHandle(M.RootID));
                     }
                 });
             }
@@ -1037,9 +1037,11 @@ FileManager.prototype.initFileManagerUI = function() {
                     targetFolder = tab.root;
 
                     // special case handling for the chat, re-render current conversation
-                    if (tab.root === 'chat' && String(M.currentdirid).substr(0, 5) === 'chat/' &&
-                        !M.currentdirid.startsWith('chat/contacts') &&
-                        !M.currentdirid.startsWith('chat/archived')) {
+                    if (
+                        tab.root === 'chat' &&
+                        String(M.currentdirid).substr(0, 5) === 'chat/' &&
+                        !M.currentdirid.startsWith('chat/contacts')
+                    ) {
                         targetFolder = M.currentdirid;
                     }
                 }
@@ -2747,7 +2749,16 @@ FileManager.prototype.initUIKeyEvents = function() {
                     M.openFolder(n.h);
                 }
                 else if ($.selected.length < 2 && (is_image2(n) || is_video(n))) {
-                    slideshow($.selected[0]);
+                    const $elm = mega.gallery.sections[M.currentdirid]
+                        ? $(`#${n.h}.data-block-view`, '#gallery-view')
+                        : $('.dropdown-item.play-item');
+
+                    if ($elm.length) {
+                        $elm.trigger('click').trigger('dblclick');
+                    }
+                    else {
+                        slideshow($.selected[0]);
+                    }
                 }
                 else {
                     M.addDownload($.selected);
@@ -4155,7 +4166,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         }
     }
 
-    if (id !== 'conversations' || id !== "archivedchats") {
+    if (id !== 'conversations') {
         if (id === 'user-management') {
             $('.fm-right-header').addClass('hidden');
             $('.fm-right-header-user-management').removeClass('hidden');

@@ -1,6 +1,3 @@
-(function(scope) {
-    'use strict'; // jscs:disable validateIndentation
-
 /**
  * Uses c2s pings to determinate if the current connection is broken or not
  *
@@ -10,49 +7,74 @@
  * @returns {PersistedTypeArea}
  * @constructor
  */
-var PersistedTypeArea = function (megaChat) {
-    var self = this;
-    self.logger = MegaLogger.getLogger("persistedTypeArea", {}, megaChat.logger);
+class PersistedTypeArea extends MegaDataEmitter {
+    constructor(megaChat) {
+        super();
+        this.megaChat = megaChat;
+        this.logger = MegaLogger.getLogger("persistedTypeArea", {}, megaChat.logger);
+    }
 
-    self.megaChat = megaChat;
+    addChangeListener(uniqueId, callback) {
+        this.removeChangeListener(uniqueId);
 
+        if (PersistedTypeArea.ready) {
+            PersistedTypeArea._db.rebind(`onChange.typingArea${uniqueId}`, callback);
+        }
+        PersistedTypeArea.listeners[uniqueId] = callback;
+    }
 
-    megaChat.rebind("onInit.persistedTypeArea", function() {
-        self.data = new SharedLocalKVStorage("pta2");
-    });
+    removeChangeListener(uniqueId) {
+        delete PersistedTypeArea.listeners[uniqueId];
 
-    // clear on logout
-    megaChat.rebind("onDestroy.persistedTypeArea", function() {
-        self.data.destroy(true);
-    });
+        if (PersistedTypeArea.ready) {
+            PersistedTypeArea._db.off(`onChange.typingArea${uniqueId}`);
+        }
+    }
 
+    updatePersistedTypedValue(chatRoom, value) {
+        const {roomId} = chatRoom;
 
-    self._throttledUpdate = function (key, cb) {
-        delay('ptaupdate:' + key, cb, 250);
-    };
-    return self;
-};
-makeObservable(PersistedTypeArea);
+        delay(`ptaupdate:${roomId}`, () => PersistedTypeArea._db.setItem(roomId, value), 480);
+    }
 
-PersistedTypeArea.prototype.updatePersistedTypedValue = function (chatRoom, value) {
-    var self = this;
-    var k = chatRoom.roomId;
-    self._throttledUpdate(k, function () {
-        self.data.setItem(chatRoom.roomId, value);
-    });
-};
+    getPersistedTypedValue(chatRoom) {
+        return PersistedTypeArea._db.getItem(chatRoom.roomId);
+    }
 
-PersistedTypeArea.prototype.getPersistedTypedValue = function (chatRoom) {
-    return this.data.getItem(chatRoom.roomId);
-};
+    removePersistedTypedValue(chatRoom) {
+        const {roomId} = chatRoom;
 
-PersistedTypeArea.prototype.removePersistedTypedValue = function (chatRoom) {
-    var self = this;
-    var k = chatRoom.roomId;
-    self._throttledUpdate(k, function () {
-        self.data.removeItem(k);
-    });
-};
+        delay.cancel(`ptaupdate:${roomId}`);
 
-scope.PersistedTypeArea = PersistedTypeArea;
-})(window);
+        if (PersistedTypeArea.ready) {
+            PersistedTypeArea._db.removeItem(roomId);
+        }
+    }
+
+    destroy() {
+
+        if (PersistedTypeArea.ready) {
+            // Hmm... well, we only use one instance anyway...
+            for (const uniqueId in PersistedTypeArea.listeners) {
+                this.removeChangeListener(uniqueId);
+            }
+            return PersistedTypeArea._db.destroy();
+        }
+    }
+}
+
+/** @property PersistedTypeArea._db */
+lazy(PersistedTypeArea, '_db', () => {
+    'use strict';
+    const db = new SharedLocalKVStorage("pta3");
+
+    for (const uniqueId in PersistedTypeArea.listeners) {
+        const callback = PersistedTypeArea.listeners[uniqueId];
+        db.rebind(`onChange.typingArea${uniqueId}`, callback);
+    }
+
+    Object.defineProperty(PersistedTypeArea, 'ready', {value: true});
+    return db;
+});
+
+Object.defineProperty(PersistedTypeArea, 'listeners', {value: Object.create(null)});

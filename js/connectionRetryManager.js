@@ -297,19 +297,17 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
         },
         1500,
         self.options.connectTimeout + (delayed ? delayed : 0),
-        undefined,
         waitForPromise,
         name
-    )
-        .always(function() {
-            self._$connectingPromise = null;
-        })
-        .done(function() {
+    );
+
+    self._$connectingPromise
+        .then(() => {
             if (self._debug) {
                 self.logger.warn("startedConnecting succeeded.", self.logger.name + "#" + self._connectionRetries);
             }
         })
-        .fail(function(ex) {
+        .catch((ex) => {
             if (ex === EAGAIN) {
                 return;
             }
@@ -321,6 +319,9 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
                 );
             }
             self.doConnectionRetry();
+        })
+        .finally(() => {
+            self._$connectingPromise = null;
         });
     return self._$connectingPromise;
 };

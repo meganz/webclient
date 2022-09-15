@@ -36,6 +36,12 @@ export default class Stream extends MegaRenderMixin {
         overlayed: false,
     };
 
+    constructor(props) {
+        super(props);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleMouseOut = this.handleMouseOut.bind(this);
+    }
+
     /**
      * movePage
      * @description Moves the current page within the carousel. Invoked by clicking on the the left/right carousel
@@ -46,8 +52,9 @@ export default class Stream extends MegaRenderMixin {
      * @returns {void}
      */
 
-    movePage = direction =>
-        this.setState(state => ({ page: direction === PAGINATION.NEXT ? state.page + 1 : state.page - 1 }));
+    movePage(direction) {
+        return this.setState(state => ({ page: direction === PAGINATION.NEXT ? state.page + 1 : state.page - 1 }));
+    }
 
     /**
      * handleMouseMove
@@ -55,13 +62,13 @@ export default class Stream extends MegaRenderMixin {
      * @returns {void}
      */
 
-    handleMouseMove = () => {
+    handleMouseMove() {
         this.setState({ hovered: true });
         if (this.delayProcID) {
             delay.cancel(this.delayProcID);
             this.delayProcID = null;
         }
-    };
+    }
 
     /**
      * handleMouseOut
@@ -69,7 +76,7 @@ export default class Stream extends MegaRenderMixin {
      * @returns {void}
      */
 
-    handleMouseOut = () => {
+    handleMouseOut() {
         if (this.state.hovered) {
             this.delayProcID =
                 delay(`${NAMESPACE}-hover`, () => {
@@ -79,7 +86,7 @@ export default class Stream extends MegaRenderMixin {
                     }
                 }, MOUSE_OUT_DELAY);
         }
-    };
+    }
 
     /**
      * getPublicLink
@@ -87,7 +94,7 @@ export default class Stream extends MegaRenderMixin {
      * @returns {void|null}
      */
 
-    getPublicLink = () => {
+    getPublicLink() {
         const { chatRoom } = this.props;
         if (chatRoom && chatRoom.isMeeting) {
             chatRoom.updatePublicHandle(
@@ -101,7 +108,7 @@ export default class Stream extends MegaRenderMixin {
             );
         }
         return null;
-    };
+    }
 
     /**
      * getColumns
@@ -110,7 +117,7 @@ export default class Stream extends MegaRenderMixin {
      * @returns {number} the number of columns
      */
 
-    getColumns = streamsCount => {
+    getColumns(streamsCount) {
         switch (true) {
             case streamsCount === 1:
                 return 1;
@@ -119,7 +126,7 @@ export default class Stream extends MegaRenderMixin {
             default:
                 return 2;
         }
-    };
+    }
 
     /**
      * chunkNodes
@@ -132,7 +139,7 @@ export default class Stream extends MegaRenderMixin {
      * @returns {Array|null}
      */
 
-    chunkNodes = (nodes, size) => {
+    chunkNodes(nodes, size) {
         if (nodes && nodes.length && size) {
             const chunked = [];
             let index = 0;
@@ -143,7 +150,7 @@ export default class Stream extends MegaRenderMixin {
             return chunked;
         }
         return null;
-    };
+    }
 
     /**
      * scaleNodes
@@ -154,8 +161,8 @@ export default class Stream extends MegaRenderMixin {
      * @returns {void}
      */
 
-    scaleNodes = (columns, forced = false) => {
-        const { streams, isOnHold, minimized, mode } = this.props;
+    scaleNodes(columns, forced = false) {
+        const { streams, minimized, mode } = this.props;
         const container = this.containerRef.current;
         this.lastRescaledCache = forced ? null : this.lastRescaledCache;
 
@@ -226,7 +233,7 @@ export default class Stream extends MegaRenderMixin {
 
             container.style.width = `${(targetWidth + marginNode * 2) * columns}px`;
         }
-    };
+    }
 
     /**
      * renderNodes
@@ -239,7 +246,7 @@ export default class Stream extends MegaRenderMixin {
      * @returns {JSX.Element|null|Array}
      */
 
-    renderNodes = () => {
+    renderNodes() {
         const {
             mode,
             streams,
@@ -389,7 +396,7 @@ export default class Stream extends MegaRenderMixin {
                 /> :
                 null
         );
-    };
+    }
 
     /**
      * renderOnHold
@@ -398,15 +405,18 @@ export default class Stream extends MegaRenderMixin {
      * @returns {JSX.Element}
      */
 
-    renderOnHold = () =>
-        <div className="on-hold-overlay">
-            <div
-                className="stream-on-hold theme-light-forced"
-                onClick={this.props.onHoldClick}>
-                <i className="sprite-fm-mono icon-play" />
-                <span>{l[23459] /* `Resume call` */}</span>
+    renderOnHold() {
+        return (
+            <div className="on-hold-overlay">
+                <div
+                    className="stream-on-hold theme-light-forced"
+                    onClick={this.props.onHoldClick}>
+                    <i className="sprite-fm-mono icon-play" />
+                    <span>{l[23459] /* `Resume call` */}</span>
+                </div>
             </div>
-        </div>;
+        );
+    }
 
     /**
      * renderStreamContainer
@@ -417,7 +427,7 @@ export default class Stream extends MegaRenderMixin {
      * @returns {JSX.Element}
      */
 
-    renderStreamContainer = () => {
+    renderStreamContainer() {
         const {
             sfuApp, call, chatRoom, streams, stayOnEnd, everHadPeers, isOnHold, onInviteToggle, onStayConfirm,
             onCallEnd
@@ -452,7 +462,7 @@ export default class Stream extends MegaRenderMixin {
         }
 
         return streamContainer(this.renderNodes());
-    };
+    }
 
     specShouldComponentUpdate(nextProps) {
         if (nextProps.minimized !== this.props.minimized || nextProps.mode !== this.props.mode) {
@@ -471,7 +481,7 @@ export default class Stream extends MegaRenderMixin {
         super.componentDidMount();
         this.getPublicLink();
         this.scaleNodes();
-        chatGlobalEventManager.addEventListener('resize', this.getUniqueId(), this.scaleNodes);
+        chatGlobalEventManager.addEventListener('resize', this.getUniqueId(), () => this.scaleNodes());
         this.callHoldListener = mBroadcaster.addListener('meetings:toggleHold', () => this.scaleNodes(undefined, true));
     }
 
@@ -502,10 +512,22 @@ export default class Stream extends MegaRenderMixin {
                 `}
                 onMouseMove={this.handleMouseMove}
                 onMouseOut={this.handleMouseOut}>
+                <ChatToaster
+                    showDualNotifications={true}
+                    hidden={minimized}
+                    onShownToast={t => {
+                        if (t.options && t.options.persistent) {
+                            this.setState({overlayed: true});
+                        }
+                    }}
+                    onHideToast={t => {
+                        if (this.state.overlayed && t.options && t.options.persistent) {
+                            this.setState({overlayed: false});
+                        }
+                    }}
+                />
                 {minimized ? null : (
-                    <div className={`
-                    ${NAMESPACE}-wrapper
-                    `}>
+                    <div className={`${NAMESPACE}-wrapper`}>
                         <StreamHead
                             disableCheckingVisibility={true}
                             mode={mode}
@@ -542,20 +564,6 @@ export default class Stream extends MegaRenderMixin {
                         />
                     </div>
                 )}
-                <ChatToaster
-                    showDualNotifications={true}
-                    hidden={minimized}
-                    onShownToast={t => {
-                        if (t.options && t.options.persistent) {
-                            this.setState({overlayed: true});
-                        }
-                    }}
-                    onHideToast={t => {
-                        if (this.state.overlayed && t.options && t.options.persistent) {
-                            this.setState({overlayed: false});
-                        }
-                    }}
-                />
                 <Local
                     call={call}
                     streams={streams}

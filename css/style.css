@@ -10910,11 +10910,12 @@ div.camera-bottom-txt {
     line-height: 0;
     height: auto;
     margin: 16px 0 0;
+    border: none;
 }
 .support textarea {
     width: 100%;
     height: 80%;
-    border: 1px solid #e8e8e8;
+    border: 2px solid #e8e8e8;
     font-size: 14px;
     color: #666666;
     -webkit-box-sizing: border-box;

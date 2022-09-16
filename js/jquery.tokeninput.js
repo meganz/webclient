@@ -926,7 +926,9 @@
 
             if ($(input).data("settings").accountHolder) {
                 if ($(input).data("settings").accountHolder.toLowerCase() === item[$(input).data("settings").tokenValue].toLowerCase()) {
-                    select_token(item);
+                    if (settings.scrollLocation === 'add') {
+                        select_token(item);
+                    }
                     var cb = $(input).data("settings").onHolder;
                     if ($.isFunction(cb)) {
                         cb.call(hidden_input, item);
@@ -976,7 +978,6 @@
                 if ($.isFunction(cb)) {
                     cb.call(hidden_input, item);
                 }
-
                 return false;
             }
 
@@ -994,7 +995,9 @@
                 });
 
                 if (found_existing_token) {
-                    select_token(found_existing_token);
+                    if (settings.scrollLocation === 'add') {
+                        select_token(found_existing_token);
+                    }
                     var cb = $(input).data("settings").onDoublet;
                     if ($.isFunction(cb)) {
                         cb.call(hidden_input, item);

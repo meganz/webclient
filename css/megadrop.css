@@ -235,7 +235,7 @@
 
 /* end .wu-items .wu.stat */
 .wu-items .wu-queue {
-    max-height: 228px;
+    max-height: 258px;
     width: inherit;
     overflow: hidden;
     color: #555;
@@ -246,7 +246,7 @@
     display: block;
     height: 48px;
     width: inherit;
-    margin-left: 20px;
+    margin: 0 16px;
     border-bottom: 1px solid #ddd;
     box-sizing: border-box;
 }

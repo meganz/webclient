@@ -1309,7 +1309,8 @@ li.active .call-duration i {
 
 /* TODO: add variables, see: `button.css` */
 .profile-head .profile-controls button,
-.profile-head .profile-controls button:hover {
+.profile-head .profile-controls button:hover,
+.profile-head .profile-controls button:focus {
     margin: 0 15px 0 0;
     background: linear-gradient(180deg, rgba(86, 210, 241, 1) 0%, rgba(43, 166, 222, 1) 100%);
 }

@@ -1379,7 +1379,7 @@ var notify = {
 
         // Takedown notice
         // Your publicly shared %1 (%2) has been taken down.
-        if (typeof notification.data.down !== 'undefined') {
+        if (notification.data.down === 1) {
             header = l[8521];
             title = l[8522].replace('%1', type).replace('(%2)', name);
             cssClass = 'nt-takedown-notification';
@@ -1387,7 +1387,7 @@ var notify = {
 
         // Takedown reinstated
         // Your taken down %1 (%2) has been reinstated.
-        else if (typeof notification.data.up !== 'undefined') {
+        else if (notification.data.down === 0) {
             header = l[8524];
             title = l[8523].replace('%1', type).replace('(%2)', name);
             cssClass = 'nt-takedown-reinstated-notification';

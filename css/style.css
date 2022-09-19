@@ -4048,6 +4048,7 @@ body.loading .light-overlay {
     padding: 0 8px;
     position: relative;
     text-align: center;
+    user-select: text;
 }
 .fm-breadcrumbs.public-links i.small-icon.get-link {
     position: absolute;
@@ -9080,6 +9081,7 @@ li.token-input-token-mega {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     background-clip: padding-box;
+    user-select: text;
 }
 .token-input-token-mega .verified_icon {
     display: none !important;

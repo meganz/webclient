@@ -610,18 +610,16 @@
     grid-template-columns: calc(50% - 10px) calc(50% - 10px);
 }
 .mega-button.action.gallery-close-discovery {
-    position: absolute;
-    right: 36px;
-    top: 12px;
     -webkit-padding-end: 8px;
     padding-inline-end: 8px;
-}
-.rtl .gallery-close-discovery {
-    right: auto;
-    left: 36px;
+    position: relative;
+    top: -4px;
 }
 .gallery-close-discovery i {
     --mask-color: var(--secondary-red);
+}
+.gallery-close-discovery span {
+    white-space: nowrap;
 }
 .btn-galleries.js-lpbtn.favourites.active i {
     --mask-color: var(--secondary-red);

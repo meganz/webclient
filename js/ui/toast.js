@@ -1093,7 +1093,8 @@ window.showToast = function(
         'send-chat': 'sprite-fm-mono icon-chat-filled',
         'megasync-transfer': ['sprite-fm-uni icon-mega-logo', 'sprite-fm-mono icon-down green'],
         'megasync-transfer upload': ['sprite-fm-uni icon-mega-logo', 'sprite-fm-mono icon-up blue'],
-        success: 'sprite-fm-uni icon-check'
+        success: 'sprite-fm-uni icon-check',
+        'clipboard-copy': 'sprite-fm-mono icon-copy',
     };
 
     const icons = typeof iconEquivalents[type] === 'string' ? [iconEquivalents[type]] : iconEquivalents[type];

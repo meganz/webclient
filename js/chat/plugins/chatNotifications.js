@@ -241,7 +241,8 @@ var ChatNotifications = function(megaChat, options) {
                         delete self._incomingDialogContainers[callId];
                     }
                     n.forceStopSound();
-                    callManager.off('onRingingStopped' + evtId);
+                    callManager.off(`onRingingStopped${evtId}`);
+                    callManager.off(`onRoomDisconnected${evtId}`);
                 }
             };
 
@@ -288,7 +289,8 @@ var ChatNotifications = function(megaChat, options) {
             document.body.append(dialogContainer);
             ReactDOM.render(dialog, dialogContainer);
 
-            callManager.on('onRingingStopped' + evtId, removeNotif);
+            callManager.on(`onRingingStopped${evtId}`, removeNotif);
+            room.on(`onRoomDisconnected${evtId}`, triggerRingingStopped);
             room.on(`onCallLeft${evtId}`, () => {
                 n.setUnread(false);
                 megaChat.updateSectionUnreadCount();

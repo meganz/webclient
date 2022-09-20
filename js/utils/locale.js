@@ -1481,6 +1481,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.contact_support_email = l.contact_support_email
         .replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
+    l.transfer_quota_pct = l.transfer_quota_pct.replace('[S]', '<span>').replace('[/S]', '</span>');
 
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,

@@ -8674,7 +8674,7 @@ textarea.mobile.support-text-field {
     max-width: 460px;
     padding: 24px 20px;
     margin: 0 auto;
-    max-height: 95vh;
+    max-height: 95%;
     overflow: scroll;
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps {

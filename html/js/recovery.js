@@ -633,8 +633,19 @@ AccountRecoveryControl.prototype.startRecovery = function _startRecovery(email, 
                     else {
                         msgDialog('info', '', l.check_email_inbox);
                     }
-                } else {
+                }
+                else {
                     msgDialog('warningb', l[135], l[200]);
+                }
+
+                // If this is mobile scroll to top to show error message correctly.
+                if (is_mobile) {
+
+                    const startHolder = document.getElementById('startholder');
+
+                    if (startHolder) {
+                        startHolder.scrollTop = 0;
+                    }
                 }
             }
         });

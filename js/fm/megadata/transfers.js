@@ -288,8 +288,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
 
             sync.megaSyncRequest(cmd)
                 .done(function() {
-                    //showToast('megasync', l[8635], 'Open');
-                    showToast('megasync-transfer', l[8635]); // Download added to MEGAsync
+                    showToast('megasync-transfer', l[8635]);
                 })
                 .fail(
                 function () {
@@ -465,9 +464,8 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         // subtract the current batch size from the stored total
         $.totalDL -= currDownloadSize;
         if (!fmconfig.dlThroughMEGAsync) {
-            var msgMsg = l[18213]; // 'Download size exceeds the maximum size supported by the browser. '
-            //    + 'You can use MEGASync to proceed with the download.'; // 18213
-            var msgSubMsg = l[18214]; // 'Do you want to turn ON downloading with MEGASync?'; // 18214
+            var msgMsg = l[18213];
+            var msgSubMsg = l[18214];
             msgDialog('confirmation', 'File Size is too big',
                 msgMsg,
                 msgSubMsg,
@@ -1112,7 +1110,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 showMEGAsyncDialog(l[8912], syncData);
             })
             .fail(function() {
-                showMEGAsyncDialog(l[8847]);
+                showMEGAsyncDialog(l.desktopapp_dialog_btn);
             });
         return;
     }

@@ -471,7 +471,12 @@ function sendCurrencyRequest() {
             else {
                 renderCountry(localCountry);
             }
-            const dailyUserNumber = result[2].value.confirmedusers.total;
+
+            let dailyUserNumber = 0;
+            if (result[2] && result[2].value && result[2].value.confirmedusers) {
+                dailyUserNumber = result[2].value.confirmedusers.total;
+            }
+
             l.ri_s4_card2_desc = l.ri_s4_card2_desc
                 .replace('235', Math.floor(dailyUserNumber / 5000000) * 5);
             $('.establish p', $pageBlock).safeHTML(l.ri_s4_card2_desc);

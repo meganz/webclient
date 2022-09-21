@@ -75,7 +75,7 @@
             localStorage.apipath = 'https://nz5-api-sandbox3.developers.mega.co.nz/';
         }
         else {
-            // Not actually working/decommissioned
+            // Used for QA of some projects
             localStorage.apipath = 'https://api-sandbox3.developers.mega.co.nz/';
         }
 
@@ -87,6 +87,9 @@
         // Use MEGA Pay test domain (Stripe card dialog iframe on the Pro Payment page)
         if (window.location.search.indexOf('testmegapay=1') > -1) {
             localStorage.megaPay = 'https://test.megapay.nz/index.html';
+        }
+        if (window.location.search.indexOf('testmegapay=localhost') > -1) {
+            localStorage.megaPay = 'http://stripe.megapay.local/index.html';
         }
 
         // Force the new secure registration method on or off for testing

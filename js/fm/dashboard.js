@@ -34,19 +34,31 @@ function dashboardUI(updProcess) {
 
     M.onSectionUIOpen('dashboard');
 
-    if (u_attr && u_attr.b) {
+    // If Business or Pro Flexi, show the Business dashboard
+    if (u_attr && (u_attr.b || u_attr.pf)) {
+
         $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
         const $bsnDashboard = $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
-        if (u_attr.b.m && u_attr.b.s !== -1) {
+
+        // If Business master account and not expired
+        if (u_attr.b && u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED) {
             $('.overall-usage-container', $bsnDashboard).addClass('admin');
             $('.subaccount-view-used-data .view-title span', $bsnDashboard).text(l.bsn_pers_usage);
         }
-        if (u_attr.b.s !== 1 || !u_attr.b.m) {
+
+        // If Business expired/grace period or sub user account
+        if (u_attr.b && (u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED || !u_attr.b.m)) {
             $('.left-pane.small-txt.plan-date-info', '.dashboard').addClass('hidden');
             $('.left-pane.big-txt.plan-date-val', '.dashboard').addClass('hidden');
         }
+
+        // If Pro Flexi, show admin overall usage container (and keep Data heading, not Personal usage data)
+        if (u_attr.pf) {
+            $('.overall-usage-container', $bsnDashboard).addClass('admin');
+        }
     }
     else {
+        // Show regular dashboard
         $('.fm-right-block.dashboard .non-business-dashboard').removeClass('hidden');
         $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
     }
@@ -96,6 +108,7 @@ function dashboardUI(updProcess) {
     // Account data
     /* eslint-disable-next-line complexity */
     M.accountData(function(account) {
+
         if (!updProcess) {
             loadingDialog.hide('loadDashboard');
         }
@@ -107,10 +120,16 @@ function dashboardUI(updProcess) {
             $('.message', $welcome).text(l[24930].replace('$1', u_attr.firstname));
         }
 
-        // Render the storage and transfer analytics graphs on the admin user's dashboard page
-        if (u_attr.b && u_attr.b.m && u_attr.b.s !== -1) {
-            const business = new BusinessAccountUI();
-            business.viewAdminDashboardAnalysisUI();
+        // If Pro Flexi, or Business master user (and not status expired), render the
+        // storage and transfer analytics graphs on the admin user's dashboard page
+        if (u_attr.pf || (u_attr.b && u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED)) {
+
+            // Make sure the files are loaded
+            M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+
+                const business = new BusinessAccountUI();
+                business.viewAdminDashboardAnalysisUI();
+            });
         }
 
         // Show balance
@@ -227,7 +246,6 @@ function dashboardUI(updProcess) {
 
                 var $businessDashboard = $('.fm-right-block.dashboard .business-dashboard').removeClass('hidden');
                 $('.fm-right-block.dashboard .non-business-dashboard').addClass('hidden');
-
             }
         }
         else {
@@ -264,7 +282,9 @@ function dashboardUI(updProcess) {
         // TODO: Remove condition once new applications are pushed live
         const mBackupsNode = localStorage.debugBackups ? M.getNodeByHandle(M.BackupsId) : false;
 
-        if (!u_attr.b) {
+        // If not Business or Pro Flexi (i.e. regular account)
+        if (!u_attr.b && !u_attr.pf) {
+
             accountUI.general.charts.init(account);
 
             /* Used Storage */
@@ -375,7 +395,7 @@ function dashboardUI(updProcess) {
             dashboardUI.updateCloudDataWidget();
         }
         else {
-
+            // Business or Pro Flexi
             // Debug code ...
             if (d && localStorage.debugNewPrice) {
                 account.space_bus_base = 3;
@@ -402,7 +422,8 @@ function dashboardUI(updProcess) {
             $('.storage-transfer-data', $storageExtBlk).text(l[5816].replace('[X]', 0));
             $('.storage-transfer-data', $transferExtBlk).text(l[5816].replace('[X]', 0));
 
-            if (u_attr.b.m) {
+            // If Pro Flexi or Business master account
+            if (u_attr.pf || (u_attr.b && u_attr.b.m)) {
 
                 $storageExtBlk.removeClass('hidden');
                 $transferExtBlk.removeClass('hidden');
@@ -534,7 +555,9 @@ dashboardUI.renderReferralWidget = function() {
     if (mega.flags.refpr) {
         M.affiliate.getBalance().then(() => {
             let prefix = '.non-business-dashboard ';
-            if (u_attr.b) {
+
+            // If Business or Pro Flexi, use the business-dashboard parent selector
+            if (u_attr.b || u_attr.pf) {
                 prefix = '.business-dashboard ';
             }
 

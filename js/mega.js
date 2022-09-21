@@ -1468,6 +1468,7 @@ scparser.$add('usc', function() {
 
 // Payment received
 scparser.$add('psts', function(a) {
+
     if (!pfid && u_type) {
         M.checkStorageQuota(2000);
     }
@@ -1629,6 +1630,12 @@ scparser.$add('ssc', process_businessAccountSubUsers_SC);
 scparser.$add('ub', function() {
     "use strict";
     fm_fullreload(null, 'ub-business');
+});
+
+// Pro Flexi account change which requires reload (such as payment against expired account)
+scparser.$add('upf', () => {
+    "use strict";
+    fm_fullreload(null, 'upf-proflexi');
 });
 
 scparser.$notify = function(a) {
@@ -3748,13 +3755,14 @@ function loadfm_done(mDBload) {
             }
         }
 
-        // Check business account is expired on initial phase in desktop web.
-        if (!is_mobile && u_attr && u_attr.b) {
+        // Check Business (or Pro Flexi) account is expired on initial phase in desktop web
+        if (!is_mobile && u_attr && (u_attr.b || u_attr.pf)) {
+
             M.require('businessAcc_js', 'businessAccUI_js').done(() => {
 
                 var business_ui = new BusinessAccountUI();
 
-                if (u_attr.b.m) {
+                if (u_attr.b && u_attr.b.m) {
                     business_ui.showWelcomeDialog();
                 }
 

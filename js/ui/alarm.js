@@ -286,7 +286,7 @@ var alarm = {
                 mastercard: 'icon-mastercard',
                 'unionpay': 'icon-union-pay',
                 'american express': 'icon-amex',
-                jcb: 'icon-jcb',
+                jcb: 'icon-jcb'
             };
 
             // Display
@@ -306,7 +306,7 @@ var alarm = {
                 $('.provider-icon', $dialog).addClass(gatewayName);
             }
             $dialog.find('.gateway-name').text(gatewayDisplayName);
-            $('.plan-icon', $dialog).removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
+            $('.plan-icon', $dialog).removeClass('pro1 pro2 pro3 pro4 pro101').addClass('pro' + proNum);
 
             // Add button click handlers
             this.initChooseButton($button, $dialog);

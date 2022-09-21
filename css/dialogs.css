@@ -4319,6 +4319,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-address-dialog .plan-icon.pro2 i.pro2,
     .mega-dialog.payment-address-dialog .plan-icon.pro3 i.pro3,
     .mega-dialog.payment-address-dialog .plan-icon.pro4 i.pro4,
+    .mega-dialog.payment-address-dialog .plan-icon.pro101 i.pro101,
     .mega-dialog.payment-address-dialog .plan-icon.business i.business {
         display: block;
     }
@@ -8417,6 +8418,7 @@ body.de .mega-dialog.new-group-chat {
         .mega-dialog.voucher-info-redeem .plan-icon.pro2 i.pro2,
         .mega-dialog.voucher-info-redeem .plan-icon.pro3 i.pro3,
         .mega-dialog.voucher-info-redeem .plan-icon.pro4 i.pro4,
+        .mega-dialog.voucher-info-redeem .plan-icon.pro101 i.pro101,
         .mega-dialog.voucher-info-redeem .plan-icon.business i.business {
             display: block;
         }
@@ -9064,6 +9066,25 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-reminder {
         width: 596px;
         text-align: center;
+    }
+
+    .mega-dialog.payment-reminder .img-dialog-pro-flexi-expiry {
+        position: relative;
+    }
+
+    .mega-dialog.payment-reminder .img-dialog-pro-flexi-expiry .icon-crests-pro-flexi-details {
+        height: 120px;
+        width: 120px;
+        z-index: 1;
+    }
+
+    .mega-dialog.payment-reminder .img-dialog-pro-flexi-expiry .icon-takedown {
+        bottom: -5px;
+        height: 70px;
+        position: absolute;
+        right: -20px;
+        width: 70px;
+        z-index: 2;
     }
 
 /* end payment-reminder dialog */

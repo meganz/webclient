@@ -4039,7 +4039,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.nw-fm-left-icon.conversations', $fmholder).addClass('hidden');
     }
 
-    // view or hide left icon for business account, confirmed and payed
+    // View or hide left icon for business account, confirmed and paid.
     if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === 1 || u_attr.b.s === 2) && u_privk) {
         $('.nw-fm-left-icon.user-management', $fmholder).removeClass('hidden');
     }
@@ -4311,7 +4311,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
         panel = document.getElementsByClassName('js-lp-usermanagement').item(0);
 
-        if (panel) {
+        // Don't show the panel if Pro Flexi
+        if (panel && !u_attr.pf) {
             panel.classList.remove('hidden');
         }
 

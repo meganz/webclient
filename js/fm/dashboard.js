@@ -261,7 +261,8 @@ function dashboardUI(updProcess) {
         $.leftPaneResizable.options.updateWidth = maxwidth;
         $($.leftPaneResizable).trigger('resize');
 
-        const mBackupsNode = M.getNodeByHandle(M.BackupsId);
+        // TODO: Remove condition once new applications are pushed live
+        const mBackupsNode = localStorage.debugBackups ? M.getNodeByHandle(M.BackupsId) : false;
 
         if (!u_attr.b) {
             accountUI.general.charts.init(account);

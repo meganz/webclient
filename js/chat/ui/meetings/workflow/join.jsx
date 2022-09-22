@@ -247,7 +247,10 @@ export default class Join extends MegaRenderMixin {
                 </div>
             </div>
             <div className="card-preview">
-                <Preview onToggle={(audio, video) => this.setState({ previewAudio: audio, previewVideo: video })} />
+                <Preview
+                    context={Join.NAMESPACE}
+                    onToggle={(audio, video) => this.setState({ previewAudio: audio, previewVideo: video })}
+                />
             </div>
         </div>;
 

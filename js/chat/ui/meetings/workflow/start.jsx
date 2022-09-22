@@ -8,6 +8,7 @@ import { Emoji } from '../../../../ui/utils';
 
 export class Start extends MegaRenderMixin {
     static NAMESPACE = 'start-meeting';
+    static dialogName = `${Start.NAMESPACE}-dialog`;
 
     static CLASS_NAMES = {
         EDIT: 'call-title-edit',
@@ -26,7 +27,8 @@ export class Start extends MegaRenderMixin {
         video: false,
         editing: false,
         previousTopic: undefined,
-        topic: undefined
+        topic: undefined,
+        mounted: false
     };
 
     constructor(props) {
@@ -88,11 +90,12 @@ export class Start extends MegaRenderMixin {
         if (onStart) {
             onStart(topic, audio, video);
         }
-    }
+    };
 
     componentDidMount() {
         super.componentDidMount();
         this.bindEvents();
+        M.safeShowDialog(Start.dialogName, () => this.setState({ mounted: true }));
     }
 
     componentWillUnmount() {
@@ -110,9 +113,13 @@ export class Start extends MegaRenderMixin {
                 name={NAMESPACE}
                 className={NAMESPACE}
                 stopKeyPropagation={editing}
+                noCloseOnClickOutside={true}
                 onClose={() => this.props.onClose()}>
                 <div className={`${NAMESPACE}-preview`}>
-                    <Preview onToggle={this.onStreamToggle} />
+                    <Preview
+                        context={NAMESPACE}
+                        onToggle={this.onStreamToggle}
+                    />
                 </div>
                 <div className="fm-dialog-body">
                     <div className={`${NAMESPACE}-title`}>

@@ -8,16 +8,84 @@ mBroadcaster.addListener('fm:initialized', () => {
         return;
     }
 
+    const OBV4_FLAGS = {
+        OBV4: 'obv4f',
+        CLOUD_DRIVE: 'obcd',
+        CLOUD_DRIVE_UPLOAD: 'obcduf',
+        CLOUD_DRIVE_MANAGE_FILES: 'obcdmyf',
+        CLOUD_DRIVE_MEGASYNC: 'obcdda',
+        CHAT: 'obmc',
+        CHAT_OPEN: 'obmcnw',
+        CHAT_NAV: 'obmclp',
+        CHAT_CHATS_PANE: 'obmccp',
+        CHAT_MEETINGS_PANE: 'obmcmp',
+        CHAT_CONTACT_PANE: 'obmcco',
+        // New onboarding flags to be added at the end of this object. Don't change the order!!!!
+    };
+
+    const flagMap = new MegaDataBitMap('obv4', false, Object.values(OBV4_FLAGS));
+    flagMap.isReady().then((res) => {
+        if (res) {
+            // ENOENT so migrate any old flags to this attribute
+            for (const flag of Object.values(OBV4_FLAGS)) {
+                let val = typeof fmconfig[flag] === 'undefined' || fmconfig[flag] === 0 ? 0 : 1;
+                if (fmconfig.obrev) {
+                    val ^= 1;
+                }
+                flagMap.setSync(flag, val, true);
+            }
+            flagMap.commit().then(() => {
+                // Migration succeeded so clear out of fmconfig
+                const flags = Object.values(OBV4_FLAGS);
+                flags.push('obrev');
+                for (const flag of flags) {
+                    mega.config.remove(flag);
+                }
+                // TODO eventually clear flags from config.js to reclaim space
+            }).catch(dump);
+        }
+
+        // If new user then we can ignore the first chat step
+        if (u_attr.since >= 1659398400) {
+            flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);
+            flagMap.safeCommit();
+            mBroadcaster.once('chat_initialized', () => {
+                // Show the new user onboarding dot when chat is ready.
+                const $mcNavDot = $('.nw-fm-left-icon.conversations .onboarding-highlight-dot', fmholder);
+                if (!flagMap.getSync(OBV4_FLAGS.CHAT_OPEN) && !M.chat) {
+                    $('.dark-tooltip', $mcNavDot.parent().addClass('w-onboard')).addClass('hidden');
+                    $mcNavDot.removeClass('hidden');
+                }
+
+                mBroadcaster.addListener('pagechange', () => {
+                    if (M.chat) {
+                        flagMap.setSync(OBV4_FLAGS.CHAT_OPEN, 1);
+                        flagMap.safeCommit();
+                        $mcNavDot.addClass('hidden');
+                        $('.dark-tooltip', $mcNavDot.parent().removeClass('w-onboard')).removeClass('hidden');
+
+                        return 0xDEAD;
+                    }
+                });
+            });
+        }
+
+        if (mega.ui.onboarding) {
+            mBroadcaster.addListener('pagechange', mega.ui.onboarding.start.bind(mega.ui.onboarding));
+            mega.ui.onboarding.start();
+        }
+    }).catch(dump);
+
     // Onboarding Flow map. This need to be set carefully for design flow on each section.
     // Instruction requires to be place on later stage.
     const obMap = {
         'cloud-drive': {
             title: l[20556],
-            flag: 'obcd',
+            flag: OBV4_FLAGS.CLOUD_DRIVE,
             steps: [
                 {
                     name: l[372],
-                    flag: 'obcduf',
+                    flag: OBV4_FLAGS.CLOUD_DRIVE_UPLOAD,
                     actions: [
                         {
                             type: 'showDialog',
@@ -32,7 +100,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 },
                 {
                     name: l.onboard_v4_manage_file_control_button,
-                    flag: 'obcdmyf',
+                    flag: OBV4_FLAGS.CLOUD_DRIVE_MANAGE_FILES,
                     get prerequisiteCondition() {
                         return M.v.length !== 0;
                     },
@@ -65,7 +133,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 },
                 {
                     name: l[956],
-                    flag: 'obcdda',
+                    flag: OBV4_FLAGS.CLOUD_DRIVE_MEGASYNC,
                     actions: [
                         {
                             type: 'showExtDialog',
@@ -79,12 +147,12 @@ mBroadcaster.addListener('fm:initialized', () => {
         },
         chat: {
             title: 'MEGA Chat',
-            flag: 'obmc',
+            flag: OBV4_FLAGS.CHAT,
             dismissNoConfirm: true,
             steps: [
                 {
                     name: 'MEGA Chat Left Pane',
-                    flag: 'obmclp',
+                    flag: OBV4_FLAGS.CHAT_NAV,
                     actions: [
                         {
                             type: 'showDialog',
@@ -101,7 +169,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 },
                 {
                     name: 'Chats',
-                    flag: 'obmccp',
+                    flag: OBV4_FLAGS.CHAT_CHATS_PANE,
                     actions: [
                         {
                             type: 'showDialog',
@@ -117,7 +185,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 },
                 {
                     name: 'Meetings',
-                    flag: 'obmcmp',
+                    flag: OBV4_FLAGS.CHAT_MEETINGS_PANE,
                     actions: [
                         {
                             type: 'showDialog',
@@ -133,7 +201,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 },
                 {
                     name: 'Contacts',
-                    flag: 'obmcco',
+                    flag: OBV4_FLAGS.CHAT_CONTACT_PANE,
                     actions: [
                         {
                             type: 'showDialog',
@@ -153,50 +221,10 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
     };
 
-    if (!fmconfig.obrev) {
-        // Reverse existing flags
-        const toRev = ['obcd', 'obcduf', 'obcdmyf', 'obcdda', 'obmc', 'obmclp', 'obmccp', 'obmcmp', 'obmcco', 'obmcnw'];
-        for (const flag of toRev) {
-            if (fmconfig[flag]) { // Already completed
-                mega.config.set(flag, 0);
-            }
-            else { // Hasn't completed
-                mega.config.set(flag, 1);
-            }
-        }
-        // Don't do it again
-        mega.config.set('obrev', 1);
-    }
 
     // If this is an old user don't show them the cloud-drive onboarding v4
     if (!(u_attr.since > 1631664000 || localStorage.obv4test)) {
         delete obMap['cloud-drive'];
-    }
-    // If new user then we can ignore the first chat step
-    if (u_attr.since >= 1659398400) {
-        const megaChatNewUserFlag = 'obmcnw';
-
-        mega.config.set('obmclp', 0);
-        mBroadcaster.once('chat_initialized', () => {
-            // Show the new user onboarding dot when chat is ready.
-            const $mcNavDot = $('.nw-fm-left-icon.conversations .onboarding-highlight-dot', fmholder);
-
-            if (fmconfig[megaChatNewUserFlag] && !M.chat) {
-                $('.dark-tooltip', $mcNavDot.parent().addClass('w-onboard')).addClass('hidden');
-                $mcNavDot.removeClass('hidden');
-            }
-
-            mBroadcaster.addListener('pagechange', () => {
-
-                if (M.chat) {
-                    mega.config.set(megaChatNewUserFlag, 0);
-                    $mcNavDot.addClass('hidden');
-                    $('.dark-tooltip', $mcNavDot.parent().removeClass('w-onboard')).removeClass('hidden');
-
-                    return 0xDEAD;
-                }
-            });
-        });
     }
 
     // Main controller level of whole OBv4 include section start, reset, initialising.
@@ -205,14 +233,15 @@ mBroadcaster.addListener('fm:initialized', () => {
         /**
          * OnboardV4
          * @constructor
+         *
+         * @param {object} map Map used to create Sections and corresponding Steps
+         * @param {MegaDataBitMap} flagStorage The onboarding flag storage
          */
-        constructor(map) {
+        constructor(map, flagStorage) {
 
             this.map = map;
             this.sections = Object.create(null);
-            this.start();
-
-            mBroadcaster.addListener('pagechange', this.start.bind(this));
+            this.flagStorage = flagStorage;
         }
 
         start() {
@@ -226,7 +255,8 @@ mBroadcaster.addListener('fm:initialized', () => {
             }
             // User visit this section first time lets start
             else {
-                this.sections[currentSectionName] = new OnboardV4Section(this.map[currentSectionName]);
+                // eslint-disable-next-line no-use-before-define
+                this.sections[currentSectionName] = new OnboardV4Section(this.map[currentSectionName], this);
             }
         }
 
@@ -238,18 +268,16 @@ mBroadcaster.addListener('fm:initialized', () => {
                 return;
             }
 
-            let obflags = [
-                'obcd', 'obcduf', 'obcdmyf', 'obcdda',
-                'obmc', 'obmclp', 'obmccp', 'obmcmp', 'obmcco', 'obmcnw'
-            ];
+            let obflags = Object.values(OBV4_FLAGS);
 
             if (prefix) {
                 obflags = obflags.filter(flag => flag.startsWith(prefix));
             }
 
             for (var i = obflags.length; i--;) {
-                mega.config.set(obflags[i], 1);
+                this.flagStorage.set(obflags[i], 0);
             }
+            this.flagStorage.safeCommit();
         }
 
         get currentSectionName() {
@@ -272,10 +300,11 @@ mBroadcaster.addListener('fm:initialized', () => {
     // Section(Page) level like Clouddrive, Chat, Backup, Settings, etc.
     class OnboardV4Section {
 
-        constructor(map) {
+        constructor(map, parent) {
 
             this.map = map;
             this.steps = [];
+            this.parent = parent;
             this.init();
         }
 
@@ -299,8 +328,7 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
 
         get isComplete() {
-
-            return !fmconfig[this.map.flag];
+            return !!this.parent.flagStorage.getSync(this.map.flag);
         }
 
         prepareControlPanel() {
@@ -472,7 +500,8 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         // set section completed on fmconfig
         setSectionComplete() {
-            mega.config.set(this.map.flag, 0);
+            this.parent.flagStorage.setSync(this.map.flag, 1);
+            this.parent.flagStorage.safeCommit();
         }
     }
 
@@ -565,7 +594,7 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
 
         get isComplete() {
-            return !fmconfig[this.map.flag];
+            return !!this.parentSection.parent.flagStorage.getSync(this.map.flag);
         }
 
         markHotspot() {
@@ -591,8 +620,8 @@ mBroadcaster.addListener('fm:initialized', () => {
 
             $('.onboarding-step-link', this.$controlPanel).eq(this.index).removeClass('active').addClass('complete');
 
-            // Setting it to user fmconfig
-            mega.config.set(this.map.flag, 0);
+            this.parentSection.parent.flagStorage.setSync(this.map.flag, 1);
+            this.parentSection.parent.flagStorage.safeCommit();
         }
     }
 
@@ -891,7 +920,8 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
     }
 
-    mega.ui.onboarding = new OnboardV4(obMap);
+    mega.ui.onboarding = new OnboardV4(obMap, flagMap);
+    mega.ui.onboardingFlags = OBV4_FLAGS;
 
     return 0xDEAD;
 });

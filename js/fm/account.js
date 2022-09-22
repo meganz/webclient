@@ -53,18 +53,27 @@ function accountUI() {
         // instead or refactoring "accounts" page to return a promise in "rendering" a non noticeable
         // heuristic 300ms delay has been added. I believe this delay simulate the slowness which allowed
         // the previous logic to work.
-        delay('settings:scrollbarinit', () => {
-            if (accountUI.$contentBlock.is('.ps')) {
-                Ps.update(accountUI.$contentBlock[0]);
-            }
-            else {
-                Ps.initialize(accountUI.$contentBlock[0]);
-            }
-        }, 300);
+        delay('settings:scrollbarinit', accountUI.initAccountScroll, 300);
     }, 1);
-
-
 }
+
+accountUI.initAccountScroll = function() {
+
+    'use strict';
+
+    const $scrollBlock = accountUI.$contentBlock || $('.fm-right-account-block');
+
+    if (!$scrollBlock.length) {
+        return false;
+    }
+
+    if ($scrollBlock.is('.ps')) {
+        Ps.update($scrollBlock[0]);
+    }
+    else {
+        Ps.initialize($scrollBlock[0]);
+    }
+};
 
 accountUI.renderAccountPage = function(account) {
 
@@ -3393,7 +3402,9 @@ accountUI.transfers = {
                                                 done();
                                             }
                                             else {
-                                                $('.slider-percentage span').text('0 %').removeClass('bold warn');
+                                                $('.slider-percentage')
+                                                    .safeHTML(l.transfer_quota_pct.replace('%1', formatPercentage(0)));
+                                                $('.slider-percentage span').removeClass('bold warn');
                                                 $('#bandwidth-slider').slider('value', 0);
                                             }
                                         });
@@ -3405,7 +3416,8 @@ accountUI.transfers = {
                             }
                         },
                         slide: function(e, ui) {
-                            $('.slider-percentage span', accountUI.$contentBlock).text(ui.value + ' %');
+                            $('.slider-percentage', accountUI.$contentBlock)
+                                .safeHTML(l.transfer_quota_pct.replace('%1', formatPercentage(ui.value / 100)));
 
                             if (ui.value > 90) {
                                 $('.slider-percentage span', accountUI.$contentBlock).addClass('warn bold');
@@ -3419,7 +3431,8 @@ accountUI.transfers = {
                     $('.ui-slider-handle', $slider).addClass('sprite-fm-mono icon-arrow-left ' +
                         'sprite-fm-mono-after icon-arrow-right-after');
 
-                    $('.slider-percentage span', accountUI.$contentBlock).text(bandwidthLimit + ' %');
+                    $('.slider-percentage', accountUI.$contentBlock)
+                        .safeHTML(l.transfer_quota_pct.replace('%1', formatPercentage(bandwidthLimit / 100)));
                     $('.bandwith-settings', accountUI.$contentBlock).removeClass('disabled').addClass('border');
                     $('.slider-percentage-bl', accountUI.$contentBlock).removeClass('hidden');
                     $('.band-grn-noti', accountUI.$contentBlock).addClass('hidden');

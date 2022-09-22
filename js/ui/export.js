@@ -1999,6 +1999,9 @@ var exportExpiry = {
             }
         }
 
+        $('.rounded-tip-button .tip-text', $linksTab)
+            .text(mega.icu.format(l.export_link_decrypt_tip, Object($.itemExport).length || 0));
+
         // Show export dialog
         M.safeShowDialog('links', function() {
 

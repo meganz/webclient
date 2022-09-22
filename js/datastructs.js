@@ -982,35 +982,35 @@ MegaDataBitMapManager.prototype.get = function(name) {
  * @constructor
  */
 function MegaDataBitMap(name, isPub, keys) {
-    var self = this;
-    MegaDataObject.call(self, array.to.object(keys, 0));
+    MegaDataObject.call(this, array.to.object(keys, 0));
 
-    self.name = name;
-    self._keys = keys;
-    self._isPub = isPub;
-    self._data = new Uint8Array(keys.length);
-    self._updatedMask = new Uint8Array(keys.length);
-    self._version = null;
-    self._readyPromise = new MegaPromise();
+    this.name = name;
+    this._keys = keys;
+    this._isPub = isPub;
+    this._data = new Uint8Array(keys.length);
+    this._updatedMask = new Uint8Array(keys.length);
+    this._version = null;
 
-    attribCache.bitMapsManager.register(name, self);
+    attribCache.bitMapsManager.register(name, this);
 
-    mega.attr.get(u_handle, name, self.isPublic() ? true : -2, true)
-        .then(function(r) {
-            if (typeof r !== 'string') {
-                throw r;
-            }
-            self.mergeFrom(r, false);
-        })
-        .catch(function(ex) {
-            if (ex !== -9) {
+    this._readyPromise = new Promise((resolve, reject) => {
+        mega.attr.get(u_handle, name, this.isPublic() ? true : -2, true)
+            .then(r => {
+                if (typeof r !== 'string') {
+                    throw r;
+                }
+                this.mergeFrom(r, false);
+                resolve();
+            })
+            .catch(ex => {
+                if (ex === ENOENT) {
+                    return resolve(ex);
+                }
                 // -9 is ok, means the attribute does not exists on the server
                 console.error("mega.attr.get failed:", ex);
-            }
-        })
-        .always(SoonFc(function() {
-            self._readyPromise.resolve();
-        }));
+                reject(ex);
+            });
+    });
 }
 
 inherits(MegaDataBitMap, MegaDataObject);
@@ -1032,7 +1032,6 @@ MegaDataBitMap.prototype.keys = function() {
     return this._keys;
 };
 
-
 /**
  * Flip the value of `key` from 0 -> 1 or from 1 -> 0
  * Calling this function would trigger a change event.
@@ -1042,12 +1041,12 @@ MegaDataBitMap.prototype.keys = function() {
  * @returns {Boolean}
  */
 MegaDataBitMap.prototype.toggle = function(key) {
-    var keyIdx = this._keys.indexOf(key);
+    const keyIdx = this._keys.indexOf(key);
     if (keyIdx === -1) {
         return false;
     }
 
-    this.set(key, !this._data[keyIdx] ? 1 : 0);
+    this.set(key, this._data[keyIdx] ? 0 : 1);
 };
 
 /**
@@ -1074,67 +1073,77 @@ MegaDataBitMap.prototype.set = function(key, v, ignoreDataChange, defaultVal) {
         return;
     }
 
-    var self = this;
-    self._readyPromise.done(function() {
-        defaultVal = defaultVal ? defaultVal : 0;
-        var keyIdx = self._keys.indexOf(key);
-        if (keyIdx === -1) {
-            return false;
-        }
-
-        if (
-            (
-                typeof(self._data[keyIdx]) === 'undefined' &&
-                typeof(defaultVal) !== 'undefined' &&
-                _cmp(defaultVal, v) === true
-            ) || (
-                self._data[keyIdx] === v /* already the same value... */
-            )
-        ) {
-            // self._data[...] is empty and defaultVal == newVal, DON'T track updates.
-            return false;
-        }
-
-        self._data[keyIdx] = v;
-        self._updatedMask[keyIdx] = 1;
-
-        if (!ignoreDataChange) {
-            self.trackDataChange(self._data, key, v);
-        }
+    this._readyPromise.then(() => {
+        this.setSync(key, v, ignoreDataChange, defaultVal);
     });
 };
 
 /**
- * Optionally check if the MegaDataBitMap is ready to be used, e.g. the data is retrieved from the server.
- * .set and .get are automatically going to wait for the data to be loaded from the API, so this is not needed to be
- * called before .get/.set, but in all other use cases this can be used.
+ * Synchronous setter. Prefer using MegaDataBitMap.set().
+ * Can use instead if you are aware of the state of this._readyPromise
  *
- * @returns {Boolean}
+ * @param {String} key The bit map key to set
+ * @param {Number} v Can be either 0 or 1
+ * @param {Boolean} ignoreDataChange If true, would not trigger a change event
+ * @param {Number} defaultVal By default, the default value is supposed to be 0, but any other value can be passed here
+ * @returns {boolean|void} False if no change
+ * @see MegaDataBitMap.prototype.set
  */
-MegaDataBitMap.prototype.isReady = function() {
-    return this._readyPromise.state() !== 'pending';
+MegaDataBitMap.prototype.setSync = function(key, v, ignoreDataChange, defaultVal = 0) {
+    const keyIdx = this._keys.indexOf(key);
+    if (keyIdx === -1) {
+        return false;
+    }
+
+    if (
+        typeof this._data[keyIdx] === 'undefined'
+        && typeof defaultVal !== 'undefined'
+        && _cmp(defaultVal, v) === true
+        || this._data[keyIdx] === v /* already the same value... */
+    ) {
+        // self._data[...] is empty and defaultVal == newVal, DON'T track updates.
+        return false;
+    }
+
+    this._data[keyIdx] = v;
+    this._updatedMask[keyIdx] = 1;
+
+    if (!ignoreDataChange) {
+        this.trackDataChange(this._data, key, v);
+    }
 };
 
-MegaDataBitMap.prototype.get = function(key, defaultVal) {
-    var self = this;
-    var resPromise = new MegaPromise();
-    self._readyPromise
-        .done(function() {
-            defaultVal = defaultVal ? defaultVal : false;
-            var keyIdx = self._keys.indexOf(key);
-            if (keyIdx === -1) {
-                resPromise.reject(key);
-                return undefined;
-            }
+/**
+ * Returns the promise that will be resolved when the MegaDataBitMap has finished requesting the attribute from
+ * the server initially
+ *
+ * @returns {Promise} The initialisation promise
+ */
+MegaDataBitMap.prototype.isReady = function() {
+    return this._readyPromise;
+};
 
-            resPromise.resolve(
-                self._data && typeof(self._data[keyIdx]) !== 'undefined' ? self._data[keyIdx] : defaultVal
-            );
-        })
-        .fail(function() {
-            resPromise.reject(arguments);
-        });
-    return resPromise;
+MegaDataBitMap.prototype.get = async function(key, defaultVal = false) {
+    await this._readyPromise;
+    return this.getSync(key, defaultVal);
+};
+
+/**
+ * Synchronous getter. Prefer using MegaDataBitMap.get().
+ * Can use instead if you are aware of the state of this._readyPromise
+ *
+ * @param {string} key Key for the value to fetch
+ * @param {*|boolean} defaultVal Default value if the key is not set
+ * @returns {*|boolean} The current value of the key
+ * @see MegaDataBitMap.prototype.get
+ */
+MegaDataBitMap.prototype.getSync = function(key, defaultVal = false) {
+    const keyIdx = this._keys.indexOf(key);
+    if (keyIdx === -1) {
+        throw key;
+    }
+
+    return this._data && typeof this._data[keyIdx] !== 'undefined' ? this._data[keyIdx] : defaultVal;
 };
 
 /**
@@ -1150,37 +1159,35 @@ MegaDataBitMap.prototype.get = function(key, defaultVal) {
  * sending to the server on the next .commit() call)
  */
 MegaDataBitMap.prototype.mergeFrom = function(str, requiresCommit) {
-    var self = this;
-
-    var targetLength = str.length;
-    if (self._keys.length > str.length) {
-        targetLength = self._keys.length;
+    let targetLength = str.length;
+    if (this._keys.length > str.length) {
+        targetLength = this._keys.length;
     }
-    for (var i = 0, strLen = str.length; i < strLen; i++) {
-        var newVal = str.charCodeAt(i);
-        if (self._data[i] !== newVal) {
-            if (self._updatedMask[i] && self._updatedMask[i] === 1) {
+    for (let i = 0, strLen = str.length; i < strLen; i++) {
+        const newVal = str.charCodeAt(i);
+        if (this._data[i] !== newVal) {
+            if (this._updatedMask[i] && this._updatedMask[i] === 1) {
                 // found uncommited change, would leave (and not merge), since in that case, we would assume that
                 // since changes are commited (almost) immediately after the .set()/.toggle() is done, then this
                 // was just changed and its newer/up to date then the one from the server.
             }
             else {
-                self._data[i] = newVal;
-                self.trackDataChange(
-                    self._data,
-                    self._keys[i],
+                this._data[i] = newVal;
+                this.trackDataChange(
+                    this._data,
+                    this._keys[i],
                     newVal
                 );
                 if (requiresCommit) {
-                    self._updatedMask[i] = 1;
+                    this._updatedMask[i] = 1;
                 }
             }
         }
     }
 
     // resize if needed.
-    if (self._keys.length > targetLength) {
-        self._data.fill(false, self._keys.length, targetLength - self._keys.length);
+    if (this._keys.length > targetLength) {
+        this._data.fill(false, this._keys.length, targetLength - this._keys.length);
     }
 };
 
@@ -1247,80 +1254,63 @@ MegaDataBitMap.prototype.isPublic = function() {
  * All non-changed keys/bits, may be altered in case another commit (by another client) had changed them. In that case,
  * a change event would be triggered.
  *
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
 MegaDataBitMap.prototype.commit = function() {
-    var self = this;
-    var masterPromise = new MegaPromise();
-    if (self._commitTimer) {
-        clearTimeout(self._commitTimer);
-    }
-    self._commitTimer = setTimeout(function() {
-        if (self._commitPromise) {
-            // commit is already in progress, create a proxy promise that would execute after the current commit op and
-            // return it
-            self._commitPromise.always(function () {
-                masterPromise.linkDoneAndFailTo(self.commit());
-            });
-            return;
-        }
-
-        self._commitPromise = new MegaPromise();
-        masterPromise.linkDoneAndFailTo(self._commitPromise);
-
-        self._commitPromise.always(function () {
-            delete self._commitPromise;
-        });
-
-        // check if we really need to commit anything (e.g. mask is not full of zeroes)
-        var foundOnes = false;
-        for (var i = 0; i < self._updatedMask.length; i++) {
-            if (self._updatedMask[i] === 1) {
-                foundOnes = true;
-                break;
+    this._commitPromise = this._commitPromise || new Promise((resolve, reject) => {
+        delay(`mdbm-commit${this.name}`, () => {
+            if (!this._updatedMask.includes(1)) {
+                delete this._commitPromise;
+                return resolve(false);
             }
-        }
 
-        // no need to commit anything.
-        if (foundOnes === false) {
-            var commitPromise = self._commitPromise;
-            self._commitPromise.resolve(false);
-            return;
-        }
-        var attributeFullName = (self.isPublic() ? "+!" : "^!") + self.name;
-
-        var cacheKey = u_handle + "_" + attributeFullName;
-        attribCache.setItem(cacheKey, JSON.stringify([self.toString(), 0]));
-
-        api_req(
-            {
-                "a": "usma",
-                "n": attributeFullName,
-                "ua": self.toString(),
-                "m": self.maskToString()
-            },
-            {
-                callback: function megaDataBitMapCommitCalback(response) {
-                    if (typeof(response) === 'number') {
-                        self._commitPromise.reject(response);
-                    }
-                    else {
-                        if (response.ua && response.ua !== self.toString()) {
-                            self.mergeFrom(base64urldecode(response.ua));
-                            attribCache.setItem(cacheKey, JSON.stringify([self.toString(), 0]));
+            const attributeFullName = `${this.isPublic() ? '+' : '^'}!${this.name}`;
+            const cacheKey = `${u_handle}_${attributeFullName}`;
+            attribCache.setItem(cacheKey, JSON.stringify([this.toString(), 0]));
+            api_req(
+                {
+                    a: 'usma',
+                    n: attributeFullName,
+                    ua: this.toString(),
+                    m: this.maskToString()
+                },
+                {
+                    callback: (response) => {
+                        if (typeof response === 'number') {
+                            reject(response);
                         }
-                        if (response.v) {
-                            self.setVersion(response.v);
+                        else {
+                            if (response.ua && response.ua !== this.toString()) {
+                                this.mergeFrom(base64urldecode(response.ua));
+                                attribCache.setItem(cacheKey, JSON.stringify([this.toString(), 0]));
+                            }
+                            if (response.v) {
+                                this.setVersion(response.v);
+                            }
+                            this.commited();
+                            resolve(response);
                         }
-                        self.commited();
-                        self._commitPromise.resolve(response);
+                        delete this._commitPromise;
                     }
                 }
-            }
-        );
-    }, 100);
+            );
+        }, 100);
+    });
 
-    return masterPromise;
+    return this._commitPromise;
+};
+
+/**
+ * Commit the MegaDataBitMap with basic handling of the resulting promise
+ *
+ * @returns {void} void
+ */
+MegaDataBitMap.prototype.safeCommit = function() {
+    if (this._commitPromise) {
+        // Already committing
+        return;
+    }
+    this.commit().then(nop).catch(dump);
 };
 
 /**
@@ -1335,17 +1325,17 @@ MegaDataBitMap.prototype.commit = function() {
  * @returns {MegaDataBitMap}
  */
 MegaDataBitMap.fromString = function(name, isPub, keys, base64str, parent) {
-    var str = base64urldecode(base64str);
-    var targetLength = str.length;
+    const str = base64urldecode(base64str);
+    let targetLength = str.length;
     if (keys.length > str.length) {
         targetLength = keys.length;
     }
-    var buf = new ArrayBuffer(targetLength); // 2 bytes for each char
-    var bufView = new Uint8Array(buf);
-    for (var i = 0, strLen = str.length; i < strLen; i++) {
+    const buf = new ArrayBuffer(targetLength); // 2 bytes for each char
+    const bufView = new Uint8Array(buf);
+    for (let i = 0, strLen = str.length; i < strLen; i++) {
         bufView[i] = str.charCodeAt(i);
     }
-    var mdbm = new MegaDataBitMap(name, isPub, keys, parent);
+    const mdbm = new MegaDataBitMap(name, isPub, keys, parent);
     mdbm._data = new Uint8Array(buf, 0, buf.byteLength);
     if (keys.length > buf.length) {
         mdbm._data.fill(false, keys.length, buf.length - keys.length);
@@ -1358,10 +1348,10 @@ MegaDataBitMap.fromString = function(name, isPub, keys, base64str, parent) {
  * Mark all bits/keys as 0s (would not commit the changes).
  */
 MegaDataBitMap.prototype.reset = function() {
-    var self = this;
-    self.keys().forEach(function(k) {
-        self.set(k, 0);
-    });
+    const keys = this.keys();
+    for (let i = 0; i < keys.length; i++) {
+        this.set(keys[i], 0);
+    }
 };
 
 /**

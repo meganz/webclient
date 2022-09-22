@@ -130,9 +130,7 @@ class StreamControls extends MegaRenderMixin {
                             <span>{audioLabel}</span>
                         </Button>
                         {signal ? null : renderSignalWarning()}
-                        {hasToRenderPermissionsWarning(Av.Audio) ?
-                            renderPermissionsWarning(Av.Audio) :
-                            null}
+                        {hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null}
                     </li>
                     <li>
                         <Button
@@ -152,9 +150,7 @@ class StreamControls extends MegaRenderMixin {
                             }}>
                             <span>{videoLabel}</span>
                         </Button>
-                        {hasToRenderPermissionsWarning(Av.Camera) ?
-                            renderPermissionsWarning(Av.Camera) :
-                            null}
+                        {hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null}
                     </li>
                     <li>
                         <StreamExtendedControls

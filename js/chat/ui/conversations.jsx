@@ -1,17 +1,14 @@
-// libs
-import { hot } from 'react-hot-loader/root';
 import React from 'react';
-import utils, { Emoji, ParsedHTML } from './../../ui/utils.jsx';
+import { hot } from 'react-hot-loader/root';
 import { MegaRenderMixin } from '../mixins.js';
-import { Button } from '../../ui/buttons.jsx';
 import { ConversationPanels, EmptyConvPanel } from "./conversationpanel.jsx";
 import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import { Start as StartMeetingDialog } from "./meetings/workflow/start.jsx";
 import { StartGroupChatWizard } from './startGroupChatWizard.jsx';
 import MeetingsCallEndedDialog from "./meetings/meetingsCallEndedDialog.jsx";
 import { inProgressAlert } from './meetings/call.jsx';
-import ChatToaster from "./chatToaster";
-import LeftPanel from './leftPanel/leftPanel';
+import ChatToaster from './chatToaster.jsx';
+import LeftPanel from './leftPanel/leftPanel.jsx';
 
 class ConversationsApp extends MegaRenderMixin {
     requestReceivedListener = null;

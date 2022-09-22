@@ -1,11 +1,6 @@
 function later(callback) {
-    if (typeof callback !== 'function') {
-        throw new Error('Invalid function parameter.');
-    }
-
-    return setTimeout(function() {
-        callback();
-    }, 1000);
+    'use strict';
+    return tSleep(1).then(callback);
 }
 
 /**
@@ -191,6 +186,7 @@ lazy(self, 'tSleep', function tSleep() {
 
         resolve.ts = ts;
         resolve.data = data;
+        resolve.id = ++mIncID;
         resolve.now = performance.now();
         pending.add(resolve);
 
@@ -198,9 +194,32 @@ lazy(self, 'tSleep', function tSleep() {
             delay.cancel(TID);
             delay(TID, dispatcher, threshold = ts);
         }
+
+        return mIncID;
     };
 
-    return (ts, data) => new Promise(resolve => schedule(resolve, ts * 1e3, data));
+    const abort = (pid, promise) => {
+        Object.defineProperty(promise, 'aborted', {value: -pid | 1});
+
+        for (const resolve of pending) {
+            if (resolve.id === pid) {
+                pending.delete(resolve);
+
+                if (!pending.size) {
+                    delay.cancel(TID);
+                }
+                return resolve.data || -pid;
+            }
+        }
+    };
+
+    return (ts, data) => {
+        let pid;
+        const promise = new Promise((resolve) => {
+            pid = schedule(resolve, ts * 1e3, data);
+        });
+        return Object.defineProperty(promise, 'abort', {value: () => abort(pid, promise)});
+    };
 });
 
 /**
@@ -232,31 +251,27 @@ lazy(self, 'sleep', function sleep() {
             super(ctx, 'mega-worklet-messenger');
             this.port.onmessage = (ev) => this.handleMessage(ev);
             this._connected = false;
-            this.dispatch();
+            this.attach().catch(dump);
         }
 
         get ready() {
             return true;
         }
 
-        attach() {
+        async attach() {
             if (!this._connected) {
-                this._connected = true;
                 this.connect(this.context.destination);
+                this._connected = true;
             }
-        }
-
-        detach() {
-            if (this._connected) {
-                this.port.postMessage({message: 'sleep'});
-                this.disconnect(this.context.destination);
-                this._connected = false;
-            }
-        }
-
-        dispatch() {
-            this.attach();
             this.port.postMessage({threshold, message: 'schedule'});
+        }
+
+        async detach() {
+            if (this._connected) {
+                this._connected = false;
+                this.port.postMessage({message: 'sleep'});
+                return this.disconnect(this.context.destination);
+            }
         }
 
         handleMessage(ev) {
@@ -283,10 +298,10 @@ lazy(self, 'sleep', function sleep() {
 
             if (pending.size) {
                 // re-schedule as per new threshold
-                queueMicrotask(() => this.dispatch());
+                queueMicrotask(() => this.attach().catch(dump));
             }
             else {
-                queueMicrotask(() => this.detach());
+                queueMicrotask(() => this.detach().catch(dump));
             }
         }
     };
@@ -326,7 +341,7 @@ lazy(self, 'sleep', function sleep() {
         threshold = Math.max(MIN_THRESHOLD, Math.min(ts, threshold));
 
         if (worklet.ready) {
-            queueMicrotask(() => worklet.dispatch());
+            queueMicrotask(() => worklet.attach().catch(dump));
         }
     });
 });

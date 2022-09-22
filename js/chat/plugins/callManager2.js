@@ -418,9 +418,9 @@
             this.av = this.sfuApp.sfuClient.availAv;
         }
         onLocalMediaError(errObj) {
-            this.chatRoom.trigger('onLocalMediaError', errObj);
+            megaChat.trigger('onLocalMediaError', errObj);
         }
-        toggleAudio(mute) {
+        toggleAudio() {
             this.sfuApp.sfuClient.muteAudio(!this.sfuApp.sfuClient.localAudioMuted());
             // when we are not a speaker, local audio track is never obtained, so the event is never fired
             this.onLocalMediaChange(SfuClient.Av.Audio);

@@ -39,7 +39,7 @@ function dlinfo(ph,key,next)
         $('.mobile.dl-browser, .mobile.dl-megaapp').addClass('disabled');
     }
     else {
-        watchdog.query('dlsize', 2100, true);
+        watchdog.query('dlsize', 2100, true).catch(nop);
     }
 
     if (dl_res)

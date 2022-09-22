@@ -1294,7 +1294,8 @@ li.active .call-duration i {
 
 /* TODO: add variables, see: `button.css` */
 .profile-head .profile-controls button,
-.profile-head .profile-controls button:hover {
+.profile-head .profile-controls button:hover,
+.profile-head .profile-controls button:focus {
     margin: 0 15px 0 0;
     background: linear-gradient(180deg, rgba(86, 210, 241, 1) 0%, rgba(43, 166, 222, 1) 100%);
 }
@@ -1450,7 +1451,7 @@ li.active .call-duration i {
     border-bottom: 0;
 }
 .profile-shared-folders table.grid-table th.name,
-.profile-shared-folders table.grid-table th.share-access {
+.profile-shared-folders table.grid-table th.access {
     display: inline-flex;
     justify-content: space-between;
     padding-right: 15px;
@@ -1460,8 +1461,8 @@ li.active .call-duration i {
 .profile-shared-folders table.shared-with-me td.name {
     width: 39%;
 }
-.profile-shared-folders table.grid-table th.share-access,
-.profile-shared-folders table.shared-with-me td.share-access {
+.profile-shared-folders table.grid-table th.access,
+.profile-shared-folders table.shared-with-me td.access {
     width: 39%;
 }
 @media only screen and (max-width: 1368px) and (min-width: 320px)  {
@@ -1476,8 +1477,8 @@ li.active .call-duration i {
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-    .profile-shared-folders table.grid-table th.share-access,
-    .profile-shared-folders table.shared-with-me td.share-access {
+    .profile-shared-folders table.grid-table th.access,
+    .profile-shared-folders table.shared-with-me td.access {
         width: 150px;
     }
 }

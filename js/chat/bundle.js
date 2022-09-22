@@ -5762,7 +5762,7 @@ __webpack_require__.d(__webpack_exports__, {
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
 var _mixins1__ = __webpack_require__(503);
-var _meetings_call_jsx2__ = __webpack_require__(486);
+var _meetings_call_jsx2__ = __webpack_require__(200);
 var _ui_buttons3__ = __webpack_require__(204);
 
 
@@ -8256,8 +8256,8 @@ ColumnContactLastInteraction.label = l[5904];
 ColumnContactLastInteraction.megatype = "interaction";
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 var dropdowns = __webpack_require__(261);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
-var call = __webpack_require__(486);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
+var call = __webpack_require__(200);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
@@ -8518,61 +8518,72 @@ class ContactList extends mixins.wl {
       interactions: {},
       contextMenuPosition: null
     };
+    this.onSelected = this.onSelected.bind(this);
+    this.onHighlighted = this.onHighlighted.bind(this);
+    this.onExpand = this.onExpand.bind(this);
+    this.onAttachClicked = this.onAttachClicked.bind(this);
+  }
 
-    this.getLastInteractions = () => {
-      const {
-        contacts
-      } = this.props;
-      let interactions = {};
-      let promises = [];
+  getLastInteractions() {
+    const {
+      contacts
+    } = this.props;
+    const promises = [];
 
-      for (let handle in contacts) {
-        if (contacts.hasOwnProperty(handle)) {
-          promises.push(getLastInteractionWith(handle, true, true).done(timestamp => {
-            const [type, time] = timestamp.split(':');
-            interactions[handle] = {
-              'u': handle,
-              'type': type,
-              'time': time
-            };
-          }));
-        }
+    const push = handle => {
+      promises.push(Promise.resolve(getLastInteractionWith(handle, true, true)).then(ts => [ts, handle]));
+    };
+
+    for (const handle in contacts) {
+      if (contacts[handle].c === 1) {
+        push(handle);
       }
+    }
 
-      Promise.allSettled(promises).then(() => {
-        if (!this.isMounted()) {
-          return;
+    Promise.allSettled(promises).then(res => {
+      if (this.isMounted()) {
+        const interactions = {};
+
+        for (let i = res.length; i--;) {
+          if (res[i].status !== 'fulfilled') {
+            if (d && res[i].reason !== false) {
+              console.warn('getLastInteractions', res[i].reason);
+            }
+          } else {
+            const [ts, u] = res[i].value;
+            const [type, time] = ts.split(':');
+            interactions[u] = {
+              u,
+              type,
+              time
+            };
+          }
         }
 
         this.setState({
           'interactions': interactions
         });
-      }).catch(() => {
-        console.error("Failed to retrieve last interactions.");
-      });
-    };
-
-    this.handleContextMenu = (ev, handle) => {
-      ev.persist();
-
-      if (this.state.selected.length > 1) {
-        return null;
       }
+    }).catch(ex => {
+      console.error("Failed to handle last interactions!", ex);
+    });
+  }
 
-      const $$REF = this.contextMenuRefs[handle];
+  handleContextMenu(ev, handle) {
+    ev.persist();
 
-      if ($$REF && $$REF.isMounted()) {
-        const refNodePosition = $$REF.domNode && $$REF.domNode.getBoundingClientRect().x;
-        this.setState({
-          contextMenuPosition: ev.clientX > refNodePosition ? null : ev.clientX
-        }, () => $$REF.onClick(ev));
-      }
-    };
+    if (this.state.selected.length > 1) {
+      return null;
+    }
 
-    this.onSelected = this.onSelected.bind(this);
-    this.onHighlighted = this.onHighlighted.bind(this);
-    this.onExpand = this.onExpand.bind(this);
-    this.onAttachClicked = this.onAttachClicked.bind(this);
+    const $$REF = this.contextMenuRefs[handle];
+
+    if ($$REF && $$REF.isMounted()) {
+      const refNodePosition = $$REF.domNode && $$REF.domNode.getBoundingClientRect().x;
+      this.setState({
+        contextMenuPosition: ev.clientX > refNodePosition ? null : ev.clientX
+      }, () => $$REF.onClick(ev));
+    }
   }
 
   componentDidMount() {
@@ -11583,8 +11594,8 @@ PushSettingsDialog.options = {
   Infinity: l[22011]
 };
 PushSettingsDialog.default = PushSettingsDialog.options[PushSettingsDialog.options.length - 1];
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
-var call = __webpack_require__(486);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
+var call = __webpack_require__(200);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
 var historyPanel = __webpack_require__(638);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
@@ -11841,6 +11852,7 @@ class Join extends mixins.wl {
     }, l.how_meetings_work))), external_React_default().createElement("div", {
       className: "card-preview"
     }, external_React_default().createElement(preview.Z, {
+      context: Join.NAMESPACE,
       onToggle: (audio, video) => this.setState({
         previewAudio: audio,
         previewVideo: video
@@ -13835,12 +13847,8 @@ var esm_extends = __webpack_require__(462);
 // EXTERNAL MODULE: external "React"
 var external_React_ = __webpack_require__(363);
 var external_React_default = __webpack_require__.n(external_React_);
-// EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
 // EXTERNAL MODULE: ./js/chat/mixins.js
 var mixins = __webpack_require__(503);
-// EXTERNAL MODULE: ./js/ui/buttons.jsx
-var buttons = __webpack_require__(204);
 // EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 13 modules
 var conversationpanel = __webpack_require__(78);
 // EXTERNAL MODULE: ./js/chat/ui/contactsPanel/contactsPanel.jsx + 19 modules
@@ -13853,6 +13861,8 @@ var meetings_button = __webpack_require__(193);
 var preview = __webpack_require__(97);
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 var ui_link = __webpack_require__(941);
+// EXTERNAL MODULE: ./js/ui/utils.jsx
+var utils = __webpack_require__(79);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/start.jsx
 
 
@@ -13871,7 +13881,8 @@ class Start extends mixins.wl {
       video: false,
       editing: false,
       previousTopic: undefined,
-      topic: undefined
+      topic: undefined,
+      mounted: false
     };
 
     this.handleChange = ev => this.setState({
@@ -13944,6 +13955,9 @@ class Start extends mixins.wl {
   componentDidMount() {
     super.componentDidMount();
     this.bindEvents();
+    M.safeShowDialog(Start.dialogName, () => this.setState({
+      mounted: true
+    }));
   }
 
   componentWillUnmount() {
@@ -13964,10 +13978,12 @@ class Start extends mixins.wl {
       name: NAMESPACE,
       className: NAMESPACE,
       stopKeyPropagation: editing,
+      noCloseOnClickOutside: true,
       onClose: () => this.props.onClose()
     }), external_React_default().createElement("div", {
       className: `${NAMESPACE}-preview`
     }, external_React_default().createElement(preview.Z, {
+      context: NAMESPACE,
       onToggle: this.onStreamToggle
     })), external_React_default().createElement("div", {
       className: "fm-dialog-body"
@@ -13999,6 +14015,7 @@ class Start extends mixins.wl {
 
 }
 Start.NAMESPACE = 'start-meeting';
+Start.dialogName = `${Start.NAMESPACE}-dialog`;
 Start.CLASS_NAMES = {
   EDIT: 'call-title-edit',
   INPUT: 'call-title-input'
@@ -14521,8 +14538,8 @@ const startGroupChatWizard = ({
 });
 // EXTERNAL MODULE: ./js/chat/ui/meetings/meetingsCallEndedDialog.jsx
 var meetingsCallEndedDialog = __webpack_require__(238);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
-var call = __webpack_require__(486);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
+var call = __webpack_require__(200);
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
 var chatToaster = __webpack_require__(142);
 ;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultTable.jsx
@@ -15252,6 +15269,8 @@ class SearchPanel extends mixins.wl {
   }
 
 }
+// EXTERNAL MODULE: ./js/ui/buttons.jsx
+var buttons = __webpack_require__(204);
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/navigation.jsx
 
 
@@ -16003,8 +16022,6 @@ class LeftPanel extends mixins.wl {
 }
 LeftPanel.NAMESPACE = 'lhp';
 ;// CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
-
-
 
 
 
@@ -17406,8 +17423,8 @@ class RetentionChange extends mixin.y {
   }
 
 }
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
-var call = __webpack_require__(486);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
+var call = __webpack_require__(200);
 ;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
 
@@ -18371,7 +18388,7 @@ const __WEBPACK_DEFAULT_EXPORT__ = (Button);
 
 /***/ }),
 
-/***/ 486:
+/***/ 200:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -19314,116 +19331,10 @@ class SidebarControls extends mixins.wl {
   }
 
 }
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/permissionsObserver.jsx
-
-
-
-const withPermissionsObserver = Component => class extends mixins.wl {
-  constructor(props) {
-    super(props);
-    this.namespace = `PO-${Component.NAMESPACE}`;
-    this.permissionsObserver = `onLocalMediaError.${this.namespace}`;
-    this.state = {
-      errMic: null,
-      errCamera: null,
-      errScreen: null
-    };
-    this.resetError = this.resetError.bind(this);
-    this.hasToRenderPermissionsWarning = this.hasToRenderPermissionsWarning.bind(this);
-    this.renderPermissionsWarning = this.renderPermissionsWarning.bind(this);
-  }
-
-  resetError(av) {
-    this.setState({
-      errMic: av === Av.Audio ? null : this.state.errMic,
-      errCamera: av === Av.Camera ? null : this.state.errCamera,
-      errScreen: av === Av.Screen ? null : this.state.errScreen
-    });
-  }
-
-  isUserActionError(error) {
-    return error && error.message === "Permission denied";
-  }
-
-  hasToRenderPermissionsWarning(av) {
-    const CONFIG = {
-      [Av.Audio]: {
-        showOnUserActionError: true,
-        err: this.state.errMic
-      },
-      [Av.Camera]: {
-        showOnUserActionError: true,
-        err: this.state.errCamera
-      },
-      [Av.Screen]: {
-        showOnUserActionError: false,
-        err: this.state.errScreen
-      }
-    };
-    const current = CONFIG[av];
-
-    if (current) {
-      return this.isUserActionError(current.err) ? current.showOnUserActionError : current.err;
-    }
-
-    return false;
-  }
-
-  renderPermissionsDialog(av) {
-    const CONTENT = {
-      [Av.Audio]: [l.no_mic_title, l.no_mic_info],
-      [Av.Camera]: [l.no_camera_title, l.no_camera_info],
-      [Av.Screen]: [l.no_screen_title, l.no_screen_info]
-    };
-    return msgDialog('warningb', null, ...CONTENT[av], null, 1);
-  }
-
-  renderPermissionsWarning(av) {
-    return external_React_default().createElement("div", {
-      className: `
-                    ${this.namespace}
-                    meetings-signal-issue
-                    simpletip
-                `,
-      "data-simpletip": "Show more info",
-      "data-simpletipposition": "top",
-      "data-simpletipoffset": "5",
-      "data-simpletip-class": "theme-dark-forced",
-      onClick: () => this.renderPermissionsDialog(av)
-    }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-exclamation-filled"
-    }));
-  }
-
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    this.props.chatRoom.unbind(this.permissionsObserver);
-  }
-
-  componentDidMount() {
-    super.componentDidMount();
-    this.props.chatRoom.rebind(this.permissionsObserver, (_, errAv) => {
-      this.setState({
-        errMic: errAv && errAv.mic ? errAv.mic : this.state.errMic,
-        errCamera: errAv && errAv.camera ? errAv.camera : this.state.errCamera,
-        errScreen: errAv && errAv.screen ? errAv.screen : this.state.errScreen
-      });
-    });
-  }
-
-  render() {
-    return external_React_default().createElement(Component, (0,esm_extends.Z)({}, this.props, {
-      errMic: this.state.errMic,
-      errCamera: this.state.errCamera,
-      errScreen: this.state.errScreen,
-      resetError: this.resetError,
-      renderPermissionsWarning: this.renderPermissionsWarning,
-      hasToRenderPermissionsWarning: this.hasToRenderPermissionsWarning
-    }));
-  }
-
-};
+// EXTERNAL MODULE: ./js/chat/ui/meetings/permissionsObserver.jsx
+var permissionsObserver = __webpack_require__(209);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamExtendedControls.jsx
+
 
 
 
@@ -19432,6 +19343,11 @@ const withPermissionsObserver = Component => class extends mixins.wl {
 class StreamExtendedControls extends mixins.wl {
   constructor(...args) {
     super(...args);
+    this.simpletip = {
+      position: 'top',
+      offset: 8,
+      className: 'theme-dark-forced'
+    };
 
     this.isActive = type => {
       return !!(this.props.call.av & type);
@@ -19442,20 +19358,21 @@ class StreamExtendedControls extends mixins.wl {
     const {
       onScreenSharingClick,
       onHoldClick,
+      hasToRenderPermissionsWarning,
+      renderPermissionsWarning,
       resetError
     } = this.props;
-    const SIMPLETIP = {
-      position: 'top',
-      offset: 8,
-      className: 'theme-dark-forced'
-    };
-    const screenSharingLabel = this.isActive(SfuClient.Av.Screen) ? l[22890] : l[22889];
-    const callHoldLabel = this.isActive(SfuClient.Av.onHold) ? l[23459] : l[23460];
-    return external_React_default().createElement(meetings_button.Z.Group, {
-      active: this.isActive(SfuClient.Av.Screen)
-    }, external_React_default().createElement(meetings_button.Z, {
+    const {
+      onHold,
+      Screen
+    } = SfuClient.Av;
+    const screenSharingLabel = this.isActive(Screen) ? l[22890] : l[22889];
+    const callHoldLabel = this.isActive(onHold) ? l[23459] : l[23460];
+    return external_React_default().createElement(meetings_button.Z.Group, (0,esm_extends.Z)({}, this.props, {
+      active: this.isActive(Screen)
+    }), external_React_default().createElement(meetings_button.Z, {
       key: "screen-sharing",
-      simpletip: { ...SIMPLETIP,
+      simpletip: { ...this.simpletip,
         label: screenSharingLabel
       },
       className: `
@@ -19463,19 +19380,17 @@ class StreamExtendedControls extends mixins.wl {
                         theme-light-forced
                         round
                         large
-                        ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
-                        ${this.isActive(SfuClient.Av.Screen) ? 'active' : ''}
+                        ${this.isActive(onHold) ? 'disabled' : ''}
+                        ${this.isActive(Screen) ? 'active' : ''}
                     `,
-      icon: `
-                        ${this.isActive(SfuClient.Av.Screen) ? 'icon-end-screenshare' : 'icon-screen-share'}
-                    `,
+      icon: this.isActive(Screen) ? 'icon-end-screenshare' : 'icon-screen-share',
       onClick: () => {
-        resetError(SfuClient.Av.Screen);
+        resetError(Screen);
         onScreenSharingClick();
       }
-    }, external_React_default().createElement("span", null, screenSharingLabel)), this.props.hasToRenderPermissionsWarning(SfuClient.Av.Screen) ? this.props.renderPermissionsWarning(SfuClient.Av.Screen) : null, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, screenSharingLabel)), hasToRenderPermissionsWarning(Screen) ? renderPermissionsWarning(Screen) : null, external_React_default().createElement(meetings_button.Z, {
       key: "call-hold",
-      simpletip: { ...SIMPLETIP,
+      simpletip: { ...this.simpletip,
         label: callHoldLabel,
         position: 'left'
       },
@@ -19484,16 +19399,16 @@ class StreamExtendedControls extends mixins.wl {
                         theme-light-forced
                         round
                         large
-                        ${this.isActive(SfuClient.Av.onHold) ? 'active' : ''}
+                        ${this.isActive(onHold) ? 'active' : ''}
                     `,
-      icon: this.isActive(SfuClient.Av.onHold) ? 'icon-play' : 'icon-pause',
+      icon: this.isActive(onHold) ? 'icon-play' : 'icon-pause',
       onClick: onHoldClick
     }, external_React_default().createElement("span", null, callHoldLabel)));
   }
 
 }
 
-const streamExtendedControls = ((0,mixins.qC)(withPermissionsObserver)(StreamExtendedControls));
+const streamExtendedControls = ((0,mixins.qC)(permissionsObserver.Q)(StreamExtendedControls));
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/micObserver.jsx
 
 
@@ -19729,7 +19644,7 @@ class StreamControls extends mixins.wl {
 }
 
 StreamControls.NAMESPACE = 'stream-controls';
-const streamControls = ((0,mixins.qC)(withMicObserver, withPermissionsObserver)(StreamControls));
+const streamControls = ((0,mixins.qC)(withMicObserver, permissionsObserver.Q)(StreamControls));
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/local.jsx
 
 
@@ -20313,7 +20228,7 @@ class Minimized extends mixins.wl {
 Minimized.NAMESPACE = 'local-stream-minimized';
 Minimized.UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
 
-const __Minimized = (0,mixins.qC)(withMicObserver, withPermissionsObserver)(Minimized);
+const __Minimized = (0,mixins.qC)(withMicObserver, permissionsObserver.Q)(Minimized);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsNotice.jsx
 
 
@@ -22380,6 +22295,177 @@ MeetingsCallEndedDialog.dialogName = 'meetings-ended-dialog';
 
 /***/ }),
 
+/***/ 209:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+"Q": () => (withPermissionsObserver)
+});
+var _extends4__ = __webpack_require__(462);
+var react0__ = __webpack_require__(363);
+var react0 = __webpack_require__.n(react0__);
+var _mixins1__ = __webpack_require__(503);
+var _ui_utils_jsx2__ = __webpack_require__(79);
+var _ui_modalDialogs3__ = __webpack_require__(904);
+
+
+
+
+
+const withPermissionsObserver = Component => class extends _mixins1__.wl {
+  constructor(props) {
+    super(props);
+    this.namespace = `PO-${Component.NAMESPACE}`;
+    this.observer = `onLocalMediaError.${this.namespace}`;
+    this.content = {
+      [Av.Audio]: {
+        title: l.no_mic_title,
+        info: l.no_mic_info
+      },
+      [Av.Camera]: {
+        title: l.no_camera_title,
+        info: l.no_camera_info
+      },
+      [Av.Screen]: {
+        title: l.no_screen_title,
+        info: l.no_screen_info
+      }
+    };
+    this.state = {
+      errMic: null,
+      errCamera: null,
+      errScreen: null,
+      [`dialog-${Av.Audio}`]: null,
+      [`dialog-${Av.Camera}`]: null,
+      [`dialog-${Av.Screen}`]: null
+    };
+    this.resetError = this.resetError.bind(this);
+    this.hasToRenderPermissionsWarning = this.hasToRenderPermissionsWarning.bind(this);
+    this.renderPermissionsWarning = this.renderPermissionsWarning.bind(this);
+  }
+
+  resetError(av) {
+    this.setState({
+      errMic: av === Av.Audio ? null : this.state.errMic,
+      errCamera: av === Av.Camera ? null : this.state.errCamera,
+      errScreen: av === Av.Screen ? null : this.state.errScreen
+    });
+  }
+
+  isUserActionError(error) {
+    return error && error.message === "Permission denied";
+  }
+
+  hasToRenderPermissionsWarning(av) {
+    const CONFIG = {
+      [Av.Audio]: {
+        showOnUserActionError: true,
+        err: this.state.errMic
+      },
+      [Av.Camera]: {
+        showOnUserActionError: true,
+        err: this.state.errCamera
+      },
+      [Av.Screen]: {
+        showOnUserActionError: false,
+        err: this.state.errScreen
+      }
+    };
+    const current = CONFIG[av];
+
+    if (current) {
+      return this.isUserActionError(current.err) ? current.showOnUserActionError : current.err;
+    }
+
+    return false;
+  }
+
+  renderPermissionsDialog(av) {
+    return react0().createElement(_ui_utils_jsx2__["default"].RenderTo, {
+      element: document.body
+    }, react0().createElement(_ui_modalDialogs3__.Z.ModalDialog, {
+      dialogName: `${this.namespace}-permissions-${av}`,
+      className: `
+                            dialog-template-message
+                            with-close-btn
+                            warning
+                        `,
+      buttons: [{
+        key: 'ok',
+        label: l[81],
+        className: 'positive',
+        onClick: () => this.setState({
+          [`dialog-${av}`]: false
+        })
+      }],
+      hideOverlay: this.props.context === 'start-meeting',
+      onClose: () => this.setState({
+        [`dialog-${av}`]: false
+      })
+    }, react0().createElement("header", null, react0().createElement("div", {
+      className: "graphic"
+    }, react0().createElement("i", {
+      className: "warning sprite-fm-uni icon-warning"
+    })), react0().createElement("div", {
+      className: "info-container"
+    }, react0().createElement("h3", {
+      id: "msgDialog-title"
+    }, this.content[av].title), react0().createElement("p", {
+      className: "text"
+    }, this.content[av].info)))));
+  }
+
+  renderPermissionsWarning(av) {
+    return react0().createElement("div", {
+      className: `
+                        ${this.namespace}
+                        meetings-signal-issue
+                        simpletip
+                    `,
+      "data-simpletip": "Show more info",
+      "data-simpletipposition": "top",
+      "data-simpletipoffset": "5",
+      "data-simpletip-class": "theme-dark-forced",
+      onClick: () => this.setState({
+        [`dialog-${av}`]: true
+      })
+    }, react0().createElement("i", {
+      className: "sprite-fm-mono icon-exclamation-filled"
+    }), this.state[`dialog-${av}`] && this.renderPermissionsDialog(av));
+  }
+
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    megaChat.unbind(this.observer);
+  }
+
+  componentDidMount() {
+    super.componentDidMount();
+    megaChat.rebind(this.observer, (ev, errAv) => {
+      this.setState({
+        errMic: errAv && errAv.mic ? errAv.mic : this.state.errMic,
+        errCamera: errAv && errAv.camera ? errAv.camera : this.state.errCamera,
+        errScreen: errAv && errAv.screen ? errAv.screen : this.state.errScreen
+      });
+    });
+  }
+
+  render() {
+    return react0().createElement(Component, (0,_extends4__.Z)({}, this.props, this.state, {
+      errMic: this.state.errMic,
+      errCamera: this.state.errCamera,
+      errScreen: this.state.errScreen,
+      hasToRenderPermissionsWarning: this.hasToRenderPermissionsWarning,
+      renderPermissionsWarning: this.renderPermissionsWarning,
+      resetError: this.resetError
+    }));
+  }
+
+};
+
+/***/ }),
+
 /***/ 336:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -22395,7 +22481,7 @@ var _mixins1__ = __webpack_require__(503);
 var _contacts_jsx2__ = __webpack_require__(13);
 var _ui_modalDialogs_jsx3__ = __webpack_require__(904);
 var _button_jsx4__ = __webpack_require__(193);
-var _call_jsx5__ = __webpack_require__(486);
+var _call_jsx5__ = __webpack_require__(200);
 var _ui_utils_jsx6__ = __webpack_require__(79);
 
 
@@ -22571,22 +22657,25 @@ window.ChatCallIncomingDialog = Incoming;
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"Z": () => (Preview)
+"Z": () => (__WEBPACK_DEFAULT_EXPORT__)
 });
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
+var _mixins_js1__ = __webpack_require__(503);
 var _contacts_jsx2__ = __webpack_require__(13);
-var _call_jsx3__ = __webpack_require__(486);
+var _call_jsx3__ = __webpack_require__(200);
 var _button_jsx4__ = __webpack_require__(193);
+var _permissionsObserver5__ = __webpack_require__(209);
 
 
 
 
 
-class Preview extends _mixins1__.wl {
-  constructor(props) {
-    super(props);
+
+
+class Preview extends _mixins_js1__.wl {
+  constructor(...args) {
+    super(...args);
     this.videoRef = react0().createRef();
     this.stream = null;
     this.state = {
@@ -22596,7 +22685,7 @@ class Preview extends _mixins1__.wl {
 
     this.getTrackType = type => !type ? 'getTracks' : type === Preview.STREAMS.AUDIO ? 'getAudioTracks' : 'getVideoTracks';
 
-    this.startStream = () => {
+    this.startStream = type => {
       this.stopStream();
       const {
         audio,
@@ -22616,7 +22705,17 @@ class Preview extends _mixins1__.wl {
             this.props.onToggle(this.state.audio, this.state.video);
           }
         }
-      }).catch(ex => console.error(ex.name + ": " + ex.message));
+      }).catch(ex => {
+        const stream = type === Preview.STREAMS.AUDIO ? 'audio' : 'video';
+        this.setState(state => ({
+          [stream]: !state[stream]
+        }), () => {
+          megaChat.trigger('onLocalMediaError', {
+            [type === Preview.STREAMS.AUDIO ? 'mic' : 'camera']: `${ex.name}: ${ex.message}`
+          });
+          console.error(`${ex.name}: ${ex.message}`);
+        });
+      });
     };
 
     this.stopStream = type => {
@@ -22678,6 +22777,11 @@ class Preview extends _mixins1__.wl {
       NAMESPACE
     } = Preview;
     const {
+      hasToRenderPermissionsWarning,
+      renderPermissionsWarning,
+      resetError
+    } = this.props;
+    const {
       audio,
       video
     } = this.state;
@@ -22700,41 +22804,50 @@ class Preview extends _mixins1__.wl {
       ref: this.videoRef
     }), !video && this.renderAvatar(), react0().createElement("div", {
       className: `${NAMESPACE}-controls`
+    }, react0().createElement("div", {
+      className: "preview-control-wrapper"
     }, react0().createElement(_button_jsx4__.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: audio ? l[16214] : l[16708]
       },
       className: `
-                            mega-button
-                            round
-                            large
-                            theme-light-forced
-                            ${audio ? '' : 'inactive'}
-                        `,
+                                mega-button
+                                round
+                                large
+                                theme-light-forced
+                                ${audio ? '' : 'inactive'}
+                            `,
       icon: audio ? 'icon-audio-filled' : 'icon-audio-off',
-      onClick: () => this.toggleStream(Preview.STREAMS.AUDIO)
-    }, react0().createElement("span", null, audio ? l[16214] : l[16708])), react0().createElement(_button_jsx4__.Z, {
+      onClick: () => {
+        resetError(Av.Audio);
+        this.toggleStream(Preview.STREAMS.AUDIO);
+      }
+    }, react0().createElement("span", null, audio ? l[16214] : l[16708])), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null), react0().createElement("div", {
+      className: "preview-control-wrapper"
+    }, react0().createElement(_button_jsx4__.Z, {
       simpletip: { ...SIMPLETIP_PROPS,
         label: video ? l[22894] : l[22893]
       },
       className: `
-                            mega-button
-                            round
-                            large
-                            theme-light-forced
-                            ${video ? '' : 'inactive'}
-                        `,
+                                mega-button
+                                round
+                                large
+                                theme-light-forced
+                                ${video ? '' : 'inactive'}
+                            `,
       icon: video ? 'icon-video-call-filled' : 'icon-video-off',
       onClick: () => this.toggleStream(Preview.STREAMS.VIDEO)
-    }, react0().createElement("span", null, video ? l[22894] : l[22893]))));
+    }, react0().createElement("span", null, video ? l[22894] : l[22893])), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null)));
   }
 
 }
+
 Preview.NAMESPACE = 'preview-meeting';
 Preview.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
+const __WEBPACK_DEFAULT_EXPORT__ = ((0,_mixins_js1__.qC)(_permissionsObserver5__.Q)(Preview));
 
 /***/ }),
 
@@ -26020,6 +26133,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       typedMessage: this.state.typedMessage.slice(0, cursorPosition) + slug + this.state.typedMessage.slice(cursorPosition)
     }, () => {
       textarea.selectionEnd = cursorPosition + slug.length;
+      this.onTypeAreaChange(e, this.state.typedMessage);
     });
   }
 
@@ -26297,7 +26411,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
     }
   }
 
-  onTypeAreaChange(e) {
+  onTypeAreaChange(e, value) {
     if (this.props.disabled) {
       e.preventDefault();
       e.stopPropagation();
@@ -26305,15 +26419,14 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
     }
 
     var self = this;
+    value = String(value || e.target.value || '').replace(/^\s+/, '');
 
-    if (self.state.typedMessage !== e.target.value) {
+    if (self.state.typedMessage !== value) {
       self.setState({
-        typedMessage: e.target.value
+        typedMessage: value
       });
       self.forceUpdate();
     }
-
-    const value = $.trim(e.target.value);
 
     if (value.length) {
       self.typing();

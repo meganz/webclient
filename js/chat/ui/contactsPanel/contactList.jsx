@@ -32,38 +32,50 @@ export default class ContactList extends MegaRenderMixin {
      * @returns {void}
      */
 
-    getLastInteractions = () => {
-        const { contacts } = this.props;
-        let interactions = {};
-        let promises = [];
-        for (let handle in contacts) {
-            if (contacts.hasOwnProperty(handle)) {
-                promises.push(
-                    getLastInteractionWith(handle, true, true)
-                        .done(timestamp => {
-                            const [type, time] = timestamp.split(':');
-                            interactions[handle] = {
-                                'u': handle,
-                                'type': type,
-                                'time': time
-                            };
-                        })
-                );
+    getLastInteractions() {
+        const {contacts} = this.props;
+        const promises = [];
+
+        const push = (handle) => {
+            // @todo remove the Promise.resolve() whenever MegaPromise is no longer used.
+            promises.push(
+                Promise.resolve(getLastInteractionWith(handle, true, true)).then((ts) => [ts, handle])
+            );
+        };
+
+        for (const handle in contacts) {
+            if (contacts[handle].c === 1) {
+                push(handle);
             }
         }
 
         Promise.allSettled(promises)
-            .then(() => {
-                if (!this.isMounted()) {
-                    return;
+            .then((res) => {
+                if (this.isMounted()) {
+                    const interactions = {};
+
+                    for (let i = res.length; i--;) {
+                        if (res[i].status !== 'fulfilled') {
+                            if (d && res[i].reason !== false) {
+                                console.warn('getLastInteractions', res[i].reason);
+                            }
+                        }
+                        else {
+                            const [ts, u] = res[i].value;
+                            const [type, time] = ts.split(':');
+
+                            interactions[u] = {u, type, time};
+                        }
+                    }
+
+                    // commit state in one go, only when all done.
+                    this.setState({'interactions': interactions});
                 }
-                // commit state in one go, only when all done.
-                this.setState({'interactions': interactions});
             })
-            .catch(() => {
-                console.error("Failed to retrieve last interactions.");
+            .catch((ex) => {
+                console.error("Failed to handle last interactions!", ex);
             });
-    };
+    }
 
     /**
      * handleContextMenu
@@ -72,7 +84,7 @@ export default class ContactList extends MegaRenderMixin {
      * @param handle
      */
 
-    handleContextMenu = (ev, handle) => {
+    handleContextMenu(ev, handle) {
         ev.persist();
         if (this.state.selected.length > 1) {
             // Do not show the context menu if select multiple contacts

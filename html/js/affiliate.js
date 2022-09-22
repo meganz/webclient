@@ -303,7 +303,7 @@ var affiliateprogram = {
 
         // For mobile hide all other buttons but referral url button
         if (is_mobile) {
-            $('.refer-blocks .green-button:not(:first)', this.$contentBlock).addClass('hidden');
+            $('.refer-blocks .green-button:not([data-reftype="url"])', this.$contentBlock).addClass('hidden');
         }
 
         $('.refer-blocks .green-button', this.$contentBlock).rebind('click', function() {

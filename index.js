@@ -3332,7 +3332,7 @@ window.addEventListener('beforeunload', () => {
     'use strict';
 
     if ('rad' in mega) {
-        mega.rad.flush();
+        mega.rad.flush().dump('rad.flush');
     }
 
     if (megaChatIsReady && megaChat.activeCall) {
@@ -3399,7 +3399,7 @@ mBroadcaster.once('startMega', () => {
             mBroadcaster.sendMessage('statechange', {prevState, state, event});
 
             if ('rad' in mega) {
-                mega.rad.flush();
+                mega.rad.flush().dump('rad.flush');
             }
         }
     };

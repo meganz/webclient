@@ -2190,13 +2190,14 @@ async function api_getfileattr(fa, type, procfa, errfa) {
     if (type in fa_handler.lru) {
         const lru = await fa_handler.lru[type];
         if (!lru.error) {
-            const found = await lru.find(Object.keys(fa)).catch(nop) || false;
-            const send = (h) => lru.get(h).then(ab => procfa({cached: 1}, h, ab));
-            for (let i = found.length; i--;) {
-                send(found[i]);
-                fa[found[i]] = null;
+            const send = async(h, ab) => procfa({cached: 1}, h, ab);
+            const found = await lru.bulkGet(Object.keys(fa)).catch(dump) || false;
+
+            for (const h in found) {
+                fa[h] = null;
+                send(h, found[h]).catch(dump);
             }
-            cache = (h, buf) => lru.set(h, buf).catch(nop);
+            cache = (h, buf) => lru.set(h, buf).catch(dump);
         }
     }
 

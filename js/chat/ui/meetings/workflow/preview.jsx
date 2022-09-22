@@ -1,10 +1,11 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../mixins';
+import { compose, MegaRenderMixin } from '../../../mixins.js';
 import { Avatar } from '../../contacts.jsx';
 import Call from '../call.jsx';
 import Button from '../button.jsx';
+import { withPermissionsObserver } from '../permissionsObserver';
 
-export default class Preview extends MegaRenderMixin {
+class Preview extends MegaRenderMixin {
     static NAMESPACE = 'preview-meeting';
 
     static STREAMS = {
@@ -20,14 +21,10 @@ export default class Preview extends MegaRenderMixin {
         video: false
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     getTrackType = type => !type ? 'getTracks' : type === Preview.STREAMS.AUDIO ? 'getAudioTracks' : 'getVideoTracks';
 
-    startStream = () => {
-        // cleanup previous streams, if any
+    startStream = type => {
+        // Cleanup previous streams, if any
         this.stopStream();
 
         const { audio, video } = this.state;
@@ -42,7 +39,16 @@ export default class Preview extends MegaRenderMixin {
                     }
                 }
             })
-            .catch(ex => console.error(ex.name + ": " + ex.message));
+            .catch(ex => {
+                // Unable to start audio/video -> trigger media error, w/o enabling the control
+                const stream = type === Preview.STREAMS.AUDIO ? 'audio' : 'video';
+                this.setState(state => ({ [stream]: !state[stream] }), () => {
+                    megaChat.trigger('onLocalMediaError', {
+                        [type === Preview.STREAMS.AUDIO ? 'mic' : 'camera']: `${ex.name}: ${ex.message}`
+                    });
+                    console.error(`${ex.name}: ${ex.message}`);
+                });
+            });
     };
 
     stopStream = type => {
@@ -91,6 +97,7 @@ export default class Preview extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE } = Preview;
+        const { hasToRenderPermissionsWarning, renderPermissionsWarning, resetError } = this.props;
         const { audio, video } = this.state;
         const SIMPLETIP_PROPS = { label: undefined, position: 'top', className: 'theme-dark-forced' };
 
@@ -105,40 +112,51 @@ export default class Preview extends MegaRenderMixin {
                 {!video && this.renderAvatar()}
 
                 <div className={`${NAMESPACE}-controls`}>
-                    <Button
-                        simpletip={{
-                            ...SIMPLETIP_PROPS,
-                            label: audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */
-                        }}
-                        className={`
-                            mega-button
-                            round
-                            large
-                            theme-light-forced
-                            ${audio ? '' : 'inactive'}
-                        `}
-                        icon={audio ? 'icon-audio-filled' : 'icon-audio-off'}
-                        onClick={() => this.toggleStream(Preview.STREAMS.AUDIO)}>
-                        <span>{audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */}</span>
-                    </Button>
-                    <Button
-                        simpletip={{
-                            ...SIMPLETIP_PROPS,
-                            label: video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video`*/
-                        }}
-                        className={`
-                            mega-button
-                            round
-                            large
-                            theme-light-forced
-                            ${video ? '' : 'inactive'}
-                        `}
-                        icon={video ? 'icon-video-call-filled' : 'icon-video-off'}
-                        onClick={() => this.toggleStream(Preview.STREAMS.VIDEO)}>
-                        <span>{video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */}</span>
-                    </Button>
+                    <div className="preview-control-wrapper">
+                        <Button
+                            simpletip={{
+                                ...SIMPLETIP_PROPS,
+                                label: audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */
+                            }}
+                            className={`
+                                mega-button
+                                round
+                                large
+                                theme-light-forced
+                                ${audio ? '' : 'inactive'}
+                            `}
+                            icon={audio ? 'icon-audio-filled' : 'icon-audio-off'}
+                            onClick={() => {
+                                resetError(Av.Audio);
+                                this.toggleStream(Preview.STREAMS.AUDIO);
+                            }}>
+                            <span>{audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */}</span>
+                        </Button>
+                        {hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null}
+                    </div>
+                    <div className="preview-control-wrapper">
+                        <Button
+                            simpletip={{
+                                ...SIMPLETIP_PROPS,
+                                label: video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video`*/
+                            }}
+                            className={`
+                                mega-button
+                                round
+                                large
+                                theme-light-forced
+                                ${video ? '' : 'inactive'}
+                            `}
+                            icon={video ? 'icon-video-call-filled' : 'icon-video-off'}
+                            onClick={() => this.toggleStream(Preview.STREAMS.VIDEO)}>
+                            <span>{video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */}</span>
+                        </Button>
+                        {hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null}
+                    </div>
                 </div>
             </div>
         );
     }
 }
+
+export default compose(withPermissionsObserver)(Preview);

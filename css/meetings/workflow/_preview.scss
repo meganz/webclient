@@ -82,6 +82,14 @@
         transform: translateX(-50%);
         z-index: 2;
 
+        .preview-control-wrapper {
+            display: inline-block;
+            position: relative;
+            width: 70px;
+            padding: 0 11px 0 11px;
+            box-sizing: border-box;
+        }
+
         button {
             display: inline;
 

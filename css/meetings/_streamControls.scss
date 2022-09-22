@@ -10,6 +10,10 @@
     transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
     z-index: 11;
 
+    .overlayed & {
+        bottom: 0;
+    }
+
     ul {
         display: block;
         margin: 0;

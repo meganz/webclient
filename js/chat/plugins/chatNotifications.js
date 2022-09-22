@@ -187,17 +187,6 @@ var ChatNotifications = function(megaChat, options) {
                         window.focus();
                         self.disconnectNotification.close();
                     };
-                })
-                .rebind('onLocalMediaError.chatNotifications', (e, errObj) => {
-                    if (errObj && errObj.screen) {
-                        self.notifications.notify(
-                            'screen-share-error',
-                            {
-                                anfFlag: 'chat_enabled',
-                            },
-                            true
-                        );
-                    }
                 });
         })
         .rebind('onIncomingCall.chatNotifications', function(e, room, callId, userId, callManager) {
@@ -346,5 +335,14 @@ var ChatNotifications = function(megaChat, options) {
         })
         .rebind('onCallAnswered.chatNotifications', function(e, room) {
             self.notifications.resetCounterGroup(room.chatId, "incoming-voice-video-call");
+        })
+        .rebind('onLocalMediaError.chatNotifications', (e, errObj) => {
+            if (errObj && errObj.screen) {
+                self.notifications.notify(
+                    'screen-share-error',
+                    { anfFlag: 'chat_enabled' },
+                    true
+                );
+            }
         });
 };

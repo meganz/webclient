@@ -1,15 +1,25 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
+import utils from '../../../ui/utils.jsx';
+import ModalDialogsUI from '../../../ui/modalDialogs';
 
 export const withPermissionsObserver = Component =>
     class extends MegaRenderMixin {
         namespace = `PO-${Component.NAMESPACE}`;
-        permissionsObserver = `onLocalMediaError.${this.namespace}`;
+        observer = `onLocalMediaError.${this.namespace}`;
+        content = {
+            [Av.Audio]: { title: l.no_mic_title, info: l.no_mic_info },
+            [Av.Camera]: { title: l.no_camera_title, info: l.no_camera_info },
+            [Av.Screen]: { title: l.no_screen_title, info: l.no_screen_info }
+        };
 
         state = {
             errMic: null,
             errCamera: null,
-            errScreen: null
+            errScreen: null,
+            [`dialog-${Av.Audio}`]: null,
+            [`dialog-${Av.Camera}`]: null,
+            [`dialog-${Av.Screen}`]: null
         };
 
         constructor(props) {
@@ -57,40 +67,66 @@ export const withPermissionsObserver = Component =>
         }
 
         renderPermissionsDialog(av) {
-            const CONTENT = {
-                [Av.Audio]: [l.no_mic_title, l.no_mic_info],
-                [Av.Camera]: [l.no_camera_title, l.no_camera_info],
-                [Av.Screen]: [l.no_screen_title, l.no_screen_info]
-            };
-            return msgDialog('warningb', null, ...CONTENT[av], null, 1);
+            return (
+                <utils.RenderTo element={document.body}>
+                    <ModalDialogsUI.ModalDialog
+                        dialogName={`${this.namespace}-permissions-${av}`}
+                        className={`
+                            dialog-template-message
+                            with-close-btn
+                            warning
+                        `}
+                        buttons={[
+                            {
+                                key: 'ok',
+                                label: l[81] /* `Ok` */,
+                                className: 'positive',
+                                onClick: () => this.setState({ [`dialog-${av}`]: false })
+                            }
+                        ]}
+                        hideOverlay={this.props.context === 'start-meeting'}
+                        onClose={() => this.setState({ [`dialog-${av}`]: false })}>
+                        <header>
+                            <div className="graphic">
+                                <i className="warning sprite-fm-uni icon-warning" />
+                            </div>
+                            <div className="info-container">
+                                <h3 id="msgDialog-title">{this.content[av].title}</h3>
+                                <p className="text">{this.content[av].info}</p>
+                            </div>
+                        </header>
+                    </ModalDialogsUI.ModalDialog>
+                </utils.RenderTo>
+            );
         }
 
         renderPermissionsWarning(av) {
             return (
                 <div
                     className={`
-                    ${this.namespace}
-                    meetings-signal-issue
-                    simpletip
-                `}
+                        ${this.namespace}
+                        meetings-signal-issue
+                        simpletip
+                    `}
                     data-simpletip="Show more info"
                     data-simpletipposition="top"
                     data-simpletipoffset="5"
                     data-simpletip-class="theme-dark-forced"
-                    onClick={() => this.renderPermissionsDialog(av)}>
-                    <i className="sprite-fm-mono icon-exclamation-filled" />
+                    onClick={() => this.setState({ [`dialog-${av}`]: true })}>
+                    <i className="sprite-fm-mono icon-exclamation-filled"/>
+                    {this.state[`dialog-${av}`] && this.renderPermissionsDialog(av)}
                 </div>
             );
         }
 
         componentWillUnmount() {
             super.componentWillUnmount();
-            this.props.chatRoom.unbind(this.permissionsObserver);
+            megaChat.unbind(this.observer);
         }
 
         componentDidMount() {
             super.componentDidMount();
-            this.props.chatRoom.rebind(this.permissionsObserver, (_, errAv) => {
+            megaChat.rebind(this.observer, (ev, errAv) => {
                 this.setState({
                     errMic: errAv && errAv.mic ? errAv.mic : this.state.errMic,
                     errCamera: errAv && errAv.camera ? errAv.camera : this.state.errCamera,
@@ -103,12 +139,13 @@ export const withPermissionsObserver = Component =>
             return (
                 <Component
                     {...this.props}
+                    {...this.state}
                     errMic={this.state.errMic}
                     errCamera={this.state.errCamera}
                     errScreen={this.state.errScreen}
-                    resetError={this.resetError}
-                    renderPermissionsWarning={this.renderPermissionsWarning}
                     hasToRenderPermissionsWarning={this.hasToRenderPermissionsWarning}
+                    renderPermissionsWarning={this.renderPermissionsWarning}
+                    resetError={this.resetError}
                 />
             );
         }

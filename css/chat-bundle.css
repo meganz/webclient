@@ -51,6 +51,9 @@
   transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
   z-index: 11;
 }
+.overlayed .meetings-call .stream .stream-controls {
+  bottom: 0;
+}
 .meetings-call .stream .stream-controls ul {
   display: block;
   margin: 0;
@@ -1968,6 +1971,13 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   bottom: 24px;
   transform: translateX(-50%);
   z-index: 2;
+}
+.preview-meeting-controls .preview-control-wrapper {
+  display: inline-block;
+  position: relative;
+  width: 70px;
+  padding: 0 11px 0 11px;
+  box-sizing: border-box;
 }
 .preview-meeting-controls button {
   display: inline;

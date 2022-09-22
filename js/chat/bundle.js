@@ -26020,6 +26020,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       typedMessage: this.state.typedMessage.slice(0, cursorPosition) + slug + this.state.typedMessage.slice(cursorPosition)
     }, () => {
       textarea.selectionEnd = cursorPosition + slug.length;
+      this.onTypeAreaChange(e, this.state.typedMessage);
     });
   }
 
@@ -26297,7 +26298,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
     }
   }
 
-  onTypeAreaChange(e) {
+  onTypeAreaChange(e, value) {
     if (this.props.disabled) {
       e.preventDefault();
       e.stopPropagation();
@@ -26305,15 +26306,14 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
     }
 
     var self = this;
+    value = String(value || e.target.value || '').replace(/^\s+/, '');
 
-    if (self.state.typedMessage !== e.target.value) {
+    if (self.state.typedMessage !== value) {
       self.setState({
-        typedMessage: e.target.value
+        typedMessage: value
       });
       self.forceUpdate();
     }
-
-    const value = $.trim(e.target.value);
 
     if (value.length) {
       self.typing();

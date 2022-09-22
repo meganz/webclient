@@ -457,10 +457,10 @@ SharedLocalKVStorage.prototype.removeItem = function(k, meta) {
             },
             true
         )
-            .done(function() {
+            .then(() => {
                 promise.resolve();
             })
-            .fail(function() {
+            .catch(() => {
                 promise.reject();
             });
         return promise;

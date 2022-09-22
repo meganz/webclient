@@ -494,6 +494,7 @@ function u_setrsa(rsakey) {
                     if (ASSERT(u_type === 3, assertMsg)) {
                         var user = {
                             u: u_attr.u,
+                            name: u_attr.name,
 
                             // u_attr.c in this phase represents confirmation
                             //  code status which is different from user contact

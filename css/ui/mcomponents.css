@@ -94,3 +94,9 @@
 .flex-justify-between {
     justify-content: space-between;
 }
+
+.text-ellipsis {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

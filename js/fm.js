@@ -3392,11 +3392,6 @@ function fm_resize_handler(force) {
             'height': `calc(100% - ${sharedHeaderHeight}px)`,
         });
     }
-    else if (M.currentrootid === 'discovery') {
-        const $galleryTabsBl = $('.gallery-tabs-bl', 'body');
-        const pos = $('.gallery-tab-lnk-y', $galleryTabsBl).position();
-        $('.gallery-section-title', $galleryTabsBl).css('max-width', pos.left - 10);
-    }
 
     if (d) {
         console.timeEnd('fm_resize_handler');

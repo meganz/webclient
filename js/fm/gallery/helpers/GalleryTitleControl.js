@@ -107,6 +107,18 @@ class GalleryTitleControl extends MComponent {
         this.el.append(this.titleEl);
     }
 
+    addTooltipToTitle() {
+        if (this.titleEl) {
+            this.titleEl.classList.add('text-ellipsis', 'simpletip', 'simpletip-tc');
+        }
+    }
+
+    removeTooltipFromTitle() {
+        if (this.titleEl) {
+            this.titleEl.classList.remove('text-ellipsis', 'simpletip', 'simpletip-tc');
+        }
+    }
+
     attachIcon() {
         this.iconEl = document.createElement('i');
         this.el.append(this.iconEl);
@@ -118,7 +130,7 @@ class GalleryTitleControl extends MComponent {
         }
 
         this._caret = document.createElement('span');
-        this._caret.setAttribute('class', 'nw-fm-tree-arrow rot-90 ml-1');
+        this._caret.classList.add('nw-fm-tree-arrow', 'rot-90', 'ml-1');
         this.el.append(this._caret);
     }
 

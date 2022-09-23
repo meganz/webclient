@@ -1747,6 +1747,7 @@ class MegaTargetGallery extends MegaGallery {
     checkGalleryUpdate(n) {
         if (!n.t && mega.gallery.isGalleryNode(n)) {
             const cameraTree = M.getTreeHandles(this.isDiscovery ? this.id : M.CameraId);
+            const rubTree = M.getTreeHandles(M.RubbishID);
 
             if (!this.isDiscovery && M.SecondCameraId) {
                 cameraTree.push(...M.getTreeHandles(M.SecondCameraId));
@@ -2094,6 +2095,8 @@ async function galleryUI(id) {
         mega.gallery.titleControl.title = M.d[id].name;
         mega.gallery.titleControl.icon = 'images';
         mega.gallery.titleControl.isClickable = false;
+        mega.gallery.titleControl.addTooltipToTitle();
+
         gallery = mega.gallery.discovery;
 
         $closeDiscovery.removeClass('hidden');
@@ -2102,6 +2105,7 @@ async function galleryUI(id) {
         mega.gallery.titleControl.filterSection = M.currentdirid;
         mega.gallery.titleControl.title = mega.gallery.sections[M.currentdirid].title;
         mega.gallery.titleControl.icon = mega.gallery.sections[M.currentdirid].icon;
+        mega.gallery.titleControl.removeTooltipFromTitle();
     }
 
     if (!gallery) {

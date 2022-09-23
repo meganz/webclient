@@ -260,8 +260,9 @@ mega.textEditorUI = new function TextEditorUI() {
                 if (editor) {
                     $saveButton.addClass('disabled');
 
-                    if (M.getNodeRights(fileHandle) < 2) {
+                    if (M.getNodeRights(fileHandle) < 1) {
                         $saveAsBtn.trigger('click');
+                        $saveButton.removeClass('disabled');
                         return false;
                     }
 

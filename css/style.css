@@ -4083,6 +4083,9 @@ body.loading .light-overlay {
   position: absolute;
   top: 32px;
 }
+.fm-breadcrumbs-wrapper .breadcrumb-dropdown.active {
+    max-height: 85vh;
+}
 .rtl .breadcrumb-dropdown.active {
     left: auto;
     right: 24px;

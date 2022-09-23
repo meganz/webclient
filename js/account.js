@@ -97,9 +97,10 @@ function u_checklogin3a(res, ctx) {
     }
     else {
         u_attr = res;
+
         var exclude = [
-            'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
-            'mkt', 'name', 'p', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
+            'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup', 'mkt',
+            'name', 'p', 'pf', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
         ];
 
         for (var n in u_attr) {
@@ -452,6 +453,7 @@ function u_setrsa(rsakey) {
                 // Check whether this is a business sub-user attempting to confirm the account.
                 if (res === EARGS && !window.businessSubAc) {
                     M.req('ug').then(function(u_attr) {
+
                         if (u_attr.b && u_attr.b.m === 0 && u_attr.b.bu) {
                             crypt.getPubKeyAttribute(u_attr.b.bu, 'RSA')
                                 .then(function(res) {

@@ -2381,7 +2381,8 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .astropay-payment-reminder .plan-icon.pro1 i.pro1,
 .astropay-payment-reminder .plan-icon.pro2 i.pro2,
 .astropay-payment-reminder .plan-icon.pro3 i.pro3,
-.astropay-payment-reminder .plan-icon.pro4 i.pro4,
+.astropay-payment-reminder .plan-icon.pro4 i.pro4,      /* Pro Lite */
+.astropay-payment-reminder .plan-icon.pro101 i.pro101,  /* Pro Flexi */
 .astropay-payment-reminder .plan-icon.business i.business {
     display: block;
 }
@@ -5390,6 +5391,7 @@ span.orange {
 .account.user-data-block .plan-icon.pro2 i.pro2,
 .account.user-data-block .plan-icon.pro3 i.pro3,
 .account.user-data-block .plan-icon.pro4 i.pro4,
+.account.user-data-block .plan-icon.pro101 i.pro101,
 .account.user-data-block .plan-icon.pro100 i.business {
     display: block;
 }
@@ -11473,14 +11475,16 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 .rtl .user-management-breadcrumb i {
     transform: rotate(180deg);
 }
-.user-management-breadcrumb .user-management-title {
+.user-management-breadcrumb .user-management-title,
+.user-management-breadcrumb.pro-iv-invoices .user-management-subuser-name.acc-acc {
     color: var(--text-color-medium);
     cursor: pointer;
     display: inline-flex;
     font: var(--text-body1);
     transition: var(--transition-color);
 }
-.user-management-breadcrumb .user-management-title:hover {
+.user-management-breadcrumb .user-management-title:hover,
+.user-management-breadcrumb.pro-iv-invoices .user-management-subuser-name.acc-acc:hover {
     color: var(--text-color-high);
 }
 
@@ -13560,6 +13564,21 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     display: none;
     --surface-alpha: 0.4;
 }
+.business-dashboard .overall-usage-container .overall-next-bill-wrapper.pro-iv {
+    background: var(--surface-main);
+    position: relative;
+}
+.business-dashboard .overall-usage-container .overall-next-bill-wrapper.pro-iv::before {
+    content: "";
+    position: absolute;
+    width: calc(100% + 48px);
+    -webkit-margin-start: -24px;
+    margin-inline-start: -24px;
+    height: 1px;
+    background-color: var(--divider-color);
+    top: 0;
+    left: 0;
+}
 
 .business-dashboard .overall-usage-container.admin .overall-next-bill-wrapper {
     display: block;
@@ -13567,6 +13586,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 
 .business-dashboard .overall-usage-container .overall-next-bill-container {
     padding: 16px 24px;
+    position: relative;
+}
+.business-dashboard .overall-usage-container .pro-iv .overall-next-bill-container {
+    padding: 16px;
 }
 
 .business-dashboard .overall-usage-container .overall-next-bill-container .title {
@@ -13609,9 +13632,22 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     position: absolute;
     left: 24px;
 }
+.business-dashboard .overall-usage-container .pro-iv .next-bill-message .first-message::before {
+    left: 16px;
+}
 .rtl .business-dashboard .overall-usage-container .next-bill-message .first-message::before {
     right: 24px;
 }
+.business-dashboard .overall-usage-container .mega-button.invoices-button {
+    position: absolute;
+    top: 16px;
+    right: 48px;
+}
+.rtl .business-dashboard .overall-usage-container .mega-button.invoices-button {
+    left: 48px;
+    right: initial;
+}
+
 
 /* Business dashboard - Overall usage next bill block End */
 

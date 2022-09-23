@@ -24,6 +24,31 @@ var pro = {
     UTQA_RES_INDEX_LOCALPRICE: 8,
     UTQA_RES_INDEX_LOCALPRICECURRENCY: 9,
     UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE: 10,
+    UTQA_RES_INDEX_ITEMNUM: 11,
+
+    /* Constants for special Pro levels */
+    ACCOUNT_LEVEL_PRO_LITE: 4,
+    ACCOUNT_LEVEL_PRO_I: 1,
+    ACCOUNT_LEVEL_PRO_II: 2,
+    ACCOUNT_LEVEL_PRO_III: 3,
+    ACCOUNT_LEVEL_PRO_FLEXI: 101,
+    ACCOUNT_LEVEL_BUSINESS: 100,
+
+    /* Account statuses for Business and Pro Flexi accounts */
+    ACCOUNT_STATUS_EXPIRED: -1,
+    ACCOUNT_STATUS_ENABLED: 1,
+    ACCOUNT_STATUS_GRACE_PERIOD: 2,
+
+    /**
+     * Determines if a Business or Pro Flexi account is expired or in grace period
+     * @param {Number} accountStatus The account status e.g. from u_attr.b.s (Business) or u_attr.pf.s (Pro Flexi)
+     * @returns {Boolean} Returns true if the account is expired or in grace period
+     */
+    isExpiredOrInGracePeriod: function(accountStatus) {
+        'use strict';
+
+        return [this.ACCOUNT_STATUS_EXPIRED, this.ACCOUNT_STATUS_GRACE_PERIOD].includes(accountStatus);
+    },
 
     /**
      * Load pricing plan information from the API. The data will be loaded into 'pro.membershipPlans'.
@@ -41,7 +66,7 @@ var pro = {
         }
         else {
             // Get the membership plans.
-            api_req({ a: 'utqa', nf: 2 }, {
+            api_req({ a: 'utqa', nf: 2, p: 1 }, {
                 callback: function(results) {
 
                     // The rest of the webclient expects this data in an array format
@@ -62,19 +87,40 @@ var pro = {
                             discount = lmbps[results[i].mbp] * results[i].m - results[i].lp;
                         }
 
-                        plans.push([
-                            results[i].id,          // id
-                            results[i].al,          // account level
-                            results[i].s,           // storage
-                            results[i].t,           // transfer
-                            results[i].m,           // months
-                            results[i].p / 100,     // price
-                            results[0].l.c,           // currency
-                            results[i].mbp / 100,   // monthly base price
-                            results[i].lp / 100,    // local price
-                            results[0].l.lc,          // local price currency
-                            discount / 100,         // local price save
-                        ]);
+                        // If this is Pro Flexi, the data is structured similarly to business, so set that manually
+                        if (results[i].al === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                            plans.push([
+                                results[i].id,             // id
+                                results[i].al,             // account level
+                                results[i].bd.ba.s,        // base storage
+                                results[i].bd.ba.t,        // base transfer
+                                results[i].m,              // months
+                                results[i].bd.ba.p  / 100, // base price
+                                results[0].l.c,            // currency
+                                results[i].bd.ba.p  / 100, // monthly base price
+                                results[i].bd.ba.lp / 100, // local base price
+                                results[0].l.lc,           // local price currency
+                                0,                         // local price save
+                                results[i].it              // item (will be 1 for business / Pro Flexi)
+                            ]);
+                        }
+                        else {
+                            // Otherwise for PRO I - III and PRO Lite set as so
+                            plans.push([
+                                results[i].id,          // id
+                                results[i].al,          // account level
+                                results[i].s,           // storage
+                                results[i].t,           // transfer
+                                results[i].m,           // months
+                                results[i].p / 100,     // price
+                                results[0].l.c,         // currency
+                                results[i].mbp / 100,   // monthly base price
+                                results[i].lp / 100,    // local price
+                                results[0].l.lc,        // local price currency
+                                discount / 100,         // local price save
+                                results[i].it           // item (will be 0 for user)
+                            ]);
+                        }
                         if (results[i].m === 1 && results[i].it !== 1) {
                             if (!maxPlan || maxPlan[2] < results[i]['s']) {
                                 maxPlan = plans[plans.length - 1];
@@ -100,7 +146,7 @@ var pro = {
 
     /**
      * Redirect to the site.
-     * @param {String} [topage] Redirect to this page of our site.
+     * @param {String} topage Redirect to this page of our site.
      */
     redirectToSite: function(topage) {
         'use strict';
@@ -112,6 +158,7 @@ var pro = {
         // and redirect to account page to show purchase
         if (M.account) {
             M.account.lastupdate = 0;
+
             // If pro page is opened from account/plan update M.currentdirid to force call openfolder
             M.currentdirid = String(M.currentdirid).substr(0, 7) === 'account' ? false : M.currentdirid;
         }
@@ -210,24 +257,26 @@ var pro = {
 
     /**
      * Get a string for the payment plan number
-     * @param {Number} planNum The plan number e.g. 1, 2, 3, 4
-     * @returns {String} The plan name i.e. PRO I, PRO II, PRO III, LITE
+     * @param {Number} planNum The plan number e.g. 1, 2, 3, 4, 100, 101, undefined
+     * @returns {String} The plan name i.e. Pro I, Pro II, Pro III, Pro Lite, Business, Pro Flexi, Free (default)
      */
     getProPlanName: function(planNum) {
 
         switch (planNum) {
             case 1:
-                return l[5819];     // PRO I
+                return l[5819];          // Pro I
             case 2:
-                return l[6125];     // PRO II
+                return l[6125];          // Pro II
             case 3:
-                return l[6126];     // PRO III
+                return l[6126];          // Pro III
             case 4:
-                return l[8413];     // PRO LITE
+                return l[8413];          // Pro Lite
             case 100:
-                return l[19530];    // Business
+                return l[19530];         // Business
+            case 101:
+                return l.pro_flexi_name; // Pro Flexi
             default:
-                return l[1150];     // FREE
+                return l[1150];          // Free
         }
     },
 

@@ -1317,7 +1317,6 @@ var addressDialog = {
         // Get discount information if available
         const discountInfo = pro.propay.getDiscount();
 
-
         // in case we are coming from normal users sign ups (PRO)
         if (!this.businessPlan || !this.userInfo) {
             // Get the selected package
@@ -1340,10 +1339,13 @@ var addressDialog = {
             }
         }
         else {
-            // here it means we are coming from business account register page
-            proNum = 'business'; // business account Plan icon
-            this.proNum = 100;
-            proPlan = l[19510];
+            // Here it means we are coming from business account register (or Business / Pro Flexi) Repay page
+            // Set plan icon
+            proNum = this.businessPlan.al === pro.ACCOUNT_LEVEL_PRO_FLEXI ? `pro${this.businessPlan.al}` : 'business';
+
+            // Get the plan number e.g. 100/101 and the plan name e.g. Business/Pro Flexi
+            this.proNum = this.businessPlan.al;
+            proPlan = pro.getProPlanName(this.proNum);
 
             if (this.businessPlan.pastInvoice && this.businessPlan.currInvoice) {
                 // since API returned values types cant be guarnteed,
@@ -1417,7 +1419,7 @@ var addressDialog = {
 
 
         // Update template
-        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 business')
+        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 pro101 business')
             .addClass(proNum);
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
@@ -2111,7 +2113,7 @@ var addressDialog = {
         if (addressDialog.stripeCheckerCounter > 20) {
             return;
         }
-        // let shift = 500 * ((addressDialog.stripeCheckerCounter / 10) | 0) + 500; // 500ms
+
         const shift = 500;
         const base = 3000; // 3sec
         const nextTick = addressDialog.stripeCheckerCounter * shift + base;
@@ -2128,8 +2130,8 @@ var addressDialog = {
                     const $stripeSuccessDialog = $('.payment-stripe-success-dialog');
                     const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
+                    // If this is newly created business account, it then requires verification
                     if (addressDialog.userInfo && !addressDialog.userInfo.isUpgrade) {
-                        // If this is newly created business account, it's then requires verification
                         $('.success-desc', $stripeSuccessDialog).safeHTML(l[25081]);
                         $('button.js-close, .btn-close-dialog', $stripeSuccessDialog).addClass('hidden');
                     }
@@ -2137,6 +2139,7 @@ var addressDialog = {
                         $('button.js-close, .btn-close-dialog', $stripeSuccessDialog)
                             .removeClass('hidden')
                             .rebind('click.stripeDlg', closeDialog);
+
                         delay('reload:stripe', pro.redirectToSite, 4000);
                     }
 

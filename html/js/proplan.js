@@ -32,11 +32,21 @@ pro.proplan = {
         "use strict";
 
         // if business sub-user is trying to get to Pro page redirect to home.
-        if (u_attr && u_attr.b && (!u_attr.b.m || (u_attr.b.m && u_attr.b.s !== -1))) {
+        if (u_attr && u_attr.b && (!u_attr.b.m || (u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED))) {
             loadSubPage('fm');
             return;
         }
-        if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+        if (u_attr && u_attr.b && u_attr.b.m && pro.isExpiredOrInGracePeriod()) {
+            loadSubPage('repay');
+            return;
+        }
+
+        // Make sure Pro Flexi can't access the Pro page and redirect to the File Manager or Repay page
+        if (u_attr && u_attr.pf && !pro.isExpiredOrInGracePeriod()) {
+            loadSubPage('fm');
+            return;
+        }
+        if (u_attr && u_attr.pf && pro.isExpiredOrInGracePeriod()) {
             loadSubPage('repay');
             return;
         }

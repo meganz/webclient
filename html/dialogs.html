@@ -3142,6 +3142,7 @@
                     <i class="pro2 sprite-fm-uni icon-crests-pro-2-details"></i>
                     <i class="pro3 sprite-fm-uni icon-crests-pro-3-details"></i>
                     <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
+                    <i class="pro101 sprite-fm-uni icon-crests-pro-flexi-details"></i>
                     <i class="business sprite-fm-uni icon-crests-business-details"></i>
                 </div>
                 <div class="payment-plan-info">
@@ -5823,13 +5824,21 @@
         </button>
 
         <header>
-            <div class="graphic sprite-fm-illustration img-dialog-business-expiry"></div>
-            <h2 id="payment-reminder-title">[$20401]</h2>
+            <div class="graphic sprite-fm-illustration img-dialog-business-expiry hidden"></div>
+            <div class="graphic img-dialog-pro-flexi-expiry hidden">
+                <i class="sprite-fm-uni icon-crests-pro-flexi-details"></i>
+                <i class="sprite-fm-uni icon-takedown"></i>
+            </div>
+            <h2 id="payment-reminder-title">
+                <span class="js-payment-reminder-title-business hidden">[$20401]</span>
+                <span class="js-payment-reminder-title-pro-flexi hidden">[$pro_flexi_account_suspended_title]</span>
+            </h2>
         </header>
 
         <section class="content">
             <div class="content-block">
-                <p>[$20402]</p>
+                <p class="js-payment-reminder-description-business hidden">[$20402]</p>
+                <p class="js-payment-reminder-description-pro-flexi hidden">[$pro_flexi_account_suspended_description]</p>
             </div>
         </section>
 
@@ -5962,6 +5971,7 @@
                         <i class="pro2 sprite-fm-uni icon-crests-pro-2-details"></i>
                         <i class="pro3 sprite-fm-uni icon-crests-pro-3-details"></i>
                         <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
+                        <i class="pro101 sprite-fm-uni icon-crests-pro-flexi-details"></i>
                         <i class="business sprite-fm-uni icon-crests-business-details"></i>
                     </div>
                     <div class="v-separator"></div>

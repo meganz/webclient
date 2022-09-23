@@ -1120,6 +1120,7 @@ BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
     if (!forceUpdate) {
         if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessPlan) {
             var currTime = new Date().getTime();
+
             if (mega.buinsessAccount.cachedBusinessPlan.timestamp &&
                 (currTime - mega.buinsessAccount.cachedBusinessPlan.timestamp) < this.invoiceListUpdateFreq) {
                 return operationPromise.resolve(1, mega.buinsessAccount.cachedBusinessPlan);
@@ -1135,6 +1136,7 @@ BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
 
     api_req(request, {
         callback: function (res) {
+
             if ($.isNumeric(res)) {
                 operationPromise.reject(0, res, 'API returned error');
             }
@@ -1159,19 +1161,72 @@ BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
                     }
                 }
                 mega.buinsessAccount.cachedBusinessPlan = businessPlan;
+
                 operationPromise.resolve(1, businessPlan); // payment gateways list
             }
             else {
                 operationPromise.reject(0, 4, 'API returned error, ret=' + res);
             }
         }
-
     });
 
     return operationPromise;
-
 };
 
+/**
+ * A function to get the Pro Flexi account plan (similar structure to getBusinessPlanInfo). Used by /repay flow
+ * @returns {Promise} resolves when we get the answer
+ */
+BusinessAccount.prototype.getProFlexiPlanInfo = function() {
+    "use strict";
+
+    // eslint-disable-next-line local-rules/hints
+    const operationPromise = new MegaPromise();
+    const request = {
+        a: 'utqa',  // get a list of plans
+        nf: 2,      // extended format
+        b: 1,       // also show business plans
+        p: 1        // get the Pro Flexi plan
+    };
+
+    api_req(request, {
+        callback: function(res) {
+
+            if ($.isNumeric(res)) {
+                operationPromise.reject(0, res, 'API returned error');
+            }
+            else if (typeof res === 'object') {
+                const currTime = Date.now();
+                let plan = Object.create(null);
+
+                plan.timestamp = currTime;
+                for (let h = 0; h < res.length; h++) {
+
+                    if (res[h].al === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                        plan = res[h];
+                        plan.bd.us.lp /= 100;
+                        plan.bd.us.p /= 100;
+                        plan.bd.trns.lp /= 100;
+                        plan.bd.trns.p /= 100;
+                        plan.bd.sto.lp /= 100;
+                        plan.bd.sto.p /= 100;
+                        plan.timestamp = currTime;
+                        plan.l = res[0].l;
+                        plan.c = res[0].l.c;
+                        break;
+                    }
+                }
+
+                operationPromise.resolve(1, plan); // payment gateways list
+            }
+            else {
+                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
+            }
+        }
+    });
+
+    return operationPromise;
+};
 
 /**
  * Get business account list of invoices

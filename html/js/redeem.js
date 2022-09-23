@@ -1,6 +1,6 @@
 /**
- * Code for the direct voucher redeem dialog when users come from
- * a direct link e.g. https://mega.nz/#voucher8RNU1PYPYDQWBE04J67F.
+ * Code for the direct voucher redeem dialog when users come from a direct link
+ * e.g. https://mega.nz/redeem or https://mega.nz/#voucher8RNU1PYPYDQWBE04J67F.
  * This code is shared for desktop and mobile webclient.
  */
 var redeem = {
@@ -14,6 +14,11 @@ var redeem = {
     accountBalance: 0,
     voucherAmount: 0,
     bestPlan: null,
+
+    /* Promotional voucher types */
+    PROMO_VOUCHER_REGULAR: 1,
+    PROMO_VOUCHER_BUSINESS: 2,
+    PROMO_VOUCHER_PRO_FLEXI: 3,
 
     /**
      * Initialisation of the dialog
@@ -57,10 +62,19 @@ var redeem = {
                 return;
             }
 
+            // If any vouchers are attempted to be redeemed for a current Pro Flexi user, show this error message
+            if (u_attr && u_attr.pf) {
+                msgDialog('error', l[1578], l.pro_flexi_cannot_redeem_voucher, '', () => {
+                    redeem.goToCloud();
+                });
+                return;
+            }
+
             redeem.voucherData = data;
 
             // Was the user already logged-in?
             if (!sessionStorage.signinorup && !window.bCreatedVoucher && !window.busUpgrade) {
+
                 // Show confirm dialog asking the user if he wants to redeem the voucher for this account.
                 promise = redeem.showConfirmAccountDialog();
             }
@@ -70,8 +84,11 @@ var redeem = {
             }
 
             var addVoucher = function() {
+
                 // if Business voucher with individual account, stop and collect needed data.
-                if (!window.busUpgrade && !window.bCreatedVoucher && data.businessmonths && u_attr && !u_attr.b) {
+                if (!window.busUpgrade && !window.bCreatedVoucher && data.businessmonths && u_attr && !u_attr.b
+                    && redeem.voucherData.proNum !== pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+
                     window.businessVoucher = 1;
                     window.busUpgrade = 1;
                     loadSubPage('registerb');
@@ -83,8 +100,10 @@ var redeem = {
                 // Make API call to redeem voucher
                 M.req({a: 'promoter' in data ? 'epcr' : 'uavr', v: data.code, p: data.promoter})
                     .then(function() {
+
                         if (data.promotional) {
-                            // A promotional voucher gets auto-redeem into quota
+
+                            // A promotional voucher gets auto-redeemed into quota
                             redeem.$dialog.addClass('hidden');
                             redeem.showSuccessfulPayment(true);
                         }
@@ -123,6 +142,7 @@ var redeem = {
         'use strict';
 
         return new MegaPromise(function(resolve, reject) {
+
             // Are you sure you want to redeem this voucher for the email@domain.com account?
             var message = String(l[19328]).replace('%1', window.u_attr && u_attr.email || '');
 
@@ -308,7 +328,7 @@ var redeem = {
 
         // This call will return an array of arrays. Each array contains this data:
         // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
-        api_req({ a : 'utqa', nf: 1 }, {
+        api_req({ a : 'utqa', nf: 2, p: 1 }, {
             callback: function (result) {
                 // Update the list of plans
                 redeem.membershipPlans = redeem.parseProPlans(result);
@@ -331,23 +351,29 @@ var redeem = {
     parseProPlans: function(result) {
         'use strict';
 
+        // Get the currency and currency symbols from the first array element i.e. { a: 'utqa', nf: 2 } structure)
+        const localeInfo = result[0].l;
+        const currency = localeInfo.c;           // Default is EUR
+        const currencySymbol = localeInfo.cs;    // Default is Euro symbol
+        const localCurrency = localeInfo.lc || currency;
+        const localCurrencySymbol = localeInfo.lcs || currencySymbol;
+
         // The rest of the webclient expects this data in an array format
         // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
         var results = [];
-        for (var i = 0; i < result.length; i++) {
+        for (var i = 1; i < result.length; i++) {
             results.push([
-                result[i]['id'],
-                result[i]['al'],  // account level
-                result[i]['s'],   // storage
-                result[i]['t'],   // transfer
-                result[i]['m'],   // months
-                result[i]['p'],   // price
-                result[i]['c'],   // currency
-                result[i]['mbp'], // monthly base price
-                result[i]['lp'],  // NEW 'local price'
-                result[i]['lpc'], // NEW 'local price currency'
-                result[i]['lps'], // NEW 'local price symbol'
-                result[i]['lp0']
+                result[i].id,
+                result[i].al,        // account level
+                result[i].s,         // storage
+                result[i].t,         // transfer
+                result[i].m,         // months
+                result[i].p / 100,   // price (convert from cents)
+                currency,            // currency (usually EUR)
+                result[i].mbp / 100, // monthly base price
+                result[i].lp / 100,  // local price
+                localCurrency,       // local currency e.g. NZD
+                localCurrencySymbol  // local currency symbol e.g. $
             ]);
         }
 
@@ -400,6 +426,40 @@ var redeem = {
     },
 
     /**
+     * Get the Pro Flexi plan details
+     * @param {Array} plans The plans from the utqa response
+     * @returns {Array} Returns the single Pro Flexi plan details
+     */
+    getProFlexiPlan: function(plans) {
+
+        'use strict';
+
+        for (var i = 0; i < plans.length; i++) {
+
+            if (plans[i].al === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                return plans[i];
+            }
+        }
+    },
+
+    /**
+     * Get the Business plan details
+     * @param {Array} plans The plans from the utqa response
+     * @returns {Array} Returns the single Business plan details
+     */
+    getBusinessPlan: function(plans) {
+
+        'use strict';
+
+        for (var i = 0; i < plans.length; i++) {
+
+            if (plans[i].al === pro.ACCOUNT_LEVEL_BUSINESS) {
+                return plans[i];
+            }
+        }
+    },
+
+    /**
      * Displays the details on the dialog
      */
     displayDialog: function() {
@@ -414,7 +474,7 @@ var redeem = {
         var numOfMonths = vd.months;
         var intl = mega.intl.decimal;
         var decimalSeparator = mega.intl.decimalSeparator;
-        var planPrice = vd.price.split('.');
+        var planPrice = String(vd.price).split('.');
         var proName = pro.getProPlanName(proNum);
         var euroSign = ' \u20ac';
 
@@ -446,7 +506,7 @@ var redeem = {
         upgradeText = upgradeText.replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
 
         // Update information
-        $('.plan-icon', redeem.$dialog).removeClass('pro1 pro2 pro3 pro4 business')
+        $('.plan-icon', redeem.$dialog).removeClass('pro1 pro2 pro3 pro4 pro101 business')
             .addClass('pro' + proNum);
         $('.plan-title', redeem.$dialog).safeHTML(proName);
         $('.price', redeem.$dialog).text(intl.format(planPriceDollars)
@@ -571,6 +631,7 @@ var redeem = {
      */
     showSuccessfulPayment: function(promo) {
         'use strict';
+
         var vd = redeem.voucherData;
         var signup = parseInt(sessionStorage.signinorup) === 2;
         delete sessionStorage.signinorup;
@@ -580,8 +641,8 @@ var redeem = {
             u_attr.p = window.bCreatedVoucher ? 100 : vd.proNum;
         }
 
-        if (signup || (u_type === 3 && vd.businessmonths)) {
-            // The user just signed up, redirect to the app onboarding
+        // If the user just signed up or Business account, redirect to the app onboarding
+        if (signup || (u_type === 3 && vd.businessmonths && vd.proNum === pro.ACCOUNT_LEVEL_BUSINESS)) {
             sessionStorage.voucherData = JSON.stringify(vd);
             loadSubPage('fm');
             return false;
@@ -591,13 +652,14 @@ var redeem = {
         var $voucherIcon = $('.plan-icon', $voucherBlock);
         var proPlanName;
 
-        if (vd.businessmonths) {
+        if (vd.businessmonths && vd.proNum === pro.ACCOUNT_LEVEL_BUSINESS) {
+
             proPlanName = mega.icu.format(l.month_business_voucher, vd.businessmonths);
             if (vd.businessmonths === 12) {
                 proPlanName = l[23491];
             }
 
-            $voucherIcon.removeClass('pro1 pro2 pro3 pro4').addClass('business');
+            $voucherIcon.removeClass('pro1 pro2 pro3 pro4 pro101').addClass('business');
             $('.promo-voucher-card', $voucherBlock).removeClass('red-block').removeClass('yellow-block')
                 .addClass('blue-block');
 
@@ -621,9 +683,11 @@ var redeem = {
             var proNum = vd.proNum;
             proPlanName = pro.getProPlanName(proNum);
 
-            $voucherIcon.removeClass('pro1 pro2 pro3 pro4 business')
+            // Show icon on mobile web
+            $voucherIcon.removeClass('pro1 pro2 pro3 pro4 pro101 business')
                 .addClass('pro' + vd.proNum);
-            if (vd.proNum === 4) {
+
+            if (vd.proNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
                 $('.promo-voucher-card', $voucherBlock).removeClass('red-block').removeClass('blue-block')
                     .addClass('yellow-block');
             }
@@ -644,6 +708,7 @@ var redeem = {
         }
 
         $voucherBlock.removeClass('hidden');
+
         // Show the success
         redeem.showBackgroundOverlay();
         redeem.$successOverlay.removeClass('hidden');
@@ -688,12 +753,13 @@ var redeem = {
             $whiteBtn.removeAttr('bFail');
             $dlgTitle.removeClass('red');
 
-            if (mega.voucher.businessmonths) {
+            // If Business (NB: Pro Flexi also sets businessmonths property, so we need to be specific)
+            if (mega.voucher.businessmonths && mega.voucher.promotional === redeem.PROMO_VOUCHER_BUSINESS) {
                 $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', l[5816].replace('[X]', 3) + '+'));
                 $('.v-transfer', $dlg).safeHTML(l[23790].replace('%1', l[5816].replace('[X]', 3) + '+'));
 
                 $('.voucher-logo', $dlg).addClass('business-v');
-                $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4').addClass('business');
+                $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4 pro101').addClass('business');
 
                 const titleText = mega.voucher.businessmonths === 12 ? l[23491]
                     : mega.icu.format(l.month_business_voucher, mega.voucher.businessmonths);
@@ -708,15 +774,14 @@ var redeem = {
                 }
             }
             else {
+                // Pro I-IV and Lite
                 var storageBytes = mega.voucher.storage * 1024 * 1024 * 1024;
                 var storageFormatted = numOfBytes(storageBytes, 0);
                 var storageValue = Math.round(storageFormatted.size) + ' ' + storageFormatted.unit;
 
                 $('.v-storage', $dlg).safeHTML(l[23789].replace('%1', storageValue));
-
-                $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4 business')
+                $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4 pro101 business')
                     .addClass('pro' + mega.voucher.proNum);
-
 
                 var bandwidthBytes = mega.voucher.bandwidth * 1024 * 1024 * 1024;
                 var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
@@ -724,12 +789,17 @@ var redeem = {
 
                 $('.v-transfer', $dlg).safeHTML(l[23790].replace('%1', bandwidthValue));
 
-                if (mega.voucher.proNum === 4) {
+                // Mobile web block background colour styling to match crest
+                if (mega.voucher.proNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
                     $('.voucher-logo', $dlg).addClass('pro-l');
+                }
+                else if (mega.voucher.proNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                    $('.voucher-logo', $dlg).addClass('pro-iv');
                 }
                 else {
                     $('.voucher-logo', $dlg).removeClass('pro-l');
                 }
+
                 $dlgTitle.text(l[22114]);
 
                 // pro voucher redemption
@@ -774,17 +844,22 @@ var redeem = {
                         return false;
                     }
                     closeDialog();
+
                     if (window.busUpgrade || window.bCreatedVoucher ||
                         (mega.voucher.businessmonths && u_attr && u_attr.b)) {
+
                         loadSubPage('redeem');
                         return false;
                     }
-                    if (mega.voucher.businessmonths) {
+
+                    // If Business (NB: Pro Flexi also has businessmonths set so check the promotional value too
+                    if (mega.voucher.businessmonths && mega.voucher.promotional === redeem.PROMO_VOUCHER_BUSINESS) {
                         window.businessVoucher = 1;
                         window.busUpgrade = 1;
                         loadSubPage('registerb');
                         return false;
                     }
+
                     register_txt = l[7712];
                     loadSubPage('register');
                     return false;
@@ -863,9 +938,11 @@ var redeem = {
                 .then(function(data) {
                     mega.voucher = data;
                     page = '';
+
                     loadSubPage('voucher' + data.code);
                 })
                 .catch(function() {
+
                     $input.val('');
                     megaInput.showError(l[20420]);
                     loadingDialog.hide();
@@ -893,11 +970,39 @@ var redeem = {
 
         return new MegaPromise(function(resolve, reject) {
             var parse = function(v) {
-                var b = v.promotional ? v.value : (v.balance + v.value);
 
+                var b = v.promotional ? v.value : (v.balance + v.value);
                 var validPlanItem = v.item && v.item.al && v.item.s && v.item.t && v.item.m && v.item.p;
 
-                if (v.promotional && validPlanItem) {
+                // If Pro Flexi promotional voucher
+                if (v.promotional === redeem.PROMO_VOUCHER_PRO_FLEXI) {
+
+                    const plan = redeem.getProFlexiPlan(v.plans);
+
+                    v.planId = plan.id;
+                    v.proNum = plan.al;
+                    v.storage = plan.bd.ba.s;
+                    v.bandwidth = plan.bd.ba.t;
+                    v.months = plan.m;
+                    v.price = plan.bd.ba.p;
+                }
+
+                // If Business promotional voucher
+                else if (v.promotional === redeem.PROMO_VOUCHER_BUSINESS) {
+
+                    const plan = redeem.getBusinessPlan(v.plans);
+
+                    v.planId = plan.id;
+                    v.proNum = plan.al;
+                    v.storage = plan.bd.ba.s;
+                    v.bandwidth = plan.bd.ba.t;
+                    v.months = plan.m;
+                    v.price = plan.bd.ba.p;
+                }
+
+                // If regular promotional voucher
+                else if (v.promotional && validPlanItem) {
+
                     v.planId = v.item.id;
                     v.proNum = v.item.al;
                     v.storage = v.item.s;
@@ -906,7 +1011,9 @@ var redeem = {
                     v.price = v.item.p;
                 }
                 else {
+                    // Regular vouchers, find the best plan
                     var p = redeem.calculateBestProPlan(redeem.parseProPlans(v.plans), b);
+
                     v.planId = p[0];
                     v.proNum = p[1];
                     v.storage = p[2];
@@ -918,6 +1025,7 @@ var redeem = {
                 if (v.available && v.proNum) {
                     return resolve(v);
                 }
+
                 reject(v);
             };
 
@@ -929,7 +1037,7 @@ var redeem = {
             var request = [
                 {a: 'uavq', f: 1, v: code},
                 {a: 'uq', pro: 1, gc: 1},
-                {a: 'utqa', nf: 1}
+                {a: 'utqa', nf: 2, b: 1, p: 1 }     // Return Business and Pro Flexi plans
             ];
 
             var callback = function(meh, ctx, rr, res) {
@@ -947,7 +1055,11 @@ var redeem = {
                         localStorage[code] = promo;
                     }
 
-                    if (v.businessmonths) {
+                    // If Pro Flexi promotional voucher
+                    if (v.promotional === redeem.PROMO_VOUCHER_PRO_FLEXI) {
+                        return parse(v);
+                    }
+                    else if (v.businessmonths) {
                         return resolve(v);
                     }
                     else if (v.value) {

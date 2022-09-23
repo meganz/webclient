@@ -4,6 +4,7 @@
 function BusinessAccountUI() {
     "use strict";
     if (!mega.buinsessController) {
+
         /**@type {BusinessAccount} */
         this.business = new BusinessAccount();
         mega.buinsessController = this.business;
@@ -14,9 +15,10 @@ function BusinessAccountUI() {
         this.business = mega.buinsessController;
         this.initialized = true;
         if (u_handle && u_attr) {
+
             this.currAdmin = {
                 u: u_handle,
-                p: u_attr.b.bu,
+                p: u_attr.b ? u_attr.b.bu : u_handle, // Parent account (for Pro Flexi there's only the current acct)
                 s: 0,
                 e: u_attr.email,
                 firstname: base64urlencode(to8(u_attr.firstname)),
@@ -35,8 +37,8 @@ function BusinessAccountUI() {
     // private function to hide all business accounts UI divs.
     this.initUItoRender = function () {
 
-        // dealing with non-confirmed accounts, and not payed-ones
-        if (!u_attr || !u_attr.b || u_attr.b.s === -1 || !u_privk) {
+        // dealing with non-confirmed accounts, non Pro Flexi accounts and not paid business ones
+        if (!u_attr || !u_privk || (!u_attr.pf && (!u_attr.b || u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED))) {
             loadSubPage('start');
             return false;
         }
@@ -75,11 +77,10 @@ function BusinessAccountUI() {
         // headers
         $('.fm-right-header-user-management .user-management-main-page-buttons').removeClass('hidden');
         $('.fm-right-header-user-management .user-management-breadcrumb').addClass('hidden');
-        $('.inv-det-arrow, .inv-det-id',
-            '.fm-right-header-user-management .user-management-breadcrumb.account').addClass('hidden');
+        $('.inv-det-arrow, .inv-det-id', '.fm-right-header-user-management .user-management-breadcrumb')
+            .addClass('hidden');
         $('.fm-right-header-user-management .user-management-overview-buttons').addClass('hidden');
         $('.user-management-overview-bar').addClass('hidden');
-
 
         // header events handlers
         $('.fm-right-header-user-management .user-management-main-page-buttons .add-sub-user').off('click.subuser')
@@ -90,6 +91,19 @@ function BusinessAccountUI() {
             .on('click.subuser', function addSubUserHeaderButtonHandler() {
                 mySelf.viewBusinessAccountPage();
             });
+
+        // If on Pro Flexi
+        if (u_attr && u_attr.pf) {
+
+            // Hide some stuff in the left panel on the Invoices page
+            $('.fm-tree-panel .content-panel.user-management').removeClass('active');
+            $('.fm-left-panel .user-management-tree-panel-header.enabled-accounts').addClass('hidden');
+            $('.fm-left-panel .user-management-tree-panel-header.disabled-accounts').addClass('hidden');
+
+            // Don't show some buttons in the top right panel
+            $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
+        }
+
         return true;
     };
 
@@ -1353,15 +1367,25 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         const outshareTotalFormatted = numOfBytes(outshareTotal, 2);
         const backupsTotalFormatted = numOfBytes(backupsTotal, 2);
 
+        // Includes checks for 0/0 causing NaN displayed (specifically on Business/Pro Flexi accounts with no data)
         let rootPercentage = rootTotal / totalStorage;
+        rootPercentage = Number.isNaN(rootPercentage) ? 0 : rootPercentage;
         rootPercentage = Math.round(Number.parseFloat(rootPercentage * 100).toFixed(2));
+
         let insharePercentage = inshareTotal / totalStorage;
+        insharePercentage = Number.isNaN(insharePercentage) ? 0 : insharePercentage;
         insharePercentage = Math.round(Number.parseFloat(insharePercentage * 100).toFixed(2));
+
         let rubbishPercentage = rubbishTotal / totalStorage;
+        rubbishPercentage = Number.isNaN(rubbishPercentage) ? 0 : rubbishPercentage;
         rubbishPercentage = Math.round(Number.parseFloat(rubbishPercentage * 100).toFixed(2));
+
         let outsharePercentage = outshareTotal / totalStorage;
+        outsharePercentage = Number.isNaN(outsharePercentage) ? 0 : outsharePercentage;
         outsharePercentage = Math.round(Number.parseFloat(outsharePercentage * 100).toFixed(2));
+
         let backupsPercentage = backupsTotal / totalStorage;
+        backupsPercentage = Number.isNaN(backupsPercentage) ? 0 : backupsPercentage;
         backupsPercentage = Math.round(Number.parseFloat(backupsPercentage * 100).toFixed(2));
 
         const digitClassMap = ["one-digit", "two-digits", "three-digits"];
@@ -1394,6 +1418,11 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             .text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
         $('.storage-division-container.rubbish-node .storage-division-per', $storageAnalysisPie)
             .text(`${rubbishPercentage}%`).addClass(rubbishNodeDigitClass);
+
+        // If Pro Flexi, hide inshare nodes and only keep external incoming shares
+        if (u_attr.pf) {
+            $('.storage-division-container.inshare-node', $storageAnalysisPie).addClass('hidden');
+        }
 
         // Show the storage pie chart and data analysis panel
         $storageAnalysisPie.removeClass('hidden');
@@ -1744,6 +1773,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
 
     // Private function to populate the next billing information on the admin user dashboard
     const populateNextBillInfo = function() {
+
         if (!M.account || !M.account.b) {
             return false;
         }
@@ -1759,6 +1789,33 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         else {
             $('.next-bill-value.euro', $nbPriceContainer).removeClass('hidden')
                 .text(formatCurrency(billData.price_eur.amount));
+        }
+
+        // If Pro Flexi
+        if (u_attr.pf) {
+
+            // Add special class for Pro Flexi specific changes to the UI in this section
+            $nbPriceContainer.addClass('pro-iv');
+
+            // Add click handler to show the Invoice List page
+            $('.js-dashboard-invoices-button', $nbPriceContainer).removeClass('hidden');
+            $('.js-dashboard-invoices-button', $nbPriceContainer).rebind('click.dashboard', () => {
+
+                M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+                    M.onFileManagerReady(() => {
+
+                        const usersM = new BusinessAccountUI();
+
+                        usersM.initUItoRender();
+
+                        M.onSectionUIOpen('user-management');
+
+                        usersM.viewBusinessInvoicesPage();
+
+                        $('.fm-right-files-block', '.fmholder').removeClass('hidden emptied');
+                    });
+                });
+            });
         }
     };
 
@@ -1877,12 +1934,15 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         populateBarChart(st, res, false);
     });
 
-    if (typeof M.account.b.v === 'undefined' || M.account.b.v === 0) {
+    // If Pro Flexi, or Business v is not set
+    if (u_attr.pf || typeof M.account.b.v === 'undefined' || M.account.b.v === 0) {
+
         // Populate the next billing info into the overall usage section
         populateNextBillInfo();
 
         // Fill the last/next bill transfer data into the analytics section
         fillStgeTrfBillInfo(true);
+
         // Fill the last/next bill storage data into the analytics section
         fillStgeTrfBillInfo(false);
     }
@@ -1904,6 +1964,12 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
     var mySelf = this;
     var $profileContainer = $('.profile', $accountContainer);
     var $invoiceContainer = $('.invoice', $accountContainer);
+
+    // Don't show the Profile Tab if on Pro Flexi
+    if (u_attr.pf) {
+        $('.settings-menu-bar .settings-menu-item.suba-setting-profile', $accountContainer).addClass('hidden');
+    }
+
     // event handler for header clicking
     $('.settings-menu-bar .settings-menu-item', $accountContainer).off('click.suba').on('click.suba',
         function settingHeaderClickHandler() {
@@ -1928,11 +1994,11 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
 /** Show UI elements if the account got expired  */
 BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
     "use strict";
-    if (!u_attr || !u_attr.b) {
+    if (!u_attr || (!u_attr.b && !u_attr.pf)) {
         return;
     }
 
-    if (u_attr.b.m && (!u_attr["^buextra"] || sessionStorage.buextra)) {
+    if (u_attr.b && u_attr.b.m && (!u_attr["^buextra"] || sessionStorage.buextra)) {
         if (sessionStorage.buextra) {
             $('.fm-notification-block.business-next-tier').text(l.business_pass_base).addClass('visible');
         }
@@ -1946,29 +2012,48 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
             });
         }
     }
-    if (u_attr.b.s !== -1 && u_attr.b.s !== 2) {
+
+    // Check the Business account is expired or in grace period
+    if (u_attr.b && !pro.isExpiredOrInGracePeriod(u_attr.b.s)) {
         return;
+    }
+    // Check the Pro Flexi account is expired or in grace period
+    if (u_attr.pf && !pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
+        return false;
     }
 
     var msg = '';
-    if (u_attr.b.s === -1) { // expired
-        if (u_attr.b.m) {
+    if ((u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) ||
+        (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)) {
+
+        // If Business master account or Pro Flexi
+        if (u_attr.b && u_attr.b.m) {
             msg = l[24431];
         }
+        else if (u_attr.pf) {
+            msg = l.pro_flexi_expired_banner;
+        }
         else {
+            // Otherwise Business sub-user
             msg = l[20462];
         }
         $('.fm-notification-block.expired-business').safeHTML(`<span>${msg}</span>`).addClass('visible');
         clickURLs();
-        this.showExpiredDialog(u_attr.b.m);
+
+        const isMaster = (u_attr.b && u_attr.b.m) || u_attr.pf;
+        this.showExpiredDialog(isMaster);
     }
-    else if (u_attr.b.s === 2) { // grace
-        if (u_attr.b.m) {
-            msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-                .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
-            $('.fm-notification-block.grace-business').safeHTML(`<span>${msg}</span>`).addClass('visible');
-            clickURLs();
+    else if ((u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_GRACE_PERIOD && u_attr.b.m) ||
+        (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_GRACE_PERIOD)) {
+
+        if (u_attr.pf) {
+            msg = l.pro_flexi_grace_period_banner;
         }
+        else {
+            msg = l[20650];
+        }
+        $('.fm-notification-block.grace-business').safeHTML(`<span>${msg}</span>`).addClass('visible');
+        clickURLs();
     }
 };
 
@@ -1993,6 +2078,20 @@ BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
                 closeDialog();
                 loadSubPage('repay');
             });
+
+        // If Business, change the title and icon
+        if (u_attr.b) {
+            $('.js-payment-reminder-title-business', $dialog).removeClass('hidden');
+            $('.js-payment-reminder-description-business', $dialog).removeClass('hidden');
+            $('.img-dialog-business-expiry', $dialog).removeClass('hidden');
+        }
+
+        // If Pro Flexi, change the title and icon
+        else if (u_attr.pf) {
+            $('.js-payment-reminder-title-pro-flexi', $dialog).removeClass('hidden');
+            $('.js-payment-reminder-description-pro-flexi', $dialog).removeClass('hidden');
+            $('.img-dialog-pro-flexi-expiry', $dialog).removeClass('hidden');
+        }
 
         M.safeShowDialog('expired-business-dialog', function() {
             return $dialog;
@@ -2033,16 +2132,20 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
     var $profileContainer = $('.profile', $accountContainer);
     var $invoiceContainer = $('.invoice', $accountContainer);
-    var $accountPageHeader =
-        $('.user-management-breadcrumb.account', '.fm-right-header-user-management');
     var $countriesSelect = $('.cnt-ddl', $profileContainer);
     var $countriesSelectScroll = $('.dropdown-scroll', $profileContainer).text('');
+
+    // If Pro Flexi, show the different breadcrumbs for Invoices
+    const $breadcrumbsClass = (u_attr.pf) ? 'pro-iv-invoices' : 'account';
+    const $pageHeader =
+        $(`.user-management-breadcrumb.${$breadcrumbsClass}`, '.fm-right-header-user-management');
 
     var unhideSection = function () {
         $businessAccountContainer.removeClass('hidden');
         $accountContainer.removeClass('hidden');
         $profileContainer.removeClass('hidden');
-        $accountPageHeader.removeClass('hidden');
+        $pageHeader.removeClass('hidden');
+
         $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
         $('.settings-menu-bar .suba-setting-profile', $accountContainer).addClass('selected');
         loadingDialog.phide();
@@ -2389,7 +2492,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     );
 
     // event handler for clicking on header
-    $accountPageHeader.find('.acc-home').off('click.suba').on('click.suba',
+    $('.acc-home', $pageHeader).rebind('click.suba',
         function invoiceListHeaderClick() {
             var $me = $(this);
             if ($me.hasClass('acc-home')) {
@@ -2432,7 +2535,11 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
     var $invoiceContainer = $('.invoice', $accountContainer);
     var $invoiceListContainer = $('.invoice-list', $invoiceContainer);
-    var $accountPageHeader = $('.fm-right-header-user-management .user-management-breadcrumb.account');
+
+    // If Pro Flexi, show the different breadcrumbs for Invoices
+    const $breadcrumbsClass = (u_attr.pf) ? 'pro-iv-invoices' : 'account';
+    const $pageHeader =
+        $(`.user-management-breadcrumb.${$breadcrumbsClass}`, '.fm-right-header-user-management');
 
     // private function to determine if we need to re-draw
     var isInvoiceRedrawNeeded = function (invoiceList, savedList) {
@@ -2463,7 +2570,8 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
             $accountContainer.removeClass('hidden');
             $invoiceContainer.removeClass('hidden');
             $invoiceListContainer.removeClass('hidden');
-            $accountPageHeader.removeClass('hidden');
+            $pageHeader.removeClass('hidden');
+
             $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
             $('.settings-menu-bar .suba-setting-inv', $accountContainer).addClass('selected');
 
@@ -2489,10 +2597,10 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
         // store what we will draw now
         mySelf.business.previousInvoices = JSON.parse(JSON.stringify(invoicesList));
 
-
         for (var k = invoicesList.length - 1; k >= 0; k--) {
-            // if the invoice is non buinsess one
-            if (!invoicesList[k].b) {
+
+            // If the invoice is non business
+            if (!invoicesList[k].b && !u_attr.pf) {
                 continue;
             }
 
@@ -2520,18 +2628,57 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
         }
 
         unhideSection();
+
+        // If Pro Flexi, hide the Invoices tab
+        if (u_attr.pf) {
+            $('.settings-menu-bar .suba-setting-inv', $accountContainer).addClass('hidden');
+        }
     };
 
-    $accountPageHeader.find('.acc-home').off('click.suba').on('click.suba',
-        function invoiceListHeaderClick() {
-            var $me = $(this);
-            if ($me.hasClass('acc-home')) {
-                return mySelf.viewSubAccountListUI();
-            }
+    // If Pro Flexi
+    if (u_attr.pf) {
+
+        // Update the avatar, name, email Pro level in dashboard side panel
+        accountUI.general.userUIUpdate();
+
+        // Init button on dashboard to backup their master key
+        $('.dashboard .backup-master-key', '.fmholder').rebind('click.dashboardBackupKey', () => {
+            M.showRecoveryKeyDialog(2);
         });
+
+        // Show dashboard side panel on the side of the Invoices list
+        $('.content-panel.dashboard', '.fmholder').addClass('active');
+    }
+
+    mySelf.initBreadcrumbClickHandlers($pageHeader);
 
     var getInvoicesPromise = this.business.getAccountInvoicesList();
     getInvoicesPromise.always(prepareInvoiceListSection);
+};
+
+
+BusinessAccountUI.prototype.initBreadcrumbClickHandlers = function($pageHeader) {
+    'use strict';
+
+    $('.acc-acc', $pageHeader).rebind('click.acc-acc', () => {
+
+        // If Pro Flexi, when clicking on Invoices breadcrumbs, go back to the Invoices page
+        if (u_attr.pf) {
+            return this.viewBusinessInvoicesPage();
+        }
+
+        return this.viewBusinessAccountPage();
+    });
+
+    $('.acc-home', $pageHeader).rebind('click.acc-home', () => {
+
+        // If Pro Flexi, when clicking on Dashboard breadcrumbs, go back to the Dashboard
+        if (u_attr.pf) {
+            loadSubPage('fm/dashboard');
+        }
+
+        return this.viewSubAccountListUI();
+    });
 };
 
 
@@ -2548,7 +2695,11 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
     var $accountContainer = $('.user-management-account-settings', $businessAccountContainer);
     var $invoiceContainer = $('.invoice', $accountContainer);
     var $invoiceDetailContainer = $('.invoice-detail', $invoiceContainer);
-    var $accountPageHeader = $('.fm-right-header-user-management .user-management-breadcrumb.account');
+
+    // If Pro Flexi, show the different breadcrumbs for Invoices
+    const $breadcrumbsClass = (u_attr.pf) ? 'pro-iv-invoices' : 'account';
+    const $pageHeader =
+        $(`.user-management-breadcrumb.${$breadcrumbsClass}`, '.fm-right-header-user-management');
 
     loadingDialog.pshow();
     this.initBusinessAccountHeader($accountContainer);
@@ -2558,8 +2709,9 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         $accountContainer.removeClass('hidden');
         $invoiceContainer.removeClass('hidden');
         $invoiceDetailContainer.removeClass('hidden');
-        $accountPageHeader.removeClass('hidden');
-        $accountPageHeader.find('.inv-det-arrow, .inv-det-id').removeClass('hidden');
+        $pageHeader.removeClass('hidden');
+
+        $('.inv-det-arrow, .inv-det-id', $pageHeader).removeClass('hidden');
         $('.settings-menu-bar .settings-menu-item', $accountContainer).removeClass('selected');
         $('.settings-menu-bar .suba-setting-inv', $accountContainer).addClass('selected');
         loadingDialog.phide();
@@ -2609,7 +2761,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         }
 
         // navigation bar
-        $accountPageHeader.find('.inv-det-id').text(invoiceDetail.n);
+        $('.inv-det-id', $pageHeader).text(invoiceDetail.n);
 
         // mega section on the top of the invoice and receipt
         var $megaContainer = $('.mega-contact-container', $invoiceDetailContainer);
@@ -2681,6 +2833,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
 
         for (var k = invoiceDetail.items.length - 1; k >= 0; k--) {
             let $invItem;
+
             if (invoiceDetail.items[k].v && invoiceDetail.items[k].list) {
                 if (invoiceDetail.items[k].list.t) {
                     $invItem = $invItemContentTemplate.clone(true);
@@ -2711,9 +2864,18 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                     $invItem.insertAfter($invItemHeader);
                 }
                 $invItem = $invItemContentTemplate.clone(true);
+
+                // If Pro Flexi, the Base price will be set so show it
+                if (invoiceDetail.items[k].list.b) {
+                    $('.inv-pay-amou', $invItem).text(formatCurrency(invoiceDetail.items[k].list.b[1]));
+                }
+                else {
+                    // Otherwise for Business don't show it
+                    $('.inv-pay-amou', $invItem).text(' ');
+                }
+
                 $('.inv-pay-date', $invItem).text(time2date(invoiceDetail.items[k].ts, 1));
                 $('.inv-pay-desc', $invItem).text(invoiceDetail.items[k].d);
-                $('.inv-pay-amou', $invItem).text(' ');
                 $invItem.insertAfter($invItemHeader);
 
                 taxExcluded = invoiceDetail.items[k].extax;
@@ -2851,20 +3013,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
         );
     };
 
-    $accountPageHeader.find('.acc-acc').off('click.suba').on('click.suba',
-        function invoiceDetailHeaderClick() {
-            var $me = $(this);
-            if ($me.hasClass('acc-acc')) {
-                return mySelf.viewBusinessAccountPage();
-            }
-        });
-    $accountPageHeader.find('.acc-home').off('click.suba').on('click.suba',
-        function invoiceListHeaderClick() {
-            var $me = $(this);
-            if ($me.hasClass('acc-home')) {
-                return mySelf.viewSubAccountListUI();
-            }
-        });
+    mySelf.initBreadcrumbClickHandlers($pageHeader);
 
     var gettingInvoiceDetailPromise = this.business.getInvoiceDetails(invoiceID, false);
     gettingInvoiceDetailPromise.always(fillInvoiceDetailPage);
@@ -3887,6 +4036,7 @@ BusinessAccountUI.prototype.URLchanger = function (subLocation) {
  */
 BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
     "use strict";
+
     if (!subuser) {
         return;
     }

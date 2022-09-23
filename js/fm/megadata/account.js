@@ -28,9 +28,20 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             loadingDialog.show();
         }
 
-        api_req({ a: 'uq', strg: 1, xfer: 1, pro: 1, v: 1, b: (u_attr.b || Object.create(null)).m || 0 }, {
+        let fetchBusinessStorage = 0;
+
+        // Fetch extra storage/transfer base data Pro Flexi or Business master
+        if (typeof u_attr !== 'undefined') {
+            fetchBusinessStorage = (u_attr.pf || (u_attr.b && u_attr.b.m)) ? 1 : 0;
+        }
+
+        api_req({
+            a: 'uq', strg: 1, xfer: 1, pro: 1, v: 1,
+            b: fetchBusinessStorage
+        }, {
             account: account,
             callback: function(res, ctx) {
+
                 loadingDialog.hide();
 
                 if (typeof res === 'object') {
@@ -49,8 +60,9 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     ctx.account.servbw_limit = Math.round(res.srvratio);
                     ctx.account.isFull = res.cstrg / res.mstrg >= 1;
                     ctx.account.isAlmostFull = res.cstrg / res.mstrg >= res.uslw / 10000;
+
                     // Business base/extra quotas:
-                    if (res.utype === 100) {
+                    if (res.utype === pro.ACCOUNT_LEVEL_BUSINESS || res.utype === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
                         ctx.account.space_bus_base = res.b ? res.b.bstrg : undefined; // unit TB
                         ctx.account.space_bus_ext = res.b ? res.b.estrg : undefined; // unit TB
                         ctx.account.tfsq_bus_base = res.b ? res.b.bxfer : undefined; // unit TB
@@ -179,6 +191,10 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                         if (pstatus) {
                             tmUpdate = true;
                         }
+                    }
+                    if (res.pf) {
+                        u_attr.pf = res.pf;
+                        tmUpdate = true;
                     }
                     if (res.b) {
                         u_attr.b = res.b;

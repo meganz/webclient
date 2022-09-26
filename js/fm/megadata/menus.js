@@ -1403,12 +1403,9 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
         }
     }
 
-    $('.sort-arrow', $sortMenuItems).removeClass('icon-up icon-down');
-
     $selectedItem = $sortMenuItems
         .filter('*[data-by=' + sorting.n + ']')
         .addClass('active');
-    $('.sort-arrow', $selectedItem).addClass(dirClass);
 
     var tmpFn = function() {
         x = event.clientX;

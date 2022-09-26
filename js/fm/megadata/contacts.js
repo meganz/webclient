@@ -165,7 +165,7 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
 
     if (!user || user.firstName || user.lastName) {
         // already loaded.
-        return promise ? promise.resolve() : false;
+        return promise ? promise.resolve(user && user.name) : false;
     }
 
     Promise.allSettled([
@@ -279,7 +279,7 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
         }
 
         if (promise) {
-            promise.resolve();
+            promise.resolve(user.name);
         }
     });
 

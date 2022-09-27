@@ -1101,6 +1101,9 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
     transition-delay: 0s;
     z-index: 99;
 }
+.download-dropdown:hover .download-dropdown-content {
+    z-index: 250;
+}
 .options-dropdown .video-share {
     display: none;
 }

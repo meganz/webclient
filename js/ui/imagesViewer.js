@@ -41,7 +41,7 @@ var slideshowid;
         var ii = [];
         var ci;
         var filter = function(n) {
-            return is_image2(n) || is_video(n);
+            return (n.fa || !M.getNodeShare(n).down) && (is_image2(n) || is_video(n));
         };
         var index = function(i) {
             return M.v[i].h;
@@ -49,11 +49,11 @@ var slideshowid;
 
         if (slideshowplay) {
             filter = function(n) {
-                return n.s && is_image3(n);
+                return n.s && (n.fa || !M.getNodeShare(n).down) && is_image3(n);
             };
         }
         else if (is_mobile) {
-            filter = (n) => is_video(n) || is_image3(n);
+            filter = (n) => (n.fa || !M.getNodeShare(n).down) && (is_video(n) || is_image3(n));
         }
 
         if (M.chat) {

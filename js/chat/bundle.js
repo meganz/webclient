@@ -16201,7 +16201,7 @@ class ConversationsApp extends mixins.wl {
       }
 
       mega.ui.onboarding.sections.chat.startNextOpenSteps(nextIdx);
-      this.$obDialog = $('#obDialog');
+      this.$obDialog = $('#ob-dialog');
     }
   }
 

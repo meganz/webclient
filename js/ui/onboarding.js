@@ -646,13 +646,13 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         showDialog() {
 
-            this.$dialog = $('#obDialog');
+            this.$dialog = $('#ob-dialog');
 
             M.safeShowDialog('onboardingDialog', () => {
                 this.$dialog.removeClass('mcob').addClass(this.map.dialogClass || '');
                 // Fill contents for the dialog
-                $('#obDialog-title').text(this.map.dialogTitle);
-                $('#obDialog-text').text(this.map.dialogDesc);
+                $('#ob-dialog-title').text(this.map.dialogTitle);
+                $('#ob-dialog-text').text(this.map.dialogDesc);
                 $('.js-next span', this.$dialog).text(this.map.dialogNext || l[556]);
                 $('.js-skip', this.$dialog).removeClass('hidden').addClass(this.map.skipHidden ? 'hidden' : '');
 
@@ -745,11 +745,11 @@ mBroadcaster.addListener('fm:initialized', () => {
             });
 
             if (arrowAt) {
-                $('#obDialog-arrow', this.$dialog)
+                $('#ob-dialog-arrow', this.$dialog)
                     .removeClass('hidden top bottom left right top-left').addClass(arrowAt);
             }
             else {
-                $('#obDialog-arrow', this.$dialog).addClass('hidden').removeClass('top bottom left right top-left');
+                $('#ob-dialog-arrow', this.$dialog).addClass('hidden').removeClass('top bottom left right top-left');
             }
 
             // If it was temporary bug fixing hidden removal, add hidden back

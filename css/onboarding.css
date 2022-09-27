@@ -1,55 +1,55 @@
 /* V4 onboarding start */
 
-#obDialog {
+#ob-dialog {
     background: var(--label-blue);
     color: var(--text-color-white-high);
     --mask-color: var(--text-color-white-high);
     max-width: 450px;
 }
-#obDialog .mega-button.action,
-#obDialog header div > * {
+#ob-dialog .mega-button.action,
+#ob-dialog header div > * {
     color: var(--text-color-white-high);
     --mask-color: var(--text-color-white-high);
 }
-#obDialog header h2 {
+#ob-dialog header h2 {
     text-align: start;
 }
-#obDialog-arrow {
+#ob-dialog-arrow {
     position: absolute;
     --mask-color: var(--label-blue);
     --icon-size: 24px;
     height: 16px;
 }
-#obDialog-arrow.right {
+#ob-dialog-arrow.right {
     transform: rotate(270deg);
     right: -12px;
     top: calc(50% - 12px);
 }
-#obDialog-arrow.left {
+#ob-dialog-arrow.left {
     transform: rotate(90deg);
     left: -12px;
     top: calc(50% - 12px);
 }
-#obDialog-arrow.top {
+#ob-dialog-arrow.top {
     transform: rotate(180deg);
     left: calc(50% - 12px);
     top: -8px;
 }
-#obDialog-arrow.bottom {
+#ob-dialog-arrow.bottom {
     left: calc(50% - 12px);
     bottom: -8px;
 }
-#obDialog-arrow.top-left {
+#ob-dialog-arrow.top-left {
     transform: rotate(180deg);
     left: 48px;
     top: -8px;
 }
-#obDialog .link-button {
+#ob-dialog .link-button {
     color: var(--text-color-white-high);
     margin-right: auto;
     min-width: 80px;
 }
-.rtl #obDialog .link-button {
+.rtl #ob-dialog .link-button {
     margin-left: auto;
     margin-right: 0;
 }
@@ -85,21 +85,23 @@
 .context .onboarding-highlight-dot::after {
     animation-delay: 500ms;
 }
-#obDialog.mcob {
+#ob-dialog.mcob {
     z-index: 121;
 }
-.overlayed #obDialog.mcob,
-.in-call #obDialog.mcob {
+.overlayed #ob-dialog.mcob {
+    visibility: hidden;
+}
+.in-call #ob-dialog.mcob {
     display: none;
 }
-#obDialog.mcob header {
+#ob-dialog.mcob header {
     padding-inline-end: 24px;
     -webkit-padding-end: 24px;
 }
-#obDialog.mcob #obDialog-title {
+#ob-dialog.mcob #ob-dialog-title {
     font: var(--text-h2-bold);
 }
-#obDialog.mcob #obDialog-text {
+#ob-dialog.mcob #ob-dialog-text {
     font: var(--text-body1);
 }
 

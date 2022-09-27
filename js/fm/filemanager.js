@@ -4656,11 +4656,10 @@ FileManager.prototype.cameraUploadUI = function() {
                         throw new Error(`Unexpected dialog(${name}) type...`);
                     }
 
-                    // arrange to back any non-controlled dialogs,
-                    // this class will be removed on the next closeDialog()
-                    $('.mega-dialog:visible, .overlay:visible').addClass('arrange-to-back');
-
-                    if (!$dialog.is('#obDialog')) {
+                    if (!$dialog.is('#ob-dialog')) {
+                        // arrange to back any non-controlled dialogs,
+                        // this class will be removed on the next closeDialog()
+                        $('.mega-dialog:visible, .overlay:visible').addClass('arrange-to-back');
                         fm_showoverlay();
                     }
                     $dialog.removeClass('hidden arrange-to-back');

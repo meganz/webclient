@@ -220,7 +220,7 @@ class ConversationsApp extends MegaRenderMixin {
                 return;
             }
             mega.ui.onboarding.sections.chat.startNextOpenSteps(nextIdx);
-            this.$obDialog = $('#obDialog');
+            this.$obDialog = $('#ob-dialog');
         }
     }
 

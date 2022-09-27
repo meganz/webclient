@@ -2284,7 +2284,6 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
     var errorMsg = function(msg) {
         var $warning = $('.multiple-input-warning span', $scope);
 
-        $('#token-input-share-multiple-input', $scope).val('');
         $warning.text(msg);
         $scope.addClass('error');
 

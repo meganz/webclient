@@ -50,10 +50,11 @@ var ChatNotifications = function(megaChat, options) {
             };
 
             megaRoom
-                .rebind('onMessagesBuffAppend.chatNotifications', function(e, message) {
+                // eslint-disable-next-line complexity -- @todo refactor & fix..
+                .rebind('onMessagesBuffAppend.chatNotifications', async(e, message) => {
                     megaChat.updateSectionUnreadCount();
 
-                    var fromContact = null;
+                    let fromContact = null;
                     if (message.userId) {
                         // contact not found.
                         if (!M.u[message.userId]) {
@@ -65,9 +66,14 @@ var ChatNotifications = function(megaChat, options) {
                         fromContact = message.authorContact;
                     }
 
-                    var avatarMeta = generateAvatarMeta(fromContact.u);
-                    var icon = avatarMeta.avatarUrl;
-                    var n;
+                    let {avatarUrl, fullName} = fromContact ? generateAvatarMeta(fromContact.u) : {};
+                    if (!fullName && fromContact) {
+                        fullName = await Promise.resolve(
+                            M.syncUsersFullname(fromContact.u, undefined, new MegaPromise())
+                        ).catch(dump);
+                    }
+
+                    let n;
 
                     // halt if already seen.
                     if (
@@ -99,10 +105,10 @@ var ChatNotifications = function(megaChat, options) {
                                     'sound': 'incoming_chat_message',
                                     'group': megaRoom.chatId,
                                     'incrementCounter': unreadFlag,
-                                    'icon': icon,
+                                    'icon': avatarUrl,
                                     'anfFlag': 'chat_enabled',
                                     'params': {
-                                        'from': avatarMeta.fullName
+                                        'from': fullName
                                     }
                                 },
                                 unreadFlag
@@ -137,9 +143,9 @@ var ChatNotifications = function(megaChat, options) {
                                 'group': megaRoom.chatId,
                                 'incrementCounter': true,
                                 'anfFlag': 'chat_enabled',
-                                'icon': icon,
+                                'icon': avatarUrl,
                                 'params': {
-                                    'from': avatarMeta.fullName,
+                                    'from': fullName,
                                     'messageText': message.textContents
                                 }
                             },
@@ -348,3 +354,4 @@ var ChatNotifications = function(megaChat, options) {
             }
         });
 };
+

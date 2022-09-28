@@ -762,20 +762,14 @@ function _generateReadableContactNameFromStr(s, shortFormat) {
  * @returns {*|jQuery|HTMLElement}
  */
 function generateAvatarMeta(user_hash) {
-    var meta = {};
-
-    var contact = M.u[user_hash];
-    if (!contact) {
-        // console.error('contact not found');
-        contact = {}; // dummy obj.
-    }
-
-    var fullName = M.getNameByHandle(user_hash);
+    'use strict';
+    const meta = {
+        fullName: M.getNameByHandle(user_hash)
+    };
 
     var ua_meta = useravatar.generateContactAvatarMeta(user_hash);
     meta.color = ua_meta.avatar.colorIndex;
     meta.shortName = ua_meta.avatar.letters;
-    meta.fullName = fullName;
 
     if (ua_meta.type === 'image') {
         meta.avatarUrl = ua_meta.avatar;

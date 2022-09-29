@@ -101,10 +101,10 @@ var bottompage = {
 
         // Show/Hide Affiliate program link in bottom menu
         if (mega.flags.refpr) {
-            $('.bottom-menu .affiliate', $bottomMenu).removeClass('hidden');
+            $('a.link.affiliate', $bottomMenu).removeClass('hidden');
         }
         else {
-            $('.bottom-menu .affiliate', $bottomMenu).addClass('hidden');
+            $('a.link.affiliate', $bottomMenu).addClass('hidden');
         }
 
         // Hide Pricing link for current Business or Pro Flexi accounts

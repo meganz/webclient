@@ -90,18 +90,22 @@ var pro = {
                         // If this is Pro Flexi, the data is structured similarly to business, so set that manually
                         if (results[i].al === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
                             plans.push([
-                                results[i].id,             // id
-                                results[i].al,             // account level
-                                results[i].bd.ba.s,        // base storage
-                                results[i].bd.ba.t,        // base transfer
-                                results[i].m,              // months
-                                results[i].bd.ba.p  / 100, // base price
-                                results[0].l.c,            // currency
-                                results[i].bd.ba.p  / 100, // monthly base price
-                                results[i].bd.ba.lp / 100, // local base price
-                                results[0].l.lc,           // local price currency
-                                0,                         // local price save
-                                results[i].it              // item (will be 1 for business / Pro Flexi)
+                                results[i].id,              // id
+                                results[i].al,              // account level
+                                results[i].bd.ba.s,         // base storage
+                                results[i].bd.ba.t,         // base transfer
+                                results[i].m,               // months
+                                results[i].bd.ba.p  / 100,  // base price
+                                results[0].l.c,             // currency
+                                results[i].bd.ba.p  / 100,  // monthly base price
+                                results[i].bd.ba.lp / 100,  // local base price
+                                results[0].l.lc,            // local price currency
+                                0,                          // local price save
+                                results[i].it,              // item (will be 1 for business / Pro Flexi)
+                                results[i].bd.sto.p / 100,  // extra storage rate
+                                results[i].bd.sto.lp / 100, // extra storage local rate
+                                results[i].bd.trns.p / 100,  // extra transfer rate
+                                results[i].bd.trns.lp / 100  // extra transfer local rate
                             ]);
                         }
                         else {

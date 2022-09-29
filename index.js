@@ -1579,8 +1579,7 @@ function init_page() {
             pro.propay.init();
         }
         else {
-            parsepage(pages['proplan']);
-            pro.proplan.init();
+            pro.proplan2.initPage();
         }
     }
     else if (page.substr(0, 7) === 'payment') {

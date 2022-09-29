@@ -94,12 +94,15 @@
                 messages: () => {
                     typeClass = 'messages';
                     name = l[166];
-                },
-                [this.InboxID]: () => {
-                    typeClass = 'restricted-item';
-                    name = l.restricted_folder_button;
                 }
             };
+
+            if (this.BackupsId) {
+                cases[this.BackupsId] = () => {
+                    typeClass = 'backups';
+                    name = l.restricted_folder_button;
+                };
+            }
 
             if (cases[handle]) {
                 cases[handle]();
@@ -187,17 +190,19 @@
                         typeClass = 'recycle-item';
                         name = l[168];
                     }
-                    else if (handle === this.InboxID) {
-                        id = this.InboxID;
-                        typeClass = 'restricted-item';
-                        name = l[166];
+                    else if (this.BackupsId && handle === this.BackupsId) {
+                        id = this.BackupsId;
+                        typeClass = 'backups';
+                        name = l.restricted_folder_button;
                     }
                     else {
                         const n = this.d[handle];
                         if (n) {
                             id = n.h;
                             typeClass = '';
-                            name = n.name;
+                            if (n.name) {
+                                name = n.name;
+                            }
                             if (n.t) {
                                 typeClass = 'folder';
                             }
@@ -246,8 +251,8 @@
             if (item.type === 'cloud-drive') {
                 icon = 'icon-cloud';
             }
-            else if (item.type === 'restricted-item') {
-                icon = 'icon-restricted-folder-filled';
+            else if (item.type === 'backups') {
+                icon = 'icon-database-filled';
             }
             else if (item.type === 'folder' || item.type === 'folder-link') {
                 icon = 'icon-folder-filled';

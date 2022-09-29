@@ -261,9 +261,9 @@ MegaData.prototype.renderTree = function() {
     // We are no longer build this tree, however, just leave this for potential later usage.
     // build('out-shares');
     // build('public-links');
+    // build(M.InboxID);
     build(M.RootID);
     build(M.RubbishID);
-    build(M.InboxID);
 
     M.addTreeUIDelayed();
 

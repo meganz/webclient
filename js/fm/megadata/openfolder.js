@@ -86,7 +86,7 @@
             this.renderMain();
         }
         else if (id && id.substr(0, 7) !== 'account'
-            && id.substr(0, 7) !== 'backups'
+            && id.substr(0, 7) !== 'devices'
             && id.substr(0, 9) !== 'dashboard'
             && id.substr(0, 15) !== 'user-management'
             && id.substr(0, 13) !== 'notifications') {
@@ -318,10 +318,10 @@
         if (id === 'rubbish') {
             id = this.RubbishID;
         }
-        else if (id === 'inbox') {
-            id = this.InboxID;
+        else if (id === 'backups' && this.BackupsId) {
+            id = this.BackupsId;
         }
-        else if (id === 'cloudroot') {
+        else if (id === 'cloudroot' || id === this.InboxID) {
             id = this.RootID;
         }
         else if (id && id.substr(0, 4) === 'chat') {
@@ -434,7 +434,7 @@
             M.onFileManagerReady(accountUI);
         }
         // TODO: Remove "localStorage.debugBackups" once new applications are ready
-        else if (id && id.substr(0, 7) === 'backups' && localStorage.debugBackups) {
+        else if (!is_mobile && id && id.substr(0, 7) === 'devices' && localStorage.debugBackups) {
             M.onFileManagerReady(() => {
                 mega.backupCenter.openSection();
             });

@@ -18,8 +18,6 @@ export default class Breadcrumbs extends MegaRenderMixin {
                 return 'cloud-drive';
             case M.RubbishID:
                 return 'recycle-item';
-            case M.InboxID:
-                return 'restricted-item';
             case 'shares':
                 return 'contacts-item';
             default:
@@ -27,6 +25,8 @@ export default class Breadcrumbs extends MegaRenderMixin {
         }
     }
     getBreadcrumbNodeText(nodeId, prevNodeId) {
+        const backupsId = M.BackupsId || 'backups';
+
         switch (nodeId) {
             case M.RootID:
                 // `Cloud Drive`
@@ -34,8 +34,8 @@ export default class Breadcrumbs extends MegaRenderMixin {
             case M.RubbishID:
                 // `Rubbish Bin`
                 return l[167];
-            case M.InboxID:
-                // `Inbox`
+            case backupsId:
+                // `Backups`
                 return l.restricted_folder_button;
             case 'shares':
                 // `username@mega.co.nz` || `Shared with me`
@@ -51,11 +51,15 @@ export default class Breadcrumbs extends MegaRenderMixin {
 
             let icon;
 
+            if (!item.name) {
+                continue;
+            }
+
             if (item.type === 'cloud-drive') {
                 icon = <i className="sprite-fm-mono icon-cloud icon24"></i>;
             }
-            else if (item.type === 'restricted-item') {
-                icon = <i className="sprite-fm-mono icon-restricted-folder-filled icon24"></i>;
+            else if (item.type === 'backups') {
+                icon = <i className="sprite-fm-mono icon-database-filled icon24"></i>;
             }
             else if (item.type === 'folder') {
                 icon = <i className="sprite-fm-mono icon-folder-filled icon24"></i>;
@@ -188,6 +192,10 @@ export default class Breadcrumbs extends MegaRenderMixin {
                     const prevNodeId = path[k - 1];
                     const nodeName = this.getBreadcrumbNodeText(nodeId, prevNodeId);
 
+                    if (!nodeName) {
+                        return;
+                    }
+
                     // Flag that the specific node is part of the `Incoming Shares` node chain;
                     // The `Attach` button is not available for isIncomingShare nodes.
 
@@ -206,9 +214,15 @@ export default class Breadcrumbs extends MegaRenderMixin {
                             );
                         }
                         else {
+                            let folderType = nodeId === M.RootID ? 'cloud-drive' : 'folder';
+
+                            if (M.BackupsId && nodeId === M.BackupsId) {
+                                folderType = 'backups';
+                            }
+
                             extraPathItems.push({
                                 name: nodeName,
-                                type: nodeId === M.RootID ? 'cloud-drive' : 'folder',
+                                type: folderType,
                                 nodeId
                             });
                         }

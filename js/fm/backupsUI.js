@@ -1486,7 +1486,7 @@ lazy(mega, 'backupCenter', () => {
          */
         async renderContent(force) {
 
-            if (M.currentdirid !== 'backups') {
+            if (M.currentdirid !== 'devices') {
                 return false;
             }
 
@@ -1508,16 +1508,16 @@ lazy(mega, 'backupCenter', () => {
             }
 
             loadingDialog.hide('backupRefresh');
-            delay('backups:update', () => this.renderContent().catch(dump), 30000);
+            delay('devices:update', () => this.renderContent().catch(dump), 30000);
 
             if (!this.bpcListener) {
                 this.bpcListener = mBroadcaster.addListener('beforepagechange', (page) => {
 
-                    if (page.includes('backups')) {
+                    if (page.includes('devices')) {
                         return;
                     }
 
-                    delay.cancel('backups:update');
+                    delay.cancel('devices:update');
                     this.data = [];
                     this.deviceCardStates = {};
                     this.lastupdate = 0;
@@ -1564,19 +1564,19 @@ lazy(mega, 'backupCenter', () => {
                 return false;
             }
 
-            // Show backups section and hide rest
+            // Show devices section and hide rest
             $('.fm-right-block, .fm-right-files-block, .section.conversations,'
                 + '.fm-right-account-block', '.fmholder').addClass('hidden');
             this.$backupWrapper.removeClass('hidden');
 
             // Render left tree pane
-            M.onSectionUIOpen('backups');
+            M.onSectionUIOpen('devices');
             this.$leftPaneBtns.removeClass('active');
-            this.$leftPaneBtns.filter('.backups').addClass('active');
+            this.$leftPaneBtns.filter('.devices').addClass('active');
 
             M.initShortcutsAndSelection(this.$backupWrapper);
 
-            // Update and render Backups content or show Empty block
+            // Update and render Devices content or show Empty block
             this.render();
         }
 

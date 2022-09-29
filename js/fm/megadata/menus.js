@@ -658,7 +658,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                 else {
                     $(menuCMI).filter('.fileupload-item,.newfolder-item').removeClass('hidden');
 
-                    if (nodeRights > 1) {
+                    if (nodeRights > 0) {
                         $(menuCMI).filter('.newfile-item').removeClass('hidden');
                     }
 
@@ -1403,12 +1403,9 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
         }
     }
 
-    $('.sort-arrow', $sortMenuItems).removeClass('icon-up icon-down');
-
     $selectedItem = $sortMenuItems
         .filter('*[data-by=' + sorting.n + ']')
         .addClass('active');
-    $('.sort-arrow', $selectedItem).addClass(dirClass);
 
     var tmpFn = function() {
         x = event.clientX;

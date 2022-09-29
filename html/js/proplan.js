@@ -32,11 +32,21 @@ pro.proplan = {
         "use strict";
 
         // if business sub-user is trying to get to Pro page redirect to home.
-        if (u_attr && u_attr.b && (!u_attr.b.m || (u_attr.b.m && u_attr.b.s !== -1))) {
+        if (u_attr && u_attr.b && (!u_attr.b.m || (u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED))) {
             loadSubPage('fm');
             return;
         }
-        if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+        if (u_attr && u_attr.b && u_attr.b.m && pro.isExpiredOrInGracePeriod()) {
+            loadSubPage('repay');
+            return;
+        }
+
+        // Make sure Pro Flexi can't access the Pro page and redirect to the File Manager or Repay page
+        if (u_attr && u_attr.pf && !pro.isExpiredOrInGracePeriod()) {
+            loadSubPage('fm');
+            return;
+        }
+        if (u_attr && u_attr.pf && pro.isExpiredOrInGracePeriod()) {
             loadSubPage('repay');
             return;
         }
@@ -1558,7 +1568,7 @@ function completeProLogin(result) {
             // If no value was set on the discount promo page, find the plan they clicked on
             // before the login/register prompt popped up. Otherwise use the discount plan number.
             const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
-            const proNum = continuePlanNum === null ?
+            const proNum = continuePlanNum === null ? pro.proplan2.selectedPlan ||
                 $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
 
             // Load the Pro payment page (step 2) now that they have logged in
@@ -1624,7 +1634,7 @@ function showRegisterDialog(aPromise) {
                 // If no value was set on the discount promo page, find the plan they clicked on
                 // before the login/register prompt popped up. Otherwise use the discount plan number.
                 const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
-                var proNum = continuePlanNum === null ?
+                var proNum = continuePlanNum === null ? pro.proplan2.selectedPlan ||
                     $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
 
                 // Load the Pro payment page (step 2) now that the account has been created

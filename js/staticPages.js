@@ -658,6 +658,7 @@ function BusinessAccount() {}
 
 BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
     "use strict";
+
     var operationPromise = new MegaPromise();
 
     if (!forceUpdate) {
@@ -687,6 +688,7 @@ BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
                 var businessPlan = Object.create(null);
                 businessPlan.timestamp = currTime;
                 for (var h = 0; h < res.length; h++) {
+
                     if (res[h].it) {
                         businessPlan = res[h];
                         businessPlan.bd.us.lp /= 100;

@@ -752,12 +752,13 @@ function fmLeftMenuUI() {
     "use strict";
 
     // handle the Inbox section use cases
-    if (!M.hasInboxItems()) {
+    if (M.InboxID && M.currentdirid === M.InboxID) {
+        M.openFolder(M.RootID);
+    }
 
-        $('.js-lp-myfiles .js-inbox-btn', '.fmholder').addClass('hidden');
-        if (M.InboxID && M.currentrootid === M.InboxID) {
-            M.openFolder(M.RootID);
-        }
+    // handle the Backups icon changes
+    if (!M.BackupsId || !localStorage.debugBackups) {
+        $('.js-lp-myfiles .js-backups-btn', '.fmholder').addClass('hidden');
     }
 
     // handle the RubbishBin icon changes
@@ -2284,7 +2285,6 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
     var errorMsg = function(msg) {
         var $warning = $('.multiple-input-warning span', $scope);
 
-        $('#token-input-share-multiple-input', $scope).val('');
         $warning.text(msg);
         $scope.addClass('error');
 
@@ -3391,11 +3391,6 @@ function fm_resize_handler(force) {
         $('.files-grid-view, .fm-blocks-view', $sharedDetailsBlock).css({
             'height': `calc(100% - ${sharedHeaderHeight}px)`,
         });
-    }
-    else if (M.currentrootid === 'discovery') {
-        const $galleryTabsBl = $('.gallery-tabs-bl', 'body');
-        const pos = $('.gallery-tab-lnk-y', $galleryTabsBl).position();
-        $('.gallery-section-title', $galleryTabsBl).css('max-width', pos.left - 10);
     }
 
     if (d) {

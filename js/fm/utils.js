@@ -1880,8 +1880,8 @@ MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
         storageBlock.querySelector('.plan').textContent = l[1150];
     }
 
-    // Show only space_used  for business accounts
-    if (u_attr && u_attr.b) {
+    // Show only space_used for Business and Pro Flexi accounts
+    if (u_attr && (u_attr.b || u_attr.pf)) {
         storageHtml = `<span class="lp-sq-used">${space_used}</span>`;
         storageBlock.querySelector('.js-storagegraph').classList.add('hidden');
         storageBlock.querySelector('.js-lpbtn[data-link="upgrade"]').classList.add('hidden');

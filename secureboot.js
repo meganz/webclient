@@ -2732,6 +2732,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
@@ -2845,9 +2846,11 @@ else if (!browserUpdate) {
 
     // Pro pages Step 1 (Pro plan) and Step 2 (Pro payment)
     jsl.push({f:'html/proplan.html', n: 'proplan', j:0});
+    jsl.push({f:'html/planpricing.html', n: 'planpricing', j:0});
     jsl.push({f:'html/propay.html', n: 'propay', j:0});
     jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
     jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
+    jsl.push({f:'html/js/planpricing.js', n: 'planpricing_js', j:1});
     jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
     jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
     jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
@@ -2993,7 +2996,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/megadata/avatars.js', n: 'fm_megadata_avatars_js', j: 1});
     jsl.push({f:'js/fm/megadata/contacts.js', n: 'fm_megadata_contacts_js', j: 1});
     jsl.push({f:'js/fm/megadata/filters.js', n: 'fm_megadata_filters_js', j: 1});
-    jsl.push({f:'js/fm/megadata/inbox.js', n: 'fm_megadata_inbox_js', j: 1});
     jsl.push({f:'js/fm/megadata/menus.js', n: 'fm_megadata_menus_js', j: 1});
     jsl.push({f:'js/fm/megadata/nodes.js', n: 'fm_megadata_nodes_js', j: 1});
     jsl.push({f:'js/fm/megadata/openfolder.js', n: 'fm_megadata_openfolder_js', j: 1});
@@ -3185,14 +3187,17 @@ else if (!browserUpdate) {
         jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
         jsl.push({f:'html/proplan.html', n: 'proplan', j:0});
+        jsl.push({f:'html/planpricing.html', n: 'planpricing', j:0});
         jsl.push({f:'html/propay.html', n: 'propay', j:0});
         jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
         jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
+        jsl.push({f:'html/js/planpricing.js', n: 'planpricing_js', j:1});
         jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
         jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
         jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
         jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
@@ -4304,7 +4309,7 @@ else if (!browserUpdate) {
                 var request = [
                     {a: 'uavq', f: 1, v: code},
                     {a: 'uq', pro: 1, gc: 1},
-                    {a: 'utqa', nf: 1}
+                    {a: 'utqa', nf: 2, p: 1}
                 ];
 
                 xhr(u_sid ? ('&sid=' + u_sid) : false, request, function(res) {

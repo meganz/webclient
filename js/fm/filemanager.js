@@ -922,9 +922,9 @@ FileManager.prototype.initFileManagerUI = function() {
             'shared-with-me':  {root: 'shares',    prev: null, subpages: ['out-shares']},
             'public-links':    {root: 'public-links',    prev: null},
             'recents':         {root: 'recents',   prev: null},
-            'inbox':           {root: M.InboxID,   prev: null},
+            'backups':         {root: 'backups',   prev: null},
             'rubbish-bin':     {root: M.RubbishID, prev: null},
-            'backup-center': {root: 'backups', prev: null}
+            'backup-center':   {root: 'devices', prev: null}
         };
     }
 
@@ -989,7 +989,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        if (this.classList.contains('backups')) {
+        if (this.classList.contains('devices')) {
             if (u_type === 0) {
 
                 // Show message 'This page is for registered users only'
@@ -997,7 +997,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
             else {
 
-                loadSubPage('fm/backups');
+                loadSubPage('fm/devices');
             }
         }
 
@@ -1033,8 +1033,11 @@ FileManager.prototype.initFileManagerUI = function() {
 
                 var targetFolder = null;
 
+                if (tab.root === 'backups') {
+                    targetFolder = M.BackupsId || M.RootID;
+                }
                 // Clicked on the currently active tab, should open the root (e.g. go back)
-                if (~clickedClass.indexOf(activeClass)) {
+                else if (clickedClass.indexOf(activeClass) !== -1) {
                     targetFolder = tab.root;
 
                     // special case handling for the chat, re-render current conversation
@@ -3239,7 +3242,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         initPerfectScrollbar($('.out-shared-blocks-scrolling', '.out-shared-blocks-view'));
     }
     else if (this.currentdirid !== 'user-management' &&
-        (this.currentdirid === this.InboxID || this.getNodeRoot(this.currentdirid) === this.InboxID)) {
+        (this.currentdirid === this.BackupsId || this.getNodeRoot(this.currentdirid) === this.InboxID)) {
         if (this.v.length > 0) {
             $('.fm-blocks-view.fm').removeClass('hidden');
         }
@@ -4039,7 +4042,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.nw-fm-left-icon.conversations', $fmholder).addClass('hidden');
     }
 
-    // view or hide left icon for business account, confirmed and payed
+    // View or hide left icon for business account, confirmed and paid.
     if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === 1 || u_attr.b.s === 2) && u_privk) {
         $('.nw-fm-left-icon.user-management', $fmholder).removeClass('hidden');
     }
@@ -4050,7 +4053,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     switch (id) {
         case 'opc':
         case 'ipc':
-        case 'backups':
+        case 'devices':
             tmpId = 'backup-center';
             break;
         case 'recents':
@@ -4058,7 +4061,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         case 'shared-with-me':
         case 'out-shares':
         case 'public-links':
-        case 'inbox':
+        case 'backups':
         case 'rubbish-bin':
             tmpId = 'cloud-drive';
             break;
@@ -4188,7 +4191,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     if (
         id !== 'cloud-drive' &&
         id !== 'rubbish-bin' &&
-        id !== 'inbox' &&
+        id !== 'backups' &&
         id !== 'shared-with-me' &&
         !String(M.currentdirid).includes('shares') &&
         id !== 'out-shares' &&
@@ -4284,7 +4287,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         || id === 'shared-with-me'
         || id === 'out-shares'
         || id === 'public-links'
-        || id === 'inbox'
+        || id === 'backups'
         || id === 'rubbish-bin'
         || id === 'recents'
         || id === 'discovery'
@@ -4293,7 +4296,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         M.initLeftPanel();
     }
     else if (id === 'cloud-drive' || id === 'dashboard'
-        || id === 'account' || id === 'backups') {
+        || id === 'account' || id === 'devices') {
 
         panel = document.getElementsByClassName('js-other-tree-panel').item(0);
 
@@ -4311,7 +4314,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
         panel = document.getElementsByClassName('js-lp-usermanagement').item(0);
 
-        if (panel) {
+        // Don't show the panel if Pro Flexi
+        if (panel && !u_attr.pf) {
             panel.classList.remove('hidden');
         }
 
@@ -4432,8 +4436,8 @@ FileManager.prototype.initLeftPanel = function() {
     if (M.currentdirid === M.RootID) {
         $('.js-clouddrive-btn').addClass('active');
     }
-    else if (M.currentrootid === M.InboxID) {
-        $('.js-lpbtn[data-link="inbox"]').addClass('active');
+    else if (M.currentdirid === M.BackupsId || M.currentrootid === M.InboxID) {
+        $('.js-lpbtn[data-link="backups"]').addClass('active');
     }
     else if (M.currentrootid === 'shares' || M.currentrootid === 'out-shares') {
         $('.js-lpbtn[data-link="shares"]').addClass('active');
@@ -4655,11 +4659,10 @@ FileManager.prototype.cameraUploadUI = function() {
                         throw new Error(`Unexpected dialog(${name}) type...`);
                     }
 
-                    // arrange to back any non-controlled dialogs,
-                    // this class will be removed on the next closeDialog()
-                    $('.mega-dialog:visible, .overlay:visible').addClass('arrange-to-back');
-
-                    if (!$dialog.is('#obDialog')) {
+                    if (!$dialog.is('#ob-dialog')) {
+                        // arrange to back any non-controlled dialogs,
+                        // this class will be removed on the next closeDialog()
+                        $('.mega-dialog:visible, .overlay:visible').addClass('arrange-to-back');
                         fm_showoverlay();
                     }
                     $dialog.removeClass('hidden arrange-to-back');

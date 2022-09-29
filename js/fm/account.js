@@ -125,15 +125,16 @@ accountUI.renderAccountPage = function(account) {
 
         var $banner = $('.quota-banner', accountUI.$contentBlock);
 
-        if (u_attr && u_attr.b) {
-            $banner.addClass('hidden');
-            return;
-        }
         if (sectionName === '/fm/account' || sectionName === '/fm/account/plan'
             || sectionName === '/fm/account/transfers') {
             $banner.removeClass('hidden');
         }
         else {
+            $banner.addClass('hidden');
+        }
+
+        // If Pro Flexi or Business, hide the banner
+        if (u_attr && (u_attr.pf || u_attr.b)) {
             $banner.addClass('hidden');
         }
     };
@@ -475,7 +476,7 @@ accountUI.general = {
         var $dashboardPane = $('.content-panel.dashboard', $fmContent);
 
         // Show Membership plan
-        $('.account .plan-icon', $dashboardPane).removeClass('pro1 pro2 pro3 pro4 pro100 free');
+        $('.account .plan-icon', $dashboardPane).removeClass('pro1 pro2 pro3 pro4 pro100 pro101 free');
 
         if (u_attr.p) {
 
@@ -906,15 +907,13 @@ accountUI.account = {
             var ach = M.maf;
 
             const hideOrDisplayBanner = () => {
-                // If not a business account
-                if (typeof u_attr.b === 'undefined') {
-
-                    // Show the standard storage/bandwidth usage banner instead of the phone banner
+                // If not Business/Pro Flexi, show the standard storage/bandwidth usage banner instead of phone banner
+                if (typeof u_attr.b === 'undefined' && typeof u_attr.pf === 'undefined') {
                     $usageBanner.removeClass('hidden');
                     $addPhoneBanner.addClass('hidden');
                 }
                 else {
-                    // Otherwise for business account hide both banners
+                    // Otherwise for Business or Pro Flexi accounts hide both banners
                     $usageBanner.addClass('hidden');
                     $addPhoneBanner.addClass('hidden');
                 }
@@ -993,6 +992,12 @@ accountUI.account = {
                         mega.config.set('skipsmsbanner', 1);
                     }
                 });
+            }
+
+            // If a Business / Pro Flexi account, permanently hide the usage and phone banners
+            if (typeof u_attr.b !== 'undefined' || typeof u_attr.pf !== 'undefined') {
+                $usageBanner.addClass('hidden');
+                $addPhoneBanner.addClass('hidden');
             }
         },
 
@@ -1851,6 +1856,12 @@ accountUI.plan = {
                 $('.upgrade-to-pro', $planContent).addClass('hidden');
             }
         }
+
+        // If Pro Flexi, hide the Upgrade Account button and Account Balance section on the Plan page
+        if (u_attr && u_attr.pf) {
+            $('.upgrade-to-pro', $planContent).addClass('hidden');
+            $('.data-block.account-balance', $planContent).addClass('hidden');
+        }
     },
 
     accountType: {
@@ -1935,7 +1946,7 @@ accountUI.plan = {
                 var planText = pro.getProPlanName(planNum);
 
                 // if this is p=100 business
-                if (planNum === 100) {
+                if (planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
                     $('.account.plan-info.accounttype', $planContent).addClass('business');
                     $('.fm-account-plan .acc-renew-date-info', $planContent).removeClass('border');
                 }
@@ -1979,10 +1990,15 @@ accountUI.plan = {
             }
 
             /* achievements */
-            if (!account.maf || (u_attr.p === 100 && u_attr.b && u_attr.b.m)) {
+            if (!account.maf ||
+                (u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS && u_attr.b && u_attr.b.m) ||
+                (u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI && u_attr.pf)) {
 
                 $('.btn-achievements', $planContent).addClass('hidden');
-                if (u_attr.p === 100 && u_attr.b && u_attr.b.m) {
+
+                // If active Business master account or active Pro Flexi account
+                if ((u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS && u_attr.b && u_attr.b.m) ||
+                    (u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI && u_attr.pf)) {
 
                     // Debug code ...
                     if (d && localStorage.debugNewPrice) {
@@ -2179,12 +2195,21 @@ accountUI.plan = {
                     self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                     loadingDialog.show();
 
+                    // Setup standard request to 'cccs' = Credit Card Cancel Subscriptions
+                    const requests = [
+                        { a: 'cccs', r: reason }
+                    ];
+
+                    // If they were Pro Flexi, we need to also downgrade the user from Pro Flexi to Free
+                    if (u_attr && u_attr.pf) {
+                        requests.push({ a: 'urpf' });
+                    }
+
                     // Cancel the subscription/s
-                    // cccs = Credit Card Cancel Subscriptions, r = reason
-                    api_req({a: 'cccs', r: reason}, {
+                    api_req(requests, {
                         callback: function() {
 
-                            // Hide loading dialog and cancel subscription button on account page, set exiry date
+                            // Hide loading dialog and cancel subscription button on account page, set expiry date
                             loadingDialog.hide();
                             self.$accountPageCancelButton.addClass('hidden');
                             self.$expiryTextBlock.text(l[987]);
@@ -2192,7 +2217,7 @@ accountUI.plan = {
                                 .safeHTML('<span class="red">@@</span>',
                                     time2date(account.expiry, 2));
 
-                            // Show success dialog and refresh UI
+                            // Show success dialog
                             self.$dialogSuccess.removeClass('hidden');
                             self.$backgroundOverlay.removeClass('hidden');
                             self.$backgroundOverlay.addClass('payment-dialog-overlay');
@@ -2438,20 +2463,23 @@ accountUI.plan = {
                     const monthWording = numOfMonths === 1 ? l[931] : l[6788];
                     const item = `${pro.getProPlanName(proNum)} (${numOfMonths} ${monthWording})`;
 
-                    if (proNum === 4) {
-                        planIcon = 'lite';
+                    if (proNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
+                        planIcon = 'icon-crest-lite';
                     }
-                    else if (proNum === 100) {
-                        planIcon = 'business';
+                    else if (proNum === pro.ACCOUNT_LEVEL_BUSINESS) {
+                        planIcon = 'icon-crest-business';
+                    }
+                    else if (proNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                        planIcon = 'icon-crest-pro-flexi';
                     }
                     else {
-                        planIcon = 'pro-' + proNum;
+                        planIcon = 'icon-crest-pro-' + proNum;
                     }
 
                     // Render table row
                     html += '<tr>'
                         + '<td><div class="label-with-icon">'
-                        + '<i class="sprite-fm-uni icon-crest-' + planIcon + '"></i>'
+                        + '<i class="sprite-fm-uni ' + planIcon + '"></i>'
                         + '<span> ' + item + '</span>'
                         + '</div></td>'
                         + '<td><span>' + dateTime + '</span></td>'
@@ -3628,12 +3656,18 @@ accountUI.contactAndChat = {
 
     status: {
 
+        AWAY_REFS: {
+            hours: 'autoaway-hours',
+            minutes: 'autoaway-minutes'
+        },
+
         render: function(presenceInt, autoaway, autoawaylock, autoawaytimeout, persist, persistlock, lastSeen) {
 
             'use strict';
 
             // Chat
             var $sectionContainerChat = $('.fm-account-contact-chats', accountUI.$contentBlock);
+
             // Status appearance radio buttons
             accountUI.inputs.radio.init(
                 '.chatstatus',
@@ -3667,24 +3701,29 @@ accountUI.contactAndChat = {
 
                 // Prevent changes to autoaway if autoawaylock is set
                 if (autoawaylock === true) {
-                    $('#auto-away-switch', $sectionContainerChat).addClass('diabled')
+                    $('#auto-away-switch', $sectionContainerChat).addClass('disabled')
                         .parent().addClass('hidden');
                 }
                 else {
-                    $('#auto-away-switch', $sectionContainerChat).removeClass('diabled')
+                    $('#auto-away-switch', $sectionContainerChat).removeClass('disabled')
                         .parent().removeClass('hidden');
                 }
 
                 // Auto-away input box
-                var autoAwayString = mega.icu.format(l[20206], autoawaytimeout / 60);
-                var autoAwayArray = autoAwayString.split(/\[A]|\[\/A]/);
+                const [hours, minutes] = [Math.floor(autoawaytimeout / 3600), autoawaytimeout % 3600 / 60];
+                const strArray = l.set_autoaway.split('[X]');
 
-                $('#autoaway_txt_1', $sectionContainerChat).text(autoAwayArray[0]);
-                $('input#autoaway', $sectionContainerChat).val(autoAwayArray[1]);
-                $('#autoaway_txt_2', $sectionContainerChat).text(autoAwayArray[2]);
+                $('#autoaway_txt_1', $sectionContainerChat).text(strArray[0]); // `Set status to Away after`
+                $(`input#${this.AWAY_REFS.hours}`, $sectionContainerChat).val(hours || '');
+                $('#autoaway_txt_2', $sectionContainerChat).text(mega.icu.format(l.plural_hour, hours));
+                $(`input#${this.AWAY_REFS.minutes}`, $sectionContainerChat).val(minutes || '');
+                $('#autoaway_txt_3', $sectionContainerChat).text(mega.icu.format(l.plural_minute, minutes));
+                $('#autoaway_txt_4', $sectionContainerChat).text(strArray[1]); // `of inactivity.`
 
                 // Always editable for user comfort -
-                accountUI.controls.enableElement($('input#autoaway', $sectionContainerChat));
+                accountUI.controls.enableElement(
+                    $(`input#${this.AWAY_REFS.hours}, input#${this.AWAY_REFS.minutes}`, $sectionContainerChat)
+                );
 
                 // Persist switch
                 accountUI.inputs.switch.init(
@@ -3698,48 +3737,41 @@ accountUI.contactAndChat = {
 
                 // Prevent changes to autoaway if autoawaylock is set
                 if (persistlock === true) {
-                    $('#persist-presence-switch', $sectionContainerChat).addClass('diabled')
+                    $('#persist-presence-switch', $sectionContainerChat).addClass('disabled')
                         .parent().addClass('hidden');
                 }
                 else {
-                    $('#persist-presence-switch', $sectionContainerChat).removeClass('diabled')
+                    $('#persist-presence-switch', $sectionContainerChat).removeClass('disabled')
                         .parent().removeClass('hidden');
                 }
             }
         },
 
         bindEvents: function(presenceInt, autoawaytimeout) {
-
             'use strict';
-
             if (autoawaytimeout !== false) {
-                var $sectionContainerChat = $('.fm-account-contact-chats', accountUI.$contentBlock);
-                var lastValidNumber = Math.floor(autoawaytimeout / 60);
+                const { AWAY_REFS } = this;
+                $(`input#${Object.values(AWAY_REFS).join(', input#')}`).rebind('change.dashboard', () =>
+                    presenceInt.userPresence.ui_setautoaway(
+                        true,
+                        Object.values(AWAY_REFS)
+                            .map(ref => {
+                                const el = document.getElementById(ref);
+                                let [value, max] = (({ value, max }) => [Math.max(0, value | 0), max | 0])(el);
 
-                // when value is changed, set checkmark
-                $('input#autoaway', $sectionContainerChat).rebind('change.dashboard', function() {
+                                if (value > max) {
+                                    el.value = value = max;
+                                }
 
-                    var val = parseInt($(this).val());
-
-                    if (val > 3505) {
-                        val = 3505;
-                    }
-                    else if (val < 0) {
-                        val = 5;
-                    }
-
-                    if (val > 0) {
-                        presenceInt.userPresence.ui_setautoaway(true, val * 60);
-                        lastValidNumber = val;
-                    }
-                }).rebind('blur.dashboard', function() {
-
-                    // the goal of the following line is to reset the value of the field if the entered data is invalid
-                    // after the user removes focus from it (and set the internally set value)
-                    $(this).val(presenceInt.userPresence.autoawaytimeout / 60);
-                }).val(lastValidNumber);
+                                // hours || minutes -> seconds
+                                return el.id === AWAY_REFS.hours ? value * 3600 : value * 60;
+                            })
+                            // hours + minutes -> seconds || default to 300 seconds as min
+                            .reduce((a, b) => a + b) || 300
+                    )
+                );
             }
-        }
+        },
     },
 
     chatList: {

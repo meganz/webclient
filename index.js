@@ -214,8 +214,8 @@ function topMenuDataUpdate(data) {
         $storageBlock.addClass('going-out');
     }
 
-    // Show only space_used  for business accounts
-    if (u_attr && u_attr.b) {
+    // Show only space_used for Business and Pro Flexi accounts
+    if (u_attr && (u_attr.b || u_attr.pf)) {
         storageHtml = '<span>' +  space_used + '</span>';
     }
     else {
@@ -1579,8 +1579,7 @@ function init_page() {
             pro.propay.init();
         }
         else {
-            parsepage(pages['proplan']);
-            pro.proplan.init();
+            pro.proplan2.initPage();
         }
     }
     else if (page.substr(0, 7) === 'payment') {
@@ -1617,7 +1616,11 @@ function init_page() {
             });
     }
     else if (page.substr(0, 5) === 'repay') {
-        if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+
+        // If Business master account (or Pro Flexi account) and expired/grace period, load the Repay page
+        if ((typeof u_attr !== 'undefined' && u_attr.b && u_attr.b.m && pro.isExpiredOrInGracePeriod(u_attr.b.s)) ||
+            (typeof u_attr !== 'undefined' && u_attr.pf && pro.isExpiredOrInGracePeriod(u_attr.pf.s))) {
+
             getUAOParameter(page, 'repay');
             parsepage(pages['repay']);
             var repayPage = new RepayPage();
@@ -1627,7 +1630,6 @@ function init_page() {
             loadSubPage('start');
             return;
         }
-
     }
     else if (page == 'credits') {
         parsepage(pages['credits']);
@@ -1842,7 +1844,7 @@ function init_page() {
                 return false;
             }
             else {
-                // we are coming form redeem page
+                // we are coming from redeem page
                 redeem.showVoucherInfoDialog();
             }
         }
@@ -2478,6 +2480,12 @@ function topmenuUI() {
             $('.email', $menuUserinfo).text(u_attr.email);
         }
 
+        // If Pro Flexi, hide the Upgrade button and Pricing link
+        if (u_attr.pf) {
+            $menuUpgradeAccount.addClass('hidden');
+            $menuPricingItem.addClass('hidden');
+        }
+
         // If a Lite/Pro plan has been purchased
         if (u_attr.p) {
 
@@ -2490,7 +2498,7 @@ function topmenuUI() {
 
             document.body.classList.remove('free');
 
-            if (proNum === 4) {
+            if (proNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
                 cssClass = 'lite';
                 document.body.classList.add('lite');
             }

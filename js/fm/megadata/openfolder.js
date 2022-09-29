@@ -86,7 +86,7 @@
             this.renderMain();
         }
         else if (id && id.substr(0, 7) !== 'account'
-            && id.substr(0, 7) !== 'backups'
+            && id.substr(0, 7) !== 'devices'
             && id.substr(0, 9) !== 'dashboard'
             && id.substr(0, 15) !== 'user-management'
             && id.substr(0, 13) !== 'notifications') {
@@ -318,10 +318,10 @@
         if (id === 'rubbish') {
             id = this.RubbishID;
         }
-        else if (id === 'inbox') {
-            id = this.InboxID;
+        else if (id === 'backups' && this.BackupsId) {
+            id = this.BackupsId;
         }
-        else if (id === 'cloudroot') {
+        else if (id === 'cloudroot' || id === this.InboxID) {
             id = this.RootID;
         }
         else if (id && id.substr(0, 4) === 'chat') {
@@ -358,10 +358,25 @@
                 });
             }
         }
+        else if (id && id.substr(0, 15) === 'user-management' && u_attr && u_attr.pf) {
+
+            // If Pro Flexi flexi, show just the invoices
+            M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+                M.onFileManagerReady(() => {
+                    var usersM = new BusinessAccountUI();
+
+                    M.onSectionUIOpen('user-management');
+
+                    usersM.viewBusinessInvoicesPage();
+                });
+            });
+        }
         else if (id && id.substr(0, 15) === 'user-management') {
+
             // id = 'user-management';
             M.require('businessAcc_js', 'businessAccUI_js').done(function() {
                 M.onFileManagerReady(function() {
+
                     if (!new BusinessAccount().isBusinessMasterAcc()) {
                         return M.openFolder('cloudroot');
                     }
@@ -369,8 +384,10 @@
                     var usersM = new BusinessAccountUI();
 
                     M.onSectionUIOpen('user-management');
+
                     // checking if we loaded sub-users and drew them
                     if (!usersM.initialized) {
+
                         // if not, then the fastest way is to render the business home page
                         usersM.viewSubAccountListUI(undefined, undefined, true);
                     }
@@ -417,7 +434,7 @@
             M.onFileManagerReady(accountUI);
         }
         // TODO: Remove "localStorage.debugBackups" once new applications are ready
-        else if (id && id.substr(0, 7) === 'backups' && localStorage.debugBackups) {
+        else if (!is_mobile && id && id.substr(0, 7) === 'devices' && localStorage.debugBackups) {
             M.onFileManagerReady(() => {
                 mega.backupCenter.openSection();
             });

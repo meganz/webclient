@@ -107,14 +107,13 @@ class ConversationsApp extends MegaRenderMixin {
             }
 
             var $target = $(e.target);
-
             if (megaChat.currentlyOpenedChat) {
                 // don't do ANYTHING if the current focus is already into an input/textarea/select or a .mega-dialog
                 // is visible/active at the moment
                 if (
                     $target.is(".messages-textarea,a,input,textarea,select,button") ||
                     $target.closest('.messages.scroll-area').length > 0 ||
-                    $(document.querySelector('.mega-dialog, .dropdown')).is(':visible') ||
+                    $target.closest('.mega-dialog').length > 0 ||
                     document.querySelector('textarea:focus,select:focus,input:focus')
                 ) {
                     return;
@@ -221,7 +220,7 @@ class ConversationsApp extends MegaRenderMixin {
                 return;
             }
             mega.ui.onboarding.sections.chat.startNextOpenSteps(nextIdx);
-            this.$obDialog = $('#obDialog');
+            this.$obDialog = $('#ob-dialog');
         }
     }
 

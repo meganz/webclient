@@ -44,12 +44,29 @@ pro.propay = {
      */
     init: function() {
         "use strict";
-        // if business sub-user is trying to get to Pro page redirect to home.
-        if (u_attr && u_attr.b && (!u_attr.b.m || (u_attr.b.m && u_attr.b.s !== -1))) {
+
+        // If Business sub-user or account is not expired/grace period, don't allow
+        // access to this Pro Pay page or they would end up purchasing a new plan
+        if (u_attr && u_attr.b && (!u_attr.b.m || !pro.isExpiredOrInGracePeriod(u_attr.b.s))) {
             loadSubPage('start');
             return;
         }
-        if (u_attr && u_attr.b && u_attr.b.m && (u_attr.b.s === -1 || u_attr.b.s === 2)) {
+
+        // If Business master user is expired or in grace period, redirect to repay page
+        if (u_attr && u_attr.b && u_attr.b.m && pro.isExpiredOrInGracePeriod(u_attr.b.s)) {
+            loadSubPage('repay');
+            return;
+        }
+
+        // If a current Pro Flexi user (not expired/grace period), don't allow
+        // access to this Pro Pay page or they would end up purchasing a new plan
+        if (u_attr && u_attr.pf && !pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
+            loadSubPage('start');
+            return;
+        }
+
+        // If a previous Pro Flexi user is expired or in grace period, they must use the Repay page to pay again
+        if (u_attr && u_attr.pf && pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
             loadSubPage('repay');
             return;
         }
@@ -139,19 +156,37 @@ pro.propay = {
     },
 
     /**
-     * Gets the Pro plan number e.g. 1-4 from the URL e.g. propay_4
+     * Gets the Pro plan number e.g. 4 from the URL e.g. propay_4
      * @returns {Boolean} Returns true if set correctly, otherwise returns false
      */
     setProPlanFromUrl: function() {
 
         // The URL should be in format /propay_x (1-4)
-        var pageParts = page.split('_');
+        const pageParts = page.split('_');
 
-        // Check the URL has propay_1, propay_2, propay_3, propay_4
-        if ((typeof pageParts[1] !== 'undefined') && (pageParts[1] >= 1) && (pageParts[1] <= 4)) {
+        if (typeof pageParts[1] === 'undefined') {
+            return false;
+        }
 
-            // Get the Pro number e.g. 1 - 4 then the name e.g. Pro I - III, Pro Lite
-            pro.propay.planNum = parseInt(pageParts[1]);
+        const proNumInt = parseInt(pageParts[1]);
+        const validProNums = [
+            pro.ACCOUNT_LEVEL_PRO_LITE,
+            pro.ACCOUNT_LEVEL_PRO_I,
+            pro.ACCOUNT_LEVEL_PRO_II,
+            pro.ACCOUNT_LEVEL_PRO_III,
+            pro.ACCOUNT_LEVEL_PRO_FLEXI
+        ];
+
+        // If the Pro Flexi enabled (pf) flag is not on and they're trying to access the page, don't allow
+        if (mega.flags && mega.flags.pf !== 1 && proNumInt === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+            return false;
+        }
+
+        // Check the URL has propay_1 (PRO I) - propay_3 (PRO III), propay_4 (PRO Lite), propay_101 (Pro Flexi)
+        if (validProNums.includes(proNumInt)) {
+
+            // Get the Pro number e.g. 2 then the name e.g. Pro I - III, Pro Lite, Pro Flexi etc
+            pro.propay.planNum = proNumInt;
             pro.propay.planName = pro.getProPlanName(pro.propay.planNum);
 
             return true;
@@ -237,6 +272,13 @@ pro.propay = {
                 if (parseInt(pro.propay.planNum) !== 4) {
                     gatewayOptions = gatewayOptions.filter((opt) => {
                         return opt.supportsExpensivePlans !== 0;
+                    });
+                }
+
+                // If Pro Flexi, filter out the gateways that don't support business plans
+                if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                    gatewayOptions = gatewayOptions.filter((opt) => {
+                        return opt.supportsBusinessPlans === 1;
                     });
                 }
 
@@ -654,9 +696,22 @@ pro.propay = {
 
         // Update the style of the dialog to be Pro I-III or Lite, also change the plan name
         $pricingBox.addClass('pro' + pro.propay.planNum);
-        $('.plan-icon:not(.alarm)', this.$page).addClass('pro' + pro.propay.planNum);
         $pricingBox.attr('data-payment', pro.propay.planNum);
         $planName.text(pro.propay.planName);
+
+        // Default to svg sprite icon format icon-crests-pro-x-details
+        let iconClass = `icon-crests-pro-${pro.propay.planNum}-details`;
+
+        // Special handling for PRO Lite (account level 4) and Pro Flexi (account level 101)
+        if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
+            iconClass = 'icon-crests-lite-details';
+        }
+        else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+            iconClass = 'icon-crests-pro-flexi-details';
+        }
+
+        // Add svg icon class (for desktop and mobile)
+        $('.plan-icon', this.$page).addClass(iconClass);
 
         // Update the price of the plan and the /month or /year next to the price box
         // work for local currency if present
@@ -969,8 +1024,9 @@ pro.propay = {
             $subscriptionInstructions.addClass('hidden');
         }
 
-        // If compulsory subscription, hide the No option
-        if (discountInfo && discountInfo.cs) {
+        // If discount with compulsory subscription or Pro Flexi, hide the No option so it'll be forced recurring
+        if ((discountInfo && discountInfo.cs) ||
+            currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
             $('.renewal-options-list .renewal-option', this.$page).last().addClass('hidden');
         }
 
@@ -1458,6 +1514,7 @@ pro.propay = {
         var apiId = pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ID];
         var price = pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_PRICE];
         var currency = pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_CURRENCY];
+        const itemNum = pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ITEMNUM];
 
         // Convert from boolean to integer for API
         var fromBandwidthDialog = ((Date.now() - parseInt(localStorage.seenOverQuotaDialog)) < 2 * 3600000) ? 1 : 0;
@@ -1466,7 +1523,7 @@ pro.propay = {
         // uts = User Transaction Sale
         var utsRequest = {
             a:  'uts',
-            it:  0,
+            it:  itemNum,
             si:  apiId,
             p:   price,
             c:   currency,

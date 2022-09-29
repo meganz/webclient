@@ -14,7 +14,13 @@ RepayPage.prototype.initPage = function() {
         $('.mobile.fm-header.fm-hr').removeClass('hidden');
     }
 
-    if (!u_attr || !u_attr.b || !u_attr.b.m || (u_attr.b.s !== -1 && u_attr.b.s !== 2)) {
+    // If u_attr not set, or
+    // If Business account and (not the master Business account, or not expired or in grace period), or
+    // If Pro Flexi account and (not expired or in grace period)
+    if (!u_attr ||
+        (u_attr.b && (!u_attr.b.m || !pro.isExpiredOrInGracePeriod(u_attr.b.s))) ||
+        (u_attr.pf && !pro.isExpiredOrInGracePeriod(u_attr.pf.s))) {
+
         loadSubPage('start');
         return;
     }
@@ -23,11 +29,13 @@ RepayPage.prototype.initPage = function() {
         return loadSubPage('registerb');
     }
 
+
     var mySelf = this;
 
     loadingDialog.show();
+
     // If necessary attributes are not loaded, load them then comeback.
-    if (!u_attr['%name'] || !u_attr['%email']) {
+    if (!u_attr.pf && (!u_attr['%name'] || !u_attr['%email'])) {
 
         Promise.allSettled([
             u_attr['%name'] ? Promise.resolve({ v: u_attr['%name'] }) : mega.attr.get(u_attr.b.bu, '%name', -1),
@@ -47,11 +55,22 @@ RepayPage.prototype.initPage = function() {
 
     const $repaySection = $('.main-mid-pad.bus-repay');
     const $leftSection = $('.main-left-block', $repaySection);
+    const $rightSection = $('.main-right-block', $repaySection);
     const $paymentBlock = $('.bus-reg-radio-block', $leftSection);
 
     const $repayBtn = $('.repay-btn', $repaySection).addClass('disabled');
 
     $('.bus-reg-agreement.mega-terms .bus-reg-txt', $leftSection).safeHTML(l['208s']);
+
+    // If Pro Flexi, show the icon and text
+    if (u_attr.pf) {
+        $('.plan-icon', $rightSection)
+            .removeClass('icon-crests-business-details')
+            .addClass('icon-crests-pro-flexi-details');
+        $('.business-plan-title', $rightSection).text(l.pro_flexi_name);
+        $('.bus-reg-agreement.ok-to-auto .radio-txt', $leftSection).text(l.setup_monthly_payment_pro_flexi);
+        $('.dialog-subtitle', $repaySection).text(l.reactivate_pro_flexi_subscription);
+    }
 
     // event handler for repay button
     $repayBtn.rebind('click', function repayButtonHandler() {
@@ -343,6 +362,7 @@ RepayPage.prototype.initPage = function() {
 
             // adding due invoice row
             nbOfUsers = res.inv[0].nb;
+
             $('.content-desc', $overduePaymentRow).text(u_attr['%name'] || ' ');
             $('.content-date', $overduePaymentRow).text(time2date(res.inv[0].ts, 1));
             $('.content-amou', $overduePaymentRow).text(dueAmount);
@@ -361,28 +381,59 @@ RepayPage.prototype.initPage = function() {
             if (res.inv[0].list) {
                 addDetailsRow($extraRowTemplate, l.additional_transfer, res.inv[0].list.t, $overduePaymentRow);
                 addDetailsRow($extraRowTemplate, l.additional_storage, res.inv[0].list.s, $overduePaymentRow);
-                addDetailsRow($extraRowTemplate, l.users_unit, res.inv[0].list.u, $overduePaymentRow);
-                $overduePaymentRow.rebind('click.repay', showDetails);
+
+                // If Pro Flexi, expand any rows by default, hide arrows and don't make clickable
+                if (u_attr.pf) {
+                    $overduePaymentRow.addClass('expand');
+                    $overduePaymentRow
+                        .nextUntil('.repay-breakdown-tb-content, .repay-breakdown-tb-total', '.repay-extra-details')
+                        .addClass('expand');
+                    $('.content-desc-container', $overduePaymentRow)
+                        .removeClass('icon-arrow-down-after icon-arrow-up-after');
+                }
+                else {
+                    // For Business, add a users row and make the row clickable
+                    addDetailsRow($extraRowTemplate, l.users_unit, res.inv[0].list.u, $overduePaymentRow);
+                    $overduePaymentRow.rebind('click.repay', showDetails);
+                }
             }
 
             if (res.nb && futureAmount) {
-                const futurePaymentRow = rowTemplate.clone();
+                const $futurePaymentRow = rowTemplate.clone();
                 nbOfUsers = res.nb;
 
-                $('.content-desc', futurePaymentRow).text(u_attr['%name'] || ' ');
-                $('.content-date', futurePaymentRow).text(time2date(new Date().getTime() / 1000, 1));
-                $('.content-amou', futurePaymentRow).text(futureAmount);
+                $('.content-desc', $futurePaymentRow).text(u_attr['%name'] || ' ');
+                $('.content-date', $futurePaymentRow).text(time2date(Date.now() / 1000, 1));
+                $('.content-amou', $futurePaymentRow).text(futureAmount);
 
-                futurePaymentRow.insertAfter($overduePaymentHeader);
+                $futurePaymentRow.insertAfter($overduePaymentHeader);
 
-                addDetailsRow($extraRowTemplate, l.additional_transfer, res.list.t, futurePaymentRow);
-                addDetailsRow($extraRowTemplate, l.additional_storage, res.list.s, futurePaymentRow);
-                addDetailsRow($extraRowTemplate, l.users_unit, res.list.u, futurePaymentRow);
+                addDetailsRow($extraRowTemplate, l.additional_transfer, res.list.t, $futurePaymentRow);
+                addDetailsRow($extraRowTemplate, l.additional_storage, res.list.s, $futurePaymentRow);
 
-                futurePaymentRow.rebind('click.repay', showDetails);
+                // If Pro Flexi, expand any rows by default, hide arrows and don't make clickable
+                if (u_attr.pf) {
+                    $futurePaymentRow.addClass('expand');
+                    $futurePaymentRow
+                        .nextUntil('.repay-breakdown-tb-content, .repay-breakdown-tb-total', '.repay-extra-details')
+                        .addClass('expand');
+                    $('.content-desc-container', $futurePaymentRow)
+                        .removeClass('icon-arrow-down-after icon-arrow-up-after');
+                }
+                else {
+                    // For Business, add a users row and make the row clickable
+                    addDetailsRow($extraRowTemplate, l.users_unit, res.list.u, $futurePaymentRow);
+                    $futurePaymentRow.rebind('click.repay', showDetails);
+                }
             }
 
             $('.repay-td-total', $rightBlock).text(totalAmount);
+
+            // If Pro Flexi, don't show the Account information section, also hide billing description row header
+            if (u_attr.pf) {
+                $('.js-account-info-section', $leftSection).addClass('hidden');
+                $('.js-repay-header-description', $overduePaymentHeader).text('');
+            }
 
             $('#repay-business-cname', $leftSection).text(u_attr['%name']);
             $('#repay-business-email', $leftSection).text(u_attr['%email']);
@@ -398,17 +449,31 @@ RepayPage.prototype.initPage = function() {
 
             business.getListOfPaymentGateways(false).always(fillPaymentGateways);
 
-            business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
-                mySelf.planInfo = info;
-                mySelf.planInfo.pastInvoice = res.inv[0];
-                mySelf.planInfo.currInvoice = { et: res.et || 0, t: res.t };
-                mySelf.userInfo = {
-                    fname: '',
-                    lname: '',
-                    nbOfUsers: res.nb || 0
-                };
-            });
+            // Change to the getProFlexiPlanInfo function if we are Pro Flexi
+            if (u_attr && u_attr.pf) {
+                business.getProFlexiPlanInfo().then(function planInfoReceived(st, info) {
+                    mySelf.planInfo = info;
+                    mySelf.planInfo.pastInvoice = res.inv[0];
+                    mySelf.planInfo.currInvoice = { et: res.et || 0, t: res.t };
+                    mySelf.userInfo = {
+                        fname: '',
+                        lname: '',
+                        nbOfUsers: res.nb || 0
+                    };
+                });
+            }
+            else {
+                business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
+                    mySelf.planInfo = info;
+                    mySelf.planInfo.pastInvoice = res.inv[0];
+                    mySelf.planInfo.currInvoice = { et: res.et || 0, t: res.t };
+                    mySelf.userInfo = {
+                        fname: '',
+                        lname: '',
+                        nbOfUsers: res.nb || 0
+                    };
+                });
+            }
         });
-
     });
 };

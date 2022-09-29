@@ -646,8 +646,8 @@
                             <i class="sprite-fm-mono icon-recents-filled"></i>[$20141]
                         </button>
 
-                        <button class="btn-myfiles js-lpbtn js-inbox-btn inbox js-fm-tab" data-link="inbox">
-                            <i class="sprite-fm-mono icon-restricted-folder-filled"></i>[$restricted_folder_button]
+                        <button class="btn-myfiles js-lpbtn js-backups-btn backups js-fm-tab" data-link="backups">
+                            <i class="sprite-fm-mono icon-database-filled"></i>[$restricted_folder_button]
                         </button>
 
                         <button class="btn-myfiles js-lpbtn rubbish-bin js-fm-tab" data-link="bin">
@@ -768,7 +768,7 @@
                         <span>[$backup_centre]</span>
                     </div>
                     <div class="lp-content-wrap">
-                        <button class="btn-myfiles backups js-fm-tab js-lpbtn" data-link="backups">
+                        <button class="btn-myfiles devices js-fm-tab js-lpbtn" data-link="devices">
                             <i class="sprite-fm-mono icon-pc-filled"></i>
                             [$devices_button]
                         </button>
@@ -804,7 +804,8 @@
                             <i class="pro1 sprite-fm-uni icon-crests-pro-1-details"></i>
                             <i class="pro2 sprite-fm-uni icon-crests-pro-2-details"></i>
                             <i class="pro3 sprite-fm-uni icon-crests-pro-3-details"></i>
-                            <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
+                            <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i><!-- Acct Level 4 (PRO Lite) -->
+                            <i class="pro101 sprite-fm-uni icon-crests-pro-flexi-details"></i><!-- Act lvl 101 (Pro Flexi) -->
                             <i class="business sprite-fm-uni icon-crests-business-details"></i>
                         </div>
                         <div class="account membership-plan"></div>
@@ -1064,17 +1065,20 @@
 
             <div class="gallery-tabs-bl hidden">
                 <div class="gallery-section-title"></div>
-                <button class="gallery-tab-lnk gallery-tab-lnk-y years" data-folder="y">[$gallery_years]</button>
-                <button class="gallery-tab-lnk gallery-tab-lnk-m months" data-folder="m">[$gallery_months]</button>
-                <button class="gallery-tab-lnk gallery-tab-lnk-d days" data-folder="d">[$gallery_days]</button>
-                <button class="gallery-tab-lnk gallery-tab-lnk-a all" data-folder="a">[$gallery_all]</button>
-                <button class="mega-button action gallery-close-discovery">
-                    <div>
-                        <i class="sprite-fm-mono icon-dialog-close"></i>
-                    </div>
-                    <span>[$gallery_exit_discovery]</span>
-                </button>
-                <div class="clear"></div>
+                <div class="gallery-section-tabs">
+                    <button class="gallery-tab-lnk gallery-tab-lnk-y years" data-folder="y">[$gallery_years]</button>
+                    <button class="gallery-tab-lnk gallery-tab-lnk-m months" data-folder="m">[$gallery_months]</button>
+                    <button class="gallery-tab-lnk gallery-tab-lnk-d days" data-folder="d">[$gallery_days]</button>
+                    <button class="gallery-tab-lnk gallery-tab-lnk-a all" data-folder="a">[$gallery_all]</button>
+                </div>
+                <div class="gallery-section-discovery">
+                    <button class="mega-button action gallery-close-discovery">
+                        <div>
+                            <i class="sprite-fm-mono icon-dialog-close"></i>
+                        </div>
+                        <span>[$gallery_exit_discovery]</span>
+                    </button>
+                </div>
             </div>
 
             <div class="fm-right-header fm hidden">
@@ -1269,6 +1273,14 @@
                     </div>
                     <i class="sprite-fm-mono icon-arrow-right"></i>
                     <div class="user-management-subuser-name acc-acc">[$403]</div>
+                    <i class="sprite-fm-mono icon-arrow-right inv-det-arrow hidden"></i>
+                    <div class="user-management-subuser-name inv-det-id hidden">Inv No. (placeholder!!!!)</div>
+                </div>
+
+                <div class="user-management-breadcrumb pro-iv-invoices hidden">
+                    <div class="user-management-title acc-home">[$16668]</div>
+                    <i class="sprite-fm-mono icon-arrow-right"></i>
+                    <div class="user-management-subuser-name acc-acc">[$19282]</div>
                     <i class="sprite-fm-mono icon-arrow-right inv-det-arrow hidden"></i>
                     <div class="user-management-subuser-name inv-det-id hidden">Inv No. (placeholder!!!!)</div>
                 </div>
@@ -3481,9 +3493,16 @@
                                     <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
                                 <div class="label-wrap full-sized">
-                                    <span id="autoaway_txt_1"> </span>
-                                    <span class="account-counter-number  short"><input type="text" id="autoaway"></span>
-                                    <span id="autoaway_txt_2"> </span>
+                                    <span id="autoaway_txt_1"></span>
+                                    <span class="account-counter-number short">
+                                        <input type="number" placeholder="0" max="23" id="autoaway-hours" />
+                                    </span>
+                                    <span id="autoaway_txt_2"></span>
+                                    <span class="account-counter-number short">
+                                        <input type="number" placeholder="0" max="59" id="autoaway-minutes" />
+                                    </span>
+                                    <span id="autoaway_txt_3"></span>&nbsp;
+                                    <span id="autoaway_txt_4"></span>
                                 </div>
                             </div>
                         </div>
@@ -3806,6 +3825,9 @@
                                             <span>[$18770]</span>
                                         </div>
                                     </div>
+                                    <button class="mega-button large invoices-button js-dashboard-invoices-button hidden">
+                                        <span>[$19282]</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>

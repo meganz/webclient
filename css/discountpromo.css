@@ -164,8 +164,16 @@
         width: calc(100% / 3 - 40px);
     }
 
-    .bottom-page.discount-promo .why-store-data .icon-wrap {
-        min-height: 190px;
+    .bottom-page.discount-promo .why-store-data .icon-wrap-3-cols {
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: 0 16px;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto auto auto;
+    }
+
+    .bottom-page.discount-promo .why-store-data .icon-wrap-3-cols i {
+        margin-top: 58px;
     }
 
     .bottom-page.discount-promo .icon-wrap.centered {
@@ -329,6 +337,10 @@
         .bottom-page.discount-promo .icon-wrap {
             max-width: 100%;
             width: 100%;
+        }
+
+        .bottom-page.discount-promo .why-store-data .icon-wrap-3-cols {
+            display: block;
         }
 
         .bottom-page.discount-promo .icon-wrap.centered {

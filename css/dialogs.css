@@ -1664,6 +1664,76 @@ body.de .mega-dialog.new-group-chat {
 .dialog-content-block {
     min-width: 100%;
 }
+.mega-dialog .fm-picker-dialog-tree-panel ul .nw-fm-tree-item {
+    -webkit-padding-start: 5px;
+    padding-inline-start: 5px;
+    -webkit-padding-end: 5px;
+    padding-inline-end: 5px;
+    -webkit-margin-end: 15px;
+    margin-inline-end: 15px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 28px;
+    padding-inline-start: 28px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 52px;
+    padding-inline-start: 52px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 76px;
+    padding-inline-start: 76px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 100px;
+    padding-inline-start: 100px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 124px;
+    padding-inline-start: 124px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 148px;
+    padding-inline-start: 148px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 172px;
+    padding-inline-start: 172px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 196px;
+    padding-inline-start: 196px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 220px;
+    padding-inline-start: 220px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 244px;
+    padding-inline-start: 244px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 268px;
+    padding-inline-start: 268px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 292px;
+    padding-inline-start: 292px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 316px;
+    padding-inline-start: 316px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 340px;
+    padding-inline-start: 340px;
+}
+.mega-dialog .fm-picker-dialog-tree-panel ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
+    -webkit-padding-start: 364px;
+    padding-inline-start: 364px;
+}
 /* end of File/folder picker dialog */
 
 /* Get link dialog */
@@ -2920,6 +2990,8 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll span {
         font: var(--text-body2);
         color: var(--text-color-high);
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll ul {
         padding: 0;
@@ -4319,6 +4391,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-address-dialog .plan-icon.pro2 i.pro2,
     .mega-dialog.payment-address-dialog .plan-icon.pro3 i.pro3,
     .mega-dialog.payment-address-dialog .plan-icon.pro4 i.pro4,
+    .mega-dialog.payment-address-dialog .plan-icon.pro101 i.pro101,
     .mega-dialog.payment-address-dialog .plan-icon.business i.business {
         display: block;
     }
@@ -8417,6 +8490,7 @@ body.de .mega-dialog.new-group-chat {
         .mega-dialog.voucher-info-redeem .plan-icon.pro2 i.pro2,
         .mega-dialog.voucher-info-redeem .plan-icon.pro3 i.pro3,
         .mega-dialog.voucher-info-redeem .plan-icon.pro4 i.pro4,
+        .mega-dialog.voucher-info-redeem .plan-icon.pro101 i.pro101,
         .mega-dialog.voucher-info-redeem .plan-icon.business i.business {
             display: block;
         }
@@ -9064,6 +9138,25 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-reminder {
         width: 596px;
         text-align: center;
+    }
+
+    .mega-dialog.payment-reminder .img-dialog-pro-flexi-expiry {
+        position: relative;
+    }
+
+    .mega-dialog.payment-reminder .img-dialog-pro-flexi-expiry .icon-crests-pro-flexi-details {
+        height: 120px;
+        width: 120px;
+        z-index: 1;
+    }
+
+    .mega-dialog.payment-reminder .img-dialog-pro-flexi-expiry .icon-takedown {
+        bottom: -5px;
+        height: 70px;
+        position: absolute;
+        right: -20px;
+        width: 70px;
+        z-index: 2;
     }
 
 /* end payment-reminder dialog */

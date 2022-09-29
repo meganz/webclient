@@ -3503,9 +3503,11 @@ div.checkboxOn {
 }
 
 .mobile.payment-options .plan-icon {
-    margin: 20px 12px 0 0;
     display: inline-block;
+    height: 32px;
+    margin: 20px 12px 0 0;
     vertical-align: top;
+    width: 32px;
 }
 .mobile.payment-options .plan-name {
     color: #676D75;
@@ -5699,10 +5701,22 @@ div.checkboxOn {
     position: absolute;
     top: 12px;
 }
-.mobile.my-account-page .plan-icon {
-    left: 16px;
+.mobile.my-account-page .plan-icon i {
+    display: none;
+    height: 26px;
+    left: 18px;
     position: absolute;
-    top: 13px;
+    top: 15px;
+    width: 26px;
+}
+.mobile.my-account-page .plan-icon.free i.free,
+.mobile.my-account-page .plan-icon.pro1 i.pro1,
+.mobile.my-account-page .plan-icon.pro2 i.pro2,
+.mobile.my-account-page .plan-icon.pro3 i.pro3,
+.mobile.my-account-page .plan-icon.pro4 i.pro4,
+.mobile.my-account-page .plan-icon.pro101 i.pro101,
+.mobile.my-account-page .plan-icon.pro100 i.business {
+    display: block;
 }
 .mobile.my-account-page .account-usage-text {
     color: #262F3B;
@@ -5719,6 +5733,9 @@ div.checkboxOn {
     top: 11px;
     text-align: right;
     color: #00A58F;
+}
+.mobile.my-account-page .storage-usage.business {
+    top: 22px;
 }
 .mobile.my-account-page .account-usage-block.warning,
 .mobile.my-account-page .account-usage-block.warning .storage-usage,
@@ -9598,11 +9615,26 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     position: relative;
     margin: 22px 15px;
 }
-.mobile.voucher-dialog .plan-icon,
-.mobile.payment-address-dialog .plan-icon {
+.mobile.voucher-dialog .plan-icon {
     float: left;
     margin: 6px 0 0 5px;
 }
+.mobile.payment-address-dialog .plan-icon i {
+    display: none;
+    float: left;
+    height: 32px;
+    margin: 6px 0 0 5px;
+    width: 32px;
+}
+.mobile.payment-address-dialog .plan-icon.pro1 i.pro1,
+.mobile.payment-address-dialog .plan-icon.pro2 i.pro2,
+.mobile.payment-address-dialog .plan-icon.pro3 i.pro3,
+.mobile.payment-address-dialog .plan-icon.pro4 i.pro4,
+.mobile.payment-address-dialog .plan-icon.pro101 i.pro101,
+.mobile.payment-address-dialog .plan-icon.business i.business {
+    display: block;
+}
+
 .mobile.voucher-dialog .voucher-plan-info,
 .mobile.payment-address-dialog .payment-plan-info {
     margin-left: 56px;
@@ -9829,6 +9861,20 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 .mobile.main-block.payment-result.success .payment-result-pad {
     width: 100%;
     margin: 0 auto;
+}
+.mobile.payment-result.success .plan-icon i {
+    display: none;
+    height: 32px;
+    margin: 0 auto;
+    width: 32px;
+}
+.mobile.payment-result.success .plan-icon.pro1 i.pro1,
+.mobile.payment-result.success .plan-icon.pro2 i.pro2,
+.mobile.payment-result.success .plan-icon.pro3 i.pro3,
+.mobile.payment-result.success .plan-icon.pro4 i.pro4,
+.mobile.payment-result.success .plan-icon.pro101 i.pro101,
+.mobile.payment-result.success .plan-icon.pro100 i.business {
+    display: block;
 }
 .mobile.footer-block {
     position: fixed;
@@ -12097,7 +12143,8 @@ code, c {
     font-size: 0;
     white-space: nowrap;
 }
-.voucher-info-redeem .voucher-logo.business-v {
+.voucher-info-redeem .voucher-logo.business-v,
+.voucher-info-redeem .voucher-logo.pro-iv {
     background-color: #46B4E5;
     border: unset;
     box-shadow: 0 1px 1px 0 rgba(0,0,0,0.05);
@@ -12124,14 +12171,26 @@ code, c {
     padding-top: 6px;
     padding-bottom: 6px;
 }
-.voucher-logo .plan-icon {
-    background-position: -0px -1620px;
+.voucher-info-redeem .plan-icon {
     height: 32px;
     width: 32px;
     left: unset;
     top: unset;
     margin: 18px 14px 0 14px;
     position: relative;
+    display: inline-block;
+}
+.voucher-info-redeem .plan-icon i {
+    display: none;
+    height: 32px;
+    width: 32px;
+}
+.voucher-info-redeem .plan-icon.pro1 i.pro1,
+.voucher-info-redeem .plan-icon.pro2 i.pro2,
+.voucher-info-redeem .plan-icon.pro3 i.pro3,
+.voucher-info-redeem .plan-icon.pro4 i.pro4,
+.voucher-info-redeem .plan-icon.pro101 i.pro101,
+.voucher-info-redeem .plan-icon.business i.business {
     display: inline-block;
 }
 .voucher-logo .v-separator {

@@ -762,8 +762,6 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
                     break;
                 }
             }
-
-
         }
 
         if (showWarnDialog) {
@@ -772,7 +770,6 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
         else {
             redirectToPaymentGateway();
         }
-
     };
 
     // at this point i know BusinessAccount class is required before
@@ -780,5 +777,4 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
     var payingPromise = business.doPaymentWithAPI(payDetails, businessPlan);
 
     payingPromise.always(finalizePayment);
-
 };

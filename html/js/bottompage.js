@@ -101,14 +101,15 @@ var bottompage = {
 
         // Show/Hide Affiliate program link in bottom menu
         if (mega.flags.refpr) {
-            $('.bottom-menu .affiliate', $bottomMenu).removeClass('hidden');
+            $('a.link.affiliate', $bottomMenu).removeClass('hidden');
         }
         else {
-            $('.bottom-menu .affiliate', $bottomMenu).addClass('hidden');
+            $('a.link.affiliate', $bottomMenu).addClass('hidden');
         }
 
-        // Show/Hide Pricing link for Business sub accounts and admin expired
-        if (u_attr && u_attr.b && u_attr.b.s !== -1) {
+        // Hide Pricing link for current Business or Pro Flexi accounts
+        if ((u_attr && u_attr.b && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED) ||
+            (u_attr && u_attr.pf && u_attr.pf.s !== pro.ACCOUNT_STATUS_EXPIRED)) {
             $('a.link.pro', $bottomMenu).addClass('hidden');
             $('.pages-menu.link.pro', $pagesMenu).addClass('hidden');
         }

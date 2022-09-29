@@ -97,9 +97,10 @@ function u_checklogin3a(res, ctx) {
     }
     else {
         u_attr = res;
+
         var exclude = [
-            'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup',
-            'mkt', 'name', 'p', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
+            'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup', 'mkt',
+            'name', 'p', 'pf', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
         ];
 
         for (var n in u_attr) {
@@ -452,6 +453,7 @@ function u_setrsa(rsakey) {
                 // Check whether this is a business sub-user attempting to confirm the account.
                 if (res === EARGS && !window.businessSubAc) {
                     M.req('ug').then(function(u_attr) {
+
                         if (u_attr.b && u_attr.b.m === 0 && u_attr.b.bu) {
                             crypt.getPubKeyAttribute(u_attr.b.bu, 'RSA')
                                 .then(function(res) {
@@ -492,6 +494,7 @@ function u_setrsa(rsakey) {
                     if (ASSERT(u_type === 3, assertMsg)) {
                         var user = {
                             u: u_attr.u,
+                            name: u_attr.name,
 
                             // u_attr.c in this phase represents confirmation
                             //  code status which is different from user contact
@@ -759,20 +762,14 @@ function _generateReadableContactNameFromStr(s, shortFormat) {
  * @returns {*|jQuery|HTMLElement}
  */
 function generateAvatarMeta(user_hash) {
-    var meta = {};
-
-    var contact = M.u[user_hash];
-    if (!contact) {
-        // console.error('contact not found');
-        contact = {}; // dummy obj.
-    }
-
-    var fullName = M.getNameByHandle(user_hash);
+    'use strict';
+    const meta = {
+        fullName: M.getNameByHandle(user_hash)
+    };
 
     var ua_meta = useravatar.generateContactAvatarMeta(user_hash);
     meta.color = ua_meta.avatar.colorIndex;
     meta.shortName = ua_meta.avatar.letters;
-    meta.fullName = fullName;
 
     if (ua_meta.type === 'image') {
         meta.avatarUrl = ua_meta.avatar;

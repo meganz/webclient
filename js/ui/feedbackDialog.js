@@ -199,9 +199,16 @@
                     'title': 'Collected Data Report',
                     'buttons': [
                         {
+                            'label': l[20840],
+                            'className': "mega-button positive collected-data-review-button-copy",
+                            'callback': function() {
+                                copyToClipboard(JSON.stringify(self._report, null, 2), l[371], 'clipboard-copy', 2000);
+                            }
+                        },
+                        {
                             'label': l[148],
-                            'className': "mega-button positive collected-data-review-button-cancel",
-                            'callback': function () {
+                            'className': "mega-button collected-data-review-button-cancel",
+                            'callback': function() {
                                 this.hide();
                             }
                         }

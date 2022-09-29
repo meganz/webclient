@@ -864,6 +864,19 @@
         disableFolders();
         onIdle(() => {
             initPerfectScrollbar($('.right-pane.active .dialog-tree-panel-scroll', $dialog));
+
+            // Place tooltip for long names
+            const folderNames = $dialog[0].querySelectorAll('.nw-fm-tree-folder:not(.inbound-share)');
+
+            for (let i = folderNames.length; i--;) {
+
+                const elm = folderNames[i];
+
+                if (elm.scrollWidth > elm.offsetWidth) {
+                    elm.setAttribute('data-simpletip', elm.textContent);
+                    elm.classList.add('simpletip');
+                }
+            }
         });
     };
 

@@ -23,7 +23,6 @@ mobile.account = {
         mobile.account.fetchAccountInformation($page);
         mobile.account.initUpgradeAccountButton($page);
         mobile.account.initPaymentCardButton($page);
-        mobile.account.initAchievementsButton($page);
         mobile.account.initRecoveryKeyButton($page);
         mobile.account.initCancelAccountButton($page);
         mobile.account.initAddPhoneNumberButton($page);
@@ -55,16 +54,17 @@ mobile.account = {
 
         'use strict';
 
-        // if this is business dont show
-        if (u_attr && u_attr.b && u_attr.b.s !== -1) {
-            $page.find('.account-upgrade-block').addClass('hidden');
+        const $upgradeBtn = $('.account-upgrade-block', $page);
+
+        // If this is Pro Flexi or Business (not expired), don't show
+        if (u_attr && (u_attr.pf || (u_attr.b && u_attr.b.s !== -1))) {
+            $upgradeBtn.addClass('hidden');
         }
         else {
-            var upgradeBtn = $page.find('.account-upgrade-block').removeClass('hidden');
-            // On clicking/tapping the Upgrade Account button
-            upgradeBtn.off('tap').on('tap', function() {
+            // Show the button and add click/tap handler to load the Pro page
+            $upgradeBtn.removeClass('hidden');
+            $upgradeBtn.rebind('tap', () => {
 
-                // Load the Pro page
                 loadSubPage('pro');
                 return false;
             });
@@ -81,8 +81,9 @@ mobile.account = {
 
         var $achievementsButton = $page.find('.account-achievements-block');
 
-        // If achievements are enabled, show the button
-        if (typeof u_attr.flags.ach !== 'undefined' && u_attr.flags.ach) {
+        // If achievements are enabled and not Pro Flexi, show the button
+        if (typeof u_attr.flags.ach !== 'undefined' && u_attr.flags.ach && !u_attr.pf) {
+
             $achievementsButton.removeClass('hidden');
         }
 
@@ -106,17 +107,10 @@ mobile.account = {
 
         'use strict';
 
-        // if this is business no limit for storage and no percentage
-        var $accountUsageBlockExternal = $('.mobile.account-usage-block');
-        if (u_attr && u_attr.b) {
-            $accountUsageBlockExternal.find('.mobile.storage-usage').addClass('hidden');
-            $accountUsageBlockExternal.find('.mobile.storage-usage.business').removeClass('hidden');
-        }
-        else {
-            $accountUsageBlockExternal.find('.mobile.storage-usage').removeClass('hidden');
-            $accountUsageBlockExternal.find('.mobile.storage-usage.business').addClass('hidden');
-        }
-        // Fetch all account data from the API
+        // Fetch all account data from the API. NB: Any rendering hide/show logic for Business/Pro Flexi which relies
+        // on u_attr.b and u_attr.pf must be applied -after- the account data has been refetched. Recently upgraded
+        // accounts require M.account.lastupdate set to 0 first (usually called before here), then the account data
+        // must be refetched, then everything should be rendered in order to show everything updated correctly.
         M.accountData(
             function() {
 
@@ -128,6 +122,7 @@ mobile.account = {
                 mobile.account.displayProPlanDetails($page);
                 mobile.account.displayStorageUsage($page);
                 mobile.account.renderCancelSubscriptionButton($page);
+                mobile.account.initAchievementsButton($page);
             },
             true,   // Show loading spinner
             true    // Force clear cache
@@ -224,6 +219,16 @@ mobile.account = {
         }
         else if (percentageUsed >= 85) {
             $accountUsageBlock.addClass('warning');
+        }
+
+        // If this is Business or Pro Flexi there is no limit for storage and no percentage
+        if (u_attr && (u_attr.b || u_attr.pf)) {
+            $('.mobile.storage-usage', $accountUsageBlock).addClass('hidden');
+            $('.mobile.storage-usage.business', $accountUsageBlock).removeClass('hidden');
+        }
+        else {
+            $('.mobile.storage-usage', $accountUsageBlock).removeClass('hidden');
+            $('.mobile.storage-usage.business', $accountUsageBlock).addClass('hidden');
         }
     },
 

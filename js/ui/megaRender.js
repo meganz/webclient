@@ -385,9 +385,6 @@
                         $('.fm-empty-folder-link').removeClass('hidden');
                     /*} */
                 }
-                else if (M.currentdirid === M.InboxID) {
-                    $('.fm-empty-messages').removeClass('hidden');
-                }
                 else if (M.currentrootid === M.RootID
                         || M.currentrootid === M.RubbishID
                         || M.currentrootid === M.InboxID) {

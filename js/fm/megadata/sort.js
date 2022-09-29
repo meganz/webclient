@@ -559,27 +559,48 @@ MegaData.prototype.doSort = function(n, d) {
     $('.grid-table thead .arrow').removeClass('asc desc');
     $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
 
-    n = String(n).replace(/\W/g, '');
-    if (d > 0) {
-        $('.arrow.' + n + ':not(.is-chat)').addClass('desc');
-    }
-    else {
-        $('.arrow.' + n + ':not(.is-chat)').addClass('asc');
+    const sortIconClassPrefix = 'icon-';
+
+    let sortItemClasses = 'selected';
+    let arrowDirection = 'desc';
+    let sortIconAddClass = 'up';
+    let sortIconRemoveClass = 'down';
+
+    if (d < 0) {
+        arrowDirection = 'asc';
+        sortItemClasses += ' inverted';
+        sortIconAddClass = 'down';
+        sortIconRemoveClass = 'up';
     }
 
-    var sortClassinSubMenu = '.sort-' + n;
+    n = String(n).replace(/\W/g, '');
+
+    $('.arrow.' + n + ':not(.is-chat)').addClass(arrowDirection);
+
+    const sortItemPrefix = '.dropdown-item.sort-grid-item.sort-';
+    let subMenuSortClass = '';
 
     if (n === 'ts') {
-        sortClassinSubMenu = '.sort-timeAd';
+        subMenuSortClass = sortItemPrefix + 'timeAd';
     }
     else if (n === 'mtime') {
-        sortClassinSubMenu = '.sort-timeMd';
+        subMenuSortClass = sortItemPrefix + 'timeMd';
     }
     else if (n === 'date') {
-        sortClassinSubMenu = '.sort-sharecreated, .sort-timeAd';
+        subMenuSortClass =  sortItemPrefix + 'sharecreated,'
+                            + sortItemPrefix + 'timeAd';
+    }
+    else {
+        subMenuSortClass = sortItemPrefix + n;
     }
 
-    $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item' + sortClassinSubMenu).addClass('selected');
+    const $selectedSortItem = $(subMenuSortClass, '.files-menu.context .submenu.sorting');
+
+    $selectedSortItem.addClass(sortItemClasses);
+
+    $('i.sort-arrow', $selectedSortItem)
+        .addClass(sortIconClassPrefix + sortIconAddClass)
+        .removeClass(sortIconClassPrefix + sortIconRemoveClass);
 
     this.sortmode = {n: n, d: d};
 

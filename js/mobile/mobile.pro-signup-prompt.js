@@ -146,7 +146,7 @@ mobile.proSignupPrompt = {
         }
 
         // Get the selected Pro card's data-payment attribute value
-        var selectedPlanNum = $('.pricing-page.plan.selected').data('payment');
+        var selectedPlanNum = pro.proplan2.selectedPlan || $('.pricing-page.plan.selected').data('payment');
 
         // Set the selected plan number so when they've completed Login and Registration they can proceed to pay
         sessionStorage.setItem('proPageContinuePlanNum', selectedPlanNum);

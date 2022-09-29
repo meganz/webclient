@@ -97,7 +97,8 @@ body.rtl .improved-recovery-steps .info-container,
 body.rtl .fm-left-panel.user-management,
 body.rtl .user-management-view,
 body.rtl .fm-right-header-user-management,
-body.rtl .datepickers-container {
+body.rtl .datepickers-container,
+body.rtl .bottom-page.pricing-pg .bottom-page.full-block {
     direction: rtl;
 }
 body.rtl .bottom-page.blue-block.top-pad.bott-pad.mcmd-pg-p,

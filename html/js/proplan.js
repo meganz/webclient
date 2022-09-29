@@ -1568,7 +1568,7 @@ function completeProLogin(result) {
             // If no value was set on the discount promo page, find the plan they clicked on
             // before the login/register prompt popped up. Otherwise use the discount plan number.
             const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
-            const proNum = continuePlanNum === null ?
+            const proNum = continuePlanNum === null ? pro.proplan2.selectedPlan ||
                 $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
 
             // Load the Pro payment page (step 2) now that they have logged in
@@ -1634,7 +1634,7 @@ function showRegisterDialog(aPromise) {
                 // If no value was set on the discount promo page, find the plan they clicked on
                 // before the login/register prompt popped up. Otherwise use the discount plan number.
                 const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
-                var proNum = continuePlanNum === null ?
+                var proNum = continuePlanNum === null ? pro.proplan2.selectedPlan ||
                     $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
 
                 // Load the Pro payment page (step 2) now that the account has been created

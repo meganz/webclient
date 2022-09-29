@@ -112,19 +112,15 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
         stype = "public-links";
         cvtree = M.getPublicLinkTree();
     }
-    else if (n.h === M.InboxID) {
+    else if (n.h === M.BackupsId) {
         if (typeof dialog === 'undefined') {
-            const lPaneButton = document.querySelector('.js-lp-myfiles .js-inbox-btn');
+            const lPaneButton = document.querySelector('.js-lp-myfiles .js-backups-btn');
 
-            if (lPaneButton.classList.contains('hidden') && M.hasInboxItems()) {
+            if (lPaneButton.classList.contains('hidden')) {
                 lPaneButton.classList.remove('hidden');
             }
         }
-        else {
-            $('.' + dialog + ' .inbox .dialog-content-block')
-                .html('<ul id="mctreesub_' + escapeHTML(M.InboxID) + '"></ul>');
-        }
-        stype = "inbox";
+        stype = "backups";
     }
     else if (n.h === M.RubbishID) {
         if (typeof dialog === 'undefined') {
@@ -510,7 +506,7 @@ MegaData.prototype.initTreePanelSorting = function() {
     // Sorting sections for tree panels, dialogs, and per field.
     // XXX: do NOT change the order, add new entries at the tail, and ask before removing anything..
     const sections = [
-        'folder-link', 'contacts', 'conversations', 'inbox',
+        'folder-link', 'contacts', 'conversations', 'backups',
         'shared-with-me', 'cloud-drive', 'rubbish-bin',
         'out-shares', 'public-links'
     ];
@@ -959,9 +955,11 @@ MegaData.prototype.redrawTree = function(f) {
     if (M.currentrootid === M.RootID || String(M.currentdirid).match("^search/")) {
         M.buildtree(M.d[M.RootID], force);
     }
-    if (M.currentrootid === M.InboxID) {
+    /*
+    else if (M.currentrootid === M.InboxID) {
         M.buildtree(M.d[M.InboxID], force);
     }
+    */
     else if (M.currentrootid === M.RubbishID) {
         M.buildtree({h: M.RubbishID}, force);
     }
@@ -1316,7 +1314,7 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
         this.onSectionUIOpen(id_r || id_s);
     }
     else if (this.InboxID && id_r === this.InboxID) {
-        this.onSectionUIOpen('inbox');
+        this.onSectionUIOpen('backups');
     }
     else if (id_r === this.RootID) {
         this.onSectionUIOpen('cloud-drive');

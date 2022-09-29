@@ -9627,9 +9627,6 @@ class Breadcrumbs extends mixins.wl {
       case M.RubbishID:
         return 'recycle-item';
 
-      case M.InboxID:
-        return 'restricted-item';
-
       case 'shares':
         return 'contacts-item';
 
@@ -9639,6 +9636,8 @@ class Breadcrumbs extends mixins.wl {
   }
 
   getBreadcrumbNodeText(nodeId, prevNodeId) {
+    const backupsId = M.BackupsId || 'backups';
+
     switch (nodeId) {
       case M.RootID:
         return l[164];
@@ -9646,7 +9645,7 @@ class Breadcrumbs extends mixins.wl {
       case M.RubbishID:
         return l[167];
 
-      case M.InboxID:
+      case backupsId:
         return l.restricted_folder_button;
 
       case 'shares':
@@ -9663,13 +9662,17 @@ class Breadcrumbs extends mixins.wl {
     for (let item of items) {
       let icon;
 
+      if (!item.name) {
+        continue;
+      }
+
       if (item.type === 'cloud-drive') {
         icon = external_React_default().createElement("i", {
           className: "sprite-fm-mono icon-cloud icon24"
         });
-      } else if (item.type === 'restricted-item') {
+      } else if (item.type === 'backups') {
         icon = external_React_default().createElement("i", {
-          className: "sprite-fm-mono icon-restricted-folder-filled icon24"
+          className: "sprite-fm-mono icon-database-filled icon24"
         });
       } else if (item.type === 'folder') {
         icon = external_React_default().createElement("i", {
@@ -9811,6 +9814,10 @@ class Breadcrumbs extends mixins.wl {
         const prevNodeId = path[k - 1];
         const nodeName = this.getBreadcrumbNodeText(nodeId, prevNodeId);
 
+        if (!nodeName) {
+          return;
+        }
+
         ((nodeId, k) => {
           if (k < 4) {
             breadcrumb.unshift(external_React_default().createElement("a", {
@@ -9826,9 +9833,15 @@ class Breadcrumbs extends mixins.wl {
               className: "next-arrow sprite-fm-mono icon-arrow-right icon16"
             })));
           } else {
+            let folderType = nodeId === M.RootID ? 'cloud-drive' : 'folder';
+
+            if (M.BackupsId && nodeId === M.BackupsId) {
+              folderType = 'backups';
+            }
+
             extraPathItems.push({
               name: nodeName,
-              type: nodeId === M.RootID ? 'cloud-drive' : 'folder',
+              type: folderType,
               nodeId
             });
           }
@@ -24193,7 +24206,7 @@ class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationM
     }, metaRichpreviewConfirmation_React.createElement("div", {
       className: "message richpreview img-wrapper"
     }, metaRichpreviewConfirmation_React.createElement("div", {
-      className: "\r message\r richpreview\r preview-confirmation\r sprite-fm-illustration\r img-chat-url-preview\r "
+      className: " message richpreview preview-confirmation sprite-fm-illustration img-chat-url-preview "
     })), metaRichpreviewConfirmation_React.createElement("div", {
       className: "message richpreview inner-wrapper"
     }, metaRichpreviewConfirmation_React.createElement("div", {

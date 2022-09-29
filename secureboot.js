@@ -2993,7 +2993,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/megadata/avatars.js', n: 'fm_megadata_avatars_js', j: 1});
     jsl.push({f:'js/fm/megadata/contacts.js', n: 'fm_megadata_contacts_js', j: 1});
     jsl.push({f:'js/fm/megadata/filters.js', n: 'fm_megadata_filters_js', j: 1});
-    jsl.push({f:'js/fm/megadata/inbox.js', n: 'fm_megadata_inbox_js', j: 1});
     jsl.push({f:'js/fm/megadata/menus.js', n: 'fm_megadata_menus_js', j: 1});
     jsl.push({f:'js/fm/megadata/nodes.js', n: 'fm_megadata_nodes_js', j: 1});
     jsl.push({f:'js/fm/megadata/openfolder.js', n: 'fm_megadata_openfolder_js', j: 1});

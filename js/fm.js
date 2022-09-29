@@ -752,12 +752,13 @@ function fmLeftMenuUI() {
     "use strict";
 
     // handle the Inbox section use cases
-    if (!M.hasInboxItems()) {
+    if (M.InboxID && M.currentdirid === M.InboxID) {
+        M.openFolder(M.RootID);
+    }
 
-        $('.js-lp-myfiles .js-inbox-btn', '.fmholder').addClass('hidden');
-        if (M.InboxID && M.currentrootid === M.InboxID) {
-            M.openFolder(M.RootID);
-        }
+    // handle the Backups icon changes
+    if (!M.BackupsId || !localStorage.debugBackups) {
+        $('.js-lp-myfiles .js-backups-btn', '.fmholder').addClass('hidden');
     }
 
     // handle the RubbishBin icon changes

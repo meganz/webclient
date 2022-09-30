@@ -139,6 +139,8 @@ lazy(pro, 'proplan2', () => {
         $freeBtns.rebind('click.pricing', function() {
             const logId = this.id === 'tryMega' ? 99785 : 99784;
 
+            localStorage.removeItem('keycomplete');
+
             delay('pricing.plan', eventlog.bind(null, logId));
 
             if (typeof u_handle === 'undefined') {
@@ -436,7 +438,8 @@ lazy(pro, 'proplan2', () => {
         };
 
         $usersBusinessInput.rebind('change.pricing', function() {
-            this.value = Math.min(Math.round(this.value), 300);
+            const min = this.getAttribute('min') | 0;
+            this.value = Math.max(Math.min(Math.round(this.value), 300), min);
 
             const newRange = fromValueToRange(symmetricRanges, this.value);
 
@@ -446,7 +449,8 @@ lazy(pro, 'proplan2', () => {
         });
 
         $strgBusinessInput.rebind('change.pricing', function() {
-            this.value = Math.min(Math.round(this.value), 10000);
+            const min = this.getAttribute('min') | 0;
+            this.value = Math.max(Math.min(Math.round(this.value), 10000), min);
 
             const newRange = fromValueToRange(asymmetricRanges, this.value);
 
@@ -456,7 +460,8 @@ lazy(pro, 'proplan2', () => {
         });
 
         $trsBusinessInput.rebind('change.pricing', function() {
-            this.value = Math.min(Math.round(this.value), 10000);
+            const min = this.getAttribute('min') | 0;
+            this.value = Math.max(Math.min(Math.round(this.value), 10000), min);
 
             const newRange = fromValueToRange(asymmetricRanges, this.value);
 
@@ -466,7 +471,8 @@ lazy(pro, 'proplan2', () => {
         });
 
         $strgFlexInput.rebind('change.pricing', function() {
-            this.value = Math.min(Math.round(this.value), 10000);
+            const min = this.getAttribute('min') | 0;
+            this.value = Math.max(Math.min(Math.round(this.value), 10000), min);
 
             const newRange = fromValueToRange(asymmetricRanges, this.value);
 
@@ -476,7 +482,8 @@ lazy(pro, 'proplan2', () => {
         });
 
         $transFlexInput.rebind('change.pricing', function() {
-            this.value = Math.min(Math.round(this.value), 10000);
+            const min = this.getAttribute('min') | 0;
+            this.value = Math.max(Math.min(Math.round(this.value), 10000), min);
 
             const newRange = fromValueToRange(asymmetricRanges, this.value);
 
@@ -873,9 +880,14 @@ lazy(pro, 'proplan2', () => {
             $planCards.removeClass('disabled popular');
 
             // hide free banners
-            $('.pricing-pg.pricing-banner-container, .pricing-pg.pricing-get-started-container', $page)
-                .addClass('hidden');
 
+            if (localStorage.keycomplete) {
+                pro.propay.planChosenAfterRegistration = true;
+            }
+            else {
+                $('.pricing-pg.pricing-banner-container, .pricing-pg.pricing-get-started-container', $page)
+                    .addClass('hidden');
+            }
             // function to set card class, and txt for the header
             const setCardClassTxt = (id, cls, txt) => {
                 const $card = $planCards.filter(`#pro${id}`).addClass(cls);

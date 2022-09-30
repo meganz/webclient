@@ -247,14 +247,25 @@ pro.propay = {
                     return false;
                 }
 
-                // clean options we shouldn't show for individual signups
                 var tempGatewayOptions = [];
                 for (var ix = 0; ix < gatewayOptions.length; ix++) {
-                    if (typeof gatewayOptions[ix].supportsIndividualPlans === 'undefined'
-                        || gatewayOptions[ix].supportsIndividualPlans) {
+
+                    // If Pro Flexi, add only the gateways that support business plans
+                    if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI &&
+                        gatewayOptions[ix].supportsBusinessPlans === 1) {
+
+                        tempGatewayOptions.push(gatewayOptions[ix]);
+                    }
+
+                    // Otherwise for Pro Lite and Pro I-III, only add if the gateway supports individual plans
+                    else if (pro.propay.planNum !== pro.ACCOUNT_LEVEL_PRO_FLEXI &&
+                        (typeof gatewayOptions[ix].supportsIndividualPlans === 'undefined'
+                        || gatewayOptions[ix].supportsIndividualPlans)) {
+
                         tempGatewayOptions.push(gatewayOptions[ix]);
                     }
                 }
+
                 // if this user has a discount, clear gateways that are not supported.
                 const discountInfo = pro.propay.getDiscount();
                 const testGateway = localStorage.testGateway;
@@ -268,17 +279,11 @@ pro.propay = {
                 }
 
                 gatewayOptions = tempGatewayOptions;
+
                 // Filter out if they don't support expensive plans
                 if (parseInt(pro.propay.planNum) !== 4) {
                     gatewayOptions = gatewayOptions.filter((opt) => {
                         return opt.supportsExpensivePlans !== 0;
-                    });
-                }
-
-                // If Pro Flexi, filter out the gateways that don't support business plans
-                if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-                    gatewayOptions = gatewayOptions.filter((opt) => {
-                        return opt.supportsBusinessPlans === 1;
                     });
                 }
 

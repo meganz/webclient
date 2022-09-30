@@ -513,6 +513,7 @@ i.dropbox-icon {
     color: var(--color-secondary-cobalt-900);
 }
 .pricing-compare-slider-container .pricing-compare-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -524,6 +525,7 @@ i.dropbox-icon {
     position: relative;
 }
 .pricing-compare-slider-container .pricing-compare-slider::-moz-range-thumb {
+    -moz-appearance: none;
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -883,6 +885,7 @@ i.pricing-i-icon {
     outline: none;
 }
 .pricing-flexi-block-estimator-slider-marks input.pricing-flexi-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -892,6 +895,7 @@ i.pricing-i-icon {
     box-sizing: border-box;
 }
 .pricing-flexi-block-estimator-slider-marks input.pricing-flexi-slider::-moz-range-thumb {
+    -moz-appearance: none;
     width: 28px;
     height: 28px;
     border-radius: 50%;

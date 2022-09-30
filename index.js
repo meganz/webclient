@@ -1019,7 +1019,7 @@ function init_page() {
         loadSubPage('start');
         return false;
     }
-    else if (is_mobile && u_type && page === 'fm/dashboard') {
+    else if (is_mobile && u_type && (page === 'fm/dashboard' || page === 'start')) {
         loadSubPage('fm');
         return false;
     }

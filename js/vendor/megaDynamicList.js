@@ -501,9 +501,9 @@
      * Similiar to onContentUpdated but will only trigger if a new node added to the view not if a node is removed.
      * @private
      */
-    MegaDynamicList.prototype._onNodeInjected = function() {
+    MegaDynamicList.prototype._onNodeInjected = function(itemId) {
         if (this.options.onNodeInjected) {
-            this.options.onNodeInjected();
+            this.options.onNodeInjected(itemId);
         }
     };
 

@@ -585,7 +585,7 @@ RecentsRender.prototype.handleInOutShareState = function($newRow, action) {
 RecentsRender.prototype.getMaxFitOnScreen = function(force) {
     'use strict';
     if (!this._maxFitOnScreen || force) {
-        this._maxFitOnScreen = Math.floor((this.$container.width() - 120) / 128) || 2;
+        this._maxFitOnScreen = Math.floor((this.$container.width() - 114) / 130) || 2;
     }
     return this._maxFitOnScreen;
 };
@@ -1056,6 +1056,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     // Attach resize listener to the image block.
     self._resizeListeners.push(function() {
         var newMax = self.getMaxFitOnScreen();
+        const isExpanded = $previewsScroll.hasClass('expanded');
 
         // Render new more images if we can now fit more on the screen.
         if (newMax > maxFitOnScreen) {
@@ -1065,10 +1066,23 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         }
         maxFitOnScreen = newMax;
 
+        if (!isExpanded) {
+            for (let i = renderedIndex; i--;) {
+                renderedThumbs[i][i < maxFitOnScreen ? 'removeClass' : 'addClass']('hidden');
+            }
+        }
+
         // Enable/disable showall button if resize makes appropriate.
-        if (newMax < action.length && !$previewsScroll.hasClass('.expanded')) {
+        if (newMax < action.length) {
             $toggleExpandedButton.removeClass("hidden");
-        } else if (newMax > action.length) {
+            if (isExpanded) {
+                $toggleExpandedButtonText.text(l[19963]);
+            }
+            else {
+                $toggleExpandedButtonText.text(l.x_more_files.replace('%1', action.length - newMax));
+            }
+        }
+        else {
             $toggleExpandedButton.addClass("hidden");
         }
     });

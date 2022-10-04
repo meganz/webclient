@@ -631,15 +631,16 @@ label span.black {
 .notification-status-icon {
     display: flex;
     position: relative;
-    align-items: center;
 }
 .notification-type {
     display: flex;
+    flex-direction: column;
     table-layout: fixed;
     width: calc(100% - 52px);
     box-sizing: border-box;
 }
 .notification-avatar {
+    margin-top: 12px;
     position: relative;
     width: 32px;
     height: 32px;
@@ -665,10 +666,10 @@ label span.black {
 }
 .notification-request-buttons,
 .notification-accepted-bl {
-    flex: 0 0 75px;
-    padding: 0 20px 0 8px;
+    margin: 2px 0;
+    padding: 0 20px 0 12px;
     text-align: right;
-    align-self: center;
+    align-self: flex-start;
 }
 .fm-dialog-button.notifications-button {
     margin-top: 0;
@@ -780,11 +781,10 @@ label span.black {
     color: var(--text-color-high);
 }
 .notification-content {
-    flex: 1 1 320px;
     overflow: hidden;
     box-sizing: border-box;
-    min-height: 64px;
-    padding: 8px 12px 6px;
+    min-height: 48px;
+    padding: 8px 12px 0;
     vertical-align: middle;
 }
 .notification-info {
@@ -798,7 +798,9 @@ label span.black {
     display: block;
     font: var(--text-caption);
     color: var(--text-color-medium);
-    padding: 0;
+    padding-inline-start: 12px;
+    -webkit-padding-start: 12px;
+    margin-bottom: 6px;
 }
 body.notification-body {
     background-color: #f2f2f3 !important;
@@ -4438,7 +4440,7 @@ input.summary-ff-name.error {
     height: 8px;
     display: block;
     border-radius: 100%;
-    margin: 0 6px;
+    margin: 24px 4px 0;
     background: var(--label-red);
     transition: background-color 200ms ease-in-out;
     flex-shrink: 0;

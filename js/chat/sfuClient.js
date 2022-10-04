@@ -787,7 +787,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '360250a8c2';
+const COMMIT_ID = 'ad9b9c3871';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1473,6 +1473,9 @@ class SfuClient {
         const wasSendingHiRes = this.outVSpeakerTrack.isSendingTrack();
         try {
             await self._doGetLocalTracks();
+            if (!this.rtcConn || this.connState !== ConnState.kCallJoined) {
+                return;
+            }
             let promises = [];
             // first, determine which tracks we want to obtain, and null sender tracks that we want disabled
             if (self._speakerState === SpeakerState.kActive) {

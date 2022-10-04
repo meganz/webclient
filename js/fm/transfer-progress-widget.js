@@ -144,6 +144,11 @@ mega.tpw = new function TransferProgressWidget() {
                 $currRow.removeClass('hidden');
             }
         }
+
+        if ($widgetTabCompleted.hasClass('active')) {
+            $('.ps__scrollbar-y-rail', $bodyContainer).addClass('y-rail-offset');
+        }
+
         initScrolling();
     };
 
@@ -211,9 +216,9 @@ mega.tpw = new function TransferProgressWidget() {
             if ($this.hasClass('inactive') || $this.hasClass('active')) {
                 return false;
             }
+            $widgetTabCompleted.toggleClass('active');
             viewTransferSection($this.hasClass('js-tab-active') ? 0 : 1);
             $widgetTabActive.toggleClass('active');
-            $widgetTabCompleted.toggleClass('active');
             $widgetFooter.toggleClass('hidden');
 
             // This disables the propagation of the click to ancestors triggering the $.hideTopMenu

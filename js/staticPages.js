@@ -248,7 +248,7 @@ mBroadcaster.once('boot_done', () => {
     pages.registerb = ' ';
     showSignupPromptDialog = () => {
         'use strict';
-        const selectedPlan = $('.pricing-page.plan.selected', 'body').data('payment');
+        const selectedPlan = pro.proplan2.selectedPlan;
         const kvLogin = [['next', 'propay_' + selectedPlan]];
         const kvReg = [['next', '1'], ['plan', selectedPlan]];
         if (is_mobile) {

@@ -525,8 +525,15 @@
     color: var(--text-color-high);
     padding-bottom: 16px;
 }
-.repay-btn.small-view-btn {
+.main-mid-pad.bus-repay .repay-btn.small-view-btn {
     display: none;
+}
+.main-mid-pad.bus-repay .revert-to-free-btn.small-view-btn {
+    display: none;
+}
+.main-mid-pad.bus-repay .revert-to-free-btn {
+    display: block;
+    margin-top: 20px;
 }
 .main-mid-pad.bus-repay .row-wrapper {
     padding-bottom: 16px;
@@ -773,6 +780,10 @@
     .repay-btn.small-view-btn {
         margin: 32px auto;
         display: inline-block;
+    }
+    .revert-to-free-btn.small-view-btn {
+        display: block;
+        margin: 0 auto 20px;
     }
     .bus-reg-plan.repay .repay-breakdown-tb tr.repay-extra-details td:first-child {
         width: 65%;

@@ -2015,7 +2015,7 @@ accountUI.plan = {
                         let spaceTxt = `${bytesToSize(used)}`;
                         let baseTxt = spaceTxt;
                         let storageConsume = used / 1048576; // MB
-                        let storageQuota = (base || 3) * 1048576 + storageConsume; // MB
+                        let storageQuota = (base || 3) * 1048576; // MB
                         let extraTxt = l[5816].replace('[X]', base || 3);
 
                         if (base) {

@@ -2800,6 +2800,11 @@ function closeDialog(ev) {
         redeem.$dialog.addClass('hidden');
     }
 
+    // Sending the client to the main page if they dismiss the dialog
+    if ($.dialog === 'dlkey-dialog') {
+        loadSubPage('start');
+    }
+
     delete $.dialog;
     treesearch = false;
 

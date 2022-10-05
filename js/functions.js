@@ -1035,6 +1035,10 @@ function mKeyDialog(ph, fl, keyr, selector) {
         M.safeShowDialog('dlkey-dialog', $dialog);
     }
 
+    $('.js-close', $dialog).rebind('click.keydlg', () => {
+        loadSubPage('start');
+    });
+
     $input.rebind('input keypress', function(e) {
         var length = String($(this).val() || '').length;
 

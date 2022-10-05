@@ -1138,7 +1138,8 @@
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('copy', function() {
                 var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ? 'shared-with-me' : 'cloud-drive';
-                handleOpenDialog(tab, M.currentdirid, { key: 'copyToUpload', value: [files, emptyFolders] });
+                var dir = M.currentdirid === 'transfers' ? M.lastSeenCloudFolder || M.RootID : M.currentdirid;
+                handleOpenDialog(tab, dir, { key: 'copyToUpload', value: [files, emptyFolders] });
                 return uiCheckboxes($dialog);
             });
         }

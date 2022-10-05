@@ -125,6 +125,13 @@ class MegaGallery {
             );
     }
 
+    dropDynamicList() {
+        if (this.dynamicList) {
+            this.dynamicList.destroy();
+            this.dynamicList = false;
+        }
+    }
+
     clearRenderCache(key) {
         if (key) {
             if (this.renderCache[key]) {
@@ -190,10 +197,7 @@ class MegaGallery {
         $('.gallery-tab-lnk').removeClass('active');
         $(`.gallery-tab-lnk-${this.mode}`).addClass('active');
 
-        if (this.dynamicList) {
-            this.dynamicList.destroy();
-            this.dynamicList = false;
-        }
+        this.dropDynamicList();
 
         if (pushHistory === 2) {
             pushHistoryState(true, {subpage: page, galleryMode: this.mode});
@@ -365,10 +369,12 @@ class MegaGallery {
 
                 this.groups.y[ts].n[0] = n.h;
 
-                if (this.dynamicList && this.mode === 'y') {
-
+                if (this.dynamicList) {
                     this.clearRenderCache(`y${ts}`);
-                    this.throttledListChange(sts);
+
+                    if (this.mode === 'y') {
+                        this.throttledListChange(sts);
+                    }
                 }
             }
         }
@@ -403,7 +409,7 @@ class MegaGallery {
             this.setYearGroup(ts, n.h);
             this.mergeYearGroup();
 
-            if (M.currentdirid === this.id && this.mode === 'y') {
+            if (this.onpage && this.mode === 'y') {
                 this.resetAndRender();
             }
         }
@@ -450,7 +456,10 @@ class MegaGallery {
             this.splitYearGroup();
             delete this.groups.y[ts];
             this.mergeYearGroup();
-            this.resetAndRender();
+
+            if (this.onpage) {
+                this.resetAndRender();
+            }
         }
     }
 
@@ -697,7 +706,8 @@ class MegaGallery {
 
             this.updateMonthMaxAndOrder();
             this.clearRenderCache(`m${ts}`);
-            if (this.dynamicList) {
+
+            if (this.mode === 'm' && this.dynamicList) {
                 this.dynamicList.remove(sts, this.onpage);
             }
 
@@ -819,12 +829,20 @@ class MegaGallery {
     }
 
     removeFromDayGroup(h, ts) {
-        const sts1 = `${ts}`;
-        const sts2 = `${ts - 0.5}`;
+        const stsArr = [`${ts}`, `${ts - 0.5}`]; // sts keys of groups to remove
 
         this.rebuildDayGroup(ts);
-        this.throttledListChange(sts1);
-        this.throttledListChange(sts2);
+
+        for (let i = 0; i < stsArr.length; i++) {
+            const sts = stsArr[i];
+
+            if (this.groups.d[sts]) {
+                this.throttledListChange(sts);
+            }
+            else if (this.mode === 'd' && this.dynamicList && this.dynamicList.items.includes(sts)) {
+                this.dynamicList.remove(sts, this.onpage);
+            }
+        }
     }
 
     // lets Chunk block by 60 to optimise performance of dom rendering
@@ -925,6 +943,7 @@ class MegaGallery {
                     reGroupedCount--;
 
                     if (this.onpage) {
+                        this.clearRenderCache('y' + items[i]);
                         this.throttledListChange(items[i]);
                     }
 
@@ -1014,8 +1033,7 @@ class MegaGallery {
             await dbfetch.get(n.h);
         }
 
-        if (!this.dynamicList && M.currentCustomView.original === this.id) {
-
+        if (!this.dynamicList && this.onpage) {
             this.initDynamicList();
             this.dynamicList.initialRender();
         }
@@ -1027,7 +1045,7 @@ class MegaGallery {
         this.addToMonthGroup(n, updatedGroup[2], updatedGroup[3]);
         this.addToYearGroup(n, updatedGroup[1]);
 
-        if (this.dynamicList && M.currentCustomView.original === this.id) {
+        if (this.dynamicList && this.onpage) {
             M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
         }
 
@@ -1039,6 +1057,10 @@ class MegaGallery {
     }
 
     removeNodeFromGroups(n) {
+        if (!this.nodes[n.h]) {
+            return; // The node has been removed already
+        }
+
         const updatedGroup = this.getGroup(n);
 
         delete this.nodes[n.h];
@@ -1057,8 +1079,7 @@ class MegaGallery {
         MegaGallery.sortViewNodes();
 
         if (this.dynamicList && M.v.length === 0) {
-            this.dynamicList.destroy();
-            this.dynamicList = false;
+            this.dropDynamicList();
             this.galleryBlock.classList.add('hidden');
 
             mega.gallery.showEmpty(M.currentdirid);
@@ -1176,11 +1197,7 @@ class MegaGallery {
         MegaGallery.sortViewNodes();
 
         this.clearRenderCache();
-
-        if (this.dynamicList) {
-            this.dynamicList.destroy();
-            this.dynamicList = false;
-        }
+        this.dropDynamicList();
 
         this.render();
     }
@@ -1348,11 +1365,7 @@ class MegaGallery {
         if (!this.beforePageChangeListener) {
             this.beforePageChangeListener = mBroadcaster.addListener('beforepagechange', tpage => {
 
-                if (this.dynamicList) {
-
-                    this.dynamicList.destroy();
-                    this.dynamicList = false;
-                }
+                this.dropDynamicList();
 
                 // Clear render cache for free memory
                 this.clearRenderCache();
@@ -1413,14 +1426,22 @@ class MegaGallery {
     }
 
     renderGroup(id) {
-        if (!this.renderCache[this.mode + id]) {
+        const cacheKey = this.mode + id;
 
+        if (!this.renderCache[cacheKey]) {
             const group = this.getGroupById(id);
+
             const groupWrap = this.contentRowTemplateNode.cloneNode(true);
             const contentBlock = groupWrap.querySelector('.content-block');
 
             groupWrap.classList.remove('template');
             groupWrap.id = `gallery-${id}`;
+
+            this.renderCache[cacheKey] = groupWrap;
+
+            if (!group) {
+                return this.renderCache[cacheKey];
+            }
 
             if (this.mode !== 'm') {
                 group.n.sort(this.sortByMtime.bind(this));
@@ -1463,13 +1484,11 @@ class MegaGallery {
             else if (this.mode === 'm') {
                 this.renderNodeExtraMonth(group, groupWrap, contentBlock, l);
             }
-
-            this.renderCache[this.mode + id] = groupWrap;
         }
 
         this.clearSelection(id);
 
-        return this.renderCache[this.mode + id];
+        return this.renderCache[cacheKey];
     }
 
     renderNodeExtraMonth(group, groupWrap, contentBlock, l) {

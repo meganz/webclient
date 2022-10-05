@@ -288,7 +288,7 @@ lazy(pro, 'proplan2', () => {
 
         $gdNote.text(`*${l[23818].replace('%1', '2 TB')}`);
         $megaNote.text(`*${l[23818].replace('%1', l[5819])}`);
-        $refNote.text(`(1) ${l[24078].replace('%1', '1.00')}`);
+        $refNote.text(`(1) ${l[24078].replace('%1', formatCurrency(1.00, null, 'number'))}`);
 
         // ordered array for ranges: [range-start,range-end,min,max]
         const symmetricRanges = [
@@ -309,6 +309,10 @@ lazy(pro, 'proplan2', () => {
             [formatCurrency(19.99), false, false],
             [formatCurrency(29.99), false, false]
         ];
+
+        $compareMEGA.text(competitorsValues[1][0]);
+        $compareDP.text(competitorsValues[1][1]);
+        $compareGD.text(competitorsValues[1][2]);
 
         const sliderEventHandler = (slider, ranges, $inputTxt) => {
             let val = slider.value;

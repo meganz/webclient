@@ -103,7 +103,8 @@ mega.utils.trans.listToString = function(items, translationString, translationAn
         //     "comma": mega.utils.trans.listFormatMeta.customCommas[lang]
         // }, null, "\t", 2));
 
-        replacement = `%s1${space1}${defConj}${space2}%s2`.replace("%s1", replacement);
+        replacement = `%s1${lang === 'en' && clonedItems.length > 1 ? ',' : ''}${space1}${defConj}${space2}%s2`
+            .replace("%s1", replacement);
     }
     replacement = replacement.replace("%s2", lastItem);
 

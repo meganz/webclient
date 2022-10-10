@@ -355,12 +355,9 @@ var megasync = (function() {
             api_req({ a: 'log', e: 99800, m: 'MEGASync is not responding' });
             msgDialog(
                 'confirmation',
-                'MEGASync is not responding',
+                'MEGA Desktop App is not responding',
                 l[17795],
-                // 'MEGASync stopped responding, it could be closed or too busy',
                 l[17796],
-                // 'Do you want to re-initialize connection with MEGASync, ' +
-                // 'and turn it off if MEGASync did not respond?',
                 function(disableMsync) {
                     if (disableMsync) {
                         lastCheckStatus = null;
@@ -371,7 +368,7 @@ var megasync = (function() {
                         }
                     }
                     else if (page === "download") {
-                        setTransferStatus(0, l[17795]);// 'No response from MEGAsync'
+                        setTransferStatus(0, l[17795]);
                     }
                 }
             );
@@ -497,21 +494,9 @@ var megasync = (function() {
                 return next(null, response);
             }
             else if (requestArgs.a === "s") {
-                // Below commented Toast was showing a toast that the sync is Done.
-                // it's commented due to Bram request.
-
-                // showToast('megasync-transfer sync',
-                //    'Sync operation is sent to MEGAsync', 'Open', 'Settings',
-                //    ns.transferManager, function () { loadSubPage('fm/account/transfers'); });
-                // Sync done with MEGAsync
                 return next(null, response);
             }
         }
-        // else if ($.isNumeric(response)){
-        //    // error handling, i dont know what to do with, since we dont have API Specification for failed ops
-        //    // in case of non-object response (.e.g 0: means OK, -1: may mean something else)
-        //    return handler.error(next);
-        // }
         else if (requestArgs.a === "sp" && $.isNumeric(response)) {
             return next(null, response);
         }
@@ -547,14 +532,12 @@ var megasync = (function() {
                     if (queuedCounter++ < 2) {
                         setTimeout(_statusTick, 2000);
                     }
-                    else {
-                        if (currStatus !== l[17593]) { // 'Download is queued in MEGAsync .'
-                            $('.download.progress-bar').width('100%');
-                            $('.download.download-page').removeClass('downloading').addClass('download-complete');
-                            currStatus = l[17593]; // 'Download is queued in MEGAsync .'
-                            $topBar = $('.download.download-page');
-                            $('.download.eta-block .light-txt', $topBar).text(currStatus);
-                        }
+                    else if (currStatus !== l[17593]) {
+                        $('.download.progress-bar').width('100%');
+                        $('.download.download-page').removeClass('downloading').addClass('download-complete');
+                        currStatus = l[17593];
+                        $topBar = $('.download.download-page');
+                        $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
                 }
                 else if (response.s && response.s == 0) { // allow implied convert
@@ -565,7 +548,7 @@ var megasync = (function() {
                         setTimeout(_statusTick, 5000);
                     }
                     else {
-                        setTransferStatus(0, l[17591]);// 'Can not get downloading status from MEGAsync '
+                        setTransferStatus(0, l[17591]);
                     }
                 }
                 else if (response.s && response.s == 6) { // allow implied convert
@@ -584,7 +567,7 @@ var megasync = (function() {
                     }
                 }
                 else if (response.s && response.s == 7) {
-                    setTransferStatus(0, l[17586]);// 'Downloading canceled in MEGAsync'
+                    setTransferStatus(0, l[17586]);
                     // give it one more try, since if user opened the a file link to download and this file
                     // is already getting downloaded, then the first response is 7 then it's OK
                     // because MEGAsync means that the new download is canceled.
@@ -595,8 +578,8 @@ var megasync = (function() {
                 else if (response.s && response.s == 3) { // allow implied convert
                     // this means we are in status [STATE_PAUSED = 3] which is not final (PAUSED)
                     // then send a new update status request after longer timeout 3 sec
-                    if (currStatus !== l[17594]) { // 'Download-Paused in MEGAsync !'
-                        currStatus = l[17594]; // 'Download-Paused in MEGAsync !'
+                    if (currStatus !== l[17594]) {
+                        currStatus = l[17594];
                         $topBar = $('.download.download-page').addClass('paused');
                         $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
@@ -605,8 +588,8 @@ var megasync = (function() {
                 else if (response.s && response.s == 4) { // allow implied convert
                     // this means we are in status [STATE_RETRYING = 4] which is not final (retry)
                     // then send a new update status request after longer timeout 3 sec
-                    if (currStatus !== l[17603]) { // 'Download retrying in MEGAsync !'
-                        currStatus = l[17603]; // 'Download retrying in MEGAsync !'
+                    if (currStatus !== l[17603]) {
+                        currStatus = l[17603];
                         $topBar = $('.download.download-page').addClass('paused');
                         $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
@@ -615,8 +598,8 @@ var megasync = (function() {
                 else if (response.s && response.s == 5) { // allow implied convert
                     // this means we are in status [STATE_COMPLETING = 5] which is not final
                     // then send a new update status request
-                    if (currStatus !== l[17604]) { // 'Download completing in MEGAsync .'
-                        currStatus = l[17604]; // 'Download completing in MEGAsync .'
+                    if (currStatus !== l[17604]) {
+                        currStatus = l[17604];
                         $topBar = $('.download.download-page').addClass('paused');
                         $('.download.eta-block .light-txt', $topBar).text(currStatus);
                     }
@@ -625,7 +608,7 @@ var megasync = (function() {
                 else if (response.s && response.s == 8) { // allow implied convert
                     // this means we are in status [STATE_FAILED = 8] which is final
                     // then stop
-                    setTransferStatus(0, l[17605]);// 'Downloading failed in MEGAsync'
+                    setTransferStatus(0, l[17605]);
                 }
                 else {
                     // no response !! ,or value out of range [0,8]
@@ -635,7 +618,7 @@ var megasync = (function() {
                         setTimeout(_statusTick, 5000);
                     }
                     else {
-                        setTransferStatus(0, l[17606]);// 'No response from MEGAsync'
+                        setTransferStatus(0, l[17606]);
                     }
                 }
             }

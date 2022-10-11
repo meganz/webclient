@@ -627,10 +627,13 @@ def pruning():
     global transifex_bot_token
     global transifex_bot_url
     prod = PROJECT_ID + ':r:' + RESOURCE
+    header = {
+        "Authorization": "Bearer " + transifex_bot_token
+    }
     if transifex_bot_token and transifex_bot_url:
         i = 30
         while i > 0:
-            request = Request(transifex_bot_url + '?o=prune&pid=55&token=' + transifex_bot_token)
+            request = Request(transifex_bot_url + '?o=prune&pid=55', headers=header)
             try:
                 response = urlopen(request)
             except HTTPError as ex:

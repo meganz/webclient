@@ -234,6 +234,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'voucher-info-dlg'
             || $.dialog === "chat-incoming-call"
             || $.dialog === 'onboardingDialog'
+            || $.dialog === 'stripe-pay'
             || $.dialog === 'start-meeting-dialog'
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {

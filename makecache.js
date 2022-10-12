@@ -48,7 +48,7 @@ var titles = {
 	'sourcecode' : 'Public Sourcecode - MEGA',
 	'start' : 'MEGA',
 	'' : 'MEGA',
-	'desktop' : 'MEGAsync - MEGA',
+	'desktop' : 'MEGA Desktop App - MEGA',
 	'takedown' : 'Takedown Policy - MEGA',
 	'terms' : 'Terms of Service - MEGA',
 	'cmd' : 'MEGAcmd - MEGA',

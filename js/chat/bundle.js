@@ -2582,18 +2582,25 @@ Chat.prototype.highlight = (text, matches, dontEscape) => {
     text = dontEscape ? text : escapeHTML(text);
     const tags = [];
     text = text.replace(/<[^>]+>/g, match => "@@!" + (tags.push(match) - 1) + "!@@").split(' ');
+    const done = [];
 
     for (let i = 0; i < matches.length; i++) {
       const match = matches[i].str;
 
-      for (let j = 0; j < text.length; j++) {
-        const word = text[j];
+      if (!done.includes(match)) {
+        done.push(match);
 
-        const wordNormalized = ChatSearch._normalize_str(word);
+        for (let j = 0; j < text.length; j++) {
+          const word = text[j];
 
-        if (wordNormalized.includes(match)) {
-          const matchIndex = wordNormalized.indexOf(match);
-          text[j] = (0,mixins.Rc)(matchIndex, word, word.slice(matchIndex, matchIndex + match.length));
+          const wordNormalized = ChatSearch._normalize_str(word);
+
+          const matchPos = wordNormalized.indexOf(match);
+
+          if (matchPos > -1) {
+            const split = wordNormalized.split(match);
+            text[j] = wordNormalized === word ? split.join(`[$]${match}[/$]`) : megaChat._highlightDiacritics(word, matchPos, split, match);
+          }
         }
       }
     }
@@ -2601,10 +2608,23 @@ Chat.prototype.highlight = (text, matches, dontEscape) => {
     text = text.join(' ').replace(/\@\@\!\d+\!\@\@/g, match => {
       return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
     });
-    return text;
+    return text.replace(/\[\$]/g, '<strong>').replace(/\[\/\$]/g, '</strong>');
   }
 
   return null;
+};
+
+Chat.prototype._highlightDiacritics = function (word, matchPos, split, match) {
+  const parts = [];
+  const origMatch = word.substring(matchPos, matchPos + match.length);
+  let pos = 0;
+
+  for (let k = 0; k < split.length; k++) {
+    parts.push(word.substring(pos, pos + split[k].length));
+    pos = pos + split[k].length + match.length;
+  }
+
+  return parts.join(`[$]${origMatch}[/$]`);
 };
 
 Chat.prototype.html = function (content) {
@@ -4818,7 +4838,6 @@ __webpack_require__.d(__webpack_exports__, {
 "LY": () => (timing),
 "M9": () => (SoonFcWrap),
 "Os": () => (schedule),
-"Rc": () => (replaceAt),
 "_p": () => (ContactAwareComponent),
 "qC": () => (compose),
 "wl": () => (MegaRenderMixin)

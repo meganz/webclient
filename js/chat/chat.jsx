@@ -2807,14 +2807,21 @@ Chat.prototype.highlight = (text, matches, dontEscape) => {
         // extract HTML tags
         const tags = [];
         text = text.replace(/<[^>]+>/g, match => "@@!" + (tags.push(match) - 1) + "!@@").split(' ');
+        const done = [];
         for (let i = 0; i < matches.length; i++) {
             const match = matches[i].str;
-            for (let j = 0; j < text.length; j++) {
-                const word = text[j];
-                const wordNormalized = ChatSearch._normalize_str(word);
-                if (wordNormalized.includes(match)) {
-                    const matchIndex = wordNormalized.indexOf(match);
-                    text[j] = replaceAt(matchIndex, word, word.slice(matchIndex, matchIndex + match.length));
+            if (!done.includes(match)) {
+                done.push(match);
+                for (let j = 0; j < text.length; j++) {
+                    const word = text[j];
+                    const wordNormalized = ChatSearch._normalize_str(word);
+                    const matchPos = wordNormalized.indexOf(match);
+                    if (matchPos > -1) {
+                        const split = wordNormalized.split(match);
+                        text[j] = wordNormalized === word
+                            ? split.join(`[$]${match}[/$]`)
+                            : megaChat._highlightDiacritics(word, matchPos, split, match);
+                    }
                 }
             }
         }
@@ -2823,10 +2830,34 @@ Chat.prototype.highlight = (text, matches, dontEscape) => {
         text = text.join(' ').replace(/\@\@\!\d+\!\@\@/g, match => {
             return tags[parseInt(match.replace("@@!", "").replace("!@@"), 10)];
         });
-        return text;
+        // Convert to strong tags
+        return text.replace(/\[\$]/g, '<strong>').replace(/\[\/\$]/g, '</strong>');
     }
     return null;
 };
+
+/**
+ * Helper for highlight to use correct diacritics when replacing in a normalised string
+ *
+ * @see Chat.highlight
+ * @param {String} word The word being matched against
+ * @param {Number} matchPos The position of the first match
+ * @param {Array} split An array terms form from splitting the normalised string around the match
+ * @param {String} match The string to match
+ * @returns {string} The highlighted string
+ * @private
+ */
+Chat.prototype._highlightDiacritics = function(word, matchPos, split, match) {
+    const parts = [];
+    const origMatch = word.substring(matchPos, matchPos + match.length);
+    let pos = 0;
+    for (let k = 0; k < split.length; k++) {
+        parts.push(word.substring(pos, pos + split[k].length));
+        pos = pos + split[k].length + match.length;
+    }
+    return parts.join(`[$]${origMatch}[/$]`);
+};
+
 
 /**
  * html

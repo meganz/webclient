@@ -51,6 +51,34 @@ function initTextareaScrolling($textarea) {
     $textarea.rebind('input.updateScroll change.updateScroll', () => {
         updateScroll();
     });
+
+    // Avoid multi handling
+    if (!$scrollBlock.hasClass('dragScroll')) {
+        $scrollBlock.addClass('dragScroll');
+
+        const [block] = $scrollBlock;
+        const [textarea] = $textarea;
+
+        const onMouseMove = (ev) => {
+            const offsets = block.getBoundingClientRect();
+
+            if (ev.clientY < offsets.top + 15) {
+                block.scrollTop = Math.max(block.scrollTop - 3, 0);
+            }
+            else if (ev.clientY > offsets.top + block.offsetHeight - 15) {
+                block.scrollTop = Math.min(block.scrollTop + 3, block.scrollHeight - block.offsetHeight);
+            }
+        };
+        const onMouseUp = () => {
+            document.removeEventListener('mouseup', onMouseUp);
+            document.removeEventListener('mousemove', onMouseMove);
+        };
+
+        textarea.addEventListener('mousedown', () => {
+            document.addEventListener('mouseup', onMouseUp);
+            document.addEventListener('mousemove', onMouseMove);
+        });
+    }
 }
 
 

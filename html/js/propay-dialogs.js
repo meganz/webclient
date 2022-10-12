@@ -3003,7 +3003,8 @@ var bitcoinDialog = {
         invoiceDateTime = invoiceDateTime[0].toUpperCase() + invoiceDateTime.substring(1);
         var proPlanNum = pro.propay.selectedProPackage[1];
         var planName = pro.getProPlanName(proPlanNum);
-        var planMonths = l[6806].replace('%1', pro.propay.selectedProPackage[4]);  // x month purchase
+        const planMonths = (pro.propay.selectedProPackage[4] === 1 ? l.bcoin_plan_month_one : l.bcoin_plan_month_mul)
+            .replace('%1', pro.propay.selectedProPackage[4]);  // %1-month purchase
         var priceEuros = pro.propay.selectedProPackage[5];
         var priceBitcoins = apiResponse.amount;
         var expiryTime = new Date(apiResponse.expiry);

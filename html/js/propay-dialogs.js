@@ -7,6 +7,14 @@
 
 var closeButtonJS = 'button.js-close';
 
+var closeStripeDialog = () => {
+    'use strict';
+
+    closeDialog();
+    $('.fm-dialog-overlay').off('click.stripeDialog');
+    $(document).off('keydown.stripeDialog');
+};
+
 /**
  * Code for the AstroPay dialog on the second step of the Pro page
  */
@@ -28,6 +36,8 @@ var astroPayDialog = {
     address: '',
     city: '',
     taxNumber: '',
+
+    confirmationIsShowing: false,
 
     /**
      * Initialise
@@ -2195,7 +2205,8 @@ var addressDialog = {
                 return;
             }
             if (event.data === 'closeme') {
-                closeDialog();
+                closeStripeDialog();
+
                 // Load the proper page UI after close the stripe payment dialog
                 if (page === 'registerb') {
                     page = '';
@@ -2382,6 +2393,14 @@ var addressDialog = {
                 pro.propay.listenRemover = setTimeout(() => {
                     window.removeEventListener('message', addressDialog.stripeFrameHandler, { once: true });
                 }, 6e5); // 10 minutes
+
+                // Keeping keys binding consistent with iframe events
+                $(document).rebind('keydown.stripeDialog', () => false);
+
+                $('.fm-dialog-overlay').rebind('click.stripeDialog', () => {
+                    this.discardCreditCardUpdate();
+                    return false;
+                });
             }
             else {
                 this.showError(utcResult);
@@ -2395,6 +2414,34 @@ var addressDialog = {
             pro.propay.hideLoadingOverlay();
             this.showError(utcResult);
         }
+    },
+
+    /**
+     * Triggers a confirmation dialog when a credit card iframe is being discarded (only with overlay for now)
+     * @returns {void}
+     */
+    discardCreditCardUpdate: function() {
+        'use strict';
+
+        if (this.confirmationIsShowing === true) {
+            return;
+        }
+
+        this.confirmationIsShowing = true;
+
+        msgDialog(
+            'confirmation',
+            '',
+            l.close_credit_card_dialog,
+            l.close_credit_card_dialog_confirmation,
+            (status) => {
+                if (status) {
+                    closeStripeDialog();
+                }
+
+                this.confirmationIsShowing = false;
+            }
+        );
     },
 
     /**

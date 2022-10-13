@@ -20328,15 +20328,20 @@ class ParticipantsNotice extends mixins.wl {
         onClick: onInviteToggle
       }, l.invite_from_contact_list))));
     };
+
+    this.av = this.props.sfuApp.sfuClient.availAv;
   }
 
   specShouldComponentUpdate(newProps) {
     const {
       stayOnEnd,
       hasLeft,
-      isOnHold
+      isOnHold,
+      sfuApp
     } = this.props;
-    return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft || newProps.isOnHold !== isOnHold;
+    const currAv = this.av;
+    this.av = sfuApp.sfuClient.availAv;
+    return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft || newProps.isOnHold !== isOnHold || this.av !== currAv;
   }
 
   render() {

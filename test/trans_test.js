@@ -18,9 +18,6 @@ describe("mega.utils.trans", function() {
     // use this (dumpListFormats) in case you want to check/develop "list formats" for newly added languages
     var avail_langs = Object.keys(languages);
     var langMap = {};
-    langMap['en-GB'] = "en";
-    langMap['en-GB'] = "en";
-    avail_langs[5] = "en-GB";
     for (var i = 0; i < avail_langs.length; i++) {
         if (remappedLangLocales[avail_langs[i]]) {
             langMap[remappedLangLocales[avail_langs[i]]] = avail_langs[i];
@@ -67,12 +64,12 @@ describe("mega.utils.trans", function() {
                 "de:3": "$0, $1 und $2",
                 "de:4": "$0, $1, $2 und $3",
                 "de:5": "$0, $1, $2, $3 und $4",
-                "en-GB:0": "",
-                "en-GB:1": "$0",
-                "en-GB:2": "$0 and $1",
-                "en-GB:3": "$0, $1 and $2",
-                "en-GB:4": "$0, $1, $2 and $3",
-                "en-GB:5": "$0, $1, $2, $3 and $4",
+                "en:0": "",
+                "en:1": "$0",
+                "en:2": "$0 and $1",
+                "en:3": "$0, $1, and $2",
+                "en:4": "$0, $1, $2, and $3",
+                "en:5": "$0, $1, $2, $3, and $4",
                 "es:0": "",
                 "es:1": "$0",
                 "es:2": "$0 y $1",

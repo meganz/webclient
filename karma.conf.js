@@ -159,7 +159,6 @@ module.exports = function(config) {
         'js/chat/plugins/callFeedback.js',
         'js/chat/plugins/geoLocationLinks.js',
         'js/chat/messages.js',
-        'js/chat/ui/incomingCallDialog.js',
         'js/utils/emoji.js',
 
 

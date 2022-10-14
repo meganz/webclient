@@ -19,10 +19,6 @@ export default class Local extends MegaRenderMixin {
         ratio: undefined
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     gcd = (width, height) => {
         return height === 0 ? width : this.gcd(height, width % height);
     };
@@ -143,10 +139,6 @@ class Stream extends MegaRenderMixin {
     LISTENERS = [];
 
     PREV_STATE = {};
-
-    constructor(props) {
-        super(props);
-    }
 
     state = {
         options: false
@@ -495,10 +487,6 @@ class Minimized extends MegaRenderMixin {
     state = {
         unread: 0
     };
-
-    constructor(props) {
-        super(props);
-    }
 
     isActive = type => {
         return this.props.call.av & type;

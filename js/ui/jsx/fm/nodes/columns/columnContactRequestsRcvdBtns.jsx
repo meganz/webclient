@@ -8,12 +8,6 @@ export class ColumnContactRequestsRcvdBtns extends MegaRenderMixin {
     static label = "";
     static megatype = "grid-url-header-nw contact-controls-container";
 
-    reinviteAllowed = rts => {
-        const TIME_FRAME = 60 * 60 * 24 * 14; // 14 days in seconds
-        const UTC_DATE_NOW = Math.floor(Date.now() / 1000);
-        return UTC_DATE_NOW > rts + TIME_FRAME;
-    };
-
     render() {
         let {nodeAdapter} = this.props;
         let {node} = nodeAdapter.props;

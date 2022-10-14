@@ -223,7 +223,7 @@ export default class Invite extends MegaRenderMixin {
     renderLoading = () => {
         return (
             <div className={`${Invite.NAMESPACE}-loading`}>
-                <h2>Loading</h2>
+                <h2>{l[1456] /* `Loading` */}</h2>
             </div>
         );
     };
@@ -273,9 +273,8 @@ export default class Invite extends MegaRenderMixin {
                             <p>{l.copy_and_share /* `Copy this link to send your invite` */}</p>
                             <div className="link-input-container">
                                 <Button
-                                    className="mega-button large positive"
-                                    onClick={() => link && copyToClipboard(link, 'Done!')}
-                                    disabled={!link}>
+                                    className={`mega-button large positive ${link ? '' : 'disabled'}`}
+                                    onClick={() => link && copyToClipboard(link, 'Done!')}>
                                     {!link ? l[7006] /* `Loading...` */ : l[1394] /* `Copy link` */}
                                 </Button>
                                 <Link

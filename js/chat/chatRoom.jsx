@@ -24,6 +24,8 @@ window.MCO_FLAGS = MCO_FLAGS;
  * @param {Object} mcoFlags Flags related to calls/chat room (Open invite, speak request, waiting room)
  * @returns {ChatRoom}
  * @constructor
+ *
+ * @property {MessagesBuff} messagesBuff
  */
 var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI,
                          publicChatHandle, publicChatKey, ck, isMeeting, retentionTime, mcoFlags
@@ -91,7 +93,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     this.callRequest = null;
     this.shownMessages = {};
     this.retentionTime = retentionTime;
-    this.retentionLabel = '';
 
     this.activeSearches = 0;
     self.members = {};
@@ -868,7 +869,7 @@ ChatRoom.prototype.persistToFmdb = function() {
 /**
  * Save the chat info into fmdb.
  * @param f {binary} new flags
- * @param updateUI {Boolen} flag to indicate whether to update UI.
+ * @param updateUI {Boolean} flag to indicate whether to update UI.
  */
 ChatRoom.prototype.updateFlags = function(f, updateUI) {
     var self = this;
@@ -966,25 +967,6 @@ ChatRoom.prototype.setState = function(newState, isRecover) {
 ChatRoom.prototype.getStateAsText = function() {
     var self = this;
     return ChatRoom.stateToText(self.state);
-};
-
-
-/**
- * Change/set the type of the room
- *
- * @param type
- */
-ChatRoom.prototype.setType = function(type) {
-    var self = this;
-
-    if (!type) {
-        if (window.d) {
-            debugger;
-        }
-        self.logger.error("missing type in .setType call");
-    }
-
-    self.type = type;
 };
 
 /**
@@ -1149,7 +1131,7 @@ ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
 /**
  * Leave this chat room
  *
- * @param [notifyOtherDevices] {boolean|undefined} true if you want to notify other devices, falsy value if you don't want action to be sent
+ * @param [triggerLeaveRequest] {boolean|undefined} true if you want to notify other devices, falsy value if you don't want action to be sent
  * @returns {undefined|Deferred}
  */
 ChatRoom.prototype.leave = function(triggerLeaveRequest) {
@@ -1175,9 +1157,6 @@ ChatRoom.prototype.leave = function(triggerLeaveRequest) {
         if (self.state !== ChatRoom.STATE.LEFT) {
             self.setState(ChatRoom.STATE.LEAVING);
             self.setState(ChatRoom.STATE.LEFT);
-        }
-        else {
-            return;
         }
     }
     else {
@@ -1545,10 +1524,6 @@ ChatRoom.prototype.appendMessage = function(message) {
         return false;
     }
 
-    if (message.getFromJid && message.getFromJid() === self.roomId) {
-        return false; // dont show any system messages (from the conf room)
-    }
-
     if (self.shownMessages[message.messageId]) {
         return false;
     }
@@ -1595,30 +1570,6 @@ ChatRoom.prototype.getNavElement = function() {
 
     return $('.nw-conversations-item[data-room-id="' + self.chatId + '"]');
 };
-
-
-/**
- * Will check if any of the plugins requires a message to be 'queued' instead of sent.
- *
- * @param [message] {Object} optional message object (currently not used)
- * @returns {boolean}
- */
-ChatRoom.prototype.arePluginsForcingMessageQueue = function(message) {
-    var self = this;
-    var pluginsForceQueue = false;
-
-    $.each(self.megaChat.plugins, function(k) {
-        if (self.megaChat.plugins[k].shouldQueueMessage) {
-            if (self.megaChat.plugins[k].shouldQueueMessage(self, message) === true) {
-                pluginsForceQueue = true;
-                return false; // break
-            }
-        }
-    });
-
-    return pluginsForceQueue;
-};
-
 
 /**
  * Send message to this room
@@ -2129,32 +2080,6 @@ ChatRoom.prototype.endCallForAll = function(callId) {
             'mid': callId
         });
         eventlog(99761, JSON.stringify([this.chatId, callId, this.isMeeting | 0]));
-    }
-};
-
-/**
- * Used in "chat link" pages to join the user before joining the call if needed.
- *
- * @param {boolean} audioFlag
- * @param {boolean} videoFlag
- */
-ChatRoom.prototype.joinCallFromLink = function(audioFlag, videoFlag) {
-    loadingDialog.show();
-    if (this.iAmInRoom()) {
-        this.joinCall(audioFlag, videoFlag);
-        loadingDialog.hide();
-    }
-    else {
-        this.joinViaPublicHandle()
-            .then(() => {
-                this.joinCall(audioFlag, videoFlag);
-            })
-            .catch(() => {
-                console.error("Joining failed.");
-            })
-            .always(function() {
-                loadingDialog.hide();
-            });
     }
 };
 

@@ -1,6 +1,4 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
-var utils = require("./utils.jsx");
 import {MegaRenderMixin} from "../chat/mixins";
 
 
@@ -67,11 +65,9 @@ class Tooltip extends MegaRenderMixin {
         }
     }
     repositionTooltip() {
-        var self = this;
-
         var elLeftPos, elTopPos, elWidth, elHeight;
         var tooltipLeftPos, tooltipTopPos, tooltipWidth, tooltipHeight;
-        var docWidth, docHeight;
+        var docHeight;
         var arrowClass;
 
         if (!this.isMounted()) {
@@ -92,7 +88,6 @@ class Tooltip extends MegaRenderMixin {
             elTopPos = $el.offset().top;
             tooltipWidth = $tooltip.outerWidth();
             tooltipHeight = $tooltip.outerHeight();
-            docWidth = $(window).width();
             docHeight = $(window).height();
             $tooltip.removeClass('dropdown-arrow left-arrow right-arrow up-arrow down-arrow').removeAttr('style');
 

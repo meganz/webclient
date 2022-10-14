@@ -124,19 +124,17 @@ var UserPresence = function userpresence(
                 },
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection
-                 * @param connectionRetryManager {ConnectionRetryManager}
                  */
-                forceDisconnect: function(connectionRetryManager) {
+                forceDisconnect: function() {
                     return self.disconnect();
                 },
                 /**
                  * Should return true or false depending on the current state of this connection, e.g.
                  * (connected || connecting)
                  *
-                 * @param connectionRetryManager {ConnectionRetryManager}
                  * @returns {bool}
                  */
-                isConnectedOrConnecting: function(connectionRetryManager) {
+                isConnectedOrConnecting: function() {
                     return (
                         self.s && (
                             self.s.readyState == self.s.CONNECTING ||
@@ -146,10 +144,9 @@ var UserPresence = function userpresence(
                 },
                 /**
                  * Should return true/false if the current state === CONNECTED
-                 * @param connectionRetryManager {ConnectionRetryManager}
                  * @returns {bool}
                  */
-                isConnected: function(connectionRetryManager) {
+                isConnected: function() {
                     return (
                         self.s && (
                             self.s.readyState == self.s.OPEN
@@ -158,20 +155,18 @@ var UserPresence = function userpresence(
                 },
                 /**
                  * Should return true/false if the current state === DISCONNECTED
-                 * @param connectionRetryManager {ConnectionRetryManager}
                  * @returns {bool}
                  */
-                isDisconnected: function(connectionRetryManager) {
+                isDisconnected: function() {
                     return (
                         !self.s || self.s.readyState == self.s.CLOSED
                     );
                 },
                 /**
                  * Should return true IF the user had forced the connection to go offline
-                 * @param connectionRetryManager {ConnectionRetryManager}
                  * @returns {bool}
                  */
-                isUserForcedDisconnect: function(connectionRetryManager) {
+                isUserForcedDisconnect: function() {
                     return (
                         self.canceled === true
                     );
@@ -517,10 +512,6 @@ UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, 
             this.peers[u] = true;
             delta[u] = true;
         }
-        else {
-            // this.logger.warn("not sure how to handle addremovepeers(", peers, del, ");");
-            // use this ^^ for debugging only.
-        }
     }
 
     if (this.open) {
@@ -750,7 +741,6 @@ UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(f
         }
         else {
             this.sendflags(false);
-            this.wasinacive = true;
         }
     }
 };

@@ -193,7 +193,6 @@ export class TypingArea extends MegaRenderMixin {
             if (self.props.chatRoom && self.iAmTyping) {
                 self.stoppedTyping();
             }
-            return;
         }
     }
 
@@ -213,7 +212,6 @@ export class TypingArea extends MegaRenderMixin {
             // send already handled in onKeyDown
             e.preventDefault();
             e.stopPropagation();
-            return;
         }
         else if (key === 13) {
             if (self.state.emojiSearchQuery) {
@@ -246,7 +244,6 @@ export class TypingArea extends MegaRenderMixin {
             if ($.trim(val).length === 0) {
                 if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
                     e.preventDefault();
-                    return;
                 }
             }
         }
@@ -259,7 +256,6 @@ export class TypingArea extends MegaRenderMixin {
             if (self.props.showButtons === true) {
                 e.preventDefault();
                 self.onCancelClicked(e);
-                return;
             }
         }
         else {

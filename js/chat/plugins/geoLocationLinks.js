@@ -1,7 +1,7 @@
 /**
  * Syncronize "geo" user attribute
  *
- * @param {Megachat} megaChat Megachat instance.
+ * @param {Chat} megaChat Megachat instance.
  * @constructor
  */
 var GeoLocationLinks = function(megaChat) {

@@ -398,18 +398,16 @@ Chatd.Shard = function(chatd, shard) {
                 /**
                  * A Callback that will trigger the 'forceDisconnect' procedure for this type of connection
                  * (Karere/Chatd/etc)
-                 * @param connectionRetryManager {ConnectionRetryManager}
                  */
-                forceDisconnect: function(connectionRetryManager) {
+                forceDisconnect: function() {
                     return self.disconnect();
                 },
                 /**
                  * Should return true or false depending on the current state of this connection,
                  * e.g. (connected || connecting)
-                 * @param connectionRetryManager {ConnectionRetryManager}
                  * @returns {bool}
                  */
-                isConnectedOrConnecting: function(connectionRetryManager) {
+                isConnectedOrConnecting: function() {
                     return (
                         self.s && (
                             self.s.readyState === self.s.CONNECTING ||
@@ -419,10 +417,9 @@ Chatd.Shard = function(chatd, shard) {
                 },
                 /**
                  * Should return true/false if the current state === CONNECTED
-                 * @param connectionRetryManager {ConnectionRetryManager}
                  * @returns {bool}
                  */
-                isConnected: function(connectionRetryManager) {
+                isConnected: function() {
                     return (
                         self.s && (
                             self.s.readyState === self.s.OPEN
@@ -431,20 +428,18 @@ Chatd.Shard = function(chatd, shard) {
                 },
                 /**
                  * Should return true/false if the current state === DISCONNECTED
-                 * @param connectionRetryManager {ConnectionRetryManager}
                  * @returns {bool}
                  */
-                isDisconnected: function(connectionRetryManager) {
+                isDisconnected: function() {
                     return (
                         !self.s || self.s.readyState === self.s.CLOSED
                     );
                 },
                 /**
                  * Should return true IF the user had forced the connection to go offline
-                 * @param connectionRetryManager {ConnectionRetryManager}
                  * @returns {bool}
                  */
-                isUserForcedDisconnect: function(connectionRetryManager) {
+                isUserForcedDisconnect: function() {
                     return (
                         self.chatd.destroyed === true ||
                         self.destroyed === true
@@ -1110,16 +1105,6 @@ Chatd.Shard.prototype.clearpending = function() {
     }
 };
 
-// resend all unconfirmed messages (this is mandatory)
-// @deprecated
-Chatd.Shard.prototype.resendpending = function(chatId) {
-    var self = this;
-    var chatIdMessages = self.chatd.chatIdMessages[chatId];
-    if (chatIdMessages) {
-        chatIdMessages.resend();
-    }
-};
-
 Chatd.prototype.cmd = function(opCode, chatId, cmd) {
     return this.chatIdShard[chatId].cmd(opCode, chatId + cmd);
 };
@@ -1537,8 +1522,6 @@ Chatd.Shard.prototype.exec = function(a) {
                 }
 
                 len = 23 + Chatd.unpack16le(cmd.substr(21, 2));
-                var rtcmd = cmd.charCodeAt(23);
-                // self.chatd.rtcHandler.handleMessage(self, cmd, len);
                 break;
             case Chatd.Opcode.CALLDATA:
                 self.keepAlive.restart();
@@ -1549,7 +1532,6 @@ Chatd.Shard.prototype.exec = function(a) {
                     break; // will be re-checked and cause error
                 }
                 // checks if payload spans outside actual cmd.length
-                // chatd.rtcHandler.handleCallData(self, cmd, pllen);
                 break;
             case Chatd.Opcode.INCALL:
             case Chatd.Opcode.ENDCALL:
@@ -1568,8 +1550,6 @@ Chatd.Shard.prototype.exec = function(a) {
                     this.logger.warn("Ingoring INCALL/ENDCALL for unknown chatid " + base64urlencode(chatid));
                     break;
                 }
-                var userid = cmd.substr(9, 8);
-                var clientid = cmd.substr(17, 4);
                 break;
             case Chatd.Opcode.CLIENTID:
                 self.keepAlive.restart();
@@ -2083,11 +2063,6 @@ Chatd.prototype.leave = function(chatId) {
     chat._setLoginState(null);
     // clear up pending list.
     chat.clearpending();
-};
-
-// gracefully terminate all connections/calls
-Chatd.prototype.shutdown = function() {
-    // this.rtcHandler.onShutdown();
 };
 
 // submit a new message to the chatId
@@ -3047,7 +3022,7 @@ Chatd.Messages.prototype.store = function(
 };
 
 // modify a message from message buffer
-Chatd.Messages.prototype.msgmodify = function(userid, msgid, ts, updated, keyid, msg, isRetry, isPersist) {
+Chatd.Messages.prototype.msgmodify = function(userid, msgid, ts, updated, keyid, msg, isRetry) {
     var origMsgNum = this.getmessagenum(msgid);
 
     // retrieve msg from chatdPersist if missing in the buff
@@ -3253,7 +3228,6 @@ Chatd.Messages.prototype.confirmkey = function(keyid) {
             self.sendingbuf[self.sending[msgxid]][Chatd.MsgField.TYPE] === Chatd.MsgType.KEY
         ) {
             firstkeyxkey = msgxid;
-            return;
         }
     });
     if (!firstkeyxkey) {

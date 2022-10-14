@@ -6,10 +6,6 @@ export default class Collapse extends MegaRenderMixin {
         expanded: true
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const { expanded } = this.state;
         const { heading, badge, children } = this.props;

@@ -80,14 +80,6 @@ Message._getTextContentsForDialogType = function(message) {
                 textMessage = l.priv_change_to_ro;
             }
             textMessage = textMessage.replace('[S]', '').replace('[/S]', '').replace('%s', contactName);
-
-            contact = M.u[message.meta.targetUserId] ? M.u[message.meta.targetUserId] : {
-                'u': message.meta.targetUserId,
-                'h': message.meta.targetUserId,
-                'c': 0
-            };
-
-            contactName = htmlentities(M.getNameByHandle(contact.u));
         }
         else if (message.dialogType === "alterParticipants" && message.meta) {
             var otherContact;
@@ -98,9 +90,7 @@ Message._getTextContentsForDialogType = function(message) {
                         textMessage = l[8908];
                     }
                     else {
-                        contact = otherContact;
                         textMessage = l[8906].replace("%s", contactName);
-                        contactName = htmlentities(M.getNameByHandle(message.meta.excluded[0]));
                     }
                 }
             }
@@ -110,9 +100,6 @@ Message._getTextContentsForDialogType = function(message) {
                     textMessage = (contact.u === otherContact.u) ?
                         l[23756] :
                         l[8907].replace("%s", contactName);
-                    var otherContactName = htmlentities(M.getNameByHandle(message.meta.included[0]));
-                    contact = otherContact;
-                    contactName = otherContactName;
                 }
             }
             else {
@@ -647,7 +634,6 @@ Message.prototype.getManagementMessageSummaryText = function() {
         return mega.icu.format(l[8897], nodes.length);
     }
     else if (this.textContents.substr(1, 1) === Message.MANAGEMENT_MESSAGE_TYPES.CONTAINS_META) {
-        var metaType = this.textContents.substr(2, 1);
         var meta = JSON.parse(this.textContents.substr(3, this.textContents.length));
         return meta.textMessage || "";
     }
@@ -823,7 +809,7 @@ ChatDialogMessage.DEFAULT_OPTS = Object.freeze({
     'persist': true
 });
 
-// @see {@link MegaDataSortedMap}
+/** @see {@link MegaDataSortedMap} */
 function MessageBuffSortedMap() {
     'use strict';
     MegaDataSortedMap.apply(this, arguments);
@@ -1080,7 +1066,7 @@ function MessagesBuff(chatRoom, chatdInt) {
         self.setLastReceived(eventData.messageId);
     });
 
-    self.chatRoom.rebind('onMessagesHistoryDone.messagesBuff' + chatRoomId, function(e, eventData) {
+    self.chatRoom.rebind('onMessagesHistoryDone.messagesBuff' + chatRoomId, function() {
         var chatRoom = self.chatRoom;
 
         Reactions.clearQueuedReactionsForChat(chatRoom.chatId);
@@ -1178,7 +1164,7 @@ function MessagesBuff(chatRoom, chatdInt) {
         self.trackDataChange();
     });
 
-    self.chatRoom.rebind('onMessagesHistoryRetrieve.messagesBuff' + chatRoomId, function(e, eventData) {
+    self.chatRoom.rebind('onMessagesHistoryRetrieve.messagesBuff' + chatRoomId, function() {
         self.haveMessages = true;
         self.trackDataChange();
         self.retrieveChatHistory(true);
@@ -1415,10 +1401,6 @@ function MessagesBuff(chatRoom, chatdInt) {
         else if (eventData.state === "CONFIRMED") {
             self.haveMessages = true;
 
-            if (!eventData.id) {
-                // debugger;
-            }
-
             var foundMessage = self.getByInternalId(eventData.id);
 
             if (foundMessage) {
@@ -1447,16 +1429,11 @@ function MessagesBuff(chatRoom, chatdInt) {
                 // its ok, this happens when a system/protocol message was sent OR this message was re-sent by chatd
                 // after the page had been reloaded
                 self.logger.warn("Not found: ", eventData.id);
-                return;
             }
         }
         else if (eventData.state === "DISCARDED") {
             // messages was already sent, but the confirmation was not received, so this is a dup and should be removed
             self.haveMessages = true;
-
-            if (!eventData.id) {
-                // debugger;
-            }
 
             var foundMessage = self.getByInternalId(eventData.id);
 
@@ -1472,10 +1449,6 @@ function MessagesBuff(chatRoom, chatdInt) {
         }
         else if (eventData.state === "EXPIRED") {
             self.haveMessages = true;
-
-            if (!eventData.id) {
-                // debugger;
-            }
 
             var foundMessage = self.getByInternalId(eventData.id);
 
@@ -1508,10 +1481,6 @@ function MessagesBuff(chatRoom, chatdInt) {
         }
         else if (eventData.state === "RESTOREDEXPIRED") {
             self.haveMessages = true;
-
-            if (!eventData.id) {
-                // debugger;
-            }
 
             var foundMessage = self.getByInternalId(eventData.id);
 
@@ -1587,7 +1556,7 @@ function MessagesBuff(chatRoom, chatdInt) {
         self.trackDataChange();
     });
 
-    self.chatRoom.rebind('onMessageIncludeKey.messagesBuff' + chatRoomId, function(e, eventData) {
+    self.chatRoom.rebind('onMessageIncludeKey.messagesBuff' + chatRoomId, function() {
         self.chatRoom.protocolHandler.setIncludeKey(true);
         self.trackDataChange();
     });
@@ -1614,7 +1583,7 @@ function MessagesBuff(chatRoom, chatdInt) {
 
     self.addChangeListener(function() {
         var newCounter = 0;
-        self.messages.forEach(function(v, k) {
+        self.messages.forEach(function(v) {
             if (
                 v.getState &&
                 v.getState() === Message.STATE.NOT_SEEN &&
@@ -1738,7 +1707,7 @@ MessagesBuff.prototype.getByInternalId = function(internalId) {
     var self = this;
     var found = false;
 
-    self.messages.every(function(v, k) {
+    self.messages.every(function(v) {
         if (v.internalId === internalId) {
 
             found = v;
@@ -1758,7 +1727,7 @@ MessagesBuff.prototype.getByOrderValue = function(orderValue) {
     var self = this;
     var found = false;
 
-    self.messages.every(function(v, k) {
+    self.messages.every(function(v) {
         if (v.orderValue === orderValue) {
 
             found = v;
@@ -1854,15 +1823,10 @@ MessagesBuff.prototype.setLastReceived = function(msgId) {
         if (!self.isRetrievingHistory) {
             if (targetMsg.userId !== u_handle) {
                 self.chatdInt.markMessageAsReceived(self.chatRoom, msgId);
-            } else {
-                // dont do anything.
             }
         }
 
         self.trackDataChange();
-    }
-    else {
-        // its totally normal if this branch of code is executed, just don't do nothing
     }
 };
 
@@ -2062,7 +2026,7 @@ MessagesBuff.prototype.markAllAsReceived = function() {
 /**
  * Get message by Id
  * @param messageId {string} message id
- * @returns {boolean}
+ * @returns {Message|boolean}
  */
 MessagesBuff.prototype.getMessageById = function(messageId) {
     "use strict";

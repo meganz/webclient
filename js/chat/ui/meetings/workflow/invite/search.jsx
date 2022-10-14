@@ -9,10 +9,6 @@ export default class Search extends MegaRenderMixin {
         return Search.inputRef && Search.inputRef.current && Search.inputRef.current.focus();
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const { value, placeholder, onChange } = this.props;
 

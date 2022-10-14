@@ -12,18 +12,6 @@ export default class Breadcrumbs extends MegaRenderMixin {
         this.onGlobalClickHandler = this.onGlobalClickHandler.bind(this);
         this.onBreadcrumbNodeClick = this.onBreadcrumbNodeClick.bind(this);
     }
-    getBreadcrumbNodeIcon(nodeId) {
-        switch (nodeId) {
-            case M.RootID:
-                return 'cloud-drive';
-            case M.RubbishID:
-                return 'recycle-item';
-            case 'shares':
-                return 'contacts-item';
-            default:
-                return nodeId && M.d[nodeId] && fileIcon(M.d[nodeId]);
-        }
-    }
     getBreadcrumbNodeText(nodeId, prevNodeId) {
         const backupsId = M.BackupsId || 'backups';
 
@@ -90,42 +78,6 @@ export default class Breadcrumbs extends MegaRenderMixin {
         }
 
         this.props.onNodeClick(nodeId);
-    }
-    resizeBreadcrumbs() {
-        Soon(() => {
-            var $breadcrumbsWrapper = $('.fm-breadcrumbs-wrapper.add-from-cloud', this.findDOMNode());
-            var $breadcrumbs = $('.fm-breadcrumbs-block', $breadcrumbsWrapper);
-
-            var wrapperWidth = $breadcrumbsWrapper.outerWidth();
-            var $el = $(this.props.isSearch ? '.search-path-txt' : '.right-arrow-bg', $breadcrumbs);
-            var i = 0;
-            var j = 0;
-            $el.removeClass('short-foldername ultra-short-foldername invisible');
-
-            $breadcrumbsWrapper.removeClass('long-path overflowed-path');
-            if ($breadcrumbs.outerWidth() > wrapperWidth) {
-                $breadcrumbsWrapper.addClass('long-path');
-            }
-
-            while ($breadcrumbs.outerWidth() > wrapperWidth) {
-                if (i < $el.length - 1) {
-                    $($el[i]).addClass('short-foldername');
-                    i++;
-                }
-                else if (j < $el.length - 1) {
-                    $($el[j]).addClass('ultra-short-foldername');
-                    j++;
-                }
-                else if (!$($el[j]).hasClass('short-foldername')) {
-                    $($el[j]).addClass('short-foldername');
-                }
-                else {
-                    $($el[j]).addClass('ultra-short-foldername');
-                    $breadcrumbsWrapper.addClass('overflowed-path');
-                    break;
-                }
-            }
-        });
     }
     customIsEventuallyVisible() {
         // TODO: Fix css issue...

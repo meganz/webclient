@@ -53,9 +53,6 @@ export default class GenericGrid extends GenericNodePropsComponent {
                     <i className="sprite-fm-mono icon-link"></i>
                 </span>
                 <span className={"block-view-file-type " + this.nodeProps.icon}>{image}</span>
-                {/* <span className="file-settings-icon" onClick={(e) => { */}
-                {/*    onContextMenu(e.target, e, 'a.data-block-view'); */}
-                {/* }}><i className="sprite-fm-mono icon-options"></i></span> */}
                 <div className="video-thumb-details">
                     <i className="small-icon small-play-icon"></i>
                     <span>00:00</span>

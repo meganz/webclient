@@ -375,13 +375,6 @@ PresencedIntegration.prototype.getPresence = function(u_h) {
     return this._presence[u_h];
 };
 
-PresencedIntegration.prototype.getPresenceAsText = function(u_h, pres) {
-    if (!pres) {
-        pres = this.getPresence(u_h);
-    }
-    return constStateToText(UserPresence.PRESENCE, pres);
-};
-
 PresencedIntegration.prototype.getAutoaway = function() {
     return this.userPresence.autoawayactive;
 };
@@ -462,7 +455,7 @@ PresencedIntegration.prototype.eventuallyRemovePeer = function(user_handle, chat
     }
 };
 
-PresencedIntegration.prototype.eventuallyAddPeer = function(user_handle, isNewChat) {
+PresencedIntegration.prototype.eventuallyAddPeer = function(user_handle) {
     'use strict';
 
     if (this.userPresence) {

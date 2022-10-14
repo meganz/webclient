@@ -3,10 +3,6 @@ import { MegaRenderMixin } from '../../../../mixins';
 import Invite, { HAS_CONTACTS } from './invite.jsx';
 
 export default class Nil extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <div className={`${Invite.NAMESPACE}-nil`}>

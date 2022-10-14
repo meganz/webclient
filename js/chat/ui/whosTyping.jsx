@@ -11,7 +11,6 @@ class WhosTyping extends MegaRenderMixin {
     componentWillMount() {
         var self = this;
         var chatRoom = self.props.chatRoom;
-        var megaChat = self.props.chatRoom.megaChat;
 
         chatRoom.bind("onParticipantTyping.whosTyping", function(e, user_handle, bCastCode) {
             if (!self.isMounted()) {
@@ -58,7 +57,6 @@ class WhosTyping extends MegaRenderMixin {
         super.componentWillUnmount();
         var self = this;
         var chatRoom = self.props.chatRoom;
-        var megaChat = chatRoom.megaChat;
 
         chatRoom.off("onParticipantTyping.whosTyping");
     }
@@ -125,9 +123,6 @@ class WhosTyping extends MegaRenderMixin {
                     <div className="typing-bounce3"></div>
                 </div>
             </div>;
-        }
-        else {
-            // don't do anything.
         }
 
         return typingElement;

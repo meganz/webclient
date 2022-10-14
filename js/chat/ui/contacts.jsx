@@ -26,40 +26,6 @@ const closeDropdowns = () => {
     document.dispatchEvent(new Event('closeDropdowns'));
 };
 
-export class ContactsListItem extends ContactAwareComponent {
-    static defaultProps = {
-        'manualDataChangeTracking': true,
-        'skipQueuedUpdatesOnResize': true
-    }
-    attachRerenderCallback = _attchRerenderCbContacts;
-    render() {
-        var classString = "nw-conversations-item";
-
-        var contact = this.props.contact;
-
-        if (!contact) {
-            return null;
-        }
-
-        classString += " " + megaChat.userPresenceToCssClass(
-            contact.presence
-        );
-
-        return (
-            <div>
-                <div className={classString}
-                    onClick={this.props.onContactClicked.bind(this)}>
-                    <div className="nw-contact-status"></div>
-                    <div className="nw-conversations-unread">0</div>
-                    <div className="nw-conversations-name selectable-txt">
-                        {M.getNameByHandle(contact.u)}
-                    </div>
-                </div>
-            </div>
-        );
-    }
-}
-
 export class ContactButton extends ContactAwareComponent {
     static defaultProps = {
         'manualDataChangeTracking': true,
@@ -458,9 +424,6 @@ export class ContactPresence extends MegaRenderMixin {
 };
 
 export class LastActivity extends ContactAwareComponent {
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         const { contact, showLastGreen } = this.props;
@@ -492,10 +455,6 @@ export class ContactAwareName extends ContactAwareComponent {
 }
 
 export class MembersAmount extends ContactAwareComponent {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const { room } = this.props;
 
@@ -518,7 +477,6 @@ export class ContactFingerprint extends MegaRenderMixin {
         ]);
     }
     render() {
-        var self = this;
         var contact = this.props.contact;
         if (!contact || !contact.u || is_chatlink) {
             return null;
@@ -858,7 +816,6 @@ export class ContactItem extends ContactAwareComponent {
     }
     attachRerenderCallbacks = _attchRerenderCbContacts;
     render() {
-        var classString = "nw-conversations-item";
         var self = this;
         var contact = this.props.contact;
 
@@ -1026,11 +983,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
             return false;
         }
 
-        var pres = megaChat.getPresence(
-            v.u
-        );
-
-
         var avatarMeta = generateAvatarMeta(v.u);
 
         if (self.state.searchValue && self.state.searchValue.length > 0) {
@@ -1048,10 +1000,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
             }
         }
 
-        if (pres === "chat") {
-            pres = "online";
-        }
-
         var selectedClass = "";
         if (self.state.selected && self.state.selected.indexOf(v.u) !== -1) {
             selectedClass = "selected";
@@ -1065,7 +1013,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 className={"contacts-search short " + selectedClass + (isDisabled ? " disabled" : "")}
                 noContextButton="true"
                 selectable={selectableContacts}
-                onClick={self.props.readOnly ? () => {} : (contact, e) => {
+                onClick={self.props.readOnly ? () => {} : (contact) => {
                     if (isDisabled) {
                         return false;
                     }
@@ -1178,7 +1126,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     self.props.onSelectDone(self.state.selected);
                 }
             };
-            var onContactSelectDoneCb = (contact, e) => {
+            var onContactSelectDoneCb = (contact) => {
 
                 var contactHash = contact.u;
 

@@ -9,8 +9,6 @@ class CloseOpenModeMessage extends ConversationMessageMixin {
         var cssClasses = "message body";
 
         var message = this.props.message;
-        var megaChat = this.props.message.chatRoom.megaChat;
-        var chatRoom = this.props.message.chatRoom;
         var contact = self.getContact();
         var timestampInt = self.getTimestamp();
         var timestamp = self.getTimestampAsString();

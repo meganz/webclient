@@ -35,7 +35,7 @@ var ChatNotifications = function(megaChat, options) {
                     }
 
                     var lastSeen = null;
-                    megaRoom.messagesBuff.messages.forEach(function (v, k) {
+                    megaRoom.messagesBuff.messages.forEach(function (v) {
                         if (v.getState && v.getState() === Message.STATE.NOT_SEEN) {
                             lastSeen = v;
                         }

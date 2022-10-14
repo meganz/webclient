@@ -3,10 +3,6 @@ import { MegaRenderMixin } from '../../../../mixins';
 import Button from '../../button.jsx';
 
 export default class Footer extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const { selected, onClose, onAdd } = this.props;
         return (

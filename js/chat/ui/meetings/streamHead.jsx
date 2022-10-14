@@ -27,10 +27,6 @@ export default class StreamHead extends MegaRenderMixin {
         banner: false
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     get fullscreen() {
         return document.fullscreenElement;
     }

@@ -191,7 +191,7 @@
             self.wrapFunction(
                 'Chatd.Shard.prototype.hist',
                 false,
-                function(args, resp, unwrapFn) {
+                function(args) {
                     histRetrievalStartTimes[args[0]] = [microtime(), this.shard];
                     receivedMsgs[args[0]] = 0;
                 })
@@ -201,7 +201,7 @@
             self.wrapFunction(
                 'Chatd.Messages.prototype.store',
                 false,
-                function(args, resp, unwrapFn) {
+                function(args) {
                     var newmsg = args[0];
                     var chatId = this.chatId;
 

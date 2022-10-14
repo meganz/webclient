@@ -1,5 +1,4 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
 import {MegaRenderMixin} from "../mixins";
 
 class SharedFolderItem extends MegaRenderMixin {
@@ -39,7 +38,6 @@ class IncSharesAccordionPanel extends MegaRenderMixin {
     }
     render() {
         var self = this;
-        var room = self.props.chatRoom;
         var contactHandle = self.getContactHandle();
         var contents = null;
         var MAX_ITEMS = 10;

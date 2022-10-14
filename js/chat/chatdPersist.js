@@ -787,7 +787,6 @@
         }
 
         var msgObject = action === "replace" ? args[1] : args[0];
-        var isEdit = args[1];
 
         if (
             msgObject.keyid === true ||

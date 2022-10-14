@@ -4,10 +4,6 @@ import Button from './button.jsx';
 import Call from './call.jsx';
 
 export default class SidebarControls extends MegaRenderMixin {
-    constructor() {
-        super();
-    }
-
     render() {
         const { streams, view, sidebar, chatRoom, onChatToggle, onParticipantsToggle } = this.props;
         const SIMPLETIP = { position: 'left', offset: 5, className: 'theme-dark-forced' };

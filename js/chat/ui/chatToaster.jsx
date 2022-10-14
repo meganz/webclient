@@ -13,8 +13,8 @@ export default class ChatToaster extends MegaRenderMixin {
         persistentToast: null,
     };
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.toasts = [];
         this.persistentToasts = [];
     }

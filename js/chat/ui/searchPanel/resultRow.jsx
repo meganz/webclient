@@ -1,6 +1,6 @@
 import React from 'react';
 import { TYPE, LABEL } from './resultContainer.jsx';
-import { Avatar, ContactPresence, LastActivity, MembersAmount } from '../contacts.jsx';
+import { Avatar, ContactPresence } from '../contacts.jsx';
 import { MegaRenderMixin } from '../../mixins';
 import { OFlowEmoji, OFlowParsedHTML } from '../../../ui/utils.jsx';
 import { ContactAwareName } from '../contacts.jsx';

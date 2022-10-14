@@ -21,10 +21,6 @@ const Nil = ({ children }) => (
 export default class ResultContainer extends MegaRenderMixin {
     intersectionObserver = null;
 
-    constructor(props) {
-        super(props);
-    }
-
     initializeIntersectionObserver = () => {
         if (HAS_INTERSECTION_OBSERVER) {
             this.intersectionObserver = new IntersectionObserver(

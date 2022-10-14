@@ -1,5 +1,4 @@
 var React = require("react");
-var utils = require("./utils.jsx");
 import {MegaRenderMixin} from "../chat/mixins";
 var DropdownsUI = require('./dropdowns.jsx');
 var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
@@ -270,11 +269,7 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             browsingCategory: false
         });
     }
-    onUserScroll(
-        $ps,
-        elem,
-        e
-    ) {
+    onUserScroll($ps) {
         if (this.state.browsingCategory) {
             var $cat = $('.emoji-category-container[data-category-name="' + this.state.browsingCategory + '"]');
             if (!elementInViewport($cat)) {
@@ -356,7 +351,6 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
     _isVisible(scrollTop, scrollBottom, elTop, elBottom) {
         var visibleTop = elTop < scrollTop ? scrollTop : elTop;
         var visibleBottom = elBottom > scrollBottom ? scrollBottom : elBottom;
-        var visibleHeight = visibleBottom - visibleTop;
 
         return visibleBottom - visibleTop > 0;
     }
@@ -373,9 +367,6 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
         if (!stateObj) {
             stateObj = self.state;
         }
-
-        var emojis = [];
-        var searchValue = stateObj.searchValue;
 
         var visibleStart = scrollPositionY;
         var visibleEnd = visibleStart + self.heightDefs.containerHeight;
@@ -430,12 +421,6 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
         var preview;
         if (self.state.previewEmoji) {
             var meta = self.state.previewEmoji;
-            var slug = meta.n;
-            var txt = ":" + slug + ":";
-            if (slug.substr(0, 1) == ":" || slug.substr(-1) == ":") {
-                txt = slug;
-            }
-
 
             preview = <div className="emoji-preview">
                 {self._generateEmoji(meta)}

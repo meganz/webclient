@@ -122,9 +122,6 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                     type="text"
                                     name="newTopic"
                                     value={newTopic}
-                                    ref={field => {
-                                        this.topicInput = field;
-                                    }}
                                     style={{ paddingLeft: 8, }}
                                     onChange={this.onTopicFieldChanged}
                                     onKeyPress={this.onTopicFieldKeyPress}

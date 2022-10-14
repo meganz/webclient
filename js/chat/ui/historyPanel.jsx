@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import {MegaRenderMixin, SoonFcWrap} from "../mixins";
 import utils, { ParsedHTML } from "../../ui/utils.jsx";
 import {AltPartsConvMessage} from "./messages/alterParticipants.jsx";

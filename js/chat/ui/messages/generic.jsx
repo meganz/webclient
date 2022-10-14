@@ -125,21 +125,6 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         return false;
     }
 
-    _nodeUpdated() {
-        var self = this;
-        // because it seems the webclient can trigger stuff before the actual
-        // change is done on the node, this function would need to be queued
-        // using Soon, so that its executed after the node modify code
-        Soon(function() {
-            if (self.isMounted() && self.isComponentVisible()) {
-                self.forceUpdate();
-                if (self.dropdown) {
-                    self.dropdown.forceUpdate();
-                }
-            }
-        });
-    }
-
     doDelete(e, msg) {
         e.preventDefault(e);
         e.stopPropagation(e);

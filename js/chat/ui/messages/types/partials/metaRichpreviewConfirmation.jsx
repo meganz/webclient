@@ -30,9 +30,6 @@ class MetaRichprevConfirmation extends ConversationMessageMixin {
                     RichpreviewsFilter.confirmationDoNever();
                     message.trackDataChange();
                 }
-                else {
-                    // do nothing.
-                }
             });
 
     }

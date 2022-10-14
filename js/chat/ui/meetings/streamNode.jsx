@@ -64,15 +64,6 @@ export default class StreamNode extends MegaRenderMixin {
         video._snSetup = true;
     }
 
-    setLoading(loading) {
-        if (this.isMounted()) {
-            this.setState({loading: loading});
-        }
-        else {
-            this.state.loading = loading;
-        }
-    }
-
     updateVideoElem() {
         // console.warn(`updateVideoElem[${this.props.stream.clientId}]`);
         if (!this.isMounted() || !this.contRef.current) {
@@ -92,7 +83,6 @@ export default class StreamNode extends MegaRenderMixin {
                 this.setupVideoElement(source);
                 // insert/replace the video in the DOM
                 this.contRef.current.replaceChildren(source);
-                // this.setLoading(source.readyState < 2);
             }
             else {
                 this.contRef.current.replaceChildren();

@@ -5,10 +5,6 @@ import { HAS_INTERSECTION_OBSERVER, NODE_CLASS, NODE_CONTAINER_CLASS } from './r
 export default class Result extends MegaRenderMixin {
     resultRef = React.createRef();
 
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         super.componentDidMount();
         this.props.onMount?.(this.resultRef.current);

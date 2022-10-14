@@ -14,10 +14,6 @@ export default class Sidebar extends MegaRenderMixin {
     containerRef = React.createRef();
     historyPanel = null;
 
-    constructor(props) {
-        super(props);
-    }
-
     renderHead = () => {
         const { call, view, chatRoom, onSidebarClose, onInviteToggle } = this.props;
         return (

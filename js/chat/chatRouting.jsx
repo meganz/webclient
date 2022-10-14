@@ -31,6 +31,10 @@ export default class ChatRouting {
         }
     };
 
+    /**
+     * @param {Chat} megaChatInstance megaChat
+     * @constructor
+     */
     constructor(megaChatInstance) {
         this.megaChat = megaChatInstance;
     }

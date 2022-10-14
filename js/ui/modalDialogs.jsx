@@ -1,8 +1,6 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
 import utils  from "./utils.jsx";
 import {MegaRenderMixin} from "../chat/mixins";
-import Tooltips from "./tooltips.jsx";
 import Forms from "./forms.jsx";
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');

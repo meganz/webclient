@@ -3,10 +3,6 @@ import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
 
 export default class Guest extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <div className="guest-register">

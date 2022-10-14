@@ -201,7 +201,7 @@ EmoticonsFilter.prototype.processOutgoingMessage = function(e, messageObject) {
 EmoticonsFilter.prototype.fromUtfToShort = function(s) {
     var self = this;
     var cached = {};
-    return s.replace(/[^\x00-\x7F]{1,}/g, function(match, pos) {
+    return s.replace(/[^\x00-\x7F]{1,}/g, function(match) {
         if (cached[match]) {
             return ":" + cached[match] + ":";
         }

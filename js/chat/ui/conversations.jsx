@@ -11,7 +11,6 @@ import ChatToaster from './chatToaster.jsx';
 import LeftPanel from './leftPanel/leftPanel.jsx';
 
 class ConversationsApp extends MegaRenderMixin {
-    requestReceivedListener = null;
 
     VIEWS = {
         CHATS: 0x00,

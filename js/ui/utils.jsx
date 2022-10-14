@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 
-import { ContactAwareComponent, MegaRenderMixin, schedule, SoonFcWrap } from "../chat/mixins";
+import { ContactAwareComponent, SoonFcWrap } from "../chat/mixins";
 
 /**
  * A trick copied from http://jamesknelson.com/rendering-react-components-to-the-document-body/
@@ -157,7 +157,6 @@ export const OFlowParsedHTML = withOverflowObserver(ParsedHTML);
 
 export default {
     RenderTo,
-    schedule,
     SoonFcWrap,
     OFlowEmoji,
     OFlowParsedHTML,

@@ -66,6 +66,8 @@ var getMessageString;
     };
 })();
 
+mega.ui = mega.ui || {};
+mega.ui.chat = mega.ui.chat || {};
 mega.ui.chat.getMessageString = getMessageString;
 
 export {

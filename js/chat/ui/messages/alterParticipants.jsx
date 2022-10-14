@@ -29,21 +29,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
         if (!this.props.message || !this.props.message.meta) {
             return false;
         }
-
-        if (this.props.message.meta) {
-            if (this.props.message.meta.included) {
-                return this.props.message.meta.included;
-            }
-            else if (this.props.message.meta.excluded) {
-                return this.props.message.meta.excluded;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            return false;
-        }
+        return this.props.message.meta.included || this.props.message.meta.excluded;
     }
     render() {
         var self = this;

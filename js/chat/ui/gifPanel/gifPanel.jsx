@@ -51,10 +51,6 @@ export default class GifPanel extends MegaRenderMixin {
 
     state = { ...this.defaultState };
 
-    constructor(props) {
-        super(props);
-    }
-
     getContainerHeight = () => (
         window.innerHeight * 0.6 > MAX_HEIGHT ? MAX_HEIGHT : window.innerHeight * 0.6
     );

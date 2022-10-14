@@ -549,7 +549,6 @@ ChatSearch.prototype.onRoomSearchComplete = function() {
     this.handler.onComplete();
 };
 
-
 /**
  * Debug only.
  *

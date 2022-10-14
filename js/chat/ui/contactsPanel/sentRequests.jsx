@@ -7,12 +7,6 @@ import {ColumnContactRequestsSentBtns} from "../../../ui/jsx/fm/nodes/columns/co
 import {ColumnContactRequestsRts} from "../../../ui/jsx/fm/nodes/columns/columnContactRequestsRts";
 
 export default class SentRequests extends MegaRenderMixin {
-    requestSentListener = null;
-
-    constructor(props) {
-        super(props);
-
-    }
 
     handleReinvite = mail => {
         this.setState({ reinvited: true }, () => {

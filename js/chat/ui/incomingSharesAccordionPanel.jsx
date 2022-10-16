@@ -38,6 +38,7 @@ class IncSharesAccordionPanel extends MegaRenderMixin {
     }
     render() {
         var self = this;
+        var room = self.props.chatRoom;
         var contactHandle = self.getContactHandle();
         var contents = null;
         var MAX_ITEMS = 10;

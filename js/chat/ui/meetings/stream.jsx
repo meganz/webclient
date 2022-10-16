@@ -429,20 +429,20 @@ export default class Stream extends MegaRenderMixin {
 
     renderStreamContainer() {
         const {
-            sfuApp, call, chatRoom, streams, stayOnEnd, everHadPeers, isOnHold, onInviteToggle, onStayConfirm,
-            onCallEnd
+            sfuApp, call, chatRoom, streams, stayOnEnd, everHadPeers, isOnHold, hasOtherParticipants,
+            onInviteToggle, onStayConfirm, onCallEnd
         } = this.props;
         const streamContainer = content =>
             <div
                 ref={this.containerRef}
                 className={`
                     ${NAMESPACE}-container
-                    ${streams.length === 0 ? 'with-notice' : ''}
+                    ${streams.length === 0 || !hasOtherParticipants ? 'with-notice' : ''}
                 `}>
                 {content}
             </div>;
 
-        if (streams.length === 0) {
+        if (streams.length === 0 || !hasOtherParticipants) {
             return (
                 <ParticipantsNotice
                     sfuApp={sfuApp}

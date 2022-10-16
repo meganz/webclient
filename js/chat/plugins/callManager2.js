@@ -362,7 +362,9 @@
             // Force high res for now:
             // thumb is already loaded, only uncomment if we want HD by default?
             // this.sfuApp.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
-            this.callTimeoutDone();
+            if (peer.userId !== u_handle) {
+                this.callTimeoutDone();
+            }
         }
         onPeerLeft(peer, reason) {
             if (this.activeStream && this.activeStream === peer.cid) {
@@ -374,7 +376,9 @@
 
             this.peers[peer.cid].destroy();
             this.chatRoom.trigger('onCallPeerLeft', { userHandle: peer.userId, reason });
-            this.left = true;
+            if (peer.userId !== u_handle) {
+                this.left = true;
+            }
             // Peer is left alone in a group call -> mute mic
             if (peer.client.isLeavingCall()) {
                 this.muteIfAlone();
@@ -463,7 +467,7 @@
         }
         callTimeoutDone(leaveCallActive) {
             if (typeof leaveCallActive === 'undefined') {
-                leaveCallActive = this.peers.length;
+                leaveCallActive = this.hasOtherParticipant();
             }
             if (this.callToutInt) {
                 clearInterval(this.callToutInt);
@@ -540,6 +544,10 @@
                     .setClose(false)
                     .dispatch();
             }
+        }
+        hasOtherParticipant() {
+            // Exclude extra clients of the current user
+            return this.peers ? Object.values(this.peers.toJS()).some(s => u_handle !== s.userHandle) : false;
         }
     }
     class LocalPeerStream {
@@ -697,13 +705,14 @@
                     chatRoom.activeCall.hangUp(SfuClient.TermCode.kLeavingRoom);
                 }
             });
-            chatRoom.rebind('onCallPeerLeft.callManager', (e, { reason }) => {
+            chatRoom.rebind('onCallPeerLeft.callManager', (e, data) => {
                 const activeCall = chatRoom.activeCall;
-                const { peers, callId, sfuApp } = activeCall;
+                const { reason, userHandle } = data;
+                const { callId, sfuApp } = activeCall;
 
                 if (
                     sfuApp.isDestroyed ||
-                    peers.length ||
+                    activeCall.hasOtherParticipant() ||
                     SfuClient.isTermCodeRetriable(reason)
                 ) {
                     return;
@@ -711,13 +720,15 @@
                 if (chatRoom.type === 'private') {
                     return chatRoom.trigger('onCallLeft', { callId });
                 }
-                // Wait for the peer left notifications to process before triggering.
-                setTimeout(() => {
-                    // make sure we still have that call as active
-                    if (chatRoom.activeCall === activeCall) {
-                        chatRoom.activeCall.initCallTimeout();
-                    }
-                }, 3000);
+                if (userHandle !== u_handle) {
+                    // Wait for the peer left notifications to process before triggering.
+                    tSleep(3).then(() => {
+                        // make sure we still have that call as active
+                        if (chatRoom.activeCall === activeCall) {
+                            chatRoom.activeCall.initCallTimeout();
+                        }
+                    });
+                }
             });
 
             chatRoom.rebind('onMeAdded', (e, addedBy) => {

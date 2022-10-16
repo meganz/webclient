@@ -18109,6 +18109,7 @@ class stream_Stream extends mixins.wl {
       stayOnEnd,
       everHadPeers,
       isOnHold,
+      hasOtherParticipants,
       onInviteToggle,
       onStayConfirm,
       onCallEnd
@@ -18117,10 +18118,10 @@ class stream_Stream extends mixins.wl {
       ref: this.containerRef,
       className: `
                     ${NAMESPACE}-container
-                    ${streams.length === 0 ? 'with-notice' : ''}
+                    ${streams.length === 0 || !hasOtherParticipants ? 'with-notice' : ''}
                 `
     }, content);
-    if (streams.length === 0) {
+    if (streams.length === 0 || !hasOtherParticipants) {
       return external_React_default().createElement(ParticipantsNotice, {
         sfuApp: sfuApp,
         call: call,
@@ -19140,14 +19141,16 @@ class Call extends mixins.wl {
             stayOnEnd: !!mega.config.get('callemptytout')
           });
         }
-        if (!this.state.everHadPeers) {
-          this.setState({
-            everHadPeers: true
-          });
-        }
-        if (this.callStartTimeout) {
-          clearTimeout(this.callStartTimeout);
-          delete this.callStartTimeout;
+        if (call.hasOtherParticipant()) {
+          if (!this.state.everHadPeers) {
+            this.setState({
+              everHadPeers: true
+            });
+          }
+          if (this.callStartTimeout) {
+            clearTimeout(this.callStartTimeout);
+            delete this.callStartTimeout;
+          }
         }
       });
       chatRoom.rebind('onCallLeft.callComp', () => this.props.minimized && this.props.onCallEnd());
@@ -19372,7 +19375,7 @@ class Call extends mixins.wl {
       const {
         call
       } = this.props;
-      if (!mega.config.get('callemptytout') && !call.peers.length) {
+      if (!mega.config.get('callemptytout') && !call.hasOtherParticipant()) {
         call.left = true;
         call.initCallTimeout();
         if (!Call.isExpanded()) {
@@ -19382,8 +19385,11 @@ class Call extends mixins.wl {
       delete this.callStartTimeout;
     }, 300000);
     setTimeout(() => {
-      const peers = this.props.call.peers;
-      if (peers && peers.length) {
+      const {
+        call
+      } = this.props;
+      const peers = call.peers;
+      if (peers && peers.length && !call.hasOtherParticipant()) {
         this.setState({
           everHadPeers: true
         });
@@ -19424,6 +19430,7 @@ class Call extends mixins.wl {
       parent,
       stayOnEnd,
       everHadPeers,
+      hasOtherParticipants: call.hasOtherParticipant(),
       isOnHold: sfuApp.sfuClient.isOnHold(),
       onSpeakerChange: this.handleSpeakerChange,
       onInviteToggle: this.handleInviteToggle,

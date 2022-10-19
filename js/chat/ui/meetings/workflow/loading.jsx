@@ -1,13 +1,8 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../mixins';
-import Call from '../call.jsx';
 
 export default class Loading extends MegaRenderMixin {
     static NAMESPACE = 'meetings-loading'
-
-    constructor(props) {
-        super(props);
-    }
 
     componentDidMount() {
         super.componentDidMount();

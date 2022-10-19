@@ -4,10 +4,6 @@ import { MegaRenderMixin } from '../../mixins';
 import { ParsedHTML } from '../../../ui/utils';
 
 export default class Nil extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         super.componentDidMount();
         setContactLink();

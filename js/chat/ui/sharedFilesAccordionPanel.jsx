@@ -1,5 +1,4 @@
 var React = require("react");
-var ReactDOM = require("react-dom");
 import {MegaRenderMixin} from "../mixins";
 import utils, { Emoji } from './../../ui/utils.jsx';
 

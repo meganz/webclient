@@ -328,7 +328,6 @@ class ConversationMessageMixin extends ContactAwareComponent {
                                 e.target.replaceWith(textNode);
                                 textNode.parentNode.classList.add('emoji-loading-error');
                             }}
-                            title={!notFoundEmoji ? `:${emojiData.n}:` : utf}
                             onLoad={(e) => {
                                 e.target.classList.remove('emoji-loading');
                             }}

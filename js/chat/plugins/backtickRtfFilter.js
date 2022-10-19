@@ -45,17 +45,6 @@ BacktickRtfFilter.ESCAPE_TEMPLATE = "%%BTRTE%$NUM%%";
 BacktickRtfFilter.ESCAPE_SEARCH = "%%BTRTE%";
 BacktickRtfFilter.UNESCAPE_REGEXP = "%%BTRTE%(\\d+)%%";
 
-BacktickRtfFilter.prototype.processStripRtfFromMessage = function(msg) {
-    "use strict";
-    var self = this;
-    Object.keys(self.regexps).forEach(function(regexp) {
-        var replacement = self.regexps[regexp];
-        msg = msg.replace(new RegExp(regexp, replacement[0]), replacement[2]);
-    });
-    return msg;
-};
-
-
 BacktickRtfFilter.prototype.escapeAndProcessMessage = function(e, eventData, props, mainProp, skipSet) {
     "use strict";
     var self = this;
@@ -150,7 +139,6 @@ BacktickRtfFilter.processUrlsInTickStrings = function(s) {
 };
 
 BacktickRtfFilter.prototype.processBackticks = function(msgString, replaceGenCb) {
-    var self = this;
     msgString = String(msgString);
     var newString = "";
     var placeholderString = "";
@@ -307,7 +295,7 @@ BacktickRtfFilter.prototype.unescapeAndProcessMessage = function(e, eventData, p
             new RegExp(BacktickRtfFilter.UNESCAPE_REGEXP, "gi"),
             function (match, id) {
                 var escaped = self.escaped[id];
-                var result = match;
+                var result;
                 if (escaped) {
                     if (prop === "messageHtml" && !e.textOnly) {
                         result = escaped[0];

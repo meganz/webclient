@@ -13,10 +13,6 @@ export default class SearchField extends MegaRenderMixin {
         SearchField.inputRef && SearchField.inputRef.current && !!SearchField.inputRef.current.value.length
     );
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         const { value, searching, onChange, onReset, onBack } = this.props;
 

@@ -870,20 +870,20 @@ export class ConversationPanel extends MegaRenderMixin {
 
         window.addEventListener('keydown', self.handleKeyDown);
 
-        self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function (e, eventData) {
+        self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function () {
             self.callJustEnded = true;
         });
 
-        self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function (e, eventData) {
+        self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function () {
             self.props.chatRoom.scrolledToBottom = true;
             if (self.messagesListScrollable) {
                 self.messagesListScrollable.scrollToBottom();
             }
         });
-        self.props.chatRoom.rebind('openSendFilesDialog.cpanel', function(e) {
+        self.props.chatRoom.rebind('openSendFilesDialog.cpanel', function() {
             self.setState({'attachCloudDialog': true});
         });
-        self.props.chatRoom.rebind('showGetChatLinkDialog.ui', function (e, eventData) {
+        self.props.chatRoom.rebind('showGetChatLinkDialog.ui', function () {
             createTimeoutPromise(function() {
                 return self.props.chatRoom.topic && self.props.chatRoom.state === ChatRoom.STATE.READY;
             }, 350, 15000)
@@ -1333,7 +1333,6 @@ export class ConversationPanel extends MegaRenderMixin {
             </ModalDialogsUI.ConfirmDialog>
         }
 
-        var pasteImageConfirmDialog = null;
         if (self.state.pasteImageConfirmDialog) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
@@ -1602,7 +1601,6 @@ export class ConversationPanel extends MegaRenderMixin {
 
 
         var startCallDisabled = isStartCallDisabled(room);
-        var startCallButtonClass = startCallDisabled ? " disabled" : "";
         return (
             <div
                 className={conversationPanelClasses}

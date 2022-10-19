@@ -7,7 +7,7 @@ export default class Ephemeral extends MegaRenderMixin {
     static NAMESPACE = 'ephemeral-dialog';
 
     buttons = [
-        { key: 'ok', label: 'Ok', onClick: this.props.onClose }
+        { key: 'ok', label: l[81], onClick: this.props.onClose }
     ];
 
     render() {

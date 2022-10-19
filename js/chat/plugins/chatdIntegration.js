@@ -250,8 +250,6 @@ ChatdIntegration.prototype.updateChatPublicHandle = function(h, d, callback) {
 };
 
 ChatdIntegration.prototype.requiresUpdate = function() {
-    var self = this;
-
     if (window.location.toString().indexOf("/chat")) {
         $('.nw-fm-left-icon.cloud-drive').triggerHandler('click');
     }
@@ -1105,7 +1103,7 @@ ChatdIntegration.prototype._attachToChatRoom = promisify(function(resolve, rejec
         chatRoom.trigger('onParticipantTyping', [eventData.userId, eventData.bCastCode]);
     });
 
-    chatRoom.rebind('onRoomDisconnected.chatdInt' + chatRoomId, function(e, eventData) {
+    chatRoom.rebind('onRoomDisconnected.chatdInt' + chatRoomId, function() {
         if (self.megaChat.isLoggingOut) {
             return;
         }
@@ -1729,19 +1727,11 @@ ChatdIntegration.prototype.markMessageAsSeen = function(chatRoom, msgid) {
     self.chatd.cmd(Chatd.Opcode.SEEN, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
 };
 
-ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom, msgid) {
-    var self = this;
+ChatdIntegration.prototype.markMessageAsReceived = function(chatRoom) {
     if (!chatRoom.stateIsLeftOrLeaving()) {
         // Temporarily disabled, until we get into the state in which we need this again in the UI:
         // self.chatd.cmd(Chatd.Opcode.RECEIVED, base64urldecode(chatRoom.chatId), base64urldecode(msgid));
     }
-};
-
-ChatdIntegration.prototype.sendNewKey = function(chatRoom, keyxid, keyBlob) {
-    var self = this;
-    var keylen = keyBlob.length;
-    var keybody = Chatd.pack32le(keyxid) + Chatd.pack32le(keylen) + keyBlob;
-    self.chatd.cmd(Chatd.Opcode.NEWKEY, base64urldecode(chatRoom.chatId), keybody);
 };
 
 ChatdIntegration.prototype.sendMessage = async function(chatRoom, messageObject) {
@@ -1903,9 +1893,6 @@ ChatdIntegration.prototype.discardMessage = function(chatRoom, msgId) {
 
     msgId = base64urldecode(msgId);
 
-    if (msgId.length === 0) {
-        // debugger;
-    }
     return self.chatd.discard(msgId, rawChatId);
 };
 

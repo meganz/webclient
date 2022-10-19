@@ -55,9 +55,6 @@
         get name() {
             return M.getNameByHandle(this.userHandle);
         }
-        get contactObject() {
-            return M.u[this.userHandle];
-        }
         setResState(newState, video) {
             const oldSource = this.source;
             this.resState = newState;

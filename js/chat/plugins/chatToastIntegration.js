@@ -394,7 +394,7 @@ class ChatToastIntegration {
                             {
                                 icon: 'sprite-fm-uni icon-hazard',
                                 close: true,
-                                timeout: 9e5
+                                timeout: 5000
                             }
                         );
                         retryFailToast.dispatch();

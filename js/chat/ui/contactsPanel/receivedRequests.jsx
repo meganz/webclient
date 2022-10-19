@@ -7,12 +7,6 @@ import {ColumnContactRequestsTs} from "../../../ui/jsx/fm/nodes/columns/columnCo
 import {ColumnContactRequestsRcvdBtns} from "../../../ui/jsx/fm/nodes/columns/columnContactRequestsRcvdBtns";
 
 export default class ReceivedRequests extends MegaRenderMixin {
-    requestReceivedListener = null;
-    receivedRequestsRefs = [];
-
-    constructor(props) {
-        super(props);
-    }
 
     drawReceivedRequests = () => {
         const { received } = this.props;

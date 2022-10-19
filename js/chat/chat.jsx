@@ -22,14 +22,6 @@ const LOAD_ORIGINALS = {
     'image/webp': 2e5
 };
 
-/**
- * Used to differentiate MegaChat instances running in the same env (tab/window)
- *
- * @type {number}
- */
-var megaChatInstanceId = 0;
-
-
 var CHATUIFLAGS_MAPPING = {
     'convPanelCollapse': 'cPC'
 };
@@ -75,6 +67,21 @@ function Chat() {
         },
         /**
          * Really simple plugin architecture
+         *
+         * @property {ChatdIntegration} chatdIntegration
+         * @property {CallManager2} callManager2
+         * @property {UrlFilter} urlFilter
+         * @property {EmoticonShortcutsFilter} emoticonShorcutsFilter
+         * @property {EmoticonsFilter} emoticonsFilter
+         * @property {CallFeedback} callFeedback
+         * @property {PresencedIntegration} presencedIntegration
+         * @property {PersistedTypeArea} persistedTypeArea
+         * @property {BacktickRtfFilter} btRtfFilter
+         * @property {RtfFilter} rtfFilter
+         * @property {RichpreviewsFilter} richpreviewsFilter
+         * @property {ChatToastIntegration} ChatToastIntegration
+         * @property {ChatStats} chatStats
+         * @property {GeoLocationLinks} geoLocationLinks
          */
         'plugins': {
             'chatdIntegration': ChatdIntegration,
@@ -96,7 +103,7 @@ function Chat() {
             'textMessages': {
                 'incoming-chat-message': {
                     title: l.notif_title_incoming_msg, /* `Incoming chat message` */
-                    'icon': function(notificationObj, params) {
+                    'icon': function(notificationObj) {
                         return notificationObj.options.icon;
                     },
                     'body': function(notificationObj, params) {
@@ -106,7 +113,7 @@ function Chat() {
                 },
                 'incoming-attachment': {
                     title: l.notif_title_incoming_attch, /* `Incoming attachment` */
-                    'icon': function(notificationObj, params) {
+                    'icon': function(notificationObj) {
                         return notificationObj.options.icon;
                     },
                     'body': function(notificationObj, params) {
@@ -117,7 +124,7 @@ function Chat() {
                 },
                 'incoming-voice-video-call': {
                     'title': l[17878] || "Incoming call",
-                    'icon': function(notificationObj, params) {
+                    'icon': function(notificationObj) {
                         return notificationObj.options.icon;
                     },
                     'body': function(notificationObj, params) {
@@ -126,7 +133,7 @@ function Chat() {
                 },
                 'call-terminated': {
                     title: l.notif_title_call_term, /* `Call terminated` */
-                    'icon': function(notificationObj, params) {
+                    'icon': function(notificationObj) {
                         return notificationObj.options.icon;
                     },
                     'body': function(notificationObj, params) {
@@ -159,8 +166,6 @@ function Chat() {
             'autoPurgeMaxMessagesPerRoom': 1024
         }
     };
-
-    this.instanceId = megaChatInstanceId++;
 
     this.plugins = {};
 
@@ -741,7 +746,7 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
     var havePendingCall = false;
     var haveCall = false;
-    self.haveAnyActiveCall() === false && self.chats.forEach(function(megaRoom, k) {
+    self.haveAnyActiveCall() === false && self.chats.forEach(function(megaRoom) {
         if (megaRoom.state == ChatRoom.STATE.LEFT) {
             // skip left rooms.
             return;
@@ -868,10 +873,6 @@ Chat.prototype.destroy = function(isLogout) {
 
     for (let i = 0; i < this.mbListeners.length; i++) {
         mBroadcaster.removeListener(this.mbListeners[i]);
-    }
-
-    if (self.rtc && self.rtc.logout) {
-        self.rtc.logout();
     }
 
     self.unregisterUploadListeners(true);
@@ -1050,44 +1051,6 @@ Chat.prototype._renderMyStatus = function() {
 
 
 Chat.prototype.renderMyStatus = SoonFc(Chat.prototype._renderMyStatus, 100);
-
-/**
- * Reorders the contact tree by last activity (THIS is going to just move DOM nodes, it will NOT recreate them from
- * scratch, the main goal is to be fast and clever.)
- */
-Chat.prototype.reorderContactTree = function() {
-    var self = this;
-
-    var folders = M.getContacts({
-        'h': 'contacts'
-    });
-
-    folders = M.sortContacts(folders);
-
-    var $container = $('#treesub_contacts');
-
-    var $prevNode = null;
-    $.each(folders, function(k, v) {
-        var $currentNode = $('#treeli_' + v.u);
-
-        if (!$prevNode) {
-            var $first = $('li:first:not(#treeli_' + v.u + ')', $container);
-            if ($first.length > 0) {
-                $currentNode.insertBefore($first);
-            }
-            else {
-                $container.append($currentNode);
-            }
-        }
-        else {
-            $currentNode.insertAfter($prevNode);
-        }
-
-
-        $prevNode = $currentNode;
-    });
-};
-
 
 /**
  * Open (and (optionally) show) a new chat
@@ -1388,7 +1351,7 @@ Chat.prototype.smartOpenChat = function(...args) {
  */
 Chat.prototype.hideAllChats = function() {
     var self = this;
-    self.chats.forEach((chatRoom, k) => {
+    self.chats.forEach((chatRoom) => {
         if (chatRoom.isCurrentlyActive) {
             chatRoom.hide();
         }
@@ -1538,14 +1501,6 @@ Chat.prototype.refreshConversations = function() {
     else {
         self.$leftPane.removeClass('hidden');
     }
-};
-
-/**
- * Debug helper
- */
-
-Chat.prototype.getChatNum = function(idx) {
-    return this.chats[this.chats.keys()[idx]];
 };
 
 Chat.prototype.navigate = function megaChatNavigate(location, event, isLandingPage) {
@@ -2232,20 +2187,6 @@ Chat.prototype.isValidEmojiSlug = function(slug) {
 };
 
 /**
- * A simple alias that returns PresencedIntegration's presence for the current user
- *
- * @returns {Number|undefined} UserPresence.PRESENCE.* or undefined for offline/unknown presence
- */
-Chat.prototype.getMyPresence = function() {
-    if (u_handle && this.plugins.presencedIntegration) {
-        return this.plugins.presencedIntegration.getMyPresence();
-    }
-    else {
-        return;
-    }
-};
-
-/**
  * A simple alias that returns PresencedIntegration's presence for the a specific user
  *
  * @param {String} user_handle the target user's presence
@@ -2254,9 +2195,6 @@ Chat.prototype.getMyPresence = function() {
 Chat.prototype.getPresence = function(user_handle) {
     if (user_handle && this.plugins.presencedIntegration) {
         return this.plugins.presencedIntegration.getPresence(user_handle);
-    }
-    else {
-        return;
     }
 };
 
@@ -2739,7 +2677,7 @@ Chat.prototype.loginOrRegisterBeforeJoining = function(
         mega.ui.showRegisterDialog({
             title: l[5840],
             onCreatingAccount: function() {},
-            onLoginAttemptFailed: function(registerData) {
+            onLoginAttemptFailed: function() {
                 msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {
                     if (e) {
                         $('.pro-register-dialog').addClass('hidden');

@@ -286,9 +286,9 @@ lazy(pro, 'proplan2', () => {
         const $strgFlexInput = $('#esti-storage', $proflexiBlock);
         const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
-        $gdNote.text(`*${l[23818].replace('%1', '2 TB')}`);
+        $gdNote.text(`*${l[23818].replace('%1', bytesToSize(2 * 1099511627776, 0))}`);
         $megaNote.text(`*${l[23818].replace('%1', l[5819])}`);
-        $refNote.text(`(1) ${l[24078].replace('%1', '1.00')}`);
+        $refNote.text(`(1) ${l[24078].replace('%1', formatCurrency(1.00, null, 'number'))}`);
 
         // ordered array for ranges: [range-start,range-end,min,max]
         const symmetricRanges = [
@@ -309,6 +309,10 @@ lazy(pro, 'proplan2', () => {
             [formatCurrency(19.99), false, false],
             [formatCurrency(29.99), false, false]
         ];
+
+        $compareMEGA.text(competitorsValues[1][0]);
+        $compareDP.text(competitorsValues[1][1]);
+        $compareGD.text(competitorsValues[1][2]);
 
         const sliderEventHandler = (slider, ranges, $inputTxt) => {
             let val = slider.value;
@@ -393,7 +397,7 @@ lazy(pro, 'proplan2', () => {
 
                 if (val === 1) {
                     $dpNote.text(`*${l[23947]}`);
-                    $gdNote.text(`*${l[23818].replace('%1', '2 TB')}`);
+                    $gdNote.text(`*${l[23818].replace('%1', bytesToSize(2 * 1099511627776, 0))}`);
                 }
                 else {
                     $dpNote.safeHTML(l[23819]);

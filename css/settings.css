@@ -1200,7 +1200,9 @@
     width: 100%;
 }
 .chat-settings .chat-show-wrapper {
-    padding: 16px 16px 0 0;
+    padding: 16px 0 0;
+    padding-inline-end: 16px;
+    -webkit-padding-end: 16px;
     width: 100%;
 }
 .chat-settings .chat-hide-wrapper {
@@ -1241,6 +1243,10 @@
     color: #00BFA5;
     width: 16px;
     height: 16px;
+}
+.rtl .chat-settings .checked.chat-selected {
+    left: 5px;
+    right: unset;
 }
 .chat-settings .chat-selected {
     display: none;

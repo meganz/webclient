@@ -21,7 +21,7 @@ export class ColumnFavIcon extends GenericNodePropsComponent {
                 (nodeAdapter.nodeProps.fav ? " icon-favourite-filled" : " icon-dot") + (
                     !isFavouritable && " disabled" || ""
                 )
-            } onClick={(e) => {
+            } onClick={() => {
                 if (isFavouritable) {
                     M.favourite([node.h], !node.fav);
                 }

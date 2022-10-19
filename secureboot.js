@@ -3439,7 +3439,6 @@ else if (!browserUpdate) {
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'sfuClient_js': {f:'js/chat/sfuClient.js', n: 'sfuClient_js', j:1},
             'sfuAppImpl_js': {f:'js/chat/sfuAppImpl.js', n: 'sfuAppImpl_js', j:1},
-            'incomingcalldialog_js': {f:'js/chat/ui/incomingCallDialog.js', n: 'incomingcalldialog_js', j:1},
             'emojiUtils_js': {f:'js/utils/emoji.js', n: 'emojiUtils_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
             'callManager2_js': {f:'js/chat/plugins/callManager2.js', n: 'callManager2_js', j:1},

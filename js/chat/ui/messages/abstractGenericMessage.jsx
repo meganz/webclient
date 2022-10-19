@@ -4,9 +4,6 @@ import { Avatar, ContactButton } from '../contacts.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 
 export default class AbstractGenericMessage extends ConversationMessageMixin {
-    constructor(props) {
-        super(props);
-    }
 
     getAvatar() {
         const contact = this.getContact() || Message.getContactForMessage(this.props.message);

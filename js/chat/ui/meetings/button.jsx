@@ -94,10 +94,6 @@ class Group extends MegaRenderMixin {
 class Button extends MegaRenderMixin {
     buttonRef = React.createRef();
 
-    constructor(props) {
-        super(props);
-    }
-
     componentDidUpdate() {
         super.componentDidUpdate();
         if (this.props.simpletip) {

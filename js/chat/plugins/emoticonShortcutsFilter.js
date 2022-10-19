@@ -30,7 +30,7 @@ var EmoticonShortcutsFilter = function(megaChat) {
 
 
     var escapedRegExps = [];
-    $.each(self.shortcuts, function(shortcut, expanded) {
+    $.each(self.shortcuts, function(shortcut) {
 
         escapedRegExps.push(
             "(^|\\W)(" + RegExpEscape(shortcut) + ")(?=(\\s|\\.|\\?|,|\\/|!|:|$))"

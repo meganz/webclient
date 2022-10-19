@@ -1378,6 +1378,10 @@ class MegaGallery {
                     // Clear discovery
                     if (this.isDiscovery) {
                         delete mega.gallery.discovery;
+
+                        if (mega.gallery.mdReporter.runId) {
+                            mega.gallery.mdReporter.stop();
+                        }
                     }
                 }
 
@@ -2034,7 +2038,6 @@ mega.gallery.checkEveryGalleryDelete = h => {
 };
 
 mega.gallery.resetAll = () => {
-
     'use strict';
 
     mega.gallery.modeBeforeReset = {};
@@ -2104,6 +2107,8 @@ async function galleryUI(id) {
 
     // This is media discovery
     if (id) {
+        mega.gallery.mdReporter.report();
+
         if (!M.getNodeByHandle(id) || M.getNodeRoot(id) === M.RubbishID) {
 
             M.openFolder(M.RootID);
@@ -2423,6 +2428,167 @@ lazy(mega.gallery, 'sections', () => {
             root: 'favourites',
             filterFn: n => is_image3(n) || mega.gallery.isGalleryVideo(n),
             title: l.gallery_favourites
+        }
+    };
+});
+
+lazy(mega.gallery, 'mdReporter', () => {
+    'use strict';
+
+    /**
+     * @type {Array}
+     * @property {Number} 0 Timeout
+     * @property {Number} 1 EventId
+     */
+    const marks = [
+        [10, 99753],
+        [30, 99754],
+        [60, 99755],
+        [180, 99756]
+    ];
+
+    /**
+     * The number to qualify as a favourite
+     * @type {Number}
+     */
+    const timesOver = 3;
+
+    const statsStorageKey = 'regularPageStats';
+    const mdPageKey = 'MD';
+
+    /**
+     * This one prevents events from sending same requests multiple times when leaving and coming back to the tab
+     * or accidentally doubling events
+     * @type {Number[]}
+     */
+    let passedSessionMarks = [];
+
+    let fmStats = null;
+    let disposeVisibilityChange = null;
+
+    const fillStats = () => new Promise((resolve) => {
+        if (fmStats !== null) {
+            resolve(true);
+            return;
+        }
+
+        M.getPersistentData(statsStorageKey).then((stats) => {
+            if (stats) {
+                fmStats = stats;
+            }
+
+            resolve(true);
+        }).catch(() => {
+            resolve(false);
+        });
+    });
+
+    return {
+        runId: 0,
+        notApplicable(currentPage, runId) {
+            return this.runId !== runId
+                || document.visibilityState === 'hidden'
+                || window.M.currentdirid !== currentPage;
+        },
+        report(skipReset) {
+            if (!skipReset && this.runId) {
+                this.stop(); // Stopping the previously initialised reporter's run
+            }
+
+            this.runId = Date.now();
+            const runId = this.runId;
+
+            disposeVisibilityChange = MComponent.listen(
+                document,
+                'visibilitychange',
+                () => {
+                    if (document.visibilityState === 'visible' && this.runId === runId) {
+                        this.report(true);
+                    }
+                }
+            );
+
+            this.reportSessionMarks(marks[0][0], M.currentdirid, 0, runId);
+            this.processSectionFavourite(M.currentdirid, runId);
+        },
+        /**
+         * Sending time marks if the session time is surpassing a specific value
+         * @param {Number} timeout
+         * @param {String} currentPage
+         * @param {Number} diff Timeout to the next mark
+         * @param {Number} runId Current report run id to check
+         */
+        reportSessionMarks(timeout, currentPage, diff, runId) {
+            const eventIndex = marks.findIndex(([to]) => to === timeout);
+
+            tSleep(timeout - diff).then(
+                () => {
+                    if (this.notApplicable(currentPage, runId)) {
+                        return;
+                    }
+
+                    if (!passedSessionMarks.includes(timeout)) {
+                        passedSessionMarks.push(timeout);
+
+                        window.eventlog(
+                            marks[eventIndex][1],
+                            'Session mark: ' + mdPageKey + ' | ' + timeout + 's'
+                        );
+                    }
+
+                    const nextIndex = eventIndex + 1;
+                    if (marks[nextIndex]) {
+                        this.reportSessionMarks(marks[nextIndex][0], currentPage, timeout, runId);
+                    }
+                }
+            );
+        },
+        /**
+         * Report if user visited a specific section/page more than timesOver times
+         * @param {String} currentPage
+         * @param {Number} runId Current report run id to check
+         */
+        processSectionFavourite(currentPage, runId) {
+            tSleep(marks[0][0]).then(() => {
+                if (this.notApplicable(currentPage, runId)) {
+                    return;
+                }
+
+                fillStats().then((status) => {
+                    if (!status) {
+                        fmStats = [];
+                    }
+
+                    let section = fmStats.find(({ name }) => name === mdPageKey);
+
+                    if (section) {
+                        section.count++;
+                    }
+                    else {
+                        section = {name: mdPageKey, count: 1, reported: false};
+                        fmStats.push(section);
+                    }
+
+                    if (!section.reported) {
+                        if (section.count >= timesOver) {
+                            section.reported = true;
+                            eventlog(99757, mdPageKey + ' has been visited ' + section.count + ' times');
+                        }
+
+                        M.setPersistentData(statsStorageKey, fmStats).catch(() => {
+                            console.error('Cannot save stats - the storage is most likely full...');
+                        });
+                    }
+                });
+            });
+        },
+        stop() {
+            if (typeof disposeVisibilityChange === 'function') {
+                disposeVisibilityChange();
+            }
+
+            this.runId = 0;
+            passedSessionMarks = [];
         }
     };
 });

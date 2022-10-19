@@ -9,10 +9,6 @@ import { inProgressAlert } from '../meetings/call.jsx';
 export default class ContextMenu extends MegaRenderMixin {
     EVENT_CLOSE = new Event('closeDropdowns');
 
-    constructor(props) {
-        super(props);
-    }
-
     close = callback => {
         if (callback && typeof callback === 'function' && !M.isInvalidUserStatus()) {
             callback();

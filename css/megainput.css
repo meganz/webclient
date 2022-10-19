@@ -360,6 +360,10 @@
     min-width: calc(100% + 16px);
     top: -7px;
 }
+.ps .mega-input .mega-input-dropdown {
+    min-width: auto;
+    position: fixed;
+}
 .mega-input-dropdown .dropdown-scroll {
     max-height: 288px;
     max-width: 100%;

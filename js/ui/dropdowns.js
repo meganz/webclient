@@ -57,7 +57,18 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
             $activeDropdownItem.addClass('active');
             $dropdown.removeClass('hidden');
 
-            
+            // For case select is located under overflow none element, to avoid it is hidden under overflow
+            if ($this.closest('.ps').length) {
+
+                $dropdown.css('min-width', $this.width() + 18);
+
+                $dropdown.position({
+                    of: $this,
+                    my: 'left-9 top-7',
+                    at: 'left top',
+                    collision: 'flipfit'
+                });
+            }
 
             $hiddenInput.trigger('focus');
 

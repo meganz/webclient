@@ -1,8 +1,8 @@
 var React = require("react");
-import {MegaRenderMixin} from "../mixins";
+import {ContactAwareComponent, MegaRenderMixin} from "../mixins";
 import utils, { Emoji } from './../../ui/utils.jsx';
 
-class SharedFileItem extends MegaRenderMixin {
+class SharedFileItem extends ContactAwareComponent {
     render() {
         var self = this;
         var message = this.props.message;
@@ -182,14 +182,18 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
                         const {icon, showThumbnail, isPreviewable} = M.getMediaProperties(node);
 
                         files.push(
-                            <SharedFileItem message={message} key={node.h + "_" + message.messageId}
-                                            isLoading={self.isLoadingMore}
-                                            node={node}
-                                            icon={icon}
-                                            imgId={imgId}
-                                            showThumbnail={showThumbnail}
-                                            isPreviewable={isPreviewable}
-                                            chatRoom={room}/>
+                            <SharedFileItem
+                                message={message}
+                                key={`${node.h}_${message.messageId}`}
+                                isLoading={self.isLoadingMore}
+                                node={node}
+                                icon={icon}
+                                imgId={imgId}
+                                showThumbnail={showThumbnail}
+                                isPreviewable={isPreviewable}
+                                chatRoom={room}
+                                contact={Message.getContactForMessage(message)}
+                            />
                         );
 
                         if (showThumbnail) {

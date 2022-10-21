@@ -177,17 +177,17 @@ featurePages.objectStoragePage = function() {
         "WI": "Wasabi",
         "BB": "Blackblaze"
     };
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     const $registerForm = $('.register-form', $pageBlock);
     const $countryInput = $('.rf-country', $registerForm);
     const $countryDropdown = $('#register-country', $registerForm);
     const $providerDropdown = $('#register-provider', $registerForm);
-    const $inputs = $('.register-form input');
+    const $inputs = $('input', $registerForm);
     $registerForm.eq(currentTab).addClass('display-block'); // Display the current tab
 
     sendCurrencyRequest();
     // event handler for Register button
-    $('.cta').rebind('click', () => {
+    $('.cta', $pageBlock).rebind('click.s4ryip', () => {
         scrollingToRegisterForm();
     });
 
@@ -203,7 +203,7 @@ featurePages.objectStoragePage = function() {
         getProviders(s3Providers);
     }
     // event handler for Current role radio buttons
-    $('.register-role .register-radio-option', $registerForm).rebind('click', function() {
+    $('.register-role .register-radio-option', $registerForm).rebind('click.s4ryip', function() {
         const $radBut = $('.register-radio', this);
         if ($radBut.hasClass('radioOn')) {
             return;
@@ -220,7 +220,7 @@ featurePages.objectStoragePage = function() {
     });
 
     // event handler for radio options yes/no if user ever use S3 storage before
-    $('.register-yesno-radio1 .register-radio-option1', $registerForm).rebind('click', function() {
+    $('.register-yesno-radio1 .register-radio-option1', $registerForm).rebind('click.s4ryip', function() {
         const $radBut = $('.register-radio', this);
         if (!$('.yesno-radio1  .register-form-error', $registerForm).hasClass('hidden')) {
             $('.yesno-radio1 .register-form-error', $registerForm).addClass('hidden');
@@ -239,7 +239,7 @@ featurePages.objectStoragePage = function() {
     });
 
     // event handler for radio options for user to choose storage amount needed
-    $('.register-radio-tb .register-radio-option2', $registerForm).rebind('click', function() {
+    $('.register-radio-tb .register-radio-option2', $registerForm).rebind('click.s4ryip', function() {
         const $radBut = $('.register-radio', this);
         if (!$('.radio-tb  .register-form-error', $registerForm).hasClass('hidden')) {
             $('.radio-tb .register-form-error', $registerForm).addClass('hidden');
@@ -252,7 +252,7 @@ featurePages.objectStoragePage = function() {
     });
 
     // event handler for radio options yes/no if user want to be a beta tester
-    $('.register-yesno-radio2 .register-radio-option3', $registerForm).rebind('click', function() {
+    $('.register-yesno-radio2 .register-radio-option3', $registerForm).rebind('click.s4ryip', function() {
         const $radBut = $('.register-radio', this);
         if (!$('.yesno-radio2  .register-form-error', $registerForm).hasClass('hidden')) {
             $('.yesno-radio2 .register-form-error', $registerForm).addClass('hidden');
@@ -265,14 +265,14 @@ featurePages.objectStoragePage = function() {
     });
 
     // event handlers for Next and Submit buttons
-    $('.next-rform', $registerForm).rebind('click', () => {
+    $('.next-rform', $registerForm).rebind('click.s4ryip', () => {
         if (inputsValidator1()) {
             nextPrev(currentTab);
             currentTab += 1;
             scrollingToRegisterForm();
         }
     });
-    $('.submit-rform', $registerForm).rebind('click', () => {
+    $('.submit-rform', $registerForm).rebind('click.s4ryip', () => {
         if (inputsValidator2()) {
             getFormData(userEmail, betaT, answers);
             sendFormData(currentTab);
@@ -280,7 +280,7 @@ featurePages.objectStoragePage = function() {
     });
 
     // event handler for Country dropdown option
-    $countryDropdown.rebind('click', (event) => {
+    $countryDropdown.rebind('click.s4ryip', (event) => {
         const $target = $(event.target);
         if ($target.hasClass('option')) {
             if ($countryInput.hasClass('error')) {
@@ -296,7 +296,7 @@ featurePages.objectStoragePage = function() {
     });
 
     // event handler for S3 provider dropdown multiple choice
-    $('.option', $providerDropdown).rebind('click', (event) => {
+    $('.option', $providerDropdown).rebind('click.s4ryip', (event) => {
         const $target = $(event.currentTarget);
         if ($('.rf-provider', $registerForm).hasClass('error')) {
             $('.rf-provider', $registerForm).removeClass('error');
@@ -310,7 +310,7 @@ featurePages.objectStoragePage = function() {
         }
 
         const $dropdownItem = $('.option', $providerDropdown);
-        const length = $('.checkboxOn', $dropdownItem).length;
+        const { length } = $('.checkboxOn', $dropdownItem);
         if (length === 1) {
             $('> span', $providerDropdown).text($('.checkboxOn', $dropdownItem).next().text().trim());
         }
@@ -326,14 +326,14 @@ featurePages.objectStoragePage = function() {
     });
 
     // event handler for Back button
-    $('.back-hover', $registerForm).rebind('click', () => {
+    $('.back-hover', $registerForm).rebind('click.s4ryip', () => {
         $registerForm.eq(currentTab).removeClass('display-block');
         currentTab = 0;
         $registerForm.eq(currentTab).addClass('display-block');
     });
 
     // event handler for Privacy agreement checkbox
-    $('.register-agreement-checkbox', $registerForm).rebind('click', () => {
+    $('.register-agreement-checkbox', $registerForm).rebind('click.s4ryip', () => {
         const $checkBox = $('.register-agreement-checkbox .checkdiv', $registerForm);
         if (!$('.register-agreement-checkbox  .register-form-error', $registerForm).hasClass('hidden')) {
             $('.register-agreement-checkbox .register-form-error', $registerForm).addClass('hidden');
@@ -356,7 +356,7 @@ function renderCountry(localCountry) {
     "use strict";
     let html = '';
     let sel = '';
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     const $registerForm = $('.register-form', $pageBlock);
     const $country = $('#register-country', $registerForm);
     $('span', $country).text(l.ri_s4_regf_country);
@@ -388,7 +388,7 @@ function renderCountry(localCountry) {
 function getProviders(s3Providers) {
     "use strict";
     let html = '';
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     const $registerForm = $('.register-form', $pageBlock);
     const $s3Provider = $('#register-provider', $registerForm);
     $('span', $s3Provider).text('Amazon');
@@ -417,7 +417,7 @@ function getProviders(s3Providers) {
  */
 function nextPrev(n) {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     const $registerForm = $('.register-form', $pageBlock);
     $registerForm.eq(n).removeClass('display-block');
     if (++n >= $registerForm.length) {
@@ -433,7 +433,7 @@ function nextPrev(n) {
  */
 function setCurrency(currency1000, currency299) {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     l.ri_s4_subheader = l.ri_s4_subheader
         .replace('&#8364 1,000', currency1000);
     $('.objectstorage-p-subheader', $('.header-block', $pageBlock)).text("").safeAppend(l.ri_s4_subheader);
@@ -451,7 +451,7 @@ function setCurrency(currency1000, currency299) {
  */
 function sendCurrencyRequest() {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     let currency1000 = "&#8364 1,000";
     let currency299 = "&#8364 2.99";
     let localCountry = '';
@@ -462,7 +462,7 @@ function sendCurrencyRequest() {
                                           'symbol', true);
             currency299 = formatCurrency(result[1].value.amount, result[1].value.name,
                                          'symbol', true);
-            const country = result[1].value.country;
+            const { country } = result[1].value;
             localCountry = M.getCountries()[country];
             setCurrency(currency1000, currency299);
             if (is_mobile) {
@@ -492,25 +492,27 @@ function sendCurrencyRequest() {
 function buildDropDownList($list, providers) {
     "use strict";
     let options = '';
-    const list = providers ? providers : M.getCountries();
+    const list = providers || M.getCountries();
     for (const item in list) {
-        const itemName = list[item];
-        let template = providers ?
-            `<div class="mobile provider-list-item js-provider-list-item s3provider-checkbox"
+        if (list[item]) {
+            const itemName = list[item];
+            let template = providers ?
+                `<div class="mobile provider-list-item js-provider-list-item s3provider-checkbox"
                     data-provider-name="${itemName}">
                     <div class="checkdiv checkboxOff" id="s3provider-checkbox-${item}"></div>
                     <label class="mobile provider-name js-provider-name s3provider-label">${itemName}</label>
              </div>` : `<div class="mobile country-list-item js-country-list-item" data-country-name="${itemName}">
                             <div class="mobile country-name js-country-name">${itemName}</div>
                         </div>`;
-        if (providers && item === 'AM') {
-            template = `<div class="mobile provider-list-item js-provider-list-item s3provider-checkbox"
+            if (providers && item === 'AM') {
+                template = `<div class="mobile provider-list-item js-provider-list-item s3provider-checkbox"
                     data-provider-name="${itemName}">
                     <div class="checkdiv checkboxOn" id="s3provider-checkbox-${item}"></div>
                     <label class="mobile provider-name js-provider-name s3provider-label">${itemName}</label>
              </div>`;
+            }
+            options += template;
         }
-        options += template;
     }
     $list.safeAppend(options);
 }
@@ -520,17 +522,17 @@ function buildDropDownList($list, providers) {
  */
 function initCountryNameClickHandler() {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
+    const $fileManagerHolder = $('.fmholder', '.mobile');
     const $registerForm = $('.register-form', $pageBlock);
     const $countriesInput = $('.js-country-input', $registerForm);
-    const $countrySelectorDialog = $('.objectstorage-mobile.js-country-selector');
-    const $backgroundOverlay = $('.dark-overlay');
+    const $countrySelectorDialog = $('.objectstorage-mobile.js-country-selector', $fileManagerHolder);
+    const $backgroundOverlay = $('.dark-overlay', $fileManagerHolder);
     const $countryList = $('.js-country-list', $countrySelectorDialog);
     const $countryInput = $('.rf-country', $registerForm);
-    const $fileManagerHolder = $('.mobile .fmholder');
 
     // On tapping the country name
-    $('.js-country-list-item', $countryList).rebind('tap', function() {
+    $('.js-country-list-item', $countryList).rebind('tap.s4ryip', function() {
 
         // Get the country name
         const countryName = $(this).attr('data-country-name');
@@ -561,13 +563,13 @@ function initCountryNameClickHandler() {
  */
 function initCountryPickerCancelButton() {
     "use strict";
-    const $countrySelectorDialog = $('.objectstorage-mobile.js-country-selector');
-    const $backgroundOverlay = $('.dark-overlay');
-    const $cancelButton = ('.js-cancel-country-selection', $countrySelectorDialog);
-    const $fileManagerHolder = $('.mobile .fmholder');
+    const $fileManagerHolder = $('.fmholder', '.mobile');
+    const $countrySelectorDialog = $('.objectstorage-mobile.js-country-selector', $fileManagerHolder);
+    const $backgroundOverlay = $('.dark-overlay', $fileManagerHolder);
+    const $cancelButton = $('.js-cancel-country-selection', $countrySelectorDialog);
 
     // Initialise the Cancel button
-    $cancelButton.rebind('tap', () => {
+    $cancelButton.rebind('tap.s4ryip', () => {
 
         // Hide the background overlay and dialog
         $backgroundOverlay.addClass('hidden');
@@ -585,14 +587,14 @@ function initCountryPickerCancelButton() {
  */
 function initCountryPickerOpenHandler() {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     const $registerForm = $('.register-form', $pageBlock);
-    const $countrySelectorDialog = $('.objectstorage-mobile.js-country-selector');
-    const $backgroundOverlay = $('.dark-overlay');
-    const $fileManagerHolder = $('.mobile .fmholder');
+    const $fileManagerHolder = $('.fmholder', '.mobile');
+    const $countrySelectorDialog = $('.objectstorage-mobile.js-country-selector', $fileManagerHolder);
+    const $backgroundOverlay = $('.dark-overlay', $fileManagerHolder);
 
     // On tapping the country container
-    $('.rf-country', $registerForm).rebind('tap', () => {
+    $('.rf-country', $registerForm).rebind('tap.s4ryip', () => {
 
         // Show the background overlay and dialog
         $backgroundOverlay.removeClass('hidden');
@@ -610,14 +612,14 @@ function initCountryPickerOpenHandler() {
  */
 function initProviderNameClickHandler() {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     const $registerForm = $('.register-form', $pageBlock);
     const $providerDropdown = $('#register-provider', $registerForm);
-    const $providerSelectorDialog = $('.objectstorage-mobile.js-provider-selector');
+    const $providerSelectorDialog = $('.objectstorage-mobile.js-provider-selector', '.fm-holder');
     const $providerList = $('.js-provider-list', $providerSelectorDialog);
 
     // On tapping the provider name
-    $('.js-provider-list-item', $providerList).rebind('tap', function() {
+    $('.js-provider-list-item', $providerList).rebind('tap.s4ryip', function() {
         let providerName = '';
         if ($('.rf-provider', $registerForm).hasClass('error')) {
             $('.rf-provider', $registerForm).removeClass('error');
@@ -630,7 +632,7 @@ function initProviderNameClickHandler() {
             $(this).children(':first').removeClass('checkboxOff').addClass('checkboxOn');
         }
 
-        const length = $('.checkboxOn', $providerList).length;
+        const { length } = $('.checkboxOn', $providerList);
         if (length === 1) {
             providerName = $('.checkboxOn', $providerList).next().text().trim();
             $('span', $providerDropdown).text(providerName);
@@ -661,13 +663,14 @@ function initProviderNameClickHandler() {
  */
 function initProviderPickerOkButton() {
     "use strict";
-    const $providerSelectorDialog = $('.objectstorage-mobile.js-provider-selector');
-    const $backgroundOverlay = $('.dark-overlay');
-    const $okButton = ('.js-cancel-provider-selection', $providerSelectorDialog);
-    const $fileManagerHolder = $('.mobile .fmholder');
+    const $fileManagerHolder = $('.fmholder', '.mobile');
+    const $providerSelectorDialog = $('.objectstorage-mobile.js-provider-selector', $fileManagerHolder);
+    const $backgroundOverlay = $('.dark-overlay', $fileManagerHolder);
+    const $okButton = $('.js-cancel-provider-selection', $providerSelectorDialog);
+
 
     // Initialise the OK button
-    $okButton.rebind('tap', () => {
+    $okButton.rebind('tap.s4ryip', () => {
 
         // Hide the background overlay and dialog
         $backgroundOverlay.addClass('hidden');
@@ -685,14 +688,14 @@ function initProviderPickerOkButton() {
  */
 function initProviderPickerOpenHandler() {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
+    const $fileManagerHolder = $('.fmholder', '.mobile');
     const $registerForm = $('.register-form', $pageBlock);
-    const $providerSelectorDialog = $('.objectstorage-mobile.js-provider-selector');
-    const $backgroundOverlay = $('.dark-overlay');
-    const $fileManagerHolder = $('.mobile .fmholder');
+    const $providerSelectorDialog = $('.objectstorage-mobile.js-provider-selector', $fileManagerHolder);
+    const $backgroundOverlay = $('.dark-overlay', $fileManagerHolder);
 
     // On tapping the country container
-    $('.rf-provider', $registerForm).rebind('tap', () => {
+    $('.rf-provider', $registerForm).rebind('tap.s4ryip', () => {
 
         // Show the background overlay and dialog
         $backgroundOverlay.removeClass('hidden');
@@ -711,9 +714,9 @@ function initProviderPickerOpenHandler() {
  */
 function mobileRenderCountry(localCountry) {
     "use strict";
-    const $countrySelectorDialog = $('.objectstorage-mobile.js-country-selector');
+    const $countrySelectorDialog = $('.objectstorage-mobile.js-country-selector', '.fmholder');
     const $countryList = $('.js-country-list', $countrySelectorDialog);
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     const $registerForm = $('.register-form', $pageBlock);
     if (localCountry && localCountry !== '') {
         $('span', $('#register-country', $registerForm)).text(localCountry);
@@ -731,7 +734,7 @@ function mobileRenderCountry(localCountry) {
  */
 function mobileRenderProvider(s3Providers) {
     "use strict";
-    const $providerSelectorDialog = $('.objectstorage-mobile.js-provider-selector');
+    const $providerSelectorDialog = $('.objectstorage-mobile.js-provider-selector', '.fmholder');
     const $providerList = $('.js-provider-list', $providerSelectorDialog);
     buildDropDownList($providerList, s3Providers);
     initProviderNameClickHandler();
@@ -748,7 +751,7 @@ function mobileRenderProvider(s3Providers) {
  */
 function getFormData(userEmail, betaT, answers) {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     const $registerForm = $('.register-form', $pageBlock);
     const $emailInput = $('.rf-email', $registerForm);
     userEmail = $emailInput.val().trim();
@@ -774,7 +777,7 @@ function getFormData(userEmail, betaT, answers) {
     else if ($('#rad1yes', $registerForm).hasClass('radioOn')) {
         const $dropdownItem = $('.dropdown-scroll', $('.rf-provider', $registerForm));
         const $checkboxOnDropDown = $('.checkboxOn', $dropdownItem);
-        const length = $checkboxOnDropDown.length;
+        const { length } = $checkboxOnDropDown;
         if (length === 1) {
             s3providers = $checkboxOnDropDown.next().text().trim();
         }
@@ -814,16 +817,16 @@ function getFormData(userEmail, betaT, answers) {
 /**
  * Send survey form data
  * @param {Number} currentTab Current tab number, number to decide which tab should be shown
- * @returns {void}
+ * @returns {void|boolean} void/failed
  */
 function sendFormData(currentTab) {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     const $registerForm = $('.register-form', $pageBlock);
     const campaingData = {};
-    const answers = featurePages.objectStoragePage.answers;
-    const length = answers.length;
-    if (!featurePages.objectStoragePage.userEmail || !length) {
+    const { answers, betaT, userEmail } = featurePages.objectStoragePage;
+    const { length } = answers;
+    if (!userEmail || !length) {
         return false;
     }
     for (let i = 0; i < length; i++) {
@@ -831,9 +834,9 @@ function sendFormData(currentTab) {
     }
     const request = {
         a: 'mrs',   // "marketing record survey"
-        e: featurePages.objectStoragePage.userEmail, // email address of the user
+        e: userEmail, // email address of the user
         c: 4294967295, // this is a campaign id
-        l: featurePages.objectStoragePage.betaT,
+        l: betaT,
         // beta tester identifier, "Y" if user wants to be a beta tester and "N" if not
         d: campaingData
     };
@@ -858,7 +861,7 @@ function sendFormData(currentTab) {
  * @returns {Boolean}   whether the validation passed or not*/
 function inputsValidator1() {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-pages');
     const $registerForm = $('.register-form', $pageBlock);
     const $countryInput = $('.rf-country', $registerForm);
     const $emailInput = $('.rf-email', $registerForm);
@@ -939,7 +942,7 @@ function inputsSubValidator($emailInput, $lnameInput, $fnameInput) {
  * @returns {Boolean}   whether the validation passed or not*/
 function inputsValidator2() {
     "use strict";
-    const $pageBlock = $('.feature-page.objectstorage');
+    const $pageBlock = $('.feature-page.objectstorage', '.bottom-page');
     const $registerForm = $('.register-form', $pageBlock);
 
     let passed = true;

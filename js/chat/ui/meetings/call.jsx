@@ -270,12 +270,14 @@ export default class Call extends MegaRenderMixin {
             if (this.state.stayOnEnd !== !!mega.config.get('callemptytout')) {
                 this.setState({ stayOnEnd: !!mega.config.get('callemptytout') });
             }
-            if (!this.state.everHadPeers) {
-                this.setState({everHadPeers: true});
-            }
-            if (this.callStartTimeout) {
-                clearTimeout(this.callStartTimeout);
-                delete this.callStartTimeout;
+            if (call.hasOtherParticipant()) {
+                if (!this.state.everHadPeers) {
+                    this.setState({everHadPeers: true});
+                }
+                if (this.callStartTimeout) {
+                    clearTimeout(this.callStartTimeout);
+                    delete this.callStartTimeout;
+                }
             }
         });
         chatRoom.rebind('onCallLeft.callComp', () => this.props.minimized && this.props.onCallEnd());
@@ -597,7 +599,10 @@ export default class Call extends MegaRenderMixin {
         ['reconnecting', 'end_call'].map(sound => ion.sound.preload(sound));
         this.callStartTimeout = setTimeout(() => {
             const { call } = this.props;
-            if (!mega.config.get('callemptytout') && !call.peers.length) {
+            if (
+                !mega.config.get('callemptytout')
+                && !call.hasOtherParticipant()
+            ) {
                 call.left = true;
                 call.initCallTimeout();
                 if (!Call.isExpanded()) {
@@ -607,8 +612,9 @@ export default class Call extends MegaRenderMixin {
             delete this.callStartTimeout;
         }, 300 * 1000);
         setTimeout(() => {
-            const peers = this.props.call.peers;
-            if (peers && peers.length) {
+            const { call } = this.props;
+            const peers = call.peers;
+            if (peers && peers.length && !call.hasOtherParticipant()) {
                 this.setState({everHadPeers: true});
             }
         }, 2000);
@@ -623,6 +629,7 @@ export default class Call extends MegaRenderMixin {
         const STREAM_PROPS = {
             mode, streams, sidebar, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
             everHadPeers,
+            hasOtherParticipants: call.hasOtherParticipant(),
             isOnHold: sfuApp.sfuClient.isOnHold(), onSpeakerChange: this.handleSpeakerChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm,
         };

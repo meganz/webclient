@@ -59,6 +59,7 @@ RepayPage.prototype.initPage = function() {
     const $paymentBlock = $('.bus-reg-radio-block', $leftSection);
 
     const $repayBtn = $('.repay-btn', $repaySection).addClass('disabled');
+    const $revertToFreeBtn = $('.revert-to-free-btn', $repaySection);
 
     $('.bus-reg-agreement.mega-terms .bus-reg-txt', $leftSection).safeHTML(l['208s']);
 
@@ -70,6 +71,42 @@ RepayPage.prototype.initPage = function() {
         $('.business-plan-title', $rightSection).text(l.pro_flexi_name);
         $('.bus-reg-agreement.ok-to-auto .radio-txt', $leftSection).text(l.setup_monthly_payment_pro_flexi);
         $('.dialog-subtitle', $repaySection).text(l.reactivate_pro_flexi_subscription);
+
+        // Show the 'Revert to free account' button and add click handler for it
+        $revertToFreeBtn.removeClass('hidden');
+        $revertToFreeBtn.rebind('click.revert', () => {
+
+            const title = l.revert_to_free_confirmation_question;
+            const message = l.revert_to_free_confirmation_info;
+
+            if (is_mobile) {
+                parsepage(pages.mobile);
+            }
+
+            msgDialog('confirmation', '', title, message, (e) => {
+                if (e) {
+                    loadingDialog.show();
+
+                    // Downgrade the user to Free
+                    M.req({ a: 'urpf', r: 1 })
+                        .catch(dump)
+                        .finally(() => {
+
+                            // Reset account cache so all account data will be refetched
+                            if (M.account) {
+                                M.account.lastupdate = 0;
+                            }
+
+                            loadSubPage('fm/account/plan');
+                        });
+                }
+                else if (is_mobile) {
+
+                    // Close button for mobile we need to reload as loadSubPage on the same page doesn't work
+                    location.reload();
+                }
+            });
+        });
     }
 
     // event handler for repay button

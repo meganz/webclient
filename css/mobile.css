@@ -11957,7 +11957,10 @@ code, c {
     border-right: none;
     padding: 8px;
 }
-.mobile .repay-btn.small-view-btn {
+.mobile .main-mid-pad.bus-repay .repay-btn.small-view-btn {
+    display: block;
+}
+.mobile .main-mid-pad.bus-repay .revert-to-free-btn.small-view-btn {
     display: block;
 }
 .card-container.bus-repay .account-info-icon {
@@ -11965,6 +11968,15 @@ code, c {
     --mask-color: var(--text-color-high);
     display: inline-block;
     vertical-align: middle;
+}
+
+@media only screen and (min-width: 801px) {
+    .mobile .main-mid-pad.bus-repay .repay-btn.small-view-btn {
+        display: none;
+    }
+    .mobile .main-mid-pad.bus-repay .revert-to-free-btn.small-view-btn {
+        display: none;
+    }
 }
 
 @media only screen and (min-width: 882px) {
@@ -12015,9 +12027,6 @@ code, c {
     }
     .mobile .main-mid-pad.bus-repay .section-wrapper:last-child .disabled {
         opacity: 0.5;
-    }
-    .mobile .repay-btn.small-view-btn {
-        display: none;
     }
 }
 /** Password Reminder Overlay **/

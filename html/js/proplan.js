@@ -1670,6 +1670,7 @@ var showSignupPromptDialog = function() {
         });
         signupPromptDialog.rebind('onBeforeShow', function() {
 
+            this.$dialog.addClass('with-close-btn');
             // custom buttons, because of the styling
             $('header p', this.$dialog)
                 .safeHTML('@@', l[5842]);
@@ -1704,13 +1705,14 @@ var showSignupPromptDialog = function() {
 
             var $selectedPlan = $('.pricing-page.plan.selected', 'body');
 
-            $(this.$dialog).addClass('pro' + $selectedPlan.data('payment'));
+            this.$dialog.addClass(`pro${$selectedPlan.data('payment')}`);
         });
 
         signupPromptDialog.rebind('onHide', function() {
+            this.$dialog.removeClass('with-close-btn');
 
             // Set default icon
-            $(this.$dialog).removeClass('pro1 pro2 pro3 pro4');
+            this.$dialog.removeClass('pro1 pro2 pro3 pro4');
         });
     }
 

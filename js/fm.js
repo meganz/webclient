@@ -257,6 +257,7 @@ function initAddDialogMultiInputPlugin() {
         scrollLocation: 'add',
         // Exclude from dropdownlist only emails/names which exists in multi-input (tokens)
         excludeCurrent: false,
+        tokenLimit: 500,
         onEmailCheck: function() {
             errorMsg(l[7415]);
         },
@@ -2621,6 +2622,10 @@ function showLoseChangesWarning() {
         // Warn user closing dialog will lose all inserted input
         msgDialog('confirmation', '', l[20474], l[18229], function(e) {
             if (e) {
+                const $tokenObj = $('.add-contact-multiple-input');
+                if ($tokenObj.tokenInput('getSettings')) {
+                    $tokenObj.data('tokenInputObject').clearOnCancel();
+                }
                 $tokenItems.remove();
                 promise.resolve();
             }

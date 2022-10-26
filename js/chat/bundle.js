@@ -9679,6 +9679,7 @@ class IncSharesAccordionPanel extends mixins.wl {
   }
   render() {
     var self = this;
+    var room = self.props.chatRoom;
     var contactHandle = self.getContactHandle();
     var contents = null;
     if (this.props.expanded) {
@@ -14034,7 +14035,7 @@ class ConversationsApp extends mixins.wl {
       }
       var $target = $(e.target);
       if (megaChat.currentlyOpenedChat) {
-        if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $target.closest('.mega-dialog').length > 0 || document.querySelector('textarea:focus,select:focus,input:focus')) {
+        if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $target.closest('.mega-dialog').length > 0 || document.querySelector('textarea:focus,select:focus,input:focus') || window.getSelection().toString()) {
           return;
         }
         var $typeArea = $('.messages-textarea:visible:first');
@@ -23357,7 +23358,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
     chatGlobalEventManager.removeEventListener('resize', 'typingArea' + self.getUniqueId());
   }
   componentDidUpdate() {
-    if (this.isComponentEventuallyVisible() && $(document.querySelector('textarea:focus,select:focus,input:focus')).filter(":visible").length === 0) {
+    if (this.isComponentEventuallyVisible() && !window.getSelection().toString() && $('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
       this.focusTypeArea();
     }
     this.updateScroll();

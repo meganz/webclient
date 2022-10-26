@@ -1128,8 +1128,8 @@ var page;
 window.redirect = ['about', 'achievements', 'android', 'bird', 'business', 'chrome', 'cmd',
                    'contact', 'collaboration', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
                    'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
-                   'mobile', 'nas', 'objectstorage', 'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat', 'security',
-                   'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
+                   'mobile', 'nas', 'objectstorage', 'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat',
+                   'security', 'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
 var isStaticPage = function(page) {
     'use strict';
     if (page) {

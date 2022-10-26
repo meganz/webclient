@@ -531,15 +531,13 @@ class ThumbManager extends LRUMap {
         }
 
         if (this.db && handles.length) {
-            const found = await this.db.find(handles);
-            const send = (h) => this.db.get(h).then(ab => loadend(h, ab));
+            const send = async(h, ab) => loadend(h, ab);
+            const found = await this.db.bulkGet(handles).catch(dump) || false;
 
-            for (let i = 0; i < found.length; ++i) {
-                const h = found[i];
-                const n = M.getNodeByHandle(h);
+            for (const h in found) {
 
-                if (each(n, h)) {
-                    send(h);
+                if (each(h)) {
+                    send(h, found[h]).catch(dump);
                 }
             }
         }

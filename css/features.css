@@ -1122,7 +1122,7 @@ body.rtl .feature-page * {
 
     .feature-page.objectstorage .content-two-column .register-interest .register-subheader {
         color: #1D1D1D;
-        font-family: "LatoWebSemiBold", Arial, sans-serif;
+        font-family: LatoWebSemiBold, Arial, sans-serif;
         font-size: 18px;
         letter-spacing: 0;
         line-height: 26px;

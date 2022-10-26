@@ -4558,6 +4558,9 @@ input.summary-ff-name.error {
     -webkit-border-radius: 100%;
     border-radius: 100%;
 }
+.delete-contact .verified_icon i.verified-user-icon {
+    display: block;
+}
 .fm-del-contacts-number {
     display: none;
 }

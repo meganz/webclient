@@ -9423,7 +9423,7 @@ var _dec, _class;
 var sharedFilesAccordionPanel_React = __webpack_require__(363);
 
 
-class SharedFileItem extends mixins.wl {
+class SharedFileItem extends mixins._p {
   render() {
     var self = this;
     var message = this.props.message;
@@ -9594,14 +9594,15 @@ let SharedFilesAccordionPanel = (_dec = utils.ZP.SoonFcWrap(350), (_class = clas
             } = M.getMediaProperties(node);
             files.push(sharedFilesAccordionPanel_React.createElement(SharedFileItem, {
               message: message,
-              key: node.h + "_" + message.messageId,
+              key: `${node.h}_${message.messageId}`,
               isLoading: self.isLoadingMore,
               node: node,
               icon: icon,
               imgId: imgId,
               showThumbnail: showThumbnail,
               isPreviewable: isPreviewable,
-              chatRoom: room
+              chatRoom: room,
+              contact: Message.getContactForMessage(message)
             }));
             if (showThumbnail) {
               self.allShownNodes.set(node.fa, node);

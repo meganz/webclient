@@ -467,9 +467,11 @@ export class TypingArea extends MegaRenderMixin {
 
     componentDidUpdate() {
 
-        if (this.isComponentEventuallyVisible() && $(
-                document.querySelector('textarea:focus,select:focus,input:focus')
-            ).filter(":visible").length === 0) {
+        if (
+            this.isComponentEventuallyVisible()
+            && !window.getSelection().toString()
+            && $('textarea:focus,select:focus,input:focus').filter(":visible").length === 0
+        ) {
             // no other element is focused...
             this.focusTypeArea();
         }

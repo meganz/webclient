@@ -15,6 +15,18 @@ var closeStripeDialog = () => {
     $(document).off('keydown.stripeDialog');
 };
 
+var resizeDlgScrollBar = function($targetDialog) {
+    'use strict';
+
+    const $contentSection = $('section.content', $targetDialog);
+    if ($contentSection.is('.ps')) {
+        Ps.update($contentSection[0]);
+    }
+    else {
+        Ps.initialize($contentSection[0]);
+    }
+};
+
 /**
  * Code for the AstroPay dialog on the second step of the Pro page
  */
@@ -136,6 +148,14 @@ var astroPayDialog = {
         if (is_mobile) {
             this.$propayPage.addClass('hidden');
         }
+
+        if (!is_mobile) {
+            // Keep the ps scrollbar block code after remove the hidden class from the dialog
+            // so that it shows the scrollbar initially
+            resizeDlgScrollBar(this.$dialog);
+
+            $(window).rebind('resize.billAddressDlg', resizeDlgScrollBar.bind(null, this.$dialog));
+        }
     },
 
     /**
@@ -149,6 +169,9 @@ var astroPayDialog = {
         // Show the Propage page
         if (is_mobile) {
             this.$propayPage.removeClass('hidden');
+        }
+        else {
+            $(window).unbind('resize.billAddressDlg');
         }
     },
 
@@ -1447,16 +1470,6 @@ var addressDialog = {
         this.cityMegaInput = new mega.ui.MegaInputs($('.city', this.$dialog));
         this.postCodeMegaInput = new mega.ui.MegaInputs($('.postcode', this.$dialog));
         this.taxCodeMegaInput = new mega.ui.MegaInputs($('.taxcode', this.$dialog));
-
-        const resizeDlgScrollBar = function($targetDialog) {
-            const $contentSection = $('section.content', $targetDialog);
-            if ($contentSection.is('.ps')) {
-                Ps.update($contentSection[0]);
-            }
-            else {
-                Ps.initialize($contentSection[0]);
-            }
-        };
 
         if (!is_mobile) {
             // Keep the ps scrollbar block code after remove the hidden class from the dialog

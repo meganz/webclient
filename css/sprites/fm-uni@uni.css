@@ -653,6 +653,9 @@
 .sprite-fm-uni.icon-union-pay, .sprite-fm-uni-before.icon-union-pay-before::before, .sprite-fm-uni-after.icon-union-pay-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-union-pay");
 }
+.sprite-fm-uni.icon-upgrade-to-pro, .sprite-fm-uni-before.icon-upgrade-to-pro-before::before, .sprite-fm-uni-after.icon-upgrade-to-pro-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-upgrade-to-pro");
+}
 .sprite-fm-uni.icon-url-24, .sprite-fm-uni-before.icon-url-24-before::before, .sprite-fm-uni-after.icon-url-24-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-url-24");
 }

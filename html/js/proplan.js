@@ -1514,7 +1514,15 @@ function startOldProLogin(email, password, pinCode, rememberMe) {
 
     'use strict';
 
-    postLogin(email, password, pinCode, rememberMe, completeProLogin);
+    postLogin(email, password, pinCode, rememberMe, (result) => {
+
+        // Check if we can upgrade the account to v2
+        security.login.checkToUpgradeAccountVersion(result, u_k, password, () => {
+
+            // Otherwise proceed with regular login
+            completeProLogin(result);
+        });
+    });
 }
 
 /**

@@ -462,7 +462,10 @@ Chat.prototype.initChatUIFlagsManagement = function() {
             if (self.loadChatUIFlagsFromConfig(v)) {
                 self.chatUIFlags.trackDataChange(0xDEAD);
             }
-        }))
+        })),
+        mBroadcaster.addListener('statechange', state => {
+            this.trigger('viewstateChange', state);
+        })
     );
 };
 

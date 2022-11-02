@@ -612,7 +612,9 @@ Chat.prototype.initChatUIFlagsManagement = function () {
     if (self.loadChatUIFlagsFromConfig(v)) {
       self.chatUIFlags.trackDataChange(0xDEAD);
     }
-  })));
+  })), mBroadcaster.addListener('statechange', state => {
+    this.trigger('viewstateChange', state);
+  }));
 };
 Chat.prototype.unregisterUploadListeners = function (destroy) {
   'use strict';
@@ -21907,6 +21909,21 @@ class Giphy extends AbstractGenericMessage {
       src: undefined
     };
   }
+  componentDidMount() {
+    super.componentDidMount();
+    megaChat.rebind(`viewstateChange.gif${this.getUniqueId()}`, e => {
+      const {
+        state
+      } = e.data;
+      if (state === 'active' && this.gifRef.current.paused || state !== 'active' && !this.gifRef.current.paused) {
+        this.toggle();
+      }
+    });
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    megaChat.off(`viewstateChange.gif${this.getUniqueId()}`);
+  }
   onVisibilityChange(isIntersecting) {
     this.setState({
       src: isIntersecting ? gifPanel.bl.convert(this.props.message.meta.src) : undefined
@@ -23311,6 +23328,25 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
     chatGlobalEventManager.addEventListener('resize', `typingArea${this.getUniqueId()}`, () => this.handleWindowResize());
     this.triggerOnUpdate(true);
     this.updateScroll();
+    megaChat.rebind(`viewstateChange.gifpanel${this.getUniqueId()}`, e => {
+      const {
+        gifPanelActive
+      } = this.state;
+      const {
+        state
+      } = e.data;
+      if (state === 'active' && !gifPanelActive && this.gifResume) {
+        this.setState({
+          gifPanelActive: true
+        });
+        delete this.gifResume;
+      } else if (state !== 'active' && gifPanelActive && !this.gifResume) {
+        this.gifResume = true;
+        this.setState({
+          gifPanelActive: false
+        });
+      }
+    });
   }
   componentWillMount() {
     const {
@@ -23357,6 +23393,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       megaChat.plugins.persistedTypeArea.removeChangeListener(self.getUniqueId());
     }
     chatGlobalEventManager.removeEventListener('resize', 'typingArea' + self.getUniqueId());
+    megaChat.off(`viewstateChange.gifpanel${this.getUniqueId()}`);
   }
   componentDidUpdate() {
     if (this.isComponentEventuallyVisible() && !window.getSelection().toString() && $('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
@@ -23542,9 +23579,12 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
                 `
     }, this.state.gifPanelActive && external_React_default().createElement(gifPanel.ZP, {
       chatRoom: this.props.chatRoom,
-      onToggle: () => this.setState({
-        gifPanelActive: false
-      })
+      onToggle: () => {
+        this.setState({
+          gifPanelActive: false
+        });
+        delete this.gifResume;
+      }
     }), external_React_default().createElement("div", {
       className: `
                         chat-textarea
@@ -23558,9 +23598,12 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
                             `,
       icon: "small-icon gif",
       disabled: this.props.disabled,
-      onClick: () => this.setState(state => ({
-        gifPanelActive: !state.gifPanelActive
-      }))
+      onClick: () => this.setState(state => {
+        delete this.gifResume;
+        return {
+          gifPanelActive: !state.gifPanelActive
+        };
+      })
     }), external_React_default().createElement(ui_buttons.z, {
       className: "popup-button emoji-button",
       icon: "sprite-fm-theme icon-emoji",

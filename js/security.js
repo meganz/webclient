@@ -82,7 +82,7 @@ var security = {
      * These values are needed for when registering, changing the user's password, recovering with Master Key and
      * for parking the user's account.
      * @param {String} password The password from the user
-     * @param {Array} masterKeyArray32 The unencrypted Master Key
+     * @param {String} masterKeyArray32 The user's Master Key
      * @param {Function} completeCallback The function to be run after the keys are created which will pass the
      *                                    the clientRandomValueBytes, encryptedMasterKeyArray32,
      *                                    hashedAuthenticationKeyBytes
@@ -1198,7 +1198,7 @@ security.login = {
 
     /**
      * Sets some session variables and skips to the RSA Key Generation page and process
-     * @param {Array} masterKeyArray32 The unencrypted Master Key
+     * @param {Array} masterKeyArray32 The raw unencrypted Master Key
      * @param {String} temporarySessionIdBase64 The temporary session ID send from the API
      */
     skipToGenerateRsaKeys: function(masterKeyArray32, temporarySessionIdBase64) {
@@ -1223,7 +1223,7 @@ security.login = {
 
     /**
      * Decrypts the RSA private key and the RSA encrypted session ID
-     * @param {Array} masterKeyArray32 The unencrypted Master Key
+     * @param {Array} masterKeyArray32 The raw unencrypted Master Key
      * @param {String} encryptedSessionIdBase64 The encrypted session ID as a Base64 string
      * @param {String} encryptedPrivateRsaKeyBase64 The private RSA key as a Base64 string
      * @param {String} userHandle The encrypted user handle from the 'us' response
@@ -1319,7 +1319,7 @@ security.login = {
      * Set the session variables and complete the login
      * @param {Array} keyAndSessionData A basic array consisting of:
      *     [
-     *        {Array} The unencrypted Master Key,
+     *        {Array} The raw unencrypted Master Key,
      *        {String} The decrypted Session ID as a Base64 string,
      *        {Array} The decoded RSA Private Key as an array of parts
      *     ]
@@ -1440,83 +1440,6 @@ security.login = {
             // Not applicable to this function
             return false;
         }
-    },
-
-    /**
-     * Silently upgrades a user's account from version 1 to the improved version 2 format (which has a per user salt)
-     * and using the user's existing password. This is a general security improvement to upgrade all legacy users to
-     * the latest account format when they log in.
-     * @param {Number} loginResult The result from the v1 postLogin function which returns from u_checklogin3a
-     * @param {Array} masterKey The unencrypted Master Key as an array of Int32 values
-     * @param {String} password The current password from the user entered at login
-     * @param {Function} completeLoginCallback The function to continue the login success (or failure) flow
-     * @returns {void}
-     */
-    checkToUpgradeAccountVersion: function(loginResult, masterKey, password, completeLoginCallback) {
-
-        'use strict';
-
-        // Double check that: 1) not currently in registration signup, 2) account version is v1 and 3) login succeeded
-        if (!confirmok && typeof u_attr === 'object' && u_attr.aav === 1 && loginResult !== false && loginResult >= 0) {
-
-            // Show a console message in case it will take a while
-            if (d) {
-                console.info('Attempting to perform account version upgrade to v2...');
-            }
-
-            // Create the Client Random Value, re-encrypt the Master Key and create the Hashed Authentication Key
-            security.deriveKeysFromPassword(password, masterKey, (crvBytes, encryptedMasterKey, hakBytes) => {
-
-                // Convert to Base64
-                const encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKey);
-                const hashedAuthenticationKeyBase64 = ab_to_base64(hakBytes);
-                const clientRandomValueBase64 = ab_to_base64(crvBytes);
-                const saltBase64 = ab_to_base64(security.createSalt(crvBytes));
-
-                // Prepare the Account Version Upgrade (avu) request
-                const requestParams = {
-                    a: 'avu',
-                    emk: encryptedMasterKeyBase64,
-                    hak: hashedAuthenticationKeyBase64,
-                    crv: clientRandomValueBase64
-                };
-
-                // Send API request to change password
-                api_req(requestParams, {
-                    callback: (result) => {
-
-                        // If successful
-                        if (result === 0) {
-
-                            // Update global user attributes (key, salt and version) because the
-                            // 'ug' request is not re-done, nor are action packets sent for this
-                            u_attr.k = encryptedMasterKeyBase64;
-                            u_attr.aas = saltBase64;
-                            u_attr.aav = 2;
-
-                            // Log to console
-                            if (d) {
-                                console.info('Account version upgrade to v2 successful.');
-                            }
-
-                            // Log to Stats (to know how many are successfully upgraded)
-                            eventlog(99770, true);
-                        }
-                        else {
-                            // Log failures as well (to alert us of bugs)
-                            eventlog(99771, true);
-                        }
-
-                        // If not successful, it will attempt again on next login, continue to update UI
-                        completeLoginCallback(result);
-                    }
-                });
-            });
-        }
-        else {
-            // Otherwise continue to the rest of the login flow (including error handling) without upgrading
-            completeLoginCallback();
-        }
     }
 };
 
@@ -1537,10 +1460,9 @@ security.changePassword = {
         'use strict';
 
         // Otherwise change the password using the old method
-        const newPasswordTrimmed = $.trim(newPassword);
-        const pw_aes = new sjcl.cipher.aes(prepare_key_pw(newPasswordTrimmed));
-        const encryptedMasterKeyBase64 = a32_to_base64(encrypt_key(pw_aes, u_k));
-        const userHash = stringhash(u_attr.email.toLowerCase(), pw_aes);
+        var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newPassword));
+        var encryptedMasterKeyBase64 = a32_to_base64(encrypt_key(pw_aes, u_k));
+        var userHash = stringhash(u_attr.email.toLowerCase(), pw_aes);
 
         // Prepare the request
         var requestParams = {
@@ -1625,7 +1547,8 @@ security.changePassword = {
         var operation = new MegaPromise();
         // registration v2
         if (method === 2) {
-            if (!u_attr || typeof u_attr.aas === "undefined" || typeof u_attr.k === "undefined" || !u_k) {
+            if (!u_attr || typeof u_attr.aas === "undefined" || typeof u_attr.k === "undefined"
+                || !u_k) {
                 return operation.reject(0);
             }
 
@@ -1652,7 +1575,6 @@ security.changePassword = {
             return operation;
         }
         else {
-            // registration v1
             var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newPassword));
             var encryptedMasterKeyBase64 = a32_to_base64(encrypt_key(pw_aes, u_k));
 

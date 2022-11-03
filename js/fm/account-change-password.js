@@ -81,7 +81,7 @@ var accountChangePassword = {
             if ($(this).hasClass('disabled')) {
                 return false;
             }
-
+            // Trim the whitespace from the passwords
             var password = $newPasswordField.val();
             var confirmPassword = $newPasswordConfirmField.val();
 
@@ -158,98 +158,64 @@ var accountChangePassword = {
 
         loadingDialog.show();
 
-        // Check their current Account Authentication Version before proceeding
-        accountChangePassword.checkAccountVersion((accountAuthVersion) => {
+        // Check if 2FA is enabled on their account
+        twofactor.isEnabledForAccount(function(result) {
 
-            // Check if 2FA is enabled on their account
-            twofactor.isEnabledForAccount((result) => {
+            loadingDialog.hide();
 
-                loadingDialog.hide();
+            // If 2FA is enabled on their account
+            if (result) {
 
-                // If 2FA is enabled on their account
-                if (result) {
-
-                    // Show the verify 2FA dialog to collect the user's PIN
-                    twofactor.verifyActionDialog.init((twoFactorPin) => {
-                        accountChangePassword.continueChangePassword(accountAuthVersion, newPassword, twoFactorPin);
-                    });
-                }
-                else {
-                    // Otherwise change the password without 2FA
-                    accountChangePassword.continueChangePassword(accountAuthVersion, newPassword, null);
-                }
-            });
-        });
-    },
-
-    /**
-     * Checks for the user's current Account Authentication Version (e.g. v1 or v2)
-     * @param {Function} callbackFunction The function to run when the version has been determined
-     * @returns {void}
-     */
-    checkAccountVersion: function(callbackFunction) {
-
-        'use strict';
-
-        // If the Account Authentication Version is already v2 we don't need to check the version again via the API
-        if (u_attr && u_attr.aav === 2) {
-            callbackFunction(u_attr.aav);
-        }
-        else {
-            // If we are currently a v1 account, we must check here for the current account version (in case it changed
-            // recently in another app/browser) because we don't want the other app/browser to have logged in and
-            // updated to v2 and then the current account which is still logged in here as v1 to overwrite that with
-            // the old format data when they change password. If that happened the user would not be able to log into
-            // their account anymore.
-            M.req({ a: 'ug' })
-                .then((res) => {
-
-                    // If successful, pass the Account Authentication Version to the callback function
-                    callbackFunction(res.aav);
-                })
-                .catch((ex) => {
-                    loadingDialog.hide();
-                    // Oops, something went wrong
-                    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
+                // Show the verify 2FA dialog to collect the user's PIN
+                twofactor.verifyActionDialog.init(function(twoFactorPin) {
+                    accountChangePassword.continueChangePassword(newPassword, twoFactorPin);
                 });
-        }
+            }
+            else {
+                // Otherwise change the password without 2FA
+                accountChangePassword.continueChangePassword(newPassword, null);
+            }
+        });
     },
 
     /**
      * Continue to change the user's password (e.g. immediately or after they've entered their 2FA PIN
-     * @param {Number} accountAuthVersion The current Account Authentication Version i.e. 1 or 2
      * @param {String} newPassword The new password
      * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
-     * @returns {void}
      */
-    continueChangePassword: function(accountAuthVersion, newPassword, twoFactorPin) {
-
+    continueChangePassword: function(newPassword, twoFactorPin) {
         'use strict';
+        var self = this;
 
-        const checkPassPromise = security.changePassword.isPasswordTheSame($.trim(newPassword), accountAuthVersion);
-
-        checkPassPromise.fail((status) => {
+        var failingAction = function(status) {
             if (status === 1) {
-                msgDialog('info', '', l[22126]); // You have entered your current password, please enter a new password
+                msgDialog('info', '', l[22126]);
             }
-            else {
-                msgDialog('info', '', l[200]); // Oops, something went wrong
-            }
-            this.resetForm();
-        });
+            self.resetForm();
+        };
 
-        checkPassPromise.done(() => {
-            if (accountAuthVersion === 1) {
-                security.changePassword.oldMethod(
-                    newPassword, twoFactorPin, accountChangePassword.completeChangePassword
-                );
-            }
-            if (accountAuthVersion === 2) {
-                security.changePassword.newMethod(
-                    newPassword, twoFactorPin, accountChangePassword.completeChangePassword
-                );
-            }
-        });
+        var registerationMethod = 1;
+
+        if (u_attr && u_attr.aav === 2) {
+            registerationMethod = 2;
+        }
+
+        var checkPassPromise = security.changePassword.isPasswordTheSame($.trim(newPassword),
+            registerationMethod);
+
+        checkPassPromise.fail(failingAction);
+
+        checkPassPromise.done(
+            function() {
+                if (registerationMethod === 2) {
+                    security.changePassword.newMethod
+                        (newPassword, twoFactorPin, accountChangePassword.completeChangePassword);
+                }
+                else {
+                    security.changePassword.oldMethod(newPassword, twoFactorPin,
+                        accountChangePassword.completeChangePassword);
+                }
+            });
     },
 
     /**

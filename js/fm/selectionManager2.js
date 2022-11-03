@@ -12,7 +12,7 @@ class SelectionManager2Base {
 
         this.debugMode = !!localStorage.selectionManagerDebug;
 
-        this.idMapper = String;
+        this.idMapper = n => n.h || String(n);
 
         /**
          * Store all selected items in an _ordered_ array.
@@ -20,6 +20,7 @@ class SelectionManager2Base {
          * @type {Array}
          */
         this.selected_list = [];
+        this.removing_list = [];
 
         this.selected_totalSize = 0;
 
@@ -70,6 +71,7 @@ class SelectionManager2Base {
         this.selected_list = [];
         this.clear_last_selected();
         this.eventHandlers.onSelectedUpdated(this.selected_list);
+        delete this.shiftFirst;
     }
 
     /**
@@ -125,7 +127,7 @@ class SelectionManager2Base {
         this.clear_last_selected();
 
         nodeId = this._getSafeListItem(nodeId);
-        if (!nodeId || this.selected_list.indexOf(nodeId) === -1) {
+        if (!nodeId || !this.selected_list.includes(nodeId)) {
             if (nodeId) {
                 this.add_to_selection(nodeId, scrollTo);
             }
@@ -155,7 +157,7 @@ class SelectionManager2Base {
         }
         nodeId = tmp;
 
-        if (this.selected_list.indexOf(nodeId) === -1) {
+        if (!this.selected_list.includes(nodeId)) {
             this.selected_list.push(nodeId);
 
             this.set_currently_selected(nodeId, scrollTo);
@@ -207,6 +209,8 @@ class SelectionManager2Base {
             if (this.debugMode) {
                 console.error("commit: ", JSON.stringify(this.selected_list));
             }
+
+            this.removing_list.push(nodeId);
         }
         else if (this.debugMode) {
             console.error("can't remove:", nodeId, JSON.stringify(this.selected_list), JSON.stringify($.selected));
@@ -247,7 +251,6 @@ class SelectionManager2Base {
         var current = this.get_currently_selected();
         var nextIndex = currentViewIds.indexOf(current);
 
-
         if (ptr === -1) {
             // up
 
@@ -265,17 +268,20 @@ class SelectionManager2Base {
                     // shift key selection logic
                     if (
                         this.selected_list.length > 0 &&
-                        this.selected_list.indexOf(nextId) > -1
+                        this.selected_list.includes(nextId)
                     ) {
                         // get first item from the list
                         var firstItemId = this.selected_list[0];
 
                         // modify selection
-                        this.resetTo(firstItemId, false);
                         this.shift_select_to(nextId, scrollTo, false, false);
                     }
                     else {
-                        this.add_to_selection(nextId, scrollTo);
+                        this.add_to_selection(nextId, scrollTo, false);
+
+                        if (!this.shiftFirst) {
+                            this.shiftFirst = current;
+                        }
                     }
                 }
             }
@@ -300,7 +306,7 @@ class SelectionManager2Base {
 
                     if (
                         this.selected_list.length > 1 &&
-                        this.selected_list.indexOf(nextId) > -1
+                        this.selected_list.includes(nextId)
                     ) {
                         // get last item from the list
                         var fromFirstItemId = this.selected_list[1];
@@ -308,12 +314,15 @@ class SelectionManager2Base {
 
 
                         // modify selection
-                        this.resetTo(fromFirstItemId, false);
-                        this.shift_select_to(lastItemId, scrollTo, false, false);
+                        this.shift_select_to(nextId, scrollTo, false, false);
                         this.last_selected = fromFirstItemId;
                     }
                     else {
-                        this.add_to_selection(nextId, scrollTo);
+                        this.add_to_selection(nextId, scrollTo, false);
+
+                        if (!this.shiftFirst) {
+                            this.shiftFirst = current;
+                        }
                     }
                 }
             }
@@ -333,49 +342,36 @@ class SelectionManager2Base {
         }
 
         var currentViewIds = items.map(this.idMapper);
-
-
         var items_per_row = this.items_per_row;
-
-
         var current = this.get_currently_selected();
+
         var current_idx = currentViewIds.indexOf(current);
-
-
         var target_element_num;
 
         if (ptr === -1) { // up
-            // handle the case when the users presses ^ and the current row is the first row
-            target_element_num = current_idx - items_per_row;
-        } else if (ptr === 1) { // down
-            // handle the case when the users presses DOWN and the current row is the last row
-            target_element_num = current_idx + items_per_row;
+            // handle the case when the users presses UP and the current row is the first row
+            target_element_num = Math.max(current_idx - items_per_row, 0);
+        }
+        else if (ptr === 1) { // down
+
+            // if user is already in the last row just ignore this.
+            if ((current_idx / items_per_row | 0) === (items.length / items_per_row | 0)) {
+                return;
+            }
+
+            // handle the case when the users presses DOWN and the current row is one before the last row
+            target_element_num = Math.min(current_idx + items_per_row, currentViewIds.length - 1);
         }
         else {
             assert('selectionManager._select_ptr_grid received invalid pointer: ' + ptr);
         }
 
-        // calc the index of the target element
-        if (target_element_num >= currentViewIds.length) {
-            if (ptr === -1) { // up
-                target_element_num = 0;
-            }
-            else {
-                // down
-                target_element_num = currentViewIds.length - 1;
-            }
-        }
-        if (target_element_num >= 0) {
-            if (shiftKey) {
-                this.shift_select_to(currentViewIds[target_element_num], scrollTo, false, false);
-            }
-            else {
-                this.clear_selection();
-                this.set_currently_selected(currentViewIds[target_element_num], scrollTo);
-            }
+        if (shiftKey) {
+            this.shift_select_to(currentViewIds[target_element_num], scrollTo, false, false);
         }
         else {
-            // do nothing.
+            this.clear_selection();
+            this.set_currently_selected(currentViewIds[target_element_num], scrollTo);
         }
     }
 
@@ -406,29 +402,63 @@ class SelectionManager2Base {
         var current = this.get_currently_selected();
         var current_idx = currentViewIds.indexOf(current);
         var last_idx = currentViewIds.indexOf(lastId);
-        var last_selected = this.last_selected;
 
         if (clear) {
             this.clear_selection();
         }
 
+        // Very first node start shift + select
+        if (!this.shiftFirst) {
+            this.shiftFirst = $.selected[0];
+        }
+
         if (current_idx !== -1 && last_idx !== -1) {
+
             if (last_idx > current_idx) {
+
                 // direction - down
-                for (let i = Math.min(current_idx, currentViewIds.length - 1); i <= last_idx; i++) {
-                    this.add_to_selection(currentViewIds[i], scrollTo);
+                const first = Math.min(current_idx, currentViewIds.length - 1);
+
+                for (let i = first + 1; i <= last_idx; i++) {
+
+                    if (this.selected_list.includes(currentViewIds[i])) {
+
+                        this.remove_from_selection(currentViewIds[i]);
+
+                        if (i === first + 1) {
+                            this.remove_from_selection(currentViewIds[first]);
+                        }
+                    }
+                    else {
+                        this.add_to_selection(currentViewIds[i], false, i !== first + 1);
+                    }
                 }
             }
             else {
+                const first = Math.max(0, current_idx);
+
                 // direction - up
-                for (let i = Math.max(0, current_idx); i >= last_idx; i--) {
-                    this.add_to_selection(currentViewIds[i], scrollTo);
+                for (let i = first - 1; i >= last_idx; i--) {
+
+                    if (this.selected_list.includes(currentViewIds[i])) {
+                        this.remove_from_selection(currentViewIds[i]);
+
+                        if (i === first - 1) {
+                            this.remove_from_selection(currentViewIds[first]);
+                        }
+                    }
+                    else {
+                        this.add_to_selection(currentViewIds[i], false, i !== first - 1 && i !== last_idx);
+                    }
                 }
             }
         }
 
-        if (isMouseClick && last_selected) {
-            this.set_currently_selected(last_selected, false);
+        // always select very first node of shift, following Windows explorer behaviour
+        this.add_to_selection(this.shiftFirst, false, true);
+
+        if (lastId) {
+            this.set_currently_selected(lastId, scrollTo);
         }
     }
 
@@ -517,6 +547,15 @@ class SelectionManager2_DOM extends SelectionManager2Base {
          */
         $jqSelectable.rebind('selectableselecting.sm selectableselected.sm', (e, data) => {
             var $selected = $(data.selecting || data.selected);
+            const mainSel = $.selectddUIgrid && $.selectddUIitem ? `${$.selectddUIgrid} ${$.selectddUIitem}` : '';
+
+            // If fm drag drop selection event is not inited yet, click may arrive here, send it back to correct event.
+            if (mainSel && (e.shiftKey || e.metaKey || e.ctrlKey) && e.originalEvent.type !== 'mouseup' &&
+                ($selected.is(mainSel) || $selected.closest(mainSel).length)) {
+
+                return $selected.trigger('click.filemanager', [e]);
+            }
+
             var id = $selected.attr('id');
             if (id) {
                 // dont use 'this/self' but the current/global selectionManager
@@ -535,23 +574,24 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 var unselectedId = $unselected.attr('id');
                 if (unselectedId) {
                     // dont use 'this/self' but the current/global selectionManager
-                    this.remove_from_selection(unselectedId);
+                    this.remove_from_selection(unselectedId , false);
                 }
             });
 
         this._boundEvents.push([$jqSelectable, 'selectableunselecting.sm selectableunselected.sm']);
 
-        if ($(target).is(".file-block-scrolling:not(.hidden)")) {
+        if ($jqSelectable.is(`${$.selectddUIgrid}:not(.hidden)`)) {
             // jQuery UI won't do trigger unselecting, in case of the ui-selected item is NOT in the DOM, so
             // we need to reset it on our own (on drag on the background OR click)
-            const $target = $(target);
-            this._boundEvents.push([$target, 'mousedown.sm']);
+            this._boundEvents.push([$jqSelectable, 'mousedown.sm']);
 
-            $target.rebind('mousedown.sm', (e) => {
-                var $target = $(e.target);
+            $jqSelectable.rebind('mousedown.sm', e => {
+                var $target = $(e.target).parent();
 
-                if ($target.parent().is('.file-block-scrolling:not(.hidden)') &&
-                    !$target.is('.ps__scrollbar-x-rail') && !$target.is('.ps__scrollbar-y-rail')) {
+                if ($target.is(`${$.selectddUIgrid}:not(.hidden)`) &&
+                    e.button === 0 && !e.shiftKey && !e.metaKey && !e.ctrlKey &&
+                    !e.target.classList.contains('ps__scrollbar-x-rail') &&
+                    !e.target.classList.contains('ps__scrollbar-y-rail')) {
                     this.clear_selection();
                 }
             });
@@ -653,7 +693,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             for (let i = this.selected_list.length; i--;) {
                 let n = this.selected_list[i];
-                const e = document.getElementById(n);
+                const e = M.megaRender ? M.megaRender.getDOMNode(n) : document.getElementById(n);
                 if ((n = M.d[n])) {
                     selectionSize += n.t ? n.tb : n.s;
                 }
@@ -666,24 +706,49 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 this.hideSelectionBar();
             }
             else {
-                this.selectionNotification(selectionSize);
+                this.selectionNotification(selectionSize, false, false);
             }
         }, 20);
 
         return res;
     }
 
-    remove_from_selection(nodeId) {
-        let $selectable = this._get_selectable_container();
-        let old_last_selected = this.last_selected;
-        super.remove_from_selection(nodeId);
-        $('#' + nodeId, $selectable).removeClass(this.CLS_UI_SELECTED);
+    remove_from_selection(nid, scrollTo) {
 
-        if (old_last_selected === nodeId) {
-            $('#' + nodeId, $selectable).removeClass('currently-selected');
+        let old_last_selected = this.last_selected;
+        super.remove_from_selection(nid);
+
+        const e = M.megaRender ? M.megaRender.getDOMNode(nid) : document.getElementById(nid);
+
+        if (e) {
+            e.classList.remove(this.CLS_UI_SELECTED);
+
+            if (old_last_selected === nid) {
+                e.classList.remove('currently-selected');
+            }
         }
 
-        this.selectionNotification(nodeId, false);
+        delay('selManUpdNotif', () => {
+
+            if (!this.removing_list || !this.selected_list) {
+                return;
+            }
+
+            const selListMap = array.to.object(this.selected_list);
+
+            // Lets deduplicate and filter reselected
+            this.removing_list = [...new Set(this.removing_list)].filter(h => !selListMap[h]);
+
+            if (this.selected_list.length !== 0 && this.removing_list.length > 1) {
+
+                const cb = (pv, c) => pv + (M.d[c].tb === undefined ? M.d[c].s : M.d[c].tb);
+                const removingSize = this.removing_list.reduce(cb, 0);
+                nid = this.selected_totalSize - removingSize;
+            }
+
+            this.selectionNotification(nid, false, scrollTo);
+            this.removing_list = [];
+        }, 50);
     }
 
     select_all() {
@@ -714,7 +779,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      * @param isAddToSelection
      * @returns {Boolean}
      */
-    selectionNotification(nodeId, isAddToSelection) {
+    selectionNotification(nodeId, isAddToSelection, scrollTo = true) {
         if (M.chat || M.currentCustomView.type === 'gallery' || typeof nodeId !== 'number' && !M.d[nodeId]) {
             return false;
         }
@@ -728,31 +793,34 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             var itemsTotalSize = "";
             var notificationText = "";
 
+            const _getNodeSize = () => M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
+
             if (typeof nodeId === 'number') {
                 this.selected_totalSize = nodeId;
             }
             else if (isAddToSelection) {
-                this.selected_totalSize += M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
+                this.selected_totalSize += _getNodeSize();
             }
             else {
-                this.selected_totalSize -= M.d[nodeId].t ? M.d[nodeId].tb : M.d[nodeId].s;
+                this.selected_totalSize -= _getNodeSize();
             }
 
             if (this.selected_totalSize > 0) {
-                itemsTotalSize = '<span>' + bytesToSize(this.selected_totalSize) + '</span>' ;
+                itemsTotalSize = bytesToSize(this.selected_totalSize);
             }
 
+            const totalHtml = `<span class="sel-notif-size-total">${itemsTotalSize}</span>`;
+
             if (totalNodes === 1) { // Only one item exists
-                notificationText = l[24679]
-                    .replace('%1', itemsNum)
-                    .replace('%2', itemsTotalSize);
+                notificationText = l[24679].replace('%1', itemsNum).replace('%2', totalHtml);
             }
             else { // Multiple items here
+                itemsNum = mega.icu.format(l.selected_count, itemsNum);
+
                 notificationText = mega.icu.format(l[24672], totalNodes)
-                    .replace('%1', mega.icu.format(l.selected_count, itemsNum))
-                    .replace('%2', itemsTotalSize);
+                    .replace('%1', `<span class="sel-notif-count-total">${itemsNum}</span>`).replace('%2', totalHtml);
             }
-            this.showSelectionBar(notificationText);
+            this.showSelectionBar(notificationText, itemsNum, itemsTotalSize, totalNodes);
 
             if (M.megaRender && M.megaRender.megaList) {
                 M.megaRender.megaList.resized();
@@ -760,7 +828,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             else {
                 initPerfectScrollbar($(this._get_selectable_container()).closest('.ps'));
             }
-            this.scrollToElementProxyMethod(this.last_selected);
+
+            if (scrollTo) {
+                this.scrollToElementProxyMethod(this.last_selected);
+            }
         }
     }
 
@@ -768,12 +839,21 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      * Show the selection notification bar at the bottom of pages
      * @param notificationText
      */
-    showSelectionBar(notificationText) {
+    showSelectionBar(notificationText, itemSelected, itemsTotalSize, totalNodes) {
 
         var $selectionBar = $('.selection-status-bar');
         let scrollBarYClass = '';
+        const $selCountElm = $('.sel-notif-count-total', $selectionBar);
 
-        $selectionBar.find('.selection-bar-col').safeHTML(notificationText);
+        // if count is existing, lets using existing dom node not create new one.
+        if ($selCountElm.length && totalNodes === $selectionBar.data('total-node')) {
+            $selCountElm.text(itemSelected);
+            $('.sel-notif-size-total', $selectionBar).text(itemsTotalSize);
+        }
+        else {
+            $('.selection-bar-col', $selectionBar).safeHTML(notificationText);
+            $selectionBar.data('total-node', totalNodes);
+        }
 
         this.vSelectionBar = $('b', $selectionBar).get(0);
 
@@ -790,17 +870,20 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 '.file-block-scrolling.ps--active-y' : '.grid-scrolling-table.ps--active-y';
         }
 
-        const scrollBarY = document.querySelector(scrollBarYClass);
-        if (scrollBarY && (scrollBarY.scrollHeight - scrollBarY.scrollTop - scrollBarY.clientHeight) < 37) {
-            scrollBarY.scrollTop = scrollBarY.scrollHeight;
-        }
-
         if (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0) {
             if (folderlink) {
                 $('.fm-bottom-right-buttons', fmholder).addClass('hidden');
             }
 
             $selectionBar.removeClass('hidden');
+        }
+
+        const scrollBarY = document.querySelector(scrollBarYClass);
+        if (scrollBarY && (scrollBarY.scrollHeight - scrollBarY.scrollTop - scrollBarY.clientHeight) < 37) {
+            requestAnimationFrame(() => {
+                scrollBarY.scrollTop = scrollBarY.scrollHeight;
+                initPerfectScrollbar();
+            });
         }
 
         this.showRequiredLinks();

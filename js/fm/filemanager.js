@@ -674,6 +674,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $fmholder.rebind('mousemove.colresize', function(col) {
             var newWidth = startOffset + col.pageX;
+
             const min = th.attr('data-minwidth') | 0;
 
             if (newWidth < min) {
@@ -3850,16 +3851,18 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         start: e => {
             $.hideContextMenu(e);
             $.hideTopMenu();
+            $.selecting = true;
         },
         stop: () => {
             M.renderSearchBreadcrumbs();
-        }
+            $.selecting = false;
+        },
+        appendTo: $.selectddUIgrid
     });
+
     // Since selectablecreate is triggered only on first creation of the selectable widget, we need to find a way
     // to notify any code (selectionManager) that it can now hook selectable events after the widget is created
     $ddUIgrid.trigger('selectablereinitialized');
-
-    $('.ui-selectable-helper').remove();
 
     const contextMenuHandler = function(e) {
         $.hideContextMenu(e);
@@ -3881,11 +3884,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 selectionManager.add_to_selection(id);
                 $.gridLastSelected = this;
             }
-
-            // Show sort menu for FM, block view only
-            // if (fmconfig.viewmodes && fmconfig.viewmodes[M.currentdirid]) {
-            //     return M.labelSortMenuUI(e, true);
-            // }
         }
 
         M.renderSearchBreadcrumbs();
@@ -3894,50 +3892,70 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
         return !!M.contextMenuUI(e, 1);
     };
-    $ddUIitem.rebind('contextmenu.filemanager', contextMenuHandler);
 
-    $ddUIitem.rebind('click', function(e) {
-        if ($.gridDragging) {
-            return false;
-        }
-        var s = e.shiftKey;
-        if (e.shiftKey) {
-            selectionManager.shift_select_to($(this).attr('id'), false, true, true);
-        }
-        else if (e.ctrlKey == false && e.metaKey == false)
-        {
-            $($.selectddUIgrid + ' ' + $.selectddUIitem).removeClass('ui-selected');
-            $(this).addClass('ui-selected');
-            $.gridLastSelected = this;
-            selectionManager.clear_selection();
-            selectionManager.add_to_selection($(this).attr('id'));
-        }
-        else
-        {
-            if ($(this).hasClass("ui-selected")) {
-                $(this).removeClass("ui-selected");
-                selectionManager.remove_from_selection($(this).attr('id'));
+    if (!$ddUIgrid.hasClass('ddinit')) {
+
+        $ddUIgrid.addClass('ddinit').rebind('click.filemanager', $.selectddUIitem, function(e, smEvent) {
+
+            // This is triggered from Selection Manager
+            if (smEvent) {
+                e = smEvent;
             }
-            else
-            {
-                $(this).addClass("ui-selected");
+
+            if ($.gridDragging) {
+                return false;
+            }
+
+            const $this = $(this);
+
+            if (e.shiftKey) {
+                selectionManager.shift_select_to($this.attr('id'), false, true, $.selected.length === 0);
+            }
+            else if (!e.ctrlKey && !e.metaKey) {
+
                 $.gridLastSelected = this;
-                selectionManager.add_to_selection($(this).attr('id'));
+
+                selectionManager.clear_selection();
+                selectionManager.add_to_selection($this.attr('id'), true);
             }
-        }
+            else if ($this.hasClass("ui-selected")) {
+                selectionManager.remove_from_selection($this.attr('id'), false);
+            }
+            else {
+                $.gridLastSelected = this;
+                selectionManager.add_to_selection($this.attr('id'));
+            }
 
-        if (!mega.cttHintTimer) {
-            M.showClickHint();
-        }
-        M.renderSearchBreadcrumbs();
-        $.hideContextMenu(e);
-        if ($.hideTopMenu) {
-            $.hideTopMenu();
-        }
+            if (!mega.cttHintTimer) {
+                M.showClickHint();
+            }
 
-        return false;
+            M.renderSearchBreadcrumbs();
+            $.hideContextMenu(e);
 
-    });
+            if ($.hideTopMenu) {
+                $.hideTopMenu();
+            }
+
+            return false;
+        });
+
+        $ddUIgrid.rebind('contextmenu.filemanager', $.selectddUIitem, contextMenuHandler);
+
+        $ddUIgrid.rebind('mousewheel.selectAndScroll', e => {
+
+            if ($.selecting) {
+
+                delay('selectAndScroll', () => {
+
+                    $ddUIgrid = $($.selectddUIgrid);
+
+                    $ddUIgrid.selectable('refresh');
+                    $ddUIgrid.selectable('triggerMouseMove', e);
+                }, 50);
+            }
+        });
+    }
 
     // Open folder/file in filemanager
     let tappedItemId = '';

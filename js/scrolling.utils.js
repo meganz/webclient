@@ -17,7 +17,10 @@ function initPerfectScrollbar($scrollBlock) {
             Ps.update($scrollBlock[i]);
         }
         else {
-            Ps.initialize($scrollBlock[i]);
+            Ps.initialize($scrollBlock[i], {
+                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                'minScrollbarLength': 20
+            });
         }
     }
 }

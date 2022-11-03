@@ -25750,7 +25750,7 @@ class BrowserEntries extends mixins.wl {
       selectionManager.clear_selection();
       selectionManager.set_currently_selected(node[self.props.keyProp]);
     } else if (e.shiftKey) {
-      selectionManager.shift_select_to(node[self.props.keyProp], true, true, false);
+      selectionManager.shift_select_to(node[self.props.keyProp], false, true, false);
     } else if (e.ctrlKey || e.metaKey) {
       if (!self.props.highlighted || self.props.highlighted.indexOf(node[self.props.keyProp]) === -1) {
         let highlighted = clone(self.props.highlighted || []);
@@ -25901,7 +25901,7 @@ class BrowserEntries extends mixins.wl {
       listAdapterOpts: listAdapterOpts,
       entries: this.props.entries,
       itemHeight: this.props.megaListItemHeight,
-      headerHeight: 36,
+      headerHeight: viewMode ? 0 : 36,
       header: !viewMode && external_React_default().createElement(GenericTableHeader, {
         columns: listAdapterOpts.columns,
         sortBy: this.state.sortBy,

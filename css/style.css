@@ -4086,6 +4086,7 @@ body.loading .light-overlay {
 }
 .fm-breadcrumbs-wrapper .breadcrumb-dropdown.active {
     max-height: 85vh;
+    z-index: 300;
 }
 .rtl .breadcrumb-dropdown.active {
     left: auto;
@@ -4195,11 +4196,6 @@ body.loading .light-overlay {
     opacity: 0.3;
 }
 
-.ui-selectable-helper {
-    position: absolute;
-    z-index: 100;
-    border: 1px dotted var(--stroke-mid-grey);
-}
 .context-menu, .dialog-sorting-menu, .fm-sorting-menu {
     min-width: 160px;
     position: absolute;
@@ -10686,82 +10682,7 @@ div.camera-bottom-txt {
         margin-top: -120px;
     }
 }
-/**
- * jQuery UI - Resizable - required classes.
- */
-.ui-resizable {
-    position: relative;
-}
-.ui-resizable-handle {
-    position: absolute;
-    font-size: 0.1px;
-    display: block;
-}
-.ui-resizable-disabled .ui-resizable-handle, .ui-resizable-autohide .ui-resizable-handle {
-    display: none;
-}
-.ui-resizable-n {
-    cursor: n-resize;
-    height: 15px;
-    width: 100%;
-    top: -1px;
-    left: 0;
-}
-.ui-resizable-s {
-    cursor: s-resize;
-    height: 7px;
-    width: 100%;
-    bottom: -5px;
-    left: 0;
-}
-.ui-resizable-e {
-    cursor: e-resize;
-    width: 7px;
-    right: -5px;
-    top: 0;
-    height: 100%;
-}
-.ui-resizable-w {
-    cursor: w-resize;
-    width: 7px;
-    left: -5px;
-    top: 0;
-    height: 100%;
-}
-.ui-resizable-se {
-    cursor: se-resize;
-    width: 12px;
-    height: 12px;
-    right: 1px;
-    bottom: 1px;
-}
-.ui-resizable-sw {
-    cursor: sw-resize;
-    width: 9px;
-    height: 9px;
-    left: -5px;
-    bottom: -5px;
-}
-.ui-resizable-nw {
-    cursor: nw-resize;
-    width: 9px;
-    height: 9px;
-    left: -5px;
-    top: -5px;
-}
-.ui-resizable-ne {
-    cursor: ne-resize;
-    width: 9px;
-    height: 9px;
-    right: -5px;
-    top: -5px;
-}
-.ui-selectable-helper {
-    position: absolute;
-    z-index: 100;
-    border: 1px solid var(--stroke-mid-grey);
-    background: var(--surface-highlight-2);
-}
+
 /**
  * Transfer Panel - Resize Handle styling
  */

@@ -262,7 +262,7 @@ table tr.ui-selected .link-transfer-status {
     position: -webkit-sticky;
     top: 0;
     background: var(--surface-main);
-    z-index: 1;
+    z-index: 201;
 }
 .grid-table th:first-child {
     -webkit-padding-start: 16px;
@@ -277,7 +277,7 @@ table tr.ui-selected .link-transfer-status {
     content: "";
     position: absolute;
     top: -1px;
-    left: -20px;
+    left: -26px;
     right: 0;
     bottom: 0;
     background-color: var(--stroke-main);
@@ -285,7 +285,7 @@ table tr.ui-selected .link-transfer-status {
 }
 .grid-table th:last-child::before {
     left: 0;
-    right: -20px;
+    right: -26px;
 }
 .grid-table thead .grid-view-resize {
     cursor: col-resize;
@@ -382,7 +382,7 @@ table tr.ui-selected .link-transfer-status {
     background-color: var(--stroke-main);
     right: 0;
     top: 0;
-    z-index: 9;
+    z-index: 209;
     cursor: pointer;
 }
 .shared-details-block .files-grid-view.fm .column-settings {

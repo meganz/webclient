@@ -1294,6 +1294,12 @@
                             'batchPages': 0,
                             'appendOnly': false,
                             'onContentUpdated': function() {
+
+                                // If there is dragging happen, do not run this.
+                                if ($.selecting) {
+                                    return;
+                                }
+
                                 if (M.viewmode) {
                                     delay('thumbnails', fm_thumbnails, 2);
                                 }

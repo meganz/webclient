@@ -1,7 +1,7 @@
 .dropdown.body {
     padding: 8px;
     position: absolute;
-    z-index: 150;
+    z-index: 250;
     background: var(--surface-main);
     border-radius: 12px;
     border: var(--dropdown-border);

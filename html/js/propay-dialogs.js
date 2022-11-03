@@ -2052,6 +2052,8 @@ var addressDialog = {
             removeAttribute('version');
         }
 
+        // log the click on the 'subscribe' button
+        delay('addressDlg.click', eventlog.bind(null, 99789));
 
         // Send to the API
         this.proceedToPay(fieldValues, state, country, taxCode);

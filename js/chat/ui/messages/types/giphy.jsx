@@ -9,6 +9,21 @@ export default class Giphy extends AbstractGenericMessage {
 
     state = { src: undefined };
 
+    componentDidMount() {
+        super.componentDidMount();
+        megaChat.rebind(`viewstateChange.gif${this.getUniqueId()}`, e => {
+            const { state } = e.data;
+            if (state === 'active' && this.gifRef.current.paused || state !== 'active' && !this.gifRef.current.paused) {
+                this.toggle();
+            }
+        });
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        megaChat.off(`viewstateChange.gif${this.getUniqueId()}`);
+    }
+
     onVisibilityChange(isIntersecting) {
         this.setState({ src: isIntersecting ? API.convert(this.props.message.meta.src) : undefined }, () => {
             this.gifRef?.current?.[isIntersecting ? 'load' : 'pause']();

@@ -1449,6 +1449,9 @@ pro.propay = {
         // Set the pro package (used in pro.propay.sendPurchaseToApi function)
         pro.propay.selectedProPackage = pro.membershipPlans[selectedProPackageIndex];
 
+        // log button clicking
+        delay('subscribe.plan', eventlog.bind(null, 99788));
+
         if (u_type === false) {
 
             u_storage = init_storage(localStorage);

@@ -2,6 +2,43 @@ var syncurl;
 var nautilusurl;
 var syncsel = false;
 
+function renderMacOptions() {
+    'use strict';
+    const $page = $('.bottom-page.megasync');
+    const $macContainer = $('.megaapp-macos', $page);
+    const $downloadBtn = $('button.mac-download', $macContainer);
+    const $archInputWraps = $('.mac-arch', $macContainer);
+    const $archInputs = $('input', $archInputWraps);
+
+    const setRadio = (value, $select) => {
+        $archInputWraps.removeClass('radioOn').addClass('radioOff');
+        $archInputs.removeClass('radioOn').addClass('radioOff').prop('checked', false);
+
+        if (!$select) {
+            $select = $archInputs.filter(`input[value="${value}"]`);
+        }
+
+        $select.parent().removeClass('radioOff').addClass('radioOn');
+        $select.removeClass('radioOff').addClass('radioOn').prop('checked', true);
+    };
+
+    $archInputs.rebind('click', (e) => {
+        const $select = $(e.currentTarget);
+        setRadio($select.val(), $select);
+    });
+
+    $downloadBtn.rebind('click', () => {
+        const selectedArch = $('input[name="mac-arch"]:checked', $macContainer).val();
+        window.location = megasync.getMegaSyncUrl(selectedArch === 'intel' ? 'mac' : 'mac_silicon');
+    });
+
+    $('.nav-buttons-bl a.mac', $page).addClass('active');
+    $macContainer.removeClass('hidden');
+
+    // Apple Silicon might also return 'MacIntel'.
+    setRadio(navigator.platform.toUpperCase().includes('MACINTEL') ? 'intel' : 'silicon');
+}
+
 function renderLinuxOptions(linuxsync) {
     var ostxt;
     var $content = $('.bottom-page.megasync');
@@ -59,6 +96,8 @@ function resetMegasync() {
     var $linuxBlock = $('.megaapp-linux', $content);
 
     $content.removeClass('linux');
+    $('.pages-nav.nav-button', $content).removeClass('active');
+    $('.megaapp-macos', $content).addClass('hidden');
     $('.megaapp-linux-box-container', $content).addClass('hidden');
     $('.nav-buttons-bl a.linux', $content).removeClass('active');
     $('.radio-buttons label, .architecture-checkbox', $linuxBlock).removeClass('hidden');
@@ -88,8 +127,17 @@ function initMegasync() {
 
     // Preload linux options if on a linux client
     if (pf.indexOf('LINUX') >= 0) {
-        $('.nav-buttons-bl a.linux').addClass('active');
-        megasync.getLinuxReleases(renderLinuxOptions);
+        const linuxTabBtn = $('.nav-buttons-bl a.linux');
+        linuxTabBtn.addClass('active');
+        megasync.getLinuxReleases((next) => {
+            // check the user hasn't selected a different tab before linux options were fetched
+            if (linuxTabBtn.hasClass('active')) {
+                renderLinuxOptions(next);
+            }
+        });
+    }
+    else if (pf.includes('MAC')) {
+        renderMacOptions();
     }
 
     $('.nav-buttons-bl a', $content).rebind('click', function() {
@@ -111,12 +159,13 @@ function initMegasync() {
                 $('.megaapp-windows-info.32bit', $content).addClass('hidden');
             }
 
-            $('.megaapp-windows', $content).removeClass('hidden');
             resetMegasync();
+            $('.nav-buttons-bl a.windows', $content).addClass('active');
+            $('.megaapp-windows', $content).removeClass('hidden');
         }
         else if (osData === 'mac') {
-            window.location = megasync.getMegaSyncUrl('mac');
             resetMegasync();
+            renderMacOptions();
         }
         else if (osData === 'linux' && is_mobile) {
             window.open('https://mega.nz/linux/repo/', '_blank');
@@ -127,6 +176,7 @@ function initMegasync() {
         }
         else {
             loadingDialog.show();
+            resetMegasync();
             megasync.getLinuxReleases(renderLinuxOptions);
         }
 
@@ -174,9 +224,6 @@ function initMegasync() {
         }
         return false;
     });
-
-    $('.pages-nav.nav-button').removeClass('active');
-    $('.pages-nav.nav-button.sync').addClass('active');
 }
 
 function changeLinux(linuxsync, i) {

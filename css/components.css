@@ -27,7 +27,7 @@
     z-index: 11;
 }
 
-.selection-status-bar .selection-bar-col span {
+.selection-status-bar .selection-bar-col .sel-notif-size-total {
     display: inline-block;
     color: var(--stroke-main-inverted);
     background-color: var(--stroke-main);
@@ -38,6 +38,10 @@
     border-radius: 50px;
     line-height: 28px;
     padding: 0 14px;
+}
+
+.selection-status-bar .selection-bar-col .sel-notif-size-total:empty {
+    display: none;
 }
 
 .selection-status-bar .selection-bar-col {

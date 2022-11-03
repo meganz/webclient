@@ -27,7 +27,8 @@ var megasync = (function() {
     var clients = {
         windows: 'https://mega.nz/MEGAsyncSetup64.exe',
         windows_x32: 'https://mega.nz/MEGAsyncSetup32.exe',
-        mac: 'https://mega.nz/MEGAsyncSetup.dmg'
+        mac: 'https://mega.nz/MEGAsyncSetup.dmg',
+        mac_silicon: 'https://mega.nz/MEGAsyncSetupArm64.dmg',
     };
     var usemsync = localStorage.usemsync;
 

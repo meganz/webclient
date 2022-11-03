@@ -262,15 +262,7 @@ var tooltiplogin = {
 
             'use strict';
 
-            postLogin(email, password, pinCode, rememberMe, (result) => {
-
-                // Check if we can upgrade the account to v2
-                security.login.checkToUpgradeAccountVersion(result, u_k, password, () => {
-
-                    // Otherwise proceed with regular login
-                    tooltiplogin.completeLogin(result);
-                });
-            });
+            postLogin(email, password, pinCode, rememberMe, tooltiplogin.completeLogin);
         }
     },
 

@@ -286,8 +286,8 @@ lazy(pro, 'proplan2', () => {
         const $strgFlexInput = $('#esti-storage', $proflexiBlock);
         const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
-        $gdNote.text(`*${l[23818].replace('%1', bytesToSize(2 * 1099511627776, 0))}`);
-        $megaNote.text(`*${l[23818].replace('%1', l[5819])}`);
+        $gdNote.text(l[23818].replace('%1', bytesToSize(2 * 1099511627776, 0)));
+        $megaNote.text(l[23818].replace('%1', l[5819]));
         $refNote.text(`(1) ${l[24078].replace('%1', formatCurrency(1.00, null, 'number'))}`);
 
         // ordered array for ranges: [range-start,range-end,min,max]
@@ -396,8 +396,8 @@ lazy(pro, 'proplan2', () => {
                 $megaNote.text(`${l[23818].replace('%1', megaPlans[val - 1])}`);
 
                 if (val === 1) {
-                    $dpNote.text(`*${l[23947]}`);
-                    $gdNote.text(`*${l[23818].replace('%1', bytesToSize(2 * 1099511627776, 0))}`);
+                    $dpNote.text(l[23947]);
+                    $gdNote.text(l[23818].replace('%1', bytesToSize(2 * 1099511627776, 0)));
                 }
                 else {
                     $dpNote.safeHTML(l[23819]);

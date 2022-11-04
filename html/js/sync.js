@@ -39,9 +39,9 @@ function renderMacOptions() {
     setRadio(navigator.platform.toUpperCase().includes('MACINTEL') ? 'intel' : 'silicon');
 }
 
-function renderLinuxOptions(linuxsync) {
+function renderLinuxOptions(linuxsync, event) {
     var ostxt;
-    var $content = $('.bottom-page.megasync');
+    var $content = event ? $(event.target.closest('.vertical-centered-bl')) : $('.bottom-page.megasync');
     var $linuxContainer = $('.megaapp-linux-box-container', $content);
     syncurl = undefined;
     syncsel = false;
@@ -140,7 +140,7 @@ function initMegasync() {
         renderMacOptions();
     }
 
-    $('.nav-buttons-bl a', $content).rebind('click', function() {
+    $('.nav-buttons-bl a', $content).rebind('click', function(ev) {
         var $this = $(this);
         var osData = $this.attr('data-os');
 
@@ -177,7 +177,9 @@ function initMegasync() {
         else {
             loadingDialog.show();
             resetMegasync();
-            megasync.getLinuxReleases(renderLinuxOptions);
+            megasync.getLinuxReleases(linuxsync => {
+                renderLinuxOptions(linuxsync, ev);
+            });
         }
 
         return false;

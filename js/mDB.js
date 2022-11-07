@@ -2276,6 +2276,198 @@ class MegaDexie extends Dexie {
 
         return promise;
     }
+
+    async export() {
+        return MegaDexie.export(this);
+    }
+
+    async import(blob) {
+        return MegaDexie.import(blob, this);
+    }
+
+    static async import(aFile, aDBInstance) {
+        const buf = aFile.name.endsWith('.gz') ? await M.decompress(aFile) : await M.toArrayBuffer(aFile);
+        const len = buf.byteLength;
+        assert(len > 0x10000);
+
+        const view = new DataView(buf);
+        assert(view.getUint32(0) === 0x13064D44, 'Invalid file.');
+        assert(view.getUint8(len - 17) === 0xEF, 'File corrupted(?)');
+
+        let offset = 8;
+        const tde = new TextDecoder();
+        const readValue = () => {
+            const b = view.getUint8(offset);
+            const l = b >> 4;
+            const t = b & 15;
+
+            const size = view[`getUint${l << 3}`](++offset, true);
+            offset += l;
+
+            let data = buf.slice(offset, offset + size);
+            if (t > 1) {
+                data = tde.decode(data);
+
+                switch (t) {
+                    case 2:
+                        data = parseInt(data, 36);
+                        break;
+                    case 4:
+                        data = JSON.parse(data);
+                        break;
+                }
+            }
+
+            offset += size;
+            return data;
+        };
+        const settings = readValue();
+        assert('schema' in settings);
+
+        const key = [
+            view.getInt32(len - 16, true),
+            view.getInt32(len - 12, true),
+            view.getInt32(len - 8, true),
+            view.getInt32(len - 4, true)
+        ];
+        const {u_k: uk1, u_k_aes: uk2} = window;
+        const keyMatch = JSON.stringify(uk1) === JSON.stringify(key);
+
+        if (aDBInstance) {
+            // @todo re-encrypt'em(?)
+            assert(keyMatch, 'Key mismatch, cannot import.');
+        }
+        else {
+            if (!keyMatch) {
+                u_k = key;
+                u_k_aes = new sjcl.cipher.aes(u_k);
+            }
+            const name = `DBImport${Math.random().toString(36)}`;
+
+            if (settings.schema.lru) {
+                // eslint-disable-next-line no-use-before-define
+                aDBInstance = await LRUMegaDexie.create(name);
+            }
+            else {
+                aDBInstance = new MegaDexie('DBIMPORT', name, 'imp_', true, settings.schema);
+            }
+
+            if (!keyMatch) {
+                u_k = uk1;
+                u_k_aes = uk2;
+            }
+        }
+
+        offset = 0x10000;
+        while (view.getUint8(offset) !== 0xEF) {
+            const bulk = [];
+            const table = readValue();
+
+            while (view.getUint8(offset) !== 0xFF) {
+                const data = {};
+
+                while (view.getUint8(offset) !== 0xFE) {
+                    const key = readValue();
+                    data[key] = readValue();
+                }
+
+                offset++;
+                bulk.push(data);
+            }
+
+            offset++;
+            await aDBInstance[table].bulkPut(bulk);
+        }
+
+        return aDBInstance;
+    }
+
+    static async export(aDBInstance) {
+        let offset = 0;
+        let buf = new Uint8Array(0x1000000);
+        const tde = new TextEncoder();
+        const gbl = (n) => n < 256 ? 1 : n < 65536 ? 2 : 4;
+        const rnd = (s, b = 0x100000) => (s + b & -b) >>> 0;
+        const types = {buffer: 1, number: 2, string: 3, object: 4};
+        const put = (data, offset) => {
+            if (typeof data === 'number') {
+                data = new window[`Uint${gbl(data) << 3}Array`]([data]);
+            }
+            if (offset + data.byteLength > buf.byteLength) {
+                const tmp = new Uint8Array(rnd(buf.byteLength + data.byteLength));
+                tmp.set(buf);
+                buf = tmp;
+            }
+            buf.set(new Uint8Array(data.buffer || data), offset);
+            return offset + data.byteLength;
+        };
+        const add = (data, pos) => {
+            let t = data.byteLength >= 0 ? 'buffer' : typeof data;
+            if (t !== 'buffer') {
+                if (t === 'number') {
+                    data = data.toString(36);
+                }
+                else if (t !== 'string') {
+                    t = 'object';
+                    data = JSON.stringify(data);
+                }
+                data = tde.encode(data);
+            }
+
+            const j = gbl(data.byteLength);
+            const p = put(data, put(data.byteLength, put(j << 4 | types[t], pos || offset)));
+            if (!pos) {
+                offset = p;
+            }
+        };
+
+        add('MDBv01');
+        offset = 0x10000;
+
+        const {tables} = aDBInstance;
+        const schema = Object.create(null);
+
+        assert(aDBInstance instanceof Dexie && tables.length);
+
+        for (let i = 0; i < tables.length; ++i) {
+            const s = [];
+            const table = tables[i];
+            const {db, name, schema: {primKey, indexes = false}} = table;
+
+            if (primKey) {
+                s.push(primKey.unique ? `&${primKey.name}` : primKey.src);
+            }
+            if (indexes.length) {
+                s.push(...indexes.map((i) => i.src));
+            }
+
+            add(name);
+            schema[name] = s.join(', ');
+
+            const res = await db[name].toArray();
+            for (let i = res.length; i--;) {
+                const e = res[i];
+
+                for (const k in e) {
+                    add(k);
+                    add(e[k]);
+                }
+
+                put(0xfe, offset++);
+            }
+
+            put(0xff, offset++);
+        }
+
+        add({schema}, 8);
+        buf = buf.slice(0, put(new Uint32Array(u_k), put(0xef, offset)));
+
+        const {_uname, name} = aDBInstance;
+        const data = await M.compress(buf).catch(nop);
+        const filename = `mega-dbexport.${_uname || name || aDBInstance}`;
+
+        return M.saveAs(data || buf, data ? `${filename}.gz` : filename);
+    }
 }
 
 /**
@@ -2590,7 +2782,11 @@ class LRUMegaDexie extends MegaDexie {
                         const ctr = payload.getUint32(0, true);
                         view.setUint32(0, ctr, true);
                         algo.additionalData = payload;
-                        return crypto.subtle.decrypt(algo, key, new DataView(data, 4));
+                        return crypto.subtle.decrypt(algo, key, new DataView(data, 4))
+                            .catch((ex) => {
+                                const msg = `LRUMegaDexie(${this}) decrypt error: ${ex.message || ex.name}`;
+                                throw new MEGAException(msg, ex, ex.name || 'DataCloneError');
+                            });
                     }
                 }
             });
@@ -2636,9 +2832,58 @@ class LRUMegaDexie extends MegaDexie {
     }
 
     async set(h, data) {
+        assert(data.byteLength > 16);
         data = await this.encrypt(data);
-        delay(this.name, () => this.drain(), 2e3);
+        delay(this.name, () => this.drain(), 9e3);
         return this.put('data', {h, data, ts: Date.now()});
+    }
+
+    async bulkGet(bulk, err = {}) {
+        const now = Date.now();
+        const res = Object.create(null);
+
+        if (bulk) {
+            bulk = await this.data.bulkGet(bulk);
+        }
+        else {
+            bulk = await this.data.orderBy('ts').toArray();
+        }
+
+        for (let i = bulk.length; i--;) {
+            const e = bulk[i];
+
+            if (e) {
+                const value = await this.decrypt(e.data)
+                    .catch((ex) => {
+                        err[e.h] = {ts: new Date(e.ts).toISOString(), bytes: e.data.byteLength, ex};
+                    });
+
+                if (value) {
+                    e.ts = now;
+                    res[e.h] = value;
+                    continue;
+                }
+            }
+
+            bulk.splice(i, 1);
+        }
+
+
+        if (d && $.len(err)) {
+            console.group(`LRUMegaDexie.bulkGet(${this}) errors found...`);
+            console.table(err);
+            console.groupEnd();
+        }
+
+        this.data.bulkPut(bulk)
+            .catch((ex) => {
+                if (d) {
+                    console.warn(`${this}: ${ex}`, ex);
+                }
+                return bulk.map((e) => this.put('data', e));
+            });
+
+        return res;
     }
 
     drain() {
@@ -2678,6 +2923,17 @@ lazy(LRUMegaDexie, 'create', () => {
                 get: {
                     value: async function(...args) {
                         return get.apply(this, args);
+                    }
+                },
+                bulkGet: {
+                    value: async function(bulk) {
+                        return bulk.reduce((target, e) => {
+                            const value = get.call(this, e);
+                            if (value) {
+                                target[e] = value;
+                            }
+                            return target;
+                        }, Object.create(null));
                     }
                 },
                 set: {
@@ -2721,7 +2977,7 @@ Object.defineProperties(LRUMegaDexie, {
             const message = String(((ev.target || ev).error || ev.inner || ev).message || ev.type || ev);
 
             if (d) {
-                console.error(`LRUMegaDexie error (${ev.type || ev.name})`, message, [ev]);
+                console.warn(`LRUMegaDexie error (${ev.type || ev.name})`, message, [ev]);
             }
 
             if (ev.type !== 'close' && !/\s(?:clos[ei]|delet[ei])/.test(message)) {
@@ -2755,23 +3011,59 @@ Object.defineProperties(LRUMegaDexie, {
             return Promise.all(dbs.filter(n => n.startsWith('lru_')).map(n => Dexie.delete(n)));
         }
     },
+    verify: {
+        value: async() => {
+            'use strict';
+            const stats = {};
+
+            for (const db of LRUMegaDexie.wSet) {
+                const err = {};
+                const res = await db.bulkGet(0, err);
+                const nid = `${db.name} (${db._uname})`;
+                const ecn = $.len(err);
+                const cnt = $.len(res) + ecn;
+
+                let bytes = 0;
+                let errors = 0;
+
+                if (ecn) {
+                    bytes = Object.values(err)
+                        .reduce((n, o) => {
+                            n += o.bytes;
+                            return n;
+                        }, 0);
+                    errors = `${ecn} (${parseFloat(ecn * 100 / cnt).toFixed(2)}%, ${bytesToSize(bytes)})`;
+                }
+
+                for (const k in res) {
+                    bytes += res[k].byteLength;
+                }
+
+                if (bytes > 1e6) {
+                    bytes = `${bytes} (${bytesToSize(bytes)})`;
+                }
+                stats[nid] = {bytes, records: cnt, errors};
+            }
+            console.table(stats);
+        }
+    },
     size: {
         get() {
             'use strict';
             const {promise} = mega;
 
             let name;
-            const seen = {total: 0};
+            const seen = {total: {bytes: 0}};
             const store = (row) => {
                 const {byteLength} = row.data;
-                seen[name] += byteLength;
-                seen.total += byteLength;
+                seen[name].bytes += byteLength;
+                seen.total.bytes += byteLength;
             };
 
             (async(obj) => {
                 for (const db of obj) {
                     name = `${db.name} (${db._uname})`;
-                    seen[name] = 0;
+                    seen[name] = {bytes: 0};
                     await db.data.each(store);
                 }
                 console.table(seen);

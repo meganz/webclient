@@ -389,6 +389,10 @@
             });
         }
 
+        if (window.d && (e.ctrlKey || e.metaKey) && /^mega-dbexport/.test(files[0].name)) {
+            return MegaDexie.import(files[0]).dump();
+        }
+
         if (window.d && (e.ctrlKey || e.metaKey) && MediaInfoLib.isFileSupported(files[0])) {
             window.d = 2;
             document.body.textContent = 'Local videostream.js Test...';

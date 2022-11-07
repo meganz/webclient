@@ -377,7 +377,7 @@ button:not(.mega-button) .icon {
     z-index: 5;
 }
 .fm-header-buttons .link-button.dropdown .dropdown-content {
-    z-index: 11;
+    z-index: 250;
 }
 .link-button.dropdown:hover .dropdown-content {
     display: block;

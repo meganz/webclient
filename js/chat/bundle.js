@@ -612,7 +612,9 @@ Chat.prototype.initChatUIFlagsManagement = function () {
     if (self.loadChatUIFlagsFromConfig(v)) {
       self.chatUIFlags.trackDataChange(0xDEAD);
     }
-  })));
+  })), mBroadcaster.addListener('statechange', state => {
+    this.trigger('viewstateChange', state);
+  }));
 };
 Chat.prototype.unregisterUploadListeners = function (destroy) {
   'use strict';
@@ -9423,7 +9425,7 @@ var _dec, _class;
 var sharedFilesAccordionPanel_React = __webpack_require__(363);
 
 
-class SharedFileItem extends mixins.wl {
+class SharedFileItem extends mixins._p {
   render() {
     var self = this;
     var message = this.props.message;
@@ -9594,14 +9596,15 @@ let SharedFilesAccordionPanel = (_dec = utils.ZP.SoonFcWrap(350), (_class = clas
             } = M.getMediaProperties(node);
             files.push(sharedFilesAccordionPanel_React.createElement(SharedFileItem, {
               message: message,
-              key: node.h + "_" + message.messageId,
+              key: `${node.h}_${message.messageId}`,
               isLoading: self.isLoadingMore,
               node: node,
               icon: icon,
               imgId: imgId,
               showThumbnail: showThumbnail,
               isPreviewable: isPreviewable,
-              chatRoom: room
+              chatRoom: room,
+              contact: Message.getContactForMessage(message)
             }));
             if (showThumbnail) {
               self.allShownNodes.set(node.fa, node);
@@ -9679,6 +9682,7 @@ class IncSharesAccordionPanel extends mixins.wl {
   }
   render() {
     var self = this;
+    var room = self.props.chatRoom;
     var contactHandle = self.getContactHandle();
     var contents = null;
     if (this.props.expanded) {
@@ -14034,7 +14038,7 @@ class ConversationsApp extends mixins.wl {
       }
       var $target = $(e.target);
       if (megaChat.currentlyOpenedChat) {
-        if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $target.closest('.mega-dialog').length > 0 || document.querySelector('textarea:focus,select:focus,input:focus')) {
+        if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $target.closest('.mega-dialog').length > 0 || document.querySelector('textarea:focus,select:focus,input:focus') || window.getSelection().toString()) {
           return;
         }
         var $typeArea = $('.messages-textarea:visible:first');
@@ -21905,6 +21909,21 @@ class Giphy extends AbstractGenericMessage {
       src: undefined
     };
   }
+  componentDidMount() {
+    super.componentDidMount();
+    megaChat.rebind(`viewstateChange.gif${this.getUniqueId()}`, e => {
+      const {
+        state
+      } = e.data;
+      if (state === 'active' && this.gifRef.current.paused || state !== 'active' && !this.gifRef.current.paused) {
+        this.toggle();
+      }
+    });
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    megaChat.off(`viewstateChange.gif${this.getUniqueId()}`);
+  }
   onVisibilityChange(isIntersecting) {
     this.setState({
       src: isIntersecting ? gifPanel.bl.convert(this.props.message.meta.src) : undefined
@@ -23309,6 +23328,25 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
     chatGlobalEventManager.addEventListener('resize', `typingArea${this.getUniqueId()}`, () => this.handleWindowResize());
     this.triggerOnUpdate(true);
     this.updateScroll();
+    megaChat.rebind(`viewstateChange.gifpanel${this.getUniqueId()}`, e => {
+      const {
+        gifPanelActive
+      } = this.state;
+      const {
+        state
+      } = e.data;
+      if (state === 'active' && !gifPanelActive && this.gifResume) {
+        this.setState({
+          gifPanelActive: true
+        });
+        delete this.gifResume;
+      } else if (state !== 'active' && gifPanelActive && !this.gifResume) {
+        this.gifResume = true;
+        this.setState({
+          gifPanelActive: false
+        });
+      }
+    });
   }
   componentWillMount() {
     const {
@@ -23355,9 +23393,10 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       megaChat.plugins.persistedTypeArea.removeChangeListener(self.getUniqueId());
     }
     chatGlobalEventManager.removeEventListener('resize', 'typingArea' + self.getUniqueId());
+    megaChat.off(`viewstateChange.gifpanel${this.getUniqueId()}`);
   }
   componentDidUpdate() {
-    if (this.isComponentEventuallyVisible() && $(document.querySelector('textarea:focus,select:focus,input:focus')).filter(":visible").length === 0) {
+    if (this.isComponentEventuallyVisible() && !window.getSelection().toString() && $('textarea:focus,select:focus,input:focus').filter(":visible").length === 0) {
       this.focusTypeArea();
     }
     this.updateScroll();
@@ -23540,9 +23579,12 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
                 `
     }, this.state.gifPanelActive && external_React_default().createElement(gifPanel.ZP, {
       chatRoom: this.props.chatRoom,
-      onToggle: () => this.setState({
-        gifPanelActive: false
-      })
+      onToggle: () => {
+        this.setState({
+          gifPanelActive: false
+        });
+        delete this.gifResume;
+      }
     }), external_React_default().createElement("div", {
       className: `
                         chat-textarea
@@ -23556,9 +23598,12 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
                             `,
       icon: "small-icon gif",
       disabled: this.props.disabled,
-      onClick: () => this.setState(state => ({
-        gifPanelActive: !state.gifPanelActive
-      }))
+      onClick: () => this.setState(state => {
+        delete this.gifResume;
+        return {
+          gifPanelActive: !state.gifPanelActive
+        };
+      })
     }), external_React_default().createElement(ui_buttons.z, {
       className: "popup-button emoji-button",
       icon: "sprite-fm-theme icon-emoji",
@@ -25705,7 +25750,7 @@ class BrowserEntries extends mixins.wl {
       selectionManager.clear_selection();
       selectionManager.set_currently_selected(node[self.props.keyProp]);
     } else if (e.shiftKey) {
-      selectionManager.shift_select_to(node[self.props.keyProp], true, true, false);
+      selectionManager.shift_select_to(node[self.props.keyProp], false, true, false);
     } else if (e.ctrlKey || e.metaKey) {
       if (!self.props.highlighted || self.props.highlighted.indexOf(node[self.props.keyProp]) === -1) {
         let highlighted = clone(self.props.highlighted || []);
@@ -25856,7 +25901,7 @@ class BrowserEntries extends mixins.wl {
       listAdapterOpts: listAdapterOpts,
       entries: this.props.entries,
       itemHeight: this.props.megaListItemHeight,
-      headerHeight: 36,
+      headerHeight: viewMode ? 0 : 36,
       header: !viewMode && external_React_default().createElement(GenericTableHeader, {
         columns: listAdapterOpts.columns,
         sortBy: this.state.sortBy,

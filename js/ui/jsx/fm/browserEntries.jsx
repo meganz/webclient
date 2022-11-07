@@ -236,7 +236,7 @@ export default class BrowserEntries extends MegaRenderMixin {
             selectionManager.set_currently_selected(node[self.props.keyProp]);
         }
         else if (e.shiftKey) {
-            selectionManager.shift_select_to(node[self.props.keyProp], true, true, false);
+            selectionManager.shift_select_to(node[self.props.keyProp], false, true, false);
         }
         else if (e.ctrlKey || e.metaKey) {
             // ctrl or cmd/meta, e.g. add to selection
@@ -426,7 +426,7 @@ export default class BrowserEntries extends MegaRenderMixin {
             listAdapterOpts={listAdapterOpts}
             entries={this.props.entries}
             itemHeight={this.props.megaListItemHeight}
-            headerHeight={36}
+            headerHeight={viewMode ? 0 : 36}
             header={!viewMode && <GenericTableHeader
                 columns={listAdapterOpts.columns}
                 sortBy={this.state.sortBy}

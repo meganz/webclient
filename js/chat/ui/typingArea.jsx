@@ -419,6 +419,18 @@ export class TypingArea extends MegaRenderMixin {
 
         this.triggerOnUpdate(true);
         this.updateScroll();
+        megaChat.rebind(`viewstateChange.gifpanel${this.getUniqueId()}`, e => {
+            const { gifPanelActive } = this.state;
+            const { state } = e.data;
+            if (state === 'active' && !gifPanelActive && this.gifResume) {
+                this.setState({ gifPanelActive: true });
+                delete this.gifResume;
+            }
+            else if (state !== 'active' && gifPanelActive && !this.gifResume) {
+                this.gifResume = true;
+                this.setState({ gifPanelActive: false });
+            }
+        });
     }
 
     componentWillMount() {
@@ -463,13 +475,16 @@ export class TypingArea extends MegaRenderMixin {
             megaChat.plugins.persistedTypeArea.removeChangeListener(self.getUniqueId());
         }
         chatGlobalEventManager.removeEventListener('resize', 'typingArea' + self.getUniqueId());
+        megaChat.off(`viewstateChange.gifpanel${this.getUniqueId()}`);
     }
 
     componentDidUpdate() {
 
-        if (this.isComponentEventuallyVisible() && $(
-                document.querySelector('textarea:focus,select:focus,input:focus')
-            ).filter(":visible").length === 0) {
+        if (
+            this.isComponentEventuallyVisible()
+            && !window.getSelection().toString()
+            && $('textarea:focus,select:focus,input:focus').filter(":visible").length === 0
+        ) {
             // no other element is focused...
             this.focusTypeArea();
         }
@@ -737,9 +752,10 @@ export class TypingArea extends MegaRenderMixin {
                 {this.state.gifPanelActive &&
                     <GifPanel
                         chatRoom={this.props.chatRoom}
-                        onToggle={() =>
-                            this.setState({ gifPanelActive: false })
-                        }
+                        onToggle={() => {
+                            this.setState({gifPanelActive: false});
+                            delete this.gifResume;
+                        }}
                     />
                 }
                 <div
@@ -759,7 +775,12 @@ export class TypingArea extends MegaRenderMixin {
                             icon="small-icon gif"
                             disabled={this.props.disabled}
                             onClick={() =>
-                                this.setState(state => ({ gifPanelActive: !state.gifPanelActive }))
+                                this.setState(state => {
+                                    delete this.gifResume;
+                                    return {
+                                        gifPanelActive: !state.gifPanelActive
+                                    };
+                                })
                             }
                         />
                     )}

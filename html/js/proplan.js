@@ -564,7 +564,7 @@ pro.proplan = {
 
                     // Change plan tip
                     if (planInfo[3]) {
-                        $planInfoBlock.text('*' + planInfo[3]);
+                        $planInfoBlock.text(planInfo[3]);
                     }
                 }
 

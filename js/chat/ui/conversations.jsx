@@ -114,6 +114,7 @@ class ConversationsApp extends MegaRenderMixin {
                     $target.closest('.messages.scroll-area').length > 0 ||
                     $target.closest('.mega-dialog').length > 0 ||
                     document.querySelector('textarea:focus,select:focus,input:focus')
+                    || window.getSelection().toString()
                 ) {
                     return;
                 }

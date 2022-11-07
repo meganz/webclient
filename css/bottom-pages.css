@@ -3067,6 +3067,33 @@ body:not(.mobile) .copy-line-icon:hover .dark-help-block {
     -webkit-margin-end: 12px;
     margin-inline-end: 12px;
 }
+.megaapp-macos {
+    max-width: 398px;
+    margin: -20px auto 60px;
+    padding: 24px;
+    background-color: #333;
+    box-sizing: border-box;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+.megaapp-macos .platform-label {
+    margin-bottom: 12px;
+    font-family: var(--text-font-family-semibold);
+    font-size: 16px;
+    line-height: 24px;
+    color: #fff;
+    text-align: left;
+}
+.megaapp-macos .form-row {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+.megaapp-macos .form-row label.radio-txt {
+    color: #fff;
+}
 .megaapp-footer {
     box-sizing: border-box;
     min-height: 48px;

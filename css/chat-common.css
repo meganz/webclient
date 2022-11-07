@@ -589,6 +589,7 @@
 }
 .chat-shared-block .chat-shared-info .small {
     font: var(--text-body2);
+    min-height: 18px;
 }
 .chat-shared-block .chat-shared-info .small .emoji {
     width: 14px;

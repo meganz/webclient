@@ -4167,7 +4167,7 @@ function fm_thumbnails(mode, nodeList, callback)
                 if (onTheFly) {
                     await thumbnails.query(
                         Object.keys(treq[1]).filter(h => !!onTheFly[h]),
-                        (n, h) => {
+                        (h) => {
                             delete treq[1][h];
                             delete onTheFly[h];
                             return validate(h);

@@ -1730,11 +1730,11 @@ var addressDialog = {
         const prefillMultipleInputs = (inputs, value) => {
             if (Array.isArray(inputs)) {
                 inputs.forEach(($megaInput) => {
-                    $megaInput.$input.val(value).trigger('change');
+                    $megaInput.setValue(value);
                 });
             }
             else {
-                inputs.$input.val(value).trigger('change');
+                inputs.setValue(value);
             }
         };
 

@@ -1077,30 +1077,15 @@ accountUI.account = {
         },
 
         renderCountry: function() {
-
             'use strict';
 
-            var html = '';
-            var sel = '';
-            var $country = $('#account-country', accountUI.$contentBlock);
-            $('span', $country).text(l[996]);
-            var countries = M.getCountries();
-            for (var country in countries) {
-                if (!countries.hasOwnProperty(country)) {
-                    continue;
-                }
-                if (u_attr.country && country === u_attr.country) {
-                    sel = 'active';
-                    $('span', $country).text(countries[country]);
-                }
-                else {
-                    sel = '';
-                }
-                html += '<div class="option" data-value="' + country
-                    +   '" data-state="' + sel + '">' + countries[country]
-                    +  '</div>';
-            }
-            $('.dropdown-scroll', $country).safeHTML(html);
+            const $country = $('#account-country', accountUI.$contentBlock);
+
+            createDropdown($country, {
+                placeholder: $('span', $country).text(l[996]),
+                items: M.getCountries(),
+                selected: u_attr.country
+            });
 
             // Bind Dropdowns events
             bindDropdownEvents($country, 1);
@@ -1422,7 +1407,7 @@ accountUI.account = {
                     birthmonth: String(bm || ''),
                     birthyear: String(by || ''),
                     country: String(
-                        $('#account-country .option[data-state="active"]', $personalInfoBlock).attr('data-value') || ''
+                        getDropdownValue($('#account-country', $personalInfoBlock))
                     )
                 };
                 var userAttrRequest = { a: 'up' };

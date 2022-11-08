@@ -220,6 +220,21 @@
         }
     };
 
+    /**
+     * Update value on all input elements and trigger change event
+     *
+     * @param {*} value New value to set on all affected input elements
+     *
+     * @returns {void}
+     */
+    MegaInputs.prototype.setValue = function(value) {
+        if (!this.$input || !this.$input.length) {
+            return;
+        }
+
+        this.$input.val(value).trigger('change');
+    };
+
     // Export
     scope.mega = scope.mega || {};
     scope.mega.ui = scope.mega.ui || {};

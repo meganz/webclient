@@ -412,7 +412,7 @@ mega.ui.MegaInputs.prototype.underlinedText._extendedFunctions = function() {
         }
 
         this.hideError();
-        this.$input.val(value).trigger('change');
+        mega.ui.MegaInputs.prototype.setValue.call(this, value);
 
         onIdle(function() {
             self.$input.prev().removeClass('no-trans');

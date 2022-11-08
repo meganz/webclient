@@ -258,3 +258,213 @@ function removeFromMultiInputDDL(dialog, item) {
         $(dialog).tokenInput("removeFromDDL", item);
     }
 }
+
+/**
+ * Set mega dropdown value
+ *
+ * @param {$} $container parent or element selctor
+ * @param {string|function} selectedOptionCallback value or callback to get selected option element
+ *
+ * @returns {void}
+ */
+function setDropdownValue($container, selectedOptionCallback) {
+    'use strict';
+
+    const $megaInputDropdown = getDropdownMegaInput($container);
+    if (!$megaInputDropdown || !$megaInputDropdown.length) {
+        return;
+    }
+
+    const $dropdownInput = $('.mega-input-dropdown',  $megaInputDropdown);
+    const $dropdownInputOptions = $('.option', $dropdownInput);
+
+    if (!$dropdownInputOptions.length) {
+        return;
+    }
+
+    let $selectedOption = typeof selectedOptionCallback === 'function' ?
+        selectedOptionCallback($dropdownInput, $dropdownInputOptions) :
+        $(`.option[data-value="${selectedOptionCallback}"]`, $dropdownInput);
+
+    const $dropdownSpanValueLabel = $('span:first', $megaInputDropdown);
+    const $dropdownHiddenInput = $('.hidden-input', $megaInputDropdown);
+
+    // Clear selected value;
+    $dropdownInputOptions
+        .removeClass('active')
+        .removeAttr('data-state');
+
+    if (!$selectedOption.length) {
+        $selectedOption = $dropdownInputOptions.first(); // If no match then select first by default?
+    }
+
+    if (!$selectedOption.length) { // Abnormal situation, dropdown may not be initialized
+        return;
+    }
+
+    $selectedOption
+        .addClass('active')
+        .attr('data-state', 'active');
+
+    $dropdownSpanValueLabel.text($selectedOption.text());
+    $dropdownHiddenInput.trigger('focus');
+}
+
+function getDropdownMegaInput($container) {
+    'use strict';
+    if (!$container || !$container.length) {
+        return;
+    }
+
+    const inputDropdownClass = 'dropdown-input';
+    const megaInputClass = 'mega-input';
+    const dropdownClass = `.${megaInputClass}.${inputDropdownClass}`;
+
+    let $megaInputDropdown = $container;
+
+    if (!$megaInputDropdown.hasClass(megaInputClass) && !$megaInputDropdown.hasClass(inputDropdownClass)) {
+        $megaInputDropdown = $container.closest(dropdownClass);
+    }
+
+    return $megaInputDropdown;
+}
+
+function createDropdown($container, options) {
+    'use strict';
+
+    const $megaInputDropdown = getDropdownMegaInput($container);
+    if (!$megaInputDropdown || !$megaInputDropdown.length) {
+        return;
+    }
+
+    const __prepareDropdownLabel = ($megaInputDropdown, options) => {
+        const $dropdownTitle = $('.mega-input-title', $megaInputDropdown);
+        const $dropdownInput = $('.mega-input-dropdown',  $megaInputDropdown);
+        let $dropdownSpanValueLabel = $('span:first', $megaInputDropdown);
+
+        if (!$dropdownSpanValueLabel.length) {
+            $dropdownSpanValueLabel = $('<span/>', {});
+
+            if ($dropdownTitle.length) {
+                $dropdownSpanValueLabel.insertAfter($dropdownTitle);
+            }
+            else {
+                $dropdownSpanValueLabel.insertBefore($dropdownInput);
+            }
+        }
+
+        if (typeof options.placeholder === 'string') {
+            $dropdownSpanValueLabel.text(options.placeholder);
+        }
+    };
+
+    const __prepareDropdownOptions = ($megaInputDropdown, $dropdownInput, options) => {
+        const $dropdownInputScroll = $('.dropdown-scroll',  $dropdownInput);
+        if ($dropdownInputScroll.length) {
+            $dropdownInputScroll.empty(); // clear list
+        }
+
+        const selectedOption = options.selected;
+        const selectedOptionCallback = typeof selectedOption === 'function' ?
+            selectedOption :
+            null;
+
+        const postActionCallback = typeof options.postAction === 'function' ?
+            options.postAction :
+            null;
+
+        const optionList = options.items;
+
+        if (typeof optionList !== 'object') {
+            return;
+        }
+
+        let $selectedOption  = null;
+
+        for (const option in optionList) {
+            if (!optionList.hasOwnProperty(option)) {
+                continue;
+            }
+
+            const value = optionList[option];
+            const index = option;
+            const attr = {
+                'data-value': index
+            };
+
+            const $dropdownOptionItem = $(
+                '<div/>', {
+                    class: 'option'
+                }
+            );
+
+            $dropdownOptionItem
+                .attr(attr)
+                .text(value);
+
+            if (selectedOption) {
+                const result =  selectedOptionCallback ?
+                    selectedOptionCallback($dropdownOptionItem, value, index) :
+                    selectedOption === index;
+
+                if (result) {
+                    $dropdownOptionItem
+                        .addClass('active')
+                        .attr('data-state', 'active');
+
+                    $selectedOption = $dropdownOptionItem;
+                }
+            }
+
+            if (postActionCallback) {
+                postActionCallback($dropdownOptionItem, value, index, optionList);
+            }
+
+            $dropdownOptionItem.appendTo($dropdownInputScroll);
+        }
+
+        const $dropdownSpanValueLabel = $('span:first', $megaInputDropdown);
+        const $dropdownHiddenInput = $('.hidden-input', $megaInputDropdown);
+
+        if (!$selectedOption || !$selectedOption.length) { // Abnormal situation, dropdown may not be initialized
+            return;
+        }
+
+        $dropdownSpanValueLabel.text($selectedOption.text());
+        $dropdownHiddenInput.trigger('focus');
+    };
+
+    __prepareDropdownLabel($megaInputDropdown, options);
+
+    const $dropdownInput = $('.mega-input-dropdown',  $megaInputDropdown);
+    __prepareDropdownOptions($megaInputDropdown, $dropdownInput, options);
+}
+
+function getDropdownValue($container, attributeName) {
+    'use strict';
+
+    const defaultValue = '';
+    const $megaInputDropdown = getDropdownMegaInput($container);
+    if (!$megaInputDropdown || !$megaInputDropdown.length) {
+        return defaultValue;
+    }
+
+    const $dropdownInput = $('.mega-input-dropdown ',  $megaInputDropdown);
+    if (!$dropdownInput.length) {
+        return defaultValue;
+    }
+
+    const $dropdownInputSelectedOption = $(`.option[data-state="active"]`, $dropdownInput);
+    if (!$dropdownInputSelectedOption.length) {
+        return defaultValue;
+    }
+
+    if (!attributeName) {
+        return $dropdownInputSelectedOption.attr('data-value') ||
+            defaultValue;
+    }
+
+    return $dropdownInputSelectedOption.attr(`data-${attributeName}`) ||
+        $dropdownInputSelectedOption.attr('data-value') ||
+        defaultValue;
+}

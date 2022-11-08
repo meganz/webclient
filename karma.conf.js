@@ -129,6 +129,9 @@ module.exports = function(config) {
         'js/keepAlive.js',
         'js/metatags.js',
         'js/utils/trans.js',
+        'js/ui/megaInputs.js',
+        'js/ui/megaInputs-underlinedText.js',
+        'js/ui/dropdowns.js',
         'js/time_checker.js',
 
         // Transfers

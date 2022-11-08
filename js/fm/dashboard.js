@@ -612,7 +612,6 @@ dashboardUI.updateCloudDataWidget = function() {
     const data = M.getDashboardData();
     const locale = [files, folders, files, folders, folders, folders, folders];
     const map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'backups', 'links', 'versions'];
-    const intl = typeof Intl !== 'undefined' && Intl.NumberFormat && new Intl.NumberFormat();
 
     $('.data-item .links-s').rebind('click', function() {
         loadSubPage('fm/public-links');
@@ -651,15 +650,11 @@ dashboardUI.updateCloudDataWidget = function() {
         .each(function(idx, elm) {
             const props = data[map[idx]];
             let {cnt, xfiles, size} = props;
-            if (intl) {
-                cnt = intl.format(cnt || 0);
-                xfiles = intl.format(xfiles || 0);
-            }
 
-            let str = idx < 7 ? mega.icu.format(locale[idx], cnt) : cnt;
+            let str = idx < 7 ? mega.icu.format(locale[idx], cnt, true) : cnt;
 
             if (props.xfiles > 0) {
-                str += `, ${mega.icu.format(files, xfiles)}`;
+                str += `, ${mega.icu.format(files, xfiles, true)}`;
             }
 
             elm.children[1].textContent = str;

@@ -739,16 +739,15 @@ body:not(.mobile) .current .pricing-page.plan-button:hover {
 
 /* If plan block is a part of a Plans list */
 .pricing-page.plans-row {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
 .plans-row .pricing-page.plan {
     border-width: 0 0 0 1px;
-    display: flex;
-    flex: 0 0 auto;
-    flex-direction: column;
     vertical-align: top;
-    width: 25%;
+}
+body:not(.rtl) .plans-row .pricing-page.plan.hidden + .plan {
+    border-left: none;
 }
 .plans-row .pricing-page.plan.free {
     display: none;
@@ -876,6 +875,9 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     max-width: 370px;
     margin: 0 auto;
     white-space: normal;
+}
+.rtl .pricing-page.plan-feature {
+    padding: 7px 16px 7px 38px;
 }
 .pricing-page.plan-feature.text-body1 {
     font: var(--text-body1);

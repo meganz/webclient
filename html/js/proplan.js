@@ -719,6 +719,7 @@ pro.proplan = {
             var $planButton = $('.pricing-page.plan-button', $pricingBox);
             var basePrice;
             var baseCurrency;
+            $pricingBox.removeClass('hidden');
 
             if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
 

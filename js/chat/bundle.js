@@ -3977,7 +3977,8 @@ ChatRoom.prototype.stopRinging = function (callId) {
   });
 };
 ChatRoom.prototype.callParticipantsUpdated = function
-() {
+(
+) {
   var self = this;
   var msgId = self.getActiveCallMessageId();
   if (!msgId) {
@@ -26531,6 +26532,11 @@ class GenericNodePropsComponent extends mixins.wl {
   }
   changeListener() {
     if (this.isMounted()) {
+      this.safeForceUpdate();
+    }
+  }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.highlighted !== this.props.highlighted) {
       this.safeForceUpdate();
     }
   }

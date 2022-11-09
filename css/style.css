@@ -13714,7 +13714,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     position: fixed;
     bottom: 0;
     left: 72px;
-    z-index: 121;
+    z-index: 221;
 }
 .active-folder-link .corner-messages {
     bottom: 24px;

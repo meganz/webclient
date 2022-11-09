@@ -777,7 +777,7 @@ var security = {
                         $($inputs.get(1)).trigger('focus');
                     }
                     else {
-                        $('button', $dialog).trigger('click');
+                        $('button.next, button.finish, button.send-email', $dialog).trigger('click');
                     }
                 }
             });

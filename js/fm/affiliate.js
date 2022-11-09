@@ -1272,11 +1272,11 @@ affiliateUI.redemptionDialog = {
 
             $('input', $autofillCheckbox).prop('checked', false);
             $('.checkdiv', $autofillCheckbox).removeClass('checkboxOn').addClass('checkboxOff');
-            accNameMegaInput.$input.val('');
+            accNameMegaInput.setValue('');
             $accountType.empty();
         }
         else if (!affiliateRedemption.requests.second.extra.an) {
-            accNameMegaInput.$input.val('');
+            accNameMegaInput.setValue('');
         }
         else if (!affiliateRedemption.requests.second.extra.type) {
             $accountType.empty();
@@ -1540,15 +1540,16 @@ affiliateUI.redemptionDialog = {
                             $('.active', parentDynamicInput[1]).data('type') === defaultInfo[parentDynamicInput[2]]) {
 
                             if (additions[j].va) {
-                                // TODO: replace this with a proper function to set the value of a MegaInput/Dropdown
-                                const $option = $('[data-type="' + defaultInfo[additions[j].key] + '"]', $newElem)
-                                const $dropdown = $option.closest('.dropdown-input');
-
-                                // Select dropdown item
-                                $('.option', $dropdown).removeClass('active').removeAttr('data-state');
-                                $option.addClass('active').attr('data-state', 'active');
-                                $('span', $dropdown).text($option.text());
-                                $('.hidden-input', $dropdown).trigger('focus');
+                                const selectedValue = defaultInfo[additions[j].key];
+                                setDropdownValue(
+                                    $newElem,
+                                    ($dropdownInput) => {
+                                        if (!$dropdownInput.length) {
+                                            return;
+                                        }
+                                        return $(`[data-type="${selectedValue}"]`, $dropdownInput);
+                                    }
+                                );
                             }
                             else {
                                 $newElem.val(defaultInfo[additions[j].key]);

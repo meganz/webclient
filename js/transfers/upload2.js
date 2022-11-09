@@ -134,6 +134,10 @@ var ulmanager = {
                     .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
                 : l[19136]);
 
+            if (is_mobile) {
+                $('.upgrade-to-pro', $dialog).rebind('tap', () => loadSubPage('/pro'));
+            }
+
             // Load the membership plans
             dlmanager.setPlanPrices($dialog);
 

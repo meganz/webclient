@@ -656,6 +656,7 @@ lazy(pro, 'proplan2', () => {
             // const priceIndex = period === 12 ? pro.UTQA_RES_INDEX_PRICE : pro.UTQA_RES_INDEX_MONTHLYBASEPRICE;
 
             const $planCard = $planCards.filter(`#pro${planNum}`);
+            $planCard.removeClass('hidden');
 
             let planPrice = currentPlan[pro.UTQA_RES_INDEX_PRICE];
             let priceCurrency = 'EUR';

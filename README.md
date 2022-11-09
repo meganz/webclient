@@ -132,6 +132,9 @@ Our JavaScript Files
   decrypt data while downloading
 * ``encrypter.js`` -- the encrypter which is used as a web worker to
   encrypt data while uploading
+* ``pdf.worker.js`` -- worker for PDF Reader in JavaScript, **this is a fork**, [compare the changes](https://github.com/mozilla/pdf.js/compare/master...meganz:master)
+* ``worker.sfuClient.bundle.js`` -- worker for [MEGA SFU client](https://github.com/meganz/sfu-client/)
+  for audio/video calls
 * ``js/avatar.js`` -- is used for avatar selection, cropping & scaling
   (all on the client side in the canvas)
 * ``js/cleartemp.js`` -- contains ``clearIt()`` which is used to purge

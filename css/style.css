@@ -4979,26 +4979,26 @@ span.orange {
     left: auto;
 }
 .context-top-arrow, .context-bottom-arrow {
-    height: 16px;
-    width: 12px;
-    left: 50%;
-    margin: 0 0 0 -6px;
+    height: 0;
+    width: 0;
+    left: calc(50% - 4px);
     position: absolute;
-    top: 6px;
-    background-image: url(../images/mega/fm-main-sprite.png);
-    background-position: center -8343px;
-    background-position: right -1288px;
-    background-repeat: no-repeat;
+    top: 10px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
     cursor: pointer;
     display: none;
 }
 .mega-height > .context-top-arrow, .mega-height > .context-bottom-arrow {
     display:block;
 }
+.context-top-arrow {
+    border-bottom: 4px solid var(--icon-rest);
+}
 .context-bottom-arrow {
-    background-position: right -1228px;
+    border-top: 4px solid var(--icon-rest);
     top: auto;
-    bottom: 6px;
+    bottom: 10px;
 }
 .context-top-arrow.disabled, .context-bottom-arrow.disabled {
     opacity: 0.7;
@@ -13714,7 +13714,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     position: fixed;
     bottom: 0;
     left: 72px;
-    z-index: 121;
+    z-index: 221;
 }
 .active-folder-link .corner-messages {
     bottom: 24px;

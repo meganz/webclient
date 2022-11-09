@@ -409,14 +409,45 @@
         // Keep track of the timeout, old vals
         var timeout;
         var input_val;
-
-        // Create a new text input an attach keyup events
         var input_box = $('<input type="text" autocomplete="disabled" autocapitalize="off"/>')
             .css({
                 outline: "none"
             })
             .attr("id", $(input).data("settings").idPrefix + input.id)
-            .on('focus', function() {
+        const initScroll = SoonFc(() => {
+            var $wrapper = $(input).closest('.multiple-input');
+
+            initPerfectScrollbar($wrapper);
+
+            if ($(input).data("settings").initFocused) {
+                focus_with_timeout(input_box);
+            }
+        });
+
+        // Magic element to help us resize the text input
+        var input_resizer = $("<tester/>");
+
+        var token_list = $("<ul />").addClass($(input).data("settings").classes.tokenList);
+
+        function resize_input() {
+            if (input_val === (input_val = input_box.val())) {
+                return;
+            }
+            // Get width left on the current line
+            var width_left = token_list.outerWidth() - input_box.offset().left - token_list.offset().left;
+            // Enter new content into resizer and resize input accordingly
+            input_resizer.html(_escapeHTML(input_val));
+            // Get maximum width, minimum the size of input and maximum the widget's width
+            input_box.width(Math.min(
+                token_list.outerWidth() || 30,
+                Math.max(width_left, input_resizer.outerWidth() + 30)
+            ));
+
+            initScroll();
+        }
+
+        // Create a new text input an attach keyup events
+        input_box.on('focus', () => {
                 if ($(input).data("settings").disabled) {
                     return false;
                 }
@@ -647,9 +678,7 @@
         var selected_dropdown_item = null;
 
         // The list to store the token items in
-        var token_list = $("<ul />")
-            .addClass($(input).data("settings").classes.tokenList)
-            .on('click', function(event) {
+        token_list.on('click', event => {
                 var li = $(event.target).closest("li");
                 if (li && li.get(0) && $.data(li.get(0), "tokeninput")) {
                     toggle_select_token(li);
@@ -689,8 +718,7 @@
             .appendTo("body")
             .hide();
 
-        // Magic element to help us resize the text input
-        var input_resizer = $("<tester/>")
+        input_resizer
             .insertAfter(input_box)
             .css({
                 position: "absolute",
@@ -699,6 +727,7 @@
                 width: "auto",
                 whiteSpace: "nowrap"
             });
+
 
         // Pre-populate list if items exist
         hidden_input.val("");
@@ -812,48 +841,31 @@
             }
         }
 
-        function initScroll() {
-            var $wrapper = $(input).closest('.multiple-input');
-
-            initPerfectScrollbar($wrapper);
-            $wrapper.scrollTop(input_box.position().top + input_box.outerHeight());
-
-            if ($(input).data("settings").initFocused) {
-                focus_with_timeout(input_box);
-            }
-        }
-
-        function resize_input() {
-            if (input_val === (input_val = input_box.val())) {
-                return;
-            }
-            // Get width left on the current line
-            var width_left = token_list.outerWidth() - input_box.offset().left - token_list.offset().left;
-            // Enter new content into resizer and resize input accordingly
-            input_resizer.html(_escapeHTML(input_val));
-            // Get maximum width, minimum the size of input and maximum the widget's width
-            input_box.width(Math.min(token_list.outerWidth() || 30,
-                Math.max(width_left, input_resizer.outerWidth() + 30)));
-
-            initScroll();
-        }
-
         function add_freetagging_tokens() {
 
             var value = $.trim(input_box.val()).replace(/\s|\n/gi, '');
             var tokens = value.split($(input).data("settings").tokenDelimiter);
 
-            $.each(tokens, function(i, token) {
-                if (!token) {
-                    return;
-                }
+            if (tokens.length > 10) {
+                loadingDialog.pshow();
+            }
+            onIdle(() => {
+                for (let i = 0; i < tokens.length; i++) {
+                    let token = tokens[i];
+                    if (token) {
+                        const { onFreeTaggingAdd, tokenValue, propertyToSearch } = $(input).data("settings");
 
-                if ($.isFunction($(input).data("settings").onFreeTaggingAdd)) {
-                    token = $(input).data("settings").onFreeTaggingAdd.call(hidden_input, token);
+                        if (typeof onFreeTaggingAdd === 'function') {
+                            token = onFreeTaggingAdd.call(hidden_input, token);
+                        }
+                        const object = {};
+                        object[tokenValue] = object[propertyToSearch] = token;
+                        add_token(object);
+                    }
                 }
-                var object = {};
-                object[$(input).data("settings").tokenValue] = object[$(input).data("settings").propertyToSearch] = token;
-                add_token(object);
+                if (tokens.length > 10) {
+                    loadingDialog.phide();
+                }
             });
         }
 
@@ -1005,9 +1017,6 @@
                     return;
                 }
             }
-
-            // Squeeze input_box so we force no unnecessary line break
-            input_box.width(1);
 
             // Insert the new tokens
             if ($(input).data("settings").tokenLimit == null || token_count < $(input).data("settings").tokenLimit && isEmail) {

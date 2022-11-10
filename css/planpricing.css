@@ -317,6 +317,12 @@ i.grey-small-check-tick {
     background-repeat: no-repeat;
     background-position: center;
 }
+i.black-small-check-tick {
+    background-image: url("../images/mega/black-small-check-tick.svg");
+}
+i.black-small-cross-tick {
+    background-image: url("../images/mega/black-small-cross-tick.svg");
+}
 i.minus-icon {
     background-image: url("../images/mega/minus-icon.svg");
     width: 24px;
@@ -554,15 +560,34 @@ i.dropbox-icon {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 32px;
-    margin-top: 48px;
+    margin-top: 64px;
 }
 .pricing-compare-cards-container .pricing-compare-cards {
     display: flex;
     flex-direction: column;
-    padding: 32px;
     background-color: var(--color-bg);
     border: 1px solid var(--color-grey-150);
     box-sizing: border-box;
+}
+.pricing-compare-cards .box {
+    padding: 32px;
+}
+.pricing-compare-cards .pricing-compare-cards-feature {
+    display: flex;
+    background-color: var(--color-grey-50);
+    padding: 16px 32px;
+}
+.pricing-compare-cards .pricing-compare-cards-feature span {
+    font: var(--text-copy-medium-bold-pricing);
+}
+.pricing-compare-cards .pricing-compare-cards-feature i {
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+    vertical-align: top;
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
+    background-size: auto;
 }
 .pricing-compare-cards .pricing-compare-cards-title {
     font: var(--text-h5-pricing);
@@ -601,7 +626,7 @@ i.dropbox-icon {
     color: var(--color-copy-secondary);
 }
 .pricing-compare-cards .pricing-compare-cards-note {
-    margin-top: 32px;
+    padding: 24px 32px 32px;
     font: var(--text-caption-regular-pricing);
     color: var(--color-copy-secondary);
 }
@@ -1042,20 +1067,22 @@ i.pricing-i-icon {
         }
         .pricing-pg.pricing-compare-container .pricing-compare-cards-container {
             gap: 24px;
-            margin-top: 44px;
+            margin-top: 56px;
         }
-        .pricing-compare-cards-container .pricing-compare-cards {
+        .pricing-compare-cards-container .pricing-compare-cards .box {
             padding: 24px;
+        }
+        .pricing-compare-cards .pricing-compare-cards-feature {
+            padding: 16px 24px;
         }
         .pricing-compare-cards .pricing-compare-cards-rate {
             margin-top: 28px;
         }
         .pricing-compare-cards .pricing-compare-cards-note {
-            margin-top: 28px;
+            padding: 24px;
         }
-        .pricing-compare-cards-container .pricing-compare-cards i {
-            width: 56px;
-            height: 56px;
+        .pricing-compare-cards-container .pricing-compare-cards span {
+            line-height: 1.7;
         }
         .pricing-pg.pricing-compare-container .pricing-compare-references {
             margin-top: 28px;
@@ -1221,21 +1248,23 @@ i.pricing-i-icon {
         }
         .pricing-pg.pricing-compare-container .pricing-compare-cards-container {
             gap: 24px;
-            margin-top: 40px;
+            margin-top: 48px;
             grid-template-columns: 1fr;
         }
-        .pricing-compare-cards-container .pricing-compare-cards {
+        .pricing-compare-cards-container .pricing-compare-cards .box {
             padding: 24px;
+        }
+        .pricing-compare-cards .pricing-compare-cards-feature {
+            padding: 16px 24px;
         }
         .pricing-compare-cards .pricing-compare-cards-rate {
             margin-top: 28px;
         }
         .pricing-compare-cards .pricing-compare-cards-note {
-            margin-top: 28px;
+            padding: 24px;
         }
-        .pricing-compare-cards-container .pricing-compare-cards i {
-            width: 56px;
-            height: 56px;
+        .pricing-compare-cards-container .pricing-compare-cards span {
+            line-height: 1.7;
         }
         .pricing-pg.pricing-compare-container .pricing-compare-references {
             margin-top: 28px;

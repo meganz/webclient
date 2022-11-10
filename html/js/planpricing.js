@@ -349,7 +349,6 @@ lazy(pro, 'proplan2', () => {
         sliderEventHandler($usersBusinessSlider[0]);
         sliderEventHandler($strgBusinessSlider[0]);
         sliderEventHandler($trsBusinessSlider[0]);
-        sliderEventHandler($compareSlider[0]);
         sliderEventHandler($flexStorageSlider[0]);
         sliderEventHandler($flexTransSlider[0]);
 

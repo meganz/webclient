@@ -78,6 +78,7 @@ export class Start extends MegaRenderMixin {
             ref={this.inputRef}
             className={Start.CLASS_NAMES.INPUT}
             value={this.state.topic}
+            maxLength={ChatRoom.TOPIC_MAX_LENGTH}
             onChange={this.handleChange}
         />;
 

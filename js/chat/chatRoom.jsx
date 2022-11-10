@@ -465,6 +465,7 @@ ChatRoom.STATE = {
 ChatRoom.INSTANCE_INDEX = 0;
 ChatRoom.ANONYMOUS_PARTICIPANT = mega.BID;
 ChatRoom.ARCHIVED = 0x01;
+ChatRoom.TOPIC_MAX_LENGTH = 30;
 
 ChatRoom.MembersSet = function(chatRoom) {
     this.chatRoom = chatRoom;
@@ -1002,9 +1003,7 @@ ChatRoom.prototype.getParticipantsExceptMe = function(userHandles) {
  * @returns {string}
  */
 
-ChatRoom.prototype.getParticipantsTruncated = function(maxMembers, maxLength) {
-    maxMembers = maxMembers || 5;
-    maxLength = maxLength || 30;
+ChatRoom.prototype.getParticipantsTruncated = function(maxMembers = 5, maxLength = ChatRoom.TOPIC_MAX_LENGTH) {
     var truncatedParticipantNames = [];
 
     const members =  Object.keys(this.members);
@@ -1065,8 +1064,7 @@ ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
  * @returns {string}
  */
 
-ChatRoom.prototype.getTruncatedRoomTopic = function(maxLength) {
-    maxLength = maxLength || 30;
+ChatRoom.prototype.getTruncatedRoomTopic = function(maxLength = ChatRoom.TOPIC_MAX_LENGTH) {
     return this.topic && this.topic.length > maxLength ? this.topic.substr(0, maxLength) + '...' : this.topic;
 };
 

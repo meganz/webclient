@@ -286,10 +286,6 @@ lazy(pro, 'proplan2', () => {
         const $strgFlexInput = $('#esti-storage', $proflexiBlock);
         const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
-        $gdNote.text(l[23818].replace('%1', bytesToSize(2 * 1099511627776, 0)));
-        $megaNote.text(l[23818].replace('%1', l[5819]));
-        $refNote.text(`(1) ${l[24078].replace('%1', formatCurrency(1.00, null, 'number'))}`);
-
         // ordered array for ranges: [range-start,range-end,min,max]
         const symmetricRanges = [
             [0, 32, 3, 75],
@@ -310,9 +306,9 @@ lazy(pro, 'proplan2', () => {
             [formatCurrency(29.99), false, false]
         ];
 
-        $compareMEGA.text(competitorsValues[1][0]);
-        $compareDP.text(competitorsValues[1][1]);
-        $compareGD.text(competitorsValues[1][2]);
+        $compareMEGA.text(formatCurrency(1.56));
+        $compareDP.text(formatCurrency(5.50));
+        $compareGD.text(formatCurrency(3.70));
 
         const sliderEventHandler = (slider, ranges, $inputTxt) => {
             let val = slider.value;

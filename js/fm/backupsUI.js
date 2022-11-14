@@ -1626,7 +1626,7 @@ lazy(mega, 'backupCenter', () => {
                 };
             }
 
-            M.openFolder('backups', true);
+            M.openFolder('devices', true);
         }
 
         ackVaultWriteAccess(h, req) {

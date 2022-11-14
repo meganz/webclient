@@ -207,7 +207,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                                 ref={this.inputRef}
                                 placeholder={l[18509] /* `Enter group name` */}
                                 value={this.state.groupName}
-                                maxLength={30}
+                                maxLength={ChatRoom.TOPIC_MAX_LENGTH}
                                 onKeyDown={e => {
                                     const code = e.which || e.keyCode;
                                     if (allowNext && code === 13 && self.state.step === 1) {

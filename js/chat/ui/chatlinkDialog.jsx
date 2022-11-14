@@ -126,7 +126,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                     onChange={this.onTopicFieldChanged}
                                     onKeyPress={this.onTopicFieldKeyPress}
                                     placeholder={l[20616] /* `Add a description for this chat` */}
-                                    maxLength="30"
+                                    maxLength={ChatRoom.TOPIC_MAX_LENGTH}
                                 />
                             </div>
                         </div>

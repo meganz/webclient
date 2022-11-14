@@ -2686,6 +2686,7 @@ ChatRoom.STATE = {
 ChatRoom.INSTANCE_INDEX = 0;
 ChatRoom.ANONYMOUS_PARTICIPANT = mega.BID;
 ChatRoom.ARCHIVED = 0x01;
+ChatRoom.TOPIC_MAX_LENGTH = 30;
 ChatRoom.MembersSet = function (chatRoom) {
   this.chatRoom = chatRoom;
   this.members = {};
@@ -3025,9 +3026,7 @@ ChatRoom.prototype.getParticipantsExceptMe = function (userHandles) {
   return res;
 };
 
-ChatRoom.prototype.getParticipantsTruncated = function (maxMembers, maxLength) {
-  maxMembers = maxMembers || 5;
-  maxLength = maxLength || 30;
+ChatRoom.prototype.getParticipantsTruncated = function (maxMembers = 5, maxLength = ChatRoom.TOPIC_MAX_LENGTH) {
   var truncatedParticipantNames = [];
   const members = Object.keys(this.members);
   for (var i = 0; i < members.length; i++) {
@@ -3063,8 +3062,7 @@ ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
   }
 };
 
-ChatRoom.prototype.getTruncatedRoomTopic = function (maxLength) {
-  maxLength = maxLength || 30;
+ChatRoom.prototype.getTruncatedRoomTopic = function (maxLength = ChatRoom.TOPIC_MAX_LENGTH) {
   return this.topic && this.topic.length > maxLength ? this.topic.substr(0, maxLength) + '...' : this.topic;
 };
 
@@ -9894,7 +9892,7 @@ class ChatlinkDialog extends mixins.wl {
       onChange: this.onTopicFieldChanged,
       onKeyPress: this.onTopicFieldKeyPress,
       placeholder: l[20616],
-      maxLength: "30"
+      maxLength: ChatRoom.TOPIC_MAX_LENGTH
     })))) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("header", null, external_React_default().createElement("i", {
       className: "sprite-fm-uni icon-chat-group"
     }), external_React_default().createElement("h2", {
@@ -11667,7 +11665,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         className: "chat-rename-group-dialog",
         name: "newTopic",
         value: renameDialogValue,
-        maxLength: "30",
+        maxLength: ChatRoom.TOPIC_MAX_LENGTH,
         onChange: e => {
           self.setState({
             'renameDialogValue': e.target.value.substr(0, 30)
@@ -12154,6 +12152,7 @@ class Start extends mixins.wl {
       ref: this.inputRef,
       className: Start.CLASS_NAMES.INPUT,
       value: this.state.topic,
+      maxLength: ChatRoom.TOPIC_MAX_LENGTH,
       onChange: this.handleChange
     });
     this.onStreamToggle = (audio, video) => this.setState({
@@ -12467,7 +12466,7 @@ class StartGroupChatWizard extends mixins.wl {
         ref: this.inputRef,
         placeholder: l[18509],
         value: this.state.groupName,
-        maxLength: 30,
+        maxLength: ChatRoom.TOPIC_MAX_LENGTH,
         onKeyDown: e => {
           const code = e.which || e.keyCode;
           if (allowNext && code === 13 && self.state.step === 1) {

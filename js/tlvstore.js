@@ -64,8 +64,14 @@ lazy(self, 'tlvstore', () => {
         if (utf8) {
             value = asmCrypto.bytes_to_string(te.encode(value));
         }
-        const length = String.fromCharCode(value.length >>> 8) + String.fromCharCode(value.length & 0xff);
-        return `${key}\u0000${length}${value}`;
+        if (value.length > 65535) {
+            if (typeof eventlog === 'function') {
+                eventlog(99772, JSON.stringify([1, 1, key.length, value.length, utf8 | 0]), true);
+            }
+            this._logger.warn(`TLV-record ${key} did overflow.`, utf8);
+        }
+        const length = Math.min(65535, value.length);
+        return `${key}\u0000${String.fromCharCode(length >>> 8)}${String.fromCharCode(length & 0xff)}${value}`;
     };
 
     /**
@@ -105,15 +111,26 @@ lazy(self, 'tlvstore', () => {
      */
     ns.containerToTlvRecords = function(container, utf8) {
         var result = '';
+        let safe = true;
         for (var key in container) {
             if (container.hasOwnProperty(key)) {
                 const type = typeof container[key];
 
                 if (type !== 'string') {
-                    console.error(`Invalid type for element '${key}'. Expected string but got ${type}.`);
+                    this._logger.error(`Invalid type for element '${key}'. Expected string but got ${type}.`);
                     return false;
                 }
-                result += ns.toTlvRecord(key, container[key], utf8);
+                if (safe !== true) {
+                    if (typeof eventlog === 'function') {
+                        eventlog(99772, JSON.stringify([1, 3, result.length]));
+                    }
+                    this._logger.error(`Cannot store ${key}, previous element did overflow.`);
+                    return false;
+                }
+                const record = ns.toTlvRecord(key, container[key], utf8);
+
+                result += record;
+                safe = record.length < 65538 + key.length;
             }
         }
         return result;
@@ -138,6 +155,12 @@ lazy(self, 'tlvstore', () => {
         var valueLength = (tlvContainer.charCodeAt(keyLength + 1)) << 8
                         | tlvContainer.charCodeAt(keyLength + 2);
         var value = tlvContainer.substring(keyLength + 3, keyLength + valueLength + 3);
+
+        // @todo what if the value did not overflow but was exactly 65535 bytes (?)..
+        if (valueLength === 0xffff) {
+            value = tlvContainer.substring(keyLength + 3);
+            valueLength = value.length;
+        }
         var rest = tlvContainer.substring(keyLength + valueLength + 3);
 
         // Consistency checks.
@@ -203,6 +226,17 @@ lazy(self, 'tlvstore', () => {
     ns.tlvRecordsToContainer = function(tlvContainer, utf8LegacySafe) {
         var rest = tlvContainer;
         var container = {};
+
+        if (!rest.charCodeAt(0) && rest.length > 65538) {
+            this._logger.warn('tlv-record overflow fix-up.', [rest]);
+
+            if (typeof eventlog === 'function') {
+                eventlog(99772, JSON.stringify([1, 7, rest.length]), true);
+            }
+
+            return {'': rest.substr(3)};
+        }
+
         while (rest.length > 0) {
             var result = ns.splitSingleTlvRecord(rest);
             if (result === false) {

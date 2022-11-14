@@ -1028,7 +1028,8 @@ function FMShortcuts() {
             !isShareRoot
         ) {
             var remItems = selectionManager.get_selected();
-            if (remItems.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2) {
+            if (remItems.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2 ||
+                M.currentrootid === M.InboxID || M.currentdirid === 'devices') {
                 return; // dont do anything.
             }
 

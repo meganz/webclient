@@ -176,14 +176,24 @@ lazy(pro, 'proplan2', () => {
         storage = Math.max(minStroage, storage);
         transfer = Math.max(minTransfer, transfer);
 
+        const extraStorage = storage - minStroage;
+        let extraTransfer = transfer - minTransfer;
+
+        if (extraTransfer > extraStorage) {
+            extraTransfer -= extraStorage;
+        }
+        else {
+            extraTransfer = 0;
+        }
+
         let totalPrice;
         let currency = 'EUR';
 
         if (pro.proplan.businessPlanData.isLocalInfoValid) {
             currency = pro.proplan.businessPlanData.l.lc;
             const totalUsersCost = pro.proplan.businessPlanData.bd.us.lp * users;
-            const totalStorageCost = pro.proplan.businessPlanData.bd.sto.lp * (storage - minStroage);
-            const totalTransferCost = pro.proplan.businessPlanData.bd.trns.lp * (transfer - minTransfer);
+            const totalStorageCost = pro.proplan.businessPlanData.bd.sto.lp * extraStorage;
+            const totalTransferCost = pro.proplan.businessPlanData.bd.trns.lp * extraTransfer;
 
             totalPrice = formatCurrency(
                 totalUsersCost + totalStorageCost + totalTransferCost,
@@ -193,8 +203,8 @@ lazy(pro, 'proplan2', () => {
         }
         else {
             const totalUsersCost = pro.proplan.businessPlanData.bd.us.p * users;
-            const totalStorageCost = pro.proplan.businessPlanData.bd.sto.p * (storage - minStroage);
-            const totalTransferCost = pro.proplan.businessPlanData.bd.trns.p * (transfer - minTransfer);
+            const totalStorageCost = pro.proplan.businessPlanData.bd.sto.p * extraStorage;
+            const totalTransferCost = pro.proplan.businessPlanData.bd.trns.p * extraTransfer;
 
             totalPrice = formatCurrency(totalUsersCost + totalStorageCost + totalTransferCost);
         }

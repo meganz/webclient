@@ -43,7 +43,9 @@ var accountChangeEmail = {
         // On text entry in the new email text field
         $newEmail.rebind('keyup', function() {
 
-            if ($newEmail.val()) {
+            const newEmailValue = $.trim($newEmail.val()).toLowerCase();
+
+            if (newEmailValue && u_attr.email !== newEmailValue) {
                 // Show information message
                 $emailInfoMessage.slideDown();
                 $changeEmailButton.closest('.save-container').removeClass('closed');
@@ -52,6 +54,10 @@ var accountChangeEmail = {
                 // Show information message
                 $emailInfoMessage.slideUp();
                 $changeEmailButton.closest('.save-container').addClass('closed');
+
+                if (u_attr.email === newEmailValue) {
+                    $newEmail.megaInputsShowError(l.m_change_email_same);
+                }
             }
 
             $.tresizer();

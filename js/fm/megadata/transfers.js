@@ -2388,7 +2388,7 @@ function tfsheadupdate(update) {
             blocks.text.textContent = l.tfw_header_error;
         }
         else if (tRemain) {
-            blocks.text.textContent = l[20808].replace('{0}', tRemain > 999 ? '999+' : tRemain);
+            blocks.text.textContent = String(l[20808] || '').replace('{0}', tRemain > 999 ? '999+' : tRemain);
             blocks.block.classList.remove('error', 'overquota');
         }
         else {

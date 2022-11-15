@@ -4213,10 +4213,12 @@ mBroadcaster.once('boot_done', function() {
     // This is basically a proxy of on paste, that would trigger a new event, which would receive the actual
     // File object, name, etc.
     $(document).on('paste', function(event) {
-        var items = (event.clipboardData || event.originalEvent.clipboardData).items;
-        if (!items && event.originalEvent.clipboardData && event.originalEvent.clipboardData.files) {
+        const {clipboardData, originalEvent = false} = event;
+        let {items} = clipboardData || originalEvent.clipboardData || {};
+
+        if (!items && originalEvent.clipboardData) {
             // safari
-            items = event.originalEvent.clipboardData.files;
+            items = originalEvent.clipboardData.files;
         }
         var fileName = false;
 

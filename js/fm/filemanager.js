@@ -2142,7 +2142,7 @@ FileManager.prototype.initContextUI = function() {
 
                     loadingDialog.phide();
                 });
-        });
+        }, 'move');
     });
 
     $(`${c}.remove-backup-item`).rebind('click.removeBckp', () => {

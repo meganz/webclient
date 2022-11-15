@@ -534,7 +534,7 @@ lazy(mega, 'backupCenter', () => {
                         inputValue += path[i] === M.RootID ? `${l[18051]}/` : `${M.d[path[i]].name}/`;
                     }
                     $input.val(inputValue);
-                });
+                }, 'move');
             });
 
             $confirmButton.rebind('click.stopBackup', (e) => {

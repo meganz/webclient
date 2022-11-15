@@ -1101,9 +1101,9 @@ function dlbeforecomplete(filename) {
 function sync_switchOS(os) {
     'use strict';
     const l1158 = String(l[1158] || 'for Windows');
+    let syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
 
     if (os === 'windows') {
-        syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
         $('.sync-button-txt.small').text(l1158);
         $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
         $('.sync-button').removeClass('mac linux').attr('href', syncurl);

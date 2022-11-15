@@ -1098,38 +1098,41 @@ function dlbeforecomplete(filename) {
     };
 }
 
-function sync_switchOS(os)
-{
-    if (os == 'windows')
-    {
-        syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
-        $('.sync-button-txt.small').text(l[1158]);
-        $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
-        $('.sync-button').removeClass('mac linux');
-        $('.sync-button').attr('href',syncurl);
-    }
-    else if (os == 'mac')
-    {
+function sync_switchOS(os) {
+    'use strict';
+    const l1158 = String(l[1158] || 'for Windows');
 
+    if (os === 'windows') {
+        syncurl = 'https://mega.nz/MEGAsyncSetup.exe';
+        $('.sync-button-txt.small').text(l1158);
+        $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red mac">Mac</a> and <a href="" class="red linux">Linux</a>');
+        $('.sync-button').removeClass('mac linux').attr('href', syncurl);
+    }
+    else if (os === 'mac') {
         syncurl = 'https://mega.nz/MEGAsyncSetup.dmg';
-        var ostxt = 'For Mac';
-        if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Mac');
-        if (l[1158].indexOf('Linux') > -1) ostxt = l[1158].replace('Linux','Mac');
+        let ostxt = 'For Mac';
+        if (l1158.includes('Windows')) {
+            ostxt = l1158.replace('Windows', 'Mac');
+        }
+        else if (l1158.includes('Linux')) {
+            ostxt = l1158.replace('Linux', 'Mac');
+        }
         $('.sync-button-txt.small').text(ostxt);
         $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red linux">Linux</a>');
-        $('.sync-button').removeClass('windows linux').addClass('mac');
-        $('.sync-button').attr('href',syncurl);
+        $('.sync-button').removeClass('windows linux').addClass('mac').attr('href', syncurl);
     }
-    else if (os == 'linux')
-    {
+    else if (os === 'linux') {
         syncurl = '/desktop';
-        var ostxt = 'For Linux';
-        if (l[1158].indexOf('Windows') > -1) ostxt = l[1158].replace('Windows','Linux');
-        if (l[1158].indexOf('Mac') > -1) ostxt = l[1158].replace('Mac','Linux');
+        let ostxt = 'For Linux';
+        if (l1158.includes('Windows')) {
+            ostxt = l1158.replace('Windows', 'Linux');
+        }
+        else if (l1158.includes('Mac')) {
+            ostxt = l1158.replace('Mac', 'Linux');
+        }
         $('.sync-button-txt.small').text(ostxt);
         $('.sync-bottom-txt').safeHTML('Also available for <a href="" class="red windows">Windows</a> and <a href="" class="red mac">Mac</a>');
-        $('.sync-button').removeClass('mac linux').addClass('linux');
-        $('.sync-button').attr('href',syncurl);
+        $('.sync-button').removeClass('mac linux').addClass('linux').attr('href', syncurl);
     }
     $('.sync-bottom-txt a').rebind('click',function(e)
     {

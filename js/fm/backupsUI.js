@@ -7,67 +7,6 @@
 lazy(mega, 'backupCenter', () => {
     'use strict';
 
-    const syncStatus = {
-
-        inProgressSyncs(syncData, statusParentNode) {
-            // Show Syncing progress (or Backing up icon if progress data is missing)
-            if (syncData.syncingPercs && syncData.syncsNumber === 1) {
-                const percsNode = mCreateElement('div', {'class': 'percs'}, statusParentNode);
-
-                mCreateElement('i', {'class': 'sprite-fm-mono icon-transfer in-progress'}, percsNode);
-                mCreateElement('span', {
-                    'class': 'in-progress'
-                }, percsNode).textContent = `${syncData.syncingPercs} %`;
-            }
-            else {
-
-                mCreateElement('i', {
-                    'class': 'sprite-fm-mono icon-transfer in-progress'
-                }, statusParentNode);
-            }
-
-            mCreateElement('span', {'class': 'in-progress'}, statusParentNode).textContent = l.updating_status;
-        },
-
-        blockedSyncs(syncData, statusParentNode, isDeviceCard) {
-            mCreateElement('i', {'class': 'sprite-fm-mono error icon-close-component'}, statusParentNode);
-            mCreateElement('span', {'class': 'error'}, statusParentNode).textContent =
-                syncData.errorMessage ? l[1578] : l.blocked_status;
-
-            // Show error icon with a tooltip
-            if (!isDeviceCard && syncData.errorMessage) {
-
-                mCreateElement('i', {
-                    'class': 'sprite-fm-mono icon-info-filled tip-icon simpletip',
-                    'data-simpletip': syncData.errorMessage,
-                    'data-simpletip-class': 'backup-tip',
-                    'data-simpletipposition': 'top',
-                    'data-simpletipoffset': 2
-                }, statusParentNode);
-            }
-        },
-
-        offlineSyncs(syncData, statusParentNode, isDeviceCard) {
-            const daysNum = 7; // Max Offline days to show warning
-
-            // Show warning icon if last heartbeat was > 'daysNum' days ago
-            if (isDeviceCard &&
-                (syncData.currentDate - syncData.lastHeartbeat * 1000) / (1000 * 3600 * 24) >= daysNum) {
-
-                mCreateElement('i', {
-                    'class': 'sprite-fm-uni icon-hazard simpletip',
-                    'data-simpletip': l.offline_device_tip.includes('{count}') ? // Temp solution for missing string
-                        mega.icu.format(l.offline_device_tip, daysNum).replace('{count}', daysNum) :
-                        l.offline_device_tip,
-                    'data-simpletipposition': 'top',
-                    'data-simpletipoffset': 2
-                }, statusParentNode);
-            }
-            mCreateElement('i', {'class': 'sprite-fm-mono icon-offline'}, statusParentNode);
-            mCreateElement('span', undefined, statusParentNode).textContent = l[5926];
-        }
-    };
-
     const errorMessages = {
         // File system not supported.
         '2': l.err_fs_is_not_supported,
@@ -123,6 +62,79 @@ lazy(mega, 'backupCenter', () => {
         '30': l.err_wrong_source_path,
         // Unable to write sync config to disk.
         '31': l.err_write_config_to_disk
+    };
+
+    const syncStatus = {
+
+        inProgressSyncs(syncData, statusParentNode) {
+            // Show Syncing progress (or Backing up icon if progress data is missing)
+            if (syncData.syncingPercs && syncData.syncsNumber === 1) {
+                const percsNode = mCreateElement('div', {'class': 'percs'}, statusParentNode);
+
+                mCreateElement('i', {'class': 'sprite-fm-mono icon-transfer in-progress'}, percsNode);
+                mCreateElement('span', {
+                    'class': 'in-progress'
+                }, percsNode).textContent = `${syncData.syncingPercs} %`;
+            }
+            else {
+
+                mCreateElement('i', {
+                    'class': 'sprite-fm-mono icon-transfer in-progress'
+                }, statusParentNode);
+            }
+
+            mCreateElement('span', {'class': 'in-progress'}, statusParentNode).textContent = l.updating_status;
+        },
+
+        blockedSyncs(syncData, statusParentNode, isDeviceCard) {
+
+            const errorMessage = errorMessages[syncData.errorState];
+            let status = l.blocked_status; // Blocked
+
+            // Expired account status
+            if (syncData.errorState === 10) {
+                status = l.expired_account_state;
+            }
+            // Error status
+            else if (errorMessage) {
+                status = l[1578];
+            }
+
+            mCreateElement('i', {'class': 'sprite-fm-mono error icon-close-component'}, statusParentNode);
+            mCreateElement('span', {'class': 'error'}, statusParentNode).textContent = status;
+
+            // Show error icon with a tooltip
+            if (!isDeviceCard && errorMessage) {
+
+                mCreateElement('i', {
+                    'class': 'sprite-fm-mono icon-info-filled tip-icon simpletip',
+                    'data-simpletip': errorMessage,
+                    'data-simpletip-class': 'backup-tip',
+                    'data-simpletipposition': 'top',
+                    'data-simpletipoffset': 2
+                }, statusParentNode);
+            }
+        },
+
+        offlineSyncs(syncData, statusParentNode, isDeviceCard) {
+            const daysNum = 7; // Max Offline days to show warning
+
+            // Show warning icon if last heartbeat was > 'daysNum' days ago
+            if (isDeviceCard &&
+                (syncData.currentDate - syncData.lastHeartbeat * 1000) / (1000 * 3600 * 24) >= daysNum) {
+
+                mCreateElement('i', {
+                    'class': 'sprite-fm-uni icon-hazard simpletip',
+                    'data-simpletip': l.offline_device_tip.includes('{count}') ? // Temp solution for missing string
+                        mega.icu.format(l.offline_device_tip, daysNum).replace('{count}', daysNum) :
+                        l.offline_device_tip,
+                    'data-simpletipposition': 'top',
+                    'data-simpletipoffset': 2
+                }, statusParentNode);
+            }
+            mCreateElement('i', {'class': 'sprite-fm-mono icon-offline'}, statusParentNode);
+            mCreateElement('span', undefined, statusParentNode).textContent = l[5926];
+        }
     };
 
     return new class {
@@ -286,12 +298,12 @@ lazy(mega, 'backupCenter', () => {
 
             const res = await M.req('sf');
 
-            if (Array.isArray(res) && res.length) {
+            if (d) {
+                console.log('Backup/sync folders API response: sf ->');
+                console.log(res);
+            }
 
-                if (d) {
-                    console.log('Backup/sync folders API response: sf ->');
-                    console.log(res);
-                }
+            if (Array.isArray(res) && res.length) {
 
                 const uniqueHandles = res.map(a => a.h)
                     .filter((val, i, self) => self.indexOf(val) === i);
@@ -300,10 +312,6 @@ lazy(mega, 'backupCenter', () => {
 
                 // Set an array of objects with device IDs and corresponding sync/backup data
                 this.data = this.formatData(res);
-            }
-            else {
-
-                console.log(`Bad response: sf -> ${res}`);
             }
         }
 
@@ -526,7 +534,7 @@ lazy(mega, 'backupCenter', () => {
                         inputValue += path[i] === M.RootID ? `${l[18051]}/` : `${M.d[path[i]].name}/`;
                     }
                     $input.val(inputValue);
-                });
+                }, 'move');
             });
 
             $confirmButton.rebind('click.stopBackup', (e) => {
@@ -962,7 +970,7 @@ lazy(mega, 'backupCenter', () => {
                 'currentDate': Date.now(),
                 'blockedSyncs': 0,
                 'disabledSyncs': 0,
-                'errorMessage': undefined,
+                'errorState': undefined,
                 'initializingSyncs': 0,
                 'inProgressSyncs': 0,
                 'isMobile': false,
@@ -1030,7 +1038,7 @@ lazy(mega, 'backupCenter', () => {
                 else if (folders[i].s === 2 || folders[i].s === 3) {
 
                     syncData.blockedSyncs++;
-                    syncData.errorMessage = errorMessages[folders[i].ss];
+                    syncData.errorState = folders[i].ss;
 
                     if (folders[i].ss === 9) {
                         syncData.overquotaSyncs++;
@@ -1626,7 +1634,7 @@ lazy(mega, 'backupCenter', () => {
                 };
             }
 
-            M.openFolder('backups', true);
+            M.openFolder('devices', true);
         }
 
         ackVaultWriteAccess(h, req) {

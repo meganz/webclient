@@ -105,7 +105,7 @@ var slideshowid;
                     forward.push(index(ii[n + 1]));
                     backward.push(index(ii[n - 1]));
             }
-            $counter.text(l.preview_counter.replace('%1', n + 1).replace('%2', len));
+            $counter.text(escapeHTML(l.preview_counter).replace('%1', n + 1).replace('%2', len));
         }
 
         if (_hideCounter) {
@@ -222,7 +222,7 @@ var slideshowid;
         var $favButton = $('.context-menu .favourite', $overlay);
         var root = M.getNodeRoot(n && n.h || false);
 
-        if (!n || !n.p || root === 'shares' && M.getNodeRights(n.p) < 2 ||
+        if (!n || !n.p || root === M.InboxID || root === 'shares' && M.getNodeRights(n.p) < 2 ||
             folderlink || root === M.RubbishID ||
             (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)) {
 
@@ -284,7 +284,7 @@ var slideshowid;
         var $divider = $removeButton.closest('li').prev('.divider');
         var root = M.getNodeRoot(n && n.h || false);
 
-        if (!n || !n.p || (root === 'shares' && M.getNodeRights(n.p) < 2) || folderlink ||
+        if (!n || !n.p || root === M.InboxID || (root === 'shares' && M.getNodeRights(n.p) < 2) || folderlink ||
             (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2) || M.chat) {
 
             $removeButton.addClass('hidden');

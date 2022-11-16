@@ -1537,7 +1537,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                     className="chat-rename-group-dialog"
                                     name="newTopic"
                                     value={renameDialogValue}
-                                    maxLength="30"
+                                    maxLength={ChatRoom.TOPIC_MAX_LENGTH}
                                     onChange={(e) => {
                                         self.setState({
                                             'renameDialogValue': e.target.value.substr(0, 30)

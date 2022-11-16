@@ -2142,7 +2142,7 @@ FileManager.prototype.initContextUI = function() {
 
                     loadingDialog.phide();
                 });
-        });
+        }, 'move');
     });
 
     $(`${c}.remove-backup-item`).rebind('click.removeBckp', () => {
@@ -2718,10 +2718,16 @@ FileManager.prototype.initUIKeyEvents = function() {
             s.length > 0 &&
             !$.dialog &&
             (M.getNodeRights(M.currentdirid) > 1 || M.currentCustomView) &&
-            M.currentCustomView.type !== 'gallery'
+            M.currentCustomView.type !== 'gallery' &&
+            M.currentrootid !== M.InboxID &&
+            M.currentdirid !== 'devices'
         ) {
-            // delete
-            fmremove(s);
+            const nodes = s.filter(h => !M.d[h] || M.getNodeRoot(M.d[h].h) !== M.InboxID);
+
+            if (nodes.length) {
+                // delete
+                fmremove(nodes);
+            }
         }
         else if ((e.keyCode === 46) && (selPanel.length > 0)
             && !$.dialog && M.getNodeRights(M.currentdirid) > 1) {
@@ -2824,7 +2830,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             !is_transfers_or_accounts &&
             (e.keyCode === 113 /* F2 */) &&
             (s.length > 0) &&
-            !$.dialog && M.getNodeRights(M.d[s[0]] && M.d[s[0]].h) > 1
+            !$.dialog && M.getNodeRights(M.d[s[0]] && M.d[s[0]].h) > 1 &&
+            M.currentrootid !== M.InboxID &&
+            M.currentdirid !== 'devices' && M.getNodeRoot(M.d[s[0]].h) !== M.InboxID
         ) {
             renameDialog();
         }

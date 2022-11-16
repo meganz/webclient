@@ -1251,7 +1251,7 @@ mega.tpw = new function TransferProgressWidget() {
                 blocks.$text.text(l.tfw_header_error);
             }
             else if (tRemain) {
-                blocks.$text.text(l[20808].replace('{0}', tRemain > 999 ? '999+' : tRemain));
+                blocks.$text.text(String(l[20808] || '').replace('{0}', tRemain > 999 ? '999+' : tRemain));
                 blocks.$block.removeClass('error overquota');
             }
             else {

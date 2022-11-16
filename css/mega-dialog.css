@@ -14,6 +14,7 @@
          * low visual impact dialog (banner) - 1090
          * normal dialog - 1115
          * modal dialog - 1200
+         * message dialog container when account loading - 1215
          * arranged back dialog - 900
          * normal dialog container - 1111
          * common dialog container - 1300
@@ -37,6 +38,10 @@
         .mega-dialog-container.msg-dialog-container,
         .fm-modal-dialog {
             z-index: 1115;
+        }
+
+        .loading .mega-dialog-container.msg-dialog-container {
+            z-index: 1215;
         }
 
         .mega-dialog-container > *,

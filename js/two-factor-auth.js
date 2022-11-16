@@ -730,7 +730,7 @@ twofactor.verifySetupDialog = {
 
                         // If the Two-Factor has already been setup, show a warning dialog
                         if (response === EEXIST) {
-                            msgDialog('warninga', l[19219], l[19220],
+                            msgDialog('warninga', l[19219], l[19220], null,
                                 function() {
                                     // Close the dialog on click of OK button
                                     twofactor.verifySetupDialog.closeDialog();

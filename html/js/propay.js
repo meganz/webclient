@@ -1842,7 +1842,7 @@ pro.propay = {
         if (window.offerPopupTimer) {
             clearTimeout(window.offerPopupTimer);
         }
-        if (is_mobile || page.indexOf('propay') > -1) {
+        if (is_mobile || typeof page !== 'string' || page.includes('propay')) {
             return;
         }
 

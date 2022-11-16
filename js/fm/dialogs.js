@@ -937,7 +937,7 @@
             $rubbishBin.addClass('hidden');
         }
 
-        if ($.copyToShare || $.selectFolderDialog || !u_type) {
+        if ($.copyToShare || $.selectFolderDialog || !u_type || M.currentdirid === 'devices') {
             $sharedMe.addClass('hidden');
         }
         else {
@@ -1248,12 +1248,13 @@
     /**
      * A version of the select a folder dialog used for selecting target folder
      * @global
-     * @param {Function} cb     a callback to be called when the user "Select"
-     * @returns {Object}        The jquery object of the dialog
+     * @param {Function} cb A callback to be called when the user "Select"
+     * @param {String} aMode Dialog mode (copy, move, share, save, etc)
+     * @returns {Object} The jquery object of the dialog
      */
-    global.selectFolderDialog = function selectedFolderDialog(cb) {
+    global.selectFolderDialog = function selectedFolderDialog(cb, aMode) {
         if (isUserAllowedToOpenDialogs()) {
-            M.safeShowDialog('selectFolder', () => {
+            M.safeShowDialog(aMode || 'selectFolder', () => {
 
                 handleOpenDialog(0, M.RootID);
                 $.selectFolderCallback = cb;
@@ -1721,6 +1722,11 @@
                 return false;
             }
 
+            if (typeof $.selectFolderCallback === 'function') {
+                $.selectFolderCallback();
+                return false;
+            }
+
             if ($.moveDialog) {
                 if (section === "shared-with-me") {
                     var $tooltip = $('.contact-preview', $dialog);
@@ -1729,11 +1735,6 @@
                 }
                 closeDialog();
                 M.safeMoveNodes($.mcselected);
-                return false;
-            }
-
-            if ($.selectFolderDialog && typeof $.selectFolderCallback === 'function') {
-                $.selectFolderCallback();
                 return false;
             }
 

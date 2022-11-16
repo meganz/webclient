@@ -17261,7 +17261,7 @@ class Stream extends mixins.wl {
       OPTIONS: {
         scroll: 'false',
         cursor: 'move',
-        opacity: 0.8,
+        opacity: 1,
         start: () => {
           if (this.state.options) {
             this.handleOptionsToggle();

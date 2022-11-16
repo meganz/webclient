@@ -526,13 +526,14 @@ mega.textEditorUI = new function TextEditorUI() {
                 init(txt);
                 mBroadcaster.sendMessage('textEditor:open');
 
-                const inRubbishBin = M.getNodeRoot(handle) === M.RubbishID;
+                const root = M.getNodeRoot(handle);
+                const inRubbishBin = root === M.RubbishID;
 
                 // Without parentheses && will be applied first,
                 // I want JS to start from left and go in with first match
                 // eslint-disable-next-line no-extra-parens
                 if (isReadonly || folderlink || (M.currentrootid === 'shares' && M.getNodeRights(handle) < 1) ||
-                    inRubbishBin) {
+                    inRubbishBin || root === M.InboxID) {
                     editor.options.readOnly = true;
 
                     if (is_mobile) {

@@ -975,6 +975,8 @@
                 var tmp;
                 var title = [];
                 let elm;
+                const isBackup = this.location === 'backups'
+                    || this.location === 'mixed-content' && M.getNodeRoot(aNode.h) === M.InboxID;
 
                 if (aNode.fav && !folderlink && this.location !== 'trashcan') {
                     elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
@@ -982,8 +984,7 @@
                     elm.classList.remove('icon-dot');
                 }
 
-                if (this.location === 'backups'
-                    || this.location === 'mixed-content' && M.getNodeRoot(aNode.h) === M.InboxID) {
+                if (isBackup) {
 
                     elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
                     if (elm) {
@@ -991,7 +992,7 @@
                     }
                 }
 
-                if (!aNode.t && aNode.tvf) {
+                if (!aNode.t && aNode.tvf && !isBackup) {
                     aTemplate.classList.add('versioning');
                     var vTemplate = aTemplate.querySelector('.hd-versions');
                     if (vTemplate) {

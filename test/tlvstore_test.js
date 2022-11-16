@@ -152,6 +152,33 @@ describe("tlvstore unit test", function() {
 
             mega.getRandomValues.restore();
         });
+
+        it('handle overflowed records', () => {
+            mStub(window, 'eventlog');
+            mStub(ns._logger, 'warn');
+            mStub(ns._logger, 'error');
+
+            const data7e4 = Array(7e4).join('.');
+            const record = ns.toTlvRecord('', data7e4);
+            const container = ns.tlvRecordsToContainer(record);
+
+            assert.strictEqual(record, `\x00\xff\xff${data7e4}`);
+
+            assert.strictEqual(ns._logger.warn.args[0][0], 'TLV-record  did overflow.');
+            assert.strictEqual(ns._logger.warn.args[1][0], 'tlv-record overflow fix-up.');
+            assert.deepEqual(ns._logger.warn.args[1][1], [record]);
+            assert.strictEqual(container[''], record.substr(3));
+
+            assert.strictEqual(ns.containerToTlvRecords(container), record);
+
+            assert.strictEqual(ns.containerToTlvRecords({...container, foo: 'bar'}), false);
+            assert.strictEqual(ns._logger.error.args[0][0], 'Cannot store foo, previous element did overflow.');
+
+            assert.strictEqual(window.eventlog.callCount, 5);
+            assert.deepEqual(window.eventlog.args[0], [99772, '[1,1,0,69999,0]', true]);
+            assert.deepEqual(window.eventlog.args[1], [99772, '[1,7,70002]', true]);
+            assert.deepEqual(window.eventlog.args[4], [99772, '[1,3,70002]']);
+        });
     });
 
     describe('attribute en-/decryption', function() {

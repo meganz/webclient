@@ -3977,7 +3977,8 @@ ChatRoom.prototype.stopRinging = function (callId) {
   });
 };
 ChatRoom.prototype.callParticipantsUpdated = function
-() {
+(
+) {
   var self = this;
   var msgId = self.getActiveCallMessageId();
   if (!msgId) {
@@ -17261,7 +17262,7 @@ class Stream extends mixins.wl {
       OPTIONS: {
         scroll: 'false',
         cursor: 'move',
-        opacity: 0.8,
+        opacity: 1,
         start: () => {
           if (this.state.options) {
             this.handleOptionsToggle();

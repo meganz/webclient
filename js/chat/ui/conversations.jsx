@@ -206,6 +206,7 @@ class ConversationsApp extends MegaRenderMixin {
             && this.state.view !== this.VIEWS.LOADING
             && (!this.$obDialog || !this.$obDialog.is(':visible'))
             && (this.obToggleDrawn || $('.toggle-panel-heading', '.conversationsApp').length)
+            && !$('.search-panel.expanded', '.conversationsApp').length
         ) {
             this.obToggleDrawn = true;
             const { chat : obChat } = mega.ui.onboarding.sections;

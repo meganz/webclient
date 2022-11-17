@@ -143,12 +143,14 @@ lazy(mega, 'backupCenter', () => {
 
             this.data = []; // Formatted API response data
             this.deviceCardStates = {}; // Saved Expanded/Selected device states, paginator value
+            this.dn = {};
             this.lastupdate = 0; // Last API request date
             this.selectedSync = false; // Selected backup/sync id, if any
             this.$fmHolder = $('.fmholder', 'body');
             this.$backupWrapper = $('.fm-right-block.backup', this.$fmHolder);
             this.$leftPane = $('.content-panel.backup-center', this.$fmHolder);
             this.$leftPaneBtns = $('.js-lpbtn', this.$leftPane);
+            this.$loader = $('.js-bc-loader', this.$backupWrapper);
             this.$emptyBlock = $('.backup-center.empty-section', this.$backupWrapper);
             this.$contentBlock = $('.backup-center.content-block', this.$backupWrapper);
         }
@@ -160,7 +162,6 @@ lazy(mega, 'backupCenter', () => {
         async getDevicesData() {
 
             const res = await Promise.resolve(mega.attr.get(u_handle, 'dn', false, true)).catch(nop);
-            this.dn = {};
 
             if (typeof res === 'object') {
 
@@ -285,16 +286,7 @@ lazy(mega, 'backupCenter', () => {
          */
         async getData(force) {
 
-            // Prevent updating less then 10s
-            if (!force && this.lastupdate > Date.now() - 10000) {
-
-                return false;
-            }
-
             this.lastupdate = Date.now();
-
-            // Clear existing data
-            this.data = [];
 
             const res = await M.req('sf');
 
@@ -312,6 +304,10 @@ lazy(mega, 'backupCenter', () => {
 
                 // Set an array of objects with device IDs and corresponding sync/backup data
                 this.data = this.formatData(res);
+            }
+            else {
+
+                this.data = [];
             }
         }
 
@@ -1472,6 +1468,13 @@ lazy(mega, 'backupCenter', () => {
          */
         populateData() {
 
+            if (d) {
+                console.log('All Backed up devices:');
+                console.log(this.data);
+            }
+
+            this.$loader.addClass('hidden');
+
             // Show a list of devices
             if (this.data.length) {
 
@@ -1494,28 +1497,15 @@ lazy(mega, 'backupCenter', () => {
          */
         async renderContent(force) {
 
-            if (M.currentdirid !== 'devices') {
+            if (M.currentdirid !== 'devices' && !force && this.lastupdate > Date.now() - 10000) {
                 return false;
             }
 
             await this.getDevicesData();
-            await this.getData(force);
+            await this.getData();
             await this.getStoppedBackups();
+            this.populateData();
 
-            if (d) {
-                console.log('All Backed up devices:');
-                console.log(this.data);
-            }
-
-            // Render Empty block or Content
-            if (this.data.length) {
-                this.populateData();
-            }
-            else {
-                this.renderEmptyScreen();
-            }
-
-            loadingDialog.hide('backupRefresh');
             delay('devices:update', () => this.renderContent().catch(dump), 30000);
 
             if (!this.bpcListener) {
@@ -1526,8 +1516,6 @@ lazy(mega, 'backupCenter', () => {
                     }
 
                     delay.cancel('devices:update');
-                    this.data = [];
-                    this.deviceCardStates = {};
                     this.lastupdate = 0;
                     this.selectedSync = false;
                     mBroadcaster.removeListener(this.bpcListener);
@@ -1540,16 +1528,15 @@ lazy(mega, 'backupCenter', () => {
          * Update and render Backups content or show Empty block when BC is opened
          * @returns {void}
          */
-        render() {
+        async render() {
 
             // Hide both Content and Empty screen till we get any data
             this.$emptyBlock.addClass('hidden');
             this.$contentBlock.addClass('hidden');
-
-            loadingDialog.show('backupRefresh');
+            this.$loader.removeClass('hidden');
 
             // Rended Content or Empty screen
-            this.renderContent().catch(dump);
+            await this.renderContent().catch(dump);
         }
 
         /**

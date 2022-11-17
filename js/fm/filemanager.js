@@ -4548,6 +4548,12 @@ FileManager.prototype.getMyBackups = async function() {
     }
 
     M.BackupsId = handle;
+
+    const lPaneButton = document.querySelector('.js-lp-myfiles .js-backups-btn');
+
+    if (lPaneButton.classList.contains('hidden')) {
+        lPaneButton.classList.remove('hidden');
+    }
 };
 
 FileManager.prototype.getCameraUploads = async function() {

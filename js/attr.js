@@ -1326,10 +1326,10 @@
 
             mega.attr.get(userHandle, 'bak', -2, 1, (res, ctx) => {
 
-                u_attr[ctx.ua] = base64urlencode(res);
+                u_attr[ctx.ua] = res;
 
                 if (fminitialized) {
-                    M.BackupsId = u_attr[ctx.ua];
+                    M.BackupsId = base64urlencode(u_attr[ctx.ua]);
                 }
             });
         };

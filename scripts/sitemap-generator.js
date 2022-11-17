@@ -14,6 +14,7 @@ const pages = [
     "corporate/reviews",
     "contact",
     "storage",
+    "megabackup",
     "collaboration",
     "securechat",
     "security",

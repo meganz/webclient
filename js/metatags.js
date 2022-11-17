@@ -398,6 +398,13 @@ mega.metatags = new function() {
             mTags.mega_title = l[24606] || mTags.en_title;
             mTags.mega_desc = l[24609] || mTags.en_desc;
         }
+        else if (page === 'megabackup') {
+            mTags.en_title = 'Back Up Your Files - MEGA';
+            mTags.en_desc = 'Get peace of mind when you back up data, such as important documents and files, ' +
+                'from your computer to MEGA.';
+            mTags.mega_title = l.ft_backup_metatag_title || mTags.en_title;
+            mTags.mega_desc = l.ft_backup_metatag_desc || mTags.en_desc;
+        }
         else if (page === 'collaboration') {
             mTags.en_title = 'Work From Anywhere and Stay Connected - MEGA';
             mTags.en_desc = 'Securely store files, stay in contact and collaborate in one easy place with MEGA.';

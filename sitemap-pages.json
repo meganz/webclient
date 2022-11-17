@@ -49,6 +49,7 @@
         ["corporate/review"],
         ["contact"],
         ["storage"],
+        ["megabackup"],
         ["objectstorage"],
         ["collaboration"],
         ["securechat"],

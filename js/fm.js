@@ -757,8 +757,8 @@ function fmLeftMenuUI() {
         M.openFolder(M.RootID);
     }
 
-    // handle the Backups icon changes
-    if (!M.BackupsId || !localStorage.debugBackups) {
+    // handle the Backups button changes
+    if (!M.BackupsId) {
         $('.js-lp-myfiles .js-backups-btn', '.fmholder').addClass('hidden');
     }
 

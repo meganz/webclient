@@ -279,8 +279,7 @@ function dashboardUI(updProcess) {
         $.leftPaneResizable.options.updateWidth = maxwidth;
         $($.leftPaneResizable).trigger('resize');
 
-        // TODO: Remove condition once new applications are pushed live
-        const mBackupsNode = localStorage.debugBackups ? M.getNodeByHandle(M.BackupsId) : false;
+        const mBackupsNode = M.getNodeByHandle(M.BackupsId);
 
         // If not Business or Pro Flexi (i.e. regular account)
         if (!u_attr.b && !u_attr.pf) {

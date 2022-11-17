@@ -9,6 +9,12 @@
     --header-p-text-color: #fff;
 }
 
+.feature-page.backup {
+    --header-background-color: rgba(255, 255, 255, 1);
+    --header-text-color: rgba(51, 51, 51, 1);
+    --header-p-text-color: rgba(51, 51, 51, 1);
+}
+
 .feature-page.chat {
     --header-background-color: #ed5564;
     --header-text-color: #fff;
@@ -462,8 +468,10 @@ body.rtl .feature-page * {
         .feature-page.objectstorage strong {
             font-family: LatoWebBold, Arial, sans-serif;
         }
+    }
 
-        /* app store links */
+    @media only screen and (max-width: 675px) {
+        /* region app store links */
 
             .feature-page .app-links a {
                 margin: 16px 8px 0;
@@ -482,7 +490,7 @@ body.rtl .feature-page * {
                 margin: 0;
                 width: 132px;
             }
-        /* end app store links */
+        /* endregion app store links */
     }
 
     @media only screen and (max-width: 877px) and (min-width: 781px) {
@@ -664,6 +672,22 @@ body.rtl .feature-page * {
         margin-top: 20px;
     }
 
+    .feature-page .icon-block .cards {
+        display: flex;
+        flex-flow: row wrap;
+        gap: 80px;
+        align-items: normal;
+    }
+
+    .feature-page .icon-block .card {
+        flex-basis: 320px;
+        align-items: start;
+        border-radius: 16px;
+        box-shadow: 4px 4px 20px 0 rgba(0, 0, 0, 0.08);
+        padding-bottom: 20px;
+        background-color: var(--surface-main);
+    }
+
     .feature-page .icon-block .icons {
         align-items: baseline;
         display: flex;
@@ -703,7 +727,9 @@ body.rtl .feature-page * {
         object-fit: cover;
         width: 112px;
     }
-   .feature-page.objectstorage .icon-block .icon img {
+
+    .feature-page .icon-block .card img,
+    .feature-page.objectstorage .icon-block .icon img {
        height: 48px;
        margin-bottom: 8px;
        margin-left: 24px;
@@ -742,6 +768,7 @@ body.rtl .feature-page * {
         text-align: center;
     }
 
+    .feature-page .icon-block .card h3,
     .feature-page.objectstorage .icon-block .icon h3 {
         font-size: 18px;
         line-height: 26px;
@@ -759,6 +786,7 @@ body.rtl .feature-page * {
         text-align: center;
     }
 
+    .feature-page .icon-block .card p,
     .feature-page.objectstorage .icon-block .icon p {
         text-align: left;
         color: #1D1D1D;
@@ -774,6 +802,7 @@ body.rtl .feature-page * {
         margin-bottom: 100px;
     }
 
+    .feature-page .icon-block .card p:last-of-type,
     .feature-page.objectstorage .icon-block .icon p:last-of-type {
         margin-bottom: 0;
     }
@@ -803,7 +832,7 @@ body.rtl .feature-page * {
     @media only screen and (max-width: 950px) {
 
         .feature-page .icon-block.columns-2 .icon,
-        .feature-page .icon-block.columns-3:not(.obst-icon) .icon{
+        .feature-page .icon-block.columns-3:not(.obst-icon) .icon {
             width: 100%;
         }
 
@@ -1069,6 +1098,14 @@ body.rtl .feature-page * {
     .feature-page .image picture.overflow-screen img {
         width: unset;
     }
+
+    .feature-page img.unset-default {
+        display: unset !important;
+        margin-bottom: unset !important;
+        width: unset !important;
+    }
+
+    /* region object storage feature page */
 
     .feature-page.objectstorage .content-two-column .register-interest {
         width: 498px;
@@ -1356,6 +1393,156 @@ body.rtl .feature-page * {
         margin: -8px 0 0 -15px;
     }
 
+    /* endregion */
+
+    /* region backup feature page */
+
+    .feature-page.backup .header-block h1 {
+        color: rgba(29, 176, 123, 1);
+    }
+
+    .feature-page.backup .icon-block {
+        padding-top: 80px;
+        padding-bottom: 60px;
+    }
+
+    .feature-page.backup .icon-block .cards {
+        padding-bottom: 20px;
+    }
+
+    .feature-page.backup .icon-block .cards .card img {
+        object-position: 0;
+    }
+
+    .feature-page.backup table.compare {
+        border-collapse: separate;
+        border-spacing: 8px;
+    }
+
+    .feature-page.backup table.compare caption {
+        margin-top: 56px;
+        caption-side: bottom;
+        color: var(--text-color-black-low);
+        text-align: left;
+    }
+
+    .feature-page.backup table.compare th {
+        padding: 10px 15px 10px 0;
+        color: var(--text-color-black-high);
+        font: normal normal 16px/19.5px var(--text-font-family-second-bold);
+        text-align: left;
+    }
+
+    .feature-page.backup table.compare thead tr th {
+        padding: 8px 18px;
+        font-size: 20px;
+        line-height: 24px;
+        text-align: center;
+        border-bottom: 20px solid transparent;
+    }
+
+    .feature-page.backup table.compare th:not(:first-child) {
+        min-width: 145px;
+    }
+
+    .feature-page.backup table.compare tr th {
+        padding: 10px 15px 10px 0;
+        color: var(--text-color-black-high);
+        font: normal normal 16px/19.5px var(--text-font-family-second-bold);
+        text-align: left;
+    }
+
+    .feature-page.backup .compare-cards {
+        display: none;
+        flex-flow: column nowrap;
+        gap: 58px;
+        width: 100%;
+        max-width: 436px;
+        padding: 0 30px;
+    }
+
+    .feature-page.backup .compare-card {
+        border: 2px solid var(--stroke-grey-2);
+        border-radius: 16px;
+    }
+
+    .feature-page.backup .compare-card .heading {
+        padding: 8px;
+        background-color: var(--surface-grey-1);
+        font: normal normal 20px/24px var(--text-font-family-second-bold);
+        border-radius: 16px;
+    }
+
+    .feature-page.backup .compare-card .content {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 24px;
+        padding: 24px;
+        color: var(--text-color-black-high);
+        font: normal normal 16px/19.5px var(--text-font-family-second-bold);
+        text-align: left;
+        word-break: break-word;
+    }
+
+    .feature-page.backup .compare-card .content > div {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .feature-page.backup .compare-card .content > div > img {
+        flex-basis: 25px;
+        height: 24px;
+        align-self: normal;
+    }
+
+    .feature-page.backup .compare-cards-note {
+        display: none;
+        margin: 45px 76px 0;
+        color: var(--text-color-black-low);
+        text-align: left;
+    }
+
+    @media only screen and (max-width: 768px) {
+        .feature-page.backup .compare-cards-note {
+            display: block;
+        }
+
+        .feature-page.backup a.cta.clickurl {
+            display: none;
+        }
+
+        .feature-page.backup .cards {
+            flex-direction: column;
+            gap: 56px;
+        }
+
+        .feature-page.backup .card {
+            flex-basis: unset;
+            max-width: 520px;
+            margin: 0;
+            padding-bottom: unset;
+            background-color: unset;
+            box-shadow: unset;
+        }
+
+        .feature-page.backup table.compare {
+            display: none;
+        }
+
+        .feature-page.backup .compare-cards {
+            display: flex;
+        }
+    }
+
+    @media only screen and (max-width: 460px) {
+        .feature-page.backup .compare-cards-note {
+            margin: 24px 24px 0;
+        }
+    }
+
+    /* endregion */
+
     @media only screen and (max-width: 1220px) {
 
         .feature-page .content-two-column .text,
@@ -1410,6 +1597,15 @@ body.rtl .feature-page * {
         .feature-page .content-two-column .text {
             text-align: center;
             width: 100%;
+        }
+
+        .feature-page.backup table.compare {
+            margin: 0 25px;
+        }
+        .feature-page.backup table.compare tr th:not(:first-child) {
+            min-width: 110px;
+            padding-left: 0;
+            padding-right: 0;
         }
 
         .feature-page.objectstorage .content-two-column .text {

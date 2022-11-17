@@ -727,6 +727,7 @@ function init_page() {
         && (page !== 'security')
         && (page !== 'storage')
         && (page !== 'objectstorage')
+        && (page !== 'megabackup')
         && (page !== 'collaboration')
         && (page !== 'securechat')
         && (page !== 'unsub')
@@ -1732,9 +1733,13 @@ function init_page() {
         parsepage(pages.feature_collaboration);
         featurePages('collaboration');
     }
-    else if (page === 'objectstorage'){
+    else if (page === 'objectstorage') {
         parsepage(pages.object_storage);
         featurePages('objectstorage');
+    }
+    else if (page === 'megabackup') {
+        parsepage(pages.feature_backup);
+        featurePages('megabackup');
     }
     else if (page == 'done') {
         parsepage(pages['done']);
@@ -2866,7 +2871,7 @@ function topmenuUI() {
                     'mobile', 'register', 'resellers', 'sdk', 'sitemap', 'sourcecode',
                     'support', 'takedown', 'terms', 'start', 'security', 'affiliate',
                     'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
-                    'achievements', 'objectstorage'
+                    'achievements', 'objectstorage', 'megabackup',
                 ];
                 var moveTo = {
                     'account': 'fm/account',

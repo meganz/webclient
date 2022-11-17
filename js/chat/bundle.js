@@ -13204,7 +13204,14 @@ class SearchPanel extends mixins.wl {
           status: undefined,
           isFirstQuery: true,
           results: []
-        }, () => searching && delay('chat-search', () => this.doSearch(value, false), 1600));
+        }, () => {
+          if (searching) {
+            delay('chat-search', () => this.doSearch(value, false), 1600);
+            if ($.dialog === 'onboardingDialog') {
+              closeDialog();
+            }
+          }
+        });
         this.wrapperRef.scrollToY(0);
       }
     };
@@ -14105,7 +14112,7 @@ class ConversationsApp extends mixins.wl {
     delay('mcob-update', () => this.handleOnboardingStep(), 1000);
   }
   handleOnboardingStep() {
-    if (M.chat && mega.ui.onboarding && mega.ui.onboarding.sections.chat && !mega.ui.onboarding.sections.chat.isComplete && this.state.view !== this.VIEWS.LOADING && (!this.$obDialog || !this.$obDialog.is(':visible')) && (this.obToggleDrawn || $('.toggle-panel-heading', '.conversationsApp').length)) {
+    if (M.chat && mega.ui.onboarding && mega.ui.onboarding.sections.chat && !mega.ui.onboarding.sections.chat.isComplete && this.state.view !== this.VIEWS.LOADING && (!this.$obDialog || !this.$obDialog.is(':visible')) && (this.obToggleDrawn || $('.toggle-panel-heading', '.conversationsApp').length) && !$('.search-panel.expanded', '.conversationsApp').length) {
       this.obToggleDrawn = true;
       const {
         chat: obChat

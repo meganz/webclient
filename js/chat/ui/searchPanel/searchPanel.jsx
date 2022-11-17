@@ -118,19 +118,27 @@ export default class SearchPanel extends MegaRenderMixin {
             const searching = value.length > 0;
 
             this.doDestroy();
-            this.setState({
-                value,
-                searching,
-                // Only contacts are retrieved when the query is less than 2 characters; given that the operation is
-                // synchronous and results might be returned quickly, we don't want to show the `IN_PROGRESS` status,
-                // because `pause search` will not be available yet. Additionally, searching `CONTACTS AND CHATS`
-                // does not perform decryption in any form and the `IN_PROGRESS` status is needed only when retrieving
-                // `MESSAGES`. Hence, we do status reset to `undefined`.
-                status: undefined,
-                isFirstQuery: true,
-                results: []
-            }, () =>
-                searching && delay('chat-search', () => this.doSearch(value, false), 1600)
+            this.setState(
+                {
+                    value,
+                    searching,
+                    // Only contacts are retrieved when the query is less than 2 characters; given that the operation is
+                    // synchronous and results might be returned quickly, we don't want to show the `IN_PROGRESS` status
+                    // because `pause search` will not be available yet. Additionally, searching `CONTACTS AND CHATS`
+                    // does not perform decryption in any form and the `IN_PROGRESS` status is needed only when
+                    // retrieving `MESSAGES`. Hence, we do status reset to `undefined`.
+                    status: undefined,
+                    isFirstQuery: true,
+                    results: []
+                },
+                () => {
+                    if (searching) {
+                        delay('chat-search', () => this.doSearch(value, false), 1600);
+                        if ($.dialog === 'onboardingDialog') {
+                            closeDialog();
+                        }
+                    }
+                }
             );
 
             this.wrapperRef.scrollToY(0);

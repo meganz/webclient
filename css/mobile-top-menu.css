@@ -517,7 +517,7 @@
     background-position: 2px -226px;
 }
 .menus-sprite.rounded.backup {
-    background-color: #00A8E1;
+    background-color: rgba(29, 176, 123, 1);
     background-position: -47px -228px;
 }
 .menus-sprite.rounded.share {

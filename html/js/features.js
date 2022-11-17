@@ -125,6 +125,7 @@ const featurePages = (function() {
         collaboration: {},
         storage: {},
         objectstorage: {},
+        backup: {},
     };
 
     /**
@@ -136,6 +137,9 @@ const featurePages = (function() {
             processPictures(pictures[pageName]);
             if (pageName === 'objectstorage') {
                 featurePages.objectStoragePage();
+            }
+            else if (pageName === 'megabackup') {
+                featurePages.backupPage();
             }
         }
         else {
@@ -343,6 +347,24 @@ featurePages.objectStoragePage = function() {
         }
         else {
             $checkBox.removeClass('checkboxOff').addClass('checkboxOn');
+        }
+    });
+};
+
+featurePages.backupPage = function() {
+    'use strict';
+
+    const $backupPage = $('.feature-page.backup');
+
+    // hero button
+    megasync.isInstalled((err, is) => {
+        if (is) {
+            $('a.megasync-available', $backupPage).removeClass('hidden');
+            $('a.megasync-not-available', $backupPage).addClass('hidden');
+        }
+        else {
+            $('a.megasync-available', $backupPage).addClass('hidden');
+            $('a.megasync-not-available', $backupPage).removeClass('hidden');
         }
     });
 };

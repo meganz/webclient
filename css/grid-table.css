@@ -99,7 +99,7 @@
 
 .grid-scrolling-table {
     background: no-repeat center 33px linear-gradient(90deg, var(--stroke-grey-2), var(--stroke-grey-2));
-    background-size: auto 1px;
+    background-size: 100% 1px;
 }
 
 .grid-scrolling-table,

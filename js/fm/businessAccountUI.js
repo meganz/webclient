@@ -1279,15 +1279,6 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $('.file-number', $versionsSection).text(versionsFileNumText);
     };
 
-    // TODO: Remove the condtion once new applications are pushed live
-    if (localStorage.debugBackups) {
-
-        $('.js-backups-el', $subAccountContainer).removeClass('hidden');
-    }
-    else {
-        $('.js-backups-el', $subAccountContainer).addClass('hidden');
-    }
-
     // getting quotas
     var quotasPromise = this.business.getQuotaUsage();
     quotasPromise.done(fillQuotaInfo);
@@ -1347,15 +1338,6 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             outshareTotal += currInhareEx[0];
             inshareTotal += currInhare[0];
             backupsTotal += currBackups[0];
-        }
-
-        // TODO: Remove condition once new applications are pushed live
-        if (localStorage.debugBackups) {
-            $('.js-backups-el', $storageAnalysisPie).removeClass('hidden');
-        }
-        else {
-            backupsTotal = 0;
-            $('.js-backups-el', $storageAnalysisPie).addClass('hidden');
         }
 
         totalStorage = rootTotal + rubbishTotal + outshareTotal + inshareTotal + backupsTotal;

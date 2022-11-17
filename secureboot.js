@@ -1128,7 +1128,8 @@ var page;
 window.redirect = ['about', 'achievements', 'android', 'bird', 'business', 'chrome', 'cmd',
                    'contact', 'collaboration', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
                    'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
-                   'mobile', 'nas', 'objectstorage', 'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat',
+                   'megabackup', 'mobile', 'nas', 'objectstorage',
+                   'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat',
                    'security', 'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
 var isStaticPage = function(page) {
     'use strict';
@@ -3389,6 +3390,7 @@ else if (!browserUpdate) {
         'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1},
         'features_js': {f:'html/js/features.js', n: 'features_js', j:1},
         'feature_storage': {f:'html/features-storage.html', n: 'feature_storage', j:0},
+        'feature_backup': {f:'html/features-backup.html', n: 'feature_backup', j:0},
         'feature_chat': {f:'html/features-chat.html', n: 'feature_chat', j:0},
         'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
         'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
@@ -3521,6 +3523,7 @@ else if (!browserUpdate) {
         'developersettings': ['developersettings', 'developersettings_js'],
         'megadrop': ['megadrop', 'nomegadrop'],
         'storage': ['feature_storage', 'features_js'],
+        'megabackup': ['feature_backup', 'features_js'],
         'securechat': ['feature_chat', 'features_js'],
         'collaboration': ['feature_collaboration', 'features_js'],
         'achievements': ['achievements', 'achievementsPage_js', 'achievements_css'],

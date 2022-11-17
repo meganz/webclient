@@ -433,8 +433,7 @@
         else if (id && id.substr(0, 7) === 'account') {
             M.onFileManagerReady(accountUI);
         }
-        // TODO: Remove "localStorage.debugBackups" once new applications are ready
-        else if (!is_mobile && id && id.substr(0, 7) === 'devices' && localStorage.debugBackups) {
+        else if (!is_mobile && id && id.substr(0, 7) === 'devices') {
             M.onFileManagerReady(() => {
                 mega.backupCenter.openSection();
             });

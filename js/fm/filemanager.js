@@ -4054,14 +4054,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     $('.nw-fm-left-icon', $fmholder).removeClass('active');
 
-    // TODO: Remove this condition once new applications are ready
-    if (localStorage.debugBackups) {
-        $('.nw-fm-left-icon.backup-center', $fmholder).removeClass('hidden');
-    }
-    else {
-        $('.nw-fm-left-icon.backup-center', $fmholder).addClass('hidden');
-    }
-
     if (u_type === 3 || window.is_eplusplus) {
         $('.nw-fm-left-icon.conversations', $fmholder).removeClass('hidden');
     }
@@ -4548,6 +4540,12 @@ FileManager.prototype.getMyBackups = async function() {
     }
 
     M.BackupsId = handle;
+
+    const lPaneButton = document.querySelector('.js-lp-myfiles .js-backups-btn');
+
+    if (lPaneButton.classList.contains('hidden')) {
+        lPaneButton.classList.remove('hidden');
+    }
 };
 
 FileManager.prototype.getCameraUploads = async function() {

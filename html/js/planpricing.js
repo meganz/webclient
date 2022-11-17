@@ -143,7 +143,7 @@ lazy(pro, 'proplan2', () => {
 
             delay('pricing.plan', eventlog.bind(null, logId));
 
-            if (typeof u_handle === 'undefined') {
+            if (!window.u_handle) {
 
                 const destination = this.id === 'tryMega' && this.textContent === l[24549]
                     ? 'registerb' : 'register';

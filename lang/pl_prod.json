@@ -4076,7 +4076,7 @@
     "ft_backup_col1_body": "Automatycznie tw\u00f3rz kopie zapasowe danych z komputera do MEGA, aby mie\u0107 pewno\u015b\u0107, \u017ce pliki w chmurze odpowiadaj\u0105 twojemu lokalnemu dyskowi.",
     "ft_backup_col1_title": "Automatyczne kopie zapasowe",
     "ft_backup_col2_body": "Odzyskiwanie usuni\u0119tych lub poprzednich wersji plik\u00f3w i folder\u00f3w. U\u017cytkownicy p\u0142ac\u0105cy mog\u0105 r\u00f3wnie\u017c pobiera\u0107 odzyskane pliki.",
-    "ft_backup_col2_title": "Odzyskiwanie starych plik\u00f3w",
+    "ft_backup_col2_title": "Recover old files (coming soon)",
     "ft_backup_col3_body": "Po utworzeniu kopii zapasowej plik\u00f3w w urz\u0105dzeniu MEGA mo\u017cna uzyska\u0107 do nich dost\u0119p z dowolnego urz\u0105dzenia.",
     "ft_backup_col3_title": "Dost\u0119p do plik\u00f3w z dowolnego miejsca",
     "ft_backup_compare_note": "* MEGA zachowuje poprzednie wersje plik\u00f3w i folder\u00f3w przez 30 dni, 90 dni dla Pro\u00a0Lite lub 365 dni dla innych kont Pro lub kont Business. Tylko p\u0142ac\u0105cy u\u017cytkownicy mog\u0105 pobiera\u0107 odzyskane pliki.",

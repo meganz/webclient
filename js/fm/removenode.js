@@ -42,6 +42,10 @@ function removeUInode(h, parent) {
         mega.gallery.nodeUpdated = true;
     }
 
+    if (M.isDynPage(M.currentdirid) > 1) {
+        M.dynContentLoader[M.currentdirid].sync(n);
+    }
+
     var hasItems = !!M.v.length;
     const __markEmptied = () => {
 
@@ -137,7 +141,10 @@ function removeUInode(h, parent) {
                 }
                 else {
                     $('.files-grid-view').addClass('hidden');
-                    if (M.currentdirid !== 'public-links') {
+                    if (M.isDynPage(M.currentdirid)) {
+                        $(`.fm-empty-${M.currentdirid}`, '.fm-right-files-block').removeClass('hidden');
+                    }
+                    else if (M.currentdirid !== 'public-links') {
                         $('.fm-empty-folder').removeClass('hidden');
                     }
                 }
@@ -368,8 +375,8 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
         var moveToRubbish = function() {
             loadingDialog.pshow();
             M.moveToRubbish(selectedNodes).always(loadingDialog.phide.bind(loadingDialog)).done(function () {
-                // Re-render the search result page after files being removed
-                if (M.currentdirid.split("/")[0] === "search") {
+                // Re-render the search result / faves page after files being removed
+                if (M.currentdirid.split("/")[0] === "search" || M.currentdirid === 'faves') {
                     M.openFolder(M.currentdirid, true);
                 }
             });

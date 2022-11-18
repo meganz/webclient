@@ -289,6 +289,26 @@ MegaData.prototype.rmSetupUIDelayed = function(ms) {
     delay('rmSetupUI', () => this.rmSetupUI(false, true), Math.max(ms | 0, 75));
 };
 
+MegaData.prototype.megaListRemoveNode = function(aNode, aHandle) {
+    'use strict';
+    const {megaRender} = M;
+    if (!megaRender) {
+        if (d) {
+            console.warn('Ignoring invalid MegaRender state..', aHandle);
+        }
+        return false;
+    }
+
+    aHandle = aHandle || aNode.id;
+    const node = megaRender.revokeDOMNode(aHandle, true);
+    if (!node) {
+        if (d) {
+            console.warn('revokeDOMNode failed..', aHandle);
+        }
+        return false;
+    }
+    return true;
+};
 
 MegaData.prototype.megaListRenderNode = function(aHandle) {
     'use strict';

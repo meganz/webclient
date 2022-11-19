@@ -4116,7 +4116,7 @@ else if (!browserUpdate) {
                         jsl_loaded[e] = 1;
                     }
                 } catch (ex) {
-                    throw new Error("Error parsing template");
+                    throw new Error("Error parsing template, " + String(ex.message || ex).substr(0, 88));
                 }
             }
             else if (jsl[i].j == 0) pages[jsl[i].n] = jsl[i].text;

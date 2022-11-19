@@ -1083,7 +1083,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
 
     var linktohelp = l.mega_help_host + '/files-folders/restore-delete/file-version-history';
-    l[17097] =  l[17097]
+    l[17097] =  escapeHTML(l[17097])
                 .replace('[A]', '<a id="versionhelp" href="' + linktohelp + '" target="_blank" class="red">')
                 .replace('[/A]', '</a>');
     l[17690] = escapeHTML(l[17690]).replace('[A]', '<a href="https://mega.nz/recovery" target="_blank" class="red">')

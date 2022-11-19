@@ -323,8 +323,29 @@ lazy(mega, 'backupCenter', () => {
 
                     megasync.megaSyncRequest({a: "ab", u: u_handle}, (ev, res) => {
 
+                        // TODO: Remove the condition when no old versions left on users devices
+                        if (res === -2 && is.v && parseFloat(is.v) < 4.8) {
+
+                            msgDialog(
+                                `confirmation:!^${l[20826]}!${l[1597]}`,
+                                l[23967],
+                                l.outdated_app_ver,
+                                undefined,
+                                (e) => {
+
+                                    if (!e || typeof megasync === 'undefined') {
+                                        return false;
+                                    }
+                                    open(
+                                        megasync.getMegaSyncUrl() || `${getAppBaseUrl()}#sync`,
+                                        '_blank',
+                                        'noopener,noreferrer'
+                                    );
+                                }
+                            );
+                        }
                         // Invalid user handle
-                        if (res === -2) {
+                        else if (res === -2) {
 
                             msgDialog('info', l[23967], l[200]);
                         }

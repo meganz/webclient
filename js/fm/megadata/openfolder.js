@@ -317,20 +317,23 @@
         $('.fm-notification-block.duplicated-items-found').removeClass('visible');
         $('.fm-right-header .fm-breadcrumbs-wrapper').removeClass('hidden');
 
-        if (this.chat) {
-            this.v = [];
-            sharedFolderUI(); // remove shares-specific UI
-        }
-        else if (id === undefined && folderlink) {
+        if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
             this.renderMain();
         }
-        else if (id && id.substr(0, 7) !== 'account'
-            && id.substr(0, 7) !== 'devices'
-            && id.substr(0, 9) !== 'dashboard'
-            && id.substr(0, 15) !== 'user-management'
-            && id.substr(0, 13) !== 'notifications') {
+        // Skip M.renderMain and clear folder nodes for sections without viewmode switchers
+        else if (this.chat || !id ||
+            id.substr(0, 7) === 'account' ||
+            id.substr(0, 7) === 'devices' ||
+            id.substr(0, 9) === 'dashboard' ||
+            id.substr(0, 15) === 'user-management') {
+
+            this.v = [];
+            delay.cancel('rmSetupUI');
+            sharedFolderUI(); // remove shares-specific UI
+        }
+        else {
 
             $('.fm-right-files-block').removeClass('hidden');
 
@@ -378,7 +381,7 @@
                 this.filterByParent(this.currentdirid);
             }
 
-            if (id.substr(0, 4) !== 'chat' && id.substr(0, 9) !== 'transfers') {
+            if (id.substr(0, 9) !== 'transfers') {
                 this.labelFilterBlockUI();
             }
 
@@ -602,14 +605,20 @@
                 });
             }
         }
+        else if (id && id.substr(0, 15) === 'user-management' && is_mobile) {
+
+            id = this.RootID;
+        }
         else if (id && id.substr(0, 15) === 'user-management' && u_attr && u_attr.pf) {
 
-            // If Pro Flexi flexi, show just the invoices
-            M.require('businessAcc_js', 'businessAccUI_js').done(() => {
-                M.onFileManagerReady(() => {
-                    var usersM = new BusinessAccountUI();
+            M.onFileManagerReady(() => {
 
-                    M.onSectionUIOpen('user-management');
+                M.onSectionUIOpen('user-management');
+
+                // If Pro Flexi flexi, show just the invoices
+                M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+
+                    var usersM = new BusinessAccountUI();
 
                     usersM.viewBusinessInvoicesPage();
                 });
@@ -617,17 +626,18 @@
         }
         else if (id && id.substr(0, 15) === 'user-management') {
 
-            // id = 'user-management';
-            M.require('businessAcc_js', 'businessAccUI_js').done(function() {
-                M.onFileManagerReady(function() {
+            M.onFileManagerReady(() => {
+
+                M.onSectionUIOpen('user-management');
+
+                // id = 'user-management';
+                M.require('businessAcc_js', 'businessAccUI_js').done(() => {
 
                     if (!new BusinessAccount().isBusinessMasterAcc()) {
                         return M.openFolder('cloudroot');
                     }
 
                     var usersM = new BusinessAccountUI();
-
-                    M.onSectionUIOpen('user-management');
 
                     // checking if we loaded sub-users and drew them
                     if (!usersM.initialized) {

@@ -59,7 +59,7 @@ mobile.twofactor.setup = {
 
                 // The Two-Factor has already been setup, return to the My Account page to disable
                 if (response === EEXIST) {
-                    mobile.messageOverlay.show(l[19219] + ' ' + l[19220], function() {
+                    mobile.messageOverlay.show(l[19219], l['2fa_already_enabled_mob'], () => {
                         loadSubPage('fm/account/');
                     });
 

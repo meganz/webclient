@@ -273,23 +273,12 @@ lazy(pro, 'proplan2', () => {
      * Handler to init all sliders : Business, Flexi, Competitors
      * */
     const initSlidersEvents = () => {
-        const $compareSlider = $('#storage-slider', $compareBox);
-        const $compareSliderLabel = $('.pricing-compare-slider-selected-val', $compareBox);
         const $compareMEGABox = $('.pricing-compare-cards.mega', $compareBox);
         const $compareDPBox = $('.pricing-compare-cards.dp', $compareBox);
         const $compareGDBox = $('.pricing-compare-cards.gd', $compareBox);
         const $compareMEGA = $('.pricing-compare-cards-rate .vl', $compareMEGABox);
         const $compareDP = $('.pricing-compare-cards-rate .vl', $compareDPBox);
         const $compareGD = $('.pricing-compare-cards-rate .vl', $compareGDBox);
-        const $comparePeriod = $('.pricing-compare-cards-period ', $compareBox);
-        const $compareArstrisks = $('.pricing-compare-cards-rate .ars, .pricing-compare-cards-rate sup', $compareBox);
-        const $megaNote = $('.pricing-compare-cards-note', $compareMEGABox);
-        const $dpNote = $('.pricing-compare-cards-note', $compareDPBox);
-        const $gdNote = $('.pricing-compare-cards-note', $compareGDBox);
-        const $dpRate = $('.pricing-compare-cards-rate', $compareDPBox);
-        const $gdRate = $('.pricing-compare-cards-rate', $compareGDBox);
-        const $refNote = $('.pricing-compare-references', $compareBox);
-        const $storageMarks = $('.pricing-compare-slider-mark', $compareBox);
 
         const $flexStorageSlider = $('#storage-flex-slider', $proflexiBlock);
         const $flexTransSlider = $('#trans-flex-slider', $proflexiBlock);
@@ -306,14 +295,6 @@ lazy(pro, 'proplan2', () => {
             [0, 50, 3, 100],
             [51, 75, 101, 1000],
             [76, 100, 1001, 10000]
-        ];
-
-        // store the value we want to show with competitors (sizes and prices)
-        const competitorsValues = [
-            [bytesToSize(20 * 1073741824, 0), bytesToSize(2 * 1073741824, 0), bytesToSize(15 * 1073741824, 0)],
-            [formatCurrency(9.99), formatCurrency(9.99), formatCurrency(12)],
-            [formatCurrency(19.99), false, false],
-            [formatCurrency(29.99), false, false]
         ];
 
         $compareMEGA.text(formatCurrency(1.56));
@@ -386,52 +367,6 @@ lazy(pro, 'proplan2', () => {
         $flexTransSlider.rebind('input.pricing', function() {
             sliderEventHandler(this, asymmetricRanges, $transFlexInput);
             estimateFlexiPrice($strgFlexInput.val(), $transFlexInput.val());
-        });
-
-        $compareSlider.rebind('input.pricing', function() {
-            sliderEventHandler(this);
-
-            let stroageLabelTxt = l.pr_free_plan;
-            const val = this.value | 0;
-
-            if (val) {
-                const stroageSizes = [2, 8, 16];
-                const megaPlans = [l[5819], l[6125], l[6126]];
-                stroageLabelTxt = bytesToSize(stroageSizes[val - 1] * 1099511627776, 0);
-                $megaNote.text(`${l[23818].replace('%1', megaPlans[val - 1])}`);
-
-                if (val === 1) {
-                    $dpNote.text(l[23947]);
-                    $gdNote.text(l[23818].replace('%1', bytesToSize(2 * 1099511627776, 0)));
-                }
-                else {
-                    $dpNote.safeHTML(l[23819]);
-                    $gdNote.safeHTML(l[24077]);
-                }
-
-            }
-            else {
-                $dpNote.text(l[24075]);
-                $gdNote.text(l[24076]);
-            }
-
-            $compareSliderLabel.text(stroageLabelTxt);
-
-            $compareMEGA.text(competitorsValues[val][0]);
-            $compareDP.text(competitorsValues[val][1]);
-            $compareGD.text(competitorsValues[val][2]);
-
-            const isSize = val === 0;
-            $comparePeriod.toggleClass('invisible', isSize);
-            $compareArstrisks.toggleClass('invisible', isSize);
-            $megaNote.toggleClass('invisible', isSize);
-            $comparePeriod[1].classList.toggle('hidden', !val || val > 1);
-            $comparePeriod[2].classList.toggle('hidden', !val || val > 1);
-            $refNote.toggleClass('invisible', val !== 1);
-            $dpRate.toggleClass('na', val > 1);
-            $gdRate.toggleClass('na', val > 1);
-            $storageMarks.removeClass('highlighted');
-            $storageMarks[val].classList.add('highlighted');
         });
 
         const fromValueToRange = (ranges, val) => {

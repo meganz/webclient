@@ -474,88 +474,6 @@ i.dropbox-icon {
     grid-row: 1;
     text-align: center;
 }
-.pricing-compare-container .pricing-compare-slider-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    margin-top: 64px;
-    grid-row: 2;
-    grid-column: 4/ span 6;
-}
-.pricing-compare-slider-container input.pricing-compare-slider {
-    width: 100%;
-    margin-top: 24px;
-    appearance: none;
-    height: 6px;
-    background: linear-gradient(to right, var(--color-secondary-cobalt-900) 33.333%, var(--color-grey-150) 33.333% 100%);
-    outline: none;
-    border-radius: 8px;
-}
-.pricing-compare-slider-container .pricing-compare-slider-marks-contianer {
-    display: flex;
-    justify-content: space-between;
-    font: var(--text-copy-secondary-pricing);
-    color: var(--color-copy-secondary);
-    position: relative;
-}
-.pricing-compare-slider-container .pricing-compare-slider-marks-contianer .first {
-    max-width: 29px;
-}
-.pricing-compare-slider-marks-contianer .pricing-compare-slider-mark.slide-splitter::before {
-    position: absolute;
-    top: 44px;
-    content: "";
-    -webkit-margin-start: 9px;
-    margin-inline-start: 9px;
-    width: 6px;
-    height: 6px;
-    background-color: var(--color-bg-surface-1);
-}
-.pricing-compare-slider-marks-contianer .pricing-compare-slider-mark.slide-splitter {
-    -webkit-padding-start: 5px;
-    padding-inline-start: 5px;
-}
-.pricing-compare-slider-marks-contianer .pricing-compare-slider-mark.highlighted {
-    color: var(--color-secondary-cobalt-900);
-}
-.pricing-compare-slider-container .pricing-compare-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: #FFFFFF;
-    cursor: pointer;
-    border: 8px solid #00174C;
-    box-sizing: border-box;
-    z-index: 10;
-    position: relative;
-}
-.pricing-compare-slider-container .pricing-compare-slider::-moz-range-thumb {
-    -moz-appearance: none;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--color-bg);
-    cursor: pointer;
-    border: 8px solid var(--color-secondary-cobalt-900);
-    box-sizing: border-box;
-    z-index: 10;
-    position: relative;
-}
-.pricing-compare-slider-container .pricing-compare-slider-selected-val-container {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 35px;
-    font: var(--text-h5-pricing);
-}
-.pricing-compare-slider-selected-val-container .pricing-compare-slider-selected-txt {
-    color: var(--color-copy-secondary);
-}
-.pricing-compare-slider-selected-val-container .pricing-compare-slider-selected-val {
-    color: var(--color-secondary-cobalt-900);
-    white-space: nowrap;
-}
 .pricing-pg.pricing-compare-container .pricing-compare-cards-container {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -997,11 +915,6 @@ i.pricing-i-icon {
         .pricing-pg .pricing-pg.tabs-module .tabs-module-block {
             width: 285px;
         }
-
-        /*.pricing-compare-container .pricing-compare-slider-container {
-            padding-left: 258px;
-            padding-right: 258px;
-        }*/
     }
     /* The range from Medium (M) 768px ---> to Large (L) 1080px */
     @media screen and (min-width: 767px) and (max-width: 1079px) {
@@ -1055,12 +968,6 @@ i.pricing-i-icon {
         .pricing-pg .pricing-compare-container {
             padding-top: 56px;
             padding-bottom: 72px;
-        }
-        .pricing-compare-container .pricing-compare-slider-container {
-            /*padding-left: 124px;
-            padding-right: 124px;*/
-            margin-top: 56px;
-            grid-column: 3 / span 8;
         }
         .pricing-compare-container .pricing-compare-title {
             grid-column: 3 / span 8;
@@ -1234,17 +1141,6 @@ i.pricing-i-icon {
         }
         .pricing-compare-container .pricing-compare-title {
             grid-column: 1 / -1;
-        }
-        .pricing-compare-container .pricing-compare-slider-container {
-            /*padding-left: 0;
-            padding-right: 0;*/
-            grid-column: 1 / -1;
-            margin-top: 48px;
-        }
-        .pricing-compare-slider-container .pricing-compare-slider-selected-val-container {
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
         }
         .pricing-pg.pricing-compare-container .pricing-compare-cards-container {
             gap: 24px;

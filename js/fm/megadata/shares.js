@@ -18,7 +18,17 @@ MegaData.prototype.sharesUI = function() {
 MegaData.prototype.openSharingDialog = function() {
     'use strict';
 
-    if (M.isInvalidUserStatus()) {
+    if (!Array.isArray($.selected)) {
+        return;
+    }
+
+    const targetHandle = $.selected[0];
+
+    if (!targetHandle // Nothing is selected
+        || !M.d[targetHandle] // Node does not exist anymore
+        || M.d[targetHandle].t === 0 // Node is not a folder
+        || M.isInvalidUserStatus() // User does not have permissions
+    ) {
         return;
     }
     if (u_type === 0) {
@@ -43,6 +53,11 @@ MegaData.prototype.openSharingDialog = function() {
     });
 
     var showShareDlg = function() {
+        // Checking if the selection is still the same after dialog rendering
+        if (!Array.isArray($.selected) || $.selected[0] !== targetHandle) {
+            return;
+        }
+
         $.hideContextMenu();
 
         $.addContactsToShare = {};// GLOBAL VARIABLE, add contacts to a share
@@ -52,7 +67,7 @@ MegaData.prototype.openSharingDialog = function() {
 
         // @todo refactor!
         // eslint-disable-next-line no-use-before-define
-        fillShareDlg($.selected[0]).catch(dump);
+        fillShareDlg(targetHandle).catch(dump);
 
         // Show the share dialog
         return $dialog.removeClass('hidden');

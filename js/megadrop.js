@@ -410,7 +410,7 @@ mega.megadrop = (function() {
 
                 // PUF handle is available and PUP is enabled/active
                 if (puf.items[handle] && puf.items[handle].p && puf.items[handle].s !== 1) {
-
+                    delay('megadrop.log', eventlog.bind(null, 99774)); // manage event
                     if (is_mobile) {
                         ui.mobileWidgetDialog(puf.items[handle].p);
                     }
@@ -425,6 +425,8 @@ mega.megadrop = (function() {
                     req.data.email = u_attr.email;
                     req.data.msg = M.getNameByHandle(handle) || 'unknown'; // Folder name instead of custom msg
                     req.n = handle;
+
+                    delay('megadrop.log', eventlog.bind(null, 99773)); // create event
 
                     api_req(req, {
                         callback: function (res) {
@@ -870,6 +872,8 @@ mega.megadrop = (function() {
             if (d) {
                 console.log('pup.check');
             }
+
+            delay('megadrop.log', eventlog.bind(null, 99775)); // open upload page - general
             var req = pupOpts.req.get;
 
             loadingDialog.show();
@@ -2057,6 +2061,7 @@ mega.megadrop = (function() {
             var $item = uiOpts.window.queueItems[id].$;
 
             $item.status.text(l[554]);
+            delay('megadrop.log', eventlog.bind(null, 99776)); // upload count
         };
 
         var isDlgInit = function uiIsDlgInit() {

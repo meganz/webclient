@@ -69,7 +69,7 @@ mobile.twofactor.verifySetup = {
 
                     // The Two-Factor has already been setup
                     if (response === EEXIST) {
-                        mobile.messageOverlay.show(l[19219], l[19220], function() {
+                        mobile.messageOverlay.show(l[19219], l['2fa_already_enabled_mob'], () => {
                             loadSubPage('fm/account/');
                         });
                     }

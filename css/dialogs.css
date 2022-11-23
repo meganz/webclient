@@ -4379,6 +4379,11 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog .content-block.payment-address-dialog-body {
         padding-bottom: 16px;
     }
+
+    .mega-dialog.payment-address-dialog section {
+        flex-shrink: unset;
+    }
+
     .mega-dialog.payment-address-dialog .plan-icon {
         display: inline-block;
         vertical-align: middle;
@@ -5944,6 +5949,9 @@ body.de .mega-dialog.new-group-chat {
 
 /* astropay-dialog */
 
+    .mega-dialog.astropay-dialog {
+        max-height: 100%;
+    }
     .mega-dialog.astropay-dialog .astropay-label {
         display: block;
         margin: 16px 0 8px;
@@ -5975,6 +5983,9 @@ body.de .mega-dialog.new-group-chat {
         bottom: 17px;
         left: 39px;
         pointer-events: none;
+    }
+    .mega-dialog.astropay-dialog section {
+        flex-shrink: unset;
     }
     .rtl .mega-dialog.astropay-dialog .powered-by-astropay i {
         left: auto;

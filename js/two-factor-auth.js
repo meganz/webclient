@@ -424,7 +424,7 @@ twofactor.setupDialog = {
                     msgDialog(
                         'warninga',
                         l[19219],
-                        l[19220],
+                        l['2fa_already_enabled'],
                         '',
                         function() {
                             // Close the dialog on click of OK button
@@ -730,7 +730,7 @@ twofactor.verifySetupDialog = {
 
                         // If the Two-Factor has already been setup, show a warning dialog
                         if (response === EEXIST) {
-                            msgDialog('warninga', l[19219], l[19220], null,
+                            msgDialog('warninga', l[19219], l['2fa_already_enabled'], null,
                                 function() {
                                     // Close the dialog on click of OK button
                                     twofactor.verifySetupDialog.closeDialog();

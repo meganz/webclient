@@ -272,7 +272,7 @@
                 M.currentdirid === 'public-links' ? 'mixed-content' :
                     M.currentrootid === M.RubbishID ? 'trashcan' :
                         M.currentrootid === M.InboxID ? 'backups' :
-                            location;
+                            M.isDynPage(M.currentdirid) ? 'dyn-page' : location;
         }
         else {
             this.chatIsReady = megaChatIsReady;
@@ -429,6 +429,11 @@
 
                     $(`.fm-empty-${pagetype}`).removeClass('hidden');
                     $('.gallery-view').addClass('hidden');
+                }
+                else if (M.isDynPage(M.currentdirid)) {
+                    if (d > 2) {
+                        console.log('Deferred dyn-page.', M.currentdirid);
+                    }
                 }
                 else if (this.logger) {
                     this.logger.info('Empty folder not handled...', M.currentdirid, M.currentrootid);
@@ -1290,6 +1295,7 @@
 
                         var megaListOptions = {
                             'itemRenderFunction': M.megaListRenderNode,
+                            'itemRemoveFunction': this.location === 'dyn-page' && M.megaListRemoveNode,
                             'preserveOrderInDOM': true,
                             'extraRows': 1,
                             'batchPages': 0,

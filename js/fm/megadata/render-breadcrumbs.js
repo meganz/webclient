@@ -131,6 +131,16 @@
                 else {
                     typeClass = 'folder';
                 }
+
+                if (M.isDynPage(handle)) {
+                    const {type, localeName} = this.dynContentLoader[handle].options;
+                    if (type) {
+                        typeClass = type;
+                    }
+                    if (localeName) {
+                        name = localeName;
+                    }
+                }
             }
 
             return {

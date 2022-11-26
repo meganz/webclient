@@ -2709,10 +2709,6 @@ function api_fareq(res, ctx, xhr) {
             pp.push(p);
         }
 
-        if (ctx.p && pp.length > 1) {
-            dd = ctx.p.length / pp.length;
-        }
-
         for (m = pp.length; m--;) {
             for (slot = 0;; slot++) {
                 if (!faxhrs[slot]) {

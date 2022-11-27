@@ -212,7 +212,7 @@ def reduce_eslint(file_line_mapping, **extra):
     if error_count == 0:
         return '', 0
     if warnings:
-        result.append('\n{} issue(s) found, {} Errors and {} Wanings'.format(error_count, error_count - warnings, warnings))
+        result.append('\n{} issue(s) found, {} Errors and {} Warnings'.format(error_count, error_count - warnings, warnings))
     else:
         result.append('\n{} error(s) found.'.format(error_count))
     return '\n'.join(result), error_count - warnings
@@ -298,7 +298,7 @@ def reduce_stylelint(file_line_mapping, **extra):
     if error_count == 0:
         return '', 0
     if warnings:
-        result.append('\n{} issue(s) found, {} Errors and {} Wanings'.format(error_count, error_count - warnings, warnings))
+        result.append('\n{} issue(s) found, {} Errors and {} Warnings'.format(error_count, error_count - warnings, warnings))
     else:
         result.append('\n{} error(s) found.'.format(error_count))
     return '\n'.join(result), error_count - warnings
@@ -409,7 +409,7 @@ def analyse_secureboot(filename, result):
     """
     test_fail = False
 
-    with open(filename, 'r') as f:
+    with open(filename, 'r', encoding="utf-8") as f:
         contents = f.read()
 
     match = re.search(r'(?:\{\sf:|\{f:\s|\{f\s:|\{\sf\s:)(?!lang)', contents)

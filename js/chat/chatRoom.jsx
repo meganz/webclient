@@ -2065,6 +2065,10 @@ ChatRoom.prototype.rejectCall = function(callId) {
             'mid': callId
         });
     }
+    const shard = this.chatd.shards[this.chatShard];
+    if (shard) {
+        shard.sendCallReject(base64urldecode(this.chatId), base64urldecode(callId));
+    }
     return Promise.resolve();
 };
 

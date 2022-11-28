@@ -377,7 +377,12 @@
             this.peers[peer.cid].destroy();
             this.chatRoom.trigger('onCallPeerLeft', { userHandle: peer.userId, reason });
             if (peer.userId !== u_handle) {
-                this.left = true;
+                // Delay so that the ParticipantsNotice changes at the same time as the notification shows
+                tSleep(3).always(() => {
+                    if (!this.peers || !this.peers.length) {
+                        this.left = true;
+                    }
+                });
             }
             // Peer is left alone in a group call -> mute mic
             if (peer.client.isLeavingCall()) {
@@ -724,7 +729,7 @@
                     // Wait for the peer left notifications to process before triggering.
                     tSleep(3).then(() => {
                         // make sure we still have that call as active
-                        if (chatRoom.activeCall === activeCall) {
+                        if (chatRoom.activeCall === activeCall && !activeCall.peers.length) {
                             chatRoom.activeCall.initCallTimeout();
                         }
                     });

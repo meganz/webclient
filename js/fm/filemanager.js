@@ -4083,6 +4083,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         case 'public-links':
         case 'backups':
         case 'rubbish-bin':
+            tmpId = 'cloud-drive';
+            break;
         case 'affiliate':
             tmpId = 'dashboard';
             break;

@@ -106,6 +106,7 @@ html.dark-mode .logo,
 html.dark-mode .browsers.icon.medium,
 html.dark-mode .business-icon.semi-medium,
 html.dark-mode .main-loader,
+html.dark-mode .sub-loader,
 html.dark-mode .plan-icon,
 html.dark-mode .achievements-icon,
 html.dark-mode video,
@@ -11842,6 +11843,9 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 
 .used-storage-wrap .used-storage-info .folder-number {
     text-align: end;
+}
+.used-storage-wrap .used-storage-info .folder-number:empty + div {
+    display: none;
 }
 .used-storage-wrap .file-number {
     padding: 7px 4px;

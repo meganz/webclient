@@ -29,7 +29,8 @@
     body.loading .loading-spinner {
         z-index: 1212;
     }
-    .loading-spinner .main-loader {
+    .loading-spinner .main-loader,
+    .sub-loader {
         background: center / 100% no-repeat url(../images/mega/loader-dark.gif);
         background-color: var(--progress-bar-fill4);
         border-radius: 100%;
@@ -39,6 +40,10 @@
         position: absolute;
         top: 0;
         width: 72px;
+    }
+    .sub-loader {
+        position: fixed;
+        top: 50%;
     }
     .loading-spinner.init .main-loader {
         height: 0;

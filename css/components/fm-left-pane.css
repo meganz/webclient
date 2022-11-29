@@ -22,7 +22,7 @@
     height: 100%;
     overflow: hidden;
 }
-.lp-myfiles .content-area {
+.fm-left-panel .content-area {
     border-top: 2px solid transparent;
     box-sizing: border-box;
     flex-grow: 1;
@@ -55,9 +55,11 @@
     margin: 0 4px 4px;
 }
 .lp-myfiles .cloud-drive-panel,
-.lp-gallery .library-panel,
-.active-folder-link .lp-content-wrap {
+.lp-gallery .library-panel {
     padding-top: 4px;
+}
+.active-folder-link .lp-content-wrap {
+    padding-top: 6px;
 }
 .lp-myfiles .cloud-drive-panel {
     display: inline-block;

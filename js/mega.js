@@ -3258,25 +3258,29 @@ function process_suba(suba, ignoreDB) {
     if (!suba || !suba.length) {
         return;
     }
-    M.require('businessAcc_js', 'businessAccUI_js').done(function () {
 
-        // the response is an array of users's handles (Masters). this means at least it will contain
-        // the current user handle.
-        // later-on we need to iterate on all of them. For now we dont know how to treat sub-masters yet
-        // --> we will target only current users's subs
-        var bAccount = new BusinessAccount();
-        // if (!suba || !suba[u_handle]) {
-        //    return;
-        // }
-        // suba = suba[u_handle];
-        if (suba.length) {
-            for (var k = 0; k < suba.length; k++) {
-                bAccount.parseSUBA(suba[k], ignoreDB);
+    M.onFileManagerReady(() => {
+
+        M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+
+            // the response is an array of users's handles (Masters). this means at least it will contain
+            // the current user handle.
+            // later-on we need to iterate on all of them. For now we dont know how to treat sub-masters yet
+            // --> we will target only current users's subs
+            const bAccount = new BusinessAccount();
+            // if (!suba || !suba[u_handle]) {
+            //    return;
+            // }
+            // suba = suba[u_handle];
+            if (suba.length) {
+                for (var k = 0; k < suba.length; k++) {
+                    bAccount.parseSUBA(suba[k], ignoreDB);
+                }
             }
-        }
-        // else {
-        //    bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
-        // }
+            // else {
+            //    bAccount.parseSUBA(null, true); // dummy call to flag that this is a master B-account
+            // }
+        });
     });
 }
 

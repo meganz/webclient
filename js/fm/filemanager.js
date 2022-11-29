@@ -3225,6 +3225,10 @@ FileManager.prototype.addViewUI = function(aNoTreeUpdate, refresh) {
 
 FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     "use strict";
+
+    if (this.chat) {
+        return;
+    }
     if (d) {
         console.time('iconUI');
     }
@@ -3252,12 +3256,6 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         $('.out-shared-blocks-view').removeClass('hidden');
         initPerfectScrollbar($('.out-shared-blocks-scrolling', '.out-shared-blocks-view'));
     }
-    else if (this.currentdirid !== 'user-management' &&
-        (this.currentdirid === this.BackupsId || this.getNodeRoot(this.currentdirid) === this.InboxID)) {
-        if (this.v.length > 0) {
-            $('.fm-blocks-view.fm').removeClass('hidden');
-        }
-    }
     else if (this.currentrootid === 'shares' && !this.v.length) {
         const viewModeClass = (M.viewmode ? '.fm-blocks-view' : '.files-grid-view') + '.fm.shared-folder-content';
 
@@ -3265,8 +3263,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         initPerfectScrollbar($(viewModeClass));
     }
     // user management ui update is handled in Business Account classes.
-    else if (this.v.length && this.currentdirid.substr(0, 15) !== 'user-management' &&
-        M.currentCustomView.type !== 'gallery') {
+    else if (this.v.length && M.currentCustomView.type !== 'gallery') {
 
         $('.fm-blocks-view.fm').removeClass('hidden');
         if (this.currentCustomView) {
@@ -3476,7 +3473,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         $(viewModeClass).removeClass('hidden');
         initPerfectScrollbar($(viewModeClass, '.shared-details-block'));
     }
-    else if (this.v.length) {
+    else if (this.v.length && M.currentCustomView.type !== 'gallery') {
 
         $('.files-grid-view.fm').removeClass('hidden');
         if (this.currentCustomView) {

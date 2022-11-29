@@ -2354,11 +2354,18 @@ function topmenuUI() {
     $topMenuActivityBlock.addClass('hidden');
 
     $headerActivityBlock.addClass('hidden');
-    $headerIndividual.removeClass('hidden'); // try Mega Business
     $headerIndividualSpan.text(l[19702]); // try Mega Business
     $headerSetStatus.addClass('hidden');
     $headerAchievements.addClass('hidden');
     $('.membership-status, .top-head .user-name', $topHeader).addClass('hidden');
+
+    // Show/hide MEGA for Business/ Try Individual button
+    if (u_type > 0 || u_type === 0 && is_fm()) {
+        $headerIndividual.addClass('hidden');
+    }
+    else {
+        $headerIndividual.removeClass('hidden');
+    }
 
     if (!fminitialized) {
         $headerSearch.addClass('hidden');
@@ -2470,7 +2477,6 @@ function topmenuUI() {
         $('.top-change-language', $topHeader).addClass('hidden');
         $headerRegisterBotton.addClass('hidden');
         $('.membership-status-block', $topHeader).removeClass('hidden');
-        $headerIndividual.addClass('hidden');
 
         // Show the rocket icon if achievements are enabled
         mega.achievem.enabled()
@@ -2587,10 +2593,6 @@ function topmenuUI() {
         $headerAchievements.addClass('hidden');
         $headerButtons.removeClass('hidden');
         $headerRegisterBotton.removeClass('hidden');
-
-        if (u_type === 0 && is_fm()) {
-            $headerIndividual.addClass('hidden');
-        }
 
         $headerRegisterBotton.rebind('click.register', function() {
             if ($(this).hasClass('business-reg')) {

@@ -1557,6 +1557,19 @@ scparser.mcpc = scparser.mcc = function (a) {
     }
     else {
         console.error('unable to parse mcc packet');
+        const { master, slaves } = mBroadcaster.crossTab;
+        eventlog(
+            99779,
+            JSON.stringify([
+                1,
+                buildVersion && buildVersion.website || 'dev',
+                sessionStorage.updateRequiredBy | 0,
+                loadfm.chatmcf === null ? 'null' : typeof loadfm.chatmcf,
+                u_type | 0,
+                (!!master) | 0,
+                Object(slaves).length | 0
+            ])
+        );
     }
 
     if (fmdb) {

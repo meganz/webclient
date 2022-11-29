@@ -249,7 +249,7 @@ ChatdIntegration.prototype.updateChatPublicHandle = function(h, d, callback) {
 
 };
 
-ChatdIntegration.prototype.requiresUpdate = function() {
+ChatdIntegration.prototype.requiresUpdate = function(source) {
     if (window.location.toString().indexOf("/chat")) {
         $('.nw-fm-left-icon.cloud-drive').triggerHandler('click');
     }
@@ -277,6 +277,10 @@ ChatdIntegration.prototype.requiresUpdate = function() {
             });
         }
     });
+
+    if (source) {
+        sessionStorage.updateRequiredBy = source;
+    }
 };
 
 ChatdIntegration._waitForProtocolHandler = async function(chatRoom, cb = nop) {
@@ -369,7 +373,7 @@ ChatdIntegration.prototype.joinChatViaPublicHandle = function(chatRoom) {
             }).catch((ex) => {
                 loadingDialog.hide();
                 if (ex === EEXPIRED) {
-                    self.requiresUpdate();
+                    self.requiresUpdate(2);
                 }
                 else if (ex === ENOENT) {
                     msgDialog('warninga', l[20641], l[20642]);
@@ -566,7 +570,7 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                 self.logger.warn(ex);
 
                 if (ex === EEXPIRED) {
-                    self.requiresUpdate();
+                    self.requiresUpdate(3);
                 }
                 else {
                     reject(ex);

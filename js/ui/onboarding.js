@@ -646,6 +646,9 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         showDialog() {
 
+            if (!$(this.map.targetElmClass).length) {
+                return;
+            }
             this.$dialog = $('#ob-dialog');
 
             M.safeShowDialog('onboardingDialog', () => {
@@ -665,6 +668,10 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         positionDialog() {
 
+            if (!$(this.map.targetElmClass).length) {
+                // Just in case something odd happened with the DOM node.
+                return;
+            }
             // Position of the onboarding dialog
             let my = 'center top';
             let at = 'center bottom+6';

@@ -16,6 +16,7 @@ function FileManager() {
     this.columnsWidth.cloud.timeAd = { max: 180, min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeMd = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.versions = { max: 180, min: 130, curr: 130, viewed: false };
+    this.columnsWidth.cloud.playtime = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
 
     this.columnsWidth.makeNameColumnStatic = function() {
@@ -3340,6 +3341,9 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
         else if ($me.hasClass('sort-versions')) {
             sortType = 'versions';
+        }
+        else if ($me.hasClass('sort-playtime')) {
+            sortType = 'playtime';
         }
 
         var classToAdd = 'selected';

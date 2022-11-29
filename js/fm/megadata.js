@@ -134,7 +134,8 @@ function MegaData() {
         'email': this.sortByEmail.bind(this),
         'label': this.sortByLabel.bind(this),
         'sharedwith': this.sortBySharedWith.bind(this),
-        'versions': this.sortByVersion.bind(this)
+        'versions': this.sortByVersion.bind(this),
+        'playtime': this.sortByPlaytime.bind(this)
     };
     Object.setPrototypeOf(sortRules, null);
     Object.defineProperty(this, 'sortRules', {value: Object.freeze(sortRules)});

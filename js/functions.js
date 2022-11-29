@@ -2543,6 +2543,7 @@ function getFMColPrefs(pref) {
     columnsPreferences.timeAd = pref & 32;
     columnsPreferences.timeMd = pref & 16;
     columnsPreferences.versions = pref & 2;
+    columnsPreferences.playtime = pref & 128;
 
     return columnsPreferences;
 }
@@ -2562,6 +2563,7 @@ function getNumberColPrefs(colName) {
         case 'timeAd': return 32;
         case 'timeMd': return 16;
         case 'versions': return 2;
+        case 'playtime': return 128;
         default: return null;
     }
 }

@@ -597,7 +597,8 @@
 }
 @media only screen and (max-width: 1240px) {
     .fr .pages-menu.link span {
-        font-size: 12px;
+        font-size: 15px;
+        padding: 0 25px;
     }
 }
 @media only screen and (max-width: 970px) {
@@ -610,10 +611,13 @@
     .pages-menu.link i {
         margin-left: -15px;
     }
+    .fr .pages-menu.link span {
+        padding: 0 20px;
+    }
 }
 @media only screen and (max-width: 780px) {
     .fr .pages-menu.link span {
-        font-size: 11px;
+        font-size: 14px;
         padding: 0 5px;
     }
     .fr .pages-menu.link.submenu-item span {

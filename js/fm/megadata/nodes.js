@@ -230,6 +230,7 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'public-links')
             || (id === this.InboxID)
             || (id === 'contacts')
+            || M.isDynPage(id)
             || (mega.gallery.sections[id])
         ) {
             result.push(id);
@@ -251,6 +252,7 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'messages')
             || (id === this.RubbishID)
             || (id === this.InboxID)
+            || M.isDynPage(id)
             || (id === 'contacts')
         ) {
             loop = false;
@@ -1863,6 +1865,10 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             mega.gallery.nodeUpdated = true;
         }
 
+        if (this.isDynPage(this.currentdirid) > 1) {
+            this.dynContentLoader[this.currentdirid].sync(n);
+        }
+
         // Update versioning dialog if it is open and the folder is its parent folder,
         // the purpose of the following code is to update permisions of historical files.
         if ($.selected
@@ -2137,16 +2143,15 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         }
 
         delay('labelDomUpdate:' + n.p, function() {
-            // We only required to re-render if there is filter on the page.
-            if (M.filterLabel[M.currentCustomView.type]) {
-
+            const {n} = M.sortmode || {};
+            if (n === 'label') {
                 // remember current scroll position and make user not losing it.
                 var $megaContainer = $('.megaListContainer:visible');
                 var currentScrollPosition = $megaContainer.prop('scrollTop');
 
-                M.openFolder(M.currentdirid, true).always(function() {
+                M.openFolder(M.currentdirid, true).always(() => {
                     $megaContainer.prop('scrollTop', currentScrollPosition);
-                }).done(reselect);
+                }).then(reselect);
             }
         }, 50);
     }
@@ -2450,16 +2455,27 @@ MegaData.prototype.initLabelFilter = function(nodelist) {
  * @param {Number} favState  Favourites state 0 or 1
  */
 MegaData.prototype.favouriteDomUpdate = function(node, favState) {
-    var $gridView = $('#' + node.h + ' .grid-status-icon');
-    var $blockView = $('#' + node.h + '.data-block-view .file-status-icon');
+    'use strict';
+    if (fminitialized) {
+        delay(`fav.dom-update.${node.h}`, () => {
+            const domListNode = document.getElementById(node.h);
 
-    if (favState) {// Add favourite
-        $gridView.removeClass('icon-dot').addClass('icon-favourite-filled');
-        $blockView.addClass('icon-favourite-filled');
-    }
-    else {// Remove from favourites
-        $gridView.removeClass('icon-favourite-filled').addClass('icon-dot');
-        $blockView.removeClass('icon-favourite-filled');
+            if (domListNode) {
+                const $gridView = $('.grid-status-icon', domListNode);
+                const $blockView = $('.file-status-icon', domListNode);
+
+                if (favState) {
+                    // Add favourite
+                    $gridView.removeClass('icon-dot').addClass('icon-favourite-filled');
+                    $blockView.addClass('icon-favourite-filled');
+                }
+                else {
+                    // Remove from favourites
+                    $gridView.removeClass('icon-favourite-filled').addClass('icon-dot');
+                    $blockView.removeClass('icon-favourite-filled');
+                }
+            }
+        });
     }
 };
 
@@ -3065,6 +3081,10 @@ MegaData.prototype.getTreeHandles = function _(h) {
  */
 MegaData.prototype.getNodeRights = function(id) {
     "use strict";
+
+    if (this.isDynPage(id)) {
+        return this.dynContentLoader[id].options.rights | 0;
+    }
 
     if (folderlink || (id && id.length > 8)) {
         return false;

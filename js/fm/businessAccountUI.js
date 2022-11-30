@@ -34,6 +34,18 @@ function BusinessAccountUI() {
 
     var mySelf = this;
 
+    this.loading = (close) => {
+
+        const $loader = $('.js-ba-loader', '.fm-right-header-user-management');
+
+        if (close) {
+            $loader.addClass('hidden');
+        }
+        else {
+            $loader.removeClass('hidden');
+        }
+    };
+
     // private function to hide all business accounts UI divs.
     this.initUItoRender = function () {
 
@@ -42,6 +54,12 @@ function BusinessAccountUI() {
             loadSubPage('start');
             return false;
         }
+
+        if (String(M.currentdirid).substr(0, 15) !== 'user-management') {
+            return false;
+        }
+
+        this.loading(1);
 
         var $businessAccountContianer = $('.files-grid-view.user-management-view');
         $businessAccountContianer.removeClass('main-page');
@@ -70,8 +88,8 @@ function BusinessAccountUI() {
 
         // view left panel tabs headers [enabled and disabled] account
         $('.fm-left-panel .nw-tree-panel-header').addClass('hidden');
-        $('.fm-left-panel .user-management-tree-panel-header.enabled-accounts').removeClass('hidden');
-        $('.fm-left-panel .user-management-tree-panel-header.disabled-accounts').removeClass('hidden');
+        $('.user-management-tree-panel-header.enabled-accounts', '.fm-left-panel').removeClass('hidden');
+        $('.user-management-tree-panel-header.disabled-accounts', '.fm-left-panel').removeClass('hidden');
         $('.fm-left-panel').addClass('user-management');
 
         // headers

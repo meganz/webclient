@@ -388,7 +388,7 @@ Chatd.Shard = function(chatd, shard) {
                             self.logger.warn(ex);
 
                             if (ex === EEXPIRED) {
-                                megaChat.plugins.chatdIntegration.requiresUpdate();
+                                megaChat.plugins.chatdIntegration.requiresUpdate(1);
                             }
                             else {
                                 connectionRetryManager.resetConnectionRetries();

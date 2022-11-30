@@ -892,7 +892,7 @@ FileManager.prototype.initFileManagerUI = function() {
             'cloud-drive': { // My-files
                 root: M.RootID,
                 prev: null,
-                subpages: [M.InboxID, M.RubbishID, 'recents', 'shares', 'out-shares', 'public-links']
+                subpages: [M.InboxID, M.RubbishID, 'recents', 'shares', 'faves', 'out-shares', 'public-links']
             },
             'gallery':         {root: 'photos',    prev: null, subpages: Object.keys(mega.gallery.sections)},
             'photos': {
@@ -924,6 +924,7 @@ FileManager.prototype.initFileManagerUI = function() {
             'shared-with-me':  {root: 'shares',    prev: null, subpages: ['out-shares']},
             'public-links':    {root: 'public-links',    prev: null},
             'recents':         {root: 'recents',   prev: null},
+            'faves':           {root: 'faves',   prev: null},
             'backups':         {root: 'backups',   prev: null},
             'rubbish-bin':     {root: M.RubbishID, prev: null},
             'backup-center':   {root: 'devices', prev: null}
@@ -3224,6 +3225,10 @@ FileManager.prototype.addViewUI = function(aNoTreeUpdate, refresh) {
 
 FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     "use strict";
+
+    if (this.chat) {
+        return;
+    }
     if (d) {
         console.time('iconUI');
     }
@@ -3251,12 +3256,6 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         $('.out-shared-blocks-view').removeClass('hidden');
         initPerfectScrollbar($('.out-shared-blocks-scrolling', '.out-shared-blocks-view'));
     }
-    else if (this.currentdirid !== 'user-management' &&
-        (this.currentdirid === this.BackupsId || this.getNodeRoot(this.currentdirid) === this.InboxID)) {
-        if (this.v.length > 0) {
-            $('.fm-blocks-view.fm').removeClass('hidden');
-        }
-    }
     else if (this.currentrootid === 'shares' && !this.v.length) {
         const viewModeClass = (M.viewmode ? '.fm-blocks-view' : '.files-grid-view') + '.fm.shared-folder-content';
 
@@ -3264,8 +3263,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         initPerfectScrollbar($(viewModeClass));
     }
     // user management ui update is handled in Business Account classes.
-    else if (this.v.length && this.currentdirid.substr(0, 15) !== 'user-management' &&
-        M.currentCustomView.type !== 'gallery') {
+    else if (this.v.length && M.currentCustomView.type !== 'gallery') {
 
         $('.fm-blocks-view.fm').removeClass('hidden');
         if (this.currentCustomView) {
@@ -3475,7 +3473,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         $(viewModeClass).removeClass('hidden');
         initPerfectScrollbar($(viewModeClass, '.shared-details-block'));
     }
-    else if (this.v.length) {
+    else if (this.v.length && M.currentCustomView.type !== 'gallery') {
 
         $('.files-grid-view.fm').removeClass('hidden');
         if (this.currentCustomView) {
@@ -3495,9 +3493,9 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,' +
         '.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content').rebind('contextmenu.fm', e => {
-            if (page === "fm/links") { // Remove context menu option from filtered view
-                return false;
-            }
+        if (page === "fm/links" && page === "fm/faves") { // Remove context menu option from filtered view
+            return false;
+        }
             $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
             if (selectionManager) {
                 selectionManager.clear_selection();
@@ -4091,6 +4089,13 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             tmpId = 'gallery';
             break;
         default:
+            if (M.isDynPage(id)) {
+                const {location} = M.dynContentLoader[id].options;
+                if (location) {
+                    tmpId = location;
+                    break;
+                }
+            }
             tmpId = (mega.gallery.sections[id]) ? 'gallery' : id;
     }
 
@@ -4209,6 +4214,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     if (
         id !== 'cloud-drive' &&
+        !M.isDynPage(id) &&
         id !== 'rubbish-bin' &&
         id !== 'backups' &&
         id !== 'shared-with-me' &&
@@ -4310,6 +4316,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         || id === 'rubbish-bin'
         || id === 'recents'
         || id === 'discovery'
+        || M.isDynPage(id)
         || mega.gallery.sections[id]
     ) {
         M.initLeftPanel();
@@ -4469,6 +4476,9 @@ FileManager.prototype.initLeftPanel = function() {
     }
     else if (M.currentrootid === M.RubbishID) {
         $('.js-lpbtn[data-link="bin"]').addClass('active');
+    }
+    else if (M.isDynPage(M.currentdirid)) {
+        $(`.js-lpbtn[data-link="${M.currentdirid}"]`, '.js-myfiles-panel').addClass('active');
     }
     else if (isGallery && mega.gallery.sections[M.currentdirid]) {
         $(`.js-lpbtn[data-link="${mega.gallery.sections[M.currentdirid].root}"]`).addClass('active');

@@ -185,7 +185,8 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
             let n = M.d[$.selected[i]];
             let nRoot = isSearch ? (n.u === u_handle && M.getNodeRoot($.selected[i])) : sourceRoot;
 
-            if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID) || nRoot === M.RubbishID) {
+            if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID && !M.isDynPage(nRoot))
+                || nRoot === M.RubbishID) {
                 return false;
             }
         }
@@ -222,7 +223,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 items['.open-item'] = 1;
             }
 
-            if (sourceRoot === M.RootID && !folderlink) {
+            if ((sourceRoot === M.RootID || M.isDynPage(M.currentrootid)) && !folderlink) {
                 items['.sh4r1ng-item'] = 1;
 
                 if (M.getNodeShareUsers(selNode, 'EXP').length || M.ps[selNode]) {
@@ -230,7 +231,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 }
             }
 
-            if (sourceRoot === M.RootID
+            if ((sourceRoot === M.RootID || M.isDynPage(M.currentrootid))
                 && u_type === 3
                 && !M.getShareNodesSync(selNode.h).length
                 && !folderlink) {
@@ -391,7 +392,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         items['.open-gallery'] = 1;
     }
 
-    if ((sourceRoot === M.RootID) && !folderlink) {
+    if ((sourceRoot === M.RootID || M.isDynPage(M.currentrootid)) && !folderlink) {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
 

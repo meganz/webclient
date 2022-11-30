@@ -1340,6 +1340,9 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     else if (id_s === 'recents') {
         this.onSectionUIOpen('recents');
     }
+    else if (M.isDynPage(id_s)) {
+        this.onSectionUIOpen(id_s);
+    }
     else if (M.isCustomView(id_s).type === 'gallery') {
         this.onSectionUIOpen(id_s);
     }

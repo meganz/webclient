@@ -2,6 +2,247 @@
     "use strict"; /* jshint -W089 */
     /* eslint-disable complexity */// <- @todo ...
 
+    const dynPages = {
+        'faves': {
+            /**
+             * Filter nodes by.
+             * @param {MegaNode} n - node
+             * @returns {Boolean} match criteria result
+             */
+            filter(n) {
+                if (!(n && n.fav && !n.fv && !n.rr)) {
+                    return false;
+                }
+
+                if (M.currentLabelFilter && !M.filterByLabel(n)) {
+                    return false;
+                }
+
+                const root = M.getNodeRoot(n.h);
+                return root !== M.RubbishID && root !== 'shares';
+            },
+            /**
+             * Internal properties, populated as options.
+             * @private
+             */
+            get properties() {
+                return {
+                    /**
+                     * Container rights, as per getNodeRights() 0: read-only, 1: read-and-write, 2: full-access
+                     * @type Number
+                     */
+                    rights: 0,
+                    /**
+                     * Under what place is shown.
+                     * @type {String}
+                     */
+                    location: 'cloud-drive',
+                    /**
+                     * Common type, long-name, etc
+                     * @type String
+                     */
+                    type: 'favourites',
+                    /**
+                     * Localized name
+                     * @type String
+                     */
+                    localeName: l.gallery_favourites
+                };
+            }
+        }
+    };
+    Object.setPrototypeOf(dynPages, null);
+    Object.freeze(dynPages);
+
+    /**
+     * Dynamic content loader
+     * @param {Object} obj destructible
+     * @param {String} obj.section The FM section/page name, i.e. `fm/${section}`
+     * @param {Function|String} obj.filter MegaNode filter, or property to filter nodes for.
+     * @param {Object} [obj.options] Additional internal options.
+     * @constructor
+     */
+    class DynContentLoader {
+        constructor({section, filter, ...options}) {
+            if (typeof filter === 'string') {
+                const prop = filter;
+                filter = (n) => n && !!n[prop];
+            }
+
+            Object.defineProperty(this, 'filter', {value: filter});
+            Object.defineProperty(this, 'section', {value: section});
+            Object.defineProperty(this, 'options', {value: {...options.properties}});
+
+            Object.defineProperty(this, 'inflight', {value: new Set()});
+            Object.defineProperty(this, '__ident_0', {value: `dcl:${section}.${makeUUID()}`});
+
+            console.assert(!DynContentLoader.instances.has(section), `dcl:${section} already exists..`);
+            DynContentLoader.instances.add(section);
+
+            /** @type {Boolean|Promise} */
+            this.ready = false;
+        }
+
+        /**
+         * Tells whether the section is active (i.e. in current view to the user)
+         * @returns {boolean} to be or not to be
+         */
+        get visible() {
+            return M.currentdirid === this.section;
+        }
+
+        /**
+         * Sort nodes based on current sorting parameters
+         * @returns {void}
+         */
+        sortNodes() {
+            const {sortmode, sortRules} = M;
+
+            if (sortmode) {
+                const {n, d} = sortmode;
+                const sort = sortRules[n];
+
+                if (typeof sort === 'function') {
+                    return sort(d);
+                }
+            }
+            return M.sort();
+        }
+
+        /**
+         * Initialize rendering for the section.
+         * @returns {Promise<*>} void
+         */
+        async setup() {
+            if (!this.ready) {
+                document.documentElement.classList.add('wait-cursor');
+
+                this.ready = this.fetch().catch(dump)
+                    .finally(() => {
+                        if (this.visible) {
+                            document.documentElement.classList.remove('wait-cursor');
+                        }
+                        this.ready = true;
+                    });
+            }
+
+            return this.update();
+        }
+
+        /**
+         * Preload required nodes from FMDB.
+         * @returns {Promise<*>} void
+         */
+        async fetch() {
+            const opts = Object.assign({limit: 200, offset: 0}, this.options);
+
+            const inflight = [];
+            await fmdb.getchunk('f', opts, (chunk) => {
+                opts.offset += opts.limit;
+                opts.limit = Math.min(122880, opts.limit << 1);
+
+                const bulk = [];
+                for (let i = chunk.length; i--;) {
+                    const n = chunk[i];
+
+                    if (!M.d[n.h] && this.filter(n)) {
+                        bulk.push(n.h);
+                    }
+                }
+
+                if (bulk.length) {
+                    inflight.push(
+                        dbfetch.geta(bulk)
+                            .then(() => this.visible && this.update(bulk.map(h => M.d[h])))
+                            .catch(dump)
+                    );
+                }
+            });
+
+            return inflight.length && Promise.allSettled(inflight);
+        }
+
+        /**
+         * Update the list of filtered nodes by the property
+         * @param {Array} [nodes] Array of filtered MegaNodes, if none given this is the first rendering attempt.
+         * @returns {*} void
+         */
+        update(nodes) {
+            if (nodes) {
+                const {v: list, megaRender: {megaList} = false} = M;
+
+                if (nodes.length) {
+                    list.push(...nodes.filter(this.filter));
+                    this.sortNodes();
+                }
+
+                if (megaList && list.length) {
+                    megaList.batchReplace(list);
+                }
+                else {
+                    M.renderMain(false);
+                }
+            }
+            else {
+                M.v = [];
+                for (const h in M.d) {
+                    if (this.filter(M.d[h])) {
+                        M.v.push(M.d[h]);
+                    }
+                }
+            }
+
+            if (!M.v.length) {
+                this.setEmptyPage().catch(dump);
+            }
+        }
+
+        /**
+         * Synchronize updated nodes.
+         * @param {MegaNode} n The ufs-node being updated
+         * @returns {void} void
+         */
+        sync(n) {
+            if (this.visible) {
+                this.inflight.add(n.h);
+
+                delay(this.__ident_0, () => {
+                    const inflight = new Set(this.inflight);
+                    this.inflight.clear();
+
+                    if (this.visible && inflight.size) {
+                        for (let i = M.v.length; i--;) {
+                            const {h} = M.v[i];
+
+                            if (inflight.has(h)) {
+                                const n = M.d[h];
+
+                                if (!this.filter(n)) {
+                                    removeUInode(n.h);
+                                }
+                                inflight.delete(h);
+                            }
+                        }
+                        this.update([...inflight].map(h => M.d[h]));
+                    }
+                }, 35);
+            }
+        }
+
+        async setEmptyPage() {
+            await this.ready;
+            if (this.visible && !M.v.length) {
+                $(`.fm-empty-${this.section}`, '.fm-right-files-block').removeClass('hidden');
+            }
+        }
+
+        get [Symbol.toStringTag]() {
+            return 'DynContentLoader';
+        }
+    }
+
+    Object.defineProperty(DynContentLoader, 'instances', {value: new Set()});
+
     // map handle to root name
     var maph = function(h) {
         if (h === M.RootID) {
@@ -76,20 +317,23 @@
         $('.fm-notification-block.duplicated-items-found').removeClass('visible');
         $('.fm-right-header .fm-breadcrumbs-wrapper').removeClass('hidden');
 
-        if (this.chat) {
-            this.v = [];
-            sharedFolderUI(); // remove shares-specific UI
-        }
-        else if (id === undefined && folderlink) {
+        if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
             this.renderMain();
         }
-        else if (id && id.substr(0, 7) !== 'account'
-            && id.substr(0, 7) !== 'devices'
-            && id.substr(0, 9) !== 'dashboard'
-            && id.substr(0, 15) !== 'user-management'
-            && id.substr(0, 13) !== 'notifications') {
+        // Skip M.renderMain and clear folder nodes for sections without viewmode switchers
+        else if (this.chat || !id ||
+            id.substr(0, 7) === 'account' ||
+            id.substr(0, 7) === 'devices' ||
+            id.substr(0, 9) === 'dashboard' ||
+            id.substr(0, 15) === 'user-management') {
+
+            this.v = [];
+            delay.cancel('rmSetupUI');
+            sharedFolderUI(); // remove shares-specific UI
+        }
+        else {
 
             $('.fm-right-files-block').removeClass('hidden');
 
@@ -127,14 +371,17 @@
                 this.filterBySearch(this.currentdirid);
                 $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
             }
-            else if (this.currentCustomView){
+            else if (this.currentCustomView) {
                 this.filterByParent(this.currentCustomView.nodeID);
+            }
+            else if (dynPages[id]) {
+                this.dynContentLoader[id].setup().catch(dump);
             }
             else {
                 this.filterByParent(this.currentdirid);
             }
 
-            if (id.substr(0, 4) !== 'chat' && id.substr(0, 9) !== 'transfers') {
+            if (id.substr(0, 9) !== 'transfers') {
                 this.labelFilterBlockUI();
             }
 
@@ -358,14 +605,20 @@
                 });
             }
         }
+        else if (id && id.substr(0, 15) === 'user-management' && is_mobile) {
+
+            id = this.RootID;
+        }
         else if (id && id.substr(0, 15) === 'user-management' && u_attr && u_attr.pf) {
 
-            // If Pro Flexi flexi, show just the invoices
-            M.require('businessAcc_js', 'businessAccUI_js').done(() => {
-                M.onFileManagerReady(() => {
-                    var usersM = new BusinessAccountUI();
+            M.onFileManagerReady(() => {
 
-                    M.onSectionUIOpen('user-management');
+                M.onSectionUIOpen('user-management');
+
+                // If Pro Flexi flexi, show just the invoices
+                M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+
+                    var usersM = new BusinessAccountUI();
 
                     usersM.viewBusinessInvoicesPage();
                 });
@@ -373,17 +626,18 @@
         }
         else if (id && id.substr(0, 15) === 'user-management') {
 
-            // id = 'user-management';
-            M.require('businessAcc_js', 'businessAccUI_js').done(function() {
-                M.onFileManagerReady(function() {
+            M.onFileManagerReady(() => {
+
+                M.onSectionUIOpen('user-management');
+
+                // id = 'user-management';
+                M.require('businessAcc_js', 'businessAccUI_js').done(() => {
 
                     if (!new BusinessAccount().isBusinessMasterAcc()) {
                         return M.openFolder('cloudroot');
                     }
 
                     var usersM = new BusinessAccountUI();
-
-                    M.onSectionUIOpen('user-management');
 
                     // checking if we loaded sub-users and drew them
                     if (!usersM.initialized) {
@@ -565,6 +819,9 @@
             if ($.ofShowNoFolders) {
                 tp = dbfetch.tree([id]);
             }
+            else if (dynPages[id]) {
+                tp = {always: finish};
+            }
             else if (stream) {
                 tp = dbfetch.open(id, promise);
                 promise = null;
@@ -581,4 +838,30 @@
 
         return masterPromise;
     };
+
+    /**
+     * Tells whether this is dynamic-handled site section.
+     * @param {String} name page/section name.
+     * @returns {Number} 0: no, -1: yes, but not initialized yet, 1: yes, but not visible, 2: yes, and visible
+     */
+    MegaData.prototype.isDynPage = function(name) {
+        if (!dynPages[name]) {
+            return 0;
+        }
+
+        if (!DynContentLoader.instances.has(name)) {
+            return -1;
+        }
+
+        return this.dynContentLoader[name].visible + 1;
+    };
+
+    /** @property MegaData.dynContentLoader */
+    lazy(MegaData.prototype, 'dynContentLoader', () => {
+        const obj = Object.create(null);
+        Object.keys(dynPages)
+            .reduce((o, k) =>
+                lazy(o, k, () => new DynContentLoader({section: k, ...dynPages[k]})), obj);
+        return obj;
+    });
 })(this);

@@ -252,11 +252,19 @@
 /* Mobile dialogs */
 
 .mobile .mega-dialog-container .mega-dialog {
+    overflow: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mobile .mega-dialog-container .mega-dialog:not(.fullsize-on-mobile) {
     max-height: calc(100% - 30px);
     width: calc(100% - 30px);
     max-width: 768px;
-    overflow: scroll;
-    -webkit-overflow-scrolling: touch;
+}
+
+.mobile .mega-dialog-container .mega-dialog.fullsize-on-mobile {
+    width: 100%;
+    height: 100%;
 }
 
 /* Email verification required */
@@ -266,6 +274,9 @@
 .mega-dialog.verify-email .header {
     background: var(--surface-error);
     border-radius: 23px 23px 0 0;
+}
+.mobile .mega-dialog.verify-email .header {
+    border-radius: 0;
 }
 .mega-dialog.verify-email .content-block {
     text-align: center;
@@ -461,7 +472,14 @@ h3.verify-email.header-txt {
 .mobile .mega-dialog {
     position: absolute;
     background: #fff;
+}
+
+.mobile .mega-dialog:not(.fullsize-on-mobile) {
     border-radius: 24px;
+}
+
+.mobile .mega-dialog.fullsize-on-mobile {
+    border-radius: 0;
 }
 
 .mobile .mega-dialog footer {

@@ -120,6 +120,12 @@
         'itemRenderFunction': false,
 
         /**
+         * A Callback function, that receives 1 argument - itemID (string/int) and should remove a node out of the DOM.
+         * String or a jQuery object that is the actual DOM node to be rendered/appended to the list.
+         */
+        'itemRemoveFunction': false,
+
+        /**
          * Optional jQuery/CSS selector of an object to be used for appending. Must be a child of the container.
          * Mainly used for hacking around table's markup and required DOM Tree where, the container would be marked as
          * scrollable area, but the tbody would be used for appending the items.
@@ -247,6 +253,13 @@
         }
         // pass a reference to MegaList, so that _calculated and other stuff can be used.
         this.options.renderAdapter.setMegaList(this);
+
+        Object.defineProperty(this, 'removeNode', {
+            value(n, h) {
+                const {itemRemoveFunction} = this.options;
+                return itemRemoveFunction && itemRemoveFunction(n, h) || DOMUtils.removeNode(n);
+            }
+        });
     };
 
     /**
@@ -358,9 +371,8 @@
             if (itemIndex > -1) {
                 if (self.isRendered(itemId)) {
                     requiresRerender = true;
-                    DOMUtils.removeNode(self._currentlyRendered[itemId]);
+                    self.removeNode(self._currentlyRendered[itemId], itemId);
                     delete self._currentlyRendered[itemId];
-
                 }
                 self.items.splice(itemIndex, 1);
                 itemsWereModified = true;
@@ -397,7 +409,19 @@
      * @returns {boolean}
      */
     MegaList.prototype.isRendered = function (itemId) {
-        return this._currentlyRendered[itemId] ? true : false;
+        const n = this._currentlyRendered[itemId];
+
+        if (n) {
+            if (n.parentNode) {
+                return true;
+            }
+
+            if (d) {
+                console.warn(`MegaList: Found stale rendered node for "${itemId}"`, n);
+            }
+            delete this._currentlyRendered[itemId];
+        }
+        return false;
     };
 
     /**
@@ -968,7 +992,7 @@
                 var id = this.items[i];
                 if (this._currentlyRendered[id]) {
                     contentWasUpdated = true;
-                    DOMUtils.removeNode(this._currentlyRendered[id]);
+                    this.removeNode(this._currentlyRendered[id], id);
                     delete this._currentlyRendered[id];
                 }
             }
@@ -978,7 +1002,7 @@
                 var id = this.items[i];
                 if (this._currentlyRendered[id]) {
                     contentWasUpdated = true;
-                    DOMUtils.removeNode(this._currentlyRendered[id]);
+                    this.removeNode(this._currentlyRendered[id], id);
                     delete this._currentlyRendered[id];
                 }
             }
@@ -991,7 +1015,7 @@
         for(var i = first; i < last; i++) {
             var id = this.items[i];
 
-            if (!this._currentlyRendered[id]) {
+            if (!this.isRendered(id)) {
                 var renderedNode = this.options.itemRenderFunction(id);
                 if (!renderedNode) {
                     console.warn('MegaList: Node not found...', id);
@@ -1126,7 +1150,7 @@
             if (itemIndex > -1) {
                 if (self.isRendered(itemId)) {
                     requiresRerender = true;
-                    DOMUtils.removeNode(self._currentlyRendered[itemId]);
+                    self.removeNode(self._currentlyRendered[itemId], itemId);
                     delete self._currentlyRendered[itemId];
                 }
                 self.items.splice(itemIndex, 1);

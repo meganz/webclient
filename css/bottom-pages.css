@@ -3467,10 +3467,6 @@ body:not(.mobile) .mobile-apps-button:hover {
     height: auto;
     margin: 0 0 -14px;
 }
-.bottom-page.appstore-button.huawei {
-    margin-left: 10px;
-    width: 200px;
-}
 .bottom-page.appstore-button.small {
     margin: 0;
     width: 131px;
@@ -3478,10 +3474,6 @@ body:not(.mobile) .mobile-apps-button:hover {
 .bottom-page.appstore-button.small.android {
     margin: -4px 0 0 -10px;
     width: 168px;
-}
-.bottom-page.appstore-button.small.huawei {
-    margin-left: -10px;
-    width: 150px;
 }
 .dark-blue-bg .bottom-page.dark-button:first-child {
     margin-right: 30px;
@@ -5476,11 +5468,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     .bottom-page.appstore-button.android {
         height: auto;
         width: 230px;
-    }
-    .bottom-page.appstore-button.huawei {
-        height: auto;
-        width: 202px;
-        margin: 10px 10px 0;
     }
     .bottom-page.appstore-button.small {
         margin: 0;

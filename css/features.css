@@ -248,6 +248,7 @@ body.rtl .feature-page * {
 
     .feature-page .app-links {
         margin-top: 15px;
+        text-align: center;
     }
 
     .feature-page .app-links a {
@@ -485,10 +486,6 @@ body.rtl .feature-page * {
             .bottom-page.appstore-button.small.android {
                 margin: 0;
                 width: 150px;
-            }
-            .bottom-page.appstore-button.small.huawei {
-                margin: 0;
-                width: 132px;
             }
         /* endregion app store links */
     }

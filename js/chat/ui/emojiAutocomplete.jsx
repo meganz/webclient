@@ -1,3 +1,5 @@
+import {ParsedHTML} from "../../ui/utils";
+
 var React = require("react");
 import {MegaRenderMixin} from './../mixins';
 
@@ -263,11 +265,9 @@ export class EmojiAutocomplete extends MegaRenderMixin {
         }
 
         return <div className="textarea-autofill-bl">
-            <div className="textarea-autofill-info">
-                <strong>tab</strong> or  <i className="small-icon tab-icon"></i> to navigate
-                <i className="small-icon enter-icon left-pad"></i> to select <strong className="left-pad">esc</strong>
-                to dismiss
-            </div>
+            <ParsedHTML tag="div" className="textarea-autofill-info">
+                {l.emoji_suggestion_instruction}
+            </ParsedHTML>
             <div className="textarea-autofill-emoji">
 
                 {emojisDomList}

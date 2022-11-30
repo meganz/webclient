@@ -27,8 +27,9 @@ export const withMicObserver = Component =>
         }
 
         renderSignalDialog() {
-            // TODO: add translation strings
-            return msgDialog('warningb', null, 'Microphone not working', l.chat_mic_off_tooltip, null, 1);
+            return msgDialog(
+                'warningb', null, l.no_mic_title, l.chat_mic_off_tooltip, null, 1
+            );
         }
 
         renderSignalWarning() {
@@ -39,7 +40,7 @@ export const withMicObserver = Component =>
                         meetings-signal-issue
                         simpletip
                     `}
-                    data-simpletip="Show more info"
+                    data-simpletip={l.show_info}
                     data-simpletipposition="top"
                     data-simpletipoffset="5"
                     data-simpletip-class="theme-dark-forced"

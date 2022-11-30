@@ -1961,8 +1961,7 @@ ChatRoom.prototype.showMissingUnifiedKeyDialog = function() {
             `warningb:!^${l[82] /* `Cancel` */}!${l[23433] /* `Reload your account` */}`,
             null,
             l[200] /* `Oops, something went wrong.` */,
-            'An error occurred while trying to join this call. Reloading MEGAchat may fix the problem. If the ' +
-            'problem persists, please contact support@mega.nz',
+            l.chat_key_failed_dlg_text, /* `Unable to join the call. Reload MEGA Chat and try again.` */
             reload => reload ? M.reload() : null,
             1
         )

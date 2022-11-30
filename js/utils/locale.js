@@ -1135,7 +1135,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[19849] = escapeHTML(l[19849]).replace('[A]', '<a class="red clickurl" href="/recovery">').replace('[/A]', '</a>');
     l[19851] = escapeHTML(l[19851]).replace('[B]', '<strong class="warning-text">').replace('[/B]', '</strong>');
-    l[19857] = escapeHTML(l[19857]) ? l[19857].replace('[BR]', '<br>') : l[19857];
+    l[19857] = escapeHTML(l[19857]).replace('[BR]', '<br>');
     l[20015] = escapeHTML(l[20015])
         .replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz/keybackup">')
         .replace('[/A]', '</a>');

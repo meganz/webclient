@@ -12,7 +12,7 @@ var lastactive = new Date().getTime();
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = null;
 var cmsStaticPath = null;
-var defaultStaticPath = 'https://eu.static.mega.co.nz/4/'; // EU should never fail. EU is the mothership.
+var defaultStaticPath = 'https://eu.static.mega.co.nz/4/';
 var defaultCMSStaticPath = 'https://eu.static.mega.co.nz/cms/';
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
@@ -647,7 +647,7 @@ if (!browserUpdate) try
         dd = 1;
     }
 
-    if (!is_extension && window.dd) {
+    if (!is_livesite && window.dd) {
         nocontentcheck = sessionStorage.dbgContentCheck ? 0 : true;
 
         staticpath = location.origin + '/';
@@ -1965,6 +1965,9 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
             return false;
         }
 
+        if (typeof errorType !== 'number') {
+            errorType = String(errorType).split('\n').slice(0, 3).join(' ').substr(0, 96);
+        }
         window.log99723 = true;
     }
 
@@ -2258,7 +2261,7 @@ else if (!browserUpdate) {
     jj = window.jj || 0;
 
     // Do not report exceptions if this build is older than 10 days
-    var exTimeLeft = ((buildVersion.timestamp + (10 * 86400)) * 1000) > Date.now();
+    var exTimeLeft = (is_extension || !nocontentcheck) && (buildVersion.timestamp + 10 * 86400) * 1000 > Date.now();
     window.buildOlderThan10Days = !exTimeLeft;
 
     // Override to see logs being sent
@@ -2320,14 +2323,6 @@ else if (!browserUpdate) {
                 return false;
             }
 
-            if ((mega.state & window.MEGAFLAG_MDBOPEN)
-                    && (dump.m === 'InvalidStateError'
-                        || (dump.m === 'UnknownError'))) {
-                // Prevent InvalidStateError exceptions from indexedDB.open
-                // caused while using Private Browser Mode on Firefox.
-                return false;
-            }
-
             if (dump.m.indexOf("Failed to construct 'Worker'") !== -1) {
                 errobj = {};
                 dump.l = ln = 1; // enforce deduplication..
@@ -2350,19 +2345,32 @@ else if (!browserUpdate) {
                 dump.m = '[lite]' + (dump.m[0] === '[' ? '' : ' ') + dump.m;
             }
 
-            if (!window.jsl_done && !window.u_checked) {
+            if (expectedSourceOrigin && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
                 // browsers other than what we use during development, and
                 // hopefully they'll report it back to us for troubleshoot
-                if (expectedSourceOrigin) {
-                    return siteLoadError(dump.m, url + ':' + ln);
-                }
+                return siteLoadError(dump.m, url + '^~' + ln);
+            }
+
+            if (/userscript|user\.js|EvalError/.test(dump.m + url + (errobj && errobj.stack))
+                || dump.m.indexOf('Permission denied to access property') !== -1
+                || dump.m.indexOf('Cannot redefine property') !== -1
+                || dump.m.indexOf("evaluating 'r(a,c)'") !== -1
+                || dump.m.indexOf('Error: hookFull') !== -1) {
+
+                // Some third party extension is injecting bogus script(s)...
+                console.warn('Your account is only as secure as your computer...');
+                console.warn('Check your installed extensions for the one injecting bogus scripts on this page...');
+                console.error(dump.m, dump, errobj);
+                return false;
             }
 
             if (!expectedSourceOrigin) {
-                    console.error(dump.m, arguments);
+                window.onerror = null;
+                console.error(dump.m, dump, errobj);
 
+                if (!/SyntaxError|Script\serror/.test(dump.m)) {
                     onIdle(function() {
                         var xhr = getxhr();
                         xhr.open('POST', apipath + 'cs?id=0' + mega.urlParams(), true);
@@ -2372,14 +2380,8 @@ else if (!browserUpdate) {
                             )
                         );
                     });
+                }
                 return;
-            }
-
-            if (dump.m.indexOf('Permission denied to access property') > -1) {
-                // Some Firefox extension is injecting some script(s)...
-                console.warn('Your account is only as secure as your computer...');
-                console.warn('Check your installed extensions and which one is injecting scripts on this page...');
-                return false;
             }
 
             var version = buildVersion.website;
@@ -3567,15 +3569,12 @@ else if (!browserUpdate) {
             }
         }
     }
-    var lightweight=false;
     var xhr_slots = d && jj ? 5 : localStorage.testSingleThreadLoad ? 1 : 2;
     var waitingToBeLoaded = 0,jsl_done,jj_done = !jj;
-    var fx_startup_cache = is_chrome_firefox && nocontentcheck;
-    if (!fx_startup_cache && !nocontentcheck)
-    {
+    if (!nocontentcheck) {
         addScript([asmCryptoSha256Js]);
     }
-    if ((typeof Worker !== 'undefined') && (typeof window.URL !== 'undefined') && !fx_startup_cache && !nocontentcheck)
+    if (typeof Worker !== 'undefined' && typeof window.URL !== 'undefined' && !nocontentcheck)
     {
         var hashdata = ['self.postMessage = self.webkitPostMessage || self.postMessage;', asmCryptoSha256Js, 'self.onmessage = function(e) { try { var hashHex = asmCryptoSha256.SHA256.hex(e.data.text); e.data.hash = hashHex; self.postMessage(e.data); } catch(err) { e.data.error = err.message; self.postMessage(e.data);  } };'];
         var hash_url = mObjectURL(hashdata, "text/javascript");
@@ -3673,11 +3672,12 @@ else if (!browserUpdate) {
         jsl_total = 0;
         jsl_perc = 0;
         jsli=0;
+        var i;
         var jjNoCache = '';
         if (localStorage.jjnocache) {
             jjNoCache = '?r=' + (new Date().toISOString().replace(/[^\w]/g, ''));
         }
-        for (var i = 0; i < jsl.length; i++) {
+        for (i = 0; i < jsl.length; i++) {
             if (jsl[i] && !jsl[i].text) {
                 jsl_total += jsl[i].w || 1;
 
@@ -3705,66 +3705,8 @@ else if (!browserUpdate) {
             console.log('jj.total...', waitingToBeLoaded);
         }
 
-        if (fx_startup_cache)
-        {
-            var step = function(jsi)
-            {
-                jsl_current += jsl[jsi].w || 1;
-                jsl_progress();
-                if (++jslcomplete == jsl.length) {
-                    jsl_done = true;
-                    initall();
-                }
-                else
-                {
-                    // mozRunAsync(next.bind(this, jsli++));
-                    next(jsli++);
-                }
-            };
-            var next = function(jsi)
-            {
-                var file = bootstaticpath + jsl[jsi].f;
-
-                if (jsl[jsi].j == 1)
-                {
-                    try
-                    {
-                        loadSubScript(file);
-                    }
-                    catch(e)
-                    {
-                        Cu.reportError(e);
-
-                        if (String(e) !== "Error: AsmJS modules are not yet supported in XDR serialization."
-                                && file.indexOf('dcraw') === -1) {
-
-                            return siteLoadError(e, file);
-                        }
-                    }
-                    step(jsi);
-                }
-                else
-                {
-                    mozNetUtilFetch(file, jsl[jsi].j === 3, function(data) {
-                        if (data === null) {
-                            siteLoadError(load_error_types.file_load_error, file);
-                        }
-                        else {
-                            jsl[jsi].text = String(data);
-
-                            if (jsl[jsi].j === 3) {
-                                l = JSON.parse(jsl[jsi].text);
-                            }
-                            step(jsi);
-                        }
-                    });
-                }
-            };
-            next(jsli++);
-        }
-        else
-        {
-            for (var i = xhr_progress.length; i--; ) jsl_load(i);
+        for (i = xhr_progress.length; i--;) {
+            jsl_load(i);
         }
     }
 
@@ -3862,7 +3804,8 @@ else if (!browserUpdate) {
             }
             else {
                 // Show site load error and log that it failed
-                siteLoadError(load_error_types.file_load_error, url, staticpath);
+                console.error('gave up retrying for', url);
+                siteLoadError(load_error_types.file_load_error, url);
             }
         }
     };
@@ -4054,10 +3997,7 @@ else if (!browserUpdate) {
         {
             if ((jsl[i].j == 1) && (!jj))
             {
-                if (!fx_startup_cache)
-                {
-                    jsar.push(jsl[i].text + '\n\n');
-                }
+                jsar.push(jsl[i].text + '\n\n');
             }
             else if ((jsl[i].j == 2) && (!jj))
             {
@@ -4116,6 +4056,7 @@ else if (!browserUpdate) {
                         jsl_loaded[e] = 1;
                     }
                 } catch (ex) {
+                    console.error("Error parsing template", ex, jsl[i]);
                     throw new Error("Error parsing template, " + String(ex.message || ex).substr(0, 88));
                 }
             }
@@ -4379,6 +4320,9 @@ else if (!browserUpdate) {
             ack();
         }
         else {
+            var setLSItem = tryCatch(function(k, v) {
+                localStorage.setItem(k, JSON.stringify(v));
+            });
             var onStorageEvent = function(ev) {
                 if (ev.key === 'sb!sid') {
                     var value = JSON.parse(ev.newValue || '""');
@@ -4394,7 +4338,7 @@ else if (!browserUpdate) {
                         }
 
                         onIdle(function() {
-                            localStorage.setItem('sb!sid', JSON.stringify(data));
+                            setLSItem('sb!sid', data);
                         });
                     }
                     else if (typeof value === 'object') {
@@ -4431,7 +4375,7 @@ else if (!browserUpdate) {
                     }
                     delete localStorage['sb!sid'];
                 }, 800);
-                localStorage.setItem('sb!sid', JSON.stringify(Math.random()));
+                setLSItem('sb!sid', Math.random());
             }
         }
     })(u_storage);

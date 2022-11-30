@@ -2454,20 +2454,30 @@ MegaData.prototype.initLabelFilter = function(nodelist) {
  * @param {Object} node      Node object
  * @param {Number} favState  Favourites state 0 or 1
  */
-MegaData.prototype.favouriteDomUpdate = SoonFc(90, (node, favState) => {
+MegaData.prototype.favouriteDomUpdate = function(node, favState) {
     'use strict';
-    var $gridView = $('#' + node.h + ' .grid-status-icon');
-    var $blockView = $('#' + node.h + '.data-block-view .file-status-icon');
+    if (fminitialized) {
+        delay(`fav.dom-update.${node.h}`, () => {
+            const domListNode = document.getElementById(node.h);
 
-    if (favState) {// Add favourite
-        $gridView.removeClass('icon-dot').addClass('icon-favourite-filled');
-        $blockView.addClass('icon-favourite-filled');
+            if (domListNode) {
+                const $gridView = $('.grid-status-icon', domListNode);
+                const $blockView = $('.file-status-icon', domListNode);
+
+                if (favState) {
+                    // Add favourite
+                    $gridView.removeClass('icon-dot').addClass('icon-favourite-filled');
+                    $blockView.addClass('icon-favourite-filled');
+                }
+                else {
+                    // Remove from favourites
+                    $gridView.removeClass('icon-favourite-filled').addClass('icon-dot');
+                    $blockView.removeClass('icon-favourite-filled');
+                }
+            }
+        });
     }
-    else {// Remove from favourites
-        $gridView.removeClass('icon-favourite-filled').addClass('icon-dot');
-        $blockView.removeClass('icon-favourite-filled');
-    }
-});
+};
 
 /**
  * Change node favourite state.

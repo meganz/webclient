@@ -2694,7 +2694,7 @@ button.l-pane-visibility {
 }
 .dark-overlay {
     background: radial-gradient(ellipse at center, #4c4c4c 0%, #000000 100%);
-    z-index: 1110;
+    z-index: 1112;
     position: fixed;
     top: 0;
     bottom: 0;

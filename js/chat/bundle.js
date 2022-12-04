@@ -14449,7 +14449,7 @@ class ResultContainer extends mixins.wl {
       return external_React_default().createElement("div", {
         className: RESULT_CONTAINER_CLASS
       }, Array.from({
-        length: 25
+        length: API.LIMIT
       }, (element, index) => external_React_default().createElement("div", {
         key: index,
         className: NODE_CONTAINER_CLASS
@@ -14516,8 +14516,8 @@ const API = {
       }
     }
   },
-  LIMIT: 25,
-  OFFSET: 25
+  LIMIT: 50,
+  OFFSET: 50
 };
 const LABELS = {
   SEARCH: l[24025],

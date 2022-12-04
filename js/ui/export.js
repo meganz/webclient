@@ -2121,7 +2121,7 @@ var exportExpiry = {
                 var $dropdown = $('.dropdown.export', $linksTab);
                 var itemsLength = $('.item', $linksTab).length;
                 var $currentItem = $this.closest('.item');
-                var expiryLabel = $('.calendar.o-hidden.v-hidden', $currentItem).length ? l[8953] : l[23665];
+                var expiryLabel = $('.calendar.vo-hidden', $currentItem).length ? l[8953] : l[23665];
                 var passwordLabel = $('.lock.hidden', $currentItem).length ? l[17454] : l[23666];
                 var removeLabel = itemsLength === 1 ? l[23668] : l[6821];
 

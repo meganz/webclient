@@ -766,6 +766,8 @@ lazy(pro, 'proplan2', () => {
 
     const initPeriodPickHandler = () => {
         const $radioOptions = $('.pricing-pg.pick-period-container .pricing-radio-option', $page);
+        const $strgFlexInput = $('#esti-storage', $proflexiBlock);
+        const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
         const preSelectedPeriod = sessionStorage.getItem('pro.period') | 0;
 
@@ -782,6 +784,7 @@ lazy(pro, 'proplan2', () => {
             sessionStorage.setItem('pro.period', this.dataset.period);
 
             fillPlansInfo(this.dataset.period | 0);
+            estimateFlexiPrice($strgFlexInput.val(), $transFlexInput.val());
 
             return false;
         });

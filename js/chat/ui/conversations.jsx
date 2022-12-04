@@ -82,7 +82,7 @@ class ConversationsApp extends MegaRenderMixin {
                     e.keyCode === 17 /* ctrl+... */ ||
                     e.keyCode === 27 /* esc */ ||
                     e.altKey ||  e.metaKey || e.ctrlKey || e.shiftKey ||
-                    $(document.querySelector('.mega-dialog, .dropdown')).is(':visible') ||
+                    $(document.querySelectorAll('.mega-dialog, .dropdown')).is(':visible') ||
                     document.querySelector('textarea:focus,select:focus,input:focus')
                 ) {
                     return;

@@ -19,8 +19,33 @@ var slideshowid;
     var fitToWindow = Object.create(null);
     var _pdfSeen = false;
     var optionsMenu;
+    var settingsMenu;
     var preselection;
     const broadcasts = [];
+    let isSlideshowInit = false;
+
+    const onConfigChange = (name) => {
+        if (name === 'speed') {
+            slideshow_timereset();
+        }
+    };
+
+    const events = [
+        'mega:openfolder',
+        'updFileManagerUI',
+        'chat_image_preview',
+        'mega:gallery:view:after'
+    ];
+
+    const listener = () => {
+        if (isSlideshowInit) {
+            mega.slideshow.manager.setState({});
+        }
+    };
+
+    for (let i = 0; i < events.length; i++) {
+        mBroadcaster.addListener(events[i], listener);
+    }
 
     function slideshow_handle(raw) {
         var result;
@@ -33,99 +58,46 @@ var slideshowid;
 
     function slideshowsteps() {
         var $overlay = $('.media-viewer-container', 'body');
-        var $controls = $('gallery-btn', $overlay);
+        var $controls = $('.gallery-btn', $overlay);
         var $counter = $('header .counter', $overlay);
         var $slideshowButton = $('footer .v-btn.slideshow', $overlay);
-        var forward = [];
-        var backward = [];
-        var ii = [];
-        var ci;
-        var filter = function(n) {
-            return (n.fa || !M.getNodeShare(n).down) && (is_image2(n) || is_video(n));
-        };
-        var index = function(i) {
-            return M.v[i].h;
-        };
 
-        if (slideshowplay) {
-            filter = function(n) {
-                return n.s && (n.fa || !M.getNodeShare(n).down) && is_image3(n);
-            };
-        }
-        else if (is_mobile) {
-            filter = (n) => (n.fa || !M.getNodeShare(n).down) && (is_video(n) || is_image3(n));
-        }
+        if (isSlideshowInit) {
+            const { node, playIndex, playLength, backward, forward } = mega.slideshow.manager.next(slideshowid);
 
-        if (M.chat) {
-            index = function(i) {
-                return M.v[i].ch;
-            };
-        }
-
-        if (preselection) {
-            index = function(i) {
-                return preselection[i].h;
-            };
-            filter = () => {
-                // This should already filtered at this point
-                return true;
-            };
-        }
-
-        const sArr = preselection ? preselection : M.v;
-        // Loop through available items and extract images
-        for (var i = 0, m = sArr.length; i < m; i++) {
-            if (filter(sArr[i])) {
-                // is currently previewed item
-                if (index(i) === slideshowid) {
-                    ci = i;
-                }
-                ii.push(i);
+            if (!mega.slideshow.manager.isLast(playIndex) && forward === undefined) {
+                mega.slideshow.manager.setState({});
+                slideshow_next();
             }
-        }
 
-        var len = ii.length;
-        // If there is at least 2 images
-        if (len > 1) {
-            var n = ii.indexOf(ci);
-            switch (n) {
-                // last
-                case len - 1:
-                    forward.push(index(ii[0]));
-                    backward.push(index(ii[n - 1]));
-                    break;
-                // first
-                case 0:
-                    forward.push(index(ii[n + 1]));
-                    backward.push(index(ii[len - 1]));
-                    break;
-                case -1:
-                    break;
-                default:
-                    forward.push(index(ii[n + 1]));
-                    backward.push(index(ii[n - 1]));
+            if (slideshowplay && !slideshowpause && mega.slideshow.manager.isLast(playIndex) && forward === undefined) {
+                slideshow_toggle_pause($('.sl-btn.playpause', '.slideshow-controls'));
             }
-            $counter.text(escapeHTML(l.preview_counter).replace('%1', n + 1).replace('%2', len));
-        }
 
-        if (_hideCounter) {
-            $counter.addClass('hidden');
-        }
-        else {
-            $counter.removeClass('hidden');
-        }
-        if (len < 2) {
-            $counter.addClass('hidden');
-            $controls.addClass('hidden');
-            $slideshowButton.addClass('hidden');
-        }
-        else {
-            $controls.removeClass('hidden');
-            if (!is_video(sArr[ci])) {
+            if (playIndex !== undefined && playIndex > -1) {
+                $counter.text(escapeHTML(l.preview_counter)
+                    .replace('%1', playIndex + 1)
+                    .replace('%2', playLength));
+            }
+
+            if (_hideCounter || playIndex === -1 || playLength < 2) {
+                $counter.addClass('hidden');
+            }
+            else {
+                $counter.removeClass('hidden');
+            }
+
+            if (playLength < 2) {
+                $controls.addClass('hidden');
+                $slideshowButton.addClass('hidden');
+            }
+            else if (node === undefined || !is_video(node)) {
                 $slideshowButton.removeClass('hidden');
             }
+            return { backward: [backward], forward: [forward], playLength };
         }
-        return {backward: backward, forward: forward};
+
+        return { backward: [], forward: [], playLength: 0 };
     }
 
     function slideshow_move(dir) {
@@ -134,15 +106,17 @@ var slideshowid;
         var step = dir === 'next' ? 'forward' : 'backward';
         $.videoAutoFullScreen = $(document).fullScreen();
 
-        $.each(dl_queue || [], function(id, file) {
-            if (file.id === h && file.preview) {
+        for (const i in dl_queue) {
+            if (dl_queue[i].id === h && dl_queue[i].preview) {
                 valid = false;
                 return false;
             }
-        });
+        }
+
         if (!valid) {
             return;
         }
+
         var steps = slideshowsteps();
         if (steps[step].length > 0) {
             const newShownHandle = steps[step][0];
@@ -151,7 +125,7 @@ var slideshowid;
                 $.autoplay = newShownHandle;
             }
 
-            mBroadcaster.sendMessage('slideshow:' + dir, steps);
+            mBroadcaster.sendMessage(`slideshow:${dir}`, steps);
             slideshow(newShownHandle);
         }
     }
@@ -391,7 +365,7 @@ var slideshowid;
     function slideshow_timereset() {
         if (slideshowplay && !slideshowpause) {
             clearTimeout(slideshowTimer);
-            slideshowTimer = setTimeout(slideshow_next, 4000);
+            slideshowTimer = setTimeout(slideshow_next, mega.slideshow.settings.speed.getValue());
 
             if (is_mobile) {
                 $(window).one('blur.slideshowLoseFocus', () => {
@@ -447,9 +421,10 @@ var slideshowid;
     }
 
     // Inits Image viewer bottom control bar
-    function slideshow_imgControls(slideshow_stop) {
+    function slideshow_imgControls(slideshow_stop, close) {
         var $overlay = $('.media-viewer-container', 'body');
         var $slideshowControls = $('.slideshow-controls', $overlay);
+        var $slideshowControlsUpper = $('.slideshow-controls-upper', $overlay);
         var $imageControls = $('.image-controls', $overlay);
         var $viewerTopBar = $('header .viewer-bars', $overlay);
         var $prevNextButtons = $('.gallery-btn', $overlay);
@@ -459,14 +434,16 @@ var slideshowid;
         var $nextButton = $('.sl-btn.next', $slideshowControls);
         var $zoomInButton = $('.v-btn.zoom-in', $imageControls);
         var $zoomOutButton = $('.v-btn.zoom-out', $imageControls);
+        const $slideshowSettings = $('.slideshow-context-settings', $overlay);
 
         if (slideshow_stop) {
             $viewerTopBar.removeClass('hidden');
             $imageControls.removeClass('hidden');
             $prevNextButtons.removeClass('hidden');
             $slideshowControls.addClass('hidden');
+            $slideshowControlsUpper.addClass('hidden');
             $overlay.removeClass('slideshow').off('mousewheel.imgzoom');
-            slideshowplay = false;
+            slideshow_play(false, close);
             slideshowpause = false;
             $pauseButton.attr('data-state', 'pause');
             $('i', $pauseButton).removeClass('icon-play').addClass('icon-pause');
@@ -486,12 +463,17 @@ var slideshowid;
 
         // Bind Slideshow Mode button
         $startButton.rebind('click.mediaviewer', function() {
+            if (isSlideshowInit && mega.slideshow.settings.manager.hasToUpdateRender($slideshowSettings)) {
+                mega.slideshow.settings.manager.render($slideshowSettings, onConfigChange);
+            }
+
             $overlay.addClass('slideshow');
-            slideshowplay = true;
+            slideshow_play(true);
             slideshow_timereset();
             $viewerTopBar.addClass('hidden');
             $imageControls.addClass('hidden');
             $slideshowControls.removeClass('hidden');
+            $slideshowControlsUpper.removeClass('hidden');
             $prevNextButtons.addClass('hidden');
             zoom_mode = false;
 
@@ -509,20 +491,7 @@ var slideshowid;
 
         // Bind Slideshow Pause button
         $pauseButton.rebind('click.mediaviewer', function() {
-            var $this = $(this);
-
-            clearTimeout(slideshowTimer);
-            if ($(this).attr('data-state') === 'pause') {
-                $this.attr('data-state', 'play');
-                $('i', $this).removeClass('icon-pause').addClass('icon-play');
-                slideshowpause = true;
-            }
-            else {
-                $this.attr('data-state', 'pause');
-                $('i', $this).removeClass('icon-play').addClass('icon-pause');
-                slideshowTimer = setTimeout(slideshow_next, 4000);
-                slideshowpause = false;
-            }
+            slideshow_toggle_pause($(this));
             return false;
         });
 
@@ -573,13 +542,8 @@ var slideshowid;
         });
 
         // Bind Slideshow Close button
-        $('.sl-btn.close', $slideshowControls).rebind('click.mediaviewer', function() {
-            slideshow_imgControls(1);
-
-            // hack to also stop fullscreen
-            if (fullScreenManager) {
-                fullScreenManager.exitFullscreen();
-            }
+        $('.sl-btn.close', is_mobile ? $slideshowControls : $slideshowControlsUpper).rebind('click.mediaviewer', () => {
+            slideshowplay_close();
             return false;
         });
     }
@@ -607,14 +571,12 @@ var slideshowid;
             dragStart = 1;
             lastPos = {x: event.pageX, y: event.pageY};
             $(this).addClass('picked');
-            return false;
         });
 
         // Stop dragging
         $imgWrap.rebind('mouseup.pickpan mouseout.pickpan', function() {
             dragStart = 0;
             $(this).removeClass('picked');
-            return false;
         });
 
         // Drag image if it doesn't fit into the container
@@ -797,6 +759,7 @@ var slideshowid;
         var $content = $('.content', $overlay);
         var $controls = $('footer, header, .gallery-btn', $overlay);
         var $imgWrap = $('.img-wrap', $content);
+        const $pendingBlock = $('.viewer-pending', $content);
         var $imageControls = $('.image-controls', $overlay);
         var $zoomSlider = $('.zoom-slider-wrap', $imageControls);
         var $playVideoButton = $('.play-video-button', $content);
@@ -819,7 +782,7 @@ var slideshowid;
             slideshowid = false;
             $.videoAutoFullScreen = false;
             _hideCounter = false;
-            slideshowplay = false;
+            slideshow_play(false, true);
             preselection = undefined;
             $overlay.removeClass('video video-theatre-mode mouse-idle slideshow fullscreen')
                 .addClass('hidden');
@@ -833,6 +796,9 @@ var slideshowid;
             $('.v-btn.active', $controls).removeClass('active');
             if (optionsMenu) {
                 contextMenu.close(optionsMenu);
+            }
+            if (settingsMenu) {
+                contextMenu.close(settingsMenu);
             }
             if (fullScreenManager) {
                 fullScreenManager.destroy();
@@ -849,7 +815,7 @@ var slideshowid;
             for (let i = broadcasts.length; i--;) {
                 mBroadcaster.removeListener(broadcasts[i]);
             }
-            slideshow_imgControls(1);
+            slideshow_imgControls(1, true);
             mBroadcaster.sendMessage('slideshow:close');
             slideshow_freemem();
             $(window).off('blur.slideshowLoseFocus');
@@ -1083,6 +1049,35 @@ var slideshowid;
                     }
                     return false;
                 });
+
+                // Settings icon
+                $('.sl-btn.settings', $overlay).rebind('click.media-viewer-settings', function() {
+                    var $this = $(this);
+
+                    if ($(this).hasClass('hidden')) {
+                        return false;
+                    }
+                    if ($this.hasClass('active')) {
+                        $this.removeClass('active deactivated');
+                        $('i', $this).removeClass('icon-slider-filled');
+                        $('i', $this).addClass('icon-slider-outline');
+
+                        contextMenu.close(settingsMenu);
+                        $overlay.removeClass('context-menu-open');
+                    }
+                    else {
+                        $this.addClass('active deactivated').trigger('simpletipClose');
+                        $('i', $this).removeClass('icon-slider-outline');
+                        $('i', $this).addClass('icon-slider-filled');
+
+                        // xxx: no, this is not a window.open() call..
+                        // eslint-disable-next-line local-rules/open
+                        contextMenu.open(settingsMenu);
+                        $overlay.addClass('context-menu-open');
+                    }
+                    return false;
+                });
+
                 if (fminitialized && !folderlink && u_type === 3 && M.currentrootid !== M.RubbishID) {
                     $sendToChat.removeClass('hidden');
                 }
@@ -1098,10 +1093,19 @@ var slideshowid;
                 });
 
                 // Close context menu
-                $overlay.rebind('mouseup.media-viewer', () => {
+                $overlay.rebind('mouseup.media-viewer', (e) => {
 
                     $('.v-btn.options', $overlay).removeClass('active deactivated');
                     contextMenu.close(optionsMenu);
+
+                    if (!$(e.target).parents('.slideshow-context-settings').length) {
+                        const $settingsButton = $('.sl-btn.settings', $overlay);
+                        $settingsButton.removeClass('active deactivated');
+                        $('i', $settingsButton).removeClass('icon-slider-filled');
+                        $('i', $settingsButton).addClass('icon-slider-outline');
+                        contextMenu.close(settingsMenu);
+                        $overlay.removeClass('context-menu-open');
+                    }
                 });
             }
 
@@ -1114,16 +1118,36 @@ var slideshowid;
                 preselection = filteredNodeArr;
             }
 
+            // Settings menu initialization
+            if (!settingsMenu) {
+                settingsMenu = contextMenu.create({
+                    template: $('#media-viewer-settings-menu', $overlay)[0],
+                    sibling: $('.sl-btn.settings', $overlay)[0],
+                    animationDuration: 150,
+                    boundingElement: $overlay[0]
+                });
+            }
+
+            // Slideshow initialization
+            if (!isSlideshowInit) {
+                mega.slideshow.settings.manager.render($('.slideshow-context-settings', $overlay), onConfigChange);
+                mega.slideshow.manager.setState({ nodes: preselection });
+                isSlideshowInit = true;
+            }
+            else if (preselection !== undefined) {
+                mega.slideshow.manager.setState({ nodes: preselection });
+            }
+
             // Icons for rubbish bin
             slideshow_bin(n, $overlay);
 
             // Previous/Next viewer buttons
             var steps = slideshowsteps();
 
-            if (steps.backward.length > 0) {
+            if (steps.playLength > 1 && steps.backward.length) {
                 $prevNextButtons.filter('.previous').removeClass('hidden');
             }
-            if (steps.forward.length > 0) {
+            if (steps.playLength > 1 && steps.forward.length) {
                 $prevNextButtons.filter('.next').removeClass('hidden');
             }
 
@@ -1180,11 +1204,6 @@ var slideshowid;
                 if (!fullScreenManager) {
                     slideshow_fullscreen($overlay);
                 }
-            }
-
-            if (!previews[n.h]) {
-                $('img', $imgWrap).attr('src', '');
-                $('.viewer-pending', $content).removeClass('hidden');
             }
         }
 
@@ -1259,8 +1278,13 @@ var slideshowid;
 
             fetchnext();
         }
-        else if (!preqs[n.h]) {
-            fetchsrc(n);
+        else {
+            $('img', $imgWrap).attr('src', '');
+            $pendingBlock.removeClass('hidden');
+
+            if (!preqs[n.h]) {
+                fetchsrc(n);
+            }
         }
 
         $overlay.removeClass('hidden');
@@ -1289,6 +1313,42 @@ var slideshowid;
                 });
             });
             broadcasts.push(listener);
+        }
+    }
+
+    function slideshow_toggle_pause($button) {
+        clearTimeout(slideshowTimer);
+        if ($button.attr('data-state') === 'pause') {
+            $button.attr('data-state', 'play');
+            $('i', $button).removeClass('icon-pause').addClass('icon-play');
+            slideshowpause = true;
+        }
+        else {
+            $button.attr('data-state', 'pause');
+            $('i', $button).removeClass('icon-play').addClass('icon-pause');
+            slideshowTimer = setTimeout(slideshow_next, mega.slideshow.settings.speed.getValue());
+            slideshowpause = false;
+        }
+    }
+
+    function slideshow_play(isPlayMode, isAbortFetch) {
+        if (isSlideshowInit) {
+            mega.slideshow.manager.setState({
+                currentNodeId: slideshowid,
+                isPlayMode,
+                isAbortFetch,
+                isNotBuildPlaylist: !isPlayMode && !slideshowplay
+            });
+        }
+        slideshowplay = isPlayMode;
+    }
+
+    function slideshowplay_close() {
+        slideshow_imgControls(1, true);
+
+        // hack to also stop fullscreen
+        if (fullScreenManager) {
+            fullScreenManager.exitFullscreen();
         }
     }
 
@@ -1494,6 +1554,7 @@ var slideshowid;
         }
         var n = slideshow_node(id, $overlay);
         var $content = $('.content', $overlay);
+        const $pendingBlock = $('.viewer-pending', $content);
         var $video = $('video', $content);
         var $playVideoButton = $('.play-video-button', $content);
         let bgsize = 'auto';
@@ -1517,7 +1578,7 @@ var slideshowid;
             }
 
             var destroy = function() {
-                $('.viewer-pending', $content).addClass('hidden').end().trigger('video-destroy');
+                $pendingBlock.addClass('hidden').end().trigger('video-destroy');
 
                 if (preqs[n.h] && preqs[n.h] instanceof Streamer) {
                     mBroadcaster.removeListener(preqs[n.h].ev1);
@@ -1534,7 +1595,7 @@ var slideshowid;
             };
 
             // Show loading spinner until video is playing
-            $('.viewer-pending', $content).removeClass('hidden');
+            $pendingBlock.removeClass('hidden');
             $('.video-controls', $overlay).removeClass('hidden');
             $overlay.addClass('video-theatre-mode');
 
@@ -1589,7 +1650,7 @@ var slideshowid;
         $overlay.addClass('video');
         $video.attr('controls', false).removeClass('hidden');
         $playVideoButton.removeClass('hidden');
-        $('.viewer-pending', $content).addClass('hidden');
+        $pendingBlock.addClass('hidden');
         $('.img-wrap', $content).addClass('hidden');
         $content.removeClass('hidden');
 
@@ -1864,6 +1925,7 @@ var slideshowid;
             $pendingBlock.addClass('hidden');
             $progressBlock.addClass('vo-hidden');
         };
+
         img.src = src;
     }
 

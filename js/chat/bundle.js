@@ -1602,6 +1602,9 @@ Chat.prototype._doneLoadingImage = function (h) {
 
     delete n.mo;
   }
+  if (src) {
+    mBroadcaster.sendMessage('chat_image_preview');
+  }
 };
 
 Chat.prototype.onChatsHistoryReady = promisify(function (resolve, reject, timeout) {

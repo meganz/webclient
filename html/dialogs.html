@@ -634,6 +634,81 @@
                 <img alt="" class="img2" />
             </div>
 
+            <div class="viewer-rounded slideshow-controls-upper hidden">
+                <button class="sl-btn close" aria-label="[[close]]">
+                    <i class="sprite-fm-mono icon-dialog-close"></i>
+                </button>
+            </div>
+
+            <template id="media-viewer-settings-menu">
+                <nav class="context-menu slideshow-context-settings options-menu avoid-bottom" aria-expanded="false">
+                    <ul>
+                        <li>
+                            <div class="message">[$ss_settings_header]</div>
+                        </li>
+                        <li>
+                            <button class="speed sprite-fm-mono-after icon-arrow-right-after">
+                                <span class="title">[$ss_settings_speed]</span>
+                                <span class="current"></span>
+                            </button>
+                            <nav class="speed context-menu options-menu avoid-bottom" aria-expanded="false">
+                                <ul>
+                                    <li>
+                                        <button class="slow">
+                                            <span></span>
+                                            <i class="sprite-fm-mono icon-active icon-green hidden"></i>
+                                        </button>
+                                        <button class="normal">
+                                            <span></span>
+                                            <i class="sprite-fm-mono icon-active icon-green hidden"></i>
+                                        </button>
+                                        <button class="fast">
+                                            <span></span>
+                                            <i class="sprite-fm-mono icon-active icon-green hidden"></i>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </li>
+                        <li>
+                            <button class="order sprite-fm-mono-after icon-arrow-right-after">
+                                <span class="title">[$ss_settings_order]</span>
+                                <i class="sprite-fm-mono"></i>
+                            </button>
+                            <nav class="order context-menu options-menu avoid-bottom" aria-expanded="false">
+                                <ul>
+                                    <li>
+                                        <button class="shuffle">
+                                            <i class="sprite-fm-mono"></i>
+                                            <span>[$ss_settings_order_opt_1]</span>
+                                            <i class="sprite-fm-mono icon-active icon-green hidden"></i>
+                                        </button>
+                                        <button class="newest">
+                                            <i class="sprite-fm-mono"></i>
+                                            <span>[$ss_settings_order_opt_2]</span>
+                                            <i class="sprite-fm-mono icon-active icon-green hidden"></i>                                
+                                        </button>
+                                        <button class="oldest">
+                                            <i class="sprite-fm-mono"></i>
+                                            <span>[$ss_settings_order_opt_3]</span>
+                                            <i class="sprite-fm-mono icon-active icon-green hidden"></i>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </li>
+                        <li>
+                            <div class="switch-option">
+                                <span class="title">[$ss_settings_repeat]</span>
+                                <div class="mega-switch toggle-on" id="repeat">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+            </template>
+
             <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
 
             <button class="gallery-btn previous" aria-label="[[previous]]">
@@ -786,8 +861,8 @@
                     </button>
                 </div>
                 <div class="bar">
-                    <button class="sl-btn close" aria-label="[[close]]">
-                        <i class="sprite-fm-mono icon-dialog-close"></i>
+                    <button class="sl-btn settings" aria-label="[[settings]]">
+                        <i class="sprite-fm-mono icon-slider-outline"></i>
                     </button>
                 </div>
             </nav>

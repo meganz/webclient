@@ -45,7 +45,7 @@ var accountChangeEmail = {
 
             const newEmailValue = $.trim($newEmail.val()).toLowerCase();
 
-            if (newEmailValue && u_attr.email !== newEmailValue) {
+            if (newEmailValue && u_attr.email.toLowerCase() !== newEmailValue) {
                 // Show information message
                 $emailInfoMessage.slideDown();
                 $changeEmailButton.closest('.save-container').removeClass('closed');
@@ -55,7 +55,7 @@ var accountChangeEmail = {
                 $emailInfoMessage.slideUp();
                 $changeEmailButton.closest('.save-container').addClass('closed');
 
-                if (u_attr.email === newEmailValue) {
+                if (u_attr.email.toLowerCase() === newEmailValue) {
                     $newEmail.megaInputsShowError(l.m_change_email_same);
                 }
             }
@@ -92,7 +92,7 @@ var accountChangeEmail = {
             }
 
             // If there is text in the email field and it doesn't match the existing one
-            if ((newEmail !== '') && (u_attr.email !== newEmail)) {
+            if (newEmail !== '' && u_attr.email.toLowerCase() !== newEmail) {
 
                 loadingDialog.show();
 

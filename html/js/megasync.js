@@ -226,9 +226,17 @@ var megasync = (function() {
                 'data-extension-id': id,
                 'data-link': extension.url
             };
-            if (!$('.option[data-extension-id="' + data['data-extension-id'] + '"]').length) {
+            const $option = $(`.option[data-extension-id="${data['data-extension-id']}"]`);
+            if ($option.length === 0) {
                 createAndAddToList($list, data, 0, extension.name, icon);
                 createAndAddToList($list, data, 1, extension.name, icon);
+            }
+            else {
+                if (id !== 0) {
+                    $option.removeAttr('data-state');
+                    $option.removeClass('active');
+                }
+                $option.attr('data-link', extension.url);
             }
 
             if (id === 0) {

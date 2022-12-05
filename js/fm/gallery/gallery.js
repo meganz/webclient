@@ -1706,6 +1706,7 @@ class MegaGallery {
 
     setViewAfter() {
         MegaGallery.sortViewNodes();
+        mBroadcaster.sendMessage('mega:gallery:view:after');
 
         if (d) {
             console.timeEnd(`MegaGallery: ${this.id}`);

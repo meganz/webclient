@@ -84,6 +84,15 @@
         delete cfg.ul_maxSlots;
         delete cfg.dl_maxSlots;
 
+        const viewercfg = parse(cfg.viewercfg);
+        cfg.xs3 = stringify(
+            viewercfg.speed << 16 |
+            viewercfg.order << 8 |
+            viewercfg.repeat << 1 |
+            viewercfg.sub
+        );
+        delete cfg.viewercfg;
+
         if (cfg.treenodes) {
             cfg.xtn = shrink.tree(cfg.treenodes);
             delete cfg.treenodes;
@@ -200,6 +209,14 @@
             config.dl_maxSlots = config.xs2 & 15;
             config.ul_maxSlots = config.xs2 >> 4 & 15;
             config.ul_maxSpeed = s & 1 ? -1 : (s >> 1) * 1024;
+        }
+
+        if (config.xs3) {
+            config.viewercfg = {};
+            config.viewercfg.speed = config.xs3 >> 16 & 0xFF;
+            config.viewercfg.order = config.xs3 >> 8 & 0xFF;
+            config.viewercfg.repeat = config.xs3 >> 1 & 1;
+            config.viewercfg.sub = config.xs3 & 1;
         }
 
         if (config.xtn) {

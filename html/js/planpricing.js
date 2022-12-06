@@ -46,7 +46,9 @@ lazy(pro, 'proplan2', () => {
 
             const visibilityState = this.id === 'pr-individual-tab';
 
-            $businessPlans.toggleClass('hidden', visibilityState);
+            if ($businessPlans) {
+                $businessPlans.toggleClass('hidden', visibilityState);
+            }
             $proPlans.toggleClass('hidden', !visibilityState);
 
             $freeBanner.toggleClass('hidden', !visibilityState || typeof u_handle !== 'undefined');

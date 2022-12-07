@@ -21,8 +21,8 @@ export const API = {
             }
         }
     },
-    LIMIT: 25,
-    OFFSET: 25
+    LIMIT: 50,
+    OFFSET: 50
 };
 
 export const LABELS = {

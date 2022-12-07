@@ -84,6 +84,12 @@
         delete cfg.ul_maxSlots;
         delete cfg.dl_maxSlots;
 
+        if (cfg.viewercfg) {
+            const xs3 = parse(cfg.viewercfg) || {};
+            cfg.xs3 = stringify(xs3.speed << 16 | xs3.order << 8 | xs3.repeat << 1 | xs3.sub);
+            delete cfg.viewercfg;
+        }
+
         if (cfg.treenodes) {
             cfg.xtn = shrink.tree(cfg.treenodes);
             delete cfg.treenodes;
@@ -159,6 +165,11 @@
                 const n = (h.length === 8 || h.length === 11) | 0;
                 const p = n ? base64urldecode(h) : h;
 
+                if (!rules.includes(v.n)) {
+                    logger.warn(`Invalid sort-mode for ${h} %o`, v);
+                    continue;
+                }
+
                 res += store(shift(v)) + store(p.length << 1 | n) + p;
             }
         }
@@ -200,6 +211,14 @@
             config.dl_maxSlots = config.xs2 & 15;
             config.ul_maxSlots = config.xs2 >> 4 & 15;
             config.ul_maxSpeed = s & 1 ? -1 : (s >> 1) * 1024;
+        }
+
+        if (config.xs3) {
+            config.viewercfg = {};
+            config.viewercfg.speed = config.xs3 >> 16 & 0xFF;
+            config.viewercfg.order = config.xs3 >> 8 & 0xFF;
+            config.viewercfg.repeat = config.xs3 >> 1 & 1;
+            config.viewercfg.sub = config.xs3 & 1;
         }
 
         if (config.xtn) {

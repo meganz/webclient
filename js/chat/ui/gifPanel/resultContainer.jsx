@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Result from './result.jsx';
-import { LABELS } from './gifPanel.jsx';
+import { API, LABELS } from './gifPanel.jsx';
 
 export const HAS_INTERSECTION_OBSERVER = typeof IntersectionObserver !== 'undefined';
 export const NODE_CONTAINER_CLASS = 'node-container';
@@ -82,7 +82,7 @@ export default class ResultContainer extends MegaRenderMixin {
         if (loading && results.length < 1) {
             return (
                 <div className={RESULT_CONTAINER_CLASS}>
-                    {Array.from({ length: 25 }, (element, index) =>
+                    {Array.from({ length: API.LIMIT }, (element, index) =>
                         <div key={index} className={NODE_CONTAINER_CLASS}>
                             <div className={NODE_CLASS} style={{ height: Math.floor(Math.random() * 150) + 100 }} />
                         </div>

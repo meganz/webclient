@@ -1602,6 +1602,9 @@ Chat.prototype._doneLoadingImage = function (h) {
 
     delete n.mo;
   }
+  if (src) {
+    mBroadcaster.sendMessage('chat_image_preview');
+  }
 };
 
 Chat.prototype.onChatsHistoryReady = promisify(function (resolve, reject, timeout) {
@@ -3991,6 +3994,7 @@ ChatRoom.prototype.callParticipantsUpdated = function
   msg && msg.wrappedChatDialogMessage && msg.wrappedChatDialogMessage.trackDataChange();
   self.trackDataChange();
 };
+
 ChatRoom.prototype.onPublicChatRoomInitialized = function () {
   var self = this;
   if (self.type !== "public" || !localStorage.autoJoinOnLoginChat) {
@@ -4087,9 +4091,13 @@ ChatRoom.prototype.toggleOpenInvite = function () {
   });
 };
 ChatRoom.prototype.toggleWaitingRoom = function () {
-};
+}
+;
+
 ChatRoom.prototype.toggleSpeakRequest = function () {
-};
+}
+;
+
 window.ChatRoom = ChatRoom;
 const __WEBPACK_DEFAULT_EXPORT__ = ({
   'ChatRoom': ChatRoom
@@ -4682,6 +4690,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
     if (window.RENDER_DEBUG) {
       if (shouldRerender) {
       }
+
       console.error("shouldRerender?", shouldRerender, "rendered: ", this.getElementName(), "props:", this.props, "nextProps:", this.props, "state:", this.state);
     }
     if (shouldRerender === true) {
@@ -14027,7 +14036,7 @@ class ConversationsApp extends mixins.wl {
       const currentlyOpenedChat = megaChat.currentlyOpenedChat;
       const currentRoom = megaChat.getCurrentRoom();
       if (currentlyOpenedChat) {
-        if (currentlyOpenedChat && currentRoom && currentRoom.isReadOnly() || $(e.target).is(".messages-textarea, input, textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91 || e.keyCode === 17 || e.keyCode === 27 || e.altKey || e.metaKey || e.ctrlKey || e.shiftKey || $(document.querySelector('.mega-dialog, .dropdown')).is(':visible') || document.querySelector('textarea:focus,select:focus,input:focus')) {
+        if (currentlyOpenedChat && currentRoom && currentRoom.isReadOnly() || $(e.target).is(".messages-textarea, input, textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91 || e.keyCode === 17 || e.keyCode === 27 || e.altKey || e.metaKey || e.ctrlKey || e.shiftKey || $(document.querySelectorAll('.mega-dialog, .dropdown')).is(':visible') || document.querySelector('textarea:focus,select:focus,input:focus')) {
           return;
         }
         var $typeArea = $('.messages-textarea:visible:first');
@@ -14443,7 +14452,7 @@ class ResultContainer extends mixins.wl {
       return external_React_default().createElement("div", {
         className: RESULT_CONTAINER_CLASS
       }, Array.from({
-        length: 25
+        length: API.LIMIT
       }, (element, index) => external_React_default().createElement("div", {
         key: index,
         className: NODE_CONTAINER_CLASS
@@ -14510,8 +14519,8 @@ const API = {
       }
     }
   },
-  LIMIT: 25,
-  OFFSET: 25
+  LIMIT: 50,
+  OFFSET: 50
 };
 const LABELS = {
   SEARCH: l[24025],
@@ -27137,6 +27146,7 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_cha
   attachAnimationEvents() {
 
   }
+
   eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
     var self = this;
     if (!self.isComponentEventuallyVisible()) {

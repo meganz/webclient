@@ -383,33 +383,38 @@ function start_countUpdate() {
         clearInterval(start_countInterval);
         return false;
     }
+    const now = Date.now();
+    const {timestamp, confirmedusers = false, files = false} = Object(start_APIcountdata);
+
     if (!start_Lcd.users) {
-        start_Lcd.users = start_APIcountdata.confirmedusers.total;
+        start_Lcd.users = confirmedusers.total;
     }
     if (!start_Lcd.files) {
-        start_Lcd.files = start_APIcountdata.files.total;
+        start_Lcd.files = files.total;
     }
     if (!start_Lcd.ts) {
-        start_Lcd.ts = start_APIcountdata.timestamp;
+        start_Lcd.ts = timestamp;
     }
     if (!start_Lcd.timestamp) {
-        start_Lcd.timestamp = start_APIcountdata.timestamp;
+        start_Lcd.timestamp = timestamp;
     }
     var filesFactor = 1;
     var usersFactor = 1;
-    if (start_Lcd.timestamp + 10 < Date.now()) {
-        var rate = (Date.now() - start_Lcd.timestamp) / 86400000;
-        if (start_APIcountdata.timestamp > start_Lcd.ts + 30000 && start_APIcountdata.timestamp + 30000 > Date.now()) {
-            if (start_Lcd.users > start_APIcountdata.confirmedusers.total) {
+
+    if (start_Lcd.timestamp + 10 < now) {
+        const rate = (now - start_Lcd.timestamp) / 86400000;
+
+        if (timestamp > start_Lcd.ts + 30000 && timestamp + 30000 > now) {
+            if (start_Lcd.users > confirmedusers.total) {
                 usersFactor = 0.3;
             }
-            else if (start_Lcd.users < start_APIcountdata.confirmedusers.total) {
+            else if (start_Lcd.users < confirmedusers.total) {
                 usersFactor = 2;
             }
-            if (start_Lcd.files > start_APIcountdata.files.total) {
+            if (start_Lcd.files > files.total) {
                 filesFactor = 0.3;
             }
-            else if (start_Lcd.files < start_APIcountdata.files.total) {
+            else if (start_Lcd.files < files.total) {
                 filesFactor = 2;
             }
         }
@@ -418,14 +423,18 @@ function start_countUpdate() {
             usersFactor = 1;
         }
 
-        if (RandomFactorTimestamp + 500 < Date.now()) {
+        if (RandomFactorTimestamp + 500 < now) {
             filesFactor *= Math.random() * 0.1 - 0.05;
-            RandomFactorTimestamp = Date.now();
+            RandomFactorTimestamp = now;
         }
 
-        start_Lcd.users += rate * usersFactor * start_APIcountdata.confirmedusers.dailydelta;
-        start_Lcd.files += rate * filesFactor * start_APIcountdata.files.dailydelta;
-        start_Lcd.timestamp = Date.now();
+        if (confirmedusers.dailydelta) {
+            start_Lcd.users += rate * usersFactor * confirmedusers.dailydelta;
+        }
+        if (files.dailydelta) {
+            start_Lcd.files += rate * filesFactor * files.dailydelta;
+        }
+        start_Lcd.timestamp = now;
     }
 
     function renderCounts(total, type) {

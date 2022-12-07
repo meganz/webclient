@@ -3727,7 +3727,7 @@ FileManager.prototype.initMegaSwitchUI = function() {
 
         e.target.setAttribute('aria-checked', on);
 
-        _setHandleIcon($(e.target.querySelector('.mega-feature-switch')), on);
+        _setHandleIcon($(e.target.querySelector('.mega-feature-switch')).addClass('sprite-fm-mono-after'), on);
     });
 };
 

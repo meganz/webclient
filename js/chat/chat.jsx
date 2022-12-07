@@ -1935,6 +1935,10 @@ Chat.prototype._doneLoadingImage = function(h) {
         // Remove the reference to the message since it's no longer needed.
         delete n.mo;
     }
+
+    if (src) {
+        mBroadcaster.sendMessage('chat_image_preview');
+    }
 };
 
 /**

@@ -130,9 +130,6 @@ var nicknames = {
         /** Cache of the jQuery selector for the dialog */
         $dialog: null,
 
-        /** Cache of the jQuery selector for the dialog background */
-        $backgroundOverlay: null,
-
         /** The contact's user handle (base64 encoded string) */
         contactUserHandle: null,
 
@@ -146,7 +143,6 @@ var nicknames = {
 
             // Init global selectors
             this.$dialog = $('.contact-nickname-dialog');
-            this.$backgroundOverlay = $('.dark-overlay');
             this.$megaInput = new mega.ui.MegaInputs($('#nickname-input',this.$dialog)).$input;
 
             // Set user handle for use later
@@ -415,7 +411,7 @@ var nicknames = {
             'use strict';
 
             this.$dialog.removeClass('hidden');
-            this.$backgroundOverlay.removeClass('hidden');
+            fm_showoverlay();
         },
 
         /**
@@ -426,7 +422,7 @@ var nicknames = {
             'use strict';
 
             this.$dialog.addClass('hidden');
-            this.$backgroundOverlay.addClass('hidden');
+            fm_hideoverlay();
         }
     }
 };

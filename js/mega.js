@@ -2117,7 +2117,8 @@ function worker_procmsg(ev) {
         // enqueue or emplace processed node
         if (ev.data.t < 2 && !crypto_keyok(ev.data)) {
             // report as missing
-            crypto_reportmissingkey(ev.data);
+            console.assert(typeof ev.data.k === 'string', `Key-less? node ${ev.data.h}`, ev.data);
+            tryCatch(() => crypto_reportmissingkey(ev.data))();
         }
 
         if (ev.data.scni >= 0) {

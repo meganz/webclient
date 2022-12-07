@@ -735,6 +735,7 @@ var mega = {
     ui: {},
     state: 0,
     utils: {},
+    slideshow: {settings: {}},
     uaoref: window.uaoref,
     updateURL: defaultStaticPath + 'current_ver.txt',
     chrome: (
@@ -2868,6 +2869,18 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/registerb.js', n: 'registerb_js', j:1});
     jsl.push({f:'js/emailNotify.js', n: 'email_notify_js', j:1});
     jsl.push({f:'js/megadrop.js', n: 'megadrop_js', j:1});
+    jsl.push({f:'js/ui/slideshow/file.js', n: 'slideshowFile_js', j:1});
+    jsl.push({f:'js/ui/slideshow/manager.js', n: 'slideshowManager_js', j:1});
+    jsl.push({f:'js/ui/slideshow/playlist.js', n: 'slideshowPlaylist_js', j:1});
+    jsl.push({f:'js/ui/slideshow/step.js', n: 'slideshowStep_js', j:1});
+    jsl.push({f:'js/ui/slideshow/utils.js', n: 'slideshowUtils_js', j:1});
+    jsl.push({f:'js/ui/slideshow/settings/base/options.js', n: 'slideshowOptionsSetting_js', j:1});
+    jsl.push({f:'js/ui/slideshow/settings/base/switch.js', n: 'slideshowSwitchSetting_js', j:1});
+    jsl.push({f:'js/ui/slideshow/settings/order.js', n: 'slideshowOrderSetting_js', j:1});
+    jsl.push({f:'js/ui/slideshow/settings/speed.js', n: 'slideshowSpeedSetting_js', j:1});
+    jsl.push({f:'js/ui/slideshow/settings/repeat.js', n: 'slideshowRepeatSetting_js', j:1});
+    jsl.push({f:'js/ui/slideshow/settings/sub.js', n: 'slideshowSubSetting_js', j:1});
+    jsl.push({f:'js/ui/slideshow/settings/settingsManager.js', n: 'slideshowSettingsManager_js', j:1});
     jsl.push({f:'js/ui/imagesViewer.js', n: 'imagesViewer_js', j:1});
 
     // Variables which can be used across all stylesheets

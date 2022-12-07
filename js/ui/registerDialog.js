@@ -379,7 +379,6 @@
             if ($this.hasClass('disabled')) {
                 return false;
             }
-            $this.addClass('disabled');
             doProRegister($dialog, aPromise);
             return false;
         });

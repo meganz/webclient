@@ -331,7 +331,11 @@
 
             this.v = [];
             delay.cancel('rmSetupUI');
-            sharedFolderUI(); // remove shares-specific UI
+
+            if (typeof sharedFolderUI === 'function') {
+                // Remove shares-specific UI.
+                sharedFolderUI();
+            }
         }
         else {
 

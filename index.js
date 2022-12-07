@@ -2692,13 +2692,9 @@ function topmenuUI() {
         if (!e || !e.target.closest('.create-new-folder') &&
             (!c || !c.includes('fm-new-folder'))) {
 
-            var c3;
+            const c3 = String(e && e.target && Object(e.target.parentNode).className || '');
 
-            if (e && e.target) {
-                c3 = e.target.parentNode.className;
-            }
-
-            if (!c3 || c3.indexOf('fm-new-folder') === -1) {
+            if (!c3.includes('fm-new-folder')) {
 
                 element = document.getElementsByClassName('fm-new-folder').item(0);
 
@@ -3049,6 +3045,13 @@ function topmenuUI() {
 
 function is_fm() {
     var r = !!pfid;
+
+    if (typeof page !== 'string') {
+        if (d) {
+            console.error(`Unexpected page '${window.page}'`, window.page);
+        }
+        page = String(window.page || '');
+    }
 
     if (!r && (u_type !== false)) {
         r = page === '' || page === 'start' || page === 'index'

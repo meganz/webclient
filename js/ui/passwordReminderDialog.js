@@ -757,6 +757,7 @@
         $(window).off('resize.prd');
         $(document.body).off(MouseDownEvent);
         $(this.passwordField).off('keypress.prd');
+        delete $.dialog;
     };
 
     PasswordReminderDialog.prototype.recheckLogoutDialog = function() {

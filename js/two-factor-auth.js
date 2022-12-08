@@ -69,11 +69,10 @@ twofactor.loginDialog = {
 
         // Show the dialog
         var $dialog = $('.mega-dialog.verify-two-factor-login');
-        var $overlay = $('.dark-overlay');
 
         // Show the modal dialog
         $dialog.removeClass('hidden');
-        $overlay.removeClass('hidden');
+        fm_showoverlay();
 
         // Initialise functionality
         this.initKeyupFunctionality();
@@ -205,14 +204,13 @@ twofactor.loginDialog = {
         'use strict';
 
         var $dialog = $('.mega-dialog.verify-two-factor-login');
-        var $overlay = $('.dark-overlay');
         var $warningText = $dialog.find('.warning-text-field');
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
 
         // Re-show the background overlay which is removed from loading dialog being hidden,
         // then show a message that the PIN code was incorrect and clear the text field
-        $overlay.removeClass('hidden');
+        fm_showoverlay();
         $submitButton.removeClass('loading');
         $warningText.removeClass('v-hidden');
         $pinCodeInput.val('');
@@ -248,11 +246,10 @@ twofactor.loginDialog = {
         'use strict';
 
         var $dialog = $('.mega-dialog.verify-two-factor-login');
-        var $overlay = $('.dark-overlay');
 
         // Close the modal dialog
         $dialog.addClass('hidden');
-        $overlay.addClass('hidden');
+        fm_hideoverlay();
     }
 };
 
@@ -379,9 +376,6 @@ twofactor.setupDialog = {
     /** jQuery selector for this dialog */
     $dialog: null,
 
-    /** jQuery selector for the background overlay */
-    $overlay: null,
-
     /**
      * Intialise the dialog
      */
@@ -391,7 +385,6 @@ twofactor.setupDialog = {
 
         // Cache selector
         this.$dialog = $('.two-factor-dialog.setup-two-factor');
-        this.$overlay = $('.dark-overlay');
 
         // Setup functionality
         this.getSharedSecret();
@@ -401,7 +394,7 @@ twofactor.setupDialog = {
 
         // Show the dialog
         this.$dialog.removeClass('hidden');
-        this.$overlay.removeClass('hidden');
+        fm_showoverlay();
     },
 
     /**
@@ -494,7 +487,7 @@ twofactor.setupDialog = {
 
         // Hide the dialog and background
         this.$dialog.addClass('hidden');
-        this.$overlay.addClass('hidden');
+        fm_hideoverlay();
     },
 
     /**
@@ -576,9 +569,6 @@ twofactor.verifySetupDialog = {
     /** jQuery selector for this dialog */
     $dialog: null,
 
-    /** jQuery selector for the background overlay */
-    $overlay: null,
-
     /**
      * Intialise the dialog
      */
@@ -588,7 +578,6 @@ twofactor.verifySetupDialog = {
 
         // Cache selector
         this.$dialog = $('.two-factor-dialog.setup-two-factor-verify');
-        this.$overlay = $('.dark-overlay');
 
         // Setup functionality
         this.resetToDefault();
@@ -599,7 +588,7 @@ twofactor.verifySetupDialog = {
 
         // Show the dialog
         this.$dialog.removeClass('hidden');
-        this.$overlay.removeClass('hidden');
+        fm_showoverlay();
 
         // Put the focus in the PIN input field after its visible
         this.$dialog.find('.pin-input').trigger('focus');
@@ -647,7 +636,7 @@ twofactor.verifySetupDialog = {
 
         // Hide the dialog and background
         this.$dialog.addClass('hidden');
-        this.$overlay.addClass('hidden');
+        fm_hideoverlay();
     },
 
     /**
@@ -774,9 +763,6 @@ twofactor.backupKeyDialog = {
     /** jQuery selector for this dialog */
     $dialog: null,
 
-    /** jQuery selector for the background overlay */
-    $overlay: null,
-
     /**
      * Intialise the dialog
      */
@@ -786,7 +772,6 @@ twofactor.backupKeyDialog = {
 
         // Cache selectors
         this.$dialog = $('.two-factor-dialog.setup-two-factor-backup-key');
-        this.$overlay = $('.dark-overlay');
 
         // Setup functionality
         this.initCloseButton();
@@ -794,7 +779,7 @@ twofactor.backupKeyDialog = {
 
         // Show the dialog
         this.$dialog.removeClass('hidden');
-        this.$overlay.removeClass('hidden');
+        fm_showoverlay();
     },
 
     /**
@@ -830,7 +815,7 @@ twofactor.backupKeyDialog = {
 
         // Hide the dialog and background
         this.$dialog.addClass('hidden');
-        this.$overlay.addClass('hidden');
+        fm_hideoverlay();
     }
 };
 
@@ -844,9 +829,6 @@ twofactor.verifyActionDialog = {
     /** jQuery selector for this dialog */
     $dialog: null,
 
-    /** jQuery selector for the background overlay */
-    $overlay: null,
-
     /**
      * Intialise the dialog
      * @param {Function} completeCallback The callback to run after 2FA verify
@@ -857,7 +839,6 @@ twofactor.verifyActionDialog = {
 
         // Cache selectors
         this.$dialog = $('.mega-dialog.two-factor-verify-action');
-        this.$overlay = $('.dark-overlay');
 
         // Initialise functionality
         this.resetState();
@@ -868,7 +849,7 @@ twofactor.verifyActionDialog = {
 
         // Show the modal dialog
         this.$dialog.removeClass('hidden');
-        this.$overlay.removeClass('hidden');
+        fm_showoverlay();
 
         // Put the focus in the PIN input field after its visible
         this.$dialog.find('.pin-input').trigger('focus');
@@ -977,7 +958,7 @@ twofactor.verifyActionDialog = {
 
         // Hide the dialog and background
         this.$dialog.addClass('hidden');
-        this.$overlay.addClass('hidden');
+        fm_hideoverlay();
     },
 
     /**

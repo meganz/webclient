@@ -437,8 +437,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         for (var j = $.selected.length; j--;) {
             n = M.getNodeByHandle($.selected[j]);
 
-            if (M.d[n.rr] && M.getNodeRoot(n.h) === M.RubbishID
-                && M.getNodeRoot(n.rr) !== M.RubbishID && M.getNodeRights(n.rr) > 1) {
+            if (M.getNodeRoot(n.h) === M.RubbishID) {
                 items['.revert-item'] = 1;
             }
             else if (items['.revert-item']) {

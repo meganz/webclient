@@ -1002,7 +1002,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
             const rub = t === M.RubbishID && M.getNodeRoot(h);
 
             // allow to revert nodes sent to the rubbish bin
-            if (rub && rub !== M.RubbishID && rub !== M.InboxID) {
+            if (rub && rub !== M.RubbishID) {
                 if (d) {
                     console.debug('Adding rr attribute...', n.rr, p);
                 }
@@ -1471,27 +1471,56 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
 
         var moveNode = function(h, t) {
             promise.pipe(function() {
+
+                if (t === M.InboxID) {
+                    return false;
+                }
+
                 if (d) {
                     console.debug('Reverting %s into %s...', String(h), t);
                 }
+
                 return M.safeMoveNodes(t, h);
             });
+        };
+
+        const selectItems = (handles) => {
+            if (!Array.isArray(handles)) {
+                handles = handles && [handles] || [];
+            }
+
+            if (window.selectionManager) {
+                selectionManager.clear_selection();
+
+                for (let i = handles.length; i--;) {
+                    selectionManager.add_to_selection(handles[i]);
+                }
+            }
+            else {
+                $.selected = handles;
+                reselect(1);
+            }
         };
 
         for (var i = handles.length; i--;) {
             var h = handles[i];
             var n = M.getNodeByHandle(h);
             var t = n.rr;
+            const tRoot = M.getNodeRoot(t);
 
             if (M.getNodeRoot(h) !== M.RubbishID) {
                 continue;
             }
 
-            if (!t || !M.d[t] || M.getNodeRoot(t) === M.RubbishID) {
+            if (!t || !M.d[t] || tRoot === M.RubbishID || M.getNodeRights(t) < 2
+                || is_mobile && tRoot === M.InboxID) {
                 if (d) {
                     console.warn('Reverting falling back to cloud root for %s.', h, t, n);
                 }
                 t = M.RootID;
+            }
+            else if (tRoot && tRoot === M.InboxID) {
+                t = M.InboxID;
             }
 
             if (targets[t]) {
@@ -1549,13 +1578,28 @@ MegaData.prototype.revertRubbishNodes = function(handles) {
                         return;
                     }
 
-                    M.openFolder(target[0])
-                        .finally(function() {
-                            $.selected = newNodes.length && newNodes || target[1];
-                            reselect(1);
+                    if (targets[M.InboxID]) {
 
+                        selectItems(targets[M.InboxID]);
+
+                        selectFolderDialog(() => {
+                            loadingDialog.pshow();
+
+                            M.moveNodes(targets[M.InboxID], $.mcselected, true, 3).finally(() => {
+                                loadingDialog.phide();
+                                closeDialog();
+                                M.openFolder($.mcselected).finally(() => selectItems(targets[M.InboxID]));
+                            });
+                        }, 'move');
+
+                        masterPromise.resolve(targets);
+                    }
+                    else {
+                        M.openFolder(target[0]).finally(() => {
+                            selectItems(newNodes.length && newNodes || target[1]);
                             masterPromise.resolve(targets);
                         });
+                    }
                 }, 90);
             });
         }

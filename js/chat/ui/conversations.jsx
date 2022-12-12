@@ -279,7 +279,7 @@ class ConversationsApp extends MegaRenderMixin {
         const { view, startGroupChatDialog, startMeetingDialog, leftPaneWidth } = this.state;
         const isEmpty =
             chats &&
-            chats.length === 0 &&
+            chats.every(c => c.isArchived()) &&
             routingSection === 'chat' &&
             !currentlyOpenedChat &&
             !is_chatlink;

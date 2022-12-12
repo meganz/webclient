@@ -14189,7 +14189,7 @@ class ConversationsApp extends mixins.wl {
       startMeetingDialog,
       leftPaneWidth
     } = this.state;
-    const isEmpty = chats && chats.length === 0 && routingSection === 'chat' && !currentlyOpenedChat && !is_chatlink;
+    const isEmpty = chats && chats.every(c => c.isArchived()) && routingSection === 'chat' && !currentlyOpenedChat && !is_chatlink;
     const isLoading = !currentlyOpenedChat && megaChat.allChatsHadInitialLoadedHistory() === false && routingSection !== 'contacts';
     const rightPane = external_React_default().createElement("div", {
       className: `

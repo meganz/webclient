@@ -273,7 +273,7 @@ class ModalDialog extends MegaRenderMixin {
 class SelectContactDialog extends MegaRenderMixin {
     static clickTime = 0;
     static defaultProps = {
-        'selectLabel': l[1940],
+        'selectLabel': l.share_contact_action, /* `Share` */
         'cancelLabel': l[82],
         'hideable': true
     };
@@ -302,7 +302,7 @@ class SelectContactDialog extends MegaRenderMixin {
 
         return (
             <ModalDialog
-                title={l[8628]}
+                title={l.share_contact_title /* `Share contact` */}
                 className={classes}
                 selected={self.state.selected}
                 onClose={() => {

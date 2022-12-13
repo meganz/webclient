@@ -102,6 +102,9 @@ export class Start extends MegaRenderMixin {
     componentWillUnmount() {
         super.componentWillUnmount();
         $(document).unbind(`.${Start.NAMESPACE}`);
+        if ($.dialog === Start.dialogName) {
+            closeDialog();
+        }
     }
 
     render() {

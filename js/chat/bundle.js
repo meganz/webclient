@@ -12193,6 +12193,9 @@ class Start extends mixins.wl {
   componentWillUnmount() {
     super.componentWillUnmount();
     $(document).unbind(`.${Start.NAMESPACE}`);
+    if ($.dialog === Start.dialogName) {
+      closeDialog();
+    }
   }
   render() {
     const {

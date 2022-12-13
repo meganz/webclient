@@ -1128,7 +1128,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             <div className="huge-icon group-chat" />
                             <h3>
                                 <Emoji>
-                                    {room.topic ? room.getRoomTitle() : " "}
+                                    {room.getRoomTitle()}
                                 </Emoji>
                             </h3>
                             <h5>{usersCount ? l[20233].replace("%s", usersCount) : " "}</h5>

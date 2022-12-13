@@ -9906,7 +9906,7 @@ class ChatlinkDialog extends mixins.wl {
       className: "sprite-fm-uni icon-chat-group"
     }), external_React_default().createElement("h2", {
       id: "chat-link-dialog-title"
-    }, external_React_default().createElement(utils.dy, null, chatRoom.topic))), external_React_default().createElement("section", {
+    }, external_React_default().createElement(utils.dy, null, chatRoom.getRoomTitle()))), external_React_default().createElement("section", {
       className: "content"
     }, external_React_default().createElement("div", {
       className: "content-block"
@@ -11336,7 +11336,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         className: "chatlink-contents"
       }, external_React_default().createElement("div", {
         className: "huge-icon group-chat"
-      }), external_React_default().createElement("h3", null, external_React_default().createElement(utils.dy, null, room.topic ? room.getRoomTitle() : " ")), external_React_default().createElement("h5", null, usersCount ? l[20233].replace("%s", usersCount) : " "), external_React_default().createElement("p", null, l[20595]))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
+      }), external_React_default().createElement("h3", null, external_React_default().createElement(utils.dy, null, room.getRoomTitle())), external_React_default().createElement("h5", null, usersCount ? l[20233].replace("%s", usersCount) : " "), external_React_default().createElement("p", null, l[20595]))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
         className: "bottom-buttons"
       }, external_React_default().createElement("button", {
         className: "mega-button positive",
@@ -12759,7 +12759,7 @@ class ChatRow extends mixins.wl {
       matches,
       onResultOpen
     } = this.props;
-    const result = megaChat.highlight(megaChat.html(room.topic), matches, true);
+    const result = megaChat.highlight(megaChat.html(room.getRoomTitle()), matches, true);
     return external_React_default().createElement("div", {
       ref: node => {
         this.nodeRef = node;
@@ -12810,7 +12810,7 @@ class MemberRow extends mixins.wl {
       className: USER_CARD_CLASS
     }, external_React_default().createElement("div", {
       className: "graphic"
-    }, isGroup ? external_React_default().createElement(utils.nF, null, megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.nF, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
+    }, isGroup ? external_React_default().createElement(utils.nF, null, megaChat.highlight(megaChat.html(room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.nF, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
       contact: contact
     }))), lastActivity(room)), external_React_default().createElement("div", {
       className: "clear"

@@ -135,7 +135,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
                         <header>
                             <i className="sprite-fm-uni icon-chat-group"/>
                             <h2 id="chat-link-dialog-title">
-                                <Emoji>{chatRoom.topic}</Emoji>
+                                <Emoji>{chatRoom.getRoomTitle()}</Emoji>
                             </h2>
                         </header>
                         <section className="content">

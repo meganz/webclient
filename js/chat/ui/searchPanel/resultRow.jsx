@@ -141,7 +141,7 @@ class MessageRow extends MegaRenderMixin {
 class ChatRow extends MegaRenderMixin {
     render() {
         const { room, matches, onResultOpen } = this.props;
-        const result = megaChat.highlight(megaChat.html(room.topic), matches, true);
+        const result = megaChat.highlight(megaChat.html(room.getRoomTitle()), matches, true);
 
         return (
             <div
@@ -190,7 +190,7 @@ class MemberRow extends MegaRenderMixin {
                     <div className="graphic">
                         {isGroup ?
                             <OFlowParsedHTML>
-                                {megaChat.highlight(megaChat.html(room.topic || room.getRoomTitle()), matches, true)}
+                                {megaChat.highlight(megaChat.html(room.getRoomTitle()), matches, true)}
                             </OFlowParsedHTML> :
                             <>
                                 <OFlowParsedHTML>

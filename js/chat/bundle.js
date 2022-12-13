@@ -5493,7 +5493,7 @@ class ComposedTextArea extends mixins.wl {
     }), !is_eplusplus && !is_chatlink && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("hr", null), external_React_default().createElement(dropdowns.DropdownItem, {
       className: "link-button",
       icon: "sprite-fm-mono icon-send-contact",
-      label: l[8628] ? l[8628] : "Send contact",
+      label: l.share_contact_button,
       onClick: () => room.trigger('openSendContactDialog')
     }))))));
   }
@@ -26851,7 +26851,7 @@ class SelectContactDialog extends mixins.wl {
     var self = this;
     var classes = "send-contact contrast small-footer dialog-template-tool " + self.props.className;
     return modalDialogs_React.createElement(ModalDialog, {
-      title: l[8628],
+      title: l.share_contact_title,
       className: classes,
       selected: self.state.selected,
       onClose: () => {
@@ -26900,7 +26900,7 @@ class SelectContactDialog extends mixins.wl {
 }
 SelectContactDialog.clickTime = 0;
 SelectContactDialog.defaultProps = {
-  'selectLabel': l[1940],
+  'selectLabel': l.share_contact_action,
   'cancelLabel': l[82],
   'hideable': true
 };

@@ -351,43 +351,62 @@ class MegaGallery {
     addToYearGroup(n, ts) {
         const sts = `${ts}`;
 
+        const group = this.groups.y[ts];
+
         // This is existing year in view, nice.
-        if (this.groups.y[ts]) {
+        if (group) {
+            group.c[0]++;
 
-            this.groups.y[ts].c[0]++;
+            let timeDiff = this.nodes[n.h] - this.nodes[group.n[0]];
 
-            if (this.nodes[n.h] > this.nodes[this.groups.y[ts].n[0]]) {
+            // Falling back to names sorting, if times are the same
+            if (!timeDiff) {
+                const sortedArr = [n, M.d[group.n[0]]];
+                sortedArr.sort(this.sortByMtime.bind(this));
 
-                this.groups.y[ts].n[0] = n.h;
+                if (sortedArr[0].h !== group.n[0]) {
+                    timeDiff = 1;
+                }
+            }
 
-                if (this.dynamicList) {
-                    this.clearRenderCache(`y${ts}`);
+            if (timeDiff > 0) {
+                group.n[0] = n.h;
 
-                    if (this.mode === 'y') {
-                        this.throttledListChange(sts);
-                    }
+                this.clearRenderCache(`y${ts}`);
+
+                if (this.mode === 'y' && this.dynamicList) {
+                    this.throttledListChange(sts);
                 }
             }
         }
         else {
-
             // This is secondary year of existing year in the view, good.
-            const yearGroups = Object.keys(this.groups.y);
+            const groupKeys = Object.keys(this.groups.y);
 
-            for (var i = yearGroups.length; i--;) {
+            for (var i = groupKeys.length; i--;) {
+                const stsGroup = this.groups.y[groupKeys[i]];
 
-                if (this.groups.y[yearGroups[i]].sy === sts) {
+                if (stsGroup.sy === sts) {
+                    stsGroup.c[1]++;
 
-                    this.groups.y[yearGroups[i]].c[1]++;
+                    let timeDiff = this.nodes[n.h] - this.nodes[stsGroup.n[1]];
 
-                    if (this.nodes[n.h] > this.nodes[this.groups.y[yearGroups[i]].n[1]]) {
+                    if (!timeDiff) {
+                        const sortedArr = [n, M.d[stsGroup.n[1]]];
+                        sortedArr.sort(this.sortByMtime.bind(this));
 
-                        this.groups.y[yearGroups[i]].n[1] = n.h;
+                        if (sortedArr[0].h !== stsGroup.n[0]) {
+                            timeDiff = 1;
+                        }
+                    }
+
+                    if (timeDiff > 0) {
+                        stsGroup.n[1] = n.h;
+
+                        this.clearRenderCache(`y${groupKeys[i]}`);
 
                         if (this.dynamicList && this.mode === 'y') {
-
-                            this.clearRenderCache(`y${ts}`);
-                            this.throttledListChange(sts);
+                            this.throttledListChange(`${groupKeys[i]}`);
                         }
                     }
 
@@ -402,6 +421,11 @@ class MegaGallery {
 
             if (this.onpage && this.mode === 'y') {
                 this.resetAndRender();
+            }
+            else {
+                for (let i = 0; i < groupKeys.length; i++) {
+                    this.clearRenderCache(`y${groupKeys[i]}`);
+                }
             }
         }
     }
@@ -617,13 +641,24 @@ class MegaGallery {
             }
 
             if (sameDayNode) {
+                let timeDiff = this.nodes[n.h] > this.nodes[sameDayNode];
 
-                if (this.nodes[n.h] > this.nodes[sameDayNode]) {
+                if (!timeDiff) {
+                    const sortedArr = [n, M.d[sameDayNode]];
+                    sortedArr.sort(this.sortByMtime.bind(this));
+
+                    if (sortedArr[0].h !== group.n[0]) {
+                        timeDiff = 1;
+                    }
+                }
+
+                if (timeDiff > 0) {
                     group.n.splice(sameDayNodeIndex, 1, n.h);
                 }
 
                 // This is only one day month
                 if (group.n.length === 1 && this.groups.d[dts].n.length > 1) {
+                    this.groups.d[dts].n.sort((a, b) => this.nodes[b] - this.nodes[a]);
                     group.extn = this.groups.d[dts].n[1];
                 }
             }
@@ -635,10 +670,10 @@ class MegaGallery {
                 group.n = group.n.slice(0, 4);
             }
 
+            this.clearRenderCache(`m${ts}`);
+
             if (this.dynamicList && this.mode === 'm' && (group.extn !== compareGroup.extn ||
                 !group.n.every(h => compareGroup.n.includes(h)))) {
-
-                this.clearRenderCache(`m${ts}`);
                 this.throttledListChange(sts);
             }
         }
@@ -748,6 +783,8 @@ class MegaGallery {
             else {
                 this.groups.d[key].n.push(h);
             }
+
+            this.groups.d[key].n.sort(this.sortByMtime.bind(this));
         }
         else {
             this.groups.d[key - 0.5].mc++;
@@ -786,7 +823,6 @@ class MegaGallery {
         }
 
         if (this.dynamicList && this.mode === 'd') {
-
             const sts1 = `${ts}`;
             const sts2 = `${ts - 0.5}`;
 
@@ -816,6 +852,9 @@ class MegaGallery {
                 this.clearRenderCache(`d${ts}`);
                 this.throttledListChange(sts1);
             }
+        }
+        else {
+            this.clearRenderCache(`d${ts}`);
         }
     }
 

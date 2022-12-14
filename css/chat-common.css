@@ -265,7 +265,8 @@
 .chat-right-area .link-button.push-settings-button {
     height: auto;
 }
-.chat-right-area .link-button.light.push-settings-button > span:first-of-type {
+.chat-right-area .link-button.light.push-settings-button > span:first-of-type,
+.chat-right-area .link-button.light.open-invite-settings-button > span:first-of-type {
     width: calc(100% - 100px);
 }
 .chat-right-area .link-button.push-settings-button span.label--green {

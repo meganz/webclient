@@ -110,7 +110,7 @@ export default class ComposedTextArea extends MegaRenderMixin {
                                     <DropdownItem
                                         className="link-button"
                                         icon="sprite-fm-mono icon-send-contact"
-                                        label={l[8628] ? l[8628] : "Send contact"}
+                                        label={l.share_contact_button /* `Share contact` */}
                                         onClick={() => room.trigger('openSendContactDialog')}
                                     />
                                 </>

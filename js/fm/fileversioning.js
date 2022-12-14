@@ -566,7 +566,7 @@ var versiondialogid;
             });
 
             $('.pad .top-column button.js-preview', '.fm-versioning').rebind('click.version', () => {
-                fileversioning.previewFile(current_sel_version);
+                fileversioning.previewFile(current_sel_version[0]);
             });
 
             fileversioning.getAllVersions(fh).done(

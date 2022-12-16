@@ -2664,8 +2664,9 @@ var exportExpiry = {
         // FIXME: check this
 
         // Get all child nodes of root folder with nodeId
-        M.getNodes(nodeId, true)
-            .always(function(childNodes) {
+        mega.keyMgr.setShareSnapshot(nodeId)
+            .then(() => {
+                const childNodes = mega.keyMgr.getShareSnapshot(nodeId);
 
                 var sharePromise = api_setshare(nodeId, [{u: 'EXP', r: 0}], childNodes);
                 sharePromise.done(function _sharePromiseDone(result) {
@@ -2686,7 +2687,8 @@ var exportExpiry = {
                     self.logger.warn('Get folder link failed: ' + result);
                     // FIXME: this seem to lack some handling code for this condition
                 });
-            });
+            })
+            .catch(dump);
     };
 
     /**

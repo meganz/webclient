@@ -103,6 +103,7 @@ function u_checklogin3a(res, ctx) {
             'name', 'p', 'pf', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
         ];
         const binary = new Set([
+            '^!keys',
             '^!bak'
         ]);
 
@@ -247,7 +248,38 @@ function u_checklogin3a(res, ctx) {
                         }
                     });
             })
-            .always(() => {
+            .catch((ex) => {
+                if (ex instanceof Error) {
+                    console.warn(ex);
+                }
+            })
+            .then(() => {
+                if (!r || is_iframed || pfid || page === 'download') {
+                    // Nothing to do here.
+                    return;
+                }
+                const keys = u_attr['^!keys'];
+
+                // We've got keys?
+                if (keys) {
+                    delete u_attr['^!keys'];
+                    return mega.keyMgr.initKeyManagement(keys);
+                }
+
+                // We don't - are we supposed to?
+                // otherwise, write them later, when the insecure state is fully loaded
+                return mega.keyMgr.getGeneration();
+            })
+            .then((bail) => {
+                if (bail) {
+                    throw new SecurityError(`
+                        Your cryptographic keys have gone missing.
+                        It is not safe to use your account at this time.
+                        Please try again later.
+                    `);
+                }
+            })
+            .then(() => {
                 // there was a race condition between importing and business accounts creation.
                 // in normal users there's no problem, however in business the user will be disabled
                 // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
@@ -262,6 +294,12 @@ function u_checklogin3a(res, ctx) {
                 else {
                     ctx.checkloginresult(ctx, r);
                 }
+            })
+            .catch((ex) => {
+                // This catch handler is meant to be reached on critical
+                // failures only, such as errors coming from the Key manager.
+                setTimeout(() => siteLoadError(ex, 'logon'), 2e3);
+                eventlog(99810, JSON.stringify([1, String(ex).trim().split('\n')[0]]));
             });
     }
 }
@@ -270,7 +308,7 @@ function u_checklogin3a(res, ctx) {
 async function u_checklogin4(sid) {
     'use strict';
 
-    console.assert(!u_sid || u_type);
+    console.assert(!u_sid || u_type, `Unexpected state (${u_type}) <> ${!!u_sid}:${!!sid}:${sid === u_sid}`);
     console.assert(u_storage === localStorage || u_storage === sessionStorage);
 
     u_storage.sid = u_sid = sid;
@@ -418,7 +456,8 @@ function u_setrsa(rsakey) {
     }
 
     // checking if we are creating keys for a business sub-user
-    if (window.businessSubAc) {
+    // (deprecated)
+    if (!mega.keyMgr.secure && window.businessSubAc) {
         // we get current user's master user + its public key (master user pubkey)
         buinessMaster = window.businessSubAc.bu;
         buinsesPubKey = window.businessSubAc.bpubk;

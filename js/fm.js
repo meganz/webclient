@@ -3434,7 +3434,7 @@ function sharedFolderUI() {
 
         // Handle of initial share owner
         var ownersHandle = nodeData.su;
-        var folderName = (M.d[M.currentdirid] || nodeData).name;
+        var folderName = M.getNameByHandle((M.d[M.currentdirid] || nodeData).h);
         var displayName = escapeHTML(M.getNameByHandle(ownersHandle));
         var avatar = useravatar.contact(M.d[ownersHandle]);
         $('.shared-blocks-view', '.fm-right-files-block').addClass('hidden');
@@ -3620,19 +3620,31 @@ function fingerprintDialog(userid) {
         // Add log to see how often they verify the fingerprints
         api_req({ a: 'log', e: 99602, m: 'Fingerprint verification approved' });
 
+        const promises = [];
         loadingDialog.show();
+
+        if (!authring.getContactAuthenticated(userid, 'Cu25519')) {
+            delete pubCu25519[userid];
+            promises.push(crypt.getPubCu25519(userid));
+        }
+
         // Generate fingerprint
-        crypt.getFingerprintEd25519(userid, 'string')
-            .done(function(fingerprint) {
+        promises.push(crypt.getFingerprintEd25519(userid, 'string'));
+
+        Promise.all(promises)
+            .then((res) => {
+                const fingerprint = res.pop();
 
                 // Authenticate the contact
-                var result = authring.setContactAuthenticated(
+                return authring.setContactAuthenticated(
                     userid,
                     fingerprint,
                     'Ed25519',
                     authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON,
                     authring.KEY_CONFIDENCE.UNSURE
                 );
+            })
+            .then(() => {
 
                 // Change button state to 'Verified'
                 $('.fm-verify').off('click').addClass('verified').find('span').text(l[6776]);
@@ -3642,17 +3654,13 @@ function fingerprintDialog(userid) {
                 if (M.u[userid]) {
                     M.u[userid].trackDataChange(M.u[userid], "fingerprint");
                 }
-
-                if (result && result.always) {
-                    // wait for the setContactAuthenticated to finish and then trigger re-rendering.
-                    result.always(function() {
-                        if (M.u[userid]) {
-                            M.u[userid].trackDataChange(M.u[userid], "fingerprint");
-                        }
-                    });
-                }
             })
-            .always(function() {
+            .catch((ex) => {
+                console.error(ex);
+                msgDialog('warninga', l[135], l[47], ex);
+                eventlog(99816, JSON.stringify([1, String(ex).trim().split('\n')[0]]));
+            })
+            .finally(() => {
                 loadingDialog.hide();
             });
     });

@@ -1239,6 +1239,7 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
         }
         if (newNode.p === this.currentdirid
             || newNode.h === this.currentdirid
+            || newNode.su && this.currentdirid === 'shares'
             || newNode.p === this.currentCustomView.nodeID
             || newNode.h === this.currentCustomView.nodeID) {
 

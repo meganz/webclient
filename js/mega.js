@@ -575,7 +575,7 @@ function sc_packet(a) {
         }
     }
 
-    if ((a.a === 's' || a.a === 's2') && a.k) {
+    if ((a.a === 's' || a.a === 's2') && a.k && !self.secureKeyMgr) {
         /**
          * There are two occasions where `crypto_process_sharekey()` must not be called:
          *
@@ -773,7 +773,19 @@ scparser.$add('s', {
                 var handle = a.n;
                 var shares = Object(M.d[handle]).shares || {};
 
-                if (a.u in shares || a.ha === crypto_handleauth(a.n)) {
+                if (self.secureKeyMgr) {
+
+                    if (a.u) {
+                        M.nodeShare(handle, {h: a.n, r: a.r, u: a.u, ts: a.ts});
+                    }
+                    else {
+                        if (d) {
+                            console.debug(`Got share action-packet for pending contact: ${a.n}*${a.p}`, [a]);
+                        }
+                        console.assert(a.a === 's2', `INVALID SHARE, missing user-handle for ${a.n}`, a);
+                    }
+                }
+                else if (a.u in shares || a.ha === crypto_handleauth(a.n)) {
 
                     // I updated or created my share
                     var k = decrypt_key(u_k_aes, base64_to_a32(a.ok));
@@ -806,17 +818,7 @@ scparser.$add('s', {
             }
         }
         else {
-            if (a.n && typeof a.k !== 'undefined' && !u_sharekeys[a.n]) {
-                /**
-                if (a.k && typeof a.k === 'string') {
-                    // @todo temp test.
-                    const k = base64_to_a32(a.k);
-                    if (k.length === 4) {
-                        console.warn('invalid share-key fixup.', a.k, k);
-                        a.k = k;
-                    }
-                }
-                /**/
+            if (a.n && typeof a.k !== 'undefined' && !u_sharekeys[a.n] && !self.secureKeyMgr) {
                 if (Array.isArray(a.k)) {
                     // a.k has been processed by the worker
                     crypto_setsharekey(a.n, a.k);
@@ -852,6 +854,7 @@ scparser.$add('s', {
                                 delete n.sk;
                                 delete M.c.shares[a.n];
                                 delete u_sharekeys[a.n];
+                                mega.keyMgr.deleteShares([a.n]).catch(dump);
 
                                 if (M.tree.shares) {
                                     delete M.tree.shares[a.n];
@@ -978,7 +981,7 @@ scparser.$add('s2', {
         this.s(a);
 
         // store ownerkey
-        if (fmdb) {
+        if (fmdb && !self.secureKeyMgr) {
             fmdb.add('ok', {h: a.n, d: {k: a.ok, ha: a.ha}});
         }
         processPS([a]);
@@ -1190,6 +1193,13 @@ scparser.$add('pup', {
 scparser.$add('se', {
     b: function(a) {
         processEmailChangeActionPacket(a);
+    }
+});
+
+scparser.$add('pk', {
+    b: function() {
+        'use strict';
+        mega.keyMgr.fetchPendingInShareKeys().catch(dump);
     }
 });
 
@@ -1884,7 +1894,7 @@ function fm_updated(n) {
         removeUInode(n.h);
         newnodes.push(n);
         if (M.megaRender) {
-            M.megaRender.revokeDOMNode(n.h);
+            M.megaRender.revokeDOMNode(n.h, true);
         }
         delay('ui:fm.updated', () => M.updFileManagerUI());
     }
@@ -1898,9 +1908,23 @@ function initworkerpool() {
     if (allowNullKeys) {
         self.allowNullKeys = allowNullKeys;
     }
+    const {secureKeyMgr} = self;
+    if (secureKeyMgr && d) {
+        console.info('Secure Keys Management.', mega.keyMgr.generation);
+    }
+
+    const workerStateData = {
+        d,
+        u_k,
+        u_privk,
+        u_handle,
+        secureKeyMgr,
+        allowNullKeys,
+        usk: window.u_attr && u_attr['*~usk']
+    };
 
     // re/initialize workers (with state for a user account fetch, if applies)
-    decWorkerPool.init(worker_procmsg, 8, !pfid && {d, u_k, u_privk, u_handle, usk: u_attr['*~usk'], allowNullKeys});
+    decWorkerPool.init(worker_procmsg, 8, !pfid && workerStateData);
 
     if (d) {
         console.debug('initworkerpool', decWorkerPool);
@@ -1986,6 +2010,13 @@ function fm_fullreload(q, logMsg) {
 function tree_ok0(ok) {
     "use strict";
 
+    if (self.secureKeyMgr) {
+        if (d > -2) {
+            console.warn('Secure environment, moving on...', ok);
+        }
+        return;
+    }
+
     if (fmdb) {
         fmdb.add('ok', { h : ok.h, d : ok });
     }
@@ -1997,9 +2028,11 @@ function tree_ok0(ok) {
         decWorkerPool.postNode(ok);
     }
     else if (crypto_handleauthcheck(ok.h, ok.ha)) {
-        if (d) console.log("Successfully decrypted sharekeys for " + ok.h);
-        var key = decrypt_key(u_k_aes, base64_to_a32(ok.k));
-        u_sharekeys[ok.h] = [key, new sjcl.cipher.aes(key)];
+        if (d) {
+            console.log(`Successfully decrypted sharekeys for ${ok.h}`);
+        }
+        const key = decrypt_key(u_k_aes, base64_to_a32(ok.k));
+        crypto_setsharekey2(ok.h, key);
     }
     else {
         console.error(`handleauthcheck() failed for ${ok.h}`);
@@ -2067,11 +2100,16 @@ function tree_node(node) {
     if (pfkey && !M.RootID) {
         // set up the workers for folder link decryption
         if (decWorkerPool.ok) {
-            decWorkerPool.signal({d, n_h: node.h, pfkey, allowNullKeys: self.allowNullKeys});
+            decWorkerPool.signal({
+                d,
+                pfkey,
+                n_h: node.h,
+                secureKeyMgr: self.secureKeyMgr,
+                allowNullKeys: self.allowNullKeys
+            });
         }
         else {
-            var key = base64_to_a32(pfkey);
-            u_sharekeys[node.h] = [key, new sjcl.cipher.aes(key)];
+            crypto_setsharekey2(node.h, base64_to_a32(pfkey));
         }
 
         M.RootID = node.h;
@@ -2772,13 +2810,18 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             masterPromise.resolve();
         }
         else {
-            $('.mega-dialog.share-dialog').removeClass('hidden');
+            // $('.mega-dialog.share-dialog').removeClass('hidden');
+            if (d) {
+                console.error('doShare failed.', result);
+            }
             loadingDialog.hide();
+            msgDialog('warninga', l[135], l[47], tryCatch(() => JSON.stringify(result))() || result);
             masterPromise.reject(result);
         }
     };
 
     // Get complete children directory structure for root node with id === nodeId
+    /** (this is now done before the share dialog opens)
     var childNodesId;
 
     M.getNodes(nodeId, true)
@@ -2787,6 +2830,7 @@ function doShare(nodeId, targets, dontShowShareDialog) {
             targets.forEach(targetsForeach);
         })
         .catch(dump);
+    */
 
     // Create new lists of users, active (with user handle) and non existing (pending)
     var targetsForeach = function(value) {
@@ -2820,7 +2864,8 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                         usersWithHandle.push({
                             'r': ctx.shareAccessRightsLevel,
                             'u': userHandle,
-                            'k': result.pubk,
+                            // this was never correct..
+                            // 'k': result.pubk,
                             'm': ctx.targetEmail
                         });
                     }
@@ -2847,6 +2892,17 @@ function doShare(nodeId, targets, dontShowShareDialog) {
                 }
             });
     };
+
+    // retrieve snapshot of the share children at the time the dialog was opened
+    // (any newer ones already have their shareufskey set)
+    const childNodesId = mega.keyMgr.getShareSnapshot(nodeId);
+    if (childNodesId) {
+        targets.forEach(targetsForeach);
+    }
+    else {
+        console.error('Check this out..', nodeId);
+        masterPromise.reject(EINTERNAL);
+    }
 
     return masterPromise;
 }
@@ -3529,7 +3585,7 @@ function init_chat(action) {
             resolve(EACCESS);
         }
         else {
-            authring.onAuthringReady('chat').done(__init_chat);
+            authring.onAuthringReady('chat').then(__init_chat);
         }
     });
 }

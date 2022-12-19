@@ -586,11 +586,13 @@ lazy(pro, 'proplan2', () => {
             const months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
             const planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
 
-            if (months !== period || planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
-                continue;
-            }
+
             if (planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
                 ProFlexiFound = currentPlan;
+                continue;
+            }
+
+            if (months !== period || planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
                 continue;
             }
 

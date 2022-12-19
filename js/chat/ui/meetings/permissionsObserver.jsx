@@ -108,7 +108,7 @@ export const withPermissionsObserver = Component =>
                         meetings-signal-issue
                         simpletip
                     `}
-                    data-simpletip="Show more info"
+                    data-simpletip={l.show_info /* `Show more info` */}
                     data-simpletipposition="top"
                     data-simpletipoffset="5"
                     data-simpletip-class="theme-dark-forced"

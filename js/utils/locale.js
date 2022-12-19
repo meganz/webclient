@@ -1506,6 +1506,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.transfer_quota_pct = escapeHTML(l.transfer_quota_pct).replace('[S]', '<span>').replace('[/S]', '</span>');
     l.pr_I_III_365_days = escapeHTML(l.pr_I_III_365_days).replace("[S]", "<span>").replace("[/S]", "</span>");
     l.pr_lite_90_days = escapeHTML(l.pr_lite_90_days).replace("[S]", "<span>").replace("[/S]", "</span>");
+    l.emoji_suggestion_instruction = escapeHTML(l.emoji_suggestion_instruction)
+        .replace(/\[S]/g, '<strong>')
+        .replace(/\[\/S]/g, '</strong>')
+        .replace('[i1]', '<i class="small-icon tab-icon"></i>')
+        .replace('[i2]', '<i class="small-icon enter-icon left-pad"></i>');
 
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,

@@ -274,7 +274,7 @@ export default class Invite extends MegaRenderMixin {
                             <div className="link-input-container">
                                 <Button
                                     className={`mega-button large positive ${link ? '' : 'disabled'}`}
-                                    onClick={() => link && copyToClipboard(link, 'Done!')}>
+                                    onClick={() => link && copyToClipboard(link, l[371] /* `Copied to clipboard` */)}>
                                     {!link ? l[7006] /* `Loading...` */ : l[1394] /* `Copy link` */}
                                 </Button>
                                 <Link

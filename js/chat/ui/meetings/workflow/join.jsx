@@ -326,7 +326,7 @@ export default class Join extends MegaRenderMixin {
                         this.props.onJoinClick(this.state.previewAudio, this.state.previewVideo);
                     }
                 }}>
-                Join
+                {l.join_chat_button /* `Join` */}
             </Button>
         </this.Card>;
 

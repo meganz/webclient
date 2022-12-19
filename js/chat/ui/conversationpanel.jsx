@@ -1889,12 +1889,19 @@ export class ConversationPanel extends MegaRenderMixin {
                             ${additionalClass}
                         `}>
                         {this.state.hasInvalidKeys && this.state.invalidKeysBanner && (
+                            /* `Unable to join the chat. Reload MEGA Chat and try again. [A]Reload MEGA Chat[/A]` */
                             <Alert
                                 type={Alert.TYPE.HIGH}
                                 content={
                                     <>
-                                        An error occurred while trying to join this chat. Reloading MEGAchat may fix
-                                        the problem. <a onClick={() => M.reload()}>Reload account</a>
+                                        {l.chat_key_failed_banner.split('[A]')[0]}
+                                        <a onClick={() => M.reload()}>
+                                            {l.chat_key_failed_banner.substring(
+                                                l.chat_key_failed_banner.indexOf('[A]') + 3,
+                                                l.chat_key_failed_banner.indexOf('[/A]')
+                                            )}
+                                        </a>
+                                        {l.chat_key_failed_banner.split('[/A]')[1]}
                                     </>
                                 }
                                 onClose={() => this.setState({ invalidKeysBanner: false })}

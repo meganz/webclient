@@ -6407,6 +6407,19 @@ body.de .mega-dialog.new-group-chat {
         background: var(--surface-error);
     }
 
+    .mega-dialog.limited-bandwidth-dialog section {
+        flex-shrink: unset;
+        min-height: inherit;
+    }
+
+    .mega-dialog.limited-bandwidth-dialog {
+        min-height: 300px;
+    }
+
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-info {
+        height: 130px;
+    }
+
     @media only screen and (max-height: 768px) {
         .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-button {
             margin: 12px 0 20px 0;

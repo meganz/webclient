@@ -1518,7 +1518,7 @@ lazy(mega, 'backupCenter', () => {
          */
         async renderContent(force) {
 
-            if (M.currentdirid !== 'devices' && !force && this.lastupdate > Date.now() - 10000) {
+            if (M.currentdirid !== 'devices' || !force && this.lastupdate > Date.now() - 10000) {
                 return false;
             }
 

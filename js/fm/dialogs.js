@@ -928,16 +928,18 @@
             $rubbishBin.removeClass('hidden');
         }
 
+        const nodeRoot = M.getNodeRoot($.selected[0]);
         if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport || $.selectFolderDialog
             || $.saveAsDialog) {
             $rubbishBin.addClass('hidden');
             $conversations.addClass('hidden');
         }
-        if (M.getNodeRoot($.selected[0]) === M.RubbishID || $.copyDialog || $.moveDialog) {
+        if (nodeRoot === M.RubbishID || $.copyDialog || $.moveDialog) {
             $rubbishBin.addClass('hidden');
         }
 
-        if ($.copyToShare || $.selectFolderDialog || !u_type || M.currentdirid === 'devices') {
+        if (nodeRoot === M.RubbishID || $.copyToShare || $.selectFolderDialog
+            || !u_type || M.currentdirid === 'devices') {
             $sharedMe.addClass('hidden');
         }
         else {

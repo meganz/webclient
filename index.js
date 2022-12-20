@@ -3448,6 +3448,13 @@ mBroadcaster.once('boot_done', () => {
         }
     });
 
+    onIdle(async() => {
+        if (window.ethereum && !await M.getPersistentData('reportedMetamask').catch(nop)) {
+            eventlog(99791);
+            M.setPersistentData('reportedMetamask', true).catch(dump);
+        }
+    });
+
     if (d) {
         if (!window.crossOriginIsolated) {
             if (window.crossOriginIsolated === false) {

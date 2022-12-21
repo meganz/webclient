@@ -55,7 +55,7 @@ function BusinessAccountUI() {
             return false;
         }
 
-        if (String(M.currentdirid).substr(0, 15) !== 'user-management') {
+        if (!u_attr.pf && String(M.currentdirid).substr(0, 15) !== 'user-management') {
             return false;
         }
 

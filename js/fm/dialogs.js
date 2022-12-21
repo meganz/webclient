@@ -90,10 +90,15 @@
             selectedNodes = selectedNodes || $.selected || [];
 
             for (var i = selectedNodes.length; i--;) {
-                if (($.moveDialog && !M.isCircular(selectedNodes[i], $.mcselected)) ||
-                    selectedNodes[i] !== $.mcselected) {
-                    r.push(selectedNodes[i]);
+                if ($.moveDialog && M.isCircular(selectedNodes[i], $.mcselected)) {
+                    continue; // Ignore circular targets if move dialog is active
                 }
+
+                if (selectedNodes[i] === $.mcselected) {
+                    continue; // If the source node is equal to target node
+                }
+
+                r.push(selectedNodes[i]);
             }
         }
 

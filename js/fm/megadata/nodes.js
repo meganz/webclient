@@ -230,6 +230,7 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'public-links')
             || (id === this.InboxID)
             || (id === 'contacts')
+            || (id === 'albums' || (cv && cv.type === 'albums'))
             || M.isDynPage(id)
             || (mega.gallery.sections[id])
         ) {
@@ -268,7 +269,7 @@ MegaData.prototype.getPath = function(id) {
         }
     }
 
-    // Get path for Out-shares, Public links, and Discovery.
+    // Get path for Out-shares, Public links, Discovery, and Albums.
     // This also cut off all path from invalid out-share and public-link path and return []
     if (cv && result.length > 1) {
 
@@ -325,6 +326,20 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.nodeID = pathOrID.replace('discovery/', '');
         result.prefixTree = '';
         result.prefixPath = 'discovery/';
+    }
+    // Albums view
+    else if (pathOrID === 'albums') {
+        result.type = 'albums';
+        result.nodeID = pathOrID;
+        result.prefixTree = '';
+        result.prefixPath = '';
+    }
+    // Specific album view
+    else if (pathOrID.startsWith('albums/')) {
+        result.type = 'albums';
+        result.nodeID = pathOrID.replace('albums/', '');
+        result.prefixTree = '';
+        result.prefixPath = 'albums/';
     }
     // This is a out-share id from tree
     else if (pathOrID.substr(0, 3) === 'os_') {
@@ -1902,11 +1917,20 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             mega.fileTextEditor.clearCachedFileData(n.h);
         }
 
+        if (M.currentCustomView.type === 'albums') {
+            mega.gallery.albums.onCDNodeUpdate(n);
+        }
+        else {
+            mega.gallery.albumsRendered = false;
+        }
+
         if (M.currentCustomView.type === 'gallery') {
             mega.gallery.checkEveryGalleryUpdate(n);
+            mega.gallery.albums.onCDNodeUpdate(n);
         }
         else {
             mega.gallery.nodeUpdated = true;
+            mega.gallery.albumsRendered = false;
         }
 
         if (this.isDynPage(this.currentdirid) > 1) {

@@ -3487,6 +3487,12 @@ mBroadcaster.once('boot_done', () => {
 mBroadcaster.once('mega:openfolder', function() {
     'use strict';
 
+    // No need to re-initiate preview when on Album page
+    if (M.currentCustomView.type === 'albums') {
+        sessionStorage.removeItem('previewNode');
+        return;
+    }
+
     const {previewNode} = sessionStorage;
     if (previewNode) {
         sessionStorage.removeItem('previewNode');

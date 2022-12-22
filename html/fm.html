@@ -1068,7 +1068,7 @@
             </div>
 
             <div class="gallery-tabs-bl hidden">
-                <div class="gallery-section-title"></div>
+                <div class="gallery-section-title flex flex-row"></div>
                 <div class="gallery-section-tabs">
                     <button class="gallery-tab-lnk gallery-tab-lnk-y years" data-folder="y">[$gallery_years]</button>
                     <button class="gallery-tab-lnk gallery-tab-lnk-m months" data-folder="m">[$gallery_months]</button>
@@ -2171,9 +2171,14 @@
                 <!-- END Templates for Gallery list -->
             </div>
 
+            <div id="albums-view" class="flex-column hidden"></div>
+
             <div class="selection-status-bar hidden">
                 <span class="selection-bar-col"></span>
                 <div class="selection-links-wrapper">
+                    <button class="mega-button simpletip small action js-statusbarbtn preview" data-simpletipoffset="2" data-simpletip="[$1899]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-preview-reveal"></i></div>
+                    </button>
                     <button class="mega-button simpletip small action js-statusbarbtn download" data-simpletipoffset="2" data-simpletip="[$58]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-download-small"></i></div>
                     </button>
@@ -2188,6 +2193,9 @@
                     </button>
                     <button class="mega-button simpletip small action js-statusbarbtn delete" data-simpletipoffset="2" data-simpletip="[$83]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-bin"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn delete-from-album" data-simpletipoffset="2" data-simpletip="[$album_item_remove_label]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-disabled-filled"></i></div>
                     </button>
                     <button class="mega-button simpletip small action js-statusbarbtn options" data-simpletipoffset="2" data-simpletip="[$tooltip_more]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-options"></i></div>

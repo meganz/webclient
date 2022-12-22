@@ -98,7 +98,8 @@
     right: auto;
 }
 .gallery-view .content .data-block-view:hover,
-.gallery-view .content .data-block-view.ui-selected {
+.gallery-view .content .data-block-view.ui-selected,
+.album-timeline-cell.ui-selected {
     border-radius: 2px;
 }
 .gallery-view .gallery-view-scrolling .content .data-block-view:not(.ui-selected):hover {
@@ -629,4 +630,241 @@
 }
 .gallery-view .data-block-fav-icon {
     display: none;
+}
+.js-lp-gallery.lp-gallery {
+    overflow-y: auto;
+}
+#albums-view {
+    height: 100%;
+    min-height: 280px;
+    overflow: hidden;
+    background: var(--surface-grey-1);
+}
+.albums-header {
+    height: 49px;
+    background-color: var(--surface-main);
+    padding-left: 21px;
+    padding-right: 21px;
+}
+.albums-grid {
+    display: grid;
+    grid-gap: 1.25rem;
+    padding: 2.1rem 0;
+    height: calc(100vh - 97px);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.albums-grid .albums-grid-cell.album-placeholder > div i {
+    margin-top: 2.2rem;
+    --mask-color: var(--secondary-grey);
+}
+.albums-grid:not(.albums-grid-3-col) .albums-grid-cell.album-placeholder > div i {
+    --icon-size: 120px;
+}
+.albums-grid:not(.albums-grid-3-col) .albums-grid-cell .album-label {
+    font: bold var(--text-h2);
+}
+.albums-grid:not(.albums-grid-3-col) .albums-grid-cell {
+    height: 300px;
+}
+.albums-grid.albums-grid-3-col .albums-grid-cell {
+    height: 200px;
+}
+.albums-grid.albums-grid-3-col .albums-grid-cell .album-label {
+    font: bold var(--text-h3);
+}
+.albums-grid.albums-grid-3-col .albums-grid-cell.album-placeholder > div i {
+    --icon-size: 72px;
+}
+.albums-grid.album-content-grid {
+    padding: 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    position: relative;
+}
+.albums-grid-cell {
+    border-radius: 24px;
+    overflow: hidden;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
+    transition-duration: 200ms;
+}
+.albums-grid-cell.ui-selected,
+.album-timeline-cell.ui-selected {
+    box-shadow: 0 0 0 2px var(--secondary-blue);
+    transition-duration: 200ms;
+}
+.albums-grid-cell.album-placeholder {
+    background-color: var(--surface-grey-2);
+}
+.albums-grid-cell > div:not(.flex-row) {
+    background: linear-gradient(180deg, rgba(34, 34, 34, 0) 0%, rgba(34, 34, 34, 0.6) 100%);
+    padding: 20px 24px;
+    color: var(--text-color-white-high);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+.albums-grid-cell.album-placeholder > div {
+    color: var(--text-color-high);
+    text-shadow: none;
+    background: none;
+}
+.albums-tree-list {
+    height: 0;
+    overflow-y: hidden;
+}
+.js-lp-gallery .btn-galleries.expansion-btn-open + .albums-tree-list {
+    height: auto;
+    overflow: visible;
+}
+.js-lp-gallery .btn-galleries:not(.expansion-btn):not(.subalbum-btn) {
+    padding-left: 1.5rem;
+}
+.js-lp-gallery .subalbum-btn {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    margin-right: 0.5rem;
+    width: auto;
+    min-width: 100%;
+}
+.js-lp-gallery .btn-galleries.expansion-btn {
+    padding-inline-start: 1.5rem;
+    position: relative;
+}
+.js-lp-gallery .btn-galleries.expansion-btn:not(.expansion-btn-open) .icon-dropdown {
+    transform: rotate(270deg);
+}
+.js-lp-gallery .btn-galleries.expansion-btn i.icon-dropdown {
+    margin-top: 4px;
+    position: absolute;
+    left: 2px;
+}
+.create-album-input-bl + div {
+    display: block;
+}
+.create-album-input-bl i.icon-album {
+    --mask-color: var(--text-color-medium);
+}
+.create-album-input-bl:hover,
+.create-album-input-bl:focus-within {
+    border: 1px solid var(--secondary-blue);
+}
+.empty-albums-title {
+    font-weight: bold;
+}
+.empty-albums-title + .mega-button {
+    margin-top: 2.3rem;
+}
+.album-timeline-main {
+    position: relative;
+    box-sizing: border-box;
+}
+.album-timeline-dialog {
+    height: 460px;
+    box-sizing: border-box;
+}
+.album-timeline {
+    display: grid;
+    grid-gap: 0.5rem;
+    background: var(--surface-grey-1);
+}
+.album-items-dialog {
+    width: 720px;
+}
+.album-items-dialog > section > div {
+    background: var(--surface-grey-1);
+}
+.album-items-dialog .m-tabs {
+    background-color: var(--surface-main);
+}
+.album-timeline-cell {
+    position: relative;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: 4px;
+}
+.album-timeline-cell.show-date::before,
+.album-timeline-cell.show-video-duration::after {
+    position: absolute;
+    border-radius: 12px;
+    background: var(--stroke-grey-2);
+    color: var(--text-color-higher);
+    left: 0.25rem;
+    z-index: 5;
+    padding: 0.125rem 0.625rem;
+    white-space: nowrap;
+}
+.album-timeline-cell.show-date::before {
+    content: attr(data-date);
+    top: 0.25rem;
+    font-weight: bold;
+}
+.album-timeline-cell.show-video-duration::after {
+    content: attr(data-video-duration);
+    bottom: 0.25rem;
+}
+.album-timeline-cell.ui-selected i.icon-check-circle {
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    --mask-color: var(--secondary-blue);
+    z-index: 4;
+    width: 1.25rem;
+    height: 1.25rem;
+    background-color: var(--text-color-white-high);
+    border-radius: 1rem;
+}
+.album-timeline-cell.ui-selected i.icon-check-circle::before {
+    position: relative;
+    top: -0.125rem;
+    left: -0.125rem;
+}
+.album-timeline-cell.show-date i.icon-check-circle {
+    display: none;
+}
+.locations-dialog-nav,
+.timeline-location {
+    width: calc(100% + 0.5rem);
+    margin-left: -0.25rem;
+}
+.empty-albums-section i {
+    --icon-size: 192px;
+}
+.album-content-grid .gallery-view-zoom-control {
+    position: absolute;
+    top: 0.75rem;
+    right: 1.25rem;
+    z-index: 10;
+    display: flex;
+    gap: 0.25rem;
+}
+.lp-gallery .btn-galleries {
+    overflow: visible;
+}
+.sidebar-button-iconwrap {
+    display: inline-block;
+    width: 30px;
+}
+.icon-next-arrow.rot-180::before {
+    transform: rotate(180deg);
+}
+.breadcrumb-btn {
+    box-shadow: none;
+    min-width: 0;
+}
+.breadcrumb-btn i {
+    --mask-color: rgba(151, 151, 151, 1);
+}
+.albums-header .mega-button span {
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.timeline-location {
+    background: var(--surface-main);
+    padding-bottom: 26px;
+    margin-top: -1rem;
 }

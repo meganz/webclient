@@ -2697,6 +2697,9 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
     jsl.push({f:'js/utils/webgl.js', n: 'webgl_js', j:1});
 
+    // Sets and elements
+    jsl.push({f:'js/utils/sets.js', n: 'fm_sets_js', j:1});
+
     jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
     jsl.push({f:'js/config.js', n: 'config_js', j:1,w:5});
@@ -2915,11 +2918,15 @@ else if (!browserUpdate) {
         // MComponents
         jsl.push({f:'css/ui/mcomponents.css', n: 'm_components_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/ui/mcomponents/classes/MComponent.js', n: 'm_component_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MButton.js', n: 'm_button_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MContextMenu.js', n: 'm_context_menu_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MDialog.js', n: 'm_dialog_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MEmptyPad.js', n: 'm_empty_pad_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MMenuSelect.js', n: 'm_menu_select_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MMenuSelectItem.js', n: 'm_menu_select_item_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MOverlay.js', n: 'm_overlay_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MEmptyPad.js', n: 'm_empty_pad_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MSidebarButton.js', n: 'm_sidebar_button_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MTab.js', n: 'm_tab_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MTabs.js', n: 'm_tabs_js', j:1});
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2948,6 +2955,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
         jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
 
+        jsl.push({f:'js/ui/dragselect.js', n: 'dargselect_js', j:1});
+
         // Gallery helpers
         jsl.push({f:'js/fm/gallery/helpers/GalleryTitleControl.js', n: 'fm_gallery_title_control_js', j:1});
         jsl.push({f:'js/fm/gallery/helpers/GalleryEmptyBlock.js', n: 'fm_gallery_empty_block_js', j:1});
@@ -2959,6 +2968,9 @@ else if (!browserUpdate) {
 
         jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/fm/gallery/gallery.js', n: 'fm_gallery_js', j:1});
+
+        // Albums
+        jsl.push({f:'js/fm/albums/Albums.js', n: 'fm_albums_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
         jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});

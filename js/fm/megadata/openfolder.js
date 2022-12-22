@@ -345,7 +345,9 @@
                 console.time('time for rendering');
             }
 
-            if (id === 'transfers' || this.currentCustomView.type === 'gallery') {
+            if (id === 'transfers'
+                || this.currentCustomView.type === 'gallery'
+                || this.currentCustomView.type === 'albums') {
                 this.v = [];
             }
             else if ($.ofShowNoFolders) {

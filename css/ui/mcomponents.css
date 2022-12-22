@@ -1,3 +1,4 @@
+/* @TODO: use backdrop-filter: blur(6px); instead of '.overlayed' body class when in full support */
 .m-overlay {
     position: fixed;
     width: 100vw;
@@ -6,38 +7,107 @@
     left: 0;
     z-index: 149;
 }
-
 .m-menu-select .dropdown-item i {
     margin: 0;
 }
-
 .cursor-pointer {
     cursor: pointer;
 }
-
 .nw-fm-tree-arrow.rot-90::before {
     transform: rotate(90deg);
 }
-
+.m-tabs > div {
+    position: relative;
+    transition: all ease 0.3s;
+    padding: 0.5rem 1.5rem;
+    color: var(--text-color-high);
+    white-space: nowrap;
+    cursor: pointer;
+}
+.m-tabs > div::after {
+    transition: all 0.3s cubic-bezier(1, 0, 0, 1);
+    will-change: transform, box-shadow, opacity;
+    position: absolute;
+    content: "";
+    height: 3px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 3px 3px 0 0;
+    background: var(--text-color-info);
+    opacity: 0;
+    transform: scale(0, 1);
+}
+.m-tabs > div.active::after {
+    opacity: 1;
+    transform: scale(1, 1);
+}
 .ml-1 {
     margin-left: 0.25rem;
 }
-
+.ml-3 {
+    margin-left: 0.75rem;
+}
+.ml-5 {
+    margin-left: 1.25rem;
+}
+.mr-4 {
+    margin-right: 1rem;
+}
 .mt-2 {
     margin-top: 0.5rem;
 }
-
 .mt-16 {
     margin-top: 4rem;
 }
-
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+.p-4 {
+    padding: 1rem;
+}
+.p-6 {
+    padding: 1.5rem;
+}
+.pl-18 {
+    padding-left: 4.5rem;
+}
+.pr-7 {
+    padding-right: 1.75rem;
+}
+.px-1 {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
 .px-2 {
     padding-left: 0.5rem;
     padding-right: 0.5rem;
 }
-
+.px-3 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+.px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+.py-1 {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+}
+.py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+.py-10 {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+}
+.w-full {
+    width: 100%;
+}
 .m-dropdown-item {
-    font-family: LatoWebBold, Arial, sans-serif;
     --mask-color: var(--icon-rest);
     align-items: center;
     border-radius: 4px;
@@ -56,47 +126,168 @@
     transition: var(--transition-color), var(--transition-bg-color);
     white-space: nowrap;
 }
-
+.m-dropdown-item:hover,
+.m-dropdown-item.opened {
+    --mask-color: var(--icon-active);
+    background: var(--button-hover);
+    color: var(--text-color-high);
+}
+.m-dropdown-item.contains-submenu.icon-arrow-right-after::after {
+    content: "\f281";
+    font-family: fm-mono, sans-serif;
+    line-height: 1;
+    font-size: var(--icon-size, 16px);
+    font-style: normal;
+    color: var(--icon-rest);
+}
+.m-dropdown-item.contains-submenu.icon-arrow-right-after:hover::after,
+.m-dropdown-item.contains-submenu.icon-arrow-right-after.opened::after {
+    color: var(--icon-active);
+}
+.m-dropdown-item i {
+    --icon-size: 24px;
+}
+.m-dropdown-item:not(.item-bold) {
+    font-family: var(--text-font-family);
+}
+.m-dropdown-item.item-bold {
+    font-family: var(--text-font-family-bold);
+}
 .m-dropdown-item-label {
     font-size: 12px;
 }
-
 .content-visibility-auto {
     content-visibility: auto;
 }
-
-.text-bold {
-    font-weight: bold;
-}
-
 .flex {
     display: flex;
 }
-
 .flex-center {
     align-items: center;
     justify-content: center;
 }
-
 .flex-column {
     flex-direction: column;
 }
-
 .flex-1 {
     flex-grow: 1;
 }
-
 .flex-row {
-    display: flex;
-    align-items: center;
+    flex-direction: row;
 }
-
-.flex-justify-between {
+.justify-between {
     justify-content: space-between;
 }
-
+.justify-center {
+    justify-content: center;
+}
+.justify-end {
+    justify-content: end;
+}
+.items-center {
+    align-items: center;
+}
 .text-ellipsis {
-    white-space: nowrap;
     text-overflow: ellipsis;
+    white-space: nowrap;
     overflow: hidden;
+}
+.text-center {
+    text-align: center;
+}
+.text-color-high {
+    color: var(--text-color-high);
+}
+.font-body-1 {
+    font: var(--text-body1);
+}
+.icon-size-6 {
+    --icon-size: 24px;
+}
+.icon-size-16 {
+    --icon-size: 64px;
+}
+.skeleton {
+    background-color: #E5E5E5;
+    animation: fadeInOutLoopSubtle 2s linear infinite;
+}
+.mega-dialog.m-dialog {
+    animation: dialogpopin 0.3s ease;
+}
+.mega-dialog.m-dialog h3 {
+    font-weight: 400;
+    margin: 1.5rem 0 0.8rem;
+    overflow: hidden;
+    padding: 0 3rem;
+    width: 100%;
+}
+.mega-dialog.m-dialog i.icon-left {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.75rem;
+}
+.mega-dialog button.m-dialog-close {
+    top: 1.5rem;
+    right: 1.5rem;
+}
+.m-dialog-overlay {
+    animation: fadein 0.3s ease;
+}
+.m-context {
+    animation: contextpopin 0.2s ease;
+}
+.grid-3-cols {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.grid-5-cols {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.grid-10-cols {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+}
+.grid-15-cols {
+    grid-template-columns: repeat(15, minmax(0, 1fr));
+}
+.m-context .m-dropdown-item.red i {
+    --mask-color: var(--secondary-red);
+}
+i.text-color-medium {
+    --mask-color: var(--text-color-medium);
+}
+.rotating {
+    animation: rotate 0.8s infinite linear;
+}
+
+@keyframes dialogpopin
+{
+    from {
+        opacity: 0;
+        margin-top: 30px;
+    }
+    to {
+        opacity: 1;
+        margin-top: 0;
+    }
+}
+
+@keyframes contextpopin
+{
+    from {
+        opacity: 0;
+        margin-top: 5px;
+    }
+    to {
+        opacity: 1;
+        margin-top: 0;
+    }
+}
+
+@keyframes fadein
+{
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }

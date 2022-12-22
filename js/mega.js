@@ -1651,6 +1651,24 @@ scparser.$add('upf', () => {
     fm_fullreload(null, 'upf-proflexi');
 });
 
+// Sets handlers
+scparser.$add('asp', (data) => {
+    'use strict';
+    mega.sets.parseAsp(data);
+});
+scparser.$add('asr',(data) => {
+    'use strict';
+    mega.sets.parseAsr(data);
+});
+scparser.$add('aep', (data) => {
+    'use strict';
+    mega.sets.parseAep(data);
+});
+scparser.$add('aer', (data) => {
+    'use strict';
+    mega.sets.parseAer(data);
+});
+
 scparser.$notify = function(a) {
     // only show a notification if we did not trigger the action ourselves
     if (!pfid && u_attr && a.ou !== u_attr.u) {
@@ -3592,6 +3610,11 @@ function loadfm_callback(res) {
         // ensure the response is saved in fmdb, even if the chat is disabled or not loaded yet
         processMCF(loadfm.chatmcf);
     }
+
+    if (res.aesp) {
+        mega.sets.resetDB(res.aesp);
+    }
+
     M.avatars();
 
     if (localStorage['treefixup$' + u_handle]) {

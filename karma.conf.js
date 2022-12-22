@@ -170,7 +170,6 @@ module.exports = function(config) {
         'test/utilities/promises.js',
 
 
-
         // == Tests ==
         // Dependency-based load order of library modules.
         // modules that already follow AMD need included: false

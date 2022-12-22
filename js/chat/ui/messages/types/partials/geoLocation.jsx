@@ -10,7 +10,7 @@ function GeoLocation(props) {
         }
 
         if (GeoLocationLinks.gmapsConfirmation === -1 || GeoLocationLinks.gmapsConfirmation === false) {
-            msgDialog('confirmation', 'geolocation-link', l[20788], 'Would you like to proceed?', (answer) => {
+            msgDialog('confirmation', 'geolocation-link', l[20788], l.confirm_ext_link, (answer) => {
                 if (answer) {
                     GeoLocationLinks.confirmationDoConfirm();
                     closeDialog();

@@ -3667,7 +3667,8 @@ ChatRoom._fnRequireParticipantKeys = function (fn, scope) {
   };
 };
 ChatRoom.prototype.showMissingUnifiedKeyDialog = function () {
-  return msgDialog(`warningb:!^${l[82]}!${l[23433]}`, null, l[200], "An error occurred while trying to join this call. Reloading MEGAchat may fix the problem. If the problem persists, please contact support@mega.nz", reload => reload ? M.reload() : null, 1);
+  return msgDialog(`warningb:!^${l[82]}!${l[23433]}`, null, l[200], l.chat_key_failed_dlg_text,
+  reload => reload ? M.reload() : null, 1);
 };
 ChatRoom.prototype.hasInvalidKeys = function () {
   if (!is_chatlink && this.type === 'public') {
@@ -10333,7 +10334,7 @@ class Join extends mixins.wl {
           this.props.onJoinClick(this.state.previewAudio, this.state.previewVideo);
         }
       }
-    }, "Join"));
+    }, l.join_chat_button));
     this.Unsupported = () => external_React_default().createElement("div", {
       className: "unsupported-container"
     }, external_React_default().createElement("i", {
@@ -11951,9 +11952,9 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
                         `
     }, this.state.hasInvalidKeys && this.state.invalidKeysBanner && external_React_default().createElement(Alert, {
       type: Alert.TYPE.HIGH,
-      content: external_React_default().createElement((external_React_default()).Fragment, null, "An error occurred while trying to join this chat. Reloading MEGAchat may fix the problem. ", external_React_default().createElement("a", {
+      content: external_React_default().createElement((external_React_default()).Fragment, null, l.chat_key_failed_banner.split('[A]')[0], external_React_default().createElement("a", {
         onClick: () => M.reload()
-      }, "Reload account")),
+      }, l.chat_key_failed_banner.substring(l.chat_key_failed_banner.indexOf('[A]') + 3, l.chat_key_failed_banner.indexOf('[/A]'))), l.chat_key_failed_banner.split('[/A]')[1]),
       onClose: () => this.setState({
         invalidKeysBanner: false
       })
@@ -15983,7 +15984,7 @@ class Group extends _mixins1__.wl {
         className: "info-indicator active"
       }), warn && react0().createElement("div", {
         className: "info-indicator warn simpletip",
-        "data-simpletip": "Screen sharing a window or browser tab may be cropped.",
+        "data-simpletip": l.screen_share_crop_tip,
         "data-simpletipposition": "top",
         "data-simpletipoffset": "5",
         "data-simpletip-class": "theme-dark-forced"
@@ -16985,7 +16986,7 @@ const withMicObserver = Component => class extends mixins.wl {
     }));
   }
   renderSignalDialog() {
-    return msgDialog('warningb', null, 'Microphone not working', l.chat_mic_off_tooltip, null, 1);
+    return msgDialog('warningb', null, l.no_mic_title, l.chat_mic_off_tooltip, null, 1);
   }
   renderSignalWarning() {
     return external_React_default().createElement("div", {
@@ -16994,7 +16995,7 @@ const withMicObserver = Component => class extends mixins.wl {
                         meetings-signal-issue
                         simpletip
                     `,
-      "data-simpletip": "Show more info",
+      "data-simpletip": l.show_info,
       "data-simpletipposition": "top",
       "data-simpletipoffset": "5",
       "data-simpletip-class": "theme-dark-forced",
@@ -18945,7 +18946,7 @@ class Invite extends mixins.wl {
       className: "link-input-container"
     }, external_React_default().createElement(meetings_button.Z, {
       className: `mega-button large positive ${link ? '' : 'disabled'}`,
-      onClick: () => link && copyToClipboard(link, 'Done!')
+      onClick: () => link && copyToClipboard(link, l[371])
     }, !link ? l[7006] : l[1394]), external_React_default().createElement(ui_link.Z, {
       className: "view-link-control",
       field: field,
@@ -19750,7 +19751,7 @@ const withPermissionsObserver = Component => class extends _mixins1__.wl {
                         meetings-signal-issue
                         simpletip
                     `,
-      "data-simpletip": "Show more info",
+      "data-simpletip": l.show_info,
       "data-simpletipposition": "top",
       "data-simpletipoffset": "5",
       "data-simpletip-class": "theme-dark-forced",
@@ -21442,7 +21443,7 @@ function GeoLocation(props) {
       window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank', 'noopener,noreferrer');
     };
     if (GeoLocationLinks.gmapsConfirmation === -1 || GeoLocationLinks.gmapsConfirmation === false) {
-      msgDialog('confirmation', 'geolocation-link', l[20788], 'Would you like to proceed?', answer => {
+      msgDialog('confirmation', 'geolocation-link', l[20788], l.confirm_ext_link, answer => {
         if (answer) {
           GeoLocationLinks.confirmationDoConfirm();
           closeDialog();
@@ -22776,6 +22777,7 @@ var emojiDropdown = __webpack_require__(768);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 var ui_buttons = __webpack_require__(204);
 ;// CONCATENATED MODULE: ./js/chat/ui/emojiAutocomplete.jsx
+
 var React = __webpack_require__(363);
 
 class EmojiAutocomplete extends mixins.wl {
@@ -22975,15 +22977,10 @@ class EmojiAutocomplete extends mixins.wl {
     }
     return React.createElement("div", {
       className: "textarea-autofill-bl"
-    }, React.createElement("div", {
+    }, React.createElement(utils.Cw, {
+      tag: "div",
       className: "textarea-autofill-info"
-    }, React.createElement("strong", null, "tab"), " or  ", React.createElement("i", {
-      className: "small-icon tab-icon"
-    }), " to navigate", React.createElement("i", {
-      className: "small-icon enter-icon left-pad"
-    }), " to select ", React.createElement("strong", {
-      className: "left-pad"
-    }, "esc"), "to dismiss"), React.createElement("div", {
+    }, l.emoji_suggestion_instruction), React.createElement("div", {
       className: "textarea-autofill-emoji"
     }, emojisDomList));
   }

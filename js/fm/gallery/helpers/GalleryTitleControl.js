@@ -1,7 +1,7 @@
 class GalleryTitleControl extends MComponent {
     buildElement() {
         this.el = document.createElement('div');
-        this.el.setAttribute('class', 'flex-row');
+        this.el.setAttribute('class', 'flex flex-row items-center text-ellipsis');
 
         this.attachIcon();
         this.attachTitle();
@@ -17,6 +17,10 @@ class GalleryTitleControl extends MComponent {
      * @type {String}
      */
     set filterSection(section) {
+        if (!mega.gallery.sections[section]) {
+            return;
+        }
+
         this.isClickable = section !== 'favourites';
 
         section = mega.gallery.sections[section].root;
@@ -70,14 +74,14 @@ class GalleryTitleControl extends MComponent {
             this.el.classList.add('cursor-pointer');
             this.attachCaret();
 
-            this.click(() => {
+            this.attachEvent('click', () => {
                 this.toggleMenu();
             });
         }
         else {
             this.el.classList.remove('cursor-pointer');
             this.detachCaret();
-            this.disposeClick();
+            this.disposeEvent('click');
         }
     }
 
@@ -170,7 +174,7 @@ class GalleryTitleControl extends MComponent {
 
     initMenu() {
         if (!this._menu) {
-            this._menu = new MMenuSelect(this.el);
+            this._menu = new MMenuSelect(this.el, ['item-bold']);
             this._menu.width = 200;
         }
     }

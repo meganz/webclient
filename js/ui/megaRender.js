@@ -332,7 +332,6 @@
          */
         cleanupLayout: function(aUpdate, aNodeList, aListSelector) {
             // TODO: This is copied as-is from the former method and should be OOPized as well.
-
             if (this.logger) {
                 console.time('MegaRender.cleanupLayout');
             }
@@ -424,7 +423,6 @@
                     }
                 }
                 else if (M.currentCustomView.type === 'gallery') {
-
                     const pagetype = M.currentdirid === M.currentCustomView.nodeID ? M.currentdirid : 'discovery';
 
                     $(`.fm-empty-${pagetype}`).removeClass('hidden');

@@ -525,7 +525,7 @@ lazy(mega, 'backupCenter', () => {
 
             $changePathButton.rebind('click.changePath', (e) => {
 
-                if ($(e.target).hasClass('disabled')) {
+                if ($(e.currentTarget).hasClass('disabled')) {
 
                     return false;
                 }
@@ -556,7 +556,7 @@ lazy(mega, 'backupCenter', () => {
 
             $confirmButton.rebind('click.stopBackup', (e) => {
 
-                if ($(e.target).hasClass('disabled') || !this.selectedSync) {
+                if ($(e.currentTarget).hasClass('disabled') || !this.selectedSync) {
 
                     return false;
                 }
@@ -1518,7 +1518,7 @@ lazy(mega, 'backupCenter', () => {
          */
         async renderContent(force) {
 
-            if (M.currentdirid !== 'devices' && !force && this.lastupdate > Date.now() - 10000) {
+            if (M.currentdirid !== 'devices' || !force && this.lastupdate > Date.now() - 10000) {
                 return false;
             }
 

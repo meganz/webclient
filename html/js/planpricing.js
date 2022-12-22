@@ -586,11 +586,13 @@ lazy(pro, 'proplan2', () => {
             const months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
             const planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
 
-            if (months !== period || planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
-                continue;
-            }
+
             if (planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
                 ProFlexiFound = currentPlan;
+                continue;
+            }
+
+            if (months !== period || planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
                 continue;
             }
 
@@ -611,8 +613,15 @@ lazy(pro, 'proplan2', () => {
                 }
             }
 
-            $('.pricing-plan-price span.vl', $planCard).text(formatCurrency(planPrice, priceCurrency, 'narrowSymbol'));
+            const priceText = formatCurrency(planPrice, priceCurrency, 'narrowSymbol');
+            $('.pricing-plan-price span.vl', $planCard).text(priceText);
             $('.pricing-plan-price-unit', $planCard).text(`${priceCurrency} / ${periodText}`);
+
+            if (priceText) {
+                $planCard.toggleClass('long-currency1', priceText.length >= 9 && priceText.length <= 12);
+                $planCard.toggleClass('long-currency2', priceText.length >= 13 && priceText.length <= 16);
+                $planCard.toggleClass('long-currency3', priceText.length >= 17);
+            }
 
             // get the storage/bandwidth, then convert it to bytes (it comes in GB) to format.
             // 1073741824 = 1024 * 1024 * 1024
@@ -624,8 +633,14 @@ lazy(pro, 'proplan2', () => {
 
             $('.pricing-plan-storage', $planCard).text(storageTxt);
 
+            const $storageBox = $('.pricing-plan-storage', $planCard);
             const $transferBox = $('.pricing-plan-trasfer', $planCard);
             const $transferSubBox = $('.pricing-plan-trasfer-val', $transferBox);
+
+            if (storageTxt) {
+                $storageBox.toggleClass('long-text', storageTxt.length >= 27 || bandwidthTxt.length >= 27);
+                $transferBox.toggleClass('long-text', storageTxt.length >= 27 || bandwidthTxt.length >= 27);
+            }
 
             if ($transferSubBox.length) {
                 $transferSubBox.text(bandwidthTxt);

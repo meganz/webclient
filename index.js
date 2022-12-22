@@ -3448,6 +3448,13 @@ mBroadcaster.once('boot_done', () => {
         }
     });
 
+    onIdle(async() => {
+        if (window.ethereum && !await M.getPersistentData('reportedMetamask').catch(nop)) {
+            eventlog(99791);
+            M.setPersistentData('reportedMetamask', true).catch(dump);
+        }
+    });
+
     if (d) {
         if (!window.crossOriginIsolated) {
             if (window.crossOriginIsolated === false) {
@@ -3479,6 +3486,12 @@ mBroadcaster.once('boot_done', () => {
 // After open folder call, check if we should restore any previously opened preview node.
 mBroadcaster.once('mega:openfolder', function() {
     'use strict';
+
+    // No need to re-initiate preview when on Album page
+    if (M.currentCustomView.type === 'albums') {
+        sessionStorage.removeItem('previewNode');
+        return;
+    }
 
     const {previewNode} = sessionStorage;
     if (previewNode) {

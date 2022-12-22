@@ -68,7 +68,7 @@ class Group extends MegaRenderMixin {
                         {warn && (
                             <div
                                 className="info-indicator warn simpletip"
-                                data-simpletip="Screen sharing a window or browser tab may be cropped."
+                                data-simpletip={l.screen_share_crop_tip /* `Screen sharing may crop your window` */}
                                 data-simpletipposition="top"
                                 data-simpletipoffset="5"
                                 data-simpletip-class="theme-dark-forced">

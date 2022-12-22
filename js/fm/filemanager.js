@@ -4259,7 +4259,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.gallery-view').addClass('hidden');
     }
 
-    if (M.previousdirid.startsWith('albums')) {
+    if (M.previousdirid && M.previousdirid.startsWith('albums')) {
         if (M.currentCustomView.type === 'gallery') {
             mega.gallery.albums.disposeInteractions();
         }

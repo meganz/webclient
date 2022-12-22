@@ -3799,7 +3799,7 @@
     "album_open": "\u6253\u5f00",
     "album_play_slideshow": "\u64ad\u653e\u5e7b\u706f\u7247",
     "album_rename_btn_label": "\u91cd\u547d\u540d",
-    "album_selected_items_count": "{count, plural, one {%1 of # item selected} other {%1 of # items selected}}",
+    "album_selected_items_count": "{count, plural, other {\u5df2\u9009\u62e9#\u4e2a\u9879\u76ee\u4e2d\u7684%1\u4e2a}}",
     "albums": "\u76f8\u518c",
     "albums_removed_status": "{count, plural, other {\u5220\u9664\u4e86#\u4e2a\u9879\u76ee}}",
     "alert_unsupported_browser": "\u60a8\u7684\u6d4f\u89c8\u5668\u4e0d\u652f\u6301MEGA\u901a\u8bdd\u3002\u8bf7\u5b89\u88c5\u5e76\u4f7f\u7528\u652f\u6301\u7684\u6d4f\u89c8\u5668\uff1aChrome\u3001Opera\u6216Edge\u3002",

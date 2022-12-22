@@ -1,7 +1,7 @@
 class MEmptyPad extends MComponent {
     buildElement() {
         this.el = document.createElement('div');
-        this.el.setAttribute('class', 'fm-empty-pad');
+        this.el.setAttribute('class', 'fm-empty-pad text-center');
     }
 
     static createTxt(text, className) {

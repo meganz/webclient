@@ -69,15 +69,6 @@ GalleryNodeBlock.dateKeyCache = Object.create(null);
 GalleryNodeBlock.maxGroupChunkSize = 60;
 GalleryNodeBlock.thumbCacheSize = 500;
 
-GalleryNodeBlock.revokeThumb = (fa) => {
-    'use strict';
-
-    if (GalleryNodeBlock.thumbCache && GalleryNodeBlock.thumbCache[fa]) {
-        URL.revokeObjectURL(GalleryNodeBlock.thumbCache[fa]);
-        delete GalleryNodeBlock.thumbCache[fa];
-    }
-};
-
 GalleryNodeBlock.getTimeString = (key, format) => {
     'use strict';
 
@@ -1722,6 +1713,15 @@ class MegaGallery {
     }
 }
 
+GalleryNodeBlock.revokeThumb = (fa) => {
+    'use strict';
+
+    if (MegaGallery.thumbCache && MegaGallery.thumbCache[fa]) {
+        URL.revokeObjectURL(MegaGallery.thumbCache[fa]);
+        delete MegaGallery.thumbCache[fa];
+    }
+};
+
 class MegaTargetGallery extends MegaGallery {
 
     async setView() {
@@ -1857,7 +1857,13 @@ class MegaMediaTypeGallery extends MegaGallery {
             dbfetch.geta(handles)
                 .then(() => {
                     MegaGallery.dbActionPassed = true;
+
                     this.updNode = {};
+
+                    // Initializing albums here for the performace's sake
+                    if (mega.gallery.albums.awaitingDbAction) {
+                        mega.gallery.albums.init();
+                    }
                 })
                 .catch(nop);
         }
@@ -1944,6 +1950,7 @@ class MegaMediaTypeGallery extends MegaGallery {
 
 mega.gallery = Object.create(null);
 mega.gallery.nodeUpdated = false;
+mega.gallery.albumsRendered = false;
 mega.gallery.titleControl = null;
 mega.gallery.emptyBlock = null;
 mega.gallery.rootMode = {photos: 'a', images: 'a', videos: 'a'};
@@ -1966,7 +1973,7 @@ mega.gallery.isGalleryNode = (n, ext) => {
 /**
  * Checks whether the node is a video, plus checks if thumbnail is available
  * @param {Object} n ufs node
- * @returns {Object.<String, Number>?} null or object
+ * @returns {Object.<String, Number>|Boolean}
  */
 mega.gallery.isGalleryVideo = (n) => {
     'use strict';
@@ -2179,8 +2186,8 @@ async function galleryUI(id) {
 MegaGallery.addThumbnails = (nodeBlocks) => {
     'use strict';
 
-    if (!GalleryNodeBlock.thumbCache) {
-        GalleryNodeBlock.thumbCache = Object.create(null);
+    if (!MegaGallery.thumbCache) {
+        MegaGallery.thumbCache = Object.create(null);
     }
 
     const faKeys = [{}, {}];
@@ -2200,8 +2207,8 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             type = 0; // Thumbnail is applying as a fallback when there is no preview available
         }
 
-        if (GalleryNodeBlock.thumbCache[fa]) {
-            nodeBlocks[i].setThumb(GalleryNodeBlock.thumbCache[fa]);
+        if (MegaGallery.thumbCache[fa]) {
+            nodeBlocks[i].setThumb(MegaGallery.thumbCache[fa], fa);
         }
         else {
             faKeys[type][fa] = nodeBlocks[i].node;
@@ -2215,67 +2222,92 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         }
     }
 
+    const cacheProcessed = (nodeFa) => {
+        if (MegaGallery.thumbCache[nodeFa]) {
+
+            for (let i = 0; i < blocks[nodeFa].length; i++) {
+                blocks[nodeFa][i].setThumb(MegaGallery.thumbCache[nodeFa], nodeFa);
+            }
+
+            delete blocks[nodeFa];
+            return true;
+        }
+
+        return false;
+    };
+
+    const thumbnailIsValid = (nodeFa, uint8) => {
+        // uint8.length === 0 should remain as is as per Firefox's limitations
+        if (uint8 === 0xDEAD || uint8.length === 0) {
+            if (d) {
+                console.warn(`Aborted preview retrieval for ${nodeFa}`);
+            }
+
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleReceivedUint8 = async(ctx, nodeFa, uint8, type) => {
+        if (!blocks[nodeFa] // The image has been applied already
+            || cacheProcessed(nodeFa) // Applying the cached image to the existing group
+            || !thumbnailIsValid(nodeFa, uint8)) {
+            return;
+        }
+
+        if (!MegaGallery.workerBranch) {
+            MegaGallery.workerBranch = await webgl.worker.attach();
+        }
+
+        const blob = (type === 1)
+            ? await webgl.getDynamicThumbnail(uint8, 515, MegaGallery.workerBranch).catch(nop)
+            : new Blob([uint8]);
+
+        const fetchStillApplicable = M.currentCustomView.type === 'gallery'
+            || M.currentCustomView.type === 'albums';
+
+        if (fetchStillApplicable) {
+            if (blob) {
+                const url = URL.createObjectURL(blob);
+
+                if (blocks[nodeFa]) {
+                    for (let i = 0; i < blocks[nodeFa].length; i++) {
+                        blocks[nodeFa][i].setThumb(url, nodeFa);
+                    }
+
+                    delete blocks[nodeFa];
+                }
+
+                if (!MegaGallery.thumbCache[nodeFa]) {
+                    MegaGallery.thumbCache[nodeFa] = url;
+
+                    const cachedKeys = Object.keys(MegaGallery.thumbCache);
+
+                    if (cachedKeys.length > GalleryNodeBlock.thumbCacheSize) {
+                        GalleryNodeBlock.revokeThumb(cachedKeys[0]);
+                    }
+                }
+            }
+            else if (type === 1) {
+                // Force-loading type 0 in case the thumbnail of type 1 cannot be retrieved
+                api_getfileattr(
+                    { [nodeFa]: null },
+                    0,
+                    handleReceivedUint8
+                );
+            }
+        }
+        else {
+            delete blocks[nodeFa];
+        }
+    };
+
     faKeys.forEach((fk, type) => {
         api_getfileattr(
             fk,
             type,
-            async(ctx, nodeFa, uint8) => {
-                // The image has been applied already
-                if (!blocks[nodeFa]) {
-                    return;
-                }
-
-                // Applying the cached image to the whole group
-                if (GalleryNodeBlock.thumbCache[nodeFa]) {
-                    for (let i = 0; i < blocks[nodeFa].length; i++) {
-                        blocks[nodeFa][i].setThumb(GalleryNodeBlock.thumbCache[nodeFa]);
-                    }
-
-                    delete blocks[nodeFa];
-                    return;
-                }
-
-                if (uint8 === 0xDEAD) {
-                    if (d) {
-                        console.log(`Aborted preview retrieval for ${nid}`);
-                    }
-
-                    return;
-                }
-
-                if (!MegaGallery.workerBranch) {
-                    MegaGallery.workerBranch = await webgl.worker.attach();
-                }
-
-                const blob = (type === 1)
-                    ? await webgl.getDynamicThumbnail(uint8, 515, MegaGallery.workerBranch).catch(nop)
-                    : new Blob([uint8]);
-
-                if (M.currentCustomView.type === 'gallery' && blob) {
-                    const url = URL.createObjectURL(blob);
-
-                    if (blocks[nodeFa]) {
-                        for (let i = 0; i < blocks[nodeFa].length; i++) {
-                            blocks[nodeFa][i].setThumb(url);
-                        }
-
-                        delete blocks[nodeFa];
-                    }
-
-                    if (!GalleryNodeBlock.thumbCache[nodeFa]) {
-                        GalleryNodeBlock.thumbCache[nodeFa] = url;
-
-                        const cachedKeys = Object.keys(GalleryNodeBlock.thumbCache);
-
-                        if (cachedKeys.length > GalleryNodeBlock.thumbCacheSize) {
-                            GalleryNodeBlock.revokeThumb(cachedKeys[0]);
-                        }
-                    }
-                }
-                else {
-                    delete blocks[nodeFa];
-                }
-            }
+            (ctx, nodeFa, uint8) => handleReceivedUint8(ctx, nodeFa, uint8, type)
         );
     });
 };
@@ -2283,17 +2315,17 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
 MegaGallery.revokeThumbs = () => {
     'use strict';
 
-    if (!GalleryNodeBlock.thumbCache) {
+    if (!MegaGallery.thumbCache) {
         return;
     }
 
-    const keys = Object.keys(GalleryNodeBlock.thumbCache);
+    const keys = Object.keys(MegaGallery.thumbCache);
 
     for (let i = 0; i < keys.length; i++) {
-        URL.revokeObjectURL(GalleryNodeBlock.thumbCache[keys[i]]);
+        URL.revokeObjectURL(MegaGallery.thumbCache[keys[i]]);
     }
 
-    GalleryNodeBlock.thumbCache = Object.create(null);
+    MegaGallery.thumbCache = Object.create(null);
 };
 
 MegaGallery.handleIntersect = (entries, gallery) => {
@@ -2302,16 +2334,16 @@ MegaGallery.handleIntersect = (entries, gallery) => {
     const toFetchAttributes = [];
 
     for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i];
+        const { isIntersecting, target: { nodeBlock } } = entries[i];
 
-        if (entry.isIntersecting) {
-            if (!entry.target.nodeBlock.isRendered) {
-                entry.target.nodeBlock.fill(gallery.mode);
-                toFetchAttributes.push(entry.target.nodeBlock);
+        if (isIntersecting) {
+            if (!nodeBlock.isRendered) {
+                nodeBlock.fill(gallery.mode);
+                toFetchAttributes.push(nodeBlock);
             }
 
-            if (Array.isArray($.selected) && $.selected.includes(entry.target.nodeBlock.node.h)) {
-                entry.target.nodeBlock.el.classList.add('ui-selected');
+            if (Array.isArray($.selected) && $.selected.includes(nodeBlock.node.h)) {
+                nodeBlock.el.classList.add('ui-selected');
             }
         }
     }

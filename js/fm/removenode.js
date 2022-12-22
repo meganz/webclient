@@ -35,11 +35,20 @@ function removeUInode(h, parent) {
         }
     }
 
+    if (M.currentCustomView.type === 'albums') {
+        mega.gallery.albums.onCDNodeRemove(n);
+    }
+    else {
+        mega.gallery.albumsRendered = false;
+    }
+
     if (M.currentCustomView.type === 'gallery') {
         mega.gallery.checkEveryGalleryDelete(h);
+        mega.gallery.albums.onCDNodeRemove(n);
     }
     else {
         mega.gallery.nodeUpdated = true;
+        mega.gallery.albumsRendered = false;
     }
 
     if (M.isDynPage(M.currentdirid) > 1) {
@@ -125,7 +134,8 @@ function removeUInode(h, parent) {
             }
             break;
         default:
-            if (M.chat || M.currentdirid.indexOf('user-management') >= 0) {
+            if (M.chat || M.currentdirid.indexOf('user-management') >= 0
+                || M.currentCustomView.type === 'albums') {
                 break;
             }
             if (!hasSubFolders) {

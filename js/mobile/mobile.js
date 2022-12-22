@@ -1166,11 +1166,18 @@ contextMenu = {
 };
 
 function bindDropdownEvents() {}
+
 mega.gallery = {
     sections: {},
     secKeys: {},
     showEmpty: nop,
-    emptyBlock: null
+    emptyBlock: null,
+    albumsRendered: false,
+    albums: {
+        grid: null,
+        store: {},
+        tree: null
+    }
 };
 
 /** Global function to be used in mobile mode, checking if the action can be taken by the user.

@@ -71,7 +71,7 @@
 }
 .ui-selectable-helper {
     position: absolute;
-    z-index: 200;
+    z-index: 1250;
     border: 1px dotted var(--stroke-mid-grey);
     background: var(--surface-highlight-2);
 }

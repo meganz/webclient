@@ -1408,8 +1408,7 @@ MegaUtils.prototype.checkForDuplication = function(id) {
     'use strict';
     if (M.currentrootid === M.RubbishID
         || !M.d[id]
-        || M.getNodeRights(id) < 2
-        || M.currentCustomView.type === 'gallery') {
+        || M.getNodeRights(id) < 2) {
         return;
     }
 

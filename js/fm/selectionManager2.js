@@ -933,21 +933,17 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             return false;
         }
 
-        const allButtons = selectionLinkWrapper.querySelectorAll('.js-statusbarbtn:not(.options)');
+        const isAlbums = M.currentCustomView.type === 'albums';
+
+        const allButtons = selectionLinkWrapper.querySelectorAll(
+            isAlbums ? '.js-statusbarbtn' : '.js-statusbarbtn:not(.options)'
+        );
 
         for (let i = allButtons.length; i--;) {
             allButtons[i].classList.add('hidden');
         }
 
-        const isSearch = page.startsWith('fm/search');
-        const selNode = M.getNodeByHandle($.selected[0]);
-        const sourceRoot = M.getSelectedSourceRoot(isSearch);
-        const shareButton = selectionLinkWrapper.querySelector(`.js-statusbarbtn.share`);
-
-        let showGetLink;
-        let restrictedFolders = false;
         let __showBtn = (className) => {
-
             const button = selectionLinkWrapper.querySelector(`.js-statusbarbtn.${className}`);
 
             if (button) {
@@ -955,63 +951,94 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
         };
 
-        // Set default "Share folder" string
-        shareButton.dataset.simpletip = l[5631];
-
-        const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
-        dataset.simpletip = M.getSelectedRemoveLabel($.selected);
-
-        if ((sourceRoot === M.RootID || M.isDynPage(sourceRoot)) && !folderlink) {
-
-            const cl = new mega.Share.ExportLink();
-
-            for (let i = 0; i < $.selected.length; i++) {
-                if (M.getNodeRoot($.selected[i]) === M.InboxID) {
-                    restrictedFolders = true;
-                    break;
-                }
+        if (isAlbums) {
+            if (
+                mega.gallery.albums.grid
+                && mega.gallery.albums.grid.timeline
+                && Object.keys(mega.gallery.albums.grid.timeline.selections).length === 1
+            ) {
+                __showBtn('preview');
             }
 
-            // If any of selected items is taken down we do not need to proceed futher
-            if (cl.isTakenDown($.selected)) {
-                if (!restrictedFolders) {
-                    __showBtn('delete');
-                }
-                __showBtn = nop;
-            }
-
-            showGetLink = 1;
-
-            if (selNode.t && $.selected.length === 1) {
-                __showBtn('share');
-            }
-        }
-
-        if (M.checkSendToChat(isSearch, sourceRoot)) {
-            __showBtn('sendto');
-        }
-
-        if (M.getNodeRoot(M.currentdirid) !== M.RubbishID) {
             __showBtn('download');
-        }
+            // __showBtn('sendto');
+            // __showBtn('link');
 
-        if (showGetLink || folderlink) {
-            __showBtn('link');
-        }
+            const albumId = M.currentdirid.replace('albums/', '');
 
-        if (sourceRoot === M.InboxID || restrictedFolders) {
-
-            // Set "Read-only share" string
-            shareButton.dataset.simpletip = l.read_only_share;
-
-            if (selNode.t && $.selected.length === 1) {
-                __showBtn('share');
+            if (mega.gallery.albums.store[albumId] && !mega.gallery.albums.store[albumId].filterFn) {
+                __showBtn('delete-from-album');
             }
-            __showBtn('link');
         }
-        else if (!folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
-            || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {
-            __showBtn('delete');
+        else {
+            const isSearch = page.startsWith('fm/search');
+            const selNode = M.getNodeByHandle($.selected[0]);
+            const sourceRoot = M.getSelectedSourceRoot(isSearch);
+            const shareButton = selectionLinkWrapper.querySelector(`.js-statusbarbtn.share`);
+
+            let showGetLink;
+            let restrictedFolders = false;
+
+            document.querySelector('.selection-bar-col .sel-notif-size-total').classList.remove('hidden');
+
+            // Set default "Share folder" string
+            shareButton.dataset.simpletip = l[5631];
+
+            const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
+            dataset.simpletip = M.getSelectedRemoveLabel($.selected);
+
+            if ((sourceRoot === M.RootID || M.isDynPage(sourceRoot)) && !folderlink) {
+
+                const cl = new mega.Share.ExportLink();
+
+                for (let i = 0; i < $.selected.length; i++) {
+                    if (M.getNodeRoot($.selected[i]) === M.InboxID) {
+                        restrictedFolders = true;
+                        break;
+                    }
+                }
+
+                // If any of selected items is taken down we do not need to proceed futher
+                if (cl.isTakenDown($.selected)) {
+                    if (!restrictedFolders) {
+                        __showBtn('delete');
+                    }
+                    __showBtn = nop;
+                }
+
+                showGetLink = 1;
+
+                if (selNode.t && $.selected.length === 1) {
+                    __showBtn('share');
+                }
+            }
+
+            if (M.checkSendToChat(isSearch, sourceRoot)) {
+                __showBtn('sendto');
+            }
+
+            if (M.getNodeRoot(M.currentdirid) !== M.RubbishID) {
+                __showBtn('download');
+            }
+
+            if (showGetLink || folderlink) {
+                __showBtn('link');
+            }
+
+            if (sourceRoot === M.InboxID || restrictedFolders) {
+
+                // Set "Read-only share" string
+                shareButton.dataset.simpletip = l.read_only_share;
+
+                if (selNode.t && $.selected.length === 1) {
+                    __showBtn('share');
+                }
+                __showBtn('link');
+            }
+            else if (!folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
+                || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {
+                __showBtn('delete');
+            }
         }
 
         M.initStatusBarLinks();

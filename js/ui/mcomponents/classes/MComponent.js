@@ -4,9 +4,7 @@ class MComponent {
      * @param {Boolean} [appendToParent=true] Append to parent right away or skip
      */
     constructor(parent, appendToParent = true) {
-        this.disposeEvents = {
-            click: null
-        };
+        this.disposeEvents = {};
 
         this.buildElement();
 
@@ -19,33 +17,46 @@ class MComponent {
                 parent.append(this.el);
             }
 
-            this.mParent = parent;
+            this._parent = parent;
         }
 
-        this.el.mComponent = this;
+        if (this.el) {
+            this.el.mComponent = this;
+        }
     }
 
     /**
-     * Attaching a click event to the directly related element (this.el)
+     * Attaching an event to the directly related element (this.el)
+     * @param {String} eventName Event name to work with as per `addeventlistener` documentation
      * @param {Function} handler Handler for the element click
-     * @param {*} options options as per AddEventListener guidelines
+     * @param {any} options Options as per AddEventListener guidelines
      */
-    click(handler, options) {
-        this.disposeClick();
-        this.disposeEvents.click = MComponent.listen(this.el, 'click', handler, options);
+    attachEvent(eventName, handler, options) {
+        this.disposeEvent(eventName);
+        this.disposeEvents[eventName] = MComponent.listen(this.el, eventName, handler, options);
     }
 
-    disposeClick() {
-        if (typeof this.disposeEvents.click === 'function') {
-            this.disposeEvents.click();
+    /**
+     * Detaching an event by name if any
+     * @param {String} eventName Event name to listen
+     * @returns {void}
+     */
+    disposeEvent(eventName) {
+        if (typeof this.disposeEvents[eventName] === 'function') {
+            this.disposeEvents[eventName]();
         }
     }
 
     /**
      * Detaching this.el
-     * This removes any reference, so it is better to use it before complete removal or resetting with buildElement()
+     * This removes this.el reference,
+     * so it is better to use it before complete removal or resetting with buildElement()
      */
-    detach() {
+    detachEl() {
+        if (!this.el) {
+            return;
+        }
+
         const parent = this.el.parentNode;
 
         if (parent) {
@@ -53,13 +64,63 @@ class MComponent {
         }
 
         // Disposing all events attached via MComponent.listen()
-        this.disposeClick();
+        const eventNames = Object.keys(this.disposeEvents);
+
+        for (let i = 0; i < eventNames.length; i++) {
+            this.disposeEvent(eventNames[i]);
+        }
+
+        delete this.el;
+    }
+
+    /**
+     * Listening for an event and conveniently removing listener disposer
+     * @param {HTMLElement|String} node DOM element to listen the event on
+     * @param {Event} event An event to listen
+     * @param {Function} handler A callback to trigger
+     * @param {Object} options Event options as per MDN for addEventListener
+     * @returns {Function} Returning function should be called when the listener needs to be disposed
+     */
+    static listen(node, event, handler, options) {
+        if (typeof node === 'string') {
+            node = document.querySelector(node);
+        }
+
+        node.addEventListener(event, handler, options);
+        return () => node.removeEventListener(event, handler, options);
+    }
+
+    /**
+     * Resetting array of specific internal elements
+     * @param {MComponent} mComponent The ref to mComponent
+     * @param {String} key Key of the list to reset
+     * @param {String|Boolean} [containerKey] The this.ref of the DOM element to clear (if any)
+     * @returns {void}
+     */
+    static resetSubElements(mComponent, key, containerKey = 'el') {
+        if (!Array.isArray(mComponent[key])) {
+            mComponent[key] = [];
+            return;
+        }
+
+        for (let i = 0; i < mComponent[key].length; i++) {
+            if (mComponent[key][i].remove) {
+                mComponent[key][i].remove();
+            }
+
+            delete mComponent[key][i];
+        }
+
+        if (containerKey) {
+            const container = mComponent[containerKey];
+
+            if (container) {
+                while (container.firstChild) {
+                    container.removeChild(container.firstChild);
+                }
+            }
+        }
+
+        mComponent[key] = [];
     }
 }
-
-MComponent.listen = (node, event, handler, options) => {
-    'use strict';
-
-    node.addEventListener(event, handler, options);
-    return () => node.removeEventListener(event, handler, options);
-};

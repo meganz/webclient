@@ -254,22 +254,28 @@ var authring = (function () {
 
         // This promise will be the one which is going to be returned.
         var masterPromise = new MegaPromise();
+        let attributePromise, fromKeys;
 
-        var attributePromise = mega.attr.get(u_handle, ns._PROPERTIES[keyType],
-                                                false, true);
+        if (!mega.keyMgr.generation || keyType === 'RSA') {
+            attributePromise = mega.attr.get(u_handle, ns._PROPERTIES[keyType], false, true);
+        }
+        else {
+            attributePromise = new MegaPromise((resolve) => {
+                fromKeys = true;
+                resolve(mega.keyMgr.authrings[keyType] || ENOENT);
+            });
+        }
 
         attributePromise.done(function _attributePromiseResolve(result) {
             if (typeof result !== 'number') {
                 // Authring is in the empty-name record.
-                u_authring[keyType] = ns.deserialise(result['']);
-                logger.debug('Got authentication ring for key type '
-                             + keyType + '.');
+                u_authring[keyType] = fromKeys === true ? result : ns.deserialise(result['']);
+                logger.debug(`Got authentication ring for key type ${keyType}.`);
                 masterPromise.resolve(u_authring[keyType]);
             }
             else if (result === ENOENT) {
                 // This authring is missing. Let's make it.
-                logger.debug('No authentication ring for key type '
-                             + keyType + ', making one.');
+                logger.debug(`No authentication ring for key type ${keyType}, making one.`);
                 u_authring[keyType] = {};
                 ns.setContacts(keyType);
                 masterPromise.resolve(u_authring[keyType]);
@@ -312,13 +318,26 @@ var authring = (function () {
      *     A promise that is resolved when the original asynch code is settled.
      */
     ns.setContacts = function(keyType) {
+
         if (ns._PROPERTIES[keyType] === undefined) {
             logger.error('Unsupported authentication key type: ' + keyType);
             return MegaPromise.reject(EARGS);
         }
 
-        return this.onAuthringReady('setContacts')
-            .then(() => mega.attr.set(ns._PROPERTIES[keyType], {'': ns.serialise(u_authring[keyType])}, false, true));
+        return this.onAuthringReady('setContacts').then(() => {
+            const promises = [];
+
+            if (!mega.keyMgr.secure) {
+
+                promises.push(
+                    Promise.resolve(
+                        mega.attr.set(ns._PROPERTIES[keyType], {'': ns.serialise(u_authring[keyType])}, false, true)
+                    )
+                );
+            }
+            promises.push(mega.keyMgr.commit());
+            return Promise.all(promises);
+        });
     };
 
 
@@ -398,11 +417,20 @@ var authring = (function () {
                 || !ns.equalFingerprints(oldRecord.fingerprint, fingerprint)
                 || (oldRecord.method !== method)
                 || (oldRecord.confidence !== confidence)) {
+
             // Need to update the record.
-            u_authring[keyType][userhandle] = { fingerprint: fingerprint,
-                                                method: method,
-                                                confidence: confidence };
-            return ns.setContacts(keyType);
+            u_authring[keyType][userhandle] = {
+                fingerprint: fingerprint,
+                method: method,
+                confidence: confidence
+            };
+
+            return ns.setContacts(keyType)
+                .then(() => {
+                    // try to complete pending out/in-shares based on the new situation.
+                    return mega.keyMgr.completePendingOutShares();
+                })
+                .then(() => mega.keyMgr.acceptPendingInShares());
         }
     };
 
@@ -669,31 +697,21 @@ var authring = (function () {
      *
      * @returns {MegaPromise}
      */
-    ns.onAuthringReady = function(debugTag) {
-        var promise = new MegaPromise();
+    ns.onAuthringReady = async function(debugTag) {
 
         if (d > 1) {
             logger.log('authring.onAuthringReady', debugTag);
         }
 
         if (this.hadInitialised() === false) {
-            logger.debug('Will wait for authring to initialize...', debugTag);
-            promise.linkDoneAndFailTo(this.initAuthenticationSystem());
-        }
-        else {
-            // Always resolve asynchronously
-            // TODO: upgrade to jQuery v3 ...
-            Soon(function() {
-                if (u_authring.Ed25519) {
-                    return promise.resolve();
-                }
+            if (d) {
+                logger.debug('Will wait for Authring to initialize...', debugTag);
+            }
 
-                logger.error('Unexpected authring failure...', debugTag);
-                promise.reject(EINTERNAL);
-            });
+            await Promise.resolve(this.initAuthenticationSystem());
         }
 
-        return promise;
+        assert(u_authring.Ed25519, `Unexpected auth-ring failure... (${debugTag})`);
     };
 
     /**
@@ -796,9 +814,16 @@ var authring = (function () {
 
             logger.warn('Good luck!..');
         }
+        let attributePromise;
 
-        // Load private keys.
-        var attributePromise = mega.attr.get(u_handle, 'keyring', false, false);
+        // Load private keys (or use the ones deserialised from ^!keys).
+        if (mega.keyMgr.generation) {
+            attributePromise = new MegaPromise((resolve) => resolve(mega.keyMgr.keyring));
+        }
+        else {
+            attributePromise = mega.attr.get(u_handle, 'keyring', false, false);
+        }
+
         attributePromise.done(function __attributePromiseResolve(result) {
             // Ensure we're in a safe-state.
             if (!safeStateAssert(masterPromise, result && typeof result === 'object')) {
@@ -821,8 +846,17 @@ var authring = (function () {
             crypt.setPubKey(u_pubEd25519, 'Ed25519');
 
             // Load authring and we're done.
-            var authringPromise = authring.getContacts('Ed25519');
-            masterPromise.linkDoneAndFailTo(authringPromise);
+
+            // @todo migrate getContacts() to native Promise.
+            Promise.all([
+                Promise.resolve(authring.getContacts('Ed25519')),
+                Promise.resolve(authring.getContacts('Cu25519'))
+            ]).then((res) => {
+                masterPromise.resolve(res);
+            }).catch((ex) => {
+                logger.error(ex);
+                masterPromise.reject(ex);
+            });
         });
         attributePromise.fail(function __attributePromiseReject(result) {
             if (result === ENOENT) {

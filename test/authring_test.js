@@ -76,6 +76,9 @@ describe("authring unit test", function() {
                 'u': 'you456789xw',
             },
         };
+
+        // @todo FIXME/adapt
+        mega.keyMgr.secure = false;
     });
 
     afterEach(function() {
@@ -587,11 +590,20 @@ describe("authring unit test", function() {
 
         it("normal behaviour Ed25519", function() {
             mStub(u_authring, 'Ed25519', {});
-            mStub(ns, 'setContacts');
+            mStub(ns, 'setContacts')
+                .returns({
+                    then() {
+                        return this;
+                    }
+                });
             ns.setContactAuthenticated('you456789xw', ED25519_STRING_FINGERPRINT, 'Ed25519',
-                                       ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
-            var expected = {'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
-                                            method: 0, confidence: 0}};
+                ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
+            const expected = {
+                'you456789xw': {
+                    fingerprint: ED25519_STRING_FINGERPRINT,
+                    method: 0, confidence: 0
+                }
+            };
             assert.deepEqual(u_authring.Ed25519, expected);
             assert.strictEqual(ns.setContacts.callCount, 1);
             assert.strictEqual(ns.setContacts.args[0][0], 'Ed25519');
@@ -599,23 +611,41 @@ describe("authring unit test", function() {
 
         it("normal behaviou RSA", function() {
             mStub(u_authring, 'RSA', {});
-            mStub(ns, 'setContacts');
+            mStub(ns, 'setContacts')
+                .returns({
+                    then() {
+                        return this;
+                    }
+                });
             ns.setContactAuthenticated('you456789xw', RSA_STRING_FINGERPRINT, 'RSA',
-                                       ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
-            var expected = {'you456789xw': {fingerprint: RSA_STRING_FINGERPRINT,
-                                            method: 0, confidence: 0}};
+                ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
+            var expected = {
+                'you456789xw': {
+                    fingerprint: RSA_STRING_FINGERPRINT,
+                    method: 0, confidence: 0
+                }
+            };
             assert.deepEqual(u_authring.RSA, expected);
             assert.strictEqual(ns.setContacts.callCount, 1);
             assert.strictEqual(ns.setContacts.args[0][0], 'RSA');
         });
 
         it("no change", function() {
-            var expected = {'you456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
-                                            method: 0, confidence: 0}};
+            var expected = {
+                'you456789xw': {
+                    fingerprint: ED25519_STRING_FINGERPRINT,
+                    method: 0, confidence: 0
+                }
+            };
             mStub(u_authring, 'Ed25519', expected);
-            mStub(ns, 'setContacts');
+            mStub(ns, 'setContacts')
+                .returns({
+                    then() {
+                        return this;
+                    }
+                });
             ns.setContactAuthenticated('you456789xw', ED25519_STRING_FINGERPRINT, 'Ed25519',
-                                       ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
+                ns.AUTHENTICATION_METHOD.SEEN, ns.KEY_CONFIDENCE.UNSURE);
             assert.deepEqual(u_authring.Ed25519, expected);
             assert.strictEqual(ns.setContacts.callCount, 0);
         });
@@ -939,9 +969,8 @@ describe("authring unit test", function() {
                     prEd255: 'private key'
                 });
                 assert.deepEqual(pubEd25519, {'me3456789xw': 'public key'});
-                assert.strictEqual(authring.getContacts.callCount, 1);
-                assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 1);
-                assert.strictEqual(masterPromise.linkDoneAndFailTo.args[0][0], 'authring');
+                assert.strictEqual(authring.getContacts.callCount, 2);
+                assert.strictEqual(masterPromise.linkDoneAndFailTo.callCount, 0);
             });
 
             it('no keyring', function() {

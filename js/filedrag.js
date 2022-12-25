@@ -306,7 +306,7 @@
 
         if (
             (
-                folderlink ||
+                folderlink || currentDir &&
                 (
                     currentDir !== 'dashboard' &&
                     currentDir !== 'transfers' &&

@@ -2686,6 +2686,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
     jsl.push({f:'js/utils/events.js', n: 'js_utils_events_js', j: 1});
     jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
+    jsl.push({f:'js/keymgr.js', n: 'keymgr_js', j:1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
     jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
     jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});

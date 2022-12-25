@@ -178,7 +178,7 @@ var useravatar = (function() {
             logger.log('isUserVerified', userHandle);
         }
 
-        authring.onAuthringReady('avatar-v').done(function isUserVerified_Callback() {
+        authring.onAuthringReady('avatar-v').then(function isUserVerified_Callback() {
             var ed25519 = u_authring.Ed25519;
             var verifyState = ed25519 && ed25519[userHandle] || {};
             var isVerified = (verifyState.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON);
@@ -186,7 +186,7 @@ var useravatar = (function() {
             if (isVerified) {
                 $('.avatar-wrapper.' + userHandle.replace(/[^\w-]/g, '')).addClass('verified');
             }
-        }).always(function() {
+        }).finally(() => {
             delete pendingVerifyQuery[userHandle];
         });
     }

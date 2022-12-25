@@ -1835,7 +1835,11 @@
                     else {
                         user.r = 0;
                     }
-                    doShare($.mcselected, [user], true);
+                    mega.keyMgr.setShareSnapshot($.mcselected)
+                        .then(() => {
+                            doShare($.mcselected, [user], true);
+                        })
+                        .catch(dump);
                 }
                 else {
                     M.copyNodes(selectedNodes, $.mcselected);

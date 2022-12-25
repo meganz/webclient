@@ -65,7 +65,6 @@
                 if (this.tree.shares) {
                     delete this.tree.shares[h];
                 }
-                delete u_sharekeys[h];
                 delInShareQ.push(`${n.su}*${h}`);
                 this.delIndex(n.su, h);
             }
@@ -108,6 +107,8 @@
 
         // node deletion traversal
         delNodeIterator.call(this, h, delInShareQ);
+
+        mega.keyMgr.deleteShares(delInShareQ.map(uh => uh.substr(12))).catch(dump);
 
         if (fmdb && !ignoreDB) {
             // Perform DB deletions once we got acknowledge from API (action-packets)
@@ -1171,7 +1172,7 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
         var apiReq = function(apireq, h) {
             pending.cnt++;
             pending.value++;
-            api_req(apireq, {
+            mega.keyMgr.moveNodesApiReq(apireq, {
                 handle: h,
                 target: t,
                 pending: pending,
@@ -1728,6 +1729,11 @@ MegaData.prototype.revokeShares = function(handles) {
                     }
                     tree = tree.concat(M.getNodesSync(n.h, true));
                 }
+            }
+
+            // delete pending outshares for the deleted nodes
+            if (folders.length) {
+                promises.push(mega.keyMgr.deletePendingOutShares(folders));
             }
 
             var widgets = mega.megadrop.isDropExist(folders);
@@ -2685,6 +2691,7 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
     var i;
 
     while (i = parents.length) {
+
         newparents = [];
 
         while (i--) {
@@ -2704,7 +2711,6 @@ MegaData.prototype.getNodesSync = function fm_getnodessync(root, includeroot, ex
     if (!includeroot) {
         nodes.shift();
     }
-
     return nodes;
 };
 
@@ -3154,12 +3160,15 @@ MegaData.prototype.getNodeRights = function(id) {
         return this.dynContentLoader[id].options.rights | 0;
     }
 
-    if (folderlink || (id && id.length > 8)) {
+    if (folderlink || !id || id.length !== 8) {
         return false;
     }
 
     while (this.d[id] && this.d[id].p) {
         if (this.d[id].r >= 0) {
+            if (missingkeys[id]) {
+                return 0;
+            }
             return this.d[id].r;
         }
         id = this.d[id].p;
@@ -3874,10 +3883,10 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
             });
         }
 
-        delete u_sharekeys[h];
         if (fmdb) {
             fmdb.del('ok', h);
         }
+        mega.keyMgr.deleteShares([h]).catch(dump);
     }
 };
 

@@ -179,6 +179,9 @@ var crypto_rsagenkey = promisify(function _crypto_rsagenkey(resolve, reject, aSe
 
     var startTime = new Date();
 
+    // suppress upgrade warning at account creation time
+    mega.keyMgr.postregistration = true;
+
     if (typeof msCrypto !== 'undefined' && msCrypto.subtle) {
         var ko = msCrypto.subtle.generateKey({
             name: 'RSAES-PKCS1-v1_5',
@@ -1802,10 +1805,11 @@ function api_cachepubkeys(users) {
  *     public key (needs to be obtained/cached beforehand).
  */
 function encryptto(user, data) {
+    'use strict';
     var pubkey;
 
     if ((pubkey = u_pubkeys[user])) {
-        return crypto_rsaencrypt(data, pubkey);
+        return crypto_rsaencrypt(data, pubkey, -0x4D454741);
     }
 
     return false;
@@ -1878,12 +1882,30 @@ function api_setshare1(ctx, params) {
         }
     }
 
+    const users = new Set();
+    for (i = ctx.targets.length; i--;) {
+        const {u} = ctx.targets[i];
+
+        if (u && u !== 'EXP') {
+            users.add(u);
+        }
+    }
+
     for (i = req.s.length; i--;) {
         if (typeof req.s[i].r !== 'undefined') {
+            // @todo if (mega.keyMgr.isTrusted(ctx.node)) {
+            if (mega.keyMgr.secure) {
+                // FIXME: only send cr element for new shares even if .secure is set
+                newkey = true;
+                // dummy key/handleauth - FIXME: remove
+                req.ok = a32_to_base64([0, 0, 0, 0]);
+                req.ha = a32_to_base64([0, 0, 0, 0]);
+                break;
+            }
             if (!req.ok) {
                 if (u_sharekeys[ctx.node]) {
                     sharekey = u_sharekeys[ctx.node][0];
-                    newkey = false;
+                    newkey = !!mega.keyMgr.createdsharekey[ctx.node];
                 }
                 else {
                     // we only need to generate a key if one or more shares are being added to a previously unshared node
@@ -1911,7 +1933,7 @@ function api_setshare1(ctx, params) {
 
     // encrypt ssharekey to known users
     for (i = req.s.length; i--;) {
-        if (u_pubkeys[req.s[i].u]) {
+        if (!mega.keyMgr.secure && u_pubkeys[req.s[i].u]) {
             req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey, u_pubkeys[req.s[i].u]));
         }
         if (typeof req.s[i].m !== 'undefined') {
@@ -1932,6 +1954,9 @@ function api_setshare1(ctx, params) {
     /** Callback for API interactions. */
     ctx.callback = function (res, ctx) {
         if (typeof res === 'object') {
+            masterPromise.resolve(res);
+
+            /* sharekey clashes will be resolved via ^!keys
             if (res.ok) {
                 logger.debug('Share key clash: Set returned key and try again.');
                 ctx.req.ok = res.ok;
@@ -1954,6 +1979,7 @@ function api_setshare1(ctx, params) {
                 logger.info('Share succeeded.');
                 masterPromise.resolve(res);
             }
+*/
         }
         else if (!--ctx.maxretry || res === EARGS) {
             logger.error('Share operation failed.', res);
@@ -1969,7 +1995,12 @@ function api_setshare1(ctx, params) {
     };
 
     logger.info('Invoking share operation.');
-    api_req(ctx.req, ctx);
+
+    mega.keyMgr.sendShareKeys(ctx.node, [...users])
+        .then(() => {
+            api_req(ctx.req, ctx);
+        })
+        .catch(dump); // @todo api3, tell
 
     return masterPromise;
 }
@@ -2036,6 +2067,17 @@ function crypto_encodeprivkey(privk) {
     while (t.length & 15) t += String.fromCharCode(rand(256));
 
     return t;
+}
+
+function crypto_encodeprivkey2(privk) {
+    'use strict';
+    const plen = privk[3].length * 8;
+    const qlen = privk[4].length * 8;
+    const dlen = privk[2].length * 8;
+
+    return String.fromCharCode(qlen / 256) + String.fromCharCode(qlen % 256) + privk[4]
+        + String.fromCharCode(plen / 256) + String.fromCharCode(plen % 256) + privk[3]
+        + String.fromCharCode(dlen / 256) + String.fromCharCode(dlen % 256) + privk[2];
 }
 
 /**
@@ -2109,6 +2151,58 @@ function crypto_decodeprivkey(privk, errobj) {
 }
 
 /**
+ * Decode private RSA key (pqd format).
+ * @param {Uint8Array} privk the key to decode.
+ * @param {Object} [errobj] Optional object to put the details of a failure, if any
+ * @returns {Array|Boolean} decoded private key, or boolean(false) if failure.
+ */
+function crypto_decodeprivkey2(privk) {
+    'use strict';
+    let i, l;
+    let pos = 0;
+    let privkey = [];
+
+    // decompose private key
+    for (i = 0; i < 3; i++) {
+        if (pos + 2 > privk.length) {
+            return false;
+        }
+
+        l = privk[pos] * 256 + (privk[pos + 1] + 7) >> 3;
+        pos += 2;
+
+        if (pos + l > privk.length) {
+            return false;
+        }
+
+        privkey[i] = new asmCrypto.BigNumber(privk.slice(pos, pos + l));
+        pos += l;
+    }
+
+    // restore privkey components via the known ones
+    const q = privkey[0];
+    const p = privkey[1];
+    const d = privkey[2];
+    const q1 = q.subtract(1);
+    const p1 = p.subtract(1);
+    const m = new asmCrypto.Modulus(p.multiply(q));
+    const e = new asmCrypto.Modulus(p1.multiply(q1)).inverse(d);
+    const dp = d.divide(p1).remainder;
+    const dq = d.divide(q1).remainder;
+
+    // Calculate inverse modulo of q under p
+    const u = new asmCrypto.Modulus(p).inverse(q);
+
+    privkey = [m, e, d, p, q, dp, dq, u];
+    for (i = 0; i < privkey.length; i++) {
+        privkey[i] = asmCrypto.bytes_to_string(privkey[i].toBytes());
+    }
+
+    return privkey;
+}
+
+
+/**
  * Encrypts a cleartext string with the supplied public key.
  *
  * @param {String} cleartext
@@ -2118,7 +2212,13 @@ function crypto_decodeprivkey(privk, errobj) {
  * @return {String}
  *     Encrypted cipher text.
  */
-function crypto_rsaencrypt(cleartext, pubkey) {
+function crypto_rsaencrypt(cleartext, pubkey, bf) {
+    'use strict';
+
+    if (bf !== -0x4d454741 && mega.keyMgr.secure) {
+        return '';
+    }
+
     // random padding up to pubkey's byte length minus 2
     for (var i = (pubkey[0].length) - 2 - cleartext.length; i-- > 0;) {
         cleartext += String.fromCharCode(rand(256));
@@ -2973,18 +3073,23 @@ function crypto_makecr(source, shares, source_is_nodes) {
 // RSA-encrypt sharekey to newly RSA-equipped user
 // TODO: check source/ownership of sharekeys, prevent forged requests
 function crypto_procsr(sr) {
+    // insecure functionality - disable
+    if (mega.keyMgr.secure) {
+        return;
+    }
+
     var logger = MegaLogger.getLogger('crypt');
     var ctx = {
         sr: sr,
         i: 0
     };
 
-    ctx.callback = function (res, ctx) {
+    ctx.callback = function(res, ctx) {
         if (ctx.sr) {
             var pubkey;
 
             if (typeof res === 'object'
-                    && typeof res.pubk === 'string') {
+                && typeof res.pubk === 'string') {
                 u_pubkeys[ctx.sr[ctx.i]] = crypto_decodepubkey(base64urldecode(res.pubk));
             }
 
@@ -3037,6 +3142,11 @@ function crypto_procsr(sr) {
 }
 
 function api_updfkey(h) {
+    // deprecated
+    if (mega.keyMgr.secure) {
+        return;
+    }
+
     if (typeof h === 'string') {
         M.getNodes(h, true).always(api_updfkeysync);
     }
@@ -3045,13 +3155,18 @@ function api_updfkey(h) {
     }
 }
 function api_updfkeysync(sn) {
-    var nk     = [];
+    // deprecated
+    if (mega.keyMgr.secure) {
+        return;
+    }
+
+    var nk = [];
 
     if (d) {
         console.debug('api_updfkey', sn);
     }
 
-    for (var i = sn.length; i--; ) {
+    for (var i = sn.length; i--;) {
         var h = sn[i];
         if (M.d[h].u != u_handle && crypto_keyok(M.d[h])) {
             nk.push(h, a32_to_base64(encrypt_key(u_k_aes, M.d[h].k)));
@@ -3073,14 +3188,24 @@ var rsa2aes = Object.create(null);
 
 // check for an RSA node key: need to rewrite to AES for faster subsequent loading.
 function crypto_rsacheck(n) {
+    // deprecated
+    if (mega.keyMgr.secure) {
+        return;
+    }
+
     if (typeof n.k == 'string'   // must be undecrypted
-     && (n.k.indexOf('/') > 55   // must be longer than userhandle (11) + ':' (1) + filekey (43)
-     || (n.k.length > 55 && n.k.indexOf('/') < 0))) {
+        && (n.k.indexOf('/') > 55   // must be longer than userhandle (11) + ':' (1) + filekey (43)
+            || (n.k.length > 55 && n.k.indexOf('/') < 0))) {
         rsa2aes[n.h] = true;
     }
 }
 
 function crypto_node_rsa2aes() {
+    // deprecated
+    if (mega.keyMgr.secure) {
+        return;
+    }
+
     var nk = [];
 
     for (h in rsa2aes) {
@@ -3176,6 +3301,13 @@ async function crypto_reqmissingkeys() {
         return;
     }
 
+    if (mega.keyMgr.secure) {
+        if (d) {
+            console.warn('New missing keys', missingkeys);
+        }
+        return;
+    }
+
     const cr = [[], [], []];
     const nodes = Object.create(null);
     const shares = Object.create(null);
@@ -3237,16 +3369,20 @@ async function crypto_reqmissingkeys() {
 
 // populate from IndexedDB's mk table
 function crypto_missingkeysfromdb(r) {
-    // FIXME: remove the following line
-    if (!r.length || !r[0].s) return;
+    'use strict';
 
-    for (var i = r.length; i--; ) {
+    // FIXME: remove the following line
+    if (!r.length || !r[0].s) {
+        return;
+    }
+
+    for (var i = r.length; i--;) {
         if (!missingkeys[r[i].h]) {
             missingkeys[r[i].h] = Object.create(null);
         }
 
         if (r[i].s) {
-            for (var j = r[i].s.length; j--; ) {
+            for (var j = r[i].s.length; j--;) {
                 missingkeys[r[i].h][r[i].s[j]] = true;
                 if (!sharemissing[r[i].s[j]]) {
                     sharemissing[r[i].s[j]] = Object.create(null);
@@ -3258,8 +3394,12 @@ function crypto_missingkeysfromdb(r) {
 }
 
 function crypto_keyfixed(h) {
+    'use strict';
+
     // no longer missing from the shares it was in
-    for (var sh in missingkeys[h]) delete sharemissing[sh][h];
+    for (const sh in missingkeys[h]) {
+        delete sharemissing[sh][h];
+    }
 
     // no longer missing
     delete missingkeys[h];
@@ -3273,6 +3413,8 @@ function crypto_keyfixed(h) {
 // upon receipt of a new u_sharekey, call this with sharemissing[sharehandle].
 // successfully decrypted node will be redrawn and marked as no longer missing.
 function crypto_fixmissingkeys(hs) {
+    'use strict';
+
     if (hs) {
         for (var h in hs) {
             var n = M.d[h];
@@ -3291,16 +3433,26 @@ function crypto_fixmissingkeys(hs) {
 
 // set a newly received sharekey - apply to relevant missing key nodes, if any.
 // also, update M.c.shares/FMDB.s if the sharekey was not previously known.
-function crypto_setsharekey(h, k, ignoreDB) {
-    u_sharekeys[h] = [k, new sjcl.cipher.aes(k)];
-    if (sharemissing[h]) crypto_fixmissingkeys(sharemissing[h]);
+function crypto_setsharekey(h, k, ignoreDB, fromKeyMgr) {
+    'use strict';
+    assert(crypto_setsharekey2(h, k), 'Invalid setShareKey() invocation...');
+
+    if (!fromKeyMgr) {
+        mega.keyMgr.createShare(h, k, true).catch(dump);
+    }
+
+    if (sharemissing[h]) {
+        crypto_fixmissingkeys(sharemissing[h]);
+    }
 
     if (M.c.shares[h] && !M.c.shares[h].sk) {
         M.c.shares[h].sk = a32_to_base64(k);
 
         if (fmdb && !ignoreDB) {
-            fmdb.add('s', { o_t: M.c.shares[h].su + '*' + h,
-                            d: M.c.shares[h] });
+            fmdb.add('s', {
+                o_t: M.c.shares[h].su + '*' + h,
+                d: M.c.shares[h]
+            });
         }
     }
 }
@@ -3330,6 +3482,11 @@ function crypto_proccr(cr) {
 
 // process incoming missing key cr and respond with the missing keys
 function crypto_procmcr(mcr) {
+    // deprecated
+    if (mega.keyMgr.secure) {
+        return;
+    }
+
     var i;
     var si = {},
         ni = {};
@@ -3368,6 +3525,11 @@ function crypto_procmcr(mcr) {
 var rsasharekeys = Object.create(null);
 
 function crypto_share_rsa2aes() {
+    // deprecated
+    if (mega.keyMgr.secure) {
+        return;
+    }
+
     var rsr = [],
         h;
 

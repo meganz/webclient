@@ -34,6 +34,7 @@ MegaData.prototype.openSharingDialog = function() {
     if (u_type === 0) {
         return ephemeralDialog(l[1006]);
     }
+
     var $dialog = $('.mega-dialog.share-dialog');
 
     $('.fm-dialog-overlay').rebind('click.closeShareDLG', function() {
@@ -117,14 +118,18 @@ MegaData.prototype.openSharingDialog = function() {
         return $dialog;
     };
 
+    const fire = () => {
+        mega.keyMgr.setShareSnapshot(targetHandle)
+            .then(() => M.safeShowDialog('share', showShareDlg))
+            .catch(dump);
+    };
+
     var mdList = mega.megadrop.isDropExist($.selected);
     if (mdList.length) {
-        mega.megadrop.showRemoveWarning(mdList).done(function() {
-            M.safeShowDialog('share', showShareDlg);
-        });
+        mega.megadrop.showRemoveWarning(mdList).then(fire).catch(nop);
     }
     else {
-        M.safeShowDialog('share', showShareDlg);
+        fire();
     }
 };
 

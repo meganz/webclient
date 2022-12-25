@@ -17,7 +17,7 @@ if (typeof importScripts !== 'undefined') {
 
     let jobs;
     // eslint-disable-next-line strict
-    const init = ({d: debug, allowNullKeys} = false) => {
+    const init = ({d: debug, allowNullKeys, secureKeyMgr} = false) => {
 
         jobs = 0;
         d = !!debug;
@@ -27,6 +27,11 @@ if (typeof importScripts !== 'undefined') {
         // Set global to allow all-0 keys to be used (for those users that set localStorage flag)
         if (allowNullKeys) {
             self.allowNullKeys = allowNullKeys;
+        }
+
+        if (secureKeyMgr) {
+            // Inherits from parent 'mega.keyMgr.secure && mega.keyMgr.generation'
+            self.secureKeyMgr = secureKeyMgr;
         }
     };
 
@@ -45,9 +50,8 @@ if (typeof importScripts !== 'undefined') {
                 if (k === false) {
                     console.warn(`Failed to decrypt RSA share key for ${req.n}: ${req.k}`);
                 }
-                else {
+                else if (crypto_setsharekey2(req.n, k)) {
                     req.k = k;
-                    u_sharekeys[req.n] = [k, new sjcl.cipher.aes(k)];
                 }
             }
             self.postMessage(req);
@@ -59,18 +63,19 @@ if (typeof importScripts !== 'undefined') {
         }
         else if (req.sk) {
             // existing sharekey
-            u_sharekeys[req.h] = [req.sk, new sjcl.cipher.aes(req.sk)];
+            crypto_setsharekey2(req.h, req.sk);
         }
         else if (req.ha) {
             // ownerkey (ok element)
+            let ok = false;
             if (crypto_handleauthcheck(req.h, req.ha)) {
                 if (d) {
                     console.log("Successfully decrypted sharekeys for " + req.h);
                 }
                 const key = decrypt_key(u_k_aes, base64_to_a32(req.k));
-                u_sharekeys[req.h] = [key, new sjcl.cipher.aes(key)];
+                ok = crypto_setsharekey2(req.h, key);
             }
-            else if (d) {
+            if (!ok && d) {
                 console.warn("handleauthcheck failed for " + req.h);
             }
         }
@@ -88,7 +93,15 @@ if (typeof importScripts !== 'undefined') {
             init(req);
 
             const key = base64_to_a32(req.pfkey);
-            u_sharekeys[req.n_h] = [key, new sjcl.cipher.aes(key)];
+            crypto_setsharekey2(req.n_h, key);
+        }
+        else if (req.assign) {
+            delete req.assign;
+            Object.assign(self, req);
+
+            if (d) {
+                console.debug('dec.worker: assign request.', JSON.stringify(req));
+            }
         }
         else {
             // unfortunately, we have to discard the SJCL AES cipher
@@ -136,7 +149,24 @@ if (typeof importScripts !== 'undefined') {
     };
 }
 
+function crypto_setsharekey2(h, sk) {
+    'use strict';
+
+    const key = tryCatch(() => new sjcl.cipher.aes(sk))();
+    if (key) {
+        u_sharekeys[h] = [sk, key];
+        return true;
+    }
+
+    console.warn(`Received invalid share key for ${h}`, typeof sk, sk && sk.length);
+    return false;
+}
+
 function crypto_process_sharekey(handle, key) {
+    if (self.secureKeyMgr) {
+        return false;
+    }
+
     if (key.length > 43) {
         key = base64urldecode(key);
         var k = crypto_rsadecrypt(key, u_privk);

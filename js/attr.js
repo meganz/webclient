@@ -1159,12 +1159,25 @@
                 console.warn('uaPacketParser: Unknown user %s handling first/lastname', userHandle);
             }
         };
-        uaPacketParserHandler['lastname']    = uaPacketParserHandler['firstname'];
-        uaPacketParserHandler['+a']          = function(userHandle) { M.avatars(userHandle); };
-        uaPacketParserHandler['*!authring']  = function() { authring.getContacts('Ed25519'); };
-        uaPacketParserHandler['*!authRSA']   = function() { authring.getContacts('RSA'); };
-        uaPacketParserHandler['*!authCu255'] = function() { authring.getContacts('Cu25519'); };
-        uaPacketParserHandler['+puEd255']    = function(userHandle) {
+        uaPacketParserHandler.lastname = uaPacketParserHandler.firstname;
+
+        uaPacketParserHandler['+a'] = function(userHandle) {
+            M.avatars(userHandle);
+        };
+        uaPacketParserHandler['*!authring'] = function() {
+            if (!mega.keyMgr.generation) {
+                authring.getContacts('Ed25519');
+            }
+        };
+        uaPacketParserHandler['*!authRSA'] = function() {
+            authring.getContacts('RSA');
+        };
+        uaPacketParserHandler['*!authCu255'] = function() {
+            if (!mega.keyMgr.generation) {
+                authring.getContacts('Cu25519');
+            }
+        };
+        uaPacketParserHandler['+puEd255'] = function(userHandle) {
             // pubEd25519 key was updated! force fingerprint regen.
             delete pubEd25519[userHandle];
             crypt.getPubEd25519(userHandle);
@@ -1332,6 +1345,19 @@
                     M.BackupsId = base64urlencode(u_attr[ctx.ua]);
                 }
             });
+        };
+
+        uaPacketParserHandler['^!keys'] = (userHandle) => {
+            if (d) {
+                console.log(`*** KEYS UPDATED for ${userHandle}`);
+            }
+
+            if (userHandle === u_handle && 'keyMgr' in mega) {
+                mega.keyMgr.fetchKeyStore()
+                    .catch((ex) => {
+                        console.error('key-manager error', ex);
+                    });
+            }
         };
 
         if (d) {

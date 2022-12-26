@@ -258,6 +258,13 @@ function u_checklogin3a(res, ctx) {
                     // Nothing to do here.
                     return;
                 }
+                if (mega.keyMgr.version > 0) {
+                    if (d) {
+                        console.warn('Key Manager already initialized, moving on.');
+                    }
+                    console.assert(window.u_checked, 'Unexpected KeyMgr state...', mega.keyMgr.generation);
+                    return;
+                }
                 const keys = u_attr['^!keys'];
 
                 // We've got keys?
@@ -299,7 +306,11 @@ function u_checklogin3a(res, ctx) {
                 // This catch handler is meant to be reached on critical
                 // failures only, such as errors coming from the Key manager.
                 setTimeout(() => siteLoadError(ex, 'logon'), 2e3);
-                eventlog(99810, JSON.stringify([1, String(ex).trim().split('\n')[0]]));
+                eventlog(99810, JSON.stringify([
+                    2,
+                    String(ex).trim().split('\n')[0],
+                    String(ex && ex.stack).trim().replace(/\s+/g, ' ').substr(0, 512)
+                ]));
             });
     }
 }

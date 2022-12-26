@@ -1884,9 +1884,13 @@ function api_setshare1(ctx, params) {
 
     const users = new Set();
     for (i = ctx.targets.length; i--;) {
-        const {u} = ctx.targets[i];
+        let {u} = ctx.targets[i];
 
         if (u && u !== 'EXP') {
+            if (M.opc[u]) {
+                console.error('Check this, got an outgoing pending contact...', u, M.opc[u]);
+                u = M.opc[u].m;
+            }
             users.add(u);
         }
     }
@@ -1895,8 +1899,7 @@ function api_setshare1(ctx, params) {
         if (typeof req.s[i].r !== 'undefined') {
             // @todo if (mega.keyMgr.isTrusted(ctx.node)) {
             if (mega.keyMgr.secure) {
-                // FIXME: only send cr element for new shares even if .secure is set
-                newkey = true;
+                newkey = mega.keyMgr.hasNewShareKey(ctx.node);
                 // dummy key/handleauth - FIXME: remove
                 req.ok = a32_to_base64([0, 0, 0, 0]);
                 req.ha = a32_to_base64([0, 0, 0, 0]);
@@ -1905,7 +1908,7 @@ function api_setshare1(ctx, params) {
             if (!req.ok) {
                 if (u_sharekeys[ctx.node]) {
                     sharekey = u_sharekeys[ctx.node][0];
-                    newkey = !!mega.keyMgr.createdsharekey[ctx.node];
+                    newkey = mega.keyMgr.hasNewShareKey(ctx.node);
                 }
                 else {
                     // we only need to generate a key if one or more shares are being added to a previously unshared node

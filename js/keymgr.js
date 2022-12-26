@@ -9,6 +9,7 @@ lazy(mega, 'keyMgr', () => {
         configurable: true
     });
     const logger = new MegaLogger('KeyMgr');
+    const dump = logger.warn.bind(logger, 'Caught Promise Rejection');
 
     const expungePendingOutShares = (u8, nodes, users = false, emails = false) => {
         const sub = $.len(users) || $.len(emails);
@@ -66,11 +67,11 @@ lazy(mega, 'keyMgr', () => {
             // deserialised sharekeys are known to be in ^!keys
             this.deserialisedsharekeys = Object.create(null);
 
+            // in-session freshly created share-keys
+            this.createdsharekey = Object.create(null);
+
             // feature flag: enable with the blog post going live
             this.secure = false;
-
-            // remove this once secure=true
-            this.createdsharekey = Object.create(null);
 
             /** @property KeyMgr.ph -- Protocol Handler instance */
             lazy(this, 'ph', () => {
@@ -593,7 +594,7 @@ lazy(mega, 'keyMgr', () => {
             const res = await crypto.subtle.decrypt(algo, this.gcmkey, this.str2u8(s.substr(14)))
                 .catch((ex) => {
                     logger.error(ex);
-                    throw new SecurityError('Your key repository cannot be read. Please try again later.');
+                    throw new SecurityError(`Your key repository cannot be read (${s.length}) Please try again later.`);
                 });
 
             if (!this.unserialise(new Uint8Array(res))) {
@@ -606,18 +607,20 @@ lazy(mega, 'keyMgr', () => {
             console.assert(this.generation > 0, `Unexpected generation... ${this.generation}`, typeof this.generation);
 
             if (this.generation) {
-                const lastKnown = await this.getGeneration();
+                const lastKnown = await this.getGeneration().catch(dump);
 
                 if (lastKnown && this.generation < lastKnown) {
                     logger.warn('downgrade attack', lastKnown, this.generation);
                     eventlog(99812, JSON.stringify([1, this.generation, lastKnown]));
 
+                    /**
                     msgDialog('warninga', l[135], `
                       A downgrade attack has been detected. Removed shares may have reappeared. Please tread carefully.
                     `);
+                     /**/
                 }
                 else if (this.generation > lastKnown) {
-                    return this.setGeneration(this.generation);
+                    return this.setGeneration(this.generation).catch(dump);
                 }
             }
             /** @returns void */
@@ -625,14 +628,19 @@ lazy(mega, 'keyMgr', () => {
 
         // newest known generation persistence.
         async setGeneration(generation) {
-            await M.setPersistentData(`keysgen_${u_handle}`, generation);
+            const key = `keysgen_${u_handle}`;
+
+            tryCatch(() => localStorage.setItem(key, generation))();
+            await M.setPersistentData(key, generation).catch(dump);
             /** @returns void */
         }
 
         async getGeneration() {
-            let value;
+            const key = `keysgen_${u_handle}`;
+            let value = tryCatch(() => localStorage.getItem(key))();
+
             if (typeof M.getPersistentData === 'function') {
-                value = await M.getPersistentData(`keysgen_${u_handle}`).catch(nop);
+                value = await M.getPersistentData(key).catch(nop) || value;
             }
             return value || false;
         }
@@ -666,7 +674,7 @@ lazy(mega, 'keyMgr', () => {
                     logger.error(ex);
                     logger.error(ex);
                     logger.error(ex);
-                    eventlog(99813, JSON.stringify([1, String(ex).trim().split('\n')[0]]));
+                    eventlog(99813, JSON.stringify([2, String(ex).trim().split('\n')[0]]));
                 })
                 .finally(() => {
                     this.resolveCommitFetchPromises(false);
@@ -721,6 +729,13 @@ lazy(mega, 'keyMgr', () => {
                     if (cmds) {
                         api_req(cmds, ctx);
                     }
+                    if (result === this.prevkeys) {
+                        if (d) {
+                            logger.warn('The ^!keys store did not changed, not committing.');
+                        }
+                        this.generation--;
+                        return;
+                    }
                     this.prevkeys = result;
 
                     // FIXME: link cmds and mega.attr.set cmd in bc mode -- @todo api3
@@ -729,21 +744,28 @@ lazy(mega, 'keyMgr', () => {
                     );
                 })
                 .then((result) => {
-                    if (d) {
-                        logger.log(`new generation ${generation}`, result);
+
+                    if (generation === this.generation) {
+                        if (d) {
+                            logger.log(`new generation ${generation}`, result);
+                        }
+                        return this.setGeneration(generation).catch(dump);
                     }
+                })
+                .then(() => {
+                    // nb: pretending an update even on 'prevkeys'-match
                     this.resolveCommitFetchPromises(true);
-                    this.setGeneration(generation).catch(dump);
                 })
                 .catch((ex) => {
                     if (d) {
                         logger.error('*** FAIL', ex);
                     }
+                    this.generation--;
 
                     if (ex === EEXPIRED) {
                         // @todo FIXME: handle versioning clash
                         logger.error("Versioning clash -- FIXME.");
-                        eventlog(99814);
+                        eventlog(99814, true);
                     }
 
                     tSleep(2 + -Math.log(Math.random()) * 4)
@@ -764,6 +786,10 @@ lazy(mega, 'keyMgr', () => {
 
             const fp = this.fetchPromise;
             this.fetchPromise = false;
+
+            if (d) {
+                logger.warn('Resolving promises...', r, p, rp, fp);
+            }
 
             if (p) {
                 p.resolve(r);
@@ -1015,6 +1041,15 @@ lazy(mega, 'keyMgr', () => {
             return this.secure;
         }
 
+        // meant to append cr-element only once during share
+        hasNewShareKey(node) {
+            if (this.createdsharekey[node]) {
+                this.createdsharekey[node] = false;
+                return true;
+            }
+            return false;
+        }
+
         // creates a sharekey for a node and sends the subtree's shareufskeys to the API
         // FIXME: (this must be called right before opening the share dialog
         //         to prevent the API from clandestinely adding nodes later)
@@ -1044,13 +1079,7 @@ lazy(mega, 'keyMgr', () => {
                 // approach changing
                 if (!u_sharekeys[node]) {
                     crypto_setsharekey2(node, sharekey);
-
-                    if (this.secure) {
-                        console.error('Remove this.');
-                    }
-                    else {
-                        this.createdsharekey[node] = true;
-                    }
+                    this.createdsharekey[node] = true;
                 }
 
                 // also, authorise this sharekey to be targeted by active backups and uploads
@@ -1258,16 +1287,18 @@ lazy(mega, 'keyMgr', () => {
                     }
                 }
 
+                let changed = false;
+
                 // and then replace the permitted backup sharekeys
                 for (const backupid in this.backups) {
                     // FIXME: detect changes
-                    this.backups[backupid][1] = this.getShareNodesSync(this.backups[backupid][0]);
+                    changed |= this.setRefShareNodes(this.backups[backupid]);
                 }
 
                 // also replace permitted upload sharekeys
                 for (const uploadid in this.uploads) {
                     // FIXME: detect changes
-                    this.uploads[uploadid][1] = this.getShareNodesSync(this.uploads[uploadid][0]);
+                    this.setRefShareNodes(this.uploads[uploadid]);
                 }
 
                 // undo speculative instant completion
@@ -1284,28 +1315,24 @@ lazy(mega, 'keyMgr', () => {
                         delete cmds[i].pp;
                     }
                 }
+                if (!changed) {
+                    api_req(cmds, ctx);
+                    return;
+                }
             } while (!await this.commit(cmds, ctx));
         }
 
         // this replaces MegaData.getShareNodesSync
         // if a backupid or an uploadid are supplied, only authorised share nodes are returned
-        getShareNodesSync(h, root, backupid, uploadid) {
-            if (this.generation) {
-                if (backupid) {
-                    return this.backups[backupid] ? this.backups[backupid][1] : [];
-                }
+        setRefShareNodes(sn, root) {
+            const sh = [];
+            const [h, a] = sn;
+            const ss = a.join(',');
 
-                if (uploadid) {
-                    return this.uploads[uploadid] ? this.uploads[uploadid][1] : [];
-                }
-            }
-
-            const sn = [];
             let n = M.d[h];
-
             while (n && n.p) {
                 if (u_sharekeys[n.h]) {
-                    sn.push(n.h);
+                    sh.push(n.h);
                 }
                 n = M.d[n.p];
             }
@@ -1314,12 +1341,14 @@ lazy(mega, 'keyMgr', () => {
                 root.handle = n && n.h;
             }
 
-            return sn;
+            sn[1] = sh;
+            return sh.join(',') !== ss;
         }
 
         // record share situation at the beginning of an ordinary (non-backup) upload
         snapshotUploadShares(uploadid, target) {
-            this.uploads[uploadid] = [target, this.getShareNodesSync(target)];
+            // @todo fixme
+            // this.uploads[uploadid] = [target, this.setRefShareNodes(target)];
         }
 
         // returns a data structure with all incomplete shares [[out],[in]]
@@ -1379,7 +1408,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             .catch((ex) => {
                 // @todo handle..
                 console.error('key-manager error', ex);
-                eventlog(99811, JSON.stringify([1, String(ex).trim().split('\n')[0]]));
+                eventlog(99811, JSON.stringify([2, String(ex).trim().split('\n')[0]]));
             });
     }
 

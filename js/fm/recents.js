@@ -136,8 +136,10 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
         this._dynamicList.resume();
     }
 
-    selectionManager.clear_selection();
-    this.clearSelected();
+    if (!$.dialog) {
+        selectionManager.clear_selection();
+        this.clearSelected();
+    }
 
     M.getRecentActionsList(this.currentLimit, this.currentUntil).then(function(actions) {
         self.getMaxFitOnScreen(true);

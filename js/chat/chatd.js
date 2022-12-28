@@ -161,6 +161,7 @@ Chatd.Opcode = {
     'CALLSTATE': 53,
     'CALLEND': 54,
     'DELCALLREASON': 55,
+    'CALLREJECT': 58
 };
 
 // privilege levels
@@ -703,7 +704,10 @@ Chatd.Shard.prototype.sendIdentity = function() {
     assert(this.chatd.identity);
     this.cmd(Chatd.Opcode.CLIENTID, this.chatd.identity, true);
 };
-
+Chatd.Shard.prototype.sendCallReject = function(chatId, callId) {
+    'use strict';
+    this.cmd(Chatd.Opcode.CALLREJECT, chatId + callId, true);
+};
 Chatd.clientIdToString = function(data, offset) {
     return '0x' + Chatd.dumpToHex(data, offset ? offset : 0, 4, true);
 };
@@ -884,15 +888,16 @@ Chatd.cmdToString = function(cmd, tx) {
                 var parsed = strongvelope._parseMessageContent(cmd.substr(39));
                 result += " mgmt-type: " + constStateToText(strongvelope.MESSAGE_TYPES, parsed.type);
                 switch (parsed.type) {
-                    case strongvelope.MESSAGE_TYPES.CALL_END:
+                    case strongvelope.MESSAGE_TYPES.CALL_END: {
                         // call-end management message format is:
                         // callId.8 endCallReason.1 callDuration.4
-                        var callId = base64urlencode(parsed.payload.substr(0, 8));
+                        const callId = base64urlencode(parsed.payload.substr(0, 8));
                         result += " callId: " + callId;
                         var reason = parsed.payload.charCodeAt(8);
                         result += " callend-type: " + constStateToText(CallManager2.CALL_END_REMOTE_REASON, reason) +
                             " dur: " + Chatd.unpack32le(parsed.payload.substr(9, 4));
                         break;
+                    }
                 }
             } else {
                 var updated = Chatd.unpack16le(cmd.substr(29, 2));
@@ -1004,7 +1009,12 @@ Chatd.cmdToString = function(cmd, tx) {
             var ts2 = Chatd.unpack32le(cmd.substr(17, 4));
             result += " msgxid: " + msgxid2 + " msgId: " + msgId2 + " ts: " + ts2;
             return [result, 21];
-
+        case Chatd.Opcode.CALLREJECT: {
+            chatId = base64urlencode(cmd.substr(1, 8));
+            const callId = base64urlencode(cmd.substr(9, 8));
+            result += ` chatId: ${chatId} callId: ${callId}`;
+            return [result, 17];
+        }
         default:
             if (cmd.length > 64) {
                 result += ' ' + Chatd.dumpToHex(cmd, 1, 64) + '...';

@@ -787,7 +787,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'ad9b9c3871';
+const COMMIT_ID = '856f01ef39';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -2704,8 +2704,7 @@ class VideoSlot extends Slot {
         for (let player of this.players) {
             player._onTrackGone(this);
         }
-        if (this.players.size)
-            debugger;
+        client_assert(this.players.size === 0);
     }
     _onDetachedFromPlayer(player) {
         if (!this.players.has(player)) {
@@ -2777,7 +2776,6 @@ class VideoPlayer {
     }
     destroy() {
         this._detachFromCurrentTrack();
-        delete this.player;
         this.gui.onDestroy();
         this.isDestroyed = true;
     }
@@ -2803,42 +2801,11 @@ class HiResPlayer extends VideoPlayer {
         this.resDivider = resDivider || 0;
         peer.hiResPlayer = this;
     }
-    attachToVThumbTrack(slot) {
-        client_assert(slot);
-        client_assert(!this.vThumbSlot);
-        this.vThumbSlot = slot;
-        slot._onAttachedToPlayer(this);
-        this.vThumbPlayer = document.createElement("video");
-        this.gui.vThumbAttachToTrack(slot.inTrack);
-    }
-    detachFromVthumbTrack() {
-        if (!this.vThumbSlot) {
-            return;
-        }
-        this.vThumbSlot._onDetachedFromPlayer(this);
-        this._onVthumbTrackGone();
-    }
-    _onTrackGone(slot) {
-        if (slot === this.vThumbSlot) {
-            this._onVthumbTrackGone();
-        }
-        else {
-            super._onTrackGone(slot);
-        }
-    }
-    _onVthumbTrackGone() {
-        client_assert(this.vThumbPlayer);
-        playerStop(this.vThumbPlayer);
-        delete this.vThumbSlot;
-        this.gui.vThumbDetachFromTrack();
-        delete this.vThumbPlayer;
-    }
     destroy() {
         if (this.isDestroyed) {
             console.warn("HiResPlayer.destroy: already destroyed");
             return;
         }
-        this.detachFromVthumbTrack();
         super.destroy();
         client_assert(this.peer.hiResPlayer === this);
         this.peer.onHiResPlayerDestroy();
@@ -2962,6 +2929,9 @@ class Peer {
     get hasThumbnailVideo() { return this.vThumbPlayer != null; }
     get hasHiresVideo() { return this.hiResPlayer != null; }
     requestThumbnailVideo() {
+        if (this.isLeaving) {
+            return null;
+        }
         if (this.vThumbPlayer) {
             console.warn("Peer.requestThumbnailVideo: Already requested (player exists)");
             return this.vThumbPlayer.gui;
@@ -2971,6 +2941,9 @@ class Peer {
         return player.gui;
     }
     requestHiResVideo(resDivider, reuseVthumb) {
+        if (this.isLeaving) {
+            return null;
+        }
         let player = this.hiResPlayer;
         if (player) {
             if (player.resDivider != resDivider) {
@@ -3080,23 +3053,6 @@ class Peer {
         }
     }
     handleSpecialCases() {
-        if (this.sendsCameraAndScreen()) {
-            if (this.hiResPlayer && this.vThumbSlot && !this.hiResPlayer.vThumbSlot) {
-                this.hiResPlayer.attachToVThumbTrack(this.vThumbSlot);
-            }
-        }
-        else {
-            if (this.hiResPlayer && this.hiResPlayer.vThumbPlayer) {
-                // peer doesn't send cam + screen, but we have a vthumb in the hi-res player, remove it
-                this.hiResPlayer.detachFromVthumbTrack();
-            }
-            /*
-            // disable because we may want hi and low res tracks at the same time (during resolution switching)
-            if (this.vThumbPlayer && this.hiResSlot && this.vThumbPlayer.slot !== this.hiResSlot) {
-                this.vThumbPlayer.attachToTrack(this.hiResSlot);
-            }
-            */
-        }
     }
     sendsCameraAndScreen() {
         return Av.hasCamAndScreen(this.av);

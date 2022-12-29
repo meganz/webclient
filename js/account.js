@@ -258,6 +258,9 @@ function u_checklogin3a(res, ctx) {
                     // Nothing to do here.
                     return;
                 }
+                const keys = u_attr['^!keys'];
+                delete u_attr['^!keys'];
+
                 if (mega.keyMgr.version > 0) {
                     if (d) {
                         console.warn('Key Manager already initialized, moving on.');
@@ -265,11 +268,9 @@ function u_checklogin3a(res, ctx) {
                     console.assert(window.u_checked, 'Unexpected KeyMgr state...', mega.keyMgr.generation);
                     return;
                 }
-                const keys = u_attr['^!keys'];
 
                 // We've got keys?
                 if (keys) {
-                    delete u_attr['^!keys'];
                     return mega.keyMgr.initKeyManagement(keys);
                 }
 
@@ -292,6 +293,11 @@ function u_checklogin3a(res, ctx) {
                 // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
                 // will fail.
                 if (r > 2 && !is_embed) {
+                    const {handle} = mBroadcaster.crossTab;
+
+                    console.assert(!handle, 'FIXME: cross-tab already initialized.', handle, u_handle);
+                    console.assert(!handle || handle === u_handle, 'Unmatched cross-tab handle', handle, u_handle);
+
                     mBroadcaster.crossTab.initialize(() => ctx.checkloginresult(ctx, r));
                 }
                 else if ($.createanonuser === u_attr.u) {
@@ -307,7 +313,7 @@ function u_checklogin3a(res, ctx) {
                 // failures only, such as errors coming from the Key manager.
                 setTimeout(() => siteLoadError(ex, 'logon'), 2e3);
                 eventlog(99810, JSON.stringify([
-                    2,
+                    3,
                     String(ex).trim().split('\n')[0],
                     String(ex && ex.stack).trim().replace(/\s+/g, ' ').substr(0, 512)
                 ]));

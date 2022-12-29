@@ -8,7 +8,7 @@ lazy(mega, 'keyMgr', () => {
         },
         configurable: true
     });
-    const logger = new MegaLogger('KeyMgr');
+    const logger = MegaLogger.getLogger('KeyMgr');
     const dump = logger.warn.bind(logger, 'Caught Promise Rejection');
 
     const expungePendingOutShares = (u8, nodes, users = false, emails = false) => {
@@ -69,6 +69,9 @@ lazy(mega, 'keyMgr', () => {
 
             // in-session freshly created share-keys
             this.createdsharekey = Object.create(null);
+
+            // a commit() attempt was unsuccessful due to incomplete state
+            this.pendingcommit = null;
 
             // feature flag: enable with the blog post going live
             this.secure = false;
@@ -607,11 +610,11 @@ lazy(mega, 'keyMgr', () => {
             console.assert(this.generation > 0, `Unexpected generation... ${this.generation}`, typeof this.generation);
 
             if (this.generation) {
-                const lastKnown = await this.getGeneration().catch(dump);
+                const lastKnown = parseInt(await this.getGeneration().catch(dump));
 
                 if (lastKnown && this.generation < lastKnown) {
                     logger.warn('downgrade attack', lastKnown, this.generation);
-                    eventlog(99812, JSON.stringify([1, this.generation, lastKnown]));
+                    eventlog(99812, JSON.stringify([2, this.generation, lastKnown]));
 
                     /**
                     msgDialog('warninga', l[135], `
@@ -619,7 +622,7 @@ lazy(mega, 'keyMgr', () => {
                     `);
                      /**/
                 }
-                else if (this.generation > lastKnown) {
+                else if (!lastKnown || this.generation > lastKnown) {
                     return this.setGeneration(this.generation).catch(dump);
                 }
             }
@@ -630,19 +633,28 @@ lazy(mega, 'keyMgr', () => {
         async setGeneration(generation) {
             const key = `keysgen_${u_handle}`;
 
+            // @todo remove localStorage usage and fix setPersistentData()'s fallback to it..
+
             tryCatch(() => localStorage.setItem(key, generation))();
             await M.setPersistentData(key, generation).catch(dump);
             /** @returns void */
         }
 
         async getGeneration() {
+            const {u_type, u_handle} = window;
+
+            console.assert(
+                (u_type === undefined || u_type > 0) && String(u_handle).length === 11,
+                'check this..', u_type, u_handle
+            );
             const key = `keysgen_${u_handle}`;
             let value = tryCatch(() => localStorage.getItem(key))();
 
             if (typeof M.getPersistentData === 'function') {
                 value = await M.getPersistentData(key).catch(nop) || value;
             }
-            return value || false;
+
+            return parseInt(value) || false;
         }
 
         // fetch current state from versioned user variable ^!keys
@@ -664,8 +676,16 @@ lazy(mega, 'keyMgr', () => {
             // @todo use mutex/web-lock (?)
             this.fetchPromise = mega.promise;
 
+            // xxx: The ua-packet-parser *should* already take care, but let's ensure it...
+            if (u_attr['^!keys']) {
+                logger.warn('Cleaning ug-provided ^!keys attribute.');
+                delete u_attr['^!keys'];
+            }
+            attribCache.removeItem(`${u_handle}_^!keys`);
+
             Promise.resolve(mega.attr.get(u_handle, 'keys', -2, true))
                 .then((result) => {
+                    assert(typeof result === 'string' && result.length > 0, `KeyMgr: Bogus fetch-result, "${result}"`);
 
                     return this.importKeysContainer(result);
                 })
@@ -674,7 +694,7 @@ lazy(mega, 'keyMgr', () => {
                     logger.error(ex);
                     logger.error(ex);
                     logger.error(ex);
-                    eventlog(99813, JSON.stringify([2, String(ex).trim().split('\n')[0]]));
+                    eventlog(99813, JSON.stringify([3, String(ex).trim().split('\n')[0]]));
                 })
                 .finally(() => {
                     this.resolveCommitFetchPromises(false);
@@ -697,10 +717,11 @@ lazy(mega, 'keyMgr', () => {
                 logger.warn('*** COMMIT', this.commitPromise, this.fetchPromise);
             }
 
-            if (!u_keyring || !u_authring) {
+            if (!u_keyring || !u_privCu25519) {
                 if (d) {
                     logger.warn('*** INCOMPLETE STATE');
                 }
+                this.pendingcommit = true;
                 return true;
             }
 
@@ -729,13 +750,6 @@ lazy(mega, 'keyMgr', () => {
                     if (cmds) {
                         api_req(cmds, ctx);
                     }
-                    if (result === this.prevkeys) {
-                        if (d) {
-                            logger.warn('The ^!keys store did not changed, not committing.');
-                        }
-                        this.generation--;
-                        return;
-                    }
                     this.prevkeys = result;
 
                     // FIXME: link cmds and mega.attr.set cmd in bc mode -- @todo api3
@@ -744,23 +758,23 @@ lazy(mega, 'keyMgr', () => {
                     );
                 })
                 .then((result) => {
+                    assert(generation === this.generation);
 
-                    if (generation === this.generation) {
-                        if (d) {
-                            logger.log(`new generation ${generation}`, result);
-                        }
-                        return this.setGeneration(generation).catch(dump);
+                    if (d) {
+                        logger.log(`new generation ${generation}`, result);
                     }
+                    return this.setGeneration(generation).catch(dump);
                 })
                 .then(() => {
-                    // nb: pretending an update even on 'prevkeys'-match
                     this.resolveCommitFetchPromises(true);
                 })
                 .catch((ex) => {
                     if (d) {
                         logger.error('*** FAIL', ex);
                     }
-                    this.generation--;
+                    if (generation === this.generation) {
+                        this.generation--;
+                    }
 
                     if (ex === EEXPIRED) {
                         // @todo FIXME: handle versioning clash
@@ -768,10 +782,11 @@ lazy(mega, 'keyMgr', () => {
                         eventlog(99814, true);
                     }
 
-                    tSleep(2 + -Math.log(Math.random()) * 4)
+                    tSleep(3 + -Math.log(Math.random()) * 7)
                         .then(() => this.resolveCommitFetchPromises(false));
                 });
 
+            this.pendingcommit = false;
             return this.commitPromise;
         }
 
@@ -933,10 +948,13 @@ lazy(mega, 'keyMgr', () => {
 
             // (new users appearing during the commit attempts will not be cached and have to wait for the next round)
             do {
+                let changed = false;
+
                 for (const node in this.pendinginshares) {
                     if (u_sharekeys[node]) {
                         // already have it
                         delete this.pendinginshares[node];
+                        changed = true;
                     }
                     else {
                         const t = this.pendinginshares[node];
@@ -949,8 +967,16 @@ lazy(mega, 'keyMgr', () => {
                             // decrypted successfully - set key and delete record
                             crypto_setsharekey(node, str_to_a32(sharekey), false, true);
                             delete this.pendinginshares[node];
+                            changed = true;
                         }
                     }
+                }
+
+                if (!changed) {
+                    if (d) {
+                        logger.warn('acceptPendingInShareCacheKeys: Nothing changed.');
+                    }
+                    break;
                 }
             } while (!await this.commit());
         }
@@ -1096,14 +1122,32 @@ lazy(mega, 'keyMgr', () => {
         // delete u_sharekeys[node] and commit the change to ^!keys
         async deleteShares(nodes) {
             do {
+                let changed = false;
+
                 for (let i = nodes.length; i--;) {
-                    delete u_sharekeys[nodes[i]];
-                    delete this.trustedsharekeys[nodes[i]];
-                    delete this.deserialisedsharekeys[nodes[i]];
+                    if (u_sharekeys[nodes[i]]) {
+                        delete u_sharekeys[nodes[i]];
+                        delete this.trustedsharekeys[nodes[i]];
+                        delete this.deserialisedsharekeys[nodes[i]];
+                        changed = true;
+                    }
                 }
 
-                if (this.pendingoutshares.byteLength) {
-                    this.pendingoutshares = expungePendingOutShares(this.pendingoutshares, nodes);
+                const {byteLength} = this.pendingoutshares;
+                if (byteLength) {
+                    const tmp = expungePendingOutShares(this.pendingoutshares, nodes);
+
+                    if (tmp.byteLength !== byteLength) {
+                        this.pendingoutshares = tmp;
+                        changed = true;
+                    }
+                }
+
+                if (!changed) {
+                    if (d) {
+                        logger.warn('deleteShares: Nothing changed.');
+                    }
+                    break;
                 }
             } while (!await this.commit());
         }
@@ -1188,7 +1232,15 @@ lazy(mega, 'keyMgr', () => {
                     }
                 }
 
+                if (t === this.pendingoutshares) {
+                    if (d) {
+                        logger.warn('createPendingOutShares: Nothing changed.');
+                    }
+                    break;
+                }
+
                 this.pendingoutshares = t;
+
             } while (!await this.commit());
         }
 
@@ -1202,7 +1254,17 @@ lazy(mega, 'keyMgr', () => {
             }
 
             do {
-                this.pendingoutshares = expungePendingOutShares(this.pendingoutshares, nodes, nodeusers, nodeemails);
+                const tmp = expungePendingOutShares(this.pendingoutshares, nodes, nodeusers, nodeemails);
+
+                if (tmp.byteLength === this.pendingoutshares.byteLength) {
+                    if (d) {
+                        logger.warn('deletePendingOutShares: Nothing changed.');
+                    }
+                    break;
+                }
+
+                this.pendingoutshares = tmp;
+
             } while (!await this.commit());
         }
 
@@ -1388,13 +1450,30 @@ mBroadcaster.addListener('fm:initialized', () => {
     }
 
     if (u_type > 0) {
+        let state = null;
 
         Promise.all([authring.onAuthringReady('KeyMgr'), mega.keyMgr.getGeneration()])
             .then(([, keyMgrGeneration]) => {
                 const keys = u_attr['^!keys'];
+                const logger = MegaLogger.getLogger('KeyMgr');
 
-                if (!keys && !keyMgrGeneration) {
-                    assert(!mega.keyMgr.generation, `Unexpected ^!keys state...`);
+                state = [
+                    mega.keyMgr.version,
+                    mega.keyMgr.generation,
+                    keyMgrGeneration,
+                    keys ? keys.length : -1
+                ].join(':');
+
+                if (!keyMgrGeneration && mega.keyMgr.version > 0) {
+                    logger.error('Unstable local-storage...', state);
+                    keyMgrGeneration = mega.keyMgr.generation;
+                }
+
+                if (keys) {
+                    assert(!mega.keyMgr.pendingcommit, 'We were about to import keys, but there is a pending commit.');
+                }
+                else if (!keyMgrGeneration) {
+                    assert(!mega.keyMgr.generation, `Unexpected State.`);
                 }
                 assert(window.u_privCu25519 && u_privCu25519.length === 32, 'Caught Invalid Cu25119 Key.');
 
@@ -1404,11 +1483,16 @@ mBroadcaster.addListener('fm:initialized', () => {
                     // Save now complete crypto state to ^!keys
                     return mega.keyMgr.initKeyManagement(keys);
                 }
+                else if (mega.keyMgr.pendingcommit) {
+                    if (d) {
+                        logger.warn('Dispatching pending commit...');
+                    }
+                    return mega.keyMgr.commit();
+                }
             })
             .catch((ex) => {
-                // @todo handle..
-                console.error('key-manager error', ex);
-                eventlog(99811, JSON.stringify([2, String(ex).trim().split('\n')[0]]));
+                console.error(`key-manager error (${state})`, ex);
+                eventlog(99811, JSON.stringify([3, String(ex).trim().split('\n')[0], state]));
             });
     }
 

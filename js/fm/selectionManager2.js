@@ -979,7 +979,11 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             let showGetLink;
             let restrictedFolders = false;
 
-            document.querySelector('.selection-bar-col .sel-notif-size-total').classList.remove('hidden');
+            const spanTotal = document.querySelector('.selection-bar-col .sel-notif-size-total');
+
+            if (spanTotal) {
+                spanTotal.classList.remove('hidden');
+            }
 
             // Set default "Share folder" string
             shareButton.dataset.simpletip = l[5631];

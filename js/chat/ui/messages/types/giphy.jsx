@@ -33,7 +33,7 @@ export default class Giphy extends AbstractGenericMessage {
 
     toggle() {
         const video = this.gifRef.current;
-        video[video.paused ? 'play' : 'pause']();
+        Promise.resolve(video[video.paused ? 'play' : 'pause']()).catch(nop);
     }
 
     getMessageActionButtons() {

@@ -1353,10 +1353,15 @@
             }
 
             if (userHandle === u_handle && 'keyMgr' in mega) {
-                mega.keyMgr.fetchKeyStore()
-                    .catch((ex) => {
-                        console.error('key-manager error', ex);
-                    });
+
+                const shouldLoad = fminitialized || !mega.keyMgr.generation;
+
+                if (shouldLoad) {
+                    mega.keyMgr.fetchKeyStore()
+                        .catch((ex) => {
+                            console.error('key-manager error', ex);
+                        });
+                }
             }
         };
 

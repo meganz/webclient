@@ -108,7 +108,11 @@
         // node deletion traversal
         delNodeIterator.call(this, h, delInShareQ);
 
-        mega.keyMgr.deleteShares(delInShareQ.map(uh => uh.substr(12))).catch(dump);
+        if (delInShareQ.length) {
+            const nodes = delInShareQ.map(uh => uh.substr(12));
+
+            mega.keyMgr.deleteShares(nodes).catch(dump);
+        }
 
         if (fmdb && !ignoreDB) {
             // Perform DB deletions once we got acknowledge from API (action-packets)

@@ -15,7 +15,6 @@ export default class StreamNode extends MegaRenderMixin {
         const { stream, externalVideo } = props;
         if (!externalVideo) {
             this.clonedVideo = document.createElement("video");
-            this.setupVideoElement(this.clonedVideo);
         }
         if (!stream.isFake) {
             stream.registerConsumer(this);
@@ -23,7 +22,8 @@ export default class StreamNode extends MegaRenderMixin {
             if (stream instanceof CallManager2.Peer) {
                 this._streamListener = stream.addChangeListener((peer, data, key) => {
                     // console.warn("change listener");
-                    if (key === "haveScreenshare") {
+                    // force re-request if video stream changed
+                    if (key === "haveScreenshare" || key === "videoMuted" || key === "isOnHold") {
                         this._lastResizeWidth = null;
                     }
                     this.requestVideo();
@@ -33,12 +33,18 @@ export default class StreamNode extends MegaRenderMixin {
     }
 
     requestVideo(forceVisible) {
-        if (this.isComponentVisible() || forceVisible) {
+        const {stream} = this.props;
+        if (stream.isFake || stream.isDestroyed) {
+            return;
+        }
+        if ((stream.isStreaming() || stream.isLocal) && this.isMounted()
+           && (this.isComponentVisible() || forceVisible)) {
             var node = this.findDOMNode();
             this.requestVideoBySize(node.offsetWidth, node.offsetHeight);
         }
         else {
             this.requestVideoBySize(0, 0);
+            this.displayStats(null);
         }
     }
 
@@ -46,6 +52,8 @@ export default class StreamNode extends MegaRenderMixin {
         if (video._snSetup) {
             return; // already done
         }
+        video._snSetup = true;
+
         video.autoplay = true;
         video.controls = false;
         video.muted = true;
@@ -61,46 +69,54 @@ export default class StreamNode extends MegaRenderMixin {
                 this.props.onLoadedData(ev);
             }
         };
-        video._snSetup = true;
     }
-
+    detachVideoElemHandlers() {
+        const video = this.contRef.current?.firstChild;
+        if (!video || !video._snSetup) {
+            return;
+        }
+        video.onloadeddata = null;
+        video.ondblclick = null;
+    }
     updateVideoElem() {
         // console.warn(`updateVideoElem[${this.props.stream.clientId}]`);
-        if (!this.isMounted() || !this.contRef.current) {
+        const vidCont = this.contRef.current;
+        if (!this.isMounted() || !vidCont) {
             // console.warn(`...abort: mounted: ${this.isMounted()}, contRef: ${this.contRef.current}`);
             return;
         }
 
-        const currVideo = this.contRef.current.firstChild; // current video in the DOM
+        const currVideo = vidCont.firstChild; // current video in the DOM
         const { stream, externalVideo } = this.props;
         const { source } = stream;
+        if (!source) {
+            if (currVideo) {
+                vidCont.replaceChildren();
+            }
+            return;
+        }
 
         if (externalVideo) {
             if (currVideo === source) { // That video is in the DOM already, nothing to do
                 return;
             }
-            if (source) {
-                this.setupVideoElement(source);
-                // insert/replace the video in the DOM
-                this.contRef.current.replaceChildren(source);
-            }
-            else {
-                this.contRef.current.replaceChildren();
-            }
+            this.setupVideoElement(source);
+            // insert/replace the video in the DOM
+            vidCont.replaceChildren(source);
         }
-        else {
+        else { // use cloned video
+            const cloned = this.clonedVideo;
             if (!currVideo) {
                 // insert our cloned video in the DOM
-                this.contRef.current.replaceChildren(this.clonedVideo);
-            }
-            if (source) {
-                if (this.clonedVideo.paused || this.clonedVideo.srcObject !== source.srcObject) {
-                    this.clonedVideo.srcObject = source.srcObject;
-                    this.clonedVideo.play().catch(()=>{});
-                }
+                this.setupVideoElement(cloned);
+                vidCont.replaceChildren(cloned);
             }
             else {
-                SfuClient.playerStop(this.clonedVideo);
+                assert(currVideo === this.clonedVideo);
+            }
+            if (cloned.paused || cloned.srcObject !== source.srcObject) {
+                cloned.srcObject = source.srcObject;
+                Promise.resolve(cloned.play()).catch(nop);
             }
         }
     }
@@ -110,7 +126,7 @@ export default class StreamNode extends MegaRenderMixin {
         if (!elem) {
             return;
         }
-        elem.textContent = `${stats} (${this.props.externalVideo ? "ref" : "cloned"})`;
+        elem.textContent = stats ? `${stats} (${this.props.externalVideo ? "ref" : "cloned"})` : "";
     }
 
     componentDidMount() {
@@ -137,18 +153,9 @@ export default class StreamNode extends MegaRenderMixin {
     componentWillUnmount() {
         super.componentWillUnmount();
         const peer = this.props.stream;
+        this.detachVideoElemHandlers();
         if (peer && !peer.isFake) {
-            this.props.stream.deregisterConsumer(this);
-            // prevent hd video removal from the DOM from stopping the video
-            if (this.props.externalVideo && peer.source) { // media html elements stop playing when removed from the DOM
-                const video = peer.source;
-                video.onpause = () => {
-                    if (!video.isDestroyed) {
-                        video.play().catch(()=>{});
-                    }
-                    delete video.onpause;
-                };
-            }
+            peer.deregisterConsumer(this);
         }
         if (this._streamListener) {
             peer.removeChangeListener(this._streamListener);
@@ -158,27 +165,22 @@ export default class StreamNode extends MegaRenderMixin {
             this.props.willUnmount();
         }
     }
-
+    requestVideoQuality(quality) {
+        this.requestedQ = (quality && CallManager2.FORCE_LOWQ) ? 1 : quality;
+        if (!this.props.stream.updateVideoQuality()) {
+            // if recalcCommonVideoQuality() returns true, stream has changed synchronously
+            // and an update was already broadcast
+            this.updateVideoElem();
+        }
+    }
     requestVideoBySize(w) {
-        const { stream } = this.props;
         // console.warn(`requestVideoBySize[${stream.clientId}]: ${w}x${h}(lastw: ${this._lastResizeWidth})`);
-
-        if (stream.isFake) {
-            return;
-        }
-        if (!this.isMounted()) {
-            // console.warn("... abort: not mounted");
-            return;
-        }
-        if (!stream.isLocal && !stream.isStreaming()) {
-            stream.consumerGetVideo(this, CallManager2.CALL_QUALITY.NO_VIDEO);
+        if (w === 0) {
+            this._lastResizeWidth = 0;
+            this.requestVideoQuality(this, CallManager2.VIDEO_QUALITY.NO_VIDEO);
             return;
         }
         if (this.contRef.current) {
-            // if we requested video, but are unable to display it right away, don't prevent
-            // re-requesting it, even with the same size. It makes sense to initiate the
-            // video request even before we are ready to display it, to save some time.
-            // The re-request will use the previous result
             // save some CPU cycles.
             if (this._lastResizeWidth === w) {
                 // console.warn("... abort: same size");
@@ -187,25 +189,25 @@ export default class StreamNode extends MegaRenderMixin {
             this._lastResizeWidth = w;
         }
         else {
+            // if we requested video, but there is no player and we are unable to display it right away, don't prevent
+            // re-requesting it, even with the same size. It makes sense to initiate the video request even before we
+            // are ready to display it, to save some time. The re-request will use the previous result
             this._lastResizeWidth = null;
         }
         let newQ;
         if (w > 400) {
-            newQ = CallManager2.CALL_QUALITY.HIGH;
+            newQ = CallManager2.VIDEO_QUALITY.HIGH;
         }
         else if (w > 200) {
-            newQ = CallManager2.CALL_QUALITY.MEDIUM;
+            newQ = CallManager2.VIDEO_QUALITY.MEDIUM;
         }
         else if (w > 180) {
-            newQ = CallManager2.CALL_QUALITY.LOW;
-        }
-        else if (w === 0) {
-            newQ = CallManager2.CALL_QUALITY.NO_VIDEO;
+            newQ = CallManager2.VIDEO_QUALITY.LOW;
         }
         else {
-            newQ = CallManager2.CALL_QUALITY.THUMB;
+            newQ = CallManager2.VIDEO_QUALITY.THUMB;
         }
-        stream.consumerGetVideo?.(this, newQ);
+        this.requestVideoQuality(newQ);
     }
 
     renderVideoDebugMode() {
@@ -232,10 +234,10 @@ export default class StreamNode extends MegaRenderMixin {
     }
 
     renderContent() {
-        const { stream, isCallOnHold } = this.props;
+        const { stream } = this.props;
         const { loading } = this.state;
 
-        if (stream && (stream.isStreaming && stream.isStreaming()) && !isCallOnHold) {
+        if (stream.isStreaming()) {
             return (
                 <>
                     {loading && (
@@ -248,7 +250,6 @@ export default class StreamNode extends MegaRenderMixin {
                 </>
             );
         }
-
         delete this._lastResizeWidth;
         return <Avatar contact={M.u[stream.userHandle]}/>;
     }

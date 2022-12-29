@@ -12,20 +12,26 @@ class PlayerData {
     }
 
     attachToTrack(track) { // we wait for player to sync and start, so nothing to do here
-        this.video.addEventListener("playing", () => {
-            if (this.onPlay()) {
-                this.appCall.registerPlayer(this);
+        this.appCall.onTrackAllocated(this);
+        this.video.onplaying = () => {
+            // console.warn("onPlaying");
+            if (this.onPlay) {
+                this.onPlay();
             }
+        };
+        this.video.onpause = tryCatch(() => {
+            Promise.resolve(this.video.play()).catch(nop);
+            // console.warn("external video onpause->play");
         });
         SfuClient.playerPlay(this.video, track);
     }
 
     detachFromTrack() {
+        delete this.video.onpause;
         SfuClient.playerStop(this.video);
+        this.appCall.onTrackReleased(this);
     }
-
     onDestroy() {
-        this.app.callManagerCall.deregisterPlayer(this);
     }
 }
 

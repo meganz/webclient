@@ -1,15 +1,13 @@
-// jscs:disable validateIndentation
+/* eslint-disable indent */
 (function(scope) {
     'use strict';
 
-    const FORCE_LOWQ = !!localStorage.forceLowQuality;
-
-    const CALL_QUALITY = {
-        NO_VIDEO: -2,
-        THUMB: -1,
-        LOW: 0,
-        MEDIUM: 1,
-        HIGH: 2
+    const VIDEO_QUALITY = {
+        NO_VIDEO: 0,
+        THUMB: 1,
+        LOW: 2,
+        MEDIUM: 3,
+        HIGH: 4
     };
     const RES_STATE = {
         NO_VIDEO: 0,
@@ -20,6 +18,51 @@
     };
     const DOWNGRADING_QUALITY_INTRVL = 2000;
 
+/**                        ==== Overview of peer & local video rendering ====
+ * The app creates a StreamNode React component for each video it wants to display - for peers, local camera,
+ * thumbnail and large viewports. The StreamNode is passed a "stream" object (implementing an imaginary
+ * StreamSource interface), which is responsible for providing the video. For peers, this is the Peer object.
+ * For local video, this is a LocalPeerStream object. A single StreamSource can have multiple StreamNode-s
+ * attached to it. StreamNode-s are regarded as "consumers" by the StreamSource. A StreamSource keeps track of all
+ * its consumers and the video resolution they need. It requests from the SFU a resolution that satisfies
+ * the requirement of all consumers, i.e. is higher or equal to the resolution each of them demands.
+ * The most important parts of the interface between the StreamNode and the StreamSource are:
+ * - StreamSource.source property, which is a video element managed by the StreamSource. This is the actual video
+ *   source. The lifetime of this object is independent of the lifetime of the GUI/consumers, and is external to React.
+ * - StreamNode.requestedQuality property - informs the StreamSource object what resolution the StreamNode consumer
+ *   requires
+ * - StreamSource.updateVideoQuality() - calculates the quality needed to satisfy all consumers and requests it
+ *   from the SFU. When a StreamNode changes its demanded video quality, it updates its .requestedQuality property
+ *   and calls StreamSource.updateVideoQuality()
+ * - StreamNode.updateVideoElem() - updates the DOM of the StreamNode to display the video of the current
+ *   StreamSource.source. This is called both internally by the StreamNode, and externally by Stream, when
+ *   StreamSource.source changes asynchronously
+ *
+ * Direct and cloned video display
+ * Ideally, all consumers of a StreamSource would simply display the StreamSource.source video. However,
+ * a DOM element can't be mounted more than once in the DOM, so each StreamNode consumer must display a different
+ * <video> player. For efficiency, one of them is the "original" external StreamSource.source <video> element,
+ * and the others are "clones", managed by React and having their .srcObject equal assigned to that of
+ * the original .source element. Hence, the StreamNode renders the video in one of two modes - "external" or "cloned".
+ * The mode flag is passed upon construction, via the .externalVideo React property.
+ *
+ * Smooth video switching
+ * When switching a StreamSource between thumbnail and hi-res track, it takes a bit of time for the newly requested
+ * track to start playing. If the track is directly fed into the visible <video> player, this will cause a short
+ * blackout before the new resolution video starts. To avoid this, two indenepdent <video> players are used while
+ * switching, and StreamSource.source points to the one currently displayed. The current track and video player
+ * are kept running and displayed while the newly requested track is being buffered. When the player of the new
+ * track fires the "onplay" event, the "old" player is swapped with the "new" one instantly, by changing the
+ * Stream.source property and calling updateVideoElem() on all consumers. The old track can then be stopped
+ * and the old player destroyed.
+ *
+ * Gradual resolution downgrade
+ * When the Peer StreamSource switches from higher to lower resolution, it does it in steps over a period of time.
+ * This is done in case the higher resolution is needed again very soon, i.e. when the active speaker
+ * changes back and forth between two peers, or the user selects again a previous peer in the carousel view.
+ * This is especially useful when the downgrade involves switching from the hi-res to the vthumb tracks, which
+ * would be avoided in a quick back-and-forth situation.
+ */
     class Peer extends MegaDataObject {
         constructor(call, userHandle, clientId, av) {
             super({
@@ -40,7 +83,7 @@
             this.sfuPeer = call.sfuApp.sfuClient.peers.get(clientId);
             this.isActive = false;
             this.consumers = new Set();
-            this.currentQuality = CALL_QUALITY.NO_VIDEO;
+            this.currentQuality = VIDEO_QUALITY.NO_VIDEO;
             this.resState = RES_STATE.NO_VIDEO;
             this.source = null;
             this.onHdReleaseTimer = this._onHdReleaseTimer.bind(this);
@@ -88,7 +131,7 @@
         deregisterConsumer(consumerGui) {
             this.consumers.delete(consumerGui);
             if (!this.isDestroyed) {
-                this.getVideoWithCommonQuality();
+                this.updateVideoQuality();
             }
         }
         hdReleaseTimerStop() {
@@ -104,6 +147,10 @@
             this.hdReleaseTimer = setInterval(this.onHdReleaseTimer, DOWNGRADING_QUALITY_INTRVL);
         }
         _onHdReleaseTimer() {
+            if (this.isDestroyed) {
+                console.error("SoftAssert: onHdReleaseTimer on destroyed peer");
+                return;
+            }
             if (isNaN(this.targetQuality) || this.currentQuality <= this.targetQuality) {
                 this.hdReleaseTimerStop();
                 console.warn("onHdReleaseTimer: BUG: Target quality is not set, or is higher than current");
@@ -115,63 +162,59 @@
             }
             this.doGetVideoWithQuality(newQ);
         }
-        // centralize consumer decision and call those 2 diff methods from 1 place (used by UI)
-        consumerGetVideo(consumer, quality) {
-            // console.warn(`consumerGetVideo[${this.clientId}]:`, quality);
-            if (!this.consumers.has(consumer)) {
-                console.error(`consumerGetVideo(${quality}): Consumer not registered:`, consumer);
-                return;
-            }
-            if (FORCE_LOWQ) {
-                quality = -1;
-            }
-            // UI-related interface for up/downgrading quality with a reference counter implementation
-            consumer.requestedQ = quality;
-            delete this.consumersUpdated;
-            this.getVideoWithCommonQuality(
-                this.call.activeVideoStreamsCnt > SfuClient.kMaxInputVideoTracks - 2 /* 2 tracks buffer for race
-                conditions */
-            );
-            if (!this.consumersUpdated) {
-                consumer.updateVideoElem();
-            }
+        noVideoForSmoothSwitching() {
+            return this.call.numVideoTracksUsed < SfuClient.numInputVideoTracks - 1;
         }
-        getVideoWithCommonQuality(immediateDowngrade = false) {
-            var maxQ = CALL_QUALITY.NO_VIDEO;
+        /** Get a video stream that satisfies the quality minimum for all consumers
+         * @returns {boolean} - true if video source changed synchronously, which can happen only if video was disabled
+         */
+        updateVideoQuality() {
+            // if no free tracks, change the quality "in-place", rather than using a second track for smooth switching
+            // leave 2 tracks for race conditions, etc
+            var maxQ = 0;
             for (const { requestedQ } of this.consumers) {
                 if (requestedQ > maxQ) {
                     maxQ = requestedQ;
-                    if (requestedQ === 2) {
+                    if (requestedQ === VIDEO_QUALITY.HIGH) {
                         break;
                     }
                 }
             }
-
             if (maxQ === this.currentQuality) {
                 this.hdReleaseTimerStop();
             }
-            else if (maxQ < this.currentQuality && !immediateDowngrade) {
+            else if (maxQ > this.currentQuality) {
+                // immediately change quality
+                this.hdReleaseTimerStop();
+                return this.doGetVideoWithQuality(maxQ);
+            }
+            else { // maxQ < this.currentQuality
+                if (maxQ === VIDEO_QUALITY.NO_VIDEO && (this.sfuPeer.av & Av.Video) === 0) {
+                    this.hdReleaseTimerStop();
+                    return this.doGetVideoWithQuality(maxQ);
+                }
                 // start gradual lowering of stream quality
                 this.hdReleaseTimerRestart(maxQ);
             }
-            else {
-                this.hdReleaseTimerStop();
-                this.doGetVideoWithQuality(maxQ); // immediately increase quality
-            }
+            return false; // return false for all cases except the ones that immediately change quality
         }
+        /** Change the quailty of the common video stream
+         * @param {number} newQuality - the requested quality
+         * @returns {boolean} - true if video source changed synchronously, which can happen only if video was disabled
+         */
         doGetVideoWithQuality(newQuality) {
             if (this.currentQuality === newQuality) {
-                return;
+                return false;
             }
             this.currentQuality = newQuality;
 
-            if (newQuality >= CALL_QUALITY.LOW) {
-                this.requestHdQuality(2 - newQuality /* invert values */);
+            if (newQuality > VIDEO_QUALITY.THUMB) {
+                this.requestHdStream(4 - newQuality); // convert quality to resolution divider
             }
-            else if (newQuality === CALL_QUALITY.THUMB) {
-                this.requestThumbQuality();
+            else if (newQuality === VIDEO_QUALITY.THUMB) {
+                this.requestThumbStream();
             }
-            else if (newQuality === CALL_QUALITY.NO_VIDEO) {
+            else if (newQuality === VIDEO_QUALITY.NO_VIDEO) {
                 this.setResState(RES_STATE.NO_VIDEO);
                 const { sfuPeer } = this;
                 if (sfuPeer.hiResPlayer) {
@@ -180,17 +223,19 @@
                 if (sfuPeer.vThumbPlayer) {
                     sfuPeer.vThumbPlayer.destroy();
                 }
+                return true;
             }
         }
         updateConsumerVideos() {
-            for (const gui of this.consumers) {
-                gui.updateVideoElem();
+            for (const cons of this.consumers) {
+                cons.updateVideoElem();
             }
-            this.consumersUpdated = true;
         }
-        requestHdQuality(resDivider) {
+        requestHdStream(resDivider) {
             const peer = this.sfuPeer;
-            // We are in hd mode and the video quality matches
+            if (this.noVideoForSmoothSwitching() && peer.vThumbPlayer) {
+                peer.vThumbPlayer.destroy();
+            }
             const hdPlayer = peer.hiResPlayer;
             if (hdPlayer) {
                 this.setResState(RES_STATE.HD);
@@ -202,6 +247,10 @@
             // request hi-res stream
             this.setResState(RES_STATE.HD_PENDING);
             const gui = peer.requestHiResVideo(resDivider);
+            if (!gui) {
+                console.error("SoftAssert: requestHiResVideo on a deleted peer");
+                return;
+            }
             gui.onPlay = () => {
                 if (this.resState !== RES_STATE.HD_PENDING) {
                     return false;
@@ -213,7 +262,7 @@
                 return true;
             };
         }
-        requestThumbQuality() {
+        requestThumbStream() {
             const peer = this.sfuPeer;
             if (peer.vThumbPlayer) {
                 this.setResState(RES_STATE.THUMB);
@@ -222,12 +271,19 @@
                 }
                 return;
             }
+            if (this.noVideoForSmoothSwitching() && peer.hiResPlayer) {
+                peer.hiResPlayer.destroy();
+            }
             this.setResState(RES_STATE.THUMB_PENDING);
             const gui = peer.requestThumbnailVideo();
+            if (!gui) {
+                console.error("SoftAssert: requestThumbnailVideo on a deleted peer");
+                return;
+            }
             gui.onPlay = () => {
                 if (this.resState !== RES_STATE.THUMB_PENDING) {
                     if (this.resState === RES_STATE.HD && peer.vThumbPlayer) {
-                        // vthumb request aborted, hd re-used. Delete the vthumb stream
+                        // vthumb request was aborted meanwhile, hd re-used. Delete the vthumb stream
                         peer.vThumbPlayer.destroy();
                     }
                     return;
@@ -249,7 +305,7 @@
             var ids = this.keys();
             if (!ids || ids.length === 0) {
                 if (d) {
-                    console.error("No streams found.");
+                    console.error("No streams found");
                 }
                 return false;
             }
@@ -302,6 +358,7 @@
             this.chatRoom = chatRoom;
             this.callId = callId;
             this.peers = new Peers(this);
+            this.numVideoTracksUsed = 0;
             // eslint-disable-next-line no-use-before-define
             this.localPeerStream = new LocalPeerStream(this);
             this.viewMode = CALL_VIEW_MODES.GRID;
@@ -316,8 +373,9 @@
         }
         setViewMode(newMode) {
             this.viewMode = newMode;
-            if (this.forcedActiveStream && this.peers[this.forcedActiveStream]) {
-                this.peers[this.forcedActiveStream].isActive = false;
+            let activePeer;
+            if (this.forcedActiveStream && (activePeer = this.peers[this.forcedActiveStream])) {
+                activePeer.isActive = false;
             }
 
             if (newMode === CALL_VIEW_MODES.GRID) {
@@ -370,7 +428,7 @@
             if (this.activeStream && this.activeStream === peer.cid) {
                 this.activeStream = null;
             }
-            if (this.forcedActiveStream && this.forcedActiveStream === peer.cid) {
+            if (this.forcedActiveStream === peer.cid) {
                 this.forcedActiveStream = null;
             }
 
@@ -401,21 +459,21 @@
         onBadNetwork(e) {
             this.chatRoom.trigger('onBadNetwork', e);
         }
-        registerPlayer() {
-            this.activeVideoStreamsCnt++;
+
+        onTrackAllocated() {
+            this.numVideoTracksUsed++;
         }
-        deregisterPlayer(playerData) {
-            this.activeVideoStreamsCnt--;
-            const { appPeer } = playerData;
+
+        onTrackReleased(playerData) {
+            this.numVideoTracksUsed--;
+            // console.log("onTrackRelease:", this.numVideoTracksUsed);
+            const peer = playerData.appPeer.sfuPeer;
             // clean up cached quality, if there are no players
-            if (
-                !appPeer.sfuPeer.hiResPlayer &&
-                !appPeer.sfuPeer.vThumbPlayer &&
-                appPeer.currentQuality !== CALL_QUALITY.NO_VIDEO
-            ) {
-                appPeer.currentQuality = CALL_QUALITY.NO_VIDEO;
-                // console.warn("No video from peer, setting quality to NO_VIDEO");
+            if ((peer.hiResPlayer && peer.hiResPlayer.slot) || (peer.vThumbPlayer && peer.vThumbPlayer.slot)) {
+                return;
             }
+            appPeer.currentQuality = VIDEO_QUALITY.NO_VIDEO;
+            // console.warn("No video from peer, setting quality to NO_VIDEO");
         }
         onLocalMediaChange(diffFlag) {
             if (diffFlag & SfuClient.Av.Video) {
@@ -437,35 +495,38 @@
             }
             this.sfuApp.sfuClient.muteCamera(!!(this.av & SfuClient.Av.Camera));
         }
-        async toggleScreenSharing() {
+        toggleScreenSharing() {
             if (this.av & SfuClient.Av.Camera) {
                 this.sfuApp.sfuClient.muteCamera(true);
             }
-            await this.sfuApp.sfuClient.enableScreenshare(!this.sfuApp.sfuClient.isSharingScreen());
+            this.sfuApp.sfuClient.enableScreenshare(!this.sfuApp.sfuClient.isSharingScreen());
         }
         isSharingScreen() {
             return this.sfuApp.sfuClient.isSharingScreen();
         }
-        async toggleHold() {
+        toggleHold() {
             if (this.av & SfuClient.Av.onHold) {
-                await this.sfuApp.sfuClient.releaseHold();
+                this.sfuApp.sfuClient.releaseHold();
             }
             else {
-                await this.sfuApp.sfuClient.putOnHold();
+                this.sfuApp.sfuClient.putOnHold();
             }
         }
         hangUp(reason) {
             this.sfuApp.destroy(reason);
-            if (!this.peers) {
+            if (this.isDestroyed) {
                 return;
             }
-            assert(this.peers.size() === 0);
-            delete this.peers;
+            this.isDestroyed = true;
+            this.localPeerStream.destroy();
+            if (this.peers.size() !== 0) {
+                console.error("hangUp: Soft assert: peers.size is not zero, but", this.peers.size());
+            }
             this.callTimeoutDone(true);
             this.chatRoom.callParticipantsUpdated(); // av: I have added it just in case, but do we need this?
         }
         muteIfAlone() {
-            if (this.peers && this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
+            if (!this.isDestroyed && this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
                 return this.sfuApp.sfuClient.muteAudio(true);
             }
             return false;
@@ -551,8 +612,13 @@
             }
         }
         hasOtherParticipant() {
-            // Exclude extra clients of the current user
-            return this.peers ? Object.values(this.peers.toJS()).some(s => u_handle !== s.userHandle) : false;
+            const {peers} = this;
+            for (let i = 0; i < peers.length; i++) {
+                if (peers.getItem(i).userHandle !== u_handle) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
     class LocalPeerStream {
@@ -593,8 +659,11 @@
         isStreaming() {
             return this.sfuApp.sfuClient.availAv & Av.Video;
         }
-        consumerGetVideo(cons) {
-            cons.updateVideoElem();
+        updateVideoQuality() {
+            return false; // returing false will cause the caller StreamNode to update itself
+        }
+        destroy() {
+            this.isDestroyed = true; // let StreamNode know we are destroyed
         }
     }
     /**
@@ -712,28 +781,23 @@
             });
             chatRoom.rebind('onCallPeerLeft.callManager', (e, data) => {
                 const activeCall = chatRoom.activeCall;
-                const { reason, userHandle } = data;
-                const { callId, sfuApp } = activeCall;
-
                 if (
-                    sfuApp.isDestroyed ||
+                    activeCall.sfuApp.isDestroyed ||
                     activeCall.hasOtherParticipant() ||
-                    SfuClient.isTermCodeRetriable(reason)
+                    SfuClient.isTermCodeRetriable(data.reason)
                 ) {
                     return;
                 }
                 if (chatRoom.type === 'private') {
-                    return chatRoom.trigger('onCallLeft', { callId });
+                    return chatRoom.trigger('onCallLeft', { callId: activeCall.callId });
                 }
-                if (userHandle !== u_handle) {
-                    // Wait for the peer left notifications to process before triggering.
-                    tSleep(3).then(() => {
-                        // make sure we still have that call as active
-                        if (chatRoom.activeCall === activeCall && !activeCall.peers.length) {
-                            chatRoom.activeCall.initCallTimeout();
-                        }
-                    });
-                }
+                // Wait for the peer left notifications to process before triggering.
+                setTimeout(() => {
+                    // make sure we still have that call as active
+                    if (chatRoom.activeCall === activeCall) {
+                        chatRoom.activeCall.initCallTimeout();
+                    }
+                }, 3000);
             });
 
             chatRoom.rebind('onMeAdded', (e, addedBy) => {
@@ -1109,17 +1173,14 @@
     CallManager2.prototype.onCallState = function(eventData, chatRoom) {
         // Caller is me and the call was locally initiated from the web client -> ring for 1-on-1s; don't ring if
         // the user had initiated the call from another client/device.
-        if (eventData.userId === u_handle && chatRoom.type === 'private' && megaChat.activeCall) {
+        const {activeCall} = megaChat;
+        if (activeCall && eventData.userId === u_handle && chatRoom.type === 'private') {
             if (eventData.arg) {
                 megaChat.trigger('onOutgoingCallRinging', [chatRoom, eventData.callId, eventData.userId, this]);
             }
-            else {
-                // Hang-up the call if the other participant didn't already join the 1-on-1 call; excl.
-                // current user joining from another client/device.
-                const { peers } = megaChat.activeCall;
-                if (!peers.length || peers.length === 1 && peers.getItem(0).userHandle === u_handle) {
-                    chatRoom.trigger('onCallLeft', { callId: eventData.callId });
-                }
+            else if (!activeCall.hasOtherParticipant()) {
+                // ringing stopped in a 1on1 call, hangup if it's only us in the call
+                chatRoom.trigger('onCallLeft', {callId: eventData.callId});
             }
             return;
         }
@@ -1163,9 +1224,8 @@
     CallManager2.Peers = Peers;
     CallManager2.Peer = Peer;
     CallManager2.Call = Call;
-    CallManager2.CALL_QUALITY = CALL_QUALITY;
-    CallManager2.MAX_CALL_PARTICIPANTS = 20;
-
+    CallManager2.VIDEO_QUALITY = VIDEO_QUALITY;
+    CallManager2.FORCE_LOWQ = !!localStorage.forceLowQuality;
     scope.CallManager2 = CallManager2;
 
 })(window);

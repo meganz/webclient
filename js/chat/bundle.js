@@ -16236,13 +16236,12 @@ class StreamNode extends mixins.wl {
     } = props;
     if (!externalVideo) {
       this.clonedVideo = document.createElement("video");
-      this.setupVideoElement(this.clonedVideo);
     }
     if (!stream.isFake) {
       stream.registerConsumer(this);
       if (stream instanceof CallManager2.Peer) {
         this._streamListener = stream.addChangeListener((peer, data, key) => {
-          if (key === "haveScreenshare") {
+          if (key === "haveScreenshare" || key === "videoMuted" || key === "isOnHold") {
             this._lastResizeWidth = null;
           }
           this.requestVideo();
@@ -16251,17 +16250,25 @@ class StreamNode extends mixins.wl {
     }
   }
   requestVideo(forceVisible) {
-    if (this.isComponentVisible() || forceVisible) {
+    const {
+      stream
+    } = this.props;
+    if (stream.isFake || stream.isDestroyed) {
+      return;
+    }
+    if ((stream.isStreaming() || stream.isLocal) && this.isMounted() && (this.isComponentVisible() || forceVisible)) {
       var node = this.findDOMNode();
       this.requestVideoBySize(node.offsetWidth, node.offsetHeight);
     } else {
       this.requestVideoBySize(0, 0);
+      this.displayStats(null);
     }
   }
   setupVideoElement(video) {
     if (video._snSetup) {
       return;
     }
+    video._snSetup = true;
     video.autoplay = true;
     video.controls = false;
     video.muted = true;
@@ -16276,13 +16283,22 @@ class StreamNode extends mixins.wl {
         this.props.onLoadedData(ev);
       }
     };
-    video._snSetup = true;
   }
-  updateVideoElem() {
-    if (!this.isMounted() || !this.contRef.current) {
+  detachVideoElemHandlers() {
+    var _this$contRef$current;
+    const video = (_this$contRef$current = this.contRef.current) == null ? void 0 : _this$contRef$current.firstChild;
+    if (!video || !video._snSetup) {
       return;
     }
-    const currVideo = this.contRef.current.firstChild;
+    video.onloadeddata = null;
+    video.ondblclick = null;
+  }
+  updateVideoElem() {
+    const vidCont = this.contRef.current;
+    if (!this.isMounted() || !vidCont) {
+      return;
+    }
+    const currVideo = vidCont.firstChild;
     const {
       stream,
       externalVideo
@@ -16290,27 +16306,29 @@ class StreamNode extends mixins.wl {
     const {
       source
     } = stream;
+    if (!source) {
+      if (currVideo) {
+        vidCont.replaceChildren();
+      }
+      return;
+    }
     if (externalVideo) {
       if (currVideo === source) {
         return;
       }
-      if (source) {
-        this.setupVideoElement(source);
-        this.contRef.current.replaceChildren(source);
-      } else {
-        this.contRef.current.replaceChildren();
-      }
+      this.setupVideoElement(source);
+      vidCont.replaceChildren(source);
     } else {
+      const cloned = this.clonedVideo;
       if (!currVideo) {
-        this.contRef.current.replaceChildren(this.clonedVideo);
-      }
-      if (source) {
-        if (this.clonedVideo.paused || this.clonedVideo.srcObject !== source.srcObject) {
-          this.clonedVideo.srcObject = source.srcObject;
-          this.clonedVideo.play().catch(() => {});
-        }
+        this.setupVideoElement(cloned);
+        vidCont.replaceChildren(cloned);
       } else {
-        SfuClient.playerStop(this.clonedVideo);
+        assert(currVideo === this.clonedVideo);
+      }
+      if (cloned.paused || cloned.srcObject !== source.srcObject) {
+        cloned.srcObject = source.srcObject;
+        Promise.resolve(cloned.play()).catch(nop);
       }
     }
   }
@@ -16319,7 +16337,7 @@ class StreamNode extends mixins.wl {
     if (!elem) {
       return;
     }
-    elem.textContent = `${stats} (${this.props.externalVideo ? "ref" : "cloned"})`;
+    elem.textContent = stats ? `${stats} (${this.props.externalVideo ? "ref" : "cloned"})` : "";
   }
   componentDidMount() {
     super.componentDidMount();
@@ -16343,17 +16361,9 @@ class StreamNode extends mixins.wl {
   componentWillUnmount() {
     super.componentWillUnmount();
     const peer = this.props.stream;
+    this.detachVideoElemHandlers();
     if (peer && !peer.isFake) {
-      this.props.stream.deregisterConsumer(this);
-      if (this.props.externalVideo && peer.source) {
-        const video = peer.source;
-        video.onpause = () => {
-          if (!video.isDestroyed) {
-            video.play().catch(() => {});
-          }
-          delete video.onpause;
-        };
-      }
+      peer.deregisterConsumer(this);
     }
     if (this._streamListener) {
       peer.removeChangeListener(this._streamListener);
@@ -16362,18 +16372,16 @@ class StreamNode extends mixins.wl {
       this.props.willUnmount();
     }
   }
+  requestVideoQuality(quality) {
+    this.requestedQ = quality && CallManager2.FORCE_LOWQ ? 1 : quality;
+    if (!this.props.stream.updateVideoQuality()) {
+      this.updateVideoElem();
+    }
+  }
   requestVideoBySize(w) {
-    const {
-      stream
-    } = this.props;
-    if (stream.isFake) {
-      return;
-    }
-    if (!this.isMounted()) {
-      return;
-    }
-    if (!stream.isLocal && !stream.isStreaming()) {
-      stream.consumerGetVideo(this, CallManager2.CALL_QUALITY.NO_VIDEO);
+    if (w === 0) {
+      this._lastResizeWidth = 0;
+      this.requestVideoQuality(this, CallManager2.VIDEO_QUALITY.NO_VIDEO);
       return;
     }
     if (this.contRef.current) {
@@ -16386,17 +16394,15 @@ class StreamNode extends mixins.wl {
     }
     let newQ;
     if (w > 400) {
-      newQ = CallManager2.CALL_QUALITY.HIGH;
+      newQ = CallManager2.VIDEO_QUALITY.HIGH;
     } else if (w > 200) {
-      newQ = CallManager2.CALL_QUALITY.MEDIUM;
+      newQ = CallManager2.VIDEO_QUALITY.MEDIUM;
     } else if (w > 180) {
-      newQ = CallManager2.CALL_QUALITY.LOW;
-    } else if (w === 0) {
-      newQ = CallManager2.CALL_QUALITY.NO_VIDEO;
+      newQ = CallManager2.VIDEO_QUALITY.LOW;
     } else {
-      newQ = CallManager2.CALL_QUALITY.THUMB;
+      newQ = CallManager2.VIDEO_QUALITY.THUMB;
     }
-    stream.consumerGetVideo == null ? void 0 : stream.consumerGetVideo(this, newQ);
+    this.requestVideoQuality(newQ);
   }
   renderVideoDebugMode() {
     const {
@@ -16427,13 +16433,12 @@ class StreamNode extends mixins.wl {
   }
   renderContent() {
     const {
-      stream,
-      isCallOnHold
+      stream
     } = this.props;
     const {
       loading
     } = this.state;
-    if (stream && stream.isStreaming && stream.isStreaming() && !isCallOnHold) {
+    if (stream.isStreaming()) {
       return external_React_default().createElement((external_React_default()).Fragment, null, loading && external_React_default().createElement("i", {
         className: "sprite-fm-theme icon-loading-spinner loading-icon"
       }), external_React_default().createElement("div", {

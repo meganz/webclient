@@ -89,12 +89,10 @@ class ChatRouting {
           if (d && ex !== ENOENT) {
             console.warn('If "%s" is a chat, something went wrong..', roomId, ex);
           }
-
           if (page !== location) {
             return EEXPIRED;
           }
           megaChat.cleanup(true);
-
           if (ex === ENOENT && megaChat.publicChatKeys[roomId]) {
             msgDialog('warninga', l[20641], l[20642], 0, () => {
               loadSubPage(is_chatlink ? 'start' : 'fm/chat', event);
@@ -197,7 +195,6 @@ class ChatRouting {
         megaChat.initialPubChatHandle = initialPubChatHandle;
         megaChat.initialChatId = chatId;
         megaChat.meetingDialogClosed = meetingDialogClosed;
-
         const mciphReq = megaChat.plugins.chatdIntegration.getMciphReqFromHandleAndKey(initialPubChatHandle, publicChatKey);
         const isReady = chatRoom => {
           if (chatRoom.state === ChatRoom.STATE.READY) {
@@ -282,7 +279,6 @@ var mixins = __webpack_require__(503);
 
 __webpack_require__(62);
 __webpack_require__(778);
-
 __webpack_require__(336);
 
 
@@ -296,7 +292,6 @@ const LOAD_ORIGINALS = {
 var CHATUIFLAGS_MAPPING = {
   'convPanelCollapse': 'cPC'
 };
-
 function Chat() {
   var self = this;
   this.is_initialized = false;
@@ -365,7 +360,6 @@ function Chat() {
             return l[5893].replace('[X]', params.from);
           }
         },
-
         'call-terminated': {
           title: l.notif_title_call_term,
           'icon': function (notificationObj) {
@@ -375,7 +369,6 @@ function Chat() {
             return l[5889].replace('[X]', params.from);
           }
         },
-
         'screen-share-error': {
           title: l.screenshare_failed_notif || 'You are no longer sharing your screen',
           icon: notificationObj => {
@@ -393,7 +386,6 @@ function Chat() {
   this.plugins = {};
   self.filePicker = null;
   self._chatsAwaitingAps = {};
-
   MegaDataObject.call(this, {
     "currentlyOpenedChat": null,
     "activeCall": null,
@@ -413,7 +405,6 @@ inherits(Chat, MegaDataObject);
 Object.defineProperty(Chat, 'mcf', {
   value: Object.create(null)
 });
-
 Chat.prototype.init = promisify(function (resolve, reject) {
   var self = this;
   if (self.is_initialized) {
@@ -422,7 +413,6 @@ Chat.prototype.init = promisify(function (resolve, reject) {
   if (d) {
     console.time('megachat:plugins:init');
   }
-
   self.plugins = Object.create(null);
   self.plugins.chatNotifications = new ChatNotifications(self, self.options.chatNotificationOptions);
   self.plugins.chatNotifications.notifications.rebind('onAfterNotificationCreated.megaChat', function () {
@@ -434,24 +424,19 @@ Chat.prototype.init = promisify(function (resolve, reject) {
   if (d) {
     console.timeEnd('megachat:plugins:init');
   }
-
   var $body = $(document.body);
   $body.rebind('mousedown.megachat', '.top-user-status-popup .dropdown-item', function () {
     var presence = $(this).data("presence");
     self._myPresence = presence;
-
     var targetPresence = PresencedIntegration.cssClassToPresence(presence);
     self.plugins.presencedIntegration.setPresence(targetPresence);
-
     if (targetPresence !== UserPresence.PRESENCE.OFFLINE) {
-
       Object.keys(self.plugins.chatdIntegration.chatd.shards).forEach(function (k) {
         var v = self.plugins.chatdIntegration.chatd.shards[k];
         v.connectionRetryManager.requiresConnection();
       });
     }
   });
-
   self.$container = $('.fm-chat-block');
   if (!is_chatlink) {
     $('.activity-status-block, .activity-status').removeClass('hidden');
@@ -500,7 +485,6 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     if (is_mobile) {
       return;
     }
-
     self.$conversationsAppInstance = external_ReactDOM_default().render(self.$conversationsApp = external_React_default().createElement(conversations.Z.ConversationsApp, {
       megaChat: self,
       routingSection: self.routingSection,
@@ -540,7 +524,6 @@ Chat.prototype._syncDnd = function () {
     });
   }
 };
-
 Chat.prototype.loadChatUIFlagsFromConfig = function (val) {
   var hadChanged = false;
   var flags = val || mega.config.get("cUIF");
@@ -548,7 +531,6 @@ Chat.prototype.loadChatUIFlagsFromConfig = function (val) {
     if (typeof flags !== 'object') {
       flags = {};
     }
-
     Object.keys(CHATUIFLAGS_MAPPING).forEach(k => {
       var v = flags[CHATUIFLAGS_MAPPING[k]];
       hadChanged = v !== undefined && this.chatUIFlags.set(k, v) !== false || hadChanged;
@@ -556,7 +538,6 @@ Chat.prototype.loadChatUIFlagsFromConfig = function (val) {
   }
   return hadChanged;
 };
-
 Chat.prototype.cleanup = function (clean) {
   const room = this.getCurrentRoom();
   if (room) {
@@ -576,7 +557,6 @@ Chat.prototype.cleanup = function (clean) {
     M.currentdirid = page = false;
   }
 };
-
 Chat.prototype.initChatUIFlagsManagement = function () {
   var self = this;
   self.loadChatUIFlagsFromConfig();
@@ -636,7 +616,6 @@ Chat.prototype.registerUploadListeners = function () {
   var self = this;
   var logger = d && MegaLogger.getLogger('chatUploadListener', false, self.logger);
   self.unregisterUploadListeners(true);
-
   var forEachChat = function (chats, callback) {
     var result = 0;
     if (!Array.isArray(chats)) {
@@ -650,7 +629,6 @@ Chat.prototype.registerUploadListeners = function () {
     }
     return result;
   };
-
   var lookupPendingUpload = function (id) {
     console.assert((id | 0) > 0 || String(id).length === 8, 'Invalid lookupPendingUpload arguments...');
     for (var uid in ulmanager.ulEventData) {
@@ -659,13 +637,11 @@ Chat.prototype.registerUploadListeners = function () {
       }
     }
   };
-
   var unregisterListeners = function () {
     if (!$.len(ulmanager.ulEventData)) {
       self.unregisterUploadListeners();
     }
   };
-
   var onUploadComplete = function (ul) {
     if (ulmanager.ulEventData[ul && ul.uid]) {
       forEachChat(ul.chat, function (room) {
@@ -678,7 +654,6 @@ Chat.prototype.registerUploadListeners = function () {
       unregisterListeners();
     }
   };
-
   var onUploadCompletion = function (uid, handle, faid, chat) {
     if (!chat) {
       if (d > 1) {
@@ -707,7 +682,6 @@ Chat.prototype.registerUploadListeners = function () {
       }
     }
   };
-
   var onUploadError = function (uid, error) {
     var ul = ulmanager.ulEventData[uid];
     if (d) {
@@ -718,7 +692,6 @@ Chat.prototype.registerUploadListeners = function () {
       unregisterListeners();
     }
   };
-
   var onAttributeReady = function (handle, fa) {
     delay('chat:fa-ready:' + handle, function () {
       var uid = lookupPendingUpload(handle);
@@ -733,17 +706,14 @@ Chat.prototype.registerUploadListeners = function () {
       }
     });
   };
-
   var onAttributeError = function (faid, error, onStorageAPIError, nFAiled) {
     var uid = lookupPendingUpload(faid);
     var ul = ulmanager.ulEventData[uid] || false;
     if (d) {
       logger.debug('fa:error', faid, error, onStorageAPIError, uid, ul, nFAiled, ul.efa);
     }
-
     if (ul) {
       ul.efa = Math.max(0, ul.efa - nFAiled) | 0;
-
       if (ul.h) {
         var n = M.d[ul.h] || false;
         if (!ul.efa || n.fa && String(n.fa).split('/').length >= ul.efa) {
@@ -752,7 +722,6 @@ Chat.prototype.registerUploadListeners = function () {
       }
     }
   };
-
   var registerLocalListeners = function () {
     self._uplError = mBroadcaster.addListener('upload:error', onUploadError);
     self._uplAbort = mBroadcaster.addListener('upload:abort', onUploadError);
@@ -760,7 +729,6 @@ Chat.prototype.registerUploadListeners = function () {
     self._uplFAError = mBroadcaster.addListener('fa:error', onAttributeError);
     self._uplDone = mBroadcaster.addListener('upload:completion', onUploadCompletion);
   };
-
   self._uplStart = mBroadcaster.addListener('upload:start', function (data) {
     if (d) {
       logger.info('onUploadStart', [data]);
@@ -884,7 +852,6 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
     $('.new-messages-indicator').removeClass('hidden');
   }
 }, 100);
-
 Chat.prototype.dropAllDatabases = promisify(function (resolve, reject) {
   const chatd = this.plugins.chatdIntegration.chatd || false;
   const promises = [];
@@ -902,7 +869,6 @@ Chat.prototype.dropAllDatabases = promisify(function (resolve, reject) {
   }
   Promise.allSettled(promises).then(resolve).catch(reject);
 });
-
 Chat.prototype.destroy = function (isLogout) {
   var self = this;
   if (self.is_initialized === false) {
@@ -914,7 +880,6 @@ Chat.prototype.destroy = function (isLogout) {
   }
   self.unregisterUploadListeners(true);
   self.trigger('onDestroy', [isLogout]);
-
   try {
     if (self.$conversationsAppInstance && external_ReactDOM_default().findDOMNode(self.$conversationsAppInstance) && external_ReactDOM_default().findDOMNode(self.$conversationsAppInstance).parentNode) {
       external_ReactDOM_default().unmountComponentAtNode(external_ReactDOM_default().findDOMNode(self.$conversationsAppInstance).parentNode);
@@ -928,7 +893,6 @@ Chat.prototype.destroy = function (isLogout) {
     }
     self.chats.remove(roomJid);
   });
-
   self.is_initialized = false;
   if (self.plugins.chatdIntegration && self.plugins.chatdIntegration.chatd && self.plugins.chatdIntegration.chatd.shards) {
     var shards = self.plugins.chatdIntegration.chatd.shards;
@@ -943,7 +907,6 @@ Chat.prototype.destroy = function (isLogout) {
     }
   }
 };
-
 Chat.prototype.getContacts = function () {
   var results = [];
   M.u.forEach(function (k, v) {
@@ -953,7 +916,6 @@ Chat.prototype.getContacts = function () {
   });
   return results;
 };
-
 Chat.prototype.userPresenceToCssClass = function (presence) {
   if (presence === UserPresence.PRESENCE.ONLINE) {
     return 'online';
@@ -967,7 +929,6 @@ Chat.prototype.userPresenceToCssClass = function (presence) {
     return 'black';
   }
 };
-
 Chat.prototype._renderMyStatus = function () {
   var self = this;
   if (!self.is_initialized) {
@@ -976,7 +937,6 @@ Chat.prototype._renderMyStatus = function () {
   if (typeof megaChat.userPresence === 'undefined') {
     return;
   }
-
   var $status = $('.activity-status-block .activity-status', 'body');
   $('.top-user-status-popup .dropdown-item').removeClass("active");
   $status.removeClass('online').removeClass('away').removeClass('busy').removeClass('offline').removeClass('black');
@@ -987,7 +947,6 @@ Chat.prototype._renderMyStatus = function () {
   if (userPresenceConRetMan.getConnectionState() !== ConnectionRetryManager.CONNECTION_STATE.CONNECTED) {
     cssClass = "offline";
   }
-
   const $activityStatus = $('.activity-text', '.js-topbar');
   if (actualPresence === UserPresence.PRESENCE.ONLINE) {
     $('.top-user-status-popup .dropdown-item[data-presence="chat"]').addClass("active");
@@ -1013,7 +972,6 @@ Chat.prototype._renderMyStatus = function () {
   }
 };
 Chat.prototype.renderMyStatus = SoonFc(Chat.prototype._renderMyStatus, 100);
-
 Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdUrl, setAsActive, chatHandle, publicChatKey, ck, isMeeting, mcoFlags) {
   var self = this;
   var room = false;
@@ -1029,7 +987,6 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
   }
   var $promise = new MegaPromise();
   if (type === "private") {
-
     userHandles.forEach(function (user_handle) {
       if (!(user_handle in M.u)) {
         M.u.set(user_handle, new MegaDataObject(MEGA_USER_STRUCT, {
@@ -1040,7 +997,6 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
         }));
       }
     });
-
     roomId = array.one(userHandles, u_handle);
     if (!roomId) {
       $promise.reject();
@@ -1072,7 +1028,6 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
           M.syncUsersFullname(contactHash);
           M.syncContactEmail(contactHash);
         }
-
         newUsers.push(contactHash);
       }
     }
@@ -1081,7 +1036,6 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
       if (d) {
         console.debug('openchat:%s.%s: processing %s new users...', chatId, type, newUsers.length);
       }
-
       for (var k in chats) {
         var chatRoom = self.chats[k];
         var participants = array.to.object(chatRoom.getParticipantsExceptMe());
@@ -1115,7 +1069,6 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
     self.hideChat(self.currentlyOpenedChat);
     self.currentlyOpenedChat = null;
   }
-
   room = new ChatRoom(self, roomId, type, userHandles, unixtime(), undefined, chatId, chatShard, chatdUrl, null, chatHandle, publicChatKey, ck, isMeeting, 0, mcoFlags);
   self.chats.set(room.roomId, room);
   if (setAsActive && !self.currentlyOpenedChat || self.currentlyOpenedChat === room.roomId) {
@@ -1134,7 +1087,6 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
     }
   })];
 };
-
 Chat.prototype.smartOpenChat = function (...args) {
   var self = this;
   if (typeof args[0] === 'string') {
@@ -1162,7 +1114,6 @@ Chat.prototype.smartOpenChat = function (...args) {
       } = aRoom;
       createTimeoutPromise(verify, 300, 3e4, false, `waitForReadyState(${roomId})`).then(ready).catch(reject);
     };
-
     if (args[0].length === 2 && args[1] === 'private') {
       var chatRoom = self.chats[array.one(args[0], u_handle)];
       if (chatRoom) {
@@ -1200,7 +1151,6 @@ Chat.prototype.smartOpenChat = function (...args) {
     }
   });
 };
-
 Chat.prototype.hideAllChats = function () {
   var self = this;
   self.chats.forEach(chatRoom => {
@@ -1209,15 +1159,12 @@ Chat.prototype.hideAllChats = function () {
     }
   });
 };
-
 Chat.prototype.getCurrentRoom = function () {
   return this.chats[this.currentlyOpenedChat];
 };
-
 Chat.prototype.getCurrentRoomJid = function () {
   return this.currentlyOpenedChat;
 };
-
 Chat.prototype.hideChat = function (roomJid) {
   var self = this;
   var room = self.chats[roomJid];
@@ -1227,12 +1174,10 @@ Chat.prototype.hideChat = function (roomJid) {
     self.logger.warn("Room not found: ", roomJid);
   }
 };
-
 Chat.prototype.sendMessage = function (roomJid, val) {
   const fail = ex => {
     this.logger.error(`sendMessage(${roomJid}) failed.`, ex);
   };
-
   if (!this.chats[roomJid]) {
     this.logger.warn("Queueing message for room: ", roomJid, val);
     const timeout = this.options.delaySendMessageIfRoomNotAvailableTimeout;
@@ -1242,10 +1187,8 @@ Chat.prototype.sendMessage = function (roomJid, val) {
   }
   return this.chats[roomJid].sendMessage(val).catch(fail);
 };
-
 Chat.prototype.processNewUser = function (u, isNewChat) {
   var self = this;
-
   if (self.plugins.presencedIntegration) {
     var user = M.u[u] || false;
     if (user.c === 1) {
@@ -1259,10 +1202,8 @@ Chat.prototype.processNewUser = function (u, isNewChat) {
   });
   self.renderMyStatus();
 };
-
 Chat.prototype.processRemovedUser = function (u) {
   var self = this;
-
   if (self.plugins.presencedIntegration) {
     self.plugins.presencedIntegration.removeContact(u);
   }
@@ -1273,10 +1214,8 @@ Chat.prototype.processRemovedUser = function (u) {
   });
   self.renderMyStatus();
 };
-
 Chat.prototype.refreshConversations = function () {
   var self = this;
-
   if (!u_type && !self.$container && !megaChatIsReady) {
     $('.fm-chat-block').hide();
     return false;
@@ -1310,7 +1249,6 @@ if (is_mobile) {
     return Promise.resolve();
   };
 }
-
 Chat.prototype.renderListing = async function megaChatRenderListing(location, isInitial) {
   if (!isInitial && !M.chat) {
     console.debug('renderListing: Not in chat.');
@@ -1360,7 +1298,6 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
   }
   return ENOENT;
 };
-
 Chat.prototype.setAttachments = function (roomId) {
   'use strict';
 
@@ -1368,7 +1305,6 @@ Chat.prototype.setAttachments = function (roomId) {
     if (d) {
       console.assert(this.chats[roomId] && this.chats[roomId].isCurrentlyActive, 'check this...');
     }
-
     M.v = Object.values(M.chc[roomId] || {});
     if (M.v.length) {
       M.v.sort(M.sortObjFn('co'));
@@ -1386,7 +1322,6 @@ Chat.prototype.setAttachments = function (roomId) {
     console.warn('Not in chat...');
   }
 };
-
 Chat.prototype._enqueueMessageUpdate = function (message) {
   this._queuedMessageUpdates.push(message);
   delay('chat:enqueue-message-updates', () => {
@@ -1397,10 +1332,8 @@ Chat.prototype._enqueueMessageUpdate = function (message) {
     }
   }, 400);
 };
-
 Chat.prototype._enqueueImageLoad = function (n) {
   'use strict';
-
   var cc = previews[n.h] || previews[n.hash];
   if (cc) {
     if (cc.poster) {
@@ -1415,18 +1348,15 @@ Chat.prototype._enqueueImageLoad = function (n) {
     }
   }
   var cached = n.src;
-
   if (String(n.fa).indexOf(':1*') > 0) {
     var load = false;
     var dedup = true;
-
     if (this._imageAttributeCache[n.fa]) {
       this._imageAttributeCache[n.fa].push(n.ch);
     } else {
       this._imageAttributeCache[n.fa] = [n.ch];
       load = !cached;
     }
-
     if (this._imageLoadCache[n.fa]) {
       this._imageLoadCache[n.fa].push(n.ch);
     } else {
@@ -1446,7 +1376,6 @@ Chat.prototype._enqueueImageLoad = function (n) {
     this._doneLoadingImage(n.fa);
   }
 };
-
 Chat.prototype._doLoadImages = function () {
   "use strict";
 
@@ -1516,7 +1445,6 @@ Chat.prototype._doLoadImages = function () {
   });
   imagesToBeLoaded = Object.create(null);
 };
-
 Chat.prototype._getImageNodes = function (h, src) {
   var nodes = this._imageLoadCache[h] || [];
   var handles = [].concat(nodes);
@@ -1536,7 +1464,6 @@ Chat.prototype._getImageNodes = function (h, src) {
   });
   return nodes;
 };
-
 Chat.prototype._startedLoadingImage = function (h) {
   "use strict";
 
@@ -1551,7 +1478,6 @@ Chat.prototype._startedLoadingImage = function (h) {
     }
   }
 };
-
 Chat.prototype._doneLoadingImage = function (h) {
   var self = this;
   var setSource = function (n, img, src) {
@@ -1560,7 +1486,6 @@ Chat.prototype._doneLoadingImage = function (h) {
       img.onload = null;
       n.srcWidth = this.naturalWidth;
       n.srcHeight = this.naturalHeight;
-
       if (message) {
         self._enqueueMessageUpdate(message);
       }
@@ -1586,27 +1511,23 @@ Chat.prototype._doneLoadingImage = function (h) {
       container.classList.remove('thumb-loading');
       setSource(n, imgNode, src || window.noThumbURI || '');
     }
-
     if (src) {
       n.src = src;
       if (root.srcBuffer && root.srcBuffer.byteLength) {
         n.srcBuffer = root.srcBuffer;
       }
-
       if (n.srcBuffer && !previews[n.h] && is_image3(n)) {
         preqs[n.h] = 1;
         previewimg(n.h, n.srcBuffer, 'image/jpeg');
         previews[n.h].fromChat = Date.now();
       }
     }
-
     delete n.mo;
   }
   if (src) {
     mBroadcaster.sendMessage('chat_image_preview');
   }
 };
-
 Chat.prototype.onChatsHistoryReady = promisify(function (resolve, reject, timeout) {
   if (this.allChatsHadInitialLoadedHistory()) {
     return resolve();
@@ -1649,7 +1570,6 @@ Chat.prototype.allChatsHadInitialLoadedHistory = function () {
   }
   return true;
 };
-
 Chat.prototype.getPrivateRoom = function (h) {
   'use strict';
 
@@ -1680,7 +1600,6 @@ Chat.prototype.createAndStartMeeting = function (topic, audio, video) {
     });
   });
 };
-
 Chat.prototype._destroyAllChatsFromChatd = function () {
   var self = this;
   asyncApiReq({
@@ -1725,7 +1644,6 @@ Chat.prototype._leaveAllGroupChats = function () {
     });
   });
 };
-
 Chat.prototype.getEmojiDataSet = function (name) {
   var self = this;
   assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");
@@ -1744,7 +1662,6 @@ Chat.prototype.getEmojiDataSet = function (name) {
     return self._emojiDataLoading[name];
   } else if (name === "categories") {
     self._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
-
     return MegaPromise.resolve(self._emojiData[name]);
   } else {
     var promise = new MegaPromise();
@@ -1783,7 +1700,6 @@ Chat.prototype._mapEmojisToAliases = function () {
     self._emojiData.emojisUtf[emoji.u] = emoji;
   }
 };
-
 Chat.prototype.isValidEmojiSlug = function (slug) {
   var self = this;
   var emojiData = self._emojiData.emojis;
@@ -1797,7 +1713,6 @@ Chat.prototype.isValidEmojiSlug = function (slug) {
     }
   }
 };
-
 Chat.prototype.getPresence = function (user_handle) {
   if (user_handle && this.plugins.presencedIntegration) {
     return this.plugins.presencedIntegration.getPresence(user_handle);
@@ -1807,7 +1722,6 @@ Chat.prototype.getPresenceAsCssClass = function (user_handle) {
   var presence = this.getPresence(user_handle);
   return this.presenceStringToCssClass(presence);
 };
-
 Chat.prototype.presenceStringToCssClass = function (presence) {
   if (presence === UserPresence.PRESENCE.ONLINE) {
     return 'online';
@@ -1821,7 +1735,6 @@ Chat.prototype.presenceStringToCssClass = function (presence) {
     return 'black';
   }
 };
-
 Chat.prototype.generateTempMessageId = function (roomId, messageAndMeta) {
   var messageIdHash = u_handle + roomId;
   if (messageAndMeta) {
@@ -1848,7 +1761,6 @@ Chat.prototype.getChatById = function (chatdId) {
   });
   return found;
 };
-
 Chat.prototype.getMessageByMessageId = async function (chatId, messageId) {
   const chatRoom = this.getChatById(chatId);
   const msg = chatRoom.messagesBuff.getMessageById(messageId);
@@ -1869,7 +1781,6 @@ Chat.prototype.getMessageByMessageId = async function (chatId, messageId) {
   }
   return Promise.reject(ENOENT);
 };
-
 Chat.prototype.haveAnyActiveCall = function () {
   var self = this;
   var chatIds = self.chats.keys();
@@ -1890,7 +1801,6 @@ Chat.prototype.haveAnyOnHoldCall = function () {
   }
   return false;
 };
-
 Chat.prototype.openChatAndSendFilesDialog = function (user_handle) {
   'use strict';
 
@@ -1905,7 +1815,6 @@ Chat.prototype.openChatAndSendFilesDialog = function (user_handle) {
     room.setActive();
   }).catch(this.logger.error.bind(this.logger));
 };
-
 Chat.prototype.openChatAndAttachNodes = function (targets, nodes, noOpen) {
   'use strict';
 
@@ -2023,7 +1932,6 @@ Chat.prototype.getFrequentContacts = function () {
   var promises = [];
   var finishedLoadingChats = {};
   var loadingMoreChats = {};
-
   var _calculateLastTsFor = function (r, maxMessages) {
     var mb = r.messagesBuff;
     var len = mb.messages.length;
@@ -2194,14 +2102,12 @@ Chat.prototype.loginOrRegisterBeforeJoining = function (chatHandle, forceRegiste
   } else if (forceLogin) {
     return doShowLoginDialog();
   }
-
   if (u_wasloggedin()) {
     doShowLoginDialog();
   } else {
     doShowRegisterDialog();
   }
 };
-
 Chat.prototype.highlight = (text, matches, dontEscape) => {
   if (text && matches) {
     text = dontEscape ? text : escapeHTML(text);
@@ -2230,7 +2136,6 @@ Chat.prototype.highlight = (text, matches, dontEscape) => {
   }
   return null;
 };
-
 Chat.prototype._highlightDiacritics = function (word, matchPos, split, match) {
   const parts = [];
   const origMatch = word.substring(matchPos, matchPos + match.length);
@@ -2241,14 +2146,12 @@ Chat.prototype._highlightDiacritics = function (word, matchPos, split, match) {
   }
   return parts.join(`[$]${origMatch}[/$]`);
 };
-
 Chat.prototype.html = function (content) {
   if (content) {
     return this.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(content));
   }
   return null;
 };
-
 Chat.prototype.updateKeysInProtocolHandlers = function () {
   this.chats.forEach(r => {
     let ph = r.protocolHandler;
@@ -2257,7 +2160,6 @@ Chat.prototype.updateKeysInProtocolHandlers = function () {
     }
   });
 };
-
 Chat.prototype.eventuallyInitMeetingUI = function () {
   if (!window.location.hash) {
     return;
@@ -2289,7 +2191,6 @@ Chat.prototype.autoJoinIfNeeded = function () {
     var autoLoginChatInfo = tryCatch(JSON.parse.bind(JSON))(rawAutoLoginInfo) || false;
     if (unixtime() - 7200 < autoLoginChatInfo[1]) {
       const req = this.plugins.chatdIntegration.getMciphReqFromHandleAndKey(autoLoginChatInfo[0], autoLoginChatInfo[2].substr(1));
-
       megaChat.rebind('onRoomInitialized.autoJoin', (e, megaRoom) => {
         if (megaRoom.chatId === autoLoginChatInfo[3]) {
           megaRoom.setActive();
@@ -2297,7 +2198,6 @@ Chat.prototype.autoJoinIfNeeded = function () {
           localStorage.removeItem("autoJoinOnLoginChat");
         }
       });
-
       M.req(req);
     } else {
       localStorage.removeItem("autoJoinOnLoginChat");
@@ -2316,9 +2216,7 @@ const chat = ({
 /***/ (() => {
 
 (function () {
-  var ChatGlobalEventManager = function () {
-  };
-
+  var ChatGlobalEventManager = function () {};
   lazy(ChatGlobalEventManager.prototype, 'listeners', function () {
     window.addEventListener('hashchange', ev => this.triggered(ev));
     $(window).rebind('resize.chatGlobalEventManager', ev => this.triggered(ev));
@@ -2327,25 +2225,20 @@ const chat = ({
     listeners.hashchange = Object.create(null);
     return listeners;
   });
-
   ChatGlobalEventManager.prototype.addEventListener = function (eventName, namespace, cb) {
     this.listeners[eventName][namespace] = this.listeners[namespace] || cb;
   };
-
   ChatGlobalEventManager.prototype.removeEventListener = function (eventName, namespace) {
     delete this.listeners[eventName][namespace];
   };
-
   ChatGlobalEventManager.prototype.triggered = SoonFc(140, function _chatEVDispatcher(ev) {
     if (M.chat) {
       var listeners = this.listeners[ev.type];
-
       for (var k in listeners) {
         listeners[k](ev);
       }
     }
   });
-
   window.chatGlobalEventManager = new ChatGlobalEventManager();
 })();
 
@@ -2375,7 +2268,6 @@ const MCO_FLAGS = {
 };
 window.RETENTION_FORMAT = RETENTION_FORMAT;
 window.MCO_FLAGS = MCO_FLAGS;
-
 var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI, publicChatHandle, publicChatKey, ck, isMeeting, retentionTime, mcoFlags) {
   var self = this;
   this.logger = MegaLogger.getLogger("room[" + roomId + "]", {}, megaChat.logger);
@@ -2453,7 +2345,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
   }
   this.setState(ChatRoom.STATE.INITIALIZED);
   this.isCurrentlyActive = false;
-
   if (d) {
     this.rebind('onStateChange.chatRoomDebug', function (e, oldState, newState) {
       self.logger.debug("Will change state from: ", ChatRoom.stateToText(oldState), " to ", ChatRoom.stateToText(newState));
@@ -2464,12 +2355,10 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
       if (d > 2) {
         self.logger.warn('Restoring persisted messages...', self.type, self.isCurrentlyActive);
       }
-
       var cim = self.getChatIdMessages();
       cim.restore(true);
     }
   });
-
   self.rebind('onMessagesBuffAppend.lastActivity', function (e, msg) {
     if (is_chatlink) {
       return;
@@ -2478,7 +2367,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     if (!ts) {
       return;
     }
-
     var contactForMessage = msg && Message.getContactForMessage(msg);
     if (contactForMessage && contactForMessage.u !== u_handle) {
       if (!contactForMessage.ats || contactForMessage.ats < ts) {
@@ -2524,7 +2412,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
       throw new Error("Not implemented");
     }
   });
-
   self.rebind('onMembersUpdated.coreRoomDataMngmt', function (e, eventData) {
     if (self.state === ChatRoom.STATE.LEFT && eventData.priv >= 0 && eventData.priv < 255) {
       self.membersLoaded = false;
@@ -2566,7 +2453,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
       self.trigger('onMembersUpdatedUI', eventData);
     }
   });
-
   if (is_chatlink && !is_chatlink.callId) {
     const unbind = () => {
       self.unbind('onMessagesHistoryDone.chatlinkAlreadyIn');
@@ -2624,7 +2510,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
       getLastInteractionWith(contact.u);
     }
   });
-
   self.megaChat.trigger('onRoomCreated', [self]);
   if (this.type === "public" && self.megaChat.publicChatKeys[self.chatId]) {
     self.publicChatKey = self.megaChat.publicChatKeys[self.chatId];
@@ -2676,7 +2561,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
   return this;
 };
 inherits(ChatRoom, MegaDataObject);
-
 ChatRoom.STATE = {
   'INITIALIZED': 5,
   'JOINING': 10,
@@ -2716,7 +2600,6 @@ ChatRoom.MembersSet.prototype.trackFromActionPacket = function (ap, isMcf) {
   (ap.u || []).forEach(function (r) {
     apMembers[r.u] = r.p;
   });
-
   Object.keys(self.members).forEach(function (u_h) {
     if (typeof apMembers[u_h] === 'undefined') {
       self.remove(u_h);
@@ -2732,7 +2615,6 @@ ChatRoom.MembersSet.prototype.trackFromActionPacket = function (ap, isMcf) {
       self.update(u_h, apMembers[u_h]);
     }
   });
-
   if (!isMcf && ap.m === 1 && !ap.n && ap.url && ap.ou !== u_handle && typeof ap.p === 'undefined' && !ap.topicChange) {
     self.chatRoom.trigger('onMeAdded', ap.ou);
   }
@@ -2767,7 +2649,6 @@ ChatRoom.prototype.trackMemberUpdatesFromActionPacket = function (ap, isMcf) {
     this.membersSetFromApi.trackFromActionPacket(ap, isMcf);
   }
 };
-
 ChatRoom.prototype.getCallParticipants = function () {
   var ids = this.activeCallIds.keys();
   if (ids.length === 0) {
@@ -2778,7 +2659,6 @@ ChatRoom.prototype.getCallParticipants = function () {
 ChatRoom.prototype.getChatIdMessages = function () {
   return this.chatd.chatIdMessages[this.chatIdBin];
 };
-
 ChatRoom.prototype.getRetentionFormat = function (retentionTime) {
   retentionTime = retentionTime || this.retentionTime;
   switch (true) {
@@ -2794,7 +2674,6 @@ ChatRoom.prototype.getRetentionFormat = function (retentionTime) {
       return RETENTION_FORMAT.HOURS;
   }
 };
-
 ChatRoom.prototype.getRetentionTimeFormatted = function (retentionTime) {
   retentionTime = retentionTime || this.retentionTime;
   switch (this.getRetentionFormat(retentionTime)) {
@@ -2810,7 +2689,6 @@ ChatRoom.prototype.getRetentionTimeFormatted = function (retentionTime) {
       return 0;
   }
 };
-
 ChatRoom.prototype.getRetentionLabel = function (retentionTime) {
   retentionTime = retentionTime || this.retentionTime;
   const days = secondsToDays(retentionTime);
@@ -2829,7 +2707,6 @@ ChatRoom.prototype.getRetentionLabel = function (retentionTime) {
       return mega.icu.format(l.hours_chat_history_plural, hours);
   }
 };
-
 ChatRoom.prototype.setRetention = function (time) {
   asyncApiReq({
     "a": "mcsr",
@@ -2838,7 +2715,6 @@ ChatRoom.prototype.setRetention = function (time) {
     "ds": 1
   });
 };
-
 ChatRoom.prototype.removeMessagesByRetentionTime = function () {
   var self = this;
   var messages = self.messagesBuff.messages;
@@ -2914,21 +2790,17 @@ ChatRoom.prototype.isOnlineForCalls = function () {
   }
   return chatdChat.loginState() >= LoginState.HISTDONE;
 };
-
 ChatRoom.prototype.isArchived = function () {
   var self = this;
   return self.flags & ChatRoom.ARCHIVED;
 };
-
 ChatRoom.prototype.isAnonymous = function () {
   return is_chatlink && this.type === "public" && this.publicChatHandle && this.publicChatKey && this.publicChatHandle === megaChat.initialPubChatHandle;
 };
-
 ChatRoom.prototype.isDisplayable = function () {
   var self = this;
   return self.showArchived === true || !self.isArchived() || self.activeCall;
 };
-
 ChatRoom.prototype.persistToFmdb = function () {
   var self = this;
   if (fmdb) {
@@ -2960,7 +2832,6 @@ ChatRoom.prototype.persistToFmdb = function () {
     }
   }
 };
-
 ChatRoom.prototype.updateFlags = function (f, updateUI) {
   var self = this;
   var flagChange = self.flags !== f;
@@ -2985,7 +2856,6 @@ ChatRoom.prototype.updateFlags = function (f, updateUI) {
   }
   this.trackDataChange();
 };
-
 ChatRoom.stateToText = function (state) {
   var txt = null;
   $.each(ChatRoom.STATE, function (k, v) {
@@ -2994,10 +2864,8 @@ ChatRoom.stateToText = function (state) {
       return false;
     }
   });
-
   return txt;
 };
-
 ChatRoom.prototype.setState = function (newState, isRecover) {
   var self = this;
   assert(newState, 'Missing state');
@@ -3012,23 +2880,19 @@ ChatRoom.prototype.setState = function (newState, isRecover) {
   self.state = newState;
   self.trigger('onStateChange', [oldState, newState]);
 };
-
 ChatRoom.prototype.getStateAsText = function () {
   var self = this;
   return ChatRoom.stateToText(self.state);
 };
-
 ChatRoom.prototype.getParticipants = function () {
   var self = this;
   return Object.keys(self.members);
 };
-
 ChatRoom.prototype.getParticipantsExceptMe = function (userHandles) {
   var res = clone(userHandles || this.getParticipants());
   array.remove(res, u_handle, true);
   return res;
 };
-
 ChatRoom.prototype.getParticipantsTruncated = function (maxMembers = 5, maxLength = ChatRoom.TOPIC_MAX_LENGTH) {
   var truncatedParticipantNames = [];
   const members = Object.keys(this.members);
@@ -3048,7 +2912,6 @@ ChatRoom.prototype.getParticipantsTruncated = function (maxMembers = 5, maxLengt
   }
   return truncatedParticipantNames.join(', ');
 };
-
 ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
   var self = this;
   var participants;
@@ -3064,11 +2927,9 @@ ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
     return names.length > 0 ? names : def;
   }
 };
-
 ChatRoom.prototype.getTruncatedRoomTopic = function (maxLength = ChatRoom.TOPIC_MAX_LENGTH) {
   return this.topic && this.topic.length > maxLength ? this.topic.substr(0, maxLength) + '...' : this.topic;
 };
-
 ChatRoom.prototype.setRoomTitle = function (newTopic, allowEmpty) {
   var self = this;
   newTopic = allowEmpty ? newTopic : String(newTopic);
@@ -3099,7 +2960,6 @@ ChatRoom.prototype.setRoomTitle = function (newTopic, allowEmpty) {
     return false;
   }
 };
-
 ChatRoom.prototype.leave = function (triggerLeaveRequest) {
   var self = this;
   self._leaving = true;
@@ -3122,7 +2982,6 @@ ChatRoom.prototype.leave = function (triggerLeaveRequest) {
     self.setState(ChatRoom.STATE.LEFT);
   }
 };
-
 ChatRoom.prototype.archive = function () {
   var self = this;
   var mask = 0x01;
@@ -3139,7 +2998,6 @@ ChatRoom.prototype.archive = function () {
     }
   });
 };
-
 ChatRoom.prototype.unarchive = function () {
   var self = this;
   var mask = 0x01;
@@ -3156,7 +3014,6 @@ ChatRoom.prototype.unarchive = function () {
     }
   });
 };
-
 ChatRoom.prototype.destroy = function (notifyOtherDevices, noRedirect) {
   var self = this;
   self.megaChat.trigger('onRoomDestroy', [self]);
@@ -3179,19 +3036,15 @@ ChatRoom.prototype.destroy = function (notifyOtherDevices, noRedirect) {
     }
   });
 };
-
 ChatRoom.prototype.updatePublicHandle = function (d, callback) {
   var self = this;
   return megaChat.plugins.chatdIntegration.updateChatPublicHandle(self.chatId, d, callback);
 };
-
 ChatRoom.prototype.iAmInRoom = function () {
   return !(!this.members.hasOwnProperty(u_handle) || this.members[u_handle] === -1);
 };
-
 ChatRoom.prototype.joinViaPublicHandle = function () {
   var self = this;
-
   if (!fminitialized && is_chatlink) {
     if (u_type) {
       return new Promise((res, rej) => {
@@ -3210,7 +3063,6 @@ ChatRoom.prototype.joinViaPublicHandle = function () {
   }
   return Promise.reject();
 };
-
 ChatRoom.prototype.switchOffPublicMode = function () {
   var self = this;
   var participants = self.protocolHandler.getTrackedParticipants();
@@ -3223,7 +3075,6 @@ ChatRoom.prototype.switchOffPublicMode = function () {
     var topic = null;
     if (self.topic) {
       topic = self.protocolHandler.embeddedEncryptTo(self.topic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, true, false);
-
       topic = base64urlencode(topic);
       asyncApiReq({
         a: 'mcscm',
@@ -3243,7 +3094,6 @@ ChatRoom.prototype.switchOffPublicMode = function () {
     _runSwitchOffPublicMode();
   });
 };
-
 ChatRoom.prototype.show = function () {
   var self = this;
   if (self.isCurrentlyActive) {
@@ -3298,20 +3148,16 @@ ChatRoom.prototype.scrollToChat = function () {
     }
   }
 };
-
 ChatRoom.prototype.isActive = function () {
   return document.hasFocus() && this.isCurrentlyActive;
 };
-
 ChatRoom.prototype.setActive = function () {
   loadSubPage(this.getRoomUrl());
 };
-
 ChatRoom.prototype.isLoading = function () {
   var mb = this.messagesBuff;
   return mb.messagesHistoryIsLoading() || mb.isDecrypting;
 };
-
 ChatRoom.prototype.getRoomUrl = function (getRawLink) {
   var self = this;
   if (self.type === "private") {
@@ -3330,12 +3176,10 @@ ChatRoom.prototype.getRoomUrl = function (getRawLink) {
     throw new Error("Can't get room url for unknown room type.");
   }
 };
-
 ChatRoom.prototype.activateWindow = function () {
   var self = this;
   loadSubPage(self.getRoomUrl());
 };
-
 ChatRoom.prototype.hide = function () {
   var self = this;
   if (d) {
@@ -3355,7 +3199,6 @@ ChatRoom.prototype.hide = function () {
   }
   self.trigger('onChatHidden', self.isCurrentlyActive);
 };
-
 ChatRoom.prototype.appendMessage = function (message) {
   var self = this;
   if (message.deleted) {
@@ -3387,12 +3230,10 @@ ChatRoom.prototype.appendMessage = function (message) {
   self.messagesBuff.messages.push(message);
   self.shownMessages[message.messageId] = true;
 };
-
 ChatRoom.prototype.getNavElement = function () {
   var self = this;
   return $('.nw-conversations-item[data-room-id="' + self.chatId + '"]');
 };
-
 ChatRoom.prototype.sendMessage = function (message) {
   var self = this;
   var megaChat = this.megaChat;
@@ -3418,7 +3259,6 @@ ChatRoom.prototype.sendMessage = function (message) {
     this.logger.error(`sendMessage failed..`, msgObject, ex);
   });
 };
-
 ChatRoom.prototype._sendMessageToTransport = function (messageObject) {
   var self = this;
   var megaChat = this.megaChat;
@@ -3427,7 +3267,6 @@ ChatRoom.prototype._sendMessageToTransport = function (messageObject) {
   megaChat.trigger('onPostBeforeSendMessage', messageObject);
   return megaChat.plugins.chatdIntegration.sendMessage(self, messageObject);
 };
-
 ChatRoom.prototype._sendNodes = function (nodeids, users) {
   var promises = [];
   var self = this;
@@ -3456,7 +3295,6 @@ ChatRoom.prototype._sendNodes = function (nodeids, users) {
   }
   return MegaPromise.allDone(promises);
 };
-
 ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resolve, reject, nodes) {
   var i;
   var step = 0;
@@ -3596,12 +3434,10 @@ ChatRoom.prototype.uploadFromComputer = function () {
   this.scrolledToBottom = true;
   $('#fileselect1').trigger('click');
 };
-
 ChatRoom.prototype.attachContacts = function (ids) {
   for (let i = 0; i < ids.length; i++) {
     const nodeId = ids[i];
     const node = M.u[nodeId];
-
     this.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.CONTACT + JSON.stringify([{
       u: node.u,
       email: node.m,
@@ -3609,7 +3445,6 @@ ChatRoom.prototype.attachContacts = function (ids) {
     }]));
   }
 };
-
 ChatRoom.prototype.getMessageById = function (messageId) {
   var self = this;
   var msgs = self.messagesBuff.messages;
@@ -3623,7 +3458,6 @@ ChatRoom.prototype.getMessageById = function (messageId) {
   }
   return false;
 };
-
 ChatRoom.prototype.renderContactTree = function () {
   var self = this;
   var $navElement = self.getNavElement();
@@ -3638,12 +3472,10 @@ ChatRoom.prototype.renderContactTree = function () {
   }
   $navElement.data('chatroom', self);
 };
-
 ChatRoom.prototype.getUnreadCount = function () {
   var self = this;
   return self.messagesBuff.getUnreadCount();
 };
-
 ChatRoom.prototype.recover = function () {
   var self = this;
   self.callRequest = null;
@@ -3667,8 +3499,7 @@ ChatRoom._fnRequireParticipantKeys = function (fn, scope) {
   };
 };
 ChatRoom.prototype.showMissingUnifiedKeyDialog = function () {
-  return msgDialog(`warningb:!^${l[82]}!${l[23433]}`, null, l[200], l.chat_key_failed_dlg_text,
-  reload => reload ? M.reload() : null, 1);
+  return msgDialog(`warningb:!^${l[82]}!${l[23433]}`, null, l[200], l.chat_key_failed_dlg_text, reload => reload ? M.reload() : null, 1);
 };
 ChatRoom.prototype.hasInvalidKeys = function () {
   if (!is_chatlink && this.type === 'public') {
@@ -3701,7 +3532,6 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     return this.showMissingUnifiedKeyDialog();
   }
   this.meetingsLoading = l.joining;
-
   this.rebind("onCallLeft.start", (e, data) => {
     if (data.callId === callId) {
       this.meetingsLoading = false;
@@ -3741,6 +3571,10 @@ ChatRoom.prototype.rejectCall = function (callId) {
       'mid': callId
     });
   }
+  const shard = this.chatd.shards[this.chatShard];
+  if (shard) {
+    shard.sendCallReject(base64urldecode(this.chatId), base64urldecode(callId));
+  }
   return Promise.resolve();
 };
 ChatRoom.prototype.endCallForAll = function (callId) {
@@ -3772,7 +3606,6 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
     return this.showMissingUnifiedKeyDialog();
   }
   this.meetingsLoading = l.starting;
-
   const opts = {
     'a': 'mcms',
     'cid': this.chatId
@@ -3803,9 +3636,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
   });
 });
 ChatRoom.prototype.stateIsLeftOrLeaving = function () {
-  return this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING ||
-  !is_chatlink && this.state === ChatRoom.STATE.READY && this.membersSetFromApi && !this.membersSetFromApi.members.hasOwnProperty(u_handle) ||
-  is_chatlink && !this.members.hasOwnProperty(u_handle);
+  return this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING || !is_chatlink && this.state === ChatRoom.STATE.READY && this.membersSetFromApi && !this.membersSetFromApi.members.hasOwnProperty(u_handle) || is_chatlink && !this.members.hasOwnProperty(u_handle);
 };
 ChatRoom.prototype._clearChatMessagesFromChatd = function () {
   this.chatd.shards[this.chatShard].retention(base64urldecode(this.chatId), 1);
@@ -3828,7 +3659,6 @@ ChatRoom.prototype.iAmStandard = function () {
 ChatRoom.prototype.iAmReadOnly = function () {
   return this.type !== 'private' && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
 };
-
 ChatRoom.prototype.didInteraction = function (user_handle, ts) {
   var self = this;
   var newTs = ts || unixtime();
@@ -3854,7 +3684,6 @@ ChatRoom.prototype.retrieveAllHistory = function () {
     }
   });
 };
-
 ChatRoom.prototype.seedRoomKeys = async function (keys) {
   assert(Array.isArray(keys) && keys.length, `Invalid keys parameter for seedRoomKeys.`, keys);
   if (d > 2) {
@@ -3948,11 +3777,9 @@ ChatRoom.prototype.havePendingGroupCall = function () {
   }
   return this.activeCallIds.length > 0;
 };
-
 ChatRoom.prototype.havePendingCall = function () {
   return this.activeCallIds.length > 0;
 };
-
 ChatRoom.prototype.getActiveCallMessageId = function (ignoreActive) {
   var self = this;
   if (!ignoreActive && !self.havePendingCall() && !self.haveActiveCall()) {
@@ -3978,9 +3805,7 @@ ChatRoom.prototype.stopRinging = function (callId) {
     chatRoom: this
   });
 };
-ChatRoom.prototype.callParticipantsUpdated = function
-(
-) {
+ChatRoom.prototype.callParticipantsUpdated = function () {
   var self = this;
   var msgId = self.getActiveCallMessageId();
   if (!msgId) {
@@ -3995,7 +3820,6 @@ ChatRoom.prototype.callParticipantsUpdated = function
   msg && msg.wrappedChatDialogMessage && msg.wrappedChatDialogMessage.trackDataChange();
   self.trackDataChange();
 };
-
 ChatRoom.prototype.onPublicChatRoomInitialized = function () {
   var self = this;
   if (self.type !== "public" || !localStorage.autoJoinOnLoginChat) {
@@ -4054,7 +3878,6 @@ ChatRoom.prototype.scrollToMessageId = function (msgId, index, retryActive) {
     var elem = $('.' + msgId + '.message.body')[0];
     self.scrolledToBottom = false;
     ps.scrollToElement(elem, true);
-
     self.$rConversationPanel.lastScrollPosition = undefined;
     self.isScrollingToMessageId = false;
   } else if (self.messagesBuff.isRetrievingHistory) {
@@ -4091,14 +3914,8 @@ ChatRoom.prototype.toggleOpenInvite = function () {
     [MCO_FLAGS.OPEN_INVITE]: Math.abs(this.options[MCO_FLAGS.OPEN_INVITE] - 1)
   });
 };
-ChatRoom.prototype.toggleWaitingRoom = function () {
-}
-;
-
-ChatRoom.prototype.toggleSpeakRequest = function () {
-}
-;
-
+ChatRoom.prototype.toggleWaitingRoom = function () {};
+ChatRoom.prototype.toggleSpeakRequest = function () {};
 window.ChatRoom = ChatRoom;
 const __WEBPACK_DEFAULT_EXPORT__ = ({
   'ChatRoom': ChatRoom
@@ -4129,7 +3946,6 @@ var _dec, _dec2, _dec3, _dec4, _dec5, _class;
 
 var INTERSECTION_OBSERVER_AVAILABLE = typeof IntersectionObserver !== 'undefined';
 var RESIZE_OBSERVER_AVAILABLE = typeof ResizeObserver !== 'undefined';
-
 function shallowEqual(objA, objB) {
   if (objA === objB) {
     return true;
@@ -4284,7 +4100,6 @@ const trycatcher = () => (t, p, d) => (d.value = tryCatch(d.value)) && d;
 let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = logcall(), _dec4 = SoonFcWrap(80, true), _dec5 = SoonFcWrap(350, true), (_class = class MegaRenderMixin extends (react1().Component) {
   constructor(props) {
     super(props);
-
     lazy(this, '__internalReactID', function () {
       let key = '';
       let fib = DEBUG_THIS && this._reactInternalFiber;
@@ -4310,7 +4125,6 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
       key = key ? '[' + key.substr(0, key.length - 1) + ']' : '';
       return '::' + this.constructor.name + '[' + ('000' + ID_CURRENT++).slice(-4) + ']' + key;
     });
-
     lazy(this, '__internalUniqueID', function () {
       return (this.__internalReactID + makeUUID().substr(-12)).replace(/[^a-zA-Z0-9]/g, '');
     });
@@ -4413,7 +4227,6 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
       chatGlobalEventManager.addEventListener('resize', 'megaRenderMixing' + this.getUniqueId(), () => this.onResizeDoUpdate());
     }
     chatGlobalEventManager.addEventListener('hashchange', 'hc' + this.getUniqueId(), () => this.onResizeDoUpdate());
-
     if (this.props) {
       this._recurseAddListenersIfNeeded("p", this.props);
     }
@@ -4483,7 +4296,6 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
       return true;
     }
     const domNode = this.findDOMNode();
-
     if (!this.props.hideable && (!domNode || domNode.offsetParent === null)) {
       return false;
     }
@@ -4537,7 +4349,6 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
   onResizeDoUpdate() {
     this.eventuallyUpdate();
   }
-
   _getUniqueIDForMap(map, payload) {
     return map + '.' + payload;
   }
@@ -4567,7 +4378,6 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
     if (!v && v === rv) {
       return false;
     }
-
     if (!rv && v) {
       return true;
     }
@@ -4657,7 +4467,6 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
         return true;
       }
     }
-
     if (this.specShouldComponentUpdate) {
       var r = this.specShouldComponentUpdate(nextProps, nextState);
       if (r === false) {
@@ -4689,9 +4498,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
       shouldRerender = this._recursiveSearchForDataChanges("s", nextState, this.state);
     }
     if (window.RENDER_DEBUG) {
-      if (shouldRerender) {
-      }
-
+      if (shouldRerender) {}
       console.error("shouldRerender?", shouldRerender, "rendered: ", this.getElementName(), "props:", this.props, "nextProps:", this.props, "state:", this.state);
     }
     if (shouldRerender === true) {
@@ -4719,7 +4526,6 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
       this.forceUpdate();
     }
   }
-
   componentDidUpdate() {
     if (window.RENDER_DEBUG) {
       var self = this;
@@ -4815,7 +4621,6 @@ class ContactAwareComponent extends MegaRenderMixin {
     }
     const syncName = !ContactAwareComponent.unavailableNames[contactHandle] && !contact.firstName && !contact.lastName;
     const syncMail = megaChat.FORCE_EMAIL_LOADING || (contact.c === 1 || contact.c === 2) && !contact.m && !is_chatlink;
-
     const syncAvtr = (is_chatlink && (!contact.avatar || ((_contact$avatar = contact.avatar) == null ? void 0 : _contact$avatar.type) === "text") || !contact.avatar) && !avatars[contactHandle] && !ContactAwareComponent.unavailableAvatars[contactHandle];
     const loader = () => {
       if (!this.isComponentEventuallyVisible()) {
@@ -4836,7 +4641,6 @@ class ContactAwareComponent extends MegaRenderMixin {
           ContactAwareComponent.unavailableAvatars[contactHandle] = true;
         }));
       }
-
       MegaPromise.allDone(promises).always(() => {
         this.eventuallyUpdate();
         this.__isLoadingContactInfo = false;
@@ -4902,7 +4706,6 @@ class ChatToaster extends _mixins1__.wl {
   customIsEventuallyVisible() {
     return M.chat;
   }
-
   enqueueToast(e) {
     if (this.props.showDualNotifications && e.data.options && e.data.options.persistent) {
       this.persistentToasts.push(e.data);
@@ -4911,7 +4714,6 @@ class ChatToaster extends _mixins1__.wl {
     }
     this.pollToasts();
   }
-
   pollToasts() {
     const {
       toast: shownToast,
@@ -4946,7 +4748,6 @@ class ChatToaster extends _mixins1__.wl {
       }
     }
   }
-
   dispatchFMToast(toast, redraw) {
     window.toaster.alerts.medium(...toast.renderFM()).then(fmToastId => {
       if (!redraw) {
@@ -4971,7 +4772,6 @@ class ChatToaster extends _mixins1__.wl {
       }
     });
   }
-
   dispatchToast(toast, now, options = {}) {
     const {
       fmToastId,
@@ -5013,7 +4813,6 @@ class ChatToaster extends _mixins1__.wl {
       onShownToast(toast);
     }
   }
-
   onClose(persistent) {
     const {
       showDualNotifications,
@@ -5052,7 +4851,6 @@ class ChatToaster extends _mixins1__.wl {
       endTime: 0
     }, () => this.pollToasts());
   }
-
   flush() {
     const {
       toast,
@@ -5082,7 +4880,6 @@ class ChatToaster extends _mixins1__.wl {
       persistentToast: null
     });
   }
-
   endToastIntervals() {
     if (!this.props.isRootToaster) {
       return;
@@ -5727,15 +5524,12 @@ class ContactButton extends _mixins1__._p {
                 return mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle);
               }
               const name = M.getNameByHandle(userHandle);
-              return msgDialog('info', '',
-              l.ephemeral_title ? l.ephemeral_title.replace('%1', name) : `${name} is using an ephemeral session.`,
-              l.ephemeral_info);
+              return msgDialog('info', '', l.ephemeral_title ? l.ephemeral_title.replace('%1', name) : `${name} is using an ephemeral session.`, l.ephemeral_info);
             });
           }
         }
       }));
     }
-
     if (u_attr && contact.u !== u_handle) {
       if (moreDropdowns.length > 0 && !(moreDropdowns.length === 2 && moreDropdowns[1] && moreDropdowns[1].key === "fingerprint")) {
         moreDropdowns.push(react0().createElement("hr", {
@@ -5746,7 +5540,6 @@ class ContactButton extends _mixins1__._p {
         key: "set-nickname",
         icon: "sprite-fm-mono icon-rename",
         label: contact.nickname === '' ? l.set_nickname_label : l.edit_nickname_label,
-
         onClick: () => {
           nicknames.setNicknameDialog.init(contact.u);
         }
@@ -6092,7 +5885,6 @@ class ContactCard extends _mixins1__._p {
         var matches = [];
         var regex = new RegExp(RegExpEscape(searchValue), 'gi');
         var result;
-
         while (result = regex.exec(username)) {
           matches.push({
             idx: result.index,
@@ -6343,7 +6135,6 @@ class ContactPickerWidget extends _mixins1__.wl {
       var userName = ChatSearch._normalize_str(avatarMeta.fullName.toLowerCase());
       var userRealName = ChatSearch._normalize_str(v.name.toLowerCase());
       var userEmail = ChatSearch._normalize_str(v.m.toLowerCase());
-
       if (userName.indexOf(self.state.searchValue.toLowerCase()) === -1 && userRealName.indexOf(self.state.searchValue.toLowerCase()) === -1 && (userEmail.indexOf(self.state.searchValue.toLowerCase()) === -1 || self.props.notSearchInEmails)) {
         return false;
       }
@@ -6364,7 +6155,6 @@ class ContactPickerWidget extends _mixins1__.wl {
           return false;
         }
         var contactHash = contact.u;
-
         if (contactHash === self.lastClicked && new Date() - self.clickTime < 500 && !self.props.disableDoubleClick || !self.props.multiple) {
           if (self.props.onSelected) {
             self.props.onSelected([contactHash]);
@@ -6374,7 +6164,6 @@ class ContactPickerWidget extends _mixins1__.wl {
           return;
         } else {
           var selected = clone(self.state.selected || []);
-
           if (selected.indexOf(contactHash) === -1) {
             selected.push(contactHash);
             self.scrollToLastSelected = true;
@@ -6456,7 +6245,6 @@ class ContactPickerWidget extends _mixins1__.wl {
       };
       var onContactSelectDoneCb = contact => {
         var contactHash = contact.u;
-
         if (contactHash === self.lastClicked && new Date() - self.clickTime < 500) {
           if (self.props.onSelected) {
             self.props.onSelected([contactHash]);
@@ -6465,7 +6253,6 @@ class ContactPickerWidget extends _mixins1__.wl {
           return;
         } else {
           var selected = clone(self.state.selected || []);
-
           if (selected.indexOf(contactHash) === -1) {
             selected.push(contactHash);
             self.scrollToLastSelected = true;
@@ -6578,7 +6365,6 @@ class ContactPickerWidget extends _mixins1__.wl {
       hideFrequents = true;
     }
     var innerDivStyles = {};
-
     if (this.props.showMeAsSelected) {
       self._eventuallyAddContact(M.u[u_handle], contacts, selectableContacts, true);
     }
@@ -7029,7 +6815,6 @@ class ColumnContactLastInteraction extends genericNodePropsComponent.L {
       return interaction ? time2last(interaction.time) : l[1051];
     };
   }
-
   render() {
     let {
       nodeAdapter
@@ -7309,7 +7094,6 @@ class ContactList extends mixins.wl {
     this.onExpand = this.onExpand.bind(this);
     this.onAttachClicked = this.onAttachClicked.bind(this);
   }
-
   getLastInteractions() {
     const {
       contacts
@@ -7341,7 +7125,6 @@ class ContactList extends mixins.wl {
             };
           }
         }
-
         this.setState({
           'interactions': interactions
         });
@@ -7350,7 +7133,6 @@ class ContactList extends mixins.wl {
       console.error("Failed to handle last interactions!", ex);
     });
   }
-
   handleContextMenu(ev, handle) {
     ev.persist();
     if (this.state.selected.length > 1) {
@@ -7425,9 +7207,7 @@ class ContactList extends mixins.wl {
           },
           contextMenuPosition: this.state.contextMenuPosition
         }]],
-        initialSortBy: ['status', 'asc']
-
-        ,
+        initialSortBy: ['status', 'asc'],
         fmConfigSortEnabled: true,
         fmConfigSortId: "contacts",
         NilComponent: external_React_default().createElement(Nil, {
@@ -7435,7 +7215,6 @@ class ContactList extends mixins.wl {
         })
       }));
     }
-
     return external_React_default().createElement(Nil, {
       title: l[5737]
     });
@@ -7598,9 +7377,7 @@ class ReceivedRequests extends mixins.wl {
             title: l[6196]
           });
         },
-        initialSortBy: ['email', 'asc']
-
-        ,
+        initialSortBy: ['email', 'asc'],
         fmConfigSortEnabled: true,
         fmConfigSortId: "ipc"
       });
@@ -7716,9 +7493,7 @@ class SentRequests extends mixins.wl {
           'className': node => node.dts && ' disabled'
         },
         keyProp: "p",
-        initialSortBy: ['email', 'asc']
-
-        ,
+        initialSortBy: ['email', 'asc'],
         fmConfigSortEnabled: true,
         fmConfigSortMap: {
           'rts': 'rTimeStamp'
@@ -7959,8 +7734,7 @@ class ContactProfile extends mixins.wl {
   }
   getSharedFoldersView() {
     return this.state.loading ? null : external_React_default().createElement(fmView.Z, {
-      currentlyViewedEntry: this.props.handle
-      ,
+      currentlyViewedEntry: this.props.handle,
       onSelected: handle => this.setState({
         selected: handle
       }),
@@ -7971,8 +7745,7 @@ class ContactProfile extends mixins.wl {
       viewMode: 0,
       currentdirid: "shares",
       megaListItemHeight: 65,
-      headerContainerClassName: "grid-table-header"
-      ,
+      headerContainerClassName: "grid-table-header",
       containerClassName: "grid-table shared-with-me",
       onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
       listAdapterColumns: [columnFavIcon.l, [ColumnSharedFolderName, {
@@ -7991,7 +7764,6 @@ class ContactProfile extends mixins.wl {
           title: l.contact_not_found
         });
       }
-
       const HAS_RELATIONSHIP = ContactsPanel.hasRelationship(contact);
       return external_React_default().createElement("div", {
         className: "contacts-profile"
@@ -8432,7 +8204,6 @@ class Breadcrumbs extends mixins.wl {
         if (!nodeName) {
           return;
         }
-
         ((nodeId, k) => {
           if (k < 4) {
             breadcrumb.unshift(external_React_default().createElement("a", {
@@ -8637,7 +8408,6 @@ class CloudBrowserDialog extends mixins.wl {
     if (nodeId === 'shares') {
       return this.handleTabChange('shares');
     }
-
     if (M.d[nodeId] && M.d[nodeId].t) {
       const nodeRoot = M.getNodeRoot(nodeId);
       this.setState({
@@ -8666,7 +8436,6 @@ class CloudBrowserDialog extends mixins.wl {
     let share = false;
     let isSearch = this.state.currentlyViewedEntry === 'search';
     const entryId = isSearch ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
-
     let isIncomingShare = M.getNodeRoot(entryId) === "shares";
     this.state.highlighted.forEach(nodeId => {
       if (M.d[nodeId] && M.d[nodeId].t === 1) {
@@ -8720,10 +8489,7 @@ class CloudBrowserDialog extends mixins.wl {
                 link
               }) => this.props.room.sendMessage(link));
             };
-            return mega.megadrop.isDropExist(highlightedNode).length ? msgDialog('confirmation',
-            l[1003],
-            l[17403].replace('%1', escapeHTML(highlightedNode.name)),
-            l[18229], e => {
+            return mega.megadrop.isDropExist(highlightedNode).length ? msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(highlightedNode.name)), l[18229], e => {
               if (e) {
                 mega.megadrop.pufRemove([highlightedNode]);
                 mega.megadrop.pufCallbacks[highlightedNode] = {
@@ -8762,8 +8528,7 @@ class CloudBrowserDialog extends mixins.wl {
     let breadcrumbPath = M.getPath(entryId);
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, {
       title: self.props.title || l[8011],
-      className: classes + (
-      isSearch && this.state.selected.length > 0 ? 'has-breadcrumbs-bottom' : ''),
+      className: classes + (isSearch && this.state.selected.length > 0 ? 'has-breadcrumbs-bottom' : ''),
       onClose: () => {
         self.props.onClose(self);
       },
@@ -8822,8 +8587,7 @@ class CloudBrowserDialog extends mixins.wl {
       nodeId: entryId,
       path: breadcrumbPath,
       onNodeClick: this.onBreadcrumbNodeClick,
-      isSearch: isSearch
-      ,
+      isSearch: isSearch,
       highlighted: this.state.highlighted,
       currentlyViewedEntry: this.state.currentlyViewedEntry
     })), external_React_default().createElement(fmView.Z, {
@@ -8838,9 +8602,7 @@ class CloudBrowserDialog extends mixins.wl {
       initialHighlighted: this.state.highlighted,
       searchValue: this.state.searchValue,
       onExpand: this.onExpand,
-      viewMode: viewMode
-
-      ,
+      viewMode: viewMode,
       initialSortBy: ['name', 'asc'],
       fmConfigSortEnabled: true,
       fmConfigSortId: "cbd"
@@ -8854,8 +8616,7 @@ class CloudBrowserDialog extends mixins.wl {
       nodeId: entryId,
       path: breadcrumbPath,
       onNodeClick: this.onBreadcrumbNodeClick,
-      isSearch: isSearch
-      ,
+      isSearch: isSearch,
       highlighted: this.state.highlighted,
       currentlyViewedEntry: this.state.currentlyViewedEntry
     }), external_React_default().createElement("div", {
@@ -9080,7 +8841,6 @@ class HistoryRetentionDialog extends external_React_.Component {
     }, external_React_default().createElement("span", null, l[726])))));
   }
 }
-
 function CustomRadioButton({
   checked = false,
   label,
@@ -9136,7 +8896,6 @@ class Accordion extends mixins.wl {
     };
   }
   onToggle(e, key) {
-
     var obj = {};
     obj[key] = !(this.state.expandedPanel || {})[key];
     this.setState({
@@ -9234,7 +8993,6 @@ class ParticipantsList extends mixins.wl {
     var room = this.props.chatRoom;
     return ($parentContainer ? $parentContainer : $('.conversationsApp')).outerHeight() - 144 - 10 - (room.type === "public" && room.observers > 0 ? 48 : 0) - (room.isReadOnly() ? 12 : 0);
   }
-
   componentDidUpdate() {
     var self = this;
     if (!self.isMounted()) {
@@ -9253,7 +9011,6 @@ class ParticipantsList extends mixins.wl {
     }
     var contacts = room.stateIsLeftOrLeaving() ? [] : room.getParticipantsExceptMe();
     var contactListStyles = {};
-
     contactListStyles.height = Math.min(this.calculateListHeight(), contacts.length * this.props.contactCardHeight);
     return external_React_default().createElement("div", {
       className: "chat-contacts-list",
@@ -9311,7 +9068,6 @@ class ParticipantsListInner extends mixins.wl {
     var contactListInnerStyles = {
       'height': contacts.length * contactCardHeight
     };
-
     if ((room.type === "group" || room.type === "public") && !room.stateIsLeftOrLeaving() && room.members.hasOwnProperty(u_handle)) {
       contacts.unshift(u_handle);
       contactListInnerStyles.height += contactCardHeight;
@@ -9697,7 +9453,6 @@ class IncSharesAccordionPanel extends mixins.wl {
     if (this.props.expanded) {
       if (!this.hadLoaded) {
         this.hadLoaded = true;
-
         self.isLoadingMore = true;
         dbfetch.geta(Object.keys(M.c.shares || {}), new MegaPromise()).always(function () {
           self.isLoadingMore = false;
@@ -9838,9 +9593,7 @@ class ChatlinkDialog extends mixins.wl {
     if (!this.loading && chatRoom.topic) {
       this.retrieveChatLink();
     }
-
     this.toastTxt = l[7654];
-
     if (!this.$popupNode) {
       return;
     }
@@ -9850,10 +9603,8 @@ class ChatlinkDialog extends mixins.wl {
       copyToClipboard(this.state.link, this.toastTxt);
       return false;
     });
-
     $('span', $copyButton).text(l[1990]);
   }
-
   render() {
     const {
       chatRoom
@@ -9867,7 +9618,6 @@ class ChatlinkDialog extends mixins.wl {
       className: "mega-button negative links-button",
       onClick: this.onClose
     }, external_React_default().createElement("span", null, l[148]));
-
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       title: chatRoom.iAmOperator() && !chatRoom.topic ? l[9080] : '',
       className: `
@@ -10176,7 +9926,6 @@ class Join extends mixins.wl {
       }) => external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
         className: `${Join.NAMESPACE}-content`
       }, children), this.Chat());
-
       if (isEphemeral()) {
         return external_React_default().createElement($$CONTAINER, null, external_React_default().createElement(meetings_button.Z, {
           className: "mega-button positive",
@@ -10196,7 +9945,6 @@ class Join extends mixins.wl {
           }))
         }, l[171])));
       }
-
       return external_React_default().createElement($$CONTAINER, null, external_React_default().createElement(meetings_button.Z, {
         className: "mega-button positive",
         onClick: () => this.setState({
@@ -10506,14 +10254,12 @@ class EndCallButton extends mixins.wl {
     } = chatRoom;
     if (activeCall) {
       const peers = activeCall.peers && activeCall.peers.length;
-
       if (type === 'private') {
         return this.renderButton({
           label: l[5884],
           onClick: () => activeCall.hangUp()
         });
       }
-
       if (this.IS_MODERATOR) {
         return this.renderButton({
           label: l[5884],
@@ -10536,14 +10282,11 @@ class EndCallButton extends mixins.wl {
           }))
         });
       }
-      return (
-        this.renderButton({
-          label: peers ? l[5883] : l[5884],
-          onClick: () => activeCall.hangUp()
-        })
-      );
+      return this.renderButton({
+        label: peers ? l[5883] : l[5884],
+        onClick: () => activeCall.hangUp()
+      });
     }
-
     if (chatRoom.havePendingGroupCall()) {
       return this.IS_MODERATOR ? this.renderButton({
         label: l.end_call_for_all,
@@ -10619,7 +10362,6 @@ class ConversationRightArea extends mixins.wl {
     if (!room || !room.roomId) {
       return null;
     }
-
     if (!room.isCurrentlyActive && !self._wasAppendedEvenOnce) {
       return null;
     }
@@ -10649,7 +10391,6 @@ class ConversationRightArea extends mixins.wl {
         className: "sprite-fm-mono icon-phone"
       }), external_React_default().createElement("span", null, l[5896]));
     }
-
     if (startVideoCallButton !== null) {
       startVideoCallButton = external_React_default().createElement("div", {
         "data-simpletip": `${l.unsupported_browser_video}`,
@@ -10662,7 +10403,6 @@ class ConversationRightArea extends mixins.wl {
         className: "sprite-fm-mono icon-video-call-filled"
       }), external_React_default().createElement("span", null, l[5897]));
     }
-
     var AVseperator = external_React_default().createElement("div", {
       className: "chat-button-separator"
     });
@@ -10712,14 +10452,12 @@ class ConversationRightArea extends mixins.wl {
         if (res) {
           contactAddDialog(null, false);
         }
-      }, 1) : msgDialog(
-      `confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
+      }, 1) : msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
         if (resp) {
           contactAddDialog(null, false);
         }
       }, 1)
     });
-
     const {
       pushSettingsValue,
       onPushSettingsToggled,
@@ -10742,9 +10480,7 @@ class ConversationRightArea extends mixins.wl {
       label: l[16709],
       secondLabel: (() => {
         if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
-          return pushSettingsValue === 0 ?
-          PushSettingsDialog.options[Infinity] :
-          l[23539].replace('%s', unixtimeToTimeString(pushSettingsValue));
+          return pushSettingsValue === 0 ? PushSettingsDialog.options[Infinity] : l[23539].replace('%s', unixtimeToTimeString(pushSettingsValue));
         }
       })(),
       secondLabelClass: "label--green",
@@ -10776,7 +10512,6 @@ class ConversationRightArea extends mixins.wl {
       },
       onClick: () => room.toggleOpenInvite()
     }), AVseperator);
-
     let retentionTime = room.retentionTime ? secondsToDays(room.retentionTime) : 0;
     const ICON_ACTIVE = external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-check"
@@ -11181,7 +10916,6 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
   }
   eventuallyInit() {
     var self = this;
-
     if (self.initialised) {
       return;
     }
@@ -11192,7 +10926,6 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       return;
     }
     var room = self.props.chatRoom;
-
     $(document).rebind("fullscreenchange.megaChat_" + room.roomId, function () {
       if (self.isComponentEventuallyVisible()) {
         self.setState({
@@ -11533,7 +11266,6 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         }
       }));
     }
-
     let pushSettingsDialog = null;
     if (self.state.pushSettingsDialog === true) {
       const state = {
@@ -11786,8 +11518,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
             console.error('E++ account failure!', ex);
           }
           setTimeout(() => {
-            msgDialog('warninga', l[135],
-            l.eplusplus_create_failed, escapeHTML(api_strerror(ex) || ex));
+            msgDialog('warninga', l[135], l.eplusplus_create_failed, escapeHTML(api_strerror(ex) || ex));
           }, 1234);
           eventlog(99745, JSON.stringify([1, String(ex).split('\n')[0]]));
         });
@@ -12660,9 +12391,7 @@ class ResultTable extends mixins.wl {
 
 const RESULT_ROW_CLASS = 'result-table-row';
 const USER_CARD_CLASS = 'user-card';
-
 const roomIsGroup = room => room && room.type === 'group' || room.type === 'public';
-
 const openResult = ({
   room,
   messageId,
@@ -12686,7 +12415,6 @@ const openResult = ({
   }
   return callback && typeof callback === 'function' && callback();
 };
-
 const lastActivity = room => {
   if (!room.lastActivity || !room.ctime) {
     room = megaChat.getChatById(room.chatId);
@@ -12696,7 +12424,6 @@ const lastActivity = room => {
   }
   return l[8000];
 };
-
 class MessageRow extends mixins.wl {
   render() {
     const {
@@ -12755,7 +12482,6 @@ class MessageRow extends mixins.wl {
     }, getTimeMarker(data.delay, true)))));
   }
 }
-
 class ChatRow extends mixins.wl {
   render() {
     const {
@@ -12785,7 +12511,6 @@ class ChatRow extends mixins.wl {
     }));
   }
 }
-
 class MemberRow extends mixins.wl {
   render() {
     const {
@@ -12843,7 +12568,6 @@ const NilRow = ({
     content: label
   }))));
 };
-
 class ResultRow extends mixins.wl {
   constructor(...args) {
     super(...args);
@@ -12913,13 +12637,11 @@ const TYPE = {
   NIL: 4
 };
 const LABEL = {
-
   MESSAGES: l[6868],
   CONTACTS_AND_CHATS: l[20174],
   NO_RESULTS: l[8674],
   SEARCH_MESSAGES_CTA: l[23547],
   SEARCH_MESSAGES_INLINE: l[23548],
-
   DECRYPTING_RESULTS: l[23543],
   PAUSE_SEARCH: l[23544],
   SEARCH_PAUSED: l[23549],
@@ -12929,7 +12651,6 @@ class ResultContainer extends mixins.wl {
   constructor(...args) {
     super(...args);
     this.renderResults = (results, status, isFirstQuery, onSearchMessages) => {
-
       if (status === STATUS.COMPLETED && results.length < 1) {
         return external_React_default().createElement(ResultTable, null, external_React_default().createElement(ResultRow, {
           type: TYPE.NIL,
@@ -13160,7 +12881,6 @@ class SearchPanel extends mixins.wl {
     };
     this.bindEvents = () => {
       this.pageChangeListener = mBroadcaster.addListener('pagechange', this.doPause);
-
       document.addEventListener(EVENTS.RESULT_OPEN, this.doPause);
       document.addEventListener(EVENTS.KEYDOWN, this.handleKeyDown);
       megaChat.plugins.chatdIntegration.chatd.rebind('onClose.search', () => this.state.searching && this.doToggle(ACTIONS.PAUSE));
@@ -13272,7 +12992,6 @@ class SearchPanel extends mixins.wl {
       isFirstQuery,
       results
     } = this.state;
-
     return external_React_default().createElement("div", {
       className: `
                     ${SEARCH_PANEL_CLASS}
@@ -13540,7 +13259,6 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
       return null;
     }
     var roomId = chatRoom.chatId;
-
     if (chatRoom.isCurrentlyActive) {
       classString += " active";
     }
@@ -13627,7 +13345,6 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
       }
     } else {
       lastMsgDivClasses = "conversation-message";
-
       lastMessageDiv = showHideMsg ? '' : external_React_default().createElement("div", {
         className: lastMsgDivClasses
       }, this.loadingShown ? l[7006] : l[8000]);
@@ -14018,7 +13735,6 @@ class ConversationsApp extends mixins.wl {
     }
     return showToast('warning', l[7211]);
   }
-
   _cacheRouting() {
     this.routingSection = this.props.megaChat.routingSection;
     this.routingSubSection = this.props.megaChat.routingSubSection;
@@ -14406,11 +14122,9 @@ class ResultContainer extends mixins.wl {
             var _target$classList, _target$classList2;
             const entry = entries[i];
             const target = entry.target;
-
             if ((_target$classList = target.classList) != null && _target$classList.contains(NODE_CLASS)) {
               target.style.backgroundImage = entry.isIntersecting ? `url(${target.dataset.url})` : null;
             }
-
             if (entry.isIntersecting && (_target$classList2 = target.classList) != null && _target$classList2.contains(RESULTS_END_CLASS)) {
               this.props.onPaginate();
             }
@@ -15265,7 +14979,6 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
         chatRoom.scrolledToBottom = true;
         return;
       }
-
       if (ps.isCloseToBottom(30) === true) {
         if (!chatRoom.scrolledToBottom) {
           messagesBuff.detachMessages();
@@ -15283,7 +14996,6 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
         chatRoom.one('onMessagesBuffAppend.pull', () => {
           msgAppended++;
         });
-
         chatRoom.off('onHistoryDecrypted.pull');
         chatRoom.one('onHistoryDecrypted.pull', () => {
           chatRoom.off('onMessagesBuffAppend.pull');
@@ -15405,7 +15117,6 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
   }
   eventuallyInit(doResize) {
     const self = this;
-
     if (self.initialised) {
       return;
     }
@@ -15466,7 +15177,6 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
       }
       return;
     }
-
     var scrollBlockHeight = $('.chat-content-block', self.$container).outerHeight() - ($('.chat-topic-block', self.$container).outerHeight() || 0) - (is_chatlink ? $('.join-chat-block', self.$container).outerHeight() : $('.messages-block .chat-textarea-block', self.$container).outerHeight());
     if (scrollBlockHeight !== self.$messages.outerHeight()) {
       self.$messages.css('height', scrollBlockHeight);
@@ -15556,7 +15266,6 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
     if (!room || !room.roomId) {
       return null;
     }
-
     var contacts = room.getParticipantsExceptMe();
     var contactHandle;
     var contact;
@@ -15834,7 +15543,6 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
       const {
         chatRoom
       } = this.props;
-
       if (this.scrollPullHistoryRetrieval || chatRoom.messagesBuff.isRetrievingHistory) {
         return;
       }
@@ -16303,7 +16011,6 @@ class StreamHead extends mixins.wl {
   get durationString() {
     return this.duration ? secondsToTimeShort(this.duration) : '--:--:--';
   }
-
   componentWillUnmount() {
     super.componentWillUnmount();
     clearInterval(this.durationInterval);
@@ -16334,7 +16041,6 @@ class StreamHead extends mixins.wl {
       offset: 5,
       className: 'theme-dark-forced'
     };
-
     return external_React_default().createElement("div", {
       ref: this.headRef,
       className: `
@@ -16428,7 +16134,6 @@ class StreamNodeMenu extends mixins.wl {
         }
       }, external_React_default().createElement("span", null, l[7997]));
     }
-
     return external_React_default().createElement(meetings_button.Z, {
       className: IS_GUEST ? 'disabled' : '',
       icon: "sprite-fm-mono icon-add",
@@ -16444,7 +16149,6 @@ class StreamNodeMenu extends mixins.wl {
       }
     }, external_React_default().createElement("span", null, l[24581]));
   }
-
   Pin() {
     const {
       stream,
@@ -16456,7 +16160,6 @@ class StreamNodeMenu extends mixins.wl {
         onClick: () => onSpeakerChange(stream)
       }, external_React_default().createElement("span", null, l.display_in_main_view));
     }
-
     return null;
   }
   Privilege() {
@@ -16483,7 +16186,6 @@ class StreamNodeMenu extends mixins.wl {
         }
       }, external_React_default().createElement("span", null, targetUserModerator ? l.remove_moderator : l.make_moderator));
     }
-
     return null;
   }
   render() {
@@ -16534,13 +16236,12 @@ class StreamNode extends mixins.wl {
     } = props;
     if (!externalVideo) {
       this.clonedVideo = document.createElement("video");
-      this.setupVideoElement(this.clonedVideo);
     }
     if (!stream.isFake) {
       stream.registerConsumer(this);
       if (stream instanceof CallManager2.Peer) {
         this._streamListener = stream.addChangeListener((peer, data, key) => {
-          if (key === "haveScreenshare") {
+          if (key === "haveScreenshare" || key === "videoMuted" || key === "isOnHold") {
             this._lastResizeWidth = null;
           }
           this.requestVideo();
@@ -16549,18 +16250,25 @@ class StreamNode extends mixins.wl {
     }
   }
   requestVideo(forceVisible) {
-    if (this.isComponentVisible() || forceVisible) {
+    const {
+      stream
+    } = this.props;
+    if (stream.isFake || stream.isDestroyed) {
+      return;
+    }
+    if ((stream.isStreaming() || stream.isLocal) && this.isMounted() && (this.isComponentVisible() || forceVisible)) {
       var node = this.findDOMNode();
       this.requestVideoBySize(node.offsetWidth, node.offsetHeight);
     } else {
       this.requestVideoBySize(0, 0);
+      this.displayStats(null);
     }
   }
   setupVideoElement(video) {
     if (video._snSetup) {
       return;
     }
-
+    video._snSetup = true;
     video.autoplay = true;
     video.controls = false;
     video.muted = true;
@@ -16575,13 +16283,22 @@ class StreamNode extends mixins.wl {
         this.props.onLoadedData(ev);
       }
     };
-    video._snSetup = true;
   }
-  updateVideoElem() {
-    if (!this.isMounted() || !this.contRef.current) {
+  detachVideoElemHandlers() {
+    var _this$contRef$current;
+    const video = (_this$contRef$current = this.contRef.current) == null ? void 0 : _this$contRef$current.firstChild;
+    if (!video || !video._snSetup) {
       return;
     }
-    const currVideo = this.contRef.current.firstChild;
+    video.onloadeddata = null;
+    video.ondblclick = null;
+  }
+  updateVideoElem() {
+    const vidCont = this.contRef.current;
+    if (!this.isMounted() || !vidCont) {
+      return;
+    }
+    const currVideo = vidCont.firstChild;
     const {
       stream,
       externalVideo
@@ -16589,27 +16306,29 @@ class StreamNode extends mixins.wl {
     const {
       source
     } = stream;
+    if (!source) {
+      if (currVideo) {
+        vidCont.replaceChildren();
+      }
+      return;
+    }
     if (externalVideo) {
       if (currVideo === source) {
         return;
       }
-      if (source) {
-        this.setupVideoElement(source);
-        this.contRef.current.replaceChildren(source);
-      } else {
-        this.contRef.current.replaceChildren();
-      }
+      this.setupVideoElement(source);
+      vidCont.replaceChildren(source);
     } else {
+      const cloned = this.clonedVideo;
       if (!currVideo) {
-        this.contRef.current.replaceChildren(this.clonedVideo);
-      }
-      if (source) {
-        if (this.clonedVideo.paused || this.clonedVideo.srcObject !== source.srcObject) {
-          this.clonedVideo.srcObject = source.srcObject;
-          this.clonedVideo.play().catch(() => {});
-        }
+        this.setupVideoElement(cloned);
+        vidCont.replaceChildren(cloned);
       } else {
-        SfuClient.playerStop(this.clonedVideo);
+        assert(currVideo === this.clonedVideo);
+      }
+      if (cloned.paused || cloned.srcObject !== source.srcObject) {
+        cloned.srcObject = source.srcObject;
+        Promise.resolve(cloned.play()).catch(nop);
       }
     }
   }
@@ -16618,7 +16337,7 @@ class StreamNode extends mixins.wl {
     if (!elem) {
       return;
     }
-    elem.textContent = `${stats} (${this.props.externalVideo ? "ref" : "cloned"})`;
+    elem.textContent = stats ? `${stats} (${this.props.externalVideo ? "ref" : "cloned"})` : "";
   }
   componentDidMount() {
     super.componentDidMount();
@@ -16642,17 +16361,9 @@ class StreamNode extends mixins.wl {
   componentWillUnmount() {
     super.componentWillUnmount();
     const peer = this.props.stream;
+    this.detachVideoElemHandlers();
     if (peer && !peer.isFake) {
-      this.props.stream.deregisterConsumer(this);
-      if (this.props.externalVideo && peer.source) {
-        const video = peer.source;
-        video.onpause = () => {
-          if (!video.isDestroyed) {
-            video.play().catch(() => {});
-          }
-          delete video.onpause;
-        };
-      }
+      peer.deregisterConsumer(this);
     }
     if (this._streamListener) {
       peer.removeChangeListener(this._streamListener);
@@ -16661,19 +16372,16 @@ class StreamNode extends mixins.wl {
       this.props.willUnmount();
     }
   }
+  requestVideoQuality(quality) {
+    this.requestedQ = quality && CallManager2.FORCE_LOWQ ? 1 : quality;
+    if (!this.props.stream.updateVideoQuality()) {
+      this.updateVideoElem();
+    }
+  }
   requestVideoBySize(w) {
-    const {
-      stream
-    } = this.props;
-
-    if (stream.isFake) {
-      return;
-    }
-    if (!this.isMounted()) {
-      return;
-    }
-    if (!stream.isLocal && !stream.isStreaming()) {
-      stream.consumerGetVideo(this, CallManager2.CALL_QUALITY.NO_VIDEO);
+    if (w === 0) {
+      this._lastResizeWidth = 0;
+      this.requestVideoQuality(this, CallManager2.VIDEO_QUALITY.NO_VIDEO);
       return;
     }
     if (this.contRef.current) {
@@ -16686,17 +16394,15 @@ class StreamNode extends mixins.wl {
     }
     let newQ;
     if (w > 400) {
-      newQ = CallManager2.CALL_QUALITY.HIGH;
+      newQ = CallManager2.VIDEO_QUALITY.HIGH;
     } else if (w > 200) {
-      newQ = CallManager2.CALL_QUALITY.MEDIUM;
+      newQ = CallManager2.VIDEO_QUALITY.MEDIUM;
     } else if (w > 180) {
-      newQ = CallManager2.CALL_QUALITY.LOW;
-    } else if (w === 0) {
-      newQ = CallManager2.CALL_QUALITY.NO_VIDEO;
+      newQ = CallManager2.VIDEO_QUALITY.LOW;
     } else {
-      newQ = CallManager2.CALL_QUALITY.THUMB;
+      newQ = CallManager2.VIDEO_QUALITY.THUMB;
     }
-    stream.consumerGetVideo == null ? void 0 : stream.consumerGetVideo(this, newQ);
+    this.requestVideoQuality(newQ);
   }
   renderVideoDebugMode() {
     const {
@@ -16727,13 +16433,12 @@ class StreamNode extends mixins.wl {
   }
   renderContent() {
     const {
-      stream,
-      isCallOnHold
+      stream
     } = this.props;
     const {
       loading
     } = this.state;
-    if (stream && stream.isStreaming && stream.isStreaming() && !isCallOnHold) {
+    if (stream.isStreaming()) {
       return external_React_default().createElement((external_React_default()).Fragment, null, loading && external_React_default().createElement("i", {
         className: "sprite-fm-theme icon-loading-spinner loading-icon"
       }), external_React_default().createElement("div", {
@@ -16780,8 +16485,7 @@ class StreamNode extends mixins.wl {
     if (isOnHold) {
       return external_React_default().createElement($$CONTAINER, null, this.getStatusIcon('icon-pause', onHoldLabel));
     }
-    return external_React_default().createElement((external_React_default()).Fragment, null,
-    mode === Call.MODE.SPEAKER && Call.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin call-role-icon', l[8875]), external_React_default().createElement($$CONTAINER, null, muted ? this.getStatusIcon('icon-audio-off', l.muted) : null, hasSlowNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null));
+    return external_React_default().createElement((external_React_default()).Fragment, null, mode === Call.MODE.SPEAKER && Call.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin call-role-icon', l[8875]), external_React_default().createElement($$CONTAINER, null, muted ? this.getStatusIcon('icon-audio-off', l.muted) : null, hasSlowNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null));
   }
   render() {
     const {
@@ -16844,7 +16548,6 @@ class SidebarControls extends mixins.wl {
       className: 'theme-dark-forced'
     };
     const notifications = chatRoom.getUnreadCount();
-
     return external_React_default().createElement("div", {
       className: "sidebar-controls"
     }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
@@ -16916,7 +16619,6 @@ class StreamExtendedControls extends mixins.wl {
     } = SfuClient.Av;
     const screenSharingLabel = this.isActive(Screen) ? l[22890] : l[22889];
     const callHoldLabel = this.isActive(onHold) ? l[23459] : l[23460];
-
     return external_React_default().createElement(meetings_button.Z.Group, (0,esm_extends.Z)({}, this.props, {
       active: this.isActive(Screen)
     }), external_React_default().createElement(meetings_button.Z, {
@@ -17108,7 +16810,6 @@ class StreamControls extends mixins.wl {
       }, external_React_default().createElement("span", null, l[5884])));
     };
   }
-
   componentWillUnmount() {
     super.componentWillUnmount();
     document.removeEventListener('mousedown', this.handleMousedown);
@@ -17134,7 +16835,6 @@ class StreamControls extends mixins.wl {
     const avFlags = call.av;
     const audioLabel = avFlags & Av.Audio ? l[16214] : l[16708];
     const videoLabel = avFlags & Av.Camera ? l[22894] : l[22893];
-
     return external_React_default().createElement("div", {
       className: StreamControls.NAMESPACE
     }, d ? this.renderDebug() : '', external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
@@ -17245,11 +16945,9 @@ class Local extends mixins.wl {
       minimized,
       call
     } = this.props;
-
     if (streams.length === 0 && !minimized && !call.isSharingScreen()) {
       return null;
     }
-
     const STREAM_PROPS = {
       ...this.props,
       ratioClass: this.getRatioClass(),
@@ -17265,10 +16963,8 @@ class Local extends mixins.wl {
     return external_React_default().createElement(Stream, STREAM_PROPS);
   }
 }
-
 Local.NAMESPACE = 'local-stream';
 Local.POSITION_MODIFIER = 'with-sidebar';
-
 class Stream extends mixins.wl {
   constructor(...args) {
     super(...args);
@@ -17349,7 +17045,6 @@ class Stream extends mixins.wl {
           return this.props.onCallMinimize();
         });
       }
-
       for (let i = this.EVENTS.EXPAND.length; i--;) {
         const event = this.EVENTS.EXPAND[i];
         this.LISTENERS[event] = mBroadcaster.addListener(event, () => {
@@ -17361,7 +17056,6 @@ class Stream extends mixins.wl {
           return this.props.view === Call.VIEW.CHAT && this.props.onCallExpand();
         });
       }
-
       document.addEventListener('click', this.handleOptionsClose);
     };
     this.initDraggable = () => {
@@ -17519,11 +17213,9 @@ class Stream extends mixins.wl {
   }
   componentDidUpdate(prevProps) {
     super.componentDidUpdate();
-
     if (this.props.mode !== prevProps.mode) {
       this.initDraggable();
     }
-
     if (this.props.sidebar !== prevProps.sidebar && this.props.sidebar) {
       this.repositionDraggable();
     }
@@ -17574,16 +17266,12 @@ class Stream extends mixins.wl {
                 `,
       onClick: ({
         target
-      }) =>
-      minimized && target.classList.contains(`${NAMESPACE}-overlay`) && onCallExpand()
-    }, IS_MINI_MODE &&
-    this.renderMiniMode(), !IS_MINI_MODE &&
-    this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.Z)({}, this.props, {
+      }) => minimized && target.classList.contains(`${NAMESPACE}-overlay`) && onCallExpand()
+    }, IS_MINI_MODE && this.renderMiniMode(), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.Z)({}, this.props, {
       onOptionsToggle: this.handleOptionsToggle
     })));
   }
 }
-
 class Minimized extends mixins.wl {
   constructor(...args) {
     super(...args);
@@ -17791,7 +17479,6 @@ class ParticipantsNotice extends mixins.wl {
     };
     this.av = this.props.sfuApp.sfuClient.availAv;
   }
-
   specShouldComponentUpdate(newProps) {
     const {
       stayOnEnd,
@@ -17803,7 +17490,6 @@ class ParticipantsNotice extends mixins.wl {
     this.av = sfuApp.sfuClient.availAv;
     return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft || newProps.isOnHold !== isOnHold || this.av !== currAv;
   }
-
   render() {
     const {
       sfuApp,
@@ -17841,7 +17527,6 @@ const STREAM_ACTIONS = {
   REMOVE: 2
 };
 const MAX_STREAMS = 19;
-
 const NAMESPACE = 'stream';
 const MAX_STREAMS_PER_PAGE = 9;
 const PAGINATION = {
@@ -17868,13 +17553,11 @@ class stream_Stream extends mixins.wl {
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseOut = this.handleMouseOut.bind(this);
   }
-
   movePage(direction) {
     return this.setState(state => ({
       page: direction === PAGINATION.NEXT ? state.page + 1 : state.page - 1
     }));
   }
-
   handleMouseMove() {
     this.setState({
       hovered: true
@@ -17884,7 +17567,6 @@ class stream_Stream extends mixins.wl {
       this.delayProcID = null;
     }
   }
-
   handleMouseOut() {
     if (this.state.hovered) {
       this.delayProcID = delay(`${NAMESPACE}-hover`, () => {
@@ -17896,7 +17578,6 @@ class stream_Stream extends mixins.wl {
       }, MOUSE_OUT_DELAY);
     }
   }
-
   getPublicLink() {
     const {
       chatRoom
@@ -17908,7 +17589,6 @@ class stream_Stream extends mixins.wl {
     }
     return null;
   }
-
   getColumns(streamsCount) {
     switch (true) {
       case streamsCount === 1:
@@ -17919,7 +17599,6 @@ class stream_Stream extends mixins.wl {
         return 2;
     }
   }
-
   chunkNodes(nodes, size) {
     if (nodes && nodes.length && size) {
       const chunked = [];
@@ -17932,7 +17611,6 @@ class stream_Stream extends mixins.wl {
     }
     return null;
   }
-
   scaleNodes(columns, forced = false) {
     const {
       streams,
@@ -17992,7 +17670,6 @@ class stream_Stream extends mixins.wl {
       container.style.width = `${(targetWidth + 4) * columns}px`;
     }
   }
-
   renderNodes() {
     const {
       mode,
@@ -18006,9 +17683,7 @@ class stream_Stream extends mixins.wl {
       onSpeakerChange,
       onThumbnailDoubleClick
     } = this.props;
-
     if (mode === Call.MODE.THUMBNAIL) {
-
       if (streams.length <= MAX_STREAMS_PER_PAGE) {
         const $$STREAMS = [];
         streams.forEach(stream => {
@@ -18045,7 +17720,6 @@ class stream_Stream extends mixins.wl {
         });
         return $$STREAMS;
       }
-
       const {
         page
       } = this.state;
@@ -18097,7 +17771,6 @@ class stream_Stream extends mixins.wl {
         className: "sprite-fm-mono icon-arrow-right-thin"
       }), external_React_default().createElement("div", null, page + 1, "/", this.chunksLength)));
     }
-
     const activeStream = call.getActiveStream();
     const targetStream = forcedLocal ? call.getLocalStream() : activeStream;
     return forcedLocal || activeStream ? external_React_default().createElement(StreamNode, {
@@ -18112,7 +17785,6 @@ class stream_Stream extends mixins.wl {
       onCallMinimize: onCallMinimize
     }) : null;
   }
-
   renderOnHold() {
     return external_React_default().createElement("div", {
       className: "on-hold-overlay"
@@ -18123,7 +17795,6 @@ class stream_Stream extends mixins.wl {
       className: "sprite-fm-mono icon-play"
     }), external_React_default().createElement("span", null, l[23459])));
   }
-
   renderStreamContainer() {
     const {
       sfuApp,
@@ -18360,11 +18031,9 @@ class Participant extends mixins.wl {
       call,
       stream
     } = this.props;
-
     if (call) {
       return !(call.av & SfuClient.Av.Audio);
     }
-
     return stream && stream.audioMuted;
   }
   videoMuted() {
@@ -18372,11 +18041,9 @@ class Participant extends mixins.wl {
       call,
       stream
     } = this.props;
-
     if (call) {
       return !(call.av & SfuClient.Av.Camera);
     }
-
     return stream && stream.videoMuted;
   }
   render() {
@@ -18608,7 +18275,6 @@ class Sidebar extends mixins.wl {
       guest,
       onGuestClose
     } = this.props;
-
     return external_React_default().createElement("div", {
       ref: this.containerRef,
       className: `
@@ -18885,7 +18551,6 @@ class Invite extends mixins.wl {
           }
         }, frequentContacts ? $$RESULT_TABLE(l[20141], frequentContacts) : '', contactsFiltered ? $$RESULT_TABLE(l[165], contactsFiltered) : '');
       }
-
       return external_React_default().createElement(Nil, null);
     };
     this.renderLoading = () => {
@@ -19071,11 +18736,9 @@ const inProgressAlert = (isJoin, chatRoom) => {
         msgDialog('warningb', null, l.call_in_progress, body, null, 1);
         return reject();
       }
-
       if (chatRoom.getCallParticipants().includes(u_handle)) {
         return resolve();
       }
-
       return msgDialog(`warningb:!^${l[2005]}!${isJoin ? l.join_call_anyway : l.start_call_anyway}`, null, isJoin ? l.join_multiple_calls_title : l.start_multiple_calls_title, isJoin ? l.join_multiple_calls_text : l.start_multiple_calls_text, join => {
         if (join) {
           return resolve();
@@ -19086,9 +18749,7 @@ const inProgressAlert = (isJoin, chatRoom) => {
     resolve();
   });
 };
-
 class Call extends mixins.wl {
-
   constructor(props) {
     super(props);
     this.ephemeralAddListener = null;
@@ -19203,15 +18864,13 @@ class Call extends mixins.wl {
           this.showTimeoutDialog();
         }
       };
-      return streams.length > 0 ?
-      this.setState({
+      return streams.length > 0 ? this.setState({
         mode: Call.MODE.MINI,
         sidebar: false
       }, () => {
         onCallMinimize();
         call.setViewMode(Call.MODE.MINI);
-      }) :
-      noPeers();
+      }) : noPeers();
     };
     this.handleCallExpand = async () => {
       return new Promise(resolve => {
@@ -19288,8 +18947,7 @@ class Call extends mixins.wl {
           });
         }
       } else {
-        msgDialog(
-        `confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
+        msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
           if (resp) {
             contactAddDialog(null, false);
           }
@@ -19339,7 +18997,6 @@ class Call extends mixins.wl {
     this.state.mode = props.call.viewMode;
     this.state.sidebar = props.chatRoom.type === 'public';
   }
-
   handleCallOffline() {
     if (this.offlineDelayed) {
       return;
@@ -19350,7 +19007,6 @@ class Call extends mixins.wl {
       });
     }, 3e4);
   }
-
   showTimeoutDialog() {
     msgDialog(`warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`, 'stay-on-call', l.empty_call_dlg_title, mega.icu.format(l.empty_call_dlg_text_min, 2).replace('%s', '02:00'), res => {
       if (res === null) {
@@ -19359,7 +19015,6 @@ class Call extends mixins.wl {
       return res ? this.handleStayConfirm() : this.handleCallEnd(1);
     }, 1);
   }
-
   componentWillUnmount() {
     super.componentWillUnmount();
     const {
@@ -19460,7 +19115,6 @@ class Call extends mixins.wl {
       onInviteToggle: this.handleInviteToggle,
       onStayConfirm: this.handleStayConfirm
     };
-
     return external_React_default().createElement("div", {
       className: `meetings-call ${minimized ? 'minimized' : ''}`
     }, external_React_default().createElement(stream_Stream, (0,esm_extends.Z)({}, STREAM_PROPS, {
@@ -19884,7 +19538,6 @@ class Incoming extends _mixins1__.wl {
           position: 'top',
           label: video ? l[22894] : l[22893]
         },
-
         onClick: () => unsupported ? null : this.setState({
           video: !video
         }, () => onToggleVideo(video))
@@ -19920,7 +19573,6 @@ class Incoming extends _mixins1__.wl {
       const CALL_IN_PROGRESS = window.sfuClient;
       const isPrivateRoom = chatRoom.type === 'private';
       const rejectLabel = isPrivateRoom ? l[20981] : l[82];
-
       return react0().createElement(_ui_modalDialogs_jsx3__.Z.ModalDialog, (0,_extends7__.Z)({}, this.state, {
         name: NAMESPACE,
         className: NAMESPACE,
@@ -20110,7 +19762,6 @@ class Preview extends _mixins_js1__.wl {
         ...SIMPLETIP_PROPS,
         label: audio ? l[16214] : l[16708]
       },
-
       className: `
                                 mega-button
                                 round
@@ -20130,7 +19781,6 @@ class Preview extends _mixins_js1__.wl {
         ...SIMPLETIP_PROPS,
         label: video ? l[22894] : l[22893]
       },
-
       className: `
                                 mega-button
                                 round
@@ -20243,7 +19893,6 @@ class AbstractGenericMessage extends mixin.y {
   }
 }
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/utils.jsx
-
 var getMessageString;
 (function () {
   var MESSAGE_STRINGS;
@@ -20355,10 +20004,8 @@ class Local extends AbstractGenericMessage {
     const ENDED = type === MESSAGE_TYPE.ENDED || type === MESSAGE_TYPE.FAILED || type === MESSAGE_TYPE.CANCELLED;
     let messageExtraInfo = [HAS_PARTICIPANTS ? mega.utils.trans.listToString(participantNames, l[20234]) : ''];
     if (ENDED) {
-      messageExtraInfo = [...messageExtraInfo, HAS_PARTICIPANTS ? '. ' : '',
-      HAS_DURATION ? l[7208].replace('[X]', `[[${secToDuration(meta.duration)}]]`) : ''];
+      messageExtraInfo = [...messageExtraInfo, HAS_PARTICIPANTS ? '. ' : '', HAS_DURATION ? l[7208].replace('[X]', `[[${secToDuration(meta.duration)}]]`) : ''];
     }
-
     return messageExtraInfo && messageExtraInfo.reduce((acc, cur) => (acc + cur).replace(/\[\[/g, '<span class="bold">').replace(/]]/g, '</span>'));
   }
   _setClassNames() {
@@ -20483,13 +20130,10 @@ class Local extends AbstractGenericMessage {
     }, external_React_default().createElement("i", {
       className: `sprite-fm-mono ${message.cssClass}`
     }));
-    return (
-      message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON
-    );
+    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON;
   }
   getMessageTimestamp() {
     var _this$props$message, _this$props$message$m;
-
     const callId = (_this$props$message = this.props.message) == null ? void 0 : (_this$props$message$m = _this$props$message.meta) == null ? void 0 : _this$props$message$m.callId;
     let debugMsg = "";
     if (d && callId) {
@@ -20562,10 +20206,8 @@ class Contact extends AbstractGenericMessage {
   constructor(...args) {
     super(...args);
     this.DIALOG = {
-      ADDED: addedEmail =>
-      msgDialog('info', l[150], l[5898].replace('[X]', addedEmail)),
-      DUPLICATE: () =>
-      msgDialog('warningb', '', l[17545])
+      ADDED: addedEmail => msgDialog('info', l[150], l[5898].replace('[X]', addedEmail)),
+      DUPLICATE: () => msgDialog('warningb', '', l[17545])
     };
   }
   _doAddContact(contactEmail) {
@@ -20576,9 +20218,7 @@ class Contact extends AbstractGenericMessage {
     if ((_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.isAnonymous()) {
       return this._doAddContact(contactEmail).done(addedEmail => this.DIALOG.ADDED(addedEmail)).catch(this.DIALOG.DUPLICATE);
     }
-    return (
-      Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).done(addedEmail => this.DIALOG.ADDED(addedEmail))
-    );
+    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).done(addedEmail => this.DIALOG.ADDED(addedEmail));
   }
   _getContactAvatar(contact, className) {
     return external_React_default().createElement(ui_contacts.Avatar, {
@@ -20621,8 +20261,7 @@ class Contact extends AbstractGenericMessage {
       className: "dropdown-user-name"
     }, external_React_default().createElement("div", {
       className: "name"
-    }, HAS_RELATIONSHIP && (
-    this.isLoadingContactInfo() ? external_React_default().createElement("em", {
+    }, HAS_RELATIONSHIP && (this.isLoadingContactInfo() ? external_React_default().createElement("em", {
       className: "contact-name-loading"
     }) : name), !HAS_RELATIONSHIP && name, external_React_default().createElement(ui_contacts.ContactPresence, {
       className: "small",
@@ -20733,7 +20372,6 @@ class Attachment extends AbstractGenericMessage {
       if (this._isRevoked(v)) {
         continue;
       }
-
       const {
         icon,
         isImage,
@@ -20986,7 +20624,6 @@ class AudioPlayer extends mixins.wl {
         });
       }
       const audios = document.getElementsByClassName('audio-player__player');
-
       Array.prototype.filter.call(audios, audioElement => audioElement.id !== this.props.audioId).forEach(audioElement => {
         if (!audioElement.paused) {
           audioElement.pause();
@@ -21204,7 +20841,6 @@ AudioContainer.defaultProps = {
   mime: null
 };
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/voiceClip.jsx
-
 
 
 
@@ -21684,7 +21320,6 @@ class Text extends AbstractGenericMessage {
     let extraPreButtons = [];
     let messageActionButtons = null;
     const IS_GEOLOCATION = this.isGeoLocation(message);
-
     if (!message.deleted && this.isRichPreview(message)) {
       if (!message.meta.requiresConfirmation) {
         if (message.isEditable()) {
@@ -21728,7 +21363,6 @@ class Text extends AbstractGenericMessage {
         })];
       }
     }
-
     if (!message.deleted) {
       const contact = this.getContact();
       if (contact && contact.u === u_handle && unixtime() - message.delay < MESSAGE_NOT_EDITABLE_TIMEOUT && isBeingEdited() !== true && chatRoom.isReadOnly() === false && !message.requiresManualRetry) {
@@ -21773,12 +21407,10 @@ class Text extends AbstractGenericMessage {
           'data-simpletipposition': 'top'
         },
         onClick: () => {
-          copyToClipboard(
-          message.textContents.replace(/```/g, ''), l.copy_txt_block_toast);
+          copyToClipboard(message.textContents.replace(/```/g, ''), l.copy_txt_block_toast);
         }
       }));
     }
-
     if (parentButtons) {
       returnedButtons.push(parentButtons);
     }
@@ -21955,7 +21587,7 @@ class Giphy extends AbstractGenericMessage {
   }
   toggle() {
     const video = this.gifRef.current;
-    video[video.paused ? 'play' : 'pause']();
+    Promise.resolve(video[video.paused ? 'play' : 'pause']()).catch(nop);
   }
   getMessageActionButtons() {
     const {
@@ -22005,13 +21637,11 @@ class Giphy extends AbstractGenericMessage {
         cursor: autoPlay ? 'default' : 'pointer'
       },
       onClick: () => !autoPlay && this.toggle(),
-      src:
-      hideActionButtons ? gifPanel.bl.convert(src) : this.state.src
+      src: hideActionButtons ? gifPanel.bl.convert(src) : this.state.src
     });
   }
 }
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/generic.jsx
-
 
 
 
@@ -22215,8 +21845,7 @@ class GenericConversationMessage extends mixin.y {
               console.warn('Unable to inject nodes... no longer existing?', res);
             }
           } else {
-            msgDialog('info', l[8005],
-            target === M.RootID ? l[8006] : l[22903].replace('%s', escapeHTML(M.d[target].name)));
+            msgDialog('info', l[8005], target === M.RootID ? l[8006] : l[22903].replace('%s', escapeHTML(M.d[target].name)));
           }
         });
       }
@@ -22273,7 +21902,6 @@ class GenericConversationMessage extends mixin.y {
     if (this.props.className) {
       additionalClasses += this.props.className;
     }
-
     if (message instanceof Message) {
       if (!message.wasRendered || !message.messageHtml) {
         message.messageHtml = htmlentities(textContents).replace(/\n/gi, "<br/>").replace(/\t/g, '    ');
@@ -22328,7 +21956,6 @@ class GenericConversationMessage extends mixin.y {
         additionalClasses += ' ' + stateText;
       }
     }
-
     const MESSAGE = {
       TYPE: {
         ATTACHMENT: textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT,
@@ -22414,7 +22041,6 @@ class ConversationMessageMixin extends _mixins1__._p {
     this.__cmmUpdateTickCount = 0;
     this._contactChangeListeners = false;
     this.onAfterRenderWasTriggered = false;
-
     lazy(this, '__cmmId', () => {
       return this.getUniqueId() + '--' + String(Math.random()).slice(-7);
     });
@@ -22487,7 +22113,6 @@ class ConversationMessageMixin extends _mixins1__._p {
     if (k === 'ts' || k === 'ats') {
       return;
     }
-
     delay(this.__cmmId, () => {
       this.eventuallyUpdate();
       this.__cmmUpdateTickCount = -2;
@@ -22571,14 +22196,12 @@ class ConversationMessageMixin extends _mixins1__._p {
     };
     const addReaction = () => chatRoom.messagesBuff.userAddReaction(message.messageId, slug, meta);
     const emoji = megaChat._emojiData.emojisSlug[slug] || meta;
-
     if (emoji && message.reacts.getReaction(u_handle, emoji.u)) {
       if (onEmojiBarChange && Object.keys(reactions).length === 1 && Object.keys(reactions[emoji.u]).length === 1) {
         onEmojiBarChange(false);
       }
       return chatRoom.messagesBuff.userDelReaction(message.messageId, slug, meta);
     }
-
     if (emoji && reactions[emoji.u] && CURRENT_USER_REACTIONS < REACTIONS_LIMIT.PER_PERSON) {
       return addReaction();
     }
@@ -22590,7 +22213,6 @@ class ConversationMessageMixin extends _mixins1__._p {
     } else if (onEmojiBarChange && Object.keys(reactions).length === 0) {
       onEmojiBarChange(true);
     }
-
     return addReaction();
   }
   _emojiOnActiveStateChange(newVal) {
@@ -22606,7 +22228,6 @@ class ConversationMessageMixin extends _mixins1__._p {
       message
     } = this.props;
     var isReadOnlyClass = chatRoom.isReadOnly() ? " disabled" : "";
-
     var emojisImages = message._reactions && message.reacts.reactions && Object.keys(message.reacts.reactions).map(utf => {
       var reaction = message.reacts.reactions[utf];
       var count = Object.keys(reaction).length;
@@ -22640,7 +22261,6 @@ class ConversationMessageMixin extends _mixins1__._p {
       } else {
         tipText = mega.utils.trans.listToString(names, (l[24069] || "%s [G]reacted with %s2[/G]").replace("%s2", slug));
       }
-
       var notFoundEmoji = slug && slug[0] !== ":";
       return react0().createElement("div", {
         key: slug,
@@ -22834,7 +22454,6 @@ class EmojiAutocomplete extends mixins.wl {
         selected = selected + (key === 9 ? e.shiftKey ? -1 : 1 : 1);
         selected = selected < 0 ? Object.keys(self.found).length - 1 : selected;
         selected = selected >= self.props.maxEmojis || selected >= Object.keys(self.found).length ? 0 : selected;
-
         if (self.found[selected] && (key === 9 || self.state.selected !== selected)) {
           self.setState({
             'selected': selected,
@@ -22906,7 +22525,6 @@ class EmojiAutocomplete extends mixins.wl {
         className: "textarea-autofill-info"
       }, l[5533]));
     }
-
     var q = self.props.emojiSearchQuery.substr(1, self.props.emojiSearchQuery.length);
     var exactMatch = [];
     var partialMatch = [];
@@ -22935,7 +22553,6 @@ class EmojiAutocomplete extends mixins.wl {
       }
     });
     var found = exactMatch.concat(partialMatch).slice(0, self.props.maxEmojis);
-
     exactMatch = partialMatch = null;
     this.maxFound = found.length;
     this.found = found;
@@ -23029,7 +22646,6 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       chatRoom
     } = props;
     this.logger = d && MegaLogger.getLogger("TypingArea", {}, chatRoom && chatRoom.logger || megaChat.logger);
-
     this.onEmojiClicked = this.onEmojiClicked.bind(this);
     this.onTypeAreaKeyUp = this.onTypeAreaKeyUp.bind(this);
     this.onTypeAreaKeyDown = this.onTypeAreaKeyDown.bind(this);
@@ -23197,7 +22813,6 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       if (self.state.emojiSearchQuery) {
         return;
       }
-
       if (e.altKey) {
         var content = element.value;
         var cursorPos = self.getCursorPosition(element);
@@ -23214,7 +22829,6 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       if (self.state.emojiSearchQuery) {
         return;
       }
-
       if ($.trim(val).length === 0) {
         if (self.props.onUpEditPressed && self.props.onUpEditPressed() === true) {
           e.preventDefault();
@@ -23224,7 +22838,6 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       if (self.state.emojiSearchQuery) {
         return;
       }
-
       if (self.props.showButtons === true) {
         e.preventDefault();
         self.onCancelClicked(e);
@@ -23247,7 +22860,6 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       if (self.prefillMode) {
         return;
       }
-
       var char = String.fromCharCode(key);
       if (key === 16 || key === 17 || key === 18 || key === 91 || key === 8 || key === 37 || key === 39 || key === 40 || key === 38 || key === 9 || /[\w:-]/.test(char)) {
         var parsedResult = mega.utils.emojiCodeParser(currentContent, currentCursorPos);
@@ -23303,7 +22915,6 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
     } else {
       self.stoppedTyping();
     }
-
     if (this.props.persist) {
       const {
         chatRoom
@@ -23326,9 +22937,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       }
     }
     self.updateScroll();
-
   }
-
   focusTypeArea() {
     if (this.props.disabled) {
       return;
@@ -23422,7 +23031,6 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       this.onUpdateCursorPosition = false;
     }
   }
-
   updateScroll() {
     if (!this.isComponentEventuallyVisible() || !this.$node && !this.typingAreaRef && !this.typingAreaRef.current) {
       return;
@@ -23527,7 +23135,6 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
             var endPos = fwdPos;
             self.onUpdateCursorPosition = fwdPos;
             self.prefillMode = true;
-
             if (post.substr(0, 2) == "::" && emojiAlias.substr(-1) == ":") {
               emojiAlias = emojiAlias.substr(0, emojiAlias.length - 1);
               endPos -= 1;
@@ -23546,7 +23153,6 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
             var msg = self.state.typedMessage;
             var pre = msg.substr(0, self.state.emojiStartPos);
             var post = msg.substr(self.state.emojiEndPos + 1, msg.length);
-
             if (post.substr(0, 2) == "::" && emojiAlias.substr(-1) == ":") {
               emojiAlias = emojiAlias.substr(0, emojiAlias.length - 1);
             } else {
@@ -23753,7 +23359,6 @@ class Button extends _chat_mixins1__.wl {
         }
       });
       $(document).rebind('closeDropdowns.' + this.getUniqueId(), () => this.onBlur());
-
       if (this.props.group) {
         if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] !== this) {
           _buttonGroups[this.props.group].setState({
@@ -23764,7 +23369,6 @@ class Button extends _chat_mixins1__.wl {
         _buttonGroups[this.props.group] = this;
       }
     }
-
     if (this.props.group && nextState.focused === false && _buttonGroups[this.props.group] === this) {
       _buttonGroups[this.props.group] = null;
     }
@@ -23915,11 +23519,9 @@ class Dropdown extends _chat_mixins1__.wl {
         this.props.onBeforeActiveChange(nextProps.active);
       }
       return true;
-    }
-    else if (this.props.focused != nextProps.focused) {
+    } else if (this.props.focused != nextProps.focused) {
       return true;
-    }
-    else if (this.state && this.state.active != nextState.active) {
+    } else if (this.state && this.state.active != nextState.active) {
       return true;
     }
     return undefined;
@@ -24029,7 +23631,6 @@ class Dropdown extends _chat_mixins1__.wl {
     setTimeout(function () {
       self.safeForceUpdate();
     }, 100);
-
     setTimeout(function () {
       self.onResized();
     }, 200);
@@ -24053,7 +23654,6 @@ class Dropdown extends _chat_mixins1__.wl {
     }
     var classes = "dropdown body " + (this.props.noArrow ? "" : "dropdown-arrow up-arrow") + " " + this.props.className;
     var styles;
-
     if (this.popupElement) {
       styles = {
         'zIndex': 123,
@@ -24111,14 +23711,11 @@ class DropdownContactsSelector extends _chat_mixins1__.wl {
   specShouldComponentUpdate(nextProps, nextState) {
     if (this.props.active != nextProps.active) {
       return true;
-    }
-    else if (this.props.focused != nextProps.focused) {
+    } else if (this.props.focused != nextProps.focused) {
       return true;
-    }
-    else if (this.state && this.state.active != nextState.active) {
+    } else if (this.state && this.state.active != nextState.active) {
       return true;
-    }
-    else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
+    } else if (this.state && JSON.stringify(this.state.selected) != JSON.stringify(nextState.selected)) {
       return true;
     } else {
       return undefined;
@@ -24355,7 +23952,6 @@ class DropdownEmojiSelector extends _chat_mixins0__.wl {
         }
         e.stopPropagation();
         e.preventDefault();
-
         self.mouseEnterTimer = setTimeout(function () {
           self.setState({
             'previewEmoji': emoji
@@ -24406,7 +24002,6 @@ class DropdownEmojiSelector extends _chat_mixins0__.wl {
             });
             return;
           }
-
           self.data_categories.push('frequently_used');
           self.data_categoriesWithCustomOrder = [];
           self.customCategoriesOrder.forEach(function (catName) {
@@ -24735,7 +24330,6 @@ var _dec, _class;
 
 
 
-
 let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 extends mixins.wl {
   constructor(props) {
     super(props);
@@ -24872,11 +24466,9 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       this._lastContentHeight = this._calculated.contentHeight;
       this.listContent.style.height = this._calculated.contentHeight + "px";
     }
-
     if (this.ps && this._calculated.scrollHeight + this._calculated.scrollTop > this._calculated.contentHeight) {
       this.ps.scrollToY(this._calculated.contentHeight - this._calculated.scrollHeight);
     }
-
     if (this.listAdapterInstance && this.listAdapterInstance.onContentUpdated) {
       this.listAdapterInstance.onContentUpdated();
     }
@@ -24902,12 +24494,9 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
     var shouldScroll = false;
     var itemOffsetTop = Math.floor(elementIndex / this._calculated.itemsPerRow) * this._calculated.itemHeight;
     var itemOffsetTopPlusHeight = itemOffsetTop + this._calculated.itemHeight;
-    if (
-    itemOffsetTop < this._calculated.scrollTop ||
-    itemOffsetTopPlusHeight > this._calculated.scrollTop + this._calculated.scrollHeight) {
+    if (itemOffsetTop < this._calculated.scrollTop || itemOffsetTopPlusHeight > this._calculated.scrollTop + this._calculated.scrollHeight) {
       shouldScroll = true;
     }
-
     if (shouldScroll) {
       this.ps.scrollToY(itemOffsetTop);
       onIdle(() => {
@@ -24930,7 +24519,6 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
   }
   onResizeDoUpdate() {
     super.onResizeDoUpdate();
-
     this._contentUpdated();
   }
   componentDidMount() {
@@ -25090,7 +24678,6 @@ class GenericGrid extends genericNodePropsComponent.L {
       className,
       keyProp
     } = this.props;
-
     let style = {};
     listAdapter.repositionItem(node, calculated, index, style);
     let image = null;
@@ -25400,7 +24987,6 @@ class Tooltip extends mixins.wl {
       tooltipHeight = $tooltip.outerHeight();
       docHeight = $(window).height();
       $tooltip.removeClass('dropdown-arrow left-arrow right-arrow up-arrow down-arrow').removeAttr('style');
-
       if (!tooltipOffset) {
         tooltipOffset = 7;
       }
@@ -25425,7 +25011,6 @@ class Tooltip extends mixins.wl {
         'left': tooltipLeftPos,
         'top': tooltipTopPos - 5
       });
-
       $tooltip.addClass(arrowClass);
     }
   }
@@ -25528,9 +25113,7 @@ class ColumnNodeName extends genericNodePropsComponent.L {
     }, external_React_default().createElement("img", {
       alt: "",
       className: `thumbnail-placeholder ${node.h}`,
-      src: node.fa || src ?
-      src || `${staticpath}/images/mega/ajax-loader-tiny.gif` :
-      window.noThumbURI
+      src: node.fa || src ? src || `${staticpath}/images/mega/ajax-loader-tiny.gif` : window.noThumbURI
     })))) : external_React_default().createElement("span", {
       className: `
                             transfer-filetype-icon
@@ -25679,7 +25262,6 @@ class BrowserEntries extends mixins.wl {
       if ($searchField.is(':focus')) {
         return;
       }
-
       if ($typingArea.is(':focus')) {
         $typingArea.trigger('blur');
       }
@@ -25742,14 +25324,12 @@ class BrowserEntries extends mixins.wl {
         }
         self.props.onAttachClicked(selectedNodes);
       }
-
       if (!charTyped) {
         self.lastCharKeyPressed = false;
         self.lastCharKeyIndex = -1;
       }
     });
   }
-
   unbindEvents() {
     $(document.body).off('keydown.be' + this.getUniqueId());
   }
@@ -25803,7 +25383,6 @@ class BrowserEntries extends mixins.wl {
     if (node) {
       self.lastCharKeyPressed = false;
       self.lastCharKeyIndex = -1;
-
       self.setState({
         'selected': [],
         'highlighted': [],
@@ -25947,7 +25526,6 @@ BrowserEntries.defaultProps = {
 
 
 
-
 class FMView extends mixins.wl {
   constructor(props) {
     var _this$dataSource;
@@ -26081,7 +25659,6 @@ class FMView extends mixins.wl {
     } else {
         sortFunc = M.sortByFavFn(order);
       }
-
     var folders = [];
     if (this.props.sortFoldersFirst) {
       for (var i = entries.length; i--;) {
@@ -26154,7 +25731,6 @@ class FMView extends mixins.wl {
         'selected': [],
         'highlighted': []
       };
-
       if (!((_this$dataSource3 = this.dataSource) != null && _this$dataSource3.addChangeListener)) {
         this.addOrUpdRawListener();
       }
@@ -26232,7 +25808,6 @@ class FMView extends mixins.wl {
         const map = this.props.fmConfigSortMap || Object.create(null);
         const name = map[newState[0]] || newState[0];
         const direction = newState[1] === "asc" ? 1 : -1;
-
         fmsortmode(sortId, name, direction);
       }
     });
@@ -26350,9 +25925,7 @@ __webpack_require__.d(__webpack_exports__, {
 // EXTERNAL MODULE: ./js/chat/mixins.js
 var mixins = __webpack_require__(503);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/nodeProperties.jsx
-
 class NodeProperties {
-
   static get(node, changeListener) {
     assert(node.h, 'missing handle for node');
     if (NodeProperties._globalCleanupTimer) {
@@ -26368,7 +25941,6 @@ class NodeProperties {
     }
     return nodeProps || NodeProperties._cache.get(node.h);
   }
-
   unuse(changeListener) {
     let node = this.node;
     if (!node) {
@@ -26386,7 +25958,6 @@ class NodeProperties {
       }
     }
   }
-
   static cleanup(maxCacheSize) {
     maxCacheSize = typeof maxCacheSize === "undefined" ? NodeProperties.MAX_CACHE_SIZE : maxCacheSize;
     let len = NodeProperties._cache.size;
@@ -26406,14 +25977,12 @@ class NodeProperties {
       }
     }
   }
-
   constructor(node, changeListener) {
     this.node = node;
     this.changeListeners = new Set();
     if (changeListener) {
       this.changeListeners.add(changeListener);
     }
-
     let _onChange = () => {
       this.initProps();
       for (let listener of this.changeListeners) {
@@ -26427,14 +25996,12 @@ class NodeProperties {
     }
     this.initProps();
   }
-
   use(changeListener) {
     if (changeListener) {
       this.changeListeners.add(changeListener);
     }
     NodeProperties._usages.set(this, (NodeProperties._usages.get(this) | 0) + 1);
   }
-
   _cleanup() {
     if (this._listener) {
       this.node.removeChangeListener(this._listener);
@@ -26444,7 +26011,6 @@ class NodeProperties {
     }
     oDestroy(this);
   }
-
   initProps() {
     let node = this.node;
     lazy(this, 'title', () => {
@@ -26465,7 +26031,6 @@ class NodeProperties {
         if (share.down) {
           classNames.push('taken-down');
         }
-
         if (missingkeys[node.h]) {
           classNames.push('undecryptable');
         }
@@ -26473,7 +26038,6 @@ class NodeProperties {
       if (share) {
         classNames.push('linked');
       }
-
       if (node.lbl && !folderlink) {
         var colourLabel = M.getLabelClassFromId(node.lbl);
         classNames.push('colour-label');
@@ -26661,7 +26225,6 @@ class ModalDialog extends mixins.wl {
       $(document.body).addClass('overlayed');
       $('.fm-dialog-overlay').removeClass('hidden');
     }
-
     $('textarea:focus').trigger("blur");
     if (!this.props.noCloseOnClickOutside) {
       const convApp = document.querySelector('.conversationsApp');
@@ -26922,7 +26485,6 @@ class ConfirmDialog extends mixins.wl {
     super(props);
     this._wasAutoConfirmed = undefined;
     this._keyUpEventName = 'keyup.confirmDialog' + this.getUniqueId();
-
     lazy(this, '_autoConfirm', () => this.props.onConfirmClicked && this.props.dontShowAgainCheckbox && ConfirmDialog.autoConfirm(this));
   }
   unbindEvents() {
@@ -26930,7 +26492,6 @@ class ConfirmDialog extends mixins.wl {
   }
   componentDidMount() {
     super.componentDidMount();
-
     queueMicrotask(() => {
       if (!this.isMounted()) {
         return;
@@ -26938,7 +26499,6 @@ class ConfirmDialog extends mixins.wl {
       if (this._autoConfirm) {
         if (!this._wasAutoConfirmed) {
           this._wasAutoConfirmed = 1;
-
           queueMicrotask(() => {
             this.onConfirmClicked();
           });
@@ -27051,7 +26611,6 @@ var _chat_mixins0__ = __webpack_require__(503);
 var _dec, _dec2, _class, _class2;
 var React = __webpack_require__(363);
 
-
 let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_chat_mixins0__.M9)(30, true), (_class = (_class2 = class PerfectScrollbar extends _chat_mixins0__.wl {
   constructor(props) {
     super(props);
@@ -27068,7 +26627,6 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_cha
     if (!this.isMounted()) {
       return;
     }
-
     var self = this;
     var $elem = self.get$Node();
     var animFrameInner = false;
@@ -27087,11 +26645,9 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_cha
       }
       self.isUserScroll = true;
     });
-
     self.isUserScroll = false;
     $elem[0][prop] = Math.round(newPos);
     Ps.update($elem[0]);
-
     animFrameInner = requestAnimationFrame(() => {
       animFrameInner = false;
       self.isUserScroll = true;
@@ -27143,10 +26699,7 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_cha
     var ns = '.ps' + this.getUniqueId();
     $elem.parents('.have-animation').unbind('animationend' + ns + ' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns);
   }
-  attachAnimationEvents() {
-
-  }
-
+  attachAnimationEvents() {}
   eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
     var self = this;
     if (!self.isComponentEventuallyVisible()) {
@@ -27345,7 +26898,6 @@ __webpack_require__.d(__webpack_exports__, {
 var _chat_mixins0__ = __webpack_require__(503);
 var React = __webpack_require__(363);
 var ReactDOM = __webpack_require__(533);
-
 
 class RenderTo extends React.Component {
   componentDidMount() {

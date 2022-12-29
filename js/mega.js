@@ -853,7 +853,6 @@ scparser.$add('s', {
                                 delete n.su;
                                 delete n.sk;
                                 delete M.c.shares[a.n];
-                                delete u_sharekeys[a.n];
                                 mega.keyMgr.deleteShares([a.n]).catch(dump);
 
                                 if (M.tree.shares) {

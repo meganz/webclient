@@ -135,6 +135,9 @@
         animation: none;
         background-position: -29px -501px;
     }
+    .theme-dark .loading-info li.loaded::after {
+        filter: invert(1);
+    }
     .loader-progressbar {
         background-color: var(--progress-bar-fill4);
         bottom: 0;

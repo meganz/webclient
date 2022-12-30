@@ -641,12 +641,9 @@ lazy(mega, 'keyMgr', () => {
         }
 
         async getGeneration() {
-            const {u_type, u_handle} = window;
+            const {u_handle} = window;
+            console.assert(String(u_handle).length === 11, 'check this..', u_handle);
 
-            console.assert(
-                (u_type === undefined || u_type > 0) && String(u_handle).length === 11,
-                'check this..', u_type, u_handle
-            );
             const key = `keysgen_${u_handle}`;
             let value = tryCatch(() => localStorage.getItem(key))();
 

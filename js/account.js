@@ -273,19 +273,18 @@ function u_checklogin3a(res, ctx) {
                 if (keys) {
                     return mega.keyMgr.initKeyManagement(keys);
                 }
+                // @todo Transifex
+                const gone =
+                    `Your cryptographic keys have gone missing. It is not safe to use your account at this time.`;
 
                 // We don't - are we supposed to?
                 // otherwise, write them later, when the insecure state is fully loaded
-                return mega.keyMgr.getGeneration();
-            })
-            .then((bail) => {
-                if (bail) {
-                    throw new SecurityError(`
-                        Your cryptographic keys have gone missing.
-                        It is not safe to use your account at this time.
-                        Please try again later.
-                    `);
-                }
+                return mega.keyMgr.getGeneration()
+                    .then((gen) => {
+                        if (gen > 0) {
+                            throw new SecurityError(`${gone} (#${gen})`);
+                        }
+                    });
             })
             .then(() => {
                 // there was a race condition between importing and business accounts creation.

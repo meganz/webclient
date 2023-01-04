@@ -602,6 +602,22 @@ BusinessAccount.prototype.isBusinessMasterAcc = function () {
 };
 
 /**
+ * @param {String} password Password to process
+ * @returns {Object?}
+ */
+BusinessAccount.prototype.passwordToAesCypher = function(password) {
+    'use strict';
+
+    return tryCatch(
+        () => {
+            const keyFromPassword = base64_to_a32(password);
+            return new sjcl.cipher.aes(keyFromPassword);
+        },
+        false
+    )();
+};
+
+/**
  * Decrypting the link sent to sub-account using a password
  * @param {String} link         invitation link #businesssignup<link> without #businesssignup prefix
  * @param {String} password     The password which the sub-user entered to decrypt the link
@@ -613,9 +629,14 @@ BusinessAccount.prototype.decryptSubAccountInvitationLink = function (link, pass
     if (!link || !password) {
         return null;
     }
+
+    const aesCipher = this.passwordToAesCypher(password);
+
+    if (!aesCipher) {
+        return null;
+    }
+
     try {
-        var keyFromPassword = base64_to_a32(password);
-        var aesCipher = new sjcl.cipher.aes(keyFromPassword);
         var decryptedTokenArray32 = aesCipher.decrypt(base64_to_a32(link));
         var decryptedTokenArray8 = a32_to_ab(decryptedTokenArray32);
         decryptedTokenArray8 = decryptedTokenArray8.slice(0, 15);

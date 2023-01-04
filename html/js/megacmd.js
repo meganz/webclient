@@ -226,19 +226,20 @@ function linuxMegacmdDropdown() {
             ['32', '64'].forEach(function(platform) {
 
                 var icon = val.name.toLowerCase().match(/([a-z]+)/i)[1];
+                var clientName = val.name.replace(/\s\s+/g, ' ');
                 var itemNode;
 
                 icon = (icon === 'red') ? 'redhat' : icon;
 
                 if (val[platform] &&
-                    $('div.option[data-client="' + val.name + '"]', $list).length === 0) {
+                    $(`div.option[data-client="${clientName}"]`, $list).length === 0) {
                     itemNode = mCreateElement('div', {
                         'class': 'option',
-                        'data-client': val.name,
+                        'data-client': clientName,
                         'data-link': linuxurl + val[platform]
                     }, $list[0]);
                     mCreateElement('i', {'class': 'icon linux download-sprite ' + icon}, itemNode);
-                    mCreateElement('span', undefined, itemNode).textContent = val.name;
+                    mCreateElement('span', undefined, itemNode).textContent = clientName;
                 }
             });
         }

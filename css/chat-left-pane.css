@@ -1300,12 +1300,28 @@ li.active .call-duration i {
     background: linear-gradient(180deg, rgba(86, 210, 241, 1) 0%, rgba(43, 166, 222, 1) 100%);
 }
 
+@media only screen and (max-width: 1080px) {
+    .profile-head .profile-controls button,
+    .profile-head .profile-controls button:hover,
+    .profile-head .profile-controls button:focus {
+        margin-right: 4px;
+        --height: 24px;
+        --outer-padding: 2px;
+    }
+}
+
 .profile-head .profile-controls button i {
     position: absolute;
     left: 50%;
     --icon-size: 24px;
     transform: translateX(-50%);
     --mask-color: var(--secondary-white);
+}
+
+@media only screen and (max-width: 1080px) {
+    .profile-head .profile-controls button i {
+        --icon-size: 16px;
+    }
 }
 
 .profile-head .profile-credentials {

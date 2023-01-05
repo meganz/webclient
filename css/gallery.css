@@ -650,7 +650,7 @@
 .albums-grid {
     display: grid;
     grid-gap: 1.25rem;
-    padding: 2.1rem 0;
+    padding: 2rem 0;
     height: calc(100vh - 97px);
     box-sizing: border-box;
     overflow: hidden;

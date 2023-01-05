@@ -16741,14 +16741,15 @@ class StreamControls extends mixins.wl {
       className: 'theme-dark-forced'
     };
     this.state = {
-      options: false
+      endCallOptions: false,
+      endCallPending: false
     };
     this.handleMousedown = ({
       target
     }) => {
       var _this$endContainerRef;
       return (_this$endContainerRef = this.endContainerRef) != null && _this$endContainerRef.current.contains(target) ? null : this.setState({
-        options: false
+        endCallOptions: false
       });
     };
     this.renderDebug = () => {
@@ -16784,7 +16785,7 @@ class StreamControls extends mixins.wl {
       return external_React_default().createElement("div", {
         ref: this.endContainerRef,
         className: "end-call-container"
-      }, this.state.options && external_React_default().createElement("div", {
+      }, this.state.endCallOptions && external_React_default().createElement("div", {
         className: "end-options theme-dark-forced"
       }, external_React_default().createElement("div", {
         className: "end-options-content"
@@ -16792,8 +16793,14 @@ class StreamControls extends mixins.wl {
         className: "mega-button",
         onClick: onCallEnd
       }, external_React_default().createElement("span", null, l.leave)), external_React_default().createElement(meetings_button.Z, {
-        className: "mega-button positive",
-        onClick: () => chatRoom.endCallForAll()
+        className: `
+                                    mega-button
+                                    positive
+                                    ${this.state.endCallPending ? 'disabled' : ''}
+                                `,
+        onClick: () => this.state.endCallPending ? null : this.setState({
+          endCallPending: true
+        }, () => chatRoom.endCallForAll())
       }, external_React_default().createElement("span", null, l.end_for_all)))), external_React_default().createElement(meetings_button.Z, {
         simpletip: {
           ...this.SIMPLETIP,
@@ -16805,7 +16812,7 @@ class StreamControls extends mixins.wl {
           this.endButtonRef = button.buttonRef;
         },
         onClick: () => chatRoom.type !== 'private' && streams.length && Call.isModerator(chatRoom, u_handle) ? this.setState(state => ({
-          options: !state.options
+          endCallOptions: !state.endCallOptions
         }), () => this.endButtonRef && $(this.endButtonRef.current).trigger('simpletipClose')) : onCallEnd()
       }, external_React_default().createElement("span", null, l[5884])));
     };

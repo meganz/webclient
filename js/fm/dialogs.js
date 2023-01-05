@@ -1141,6 +1141,7 @@
             M.safeShowDialog('copy', function() {
                 var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ? 'shared-with-me' : 'cloud-drive';
                 var dir = M.currentdirid === 'transfers' ? M.lastSeenCloudFolder || M.RootID : M.currentdirid;
+                closeMsg();
                 handleOpenDialog(tab, dir, { key: 'copyToUpload', value: [files, emptyFolders] });
                 return uiCheckboxes($dialog);
             });

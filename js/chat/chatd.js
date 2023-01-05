@@ -280,8 +280,8 @@ Chatd.prototype._proxyEventsToRooms = function() {
                 else {
                     if (d) {
                         console.warn("chatRoom was missing for event:", eventName, eventData);
-                        megaChat.enqueueChatRoomEvent(eventName, eventData);
                     }
+                    megaChat.enqueueChatRoomEvent(eventName, eventData);
                 }
             });
         });

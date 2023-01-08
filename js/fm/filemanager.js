@@ -3527,7 +3527,7 @@ FileManager.prototype.addGridUI = function(refresh) {
             if (M.isInvalidUserStatus()) {
                 return;
             }
-            var id = [$(this).parent().attr('id')];
+            var id = $(this).parent().attr('id');
             var newFavState = Number(!M.isFavourite(id));
 
             // Handling favourites is allowed for full permissions shares only

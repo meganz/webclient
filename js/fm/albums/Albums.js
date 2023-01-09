@@ -122,6 +122,17 @@ lazy(mega.gallery, 'albums', () => {
     const getAlbumIdFromPath = () => M.currentdirid.replace('albums/', '');
 
     /**
+     * Reporting album content download event
+     * @returns {void}
+     */
+    const reportDownload = () => {
+        const onlySelection = scope.albums.grid.timeline
+            && Object.keys(scope.albums.grid.timeline.selections).length > 0;
+
+        eventlog((onlySelection) ? 99793 : 99792);
+    };
+
+    /**
      * @param {HTMLElement} el DOM element to apply PerfectScroll to
      * @returns {void}
      */
@@ -239,6 +250,7 @@ lazy(mega.gallery, 'albums', () => {
                     const handles = getAlbumsHandles(albumIds);
 
                     if (handles.length) {
+                        reportDownload();
                         M.addDownload(handles);
                     }
                 }
@@ -250,6 +262,7 @@ lazy(mega.gallery, 'albums', () => {
                     const handles = getAlbumsHandles(albumIds);
 
                     if (handles.length) {
+                        reportDownload();
                         M.addDownload(
                             handles,
                             true,
@@ -275,6 +288,7 @@ lazy(mega.gallery, 'albums', () => {
                 const handles = getAlbumsHandles(albumIds);
 
                 if (handles.length) {
+                    reportDownload();
                     M.addDownload(handles);
                 }
             },
@@ -927,6 +941,7 @@ lazy(mega.gallery, 'albums', () => {
                             return;
                         }
 
+                        reportDownload();
                         M.addDownload(handles);
                     }
                 }
@@ -1533,6 +1548,7 @@ lazy(mega.gallery, 'albums', () => {
                             playSlideshow(getAlbumIdFromPath());
                         }
                         else if (selectedHandles.length > 1) {
+                            reportDownload();
                             M.addDownload(selectedHandles);
                         }
 
@@ -2878,6 +2894,7 @@ lazy(mega.gallery, 'albums', () => {
                             const handles = getAlbumsHandles([albumId]);
 
                             if (handles.length) {
+                                reportDownload();
                                 M.addDownload(handles);
                             }
                         }
@@ -3119,6 +3136,7 @@ lazy(mega.gallery, 'albums', () => {
                         const isVideo = mega.gallery.isGalleryVideo(cell.el.ref.node);
 
                         if (isVideo && (!isVideo.isPreviewable || !MediaAttribute.getMediaType(cell.el.ref.node))) {
+                            reportDownload();
                             M.addDownload([h]);
                         }
                         else {
@@ -4687,6 +4705,7 @@ lazy(mega.gallery, 'albums', () => {
 
         downloadSelectedElements() {
             if (this.grid && this.grid.timeline) {
+                reportDownload();
                 M.addDownload(Object.keys(mega.gallery.albums.grid.timeline.selections));
             }
         }

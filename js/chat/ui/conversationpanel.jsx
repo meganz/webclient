@@ -1131,7 +1131,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                     {room.getRoomTitle()}
                                 </Emoji>
                             </h3>
-                            <h5>{usersCount ? l[20233].replace("%s", usersCount) : " "}</h5>
+                            <h5>{usersCount ? mega.icu.format(l[20233], usersCount) : ''}</h5>
                             <p>{l[20595]}</p>
                         </div>
                     </section>

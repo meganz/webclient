@@ -71,7 +71,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
         }
         const { groupName, selected, keyRotation, createChatLink, openInvite } = this.state;
 
-        megaChat.createAndShowGroupRoomFor(selected, groupName, {
+        megaChat.createAndShowGroupRoomFor(selected, groupName.trim(), {
             keyRotation,
             createChatLink: keyRotation ? false : createChatLink,
             oi: openInvite,

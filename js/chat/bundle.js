@@ -11849,6 +11849,7 @@ class Start extends mixins.wl {
   constructor(props) {
     super(props);
     this.inputRef = external_React_default().createRef();
+    this.defaultTopic = l.default_meeting_topic.replace('%NAME', M.getNameByHandle(u_handle));
     this.state = {
       audio: false,
       video: false,
@@ -11860,10 +11861,16 @@ class Start extends mixins.wl {
     this.handleChange = ev => this.setState({
       topic: ev.target.value
     });
-    this.toggleEdit = () => this.setState(state => ({
-      editing: !state.editing,
-      previousTopic: state.topic
-    }), () => onIdle(this.doFocus));
+    this.toggleEdit = () => {
+      this.setState(state => {
+        const topic = state.topic.trim() || this.defaultTopic;
+        return {
+          editing: !state.editing,
+          topic,
+          previousTopic: topic
+        };
+      }, () => onIdle(this.doFocus));
+    };
     this.doFocus = () => {
       if (this.state.editing) {
         const input = this.inputRef.current;
@@ -11910,10 +11917,10 @@ class Start extends mixins.wl {
         video
       } = this.state;
       if (onStart) {
-        onStart(topic, audio, video);
+        onStart(topic.trim() || this.defaultTopic, audio, video);
       }
     };
-    this.state.topic = l.default_meeting_topic.replace('%NAME', M.getNameByHandle(u_handle));
+    this.state.topic = this.defaultTopic;
   }
   componentDidMount() {
     super.componentDidMount();
@@ -12084,7 +12091,7 @@ class StartGroupChatWizard extends mixins.wl {
       createChatLink,
       openInvite
     } = this.state;
-    megaChat.createAndShowGroupRoomFor(selected, groupName, {
+    megaChat.createAndShowGroupRoomFor(selected, groupName.trim(), {
       keyRotation,
       createChatLink: keyRotation ? false : createChatLink,
       oi: openInvite

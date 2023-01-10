@@ -93,7 +93,11 @@ export default class Navigation extends MegaRenderMixin {
                             contactRequests={contactRequests}
                             icon="sprite-fm-mono icon-contacts">
                             {!!contactRequests && (
-                                <div className="notifications-count">
+                                <div
+                                    className={`
+                                        notifications-count
+                                        ${contactRequests > 99  ? 'large' : ''}
+                                    `}>
                                     <span>{contactRequests}</span>
                                 </div>
                             )}

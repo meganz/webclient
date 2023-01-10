@@ -1602,11 +1602,23 @@ li.active .call-duration i {
     background: var(--secondary-red);
 }
 
+.conversationsApp .lhp-nav-container .notifications-count.large {
+    width: 18px;
+    height: 18px;
+    top: -6px;
+    right: -8px;
+}
+
 .conversationsApp .lhp-nav-container .notifications-count span {
     display: block;
     margin: 0;
     font: var(--text-caption);
     color: var(--text-color-white-high);
+}
+
+.conversationsApp .lhp-nav-container .notifications-count.large span {
+    font-size: 8px;
+    padding-top: 1px;
 }
 
 .conversationsApp .lhp-action-buttons {

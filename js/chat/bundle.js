@@ -13114,7 +13114,10 @@ class Navigation extends mixins.wl {
       contactRequests: contactRequests,
       icon: "sprite-fm-mono icon-contacts"
     }, !!contactRequests && external_React_default().createElement("div", {
-      className: "notifications-count"
+      className: `
+                                        notifications-count
+                                        ${contactRequests > 99 ? 'large' : ''}
+                                    `
     }, external_React_default().createElement("span", null, contactRequests))), external_React_default().createElement("span", null, l[165])));
   }
 }

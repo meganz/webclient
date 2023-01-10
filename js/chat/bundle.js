@@ -5689,7 +5689,8 @@ class MembersAmount extends _mixins1__._p {
     const {
       room
     } = this.props;
-    return room ? react0().createElement("span", null, (l[20233] || "%s Members").replace("%s", Object.keys(room.members).length)) : null;
+    const memberKeys = Object.keys(room.members);
+    return room && memberKeys.length ? react0().createElement("span", null, mega.icu.format(l[20233], memberKeys.length)) : null;
   }
 }
 class ContactFingerprint extends _mixins1__.wl {
@@ -11070,7 +11071,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         className: "chatlink-contents"
       }, external_React_default().createElement("div", {
         className: "huge-icon group-chat"
-      }), external_React_default().createElement("h3", null, external_React_default().createElement(utils.dy, null, room.getRoomTitle())), external_React_default().createElement("h5", null, usersCount ? l[20233].replace("%s", usersCount) : " "), external_React_default().createElement("p", null, l[20595]))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
+      }), external_React_default().createElement("h3", null, external_React_default().createElement(utils.dy, null, room.getRoomTitle())), external_React_default().createElement("h5", null, usersCount ? mega.icu.format(l[20233], usersCount) : ''), external_React_default().createElement("p", null, l[20595]))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
         className: "bottom-buttons"
       }, external_React_default().createElement("button", {
         className: "mega-button positive",

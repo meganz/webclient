@@ -63,7 +63,7 @@ mobile.chatlink = {
                         $('h2.topic', $overlay).safeHTML(topic);
                     }
                     if (result.ncm) {
-                        $('.members', $overlay).text(l[20233].replace("%s", result.ncm));
+                        $('.members', $overlay).text(mega.icu.format(l[20233], result.ncm));
                     }
                 })
             });

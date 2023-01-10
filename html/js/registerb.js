@@ -46,6 +46,19 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     var nbUsersMegaInput = new mega.ui.MegaInputs($nbUsersInput);
     nbUsersMegaInput.showMessage('*' + l[19501], true);
 
+    $nbUsersInput.rebind('keypress.business paste.business', e => {
+        // Firefox fix bug on allowing strings on input type number applies to Webkit also
+        if (e.type === 'paste') {
+            var ptext = e.originalEvent.clipboardData.getData('text');
+            if (isNaN(ptext)) {
+                return false;
+            }
+        }
+        if (e.type === 'keypress' && isNaN(e.key)) {
+            return false;
+        }
+    });
+
     $nbUsersInput.rebind('wheel.registerb', function(e) {
         e.preventDefault();
     });

@@ -272,8 +272,8 @@ export default class Stream extends MegaRenderMixin {
 
             if (streams.length <= MAX_STREAMS_PER_PAGE) {
                 const $$STREAMS = [];
-                streams.forEach(stream => {
-                    const cacheKey = stream.source?.srcObject?.id;
+                streams.forEach((stream, i) => {
+                    const cacheKey = `${mode}_${stream.clientId}_${i}`;
 
                     $$STREAMS.push(
                         <StreamNode
@@ -290,7 +290,7 @@ export default class Stream extends MegaRenderMixin {
                                 e.stopPropagation();
                                 onThumbnailDoubleClick(streamNode);
                             }}
-                            key={`${mode}_${stream.clientId}_${cacheKey}`}
+                            key={cacheKey}
                             stream={stream}
                             didMount={ref => {
                                 this.nodeRefs.push({ clientId: stream.clientId, cacheKey, ref });

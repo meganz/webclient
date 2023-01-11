@@ -732,8 +732,8 @@ var exportPassword = {
             exportPassword.encrypt.hideSetPasswordDialog();
             exportPassword.encrypt.initRemovePasswordButton();
 
-            // Log to see if feature is used much
-            api_req({ a: 'log', e: 99618, m: 'User created password protected link' });
+            // Log to see if encryption feature is used much
+            eventlog(99618, JSON.stringify([1, linkInfo.type === exportPassword.LINK_TYPE_FOLDER ? 1 : 0]));
         },
 
         /**
@@ -1341,6 +1341,7 @@ var exportExpiry = {
                 // Select link item
                 $('.item.selected', self.$dialog).removeClass('selected');
                 $inputClicked.closest('.item').addClass('selected');
+                $inputClicked.trigger('change.logDateChange');
 
                 // Update the link with the new expiry timestamp
                 exportExpiry.updateLinks(dateText / 1000);
@@ -1735,6 +1736,38 @@ var exportExpiry = {
         var toastTxt;
         var linksNum;
 
+        /**
+         * Log public-link dialog events:
+         * 1: "Export link decryption key separately" click
+         * 2: "Set an expiry date" buttons click
+         * 3: Select expiry date in the calendar
+         * 4: "Set password" buttons click
+         * 5: "Cog" icon click to show context menu
+         * 6: "Remove link" button click
+         * @param {Number} type 1-6
+         * @param {Object} target Target elem selector
+         * @returns {void}
+         */
+        const logExportEvt = (type, target) => {
+
+            const h = $(target).closest('.item').data('node-handle');
+            let folders = 0;
+            let files = 0;
+
+            if (h && M.d[h].t) {
+                folders++;
+            }
+            else if (h) {
+                files++;
+            }
+            else {
+                folders = $.exportFolderLinks;
+                files = $.exportFileLinks;
+            }
+
+            eventlog(99790, JSON.stringify([1, type, folders, files]));
+        };
+
         // Close dialog
         if (close) {
 
@@ -2039,6 +2072,9 @@ var exportExpiry = {
                 $linkContent.addClass('separately');
                 $('button.copy.links span', $bottomBar).text(l[23625]);
                 $('button.copy.keys', $bottomBar).removeClass('hidden');
+
+                // Log to see if "export link decryption key separately" is used much
+                logExportEvt(1);
             }
             else {
                 $checkboxWrap.removeClass('checkboxOn').addClass('checkboxOff');
@@ -2112,12 +2148,12 @@ var exportExpiry = {
         });
 
         // Init FREE export links events
-        var initFreeEvents = function() {
+        const initFreeEvents = () => {
 
             // Add click event to Settings icon, show dropdown
-            $cogIcons.rebind('click.showDropdown', function() {
+            $cogIcons.rebind('click.showDropdown', (e) => {
 
-                var $this = $(this);
+                var $this = $(e.currentTarget);
                 var $dropdown = $('.dropdown.export', $linksTab);
                 var itemsLength = $('.item', $linksTab).length;
                 var $currentItem = $this.closest('.item');
@@ -2146,10 +2182,13 @@ var exportExpiry = {
                     at: 'left top',
                     collision: 'flipfit'
                 });
+
+                // Log to see if context menu is used much
+                logExportEvt(5, e.currentTarget);
             });
 
             // Add click event to Remove link dropdown item
-            $removeItem.rebind('click.removeLink', function() {
+            $removeItem.rebind('click.removeLink', (e) => {
 
                 const $bottomBar = $('footer', this.$dialog);
                 const $selectedLink = $('.item.selected', $linksTab);
@@ -2168,6 +2207,13 @@ var exportExpiry = {
 
                     // Remove Link item from DOM
                     $selectedLink.remove();
+
+                    if (M.d[handle].t) {
+                        $.exportFolderLinks--;
+                    }
+                    else {
+                        $.exportFileLinks--;
+                    }
 
                     // Update Export links scrolling
                     if ($scroll.is('.ps')) {
@@ -2214,6 +2260,9 @@ var exportExpiry = {
                 else {
                     removeLink();
                 }
+
+                // Log to see if Remove link is used much
+                logExportEvt(6, e.currentTarget);
             });
 
             // Click anywhere in Export link dialog to hide dropdown
@@ -2239,23 +2288,41 @@ var exportExpiry = {
         };
 
         // Init PRO events links events
-        var initProEvents = function() {
+        const initProEvents = () => {
+
+            const $calendarInputs = $('.set-date', $linksDialog);
 
             // Add click event to Set date dropdown item
-            $setExpiryItem.rebind('click.setDate', function() {
+            $setExpiryItem.rebind('click.setDate', () => {
 
                 var $selectedLink = $('.item.selected', $linksTab);
                 var datepicker = $('.set-date', $selectedLink).datepicker().data('datepicker');
 
                 // Show datepicker
                 datepicker.show();
+
+                // Log to see if "Set an expiry date" is clicked much
+                logExportEvt(2, $selectedLink);
             });
 
+            // Log to see if "Set an expiry date" is clicked much
+            $calendarInputs.rebind('mousedown.logClickEvt', (e) => logExportEvt(2, e.currentTarget));
+
+            // Log to see if Expiry date is set much
+            $calendarInputs.rebind('change.logDateChange', (e) => logExportEvt(3, e.currentTarget));
+
+            // Log to see if "Set password" is clicked much
+            $lockIcons.add($('button.password', $linksTab))
+                .rebind('click.logClickEvt', (e) => logExportEvt(4, e.currentTarget));
+
             // Add click event to Set password dropdown item
-            $setPasswordtem.rebind('click.setPass', function() {
+            $setPasswordtem.rebind('click.setPass', () => {
 
                 // Show Set password dialog
                 exportPassword.encrypt.showSetPasswordDialog();
+
+                // Log to see if "Set password" is clicked much
+                logExportEvt(4, $('.item.selected', $linksTab));
             });
         };
 
@@ -2487,8 +2554,8 @@ var exportExpiry = {
 
         var html = '';
 
-        $.itemExportHasFolder = false;
-        $.itemExportHasFile = false;
+        $.exportFolderLinks = 0;
+        $.exportFileLinks = 0;
 
         $.each($.itemExport, function(index, value) {
 
@@ -2499,10 +2566,10 @@ var exportExpiry = {
             }
 
             if (node.t) {
-                $.itemExportHasFolder = true;
+                $.exportFolderLinks++;
             }
             else {
-                $.itemExportHasFile = true;
+                $.exportFileLinks++;
             }
         });
 

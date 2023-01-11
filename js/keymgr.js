@@ -48,9 +48,93 @@ lazy(mega, 'keyMgr', () => {
         return new Uint8Array(u8.buffer, u8.byteOffset, len);
     };
 
+    const cleanupCachedAttribute = async() => {
+        if (u_attr['^!keys']) {
+            logger.warn('Cleaning ug-provided ^!keys attribute.');
+            delete u_attr['^!keys'];
+        }
+        return attribCache.removeItem(`${u_handle}_^!keys`);
+    };
+
+    const syncRemoteKeysAttribute = async(keyMgr) => {
+        await cleanupCachedAttribute();
+
+        return Promise.resolve(mega.attr.get(u_handle, 'keys', -2, true))
+            .then((result) => {
+                assert(typeof result === 'string' && result.length > 0, `KeyMgr: Bogus fetch-result, "${result}"`);
+
+                return keyMgr.importKeysContainer(result);
+            })
+            .catch((ex) => {
+                cleanupCachedAttribute().catch(dump);
+                throw ex;
+            });
+    };
+
+    const kmWebLock = self.LockManager && navigator.locks instanceof self.LockManager
+        ? async(handler) => navigator.locks.request('KeyMgr-readwrite.lock', handler)
+        : async(handler) => handler();
+
+    const eventlog = (...args) => {
+        if (window.buildOlderThan10Days) {
+            logger.warn(...args);
+        }
+        else {
+            queueMicrotask(() => window.eventlog(...args));
+        }
+    };
+
+    const isValidMasterKey = (key) => Array.isArray(key) && key.length === 4 && Math.max(...key) >>> 0;
+
+    if (!window.is_karma) {
+        let gMasterKey = window.u_k;
+
+        delete window.u_k;
+        Object.defineProperty(window, 'u_k', {
+            get() {
+                if (d > 8) {
+                    logger.warn('Feeding master-key for user %s...', u_handle);
+                }
+                return gMasterKey;
+            },
+            set(value) {
+                const valid = value === undefined || isValidMasterKey(value);
+
+                if (!valid || value && mega.keyMgr.equal(value, gMasterKey || [])) {
+                    logger.error('Forbidden attempt to replace the master-key...', !!value);
+                    return;
+                }
+
+                if (d) {
+                    if (gMasterKey) {
+                        logger.warn('%s master-key for user %s...', value ? 'Replacing' : 'Removing', u_handle);
+                    }
+                    else {
+                        logger.warn('Establishing new master-key for user %s.', u_handle);
+                    }
+                }
+
+                // @todo ensure there is nothing pending/running concurrently given the reset() call..
+
+                gMasterKey = value;
+                mega.keyMgr.reset();
+            }
+        });
+    }
+
     return new class KeyMgr {
 
         constructor() {
+            this.reset();
+        }
+
+        reset() {
+            const ownKeys = Reflect.ownKeys(this);
+
+            for (let i = ownKeys.length; i--;) {
+                delete this[ownKeys[i]];
+            }
+
             // share keys that an upload is allowed to encrypt to
             // { uploadid : [ targetnode, [ sharenode, sharenode, ... ] ] }
             this.uploads = Object.create(null);
@@ -72,6 +156,9 @@ lazy(mega, 'keyMgr', () => {
 
             // a commit() attempt was unsuccessful due to incomplete state
             this.pendingcommit = null;
+
+            // indicates an unresolved version clash
+            this.versionclash = false;
 
             // feature flag: enable with the blog post going live
             this.secure = false;
@@ -95,7 +182,7 @@ lazy(mega, 'keyMgr', () => {
             }
 
             if (keys) {
-                return this.importKeysContainer(keys);
+                return this.importKeysContainer(keys, -0x4D454741);
             }
 
             if (d) {
@@ -165,6 +252,8 @@ lazy(mega, 'keyMgr', () => {
 
         async setKey(basekey) {
             if (!this.gcmkey) {
+                assert(isValidMasterKey(basekey), 'Invalid base-key.');
+
                 const key = await crypto.subtle.importKey(
                     "raw",
                     new Uint8Array(a32_to_ab(basekey)),
@@ -180,6 +269,11 @@ lazy(mega, 'keyMgr', () => {
                     true,
                     ['encrypt', 'decrypt']
                 );
+
+                Object.defineProperty(this.gcmkey, 'bk', {
+                    value: basekey,
+                    configurable: true
+                });
             }
         }
 
@@ -219,29 +313,31 @@ lazy(mega, 'keyMgr', () => {
                 p += len + 4;
             }
 
-            if (!(this.version = this.gettlv(blob, tagpos, 1)[0])) {
+            const version = this.gettlv(blob, tagpos, 1)[0];
+            if (!version) {
                 return false;
             }
 
-            this.creationtime = this.gettlv(blob, tagpos, 2);
-            if (this.creationtime.byteLength !== 4) {
+            const creationtime = this.gettlv(blob, tagpos, 2);
+            if (creationtime.byteLength !== 4) {
                 return false;
             }
 
-            this.identity = this.gettlv(blob, tagpos, 3);
-            if (ab_to_base64(this.identity) !== u_handle) {
+            const identity = this.gettlv(blob, tagpos, 3);
+            if (ab_to_base64(identity) !== u_handle) {
                 return false;
             }
 
             if ((val = this.gettlv(blob, tagpos, 4)).byteLength !== 4) {
                 return false;
             }
-            this.generation = this.u8uint32(val);
+
+            const generation = this.u8uint32(val);
             if (d) {
-                logger.info(`Generation: ${this.generation}`);
+                logger.info(`Generation: ${generation}`);
             }
 
-            this.attr = this.u82obj(this.gettlv(blob, tagpos, 5));
+            const attr = this.u82obj(this.gettlv(blob, tagpos, 5));
 
             // deserialise static members only once
             if (this.keyring) {
@@ -251,28 +347,38 @@ lazy(mega, 'keyMgr', () => {
                 assert(this.equal(this.prived25519, this.gettlv(blob, tagpos, 16)), 'prEd255');
             }
             else {
-                const keyring = Object.create(null);
 
-                this.prived25519 = this.gettlv(blob, tagpos, 16);
-                if (this.prived25519.length !== 32) {
+                const prived25519 = this.gettlv(blob, tagpos, 16);
+                if (prived25519.length !== 32) {
                     return false;
                 }
-                keyring.prEd255 = ab_to_str(this.prived25519);
 
-                this.privcu25519 = this.gettlv(blob, tagpos, 17);
-                if (this.privcu25519.length !== 32) {
+                const privcu25519 = this.gettlv(blob, tagpos, 17);
+                if (privcu25519.length !== 32) {
                     return false;
                 }
-                keyring.prCu255 = ab_to_str(this.privcu25519);
 
-                this.privrsa = this.gettlv(blob, tagpos, 18);
-                if (this.privrsa.length < 512) {
+                const privrsa = this.gettlv(blob, tagpos, 18);
+                if (privrsa.length < 512) {
                     return false;
                 }
+
+                this.keyring = Object.create(null);
+                this.keyring.prEd255 = ab_to_str(prived25519);
+                this.keyring.prCu255 = ab_to_str(privcu25519);
+
+                this.privrsa = privrsa;
+                this.prived25519 = prived25519;
+                this.privcu25519 = privcu25519;
 
                 u_privk = crypto_decodeprivkey2(this.privrsa);
-                this.keyring = keyring;
             }
+
+            this.attr = attr;
+            this.version = version;
+            this.identity = identity;
+            this.generation = generation;
+            this.creationtime = creationtime;
 
             this.authrings = Object.create(null);
 
@@ -556,11 +662,13 @@ lazy(mega, 'keyMgr', () => {
 
         // serialise and encrypt
         async getKeysContainer() {
+            const {u_k} = window;
             const iv = crypto.getRandomValues(new Uint8Array(12));
 
             if (!this.gcmkey) {
                 await this.setKey(u_k);
             }
+            assert(this.equal(this.gcmkey.bk, u_k), 'Unexpected GCM Key..');
 
             const ciphertext = await crypto.subtle.encrypt(
                 {name: "AES-GCM", iv},
@@ -572,7 +680,7 @@ lazy(mega, 'keyMgr', () => {
         }
 
         // decrypt and unserialise
-        async importKeysContainer(s) {
+        async importKeysContainer(s, stage) {
             if (s === this.prevkeys) {
                 if (d) {
                     logger.debug('The current ^!keys were written by ourselves, not processing.');
@@ -590,10 +698,13 @@ lazy(mega, 'keyMgr', () => {
                 throw new SecurityError('Unexpected key repository, please try again later.');
             }
             const algo = {name: "AES-GCM", iv: this.str2u8(s.substr(2, 12))};
+            const {u_k} = window;
 
             if (!this.gcmkey) {
                 await this.setKey(u_k);
             }
+            assert(this.equal(this.gcmkey.bk, u_k), 'Unexpected GCM Key.');
+
             const res = await crypto.subtle.decrypt(algo, this.gcmkey, this.str2u8(s.substr(14)))
                 .catch((ex) => {
                     logger.error(ex);
@@ -613,8 +724,14 @@ lazy(mega, 'keyMgr', () => {
                 const lastKnown = parseInt(await this.getGeneration().catch(dump));
 
                 if (lastKnown && this.generation < lastKnown) {
-                    logger.warn('downgrade attack', lastKnown, this.generation);
-                    eventlog(99812, JSON.stringify([2, this.generation, lastKnown]));
+
+                    if (stage === -0x4D454741) {
+                        logger.warn('downgrade-attack? verifying...', lastKnown, this.generation);
+
+                        return this.fetchKeyStore().dump('KeyMgr.staged.fetch');
+                    }
+                    logger.error('downgrade attack', lastKnown, this.generation);
+                    eventlog(99812, JSON.stringify([4, this.generation, lastKnown]));
 
                     /**
                     msgDialog('warninga', l[135], `
@@ -633,8 +750,6 @@ lazy(mega, 'keyMgr', () => {
         async setGeneration(generation) {
             const key = `keysgen_${u_handle}`;
 
-            // @todo remove localStorage usage and fix setPersistentData()'s fallback to it..
-
             tryCatch(() => localStorage.setItem(key, generation))();
             await M.setPersistentData(key, generation).catch(dump);
             /** @returns void */
@@ -645,13 +760,24 @@ lazy(mega, 'keyMgr', () => {
             console.assert(String(u_handle).length === 11, 'check this..', u_handle);
 
             const key = `keysgen_${u_handle}`;
-            let value = tryCatch(() => localStorage.getItem(key))();
+            let value = parseInt(tryCatch(() => localStorage.getItem(key))()) || 0;
 
             if (typeof M.getPersistentData === 'function') {
-                value = await M.getPersistentData(key).catch(nop) || value;
+                const dbValue = parseInt(await M.getPersistentData(key).catch(nop)) || 0;
+
+                if (dbValue !== value) {
+                    if (dbValue > value) {
+                        logger.warn('Redundancy collision, db > ls', dbValue, value);
+                    }
+                    else {
+                        logger.warn('Redundancy collision, ls > db', value, dbValue);
+                    }
+                }
+
+                value = Math.max(value, dbValue);
             }
 
-            return parseInt(value) || false;
+            return value || false;
         }
 
         // fetch current state from versioned user variable ^!keys
@@ -669,29 +795,15 @@ lazy(mega, 'keyMgr', () => {
             if (this.fetchPromise) {
                 return this.fetchPromise;
             }
-
-            // @todo use mutex/web-lock (?)
             this.fetchPromise = mega.promise;
 
-            // xxx: The ua-packet-parser *should* already take care, but let's ensure it...
-            if (u_attr['^!keys']) {
-                logger.warn('Cleaning ug-provided ^!keys attribute.');
-                delete u_attr['^!keys'];
-            }
-            attribCache.removeItem(`${u_handle}_^!keys`);
-
-            Promise.resolve(mega.attr.get(u_handle, 'keys', -2, true))
-                .then((result) => {
-                    assert(typeof result === 'string' && result.length > 0, `KeyMgr: Bogus fetch-result, "${result}"`);
-
-                    return this.importKeysContainer(result);
-                })
+            kmWebLock(() => syncRemoteKeysAttribute(this))
                 .catch((ex) => {
                     // @todo recover/repair the keys-container (?)
                     logger.error(ex);
                     logger.error(ex);
                     logger.error(ex);
-                    eventlog(99813, JSON.stringify([3, String(ex).trim().split('\n')[0]]));
+                    eventlog(99813, JSON.stringify([4, String(ex).trim().split('\n')[0]]));
                 })
                 .finally(() => {
                     this.resolveCommitFetchPromises(false);
@@ -736,13 +848,48 @@ lazy(mega, 'keyMgr', () => {
                 return this.commitRetryPromise;
             }
 
-            // @todo use mutex/web-lock (?)
             this.commitPromise = mega.promise;
 
+            kmWebLock(() => this.updateKeysAttribute(cmds, ctx))
+                .then(() => {
+
+                    if (d && this.versionclash) {
+                        logger.log('Resolved versioning clash after %d retries', this.versionclash | 0);
+                    }
+
+                    this.versionclash = false;
+                    this.resolveCommitFetchPromises(true);
+                })
+                .catch((ex) => {
+
+                    if (this.versionclash) {
+
+                        if (this.versionclash > 4) {
+                            eventlog(99814, true);
+                            logger.error("Too many versioning-clash errors -- FIXME.", ex);
+                        }
+
+                        if (d) {
+                            logger.warn('Retrying last commit on version clash...', this.versionclash, ex);
+                        }
+                    }
+                    else if (d) {
+                        logger.error('*** FAIL', ex);
+                    }
+
+                    tSleep(2 + -Math.log(Math.random()) * 4)
+                        .then(() => this.resolveCommitFetchPromises(false));
+                });
+
+            this.pendingcommit = false;
+            return this.commitPromise;
+        }
+
+        async updateKeysAttribute(cmds, ctx) {
             // tentatively increment generation and store
             const generation = ++this.generation;
 
-            this.getKeysContainer()
+            return this.getKeysContainer()
                 .then((result) => {
                     if (cmds) {
                         api_req(cmds, ctx);
@@ -762,29 +909,20 @@ lazy(mega, 'keyMgr', () => {
                     }
                     return this.setGeneration(generation).catch(dump);
                 })
-                .then(() => {
-                    this.resolveCommitFetchPromises(true);
-                })
-                .catch((ex) => {
-                    if (d) {
-                        logger.error('*** FAIL', ex);
-                    }
-                    if (generation === this.generation) {
-                        this.generation--;
-                    }
+                .catch(async(ex) => {
 
                     if (ex === EEXPIRED) {
-                        // @todo FIXME: handle versioning clash
-                        logger.error("Versioning clash -- FIXME.");
-                        eventlog(99814, true);
+
+                        if (d) {
+                            logger.warn('Version clash, retrieving remote attribute...', this.versionclash);
+                        }
+
+                        this.versionclash++;
+                        await syncRemoteKeysAttribute(this);
                     }
 
-                    tSleep(3 + -Math.log(Math.random()) * 7)
-                        .then(() => this.resolveCommitFetchPromises(false));
+                    throw ex;
                 });
-
-            this.pendingcommit = false;
-            return this.commitPromise;
         }
 
         // overlapping commit()s/fetch()s are not permitted
@@ -880,7 +1018,7 @@ lazy(mega, 'keyMgr', () => {
             return promises.length && Promise.all(promises)
                 .catch((ex) => {
                     logger.warn(`pub-key(s) retrieval failed for ${userHandle}`, [ex]);
-                    eventlog(99815, JSON.stringify([1, userHandle, String(ex).trim().split('\n')[0]]));
+                    eventlog(99815, JSON.stringify([2, userHandle, String(ex).trim().split('\n')[0]]));
                 });
         }
 
@@ -1130,7 +1268,7 @@ lazy(mega, 'keyMgr', () => {
                     }
                 }
 
-                const {byteLength} = this.pendingoutshares;
+                const {byteLength} = this.pendingoutshares || {};
                 if (byteLength) {
                     const tmp = expungePendingOutShares(this.pendingoutshares, nodes);
 
@@ -1169,7 +1307,7 @@ lazy(mega, 'keyMgr', () => {
 
             // snapshot exists?
             if (!this.sharechildren[node]) {
-                await this.createShare(node);
+                this.createShare(node).catch(dump);
                 this.sharechildren[node] = await M.getNodes(node, true);
             }
         }
@@ -1478,7 +1616,18 @@ mBroadcaster.addListener('fm:initialized', () => {
                     delete u_attr['^!keys'];
 
                     // Save now complete crypto state to ^!keys
-                    return mega.keyMgr.initKeyManagement(keys);
+                    return mega.keyMgr.initKeyManagement(keys)
+                        .catch((ex) => {
+
+                            if (keys && !mega.keyMgr.secure) {
+                                logger.warn(ex);
+
+                                mega.keyMgr.reset();
+                                return mega.keyMgr.initKeyManagement();
+                            }
+
+                            throw ex;
+                        });
                 }
                 else if (mega.keyMgr.pendingcommit) {
                     if (d) {
@@ -1489,7 +1638,11 @@ mBroadcaster.addListener('fm:initialized', () => {
             })
             .catch((ex) => {
                 console.error(`key-manager error (${state})`, ex);
-                eventlog(99811, JSON.stringify([3, String(ex).trim().split('\n')[0], state]));
+
+                if (!window.buildOlderThan10Days) {
+
+                    eventlog(99811, JSON.stringify([4, String(ex).trim().split('\n')[0], state]));
+                }
             });
     }
 

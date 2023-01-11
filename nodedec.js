@@ -1,5 +1,4 @@
 var d;
-var u_k;
 var usk;
 var u_handle;
 var u_privk;
@@ -9,6 +8,12 @@ var vkey = new Set();
 var ckey = new Set();
 var nkey = new Set();
 var u_sharekeys = Object.create(null);
+
+Object.defineProperty(self, 'u_k', {
+    writable: true,
+    value: undefined,
+    configurable: true
+});
 
 if (typeof importScripts !== 'undefined') {
     importScripts('sjcl.js', 'rsaasm.js');

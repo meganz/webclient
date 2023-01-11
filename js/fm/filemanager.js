@@ -347,6 +347,9 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
+        // Checks selected/dragseleted items has folder on it
+        const hasFolder = ids.some((id) => M.getNodeByHandle(id).t);
+
         // Workaround a problem where we get over[1] -> over[2] -> out[1]
         if (a === 'out' && $.currentOver !== $(e.target).attr('id')) {
             a = 'noop';
@@ -496,7 +499,12 @@ FileManager.prototype.initFileManagerUI = function() {
                     $.draggingClass = ('dndc-to-rubbish');
                 }
                 else if (c.indexOf('conversations') > -1) {
-                    $.draggingClass = ('dndc-to-conversations');
+                    if (hasFolder) {
+                        c = null;
+                    }
+                    else {
+                        $.draggingClass = 'dndc-to-conversations';
+                    }
                 }
                 else if (c.indexOf('shared-with-me') > -1) {
                     $.draggingClass = ('dndc-to-shared');
@@ -516,7 +524,7 @@ FileManager.prototype.initFileManagerUI = function() {
                         clearTimeout($.liTooltipTimer);
                     }
                     $.liTimerK = setTimeout(function() {
-                        $(e.target).click()
+                        $(e.target).click();
                     }, 920);
                 }
             }
@@ -3519,7 +3527,7 @@ FileManager.prototype.addGridUI = function(refresh) {
             if (M.isInvalidUserStatus()) {
                 return;
             }
-            var id = [$(this).parent().attr('id')];
+            var id = $(this).parent().attr('id');
             var newFavState = Number(!M.isFavourite(id));
 
             // Handling favourites is allowed for full permissions shares only

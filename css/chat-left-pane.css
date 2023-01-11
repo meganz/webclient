@@ -1300,12 +1300,28 @@ li.active .call-duration i {
     background: linear-gradient(180deg, rgba(86, 210, 241, 1) 0%, rgba(43, 166, 222, 1) 100%);
 }
 
+@media only screen and (max-width: 1080px) {
+    .profile-head .profile-controls button,
+    .profile-head .profile-controls button:hover,
+    .profile-head .profile-controls button:focus {
+        margin-right: 4px;
+        --height: 24px;
+        --outer-padding: 2px;
+    }
+}
+
 .profile-head .profile-controls button i {
     position: absolute;
     left: 50%;
     --icon-size: 24px;
     transform: translateX(-50%);
     --mask-color: var(--secondary-white);
+}
+
+@media only screen and (max-width: 1080px) {
+    .profile-head .profile-controls button i {
+        --icon-size: 16px;
+    }
 }
 
 .profile-head .profile-credentials {
@@ -1586,11 +1602,23 @@ li.active .call-duration i {
     background: var(--secondary-red);
 }
 
+.conversationsApp .lhp-nav-container .notifications-count.large {
+    width: 18px;
+    height: 18px;
+    top: -6px;
+    right: -8px;
+}
+
 .conversationsApp .lhp-nav-container .notifications-count span {
     display: block;
     margin: 0;
     font: var(--text-caption);
     color: var(--text-color-white-high);
+}
+
+.conversationsApp .lhp-nav-container .notifications-count.large span {
+    font-size: 8px;
+    padding-top: 1px;
 }
 
 .conversationsApp .lhp-action-buttons {

@@ -15,11 +15,12 @@ class StreamControls extends MegaRenderMixin {
     SIMPLETIP = { position: 'top', offset: 8, className: 'theme-dark-forced' };
 
     state = {
-        options: false
+        endCallOptions: false,
+        endCallPending: false
     };
 
     handleMousedown = ({ target }) =>
-        this.endContainerRef?.current.contains(target) ? null : this.setState({ options: false });
+        this.endContainerRef?.current.contains(target) ? null : this.setState({ endCallOptions: false });
 
     renderDebug = () => {
         return (
@@ -48,7 +49,7 @@ class StreamControls extends MegaRenderMixin {
             <div
                 ref={this.endContainerRef}
                 className="end-call-container">
-                {this.state.options && (
+                {this.state.endCallOptions &&
                     <div className="end-options theme-dark-forced">
                         <div className="end-options-content">
                             <Button
@@ -57,13 +58,21 @@ class StreamControls extends MegaRenderMixin {
                                 <span>{l.leave}</span>
                             </Button>
                             <Button
-                                className="mega-button positive"
-                                onClick={() => chatRoom.endCallForAll()}>
+                                className={`
+                                    mega-button
+                                    positive
+                                    ${this.state.endCallPending ? 'disabled' : ''}
+                                `}
+                                onClick={() =>
+                                    this.state.endCallPending ?
+                                        null :
+                                        this.setState({ endCallPending: true }, () => chatRoom.endCallForAll())
+                                }>
                                 <span>{l.end_for_all}</span>
                             </Button>
                         </div>
                     </div>
-                )}
+                }
                 <Button
                     simpletip={{ ...this.SIMPLETIP, label: l[5884] /* `End call` */ }}
                     className="mega-button theme-dark-forced round large negative end-call"
@@ -73,7 +82,7 @@ class StreamControls extends MegaRenderMixin {
                     }}
                     onClick={() =>
                         chatRoom.type !== 'private' && streams.length && Call.isModerator(chatRoom, u_handle) ?
-                            this.setState(state => ({ options: !state.options }), () =>
+                            this.setState(state => ({ endCallOptions: !state.endCallOptions }), () =>
                                 this.endButtonRef && $(this.endButtonRef.current).trigger('simpletipClose')
                             ) :
                             onCallEnd()

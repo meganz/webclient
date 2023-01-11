@@ -128,18 +128,19 @@ var megasync = (function() {
         linuxClients.forEach(function(client, id) {
 
             var icon = client.name.toLowerCase().match(/([a-z]+)/i)[1];
+            var clientName = client.name.replace(/\s\s+/g, ' ');
 
             icon = (icon === 'red') ? 'redhat' : icon;
 
             var data = {
                 'class': 'option',
-                'data-client': client.name,
+                'data-client': clientName,
                 'data-client-id': id,
                 'data-link': ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32"))
             };
             if (!$('.option[data-client-id="' + data['data-client-id'] + '"]').length) {
-                createAndAddToList($list, data, 0, client.name, icon);
-                createAndAddToList($list, data, 1, client.name, icon);
+                createAndAddToList($list, data, 0, clientName, icon);
+                createAndAddToList($list, data, 1, clientName, icon);
             }
         });
 

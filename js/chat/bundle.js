@@ -5689,7 +5689,8 @@ class MembersAmount extends _mixins1__._p {
     const {
       room
     } = this.props;
-    return room ? react0().createElement("span", null, (l[20233] || "%s Members").replace("%s", Object.keys(room.members).length)) : null;
+    const memberKeys = Object.keys(room.members);
+    return room && memberKeys.length ? react0().createElement("span", null, mega.icu.format(l[20233], memberKeys.length)) : null;
   }
 }
 class ContactFingerprint extends _mixins1__.wl {
@@ -11070,7 +11071,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         className: "chatlink-contents"
       }, external_React_default().createElement("div", {
         className: "huge-icon group-chat"
-      }), external_React_default().createElement("h3", null, external_React_default().createElement(utils.dy, null, room.getRoomTitle())), external_React_default().createElement("h5", null, usersCount ? l[20233].replace("%s", usersCount) : " "), external_React_default().createElement("p", null, l[20595]))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
+      }), external_React_default().createElement("h3", null, external_React_default().createElement(utils.dy, null, room.getRoomTitle())), external_React_default().createElement("h5", null, usersCount ? mega.icu.format(l[20233], usersCount) : ''), external_React_default().createElement("p", null, l[20595]))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
         className: "bottom-buttons"
       }, external_React_default().createElement("button", {
         className: "mega-button positive",
@@ -11849,6 +11850,7 @@ class Start extends mixins.wl {
   constructor(props) {
     super(props);
     this.inputRef = external_React_default().createRef();
+    this.defaultTopic = l.default_meeting_topic.replace('%NAME', M.getNameByHandle(u_handle));
     this.state = {
       audio: false,
       video: false,
@@ -11860,10 +11862,16 @@ class Start extends mixins.wl {
     this.handleChange = ev => this.setState({
       topic: ev.target.value
     });
-    this.toggleEdit = () => this.setState(state => ({
-      editing: !state.editing,
-      previousTopic: state.topic
-    }), () => onIdle(this.doFocus));
+    this.toggleEdit = () => {
+      this.setState(state => {
+        const topic = state.topic.trim() || this.defaultTopic;
+        return {
+          editing: !state.editing,
+          topic,
+          previousTopic: topic
+        };
+      }, () => onIdle(this.doFocus));
+    };
     this.doFocus = () => {
       if (this.state.editing) {
         const input = this.inputRef.current;
@@ -11910,10 +11918,10 @@ class Start extends mixins.wl {
         video
       } = this.state;
       if (onStart) {
-        onStart(topic, audio, video);
+        onStart(topic.trim() || this.defaultTopic, audio, video);
       }
     };
-    this.state.topic = l.default_meeting_topic.replace('%NAME', M.getNameByHandle(u_handle));
+    this.state.topic = this.defaultTopic;
   }
   componentDidMount() {
     super.componentDidMount();
@@ -12084,7 +12092,7 @@ class StartGroupChatWizard extends mixins.wl {
       createChatLink,
       openInvite
     } = this.state;
-    megaChat.createAndShowGroupRoomFor(selected, groupName, {
+    megaChat.createAndShowGroupRoomFor(selected, groupName.trim(), {
       keyRotation,
       createChatLink: keyRotation ? false : createChatLink,
       oi: openInvite
@@ -13114,7 +13122,10 @@ class Navigation extends mixins.wl {
       contactRequests: contactRequests,
       icon: "sprite-fm-mono icon-contacts"
     }, !!contactRequests && external_React_default().createElement("div", {
-      className: "notifications-count"
+      className: `
+                                        notifications-count
+                                        ${contactRequests > 99 ? 'large' : ''}
+                                    `
     }, external_React_default().createElement("span", null, contactRequests))), external_React_default().createElement("span", null, l[165])));
   }
 }
@@ -16366,7 +16377,7 @@ class StreamNode extends mixins.wl {
       peer.deregisterConsumer(this);
     }
     if (this._streamListener) {
-      peer.removeChangeListener(this._streamListener);
+      peer.removeChangeListener == null ? void 0 : peer.removeChangeListener(this._streamListener);
     }
     if (this.props.willUnmount) {
       this.props.willUnmount();
@@ -16741,14 +16752,15 @@ class StreamControls extends mixins.wl {
       className: 'theme-dark-forced'
     };
     this.state = {
-      options: false
+      endCallOptions: false,
+      endCallPending: false
     };
     this.handleMousedown = ({
       target
     }) => {
       var _this$endContainerRef;
       return (_this$endContainerRef = this.endContainerRef) != null && _this$endContainerRef.current.contains(target) ? null : this.setState({
-        options: false
+        endCallOptions: false
       });
     };
     this.renderDebug = () => {
@@ -16784,7 +16796,7 @@ class StreamControls extends mixins.wl {
       return external_React_default().createElement("div", {
         ref: this.endContainerRef,
         className: "end-call-container"
-      }, this.state.options && external_React_default().createElement("div", {
+      }, this.state.endCallOptions && external_React_default().createElement("div", {
         className: "end-options theme-dark-forced"
       }, external_React_default().createElement("div", {
         className: "end-options-content"
@@ -16792,8 +16804,14 @@ class StreamControls extends mixins.wl {
         className: "mega-button",
         onClick: onCallEnd
       }, external_React_default().createElement("span", null, l.leave)), external_React_default().createElement(meetings_button.Z, {
-        className: "mega-button positive",
-        onClick: () => chatRoom.endCallForAll()
+        className: `
+                                    mega-button
+                                    positive
+                                    ${this.state.endCallPending ? 'disabled' : ''}
+                                `,
+        onClick: () => this.state.endCallPending ? null : this.setState({
+          endCallPending: true
+        }, () => chatRoom.endCallForAll())
       }, external_React_default().createElement("span", null, l.end_for_all)))), external_React_default().createElement(meetings_button.Z, {
         simpletip: {
           ...this.SIMPLETIP,
@@ -16805,7 +16823,7 @@ class StreamControls extends mixins.wl {
           this.endButtonRef = button.buttonRef;
         },
         onClick: () => chatRoom.type !== 'private' && streams.length && Call.isModerator(chatRoom, u_handle) ? this.setState(state => ({
-          options: !state.options
+          endCallOptions: !state.endCallOptions
         }), () => this.endButtonRef && $(this.endButtonRef.current).trigger('simpletipClose')) : onCallEnd()
       }, external_React_default().createElement("span", null, l[5884])));
     };
@@ -17686,9 +17704,8 @@ class stream_Stream extends mixins.wl {
     if (mode === Call.MODE.THUMBNAIL) {
       if (streams.length <= MAX_STREAMS_PER_PAGE) {
         const $$STREAMS = [];
-        streams.forEach(stream => {
-          var _stream$source, _stream$source$srcObj;
-          const cacheKey = (_stream$source = stream.source) == null ? void 0 : (_stream$source$srcObj = _stream$source.srcObject) == null ? void 0 : _stream$source$srcObj.id;
+        streams.forEach((stream, i) => {
+          const cacheKey = `${mode}_${stream.clientId}_${i}`;
           $$STREAMS.push(external_React_default().createElement(StreamNode, {
             mode: mode,
             externalVideo: true,
@@ -17703,7 +17720,7 @@ class stream_Stream extends mixins.wl {
               e.stopPropagation();
               onThumbnailDoubleClick(streamNode);
             },
-            key: `${mode}_${stream.clientId}_${cacheKey}`,
+            key: cacheKey,
             stream: stream,
             didMount: ref => {
               this.nodeRefs.push({

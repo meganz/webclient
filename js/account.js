@@ -217,6 +217,26 @@ function u_checklogin3a(res, ctx) {
             document.body.classList.add('rk-saved');
         }
 
+        const log99810 = async(ex, tag = 0) => {
+            console.error(ex);
+
+            if (!window.buildOlderThan10Days) {
+                const msg = String(ex).trim().replace(/:\s+/, ': ').split('\n')[0];
+                const stack = String(ex && ex.stack).trim().replace(/\s+/g, ' ').replace(msg, '').substr(0, 512);
+
+                const payload = [
+                    4,
+                    msg,
+                    stack,
+                    tag | 0,
+                    is_mobile | 0,
+                    is_extension | 0,
+                    buildVersion.website || 'dev'
+                ];
+                return eventlog(99810, JSON.stringify(payload));
+            }
+        };
+
         (window.M && typeof M.getPersistentData === 'function' ? M.getPersistentData('e++ck') : Promise.reject())
             .then((data) => {
                 if (r < 3) {
@@ -254,10 +274,17 @@ function u_checklogin3a(res, ctx) {
                 }
             })
             .then(() => {
-                if (!r || is_iframed || pfid || page === 'download') {
+                if (!r || is_iframed || pfid) {
                     // Nothing to do here.
                     return;
                 }
+                const page = getCleanSitePath();
+                const pubLink = isPublicLink(page) || isPublickLinkV2(page);
+                if (pubLink) {
+                    // Nor here.
+                    return;
+                }
+
                 const keys = u_attr['^!keys'];
                 delete u_attr['^!keys'];
 
@@ -271,8 +298,20 @@ function u_checklogin3a(res, ctx) {
 
                 // We've got keys?
                 if (keys) {
-                    return mega.keyMgr.initKeyManagement(keys);
+                    return mega.keyMgr.initKeyManagement(keys)
+                        .catch((ex) => {
+
+                            if (!mega.keyMgr.secure) {
+                                log99810(ex, 1).catch(dump);
+
+                                mega.keyMgr.reset();
+                                return mega.keyMgr.setGeneration(0).catch(dump);
+                            }
+
+                            throw ex;
+                        });
                 }
+
                 // @todo Transifex
                 const gone =
                     `Your cryptographic keys have gone missing. It is not safe to use your account at this time.`;
@@ -311,11 +350,8 @@ function u_checklogin3a(res, ctx) {
                 // This catch handler is meant to be reached on critical
                 // failures only, such as errors coming from the Key manager.
                 setTimeout(() => siteLoadError(ex, 'logon'), 2e3);
-                eventlog(99810, JSON.stringify([
-                    3,
-                    String(ex).trim().split('\n')[0],
-                    String(ex && ex.stack).trim().replace(/\s+/g, ' ').substr(0, 512)
-                ]));
+
+                log99810(ex).catch(dump);
             });
     }
 }

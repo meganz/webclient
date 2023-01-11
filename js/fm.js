@@ -3658,7 +3658,16 @@ function fingerprintDialog(userid) {
             .catch((ex) => {
                 console.error(ex);
                 msgDialog('warninga', l[135], l[47], ex);
-                eventlog(99816, JSON.stringify([1, String(ex).trim().split('\n')[0]]));
+
+                const user = M.getUserByHandle(userid);
+                const info = [
+                    2,
+                    String(ex).trim().split('\n')[0],
+                    String(ex && ex.stack).trim().replace(/\s+/g, ' ').substr(0, 512),
+                    userid,
+                    {c: user.c, m: user.m ? 1 : 0, h: user.h, u: user.u, ts: user.ts, ats: user.ats}
+                ];
+                eventlog(99816, JSON.stringify(info));
             })
             .finally(() => {
                 loadingDialog.hide();

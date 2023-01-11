@@ -21,6 +21,7 @@ export class Start extends MegaRenderMixin {
     };
 
     inputRef = React.createRef();
+    defaultTopic = l.default_meeting_topic.replace('%NAME', M.getNameByHandle(u_handle));
 
     state = {
         audio: false,
@@ -33,16 +34,19 @@ export class Start extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
-        this.state.topic = l.default_meeting_topic.replace('%NAME', M.getNameByHandle(u_handle));
+        this.state.topic = this.defaultTopic;
     }
 
     handleChange = ev => this.setState({ topic: ev.target.value });
 
-    toggleEdit = () =>
-        this.setState(
-            state => ({ editing: !state.editing, previousTopic: state.topic }),
-            () => onIdle(this.doFocus)
+    toggleEdit = () =>  {
+        this.setState(state => {
+            const topic = state.topic.trim() || this.defaultTopic; // Default to `${CURRENT_USER}'s meeting` as topic
+            return { editing: !state.editing, topic, previousTopic: topic };
+        }, () =>
+            onIdle(this.doFocus)
         );
+    };
 
     doFocus = () => {
         if (this.state.editing) {
@@ -89,7 +93,7 @@ export class Start extends MegaRenderMixin {
         const { topic, audio, video } = this.state;
 
         if (onStart) {
-            onStart(topic, audio, video);
+            onStart(topic.trim() || this.defaultTopic, audio, video);
         }
     };
 

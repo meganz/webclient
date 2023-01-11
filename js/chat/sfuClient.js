@@ -4,7 +4,7 @@
 /******/ 	"use strict";
 /******/ 	// The require scope
 /******/ 	var __webpack_require__ = {};
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
@@ -17,12 +17,12 @@
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
 var __webpack_exports__ = {};
 
@@ -950,6 +950,9 @@ class SfuClient {
             clearTimeout(this.statTimer);
         }
         this.disableStats();
+        if (this.micMuteMonitor) {
+            this.micMuteMonitor.stop();
+        }
         if (this._connState === ConnState.kCallJoined) {
             this._statsRecorder.submit(this.termCode);
         }

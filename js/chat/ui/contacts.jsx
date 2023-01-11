@@ -457,11 +457,9 @@ export class ContactAwareName extends ContactAwareComponent {
 export class MembersAmount extends ContactAwareComponent {
     render() {
         const { room } = this.props;
-
-        return room ?
-            <span>
-                {(l[20233] || "%s Members").replace("%s", Object.keys(room.members).length)}
-            </span> :
+        const memberKeys = Object.keys(room.members);
+        return room && memberKeys.length ?
+            <span>{mega.icu.format(l[20233], memberKeys.length)}</span> :
             null;
     }
 }

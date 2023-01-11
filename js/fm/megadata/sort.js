@@ -489,34 +489,35 @@ MegaData.prototype.sortByStatus = function(d) {
 
 MegaData.prototype.getSortByVersionFn = function() {
     'use strict';
-    var sortfn;
 
-    sortfn = function(a, b, d) {
-
-        var av = a.tvf || 0;
-        var ab = a.tvb || 0;
-        var bv = b.tvf || 0;
-        var bb = b.tvb || 0;
+    return (a, b, d) => {
+        const av = a.tvf || 0;
+        const bv = b.tvf || 0;
 
         if (av < bv) {
-            return -1 * d;
+            return -d;
         }
-        else if (av > bv) {
+        if (av > bv) {
             return d;
         }
-        else if (ab < bb) {
-            return -1 * d;
-        }
-        else if (ab > bb) {
-            return d;
-        }
-    };
 
-    return sortfn;
+        const ab = a.tvb || 0;
+        const bb = b.tvb || 0;
+
+        if (ab < bb) {
+            return -d;
+        }
+        if (ab > bb) {
+            return d;
+        }
+
+        return M.doFallbackSortWithName(a, b, d);
+    };
 };
 
 MegaData.prototype.sortByVersion = function(d) {
     'use strict';
+
     this.sortfn = this.getSortByVersionFn();
     this.sortd = d;
     this.sort();

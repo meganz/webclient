@@ -23,13 +23,13 @@ lazy(mega.slideshow.settings, 'order', () => {
                         cfg: 2,
                         icon: 'icon-hourglass-new',
                         absolute: true,
-                        value: (indexList, nodeList) => indexList.sort((a, b) => nodeList[b].ts - nodeList[a].ts)
+                        value: (indexList, nodeList) => this._timeSort(indexList, nodeList, -1)
                     },
                     oldest: {
                         cfg: 3,
                         icon: 'icon-hourglass-old',
                         absolute: true,
-                        value: (indexList, nodeList) => indexList.sort((a, b) => nodeList[a].ts - nodeList[b].ts)
+                        value: (indexList, nodeList) => this._timeSort(indexList, nodeList, 1)
                     }
                 }
             );
@@ -156,6 +156,34 @@ lazy(mega.slideshow.settings, 'order', () => {
                     $(`button.${k}`, $options).addClass('disabled');
                 }
             }
+        }
+
+        /**
+         * Sort list of indexes
+         * In case chat items, given list of indexes is already time sorted (ascending), reversed_list (descending)
+         * Otherwise, order will be based on the mtime and name of the nodes they correspond to
+         * @param {Array} indexList - list of indexes to sort
+         * @param {Array} nodeList - list of nodes referenced on the list of indexes
+         * @param {Number} d - sort direction. 1: ascending, -1: descending
+         * @returns {Array} Sorted list of indexes
+         */
+        _timeSort(indexList, nodeList, d) {
+            if (M.chat) {
+                return d === 1 ? indexList : indexList.reverse();
+            }
+
+            return indexList.sort((a, b) => {
+                a = nodeList[a];
+                b = nodeList[b];
+
+                const time1 = a.mtime - a.mtime % 60;
+                const time2 = b.mtime - b.mtime % 60;
+                if (time1 !== time2) {
+                    return (time1 < time2 ? -1 : 1) * d;
+                }
+
+                return M.compareStrings(a.name, b.name, d);
+            });
         }
     };
 });

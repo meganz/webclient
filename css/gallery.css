@@ -615,6 +615,7 @@
     padding-inline-end: 8px;
     position: relative;
     top: -4px;
+    min-height: 32px;
 }
 .gallery-close-discovery i {
     --mask-color: var(--secondary-red);

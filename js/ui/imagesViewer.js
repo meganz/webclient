@@ -953,6 +953,9 @@ var slideshowid;
                     if ($.dialog) {
                         closeDialog($.dialog);
                     }
+                    else if ($.msgDialog) {
+                        closeMsg();
+                    }
                     else if (slideshowplay) {
                         slideshow_imgControls(1);
                     }

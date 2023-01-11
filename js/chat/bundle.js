@@ -16377,7 +16377,7 @@ class StreamNode extends mixins.wl {
       peer.deregisterConsumer(this);
     }
     if (this._streamListener) {
-      peer.removeChangeListener(this._streamListener);
+      peer.removeChangeListener == null ? void 0 : peer.removeChangeListener(this._streamListener);
     }
     if (this.props.willUnmount) {
       this.props.willUnmount();
@@ -17704,9 +17704,8 @@ class stream_Stream extends mixins.wl {
     if (mode === Call.MODE.THUMBNAIL) {
       if (streams.length <= MAX_STREAMS_PER_PAGE) {
         const $$STREAMS = [];
-        streams.forEach(stream => {
-          var _stream$source, _stream$source$srcObj;
-          const cacheKey = (_stream$source = stream.source) == null ? void 0 : (_stream$source$srcObj = _stream$source.srcObject) == null ? void 0 : _stream$source$srcObj.id;
+        streams.forEach((stream, i) => {
+          const cacheKey = `${mode}_${stream.clientId}_${i}`;
           $$STREAMS.push(external_React_default().createElement(StreamNode, {
             mode: mode,
             externalVideo: true,
@@ -17721,7 +17720,7 @@ class stream_Stream extends mixins.wl {
               e.stopPropagation();
               onThumbnailDoubleClick(streamNode);
             },
-            key: `${mode}_${stream.clientId}_${cacheKey}`,
+            key: cacheKey,
             stream: stream,
             didMount: ref => {
               this.nodeRefs.push({

@@ -158,7 +158,7 @@ export default class StreamNode extends MegaRenderMixin {
             peer.deregisterConsumer(this);
         }
         if (this._streamListener) {
-            peer.removeChangeListener(this._streamListener);
+            peer.removeChangeListener?.(this._streamListener);
         }
 
         if (this.props.willUnmount) {

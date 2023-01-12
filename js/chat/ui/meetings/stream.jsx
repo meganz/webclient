@@ -543,6 +543,7 @@ export default class Stream extends MegaRenderMixin {
 
                         <StreamControls
                             call={call}
+                            minimized={minimized}
                             streams={streams}
                             chatRoom={chatRoom}
                             onAudioClick={onAudioClick}

@@ -1,5 +1,5 @@
 /** @file automatically generated, do not edit it. */
-/* eslint-disable max-len, indent */
+/* eslint-disable max-len, indent, dot-notation, no-extra-parens */
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	// The require scope
@@ -47,6 +47,7 @@ var TermCode;
     TermCode[TermCode["kPeerJoinTimeout"] = 5] = "kPeerJoinTimeout";
     TermCode[TermCode["kPushedToWaitingRoom"] = 6] = "kPushedToWaitingRoom";
     TermCode[TermCode["kKickedFromWaitingRoom"] = 7] = "kKickedFromWaitingRoom";
+    TermCode[TermCode["kTooManyUserClients"] = 8] = "kTooManyUserClients";
     // Disconnects
     TermCode[TermCode["kRtcDisconn"] = 64] = "kRtcDisconn";
     TermCode[TermCode["kSigDisconn"] = 65] = "kSigDisconn";
@@ -59,7 +60,7 @@ var TermCode;
     TermCode[TermCode["kErrAuth"] = 130] = "kErrAuth";
     TermCode[TermCode["kErrApiTimeout"] = 131] = "kErrApiTimeout";
     TermCode[TermCode["kErrSdp"] = 132] = "kErrSdp";
-    TermCode[TermCode["kErrTooManyClients"] = 133] = "kErrTooManyClients";
+    TermCode[TermCode["kErrorProtocolVersion"] = 133] = "kErrorProtocolVersion";
     TermCode[TermCode["kErrClientGeneral"] = 190] = "kErrClientGeneral";
     TermCode[TermCode["kErrSfuGeneral"] = 191] = "kErrSfuGeneral";
 })(TermCode || (TermCode = {}));
@@ -387,9 +388,111 @@ function compressedSdpToString(sdp) {
     return summary;
 }
 
+;// CONCATENATED MODULE: ../shared/base64.ts
+var b64 = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_="];
+function base64encode(data, offs, len) {
+    const end = offs + len;
+    let str = "";
+    do { // pack three octets into four hexets
+        const o1 = data.getUint8(offs++);
+        const o2 = offs < end ? data.getUint8(offs++) : 0;
+        const o3 = offs < end ? data.getUint8(offs++) : 0;
+        const bits = o1 << 16 | o2 << 8 | o3;
+        str += b64[bits >> 18 & 0x3f] + b64[bits >> 12 & 0x3f] + b64[bits >> 6 & 0x3f] + b64[bits & 0x3f];
+    } while (offs < end);
+    const r = len % 3;
+    return (r ? str.slice(0, r - 3) : str);
+}
+function base64ArrEncode(arr) {
+    return base64encode(new DataView(arr.buffer || arr), 0, arr.byteLength);
+}
+const b64dectable = [
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 62, 255, 62, 255, 63,
+    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 255, 255, 255, 255, 255, 255,
+    255, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 255, 255, 255, 255, 63,
+    255, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255
+];
+class StringAppender {
+    constructor() {
+        this.value = "";
+    }
+    append(byte) {
+        this.value += String.fromCharCode(byte);
+    }
+}
+class ArrayAppender {
+    constructor(size) {
+        this.len = 0;
+        this.value = new Uint8Array(size);
+    }
+    append(byte) {
+        this.value[this.len++] = byte;
+    }
+}
+function doBase64Decode(str, out) {
+    const len = str.length;
+    const mod = len % 4;
+    if ((mod !== 0) && (mod < 2)) {
+        throw new Error("Incorrect size of base64 string, size mod 4 must be at least 2");
+    }
+    for (let i = 0; i < len;) {
+        const one = b64dectable[str.charCodeAt(i++)];
+        if (one > 63) {
+            throw new Error(`Invalid char ${str[i]} in base64 stream at offset ${i - 1}`);
+        }
+        const two = b64dectable[str.charCodeAt(i++)];
+        if (two > 63) {
+            throw new Error(`Invalid char ${str[i]} in base64 stream at offset ${i - 1}`);
+        }
+        out.append((one << 2) | (two >> 4));
+        if (i >= len) {
+            break;
+        }
+        const three = b64dectable[str.charCodeAt(i++)];
+        if (three > 63) {
+            throw new Error(`Invalid char ${str[i]} in base64 stream at offset ${i - 1}`);
+        }
+        out.append(((two << 4) & 0xff) | (three >> 2));
+        if (i >= len) {
+            break;
+        }
+        const four = b64dectable[str.charCodeAt(i++)];
+        if (four > 63) {
+            throw new Error(`Invalid char ${str[i]} in base64 stream at offset ${i - 1}`);
+        }
+        out.append(((three << 6) & 0xff) | four);
+    }
+}
+function base64decode(str) {
+    const out = new StringAppender;
+    doBase64Decode(str, out);
+    return out.value;
+}
+function base64DecodeToArr(str) {
+    const out = new ArrayAppender(Math.floor(str.length * 6 / 8));
+    doBase64Decode(str, out);
+    if (out.value.length !== out.len) {
+        throw new Error("Assertion failed");
+    }
+    return out.value;
+}
+
 ;// CONCATENATED MODULE: ./adaptation.ts
 
 
+const kLogTag = "sfuAdapt:";
 class SvcDriver {
     constructor(client) {
         this.currRxQuality = 4; // start at half resolution, full fps
@@ -424,11 +527,11 @@ class SvcDriver {
         this.smaPlost = (this.smaPlost * 29 + plostCapped) / 30;
         this.setPlostWindow(this.smaPlost);
         plost = this.fmaPlost = (this.fmaPlost * 2 + plost) / 3;
-        /*
-        console.log("rtt:", rtt.toFixed(1), "rttLower:", this.rttLower.toFixed(1), "rttUpper:", this.rttUpper.toFixed(1),
-            "plost:", plost.toFixed(1), "fmaPlost:", this.fmaPlost.toFixed(1),
-            "plostLower", this.plostLower.toFixed(1), "plostUpper:", this.plostUpper.toFixed(1));
-        */
+        do {
+            if (window.dSfuAdapt) {
+                console.log(kLogTag, "rtt:", rtt.toFixed(1), "rttLower:", this.rttLower.toFixed(1), "rttUpper:", this.rttUpper.toFixed(1), "plost:", plost.toFixed(1), "fmaPlost:", this.fmaPlost.toFixed(1), "plostLower", this.plostLower.toFixed(1), "plostUpper:", this.plostUpper.toFixed(1));
+            }
+        } while (0);
         const tsNow = Date.now();
         if (!this.tsNoSwitchUntil) {
             this.tsNoSwitchUntil = tsNow;
@@ -444,15 +547,21 @@ class SvcDriver {
             else {
                 maTxKbps = this.maTxKbps = (this.maTxKbps * 5 + txBwidth) / 6;
             }
-            // console.log("scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
+            do {
+                if (window.dSfuAdapt) {
+                    console.log(kLogTag, "scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
+                }
+            } while (0);
         }
         if (tsNow < this.tsNoSwitchUntil) {
             return; // too early
         }
         if (plost > this.plostUpper) {
-            if (window.d) {
-                console.warn("Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
-            }
+            do {
+                if (window.d) {
+                    console.warn(kLogTag, "Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
+                }
+            } while (0);
             this.decRxQuality(plost > SvcDriver.kPlostCritical);
         }
         else if (rtt > this.rttUpper) { // rtt or packet loss increased above thresholds
@@ -479,9 +588,11 @@ class SvcDriver {
                 }
             }
             else if (stats.vtxdly > 2500) {
-                if (window.d) {
-                    console.warn(`scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
-                }
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, `scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
+                    }
+                } while (0);
                 this.switchTxQuality(-1, "scr");
             }
             else if (stats.vtxdly > 0 && stats.vtxdly < 1400) {
@@ -524,9 +635,11 @@ class SvcDriver {
         this.lowestRttSeen = rtt;
         this.rttLower = rtt + SvcDriver.kRttLowerHeadroom;
         this.rttUpper = rtt + SvcDriver.kRttUpperHeadroom;
-        if (window.d) {
-            console.warn("Rtt floor set to", rtt.toFixed(2));
-        }
+        do {
+            if (window.d) {
+                console.warn(kLogTag, "Rtt floor set to", rtt.toFixed(2));
+            }
+        } while (0);
     }
     setPlostWindow(plost) {
         this.plostLower = plost + SvcDriver.kPlostLowerHeadroom;
@@ -561,14 +674,18 @@ class SvcDriver {
                 }
                 hist.upFails++;
                 hist.tsValidTill = now + span;
-                if (window.d) {
-                    console.warn(`decRxQuality[${this.currRxQuality} -> ${newQ}]: Marking rx quality switch up attempt as failed: critcal: ${!!critical}, for period: ${span}`);
-                }
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: Marking rx quality switch up attempt as failed: critcal: ${!!critical}, for period: ${span}`);
+                    }
+                } while (0);
             }
             else {
-                if (window.d) {
-                    console.warn(`decRxQuality[${this.currRxQuality} -> ${newQ}]: not marking as failed: areaMatch: ${hist.hiArea === this.rxTotalArea()}, timeMatch: ${Date.now() - hist.tsMonitorTill}`);
-                }
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: not marking as failed: areaMatch: ${hist.hiArea === this.rxTotalArea()}, timeMatch: ${Date.now() - hist.tsMonitorTill}`);
+                    }
+                } while (0);
             }
         }
         this.setRxQuality(newQ, SvcDriver.kQualityDecreaseSettleTime);
@@ -589,24 +706,30 @@ class SvcDriver {
             const rttMatch = this.maRtt > hist.rtt - 50;
             histMatch = hist.upFails && kbpsMatch && rttMatch && hist.lowArea <= this.rxTotalArea();
             if (histMatch && (hist.tsValidTill - now) >= 0) {
-                if (window.d) {
-                    console.warn(`incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Not increasing rxQ, have failed recently`);
-                }
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Not increasing rxQ, have failed recently`);
+                    }
+                } while (0);
                 return;
             }
             else {
-                if (window.d) {
-                    console.warn(`incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: not failed(recently): upFails:${hist.upFails}, timeMatch: ${(hist.tsValidTill - now)}, kbpsMatch: ${kbpsMatch} (hist: ${hist.kbps}, curr: ${stats.rx}), rttMatch: ${rttMatch} (hist: ${hist.rtt.toFixed()}, curr: ${this.maRtt.toFixed()}), areaDiff: ${this.rxTotalArea() - hist.lowArea}`);
-                }
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: not failed(recently): upFails:${hist.upFails}, timeMatch: ${(hist.tsValidTill - now)}, kbpsMatch: ${kbpsMatch} (hist: ${hist.kbps}, curr: ${stats.rx}), rttMatch: ${rttMatch} (hist: ${hist.rtt.toFixed()}, curr: ${this.maRtt.toFixed()}), areaDiff: ${this.rxTotalArea() - hist.lowArea}`);
+                    }
+                } while (0);
             }
         }
         if (histMatch) {
             hist.tsMonitorTill = now + SvcDriver.kRxUpFailMonitorDur;
             hist.kbps = stats.rx;
             hist.rtt = stats.rtt;
-            if (window.d) {
-                console.warn(`incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Same up-fail parameters, preserving fail descriptor`);
-            }
+            do {
+                if (window.d) {
+                    console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Same up-fail parameters, preserving fail descriptor`);
+                }
+            } while (0);
         }
         else {
             hist = this.rxqUpSwitchHistory[this.currRxQuality] = {
@@ -614,9 +737,11 @@ class SvcDriver {
                 tsMonitorTill: now + SvcDriver.kRxUpFailMonitorDur,
                 kbps: stats.rx, rtt: this.maRtt, lowArea: this.rxTotalArea()
             };
-            if (window.d) {
-                console.warn(`incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Created new up-fail descriptor`);
-            }
+            do {
+                if (window.d) {
+                    console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Created new up-fail descriptor`);
+                }
+            } while (0);
         }
         // we can't know the area after quality increasing before the actual quality switch takes place, so we do it
         // with a delay
@@ -633,18 +758,22 @@ class SvcDriver {
         assert(params);
         this.tsNoSwitchUntil = Date.now() + deadTime;
         this.rxqSwitchSeqNo++;
-        if (window.d) {
-            console.warn(`Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: %o`, params);
-        }
+        do {
+            if (window.d) {
+                console.warn(kLogTag, `Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: ${JSON.stringify(params)}`);
+            }
+        } while (0);
         this.currRxQuality = newQ;
         this.client.requestSvcLayers(params[0], params[1], params[2]);
     }
     decRxQualityDueToRtt(stats) {
         if (!this.rxRttDowngr) {
             if (this.currRxQuality > 0) {
-                if (window.d) {
-                    console.warn(`Decreasing rxQ due to HIGH RTT of ${this.maRtt.toFixed()}, saving checkpoint`);
-                }
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, `Decreasing rxQ due to HIGH RTT of ${this.maRtt.toFixed()}, saving checkpoint`);
+                    }
+                } while (0);
                 this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
                 this.decRxQuality();
             }
@@ -658,9 +787,11 @@ class SvcDriver {
             // packet loss, then assume the high rtt is not due to network congestion
             if ((this.fmaPlost <= this.plostLower) && (stats.rtt < 1000) && (Math.abs(stats.rtt - this.rxRttDowngr.lastRtt) < 16)) {
                 // rtt did not change
-                if (window.d) {
-                    console.warn(`Decreased rxQ by ${nSteps} steps: rtt didn't change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
-                }
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt didnt change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
+                    }
+                } while (0);
                 this.setRttWindow(this.maRtt);
                 // reset the checkpoint as well - otherwise we may ignore a future rtt decrease
                 // on top of the current increase
@@ -670,9 +801,11 @@ class SvcDriver {
             else if (this.currRxQuality > 0) {
                 // rtt changed - could be decreasing from the quality downgrade, or still rising
                 // because of network conditions. Either way, we should further downgrade quality
-                if (window.d) {
-                    console.warn(`Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
-                }
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
+                    }
+                } while (0);
                 this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
             }
         }
@@ -705,21 +838,27 @@ class SvcDriver {
             const res = track.getSettings();
             if (res.width && res.height) {
                 ar = this.client.screenAspectRatio = res.width / res.height;
-                if (window.d) {
-                    console.warn(`Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
-                }
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, `Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
+                    }
+                } while (0);
             }
             else {
                 ar = 1.78;
-                if (window.d) {
-                    console.warn("setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
-                }
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, "setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
+                    }
+                } while (0);
             }
         }
         params.width = Math.round(params.height * ar);
-        if (window.d) {
-            console.warn(`Switching TX quality from ${this.currTxQuality} to ${newQ}: %o (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`, params);
-        }
+        do {
+            if (window.d) {
+                console.warn(kLogTag, `Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)} (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`);
+            }
+        } while (0);
         this.currTxQuality = newQ;
         track.applyConstraints(params);
         return true;
@@ -787,7 +926,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '856f01ef39';
+const COMMIT_ID = 'bdbffcb86c';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -797,6 +936,8 @@ const COMMIT_ID = '856f01ef39';
 
 
 
+
+const client_kLogTag = "sfuClient:";
 function client_assert(cond) {
     if (!cond) {
         throw new Error("Assertion failed");
@@ -830,7 +971,12 @@ var CallJoinPermission;
     CallJoinPermission[CallJoinPermission["kAllow"] = 1] = "kAllow";
     CallJoinPermission[CallJoinPermission["kDeny"] = 2] = "kDeny";
 })(CallJoinPermission || (CallJoinPermission = {}));
-;
+var TxTrackIndex;
+(function (TxTrackIndex) {
+    TxTrackIndex[TxTrackIndex["kVthumb"] = 0] = "kVthumb";
+    TxTrackIndex[TxTrackIndex["kHiRes"] = 1] = "kHiRes";
+    TxTrackIndex[TxTrackIndex["kAudio"] = 2] = "kAudio";
+})(TxTrackIndex || (TxTrackIndex = {}));
 class SfuClient {
     constructor(userId, app, callKey, options, url) {
         this.peers = new Map();
@@ -857,6 +1003,9 @@ class SfuClient {
         if (!SfuClient.platformHasSupport()) {
             throw new Error("This browser does not support insertable streams");
         }
+        if (!window.nacl) {
+            throw new Error("Nacl library not present in global namespace");
+        }
         client_assert(options);
         this.userId = userId;
         this.app = app;
@@ -867,6 +1016,7 @@ class SfuClient {
         if (callKey) {
             this.setCallKey(callKey);
         }
+        this.numInputVideoTracks = options.numVideoSlots || SfuClient.kMaxVideoSlotsDefault;
         this.url = url;
         this.cryptoWorker = new Worker(SfuClient.kWorkerUrl);
         this.cryptoWorker.addEventListener("message", this.onCryptoWorkerEvent.bind(this));
@@ -891,7 +1041,11 @@ class SfuClient {
     }
     onCryptoWorkerEvent(event) {
         let msg = event.data;
-        console.debug("Message from crypto worker:", msg);
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "Message from crypto worker:", msg);
+            }
+        } while (0);
         if ((msg.op === "keyset") && (this.keySetPromise && msg.keyId === this.keySetPromise.keyId)) {
             this.keySetPromise.resolve();
             delete this.keySetPromise;
@@ -925,32 +1079,44 @@ class SfuClient {
     }
     async onWsClose(event) {
         if (event && event.target !== this.conn) {
-            console.warn("onWsClose: ignoring stale event for a previous websocket instance");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "onWsClose: ignoring stale event for a previous websocket instance");
+                }
+            } while (0);
             return;
         }
-        console.warn("SfuClient: Signaling connection closed");
+        do {
+            if (window.d) {
+                console.warn(client_kLogTag, "SfuClient: Signaling connection closed");
+            }
+        } while (0);
         delete this.conn;
-        this.leaveCall(termCodes.kSigDisconn); // sets this.termCode
         const willReconnect = this.willReconnect(); // decides based on this.termCode
         if (willReconnect) {
-            this._setConnState(ConnState.kDisconnectedRetrying);
+            this.leaveCall(termCodes.kSigDisconn, ConnState.kDisconnectedRetrying);
             this.scheduleReconnect();
         }
         else {
-            this._setConnState(ConnState.kDisconnected);
+            this.leaveCall(termCodes.kSigDisconn, ConnState.kDisconnected);
             this._stopLocalTracks();
         }
         this._fire("onDisconnect", this.termCode, willReconnect);
     }
-    leaveCall(termCode) {
+    leaveCall(termCode, newState) {
         if (this.termCode == null) {
             this.termCode = termCode;
         }
+        const oldState = this._connState;
+        this._setConnState(newState);
         if (this.statTimer) {
             clearTimeout(this.statTimer);
         }
         this.disableStats();
-        if (this._connState === ConnState.kCallJoined) {
+        if (this.micMuteMonitor) {
+            this.micMuteMonitor.stop();
+        }
+        if (oldState === ConnState.kCallJoined) {
             this._statsRecorder.submit(this.termCode);
         }
         this._closeMediaConnection();
@@ -961,7 +1127,11 @@ class SfuClient {
         if (delay > 2000) {
             delay = 2000;
         }
-        console.warn("Reconnecting in", delay, "ms....");
+        do {
+            if (window.d) {
+                console.warn(client_kLogTag, "Reconnecting in", delay, "ms....");
+            }
+        } while (0);
         await msDelay(delay);
         if (!this._forcedDisconnect) {
             this.connect();
@@ -982,10 +1152,18 @@ class SfuClient {
     _fire(evName, ...args) {
         let method = this.app[evName];
         if (!method) {
-            console.warn(`Unhandled event: ${evName}(${args.join(",")})`);
+            do {
+                if (window.d) {
+                    console.log(client_kLogTag, `Unhandled event: ${evName}(${args.join(",")})`);
+                }
+            } while (0);
             return;
         }
-        console.log(`fire [${evName}](${args.join(',')})`);
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, `fire [${evName}](${args.join(',')})`);
+            }
+        } while (0);
         try {
             method.call(this.app, ...args);
         }
@@ -994,10 +1172,14 @@ class SfuClient {
         }
     }
     async generateKey() {
-        let keyObj = await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 128 }, true, ["encrypt", "decrypt"]);
-        let tsStart = Date.now();
+        const tsStart = Date.now();
+        const keyObj = await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 128 }, true, ["encrypt", "decrypt"]);
         let key = await crypto.subtle.exportKey("raw", keyObj);
-        console.warn(`exportKey completed in ${Date.now() - tsStart} ms`);
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "Media key generated in", Date.now() - tsStart, "ms");
+            }
+        } while (0);
         this.xorWithCallKeyIfNeeded(key);
         let keyId = ++this._sendKeyIdGen;
         this._newestSendKey = {
@@ -1027,7 +1209,24 @@ class SfuClient {
     */
     async rotateKey() {
         var self = this;
-        console.warn("Rotate key");
+        if (!this.sentAv) {
+            if (this.noSendKeyRotated) {
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "rotateKey: Not rotating, already done once, and we are not sending media");
+                    }
+                } while (0);
+                return;
+            }
+            else {
+                this.noSendKeyRotated = true;
+            }
+        }
+        do {
+            if (window.d) {
+                console.warn(client_kLogTag, "Rotate key");
+            }
+        } while (0);
         let key = await self.generateKey();
         self.encryptAndSendLastKeyToAllPeers()
             .then(async () => {
@@ -1066,6 +1265,9 @@ class SfuClient {
         if (!this.peers.size) {
             return;
         }
+        if (!this.sentAv) {
+            return;
+        }
         let key = this._newestSendKey;
         if (!key) {
             this.logError("No send key");
@@ -1075,24 +1277,26 @@ class SfuClient {
         let promises = [];
         for (let peer of this.peers.values()) {
             promises.push(peer.encryptKey(keyData));
+            peer.lastKeySent = key;
         }
         let results = await Promise.all(promises);
         this.send({ a: "KEY", id: key.id & 0xff, data: results });
     }
     async msgKey(msg) {
-        var self = this;
-        let peer = self.peers.get(msg.from);
+        const peer = this.peers.get(msg.from);
         if (!peer) {
-            console.warn("msgKey: Unknown peer cid", msg.from);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "msgKey: Unknown peer cid", msg.from);
+                }
+            } while (0);
             return;
         }
-        let id = msg.id;
-        client_assert(!isNaN(id) && (id >= 0) && (id < 256));
-        self.app.decryptKeyFrom(msg.key, peer.userId)
-            .then(function (key) {
-            self.xorWithCallKeyIfNeeded(key);
-            self.cryptoWorker.postMessage(['dk', msg.from, id, key]);
-        });
+        const keyId = msg.id;
+        client_assert(!isNaN(keyId) && (keyId >= 0) && (keyId < 256));
+        const key = await peer.decryptKey(msg.key);
+        this.xorWithCallKeyIfNeeded(key);
+        this.cryptoWorker.postMessage(['dk', msg.from, keyId, key]);
     }
     addVersionToUrl(url) {
         let and;
@@ -1107,7 +1311,7 @@ class SfuClient {
     }
     async connect(url, callId, config) {
         if (url) { // for reconnect, we don't pass any parameters to connect()
-            this.url = this.addVersionToUrl(url);
+            url = this.url = this.addVersionToUrl(url);
             client_assert(callId);
             client_assert(config);
             this.callId = callId;
@@ -1135,9 +1339,16 @@ class SfuClient {
      *  which may be kept running
      **/
     reinit() {
+        if (this.cid) {
+            this.prevCid = this.cid;
+            delete this.cid;
+        }
+        delete this.rtcConn;
         this._sendKeyIdGen = -1;
         this.peers.clear();
+        this._sendHires = this._sendVthumb = false;
         this._sentAv = 0;
+        this.noSendKeyRotated = false;
         delete this._lastPeerJoinLeave;
         delete this.termCode;
         delete this.waitingRoomUsers;
@@ -1146,12 +1357,9 @@ class SfuClient {
         this.statCtx = {};
         this._statsRecorder.reset();
         this.micMuteMonitor.reinit();
-        if (this.callConfig.hasWaitingRoom) {
-            this.waitingRoomUsers = new Map();
-        }
-        this._callJoinPermission = this.callConfig.hasWaitingRoom
-            ? CallJoinPermission.kUnknown
-            : CallJoinPermission.kAllow;
+        delete this._callJoinPermission;
+    }
+    createPeerConn() {
         let pc = this.rtcConn = new RTCPeerConnection({
             encodedInsertableStreams: true,
             sdpSemantics: 'unified-plan'
@@ -1161,7 +1369,11 @@ class SfuClient {
             let xponder = e.transceiver;
             let track = e.track;
             let slot = xponder.slot;
-            console.log(`onTrack: mid: ${xponder.mid}, kind: ${track.kind}, dir: ${xponder.direction}, slot: ${slot ? "has" : "none-yet"}`);
+            do {
+                if (window.d) {
+                    console.log(client_kLogTag, `onTrack: mid: ${xponder.mid}, kind: ${track.kind}, dir: ${xponder.direction}, slot: ${slot ? "has" : "none-yet"}`);
+                }
+            } while (0);
             if (track.kind === "video") {
                 if (!slot) {
                     client_assert(xponder.direction === "recvonly");
@@ -1182,7 +1394,11 @@ class SfuClient {
             }
         };
         pc.onaddstream = (event) => {
-            console.debug("onAddStream");
+            do {
+                if (window.d) {
+                    console.log(client_kLogTag, "onAddStream");
+                }
+            } while (0);
             this.outVSpeakerTrack.createEncryptor();
             this.outVSpeakerTrack.createDecryptor();
             this.outASpeakerTrack.createEncryptor();
@@ -1191,10 +1407,18 @@ class SfuClient {
             this.outVThumbTrack.createDecryptor();
         };
         pc.oniceconnectionstatechange = (ev) => {
-            console.log("onIceConnState:", pc.iceConnectionState);
+            do {
+                if (window.d) {
+                    console.log(client_kLogTag, "onIceConnState:", pc.iceConnectionState);
+                }
+            } while (0);
         };
         pc.onconnectionstatechange = (ev) => {
-            console.log("onConnState:", pc.connectionState);
+            do {
+                if (window.d) {
+                    console.log(client_kLogTag, "onConnState:", pc.connectionState);
+                }
+            } while (0);
             if (pc.connectionState === "failed") {
                 this.handleRtcDisconnect();
             }
@@ -1206,11 +1430,19 @@ class SfuClient {
     async handleRtcDisconnect() {
         let statsRec = this._statsRecorder;
         if (statsRec && statsRec.arrays.t.length === 0 && statsRec.tsStart && (Date.now() - statsRec.tsStart > 6000)) {
-            console.warn("WebRTC connection failed, looks like no UDP connectivity");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "WebRTC connection failed, looks like no UDP connectivity");
+                }
+            } while (0);
             this.disconnect(termCodes.kNoMediaPath);
         }
         else {
-            console.warn("WebRTC connection failed, forcing full reconnect of client");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "WebRTC connection failed, forcing full reconnect of client");
+                }
+            } while (0);
             this.disconnect(termCodes.kRtcDisconn, true);
         }
     }
@@ -1261,10 +1493,10 @@ class SfuClient {
         this.outVThumbTrack = new VideoSlot(this, pc.addTransceiver("video", { direction: "sendrecv" }), true);
         this.outVSpeakerTrack = new VideoSlot(this, pc.addTransceiver("video", { direction: "sendrecv" }), true);
         this.outASpeakerTrack = new Slot(this, pc.addTransceiver("audio", { direction: "sendrecv" }), true);
-        for (let i = 1; i < SfuClient.kMaxActiveSpeakers; i++) {
+        for (let i = 1; i < this.numInputAudioTracks; i++) {
             pc.addTransceiver("audio", { direction: "recvonly" });
         }
-        for (let i = 2; i < SfuClient.kMaxInputVideoTracks; i++) {
+        for (let i = 2; i < this.numInputVideoTracks; i++) {
             pc.addTransceiver("video", { direction: "recvonly" });
         }
     }
@@ -1274,49 +1506,87 @@ class SfuClient {
         }
         let strMsg = JSON.stringify(msg);
         this.conn.send(strMsg);
-        console.log("tx:\n", JSON.stringify(msg, logReplacerFunc));
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "tx:\n", JSON.stringify(msg, logReplacerFunc));
+            }
+        } while (0);
     }
     async onConnect() {
         this._fire("onConnected");
-        if (!this.callConfig.hasWaitingRoom) {
-            this.joinCall();
+    }
+    msgHello(msg) {
+        client_assert(msg.cid);
+        client_assert(msg.na);
+        this.cid = msg.cid;
+        this.numInputAudioTracks = msg.na;
+        if (msg.mods) {
+            this.moderators = new Set(msg.mods);
+        }
+        const wr = msg.wr;
+        if (wr) {
+            this._setConnState(ConnState.kInWaitingRoom);
+            if (wr.allow) {
+                this._callJoinPermission = CallJoinPermission.kAllow;
+                this._fire("wrOnJoinAllowed");
+            }
+            else {
+                this._callJoinPermission = CallJoinPermission.kDeny;
+                this._fire("wrOnJoinNotAllowed");
+            }
+            if (wr.users) {
+                this.msgWrDump(wr);
+            }
         }
         else {
-            this._setConnState(ConnState.kInWaitingRoom);
+            this.joinCall();
         }
     }
     async joinCall() {
+        this.createPeerConn();
         this._setConnState(ConnState.kCallJoining);
         // this._sendVthumb = true;
-        await this._updateSentTracks();
+        const pc = this.rtcConn;
+        const offer = await pc.createOffer();
         if (this._connState !== ConnState.kCallJoining) {
-            // might have been disconnected while waiting for updateSentTracks
+            // might have been disconnected while waiting for createOffer
             return;
         }
-        let pc = this.rtcConn;
-        let offer = await pc.createOffer();
         let sdp = sdpCompress(offer.sdp);
         // hack to enable SVC
         this.mungeSdpForSvc(sdp.tracks[1]);
         //  sdp.tracks[0].sdp = "a=fmtp:98 x-google-max-bitrate=150";
-        // Set it
         offer.sdp = sdpUncompress(sdp);
+        const tsStart = Date.now();
         await pc.setLocalDescription(offer);
-        let ivs = {
-            0: binToHex(this.outVThumbTrack.iv.buffer),
-            1: binToHex(this.outVSpeakerTrack.iv.buffer),
-            2: binToHex(this.outASpeakerTrack.iv.buffer)
-        };
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "setLocalDescription took", Date.now() - tsStart, "ms");
+            }
+        } while (0);
+        if (this._connState !== ConnState.kCallJoining) {
+            return;
+        }
+        this.keyEncryptIv = this.makeKeyEncryptIv();
+        const ivs = this.strIvs = [
+            binToHex(this.outVThumbTrack.iv.buffer),
+            binToHex(this.outVSpeakerTrack.iv.buffer),
+            binToHex(this.outASpeakerTrack.iv.buffer)
+        ];
+        const sessSignedPubKey = await this.generateSessionKeyPair();
         let options = this.options;
-        this._speakerState = options && options.moderator && options.speak ? SpeakerState.kPending : SpeakerState.kNoSpeaker;
+        this._speakerState = (options && options.moderator && options.speak) ? SpeakerState.kPending : SpeakerState.kNoSpeaker;
+        await this._updateSentTracks(); // at this point we are not sending anything: no key should be sent out
+        client_assert(this.sentAv === 0);
         let offerCmd = {
             a: "JOIN",
             sdp: sdp,
             ivs: ivs,
-            av: this.availAv
+            av: this.availAv,
+            pubk: sessSignedPubKey
         };
-        if (this.cid) { // when reconnecting, tell the SFU the CID of the previous connection, so it can kill it instantly
-            offerCmd.cid = this.cid;
+        if (this.prevCid) { // when reconnecting, tell the SFU the CID of the previous connection, so it can kill it instantly
+            offerCmd.cid = this.prevCid;
         }
         if (this.initialVthumbCount) {
             offerCmd.vthumbs = this.initialVthumbCount;
@@ -1330,6 +1600,31 @@ class SfuClient {
             offerCmd.spk = 1;
         }
         this.send(offerCmd);
+    }
+    makeKeyEncryptIv() {
+        // The IV is 12 bytes. First 8 bytes are taken from the vthumb track IV,
+        // the rest 4 bytes are the first from the hi-res video track IV
+        const first = this.outVThumbTrack.iv;
+        const second = this.outVSpeakerTrack.iv;
+        client_assert(first.length === 8 && second.length === 8);
+        const arr = new Uint8Array(12);
+        arr.set(first);
+        arr.set(second.subarray(0, 4), 8);
+        return arr;
+    }
+    async generateSessionKeyPair() {
+        client_assert(this.cid);
+        const tsStart = Date.now();
+        const keyPair = window.nacl.box.keyPair();
+        this.privSessKey = keyPair.secretKey;
+        const pubKeyStr = base64ArrEncode(keyPair.publicKey);
+        const signature = await this.app.signString(`sesskey|${this.callId}|${this.cid}|${pubKeyStr}`);
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "Sess keypair generated in", Date.now() - tsStart, "ms");
+            }
+        } while (0);
+        return `${pubKeyStr}:${signature}`;
     }
     _stopAndDelLocalTrack(name) {
         let track = this[name];
@@ -1354,9 +1649,19 @@ class SfuClient {
         var screenChange = screen != (!!self._screenTrack);
         var audioChange = audio != (!!self._audioTrack);
         if (!(camChange || audioChange || screenChange)) {
-            console.log("getLocalTracks: nothing to change");
+            do {
+                if (window.d) {
+                    console.log(client_kLogTag, "getLocalTracks: nothing to change");
+                }
+            } while (0);
             return false;
         }
+        const tsStart = Date.now();
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "Getting local media...");
+            }
+        } while (0);
         let errors = null;
         // delete the tracks we disable, and prepare options for getting the ones we enable
         let promises = [];
@@ -1437,6 +1742,11 @@ class SfuClient {
             }));
         }
         await Promise.allSettled(promises);
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "Get local media completed in", Date.now() - tsStart, "ms");
+            }
+        } while (0);
         if (errors) {
             self._fire("onLocalMediaError", errors);
         }
@@ -1469,7 +1779,8 @@ class SfuClient {
     */
     async _doUpdateSentTracks() {
         var self = this;
-        let oldAv = this.availAv;
+        const oldAvailAv = this.availAv;
+        const oldSentAv = this.sentAv;
         const wasSendingHiRes = this.outVSpeakerTrack.isSendingTrack();
         try {
             await self._doGetLocalTracks();
@@ -1517,7 +1828,11 @@ class SfuClient {
             promises.push(self.outVThumbTrack.sendTrack(this._sendVthumb ? vthumbTrack : null));
             let tsStart = Date.now();
             await Promise.all(promises);
-            console.log("sendTrack changes took", Date.now() - tsStart, "ms");
+            do {
+                if (window.d) {
+                    console.log(client_kLogTag, "updateSentTracks took", Date.now() - tsStart, "ms");
+                }
+            } while (0);
             // hook the svc driver init here, so that it is always executed
             if (this.outVSpeakerTrack.isSendingTrack() && !wasSendingHiRes) {
                 this._svcDriver.initTx();
@@ -1525,11 +1840,28 @@ class SfuClient {
         }
         finally {
             self._updateAvailAndSentAv();
+            self.handleStartStopSend(oldSentAv);
             let av = self.availAv;
-            if (av !== oldAv) {
+            if (av !== oldAvailAv) {
                 self._sendAvState();
-                self._fire("onLocalMediaChange", av ^ oldAv);
+                self._fire("onLocalMediaChange", av ^ oldAvailAv);
             }
+        }
+    }
+    handleStartStopSend(oldSentAv) {
+        if (!!oldSentAv === !!this.sentAv) {
+            return;
+        }
+        if (this.sentAv) { // start send
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Starting to send media: broadcasting media key");
+                }
+            } while (0);
+            this.encryptAndSendLastKeyToAllPeers();
+        }
+        else {
+            this.noSendKeyRotated = false;
         }
     }
     /** Returns not what tracks are actually sent, but what are available for sending. This is because
@@ -1539,8 +1871,8 @@ class SfuClient {
         if (this._onHold) {
             return;
         }
-        let availAv = this.outASpeakerTrack.outTrack ? Av.Audio : 0;
-        let sentAv = availAv;
+        let sentAv = this.outASpeakerTrack.sentTrack ? Av.Audio : 0;
+        let availAv = sentAv;
         if (this._screenTrack) {
             if (this._cameraTrack) {
                 availAv |= Av.ScreenHiRes | Av.CameraLowRes;
@@ -1555,11 +1887,11 @@ class SfuClient {
             }
         }
         this._availAv = availAv;
-        let track = this.outVThumbTrack.outTrack;
+        let track = this.outVThumbTrack.sentTrack;
         if (track) {
             sentAv |= ((track === this._cameraTrack) ? Av.CameraLowRes : Av.ScreenLowRes);
         }
-        track = this.outVSpeakerTrack.outTrack;
+        track = this.outVSpeakerTrack.sentTrack;
         if (track) {
             sentAv |= ((track === this._cameraTrack) ? Av.CameraHiRes : Av.ScreenHiRes);
         }
@@ -1579,13 +1911,13 @@ class SfuClient {
     }
     sentTracksString() {
         let result = "";
-        if (this.outASpeakerTrack.outTrack) {
+        if (this.outASpeakerTrack.sentTrack) {
             result += "A";
         }
-        if (this.outVSpeakerTrack.outTrack) {
+        if (this.outVSpeakerTrack.sentTrack) {
             result += "H";
         }
-        if (this.outVThumbTrack.outTrack) {
+        if (this.outVThumbTrack.sentTrack) {
             result += "L";
         }
         return result;
@@ -1621,7 +1953,7 @@ class SfuClient {
     localCameraMuted() {
         return this._onHold ? this._onHold.muteCamera : this._muteCamera;
     }
-    speakerState() {
+    get speakerState() {
         return this._speakerState;
     }
     _sendAvState() {
@@ -1640,7 +1972,11 @@ class SfuClient {
             return;
         }
         if (mute === this._muteCamera) {
-            console.warn("muteCamera: No change");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "muteCamera: No change");
+                }
+            } while (0);
             return Promise.resolve();
         }
         return this._updateSentTracks(() => this._muteCamera = mute);
@@ -1655,7 +1991,11 @@ class SfuClient {
             return;
         }
         if (mute === this._muteAudio) {
-            console.warn("muteAudio: No change");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "muteAudio: No change");
+                }
+            } while (0);
             return Promise.resolve();
         }
         return this._updateSentTracks(() => this._muteAudio = mute);
@@ -1708,7 +2048,11 @@ class SfuClient {
             return;
         }
         if (enable === this._isSharingScreen) {
-            console.warn("enableScreenshare: No change");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "enableScreenshare: No change");
+                }
+            } while (0);
             return Promise.resolve();
         }
         await this._updateSentTracks(() => this._isSharingScreen = enable);
@@ -1738,12 +2082,20 @@ class SfuClient {
             return ScreenShareType.kBrowserTab;
         }
         else {
-            console.warn("Could not determine screensharing type from track label", label);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Could not determine screensharing type from track label", label);
+                }
+            } while (0);
             return ScreenShareType.kInvalid;
         }
     }
     onScreenSharingStoppedByUser() {
-        console.warn("Screen sharing stopped by user");
+        do {
+            if (window.d) {
+                console.warn(client_kLogTag, "Screen sharing stopped by user");
+            }
+        } while (0);
         // In theory this may be called immediately from within _getLocalTracks when the track onended
         // handle is attached. In that case, we need to go through the message loop to avoid recursion
         var self = this;
@@ -1760,7 +2112,6 @@ class SfuClient {
     async onPacket(event) {
         //Get protocol message
         const msg = JSON.parse(event.data);
-        console.log("rx:\n", JSON.stringify(msg, logReplacerFunc));
         if (this.inputPacketQueue) {
             this.inputPacketQueue.push(msg);
         }
@@ -1769,6 +2120,11 @@ class SfuClient {
         }
     }
     processMessage(msg) {
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "rx:\n", JSON.stringify(msg, logReplacerFunc));
+            }
+        } while (0);
         if (msg.err != null) {
             const strError = termCodes[msg.err];
             let logMsg = "Server closed connection with error ";
@@ -1776,12 +2132,20 @@ class SfuClient {
             if (msg.msg) {
                 logMsg += ": " + msg.msg;
             }
-            console.warn(logMsg);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, logMsg);
+                }
+            } while (0);
             this.disconnect(msg.err, true); // may be retriable, i.e. kSvrShuttingDown
             return;
         }
         if (msg.warn != null) {
-            console.warn("SFU server WARNING:", msg.warn);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "SFU server WARNING:", msg.warn);
+                }
+            } while (0);
             return;
         }
         if (msg.deny) {
@@ -1793,7 +2157,11 @@ class SfuClient {
             handler.call(this, msg);
         }
         else {
-            console.warn("Ingoring unknown packet", msg.a || JSON.stringify(msg));
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Ingoring unknown packet", msg.a || JSON.stringify(msg));
+                }
+            } while (0);
         }
     }
     processInputQueue() {
@@ -1844,12 +2212,20 @@ class SfuClient {
         try {
             let tsStart = Date.now();
             sdp = sdpUncompress(msg.sdp);
-            console.log("Setting answer SDP...");
+            do {
+                if (window.d) {
+                    console.log(client_kLogTag, "Setting answer SDP...");
+                }
+            } while (0);
             await this.rtcConn.setRemoteDescription(new RTCSessionDescription({
                 type: 'answer',
                 sdp: sdp
             }));
-            console.warn("setRemoteDescription completed in %d ms", Date.now() - tsStart);
+            do {
+                if (window.d) {
+                    console.log(client_kLogTag, "setRemoteDescription took", Date.now() - tsStart, "ms");
+                }
+            } while (0);
         }
         catch (ex) {
             this.logError("setRemoteDescrition failed:", ex, "\nsdp:\n" + sdp);
@@ -1867,11 +2243,16 @@ class SfuClient {
         }
         let speakers = msg.speakers;
         if (speakers) {
-            for (let strCid in speakers) {
-                let info = speakers[strCid];
-                let cid = parseInt(strCid);
-                client_assert(!isNaN(cid));
-                this.addPeerSpeaker(cid, info);
+            for (const desc of speakers) {
+                if (Array.isArray(desc)) {
+                    const peer = this.addPeerSpeaker(desc[0]);
+                    if (peer) {
+                        peer.onAudioStart(desc[1]);
+                    }
+                }
+                else {
+                    this.addPeerSpeaker(desc);
+                }
             }
         }
         setTimeout(() => this.processInputQueue(), 0);
@@ -1901,14 +2282,22 @@ class SfuClient {
     }
     msgPeerJoin(msg) {
         if (!msg.cid || !msg.userId || msg.av == null) {
-            console.warn("Invalid PEERJOIN packet");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "PEERJOIN packet missing required property");
+                }
+            } while (0);
             return;
         }
         let peer = new Peer(this, msg);
         // rotate only if peer is not the first one to see our most recent key
         if (!this._lastPeerJoinLeave || ((this._lastPeerJoinLeave.userId === msg.userId) &&
             (Date.now() - this._lastPeerJoinLeave.ts <= SfuClient.kPeerReconnNoKeyRotationPeriod))) {
-            console.warn("This is the first peer, or they just reconnected, NOT rotating key");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "This is the first peer, or they just reconnected, NOT rotating key");
+                }
+            } while (0);
             peer.encryptAndSendLastKey();
         }
         else {
@@ -1920,7 +2309,11 @@ class SfuClient {
         let cid = msg.cid;
         let peer = this.peers.get(cid);
         if (!peer) {
-            console.warn("PEERLEFT: Unknown peer cid", cid);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "PEERLEFT: Unknown peer cid", cid);
+                }
+            } while (0);
             return;
         }
         this._lastPeerJoinLeave = { userId: peer.userId, ts: Date.now() };
@@ -1929,19 +2322,24 @@ class SfuClient {
         this.rotateKey();
     }
     handleIncomingVideoTracks(tracks, isHiRes) {
-        for (let strCid in tracks) {
-            let cid = parseInt(strCid);
-            let peer = this.peers.get(cid);
+        for (const desc of tracks) {
+            const cid = desc[0];
+            const peer = this.peers.get(cid);
             if (!peer) {
-                console.warn("Unknown peer cid", cid);
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Unknown peer cid", cid);
+                    }
+                } while (0);
                 continue;
             }
-            let info = tracks[cid];
+            const mid = desc[1];
+            const reused = !!desc[2];
             if (isHiRes) {
-                peer.incomingHiResVideoTrack(info);
+                peer.incomingHiResVideoTrack(mid, reused);
             }
             else {
-                peer.incomingVthumbTrack(info);
+                peer.incomingVthumbTrack(mid, reused);
             }
         }
     }
@@ -2013,32 +2411,14 @@ class SfuClient {
         await this._updateSentTracks(() => this._speakerState = SpeakerState.kNoSpeaker);
         this._fire("onNoSpeaker");
     }
-    addPeerSpeaker(cid, info) {
+    addPeerSpeaker(cid) {
         client_assert(cid !== this.cid);
         let peer = this.peers.get(cid);
         if (!peer) {
             this.logError("addPeerSpeaker: Unknown cid", cid);
-            debugger;
             return null;
         }
-        let audio = info.audio;
-        if (!audio) {
-            this.logError("addPeerSpeaker: Missing audio track in track info");
-            return null;
-        }
-        let slot = this.inAudioTracks.get(audio.mid);
-        if (!slot) {
-            this.logError("addPeerSpeaker: Unknown audio track mid", audio.mid);
-            return null;
-        }
-        slot.reassign(cid, audio.iv);
-        peer.onSpeaker(slot);
-        let video = info.video;
-        if (!video) {
-            return peer;
-        }
-        peer.incomingHiResVideoTrack(video);
-        //  this.send({a: "LAYER", mid: video.mid, spt: 2, tmp: 2});
+        peer.onSpeaker();
         return peer;
     }
     msgSpeakRequestDel(msg) {
@@ -2053,7 +2433,11 @@ class SfuClient {
         else {
             let peer = this.peers.get(msg.cid);
             if (!peer) {
-                console.warn("Unknown peer cid", msg.cid);
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Unknown peer cid", msg.cid);
+                    }
+                } while (0);
                 return;
             }
             peer.delSpeakReq();
@@ -2092,7 +2476,7 @@ class SfuClient {
             this.onStartSpeaking();
         }
         else {
-            this.addPeerSpeaker(msg.cid, msg);
+            this.addPeerSpeaker(msg.cid);
         }
     }
     msgSpeakOff(msg) {
@@ -2106,7 +2490,11 @@ class SfuClient {
     delPeerSpeaker(cid) {
         let peer = this.peers.get(cid);
         if (!peer) {
-            console.warn("delPeerSpeaker: Unknown peer cid", cid);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "delPeerSpeaker: Unknown peer cid", cid);
+                }
+            } while (0);
             return null;
         }
         peer.onNoSpeaker();
@@ -2116,15 +2504,23 @@ class SfuClient {
         let cid = msg.cid;
         client_assert(cid);
         if (cid === this.cid) {
-            console.warn("msgAv: Received our own av flags");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "msgAv: Received our own av flags");
+                }
+            } while (0);
             return;
         }
         let peer = this.peers.get(msg.cid);
         if (!peer) {
-            console.warn("msgAv: Unknown peer with cid", msg.cid);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "msgAv: Unknown peer with cid", msg.cid);
+                }
+            } while (0);
             return;
         }
-        peer.onAvChange(msg.av);
+        peer.onAvChange(msg);
     }
     msgSpeakReqs(msg) {
         for (let cid of msg.cids) {
@@ -2134,7 +2530,11 @@ class SfuClient {
             }
             let peer = this.peers.get(cid);
             if (!peer) {
-                console.warn("Unknown cid", cid);
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Unknown cid", cid);
+                    }
+                } while (0);
                 continue;
             }
             peer.setSpeakReq();
@@ -2143,7 +2543,7 @@ class SfuClient {
     msgModAdd(msg) {
         client_assert(msg.user);
         if (!this.moderators) {
-            console.error("BUG: msgModAdd: moderators list does not exist, creating it");
+            this.logError("BUG: msgModAdd: moderators list does not exist, creating it");
             this.moderators = new Set();
         }
         this.moderators.add(msg.user);
@@ -2152,7 +2552,7 @@ class SfuClient {
     msgModDel(msg) {
         client_assert(msg.user);
         if (!this.moderators) {
-            console.error("BUG: msgModDel: moderators list does not exist");
+            this.logError("BUG: msgModDel: moderators list does not exist");
         }
         else {
             this.moderators.delete(msg.user);
@@ -2161,11 +2561,17 @@ class SfuClient {
     }
     // WaitingRoom list and permissions sync notifications, for moderators only
     msgWrDump(msg) {
+        if (this.waitingRoomUsers) {
+            this.waitingRoomUsers.clear();
+        }
+        else {
+            this.waitingRoomUsers = new Map();
+        }
         const users = msg.users;
         for (const userId in users) {
             this.waitingRoomUsers.set(userId, users[userId]);
         }
-        this._fire("wrOnUsersEntered", users);
+        this._fire("wrOnUserDump", users);
     }
     msgWrEnter(msg) {
         client_assert(msg.users);
@@ -2200,10 +2606,12 @@ class SfuClient {
     }
     // Waiting room greeting - allow or deny call access
     msgWrAllow(msg) {
+        client_assert(msg.cid);
         if (this._connState !== ConnState.kInWaitingRoom) {
             return;
         }
         this._callJoinPermission = CallJoinPermission.kAllow;
+        this.cid = msg.cid;
         if (msg.mods) {
             this.moderators = new Set(msg.mods);
         }
@@ -2222,26 +2630,41 @@ class SfuClient {
     // ====
     msgBye(msg) {
         if (msg.wr) { // pushed from call to waiting room
-            client_assert(this.callConfig.hasWaitingRoom);
-            console.warn("Leaving call and entering waiting room");
-            this.leaveCall(msg.rsn);
-            this._setConnState(ConnState.kInWaitingRoom);
+            client_assert(this._callJoinPermission || this._callJoinPermission === 0);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Leaving call and entering waiting room");
+                }
+            } while (0);
+            this.leaveCall(msg.trsn, ConnState.kInWaitingRoom);
             this.reinit();
             this._fire("wrOnPushedFromCall");
         }
         else { // completely disconnected
-            this.disconnect(msg.rsn, false);
+            this.disconnect(msg.trsn, false);
         }
     }
     handleDeny(msg) {
-        if (msg.deny === "JOIN") {
-            if (this._connState !== ConnState.kCallJoining) {
-                return;
+        switch (msg.deny) {
+            case "JOIN": {
+                if (this._connState !== ConnState.kCallJoining) {
+                    return;
+                }
+                this.leaveCall(termCodes.kPushedToWaitingRoom, ConnState.kInWaitingRoom);
+                break;
             }
-            this.leaveCall(termCodes.kPushedToWaitingRoom);
-        }
-        else {
-            console.warn(`Operation ${msg.deny} denied: ${msg.msg}`);
+            case "audio": {
+                this.muteAudio(true);
+                this._fire("onAudioSendDenied", msg.msg);
+                break;
+            }
+            default:
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, `Operation "${msg.deny}" denied: ${msg.msg || "(no details)"}`);
+                    }
+                } while (0);
+                break;
         }
     }
     wrAllowJoin(users) {
@@ -2301,7 +2724,11 @@ class SfuClient {
     }
     async pollStats() {
         if (this._connState !== ConnState.kCallJoined) {
-            console.warn("pollStats called while not in kCallJoined state");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "pollStats called while not in kCallJoined state");
+                }
+            } while (0);
             return;
         }
         let stats = this.rtcStats = { pl: 0, jtr: 1000000 };
@@ -2408,7 +2835,7 @@ class SfuClient {
                         ? Math.round((stat.totalPacketSendDelay - prev.totalPacketSendDelay) * 1000 / pktSent)
                         : -1;
                     txStat = stat;
-                    //  console.log("tag:", tag, "nacks:", stat.nackCount, "pli:", stat.pliCount, "fir", stat.firCount, "vtxh:", rtcStats.vtxh);
+                    //  LOGI("tag:", tag, "nacks:", stat.nackCount, "pli:", stat.pliCount, "fir", stat.firCount, "vtxh:", rtcStats.vtxh);
                 }
                 if (!getConnTotals) {
                     break;
@@ -2483,10 +2910,9 @@ class SfuClient {
         ];
     }
 }
-SfuClient.kProtocolVersion = 0;
+SfuClient.kProtocolVersion = 1;
 SfuClient.debugSdp = localStorage.debugSdp ? 1 : 0;
-SfuClient.kMaxActiveSpeakers = 20;
-SfuClient.kMaxInputVideoTracks = 20;
+SfuClient.kMaxVideoSlotsDefault = 24;
 SfuClient.kSpatialLayerCount = 3;
 SfuClient.kVideoCaptureOptions = { height: 540 };
 SfuClient.kScreenCaptureOptions = { video: { height: { max: 1440 } } };
@@ -2504,6 +2930,7 @@ SfuClient.TermCode = termCodes;
 SfuClient.ScreenShareType = ScreenShareType;
 SfuClient.Av = Av;
 SfuClient.msgHandlerMap = {
+    "HELLO": SfuClient.prototype.msgHello,
     "AV": SfuClient.prototype.msgAv,
     "ANSWER": SfuClient.prototype.msgAnswer,
     "PEERJOIN": SfuClient.prototype.msgPeerJoin,
@@ -2538,7 +2965,7 @@ class Slot {
         this.client = client;
         this.xponder = xponder;
         xponder.slot = this;
-        this.sentTrack = null;
+        this._sentTrack = null;
         if (generateIv) {
             this.iv = randomBuf(8);
         }
@@ -2567,21 +2994,21 @@ class Slot {
         this.active = true;
     }
     sendTrack(track) {
-        if (track === this.sentTrack) {
+        if (track === this._sentTrack) {
             return Promise.resolve();
         }
-        this.sentTrack = track;
+        this._sentTrack = track;
         return this.xponder.sender.replaceTrack(track)
             .then(() => this.tsStart = Date.now());
     }
-    get outTrack() {
-        return this.sentTrack;
+    get sentTrack() {
+        return this._sentTrack;
     }
     get inTrack() {
         return this.xponder.receiver.track;
     }
     isSendingTrack() {
-        return this.sentTrack != null;
+        return !!this._sentTrack;
     }
     async pollRxStats() {
         let client = this.client;
@@ -2681,19 +3108,19 @@ class VideoSlot extends Slot {
         this.sentLayers = count;
         let sender = this.xponder.sender;
         if (!sender) {
-            console.warn(`setTxSvcLayerCount: Currently not sending track, will only record value`);
+            LOGW(`setTxSvcLayerCount: Currently not sending track, will only record value`);
             return Promise.resolve();
         }
         let params: any = sender.getParameters();
         let encs = params.encodings;
         if (!encs || encs.length < 2) {
-            console.warn("setTxSvcLayerCount: There is no SVC enabled for this sender");
+            LOGW("setTxSvcLayerCount: There is no SVC enabled for this sender");
             return Promise.resolve();
         }
         for (let i = 0; i < encs.length; i++) {
             encs[i].active = i < count;
         }
-        console.warn(`setTxSvcLayerCount: Enabling only first ${count} layers`);
+        LOGW(`setTxSvcLayerCount: Enabling only first ${count} layers`);
         return sender.setParameters(params);
     }
     */
@@ -2704,15 +3131,21 @@ class VideoSlot extends Slot {
         for (let player of this.players) {
             player._onTrackGone(this);
         }
-        client_assert(this.players.size === 0);
+        if (this.players.size) {
+            console.error("Soft assert: not all players destroyed");
+        }
     }
     _onDetachedFromPlayer(player) {
         if (!this.players.has(player)) {
-            console.warn("Slot.detachFromPlayer: Was not attached to that player");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Slot.detachFromPlayer: Was not attached to that player");
+                }
+            } while (0);
             return;
         }
         this.players.delete(player);
-        //console.warn("slot %s detach from player -> refcnt = ", this.isHiRes ? "hires":"lores", this.players.size);
+        // LOGW(`slot ${this.isHiRes ? "hires":"lores"} detach from player -> refcnt =`, this.players.size);
         if (!this.players.size && this._releaseTrackCb) {
             this.active = false;
             this._releaseTrackCb();
@@ -2720,11 +3153,15 @@ class VideoSlot extends Slot {
     }
     _onAttachedToPlayer(player) {
         if (this.players.has(player)) {
-            console.warn("Slot.attachToPlayer: Already attached to that player");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Slot.attachToPlayer: Already attached to that player");
+                }
+            } while (0);
             return;
         }
         this.players.add(player);
-        //console.warn("slot %s attach to player -> refcnt = ", this.isHiRes ? "hires":"lores", this.players.size);
+        // LOGW("slot ${this.isHiRes ? "hires":"lores"} attach to player -> refcnt =", this.players.size);
     }
 }
 class VideoPlayer {
@@ -2745,12 +3182,20 @@ class VideoPlayer {
     attachToTrack(slot) {
         client_assert(slot);
         if (slot === this.slot) {
-            console.warn("VideoPlayer.attachToTrack: Already attached to that slot");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "VideoPlayer.attachToTrack: Already attached to that slot");
+                }
+            } while (0);
             return;
         }
         let prevSlot = this.slot;
         if (this._detachFromCurrentTrack()) {
-            console.warn("VideoPlayer: replacing slot %d with %d", prevSlot ? prevSlot.mid : "(null)", slot.mid);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, `VideoPlayer: replacing slot ${prevSlot ? prevSlot.mid : "(null)"} with ${slot.mid}`);
+                }
+            } while (0);
         }
         this.slot = slot;
         slot._onAttachedToPlayer(this);
@@ -2787,7 +3232,11 @@ class ThumbPlayer extends VideoPlayer {
     }
     destroy() {
         if (this.isDestroyed) {
-            console.warn("ThumbPlayer.destroy: already destroyed");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "ThumbPlayer.destroy: already destroyed");
+                }
+            } while (0);
             return;
         }
         client_assert(this.peer.vThumbPlayer === this);
@@ -2803,7 +3252,11 @@ class HiResPlayer extends VideoPlayer {
     }
     destroy() {
         if (this.isDestroyed) {
-            console.warn("HiResPlayer.destroy: already destroyed");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "HiResPlayer.destroy: already destroyed");
+                }
+            } while (0);
             return;
         }
         super.destroy();
@@ -2815,7 +3268,13 @@ function playerPlay(player, track) {
     player.srcObject = new MediaStream([track]);
     let ts = Date.now();
     player.play()
-        .then(() => console.debug("play() returned after %d ms", Date.now() - ts))
+        .then(() => {
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, `play() returned after ${Date.now() - ts} ms`);
+            }
+        } while (0);
+    })
         .catch(function (err) { });
 }
 function playerStop(player) {
@@ -2851,10 +3310,15 @@ class Peer {
         this.cid = info.cid;
         this.userId = info.userId;
         this.av = info.av;
-        this.encryptKeyTo = client.app.encryptKeyTo.bind(client.app); // performance optimization
+        this.strIvs = info.ivs;
+        this.keyDecryptIv = hexToBin(this.strIvs[0] + this.strIvs[1].substring(0, 8));
+        this.encryptKeyToUser = client.app.encryptKeyToUser.bind(client.app); // performance optimization
         client._addPeer(this);
         if (!isInitialDump) {
             this._fire("onPeerJoined");
+        }
+        if (info.pubk) {
+            this.verifyAndDeriveSharedSessKey(info.pubk);
         }
     }
     get isModerator() {
@@ -2878,33 +3342,95 @@ class Peer {
         this._speakReq = false;
         this._fire("onPeerSpeakReqDel");
     }
+    async verifyAndDeriveSharedSessKey(pubKey) {
+        const pms = this.sessSharedKey = createPromiseWithResolveMethods();
+        const items = pubKey.split(':');
+        if (items.length !== 2) {
+            throw new Error(`Bad pubkey format from peer ${this.userId}:${this.cid}`);
+        }
+        if (!(await this.client.app.verifySignature(`sesskey|${this.client.callId}|${this.cid}|${items[0]}`, items[1], this.userId))) {
+            pms.reject(`Pubkey signature verification failed for peer ${this.userId}:${this.cid}`);
+        }
+        this.sessSharedKey = await this.deriveSharedKey(items[0]);
+        pms.resolve(this.sessSharedKey);
+    }
+    async deriveSharedKey(strPeerPubKey) {
+        const peerPubKey = base64DecodeToArr(strPeerPubKey);
+        const dhSharedKey = window.nacl.scalarMult(this.client.privSessKey, peerPubKey);
+        // HKDF transform
+        const hkdfKey = await window.crypto.subtle.importKey("raw", dhSharedKey, "HKDF", false, ["deriveKey", "deriveBits"]);
+        return crypto.subtle.deriveKey({
+            name: "HKDF", hash: "SHA-256",
+            salt: hexToBin([this.strIvs[1], this.strIvs[2], this.client.strIvs[1], this.client.strIvs[2]].sort().join('')),
+            info: new Uint8Array([])
+        }, hkdfKey, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+    }
     async encryptKey(key) {
-        let encKey = await this.encryptKeyTo(key, this.userId);
+        let encKey;
+        let sharedKey = this.sessSharedKey;
+        if (sharedKey) { // new clients, implementing ephemeral session key pair
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, `Using ephemeral session key for client ${this.userId}:${this.cid}`);
+                }
+            } while (0);
+            if (sharedKey.then) { // it's a promise, wait till key is decrypted and imported
+                await sharedKey;
+                sharedKey = this.sessSharedKey;
+            }
+            client_assert(sharedKey.usages);
+            const encKeyBin = await crypto.subtle.encrypt({ name: "AES-GCM", iv: this.client.keyEncryptIv, tagLength: 32 }, sharedKey, key);
+            encKey = base64ArrEncode(encKeyBin);
+        }
+        else { // old clients, using chat keys
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, `Using chat key (OLD crypto scheme) for client ${this.userId}:${this.cid}`);
+                }
+            } while (0);
+            encKey = await this.encryptKeyToUser(key, this.userId);
+        }
         return [this.cid, encKey];
     }
     encryptAndSendLastKey() {
-        var self = this;
-        let key = self.client._newestSendKey;
-        if (!key) {
+        if (!this.client.sentAv) {
+            return;
+        }
+        const key = this.client._newestSendKey;
+        if (!key || key === this.lastKeySent) {
             return null;
         }
-        this.encryptKeyTo(key.key, this.userId)
-            .then(function (encKey) {
-            if (encKey) {
-                self.client.send({ a: "KEY", id: key.id & 0xff, data: [[self.cid, encKey]] });
-            }
+        this.lastKeySent = key;
+        this.encryptKey(key.key)
+            .then((info) => {
+            this.client.send({ a: "KEY", id: key.id & 0xff, data: [info] });
         });
+    }
+    async decryptKey(key) {
+        let sharedKey = this.sessSharedKey;
+        if (sharedKey) { // new clients, implementing ephemeral session key pair
+            if (sharedKey.then) { // it's a promise, wait till key is decrypted and imported
+                await sharedKey;
+                sharedKey = this.sessSharedKey;
+            }
+            client_assert(sharedKey.usages);
+            return crypto.subtle.decrypt({ name: "AES-GCM", iv: this.keyDecryptIv, tagLength: 32 }, sharedKey, base64DecodeToArr(key).buffer);
+        }
+        else { // old clients, using chat keys
+            return this.client.app.decryptKeyFromUser(key, this.userId);
+        }
     }
     onVthumbPlayerDestroy() {
         delete this.vThumbPlayer;
     }
     onHiResPlayerDestroy() {
         delete this.hiResPlayer;
-        if (!this.isLeaving) {
-            let vtp = this.vThumbPlayer;
-            if (vtp && vtp.slot && vtp.slot.isHiRes) {
-                this.client.send({ a: "GET_VTHUMBS", cids: [this.cid] });
-            }
+        if (this.isLeaving) {
+            return;
+        }
+        const vtp = this.vThumbPlayer;
+        if (vtp && vtp.slot && vtp.slot.isHiRes) {
+            this.client.send({ a: "GET_VTHUMBS", cids: [this.cid] });
         }
     }
     destroy(reason) {
@@ -2929,11 +3455,12 @@ class Peer {
     get hasThumbnailVideo() { return this.vThumbPlayer != null; }
     get hasHiresVideo() { return this.hiResPlayer != null; }
     requestThumbnailVideo() {
-        if (this.isLeaving) {
-            return null;
-        }
         if (this.vThumbPlayer) {
-            console.warn("Peer.requestThumbnailVideo: Already requested (player exists)");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Peer.requestThumbnailVideo: Already requested (player exists)");
+                }
+            } while (0);
             return this.vThumbPlayer.gui;
         }
         let player = new ThumbPlayer(this);
@@ -2941,17 +3468,22 @@ class Peer {
         return player.gui;
     }
     requestHiResVideo(resDivider, reuseVthumb) {
-        if (this.isLeaving) {
-            return null;
-        }
         let player = this.hiResPlayer;
         if (player) {
             if (player.resDivider != resDivider) {
-                console.warn("Peer.requestHiResVideo: Already requested, but with different res divider, updating it");
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Peer.requestHiResVideo: Already requested, but with different res divider, updating it");
+                    }
+                } while (0);
                 this.setHiResDivider(resDivider || 0);
             }
             else {
-                console.warn("Peer.requestHiResVideo: Already requested (player exists)");
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Peer.requestHiResVideo: Already requested (player exists)");
+                    }
+                } while (0);
             }
             return player.gui;
         }
@@ -2966,14 +3498,14 @@ class Peer {
         this.client.send(cmd);
         return player.gui;
     }
-    incomingVthumbTrack(info) {
-        let slot = this.client.inVideoTracks.get(info.mid);
+    incomingVthumbTrack(mid, reused) {
+        const slot = this.client.inVideoTracks.get(mid);
         if (!slot) {
-            this.client.logError("Unknown vtrack mid", info.mid);
+            this.client.logError("Unknown vtrack mid", mid);
             return;
         }
         this.vThumbSlot = slot;
-        slot.reassignV(this.cid, info.iv, false, info.r, () => {
+        slot.reassignV(this.cid, this.strIvs[TxTrackIndex.kVthumb], false, reused, () => {
             if (slot === this.vThumbSlot) {
                 delete this.vThumbSlot;
             }
@@ -2986,20 +3518,19 @@ class Peer {
             client_assert(this.vThumbPlayer);
         }
         this.vThumbPlayer.attachToTrack(slot);
-        this.handleSpecialCases();
     }
-    incomingHiResVideoTrack(info) {
-        let slot = this.client.inVideoTracks.get(info.mid);
+    incomingHiResVideoTrack(mid, reused) {
+        const slot = this.client.inVideoTracks.get(mid);
         if (!slot) {
-            this.client.logError("Unknown vtrack mid", info.mid);
+            this.client.logError("Unknown vtrack mid", mid);
             return;
         }
         this.hiResSlot = slot;
         if (this.vThumbSlot === slot) {
-            client_assert(info.r);
+            client_assert(reused);
             delete this.vThumbSlot;
         }
-        slot.reassignV(this.cid, info.iv, true, info.r, () => {
+        slot.reassignV(this.cid, this.strIvs[TxTrackIndex.kHiRes], true, reused, () => {
             if (this.hiResSlot === slot) {
                 delete this.hiResSlot;
             }
@@ -3012,29 +3543,58 @@ class Peer {
             client_assert(this.hiResPlayer);
         }
         this.hiResPlayer.attachToTrack(slot);
-        this.handleSpecialCases();
     }
     setHiResDivider(divider) {
         if (!this.hiResPlayer) {
-            console.warn("setHiResDivider: Currently not receiving a hi-res stream for this peer");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "setHiResDivider: Currently not receiving a hi-res stream for this peer");
+                }
+            } while (0);
             return;
         }
         if (divider < 0 || divider > 2) {
-            console.warn(`setHiResDivider: invalid resolution divider value (spatial layer offset) ${divider}, must be 0, 1 or 2`);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, `setHiResDivider: invalid resolution divider value (spatial layer offset) ${divider}, must be 0, 1 or 2`);
+                }
+            } while (0);
             return;
         }
         this.hiResPlayer.resDivider = divider;
         this.client.send({ a: "HIRES_SET_LO", cid: this.cid, lo: divider });
     }
-    onAvChange(av) {
+    onAvChange(msg) {
+        const av = msg.av;
         if (av === this.av) {
-            console.warn("Peer.onAvChange: No actual change in av flags");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Peer.onAvChange: No actual change in av flags");
+                }
+            } while (0);
             return;
         }
+        const oldAv = this.av;
         this.av = av;
-        this.handleSpecialCases();
-        this._fire("onPeerAvChange", av);
-        this._notifyPlayers("onAvChange", av);
+        try {
+            if ((oldAv ^ av) & Av.Audio) { // change in audio
+                if (av & Av.Audio) { // peer starts sending audio
+                    const mid = msg.amid;
+                    if (isNaN(mid)) {
+                        this.client.logError("Peer.onAvChange: No 'amid' specified when started sending audio");
+                        return;
+                    }
+                    this.onAudioStart(mid);
+                }
+                else {
+                    this.onAudioEnd();
+                }
+            }
+        }
+        finally {
+            this._fire("onPeerAvChange", av);
+            this._notifyPlayers("onAvChange", av);
+        }
     }
     _notifyPlayers(event, ...args) {
         if (this.vThumbPlayer) {
@@ -3052,36 +3612,62 @@ class Peer {
             }
         }
     }
-    handleSpecialCases() {
-    }
     sendsCameraAndScreen() {
         return Av.hasCamAndScreen(this.av);
     }
-    onSpeaker(slot) {
+    onSpeaker() {
         if (this._isSpeaker) {
-            this.client.logError("Peer.onSpeaker: Peer %d is already a speaker", this.cid);
+            this.client.logError(`Peer.onSpeaker: Peer ${this.cid} is already a speaker`);
             return;
         }
         this._isSpeaker = true;
-        let rx = this.audioReceiver = slot.xponder.receiver;
-        let player = this.audioPlayer = document.createElement("audio");
         this._fire("onPeerSpeaker");
-        this._notifyPlayers("onSpeaker", true);
+    }
+    onAudioStart(mid) {
+        if (!this._isSpeaker) {
+            this.client.logError(`Peer.onStartSpeak: Peer ${this.cid} is not a speaker`);
+            return;
+        }
+        // prepare track
+        const slot = this.client.inAudioTracks.get(mid);
+        if (!slot) {
+            this.client.logError("addPeerSpeaker: Unknown audio track mid", mid);
+            return;
+        }
+        slot.reassign(this.cid, this.strIvs[TxTrackIndex.kAudio]);
+        // connect track to a player
+        const rx = this.audioReceiver = slot.xponder.receiver;
+        const player = this.audioPlayer = document.createElement("audio");
         playerPlay(player, rx.track);
+        // setup speaker detector
         this.slowAudioLevel = 0.0;
         this.client._speakerDetector.registerPeer(this);
     }
     onNoSpeaker() {
         if (!this._isSpeaker) {
-            console.warn("Peer.onNoSpeaker: Peer %d was not a speaker", this.cid);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, `Peer.onNoSpeaker: Peer ${this.cid} was not a speaker`);
+                }
+            } while (0);
             return;
         }
         this._isSpeaker = false;
+        this._fire("onPeerNoSpeaker");
+    }
+    onAudioEnd() {
+        if (!this._isSpeaker) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, `Peer.onStopSpeak: Peer ${this.cid} is not a speaker`);
+                }
+            } while (0);
+            return;
+        }
         playerStop(this.audioPlayer);
         this.client._speakerDetector.unregisterPeer(this);
-        this._fire("onPeerNoSpeaker");
-        this._notifyPlayers("onSpeaker", false);
         delete this.audioPlayer;
+        delete this.audioReceiver;
     }
     requestAudioLevel(cb) {
         this._onAudioLevel = cb;
@@ -3108,10 +3694,18 @@ class Peer {
     _fire(evName, ...args) {
         let method = this.handler[evName];
         if (!method) {
-            console.warn(`Peer: Unhandled event: ${evName}(${args.join(",")})`);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, `Peer: Unhandled event: ${evName}(${args.join(",")})`);
+                }
+            } while (0);
             return;
         }
-        console.log(`fire [${evName}](${args.join(',')})`);
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, `fire [${evName}](${args.join(',')})`);
+            }
+        } while (0);
         try {
             if (args) {
                 method.call(this.handler, this, ...args);
@@ -3219,9 +3813,11 @@ class MicMuteMonitor {
             delete this.timer;
             this.fireWarning();
         }, MicMuteMonitor.kWarningTimeoutMs);
-        if (window.d) {
-            console.log("Started mic muted monitor");
-        }
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "Started mic muted monitor");
+            }
+        } while (0);
     }
     fireWarning() {
         this.muteIndicatorActive = true;
@@ -3323,15 +3919,19 @@ class SpeakerDetector {
         let prev = this.currSpeaker;
         this.currSpeaker = maxPeer;
         if (maxPeer) {
-            if (window.d) {
-                console.warn("Active speaker changed to", maxPeer.userId);
-            }
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Active speaker changed to", maxPeer.userId);
+                }
+            } while (0);
             client_assert(this.client.peers.get(maxPeer.cid));
         }
         else {
-            if (window.d) {
-                console.warn("Active speaker changed to us");
-            }
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Active speaker changed to us");
+                }
+            } while (0);
         }
         this.client.app.onActiveSpeakerChange(maxPeer, prev);
     }
@@ -3354,7 +3954,11 @@ class StatsRecorder {
     }
     onStats(sample) {
         if (!this.tsStart) {
-            console.warn("statsRecoder: onStats called while we are not started");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "statsRecoder: onStats called while we are not started");
+                }
+            } while (0);
             return;
         }
         let arrays = this.arrays;
@@ -3377,7 +3981,11 @@ class StatsRecorder {
     }
     submit(termReason) {
         if (!this.tsStart) {
-            console.warn("StatsRecorder.submit: was not started (tsStart is not set)");
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "StatsRecorder.submit: was not started (tsStart is not set)");
+                }
+            } while (0);
             return;
         }
         let arrs = this.arrays;
@@ -3421,12 +4029,20 @@ class StatsRecorder {
         if (client.url) {
             data.sfu = new URL(client.url).host;
         }
-        console.log(`Posting stats to ${SfuClient.kStatServerUrl}/stats:\n`, data);
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, `Posting stats to ${SfuClient.kStatServerUrl}/stats:\n`, data);
+            }
+        } while (0);
         fetch(SfuClient.kStatServerUrl + "/stats", {
             method: "POST",
             body: JSON.stringify(data)
         }).catch((ex) => {
-            console.warn("Failed to post stats:", ex.message);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Failed to post stats:", ex.message);
+                }
+            } while (0);
         });
     }
     static compressArray(arr) {
@@ -3475,6 +4091,8 @@ ns.playerPlay = playerPlay;
 ns.playerStop = playerStop;
 ns.binToHex = binToHex;
 ns.hexToBin = hexToBin;
+ns.base64ArrEncode = base64ArrEncode;
+ns.base64DecodeToArr = base64DecodeToArr;
 window.SfuClient = SfuClient;
 window.Av = Av;
 

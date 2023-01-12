@@ -24,18 +24,18 @@
                 --surface-alpha: 1;
                 border: unset;
                 box-shadow: var(--dialog-shadow);
-                height: 64px;
+                min-height: 64px;
+                height: auto;
                 left: 50%;
                 margin: 56px 0;
                 padding: 20px;
                 transform: translateX(-50%);
-                width: 640px;
+                width: 510px;
                 z-index: 100;
-                -webkit-transform: translateX(-50%);
+                align-items: center;
                 .chat-toast-close {
                     height: 36px;
                     position: relative;
-                    top: 4px;
                     width: 36px;
                     div:hover {
                         background: var(--surface-grey-2);
@@ -47,8 +47,8 @@
                 }
             }
             .toast-value-wrapper {
-                align-self: flex-start;
                 display: flex;
+                align-items: center;
             }
             i {
                 --icon-size: 24px;

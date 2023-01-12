@@ -1,19 +1,23 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
+import Button from './button.jsx';
 
 export const withMicObserver = Component =>
     class extends MegaRenderMixin {
         namespace = `SO-${Component.NAMESPACE}`;
         signalObserver = `onMicSignalDetected.${this.namespace}`;
         inputObserver = `onNoMicInput.${this.namespace}`;
+        sendObserver = `onAudioSendDenied.${this.namespace}`;
 
         state = {
-            signal: true
+            signal: true,
+            blocked: false
         };
 
         constructor(props) {
             super(props);
             this.renderSignalWarning = this.renderSignalWarning.bind(this);
+            this.renderBlockedWarning = this.renderBlockedWarning.bind(this);
         }
 
         unbindObservers() {
@@ -23,7 +27,18 @@ export const withMicObserver = Component =>
         bindObservers() {
             this.props.chatRoom
                 .rebind(this.signalObserver, ({ data: signal }) => this.setState({ signal }))
-                .rebind(this.inputObserver, () => this.setState({ signal: false }));
+                .rebind(this.inputObserver, () => this.setState({ signal: false }))
+                .rebind(this.sendObserver, () => {
+                    this.setState({ blocked: true }, () => {
+                        if (this.props.minimized) {
+                            const toast = new ChatToast(
+                                l.max_speakers_toast,
+                                { icon: 'sprite-fm-uni icon-hazard', close: true }
+                            );
+                            toast.dispatch();
+                        }
+                    });
+                });
         }
 
         renderSignalDialog() {
@@ -50,6 +65,22 @@ export const withMicObserver = Component =>
             );
         }
 
+        renderBlockedWarning() {
+            return (
+                <div className="stream-toast theme-dark-forced">
+                    <div className="stream-toast-content">
+                        <i className="stream-toast-icon sprite-fm-uni icon-warning" />
+                        <div className="stream-toast-message">{l.max_speakers_toast}</div>
+                        <Button
+                            className="mega-button action stream-toast-close"
+                            icon="sprite-fm-mono icon-close-component"
+                            onClick={() => this.setState({ blocked: false })}
+                        />
+                    </div>
+                </div>
+            );
+        }
+
         componentWillUnmount() {
             super.componentWillUnmount();
             this.unbindObservers();
@@ -66,6 +97,8 @@ export const withMicObserver = Component =>
                     {...this.props}
                     signal={this.state.signal}
                     renderSignalWarning={this.renderSignalWarning}
+                    blocked={this.state.blocked}
+                    renderBlockedWarning={this.renderBlockedWarning}
                 />
             );
         }

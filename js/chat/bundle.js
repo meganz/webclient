@@ -7996,8 +7996,7 @@ ContactsPanel.resetCredentials = contact => {
   if (M.isInvalidUserStatus()) {
     return;
   }
-  authring.resetFingerprintsForUser(contact.u);
-  contact.trackDataChange();
+  authring.resetFingerprintsForUser(contact.u).then(() => contact.trackDataChange()).catch(dump);
 };
 ContactsPanel.getUserFingerprint = handle => {
   const $$FINGERPRINT = [];

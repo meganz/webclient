@@ -116,7 +116,7 @@
         $dialog.find('.reset-credentials-button').rebind('click', function() {
 
             // Reset the authring for the user and show the success message
-            authring.resetFingerprintsForUser(CredentialsWarningDialog.contactHandle);
+            authring.resetFingerprintsForUser(CredentialsWarningDialog.contactHandle).catch(dump);
 
             // If they're already on the contact's page, reload the fingerprint info
             if (getSitePath() === '/fm/' + CredentialsWarningDialog.contactHandle) {

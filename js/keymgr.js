@@ -100,17 +100,23 @@ lazy(mega, 'keyMgr', () => {
             set(value) {
                 const valid = value === undefined || isValidMasterKey(value);
 
-                if (!valid || value && mega.keyMgr.equal(value, gMasterKey || [])) {
-                    logger.error('Forbidden attempt to replace the master-key...', !!value);
+                if (!valid || value
+                    && mega.keyMgr.equal(Uint32Array.from(value), Uint32Array.from(gMasterKey || []))) {
+
+                    if (!valid || mega.keyMgr.version) {
+                        logger.error('Forbidden attempt to replace the master-key...', !!value);
+                    }
                     return;
                 }
 
                 if (d) {
+                    const user = window.u_handle || $.createanonuser || 'anon';
+
                     if (gMasterKey) {
-                        logger.warn('%s master-key for user %s...', value ? 'Replacing' : 'Removing', u_handle);
+                        logger.warn('%s master-key for user %s...', value ? 'Replacing' : 'Removing', user);
                     }
                     else {
-                        logger.warn('Establishing new master-key for user %s.', u_handle);
+                        logger.warn('Establishing new master-key for user %s.', user);
                     }
                 }
 

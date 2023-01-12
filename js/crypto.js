@@ -1291,11 +1291,10 @@ mBroadcaster.once('startMega', function() {
 });
 
 function api_create_u_k() {
-    u_k = Array(4); // static master key, will be stored at the server side encrypted with the master pw
+    'use strict';
 
-    for (var i = 4; i--;) {
-        u_k[i] = rand(0x100000000);
-    }
+    // static master key, will be stored at the server side encrypted with the master pw
+    u_k = [...crypto.getRandomValues(new Uint32Array(4))];
 }
 
 // If the user triggers an action that requires an account, but hasn't logged in,

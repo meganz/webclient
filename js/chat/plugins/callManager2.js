@@ -18,7 +18,7 @@
     };
     const DOWNGRADING_QUALITY_INTRVL = 2000;
 
-/**                        ==== Overview of peer & local video rendering ====
+ /**                        ==== Overview of peer & local video rendering ====
  * The app creates a StreamNode React component for each video it wants to display - for peers, local camera,
  * thumbnail and large viewports. The StreamNode is passed a "stream" object (implementing an imaginary
  * StreamSource interface), which is responsible for providing the video. For peers, this is the Peer object.
@@ -162,7 +162,7 @@
             }
             this.doGetVideoWithQuality(newQ);
         }
-        noVideoForSmoothSwitching() {
+        noVideoSlotsForSmoothSwitch() {
             return this.call.numVideoTracksUsed < SfuClient.numInputVideoTracks - 1;
         }
         /** Get a video stream that satisfies the quality minimum for all consumers
@@ -233,7 +233,7 @@
         }
         requestHdStream(resDivider) {
             const peer = this.sfuPeer;
-            if (this.noVideoForSmoothSwitching() && peer.vThumbPlayer) {
+            if (this.noVideoSlotsForSmoothSwitch() && peer.vThumbPlayer) {
                 peer.vThumbPlayer.destroy();
             }
             const hdPlayer = peer.hiResPlayer;
@@ -271,7 +271,7 @@
                 }
                 return;
             }
-            if (this.noVideoForSmoothSwitching() && peer.hiResPlayer) {
+            if (this.noVideoSlotsForSmoothSwitch() && peer.hiResPlayer) {
                 peer.hiResPlayer.destroy();
             }
             this.setResState(RES_STATE.THUMB_PENDING);
@@ -459,11 +459,9 @@
         onBadNetwork(e) {
             this.chatRoom.trigger('onBadNetwork', e);
         }
-
-        onTrackAllocated() {
+        onTrackAllocated(playerData) {
             this.numVideoTracksUsed++;
         }
-
         onTrackReleased(playerData) {
             this.numVideoTracksUsed--;
             // console.log("onTrackRelease:", this.numVideoTracksUsed);
@@ -483,6 +481,9 @@
         }
         onLocalMediaError(errObj) {
             megaChat.trigger('onLocalMediaError', errObj);
+        }
+        onAudioSendDenied(msg) {
+            this.chatRoom.trigger('onAudioSendDenied');
         }
         toggleAudio() {
             this.sfuApp.sfuClient.muteAudio(!this.sfuApp.sfuClient.localAudioMuted());
@@ -1178,9 +1179,10 @@
             if (eventData.arg) {
                 megaChat.trigger('onOutgoingCallRinging', [chatRoom, eventData.callId, eventData.userId, this]);
             }
-            else if (!activeCall.hasOtherParticipant()) {
-                // ringing stopped in a 1on1 call, hangup if it's only us in the call
-                chatRoom.trigger('onCallLeft', {callId: eventData.callId});
+            else { // ringing stopped in a 1on1 call, hangup if it's only us in the call
+                if (!activeCall.hasOtherParticipant()) {
+                    chatRoom.trigger('onCallLeft', { callId: eventData.callId });
+                }
             }
             return;
         }

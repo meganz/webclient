@@ -106,7 +106,7 @@ class StreamControls extends MegaRenderMixin {
     render() {
         const {
             call, chatRoom, signal, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick, renderSignalWarning,
-            hasToRenderPermissionsWarning, renderPermissionsWarning, resetError,
+            hasToRenderPermissionsWarning, renderPermissionsWarning, resetError, blocked, renderBlockedWarning
         } = this.props;
         const avFlags = call.av;
         const audioLabel = avFlags & Av.Audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */;
@@ -117,63 +117,66 @@ class StreamControls extends MegaRenderMixin {
         // -------------------------------------------------------------------------
 
         return (
-            <div className={StreamControls.NAMESPACE}>
-                {d ? this.renderDebug() : ''}
-                <ul>
-                    <li>
-                        <Button
-                            simpletip={{ ...this.SIMPLETIP, label: audioLabel }}
-                            className={`
-                                mega-button
-                                theme-light-forced
-                                round
-                                large
-                                ${avFlags & Av.onHold ? 'disabled' : ''}
-                                ${avFlags & Av.Audio ? '' : 'inactive'}
-                            `}
-                            icon={`${avFlags & Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`}
-                            onClick={() => {
-                                resetError(Av.Audio);
-                                onAudioClick();
-                            }}>
-                            <span>{audioLabel}</span>
-                        </Button>
-                        {signal ? null : renderSignalWarning()}
-                        {hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null}
-                    </li>
-                    <li>
-                        <Button
-                            simpletip={{ ...this.SIMPLETIP, label: videoLabel }}
-                            className={`
-                                mega-button
-                                theme-light-forced
-                                round
-                                large
-                                ${avFlags & Av.onHold ? 'disabled' : ''}
-                                ${avFlags & Av.Camera ? '' : 'inactive'}
-                            `}
-                            icon={`${avFlags & Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`}
-                            onClick={() => {
-                                resetError(Av.Camera);
-                                onVideoClick();
-                            }}>
-                            <span>{videoLabel}</span>
-                        </Button>
-                        {hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null}
-                    </li>
-                    <li>
-                        <StreamExtendedControls
-                            call={call}
-                            chatRoom={chatRoom}
-                            onScreenSharingClick={onScreenSharingClick}
-                            onHoldClick={onHoldClick}
-                        />
-                    </li>
-                    <li>
-                        {this.renderEndCall()}
-                    </li>
-                </ul>
-            </div>
+            <>
+                {blocked && renderBlockedWarning()}
+                <div className={StreamControls.NAMESPACE}>
+                    {d ? this.renderDebug() : ''}
+                    <ul>
+                        <li>
+                            <Button
+                                simpletip={{ ...this.SIMPLETIP, label: audioLabel }}
+                                className={`
+                                    mega-button
+                                    theme-light-forced
+                                    round
+                                    large
+                                    ${avFlags & Av.onHold ? 'disabled' : ''}
+                                    ${avFlags & Av.Audio ? '' : 'inactive'}
+                                `}
+                                icon={`${avFlags & Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`}
+                                onClick={() => {
+                                    resetError(Av.Audio);
+                                    onAudioClick();
+                                }}>
+                                <span>{audioLabel}</span>
+                            </Button>
+                            {signal ? null : renderSignalWarning()}
+                            {hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null}
+                        </li>
+                        <li>
+                            <Button
+                                simpletip={{ ...this.SIMPLETIP, label: videoLabel }}
+                                className={`
+                                    mega-button
+                                    theme-light-forced
+                                    round
+                                    large
+                                    ${avFlags & Av.onHold ? 'disabled' : ''}
+                                    ${avFlags & Av.Camera ? '' : 'inactive'}
+                                `}
+                                icon={`${avFlags & Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`}
+                                onClick={() => {
+                                    resetError(Av.Camera);
+                                    onVideoClick();
+                                }}>
+                                <span>{videoLabel}</span>
+                            </Button>
+                            {hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null}
+                        </li>
+                        <li>
+                            <StreamExtendedControls
+                                call={call}
+                                chatRoom={chatRoom}
+                                onScreenSharingClick={onScreenSharingClick}
+                                onHoldClick={onHoldClick}
+                            />
+                        </li>
+                        <li>
+                            {this.renderEndCall()}
+                        </li>
+                    </ul>
+                </div>
+            </>
         );
     }
 }

@@ -8267,6 +8267,7 @@ var fmView = __webpack_require__(309);
 
 
 
+const MIN_SEARCH_LENGTH = 2;
 class CloudBrowserDialog extends mixins.wl {
   constructor(props) {
     super(props);
@@ -8349,14 +8350,15 @@ class CloudBrowserDialog extends mixins.wl {
   onSearchChange(e) {
     var searchValue = e.target.value;
     const newState = {
-      searchText: searchValue
+      searchText: searchValue,
+      nodeLoading: searchValue.length >= MIN_SEARCH_LENGTH
     };
-    if (searchValue && searchValue.length >= 3) {
+    if (searchValue && searchValue.length >= MIN_SEARCH_LENGTH) {
       this.setState(newState);
       delay('cbd:search-proc', this.searchProc.bind(this), 500);
       return;
     }
-    if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < 3)) {
+    if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < MIN_SEARCH_LENGTH)) {
       newState.currentlyViewedEntry = this.state.selectedTab === 'shares' ? 'shares' : M.RootID;
       newState.searchValue = undefined;
     }
@@ -8370,7 +8372,7 @@ class CloudBrowserDialog extends mixins.wl {
     const newState = {
       nodeLoading: true
     };
-    if (searchText && searchText.length >= 3) {
+    if (searchText && searchText.length >= MIN_SEARCH_LENGTH) {
       this.setState(newState);
       M.fmSearchNodes(searchText).then(() => {
         newState.nodeLoading = false;
@@ -8518,7 +8520,7 @@ class CloudBrowserDialog extends mixins.wl {
       });
     }
     var clearSearchBtn = null;
-    if (self.state.searchText.length >= 3) {
+    if (self.state.searchText.length >= MIN_SEARCH_LENGTH) {
       clearSearchBtn = external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-close-component",
         onClick: () => {
@@ -8602,6 +8604,7 @@ class CloudBrowserDialog extends mixins.wl {
       initialSelected: this.state.selected,
       initialHighlighted: this.state.highlighted,
       searchValue: this.state.searchValue,
+      minSearchLength: MIN_SEARCH_LENGTH,
       onExpand: this.onExpand,
       viewMode: viewMode,
       initialSortBy: ['name', 'asc'],
@@ -25671,7 +25674,8 @@ class FMView extends mixins.wl {
     var sortBy = newState && newState.sortBy || self.state.sortBy;
     var order = sortBy[1] === "asc" ? 1 : -1;
     var entries = [];
-    if (self.props.currentlyViewedEntry === "search" && self.props.searchValue && self.props.searchValue.length >= 3) {
+    const minSearchLength = self.props.minSearchLength || 3;
+    if (self.props.currentlyViewedEntry === "search" && self.props.searchValue && self.props.searchValue.length >= minSearchLength) {
       M.getFilterBy(M.getFilterBySearchFn(self.props.searchValue)).forEach(function (n) {
         if (!n.h || n.h.length === 11 || n.fv) {
           return;

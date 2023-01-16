@@ -115,10 +115,12 @@ export default class FMView extends MegaRenderMixin {
         var order = sortBy[1] === "asc" ? 1 : -1;
         var entries = [];
 
+        const minSearchLength = self.props.minSearchLength || 3;
+
         if (
             self.props.currentlyViewedEntry === "search" &&
             self.props.searchValue &&
-            self.props.searchValue.length >= 3
+            self.props.searchValue.length >= minSearchLength
         ) {
             M.getFilterBy(M.getFilterBySearchFn(self.props.searchValue))
                 .forEach(function(n) {

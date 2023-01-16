@@ -571,6 +571,14 @@ mega.textEditorUI = new function TextEditorUI() {
             if (page !== 'download') {
                 eventlog(99807);
             }
+
+            const $getLink = $('.file-menu .get-link-f', $menuBar);
+            if (M.currentrootid === 'shares') {
+                $getLink.addClass('hidden');
+            }
+            else {
+                $getLink.removeClass('hidden');
+            }
         });
     };
 

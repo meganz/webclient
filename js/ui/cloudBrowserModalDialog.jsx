@@ -5,6 +5,8 @@ import ViewModeSelector from "./jsx/fm/viewModeSelector.jsx";
 import Breadcrumbs from "./jsx/fm/breadcrumbs.jsx";
 import FMView from "./jsx/fm/fmView.jsx";
 
+const MIN_SEARCH_LENGTH = 2;
+
 class CloudBrowserDialog extends MegaRenderMixin {
     static defaultProps = {
         'selectLabel': l[8023],
@@ -104,14 +106,15 @@ class CloudBrowserDialog extends MegaRenderMixin {
     onSearchChange(e) {
         var searchValue = e.target.value;
         const newState = {
-            searchText: searchValue
+            searchText: searchValue,
+            nodeLoading: searchValue.length >= MIN_SEARCH_LENGTH,
         };
-        if (searchValue && searchValue.length >= 3) {
+        if (searchValue && searchValue.length >= MIN_SEARCH_LENGTH) {
             this.setState(newState);
             delay('cbd:search-proc', this.searchProc.bind(this), 500);
             return;
         }
-        if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < 3)) {
+        if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < MIN_SEARCH_LENGTH)) {
             newState.currentlyViewedEntry = this.state.selectedTab === 'shares' ? 'shares' : M.RootID;
             newState.searchValue = undefined;
         }
@@ -124,7 +127,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         const newState = {
             nodeLoading: true,
         };
-        if (searchText && searchText.length >= 3) {
+        if (searchText && searchText.length >= MIN_SEARCH_LENGTH) {
             this.setState(newState);
             M.fmSearchNodes(searchText).then(() => {
                 newState.nodeLoading = false;
@@ -301,7 +304,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         }
 
         var clearSearchBtn = null;
-        if (self.state.searchText.length >= 3) {
+        if (self.state.searchText.length >= MIN_SEARCH_LENGTH) {
             clearSearchBtn = (
                 <i
                     className="sprite-fm-mono icon-close-component"
@@ -400,6 +403,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                             initialSelected={this.state.selected}
                             initialHighlighted={this.state.highlighted}
                             searchValue={this.state.searchValue}
+                            minSearchLength={MIN_SEARCH_LENGTH}
                             onExpand={this.onExpand}
                             viewMode={viewMode}
 

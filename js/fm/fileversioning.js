@@ -114,6 +114,8 @@ var versiondialogid;
                     versiondialogid = undefined;
                     $(document).off('keydown.fileversioningKeydown');
                     $(window).unbind('resize.fileversioning');
+
+                    mBroadcaster.sendMessage('mega:close_fileversioning');
                 }
                 else {
                     fileversioning.updateFileVersioningDialog();

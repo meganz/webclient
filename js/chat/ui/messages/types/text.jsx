@@ -155,7 +155,11 @@ export default class Text extends AbstractGenericMessage {
         if (messageActionButtons) {
             returnedButtons.push(messageActionButtons);
         }
-        if (message.messageHtml.includes('<pre class="rtf-multi">') && message.messageHtml.includes('</pre>')) {
+        if (
+            message.messageHtml
+            && message.messageHtml.includes('<pre class="rtf-multi">')
+            && message.messageHtml.includes('</pre>')
+        ) {
             returnedButtons.push(
                 <Button
                     key="copy-msg"

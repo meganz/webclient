@@ -1785,12 +1785,6 @@ function mObjectURL(data, type)
                             }
                             delete localStorage['mCrossTabRef_' + u_handle];
                             this.setMaster();
-                            //if (u_handle && window.indexedDB) {
-                            //    mDBstart(true);
-                            //}
-                            if (Object(window.fmdb).crashed === 666) {
-                                fmdb.crashed = 0;
-                            }
                         }
                     }
                 default:

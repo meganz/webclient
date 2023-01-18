@@ -1035,8 +1035,22 @@ function mKeyDialog(ph, fl, keyr, selector) {
         M.safeShowDialog('dlkey-dialog', $dialog);
     }
 
+    const processKeyboardEvent = (evt) => {
+        if (evt.key === 'Escape') {
+            // Adhering to overlay's behaviour here, blocking the esc click
+            evt.preventDefault();
+            evt.stopPropagation();
+        }
+    };
+
     $('.js-close', $dialog).rebind('click.keydlg', () => {
         loadSubPage('start');
+    });
+
+    document.addEventListener('keydown', processKeyboardEvent);
+
+    $dialog.rebind('dialog-closed.dlkey', () => {
+        document.removeEventListener('keydown', processKeyboardEvent);
     });
 
     $input.rebind('input keypress', function(e) {

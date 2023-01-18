@@ -21454,7 +21454,7 @@ class Text extends AbstractGenericMessage {
     if (messageActionButtons) {
       returnedButtons.push(messageActionButtons);
     }
-    if (message.messageHtml.includes('<pre class="rtf-multi">') && message.messageHtml.includes('</pre>')) {
+    if (message.messageHtml && message.messageHtml.includes('<pre class="rtf-multi">') && message.messageHtml.includes('</pre>')) {
       returnedButtons.push(external_React_default().createElement(buttons.z, {
         key: "copy-msg",
         className: "tiny-button simpletip copy-txt-block",

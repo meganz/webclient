@@ -1084,7 +1084,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                     // Check whether the user logged in MEGAsync does match here
                     if (syncData.u === u_handle) {
                         // Let MEGAsync open the local file selector.
-                        megasync.megaSyncRequest({a: 'u'});
+                        megasync.uploadFile(M.currentdirid);
                     }
                 }
             });

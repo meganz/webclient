@@ -60,7 +60,6 @@ class PlayerData {
     SfuApp.prototype.onPeerLeft = function(peer, reason) {
         this.callManagerCall.onPeerLeft(peer, reason);
     };
-
     SfuApp.prototype.onJoined = function() {
         for (const peer of this.sfuClient.peers.values()) {
             this.callManagerCall.onPeerJoined(peer, true);
@@ -141,8 +140,22 @@ class PlayerData {
                 hmac("webrtc pairwise key\x01", hmac(sharedSecret, ''))
             ).substring(0, 16));
     };
-
-    SfuApp.prototype.encryptKeyTo = async function(key, userId) {
+    SfuApp.prototype.signString = async function(str) {
+        var detachedSignature = nacl.sign.detached(
+            asmCrypto.string_to_bytes(str),
+            asmCrypto.string_to_bytes(u_privEd25519 + u_pubEd25519));
+        return SfuClient.base64ArrEncode(detachedSignature.buffer);
+    };
+    SfuApp.prototype.verifySignature = function(msg, signature, userId) {
+        const userPubKey = pubEd25519[userId];
+        if (!userPubKey) {
+            throw new Error(`verifySignature: No pubEd25519 key found for user ${userId}`);
+        }
+        return backgroundNacl.sign.detached.verify(
+            asmCrypto.string_to_bytes(msg), SfuClient.base64DecodeToArr(signature),
+            asmCrypto.string_to_bytes(userPubKey));
+    };
+    SfuApp.prototype.encryptKeyToUser = async function(key, userId) {
         // console.error("encryptKeyTo", ab_to_str(key), userId);
         assert(key);
         assert(userId);
@@ -152,7 +165,7 @@ class PlayerData {
         return base64urlencode(asmCrypto.bytes_to_string(
             asmCrypto.AES_ECB.encrypt(key, userSharedKey, false)));
     };
-    SfuApp.prototype.decryptKeyFrom = async function(key, userId) {
+    SfuApp.prototype.decryptKeyFromUser = async function(key, userId) {
         // console.error("decryptKeyFrom", key, userId);
         assert(key);
         assert(userId);
@@ -179,6 +192,7 @@ class PlayerData {
     [
         'onLocalMediaChange',
         'onLocalMediaError',
+        'onAudioSendDenied',
         'onNoMicInput',
         'onMicSignalDetected',
         'onBadNetwork'

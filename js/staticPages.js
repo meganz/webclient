@@ -265,11 +265,13 @@ mBroadcaster.once('boot_done', () => {
         }
         else {
             const $dlg = $('.loginrequired-dialog', '.common-container');
+            $dlg.addClass('with-close-btn');
             $('header h2', $dlg).text(l[5841]);
             $('header p', $dlg).text(l[5842]);
-            $($dlg).addClass('pro' + selectedPlan);
+            $dlg.addClass(`pro${selectedPlan}`);
             $('.js-close', $dlg).rebind('click', () => {
-                $($dlg).removeClass('pro1 pro2 pro3 pro4');
+                $dlg.removeClass('with-close-btn');
+                $dlg.removeClass('pro1 pro2 pro3 pro4');
                 closeDialog();
             });
             $('.pro-login').rebind('click', mega.redirect.bind(mega, 'mega.nz', 'login', kvLogin, null));

@@ -239,3 +239,37 @@
         right: 21px;
     }
 }
+
+.stream-toast {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: 100px;
+    width: 100%;
+    z-index: 20;
+
+    &-content {
+        display: flex;
+        align-items: center;
+        width: 430px;
+        padding: 14px;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+        background: var(--surface-main);
+
+        .stream-toast-icon {
+            --icon-size: 20px;
+        }
+
+        .stream-toast-message {
+            padding: 0 14px 0;
+            color: var(--text-color-high);
+        }
+
+        .stream-toast-close {
+            --icon-size: 20px;
+            justify-content: center;
+        }
+    }
+}

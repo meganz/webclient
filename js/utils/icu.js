@@ -76,7 +76,7 @@ lazy(mega, 'icu', () => {
          * @param {Number} count    The count of counted items in the rule
          * @returns {Boolean}       True if ICU/Plural
          */
-        format: (msg, count) => {
+        format: (msg, count, localizeCount) => {
             if (d && window.dstringids) {
                 return msg;
             }
@@ -128,9 +128,10 @@ lazy(mega, 'icu', () => {
                 return String(msg);
             }
 
-            let val = stringDic[count] || stringDic[plural.select(count)] || stringDic['other'];
+            let val = stringDic[count] || stringDic[plural.select(count)] || stringDic.other;
+
             if (val) {
-                val = val.replace(/#/g, count);
+                val = val.replace(/#/g, localizeCount ? mega.intl.decimal.format(count) : count);
                 const beginTxt = msg.substring(0, icuBody.index);
                 const endTxt = msg.substring(icuBody.index + icuBody[1].length, msg.length);
                 return beginTxt + val + endTxt;

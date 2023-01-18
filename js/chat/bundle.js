@@ -8267,6 +8267,7 @@ var fmView = __webpack_require__(309);
 
 
 
+const MIN_SEARCH_LENGTH = 2;
 class CloudBrowserDialog extends mixins.wl {
   constructor(props) {
     super(props);
@@ -8349,14 +8350,15 @@ class CloudBrowserDialog extends mixins.wl {
   onSearchChange(e) {
     var searchValue = e.target.value;
     const newState = {
-      searchText: searchValue
+      searchText: searchValue,
+      nodeLoading: searchValue.length >= MIN_SEARCH_LENGTH
     };
-    if (searchValue && searchValue.length >= 3) {
+    if (searchValue && searchValue.length >= MIN_SEARCH_LENGTH) {
       this.setState(newState);
       delay('cbd:search-proc', this.searchProc.bind(this), 500);
       return;
     }
-    if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < 3)) {
+    if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < MIN_SEARCH_LENGTH)) {
       newState.currentlyViewedEntry = this.state.selectedTab === 'shares' ? 'shares' : M.RootID;
       newState.searchValue = undefined;
     }
@@ -8370,7 +8372,7 @@ class CloudBrowserDialog extends mixins.wl {
     const newState = {
       nodeLoading: true
     };
-    if (searchText && searchText.length >= 3) {
+    if (searchText && searchText.length >= MIN_SEARCH_LENGTH) {
       this.setState(newState);
       M.fmSearchNodes(searchText).then(() => {
         newState.nodeLoading = false;
@@ -8518,7 +8520,7 @@ class CloudBrowserDialog extends mixins.wl {
       });
     }
     var clearSearchBtn = null;
-    if (self.state.searchText.length >= 3) {
+    if (self.state.searchText.length >= MIN_SEARCH_LENGTH) {
       clearSearchBtn = external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-close-component",
         onClick: () => {
@@ -8602,6 +8604,7 @@ class CloudBrowserDialog extends mixins.wl {
       initialSelected: this.state.selected,
       initialHighlighted: this.state.highlighted,
       searchValue: this.state.searchValue,
+      minSearchLength: MIN_SEARCH_LENGTH,
       onExpand: this.onExpand,
       viewMode: viewMode,
       initialSortBy: ['name', 'asc'],
@@ -16675,16 +16678,20 @@ const streamExtendedControls = ((0,mixins.qC)(permissionsObserver.Q)(StreamExten
 
 
 
+
 const withMicObserver = Component => class extends mixins.wl {
   constructor(props) {
     super(props);
     this.namespace = `SO-${Component.NAMESPACE}`;
     this.signalObserver = `onMicSignalDetected.${this.namespace}`;
     this.inputObserver = `onNoMicInput.${this.namespace}`;
+    this.sendObserver = `onAudioSendDenied.${this.namespace}`;
     this.state = {
-      signal: true
+      signal: true,
+      blocked: false
     };
     this.renderSignalWarning = this.renderSignalWarning.bind(this);
+    this.renderBlockedWarning = this.renderBlockedWarning.bind(this);
   }
   unbindObservers() {
     [this.signalObserver, this.inputObserver].map(observer => this.props.chatRoom.unbind(observer));
@@ -16696,7 +16703,19 @@ const withMicObserver = Component => class extends mixins.wl {
       signal
     })).rebind(this.inputObserver, () => this.setState({
       signal: false
-    }));
+    })).rebind(this.sendObserver, () => {
+      this.setState({
+        blocked: true
+      }, () => {
+        if (this.props.minimized) {
+          const toast = new ChatToast(l.max_speakers_toast, {
+            icon: 'sprite-fm-uni icon-hazard',
+            close: true
+          });
+          toast.dispatch();
+        }
+      });
+    });
   }
   renderSignalDialog() {
     return msgDialog('warningb', null, l.no_mic_title, l.chat_mic_off_tooltip, null, 1);
@@ -16717,6 +16736,23 @@ const withMicObserver = Component => class extends mixins.wl {
       className: "sprite-fm-mono icon-exclamation-filled"
     }));
   }
+  renderBlockedWarning() {
+    return external_React_default().createElement("div", {
+      className: "stream-toast theme-dark-forced"
+    }, external_React_default().createElement("div", {
+      className: "stream-toast-content"
+    }, external_React_default().createElement("i", {
+      className: "stream-toast-icon sprite-fm-uni icon-warning"
+    }), external_React_default().createElement("div", {
+      className: "stream-toast-message"
+    }, l.max_speakers_toast), external_React_default().createElement(meetings_button.Z, {
+      className: "mega-button action stream-toast-close",
+      icon: "sprite-fm-mono icon-close-component",
+      onClick: () => this.setState({
+        blocked: false
+      })
+    })));
+  }
   componentWillUnmount() {
     super.componentWillUnmount();
     this.unbindObservers();
@@ -16728,7 +16764,9 @@ const withMicObserver = Component => class extends mixins.wl {
   render() {
     return external_React_default().createElement(Component, (0,esm_extends.Z)({}, this.props, {
       signal: this.state.signal,
-      renderSignalWarning: this.renderSignalWarning
+      renderSignalWarning: this.renderSignalWarning,
+      blocked: this.state.blocked,
+      renderBlockedWarning: this.renderBlockedWarning
     }));
   }
 };
@@ -16848,12 +16886,14 @@ class StreamControls extends mixins.wl {
       renderSignalWarning,
       hasToRenderPermissionsWarning,
       renderPermissionsWarning,
-      resetError
+      resetError,
+      blocked,
+      renderBlockedWarning
     } = this.props;
     const avFlags = call.av;
     const audioLabel = avFlags & Av.Audio ? l[16214] : l[16708];
     const videoLabel = avFlags & Av.Camera ? l[22894] : l[22893];
-    return external_React_default().createElement("div", {
+    return external_React_default().createElement((external_React_default()).Fragment, null, blocked && renderBlockedWarning(), external_React_default().createElement("div", {
       className: StreamControls.NAMESPACE
     }, d ? this.renderDebug() : '', external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
       simpletip: {
@@ -16861,13 +16901,13 @@ class StreamControls extends mixins.wl {
         label: audioLabel
       },
       className: `
-                                mega-button
-                                theme-light-forced
-                                round
-                                large
-                                ${avFlags & Av.onHold ? 'disabled' : ''}
-                                ${avFlags & Av.Audio ? '' : 'inactive'}
-                            `,
+                                    mega-button
+                                    theme-light-forced
+                                    round
+                                    large
+                                    ${avFlags & Av.onHold ? 'disabled' : ''}
+                                    ${avFlags & Av.Audio ? '' : 'inactive'}
+                                `,
       icon: `${avFlags & Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`,
       onClick: () => {
         resetError(Av.Audio);
@@ -16879,13 +16919,13 @@ class StreamControls extends mixins.wl {
         label: videoLabel
       },
       className: `
-                                mega-button
-                                theme-light-forced
-                                round
-                                large
-                                ${avFlags & Av.onHold ? 'disabled' : ''}
-                                ${avFlags & Av.Camera ? '' : 'inactive'}
-                            `,
+                                    mega-button
+                                    theme-light-forced
+                                    round
+                                    large
+                                    ${avFlags & Av.onHold ? 'disabled' : ''}
+                                    ${avFlags & Av.Camera ? '' : 'inactive'}
+                                `,
       icon: `${avFlags & Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`,
       onClick: () => {
         resetError(Av.Camera);
@@ -16896,7 +16936,7 @@ class StreamControls extends mixins.wl {
       chatRoom: chatRoom,
       onScreenSharingClick: onScreenSharingClick,
       onHoldClick: onHoldClick
-    })), external_React_default().createElement("li", null, this.renderEndCall())));
+    })), external_React_default().createElement("li", null, this.renderEndCall()))));
   }
 }
 StreamControls.NAMESPACE = 'stream-controls';
@@ -17945,6 +17985,7 @@ class stream_Stream extends mixins.wl {
       className: "call-overlay"
     }), this.renderStreamContainer(), external_React_default().createElement(streamControls, {
       call: call,
+      minimized: minimized,
       streams: streams,
       chatRoom: chatRoom,
       onAudioClick: onAudioClick,
@@ -21413,7 +21454,7 @@ class Text extends AbstractGenericMessage {
     if (messageActionButtons) {
       returnedButtons.push(messageActionButtons);
     }
-    if (message.messageHtml.includes('<pre class="rtf-multi">') && message.messageHtml.includes('</pre>')) {
+    if (message.messageHtml && message.messageHtml.includes('<pre class="rtf-multi">') && message.messageHtml.includes('</pre>')) {
       returnedButtons.push(external_React_default().createElement(buttons.z, {
         key: "copy-msg",
         className: "tiny-button simpletip copy-txt-block",
@@ -25633,7 +25674,8 @@ class FMView extends mixins.wl {
     var sortBy = newState && newState.sortBy || self.state.sortBy;
     var order = sortBy[1] === "asc" ? 1 : -1;
     var entries = [];
-    if (self.props.currentlyViewedEntry === "search" && self.props.searchValue && self.props.searchValue.length >= 3) {
+    const minSearchLength = self.props.minSearchLength || 3;
+    if (self.props.currentlyViewedEntry === "search" && self.props.searchValue && self.props.searchValue.length >= minSearchLength) {
       M.getFilterBy(M.getFilterBySearchFn(self.props.searchValue)).forEach(function (n) {
         if (!n.h || n.h.length === 11 || n.fv) {
           return;

@@ -106,8 +106,8 @@
             }
             else {
                 this.source = (newState === RES_STATE.HD || newState === RES_STATE.THUMB_PENDING)
-                    ? this.sfuPeer.hiResPlayer && this.sfuPeer.hiResPlayer.gui.video
-                    : this.sfuPeer.vThumbPlayer && this.sfuPeer.vThumbPlayer.gui.video;
+                    ? (this.sfuPeer.hiResPlayer && this.sfuPeer.hiResPlayer.gui.video)
+                    : (this.sfuPeer.vThumbPlayer && this.sfuPeer.vThumbPlayer.gui.video);
             }
             // console.warn(`setResState[${this.clientId}]: ->`, newState, this.source);
             if (this.source !== oldSource) {
@@ -127,6 +127,9 @@
         }
         registerConsumer(consumerGui) {
             this.consumers.add(consumerGui);
+            if (this.source && !consumerGui.clonedVideo) {
+                Promise.resolve(this.source.play()).catch(nop);
+            }
         }
         deregisterConsumer(consumerGui) {
             this.consumers.delete(consumerGui);
@@ -166,11 +169,13 @@
             return this.call.numVideoTracksUsed < SfuClient.numInputVideoTracks - 1;
         }
         /** Get a video stream that satisfies the quality minimum for all consumers
-         * @returns {boolean} - true if video source changed synchronously, which can happen only if video was disabled
+         * @returns {boolean} - true if video source changed synchronously, which can happen only if video was disabled,
+         * or if there was no free slot for parallel request to change hi-res<->vthumb quality
          */
         updateVideoQuality() {
             // if no free tracks, change the quality "in-place", rather than using a second track for smooth switching
             // leave 2 tracks for race conditions, etc
+            this._consumersUpdated = false;
             var maxQ = 0;
             for (const { requestedQ } of this.consumers) {
                 if (requestedQ > maxQ) {
@@ -186,25 +191,24 @@
             else if (maxQ > this.currentQuality) {
                 // immediately change quality
                 this.hdReleaseTimerStop();
-                return this.doGetVideoWithQuality(maxQ);
+                this.doGetVideoWithQuality(maxQ);
             }
             else { // maxQ < this.currentQuality
                 if (maxQ === VIDEO_QUALITY.NO_VIDEO && (this.sfuPeer.av & Av.Video) === 0) {
                     this.hdReleaseTimerStop();
-                    return this.doGetVideoWithQuality(maxQ);
+                    this.doGetVideoWithQuality(maxQ);
                 }
                 // start gradual lowering of stream quality
                 this.hdReleaseTimerRestart(maxQ);
             }
-            return false; // return false for all cases except the ones that immediately change quality
+            return this._consumersUpdated; // return false for all cases except the ones that immediately change quality
         }
         /** Change the quailty of the common video stream
          * @param {number} newQuality - the requested quality
-         * @returns {boolean} - true if video source changed synchronously, which can happen only if video was disabled
          */
         doGetVideoWithQuality(newQuality) {
             if (this.currentQuality === newQuality) {
-                return false;
+                return;
             }
             this.currentQuality = newQuality;
 
@@ -223,13 +227,13 @@
                 if (sfuPeer.vThumbPlayer) {
                     sfuPeer.vThumbPlayer.destroy();
                 }
-                return true;
             }
         }
         updateConsumerVideos() {
             for (const cons of this.consumers) {
                 cons.updateVideoElem();
             }
+            this._consumersUpdated = true;
         }
         requestHdStream(resDivider) {
             const peer = this.sfuPeer;
@@ -475,7 +479,7 @@
         }
         onLocalMediaChange(diffFlag) {
             if (diffFlag & SfuClient.Av.Video) {
-                this.localPeerStream.onVideoChange();
+                this.localPeerStream.onStreamChange();
             }
             this.av = this.sfuApp.sfuClient.availAv;
         }
@@ -633,7 +637,7 @@
             this.userHandle = u_handle;
             this.consumers = new Set();
         }
-        onVideoChange() {
+        onStreamChange() {
             const vtrack = this.sfuApp.sfuClient.mainSentVtrack();
             if (vtrack) {
                 if (!this.source) {
@@ -653,6 +657,10 @@
         }
         registerConsumer(consumer) {
             this.consumers.add(consumer);
+            // player may have stopped when the last non-clone consumer was unmounted from the DOM
+            if (this.source && !consumer.clonedVideo) { // && this.source.paused - just in case, don't check if paused
+                Promise.resolve(this.source.play()).catch(nop);
+            }
         }
         deregisterConsumer(consumer) {
             this.consumers.delete(consumer);

@@ -14,14 +14,13 @@ class PlayerData {
     attachToTrack(track) { // we wait for player to sync and start, so nothing to do here
         this.appCall.onTrackAllocated(this);
         this.video.onplaying = () => {
-            // console.warn("onPlaying");
+            // console.warn("source video: onPlaying");
             if (this.onPlay) {
                 this.onPlay();
             }
         };
         this.video.onpause = tryCatch(() => {
-            Promise.resolve(this.video.play()).catch(nop);
-            // console.warn("external video onpause->play");
+            // console.warn("source video: onPause");
         });
         SfuClient.playerPlay(this.video, track);
     }

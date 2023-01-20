@@ -19702,6 +19702,7 @@ class Preview extends _mixins_js1__.wl {
     super(...args);
     this.videoRef = react0().createRef();
     this.stream = null;
+    this.avatarMeta = null;
     this.state = {
       audio: false,
       video: false
@@ -19758,12 +19759,28 @@ class Preview extends _mixins_js1__.wl {
       });
     };
     this.renderAvatar = () => {
-      if (_call_jsx3__.ZP.isGuest() || is_chatlink) {
+      if (_call_jsx3__.ZP.isGuest()) {
         return react0().createElement("div", {
           className: "avatar-guest"
         }, react0().createElement("i", {
           className: "sprite-fm-uni icon-owner"
         }));
+      }
+      if (is_chatlink) {
+        const {
+          avatarUrl,
+          color,
+          shortName
+        } = this.avatarMeta || {};
+        return react0().createElement("div", {
+          className: `
+                        avatar-wrapper
+                        ${color ? `color${color}` : ''}
+                    `
+        }, avatarUrl && react0().createElement("img", {
+          src: avatarUrl,
+          alt: ""
+        }), color && react0().createElement("span", null, shortName));
       }
       return react0().createElement(_contacts_jsx2__.Avatar, {
         contact: M.u[u_handle]
@@ -19780,6 +19797,7 @@ class Preview extends _mixins_js1__.wl {
       this.props.onToggle(this.state.audio, this.state.video);
     }
     this.toggleStream(Preview.STREAMS.AUDIO);
+    this.avatarMeta = is_chatlink ? generateAvatarMeta(u_handle) : null;
   }
   render() {
     const {

@@ -3854,7 +3854,7 @@ accountUI.contactAndChat = {
             if (dnd) {
                 return (
                     // `Notifications will be silent until %s`
-                    l[23540].replace('%s', '<span>' + escapeHTML(unixtimeToTimeString(dnd)) + '</span>')
+                    l[23540].replace('%s', '<span>' + toLocaleTime(dnd) + '</span>')
                 );
             }
             return '&nbsp;';

@@ -179,6 +179,16 @@ function setDateTimeFormat(locales, format) {
                 options.month = 'numeric';
                 options.day = 'numeric';
                 break;
+            case 18:
+                options.hourCycle = 'h23';
+                options.hour = 'numeric';
+                options.minute = 'numeric';
+                break;
+            case 19:
+                options.hourCycle = undefined;
+                options.hour = 'numeric';
+                options.minute = 'numeric';
+                break;
         }
     }
 
@@ -905,7 +915,7 @@ function getTimeMarker(unixtime, verbose) {
     if (todayOrYesterday(unixtime * 1000)) {
         // if in last 2 days, use the time2lastSeparator
         var iso = (new Date(unixtime * 1e3)).toISOString();
-        result = time2lastSeparator(iso) + (verbose ? ", " + unixtimeToTimeString(unixtime) : "");
+        result = time2lastSeparator(iso) + (verbose ? ", " + toLocaleTime(unixtime) : "");
     }
     else {
         // if not in the last 2 days, use 1st June [Year]
@@ -913,6 +923,22 @@ function getTimeMarker(unixtime, verbose) {
     }
     return result;
 
+}
+
+/**
+ * Returns formatted time string for the given timestamp. The format used is based on the user's locale and selected
+ * settings, e.g. ISO formatting. Use `HH h MM` format for French locales.
+ * @param {Number} unixtime
+ * @returns {String}
+ */
+
+function toLocaleTime(unixtime) {
+    'use strict';
+    const { locales, country } = getCountryAndLocales();
+    if (fmconfig.uidateformat || country === 'ISO') {
+        return time2date(unixtime, 18);
+    }
+    return locales.startsWith('fr') ? time2date(unixtime, 19).replace(':', ' h ') : time2date(unixtime, 19);
 }
 
 //----------------------------------------------------------------------------

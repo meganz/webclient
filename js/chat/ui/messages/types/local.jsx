@@ -254,7 +254,7 @@ export default class Local extends AbstractGenericMessage {
             debugMsg = `: callId: ${callId}`;
         }
         return (
-            <div className="message date-time simpletip" data-simpletip={time2date(this.getTimestamp())}>
+            <div className="message date-time simpletip" data-simpletip={time2date(this.getTimestamp(), 17)}>
                 {this.getTimestampAsString()}
                 {debugMsg}
             </div>

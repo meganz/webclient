@@ -414,6 +414,9 @@
         if ((filecnt === 1) && (foldercnt === 0)) {
             $('#previousversions').rebind('click', function(ev) {
                 if (M.currentdirid !== M.RubbishID) {
+                    if (slideshowid) {
+                        slideshow(n.h, 1);
+                    }
                     fileversioning.fileVersioningDialog(n.h);
                     closeDialog();
                 }

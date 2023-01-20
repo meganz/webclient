@@ -386,7 +386,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 // `Muted until %s`
                                 l[23539].replace(
                                     '%s',
-                                    unixtimeToTimeString(pushSettingsValue)
+                                    toLocaleTime(pushSettingsValue)
                                 );
                         }
                     })()}

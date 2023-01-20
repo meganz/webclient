@@ -17,7 +17,7 @@ export class RetentionChange extends ConversationMessageMixin {
                         className="message"
                         label={<Emoji>{M.getNameByHandle(contact.u)}</Emoji>}
                     />
-                    <div className="message date-time simpletip" data-simpletip={time2date(this.getTimestamp())}>
+                    <div className="message date-time simpletip" data-simpletip={time2date(this.getTimestamp(), 17)}>
                         {this.getTimestampAsString()}
                     </div>
                     <div className="message text-block">

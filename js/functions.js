@@ -919,13 +919,6 @@ function RegExpEscape(text) {
     return text.replace(/[\s#$()*+,.?[\\\]^{|}-]/g, "\\$&");
 }
 
-function unixtimeToTimeString(timestamp) {
-    var date = new Date(timestamp * 1000);
-    var hourSeparator = locale === 'fr' ? ' h ' : ':';
-    return addZeroIfLenLessThen(date.getHours(), 2)
-        + hourSeparator + addZeroIfLenLessThen(date.getMinutes(), 2);
-}
-
 
 /**
  * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)

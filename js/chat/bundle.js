@@ -10484,7 +10484,7 @@ class ConversationRightArea extends mixins.wl {
       label: l[16709],
       secondLabel: (() => {
         if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
-          return pushSettingsValue === 0 ? PushSettingsDialog.options[Infinity] : l[23539].replace('%s', unixtimeToTimeString(pushSettingsValue));
+          return pushSettingsValue === 0 ? PushSettingsDialog.options[Infinity] : l[23539].replace('%s', toLocaleTime(pushSettingsValue));
         }
       })(),
       secondLabelClass: "label--green",
@@ -14532,7 +14532,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
     var timestamp = self.getTimestampAsString();
     var datetime = React.createElement("div", {
       className: "message date-time simpletip",
-      "data-simpletip": time2date(timestampInt)
+      "data-simpletip": time2date(timestampInt, 17)
     }, timestamp);
     var displayName;
     if (contact) {
@@ -14624,7 +14624,7 @@ class TruncatedMessage extends truncated_ConversationMessageMixin {
     var timestamp = self.getTimestampAsString();
     var datetime = truncated_React.createElement("div", {
       className: "message date-time simpletip",
-      "data-simpletip": time2date(timestampInt)
+      "data-simpletip": time2date(timestampInt, 17)
     }, timestamp);
     var displayName;
     if (contact) {
@@ -14643,7 +14643,7 @@ class TruncatedMessage extends truncated_ConversationMessageMixin {
       });
       datetime = truncated_React.createElement("div", {
         className: "message date-time simpletip",
-        "data-simpletip": time2date(timestampInt)
+        "data-simpletip": time2date(timestampInt, 17)
       }, timestamp);
     }
     return truncated_React.createElement("div", {
@@ -14688,7 +14688,7 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
     var timestamp = self.getTimestampAsString();
     var datetime = privilegeChange_React.createElement("div", {
       className: "message date-time simpletip",
-      "data-simpletip": time2date(timestampInt)
+      "data-simpletip": time2date(timestampInt, 17)
     }, timestamp);
     var displayName;
     if (contact) {
@@ -14751,7 +14751,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
     var timestamp = self.getTimestampAsString();
     var datetime = topicChange_React.createElement("div", {
       className: "message date-time simpletip",
-      "data-simpletip": time2date(timestampInt)
+      "data-simpletip": time2date(timestampInt, 17)
     }, timestamp);
     var displayName;
     if (contact) {
@@ -14920,7 +14920,7 @@ class RetentionChange extends mixin.y {
       label: external_React_default().createElement(utils.dy, null, M.getNameByHandle(contact.u))
     }), external_React_default().createElement("div", {
       className: "message date-time simpletip",
-      "data-simpletip": time2date(this.getTimestamp())
+      "data-simpletip": time2date(this.getTimestamp(), 17)
     }, this.getTimestampAsString()), external_React_default().createElement("div", {
       className: "message text-block"
     }, message.getMessageRetentionSummary())));
@@ -19946,7 +19946,7 @@ class AbstractGenericMessage extends mixin.y {
       className: "message content-area selectable-txt"
     }, this.getName && this.getName(), this.getMessageTimestamp ? this.getMessageTimestamp() : grouped ? null : external_React_default().createElement("div", {
       className: "message date-time simpletip",
-      "data-simpletip": time2date(this.getTimestamp())
+      "data-simpletip": time2date(this.getTimestamp(), 17)
     }, this.getTimestampAsString()), !hideActionButtons && this.getMessageActionButtons && this.renderMessageActionButtons(this.getMessageActionButtons()), this.getContents && this.getContents(), hideActionButtons ? null : this.getEmojisImages()));
   }
 }
@@ -20199,7 +20199,7 @@ class Local extends AbstractGenericMessage {
     }
     return external_React_default().createElement("div", {
       className: "message date-time simpletip",
-      "data-simpletip": time2date(this.getTimestamp())
+      "data-simpletip": time2date(this.getTimestamp(), 17)
     }, this.getTimestampAsString(), debugMsg);
   }
   getClassNames() {
@@ -22194,7 +22194,7 @@ class ConversationMessageMixin extends _mixins1__._p {
     return Message.getContactForMessage(message);
   }
   getTimestampAsString() {
-    return unixtimeToTimeString(this.getTimestamp());
+    return toLocaleTime(this.getTimestamp());
   }
   getTimestamp() {
     var message = this.props.message;

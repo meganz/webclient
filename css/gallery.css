@@ -691,6 +691,7 @@
     background-size: cover;
     transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
     transition-duration: 200ms;
+    background-color: white;
 }
 .albums-grid-cell.ui-selected,
 .album-timeline-cell.ui-selected {
@@ -785,6 +786,7 @@
     background-repeat: no-repeat;
     background-size: cover;
     margin: 4px;
+    background-color: white;
 }
 .album-timeline-cell.show-date::before,
 .album-timeline-cell.show-video-duration::after {

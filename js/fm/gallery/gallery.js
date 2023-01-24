@@ -66,13 +66,33 @@ class GalleryNodeBlock {
 }
 
 GalleryNodeBlock.dateKeyCache = Object.create(null);
-GalleryNodeBlock.maxGroupChunkSize = 60;
-GalleryNodeBlock.thumbCacheSize = 500;
+GalleryNodeBlock.maxGroupChunkSize = 60; // Max number of nodes per chunk
+GalleryNodeBlock.thumbCacheSize = 500; // Number of images per cache at any given point
+GalleryNodeBlock.allowsTransparent = { WEBP: 1, PNG: 1, GIF: 1 }; // Ideally, sync it with js/mega.js
+
+GalleryNodeBlock.revokeThumb = (h) => {
+    'use strict';
+
+    if (!GalleryNodeBlock.thumbCache) {
+        return;
+    }
+
+    const keys = Object.keys(GalleryNodeBlock.thumbCache);
+
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+
+        if (M.d[h] && M.d[h].fa && key.startsWith(M.d[h].fa)) {
+            URL.revokeObjectURL(GalleryNodeBlock.thumbCache[key]);
+            delete GalleryNodeBlock.thumbCache[key];
+        }
+    }
+};
 
 GalleryNodeBlock.getTimeString = (key, format) => {
     'use strict';
 
-    const cacheKey = key + '-' + format;
+    const cacheKey = `${key}-${format}`;
 
     if (!GalleryNodeBlock.dateKeyCache[cacheKey]) {
         GalleryNodeBlock.dateKeyCache[cacheKey] = time2date(key, format);
@@ -963,7 +983,7 @@ class MegaGallery {
 
         if (this.dynamicList && this.mode === 'a') {
 
-            const items = this.dynamicList.items;
+            const {items} = this.dynamicList;
 
             for (let i = 0; i < items.length; i++) {
 
@@ -973,7 +993,7 @@ class MegaGallery {
                     reGroupedCount--;
 
                     if (this.onpage) {
-                        this.clearRenderCache('y' + items[i]);
+                        this.clearRenderCache(`y${items[i]}`);
                         this.throttledListChange(items[i]);
                     }
 
@@ -1006,7 +1026,7 @@ class MegaGallery {
 
     removeFromAllGroup(h, ts) {
         if (M.d[h] && M.d[h].fa) {
-            GalleryNodeBlock.revokeThumb(M.d[h].fa);
+            GalleryNodeBlock.revokeThumb(h);
         }
 
         const flatNodes = this.flatTargetAllGroup(ts).filter(nh => nh !== h);
@@ -1185,10 +1205,10 @@ class MegaGallery {
                 && M.currentdirid === mega.gallery.sections[M.currentdirid].root
                 && (
                     M.currentdirid === M.previousdirid
-                    || (
+                    ||
                         mega.gallery.sections[M.previousdirid]
                         && mega.gallery.sections[M.previousdirid].root === mega.gallery.sections[M.currentdirid].root
-                    )
+
                 );
 
             if (modeResetIsNeeded) {
@@ -1507,7 +1527,7 @@ class MegaGallery {
 
                 if (extraNode) {
 
-                    extraNode.removeAttribute('data-date');
+                    delete extraNode.dataset.date;
                     contentBlock.appendChild(extraNode);
                 }
             }
@@ -1752,15 +1772,6 @@ class MegaGallery {
     }
 }
 
-GalleryNodeBlock.revokeThumb = (fa) => {
-    'use strict';
-
-    if (MegaGallery.thumbCache && MegaGallery.thumbCache[fa]) {
-        URL.revokeObjectURL(MegaGallery.thumbCache[fa]);
-        delete MegaGallery.thumbCache[fa];
-    }
-};
-
 class MegaTargetGallery extends MegaGallery {
 
     async setView() {
@@ -1776,7 +1787,7 @@ class MegaTargetGallery extends MegaGallery {
 
         for (let i = handles.length; i--;) {
             if (!M.c[handles[i]]) {
-                console.error('Gallery cannot find handle ' + handles[i]);
+                console.error(`Gallery cannot find handle ${handles[i]}`);
                 continue;
             }
 
@@ -1924,7 +1935,7 @@ class MegaMediaTypeGallery extends MegaGallery {
         for (var i = 0; i < nodes.length; i++) {
             var n = nodes[i];
 
-            if (this.nodes[n.h] || n.t || sharesTree.includes(n.p) || (this.id === 'favourites' && !n.fav)) {
+            if (this.nodes[n.h] || n.t || sharesTree.includes(n.p) || this.id === 'favourites' && !n.fav) {
                 continue;
             }
 
@@ -1979,7 +1990,7 @@ class MegaMediaTypeGallery extends MegaGallery {
                 this.updateNodeName(n);
 
                 if (mega.gallery.pendingFaBlocks[n.h] && n.fa.includes(':1*')) {
-                    MegaGallery.addThumbnails([mega.gallery.pendingFaBlocks[n.h]]);
+                    MegaGallery.addThumbnails(Object.values(mega.gallery.pendingFaBlocks[n.h]));
                     delete mega.gallery.pendingFaBlocks[n.h];
                 }
             }
@@ -1994,6 +2005,16 @@ mega.gallery.titleControl = null;
 mega.gallery.emptyBlock = null;
 mega.gallery.rootMode = {photos: 'a', images: 'a', videos: 'a'};
 mega.gallery.pendingFaBlocks = {};
+mega.gallery.pendingThumbBlocks = {};
+
+mega.gallery.secKeys = {
+    cuphotos: 'camera-uploads-photos',
+    cdphotos: 'cloud-drive-photos',
+    cuimages: 'camera-uploads-images',
+    cdimages: 'cloud-drive-images',
+    cuvideos: 'camera-uploads-videos',
+    cdvideos: 'cloud-drive-videos'
+};
 
 /**
  * Same as is_image3(), additionally checking whether the node meet requirements for photo/media gallery.
@@ -2006,7 +2027,7 @@ mega.gallery.isGalleryNode = (n, ext) => {
 
     ext = ext || fileext(n && n.name || n, true, true);
 
-    return (ext !== 'PSD' && is_image3(n, ext)) || mega.gallery.isGalleryVideo(n);
+    return ext !== 'PSD' && is_image3(n, ext) || mega.gallery.isGalleryVideo(n);
 };
 
 /**
@@ -2029,7 +2050,7 @@ mega.gallery.isGalleryVideo = (n) => {
 
     const props = MediaAttribute.prototype.fromAttributeString(n.fa, n.k);
 
-    return (props && props.width && props.height) ? p : false;
+    return props && props.width && props.height ? p : false;
 };
 
 mega.gallery.checkEveryGalleryUpdate = n => {
@@ -2112,15 +2133,6 @@ mega.gallery.resetAll = () => {
     mega.gallery.nodeUpdated = false;
 };
 
-mega.gallery.secKeys = {
-    cuphotos: 'camera-uploads-photos',
-    cdphotos: 'cloud-drive-photos',
-    cuimages: 'camera-uploads-images',
-    cdimages: 'cloud-drive-images',
-    cuvideos: 'camera-uploads-videos',
-    cdvideos: 'cloud-drive-videos'
-};
-
 mega.gallery.showEmpty = (type) => {
     'use strict';
 
@@ -2138,6 +2150,169 @@ mega.gallery.hideEmpty = () => {
     if (mega.gallery.emptyBlock) {
         mega.gallery.emptyBlock.hide();
     }
+};
+
+/**
+ * This is specifically a check for standard PNG/WEBP thumbnails.
+ * Upon creation, thumnails for new PNG/GIF/SVG/WEBP are conveniently stored as PNG or WEBP files
+ * @param {ArrayBuffer|Uint8Array} ab Image array buffer
+ * @returns {Boolean}
+ */
+mega.gallery.arrayBufferContainsAlpha = (ab) => {
+    'use strict';
+
+    const fileData = webgl.identify(ab);
+
+    if (!fileData || fileData.format !== 'PNG') {
+        return false;
+    }
+
+    // The check is based on https://www.w3.org/TR/png/#table111
+    // We know format field exists in the IHDR chunk. The chunk exists at
+    // offset 8 +8 bytes (size, name) +8 (depth) & +9 (type)
+    // So, if it is not type 4 or 6, that would mean alpha sample is not following RGB triple
+    const transparentTypes = [4, 6];
+
+    const abType = new DataView(ab.buffer || ab).getUint8(8 + 8 + 9);
+
+    return transparentTypes.includes(abType);
+};
+
+/**
+ * A method to make/load the thumbnails of specific size based on the list of handles provided
+ * @param {Array} keys Handle+size key to fetch from local database or to generate.
+ * Key example: `1P9hFJwb|w233` - handle is 1P9hFJwb, width 233px
+ * @param {Function} [onLoad] Single image successful load callback
+ * @param {Function} [onErr] Callback when a single image is failed to load
+ * @returns {void}
+ */
+mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
+    'use strict';
+
+    const {dbLoading} = mega.gallery;
+
+    if (!MegaGallery.workerBranch) {
+        MegaGallery.workerBranch = await webgl.worker.attach();
+    }
+
+    if (dbLoading) {
+        await dbLoading;
+    }
+    const {workerBranch} = MegaGallery;
+
+    const processBlob = (key, blob) => {
+
+        webgl.readAsArrayBuffer(blob)
+            .then((ab) => {
+                ab.type = blob.type;
+
+                onLoad(key, ab);
+                return mega.gallery.lru.set(key, ab);
+            })
+            .catch(dump);
+    };
+
+    const sizedThumbs = await mega.gallery.lru.bulkGet(keys).catch(dump) || false;
+    const fetchTypes = [{}, {}];
+    const faData = {};
+
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+
+        // Fetching already stored thumbnail
+        if (sizedThumbs[key]) {
+            onLoad(key, sizedThumbs[key]);
+            continue;
+        }
+
+        const [fa, pxSize] = key.split('|w');
+        const faBlocks = mega.gallery.pendingThumbBlocks[key];
+
+        if (!faBlocks) {
+            onErr(`Cannot work with blocks anymore for fa: ${fa}...`);
+            continue;
+        }
+
+        const { node } = faBlocks[0];
+
+        if (!node || !node.fa) {
+            onErr(`The node ${node.h} either does not exist or is not a media file...`);
+            continue;
+        }
+
+        const inThumbSize = pxSize <= MEGAImageElement.THUMBNAIL_SIZE;
+        const ext = fileext(node.name || node, true, true);
+        const type = inThumbSize || GalleryNodeBlock.allowsTransparent[ext] || ext === 'SVG' ? 0 : 1;
+
+        faData[fa] = {
+            key,
+            handle: node.h,
+            byteSize: node.s,
+            pxSize,
+            inThumbSize,
+            ext
+        };
+
+        fetchTypes[type][node.fa] = node;
+    }
+
+    fetchTypes.forEach((nodes, type) => {
+        if (!Object.keys(nodes).length) {
+            return;
+        }
+
+        api_getfileattr(
+            nodes,
+            type,
+            async(thumbCtx, thumbFa, thumbAB) => {
+                let blob;
+
+                if (thumbAB === 0xDEAD || thumbAB.length === 0) {
+                    if (d) {
+                        console.log(`Cannot make thumbnail for ${thumbFa}`);
+                    }
+
+                    onErr('The basic thumbnail image seems to be tainted...');
+                    return;
+                }
+
+                const {
+                    key,
+                    handle,
+                    pxSize,
+                    byteSize,
+                    inThumbSize,
+                    ext
+                } = faData[thumbFa];
+
+                const size = parseInt(pxSize) | 0;
+
+                // Checking when we can use the already receieved thumbAB (either `:0*` or `:1*`)
+                if (
+                    !inThumbSize // The image px size is bigger than the one we already have
+                    && byteSize < 8e6 // 8MB. The image size allows the network fetch
+                    && GalleryNodeBlock.allowsTransparent[ext] // The image is designed to be transparent
+                    && mega.gallery.arrayBufferContainsAlpha(thumbAB)  // The image contains alpha channel
+                ) {
+                    // The thumbnail did not qualify for `:0*` or `:1*`, so original image must be fetched
+                    const original = await M.gfsfetch(handle, 0, -1).catch(dump);
+
+                    if (original) {
+                        blob = await webgl.getDynamicThumbnail(original, size, workerBranch).catch(dump);
+                    }
+                }
+
+                blob = blob || await webgl.getDynamicThumbnail(thumbAB, size, workerBranch).catch(dump);
+
+                if (blob) {
+                    processBlob(key, blob);
+                }
+                else {
+                    onErr(`Could not generate dynamic thumbnail of ${size}px for ${handle}`);
+                }
+            }
+        );
+    });
 };
 
 async function galleryUI(id) {
@@ -2228,149 +2403,134 @@ async function galleryUI(id) {
     });
 }
 
+/**
+ * @param {GalleryNodeBlock[]} nodeBlocks Array of objects encapsulating setThumb and node
+ * @returns {void}
+ */
 MegaGallery.addThumbnails = (nodeBlocks) => {
     'use strict';
 
-    if (!MegaGallery.thumbCache) {
-        MegaGallery.thumbCache = Object.create(null);
+    if (!GalleryNodeBlock.thumbCache) {
+        GalleryNodeBlock.thumbCache = Object.create(null);
     }
 
-    const faKeys = [{}, {}];
-    const blocks = {};
+    const keys = [];
 
     for (let i = 0; i < nodeBlocks.length; i++) {
-        const {h, fa} = nodeBlocks[i].node;
-        let type = 1; // Default type for fetch is 1
-
-        // In case fa is not arrived yet, placing the node to the buffer
-        if (!fa) {
-            mega.gallery.pendingFaBlocks[h] = nodeBlocks[i];
+        if (!nodeBlocks[i].node) { // No node is associated with the block
             continue;
         }
 
-        if (!String(fa).includes(':1*')) {
-            type = 0; // Thumbnail is applying as a fallback when there is no preview available
+        const { h, fa } = nodeBlocks[i].node;
+
+        /**
+         * The element width to fetch with relation to dpx
+         */
+        const width = parseInt(nodeBlocks[i].el.clientWidth * (window.devicePixelRatio || 1));
+        const key = MegaGallery.getCacheKey(fa, width);
+
+        // In case fa is not arrived yet, placing the node to the buffer
+        if (!fa) {
+            mega.gallery.pendingFaBlocks[h][width] = nodeBlocks[i];
+            continue;
         }
 
-        if (MegaGallery.thumbCache[fa]) {
-            nodeBlocks[i].setThumb(MegaGallery.thumbCache[fa], fa);
+        if (GalleryNodeBlock.thumbCache[key]) {
+            nodeBlocks[i].setThumb(GalleryNodeBlock.thumbCache[key], nodeBlocks[i].node.fa);
+            continue;
+        }
+
+        if (!keys.includes(key)) {
+            keys.push(key);
+        }
+
+        if (mega.gallery.pendingThumbBlocks[key]) {
+            mega.gallery.pendingThumbBlocks[key].push(nodeBlocks[i]);
         }
         else {
-            faKeys[type][fa] = nodeBlocks[i].node;
-
-            if (blocks[fa]) {
-                blocks[fa].push(nodeBlocks[i]);
-            }
-            else {
-                blocks[fa] = [nodeBlocks[i]];
-            }
+            mega.gallery.pendingThumbBlocks[key] = [nodeBlocks[i]];
         }
     }
 
-    const cacheProcessed = (nodeFa) => {
-        if (MegaGallery.thumbCache[nodeFa]) {
+    // All nodes are in pending state, no need to proceed
+    if (!keys.length) {
+        return;
+    }
 
-            for (let i = 0; i < blocks[nodeFa].length; i++) {
-                blocks[nodeFa][i].setThumb(MegaGallery.thumbCache[nodeFa], nodeFa);
+    mega.gallery.generateSizedThumbnails(
+        keys,
+        (key, arrayBuffer) => {
+            const blocks = mega.gallery.pendingThumbBlocks;
+
+            // The image has been applied already
+            if (!blocks[key]) {
+                return;
             }
+            const weAreOnGallery = M.currentCustomView.type === 'gallery' || M.currentCustomView.type === 'albums';
 
-            delete blocks[nodeFa];
-            return true;
-        }
-
-        return false;
-    };
-
-    const thumbnailIsValid = (nodeFa, uint8) => {
-        // uint8.length === 0 should remain as is as per Firefox's limitations
-        if (uint8 === 0xDEAD || uint8.length === 0) {
             if (d) {
-                console.warn(`Aborted preview retrieval for ${nodeFa}`);
+                console.assert(weAreOnGallery, `This should not be running!`);
             }
 
-            return false;
-        }
-
-        return true;
-    };
-
-    const handleReceivedUint8 = async(ctx, nodeFa, uint8, type) => {
-        if (!blocks[nodeFa] // The image has been applied already
-            || cacheProcessed(nodeFa) // Applying the cached image to the existing group
-            || !thumbnailIsValid(nodeFa, uint8)) {
-            return;
-        }
-
-        if (!MegaGallery.workerBranch) {
-            MegaGallery.workerBranch = await webgl.worker.attach();
-        }
-
-        const blob = (type === 1)
-            ? await webgl.getDynamicThumbnail(uint8, 515, MegaGallery.workerBranch).catch(nop)
-            : new Blob([uint8]);
-
-        const fetchStillApplicable = M.currentCustomView.type === 'gallery'
-            || M.currentCustomView.type === 'albums';
-
-        if (fetchStillApplicable) {
-            if (blob) {
-                const url = URL.createObjectURL(blob);
-
-                if (blocks[nodeFa]) {
-                    for (let i = 0; i < blocks[nodeFa].length; i++) {
-                        blocks[nodeFa][i].setThumb(url, nodeFa);
-                    }
-
-                    delete blocks[nodeFa];
+            if (GalleryNodeBlock.thumbCache[key]) {
+                for (let i = 0; i < blocks[key].length; i++) {
+                    blocks[key][i].setThumb(GalleryNodeBlock.thumbCache[key], blocks[key][i].node.fa);
                 }
 
-                if (!MegaGallery.thumbCache[nodeFa]) {
-                    MegaGallery.thumbCache[nodeFa] = url;
+                delete blocks[key];
+                return;
+            }
 
-                    const cachedKeys = Object.keys(MegaGallery.thumbCache);
+            if (weAreOnGallery) {
+                const url = mObjectURL([arrayBuffer], arrayBuffer.type || 'image/jpeg');
+
+                if (blocks[key]) {
+                    for (let i = 0; i < blocks[key].length; i++) {
+                        blocks[key][i].setThumb(url, blocks[key][i].node.fa);
+                    }
+
+                    delete blocks[key];
+                }
+
+                if (!GalleryNodeBlock.thumbCache[key]) {
+                    GalleryNodeBlock.thumbCache[key] = url;
+
+                    const cachedKeys = Object.keys(GalleryNodeBlock.thumbCache);
 
                     if (cachedKeys.length > GalleryNodeBlock.thumbCacheSize) {
                         GalleryNodeBlock.revokeThumb(cachedKeys[0]);
                     }
                 }
             }
-            else if (type === 1) {
-                // Force-loading type 0 in case the thumbnail of type 1 cannot be retrieved
-                api_getfileattr(
-                    { [nodeFa]: null },
-                    0,
-                    handleReceivedUint8
-                );
+            else {
+                delete blocks[key];
             }
+        },
+        (err) => {
+            console.warn(`Cannot make thumbnail(s). Error: ${err}`);
         }
-        else {
-            delete blocks[nodeFa];
-        }
-    };
-
-    faKeys.forEach((fk, type) => {
-        api_getfileattr(
-            fk,
-            type,
-            (ctx, nodeFa, uint8) => handleReceivedUint8(ctx, nodeFa, uint8, type)
-        );
-    });
+    );
 };
 
 MegaGallery.revokeThumbs = () => {
     'use strict';
 
-    if (!MegaGallery.thumbCache) {
+    if (!GalleryNodeBlock.thumbCache) {
         return;
     }
 
-    const keys = Object.keys(MegaGallery.thumbCache);
+    const keys = Object.keys(GalleryNodeBlock.thumbCache);
 
     for (let i = 0; i < keys.length; i++) {
-        URL.revokeObjectURL(MegaGallery.thumbCache[keys[i]]);
+        URL.revokeObjectURL(GalleryNodeBlock.thumbCache[keys[i]]);
     }
 
-    MegaGallery.thumbCache = Object.create(null);
+    GalleryNodeBlock.thumbCache = Object.create(null);
+};
+
+MegaGallery.getCacheKey = (prefix, width) => {
+    'use strict';
+    return width ? `${prefix}|w${parseInt(width)}` : prefix;
 };
 
 MegaGallery.handleIntersect = (entries, gallery) => {
@@ -2430,6 +2590,19 @@ MegaGallery.handlesArrToObj = (array) => {
 
     return obj;
 };
+
+lazy(mega.gallery, 'dbLoading', () => {
+    'use strict';
+
+    return LRUMegaDexie.create('gallery_thumbs', 200)
+        .then((db) => {
+            mega.gallery.lru = db;
+        })
+        .catch(dump)
+        .finally(() => {
+            delete mega.gallery.dbLoading;
+        });
+});
 
 lazy(mega.gallery, 'sections', () => {
     'use strict';
@@ -2574,7 +2747,7 @@ lazy(mega.gallery, 'mdReporter', () => {
             }
 
             this.runId = Date.now();
-            const runId = this.runId;
+            const {runId} = this;
 
             disposeVisibilityChange = MComponent.listen(
                 document,
@@ -2610,7 +2783,7 @@ lazy(mega.gallery, 'mdReporter', () => {
 
                         window.eventlog(
                             marks[eventIndex][1],
-                            'Session mark: ' + mdPageKey + ' | ' + timeout + 's'
+                            `Session mark: ${mdPageKey} | ${timeout}s`
                         );
                     }
 
@@ -2650,7 +2823,7 @@ lazy(mega.gallery, 'mdReporter', () => {
                     if (!section.reported) {
                         if (section.count >= timesOver) {
                             section.reported = true;
-                            eventlog(99757, mdPageKey + ' has been visited ' + section.count + ' times');
+                            eventlog(99757, `${mdPageKey} has been visited ${section.count} times`);
                         }
 
                         M.setPersistentData(statsStorageKey, fmStats).catch(() => {

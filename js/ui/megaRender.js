@@ -24,6 +24,7 @@
                     '<td megatype="timeAd" class="time ad"></td>' +
                     '<td megatype="timeMd" class="time md"></td>' +
                     '<td megatype="versions" class="hd-versions"></td>' +
+                    '<td megatype="playtime" class="playtime"></td>' +
                     '<td megatype="extras" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                         '<span class="versioning-indicator">' +
@@ -1044,6 +1045,9 @@
 
                     if (aProperties.size !== undefined) {
                         aTemplate.querySelector('.size').textContent = aProperties.size;
+                    }
+                    if (aProperties.playtime !== undefined) {
+                        aTemplate.querySelector('.playtime').textContent = secondsToTimeShort(aProperties.playtime);
                     }
                     aTemplate.querySelector('.type').textContent = aProperties.type;
                     aTemplate.querySelector('.time').textContent = aProperties.time;

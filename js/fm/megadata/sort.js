@@ -748,3 +748,53 @@ MegaData.prototype.sortBySharedWith = function(d) {
         return fn(a, b, d);
     });
 };
+
+/**
+ * Sort by playtime
+ * @param {Number} d sort direction
+ * @returns {void}
+ */
+MegaData.prototype.sortByPlaytime = function(d) {
+    'use strict';
+
+    var fn = this.sortfn = this.sortByPlaytimeFn(d);
+    this.sortd = d;
+
+    if (!d) {
+        d = 1;
+    }
+
+    // playtime sort is not doing folder sorting first. therefore using view sort directly to avoid.
+    this.v.sort((a, b) => {
+        return fn(a, b, d);
+    });
+};
+
+/**
+ * Sort nodes having playtime always first and then the rest including folders.
+ * @param {Number} d sort direction
+ * @returns {Function} sort compare function
+ */
+MegaData.prototype.sortByPlaytimeFn = function(d) {
+    "use strict";
+
+    return function(a, b) {
+        const aPlayTime = MediaAttribute(a).data.playtime;
+        const bPlayTime = MediaAttribute(b).data.playtime;
+
+        if (aPlayTime !== undefined && bPlayTime !== undefined) {
+            if (aPlayTime === bPlayTime) {
+                return M.doFallbackSortWithName(a, b, d);
+            }
+            return (aPlayTime < bPlayTime ? -1 : 1) * d;
+        }
+        else if (aPlayTime) {
+            return d < 0 ? aPlayTime * d : -aPlayTime * d;
+        }
+        else if (bPlayTime) {
+            return d < 0 ? -bPlayTime * d : bPlayTime * d;
+        }
+
+        return M.doFallbackSortWithFolder(a, b);
+    };
+};

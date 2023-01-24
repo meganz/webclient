@@ -350,6 +350,7 @@ table tr.ui-selected .link-transfer-status {
 .grid-table.fm.v-timeAd [megatype="timeAd"],
 .grid-table.fm.v-timeMd [megatype="timeMd"],
 .grid-table.fm.v-versions [megatype="versions"],
+.grid-table.fm.v-playtime [megatype="playtime"],
 .grid-table.fm.v-extras [megatype="extras"] {
     display: table-cell;
 }

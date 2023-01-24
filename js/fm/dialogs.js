@@ -57,6 +57,13 @@
     };
 
     /**
+     * Checking if the current folder is a share
+     * @private
+     * @returns {Boolean}
+     */
+    const isInShares = () => M.currentrootid === 'shares' || M.currentrootid === 'out-shares';
+
+    /**
      * Disable circular references and read-only shared folders.
      * @private
      */
@@ -335,9 +342,12 @@
 
         $('.summary-title.summary-selected-title', $dialog).text(l[19180]);
 
-        let title = mega.icu.format(l[19339], items.length);
-        const setTitle = function() {
-            title = mega.icu.format(l[19339], items.length);
+        const setTitle = () => {
+            const title = mega.icu.format(
+                (isInShares()) ? l.upload_to_share : l[19339],
+                items.length
+            );
+
             $('header h2', $dialog).text(title);
         };
 
@@ -510,7 +520,7 @@
             return l[776]; // Save
         }
 
-        if ($.copyToShare || section === 'shared-with-me') {
+        if ($.copyToShare) {
             return l[1344]; // Share
         }
 
@@ -560,7 +570,10 @@
 
         if ($.copyToUpload) {
             var len = $.copyToUpload[0].length;
-            return mega.icu.format(l[19339], len);
+            return mega.icu.format(
+                (isInShares()) ? l.upload_to_share : l[19339],
+                len
+            );
         }
 
         if ($.saveToDialog) {

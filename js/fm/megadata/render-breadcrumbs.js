@@ -467,8 +467,11 @@
                 id = n.p;
             }
 
-            if (M.currentCustomView &&
-                !(M.currentCustomView.prefixPath === 'discovery/' && id === M.RootID)) {
+            if (
+                M.currentCustomView
+                && M.currentCustomView.type !== 'albums'
+                && !(M.currentCustomView.prefixPath === 'discovery/' && id === M.RootID)
+            ) {
                 id = M.currentCustomView.prefixPath + id;
             }
 

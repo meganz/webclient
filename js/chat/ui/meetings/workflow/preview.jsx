@@ -15,6 +15,7 @@ class Preview extends MegaRenderMixin {
 
     videoRef = React.createRef();
     stream = null;
+    avatarMeta = null;
 
     state = {
         audio: false,
@@ -72,13 +73,28 @@ class Preview extends MegaRenderMixin {
     };
 
     renderAvatar = () => {
-        if (Call.isGuest() || is_chatlink) {
+        if (Call.isGuest()) {
             return (
                 <div className="avatar-guest">
                     <i className="sprite-fm-uni icon-owner" />
                 </div>
             );
         }
+
+        if (is_chatlink) {
+            const { avatarUrl, color, shortName } = this.avatarMeta || {};
+            return (
+                <div
+                    className={`
+                        avatar-wrapper
+                        ${color ? (`color${color}`) : ''}
+                    `}>
+                    {avatarUrl && <img src={avatarUrl} alt=""/>}
+                    {color && <span>{shortName}</span>}
+                </div>
+            );
+        }
+
         return <Avatar contact={M.u[u_handle]} />;
     };
 
@@ -93,6 +109,7 @@ class Preview extends MegaRenderMixin {
             this.props.onToggle(this.state.audio, this.state.video);
         }
         this.toggleStream(Preview.STREAMS.AUDIO);
+        this.avatarMeta = is_chatlink ? generateAvatarMeta(u_handle) : null;
     }
 
     render() {

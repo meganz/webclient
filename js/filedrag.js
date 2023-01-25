@@ -509,6 +509,7 @@
         }
         return !(is_fm() && // if page is fm,
             (window.slideshowid || !$('.feedback-dialog').hasClass('hidden') || // preview and feedback dialog show
+                !$('.mega-dialog.duplicate-conflict', 'body').hasClass('hidden') || // conflict dialog show
                 M.currentdirid === 'shares' || // Share root page
                 M.currentdirid === 'out-shares' || // Out-share root page
                 M.currentdirid === 'public-links' || // Public-link root page

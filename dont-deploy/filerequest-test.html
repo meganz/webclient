@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/Tr</xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>MEGA FileRequest Test</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+        
+    </head>
+    <body>
+        <textarea id="sample-html" cols="30" rows="10"></textarea>
+        <button onclick="applyHtml()">Apply</button>
+        <div id="container">
+        </div>
+
+        <script type="text/javascript">
+            function applyHtml(htmlValue) {
+                const container = document.getElementById('container');
+                const sampleHtml = document.getElementById('sample-html');
+
+                container.innerHTML = "";
+
+                if (htmlValue) {
+                    container.innerHTML = htmlValue;
+                    sampleHtml.value = htmlValue;
+                    return;
+                }
+
+                container.innerHTML = sampleHtml.value;
+                localStorage.setItem('FileRequestTest', sampleHtml.value);
+            }
+
+            const fileRequestTest = localStorage.getItem('FileRequestTest');
+            if (typeof fileRequestTest === 'string') {
+                applyHtml(fileRequestTest);
+            }
+        </script>
+    </body>
+</html>

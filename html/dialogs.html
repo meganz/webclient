@@ -1604,8 +1604,15 @@
          aria-labelledby="fm-picker-dialog-title"
          aria-modal="true">
 
+        <button class="close js-close hidden" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
         <header>
             <h2 id="fm-picker-dialog-title">[$63]</h2>
+            <div class="fm-picker-dialog-desc hidden">
+                <p></p>
+            </div>
         </header>
 
         <section class="content">
@@ -4852,170 +4859,6 @@
         </footer>
     </div>
 
-    <!-- Dialog: create-widget-info-dialog -->
-    <!-- Create MEGAdrop introduction -->
-    <div class="mega-dialog dialog-template-action create-widget-info-dialog hidden"
-         role="dialog"
-         aria-labelledby="create-widget-info-dialog-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="create-widget-info-dialog-title">[$17401]</h2>
-        </header>
-
-        <section class="content">
-            <div class="content-block">
-                <div class="fm-widget-illustration sprite-fm-illustration-wide img-dialog-megadrop"></div>
-                <div class="fm-widget-introduction">
-                    [$17412]
-                </div>
-                <div class="fm-widget-manage">
-                    [$17399]
-                </div>
-                <div class="fm-body-text">
-                    [$17413]
-                </div>
-            </div>
-        </section>
-
-        <footer>
-            <div class="footer-container">
-                <button class="mega-button positive large widget-create-button">
-                    <span>[$158]</span>
-                </button>
-            </div>
-
-            <aside>
-                <div class="CWD_cb checkboxOff"> <input type="checkbox" name="CWD_cb" id="CWD_cb" class="checkboxOff"> </div>
-                <label for="CWD_cb" class="radio-txt">[$229]</label>
-            </aside>
-        </footer>
-    </div>
-
-    <!-- Dialog: widget-dialog -->
-    <!-- Get MEGAdrop embed instructions -->
-    <div class="mega-dialog dialog-template-tool widget-dialog hidden"
-         role="dialog"
-         aria-labelledby="widget-dialog-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="widget-dialog-title">[$17401]</h2>
-        </header>
-
-        <section class="content">
-            <!-- URL & Embed Tab link -->
-            <div class="content-block fm-dialog-tab">
-                <div class="fm-tab-wrapper">
-                    <div class="fm-tab tab-url-link active">
-                        <span>[$5622]</span>
-                    </div>
-                    <div class="fm-tab tab-embed-link">
-                        <span>[$17407]</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="content-block fm-dialog-body megadrop alt-background">
-                <div class="wrapper embed-link hidden">
-                    <div class="fm-body-text">
-                        <i class="widget-folder-icon sprite-fm-mono icon-folder-mega-drop"></i>
-                        <span>[$18218]</span>
-                    </div>
-                    <div class="fm-dialog-block">
-                        <div class="widget-code">
-                            <i class="tab-icon embed sprite-fm-mono icon-embed-code"></i>
-                            <span class="widget-code-wrapper">
-                            </span>
-                        </div>
-                    </div>
-                    <div class="fm-dialog-block">
-                        <div class="fm-block-subheading">
-                            [$20956]
-                        </div>
-                        <div class="embed-button-container">
-                            <!-- Apply `active` class to the embed block right/left buttons to show which one is selected. -->
-                            <div class="embed-block left-button active">
-                                <div class="embed-button-centre">
-                                    <div class="embed-button-select">
-                                        <!-- Radio button logic still needs to be correctly applied. I have only included the markup -->
-                                        <div class="uiembed-button radioOn" id="rad22_div"><input type="radio" class="uiembed-button radioOn" value="1"></div>
-                                        <div class="embed-button-subheading">
-                                            [$18217]
-                                        </div>
-                                    </div>
-                                    <div class="embed-button light-theme centre-button">
-                                        <div class="embed-content-wrapper">
-                                            <div class="embed-mega-icon">
-                                            </div>
-                                            <div class="embed-action-text">
-                                                [$18215]
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="embed-block right-button">
-                                <div class="embed-button-centre">
-                                    <div class="embed-button-select">
-                                        <div class="uiembed-button radioOff" id="rad23_div"><input type="radio" class="uiembed-button radioOff" value="1"></div>
-                                        <div class="embed-button-subheading">
-                                            [$18216]
-                                        </div>
-                                    </div>
-                                    <div class="embed-button dark-theme centre-button">
-                                        <div class="embed-content-wrapper">
-                                            <div class="embed-mega-icon">
-                                            </div>
-                                            <div class="embed-action-text">
-                                                [$18215]
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="wrapper url-link">
-                    <div class="fm-body-text">
-                        <i class="widget-folder-icon sprite-fm-mono icon-folder-mega-drop"></i>
-                        <span>[$17410]</span>
-                    </div>
-                    <div class="widget-code">
-                        <div class="tab-icon url sprite-fm-mono icon-link"></div>
-                        <span class="widget-code-wrapper widget-url">
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer class="alt-background">
-            <div class="footer-container space-between">
-                <button class="mega-button preview-widget">
-                    <span>[$17409]</span>
-                </button>
-                <div>
-                    <button class="mega-button close-button">
-                        <span><span>[$148]</span></span>
-                    </button>
-                    <button class="mega-button positive copy-widget-code url">
-                        <span>[$17835]</span>
-                    </button>
-                </div>
-            </div>
-        </footer>
-    </div>
-
     <!-- Dialog: park-account-dialog -->
     <!-- Park account warning -->
     <div class="mega-dialog dialog-template-main park-account-dialog hidden"
@@ -7362,6 +7205,313 @@
                 <button class="mega-button positive disabled js-confirm">
                     <span>[$870]</span>
                 </button>
+            </div>
+        </footer>
+    </div>
+    <!-- Dialog: file-request-create-dialog -->
+    <!-- Create File Request folder -->
+    <div class="mega-dialog dialog-template-tool file-request file-request-create-dialog hidden"
+         role="dialog"
+         aria-labelledby="file-request-create-dialog-title"
+         aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <h2 id="file-request-create-dialog-title" class="dialog-title">[$file_request_dialog_create_title]</h2>
+            <p>[$file_request_dialog_create_desc]</p>
+        </header>
+
+        <section class="content">
+            <div class="content-block scrollable">
+                <div class="form-row create">
+                    <label for="file-request-folder">[$1049]</label>
+                    <div class="input-container">
+                        <div class="mega-input box-style mega-input-icon">
+                            <i class="sprite-fm-mono icon-folder-filled"></i>
+                            <input class="file-request-folder" type="text" placeholder="Folder name">
+                        </div>
+                        <button class="mega-button file-request-select-folder disabled">
+                            <span>[$file_request_dialog_button_select_folder]</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-row create">
+                    <label for="file-request-title">[$file_request_dialog_label_title]</label>
+                    <span class="char-count"></span>
+                    <div class="mega-input-wrapper">
+                        <div class="mega-input box-style">
+                            <input class="file-request-title" type="text" placeholder="[$file_request_dialog_placeholder_title]">
+                        </div>
+                        <div class="message-container"></div>
+                    </div>
+                </div>
+                <div class="form-row last">
+                    <label for="file-request-description">[$16462]</label>
+                    <span class="char-count"></span>
+                    <div class="mega-input-wrapper">
+                        <div class="mega-input box-style">
+                            <input class="file-request-description" type="text" placeholder="[$file_request_dialog_placeholder_desc]">
+                        </div>
+                        <div class="message-container"></div>
+                    </div>
+                    <p class="caption">[$file_request_dialog_caption_desc]</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="alt-background">
+            <div class="footer-container manage alt-background space-between">
+                <button class="mega-button file-request-preview-button">
+                    <span>[$file_request_dialog_button_preview]</span>
+                </button>
+                <div class="button-container">
+                    <button class="mega-button file-request-close-button">
+                        <span>[$82]</span>
+                    </button>
+                    <button class="mega-button file-request-create-button positive">
+                        <span>[$158]</span>
+                    </button>
+                </div>
+            </div>
+        </footer>
+    </div>
+ 
+    <!-- Create File Request Success folder -->
+    <div class="mega-dialog dialog-template-tool file-request file-request-create-success-dialog hidden"
+         role="dialog"
+         aria-labelledby="file-request-create-success-dialog-title"
+         aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <h2 id="file-request-create-success-dialog-title" class="dialog-title">[$file_request_dialog_create_success_title]</h2>
+            <p>[$file_request_dialog_create_success_desc]</p>
+        </header>
+
+        <section class="content">
+            <div class="content-block scrollable">
+                <div class="form-row create-success">
+                    <label for="file-request-share-link">[$file_request_dialog_label_url]</label>
+                    <div class="file-request-input input-share">
+                        <div class="input-wrapper">
+                            <i class="sprite-fm-mono icon-link chain"></i>
+                            <input class="file-request-share-link" type="text" readonly="readonly">
+                        </div>
+                        <div class="button-wrapper">
+                            <button class="mega-button positive copy">[$1394]</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row create-success">
+                    <label for="file-request-embed-code">[$file_request_dialog_label_embed]</label>
+                    <div class="file-request-input input-code">
+                        <div class="input-wrapper">
+                            <i class="tab-icon url sprite-fm-mono icon-embed-code"></i>
+                            <input type="text" class="file-request-embed-code" value="" readonly="readonly">
+                        </div>
+                        <div class="button-wrapper">
+                            <button class="mega-button positive copy">[$17408]</button>
+                        </div>
+                    </div>
+                    <div class="file-request-embed-button-container">
+                        <div class="embed-button-header">
+                            [$file_request_dialog_theme_desc]
+                        </div>
+                        <div class="embed-button-selection light-theme">
+                            <div class="embed-block active">
+                                <div class="embed-button-centre">
+                                    <div class="embed-button centre-button theme-light-forced">
+                                        <div class="embed-content-wrapper">
+                                            <div class="embed-mega-icon">
+                                            </div>
+                                            <div class="embed-action-text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="embed-button-select">
+                                        <div class="embed-button-theme radioOn">
+                                            <input type="radio" class="embed-button-theme-input radioOn" value="0">
+                                        </div>
+                                        <div class="embed-button-subheading">
+                                            [$18217]
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="embed-block dark-theme">
+                                <div class="embed-button-centre">
+                                    <div class="embed-button centre-button">
+                                        <div class="embed-content-wrapper">
+                                            <div class="embed-mega-icon">
+                                            </div>
+                                            <div class="embed-action-text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="embed-button-select">
+                                        <div class="embed-button-theme radioOff">
+                                            <input type="radio" class="embed-button-theme-input radioOff" value="1">
+                                        </div>
+                                        <div class="embed-button-subheading">
+                                            [$18216]
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="alt-background">
+            <div class="footer-container manage">
+                <button class="mega-button positive file-request-close-button">
+                    <span>[$81]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Manage File Request folder -->
+    <div class="mega-dialog dialog-template-tool file-request file-request-manage-dialog hidden"
+         role="dialog"
+         aria-labelledby="file-request-manage-dialog-title"
+         aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <h2 id="file-request-manage-dialog-title" class="dialog-title">[$file_request_dialog_manage_title]</h2>
+        </header>
+
+        <section class="content">
+            <div class="scrollable">
+                <div class="content-block primary">
+                    <div class="form-row create">
+                        <label for="file-request-title">[$file_request_dialog_label_title]</label>
+                        <span class="char-count"></span>
+                        <div class="mega-input-wrapper">
+                            <div class="mega-input box-style">
+                                <input class="file-request-title" type="text" placeholder="[$file_request_dialog_placeholder_title]">
+                            </div>
+                            <div class="message-container"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="file-request-description">[$16462]</label>
+                        <span class="char-count"></span>
+                        <div class="mega-input-wrapper">
+                            <div class="mega-input box-style">
+                                <input class="file-request-description" type="text" placeholder="[$file_request_dialog_placeholder_desc]">
+                            </div>
+                            <div class="message-container"></div>
+                        </div>
+                        <p class="caption">[$file_request_dialog_caption_desc]</p>
+                    </div>
+                    <div class="footer-container space-between">
+                        <button class="mega-button file-request-preview-button">
+                            <span>[$file_request_dialog_button_preview]</span>
+                        </button>
+                    </div>
+                </div>
+                <hr class="divider"/>
+                <div class="content-block secondary">
+                    <div class="form-row create-success">
+                        <label for="file-request-share-link">[$file_request_dialog_label_url]</label>
+                        <div class="file-request-input input-share">
+                            <div class="input-wrapper">
+                                <i class="sprite-fm-mono icon-link chain"></i>
+                                <input class="file-request-share-link" type="text" value="" readonly="readonly">
+                            </div>
+                            <div class="button-wrapper">
+                                <button class="mega-button positive copy">[$1394]</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row create-success">
+                        <label for="file-request-embed-code">[$file_request_dialog_label_embed]</label>
+                        <div class="file-request-input input-code">
+                            <div class="input-wrapper">
+                                <i class="tab-icon url sprite-fm-mono icon-embed-code"></i>
+                                <input class="file-request-embed-code" type="text" value="" readonly="readonly">
+                            </div>
+                            <div class="button-wrapper">
+                                <button class="mega-button positive copy">[$17408]</button>
+                            </div>
+                        </div>
+                        <div class="file-request-embed-button-container">
+                            <div class="embed-button-header">
+                                [$file_request_dialog_theme_desc]
+                            </div>
+                            <div class="embed-button-selection light-theme">
+                                <div class="embed-block active">
+                                    <div class="embed-button-centre">
+                                        <div class="embed-button centre-button theme-light-forced">
+                                            <div class="embed-content-wrapper">
+                                                <div class="embed-mega-icon">
+                                                </div>
+                                                <div class="embed-action-text">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="embed-button-select">
+                                            <div class="embed-button-theme radioOn">
+                                                <input type="radio" class="embed-button-theme-input radioOn" value="0">
+                                            </div>
+                                            <div class="embed-button-subheading">
+                                                [$18217]
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="embed-block dark-theme">
+                                    <div class="embed-button-centre">
+                                        <div class="embed-button centre-button theme-light-forced">
+                                            <div class="embed-content-wrapper">
+                                                <div class="embed-mega-icon">
+                                                </div>
+                                                <div class="embed-action-text">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="embed-button-select">
+                                            <div class="embed-button-theme radioOff">
+                                                <input type="radio" class="embed-button-theme-input radioOff" value="1">
+                                            </div>
+                                            <div class="embed-button-subheading">
+                                                [$18216]
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer class="alt-background">
+            <div class="footer-container space-between manage">
+                <button class="mega-button file-request-remove-button">
+                    <span>[$file_request_dialog_button_remove]</span>
+                </button>
+                <div class="button-container">
+                    <button class="mega-button file-request-close-button">
+                        <span>[$82]</span>
+                    </button>
+                    <button class="mega-button file-request-update-button positive">
+                        <span>[$msg_dlg_save]</span>
+                    </button>
+                </div>
             </div>
         </footer>
     </div>

@@ -1184,12 +1184,12 @@ function init_page() {
         loadSubPage('fm/account');
         return false;
     }
+    else if (page.substr(0, 11) === 'filerequest') {
+        mega.fileRequestUpload.handlePublicUploadPage(page.substr(12));
+    }
     else if (page.substr(0, 8) === 'megadrop') {
-        if (is_mobile) {
-            parsepage(pages['mobile']);
-        }
-        var pupHandle = page.substr(9, 11);
-        mega.megadrop.pupCheck(pupHandle);
+        loadSubPage(`filerequest/${page.substr(9)}`);
+        return false;
     }
     else if (page == 'dashboard') {
         loadSubPage('fm/dashboard');

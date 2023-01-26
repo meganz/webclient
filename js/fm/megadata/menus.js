@@ -73,8 +73,12 @@ MegaData.prototype.buildSubMenu = function(id) {
                 classes += ' shared-folder-item';
                 iconClass = 'icon-folder-outgoing-share';
             }
-            else if (mega.megadrop.pufs[fid] && mega.megadrop.pufs[fid].s !== 1) {
-                classes += ' puf-folder';
+            else if (
+                mega.fileRequestCommon.storage.cache.puHandle[i]
+                && mega.fileRequestCommon.storage.cache.puHandle[i].s !== 1
+                && mega.fileRequestCommon.storage.cache.puHandle[i].p
+            ) {
+                classes += ' file-request-folder';
                 iconClass = 'icon-folder-upload';
             }
 
@@ -166,7 +170,7 @@ MegaData.prototype.getSelectedSourceRoot = function(isSearch) {
 
     let sourceRoot = isSearch || M.currentdirid === 'recents' ? M.getNodeRoot($.selected[0]) : M.currentrootid;
 
-    if (sourceRoot === 'public-links' || sourceRoot === 'out-shares') {
+    if (sourceRoot === 'public-links' || sourceRoot === 'out-shares' || sourceRoot === 'file-requests') {
         sourceRoot = M.RootID;
     }
 
@@ -243,15 +247,22 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                     || shareNode.down === undefined
                     || shareNode.down !== 1) {
 
-                    // Create or Remove upload page context menu action
-                    if (mega.megadrop.pufs[selNode.h]
-                        && mega.megadrop.pufs[selNode.h].s !== 1
-                        && mega.megadrop.pufs[selNode.h].p) {
-                        items['.removewidget-item'] = 1;
-                        items['.managewidget-item'] = 1;
+                    let fileRequestPageClass = ':not(.file-request-page)';
+                    if (M.currentrootid === 'file-requests') {
+                        fileRequestPageClass = '.file-request-page';
+                    }
+
+                    if (
+                        mega.fileRequest.storage.cache.puHandle[selNode.h]
+                        && mega.fileRequest.storage.cache.puHandle[selNode.h].s !== 1
+                        && mega.fileRequest.storage.cache.puHandle[selNode.h].p
+                    ) {
+                        items[`.file-request-manage${fileRequestPageClass}`] = 1;
+                        items[`.file-request-copy-link${fileRequestPageClass}`] = 1;
+                        items[`.file-request-remove${fileRequestPageClass}`] = 1;
                     }
                     else {
-                        items['.createwidget-item'] = 1;
+                        items[`.file-request-create`] = 1;
                     }
                 }
             }
@@ -503,6 +514,18 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     if (!folderlink && M.getNodeRoot(selNode.p) === M.RubbishID) {
         delete items['.download-item'];
         delete items['.zipdownload-item'];
+    }
+
+    if (M.currentdirid === 'file-requests') {
+        delete items['.move-item'];
+        delete items['.copy-item'];
+        delete items['.open-gallery'];
+        delete items['.open-cloud-item'];
+        delete items['.getlink-item'];
+        delete items['.embedcode-item'];
+        delete items['.removelink-item'];
+        delete items['.sh4r1ng-item'];
+        delete items['.send-to-contact-item'];
     }
 
     if (restrictedFolders || $.selected.length === 1

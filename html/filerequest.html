@@ -1,0 +1,117 @@
+<!-- Template FileRequest upload item -->
+<div class="block-uploading-item hidden" id="file-upload-item-template">
+    <div class="item-details">
+        <div class="item-name">
+        </div>
+        <div class="item-size">
+        </div>
+        <div class="item-status transfer-status">
+        </div>
+    </div>
+    <div class="item-progress">
+        <div class="item-progress-bar" style="width: 0%"></div>
+    </div>
+    <div class="item-error hidden">
+        <span class="error-icon">
+            <i class="sprite-fm-mono icon-alert-triangle"></i>
+        </span>
+        <span class="error-message-wrapper">
+            <span class="error-message">[$1578]</span>
+            <a class="error-reupload hidden">[$file_request_upload_error_reupload]</a>
+        </span>
+    </div>
+</div>
+<!-- END Template FileRequest upload item -->
+
+<div class="file-request-upload-page">
+    <div class="page-wrapper">
+        <div class="page-main">
+            <div class="page-logo">
+                <i class="sprite-fm-uni icon-mega-logo"></i>
+                <i class="icon-mega-logo-mobile hidden"></i>
+            </div>
+            <div class="page-content">
+                <div class="content-wrapper">
+                    <h1 class="content-title">
+                        [$file_request_upload_content_title]
+                    </h1>
+                    <div class="content-details">
+                        <span class="error-icon">
+                            <i class="sprite-fm-mono icon-alert-triangle"></i>
+                        </span>
+                        <div class="detail-wrapper">
+                            <h2 class="detail-title">
+                                EOFY Project
+                            </h2>
+                            <p class="detail-description">
+                                Can everyone please upload their reports by 00/00/0000
+                            </p>
+                            <p class="detail-upload-id">
+                                [$file_request_upload_content_upload_id] <span class="upload-id">XXXXX</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="content-upload-block block-empty">
+                        <div class="block-empty-icon">
+                            <i class="sprite-fm-uni icon-folder-upload-1"></i>
+                        </div>
+                        <div class="block-empty-icon error-icon">
+                            <i class="sprite-fm-mono icon-folder-upload-1"></i>
+                        </div>
+                        <div class="block-empty-caption">
+                            [$file_request_upload_empty]
+                        </div>
+                    </div>
+                    <div class="content-upload-block mobile block-empty">
+                        <a class="upload-btn block-empty-upload-button" href="#">[$file_request_upload_empty_block_mobile]</a>
+                    </div>
+                    <div class="content-upload-block block-uploading hidden">
+                        <div class="block-uploading-scroll">
+                        </div>
+                    </div>
+                    <div class="content-upload-summary hidden">
+                        <div class="upload-info">
+                            [$file_request_upload_summary_total]
+                        </div>
+                        <a class="upload-more">
+                            <span class="add-icon">
+                                <i class="sprite-fm-mono icon-plus-circle-filled"></i>
+                            </span>
+                            <span>[$file_request_upload_summary_button_add]</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-caption">
+            <div class="page-caption-wrapper">
+                <p>[$file_request_upload_caption_1]</p>
+                <p>[$file_request_upload_caption_2]</p>
+            </div>
+        </div>
+        <div class="page-footer">
+            <div class="page-copyright">
+                <div class="copyright-wrapper">
+                    <a href="https://www.mega.nz" target="_blank" class="wu-copyrights">
+                        <span>&copy; [$0]</span> <span class="year">[$381]</span>
+                    </a>
+                </div>
+            </div>
+            <div class="page-language">
+                <a class="language-wrapper">
+                    <span class="language-icon">
+                        <i class="sprite-fm-mono icon-globe-01"></i>
+                    </span>
+                    <span class="language-text">EN</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="hidden">
+    <input id="fileselect5" type="file" multiple>
+</div>
+
+<div class="mobile-only">
+    <div class="dark-overlay hidden" id="loading-overlay"></div>
+</div>

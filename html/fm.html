@@ -91,17 +91,36 @@
             <i class="sprite-fm-mono icon-search-cloud"></i>
             <span>[$23704]</span>
         </a>
-        <a class="dropdown-item createwidget-item">
+        <a class="dropdown-item file-request-create">
             <i class="sprite-fm-mono icon-folder-mega-drop"></i>
-            <span>[$17450]</span>
+            <span>[$file_request_dropdown_create]</span>
         </a>
-        <a class="dropdown-item managewidget-item">
+        <a class="dropdown-item file-request-copy-link">
+            <i class="sprite-fm-mono icon-copy-2"></i>
+            <span>[$file_request_dropdown_copy]</span>
+        </a>
+        <a class="dropdown-item file-request-manage">
             <i class="sprite-fm-mono icon-manage-folders"></i>
-            <span>[$17399]</span>
+            <span>[$file_request_dropdown_manage]</span>
         </a>
-        <a class="dropdown-item removewidget-item">
+        <a class="dropdown-item file-request-remove">
             <i class="sprite-fm-mono icon-cancel-folders"></i>
-            <span>[$17400]</span>
+            <span>[$file_request_dropdown_remove]</span>
+        </a>
+        <hr />
+    </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item file-request-copy-link file-request-page">
+            <i class="sprite-fm-mono icon-copy-2"></i>
+            <span>[$file_request_dropdown_copy]</span>
+        </a>
+        <a class="dropdown-item file-request-manage file-request-page">
+            <i class="sprite-fm-mono icon-manage-folders"></i>
+            <span>[$file_request_dropdown_manage]</span>
+        </a>
+        <a class="dropdown-item file-request-remove file-request-page">
+            <i class="sprite-fm-mono icon-cancel-folders"></i>
+            <span>[$file_request_dropdown_remove]</span>
         </a>
         <hr />
     </div>
@@ -672,6 +691,9 @@
                         <button class="btn-myfiles js-lpbtn public-links js-fm-tab" data-link="links">
                             <i class="sprite-fm-mono icon-link-filled"></i>[$24687]
                         </button>
+                        <button class="btn-myfiles js-lpbtn file-requests js-fm-tab" data-link="file-requests">
+                            <i class="sprite-fm-mono icon-folder-mega-drop-filled"></i>[$file_request_title]
+                        </button>
                     </div>
                 </div>
             </section>
@@ -939,7 +961,6 @@
                             <div class="sub-menu slide-item">
                                 <div class="sub-title" data-scrollto="upload-and-download">[$20170]</div>
                                 <div class="sub-title" data-scrollto="transfer-tools">[$20171]</div>
-                                <div class="sub-title" data-scrollto="megadrop-folders">[$17401]</div>
                             </div>
                         </div>
                         <div class="settings-button slide-in-out ts-500 closed contact-chats">
@@ -1179,6 +1200,13 @@
                         </div>
                         <span>[$20667]</span>
                     </button>
+
+                    <button class="mega-button no-hover action fm-new-file-request hidden">
+                        <div>
+                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
+                        </div>
+                        <span>[$file_request_action_create]</span>
+                    </button>
                 </div>
 
                 <div class="filter-block fm body hidden">
@@ -1403,6 +1431,21 @@
                 <div class="fm-empty-pad">
                     <i class="section-icon sprite-fm-mono icon-folder-outgoing-share-filled"></i>
                     <div class="fm-empty-cloud-txt">[$20668]</div>
+                </div>
+            </div>
+
+            <div class="fm-empty-section fm-empty-file-requests hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-mono icon-folder-mega-drop-filled"></i>
+                    <div class="fm-empty-cloud-txt">[$file_request_page_empty_title]</div>
+                    <div class="fm-empty-description">[$file_request_page_empty_desc]</div>
+                    <div class="fm-empty-options">
+                        <div class="fm-empty-options-item">
+                            <button class="mega-button positive fm-new-file-request">
+                                <span>[$file_request_action_create]</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -3374,81 +3417,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="account data-block megadrop-folders">
-                        <div class="settings-full-block">
-                            <div class="mega-data-header">
-                                <span class="title-txt">[$17401]</span>
-                            </div>
-                            <table class="megadrop-template-table hidden">
-                                <tbody>
-                                    <tr class="megadrop-header" id="megadrop-header-template">
-                                        <th>[$1049]</th>
-                                        <th>[$1724]</th>
-                                        <th></th>
-                                    </tr>
-                                    <tr class="megadrop-row slide-in-out closed" id="megadrop-row-template">
-                                        <td>
-                                            <span class="megafolder-name break-word"></span>
-                                        </td>
-                                        <td>
-                                            <div class="settings-breadcrumbs"></div>
-                                            <div class="widget-dialog expanded-widget slide-item">
-                                                <div class="tab-wrapper">
-                                                    <div class="tab tab-url-link active">
-                                                        <i class="sprite-fm-mono icon-link"></i>
-                                                        <span>[$5622]</span>
-                                                    </div>
-                                                    <div class="tab tab-embed-link">
-                                                        <i class="sprite-fm-mono icon-embed-code"></i>
-                                                        <span>[$17407]</span>
-                                                    </div>
-                                                </div>
-                                                <div class="widget-body-wrapper embed-link hidden">
-                                                    <div class="fm-body-text">
-                                                        <span>[$17411]</span>
-                                                    </div>
-                                                    <div class="widget-code embed-code">
-                                                        <span class="widget-code-wrapper"></span>
-                                                    </div>
-                                                    <div class="settings-table-buttons">
-                                                        <button class="mega-button preview-widget">
-                                                           <span>[$17409]</span>
-                                                        </button>
-                                                        <button class="mega-button positive copy-code">
-                                                            <span>[$17408]</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div class="widget-body-wrapper url-link">
-                                                    <div class="fm-body-text">
-                                                        <span>[$17410]</span>
-                                                    </div>
-                                                    <div class="widget-code url-link">
-                                                        <span class="widget-code-wrapper widget-url">%url</span>
-                                                    </div>
-                                                    <div class="settings-table-buttons">
-                                                        <button class="mega-button preview-widget">
-                                                            <span>[$17409]</span>
-                                                        </button>
-                                                        <button class="mega-button positive copy-url">
-                                                            <span>[$1394]</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <i class="megadrop-icon toggle sprite-fm-mono icon-arrow-down simpletip" data-simpletipposition="top" data-simpletip="[$20172]"></i>
-                                            <i class="megadrop-icon delete sprite-fm-mono icon-close-component simpletip" data-simpletipposition="top" data-simpletip="[$1730]"></i>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <table class="data-table megadrop js-data-table-megadrop">
-                                <tbody></tbody>
-                            </table>
                         </div>
                     </div>
                 </div>

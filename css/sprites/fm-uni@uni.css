@@ -281,6 +281,9 @@
 .sprite-fm-uni.icon-folder-upload, .sprite-fm-uni-before.icon-folder-upload-before::before, .sprite-fm-uni-after.icon-folder-upload-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-upload");
 }
+.sprite-fm-uni.icon-folder-upload-1, .sprite-fm-uni-before.icon-folder-upload-1-before::before, .sprite-fm-uni-after.icon-folder-upload-1-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-upload-1");
+}
 .sprite-fm-uni.icon-font-24, .sprite-fm-uni-before.icon-font-24-before::before, .sprite-fm-uni-after.icon-font-24-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-font-24");
 }

@@ -238,6 +238,7 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'albums' || (cv && cv.type === 'albums'))
             || M.isDynPage(id)
             || (mega.gallery.sections[id])
+            || id === 'file-requests'
         ) {
             result.push(id);
         }
@@ -291,6 +292,14 @@ MegaData.prototype.getPath = function(id) {
             }
             else if (cv.type === 'gallery' && cv.nodeID === result[i]) {
                 result[i + 1] = 'discovery';
+                break;
+            }
+            else if (cv.type === 'file-requests' && (
+                mega.fileRequestCommon.storage.cache.puHandle[result[i]]
+                && mega.fileRequestCommon.storage.cache.puHandle[result[i]].s !== 1
+                && mega.fileRequestCommon.storage.cache.puHandle[result[i]].p
+            )) {
+                result[i + 1] = 'file-requests';
                 break;
             }
             result.pop();
@@ -374,6 +383,12 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.prefixTree = 'pl_';
         result.prefixPath = 'public-links/';
     }
+    else if (pathOrID.substr(0, 14) === 'file-requests/') {
+        result.type = 'file-requests';
+        result.nodeID = pathOrID.replace('file-requests/', '');
+        result.prefixTree = 'fr_';
+        result.prefixPath = 'file-requests/';
+    }
     else if (pathOrID === 'out-shares') {
         result.type = result.nodeID = 'out-shares';
         result.prefixTree = 'os_';
@@ -384,6 +399,12 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.prefixTree = 'pl_';
         result.prefixPath = '';
     }
+    else if (pathOrID === 'file-requests') {
+        result.type = result.nodeID = 'file-requests';
+        result.prefixTree = 'fr_';
+        result.prefixPath = '';
+    }
+
     // This is not a out-share or a public-link
     else {
         result = false;
@@ -659,7 +680,7 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree, qui
     if (del && !tree.safeToDel) {
         tree.safeToDel = true;
 
-        var shared = mega.megadrop.isDropExist(cn);
+        var shared = mega.fileRequestCommon.storage.isDropExist(cn);
         for (var i = tree.length; i--;) {
             var n = M.d[tree[i].h] || false;
 
@@ -1094,7 +1115,9 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
             }
 
             // If user is on out-shares, public-link or search list page, move should not remove node from the list
-            if (M.currentdirid !== 'out-shares' && M.currentdirid !== 'public-links'
+            if (M.currentdirid !== 'out-shares'
+                && M.currentdirid !== 'public-links'
+                && M.currentdirid !== 'file-requests'
                 && String(M.currentdirid).split("/")[0] !== "search") {
                 removeUInode(h, p);
             }
@@ -1246,7 +1269,8 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
 
         // If the target folder is not the Rubbish, check whether we have to handle conflicts.
         if (t !== M.RubbishID) {
-            mega.megadrop.preMoveCheck(n, t).done(function(n, t) {
+            mega.fileRequest.preMoveCheck(n, t).then((response) => {
+                const { 0: n, 1: t } = response;
                 fileconflict.check(n, t, 'move', null, folderDefaultConflictResolution)
                     .always(function(files) {
                         if (!files.length) {
@@ -1305,9 +1329,9 @@ MegaData.prototype.moveNodes = function moveNodes(n, t, quiet, folderDefaultConf
                             promise.reject(ECIRCULAR);
                         }
                     });
-            }).fail(function() {
+            }).catch(() => {
                 loadingDialog.hide('force');
-                // The user didn't want to disable MEGAdrop folders
+                // The user didn't want to disable file request folders
                 promise.reject(EBLOCKED);
             });
         }
@@ -1740,13 +1764,13 @@ MegaData.prototype.revokeShares = function(handles) {
                 promises.push(mega.keyMgr.deletePendingOutShares(folders));
             }
 
-            var widgets = mega.megadrop.isDropExist(folders);
+            var widgets = mega.fileRequestCommon.storage.isDropExist(folders);
 
             if (widgets.length) {
                 if (d) {
-                    console.debug('Revoking %s MEGAdrop folders...', widgets.length);
+                    console.debug('Revoking %s File request folders...', widgets.length);
                 }
-                promises.push(mega.megadrop.pufRemove(widgets, true));
+                promises.push(mega.fileRequest.removeList(widgets, null, true));
             }
 
             for (i = tree.length; i--;) {
@@ -2033,7 +2057,7 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
             }, 90);
         }
 
-        mega.megadrop.onRename(itemHandle, newItemName);
+        mega.fileRequest.onRename(itemHandle, newItemName);
 
         // update file versioning dialog if the name of the versioned file changes.
         if (!n.t && n.tvf > 0) {

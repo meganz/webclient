@@ -690,6 +690,9 @@
         else if (id === 'public-links') {
             id = 'public-links';
         }
+        else if (id === 'file-requests') {
+            id = 'file-requests';
+        }
         else if (id && id.substr(0, 7) === 'account') {
             M.onFileManagerReady(accountUI);
         }
@@ -722,7 +725,14 @@
                 galleryUI();
             });
         }
-        else if (id && (id.substr(0, 11) === 'out-shares/' || id.substr(0, 13) === 'public-links/')) {
+        else if (
+            id &&
+            (
+                id.substr(0, 11) === 'out-shares/' ||
+                id.substr(0, 13) === 'public-links/' ||
+                id.substr(0, 14) === 'file-requests/'
+            )
+        ) {
             fetchdbnodes = true;
             id = cv.nodeID;
         }

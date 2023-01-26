@@ -1185,9 +1185,6 @@ function percent_megatitle() {
     }
     else if (transferStatus.ul_total) {
         t = ' \u2191 ' + x_ul + '%';
-        if (mega.megadrop.isInit()) {
-            mega.megadrop.uiUpdateTotalProgress(transferStatus.ul_done, transferStatus.ul_total, x_ul);
-        }
     }
     else {
         t = '';

@@ -165,6 +165,59 @@
                     '<span class="shared-contact-info"></span>' +
                 '</span>' +
             '</a>'
+        ],
+
+        'file-requests': [
+            // List view mode
+            '<table>' +
+                '<tr>' +
+                    '<td class="space-maintainer-start"></td>' +
+                    '<td megatype="fav">' +
+                        '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
+                    '</td>' +
+                    '<td megatype="fname">' +
+                        '<span class="transfer-filetype-icon"><img/></span>' +
+                        '<span class="tranfer-filetype-txt"></span>' +
+                    '</td>' +
+                    '<td megatype="label" class="label"></td>' +
+                    '<td megatype="size" class="size"></td>' +
+                    '<td megatype="type" class="type"></td>' +
+                    '<td megatype="timeAd" class="time ad"></td>' +
+                    '<td megatype="timeMd" class="time md"></td>' +
+                    '<td megatype="versions" class="hd-versions"></td>' +
+                    '<td megatype="extras" class="grid-url-field own-data">' +
+                        '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
+                        '<span class="versioning-indicator">' +
+                            '<i class="sprite-fm-mono icon-versions-previous"></i>' +
+                        '</span>' +
+                        '<i class="sprite-fm-mono icon-link"></i>' +
+                        '<a class="grid-file-request-manage hidden">' +
+                            '<i class="sprite-fm-mono icon-manage-folders"></i>' +
+                        '</a>' +
+                    '</td>' +
+                    '<td class="space-maintainer-end" megatype="empty"></td>' +
+                '</tr>' +
+            '</table>',
+
+            // Icon view mode
+            '<a class="data-block-view">' +
+                '<span class="data-block-bg ">' +
+                    '<span class="data-block-indicators">' +
+                        '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
+                        '<span class="versioning-indicator">' +
+                            '<i class="sprite-fm-mono icon-versions-previous"></i>' +
+                        '</span>' +
+                        '<i class="sprite-fm-mono icon-link"></i>' +
+                    '</span>' +
+                    '<span class="block-view-file-type"><img/></span>' +
+                    '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
+                    '<div class="video-thumb-details">' +
+                        '<i class="sprite-fm-mono icon-play"></i>' +
+                        '<span>00:00</span>' +
+                    ' </div>' +
+                '</span>' +
+                '<span class="file-block-title"></span>' +
+            '</a>'
         ]
     };
 
@@ -180,6 +233,10 @@
         'out-shares': [
             '.out-shared-grid-view .grid-table.out-shares',
             '.out-shared-blocks-scrolling'
+        ],
+        'file-requests': [
+            '.grid-table.fm',
+            '.fm-blocks-view.fm .file-block-scrolling',
         ]
     };
 
@@ -259,8 +316,10 @@
             section = 'shares';
         }
         else if (M.currentdirid === 'out-shares') {
-
             section = 'out-shares';
+        }
+        else if (M.currentrootid === 'file-requests') {
+            section = 'file-requests';
         }
         if (section === 'cloud-drive') {
 
@@ -402,6 +461,15 @@
                 else if (M.currentrootid === 'out-shares') {
                     if (M.currentdirid === 'out-shares') {
                         $('.fm-empty-outgoing').removeClass('hidden');
+                    }
+                    else {
+                        $('.fm-empty-folder').removeClass('hidden');
+                    }
+                }
+                else if (M.currentrootid === 'file-requests') {
+                    if (M.currentdirid === 'file-requests') {
+                        $('.fm-empty-file-requests').removeClass('hidden');
+                        mega.fileRequest.rebindPageEmptyCreateButton();
                     }
                     else {
                         $('.fm-empty-folder').removeClass('hidden');
@@ -568,7 +636,7 @@
         setDOMColumnsWidth: function(nodeDOM) {
             var sectionName = 'cloud';
 
-            if (this.section !== 'cloud-drive') {
+            if (this.section !== 'cloud-drive' && this.section !== 'file-requests') {
                 sectionName = this.section;
             }
 
@@ -583,6 +651,7 @@
                     const colWidths = M.columnsWidth[sectionName][knownColumnsWidths[col]];
 
                     if (tCol && tCol.nodeName === 'TH') {
+                        tCol.classList.remove('hidden');
 
                         if (typeof colWidths.curr === 'number') {
                             tCol.style.width = colWidths.curr + 'px';
@@ -600,6 +669,10 @@
                             else if (headerWidth > colMax) {
                                 tCol.style.width = `${colMax}px`;
                             }
+                        }
+
+                        if (colWidths.hidden) {
+                            tCol.classList.add('hidden');
                         }
                     }
                 }
@@ -965,6 +1038,9 @@
                 }
 
                 return props;
+            },
+            'file-requests': function(...args) {
+                return this.nodeProperties['*'].apply(this, args);
             }
         }),
 
@@ -1066,6 +1142,7 @@
                         tmp.classList.add(aProperties.icon);
                     }
                 }
+
                 this.addClasses(tmp, aProperties.classNames);
 
                 if (aProperties.undecryptable) {
@@ -1095,7 +1172,6 @@
                         elm.classList.add('icon-takedown');
                     }
                 }
-
 
                 return aTemplate;
             },
@@ -1250,6 +1326,22 @@
                 }
 
                 return aTemplate;
+            },
+            'file-requests': function(aNode, aProperties, aTemplate) {
+                const renderTemplate = this.builders['cloud-drive'].call(this, aNode, aProperties, aTemplate);
+
+                if (aNode.t && mega.fileRequestCommon.storage.isPresent(aNode.h)) {
+                    const manageIcon = renderTemplate
+                        .querySelector('.grid-file-request-manage');
+
+                    if (manageIcon) {
+                        manageIcon
+                            .classList
+                            .remove('hidden');
+                    }
+                }
+
+                return renderTemplate;
             }
         }),
 
@@ -1272,6 +1364,9 @@
                 if (!DYNLIST_ENABLED || !this.megaList) {
                     this.insertDOMNode(aNode, aNodeIndex, aDOMNode, aUpdate, cacheEntry);
                 }
+            },
+            'file-requests': function(...args) {
+                return this.renderer['cloud-drive'].apply(this, args);
             }
         }),
 
@@ -1290,7 +1385,7 @@
                 return null;
             },
             'cloud-drive': function(aUpdate, aNodeList) {
-                var result = this.initializers['*'].apply(this, arguments);
+                var result = this.initializers['*'].call(this, aUpdate, aNodeList);
 
                 if (DYNLIST_ENABLED) {
                     if (!aUpdate || !this.megaList) {
@@ -1372,6 +1467,11 @@
                 }
 
                 return result;
+            },
+            'file-requests': function(aUpdate, aNodeList) {
+
+
+                return this.initializers['cloud-drive'].call(this, aUpdate, aNodeList);
             }
         }),
 
@@ -1418,6 +1518,9 @@
                         this.megaList.batchReplace(aUserData.curNodeList.map(String));
                     }
                 }
+            },
+            'file-requests': function(aUpdate, aNodeList, aUserData) {
+                this.finalizers['cloud-drive'].call(this, aUpdate, aNodeList, aUserData);
             }
         }),
 

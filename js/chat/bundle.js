@@ -1904,8 +1904,13 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes, noOpen) {
         reject(result);
       });
     };
-    if (mega.megadrop.isDropExist(folderNodes).length) {
-      mega.megadrop.showRemoveWarning(folderNodes).then(_afterMDcheck);
+    if (mega.fileRequestCommon.storage.isDropExist(folderNodes).length) {
+      mega.fileRequest.showRemoveWarning(folderNodes).then(_afterMDcheck).catch(ex => {
+        if (ex) {
+          dump(ex);
+          showToast('warning2', l[253]);
+        }
+      });
     } else {
       _afterMDcheck();
     }
@@ -8492,12 +8497,9 @@ class CloudBrowserDialog extends mixins.wl {
                 link
               }) => this.props.room.sendMessage(link));
             };
-            return mega.megadrop.isDropExist(highlightedNode).length ? msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(highlightedNode.name)), l[18229], e => {
+            return mega.fileRequestCommon.storage.isDropExist(highlightedNode).length ? msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(highlightedNode.name)), l[18229], e => {
               if (e) {
-                mega.megadrop.pufRemove([highlightedNode]);
-                mega.megadrop.pufCallbacks[highlightedNode] = {
-                  del: createPublicLink
-                };
+                mega.fileRequest.removeList([highlightedNode], createPublicLink);
               }
             }) : createPublicLink();
           });

@@ -262,7 +262,7 @@
     .properties-file-icon i,
     .mega-dialog.properties-dialog .properties-file-icon i {
         background-image: url(../images/mega/properties-sprite@2x.png);
-        background-size: 589px 8470px;
+        background-size: 589px 8800px;
     }
     .drag-n-drop.header, .drag-n-drop hr, .drag-n-drop.info-block i {
         background-image: url(../images/mega/overlay-sprite@2x.png);

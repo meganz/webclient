@@ -259,19 +259,19 @@ class CloudBrowserDialog extends MegaRenderMixin {
                             };
 
                             return (
-                                mega.megadrop.isDropExist(highlightedNode).length ?
+                                mega.fileRequestCommon.storage.isDropExist(highlightedNode).length ?
                                     msgDialog(
                                         'confirmation',
                                         // `Confirm removal`
                                         l[1003],
-                                        // `By doing this you will cancel your MEGAdrop setup for the folder named %1`
+                                        // `By doing this you will cancel your File request setup
+                                        // for the folder named %1`
                                         l[17403].replace('%1', escapeHTML(highlightedNode.name)),
                                         // `Do you want to proceed?`
                                         l[18229],
                                         (e) => {
                                             if (e) {
-                                                mega.megadrop.pufRemove([highlightedNode]);
-                                                mega.megadrop.pufCallbacks[highlightedNode] = { del: createPublicLink };
+                                                mega.fileRequest.removeList([highlightedNode], createPublicLink);
                                             }
                                         }
                                     ) :

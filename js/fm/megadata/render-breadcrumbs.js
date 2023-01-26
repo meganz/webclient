@@ -87,6 +87,10 @@
                     typeClass = 'pub-links';
                     name = l[16516];
                 },
+                'file-requests': () => {
+                    typeClass = 'file-requests';
+                    name = l.file_request_title;
+                },
                 [this.RubbishID]: () => {
                     typeClass = 'rubbish-bin';
                     name = l[167];
@@ -451,7 +455,8 @@
         const specialCases = [
             'shares',
             'out-shares',
-            'public-links'
+            'public-links',
+            'file-requests'
         ];
 
         // super special case (contact)

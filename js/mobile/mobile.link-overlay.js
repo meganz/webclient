@@ -17,9 +17,6 @@ mobile.linkOverlay = {
         // Store the selector as it is re-used
         this.$overlay = $('#mobile-ui-copy-link');
 
-        // Lets make sure remove megadrop class from this overlay
-        this.$overlay.removeClass('megadrop');
-
         // Get initial overlay details
         var node = M.d[nodeHandle];
         var fileName = node.name;
@@ -28,7 +25,6 @@ mobile.linkOverlay = {
         var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
         var fileIconName = fileIcon(node);
         var fileIconPath = mobile.imagePath + fileIconName + '.png';
-        var self = this;
 
         // Set file name, size and image
         this.$overlay.find('.filename').text(fileName);
@@ -71,13 +67,19 @@ mobile.linkOverlay = {
             this.$overlay.removeClass('hidden').addClass('overlay');
         };
 
-        var mdList = mega.megadrop.isDropExist(nodeHandle);
-
+        const mdList = mega.fileRequestCommon.storage.isDropExist(nodeHandle);
         if (mdList.length) {
-
-            mega.megadrop.showRemoveWarning(mdList).done(function() {
-                mega.megadrop.pufRemove(mdList).done(tmpFn.bind(self));
-            });
+            mega.fileRequest
+                .showRemoveWarning(mdList)
+                .then(() => {
+                    tmpFn.call(this);
+                })
+                .catch((ex) => {
+                    if (ex) {
+                        dump(ex);
+                        showToast('warning2', l[253]);
+                    }
+                });
         }
         else {
             tmpFn.call(this);
@@ -346,10 +348,7 @@ mobile.linkOverlay = {
 
             // This is real touch, just trigger history back to clear history
             if (e.originalEvent) {
-
                 history.back();
-
-                return false;
             }
 
             // Hide overlay

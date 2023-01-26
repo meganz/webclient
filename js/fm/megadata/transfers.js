@@ -1465,7 +1465,7 @@ MegaData.prototype.addNewFile = function(fileName, dest) {
     // eslint-disable-next-line local-rules/hints
     var addFilePromise = new MegaPromise();
     dest = dest || M.currentdirid || M.RootID;
-    dest = dest.replace('public-links/', '').replace('out-shares/', '');
+    dest = dest.replace('public-links/', '').replace('out-shares/', '').replace('file-requests/', '');
 
     if ([8, 11].indexOf(String(dest).length) === -1) {
         return addFilePromise.reject(EACCESS);
@@ -1601,10 +1601,7 @@ MegaData.prototype.ulerror = function(ul, error) {
 
     if (error === EOVERQUOTA) {
         ulQueue.pause();
-        if (mega.megadrop.isInit()) {// MEGAdrop window is active
-            mega.megadrop.overQuota();
-        }
-        else {
+        if (mega.fileRequestUpload && !mega.fileRequestUpload.isUploadPageInitialized()) {
             M.showOverStorageQuota(-1);
         }
     }
@@ -1648,9 +1645,9 @@ MegaData.prototype.ulerror = function(ul, error) {
             $rows.addClass('transfer-error overquota').removeClass('transfer-completed');
             $('.transfer-status', $rows).text(l[1010]);
 
-            // Inform user that upload MEGAdrop is not available anymore
-            if (page.substr(0, 8) === 'megadrop') {
-                mBroadcaster.sendMessage('MEGAdrop:overquota');
+            // Inform user that upload File request is not available anymore
+            if (page.substr(0, 11) === 'filerequest') {
+                mBroadcaster.sendMessage('FileRequest:overquota');
             }
         }
         else {
@@ -1660,11 +1657,6 @@ MegaData.prototype.ulerror = function(ul, error) {
                 if (error === EOVERQUOTA) {
                     $ulRow.addClass('overquota');
                 }
-            }
-
-            // Inform user that upload MEGAdrop is not available anymore
-            if ((error === ENOENT || error === EACCESS) && page.substr(0, 8) === 'megadrop') {
-                mBroadcaster.sendMessage('MEGAdrop:disabled');
             }
 
             // Target is not exist on M.d anymore, target is deleted.
@@ -1733,13 +1725,9 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
         delete $.transferprogress['ul_' + id];
     }
 
-    // If MEGAdrop windows exists and upload
-    if (id && mega.megadrop.isInit()) {
-        var gid = 'ul_' + id;
-        if (is_mobile) {
-            gid = 'md_' + gid;
-        }
-        mega.megadrop.onItemCompletion('#' + gid);
+    // If File request windows exists and upload
+    if (id && mega.fileRequestUpload && mega.fileRequestUpload.isUploadPageInitialized()) {
+        mega.fileRequestUpload.onItemUploadCompletion(id);
     }
 
     delay('tfscomplete', function() {

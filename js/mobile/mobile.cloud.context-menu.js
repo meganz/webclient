@@ -88,15 +88,16 @@ mobile.cloud.contextMenu = {
             // Otherwise inititalise tap handler on the buttons
             mobile.cloud.contextMenu.initFolderOpenButtonHandler($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDownloadButton($folderContextMenu, nodeHandle);
-            mobile.cloud.contextMenu.initMegadropButtons($folderContextMenu, nodeHandle);
+            mobile.cloud.contextMenu.initFileRequestButtons($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initRenameButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initDeleteButton($folderContextMenu, nodeHandle);
             mobile.cloud.contextMenu.initCloseButton($folderContextMenu);
             mobile.cloud.contextMenu.initOverlayTap($folderContextMenu);
 
-            $('.create-megadrop', $folderContextMenu).addClass('hidden');
-            $('.manage-megadrop', $folderContextMenu).addClass('hidden');
-            $('.cancel-megadrop', $folderContextMenu).addClass('hidden');
+            $('.create-file-request', $folderContextMenu).addClass('hidden');
+            $('.manage-file-request', $folderContextMenu).addClass('hidden');
+            $('.copy-file-request', $folderContextMenu).addClass('hidden');
+            $('.cancel-file-request', $folderContextMenu).addClass('hidden');
 
             if (share && share.down) {
                 $folderContextMenu.find('.link-button').addClass('hidden');
@@ -109,14 +110,15 @@ mobile.cloud.contextMenu = {
                     && !folderlink) {
 
                     // Create or Remove upload page context menu action
-                    if (mega.megadrop.pufs[nodeHandle]
-                        && mega.megadrop.pufs[nodeHandle].s !== 1
-                        && mega.megadrop.pufs[nodeHandle].p) {
-                        $('.manage-megadrop', $folderContextMenu).removeClass('hidden');
-                        $('.cancel-megadrop', $folderContextMenu).removeClass('hidden');
+                    if (mega.fileRequestCommon.storage.cache.puHandle[nodeHandle]
+                        && mega.fileRequestCommon.storage.cache.puHandle[nodeHandle].s !== 1
+                        && mega.fileRequestCommon.storage.cache.puHandle[nodeHandle].p) {
+                        $('.manage-file-request', $folderContextMenu).removeClass('hidden');
+                        $('.cancel-file-request', $folderContextMenu).removeClass('hidden');
+                        $('.copy-file-request', $folderContextMenu).removeClass('hidden');
                     }
                     else {
-                        $('.create-megadrop', $folderContextMenu).removeClass('hidden');
+                        $('.create-file-request', $folderContextMenu).removeClass('hidden');
                     }
                 }
             }
@@ -329,81 +331,9 @@ mobile.cloud.contextMenu = {
         });
     },
 
-    initMegadropButtons: function($contextMenu, nodeHandle) {
-
+    initFileRequestButtons: function($contextMenu, nodeHandle) {
         'use strict';
-
-        var $makeBtn = $('.create-megadrop', $contextMenu);
-        var $manageBtn = $('.manage-megadrop', $contextMenu);
-        var $cancelBtn = $('.cancel-megadrop', $contextMenu);
-
-        // When the button is tapped
-        $makeBtn.rebind('tap', function() {
-
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
-                return false;
-            }
-
-            mobile.cloud.contextMenu.hide();
-
-            // Go to widget creation directly don't display PUF info dialog
-            if (mega.megadrop.uiSkipDialog()) {
-                mega.megadrop.pufCreate(nodeHandle);
-            }
-            else {// Display PUF info dialog
-                mega.megadrop.uiMobileInfoDialog(nodeHandle, true);
-            }
-
-            return false;
-        });
-
-        $manageBtn.rebind('tap', function() {
-
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
-                return false;
-            }
-
-            mobile.cloud.contextMenu.hide();
-
-            // Go to widget creation directly don't display PUF info dialog
-            if (mega.megadrop.uiSkipDialog()) {
-                mega.megadrop.pufCreate(nodeHandle);
-            }
-            else {// Display PUF info dialog
-                mega.megadrop.uiMobileInfoDialog(nodeHandle, false);
-            }
-
-            return false;
-        });
-
-        $cancelBtn.rebind('tap', function() {
-
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
-                return false;
-            }
-
-            mobile.cloud.contextMenu.hide();
-            mega.megadrop.pufRemove([nodeHandle]);
-            return false;
-        });
+        mega.fileRequest.mobileContextMenu.init($contextMenu, nodeHandle);
     },
 
     /**

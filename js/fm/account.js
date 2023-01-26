@@ -1447,8 +1447,8 @@ accountUI.account = {
                                 $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.name);
                                 showToast('settings', l[7698]);
                                 accountUI.account.profiles.bindEvents();
-                                // update megadrop username for existing megadrop
-                                mega.megadrop.updatePUPUserName(u_attr.fullname);
+                                // update file request username for existing folder
+                                mega.fileRequest.onUpdateUserName(u_attr.fullname);
                             }
                         }
                     });
@@ -3384,9 +3384,6 @@ accountUI.transfers = {
 
         // Transfer Tools - Megasync
         this.transferTools.megasync.render();
-
-        // MEGAdrop folders table
-        mega.megadrop.stngsDraw();
 
         // Download folder setting for PaleMoon ext
         this.addDownloadFolderSetting();

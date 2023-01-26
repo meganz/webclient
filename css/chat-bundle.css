@@ -389,7 +389,7 @@
 }
 @media only screen and (max-height: 760px) {
   .meetings-call .carousel-button-prev,
-  .meetings-call .carousel-button-next {
+.meetings-call .carousel-button-next {
     top: auto;
     bottom: 322px;
     width: 56px;
@@ -406,7 +406,7 @@
 }
 @media only screen and (max-height: 760px) {
   .meetings-call .carousel-button-prev i,
-  .meetings-call .carousel-button-next i {
+.meetings-call .carousel-button-next i {
     --icon-size: 28px;
   }
 }
@@ -431,7 +431,7 @@
 }
 @media only screen and (max-height: 760px) {
   .meetings-call .carousel-button-prev div,
-  .meetings-call .carousel-button-next div {
+.meetings-call .carousel-button-next div {
     top: -32px;
     bottom: auto;
   }

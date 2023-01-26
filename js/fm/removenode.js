@@ -154,7 +154,7 @@ function removeUInode(h, parent) {
                     if (M.isDynPage(M.currentdirid)) {
                         $(`.fm-empty-${M.currentdirid}`, '.fm-right-files-block').removeClass('hidden');
                     }
-                    else if (M.currentdirid !== 'public-links') {
+                    else if (M.currentdirid !== 'public-links' && M.currentdirid !== 'file-requests') {
                         $('.fm-empty-folder').removeClass('hidden');
                     }
                 }

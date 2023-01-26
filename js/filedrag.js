@@ -4,7 +4,35 @@
     var dir_inflight = 0;
     var filedrag_u = [];
     var filedrag_paths = Object.create(null);
-    var touchedElement = 0;
+
+    const optionReference = {
+        touchedElement: 0,
+        fileRequestEnabled: false,
+        addOverlay: addOverlay,
+        removeOverlay: removeOverlay
+    };
+
+    function addOverlay() {
+        $('body', document).addClass('overlayed');
+
+        if (optionReference.fileRequestEnabled) {
+            $('body', document).addClass('file-request-drag');
+            return;
+        }
+
+        $('.drag-n-drop.overlay').removeClass('hidden');
+    }
+
+    function removeOverlay() {
+        $('body', document).removeClass('overlayed');
+
+        if (optionReference.fileRequestEnabled) {
+            $('body', document).removeClass('file-request-drag');
+            return;
+        }
+
+        $('.drag-n-drop.overlay').addClass('hidden');
+    }
 
     function addUpload(files, emptyFolders) {
         var straight = $.doStraightUpload || Object(window.fmconfig).ulddd || M.currentrootid === M.RubbishID;
@@ -155,7 +183,7 @@
 
     function FileDragEnter(e) {
         if (d) {
-            console.log('DragEnter');
+            console.log('DragEnter', optionReference.touchedElement);
         }
         e.preventDefault();
         if ($.dialog === 'avatar') {
@@ -168,10 +196,9 @@
         if (d > 1) {
             console.info('----- ENTER event :' + e.target.className);
         }
-        touchedElement++;
-        if (touchedElement === 1) {
-            $('.drag-n-drop.overlay').removeClass('hidden');
-            $('body').addClass('overlayed');
+        optionReference.touchedElement++;
+        if (optionReference.touchedElement === 1) {
+            addOverlay();
         }
 
     }
@@ -248,7 +275,7 @@
 
     function FileDragLeave(e) {
         if (d) {
-            console.log('DragLeave');
+            console.log('DragLeave', optionReference.touchedElement);
         }
         e.preventDefault();
         if ($.dialog === 'avatar') {
@@ -259,12 +286,14 @@
         if (d > 1) {
             console.warn('----- LEAVE event :' + e.target.className + '   ' + e.type);
         }
-        touchedElement--;
+        optionReference.touchedElement--;
         // below condition is due to firefox bug. https://developer.mozilla.org/en-US/docs/Web/Events/dragenter
-        if ((touchedElement <= 0) || (touchedElement === 1 && ua.details.browser === 'Firefox')) {
-            $('.drag-n-drop.overlay').addClass('hidden');
-            $('body').removeClass('overlayed');
-            touchedElement = 0;
+        if (
+            optionReference.touchedElement <= 0 ||
+            optionReference.touchedElement === 1 && ua.details.browser === 'Firefox'
+        ) {
+            removeOverlay();
+            optionReference.touchedElement = 0;
         }
     }
 
@@ -276,10 +305,9 @@
         }
 
         // Clear drag element
-        touchedElement = 0;
+        optionReference.touchedElement = 0;
 
-        $('.drag-n-drop.overlay').addClass('hidden');
-        $('body').removeClass('overlayed');
+        removeOverlay();
 
         if (M.isInvalidUserStatus()) {
             return false;
@@ -513,6 +541,7 @@
                 M.currentdirid === 'shares' || // Share root page
                 M.currentdirid === 'out-shares' || // Out-share root page
                 M.currentdirid === 'public-links' || // Public-link root page
+                M.currentdirid === 'file-requests' || // File request page
                 String(M.currentdirid).startsWith('chat/contacts') || // Contacts pages
                 M.currentrootid === M.RubbishID || // Rubbish bin
                 (M.currentrootid === undefined && M.currentdirid !== 'transfers') // Dashboard and Settings pages
@@ -533,25 +562,26 @@
         }
 
         // dran&drop overlay click handler, to allow closing if stuck
-        $('.drag-n-drop.overlay').off('click.dnd').on('click.dnd',
-            function dragDropLayoutClickHndler() {
-                $('.drag-n-drop.overlay').addClass('hidden');
-                $('body').removeClass('overlayed');
-            }
-        );
+        $('.drag-n-drop.overlay')
+            .rebind('click.dnd', function dragDropLayoutClickHndler() {
+                removeOverlay();
+            });
 
         var fnHandler = FileSelectHandler;
         var fnEnter = FileDragEnter;
         var fnHover = FileDragHover;
         var fnLeave = FileDragLeave;
 
-        touchedElement = 0;
+        optionReference.touchedElement = 0;
 
-        // MEGAdrop upload
-        var elem = document.getElementById("wu_items");
-        if (elem) {
-            fnHandler = mega.megadrop.upload;
-            document.getElementById("fileselect5").addEventListener("change", fnHandler, false);
+        // FileRequest upload
+        const fileSelect = document.getElementById('fileselect5');
+        if (fileSelect) {
+            optionReference.fileRequestEnabled = true;
+            fnHandler = mega.fileRequestUpload.getAndSetUploadHandler(optionReference);
+            fnEnter = mega.fileRequestUpload.checkUploadDragHandler(fnEnter);
+            fnHover = mega.fileRequestUpload.checkUploadDragHandler(fnHover);
+            fnLeave = mega.fileRequestUpload.checkUploadDragHandler(fnLeave);
         }
 
         document.getElementsByTagName("body")[0].addEventListener("dragenter", fnEnter, false);

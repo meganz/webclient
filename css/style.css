@@ -1846,6 +1846,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.selected.opened .nw-fm-tree-folder.puf-folder::before, .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder.puf-folder::before, .nw-fm-tree-item.dragover.expanded .nw-fm-tree-folder.puf-folder::before, .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.puf-folder::before, .rubbish-bin .nw-fm-tree-item.selected.opened .nw-fm-tree-folder.puf-folder::before, .rubbish-bin .nw-fm-tree-item.dragover.opened .nw-fm-tree-folder.puf-folder::before, .rubbish-bin .nw-fm-tree-item.opened:hover .nw-fm-tree-folder.puf-folder::before, .nw-fm-tree-item.expanded.opened.selected .nw-fm-tree-folder.puf-folder::before, .nw-fm-tree-item.expanded:hover .nw-fm-tree-folder.puf-folder::before {
     background-position: -377px -1117px;
 }
+.transfer-filetype-icon.file-request-folder {
+    background-position: -298px -1559px;
+}
 .nw-contact-item {
     height: 48px;
     overflow: hidden;
@@ -5104,15 +5107,6 @@ span.orange {
     background-position: -3px -4987px;
 }
 .getlink-item .context-menu-icon {
-    background-position: -3px -4344px;
-}
-.createwidget-item .context-menu-icon {
-    background-position: -3px -4344px;
-}
-.managewidget-item .context-menu-icon {
-    background-position: -3px -4344px;
-}
-.removewidget-item .context-menu-icon {
     background-position: -3px -4344px;
 }
 .removelink-item .context-menu-icon {

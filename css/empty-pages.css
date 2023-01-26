@@ -133,3 +133,12 @@
 .contacts-content .fm-empty-contacts {
     margin-top: 10px;
 }
+
+/* file-request */
+.fm-empty-file-requests .fm-empty-description {
+    max-width: 511px;
+    font-family: var(--text-font-family-semibold);
+}
+.fm-empty-file-requests .fm-empty-options-item {
+    margin-top: 6px;
+}

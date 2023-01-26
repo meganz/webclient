@@ -73,6 +73,14 @@
         if ($.moveDialog) {
             M.disableCircularTargets('#mctreea_');
         }
+        else if ($.selectFolderDialog && M.currentrootid === 'file-requests') {
+            $('*[id^="mctreea_"]', $dialog)
+                .children('.file-request-folder, .shared-folder')
+                .closest('.nw-fm-tree-item')
+                .addClass('disabled');
+
+            $('*[id^="mctreea_"].linked', $dialog).addClass('disabled');
+        }
         else if (!$.copyToUpload) {
             var sel = $.selected || [];
 
@@ -913,6 +921,9 @@
         $('.dialog-empty-block', $dialog).removeClass('active');
         $('.fm-picker-dialog-tree-panel', $dialog).removeClass('active');
         $('.fm-picker-dialog-panel-arrows', $dialog).removeClass('active');
+        $('.fm-picker-dialog-desc', $dialog).addClass('hidden'); // Hide description
+        $dialog.removeClass('fm-picker-file-request');
+        $('button.js-close', $dialog).addClass('hidden');
 
         // inherited dialog content...
         var html = section !== 'conversations' && $('.content-panel.' + section).html();
@@ -1013,7 +1024,18 @@
         }
         else if ($.selectFolderDialog) {
             $permissionSelect.addClass('hidden');
-            $('header h2', $dialog).text(l[16533]);
+            if ($.fileRequestNew) {
+                $dialog.addClass('fm-picker-file-request');
+                $('header h2', $dialog).text(l.file_request_select_folder_title);
+                $('.fm-picker-dialog-desc', $dialog)
+                    .removeClass('hidden');
+                $('.fm-picker-dialog-desc p', $dialog)
+                    .text(l.file_request_select_folder_desc);
+                $('button.js-close', $dialog).removeClass('hidden');
+            }
+            else {
+                $('header h2', $dialog).text(l[16533]);
+            }
         }
         else {
             $permissionSelect.addClass('hidden');
@@ -1279,6 +1301,34 @@
 
                 handleOpenDialog(0, M.RootID);
                 $.selectFolderCallback = cb;
+                return $dialog;
+            });
+        }
+
+        return false;
+    };
+
+    /**
+     * A version of the select a folder dialog used for "New File Request Folder" in out-shares.
+     * @global
+     * @param {Object} options Additional settings for new file request dialog
+     * @returns {Object} The jquery object of the dialog
+     */
+    global.openNewFileRequestDialog = function(options) {
+        if (!isUserAllowedToOpenDialogs()) {
+            return false;
+        }
+
+        const postEventHandler = options && options.post || null;
+        if (postEventHandler) {
+            const aMode = options && options.mode || 'fileRequestNew';
+
+            M.safeShowDialog('selectFolder', () => {
+                handleOpenDialog(0, M.RootID, aMode);
+                $.selectFolderCallback = function() {
+                    closeDialog();
+                    postEventHandler($.mcselected);
+                };
                 return $dialog;
             });
         }

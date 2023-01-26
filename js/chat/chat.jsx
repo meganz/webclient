@@ -2467,8 +2467,15 @@ Chat.prototype.openChatAndAttachNodes = function(targets, nodes, noOpen) {
             });
         };
 
-        if (mega.megadrop.isDropExist(folderNodes).length) {
-            mega.megadrop.showRemoveWarning(folderNodes).then(_afterMDcheck);
+        if (mega.fileRequestCommon.storage.isDropExist(folderNodes).length) {
+            mega.fileRequest.showRemoveWarning(folderNodes)
+                .then(_afterMDcheck)
+                .catch((ex) => {
+                    if (ex) {
+                        dump(ex);
+                        showToast('warning2', l[253]);
+                    }
+                });
         }
         else {
             _afterMDcheck();

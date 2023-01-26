@@ -124,9 +124,14 @@ MegaData.prototype.openSharingDialog = function() {
             .catch(dump);
     };
 
-    var mdList = mega.megadrop.isDropExist($.selected);
+    const mdList = mega.fileRequestCommon.storage.isDropExist($.selected);
     if (mdList.length) {
-        mega.megadrop.showRemoveWarning(mdList).then(fire).catch(nop);
+        mega.fileRequest.showRemoveWarning(mdList).then(fire).catch((ex) => {
+            if (ex) {
+                dump(ex);
+                showToast('warning2', l[253]);
+            }
+        });
     }
     else {
         fire();

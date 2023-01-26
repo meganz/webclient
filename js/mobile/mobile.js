@@ -1071,6 +1071,10 @@ var preqs = Object.create(null); // FIXME: mobile needs to use preqs[] to preven
 function fm_tfsupdate() {
     'use strict';
     var overlay = document.querySelector('.mobile.upload-overlay');
+    if (!overlay) {
+        return;
+    }
+
     var table = overlay.querySelector('.mobile-transfer-table');
 
     if (M.pendingTransfers) {

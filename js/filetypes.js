@@ -681,11 +681,13 @@ function folderIcon(node) {
         // folderIcon += 'folder-outgoing'; for vector icon
         return `${folderIcon}folder-shared`;
     }
-    // Public upload folder
-    else if (mega.megadrop.pufs[node.h] && mega.megadrop.pufs[node.h].s !== 1) {
-
-        // `${folderIcon}folder-public}` for vector icon
-        return `${folderIcon}puf-folder`;
+    // File request folder
+    else if (
+        mega.fileRequestCommon.storage.cache.puHandle[node.h]
+        && mega.fileRequestCommon.storage.cache.puHandle[node.h].s !== 1
+        && mega.fileRequestCommon.storage.cache.puHandle[node.h].p
+    ) {
+        return `${folderIcon}file-request-folder`;
     }
     // Incoming share
     else if (node.su) {

@@ -92,6 +92,7 @@ var EGOINGOVERQUOTA = -24;
 
 var EROLLEDBACK = -25;
 var EMFAREQUIRED = -26;     // Multi-Factor Authentication Required
+var EBUSINESSPASTDUE = -28;
 var EPAYWALL = -29;     // ODQ paywall state
 
 // custom errors

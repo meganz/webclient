@@ -449,9 +449,8 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
 
         if (page !== 'download') {
-
-            if (mega.megadrop.isInit()) {
-                mega.megadrop.onCompletion();
+            if (mega.fileRequestUpload && mega.fileRequestUpload.isUploadPageInitialized()) {
+                mega.fileRequestUpload.onUploadCompletion();
             }
         }
     }

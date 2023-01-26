@@ -142,6 +142,9 @@ twofactor.loginDialog = {
 
             // Get the Google Authenticator PIN code from the user
             var pinCode = $.trim($pinCodeInput.val());
+            if (!pinCode) {
+                return;
+            }
 
             // Get cached data from the login form
             var email = security.login.email.trim();

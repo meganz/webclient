@@ -159,6 +159,7 @@ function pagelogin() {
     var $formWrapper = $('.main-mid-pad.login form');
     var $email = $formWrapper.find('#login-name2');
     var $password = $formWrapper.find('#login-password2');
+    var $button = $('button.login-button', $formWrapper);
 
     var e = $email.val().trim();
     if (e === '' || !isValidEmail(e)) {
@@ -169,8 +170,16 @@ function pagelogin() {
         $('#login-password2').megaInputsShowError(l[1791]);
         $password.focus();
     }
+    else if ($button.hasClass('disabled')) {
+        if (d) {
+            console.warn('Aborting login procedure, there is another ongoing...');
+        }
+    }
     else {
+        $button.addClass('disabled');
+        tSleep(9).then(() => $button.removeClass('disabled'));
         loadingDialog.show();
+
         $formWrapper.find('.top-dialog-login-button').addClass('loading');
         if ($formWrapper.find('.loginwarning-checkbox').hasClass('checkboxOn')) {
             localStorage.hideloginwarning = 1;
@@ -197,7 +206,7 @@ function init_login() {
     'use strict';
 
     var $formWrapper = $('.main-mid-pad.login');
-    var $inputs = $('input', $formWrapper);
+    var $inputs = $('#login-name2, #login-password2, .login-button', $formWrapper);
     var $button = $('button.login-button', $formWrapper);
     var $forgotPassLink = $('.top-login-forgot-pass', $formWrapper);
 
@@ -254,12 +263,6 @@ function init_login() {
 
     $button.rebind('click.initlogin', function() {
         pagelogin();
-    });
-
-    $button.rebind('keydown.initlogin', function (e) {
-        if (e.keyCode === 13) {
-            pagelogin();
-        }
     });
 
     // Init inputs events

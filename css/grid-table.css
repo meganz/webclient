@@ -10,7 +10,8 @@
 .files-grid-view,
 .files-grid-view.shared-view,
 .files-grid-view.out-shares-view,
-.files-grid-view.public-links-view {
+.files-grid-view.public-links-view,
+.files-grid-view.file-requests-view {
     box-sizing: border-box;
     height: 100%;
     overflow: hidden;
@@ -218,7 +219,9 @@ table tr.ui-selected .grid-url-arrow,
 table tr:hover .clear-transfer-icon,
 table tr.ui-selected .clear-transfer-icon,
 table tr:hover .link-transfer-status,
-table tr.ui-selected .link-transfer-status {
+table tr.ui-selected .link-transfer-status,
+table tr:hover .grid-file-request-manage,
+table tr.ui-selected .grid-file-request-manage {
      opacity: 1;
 }
 
@@ -350,6 +353,7 @@ table tr.ui-selected .link-transfer-status {
 .grid-table.fm.v-timeAd [megatype="timeAd"],
 .grid-table.fm.v-timeMd [megatype="timeMd"],
 .grid-table.fm.v-versions [megatype="versions"],
+.grid-table.fm.v-playtime [megatype="playtime"],
 .grid-table.fm.v-extras [megatype="extras"] {
     display: table-cell;
 }
@@ -1269,4 +1273,11 @@ table.out-shares .fm-chat-users {
 }
 .transfer-scrolling-table.ps > .ps__scrollbar-y-rail {
     margin-top: 26px;
+}
+
+/* ======================================== *\
+   grid-table file-requests
+\* ======================================== */
+.file-requests-view .grid-table tr:not(.ui-selected):not(:hover) .grid-file-request-manage {
+    opacity: 0;
 }

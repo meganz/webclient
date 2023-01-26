@@ -649,7 +649,8 @@
         delay(tag, async() => {
             const holders = {
                 cookie: 1, download: 1, file: 1, folder: 1,
-                megadrop: 1, privacy: 1, takedown: 1, terms: 1
+                privacy: 1, takedown: 1, terms: 1,
+                filerequest: 1
             };
             let hold = pfid || holders[page] || String(page).includes('chat');
             if (!hold) {

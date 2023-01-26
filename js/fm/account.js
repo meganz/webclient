@@ -793,12 +793,23 @@ accountUI.leftPane = {
             const $parentBtn = $this.closest('.settings-button');
             const dataScrollto = $this.attr('data-scrollto');
             const $target = $(`.data-block.${dataScrollto}`);
-            const targetPosition = $target.position().top;
             const parentPage = accountUI.leftPane.getPageUrlBySection($parentBtn);
             const page = `${parentPage}/${dataScrollto}`;
+            const isHidden = $target.hasClass('hidden');
+
+            if (isHidden) {
+                // display: block removes an element from DOM, so we need to mimic it's location for a bit
+                $target.addClass('v-hidden').removeClass('hidden');
+            }
+
+            const targetPosition = $target.position().top;
+
+            if (isHidden) {
+                $target.addClass('hidden').removeClass('v-hidden');
+            }
 
             if ($parentBtn.hasClass('active')) {
-                accountUI.$contentBlock.animate({scrollTop: targetPosition}, 500);
+                accountUI.$contentBlock.animate({ scrollTop: targetPosition }, 500);
                 pushHistoryState(page);
             }
             else {
@@ -1436,8 +1447,8 @@ accountUI.account = {
                                 $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.name);
                                 showToast('settings', l[7698]);
                                 accountUI.account.profiles.bindEvents();
-                                // update megadrop username for existing megadrop
-                                mega.megadrop.updatePUPUserName(u_attr.fullname);
+                                // update file request username for existing folder
+                                mega.fileRequest.onUpdateUserName(u_attr.fullname);
                             }
                         }
                     });
@@ -3374,9 +3385,6 @@ accountUI.transfers = {
         // Transfer Tools - Megasync
         this.transferTools.megasync.render();
 
-        // MEGAdrop folders table
-        mega.megadrop.stngsDraw();
-
         // Download folder setting for PaleMoon ext
         this.addDownloadFolderSetting();
     },
@@ -3854,7 +3862,7 @@ accountUI.contactAndChat = {
             if (dnd) {
                 return (
                     // `Notifications will be silent until %s`
-                    l[23540].replace('%s', '<span>' + escapeHTML(unixtimeToTimeString(dnd)) + '</span>')
+                    l[23540].replace('%s', '<span>' + toLocaleTime(dnd) + '</span>')
                 );
             }
             return '&nbsp;';

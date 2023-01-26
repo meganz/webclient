@@ -351,8 +351,12 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 else if (folders[idx].t & M.IS_SHARED) {
                     node.classList.add('shared-folder');
                 }
-                else if (mega.megadrop.pufs[curItemHandle] && mega.megadrop.pufs[curItemHandle].s !== 1) {
-                    node.classList.add('puf-folder');
+                else if (
+                    mega.fileRequestCommon.storage.cache.puHandle[curItemHandle]
+                    && mega.fileRequestCommon.storage.cache.puHandle[curItemHandle].s !== 1
+                    && mega.fileRequestCommon.storage.cache.puHandle[curItemHandle].p
+                ) {
+                    node.classList.add('file-request-folder');
                 }
                 else if (curItemHandle === M.CameraId) {
                     node.classList.add('camera-folder');
@@ -1067,6 +1071,24 @@ MegaData.prototype.getOutShareTree = function() {
         }
     }
     return ostree;
+};
+
+/**
+ * Create tree of file-request's children. Same structure as M.tree
+ * @return {Object} file requests tree
+ */
+MegaData.prototype.getFileRequestsTree = function() {
+    'use strict';
+
+    const fileRequestsTree = {};
+    const currentPuFolders = mega.fileRequest.getPuHandleList();
+    for (const puHandleKey in currentPuFolders) {
+        if (currentPuFolders[puHandleKey] && M.d[puHandleKey]) {
+            fileRequestsTree[puHandleKey] = Object.assign({}, M.d[puHandleKey]);
+        }
+    }
+
+    return fileRequestsTree;
 };
 
 /**

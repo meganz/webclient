@@ -27,7 +27,7 @@ class PrivilegeChange extends ConversationMessageMixin {
 
 
         var datetime = <div className="message date-time simpletip"
-            data-simpletip={time2date(timestampInt)}>{timestamp}</div>;
+            data-simpletip={time2date(timestampInt, 17)}>{timestamp}</div>;
 
         var displayName;
         if (contact) {

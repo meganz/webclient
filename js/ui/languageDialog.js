@@ -12,7 +12,12 @@ var langDialog = {
     show: function() {
 
         // Cache some selectors for performance
-        langDialog.$dialog = $('.mega-dialog.languages-dialog');
+        let langDialogSelector = '.languages-dialog';
+        if (is_mobile) {
+            langDialogSelector = '.languages-dialog-mobile';
+        }
+
+        langDialog.$dialog = $(`.mega-dialog${langDialogSelector}`);
         langDialog.$overlay = $('.fm-dialog-overlay');
 
         var $tierOneLanguages = langDialog.$dialog.find('.tier-one-languages');
@@ -137,7 +142,12 @@ var langDialog = {
      */
     renderLanguages: function(langCodes, tierTwo) {
 
-        var $template = $('.languages-dialog .language-template').clone();
+        let langDialogSelector = '.languages-dialog';
+        if (is_mobile) {
+            langDialogSelector = '.languages-dialog-mobile';
+        }
+
+        var $template = $(`${langDialogSelector} .language-template`).clone();
         var html = '';
 
         // Remove template class

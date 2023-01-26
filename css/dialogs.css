@@ -4270,6 +4270,12 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.properties-dialog .properties-file-icon i.rubbish-puf-folder {
         background-position: -391px -5860px;
     }
+    .mega-dialog.properties-dialog .properties-file-icon i.file-request-folder {
+        background-position: 9px -8520px;
+    }
+    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-file-request-folder {
+        background-position: -391px -8520px;
+    }
 
 /* end properties-dialog */
 
@@ -5930,30 +5936,6 @@ body.de .mega-dialog.new-group-chat {
 
 /* end invitation-dialog */
 
-/* create-widget-info-dialog */
-
-    .mega-dialog.create-widget-info-dialog {
-        width: 640px;
-        text-align: center;
-    }
-    .mega-dialog.create-widget-info-dialog aside {
-        text-align: start;
-    }
-    .mega-dialog.create-widget-info-dialog .fm-widget-illustration {
-        margin: 0 auto;
-        height: 120px;
-        width: 336px;
-        --width: 336px;
-    }
-    .mega-dialog.create-widget-info-dialog .fm-widget-introduction,
-    .mega-dialog.create-widget-info-dialog .fm-widget-manage {
-        font: var(--text-h2);
-        color: var(--text-color-high);
-        margin: 24px auto 12px;
-    }
-
-/* end create-widget-info-dialog */
-
 /* astropay-dialog */
 
     .mega-dialog.astropay-dialog {
@@ -6617,242 +6599,6 @@ body.de .mega-dialog.new-group-chat {
     }
 
 /* end storage-dialog */
-
-/* widget-dialog */
-
-    .mega-dialog.widget-dialog {
-        width: 690px;
-    }
-
-    /* Please do not use ".mega-dialog" inheritance as  it may used inn other sections */
-
-    .widget-dialog .fm-subheading {
-        color: var(--text-color-high);
-        letter-spacing: 0;
-        margin: 32px auto 12px auto;
-        width: 556px;
-    }
-    .widget-dialog .fm-body-text {
-        color: var(--text-color-high);
-        font: var(--text-body2);
-        letter-spacing: 0;
-        margin: 24px 2px;
-        display: flex;
-        align-items: center;
-    }
-    .widget-dialog .widget-folder-icon {
-        --mask-color: var(--text-color-medium);
-        --icon-size: 24px;
-        -webkit-margin-end: 8px;
-        margin-inline-end: 8px;
-        display: inline-block;
-    }
-    .widget-dialog .fm-body-text span {
-        width: 496px;
-    }
-    .widget-dialog .widget-code {
-        align-items: center;
-        background: var(--surface-main);
-        border-radius: 3px;
-        border: 1px solid var(--stroke-grey-2);
-        display: flex;
-        padding: 8px 10px;
-        overflow: hidden;
-    }
-    .widget-dialog .widget-code-wrapper {
-        color: var(--text-color-medium);
-        cursor: text;
-        font: var(--text-body1);
-        line-height: 1.5;
-        -webkit-user-select: text;  /* Chrome 49+ */
-        -moz-user-select: text;     /* Firefox 43+ */
-        -ms-user-select: text;      /* No support yet */
-        user-select: text;          /* Likely future */
-        white-space: normal;
-        word-break: break-word;
-    }
-    .widget-dialog .widget-dialog-buttons {
-        margin: 0 8px;
-        height: 32px;
-    }
-    .widget-dialog .fm-dialog-tab {
-        margin-top: 8px;
-    }
-    .widget-dialog .fm-dialog-tab .fm-tab-wrapper {
-        display: flex;
-        margin: 0 auto;
-        width: auto;
-        align-items: center;
-        justify-content: center;
-    }
-    .widget-dialog .fm-dialog-tab .fm-tab {
-        color: var(--text-color-high);
-        cursor: pointer;
-        border-bottom: 2px solid transparent;
-        font: var(--text-body1);
-        min-width: 100px;
-        opacity: 0.4;
-        padding: 13px 20px;
-        text-align: center;
-        transition: var(--transition-border), var(--transition-opacity);
-    }
-    .widget-dialog .fm-dialog-tab .fm-tab i {
-        --icon-size: 24px;
-        --mask-color: var(--icon-rest);
-    }
-    .widget-dialog .fm-dialog-tab .fm-tab.active {
-        opacity: 1;
-        border-bottom: 2px solid var(--stroke-info);
-    }
-    .mega-dialog.widget-dialog .tab-icon {
-        --icon-size: 24px;
-        --mask-color: var(--icon-rest);
-        -webkit-margin-end: 10px;
-        margin-inline-end: 10px;
-        float: left;
-        display: inline-block;
-    }
-    .widget-dialog .close-button {
-        min-width: 100px;
-    }
-    .widget-dialog .fm-dialog-block {
-        margin: 24px 0 0 0;
-    }
-    .widget-dialog .fm-block-subheading {
-        font-size: 14px;
-        color: var(--text-color-high);
-        margin-bottom: 12px;
-    }
-    .widget-dialog .embed-block {
-        width: calc(50% - 4px);
-        display: table;
-        height: 100%;
-        cursor: pointer;
-        border-radius: 2px;
-        transition: all 0.2s ease-out;
-        box-sizing: border-box;
-    }
-    .widget-dialog .embed-block.active .embed-button-subheading {
-        font-family: var(--text-font-family-semibold);
-        color: var(--text-color-high);
-    }
-    .widget-dialog .embed-button-centre {
-        -webkit-margin-end: 4px;
-        margin-inline-end: 4px;
-        padding: 8px;
-        border-radius: 3px;
-        text-align: center;
-        transition: all 0.2s ease-out;
-    }
-    .widget-dialog .embed-button {
-        height: 44px;
-        border-radius: 3px;
-        display: table;
-    }
-    .widget-dialog .embed-button.centre-button {
-        margin: 12px auto 0 auto;
-    }
-    .widget-dialog .right-button .embed-button-centre {
-        -webkit-margin-start: 4px;
-        margin-inline-start: 4px;
-    }
-    .widget-dialog .embed-button-container {
-        border-radius: 2px;
-        display: flex;
-        justify-content: space-between;
-        background: var(--surface-grey-2);
-        padding: 8px;
-    }
-    .widget-dialog .embed-button-centre:hover {
-        background: var(--surface-main);
-        transition: all 0.2s ease-out;
-    }
-
-    /* do not use theme variables in this section */
-
-        .widget-dialog .embed-button-subheading {
-            text-align: center;
-            font-size: 13px;
-            color: #999;
-            display: inline-block;
-            -webkit-margin-start: 12px;
-            margin-inline-start: 12px;
-            line-height: 19px;
-        }
-        .widget-dialog .embed-button.light-theme {
-            background: #fff;
-            /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-            background-image: linear-gradient(-180deg, rgba(255, 255, 255, 0) 0%, rgba(246, 246, 246, 0.5) 100%);
-            border: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
-            transition: all 0.5s ease-out;
-        }
-        .widget-dialog .embed-button.dark-theme {
-            background-color: #ff3333;
-            border: 1px solid #D90007;
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.25), inset 0 -2px 3px 0 rgba(159,0,0,0.12);
-            transition: all 0.5s ease-out;
-        }
-        .widget-dialog .embed-button.dark-theme .embed-action-text {
-            color: #fff;
-        }
-        .widget-dialog .embed-button.light-theme .embed-action-text {
-            color: #70777B;
-        }
-        .widget-dialog .embed-button.dark-theme:hover {
-            background-color: #ff4444;
-            border: 1px solid #D90007;
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.25), inset 0 -2px 3px 0 rgba(159,0,0,0.12);
-            transition: all 0.5s ease-out;
-        }
-        .widget-dialog .embed-button.light-theme:hover {
-            box-shadow: 0 0 0 0 rgba(0,0,0,0);
-            /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-            background-image: linear-gradient(-180deg, rgba(255, 255, 255, 0) 0%, rgba(246, 246, 246, 0.25) 100%);
-            border: 1px solid #eee;
-            transition: all 0.5s ease-out;
-        }
-
-    /* end do not use theme variables in this section */
-
-    .widget-dialog .embed-button .embed-content-wrapper {
-        vertical-align: middle;
-        display: table-cell;
-        padding: 0 16px;
-    }
-    .widget-dialog .embed-button .embed-mega-icon {
-        width: 25px;
-        height: 25px;
-        display: inline-block;
-        vertical-align: middle;
-        -webkit-margin-end: 12px;
-        margin-inline-end: 12px;
-        background-image: url(../images/mega/puf-embed-icons@2x.png);
-        background-size: 56px auto;
-        background-repeat: no-repeat;
-    }
-    .widget-dialog .embed-button.dark-theme .embed-mega-icon {
-        background-position:-2px -2px;
-    }
-    .widget-dialog .embed-button.light-theme .embed-mega-icon {
-        background-position: -29px -2px;
-    }
-    .widget-dialog .embed-button .embed-action-text {
-        font-family: 'source_sans_prosemibold', sans-serif;
-        display: inline-block;
-        vertical-align: middle;
-    }
-    .widget-dialog .embed-button-select {
-        display: inline-flex;
-    }
-    .widget-dialog .uiembed-button {
-        margin: 0 0;
-    }
-    .widget-dialog .url-link .widget-dialog-buttons {
-        padding-top: 10px;
-    }
-
-/* end widget-dialog */
 
 /* copyrights-dialog */
 
@@ -10533,3 +10279,306 @@ body.de .mega-dialog.new-group-chat {
 }
 
 /* Stop backup dialog End */
+
+/* File Request Dialog Start */
+
+.mega-dialog.file-request {
+    --file-request-red: rgba(255, 51, 58, 1);
+    min-width: auto;
+}
+
+.mega-dialog.file-request header {
+    padding-bottom: 24px;
+}
+
+.mega-dialog.file-request header .dialog-title {
+    margin-top: 38px;
+    margin-bottom: 12px;
+}
+
+.mega-dialog.file-request.file-request-manage-dialog header {
+    padding-bottom: 2px;
+}
+.mega-dialog.file-request.file-request-manage-dialog header .dialog-title {
+    margin-bottom: 0;
+}
+
+.mega-dialog.file-request .content {
+    max-height: 45vh;
+}
+
+@media only screen and (max-height: 768px) {
+    .mega-dialog.file-request .content {
+        max-height: 35vh;
+    }
+}
+
+.mega-dialog.file-request .content .scrollable {
+    overflow-y: auto;
+}
+
+.mega-dialog.file-request .content .scrollable .ps__scrollbar-y-rail {
+    margin-right: 8px;
+    opacity: 0.6;
+}
+
+.mega-dialog.file-request .content-block {
+    padding-top: 24px;
+    padding-bottom: 14px;
+}
+
+.mega-dialog.file-request.file-request-manage-dialog .content-block {
+    padding-bottom: 20px;
+}
+
+.mega-dialog.file-request.file-request-manage-dialog .content-block .form-row.create-success {
+    margin-bottom: 22px;
+}
+
+.mega-dialog.file-request .content-block.primary {
+    padding-bottom: 36px;
+}
+
+.mega-dialog.file-request hr.divider {
+    margin: 0 48px;
+    width: auto;
+}
+
+.mega-dialog.file-request .content-block.secondary {
+    padding-top: 32px;
+    padding-bottom: 18px;
+}
+
+.mega-dialog.file-request .content-block .form-row > label {
+    color: var(--text-color-high);
+    font: var(--text-body2);
+}
+
+.mega-dialog.file-request .content-block .form-row > span.char-count {
+    color: var(--text-color-low);
+    font: var(--text-caption);
+}
+
+.mega-dialog.file-request .content-block .form-row {
+    margin-bottom: 20px;
+}
+
+.mega-dialog.file-request .content-block .form-row .input-container {
+    display: inline-flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 18px;
+}
+
+.mega-dialog.file-request .content-block .form-row .input-container button {
+    min-width: auto;
+}
+
+.mega-dialog.file-request .content-block .form-row .input-container button span {
+    white-space: nowrap;
+}
+
+.mega-dialog.file-request .content-block .form-row .mega-input {
+    padding-top: 6px;
+}
+
+.mega-dialog.file-request .content-block .form-row .mega-input::before {
+    background: var(--surface-grey-2);
+    border-color: var(--stroke-grey-2);
+}
+
+.mega-dialog.file-request .content-block .form-row .mega-input.active::before {
+    background: var(--surface-grey-1);
+    border-color: var(--stroke-grey-2);
+}
+
+.mega-dialog.file-request .content-block .form-row .mega-input:not(.mega-input-icon) input {
+    padding-left: 16px;
+    font: var(--text-body1);
+    color: var(--text-color-low);
+}
+
+.mega-dialog.file-request .content-block .form-row .mega-input.active input {
+    color: var(--text-color-high);
+}
+
+.mega-dialog.file-request .content-block .form-row .mega-input.textarea.msg .message-container {
+    top: calc(100% + 2px);
+}
+
+.mega-dialog.file-request .content-block .form-row.last {
+    margin-bottom: 26px;
+}
+
+.mega-dialog.file-request .content-block .form-row.create {
+    margin-bottom: 24px;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success {
+    margin-bottom: 18px;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success label {
+    font-family: var(--text-font-family-bold);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success.manage {
+    margin-bottom: 0;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .file-request-input {
+    display: flex;
+    width: 100%;
+    position: relative;
+    border: 1px solid var(--stroke-grey-2);
+    border-radius: 4px;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper {
+    flex: 1;
+    vertical-align: top;
+    width: 100%;
+    background-color: var(--stroke-grey-1);
+    padding: 8px;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper i {
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    --icon-size: 24px;
+    --mask-color: var(--text-color-medium);
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper input {
+    height: 24px;
+    border: 0;
+    padding-inline-start: 34px;
+    padding-inline-end: 10px;
+    text-overflow: ellipsis;
+    width: 100%;
+    font: var(--text-body2);
+    background-color: transparent;
+    color: var(--text-color-medium);
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .button-wrapper button {
+    --height: 100%;
+    font: var(--text-body1);
+    padding: 2px 12px;
+    min-width: 89px;
+    justify-content: center;
+    margin: 0;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .file-request-input.input-code {
+    border-radius: 4px;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .file-request-embed-button-container {
+    padding: 20px;
+    background-color: var(--surface-grey-1);
+    text-align: center;
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-button-header {
+    font-family: var(--text-font-family-bold);
+    margin-bottom: 20px;
+    color: var(--text-color-high);
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-button-selection {
+    display: flex;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-button-selection .embed-block {
+    width: 50%;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-content-wrapper {
+    width: 156px;
+    border-radius: 5px;
+    background-color: var(--surface-grey-2);
+    height: 40px;
+    padding: 8px 12px;
+    margin: 0 auto 12px;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-mega-icon {
+    border-radius: 50%;
+    background-color: var(--file-request-red);
+    height: 24px;
+    width: 24px;
+    display: inline-block;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-action-text {
+    margin: 6px 0 6px 6px;
+    width: 98px;
+    background-color: rgba(196, 196, 196, 1);
+    height: 12px;
+    display: inline-block;
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-block.dark-theme .embed-content-wrapper {
+    background-color: var(--file-request-red);
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-block.dark-theme .embed-mega-icon {
+    background-color: var(--surface-main);
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-block.dark-theme .embed-action-text {
+    background-color: var(--surface-main);
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-button-select {
+    display: inline-flex;
+    margin-bottom: 4px;
+    color: var(--text-color-medium);
+    font: var(--text-body2-bold);
+}
+
+.mega-dialog.file-request .content-block .form-row.create-success .embed-block.active .embed-button-select {
+    color: var(--text-color-high);
+}
+
+.mega-dialog.file-request .content-block .form-row .caption {
+    font: var(--text-body2);
+    margin-top: 24px;
+}
+
+.mega-dialog.file-request.file-request-manage-dialog .content-block .form-row .caption {
+    margin-top: 20px;
+}
+
+.mega-dialog.file-request .footer-container.manage {
+    padding: 24px 48px 48px;
+    display: flex;
+    width: 100%;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.mega-dialog.file-request .footer-container .button-container {
+    display: inline-flex;
+    gap: 8px;
+}
+
+.mega-dialog.file-request .footer-container .button-container button {
+    margin-inline-start: 0;
+}
+
+.mega-dialog.fm-picker-dialog.fm-picker-file-request header {
+    padding-top: 40px;
+}
+
+.mega-dialog.fm-picker-dialog.fm-picker-file-request header p {
+    max-width: 359px;
+    margin: 16px auto;
+}
+
+/* File Request Dialog End */

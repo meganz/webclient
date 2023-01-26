@@ -1375,10 +1375,13 @@ ul, li {
     background-position: -3px -4383px;
 }
 .mobile.context-menu-container .rename-button .sprite-fm-mono::before,
-.mobile.context-menu-container .rename-button .sprite-fm-mono-after::after {
+.mobile.context-menu-container .rename-button .sprite-fm-mono-after::after,
+.mobile.context-menu-container i.icon-mono::before,
+.mobile.context-menu-container i.icon-mono::after {
     --icon-size: 24px;
 }
-.mobile.context-menu-container .rename-button .icon-rename {
+.mobile.context-menu-container .rename-button .icon-rename,
+.mobile.context-menu-container i.icon-mono {
     height: 32px;
     margin: 8px -1px 0 18px;
     width: 42px;
@@ -1401,13 +1404,16 @@ ul, li {
 .mobile.fm-icon.open-folder {
     background-position: -200px -1750px;
 }
-.mobile.fm-icon.create-megadrop {
+.mobile.fm-icon.create-file-request {
     background-position: -98px -1748px;
 }
-.mobile.fm-icon.manage-megadrop {
+.mobile.fm-icon.copy-file-request {
+    background-position: -98px -1748px;
+}
+.mobile.fm-icon.manage-file-request {
     background-position: -187px -3498px;
 }
-.mobile.fm-icon.cancel-megadrop {
+.mobile.fm-icon.cancel-file-request {
     background-position: -187px -3533px;
 }
 .mobile.fm-icon.download {
@@ -4136,11 +4142,13 @@ div.checkboxOn {
     float: right;
 }
 .mobile.create-new-folder-dialog .folder-name-warning-block,
-.mobile.mobile-rename-overlay .folder-name-warning-block {
+.mobile.mobile-rename-overlay .folder-name-warning-block,
+.file-request-block .input-warning-block {
     position: relative;
 }
 .mobile.create-new-folder-dialog .folder-name-warning-block .fm-icon.red-warning,
-.mobile.mobile-rename-overlay .folder-name-warning-block .fm-icon.red-warning {
+.mobile.mobile-rename-overlay .folder-name-warning-block .fm-icon.red-warning,
+.file-request-block .input-warning-block .fm-icon.red-warning {
     left: -4px;
     position: absolute;
     top: -3px;
@@ -4149,7 +4157,8 @@ div.checkboxOn {
 .mobile.create-new-folder-dialog .folder-name-warning-block .warning-text,
 .two-factor-page .warning-text-field,
 .mobile.verify-number .warning-text-field,
-.mobile.mobile-rename-overlay .folder-name-warning-block .warning-text {
+.mobile.mobile-rename-overlay .folder-name-warning-block .warning-text,
+.file-request-block .input-warning-block .warning-text {
     opacity: 0.75;
     color: #131313;
     font-size: 12px;
@@ -13780,6 +13789,60 @@ body.landscape .upload-overlay .mobile.filetype-img {
     font: var(--text-caption);
     text-decoration: underline;
 }
+
+/*
+ * Mobile file request create dialog
+ */
+.file-request-block .dialog-heading-text {
+    color: var(--text-color-black-high);
+    font: var(--text-h2);
+    line-height: 24px;
+}
+
+.file-request-block .dialog-body-text {
+    color: var(--text-color-black-medium);
+    font: var(--text-body1);
+    margin-bottom: 16px;
+}
+
+.file-request-block .dialog-body-text.caption {
+    color: var(--text-color-black-medium);
+    font: var(--text-body2);
+    text-align: left;
+    margin-bottom: 24px;
+}
+
+.file-request-block .input-container {
+    padding: 16px 0 8px;
+}
+
+.file-request-block .input-text {
+    font-family: LatoWeb, "source_sans_proregular", sans-serif, Arial;
+
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(38, 47, 59, 0.15);
+    border-radius: 3px;
+    box-sizing: border-box;
+
+    color: #676D75;
+    font-size: 15px;
+    line-height: 19px;
+    padding: 11px 16px;
+    width: 100%;
+}
+
+.file-request-block .input-text::placeholder {
+    color: var(--text-color-black-low);
+}
+
+.file-request-block .input-warning-block {
+    text-align: left;
+}
+
+/*
+ * End Mobile file request create dialog
+ */
+
 /*
  * Retina Sprite for mobile
  * Please leave it on the bottom to make sure it override on Retina.

@@ -105,9 +105,10 @@ var ulmanager = {
             this.ulOverStorageQueue.push(aFileUpload);
         }
 
-        // Inform user that upload MEGAdrop is not available anymore
-        if (page.substr(0, 8) === 'megadrop') {
-            mBroadcaster.sendMessage('MEGAdrop:overquota');
+        // Inform user that upload file request is not available anymore
+        if (page.substr(0, 11) === 'filerequest') {
+            mBroadcaster.sendMessage('FileRequest:overquota');
+            return; // Disable quota dialog
         }
 
         M.safeShowDialog('upload-overquota', function() {
@@ -661,10 +662,10 @@ var ulmanager = {
         var dir = target;
 
         // Put to public upload folder
-        if (getCleanSitePath().substr(0, 8) === 'megadrop') {
+        if (page.substr(0, 11) === 'filerequest') {
             req_type = 'pp';
-            target = mega.megadrop.getOwnersHandle();
-            dir = mega.megadrop.getPufHandle();
+            target = mega.fileRequestUpload.getUploadPageOwnerHandle();
+            dir = mega.fileRequestUpload.getUploadPagePuHandle();
         }
 
         var req = {
@@ -766,6 +767,12 @@ var ulmanager = {
                 ulmanager.ulShowOverStorageQuotaDialog(File, res);
 
                 // Return early so it does not retry automatically and spam the API server with requests
+                return false;
+            }
+
+            // If the response is that the business account is suspended
+            if (res === EBUSINESSPASTDUE && page.substr(0, 11) === 'filerequest') {
+                mBroadcaster.sendMessage('upload:error', File.ul.id, res);
                 return false;
             }
 
@@ -1055,8 +1062,8 @@ var ulmanager = {
                 storedattr[ctx.faid].target = n.h;
             }
 
-            // Don't execute if MEGAdrop upload window exist
-            if (res.f !== 'pv3' && !mega.megadrop.isInit()) {
+            // Don't execute if file request upload window exist
+            if (res.f !== 'pv3' && page.substr(0, 11) !== 'filerequest') {
                 newnodes = [];
                 process_f(res.f);
                 M.updFileManagerUI();
@@ -1257,7 +1264,7 @@ var ulmanager = {
             promises.push(dbfetch.get(aFile.target));
         }
 
-        if ((!M.h[aFile.hash] || !M.d[M.h[aFile.hash].first]) && !mega.megadrop.isInit()) {
+        if ((!M.h[aFile.hash] || !M.d[M.h[aFile.hash].first]) && page.substr(0, 11) !== 'filerequest') {
             promises.push(dbfetch.hash(aFile.hash).then(node => (hashNode = node)));
         }
 
@@ -1734,7 +1741,10 @@ FileUpload.prototype.run = function(done) {
     }
     if (!file.isCreateFile) {
         domNode.classList.add('transfer-initiliazing');
-        domNode.querySelector('.transfer-status').textContent = l[1042];
+        const transferStatus = domNode.querySelector('.transfer-status');
+        if (transferStatus) {
+            transferStatus.textContent = l[1042];
+        }
     }
 
     ulmanager.ulSize += file.size;
@@ -1806,6 +1816,11 @@ FileUpload.prototype.run = function(done) {
 
         if (file && self.file) {
             onUploadError(file, error);
+
+            if (page.substr(0, 11) === 'filerequest') {
+                mBroadcaster.sendMessage('upload:error', file.id, error);
+                return;
+            }
 
             var that = self;
             ulmanager.abort(file);

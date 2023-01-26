@@ -33,6 +33,7 @@
                 || is_chatlink
                 || (is_fm() && page.substr(0, 5) !== 'start')
                 || (page === 'download' && !is_mobile)
+                || page.substr(0, 11) === 'filerequest'
             )
         ) {
             return;

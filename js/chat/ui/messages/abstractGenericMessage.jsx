@@ -82,7 +82,9 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
                 <div className="message content-area selectable-txt">
                     {this.getName && this.getName()}
                     {this.getMessageTimestamp ? this.getMessageTimestamp() : grouped ? null : (
-                        <div className="message date-time simpletip" data-simpletip={time2date(this.getTimestamp())}>
+                        <div
+                            className="message date-time simpletip"
+                            data-simpletip={time2date(this.getTimestamp(), 17)}>
                             {this.getTimestampAsString()}
                         </div>
                     )}

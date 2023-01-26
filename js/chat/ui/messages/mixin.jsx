@@ -142,7 +142,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
     }
 
     getTimestampAsString() {
-        return unixtimeToTimeString(this.getTimestamp());
+        return toLocaleTime(this.getTimestamp());
     }
 
     getTimestamp() {

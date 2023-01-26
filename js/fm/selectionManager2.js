@@ -919,10 +919,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
     }
 
     /**
-     * Show required links in selection notification bar based on selection
-     */
+    * Show required links in selection notification bar based on selection
+    */
     showRequiredLinks() {
-
         if (d) {
             console.time('showRequiredLinks');
         }
@@ -948,6 +947,14 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             if (button) {
                 button.classList.remove('hidden');
+            }
+        };
+
+        const __hideButton = (className) => {
+            const button = selectionLinkWrapper.querySelector(`.js-statusbarbtn.${className}`);
+
+            if (button) {
+                button.classList.add('hidden');
             }
         };
 
@@ -1038,6 +1045,12 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             else if (!folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
                 || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {
                 __showBtn('delete');
+            }
+
+            if (M.currentdirid === 'file-requests') {
+                __hideButton('link');
+                __hideButton('share');
+                __hideButton('sendto');
             }
         }
 

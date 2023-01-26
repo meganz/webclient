@@ -16,6 +16,7 @@ function FileManager() {
     this.columnsWidth.cloud.timeAd = { max: 180, min: 130, curr: 130, viewed: true };
     this.columnsWidth.cloud.timeMd = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.versions = { max: 180, min: 130, curr: 130, viewed: false };
+    this.columnsWidth.cloud.playtime = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
 
     this.columnsWidth.makeNameColumnStatic = function() {
@@ -572,7 +573,10 @@ FileManager.prototype.initFileManagerUI = function() {
                     else {
                         M.moveNodes($.moveids, $.movet)
                             .done(function(moves) {
-                                if (moves && M.currentdirid !== 'out-shares' && M.currentdirid !== 'public-links'
+                                if (moves
+                                    && M.currentdirid !== 'out-shares'
+                                    && M.currentdirid !== 'public-links'
+                                    && M.currentdirid !== 'file-requests'
                                     && String(M.currentdirid).split("/")[0] !== "search") {
                                     $ddelm.remove();
                                 }
@@ -900,7 +904,10 @@ FileManager.prototype.initFileManagerUI = function() {
             'cloud-drive': { // My-files
                 root: M.RootID,
                 prev: null,
-                subpages: [M.InboxID, M.RubbishID, 'recents', 'shares', 'faves', 'out-shares', 'public-links']
+                subpages: [
+                    M.InboxID, M.RubbishID,
+                    'recents', 'shares', 'faves', 'out-shares', 'public-links', 'file-requests'
+                ]
             },
             'gallery':         {root: 'photos',    prev: null, subpages: Object.keys(mega.gallery.sections)},
             'photos': {
@@ -936,7 +943,8 @@ FileManager.prototype.initFileManagerUI = function() {
             'faves':           {root: 'faves',   prev: null},
             'backups':         {root: 'backups',   prev: null},
             'rubbish-bin':     {root: M.RubbishID, prev: null},
-            'backup-center':   {root: 'devices', prev: null}
+            'backup-center':   {root: 'devices', prev: null},
+            'file-requests':   {root: 'file-requests',    prev: null}
         };
     }
 
@@ -2080,7 +2088,11 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.open-item').rebind('click', function() {
         var target = $.selected[0];
-        if (M.currentrootid === 'out-shares' || M.currentrootid === 'public-links') {
+        if (
+            M.currentrootid === 'out-shares' ||
+            M.currentrootid === 'public-links' ||
+            M.currentrootid === 'file-requests'
+        ) {
             target = M.currentrootid + '/' + target;
         }
         $('.js-lpbtn').removeClass('active');
@@ -3242,12 +3254,19 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         console.time('iconUI');
     }
 
-    // Change title for Public link page
-    if (page === 'fm/public-links') {
-        $('.files-menu.context .dropdown-item.sort-timeAd span').safeHTML(l[20694]);
+    // #file-request change column title for public link page
+    let dateLabel = l[17445];
+    switch (page) {
+        case 'fm/public-links':
+            dateLabel = l[20694];
+            break;
+        case 'fm/file-requests':
+            dateLabel = l.file_request_page_label_request_created;
+            break;
     }
-    else {
-        $('.files-menu.context .dropdown-item.sort-timeAd span').safeHTML(l[17445]);
+
+    if (dateLabel) {
+        $('.files-menu.context .dropdown-item.sort-timeAd span').safeHTML(dateLabel);
     }
 
     $('.fm-files-view-icon.block-view').addClass('active');
@@ -3275,12 +3294,12 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     else if (this.v.length && M.currentCustomView.type !== 'gallery') {
 
         $('.fm-blocks-view.fm').removeClass('hidden');
+        $('.fm-blocks-view.fm').removeClass('out-shares-view public-links-view file-requests-view');
+
         if (this.currentCustomView) {
             $('.fm-blocks-view.fm').addClass(this.currentCustomView.type + '-view');
         }
-        else {
-            $('.fm-blocks-view.fm').removeClass('out-shares-view public-links-view');
-        }
+
         if (!aQuiet) {
             initPerfectScrollbar($('.file-block-scrolling', '.fm-blocks-view.fm'));
         }
@@ -3341,6 +3360,9 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         else if ($me.hasClass('sort-versions')) {
             sortType = 'versions';
         }
+        else if ($me.hasClass('sort-playtime')) {
+            sortType = 'playtime';
+        }
 
         var classToAdd = 'selected';
         var iconClassToAdd = 'icon-up';
@@ -3393,15 +3415,20 @@ FileManager.prototype.addGridUI = function(refresh) {
     }
 
     // Change title for Public link page
-    if (page === 'fm/public-links') {
-        $('.fm .grid-table thead .ts').text(l[20694]);
-        $('.fm .grid-table thead .date').text(l[20694]);
-        $('.dropdown.body.files-menu .dropdown-item.visible-col-select[megatype="timeAd"] span').text(l[20694]);
+    let dateLabel = l[17445];
+    switch (page) {
+        case 'fm/public-links':
+            dateLabel = l[20694];
+            break;
+        case 'fm/file-requests':
+            dateLabel = l.file_request_page_label_request_created;
+            break;
     }
-    else {
-        $('.fm .grid-table thead .ts').text(l[17445]);
-        $('.fm .grid-table thead .date').text(l[17445]);
-        $('.dropdown.body.files-menu .dropdown-item.visible-col-select[megatype="timeAd"] span').text(l[17445]);
+
+    if (dateLabel) {
+        $('.fm .grid-table thead .ts').text(dateLabel);
+        $('.fm .grid-table thead .date').text(dateLabel);
+        $('.dropdown.body.files-menu .dropdown-item.visible-col-select[megatype="timeAd"] span').text(dateLabel);
     }
 
     // $.gridDragging=false;
@@ -3426,6 +3453,7 @@ FileManager.prototype.addGridUI = function(refresh) {
             M.columnsWidth.cloud.versions.disabled = false;
             M.columnsWidth.cloud.fav.disabled = false;
             M.columnsWidth.cloud.label.disabled = false;
+            M.columnsWidth.cloud.type.disabled = false;
 
             // if we have FM configuration
             var storedColumnsPreferences = mega.config.get('fmColPrefs');
@@ -3484,6 +3512,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     }
     else if (this.v.length) {
         $('.files-grid-view.fm').removeClass('hidden');
+        $('.files-grid-view.fm').removeClass('out-shares-view public-links-view file-requests-view');
 
         if (this.currentCustomView) {
             if (this.currentCustomView.type === 'gallery'
@@ -3497,6 +3526,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         else {
             $('.files-grid-view.fm').removeClass('out-shares-view public-links-view');
         }
+
         $.gridHeader();
 
         // if there is any node that already rendered before getting correct value, update with resize handler.
@@ -3981,7 +4011,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     // Open folder/file in filemanager
     let tappedItemId = '';
     $ddUIitem.rebind('dblclick.openTarget touchend.tabletOpenTarget', (e) => {
-
         let h = $(e.currentTarget).attr('id');
         const n = M.getNodeByHandle(h);
 
@@ -4009,7 +4038,11 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.ofShowNoFolders = true;
             }
             $('.top-context-menu').hide();
-            if (M.currentrootid === 'out-shares' || M.currentrootid === 'public-links') {
+            if (
+                M.currentrootid === 'out-shares' ||
+                M.currentrootid === 'public-links' ||
+                M.currentrootid === 'file-requests'
+            ) {
                 h = M.currentrootid + '/' + h;
             }
             M.openFolder(h);
@@ -4096,6 +4129,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         case 'public-links':
         case 'backups':
         case 'rubbish-bin':
+        case 'file-requests':
             tmpId = 'cloud-drive';
             break;
         case 'affiliate':
@@ -4236,7 +4270,9 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         id !== 'out-shares' &&
         !String(M.currentdirid).includes('out-shares') &&
         id !== 'public-links' &&
-        !String(M.currentdirid).includes('public-links')
+        !String(M.currentdirid).includes('public-links') &&
+        id !== 'file-requests' &&
+        !String(M.currentdirid).includes('file-requests')
     ) {
         $('.files-grid-view.fm').addClass('hidden');
         $('.fm-blocks-view.fm').addClass('hidden');
@@ -4349,6 +4385,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         || isAlbums
         || M.isDynPage(id)
         || mega.gallery.sections[id]
+        || id === 'file-requests'
     ) {
         M.initLeftPanel();
     }
@@ -4395,7 +4432,7 @@ FileManager.prototype.getLinkAction = function() {
     // ToDo: Selected can be more than one folder $.selected
     // Avoid multiple referencing $.selected instead use event
     // add new translation message '... for multiple folders.'
-    // cancel descendant MEGAdrops after copyRights are accepted
+    // cancel descendant File requests folders after copyRights are accepted
     if (u_type === 0) {
         ephemeralDialog(l[1005]);
     }
@@ -4406,15 +4443,19 @@ FileManager.prototype.getLinkAction = function() {
             mega.Share.initCopyrightsDialog(selNodes, isEmbed);
         };
 
-        var mdList = mega.megadrop.isDropExist(selNodes);
+        const mdList = mega.fileRequestCommon.storage.isDropExist(selNodes);
         if (mdList.length) {
             var fldName = mdList.length > 1 ? l[17626] : l[17403].replace('%1', escapeHTML(M.d[mdList[0]].name));
 
             msgDialog('confirmation', l[1003], fldName, l[18229], function(e) {
                 if (e) {
-                    mega.megadrop.pufRemove(mdList);
-                    // set showDialog as callback for after delete puf.
-                    mega.megadrop.pufCallbacks[selNodes[0]] = {del: showDialog};
+                    mega.fileRequest
+                        .removeList(mdList, true)
+                        .then(() => {
+                            showDialog();
+                        }).catch((ex) => {
+                            return dump(ex);
+                        });
                 }
             });
         }
@@ -4529,6 +4570,9 @@ FileManager.prototype.initLeftPanel = function() {
     }
     else if (M.currentrootid === 'public-links') {
         $('.js-lpbtn[data-link="links"]').addClass('active');
+    }
+    else if (M.currentrootid === 'file-requests') {
+        $('.js-lpbtn[data-link="file-requests"]').addClass('active'); // Active left panel button
     }
     else if (M.currentrootid === M.RubbishID) {
         $('.js-lpbtn[data-link="bin"]').addClass('active');

@@ -543,36 +543,15 @@
     };
 
     MegaDynamicList.prototype.throttledOnScroll = function(e) {
-        var wait = isFirefox ? 30 : 5;
         var self = this;
-        if (!self._lastThrottledOnScroll) {
-            self._lastThrottledOnScroll = Date.now();
-        }
-
-        if ((self._lastThrottledOnScroll + wait - Date.now()) < 0) {
-            if (
-                self._lastScrollPosY !== e.target.scrollTop &&
-                self._isUserScroll === true &&
-                self.listContainer === e.target
-            ) {
-                self._lastScrollPosY = e.target.scrollTop;
-
-                if (isFirefox) {
-                    if (self._lastOnScrollTimer) {
-                        clearTimeout(self._lastOnScrollTimer);
-                    }
-
-                    self._lastOnScrollTimer = setTimeout(function() {
-                        self._actualOnScrollCode(e);
-                    }, 0);
+        delay('megalist:scroll:' + this.listId, function() {
+            if (self._isUserScroll === true && self.listContainer === e.target) {
+                if (self.options.enableUserScrollEvent) {
+                    self.trigger('onUserScroll', e);
                 }
-                else {
-                    self._actualOnScrollCode(e);
-                }
-
+                self._onScroll(e);
             }
-            self._lastThrottledOnScroll = Date.now();
-        }
+        }, 1);
     };
 
     /**

@@ -427,14 +427,13 @@
 
 /* Error/warning message containers */
 .mega-input .message-container {
-    font: var(--text-body1);
-    padding: 2px;
-    white-space: normal;
-    text-overflow: ellipsis;
     position: absolute;
     top: 40px;
     left: 0;
     width: 100%;
+}
+.mega-input .message-container,
+.mega-input-wrapper .message-container {
     display: none;
     text-align: center;
     box-sizing: border-box;
@@ -442,11 +441,19 @@
     color: var(--banner-text-info);
     border: 1px solid var(--banner-border-info);
     background: var(--banner-background-info);
+    font: var(--text-body1);
+    padding: 2px;
+    white-space: normal;
+    text-overflow: ellipsis;
+}
+.mega-input-wrapper .message-container {
+    margin-top: 5px;
 }
 .mega-input.halfSize-l .message-container {
     width: 208%;
 }
-.mega-input.error .message-container {
+.mega-input.error .message-container,
+.mega-input-wrapper.error .message-container {
     color: var(--banner-text-error);
     border-color: var(--banner-border-error);
     background: var(--banner-background-error);
@@ -464,6 +471,10 @@
 .mega-input.msg .message-container,
 .mega-input.fix-msg .message-container {
     display: inline-block;
+}
+.mega-input-wrapper.msg .message-container,
+.mega-input-wrapper.fix-msg .message-container {
+    display: block;
 }
 .mega-input.fix-msg .message-container {
     padding: 0;

@@ -57,6 +57,13 @@
     };
 
     /**
+     * Checking if the current folder is a share
+     * @private
+     * @returns {Boolean}
+     */
+    const isInShares = () => M.currentrootid === 'shares' || M.currentrootid === 'out-shares';
+
+    /**
      * Disable circular references and read-only shared folders.
      * @private
      */
@@ -65,6 +72,14 @@
 
         if ($.moveDialog) {
             M.disableCircularTargets('#mctreea_');
+        }
+        else if ($.selectFolderDialog && M.currentrootid === 'file-requests') {
+            $('*[id^="mctreea_"]', $dialog)
+                .children('.file-request-folder, .shared-folder')
+                .closest('.nw-fm-tree-item')
+                .addClass('disabled');
+
+            $('*[id^="mctreea_"].linked', $dialog).addClass('disabled');
         }
         else if (!$.copyToUpload) {
             var sel = $.selected || [];
@@ -335,9 +350,12 @@
 
         $('.summary-title.summary-selected-title', $dialog).text(l[19180]);
 
-        let title = mega.icu.format(l[19339], items.length);
-        const setTitle = function() {
-            title = mega.icu.format(l[19339], items.length);
+        const setTitle = () => {
+            const title = mega.icu.format(
+                (isInShares()) ? l.upload_to_share : l[19339],
+                items.length
+            );
+
             $('header h2', $dialog).text(title);
         };
 
@@ -510,7 +528,7 @@
             return l[776]; // Save
         }
 
-        if ($.copyToShare || section === 'shared-with-me') {
+        if ($.copyToShare) {
             return l[1344]; // Share
         }
 
@@ -560,7 +578,10 @@
 
         if ($.copyToUpload) {
             var len = $.copyToUpload[0].length;
-            return mega.icu.format(l[19339], len);
+            return mega.icu.format(
+                (isInShares()) ? l.upload_to_share : l[19339],
+                len
+            );
         }
 
         if ($.saveToDialog) {
@@ -900,6 +921,9 @@
         $('.dialog-empty-block', $dialog).removeClass('active');
         $('.fm-picker-dialog-tree-panel', $dialog).removeClass('active');
         $('.fm-picker-dialog-panel-arrows', $dialog).removeClass('active');
+        $('.fm-picker-dialog-desc', $dialog).addClass('hidden'); // Hide description
+        $dialog.removeClass('fm-picker-file-request');
+        $('button.js-close', $dialog).addClass('hidden');
 
         // inherited dialog content...
         var html = section !== 'conversations' && $('.content-panel.' + section).html();
@@ -1000,7 +1024,18 @@
         }
         else if ($.selectFolderDialog) {
             $permissionSelect.addClass('hidden');
-            $('header h2', $dialog).text(l[16533]);
+            if ($.fileRequestNew) {
+                $dialog.addClass('fm-picker-file-request');
+                $('header h2', $dialog).text(l.file_request_select_folder_title);
+                $('.fm-picker-dialog-desc', $dialog)
+                    .removeClass('hidden');
+                $('.fm-picker-dialog-desc p', $dialog)
+                    .text(l.file_request_select_folder_desc);
+                $('button.js-close', $dialog).removeClass('hidden');
+            }
+            else {
+                $('header h2', $dialog).text(l[16533]);
+            }
         }
         else {
             $permissionSelect.addClass('hidden');
@@ -1266,6 +1301,34 @@
 
                 handleOpenDialog(0, M.RootID);
                 $.selectFolderCallback = cb;
+                return $dialog;
+            });
+        }
+
+        return false;
+    };
+
+    /**
+     * A version of the select a folder dialog used for "New File Request Folder" in out-shares.
+     * @global
+     * @param {Object} options Additional settings for new file request dialog
+     * @returns {Object} The jquery object of the dialog
+     */
+    global.openNewFileRequestDialog = function(options) {
+        if (!isUserAllowedToOpenDialogs()) {
+            return false;
+        }
+
+        const postEventHandler = options && options.post || null;
+        if (postEventHandler) {
+            const aMode = options && options.mode || 'fileRequestNew';
+
+            M.safeShowDialog('selectFolder', () => {
+                handleOpenDialog(0, M.RootID, aMode);
+                $.selectFolderCallback = function() {
+                    closeDialog();
+                    postEventHandler($.mcselected);
+                };
                 return $dialog;
             });
         }

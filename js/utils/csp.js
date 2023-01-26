@@ -69,8 +69,7 @@ lazy(self, 'csp', () => {
 
     const canShowDialog = promisify(resolve => {
         const exclude = {
-            download: 1, file: 1, folder: 1,
-            megadrop: 1
+            download: 1, file: 1, folder: 1, filerequest: 1
         };
 
         (function check(page) {

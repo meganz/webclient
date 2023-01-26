@@ -92,7 +92,10 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         delete this.onRenderFinished;
     }
 
-    var cmIconHandler = function _cmIconHandler(listView, elm, ev) {
+    var cmIconHandler = function _cmIconHandler(listView, elm, ev, options) {
+        const isDefault = typeof options === 'undefined';
+        const postEventHandler = options && options.post || null;
+
         $.hideContextMenu(ev);
         var target = listView ? $(this).closest('tr') : $(this).parents('.data-block-view');
 
@@ -109,14 +112,20 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         ev.stopPropagation(); // do not treat it as a regular click on the file
         ev.currentTarget = target;
 
-        delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
+        if (isDefault) {
+            delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
 
-        if (!$(this).hasClass('active')) {
-            M.contextMenuUI(ev, 1);
-            $(this).addClass('active');
+            if ($(this).hasClass('active')) {
+                $(this).removeClass('active');
+            }
+            else {
+                M.contextMenuUI(ev, 1);
+                $(this).addClass('active');
+            }
         }
-        else {
-            $(this).removeClass('active');
+
+        if (postEventHandler) {
+            postEventHandler.call(this, target.attr('id'));
         }
 
         return false;
@@ -128,6 +137,12 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
     $('.data-block-view .file-settings-icon').rebind('click', function(ev) {
         return cmIconHandler.call(this, false, 'a', ev);
     });
+
+    if (M.currentrootid === 'file-requests') {
+        mega.fileRequest.rebindListManageIcon({
+            iconHandler: cmIconHandler
+        });
+    }
 
     if (!u) {
 

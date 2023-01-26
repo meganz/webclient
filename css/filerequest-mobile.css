@@ -1,0 +1,132 @@
+/* languages-dialog */
+.mega-dialog.dialog-template-main .language-menu-options {
+    padding: 0 48px;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.mega-dialog.languages-dialog-mobile {
+    min-height: 320px;
+    width: 100%;
+    background: var(--surface-main);
+}
+
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk,
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk:link,
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk:visited,
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk:active {
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: var(--text-color-high);
+    cursor: pointer;
+    display: inline-block;
+    font: var(--text-body1);
+    margin: 1px;
+    padding: 2px 12px;
+    position: relative;
+    text-decoration: none;
+    width: 163px;
+}
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk:hover {
+    background: var(--surface-grey-3);
+}
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk.language-template {
+    display: none;
+}
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk.selected,
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk.selected:link,
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk.selected:visited,
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk.selected:hover,
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk.selected:active {
+    background: var(--surface-grey-4);
+}
+.mega-dialog.languages-dialog-mobile a.nlanguage-lnk.selected::before {
+    content: "";
+    position: absolute;
+    background: var(--label-blue);
+    border-radius: 1px;
+    width: 2px;
+    height: calc(100% - 8px);
+    top: 4px;
+    left: 4px;
+}
+.rtl .mega-dialog.languages-dialog-mobile a.nlanguage-lnk.selected::before {
+    left: auto;
+    right: 4px;
+}
+.mega-dialog.languages-dialog-mobile .tier-one-languages {
+    margin-top: 15px;
+}
+.mega-dialog.languages-dialog-mobile .tier-two-languages {
+    display: none;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+.mega-dialog.languages-dialog-mobile .native-language-name {
+    line-height: 28px;
+}
+.mega-dialog.languages-dialog-mobile .show-more-languages {
+    cursor: pointer;
+    display: table;
+    margin-top: 30px;
+    width: 100%;
+}
+.mega-dialog.languages-dialog-mobile .show-more-languages .show-more-text {
+    color: #999;
+    display: table-cell;
+    font-size: 14px;
+    font-family: "source_sans_proregular", Arial, sans-serif;
+    padding-left: 12px;
+    white-space: nowrap;
+}
+.mega-dialog.languages-dialog-mobile .show-more-languages:hover .show-more-text {
+    color: #555;
+}
+.mega-dialog.languages-dialog-mobile .show-more-languages .bar {
+    display: table-cell;
+    padding-left: 15px;
+    width: 100%;
+}
+.mega-dialog.languages-dialog-mobile .show-more-languages .bar div {
+    border-bottom: 1px solid #f2f2f2;
+    margin-bottom: 3px;
+}
+.mega-dialog.languages-dialog-mobile .show-more-languages .round-arrow {
+    display: table-cell;
+    padding-left: 14px;
+    vertical-align: middle;
+}
+.mega-dialog.languages-dialog-mobile .show-more-languages .round-arrow span {
+    background-image: url("../images/mega/top-sprite.png");
+    background-position: -13px -1108px;
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 7px;
+    opacity: 0.6;
+    position: relative;
+    top: 1px;
+    vertical-align: middle;
+    width: 11px;
+}
+.mega-dialog.languages-dialog-mobile .show-more-languages .round-arrow.opened span {
+    transform: rotate(180deg);
+}
+.mega-dialog.languages-dialog-mobile .show-more-languages:hover .round-arrow span {
+    opacity: 1;
+}
+.mega-dialog.languages-dialog-mobile .nlanguage-lnk .beta {
+    border: 1px solid rgba(192, 199, 203, 0.3);
+    border-radius: 7px;
+    box-sizing: border-box;
+    color: #c0c7cd;
+    font-size: 10px;
+    font-style: normal;
+    margin-left: 5px;
+    padding: 0 4px;
+    text-align: center;
+}
+.mega-dialog.languages-dialog-mobile .nlanguage-lnk.selected .beta {
+    visibility: hidden;
+}
+
+/* end languages-dialog */

@@ -614,7 +614,9 @@ function fmtopUI() {
     $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
 
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
-        .add('.fm-new-shared-folder,.fm-new-link').addClass('hidden');
+        .add('.fm-new-shared-folder,.fm-new-link')
+        .add('.fm-new-file-request')
+        .addClass('hidden');
     $('.fm-new-folder').removeClass('filled-input');
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
     $('.fm-breadcrumbs-block').removeClass('hidden');
@@ -691,6 +693,16 @@ function fmtopUI() {
                 showUploadBlock();
             }
         }
+        else if (M.currentrootid === 'file-requests') {
+            $('.fm-right-files-block', document).addClass('visible-notification');
+
+            if (M.currentdirid === M.currentrootid) {
+                $('.fm-new-file-request', document).removeClass('hidden');
+            }
+            else {
+                showUploadBlock();
+            }
+        }
         else if (M.currentCustomView.type === 'gallery') {
 
             $galleryTabBlock.removeClass('hidden');
@@ -717,6 +729,10 @@ function fmtopUI() {
     $('.fm-clearbin-button').rebind('click', function() {
         doClearbin(true);
     });
+
+    if (M.currentrootid === 'file-requests') {
+        mega.fileRequest.rebindTopMenuCreateIcon();
+    }
 }
 
 /**
@@ -2637,7 +2653,16 @@ function showLoseChangesWarning() {
     }
     else if ($.dialog === 'share' && Object.keys($.addContactsToShare || []).length > 0
         || Object.keys($.changedPermissions || []).length > 0
-        || Object.keys($.removedContactsFromShare || []).length > 0)  {
+        || Object.keys($.removedContactsFromShare || []).length > 0
+        || (
+            $.dialog === 'file-request-create-dialog' &&
+            mega.fileRequest.dialogs.createDialog.checkLoseChangesWarning()
+        )
+        || (
+            $.dialog === 'file-request-manage-dialog' &&
+            mega.fileRequest.dialogs.manageDialog.checkLoseChangesWarning()
+        )
+    )  {
         // Warn user closing dialog will lose all unsaved changes
         msgDialog('confirmation', '', l[24208], l[18229], function(e) {
             if (e) {

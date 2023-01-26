@@ -919,13 +919,6 @@ function RegExpEscape(text) {
     return text.replace(/[\s#$()*+,.?[\\\]^{|}-]/g, "\\$&");
 }
 
-function unixtimeToTimeString(timestamp) {
-    var date = new Date(timestamp * 1000);
-    var hourSeparator = locale === 'fr' ? ' h ' : ':';
-    return addZeroIfLenLessThen(date.getHours(), 2)
-        + hourSeparator + addZeroIfLenLessThen(date.getMinutes(), 2);
-}
-
 
 /**
  * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
@@ -1192,9 +1185,6 @@ function percent_megatitle() {
     }
     else if (transferStatus.ul_total) {
         t = ' \u2191 ' + x_ul + '%';
-        if (mega.megadrop.isInit()) {
-            mega.megadrop.uiUpdateTotalProgress(transferStatus.ul_done, transferStatus.ul_total, x_ul);
-        }
     }
     else {
         t = '';
@@ -2550,6 +2540,7 @@ function getFMColPrefs(pref) {
     columnsPreferences.timeAd = pref & 32;
     columnsPreferences.timeMd = pref & 16;
     columnsPreferences.versions = pref & 2;
+    columnsPreferences.playtime = pref & 128;
 
     return columnsPreferences;
 }
@@ -2569,6 +2560,7 @@ function getNumberColPrefs(colName) {
         case 'timeAd': return 32;
         case 'timeMd': return 16;
         case 'versions': return 2;
+        case 'playtime': return 128;
         default: return null;
     }
 }

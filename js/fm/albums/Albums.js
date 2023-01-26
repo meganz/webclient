@@ -321,41 +321,6 @@ lazy(mega.gallery, 'albums', () => {
         });
     };
 
-    /**
-     * Options for Intersection Observer API
-     * @param {HTMLElement} root DOM Element to use observer on
-     * @returns {Object}
-     */
-    const observerOptions = (root) => {
-        return {
-            root,
-            rootMargin: '500px',
-            threshold: 0.1
-        };
-    };
-
-    const handleIntersect = (entries, refKey, fill) => {
-        const toFetchAttributes = [];
-
-        for (let i = 0; i < entries.length; i++) {
-            const { isIntersecting, target } = entries[i];
-
-            if (isIntersecting && !target.isIntersectedBefore) {
-                fill(target);
-
-                if (target[refKey].node) {
-                    toFetchAttributes.push(target[refKey]);
-                }
-
-                target.isIntersectedBefore = true;
-            }
-        }
-
-        if (toFetchAttributes.length) {
-            MegaGallery.addThumbnails(toFetchAttributes);
-        }
-    };
-
     const fillAlbumTimelineCell = (el) => {
         if (el.ref.isVideo) {
             el.dataset.videoDuration = secondsToTimeShort(MediaAttribute(el.ref.node).data.playtime);
@@ -364,10 +329,6 @@ lazy(mega.gallery, 'albums', () => {
     };
 
     const fillAlbumCell = (el) => {
-        if (el.album.cellEl.isFilled) {
-            return;
-        }
-
         const div = document.createElement('div');
         const titleEl = document.createElement('div');
         el.album.cellEl.countEl = document.createElement('div');
@@ -379,11 +340,9 @@ lazy(mega.gallery, 'albums', () => {
         div.append(titleEl);
         div.append(el.album.cellEl.countEl);
 
-        el.isInViewport = true;
         el.album.cellEl.updatePlaceholders();
 
         el.append(div);
-        el.album.cellEl.isFilled = true;
     };
 
     /**
@@ -1108,15 +1067,6 @@ lazy(mega.gallery, 'albums', () => {
 
             this.sidePadding = sidePadding || 0;
 
-            if ('IntersectionObserver' in window) {
-                this.observer = new IntersectionObserver(
-                    (entries) => {
-                        handleIntersect(entries, 'ref', fillAlbumTimelineCell);
-                    },
-                    observerOptions(this.el.grid)
-                );
-            }
-
             if (typeof containerClass === 'string') {
                 this.el.className = containerClass;
             }
@@ -1179,8 +1129,6 @@ lazy(mega.gallery, 'albums', () => {
          * @returns {void}
          */
         set nodes(nodes) {
-            this.unobserveRowCells();
-
             if (this.dynamicList) {
                 this.dynamicList.destroy();
                 this.dynamicList = null;
@@ -1693,6 +1641,8 @@ lazy(mega.gallery, 'albums', () => {
             const div = document.createElement('div');
             div.className = 'flex flex-row';
 
+            const toFetchAttributes = [];
+
             if (this._nodes[rowKey]) {
                 const sizePx = this.cellSize + 'px';
                 const { list, monthLabel } = this._nodes[rowKey];
@@ -1715,39 +1665,19 @@ lazy(mega.gallery, 'albums', () => {
                     }
 
                     div.append(tCell.el);
-                    this.observe(tCell);
+                    fillAlbumTimelineCell(tCell.el);
+
+                    tCell.el.ref.el = tCell.el;
+
+                    toFetchAttributes.push(tCell.el.ref);
                 }
+            }
+
+            if (toFetchAttributes.length) {
+                delay('album_timeline:render_row' + rowKey, () => MegaGallery.addThumbnails(toFetchAttributes));
             }
 
             return div;
-        }
-
-        unobserveRowCells() {
-            if (this.observer && this.dynamicList && this.dynamicList._currentlyRendered) {
-                const keys = Object.keys(this.dynamicList._currentlyRendered);
-
-                for (let i = 0; i < keys.length; i++) {
-                    const div = this.dynamicList._currentlyRendered[keys[i]];
-                    const cell = div.querySelector(':scope > div');
-
-                    this.observer.unobserve(cell);
-                }
-            }
-        }
-
-        observe(cell) {
-            if (this.observer) {
-                this.observer.observe(cell.el);
-            }
-            else {
-                fillAlbumTimelineCell(cell.el);
-            }
-        }
-
-        unobserve(cell) {
-            if (this.observer) {
-                this.observer.unobserve(cell.el);
-            }
         }
 
         /**
@@ -1898,8 +1828,9 @@ lazy(mega.gallery, 'albums', () => {
         clear() {
             this.selections = {};
 
-            if (this.observer) {
-                this.observer.disconnect();
+            if (this.dynamicList) {
+                this.dynamicList.destroy();
+                this.dynamicList = null;
             }
 
             if (this.zoomControls) {
@@ -2730,10 +2661,6 @@ lazy(mega.gallery, 'albums', () => {
         updatePlaceholders() {
             const count = this.el.album.nodes.length;
 
-            if (!this.el.isInViewport) {
-                return;
-            }
-
             const isPlaceholder = this.el.classList.contains('album-placeholder');
             this.el.classList.remove('skeleton');
             this.countEl.textContent = count ? mega.icu.format(l.album_items_count, count) : l.album_empty;
@@ -3008,15 +2935,6 @@ lazy(mega.gallery, 'albums', () => {
             parent.append(this.el);
         }
 
-        observe(cell) {
-            if (this.observer) {
-                this.observer.observe(cell.el);
-            }
-            else {
-                fillAlbumCell(cell.el);
-            }
-        }
-
         setPendingCell(label) {
             this.pendingCell = document.createElement('div');
             this.pendingCell.className  = 'albums-grid-cell flex flex-column'
@@ -3248,9 +3166,10 @@ lazy(mega.gallery, 'albums', () => {
             if (!albumCell) {
                 albumCell = new AlbumCell(id);
                 album.cellEl = albumCell;
+                fillAlbumCell(albumCell.el);
             }
 
-            this.observe(albumCell);
+            albumCell.el.album.el = albumCell.el;
 
             return albumCell;
         }
@@ -3265,6 +3184,8 @@ lazy(mega.gallery, 'albums', () => {
             else {
                 this.el.prepend(albumCell.el);
             }
+
+            MegaGallery.addThumbnails([albumCell.el.album]);
         }
 
         insertUserAlbum(id) {
@@ -3272,6 +3193,7 @@ lazy(mega.gallery, 'albums', () => {
 
             if (albumCell) {
                 insertAlbumElement(id, albumCell.el, this.el, 'cellEl');
+                MegaGallery.addThumbnails([albumCell.el.album]);
             }
         }
 
@@ -3279,7 +3201,7 @@ lazy(mega.gallery, 'albums', () => {
             const albumKeys = Object.keys(scope.albums.store);
             let albumsCount = 0;
 
-            this.setObserver();
+            const thumbBlocks = [];
 
             for (let i = 0; i < albumKeys.length; i++) {
                 const albumCell = this.prepareAlbumCell(albumKeys[i]);
@@ -3287,6 +3209,10 @@ lazy(mega.gallery, 'albums', () => {
                 if (albumCell) {
                     this.el.append(albumCell.el);
                     albumsCount++;
+
+                    if (albumCell.el.album.node) {
+                        thumbBlocks.push(albumCell.el.album);
+                    }
                 }
             }
 
@@ -3294,6 +3220,8 @@ lazy(mega.gallery, 'albums', () => {
 
             delay('render:albums_grid', () => {
                 applyPs(this.el);
+
+                MegaGallery.addThumbnails(thumbBlocks);
 
                 this.attachDragSelect();
                 this.attachKeyboardEvents();
@@ -3547,21 +3475,10 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         clear(removeGridContainer) {
-            const { el, timeline, observer } = this;
-
-            const observerIsSet = !!observer;
+            const { el, timeline } = this;
 
             while (el.firstChild) {
-                if (observerIsSet) {
-                    observer.unobserve(el.firstChild);
-                }
-
                 el.removeChild(el.firstChild);
-            }
-
-            if (observerIsSet) {
-                observer.disconnect();
-                delete this.observer;
             }
 
             if (removeGridContainer && el.parentNode) {
@@ -3626,17 +3543,6 @@ lazy(mega.gallery, 'albums', () => {
 
         removeAlbum(album) {
             this.el.removeChild(album.cellEl.el);
-        }
-
-        setObserver() {
-            if (this.observer === undefined && 'IntersectionObserver' in window) {
-                this.observer = new IntersectionObserver(
-                    (entries) => {
-                        handleIntersect(entries, 'album', fillAlbumCell);
-                    },
-                    observerOptions(this.el)
-                );
-            }
         }
     }
 
@@ -4349,6 +4255,10 @@ lazy(mega.gallery, 'albums', () => {
 
             this.removeTree();
             this.clearSubscribers();
+
+            if (this.grid) {
+                this.grid.clear();
+            }
 
             scope.albumsRendered = false;
         }

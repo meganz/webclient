@@ -1178,14 +1178,20 @@ scparser.$add('upco', {
 scparser.$add('puh', {
     b: function(a) {
         "use strict";
-        mega.megadrop.pufProcessPUH([a]);
+        if (d) {
+            console.log('#file-request - scparser.add - puh', a);
+        }
+        mega.fileRequestCommon.actionHandler.processPublicUploadHandle([a]);
     }
 });
 
 scparser.$add('pup', {
     b: function(a) {
         "use strict";
-        mega.megadrop.pupProcessPUP([a]);
+        if (d) {
+            console.log('#file-request - scparser.add - pup', a);
+        }
+        mega.fileRequestCommon.actionHandler.processPublicUploadPage([a]);
     }
 });
 
@@ -1370,8 +1376,12 @@ scparser.$add('u', function(a) {
         else {
             // success - check what changed and redraw
             if (M.scAckQueue[a.i]) {
-                if (fminitialized && mega.megadrop.pufs[n.h] && n.name !== mega.megadrop.pufs[n.h].fn) {
-                    mega.megadrop.pupUpdate(n.h, 'msg', n.name);
+                if (
+                    fminitialized &&
+                    mega.fileRequestCommon.storage.cache.puHandle[n.h] &&
+                    n.name !== mega.fileRequestCommon.storage.cache.puHandle[n.h].fn
+                ) {
+                    mega.fileRequest.updatePuHandleAttribute(n.h, 'msg', n.name);
                 }
 
                 // Triggered locally, being DOM already updated.
@@ -2423,12 +2433,22 @@ function dbfetchfm() {
         },
         puf: function _(r) {
             if (r.length) {
-                mega.megadrop.pufProcessDb(r);
+                if (d) {
+                    console.log('#file-request - dbfetchfm - puf', r);
+                }
+                mega.fileRequest.processPuHandleFromDB(r);
                 return dbfetch.geta(r.map(n => n.h));
             }
         },
         suba: process_suba,
-        pup: mega.megadrop.pupProcessDb,
+        pup: function(r) {
+            if (r.length) {
+                if (d) {
+                    console.log('#file-request - dbfetchfm - pup', r);
+                }
+                mega.fileRequest.processPuPageFromDB(r);
+            }
+        },
         mcf: 1
     };
     var tableProc = function(t) {
@@ -3725,7 +3745,7 @@ function loadfm_callback(res) {
 
         // This package is sent on hard refresh if owner have enabled or disabled PUF
         if (res.uph) {
-            mega.megadrop.processUPHAP(res.uph);
+            mega.fileRequest.processUploadedPuHandles(res.uph);
         }
 
         // decrypt hitherto undecrypted nodes

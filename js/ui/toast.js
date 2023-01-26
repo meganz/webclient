@@ -1095,6 +1095,8 @@ window.showToast = function(
         'megasync-transfer upload': ['sprite-fm-uni icon-mega-logo', 'sprite-fm-mono icon-up blue'],
         success: 'sprite-fm-uni icon-check',
         'clipboard-copy': 'sprite-fm-mono icon-copy',
+        warning2: 'sprite-fm-uni icon-warning',
+        'clipboard-embed-code': 'sprite-fm-mono icon-embed-code',
     };
 
     const icons = typeof iconEquivalents[type] === 'string' ? [iconEquivalents[type]] : iconEquivalents[type];

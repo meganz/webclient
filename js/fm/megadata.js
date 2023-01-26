@@ -134,7 +134,8 @@ function MegaData() {
         'email': this.sortByEmail.bind(this),
         'label': this.sortByLabel.bind(this),
         'sharedwith': this.sortBySharedWith.bind(this),
-        'versions': this.sortByVersion.bind(this)
+        'versions': this.sortByVersion.bind(this),
+        'playtime': this.sortByPlaytime.bind(this)
     };
     Object.setPrototypeOf(sortRules, null);
     Object.defineProperty(this, 'sortRules', {value: Object.freeze(sortRules)});
@@ -270,20 +271,28 @@ function MegaData() {
             this[tf[i]] = dummy;
         }
     }
-    else if (page.substr(0, 8) === 'megadrop') {
+
+    if (page.substr(0, 11) === 'filerequest') {
         this['ul' + 'progress'] = function(ul, perc, bl, bt, bps) {
             if (!bl || !ul.starttime || uldl_hold) {
                 return false;
             }
+
             if (d) {
-                console.assert(mega.megadrop.isInit(), 'Check this...');
+                console.assert(
+                    mega.fileRequestUpload.isUploadPageInitialized(),
+                    'Check this...'
+                );
             }
-            var id = ul.id;
-            var retime = bps > 1000 ? (bt - bl) / bps : -1;
+
+            const { id } = ul;
+            const remainingTime = bps > 1000 ? (bt - bl) / bps : -1;
 
             $.transferprogress['ul_' + id] = [bl, bt, bps];
+
             delay('percent_megatitle', percent_megatitle, 50);
-            mega.megadrop.uiUpdateItem(id, bps, retime, perc, bl);
+
+            mega.fileRequestUpload.onItemUploadProgress(ul, bps, remainingTime, perc, bl);
         };
     }
 

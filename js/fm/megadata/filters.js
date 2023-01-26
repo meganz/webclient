@@ -84,6 +84,18 @@ MegaData.prototype.filterByParent = function(id) {
                 return true;
             });
     }
+    // We should have a parent's childs into M.c, no need to traverse the whole M.d
+    else if (id === 'file-requests') {
+        const list = this.getFileRequestsTree();
+
+        this.v = Object.keys(list)
+            .map((h) => {
+                return M.d[h];
+            })
+            .filter((n) => {
+                return !(!n || M.currentLabelFilter && !M.filterByLabel(n));
+            });
+    }
     else {
         this.filterBy(function(node) {
             return (node.p === id);

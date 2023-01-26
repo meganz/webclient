@@ -33,23 +33,23 @@ function init_page() {
     textNode.textContent = l[18215] || '(translation-missing)';
     document.body.textContent = '';
 
-    mCreateElement('div', {id: "MEGAdrop", 'class': "embed-button centre-button"}, [
+    mCreateElement('div', {id: "FileRequest", 'class': "embed-button centre-button"}, [
         mCreateElement('div', {'class': "embed-content-wrapper"}, [
             mCreateElement('div', {'class': "embed-mega-icon"}), textNode
         ])
     ], 'body');
 
-    var elm = document.getElementById("MEGAdrop");
+    var elm = document.getElementById("FileRequest");
 
     if (d) {
-        console.debug('megadrop', id);
+        console.debug('filerequest', id);
     }
 
     if (id) {
         elm.classList.add(theme);
         elm.addEventListener("click", function() {
             window.open(
-                getAppBaseUrl() + (is_extension ? '#' : '/') + 'megadrop/' + id, "_blank",
+                getAppBaseUrl() + (is_extension ? '#' : '/') + 'filerequest/' + id, "_blank",
                 "width=750, height=738, resizable=no, status=no, location=no, titlebar=no, toolbar=no",
                 true
             );

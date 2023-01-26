@@ -3,7 +3,7 @@
  * @param {Object} $scrollBlock DOM scrollable element.
  * @returns {void}
  */
-function initPerfectScrollbar($scrollBlock) {
+function initPerfectScrollbar($scrollBlock, options) {
 
     'use strict';
 
@@ -17,9 +17,14 @@ function initPerfectScrollbar($scrollBlock) {
             Ps.update($scrollBlock[i]);
         }
         else {
+            if (!options) {
+                options = {};
+            }
+
             Ps.initialize($scrollBlock[i], {
                 'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
-                'minScrollbarLength': 20
+                'minScrollbarLength': 20,
+                ...options
             });
         }
     }

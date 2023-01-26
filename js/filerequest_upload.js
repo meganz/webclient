@@ -1052,9 +1052,6 @@ lazy(mega, 'fileRequestUpload', () => {
         }
 
         parsePage() {
-            if (is_mobile && pages.filerequest_mobile) {
-                $('.mega-dialog-container').safeAppend(translate(pages.filerequest_mobile));
-            }
             parsepage(pages.filerequest);
         }
 

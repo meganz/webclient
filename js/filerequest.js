@@ -1762,18 +1762,20 @@ lazy(mega, 'fileRequest', () => {
 
         async onUpdateUserName(newName) {
             const puHandleObjects = this.storage.cache.puHandle;
-            if (!puHandleObject.length) {
+            if (!Object.keys(puHandleObjects).length) {
                 return false;
             }
 
             for (const key in puHandleObjects) {
-                if (puHandleObjects.hasOwnProperty(key)) {
-                    puHandle = puHandleObjects[key];
+                if (Object.hasOwnProperty.call(puHandleObjects, key)) {
+                    const puHandle = puHandleObjects[key];
                     if (puHandle.p) {
                         this.updatePuHandleAttribute(puHandle.h, 'name', newName);
                     }
                 }
             }
+
+            return true;
         }
     };
 });

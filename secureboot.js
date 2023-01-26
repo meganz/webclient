@@ -3138,7 +3138,6 @@ else if (!browserUpdate) {
             jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
             jsl.push({f:'js/ui/languageDialog.js', n: 'languagedialog_js', j:1});
             jsl.push({f:'css/filerequest.css', n: 'filerequest_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'html/filerequest-mobile.html', n: 'filerequest_mobile', j: 0, w: 1});
             jsl.push({f:'css/filerequest-mobile.css', n: 'filerequest_mobile_css', j:2,w:5,c:1,d:1,cache:1});
         }
     }

@@ -714,8 +714,14 @@
             this.search = true;
         }
         else if (id && id.substr(0, 10) === 'discovery/') {
+            if (cv.nodeID === M.RootID) {
+                // Preventing MD on root folder
+                return M.openFolder('cloudroot');
+            }
+
             fetchdbnodes = true;
             id = cv.nodeID;
+
             M.onFileManagerReady(() => {
                 galleryUI(cv.nodeID || '');
             });

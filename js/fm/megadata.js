@@ -272,7 +272,7 @@ function MegaData() {
         }
     }
 
-    if (page.substr(0, 11) === 'filerequest') {
+    if (is_filerequest_page) {
         this['ul' + 'progress'] = function(ul, perc, bl, bt, bps) {
             if (!bl || !ul.starttime || uldl_hold) {
                 return false;

@@ -513,7 +513,7 @@ mobile.uploadOverlay = {
             if (!self.uploading) {
                 // loadingDialog.show();
                 self.uploading = true;
-                dispatchNextUpload();
+                self._dispatchNextUpload();
             }
         };
     }

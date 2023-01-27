@@ -94,7 +94,9 @@ var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
     || location.host === 'smoketest.mega.nz' || is_extension;
 var is_litesite = !is_embed && location.host === 'mega.io';
 var is_eplusplus = false;
-var is_filerequest_page = String(location.pathname).substr(0, 13) === '/filerequest/';
+var is_filerequest_page = String(location.pathname).substr(0, 13) === '/filerequest/' ||
+    String(location.pathname).substr(0, 10) === '/megadrop/';
+
 
 self.fetchStreamSupport = (
     window.fetch && !window.MSBlobBuilder

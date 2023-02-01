@@ -671,15 +671,37 @@ var authring = (function () {
      * Resets the seen or verified fingerprints for a particular user.
      * @param {string} userHandle The user handle e.g. EWh7LzU3Zf0
      */
-    ns.resetFingerprintsForUser = function(userHandle) {
-        assertUserHandle(userHandle);
-        delete u_authring.Ed25519[userHandle];
-        delete u_authring.Cu25519[userHandle];
-        delete u_authring.RSA[userHandle];
+    ns.resetFingerprintsForUser = async function(userHandle) {
 
-        ns.setContacts('Ed25519');
-        ns.setContacts('Cu25519');
-        ns.setContacts('RSA');
+        if (!u_authring.Ed25519) {
+            logger.warn('Auth-ring is not initialized, yet.');
+            return false;
+        }
+
+        const ring = u_authring.Ed25519[userHandle];
+        if (!ring) {
+            logger.warn('Failed to reset credentials for user %s: Ed25519 key is not tracked yet.', userHandle);
+            return false;
+        }
+
+        if (ring.method === this.AUTHENTICATION_METHOD.SEEN) {
+            logger.warn('Failed to reset credentials for user %s: Ed25519 key is not verified.', userHandle);
+            return false;
+        }
+        assert(ring.method === this.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON, 'Invalid Ed25519 method.');
+
+        if (d) {
+            logger.info('Resetting credentials for user %s...', userHandle);
+        }
+        const fingerprint = await crypt.getFingerprintEd25519(userHandle, 'string');
+
+        return this.setContactAuthenticated(
+            userHandle,
+            fingerprint,
+            'Ed25519',
+            this.AUTHENTICATION_METHOD.SEEN,
+            this.KEY_CONFIDENCE.UNSURE
+        );
     };
 
 

@@ -153,12 +153,28 @@
 .pricing-pg .pricing-radio-group .pricing-radio-option .pricing-radio-btn {
     width: 20px;
     height: 20px;
-    border: 1px solid var(--color-heading);
+    border: 2px solid var(--color-heading);
     border-radius: 10px;
     box-sizing: border-box;
+    position: relative;
 }
 .pricing-pg .pricing-radio-group .pricing-radio-option.selected .pricing-radio-btn {
-    border-width: 5px;
+    width: 10px;
+    height: 10px;
+    border: none;
+    background: var(--color-heading);
+    margin-right: 5px;
+    margin-left: 5px;
+}
+.pricing-pg .pricing-radio-group .pricing-radio-option.selected .pricing-radio-btn::after {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 10px;
+    border: 2px solid var(--color-heading);
 }
 .pricing-pg .pricing-pg.period-note-container .period-note-txt {
     padding: 10px;

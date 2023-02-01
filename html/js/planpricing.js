@@ -797,7 +797,6 @@ lazy(pro, 'proplan2', () => {
             $radioOptions.removeClass('selected');
 
             this.classList.add('selected');
-
             sessionStorage.setItem('pro.period', this.dataset.period);
 
             fillPlansInfo(this.dataset.period | 0);

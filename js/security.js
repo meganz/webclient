@@ -1399,8 +1399,9 @@ security.login = {
      * @returns {Boolean} Returns true if the error was handled by this function, otherwise false and it will continue
      */
     checkForCommonErrors: function(result, oldStartLoginCallback, newStartLoginCallback) {
-
         'use strict';
+
+        loadingDialog.hide();
 
         // Reset the 2FA dialog back to default UI
         twofactor.loginDialog.resetState();
@@ -1419,16 +1420,22 @@ security.login = {
             return true;
         }
 
+        // Cleanup temporary login variables
+        security.login.email = null;
+        security.login.password = null;
+        security.login.rememberMe = false;
+
+        // close two-factor dialog if it was opened
+        twofactor.loginDialog.closeDialog();
+
         // Check for suspended account
-        else if (result === EBLOCKED) {
-            twofactor.loginDialog.closeDialog();
+        if (result === EBLOCKED) {
             msgDialog('warninga', l[6789], l[730]);
             return true;
         }
 
         // Check for too many login attempts
         else if (result === ETOOMANY) {
-            twofactor.loginDialog.closeDialog();
             api_getsid.etoomany = Date.now();
             api_getsid.warning();
             return true;
@@ -1440,16 +1447,14 @@ security.login = {
                 mobile.messageOverlay.show(l[882], l[9082]);
             }
             else {
-                twofactor.loginDialog.closeDialog();
                 msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration
             }
 
             return true;
         }
-        else {
-            // Not applicable to this function
-            return false;
-        }
+
+        // Not applicable to this function
+        return false;
     }
 };
 

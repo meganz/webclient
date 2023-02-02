@@ -22,8 +22,6 @@ var signin = {
 
             postLogin(email, password, pinCode, rememberMe, (result) => {
 
-                loadingDialog.hide();
-
                 // Otherwise proceed with regular login
                 signin.proceedWithLogin(result);
             });
@@ -49,8 +47,6 @@ var signin = {
 
             // Start the login using the new process
             security.login.startLogin(email, password, pinCode, rememberMe, salt, function(result) {
-
-                loadingDialog.hide();
 
                 // Otherwise proceed with regular login
                 signin.proceedWithLogin(result);
@@ -86,11 +82,6 @@ var signin = {
             return false;
         }
 
-        // close two-factor dialog if it was opened
-        if (twofactor && twofactor.loginDialog) {
-            twofactor.loginDialog.closeDialog();
-        }
-
         // If successful result
         if (result !== false && result >= 0) {
 
@@ -119,9 +110,6 @@ var signin = {
             // Show a failed login
             $('#login-name2').megaInputsShowError().blur();
             $('#login-password2').megaInputsShowError(l[7431]).val('').blur();
-
-            // Close the 2FA dialog for a generic error
-            twofactor.loginDialog.closeDialog();
 
             msgDialog('warninga', l[135], l[7431] + '.', false, function() {
                 $('#login-name2').select();

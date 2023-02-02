@@ -302,16 +302,11 @@ var tooltiplogin = {
         var $passwordField = $topLoginPopup.find('#login-password');
 
         // Remove loading spinner on the button
-        tSleep(9).then(() => $button.removeClass('loading'));
+        onIdle(() => $button.removeClass('loading'));
 
         // Check and handle the common login errors
         if (security.login.checkForCommonErrors(result, tooltiplogin.old.startLogin, tooltiplogin.new.startLogin)) {
             return false;
-        }
-
-        // close two-factor dialog if it was opened
-        if (twofactor && twofactor.loginDialog) {
-            twofactor.loginDialog.closeDialog();
         }
 
         // If successful result
@@ -347,8 +342,6 @@ var tooltiplogin = {
             login_next = false;
         }
         else {
-            // Close the 2FA dialog for a generic error
-            twofactor.loginDialog.closeDialog();
 
             $emailField.megaInputsShowError();
             $passwordField.megaInputsShowError(l[7431]);

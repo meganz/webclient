@@ -142,7 +142,7 @@ var tooltiplogin = {
         }
 
         $('#login-name, #login-password, .top-dialog-login-button', $dialog)
-            .rebind('keydown.loginpopup', (e) => {
+            .rebind('keydown.loginpopup', function(e) {
                 if (e.keyCode === 13) {
                     tooltiplogin.startLogin.call(this);
                     return false;

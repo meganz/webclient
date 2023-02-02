@@ -8001,8 +8001,7 @@ ContactsPanel.resetCredentials = contact => {
   if (M.isInvalidUserStatus()) {
     return;
   }
-  authring.resetFingerprintsForUser(contact.u);
-  contact.trackDataChange();
+  authring.resetFingerprintsForUser(contact.u).then(() => contact.trackDataChange()).catch(dump);
 };
 ContactsPanel.getUserFingerprint = handle => {
   const $$FINGERPRINT = [];
@@ -18468,8 +18467,10 @@ class Invite extends mixins.wl {
     this.doMatch = (value, collection) => {
       value = value.toLowerCase();
       return collection.filter(contact => {
+        contact = typeof contact === 'string' ? M.getUserByHandle(contact) : contact;
         const name = M.getNameByHandle(contact.u || contact).toLowerCase();
-        return name.includes(value);
+        const email = contact.m && contact.m.toLowerCase();
+        return name.includes(value) || email.includes(value);
       });
     };
     this.handleSearch = ev => {

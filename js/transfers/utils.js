@@ -622,7 +622,12 @@ function bindTransfersMassEvents(context) {
                 time('ulm:abort', () => ulmanager.abort(null));
                 time('tfs:abort', () => {
                     if (typeof $.removeTransferItems === 'function') {
-                        $.removeTransferItems($('.transfer-table tbody tr', '.fmholder'));
+                        const keys = Object.keys(ulmanager.ulCompletingPhase);
+                        if (d && keys.length) {
+                            console.log('Not removing %d completing uploads', keys.length);
+                        }
+                        const $trs = $('.transfer-table tbody tr', '.fmholder');
+                        $.removeTransferItems(keys.length ? $($trs.toArray().filter(r => !keys.includes(r.id))) : $trs);
                     }
                     else {
                         tfsheadupdate({

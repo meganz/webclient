@@ -29,11 +29,17 @@ class MComponent {
      * Attaching an event to the directly related element (this.el)
      * @param {String} eventName Event name to work with as per `addeventlistener` documentation
      * @param {Function} handler Handler for the element click
-     * @param {any} options Options as per AddEventListener guidelines
+     * @param {any} [options] Options as per AddEventListener guidelines
+     * @param {HTMLElement} [domNode] A specific DOM node to attach the event to
      */
-    attachEvent(eventName, handler, options) {
+    attachEvent(eventName, handler, options, domNode) {
         this.disposeEvent(eventName);
-        this.disposeEvents[eventName] = MComponent.listen(this.el, eventName, handler, options);
+        this.disposeEvents[eventName] = MComponent.listen(
+            domNode || this.el,
+            eventName.split('.')[0],
+            handler,
+            options
+        );
     }
 
     /**
@@ -69,6 +75,8 @@ class MComponent {
         for (let i = 0; i < eventNames.length; i++) {
             this.disposeEvent(eventNames[i]);
         }
+
+        $(this.el).off('dialog-closed.mDialog');
 
         delete this.el;
     }

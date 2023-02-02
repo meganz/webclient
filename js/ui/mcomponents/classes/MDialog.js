@@ -80,17 +80,25 @@ class MDialog extends MComponent {
             const overlay = this._parent.querySelector('.fm-dialog-overlay');
             overlay.classList.add('m-dialog-overlay');
 
-            const disposeClick = MComponent.listen(overlay, 'click', () => {
-                this.hide();
-                disposeClick();
-            });
-
-            const disposeEsc = MComponent.listen(document, 'keyup', ({ key }) => {
-                if (key === 'Escape') {
+            this.attachEvent(
+                'click.dialog.overlay',
+                () => {
                     this.hide();
-                    disposeEsc();
-                }
-            });
+                },
+                null,
+                overlay
+            );
+
+            this.attachEvent(
+                'keyup.dialog.escape',
+                ({ key }) => {
+                    if (key === 'Escape') {
+                        this.hide();
+                    }
+                },
+                null,
+                document
+            );
         }
 
         if (this._slot) {
@@ -108,21 +116,15 @@ class MDialog extends MComponent {
         }
 
         M.safeShowDialog('m-dialog', $(this.el));
+
+        $(this.el).rebind('dialog-closed.mDialog', () => {
+            this.detachEl();
+        });
     }
 
     hide() {
-        this.detachEl();
-
         assert($.dialog === 'm-dialog');
         closeDialog();
-
-        if (this.disposeCloseClick) {
-            this.disposeCloseClick();
-        }
-
-        if (this.disposeEnterHit) {
-            this.disposeEnterHit();
-        }
     }
 
     disable() {
@@ -166,9 +168,14 @@ class MDialog extends MComponent {
         this._contentWrapper.className = (typeof this._contentClasses === 'string') ? this._contentClasses : '';
         content.append(this._contentWrapper);
 
-        this.disposeCloseClick = MComponent.listen(closeBtn, 'click', () => {
-            this.triggerCancelAction();
-        });
+        this.attachEvent(
+            'click.dialog.close',
+            () => {
+                this.triggerCancelAction();
+            },
+            null,
+            closeBtn
+        );
     }
 
     setButtons() {
@@ -218,19 +225,21 @@ class MDialog extends MComponent {
 
             footerContainer.append(this.okBtn.el);
 
-            this.disposeEnterHit = MComponent.listen(document, 'keyup', (evt) => {
-                if (this.okBtn.el.disabled) {
-                    return;
-                }
+            this.attachEvent(
+                'keyup.dialog.enter',
+                (evt) => {
+                    if (this.okBtn.el.disabled) {
+                        return;
+                    }
 
-                if (evt.key === 'Enter') {
-                    this.okBtn.el.click();
-                    return false;
-                }
-                else if (evt.key === 'Escape') {
-                    this.hide();
-                }
-            });
+                    if (evt.key === 'Enter') {
+                        this.okBtn.el.click();
+                        return false;
+                    }
+                },
+                null,
+                document
+            );
         }
     }
 }

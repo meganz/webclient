@@ -50,7 +50,6 @@ var accountinputs = {
 
         $button.rebind('keydown.commonevent', function (e) {
             if (e.keyCode === 9) {
-                e.preventDefault();
                 if (e.shiftKey) {
                     $checkbox.last().focus();
                 }
@@ -58,10 +57,7 @@ var accountinputs = {
                     $inputs.first().focus();
                 }
             }
-            else if (e.keyCode === 32) {
-                e.preventDefault();
-                $button.triggerHandler('click');
-            }
+            return false;
         });
 
         $button.rebind('focus.commonevent', function() {
@@ -103,8 +99,8 @@ var accountinputs = {
             }
         });
 
-        Soon(function() {
-            $inputs.first().focus()
+        onIdle(() => {
+            $inputs.first().focus();
         });
 
         return $formWrapper;
@@ -145,17 +141,15 @@ var tooltiplogin = {
             $dialog.find('.top-login-warning').addClass('hidden');
         }
 
-        var $inputs = $('input',  $dialog);
-        var $button = $('.top-dialog-login-button', $dialog);
+        $('#login-name, #login-password, .top-dialog-login-button', $dialog)
+            .rebind('keydown.loginpopup', (e) => {
+                if (e.keyCode === 13) {
+                    tooltiplogin.startLogin.call(this);
+                    return false;
+                }
+            });
 
-        $inputs.add($button).rebind('keydown.loginpopup', function(e) {
-            if (e.keyCode === 13) {
-                tooltiplogin.startLogin.call(this);
-                return false;
-            }
-        });
-
-        $button.rebind('click.loginpopup', tooltiplogin.startLogin);
+        $('.top-dialog-login-button', $dialog).rebind('click.loginpopup', tooltiplogin.startLogin);
 
         $('.top-login-full', $dialog).rebind('click', function() {
             tooltiplogin.init(1);
@@ -229,6 +223,11 @@ var tooltiplogin = {
             $passwordField.megaInputsShowError(l[1791]);
             $passwordField.focus();
         }
+        else if ($loginButton.hasClass('loading')) {
+            if (d) {
+                console.warn('Aborting login procedure, there is another ongoing..');
+            }
+        }
         else {
             $loginButton.addClass('loading');
 
@@ -245,6 +244,8 @@ var tooltiplogin = {
                                             tooltiplogin.old.startLogin,
                                             tooltiplogin.new.startLogin);
         }
+
+        return false;
     },
 
     /**
@@ -301,7 +302,7 @@ var tooltiplogin = {
         var $passwordField = $topLoginPopup.find('#login-password');
 
         // Remove loading spinner on the button
-        $button.removeClass('loading');
+        tSleep(9).then(() => $button.removeClass('loading'));
 
         // Check and handle the common login errors
         if (security.login.checkForCommonErrors(result, tooltiplogin.old.startLogin, tooltiplogin.new.startLogin)) {

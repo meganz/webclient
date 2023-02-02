@@ -795,7 +795,7 @@ var security = {
 security.register = {
 
     /** Backup of the details to re-send the email if requested  */
-    sendEmailRequestParams: {},
+    sendEmailRequestParams: false,
 
     /**
      * Create new account registration
@@ -807,8 +807,13 @@ security.register = {
      * @param {Function} completeCallback A function to run when the registration is complete
      */
     startRegistration: function(firstName, lastName, email, password, fromProPage, completeCallback) {
-
         'use strict';
+
+        if (this.sendEmailRequestParams) {
+            console.error('startRegistration blocked, ongoing.');
+            return;
+        }
+        this.sendEmailRequestParams = true;
 
         // Show loading dialog
         loadingDialog.show();
@@ -1068,8 +1073,13 @@ security.login = {
      * @param {Function} newStartCallback A callback for starting the new login process
      */
     checkLoginMethod: function(email, password, pinCode, rememberMe, oldStartCallback, newStartCallback) {
-
         'use strict';
+
+        console.assert(!!password, 'checkLoginMethod: blocked, pwd missing.');
+        console.assert(pinCode || !security.login.email, 'checkLoginMethod: blocked, ongoing.');
+        if ((!pinCode && security.login.email) || !password) {
+            return;
+        }
 
         // Temporarily cache the email, password and remember me checkbox status
         // in case we need to resend after they have entered their two factor code

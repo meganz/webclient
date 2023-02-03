@@ -59,11 +59,12 @@ mobile.twofactor.verifyLogin = {
 
             // Get the Google Authenticator PIN code from the user
             var pinCode = $.trim($pinCode.val());
+            if (!pinCode || $verifyButton.hasClass('loading')) {
+                return;
+            }
 
             // Get cached data that was already entered on the login form
-            var email = security.login.email.trim();
-            var password = security.login.password;
-            var rememberMe = security.login.rememberMe;
+            const {email, password, rememberMe} = security.login;
 
             // Show loading spinner on the buttons
             $verifyButton.addClass('loading');

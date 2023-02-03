@@ -121,8 +121,12 @@ mobile.signin = {
      * Initialise the login button to log the user into the site
      */
     initLoginButton: function() {
-
         'use strict';
+
+        // Cleanup temporary login variables
+        security.login.email = null;
+        security.login.password = null;
+        security.login.rememberMe = false;
 
         var $emailField = this.$screen.find('.signin-input.login input');
         var $passwordField = this.$screen.find('.signin-input.password input');
@@ -236,14 +240,20 @@ mobile.signin.old = {
             return false;
         }
 
-        // Check they are not locked out
-        else if (result === EBLOCKED) {
-            mobile.messageOverlay.show(l[730]);
-        }
-
         // If there was a 2FA error, show a message that the PIN code was incorrect and clear the text field
         else if (result === EFAILED) {
             mobile.twofactor.verifyLogin.showVerificationError();
+            return false;
+        }
+
+        // Cleanup temporary login variables
+        security.login.email = null;
+        security.login.password = null;
+        security.login.rememberMe = false;
+
+        // Check they are not locked out
+        if (result === EBLOCKED) {
+            mobile.messageOverlay.show(l[730]);
         }
 
         // Otherwise if successful
@@ -348,14 +358,20 @@ mobile.signin.new = {
                 return false;
             }
 
-            // Check they are not locked out
-            else if (result === EBLOCKED) {
-                mobile.messageOverlay.show(l[730]);
-            }
-
             // If there was a 2FA error, show a message that the PIN code was incorrect and clear the text field
             else if (result === EFAILED) {
                 mobile.twofactor.verifyLogin.showVerificationError();
+                return false;
+            }
+
+            // Cleanup temporary login variables
+            security.login.email = null;
+            security.login.password = null;
+            security.login.rememberMe = false;
+
+            // Check they are not locked out
+            if (result === EBLOCKED) {
+                mobile.messageOverlay.show(l[730]);
             }
 
             // Otherwise if successful

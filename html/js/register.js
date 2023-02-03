@@ -72,8 +72,6 @@ var loginFromEphemeral = {
         // Remove loading spinner on the button
         $('.top-dialog-login-button').removeClass('loading');
 
-        loadingDialog.hide();
-
         // Check and handle the common login errors
         if (security.login.checkForCommonErrors(result, loginFromEphemeral.old.startLogin,
                                                 loginFromEphemeral.new.startLogin)) {
@@ -117,9 +115,6 @@ var loginFromEphemeral = {
             }
         }
         else {
-            // Close the 2FA dialog for a generic error
-            twofactor.loginDialog.closeDialog();
-
             // Show message that the email has already been registered and to choose an alternative email to proceed
             $('#register-email-registerpage2').megaInputsShowError(l[1297]);
             $('.account.input-wrapper.email input').focus();

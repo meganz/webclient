@@ -239,8 +239,6 @@
         var $emailInput = $formWrapper.find('#login-name3');
         var $passwordInput = $formWrapper.find('#login-password3');
 
-        loadingDialog.hide();
-
         // Check and handle the common login errors
         if (security.login.checkForCommonErrors(result, startOldLogin, startNewLogin)) {
             return false;
@@ -268,9 +266,6 @@
             $passwordInput.val('');
         }
         else {
-            // Close the 2FA dialog for a generic error
-            twofactor.loginDialog.closeDialog();
-
             $emailInput.megaInputsShowError();
             $passwordInput.megaInputsShowError(l[7431]);
             $passwordInput.focus();

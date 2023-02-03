@@ -138,18 +138,17 @@ twofactor.loginDialog = {
         var $submitButton = $dialog.find('.submit-button');
 
         // On Submit button click
-        $submitButton.rebind('click', function() {
+        $submitButton.rebind('click', () => {
 
             // Get the Google Authenticator PIN code from the user
             var pinCode = $.trim($pinCodeInput.val());
-            if (!pinCode) {
+            if (!pinCode || $submitButton.hasClass('loading')) {
                 return;
             }
+            this.resetState();
 
             // Get cached data from the login form
-            var email = security.login.email.trim();
-            var password = security.login.password;
-            var rememberMe = security.login.rememberMe;
+            const {email, password, rememberMe} = security.login;
 
             // Show loading spinner on the buttons
             $submitButton.addClass('loading');
@@ -175,6 +174,11 @@ twofactor.loginDialog = {
         // On button click
         $lostDeviceButton.rebind('click', function() {
 
+            // Cleanup temporary login variables
+            security.login.email = null;
+            security.login.password = null;
+            security.login.rememberMe = false;
+
             // Load the Recovery page where they can recover using their Recovery Key
             loadSubPage('recovery');
         });
@@ -193,6 +197,11 @@ twofactor.loginDialog = {
 
         // On click of the close and back buttons
         $closeButton.rebind('click', function() {
+
+            // Cleanup temporary login variables
+            security.login.email = null;
+            security.login.password = null;
+            security.login.rememberMe = false;
 
             // Close the modal dialog
             twofactor.loginDialog.closeDialog();

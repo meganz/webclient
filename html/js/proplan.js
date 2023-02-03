@@ -1545,8 +1545,6 @@ function completeProLogin(result) {
     var $emailField = $formWrapper.find('input#login-name3');
     var $passwordField = $formWrapper.find('input#login-password3');
 
-    loadingDialog.hide();
-
     // Check and handle the common login errors
     if (security.login.checkForCommonErrors(result, startOldProLogin, startNewProLogin)) {
         return false;
@@ -1577,8 +1575,6 @@ function completeProLogin(result) {
         }
     }
     else {
-        // Close the 2FA dialog for a generic error
-        twofactor.loginDialog.closeDialog();
         $emailField.megaInputsShowError();
         $passwordField.megaInputsShowError(l[7431]);
 

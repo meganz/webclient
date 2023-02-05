@@ -253,10 +253,11 @@ class CloudBrowserDialog extends MegaRenderMixin {
                         onIdle(() => {
                             const createPublicLink = () => {
                                 M.createPublicLink(highlightedNode)
-                                    .then(({ link }) =>
+                                    .then(({link}) =>
                                         this.props.room.sendMessage(link)
                                     );
                             };
+                            const name = M.getNameByHandle(highlightedNode) || l[1049];
 
                             return (
                                 mega.fileRequestCommon.storage.isDropExist(highlightedNode).length ?
@@ -266,12 +267,14 @@ class CloudBrowserDialog extends MegaRenderMixin {
                                         l[1003],
                                         // `By doing this you will cancel your File request setup
                                         // for the folder named %1`
-                                        l[17403].replace('%1', escapeHTML(highlightedNode.name)),
+                                        l[17403].replace('%1', escapeHTML(name)),
                                         // `Do you want to proceed?`
                                         l[18229],
                                         (e) => {
                                             if (e) {
-                                                mega.fileRequest.removeList([highlightedNode], createPublicLink);
+                                                mega.fileRequest.removeList([highlightedNode])
+                                                    .then(createPublicLink)
+                                                    .catch(dump);
                                             }
                                         }
                                     ) :
@@ -279,7 +282,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                             );
                         });
                     }
-                } : null,
+                } : null
             );
         }
 

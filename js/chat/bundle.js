@@ -8496,9 +8496,10 @@ class CloudBrowserDialog extends mixins.wl {
                 link
               }) => this.props.room.sendMessage(link));
             };
-            return mega.fileRequestCommon.storage.isDropExist(highlightedNode).length ? msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(highlightedNode.name)), l[18229], e => {
+            const name = M.getNameByHandle(highlightedNode) || l[1049];
+            return mega.fileRequestCommon.storage.isDropExist(highlightedNode).length ? msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(name)), l[18229], e => {
               if (e) {
-                mega.fileRequest.removeList([highlightedNode], createPublicLink);
+                mega.fileRequest.removeList([highlightedNode]).then(createPublicLink).catch(dump);
               }
             }) : createPublicLink();
           });

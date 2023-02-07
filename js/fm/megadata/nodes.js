@@ -79,7 +79,7 @@
         clearIndex.call(this, h);
     };
 
-    MegaData.prototype.delNode = function(h, ignoreDB) {
+    MegaData.prototype.delNode = function(h, ignoreDB, isBeingMoved) {
         const delInShareQ = delInShareQueue[h] = delInShareQueue[h] || [];
 
         if (d) {
@@ -108,10 +108,10 @@
         // node deletion traversal
         delNodeIterator.call(this, h, delInShareQ);
 
-        if (delInShareQ.length) {
+        if (!isBeingMoved && delInShareQ.length) {
             const nodes = delInShareQ.map(uh => uh.substr(12));
 
-            mega.keyMgr.deleteShares(nodes).catch(dump);
+            mega.keyMgr.enqueueShareRevocation(nodes);
         }
 
         if (fmdb && !ignoreDB) {
@@ -3899,22 +3899,21 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
         }
     }
 
-    if (okd) {
+    if (okd === -0x9f) {
         // The node is no longer shared with anybody, ensure it's properly cleared..
-        var users = this.getNodeShareUsers(h, 'EXP');
+        const users = this.getNodeShareUsers(h);
 
         if (users.length) {
-            console.warn('The node ' + h + ' still has shares on it!', users);
+            if (d) {
+                console.warn(`Removing users left on share revocation for ${h}...`, users);
+            }
 
-            users.forEach(function(user) {
-                M.delNodeShare(h, user);
-            });
+            for (let u = users.length; u--;) {
+                M.delNodeShare(h, users[u]);
+            }
         }
 
-        if (fmdb) {
-            fmdb.del('ok', h);
-        }
-        mega.keyMgr.deleteShares([h]).catch(dump);
+        mega.keyMgr.enqueueShareRevocation([h]);
     }
 };
 

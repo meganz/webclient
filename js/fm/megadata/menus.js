@@ -74,12 +74,12 @@ MegaData.prototype.buildSubMenu = function(id) {
                 iconClass = 'icon-folder-outgoing-share';
             }
             else if (
-                mega.fileRequestCommon.storage.cache.puHandle[i]
-                && mega.fileRequestCommon.storage.cache.puHandle[i].s !== 1
-                && mega.fileRequestCommon.storage.cache.puHandle[i].p
+                mega.fileRequestCommon.storage.cache.puHandle[fid]
+                && mega.fileRequestCommon.storage.cache.puHandle[fid].s !== 1
+                && mega.fileRequestCommon.storage.cache.puHandle[fid].p
             ) {
                 classes += ' file-request-folder';
-                iconClass = 'icon-folder-upload';
+                iconClass = 'icon-folder-mega-drop';
             }
 
             var nodeName = missingkeys[fid] ? l[8686] : folders[i].name;
@@ -228,35 +228,28 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             }
 
             if ((sourceRoot === M.RootID || M.isDynPage(M.currentrootid)) && !folderlink) {
+                let exp = false;
+                const shares = this.getNodeShareUsers(selNode);
+
+                for (let i = shares.length; i--;) {
+                    if (shares[i] === 'EXP') {
+                        shares.splice(i, 1);
+                        exp = selNode.shares.EXP;
+                    }
+                }
                 items['.sh4r1ng-item'] = 1;
 
-                if (M.getNodeShareUsers(selNode, 'EXP').length || M.ps[selNode]) {
+                if (shares.length || M.ps[selNode.h]) {
                     items['.removeshare-item'] = 1;
                 }
-            }
+                else if (!exp && !shared.is(selNode.h)) {
 
-            if ((sourceRoot === M.RootID || M.isDynPage(M.currentrootid))
-                && u_type === 3
-                && !M.getShareNodesSync(selNode.h).length
-                && !folderlink) {
+                    if (mega.fileRequest.publicFolderExists(selNode.h)) {
+                        const fileRequestPageClass =
+                            M.currentrootid === 'file-requests'
+                                ? '.file-request-page'
+                                : ':not(.file-request-page)';
 
-                // Check if the folder is taken down or not
-                var shareNode = M.getNodeShare(selNode.h);
-                if (shareNode === false
-                    || shareNode === null
-                    || shareNode.down === undefined
-                    || shareNode.down !== 1) {
-
-                    let fileRequestPageClass = ':not(.file-request-page)';
-                    if (M.currentrootid === 'file-requests') {
-                        fileRequestPageClass = '.file-request-page';
-                    }
-
-                    if (
-                        mega.fileRequest.storage.cache.puHandle[selNode.h]
-                        && mega.fileRequest.storage.cache.puHandle[selNode.h].s !== 1
-                        && mega.fileRequest.storage.cache.puHandle[selNode.h].p
-                    ) {
                         items[`.file-request-manage${fileRequestPageClass}`] = 1;
                         items[`.file-request-copy-link${fileRequestPageClass}`] = 1;
                         items[`.file-request-remove${fileRequestPageClass}`] = 1;

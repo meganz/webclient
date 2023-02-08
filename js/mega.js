@@ -2628,17 +2628,20 @@ async function shared(h) {
     if (!M.d[h]) {
         await dbfetch.acquire(h);
     }
+    return shared.is(h);
+}
 
-    let rc = false;
-    while (h && M.d[h]) {
-        if (M.d[h].shares) {
-            rc = h;
-            break;
+shared.is = function(h) {
+    'use strict';
+
+    while (M.d[h]) {
+        if (M.ps[h] || M.d[h].shares) {
+            return h;
         }
         h = M.d[h].p;
     }
-    return rc;
-}
+    return false;
+};
 
 // returns sharing user (or false if not in an inshare)
 function sharer(h) {

@@ -210,7 +210,9 @@ lazy(mega, 'fileRequestCommon', () => {
                 });
             }
 
-            fmdb.del('puf', puHandlePublicHandle);
+            if (fmdb && !pfkey) {
+                fmdb.del('puf', puHandlePublicHandle);
+            }
 
             let nodeHandle = puHandleNodeHandle;
             if (!puHandleNodeHandle || !this.cache.puHandle[nodeHandle]) {
@@ -357,10 +359,12 @@ lazy(mega, 'fileRequestCommon', () => {
                 }
             };
 
-            fmdb.add('puf', {
-                ph: publicHandle,
-                d: puHandleDBData
-            });
+            if (fmdb && !pfkey) {
+                fmdb.add('puf', {
+                    ph: publicHandle,
+                    d: puHandleDBData
+                });
+            }
 
             return puHandleCacheData;
         }
@@ -512,15 +516,6 @@ lazy(mega, 'fileRequestCommon', () => {
                 return;
             }
 
-            if (!fmdb || pfkey) {
-                if (d) {
-                    logger.info('Storage.addPuPage - no fmdb or has pfkey', {
-                        puPageObject
-                    });
-                }
-                return;
-            }
-
             const folderName = puHandleObject.fn;
             const nodeHandle = puHandleObject.h;
 
@@ -621,10 +616,12 @@ lazy(mega, 'fileRequestCommon', () => {
                 }
             };
 
-            fmdb.add('pup', {
-                p: pagePublicHandle,
-                d: puHandleDBData
-            });
+            if (fmdb && !pfkey) {
+                fmdb.add('pup', {
+                    p: pagePublicHandle,
+                    d: puHandleDBData
+                });
+            }
 
             return puHandleCacheData;
         }
@@ -688,15 +685,6 @@ lazy(mega, 'fileRequestCommon', () => {
                 return;
             }
 
-            if (!fmdb || pfkey) {
-                if (d) {
-                    logger.info('Storage.updatePuPage - no fmdb or has pfkey', {
-                        puPageObject
-                    });
-                }
-                return;
-            }
-
             let message = puPageObject.msg || '';
 
             if (isEmpty(title)) {
@@ -737,15 +725,6 @@ lazy(mega, 'fileRequestCommon', () => {
                 });
             }
 
-            if (!fmdb || pfkey) {
-                if (d) {
-                    logger.info('Storage.updatePuHandle - no fmdb or has pfkey', {
-                        puHandleObject
-                    });
-                }
-                return;
-            }
-
             this.saveOrUpdatePuHandle(
                 {
                     nodeHandle: puHandleNodeHandle,
@@ -764,7 +743,10 @@ lazy(mega, 'fileRequestCommon', () => {
                 });
             }
 
-            fmdb.del('pup', puPagePublicHandle);
+            if (fmdb && !pfkey) {
+                fmdb.del('pup', puPagePublicHandle);
+            }
+
             let nodeHandle = null;
             if (this.cache.puPage[puPagePublicHandle]) {
                 nodeHandle = this.cache.puPage[puPagePublicHandle].h;
@@ -802,7 +784,9 @@ lazy(mega, 'fileRequestCommon', () => {
                     const puPagePublicHandle = key;
 
                     if (puHandlePublicHandle === puPageObject.ph) {
-                        fmdb.del('pup', puPagePublicHandle);
+                        if (fmdb && !pfkey) {
+                            fmdb.del('pup', puPagePublicHandle);
+                        }
                         if (this.cache.puPage[puPagePublicHandle]) {
                             delete this.cache.puPage[puPagePublicHandle];
                         }
@@ -811,7 +795,9 @@ lazy(mega, 'fileRequestCommon', () => {
                 }
             }
 
-            fmdb.del('puf', puHandlePublicHandle);
+            if (fmdb && !pfkey) {
+                fmdb.del('puf', puHandlePublicHandle);
+            }
             if (this.cache.puHandle[puHandleNodeHandle]) {
                 delete this.cache.puHandle[puHandleNodeHandle];
             }
@@ -913,8 +899,7 @@ lazy(mega, 'fileRequestCommon', () => {
         }
 
         generateUrl(puPagePublicHandle) {
-            const extensionSymbol = is_extension ? '#' : '/';
-            return `${getAppBaseUrl()}${extensionSymbol}filerequest/${puPagePublicHandle}`;
+            return `${getBaseUrl()}/filerequest/${puPagePublicHandle}`;
         }
 
         generateUrlPreview(name, title, description, theme) {
@@ -934,7 +919,7 @@ lazy(mega, 'fileRequestCommon', () => {
                 url,
                 '_blank',
                 'noopener,noreferrer,' +
-                'width=750, height=770, resizable=no,' +
+                'width=770, height=770, resizable=no,' +
                 'status=no, location=no, titlebar=no, toolbar=no'
             );
         }

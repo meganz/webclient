@@ -10541,6 +10541,7 @@ body.de .mega-dialog.new-group-chat {
     margin-bottom: 4px;
     color: var(--text-color-medium);
     font: var(--text-body2-bold);
+    cursor: pointer;
 }
 
 .mega-dialog.file-request .content-block .form-row.create-success .embed-block.active .embed-button-select {

@@ -1770,7 +1770,7 @@ MegaData.prototype.revokeShares = function(handles) {
                 if (d) {
                     console.debug('Revoking %s File request folders...', widgets.length);
                 }
-                promises.push(mega.fileRequest.removeList(widgets, null, true));
+                promises.push(mega.fileRequest.removeList(widgets, true));
             }
 
             for (i = tree.length; i--;) {

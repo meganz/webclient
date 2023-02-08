@@ -1754,7 +1754,13 @@ var addressDialog = {
         'use strict';
 
         const getBillingProp = (propName, encoded) => {
-            return encoded ? from8(billingInfo[propName]) : billingInfo[propName];
+            if (!billingInfo[propName] || !encoded) {
+                return billingInfo[propName];
+            }
+            const val = tryCatch(() => from8(billingInfo[propName]), () => {
+                console.error(`Invalid utf-8 encoded key value ${propName} -> ${billingInfo[propName]}`);
+            })();
+            return val || billingInfo[propName];
         };
 
         const fillInputFromAttr = ($input, businessAttrName, Atrrname) => {

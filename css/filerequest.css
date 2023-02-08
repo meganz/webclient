@@ -140,6 +140,11 @@
     word-break: break-word;
 }
 
+.file-request-upload-page .page-main .page-content .content-details .detail-upload-id .upload-id {
+    user-select: text;
+    -webkit-user-select: text;
+}
+
 .file-request-upload-page .page-main .page-content .content-details.content-error {
     text-align: center;
     border: 1px solid var(--color-support-error);

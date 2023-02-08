@@ -21,6 +21,12 @@ lazy(mega, 'fileRequest', () => {
     };
 
     const openNewDialogHandler = () => {
+        if (M.currentrootid === 'file-requests') {
+            // We clear the selection as its useless on file requests list page
+            // and will default to M.RootID once dialog is opened
+            selectionManager.clear_selection();
+        }
+
         openNewFileRequestDialog({
             post: openCreateDialogFromSelect
         });
@@ -172,6 +178,21 @@ lazy(mega, 'fileRequest', () => {
                 this.setEmbedCode();
                 this.$themeButton.getInput().closest('.embed-block').removeClass(activeClass);
                 $input.closest('.embed-block').addClass(activeClass);
+                return false;
+            });
+
+            this.$themeButtonWrapper.eventOnClick(($input) => {
+                if ($input.is(this.themeButtonSelector)) {
+                    return;
+                }
+
+                let $parentElement = $input;
+                if ($input.not(this.themeButtonWrapper)) {
+                    $parentElement = $input.parent();
+                }
+
+                $(this.themeButtonSelector, $parentElement).trigger('click');
+                return false;
             });
         }
 
@@ -300,7 +321,6 @@ lazy(mega, 'fileRequest', () => {
                 this.$selectFolder.setFolder(this.folderName);
             }
 
-            delay('filerequest.log', eventlog.bind(null, 99773)); // create event
             M.safeShowDialog('file-request-create-dialog', this.$dialog);
 
             const $scrollableContent = $('.content .scrollable', this.$dialog);
@@ -355,9 +375,16 @@ lazy(mega, 'fileRequest', () => {
             this.$closeButton = new mega.fileRequestUI.CloseButtonComponent(
                 $('.file-request-close-button, button.close', this.$dialog)
             );
+
+            this.themeButtonSelector = '.embed-button-theme-input';
             this.$themeButton = new mega.fileRequestUI.RadioComponent(
-                $('.embed-button-theme-input', this.$dialog), { namespace: 'frcs' }
+                $(this.themeButtonSelector, this.$dialog), { namespace: 'frcs' }
             );
+            this.themeButtonWrapper = '.embed-button-select';
+            this.$themeButtonWrapper = new mega.fileRequestUI.ButtonComponent(
+                $(this.themeButtonWrapper, this.$dialog), { namespace: 'frcs' }
+            );
+
             this.$embedCode = new mega.fileRequestUI.EmbedCodeInputComponent(
                 $('.file-request-embed-code', this.$dialog)
             );
@@ -405,21 +432,21 @@ lazy(mega, 'fileRequest', () => {
 
             this.puPagePublicHandle = this.puHandleObject.p;
 
-            this.setShareLink();
-            this.setEmbedCode();
+            M.safeShowDialog('file-request-create-success-dialog', () => {
+                const $scrollableContent = $('.content .scrollable', this.$dialog);
 
-            M.safeShowDialog('file-request-create-success-dialog', this.$dialog);
-            loadingDialog.hide();
+                this.setShareLink();
+                this.setEmbedCode();
 
-            const $scrollableContent = $('.content .scrollable', this.$dialog);
-            initPerfectScrollbar($scrollableContent, {
-                scrollYMarginOffset: 20
-            });
+                this.triggerClickOnRail($scrollableContent);
+                initPerfectScrollbar($scrollableContent, {scrollYMarginOffset: 20});
 
-            this.triggerClickOnRail($scrollableContent);
+                this.$dialog.rebind('dialog-closed', () => {
+                    this.$dialog.off('dialog-closed');
+                    mega.fileRequest.storage.removePuMessage(context.ph);
+                });
 
-            mBroadcaster.once('closedialog', () => {
-                mega.fileRequest.storage.removePuMessage(context.ph);
+                return this.$dialog;
             });
         }
 
@@ -454,9 +481,16 @@ lazy(mega, 'fileRequest', () => {
                     warning: true
                 }
             );
+
+            this.themeButtonSelector = '.embed-button-theme-input';
             this.$themeButton = new mega.fileRequestUI.RadioComponent(
-                $('.embed-button-theme-input', this.$dialog), { namespace: 'frcs' }
+                $(this.themeButtonSelector, this.$dialog), { namespace: 'frm' }
             );
+            this.themeButtonWrapper = '.embed-button-select';
+            this.$themeButtonWrapper = new mega.fileRequestUI.ButtonComponent(
+                $(this.themeButtonWrapper, this.$dialog), { namespace: 'frm' }
+            );
+
             this.$embedCode = new mega.fileRequestUI.EmbedCodeInputComponent(
                 $('.file-request-embed-code', this.$dialog)
             );
@@ -566,20 +600,20 @@ lazy(mega, 'fileRequest', () => {
                 const message = l.file_request_action_remove_prompt_title;
                 const description = l.file_request_action_remove_prompt_desc;
 
-                const removeDialogCallback = async(res) => {
+                const removeDialogCallback = (res) => {
                     if (!res) {
                         return;
                     }
                     this.$removeButton.disable();
 
-                    await mega.fileRequest.remove(
-                        this.puHandleObject.h
-                    ).catch(dump);
-
-                    closeDialog();
-                    this.$removeButton.enable();
-                    showToast('warning2', l.file_request_action_remove);
-                    selectionManager.clear_selection();
+                    mega.fileRequest.remove(this.puHandleObject.h)
+                        .catch(dump)
+                        .finally(() => {
+                            closeDialog();
+                            this.$removeButton.enable();
+                            showToast('warning2', l.file_request_action_remove);
+                            selectionManager.clear_selection();
+                        });
                 };
 
                 msgDialog(
@@ -701,28 +735,26 @@ lazy(mega, 'fileRequest', () => {
                     title,
                     message,
                     description,
-                    async(res) => {
+                    (res) => {
                         if (!res) {
                             return;
                         }
 
                         loadingDialog.show();
-                        await mega.fileRequest
-                            .remove(selectedNodeHandle)
+                        mega.fileRequest.remove(selectedNodeHandle)
                             .catch((ex) => {
                                 if (typeof ex !== 'number' || ex && ex !== ENOENT) {
                                     return;
                                 }
 
-                                mega.fileRequest
-                                    .storage
-                                    .removePuPageByNodeHandle(selectedNodeHandle);
+                                mega.fileRequest.storage.removePuPageByNodeHandle(selectedNodeHandle);
 
                                 refreshFileRequestPageList();
+                            })
+                            .finally(() => {
+                                showToast('warning2', l.file_request_action_remove);
+                                selectionManager.clear_selection();
                             });
-
-                        showToast('warning2', l.file_request_action_remove);
-                        selectionManager.clear_selection();
                     },
                     1
                 );
@@ -1251,15 +1283,16 @@ lazy(mega, 'fileRequest', () => {
         }
 
         addEventHandlers() {
-            this.$removeButton.eventOnClick(async() => {
+            this.$removeButton.eventOnClick(() => {
                 this.$removeButton.disable();
-                await mega.fileRequest.remove(
-                    this.context.h
-                ).catch(dump);
-                this.$removeButton.enable();
 
-                showToast('warning2', l.file_request_action_remove);
-                this.$closeButton.closeDialog();
+                mega.fileRequest.remove(this.context.h)
+                    .catch(dump)
+                    .finally(() => {
+                        this.$removeButton.enable();
+                        showToast('warning2', l.file_request_action_remove);
+                        this.$closeButton.closeDialog();
+                    });
             });
         }
     }
@@ -1310,6 +1343,8 @@ lazy(mega, 'fileRequest', () => {
             }
 
             loadingDialog.show();
+
+            delay('filerequest.log', eventlog.bind(null, 99773)); // create event
             const response = await this
                 .api
                 .create(handle, title, description)
@@ -1388,6 +1423,12 @@ lazy(mega, 'fileRequest', () => {
             }
 
             loadingDialog.hide();
+        }
+
+        publicFolderExists(h, p = false) {
+            const e = this.storage.cache.puHandle[h];
+
+            return e && e.s !== 1 && (!p || e.p);
         }
 
         removeList(handles, quiet) {
@@ -1591,11 +1632,13 @@ lazy(mega, 'fileRequest', () => {
                 .rebind('click.frlm', function(ev) {
                     return iconHandler.call(this, true, 'tr', ev, {
                         post: (selected) => {
-                            mega.fileRequest
-                                .dialogs
-                                .manageDialog.init({
-                                    h: selected
-                                });
+                            if (M.isInvalidUserStatus()) {
+                                return;
+                            }
+
+                            mega.fileRequest.dialogs.manageDialog.init({
+                                h: selected
+                            });
                         }
                     });
                 });
@@ -1617,38 +1660,24 @@ lazy(mega, 'fileRequest', () => {
                     ? l[17626]
                     : l[17403].replace('%1', escapeHTML(M.d[list[0]].name));
 
-                if (!is_mobile) {
-                    msgDialog(
-                        'confirmation',
-                        l[1003],
-                        fldName,
-                        l[18229],
-                        async(result) => {
-                            if (!result) {
-                                reject();
-                                return;
-                            }
+                const ack = () => {
+                    onIdle(closeDialog);
+                    mega.fileRequest.removeList(list).always(dump).finally(resolve);
+                };
 
-                            closeDialog();
-                            await mega.fileRequest
-                                .removeList(list)
-                                .catch((ex) => {
-                                    reject(ex);
-                                });
-
-                            resolve();
+                if (is_mobile) {
+                    mobile.messageOverlay.show(fldName, l[18229], false, ['No', 'Yes']).then(ack).catch(reject);
+                }
+                else {
+                    msgDialog('confirmation', l[1003], fldName, l[18229], (result) => {
+                        if (result) {
+                            return ack();
                         }
-                    );
-                    return;
+                        reject();
+                    });
                 }
 
-                mobile.messageOverlay.show(fldName, l[18229], false, ['No', 'Yes'])
-                    .then(() => {
-                        closeDialog();
-                        return mega.fileRequest.removeList(list);
-                    })
-                    .then(resolve)
-                    .catch(reject);
+
             });
         }
 

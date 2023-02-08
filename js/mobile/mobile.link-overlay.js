@@ -69,8 +69,7 @@ mobile.linkOverlay = {
 
         const mdList = mega.fileRequestCommon.storage.isDropExist(nodeHandle);
         if (mdList.length) {
-            mega.fileRequest
-                .showRemoveWarning(mdList)
+            mega.fileRequest.showRemoveWarning(mdList)
                 .then(() => {
                     tmpFn.call(this);
                 })

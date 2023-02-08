@@ -74,12 +74,41 @@
             M.disableCircularTargets('#mctreea_');
         }
         else if ($.selectFolderDialog && M.currentrootid === 'file-requests') {
-            $('*[id^="mctreea_"]', $dialog)
-                .children('.file-request-folder, .shared-folder')
-                .closest('.nw-fm-tree-item')
+            const getIdAndDisableDescendants = (elem) => {
+                const handle = String($(elem).attr('id')).replace('mctreea_', '');
+                if (handle) {
+                    M.disableDescendantFolders(handle, '#mctreea_');
+                }
+            };
+
+            const $allFolders = $('*[id^="mctreea_"]', $dialog);
+            const $sharedAndFileRequestFolders = $('*[id^="mctreea_"]', $dialog)
+                .children('.file-request-folder, .shared-folder');
+
+            // All parent file request and shared folder
+            $sharedAndFileRequestFolders.closest('.nw-fm-tree-item')
                 .addClass('disabled');
 
-            $('*[id^="mctreea_"].linked', $dialog).addClass('disabled');
+            // Filter shared folder and disable descendants
+            const filteredSharedFolders = $sharedAndFileRequestFolders.filter('.shared-folder')
+                .closest('.nw-fm-tree-item');
+
+            if (filteredSharedFolders.length) {
+                for (let i = 0; i < filteredSharedFolders.length; i++) {
+                    getIdAndDisableDescendants(filteredSharedFolders[i]);
+                }
+            }
+
+            // Check all linked folders and disable descendants
+            const filteredLinkedFolders = $allFolders
+                .filter('.linked')
+                .addClass('disabled');
+
+            if (filteredLinkedFolders.length) {
+                for (let i = 0; i < filteredLinkedFolders.length; i++) {
+                    getIdAndDisableDescendants(filteredLinkedFolders[i]);
+                }
+            }
         }
         else if (!$.copyToUpload) {
             var sel = $.selected || [];

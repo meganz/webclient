@@ -962,7 +962,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }
 
                     if (videoElement.ended && typeof slideshow_next === 'function' && $document.fullScreen()) {
-                        onIdle(slideshow_next);
+                        onIdle(() => slideshow_next());
                     }
                 }
                 else {

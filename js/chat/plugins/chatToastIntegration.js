@@ -217,7 +217,7 @@ class ChatToastIntegration {
         const { chatd } = megaChat.plugins.chatdIntegration;
         if (chatd) {
             chatd.rebind('onOpen.cTI', () => {
-                if (!megaChat.allChatsHadInitialLoadedHistory()) {
+                if (!megaChat.allChatsHadInitialLoadedHistory() || !mega.active) {
                     return;
                 }
                 delay(
@@ -228,6 +228,9 @@ class ChatToastIntegration {
                 );
             });
             chatd.rebind('onClose.cTI', () => {
+                if (!mega.active) {
+                    return;
+                }
                 delay(
                     'chatdClose.cTI',
                     /* `Chat is now offline` */

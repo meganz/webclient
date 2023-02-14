@@ -1499,7 +1499,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
         .replace('[BR]', '<br>');
     ['empty_call_dlg_text', 'empty_call_dlg_text_min', 'empty_call_dlg_text_sec'].forEach(s => {
-        l[s] = escapeHTML(l[s])
+        // Prevent double escaping
+        l[s] = escapeHTML(l[s].replace(/&gt;/g, '>'))
             .replace(/\[S1]/g, '<span class="stay-dlg-counter">')
             .replace(/\[\/S1]/g, '</span>')
             .replace(/\[S2]/g, '<div class="stay-dlg-subtext">')

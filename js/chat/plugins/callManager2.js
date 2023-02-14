@@ -586,7 +586,11 @@
                 ChatToast.flush(); // We don't want this toast to be held up by any other toasts so clear them out.
                 this.callToutId
                     .setOnShown(function() {
+                        // `this` is the toast object not the call.
                         this.callToutEnd = unixtime() + 120;
+                        if (megaChat.activeCall) {
+                            megaChat.activeCall.showTimeoutDialog();
+                        }
                     })
                     .setUpdater(function() {
                         let timeRemain = (this.callToutEnd || unixtime() + 120) - unixtime();
@@ -615,6 +619,29 @@
                     .setClose(false)
                     .dispatch();
             }
+        }
+        showTimeoutDialog() {
+            if (document.body.classList.contains('in-call')) {
+                return;
+            }
+            msgDialog(
+                `warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`,
+                'stay-on-call',
+                l.empty_call_dlg_title,
+                mega.icu.format(l.empty_call_dlg_text_min, 2).replace('%s', '02:00'),
+                res => {
+                    if (res === null) {
+                        return;
+                    }
+                    return res ? this.handleStayConfirm ? this.handleStayConfirm() : null : () => {
+                        eventlog(99760, JSON.stringify([this.callId, 0]));
+                        if (this.sfuApp) {
+                            this.sfuApp.destroy();
+                        }
+                    };
+                },
+                1
+            );
         }
         hasOtherParticipant() {
             const {peers} = this;

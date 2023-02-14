@@ -183,6 +183,7 @@ export default class Call extends MegaRenderMixin {
         super(props);
         this.state.mode = props.call.viewMode;
         this.state.sidebar = props.chatRoom.type === 'public';
+        this.props.call.handleStayConfirm = this.handleStayConfirm;
     }
 
     /**
@@ -249,9 +250,6 @@ export default class Call extends MegaRenderMixin {
                 this.setState({ mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI }, () => {
                     call.setViewMode(this.state.mode);
                 });
-                if (call.peers.length === 0) {
-                    this.showTimeoutDialog();
-                }
             }
             else if (this.state.mode === Call.MODE.SPEAKER && call.forcedActiveStream &&
                 !streams[call.forcedActiveStream]) {
@@ -305,7 +303,7 @@ export default class Call extends MegaRenderMixin {
         const noPeers = () => {
             onCallMinimize();
             if (typeof call.callToutId !== 'undefined' && !stayOnEnd) {
-                this.showTimeoutDialog();
+                onIdle(() => call.showTimeoutDialog());
             }
         };
 
@@ -320,27 +318,6 @@ export default class Call extends MegaRenderMixin {
                 noPeers()
         );
     };
-
-    /**
-     * showTimeoutDialog
-     * @description Handles showing the timeout dialog when the call UI is minimised
-     * @returns {void} void
-     */
-    showTimeoutDialog() {
-        msgDialog(
-            `warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`,
-            'stay-on-call',
-            l.empty_call_dlg_title,
-            mega.icu.format(l.empty_call_dlg_text_min, 2).replace('%s', '02:00'),
-            res => {
-                if (res === null) {
-                    return;
-                }
-                return res ? this.handleStayConfirm() : this.handleCallEnd(1);
-            },
-            1
-        );
-    }
 
     /**
      * handleCallExpand
@@ -605,9 +582,6 @@ export default class Call extends MegaRenderMixin {
             ) {
                 call.left = true;
                 call.initCallTimeout();
-                if (!Call.isExpanded()) {
-                    this.showTimeoutDialog();
-                }
             }
             delete this.callStartTimeout;
         }, 300 * 1000);

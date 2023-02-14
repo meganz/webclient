@@ -370,6 +370,7 @@
             megaChat.activeCall = this;
             // Peer is alone in a group call after 1 min -> mute mic
             delay('call:init', this.muteIfAlone.bind(this), 6e4);
+            this.stayOnEnd = !!mega.config.get('callemptytout');
         }
         get isPublic() {
             const type = this.chatRoom && this.chatRoom.type;
@@ -426,6 +427,9 @@
             // this.sfuApp.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
             if (peer.userId !== u_handle) {
                 this.callTimeoutDone();
+            }
+            if (this.stayOnEnd !== !!mega.config.get('callemptytout')) {
+                this.stayOnEnd = !!mega.config.get('callemptytout');
             }
         }
         onPeerLeft(peer, reason) {
@@ -633,7 +637,7 @@
                     if (res === null) {
                         return;
                     }
-                    return res ? this.handleStayConfirm ? this.handleStayConfirm() : null : () => {
+                    return res ? this.handleStayConfirm() : () => {
                         eventlog(99760, JSON.stringify([this.callId, 0]));
                         if (this.sfuApp) {
                             this.sfuApp.destroy();
@@ -642,6 +646,11 @@
                 },
                 1
             );
+        }
+        handleStayConfirm() {
+            eventlog(99760, JSON.stringify([this.callId, 1]));
+            this.stayOnEnd = true;
+            this.initCallTimeout(true);
         }
         hasOtherParticipant() {
             const {peers} = this;

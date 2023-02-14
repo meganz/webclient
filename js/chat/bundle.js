@@ -18824,7 +18824,6 @@ class Call extends mixins.wl {
       ephemeral: false,
       offline: false,
       ephemeralAccounts: [],
-      stayOnEnd: !!mega.config.get('callemptytout'),
       everHadPeers: false,
       guest: Call.isGuest()
     };
@@ -18880,11 +18879,6 @@ class Call extends mixins.wl {
             call.setViewMode(this.state.mode);
           });
         }
-        if (this.state.stayOnEnd !== !!mega.config.get('callemptytout')) {
-          this.setState({
-            stayOnEnd: !!mega.config.get('callemptytout')
-          });
-        }
         if (call.hasOtherParticipant()) {
           if (!this.state.everHadPeers) {
             this.setState({
@@ -18909,9 +18903,11 @@ class Call extends mixins.wl {
       const {
         mode,
         sidebar,
-        view,
-        stayOnEnd
+        view
       } = this.state;
+      const {
+        stayOnEnd
+      } = call;
       Call.STATE.PREVIOUS = mode !== Call.MODE.MINI ? {
         mode,
         sidebar,
@@ -19042,19 +19038,8 @@ class Call extends mixins.wl {
       ephemeral: true,
       ephemeralAccounts: [...state.ephemeralAccounts, handle]
     }));
-    this.handleStayConfirm = () => {
-      const {
-        call
-      } = this.props;
-      eventlog(99760, JSON.stringify([call.callId, 1]));
-      this.setState({
-        stayOnEnd: true
-      });
-      call.initCallTimeout(true);
-    };
     this.state.mode = props.call.viewMode;
     this.state.sidebar = props.chatRoom.type === 'public';
-    this.props.call.handleStayConfirm = this.handleStayConfirm;
   }
   handleCallOffline() {
     if (this.offlineDelayed) {
@@ -19143,9 +19128,11 @@ class Call extends mixins.wl {
       ephemeralAccounts,
       guest,
       offline,
-      stayOnEnd,
       everHadPeers
     } = this.state;
+    const {
+      stayOnEnd
+    } = call;
     const STREAM_PROPS = {
       mode,
       streams,
@@ -19161,7 +19148,10 @@ class Call extends mixins.wl {
       isOnHold: sfuApp.sfuClient.isOnHold(),
       onSpeakerChange: this.handleSpeakerChange,
       onInviteToggle: this.handleInviteToggle,
-      onStayConfirm: this.handleStayConfirm
+      onStayConfirm: () => {
+        call.handleStayConfirm();
+        onIdle(() => this.safeForceUpdate());
+      }
     };
     return external_React_default().createElement("div", {
       className: `meetings-call ${minimized ? 'minimized' : ''}`

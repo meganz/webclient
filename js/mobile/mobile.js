@@ -1200,6 +1200,10 @@ function validateUserAction(hideContext) {
             }
             return false;
         }
+        else if (u_attr && u_attr.pf && u_attr.pf.s === -1) {
+            msgDialog('warningb', '', l.pro_flexi_account_suspended_title, l.pro_flexi_account_suspended_description);
+            return false;
+        }
         else if (u_attr.uspw) {
             if (hideContext) {
                 mobile.cloud.contextMenu.hide();

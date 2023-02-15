@@ -46,6 +46,11 @@ class ConversationsApp extends MegaRenderMixin {
         this.routingParams = this.props.megaChat.routingParams;
     }
 
+    hasOpenDialog() {
+        return [...document.querySelectorAll('.mega-dialog')]
+            .some(dialog => !!(dialog.offsetParent || dialog.offsetWidth || dialog.offsetHeight));
+    }
+
     specShouldComponentUpdate() {
         // Since this is a root component, there are issues with it (or the hotreload) causing it to not properly
         // update when needed, so we need to cache important root re-updates in here.
@@ -63,26 +68,26 @@ class ConversationsApp extends MegaRenderMixin {
         super.componentDidMount();
         var self = this;
 
-        $(document).rebind('keydown.megaChatTextAreaFocus', function(e) {
+        $(document).rebind('keydown.megaChatTextAreaFocus', e => {
             // prevent recursion!
             if (!M.chat || e.megaChatHandled) {
                 return;
             }
 
-            const currentlyOpenedChat = megaChat.currentlyOpenedChat;
+            const { currentlyOpenedChat } = megaChat;
             const currentRoom = megaChat.getCurrentRoom();
             if (currentlyOpenedChat) {
                 // don't do ANYTHING if the current focus is already into an input/textarea/select or a .mega-dialog
                 // is visible/active at the moment
                 if (
-                    (currentlyOpenedChat && currentRoom && currentRoom.isReadOnly()) ||
+                    (currentRoom && currentRoom.isReadOnly()) ||
                     $(e.target).is(".messages-textarea, input, textarea") ||
                     ((e.ctrlKey || e.metaKey || e.which === 19) && (e.keyCode === 67)) ||
                     e.keyCode === 91 /* cmd+... */ ||
                     e.keyCode === 17 /* ctrl+... */ ||
                     e.keyCode === 27 /* esc */ ||
-                    e.altKey ||  e.metaKey || e.ctrlKey || e.shiftKey ||
-                    $(document.querySelectorAll('.mega-dialog, .dropdown')).is(':visible') ||
+                    e.altKey || e.metaKey || e.ctrlKey || e.shiftKey ||
+                    this.hasOpenDialog() ||
                     document.querySelector('textarea:focus,select:focus,input:focus')
                 ) {
                     return;
@@ -99,7 +104,7 @@ class ConversationsApp extends MegaRenderMixin {
             }
         });
 
-        $(document).rebind('mouseup.megaChatTextAreaFocus', function(e) {
+        $(document).rebind('mouseup.megaChatTextAreaFocus', e => {
             // prevent recursion!
             if (!M.chat || e.megaChatHandled || slideshowid) {
                 return;
@@ -113,6 +118,7 @@ class ConversationsApp extends MegaRenderMixin {
                     $target.is(".messages-textarea,a,input,textarea,select,button") ||
                     $target.closest('.messages.scroll-area').length > 0 ||
                     $target.closest('.mega-dialog').length > 0 ||
+                    this.hasOpenDialog() ||
                     document.querySelector('textarea:focus,select:focus,input:focus')
                     || window.getSelection().toString()
                 ) {

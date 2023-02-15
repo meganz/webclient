@@ -1836,31 +1836,23 @@ MessagesBuff.prototype.messagesHistoryIsLoading = function() {
     return !!this.$msgsHistoryLoading;
 };
 
-MessagesBuff.prototype.retrieveSharedFilesHistory = function(len) {
+MessagesBuff.prototype.retrieveSharedFilesHistory = async function(len) {
+    'use strict';
     var self = this;
-    len = typeof len === "undefined" ? 32 : len;
-    if (self.$msgsHistoryLoading) {
-        var proxyPromise = new MegaPromise();
-        self.$msgsHistoryLoading.finally(function() {
-            proxyPromise.linkDoneAndFailTo(self.retrieveSharedFilesHistory());
-        });
-        return proxyPromise;
+    len = parseInt(len) || 32;
+
+    if (d > 1) {
+        this.logger.warn('Retrieving %s shared files...', len, this.haveMoreSharedFiles);
     }
-    else if (self.$isDecryptingSharedFiles) {
-        var proxyPromise = new MegaPromise();
-        self.$isDecryptingSharedFiles.finally(function() {
-            proxyPromise.linkDoneAndFailTo(self.retrieveSharedFilesHistory());
-        });
-        return proxyPromise;
-    }
-    else if (self.$sharedFilesLoading) {
-        var proxyPromise = new MegaPromise();
-        self.$sharedFilesLoading.finally(function() {
-            proxyPromise.linkDoneAndFailTo(self.retrieveSharedFilesHistory());
-        });
-        return proxyPromise;
-    }
-    else {
+    // @todo prevent concurrent calls
+
+    await Promise.all([
+        this.$msgsHistoryLoading,
+        this.$sharedFilesLoading,
+        this.$isDecryptingSharedFiles
+    ]).catch(dump);
+
+    if (this.haveMoreSharedFiles || !this.sharedFilesLoadedOnce) {
         var lastKnownMessage = self.getLastMessageFromServer();
         /**
          * Edge case:

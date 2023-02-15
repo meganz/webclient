@@ -37,7 +37,7 @@ lazy(mega.slideshow, 'utils', () => {
          * Filter nodes argument depending on current situation
          * @param {MegaNode[]} nodes - list of nodes to filter
          * @param {Boolean} isPlayMode - whether slideshow is on play mode or not
-         * @returns {void}
+         * @returns {Function}
          */
         filterNodes: (nodes, isPlayMode) => {
             if (nodes !== undefined) {
@@ -57,13 +57,9 @@ lazy(mega.slideshow, 'utils', () => {
          * @returns {Boolean} whether current dir is flat
          */
         isCurrentDirFlat: () => {
-            // TODO replace isCurrentDirFlat function body with line below once WEB-14237 MR is merged into develop
-            // M.chat ||
-            //   M.isDynPage(M.currentdirid) ||
-            //   ['recents','photos','images','favourites'].includes(M.currentdirid);
-
             return M.chat ||
-                ['recents', 'photos', 'images', 'favourites', 'faves'].includes(M.currentdirid);
+                M.isDynPage(M.currentdirid) ||
+                ['recents','photos','images','favourites'].includes(M.currentdirid);
         },
     };
 });

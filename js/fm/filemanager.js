@@ -1593,6 +1593,10 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(`${c}.removeshare-item`).rebind('click', () => {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
+
         msgDialog(`remove:!^${l[23737]}!${l[82]}`, '', l.remove_share_title, l.remove_share_msg, res => {
             if (res) {
                 loadingDialog.show();
@@ -2745,6 +2749,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             M.currentdirid !== 'devices'
         ) {
             const nodes = s.filter(h => !M.d[h] || M.getNodeRoot(M.d[h].h) !== M.InboxID);
+            if (M.isInvalidUserStatus()) {
+                return;
+            }
 
             if (nodes.length) {
                 // delete

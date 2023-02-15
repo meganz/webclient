@@ -13755,6 +13755,9 @@ class ConversationsApp extends mixins.wl {
     this.routingSubSection = this.props.megaChat.routingSubSection;
     this.routingParams = this.props.megaChat.routingParams;
   }
+  hasOpenDialog() {
+    return [...document.querySelectorAll('.mega-dialog')].some(dialog => !!(dialog.offsetParent || dialog.offsetWidth || dialog.offsetHeight));
+  }
   specShouldComponentUpdate() {
     if (this.routingSection !== this.props.megaChat.routingSection || this.routingSubSection !== this.props.megaChat.routingSubSection || this.routingParams !== this.props.megaChat.routingParams) {
       this._cacheRouting();
@@ -13764,14 +13767,16 @@ class ConversationsApp extends mixins.wl {
   componentDidMount() {
     super.componentDidMount();
     var self = this;
-    $(document).rebind('keydown.megaChatTextAreaFocus', function (e) {
+    $(document).rebind('keydown.megaChatTextAreaFocus', e => {
       if (!M.chat || e.megaChatHandled) {
         return;
       }
-      const currentlyOpenedChat = megaChat.currentlyOpenedChat;
+      const {
+        currentlyOpenedChat
+      } = megaChat;
       const currentRoom = megaChat.getCurrentRoom();
       if (currentlyOpenedChat) {
-        if (currentlyOpenedChat && currentRoom && currentRoom.isReadOnly() || $(e.target).is(".messages-textarea, input, textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91 || e.keyCode === 17 || e.keyCode === 27 || e.altKey || e.metaKey || e.ctrlKey || e.shiftKey || $(document.querySelectorAll('.mega-dialog, .dropdown')).is(':visible') || document.querySelector('textarea:focus,select:focus,input:focus')) {
+        if (currentRoom && currentRoom.isReadOnly() || $(e.target).is(".messages-textarea, input, textarea") || (e.ctrlKey || e.metaKey || e.which === 19) && e.keyCode === 67 || e.keyCode === 91 || e.keyCode === 17 || e.keyCode === 27 || e.altKey || e.metaKey || e.ctrlKey || e.shiftKey || this.hasOpenDialog() || document.querySelector('textarea:focus,select:focus,input:focus')) {
           return;
         }
         var $typeArea = $('.messages-textarea:visible:first');
@@ -13783,13 +13788,13 @@ class ConversationsApp extends mixins.wl {
         return false;
       }
     });
-    $(document).rebind('mouseup.megaChatTextAreaFocus', function (e) {
+    $(document).rebind('mouseup.megaChatTextAreaFocus', e => {
       if (!M.chat || e.megaChatHandled || slideshowid) {
         return;
       }
       var $target = $(e.target);
       if (megaChat.currentlyOpenedChat) {
-        if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $target.closest('.mega-dialog').length > 0 || document.querySelector('textarea:focus,select:focus,input:focus') || window.getSelection().toString()) {
+        if ($target.is(".messages-textarea,a,input,textarea,select,button") || $target.closest('.messages.scroll-area').length > 0 || $target.closest('.mega-dialog').length > 0 || this.hasOpenDialog() || document.querySelector('textarea:focus,select:focus,input:focus') || window.getSelection().toString()) {
           return;
         }
         var $typeArea = $('.messages-textarea:visible:first');

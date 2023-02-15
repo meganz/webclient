@@ -3769,7 +3769,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     var handleEditResult = function (st, res, req) {
         closeDialog();
         if (st === 0) {
-            msgDialog('warningb', '', l[19524]);
+            msgDialog('warningb', '', res === EACCESS ?  l[19562] : l[19524]);
             if (d) {
                 console.error(res);
             }
@@ -3831,9 +3831,21 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
                     $lnameInput.megaInputsShowError();
                     return;
                 }
-                if ('email' in changedVals && !isValidEmail(changedVals.email)) {
-                    $emailInput.megaInputsShowError(l[5705]);
-                    return;
+                if ('email' in changedVals) {
+                    if (!isValidEmail(changedVals.email)) {
+                        $emailInput.megaInputsShowError(l[5705]);
+                        return;
+                    }
+                    for (const u of Object.values(M.suba)) {
+                        if (u.e === changedVals.email) {
+                            $emailInput.megaInputsShowError(
+                                u.s !== 0 && u.s !== 10
+                                    ? l.err_bus_sub_exists_deactive
+                                    : l[19562]
+                            );
+                            return;
+                        }
+                    }
                 }
                 var editPromise = mySelf.business.editSubAccount(subUserHandle, changedVals.email,
                     changedVals.fname, changedVals.lname,

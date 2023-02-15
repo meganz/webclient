@@ -1043,6 +1043,10 @@ function FMShortcuts() {
             charCode === 8 &&
             !isShareRoot
         ) {
+            if (M.isInvalidUserStatus()) {
+                return;
+            }
+
             var remItems = selectionManager.get_selected();
             if (remItems.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2 ||
                 M.currentrootid === M.InboxID || M.currentdirid === 'devices') {

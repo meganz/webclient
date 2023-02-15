@@ -490,10 +490,10 @@ lazy(pro, 'proplan2', () => {
                 $socialIconsContainer[0].scroll(this.offsetLeft - $socialIconsContainer[0].offsetLeft, 0);
             }
 
-            rotatingTimer = setInterval(rotatingQuotes, 4000);
+            rotatingTimer = setInterval(rotatingQuotes, 9000);
         });
 
-        rotatingTimer = setInterval(rotatingQuotes, 4000);
+        rotatingTimer = setInterval(rotatingQuotes, 9000);
 
     };
 

@@ -2745,6 +2745,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             M.currentdirid !== 'devices'
         ) {
             const nodes = s.filter(h => !M.d[h] || M.getNodeRoot(M.d[h].h) !== M.InboxID);
+            if (M.isInvalidUserStatus()) {
+                return;
+            }
 
             if (nodes.length) {
                 // delete

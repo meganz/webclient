@@ -19,6 +19,8 @@
             $('.fm-dialog-overlay').off('click.registerDialog');
             $('button.js-close', $dialog).off('click.registerDialog');
             $('input', $dialog).val('');
+            $('.understand-check', $dialog).removeClass('checkboxOn').addClass('checkboxOff');
+            $('.register-check', $dialog).removeClass('checkboxOn').addClass('checkboxOff');
 
             if (isUserTriggered && options.onDialogClosed) {
                 options.onDialogClosed($dialog);

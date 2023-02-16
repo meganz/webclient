@@ -19043,6 +19043,13 @@ class Call extends mixins.wl {
       ephemeral: true,
       ephemeralAccounts: [...state.ephemeralAccounts, handle]
     }));
+    this.handleStayConfirm = () => {
+      const {
+        call
+      } = this.props;
+      call.handleStayConfirm();
+      onIdle(() => this.safeForceUpdate());
+    };
     this.state.mode = props.call.viewMode;
     this.state.sidebar = props.chatRoom.type === 'public';
   }
@@ -19153,10 +19160,7 @@ class Call extends mixins.wl {
       isOnHold: sfuApp.sfuClient.isOnHold(),
       onSpeakerChange: this.handleSpeakerChange,
       onInviteToggle: this.handleInviteToggle,
-      onStayConfirm: () => {
-        call.handleStayConfirm();
-        onIdle(() => this.safeForceUpdate());
-      }
+      onStayConfirm: this.handleStayConfirm
     };
     return external_React_default().createElement("div", {
       className: `meetings-call ${minimized ? 'minimized' : ''}`

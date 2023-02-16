@@ -637,12 +637,14 @@
                     if (res === null) {
                         return;
                     }
-                    return res ? this.handleStayConfirm() : () => {
-                        eventlog(99760, JSON.stringify([this.callId, 0]));
-                        if (this.sfuApp) {
-                            this.sfuApp.destroy();
-                        }
-                    };
+                    if (res) {
+                        this.handleStayConfirm();
+                        return;
+                    }
+                    eventlog(99760, JSON.stringify([this.callId, 0]));
+                    if (this.sfuApp) {
+                        this.sfuApp.destroy();
+                    }
                 },
                 1
             );

@@ -526,6 +526,12 @@ export default class Call extends MegaRenderMixin {
             ephemeralAccounts: [...state.ephemeralAccounts, handle]
         }));
 
+    handleStayConfirm = () => {
+        const { call } = this.props;
+        call.handleStayConfirm();
+        onIdle(() => this.safeForceUpdate());
+    };
+
     componentWillUnmount() {
         super.componentWillUnmount();
         const { minimized, willUnmount, chatRoom } = this.props;
@@ -589,10 +595,7 @@ export default class Call extends MegaRenderMixin {
             everHadPeers,
             hasOtherParticipants: call.hasOtherParticipant(),
             isOnHold: sfuApp.sfuClient.isOnHold(), onSpeakerChange: this.handleSpeakerChange,
-            onInviteToggle: this.handleInviteToggle, onStayConfirm: () => {
-                call.handleStayConfirm();
-                onIdle(() => this.safeForceUpdate());
-            },
+            onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm,
         };
 
         //

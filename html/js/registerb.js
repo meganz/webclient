@@ -389,7 +389,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
     };
 
     // event handler for clicking on terms anchor
-    $('.bus-reg-agreement.mega-terms .radio-txt span', $pageContainer)
+    $('.bus-reg-agreement.mega-terms .radio-txt a', $pageContainer)
         .rebind('click', function termsClickHandler() {
             if (!is_mobile) {
                 bottomPageDialog(false, 'terms', false, true);

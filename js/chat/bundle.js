@@ -1159,6 +1159,10 @@ Chat.prototype.hideAllChats = function () {
     }
   });
 };
+Chat.prototype.retrieveSharedFilesHistory = async function (len = 47, chatRoom = null) {
+  chatRoom = len instanceof ChatRoom ? len : chatRoom || this.getCurrentRoom();
+  return chatRoom.messagesBuff.retrieveSharedFilesHistory(len);
+};
 Chat.prototype.getCurrentRoom = function () {
   return this.chats[this.currentlyOpenedChat];
 };
@@ -1307,7 +1311,16 @@ Chat.prototype.setAttachments = function (roomId) {
     }
     M.v = Object.values(M.chc[roomId] || {});
     if (M.v.length) {
-      M.v.sort(M.sortObjFn('co'));
+      var _this$chats$roomId, _this$chats$roomId$me, _this$chats$roomId$me2;
+      const sv = (_this$chats$roomId = this.chats[roomId]) == null ? void 0 : (_this$chats$roomId$me = _this$chats$roomId.messagesBuff) == null ? void 0 : (_this$chats$roomId$me2 = _this$chats$roomId$me.sharedFiles) == null ? void 0 : _this$chats$roomId$me2._sortedVals;
+      if (sv && sv.length === M.v.length) {
+        M.v.sort((a, b) => sv.indexOf(a.m) - sv.indexOf(b.m));
+      } else {
+        if (d) {
+          this.logger.info('falling back to order-value sorting.', sv);
+        }
+        M.v.sort(M.sortObjFn('co'));
+      }
       for (var i = M.v.length; i--;) {
         var n = M.v[i];
         if (!n.revoked && !n.seen) {
@@ -1316,6 +1329,17 @@ Chat.prototype.setAttachments = function (roomId) {
             this._enqueueImageLoad(n);
           }
         }
+      }
+      if ($.triggerSlideShow) {
+        delay('chat:refresh-slideshow-on-single-entry', () => {
+          const {
+            slideshowid: id
+          } = window;
+          if (id && $.triggerSlideShow === id) {
+            slideshow(id);
+          }
+          delete $.triggerSlideShow;
+        });
       }
     }
   } else if (d) {
@@ -9310,7 +9334,7 @@ let SharedFilesAccordionPanel = (_dec = utils.ZP.SoonFcWrap(350), (_class = clas
             }
             if (mb.sharedFiles.length < endPos + 12) {
               self.isLoadingMore = true;
-              mb.retrieveSharedFilesHistory(12).always(function () {
+              mb.retrieveSharedFilesHistory(12).catch(dump).finally(() => {
                 self.isLoadingMore = false;
                 mb.sharedFilesPage++;
                 if (!mb.haveMoreSharedFiles && mb.sharedFilesPage > totalPages) {
@@ -9330,11 +9354,7 @@ let SharedFilesAccordionPanel = (_dec = utils.ZP.SoonFcWrap(350), (_class = clas
         });
       }
       if (!mb.sharedFilesLoadedOnce) {
-        mb.retrieveSharedFilesHistory(12).always(function () {
-          Soon(function () {
-            self.safeForceUpdate();
-          });
-        });
+        mb.retrieveSharedFilesHistory(12).then(() => this.safeForceUpdate()).catch(dump);
       }
       var sharedNodesContainer = null;
       if (mb.isRetrievingSharedFiles && !self.isLoadingMore) {
@@ -9345,8 +9365,7 @@ let SharedFilesAccordionPanel = (_dec = utils.ZP.SoonFcWrap(350), (_class = clas
         }, sharedFilesAccordionPanel_React.createElement("div", {
           className: "main-loader"
         })));
-      } else if (mb.sharedFiles.length === 0) {
-        mb.haveMoreSharedFiles = false;
+      } else if (!mb.haveMoreSharedFiles && !mb.sharedFiles.length) {
         sharedNodesContainer = sharedFilesAccordionPanel_React.createElement("div", {
           className: "chat-dropdown empty-txt"
         }, l[19985]);

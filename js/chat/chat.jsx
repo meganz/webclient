@@ -1361,6 +1361,19 @@ Chat.prototype.hideAllChats = function() {
     });
 };
 
+/**
+ * Retrieve shared files history.
+ * @param {Number} [len] number to retrieve
+ * @param {ChatRoom} [chatRoom] chat room, current by default.
+ * @returns {Promise<*>}
+ */
+Chat.prototype.retrieveSharedFilesHistory = async function(len = 47, chatRoom = null) {
+
+    chatRoom = len instanceof ChatRoom ? len : chatRoom || this.getCurrentRoom();
+
+    return chatRoom.messagesBuff.retrieveSharedFilesHistory(len);
+};
+
 
 /**
  * Returns the currently opened room/chat
@@ -1609,7 +1622,17 @@ Chat.prototype.setAttachments = function(roomId) {
         M.v = Object.values(M.chc[roomId] || {});
 
         if (M.v.length) {
-            M.v.sort(M.sortObjFn('co'));
+            const sv = this.chats[roomId]?.messagesBuff?.sharedFiles?._sortedVals;
+
+            if (sv && sv.length === M.v.length) {
+                M.v.sort((a, b) => sv.indexOf(a.m) - sv.indexOf(b.m));
+            }
+            else {
+                if (d) {
+                    this.logger.info('falling back to order-value sorting.', sv);
+                }
+                M.v.sort(M.sortObjFn('co'));
+            }
 
             for (var i = M.v.length; i--;) {
                 var n = M.v[i];
@@ -1621,6 +1644,18 @@ Chat.prototype.setAttachments = function(roomId) {
                         this._enqueueImageLoad(n);
                     }
                 }
+            }
+
+            if ($.triggerSlideShow) {
+
+                delay('chat:refresh-slideshow-on-single-entry', () => {
+                    const {slideshowid: id} = window;
+
+                    if (id && $.triggerSlideShow === id) {
+                        slideshow(id);
+                    }
+                    delete $.triggerSlideShow;
+                });
             }
         }
     }

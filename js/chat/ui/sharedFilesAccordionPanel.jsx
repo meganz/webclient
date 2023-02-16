@@ -127,7 +127,8 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
                     if (mb.sharedFiles.length < endPos + perPage) {
                         self.isLoadingMore = true;
                         mb.retrieveSharedFilesHistory(perPage)
-                            .always(function () {
+                            .catch(dump)
+                            .finally(() => {
                                 self.isLoadingMore = false;
                                 mb.sharedFilesPage++;
                                 if (!mb.haveMoreSharedFiles && mb.sharedFilesPage > totalPages) {
@@ -151,11 +152,8 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
 
             if (!mb.sharedFilesLoadedOnce) {
                 mb.retrieveSharedFilesHistory(perPage)
-                    .always(function() {
-                        Soon(function() {
-                            self.safeForceUpdate();
-                        });
-                    })
+                    .then(() => this.safeForceUpdate())
+                    .catch(dump);
             }
             var sharedNodesContainer = null;
             if (mb.isRetrievingSharedFiles && !self.isLoadingMore) {
@@ -163,8 +161,7 @@ class SharedFilesAccordionPanel extends MegaRenderMixin {
                     <div className="loading-spinner light small"><div className="main-loader"></div></div>
                 </div>;
             }
-            else if (mb.sharedFiles.length === 0) {
-                mb.haveMoreSharedFiles = false;
+            else if (!mb.haveMoreSharedFiles && !mb.sharedFiles.length) {
                 sharedNodesContainer = <div className="chat-dropdown empty-txt">
                     {l[19985]}
                 </div>;

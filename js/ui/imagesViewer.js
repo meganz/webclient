@@ -1324,10 +1324,6 @@ var slideshowid;
             if (page === 'download') {
                 $('button.download-file').click();
             }
-            else if (p && !p.full && p.loadOriginal) {
-                p.onFetch = () => this.click();
-                showToast('download', l[5740]);
-            }
             else if (M.d[slideshow_handle()]) {
                 M.addDownload([slideshow_handle()]);
             }
@@ -1567,8 +1563,6 @@ var slideshowid;
         }
 
         if (loadOriginal) {
-            previews[n.h] = {...previews[n.h], loadOriginal};
-
             var $overlay = $('.media-viewer-container');
             var $progressBar = $('.viewer-progress', $overlay);
 
@@ -1602,9 +1596,6 @@ var slideshowid;
                 preview({type: filemime(n, 'image/jpeg')}, n.h, data.buffer);
                 if (!exifImageRotation.fromImage) {
                     previews[n.h].orientation = parseInt(EXIF.readFromArrayBuffer(data, true).Orientation) || 1;
-                }
-                if (typeof previews[n.h].onFetch === 'function') {
-                    previews[n.h].onFetch();
                 }
             }).catch((ex) => {
                 if (ex === EOVERQUOTA || Object(ex.target).status === 509) {

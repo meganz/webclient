@@ -10581,6 +10581,10 @@ class ConversationRightArea extends mixins.wl {
     } else {
       expandedPanel['options'] = true;
     }
+    let archiveText = room.isMeeting ? l.archive_meeting_btn : l[16689];
+    if (room.isArchived()) {
+      archiveText = room.isMeeting ? l.unarchive_meeting_btn : l[19065];
+    }
     return external_React_default().createElement("div", {
       className: "chat-right-area"
     }, external_React_default().createElement(perfectScrollbar.F, {
@@ -10737,7 +10741,7 @@ class ConversationRightArea extends mixins.wl {
                                             sprite-fm-mono
                                             ${room.isArchived() ? 'icon-unarchive' : 'icon-archive'}
                                         `
-    }), external_React_default().createElement("span", null, room.isArchived() ? l[19065] : l[16689])), room.type !== "private" ? external_React_default().createElement("div", {
+    }), external_React_default().createElement("span", null, archiveText)), room.type !== "private" ? external_React_default().createElement("div", {
       className: `
                                             link-button
                                             light
@@ -13727,7 +13731,7 @@ class LeftPanel extends mixins.wl {
       heading: !IS_LOADING && (view === views.CHATS ? l.contacts_and_groups : l.past_meetings)
     }, this.renderConversations()), external_React_default().createElement(TogglePanel, {
       key: "two",
-      heading: !IS_LOADING && l[19067]
+      heading: !IS_LOADING && view === views.CHATS ? l[19067] : l.archived_meetings
     }, this.renderConversations(true)))));
   }
 }

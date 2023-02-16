@@ -96,7 +96,7 @@ export default class LeftPanel extends MegaRenderMixin {
                         </TogglePanel>
                         <TogglePanel
                             key="two"
-                            heading={!IS_LOADING && l[19067] /* `Archived` */}>
+                            heading={!IS_LOADING && view === views.CHATS ? l[19067] : l.archived_meetings}>
                             {this.renderConversations(true)}
                         </TogglePanel>
                     </Toggle>

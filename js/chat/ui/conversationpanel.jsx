@@ -499,6 +499,12 @@ export class ConversationRightArea extends MegaRenderMixin {
         else {
             expandedPanel['options'] = true;
         }
+        /* `Archive chat/meeting` */
+        let archiveText = room.isMeeting ? l.archive_meeting_btn : l[16689];
+        if (room.isArchived()) {
+            /* `Unarchive chat/meeting` */
+            archiveText = room.isMeeting ? l.unarchive_meeting_btn : l[19065];
+        }
 
         return <div className="chat-right-area">
             <PerfectScrollbar
@@ -719,7 +725,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                             ${room.isArchived() ? 'icon-unarchive' : 'icon-archive'}
                                         `}
                                     />
-                                    <span>{room.isArchived() ? l[19065] : l[16689]}</span>
+                                    <span>{archiveText}</span>
                                 </div>
                             }
                             {

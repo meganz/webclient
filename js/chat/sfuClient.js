@@ -510,22 +510,17 @@ class SvcDriver {
         if (isNaN(rtt)) {
             return;
         }
-        if (isNaN(plost)) {
-            plost = stats.pl = 0;
-        }
-        const plostCapped = (plost > SvcDriver.kPlostCap) ? SvcDriver.kPlostCap : plost;
+        assert(!isNaN(plost));
         if (isNaN(this.maRtt)) {
             this.maRtt = rtt;
-            this.smaPlost = plostCapped;
-            this.fmaPlost = plost;
+            this.smaPlost = this.fmaPlost = plost;
             return; // intentionally skip first sample for lower/upper range calculation
         }
         rtt = this.maRtt = (this.maRtt * 2 + rtt) / 3;
         if (rtt < this.lowestRttSeen) {
             this.setRttWindow(rtt);
         }
-        this.smaPlost = (this.smaPlost * 29 + plostCapped) / 30;
-        this.setPlostWindow(this.smaPlost);
+        this.updatePlostWindow(plost);
         plost = this.fmaPlost = (this.fmaPlost * 2 + plost) / 3;
         do {
             if (window.dSfuAdapt) {
@@ -562,7 +557,7 @@ class SvcDriver {
                     console.warn(kLogTag, "Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
                 }
             } while (0);
-            this.decRxQuality(plost > SvcDriver.kPlostCritical);
+            this.decRxQuality(plost >= SvcDriver.kPlostCap);
         }
         else if (rtt > this.rttUpper) { // rtt or packet loss increased above thresholds
             this.decRxQualityDueToRtt(stats);
@@ -619,7 +614,7 @@ class SvcDriver {
             this.maVideoTxHeight = !isNaN(this.maVideoTxHeight) ? (this.maVideoTxHeight * 3 + stats.vtxh) / 4 : stats.vtxh;
             txBad = txBad || (this.maVideoTxHeight < 200);
         }
-        const rxBad = rtt > 1500 || plost > 20;
+        const rxBad = rtt > 1500 || plost > 30;
         if (txBad || rxBad) {
             if (!this.hasBadNetwork) {
                 this.hasBadNetwork = true;
@@ -641,7 +636,9 @@ class SvcDriver {
             }
         } while (0);
     }
-    setPlostWindow(plost) {
+    updatePlostWindow(plost) {
+        plost = Math.min(plost, SvcDriver.kPlostCap);
+        plost = this.smaPlost = (this.smaPlost * 29 + plost) / 30;
         this.plostLower = plost + SvcDriver.kPlostLowerHeadroom;
         this.plostUpper = plost + SvcDriver.kPlostUpperHeadroom;
     }
@@ -886,10 +883,9 @@ class SvcDriver {
 }
 SvcDriver.kRttLowerHeadroom = 20;
 SvcDriver.kRttUpperHeadroom = 100;
-SvcDriver.kPlostUpperHeadroom = 3;
-SvcDriver.kPlostLowerHeadroom = 0.01;
-SvcDriver.kPlostCap = 3; // cap on adaptive continuous packet loss reference
-SvcDriver.kPlostCritical = 10;
+SvcDriver.kPlostUpperHeadroom = 10; // plostUpper = smaPlost + this
+SvcDriver.kPlostLowerHeadroom = 2; // plostLower = smaPlost + this
+SvcDriver.kPlostCap = 40; // cap on adaptive continuous packet loss reference .smaPlost
 SvcDriver.kQualityDecreaseSettleTime = 6000;
 SvcDriver.kQualityIncreaseSettleTime = 4000;
 SvcDriver.kRxUpFailMonitorDur = 40000;
@@ -926,7 +922,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'bdbffcb86c';
+const COMMIT_ID = '4efe813891';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -978,7 +974,7 @@ var TxTrackIndex;
     TxTrackIndex[TxTrackIndex["kAudio"] = 2] = "kAudio";
 })(TxTrackIndex || (TxTrackIndex = {}));
 class SfuClient {
-    constructor(userId, app, callKey, options, url) {
+    constructor(userId, app, callKey, options) {
         this.peers = new Map();
         this._isSharingScreen = false;
         this._muteCamera = false;
@@ -1017,7 +1013,6 @@ class SfuClient {
             this.setCallKey(callKey);
         }
         this.numInputVideoTracks = options.numVideoSlots || SfuClient.kMaxVideoSlotsDefault;
-        this.url = url;
         this.cryptoWorker = new Worker(SfuClient.kWorkerUrl);
         this.cryptoWorker.addEventListener("message", this.onCryptoWorkerEvent.bind(this));
         this._svcDriver = new SvcDriver(this);
@@ -1134,7 +1129,7 @@ class SfuClient {
         } while (0);
         await msDelay(delay);
         if (!this._forcedDisconnect) {
-            this.connect();
+            this.reconnect();
         }
     }
     _closeMediaConnection() {
@@ -1309,24 +1304,26 @@ class SfuClient {
         }
         return `${url}${and}v=${SfuClient.kProtocolVersion}`;
     }
-    async connect(url, callId, config) {
-        if (url) { // for reconnect, we don't pass any parameters to connect()
-            url = this.url = this.addVersionToUrl(url);
-            client_assert(callId);
-            client_assert(config);
-            this.callId = callId;
-            this.callConfig = config;
-            this._joinRetries = 0;
-            this._forcedDisconnect = false;
+    connect(url, callId, config) {
+        url = this.url = this.addVersionToUrl(url);
+        client_assert(callId);
+        client_assert(config);
+        this.callId = callId;
+        this.callConfig = config;
+        this._joinRetries = 0;
+        this._forcedDisconnect = false;
+        this.doConnect(this.url);
+    }
+    reconnect() {
+        client_assert(!this._forcedDisconnect);
+        client_assert(this.url);
+        let url = this.url;
+        if (!isNaN(this.cid)) {
+            url += "&cid=" + this.cid;
         }
-        else {
-            // this is reconnect
-            client_assert(!this._forcedDisconnect);
-            url = this.url;
-            if (!isNaN(this.cid)) {
-                url += "&cid=" + this.cid;
-            }
-        }
+        this.doConnect(url);
+    }
+    doConnect(url) {
         this.reinit();
         this._setConnState(ConnState.kConnecting);
         this._fire("onConnecting");
@@ -2734,13 +2731,19 @@ class SfuClient {
         let stats = this.rtcStats = { pl: 0, jtr: 1000000 };
         this.hasConnStats = false;
         let promises = [this.pollTxVideoStats(), this.pollMicAudioLevel()];
-        for (let rxTrack of this.inVideoTracks.values()) {
+        // first, get all audio stats, because the stats display callbacks are connected to the video
+        // stats, and they may want to display audio stats as well - audio stats should be already available
+        for (let rxTrack of this.inAudioTracks.values()) {
             if (!rxTrack.active) {
                 continue;
             }
             promises.push(rxTrack.pollRxStats());
         }
-        for (let rxTrack of this.inAudioTracks.values()) {
+        if (promises.length) {
+            await Promise.allSettled(promises);
+        }
+        promises = [];
+        for (let rxTrack of this.inVideoTracks.values()) {
             if (!rxTrack.active) {
                 continue;
             }
@@ -2759,8 +2762,12 @@ class SfuClient {
         if (stats.jtr === 1000000) {
             stats.jtr = -1;
         }
-        if (stats.pl != null) {
-            stats.pl = Math.round(stats.pl * 10) / 10; // truncate to single decimal
+        if (stats._pktRxTotal) {
+            stats.pl = stats.pl * 100 / stats._pktRxTotal; // truncate to single decimal
+        }
+        else {
+            console.warn("No total packets, plost =", stats.pl);
+            stats.pl = 0;
         }
         this._statsRecorder.onStats(this.rtcStats);
         this._svcDriver.onStats();
@@ -2870,15 +2877,16 @@ class SfuClient {
         */
         let ctx = this.statCtx;
         this.hasConnStats = true;
-        if (!ctx.prevTx) {
-            ctx.prevTx = stat;
+        if (!ctx.prev) {
+            ctx.prev = stat;
             return;
         }
-        let prev = ctx.prevTx;
-        ctx.prevTx = stat;
+        let prev = ctx.prev;
+        ctx.prev = stat;
         let per = (stat.timestamp - prev.timestamp) / 1000;
         s.rx = Math.round(((stat.bytesReceived - prev.bytesReceived) / 128) / per);
         s.tx = Math.round(((stat.bytesSent - prev.bytesSent) / 128) / per);
+        s._pktRxTotal = stat.packetsReceived - prev.packetsReceived;
     }
     async getConnStatsFromPeerConn() {
         if (!this.rtcConn) {
@@ -2960,8 +2968,6 @@ class Slot {
     constructor(client, xponder, generateIv) {
         this.active = false;
         this.rxStatCtx = {};
-        // needs to be accessed by VideoPlayer
-        this.rxStatsCallbacks = new Map; // key is a VideoPlayer object that receives the stats
         this.client = client;
         this.xponder = xponder;
         xponder.slot = this;
@@ -2987,10 +2993,10 @@ class Slot {
         this.client.cryptoWorker.postMessage(['ce', txStreams.readable, txStreams.writable, this.mid,
             this.iv], [txStreams.readable, txStreams.writable]);
     }
-    reassign(fromCid, iv) {
-        this.cid = fromCid;
+    reassign(peer, iv) {
+        this.peer = peer;
         // TODO: was parseInt(fromCid)
-        this.client.cryptoWorker.postMessage(['dt', this.mid, fromCid, hexToBin(iv)]);
+        this.client.cryptoWorker.postMessage(['dt', this.mid, peer.cid, hexToBin(iv)]);
         this.active = true;
     }
     sendTrack(track) {
@@ -3027,8 +3033,9 @@ class Slot {
                     let prev = ctx.prev;
                     ctx.prev = stat;
                     let period = (stat.timestamp - prev.timestamp) / 1000;
-                    let plostPerSecond = (stat.packetsLost - prev.packetsLost) / period;
-                    commonStats.pl += plostPerSecond;
+                    const recvd = stat.packetsReceived - prev.packetsReceived;
+                    let plost = (stat.packetsLost - prev.packetsLost);
+                    commonStats.pl += plost;
                     if (!this.isVideo) {
                         if (stat.jitter != null) {
                             let jtr = Math.round(stat.jitter * 1000);
@@ -3036,6 +3043,7 @@ class Slot {
                                 commonStats.jtr = jtr;
                             }
                         }
+                        this.peer.audioPktLoss = recvd ? (plost * 100 / recvd) : 0;
                     }
                     else { // video stats
                         if (commonStats.mrxw == null || commonStats.mrxw < stat.frameWidth) {
@@ -3046,7 +3054,7 @@ class Slot {
                         if (cbs.size) {
                             // more detailed stats for app
                             let info = {
-                                plost: plostPerSecond,
+                                plost: recvd ? (plost * 100 / recvd) : 0,
                                 nacktx: (stat.nackCount - prev.nackCount) / period,
                                 kbps: ((stat.bytesReceived - prev.bytesReceived) / 128) / period,
                                 keyfps: (stat.keyFramesDecoded - prev.keyFramesDecoded) / period
@@ -3077,15 +3085,16 @@ class VideoSlot extends Slot {
         this.players = new Set();
         this.isHiRes = false;
         this.sentLayers = SfuClient.kSpatialLayerCount;
+        this.rxStatsCallbacks = new Map; // key is a VideoPlayer object that receives the stats
         this.isVideo = true;
     }
-    reassignV(fromCid, iv, isHiRes, trackReused, releaseCb) {
+    reassignV(peer, iv, isHiRes, trackReused, releaseCb) {
         this.isHiRes = isHiRes;
-        if (fromCid !== this.cid || !trackReused) {
+        if (peer !== this.peer || !trackReused) {
             this._detachAllPlayers();
         }
         this._releaseTrackCb = releaseCb;
-        super.reassign(fromCid, iv);
+        super.reassign(peer, iv);
     }
     setEncoderParams(cb) {
         let sender = this.xponder.sender;
@@ -3301,6 +3310,7 @@ class Peer {
         this._isSpeaker = false;
         this._audioLevel = 0;
         this._speakReq = false;
+        this.audioPktLoss = 0;
         this.slowAudioLevel = 0;
         client_assert(info.cid);
         client_assert(info.userId);
@@ -3505,7 +3515,7 @@ class Peer {
             return;
         }
         this.vThumbSlot = slot;
-        slot.reassignV(this.cid, this.strIvs[TxTrackIndex.kVthumb], false, reused, () => {
+        slot.reassignV(this, this.strIvs[TxTrackIndex.kVthumb], false, reused, () => {
             if (slot === this.vThumbSlot) {
                 delete this.vThumbSlot;
             }
@@ -3530,7 +3540,7 @@ class Peer {
             client_assert(reused);
             delete this.vThumbSlot;
         }
-        slot.reassignV(this.cid, this.strIvs[TxTrackIndex.kHiRes], true, reused, () => {
+        slot.reassignV(this, this.strIvs[TxTrackIndex.kHiRes], true, reused, () => {
             if (this.hiResSlot === slot) {
                 delete this.hiResSlot;
             }
@@ -3634,7 +3644,7 @@ class Peer {
             this.client.logError("addPeerSpeaker: Unknown audio track mid", mid);
             return;
         }
-        slot.reassign(this.cid, this.strIvs[TxTrackIndex.kAudio]);
+        slot.reassign(this, this.strIvs[TxTrackIndex.kAudio]);
         // connect track to a player
         const rx = this.audioReceiver = slot.xponder.receiver;
         const player = this.audioPlayer = document.createElement("audio");

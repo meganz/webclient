@@ -236,6 +236,9 @@ var versiondialogid;
             current_sel_version = current_sel_version.length ? current_sel_version : [fh];
 
             var revertVersion = function(handle, current_node) {
+                if (M.isInvalidUserStatus()) {
+                    return;
+                }
 
                 var file = M.d[handle];
                 var n = {
@@ -533,6 +536,10 @@ var versiondialogid;
 
             $('.fm-versioning .pad .top-column button.js-delete')
                 .rebind('click', function() {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
+
                     $('.fm-versioning.overlay').addClass('arrange-to-back');
                     var apiReq = function(handles) {
                         for (let i = handles.length; i--;) {
@@ -630,6 +637,10 @@ var versiondialogid;
                     });
 
                     $('.fm-versioning .buttons .delete-file').rebind('click', function(e) {
+                        if (M.isInvalidUserStatus()) {
+                            return;
+                        }
+
                         var apiReq = function(handle) {
                             api_req({a: 'd',
                                      n: handle,
@@ -657,6 +668,9 @@ var versiondialogid;
 
                     $('.fm-versioning .pad .top-column button.js-clear-previous')
                         .rebind('click', function() {
+                            if (M.isInvalidUserStatus()) {
+                                return;
+                            }
 
                             if (!$(this).hasClass('disabled')) {
                                 msgDialog('remove', l[1003], mega.icu.format(l[17154], 1), l[1007], e => {
@@ -737,6 +751,10 @@ var versiondialogid;
          * @returns {none} none (ESLint requires)
          */
         previewFile: function(previewHandle) {
+            if (M.isInvalidUserStatus()) {
+                return;
+            }
+
             loadingDialog.show('common', l[23130]);
             const versionHandle = window.versiondialogid;
             const reopen = () => {

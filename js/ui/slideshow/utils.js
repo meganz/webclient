@@ -37,7 +37,7 @@ lazy(mega.slideshow, 'utils', () => {
          * Filter nodes argument depending on current situation
          * @param {MegaNode[]} nodes - list of nodes to filter
          * @param {Boolean} isPlayMode - whether slideshow is on play mode or not
-         * @returns {void}
+         * @returns {Function}
          */
         filterNodes: (nodes, isPlayMode) => {
             if (nodes !== undefined) {

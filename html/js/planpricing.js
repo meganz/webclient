@@ -490,10 +490,10 @@ lazy(pro, 'proplan2', () => {
                 $socialIconsContainer[0].scroll(this.offsetLeft - $socialIconsContainer[0].offsetLeft, 0);
             }
 
-            rotatingTimer = setInterval(rotatingQuotes, 4000);
+            rotatingTimer = setInterval(rotatingQuotes, 9000);
         });
 
-        rotatingTimer = setInterval(rotatingQuotes, 4000);
+        rotatingTimer = setInterval(rotatingQuotes, 9000);
 
     };
 
@@ -548,9 +548,14 @@ lazy(pro, 'proplan2', () => {
             extraPrice = formatCurrency(ProFlexiFound[12]);
         }
 
-
-        $('.pricing-plan-trasfer .ex-desc', $proFlexCard)
-            .text(l.pr_flexi_extra.replace('%1', extraPrice));
+        if (flexiCurrency === 'EUR') {
+            $('.pricing-plan-trasfer .ex-desc', $proFlexCard)
+                .text(l.pr_flexi_extra.replace('%1', extraPrice));
+        }
+        else {
+            $('.pricing-plan-trasfer .ex-desc', $proFlexCard)
+                .text(l.bsn_add_base_stg_trs.replace('%1', extraPrice));
+        }
 
         const $buyBtn = $('.pricing-plan-btn', $proFlexCard)
             .text(l.buy_plan.replace('%1', planName));

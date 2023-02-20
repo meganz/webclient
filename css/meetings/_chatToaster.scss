@@ -63,16 +63,16 @@
             .chat-toast-close {
                 align-self: flex-end;
             }
+            &.dual-toast {
+                margin-top: 24px;
+            }
         }
         &.chat-persistent-toast {
             animation: toastfadeinout 4s linear infinite;
             color: #FFFFFF;
             font: var(--text-h1-bold);
-            margin: 168px auto 0;
+            margin: 88px auto 0;
             -webkit-animation: toastfadeinout 4s linear infinite;
-            &.dual-toast {
-                margin-top: 32px;
-            }
         }
     }
 }

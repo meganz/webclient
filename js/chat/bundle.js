@@ -4990,15 +4990,15 @@ class ChatToaster extends _mixins1__.wl {
     } = this.state;
     return !hidden && !fmToastId && react0().createElement("div", {
       className: `chat-toast-bar ${isRootToaster ? 'toaster-root' : ''}`
-    }, toast && react0().createElement(ChatToastMsg, {
-      toast: toast,
-      isRootToaster: isRootToaster,
-      onClose: p => this.onClose(p)
-    }), showDualNotifications && persistentToast && react0().createElement(ChatToastMsg, {
+    }, showDualNotifications && persistentToast && react0().createElement(ChatToastMsg, {
       toast: persistentToast,
       isRootToaster: isRootToaster,
-      isDualToast: !!toast,
       usePersistentStyle: true,
+      onClose: p => this.onClose(p)
+    }), toast && react0().createElement(ChatToastMsg, {
+      toast: toast,
+      isRootToaster: isRootToaster,
+      isDualToast: !!persistentToast,
       onClose: p => this.onClose(p)
     }));
   }
@@ -5059,7 +5059,7 @@ class ChatToastMsg extends _mixins1__.wl {
     } = this.state;
     if (usePersistentStyle && toast.options.persistent) {
       return react0().createElement("div", {
-        className: `${NAMESPACE} chat-persistent-toast ${isDualToast ? 'dual-toast' : ''}`
+        className: `${NAMESPACE} chat-persistent-toast`
       }, value || toast.render());
     }
     const closeButton = toast.close && react0().createElement(_ui_buttons3__.z, {
@@ -5080,7 +5080,7 @@ class ChatToastMsg extends _mixins1__.wl {
       }, value || toast.render())), closeButton);
     }
     return react0().createElement("div", {
-      className: `${NAMESPACE} chat-toast-wrapper theme-light-forced`
+      className: `${NAMESPACE} chat-toast-wrapper theme-light-forced ${isDualToast ? 'dual-toast' : ''}`
     }, react0().createElement("div", {
       className: "toast-value"
     }, value || toast.render()));

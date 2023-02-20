@@ -4154,6 +4154,12 @@ div.checkboxOn {
     top: -3px;
     margin-top: 6px;
 }
+.rtl .mobile.create-new-folder-dialog .folder-name-warning-block .fm-icon.red-warning,
+.rtl .mobile.mobile-rename-overlay .folder-name-warning-block .fm-icon.red-warning,
+.rtl .file-request-block .input-warning-block .fm-icon.red-warning {
+    left: initial;
+    right: -4px;
+}
 .mobile.create-new-folder-dialog .folder-name-warning-block .warning-text,
 .two-factor-page .warning-text-field,
 .mobile.verify-number .warning-text-field,
@@ -4163,7 +4169,9 @@ div.checkboxOn {
     color: #131313;
     font-size: 12px;
     line-height: 15px;
-    padding: 16px 0 16px 31px;
+    padding: 16px 0;
+    -webkit-padding-start: 31px;
+    padding-inline-start: 31px;
 }
 .mobile.mobile-rename-overlay .folder-name-warning-block .warning-text {
     overflow-wrap: break-word;
@@ -13793,6 +13801,10 @@ body.landscape .upload-overlay .mobile.filetype-img {
 /*
  * Mobile file request create dialog
  */
+.rtl .file-request-block {
+    direction: rtl;
+}
+
 .file-request-block .dialog-heading-text {
     color: var(--text-color-black-high);
     font: var(--text-h2);
@@ -13810,6 +13822,10 @@ body.landscape .upload-overlay .mobile.filetype-img {
     font: var(--text-body2);
     text-align: left;
     margin-bottom: 24px;
+}
+
+.rtl .file-request-block .dialog-body-text.caption {
+    text-align: right;
 }
 
 .file-request-block .input-container {
@@ -13837,6 +13853,10 @@ body.landscape .upload-overlay .mobile.filetype-img {
 
 .file-request-block .input-warning-block {
     text-align: left;
+}
+
+.rtl .file-request-block .input-warning-block {
+    text-align: right;
 }
 
 /*

@@ -5670,7 +5670,7 @@ body.de .mega-dialog.new-group-chat {
         justify-content: space-between;
     }
     .fm-voucher-popup .mega-input.title-ontop {
-        -webkit-margin-inline-end: 12px;
+        -webkit-margin-end: 12px;
         margin-inline-end: 12px;
     }
 
@@ -10318,7 +10318,8 @@ body.de .mega-dialog.new-group-chat {
 }
 
 .mega-dialog.file-request .content .scrollable .ps__scrollbar-y-rail {
-    margin-right: 8px;
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
     opacity: 0.6;
 }
 
@@ -10393,7 +10394,8 @@ body.de .mega-dialog.new-group-chat {
 }
 
 .mega-dialog.file-request .content-block .form-row .mega-input:not(.mega-input-icon) input {
-    padding-left: 16px;
+    padding-inline-start: 16px;
+    -webkit-padding-start: 16px;
     font: var(--text-body1);
     color: var(--text-color-low);
 }
@@ -10452,10 +10454,17 @@ body.de .mega-dialog.new-group-chat {
     --mask-color: var(--text-color-medium);
 }
 
+.rtl .mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper i {
+    right: 10px;
+    left: initial;
+}
+
 .mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper input {
     height: 24px;
     border: 0;
+    -webkit-padding-start: 34px;
     padding-inline-start: 34px;
+    -webkit-padding-end: 10px;
     padding-inline-end: 10px;
     text-overflow: ellipsis;
     width: 100%;
@@ -10517,7 +10526,9 @@ body.de .mega-dialog.new-group-chat {
 }
 
 .mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-action-text {
-    margin: 6px 0 6px 6px;
+    margin: 6px 0;
+    -webkit-padding-start: 6px;
+    padding-inline-start: 6px;
     width: 98px;
     background-color: rgba(196, 196, 196, 1);
     height: 12px;

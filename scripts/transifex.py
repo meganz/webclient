@@ -16,7 +16,7 @@ Requirements:
 This script will work with both Python 2.7 as well as 3.x.
 """
 
-import copy, json, os, sys, re, subprocess, time, io, random, argparse
+import copy, json, os, sys, re, subprocess, time, io, random, argparse, datetime
 from threading import Thread
 from collections import OrderedDict
 from functools import cmp_to_key
@@ -561,7 +561,7 @@ def has_locked_msgs(is_prod):
         print("SUCCESS ... checking for Locked strings in PROD. None found")
     return False
 
-def lock_resource(branch_resource_name, keys):
+def lock_resource(branch_resource_name, keys, update_time = 0):
     url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:" + branch_resource_name
     languages = get_languages()
     if languages:
@@ -578,21 +578,23 @@ def lock_resource(branch_resource_name, keys):
                     string_codes = []
                     for key in content['data']:
                         if key["attributes"]["key"] in keys:
-                            updateUrl = BASE_URL + "/resource_strings/" + key['id']
-                            stringTags = key["attributes"]["tags"]
-                            for tag in lockedTags:
-                                if tag not in stringTags:
-                                    stringTags.append(tag)
-                            payload = {
-                                        "data": {
-                                            "attributes": {
-                                                "tags": stringTags,
-                                            },
-                                            "id": key['id'],
-                                            "type": "resource_strings"
+                            mod_time = datetime.datetime.strptime(key["attributes"]["strings_datetime_modified"], "%Y-%m-%dT%H:%M:%SZ")
+                            if int(mod_time.replace(tzinfo=datetime.timezone.utc).timestamp()) >= update_time
+                                updateUrl = BASE_URL + "/resource_strings/" + key['id']
+                                stringTags = key["attributes"]["tags"]
+                                for tag in lockedTags:
+                                    if tag not in stringTags:
+                                        stringTags.append(tag)
+                                payload = {
+                                            "data": {
+                                                "attributes": {
+                                                    "tags": stringTags,
+                                                },
+                                                "id": key['id'],
+                                                "type": "resource_strings"
+                                            }
                                         }
-                                    }
-                            string_codes.append({'url': updateUrl, 'payload': payload})
+                                string_codes.append({'url': updateUrl, 'payload': payload})
 
                     def transifex_patch_strings(url, request):
                         try:
@@ -743,7 +745,7 @@ def main():
                         branch_resource_strings[key] = value
             else:
                 branch_resource_strings = new_strings
-
+            now = int(datetime.datetime.now(datetime.timezone.utc).timestamp()) - 30
             # Push new string to the branch resource file
             print("Pushing new strings to branch resource file... ")
             sys.stdout.flush()
@@ -768,7 +770,7 @@ def main():
             success = send_upload_request(url, payload)
             if success:
                 print("Locking resource")
-                lock_resource(branch_resource_name, new_strings.keys())
+                lock_resource(branch_resource_name, new_strings.keys(), now)
                 print("Completed")
         print("~ Import completed ~")
         print("")

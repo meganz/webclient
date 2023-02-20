@@ -2733,7 +2733,7 @@ class SfuClient {
         let promises = [this.pollTxVideoStats(), this.pollMicAudioLevel()];
         // first, get all audio stats, because the stats display callbacks are connected to the video
         // stats, and they may want to display audio stats as well - audio stats should be already available
-        for (let rxTrack of this.inAudioTracks.values()) {
+        for (const rxTrack of this.inAudioTracks.values()) {
             if (!rxTrack.active) {
                 continue;
             }
@@ -2743,7 +2743,7 @@ class SfuClient {
             await Promise.allSettled(promises);
         }
         promises = [];
-        for (let rxTrack of this.inVideoTracks.values()) {
+        for (const rxTrack of this.inVideoTracks.values()) {
             if (!rxTrack.active) {
                 continue;
             }
@@ -2826,9 +2826,9 @@ class SfuClient {
                     ctx.prev = stat;
                 }
                 else {
-                    let prev = ctx.prev;
+                    const prev = ctx.prev;
                     ctx.prev = stat;
-                    let period = (stat.timestamp - prev.timestamp) / 1000;
+                    const period = (stat.timestamp - prev.timestamp) / 1000;
                     rtcStats._vtxIsHiRes = isHiRes;
                     if (isNaN((rtcStats._vtxkbps = ((stat.bytesSent - prev.bytesSent) / 128) / period))) {
                         rtcStats._vtxkbps = 0;
@@ -2837,7 +2837,7 @@ class SfuClient {
                     rtcStats.vtxw = stat.frameWidth;
                     rtcStats.vtxh = stat.frameHeight;
                     rtcStats._vtxkfps = (stat.keyFramesEncoded - prev.keyFramesEncoded) / period;
-                    let pktSent = stat.packetsSent - prev.packetsSent;
+                    const pktSent = stat.packetsSent - prev.packetsSent;
                     rtcStats.vtxdly = pktSent
                         ? Math.round((stat.totalPacketSendDelay - prev.totalPacketSendDelay) * 1000 / pktSent)
                         : -1;
@@ -2881,9 +2881,9 @@ class SfuClient {
             ctx.prev = stat;
             return;
         }
-        let prev = ctx.prev;
+        const prev = ctx.prev;
         ctx.prev = stat;
-        let per = (stat.timestamp - prev.timestamp) / 1000;
+        const per = (stat.timestamp - prev.timestamp) / 1000;
         s.rx = Math.round(((stat.bytesReceived - prev.bytesReceived) / 128) / per);
         s.tx = Math.round(((stat.bytesSent - prev.bytesSent) / 128) / per);
         s._pktRxTotal = stat.packetsReceived - prev.packetsReceived;
@@ -3030,11 +3030,11 @@ class Slot {
                     ctx.prev = stat;
                 }
                 else {
-                    let prev = ctx.prev;
+                    const prev = ctx.prev;
                     ctx.prev = stat;
-                    let period = (stat.timestamp - prev.timestamp) / 1000;
+                    const period = (stat.timestamp - prev.timestamp) / 1000;
                     const recvd = stat.packetsReceived - prev.packetsReceived;
-                    let plost = (stat.packetsLost - prev.packetsLost);
+                    const plost = (stat.packetsLost - prev.packetsLost);
                     commonStats.pl += plost;
                     if (!this.isVideo) {
                         if (stat.jitter != null) {

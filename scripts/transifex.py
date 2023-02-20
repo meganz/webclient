@@ -579,7 +579,7 @@ def lock_resource(branch_resource_name, keys, update_time = 0):
                     for key in content['data']:
                         if key["attributes"]["key"] in keys:
                             mod_time = datetime.datetime.strptime(key["attributes"]["strings_datetime_modified"], "%Y-%m-%dT%H:%M:%SZ")
-                            if int(mod_time.replace(tzinfo=datetime.timezone.utc).timestamp()) >= update_time
+                            if int(mod_time.replace(tzinfo=datetime.timezone.utc).timestamp()) >= update_time:
                                 updateUrl = BASE_URL + "/resource_strings/" + key['id']
                                 stringTags = key["attributes"]["tags"]
                                 for tag in lockedTags:

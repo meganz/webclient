@@ -260,7 +260,12 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
                 var shareId = getSitePath().replace('/fm/', '');
 
                 // Remove user from the share
-                M.leaveShare(shareId);
+                M.leaveShare(shareId).catch(ex => {
+                    if (ex === EMASTERONLY) {
+                        msgDialog('warningb', '',
+                                  l.err_bus_sub_leave_share_dlg_title, l.err_bus_sub_leave_share_dlg_text);
+                    }
+                });
             });
         }
     }

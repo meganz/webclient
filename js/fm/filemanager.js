@@ -1767,9 +1767,14 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
+        const errHandler = ex => {
+            if (ex === EMASTERONLY) {
+                msgDialog('warningb', '', l.err_bus_sub_leave_share_dlg_title, l.err_bus_sub_leave_share_dlg_text);
+            }
+        };
 
         for (let i = 0; i < $.selected.length; i++) {
-            M.leaveShare($.selected[i]).catch(dump);
+            M.leaveShare($.selected[i]).catch(errHandler);
         }
     });
 

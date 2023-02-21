@@ -1340,7 +1340,7 @@ function renameDialog() {
 // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     'use strict';
-    var doneButton  = l[81];
+    var doneButton  = l.ok_button;
     var extraButton = String(type).split(':');
     if (extraButton.length === 1) {
         extraButton = null;
@@ -1474,7 +1474,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                 `<button class="mega-button confirm ${checkboxSetting === 1 ? 'positive' : ''}">
                     <span>@@</span>
                 </button>`,
-                l[81]
+                l.ok_button
             );
 
             // eslint-disable-next-line sonarjs/no-identical-functions
@@ -1500,7 +1500,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
         }
     }
     else if (type === 'confirmationa' || type === 'confirmation' || type === 'remove') {
-        if (doneButton === l[81]) {
+        if (doneButton === l.ok_button) {
             doneButton = false;
         }
         $('#msgDialog footer .footer-container')

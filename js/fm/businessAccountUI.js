@@ -2933,32 +2933,37 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         var myPage = pages['business_invoice'];
                         myPage = translate(myPage);
 
+                        const { mega, ts, n, u, items, tot } = invoiceDetail;
+                        const { e, phaddr, poaddr, taxnum, cname } = mega;
                         // now prepare the invoice.
-                        myPage = myPage.replace('{0Date}', escapeHTML(time2date(invoiceDetail.ts, 1)));
+                        myPage = myPage.replace('{1cname}', escapeHTML(cname));
+                        myPage = myPage.replace('{1megae}', escapeHTML(e));
+                        myPage = myPage.replace('{1phaddr}', escapeHTML(phaddr.join(', ')));
+                        myPage = myPage.replace('{1poaddr}', escapeHTML(poaddr.join(', ')));
+                        myPage = myPage.replace('{0Date}', escapeHTML(time2date(ts, 1)));
                         myPage = myPage.replace('{1InvoiceTitle}', escapeHTML($invoiceTopTitle.find('.inv-title.invv').text()));
-                        myPage = myPage.replace('{1InvoiceNB}', escapeHTML(invoiceDetail.n));
-                        myPage = myPage.replace('{2VATNB}', escapeHTML(invoiceDetail.mega.taxnum[1]));
+                        myPage = myPage.replace('{1InvoiceNB}', escapeHTML(n));
+                        myPage = myPage.replace('{2VATNB}', escapeHTML(taxnum[1]));
                         myPage = myPage.replace('{2VATTXT}', escapeHTML(
-                            l.taxname_label.replace('%TAXNAME', invoiceDetail.mega.taxnum[0])));
-                        myPage = myPage.replace('{3CompanyName}', escapeHTML(invoiceDetail.u.cname));
-                        myPage = myPage.replace('{4CompanyEmail}', escapeHTML(invoiceDetail.u.e));
+                            l.taxname_label.replace('%TAXNAME', taxnum[0])));
+                        myPage = myPage.replace('{3CompanyName}', escapeHTML(u.cname));
+                        myPage = myPage.replace('{4CompanyEmail}', escapeHTML(u.e));
                         myPage = myPage.replace('{5CompanyAddress}', escapeHTML(validAddressSentFromApi.join(', ')));
-                        myPage = myPage.replace('{6CompanyCountry}',
-                            escapeHTML(invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]));
+                        myPage = myPage.replace('{6CompanyCountry}', escapeHTML(u.addr[u.addr.length - 1]));
                         var cVat = '---';
-                        if (invoiceDetail.u.taxnum && invoiceDetail.u.taxnum[1]) {
-                            cVat = l.taxname_label.replace('%TAXNAME', invoiceDetail.u.taxnum[0])
-                                + ' ' + invoiceDetail.u.taxnum[1];
+                        if (u.taxnum && u.taxnum[1]) {
+                            cVat = l.taxname_label.replace('%TAXNAME', u.taxnum[0])
+                                + ' ' + u.taxnum[1];
                         }
                         myPage = myPage.replace('{7CompanyVat}', escapeHTML(cVat));
                         var itemDate = '---';
                         var itemDec = '---';
                         var itemAmount = '---';
-                        if (invoiceDetail.items && invoiceDetail.items.length) {
-                            itemDate = time2date(invoiceDetail.items[0].ts, 1);
-                            itemDec = invoiceDetail.items[0].d;
-                            itemAmount = invoiceDetail.items[0].net;
-                            if (invoiceDetail.items[0].v && invoiceDetail.items[0].list) {
+                        if (items && items.length) {
+                            itemDate = time2date(items[0].ts, 1);
+                            itemDec = items[0].d;
+                            itemAmount = items[0].net;
+                            if (items[0].v && items[0].list) {
                                 const rowStart = myPage.indexOf('<li class="inv-li-content"');
                                 if (rowStart) {
                                     const rowEnd = myPage.indexOf('</li>', rowStart);
@@ -2988,7 +2993,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                             escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')[0].textContent));
                         myPage = myPage.replace('{11itemVat}',
                             escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent));
-                        myPage = myPage.replace('{12totalCost}', '\u20ac' + Number(invoiceDetail.tot).toFixed(2));
+                        myPage = myPage.replace('{12totalCost}', '\u20ac' + Number(tot).toFixed(2));
 
                         var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
                         var newPdfPrintIframe = document.createElement('iframe');

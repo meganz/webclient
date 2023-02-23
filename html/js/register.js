@@ -363,18 +363,6 @@ function init_register() {
         }
     });
 
-    $('.checkbox-block.register .radio-txt', $formWrapper).safeHTML(l['208s']);
-
-    $('.checkbox-block.register a', $formWrapper).rebind('click.tos', (e) => {
-        e.preventDefault();
-        $.termsAgree = () => {
-            $('.register-check', $formWrapper).removeClass('checkboxOff')
-                .addClass('checkboxOn');
-        };
-        bottomPageDialog(false, 'terms', false, true);
-        return false;
-    });
-
     var $regInfoContainer = $('.main-mid-pad.big-pad.register1 .main-left-block').removeClass('businessSubAc');
     $('.mega-input.title-ontop', $regInfoContainer).removeClass('hidden');
     $('.account.top-header', $regInfoContainer).safeHTML(l[1095]);

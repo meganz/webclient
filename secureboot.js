@@ -92,7 +92,6 @@ var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_webcache = location.host === 'webcache.googleusercontent.com';
 var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
     || location.host === 'smoketest.mega.nz' || is_extension;
-var is_litesite = !is_embed && location.host === 'mega.io';
 var is_eplusplus = false;
 var is_filerequest_page = String(location.pathname).substr(0, 13) === '/filerequest/' ||
     String(location.pathname).substr(0, 10) === '/megadrop/';
@@ -199,33 +198,6 @@ function openExternalLink(aExternalLink, aFallbackLink, aTimeout) {
     tryCatch(function() {
         top.location = aExternalLink;
     }, dsp)();
-}
-
-function setCookie(key, val) {
-    'use strict';
-    if (!is_iframed && !is_extension && is_livesite && key) {
-        tryCatch(function() {
-            document.cookie = key + '=' + (val || '') + '; expires=' +
-                (val ? 'Fri, 31 Dec 9999 23:59:59 GMT' : 'Thu, 01 Jan 1970 00:00:00 GMT')
-                + '; path=/';
-            // now we need to inform the server [of mega.io]
-            if (location.host === 'mega.nz') {
-                var iping = document.getElementById('i-ping');
-                if (iping) {
-                    iping.src = 'https://mega.io/' + (val ? 'loggedin' : 'loggedout');
-                }
-            }
-        })();
-    }
-}
-
-function getCookie() {
-    'use strict';
-    var cookies = '';
-    tryCatch(function() {
-        cookies = document.cookie;
-    })();
-    return cookies;
 }
 
 function getSitePath() {
@@ -667,7 +639,6 @@ if (!browserUpdate) try
         defaultStaticPath = staticpath;
         d = 1;
         sessionStorage.rad = 1;
-        is_litesite = !!localStorage.testIO;
     }
 
     if (d > 0) {
@@ -715,7 +686,6 @@ catch(e) {
     }
 }
 
-is_litesite = is_litesite || !is_livesite && localStorage.testIO;
 if (location.host === 'mega.io') {
     tmp = document.head.querySelector('meta[property="og:url"]');
     if (tmp) {
@@ -839,6 +809,13 @@ var mega = {
         var storage = localStorage;
 
         to = (String(to).indexOf('//') < 0 ? 'https://' : '') + to;
+
+        var uLang = sessionStorage.lang || storage.lang;
+        if (uLang) {
+            // Map webclient language codes to those that are supported on mega.io
+            to += '/' + mega.getMegaIoMappedLang(uLang);
+        }
+
         if (page) {
             to += '/' + page;
         }
@@ -846,12 +823,7 @@ var mega = {
         var affid = sessionStorage.affid || storage.affid;
         var affts = sessionStorage.affts || storage.affts;
         if (affid && affts && !(Date.now() - affts > 864e5)) {
-            to += '/aff=' + affid;
-        }
-
-        var uLang = sessionStorage.lang || storage.lang;
-        if (uLang) {
-            to += '/lang=' + uLang;
+            to += '?aff=' + affid;
         }
 
         if (storage.csp) {
@@ -875,6 +847,47 @@ var mega = {
 
         window.onload = window.onerror = null;
         location.replace(to + (urlQs || ''));
+    },
+
+    /**
+     * Map webclient language codes to those that are supported on mega.io
+     * @param {String} userLang The current webclient user language code e.g. EN, NL etc
+     * @returns {String} Returns the mapped language for mega.io (could be empty string for English or not supported)
+     */
+    getMegaIoMappedLang(userLang) {
+
+        // Webclient (mega.nz) to mega.io mappings
+        const mappings = {
+            'en': '',
+            'ar': 'ar',
+            'br': 'pt-br',
+            'cn': 'zh-hans',
+            'ct': 'zh-hant',
+            'de': 'de',
+            'es': 'es',
+            'fr': 'fr',
+            'he': '',   // Hebrew not supported
+            'hu': '',   // Hungarian not supported
+            'id': 'id',
+            'it': 'it',
+            'jp': 'ja',
+            'ka': '',   // Georgian not supported
+            'kr': 'ko',
+            'nl': 'nl',
+            'pl': 'pl',
+            'pt': 'pt',
+            'ro': 'ro',
+            'ru': 'ru',
+            'th': 'th',
+            'tl': '',   // Filipino not supported
+            'tr': '',   // Turkish not supported
+            'uk': '',   // Ukrainian not supported
+            'vi': 'vi'
+        };
+
+        const mappedLang = mappings[userLang];
+
+        return typeof mappedLang === 'undefined' ? '' : mappedLang;
     },
 
     /** Parameters to append to API requests */
@@ -1024,6 +1037,13 @@ else if (is_karma) {
     bootstaticpath = 'base/';
 }
 
+// Disable hash checking if requested for development
+/*
+else if (localStorage.disablecontentcheck) {
+    nocontentcheck = true;
+}
+//*/
+
 tmp = getCleanSitePath(location.hash || undefined);
 if (tmp.substr(0, 12) === 'sitetransfer') {
     try {
@@ -1129,12 +1149,12 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
-window.redirect = ['about', 'achievements', 'android', 'bird', 'business', 'chrome', 'cmd',
-                   'contact', 'collaboration', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
-                   'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
+window.redirect = ['achievements', 'android', 'bird', 'business', 'chrome', 'cmd',
+                   'contact', 'copyright', 'desktop', 'dev',
+                   'developers', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
                    'megabackup', 'mobile', 'nas', 'objectstorage',
-                   'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat',
-                   'security', 'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
+                   'plugin', 'privacy', 'resellers', 'sdkterms',
+                   'security', 'start', 'storage', 'takedown', 'terms', 'uwp', 'wp'];
 var isStaticPage = function(page) {
     'use strict';
     if (page) {
@@ -1165,14 +1185,7 @@ else if ((tmp = getSitePath()).substr(0, 6) === '/chat/') {
 else if ((page = isPublicLink(document.location.hash))) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     // history.replaceState so that back button works in new URL paradigm
-    if (is_litesite) {
-        page = '';
-        history.replaceState({ subpage: page }, "", page);
-    }
-    else {
-        history.replaceState({ subpage: page }, "", '#' + page);
-    }
-
+    history.replaceState({ subpage: page }, "", '#' + page);
 }
 else if (isPublickLinkV2(document.location.pathname)) {
     page = getCleanSitePath();
@@ -1194,19 +1207,6 @@ else {
     }
 
     page = getCleanSitePath(page);
-    if (is_litesite) {
-        var loggedCookie = getCookie().indexOf('logged=1') > -1;
-        var comingFromNZ = locationSearchParams.indexOf('nz=1') > -1;
-        if ((!isStaticPage(page) && page !== 'pro' && page !== 'sdk' && page !== 'refer') ||
-            (loggedCookie && !comingFromNZ)) {
-
-            mega.redirect('mega.nz', page);
-        }
-        else if (loggedCookie && comingFromNZ) {
-            // oh, a race probably,
-            setCookie('logged');
-        }
-    }
 
 	// put try block around it to allow the page to be rendered in Google cache
 	try
@@ -2339,10 +2339,6 @@ else if (!browserUpdate) {
                         is_drop ? '[drop] ' : ''
             ) + dump.m.replace(/\s+/g, ' ');
 
-            if (is_litesite) {
-                dump.m = '[lite]' + (dump.m[0] === '[' ? '' : ' ') + dump.m;
-            }
-
             if (expectedSourceOrigin && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
@@ -2744,12 +2740,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-    jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/achievements.css', n: 'achievements_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'html/start.html', n: 'start', j:0});
-    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
@@ -3080,7 +3071,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.affiliate.js', n: 'mobile_affiliate_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.backup.js', n: 'mobile_backup_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.cookie.js', n: 'mobile_cookie_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.context-menu.js', n: 'mobile_cloud_context_menu_js', j: 1, w: 1});
@@ -3095,7 +3085,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.link-overlay.js', n: 'mobile_link_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.not-found-overlay.js', n: 'mobile_not_found_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.privacy.js', n: 'mobile_privacy_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.pro-signup-prompt.js', n: 'mobile_pro_signup_prompt_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.propay.js', n: 'mobile_propay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.recovery.js', n: 'mobile_rec_js', j: 1, w: 1});
@@ -3107,8 +3096,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.rename-overlay.js', n: 'mobile_rename_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.support.js', n: 'mobile_support_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.takedown.js', n: 'mobile_takedown_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});
@@ -3189,127 +3176,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
     }
 
-    if (is_litesite) {
-        jsl = [{f: langFilepath, n: 'lang', j: 3}];
-        jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j:1, w:10});
-        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
-        jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
-        jsl.push({f:'js/vendor/jquery-ui-touch.js', n: 'jqueryui_touch_js', j:1, w:10});
-        jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
-        jsl.push({f:'js/scrolling.utils.js', n: 'scrolling_utils_js', j: 1});
-        jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
-        jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
-        jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
-        jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
-        jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
-        jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
-        jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
-        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-        jsl.push({f:'index.js', n: 'index', j:1,w:4});
-        jsl.push({f:'js/staticPages.js', n: 'staticPages_js', j:1});
-        jsl.push({f:'js/metatags.js', n: 'metatags_js', j:1 });
-        jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-        jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
-        jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'html/start.html', n: 'start', j:0});
-        jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-        jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-        jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
-        jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
-        jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-        jsl.push({f:'html/proplan.html', n: 'proplan', j:0});
-        jsl.push({f:'html/planpricing.html', n: 'planpricing', j:0});
-        jsl.push({f:'html/propay.html', n: 'propay', j:0});
-        jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
-        jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
-        jsl.push({f:'html/js/planpricing.js', n: 'planpricing_js', j:1});
-        jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
-        jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
-        jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
-        jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'html/staticdialog.html', n: 'staticdialog', j:0});
-        jsl.push({f:'js/ui/languageDialog.js', n: 'languagedialog_js', j:1});
-        jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
-        jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
-        jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-        jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
-        jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
-        jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
-
-        // Sprites
-        jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/sprites/fm-illustrations.css', n: 'fm_illustration_css', j:2, w:30, c:1, d:1, cache:1});
-
-        // Dialog templates
-        jsl.push({f:'css/mega-dialog.css', n: 'mega_dialog_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/vars/dialog.css', n: 'vars_dialog_css', j:2, w:30, c:1, d:1, cache:1});
-
-        // Inputs
-        jsl.push({f:'css/megainput.css', n: 'megainput_css', j:2, w:5, c:1, d:1, cache: 1});
-        jsl.push({f:'css/vars/button.css', n: 'vars_button_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/radios.css', n: 'radios_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mega-button.css', n: 'mega_button_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/switches.css', n: 'switches_css', j:2,w:5,c:1,d:1,cache:1});
-
-        jsl.push({f:'html/dialogs-common.html', n: 'dialogs-common', j:0,w:2});
-        jsl.push({f:'css/dialogs/cookie-dialog.css', n: 'cookie-dialog_css', j:2,w:5,c:1,d:1,cache:1});
-
-        if (lang === 'ar' || lang === 'fa') {
-            jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
-        }
-        if (lang === 'th') {
-            jsl.push({f:'css/lang_th.css', n: 'lang_thai_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
-        }
-        if (is_mobile) {
-            jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
-            jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-            jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-            jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
-            jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
-            jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
-            jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
-            jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
-            jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
-            jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
-            jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
-            jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-            jsl.push({f:'js/mobile/mobile.privacy.js', n: 'mobile_privacy_js', j: 1, w: 1});
-        }
-        else {
-            jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
-            jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
-            jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'html/top.html', n: 'top', j:0});
-            jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
-            jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-            jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-        }
-
-        // end of staticPages
-    }
-
     if (is_drop) {
         u_checked = true;
         jsl = [{f: langFilepath, n: 'lang', j: 3}];
@@ -3335,26 +3201,16 @@ else if (!browserUpdate) {
     var jsl2 =
     {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
-        'about': {f:'html/about.html', n: 'about', j:0},
-        'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
-        'corporate': {f:'html/corporate.html', n: 'corporate', j:0},
-        'corporate_js': {f:'html/js/corporate.js', n: 'corporate_js', j:1},
         'datepicker_js': {f:'js/vendor/datepicker.js', n: 'datepicker_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
-        'affiliate': {f:'html/affiliate.html', n: 'affiliate', j:0},
-        'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:1},
         'register': {f:'html/register.html', n: 'register', j:0},
         'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
         'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
-        'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
         'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
         'copyright_js': {f:'html/js/copyright.js', n: 'copyright_js', j:1},
-        'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
-        'terms': {f:'html/terms.html', n: 'terms', j:0},
         'keybackup': {f:'html/backup.html', n: 'keybackup', j:0},
         'keybackup_js': {f:'html/js/backup.js', n: 'keybackup_js', j:1},
         'cancel': {f:'html/cancel.html', n: 'cancel', j:0},
@@ -3366,22 +3222,10 @@ else if (!browserUpdate) {
         'filesaver': {f:'js/vendor/filesaver.js', n: 'filesaver', j:1},
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
-        'credits': {f:'html/credits.html', n: 'credits', j:0},
-        'creditscss': {f:'css/credits.css', n: 'creditscss', j:2},
-        'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
-        'dev': {f:'html/dev.html', n: 'dev', j:0},
-        'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-        'desktop': {f:'html/desktop.html', n: 'desktop', j:0},
-        'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
-        'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
-        'mobileapp': {f:'html/mobileapp.html', n: 'mobileapp', j:0},
-        'megacmd_js': {f:'html/js/megacmd.js', n: 'megacmd_js', j:1},
-        'nas': {f:'html/nas.html', n: 'nas', j:0},
         'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
-        'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
         'tiffjs': {f:'js/vendor/tiff.js', n: 'tiffjs', j:1},
         'webpjs': {f:'js/vendor/webp.js', n: 'webpjs', j:1},
@@ -3395,8 +3239,6 @@ else if (!browserUpdate) {
         'unsub': {f:'html/unsub.html', n: 'unsub', j:0},
         'unsub_js': {f:'html/js/unsub.js', n: 'unsub_js', j:1},
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
-        'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
-        'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
         'nzipp': {f:'html/nzipp.html', n: 'nzipp', j:0},
         'nzipp_js': {f:'html/js/nzipp.js', n: 'nzipp_js', j:1},
         'nzipp_css': {f:'css/nzipp.css', n: 'nzipp_css', j:2},
@@ -3408,29 +3250,15 @@ else if (!browserUpdate) {
         'filerequest': {f:'html/filerequest.html', n: 'filerequest', j:0 },
         'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
         'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
-        'business': {f:'html/business.html', n: 'business',j:0},
-        'businessjs': {f:'html/js/business.js', n: 'business_pp_js', j:1},
         'charts_js': {f:'js/vendor/Chart.js', n: 'charts_js', j:1},
         'charthelper_js': {f:'js/ui/chart.helper.js', n: 'charthelper_js', j:1},
         'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0},
-        'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
-        'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1},
         'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
         'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1},
-        'features_js': {f:'html/js/features.js', n: 'features_js', j:1},
-        'feature_storage': {f:'html/features-storage.html', n: 'feature_storage', j:0},
-        'feature_backup': {f:'html/features-backup.html', n: 'feature_backup', j:0},
-        'feature_chat': {f:'html/features-chat.html', n: 'feature_chat', j:0},
-        'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
-        'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
-        'achievements': {f:'html/achievements.html', n: 'achievements', j:0},
-        'achievementsPage_js': {f:'html/js/achievements.js', n: 'achievementsPage_js', j:1},
-        'achievements_css':{f:'css/achievements.css', n: 'achievements_css', j: 2, w: 5, c: 1, d: 1, cache: 1 },
         'special': {f:'html/troy-hunt.html', n:'special', j:0},
         'special_js': {f:'html/js/troy-hunt.js', n:'special_js', j:1},
         'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2},
         'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
-        'object_storage': {f:'html/objectstorage.html', n: 'object_storage', j:0},
         'folderlink_css':{f:'css/folder-link.css', n: 'folderlink_css', j: 2, w: 5, c: 1, d: 1, cache: 1},
         'time_checker_js': {f:'js/time_checker.js', n:'time_checker_js', j:1},
         'filerequest_js': {f:'js/filerequest.js', n: 'filerequest_js', j:1 },
@@ -3501,11 +3329,6 @@ else if (!browserUpdate) {
 
     var subpages =
     {
-        'about': ['about', 'about_js'],
-        'corporate': ['corporate', 'corporate_js'],
-        'sourcecode': ['sourcecode'],
-        'terms': ['terms'],
-        'credits': ['credits', 'creditscss'],
         'keybackup': ['keybackup', 'keybackup_js', 'filesaver'],
         'recovery': ['recovery', 'recovery_js'],
         'reset': ['reset', 'reset_js'],
@@ -3520,50 +3343,19 @@ else if (!browserUpdate) {
         'F!': ['folderlink_css'],
         'folder': ['folderlink_css'],
         'discountpromo': ['discountpromo', 'discountpromo_js', 'discountpromo_css'],
-        's': ['discountpromo', 'discountpromo_js', 'discountpromo_css'], // Short URL for 'sale' e.g. /sale/blackfriday
-        'dispute': ['dispute'],
+        's': ['discountpromo', 'discountpromo_js', 'discountpromo_css'], // Short URL for 'sale' e.g. /s/blackfriday
         'disputenotice': ['disputenotice', 'copyright_js'],
-        'copyright': ['copyright'],
         'copyrightnotice': ['copyrightnotice', 'copyright_js'],
-        'privacy': ['privacy'],
-        'takedown': ['takedown'],
-        'desktop': ['desktop', 'sync_js'],
-        'cmd': ['cmd', 'megacmd_js'],
-        'mobile': ['mobileapp'],
-        'nas': ['nas'],
-        'ios': ['mobileapp'],
-        'refer': ['affiliate', 'affiliate_js'],
-        'android': ['mobileapp'],
         'support': ['support_js', 'support'],
-        'contact': ['contact'],
-        'dev': ['dev','dev_js','sdkterms'],
-        'sdk': ['dev','dev_js','sdkterms'],
-        'doc': ['dev','dev_js','sdkterms'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
-        'plugin': ['browsers', 'browsers_js'],
-        'extensions': ['browsers', 'browsers_js'],
-        'chrome': ['browsers', 'browsers_js'],
-        'firefox': ['browsers', 'browsers_js'],
-        'edge': ['browsers', 'browsers_js'],
         'bird': ['megabird'],
-        'wp': ['mobileapp'],
-        'uwp': ['mobileapp'],
         'unsub': ['unsub', 'unsub_js'],
-        'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
         'developersettings': ['developersettings', 'developersettings_js'],
         'filerequest': ['filerequest', 'filerequest_upload_js'],
-        'storage': ['feature_storage', 'features_js'],
-        'megabackup': ['feature_backup', 'features_js'],
-        'securechat': ['feature_chat', 'features_js'],
-        'collaboration': ['feature_collaboration', 'features_js'],
-        'achievements': ['achievements', 'achievementsPage_js', 'achievements_css'],
         'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
-        'business': ['business', 'businessjs'],
-        'cookie': ['cookie'],
-        'special': ['special', 'special_js', 'special_css'],
-        'objectstorage': ['object_storage', 'features_js']
+        'special': ['special', 'special_js', 'special_css']
     };
 
     if (is_mobile) {
@@ -4313,13 +4105,10 @@ else if (!browserUpdate) {
             return;
         }
 
-        if (location.host === 'mega.nz' && !u_storage.sid
-            && !is_iframed && isStaticPage(page) && !location.hash && !u_storage.wasloggedin
-            && getCookie().indexOf('logged=1') === -1) {
-            // there isn't a stored session ID (regardless of its validity), we move.
-            // since without a session-id it's not possible to access any internal page.
-            tmp = (locationSearchParams ? locationSearchParams + '&' : '?') + 'nz=1';
-            return mega.redirect('mega.io', page, false, tmp);
+        // Redirect static pages to mega.io if there isn't a stored session ID (regardless of its validity),
+        // since without a session-id it's not possible to access any internal page.
+        if (location.host === 'mega.nz' && !u_storage.sid && !is_iframed && isStaticPage(page) && !location.hash) {
+            return mega.redirect('mega.io', page, false, locationSearchParams);
         }
 
         if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {

@@ -932,6 +932,9 @@ var voucherDialog = {
 
         insertEmailToPayResult(voucherDialog.$successOverlay);
 
+        // Send some data to mega.io that we updated the Pro plan
+        initMegaIoIframe(true, proNum);
+
         // Add click handlers for 'Go to my account' and Close buttons
         voucherDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
 
@@ -2914,6 +2917,8 @@ var cardDialog = {
 
         insertEmailToPayResult(cardDialog.$successOverlay);
 
+        // Send some data to mega.io that we updated the Pro plan
+        initMegaIoIframe(true, proNum);
 
         // Add click handlers for 'Go to my account' and Close buttons
         cardDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {

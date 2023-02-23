@@ -919,6 +919,9 @@ function avatarDialog(close) {
                 mega.attr.set('a', ab_to_base64(data), true, false);
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
+                // Update mega.io about the new avatar change
+                initMegaIoIframe(true);
+
                 $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
                 $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
                 avatarDialog(1);
@@ -942,6 +945,10 @@ function avatarDialog(close) {
         msgDialog('confirmation', 'confirm-remove-avatar', l[18699], l[6973], function(response) {
             if (response){
                 mega.attr.set('a', "none", true, false);
+
+                // Update mega.io about the new avatar change
+                initMegaIoIframe(true);
+
                 avatarDialog(1);
             }
         });
@@ -1340,7 +1347,7 @@ function renameDialog() {
 // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     'use strict';
-    var doneButton  = l[81];
+    var doneButton  = l.ok_button;
     var extraButton = String(type).split(':');
     if (extraButton.length === 1) {
         extraButton = null;
@@ -1474,7 +1481,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                 `<button class="mega-button confirm ${checkboxSetting === 1 ? 'positive' : ''}">
                     <span>@@</span>
                 </button>`,
-                l[81]
+                l.ok_button
             );
 
             // eslint-disable-next-line sonarjs/no-identical-functions
@@ -1500,7 +1507,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
         }
     }
     else if (type === 'confirmationa' || type === 'confirmation' || type === 'remove') {
-        if (doneButton === l[81]) {
+        if (doneButton === l.ok_button) {
             doneButton = false;
         }
         $('#msgDialog footer .footer-container')

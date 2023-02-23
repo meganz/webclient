@@ -205,11 +205,12 @@ function u_checklogin3a(res, ctx) {
             psa.updateApiWithLastPsaSeen(u_attr['^!lastPsa']);
         }
 
-        setCookie('logged', '1');
-
         if (r === 3) {
             document.body.classList.add('logged');
             document.body.classList.remove('not-logged');
+
+            // Send some data to mega.io that we logged in
+            initMegaIoIframe(true);
         }
 
         // Recovery key has been saved
@@ -461,7 +462,10 @@ function u_logout(logout) {
         u_sharekeys = {};
         u_type = false;
         loggedout = true;
-        // setCookie('logged');
+
+        // Send some data to mega.io that we logged out
+        initMegaIoIframe(false);
+
         $('#fmholder').text('').attr('class', 'fmholder');
         if (window.MegaData) {
             M = new MegaData();
@@ -994,6 +998,94 @@ function setLandingPage(page) {
     'use strict';
     var index = allowedLandingPages.indexOf(page);
     mega.config.set('uhp', index < 0 ? 0 : index);
+}
+
+/**
+ * Inform the mega.io static server of first name, avatar, login status in/out
+ * @param {Boolean} loginStatus This is true if they just logged in, false if they logged out
+ * @param {Number|undefined} planNum Optional Pro plan number if recently purchased (otherwise u_attr.p is used)
+ * @returns {undefined}
+ */
+function initMegaIoIframe(loginStatus, planNum) {
+
+    'use strict';
+
+    // Set constants for URLs (easier to change for local testing)
+    const iframeUrl = 'https://mega.io';
+    const parentUrl = 'https://mega.nz';
+
+    tryCatch(() => {
+        const megaIoIframe = document.getElementById('i-ping');
+
+        // Check iframe is available
+        if (!megaIoIframe) {
+            console.error('The mega.io iframe is not available');
+            return;
+        }
+
+        // We only want to inform the mega.io site if on live domain
+        if (is_iframed || is_extension || location.origin !== parentUrl) {
+            console.error('The mega.io iframe was not initialised');
+            return;
+        }       
+
+        // Once the mega.io iframe has loaded
+        megaIoIframe.onload = (ev) => {
+
+            console.info('Inside mega.nz iframe onload event', ev.contentWindow, ev);
+
+            let postMessageData = {};
+
+            // If logging in, encode the first name to Base64 and set the plan num if available (NB: Free is undefined)
+            if (loginStatus) {                
+                postMessageData = {
+                    firstName: base64urlencode(to8(u_attr.firstname)),
+                    planNum: (planNum || u_attr.p || undefined)
+                };
+
+                // Get the avatar
+                mega.attr.get(u_handle, 'a', true, false)
+                    .done((res) => {
+
+                        // If the avatar (in Base64) exists, add to the data
+                        if (typeof res !== 'number' && res.length > 5) {
+                            postMessageData.avatar = res;
+                        }
+                    })
+                    .always(() => {
+
+                        console.info('Sending postMessage data to mega.io iframe', postMessageData);
+
+                        // Send the data
+                        megaIoIframe.contentWindow.postMessage(postMessageData, iframeUrl);
+                    });
+            }
+            else {
+                // Logout data so the localStorage data on mega.io gets cleared
+                postMessageData = {
+                    clearUser: true
+                };
+
+                console.info('Sending logout postMessage data to mega.io iframe', postMessageData);
+
+                // Send the data
+                megaIoIframe.contentWindow.postMessage(postMessageData, iframeUrl);
+            }
+        };
+
+        // If they logged out, inform the logged out mega.io URL
+        if (!loginStatus) {
+            console.info('Setting mega.io iframe source to logged out URL');
+
+            megaIoIframe.src = iframeUrl + '/webclient/loggedout.html';
+        }
+        else {
+            console.info('Setting mega.io iframe source to logged in URL');
+
+            // Set the source to the logged in mega.io URL
+            megaIoIframe.src = iframeUrl + '/webclient/loggedin.html';
+        }
+    })();
 }
 
 (function(exportScope) {

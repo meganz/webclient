@@ -391,17 +391,6 @@
                 return false;
             }
         });
-
-        $('.checkbox-block.register .terms-check a', $dialog).rebind('click', function(e) {
-
-            e.preventDefault();
-            $.termsAgree = function() {
-                $('.register-check', $dialog).removeClass('checkboxOff')
-                    .addClass('checkboxOn');
-            };
-            bottomPageDialog(false, 'terms', false, true); // show terms dialog
-            return false;
-        });
     }
 
     /**

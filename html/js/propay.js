@@ -1020,9 +1020,6 @@ pro.propay = {
         // If recurring, always show recurring info box above the Pro pay page Purchase button and init click handler
         if (recurringEnabled) {
             $subscriptionInstructions.removeClass('hidden');
-            $subscriptionInstructions.rebind('click.subscriptioninstructions', () => {
-                bottomPageDialog(false, 'terms', false, true);
-            });
         }
         else {
             // Otherwise hide it

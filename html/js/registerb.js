@@ -388,27 +388,6 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         updateBreakdown(users, quota, userFare, extraFares.storageFare);
     };
 
-    // event handler for clicking on terms anchor
-    $('.bus-reg-agreement.mega-terms .radio-txt span', $pageContainer)
-        .rebind('click', function termsClickHandler() {
-            if (!is_mobile) {
-                bottomPageDialog(false, 'terms', false, true);
-            }
-            else {
-                var wentOut = false;
-                if (window.open) {
-                    var cutPlace = location.href.indexOf('/registerb');
-                    var myHost = location.href.substr(0, cutPlace);
-                    myHost += '/terms';
-                    wentOut = window.open(myHost, 'MEGA LIMITED TERMS OF SERVICE');
-                }
-                if (!wentOut) {
-                    loadSubPage('terms');
-                }
-            }
-            return false;
-        });
-
     // event handler for check box
     $('.bus-reg-agreement', $pageContainer).rebind(
         'click.suba',

@@ -973,9 +973,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[8762] = escapeHTML(l[8762]).replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[208] = escapeHTML(l[208]).replace('[/A]', '</a>');
     l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl" tabindex="-1">');
-    l['208.a2'] = l[208].replace('[A]', '<a href="/terms" tabindex="-1">');
-    l['208s'] = l[208].replace('[A]', '<a class="red txt-bold" href="#">');
-    l['208.g'] = l[208].replace('[A]', '<a class="green">');
+    l['208.a2'] = l[208].replace('[A]', '<a href="https://mega.io/terms" tabindex="-1" target="_blank">');
+    l['208s'] = l[208].replace('[A]', '<a href="https://mega.io/terms" class="red txt-bold" target="_blank">');
+    l['208.g'] = l[208].replace('[A]', '<a href="https://mega.io/terms" class="green" target="_blank">');
     l['208.g2'] = l[208].replace('[A]', '<a href="/terms" class="green clickurl" target="_blank">');
     l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
     l[517] = escapeHTML(l[517]).replace(
@@ -1017,7 +1017,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', `<a href="https://blog.mega.io/the-mega-vulnerability-reward-program" target="_blank">`)
         .replace('[/A]', '</a>');
 
-
     l[8644] = escapeHTML(l[8644]).replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = escapeHTML(l[8651]).replace('%1', '<span class="header-pro-plan"></span>');
     l[8653] = escapeHTML(l[8653]).replace('[S]', '<span class="renew-text">').replace('[/S]', '</span>')
@@ -1036,10 +1035,12 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[8951] = escapeHTML(l[8951]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[8952] = escapeHTML(l[8952]).replace('[S]', '<span>').replace('[/S]', '</span>');
 
-    l[10631] = escapeHTML(l[10631]).replace('[A]',
-        '<a href="https://mega.nz/terms/refunds" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
-    l[10630] = escapeHTML(l[10630]).replace('[A]',
-        '<a href="https://mega.nz/terms/refunds" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
+    l[10631] = escapeHTML(l[10631])
+        .replace('[A]', '<a href="https://mega.io/terms/#Refunds" target="_blank" rel="noopener noreferrer">')
+        .replace('[/A]', '</a>');
+    l[10630] = escapeHTML(l[10630])
+        .replace('[A]', '<a href="https://mega.io/terms/#Refunds" target="_blank" rel="noopener noreferrer">')
+        .replace('[/A]', '</a>');
     l[10634] = escapeHTML(l[10634])
         .replace('[A]', '<a href="https://mega.nz/support" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');

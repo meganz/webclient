@@ -3878,7 +3878,7 @@
     "no_mic_info": "Nie mo\u017cemy uzyska\u0107 dost\u0119pu do Twojego mikrofonu. Przejd\u017a do ustawie\u0144 przegl\u0105darki i zezw\u00f3l MEGA na dost\u0119p do mikrofonu.",
     "no_mic_title": "Microphone access needed ",
     "no_payment_providers": "Dostawcy p\u0142atno\u015bci nie s\u0105 obs\u0142ugiwani w Twoim regionie. Je\u015bli uwa\u017casz, \u017ce jest to b\u0142\u0105d, skontaktuj si\u0119 z obs\u0142ug\u0105 pod adresem support@mega.nz",
-    "no_screen_info": "To share your screen, change the screen sharing permissions in your System Settings or in your browser settings.",
+    "no_screen_info": "Aby udost\u0119pni\u0107 ekran, zmie\u0144 uprawnienia do udost\u0119pniania ekranu w ustawieniach systemu lub w ustawieniach przegl\u0105darki.",
     "no_screen_title": "Nie mo\u017cna udost\u0119pni\u0107 ekranu",
     "no_selected_items": "Nie wybrano \u017cadnych element\u00f3w",
     "notif_body_incoming_attch": "{count, plural, one {%s udost\u0119pni\u0142 plik na czacie.} few {%s udost\u0119pni\u0142 # pliki na czacie.} many {%s udost\u0119pni\u0142 # pliki na czacie.} other {%s udost\u0119pni\u0142 # pliki na czacie.}}",

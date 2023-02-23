@@ -807,6 +807,8 @@ var mega = {
     redirect: function(to, page, kv, urlQs) {
         'use strict';
         var storage = localStorage;
+        const toMegaIo = to === 'mega.io';
+        let getCount = 0;
 
         to = (String(to).indexOf('//') < 0 ? 'https://' : '') + to;
 
@@ -824,14 +826,24 @@ var mega = {
         var affts = sessionStorage.affts || storage.affts;
         if (affid && affts && !(Date.now() - affts > 864e5)) {
             to += '?aff=' + affid;
+            getCount++;
+        }
+
+        const _getSeperator = () => {
+            if (toMegaIo) {
+                return getCount++ ? '&' : '?';
+            }
+            else {
+                return '/';
+            }
         }
 
         if (storage.csp) {
-            to += '/csp=' + storage.csp;
+            to += `${_getSeperator()}csp=${storage.csp}`;
         }
 
         if (storage.utm) {
-            to += '/sra=' + b64encode(storage.utm);
+            to += `${_getSeperator()}sra=${b64encode(storage.utm)}`;
         }
 
         if (Array.isArray(kv)) {

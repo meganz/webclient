@@ -199,8 +199,7 @@ var Secureboot = function() {
                 var currentSection =
                     content[i].indexOf('if (is_drop') > 0 ? 'drop' :
                         content[i].indexOf('if (is_embed') > 0 ? 'embed' :
-                            content[i].indexOf('if (is_litesite') > 0 ? 'lite' :
-                                section;
+                            section;
 
                 if (currentSection !== section) {
                     // console.log('Section move, %s->%s', section, currentSection);

@@ -140,28 +140,6 @@ RepayPage.prototype.initPage = function() {
             $me.removeClass('radioOff').addClass('radioOn');
         });
 
-
-    // event handler for clicking on terms anchor
-    $('.bus-reg-agreement.mega-terms .radio-txt a', $leftSection)
-        .rebind('click', function termsClickHandler() {
-            if (!is_mobile) {
-                bottomPageDialog(false, 'terms', false, true);
-            }
-            else {
-                var wentOut = false;
-                if (window.open) {
-                    var cutPlace = location.href.indexOf('/registerb');
-                    var myHost = location.href.substr(0, cutPlace);
-                    myHost += '/terms';
-                    wentOut = window.open(myHost, 'MEGA LIMITED TERMS OF SERVICE');
-                }
-                if (!wentOut) {
-                    loadSubPage('terms');
-                }
-            }
-            return false;
-        });
-
     $('.bus-reg-agreement.mega-terms .checkdiv', $leftSection)
         .removeClass('checkboxOn').addClass('checkboxOff');
 

@@ -612,7 +612,7 @@
             $(this.firstText).html(
                 escapeHTML(!this.isLogout ? l[16900] : l[20633])
                     .replace('[A]', '<a \n' +
-                        'href="https://mega.nz/security" target="_blank" class="red">')
+                        'href="https://mega.io/security" target="_blank" class="red">')
                     .replace('[/A]', '</a>')
             );
         }

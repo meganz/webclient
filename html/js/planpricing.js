@@ -985,6 +985,11 @@ lazy(pro, 'proplan2', () => {
                 return false;
             }
 
+            // They're from mega.io with a plan chosen, but they need to register first before going to /propay_x
+            if (is_mobile && window.nextPage === '1' && window.pickedPlan){
+                return loadSubpage('register');
+            }
+
             loadingDialog.show();
 
             await fetchPlansData();

@@ -334,6 +334,12 @@ lazy(self, 'csp', () => {
 
                     eventlog(99743, JSON.stringify([1, type, value | 0, chg | 0, pid, ctx]));
                 }
+
+                // If they came from mega.io to directly edit their cookie settings, go back
+                // there after saving so they don't remain on the placeholder background page
+                if (page === 'cookiedialog') {
+                    window.location.replace('https://mega.io/cookie');
+                }
             };
 
             value |= CS_ESSENT;

@@ -18,22 +18,19 @@
 
     var CMS = {scope: ''};
     var IMAGE_PLACEHOLDER = staticpath + "/images/img_loader@2x.png";
-    var isReady = true;
+    var isReady = false;
 
-    if (!is_litesite) {
-        isReady = false;
-        mBroadcaster.once('startMega', function() {
-            for (var sub in signPubKey) {
-                if (!signPubKey.hasOwnProperty(sub)) {
-                    continue;
-                }
-                for (var l = 0; l < signPubKey[sub].length; ++l) {
-                    signPubKey[sub][l] = asmCrypto.base64_to_bytes(signPubKey[sub][l]);
-                }
+    mBroadcaster.once('startMega', () => {
+        for (var sub in signPubKey) {
+            if (!signPubKey.hasOwnProperty(sub)) {
+                continue;
             }
-            isReady = true;
-        });
-    }
+            for (var l = 0; l < signPubKey[sub].length; ++l) {
+                signPubKey[sub][l] = asmCrypto.base64_to_bytes(signPubKey[sub][l]);
+            }
+        }
+        isReady = true;
+    });
 
     var cmsRetries = 1; // how many times to we keep retyring to ping the CMS before using the snapshot?
     var fetching = {};
@@ -112,9 +109,7 @@
     }
 
     function verify_cms_content(content, signature, objectId) {
-        if (is_litesite) {
-            return true;
-        }
+
         var hash = asmCrypto.SHA256.bytes(content);
         signature = asmCrypto.string_to_bytes(ab_to_str(signature));
         var i;

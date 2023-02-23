@@ -24,6 +24,12 @@ var sms = {
             $closeButton.rebind('click', () => {
                 $dialog.addClass('hidden');
                 $background.addClass('hidden');
+
+                // This dialog is also used on the /smsdialog page, but if they used the Close/Not Now buttons on this
+                // page they would be left with a blank background, so instead we load /login (or /fm if logged in).
+                if (page === 'smsdialog') {
+                    loadSubPage('login');
+                }
             });
         }
     },

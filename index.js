@@ -503,7 +503,9 @@ function init_page() {
         var ctLink = page.substring(2, page.length);
         if (!is_mobile) {
             if (!u_type) {
+                parsepage(pages.placeholder);
                 openContactInfoLink(ctLink);
+                return;
             }
             else {
                 page = 'fm/chat/contacts';
@@ -524,7 +526,9 @@ function init_page() {
                 contactInfoCard.showContactLinkInfo();
             };
             if (!u_type) {
-                mBroadcaster.once('HomeStartPageRendered:mobile', processContactLink);
+                parsepage(pages.placeholder);
+                processContactLink();
+                return;
             }
             else {
                 loadSubPage('fm');

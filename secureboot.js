@@ -829,7 +829,7 @@ var mega = {
             getCount++;
         }
 
-        var _getSeperator = () => {
+        var _getSeperator = function() {
             if (toMegaIo) {
                 return getCount++ ? '&' : '?';
             }

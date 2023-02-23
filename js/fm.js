@@ -919,6 +919,9 @@ function avatarDialog(close) {
                 mega.attr.set('a', ab_to_base64(data), true, false);
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
+                // Update mega.io about the new avatar change
+                initMegaIoIframe(true);
+
                 $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
                 $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
                 avatarDialog(1);
@@ -942,6 +945,10 @@ function avatarDialog(close) {
         msgDialog('confirmation', 'confirm-remove-avatar', l[18699], l[6973], function(response) {
             if (response){
                 mega.attr.set('a', "none", true, false);
+
+                // Update mega.io about the new avatar change
+                initMegaIoIframe(true);
+
                 avatarDialog(1);
             }
         });

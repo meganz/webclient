@@ -345,7 +345,7 @@ mBroadcaster.once('startMega', async() => {
 mBroadcaster.once('boot_done', function radSetup() {
     'use strict';
 
-    const exclude = is_mobile || is_karma || is_litesite || is_iframed || localStorage.norad || !is_livesite;
+    const exclude = is_mobile || is_karma || is_iframed || localStorage.norad || !is_livesite;
     if (exclude && !sessionStorage.rad) {
         return;
     }

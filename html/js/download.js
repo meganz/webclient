@@ -13,9 +13,7 @@ var maxDownloadSize = Math.pow(2, 53);
 function dlinfo(ph,key,next)
 {
     $('.widget-block').addClass('hidden');
-    if (!is_mobile) {
-        init_start();
-    }
+
     if (dlMethod === FlashIO) {
         $('.mega-dialog.download-dialog').removeClass('hidden');
         $('.mega-dialog.download-dialog').css('left','-1000px');

@@ -3878,7 +3878,7 @@
     "no_mic_info": "Non possiamo accedere al tuo microfono. Vai nelle impostazioni del tuo browser e permetti a MEGA di accedere al tuo microfono.",
     "no_mic_title": "Microphone access needed ",
     "no_payment_providers": "I provider dei pagamenti non sono supportati nella tua regione. Se credi che questo sia un errore, per favore contatta il supporto a support@mega.nz",
-    "no_screen_info": "To share your screen, change the screen sharing permissions in your System Settings or in your browser settings.",
+    "no_screen_info": "To share your screen, change the screen sharing permissions in your system or browser Settings.",
     "no_screen_title": "Impossibile condividere lo schermo",
     "no_selected_items": "Nessun oggetto selezionato",
     "notif_body_incoming_attch": "{count, plural, one {%s ha condiviso un file con te in chat.} many {%s ha condiviso # file con te in chat.} other {%s ha condiviso # file con te in chat.}}",

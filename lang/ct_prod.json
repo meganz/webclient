@@ -3878,7 +3878,7 @@
     "no_mic_info": "\u6211\u5011\u7121\u6cd5\u5b58\u53d6\u60a8\u7684\u9ea5\u514b\u98a8\u3002\u8acb\u81f3\u60a8\u7684\u700f\u89bd\u5668\u8a2d\u5b9a\u4e26\u5141\u8a31MEGA\u5b58\u53d6\u60a8\u7684\u9ea5\u514b\u98a8\u3002",
     "no_mic_title": "Microphone access needed ",
     "no_payment_providers": "\u60a8\u6240\u5728\u5730\u5340\u6c92\u6709\u652f\u63f4\u7684\u652f\u4ed8\u670d\u52d9\u63d0\u4f9b\u5546\u3002\u5982\u6709\u7591\u554f\uff0c\u8acb\u806f\u7e6b\u5ba2\u670d support@mega.nz",
-    "no_screen_info": "To share your screen, change the screen sharing permissions in your System Settings or in your browser settings.",
+    "no_screen_info": "To share your screen, change the screen sharing permissions in your system or browser Settings.",
     "no_screen_title": "\u7121\u6cd5\u5171\u4eab\u87a2\u5e55\u756b\u9762",
     "no_selected_items": "\u6c92\u6709\u9078\u64c7\u9805\u76ee",
     "notif_body_incoming_attch": "{count, plural, other {%s\u5728\u5c0d\u8a71\u4e2d\u8207\u60a8\u5171\u4eab\u4e86#\u500b\u6a94\u6848\u3002}}",

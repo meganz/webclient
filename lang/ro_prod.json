@@ -3878,7 +3878,7 @@
     "no_mic_info": "We can\u2019t access your microphone. Go to your browser settings and allow MEGA to access your microphone.",
     "no_mic_title": "Microphone access needed ",
     "no_payment_providers": "Payment providers not supported in your region. If you believe this is an error please contact support on support@mega.nz",
-    "no_screen_info": "To share your screen, change the screen sharing permissions in your System Settings or in your browser settings.",
+    "no_screen_info": "To share your screen, change the screen sharing permissions in your system or browser Settings.",
     "no_screen_title": "Nu se poate partaja ecranul",
     "no_selected_items": "Niciun element selectat",
     "notif_body_incoming_attch": "{count, plural, one {%s a partajat un fi\u0219ier cu tine pe chat.} few {%s a partajat # fi\u0219iere cu tine pe chat.} other {%s a partajat # de fi\u0219iere cu tine pe chat.}}",

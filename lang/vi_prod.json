@@ -3878,7 +3878,7 @@
     "no_mic_info": "Kh\u00f4ng th\u1ec3 truy c\u1eadp v\u00e0o micr\u00f4 c\u1ee7a b\u1ea1n \u0111\u01b0\u1ee3c. Xin \u0111i \u0111\u1ebfn ph\u1ea7n thi\u1ebft \u0111\u1eb7t c\u1ee7a tr\u00ecnh duy\u1ec7t web \u0111ang s\u1eed d\u1ee5ng v\u00e0 cho ph\u00e9p MEGA c\u00f3 quy\u1ec1n truy c\u1eadp v\u00e0o micr\u00f4.",
     "no_mic_title": "Microphone access needed ",
     "no_payment_providers": "D\u1ecbch v\u1ee5 cung c\u1ea5p thanh to\u00e1n kh\u00f4ng \u0111\u01b0\u1ee3c h\u1ed7 tr\u1ee3 trong khu v\u1ef1c c\u1ee7a qu\u00fd kh\u00e1ch. N\u1ebfu qu\u00fd kh\u00e1ch cho r\u1eb1ng \u0111\u00e2y l\u00e0 l\u1ed7i, xin li\u00ean h\u1ec7 v\u1edbi b\u1ed9 ph\u1eadn h\u1ed7 tr\u1ee3 t\u1ea1i support@mega.nz",
-    "no_screen_info": "To share your screen, change the screen sharing permissions in your System Settings or in your browser settings.",
+    "no_screen_info": "To share your screen, change the screen sharing permissions in your system or browser Settings.",
     "no_screen_title": "Kh\u00f4ng th\u1ec3 chia s\u1ebb m\u00e0n h\u00ecnh",
     "no_selected_items": "Ch\u01b0a c\u00f3 m\u1ee5c n\u00e0o \u0111\u01b0\u1ee3c ch\u1ecdn",
     "notif_body_incoming_attch": "{count, plural, other {%s \u0111\u00e3 chia s\u1ebb # t\u1ec7p tin cho b\u1ea1n trong cu\u1ed9c ch\u00e1t.}}",

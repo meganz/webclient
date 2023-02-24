@@ -807,8 +807,8 @@ var mega = {
     redirect: function(to, page, kv, urlQs) {
         'use strict';
         var storage = localStorage;
-        const toMegaIo = to === 'mega.io';
-        let getCount = 0;
+        var toMegaIo = to === 'mega.io';
+        var getCount = 0;
 
         to = (String(to).indexOf('//') < 0 ? 'https://' : '') + to;
 
@@ -829,7 +829,7 @@ var mega = {
             getCount++;
         }
 
-        const _getSeperator = () => {
+        var _getSeperator = function() {
             if (toMegaIo) {
                 return getCount++ ? '&' : '?';
             }
@@ -869,7 +869,7 @@ var mega = {
     getMegaIoMappedLang(userLang) {
 
         // Webclient (mega.nz) to mega.io mappings
-        const mappings = {
+        var mappings = {
             'en': '',
             'ar': 'ar',
             'br': 'pt-br',
@@ -897,7 +897,7 @@ var mega = {
             'vi': 'vi'
         };
 
-        const mappedLang = mappings[userLang];
+        var mappedLang = mappings[userLang];
 
         return typeof mappedLang === 'undefined' ? '' : mappedLang;
     },

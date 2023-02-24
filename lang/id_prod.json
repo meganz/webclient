@@ -3878,7 +3878,7 @@
     "no_mic_info": "Kami tidak dapat mengakses mikrofon anda. Buka pengaturan browser anda dan izinkan MEGA mengakses mikrofon anda.",
     "no_mic_title": "Microphone access needed ",
     "no_payment_providers": "Penyedia pembayaran tidak didukung di wilayah anda. Jika anda yakin ini adalah kesalahan, silakan hubungi bantuan di support@mega.nz",
-    "no_screen_info": "To share your screen, change the screen sharing permissions in your System Settings or in your browser settings.",
+    "no_screen_info": "To share your screen, change the screen sharing permissions in your system or browser Settings.",
     "no_screen_title": "Tidak dapat membagikan layar",
     "no_selected_items": "Tidak ada item yang dipilih",
     "notif_body_incoming_attch": "{count, plural, other {%s berbagi # file dengan anda di obrolan.}}",

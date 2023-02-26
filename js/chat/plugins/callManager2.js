@@ -533,6 +533,9 @@
             }
             this.callTimeoutDone(true);
             this.chatRoom.callParticipantsUpdated(); // av: I have added it just in case, but do we need this?
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
         }
         muteIfAlone() {
             if (!this.isDestroyed && this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {

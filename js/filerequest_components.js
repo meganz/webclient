@@ -166,6 +166,10 @@ lazy(mega, 'fileRequestUI', () => {
             }
 
             const clickHandler = (evt) => {
+                if (is_mobile && !validateUserAction(true)) {
+                    return false;
+                }
+
                 const stopPropagation = typeof this.options.propagate !== 'undefined' && !this.options.propagate;
                 const inputElement = evt.target;
                 const $input = $(inputElement);
@@ -237,6 +241,10 @@ lazy(mega, 'fileRequestUI', () => {
 
         setOnClick() {
             this.eventOnClick(($input) => {
+                if (M.isInvalidUserStatus()) {
+                    return;
+                }
+
                 const optionCallback = this.options.callback;
                 if (!optionCallback) {
                     return;

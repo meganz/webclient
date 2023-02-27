@@ -18848,7 +18848,6 @@ class Call extends mixins.wl {
       ephemeral: false,
       offline: false,
       ephemeralAccounts: [],
-      stayOnEnd: !!mega.config.get('callemptytout'),
       everHadPeers: false,
       guest: Call.isGuest()
     };
@@ -18883,9 +18882,6 @@ class Call extends mixins.wl {
           }, () => {
             call.setViewMode(this.state.mode);
           });
-          if (call.peers.length === 0) {
-            this.showTimeoutDialog();
-          }
         } else if (this.state.mode === Call.MODE.SPEAKER && call.forcedActiveStream && !streams[call.forcedActiveStream]) {
           this.setState({
             mode: Call.MODE.THUMBNAIL
@@ -18905,11 +18901,6 @@ class Call extends mixins.wl {
             mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI
           }, () => {
             call.setViewMode(this.state.mode);
-          });
-        }
-        if (this.state.stayOnEnd !== !!mega.config.get('callemptytout')) {
-          this.setState({
-            stayOnEnd: !!mega.config.get('callemptytout')
           });
         }
         if (call.hasOtherParticipant()) {
@@ -18936,27 +18927,28 @@ class Call extends mixins.wl {
       const {
         mode,
         sidebar,
-        view,
-        stayOnEnd
+        view
       } = this.state;
+      const {
+        stayOnEnd
+      } = call;
       Call.STATE.PREVIOUS = mode !== Call.MODE.MINI ? {
         mode,
         sidebar,
         view
       } : Call.STATE.PREVIOUS;
-      const noPeers = () => {
-        onCallMinimize();
-        if (typeof call.callToutId !== 'undefined' && !stayOnEnd) {
-          this.showTimeoutDialog();
-        }
-      };
       return streams.length > 0 ? this.setState({
         mode: Call.MODE.MINI,
         sidebar: false
       }, () => {
         onCallMinimize();
         call.setViewMode(Call.MODE.MINI);
-      }) : noPeers();
+      }) : (() => {
+        onCallMinimize();
+        if (typeof call.callToutId !== 'undefined' && !stayOnEnd) {
+          onIdle(() => call.showTimeoutDialog());
+        }
+      })();
     };
     this.handleCallExpand = async () => {
       return new Promise(resolve => {
@@ -19074,11 +19066,8 @@ class Call extends mixins.wl {
       const {
         call
       } = this.props;
-      eventlog(99760, JSON.stringify([call.callId, 1]));
-      this.setState({
-        stayOnEnd: true
-      });
-      call.initCallTimeout(true);
+      call.handleStayConfirm();
+      onIdle(() => this.safeForceUpdate());
     };
     this.state.mode = props.call.viewMode;
     this.state.sidebar = props.chatRoom.type === 'public';
@@ -19092,14 +19081,6 @@ class Call extends mixins.wl {
         offline: true
       });
     }, 3e4);
-  }
-  showTimeoutDialog() {
-    msgDialog(`warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`, 'stay-on-call', l.empty_call_dlg_title, mega.icu.format(l.empty_call_dlg_text_min, 2).replace('%s', '02:00'), res => {
-      if (res === null) {
-        return;
-      }
-      return res ? this.handleStayConfirm() : this.handleCallEnd(1);
-    }, 1);
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -19143,9 +19124,6 @@ class Call extends mixins.wl {
       if (!mega.config.get('callemptytout') && !call.hasOtherParticipant()) {
         call.left = true;
         call.initCallTimeout();
-        if (!Call.isExpanded()) {
-          this.showTimeoutDialog();
-        }
       }
       delete this.callStartTimeout;
     }, 300000);
@@ -19181,9 +19159,11 @@ class Call extends mixins.wl {
       ephemeralAccounts,
       guest,
       offline,
-      stayOnEnd,
       everHadPeers
     } = this.state;
+    const {
+      stayOnEnd
+    } = call;
     const STREAM_PROPS = {
       mode,
       streams,

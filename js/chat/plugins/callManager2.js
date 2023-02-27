@@ -370,6 +370,7 @@
             megaChat.activeCall = this;
             // Peer is alone in a group call after 1 min -> mute mic
             delay('call:init', this.muteIfAlone.bind(this), 6e4);
+            this.stayOnEnd = !!mega.config.get('callemptytout');
         }
         get isPublic() {
             const type = this.chatRoom && this.chatRoom.type;
@@ -426,6 +427,9 @@
             // this.sfuApp.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
             if (peer.userId !== u_handle) {
                 this.callTimeoutDone();
+            }
+            if (this.stayOnEnd !== !!mega.config.get('callemptytout')) {
+                this.stayOnEnd = !!mega.config.get('callemptytout');
             }
         }
         onPeerLeft(peer, reason) {
@@ -586,7 +590,11 @@
                 ChatToast.flush(); // We don't want this toast to be held up by any other toasts so clear them out.
                 this.callToutId
                     .setOnShown(function() {
+                        // `this` is the toast object not the call.
                         this.callToutEnd = unixtime() + 120;
+                        if (megaChat.activeCall) {
+                            megaChat.activeCall.showTimeoutDialog();
+                        }
                     })
                     .setUpdater(function() {
                         let timeRemain = (this.callToutEnd || unixtime() + 120) - unixtime();
@@ -615,6 +623,36 @@
                     .setClose(false)
                     .dispatch();
             }
+        }
+        showTimeoutDialog() {
+            if (document.body.classList.contains('in-call')) {
+                return;
+            }
+            msgDialog(
+                `warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`,
+                'stay-on-call',
+                l.empty_call_dlg_title,
+                mega.icu.format(l.empty_call_dlg_text_min, 2).replace('%s', '02:00'),
+                res => {
+                    if (res === null) {
+                        return;
+                    }
+                    if (res) {
+                        this.handleStayConfirm();
+                        return;
+                    }
+                    eventlog(99760, JSON.stringify([this.callId, 0]));
+                    if (this.sfuApp) {
+                        this.sfuApp.destroy();
+                    }
+                },
+                1
+            );
+        }
+        handleStayConfirm() {
+            eventlog(99760, JSON.stringify([this.callId, 1]));
+            this.stayOnEnd = true;
+            this.initCallTimeout(true);
         }
         hasOtherParticipant() {
             const {peers} = this;

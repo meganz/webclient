@@ -15,9 +15,7 @@ lazy(mega, 'fileRequest', () => {
     };
 
     const openCreateDialogFromSelect = (selectedNodeHandle) => {
-        mega.fileRequest.dialogs.createDialog.init(selectedNodeHandle, {
-            dialog: false
-        });
+        mega.fileRequest.dialogs.createDialog.init(selectedNodeHandle);
     };
 
     const openNewDialogHandler = () => {
@@ -211,7 +209,8 @@ lazy(mega, 'fileRequest', () => {
                         name: u_attr.name,
                         title,
                         description,
-                        theme: u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : ''
+                        theme: u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : '',
+                        pupHandle: this.puPagePublicHandle || null
                     };
                 }
             });
@@ -304,10 +303,10 @@ lazy(mega, 'fileRequest', () => {
             this.addEventHandlers();
         }
 
-        init(selectedHandle, settings) {
+        init(selectedHandle) {
             // Reset fields
             this.initTitleDescInput();
-            this.$selectFolder.init(settings);
+            this.$selectFolder.init();
 
             // Reset error messages
             this.setContext({
@@ -319,6 +318,7 @@ lazy(mega, 'fileRequest', () => {
             this.folderName = this.fileObject && this.fileObject.name || null;
             if (this.folderName) {
                 this.$selectFolder.setFolder(this.folderName);
+                this.$selectFolder.setNodeHandle(selectedHandle);
             }
 
             M.safeShowDialog('file-request-create-dialog', this.$dialog);
@@ -1257,6 +1257,7 @@ lazy(mega, 'fileRequest', () => {
                                 description: this.context.description || null,
                             });
                         }
+                        $('.mobile.file-manager-block').removeClass('disable-scroll');
                     },
                     propagate: false
                 }

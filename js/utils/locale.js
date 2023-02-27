@@ -1543,7 +1543,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a class="upload-btn block-empty-upload-link" href="#">')
         .replace('[/A]', '</a>');
     l.file_request_upload_caption_2 = l.file_request_upload_caption_2
-        .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/file-request">')
+        .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/upload-file-request">')
         .replace('[/A]', '</a>');
 
 

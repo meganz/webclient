@@ -2469,6 +2469,10 @@ FileManager.prototype.createFolderUI = function() {
     });
 
     $('.fm-new-link').rebind('click', function() {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
+
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }

@@ -256,6 +256,10 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
 
             // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button
             $('.shared-details-info-block .fm-leave-share').rebind('click', function(e) {
+                if (M.isInvalidUserStatus()) {
+                    return;
+                }
+
                 // Get the share ID from the hash in the URL
                 var shareId = getSitePath().replace('/fm/', '');
 

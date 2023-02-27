@@ -8,9 +8,6 @@
     width: var(--icon-size, 16px);
     height: var(--icon-size, 16px);
 }
-.sprite-mobile-fm-uni.mega-logo-full, .sprite-mobile-fm-uni-before.mega-logo-full-before::before, .sprite-mobile-fm-uni-after.mega-logo-full-after::after {
-   background-image: url("../../images/sprites/mobile-fm-uni@uni.svg#mega-logo-full");
-}
 .sprite-mobile-fm-uni.mime-3d-outline, .sprite-mobile-fm-uni-before.mime-3d-outline-before::before, .sprite-mobile-fm-uni-after.mime-3d-outline-after::after {
    background-image: url("../../images/sprites/mobile-fm-uni@uni.svg#mime-3d-outline");
 }

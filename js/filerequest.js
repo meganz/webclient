@@ -850,27 +850,9 @@ lazy(mega, 'fileRequest', () => {
             }
         }
 
-        isInvalidUserStatus() {
-            if (is_mobile) {
-                return !validateUserAction();
-            }
-
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
-                return true;
-            }
-
-            return false;
-        }
-
         addEventHandlers() {
             this.$createButton.eventOnClick(() => {
-                if (this.isInvalidUserStatus()) {
+                if (!validateUserAction()) {
                     return false;
                 }
 
@@ -881,7 +863,7 @@ lazy(mega, 'fileRequest', () => {
             });
 
             this.$manageButton.eventOnClick(() => {
-                if (this.isInvalidUserStatus()) {
+                if (!validateUserAction()) {
                     return false;
                 }
 
@@ -909,7 +891,7 @@ lazy(mega, 'fileRequest', () => {
             });
 
             this.$removeButton.eventOnClick(() => {
-                if (this.isInvalidUserStatus()) {
+                if (!validateUserAction()) {
                     return false;
                 }
 

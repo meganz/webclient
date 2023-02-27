@@ -971,7 +971,8 @@ Object.defineProperty(mega, 'BID', {
 Object.defineProperty(mega, 'paywall', {
     get: function() {
         'use strict';
-        return typeof u_attr === 'object' && (u_attr.uspw || u_attr.b && u_attr.b.s === -1) || false;
+        return typeof u_attr === 'object' &&
+            (u_attr.uspw || u_attr.b && u_attr.b.s === -1 || u_attr.pf && u_attr.pf.s === -1) || false;
     }
 });
 

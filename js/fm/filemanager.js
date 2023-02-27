@@ -94,9 +94,10 @@ FileManager.prototype.constructor = FileManager;
 
 FileManager.prototype.showExpiredBusiness = function() {
     'use strict';
-    M.require('businessAcc_js', 'businessAccUI_js').done(function() {
-        var business_ui = new BusinessAccountUI();
-        business_ui.showExpiredDialog(u_attr.b.m);
+    M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+        const isMaster = u_attr.b && u_attr.b.m || u_attr.pf;
+        const business_ui = new BusinessAccountUI();
+        business_ui.showExpiredDialog(isMaster);
     });
 };
 
@@ -104,7 +105,7 @@ FileManager.prototype.showExpiredBusiness = function() {
 FileManager.prototype.isInvalidUserStatus = function() {
     'use strict';
     if (mega.paywall) {
-        if (u_attr.b && u_attr.b.s === -1) {
+        if ((u_attr.b && u_attr.b.s === -1) || (u_attr.pf && u_attr.pf.s === -1)) {
             if ($.hideContextMenu) {
                 $.hideContextMenu();
             }

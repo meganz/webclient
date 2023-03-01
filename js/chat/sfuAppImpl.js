@@ -249,12 +249,13 @@ class PlayerData {
             if (!window.sfuClient) {
                 return;
             }
-            let text = `${track.cid}: `;
+            let text = `${track.peer.cid}: `;
             if (raw.frameWidth) {
                 text += `${raw.frameWidth}x${raw.frameHeight} `;
             }
             text += `${raw.framesPerSecond || 0}fps ${Math.round(info.keyfps)}kfs ${Math.round(info.kbps)
-                }kbps rtt: ${sfuClient.rtcStats.rtt}, pl: ${Math.round(info.plost)}, rxq: ${sfuClient.rxQuality}`;
+                }kbps rtt: ${sfuClient.rtcStats.rtt}, apl: ${track.peer.audioPktLoss.toFixed(1)
+                }%, vpl: ${info.plost.toFixed(1)}%, rxq: ${sfuClient.rxQuality}`;
 
             for (const cons of this.appPeer.consumers) {
                 cons.displayStats(text);

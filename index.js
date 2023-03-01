@@ -423,13 +423,19 @@ function init_page() {
             return false;
         }
 
+        page = page.slice(0, 36);
+        const [publicChatHandle, publicChatKey] = page.replace('chat/', '').split('#');
+        if (!publicChatHandle || publicChatHandle.length !== 8 || !publicChatKey || publicChatKey.length !== 22) {
+            return u_type ? loadSubPage('fm/chat') : loadSubPage('securechat');
+        }
+
         if (typeof is_chatlink !== 'object') {
             is_chatlink = Object.create(null);
         }
 
         Object.defineProperties(is_chatlink, {
-            ph: {value: page.substr(5, 8)},
-            key: {value: page.substr(14).split("?")[0]},
+            ph: { value: publicChatHandle },
+            key: { value: publicChatKey },
             pnh: {
                 get: function() {
                     return this.url && this.ph;

@@ -727,6 +727,10 @@ function fmtopUI() {
         }
     }
     $('.fm-clearbin-button').rebind('click', function() {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
+
         doClearbin(true);
     });
 

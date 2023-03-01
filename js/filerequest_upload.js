@@ -319,6 +319,7 @@ lazy(mega, 'fileRequestUpload', () => {
             this.$labelTitle = $('.detail-title', this.$wrapper);
             this.$labelDescription = $('.detail-description', this.$wrapper);
             this.$labelUploadId = $('.detail-upload-id .upload-id', this.$wrapper);
+            this.$labelUploadIdWrapper = $('.detail-upload-id', this.$wrapper);
 
             this.$selectFileButton = $('#fileselect5', document.body);
             this.$uploadItems = $('.block-uploading-scroll', this.$wrapper);
@@ -526,10 +527,13 @@ lazy(mega, 'fileRequestUpload', () => {
             }
 
             $item.$.progress.css('width', `${perc}%`);
-            $item.currentSize = bl;
             $item.percent = perc;
 
-            if (!$item.$.element) {
+            if (bl) {
+                $item.currentSize = bl;
+            }
+
+            if ($item.$.element) {
                 $item.$.element.removeClass('transfer-initiliazing transfer-queued');
                 $item.$.element.addClass('transfer-started');
             }
@@ -601,6 +605,11 @@ lazy(mega, 'fileRequestUpload', () => {
                     ulmanager.abort(gid);
                 }
                 $errorMessage.text(message);
+
+                this.onItemUploadProgress({
+                    id: uid
+                }, 0, 0, 100, 0);
+
                 return;
             }
 
@@ -707,12 +716,12 @@ lazy(mega, 'fileRequestUpload', () => {
                 true
             );
 
-            this.$wrapperEmptyBlock
-                .addClass('block-empty-error')
-                .removeClass('hidden');
+            this.showEmptyBlockError();
 
             this.$wrapperItems.addClass('hidden');
             this.$wrapperStatus.addClass('hidden');
+
+            this.$labelUploadIdWrapper.addClass('hidden');
         }
 
         hasError() {
@@ -760,6 +769,12 @@ lazy(mega, 'fileRequestUpload', () => {
 
             return `${newName} (${index - 1})_${this.id}.${ext}`;
         }
+
+        showEmptyBlockError() {
+            this.$wrapperEmptyBlock
+                .addClass('block-empty-error')
+                .removeClass('hidden');
+        }
     }
 
     return new class FileRequestUploadPageHandler {
@@ -779,7 +794,7 @@ lazy(mega, 'fileRequestUpload', () => {
 
         async handlePublicUploadPage(uploadPagePath) {
             const parameters = this.parseParameters(uploadPagePath);
-            if (parameters.isPreview) {
+            if (parameters.isPreview && !parameters.isUpdate) {
                 this.handlePreview(parameters);
                 return;
             }
@@ -914,11 +929,18 @@ lazy(mega, 'fileRequestUpload', () => {
         handleChecked() {
             this.parsePage();
 
-            mega.ui.theme.set(0);
-
-            const {name, description, msg: title} = this.puHandleObjectData;
+            let {name, description, msg: title} = this.puHandleObjectData;
+            let theme = 0;
 
             this.uploadPage.init();
+            if (this.parameters && this.parameters.isUpdate) {
+                name = this.parameters.name || '';
+                title = this.parameters.title || '';
+                description = this.parameters.description || '';
+                theme = this.parameters.theme !== '' && parseInt(this.parameters.theme) || 0;
+            }
+
+            mega.ui.theme.set(theme);
             this.uploadPage.setLabel(name, title, description);
 
             this.api
@@ -967,12 +989,13 @@ lazy(mega, 'fileRequestUpload', () => {
             const theme = parameters.theme !== '' && parseInt(parameters.theme) || 0;
 
             mega.ui.theme.set(theme);
+            this.uploadPage.setError(true);
 
             this.uploadPage.init();
-            this.uploadPage.initUploadEventHandler();
-            InitFileDrag();
             this.uploadPage.setLabel(name, title, description);
             this.uploadPage.initLanguage();
+
+            this.uploadPage.showEmptyBlockError();
         }
 
         handle(puPageObject, puPagePublicHandle) {
@@ -1056,7 +1079,9 @@ lazy(mega, 'fileRequestUpload', () => {
         }
 
         parseParameters(pagePath) {
-            const isPreview = pagePath.substr(0, 1) === '!';
+            const previewIndex = pagePath.indexOf('!');
+            const isPreview = previewIndex > -1;
+            let isUpdate = false;
 
             if (isPreview) {
                 const parsedPath = String(pagePath).split('!');
@@ -1092,14 +1117,22 @@ lazy(mega, 'fileRequestUpload', () => {
                     description,
                     theme
                 };
-
-                return this.parameters;
             }
 
-            const pupHandle = pagePath.substr(0, 14);
+            let pupHandle = null;
+            if (pagePath.substr(0, 1) !== '!') {
+                const endIndex = isPreview ? previewIndex : 14;
+                pupHandle = pagePath.substr(0, endIndex);
+
+                if (isPreview) { // It has a pup handle and has preview parameters
+                    isUpdate = true;
+                }
+            }
+
             this.parameters = {
-                isPreview,
-                puPageId: pupHandle
+                isUpdate,
+                puPageId: pupHandle,
+                ...this.parameters
             };
 
             return this.parameters;

@@ -186,6 +186,10 @@ mobile.cloud.contextMenu = {
         'use strict';
 
         $contextMenu.find(".restore-item").off('tap').on('tap', function() {
+            if (!validateUserAction(true)) {
+                return false;
+            }
+
             mobile.rubbishBin.restore(nodeHandle)
                 .always(function() {
                     // Manually filter out the item we just removed from the current view.
@@ -217,6 +221,10 @@ mobile.cloud.contextMenu = {
         'use strict';
 
         $contextMenu.find(".delete-item").off('tap').on('tap', function() {
+            if (!validateUserAction(true)) {
+                return false;
+            }
+
             $.selected = [nodeHandle];
             M.clearRubbish(false)
                 .then(function() {

@@ -902,7 +902,7 @@ lazy(mega, 'fileRequestCommon', () => {
             return `${getBaseUrl()}/filerequest/${puPagePublicHandle}`;
         }
 
-        generateUrlPreview(name, title, description, theme) {
+        generateUrlPreview(name, title, description, theme, pupHandle) {
             const extensionSymbol = is_extension ? '#' : '/';
             const encodedName = name ? `!n-${base64urlencode(to8(name))}` : '';
             const encodedTitle = title ? `!t-${base64urlencode(to8(title))}` : '';
@@ -910,7 +910,7 @@ lazy(mega, 'fileRequestCommon', () => {
             const encodedTheme = theme ? `!m-${base64urlencode(to8(theme))}` : '';
 
             return `${getAppBaseUrl()}${extensionSymbol}` +
-                `filerequest/${encodedName}${encodedTitle}${encodedDescription}${encodedTheme}`;
+                `filerequest/${pupHandle || ''}${encodedName}${encodedTitle}${encodedDescription}${encodedTheme}`;
         }
 
         windowOpen(url) {

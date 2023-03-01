@@ -1500,7 +1500,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
         .replace('[BR]', '<br>');
     ['empty_call_dlg_text', 'empty_call_dlg_text_min', 'empty_call_dlg_text_sec'].forEach(s => {
-        l[s] = escapeHTML(l[s])
+        // Prevent double escaping
+        l[s] = escapeHTML(l[s].replace(/&gt;/g, '>'))
             .replace(/\[S1]/g, '<span class="stay-dlg-counter">')
             .replace(/\[\/S1]/g, '</span>')
             .replace(/\[S2]/g, '<div class="stay-dlg-subtext">')
@@ -1543,7 +1544,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a class="upload-btn block-empty-upload-link" href="#">')
         .replace('[/A]', '</a>');
     l.file_request_upload_caption_2 = l.file_request_upload_caption_2
-        .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/file-request">')
+        .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/upload-file-request">')
         .replace('[/A]', '</a>');
 
 

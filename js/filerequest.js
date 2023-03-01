@@ -15,9 +15,7 @@ lazy(mega, 'fileRequest', () => {
     };
 
     const openCreateDialogFromSelect = (selectedNodeHandle) => {
-        mega.fileRequest.dialogs.createDialog.init(selectedNodeHandle, {
-            dialog: false
-        });
+        mega.fileRequest.dialogs.createDialog.init(selectedNodeHandle);
     };
 
     const openNewDialogHandler = () => {
@@ -211,7 +209,8 @@ lazy(mega, 'fileRequest', () => {
                         name: u_attr.name,
                         title,
                         description,
-                        theme: u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : ''
+                        theme: u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : '',
+                        pupHandle: this.puPagePublicHandle || null
                     };
                 }
             });
@@ -304,10 +303,10 @@ lazy(mega, 'fileRequest', () => {
             this.addEventHandlers();
         }
 
-        init(selectedHandle, settings) {
+        init(selectedHandle) {
             // Reset fields
             this.initTitleDescInput();
-            this.$selectFolder.init(settings);
+            this.$selectFolder.init();
 
             // Reset error messages
             this.setContext({
@@ -319,6 +318,7 @@ lazy(mega, 'fileRequest', () => {
             this.folderName = this.fileObject && this.fileObject.name || null;
             if (this.folderName) {
                 this.$selectFolder.setFolder(this.folderName);
+                this.$selectFolder.setNodeHandle(selectedHandle);
             }
 
             M.safeShowDialog('file-request-create-dialog', this.$dialog);
@@ -850,27 +850,9 @@ lazy(mega, 'fileRequest', () => {
             }
         }
 
-        isInvalidUserStatus() {
-            if (is_mobile) {
-                return !validateUserAction();
-            }
-
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
-                return true;
-            }
-
-            return false;
-        }
-
         addEventHandlers() {
             this.$createButton.eventOnClick(() => {
-                if (this.isInvalidUserStatus()) {
+                if (!validateUserAction()) {
                     return false;
                 }
 
@@ -881,7 +863,7 @@ lazy(mega, 'fileRequest', () => {
             });
 
             this.$manageButton.eventOnClick(() => {
-                if (this.isInvalidUserStatus()) {
+                if (!validateUserAction()) {
                     return false;
                 }
 
@@ -909,7 +891,7 @@ lazy(mega, 'fileRequest', () => {
             });
 
             this.$removeButton.eventOnClick(() => {
-                if (this.isInvalidUserStatus()) {
+                if (!validateUserAction()) {
                     return false;
                 }
 
@@ -1257,6 +1239,7 @@ lazy(mega, 'fileRequest', () => {
                                 description: this.context.description || null,
                             });
                         }
+                        $('.mobile.file-manager-block').removeClass('disable-scroll');
                     },
                     propagate: false
                 }

@@ -166,6 +166,10 @@ lazy(mega, 'fileRequestUI', () => {
             }
 
             const clickHandler = (evt) => {
+                if (is_mobile && !validateUserAction(true)) {
+                    return false;
+                }
+
                 const stopPropagation = typeof this.options.propagate !== 'undefined' && !this.options.propagate;
                 const inputElement = evt.target;
                 const $input = $(inputElement);
@@ -237,6 +241,10 @@ lazy(mega, 'fileRequestUI', () => {
 
         setOnClick() {
             this.eventOnClick(($input) => {
+                if (M.isInvalidUserStatus()) {
+                    return;
+                }
+
                 const optionCallback = this.options.callback;
                 if (!optionCallback) {
                     return;
@@ -293,16 +301,16 @@ lazy(mega, 'fileRequestUI', () => {
                 }
 
                 const {
-                    name, title, description, theme
+                    name, title, description, theme, pupHandle
                 } = optionCallback($input);
 
-                const url = generator
-                    .generateUrlPreview(
-                        name,
-                        title,
-                        description,
-                        theme
-                    );
+                const url = generator.generateUrlPreview(
+                    name,
+                    title,
+                    description,
+                    theme,
+                    pupHandle
+                );
 
                 if (url) {
                     generator
@@ -519,30 +527,27 @@ lazy(mega, 'fileRequestUI', () => {
             );
 
             this.$selectFolderButton =  new ButtonComponent($('.file-request-select-folder', this.$dialog));
+            this.nodeHandle = null;
         }
 
-        init(options) {
+        init() {
             this.$inputFolder.disable();
-            this.$selectFolderButton.disable();
-            this.$inputFolder.setValue('');
+            this.$selectFolderButton.enable();
             this.$inputFolder
                 .getInput()
+                .removeClass('disabled')
                 .closest(megaInputSelector)
-                .removeClass(activeClass);
+                .addClass(activeClass);
 
-            const fromCreate = options && options.dialog === false;
-            if (fromCreate) {
-                this.$selectFolderButton.enable();
-                this.$inputFolder
-                    .getInput()
-                    .removeClass('disabled')
-                    .closest(megaInputSelector)
-                    .addClass(activeClass);
-            }
+            this.nodeHandle = null;
         }
 
         setFolder(folderName) {
             this.$inputFolder.setValue(folderName);
+        }
+
+        setNodeHandle(nodeHandle) {
+            this.nodeHandle = nodeHandle;
         }
 
         addEventHandlers(options) {
@@ -561,6 +566,15 @@ lazy(mega, 'fileRequestUI', () => {
                                 if (options && typeof options.post === 'function') {
                                     options.post(selectedNodeHandle);
                                 }
+                            },
+                            selectedNodeHandle: this.nodeHandle,
+                            close: ($dialog, selectedNode) => {
+                                $dialog.rebind('dialog-closed.fileRequestDialog', () => {
+                                    if (selectedNode && options && typeof options.post === 'function') {
+                                        options.post(selectedNode);
+                                    }
+                                    $dialog.off('dialog-closed.fileRequestDialog');
+                                });
                             }
                         });
                         return false;

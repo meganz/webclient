@@ -68,6 +68,10 @@ mobile.cloud.actionBar = {
     initRubbishBinControls: function() {
         'use strict';
         $(".empty-rubbish-bin").off('tap').on('tap', function() {
+            if (!validateUserAction(true)) {
+                return false;
+            }
+
             mobile.rubbishBinEmptyOverlay.show();
         });
     },

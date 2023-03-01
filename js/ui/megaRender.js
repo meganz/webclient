@@ -404,7 +404,7 @@
 
                 sharedFolderUI();
 
-                $('.grid-table tbody tr').remove();
+                $('.grid-table tbody tr').not('.conversationsApp .grid-table tbody tr').remove();
                 $('.file-block-scrolling a').remove();
                 $('.shared-blocks-scrolling a').remove();
                 $('.out-shared-blocks-scrolling a').remove();

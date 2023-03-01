@@ -73,7 +73,7 @@
         if ($.moveDialog) {
             M.disableCircularTargets('#mctreea_');
         }
-        else if ($.selectFolderDialog && M.currentrootid === 'file-requests') {
+        else if ($.selectFolderDialog && $.fileRequestNew) {
             const getIdAndDisableDescendants = (elem) => {
                 const handle = String($(elem).attr('id')).replace('mctreea_', '');
                 if (handle) {
@@ -1349,15 +1349,21 @@
         }
 
         const postEventHandler = options && options.post || null;
+        const closeEventHandler = options && options.close || null;
         if (postEventHandler) {
             const aMode = options && options.mode || 'fileRequestNew';
 
             M.safeShowDialog('selectFolder', () => {
-                handleOpenDialog(0, M.RootID, aMode);
+                handleOpenDialog(0, options && options.selectedNodeHandle || M.RootID, aMode);
                 $.selectFolderCallback = function() {
                     closeDialog();
                     postEventHandler($.mcselected);
                 };
+
+                if (closeEventHandler) {
+                    closeEventHandler($dialog, options && options.selectedNodeHandle);
+                }
+
                 return $dialog;
             });
         }

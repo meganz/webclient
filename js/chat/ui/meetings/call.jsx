@@ -128,7 +128,6 @@ export default class Call extends MegaRenderMixin {
         ephemeral: false,
         offline: false,
         ephemeralAccounts: [],
-        stayOnEnd: !!mega.config.get('callemptytout'),
         everHadPeers: false,
         guest: Call.isGuest()
     };
@@ -249,9 +248,6 @@ export default class Call extends MegaRenderMixin {
                 this.setState({ mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI }, () => {
                     call.setViewMode(this.state.mode);
                 });
-                if (call.peers.length === 0) {
-                    this.showTimeoutDialog();
-                }
             }
             else if (this.state.mode === Call.MODE.SPEAKER && call.forcedActiveStream &&
                 !streams[call.forcedActiveStream]) {
@@ -266,9 +262,6 @@ export default class Call extends MegaRenderMixin {
                 this.setState({ mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI }, () => {
                     call.setViewMode(this.state.mode);
                 });
-            }
-            if (this.state.stayOnEnd !== !!mega.config.get('callemptytout')) {
-                this.setState({ stayOnEnd: !!mega.config.get('callemptytout') });
             }
             if (call.hasOtherParticipant()) {
                 if (!this.state.everHadPeers) {
@@ -299,13 +292,14 @@ export default class Call extends MegaRenderMixin {
 
     handleCallMinimize = () => {
         const { call, streams, onCallMinimize } = this.props;
-        const { mode, sidebar, view, stayOnEnd } = this.state;
+        const { mode, sidebar, view } = this.state;
+        const { stayOnEnd } = call;
         // Cache previous state only when `Local` is not already minimized
         Call.STATE.PREVIOUS = mode !== Call.MODE.MINI ? { mode, sidebar, view } : Call.STATE.PREVIOUS;
         const noPeers = () => {
             onCallMinimize();
             if (typeof call.callToutId !== 'undefined' && !stayOnEnd) {
-                this.showTimeoutDialog();
+                onIdle(() => call.showTimeoutDialog());
             }
         };
 
@@ -320,27 +314,6 @@ export default class Call extends MegaRenderMixin {
                 noPeers()
         );
     };
-
-    /**
-     * showTimeoutDialog
-     * @description Handles showing the timeout dialog when the call UI is minimised
-     * @returns {void} void
-     */
-    showTimeoutDialog() {
-        msgDialog(
-            `warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`,
-            'stay-on-call',
-            l.empty_call_dlg_title,
-            mega.icu.format(l.empty_call_dlg_text_min, 2).replace('%s', '02:00'),
-            res => {
-                if (res === null) {
-                    return;
-                }
-                return res ? this.handleStayConfirm() : this.handleCallEnd(1);
-            },
-            1
-        );
-    }
 
     /**
      * handleCallExpand
@@ -553,17 +526,10 @@ export default class Call extends MegaRenderMixin {
             ephemeralAccounts: [...state.ephemeralAccounts, handle]
         }));
 
-    /**
-     * handleStayConfirm
-     * @description Handles the Last in group call timeout behaviour. If call will cancel the 5 minute timeout
-     * in favour of the 24hr timeout
-     * @returns {void} void
-     */
     handleStayConfirm = () => {
         const { call } = this.props;
-        eventlog(99760, JSON.stringify([call.callId, 1]));
-        this.setState({stayOnEnd: true});
-        call.initCallTimeout(true);
+        call.handleStayConfirm();
+        onIdle(() => this.safeForceUpdate());
     };
 
     componentWillUnmount() {
@@ -605,9 +571,6 @@ export default class Call extends MegaRenderMixin {
             ) {
                 call.left = true;
                 call.initCallTimeout();
-                if (!Call.isExpanded()) {
-                    this.showTimeoutDialog();
-                }
             }
             delete this.callStartTimeout;
         }, 300 * 1000);
@@ -624,8 +587,9 @@ export default class Call extends MegaRenderMixin {
         const { minimized, streams, call, chatRoom, parent, sfuApp, onDeleteMessage } = this.props;
         const {
             mode, view, sidebar, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
-            offline, stayOnEnd, everHadPeers
+            offline, everHadPeers
         } = this.state;
+        const { stayOnEnd } = call;
         const STREAM_PROPS = {
             mode, streams, sidebar, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
             everHadPeers,

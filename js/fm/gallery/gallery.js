@@ -2256,6 +2256,15 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
         fetchTypes[type][node.fa] = node;
     }
 
+    const isLocationCorrect = () => {
+        if (M.currentCustomView.type !== 'gallery' && M.currentCustomView.type !== 'albums') {
+            console.log(`Cancelling the thumbnail request...`);
+            return false;
+        }
+
+        return true;
+    };
+
     fetchTypes.forEach((nodes, type) => {
         if (!Object.keys(nodes).length) {
             return;
@@ -2265,6 +2274,10 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
             nodes,
             type,
             async(thumbCtx, thumbFa, thumbAB) => {
+                if (!isLocationCorrect()) {
+                    return;
+                }
+
                 let blob;
 
                 if (thumbAB === 0xDEAD || thumbAB.length === 0) {
@@ -2297,12 +2310,24 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
                     // The thumbnail did not qualify for `:0*` or `:1*`, so original image must be fetched
                     const original = await M.gfsfetch(handle, 0, -1).catch(dump);
 
+                    if (!isLocationCorrect()) {
+                        return;
+                    }
+
                     if (original) {
                         blob = await webgl.getDynamicThumbnail(original, size, workerBranch).catch(dump);
                     }
                 }
 
+                if (!isLocationCorrect()) {
+                    return;
+                }
+
                 blob = blob || await webgl.getDynamicThumbnail(thumbAB, size, workerBranch).catch(dump);
+
+                if (!isLocationCorrect()) {
+                    return;
+                }
 
                 if (blob) {
                     processBlob(key, blob);

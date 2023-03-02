@@ -161,7 +161,7 @@ function setDateTimeFormat(locales, format) {
         options.day = format === 3 || format === 6 ? undefined : 'numeric';
         options.weekday = format === 4 || format === 5 ? 'long' : undefined;
 
-        if (format === 0 || format === 5) {
+        if (format === 0 || format === 5 || format === 7) {
             options.minute = 'numeric';
             options.hour = 'numeric';
             if (format === 5) {
@@ -172,6 +172,10 @@ function setDateTimeFormat(locales, format) {
 
         if (format === 6) {
             options.month = 'short';
+        }
+        if (format === 7) {
+            options.weekday = 'long';
+            options.timeZoneName = 'short';
         }
     }
     // Set non full date format

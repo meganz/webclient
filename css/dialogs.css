@@ -5218,25 +5218,6 @@ body.de .mega-dialog.new-group-chat {
         top: 183px;
         width: 40.5px;
     }
-    .mega-dialog.bitcoin-invoice-dialog a.btn-open-wallet {
-        border: 2px solid #47abdc;
-        border-radius: 5px;
-        color: #47abdc;
-        font-size: 14px;
-        line-height: 27px;
-        margin: 0 36px;
-        display: block;
-        text-align: center;
-        box-sizing: border-box;
-        height: 32px;
-        transition: all 200ms ease-in-out;
-        overflow: hidden;
-        padding: 0 10px;
-    }
-    .mega-dialog.bitcoin-invoice-dialog a.btn-open-wallet:hover {
-        background-color: #47abdc;
-        color: #fff;
-    }
     .mega-dialog.bitcoin-invoice-dialog .bitcoin-address {
         color: var(--text-color-medium);
         font-size: 11px;

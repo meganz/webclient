@@ -3071,8 +3071,7 @@ var bitcoinDialog = {
 
         // Set details
         var bitcoinAddress = apiResponse.address;
-        var bitcoinUrl = 'bitcoin:' + apiResponse.address + '?amount=' + apiResponse.amount;
-        var invoiceDateTime = time2date(apiResponse.created, 5);
+        var invoiceDateTime = time2date(apiResponse.created, 7);
         invoiceDateTime = invoiceDateTime[0].toUpperCase() + invoiceDateTime.substring(1);
         var proPlanNum = pro.propay.selectedProPackage[1];
         var planName = pro.getProPlanName(proPlanNum);
@@ -3107,7 +3106,6 @@ var bitcoinDialog = {
         bitcoinDialog.generateBitcoinQrCode($bitcoinDialog, bitcoinAddress, priceBitcoins);
 
         // Update details inside dialog
-        $bitcoinDialog.find('.btn-open-wallet').attr('href', bitcoinUrl);
         $bitcoinDialog.find('.bitcoin-address').text(bitcoinAddress);
         $bitcoinDialog.find('.invoice-date-time').text(invoiceDateTime);
         $bitcoinDialog.find('.plan-icon').addClass('pro' + proPlanNum);
@@ -3194,7 +3192,6 @@ var bitcoinDialog = {
             else {
                 // Grey out and hide details as the price has expired
                 dialog.find('.scan-code-instruction').css('opacity', '0.25');
-                dialog.find('.btn-open-wallet').css('visibility', 'hidden');
                 dialog.find('.bitcoin-address').css('visibility', 'hidden');
                 dialog.find('.bitcoin-qr-code').css('opacity', '0.15');
                 dialog.find('.qr-code-mega-icon').hide();

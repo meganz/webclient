@@ -1556,8 +1556,6 @@ function api_getsid2(res, ctx) {
                 }
                 else if (typeof res.u !== 'string' || res.u.length !== 11) {
 
-                    eventlog(99752, JSON.stringify([1, 1, res.u]));
-
                     console.error("Incorrect user handle in the 'us' response", res.u);
 
                     Soon(() => {
@@ -1576,8 +1574,6 @@ function api_getsid2(res, ctx) {
                     }
                     catch (ex) {
 
-                        eventlog(99752, JSON.stringify([1, 2, res.u, errobj, String(ex).split('\n')[0]]));
-
                         console.error('Error decoding private RSA key! %o', errobj, ex);
 
                         Soon(() => {
@@ -1590,10 +1586,6 @@ function api_getsid2(res, ctx) {
                     if (!privk) {
                         // Bad decryption of RSA is an indication that the password was wrong
                         console.error('RSA key decoding failed (%o)', errobj);
-                        // eslint-disable-next-line max-depth
-                        if ('pl' in errobj) {
-                            eventlog(99752, JSON.stringify([1, 5, errobj]));
-                        }
                         ctx.checkloginresult(ctx, false);
                         return false;
                     }
@@ -1608,8 +1600,6 @@ function api_getsid2(res, ctx) {
                     // Otherwise, we could construct an oracle based on shortened csids with single-byte user handles.
                     if (decryptedSessionId.length !== 255) {
 
-                        eventlog(99752, JSON.stringify([1, 3, res.u, decryptedSessionId.length]));
-
                         console.error("Incorrect length of Session ID", decryptedSessionId.length, sessionIdUserHandle);
 
                         Soon(() => {
@@ -1621,8 +1611,6 @@ function api_getsid2(res, ctx) {
 
                     // Check the user handle included in the Session ID matches the one sent in the 'us' response
                     if (sessionIdUserHandle !== res.u) {
-
-                        eventlog(99752, JSON.stringify([1, 4, res.u, sessionIdUserHandle]));
 
                         console.error(
                             "User handle in Session ID did not match user handle from the 'us' request",

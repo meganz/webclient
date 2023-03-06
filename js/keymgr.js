@@ -167,7 +167,7 @@ lazy(mega, 'keyMgr', () => {
             this.versionclash = false;
 
             // feature flag: enable with the blog post going live
-            this.secure = false;
+            this.secure = true;
 
             /** @property KeyMgr.ph -- Protocol Handler instance */
             lazy(this, 'ph', () => {

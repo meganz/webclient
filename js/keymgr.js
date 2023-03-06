@@ -160,6 +160,9 @@ lazy(mega, 'keyMgr', () => {
             // in-session freshly created share-keys
             this.createdsharekey = Object.create(null);
 
+            // share-key revocation queue
+            this.delSharesQueue = null;
+
             // a commit() attempt was unsuccessful due to incomplete state
             this.pendingcommit = null;
 
@@ -1291,6 +1294,64 @@ lazy(mega, 'keyMgr', () => {
                     break;
                 }
             } while (!await this.commit());
+        }
+
+        // share-key revocation.
+        enqueueShareRevocation(handles) {
+
+            if (this.delSharesQueue) {
+
+                for (let i = handles.length; i--;) {
+
+                    this.delSharesQueue.add(handles[i]);
+                }
+            }
+            else {
+                this.delSharesQueue = new Set(handles);
+
+                const assertSafeState = (t) => {
+                    const {fmdb} = window;
+
+                    if (!fmdb || fmdb.crashed) {
+                        const state = fmdb ? 'crashed' : 'unavailable';
+
+                        throw new SecurityError(`Cannot revoke share-keys, FMDB is ${state} (${t})`);
+                    }
+                };
+
+                tSleep(2)
+                    .then(() => {
+                        const handles = [...this.delSharesQueue];
+                        this.delSharesQueue = null;
+
+                        assertSafeState(1);
+                        return dbfetch.geta(handles).then(() => handles);
+                    })
+                    .then((handles) => {
+                        assertSafeState(2);
+
+                        for (let i = handles.length; i--;) {
+                            const h = handles[i];
+
+                            if (M.d[h]) {
+                                logger.warn(`Cannot revoke share-key for ${h}, node exists...`);
+                                handles.splice(i, 1);
+                            }
+                            else {
+
+                                fmdb.del('ok', h);
+                            }
+                        }
+
+                        if (d) {
+                            logger.warn('Revoking share-keys...', handles);
+                        }
+
+                        return this.deleteShares(handles);
+                    })
+                    .catch((ex) => logger.error(ex))
+                    .finally(() => logger.info('Share-keys revocation finished.'));
+            }
         }
 
         // authorise all uploads or backups under node to encrypt to sharekey

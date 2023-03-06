@@ -1888,7 +1888,8 @@ function api_setshare1(ctx, params) {
         if (typeof req.s[i].r !== 'undefined') {
             // @todo if (mega.keyMgr.isTrusted(ctx.node)) {
             if (mega.keyMgr.secure) {
-                newkey = mega.keyMgr.hasNewShareKey(ctx.node);
+                // @tod improve/fixup/amend/recheck
+                newkey = req.s[i].u === 'EXP' || mega.keyMgr.hasNewShareKey(ctx.node);
                 // dummy key/handleauth - FIXME: remove
                 req.ok = a32_to_base64([0, 0, 0, 0]);
                 req.ha = a32_to_base64([0, 0, 0, 0]);

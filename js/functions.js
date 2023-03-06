@@ -2316,8 +2316,8 @@ if (typeof sjcl !== 'undefined') {
                 var promise = new MegaPromise();
                 var resolve = function() {
                     if (!--step) {
-                        if (packet.okd && u_sharekeys[selectedNodeHandle]) {
-                            console.error('The sharekey should have been removed...');
+                        if (!u_sharekeys[selectedNodeHandle]) {
+                            console.error('The share-key should not have been removed...', packet.okd, [packet]);
                         }
                         promise.resolve(packet);
                     }

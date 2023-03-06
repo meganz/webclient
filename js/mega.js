@@ -756,7 +756,11 @@ scparser.$add('s', {
         if (a.o === u_handle) {
             // if access right are undefined, then share is deleted
             if (typeof a.r === 'undefined') {
-                M.delNodeShare(a.n, a.u, a.okd);
+                if (a.okd && d) {
+                    console.warn(`Ignoring okd for ${a.n}...`, a);
+                }
+                M.delNodeShare(a.n, a.u);
+
                 if (!folderlink && a.u !== 'EXP' && fminitialized) {
                     if (a.ou !== u_handle) {
                         notify.notifyFromActionPacket({
@@ -853,7 +857,7 @@ scparser.$add('s', {
                                 delete n.su;
                                 delete n.sk;
                                 delete M.c.shares[a.n];
-                                mega.keyMgr.deleteShares([a.n]).catch(dump);
+                                // mega.keyMgr.deleteShares([a.n]).catch(dump);
 
                                 if (M.tree.shares) {
                                     delete M.tree.shares[a.n];
@@ -954,10 +958,6 @@ scparser.$add('s', {
                 addToMultiInputDropDownList('.share-multiple-input', [{id: email, name: contactName}]);
                 addToMultiInputDropDownList('.add-contact-multiple-input', [{id: email, name: contactName}]);
             }
-        }
-
-        if (a.okd) {
-            M.delNodeShare(a.n, a.u, a.okd);
         }
 
         if (fminitialized) {
@@ -1440,7 +1440,7 @@ scparser.$add('d', function(a) {
     }
 
     // node deletion
-    M.delNode(a.n);
+    M.delNode(a.n, false, !!a.m);
 
     // was selected, now clear the selected array.
     if ($.selected && ($.selected[0] === a.n)) {

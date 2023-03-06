@@ -783,13 +783,14 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         if (M.chat || M.currentCustomView.type === 'gallery' || typeof nodeId !== 'number' && !M.d[nodeId]) {
             return false;
         }
+        let itemsNum = this.selected_list.filter(h => h !== this.currentdirid).length;
 
-        if (this.selected_list.length === 0) {
+        if (itemsNum === 0) {
             this.hideSelectionBar();
         }
         else {
             var totalNodes = this.items.length;
-            var itemsNum = this.selected_list.length;
+
             var itemsTotalSize = "";
             var notificationText = "";
 

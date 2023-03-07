@@ -236,7 +236,12 @@ export default class BrowserEntries extends MegaRenderMixin {
             selectionManager.set_currently_selected(node[self.props.keyProp]);
         }
         else if (e.shiftKey) {
-            selectionManager.shift_select_to(node[self.props.keyProp], false, true, false);
+            if ($.selected && $.selected.length) {
+                selectionManager.shift_select_to(node[self.props.keyProp], false, true, false);
+            }
+            else {
+                selectionManager.set_currently_selected(node[self.props.keyProp]);
+            }
         }
         else if (e.ctrlKey || e.metaKey) {
             // ctrl or cmd/meta, e.g. add to selection

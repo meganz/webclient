@@ -65,7 +65,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             dnd: null,
             alwaysNotify: null,
             retentionTime: 0,
-            sfuApp: null,
             activeCallIds: null,
             meetingsLoading: null,
             options: {},
@@ -420,7 +419,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     });
 
     self.rebind('onRoomDisconnected', () => {
-        if (!self.activeCall) {
+        if (!self.call) {
             for (const activeCallId of self.activeCallIds.keys()) {
                 self.activeCallIds.remove(activeCallId);
             }
@@ -831,8 +830,7 @@ ChatRoom.prototype.isAnonymous = function() {
  * @returns {Boolean}
  */
 ChatRoom.prototype.isDisplayable = function() {
-    var self = this;
-    return self.showArchived === true || !self.isArchived() || self.activeCall;
+    return this.showArchived === true || !this.isArchived() || this.call;
 };
 
 /**
@@ -2014,13 +2012,7 @@ ChatRoom.prototype.hasInvalidKeys = function() {
 };
 
 ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio, video, callId) {
-    if (this.activeCallIds.length === 0) {
-        return;
-    }
-    if (!megaChat.hasSupportForCalls) {
-        return;
-    }
-    if (this.meetingsLoading) {
+    if (!megaChat.hasSupportForCalls || this.activeCallIds.length === 0 || this.meetingsLoading) {
         return;
     }
     if (this.hasInvalidKeys()) {
@@ -2029,43 +2021,37 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
 
     this.meetingsLoading = l.joining /* `Joining` */;
 
-    this.rebind("onCallLeft.start", (e, data) => {
-        if (data.callId === callId) {
-            // ensure that the Loading/Joining/Starting overlay is removed if the call ended
-            // (or had failed to start)
-            this.meetingsLoading = false;
-        }
-    });
-
     callId = callId || this.activeCallIds.keys()[0];
     return asyncApiReq({'a': 'mcmj', 'cid': this.chatId, "mid": callId})
         .then((r) => {
-            var app = new SfuApp(this, callId);
-            window.sfuClient = app.sfuClient = new SfuClient(
-                u_handle,
-                app,
-                (
-                    this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC &&
-                    str_to_ab(this.protocolHandler.unifiedKey)
-                ),
-                {
-                    'speak': true,
-                    'moderator': true
-                },
-                r.url.replace("https://", "wss://")
-            );
-            app.sfuClient.muteAudio(!audio);
-            app.sfuClient.muteCamera(!video);
-            return app.sfuClient.connect(r.url, callId, {isGroup: this.type !== "private"});
-        }, ex => {
-            console.error('Failed to join call:', ex);
-            this.meetingsLoading = false;
-            this.unbind("onCallLeft.start");
+            this.startOrJoinCall(callId, r.url, audio, video);
         });
-
 });
-
-
+ChatRoom.prototype.startOrJoinCall = function(callId, url, audio, video) {
+    tryCatch(() => {
+        const call = this.call = megaChat.activeCall = megaChat.plugins.callManager2.createCall(this, callId);
+        const sfuClient = window.sfuClient = call.sfuClient = new SfuClient(
+            u_handle,
+            call,
+            (
+                this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC &&
+                str_to_ab(this.protocolHandler.unifiedKey)
+            ),
+            {
+                'speak': true,
+                'moderator': true
+            }
+        );
+        call.setSfuClient(sfuClient);
+        sfuClient.muteAudio(!audio);
+        sfuClient.muteCamera(!video);
+        return sfuClient.connect(url, callId, {isGroup: this.type !== "private"});
+    }, ex => {
+        this.call = megaChat.activeCall = null;
+        this.meetingsLoading = false;
+        console.error('Failed to start/join call:', ex);
+    })();
+};
 ChatRoom.prototype.rejectCall = function(callId) {
     if (this.activeCallIds.length === 0) {
         return;
@@ -2128,38 +2114,151 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
 
     return asyncApiReq(opts)
         .then((r) => {
-            var app = new SfuApp(this, r.callId);
-            window.sfuClient = app.sfuClient = new SfuClient(
-                u_handle,
-                app,
-                (
-                    this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC &&
-                    str_to_ab(this.protocolHandler.unifiedKey)
-                ),
-                {
-                    'speak': true,
-                    'moderator': true
-                },
-                r.sfu.replace("https://", "wss://")
-            );
-            app.sfuClient.muteAudio(!audio);
-            app.sfuClient.muteCamera(!video);
-
-            this.rebind("onCallLeft.start", (e, data) => {
-                if (data.callId === r.callId) {
-                    this.meetingsLoading = false;
-                }
-            });
-            // r.callId
-            sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, {isGroup: this.type !== "private"});
-        }, ex => {
-            console.error('Failed to start call:', ex);
-            this.meetingsLoading = false;
-            this.unbind("onCallLeft.start");
+            this.startOrJoinCall(r.callId, r.sfu, audio, video);
         });
 });
 
+ChatRoom.prototype.subscribeForCallEvents = function() {
+    const callMgr = megaChat.plugins.callManager2;
+    this.rebind("onChatdPeerJoinedCall.callManager", (e, data) => {
+        if (!this.activeCallIds.exists(data.callId)) {
+            this.activeCallIds.set(data.callId, []);
+        }
+        this.activeCallIds.set(data.callId, [...this.activeCallIds[data.callId], ...data.participants]);
 
+        const parts = data.participants;
+        for (var i = 0; i < parts.length; i++) {
+            // halt call if anyone joins a 1on1 room or if I'd joined (e.g. I'd an incoming ringing first)
+            if (
+                this.type === "private" ||
+                (
+                    parts[i] === u_handle &&
+                    this.ringingCalls.exists(data.callId)
+                )
+            ) {
+                this.ringingCalls.remove(data.callId);
+
+                callMgr.trigger("onRingingStopped", {
+                    callId: data.callId,
+                    chatRoom: this
+                });
+            }
+        }
+
+        this.callParticipantsUpdated();
+    });
+    this.rebind("onChatdPeerLeftCall.callManager", (e, data) => {
+        if (!this.activeCallIds[data.callId]) {
+            return;
+        }
+        const parts = data.participants;
+        for (var i = 0; i < parts.length; i++) {
+            array.remove(this.activeCallIds[data.callId], parts[i], true);
+
+            if (parts[i] === u_handle && this.ringingCalls.exists(data.callId)) {
+                this.ringingCalls.remove(data.callId);
+
+                callMgr.trigger("onRingingStopped", {
+                    callId: data.callId,
+                    chatRoom: this
+                });
+            }
+        }
+
+        this.callParticipantsUpdated();
+    });
+    this.rebind("onCallLeft.callManager", (e, data) => {
+        console.warn("onCallLeft:", JSON.stringify(data));
+        const {call} = this;
+        if (!call || call.callId !== data.callId) {
+            if (d) {
+                console.warn("... no active call or event not for it");
+            }
+            return;
+        }
+        this.meetingsLoading = false;
+        call.hangUp(data.reason);
+        megaChat.activeCall = this.call = null;
+    });
+    this.rebind("onChatdCallEnd.callManager", (e, data) => {
+        if (d) {
+            console.warn("onChatdCallEnd:", JSON.stringify(data));
+        }
+        this.activeCallIds.remove(data.callId);
+        this.stopRinging(data.callId);
+        this.callParticipantsUpdated();
+    });
+    this.rebind('onCallState.callManager', function(e, data) {
+        assert(this.activeCallIds[data.callId], `unknown call: ${data.callId}`);
+        callMgr.onCallState(data, this);
+        this.callParticipantsUpdated();
+    });
+    this.rebind('onRoomDisconnected.callManager', function() {
+        this.activeCallIds.clear(); // av: Added this to complement the explicit handling of chatd call events
+        // Keep the current call active when online, but chatd got disconnected
+        if (navigator.onLine) {
+            return;
+        }
+
+        if (this.call) {
+            this.trigger('ChatDisconnected', this);
+        }
+        this.callParticipantsUpdated();
+    });
+    this.rebind('onStateChange.callManager', function(e, oldState, newState) {
+        if (newState === ChatRoom.STATE.LEFT && this.call) {
+            this.call.hangUp(SfuClient.TermCode.kLeavingRoom);
+        }
+    });
+    this.rebind('onCallPeerLeft.callManager', (e, data) => {
+        const {call} = this;
+        if (
+            call.isDestroyed ||
+            call.hasOtherParticipant() ||
+            SfuClient.isTermCodeRetriable(data.reason)
+        ) {
+            return;
+        }
+        if (this.type === 'private') {
+            return this.trigger('onCallLeft', { callId: call.callId });
+        }
+        // Wait for the peer left notifications to process before triggering.
+        setTimeout(() => {
+            // make sure we still have that call as active
+            if (this.call === call) {
+                this.call.initCallTimeout();
+            }
+        }, 3000);
+    });
+
+    this.rebind('onMeAdded', (e, addedBy) => {
+        if (this.activeCallIds.length > 0) {
+            const callId = this.activeCallIds.keys()[0];
+            if (this.ringingCalls.exists(callId)) {
+                return;
+            }
+            this.ringingCalls.set(callId, addedBy);
+            this.megaChat.trigger('onIncomingCall', [
+                this,
+                callId,
+                addedBy,
+                callMgr
+            ]);
+            this.fakedLocalRing = true;
+
+            // clear if not canceled/rejected already
+            setTimeout(() => {
+                delete this.fakedLocalRing;
+                if (this.ringingCalls.exists(callId)) {
+                    callMgr.trigger("onRingingStopped", {
+                        callId: callId,
+                        chatRoom: this
+                    });
+                }
+            }, 30e3);
+        }
+    });
+};
 ChatRoom.prototype.stateIsLeftOrLeaving = function() {
     return (
         this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING ||

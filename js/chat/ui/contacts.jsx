@@ -242,7 +242,7 @@ export class ContactButton extends ContactAwareComponent {
                                     const { chatRoom } = this.props;
                                     const { u: userHandle } = contact;
 
-                                    if (chatRoom.sfuApp) {
+                                    if (chatRoom.call) {
                                         return mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle);
                                     }
 

@@ -18,12 +18,12 @@ export default class Loading extends MegaRenderMixin {
 
     renderDebug = () => {
         const { chatRoom } = this.props;
-        if (chatRoom && chatRoom.sfuApp) {
+        if (chatRoom && chatRoom.call) {
             return (
                 <div className={`${Loading.NAMESPACE}-debug`}>
-                    <div>callId: {chatRoom.sfuApp.callId}</div>
-                    <div>roomId: {chatRoom.sfuApp.room.roomId}</div>
-                    <div>isMeeting: {chatRoom.sfuApp.room.isMeeting ? 'true' : 'false'}</div>
+                    <div>callId: {chatRoom.call.callId}</div>
+                    <div>roomId: {chatRoom.roomId}</div>
+                    <div>isMeeting: {chatRoom.isMeeting ? 'true' : 'false'}</div>
                 </div>
             );
         }

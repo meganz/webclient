@@ -347,7 +347,7 @@ class ChatToastIntegration {
                         );
                     })
                     .rebind('onNoMicInput.cTI', () => {
-                        if (megaRoom.activeCall) {
+                        if (megaRoom.call) {
                             ChatToast.quick(
                                 l.chat_mic_off_toast /* Your mic is not working */,
                                 'sprite-fm-mono icon-audio-off'
@@ -372,7 +372,7 @@ class ChatToastIntegration {
                                         }
                                     },
                                     updater: function() {
-                                        if (!megaRoom.activeCall) {
+                                        if (!megaRoom.call) {
                                             this.content = '';
                                         }
                                     }

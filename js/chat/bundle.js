@@ -3225,7 +3225,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     dnd: null,
     alwaysNotify: null,
     retentionTime: 0,
-    sfuApp: null,
     activeCallIds: null,
     meetingsLoading: null,
     options: {},
@@ -3475,7 +3474,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     }, 3e5);
   });
   self.rebind('onRoomDisconnected', () => {
-    if (!self.activeCall) {
+    if (!self.call) {
       for (const activeCallId of self.activeCallIds.keys()) {
         self.activeCallIds.remove(activeCallId);
       }
@@ -3726,8 +3725,7 @@ ChatRoom.prototype.isAnonymous = function () {
   return is_chatlink && this.type === "public" && this.publicChatHandle && this.publicChatKey && this.publicChatHandle === megaChat.initialPubChatHandle;
 };
 ChatRoom.prototype.isDisplayable = function () {
-  var self = this;
-  return self.showArchived === true || !self.isArchived() || self.activeCall;
+  return this.showArchived === true || !this.isArchived() || this.call;
 };
 ChatRoom.prototype.persistToFmdb = function () {
   var self = this;
@@ -4447,46 +4445,41 @@ ChatRoom.prototype.hasInvalidKeys = function () {
   return false;
 };
 ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio, video, callId) {
-  if (this.activeCallIds.length === 0) {
-    return;
-  }
-  if (!megaChat.hasSupportForCalls) {
-    return;
-  }
-  if (this.meetingsLoading) {
+  if (!megaChat.hasSupportForCalls || this.activeCallIds.length === 0 || this.meetingsLoading) {
     return;
   }
   if (this.hasInvalidKeys()) {
     return this.showMissingUnifiedKeyDialog();
   }
   this.meetingsLoading = l.joining;
-  this.rebind("onCallLeft.start", (e, data) => {
-    if (data.callId === callId) {
-      this.meetingsLoading = false;
-    }
-  });
   callId = callId || this.activeCallIds.keys()[0];
   return asyncApiReq({
     'a': 'mcmj',
     'cid': this.chatId,
     "mid": callId
   }).then(r => {
-    var app = new SfuApp(this, callId);
-    window.sfuClient = app.sfuClient = new SfuClient(u_handle, app, this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC && str_to_ab(this.protocolHandler.unifiedKey), {
+    this.startOrJoinCall(callId, r.url, audio, video);
+  });
+});
+ChatRoom.prototype.startOrJoinCall = function (callId, url, audio, video) {
+  tryCatch(() => {
+    const call = this.call = megaChat.activeCall = megaChat.plugins.callManager2.createCall(this, callId);
+    const sfuClient = window.sfuClient = call.sfuClient = new SfuClient(u_handle, call, this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC && str_to_ab(this.protocolHandler.unifiedKey), {
       'speak': true,
       'moderator': true
-    }, r.url.replace("https://", "wss://"));
-    app.sfuClient.muteAudio(!audio);
-    app.sfuClient.muteCamera(!video);
-    return app.sfuClient.connect(r.url, callId, {
+    });
+    call.setSfuClient(sfuClient);
+    sfuClient.muteAudio(!audio);
+    sfuClient.muteCamera(!video);
+    return sfuClient.connect(url, callId, {
       isGroup: this.type !== "private"
     });
   }, ex => {
-    console.error('Failed to join call:', ex);
+    this.call = megaChat.activeCall = null;
     this.meetingsLoading = false;
-    this.unbind("onCallLeft.start");
-  });
-});
+    console.error('Failed to start/join call:', ex);
+  })();
+};
 ChatRoom.prototype.rejectCall = function (callId) {
   if (this.activeCallIds.length === 0) {
     return;
@@ -4543,27 +4536,127 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
     opts.sfu = parseInt(localStorage.sfuId, 10);
   }
   return asyncApiReq(opts).then(r => {
-    var app = new SfuApp(this, r.callId);
-    window.sfuClient = app.sfuClient = new SfuClient(u_handle, app, this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC && str_to_ab(this.protocolHandler.unifiedKey), {
-      'speak': true,
-      'moderator': true
-    }, r.sfu.replace("https://", "wss://"));
-    app.sfuClient.muteAudio(!audio);
-    app.sfuClient.muteCamera(!video);
-    this.rebind("onCallLeft.start", (e, data) => {
-      if (data.callId === r.callId) {
-        this.meetingsLoading = false;
-      }
-    });
-    sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, {
-      isGroup: this.type !== "private"
-    });
-  }, ex => {
-    console.error('Failed to start call:', ex);
-    this.meetingsLoading = false;
-    this.unbind("onCallLeft.start");
+    this.startOrJoinCall(r.callId, r.sfu, audio, video);
   });
 });
+ChatRoom.prototype.subscribeForCallEvents = function () {
+  const callMgr = megaChat.plugins.callManager2;
+  this.rebind("onChatdPeerJoinedCall.callManager", (e, data) => {
+    if (!this.activeCallIds.exists(data.callId)) {
+      this.activeCallIds.set(data.callId, []);
+    }
+    this.activeCallIds.set(data.callId, [...this.activeCallIds[data.callId], ...data.participants]);
+    const parts = data.participants;
+    for (var i = 0; i < parts.length; i++) {
+      if (this.type === "private" || parts[i] === u_handle && this.ringingCalls.exists(data.callId)) {
+        this.ringingCalls.remove(data.callId);
+        callMgr.trigger("onRingingStopped", {
+          callId: data.callId,
+          chatRoom: this
+        });
+      }
+    }
+    this.callParticipantsUpdated();
+  });
+  this.rebind("onChatdPeerLeftCall.callManager", (e, data) => {
+    if (!this.activeCallIds[data.callId]) {
+      return;
+    }
+    const parts = data.participants;
+    for (var i = 0; i < parts.length; i++) {
+      array.remove(this.activeCallIds[data.callId], parts[i], true);
+      if (parts[i] === u_handle && this.ringingCalls.exists(data.callId)) {
+        this.ringingCalls.remove(data.callId);
+        callMgr.trigger("onRingingStopped", {
+          callId: data.callId,
+          chatRoom: this
+        });
+      }
+    }
+    this.callParticipantsUpdated();
+  });
+  this.rebind("onCallLeft.callManager", (e, data) => {
+    console.warn("onCallLeft:", JSON.stringify(data));
+    const {
+      call
+    } = this;
+    if (!call || call.callId !== data.callId) {
+      if (d) {
+        console.warn("... no active call or event not for it");
+      }
+      return;
+    }
+    this.meetingsLoading = false;
+    call.hangUp(data.reason);
+    megaChat.activeCall = this.call = null;
+  });
+  this.rebind("onChatdCallEnd.callManager", (e, data) => {
+    if (d) {
+      console.warn("onChatdCallEnd:", JSON.stringify(data));
+    }
+    this.activeCallIds.remove(data.callId);
+    this.stopRinging(data.callId);
+    this.callParticipantsUpdated();
+  });
+  this.rebind('onCallState.callManager', function (e, data) {
+    assert(this.activeCallIds[data.callId], `unknown call: ${data.callId}`);
+    callMgr.onCallState(data, this);
+    this.callParticipantsUpdated();
+  });
+  this.rebind('onRoomDisconnected.callManager', function () {
+    this.activeCallIds.clear();
+    if (navigator.onLine) {
+      return;
+    }
+    if (this.call) {
+      this.trigger('ChatDisconnected', this);
+    }
+    this.callParticipantsUpdated();
+  });
+  this.rebind('onStateChange.callManager', function (e, oldState, newState) {
+    if (newState === ChatRoom.STATE.LEFT && this.call) {
+      this.call.hangUp(SfuClient.TermCode.kLeavingRoom);
+    }
+  });
+  this.rebind('onCallPeerLeft.callManager', (e, data) => {
+    const {
+      call
+    } = this;
+    if (call.isDestroyed || call.hasOtherParticipant() || SfuClient.isTermCodeRetriable(data.reason)) {
+      return;
+    }
+    if (this.type === 'private') {
+      return this.trigger('onCallLeft', {
+        callId: call.callId
+      });
+    }
+    setTimeout(() => {
+      if (this.call === call) {
+        this.call.initCallTimeout();
+      }
+    }, 3000);
+  });
+  this.rebind('onMeAdded', (e, addedBy) => {
+    if (this.activeCallIds.length > 0) {
+      const callId = this.activeCallIds.keys()[0];
+      if (this.ringingCalls.exists(callId)) {
+        return;
+      }
+      this.ringingCalls.set(callId, addedBy);
+      this.megaChat.trigger('onIncomingCall', [this, callId, addedBy, callMgr]);
+      this.fakedLocalRing = true;
+      setTimeout(() => {
+        delete this.fakedLocalRing;
+        if (this.ringingCalls.exists(callId)) {
+          callMgr.trigger("onRingingStopped", {
+            callId: callId,
+            chatRoom: this
+          });
+        }
+      }, 30e3);
+    }
+  });
+};
 ChatRoom.prototype.stateIsLeftOrLeaving = function () {
   return this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING || !is_chatlink && this.state === ChatRoom.STATE.READY && this.membersSetFromApi && !this.membersSetFromApi.members.hasOwnProperty(u_handle) || is_chatlink && !this.members.hasOwnProperty(u_handle);
 };
@@ -6449,7 +6542,7 @@ class ContactButton extends _mixins1__._p {
               const {
                 u: userHandle
               } = contact;
-              if (chatRoom.sfuApp) {
+              if (chatRoom.call) {
                 return mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle);
               }
               const name = M.getNameByHandle(userHandle);
@@ -10716,10 +10809,10 @@ class Loading extends mixins.wl {
       const {
         chatRoom
       } = this.props;
-      if (chatRoom && chatRoom.sfuApp) {
+      if (chatRoom && chatRoom.call) {
         return external_React_default().createElement("div", {
           className: `${Loading.NAMESPACE}-debug`
-        }, external_React_default().createElement("div", null, "callId: ", chatRoom.sfuApp.callId), external_React_default().createElement("div", null, "roomId: ", chatRoom.sfuApp.room.roomId), external_React_default().createElement("div", null, "isMeeting: ", chatRoom.sfuApp.room.isMeeting ? 'true' : 'false'));
+        }, external_React_default().createElement("div", null, "callId: ", chatRoom.call.callId), external_React_default().createElement("div", null, "roomId: ", chatRoom.roomId), external_React_default().createElement("div", null, "isMeeting: ", chatRoom.isMeeting ? 'true' : 'false'));
       }
     };
   }
@@ -11185,20 +11278,20 @@ class EndCallButton extends mixins.wl {
     } = this.props;
     const {
       type,
-      activeCall
+      call
     } = chatRoom;
-    if (activeCall) {
-      const peers = activeCall.peers && activeCall.peers.length;
+    if (call) {
+      const peers = call.peers && call.peers.length;
       if (type === 'private') {
         return this.renderButton({
           label: l[5884],
-          onClick: () => activeCall.hangUp()
+          onClick: () => call.hangUp()
         });
       }
       if (this.IS_MODERATOR) {
         return this.renderButton({
           label: l[5884],
-          onClick: peers ? null : () => activeCall.hangUp(),
+          onClick: peers ? null : () => call.hangUp(),
           children: peers && external_React_default().createElement(dropdowns.Dropdown, {
             className: "wide-dropdown send-files-selector light",
             noArrow: "true",
@@ -11208,7 +11301,7 @@ class EndCallButton extends mixins.wl {
             className: "link-button",
             icon: "sprite-fm-mono icon-leave-call",
             label: l.leave,
-            onClick: () => activeCall.hangUp()
+            onClick: () => call.hangUp()
           }), external_React_default().createElement(dropdowns.DropdownItem, {
             className: "link-button",
             icon: "sprite-fm-mono icon-contacts",
@@ -11219,7 +11312,7 @@ class EndCallButton extends mixins.wl {
       }
       return this.renderButton({
         label: peers ? l[5883] : l[5884],
-        onClick: () => activeCall.hangUp()
+        onClick: () => call.hangUp()
       });
     }
     if (chatRoom.havePendingGroupCall()) {
@@ -11240,7 +11333,7 @@ class StartMeetingNotification extends mixins.wl {
       chatRoom,
       onStartCall
     } = this.props;
-    if (chatRoom.activeCall || !megaChat.hasSupportForCalls) {
+    if (chatRoom.call || !megaChat.hasSupportForCalls) {
       return null;
     }
     return external_React_default().createElement("div", {
@@ -11259,7 +11352,7 @@ class JoinCallNotification extends mixins.wl {
     const {
       chatRoom
     } = this.props;
-    if (chatRoom.activeCall) {
+    if (chatRoom.call) {
       return null;
     }
     if (!megaChat.hasSupportForCalls) {
@@ -11486,7 +11579,7 @@ class ConversationRightArea extends mixins.wl {
     var startCallButtonClass = startCallDisabled ? " disabled" : "";
     var startAudioCallButton;
     var startVideoCallButton;
-    var isInCall = !!room.activeCall;
+    var isInCall = !!room.call;
     if (isInCall) {
       startAudioCallButton = startVideoCallButton = null;
     }
@@ -11900,7 +11993,7 @@ class ConversationRightArea extends mixins.wl {
       className: `
                                                     link-button
                                                     light
-                                                    ${room.type !== 'private' && !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 && !room.activeCall ? '' : 'disabled'}
+                                                    ${room.type !== 'private' && !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 && !room.call ? '' : 'disabled'}
                                                 `,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
@@ -12706,11 +12799,10 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     }, room.meetingsLoading && external_React_default().createElement(Loading, {
       chatRoom: room,
       title: room.meetingsLoading
-    }), room.sfuApp && external_React_default().createElement(call.ZP, {
+    }), room.call && external_React_default().createElement(call.ZP, {
       chatRoom: room,
-      sfuApp: room.sfuApp,
-      streams: room.sfuApp.callManagerCall.peers,
-      call: room.sfuApp.callManagerCall,
+      streams: room.call.peers,
+      call: room.call,
       minimized: this.state.callMinimized,
       onCallMinimize: () => {
         return this.state.callMinimized ? null : this.setState({
@@ -12743,7 +12835,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       onCallEnd: () => this.safeForceUpdate(),
       onDeleteMessage: msg => this.handleDeleteDialog(msg),
       parent: this
-    }), megaChat.initialPubChatHandle && room.publicChatHandle === megaChat.initialPubChatHandle && !room.activeCall && room.isMeeting && !room.activeCall && room.activeCallIds.length > 0 && external_React_default().createElement(Join, {
+    }), megaChat.initialPubChatHandle && room.publicChatHandle === megaChat.initialPubChatHandle && !room.call && room.isMeeting && !room.call && room.activeCallIds.length > 0 && external_React_default().createElement(Join, {
       initialView: u_type || is_eplusplus ? Join.VIEW.ACCOUNT : Join.VIEW.INITIAL,
       chatRoom: room,
       onJoinGuestClick: (firstName, lastName, audioFlag, videoFlag) => {
@@ -13086,7 +13178,7 @@ function isStartCallDisabled(room) {
   if (!megaChat.hasSupportForCalls) {
     return true;
   }
-  return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.activeCall || (room.type === "group" || room.type === "public") && false || room.getCallParticipants().length > 0;
+  return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.call || (room.type === "group" || room.type === "public") && false || room.getCallParticipants().length > 0;
 }
 
 /***/ }),
@@ -18020,7 +18112,7 @@ class StreamNode extends mixins.wl {
       onSpeakerChange: onSpeakerChange
     }), external_React_default().createElement("div", {
       className: "stream-node-content"
-    }, SfuApp.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null, this.renderContent(), mode === Call.MODE.MINI || minimized ? null : this.renderStatus())));
+    }, CallManager2.Call.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null, this.renderContent(), mode === Call.MODE.MINI || minimized ? null : this.renderStatus())));
   }
 }
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebarControls.jsx
@@ -19018,28 +19110,27 @@ class ParticipantsNotice extends mixins.wl {
         onClick: onInviteToggle
       }, l.invite_from_contact_list))));
     };
-    this.av = this.props.sfuApp.sfuClient.availAv;
+    this.av = this.props.call.sfuClient.availAv;
   }
   specShouldComponentUpdate(newProps) {
     const {
       stayOnEnd,
       hasLeft,
       isOnHold,
-      sfuApp
+      call
     } = this.props;
     const currAv = this.av;
-    this.av = sfuApp.sfuClient.availAv;
+    this.av = call.sfuClient.availAv;
     return newProps.stayOnEnd !== stayOnEnd || newProps.hasLeft !== hasLeft || newProps.isOnHold !== isOnHold || this.av !== currAv;
   }
   render() {
     const {
-      sfuApp,
       call,
       hasLeft,
       streamContainer,
       isOnHold
     } = this.props;
-    if (sfuApp.isDestroyed) {
+    if (call.isDestroyed) {
       return null;
     }
     return external_React_default().createElement((external_React_default()).Fragment, null, call.isSharingScreen() ? null : external_React_default().createElement(StreamNode, {
@@ -19325,7 +19416,6 @@ class stream_Stream extends mixins.wl {
   }
   renderStreamContainer() {
     const {
-      sfuApp,
       call,
       chatRoom,
       streams,
@@ -19346,7 +19436,6 @@ class stream_Stream extends mixins.wl {
     }, content);
     if (streams.length === 0 || !hasOtherParticipants) {
       return external_React_default().createElement(ParticipantsNotice, {
-        sfuApp: sfuApp,
         call: call,
         hasLeft: call.left,
         chatRoom: chatRoom,
@@ -20280,7 +20369,7 @@ class Call extends mixins.wl {
       guest: Call.isGuest()
     };
     this.handleRetryTimeout = () => {
-      if (this.props.sfuApp.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
+      if (this.props.call.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
         this.handleCallEnd();
         this.props.chatRoom.trigger('onRetryTimeout');
         ion.sound.play('end_call');
@@ -20476,15 +20565,13 @@ class Call extends mixins.wl {
       return call.toggleScreenSharing();
     };
     this.handleCallEnd = l => {
-      var _chatRoom$sfuApp;
       const {
-        chatRoom,
         call
       } = this.props;
       if (l) {
         eventlog(99760, JSON.stringify([call.callId, 0]));
       }
-      chatRoom == null ? void 0 : (_chatRoom$sfuApp = chatRoom.sfuApp) == null ? void 0 : _chatRoom$sfuApp.destroy();
+      call.destroy();
     };
     this.handleEphemeralAdd = handle => handle && this.setState(state => ({
       ephemeral: true,
@@ -20574,7 +20661,6 @@ class Call extends mixins.wl {
       call,
       chatRoom,
       parent,
-      sfuApp,
       onDeleteMessage
     } = this.props;
     const {
@@ -20604,7 +20690,7 @@ class Call extends mixins.wl {
       stayOnEnd,
       everHadPeers,
       hasOtherParticipants: call.hasOtherParticipant(),
-      isOnHold: sfuApp.sfuClient.isOnHold(),
+      isOnHold: call.sfuClient.isOnHold(),
       onSpeakerChange: this.handleSpeakerChange,
       onInviteToggle: this.handleInviteToggle,
       onStayConfirm: this.handleStayConfirm
@@ -20612,7 +20698,6 @@ class Call extends mixins.wl {
     return external_React_default().createElement("div", {
       className: `meetings-call ${minimized ? 'minimized' : ''}`
     }, external_React_default().createElement(stream_Stream, (0,esm_extends.Z)({}, STREAM_PROPS, {
-      sfuApp: sfuApp,
       minimized: minimized,
       ephemeralAccounts: ephemeralAccounts,
       onCallMinimize: this.handleCallMinimize,

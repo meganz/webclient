@@ -10,7 +10,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
-        this.av = this.props.sfuApp.sfuClient.availAv;
+        this.av = this.props.call.sfuClient.availAv;
     }
 
     /**
@@ -21,9 +21,9 @@ export default class ParticipantsNotice extends MegaRenderMixin {
      * @returns {boolean} If the component should updated
      */
     specShouldComponentUpdate(newProps) {
-        const { stayOnEnd, hasLeft, isOnHold, sfuApp } = this.props;
+        const { stayOnEnd, hasLeft, isOnHold, call } = this.props;
         const currAv = this.av;
-        this.av = sfuApp.sfuClient.availAv;
+        this.av = call.sfuClient.availAv;
         return newProps.stayOnEnd !== stayOnEnd
             || newProps.hasLeft !== hasLeft
             || newProps.isOnHold !== isOnHold
@@ -126,9 +126,9 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
 
     render() {
-        const { sfuApp, call, hasLeft, streamContainer, isOnHold } = this.props;
+        const { call, hasLeft, streamContainer, isOnHold } = this.props;
 
-        if (sfuApp.isDestroyed) {
+        if (call.isDestroyed) {
             return null;
         }
 

@@ -1016,6 +1016,10 @@ lazy(mega, 'keyMgr', () => {
         async cacheVerifiedPeerKeys(userHandle) {
             const promises = [];
 
+            if (d) {
+                logger.debug('Cache peer-key for %s', userHandle, !!pubCu25519[userHandle], !!pubEd25519[userHandle]);
+            }
+
             if (!pubCu25519[userHandle]) {
                 promises.push(crypt.getPubCu25519(userHandle));
             }
@@ -1035,6 +1039,11 @@ lazy(mega, 'keyMgr', () => {
             // trusted key available?
             const ed = authring.getContactAuthenticated(userHandle, 'Ed25519');
             const cu = authring.getContactAuthenticated(userHandle, 'Cu25519');
+
+            if (d) {
+                const msg = 'Checking verified status for %s... (cu=%s, ed=%s)';
+                logger.debug(msg, userHandle, cu && cu.method, ed && ed.method);
+            }
 
             return cu && cu.method >= authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED
                 && ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
@@ -1085,20 +1094,24 @@ lazy(mega, 'keyMgr', () => {
 
         // pending inshare keys (from this.pendinginshares)
         // from peers whose keys are verified and cached will be decrypted, set and removed from ^!keys
-        async acceptPendingInShareCacheKeys() {
+        async acceptPendingInShareCacheKeys(stub) {
             if (!this.generation) {
                 return;
             }
 
             // (new users appearing during the commit attempts will not be cached and have to wait for the next round)
             do {
-                let changed = false;
+                let changed = typeof stub === 'function' && stub() || false;
 
                 for (const node in this.pendinginshares) {
                     if (u_sharekeys[node]) {
                         // already have it
                         delete this.pendinginshares[node];
                         changed = true;
+
+                        if (d) {
+                            logger.log('existing share-key for %s', node);
+                        }
                     }
                     else {
                         const t = this.pendinginshares[node];
@@ -1112,6 +1125,13 @@ lazy(mega, 'keyMgr', () => {
                             crypto_setsharekey(node, str_to_a32(sharekey), false, true);
                             delete this.pendinginshares[node];
                             changed = true;
+
+                            if (d) {
+                                logger.info('share-key decrypted for %s', node);
+                            }
+                        }
+                        else if (d) {
+                            logger.debug('cannot (yet) decrypt share-key for %s', node);
                         }
                     }
                 }
@@ -1127,7 +1147,7 @@ lazy(mega, 'keyMgr', () => {
 
         // cache peer public keys required to decrypt pendinginshare
         // then, try to decrypt them and persist the remainder for retry later
-        async acceptPendingInShares() {
+        async acceptPendingInShares(stub) {
             const promises = [];
 
             // cache senders' public keys
@@ -1138,15 +1158,17 @@ lazy(mega, 'keyMgr', () => {
             }
 
             await Promise.allSettled(promises);
-            await this.acceptPendingInShareCacheKeys();
+            await this.acceptPendingInShareCacheKeys(stub);
 
-            return this.decryptInShares();
+            queueMicrotask(() => {
+                this.decryptInShares().catch(dump);
+            });
         }
 
         // fetch pending inshare keys from the API, decrypt inshares for trusted sender keys, store in ^!keys otherwise
         // (idempotent operation)
         async fetchPendingInShareKeys() {
-            let rem;
+            let rem, stub;
 
             if (d) {
                 logger.warn('Fetching pending in-share keys...');
@@ -1162,23 +1184,32 @@ lazy(mega, 'keyMgr', () => {
                 rem = res.d;
                 delete res.d;
 
-                for (const userHandle in res) {
-                    const uhab = new Uint8Array(base64_to_ab(userHandle), 0, 8);
+                stub = () => {
+                    let changed = false;
 
-                    for (const node in res[userHandle]) {
-                        if (!u_sharekeys[node]) {
-                            // construct userhandle / key blob and add it to pendinginshares
-                            const t = new Uint8Array(24);
-                            t.set(uhab);
-                            t.set(new Uint8Array(base64_to_ab(res[userHandle][node])), 8);
-                            this.pendinginshares[node] = t;
+                    for (const userHandle in res) {
+                        const uhab = new Uint8Array(base64_to_ab(userHandle), 0, 8);
+
+                        for (const node in res[userHandle]) {
+                            if (!u_sharekeys[node]) {
+                                // construct userhandle / key blob and add it to pendinginshares
+                                const t = new Uint8Array(24);
+
+                                t.set(uhab);
+                                t.set(new Uint8Array(base64_to_ab(res[userHandle][node])), 8);
+
+                                changed = true;
+                                this.pendinginshares[node] = t;
+                            }
                         }
                     }
-                }
+
+                    return changed;
+                };
             }
 
             // decrypt trusted keys, store the remaining ones
-            await this.acceptPendingInShares();
+            await this.acceptPendingInShares(stub);
 
             // we can now delete the fetched inshare keys from the queue
             // (if this operation fails, no problem, it's all idempotent)

@@ -871,10 +871,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
 
         if (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0) {
-            if (folderlink) {
-                $('.fm-bottom-right-buttons', fmholder).addClass('hidden');
-            }
-
             $selectionBar.removeClass('hidden');
         }
 
@@ -911,10 +907,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
         else {
             initPerfectScrollbar($(this._get_selectable_container()).closest('.ps'));
-        }
-
-        if (this.currentdirid.substr(0, 7) !== 'search/' && folderlink) {
-            $('.fm-bottom-right-buttons', fmholder).removeClass('hidden');
         }
     }
 

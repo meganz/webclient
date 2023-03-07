@@ -726,7 +726,7 @@ var megasync = (function() {
     };
 
     ns.isInstalled = function (next) {
-        if ((!fmconfig.dlThroughMEGAsync && page !== "download" && page !== 'fm/account/transfers')
+        if ((!fmconfig.dlThroughMEGAsync && page !== "download" && page !== 'fm/account/transfers' && !folderlink)
             || (!is_livesite && !usemsync)) {
             next(true, false, true); // next with error=true and isworking=false, off=true
         }

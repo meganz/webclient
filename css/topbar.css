@@ -637,7 +637,8 @@
     display: inline-block;
 }
 .bottom-page.download .topbar .logo,
-.bottom-page.download .topbar .logo-wrapper button {
+.bottom-page.download .topbar .logo-wrapper button,
+.active-folder-link .topbar .logo-wrapper button {
     display: none;
 }
 

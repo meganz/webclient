@@ -11,7 +11,7 @@ require("./chatRoom.jsx");
 require("./ui/meetings/workflow/incoming.jsx");
 
 import ChatRouting from "./chatRouting.jsx";
-import { replaceAt } from './mixins.js';
+import MeetingsManager from './meetingsManager.jsx';
 
 const EMOJI_DATASET_VERSION = 4;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
@@ -42,6 +42,7 @@ function Chat() {
     this.mbListeners = [];
 
     this.chats = new MegaDataMap();
+    this.scheduledMeetings = new MegaDataMap();
     this.chatUIFlags = new MegaDataMap();
     this.initChatUIFlagsManagement();
 
@@ -55,6 +56,7 @@ function Chat() {
     this._imagesToBeLoaded = Object.create(null);
     this._imageAttributeCache = Object.create(null);
     this._queuedMccPackets = [];
+    this._queuedMcsmPackets = {};
     this._queuedMessageUpdates = [];
     this._queuedChatRoomEvents = {};
 
@@ -82,6 +84,7 @@ function Chat() {
          * @property {ChatToastIntegration} ChatToastIntegration
          * @property {ChatStats} chatStats
          * @property {GeoLocationLinks} geoLocationLinks
+         * @property {MeetingsManager} meetingsManager
          */
         'plugins': {
             'chatdIntegration': ChatdIntegration,
@@ -98,6 +101,7 @@ function Chat() {
             'chatToastIntegration': ChatToastIntegration,
             'chatStats': ChatStats,
             'geoLocationLinks': GeoLocationLinks,
+            'meetingsManager': MeetingsManager,
         },
         'chatNotificationOptions':  {
             'textMessages': {
@@ -200,6 +204,7 @@ function Chat() {
 inherits(Chat, MegaDataObject);
 
 Object.defineProperty(Chat, 'mcf', {value: Object.create(null)});
+Object.defineProperty(Chat, 'mcsm', {value: Object.create(null)});
 
 /**
  * Initialize the MegaChat (also will connect to the XMPP)
@@ -284,11 +289,13 @@ Chat.prototype.init = promisify(function(resolve, reject) {
         this.publicChatKeys[ph] = key;
     }
 
-    var promises = [];
-    var rooms = Object.keys(Chat.mcf);
-    for (var i = rooms.length; i--;) {
+    const promises = [];
+    const rooms = Object.keys(Chat.mcf);
+    for (let i = rooms.length; i--;) {
+        const roomId = rooms[i];
+        const room = Chat.mcf[roomId];
         if (!this.publicChatKeys[rooms[i]]) {
-            promises.push(self.plugins.chatdIntegration.openChat(Chat.mcf[rooms[i]], true));
+            promises.push(self.plugins.chatdIntegration.openChat(room, true));
         }
         delete Chat.mcf[rooms[i]];
     }
@@ -341,6 +348,15 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             setInterval(self.removeMessagesByRetentionTime.bind(self, null), 20000);
 
             self.autoJoinIfNeeded();
+
+            const scheduledMeetings = Object.values(Chat.mcsm);
+            if (scheduledMeetings && scheduledMeetings.length) {
+                for (let i = scheduledMeetings.length; i--;) {
+                    const scheduledMeeting = scheduledMeetings[i];
+                    self.plugins.meetingsManager.attachMeeting(scheduledMeeting);
+                    delete Chat.mcsm[scheduledMeeting.id];
+                }
+            }
 
             return true;
         })
@@ -1056,21 +1072,22 @@ Chat.prototype._renderMyStatus = function() {
 Chat.prototype.renderMyStatus = SoonFc(Chat.prototype._renderMyStatus, 100);
 
 /**
- * Open (and (optionally) show) a new chat
- *
- * @param userHandles {Array} list of user handles
- * @param type {String} "private" or "group", "public"
- * @param [chatId] {String}
- * @param [chatShard]  {String}
- * @param [chatdUrl]  {String}
- * @param [setAsActive] {Boolean}
+ * openChat
+ * @description Open and optionally show a new chat
+ * @param {Array} userHandles LIst of user handles
+ * @param {String} type Chat type, e.g. `private`, `group` or `public`
+ * @param {String} [chatId] the chat id
+ * @param {String} [chatShard] the chat shard
+ * @param {String} [chatdUrl] the chatd URL
+ * @param {Boolean} [setAsActive] optionally open and set the given chat as active
  * @param {String} [chatHandle] the public chat handle
  * @param {String} [publicChatKey] the public chat key
  * @param {String} ck the chat key
  * @param {Boolean} isMeeting Is the chat a meeting
  * @param {Object} [mcoFlags] Flags set by mco requests for the room see MCO_FLAGS for options.
- * @returns [roomId {string}, room {MegaChatRoom}, {Deferred}]
+ * @return {String|ChatRoom|Promise}
  */
+
 Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUrl, setAsActive, chatHandle,
                                    publicChatKey, ck, isMeeting, mcoFlags
 ) {
@@ -1254,6 +1271,8 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
                 delete this._queuedChatRoomEvents[chatId];
                 delete this._queuedChatRoomEvents[`${chatId}_timer`];
             }
+
+            this.processQueuedMcsmPackets();
         })
     ];
 };
@@ -1382,6 +1401,16 @@ Chat.prototype.retrieveSharedFilesHistory = async function(len = 47, chatRoom = 
  */
 Chat.prototype.getCurrentRoom = function() {
     return this.chats[this.currentlyOpenedChat];
+};
+
+/**
+ * Returns the scheduled meeting for the currently opened room/chat
+ * @returns {null|undefined|ScheduledMeeting}
+ */
+
+Chat.prototype.getCurrentMeeting = function() {
+    const chatRoom = this.getCurrentRoom();
+    return chatRoom && chatRoom.scheduledMeeting || null;
 };
 
 /**
@@ -2074,7 +2103,7 @@ Chat.prototype.createAndShowGroupRoomFor = function(contactHashes, topic, opts =
 Chat.prototype.createAndStartMeeting = function(topic, audio, video) {
     megaChat.createAndShowGroupRoomFor([], topic, {
         keyRotation: false,
-        createChatLink: 2,
+        createChatLink: true,
         isMeeting: true
     });
     megaChat.rebind('onRoomInitialized.meetingCreate', function(e, room) {
@@ -2530,8 +2559,36 @@ Chat.prototype.onSnActionPacketReceived = function() {
             mBroadcaster.sendMessage('onChatdChatUpdatedActionPacket', aps[i]);
         }
     }
+    this.processQueuedMcsmPackets();
 };
 
+Chat.prototype.processQueuedMcsmPackets = function() {
+    const aps = Object.values(this._queuedMcsmPackets);
+    if (aps.length) {
+        for (let i = 0; i < aps.length; i++) {
+            const ap = aps[i];
+            const { type, data } = ap;
+            const { meetingsManager } = this.plugins;
+
+            // Attach a new scheduled meeting to an existing room; handled in `Chat.openChat()` if
+            // the room is not instantiated yet, e.g. when `mcc` and `mcsmp` are being received together.
+            // Covers also existing scheduled meetings, incl. canceling a meeting.
+            if (type === 'mcsmp') {
+                const chatRoom = this.getChatById(data.cid);
+                if (chatRoom) {
+                    const scheduledMeeting = meetingsManager.attachMeeting(data, true);
+                    delete this._queuedMcsmPackets[scheduledMeeting.id];
+                    return scheduledMeeting.iAmOwner ? null : notify.notifyFromActionPacket({ ...data, a: type });
+                }
+            }
+
+            if (type === 'mcsmr') {
+                meetingsManager.detachMeeting(data);
+                delete this._queuedMcsmPackets[data.id];
+            }
+        }
+    }
+};
 
 Chat.prototype.getFrequentContacts = function() {
     if (Chat._frequentsCache) {

@@ -47,7 +47,9 @@ class ParticipantsList extends MegaRenderMixin {
                 $('.chat-contacts-list', $parentContainer).height(
                     fitHeight
                 );
-                self.contactsListScroll.reinitialise();
+                if (self.contactsListScroll) {
+                    self.contactsListScroll.reinitialise();
+                }
             }
 
 

@@ -1,6 +1,8 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins.js';
 import ConversationsListItem from './conversationsListItem.jsx';
+import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
+import { TogglePanel } from './toggle.jsx';
 
 export class ConversationsList extends MegaRenderMixin {
     backgroundUpdateInterval = null;
@@ -67,11 +69,19 @@ export class ConversationsList extends MegaRenderMixin {
     }
 
     renderEmptyState() {
-        const { view, views, isArchived } = this.props;
+        const { type, view, views } = this.props;
+        const isArchived = type === TogglePanel.KEYS.ARCHIVE;
+        const isUpcoming = type === TogglePanel.KEYS.UPCOMING;
         const messages = {
             [views.CHATS]: isArchived ? l.no_archived_chats_lhp : l.no_chats_lhp,
-            [views.MEETINGS]: isArchived ? l.no_archived_meetings_lhp : l.no_meetings_lhp
+            [views.MEETINGS]: (() => {
+                if (isArchived) {
+                    return l.no_archived_meetings_lhp;
+                }
+                return isUpcoming ? l.no_upcoming_meetings_lhp : l.no_meetings_lhp;
+            })()
         };
+
         return (
             <span className="empty-conversations">
                 {messages[view]}
@@ -79,12 +89,18 @@ export class ConversationsList extends MegaRenderMixin {
         );
     }
 
-    renderConversations() {
-        const { conversations, onConversationClick } = this.props;
+    renderConversationsList() {
+        const { view, conversations, onConversationClick } = this.props;
         return (
-            <ul className="conversations-pane">
-                {conversations.sort(M.sortObjFn(room => room.lastActivity || room.ctime, -1))
-                    .map(chatRoom => {
+            <PerfectScrollbar
+                className="chat-lp-scroll-area"
+                ref={ref => {
+                    megaChat.$chatTreePanePs = ref;
+                }}
+                view={view}
+                conversations={conversations}>
+                <ul className="conversations-pane">
+                    {conversations.map(chatRoom => {
                         if (chatRoom.roomId) {
                             return (
                                 <ConversationsListItem
@@ -103,7 +119,8 @@ export class ConversationsList extends MegaRenderMixin {
                         }
                         return null;
                     })}
-            </ul>
+                </ul>
+            </PerfectScrollbar>
         );
     }
 
@@ -127,6 +144,6 @@ export class ConversationsList extends MegaRenderMixin {
             return this.renderEmptyState();
         }
 
-        return view === views.LOADING ? this.renderLoading() : this.renderConversations();
+        return view === views.LOADING ? this.renderLoading() : this.renderConversationsList();
     }
 }

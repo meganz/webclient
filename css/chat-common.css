@@ -463,6 +463,10 @@
     padding: 0 14px 4px 14px;
     line-height: 0;
 }
+.chat-dropdown.content.chat-occurrences-panel {
+    padding: 0 10px 4px 0;
+    line-height: inherit;
+}
 .chat-dropdown.content.buttons {
     padding: 0 8px 4px 8px;
 }
@@ -1139,13 +1143,24 @@ button.fm-empty-button {
     box-shadow: var(--dialog-shadow);
 }
 
-.in-call-notif.neutral.join button {
+.in-call-notif.neutral.start {
+    padding: 6px 8px;
+    min-width: auto;
+    height: auto;
+}
+
+.in-call-notif.neutral.join button,
+.in-call-notif.neutral.start button {
     border-radius: 12px;
     padding: 0 12px;
     transition: color 200ms ease-in-out, background-color 200ms ease-in-out, border-color 200ms ease-in-out;
     display: inline-block;
     height: 24px;
     margin: -2px 7px 0 24px;
+}
+
+.in-call-notif.neutral.start button {
+    margin: auto;
 }
 
 .in-call-notif.neutral .small-icon {
@@ -1170,4 +1185,112 @@ button.fm-empty-button {
 .in-call-notif.yellow.join {
     top: 0;
     text-align: center;
+}
+
+/* Occurrences RHP */
+
+.chat-occurrences-list {
+    margin: 0 0 10px;
+    height: 420px;
+}
+
+.chat-occurrences-list-inner {
+    padding: 5px 12px 0 0;
+}
+
+.chat-occurrences-list-inner .loading-sketch {
+    animation: fadeInOutLoopSubtle 2s linear infinite;
+}
+
+.chat-occurrence {
+    margin: 0 0 24px;
+    padding: 0 0 0 10px;
+    font: var(--text-body2);
+}
+
+.chat-occurrence:last-child {
+    padding-bottom: 15px;
+}
+
+.chat-occurrence:hover .chat-occurrence-controls {
+    opacity: 1;
+    transition: opacity 400ms ease-in-out;
+}
+
+.chat-occurrence:hover .chat-occurrence-content {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 200ms ease-in;
+}
+
+.chat-occurrence-date,
+.chat-occurrence-title {
+    font: var(--text-body2-bold);
+    color: var(--text-color-high);
+}
+
+.chat-occurrence-date span {
+    margin: 0 2px 0 0;
+}
+
+.loading-sketch .chat-occurrence-date,
+.loading-sketch .chat-occurrence-title,
+.loading-sketch .chat-occurrence-time {
+    height: 10px;
+    padding: 0;
+    border-radius: 3px;
+    background: #CBCBCB;
+}
+
+.loading-sketch .chat-occurrence-title {
+    width: 90%;
+    margin: 0 0 7px;
+}
+
+.loading-sketch .chat-occurrence-time {
+    width: 70%;
+}
+
+.chat-occurrence-content {
+    position: relative;
+    margin: 8px 0 0;
+    padding: 8px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background: var(--surface-grey-2);
+}
+
+.chat-occurrence-title {
+    overflow: hidden;
+    padding: 0 0 6px;
+    max-width: calc(100% - 50px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chat-occurrence-controls {
+    position: absolute;
+    top: 8px;
+    right: 0;
+    --icon-size: 18px;
+    opacity: 0;
+}
+
+.chat-occurrence-control {
+    float: left;
+    margin: 0 8px 0 0;
+    cursor: pointer;
+}
+
+.mega-dialog.scheduled-description-dialog header h3 {
+    text-align: start;
+    padding: 24px 24px 12px;
+}
+.mega-dialog.scheduled-description-dialog section {
+    max-height: 530px;
+    min-height: 120px;
+    padding: 0 24px 24px;
+}
+.mega-dialog.scheduled-description-dialog .description-scroller {
+    padding-inline-end: 26px;
+    -webkit-padding-end: 26px;
 }

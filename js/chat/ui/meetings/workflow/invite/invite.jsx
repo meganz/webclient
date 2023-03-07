@@ -230,33 +230,16 @@ export default class Invite extends MegaRenderMixin {
         );
     };
 
-    getPublicLink = () => {
-        const { chatRoom } = this.props;
-        if (chatRoom && chatRoom.isMeeting) {
-            chatRoom.updatePublicHandle(
-                undefined,
-                () => {
-                    if (this.isMounted()) {
-                        this.setState({
-                            link: chatRoom.publicLink ? `${getBaseUrl()}/${chatRoom.publicLink}` : l[20660]
-                        });
-                    }
-                }
-            );
-        }
-    };
-
     componentDidMount() {
         super.componentDidMount();
         this.getFrequentContacts();
-        this.getPublicLink();
     }
 
     render() {
         const { NAMESPACE } = Invite;
-        const { link, value, loading, selected, field, contactsInitial } = this.state;
+        const { value, loading, selected, field, contactsInitial } = this.state;
         const { chatRoom, onClose } = this.props;
-        const IS_MEETING = chatRoom && chatRoom.isMeeting;
+        const { isMeeting, publicLink } = chatRoom || {};
 
         return (
             <ModalDialogsUI.ModalDialog
@@ -269,27 +252,30 @@ export default class Invite extends MegaRenderMixin {
                 hideOverlay={true}
                 onClose={onClose}>
                 <div className={`${NAMESPACE}-head`}>
-                    <h2>{IS_MEETING ? l.invite_participants /* `Invite participants` */ : l[8726] /* `Invite` */}</h2>
-                    {IS_MEETING && (
+                    <h2>{isMeeting ? l.invite_participants /* `Invite participants` */ : l[8726] /* `Invite` */}</h2>
+                    {isMeeting && publicLink && (
                         <>
                             <p>{l.copy_and_share /* `Copy this link to send your invite` */}</p>
                             <div className="link-input-container">
                                 <Button
-                                    className={`mega-button large positive ${link ? '' : 'disabled'}`}
-                                    onClick={() => link && copyToClipboard(link, l[371] /* `Copied to clipboard` */)}>
-                                    {!link ? l[7006] /* `Loading...` */ : l[1394] /* `Copy link` */}
+                                    className={`mega-button large positive ${publicLink ? '' : 'disabled'}`}
+                                    onClick={() =>
+                                        publicLink &&
+                                        copyToClipboard(publicLink, l[371] /* `Copied to clipboard` */)
+                                    }>
+                                    {!publicLink ? l[7006] /* `Loading...` */ : l[1394] /* `Copy link` */}
                                 </Button>
                                 <Link
                                     className="view-link-control"
                                     field={field}
                                     onClick={() => this.setState({ field: !field })}>
                                     {field ? l.collapse_meeting_link : l.expand_meeting_link}
-                                    <i className={`sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`} />
+                                    <i className={`sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`}/>
                                 </Link>
-                                {field && link && (
+                                {field && publicLink && (
                                     <div className="chat-link-input">
                                         <i className="sprite-fm-mono icon-link"/>
-                                        <input type="text" readOnly={true} value={link}/>
+                                        <input type="text" readOnly={true} value={publicLink}/>
                                     </div>
                                 )}
                             </div>

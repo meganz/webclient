@@ -2,7 +2,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 662:
+/***/ 638:
 /***/ ((__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -271,8 +271,853 @@ ChatRouting.gPageHandlers = {
     }
   }
 };
-// EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+// EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
+var scheduleMetaChange = __webpack_require__(97);
+;// CONCATENATED MODULE: ./js/chat/meetingsManager.jsx
+
+class Occurrence {
+  constructor(megaChat, occurrence) {
+    const {
+      decodeData
+    } = megaChat.plugins.meetingsManager;
+    this.megaChat = megaChat;
+    this.id = occurrence.id;
+    this.uid = `${occurrence.cid}-${occurrence.o || occurrence.s}`;
+    this.chatId = occurrence.cid;
+    this.parentId = occurrence.p;
+    this.start = occurrence.s * 1000;
+    this.startInitial = parseInt(occurrence.o) * 1000 || undefined;
+    this.end = occurrence.e * 1000;
+    this.timezone = decodeData(occurrence.tz);
+    this.title = decodeData(occurrence.t);
+    this.description = decodeData(occurrence.d);
+    this.ownerHandle = occurrence.u;
+    this.flags = occurrence.f;
+    this.canceled = occurrence.c;
+    this.scheduledMeeting = occurrence.scheduledMeeting;
+  }
+  get isUpcoming() {
+    return !this.canceled && this.end > Date.now();
+  }
+  cancel() {
+    const {
+      encodeData
+    } = this.megaChat.plugins.meetingsManager;
+    const req = {
+      a: 'mcsmp',
+      p: this.parentId || this.id,
+      ...(this.parentId && {
+        id: this.id
+      }),
+      cid: this.chatId,
+      o: this.start / 1000,
+      s: this.start / 1000,
+      e: this.end / 1000,
+      tz: encodeData(this.timezone),
+      t: encodeData(this.title),
+      d: encodeData(this.description) || '',
+      f: this.scheduledMeeting.flags,
+      c: 1
+    };
+    asyncApiReq(req).catch(ex => console.error('Occurrence > cancel ->', ex));
+  }
+  update(startDateTime, endDateTime) {
+    const {
+      encodeData
+    } = this.megaChat.plugins.meetingsManager;
+    const req = {
+      a: 'mcsmp',
+      cid: this.chatId,
+      p: this.parentId || this.id,
+      ...(this.parentId && {
+        id: this.id
+      }),
+      o: this.start / 1000,
+      s: startDateTime / 1000,
+      e: endDateTime / 1000,
+      tz: encodeData(this.timezone),
+      t: encodeData(this.title),
+      d: encodeData(this.description) || '',
+      f: this.scheduledMeeting.flags
+    };
+    asyncApiReq(req).catch(ex => console.error('Occurrence > update ->', ex));
+  }
+}
+class ScheduledMeeting {
+  constructor(megaChat, meetingInfo, fromActionPacket) {
+    const {
+      decodeData
+    } = megaChat.plugins.meetingsManager;
+    this.megaChat = megaChat;
+    this.id = meetingInfo.id;
+    this.chatId = meetingInfo.cid;
+    this.parentId = meetingInfo.p;
+    this.start = meetingInfo.s * 1000;
+    this.startInitial = parseInt(meetingInfo.o) * 1000 || undefined;
+    this.end = meetingInfo.e * 1000;
+    this.timezone = decodeData(meetingInfo.tz);
+    this.title = decodeData(meetingInfo.t);
+    this.description = decodeData(meetingInfo.d);
+    this.flags = meetingInfo.f;
+    this.canceled = meetingInfo.c;
+    this.recurring = meetingInfo.r && {
+      frequency: meetingInfo.r.f || undefined,
+      interval: meetingInfo.r.i || 0,
+      end: meetingInfo.r.u * 1000 || undefined,
+      weekDays: meetingInfo.r.wd || [],
+      monthDays: meetingInfo.r.md || [],
+      offset: meetingInfo.r.mwd && meetingInfo.r.mwd.length ? {
+        value: meetingInfo.r.mwd[0][0],
+        weekDay: meetingInfo.r.mwd[0][1]
+      } : []
+    };
+    this.occurrences = new MegaDataMap();
+    this.nextOccurrenceStart = this.start;
+    this.nextOccurrenceEnd = this.end;
+    this.ownerHandle = meetingInfo.u;
+    this.chatRoom = meetingInfo.chatRoom;
+    this.chatRoom.scheduledMeeting = this.isRoot ? this : this.parent;
+    if (fromActionPacket) {
+      this.initializeFromActionPacket();
+    }
+  }
+  get isRoot() {
+    return !this.parentId;
+  }
+  get isCanceled() {
+    return !!this.canceled;
+  }
+  get isPast() {
+    const end = this.isRecurring ? this.recurring.end : this.end;
+    return end < Date.now();
+  }
+  get isUpcoming() {
+    return !this.isCanceled && !this.isPast;
+  }
+  get isRecurring() {
+    return !!this.recurring;
+  }
+  get isNear() {
+    return this.start - Date.now() < ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
+  }
+  get iAmOwner() {
+    if (this.ownerHandle) {
+      return this.ownerHandle === u_handle;
+    }
+    return null;
+  }
+  get parent() {
+    return this.isRoot ? null : this.megaChat.plugins.meetingsManager.getMeetingById(this.parentId);
+  }
+  setNextOccurrence() {
+    if (this.occurrences && this.occurrences.length) {
+      const nextOccurrences = Object.values(this.occurrences).filter(o => o.isUpcoming).sort((a, b) => a.start - b.start);
+      this.nextOccurrenceStart = nextOccurrences[0].start;
+      this.nextOccurrenceEnd = nextOccurrences[0].end;
+      return {
+        start: this.nextOccurrenceStart,
+        end: this.nextOccurrenceEnd
+      };
+    }
+    return null;
+  }
+  async getOccurrences(options) {
+    const {
+      from,
+      to,
+      count
+    } = options || {};
+    const {
+      meetingsManager
+    } = this.megaChat.plugins;
+    const req = {
+      a: 'mcsmfo',
+      cid: this.chatId,
+      ...(from && {
+        cf: Math.round(from / 1000)
+      }),
+      ...(to && {
+        ct: Math.round(to / 1000)
+      }),
+      ...(count && {
+        cc: count
+      })
+    };
+    if (is_chatlink) {
+      req.ph = is_chatlink.ph;
+      delete req.cid;
+    }
+    const occurrences = await asyncApiReq(req);
+    if (Array.isArray(occurrences)) {
+      for (let i = 0; i < occurrences.length; i++) {
+        const occurrence = new Occurrence(this.megaChat, {
+          scheduledMeeting: this,
+          ...occurrences[i]
+        });
+        this.occurrences.set(occurrence.uid, occurrence);
+      }
+      this.megaChat.trigger(meetingsManager.EVENTS.OCCURRENCES_UPDATE, this);
+      this.setNextOccurrence();
+    }
+    return this.occurrences;
+  }
+  getOccurrencesById(occurrenceId) {
+    const occurrences = Object.values(this.occurrences.toJS()).filter(o => o.id === occurrenceId);
+    return occurrences.length ? occurrences : false;
+  }
+  initializeFromActionPacket() {
+    const {
+      megaChat,
+      isUpcoming,
+      isCanceled,
+      isRecurring,
+      parent
+    } = this;
+    if (isUpcoming && isRecurring || parent) {
+      return parent ? (() => {
+        const {
+          chatId,
+          start,
+          startInitial
+        } = this;
+        const occurrences = Object.values(parent.occurrences);
+        const currentIndex = occurrences.findIndex(o => o.uid === `${chatId}-${(startInitial || start) / 1000}`);
+        const previous = occurrences[currentIndex - 1];
+        return parent.getOccurrences({
+          from: previous ? previous.start : Date.now(),
+          count: occurrences.length - currentIndex
+        }).catch(nop);
+      })() : this.getOccurrences().catch(nop);
+    }
+    megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS[isCanceled ? 'CANCEL' : 'INITIALIZE'], this);
+  }
+  isSameAsOpts(opts) {
+    const {
+      timezone,
+      startDateTime,
+      endDateTime,
+      topic,
+      description,
+      f,
+      recurring
+    } = opts;
+    if (this.timezone !== timezone || this.start !== startDateTime || this.end !== endDateTime) {
+      return false;
+    }
+    if (this.title !== topic) {
+      return false;
+    }
+    if (this.description !== description) {
+      return false;
+    }
+    if (this.flags !== f) {
+      return false;
+    }
+    if (!!this.recurring ^ !!recurring) {
+      return false;
+    }
+    if (this.recurring) {
+      if (this.recurring.frequency !== recurring.frequency || this.recurring.interval !== (recurring.interval || 0)) {
+        return false;
+      }
+      if (this.recurring.end !== recurring.end) {
+        return false;
+      }
+      let diff = array.diff(this.recurring.weekDays, recurring.weekDays || []);
+      if (diff.removed.length + diff.added.length) {
+        return false;
+      }
+      diff = array.diff(this.recurring.monthDays, recurring.monthDays || []);
+      if (diff.removed.length + diff.added.length) {
+        return false;
+      }
+      if (Array.isArray(this.recurring.offset) && !Array.isArray(recurring.offset) || !Array.isArray(this.recurring.offset) && Array.isArray(recurring.offset)) {
+        return false;
+      }
+      if ((this.recurring.offset.value || 0) !== (recurring.offset.value || 0) || (this.recurring.offset.weekDay || 0) !== (recurring.offset.weekDay || 0)) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+class MeetingsManager {
+  constructor(megaChat) {
+    this.EVENTS = {
+      INITIALIZE: 'onMeetingInitialize',
+      EDIT: 'onMeetingEdit',
+      CANCEL: 'onMeetingCancel',
+      LEAVE: 'onMeetingLeave',
+      OCCURRENCES_UPDATE: 'onOccurrencesUpdate'
+    };
+    this.startDayStrings = [l.schedule_occur_sun, l.schedule_occur_mon, l.schedule_occur_tue, l.schedule_occur_wed, l.schedule_occur_thu, l.schedule_occur_fri, l.schedule_occur_sat];
+    this.midDayStrings = [l.schedule_occur_sun_mid, l.schedule_occur_mon_mid, l.schedule_occur_tue_mid, l.schedule_occur_wed_mid, l.schedule_occur_thu_mid, l.schedule_occur_fri_mid, l.schedule_occur_sat_mid];
+    this.NOTIF_TITLES = {
+      recur: {
+        desc: {
+          update: l.schedule_notif_update_desc
+        },
+        name: {
+          update: l.schedule_mgmt_title
+        },
+        time: {
+          occur: l.schedule_mgmt_update_occur,
+          all: l.schedule_mgmt_update_recur
+        },
+        convert: l.schedule_mgmt_update_convert_recur,
+        inv: l.schedule_notif_invite_recur,
+        multi: l.schedule_notif_update_multi,
+        cancel: {
+          occur: l.schedule_mgmt_cancel_occur,
+          all: l.schedule_mgmt_cancel_recur
+        }
+      },
+      once: {
+        desc: {
+          update: l.schedule_notif_update_desc
+        },
+        name: {
+          update: l.schedule_mgmt_title
+        },
+        time: {
+          occur: '',
+          all: l.schedule_mgmt_update
+        },
+        convert: l.schedule_mgmt_update_convert,
+        inv: l.schedule_notif_invite,
+        multi: l.schedule_notif_update_multi,
+        cancel: {
+          occur: '',
+          all: l.schedule_mgmt_cancel
+        }
+      }
+    };
+    this.OCCUR_STRINGS = {
+      recur: {
+        daily: {
+          continuous: {
+            occur: l.schedule_recur_time_daily_cont
+          },
+          limited: {
+            occur: l.schedule_recur_time_daily
+          }
+        },
+        weekly: {
+          continuous: {
+            list: l.schedule_recur_time_week_cont_list,
+            spec: l.schedule_recur_time_week_cont
+          },
+          limited: {
+            list: l.schedule_recur_time_week_list,
+            spec: l.schedule_recur_time_week
+          }
+        },
+        monthly: {
+          continuous: {
+            num: l.schedule_recur_time_num_day_month_cont,
+            pos: [[l.schedule_recur_time_first_day_month_6_cont, l.schedule_recur_time_first_day_month_0_cont, l.schedule_recur_time_first_day_month_1_cont, l.schedule_recur_time_first_day_month_2_cont, l.schedule_recur_time_first_day_month_3_cont, l.schedule_recur_time_first_day_month_4_cont, l.schedule_recur_time_first_day_month_5_cont], [l.schedule_recur_time_second_day_month_6_cont, l.schedule_recur_time_second_day_month_0_cont, l.schedule_recur_time_second_day_month_1_cont, l.schedule_recur_time_second_day_month_2_cont, l.schedule_recur_time_second_day_month_3_cont, l.schedule_recur_time_second_day_month_4_cont, l.schedule_recur_time_second_day_month_5_cont], [l.schedule_recur_time_third_day_month_6_cont, l.schedule_recur_time_third_day_month_0_cont, l.schedule_recur_time_third_day_month_1_cont, l.schedule_recur_time_third_day_month_2_cont, l.schedule_recur_time_third_day_month_3_cont, l.schedule_recur_time_third_day_month_4_cont, l.schedule_recur_time_third_day_month_5_cont], [l.schedule_recur_time_fourth_day_month_6_cont, l.schedule_recur_time_fourth_day_month_0_cont, l.schedule_recur_time_fourth_day_month_1_cont, l.schedule_recur_time_fourth_day_month_2_cont, l.schedule_recur_time_fourth_day_month_3_cont, l.schedule_recur_time_fourth_day_month_4_cont, l.schedule_recur_time_fourth_day_month_5_cont], [l.schedule_recur_time_fifth_day_month_6_cont, l.schedule_recur_time_fifth_day_month_0_cont, l.schedule_recur_time_fifth_day_month_1_cont, l.schedule_recur_time_fifth_day_month_2_cont, l.schedule_recur_time_fifth_day_month_3_cont, l.schedule_recur_time_fifth_day_month_4_cont, l.schedule_recur_time_fifth_day_month_5_cont]]
+          },
+          limited: {
+            num: l.schedule_recur_time_num_day_month,
+            pos: [[l.schedule_recur_time_first_day_month_6, l.schedule_recur_time_first_day_month_0, l.schedule_recur_time_first_day_month_1, l.schedule_recur_time_first_day_month_2, l.schedule_recur_time_first_day_month_3, l.schedule_recur_time_first_day_month_4, l.schedule_recur_time_first_day_month_5], [l.schedule_recur_time_second_day_month_6, l.schedule_recur_time_second_day_month_0, l.schedule_recur_time_second_day_month_1, l.schedule_recur_time_second_day_month_2, l.schedule_recur_time_second_day_month_3, l.schedule_recur_time_second_day_month_4, l.schedule_recur_time_second_day_month_5], [l.schedule_recur_time_third_day_month_6, l.schedule_recur_time_third_day_month_0, l.schedule_recur_time_third_day_month_1, l.schedule_recur_time_third_day_month_2, l.schedule_recur_time_third_day_month_3, l.schedule_recur_time_third_day_month_4, l.schedule_recur_time_third_day_month_5], [l.schedule_recur_time_fourth_day_month_6, l.schedule_recur_time_fourth_day_month_0, l.schedule_recur_time_fourth_day_month_1, l.schedule_recur_time_fourth_day_month_2, l.schedule_recur_time_fourth_day_month_3, l.schedule_recur_time_fourth_day_month_4, l.schedule_recur_time_fourth_day_month_5], [l.schedule_recur_time_fifth_day_month_6, l.schedule_recur_time_fifth_day_month_0, l.schedule_recur_time_fifth_day_month_1, l.schedule_recur_time_fifth_day_month_2, l.schedule_recur_time_fifth_day_month_3, l.schedule_recur_time_fifth_day_month_4, l.schedule_recur_time_fifth_day_month_5]]
+          }
+        },
+        [scheduleMetaChange.Z.MODE.CANCELLED]: {
+          occur: l.schedule_occurrence_time,
+          all: ''
+        }
+      },
+      once: {
+        [scheduleMetaChange.Z.MODE.CREATED]: {
+          occur: l.schedule_occurrence_time
+        },
+        [scheduleMetaChange.Z.MODE.EDITED]: {
+          occur: l.schedule_occurrence_time_recur
+        },
+        [scheduleMetaChange.Z.MODE.CANCELLED]: {
+          occur: ''
+        }
+      }
+    };
+    this.megaChat = megaChat;
+    this.scheduledMeetings = megaChat.scheduledMeetings || new MegaDataMap();
+    this._goneOccurrences = {};
+    this.megaChat.rebind(this.EVENTS.CANCEL, ({
+      data
+    }) => this.archiveMeeting(data));
+    this.megaChat.rebind(this.EVENTS.LEAVE, ({
+      data
+    }) => this.detachMeeting(data));
+    this.megaChat.rebind(`${this.EVENTS.OCCURRENCES_UPDATE}.tracker`, ({
+      data
+    }) => {
+      if (!this._goneOccurrences[data.chatId]) {
+        return;
+      }
+      const {
+        chatId
+      } = data;
+      for (const scheduledId of Object.keys(this._goneOccurrences[chatId])) {
+        if (this._goneOccurrences[chatId][scheduledId] === -1) {
+          this._goneOccurrences[chatId][scheduledId] = this.scheduledMeetings[scheduledId] ? 0 : 1;
+        }
+      }
+    });
+  }
+  encodeData(data) {
+    return data && base64urlencode(to8(data));
+  }
+  decodeData(data) {
+    return data && from8(base64urldecode(data));
+  }
+  getMeetingById(meetingId) {
+    return this.scheduledMeetings[meetingId];
+  }
+  getMeetingOrOccurrenceParent(meetingId) {
+    const meeting = this.scheduledMeetings[meetingId];
+    if (!meeting) {
+      return false;
+    }
+    if (meeting.parentId) {
+      return this.getMeetingOrOccurrenceParent(meeting.parentId);
+    }
+    return meeting;
+  }
+  getRoomByMeetingId() {}
+  async createMeeting(meetingInfo) {
+    await this.megaChat.createAndShowGroupRoomFor(meetingInfo.participants, meetingInfo.topic, {
+      keyRotation: false,
+      createChatLink: meetingInfo.link,
+      isMeeting: true,
+      openInvite: meetingInfo.openInvite,
+      scheduledMeeting: {
+        a: 'mcsmp',
+        s: meetingInfo.startDateTime / 1000,
+        e: meetingInfo.endDateTime / 1000,
+        tz: this.encodeData(meetingInfo.timezone),
+        t: this.encodeData(meetingInfo.topic),
+        d: this.encodeData(meetingInfo.description),
+        f: meetingInfo.sendInvite ? 0x01 : 0x00,
+        ...(meetingInfo.recurring && {
+          r: {
+            f: meetingInfo.recurring.frequency,
+            wd: meetingInfo.recurring.weekDays,
+            md: meetingInfo.recurring.monthDays,
+            mwd: meetingInfo.recurring.offset,
+            ...(meetingInfo.recurring.end && {
+              u: meetingInfo.recurring.end / 1000
+            }),
+            ...(meetingInfo.recurring.interval && {
+              i: meetingInfo.recurring.interval
+            })
+          }
+        })
+      }
+    });
+  }
+  async updateMeeting(meetingInfo, chatRoom) {
+    const {
+      scheduledMeeting,
+      chatId,
+      publicLink,
+      options,
+      topic
+    } = chatRoom;
+    await megaChat.plugins.chatdIntegration.updateScheduledMeeting(meetingInfo, scheduledMeeting.id, chatId);
+    const nextParticipants = meetingInfo.participants;
+    const prevParticipants = chatRoom.getParticipantsExceptMe();
+    const participantsDiff = JSON.stringify(nextParticipants) !== JSON.stringify(prevParticipants);
+    if (participantsDiff) {
+      const removed = prevParticipants.filter(h => !nextParticipants.includes(h));
+      const added = nextParticipants.filter(h => !prevParticipants.includes(h));
+      if (removed.length) {
+        for (let i = removed.length; i--;) {
+          chatRoom.trigger('onRemoveUserRequest', [removed[i]]);
+        }
+      }
+      if (added.length) {
+        chatRoom.trigger('onAddUserRequest', [added]);
+      }
+    }
+    if (!!meetingInfo.link !== !!publicLink) {
+      chatRoom.updatePublicHandle(!meetingInfo.link);
+    }
+    if (meetingInfo.openInvite !== options.oi) {
+      chatRoom.toggleOpenInvite();
+    }
+    if (meetingInfo.topic !== topic) {
+      chatRoom.setRoomTitle(meetingInfo.topic, false);
+    }
+  }
+  cancelMeeting(scheduledMeeting, chatId) {
+    return this.megaChat.plugins.chatdIntegration.cancelScheduledMeeting(scheduledMeeting, chatId);
+  }
+  deleteMeeting(scheduledMeetingId, chatId) {
+    return this.megaChat.plugins.chatdIntegration.deleteScheduledMeeting(scheduledMeetingId, chatId);
+  }
+  attachMeeting(meetingInfo, fromActionPacket) {
+    const chatRoom = meetingInfo.chatRoom || this.megaChat.getChatById(meetingInfo.cid);
+    if (chatRoom) {
+      const scheduledMeeting = new ScheduledMeeting(this.megaChat, {
+        chatRoom,
+        ...meetingInfo
+      }, fromActionPacket);
+      this.scheduledMeetings.set(meetingInfo.id, scheduledMeeting);
+      return scheduledMeeting;
+    }
+  }
+  detachMeeting(scheduledMeeting) {
+    if (scheduledMeeting) {
+      this.archiveMeeting(scheduledMeeting);
+      scheduledMeeting.chatRoom.scheduledMeeting = null;
+      this.scheduledMeetings.remove(scheduledMeeting.id);
+      if (fmdb) {
+        fmdb.del('mcsm', scheduledMeeting.id);
+      }
+    }
+  }
+  archiveMeeting(scheduledMeeting) {
+    const {
+      chatRoom
+    } = scheduledMeeting;
+    const {
+      messages
+    } = chatRoom.messagesBuff;
+    tSleep(2).then(() => (messages.length === 0 || messages.every(m => !m.messageHtml)) && chatRoom.archive());
+  }
+  getOccurrenceStrings(meta) {
+    const res = [];
+    const {
+      prevTiming,
+      timeRules,
+      mode,
+      occurrence,
+      recurring,
+      converted
+    } = meta;
+    const {
+      MODE
+    } = scheduleMetaChange.Z;
+    if (!mode) {
+      return res;
+    }
+    const {
+      OCCUR_STRINGS
+    } = this;
+    let string;
+    if (recurring) {
+      res.push(this._parseOccurrence(timeRules, mode, occurrence));
+      if (prevTiming && !(occurrence && mode === MODE.CANCELLED)) {
+        res.push(this._parseOccurrence(prevTiming, mode, occurrence));
+      }
+    } else {
+      const {
+        startTime,
+        endTime
+      } = timeRules;
+      string = OCCUR_STRINGS.once[mode].occur;
+      res.push(string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 20)).replace('%s', time2date(startTime, 11)));
+      if (prevTiming) {
+        const {
+          startTime: pStartTime,
+          endTime: pEndTime
+        } = prevTiming;
+        if (converted) {
+          res.push(this._parseOccurrence(prevTiming, mode, occurrence));
+        } else {
+          res.push(string.replace('%1', toLocaleTime(pStartTime)).replace('%2', toLocaleTime(pEndTime)).replace('%6', time2date(pStartTime, 20)).replace('%s', time2date(pStartTime, 11)));
+        }
+      }
+    }
+    return res;
+  }
+  _parseOccurrence(timeRules, mode, occurrence) {
+    const {
+      startTime,
+      endTime,
+      days,
+      dayInt,
+      interval,
+      month,
+      recurEnd
+    } = timeRules;
+    const {
+      recur,
+      once
+    } = this.OCCUR_STRINGS;
+    const occurrenceEnd = recurEnd ? 'limited' : 'continuous';
+    let string = '';
+    if (recur[mode]) {
+      return occurrence ? recur[mode].occur.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%s', time2date(startTime, 11)) : recur[mode].all;
+    } else if (month) {
+      const {
+        count,
+        occur
+      } = month;
+      string = mega.icu.format(recur.monthly[occurrenceEnd].pos[count][occur], interval);
+      return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%3', time2date(startTime, 2)).replace('%4', time2date(recurEnd, 2));
+    } else if (days) {
+      if (days.length > 1) {
+        if (days.length === 7) {
+          return recur.daily[occurrenceEnd].occur.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%3', time2date(startTime, 2)).replace('%4', time2date(recurEnd, 2));
+        }
+        const weekDays = days.map((day, idx) => {
+          if (idx) {
+            return this.midDayStrings[day];
+          }
+          return this.startDayStrings[day];
+        });
+        string = mega.icu.format(recur.weekly[occurrenceEnd].list, interval);
+        string = mega.utils.trans.listToString(weekDays, string);
+      } else {
+        string = mega.icu.format(recur.weekly[occurrenceEnd].spec, interval).replace('%s', this.startDayStrings[days[0]]);
+      }
+      return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%3', time2date(startTime, 2)).replace('%4', time2date(recurEnd, 2));
+    } else if (dayInt) {
+      string = mega.icu.format(recur.monthly[occurrenceEnd].num, interval);
+      return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%3', time2date(startTime, 2)).replace('%4', time2date(recurEnd, 2)).replace('%5', dayInt);
+    }
+    string = once[mode].occur;
+    return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 20)).replace('%s', time2date(startTime, 11));
+  }
+  getFormattingMeta(scheduledId, data, chatRoom) {
+    const {
+      MODE
+    } = scheduleMetaChange.Z;
+    const meta = {
+      userId: data.sender || false,
+      timeRules: {},
+      mode: MODE.EDITED,
+      handle: scheduledId,
+      cid: chatRoom.chatId
+    };
+    const changeSet = data.schedChange || data.cs || false;
+    if (changeSet) {
+      const {
+        s,
+        e,
+        c,
+        r,
+        t,
+        d: desc
+      } = changeSet;
+      let onlyTitle = typeof t !== 'undefined';
+      if (Array.isArray(c) && c[1]) {
+        meta.mode = MODE.CANCELLED;
+      }
+      if (Array.isArray(s)) {
+        meta.prevTiming = {
+          startTime: s[0]
+        };
+        meta.timeRules.startTime = s[1] || s[0];
+      }
+      if (Array.isArray(e)) {
+        meta.prevTiming.endTime = e[0];
+        meta.timeRules.endTime = e[1] || e[0];
+        onlyTitle = false;
+      }
+      if (desc) {
+        meta.description = true;
+        onlyTitle = false;
+      }
+      if (Array.isArray(r)) {
+        const parseR = r => r ? typeof r === 'string' ? JSON.parse(r) : r : false;
+        const prev = parseR(r[0]);
+        const next = parseR(r[1]);
+        if (r.length === 1) {
+          meta.converted = false;
+          meta.timeRules = this._recurringTimings(prev, meta.timeRules || {});
+          meta.prevTiming = this._recurringTimings(prev, meta.prevTiming);
+          meta.recurring = r[0] !== '';
+        } else {
+          meta.converted = !!(!!prev ^ !!next);
+          if (prev) {
+            meta.prevTiming = this._recurringTimings(prev, meta.prevTiming || {});
+          }
+          meta.timeRules = this._recurringTimings(next, meta.timeRules || {});
+          meta.recurring = next !== false;
+        }
+        onlyTitle = false;
+      }
+      const meeting = this.getMeetingOrOccurrenceParent(scheduledId);
+      if (!meeting || meeting.id !== scheduledId) {
+        meta.occurrence = true;
+        meta.recurring = true;
+      }
+      if (Array.isArray(t)) {
+        meta.topicChange = true;
+        meta.onlyTitle = onlyTitle;
+        meta.topic = this.decodeData(t[1]);
+        meta.oldTopic = this.decodeData(t[0]);
+      }
+      return meta;
+    }
+    return this.noCsMeta(scheduledId, data, chatRoom);
+  }
+  _recurringTimings(meta, obj) {
+    if (!meta) {
+      return obj;
+    }
+    obj.recurEnd = meta.u || false;
+    obj.interval = meta.i || 1;
+    if (meta.wd) {
+      obj.days = meta.wd.sort((a, b) => a - b).map(wd => wd === 7 ? 0 : wd);
+    }
+    if (meta.md) {
+      obj.dayInt = meta.md[0];
+    }
+    if (meta.mwd) {
+      obj.month = meta.mwd.map(oc => {
+        return {
+          count: (oc[0] || 1) - 1,
+          occur: oc[1] ? oc[1] === 7 ? 0 : oc[1] : 1
+        };
+      })[0];
+    }
+    return obj;
+  }
+  noCsMeta(scheduledId, data, chatRoom) {
+    const meta = {
+      timeRules: {},
+      userId: data.sender || false,
+      ap: data,
+      handle: scheduledId,
+      cid: chatRoom.chatId
+    };
+    if (!this.getMeetingOrOccurrenceParent(scheduledId) && !chatRoom.scheduledMeeting) {
+      const res = this._checkOccurrenceAwait(chatRoom, scheduledId, meta);
+      if (res) {
+        return res;
+      }
+    }
+    const meeting = this.getMeetingOrOccurrenceParent(scheduledId) || chatRoom.scheduledMeeting;
+    assert(meeting, `Invalid scheduled meeting state for ${scheduledId} msg`);
+    const toS = ms => Math.floor(ms / 1000);
+    const {
+      MODE
+    } = scheduleMetaChange.Z;
+    meta.timeRules.startTime = toS(meeting.start);
+    meta.timeRules.endTime = toS(meeting.end);
+    meta.topic = meeting.title;
+    meta.recurring = !!meeting.recurring;
+    meta.mode = meeting.canceled ? MODE.CANCELLED : MODE.CREATED;
+    meta.occurrence = meta.recurring && meeting.id !== scheduledId;
+    if (!meta.occurrence && !meeting.canceled) {
+      meta.mode = MODE.CREATED;
+    }
+    const cal = ms => {
+      const date = new Date(ms);
+      return {
+        date: date.getDate(),
+        month: time2date(toS(ms), 12)
+      };
+    };
+    if (meta.occurrence) {
+      const occurrences = meeting.getOccurrencesById(scheduledId);
+      if (!occurrences) {
+        meta.mode = MODE.EDITED;
+        const res = this._checkOccurrenceAwait(chatRoom, scheduledId, meta);
+        if (res) {
+          return res;
+        }
+        meta.ap = data;
+        return meta;
+      }
+      meta.mode = occurrences.some(o => o.canceled) ? MODE.CANCELLED : MODE.EDITED;
+      meta.calendar = cal(occurrences[0].start);
+      const timeDiff = meta.timeRules.endTime - meta.timeRules.startTime;
+      meta.timeRules.startTime = toS(occurrences[0].start);
+      meta.timeRules.endTime = toS(occurrences[0].end);
+      if (occurrences.length === 1 && occurrences[0].startInitial) {
+        meta.prevTiming = {
+          startTime: toS(occurrences[0].startInitial)
+        };
+        meta.prevTiming.endTime = meta.prevTiming.startTime + timeDiff;
+      }
+    } else if (meta.recurring) {
+      const {
+        end,
+        weekDays = [],
+        interval,
+        monthDays = [],
+        offset
+      } = meeting.recurring;
+      meta.recurring = true;
+      meta.timeRules.recurEnd = end ? toS(end) : false;
+      meta.timeRules.interval = interval || 1;
+      if (weekDays.length) {
+        meta.timeRules.days = weekDays.sort((a, b) => a - b).map(wd => wd === 7 ? 0 : wd);
+      }
+      if (monthDays.length) {
+        meta.timeRules.dayInt = monthDays[0];
+      }
+      if (!Array.isArray(offset)) {
+        meta.timeRules.month = {
+          count: (offset.value || 1) - 1,
+          occur: offset.weekDay ? offset.weekDay === 7 ? 0 : offset.weekDay : 1
+        };
+      }
+      meta.calendar = cal(meeting.start);
+    } else {
+      meta.calendar = cal(meeting.start);
+    }
+    if (!meta.occurrence && meeting.canceled && $.len(meta.timeRules)) {
+      meta.mode = MODE.CREATED;
+    }
+    delete meta.ap;
+    return meta;
+  }
+  _checkOccurrenceAwait(chatRoom, scheduledId, meta) {
+    if (!this._goneOccurrences[chatRoom.chatId]) {
+      this._goneOccurrences[chatRoom.chatId] = {};
+    }
+    if (typeof this._goneOccurrences[chatRoom.chatId][scheduledId] === 'undefined') {
+      this._goneOccurrences[chatRoom.chatId][scheduledId] = -1;
+      return meta;
+    }
+    const datum = this._goneOccurrences[chatRoom.chatId];
+    if (datum[scheduledId] === -1) {
+      return meta;
+    } else if (datum[scheduledId] === 1) {
+      meta.gone = true;
+      return meta;
+    }
+    return false;
+  }
+  areMetaObjectsSame(obj1, obj2) {
+    if (obj1 && !obj2 || !obj1 && obj2) {
+      return false;
+    }
+    const keys = Object.keys(obj1);
+    if (keys.length !== $.len(obj2)) {
+      return false;
+    }
+    const diff = array.diff(keys, Object.keys(obj2));
+    if (diff.removed.length + diff.added.length) {
+      return false;
+    }
+    for (const key of keys) {
+      if (!obj2.hasOwnProperty(key)) {
+        return false;
+      }
+      if (obj1[key] instanceof Object && obj2[key] instanceof Object) {
+        if (!this.areMetaObjectsSame(obj1[key], obj2[key])) {
+          return false;
+        }
+      } else if (Array.isArray(obj1[key]) && Array.isArray(obj2[key])) {
+        const keyDiff = array.diff(obj1[key], obj2[key]);
+        if (keyDiff.removed.length + keyDiff.added.length) {
+          return false;
+        }
+      } else if (obj1[key] !== obj2[key]) {
+        return false;
+      }
+    }
+    return true;
+  }
+}
+const meetingsManager = (MeetingsManager);
+window.MeetingsManager = MeetingsManager;
 ;// CONCATENATED MODULE: ./js/chat/chat.jsx
 
 
@@ -298,6 +1143,7 @@ function Chat() {
   this.logger = MegaLogger.getLogger("chat");
   this.mbListeners = [];
   this.chats = new MegaDataMap();
+  this.scheduledMeetings = new MegaDataMap();
   this.chatUIFlags = new MegaDataMap();
   this.initChatUIFlagsManagement();
   this.currentlyOpenedChat = null;
@@ -308,6 +1154,7 @@ function Chat() {
   this._imagesToBeLoaded = Object.create(null);
   this._imageAttributeCache = Object.create(null);
   this._queuedMccPackets = [];
+  this._queuedMcsmPackets = {};
   this._queuedMessageUpdates = [];
   this._queuedChatRoomEvents = {};
   this.handleToId = Object.create(null);
@@ -329,7 +1176,8 @@ function Chat() {
       'richpreviewsFilter': RichpreviewsFilter,
       'chatToastIntegration': ChatToastIntegration,
       'chatStats': ChatStats,
-      'geoLocationLinks': GeoLocationLinks
+      'geoLocationLinks': GeoLocationLinks,
+      'meetingsManager': meetingsManager
     },
     'chatNotificationOptions': {
       'textMessages': {
@@ -405,6 +1253,9 @@ inherits(Chat, MegaDataObject);
 Object.defineProperty(Chat, 'mcf', {
   value: Object.create(null)
 });
+Object.defineProperty(Chat, 'mcsm', {
+  value: Object.create(null)
+});
 Chat.prototype.init = promisify(function (resolve, reject) {
   var self = this;
   if (self.is_initialized) {
@@ -466,11 +1317,13 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     Chat.mcf[ph] = key;
     this.publicChatKeys[ph] = key;
   }
-  var promises = [];
-  var rooms = Object.keys(Chat.mcf);
-  for (var i = rooms.length; i--;) {
+  const promises = [];
+  const rooms = Object.keys(Chat.mcf);
+  for (let i = rooms.length; i--;) {
+    const roomId = rooms[i];
+    const room = Chat.mcf[roomId];
     if (!this.publicChatKeys[rooms[i]]) {
-      promises.push(self.plugins.chatdIntegration.openChat(Chat.mcf[rooms[i]], true));
+      promises.push(self.plugins.chatdIntegration.openChat(room, true));
     }
     delete Chat.mcf[rooms[i]];
   }
@@ -505,6 +1358,14 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     setInterval(self._syncDnd.bind(self), 60000);
     setInterval(self.removeMessagesByRetentionTime.bind(self, null), 20000);
     self.autoJoinIfNeeded();
+    const scheduledMeetings = Object.values(Chat.mcsm);
+    if (scheduledMeetings && scheduledMeetings.length) {
+      for (let i = scheduledMeetings.length; i--;) {
+        const scheduledMeeting = scheduledMeetings[i];
+        self.plugins.meetingsManager.attachMeeting(scheduledMeeting);
+        delete Chat.mcsm[scheduledMeeting.id];
+      }
+    }
     return true;
   }).then(resolve).catch(reject);
 });
@@ -1085,6 +1946,7 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
       delete this._queuedChatRoomEvents[chatId];
       delete this._queuedChatRoomEvents[`${chatId}_timer`];
     }
+    this.processQueuedMcsmPackets();
   })];
 };
 Chat.prototype.smartOpenChat = function (...args) {
@@ -1165,6 +2027,10 @@ Chat.prototype.retrieveSharedFilesHistory = async function (len = 47, chatRoom =
 };
 Chat.prototype.getCurrentRoom = function () {
   return this.chats[this.currentlyOpenedChat];
+};
+Chat.prototype.getCurrentMeeting = function () {
+  const chatRoom = this.getCurrentRoom();
+  return chatRoom && chatRoom.scheduledMeeting || null;
 };
 Chat.prototype.getCurrentRoomJid = function () {
   return this.currentlyOpenedChat;
@@ -1615,7 +2481,7 @@ Chat.prototype.createAndShowGroupRoomFor = function (contactHashes, topic, opts 
 Chat.prototype.createAndStartMeeting = function (topic, audio, video) {
   megaChat.createAndShowGroupRoomFor([], topic, {
     keyRotation: false,
-    createChatLink: 2,
+    createChatLink: true,
     isMeeting: true
   });
   megaChat.rebind('onRoomInitialized.meetingCreate', function (e, room) {
@@ -1949,6 +2815,37 @@ Chat.prototype.onSnActionPacketReceived = function () {
     this._queuedMccPackets = [];
     for (var i = 0; i < aps.length; i++) {
       mBroadcaster.sendMessage('onChatdChatUpdatedActionPacket', aps[i]);
+    }
+  }
+  this.processQueuedMcsmPackets();
+};
+Chat.prototype.processQueuedMcsmPackets = function () {
+  const aps = Object.values(this._queuedMcsmPackets);
+  if (aps.length) {
+    for (let i = 0; i < aps.length; i++) {
+      const ap = aps[i];
+      const {
+        type,
+        data
+      } = ap;
+      const {
+        meetingsManager
+      } = this.plugins;
+      if (type === 'mcsmp') {
+        const chatRoom = this.getChatById(data.cid);
+        if (chatRoom) {
+          const scheduledMeeting = meetingsManager.attachMeeting(data, true);
+          delete this._queuedMcsmPackets[scheduledMeeting.id];
+          return scheduledMeeting.iAmOwner ? null : notify.notifyFromActionPacket({
+            ...data,
+            a: type
+          });
+        }
+      }
+      if (type === 'mcsmr') {
+        meetingsManager.detachMeeting(data);
+        delete this._queuedMcsmPackets[data.id];
+      }
     }
   }
 };
@@ -2331,7 +3228,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     sfuApp: null,
     activeCallIds: null,
     meetingsLoading: null,
-    options: {}
+    options: {},
+    scheduledMeeting: undefined
   });
   this.roomId = roomId;
   this.instanceIndex = ChatRoom.INSTANCE_INDEX++;
@@ -2603,6 +3501,7 @@ ChatRoom.INSTANCE_INDEX = 0;
 ChatRoom.ANONYMOUS_PARTICIPANT = mega.BID;
 ChatRoom.ARCHIVED = 0x01;
 ChatRoom.TOPIC_MAX_LENGTH = 30;
+ChatRoom.SCHEDULED_MEETINGS_INTERVAL = 1.8e6;
 ChatRoom.MembersSet = function (chatRoom) {
   this.chatRoom = chatRoom;
   this.members = {};
@@ -2941,20 +3840,18 @@ ChatRoom.prototype.getParticipantsTruncated = function (maxMembers = 5, maxLengt
   }
   return truncatedParticipantNames.join(', ');
 };
-ChatRoom.prototype.getRoomTitle = function (ignoreTopic, encapsTopicInQuotes) {
-  var self = this;
-  var participants;
-  if (self.type === "private") {
-    participants = self.getParticipantsExceptMe();
-    return M.getNameByHandle(participants[0]) || "";
-  } else {
-    if (!ignoreTopic && self.topic && self.topic.substr) {
-      return (encapsTopicInQuotes ? '"' : "") + self.getTruncatedRoomTopic() + (encapsTopicInQuotes ? '"' : "");
-    }
-    var names = self.getParticipantsTruncated();
-    var def = l[19077].replace('%s1', new Date(self.ctime * 1000).toLocaleString());
-    return names.length > 0 ? names : def;
+ChatRoom.prototype.getRoomTitle = function () {
+  const formattedDate = l[19077].replace('%s1', new Date(this.ctime * 1000).toLocaleString());
+  if (this.type === 'private') {
+    const participants = this.getParticipantsExceptMe();
+    return participants && Array.isArray(participants) ? M.getNameByHandle(participants[0]) : formattedDate;
   }
+  if (this.topic === '' || !this.topic) {
+    return this.getParticipantsTruncated() || formattedDate;
+  }
+  const formattedTopic = this.getTruncatedRoomTopic();
+  const isCanceled = this.scheduledMeeting && this.scheduledMeeting.isCanceled;
+  return isCanceled ? `${formattedTopic} ${l.canceled_meeting}` : formattedTopic;
 };
 ChatRoom.prototype.getTruncatedRoomTopic = function (maxLength = ChatRoom.TOPIC_MAX_LENGTH) {
   return this.topic && this.topic.length > maxLength ? this.topic.substr(0, maxLength) + '...' : this.topic;
@@ -3065,9 +3962,11 @@ ChatRoom.prototype.destroy = function (notifyOtherDevices, noRedirect) {
     }
   });
 };
-ChatRoom.prototype.updatePublicHandle = function (d, callback) {
-  var self = this;
-  return megaChat.plugins.chatdIntegration.updateChatPublicHandle(self.chatId, d, callback);
+ChatRoom.prototype.updatePublicHandle = function (d, cim, callback) {
+  return megaChat.plugins.chatdIntegration.updateChatPublicHandle(this.chatId, d, cim, callback);
+};
+ChatRoom.prototype.getPublicLink = function (callback) {
+  return this.publicLink || this.updatePublicHandle(false, false, callback);
 };
 ChatRoom.prototype.iAmInRoom = function () {
   return !(!this.members.hasOwnProperty(u_handle) || this.members[u_handle] === -1);
@@ -3617,13 +4516,13 @@ ChatRoom.prototype.endCallForAll = function (callId) {
     eventlog(99761, JSON.stringify([this.chatId, callId, this.isMeeting | 0]));
   }
 };
-ChatRoom.prototype.startAudioCall = function () {
-  return this.startCall(true, false);
+ChatRoom.prototype.startAudioCall = function (scheduled) {
+  return this.startCall(true, false, scheduled);
 };
-ChatRoom.prototype.startVideoCall = function () {
-  return this.startCall(true, true);
+ChatRoom.prototype.startVideoCall = function (scheduled) {
+  return this.startCall(true, true, scheduled);
 };
-ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audio, video) {
+ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audio, video, scheduled) {
   if (!megaChat.hasSupportForCalls || this.meetingsLoading) {
     return;
   }
@@ -3636,8 +4535,9 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
   }
   this.meetingsLoading = l.starting;
   const opts = {
-    'a': 'mcms',
-    'cid': this.chatId
+    a: 'mcms',
+    cid: this.chatId,
+    sm: scheduled && this.scheduledMeeting && this.scheduledMeeting.id
   };
   if (localStorage.sfuId) {
     opts.sfu = parseInt(localStorage.sfuId, 10);
@@ -5716,10 +6616,13 @@ class ContactAwareName extends _mixins1__._p {
 class MembersAmount extends _mixins1__._p {
   render() {
     const {
-      room
+      chatRoom
     } = this.props;
-    const memberKeys = Object.keys(room.members);
-    return room && memberKeys.length ? react0().createElement("span", null, mega.icu.format(l[20233], memberKeys.length)) : null;
+    const memberKeys = Object.keys(chatRoom.members);
+    if (chatRoom && chatRoom.iAmInRoom() && memberKeys.length) {
+      return react0().createElement("span", null, mega.icu.format(l[20233], memberKeys.length));
+    }
+    return null;
   }
 }
 class ContactFingerprint extends _mixins1__.wl {
@@ -8998,7 +9901,9 @@ class ParticipantsList extends mixins.wl {
       var $contactsList = $('.chat-contacts-list', $parentContainer);
       if ($contactsList.height() !== fitHeight) {
         $('.chat-contacts-list', $parentContainer).height(fitHeight);
-        self.contactsListScroll.reinitialise();
+        if (self.contactsListScroll) {
+          self.contactsListScroll.reinitialise();
+        }
       }
       if (self.state.scrollHeight !== fitHeight) {
         self.setState({
@@ -9798,7 +10703,7 @@ PushSettingsDialog.default = PushSettingsDialog.options[PushSettingsDialog.optio
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
 var call = __webpack_require__(200);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
-var historyPanel = __webpack_require__(638);
+var historyPanel = __webpack_require__(214);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 var composedTextArea = __webpack_require__(813);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/loading.jsx
@@ -9850,7 +10755,7 @@ Loading.NAMESPACE = 'meetings-loading';
 // EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
 var meetings_button = __webpack_require__(193);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/workflow/preview.jsx
-var preview = __webpack_require__(97);
+var preview = __webpack_require__(889);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/meetingsCallEndedDialog.jsx
 var meetingsCallEndedDialog = __webpack_require__(238);
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
@@ -10210,10 +11115,15 @@ Alert.TYPE = {
   MEDIUM: 'medium',
   HIGH: 'high'
 };
+// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
+var helpers = __webpack_require__(435);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/recurring.jsx
+var recurring = __webpack_require__(340);
 ;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
 var conversationpanel_dec, _dec2, conversationpanel_class;
+
 
 
 
@@ -10321,6 +11231,26 @@ class EndCallButton extends mixins.wl {
     return null;
   }
 }
+class StartMeetingNotification extends mixins.wl {
+  customIsEventuallyVisible() {
+    return this.props.chatRoom.isCurrentlyActive;
+  }
+  render() {
+    const {
+      chatRoom,
+      onStartCall
+    } = this.props;
+    if (chatRoom.activeCall || !megaChat.hasSupportForCalls) {
+      return null;
+    }
+    return external_React_default().createElement("div", {
+      className: "in-call-notif neutral start",
+      onClick: () => onStartCall(call.ZP.TYPE.AUDIO)
+    }, external_React_default().createElement("button", {
+      className: "mega-button positive small"
+    }, l.schedule_start_aot));
+  }
+}
 class JoinCallNotification extends mixins.wl {
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
@@ -10364,6 +11294,145 @@ const excludedParticipants = room => {
   }
   return excParticipants;
 };
+class Occurrences extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.loadingMore = false;
+    this.state = {
+      editDialog: false,
+      occurrenceId: undefined
+    };
+  }
+  loadOccurrences() {
+    if (!this.loadingMore) {
+      const {
+        scheduledMeeting,
+        occurrences
+      } = this.props;
+      const occurrenceItems = Object.values(occurrences || {});
+      const lastOccurrence = occurrenceItems[occurrenceItems.length - 1];
+      if (lastOccurrence) {
+        this.loadingMore = true;
+        scheduledMeeting.getOccurrences({
+          from: lastOccurrence.start
+        }).catch(dump).finally(() => {
+          this.loadingMore = false;
+        });
+      }
+    }
+  }
+  renderCancelConfirmation(occurrence) {
+    return msgDialog(`confirmation:!^${l.cancel_meeting_occurrence_button}!${l.schedule_cancel_abort}`, 'cancel-occurrence', l.schedule_cancel_occur_dlg_title, l.schedule_cancel_occur_dlg_text, cb => cb && occurrence.cancel(), 1);
+  }
+  renderLoading() {
+    return external_React_default().createElement("div", {
+      className: "loading-sketch"
+    }, Array.from({
+      length: 10
+    }, (el, i) => {
+      return external_React_default().createElement("div", {
+        key: i,
+        className: "chat-occurrence"
+      }, external_React_default().createElement("div", {
+        className: "chat-occurrence-date"
+      }), external_React_default().createElement("div", {
+        className: "chat-occurrence-content"
+      }, external_React_default().createElement("div", {
+        className: "chat-occurrence-title"
+      }), external_React_default().createElement("div", {
+        className: "chat-occurrence-time"
+      })));
+    }));
+  }
+  renderOccurrences() {
+    const {
+      chatRoom,
+      occurrences,
+      occurrencesLoading,
+      scheduledMeeting
+    } = this.props;
+    if (occurrencesLoading) {
+      return this.renderLoading();
+    }
+    if (occurrences && occurrences.length > 0) {
+      const sortedOccurrences = Object.values(occurrences).sort((a, b) => a.start - b.start);
+      return external_React_default().createElement((external_React_default()).Fragment, null, sortedOccurrences.map(occurrence => occurrence.isUpcoming ? external_React_default().createElement("div", {
+        key: occurrence.uid,
+        className: `
+                                    chat-occurrence
+                                    ${occurrence.uid}
+                                `
+      }, external_React_default().createElement("div", {
+        className: "chat-occurrence-date"
+      }, (0,helpers.zk)(occurrence.start) && external_React_default().createElement("span", null, l.today_occurrence_label, " -"), (0,helpers.Pm)(occurrence.start) && external_React_default().createElement("span", null, l.tomorrow_occurrence_label, " -"), external_React_default().createElement("span", null, time2date(occurrence.start / 1000, 19))), external_React_default().createElement("div", {
+        className: "chat-occurrence-content"
+      }, external_React_default().createElement("div", {
+        className: "chat-occurrence-title"
+      }, scheduledMeeting.title), external_React_default().createElement("div", {
+        className: "chat-occurrence-time"
+      }, toLocaleTime(occurrence.start), " - \xA0", toLocaleTime(occurrence.end)), chatRoom.iAmOperator() && external_React_default().createElement("div", {
+        className: "chat-occurrence-controls"
+      }, external_React_default().createElement("div", {
+        className: "chat-occurrence-control simpletip",
+        "data-simpletip": l[1342],
+        "data-simpletipposition": "top",
+        "data-simpletipoffset": "5"
+      }, external_React_default().createElement(buttons.z, {
+        icon: "sprite-fm-mono icon-rename",
+        onClick: () => {
+          this.setState({
+            editDialog: true,
+            occurrenceId: occurrence.uid
+          });
+        }
+      })), external_React_default().createElement("div", {
+        className: "chat-occurrence-control simpletip",
+        "data-simpletip": l[82],
+        "data-simpletipposition": "top",
+        "data-simpletipoffset": "5"
+      }, external_React_default().createElement(buttons.z, {
+        icon: "sprite-fm-mono icon-bin",
+        onClick: () => this.renderCancelConfirmation(occurrence)
+      }))))) : null));
+    }
+    return external_React_default().createElement("span", null, l.no_occurrences_remain);
+  }
+  render() {
+    const {
+      chatRoom,
+      scheduledMeeting
+    } = this.props;
+    const {
+      editDialog,
+      occurrenceId
+    } = this.state;
+    return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
+      className: "chat-occurrences-list"
+    }, external_React_default().createElement(perfectScrollbar.F, {
+      chatRoom: chatRoom,
+      ref: ref => {
+        this.contactsListScroll = ref;
+      },
+      disableCheckingVisibility: true,
+      onUserScroll: ps => ps.isCloseToBottom(30) && this.loadOccurrences(),
+      isVisible: this.isCurrentlyActive,
+      options: {
+        suppressScrollX: true
+      }
+    }, external_React_default().createElement("div", {
+      className: "chat-occurrences-list-inner"
+    }, this.renderOccurrences()))), editDialog && external_React_default().createElement(recurring.I, {
+      chatRoom: chatRoom,
+      scheduledMeeting: scheduledMeeting,
+      occurrenceId: occurrenceId,
+      onClose: () => {
+        this.setState({
+          editDialog: false
+        });
+      }
+    }));
+  }
+}
 class ConversationRightArea extends mixins.wl {
   constructor(props) {
     super(props);
@@ -10378,11 +11447,33 @@ class ConversationRightArea extends mixins.wl {
     chatRoom.setRetention(retentionTime);
     $(document).trigger('closeDropdowns');
   }
+  cancelScheduledMeeting() {
+    const {
+      chatRoom
+    } = this.props;
+    const {
+      scheduledMeeting,
+      chatId
+    } = chatRoom;
+    if (scheduledMeeting) {
+      const doCancel = () => megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, chatId);
+      return scheduledMeeting.isRecurring ? msgDialog(`confirmation:!^${l.cancel_meeting_series_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_series_dlg_title, l.schedule_cancel_series_dlg_text, cb => cb && doCancel(), 1) : msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dlg_title, l.schedule_cancel_dlg_text, cb => cb && doCancel(), 1);
+    }
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => {
+      if (this.isMounted()) {
+        this.safeForceUpdate();
+      }
+    });
+  }
   render() {
     const self = this;
     const {
       chatRoom: room,
-      onStartCall
+      onStartCall,
+      occurrencesLoading
     } = self.props;
     if (!room || !room.roomId) {
       return null;
@@ -10486,7 +11577,8 @@ class ConversationRightArea extends mixins.wl {
     const {
       pushSettingsValue,
       onPushSettingsToggled,
-      onPushSettingsClicked
+      onPushSettingsClicked,
+      onShowScheduledDescription
     } = this.props;
     const pushSettingsIcon = pushSettingsValue || pushSettingsValue === 0 ? 'icon-notification-off-filled' : 'icon-notification-filled';
     const pushSettingsBtn = !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && external_React_default().createElement("div", {
@@ -10575,12 +11667,16 @@ class ConversationRightArea extends mixins.wl {
         self.props.onHistoryRetentionConfig();
       }
     }, external_React_default().createElement("span", null, l[23440]), [0, 1, 7, 30].indexOf(retentionTime) === -1 && ICON_ACTIVE))) : null);
-    var expandedPanel = {};
-    if (room.type === "group" || room.type === "public") {
-      expandedPanel['participants'] = true;
-    } else {
-      expandedPanel['options'] = true;
-    }
+    const MEMBERS_LIMITED = Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE;
+    const {
+      scheduledMeeting,
+      isMeeting
+    } = room;
+    const {
+      isRecurring,
+      isUpcoming,
+      occurrences
+    } = scheduledMeeting || {};
     let archiveText = room.isMeeting ? l.archive_meeting_btn : l[16689];
     if (room.isArchived()) {
       archiveText = room.isMeeting ? l.unarchive_meeting_btn : l[19065];
@@ -10592,81 +11688,136 @@ class ConversationRightArea extends mixins.wl {
       options: {
         'suppressScrollX': true
       },
-      ref: function (ref) {
-        self.rightScroll = ref;
+      ref: ref => {
+        this.rightScroll = ref;
       },
       triggerGlobalResize: true,
-      isVisible: self.props.chatRoom.isCurrentlyActive,
-      chatRoom: self.props.chatRoom
+      isVisible: room.isCurrentlyActive,
+      chatRoom: room
     }, external_React_default().createElement("div", {
       className: `
-                        chat-right-pad
-                        ${room.haveActiveCall() ? 'in-call' : ''}
-                    `
+                            chat-right-pad
+                            ${room.haveActiveCall() ? 'in-call' : ''}
+                        `
     }, external_React_default().createElement(Accordion, (0,esm_extends.Z)({}, this.state, {
       chatRoom: room,
-      onToggle: SoonFc(20, function () {
-        if (self.rightScroll) {
-          self.rightScroll.reinitialise();
+      onToggle: SoonFc(20, () => {
+        if (this.rightScroll) {
+          this.rightScroll.reinitialise();
         }
-        if (self.participantsListRef) {
-          self.participantsListRef.safeForceUpdate();
+        if (this.participantsListRef) {
+          this.participantsListRef.safeForceUpdate();
         }
       }),
-      expandedPanel: expandedPanel
+      expandedPanel: {
+        participants: (room.type === 'group' || room.type === 'public') && !isMeeting,
+        options: room.type === 'private' || isMeeting && !isRecurring,
+        occurrences: isMeeting && scheduledMeeting && isRecurring
+      }
     }), participantsList ? external_React_default().createElement(AccordionPanel, {
       className: "small-pad",
       title: l[8876],
       chatRoom: room,
       key: "participants"
-    }, participantsList) : null, room.type === "public" && room.observers > 0 ? external_React_default().createElement("div", {
+    }, participantsList) : null, room.type === 'public' && room.observers > 0 ? external_React_default().createElement("div", {
       className: "accordion-text observers"
     }, l[20466], external_React_default().createElement("span", {
       className: "observers-count"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-eye-reveal"
-    }), room.observers)) : external_React_default().createElement("div", null), external_React_default().createElement(AccordionPanel, {
+    }), room.observers)) : external_React_default().createElement("div", null), isRecurring && isUpcoming && external_React_default().createElement(AccordionPanel, {
+      key: "occurrences",
+      className: "chat-occurrences-panel",
+      title: l.occurrences_heading,
+      chatRoom: room,
+      scheduledMeeting: scheduledMeeting,
+      occurrences: occurrences
+    }, external_React_default().createElement(Occurrences, {
+      chatRoom: room,
+      scheduledMeeting: scheduledMeeting,
+      occurrences: occurrences,
+      occurrencesLoading: occurrencesLoading
+    })), external_React_default().createElement(AccordionPanel, {
       key: "options",
       className: "have-animation buttons",
       title: l[7537],
       chatRoom: room,
       sfuClient: window.sfuClient
-    }, external_React_default().createElement("div", null, addParticipantBtn, startAudioCallButton, startVideoCallButton, external_React_default().createElement(EndCallButton, {
+    }, external_React_default().createElement((external_React_default()).Fragment, null, addParticipantBtn, startAudioCallButton, startVideoCallButton, external_React_default().createElement(EndCallButton, {
       call: room.havePendingGroupCall() || room.haveActiveCall(),
       chatRoom: room
-    }), room.type == "group" || room.type == "public" ? external_React_default().createElement("div", {
+    }), scheduledMeeting && external_React_default().createElement("div", {
+      className: `
+                                            link-button light schedule-view-desc
+                                            ${room.isReadOnly() || !scheduledMeeting.description ? 'disabled' : ''}
+                                        `,
+      onClick: () => {
+        if (!room.isReadOnly() && scheduledMeeting.description) {
+          onShowScheduledDescription();
+        }
+      }
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-description"
+    }), external_React_default().createElement("span", null, l.schedule_view_desc)), (room.type === 'group' || room.type === 'public') && !scheduledMeeting ? external_React_default().createElement("div", {
       className: renameButtonClass,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
         }
-        if (self.props.onRenameClicked) {
-          self.props.onRenameClicked();
+        if (this.props.onRenameClicked) {
+          this.props.onRenameClicked();
         }
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-rename"
-    }), external_React_default().createElement("span", null, l[9080])) : null, room.type === "public" ? external_React_default().createElement("div", {
+    }), external_React_default().createElement("span", null, l[9080])) : null, scheduledMeeting ? external_React_default().createElement("div", {
+      className: `
+                                                link-button
+                                                light
+                                                ${room.iAmOperator() ? '' : 'disabled'}
+                                            `,
+      onClick: () => {
+        const {
+          plugins
+        } = megaChat;
+        return room.iAmOperator() ? megaChat.trigger(plugins.meetingsManager.EVENTS.EDIT, room) : null;
+      }
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-rename"
+    }), scheduledMeeting.isRecurring ? external_React_default().createElement("span", null, l.edit_meeting_series_button) : external_React_default().createElement("span", null, l.edit_meeting_button)) : null, room.type === "public" ? external_React_default().createElement("div", {
       className: getChatLinkClass,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
         }
-        self.props.onGetManageChatLinkClicked();
+        this.props.onGetManageChatLinkClicked();
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-link-filled"
-    }), external_React_default().createElement("span", null, l[20481])) : null, !room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.type === "public" && !is_chatlink && room.publicChatHandle && room.publicChatKey ? external_React_default().createElement("div", {
+    }), external_React_default().createElement("span", null, scheduledMeeting ? l.share_meeting_button : l[20481])) : null, scheduledMeeting ? external_React_default().createElement("div", {
+      className: `
+                                                link-button
+                                                light
+                                                ${room.iAmOperator() && !scheduledMeeting.canceled ? '' : 'disabled'}
+                                            `,
+      onClick: () => {
+        if (room.iAmOperator() && !scheduledMeeting.canceled) {
+          this.cancelScheduledMeeting();
+        }
+      }
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-bin-filled"
+    }), scheduledMeeting.isRecurring ? external_React_default().createElement("span", null, l.cancel_meeting_series_button) : external_React_default().createElement("span", null, l.cancel_meeting_button)) : null, !room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.type === 'public' && !is_chatlink && room.publicChatHandle && room.publicChatKey ? external_React_default().createElement("div", {
       className: "link-button light",
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
         }
-        self.props.onJoinViaPublicLinkClicked();
+        this.props.onJoinViaPublicLinkClicked();
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-rename"
-    }), external_React_default().createElement("span", null, l[20597])) : null, AVseperator, external_React_default().createElement(buttons.z, {
+    }), external_React_default().createElement("span", null, l[20597])) : null, scheduledMeeting ? null : external_React_default().createElement((external_React_default()).Fragment, null, AVseperator, external_React_default().createElement(buttons.z, {
       className: "link-button light dropdown-element",
       icon: "sprite-fm-mono icon-upload-filled",
       label: l[23753],
@@ -10675,78 +11826,82 @@ class ConversationRightArea extends mixins.wl {
       className: "wide-dropdown send-files-selector light",
       noArrow: "true",
       vertOffset: 4,
-      onClick: () => {}
+      onClick: () => false
     }, external_React_default().createElement("div", {
       className: "dropdown info-txt"
-    }, l[23753] ? l[23753] : "Send..."), external_React_default().createElement(dropdowns.DropdownItem, {
+    }, l[23753] || 'Send...'), external_React_default().createElement(dropdowns.DropdownItem, {
       className: "link-button",
       icon: "sprite-fm-mono icon-cloud-drive",
-      label: l[19794] ? l[19794] : "My Cloud Drive",
+      label: l[19794] || 'My Cloud Drive',
       disabled: mega.paywall,
       onClick: () => {
-        self.props.onAttachFromCloudClicked();
+        this.props.onAttachFromCloudClicked();
       }
     }), external_React_default().createElement(dropdowns.DropdownItem, {
       className: "link-button",
       icon: "sprite-fm-mono icon-session-history",
-      label: l[19795] ? l[19795] : "My computer",
+      label: l[19795] || 'My computer',
       disabled: mega.paywall,
       onClick: () => {
-        self.props.onAttachFromComputerClicked();
+        this.props.onAttachFromComputerClicked();
       }
-    }))), pushSettingsBtn, openInviteBtn, external_React_default().createElement(buttons.z, {
+    })))), pushSettingsBtn, openInviteBtn, external_React_default().createElement(buttons.z, {
       className: "link-button light clear-history-button",
       disabled: dontShowTruncateButton || !room.members.hasOwnProperty(u_handle),
       onClick: () => {
-        if (self.props.onTruncateClicked) {
-          self.props.onTruncateClicked();
+        if (this.props.onTruncateClicked) {
+          this.props.onTruncateClicked();
         }
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-remove"
     }), external_React_default().createElement("span", {
       className: "accordion-clear-history-text"
-    }, l[8871])), retentionHistoryBtn, room.iAmOperator() && room.type === "public" ? external_React_default().createElement("div", {
+    }, l[8871])), retentionHistoryBtn, room.iAmOperator() && room.type === 'public' && !scheduledMeeting ? external_React_default().createElement("div", {
       className: "chat-enable-key-rotation-paragraph"
     }, AVseperator, external_React_default().createElement("div", {
-      className: "link-button light " + (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE ? " disabled" : ""),
+      className: `
+                                                    link-button
+                                                    light
+                                                    ${MEMBERS_LIMITED ? 'disabled' : ''}
+                                                `,
       onClick: e => {
-        if (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE || $(e.target).closest('.disabled').length > 0) {
+        if (MEMBERS_LIMITED || $(e.target).closest('.disabled').length > 0) {
           return false;
         }
-        self.props.onMakePrivateClicked();
+        this.props.onMakePrivateClicked();
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-key"
     }), external_React_default().createElement("span", null, l[20623])), external_React_default().createElement("p", null, external_React_default().createElement("span", null, l[20454]))) : null, AVseperator, external_React_default().createElement("div", {
       className: `
-                                        link-button
-                                        light
-                                        ${(room.members.hasOwnProperty(u_handle) || room.state === ChatRoom.STATE.LEFT) && !is_chatlink ? '' : 'disabled'}
-                                    `,
+                                                link-button
+                                                light
+                                                ${(room.members.hasOwnProperty(u_handle) || room.state === ChatRoom.STATE.LEFT) && !is_chatlink ? '' : 'disabled'}
+                                            `,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
         }
         if (room.isArchived()) {
-          if (self.props.onUnarchiveClicked) {
-            self.props.onUnarchiveClicked();
+          if (this.props.onUnarchiveClicked) {
+            this.props.onUnarchiveClicked();
           }
-        } else if (self.props.onArchiveClicked) {
-          self.props.onArchiveClicked();
+        } else if (this.props.onArchiveClicked) {
+          this.props.onArchiveClicked();
         }
       }
     }, external_React_default().createElement("i", {
       className: `
-                                            sprite-fm-mono
-                                            ${room.isArchived() ? 'icon-unarchive' : 'icon-archive'}
-                                        `
-    }), external_React_default().createElement("span", null, archiveText)), room.type !== "private" ? external_React_default().createElement("div", {
+                                                sprite-fm-mono
+                                                ${room.isArchived() ? 'icon-unarchive' : 'icon-archive'}
+                                            `
+    }), external_React_default().createElement("span", null, archiveText)), room.type !== 'private' ? external_React_default().createElement("div", {
       className: `
-                                            link-button
-                                            light
-                                            ${room.type !== "private" && !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 && !room.activeCall ? '' : 'disabled'}
-                                        `,
+                                                    link-button
+                                                    light
+                                                    ${room.type !== 'private' && !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && room.membersSetFromApi.members[u_handle] !== -1 && !room.activeCall ? '' : 'disabled'}
+                                                `,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
@@ -10759,7 +11914,7 @@ class ConversationRightArea extends mixins.wl {
       className: "sprite-fm-mono icon-disabled-filled"
     }), external_React_default().createElement("span", null, l[8633])) : null)), external_React_default().createElement(SharedFilesAccordionPanel, {
       key: "sharedFiles",
-      title: l[19796] ? l[19796] : "Shared Files",
+      title: l[19796] || 'Shared Files',
       chatRoom: room,
       sharedFiles: room.messagesBuff.sharedFiles
     }), room.type === "private" ? external_React_default().createElement(IncSharesAccordionPanel, {
@@ -10815,13 +11970,16 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       showHistoryRetentionDialog: false,
       setNonLoggedInJoinChatDlgTrue: null,
       hasInvalidKeys: null,
-      invalidKeysBanner: null
+      invalidKeysBanner: null,
+      descriptionDialog: false,
+      occurrencesLoading: false
     };
     const {
       chatRoom
     } = this.props;
     chatRoom.rebind(`openAttachCloudDialog.${this.getUniqueId()}`, () => this.openAttachCloudDialog());
     chatRoom.rebind(`openSendContactDialog.${this.getUniqueId()}`, () => this.openSendContactDialog());
+    chatRoom.rebind(`openSchedDescDialog.${this.getUniqueId()}`, () => this.openSchedDescDialog());
     this.handleKeyDown = SoonFc(120, ev => this._handleKeyDown(ev));
   }
   customIsEventuallyVisible() {
@@ -10835,6 +11993,11 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
   openSendContactDialog() {
     this.setState({
       'sendContactDialog': true
+    });
+  }
+  openSchedDescDialog() {
+    this.setState({
+      descriptionDialog: true
     });
   }
   onMouseMove() {
@@ -10862,14 +12025,30 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
   toggleExpandedFlag() {
     return document.body.classList[call.ZP.isExpanded() ? 'remove' : 'add'](call.F3);
   }
-  startCall(type) {
+  startCall(type, scheduled) {
     const {
       chatRoom
     } = this.props;
     if (isStartCallDisabled(chatRoom)) {
       return false;
     }
-    return type === call.ZP.TYPE.AUDIO ? chatRoom.startAudioCall() : chatRoom.startVideoCall();
+    return type === call.ZP.TYPE.AUDIO ? chatRoom.startAudioCall(scheduled) : chatRoom.startVideoCall(scheduled);
+  }
+  renderUpcomingInfo() {
+    const {
+      scheduledMeeting
+    } = this.props.chatRoom;
+    if (scheduledMeeting) {
+      const {
+        recurring,
+        nextOccurrenceStart,
+        nextOccurrenceEnd,
+        isUpcoming
+      } = scheduledMeeting;
+      const until = `${(0,helpers.KC)(nextOccurrenceStart, nextOccurrenceEnd) ? '' : time2date(nextOccurrenceEnd / 1000, 4)} ${toLocaleTime(nextOccurrenceEnd)}`;
+      return external_React_default().createElement((external_React_default()).Fragment, null, isUpcoming && recurring && external_React_default().createElement("span", null, l.next_meeting), external_React_default().createElement("span", null, (l.schedule_formatted_date || '%1 from %2 to %3').replace('%1', time2date(nextOccurrenceStart / 1000, 4)).replace('%2', toLocaleTime(nextOccurrenceStart)).replace('%3', until)));
+    }
+    return null;
   }
   componentDidMount() {
     super.componentDidMount();
@@ -10942,6 +12121,9 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         }, () => this.safeForceUpdate());
       }
     });
+    megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => this.isMounted() && this.setState({
+      occurrencesLoading: false
+    }));
   }
   eventuallyInit() {
     var self = this;
@@ -10978,6 +12160,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     }
     this.props.chatRoom.unbind("openAttachCloudDialog." + this.getUniqueId());
     this.props.chatRoom.unbind("openSendContactDialog." + this.getUniqueId());
+    this.props.chatRoom.unbind(`openSchedDescDialog.${this.getUniqueId()}`);
     window.removeEventListener('keydown', self.handleKeyDown);
     $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
     $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
@@ -11449,22 +12632,45 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         }
       }))))));
     }
+    let {
+      descriptionDialog
+    } = this.state;
+    descriptionDialog = descriptionDialog ? external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+      className: "scheduled-description-dialog",
+      meeting: room.scheduledMeeting,
+      onClose: () => {
+        this.setState({
+          descriptionDialog: false
+        });
+      }
+    }, external_React_default().createElement("header", null, external_React_default().createElement("h3", null, l.schedule_desc_dlg_title)), external_React_default().createElement("section", {
+      className: "content"
+    }, external_React_default().createElement(perfectScrollbar.F, {
+      className: "description-scroller"
+    }, external_React_default().createElement(utils.Cw, null, room.scheduledMeeting.description.replace(/\n/g, '<br>') || l.schedule_no_desc)))) : null;
     var topicInfo = null;
-    if (self.props.chatRoom.type === "group" || self.props.chatRoom.type === "public") {
+    const isUpcoming = room.scheduledMeeting && room.scheduledMeeting.isUpcoming;
+    const isRecurring = room.scheduledMeeting && room.scheduledMeeting.isRecurring;
+    if (room.type === 'group' || room.type === 'public') {
       topicInfo = external_React_default().createElement("div", {
         className: "chat-topic-info"
       }, external_React_default().createElement("div", {
-        className: "chat-topic-icon"
+        className: `
+                            chat-topic-icon
+                            ${room.isMeeting ? 'meeting-icon' : ''}
+                        `
       }, external_React_default().createElement("i", {
-        className: "sprite-fm-uni icon-chat-group"
+        className: room.isMeeting ? 'sprite-fm-mono icon-video-call-filled' : 'sprite-fm-uni icon-chat-group'
       })), external_React_default().createElement("div", {
         className: "chat-topic-text"
       }, external_React_default().createElement("span", {
         className: "txt"
-      }, external_React_default().createElement(utils.dy, null, self.props.chatRoom.getRoomTitle())), external_React_default().createElement("span", {
+      }, external_React_default().createElement(utils.dy, null, room.getRoomTitle()), isUpcoming && isRecurring && external_React_default().createElement("i", {
+        className: "sprite-fm-mono icon-repeat"
+      })), external_React_default().createElement("span", {
         className: "txt small"
-      }, external_React_default().createElement(ui_contacts.MembersAmount, {
-        room: self.props.chatRoom
+      }, isUpcoming ? this.renderUpcomingInfo() : external_React_default().createElement(ui_contacts.MembersAmount, {
+        chatRoom: room
       }))));
     } else {
       contactHandle = contacts[0];
@@ -11525,7 +12731,12 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
           this.toggleExpandedFlag();
         });
       },
-      didMount: () => this.toggleExpandedFlag(),
+      didMount: () => {
+        this.toggleExpandedFlag();
+        if (room.isMeeting) {
+          room.getPublicLink();
+        }
+      },
       willUnmount: minimised => this.setState({
         callMinimized: false
       }, () => minimised ? null : this.toggleExpandedFlag()),
@@ -11579,6 +12790,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       members: this.props.chatRoom.membersSetFromApi,
       messagesBuff: room.messagesBuff,
       pushSettingsValue: pushNotificationSettings.getDnd(this.props.chatRoom.chatId),
+      occurrencesLoading: this.state.occurrencesLoading,
       onStartCall: mode => (0,call.xt)().then(() => this.startCall(mode)).catch(() => d && console.warn('Already in a call.')),
       onAttachFromComputerClicked: function () {
         self.props.chatRoom.uploadFromComputer();
@@ -11658,8 +12870,15 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         } else {
           self.props.chatRoom.trigger('onAddUserRequest', [contactHashes]);
         }
+      },
+      onShowScheduledDescription: () => {
+        if (room.scheduledMeeting) {
+          this.setState({
+            descriptionDialog: true
+          });
+        }
       }
-    }) : null, privateChatDialog, chatLinkDialog, nonLoggedInJoinChatDialog, attachCloudDialog, sendContactDialog, confirmDeleteDialog, historyRetentionDialog, null, pushSettingsDialog, external_React_default().createElement("div", {
+    }) : null, privateChatDialog, chatLinkDialog, nonLoggedInJoinChatDialog, attachCloudDialog, sendContactDialog, confirmDeleteDialog, historyRetentionDialog, null, pushSettingsDialog, descriptionDialog, external_React_default().createElement("div", {
       className: "dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden"
     }, external_React_default().createElement("i", {
       className: "dropdown-white-arrow"
@@ -11730,7 +12949,12 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         this.historyPanel = historyPanel;
       },
       onDeleteClicked: msg => this.handleDeleteDialog(msg)
-    })), !is_chatlink && room.state !== ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ? external_React_default().createElement(JoinCallNotification, {
+    })), !is_chatlink && room.state !== ChatRoom.STATE.LEFT && navigator.onLine && room.scheduledMeeting && !room.isArchived() && !startCallDisabled ? external_React_default().createElement(StartMeetingNotification, {
+      chatRoom: room,
+      onStartCall: mode => {
+        return startCallDisabled ? null : (0,call.xt)(true, room).then(() => this.startCall(mode, true)).catch(ex => d && console.warn(`Already in a call. ${ex}`));
+      }
+    }) : null, !is_chatlink && room.state !== ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ? external_React_default().createElement(JoinCallNotification, {
       chatRoom: room
     }) : null, room.isAnonymous() ? external_React_default().createElement("div", {
       className: "join-chat-block"
@@ -11773,6 +12997,14 @@ class ConversationPanels extends mixins.wl {
     var _this$props$onMount, _this$props;
     super.componentDidMount();
     (_this$props$onMount = (_this$props = this.props).onMount) == null ? void 0 : _this$props$onMount.call(_this$props);
+    megaChat.chats.forEach(chatRoom => {
+      const {
+        scheduledMeeting
+      } = chatRoom;
+      if (scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring) {
+        scheduledMeeting.getOccurrences().catch(nop);
+      }
+    });
   }
   render() {
     const {
@@ -11804,22 +13036,47 @@ class ConversationPanels extends mixins.wl {
   }
 }
 class EmptyConvPanel extends mixins.wl {
-  render() {
+  renderActions() {
     const {
       isMeeting,
-      onNewClick
+      onNewChat,
+      onStartMeeting,
+      onScheduleMeeting
     } = this.props;
+    if (isMeeting) {
+      return external_React_default().createElement(buttons.z, {
+        className: "mega-button large positive",
+        label: l.create_meeting
+      }, external_React_default().createElement(dropdowns.Dropdown, {
+        className: "light",
+        noArrow: "true",
+        vertOffset: 4
+      }, external_React_default().createElement(dropdowns.DropdownItem, {
+        className: "link-button",
+        icon: "sprite-fm-mono icon-video-plus",
+        label: l.new_meeting_start,
+        onClick: onStartMeeting
+      }), external_React_default().createElement("hr", null), external_React_default().createElement(dropdowns.DropdownItem, {
+        className: "link-button",
+        icon: "sprite-fm-mono icon-calendar2",
+        label: l.schedule_meeting_start,
+        onClick: onScheduleMeeting
+      })));
+    }
+    return external_React_default().createElement(buttons.z, {
+      className: "mega-button large positive",
+      label: l.add_chat,
+      onClick: onNewChat
+    });
+  }
+  render() {
     return external_React_default().createElement("div", {
       className: "conversations-empty"
     }, external_React_default().createElement("div", {
       className: "conversations-empty-content"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-chat-filled"
-    }), external_React_default().createElement("h1", null, isMeeting ? l.start_meeting : l.start_chat), external_React_default().createElement("p", null, isMeeting ? l.onboard_megachat_dlg3_text : l.onboard_megachat_dlg2_text), external_React_default().createElement(buttons.z, {
-      className: "mega-button large positive",
-      label: isMeeting ? l.new_meeting : l.add_chat,
-      onClick: onNewClick
-    })));
+    }), this.props.isMeeting ? external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("h1", null, l.start_meeting), external_React_default().createElement("p", null, l.onboard_megachat_dlg3_text)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("h1", null, l.start_chat), external_React_default().createElement("p", null, l.onboard_megachat_dlg2_text)), this.renderActions()));
   }
 }
 function isStartCallDisabled(room) {
@@ -11860,7 +13117,7 @@ var modalDialogs = __webpack_require__(182);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
 var meetings_button = __webpack_require__(193);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/workflow/preview.jsx
-var preview = __webpack_require__(97);
+var preview = __webpack_require__(889);
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 var ui_link = __webpack_require__(941);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
@@ -12023,6 +13280,8 @@ Start.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
+// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx + 1 modules
+var schedule = __webpack_require__(158);
 ;// CONCATENATED MODULE: ./js/ui/miniui.jsx
 
 
@@ -12123,7 +13382,7 @@ class StartGroupChatWizard extends mixins.wl {
     megaChat.createAndShowGroupRoomFor(selected, groupName.trim(), {
       keyRotation,
       createChatLink: keyRotation ? false : createChatLink,
-      oi: openInvite
+      openInvite
     });
     this.props.onClose(this);
   }
@@ -13173,6 +14432,7 @@ class Actions extends mixins.wl {
       views,
       routingSection,
       startMeeting,
+      scheduleMeeting,
       createGroupChat
     } = this.props;
     const {
@@ -13214,9 +14474,26 @@ class Actions extends mixins.wl {
     })), view === MEETINGS && routingSection !== 'contacts' && external_React_default().createElement(buttons.z, {
       className: "mega-button action",
       icon: "sprite-fm-mono icon-add-circle",
-      label: l.new_meeting,
+      label: l.create_meeting
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-arrow-down"
+    }), external_React_default().createElement(dropdowns.Dropdown, {
+      className: "light",
+      noArrow: "true",
+      vertOffset: 4,
+      positionMy: "left top",
+      positionAt: "left bottom"
+    }, external_React_default().createElement(dropdowns.DropdownItem, {
+      className: "link-button",
+      icon: "sprite-fm-mono icon-video-plus",
+      label: l.new_meeting_start,
       onClick: startMeeting
-    }), routingSection === 'contacts' && external_React_default().createElement(buttons.z, {
+    }), external_React_default().createElement("hr", null), external_React_default().createElement(dropdowns.DropdownItem, {
+      className: "link-button",
+      icon: "sprite-fm-mono icon-calendar2",
+      label: l.schedule_meeting_start,
+      onClick: scheduleMeeting
+    }))), routingSection === 'contacts' && external_React_default().createElement(buttons.z, {
       className: "mega-button action",
       icon: "sprite-fm-mono icon-add-circle",
       label: l[71],
@@ -13290,6 +14567,27 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
       return todayOrYesterday(timestamp * 1000) ? getTimeMarker(timestamp) : time2date(timestamp, 17);
     }
     return null;
+  }
+  getScheduledDateTime() {
+    const {
+      scheduledMeeting
+    } = this.props.chatRoom;
+    if (scheduledMeeting) {
+      const {
+        isRecurring,
+        nextOccurrenceStart
+      } = scheduledMeeting;
+      if (isRecurring) {
+        return {
+          date: time2date(nextOccurrenceStart / 1000, 19),
+          time: toLocaleTime(nextOccurrenceStart)
+        };
+      }
+      return {
+        date: time2date(nextOccurrenceStart / 1000, 19),
+        time: toLocaleTime(nextOccurrenceStart)
+      };
+    }
   }
   render() {
     var classString = "";
@@ -13403,9 +14701,21 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
       }, external_React_default().createElement(utils.nF, null, megaChat.html(chatRoom.getRoomTitle()))));
     }
     nameClassString += chatRoom.type === "private" || chatRoom.type === "group" ? ' badge-pad' : '';
+    const {
+      scheduledMeeting,
+      isMeeting
+    } = chatRoom;
+    const isUpcoming = scheduledMeeting && scheduledMeeting.isUpcoming;
+    const {
+      date,
+      time
+    } = this.getScheduledDateTime() || {};
     return external_React_default().createElement("li", {
       id: id,
-      className: classString,
+      className: `
+                    ${classString}
+                    ${isUpcoming ? 'upcoming-conversation' : ''}
+                `,
       "data-room-id": roomId,
       "data-jid": contactId,
       onClick: ev => this.props.onConversationClick(ev)
@@ -13414,10 +14724,10 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
     }, (chatRoom.type === 'group' || chatRoom.type === 'public') && external_React_default().createElement("div", {
       className: `
                                 chat-topic-icon
-                                ${chatRoom.isMeeting ? 'meeting-icon' : ''}
+                                ${isMeeting ? 'meeting-icon' : ''}
                             `
     }, external_React_default().createElement("i", {
-      className: chatRoom.isMeeting ? 'sprite-fm-mono icon-video-call-filled' : 'sprite-fm-uni icon-chat-group'
+      className: isMeeting ? 'sprite-fm-mono icon-video-call-filled' : 'sprite-fm-uni icon-chat-group'
     })), chatRoom.type === 'private' && contact && external_React_default().createElement(ui_contacts.Avatar, {
       contact: contact
     })), external_React_default().createElement("div", {
@@ -13428,16 +14738,30 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
       className: `conversation-data-name ${nameClassString}`
     }, roomTitle), external_React_default().createElement("div", {
       className: "conversation-data-badges"
-    }, chatRoom.type === "private" && external_React_default().createElement("span", {
+    }, chatRoom.type === 'private' && external_React_default().createElement("span", {
       className: `user-card-presence ${presenceClass}`
-    }), (chatRoom.type === "group" || chatRoom.type === "private") && external_React_default().createElement("i", {
+    }), (chatRoom.type === 'group' || chatRoom.type === 'private') && external_React_default().createElement("i", {
       className: "sprite-fm-uni icon-ekr-key simpletip",
       "data-simpletip": l[20935]
+    }), scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring && external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-repeat"
     }))), external_React_default().createElement("div", {
       className: "clear"
-    }), external_React_default().createElement("div", {
+    }), isUpcoming ? external_React_default().createElement("div", {
       className: "conversation-message-info"
-    }, lastMessageDiv)), external_React_default().createElement("div", {
+    }, external_React_default().createElement("div", {
+      className: "conversation-scheduled-data"
+    }, external_React_default().createElement("span", null, date)), external_React_default().createElement("div", {
+      className: "conversation-scheduled-data"
+    }, external_React_default().createElement("span", null, time), notificationItems.length > 0 ? external_React_default().createElement("div", {
+      className: `
+                                            unread-messages
+                                            items-${notificationItems.length}
+                                            unread-upcoming
+                                        `
+    }, notificationItems) : null)) : external_React_default().createElement("div", {
+      className: "conversation-message-info"
+    }, lastMessageDiv)), isUpcoming ? null : external_React_default().createElement("div", {
       className: "date-time-wrapper"
     }, external_React_default().createElement("div", {
       className: "date-time"
@@ -13449,7 +14773,125 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
   }
 }, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "eventuallyScrollTo", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyScrollTo"), _class.prototype), (0,applyDecoratedDescriptor.Z)(_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "render"), _class.prototype)), _class));
 
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/toggle.jsx
+
+
+
+class TogglePanel extends mixins.wl {
+  componentDidUpdate() {
+    super.componentDidUpdate();
+    const {
+      $chatTreePanePs: content
+    } = megaChat;
+    if (content) {
+      const container = document.querySelector(`.${LeftPanel.NAMESPACE}-conversations`);
+      const scrollable = content.getContentHeight() > container.offsetHeight - 40;
+      container.classList[scrollable ? 'add' : 'remove']('scrollable');
+      content.reinitialise();
+    }
+  }
+  specShouldComponentUpdate() {
+    return !this.props.loading;
+  }
+  render() {
+    const {
+      loading,
+      expanded,
+      heading,
+      children,
+      onToggle
+    } = this.props;
+    return external_React_default().createElement("div", {
+      className: `
+                    toggle-panel
+                    ${expanded ? 'expanded' : ''}
+                `,
+      onClick: onToggle
+    }, heading && external_React_default().createElement("div", {
+      className: "toggle-panel-heading"
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-arrow-down"
+    }), external_React_default().createElement("span", null, heading)), expanded && external_React_default().createElement("div", {
+      className: `
+                            toggle-panel-content
+                            ${loading ? 'loading-sketch' : ''}
+                        `
+    }, children));
+  }
+}
+TogglePanel.KEYS = {
+  UPCOMING: 'upcoming',
+  PAST: 'past',
+  ARCHIVE: 'archive'
+};
+class Toggle extends mixins.wl {
+  constructor(props) {
+    super(props);
+    this.state = {
+      expanded: null
+    };
+    this.state.expanded = this.props.expanded || null;
+  }
+  specShouldComponentUpdate() {
+    return !this.props.loading;
+  }
+  componentWillUpdate(nextProps) {
+    const {
+      view,
+      views
+    } = this.props;
+    if (view !== views.MEETINGS && nextProps.view === views.MEETINGS) {
+      this.setState({
+        expanded: TogglePanel.KEYS.UPCOMING
+      });
+    }
+  }
+  componentDidUpdate() {
+    super.componentDidUpdate();
+    const {
+      view,
+      views,
+      children
+    } = this.props;
+    const hasExpandablePanel = children.some(child => child.key === this.state.expanded);
+    if (!hasExpandablePanel && view !== views.MEETINGS) {
+      this.setState({
+        expanded: TogglePanel.KEYS.PAST
+      });
+    }
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.INITIALIZE, (ev, scheduledMeeting) => {
+      if (scheduledMeeting && scheduledMeeting.chatRoom && scheduledMeeting.iAmOwner) {
+        this.setState({
+          expanded: TogglePanel.KEYS.UPCOMING
+        }, () => scheduledMeeting.chatRoom.setActive());
+      }
+    });
+  }
+  render() {
+    const {
+      loading,
+      children
+    } = this.props;
+    if (children) {
+      return children.map(child => {
+        return child && external_React_default().cloneElement(child, {
+          loading,
+          expanded: this.state.expanded === child.key,
+          onToggle: () => this.setState({
+            expanded: child.key
+          })
+        });
+      });
+    }
+    return null;
+  }
+}
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsList.jsx
+
+
 
 
 
@@ -13506,26 +14948,41 @@ class ConversationsList extends mixins.wl {
   }
   renderEmptyState() {
     const {
+      type,
       view,
-      views,
-      isArchived
+      views
     } = this.props;
+    const isArchived = type === TogglePanel.KEYS.ARCHIVE;
+    const isUpcoming = type === TogglePanel.KEYS.UPCOMING;
     const messages = {
       [views.CHATS]: isArchived ? l.no_archived_chats_lhp : l.no_chats_lhp,
-      [views.MEETINGS]: isArchived ? l.no_archived_meetings_lhp : l.no_meetings_lhp
+      [views.MEETINGS]: (() => {
+        if (isArchived) {
+          return l.no_archived_meetings_lhp;
+        }
+        return isUpcoming ? l.no_upcoming_meetings_lhp : l.no_meetings_lhp;
+      })()
     };
     return external_React_default().createElement("span", {
       className: "empty-conversations"
     }, messages[view]);
   }
-  renderConversations() {
+  renderConversationsList() {
     const {
+      view,
       conversations,
       onConversationClick
     } = this.props;
-    return external_React_default().createElement("ul", {
+    return external_React_default().createElement(perfectScrollbar.F, {
+      className: "chat-lp-scroll-area",
+      ref: ref => {
+        megaChat.$chatTreePanePs = ref;
+      },
+      view: view,
+      conversations: conversations
+    }, external_React_default().createElement("ul", {
       className: "conversations-pane"
-    }, conversations.sort(M.sortObjFn(room => room.lastActivity || room.ctime, -1)).map(chatRoom => {
+    }, conversations.map(chatRoom => {
       if (chatRoom.roomId) {
         return external_React_default().createElement(ConversationsListItem, {
           key: chatRoom.roomId,
@@ -13541,7 +14998,7 @@ class ConversationsList extends mixins.wl {
         });
       }
       return null;
-    }));
+    })));
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -13563,90 +15020,12 @@ class ConversationsList extends mixins.wl {
     if (conversations && conversations.length === 0) {
       return this.renderEmptyState();
     }
-    return view === views.LOADING ? this.renderLoading() : this.renderConversations();
+    return view === views.LOADING ? this.renderLoading() : this.renderConversationsList();
   }
 }
 ConversationsList.defaultProps = {
   manualDataChangeTracking: true
 };
-;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/toggle.jsx
-
-
-
-class TogglePanel extends mixins.wl {
-  componentDidUpdate() {
-    super.componentDidUpdate();
-    const {
-      $chatTreePanePs: content
-    } = megaChat;
-    if (content) {
-      const container = document.querySelector(`.${LeftPanel.NAMESPACE}-conversations`);
-      const scrollable = content.getContentHeight() > container.offsetHeight - 40;
-      container.classList[scrollable ? 'add' : 'remove']('scrollable');
-      content.reinitialise();
-    }
-  }
-  specShouldComponentUpdate() {
-    return !this.props.loading;
-  }
-  render() {
-    const {
-      loading,
-      expanded,
-      heading,
-      children,
-      onToggle
-    } = this.props;
-    return external_React_default().createElement("div", {
-      className: `
-                    toggle-panel
-                    ${expanded ? 'expanded' : ''}
-                `,
-      onClick: onToggle
-    }, heading && external_React_default().createElement("div", {
-      className: "toggle-panel-heading"
-    }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-arrow-down"
-    }), external_React_default().createElement("span", null, heading)), expanded && external_React_default().createElement("div", {
-      className: `
-                            toggle-panel-content
-                            ${loading ? 'loading-sketch' : ''}
-                        `
-    }, children));
-  }
-}
-class Toggle extends mixins.wl {
-  constructor(props) {
-    super(props);
-    this.state = {
-      expanded: null
-    };
-    this.state.expanded = this.props.expanded || null;
-  }
-  specShouldComponentUpdate() {
-    return !this.props.loading;
-  }
-  render() {
-    const {
-      loading,
-      shouldUpdate,
-      children
-    } = this.props;
-    if (children) {
-      return children.map(child => {
-        return external_React_default().cloneElement(child, {
-          loading,
-          shouldUpdate,
-          expanded: this.state.expanded === child.key,
-          onToggle: () => this.setState({
-            expanded: child.key
-          })
-        });
-      });
-    }
-    return null;
-  }
-}
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/leftPanel.jsx
 
 
@@ -13656,29 +15035,39 @@ class Toggle extends mixins.wl {
 
 
 
-
 class LeftPanel extends mixins.wl {
-  renderConversations(archived = false) {
+  renderConversations(type) {
     const {
       view,
       views,
       renderView
     } = this.props;
-    const conversations = Object.values(this.props.conversations).filter(c => (view === views.MEETINGS ? c.isMeeting : !c.isMeeting) && c[archived ? 'isArchived' : 'isDisplayable']());
-    return external_React_default().createElement(perfectScrollbar.F, {
-      className: "chat-lp-scroll-area",
-      ref: ref => {
-        megaChat.$chatTreePanePs = ref;
-      },
-      view: view,
-      conversations: conversations
-    }, external_React_default().createElement(ConversationsList, {
-      isArchived: archived,
+    const filteredConversations = this.filterConversations(type);
+    return external_React_default().createElement(ConversationsList, {
+      type: type,
       view: view,
       views: views,
-      conversations: conversations,
+      conversations: filteredConversations,
       onConversationClick: chatRoom => renderView(chatRoom.isMeeting ? views.MEETINGS : views.CHATS)
-    }));
+    });
+  }
+  filterConversations(type) {
+    let {
+      view,
+      views,
+      conversations
+    } = this.props;
+    conversations = Object.values(conversations);
+    switch (type) {
+      case TogglePanel.KEYS.UPCOMING:
+        return conversations.filter(c => c.isDisplayable() && c.isMeeting && c.scheduledMeeting && c.scheduledMeeting.isUpcoming).sort((a, b) => {
+          return a.scheduledMeeting.nextOccurrenceStart - b.scheduledMeeting.nextOccurrenceStart || a.ctime - b.ctime;
+        });
+      case TogglePanel.KEYS.PAST:
+        return conversations.filter(c => c.isDisplayable() && (view === views.MEETINGS ? c.isMeeting : !c.isMeeting) && (!c.scheduledMeeting || c.scheduledMeeting.isCanceled || c.scheduledMeeting.isPast)).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+      case TogglePanel.KEYS.ARCHIVE:
+        return conversations.filter(c => c.isArchived() && (view === views.MEETINGS ? c.isMeeting : !c.isMeeting)).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+    }
   }
   render() {
     const {
@@ -13689,6 +15078,7 @@ class LeftPanel extends mixins.wl {
       leftPaneWidth,
       renderView,
       startMeeting,
+      scheduleMeeting,
       createGroupChat
     } = this.props;
     const IS_LOADING = view === views.LOADING;
@@ -13713,26 +15103,32 @@ class LeftPanel extends mixins.wl {
       views: views,
       routingSection: routingSection,
       startMeeting: startMeeting,
+      scheduleMeeting: scheduleMeeting,
       createGroupChat: createGroupChat
     }), external_React_default().createElement("div", {
       className: `
                         ${LeftPanel.NAMESPACE}-conversations
+                        ${view === views.MEETINGS ? 'meetings-view' : 'chats-view'}
                         conversations
                         content-panel
                         active
                     `
     }, external_React_default().createElement(Toggle, {
       view: view,
+      views: views,
       loading: IS_LOADING,
       conversations: conversations,
-      expanded: "one"
-    }, external_React_default().createElement(TogglePanel, {
-      key: "one",
+      expanded: TogglePanel.KEYS.UPCOMING
+    }, view === views.MEETINGS && external_React_default().createElement(TogglePanel, {
+      key: TogglePanel.KEYS.UPCOMING,
+      heading: l.upcoming_meetings
+    }, this.renderConversations(TogglePanel.KEYS.UPCOMING)), external_React_default().createElement(TogglePanel, {
+      key: TogglePanel.KEYS.PAST,
       heading: !IS_LOADING && (view === views.CHATS ? l.contacts_and_groups : l.past_meetings)
-    }, this.renderConversations()), external_React_default().createElement(TogglePanel, {
-      key: "two",
+    }, this.renderConversations(TogglePanel.KEYS.PAST)), external_React_default().createElement(TogglePanel, {
+      key: TogglePanel.KEYS.ARCHIVE,
       heading: !IS_LOADING && view === views.CHATS ? l[19067] : l.archived_meetings
-    }, this.renderConversations(true)))));
+    }, this.renderConversations(TogglePanel.KEYS.ARCHIVE)))));
   }
 }
 LeftPanel.NAMESPACE = 'lhp';
@@ -13749,9 +15145,11 @@ LeftPanel.NAMESPACE = 'lhp';
 
 
 
+
 class ConversationsApp extends mixins.wl {
   constructor(props) {
     super(props);
+    this.chatRoomRef = null;
     this.VIEWS = {
       CHATS: 0x00,
       MEETINGS: 0x01,
@@ -13761,6 +15159,7 @@ class ConversationsApp extends mixins.wl {
       leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
       startGroupChatDialog: false,
       startMeetingDialog: false,
+      scheduleMeetingDialog: false,
       view: this.VIEWS.LOADING
     };
     this._cacheRouting();
@@ -13874,6 +15273,12 @@ class ConversationsApp extends mixins.wl {
     } else {
       megaChat.$leftPane.removeClass('hidden');
     }
+    megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.EDIT, (ev, chatRoom) => {
+      this.chatRoomRef = chatRoom;
+      this.setState({
+        scheduleMeetingDialog: true
+      });
+    });
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -13900,14 +15305,8 @@ class ConversationsApp extends mixins.wl {
   }
   createMeetingEndDlgIfNeeded() {
     if (megaChat.initialPubChatHandle || megaChat.initialChatId) {
-      let chatRoom = megaChat.getCurrentRoom();
-      if (!chatRoom) {
-        return null;
-      }
-      if (!chatRoom.initialMessageHistLoaded) {
-        return null;
-      }
-      if (megaChat.meetingDialogClosed === chatRoom.chatId) {
+      const chatRoom = megaChat.getCurrentRoom();
+      if (!chatRoom || chatRoom.scheduledMeeting || !chatRoom.initialMessageHistLoaded || megaChat.meetingDialogClosed === chatRoom.chatId) {
         return null;
       }
       const activeCallIds = chatRoom.activeCallIds.keys();
@@ -13930,7 +15329,7 @@ class ConversationsApp extends mixins.wl {
         $chatTreePanePs,
         routingSection
       } = megaChat;
-      $chatTreePanePs.reinitialise();
+      $chatTreePanePs == null ? void 0 : $chatTreePanePs.reinitialise();
       if (routingSection !== 'chat') {
         loadSubPage('fm/chat');
       }
@@ -13951,6 +15350,7 @@ class ConversationsApp extends mixins.wl {
       view,
       startGroupChatDialog,
       startMeetingDialog,
+      scheduleMeetingDialog,
       leftPaneWidth
     } = this.state;
     const isEmpty = chats && chats.every(c => c.isArchived()) && routingSection === 'chat' && !currentlyOpenedChat && !is_chatlink;
@@ -13970,8 +15370,12 @@ class ConversationsApp extends mixins.wl {
       sent: M.opc
     }), !isLoading && routingSection === 'notFound' && external_React_default().createElement("span", null, external_React_default().createElement("center", null, "Section not found")), !isLoading && this.createMeetingEndDlgIfNeeded(), !isLoading && isEmpty && external_React_default().createElement(conversationpanel.L2, {
       isMeeting: view === MEETINGS,
-      onNewClick: () => view === MEETINGS ? this.startMeeting() : this.setState({
+      onNewChat: () => this.setState({
         startGroupChatDialog: true
+      }),
+      onStartMeeting: () => this.startMeeting(),
+      onScheduleMeeting: () => this.setState({
+        scheduleMeetingDialog: true
       })
     }), !isLoading && external_React_default().createElement(conversationpanel.GY, (0,esm_extends.Z)({}, this.props, {
       className: routingSection === 'chat' ? '' : 'hidden',
@@ -14009,6 +15413,15 @@ class ConversationsApp extends mixins.wl {
       onClose: () => this.setState({
         startMeetingDialog: false
       })
+    }), scheduleMeetingDialog && external_React_default().createElement(schedule.Pf, {
+      chatRoom: this.chatRoomRef,
+      onClose: () => {
+        this.setState({
+          scheduleMeetingDialog: false
+        }, () => {
+          this.chatRoomRef = null;
+        });
+      }
     }), external_React_default().createElement(LeftPanel, {
       view: view,
       views: this.VIEWS,
@@ -14017,6 +15430,9 @@ class ConversationsApp extends mixins.wl {
       leftPaneWidth: leftPaneWidth,
       renderView: view => this.renderView(view),
       startMeeting: () => this.startMeeting(),
+      scheduleMeeting: () => this.setState({
+        scheduleMeetingDialog: true
+      }),
       createGroupChat: () => this.setState({
         startGroupChatDialog: true
       })
@@ -14361,7 +15777,7 @@ class GifPanel extends mixins.wl {
             return this.setState({
               bottom: true,
               loading: false
-            }, () => this.resultContainerRef.reinitialise());
+            }, () => this.resultContainerRef && this.resultContainerRef.reinitialise());
           }
         }).catch(ex => {
           return ex.name === 'AbortError' ? null : this.setState({
@@ -14495,7 +15911,7 @@ class GifPanel extends mixins.wl {
 
 /***/ }),
 
-/***/ 638:
+/***/ 214:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -14776,6 +16192,9 @@ class TopicChange extends topicChange_ConversationMessageMixin {
     var message = this.props.message;
     var megaChat = this.props.message.chatRoom.megaChat;
     var chatRoom = this.props.message.chatRoom;
+    if (message.meta.isScheduled) {
+      return null;
+    }
     var contact = self.getContact();
     var timestampInt = self.getTimestamp();
     var timestamp = self.getTimestampAsString();
@@ -14796,6 +16215,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
       className: "message avatar-wrapper small-rounded-avatar"
     });
     const topic = megaChat.html(message.meta.topic);
+    const oldTopic = megaChat.html(message.meta.oldTopic) || '';
     messages.push(topicChange_React.createElement("div", {
       className: "message body",
       "data-id": "id" + message.messageId,
@@ -14809,7 +16229,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
       label: topicChange_React.createElement(utils.dy, null, displayName)
     }), datetime, topicChange_React.createElement("div", {
       className: "message text-block"
-    }, topicChange_React.createElement(utils.Cw, null, l[9081].replace('%s', `<strong>"${topic}"</strong>`))))));
+    }, topicChange_React.createElement(utils.Cw, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>\u201c${topic}\u201d</strong>`))))));
     return topicChange_React.createElement("div", null, messages);
   }
 }
@@ -14958,11 +16378,14 @@ class RetentionChange extends mixin.y {
 }
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
 var call = __webpack_require__(200);
+// EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
+var scheduleMetaChange = __webpack_require__(97);
 ;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
 
 
 var _dec, _dec2, _class, _descriptor;
+
 
 
 
@@ -15238,7 +16661,9 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
       room.trigger('RefreshUI');
       if (room.scrolledToBottom) {
         delay('hp:reinit-scroll', () => {
-          this.messagesListScrollable.reinitialise(true, true);
+          if (this.messagesListScrollable) {
+            this.messagesListScrollable.reinitialise(true, true);
+          }
         }, 30);
       }
     }
@@ -15321,7 +16746,7 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
       avatarMeta = contact ? generateAvatarMeta(contact.u) : {};
       contactName = avatarMeta.fullName;
     } else if (contacts && contacts.length > 1) {
-      contactName = room.getRoomTitle(true);
+      contactName = room.getRoomTitle();
     }
     var messagesList = [];
     if (this.isLoading()) {
@@ -15343,7 +16768,7 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
           className: "header"
         }, external_React_default().createElement(utils.Cw, {
           tag: "div",
-          content: headerText
+          content: room.scheduledMeeting ? megaChat.html(room.getRoomTitle()) : headerText
         })), external_React_default().createElement("div", {
           className: "info"
         }, l[8080], external_React_default().createElement("p", null, external_React_default().createElement("i", {
@@ -15465,6 +16890,35 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
               key: v.messageId,
               contact: Message.getContactForMessage(v)
             });
+          } else if (v.dialogType === 'scheduleMeta') {
+            if (v.meta.onlyTitle) {
+              messageInstance = external_React_default().createElement(TopicChange, {
+                message: v,
+                key: v.messageId,
+                contact: Message.getContactForMessage(v),
+                grouped: grouped,
+                chatRoom: v.chatRoom
+              });
+            } else {
+              if (v.meta.topicChange) {
+                messagesList.push(external_React_default().createElement(TopicChange, {
+                  message: v,
+                  key: `${v.messageId}-topic`,
+                  contact: Message.getContactForMessage(v),
+                  grouped: grouped,
+                  chatRoom: v.chatRoom
+                }));
+              }
+              messageInstance = external_React_default().createElement(scheduleMetaChange.Z, {
+                message: v,
+                key: v.messageId,
+                mode: v.meta.mode,
+                chatRoom: room,
+                grouped: grouped,
+                link: v.chatRoom.publicLink,
+                contact: Message.getContactForMessage(v)
+              });
+            }
           }
           messagesList.push(messageInstance);
         } else {
@@ -16001,9 +17455,7 @@ class StreamHead extends mixins.wl {
       }
     };
     this.Dialog = () => {
-      const {
-        link
-      } = this.props;
+      const link = `${getBaseUrl()}/${this.props.chatRoom.publicLink}`;
       return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({
         ref: this.dialogRef
       }, this.state, {
@@ -16102,13 +17554,13 @@ class StreamHead extends mixins.wl {
       ref: this.topicRef,
       className: `
                                 stream-topic
-                                ${chatRoom.isMeeting ? 'has-meeting-link' : ''}
+                                ${chatRoom.isMeeting && chatRoom.publicLink ? 'has-meeting-link' : ''}
                             `,
-      onClick: () => chatRoom.isMeeting && this.setState({
+      onClick: () => chatRoom.isMeeting && chatRoom.publicLink && this.setState({
         dialog: !dialog,
         banner: false
       })
-    }, external_React_default().createElement(utils.dy, null, chatRoom.getRoomTitle()), chatRoom.isMeeting && external_React_default().createElement("i", {
+    }, external_React_default().createElement(utils.dy, null, chatRoom.getRoomTitle()), chatRoom.isMeeting && chatRoom.publicLink && external_React_default().createElement("i", {
       className: `
                                         sprite-fm-mono
                                         ${dialog ? 'icon-arrow-up' : 'icon-arrow-down'}
@@ -17536,6 +18988,7 @@ class ParticipantsNotice extends mixins.wl {
         chatRoom,
         onInviteToggle
       } = this.props;
+      const link = `${getBaseUrl()}/${chatRoom.publicLink}`;
       return external_React_default().createElement("div", {
         className: `
                     ${ParticipantsNotice.NAMESPACE}
@@ -17544,7 +18997,7 @@ class ParticipantsNotice extends mixins.wl {
                 `
       }, external_React_default().createElement("div", {
         className: `${ParticipantsNotice.NAMESPACE}-heading`
-      }, external_React_default().createElement("h1", null, l.waiting_for_others)), chatRoom.isMeeting && external_React_default().createElement("div", {
+      }, external_React_default().createElement("h1", null, l.waiting_for_others)), chatRoom.isMeeting && chatRoom.publicLink && external_React_default().createElement("div", {
         className: `${ParticipantsNotice.NAMESPACE}-content`
       }, external_React_default().createElement("h3", null, l.copy_and_share), external_React_default().createElement("div", {
         className: "mega-input with-icon box-style"
@@ -17554,10 +19007,10 @@ class ParticipantsNotice extends mixins.wl {
         type: "text",
         className: "megaInputs",
         readOnly: true,
-        defaultValue: this.props.link
+        defaultValue: link
       })), external_React_default().createElement(meetings_button.Z, {
         className: "mega-button positive large copy-to-clipboard",
-        onClick: () => copyToClipboard(this.props.link, l[7654])
+        onClick: () => copyToClipboard(link, l[7654])
       }, external_React_default().createElement("span", null, l[17835])), Call.isModerator(chatRoom, u_handle) && external_React_default().createElement("div", {
         className: "peers-invite"
       }, external_React_default().createElement("hr", null), external_React_default().createElement(meetings_button.Z, {
@@ -17635,7 +19088,6 @@ class stream_Stream extends mixins.wl {
     this.state = {
       page: 0,
       hovered: false,
-      link: undefined,
       overlayed: false
     };
     this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -17665,17 +19117,6 @@ class stream_Stream extends mixins.wl {
         }
       }, MOUSE_OUT_DELAY);
     }
-  }
-  getPublicLink() {
-    const {
-      chatRoom
-    } = this.props;
-    if (chatRoom && chatRoom.isMeeting) {
-      chatRoom.updatePublicHandle(undefined, () => this.isMounted() ? this.setState({
-        link: chatRoom.publicLink ? `${getBaseUrl()}/${chatRoom.publicLink}` : l[20660]
-      }) : null);
-    }
-    return null;
   }
   getColumns(streamsCount) {
     switch (true) {
@@ -17911,7 +19352,6 @@ class stream_Stream extends mixins.wl {
         chatRoom: chatRoom,
         everHadPeers: everHadPeers,
         streamContainer: streamContainer,
-        link: this.state.link,
         stayOnEnd: stayOnEnd,
         isOnHold: isOnHold,
         onInviteToggle: onInviteToggle,
@@ -17934,7 +19374,6 @@ class stream_Stream extends mixins.wl {
   }
   componentDidMount() {
     super.componentDidMount();
-    this.getPublicLink();
     this.scaleNodes();
     chatGlobalEventManager.addEventListener('resize', this.getUniqueId(), () => this.scaleNodes());
     this.callHoldListener = mBroadcaster.addListener('meetings:toggleHold', () => this.scaleNodes(undefined, true));
@@ -17949,7 +19388,6 @@ class stream_Stream extends mixins.wl {
   render() {
     const {
       hovered,
-      link,
       overlayed
     } = this.state;
     const {
@@ -18008,7 +19446,6 @@ class stream_Stream extends mixins.wl {
       mode: mode,
       call: call,
       chatRoom: chatRoom,
-      link: link,
       onCallMinimize: onCallMinimize,
       onModeChange: onModeChange
     }), isOnHold ? this.renderOnHold() : overlayed && external_React_default().createElement("div", {
@@ -18061,7 +19498,7 @@ class stream_Stream extends mixins.wl {
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 var composedTextArea = __webpack_require__(813);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
-var historyPanel = __webpack_require__(638);
+var historyPanel = __webpack_require__(214);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/collapse.jsx
 
 
@@ -18648,34 +20085,18 @@ class Invite extends mixins.wl {
         className: `${Invite.NAMESPACE}-loading`
       }, external_React_default().createElement("h2", null, l[1456]));
     };
-    this.getPublicLink = () => {
-      const {
-        chatRoom
-      } = this.props;
-      if (chatRoom && chatRoom.isMeeting) {
-        chatRoom.updatePublicHandle(undefined, () => {
-          if (this.isMounted()) {
-            this.setState({
-              link: chatRoom.publicLink ? `${getBaseUrl()}/${chatRoom.publicLink}` : l[20660]
-            });
-          }
-        });
-      }
-    };
     this.state.excluded = this.props.chatRoom ? this.props.chatRoom.getParticipantsExceptMe() : [];
     this.state.contacts = this.state.contactsInitial = this.getSortedContactsList();
   }
   componentDidMount() {
     super.componentDidMount();
     this.getFrequentContacts();
-    this.getPublicLink();
   }
   render() {
     const {
       NAMESPACE
     } = Invite;
     const {
-      link,
       value,
       loading,
       selected,
@@ -18686,7 +20107,10 @@ class Invite extends mixins.wl {
       chatRoom,
       onClose
     } = this.props;
-    const IS_MEETING = chatRoom && chatRoom.isMeeting;
+    const {
+      isMeeting,
+      publicLink
+    } = chatRoom || {};
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       name: NAMESPACE,
       className: `
@@ -18697,12 +20121,12 @@ class Invite extends mixins.wl {
       onClose: onClose
     }), external_React_default().createElement("div", {
       className: `${NAMESPACE}-head`
-    }, external_React_default().createElement("h2", null, IS_MEETING ? l.invite_participants : l[8726]), IS_MEETING && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("p", null, l.copy_and_share), external_React_default().createElement("div", {
+    }, external_React_default().createElement("h2", null, isMeeting ? l.invite_participants : l[8726]), isMeeting && publicLink && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("p", null, l.copy_and_share), external_React_default().createElement("div", {
       className: "link-input-container"
     }, external_React_default().createElement(meetings_button.Z, {
-      className: `mega-button large positive ${link ? '' : 'disabled'}`,
-      onClick: () => link && copyToClipboard(link, l[371])
-    }, !link ? l[7006] : l[1394]), external_React_default().createElement(ui_link.Z, {
+      className: `mega-button large positive ${publicLink ? '' : 'disabled'}`,
+      onClick: () => publicLink && copyToClipboard(publicLink, l[371])
+    }, !publicLink ? l[7006] : l[1394]), external_React_default().createElement(ui_link.Z, {
       className: "view-link-control",
       field: field,
       onClick: () => this.setState({
@@ -18710,14 +20134,14 @@ class Invite extends mixins.wl {
       })
     }, field ? l.collapse_meeting_link : l.expand_meeting_link, external_React_default().createElement("i", {
       className: `sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`
-    })), field && link && external_React_default().createElement("div", {
+    })), field && publicLink && external_React_default().createElement("div", {
       className: "chat-link-input"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-link"
     }), external_React_default().createElement("input", {
       type: "text",
       readOnly: true,
-      value: link
+      value: publicLink
     })))), HAS_CONTACTS() && external_React_default().createElement(Search, {
       value: value,
       placeholder: contactsInitial.length,
@@ -19514,6 +20938,1907 @@ const withPermissionsObserver = Component => class extends _mixins1__.wl {
 
 /***/ }),
 
+/***/ 711:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+"Z": () => (Datepicker)
+});
+var react0__ = __webpack_require__(363);
+var react0 = __webpack_require__.n(react0__);
+var _mixins_js1__ = __webpack_require__(503);
+
+
+class Datepicker extends _mixins_js1__.wl {
+  constructor(props) {
+    super(props);
+    this.OPTIONS = {
+      classes: 'meetings-datepicker-calendar',
+      dateFormat: '@',
+      minDate: null,
+      startDate: null,
+      selectedDates: [],
+      prevHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
+      nextHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
+      altField: null,
+      firstDay: 0,
+      autoClose: true,
+      toggleSelected: false,
+      position: 'bottom left',
+      language: {
+        daysMin: [l[8763], l[8764], l[8765], l[8766], l[8767], l[8768], l[8769]],
+        months: [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]],
+        monthsShort: [l[24035], l[24037], l[24036], l[24038], l[24047], l[24039], l[24040], l[24041], l[24042], l[24043], l[24044], l[24045]]
+      },
+      onSelect: dateText => {
+        const prevDate = new Date(+this.props.value);
+        const nextDate = new Date(+dateText);
+        nextDate.setHours(prevDate.getHours(), prevDate.getMinutes());
+        return this.props.onSelect(nextDate.getTime());
+      }
+    };
+    this.containerRef = react0().createRef();
+    this.inputRef = react0().createRef();
+    this.datepicker = null;
+    this.OPTIONS.startDate = new Date(this.props.startDate);
+    this.OPTIONS.selectedDates = this.props.selectedDates || [this.OPTIONS.startDate];
+    this.OPTIONS.minDate = this.props.minDate ? new Date(this.props.minDate) : new Date();
+    this.OPTIONS.position = this.props.position || this.OPTIONS.position;
+    this.OPTIONS.altField = `input.${this.props.altField}`;
+  }
+  initialize() {
+    const inputRef = this.inputRef && this.inputRef.current;
+    if (inputRef) {
+      var _this$props$onMount, _this$props;
+      $(inputRef).datepicker(this.OPTIONS);
+      this.datepicker = $(inputRef).data('datepicker');
+      (_this$props$onMount = (_this$props = this.props).onMount) == null ? void 0 : _this$props$onMount.call(_this$props, this.datepicker);
+    }
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    M.require('datepicker_js').done(() => this.initialize());
+  }
+  render() {
+    const {
+      NAMESPACE
+    } = Datepicker;
+    const {
+      value,
+      className,
+      placeholder
+    } = this.props;
+    return react0().createElement("div", {
+      ref: this.containerRef,
+      className: NAMESPACE
+    }, react0().createElement("div", {
+      className: "mega-input datepicker-input"
+    }, react0().createElement("input", {
+      ref: this.inputRef,
+      type: "text",
+      name: "account-firstname",
+      className: `
+                            dialog-input
+                            ${className || ''}
+                        `,
+      autoComplete: "off",
+      placeholder: placeholder || '',
+      value: value && time2date(value / 1000, 18),
+      onChange: () => false
+    }), react0().createElement("i", {
+      className: "sprite-fm-mono icon-calendar1",
+      onClick: () => this.datepicker && this.datepicker.show()
+    })));
+  }
+}
+Datepicker.NAMESPACE = 'meetings-datepicker';
+
+/***/ }),
+
+/***/ 435:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+"KC": () => (isSameDay),
+"Ny": () => (getNearestHalfHour),
+"Pm": () => (isTomorrow),
+"Sv": () => (getUserTimezone),
+"nl": () => (getTimeIntervals),
+"zI": () => (addMonths),
+"zk": () => (isToday)
+});
+
+const isSameDay = (a, b) => {
+  return new Date(a).toDateString() === new Date(b).toDateString();
+};
+const isToday = timestamp => {
+  return new Date(timestamp).toDateString() === new Date().toDateString();
+};
+const isTomorrow = timestamp => {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toDateString() === new Date(timestamp).toDateString();
+};
+const getDaysInMonth = (year, month) => {
+  return new Date(year, month, 0).getDate();
+};
+const addMonths = (timestamp, months) => {
+  const date = new Date(timestamp);
+  return new Date(date.setMonth(date.getMonth() + months)).getTime();
+};
+const getNearestHalfHour = (timestamp = Date.now()) => {
+  const {
+    SCHEDULED_MEETINGS_INTERVAL
+  } = ChatRoom;
+  return new Date(Math.ceil(timestamp / SCHEDULED_MEETINGS_INTERVAL) * SCHEDULED_MEETINGS_INTERVAL).getTime();
+};
+const getUserTimezone = () => {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+};
+const getTimeIntervals = (timestamp, offsetFrom, interval = 30) => {
+  const increments = [];
+  if (timestamp) {
+    const [targetDate, initialDate] = [new Date(timestamp), new Date(timestamp)].map(date => {
+      date.setHours(0);
+      date.setMinutes(0);
+      return date;
+    });
+    while (targetDate.getDate() === initialDate.getDate()) {
+      const timestamp = targetDate.getTime();
+      const diff = offsetFrom && isSameDay(timestamp, offsetFrom) && timestamp - offsetFrom;
+      increments.push({
+        value: timestamp,
+        label: toLocaleTime(timestamp),
+        duration: diff && diff > 0 ? diff : undefined
+      });
+      targetDate.setMinutes(targetDate.getMinutes() + interval);
+    }
+  }
+  return increments;
+};
+
+/***/ }),
+
+/***/ 340:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+"I": () => (Edit),
+"Z": () => (Recurring)
+});
+var _extends10__ = __webpack_require__(462);
+var react0__ = __webpack_require__(363);
+var react0 = __webpack_require__.n(react0__);
+var _mixins1__ = __webpack_require__(503);
+var _button_jsx2__ = __webpack_require__(193);
+var _schedule_jsx3__ = __webpack_require__(158);
+var _datepicker_jsx4__ = __webpack_require__(711);
+var _select_jsx5__ = __webpack_require__(702);
+var _ui_modalDialogs_jsx6__ = __webpack_require__(182);
+var _helpers_jsx9__ = __webpack_require__(435);
+var _link_jsx7__ = __webpack_require__(941);
+var _ui_utils_jsx8__ = __webpack_require__(79);
+
+
+
+
+
+
+
+
+
+
+
+class Recurring extends _mixins1__.wl {
+  constructor(props) {
+    var _Object$values$find;
+    super(props);
+    this.VIEWS = {
+      DAILY: 0x00,
+      WEEKLY: 0x01,
+      MONTHLY: 0x02
+    };
+    this.FREQUENCIES = {
+      DAILY: 'd',
+      WEEKLY: 'w',
+      MONTHLY: 'm'
+    };
+    this.WEEK_DAYS = {
+      MONDAY: {
+        value: 1,
+        label: l.schedule_day_control_mon,
+        name: l.schedule_occur_mon
+      },
+      TUESDAY: {
+        value: 2,
+        label: l.schedule_day_control_tue,
+        name: l.schedule_occur_tue
+      },
+      WEDNESDAY: {
+        value: 3,
+        label: l.schedule_day_control_wed,
+        name: l.schedule_occur_wed
+      },
+      THURSDAY: {
+        value: 4,
+        label: l.schedule_day_control_thu,
+        name: l.schedule_occur_thu
+      },
+      FRIDAY: {
+        value: 5,
+        label: l.schedule_day_control_fri,
+        name: l.schedule_occur_fri
+      },
+      SATURDAY: {
+        value: 6,
+        label: l.schedule_day_control_sat,
+        name: l.schedule_occur_sat
+      },
+      SUNDAY: {
+        value: 7,
+        label: l.schedule_day_control_sun,
+        name: l.schedule_occur_sun
+      }
+    };
+    this.OFFSETS = {
+      FIRST: {
+        value: 1,
+        label: l.recurring_frequency_offset_first
+      },
+      SECOND: {
+        value: 2,
+        label: l.recurring_frequency_offset_second
+      },
+      THIRD: {
+        value: 3,
+        label: l.recurring_frequency_offset_third
+      },
+      FOURTH: {
+        value: 4,
+        label: l.recurring_frequency_offset_fourth
+      },
+      FIFTH: {
+        value: 5,
+        label: l.recurring_frequency_offset_fifth
+      }
+    };
+    this.MONTH_RULES = {
+      DAY: 'day',
+      OFFSET: 'offset'
+    };
+    this.initialEnd = (0,_helpers_jsx9__.zI)(this.props.startDateTime, 6);
+    this.initialWeekDays = Object.values(this.WEEK_DAYS).map(d => d.value);
+    this.initialMonthDay = this.props.startDateTime ? new Date(this.props.startDateTime).getDate() : undefined;
+    this.state = {
+      view: this.VIEWS.DAILY,
+      frequency: this.FREQUENCIES.DAILY,
+      end: this.initialEnd,
+      prevEnd: undefined,
+      interval: 0,
+      weekDays: this.initialWeekDays,
+      monthRule: this.MONTH_RULES.DAY,
+      monthDays: [this.initialMonthDay],
+      offset: {
+        value: this.OFFSETS.FIRST.value,
+        weekDay: this.WEEK_DAYS.MONDAY.value
+      },
+      monthDaysWarning: false
+    };
+    this.toggleView = (view, frequency, state) => this.setState({
+      view,
+      frequency,
+      ...state
+    });
+    const {
+      chatRoom,
+      startDateTime
+    } = this.props;
+    const weekDay = new Date(startDateTime).getDay();
+    this.state.offset.weekDay = ((_Object$values$find = Object.values(this.WEEK_DAYS).find(d => d.value === weekDay)) == null ? void 0 : _Object$values$find.value) || this.WEEK_DAYS.SUNDAY.value;
+    if (chatRoom && chatRoom.scheduledMeeting && chatRoom.scheduledMeeting.isRecurring) {
+      const {
+        frequency,
+        interval,
+        end,
+        weekDays,
+        monthDays,
+        offset
+      } = chatRoom.scheduledMeeting.recurring;
+      this.state.view = frequency === 'd' ? this.VIEWS.DAILY : frequency === 'w' ? this.VIEWS.WEEKLY : this.VIEWS.MONTHLY;
+      this.state.frequency = frequency;
+      this.state.end = end;
+      this.state.interval = interval;
+      this.state.weekDays = weekDays && weekDays.length ? weekDays : this.initialWeekDays;
+      this.state.monthRule = monthDays && monthDays.length ? this.MONTH_RULES.DAY : this.MONTH_RULES.OFFSET;
+      this.state.monthDays = monthDays && monthDays.length ? [monthDays[0]] : [this.initialMonthDay];
+      this.state.offset = offset && Object.keys(offset).length ? offset : this.state.offset;
+    }
+  }
+  getFormattedState(state) {
+    const {
+      frequency,
+      end,
+      interval,
+      weekDays,
+      monthRule,
+      monthDays,
+      offset
+    } = state;
+    switch (true) {
+      case frequency === this.FREQUENCIES.DAILY:
+        return {
+          frequency,
+          end,
+          weekDays
+        };
+      case frequency === this.FREQUENCIES.WEEKLY:
+        return {
+          frequency,
+          end,
+          ...(interval && {
+            interval
+          }),
+          weekDays
+        };
+      case frequency === this.FREQUENCIES.MONTHLY:
+        return {
+          frequency,
+          end,
+          ...(interval && {
+            interval
+          }),
+          ...(monthRule === this.MONTH_RULES.DAY ? {
+            monthDays
+          } : {
+            offset: [[offset.value, offset.weekDay]]
+          })
+        };
+    }
+  }
+  renderDayControls() {
+    const {
+      weekDays,
+      view
+    } = this.state;
+    const handleWeeklySelection = (weekDay, remove) => {
+      this.setState(state => {
+        if (remove) {
+          return {
+            weekDays: state.weekDays.length === 1 ? state.weekDays : state.weekDays.filter(d => d !== weekDay)
+          };
+        }
+        return {
+          weekDays: [...state.weekDays, weekDay]
+        };
+      }, () => {
+        const {
+          weekDays
+        } = this.state;
+        if (weekDays.length === Object.keys(this.WEEK_DAYS).length) {
+          this.toggleView(this.VIEWS.DAILY, this.FREQUENCIES.DAILY);
+        }
+      });
+    };
+    const handleDailySelection = weekDay => {
+      this.toggleView(this.VIEWS.WEEKLY, this.FREQUENCIES.WEEKLY, {
+        weekDays: weekDays.filter(d => d !== weekDay)
+      });
+    };
+    return react0().createElement("div", {
+      className: "recurring-field-row"
+    }, Object.values(this.WEEK_DAYS).map(({
+      value,
+      label
+    }) => {
+      const isCurrentlySelected = weekDays.includes(value);
+      return react0().createElement(_button_jsx2__.Z, {
+        key: value,
+        className: `
+                                mega-button
+                                action
+                                recurring-toggle-button
+                                ${isCurrentlySelected ? 'active' : ''}
+                                ${weekDays.length === 1 && isCurrentlySelected ? 'disabled' : ''}
+                            `,
+        onClick: () => {
+          if (view === this.VIEWS.WEEKLY) {
+            return handleWeeklySelection(value, isCurrentlySelected);
+          }
+          return handleDailySelection(value);
+        }
+      }, label);
+    }));
+  }
+  renderIntervalControls() {
+    const {
+      view,
+      interval
+    } = this.state;
+    return react0().createElement("div", {
+      className: "recurring-field-row"
+    }, react0().createElement("span", null, l.recur_rate), react0().createElement("div", {
+      className: "mega-input inline recurring-interval"
+    }, react0().createElement(_select_jsx5__.Z, {
+      name: `${Recurring.NAMESPACE}-interval`,
+      value: interval > 0 ? interval : 1,
+      icon: true,
+      options: [...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
+        value += 1;
+        return {
+          value: value,
+          label: value
+        };
+      }),
+      onSelect: ({
+        value
+      }) => {
+        this.setState({
+          interval: value === 1 ? 0 : value
+        });
+      }
+    })), view === this.VIEWS.WEEKLY && react0().createElement("span", null, mega.icu.format(l.plural_week, interval)), view === this.VIEWS.MONTHLY && react0().createElement("span", null, mega.icu.format(l.plural_month, interval)));
+  }
+  renderEndControls() {
+    const {
+      end,
+      prevEnd
+    } = this.state;
+    return react0().createElement("div", {
+      className: "recurring-field-row"
+    }, react0().createElement("div", {
+      className: "recurring-title-heading"
+    }, l.recurring_ends), react0().createElement("div", {
+      className: "recurring-radio-buttons"
+    }, react0().createElement("div", {
+      className: "recurring-label-wrap"
+    }, react0().createElement("div", {
+      className: `
+                                uiTheme
+                                ${end ? 'radioOff' : 'radioOn'}
+                            `
+    }, react0().createElement("input", {
+      type: "radio",
+      name: `${Recurring.NAMESPACE}-radio-end`,
+      className: `
+                                    uiTheme
+                                    ${end ? 'radioOff' : 'radioOn'}
+                                `,
+      onChange: () => {
+        this.setState(state => ({
+          end: undefined,
+          prevEnd: state.end || state.prevEnd
+        }));
+      }
+    })), react0().createElement("div", {
+      className: "radio-txt"
+    }, react0().createElement("span", {
+      className: "recurring-radio-label",
+      onClick: () => {
+        this.setState(state => ({
+          end: undefined,
+          prevEnd: state.end || state.prevEnd
+        }));
+      }
+    }, l.recurring_never))), react0().createElement("div", {
+      className: "recurring-label-wrap"
+    }, react0().createElement("div", {
+      className: `
+                                uiTheme
+                                ${end ? 'radioOn' : 'radioOff'}
+                            `
+    }, react0().createElement("input", {
+      type: "radio",
+      name: `${Recurring.NAMESPACE}-radio-end`,
+      className: `
+                                    uiTheme
+                                    ${end ? 'radioOn' : 'radioOff'}
+                                `,
+      onChange: () => {
+        this.setState({
+          end: prevEnd || this.initialEnd
+        });
+      }
+    })), react0().createElement("div", {
+      className: "radio-txt"
+    }, react0().createElement("span", {
+      className: "recurring-radio-label",
+      onClick: () => {
+        return end ? null : this.setState({
+          end: prevEnd || this.initialEnd
+        });
+      }
+    }, l.recurring_on), react0().createElement(_datepicker_jsx4__.Z, {
+      name: `${Recurring.NAMESPACE}-endDateTime`,
+      position: "top left",
+      startDate: end || this.initialEnd,
+      selectedDates: [new Date(end)],
+      value: end || prevEnd || '',
+      placeholder: time2date(end || prevEnd || this.initialEnd / 1000, 18),
+      onMount: this.props.onMount,
+      onSelect: timestamp => {
+        this.setState({
+          end: timestamp
+        }, () => {
+          this.safeForceUpdate();
+        });
+      }
+    })))));
+  }
+  renderDaily() {
+    return react0().createElement("div", {
+      className: `${Recurring.NAMESPACE}-daily`
+    }, this.renderDayControls(), this.renderEndControls());
+  }
+  renderWeekly() {
+    return react0().createElement("div", {
+      className: `${Recurring.NAMESPACE}-weekly`
+    }, this.renderIntervalControls(), this.renderDayControls(), this.renderEndControls());
+  }
+  renderMonthly() {
+    const {
+      monthRule,
+      monthDays,
+      monthDaysWarning,
+      offset
+    } = this.state;
+    return react0().createElement("div", {
+      className: `${Recurring.NAMESPACE}-monthly`
+    }, this.renderIntervalControls(), react0().createElement("div", {
+      className: "recurring-field-row"
+    }, react0().createElement("div", {
+      className: "recurring-radio-buttons",
+      onChange: ({
+        target
+      }) => {
+        if (target.name === `${Recurring.NAMESPACE}-radio-monthRule`) {
+          this.setState({
+            monthRule: target.value
+          });
+        }
+      }
+    }, react0().createElement("div", {
+      className: "recurring-label-wrap"
+    }, react0().createElement("div", {
+      className: `
+                                    uiTheme
+                                    ${monthRule === 'day' ? 'radioOn' : 'radioOff'}
+                                `
+    }, react0().createElement("input", {
+      type: "radio",
+      name: `${Recurring.NAMESPACE}-radio-monthRule`,
+      value: "day",
+      className: `
+                                        uiTheme
+                                        ${monthRule === 'day' ? 'radioOn' : 'radioOff'}
+                                    `
+    })), react0().createElement("div", {
+      className: "radio-txt"
+    }, react0().createElement("span", {
+      className: "recurring-radio-label",
+      onClick: () => {
+        this.setState({
+          monthRule: this.MONTH_RULES.DAY
+        });
+      }
+    }, l.recurring_frequency_day), react0().createElement("div", {
+      className: "mega-input inline recurring-day"
+    }, react0().createElement(_select_jsx5__.Z, {
+      name: `${Recurring.NAMESPACE}-monthDay`,
+      icon: true,
+      value: monthDays[0],
+      options: [...Array(31).keys()].map(value => {
+        value += 1;
+        return {
+          value,
+          label: value
+        };
+      }),
+      onSelect: ({
+        value
+      }) => {
+        this.setState({
+          monthRule: this.MONTH_RULES.DAY,
+          monthDays: [value],
+          monthDaysWarning: value > 28
+        });
+      }
+    })))), monthDaysWarning && react0().createElement("div", {
+      className: "recurring-label-wrap"
+    }, react0().createElement("div", {
+      className: "mega-banner body with-btn"
+    }, react0().createElement("div", {
+      className: "green-notification cell text-cell"
+    }, react0().createElement("div", {
+      className: "versioning-body-text"
+    }, l.recurring_monthdays_warning.replace('%n', monthDays[0]))))), react0().createElement("div", {
+      className: "recurring-label-wrap"
+    }, react0().createElement("div", {
+      className: `
+                                    uiTheme
+                                    ${monthRule === this.MONTH_RULES.OFFSET ? 'radioOn' : 'radioOff'}
+                                `
+    }, react0().createElement("input", {
+      type: "radio",
+      name: `${Recurring.NAMESPACE}-radio-monthRule`,
+      value: "offset",
+      className: `
+                                        uiTheme
+                                        ${monthRule === this.MONTH_RULES.OFFSET ? 'radioOn' : 'radioOff'}
+                                    `
+    })), react0().createElement("div", {
+      className: "radio-txt"
+    }, react0().createElement(_select_jsx5__.Z, {
+      name: "recurring-offset-value",
+      className: "inline",
+      icon: true,
+      value: offset && offset.value && Object.values(this.OFFSETS).find(o => o.value === offset.value).label || this.OFFSETS.FIRST.label,
+      options: Object.values(this.OFFSETS),
+      onSelect: option => {
+        this.setState(state => ({
+          monthRule: this.MONTH_RULES.OFFSET,
+          offset: {
+            value: option.value,
+            weekDay: state.offset.weekDay || this.WEEK_DAYS.MONDAY.value
+          }
+        }));
+      }
+    }), react0().createElement(_select_jsx5__.Z, {
+      name: "recurring-offset-day",
+      className: "inline",
+      icon: true,
+      value: offset && offset.weekDay && Object.values(this.WEEK_DAYS).find(o => o.value === offset.weekDay).name || this.WEEK_DAYS.MONDAY.name,
+      options: Object.values(this.WEEK_DAYS).map(({
+        value,
+        name
+      }) => ({
+        value,
+        label: name
+      })),
+      onSelect: option => {
+        this.setState(state => ({
+          monthRule: this.MONTH_RULES.OFFSET,
+          offset: {
+            value: state.offset.value || this.OFFSETS.FIRST.value,
+            weekDay: option.value
+          }
+        }));
+      }
+    }))))), this.renderEndControls());
+  }
+  renderNavigation(view) {
+    return react0().createElement((react0().Fragment), null, react0().createElement(_button_jsx2__.Z, {
+      className: `
+                        mega-button
+                        action
+                        recurring-nav-button
+                        ${view === this.VIEWS.DAILY ? 'active' : ''}
+                    `,
+      onClick: () => this.toggleView(this.VIEWS.DAILY, this.FREQUENCIES.DAILY)
+    }, l.recurring_daily), react0().createElement(_button_jsx2__.Z, {
+      className: `
+                        mega-button
+                        action
+                        recurring-nav-button
+                        ${view === this.VIEWS.WEEKLY ? 'active' : ''}
+                    `,
+      onClick: () => this.toggleView(this.VIEWS.WEEKLY, this.FREQUENCIES.WEEKLY)
+    }, l.recurring_weekly), react0().createElement(_button_jsx2__.Z, {
+      className: `
+                        mega-button
+                        action
+                        recurring-nav-button
+                        ${view === this.VIEWS.MONTHLY ? 'active' : ''}
+                    `,
+      onClick: () => this.toggleView(this.VIEWS.MONTHLY, this.FREQUENCIES.MONTHLY)
+    }, l.recurring_monthly));
+  }
+  renderContent(view) {
+    switch (view) {
+      case this.VIEWS.DAILY:
+        return this.renderDaily();
+      case this.VIEWS.WEEKLY:
+        return this.renderWeekly();
+      case this.VIEWS.MONTHLY:
+        return this.renderMonthly();
+    }
+  }
+  componentWillUpdate(nextProps, nextState) {
+    if (this.state.view !== this.VIEWS.DAILY && nextState.view === this.VIEWS.DAILY) {
+      nextState.weekDays = this.initialWeekDays;
+    }
+    if (nextState.weekDays.length === Object.keys(this.WEEK_DAYS).length && this.state.view !== this.VIEWS.WEEKLY && nextState.view === this.VIEWS.WEEKLY || !(0,_helpers_jsx9__.KC)(nextProps.startDateTime, this.props.startDateTime) && this.state.view === this.VIEWS.WEEKLY) {
+      const weekday = new Date(nextProps.startDateTime).getDay();
+      nextState.weekDays = [weekday === 0 ? 7 : weekday];
+    }
+    if (!(0,_helpers_jsx9__.KC)(nextProps.startDateTime, this.props.startDateTime) && this.state.view === this.VIEWS.MONTHLY) {
+      var _Object$values$find2;
+      const nextDate = new Date(nextProps.startDateTime);
+      nextState.monthDays = [nextDate.getDate()];
+      nextState.offset.weekDay = ((_Object$values$find2 = Object.values(this.WEEK_DAYS).find(d => d.value === nextDate.getDay())) == null ? void 0 : _Object$values$find2.value) || this.WEEK_DAYS.SUNDAY.value;
+    }
+    if (nextState.view === this.VIEWS.MONTHLY && this.state.interval > 12) {
+      nextState.interval = 12;
+    }
+    this.props.onUpdate(this.getFormattedState(nextState));
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this.props.onUpdate(this.getFormattedState(this.state));
+  }
+  render() {
+    const {
+      NAMESPACE
+    } = Recurring;
+    const {
+      view
+    } = this.state;
+    return react0().createElement(_schedule_jsx3__.X2, null, react0().createElement(_schedule_jsx3__.sg, null), react0().createElement(_schedule_jsx3__.sg, null, react0().createElement("div", {
+      className: NAMESPACE
+    }, react0().createElement("div", {
+      className: `${NAMESPACE}-container`
+    }, react0().createElement("div", {
+      className: `${NAMESPACE}-navigation`
+    }, this.renderNavigation(view)), react0().createElement("div", {
+      className: `${NAMESPACE}-content`
+    }, this.renderContent(view))))));
+  }
+}
+Recurring.NAMESPACE = 'meetings-recurring';
+class Edit extends _mixins1__.wl {
+  constructor(props) {
+    super(props);
+    this.occurrenceRef = null;
+    this.datepickerRefs = [];
+    this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
+    this.state = {
+      startDateTime: undefined,
+      endDateTime: undefined,
+      isDirty: false,
+      closeDialog: false
+    };
+    this.handleTimeSelect = ({
+      startDateTime,
+      endDateTime
+    }) => {
+      startDateTime = startDateTime || this.state.startDateTime;
+      endDateTime = endDateTime || this.state.endDateTime;
+      this.setState(state => {
+        return {
+          startDateTime: endDateTime <= state.startDateTime ? endDateTime - this.interval : startDateTime,
+          endDateTime: startDateTime >= state.endDateTime ? startDateTime + this.interval : endDateTime,
+          isDirty: true
+        };
+      });
+    };
+    const {
+      scheduledMeeting,
+      occurrenceId
+    } = this.props;
+    this.occurrenceRef = scheduledMeeting.occurrences[occurrenceId];
+    this.state.startDateTime = this.occurrenceRef.start;
+    this.state.endDateTime = this.occurrenceRef.end;
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if ($.dialog === _schedule_jsx3__.Pf.dialogName) {
+      closeDialog();
+    }
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    M.safeShowDialog(_schedule_jsx3__.Pf.dialogName, `#${_schedule_jsx3__.Pf.NAMESPACE}`);
+  }
+  render() {
+    const {
+      chatRoom,
+      onClose
+    } = this.props;
+    const {
+      startDateTime,
+      endDateTime,
+      isDirty,
+      closeDialog
+    } = this.state;
+    return react0().createElement(_ui_modalDialogs_jsx6__.Z.ModalDialog, (0,_extends10__.Z)({}, this.state, {
+      id: _schedule_jsx3__.Pf.NAMESPACE,
+      className: `
+                    fluid
+                    ${closeDialog ? 'with-confirmation-dialog' : ''}
+                `,
+      dialogName: _schedule_jsx3__.Pf.dialogName,
+      dialogType: "main",
+      onClose: () => {
+        return isDirty ? this.setState({
+          closeDialog: true
+        }) : onClose();
+      }
+    }), react0().createElement("header", null, react0().createElement("h2", null, l.edit_meeting_title)), react0().createElement("div", {
+      className: "fm-dialog-body"
+    }, react0().createElement(_schedule_jsx3__.X2, null, react0().createElement("div", {
+      className: "mega-banner body recurring-edit-banner"
+    }, react0().createElement("div", {
+      className: "cell"
+    }, (0,_ui_utils_jsx8__.hV)(l.scheduled_edit_occurrence_note, '[A]', _link_jsx7__.Z, {
+      onClick: () => {
+        onClose();
+        megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, chatRoom);
+      }
+    })))), react0().createElement(_schedule_jsx3__.ou, {
+      name: "startDateTime",
+      altField: "startTime",
+      startDate: startDateTime,
+      value: startDateTime,
+      filteredTimeIntervals: (0,_helpers_jsx9__.nl)(startDateTime),
+      icon: "sprite-fm-mono icon-recents-filled",
+      label: l.schedule_duration_separator,
+      onMount: datepicker => {
+        this.datepickerRefs.startDateTime = datepicker;
+      },
+      onSelectDate: startDateTime => {
+        this.setState({
+          startDateTime,
+          isDirty: true
+        }, () => {
+          const {
+            startDateTime,
+            endDateTime
+          } = this.state;
+          if (startDateTime > endDateTime) {
+            this.datepickerRefs.endDateTime.selectDate(new Date(startDateTime + this.interval));
+          }
+        });
+      },
+      onSelectTime: ({
+        value: startDateTime
+      }) => {
+        this.handleTimeSelect({
+          startDateTime
+        });
+      }
+    }), react0().createElement(_schedule_jsx3__.ou, {
+      name: "endDateTime",
+      altField: "endTime",
+      startDate: endDateTime,
+      value: endDateTime,
+      filteredTimeIntervals: (0,_helpers_jsx9__.nl)(endDateTime, startDateTime),
+      onMount: datepicker => {
+        this.datepickerRefs.endDateTime = datepicker;
+      },
+      onSelectDate: endDateTime => {
+        this.setState({
+          endDateTime,
+          isDirty: true
+        }, () => {
+          const {
+            startDateTime,
+            endDateTime
+          } = this.state;
+          if (endDateTime < startDateTime) {
+            if (endDateTime < Date.now()) {
+              return this.setState({
+                endDateTime: startDateTime + this.interval
+              });
+            }
+            this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+          }
+        });
+      },
+      onSelectTime: ({
+        value: endDateTime
+      }) => {
+        this.handleTimeSelect({
+          endDateTime
+        });
+      }
+    })), react0().createElement("footer", null, react0().createElement("div", {
+      className: "footer-container"
+    }, react0().createElement(_button_jsx2__.Z, {
+      className: "mega-button positive",
+      onClick: () => {
+        const {
+          startDateTime,
+          endDateTime
+        } = this.state;
+        if (startDateTime !== this.occurrenceRef.start || endDateTime !== this.occurrenceRef.end) {
+          this.occurrenceRef.update(startDateTime, endDateTime);
+        }
+        onClose();
+      }
+    }, react0().createElement("span", null, l.update_meeting_button)))), closeDialog && react0().createElement(_schedule_jsx3__.sj, {
+      onToggle: () => this.setState({
+        closeDialog: false
+      }),
+      onClose: onClose
+    }));
+  }
+}
+
+/***/ }),
+
+/***/ 158:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "sj": () => (CloseDialog),
+  "sg": () => (Column),
+  "ou": () => (DateTime),
+  "X2": () => (Row),
+  "Pf": () => (Schedule)
+});
+
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
+var esm_extends = __webpack_require__(462);
+// EXTERNAL MODULE: external "React"
+var external_React_ = __webpack_require__(363);
+var external_React_default = __webpack_require__.n(external_React_);
+// EXTERNAL MODULE: ./js/chat/mixins.js
+var mixins = __webpack_require__(503);
+// EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
+var modalDialogs = __webpack_require__(182);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
+var meetings_button = __webpack_require__(193);
+// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
+var perfectScrollbar = __webpack_require__(285);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/datepicker.jsx
+var datepicker = __webpack_require__(711);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/select.jsx
+var schedule_select = __webpack_require__(702);
+// EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
+var ui_contacts = __webpack_require__(13);
+// EXTERNAL MODULE: ./js/ui/utils.jsx
+var utils = __webpack_require__(79);
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/invite.jsx
+
+
+
+
+
+class Invite extends mixins.wl {
+  constructor(props) {
+    super(props);
+    this.containerRef = external_React_default().createRef();
+    this.wrapperRef = external_React_default().createRef();
+    this.state = {
+      value: '',
+      expanded: false,
+      loading: true,
+      frequents: [],
+      frequentsInitial: [],
+      contacts: [],
+      contactsInitial: [],
+      selected: []
+    };
+    this.handleMousedown = ({
+      target
+    }) => {
+      var _this$containerRef;
+      return (_this$containerRef = this.containerRef) != null && _this$containerRef.current.contains(target) ? null : this.setState({
+        expanded: false
+      });
+    };
+    this.getSortedContactsList = frequents => {
+      const filteredContacts = [];
+      M.u.forEach(contact => {
+        if (contact.c === 1 && !frequents.includes(contact.u) && !this.state.selected.includes(contact.u)) {
+          filteredContacts.push(contact);
+        }
+      });
+      const sortFn = M.getSortByNameFn2(1);
+      filteredContacts.sort((a, b) => sortFn(a, b));
+      return filteredContacts;
+    };
+    this.doMatch = (value, collection) => {
+      value = value.toLowerCase();
+      return collection.filter(contact => {
+        contact = typeof contact === 'string' ? M.getUserByHandle(contact) : contact;
+        const name = M.getNameByHandle(contact.u).toLowerCase();
+        const email = contact.m && contact.m.toLowerCase();
+        return name.includes(value) || email.includes(value);
+      });
+    };
+    this.handleSearch = this.handleSearch.bind(this);
+    this.state.selected = this.props.participants || [];
+  }
+  reinitializeWrapper() {
+    const wrapperRef = this.wrapperRef && this.wrapperRef.current;
+    if (wrapperRef) {
+      wrapperRef.reinitialise();
+      wrapperRef.scrollToY(0);
+    }
+  }
+  buildContactsList() {
+    megaChat.getFrequentContacts().then(frequentContacts => {
+      if (this.isMounted()) {
+        const frequents = frequentContacts.slice(-ui_contacts.MAX_FREQUENTS).map(c => c.userId);
+        const contacts = this.getSortedContactsList(frequents);
+        this.setState({
+          frequents,
+          frequentsInitial: frequents,
+          contacts,
+          contactsInitial: contacts,
+          loading: false
+        });
+      }
+    });
+  }
+  handleSearch(ev) {
+    const {
+      value
+    } = ev.target;
+    const searching = value.length >= 2;
+    const frequents = searching ? this.doMatch(value, this.state.frequentsInitial) : this.state.frequentsInitial;
+    const contacts = searching ? this.doMatch(value, this.state.contactsInitial) : this.state.contactsInitial;
+    this.setState({
+      value,
+      contacts,
+      frequents
+    }, () => this.reinitializeWrapper());
+  }
+  handleSelect(userHandle, expanded = false) {
+    this.setState(state => ({
+      value: '',
+      expanded,
+      selected: state.selected.includes(userHandle) ? state.selected.filter(c => c !== userHandle) : [...state.selected, userHandle]
+    }), () => {
+      this.props.onSelect(this.state.selected);
+      this.buildContactsList();
+      this.reinitializeWrapper();
+    });
+  }
+  getFilteredContacts(contacts) {
+    if (contacts && contacts.length) {
+      return contacts.map(contact => {
+        contact = contact instanceof MegaDataMap ? contact : M.u[contact];
+        return this.state.selected.includes(contact.u) ? null : external_React_default().createElement("div", {
+          key: contact.u,
+          className: "invite-section-item",
+          onClick: () => {
+            this.handleSelect(contact.u);
+          }
+        }, external_React_default().createElement(ui_contacts.Avatar, {
+          contact: contact
+        }), external_React_default().createElement("div", {
+          className: "invite-item-data"
+        }, external_React_default().createElement("div", {
+          className: "invite-item-name"
+        }, external_React_default().createElement(utils.a0, {
+          simpletip: {
+            offset: 10
+          }
+        }, M.getNameByHandle(contact.u))), external_React_default().createElement("div", {
+          className: "invite-item-mail"
+        }, contact.m)));
+      });
+    }
+    return null;
+  }
+  renderContent() {
+    const {
+      frequents,
+      contacts,
+      selected
+    } = this.state;
+    const hasMoreFrequents = frequents.length && frequents.some(h => !selected.includes(h));
+    const $$SECTION = (title, children) => external_React_default().createElement("div", {
+      className: "invite-section"
+    }, external_React_default().createElement("div", {
+      className: "invite-section-title"
+    }, title), children && external_React_default().createElement("div", {
+      className: "invite-section-list"
+    }, children));
+    if (hasMoreFrequents || contacts.length) {
+      return external_React_default().createElement(perfectScrollbar.F, {
+        ref: this.wrapperRef,
+        className: "invite-scroll-wrapper",
+        options: {
+          'suppressScrollX': true
+        }
+      }, hasMoreFrequents ? $$SECTION(l.recent_contact_label, this.getFilteredContacts(frequents)) : '', contacts.length ? $$SECTION(l.all_contact_label, this.getFilteredContacts(contacts)) : '', frequents.length === 0 && contacts.length === 0 && $$SECTION(l.invite_no_results_found, null));
+    }
+    return $$SECTION(l.invite_no_contacts_to_add, null);
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    document.removeEventListener('mousedown', this.handleMousedown);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    document.addEventListener('mousedown', this.handleMousedown);
+    this.buildContactsList();
+  }
+  render() {
+    const {
+      value,
+      expanded,
+      loading,
+      selected
+    } = this.state;
+    return external_React_default().createElement("div", {
+      ref: this.containerRef,
+      className: `
+                    ${Invite.NAMESPACE}
+                    ${this.props.className || ''}
+                `
+    }, external_React_default().createElement("div", {
+      className: "multiple-input"
+    }, external_React_default().createElement("ul", {
+      className: "token-input-list-mega",
+      onClick: ev => ev.target.classList.contains('token-input-list-mega') && this.setState({
+        expanded: true
+      })
+    }, selected.map(handle => {
+      return external_React_default().createElement("li", {
+        key: handle,
+        className: "token-input-token-mega"
+      }, external_React_default().createElement("div", {
+        className: "contact-tag-item"
+      }, external_React_default().createElement(ui_contacts.Avatar, {
+        contact: M.u[handle],
+        className: "avatar-wrapper box-avatar"
+      }), external_React_default().createElement(utils.a0, null, M.getNameByHandle(handle)), external_React_default().createElement("i", {
+        className: "sprite-fm-mono icon-close-component",
+        onClick: () => {
+          this.handleSelect(handle);
+        }
+      })));
+    }), external_React_default().createElement("li", {
+      className: "token-input-input-token-mega"
+    }, external_React_default().createElement("input", {
+      type: "text",
+      name: "participants",
+      className: `${Invite.NAMESPACE}-input`,
+      autoComplete: "off",
+      placeholder: selected.length ? '' : l.schedule_participant_input,
+      value: value,
+      onFocus: () => this.setState({
+        expanded: true
+      }),
+      onChange: this.handleSearch,
+      onKeyDown: ({
+        target,
+        keyCode
+      }) => {
+        const {
+          selected
+        } = this.state;
+        return keyCode === 8 && target.value === '' && selected.length && this.handleSelect(selected[selected.length - 1], true);
+      }
+    })))), loading ? null : external_React_default().createElement("div", {
+      className: `mega-input-dropdown ${expanded ? '' : 'hidden'}`
+    }, this.renderContent()));
+  }
+}
+Invite.NAMESPACE = 'meetings-invite';
+// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
+var helpers = __webpack_require__(435);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/recurring.jsx
+var schedule_recurring = __webpack_require__(340);
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx
+
+
+
+
+
+
+
+
+
+
+
+class Schedule extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.wrapperRef = external_React_default().createRef();
+    this.scheduledMeetingRef = null;
+    this.localStreamRef = '.local-stream';
+    this.datepickerRefs = [];
+    this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
+    this.nearestHalfHour = (0,helpers.Ny)();
+    this.state = {
+      topic: '',
+      startDateTime: this.nearestHalfHour,
+      endDateTime: this.nearestHalfHour + this.interval,
+      timezone: (0,helpers.Sv)(),
+      recurring: false,
+      participants: [],
+      link: false,
+      sendInvite: false,
+      openInvite: true,
+      description: '',
+      closeDialog: false,
+      isEdit: false,
+      isDirty: false,
+      isLoading: false,
+      topicInvalid: false
+    };
+    this.handleToggle = prop => {
+      return Object.keys(this.state).includes(prop) && this.setState(state => ({
+        [prop]: !state[prop],
+        isDirty: true
+      }));
+    };
+    this.handleChange = (prop, value) => {
+      return Object.keys(this.state).includes(prop) && this.setState({
+        [prop]: value,
+        isDirty: true
+      });
+    };
+    this.handleDateSelect = ({
+      startDateTime,
+      endDateTime
+    }, callback) => {
+      this.setState(state => ({
+        startDateTime: startDateTime || state.startDateTime,
+        endDateTime: endDateTime || state.endDateTime,
+        isDirty: true
+      }), () => {
+        if (callback) {
+          callback();
+        }
+        const {
+          recurring
+        } = this.state;
+        if (recurring && recurring.end) {
+          const recurringEnd = (0,helpers.zI)(this.state.startDateTime, 6);
+          this.datepickerRefs.recurringEnd.selectDate(new Date(recurringEnd));
+        }
+      });
+    };
+    this.handleTimeSelect = ({
+      startDateTime,
+      endDateTime
+    }) => {
+      startDateTime = startDateTime || this.state.startDateTime;
+      endDateTime = endDateTime || this.state.endDateTime;
+      this.setState(state => {
+        return {
+          startDateTime: endDateTime <= state.startDateTime ? endDateTime - this.interval : startDateTime,
+          endDateTime: startDateTime >= state.endDateTime ? startDateTime + this.interval : endDateTime,
+          isDirty: true
+        };
+      });
+    };
+    this.handleParticipantSelect = participants => {
+      return participants && Array.isArray(participants) && this.setState({
+        participants,
+        isDirty: true
+      }, () => {
+        const wrapperRef = this.wrapperRef && this.wrapperRef.current;
+        if (wrapperRef) {
+          wrapperRef.reinitialise();
+        }
+      });
+    };
+    this.handleSubmit = () => {
+      this.setState({
+        isLoading: true
+      }, async () => {
+        const {
+          chatRoom,
+          onClose
+        } = this.props;
+        await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](this.state, chatRoom);
+        this.setState({
+          isLoading: false
+        }, () => onClose());
+      });
+    };
+  }
+  syncPublicLink() {
+    if (this.state.isEdit) {
+      const {
+        chatRoom
+      } = this.props;
+      chatRoom.getPublicLink(() => this.isMounted() && this.setState({
+        link: !!chatRoom.publicLink
+      }));
+    }
+  }
+  getFilteredTimeIntervals(timestamp, offsetFrom) {
+    const timeIntervals = (0,helpers.nl)(timestamp, offsetFrom);
+    const {
+      end
+    } = this.scheduledMeetingRef || {};
+    if (this.state.isEdit && end < Date.now()) {
+      return timeIntervals;
+    }
+    return timeIntervals.filter(o => {
+      return offsetFrom ? o.value > this.nearestHalfHour : o.value > Date.now();
+    });
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if ($.dialog === Schedule.dialogName) {
+      closeDialog();
+    }
+    [document, this.localStreamRef].map(el => $(el).unbind(`.${Schedule.NAMESPACE}`));
+  }
+  componentWillMount() {
+    const {
+      chatRoom
+    } = this.props;
+    if (chatRoom) {
+      const {
+        scheduledMeeting,
+        publicLink,
+        options
+      } = chatRoom;
+      this.state.topic = scheduledMeeting.title;
+      this.state.startDateTime = scheduledMeeting.start;
+      this.state.endDateTime = scheduledMeeting.end;
+      this.state.timezone = scheduledMeeting.timezone || (0,helpers.Sv)();
+      this.state.recurring = scheduledMeeting.recurring;
+      this.state.participants = chatRoom.getParticipantsExceptMe();
+      this.state.link = !!publicLink;
+      this.state.description = scheduledMeeting.description || '';
+      this.state.sendInvite = scheduledMeeting.flags;
+      this.state.openInvite = options.oi;
+      this.state.isEdit = true;
+      this.scheduledMeetingRef = scheduledMeeting;
+    }
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this.syncPublicLink();
+    M.safeShowDialog(Schedule.dialogName, () => {
+      if (!this.isMounted()) {
+        throw new Error(`${Schedule.dialogName} dialog: component ${Schedule.NAMESPACE} not mounted.`);
+      }
+      $(document).rebind(`keyup.${Schedule.NAMESPACE}`, ({
+        keyCode,
+        target
+      }) => {
+        return this.state.closeDialog || target instanceof HTMLTextAreaElement ? null : keyCode === 13 && this.handleSubmit();
+      });
+      $(this.localStreamRef).rebind(`click.${Schedule.NAMESPACE}`, () => {
+        if (this.state.isDirty) {
+          this.handleToggle('closeDialog');
+          return false;
+        }
+      });
+      return $(`#${Schedule.NAMESPACE}`);
+    });
+  }
+  render() {
+    const {
+      NAMESPACE,
+      dialogName
+    } = Schedule;
+    const {
+      topic,
+      startDateTime,
+      endDateTime,
+      recurring,
+      participants,
+      link,
+      sendInvite,
+      openInvite,
+      description,
+      closeDialog,
+      isEdit,
+      isDirty,
+      isLoading,
+      topicInvalid
+    } = this.state;
+    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+      id: NAMESPACE,
+      className: closeDialog ? 'with-confirmation-dialog' : '',
+      dialogName: dialogName,
+      dialogType: "main",
+      onClose: () => {
+        return isDirty ? this.handleToggle('closeDialog') : this.props.onClose();
+      }
+    }), external_React_default().createElement(Header, {
+      chatRoom: isEdit && this.props.chatRoom
+    }), external_React_default().createElement(perfectScrollbar.F, {
+      ref: this.wrapperRef,
+      className: "fm-dialog-body",
+      options: {
+        suppressScrollX: true
+      }
+    }, external_React_default().createElement(Input, {
+      name: "topic",
+      placeholder: l.schedule_title_input,
+      value: topic,
+      invalid: topicInvalid,
+      invalidMessage: l.schedule_title_missing,
+      autoFocus: true,
+      isLoading: isLoading,
+      onFocus: () => topicInvalid && this.setState({
+        topicInvalid: false
+      }),
+      onChange: this.handleChange
+    }), external_React_default().createElement(DateTime, {
+      name: "startDateTime",
+      altField: "startTime",
+      startDate: startDateTime,
+      value: startDateTime,
+      filteredTimeIntervals: this.getFilteredTimeIntervals(startDateTime),
+      icon: "sprite-fm-mono icon-recents-filled",
+      label: l.schedule_duration_separator,
+      isLoading: isLoading,
+      onMount: datepicker => {
+        this.datepickerRefs.startDateTime = datepicker;
+      },
+      onSelectDate: startDateTime => {
+        this.handleDateSelect({
+          startDateTime
+        }, () => {
+          const {
+            startDateTime,
+            endDateTime
+          } = this.state;
+          if (startDateTime > endDateTime) {
+            this.datepickerRefs.endDateTime.selectDate(new Date(startDateTime + this.interval));
+          }
+        });
+      },
+      onSelectTime: ({
+        value: startDateTime
+      }) => {
+        this.handleTimeSelect({
+          startDateTime
+        });
+      }
+    }), external_React_default().createElement(DateTime, {
+      name: "endDateTime",
+      altField: "endTime",
+      isLoading: isLoading,
+      startDate: endDateTime,
+      value: endDateTime,
+      filteredTimeIntervals: this.getFilteredTimeIntervals(endDateTime, startDateTime),
+      onMount: datepicker => {
+        this.datepickerRefs.endDateTime = datepicker;
+      },
+      onSelectDate: endDateTime => {
+        this.handleDateSelect({
+          endDateTime
+        }, () => {
+          const {
+            startDateTime,
+            endDateTime
+          } = this.state;
+          if (endDateTime < startDateTime) {
+            if (endDateTime < Date.now()) {
+              return this.setState({
+                endDateTime: startDateTime + this.interval
+              });
+            }
+            this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+          }
+        });
+      },
+      onSelectTime: ({
+        value: endDateTime
+      }) => {
+        this.handleTimeSelect({
+          endDateTime
+        });
+      }
+    }), external_React_default().createElement(Checkbox, {
+      name: "recurring",
+      checked: recurring,
+      label: l.schedule_recurring_label,
+      isLoading: isLoading,
+      onToggle: this.handleToggle
+    }), recurring && external_React_default().createElement(schedule_recurring.Z, {
+      chatRoom: this.props.chatRoom,
+      startDateTime: startDateTime,
+      endDateTime: endDateTime,
+      onMount: datepicker => {
+        this.datepickerRefs.recurringEnd = datepicker;
+      },
+      onUpdate: state => {
+        this.setState({
+          recurring: state
+        });
+      }
+    }), external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-contacts"
+    })), external_React_default().createElement(Column, null, external_React_default().createElement(Invite, {
+      className: isLoading ? 'disabled' : '',
+      participants: participants,
+      onSelect: this.handleParticipantSelect
+    }))), external_React_default().createElement(Switch, {
+      name: "link",
+      toggled: link,
+      label: l.schedule_link_label,
+      isLoading: isLoading,
+      onToggle: this.handleToggle
+    }), external_React_default().createElement(Checkbox, {
+      name: "sendInvite",
+      checked: sendInvite,
+      label: l.schedule_invite_label,
+      isLoading: isLoading,
+      onToggle: this.handleToggle
+    }), external_React_default().createElement(Checkbox, {
+      name: "openInvite",
+      checked: openInvite,
+      label: l.open_invite_desc,
+      isLoading: isLoading,
+      onToggle: this.handleToggle
+    }), external_React_default().createElement(Textarea, {
+      name: "description",
+      placeholder: l.schedule_description_input,
+      value: description,
+      onChange: this.handleChange
+    })), external_React_default().createElement(Footer, {
+      isLoading: isLoading,
+      isEdit: isEdit,
+      topic: topic,
+      onSubmit: this.handleSubmit,
+      onInvalid: () => this.setState({
+        topicInvalid: !topic
+      })
+    }), closeDialog && external_React_default().createElement(CloseDialog, {
+      onToggle: this.handleToggle,
+      onClose: this.props.onClose
+    }));
+  }
+}
+Schedule.NAMESPACE = 'schedule-dialog';
+Schedule.dialogName = `meetings-${Schedule.NAMESPACE}`;
+const CloseDialog = ({
+  onToggle,
+  onClose
+}) => {
+  return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+    name: `${Schedule.NAMESPACE}-confirmation`,
+    dialogType: "message",
+    className: `
+                    with-close-btn
+                    ${Schedule.NAMESPACE}-confirmation
+                `,
+    title: l.schedule_discard_dlg_title,
+    icon: "sprite-fm-uni icon-question",
+    buttons: [{
+      key: 'n',
+      label: l.schedule_discard_cancel,
+      onClick: () => onToggle('closeDialog')
+    }, {
+      key: 'y',
+      label: l.schedule_discard_confirm,
+      className: 'positive',
+      onClick: onClose
+    }],
+    noCloseOnClickOutside: true,
+    stopKeyPropagation: true,
+    hideOverlay: true,
+    onClose: () => onToggle('closeDialog')
+  }), external_React_default().createElement("div", {
+    className: `${Schedule.NAMESPACE}-confirmation-overlay`,
+    onClick: () => onToggle('closeDialog')
+  }));
+};
+const Row = ({
+  children,
+  className
+}) => external_React_default().createElement("div", {
+  className: `
+            ${Schedule.NAMESPACE}-row
+            ${className || ''}
+        `
+}, children);
+const Column = ({
+  children
+}) => external_React_default().createElement("div", {
+  className: `${Schedule.NAMESPACE}-column`
+}, children);
+const Header = ({
+  chatRoom
+}) => {
+  const $$container = title => external_React_default().createElement("header", null, external_React_default().createElement("h2", null, title));
+  if (chatRoom) {
+    const {
+      scheduledMeeting
+    } = chatRoom;
+    return $$container(scheduledMeeting.isRecurring ? l.edit_meeting_series_title : l.edit_meeting_title);
+  }
+  return $$container(l.schedule_meeting_title);
+};
+const Input = ({
+  name,
+  placeholder,
+  value,
+  invalid,
+  invalidMessage,
+  autoFocus,
+  isLoading,
+  onFocus,
+  onChange
+}) => {
+  return external_React_default().createElement(Row, {
+    className: invalid ? 'invalid-aligned' : ''
+  }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+    className: "sprite-fm-mono icon-rename"
+  })), external_React_default().createElement(Column, null, external_React_default().createElement("div", {
+    className: `
+                        mega-input
+                        ${invalid ? 'error msg' : ''}
+                    `
+  }, external_React_default().createElement("input", {
+    type: "text",
+    name: `${Schedule.NAMESPACE}-${name}`,
+    className: isLoading ? 'disabled' : '',
+    autoFocus: autoFocus,
+    autoComplete: "off",
+    maxLength: ChatRoom.TOPIC_MAX_LENGTH,
+    placeholder: placeholder,
+    value: value,
+    onFocus: onFocus,
+    onChange: ({
+      target
+    }) => onChange('topic', target.value)
+  }), invalid && external_React_default().createElement("div", {
+    className: "message-container mega-banner"
+  }, invalidMessage))));
+};
+const DateTime = ({
+  name,
+  startDate,
+  altField,
+  value,
+  minDate,
+  filteredTimeIntervals,
+  icon,
+  label,
+  isLoading,
+  onMount,
+  onSelectDate,
+  onSelectTime
+}) => {
+  return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, icon && external_React_default().createElement("i", {
+    className: icon
+  })), external_React_default().createElement("div", {
+    className: "schedule-date-container"
+  }, external_React_default().createElement(datepicker.Z, {
+    name: `${datepicker.Z.NAMESPACE}-${name}`,
+    className: isLoading ? 'disabled' : '',
+    startDate: startDate,
+    altField: `${schedule_select.Z.NAMESPACE}-${altField}`,
+    value: value,
+    minDate: minDate,
+    onMount: onMount,
+    onSelect: onSelectDate
+  }), external_React_default().createElement(schedule_select.Z, {
+    name: `${schedule_select.Z.NAMESPACE}-${altField}`,
+    className: isLoading ? 'disabled' : '',
+    options: filteredTimeIntervals,
+    value: value,
+    format: toLocaleTime,
+    onSelect: onSelectTime
+  }), label && external_React_default().createElement("div", null, label)));
+};
+const Checkbox = ({
+  name,
+  checked,
+  label,
+  isLoading,
+  onToggle
+}) => {
+  return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("div", {
+    className: `
+                        checkdiv
+                        ${checked ? 'checkboxOn' : 'checkboxOff'}
+                    `
+  }, external_React_default().createElement("input", {
+    name: `${Schedule.NAMESPACE}-${name}`,
+    className: isLoading ? 'disabled' : '',
+    type: "checkbox",
+    onChange: () => onToggle(name)
+  }))), external_React_default().createElement(Column, null, external_React_default().createElement("label", {
+    htmlFor: `${Schedule.NAMESPACE}-${name}`,
+    className: isLoading ? 'disabled' : '',
+    onClick: () => onToggle(name)
+  }, label)));
+};
+const Switch = ({
+  name,
+  toggled,
+  label,
+  isLoading,
+  onToggle
+}) => {
+  return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+    className: "sprite-fm-uni icon-mega-logo"
+  })), external_React_default().createElement(Column, null, external_React_default().createElement("span", {
+    className: `
+                        schedule-label
+                        ${isLoading ? 'disabled' : ''}
+                    `,
+    onClick: () => onToggle(name)
+  }, label), external_React_default().createElement("div", {
+    className: `
+                        mega-switch
+                        ${toggled ? 'toggle-on' : ''}
+                        ${isLoading ? 'disabled' : ''}
+                    `,
+    onClick: () => onToggle(name)
+  }, external_React_default().createElement("div", {
+    className: `
+                            mega-feature-switch
+                            sprite-fm-mono-after
+                            ${toggled ? 'icon-check-after' : 'icon-minimise-after'}
+                        `
+  }))));
+};
+const Textarea = ({
+  name,
+  placeholder,
+  isLoading,
+  value,
+  onChange
+}) => {
+  return external_React_default().createElement(Row, {
+    className: "start-aligned"
+  }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+    className: "sprite-fm-mono icon-description"
+  })), external_React_default().createElement(Column, null, external_React_default().createElement("div", {
+    className: "mega-input box-style textarea"
+  }, external_React_default().createElement("textarea", {
+    name: `${Schedule.NAMESPACE}-${name}`,
+    className: isLoading ? 'disabled' : '',
+    placeholder: placeholder,
+    value: value,
+    maxLength: 4000,
+    onChange: ({
+      target
+    }) => onChange('description', target.value)
+  }))));
+};
+const Footer = ({
+  isLoading,
+  isEdit,
+  topic,
+  onSubmit,
+  onInvalid
+}) => {
+  return external_React_default().createElement("footer", null, external_React_default().createElement("div", {
+    className: "footer-container"
+  }, external_React_default().createElement(meetings_button.Z, {
+    className: `
+                        mega-button
+                        positive
+                        ${isLoading ? 'disabled' : ''}
+                    `,
+    onClick: () => {
+      if (!isLoading) {
+        return topic ? onSubmit() : onInvalid();
+      }
+    },
+    topic: topic
+  }, external_React_default().createElement("span", null, isEdit ? l.update_meeting_button : l.schedule_meeting_button))));
+};
+
+/***/ }),
+
+/***/ 702:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+"Z": () => (Select)
+});
+var react0__ = __webpack_require__(363);
+var react0 = __webpack_require__.n(react0__);
+var _mixins_js1__ = __webpack_require__(503);
+var _ui_perfectScrollbar_jsx2__ = __webpack_require__(285);
+
+
+
+class Select extends _mixins_js1__.wl {
+  constructor(...args) {
+    super(...args);
+    this.containerRef = react0().createRef();
+    this.menuRef = react0().createRef();
+    this.optionRefs = {};
+    this.state = {
+      expanded: false
+    };
+    this.handleMousedown = ({
+      target
+    }) => {
+      var _this$containerRef;
+      return (_this$containerRef = this.containerRef) != null && _this$containerRef.current.contains(target) ? null : this.setState({
+        expanded: false
+      });
+    };
+  }
+  getFormattedDuration(duration) {
+    duration = moment.duration(duration);
+    const hours = duration.get('hours');
+    const minutes = duration.get('minutes');
+    if (!hours && !minutes) {
+      return '';
+    }
+    if (!hours && minutes) {
+      return l.time_offset_om;
+    }
+    return (minutes ? l.time_offset_wm : l.time_offset_wh).replace('%d', hours);
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    document.removeEventListener('mousedown', this.handleMousedown);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    document.addEventListener('mousedown', this.handleMousedown);
+  }
+  render() {
+    const {
+      NAMESPACE
+    } = Select;
+    const {
+      name,
+      className,
+      icon,
+      options,
+      value,
+      format,
+      onSelect
+    } = this.props;
+    return react0().createElement("div", {
+      ref: this.containerRef,
+      className: `
+                    ${NAMESPACE}
+                    ${className || ''}
+                `,
+      onClick: () => {
+        this.setState(state => ({
+          expanded: !state.expanded
+        }), () => {
+          if (value && this.optionRefs[value]) {
+            this.menuRef.current.scrollToElement(this.optionRefs[value]);
+          }
+        });
+      }
+    }, react0().createElement("input", {
+      type: "text",
+      className: `
+                        ${NAMESPACE}-input
+                        ${name}
+                    `,
+      value: value,
+      onChange: () => false
+    }), react0().createElement("div", {
+      className: "mega-input dropdown-input"
+    }, value && react0().createElement("span", null, format ? format(value) : value), icon && react0().createElement("i", {
+      className: "sprite-fm-mono icon-dropdown"
+    }), options && react0().createElement("div", {
+      className: `
+                                mega-input-dropdown
+                                ${this.state.expanded ? '' : 'hidden'}
+                            `
+    }, react0().createElement(_ui_perfectScrollbar_jsx2__.F, {
+      ref: this.menuRef,
+      options: {
+        suppressScrollX: true
+      }
+    }, options.map(option => {
+      return react0().createElement("div", {
+        ref: ref => {
+          this.optionRefs[option.value] = ref;
+        },
+        key: option.value,
+        className: `
+                                                option
+                                                ${option.value === value || option.label === value ? 'active' : ''}
+                                            `,
+        onClick: () => onSelect(option)
+      }, option.label, "\xA0", option.duration && this.getFormattedDuration(option.duration));
+    })))));
+  }
+}
+Select.NAMESPACE = 'meetings-select';
+
+/***/ }),
+
 /***/ 336:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -19689,7 +23014,7 @@ window.ChatCallIncomingDialog = Incoming;
 
 /***/ }),
 
-/***/ 97:
+/***/ 889:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -22439,6 +25764,268 @@ class ConversationMessageMixin extends _mixins1__._p {
 
 /***/ }),
 
+/***/ 97:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+"Z": () => (ScheduleMetaChange)
+});
+var react0__ = __webpack_require__(363);
+var react0 = __webpack_require__.n(react0__);
+var _mixin_jsx1__ = __webpack_require__(416);
+var _contacts_jsx2__ = __webpack_require__(13);
+var _ui_utils_jsx3__ = __webpack_require__(79);
+var _ui_buttons_jsx4__ = __webpack_require__(204);
+
+
+
+
+
+class ScheduleMetaChange extends _mixin_jsx1__.y {
+  constructor(...args) {
+    super(...args);
+    this.state = {
+      link: ''
+    };
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    if (this.props.mode === ScheduleMetaChange.MODE.CREATED) {
+      const val = is_chatlink ? `chat/${is_chatlink.ph}#${is_chatlink.key}` : this.props.chatRoom.getPublicLink();
+      if (typeof val === 'string') {
+        this.setState({
+          link: `${getBaseUrl()}/${val}`
+        });
+      } else if (val instanceof MegaPromise) {
+        val.done(() => {
+          if (this.isMounted() && !this.state.link && this.props.chatRoom.publicLink) {
+            this.setState({
+              link: `${getBaseUrl()}/${this.props.chatRoom.publicLink}`
+            });
+          }
+        });
+      }
+    }
+    if (this.props.message.meta.ap) {
+      const {
+        meetingsManager
+      } = megaChat.plugins;
+      this.redrawListener = `${meetingsManager.EVENTS.OCCURRENCES_UPDATE}.redraw${this.getUniqueId()}`;
+      megaChat.rebind(this.redrawListener, () => {
+        onIdle(() => {
+          const {
+            meta
+          } = this.props.message;
+          if (!meta.ap) {
+            return;
+          }
+          this.props.message.meta = meetingsManager.noCsMeta(meta.handle, meta.ap, megaChat.chats[meta.cid]);
+          this.safeForceUpdate();
+        });
+        megaChat.off(this.redrawListener);
+        delete this.redrawListener;
+      });
+    }
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if (this.redrawListener) {
+      megaChat.off(this.redrawListener);
+    }
+  }
+  componentDidUpdate(prevProps) {
+    if (this.props.mode === ScheduleMetaChange.MODE.CREATED && prevProps.link !== this.props.link) {
+      this.setState({
+        link: this.props.link ? `${getBaseUrl()}/${this.props.link}` : ''
+      });
+    }
+  }
+  onAddToCalendar() {
+    const {
+      chatRoom
+    } = this.props;
+    const {
+      id,
+      title
+    } = chatRoom && chatRoom.scheduledMeeting || {};
+    if (id) {
+      delay(`fetchical${id}`, () => {
+        asyncApiReq({
+          a: 'mcsmfical',
+          id
+        }).then(res => {
+          delay(`saveical${id}`, () => {
+            M.saveAs(base64urldecode(res), `${title.replace(/\W/g, '')}.ics`).then(nop).catch(() => {
+              msgDialog('error', '', l.calendar_add_failed, '');
+            });
+          }, 1000);
+        }).catch(() => {
+          msgDialog('error', '', l.calendar_add_failed, '');
+        });
+      }, 250);
+    }
+  }
+  static getTitleText(meta) {
+    const {
+      mode,
+      recurring,
+      occurrence,
+      converted,
+      prevTiming
+    } = meta;
+    const {
+      MODE
+    } = ScheduleMetaChange;
+    switch (mode) {
+      case MODE.CREATED:
+        {
+          return recurring ? l.schedule_mgmt_new_recur : l.schedule_mgmt_new;
+        }
+      case MODE.EDITED:
+        {
+          if (converted) {
+            return recurring ? l.schedule_mgmt_update_convert_recur : l.schedule_mgmt_update_convert;
+          }
+          if (occurrence) {
+            return l.schedule_mgmt_update_occur;
+          }
+          if (prevTiming) {
+            return recurring ? l.schedule_mgmt_update_recur : l.schedule_mgmt_update;
+          }
+          return l.schedule_mgmt_update_desc;
+        }
+      case MODE.CANCELLED:
+        {
+          if (recurring) {
+            return occurrence ? l.schedule_mgmt_cancel_occur : l.schedule_mgmt_cancel_recur;
+          }
+          return l.schedule_mgmt_cancel;
+        }
+    }
+    return '';
+  }
+  renderTimingBlock() {
+    const {
+      message,
+      mode
+    } = this.props;
+    const {
+      meta
+    } = message;
+    const {
+      MODE
+    } = ScheduleMetaChange;
+    if (mode === MODE.CANCELLED && !meta.occurrence) {
+      return null;
+    }
+    const [now, prev] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
+    return react0().createElement("div", {
+      className: "schedule-timing-block"
+    }, meta.prevTiming && react0().createElement("s", null, prev || ''), now);
+  }
+  checkAndFakeOccurrenceMeta(meta) {
+    const {
+      MODE
+    } = ScheduleMetaChange;
+    if (meta.occurrence && meta.mode === MODE.CANCELLED && !meta.calendar) {
+      const meeting = megaChat.plugins.meetingsManager.getMeetingOrOccurrenceParent(meta.handle);
+      if (meeting) {
+        const occurrences = meeting.getOccurrencesById(meta.handle);
+        if (occurrences) {
+          meta.calendar = {
+            date: new Date(occurrences[0].start).getDate(),
+            month: time2date(Math.floor(occurrences[0].start / 1000), 12)
+          };
+          meta.timeRules.startTime = Math.floor(occurrences[0].start / 1000);
+          meta.timeRules.endTime = Math.floor(occurrences[0].end / 1000);
+        }
+      }
+    }
+  }
+  render() {
+    const {
+      chatRoom,
+      message,
+      mode,
+      contact
+    } = this.props;
+    const {
+      meta,
+      messageId
+    } = message;
+    const {
+      scheduledMeeting
+    } = chatRoom;
+    const {
+      MODE
+    } = ScheduleMetaChange;
+    const {
+      link
+    } = this.state;
+    if (meta.gone) {
+      return null;
+    }
+    this.checkAndFakeOccurrenceMeta(meta);
+    return react0().createElement("div", null, react0().createElement("div", {
+      className: "message body",
+      "data-id": `id${messageId}`,
+      key: messageId
+    }, react0().createElement(_contacts_jsx2__.Avatar, {
+      contact: contact.u,
+      className: "message avatar-wrapper small-rounded-avatar",
+      chatRoom: chatRoom
+    }), react0().createElement("div", {
+      className: "message schedule-message content-area small-info-txt selectable-txt"
+    }, react0().createElement(_contacts_jsx2__.ContactButton, {
+      className: "message",
+      chatRoom: chatRoom,
+      contact: contact,
+      label: react0().createElement(_ui_utils_jsx3__.dy, null, M.getNameByHandle(contact.u))
+    }), react0().createElement("div", {
+      className: "message date-time simpletip",
+      "data-simpletip": time2date(this.getTimestamp())
+    }, this.getTimestampAsString()), react0().createElement("div", {
+      className: "message text-block"
+    }, ScheduleMetaChange.getTitleText(meta), " ", d && meta.handle), react0().createElement("div", {
+      className: "message body-block"
+    }, (meta.prevTiming || meta.calendar || meta.topic && meta.onlyTitle || meta.recurring) && react0().createElement("div", {
+      className: "schedule-detail-block"
+    }, meta.calendar && scheduledMeeting && (meta.recurring && !scheduledMeeting.recurring || meta.occurrence && meta.mode === MODE.CANCELLED || !meta.recurring) && react0().createElement("div", {
+      className: "schedule-calendar-icon"
+    }, react0().createElement("div", {
+      className: "schedule-date"
+    }, meta.calendar.date), react0().createElement("div", {
+      className: "schedule-month"
+    }, meta.calendar.month)), react0().createElement("div", {
+      className: "schedule-detail-main"
+    }, react0().createElement("div", {
+      className: "schedule-meeting-title"
+    }, mode === MODE.CANCELLED ? react0().createElement("s", null, meta.topic || chatRoom.topic) : meta.topic || chatRoom.topic), this.renderTimingBlock()), chatRoom.iAmInRoom() && scheduledMeeting && mode !== MODE.CANCELLED && react0().createElement(_ui_buttons_jsx4__.z, {
+      className: "mega-button",
+      onClick: () => this.onAddToCalendar()
+    }, react0().createElement("span", null, mode === MODE.CREATED && !meta.occurrence ? l.schedule_add_calendar : l.schedule_update_calendar))), mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description && react0().createElement(_ui_utils_jsx3__.Cw, {
+      tag: "div",
+      className: "schedule-description"
+    }, scheduledMeeting.description.replace(/\n/g, '<br>')), link && react0().createElement("div", null, react0().createElement("div", {
+      className: "schedule-meeting-link"
+    }, react0().createElement("span", null, link), react0().createElement(_ui_buttons_jsx4__.z, {
+      className: "mega-button positive",
+      onClick: () => {
+        copyToClipboard(link, l[7654]);
+      }
+    }, react0().createElement("span", null, l[63]))), react0().createElement("span", null, l.schedule_link_note))))));
+  }
+}
+ScheduleMetaChange.MODE = {
+  CREATED: 1,
+  EDITED: 2,
+  CANCELLED: 3
+};
+window.ScheduleMetaChange = ScheduleMetaChange;
+
+/***/ }),
+
 /***/ 480:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -23139,7 +26726,9 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       }
       $textarea.height(textareaHeight);
     }
-    this.textareaScroll.reinitialise();
+    if (this.textareaScroll) {
+      this.textareaScroll.reinitialise();
+    }
   }
   getCursorPosition(el) {
     var pos = 0;
@@ -23273,13 +26862,6 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
         }
       });
     }
-    var placeholder = l[18669];
-    var roomTitle = room.getRoomTitle(false, true);
-    if (roomTitle[0] === '"' && roomTitle[roomTitle.length - 1] === '"') {
-      placeholder = l[18763];
-      roomTitle = roomTitle.slice(1, -1);
-    }
-    placeholder = placeholder.replace("%s", roomTitle);
     var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
     return external_React_default().createElement("div", {
       ref: this.typingAreaRef,
@@ -23335,7 +26917,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       }
     }, external_React_default().createElement("div", {
       className: "messages-textarea-placeholder"
-    }, self.state.typedMessage ? null : external_React_default().createElement(utils.dy, null, placeholder)), external_React_default().createElement("textarea", {
+    }, self.state.typedMessage ? null : external_React_default().createElement(utils.dy, null, (l[18763] || `Write message to \u201c%s\u201d\u2026`).replace('%s', room.getRoomTitle()))), external_React_default().createElement("textarea", {
       className: `
                                 ${"messages-textarea"}
                                 ${disabledTextarea ? 'disabled' : ''}
@@ -26457,6 +30039,7 @@ class ModalDialog extends mixins.wl {
       className: "fm-modal-dialog",
       popupDidMount: this.onPopupDidMount
     }, modalDialogs_React.createElement("div", {
+      id: self.props.id,
       className: classes,
       "aria-labelledby": self.props.dialogName ? self.props.dialogName + "-title" : null,
       role: "dialog",
@@ -26986,6 +30569,7 @@ __webpack_require__.d(__webpack_exports__, {
 "ZP": () => (__WEBPACK_DEFAULT_EXPORT__),
 "a0": () => (OFlowEmoji),
 "dy": () => (Emoji),
+"hV": () => (reactStringWrap),
 "nF": () => (OFlowParsedHTML),
 "pQ": () => (withOverflowObserver)
 });
@@ -27125,6 +30709,10 @@ class ParsedHTML extends React.Component {
     });
   }
 }
+const reactStringWrap = (src, find, WrapClass, wrapProps) => {
+  const endTag = find.replace('[', '[/');
+  return React.createElement(React.Fragment, null, src.split(find)[0], React.createElement(WrapClass, wrapProps, src.substring(src.indexOf(find) + find.length, src.indexOf(endTag))), src.split(endTag)[1]);
+};
 const OFlowEmoji = withOverflowObserver(Emoji);
 const OFlowParsedHTML = withOverflowObserver(ParsedHTML);
 const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -27280,7 +30868,7 @@ function _extends() {
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	__webpack_require__(662);
+/******/ 	__webpack_require__(638);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __webpack_require__(222);
 /******/ 	

@@ -1,0 +1,152 @@
+.meetings-recurring {
+    width: 100%;
+
+    &-container {
+        position: relative;
+    }
+
+    .mega-button.recurring-nav-button,
+    .mega-button.recurring-toggle-button {
+        margin: 0 8px 0 0;
+        border: 1px solid var(--neutral-border);
+        font: var(--text-body1);
+        color: var(--text-color-high);
+
+        &:hover {
+            background: transparent;
+            border-color: var(--context-menu-border);
+        }
+    }
+
+    &-navigation {
+        margin: 0 0 18px 0;
+
+        /* TODO: add vars; update the library re: introduce global variation of this button? */
+        .mega-button.recurring-nav-button {
+            /* [...] */
+
+            &.active {
+                color: white;
+                background: var(--surface-dark-grey);
+
+                body.theme-dark & {
+                    color: black;
+                    background: white;
+                }
+
+                &:hover {
+                    background: var(--surface-dark-grey);
+                    border-color: transparent;
+
+                    body.theme-dark & {
+                        color: black;
+                        background: white;
+                    }
+                }
+            }
+        }
+    }
+
+    &-content {
+        /* [...] */
+
+        .mega-button.recurring-toggle-button {
+            width: 36px;
+            height: 36px;
+            justify-content: center;
+
+            &.active {
+                border-color: transparent;
+                color: var(--secondary-white);
+                background: var(--secondary-green);
+
+                body.theme-dark & {
+                    color: black;
+                }
+            }
+        }
+
+        /* --- */
+
+        .recurring-field-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 0 0 18px 0;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            .recurring-title-heading {
+                width: 100%;
+                margin: 0 0 12px 0;
+            }
+
+            .recurring-interval {
+                margin: 0 8px;
+
+                input {
+                    width: 24px;
+                }
+            }
+
+            .recurring-day {
+                margin: -8px 8px 0 0;
+
+                input {
+                    width: 34px;
+                    text-align: center;
+                }
+            }
+
+            .recurring-radio-buttons {
+                width: 100%;
+
+                .recurring-label-wrap {
+                    display: flex;
+                    margin: 0 0 12px 0;
+
+                    .mega-banner.with-btn {
+                        margin: 4px 0;
+                        text-align: center;
+                    }
+                }
+
+                .recurring-radio-label {
+                    display: block;
+                    margin: 0 12px 0 0;
+                    cursor: pointer;
+                }
+
+                .radio-txt {
+                    display: flex;
+                    width: 100%;
+                    padding-inline: 0;
+                }
+
+                .meetings-datepicker {
+                    width: 40%;
+
+                    .datepicker-input {
+                        margin-top: -8px;
+                    }
+                }
+            }
+        }
+
+        /* --- */
+
+        .meetings-recurring-daily {
+            /* [...] */
+        }
+
+        .meetings-recurring-weekly {
+            /* [...] */
+        }
+
+        .meetings-recurring-monthly {
+            /* [...] */
+        }
+    }
+}

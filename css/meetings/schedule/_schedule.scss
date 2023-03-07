@@ -1,0 +1,151 @@
+#schedule-dialog {
+    width: 500px;
+    height: 712px;
+
+    &.fluid {
+        height: auto;
+    }
+
+    &.with-confirmation-dialog {
+        filter: blur(0.25em);
+    }
+
+    header {
+        padding: 30px 24px 24px;
+        border-bottom: 1px solid var(--stroke-grey-2);
+        background: var(--surface-grey-1);
+    }
+
+    button.close {
+        padding-top: 18px;
+        padding-inline: 10px;
+    }
+
+    .schedule-dialog-row {
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin: 0 0 15px 0;
+
+        &.start-aligned {
+            align-items: start;
+
+            .schedule-dialog-column {
+                margin-top: 0;
+            }
+        }
+
+        &.invalid-aligned {
+            margin-bottom: 30px;
+        }
+    }
+
+    .recurring-edit-banner {
+        width: 100%;
+        margin: 0 0 20px;
+        padding: 4px 0;
+        text-align: center;
+
+        a {
+            margin: 0 0 0 4px;
+            text-decoration: underline;
+
+            body.theme-dark & {
+                color: var(--secondary-white);
+            }
+        }
+    }
+
+    .schedule-dialog-column {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        width: 100%;
+
+        &:first-child {
+            display: block;
+            width: 20px;
+            height: 20px;
+            margin-top: -3px;
+            margin-inline: 0 16px;
+
+            i {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                --icon-size: 20px;
+            }
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        label,
+        .schedule-label {
+            cursor: pointer;
+            color: var(--text-color-high);
+        }
+    }
+
+    .schedule-date-container {
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        & > div {
+            margin: 0 16px 0 0;
+        }
+    }
+
+    .schedule-timepicker-container {
+        display: flex;
+        align-items: center;
+
+        span {
+            display: block;
+            float: left;
+            margin: 0 10px;
+        }
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+        color: var(--text-color-medium);
+    }
+
+    textarea {
+        overflow: auto;
+        white-space: normal;
+    }
+
+    footer {
+        border-top: 1px solid var(--stroke-grey-2);
+        background: var(--surface-grey-1);
+
+        .footer-container {
+            padding: 24px;
+        }
+    }
+
+    @import '_select.scss';
+    @import '_invite.scss';
+}
+
+.schedule-dialog-confirmation.mega-dialog {
+    /* [...] */
+
+    header i {
+        display: block;
+    }
+}
+
+.schedule-dialog-confirmation-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2010;
+}

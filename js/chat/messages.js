@@ -179,6 +179,9 @@ Message._getTextContentsForDialogType = function(message) {
                 textMessage = textMessage.replace("%s", contactName);
             }
         }
+        else if (message.dialogType === 'scheduleMeta') {
+            textMessage = ScheduleMetaChange.getTitleText(message.meta);
+        }
         else if (textMessage.splice) {
             textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage);
         }

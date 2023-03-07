@@ -139,7 +139,9 @@ var strongvelope = {};
         MESSAGE_IDENTITY:   0x0d,
         MESSAGE_REFERENCE:  0x0e,
         KEY_BLOB:           0x0f,
-        OPENMODE:  0x10
+        OPENMODE:           0x10,
+        SCHED_HANDLE:       0x11,
+        SCHED_CHANGE:       0x12,
     };
 
     var TLV_TYPES = strongvelope.TLV_TYPES;
@@ -164,6 +166,8 @@ var strongvelope = {};
         0x0e: 'reference',
         0x0f: 'keyBlob',
         0x10: 'openMode',
+        0x11: 'schedHandle',
+        0x12: 'schedChange',
     };
 
     /**
@@ -198,7 +202,8 @@ var strongvelope = {};
         PUBLIC_HANDLE_CREATE:    0x08,
         PUBLIC_HANDLE_DELETE:    0x09,
         OPEN_MODE_CLOSED:        0x0a,
-        MESSAGES_RETENTION: 0x0b
+        MESSAGES_RETENTION:      0x0b,
+        SCHEDULE_MEET:           0x0c,
     };
     var MESSAGE_TYPES = strongvelope.MESSAGE_TYPES;
     var _KEYED_MESSAGES = [MESSAGE_TYPES.GROUP_KEYED,
@@ -525,6 +530,12 @@ var strongvelope = {};
                                     value.substring(pos + USER_HANDLE_SIZE + 2, pos + USER_HANDLE_SIZE + 2 + len));
                             pos = pos + USER_HANDLE_SIZE + 2 + len;
                         }
+                        break;
+                    case TLV_TYPES.SCHED_HANDLE:
+                        parsedContent[tlvVariable] = base64urlencode(value);
+                        break;
+                    case TLV_TYPES.SCHED_CHANGE:
+                        parsedContent[tlvVariable] = base64urldecode(value);
                         break;
                     default:
                         // For all non-special cases, this will be used.
@@ -1780,7 +1791,17 @@ var strongvelope = {};
 
                     proxyPromise2.resolve(result);
                     return proxyPromise2;
-
+                case MESSAGE_TYPES.SCHEDULE_MEET: {
+                    const res = {
+                        type: parsedMessage.type,
+                        sender: parsedMessage.invitor,
+                        handle: parsedMessage.schedHandle,
+                    };
+                    if (parsedMessage.schedChange) {
+                        res.schedChange = JSON.parse(parsedMessage.schedChange);
+                    }
+                    return MegaPromise.resolve(res);
+                }
                 default:
                     this.logger.critical('Invalid management message.');
                     break;

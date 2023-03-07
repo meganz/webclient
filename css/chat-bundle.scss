@@ -7,7 +7,7 @@
 @import 'meetings/_local.scss';
 @import 'meetings/_streamExtendedControls.scss';
 @import 'meetings/_micObserver.scss';
-@import 'meetings/chatToaster.scss';
+@import 'meetings/_chatToaster.scss';
 
 // Workflow components
 @import 'meetings/workflow/_start.scss';
@@ -17,3 +17,6 @@
 @import 'meetings/workflow/_invite.scss';
 @import 'meetings/workflow/_loading.scss';
 @import 'meetings/workflow/_alert.scss';
+@import 'meetings/schedule/_schedule.scss';
+@import 'meetings/schedule/_datepicker.scss';
+@import 'meetings/schedule/_recurring.scss';

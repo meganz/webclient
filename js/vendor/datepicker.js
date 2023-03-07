@@ -132,7 +132,7 @@
         this.currentDate = this.opts.startDate;
         this.currentView = this.opts.view;
         this._createShortCuts();
-        this.selectedDates = [];
+        this.selectedDates = this.opts.selectedDates || [];
         this.views = {};
         this.keys = [];
         this.minRange = '';
@@ -377,14 +377,14 @@
                 return time2date(date.getTime() / 1000, 3);
             }
             else if (string === this.opts.navTitles.months) {
-                return time2date(date.getTime() / 1000, 15);
+                return time2date(date.getTime() / 1000, 14);
             }
             else if (string === this.opts.navTitles.years) {
 
                 var decade = datepicker.getDecade(date);
-                var date1 = (new Date()).setYear(decade[0]);
-                var date2 = (new Date()).setYear(decade[1]);
-                return l[22899].replace('%d1', time2date(date1 / 1000, 15)).replace('%d2', time2date(date2 / 1000, 15));
+                var date1 = (new Date()).setYear(decade[0] - 1);
+                var date2 = (new Date()).setYear(decade[1] + 2);
+                return l[22899].replace('%d1', time2date(date1 / 1000, 14)).replace('%d2', time2date(date2 / 1000, 14));
             }
 
             var result = string,
@@ -1605,7 +1605,7 @@
                     if (locale === 'ar') {
                         html = time2date(date.getTime() / 1000, 14);
                     }
-                    
+
                     if (d.year < decade[0] || d.year > decade[1]) {
                         classes += ' -other-decade-';
                         if (!opts.selectOtherYears) {

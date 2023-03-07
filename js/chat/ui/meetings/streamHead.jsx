@@ -134,7 +134,7 @@ export default class StreamHead extends MegaRenderMixin {
      */
 
     Dialog = () => {
-        const { link } = this.props;
+        const link = `${getBaseUrl()}/${this.props.chatRoom.publicLink}`;
         return (
             <ModalDialogsUI.ModalDialog
                 ref={this.dialogRef}
@@ -150,7 +150,12 @@ export default class StreamHead extends MegaRenderMixin {
                         <div className="link-input-container">
                             <div className="mega-input with-icon box-style">
                                 <i className="sprite-fm-mono icon-link" />
-                                <input type="text" className="megaInputs" readOnly={true} value={link} />
+                                <input
+                                    type="text"
+                                    className="megaInputs"
+                                    readOnly={true}
+                                    value={link}
+                                />
                             </div>
                             <Button
                                 className="mega-button positive copy-to-clipboard"
@@ -222,11 +227,15 @@ export default class StreamHead extends MegaRenderMixin {
                             ref={this.topicRef}
                             className={`
                                 stream-topic
-                                ${chatRoom.isMeeting ? 'has-meeting-link' : ''}
+                                ${chatRoom.isMeeting && chatRoom.publicLink ? 'has-meeting-link' : ''}
                             `}
-                            onClick={() => chatRoom.isMeeting && this.setState({ dialog: !dialog, banner: false })}>
+                            onClick={() =>
+                                chatRoom.isMeeting &&
+                                chatRoom.publicLink &&
+                                this.setState({ dialog: !dialog, banner: false })
+                            }>
                             <Emoji>{chatRoom.getRoomTitle()}</Emoji>
-                            {chatRoom.isMeeting && (
+                            {chatRoom.isMeeting && chatRoom.publicLink && (
                                 <i
                                     className={`
                                         sprite-fm-mono

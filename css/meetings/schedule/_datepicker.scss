@@ -1,0 +1,86 @@
+.meetings-datepicker {
+    width: 50%;
+
+    .mega-input.datepicker-input {
+        /* [...] */
+
+        i {
+            --icon-size: 16px;
+            --mask-color: var(--icon-rest);
+            cursor: pointer;
+        }
+    }
+}
+
+.meetings-datepicker-calendar {
+    position: absolute;
+    padding: 8px 0;
+    min-width: 300px;
+    border: var(--context-menu-border);
+    border-radius: 20px;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+    background: var(--surface-main);
+    transition: var(--transition-opacity);
+    z-index: 150;
+
+    .datepicker--pointer {
+        display: none;
+    }
+
+    .datepicker--nav {
+        /* [...] */
+    }
+
+    .datepicker--content {
+        padding: 7px 7px 7px 10px;
+    }
+
+    .datepicker--days-names {
+        /* [...] */
+
+        .datepicker--day-name {
+            margin: 2px;
+            width: 36px;
+            color: var(--text-color-low);
+        }
+    }
+
+    .datepicker--cell {
+        width: 36px;
+        height: 36px;
+        margin: 2px;
+        font-size: 12px;
+        line-height: 36px;
+
+        &.-selected- {
+            color: var(--secondary-white);
+        }
+
+        &.-disabled- {
+            color: var(--text-color-low);
+        }
+
+        &.-disabled-.-selected- {
+            color: var(--secondary-white);
+        }
+
+        &.-current- {
+            border: 1px solid #333;
+            background: linear-gradient(180deg, #F2F2F2 0%, #EDEDED 100%);
+            color: var(--text-color-high);
+
+            body.theme-dark & {
+                border: 1px solid #FFF;
+                background: transparent;
+            }
+        }
+
+        &.-other-month- {
+            color: var(--text-color-low);
+        }
+
+        &-month {
+
+        }
+    }
+}

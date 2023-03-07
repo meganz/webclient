@@ -2367,3 +2367,487 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   --icon-size: 24px;
   --mask-color: var(--secondary-white);
 }
+
+#schedule-dialog {
+  width: 500px;
+  height: 712px;
+}
+#schedule-dialog.fluid {
+  height: auto;
+}
+#schedule-dialog.with-confirmation-dialog {
+  filter: blur(0.25em);
+}
+#schedule-dialog header {
+  padding: 30px 24px 24px;
+  border-bottom: 1px solid var(--stroke-grey-2);
+  background: var(--surface-grey-1);
+}
+#schedule-dialog button.close {
+  padding-top: 18px;
+  padding-inline: 10px;
+}
+#schedule-dialog .schedule-dialog-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 0 0 15px 0;
+}
+#schedule-dialog .schedule-dialog-row.start-aligned {
+  align-items: start;
+}
+#schedule-dialog .schedule-dialog-row.start-aligned .schedule-dialog-column {
+  margin-top: 0;
+}
+#schedule-dialog .schedule-dialog-row.invalid-aligned {
+  margin-bottom: 30px;
+}
+#schedule-dialog .recurring-edit-banner {
+  width: 100%;
+  margin: 0 0 20px;
+  padding: 4px 0;
+  text-align: center;
+}
+#schedule-dialog .recurring-edit-banner a {
+  margin: 0 0 0 4px;
+  text-decoration: underline;
+}
+body.theme-dark #schedule-dialog .recurring-edit-banner a {
+  color: var(--secondary-white);
+}
+#schedule-dialog .schedule-dialog-column {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+}
+#schedule-dialog .schedule-dialog-column:first-child {
+  display: block;
+  width: 20px;
+  height: 20px;
+  margin-top: -3px;
+  margin-inline: 0 16px;
+}
+#schedule-dialog .schedule-dialog-column:first-child i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  --icon-size: 20px;
+}
+#schedule-dialog .schedule-dialog-column:last-child {
+  margin-bottom: 0;
+}
+#schedule-dialog .schedule-dialog-column label,
+#schedule-dialog .schedule-dialog-column .schedule-label {
+  cursor: pointer;
+  color: var(--text-color-high);
+}
+#schedule-dialog .schedule-date-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+#schedule-dialog .schedule-date-container > div {
+  margin: 0 16px 0 0;
+}
+#schedule-dialog .schedule-timepicker-container {
+  display: flex;
+  align-items: center;
+}
+#schedule-dialog .schedule-timepicker-container span {
+  display: block;
+  float: left;
+  margin: 0 10px;
+}
+#schedule-dialog input::placeholder,
+#schedule-dialog textarea::placeholder {
+  color: var(--text-color-medium);
+}
+#schedule-dialog textarea {
+  overflow: auto;
+  white-space: normal;
+}
+#schedule-dialog footer {
+  border-top: 1px solid var(--stroke-grey-2);
+  background: var(--surface-grey-1);
+}
+#schedule-dialog footer .footer-container {
+  padding: 24px;
+}
+#schedule-dialog .meetings-select {
+  /* [...] */
+}
+#schedule-dialog .meetings-select.plain .mega-input::before {
+  border: 0 none;
+}
+#schedule-dialog .meetings-select.inline {
+  float: left;
+  margin: 0 8px 0 0;
+}
+#schedule-dialog .meetings-select.inline .mega-input {
+  width: auto;
+  margin-top: -8px;
+}
+#schedule-dialog .meetings-select-input {
+  display: none;
+}
+#schedule-dialog .meetings-select .mega-input {
+  position: relative;
+  min-width: 52px;
+}
+#schedule-dialog .meetings-select .mega-input .mega-input-dropdown {
+  position: absolute;
+  top: 100%;
+  height: 220px;
+}
+#schedule-dialog .meetings-invite {
+  width: 100%;
+}
+#schedule-dialog .meetings-invite.disabled {
+  opacity: 0.2;
+}
+#schedule-dialog .meetings-invite .multiple-input {
+  max-height: none;
+  border: unset;
+  background: unset;
+}
+#schedule-dialog .meetings-invite .multiple-input ul {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+}
+#schedule-dialog .meetings-invite .multiple-input ul:before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  content: "";
+  border-bottom: 1px solid var(--stroke-mid-grey);
+  transition: var(--transition-border);
+}
+#schedule-dialog .meetings-invite .multiple-input ul:hover::before {
+  border-color: var(--input-text-underline-hover);
+}
+#schedule-dialog .meetings-invite .multiple-input ul li {
+  margin: 4px;
+  padding: 6px;
+  border-radius: 4px;
+  background: var(--surface-grey-2);
+}
+#schedule-dialog .meetings-invite .multiple-input ul li.token-input-input-token-mega {
+  position: relative;
+  padding: 0;
+  max-width: 100%;
+  z-index: 1;
+  background: transparent;
+  flex-grow: 1;
+}
+#schedule-dialog .meetings-invite .multiple-input ul li.token-input-input-token-mega input {
+  width: 100%;
+}
+#schedule-dialog .meetings-invite .multiple-input ul li .contact-tag-item {
+  display: flex;
+  width: 100%;
+}
+#schedule-dialog .meetings-invite .multiple-input ul li .contact-tag-item .avatar-wrapper {
+  border-radius: 4px;
+  height: 24px;
+  line-height: 24px;
+  width: 24px;
+}
+#schedule-dialog .meetings-invite .multiple-input ul li .contact-tag-item .avatar-wrapper .user-card-verified {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+}
+#schedule-dialog .meetings-invite .multiple-input ul li .contact-tag-item .avatar-wrapper .user-card-verified i {
+  --icon-size: 10px;
+  cursor: default;
+}
+#schedule-dialog .meetings-invite .multiple-input ul li .contact-tag-item .overflow-observer {
+  margin: auto 4px;
+}
+#schedule-dialog .meetings-invite .multiple-input ul li i {
+  margin: 1px 0 0;
+  --icon-size: 24px;
+  cursor: pointer;
+}
+#schedule-dialog .meetings-invite .mega-input {
+  /* [...] */
+}
+#schedule-dialog .meetings-invite .invite-scroll-wrapper {
+  max-height: 240px;
+}
+#schedule-dialog .meetings-invite .mega-input-dropdown {
+  position: absolute;
+  top: 100%;
+  margin: 4px 0 0;
+  padding: 8px 0;
+  max-width: 80%;
+  min-width: 200px;
+  box-sizing: border-box;
+  border: var(--context-menu-border);
+  border-radius: 12px;
+  background: var(--surface-main);
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+}
+#schedule-dialog .meetings-invite .invite-section {
+  padding: 4px 8px 8px;
+}
+#schedule-dialog .meetings-invite .invite-section-title {
+  font: var(--text-body1-bold);
+  color: var(--text-color-medium);
+  white-space: pre-wrap;
+}
+#schedule-dialog .meetings-invite .invite-section-list {
+  padding: 4px 0 0;
+}
+#schedule-dialog .meetings-invite .invite-section-item {
+  display: flex;
+  align-items: center;
+  width: calc(100% - 6px);
+  margin: 8px 0;
+  padding: 2px 4px;
+  text-align: start;
+  font: var(--text-body1);
+  background: var(--surface-main);
+  border-radius: 4px;
+  transition: var(--transition-bg-color), var(--transition-color);
+  cursor: pointer;
+}
+#schedule-dialog .meetings-invite .invite-section-item:hover {
+  background: var(--button-hover);
+  color: var(--text-color-high);
+}
+#schedule-dialog .meetings-invite .invite-section-item .invite-item-data {
+  margin: 0 0 0 8px;
+  width: calc(100% - 40px);
+}
+#schedule-dialog .meetings-invite .invite-section-item .avatar-wrapper {
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 4px;
+}
+#schedule-dialog .meetings-invite .invite-section-item .invite-item-name {
+  font: var(--text-body1);
+  color: var(--text-color-high);
+}
+#schedule-dialog .meetings-invite .invite-section-item .invite-item-name img {
+  width: 12px;
+  height: 12px;
+}
+#schedule-dialog .meetings-invite .invite-section-item .invite-item-mail {
+  font: var(--text-body2);
+  color: var(--text-color-low);
+}
+
+.schedule-dialog-confirmation.mega-dialog {
+  /* [...] */
+}
+.schedule-dialog-confirmation.mega-dialog header i {
+  display: block;
+}
+
+.schedule-dialog-confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2010;
+}
+
+.meetings-datepicker {
+  width: 50%;
+}
+.meetings-datepicker .mega-input.datepicker-input {
+  /* [...] */
+}
+.meetings-datepicker .mega-input.datepicker-input i {
+  --icon-size: 16px;
+  --mask-color: var(--icon-rest);
+  cursor: pointer;
+}
+
+.meetings-datepicker-calendar {
+  position: absolute;
+  padding: 8px 0;
+  min-width: 300px;
+  border: var(--context-menu-border);
+  border-radius: 20px;
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+  background: var(--surface-main);
+  transition: var(--transition-opacity);
+  z-index: 150;
+}
+.meetings-datepicker-calendar .datepicker--pointer {
+  display: none;
+}
+.meetings-datepicker-calendar .datepicker--nav {
+  /* [...] */
+}
+.meetings-datepicker-calendar .datepicker--content {
+  padding: 7px 7px 7px 10px;
+}
+.meetings-datepicker-calendar .datepicker--days-names {
+  /* [...] */
+}
+.meetings-datepicker-calendar .datepicker--days-names .datepicker--day-name {
+  margin: 2px;
+  width: 36px;
+  color: var(--text-color-low);
+}
+.meetings-datepicker-calendar .datepicker--cell {
+  width: 36px;
+  height: 36px;
+  margin: 2px;
+  font-size: 12px;
+  line-height: 36px;
+}
+.meetings-datepicker-calendar .datepicker--cell.-selected- {
+  color: var(--secondary-white);
+}
+.meetings-datepicker-calendar .datepicker--cell.-disabled- {
+  color: var(--text-color-low);
+}
+.meetings-datepicker-calendar .datepicker--cell.-disabled-.-selected- {
+  color: var(--secondary-white);
+}
+.meetings-datepicker-calendar .datepicker--cell.-current- {
+  border: 1px solid #333;
+  background: linear-gradient(180deg, #F2F2F2 0%, #EDEDED 100%);
+  color: var(--text-color-high);
+}
+body.theme-dark .meetings-datepicker-calendar .datepicker--cell.-current- {
+  border: 1px solid #FFF;
+  background: transparent;
+}
+.meetings-datepicker-calendar .datepicker--cell.-other-month- {
+  color: var(--text-color-low);
+}
+.meetings-recurring {
+  width: 100%;
+}
+.meetings-recurring-container {
+  position: relative;
+}
+.meetings-recurring .mega-button.recurring-nav-button,
+.meetings-recurring .mega-button.recurring-toggle-button {
+  margin: 0 8px 0 0;
+  border: 1px solid var(--neutral-border);
+  font: var(--text-body1);
+  color: var(--text-color-high);
+}
+.meetings-recurring .mega-button.recurring-nav-button:hover,
+.meetings-recurring .mega-button.recurring-toggle-button:hover {
+  background: transparent;
+  border-color: var(--context-menu-border);
+}
+.meetings-recurring-navigation {
+  margin: 0 0 18px 0;
+  /* TODO: add vars; update the library re: introduce global variation of this button? */
+}
+.meetings-recurring-navigation .mega-button.recurring-nav-button {
+  /* [...] */
+}
+.meetings-recurring-navigation .mega-button.recurring-nav-button.active {
+  color: white;
+  background: var(--surface-dark-grey);
+}
+body.theme-dark .meetings-recurring-navigation .mega-button.recurring-nav-button.active {
+  color: black;
+  background: white;
+}
+.meetings-recurring-navigation .mega-button.recurring-nav-button.active:hover {
+  background: var(--surface-dark-grey);
+  border-color: transparent;
+}
+body.theme-dark .meetings-recurring-navigation .mega-button.recurring-nav-button.active:hover {
+  color: black;
+  background: white;
+}
+.meetings-recurring-content {
+  /* [...] */
+  /* --- */
+  /* --- */
+}
+.meetings-recurring-content .mega-button.recurring-toggle-button {
+  width: 36px;
+  height: 36px;
+  justify-content: center;
+}
+.meetings-recurring-content .mega-button.recurring-toggle-button.active {
+  border-color: transparent;
+  color: var(--secondary-white);
+  background: var(--secondary-green);
+}
+body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button.active {
+  color: black;
+}
+.meetings-recurring-content .recurring-field-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 0 18px 0;
+}
+.meetings-recurring-content .recurring-field-row:last-child {
+  margin-bottom: 0;
+}
+.meetings-recurring-content .recurring-field-row .recurring-title-heading {
+  width: 100%;
+  margin: 0 0 12px 0;
+}
+.meetings-recurring-content .recurring-field-row .recurring-interval {
+  margin: 0 8px;
+}
+.meetings-recurring-content .recurring-field-row .recurring-interval input {
+  width: 24px;
+}
+.meetings-recurring-content .recurring-field-row .recurring-day {
+  margin: -8px 8px 0 0;
+}
+.meetings-recurring-content .recurring-field-row .recurring-day input {
+  width: 34px;
+  text-align: center;
+}
+.meetings-recurring-content .recurring-field-row .recurring-radio-buttons {
+  width: 100%;
+}
+.meetings-recurring-content .recurring-field-row .recurring-radio-buttons .recurring-label-wrap {
+  display: flex;
+  margin: 0 0 12px 0;
+}
+.meetings-recurring-content .recurring-field-row .recurring-radio-buttons .recurring-label-wrap .mega-banner.with-btn {
+  margin: 4px 0;
+  text-align: center;
+}
+.meetings-recurring-content .recurring-field-row .recurring-radio-buttons .recurring-radio-label {
+  display: block;
+  margin: 0 12px 0 0;
+  cursor: pointer;
+}
+.meetings-recurring-content .recurring-field-row .recurring-radio-buttons .radio-txt {
+  display: flex;
+  width: 100%;
+  padding-inline: 0;
+}
+.meetings-recurring-content .recurring-field-row .recurring-radio-buttons .meetings-datepicker {
+  width: 40%;
+}
+.meetings-recurring-content .recurring-field-row .recurring-radio-buttons .meetings-datepicker .datepicker-input {
+  margin-top: -8px;
+}
+.meetings-recurring-content .meetings-recurring-daily {
+  /* [...] */
+}
+.meetings-recurring-content .meetings-recurring-weekly {
+  /* [...] */
+}
+.meetings-recurring-content .meetings-recurring-monthly {
+  /* [...] */
+}

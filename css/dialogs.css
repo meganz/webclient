@@ -10475,6 +10475,7 @@ body.de .mega-dialog.new-group-chat {
 
 .mega-dialog.file-request .content-block .form-row.create-success .file-request-input.input-code {
     border-radius: 4px;
+    margin-top: 12px;
 }
 
 .mega-dialog.file-request .content-block .form-row.create-success .file-request-embed-button-container {
@@ -10482,7 +10483,6 @@ body.de .mega-dialog.new-group-chat {
     background-color: var(--surface-grey-1);
     text-align: center;
     border-radius: 8px;
-    margin-top: 12px;
 }
 
 .mega-dialog.file-request .content-block .form-row.create-success .embed-button-header {

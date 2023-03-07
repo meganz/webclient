@@ -389,7 +389,7 @@
 }
 @media only screen and (max-height: 760px) {
   .meetings-call .carousel-button-prev,
-.meetings-call .carousel-button-next {
+  .meetings-call .carousel-button-next {
     top: auto;
     bottom: 322px;
     width: 56px;
@@ -406,7 +406,7 @@
 }
 @media only screen and (max-height: 760px) {
   .meetings-call .carousel-button-prev i,
-.meetings-call .carousel-button-next i {
+  .meetings-call .carousel-button-next i {
     --icon-size: 28px;
   }
 }
@@ -431,7 +431,7 @@
 }
 @media only screen and (max-height: 760px) {
   .meetings-call .carousel-button-prev div,
-.meetings-call .carousel-button-next div {
+  .meetings-call .carousel-button-next div {
     top: -32px;
     bottom: auto;
   }
@@ -1615,15 +1615,15 @@
 .chat-toast-bar .chat-toast.chat-toast-wrapper .chat-toast-close {
   align-self: flex-end;
 }
+.chat-toast-bar .chat-toast.chat-toast-wrapper.dual-toast {
+  margin-top: 24px;
+}
 .chat-toast-bar .chat-toast.chat-persistent-toast {
   animation: toastfadeinout 4s linear infinite;
   color: #FFFFFF;
   font: var(--text-h1-bold);
-  margin: 168px auto 0;
+  margin: 88px auto 0;
   -webkit-animation: toastfadeinout 4s linear infinite;
-}
-.chat-toast-bar .chat-toast.chat-persistent-toast.dual-toast {
-  margin-top: 32px;
 }
 
 @keyframes toastfadeinout {
@@ -2367,5 +2367,3 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   --icon-size: 24px;
   --mask-color: var(--secondary-white);
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

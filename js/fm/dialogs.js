@@ -1782,6 +1782,31 @@
             setDialogButtonState($btn);
         });
 
+        const handleCopyToChat = async(chats, selectedNodes) => {
+            selectedNodes = selectedNodes.map(n => {
+                if (M.isFileNode(n)) {
+                    return n;
+                }
+                return M.getNodeByHandle(n);
+            });
+            const mcf = await M.myChatFilesFolder.get(true).catch(() => {
+                if (d) {
+                    console.error('Failed to allocate "My chat files" folder');
+                }
+                throw ENOENT;
+            });
+
+            M.injectNodes(selectedNodes, mcf.h, res => {
+                if (Array.isArray(res) && res.length) {
+                    const noOpen = $.noOpenChatFromPreview;
+                    delete $.noOpenChatFromPreview;
+                    megaChat.openChatAndAttachNodes(chats, res, noOpen).dump();
+                }
+                else if (d) {
+                    console.warn('Unable to inject nodes... no longer existing?', res);
+                }
+            });
+        };
         // Handle copy/move/share button action
         $btn.rebind('click', function() {
             var chats = getSelectedChats();
@@ -1954,13 +1979,7 @@
             }
             else if (section === 'conversations') {
                 if (window.megaChatIsReady) {
-                    if ($.noOpenChatFromPreview) {
-                        delete $.noOpenChatFromPreview;
-                        megaChat.openChatAndAttachNodes(chats, selectedNodes, true).dump();
-                    }
-                    else {
-                        megaChat.openChatAndAttachNodes(chats, selectedNodes).dump();
-                    }
+                    handleCopyToChat(chats, selectedNodes).catch(dump);
                 }
                 else if (d) {
                     console.error('MEGAchat is not ready');

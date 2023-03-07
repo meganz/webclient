@@ -69,6 +69,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             activeCallIds: null,
             meetingsLoading: null,
             options: {},
+            scheduledMeeting: undefined
         }
     );
 
@@ -466,6 +467,7 @@ ChatRoom.INSTANCE_INDEX = 0;
 ChatRoom.ANONYMOUS_PARTICIPANT = mega.BID;
 ChatRoom.ARCHIVED = 0x01;
 ChatRoom.TOPIC_MAX_LENGTH = 30;
+ChatRoom.SCHEDULED_MEETINGS_INTERVAL = 1.8e6; /* 30 minutes */
 
 ChatRoom.MembersSet = function(chatRoom) {
     this.chatRoom = chatRoom;
@@ -1032,29 +1034,37 @@ ChatRoom.prototype.getParticipantsTruncated = function(maxMembers = 5, maxLength
 };
 
 /**
- * Get room title
+ * getRoomTitle
+ * @description Returns the room's topic in i) formatted form if available; alternatively, falls back to
+ * ii) list of participants or iii) room's creation date.
  *
- * @param {Boolean} [ignoreTopic] ignore the topic and just return member names
- * @param {Boolean} [encapsTopicInQuotes] add quotes for the returned topic
- * @returns {string}
+ * ex.:
+ * i)  `MEGA meeting`
+ * ii) `Chat created on DD/MM/YYYY, HH:MM:SS`
+ * iii) `Participant A, Participant B, Participant c, ...`
+ *
+ * @return {string} Formatted room title
  */
-ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
-    var self = this;
-    var participants;
-    if (self.type === "private") {
-        participants = self.getParticipantsExceptMe();
-        return M.getNameByHandle(participants[0]) || "";
-    }
-    else {
-        if (!ignoreTopic && self.topic && self.topic.substr) {
-            return (encapsTopicInQuotes ? '"' : "") + self.getTruncatedRoomTopic() + (encapsTopicInQuotes ? '"' : "");
-        }
 
-        var names = self.getParticipantsTruncated();
-        var def = l[19077].replace('%s1', new Date(self.ctime * 1000).toLocaleString());
+ChatRoom.prototype.getRoomTitle = function() {
+    const formattedDate =
+        l[19077 /* `Chat created on %s1` */].replace('%s1', new Date(this.ctime * 1000).toLocaleString());
 
-        return names.length > 0 ? names : def;
+    // 1-on-1 chat -> use other participant's name as a topic
+    if (this.type === 'private') {
+        const participants = this.getParticipantsExceptMe();
+        return participants && Array.isArray(participants) ? M.getNameByHandle(participants[0]) : formattedDate;
     }
+
+    // No topic set -> list the participant names or if there aren't any fallback to the room creation date
+    if (this.topic === '' || !this.topic) {
+        return this.getParticipantsTruncated() || formattedDate;
+    }
+
+    // Public chat -> formatted room topic, incl. appended `(canceled)` label for canceled scheduled meetings
+    const formattedTopic = this.getTruncatedRoomTopic();
+    const isCanceled = this.scheduledMeeting && this.scheduledMeeting.isCanceled;
+    return isCanceled ? `${formattedTopic} ${l.canceled_meeting}` : formattedTopic;
 };
 
 /**
@@ -1242,13 +1252,18 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
 
 /**
  * Create a public handle of a chat
- * @param [d] {boolean|undefined} if d is specified, then it will delete the public chat link.
- * @param [callback] {function} call back function.
+ * @param {boolean|undefined} [d]  if d is specified, then it will delete the public chat link.
+ * @param {boolean|undefined} [cim]  create chat link if missing
+ * @param {function} [callback] call back function.
+ * @return {void}
  */
-ChatRoom.prototype.updatePublicHandle = function(d, callback) {
-    var self = this;
+ChatRoom.prototype.updatePublicHandle = function(d, cim, callback) {
+    return megaChat.plugins.chatdIntegration.updateChatPublicHandle(this.chatId, d, cim, callback);
+};
 
-    return megaChat.plugins.chatdIntegration.updateChatPublicHandle(self.chatId, d, callback);
+// [...] TODO: add documentation
+ChatRoom.prototype.getPublicLink = function(callback) {
+    return this.publicLink || this.updatePublicHandle(false, false, callback);
 };
 
 
@@ -2084,13 +2099,13 @@ ChatRoom.prototype.endCallForAll = function(callId) {
     }
 };
 
-ChatRoom.prototype.startAudioCall = function() {
-    return this.startCall(true, false);
+ChatRoom.prototype.startAudioCall = function(scheduled) {
+    return this.startCall(true, false, scheduled);
 };
-ChatRoom.prototype.startVideoCall = function() {
-    return this.startCall(true, true);
+ChatRoom.prototype.startVideoCall = function(scheduled) {
+    return this.startCall(true, true, scheduled);
 };
-ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio, video) {
+ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio, video, scheduled) {
     if (!megaChat.hasSupportForCalls || this.meetingsLoading) {
         return;
     }
@@ -2106,7 +2121,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
 
     this.meetingsLoading = l.starting /* `Starting` */;
 
-    const opts = {'a': 'mcms', 'cid': this.chatId};
+    const opts = { a: 'mcms', cid: this.chatId, sm: scheduled && this.scheduledMeeting && this.scheduledMeeting.id };
     if (localStorage.sfuId) {
         opts.sfu = parseInt(localStorage.sfuId, 10);
     }

@@ -120,6 +120,31 @@ function localeImages(scope) {
 
 /**
  * Set Date time object for time2date
+ *
+ * Examples by format value (NZ locale all made on Monday, 3 October 2022):
+ * 1:       3/10/2022
+ * 2:       3 October 2022
+ * 3:       October 2022
+ * 4:       Monday, 3 October 2022
+ * 5:       Monday, 3 October 2022 at 10:30:00 NZDT
+ * 6:       Oct 2022
+ * 7:       3 October 2022
+ * 8:       3 October 2022
+ * 9:       3 October 2022
+ * 10:      Mon
+ * 11:      Monday
+ * 12:      Oct
+ * 13:      October
+ * 14:      2022
+ * 15:      3 Oct
+ * 16:      3
+ * 17:      3/10/22
+ * 18:      3 Oct 2022
+ * 19:      Mon, 3 Oct
+ * 20:      Mon, 3 Oct 2022
+ * 21:      13:30
+ * 22:      1:30 pm
+ *
  * @param {String} locales Locale string
  * @param {Number} format format number for the case.
  */
@@ -180,11 +205,27 @@ function setDateTimeFormat(locales, format) {
                 options.day = 'numeric';
                 break;
             case 18:
+                options.day = 'numeric';
+                options.month = 'short';
+                options.year = 'numeric';
+                break;
+            case 19:
+                options.weekday = 'short';
+                options.day = 'numeric';
+                options.month = 'long';
+                break;
+            case 20:
+                options.weekday = 'short';
+                options.day = 'numeric';
+                options.month = 'long';
+                options.year = 'numeric';
+                break;
+            case 21:
                 options.hourCycle = 'h23';
                 options.hour = 'numeric';
                 options.minute = 'numeric';
                 break;
-            case 19:
+            case 22:
                 options.hourCycle = undefined;
                 options.hour = 'numeric';
                 options.minute = 'numeric';
@@ -236,7 +277,7 @@ function setDateTimeFormat(locales, format) {
  *       13: January (Only month long version)
  *       14: 2021 (Only year)
  *       15: dd mm (Date format with short month and without time and year)
- *       16: yyyy (Only year)
+ *       16: dd (Only day)
  */
 function time2date(unixTime, format) {
     'use strict';
@@ -928,17 +969,18 @@ function getTimeMarker(unixtime, verbose) {
 /**
  * Returns formatted time string for the given timestamp. The format used is based on the user's locale and selected
  * settings, e.g. ISO formatting. Use `HH h MM` format for French locales.
- * @param {Number} unixtime
+ * @param {Number} unixtime UNIX timestamp, either in milliseconds or seconds.
  * @returns {String}
  */
 
 function toLocaleTime(unixtime) {
     'use strict';
+    unixtime = Math.abs(Date.now() - unixtime) < Math.abs(Date.now() - unixtime * 1000) ? unixtime / 1000 : unixtime;
     const { locales, country } = getCountryAndLocales();
     if (fmconfig.uidateformat || country === 'ISO') {
-        return time2date(unixtime, 18);
+        return time2date(unixtime, 21);
     }
-    return locales.startsWith('fr') ? time2date(unixtime, 19).replace(':', ' h ') : time2date(unixtime, 19);
+    return locales.startsWith('fr') ? time2date(unixtime, 22).replace(':', ' h ') : time2date(unixtime, 22);
 }
 
 //----------------------------------------------------------------------------

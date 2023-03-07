@@ -73,6 +73,12 @@
     text-overflow: ellipsis;
     overflow: hidden;
 }
+.chat-topic-text i.icon-repeat {
+    margin: 0 0 0 8px;
+    line-height: 18px;
+    --icon-size: 20px;
+    --mask-color: var(--icon-rest);
+}
 .chat-topic-text span.small {
     font: var(--text-body2);
     color: var(--text-color-medium);
@@ -1222,3 +1228,107 @@ body.theme-dark .message .audio-player {
     --icon-size: 20px;
     --mask-color: var(--icon-rest);
 }
+
+.message.schedule-message .body-block {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    position: relative;
+}
+
+.message.schedule-message .schedule-detail-block {
+    background: var(--surface-grey-1);
+    border: solid 1px var(--surface-grey-2);
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    padding: 20px 24px;
+    position: relative;
+}
+
+.message.schedule-message .schedule-detail-block div {
+    flex: 1;
+}
+
+.message.schedule-message .schedule-detail-block .schedule-meeting-title {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+    max-width: 50%;
+}
+
+.message.schedule-message .schedule-detail-block .schedule-calendar-icon {
+    background: var(--surface-main);
+    border-top: solid 6px var(--secondary-red);
+    border-radius: 7px;
+    box-sizing: border-box;
+    color: var(--text-color-high);
+    flex: 0 0 52px;
+    height: 52px;
+    margin-right: 24px;
+    text-align: center;
+}
+
+.message.schedule-message .schedule-calendar-icon .schedule-date {
+    font: var(--text-h2);
+    line-height: 20px;
+    margin-top: 6px;
+}
+
+.message.schedule-message .schedule-calendar-icon .schedule-month {
+    font: var(--text-body2);
+}
+
+.message.schedule-message .schedule-detail-block .schedule-detail-main {
+    flex: 1;
+}
+
+.message.schedule-message .schedule-detail-block .schedule-timing-block {
+    max-width: 45%;
+}
+
+.message.schedule-message .schedule-timing-block s {
+    display: block;
+}
+
+.message.schedule-message .schedule-detail-block button {
+    align-self: flex-end;
+    margin: auto 0;
+}
+
+.message.schedule-message .schedule-description {
+    margin-top: 8px;
+}
+
+.message.schedule-message .schedule-meeting-link {
+    background: var(--surface-grey-2);
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+    padding: 10px 0 10px 16px;
+    position: relative;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.message.schedule-message .schedule-meeting-link span {
+    color: var(--text-color-high);
+    font: var(--text-body1);
+}
+
+.message.schedule-message .schedule-meeting-link button {
+    --height: 40px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.message.schedule-message .schedule-meeting-link button span {
+    color: var(--text-green);
+}
+
+.message.schedule-message .schedule-meeting-link + span {
+    color: var(--text-color-low);
+    display: block;
+    margin-top: 8px;
+}
+

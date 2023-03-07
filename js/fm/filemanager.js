@@ -238,6 +238,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'onboardingDialog'
             || $.dialog === 'stripe-pay'
             || $.dialog === 'start-meeting-dialog'
+            || $.dialog === 'meetings-schedule-dialog'
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {
 
@@ -2839,7 +2840,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             topMenu(1);
         }
         else if (e.keyCode == 27 && $.dialog) {
-            if ($.dialog === 'share-add' || $.dialog === 'share') {
+            if ($.dialog === 'share-add' || $.dialog === 'share' || $.dialog === 'meetings-schedule-dialog') {
                 return false;
             }
             closeDialog();

@@ -1,17 +1,16 @@
 import React from 'react';
 import utils, { Emoji, ParsedHTML } from './../../ui/utils.jsx';
-import {MegaRenderMixin, timing} from '../mixins.js';
-import {Button} from '../../ui/buttons.jsx';
+import { MegaRenderMixin, timing } from '../mixins.js';
+import { Button } from '../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 import CloudBrowserModalDialog from './../../ui/cloudBrowserModalDialog.jsx';
 import { HistoryRetentionDialog } from '../../ui/historyRetentionDialog.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 import { ContactCard, ContactPickerDialog, MembersAmount } from './contacts.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
-import { Accordion } from '../../ui/accordion.jsx';
-import { AccordionPanel } from '../../ui/accordion.jsx';
+import { Accordion, AccordionPanel } from '../../ui/accordion.jsx';
 import { ParticipantsList } from './participantsList.jsx';
-import GenericConversationMessage  from './messages/generic.jsx';
+import GenericConversationMessage from './messages/generic.jsx';
 import { SharedFilesAccordionPanel } from './sharedFilesAccordionPanel.jsx';
 import { IncSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
 import { ChatlinkDialog } from './chatlinkDialog.jsx';
@@ -21,7 +20,9 @@ import HistoryPanel from "./historyPanel.jsx";
 import ComposedTextArea from "./composedTextArea.jsx";
 import Loading from "./meetings/workflow/loading.jsx";
 import Join from "./meetings/workflow/join.jsx";
-import Alert from './meetings/workflow/alert';
+import Alert from './meetings/workflow/alert.jsx';
+import { isSameDay, isToday, isTomorrow } from './meetings/schedule/helpers.jsx';
+import { Edit } from './meetings/schedule/recurring.jsx';
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -132,6 +133,28 @@ class EndCallButton extends MegaRenderMixin {
     }
 }
 
+class StartMeetingNotification extends MegaRenderMixin {
+    customIsEventuallyVisible() {
+        return this.props.chatRoom.isCurrentlyActive;
+    }
+
+    render() {
+        const { chatRoom, onStartCall } = this.props;
+
+        if (chatRoom.activeCall || !megaChat.hasSupportForCalls) {
+            return null;
+        }
+
+        return (
+            <div
+                className="in-call-notif neutral start"
+                onClick={() => onStartCall(Call.TYPE.AUDIO)}>
+                <button className="mega-button positive small">{l.schedule_start_aot}</button>
+            </div>
+        );
+    }
+}
+
 export class JoinCallNotification extends MegaRenderMixin {
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
@@ -191,10 +214,173 @@ export const excludedParticipants = (room) => {
     return excParticipants;
 };
 
+class Occurrences extends MegaRenderMixin {
+    loadingMore = false;
+
+    state = {
+        editDialog: false,
+        occurrenceId: undefined
+    };
+
+    loadOccurrences() {
+        if (!this.loadingMore) {
+            const { scheduledMeeting, occurrences } = this.props;
+            const occurrenceItems = Object.values(occurrences || {});
+            const lastOccurrence = occurrenceItems[occurrenceItems.length - 1];
+
+            if (lastOccurrence) {
+                this.loadingMore = true;
+                scheduledMeeting.getOccurrences({ from: lastOccurrence.start })
+                    .catch(dump)
+                    .finally(() => {
+                        this.loadingMore = false;
+                    });
+            }
+        }
+    }
+
+    renderCancelConfirmation(occurrence) {
+        return (
+            msgDialog(
+                `confirmation:!^${l.cancel_meeting_occurrence_button}!${l.schedule_cancel_abort}`,
+                'cancel-occurrence',
+                l.schedule_cancel_occur_dlg_title,
+                l.schedule_cancel_occur_dlg_text,
+                cb => cb && occurrence.cancel(),
+                1
+            )
+        );
+    }
+
+    renderLoading() {
+        return (
+            <div className="loading-sketch">
+                {Array.from({ length: 10 }, (el, i) => {
+                    return (
+                        <div
+                            key={i}
+                            className="chat-occurrence">
+                            <div className="chat-occurrence-date" />
+                            <div className="chat-occurrence-content">
+                                <div className="chat-occurrence-title" />
+                                <div className="chat-occurrence-time" />
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    }
+
+    renderOccurrences() {
+        const { chatRoom, occurrences, occurrencesLoading, scheduledMeeting } = this.props;
+
+        if (occurrencesLoading) {
+            return this.renderLoading();
+        }
+
+        if (occurrences && occurrences.length > 0) {
+            const sortedOccurrences = Object.values(occurrences).sort((a, b) => a.start - b.start);
+            return (
+                <>
+                    {sortedOccurrences.map(occurrence =>
+                        occurrence.isUpcoming ?
+                            <div
+                                key={occurrence.uid}
+                                className={`
+                                    chat-occurrence
+                                    ${occurrence.uid}
+                                `}>
+                                <div className="chat-occurrence-date">
+                                    {isToday(occurrence.start) && <span>{l.today_occurrence_label} -</span>}
+                                    {isTomorrow(occurrence.start) && <span>{l.tomorrow_occurrence_label} -</span>}
+                                    <span>{time2date(occurrence.start / 1000, 19)}</span>
+                                </div>
+                                <div className="chat-occurrence-content">
+                                    <div className="chat-occurrence-title">{scheduledMeeting.title}</div>
+                                    <div className="chat-occurrence-time">
+                                        {toLocaleTime(occurrence.start)} -
+                                        &nbsp;
+                                        {toLocaleTime(occurrence.end)}
+                                    </div>
+                                    {chatRoom.iAmOperator() &&
+                                        <div className="chat-occurrence-controls">
+                                            <div
+                                                className="chat-occurrence-control simpletip"
+                                                data-simpletip={l[1342]}
+                                                data-simpletipposition="top"
+                                                data-simpletipoffset="5">
+                                                <Button
+                                                    icon="sprite-fm-mono icon-rename"
+                                                    onClick={() => {
+                                                        this.setState({
+                                                            editDialog: true,
+                                                            occurrenceId: occurrence.uid
+                                                        });
+                                                    }}
+                                                />
+                                            </div>
+                                            <div
+                                                className="chat-occurrence-control simpletip"
+                                                data-simpletip={l[82]}
+                                                data-simpletipposition="top"
+                                                data-simpletipoffset="5">
+                                                <Button
+                                                    icon="sprite-fm-mono icon-bin"
+                                                    onClick={() => this.renderCancelConfirmation(occurrence)}
+                                                />
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div> :
+                            null
+                    )}
+                </>
+            );
+        }
+
+        return <span>{l.no_occurrences_remain}</span>;
+    }
+
+    render() {
+        const { chatRoom, scheduledMeeting } = this.props;
+        const { editDialog, occurrenceId } = this.state;
+
+        return (
+            <>
+                <div className="chat-occurrences-list">
+                    <PerfectScrollbar
+                        chatRoom={chatRoom}
+                        ref={ref => {
+                            this.contactsListScroll = ref;
+                        }}
+                        disableCheckingVisibility={true}
+                        onUserScroll={ps => ps.isCloseToBottom(30) && this.loadOccurrences()}
+                        isVisible={this.isCurrentlyActive}
+                        options={{ suppressScrollX: true }}>
+                        <div className="chat-occurrences-list-inner">{this.renderOccurrences()}</div>
+                    </PerfectScrollbar>
+                </div>
+                {editDialog &&
+                    <Edit
+                        chatRoom={chatRoom}
+                        scheduledMeeting={scheduledMeeting}
+                        occurrenceId={occurrenceId}
+                        onClose={() => {
+                            this.setState({ editDialog: false });
+                        }}
+                    />
+                }
+            </>
+        );
+    }
+}
+
 export class ConversationRightArea extends MegaRenderMixin {
     static defaultProps = {
         'requiresUpdateOnResize': true
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -209,9 +395,47 @@ export class ConversationRightArea extends MegaRenderMixin {
         chatRoom.setRetention(retentionTime);
         $(document).trigger('closeDropdowns');
     }
+
+    cancelScheduledMeeting() {
+        const { chatRoom } = this.props;
+        const { scheduledMeeting, chatId } = chatRoom;
+
+        if (scheduledMeeting) {
+            const doCancel = () => megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, chatId);
+            return (
+                scheduledMeeting.isRecurring ?
+                    msgDialog(
+                        `confirmation:!^${l.cancel_meeting_series_button}!${l.schedule_cancel_abort}`,
+                        null,
+                        l.schedule_cancel_series_dlg_title,
+                        l.schedule_cancel_series_dlg_text,
+                        cb => cb && doCancel(),
+                        1
+                    ) :
+                    msgDialog(
+                        `confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`,
+                        null,
+                        l.schedule_cancel_dlg_title,
+                        l.schedule_cancel_dlg_text,
+                        cb => cb && doCancel(),
+                        1
+                    )
+            );
+        }
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => {
+            if (this.isMounted()) {
+                this.safeForceUpdate();
+            }
+        });
+    }
+
     render() {
         const self = this;
-        const { chatRoom: room, onStartCall } = self.props;
+        const { chatRoom: room, onStartCall, occurrencesLoading } = self.props;
 
         if (!room || !room.roomId) {
             // destroyed
@@ -359,7 +583,8 @@ export class ConversationRightArea extends MegaRenderMixin {
         // Push notification settings
         // ----------------------------------------------------------------------
 
-        const { pushSettingsValue, onPushSettingsToggled, onPushSettingsClicked } = this.props;
+        const { pushSettingsValue, onPushSettingsToggled, onPushSettingsClicked, onShowScheduledDescription }
+            = this.props;
         const pushSettingsIcon = pushSettingsValue || pushSettingsValue === 0 ?
             'icon-notification-off-filled' :
             'icon-notification-filled';
@@ -492,13 +717,10 @@ export class ConversationRightArea extends MegaRenderMixin {
             }
         </Button>;
 
-        var expandedPanel = {};
-        if (room.type === "group" || room.type === "public") {
-            expandedPanel['participants'] = true;
-        }
-        else {
-            expandedPanel['options'] = true;
-        }
+        const MEMBERS_LIMITED = Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE;
+        const { scheduledMeeting, isMeeting } = room;
+        const { isRecurring, isUpcoming, occurrences } = scheduledMeeting || {};
+
         /* `Archive chat/meeting` */
         let archiveText = room.isMeeting ? l.archive_meeting_btn : l[16689];
         if (room.isArchived()) {
@@ -506,280 +728,375 @@ export class ConversationRightArea extends MegaRenderMixin {
             archiveText = room.isMeeting ? l.unarchive_meeting_btn : l[19065];
         }
 
-        return <div className="chat-right-area">
-            <PerfectScrollbar
-                className="chat-right-area conversation-details-scroll"
-                options={{
-                    'suppressScrollX': true
-                }}
-                ref={function(ref) {
-                    self.rightScroll = ref;
-                }}
-                triggerGlobalResize={true}
-                isVisible={self.props.chatRoom.isCurrentlyActive}
-                chatRoom={self.props.chatRoom}>
-                <div
-                    className={`
-                        chat-right-pad
-                        ${room.haveActiveCall() ? 'in-call' : ''}
-                    `}>
-                    <Accordion
-                        {...this.state}
-                        chatRoom={room}
-                        onToggle={SoonFc(20, function() {
-                            // wait for animations.
-                            if (self.rightScroll) {
-                                self.rightScroll.reinitialise();
-                            }
-                            if (self.participantsListRef) {
-                                self.participantsListRef.safeForceUpdate();
-                            }
-                        })}
-                        expandedPanel={expandedPanel}
-                    >
-                        {participantsList ? <AccordionPanel className="small-pad" title={l[8876]}
-                            chatRoom={room} key="participants">
-                            {participantsList}
-                        </AccordionPanel> : null}
-                        {room.type === "public" && room.observers > 0 ? <div className="accordion-text observers">
-                            {l[20466]}
-                            <span className="observers-count">
-                                <i className="sprite-fm-mono icon-eye-reveal" />
-                                {room.observers}
-                            </span>
-                        </div> : <div></div>}
-
-                        <AccordionPanel
-                            key="options"
-                            className="have-animation buttons"
-                            title={l[7537]}
+        return (
+            <div className="chat-right-area">
+                <PerfectScrollbar
+                    className="chat-right-area conversation-details-scroll"
+                    options={{ 'suppressScrollX': true }}
+                    ref={ref => {
+                        this.rightScroll = ref;
+                    }}
+                    triggerGlobalResize={true}
+                    isVisible={room.isCurrentlyActive}
+                    chatRoom={room}>
+                    <div
+                        className={`
+                            chat-right-pad
+                            ${room.haveActiveCall() ? 'in-call' : ''}
+                        `}>
+                        <Accordion
+                            {...this.state}
                             chatRoom={room}
-                            sfuClient={window.sfuClient}>
-                            <div>
-                            {addParticipantBtn}
-                            {startAudioCallButton}
-                            {startVideoCallButton}
-                                <EndCallButton
-                                    call={room.havePendingGroupCall() || room.haveActiveCall()}
+                            onToggle={SoonFc(20, () => {
+                                // wait for animations.
+                                if (this.rightScroll) {
+                                    this.rightScroll.reinitialise();
+                                }
+                                if (this.participantsListRef) {
+                                    this.participantsListRef.safeForceUpdate();
+                                }
+                            })}
+                            expandedPanel={{
+                                // [...] TODO: refactor
+                                // Group chat -> `Chat Participants` expanded by default
+                                participants: (room.type === 'group' || room.type === 'public') && !isMeeting,
+                                // 1-on-1 chat or meeting -> default to `Options`
+                                options: room.type === 'private' || (isMeeting && !isRecurring),
+                                // Scheduled meeting (recurring)
+                                occurrences: isMeeting && scheduledMeeting && isRecurring
+                            }}>
+                            {participantsList ?
+                                <AccordionPanel
+                                    className="small-pad"
+                                    title={l[8876]}
                                     chatRoom={room}
-                                />
-                            {
-                                room.type == "group" || room.type == "public" ?
-                                (
-                                    <div className={renameButtonClass}
-                                         onClick={(e) => {
-                                             if ($(e.target).closest('.disabled').length > 0) {
-                                                 return false;
-                                             }
-                                             if (self.props.onRenameClicked) {
-                                                self.props.onRenameClicked();
-                                             }
-                                    }}>
-                                        <i className="sprite-fm-mono icon-rename"></i>
-                                        <span>{l[9080]}</span>
-                                    </div>
-                                ) : null
+                                    key="participants">
+                                    {participantsList}
+                                </AccordionPanel> :
+                                null
                             }
-                            {
-                                room.type === "public" ?
-                                    (
+                            {room.type === 'public' && room.observers > 0 ?
+                                <div className="accordion-text observers">
+                                    {l[20466] /* `Observers` */}
+                                    <span className="observers-count">
+                                        <i className="sprite-fm-mono icon-eye-reveal"/>
+                                        {room.observers}
+                                    </span>
+                                </div> :
+                                <div/>
+                            }
+
+                            {isRecurring && isUpcoming &&
+                                <AccordionPanel
+                                    key="occurrences"
+                                    className="chat-occurrences-panel"
+                                    title={l.occurrences_heading}
+                                    chatRoom={room}
+                                    scheduledMeeting={scheduledMeeting}
+                                    occurrences={occurrences}>
+                                    <Occurrences
+                                        chatRoom={room}
+                                        scheduledMeeting={scheduledMeeting}
+                                        occurrences={occurrences}
+                                        occurrencesLoading={occurrencesLoading}
+                                    />
+                                </AccordionPanel>
+                            }
+
+                            <AccordionPanel
+                                key="options"
+                                className="have-animation buttons"
+                                title={l[7537]}
+                                chatRoom={room}
+                                sfuClient={window.sfuClient}>
+                                <>
+                                    {addParticipantBtn}
+                                    {startAudioCallButton}
+                                    {startVideoCallButton}
+                                    <EndCallButton
+                                        call={room.havePendingGroupCall() || room.haveActiveCall()}
+                                        chatRoom={room}
+                                    />
+                                    {scheduledMeeting && <div
+                                        className={`
+                                            link-button light schedule-view-desc
+                                            ${room.isReadOnly() || !scheduledMeeting.description ? 'disabled' : ''}
+                                        `}
+                                        onClick={() => {
+                                            if (!room.isReadOnly() && scheduledMeeting.description) {
+                                                onShowScheduledDescription();
+                                            }
+                                        }}>
+                                        <i className="sprite-fm-mono icon-description" />
+                                        <span>{l.schedule_view_desc /* `View description` */}</span>
+                                    </div>}
+                                    {(room.type === 'group' || room.type === 'public') && !scheduledMeeting ?
+                                        <div
+                                            className={renameButtonClass}
+                                            onClick={(e) => {
+                                                if ($(e.target).closest('.disabled').length > 0) {
+                                                    return false;
+                                                }
+                                                if (this.props.onRenameClicked) {
+                                                    this.props.onRenameClicked();
+                                                }
+                                            }}>
+                                            <i className="sprite-fm-mono icon-rename"/>
+                                            <span>{l[9080] /* `Rename group` */}</span>
+                                        </div> :
+                                        null
+                                    }
+                                    {scheduledMeeting ?
+                                        <div
+                                            className={`
+                                                link-button
+                                                light
+                                                ${room.iAmOperator() ? '' : 'disabled'}
+                                            `}
+                                            onClick={() => {
+                                                const { plugins } = megaChat;
+                                                return room.iAmOperator() ?
+                                                    megaChat.trigger(plugins.meetingsManager.EVENTS.EDIT, room) :
+                                                    null;
+                                            }}>
+                                            <i className="sprite-fm-mono icon-rename"/>
+                                            {scheduledMeeting.isRecurring ?
+                                                <span>{l.edit_meeting_series_button /* `Edit entire series` */}</span> :
+                                                <span>{l.edit_meeting_button /* `Edit meeting` */}</span>}
+                                        </div> :
+                                        null
+                                    }
+                                    {room.type === "public" ?
                                         <div
                                             className={getChatLinkClass}
                                             onClick={e => {
                                                 if ($(e.target).closest('.disabled').length > 0) {
                                                     return false;
                                                 }
-                                                self.props.onGetManageChatLinkClicked();
+                                                this.props.onGetManageChatLinkClicked();
                                             }}>
                                             <i className="sprite-fm-mono icon-link-filled"/>
-                                            <span>{l[20481] /* `Get chat link` */}</span>
-                                        </div>
-                                    ) : null
-                            }
-                            {
-                                !room.membersSetFromApi.members.hasOwnProperty(u_handle) &&
-                                room.type === "public" && !is_chatlink &&
-                                room.publicChatHandle && room.publicChatKey ?
-                                    (
-                                        <div className="link-button light"
-                                             onClick={(e) => {
-                                                 if ($(e.target).closest('.disabled').length > 0) {
-                                                     return false;
-                                                 }
-
-                                                 self.props.onJoinViaPublicLinkClicked();
-                                             }}>
-                                            <i className="sprite-fm-mono icon-rename"></i>
-                                            <span>{l[20597]}</span>
-                                        </div>
-                                    ) : null
-                            }
-
-                            {AVseperator}
-                            <Button
-                                className="link-button light dropdown-element"
-                                icon="sprite-fm-mono icon-upload-filled"
-                                label={l[23753]}
-                                disabled={room.isReadOnly()}
-                                >
-                                <Dropdown
-                                    className="wide-dropdown send-files-selector light"
-                                    noArrow="true"
-                                    vertOffset={4}
-                                    onClick={() => {}}
-                                >
-                                    <div className="dropdown info-txt">
-                                        {l[23753] ? l[23753] : "Send..."}
-                                    </div>
-                                    <DropdownItem
-                                        className="link-button"
-                                        icon="sprite-fm-mono icon-cloud-drive"
-                                        label={l[19794] ? l[19794] : "My Cloud Drive"}
-                                        disabled={mega.paywall}
-                                        onClick={() => {
-                                            self.props.onAttachFromCloudClicked();
-                                        }} />
-                                    <DropdownItem
-                                        className="link-button"
-                                        icon="sprite-fm-mono icon-session-history"
-                                        label={l[19795] ? l[19795] : "My computer"}
-                                        disabled={mega.paywall}
-                                        onClick={() => {
-                                            self.props.onAttachFromComputerClicked();
-                                        }} />
-                                </Dropdown>
-                            </Button>
-
-                            {pushSettingsBtn}
-                                {openInviteBtn}
-
-                            <Button
-                                className="link-button light clear-history-button"
-                                disabled={dontShowTruncateButton || !room.members.hasOwnProperty(u_handle)}
-                                onClick={() => {
-                                    if (self.props.onTruncateClicked) {
-                                        self.props.onTruncateClicked();
+                                            <span>
+                                                {/* `Share meeting` || `Get chat link` */}
+                                                {scheduledMeeting ? l.share_meeting_button : l[20481]}
+                                            </span>
+                                        </div> :
+                                        null
                                     }
-                                }}>
-                                <i className="sprite-fm-mono icon-remove" />
-                                <span className="accordion-clear-history-text">{l[8871] /* Clear Chat History */}</span>
-                            </Button>
-
-                                {retentionHistoryBtn}
-
-                            {
-                                (room.iAmOperator() && (room.type === "public")) ?
-                                    (
-                                        <div className="chat-enable-key-rotation-paragraph">
-                                            {AVseperator}
-                                            <div className={
-                                                "link-button light " +
-                                                (Object.keys(room.members).length > MAX_USERS_CHAT_PRIVATE ?
-                                                    " disabled" : "")
-                                            }
-                                            onClick={(e) => {
-                                                if (
-                                                    Object.keys(room.members).length >
-                                                    MAX_USERS_CHAT_PRIVATE ||
-                                                    $(e.target).closest('.disabled').length > 0
-                                                ) {
-                                                    return false;
+                                    {scheduledMeeting ?
+                                        <div
+                                            className={`
+                                                link-button
+                                                light
+                                                ${room.iAmOperator() && !scheduledMeeting.canceled ? '' : 'disabled'}
+                                            `}
+                                            onClick={() => {
+                                                if (room.iAmOperator() && !scheduledMeeting.canceled) {
+                                                    this.cancelScheduledMeeting();
                                                 }
-                                                self.props.onMakePrivateClicked();
                                             }}>
-                                                <i className="sprite-fm-mono icon-key" />
-                                                <span>{l[20623]}</span>
-                                            </div>
-                                            <p>
-                                                <span>{l[20454]}</span>
-                                            </p>
-                                        </div>
-                                    ) : null
-                            }
-
-                            {AVseperator}
-                            {
-                                <div
-                                    className={`
-                                        link-button
-                                        light
-                                        ${(room.members.hasOwnProperty(u_handle) || room.state === ChatRoom.STATE.LEFT)
-                                        && !is_chatlink ? '' : 'disabled'}
-                                    `}
-                                    onClick={(e) => {
-                                        if ($(e.target).closest('.disabled').length > 0) {
-                                            return false;
-                                        }
-                                        if (room.isArchived()) {
-                                            if (self.props.onUnarchiveClicked) {
-                                                self.props.onUnarchiveClicked();
-                                            }
-                                        }
-                                        else if (self.props.onArchiveClicked) {
-                                            self.props.onArchiveClicked();
-                                        }
-                                    }}>
-                                    <i
-                                        className={`
-                                            sprite-fm-mono
-                                            ${room.isArchived() ? 'icon-unarchive' : 'icon-archive'}
-                                        `}
-                                    />
-                                    <span>{archiveText}</span>
-                                </div>
-                            }
-                            {
-                                room.type !== "private" ? (
-                                    <div
-                                        className={`
-                                            link-button
-                                            light
-                                            ${room.type !== "private" && !is_chatlink &&
-                                            room.membersSetFromApi.members.hasOwnProperty(u_handle) &&
-                                            room.membersSetFromApi.members[u_handle] !== -1 &&
-                                            !room.activeCall ? '' : 'disabled'}
-                                        `}
-                                        onClick={(e) => {
-                                            if ($(e.target).closest('.disabled').length > 0) {
-                                                return false;
-                                            }
-                                            if (self.props.onLeaveClicked) {
-                                                self.props.onLeaveClicked();
+                                            <i className="sprite-fm-mono icon-bin-filled"/>
+                                            {scheduledMeeting.isRecurring ?
+                                                <span>
+                                                    {l.cancel_meeting_series_button /* `Cancel entire series` */}
+                                                </span> :
+                                                <span>{l.cancel_meeting_button /* `Cancel meeting` */}</span>}
+                                        </div> :
+                                        null
+                                    }
+                                    {
+                                        !room.membersSetFromApi.members.hasOwnProperty(u_handle) &&
+                                        room.type === 'public' &&
+                                        !is_chatlink &&
+                                        room.publicChatHandle &&
+                                        room.publicChatKey ?
+                                            <div
+                                                className="link-button light"
+                                                onClick={(e) => {
+                                                    if ($(e.target).closest('.disabled').length > 0) {
+                                                        return false;
+                                                    }
+                                                    this.props.onJoinViaPublicLinkClicked();
+                                                }}>
+                                                <i className="sprite-fm-mono icon-rename"/>
+                                                <span>{l[20597] /* `Join Group` */}</span>
+                                            </div> :
+                                            null
+                                    }
+                                    {scheduledMeeting ?
+                                        null :
+                                        <>
+                                            {AVseperator}
+                                            <Button
+                                                className="link-button light dropdown-element"
+                                                icon="sprite-fm-mono icon-upload-filled"
+                                                label={l[23753]}
+                                                disabled={room.isReadOnly()}>
+                                                <Dropdown
+                                                    className="wide-dropdown send-files-selector light"
+                                                    noArrow="true"
+                                                    vertOffset={4}
+                                                    onClick={() => false}>
+                                                    <div className="dropdown info-txt">
+                                                        {l[23753] || 'Send...'}
+                                                    </div>
+                                                    <DropdownItem
+                                                        className="link-button"
+                                                        icon="sprite-fm-mono icon-cloud-drive"
+                                                        label={l[19794] || 'My Cloud Drive'}
+                                                        disabled={mega.paywall}
+                                                        onClick={() => {
+                                                            this.props.onAttachFromCloudClicked();
+                                                        }}
+                                                    />
+                                                    <DropdownItem
+                                                        className="link-button"
+                                                        icon="sprite-fm-mono icon-session-history"
+                                                        label={l[19795] || 'My computer'}
+                                                        disabled={mega.paywall}
+                                                        onClick={() => {
+                                                            this.props.onAttachFromComputerClicked();
+                                                        }}
+                                                    />
+                                                </Dropdown>
+                                            </Button>
+                                        </>
+                                    }
+                                    {pushSettingsBtn}
+                                    {openInviteBtn}
+                                    <Button
+                                        className="link-button light clear-history-button"
+                                        disabled={dontShowTruncateButton || !room.members.hasOwnProperty(u_handle)}
+                                        onClick={() => {
+                                            if (this.props.onTruncateClicked) {
+                                                this.props.onTruncateClicked();
                                             }
                                         }}>
-                                        <i className="sprite-fm-mono icon-disabled-filled"/>
-                                        <span>{l[8633]}</span>
-                                    </div>) : null
+                                        <i className="sprite-fm-mono icon-remove"/>
+                                        <span className="accordion-clear-history-text">
+                                            {l[8871] /* Clear Chat History */}
+                                        </span>
+                                    </Button>
+                                    {retentionHistoryBtn}
+                                    {room.iAmOperator() && room.type === 'public' && !scheduledMeeting ?
+                                        <div className="chat-enable-key-rotation-paragraph">
+                                            {AVseperator}
+                                            <div
+                                                className={`
+                                                    link-button
+                                                    light
+                                                    ${MEMBERS_LIMITED ? 'disabled' : ''}
+                                                `}
+                                                onClick={(e) => {
+                                                    if (
+                                                        MEMBERS_LIMITED ||
+                                                        $(e.target).closest('.disabled').length > 0
+                                                    ) {
+                                                        return false;
+                                                    }
+                                                    this.props.onMakePrivateClicked();
+                                                }}>
+                                                <i className="sprite-fm-mono icon-key"/>
+                                                <span>{l[20623] /* `Enable key rotation` */}</span>
+                                            </div>
+                                            <p>
+                                                <span>{l[20454] /* `Encryption key rotation is slightly...` */}</span>
+                                            </p>
+                                        </div> :
+                                        null
+                                    }
+                                    {AVseperator}
+                                    {
+                                        <div
+                                            className={`
+                                                link-button
+                                                light
+                                                ${(room.members.hasOwnProperty(u_handle) ||
+                                                room.state === ChatRoom.STATE.LEFT) &&
+                                                !is_chatlink ? '' : 'disabled'}
+                                            `}
+                                            onClick={(e) => {
+                                                if ($(e.target).closest('.disabled').length > 0) {
+                                                    return false;
+                                                }
+                                                if (room.isArchived()) {
+                                                    if (this.props.onUnarchiveClicked) {
+                                                        this.props.onUnarchiveClicked();
+                                                    }
+                                                }
+                                                else if (this.props.onArchiveClicked) {
+                                                    this.props.onArchiveClicked();
+                                                }
+                                            }}>
+                                            <i
+                                                className={`
+                                                sprite-fm-mono
+                                                ${room.isArchived() ? 'icon-unarchive' : 'icon-archive'}
+                                            `}
+                                            />
+                                            <span>
+                                                {archiveText}
+                                            </span>
+                                        </div>
+                                    }
+                                    {
+                                        room.type !== 'private' ?
+                                            <div
+                                                className={`
+                                                    link-button
+                                                    light
+                                                    ${room.type !== 'private' && !is_chatlink &&
+                                                    room.membersSetFromApi.members.hasOwnProperty(u_handle) &&
+                                                    room.membersSetFromApi.members[u_handle] !== -1 &&
+                                                    !room.activeCall ? '' : 'disabled'}
+                                                `}
+                                                onClick={(e) => {
+                                                    if ($(e.target).closest('.disabled').length > 0) {
+                                                        return false;
+                                                    }
+                                                    if (self.props.onLeaveClicked) {
+                                                        self.props.onLeaveClicked();
+                                                    }
+                                                }}>
+                                                <i className="sprite-fm-mono icon-disabled-filled"/>
+                                                <span>{l[8633] /* `Leave Chat` */}</span>
+                                            </div> :
+                                            null
+                                    }
+                                </>
+                            </AccordionPanel>
+                            <SharedFilesAccordionPanel
+                                key="sharedFiles"
+                                title={l[19796] || 'Shared Files'}
+                                chatRoom={room}
+                                sharedFiles={room.messagesBuff.sharedFiles}
+                            />
+                            {room.type === "private" ?
+                                <IncSharesAccordionPanel key="incomingShares" title={l[5542]} chatRoom={room} /> :
+                                null
                             }
-                            </div>
-                        </AccordionPanel>
-                        <SharedFilesAccordionPanel key="sharedFiles" title={l[19796] ? l[19796] : "Shared Files"} chatRoom={room}
-                                                   sharedFiles={room.messagesBuff.sharedFiles} />
-                        {room.type === "private" ?
-                            <IncSharesAccordionPanel key="incomingShares" title={l[5542]} chatRoom={room} /> :
-                            null
-                        }
-                    </Accordion>
-                </div>
-            </PerfectScrollbar>
-            {this.state.contactPickerDialog && (
-                <ContactPickerDialog
-                    exclude={exParticipants}
-                    megaChat={room.megaChat}
-                    multiple={true}
-                    className="popup add-participant-selector"
-                    singleSelectedButtonLabel={l[8869] /* `Add to Group Conversation` */}
-                    multipleSelectedButtonLabel={l[8869] /* `Add to Group Conversation` */}
-                    nothingSelectedButtonLabel={l[8870] /* `Select one or more contacts to continue` */}
-                    onSelectDone={selected => {
-                        this.props.onAddParticipantSelected(selected);
-                        this.setState({contactPickerDialog: false});
-                    }}
-                    onClose={() => this.setState({contactPickerDialog: false})}
-                    selectFooter={true}
-                />
-            )}
-        </div>;
+                        </Accordion>
+                    </div>
+                </PerfectScrollbar>
+                {this.state.contactPickerDialog && (
+                    <ContactPickerDialog
+                        exclude={exParticipants}
+                        megaChat={room.megaChat}
+                        multiple={true}
+                        className="popup add-participant-selector"
+                        singleSelectedButtonLabel={l[8869] /* `Add to Group Conversation` */}
+                        multipleSelectedButtonLabel={l[8869] /* `Add to Group Conversation` */}
+                        nothingSelectedButtonLabel={l[8870] /* `Select one or more contacts to continue` */}
+                        onSelectDone={selected => {
+                            this.props.onAddParticipantSelected(selected);
+                            this.setState({contactPickerDialog: false});
+                        }}
+                        onClose={() => this.setState({contactPickerDialog: false})}
+                        selectFooter={true}
+                    />
+                )}
+            </div>
+        );
     }
 }
 
@@ -807,7 +1124,9 @@ export class ConversationPanel extends MegaRenderMixin {
         showHistoryRetentionDialog: false,
         setNonLoggedInJoinChatDlgTrue: null,
         hasInvalidKeys: null,
-        invalidKeysBanner: null
+        invalidKeysBanner: null,
+        descriptionDialog: false,
+        occurrencesLoading: false
     };
 
     constructor(props) {
@@ -816,6 +1135,7 @@ export class ConversationPanel extends MegaRenderMixin {
         const { chatRoom } = this.props;
         chatRoom.rebind(`openAttachCloudDialog.${this.getUniqueId()}`, () => this.openAttachCloudDialog());
         chatRoom.rebind(`openSendContactDialog.${this.getUniqueId()}`, () => this.openSendContactDialog());
+        chatRoom.rebind(`openSchedDescDialog.${this.getUniqueId()}`, () => this.openSchedDescDialog());
 
         this.handleKeyDown = SoonFc(120, (ev) => this._handleKeyDown(ev));
     }
@@ -830,6 +1150,10 @@ export class ConversationPanel extends MegaRenderMixin {
 
     openSendContactDialog() {
         this.setState({ 'sendContactDialog': true });
+    }
+
+    openSchedDescDialog() {
+        this.setState({ descriptionDialog: true });
     }
 
     @utils.SoonFcWrap(360)
@@ -858,14 +1182,37 @@ export class ConversationPanel extends MegaRenderMixin {
         return document.body.classList[Call.isExpanded() ? 'remove' : 'add'](EXPANDED_FLAG);
     }
 
-    startCall(type) {
+    startCall(type, scheduled) {
         const { chatRoom } = this.props;
 
         if (isStartCallDisabled(chatRoom)) {
             return false;
         }
 
-        return type === Call.TYPE.AUDIO ? chatRoom.startAudioCall() : chatRoom.startVideoCall();
+        return type === Call.TYPE.AUDIO ? chatRoom.startAudioCall(scheduled) : chatRoom.startVideoCall(scheduled);
+    }
+
+    renderUpcomingInfo() {
+        const { scheduledMeeting } = this.props.chatRoom;
+        if (scheduledMeeting) {
+            const { recurring, nextOccurrenceStart, nextOccurrenceEnd, isUpcoming } = scheduledMeeting;
+            const until = `${isSameDay(nextOccurrenceStart, nextOccurrenceEnd) ?
+                '' :
+                time2date(nextOccurrenceEnd / 1000, 4)} ${toLocaleTime(nextOccurrenceEnd)}`;
+
+            return (
+                <>
+                    {isUpcoming && recurring && <span>{l.next_meeting}</span>}
+                    <span>
+                        {(l.schedule_formatted_date || '%1 from %2 to %3')
+                            .replace('%1', time2date(nextOccurrenceStart / 1000, 4))
+                            .replace('%2', toLocaleTime(nextOccurrenceStart))
+                            .replace('%3', until)}
+                    </span>
+                </>
+            );
+        }
+        return null;
     }
 
     componentDidMount() {
@@ -945,6 +1292,12 @@ export class ConversationPanel extends MegaRenderMixin {
                 this.setState({ hasInvalidKeys, invalidKeysBanner: hasInvalidKeys }, () => this.safeForceUpdate());
             }
         });
+
+        // --
+
+        megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () =>
+            this.isMounted() && this.setState({ occurrencesLoading: false })
+        );
     }
 
     eventuallyInit() {
@@ -992,6 +1345,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
         this.props.chatRoom.unbind("openAttachCloudDialog." + this.getUniqueId());
         this.props.chatRoom.unbind("openSendContactDialog." + this.getUniqueId());
+        this.props.chatRoom.unbind(`openSchedDescDialog.${this.getUniqueId()}`);
         window.removeEventListener('keydown', self.handleKeyDown);
         $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
         $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
@@ -1562,23 +1916,60 @@ export class ConversationPanel extends MegaRenderMixin {
             </ModalDialogsUI.ModalDialog>
         }
 
+        let { descriptionDialog } = this.state;
+        descriptionDialog = descriptionDialog ? <ModalDialogsUI.ModalDialog
+            className="scheduled-description-dialog"
+            meeting={room.scheduledMeeting}
+            onClose={() => {
+                this.setState({ descriptionDialog: false });
+            }}>
+            <header>
+                <h3>{l.schedule_desc_dlg_title /* `Meeting description` */}</h3>
+            </header>
+            <section className="content">
+                <PerfectScrollbar className="description-scroller">
+                    <ParsedHTML>
+                        {
+                            room.scheduledMeeting.description.replace(/\n/g, '<br>')
+                            || l.schedule_no_desc /* `The description has been removed` */
+                        }
+                    </ParsedHTML>
+
+                </PerfectScrollbar>
+            </section>
+        </ModalDialogsUI.ModalDialog> : null;
+
         var additionalClass = "";
 
         var topicInfo = null;
-        if (self.props.chatRoom.type === "group" || self.props.chatRoom.type === "public") {
-            topicInfo = <div className="chat-topic-info">
-                <div className="chat-topic-icon">
-                    <i className="sprite-fm-uni icon-chat-group" />
-                </div>
-                <div className="chat-topic-text">
-                    <span className="txt">
-                        <Emoji>{self.props.chatRoom.getRoomTitle()}</Emoji>
-                    </span>
-                    <span className="txt small">
-                        <MembersAmount room={self.props.chatRoom} />
-                    </span>
-                </div>
-            </div>;
+        const isUpcoming = room.scheduledMeeting && room.scheduledMeeting.isUpcoming;
+        const isRecurring = room.scheduledMeeting && room.scheduledMeeting.isRecurring;
+        if (room.type === 'group' || room.type === 'public') {
+            topicInfo =
+                <div className="chat-topic-info">
+                    <div
+                        className={`
+                            chat-topic-icon
+                            ${room.isMeeting ? 'meeting-icon' : ''}
+                        `}>
+                        <i
+                            className={
+                                room.isMeeting ?
+                                    'sprite-fm-mono icon-video-call-filled' :
+                                    'sprite-fm-uni icon-chat-group'
+                            }
+                        />
+                    </div>
+                    <div className="chat-topic-text">
+                        <span className="txt">
+                            <Emoji>{room.getRoomTitle()}</Emoji>
+                            {isUpcoming && isRecurring && <i className="sprite-fm-mono icon-repeat" />}
+                        </span>
+                        <span className="txt small">
+                            {isUpcoming ? this.renderUpcomingInfo() : <MembersAmount chatRoom={room} />}
+                        </span>
+                    </div>
+                </div>;
         }
         else {
             contactHandle = contacts[0];
@@ -1604,7 +1995,6 @@ export class ConversationPanel extends MegaRenderMixin {
                 }}
             />;
         }
-
 
         var startCallDisabled = isStartCallDisabled(room);
         return (
@@ -1638,7 +2028,12 @@ export class ConversationPanel extends MegaRenderMixin {
                                     this.toggleExpandedFlag();
                                 });
                         }}
-                        didMount={() => this.toggleExpandedFlag()}
+                        didMount={() => {
+                            this.toggleExpandedFlag();
+                            if (room.isMeeting) {
+                                room.getPublicLink();
+                            }
+                        }}
                         willUnmount={minimised =>
                             this.setState({ callMinimized: false }, () =>
                                 minimised ? null : this.toggleExpandedFlag()
@@ -1727,6 +2122,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         members={this.props.chatRoom.membersSetFromApi}
                         messagesBuff={room.messagesBuff}
                         pushSettingsValue={pushNotificationSettings.getDnd(this.props.chatRoom.chatId)}
+                        occurrencesLoading={this.state.occurrencesLoading}
                         onStartCall={(mode) =>
                             inProgressAlert()
                                 .then(() => this.startCall(mode))
@@ -1812,6 +2208,11 @@ export class ConversationPanel extends MegaRenderMixin {
                                 self.props.chatRoom.trigger('onAddUserRequest', [contactHashes]);
                             }
                         }}
+                        onShowScheduledDescription={() => {
+                            if (room.scheduledMeeting) {
+                                this.setState({ descriptionDialog: true });
+                            }
+                        }}
                     /> : null}
 
                     {privateChatDialog}
@@ -1823,6 +2224,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     {historyRetentionDialog}
                     {confirmTruncateDialog}
                     {pushSettingsDialog}
+                    {descriptionDialog}
 
 
                     <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden">
@@ -1935,6 +2337,26 @@ export class ConversationPanel extends MegaRenderMixin {
                         {
                             !is_chatlink &&
                             room.state !== ChatRoom.STATE.LEFT &&
+                            navigator.onLine &&
+                            room.scheduledMeeting &&
+                            !room.isArchived() &&
+                            !startCallDisabled ?
+                                <StartMeetingNotification
+                                    chatRoom={room}
+                                    onStartCall={mode => {
+                                        return startCallDisabled ?
+                                            null :
+                                            inProgressAlert(true, room)
+                                                .then(() => this.startCall(mode, true))
+                                                .catch((ex) => d && console.warn(`Already in a call. ${ex}`));
+                                    }}
+                                /> :
+                                null
+                        }
+
+                        {
+                            !is_chatlink &&
+                            room.state !== ChatRoom.STATE.LEFT &&
                             (room.havePendingGroupCall() || room.havePendingCall()) &&
                             navigator.onLine ?
                                 <JoinCallNotification chatRoom={room}/> :
@@ -2003,6 +2425,12 @@ export class ConversationPanels extends MegaRenderMixin {
     componentDidMount() {
         super.componentDidMount();
         this.props.onMount?.();
+        megaChat.chats.forEach(chatRoom => {
+            const { scheduledMeeting } = chatRoom;
+            if (scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring) {
+                scheduledMeeting.getOccurrences().catch(nop);
+            }
+        });
     }
 
     render() {
@@ -2039,23 +2467,61 @@ export class ConversationPanels extends MegaRenderMixin {
 }
 
 export class EmptyConvPanel extends MegaRenderMixin {
+    renderActions() {
+        const { isMeeting, onNewChat, onStartMeeting, onScheduleMeeting } = this.props;
+
+        if (isMeeting) {
+            return (
+                <Button
+                    className="mega-button large positive"
+                    label={l.create_meeting /* `Create meeting` */}>
+                    <Dropdown
+                        className="light"
+                        noArrow="true"
+                        vertOffset={4}>
+                        <DropdownItem
+                            className="link-button"
+                            icon="sprite-fm-mono icon-video-plus"
+                            label={l.new_meeting_start /* `Start meeting now` */}
+                            onClick={onStartMeeting}
+                        />
+                        <hr/>
+                        <DropdownItem
+                            className="link-button"
+                            icon="sprite-fm-mono icon-calendar2"
+                            label={l.schedule_meeting_start /* `Schedule meeting` */}
+                            onClick={onScheduleMeeting}
+                        />
+                    </Dropdown>
+                </Button>
+            );
+        }
+
+        return (
+            <Button
+                className="mega-button large positive"
+                label={l.add_chat /* `New chat` */}
+                onClick={onNewChat}
+            />
+        );
+    }
+
     render() {
-        const { isMeeting, onNewClick } = this.props;
         return (
             <div className="conversations-empty">
                 <div className="conversations-empty-content">
                     <i className="sprite-fm-mono icon-chat-filled" />
-                    <h1>
-                        {isMeeting ? l.start_meeting /* `Start a meeting` */ : l.start_chat /* `Start chatting now` */}
-                    </h1>
-                    <p>
-                        {isMeeting ? l.onboard_megachat_dlg3_text : l.onboard_megachat_dlg2_text}
-                    </p>
-                    <Button
-                        className="mega-button large positive"
-                        label={isMeeting ? l.new_meeting /* `New meeting` */ : l.add_chat /* `New chat` */}
-                        onClick={onNewClick}
-                    />
+                    {this.props.isMeeting ?
+                        <>
+                            <h1>{l.start_meeting /* `Start a meeting` */}</h1>
+                            <p>{l.onboard_megachat_dlg3_text}</p>
+                        </> :
+                        <>
+                            <h1>{l.start_chat /* `Start chatting now` */}</h1>
+                            <p>{l.onboard_megachat_dlg2_text}</p>
+                        </>
+                    }
+                    {this.renderActions()}
                 </div>
             </div>
         );

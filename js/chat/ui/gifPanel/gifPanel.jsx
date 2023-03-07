@@ -110,7 +110,7 @@ export default class GifPanel extends MegaRenderMixin {
                                 }));
                             }
                             return this.setState({ bottom: true, loading: false }, () =>
-                                this.resultContainerRef.reinitialise()
+                                this.resultContainerRef && this.resultContainerRef.reinitialise()
                             );
                         }
                     })

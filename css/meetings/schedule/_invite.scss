@@ -1,0 +1,171 @@
+.meetings-invite {
+    width: 100%;
+
+    &.disabled {
+        opacity: 0.2;
+    }
+
+    .multiple-input {
+        max-height: none;
+        border: unset;
+        background: unset;
+
+        ul {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
+
+            &:before {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                box-sizing: border-box;
+                content: '';
+                border-bottom: 1px solid var(--stroke-mid-grey);
+                transition: var(--transition-border);
+            }
+
+            &:hover::before {
+                border-color: var(--input-text-underline-hover);
+            }
+
+            li {
+                margin: 4px;
+                padding: 6px;
+                border-radius: 4px;
+                background: var(--surface-grey-2);
+
+                &.token-input-input-token-mega {
+                    position: relative;
+                    padding: 0;
+                    max-width: 100%;
+                    z-index: 1;
+                    background: transparent;
+                    flex-grow: 1;
+
+                    input {
+                        width: 100%;
+                    }
+                }
+
+                .contact-tag-item {
+                    display: flex;
+                    width: 100%;
+
+                    .avatar-wrapper {
+                        border-radius: 4px;
+                        height: 24px;
+                        line-height: 24px;
+                        width: 24px;
+
+                        .user-card-verified {
+                            position: absolute;
+                            top: -4px;
+                            right: -4px;
+                            width: 12px;
+                            height: 12px;
+
+                            i {
+                                --icon-size: 10px;
+                                cursor: default;
+                            }
+                        }
+                    }
+
+                    .overflow-observer {
+                        margin: auto 4px;
+                    }
+                }
+
+                i {
+                    margin: 1px 0 0;
+                    --icon-size: 24px;
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+
+    .mega-input {
+        /* [...] */
+    }
+
+    .invite-scroll-wrapper {
+        max-height: 240px;
+    }
+
+    .mega-input-dropdown {
+        position: absolute;
+        top: 100%;
+        margin: 4px 0 0;
+        padding: 8px 0;
+        max-width: 80%;
+        min-width: 200px;
+        box-sizing: border-box;
+        border: var(--context-menu-border);
+        border-radius: 12px;
+        background: var(--surface-main);
+        box-shadow: 0 5px 10px 0 rgb(0 0 0 / 30%);
+    }
+
+    .invite-section {
+        padding: 4px 8px 8px;
+
+        &-title {
+            font: var(--text-body1-bold);
+            color: var(--text-color-medium);
+            white-space: pre-wrap;
+        }
+
+        &-list {
+            padding: 4px 0 0;
+        }
+
+        &-item {
+            display: flex;
+            align-items: center;
+            width: calc(100% - 6px);
+            margin: 8px 0;
+            padding: 2px 4px;
+            text-align: start;
+            font: var(--text-body1);
+            background: var(--surface-main);
+            border-radius: 4px;
+            transition: var(--transition-bg-color), var(--transition-color);
+            cursor: pointer;
+
+            &:hover {
+                background: var(--button-hover);
+                color: var(--text-color-high);
+            }
+
+            .invite-item-data {
+                margin: 0 0 0 8px;
+                width: calc(100% - 40px);
+            }
+
+            .avatar-wrapper {
+                min-width: 32px;
+                min-height: 32px;
+                border-radius: 4px;
+            }
+
+            .invite-item-name {
+                font: var(--text-body1);
+                color: var(--text-color-high);
+
+                img {
+                    width: 12px;
+                    height: 12px;
+                }
+            }
+
+            .invite-item-mail {
+                font: var(--text-body2);
+                color: var(--text-color-low);
+            }
+        }
+    }
+}

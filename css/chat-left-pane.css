@@ -104,14 +104,15 @@
     background-color: var(--stroke-grey-2);
 }
 .content-panel.conversations span.empty-conversations {
+    overflow: hidden;
     display: block;
     margin: 5px 0 5px 40px;
-    font: var(--text-body2);
-    color: var(--text-color-medium);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
+    padding: 0 0 4px;
     width: calc(100% - 46px);
+    font: var(--text-body2);
+    text-overflow: ellipsis;
+    color: var(--text-color-medium);
+    white-space: nowrap;
 }
 .conversation-reduce-height {
     position: relative;
@@ -178,6 +179,9 @@
     margin-inline-end: 4px;
     -webkit-margin-end: 4px;
 }
+.conversations-pane .upcoming-conversation .conversation-data-top {
+    justify-content: space-between;
+}
 .conversation-data-top .conversation-data-name {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -191,6 +195,9 @@
     flex: 0 1;
     max-width: 26px;
     display: flex;
+}
+.conversation-data-top .conversation-data-badges i.icon-repeat {
+    --icon-size: 20px;
 }
 .conversation-data-top .date-time {
     align-self: flex-end;
@@ -208,6 +215,9 @@
     height: 10px;
     margin: auto 0;
 }
+.conversation-data-top .conversation-scheduled-badges i {
+    --icon-size: 18px;
+}
 .user-card-name.conversation-name {
     font: var(--text-body1);
     color: var(--text-color-high);
@@ -220,12 +230,21 @@
     position: absolute;
     right: 0;
 }
-.conversation-message {
+.conversation-message,
+.conversation-scheduled-data {
     overflow: hidden;
     width: calc(100% - 22px);
     font: var(--text-body2);
     color: var(--text-color-medium);
     text-overflow: ellipsis;
+}
+.conversation-scheduled-data:first-child {
+    width: calc(100% - 55px);
+}
+.conversation-scheduled-data:last-child {
+    display: flex;
+    justify-content: flex-end;
+    text-align: right;
 }
 .conversation-message.unread {
     font-family: var(--text-font-family-semibold);
@@ -259,7 +278,8 @@
 .conversations-pane li.active .user-card-name {
     color: var(--text-color-higher);
 }
-.conversations-pane li.active .conversation-message {
+.conversations-pane li.active .conversation-message,
+.conversations-pane li.active .conversation-scheduled-data {
     color: var(--text-color-higher);
 }
 .conversations-pane li.active .date-time {
@@ -278,6 +298,14 @@
     color: var(--text-color-white-high);
     text-align: center;
     background-color: var(--secondary-blue);
+}
+.unread-messages.unread-upcoming {
+    display: block;
+    float: right;
+    margin: 0 0 0 6px;
+    min-width: 16px;
+    min-height: 16px;
+    font: var(--text-caption);
 }
 .conversations-pane li.active .unread-messages {
     background-color: white;
@@ -1657,6 +1685,11 @@ li.active .call-duration i {
     --mask-color: var(--secondary-green);
 }
 
+.conversationsApp .lhp-action-buttons i.icon-arrow-down {
+    --icon-size: 16px;
+    --mask-color: var(--icon-active);
+}
+
 .conversationsApp .conversations-empty {
     position: absolute;
     top: 0;
@@ -1681,7 +1714,9 @@ li.active .call-duration i {
     --icon-size: 120px;
     --mask-color: var(--icon-inactive);
 }
-
+.lhp-conversations.scrollable.meetings-view .toggle-panel.expanded {
+    max-height: calc(100% - 60px);
+}
 .lhp-conversations.scrollable .toggle-panel.expanded {
     max-height: calc(100% - 35px);
 }

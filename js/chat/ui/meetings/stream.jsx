@@ -32,7 +32,6 @@ export default class Stream extends MegaRenderMixin {
     state = {
         page: 0,
         hovered: false,
-        link: undefined,
         overlayed: false,
     };
 
@@ -86,28 +85,6 @@ export default class Stream extends MegaRenderMixin {
                     }
                 }, MOUSE_OUT_DELAY);
         }
-    }
-
-    /**
-     * getPublicLink
-     * @description Retrieves the public link for the current chat room.
-     * @returns {void|null}
-     */
-
-    getPublicLink() {
-        const { chatRoom } = this.props;
-        if (chatRoom && chatRoom.isMeeting) {
-            chatRoom.updatePublicHandle(
-                undefined,
-                () =>
-                    this.isMounted() ?
-                        this.setState({
-                            link: chatRoom.publicLink ? `${getBaseUrl()}/${chatRoom.publicLink}` : l[20660]
-                        }) :
-                        null
-            );
-        }
-        return null;
     }
 
     /**
@@ -451,7 +428,6 @@ export default class Stream extends MegaRenderMixin {
                     chatRoom={chatRoom}
                     everHadPeers={everHadPeers}
                     streamContainer={streamContainer}
-                    link={this.state.link}
                     stayOnEnd={stayOnEnd}
                     isOnHold={isOnHold}
                     onInviteToggle={onInviteToggle}
@@ -479,7 +455,6 @@ export default class Stream extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        this.getPublicLink();
         this.scaleNodes();
         chatGlobalEventManager.addEventListener('resize', this.getUniqueId(), () => this.scaleNodes());
         this.callHoldListener = mBroadcaster.addListener('meetings:toggleHold', () => this.scaleNodes(undefined, true));
@@ -495,7 +470,7 @@ export default class Stream extends MegaRenderMixin {
     }
 
     render() {
-        const { hovered, link, overlayed } = this.state;
+        const { hovered, overlayed } = this.state;
         const {
             mode, call, chatRoom, minimized, streams, sidebar, forcedLocal, view, isOnHold, onCallMinimize,
             onCallExpand, onStreamToggle, onModeChange, onChatToggle, onParticipantsToggle, onAudioClick, onVideoClick,
@@ -533,7 +508,6 @@ export default class Stream extends MegaRenderMixin {
                             mode={mode}
                             call={call}
                             chatRoom={chatRoom}
-                            link={link}
                             onCallMinimize={onCallMinimize}
                             onModeChange={onModeChange}
                         />

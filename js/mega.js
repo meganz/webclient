@@ -1550,6 +1550,37 @@ scparser.$add('cce', () => {
     }
 });
 
+scparser.mcsmp = a => {
+    'use strict';
+
+    if (megaChatIsReady) {
+        megaChat._queuedMcsmPackets[a.id] = { data: a, type: 'mcsmp' };
+    }
+    else if (Array.isArray(loadfm.chatmcsm)) {
+        loadfm.chatmcsm.push(a);
+    }
+
+    if (fmdb) {
+        delete a.a;
+        fmdb.add('mcsm', { id: a.id, d: a });
+    }
+};
+
+scparser.mcsmr = a => {
+    'use strict';
+
+    if (megaChatIsReady) {
+        megaChat._queuedMcsmPackets[a.id] = { data: a, type: 'mcsmr' };
+    }
+    else if (Array.isArray(loadfm.chatmcsm)) {
+        loadfm.chatmcsm = loadfm.chatmcsm.filter(s => s.id !== a.id);
+    }
+
+    if (fmdb) {
+        fmdb.del('mcsm', a.id);
+    }
+};
+
 scparser.mcpc = scparser.mcc = function (a) {
     // MEGAchat
     if (megaChatIsReady) {
@@ -2325,6 +2356,9 @@ function loadfm(force) {
                     ipc    : '&p',             // incoming pending contact - id
                     ps     : '&h_p',           // pending share - handle/id
                     mcf    : '&id',            // chats - id
+                    mcsm   : '&id',            // scheduled meetings - id
+                    asp    : '&id, ts, cts',   // Element Sets (set)
+                    aep    : '&id, ts, s, h',  // Element Sets (elements)
                     ua     : '&k',             // user attributes - key (maintained by IndexedBKVStorage)
                     _sn    : '&i',             // sn - fixed index 1
                     puf    : '&ph',            // public upload folder - handle
@@ -2449,7 +2483,8 @@ function dbfetchfm() {
                 mega.fileRequest.processPuPageFromDB(r);
             }
         },
-        mcf: 1
+        mcf: 1,
+        mcsm: 2
     };
     var tableProc = function(t) {
         return function(r) {
@@ -2462,6 +2497,9 @@ function dbfetchfm() {
                 else {
                     loadfm.chatmcf = -1;
                 }
+            }
+            else if (tables[t] === 2) {
+                loadfm.chatmcsm = r.length > 0 ? r : -1;
             }
             else {
                 return tables[t](r, true);
@@ -3495,6 +3533,22 @@ function processMCF(mcfResponse, ignoreDB) {
     }
 }
 
+function processMCSM(mcsm, ignoreDB) {
+    'use strict';
+
+    if (Array.isArray(mcsm)) {
+        for (let i = mcsm.length; i--;) {
+            const scheduledMeeting = mcsm[i];
+            if (fmdb && !pfkey && !ignoreDB) {
+                fmdb.add('mcsm', { id: scheduledMeeting.id, d: scheduledMeeting });
+            }
+            if (typeof Chat !== 'undefined') {
+                Chat.mcsm[scheduledMeeting.id] = scheduledMeeting;
+            }
+        }
+    }
+}
+
 function folderreqerr(c, e) {
     'use strict';
 
@@ -3693,6 +3747,10 @@ function loadfm_callback(res) {
         mega.sets.resetDB(res.aesp);
     }
 
+    if (res.mcsm) {
+        loadfm.chatmcsm = res.mcsm;
+        processMCSM(loadfm.chatmcsm);
+    }
     M.avatars();
 
     if (localStorage['treefixup$' + u_handle]) {
@@ -3854,6 +3912,10 @@ function loadfm_done(mDBload) {
                             if (loadfm.chatmcf) {
                                 processMCF(loadfm.chatmcf, true);
                                 loadfm.chatmcf = null;
+                            }
+                            if (loadfm.chatmcsm) {
+                                processMCSM(loadfm.chatmcsm, true);
+                                loadfm.chatmcsm = null;
                             }
                             init_chat();
                         }

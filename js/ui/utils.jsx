@@ -152,6 +152,19 @@ export class ParsedHTML extends React.Component {
     }
 }
 
+export const reactStringWrap = (src, find, WrapClass, wrapProps) => {
+    const endTag = find.replace('[', '[/');
+    return <>
+        {src.split(find)[0]}
+        <WrapClass
+            {...wrapProps}
+        >
+            {src.substring(src.indexOf(find) + find.length, src.indexOf(endTag))}
+        </WrapClass>
+        {src.split(endTag)[1]}
+    </>;
+};
+
 export const OFlowEmoji = withOverflowObserver(Emoji);
 export const OFlowParsedHTML = withOverflowObserver(ParsedHTML);
 

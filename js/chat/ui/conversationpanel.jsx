@@ -60,21 +60,21 @@ class EndCallButton extends MegaRenderMixin {
 
     render() {
         const { chatRoom } = this.props;
-        const { type, activeCall } = chatRoom;
+        const { type, call } = chatRoom;
 
-        if (activeCall) {
-            const peers = activeCall.peers && activeCall.peers.length;
+        if (call) {
+            const peers = call.peers && call.peers.length;
 
             // 1-on-1 call -> `End call`
             if (type === 'private') {
-                return this.renderButton({ label: l[5884], onClick: () => activeCall.hangUp() });
+                return this.renderButton({ label: l[5884], onClick: () => call.hangUp() });
             }
 
             // Moderator in a public call: render `End call...` drop down w/ `Leave` and `End for all` options.
             if (this.IS_MODERATOR) {
                 return this.renderButton({
                     label: l[5884],
-                    onClick: peers ? null : () => activeCall.hangUp(),
+                    onClick: peers ? null : () => call.hangUp(),
                     children: peers && (
                         <Dropdown
                             className="wide-dropdown send-files-selector light"
@@ -85,7 +85,7 @@ class EndCallButton extends MegaRenderMixin {
                                 className="link-button"
                                 icon="sprite-fm-mono icon-leave-call"
                                 label={l.leave}
-                                onClick={() => activeCall.hangUp()}
+                                onClick={() => call.hangUp()}
                             />
                             <DropdownItem
                                 className="link-button"
@@ -104,7 +104,7 @@ class EndCallButton extends MegaRenderMixin {
                 // alone in the call.
                 this.renderButton({
                     label: peers ? l[5883] : l[5884],
-                    onClick: () => activeCall.hangUp()
+                    onClick: () => call.hangUp()
                 })
             );
         }
@@ -141,7 +141,7 @@ class StartMeetingNotification extends MegaRenderMixin {
     render() {
         const { chatRoom, onStartCall } = this.props;
 
-        if (chatRoom.activeCall || !megaChat.hasSupportForCalls) {
+        if (chatRoom.call || !megaChat.hasSupportForCalls) {
             return null;
         }
 
@@ -163,7 +163,7 @@ export class JoinCallNotification extends MegaRenderMixin {
     render() {
         const { chatRoom } = this.props;
 
-        if (chatRoom.activeCall) {
+        if (chatRoom.call) {
             return null;
         }
 
@@ -453,7 +453,7 @@ export class ConversationRightArea extends MegaRenderMixin {
         var startAudioCallButton;
         var startVideoCallButton;
 
-        var isInCall = !!room.activeCall;
+        var isInCall = !!room.call;
         if (isInCall) {
             startAudioCallButton = startVideoCallButton = null;
         }
@@ -1048,7 +1048,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                                     ${room.type !== 'private' && !is_chatlink &&
                                                     room.membersSetFromApi.members.hasOwnProperty(u_handle) &&
                                                     room.membersSetFromApi.members[u_handle] !== -1 &&
-                                                    !room.activeCall ? '' : 'disabled'}
+                                                    !room.call ? '' : 'disabled'}
                                                 `}
                                                 onClick={(e) => {
                                                     if ($(e.target).closest('.disabled').length > 0) {
@@ -2003,12 +2003,11 @@ export class ConversationPanel extends MegaRenderMixin {
                 onMouseMove={() => self.onMouseMove()}
                 data-room-id={self.props.chatRoom.chatId}>
                 {room.meetingsLoading && <Loading chatRoom={room} title={room.meetingsLoading} />}
-                {room.sfuApp && (
+                {room.call && (
                     <Call
                         chatRoom={room}
-                        sfuApp={room.sfuApp}
-                        streams={room.sfuApp.callManagerCall.peers}
-                        call={room.sfuApp.callManagerCall}
+                        streams={room.call.peers}
+                        call={room.call}
                         minimized={this.state.callMinimized}
                         onCallMinimize={() => {
                             return this.state.callMinimized ?
@@ -2045,8 +2044,8 @@ export class ConversationPanel extends MegaRenderMixin {
                     />
                 )}
                 {megaChat.initialPubChatHandle && room.publicChatHandle === megaChat.initialPubChatHandle &&
-                    !room.activeCall && (
-                    room.isMeeting && !room.activeCall && room.activeCallIds.length > 0
+                    !room.call && (
+                    room.isMeeting && !room.call && room.activeCallIds.length > 0
                 ) &&
                     <Join
                         initialView={u_type || is_eplusplus ? Join.VIEW.ACCOUNT : Join.VIEW.INITIAL}
@@ -2535,7 +2534,7 @@ function isStartCallDisabled(room) {
     if (!megaChat.hasSupportForCalls) {
         return true;
     }
-    return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.activeCall ||
+    return !room.isOnlineForCalls() || room.isReadOnly() || !room.chatId || room.call ||
         (
             (room.type === "group" || room.type === "public")
             && !ENABLE_GROUP_CALLING_FLAG

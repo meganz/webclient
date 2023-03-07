@@ -80,7 +80,7 @@
             this.call = call;
             this.userHandle = userHandle;
             this.clientId = clientId;
-            this.sfuPeer = call.sfuApp.sfuClient.peers.get(clientId);
+            this.sfuPeer = call.sfuClient.peers.get(clientId);
             this.isActive = false;
             this.consumers = new Set();
             this.currentQuality = VIDEO_QUALITY.NO_VIDEO;
@@ -345,7 +345,7 @@
     };
 
     class Call extends MegaDataObject {
-        constructor(sfuApp, chatRoom, callId) {
+        constructor(chatRoom, callId) {
             super({
                 'chatRoom': null,
                 'callId': null,
@@ -358,7 +358,6 @@
                 'ts': Date.now(),
                 'left': false
             });
-            this.sfuApp = sfuApp;
             this.chatRoom = chatRoom;
             this.callId = callId;
             this.peers = new Peers(this);
@@ -366,55 +365,30 @@
             // eslint-disable-next-line no-use-before-define
             this.localPeerStream = new LocalPeerStream(this);
             this.viewMode = CALL_VIEW_MODES.GRID;
-            chatRoom.activeCall = this;
-            megaChat.activeCall = this;
+            chatRoom.meetingsLoading = l.joining;
             // Peer is alone in a group call after 1 min -> mute mic
             delay('call:init', this.muteIfAlone.bind(this), 6e4);
             this.stayOnEnd = !!mega.config.get('callemptytout');
         }
-        get isPublic() {
-            const type = this.chatRoom && this.chatRoom.type;
-            return type === 'group' || type === 'public';
+        setSfuClient(sfuClient) { // Call and sfuClient reference each other and need post-construction linking
+            this.sfuClient = sfuClient;
+            this.localPeerStream.sfuClient = sfuClient;
         }
-        setViewMode(newMode) {
-            this.viewMode = newMode;
-            let activePeer;
-            if (this.forcedActiveStream && (activePeer = this.peers[this.forcedActiveStream])) {
-                activePeer.isActive = false;
-            }
-
-            if (newMode === CALL_VIEW_MODES.GRID) {
-                this.forcedActiveStream = null;
-            }
-
-            if (newMode === CALL_VIEW_MODES.SPEAKER || newMode === CALL_VIEW_MODES.MINI) {
-                this.sfuApp.sfuClient.enableSpeakerDetector(true);
-            }
-            else {
-                this.sfuApp.sfuClient.enableSpeakerDetector(false);
-                this.activeStream = null;
-            }
+// SfuClient.IClientEventListener interface
+        onServerError(errCode) {
+            console.error('onServerError!!!', errCode);
         }
-        setForcedActiveStream(clientId) {
-            if (this.forcedActiveStream === clientId) {
-                this.forcedActiveStream = null;
-            }
-            else {
-                this.forcedActiveStream = clientId;
-            }
+        onNewPlayer(sfuPlayer) {
+            return new PlayerData(this, sfuPlayer);
         }
-        setActiveStream(clientId) {
-            this.activeStream = clientId;
-        }
-        getActiveStream() {
-            const activeStream = this.forcedActiveStream || this.activeStream;
-            if (activeStream) {
-                return this.peers[activeStream];
+        onJoined() {
+            for (const peer of this.sfuClient.peers.values()) {
+                this.onPeerJoined(peer, true);
             }
-            return this.peers.getItem(0);
-        }
-        getLocalStream() {
-            return this.localPeerStream;
+            this.chatRoom.trigger('onCallIJoined');
+            this.chatRoom.meetingsLoading = false;
+            this.chatRoom.unbind("onCallLeft.start");
+            this.chatRoom.megaChat.trigger('sfuConnOpen');
         }
         onPeerJoined(peer, isInitial) {
             new Peer(this, peer.userId, peer.cid, peer.av);
@@ -424,7 +398,7 @@
 
             // Force high res for now:
             // thumb is already loaded, only uncomment if we want HD by default?
-            // this.sfuApp.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
+            // this.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
             if (peer.userId !== u_handle) {
                 this.callTimeoutDone();
             }
@@ -455,8 +429,20 @@
                 this.muteIfAlone();
             }
         }
-        onJoined() {
-            this.chatRoom.trigger('onCallIJoined');
+        onActiveSpeakerChange(newPeer/* , prevPeer */) {
+            if (newPeer) {
+                var peer = this.peers[newPeer.cid];
+                assert(peer);
+                this.setActiveStream(newPeer.cid);
+            }
+            else {
+                this.setActiveStream(null);
+            }
+        }
+        onPeerAvChange(peer, av) {
+            const callManagerPeer = this.peers[peer.cid];
+            assert(callManagerPeer);
+            callManagerPeer.onAvChange(av);
         }
         onNoMicInput() {
             this.chatRoom.trigger('onNoMicInput');
@@ -466,6 +452,65 @@
         }
         onBadNetwork(e) {
             this.chatRoom.trigger('onBadNetwork', e);
+        }
+        onDisconnect(termCode, willReconnect, removeActive) {
+            if (willReconnect) {
+                this.chatRoom.megaChat.trigger('sfuConnClose');
+            }
+            else if (!this.isDisconnecting) {
+                this.handleDisconnect(termCode);
+            }
+        }
+// == end SfuClientIClientEventListener interface
+        handleDisconnect(termCode) {
+            this.isDisconnecting = true;
+            this.chatRoom.trigger('onCallLeft', {
+                callId: this.callId,
+                chatId: this.chatRoom.chatId,
+                showCallFeedback: true
+            });
+            if (termCode === SfuClient.TermCode.kTooManyParticipants) {
+                msgDialog('warningb', '', l[20200]);
+            }
+        }
+        get isPublic() {
+            const type = this.chatRoom && this.chatRoom.type;
+            return type === 'group' || type === 'public';
+        }
+        setViewMode(newMode) {
+            this.viewMode = newMode;
+            let activePeer;
+            if (this.forcedActiveStream && (activePeer = this.peers[this.forcedActiveStream])) {
+                activePeer.isActive = false;
+            }
+
+            if (newMode === CALL_VIEW_MODES.GRID) {
+                this.forcedActiveStream = null;
+            }
+
+            if (newMode === CALL_VIEW_MODES.SPEAKER || newMode === CALL_VIEW_MODES.MINI) {
+                this.sfuClient.enableSpeakerDetector(true);
+            }
+            else {
+                this.sfuClient.enableSpeakerDetector(false);
+                this.activeStream = null;
+            }
+        }
+        setForcedActiveStream(clientId) {
+            this.forcedActiveStream = (this.forcedActiveStream === clientId) ? null : clientId;
+        }
+        setActiveStream(clientId) {
+            this.activeStream = clientId;
+        }
+        getActiveStream() {
+            const activeStream = this.forcedActiveStream || this.activeStream;
+            if (activeStream) {
+                return this.peers[activeStream];
+            }
+            return this.peers.getItem(0);
+        }
+        getLocalStream() {
+            return this.localPeerStream;
         }
         onTrackAllocated(playerData) {
             this.numVideoTracksUsed++;
@@ -485,7 +530,7 @@
             if (diffFlag & SfuClient.Av.Video) {
                 this.localPeerStream.onStreamChange();
             }
-            this.av = this.sfuApp.sfuClient.availAv;
+            this.av = this.sfuClient.availAv;
         }
         onLocalMediaError(errObj) {
             megaChat.trigger('onLocalMediaError', errObj);
@@ -494,39 +539,45 @@
             this.chatRoom.trigger('onAudioSendDenied');
         }
         toggleAudio() {
-            this.sfuApp.sfuClient.muteAudio(!this.sfuApp.sfuClient.localAudioMuted());
+            this.sfuClient.muteAudio(!this.sfuClient.localAudioMuted());
             // when we are not a speaker, local audio track is never obtained, so the event is never fired
             this.onLocalMediaChange(SfuClient.Av.Audio);
         }
         toggleVideo() {
             if (this.isSharingScreen()) {
-                this.sfuApp.sfuClient.enableScreenshare(false);
+                this.sfuClient.enableScreenshare(false);
             }
-            this.sfuApp.sfuClient.muteCamera(!!(this.av & SfuClient.Av.Camera));
+            this.sfuClient.muteCamera(!!(this.av & SfuClient.Av.Camera));
         }
         toggleScreenSharing() {
             if (this.av & SfuClient.Av.Camera) {
-                this.sfuApp.sfuClient.muteCamera(true);
+                this.sfuClient.muteCamera(true);
             }
-            this.sfuApp.sfuClient.enableScreenshare(!this.sfuApp.sfuClient.isSharingScreen());
+            this.sfuClient.enableScreenshare(!this.sfuClient.isSharingScreen());
         }
         isSharingScreen() {
-            return this.sfuApp.sfuClient.isSharingScreen();
+            return this.sfuClient.isSharingScreen();
         }
         toggleHold() {
             if (this.av & SfuClient.Av.onHold) {
-                this.sfuApp.sfuClient.releaseHold();
+                this.sfuClient.releaseHold();
             }
             else {
-                this.sfuApp.sfuClient.putOnHold();
+                this.sfuClient.putOnHold();
             }
         }
         hangUp(reason) {
-            this.sfuApp.destroy(reason);
+            this.destroy(reason);
+        }
+        destroy(reason) {
             if (this.isDestroyed) {
                 return;
             }
             this.isDestroyed = true;
+            if (!this.isDisconnecting && !this.sfuClient.disconnect(reason)) {
+                this.handleDisconnect(reason);
+            }
+            delete window.sfuClient;
             this.localPeerStream.destroy();
             if (this.peers.size() !== 0) {
                 console.error("hangUp: Soft assert: peers.size is not zero, but", this.peers.size());
@@ -539,7 +590,7 @@
         }
         muteIfAlone() {
             if (!this.isDestroyed && this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
-                return this.sfuApp.sfuClient.muteAudio(true);
+                return this.sfuClient.muteAudio(true);
             }
             return false;
         }
@@ -667,19 +718,49 @@
             return false;
         }
     }
+    class PlayerData { // implements IVideoPlayerGui
+        constructor(call, player) {
+            this.call = call;
+            this.player = player;
+            this.appPeer = this.call.peers[player.peer.cid];
+            assert(this.appPeer);
+            this.video = document.createElement("video");
+        }
+        attachToTrack(track) { // we wait for player to sync and start, so nothing to do here
+            this.call.onTrackAllocated(this);
+            this.video.onplaying = () => {
+                // console.warn("source video: onPlaying");
+                if (this.onPlay) {
+                    this.onPlay();
+                }
+            };
+            this.video.onpause = tryCatch(() => {
+                // console.warn("source video: onPause");
+            });
+            SfuClient.playerPlay(this.video, track);
+        }
+
+        detachFromTrack() {
+            delete this.video.onpause;
+            SfuClient.playerStop(this.video);
+            this.call.onTrackReleased(this);
+        }
+        onDestroy() {
+        }
+    }
+    Call.PlayerData = PlayerData;
+
     class LocalPeerStream {
         constructor(call) {
             this.isLocal = true;
             this.hasSlowNetwork = null;
             this.source = null; // local video player
-            // call.sfuApp.sfuClient is not available at this time
             this.call = call;
-            this.sfuApp = call.sfuApp;
             this.userHandle = u_handle;
             this.consumers = new Set();
         }
         onStreamChange() {
-            const vtrack = this.sfuApp.sfuClient.mainSentVtrack();
+            const vtrack = this.sfuClient.mainSentVtrack();
             if (vtrack) {
                 if (!this.source) {
                     this.source = document.createElement("video");
@@ -694,7 +775,7 @@
             }
         }
         get audioMuted() {
-            return this.sfuApp.sfuClient.localAudioMuted();
+            return this.sfuClient.localAudioMuted();
         }
         registerConsumer(consumer) {
             this.consumers.add(consumer);
@@ -707,7 +788,7 @@
             this.consumers.delete(consumer);
         }
         isStreaming() {
-            return this.sfuApp.sfuClient.availAv & Av.Video;
+            return this.sfuClient.availAv & Av.Video;
         }
         updateVideoQuality() {
             return false; // returing false will cause the caller StreamNode to update itself
@@ -724,167 +805,19 @@
      * @constructor
      */
     var CallManager2 = function(megaChat) {
-        var self = this;
-
-        self.logger = MegaLogger.getLogger("callManager", {}, megaChat.logger);
-
-        self.megaChat = megaChat;
-
-
+        this.logger = MegaLogger.getLogger("callManager", {}, megaChat.logger);
+        this.megaChat = megaChat;
         megaChat.rebind("onRoomDestroy.callManager", function(e, chatRoom) {
             assert(chatRoom.type, 'missing room type');
         });
 
         megaChat.rebind("onRoomInitialized.chatStore", function(e, chatRoom) {
             assert(chatRoom.type, 'missing room type');
-
-
-            chatRoom.rebind("onChatdPeerJoinedCall.callManager", (e, data) => {
-                if (!chatRoom.activeCallIds.exists(data.callId)) {
-                    chatRoom.activeCallIds.set(data.callId, []);
-                }
-                chatRoom.activeCallIds.set(data.callId, chatRoom.activeCallIds[data.callId].concat(data.participants));
-
-                const parts = data.participants;
-                for (var i = 0; i < parts.length; i++) {
-                    // halt call if anyone joins a 1on1 room or if I'd joined (e.g. I'd an incoming ringing first)
-                    if (
-                        chatRoom.type === "private" ||
-                        (
-                            parts[i] === u_handle &&
-                            chatRoom.ringingCalls.exists(data.callId)
-                        )
-                    ) {
-                        chatRoom.ringingCalls.remove(data.callId);
-
-                        self.trigger("onRingingStopped", {
-                            callId: data.callId,
-                            chatRoom: chatRoom
-                        });
-                    }
-                }
-
-                chatRoom.callParticipantsUpdated();
-            });
-            chatRoom.rebind("onChatdPeerLeftCall.callManager", (e, data) => {
-                if (!chatRoom.activeCallIds[data.callId]) {
-                    return;
-                }
-                let parts = data.participants;
-                for (var i = 0; i < parts.length; i++) {
-                    array.remove(chatRoom.activeCallIds[data.callId], parts[i], true);
-
-                    if (parts[i] === u_handle && chatRoom.ringingCalls.exists(data.callId)) {
-                        chatRoom.ringingCalls.remove(data.callId);
-
-                        self.trigger("onRingingStopped", {
-                            callId: data.callId,
-                            chatRoom: chatRoom
-                        });
-                    }
-                }
-
-                chatRoom.callParticipantsUpdated();
-            });
-            chatRoom.rebind("onCallLeft.callManager", (e, data) => {
-                console.warn("onCallLeft:", JSON.stringify(data));
-                const activeCall = chatRoom.activeCall;
-                if (!activeCall || activeCall.callId !== data.callId) {
-                    if (d) {
-                        console.warn("... no active call or event not for it");
-                    }
-                    return;
-                }
-                activeCall.hangUp(data.reason);
-                megaChat.activeCall = chatRoom.activeCall = null;
-            });
-            chatRoom.rebind("onChatdCallEnd.callManager", (e, data) => {
-                if (d) {
-                    console.warn("onChatdCallEnd:", JSON.stringify(data));
-                }
-                chatRoom.activeCallIds.remove(data.callId);
-                chatRoom.stopRinging(data.callId);
-                chatRoom.callParticipantsUpdated();
-            });
-            chatRoom.rebind('onCallState.callManager', function(e, data) {
-                assert(chatRoom.activeCallIds[data.callId], 'unknown call:' + data.callId);
-                self.onCallState(data, chatRoom);
-                chatRoom.callParticipantsUpdated();
-            });
-            chatRoom.rebind('onRoomDisconnected.callManager', function() {
-                this.activeCallIds.clear(); // av: Added this to complement the explicit handling of chatd call events
-                // Keep the current call active when online, but chatd got disconnected
-                if (navigator.onLine) {
-                    return;
-                }
-
-                if (this.activeCall) {
-                    chatRoom.trigger('ChatDisconnected', chatRoom);
-                }
-
-                chatRoom.callParticipantsUpdated();
-            });
-            chatRoom.rebind('onStateChange.callManager', function(e, oldState, newState) {
-                if (newState === ChatRoom.STATE.LEFT && chatRoom.activeCall) {
-                    chatRoom.activeCall.hangUp(SfuClient.TermCode.kLeavingRoom);
-                }
-            });
-            chatRoom.rebind('onCallPeerLeft.callManager', (e, data) => {
-                const activeCall = chatRoom.activeCall;
-                if (
-                    activeCall.sfuApp.isDestroyed ||
-                    activeCall.hasOtherParticipant() ||
-                    SfuClient.isTermCodeRetriable(data.reason)
-                ) {
-                    return;
-                }
-                if (chatRoom.type === 'private') {
-                    return chatRoom.trigger('onCallLeft', { callId: activeCall.callId });
-                }
-                // Wait for the peer left notifications to process before triggering.
-                setTimeout(() => {
-                    // make sure we still have that call as active
-                    if (chatRoom.activeCall === activeCall) {
-                        chatRoom.activeCall.initCallTimeout();
-                    }
-                }, 3000);
-            });
-
-            chatRoom.rebind('onMeAdded', (e, addedBy) => {
-                if (chatRoom.activeCallIds.length > 0) {
-                    const cm = megaChat.plugins.callManager2;
-
-                    const callId = chatRoom.activeCallIds.keys()[0];
-                    if (chatRoom.ringingCalls.exists(callId)) {
-                        return;
-                    }
-                    chatRoom.ringingCalls.set(callId, addedBy);
-                    chatRoom.megaChat.trigger('onIncomingCall', [
-                        chatRoom,
-                        callId,
-                        addedBy,
-                        cm
-                    ]);
-                    chatRoom.fakedLocalRing = true;
-
-                    // clear if not canceled/rejected already
-                    setTimeout(() => {
-                        delete chatRoom.fakedLocalRing;
-                        if (chatRoom.ringingCalls.exists(callId)) {
-                            cm.trigger("onRingingStopped", {
-                                callId: callId,
-                                chatRoom: chatRoom
-                            });
-                        }
-                    }, 30e3);
-                }
-            });
+            chatRoom.subscribeForCallEvents();
         });
-
         this.calls = {};
-        return self;
+        return this;
     };
-
     inherits(CallManager2, MegaDataEmitter);
 
     /**
@@ -1215,9 +1148,8 @@
         return result;
     };
 
-    CallManager2.prototype.registerCall = function(sfuApp, chatRoom, callId) {
-        this.calls[`${chatRoom.chatId}_${callId}`] = new Call(sfuApp, chatRoom, callId);
-        return this.calls[`${chatRoom.chatId}_${callId}`];
+    CallManager2.prototype.createCall = function(chatRoom, callId) {
+        return (this.calls[`${chatRoom.chatId}_${callId}`] = new Call(chatRoom, callId));
     };
 
     CallManager2.prototype.onCallState = function(eventData, chatRoom) {

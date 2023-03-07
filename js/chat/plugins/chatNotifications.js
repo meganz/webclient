@@ -186,8 +186,8 @@ var ChatNotifications = function(megaChat, options) {
                     const chatRoom = ev.data;
                     self.disconnectNotification = new Notification(chatRoom.getRoomTitle(), { body: l.chat_offline });
                     ion.sound.play('reconnecting');
-                    if (chatRoom.activeCall.isSharingScreen()) {
-                        chatRoom.activeCall.toggleScreenSharing();
+                    if (chatRoom.call.isSharingScreen()) {
+                        chatRoom.call.toggleScreenSharing();
                     }
                     self.disconnectNotification.onclick = () => {
                         window.focus();

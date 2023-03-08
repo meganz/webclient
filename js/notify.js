@@ -555,7 +555,6 @@ var notify = {
         this.userEmails[userHandle] = Promise.allSettled(promises)
             .then(() => {
                 this.userEmails[userHandle] = M.getUserByHandle(userHandle).m;
-                delay('notifyemailfetched', () => notify.renderNotifications(), 500);
             });
         return false;
     },

@@ -3603,47 +3603,76 @@ function enableVerifyFingerprintsButton(userHandle) {
     });
 }
 
-function fingerprintDialog(userid) {
+function fingerprintDialog(userid, isAdminVerify, callback) {
+    'use strict';
 
     // Add log to see how often they open the verify dialog
     api_req({ a: 'log', e: 99601, m: 'Fingerprint verify dialog opened' });
 
     userid = userid.u || userid;
-    var user = M.u[userid];
+    const user = M.u[userid];
     if (!user || !user.u) {
-        return;
+        return -5;
     }
 
-    var $dialog = $('.fingerprint-dialog');
-    var closeFngrPrntDialog = function() {
+    const $dialog = $('.fingerprint-dialog');
+
+    $dialog.toggleClass('admin-verify', isAdminVerify === true);
+    let titleTxt = l[6783];
+    let subTitleTxt = l[6779];
+    let approveBtnTxt = l[6777];
+    let credentialsTitle = l[6780];
+
+    if (isAdminVerify) {
+        titleTxt = l.bus_admin_ver;
+        subTitleTxt = l.bus_admin_ver_sub;
+        approveBtnTxt = l[1960];
+        credentialsTitle = l.bus_admin_cred;
+    }
+
+    $('header h2', $dialog).text(titleTxt);
+    $('.content-block p.sub-title-txt', $dialog).text(subTitleTxt);
+    $('.footer-container .dialog-approve-button span', $dialog).text(approveBtnTxt);
+    $('.fingerprint-code .contact-fingerprint-title', $dialog).text(credentialsTitle);
+
+    const closeFngrPrntDialog = () => {
         closeDialog();
         $('button.js-close', $dialog).off('click');
         $('.dialog-approve-button').off('click');
         $('.dialog-skip-button').off('click');
-        mega.ui.CredentialsWarningDialog.rendernext();
+        if (!isAdminVerify) {
+            callback = callback || mega.ui.CredentialsWarningDialog.rendernext;
+            callback(userid);
+        }
+        else {
+            const bus = new BusinessAccount();
+            bus.sendSubMKey();
+        }
     };
 
-    $dialog.find('.fingerprint-avatar').empty()
+    $('.fingerprint-avatar', $dialog).empty()
         .append($(useravatar.contact(userid, 'semi-mid-avatar')));
 
-    $dialog.find('.contact-details-user-name')
+    $('.contact-details-user-name', $dialog)
         .text(M.getNameByHandle(user.u)) // escape HTML things
         .end()
         .find('.contact-details-email')
         .text(user.m); // escape HTML things
 
-    $dialog.find('.fingerprint-txt').empty();
-    userFingerprint(u_handle, function(fprint) {
-        var target = $('.fingerprint-bott-txt .fingerprint-txt');
+    $('.fingerprint-txt', $dialog).empty();
+
+    userFingerprint(u_handle, (fprint) => {
+        const target = $('.fingerprint-bott-txt .fingerprint-txt');
         fprint.forEach(function(v) {
             $('<span>').text(v).appendTo(target);
         });
     });
 
-    userFingerprint(user, function(fprint) {
-        var offset = 0;
+    userFingerprint(user, (fprint) => {
+        let offset = 0;
         $dialog.find('.fingerprint-code .fingerprint-txt').each(function() {
-            var that = $(this);
+            let that = $(this);
+
             fprint.slice(offset, offset + 5).forEach(function(v) {
                 $('<span>').text(v).appendTo(that);
                 offset++;
@@ -3651,11 +3680,14 @@ function fingerprintDialog(userid) {
         });
     });
 
-    $('button.js-close', $dialog).rebind('click', function() {
+    $('button.js-close, .dialog-skip-button', $dialog).rebind('click', function() {
+        if (isAdminVerify) {
+            return;
+        }
         closeFngrPrntDialog();
     });
 
-    $('.dialog-approve-button').rebind('click', function() {
+    $('.dialog-approve-button', $dialog).rebind('click', () => {
 
         // Add log to see how often they verify the fingerprints
         api_req({ a: 'log', e: 99602, m: 'Fingerprint verification approved' });
@@ -3714,11 +3746,7 @@ function fingerprintDialog(userid) {
             });
     });
 
-    $('.dialog-skip-button').rebind('click', function() {
-        closeFngrPrntDialog();
-    });
-
-    M.safeShowDialog('fingerprint-dialog', $dialog);
+    M.safeShowDialog(isAdminVerify ? 'fingerprint-admin-dlg' : 'fingerprint-dialog', $dialog);
 }
 
 /**

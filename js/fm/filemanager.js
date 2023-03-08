@@ -238,6 +238,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'onboardingDialog'
             || $.dialog === 'stripe-pay'
             || $.dialog === 'start-meeting-dialog'
+            || $.dialog === 'fingerprint-admin-dlg'
             || $.dialog === 'meetings-schedule-dialog'
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {

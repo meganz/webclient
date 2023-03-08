@@ -3752,7 +3752,6 @@ body.de .mega-dialog.new-group-chat {
         padding: 0 5px 17px 5px;
         height: auto;
     }
-
     .mega-dialog.fingerprint-dialog .fingerprint-contact-info {
         margin: 0 16px;
         padding: 21px 0 0 0;
@@ -3766,6 +3765,39 @@ body.de .mega-dialog.new-group-chat {
         display: block;
         float: none;
         padding-right: 0;
+    }
+    .mega-dialog.fingerprint-dialog .business-subuser-confirm {
+        display: none;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify .business-subuser-confirm {
+        background-image: url(../images/mega/fingerprint-icon.svg);
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 140px;
+        height: 102px;
+        display: block;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify header {
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify header h2 {
+        text-align: center;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify .content-block > p {
+        text-align: center;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify footer button.dialog-skip-button {
+        display: none;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify footer .footer-container {
+        justify-content: center;
+        align-items: center;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify button.close {
+        display: none;
     }
 
 /* end fingerprint-dialog */
@@ -8714,7 +8746,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.user-management-add-user-dialog .verification-container {
         position: relative;
         height: auto;
-        background: var(--surface-grey-1);
+        background: var(--surface-grey-2);
         box-sizing: border-box;
         border-radius: 4px;
         width: 100%;
@@ -8782,6 +8814,25 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.user-management-add-user-dialog .border {
         margin-bottom: 24px;
+    }
+    .mega-dialog.user-management-add-user-dialog .fingerprint-container {
+        background-color: var(--surface-grey-1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        align-content: center;
+        justify-content: center;
+        margin: 24px 0;
+    }
+    .mega-dialog.user-management-add-user-dialog .fingerprint-container .fingerprint-title {
+        padding-top: 10px;
+        color: var(--text-color-high);
+    }
+    .mega-dialog.user-management-add-user-dialog .fingerprint-container .fingerprint-content-container {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        padding: 8px 0;
     }
 
 /* end user-management-add-user-dialog */

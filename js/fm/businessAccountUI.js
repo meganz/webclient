@@ -260,6 +260,26 @@ function getReportDates(leadingDate) {
     return { fromDate: startDate, toDate: endDateStr };
 }
 
+BusinessAccountUI.prototype.checkCu25519 = function(userHandle, callback) {
+    if (!pubCu25519[userHandle]) {
+        if (!authring.getContactAuthenticated(userHandle, 'Cu25519')) {
+            const ret = fingerprintDialog(userHandle, false, callback);
+            if (ret === -5) {
+                // not confimed account
+                return true;
+            }
+        }
+        else {
+            crypt.getPubCu25519(userHandle).always(() => {
+                callback(userHandle);
+            });
+        }
+        return false;
+    }
+    return true;
+};
+
+
 /**
  * Decodes fields in a user object into the correct values.
  *
@@ -548,13 +568,22 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.grid-table-user-management .dis-en-icon').rebind(
             'click.subuser',
             function disableEnableSubUserClickHandler() {
-                if ($(this).hasClass('disabled')) {
+                const $this = $(this);
+
+                if ($this.hasClass('disabled')) {
                     return false;
                 }
-                var userHandle = $(this).closest('tr').attr('id');
+                const userHandle = $this.closest('tr').attr('id');
                 if (!M.suba[userHandle]) {
                     return;
                 }
+
+                $this.addClass('disabled');
+
+                if (!mySelf.checkCu25519(userHandle, mySelf.viewSubAccountInfoUI.bind(mySelf))) {
+                    return false;
+                }
+
                 var isDisable = false;
                 if (M.suba[userHandle].s === 10 || M.suba[userHandle].s === 0) {
                     isDisable = true;
@@ -579,6 +608,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                                 }
                             );
                         }
+                        $this.removeClass('disabled');
                     };
 
                     mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler, uName);
@@ -604,6 +634,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                                 }
                             );
                         }
+                        $this.removeClass('disabled');
                     };
 
                     mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler2, uName, true);
@@ -957,7 +988,12 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     if (!this.initUItoRender()) {
         return;
     }
-    var mySelf = this;
+
+    const mySelf = this;
+
+    if (!mySelf.checkCu25519(subUserHandle, mySelf.viewSubAccountInfoUI.bind(mySelf))) {
+        return false;
+    }
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $subAccountContainer = $('.user-management-subaccount-view-container', $businessAccountContainer);
@@ -3076,6 +3112,29 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
     });
 };
 
+/**
+ * This is a function to show the fingerprint dialog.
+ * It can be called whenever needed
+ */
+BusinessAccountUI.prototype.showVerifyDialog = function() {
+    "use strict";
+
+    if (!u_attr || !u_attr.b || u_attr.b.m || u_attr.b.s === -1) {
+        return;
+    }
+
+    const showVerifyDlg = (sendCredentials) => {
+
+        if (!sendCredentials || sendCredentials === -9) {
+            return;
+        }
+
+        fingerprintDialog(u_attr.b.mu[0], true);
+
+    };
+
+    mega.attr.get(u_handle, 'gmk', -2, 0).always(showVerifyDlg);
+};
 
 /** show Welcome to business account dialog */
 BusinessAccountUI.prototype.showWelcomeDialog = function () {
@@ -3132,6 +3191,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $adduserContianer.removeClass('hidden');
         $('.verification-container', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).addClass('hidden');
+        $('.fingerprint-container', $dialog).addClass('hidden');
         $('header h2', $dialog).text(l[19084]).removeClass('hidden');
         $('footer .add-more', $dialog).addClass('hidden');
         $('footer .add-sub-user', $dialog).removeClass('a-ok-btn');
@@ -3159,10 +3219,11 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
     // checking if we are passing a valid result object
     if (result && result.u && result.m) {
-        var $addContianer = $('.dialog-input-container', $dialog);
-        var $resultContianer = $('.verification-container', $dialog);
+        const $addContianer = $('.dialog-input-container', $dialog);
+        const $resultContianer = $('.verification-container', $dialog);
+        const $fpContainer = $('.fingerprint-container', $dialog).addClass('hidden');
 
-        var subUserDefaultAvatar = useravatar.contact(result.u);
+        const subUserDefaultAvatar = useravatar.contact(result.u);
         $('.new-sub-user', $resultContianer).safeHTML(subUserDefaultAvatar);
         $('.sub-e', $resultContianer).text(result.m);
         if (result.lp) {
@@ -3191,6 +3252,18 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         }
 
         $addContianer.addClass('hidden');
+
+        userFingerprint(u_handle, (fprint) => {
+            if (!fprint || !fprint.length) {
+                return;
+            }
+            const $divs = $('.fingerprint-content-container div', $fpContainer);
+            for (let v = 0; v < fprint.length && v < 10; v++) {
+                $divs[v].textContent = fprint[v];
+            }
+            $fpContainer.removeClass('hidden');
+        });
+
         $resultContianer.removeClass('hidden');
         $('footer .add-sub-user', $dialog).addClass('a-ok-btn'); // OK
         $('footer .add-sub-user span', $dialog).text(l[81]); // OK
@@ -3328,6 +3401,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                 var $addContianer = $('.dialog-input-container', $dialog);
                 var $resultContianer = $('.verification-container', $dialog);
                 const $subUserEmail = $('.sub-e', $resultContianer);
+                const $fpContainer = $('.fingerprint-container', $dialog).addClass('hidden');
 
                 if (st === 1) {
                     var subUserDefaultAvatar = useravatar.contact(res.u);
@@ -3363,6 +3437,18 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     }
 
                     $addContianer.addClass('hidden');
+
+                    userFingerprint(u_handle, (fprint) => {
+                        if (!fprint || !fprint.length) {
+                            return;
+                        }
+                        const $divs = $('.fingerprint-content-container div', $fpContainer);
+                        for (let v = 0; v < fprint.length && v < 10; v++) {
+                            $divs[v].textContent = fprint[v];
+                        }
+                        $fpContainer.removeClass('hidden');
+                    });
+
                     $resultContianer.removeClass('hidden');
                     $('footer .add-more', $dialog).removeClass('hidden');
                     $('footer .add-sub-user', $dialog).addClass('a-ok-btn'); // OK
@@ -3538,8 +3624,14 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     if (!M.suba[subUserHandle]) {
         return;
     }
+
+    const mySelf = this;
+
+    if (!mySelf.checkCu25519(subUserHandle, mySelf.showEditSubUserDialog.bind(mySelf))) {
+        return false;
+    }
+
     var subUser = M.suba[subUserHandle];
-    var mySelf = this;
 
     var $dialog = $('.user-management-edit-profile-dialog.user-management-dialog');
     var $usersContainer = $('.content-block', $dialog);
@@ -3906,7 +3998,22 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
                 function getMKeyOK(st2, MKeyResult) {
                     changePercentage(20);
                     // sub-user tree decrypting
-                    var treeObj = mySelf.business.decrypteSubUserTree(treeResult, MKeyResult.k);
+
+                    let treeObj;
+
+                    if (MKeyResult.k) {
+                        treeObj = mySelf.business.decrypteSubUserTree(treeResult, MKeyResult.k);
+                    }
+                    else if (MKeyResult.k2) {
+                        treeObj = mySelf.business.decrypteSubUserTree(treeResult, MKeyResult.k2, subUserHandle);
+                    }
+                    else {
+                        if (d) {
+                            console.error(`couldnt find a key for sub user ${JSON.stringify(MKeyResult)}`);
+                        }
+                        return failing('No master key found for the subuser');
+                    }
+
                     changePercentage(30);
                     if (!treeObj) {
                         if (d) {

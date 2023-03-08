@@ -3952,6 +3952,18 @@ function loadfm_done(mDBload) {
             });
         }
 
+        // check if this a Business sub-user that needs to send his key
+        if (u_attr && u_attr.b && !u_attr.b.m && u_attr.b.s !== -1) {
+
+            M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+
+                const business_ui = new BusinessAccountUI();
+
+                business_ui.showVerifyDialog();
+
+            });
+        }
+
         if (hideLoadingDialog) {
             onIdle(() => {
                 window.loadingInitDialog.hide();

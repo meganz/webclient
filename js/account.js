@@ -497,8 +497,6 @@ function u_setrsa(rsakey) {
     // performance optimization. encode keys once
     var privateKeyEncoded = crypto_encodeprivkey(rsakey);
     var publicKeyEncodedB64 = base64urlencode(crypto_encodepubkey(rsakey));
-    var buinessMaster;
-    var buinsesPubKey;
 
     var request = {
         a: 'up',
@@ -513,28 +511,8 @@ function u_setrsa(rsakey) {
 
     // checking if we are creating keys for a business sub-user
     // (deprecated)
-    if (!mega.keyMgr.secure && window.businessSubAc) {
-        // we get current user's master user + its public key (master user pubkey)
-        buinessMaster = window.businessSubAc.bu;
-        buinsesPubKey = window.businessSubAc.bpubk;
-
-
-        // now we will encrypt the current user master-key using master-user public key. and include it in 'up' request
-        // because master-user must be aware of evey sub-user's master-key.
-        var subUserMasterKey = a32_to_str(u_k);
-
-        var masterAccountRSA_keyPub;
-        if (typeof buinsesPubKey === 'string') {
-            masterAccountRSA_keyPub = crypto_decodepubkey(base64urldecode(buinsesPubKey));
-        }
-        else {
-            masterAccountRSA_keyPub = buinsesPubKey;
-        }
-        var subUserMasterKeyEncRSA = crypto_rsaencrypt(subUserMasterKey, masterAccountRSA_keyPub);
-        var subUserMasterKeyEncRSA_B64 = base64urlencode(subUserMasterKeyEncRSA);
-
-        request.mk = subUserMasterKeyEncRSA_B64;
-
+    if (window.businessSubAc) {
+        request['^gmk'] = 'MQ';
     }
 
     var ctx = {

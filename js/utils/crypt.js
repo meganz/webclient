@@ -345,6 +345,12 @@ var crypt = (function() {
     ns.getPubKey = function(userhandle, keyType, callback) {
         assertUserHandle(userhandle);
 
+        let ignoreCache = false;
+        if (callback === true) {
+            ignoreCache = true;
+            callback = null;
+        }
+
         // if there is already a getPubKey request in progress, return it, instead of creating a brand new one
         if (ns._pubKeyRetrievalPromises[userhandle + "_" + keyType]) {
             var promise = ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
@@ -395,7 +401,7 @@ var crypt = (function() {
                     delete ns._pubKeyRetrievalPromises[userhandle + "_" + keyType];
                 }
 
-                var newPromise = ns.getPubKey(userhandle, keyType);
+                var newPromise = ns.getPubKey(userhandle, keyType, ignoreCache);
 
                 if (tmpPromise) {
                     tmpPromise.linkDoneAndFailTo(newPromise);
@@ -415,7 +421,7 @@ var crypt = (function() {
         var fingerprint;
 
         // Get out quickly if the key is cached.
-        if (pubKeyCache[userhandle]) {
+        if (!ignoreCache && pubKeyCache[userhandle]) {
             masterPromise.resolve(pubKeyCache[userhandle]);
             __callbackAttachAfterDone(masterPromise);
 
@@ -439,19 +445,11 @@ var crypt = (function() {
         var getPubKeyPromise = ns.getPubKeyAttribute(userhandle, keyType);
 
         // 2020-03-31: nowadays there is no point on verifying non-contacts...
+        // 2023-03-09: let's think that twice...
         var isNonContact = !is_karma && M.getUserByHandle(userhandle).c !== 1;
         if (isNonContact) {
-            if (d) {
-                logger[d > 1 ? 'warn' : 'info']('Skipping %s verification for non-contact "%s"', keyType, userhandle);
-            }
 
-            getPubKeyPromise.done(function(pubKey) {
-                pubKeyCache[userhandle] = pubKey;
-                masterPromise.resolve(pubKey);
-                __callbackAttachAfterDone(masterPromise);
-            });
-            masterPromise.linkFailTo(getPubKeyPromise);
-            return masterPromise;
+            logger.warn('Performing %s verification for non-contact "%s"', keyType, userhandle);
         }
 
         getPubKeyPromise.done(function __resolvePubKey(result) {

@@ -1204,7 +1204,11 @@ scparser.$add('se', {
 scparser.$add('pk', {
     b: function() {
         'use strict';
-        mega.keyMgr.fetchPendingInShareKeys().catch(dump);
+
+        delay('fetch-pending-share-keys', () => {
+
+            mega.keyMgr.fetchPendingInShareKeys().catch(dump);
+        });
     }
 });
 
@@ -1215,10 +1219,13 @@ scparser.$add('ua', {
         if (Array.isArray(a.ua)) {
             var attrs = a.ua;
             var actionPacketUserId = a.u;
+            let gotCu255 = false;
 
             for (var j = 0; j < attrs.length; j++) {
                 var attributeName = attrs[j];
                 mega.attr.uaPacketParser(attributeName, actionPacketUserId, false, a.v && a.v[j]);
+
+                gotCu255 = gotCu255 || String(attributeName).includes('Cu255');
             }
 
             // in case of business master
@@ -1232,6 +1239,16 @@ scparser.$add('ua', {
                             business.updateSubUserInfo(actionPacketUserId, attrs);
                         }
                     );
+                }
+
+                if (gotCu255) {
+
+                    delay('complete-pending-out-shares', () => {
+                        if (d) {
+                            console.warn('Trying to complete out-shares from business admin...');
+                        }
+                        mega.keyMgr.completePendingOutShares().catch(dump);
+                    });
                 }
             }
         }

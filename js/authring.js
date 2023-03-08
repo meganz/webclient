@@ -160,10 +160,14 @@ var authring = (function () {
                 continue;
             }
 
+            /* (refer to commit history if you ever want to uncomment this)
+
             // Skip non-contact's fingerprints
             if (!(userhandle in M.u && M.u[userhandle].c >= 0 && M.u[userhandle].c < 2)) {
                 continue;
             }
+
+            /***/
 
             result += this._serialiseRecord(userhandle, record.fingerprint,
                                             record.method, record.confidence);
@@ -306,6 +310,52 @@ var authring = (function () {
         return masterPromise;
     };
 
+    /**
+     * Enqueue key-management commit, upon established authenticated users.
+     * @returns {Promise<*>} none
+     */
+    ns.enqueueKeyMgrCommit = function() {
+
+        if (!this.pendingKeyMgrCommit) {
+
+            this.pendingKeyMgrCommit = mega.promise;
+
+            // @todo debounce longer if no side-effects..
+            onIdle(() => {
+                const {resolve, reject} = this.pendingKeyMgrCommit;
+
+                this.pendingKeyMgrCommit = null;
+                mega.keyMgr.commit().then(resolve).catch(reject);
+            });
+        }
+
+        return this.pendingKeyMgrCommit;
+    };
+
+    /**
+     * Try to complete pending out/in-shares based on the new situation.
+     * @returns {Promise<*>}
+     */
+    ns.enqueueKeyMgrSharesCompletion = function() {
+
+        if (!this.pendingKeyMgrSharesCompletion) {
+
+            this.pendingKeyMgrSharesCompletion = mega.promise;
+
+            onIdle(() => {
+                const {resolve, reject} = this.pendingKeyMgrSharesCompletion;
+
+                mega.keyMgr.completePendingOutShares()
+                    .then(() => mega.keyMgr.acceptPendingInShares())
+                    .then(resolve)
+                    .catch(reject);
+
+                this.pendingKeyMgrSharesCompletion = null;
+            });
+        }
+
+        return this.pendingKeyMgrSharesCompletion;
+    };
 
     /**
      * Saves the ring for all authenticated contacts from `u_authring`.
@@ -335,7 +385,7 @@ var authring = (function () {
                     )
                 );
             }
-            promises.push(mega.keyMgr.commit());
+            promises.push(this.enqueueKeyMgrCommit());
             return Promise.all(promises);
         });
     };
@@ -427,10 +477,8 @@ var authring = (function () {
 
             return ns.setContacts(keyType)
                 .then(() => {
-                    // try to complete pending out/in-shares based on the new situation.
-                    return mega.keyMgr.completePendingOutShares();
-                })
-                .then(() => mega.keyMgr.acceptPendingInShares());
+                    return this.enqueueKeyMgrSharesCompletion();
+                });
         }
     };
 
@@ -734,6 +782,21 @@ var authring = (function () {
         }
 
         assert(u_authring.Ed25519, `Unexpected auth-ring failure... (${debugTag})`);
+    };
+
+    // wait for auth-ring and strongvelope
+    ns.waitForARSVLP = function(id) {
+        return new Promise((resolve, reject) => {
+
+            this.onAuthringReady(id)
+                .then(() => {
+                    if (megaChatIsReady) {
+                        return resolve();
+                    }
+                    mBroadcaster.once('chat_initialized', resolve);
+                })
+                .catch(reject);
+        });
     };
 
     /**

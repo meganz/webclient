@@ -11,6 +11,12 @@ lazy(mega, 'keyMgr', () => {
     const logger = MegaLogger.getLogger('KeyMgr');
     const dump = logger.warn.bind(logger, 'Caught Promise Rejection');
 
+    const pkPull = {
+        lock: null,
+        smbl: Symbol('fetch-pending-share-keys')
+    };
+    let sNodeUsers = Object.create(null);
+
     const expungePendingOutShares = (u8, nodes, users = false, emails = false) => {
         const sub = $.len(users) || $.len(emails);
         const any = !sub && nodes === false;
@@ -157,20 +163,23 @@ lazy(mega, 'keyMgr', () => {
             // deserialised sharekeys are known to be in ^!keys
             this.deserialisedsharekeys = Object.create(null);
 
-            // in-session freshly created share-keys
-            this.createdsharekey = Object.create(null);
-
             // share-key revocation queue
             this.delSharesQueue = null;
 
             // a commit() attempt was unsuccessful due to incomplete state
             this.pendingcommit = null;
 
+            // a pk-packet is awaiting
+            this.pendingpullkey = false;
+
             // indicates an unresolved version clash
             this.versionclash = false;
 
             // feature flag: enable with the blog post going live
             this.secure = true;
+
+            // true if user needs to manually verify contact's credentials to encrypt/decrypt share keys
+            this.manualVerification = false;
 
             /** @property KeyMgr.ph -- Protocol Handler instance */
             lazy(this, 'ph', () => {
@@ -587,7 +596,7 @@ lazy(mega, 'keyMgr', () => {
                 }
 
                 if (this.trustedsharekeys[h]) {
-                    blob[p + 22] = 1;
+                    blob[p + 22] = this.trustedsharekeys[h] | 0;
                 }
 
                 p += 23;
@@ -614,7 +623,7 @@ lazy(mega, 'keyMgr', () => {
                 }
 
                 if (blob[p + 22]) {
-                    this.trustedsharekeys[h] = true;
+                    this.trustedsharekeys[h] = blob[p + 22] | 0;
                 }
 
                 this.deserialisedsharekeys[h] = true;
@@ -1012,20 +1021,30 @@ lazy(mega, 'keyMgr', () => {
             return sharedNodes;
         }
 
-        // FIXME: discontinue SEEN status
         async cacheVerifiedPeerKeys(userHandle) {
             const promises = [];
 
+            if (typeof userHandle !== 'string' || userHandle.length !== 11) {
+                logger.error('Got invalid user-handle...', userHandle, typeof userHandle);
+                return;
+            }
+
+            const cuMissing =
+                pubCu25519[userHandle] ? authring.getContactAuthenticated(userHandle, 'Cu25519') ? 0 : -2 : -1;
+
+            const edMissing =
+                pubEd25519[userHandle] ? authring.getContactAuthenticated(userHandle, 'Ed25519') ? 0 : -2 : -1;
+
             if (d) {
-                logger.debug('Cache peer-key for %s', userHandle, !!pubCu25519[userHandle], !!pubEd25519[userHandle]);
+                logger.debug('Cache peer-key for %s', userHandle, cuMissing, edMissing);
             }
 
-            if (!pubCu25519[userHandle]) {
-                promises.push(crypt.getPubCu25519(userHandle));
+            if (cuMissing) {
+                promises.push(crypt.getPubCu25519(userHandle, true));
             }
 
-            if (!pubEd25519[userHandle]) {
-                promises.push(crypt.getPubEd25519(userHandle));
+            if (edMissing) {
+                promises.push(crypt.getPubEd25519(userHandle, true));
             }
 
             return promises.length && Promise.all(promises)
@@ -1036,6 +1055,11 @@ lazy(mega, 'keyMgr', () => {
         }
 
         haveVerifiedKeyFor(userHandle) {
+            if (typeof userHandle !== 'string' || userHandle.length !== 11) {
+                logger.error('Got invalid user-handle..', userHandle, typeof userHandle);
+                return false;
+            }
+
             // trusted key available?
             const ed = authring.getContactAuthenticated(userHandle, 'Ed25519');
             const cu = authring.getContactAuthenticated(userHandle, 'Cu25519');
@@ -1043,6 +1067,16 @@ lazy(mega, 'keyMgr', () => {
             if (d) {
                 const msg = 'Checking verified status for %s... (cu=%s, ed=%s)';
                 logger.debug(msg, userHandle, cu && cu.method, ed && ed.method);
+
+                if (!cu) {
+                    logger.warn(`Cu25519 for ${userHandle} not yet cached...`);
+                }
+            }
+
+            if (!this.manualVerification) {
+                // if no manual verification required, still check Ed25519 public key is SEEN
+
+                return ed && ed.method >= authring.AUTHENTICATION_METHOD.SEEN;
             }
 
             return cu && cu.method >= authring.AUTHENTICATION_METHOD.SIGNATURE_VERIFIED
@@ -1104,35 +1138,33 @@ lazy(mega, 'keyMgr', () => {
                 let changed = typeof stub === 'function' && stub() || false;
 
                 for (const node in this.pendinginshares) {
-                    if (u_sharekeys[node]) {
-                        // already have it
+                    const t = this.pendinginshares[node];
+                    const s = ab_to_str(new Uint8Array(t.buffer, t.byteOffset + 8));
+                    const u = ab_to_base64(new Uint8Array(t.buffer, t.byteOffset, 8));
+                    const k = u_sharekeys[node];
+
+                    const sharekey = this.decryptFrom(s, u);
+
+                    if (sharekey) {
+                        // decrypted successfully - set key and delete record
+                        crypto_setsharekey(node, str_to_a32(sharekey), false, true);
                         delete this.pendinginshares[node];
                         changed = true;
 
                         if (d) {
-                            logger.log('existing share-key for %s', node);
-                        }
-                    }
-                    else {
-                        const t = this.pendinginshares[node];
-                        const s = ab_to_str(new Uint8Array(t.buffer, t.byteOffset + 8));
-                        const u = ab_to_base64(new Uint8Array(t.buffer, t.byteOffset, 8));
-
-                        const sharekey = this.decryptFrom(s, u);
-
-                        if (sharekey) {
-                            // decrypted successfully - set key and delete record
-                            crypto_setsharekey(node, str_to_a32(sharekey), false, true);
-                            delete this.pendinginshares[node];
-                            changed = true;
-
-                            if (d) {
+                            if (k) {
+                                logger.info('share-key decrypted and replaced for %s', node, k);
+                            }
+                            else {
                                 logger.info('share-key decrypted for %s', node);
                             }
                         }
-                        else if (d) {
-                            logger.debug('cannot (yet) decrypt share-key for %s', node);
-                        }
+                    }
+                    else if (k && d) {
+                        logger.debug('cannot (yet) decrypt share-key for %s, leaving existing one...', node);
+                    }
+                    else if (d) {
+                        logger.debug('cannot (yet) decrypt share-key for %s', node);
                     }
                 }
 
@@ -1148,27 +1180,52 @@ lazy(mega, 'keyMgr', () => {
         // cache peer public keys required to decrypt pendinginshare
         // then, try to decrypt them and persist the remainder for retry later
         async acceptPendingInShares(stub) {
-            const promises = [];
+            const users = Object.create(null);
 
             // cache senders' public keys
             for (const node in this.pendinginshares) {
                 const {buffer, byteOffset} = this.pendinginshares[node];
 
-                promises.push(this.cacheVerifiedPeerKeys(ab_to_base64(new Uint8Array(buffer, byteOffset, 8))));
+                users[ab_to_base64(new Uint8Array(buffer, byteOffset, 8))] = 1;
             }
 
-            await Promise.allSettled(promises);
+            await Promise.all(Object.keys(users).map(uh => this.cacheVerifiedPeerKeys(uh)));
             await this.acceptPendingInShareCacheKeys(stub);
 
-            queueMicrotask(() => {
-                this.decryptInShares().catch(dump);
-            });
+            return this.decryptInShares();
         }
 
         // fetch pending inshare keys from the API, decrypt inshares for trusted sender keys, store in ^!keys otherwise
         // (idempotent operation)
         async fetchPendingInShareKeys() {
+
+            if (!this.version || pkPull.lock) {
+                logger.debug('Cannot fetch pending in-share keys atm.', this.version, this.pendingpullkey, pkPull.lock);
+                this.pendingpullkey = true;
+                return;
+            }
+            pkPull.lock = true;
+
+            return this._fetchPendingInShareKeys(pkPull.smbl)
+                .finally(() => {
+
+                    pkPull.lock = false;
+
+                    if (this.pendingpullkey) {
+                        this.pendingpullkey = false;
+
+                        onIdle(() => {
+                            this.fetchPendingInShareKeys().catch(dump);
+                        });
+                    }
+                });
+        }
+
+        async _fetchPendingInShareKeys(auth) {
             let rem, stub;
+
+            assert(auth === pkPull.smbl, 'invalid invocation.');
+            await authring.waitForARSVLP('fetch-pending-share-keys');
 
             if (d) {
                 logger.warn('Fetching pending in-share keys...');
@@ -1184,6 +1241,9 @@ lazy(mega, 'keyMgr', () => {
                 rem = res.d;
                 delete res.d;
 
+                // ensure required sender key(s) are available...
+                await Promise.all(Object.keys(res).map(uh => this.cacheVerifiedPeerKeys(uh))).catch(dump);
+
                 stub = () => {
                     let changed = false;
 
@@ -1191,16 +1251,14 @@ lazy(mega, 'keyMgr', () => {
                         const uhab = new Uint8Array(base64_to_ab(userHandle), 0, 8);
 
                         for (const node in res[userHandle]) {
-                            if (!u_sharekeys[node]) {
-                                // construct userhandle / key blob and add it to pendinginshares
-                                const t = new Uint8Array(24);
+                            // construct userhandle / key blob and add it to pendinginshares
+                            const t = new Uint8Array(24);
 
-                                t.set(uhab);
-                                t.set(new Uint8Array(base64_to_ab(res[userHandle][node])), 8);
+                            t.set(uhab);
+                            t.set(new Uint8Array(base64_to_ab(res[userHandle][node])), 8);
 
-                                changed = true;
-                                this.pendinginshares[node] = t;
-                            }
+                            changed = true;
+                            this.pendinginshares[node] = t;
                         }
                     }
 
@@ -1244,11 +1302,23 @@ lazy(mega, 'keyMgr', () => {
 
         // meant to append cr-element only once during share
         hasNewShareKey(node) {
-            if (this.createdsharekey[node]) {
-                this.createdsharekey[node] = false;
-                return true;
+            return !(this.trustedsharekeys[node] & 2);
+        }
+
+        // write out a new share-key was successfully used in s/s2.cr
+        async setUsedNewShareKey(node) {
+            if (!this.trustedsharekeys[node]) {
+                return;
             }
-            return false;
+
+            do {
+                if (this.trustedsharekeys[node] & 2) {
+                    break;
+                }
+
+                this.trustedsharekeys[node] |= 2;
+            }
+            while (!await this.commit());
         }
 
         // creates a sharekey for a node and sends the subtree's shareufskeys to the API
@@ -1280,7 +1350,6 @@ lazy(mega, 'keyMgr', () => {
                 // approach changing
                 if (!u_sharekeys[node]) {
                     crypto_setsharekey2(node, sharekey);
-                    this.createdsharekey[node] = true;
                 }
 
                 // also, authorise this sharekey to be targeted by active backups and uploads
@@ -1424,15 +1493,45 @@ lazy(mega, 'keyMgr', () => {
                 logger.info('*** sending share-keys', users, [node]);
             }
 
-            if (users && users.length) {
-                await this.createPendingOutShares(node, users);
-                return this.completePendingOutShares();
+            if (!(typeof node === 'string' && node.length === 8 && Array.isArray(users) && users.length)) {
+                logger.warn('Cannot send share keys with the provided parameters..', node, users);
+                return false;
             }
+
+            if (sNodeUsers[node]) {
+                sNodeUsers[node].push(...users);
+            }
+            else {
+                sNodeUsers[node] = [...users];
+            }
+
+            if (!this.sendShareKeysLock) {
+                this.sendShareKeysLock = mega.promise;
+
+                onIdle(() => {
+                    const {resolve, reject} = this.sendShareKeysLock;
+
+                    const nodes = Object.keys(sNodeUsers);
+                    const users = Object.values(sNodeUsers);
+
+                    this.sendShareKeysLock = null;
+                    sNodeUsers = Object.create(null);
+
+                    this.createPendingOutShares(nodes, users)
+                        .then(resolve)
+                        .catch(reject)
+                        .finally(() => {
+                            this.completePendingOutShares().catch(dump);
+                        });
+                });
+            }
+
+            return this.sendShareKeysLock;
         }
 
         // pending outshares
         // associate targetuser (handle or email address) with a node
-        async createPendingOutShares(node, targetusers) {
+        async createPendingOutShares(nodes, targets) {
             if (!this.generation) {
                 return;
             }
@@ -1440,27 +1539,41 @@ lazy(mega, 'keyMgr', () => {
             do {
                 let t = this.pendingoutshares;
 
-                for (let j = 0; j < targetusers.length; ++j) {
-                    const targetuser = targetusers[j];
+                for (let u = 0; u < nodes.length; ++u) {
+                    const node = nodes[u];
+                    const targetusers = targets[u];
 
-                    if (targetuser.length && targetuser.length < 256) {
-                        if (!targetuser.includes('@') && targetuser.length === 11) {
-                            // store as NUL + 12-byte node-user pair
-                            const tt = new Uint8Array(t.length + 15);
-                            tt.set(new Uint8Array(base64_to_ab(node + targetuser), 0, 14), 1);
-                            tt.set(t, 15);
-                            t = tt;
-                        }
-                        else if (targetuser !== 'EXP') {
-                            // store as targetuser.length + 8-byte node plus ASCII email address + targetuser
-                            const tt = new Uint8Array(t.length + targetuser.length + 7);
-                            tt[0] = targetuser.length;
-                            tt.set(new Uint8Array(base64_to_ab(node), 0, 6), 1);
-                            for (let i = 0; i < targetuser.length; i++) {
-                                tt[i + 7] = targetuser.charCodeAt(i);
+                    if (d) {
+                        logger.info(`Creating pending out-share with ${node} for...`, targetusers);
+                    }
+
+                    for (let j = 0; j < targetusers.length; ++j) {
+                        const targetuser = targetusers[j];
+
+                        if (targetuser.length && targetuser.length < 256) {
+
+                            if (!targetuser.includes('@') && targetuser.length === 11) {
+                                // store as NUL + 12-byte node-user pair
+                                const tt = new Uint8Array(t.length + 15);
+
+                                tt.set(new Uint8Array(base64_to_ab(node + targetuser), 0, 14), 1);
+                                tt.set(t, 15);
+                                t = tt;
                             }
-                            tt.set(t, targetuser.length + 7);
-                            t = tt;
+                            else if (targetuser !== 'EXP') {
+                                // store as targetuser.length + 8-byte node plus ASCII email address + targetuser
+                                const tt = new Uint8Array(t.length + targetuser.length + 7);
+
+                                tt[0] = targetuser.length;
+                                tt.set(new Uint8Array(base64_to_ab(node), 0, 6), 1);
+
+                                // eslint-disable-next-line max-depth -- @todo
+                                for (let i = 0; i < targetuser.length; i++) {
+                                    tt[i + 7] = targetuser.charCodeAt(i);
+                                }
+                                tt.set(t, targetuser.length + 7);
+                                t = tt;
+                            }
                         }
                     }
                 }
@@ -1504,24 +1617,32 @@ lazy(mega, 'keyMgr', () => {
         // complete all pending outshares that have a userhandle attached for which we have an authenticated public key
         // (this is idempotent and must be called at app start to cater for aborts during the previous run)
         async completePendingOutShares() {
-            if (!this.generation) {
+            if (!this.generation || !this.pendingoutshares.byteLength) {
                 return;
             }
 
             // first, expand the binary pendingoutshares blob
             const t = this.pendingoutshares;
             const pending = [];
-            const promises = [];
+            const users = Object.create(null);
 
             for (let p = 0; p < t.length;) {
+                let uh = null;
+
                 if (t[p]) {
                     // pending user - email address
-                    const email = String.fromCharCode.apply(null, t.subarray(p + 7, t[p] + 7));
-                    const uh = M.getUserByEmail(email).u;
+                    const email = String.fromCharCode.apply(null, t.subarray(p + 7, t[p] + p + 7));
 
                     // FIXME: risk of crossover attacks
-                    if (uh) {
-                        pending.push([ab_to_base64(new Uint8Array(t.buffer, t.byteOffset + p + 1, 6)), uh]);
+                    if (email) {
+                        uh = M.getUserByEmail(email).u;
+
+                        if (uh) {
+                            pending.push([ab_to_base64(new Uint8Array(t.buffer, t.byteOffset + p + 1, 6)), uh, email]);
+                        }
+                    }
+                    else {
+                        logger.error('Empty email on pending out-shares store..', p, t[p]);
                     }
 
                     p += t[p] + 7;
@@ -1529,20 +1650,24 @@ lazy(mega, 'keyMgr', () => {
                 else {
                     // known user handle
                     const nodeuser = ab_to_base64(new Uint8Array(t.buffer, t.byteOffset + p + 1, 14));
-                    pending.push([nodeuser.substr(0, 8), nodeuser.substr(8, 11)]);
+
+                    uh = nodeuser.substr(8, 11);
+                    pending.push([nodeuser.substr(0, 8), uh]);
                     p += 15;
+                }
+
+                if (uh) {
+                    users[uh] = 1;
                 }
             }
 
             // step 1: cache recipients' keys
-            for (let i = pending.length; i--;) {
-                promises.push(this.cacheVerifiedPeerKeys(pending[i][1]));
-            }
-            await Promise.allSettled(promises);
+            await Promise.all(Object.keys(users).map(uh => this.cacheVerifiedPeerKeys(uh)));
 
             // step 2: encrypt sharekeys to cached recipients and queue to the API
             const deletePendingNode = [];
             const deletePendingNodeUser = Object.create(null);
+            const deletePendingNodeEmail = Object.create(null);
 
             for (let i = pending.length; i--;) {
                 if (u_sharekeys[pending[i][0]]) {    // do we still have a sharekey for the node?
@@ -1552,6 +1677,10 @@ lazy(mega, 'keyMgr', () => {
                     if (shareKeyForPeer) {
                         api_req({a: 'pk', u: pending[i][1], h: pending[i][0], k: base64urlencode(shareKeyForPeer)});
                         deletePendingNodeUser[pending[i][0] + pending[i][1]] = true;
+
+                        if (pending[i][2]) {
+                            deletePendingNodeEmail[pending[i][0] + pending[i][2]] = true;
+                        }
                     }
                 }
                 else {
@@ -1560,7 +1689,7 @@ lazy(mega, 'keyMgr', () => {
                 }
             }
 
-            return this.deletePendingOutShares(deletePendingNode, deletePendingNodeUser);
+            return this.deletePendingOutShares(deletePendingNode, deletePendingNodeUser, deletePendingNodeEmail);
         }
 
         // adjust the permitted sharekeys for any backup or upload under
@@ -1684,11 +1813,37 @@ mBroadcaster.addListener('fm:initialized', () => {
 
     if (u_type > 0) {
         let state = null;
+        const logger = MegaLogger.getLogger('KeyMgr');
+
+        const dspSequentialPendingEvents = (v) => {
+            const seq = [];
+
+            if (mega.keyMgr.pendingpullkey) {
+                seq.push(() => {
+                    if (d) {
+                        logger.warn('Dispatching pending pk..');
+                    }
+                    return mega.keyMgr.fetchPendingInShareKeys();
+                });
+            }
+
+            seq.push(() => {
+                if (mega.keyMgr.pendingcommit) {
+                    if (d) {
+                        logger.warn('Dispatching pending commit...');
+                    }
+                    return mega.keyMgr.commit();
+                }
+            });
+
+            logger.info('Dispatching sequential pending events...', v, seq.length);
+
+            return seq.reduce((p, f) => p.then(f), Promise.resolve(v));
+        };
 
         Promise.all([authring.onAuthringReady('KeyMgr'), mega.keyMgr.getGeneration()])
             .then(([, keyMgrGeneration]) => {
                 const keys = u_attr['^!keys'];
-                const logger = MegaLogger.getLogger('KeyMgr');
 
                 state = [
                     mega.keyMgr.version,
@@ -1715,6 +1870,7 @@ mBroadcaster.addListener('fm:initialized', () => {
 
                     // Save now complete crypto state to ^!keys
                     return mega.keyMgr.initKeyManagement(keys)
+                        .then(dspSequentialPendingEvents)
                         .catch((ex) => {
 
                             if (keys && !mega.keyMgr.secure) {
@@ -1727,21 +1883,18 @@ mBroadcaster.addListener('fm:initialized', () => {
                             throw ex;
                         });
                 }
-                else if (mega.keyMgr.pendingcommit) {
-                    if (d) {
-                        logger.warn('Dispatching pending commit...');
-                    }
-                    return mega.keyMgr.commit();
-                }
+
+                return dspSequentialPendingEvents();
             })
             .catch((ex) => {
-                console.error(`key-manager error (${state})`, ex);
+                logger.error(`key-manager error (${state})`, ex);
 
                 if (!window.buildOlderThan10Days) {
 
                     eventlog(99811, JSON.stringify([4, String(ex).trim().split('\n')[0], state]));
                 }
-            });
+            })
+            .finally(() => logger.info('Setup finished...'));
     }
 
     return 0xDEAD;

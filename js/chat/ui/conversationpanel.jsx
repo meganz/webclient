@@ -722,7 +722,7 @@ export class ConversationRightArea extends MegaRenderMixin {
         const { isRecurring, isUpcoming, occurrences } = scheduledMeeting || {};
 
         /* `Archive chat/meeting` */
-        let archiveText = room.isMeeting ? l.archive_meeting_btn : l[16689];
+        let archiveText = room.isMeeting ? l.archive_meeting_btn : l.archive_chat_btn;
         if (room.isArchived()) {
             /* `Unarchive chat/meeting` */
             archiveText = room.isMeeting ? l.unarchive_meeting_btn : l[19065];

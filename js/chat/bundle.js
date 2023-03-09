@@ -11770,7 +11770,7 @@ class ConversationRightArea extends mixins.wl {
       isUpcoming,
       occurrences
     } = scheduledMeeting || {};
-    let archiveText = room.isMeeting ? l.archive_meeting_btn : l[16689];
+    let archiveText = room.isMeeting ? l.archive_meeting_btn : l.archive_chat_btn;
     if (room.isArchived()) {
       archiveText = room.isMeeting ? l.unarchive_meeting_btn : l[19065];
     }

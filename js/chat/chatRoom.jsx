@@ -1259,7 +1259,7 @@ ChatRoom.prototype.updatePublicHandle = function(d, cim, callback) {
     return megaChat.plugins.chatdIntegration.updateChatPublicHandle(this.chatId, d, cim, callback);
 };
 
-// [...] TODO: add documentation
+// [...] TODO: -- REMOVE
 ChatRoom.prototype.getPublicLink = function(callback) {
     return this.publicLink || this.updatePublicHandle(false, false, callback);
 };

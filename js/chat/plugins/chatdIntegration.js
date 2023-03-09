@@ -222,7 +222,7 @@ ChatdIntegration.prototype.updateChatPublicHandle = function(h, d, cim, callback
         a: 'mcph',
         id: h,
         d: d || undefined,
-        cim: cim || undefined,
+        cim,
         v: Chatd.VERSION
     })
         .done(r => {

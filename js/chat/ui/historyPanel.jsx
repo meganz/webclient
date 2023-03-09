@@ -11,6 +11,7 @@ import GenericConversationMessage from "./messages/generic.jsx";
 import {PerfectScrollbar} from "../../ui/perfectScrollbar.jsx";
 import {RetentionChange} from "./messages/retentionChange.jsx";
 import Call from './meetings/call.jsx';
+import ScheduleMetaChange from "./messages/scheduleMetaChange";
 
 export default class HistoryPanel extends MegaRenderMixin {
     $container = null;
@@ -243,7 +244,9 @@ export default class HistoryPanel extends MegaRenderMixin {
             room.trigger('RefreshUI');
             if (room.scrolledToBottom) {
                 delay('hp:reinit-scroll', () => {
-                    this.messagesListScrollable.reinitialise(true, true);
+                    if (this.messagesListScrollable) {
+                        this.messagesListScrollable.reinitialise(true, true);
+                    }
                 }, 30);
             }
         }
@@ -498,7 +501,7 @@ export default class HistoryPanel extends MegaRenderMixin {
             contactName = avatarMeta.fullName;
         }
         else if (contacts && contacts.length > 1) {
-            contactName = room.getRoomTitle(true);
+            contactName = room.getRoomTitle();
         }
 
         var messagesList = [];
@@ -527,7 +530,7 @@ export default class HistoryPanel extends MegaRenderMixin {
                         <div className="header">
                             <ParsedHTML
                                 tag="div"
-                                content={headerText}
+                                content={room.scheduledMeeting ? megaChat.html(room.getRoomTitle()) : headerText}
                             />
                         </div>
                         <div className="info">
@@ -699,7 +702,41 @@ export default class HistoryPanel extends MegaRenderMixin {
                             contact={Message.getContactForMessage(v)}
                         />;
                     }
-
+                    else if (v.dialogType === 'scheduleMeta') {
+                        if (v.meta.onlyTitle) {
+                            messageInstance =
+                                <TopicChange
+                                    message={v}
+                                    key={v.messageId}
+                                    contact={Message.getContactForMessage(v)}
+                                    grouped={grouped}
+                                    chatRoom={v.chatRoom}
+                                />;
+                        }
+                        else {
+                            if (v.meta.topicChange) {
+                                messagesList.push(
+                                    <TopicChange
+                                        message={v}
+                                        key={`${v.messageId}-topic`}
+                                        contact={Message.getContactForMessage(v)}
+                                        grouped={grouped}
+                                        chatRoom={v.chatRoom}
+                                    />
+                                );
+                            }
+                            messageInstance =
+                                <ScheduleMetaChange
+                                    message={v}
+                                    key={v.messageId}
+                                    mode={v.meta.mode}
+                                    chatRoom={room}
+                                    grouped={grouped}
+                                    link={v.chatRoom.publicLink}
+                                    contact={Message.getContactForMessage(v)}
+                                />;
+                        }
+                    }
 
                     messagesList.push(messageInstance);
                 }

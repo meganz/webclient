@@ -155,7 +155,10 @@ var notify = {
         // some sharing scenarios where a user is part of a share then another user adds files to the share but they
         // are not contacts with that other user so the local state has no information about them and would display a
         // broken notification if the email is not known.
-        if (newNotification.type === 'put' && !this.getUserEmailByTheirHandle(newNotification.userHandle)) {
+        if (
+            newNotification.type === 'put'
+            && !this.getUserEmailByTheirHandle(newNotification.userHandle, undefined, true)
+        ) {
             console.assert(newNotification.userHandle && newNotification.userHandle.length === 11);
 
             // Once the email is fetched it will re-call the notifyFromActionPacket function with the same actionPacket
@@ -205,6 +208,10 @@ var notify = {
     isUnwantedNotification: function(notification) {
 
         var action;
+
+        if (notification.dn) {
+            return true;
+        }
 
         switch (notification.a || notification.t) {
             case 'put':
@@ -515,13 +522,41 @@ var notify = {
     },
 
     /**
-     * Retrieve the email associated to an user by his/their handle.
-     * @param {String} userHandle the
-     * @returns {Object} or false if not found.
+     * Retrieve the email associated to a user by his/their handle or from the optional notification data
+     * @param {String} userHandle the user handle to fetch the email for
+     * @param {Object} [data] Optional the notification data
+     * @param {boolean} [skipFetch] Optional to not use this function to sync the user data
+     * @returns {string|false} The email if found or false if fetching data (or skipped by skipFetch)
      */
-    getUserEmailByTheirHandle: function(userHandle) {
+    getUserEmailByTheirHandle: function(userHandle, data, skipFetch) {
         'use strict';
-        return M.getUserByHandle(userHandle).m || this.userEmails[userHandle] || false;
+        if (typeof this.userEmails[userHandle] === 'string' && this.userEmails[userHandle]) {
+            // Previously found and not an empty string.
+            return this.userEmails[userHandle];
+        }
+        const userEmail = M.getUserByHandle(userHandle).m;
+        if (userEmail) {
+            // Found in M.u
+            return userEmail;
+        }
+        if (data && data.m) {
+            // Found on notification data
+            return data.m;
+        }
+        if (skipFetch || (this.userEmails[userHandle] instanceof Promise)) {
+            return false;
+        }
+        // Fetch data from API
+        M.setUser(userHandle);
+        const promises = [
+            M.syncUsersFullname(userHandle, undefined, new MegaPromise()),
+            M.syncContactEmail(userHandle, new MegaPromise(), true)
+        ];
+        this.userEmails[userHandle] = Promise.allSettled(promises)
+            .then(() => {
+                this.userEmails[userHandle] = M.getUserByHandle(userHandle).m;
+            });
+        return false;
     },
 
     /**
@@ -599,6 +634,7 @@ var notify = {
         notify.initPaymentReminderClickHandler();
         notify.initAcceptContactClickHandler();
         notify.initSettingsClickHander();
+        notify.initScheduledClickHandler();
     },
 
     /**
@@ -758,6 +794,22 @@ var notify = {
         });
     },
 
+    initScheduledClickHandler: () => {
+        'use strict';
+        $('.nt-schedule-meet', this.$popup).rebind('click.notifications', e => {
+            const chatId = $(e.currentTarget).attr('data-chatid');
+            if (chatId) {
+                notify.closePopup();
+                loadSubPage(`fm/chat/${chatId}`);
+                if ($(e.currentTarget).attr('data-desc') === '1') {
+                    delay(`showSchedDescDialog-${chatId}`, () => {
+                        megaChat.chats[chatId].trigger('openSchedDescDialog');
+                    }, 1500);
+                }
+            }
+        });
+    },
+
     /**
      * Main function to update each notification with relevant style and details
      * @param {Object} $notificationHtml The jQuery clone of the HTML notification template
@@ -792,7 +844,14 @@ var notify = {
         // or if it was populated partially locally (i.e from chat, without email)
         // or if the notification is closed account notification, M.u cannot be exist, so just using attached email.
         if (userEmail === l[7381]) {
-            userEmail = this.getUserEmailByTheirHandle(userHandle) || data && data.m || userEmail;
+            let email = data && data.m;
+            if (userHandle) {
+                email = this.getUserEmailByTheirHandle(userHandle, data);
+                if (!email) {
+                    return false; // Fetching user attributes...
+                }
+            }
+            userEmail = email || userEmail;
         }
 
         // If the notification is not one of the custom ones, generate an avatar from the user information
@@ -855,6 +914,12 @@ var notify = {
                 return notify.renderPaymentReminder($notificationHtml, notification);
             case 'ph':
                 return notify.renderTakedown($notificationHtml, notification);
+            case 'mcsmp': {
+                if (!window.megaChat || !window.megaChat.is_initialized) {
+                    return false;
+                }
+                return notify.renderScheduled($notificationHtml, notification);
+            }
             default:
                 return false;   // If it's a notification type we do not recognise yet
         }
@@ -1361,6 +1426,158 @@ var notify = {
         $notificationHtml.find('.notification-username').text(header);
         $notificationHtml.attr('data-folder-or-file-id', handle);
 
+        return $notificationHtml;
+    },
+
+    getScheduledNotifOrReject(data) {
+        'use strict';
+
+        const chatRoom = megaChat.chats[data.cid];
+        if (!chatRoom) {
+            return false;
+        }
+
+        if (data && data.cs && Array.isArray(data.cs.c) && $.len(data.cs) === 1 && data.cs.c[1] === 0) {
+            // Only change we see is that the meeting is no longer cancelled so ignore it.
+            return false;
+        }
+        const meta = megaChat.plugins.meetingsManager.getFormattingMeta(data.id, data, chatRoom);
+        if (meta.ap || meta.gone) {
+            // If the ap flag is set the occurrence state is not known.
+            // A future render should be able to get past this step when all occurrences are known
+            // If the gone flag is set then the occurrence no longer exists so skip it.
+            return false;
+        }
+
+        const { MODE } = ScheduleMetaChange;
+
+        if (meta.occurrence && meta.mode === MODE.CANCELLED && !$.len(meta.timeRules)) {
+            const meeting = megaChat.plugins.meetingsManager.getMeetingOrOccurrenceParent(meta.handle);
+            if (!meeting) {
+                return false;
+            }
+            const occurrences = meeting.getOccurrencesById(meta.handle);
+            if (!occurrences) {
+                return false;
+            }
+            meta.timeRules.startTime = Math.floor(occurrences[0].start / 1000);
+            meta.timeRules.endTime = Math.floor(occurrences[0].end / 1000);
+        }
+
+        return meta;
+    },
+
+    renderScheduled: function($notificationHtml, notification) {
+        'use strict';
+        const { data } = notification;
+
+        const meta = this.getScheduledNotifOrReject(data);
+        if (!meta) {
+            return false;
+        }
+
+        const chatRoom = megaChat.chats[data.cid];
+        let now;
+        let prev;
+        const { MODE } = ScheduleMetaChange;
+
+        if (meta.timeRules.startTime && meta.timeRules.endTime) {
+            const prevMode = meta.mode;
+            if (!meta.recurring && prevMode !== MODE.CANCELLED) {
+                // Fake the mode for one-off meetings to get the correct time string.
+                meta.mode = MODE.EDITED;
+            }
+            [now, prev] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
+            meta.mode = prevMode;
+        }
+
+        const $notifBody = $('.notification-scheduled-body', $notificationHtml);
+        $notifBody.removeClass('hidden');
+        const $notifLabel = $('.notification-content .notification-info', $notificationHtml).eq(0);
+
+        const { NOTIF_TITLES } = megaChat.plugins.meetingsManager;
+        let showTitle = true;
+
+        const titleSelect = (core) => {
+            const occurrenceKey = meta.occurrence ? 'occur' : 'all';
+            if (meta.mode === MODE.CREATED) {
+                return core.inv;
+            }
+            else if (meta.mode === MODE.EDITED) {
+                let string = '';
+                let diffCounter = 0;
+                if (
+                    meta.prevTiming
+                    && (
+                        meta.timeRules.startTime !== meta.prevTiming.startTime
+                        || meta.timeRules.endTime !== meta.prevTiming.endTime
+                        || (
+                            meta.recurring
+                            && !megaChat.plugins.meetingsManager.areMetaObjectsSame(meta.timeRules, meta.prevTiming)
+                        )
+                    )
+                    || (meta.occurrence && meta.mode !== MODE.CANCELLED)
+                ) {
+                    string = core.time[occurrenceKey];
+                    diffCounter++;
+                }
+                if (meta.topicChange) {
+                    string = core.name.update.replace('%1', meta.oldTopic).replace('%s', `\u201c${meta.topic}\u201d`);
+                    diffCounter++;
+                    showTitle = false;
+                }
+                if (meta.description) {
+                    string = core.desc.update;
+                    diffCounter++;
+                    $notificationHtml.attr('data-desc', diffCounter);
+                }
+                if (meta.converted) {
+                    string = core.convert;
+                }
+                else if (diffCounter > 1) {
+                    string = core.multi;
+                    now = false;
+                    prev = false;
+                    showTitle = true;
+                }
+                return string;
+            }
+            return core.cancel[occurrenceKey];
+        };
+
+        if (meta.mode === MODE.CREATED) {
+            let email = this.getUserEmailByTheirHandle(data.ou);
+            if (email) {
+                const avatar = useravatar.contact(email);
+                if (avatar) {
+                    const $avatar = $('.notification-avatar', $notificationHtml).removeClass('hidden');
+                    $avatar.empty();
+                    $avatar.safePrepend(avatar);
+                }
+                email = this.getDisplayName(email);
+                $('.notification-username', $notificationHtml).text(email);
+            }
+        }
+
+        $notifLabel.text(titleSelect(meta.recurring ? NOTIF_TITLES.recur : NOTIF_TITLES.once));
+        const $title = $('.notification-scheduled-title', $notifBody);
+
+        if (showTitle) {
+            $title.text(chatRoom.topic).removeClass('hidden');
+        }
+
+        const $prev = $('.notification-scheduled-prev', $notifBody);
+        const $new = $('.notification-scheduled-occurrence', $notifBody);
+
+        if (prev && !(meta.occurrence && meta.mode === MODE.CANCELLED)) {
+            $prev.removeClass('hidden');
+            $('s', $prev).text(prev);
+        }
+        if (now) {
+            $new.removeClass('hidden');
+            $new.text(now);
+        }
+        $notificationHtml.addClass('nt-schedule-meet').attr('data-chatid', chatRoom.chatId);
         return $notificationHtml;
     },
 

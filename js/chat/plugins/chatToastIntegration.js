@@ -217,7 +217,7 @@ class ChatToastIntegration {
         const { chatd } = megaChat.plugins.chatdIntegration;
         if (chatd) {
             chatd.rebind('onOpen.cTI', () => {
-                if (!megaChat.allChatsHadInitialLoadedHistory()) {
+                if (!megaChat.allChatsHadInitialLoadedHistory() || !mega.active) {
                     return;
                 }
                 delay(
@@ -228,6 +228,9 @@ class ChatToastIntegration {
                 );
             });
             chatd.rebind('onClose.cTI', () => {
+                if (!mega.active) {
+                    return;
+                }
                 delay(
                     'chatdClose.cTI',
                     /* `Chat is now offline` */
@@ -347,7 +350,7 @@ class ChatToastIntegration {
                         );
                     })
                     .rebind('onNoMicInput.cTI', () => {
-                        if (megaRoom.activeCall) {
+                        if (megaRoom.call) {
                             ChatToast.quick(
                                 l.chat_mic_off_toast /* Your mic is not working */,
                                 'sprite-fm-mono icon-audio-off'
@@ -372,7 +375,7 @@ class ChatToastIntegration {
                                         }
                                     },
                                     updater: function() {
-                                        if (!megaRoom.activeCall) {
+                                        if (!megaRoom.call) {
                                             this.content = '';
                                         }
                                     }

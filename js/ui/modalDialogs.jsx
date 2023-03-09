@@ -217,7 +217,9 @@ class ModalDialog extends MegaRenderMixin {
 
         return (
             <utils.RenderTo element={document.body} className="fm-modal-dialog" popupDidMount={this.onPopupDidMount}>
-                <div className={classes}
+                <div
+                    id={self.props.id}
+                    className={classes}
                     aria-labelledby={self.props.dialogName ? self.props.dialogName + "-title" : null}
                     role="dialog"
                     aria-modal="true"

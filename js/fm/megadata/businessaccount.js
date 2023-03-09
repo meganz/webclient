@@ -20,7 +20,6 @@ function BusinessAccount() {
 BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName, optionals, isProtectLink) {
     "use strict";
     var operationPromise = new MegaPromise();
-    var mySelf = this;
 
     if (!isValidEmail(subEmail)) {
         // promise reject/resolve will return: success,errorCode,errorDesc
@@ -262,6 +261,148 @@ BusinessAccount.prototype.activateSubAccount = function (subUserHandle) {
     });
 
     return operationPromise;
+};
+
+/**
+ * Get Shared Key
+ * @param {String} myPrivate    Private Cu25519 (me)
+ * @param {String} theirPublic  Public Cu25519 (them)
+ * @param {String} data         Data payload
+ */
+BusinessAccount.prototype.getSharedKey = function(myPrivate, theirPublic, data) {
+    'use strict';
+
+    if (!theirPublic || !myPrivate) {
+        console.error('Fatal: trying to get shared key without prior verification. Not expected reach');
+        return false;
+    }
+
+    const prvCuBytes = asmCrypto.string_to_bytes(myPrivate);
+    const pubCuBytes = asmCrypto.string_to_bytes(theirPublic);
+    const sharedSecret = nacl.scalarMult(prvCuBytes, pubCuBytes);
+
+    //// now let's calculate the cryptographic hash
+    //// Hashing an empty data with shared secret as a key is sufficient.
+    //// In chat context, they used a static data and a hashed secret.
+    //// I will use dynamic data, which will harden the challenge, and I will inherit the repeated hash approach.
+    const hashBytes = asmCrypto.HMAC_SHA256.bytes(data, asmCrypto.HMAC_SHA256.bytes(sharedSecret, ''));
+
+    // convert to string to take the first 16 characters as the key.
+    // we cant do that on bytes.
+    const keyString = asmCrypto.bytes_to_string(hashBytes).substring(0, 16);
+
+    return asmCrypto.string_to_bytes(keyString);
+
+
+
+};
+
+BusinessAccount.prototype.encryptKey = function() {
+    'use strict';
+
+    if (!u_attr || !u_attr.b || u_attr.b.m || !u_attr.b.mu[0]) {
+        console.error('Error: trying to encrypt key in an invalid case');
+        return false;
+    }
+
+    if (!pubCu25519[u_attr.b.mu[0]]) {
+        console.error('Fatal: trying to encrypt key without prior verification. Not expected reach');
+        return false;
+    }
+
+    if (!u_attr || !u_attr.prCu255) {
+        console.error('Fatal: trying to encrypt key without having Cu25519 private key');
+        return false;
+    }
+
+    const msgString = a32_to_str(u_k);
+    const msgBytes = asmCrypto.string_to_bytes(msgString);
+
+
+    const cryptoHash = this.getSharedKey(u_attr.prCu255, pubCu25519[u_attr.b.mu[0]], u_handle);
+
+
+
+    const EncMsg = asmCrypto.AES_ECB.encrypt(msgBytes, cryptoHash, false);
+
+    return asmCrypto.bytes_to_string(EncMsg);
+};
+
+
+/**
+ * Decrypt the mk for the sub-user using k2
+ * @param {String} key          The mk (k2) after b64 decode
+ * @param {any} userHandle      subuser's handle
+ */
+BusinessAccount.prototype.decryptKey = function(key, userHandle) {
+    'use strict';
+
+    if (!u_attr || !u_attr.b || !u_attr.b.m || !key || !userHandle) {
+        console.error('Error: trying to decrypt key in an invalid case');
+        return false;
+    }
+    if (!pubCu25519[userHandle]) {
+        console.error('Fatal: trying to decrypt key without prior verification. Not expected reach');
+        return false;
+    }
+
+    const msgBytes = asmCrypto.string_to_bytes(key);
+    const cryptoHash = (this || mega.buinsessController)
+        .getSharedKey(u_attr.prCu255, pubCu25519[userHandle], userHandle);
+    const decMsg = asmCrypto.AES_ECB.decrypt(msgBytes, cryptoHash, false);
+
+    return asmCrypto.bytes_to_string(decMsg);
+
+};
+
+/**
+ * Function that send the master-key of the sub-user to Master
+ * Encrypted using Ed25519
+ * @returns {Promise}               Operation result
+ */
+BusinessAccount.prototype.sendSubMKey = function() {
+    'use strict';
+
+    if (!u_attr || !u_attr.b || u_attr.b.m || !u_attr.b.mu[0]) {
+        return Promise.reject('Invalid business attributes');
+    }
+
+    return new Promise((resolve, reject) => {
+
+        const encryptedMKey = this.encryptKey();
+
+        if (!encryptedMKey || !encryptedMKey.length) {
+            reject('Encrypting sub master-k failed');
+            return;
+        }
+
+        const b64Encoded = base64urlencode(encryptedMKey);
+        if (!b64Encoded || !b64Encoded.length) {
+            reject('Encoding sub master-k failed');
+            return;
+        }
+
+        const request = {
+            "a": "up",          // update attributes
+            "mk2": b64Encoded   // master-key encrypted
+        };
+
+        api_req(request, {
+            callback: function(res) {
+                if ($.isNumeric(res)) {
+                    reject(`API returned error ${res} while setting the sub mk2`);
+                }
+                else if (typeof res === 'string') {
+                    mega.attr.remove('gmk', -2, 0);
+                    resolve();
+                }
+                else {
+                    reject(`API failed ${res} while setting the sub mk2`);
+                }
+            }
+
+        });
+    });
 };
 
 /**
@@ -849,11 +990,12 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
 
 /**
  * decrypt the sub-user tree using the passed key
- * @param {Array} theTree   sub-user tree as an array of nodes
- * @param {String} key      sub-user's master key
- * @returns {Object}        if succeeded, contains .tree attribute and .errors .warn
+ * @param {Array} theTree        sub-user tree as an array of nodes
+ * @param {String} key           sub-user's master key
+ * @param {String} subUserHandle sub-user's handle, if passed master key is K2 version
+ * @returns {Object}             if succeeded, contains .tree attribute and .errors .warn
  */
-BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
+BusinessAccount.prototype.decrypteSubUserTree = function(theTree, key, subUserHandle) {
     "use strict";
 
     if (!theTree || !theTree.ok0) {
@@ -872,12 +1014,18 @@ BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
         return null;
     }
 
-    var business_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
+    let subUserKey = null;
+    const t = base64urldecode(key);
 
-    var t = base64urldecode(key);
-    // var dKey = crypto_rsadecrypt(t, u_privk);
-    var dKey = crypto_rsadecrypt(t, business_privk);
-    var subUserKey = new sjcl.cipher.aes(str_to_a32(dKey.substr(0, 16)));
+    if (!subUserHandle) {
+        const business_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
+        const dKey = crypto_rsadecrypt(t, business_privk);
+        subUserKey = new sjcl.cipher.aes(str_to_a32(dKey.substr(0, 16)));
+    }
+    else {
+        const dKey = this.decryptKey(t, subUserHandle);
+        subUserKey = new sjcl.cipher.aes(str_to_a32(dKey));
+    }
 
     // loading sharing keys, as out-shares will be sent with sharing keys (instead of owner node key)
     var subUserShareKeys = Object.create(null);
@@ -1360,6 +1508,17 @@ BusinessAccount.prototype.setMasterUserAttributes =
                         encrypt_key(u_k_aes, str_to_a32(crypto_encodeprivkey(businessRSA)))
                     );
 
+                    /* const keyPair = nacl.sign.keyPair();
+                    const b_privEd25519 = asmCrypto.bytes_to_string(keyPair.secretKey.subarray(0, 32));
+                    const b_pubEd25519 = asmCrypto.bytes_to_string(keyPair.publicKey);
+                    const b_k_aes = new sjcl.cipher.aes(businessKey);
+                    const enc_b_priv = a32_to_base64(encrypt_key(b_k_aes, str_to_a32(b_privEd25519)));
+                    const enc_b_pub = base64urlencode(b_pubEd25519);
+
+                    request_upb['%prv25519'] = enc_b_priv;
+                    request_upb['+pub25519'] = enc_b_pub;
+                    */
+
                     if (!isUpgrade) {
 
                         security.deriveKeysFromPassword(pass, u_k,
@@ -1743,7 +1902,7 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
 
 BusinessAccount.prototype.resetSubUserPassword = function(subuserHandle, password) {
     "use strict";
-    var operationPromise = new MegaPromise();
+    const operationPromise = new MegaPromise();
 
     if (!subuserHandle) {
         return operationPromise.reject(0, 11, 'Empty sub-user handle');
@@ -1755,7 +1914,8 @@ BusinessAccount.prototype.resetSubUserPassword = function(subuserHandle, passwor
         return operationPromise.reject(0, 62, 'Broken master account status');
     }
 
-    var getmKey = this.getSubAccountMKey(subuserHandle);
+    const getmKey = this.getSubAccountMKey(subuserHandle);
+    const decryptKey = this.decryptKey;
 
     getmKey.fail(
         function(c, r, t) {
@@ -1765,21 +1925,31 @@ BusinessAccount.prototype.resetSubUserPassword = function(subuserHandle, passwor
     // // //
     // // //
     getmKey.done(
-        function resetSubPass(c, sub_key) {
-            var request = {
+        (c, sub_key) => {
+            let request = {
                 "a": "upsub",
                 "su": subuserHandle // user handle
             };
 
+            let subUserKey = null;
 
-            var business_privk =
-                crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
+            if (sub_key.k) {
+                const business_privk =
+                    crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
 
-            var _t = base64urldecode(sub_key.k);
+                const _t = base64urldecode(sub_key.k);
 
-            var dKey = crypto_rsadecrypt(_t, business_privk);
-            var subUserKey = str_to_a32(dKey.substr(0, 16));
-
+                const dKey = crypto_rsadecrypt(_t, business_privk);
+                subUserKey = str_to_a32(dKey.substr(0, 16));
+            }
+            else if (sub_key.k2) {
+                const keyStr = base64urldecode(sub_key.k2);
+                const dKey = decryptKey(keyStr, subuserHandle);
+                subUserKey = str_to_a32(dKey);
+            }
+            else {
+                return operationPromise.reject(0, 63, 'Failed to get/decrypt subuser key');
+            }
 
             security.deriveKeysFromPassword(password, subUserKey,
                 function(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {

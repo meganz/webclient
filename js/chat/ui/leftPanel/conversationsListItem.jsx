@@ -74,6 +74,17 @@ export default class ConversationsListItem extends MegaRenderMixin {
         return null;
     }
 
+    getScheduledDateTime() {
+        const { scheduledMeeting } = this.props.chatRoom;
+        if (scheduledMeeting) {
+            const { isRecurring, nextOccurrenceStart } = scheduledMeeting;
+            if (isRecurring) {
+                return { date: time2date(nextOccurrenceStart / 1000, 19), time: toLocaleTime(nextOccurrenceStart) };
+            }
+            return { date: time2date(nextOccurrenceStart / 1000, 19), time: toLocaleTime(nextOccurrenceStart) };
+        }
+    }
+
     @timing(0.7, 8)
     render() {
         var classString = "";
@@ -223,7 +234,6 @@ export default class ConversationsListItem extends MegaRenderMixin {
             .replace(" unread", "");
         this._lastMessageDivCache = lastMessageDiv;
 
-
         if (chatRoom.type !== "public") {
             nameClassString += " privateChat";
         }
@@ -238,10 +248,17 @@ export default class ConversationsListItem extends MegaRenderMixin {
         }
         nameClassString += chatRoom.type === "private" || chatRoom.type === "group" ? ' badge-pad' : '';
 
+        const { scheduledMeeting, isMeeting } = chatRoom;
+        const isUpcoming = scheduledMeeting && scheduledMeeting.isUpcoming;
+        const { date, time } = this.getScheduledDateTime() || {};
+
         return (
             <li
                 id={id}
-                className={classString}
+                className={`
+                    ${classString}
+                    ${isUpcoming ? 'upcoming-conversation' : ''}
+                `}
                 data-room-id={roomId}
                 data-jid={contactId}
                 onClick={ev => this.props.onConversationClick(ev)}>
@@ -250,11 +267,11 @@ export default class ConversationsListItem extends MegaRenderMixin {
                         <div
                             className={`
                                 chat-topic-icon
-                                ${chatRoom.isMeeting ? 'meeting-icon' : ''}
+                                ${isMeeting ? 'meeting-icon' : ''}
                             `}>
                             <i
                                 className={
-                                    chatRoom.isMeeting ?
+                                    isMeeting ?
                                         'sprite-fm-mono icon-video-call-filled' :
                                         'sprite-fm-uni icon-chat-group'
                                 }
@@ -269,25 +286,53 @@ export default class ConversationsListItem extends MegaRenderMixin {
                             {roomTitle}
                         </div>
                         <div className="conversation-data-badges">
-                            {chatRoom.type === "private" && <span className={`user-card-presence ${presenceClass}`} />}
-                            {(chatRoom.type === "group" || chatRoom.type === "private") &&
+                            {chatRoom.type === 'private' && <span className={`user-card-presence ${presenceClass}`} />}
+                            {(chatRoom.type === 'group' || chatRoom.type === 'private') &&
                                 <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} />}
+                            {scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring &&
+                                <i className="sprite-fm-mono icon-repeat" />}
                         </div>
                     </div>
                     <div className="clear" />
-                    <div className="conversation-message-info">
-                        {lastMessageDiv}
-                    </div>
+                    {isUpcoming ?
+                        <div className="conversation-message-info">
+                            <div className="conversation-scheduled-data">
+                                <span>{date}</span>
+                            </div>
+                            <div className="conversation-scheduled-data">
+                                <span>{time}</span>
+                                {notificationItems.length > 0 ?
+                                    <div
+                                        className={`
+                                            unread-messages
+                                            items-${notificationItems.length}
+                                            unread-upcoming
+                                        `}>
+                                        {notificationItems}
+                                    </div> :
+                                    null
+                                }
+                            </div>
+                        </div> :
+                        <div className="conversation-message-info">
+                            {lastMessageDiv}
+                        </div>
+                    }
                 </div>
-                <div className='date-time-wrapper'>
-                    <div className="date-time">{this.getConversationTimestamp()}</div>
-                    {notificationItems.length > 0 ?
+                {isUpcoming ?
+                    null :
+                    <div className="date-time-wrapper">
+                        <div className="date-time">{this.getConversationTimestamp()}</div>
+                        {notificationItems.length > 0 ?
                             <div className="unread-messages-container">
                                 <div className={`unread-messages items-${notificationItems.length}`}>
                                     {notificationItems}
                                 </div>
-                            </div> : null}
-                </div>
+                            </div> :
+                            null
+                        }
+                    </div>
+                }
             </li>
         );
     }

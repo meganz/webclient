@@ -1,9 +1,10 @@
-import React from 'react';
 import { hot } from 'react-hot-loader/root';
+import React from 'react';
 import { MegaRenderMixin } from '../mixins.js';
-import { ConversationPanels, EmptyConvPanel } from "./conversationpanel.jsx";
+import { ConversationPanels, EmptyConvPanel } from './conversationpanel.jsx';
 import ContactsPanel from './contactsPanel/contactsPanel.jsx';
-import { Start as StartMeetingDialog } from "./meetings/workflow/start.jsx";
+import { Start as StartMeetingDialog } from './meetings/workflow/start.jsx';
+import { Schedule as ScheduleMeetingDialog } from './meetings/schedule/schedule.jsx';
 import { StartGroupChatWizard } from './startGroupChatWizard.jsx';
 import MeetingsCallEndedDialog from "./meetings/meetingsCallEndedDialog.jsx";
 import { inProgressAlert } from './meetings/call.jsx';
@@ -11,6 +12,7 @@ import ChatToaster from './chatToaster.jsx';
 import LeftPanel from './leftPanel/leftPanel.jsx';
 
 class ConversationsApp extends MegaRenderMixin {
+    chatRoomRef = null;
 
     VIEWS = {
         CHATS: 0x00,
@@ -22,6 +24,7 @@ class ConversationsApp extends MegaRenderMixin {
         leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
         startGroupChatDialog: false,
         startMeetingDialog: false,
+        scheduleMeetingDialog: false,
         view: this.VIEWS.LOADING
     };
 
@@ -190,6 +193,13 @@ class ConversationsApp extends MegaRenderMixin {
         else {
             megaChat.$leftPane.removeClass('hidden');
         }
+
+        // --
+
+        megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.EDIT, (ev, chatRoom) => {
+            this.chatRoomRef = chatRoom;
+            this.setState({ scheduleMeetingDialog: true });
+        });
     }
 
     componentWillUnmount() {
@@ -233,16 +243,14 @@ class ConversationsApp extends MegaRenderMixin {
 
     createMeetingEndDlgIfNeeded() {
         if (megaChat.initialPubChatHandle || megaChat.initialChatId) {
+            const chatRoom = megaChat.getCurrentRoom();
 
-            let chatRoom = megaChat.getCurrentRoom();
-            if (!chatRoom) {
-                return null;
-            }
-            if (!chatRoom.initialMessageHistLoaded /* haven't received the CALL info yet */) {
-                return null;
-            }
-
-            if (megaChat.meetingDialogClosed === chatRoom.chatId) {
+            if (
+                !chatRoom ||
+                chatRoom.scheduledMeeting ||
+                !chatRoom.initialMessageHistLoaded /* haven't received the CALL info yet */ ||
+                megaChat.meetingDialogClosed === chatRoom.chatId
+            ) {
                 return null;
             }
 
@@ -272,7 +280,7 @@ class ConversationsApp extends MegaRenderMixin {
     renderView(view) {
         this.setState({ view }, () => {
             const { $chatTreePanePs, routingSection } = megaChat;
-            $chatTreePanePs.reinitialise();
+            $chatTreePanePs?.reinitialise();
             if (routingSection !== 'chat') {
                 loadSubPage('fm/chat');
             }
@@ -282,7 +290,7 @@ class ConversationsApp extends MegaRenderMixin {
     render() {
         const { CHATS, MEETINGS } = this.VIEWS;
         const { routingSection, chatUIFlags, currentlyOpenedChat, chats } = megaChat;
-        const { view, startGroupChatDialog, startMeetingDialog, leftPaneWidth } = this.state;
+        const { view, startGroupChatDialog, startMeetingDialog, scheduleMeetingDialog, leftPaneWidth } = this.state;
         const isEmpty =
             chats &&
             chats.every(c => c.isArchived()) &&
@@ -310,11 +318,9 @@ class ConversationsApp extends MegaRenderMixin {
                 {!isLoading && isEmpty &&
                     <EmptyConvPanel
                         isMeeting={view === MEETINGS}
-                        onNewClick={() =>
-                            view === MEETINGS ?
-                                this.startMeeting() :
-                                this.setState({ startGroupChatDialog: true })
-                        }
+                        onNewChat={() => this.setState({ startGroupChatDialog: true })}
+                        onStartMeeting={() => this.startMeeting()}
+                        onScheduleMeeting={() => this.setState({ scheduleMeetingDialog: true })}
                     />
                 }
                 {!isLoading && (
@@ -358,6 +364,17 @@ class ConversationsApp extends MegaRenderMixin {
                     />
                 )}
 
+                {scheduleMeetingDialog && (
+                    <ScheduleMeetingDialog
+                        chatRoom={this.chatRoomRef}
+                        onClose={() => {
+                            this.setState({ scheduleMeetingDialog: false }, () => {
+                                this.chatRoomRef = null;
+                            });
+                        }}
+                    />
+                )}
+
                 <LeftPanel
                     view={view}
                     views={this.VIEWS}
@@ -366,6 +383,7 @@ class ConversationsApp extends MegaRenderMixin {
                     leftPaneWidth={leftPaneWidth}
                     renderView={view => this.renderView(view)}
                     startMeeting={() => this.startMeeting()}
+                    scheduleMeeting={() => this.setState({ scheduleMeetingDialog: true })}
                     createGroupChat={() => this.setState({ startGroupChatDialog: true })}
                 />
 

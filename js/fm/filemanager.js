@@ -238,6 +238,8 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'onboardingDialog'
             || $.dialog === 'stripe-pay'
             || $.dialog === 'start-meeting-dialog'
+            || $.dialog === 'fingerprint-admin-dlg'
+            || $.dialog === 'meetings-schedule-dialog'
             || String($.dialog).startsWith('verify-email')
             || localStorage.awaitingConfirmationAccount) {
 
@@ -299,9 +301,7 @@ FileManager.prototype.initFileManagerUI = function() {
             $.tresizer();
         });
 
-        if (!M.tree[M.RootID]) {
-            $('button.l-pane-visibility').trigger('click');
-        }
+        $('button.l-pane-visibility').trigger('click');
     }
     else {
         $('.nw-fm-left-icons-panel .logo').addClass('hidden');
@@ -2841,7 +2841,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             topMenu(1);
         }
         else if (e.keyCode == 27 && $.dialog) {
-            if ($.dialog === 'share-add' || $.dialog === 'share') {
+            if ($.dialog === 'share-add' || $.dialog === 'share' || $.dialog === 'meetings-schedule-dialog') {
                 return false;
             }
             closeDialog();
@@ -4200,7 +4200,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.nw-fm-left-icon.gallery', $fmholder).addClass('hidden');
     }
 
-    $('.fm.fm-right-header, .fm-bottom-right-buttons', $fmholder).addClass('hidden');
+    $('.fm.fm-right-header, .fm-import-donwload-buttons', $fmholder).addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).off('click');
 
     $fmholder.removeClass('affiliate-program');
@@ -4235,25 +4235,46 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
             // Remove import and download buttons from the search result.
             if (M.currentdirid.substr(0, 6) !== 'search') {
-                $('.fm-import-to-cloudrive span', $fmholder)
-                    .text(M.currentdirid === M.RootID ? l.folder_link_import_all : l.folder_link_import);
-                $('.fm-download-as-zip span', $fmholder)
-                    .text(M.currentdirid === M.RootID ? l.folder_link_download_all : l.folder_link_download);
-                $('.fm-bottom-right-buttons', $fmholder).removeClass('hidden');
+                const $btnWrap = $('.fm-import-donwload-buttons', $fmholder).removeClass('hidden');
 
-                $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).rebind('click', function() {
-                    const c = $(this).attr('class');
+                megasync.isInstalled((err, is) => {
 
-                    if (c.indexOf('fm-import-to-cloudrive') > -1) {
-                        eventlog(M.currentdirid === M.RootID ? 99765 : 99763);
-                        // Import the current folder, could be the root or sub folder
-                        M.importFolderLinkNodes([M.currentdirid]);
+                    if (!err || is) {
+
+                        $('.merge-mega-button', $btnWrap).removeClass('merge-mega-button');
+                        $('.download-dropdown', $btnWrap).addClass('hidden');
                     }
-                    else if (c.indexOf('fm-download-as-zip') > -1) {
-                        eventlog(M.currentdirid === M.RootID ? 99766 : 99764);
-                        // Download the current folder, could be the root or sub folder
-                        M.addDownload([M.currentdirid], true);
-                    }
+                });
+
+                $('.fm-import-to-cloudrive', $btnWrap).rebind('click', () => {
+
+                    eventlog(99765);
+                    // Import the current folder, could be the root or sub folder
+                    M.importFolderLinkNodes([M.RootID]);
+                });
+
+                $('.fm-download-as-zip', $btnWrap).rebind('click', () => {
+
+                    eventlog(99766);
+                    // Download the current folder, could be the root or sub folder
+                    M.addDownload([M.RootID], true);
+                });
+
+                $('.fm-megasync-download', $btnWrap).rebind('click', () => {
+
+                    loadingDialog.show();
+                    megasync.isInstalled((err, is) => {
+
+                        loadingDialog.hide();
+
+                        if (fmconfig.dlThroughMEGAsync && (!err || is)) {
+                            $('.megasync-overlay').removeClass('downloading');
+                            M.addDownload([M.RootID]);
+                        }
+                        else {
+                            dlmanager.showMEGASyncOverlay();
+                        }
+                    });
                 });
             }
         }

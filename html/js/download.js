@@ -411,11 +411,6 @@ function dl_g(res, ctx) {
                 '.js-resume-download, .js-save-download, .mobile.dl-browser')
                 .rebind('click', (event) => {
 
-                    if (event.target.classList.contains('js-megasync-qus')) {
-                        window.open(getAppBaseUrl() + '/desktop', "_blank");
-                        return false;
-                    }
-
                     $('.download.progress-bar').width('0%');
                     $('.open-in-folder').addClass('hidden');
 

@@ -724,9 +724,11 @@ label span.black {
 .nt-contact-request-denied .notification-avatar-icon i.minus,
 .nt-contact-request-blocked .notification-avatar-icon i.minus,
 .nt-contact-request-ignored .notification-avatar-icon i.minus,
-.nt-payment-reminder-notification .notification-avatar-icon i.exclamation {
+.nt-payment-reminder-notification .notification-avatar-icon i.exclamation,
+.nt-schedule-meet .notification-avatar-icon i.camera {
     display: block;
 }
+.nt-schedule-meet .notification-avatar-icon i,
 .nt-new-files .notification-avatar-icon i {
     --mask-color: var(--secondary-green);
 }
@@ -805,6 +807,23 @@ label span.black {
 }
 body.notification-body {
     background-color: #f2f2f3 !important;
+}
+.notification-scheduled-body {
+    box-sizing: border-box;
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    overflow: hidden;
+    padding: 8px 12px 0;
+    vertical-align: middle;
+}
+.notification-scheduled-body .notification-scheduled-title {
+    color: var(--text-color-high);
+    display: block;
+    font: var(--text-body2-bold);
+}
+.notification-scheduled-body .notification-scheduled-prev,
+.notification-scheduled-body .notification-scheduled-occurrence {
+    display: block;
 }
 #fmholder {
     position: absolute;
@@ -9123,7 +9142,7 @@ li.token-input-input-token-mega:first-child input {
 .active li.token-input-input-token-mega:first-child {
     min-width: none;
 }
-.multiple-input input::placeholder,
+.multiple-input input:not(.meetings-invite-input)::placeholder,
 .create-folder-input-bl input::placeholder,
 .add-user-notification textarea::placeholder {
     color: var(--text-color-low) !important;

@@ -242,7 +242,7 @@ export class ContactButton extends ContactAwareComponent {
                                     const { chatRoom } = this.props;
                                     const { u: userHandle } = contact;
 
-                                    if (chatRoom.sfuApp) {
+                                    if (chatRoom.call) {
                                         return mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle);
                                     }
 
@@ -456,11 +456,14 @@ export class ContactAwareName extends ContactAwareComponent {
 
 export class MembersAmount extends ContactAwareComponent {
     render() {
-        const { room } = this.props;
-        const memberKeys = Object.keys(room.members);
-        return room && memberKeys.length ?
-            <span>{mega.icu.format(l[20233], memberKeys.length)}</span> :
-            null;
+        const { chatRoom } = this.props;
+        const memberKeys = Object.keys(chatRoom.members);
+
+        if (chatRoom && chatRoom.iAmInRoom() && memberKeys.length) {
+            return <span>{mega.icu.format(l[20233], memberKeys.length)}</span>;
+        }
+
+        return null;
     }
 }
 

@@ -548,7 +548,9 @@ export class TypingArea extends MegaRenderMixin {
             $textarea.height(textareaHeight);
         }
 
-        this.textareaScroll.reinitialise();
+        if (this.textareaScroll) {
+            this.textareaScroll.reinitialise();
+        }
     }
 
 
@@ -731,14 +733,6 @@ export class TypingArea extends MegaRenderMixin {
                 }}
             />;
         }
-        var placeholder = l[18669];
-        var roomTitle = room.getRoomTitle(false, true);
-        // If room title contains quote, use translation with translated quote
-        if (roomTitle[0] === '"' && roomTitle[roomTitle.length - 1] === '"') {
-            placeholder = l[18763];
-            roomTitle = roomTitle.slice(1, -1);
-        }
-        placeholder = placeholder.replace("%s", roomTitle);
 
         var disabledTextarea = room.pubCu25519KeyIsMissing === true || this.props.disabled ? true : false;
 
@@ -805,7 +799,13 @@ export class TypingArea extends MegaRenderMixin {
                             self.textareaScroll = ref;
                         }}>
                         <div className="messages-textarea-placeholder">
-                            {self.state.typedMessage ? null : <Emoji>{placeholder}</Emoji>}
+                            {self.state.typedMessage ?
+                                null :
+                                <Emoji>
+                                    {(l[18763] || `Write message to \u201c%s\u201d\u2026`)
+                                        .replace('%s', room.getRoomTitle())}
+                                </Emoji>}
+
                         </div>
                         <textarea
                             className={`

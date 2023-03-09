@@ -10,7 +10,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
-        this.av = this.props.sfuApp.sfuClient.availAv;
+        this.av = this.props.call.sfuClient.availAv;
     }
 
     /**
@@ -21,9 +21,9 @@ export default class ParticipantsNotice extends MegaRenderMixin {
      * @returns {boolean} If the component should updated
      */
     specShouldComponentUpdate(newProps) {
-        const { stayOnEnd, hasLeft, isOnHold, sfuApp } = this.props;
+        const { stayOnEnd, hasLeft, isOnHold, call } = this.props;
         const currAv = this.av;
-        this.av = sfuApp.sfuClient.availAv;
+        this.av = call.sfuClient.availAv;
         return newProps.stayOnEnd !== stayOnEnd
             || newProps.hasLeft !== hasLeft
             || newProps.isOnHold !== isOnHold
@@ -84,6 +84,8 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
     renderUserWaiting = () => {
         const { chatRoom, onInviteToggle } = this.props;
+        const link = `${getBaseUrl()}/${chatRoom.publicLink}`;
+
         return (
             <div
                 className={`
@@ -94,16 +96,16 @@ export default class ParticipantsNotice extends MegaRenderMixin {
                 <div className={`${ParticipantsNotice.NAMESPACE}-heading`}>
                     <h1>{l.waiting_for_others /* `Waiting for others to join...` */}</h1>
                 </div>
-                {chatRoom.isMeeting && (
+                {chatRoom.isMeeting && chatRoom.publicLink && (
                     <div className={`${ParticipantsNotice.NAMESPACE}-content`}>
                         <h3>{l.copy_and_share /* `Copy this link to send your invite` */}</h3>
                         <div className="mega-input with-icon box-style">
                             <i className="sprite-fm-mono icon-link" />
-                            <input type="text" className="megaInputs" readOnly={true} defaultValue={this.props.link} />
+                            <input type="text" className="megaInputs" readOnly={true} defaultValue={link} />
                         </div>
                         <Button
                             className="mega-button positive large copy-to-clipboard"
-                            onClick={() => copyToClipboard(this.props.link, l[7654])}>
+                            onClick={() => copyToClipboard(link, l[7654])}>
                             <span>{l[17835] /* `Copy Link` */}</span>
                         </Button>
                         {Call.isModerator(chatRoom, u_handle) && (
@@ -124,9 +126,9 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
 
     render() {
-        const { sfuApp, call, hasLeft, streamContainer, isOnHold } = this.props;
+        const { call, hasLeft, streamContainer, isOnHold } = this.props;
 
-        if (sfuApp.isDestroyed) {
+        if (call.isDestroyed) {
             return null;
         }
 

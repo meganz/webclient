@@ -101,7 +101,7 @@ var ChatdIntegration = function(megaChat) {
             ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
         );
 
-        var _createChat = function() {
+        var _createChat = () => {
             var invited_users = [];
             contactHashes.forEach(function(contactHash) {
                 var entry = {
@@ -130,21 +130,19 @@ var ChatdIntegration = function(megaChat) {
                     (chatMode === strongvelope.CHAT_MODE.PUBLIC)
                 );
             }
-            // Speak Request, Open Invite, Waiting room
-            const { sr, oi, w } = opts;
 
             const reqi = String(rand(6e10));
-
-            var mccPacket = {
-                'a': 'mcc',
-                'g': 1,
-                'u': invited_users,
-                'm': chatMode === strongvelope.CHAT_MODE.PUBLIC ? 1 : 0,
-                'v': Chatd.VERSION,
-                'i': reqi,
-                sr,
-                w,
-                oi,
+            const mccPacket = {
+                a: 'mcc',
+                g: 1,
+                u: invited_users,
+                m: chatMode === strongvelope.CHAT_MODE.PUBLIC ? 1 : 0,
+                v: Chatd.VERSION,
+                i: reqi,
+                sr: opts.sr, // Speak request
+                w: opts.w, // Waiting room
+                oi: opts.openInvite,
+                sm: opts.scheduledMeeting
             };
 
             if (opts.isMeeting) {
@@ -152,7 +150,7 @@ var ChatdIntegration = function(megaChat) {
             }
 
             if (topic) {
-                mccPacket['ct'] = topic;
+                mccPacket.ct = topic;
             }
 
             if (chatMode === strongvelope.CHAT_MODE.PUBLIC) {
@@ -162,10 +160,11 @@ var ChatdIntegration = function(megaChat) {
             }
             megaChat._chatsAwaitingAps[reqi] = opts;
             asyncApiReq(mccPacket)
-                .fail(function() {
-                    self.logger.error(
+                .catch(ex => {
+                    this.logger.error(
                         "Failed to retrieve chatd ID from API, while trying to create a new room, mccReq:",
-                        mccPacket
+                        mccPacket,
+                        ex
                     );
                 });
         };
@@ -218,30 +217,26 @@ ChatdIntegration.decryptMessageHelper = async function(message, chatRoom) {
     return decrypted;
 };
 
-ChatdIntegration.prototype.updateChatPublicHandle = function(h, d, callback) {
-    var self = this;
-    var req = {a: "mcph", "id": h, v: Chatd.VERSION};
-    if (d) {
-        req['d'] = 1;
-    }
-
-    return asyncApiReq(req)
-        .done(function(r) {
-            var chatRoom = self.megaChat.chats[h];
-            if (d) {
-                chatRoom.publicLink = null;
-            }
-            else {
-                chatRoom.publicLink = 'chat/' + r + '#' + chatRoom.protocolHandler.getUnifiedKey();
-            }
+ChatdIntegration.prototype.updateChatPublicHandle = function(h, d, cim, callback) {
+    return asyncApiReq({
+        a: 'mcph',
+        id: h,
+        d,
+        cim,
+        v: Chatd.VERSION
+    })
+        .done(r => {
+            const chatRoom = this.megaChat.getChatById(h);
+            chatRoom.publicLink = d ? null : `chat/${r}#${chatRoom.protocolHandler.getUnifiedKey()}`;
 
             if (callback) {
                 callback();
             }
         })
-        .fail(function() {
-            var chatRoom = self.megaChat.chats[h];
+        .fail(() => {
+            const chatRoom = this.megaChat.chats[h];
             chatRoom.publicLink = null;
+
             if (callback) {
                 callback();
             }
@@ -430,6 +425,10 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
 
         if (chatRoom && self.megaChat.publicChatKeys[publicChatHandle]) {
             chatRoom.publicChatKey = self.megaChat.publicChatKeys[publicChatHandle];
+        }
+
+        if (Array.isArray(ret.sm)) {
+            processMCSM(ret.sm, true);
         }
 
         // feed the chat link info in is_chatlink, since thats where its stored now
@@ -687,24 +686,21 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                 };
 
                 createTimeoutPromise(validate1, 500, 10000)
-                    .then(function() {
+                    .then(() => {
                         if (setAsActive.createChatLink === true) {
                             createTimeoutPromise(validate2, 300, 2000)
-                                .always(function() {
+                                .always(() => {
+                                    if (chatRoom.isMeeting) {
+                                        chatRoom.updatePublicHandle();
+                                        return chatRoom.scheduledMeeting ? null : chatRoom.trigger('onNewMeetingReady');
+                                    }
                                     chatRoom.trigger('showGetChatLinkDialog');
                                     affiliateUI.registeredDialog.show();
                                 });
                         }
-                        else if (setAsActive.createChatLink === 2) {
-                            createTimeoutPromise(validate2, 300, 2000)
-                                .always(function() {
-                                    chatRoom.updatePublicHandle();
-                                    chatRoom.trigger('onNewMeetingReady');
-                                });
-                        }
                     })
-                    .catch(function(ex) {
-                        self.logger.warn("Timed out waiting for protocolHandler, room title not set.", ex);
+                    .catch(ex => {
+                        this.logger.warn("Timed out waiting for protocolHandler, room title not set.", ex);
                     });
             }
 
@@ -777,6 +773,10 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                                         }
                                         delete chatRoom.members[user_handle];
                                     });
+                                }
+                                const { scheduledMeeting } = chatRoom;
+                                if (scheduledMeeting) {
+                                    megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.LEAVE, scheduledMeeting);
                                 }
                                 chatRoom.leave(false);
                             }
@@ -1540,7 +1540,8 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
             if (decryptedResult.payload && decryptedResult.payload.length > 0) {
                 msgInstance.meta = {
                     userId: decryptedResult.sender,
-                    topic: decryptedResult.payload
+                    topic: decryptedResult.payload,
+                    isScheduled: !!msgInstance.chatRoom.scheduledMeeting
                 };
                 msgInstance.dialogType = "topicChange";
 
@@ -1599,6 +1600,13 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
                 userId: decryptedResult.sender,
                 handleUpdate: (decryptedResult.type === strongvelope.MESSAGE_TYPES.PUBLIC_HANDLE_CREATE) ? 1 : 0
             };
+            delay(`updatechatlink-${chatRoom.chatId}`, () => {
+                chatRoom.publicLink = null;
+                const res = chatRoom.getPublicLink();
+                if (res instanceof MegaPromise) {
+                    res.then(nop).catch(dump);
+                }
+            }, 2000);
         }
         else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.MESSAGES_RETENTION) {
             msgInstance.dialogType = 'messageRetention';
@@ -1606,6 +1614,11 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
                 userId: decryptedResult.sender,
                 retentionTime: Chatd.unpack32le(decryptedResult.payload),
             };
+        }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.SCHEDULE_MEET) {
+            msgInstance.dialogType = 'scheduleMeta';
+            msgInstance.meta = megaChat.plugins.meetingsManager
+                .getFormattingMeta(decryptedResult.handle, decryptedResult, chatRoom);
         }
         else {
             self.logger.error("Could not decrypt: ", decryptedResult);
@@ -1927,6 +1940,92 @@ ChatdIntegration.prototype.handleLeave = function(room) {
 
 ChatdIntegration.prototype.destroy = function() {
     mBroadcaster.removeListener(this.mBApListener);
+};
+
+ChatdIntegration.prototype.updateScheduledMeeting = async function(options, scheduledMeetingId, chatId) {
+    const { timezone, startDateTime, endDateTime, topic, description, sendInvite, recurring } = options;
+    const { encodeData } = megaChat.plugins.meetingsManager;
+    const scheduledMeeting = megaChat.plugins.meetingsManager.getMeetingById(scheduledMeetingId);
+
+    options.f = sendInvite ? 0x01 : 0x00;
+    if (!scheduledMeeting.isSameAsOpts(options)) {
+        const res = await asyncApiReq({
+            a: 'mcsmp',
+            id: scheduledMeetingId,
+            cid: chatId,
+            tz: encodeData(timezone),
+            s: startDateTime / 1000,
+            e: endDateTime / 1000,
+            t: encodeData(topic),
+            d: encodeData(description) || '',
+            f: sendInvite ? 0x01 : 0x00,
+            // [...] TODO: refactor, clean-up, unify w/ `createMeeting`
+            ...recurring && {
+                r: {
+                    f: recurring.frequency,
+                    wd: recurring.weekDays,
+                    md: recurring.monthDays,
+                    mwd: recurring.offset,
+                    ...recurring.end && { u: recurring.end / 1000 },
+                    ...recurring.interval && { i: recurring.interval }
+                }
+            }
+        }).catch(ex => {
+            this.logger.error(
+                `Failed to update scheduled meeting ${scheduledMeetingId}, chatId: ${chatId}, error: ${ex}`
+            );
+            throw ex;
+        });
+        this.logger.info(`Updated scheduled meeting ${res}, chatId: ${chatId}`);
+        return res;
+    }
+};
+
+ChatdIntegration.prototype.cancelScheduledMeeting = async function(scheduledMeeting, chatId) {
+    const { encodeData } = megaChat.plugins.meetingsManager;
+    const res = await asyncApiReq({
+        a: 'mcsmp',
+        id: scheduledMeeting.id,
+        cid: chatId,
+        tz: encodeData(scheduledMeeting.timezone),
+        s: scheduledMeeting.start / 1000,
+        e: scheduledMeeting.end / 1000,
+        t: encodeData(scheduledMeeting.title),
+        d: encodeData(scheduledMeeting.description) || '',
+        c: 1,
+        f: scheduledMeeting.flags,
+        ...scheduledMeeting.recurring && {
+            r: {
+                f: scheduledMeeting.recurring.frequency,
+                wd: scheduledMeeting.recurring.weekDays,
+                md: scheduledMeeting.recurring.monthDays,
+                // TODO: refactor re: tuple format, helper
+                mwd: scheduledMeeting.recurring.offset && Object.keys(scheduledMeeting.recurring.offset).length ?
+                    [[scheduledMeeting.recurring.offset.value, scheduledMeeting.recurring.offset.weekDay]] :
+                    [],
+                ...scheduledMeeting.recurring.end && { u: scheduledMeeting.recurring.end / 1000 },
+                ...scheduledMeeting.recurring.interval && { i: scheduledMeeting.recurring.interval }
+            }
+        }
+    })
+        .catch(ex => {
+            this.logger.error(
+                `Failed to cancel scheduled meeting ${scheduledMeeting.id}, chatId: ${chatId}, error: ${ex}`
+            );
+            throw ex;
+        });
+    this.logger.info(`Canceled scheduled meeting ${res}, chatId: ${chatId}`);
+    return res;
+};
+
+ChatdIntegration.prototype.deleteScheduledMeeting = async function(scheduledMeetingId, chatId) {
+    const res = await asyncApiReq({ a: 'mcsmr', id: scheduledMeetingId, i: chatId })
+        .catch(ex => {
+            this.logger.error(`Failed to cancel remove meeting ${scheduledMeetingId}, chatId: ${chatId}, error: ${ex}`);
+            throw ex;
+        });
+    this.logger.info(`Removed scheduled meeting ${res}, chatId: ${chatId}`);
+    return res;
 };
 
 // decorate ALL functions which require shard to be available before executing

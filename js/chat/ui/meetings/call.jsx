@@ -192,7 +192,7 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleRetryTimeout = () => {
-        if (this.props.sfuApp.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
+        if (this.props.call.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
             this.handleCallEnd();
             this.props.chatRoom.trigger('onRetryTimeout');
             ion.sound.play('end_call');
@@ -498,16 +498,16 @@ export default class Call extends MegaRenderMixin {
     /**
      * handleCallEnd
      * @description Handles the call end behavior
-     * @see SfuApp
+     * @see CallManager.Call
      * @returns {void}
      */
 
     handleCallEnd = l => {
-        const { chatRoom, call } = this.props;
+        const { call } = this.props;
         if (l) {
             eventlog(99760, JSON.stringify([call.callId, 0]));
         }
-        chatRoom?.sfuApp?.destroy();
+        call.destroy();
     };
 
     /**
@@ -584,7 +584,7 @@ export default class Call extends MegaRenderMixin {
     }
 
     render() {
-        const { minimized, streams, call, chatRoom, parent, sfuApp, onDeleteMessage } = this.props;
+        const { minimized, streams, call, chatRoom, parent, onDeleteMessage } = this.props;
         const {
             mode, view, sidebar, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
             offline, everHadPeers
@@ -594,7 +594,7 @@ export default class Call extends MegaRenderMixin {
             mode, streams, sidebar, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
             everHadPeers,
             hasOtherParticipants: call.hasOtherParticipant(),
-            isOnHold: sfuApp.sfuClient.isOnHold(), onSpeakerChange: this.handleSpeakerChange,
+            isOnHold: call.sfuClient.isOnHold(), onSpeakerChange: this.handleSpeakerChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm,
         };
 
@@ -605,7 +605,6 @@ export default class Call extends MegaRenderMixin {
             <div className={`meetings-call ${minimized ? 'minimized' : ''}`}>
                 <Stream
                     {...STREAM_PROPS}
-                    sfuApp={sfuApp}
                     minimized={minimized}
                     ephemeralAccounts={ephemeralAccounts}
                     onCallMinimize={this.handleCallMinimize}

@@ -108,6 +108,7 @@ export default class FMView extends MegaRenderMixin {
         this.setState({'selected': selectedList, 'highlighted': highlighted});
         this.props.onSelected(selectedList);
         this.props.onHighlighted(highlighted);
+        $.selected = highlighted;
     }
     getEntries(newState) {
         var self = this;

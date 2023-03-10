@@ -146,11 +146,18 @@ function topMenu(close) {
             $mobileOverlay.addClass('hidden').removeClass('active').unbind('tap.topmenu');
         }
         $(window).off('resize.topmenu');
+        if (M.chat && megaChatIsReady) {
+            megaChat.plugins.chatOnboarding.checkAndShowStep();
+        }
     }
     else {
         $.topMenu = 'topmenu';
         $topMenuBtn.addClass('menu-open');
         $topMenu.removeClass('o-hidden');
+
+        if (M.chat && $.dialog === 'onboardingDialog') {
+            closeDialog();
+        }
 
         if (u_type) {
             const $menuAvatar = $('.avatar-block', $topMenu);

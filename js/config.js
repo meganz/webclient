@@ -71,11 +71,11 @@
         }
 
         cfg.xs1 = stringify(
-            (cfg.chatAvPaneHeight & 0xfff) << 20 | (cfg.font_size & 15) << 12 | cfg.leftPaneWidth & 0xfff
+            (cfg.obVer & 0xfff) << 20 | (cfg.font_size & 15) << 12 | cfg.leftPaneWidth & 0xfff
         );
         delete cfg.font_size;
         delete cfg.leftPaneWidth;
-        delete cfg.chatAvPaneHeight;
+        delete cfg.obVer;
 
         let s = cfg.ul_maxSpeed;
         s = s / 1024 << 1 | (s < 0 ? 1 : 0);
@@ -203,7 +203,7 @@
         if (config.xs1) {
             config.font_size = config.xs1 >> 12 & 15;
             config.leftPaneWidth = config.xs1 & 0xfff;
-            config.chatAvPaneHeight = 0;
+            config.obVer = config.xs1 >> 20;
         }
 
         if (config.xs2) {

@@ -2,7 +2,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 638:
+/***/ 51:
 /***/ ((__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -1118,6 +1118,293 @@ class MeetingsManager {
 }
 const meetingsManager = (MeetingsManager);
 window.MeetingsManager = MeetingsManager;
+// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
+var applyDecoratedDescriptor = __webpack_require__(229);
+// EXTERNAL MODULE: ./js/chat/mixins.js
+var mixins = __webpack_require__(503);
+;// CONCATENATED MODULE: ./js/chat/chatOnboarding.jsx
+
+var _dec, _class;
+
+
+let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding {
+  constructor(megaChat) {
+    this.scheduledOccurrencesMap = {
+      flag: OBV4_FLAGS.CHAT_SCHEDULE_OCCUR,
+      actions: [{
+        type: 'showDialog',
+        dialogClass: 'mcob',
+        dialogTitle: l.onboard_megachat_dlg7b_title,
+        dialogDesc: l.onboard_megachat_dlg7b_text,
+        targetElmClass: `.conversationsApp .conversation-panel:not(.hidden)
+                                 .chatroom-occurrences-panel .chat-dropdown.header`,
+        targetElmPosition: 'left',
+        ignoreBgClick: true,
+        markComplete: true
+      }]
+    };
+    this.feedbackMap = {
+      flag: OBV4_FLAGS.CHAT_FEEDBACK_NEW,
+      actions: [{
+        type: 'showDialog',
+        dialogClass: 'mcob',
+        dialogTitle: l.onboard_megachat_dlg10_title,
+        dialogDesc: l.onboard_megachat_dlg10_text,
+        targetElmClass: '#fmholder button.js-more-menu.js-top-buttons',
+        targetElmPosition: 'left bottom',
+        targetHotSpot: true,
+        markComplete: true,
+        skipHidden: true,
+        ignoreBgClick: '.conversationsApp',
+        dialogNext: l[726]
+      }]
+    };
+    this.state = {
+      [OBV4_FLAGS.CHAT]: -1,
+      [OBV4_FLAGS.CHAT_SCHEDULE_NEW]: -1,
+      [OBV4_FLAGS.CHAT_SCHEDULE_ADDED]: -1,
+      [OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]: -1,
+      [OBV4_FLAGS.CHAT_SCHEDULE_CONF]: -1,
+      [OBV4_FLAGS.CHAT_FEEDBACK_NEW]: -1,
+      [OBV4_FLAGS.CHAT_CONTACT_PANE]: -1
+    };
+    this.actions = {
+      [OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]: null,
+      [OBV4_FLAGS.CHAT_FEEDBACK_NEW]: null
+    };
+    this.finished = false;
+    this.currentChatIsScheduled = false;
+    this.megaChat = megaChat;
+    this.flagMap = attribCache.bitMapsManager.exists('obv4') ? attribCache.bitMapsManager.get('obv4') : new MegaDataBitMap('obv4', false, Object.values(OBV4_FLAGS));
+    const keys = Object.keys(this.state);
+    const promises = keys.map(key => this.flagMap.get(key));
+    Promise.allSettled(promises).then(res => {
+      for (let i = 0; i < res.length; ++i) {
+        const v = res[i];
+        if (v.status === 'fulfilled') {
+          this.state[keys[i]] = v.value;
+        }
+      }
+    });
+    this.interval = setInterval(() => {
+      if (!$.dialog) {
+        this.checkAndShowStep();
+      }
+    }, 10000);
+    this.initListeners();
+  }
+  initListeners() {
+    this.flagMap.addChangeListener((...args) => this.handleFlagChange(...args));
+    this.megaChat.chatUIFlags.addChangeListener(SoonFc(200, () => {
+      if (this.megaChat.chatUIFlags.convPanelCollapse && $.dialog === 'onboardingDialog') {
+        closeDialog();
+      }
+      this.checkAndShowStep();
+    }));
+    this.megaChat.addChangeListener(() => {
+      const room = this.megaChat.getCurrentRoom();
+      if (!room) {
+        return;
+      }
+      if ($.dialog === 'onboardingDialog' && (this.currentChatIsScheduled && !room.scheduledMeeting || this.occurrenceDialogShown ^ this.willShowOccurrences)) {
+        closeDialog();
+      }
+      this.currentChatIsScheduled = !!room.scheduledMeeting;
+      this.checkAndShowStep();
+    });
+    this.schedListeners = [`${this.megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.chatonboard`, `${this.megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.chatonboard`];
+    for (const event of this.schedListeners) {
+      this.megaChat.rebind(event, () => this.handleNewScheduledMeeting());
+    }
+  }
+  handleNewScheduledMeeting() {
+    if (this.state[OBV4_FLAGS.CHAT_SCHEDULE_NEW] !== 1) {
+      this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_NEW, 1);
+      this.flagMap.safeCommit();
+      if ($.dialog === 'onboardingDialog') {
+        closeDialog();
+      }
+      this.checkAndShowStep();
+    }
+    for (const event of this.schedListeners) {
+      this.megaChat.off(event);
+    }
+    this.megaChat.trigger(conversations.F1.NAV_RENDER_VIEW, conversations.vN.MEETINGS);
+    delete this.schedListeners;
+  }
+  showOccurrencesDialog() {
+    if (this.state[OBV4_FLAGS.CHAT_SCHEDULE_CONF] === 1) {
+      this.scheduledOccurrencesMap.actions[0].skipHidden = true;
+      this.scheduledOccurrencesMap.actions[0].dialogNext = l[81];
+      if (this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR] && typeof this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR].map.skipHidden === 'undefined') {
+        delete this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR];
+      }
+    }
+    if (!this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]) {
+      const parent = {
+        markDone: () => {
+          this.occurrenceDialogShown = false;
+          this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_OCCUR, 1);
+          this.flagMap.safeCommit();
+          this.checkAndShowStep();
+        },
+        markDeactive: () => {
+          this.occurrenceDialogShown = false;
+        },
+        toNextAction: nop,
+        $obControlPanel: $('.onboarding-control-panel', fmholder),
+        parentSection: {
+          showConfirmDismiss: () => {
+            this.flagMap.setSync(OBV4_FLAGS.CHAT_SCHEDULE_OCCUR, 1);
+            this.flagMap.commit().always(() => {
+              this.flagMap.setSync(OBV4_FLAGS.CHAT, 1);
+              this.flagMap.safeCommit();
+            });
+          },
+          startNextOpenSteps: nop,
+          hotspotNextStep: nop,
+          parent: {}
+        }
+      };
+      this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR] = new OnboardV4Action(parent, this.scheduledOccurrencesMap.actions[0]);
+    }
+    if ($.dialog === 'onboardingDialog') {
+      closeDialog();
+    }
+    $('.chat-dropdown.header:not(.expanded)', '.chatroom-occurrences-panel').filter(':visible').click();
+    this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR].execute();
+    this.occurrenceDialogShown = true;
+  }
+  showNewUserFeedbackDialog() {
+    if (!this.actions[OBV4_FLAGS.CHAT_FEEDBACK_NEW]) {
+      const parent = {
+        markDone: () => {
+          this.flagMap.set(OBV4_FLAGS.CHAT_FEEDBACK_NEW, 1);
+          this.flagMap.safeCommit();
+          delete mega.ui.onboarding.$hotSpotNode;
+          this.checkAndShowStep();
+        },
+        markDeactive: () => {
+          delete mega.ui.onboarding.$hotSpotNode;
+        },
+        toNextAction: nop,
+        $obControlPanel: $('.onboarding-control-panel', fmholder),
+        parentSection: {
+          showConfirmDismiss: nop,
+          startNextOpenSteps: nop,
+          hotspotNextStep: nop,
+          parent: {}
+        }
+      };
+      this.actions[OBV4_FLAGS.CHAT_FEEDBACK_NEW] = new OnboardV4Action(parent, this.feedbackMap.actions[0]);
+    }
+    if ($.dialog === 'onboardingDialog') {
+      closeDialog();
+    }
+    this.actions[OBV4_FLAGS.CHAT_FEEDBACK_NEW].execute();
+    mega.ui.onboarding.$hotSpotNode = $(this.feedbackMap.actions[0].targetElmClass);
+  }
+  checkAndShowStep() {
+    if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active) {
+      return;
+    }
+    const {
+      sections
+    } = mega.ui.onboarding;
+    if (!sections) {
+      return;
+    }
+    const {
+      chat: obChat
+    } = sections;
+    if (!obChat) {
+      return;
+    }
+    this.$searchPanel = this.$searchPanel || $('.search-panel', '.conversationsApp');
+    if (this.$searchPanel.hasClass('expanded')) {
+      return;
+    }
+    if (this.state[OBV4_FLAGS.CHAT_FEEDBACK_NEW] !== 1 && this.state[OBV4_FLAGS.CHAT_CONTACT_PANE] === 1) {
+      this.showNewUserFeedbackDialog();
+      return;
+    }
+    const room = this.megaChat.getCurrentRoom();
+    if (room && room.scheduledMeeting && room.scheduledMeeting.recurring && this.state[OBV4_FLAGS.CHAT_SCHEDULE_ADDED] === 1 && this.state[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR] !== 1 && !this.megaChat.chatUIFlags.convPanelCollapse) {
+      this.showOccurrencesDialog();
+      return;
+    }
+    if (this.state[OBV4_FLAGS.CHAT]) {
+      return;
+    }
+    this.showDefaultNextStep(obChat);
+  }
+  showDefaultNextStep(obChat) {
+    const nextIdx = obChat.searchNextOpenStep();
+    if (nextIdx !== false && (!this.$obDialog || !this.$obDialog.is(':visible')) && (this.obToggleDrawn || $('.toggle-panel-heading', '.conversationsApp').length)) {
+      this.obToggleDrawn = true;
+      if (obChat.steps && obChat.steps[nextIdx] && obChat.steps[nextIdx].isComplete) {
+        return;
+      }
+      if (!megaChat.hasSupportForCalls && obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_START) {
+        this.flagMap.isReady().always(() => {
+          this.flagMap.setSync(OBV4_FLAGS.CHAT_SCHEDULE_START, 1);
+          this.flagMap.safeCommit();
+          this.checkAndShowStep();
+        });
+        return;
+      }
+      const res = obChat.startNextOpenSteps(nextIdx);
+      if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_CONF && res !== false) {
+        $('.chat-dropdown.header:not(.expanded)', '.chatroom-options-panel').filter(':visible').click();
+      }
+      this.$obDialog = this.$obDialog || $('#ob-dialog');
+    }
+  }
+  handleFlagChange(...args) {
+    if (args.length >= 4 && typeof args[2] === 'string' && typeof args[3] === 'number' && this.state.hasOwnProperty(args[2])) {
+      if (d) {
+        console.debug(`Chat onboarding flag ${args[2]}: ${this.state[args[2]]} -> ${args[3]}`);
+      }
+      this.state[args[2]] = args[3];
+      if (args[2] === OBV4_FLAGS.CHAT && args[3] === 1 && this.interval) {
+        clearInterval(this.interval);
+        delete this.interval;
+      }
+    }
+  }
+  get isMeetingsTab() {
+    this.$meetingsTab = this.$meetingsTab || $('.lhp-nav .lhp-meetings-tab', '.conversationsApp');
+    return this.$meetingsTab.hasClass('active');
+  }
+  get willShowOccurrences() {
+    if (!this.currentChatIsScheduled) {
+      return false;
+    }
+    if (this.state[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR] === 1) {
+      return false;
+    }
+    if (this.state[OBV4_FLAGS.CHAT_SCHEDULE_ADDED] === 0) {
+      return false;
+    }
+    return !!this.megaChat.getCurrentRoom().scheduledMeeting.recurring;
+  }
+  get canShowScheduledNew() {
+    return this.state[OBV4_FLAGS.CHAT_FEEDBACK_NEW] === 1 && this.state[OBV4_FLAGS.CHAT_CONTACT_PANE] === 1;
+  }
+  destroy() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      delete this.interval;
+    }
+    if (this.schedListeners) {
+      for (const event of this.schedListeners) {
+        this.megaChat.off(event);
+      }
+      delete this.schedListeners;
+    }
+  }
+}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "checkAndShowStep", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "checkAndShowStep"), _class.prototype)), _class));
+
 ;// CONCATENATED MODULE: ./js/chat/chat.jsx
 
 
@@ -1125,6 +1412,7 @@ window.MeetingsManager = MeetingsManager;
 __webpack_require__(62);
 __webpack_require__(778);
 __webpack_require__(336);
+
 
 
 const EMOJI_DATASET_VERSION = 4;
@@ -1177,7 +1465,8 @@ function Chat() {
       'chatToastIntegration': ChatToastIntegration,
       'chatStats': ChatStats,
       'geoLocationLinks': GeoLocationLinks,
-      'meetingsManager': meetingsManager
+      'meetingsManager': meetingsManager,
+      'chatOnboarding': ChatOnboarding
     },
     'chatNotificationOptions': {
       'textMessages': {
@@ -1338,7 +1627,7 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     if (is_mobile) {
       return;
     }
-    self.$conversationsAppInstance = external_ReactDOM_default().render(self.$conversationsApp = external_React_default().createElement(conversations.Z.ConversationsApp, {
+    self.$conversationsAppInstance = external_ReactDOM_default().render(self.$conversationsApp = external_React_default().createElement(conversations.ZP.ConversationsApp, {
       megaChat: self,
       routingSection: self.routingSection,
       routingSubSection: self.routingSubSection,
@@ -9901,7 +10190,7 @@ class AccordionPanel extends mixins.wl {
     var self = this;
     var contentClass = self.props.className ? self.props.className : '';
     return React.createElement("div", {
-      className: "chat-dropdown container"
+      className: `chat-dropdown container ${this.props.accordionClass || ''}`
     }, React.createElement("div", {
       className: "chat-dropdown header " + (this.props.expanded ? "expanded" : ""),
       onClick: function (e) {
@@ -10796,7 +11085,7 @@ PushSettingsDialog.default = PushSettingsDialog.options[PushSettingsDialog.optio
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
 var call = __webpack_require__(200);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
-var historyPanel = __webpack_require__(214);
+var historyPanel = __webpack_require__(638);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 var composedTextArea = __webpack_require__(813);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/loading.jsx
@@ -11821,6 +12110,7 @@ class ConversationRightArea extends mixins.wl {
     }), room.observers)) : external_React_default().createElement("div", null), isRecurring && isUpcoming && external_React_default().createElement(AccordionPanel, {
       key: "occurrences",
       className: "chat-occurrences-panel",
+      accordionClass: "chatroom-occurrences-panel",
       title: l.occurrences_heading,
       chatRoom: room,
       scheduledMeeting: scheduledMeeting,
@@ -11833,6 +12123,7 @@ class ConversationRightArea extends mixins.wl {
     })), external_React_default().createElement(AccordionPanel, {
       key: "options",
       className: "have-animation buttons",
+      accordionClass: "chatroom-options-panel",
       title: l[7537],
       chatRoom: room,
       sfuClient: window.sfuClient
@@ -13190,7 +13481,9 @@ function isStartCallDisabled(room) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "Z": () => (conversations)
+  "F1": () => (CONVERSATIONS_APP_EVENTS),
+  "vN": () => (CONVERSATIONS_APP_VIEWS),
+  "ZP": () => (conversations)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
@@ -14330,6 +14623,8 @@ class SearchPanel extends mixins.wl {
             if ($.dialog === 'onboardingDialog') {
               closeDialog();
             }
+          } else {
+            megaChat.plugins.chatOnboarding.checkAndShowStep();
           }
         });
         this.wrapperRef.scrollToY(0);
@@ -14891,12 +15186,14 @@ class TogglePanel extends mixins.wl {
       expanded,
       heading,
       children,
+      className,
       onToggle
     } = this.props;
     return external_React_default().createElement("div", {
       className: `
                     toggle-panel
                     ${expanded ? 'expanded' : ''}
+                    ${className || ''}
                 `,
       onClick: onToggle
     }, heading && external_React_default().createElement("div", {
@@ -14954,7 +15251,7 @@ class Toggle extends mixins.wl {
   }
   componentDidMount() {
     super.componentDidMount();
-    megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.INITIALIZE, (ev, scheduledMeeting) => {
+    megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.toggle`, (ev, scheduledMeeting) => {
       if (scheduledMeeting && scheduledMeeting.chatRoom && scheduledMeeting.iAmOwner) {
         this.setState({
           expanded: TogglePanel.KEYS.UPCOMING
@@ -15216,6 +15513,7 @@ class LeftPanel extends mixins.wl {
       heading: l.upcoming_meetings
     }, this.renderConversations(TogglePanel.KEYS.UPCOMING)), external_React_default().createElement(TogglePanel, {
       key: TogglePanel.KEYS.PAST,
+      className: "lhp-toggle-past",
       heading: !IS_LOADING && (view === views.CHATS ? l.contacts_and_groups : l.past_meetings)
     }, this.renderConversations(TogglePanel.KEYS.PAST)), external_React_default().createElement(TogglePanel, {
       key: TogglePanel.KEYS.ARCHIVE,
@@ -15238,15 +15536,20 @@ LeftPanel.NAMESPACE = 'lhp';
 
 
 
+const CONVERSATIONS_APP_VIEWS = {
+  CHATS: 0x00,
+  MEETINGS: 0x01,
+  LOADING: 0x02
+};
+const CONVERSATIONS_APP_EVENTS = {
+  NAV_RENDER_VIEW: 'navRenderView'
+};
 class ConversationsApp extends mixins.wl {
   constructor(props) {
     super(props);
     this.chatRoomRef = null;
-    this.VIEWS = {
-      CHATS: 0x00,
-      MEETINGS: 0x01,
-      LOADING: 0x02
-    };
+    this.VIEWS = CONVERSATIONS_APP_VIEWS;
+    this.EVENTS = CONVERSATIONS_APP_EVENTS;
     this.state = {
       leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
       startGroupChatDialog: false,
@@ -15371,6 +15674,11 @@ class ConversationsApp extends mixins.wl {
         scheduleMeetingDialog: true
       });
     });
+    megaChat.rebind(this.EVENTS.NAV_RENDER_VIEW, (ev, view) => {
+      if (Object.values(this.VIEWS).includes(view)) {
+        this.renderView(view);
+      }
+    });
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -15379,21 +15687,13 @@ class ConversationsApp extends mixins.wl {
     delete this.props.megaChat.$conversationsAppInstance;
   }
   componentDidUpdate() {
-    delay('mcob-update', () => this.handleOnboardingStep(), 1000);
+    this.handleOnboardingStep();
   }
   handleOnboardingStep() {
-    if (M.chat && mega.ui.onboarding && mega.ui.onboarding.sections.chat && !mega.ui.onboarding.sections.chat.isComplete && this.state.view !== this.VIEWS.LOADING && (!this.$obDialog || !this.$obDialog.is(':visible')) && (this.obToggleDrawn || $('.toggle-panel-heading', '.conversationsApp').length) && !$('.search-panel.expanded', '.conversationsApp').length) {
-      this.obToggleDrawn = true;
-      const {
-        chat: obChat
-      } = mega.ui.onboarding.sections;
-      const nextIdx = obChat.searchNextOpenStep();
-      if (nextIdx === false || obChat.steps && obChat.steps[nextIdx] && obChat.steps[nextIdx].isComplete) {
-        return;
-      }
-      mega.ui.onboarding.sections.chat.startNextOpenSteps(nextIdx);
-      this.$obDialog = $('#ob-dialog');
+    if (this.state.view === this.VIEWS.LOADING) {
+      return;
     }
+    megaChat.plugins.chatOnboarding.checkAndShowStep();
   }
   createMeetingEndDlgIfNeeded() {
     if (megaChat.initialPubChatHandle || megaChat.initialChatId) {
@@ -16003,7 +16303,7 @@ class GifPanel extends mixins.wl {
 
 /***/ }),
 
-/***/ 214:
+/***/ 638:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -19587,7 +19887,7 @@ class stream_Stream extends mixins.wl {
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 var composedTextArea = __webpack_require__(813);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
-var historyPanel = __webpack_require__(214);
+var historyPanel = __webpack_require__(638);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/collapse.jsx
 
 
@@ -22371,6 +22671,9 @@ class Schedule extends mixins.wl {
   componentDidMount() {
     super.componentDidMount();
     this.syncPublicLink();
+    if ($.dialog === 'onboardingDialog') {
+      closeDialog();
+    }
     M.safeShowDialog(Schedule.dialogName, () => {
       if (!this.isMounted()) {
         throw new Error(`${Schedule.dialogName} dialog: component ${Schedule.NAMESPACE} not mounted.`);
@@ -30953,7 +31256,7 @@ function _extends() {
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	__webpack_require__(638);
+/******/ 	__webpack_require__(51);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __webpack_require__(222);
 /******/ 	

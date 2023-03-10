@@ -11,14 +11,21 @@ import { inProgressAlert } from './meetings/call.jsx';
 import ChatToaster from './chatToaster.jsx';
 import LeftPanel from './leftPanel/leftPanel.jsx';
 
+export const CONVERSATIONS_APP_VIEWS = {
+    CHATS: 0x00,
+    MEETINGS: 0x01,
+    LOADING: 0x02
+};
+
+export const CONVERSATIONS_APP_EVENTS = {
+    NAV_RENDER_VIEW: 'navRenderView',
+};
+
 class ConversationsApp extends MegaRenderMixin {
     chatRoomRef = null;
 
-    VIEWS = {
-        CHATS: 0x00,
-        MEETINGS: 0x01,
-        LOADING: 0x02
-    };
+    VIEWS = CONVERSATIONS_APP_VIEWS;
+    EVENTS = CONVERSATIONS_APP_EVENTS;
 
     state = {
         leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
@@ -200,6 +207,12 @@ class ConversationsApp extends MegaRenderMixin {
             this.chatRoomRef = chatRoom;
             this.setState({ scheduleMeetingDialog: true });
         });
+
+        megaChat.rebind(this.EVENTS.NAV_RENDER_VIEW, (ev, view) => {
+            if (Object.values(this.VIEWS).includes(view)) {
+                this.renderView(view);
+            }
+        });
     }
 
     componentWillUnmount() {
@@ -210,35 +223,14 @@ class ConversationsApp extends MegaRenderMixin {
     }
 
     componentDidUpdate() {
-        delay('mcob-update', () => this.handleOnboardingStep(), 1000);
+        this.handleOnboardingStep();
     }
 
     handleOnboardingStep() {
-        if (
-            M.chat
-            && mega.ui.onboarding
-            && mega.ui.onboarding.sections.chat
-            && !mega.ui.onboarding.sections.chat.isComplete
-            && this.state.view !== this.VIEWS.LOADING
-            && (!this.$obDialog || !this.$obDialog.is(':visible'))
-            && (this.obToggleDrawn || $('.toggle-panel-heading', '.conversationsApp').length)
-            && !$('.search-panel.expanded', '.conversationsApp').length
-        ) {
-            this.obToggleDrawn = true;
-            const { chat : obChat } = mega.ui.onboarding.sections;
-            const nextIdx = obChat.searchNextOpenStep();
-            if (
-                nextIdx === false
-                || obChat.steps
-                && obChat.steps[nextIdx]
-                && obChat.steps[nextIdx].isComplete
-            ) {
-                // If the next section is done skip until the next update with the correct step.
-                return;
-            }
-            mega.ui.onboarding.sections.chat.startNextOpenSteps(nextIdx);
-            this.$obDialog = $('#ob-dialog');
+        if (this.state.view === this.VIEWS.LOADING) {
+            return;
         }
+        megaChat.plugins.chatOnboarding.checkAndShowStep();
     }
 
     createMeetingEndDlgIfNeeded() {

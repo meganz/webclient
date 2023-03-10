@@ -248,6 +248,9 @@ export class Schedule extends MegaRenderMixin {
     componentDidMount() {
         super.componentDidMount();
         this.syncPublicLink();
+        if ($.dialog === 'onboardingDialog') {
+            closeDialog();
+        }
         M.safeShowDialog(Schedule.dialogName, () => {
             if (!this.isMounted()) {
                 throw new Error(`${Schedule.dialogName} dialog: component ${Schedule.NAMESPACE} not mounted.`);

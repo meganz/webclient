@@ -6,7 +6,7 @@ class AccordionPanel extends MegaRenderMixin {
         var self = this;
         var contentClass = self.props.className ? self.props.className : '';
 
-        return <div className="chat-dropdown container">
+        return <div className={`chat-dropdown container ${this.props.accordionClass || ''}`}>
             <div className={"chat-dropdown header " + (this.props.expanded ? "expanded" : "")} onClick={function(e) {
                 self.props.onToggle(e);
             }}>

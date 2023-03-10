@@ -91,7 +91,7 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
         else {
             let upgraded = false;
-            if (upgradeFrom < 1) {
+            if (upgradedFrom !== false && upgradeFrom < 1) {
                 // This is the version where the new chat path was added so convert to it.
                 // Existing users shall only see the scheduled meetings changes
                 flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);

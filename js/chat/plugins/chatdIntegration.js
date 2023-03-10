@@ -221,7 +221,7 @@ ChatdIntegration.prototype.updateChatPublicHandle = function(h, d, cim, callback
     return asyncApiReq({
         a: 'mcph',
         id: h,
-        d,
+        d: d || undefined,
         cim,
         v: Chatd.VERSION
     })

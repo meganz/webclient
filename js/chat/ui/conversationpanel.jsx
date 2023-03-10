@@ -722,7 +722,7 @@ export class ConversationRightArea extends MegaRenderMixin {
         const { isRecurring, isUpcoming, occurrences } = scheduledMeeting || {};
 
         /* `Archive chat/meeting` */
-        let archiveText = room.isMeeting ? l.archive_meeting_btn : l[16689];
+        let archiveText = room.isMeeting ? l.archive_meeting_btn : l.archive_chat_btn;
         if (room.isArchived()) {
             /* `Unarchive chat/meeting` */
             archiveText = room.isMeeting ? l.unarchive_meeting_btn : l[19065];
@@ -790,6 +790,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 <AccordionPanel
                                     key="occurrences"
                                     className="chat-occurrences-panel"
+                                    accordionClass="chatroom-occurrences-panel"
                                     title={l.occurrences_heading}
                                     chatRoom={room}
                                     scheduledMeeting={scheduledMeeting}
@@ -806,6 +807,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                             <AccordionPanel
                                 key="options"
                                 className="have-animation buttons"
+                                accordionClass="chatroom-options-panel"
                                 title={l[7537]}
                                 chatRoom={room}
                                 sfuClient={window.sfuClient}>

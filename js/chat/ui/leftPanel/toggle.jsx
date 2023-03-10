@@ -26,12 +26,13 @@ export class TogglePanel extends MegaRenderMixin {
     }
 
     render() {
-        const { loading, expanded, heading, children, onToggle } = this.props;
+        const { loading, expanded, heading, children, className, onToggle } = this.props;
         return (
             <div
                 className={`
                     toggle-panel
                     ${expanded ? 'expanded' : ''}
+                    ${className || ''}
                 `}
                 onClick={onToggle}>
                 {heading && (
@@ -89,7 +90,7 @@ export default class Toggle extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.INITIALIZE, (ev, scheduledMeeting) => {
+        megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.toggle`, (ev, scheduledMeeting) => {
             if (scheduledMeeting && scheduledMeeting.chatRoom && scheduledMeeting.iAmOwner) {
                 this.setState({ expanded: TogglePanel.KEYS.UPCOMING }, () => scheduledMeeting.chatRoom.setActive());
             }

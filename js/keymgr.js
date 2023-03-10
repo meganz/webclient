@@ -212,7 +212,7 @@ lazy(mega, 'keyMgr', () => {
 
                 // eslint-disable-next-line no-alert -- @todo non-alert blocking method..
                 if (!confirm(msg)) {
-                    location.replace('https://mega.nz/support?resilience=1');
+                    location.replace('https://blog.mega.io/?resilience=1');
                 }
             }
             else {

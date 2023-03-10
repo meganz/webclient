@@ -625,8 +625,21 @@ function u_setrsa(rsakey) {
                     }
                     mBroadcaster.sendMessage('trk:event', 'account', 'regist', u_attr.b ? 'bus' : 'norm', u_type);
 
-                    $promise.resolve(rsakey);
-                    ui_keycomplete();
+                    if (d) {
+                        console.warn('Initializing auth-ring and keys subsystem...');
+                    }
+
+                    Promise.resolve(authring.initAuthenticationSystem())
+                        .then(() => {
+                            return mega.keyMgr.initKeyManagement();
+                        })
+                        .then(() => {
+                            $promise.resolve(rsakey);
+                        })
+                        .catch((ex) => {
+                            msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
+                        })
+                        .finally(ui_keycomplete);
                 }
             });
         }

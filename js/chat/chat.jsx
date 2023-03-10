@@ -12,6 +12,7 @@ require("./ui/meetings/workflow/incoming.jsx");
 
 import ChatRouting from "./chatRouting.jsx";
 import MeetingsManager from './meetingsManager.jsx';
+import { ChatOnboarding } from "./chatOnboarding.jsx";
 
 const EMOJI_DATASET_VERSION = 4;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
@@ -85,6 +86,7 @@ function Chat() {
          * @property {ChatStats} chatStats
          * @property {GeoLocationLinks} geoLocationLinks
          * @property {MeetingsManager} meetingsManager
+         * @property {ChatOnboarding} chatOnboarding
          */
         'plugins': {
             'chatdIntegration': ChatdIntegration,
@@ -102,6 +104,7 @@ function Chat() {
             'chatStats': ChatStats,
             'geoLocationLinks': GeoLocationLinks,
             'meetingsManager': MeetingsManager,
+            'chatOnboarding': ChatOnboarding,
         },
         'chatNotificationOptions':  {
             'textMessages': {
@@ -1397,7 +1400,7 @@ Chat.prototype.retrieveSharedFilesHistory = async function(len = 47, chatRoom = 
 /**
  * Returns the currently opened room/chat
  *
- * @returns {null|undefined|Object}
+ * @returns {null|undefined|ChatRoom}
  */
 Chat.prototype.getCurrentRoom = function() {
     return this.chats[this.currentlyOpenedChat];

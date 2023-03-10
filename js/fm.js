@@ -2820,6 +2820,17 @@ function closeDialog(ev) {
             }
             delete $.msgDialog;
         }
+        if ($.dialog === 'onboardingDialog') {
+            if (
+                mega.ui.onboarding.$hotSpotNode
+                && mega.ui.onboarding.$hotSpotNode.hasClass('onboarding-hotspot-animation-rect')
+            ) {
+                mega.ui.onboarding.$hotSpotNode.removeClass('onboarding-hotspot-animation-rect');
+            }
+            if (M.chat) {
+                megaChat.plugins.chatOnboarding.occurrenceDialogShown = false;
+            }
+        }
     }
     $('.mega-dialog, .overlay.arrange-to-back, .mega-dialog-container.common-container').removeClass('arrange-to-back');
     // $('.mega-dialog .dialog-sorting-menu').remove();

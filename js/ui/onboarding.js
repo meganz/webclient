@@ -1,6 +1,31 @@
 // initialising onboarding v4
-mBroadcaster.addListener('fm:initialized', () => {
 
+// Bump this version number if changes are required in an existing section or if required to reduce complexity.
+window.ONBOARD_VERSION = 1;
+window.OBV4_FLAGS = {
+    OBV4: 'obv4f',
+    CLOUD_DRIVE: 'obcd',
+    CLOUD_DRIVE_UPLOAD: 'obcduf',
+    CLOUD_DRIVE_MANAGE_FILES: 'obcdmyf',
+    CLOUD_DRIVE_MEGASYNC: 'obcdda',
+    CHAT: 'obmc',
+    CHAT_OPEN: 'obmcnw',
+    CHAT_NAV: 'obmclp',
+    CHAT_CHATS_PANE: 'obmccp',
+    CHAT_MEETINGS_PANE: 'obmcmp',
+    CHAT_CONTACT_PANE: 'obmcco',
+    CHAT_SCHEDULE_NEW: 'obmcsn',
+    CHAT_SCHEDULE_ADDED: 'obmcsa',
+    CHAT_SCHEDULE_CONF: 'obmcsc',
+    CHAT_SCHEDULE_OCCUR: 'obmcso',
+    CHAT_SCHEDULE_START: 'obmcss',
+    CHAT_SCHEDULE_PAST: 'obmcsp',
+    CHAT_FEEDBACK: 'obmcfb',
+    CHAT_FEEDBACK_NEW: 'obmcfn',
+    // New onboarding flags to be added at the end of this object. Don't change the order!!!!
+};
+
+mBroadcaster.addListener('fm:initialized', () => {
     'use strict';
 
     // If user is visiting folderlink, or not complete registration do not show Onboarding V4.
@@ -8,22 +33,17 @@ mBroadcaster.addListener('fm:initialized', () => {
         return;
     }
 
-    const OBV4_FLAGS = {
-        OBV4: 'obv4f',
-        CLOUD_DRIVE: 'obcd',
-        CLOUD_DRIVE_UPLOAD: 'obcduf',
-        CLOUD_DRIVE_MANAGE_FILES: 'obcdmyf',
-        CLOUD_DRIVE_MEGASYNC: 'obcdda',
-        CHAT: 'obmc',
-        CHAT_OPEN: 'obmcnw',
-        CHAT_NAV: 'obmclp',
-        CHAT_CHATS_PANE: 'obmccp',
-        CHAT_MEETINGS_PANE: 'obmcmp',
-        CHAT_CONTACT_PANE: 'obmcco',
-        // New onboarding flags to be added at the end of this object. Don't change the order!!!!
-    };
+    const upgradeFrom = fmconfig.obVer ?
+        fmconfig.obVer < ONBOARD_VERSION ? fmconfig.obVer : false
+        : -1;
+    if (upgradeFrom) {
+        mega.config.set('obVer', ONBOARD_VERSION);
+    }
 
-    const flagMap = new MegaDataBitMap('obv4', false, Object.values(OBV4_FLAGS));
+    const flagMap = attribCache.bitMapsManager.exists('obv4')
+        ? attribCache.bitMapsManager.get('obv4')
+        : new MegaDataBitMap('obv4', false, Object.values(OBV4_FLAGS));
+
     flagMap.isReady().then((res) => {
         if (res) {
             // ENOENT so migrate any old flags to this attribute
@@ -68,6 +88,33 @@ mBroadcaster.addListener('fm:initialized', () => {
                     }
                 });
             });
+        }
+        else {
+            let upgraded = false;
+            if (upgradeFrom < 1) {
+                // This is the version where the new chat path was added so convert to it.
+                // Existing users shall only see the scheduled meetings changes
+                flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);
+                flagMap.setSync(OBV4_FLAGS.CHAT_CHATS_PANE, 1);
+                flagMap.setSync(OBV4_FLAGS.CHAT_MEETINGS_PANE, 1);
+                flagMap.setSync(OBV4_FLAGS.CHAT_CONTACT_PANE, 1);
+                // Set complete for now future schedule steps will reset it
+                flagMap.setSync(OBV4_FLAGS.CHAT, 0);
+                upgraded = true;
+            }
+
+
+            // Future upgrades may be added here
+
+
+            if (upgraded) {
+                flagMap.safeCommit();
+            }
+        }
+
+        if (u_attr.since <= 1674432000) {
+            flagMap.setSync(OBV4_FLAGS.CHAT_FEEDBACK_NEW, 1);
+            flagMap.safeCommit();
         }
 
         if (mega.ui.onboarding) {
@@ -163,7 +210,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             targetElmClass: '.conversationsApp .lhp-nav',
                             targetElmPosition: 'right bottom',
                             markComplete: true,
-                            ignoreBgClick: true,
+                            ignoreBgClick: '.conversationsApp',
                         }
                     ]
                 },
@@ -179,7 +226,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             targetElmClass: '.conversationsApp .toggle-panel-heading',
                             targetElmPosition: 'right',
                             markComplete: true,
-                            ignoreBgClick: true,
+                            ignoreBgClick: '.conversationsApp',
                         }
                     ]
                 },
@@ -195,7 +242,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             targetElmClass: '.conversationsApp .lhp-nav .lhp-meetings-tab',
                             targetElmPosition: 'bottom right',
                             markComplete: true,
-                            ignoreBgClick: true,
+                            ignoreBgClick: '.conversationsApp',
                         }
                     ]
                 },
@@ -208,12 +255,144 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogClass: 'mcob',
                             dialogTitle: l.onboard_megachat_dlg4_title,
                             dialogDesc: l.onboard_megachat_dlg4_text,
-                            dialogNext: l[726],
                             targetElmClass: '.conversationsApp .lhp-nav .lhp-contacts-tab',
                             targetElmPosition: 'bottom right',
                             markComplete: true,
+                            ignoreBgClick: '.conversationsApp',
+                        }
+                    ]
+                },
+                {
+                    name: 'Schedule available',
+                    flag: OBV4_FLAGS.CHAT_SCHEDULE_NEW,
+                    get prerequisiteCondition() {
+                        return megaChat.plugins.chatOnboarding.canShowScheduledNew;
+                    },
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'mcob',
+                            dialogTitle: l.onboard_megachat_dlg5_title,
+                            dialogDesc: l.onboard_megachat_dlg5_text,
+                            targetElmClass: '.conversationsApp .lhp-nav .lhp-meetings-tab',
+                            targetElmPosition: 'bottom right',
+                            markComplete: true,
+                            ignoreBgClick: '.conversationsApp',
+                            dialogNext: l.onboard_try_scheduled,
+                            dialogSkip: l[148],
+                            postComplete: () => megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, null),
+                        }
+                    ]
+                },
+                {
+                    name: 'Schedule created',
+                    flag: OBV4_FLAGS.CHAT_SCHEDULE_ADDED,
+                    get prerequisiteCondition() {
+                        return !!megaChat.scheduledMeetings.length && megaChat.plugins.chatOnboarding.isMeetingsTab;
+                    },
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'mcob',
+                            dialogTitle: l.onboard_megachat_dlg6_title,
+                            dialogDesc: l.onboard_megachat_dlg6_text,
+                            targetElmClass: `.conversationsApp .lhp-conversations ul.conversations-pane
+                                             li.upcoming-conversation:first-child`,
+                            targetElmPosition: 'right',
+                            markComplete: true,
+                            ignoreBgClick: '.conversationsApp',
+                            dialogNext: l.onboard_schedule_tour_start,
+                            postComplete: () => {
+                                // The plugin needs this flag set immediately to block the next step correctly.
+                                megaChat.plugins.chatOnboarding
+                                    .handleFlagChange(null, null, OBV4_FLAGS.CHAT_SCHEDULE_ADDED, 1);
+                                megaChat.plugins.chatOnboarding.checkAndShowStep();
+                            },
+                        }
+                    ],
+                },
+                {
+                    name: 'Schedule options',
+                    flag: OBV4_FLAGS.CHAT_SCHEDULE_CONF,
+                    get prerequisiteCondition() {
+                        return M.chat
+                            && megaChat.plugins.chatOnboarding.currentChatIsScheduled
+                            && !megaChat.chatUIFlags.convPanelCollapse
+                            && !megaChat.plugins.chatOnboarding.willShowOccurrences;
+                    },
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'mcob',
+                            dialogTitle: l.onboard_megachat_dlg7a_title,
+                            dialogDesc: l.onboard_megachat_dlg7a_text,
+                            targetElmClass: `.conversationsApp .conversation-panel:not(.hidden)
+                                             .chatroom-options-panel .chat-dropdown.header`,
+                            targetElmPosition: 'left',
+                            ignoreBgClick: '.conversationsApp',
+                            markComplete: true,
+                        }
+                    ],
+                },
+                {
+                    name: 'Schedule start early',
+                    flag: OBV4_FLAGS.CHAT_SCHEDULE_START,
+                    get prerequisiteCondition() {
+                        if (!M.chat) {
+                            return false;
+                        }
+                        const room = megaChat.getCurrentRoom();
+                        return !!room.scheduledMeeting && room.state === ChatRoom.STATE.READY;
+                    },
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'mcob',
+                            dialogTitle: l.onboard_megachat_dlg8_title,
+                            dialogDesc: l.onboard_megachat_dlg8_text,
+                            targetElmClass: '.conversationsApp .in-call-notif:visible',
+                            targetElmPosition: 'bottom 20',
+                            ignoreBgClick: '.conversationsApp',
+                            markComplete: true,
+                        }
+                    ],
+                },
+                {
+                    name: 'Schedule past meetings',
+                    flag: OBV4_FLAGS.CHAT_SCHEDULE_PAST,
+                    get prerequisiteCondition() {
+                        return M.chat && megaChat.plugins.chatOnboarding.isMeetingsTab;
+                    },
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'mcob',
+                            dialogTitle: l.onboard_megachat_dlg9_title,
+                            dialogDesc: '',
+                            targetElmClass: `.conversationsApp .lhp-conversations
+                                             .toggle-panel.lhp-toggle-past .toggle-panel-heading`,
+                            targetElmPosition: 'right',
+                            ignoreBgClick: '.conversationsApp',
+                            markComplete: true,
+                        }
+                    ],
+                },
+                {
+                    name: 'Feedback',
+                    flag: OBV4_FLAGS.CHAT_FEEDBACK,
+                    actions: [
+                        {
+                            type: 'showDialog',
+                            dialogClass: 'mcob',
+                            dialogTitle: l.onboard_megachat_dlg10_title,
+                            dialogDesc: l.onboard_megachat_dlg10_text,
+                            targetElmClass: '#fmholder button.js-more-menu.js-top-buttons',
+                            targetElmPosition: 'left bottom',
+                            targetHotSpot: true,
+                            markComplete: true,
                             skipHidden: true,
-                            ignoreBgClick: true,
+                            ignoreBgClick: '.conversationsApp',
+                            dialogNext: l[726],
                         }
                     ]
                 }
@@ -657,7 +836,10 @@ mBroadcaster.addListener('fm:initialized', () => {
                 $('#ob-dialog-title').text(this.map.dialogTitle);
                 $('#ob-dialog-text').text(this.map.dialogDesc);
                 $('.js-next span', this.$dialog).text(this.map.dialogNext || l[556]);
-                $('.js-skip', this.$dialog).removeClass('hidden').addClass(this.map.skipHidden ? 'hidden' : '');
+                $('.js-skip', this.$dialog)
+                    .text(this.map.dialogSkip || l.onboard_v4_dialog_skip)
+                    .removeClass('hidden')
+                    .addClass(this.map.skipHidden ? 'hidden' : '');
 
                 this.positionDialog();
                 this.bindDialogEvents();
@@ -709,10 +891,14 @@ mBroadcaster.addListener('fm:initialized', () => {
                     at = 'right-42 top';
                     arrowAt = 'top-left';
                     break;
+                case 'bottom 20':
+                    at = 'center bottom+26';
+                    break;
             }
 
             if (this.map.targetHotSpot) {
-                $(this.map.targetElmClass).addClass('onboarding-hotspot-animation-rect');
+                this.parentStep.parentSection.parent.$hotSpotNode
+                    = $(this.map.targetElmClass).addClass('onboarding-hotspot-animation-rect');
             }
 
             // $.position bug escaping
@@ -771,7 +957,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             const __closeDialogAction = (noComplete) => {
 
                 closeDialog();
-                $('.onboarding-hotspot-animation-rect').removeClass('onboarding-hotspot-animation-rect');
+                delete this.parentStep.parentSection.parent.$hotSpotNode;
 
                 $('#fmholder').off('mouseup.onboarding');
                 $('.fm-right-files-block .ui-selectable:visible:not(.hidden)').off('mousedown.onboarding');
@@ -786,6 +972,9 @@ mBroadcaster.addListener('fm:initialized', () => {
 
                 if (!noComplete && this.map.markComplete) {
                     this.parentStep.markDone();
+                    if (typeof this.map.postComplete === 'function') {
+                        this.map.postComplete();
+                    }
                 }
                 else if (noComplete) {
                     this.parentStep.markDeactive();
@@ -821,14 +1010,19 @@ mBroadcaster.addListener('fm:initialized', () => {
             $('#fmholder').rebind('mouseup.onboarding', e => {
 
                 // If there is nextActionTrigger, let that handle close dialog.
+                const $target = $(e.target);
                 if (
-                    !this.map.ignoreBgClick
-                    && (
-                        !this.map.nextActionTrigger
-                        || !($(e.target).is(this.map.targetElmClass)
-                        || $(e.target).parents(this.map.targetElmClass).length)
-                    )
+                    !this.map.nextActionTrigger
+                    || !$target.is(this.map.targetElmClass)
+                    || $target.parents(this.map.targetElmClass).length
                 ) {
+                    if (this.map.ignoreBgClick) {
+                        if ($target.is(this.map.ignoreBgClick) || $target.parents(this.map.ignoreBgClick).length) {
+                            return;
+                        }
+                        __closeDialogAction(true);
+                        return;
+                    }
 
                     __closeDialogAction();
                     this.parentStep.parentSection.hotspotNextStep();
@@ -838,8 +1032,16 @@ mBroadcaster.addListener('fm:initialized', () => {
             // Event for block view empty space, to not conflict with selection manger multi-selection event.
             $('.fm-right-files-block .ui-selectable:visible:not(.hidden)').rebind('mousedown.onboarding', e => {
 
-                if (e.which === 1 && !this.map.ignoreBgClick) {
+                if (e.which === 1) {
 
+                    if (this.map.ignoreBgClick) {
+                        const $target = $(e.target);
+                        if ($target.is(this.map.ignoreBgClick) || $target.parents(this.map.ignoreBgClick).length) {
+                            return;
+                        }
+                        __closeDialogAction(true);
+                        return;
+                    }
                     __closeDialogAction();
                     this.parentStep.parentSection.hotspotNextStep();
                 }
@@ -929,6 +1131,8 @@ mBroadcaster.addListener('fm:initialized', () => {
 
     mega.ui.onboarding = new OnboardV4(obMap, flagMap);
     mega.ui.onboardingFlags = OBV4_FLAGS;
+
+    window.OnboardV4Action = OnboardV4Action;
 
     return 0xDEAD;
 });

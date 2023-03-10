@@ -86,6 +86,7 @@
     animation-delay: 500ms;
 }
 #ob-dialog.mcob {
+    width: 450px;
     z-index: 121;
 }
 .overlayed #ob-dialog.mcob {
@@ -155,7 +156,9 @@
 .onboarding-control-panel .onboarding-step-link.hotspot::before,
 .onboarding-control-panel .onboarding-step-link.hotspot::after,
 .button.onboarding-hotspot-animation-rect::before,
-.button.onboarding-hotspot-animation-rect::after {
+.button.onboarding-hotspot-animation-rect::after,
+.js-more-menu.onboarding-hotspot-animation-rect::before,
+.js-more-menu.onboarding-hotspot-animation-rect::after {
     content: '';
     position: absolute;
     border-radius: 4px;
@@ -174,6 +177,17 @@
     animation-name: onboarding-hotspot-rect-2;
     animation-delay: 400ms;
     left: 0;
+}
+.js-more-menu.onboarding-hotspot-animation-rect {
+    position: relative;
+}
+.js-more-menu.onboarding-hotspot-animation-rect::before,
+.js-more-menu.onboarding-hotspot-animation-rect::after {
+    height: calc(100% - 12px);
+    left: 6px;
+    top: 6px;
+    width: 64%;
+    z-index: 4;
 }
 
 /* Onboarding control panel */

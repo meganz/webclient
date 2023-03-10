@@ -124,6 +124,7 @@ export default class LeftPanel extends MegaRenderMixin {
                         )}
                         <TogglePanel
                             key={TogglePanel.KEYS.PAST}
+                            className="lhp-toggle-past"
                             heading={!IS_LOADING && (view === views.CHATS ? l.contacts_and_groups : l.past_meetings)}>
                             {this.renderConversations(TogglePanel.KEYS.PAST)}
                         </TogglePanel>

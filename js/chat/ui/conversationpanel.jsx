@@ -790,6 +790,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 <AccordionPanel
                                     key="occurrences"
                                     className="chat-occurrences-panel"
+                                    accordionClass="chatroom-occurrences-panel"
                                     title={l.occurrences_heading}
                                     chatRoom={room}
                                     scheduledMeeting={scheduledMeeting}
@@ -806,6 +807,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                             <AccordionPanel
                                 key="options"
                                 className="have-animation buttons"
+                                accordionClass="chatroom-options-panel"
                                 title={l[7537]}
                                 chatRoom={room}
                                 sfuClient={window.sfuClient}>

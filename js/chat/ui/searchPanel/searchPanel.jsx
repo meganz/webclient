@@ -138,6 +138,9 @@ export default class SearchPanel extends MegaRenderMixin {
                             closeDialog();
                         }
                     }
+                    else {
+                        megaChat.plugins.chatOnboarding.checkAndShowStep();
+                    }
                 }
             );
 

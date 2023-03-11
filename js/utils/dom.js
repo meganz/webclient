@@ -32,7 +32,17 @@ function parseHTML(markup) {
 
     markup = String(markup).replace(/<!--[\S\s]*?-->/g, '');
 
-    var dumb = {'SCRIPT': 1, 'STYLE': 1, 'SVG': 1, 'XML': 1, 'OBJECT': 1, 'IFRAME': 1, 'EMBED': 1, 'MARQUEE': 1};
+    const dumb = {
+        'SCRIPT': 1,
+        'STYLE': 1,
+        'SVG': 1,
+        'XML': 1,
+        'OBJECT': 1,
+        'IFRAME': 1,
+        'EMBED': 1,
+        'MARQUEE': 1,
+        'META': 1
+    };
 
     $.parseHTML(markup, doc)
         .forEach((node) => {

@@ -235,11 +235,9 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
                                 }
                             </div>}
                             {mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description &&
-                                <ParsedHTML
-                                    tag="div"
-                                    className="schedule-description">
-                                    {scheduledMeeting.description.replace(/\n/g, '<br>')}
-                                </ParsedHTML>
+                                <div className="schedule-description">
+                                    <Emoji>{scheduledMeeting.description.replace(/\n/g, '<br>')}</Emoji>
+                                </div>
                             }
                             {link && (
                                 <div>

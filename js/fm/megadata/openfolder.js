@@ -714,7 +714,7 @@
             this.search = true;
         }
         else if (id && id.substr(0, 10) === 'discovery/') {
-            if (cv.nodeID === M.RootID) {
+            if (cv.nodeID === M.RootID || cv.nodeID === M.RubbishID || !M.d[cv.nodeID]) {
                 // Preventing MD on root folder
                 return M.openFolder('cloudroot');
             }

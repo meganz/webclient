@@ -78,7 +78,7 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                     true : !(megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url);
 
                 if (megaLinkInfo.is_chatlink) {
-                    desc = l[8876] + ": " + megaLinkInfo.info.ncm;
+                    desc = l[8876].replace('%1', megaLinkInfo.info.ncm) /* `Chat participants: %1` */;
                 }
                 else if (!megaLinkInfo.is_dir) {
                     desc = bytesToSize(megaLinkInfo.info.size);

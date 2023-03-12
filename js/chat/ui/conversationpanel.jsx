@@ -602,7 +602,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                         sprite-fm-mono
                         ${pushSettingsIcon}
                     `}
-                    label={l[16709] /* `Mute chat` */}
+                    label={room.isMeeting
+                        ? l.meeting_notifications /* `Meeting notifications` */
+                        : l[16709] /* `Chat notifications` */}
                     secondLabel={(() => {
                         if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
                             return pushSettingsValue === 0 ?
@@ -642,7 +644,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                         sprite-fm-mono
                         icon-user-filled
                     `}
-                    label={l.open_invite_label /* `Chat invitations` */}
+                    label={room.isMeeting
+                        ? l.meeting_open_invite_label /* `Meeting invitations` */
+                        : l.chat_open_invite_label /* `Chat invitations` */}
                     secondLabel={l.open_invite_desc /* `Non-host can add participants to the chat` */}
                     secondLabelClass="label--green"
                     toggle={{
@@ -768,7 +772,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                             {participantsList ?
                                 <AccordionPanel
                                     className="small-pad"
-                                    title={l[8876]}
+                                    title={room.isMeeting
+                                        ? l.meeting_participants /* `Meeting participants` */
+                                        : l.chat_participants /* `Chat participants` */}
                                     chatRoom={room}
                                     key="participants">
                                     {participantsList}
@@ -844,7 +850,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                                                 }
                                             }}>
                                             <i className="sprite-fm-mono icon-rename"/>
-                                            <span>{l[9080] /* `Rename group` */}</span>
+                                            <span>{room.isMeeting
+                                                ? l.rename_meeting /* `Rename Meeting` */
+                                                : l[9080] /* `Rename group` */}</span>
                                         </div> :
                                         null
                                     }
@@ -879,8 +887,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                                             }}>
                                             <i className="sprite-fm-mono icon-link-filled"/>
                                             <span>
-                                                {/* `Share meeting` || `Get chat link` */}
-                                                {scheduledMeeting ? l.share_meeting_button : l[20481]}
+                                                {/* `Share meeting` || `Get chat link` || `Get meeting link` */}
+                                                {scheduledMeeting ? l.share_meeting_button
+                                                    : room.isMeeting ? l.meeting_get_link : l[20481]}
                                             </span>
                                         </div> :
                                         null
@@ -976,7 +985,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         }}>
                                         <i className="sprite-fm-mono icon-remove"/>
                                         <span className="accordion-clear-history-text">
-                                            {l[8871] /* Clear Chat History */}
+                                            {room.isMeeting
+                                                ? l.meeting_clear_hist /* `Clear Meeting History` */
+                                                : l[8871] /* `Clear Chat History` */}
                                         </span>
                                     </Button>
                                     {retentionHistoryBtn}
@@ -1061,7 +1072,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                                                     }
                                                 }}>
                                                 <i className="sprite-fm-mono icon-disabled-filled"/>
-                                                <span>{l[8633] /* `Leave Chat` */}</span>
+                                                <span>{room.isMeeting
+                                                    ? l.meeting_leave /* `Leave Meeting` */
+                                                    : l[8633] /* `Leave Chat` */}</span>
                                             </div> :
                                             null
                                     }
@@ -1086,8 +1099,12 @@ export class ConversationRightArea extends MegaRenderMixin {
                         megaChat={room.megaChat}
                         multiple={true}
                         className="popup add-participant-selector"
-                        singleSelectedButtonLabel={l[8869] /* `Add to Group Conversation` */}
-                        multipleSelectedButtonLabel={l[8869] /* `Add to Group Conversation` */}
+                        singleSelectedButtonLabel={room.isMeeting
+                            ? l.meeting_add_participant /* `Add to meeting` */
+                            : l[8869] /* `Add to Group Conversation` */}
+                        multipleSelectedButtonLabel={room.isMeeting
+                            ? l.meeting_add_participant /* `Add to meeting` */
+                            : l[8869] /* `Add to Group Conversation` */}
                         nothingSelectedButtonLabel={l[8870] /* `Select one or more contacts to continue` */}
                         onSelectDone={selected => {
                             this.props.onAddParticipantSelected(selected);
@@ -1782,8 +1799,12 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.state.truncateDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
-                title={l[8871]}
-                subtitle={l[8881]}
+                title={room.isMeeting
+                    ? l.meeting_clear_hist /* `Clear Meeting History` */
+                    : l[8871] /* `Clear Chat History` */}
+                subtitle={room.isMeeting
+                    ? l.meeting_trunc_txt/* `Are you sure you want to clear the full message history of this meeting?`*/
+                    : l[8881] /* `Are you sure you want to clear the full message history of this conversation?` */}
                 icon="sprite-fm-uni icon-question"
                 name="truncate-conversation"
                 pref="3"
@@ -1806,8 +1827,12 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.state.archiveDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
-                title={l[19068]}
-                subtitle={l[19069]}
+                title={room.isMeeting
+                    ? l.meeting_archive_dlg /* `Archive meeting` */
+                    : l[19068] /* `Archive chat` */}
+                subtitle={room.isMeeting
+                    ? l.meeting_archive_dlg_text /* `Are you sure you want to archive this meeting?` */
+                    : l[19069] /* `Are you sure you want to archive this chat?` */}
                 icon="sprite-fm-uni icon-question"
                 name="archive-conversation"
                 pref="4"
@@ -1828,8 +1853,12 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.state.unarchiveDialog === true) {
             confirmDeleteDialog = <ModalDialogsUI.ConfirmDialog
                 chatRoom={room}
-                title={l[19063]}
-                subtitle={l[19064]}
+                title={room.isMeeting
+                    ? l.meeting_unarchive_dlg /* `Unarchive meeting` */
+                    : l[19063] /* `Unarchive chat` */}
+                subtitle={room.isMeeting
+                    ? l.meeting_unarchive_dlg_text /* `Are you sure you want to unarchive this meeting?` */
+                    : l[19064] /* `Are you sure you want to unarchive this conversation?` */}
                 icon="sprite-fm-uni icon-question"
                 name="unarchive-conversation"
                 pref="5"
@@ -1861,7 +1890,9 @@ export class ConversationPanel extends MegaRenderMixin {
 
             confirmDeleteDialog = <ModalDialogsUI.ModalDialog
                 chatRoom={room}
-                title={l[9080]}
+                title={room.isMeeting
+                    ? l.rename_meeting /* `Rename Meeting` */
+                    : l[9080] /* `Rename Group` */}
                 name="rename-group"
                 className="chat-rename-dialog dialog-template-main"
                 onClose={() => {

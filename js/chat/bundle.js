@@ -10929,7 +10929,7 @@ class ChatlinkDialog extends mixins.wl {
       onClick: this.onClose
     }, external_React_default().createElement("span", null, l[148]));
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
-      title: chatRoom.iAmOperator() && !chatRoom.topic ? l[9080] : '',
+      title: chatRoom.iAmOperator() && !chatRoom.topic ? chatRoom.isMeeting ? l.rename_meeting : l[9080] : '',
       className: `
                     chat-rename-dialog
                     export-chat-links-dialog
@@ -11052,7 +11052,7 @@ class PushSettingsDialog extends mixins.wl {
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       name: "push-settings",
       title: l.dnd_mute_title,
-      subtitle: l[22015],
+      subtitle: this.props.room.isMeeting ? l.meeting_dnd_subtitle : l[22015],
       className: "push-settings-dialog",
       dialogName: "push-settings-chat-dialog",
       dialogType: "tool",
@@ -11966,7 +11966,7 @@ class ConversationRightArea extends mixins.wl {
                         sprite-fm-mono
                         ${pushSettingsIcon}
                     `,
-      label: l[16709],
+      label: room.isMeeting ? l.meeting_notifications : l[16709],
       secondLabel: (() => {
         if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
           return pushSettingsValue === 0 ? PushSettingsDialog.options[Infinity] : l[23539].replace('%s', toLocaleTime(pushSettingsValue));
@@ -11992,7 +11992,7 @@ class ConversationRightArea extends mixins.wl {
                         sprite-fm-mono
                         icon-user-filled
                     `,
-      label: l.open_invite_label,
+      label: room.isMeeting ? l.meeting_open_invite_label : l.chat_open_invite_label,
       secondLabel: l.open_invite_desc,
       secondLabelClass: "label--green",
       toggle: {
@@ -12088,7 +12088,7 @@ class ConversationRightArea extends mixins.wl {
       }
     }), participantsList ? external_React_default().createElement(AccordionPanel, {
       className: "small-pad",
-      title: l[8876],
+      title: room.isMeeting ? l.meeting_participants : l.chat_participants,
       chatRoom: room,
       key: "participants"
     }, participantsList) : null, room.type === 'public' && room.observers > 0 ? external_React_default().createElement("div", {
@@ -12144,7 +12144,7 @@ class ConversationRightArea extends mixins.wl {
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-rename"
-    }), external_React_default().createElement("span", null, l[9080])) : null, scheduledMeeting ? external_React_default().createElement("div", {
+    }), external_React_default().createElement("span", null, room.isMeeting ? l.rename_meeting : l[9080])) : null, scheduledMeeting ? external_React_default().createElement("div", {
       className: `
                                                 link-button
                                                 light
@@ -12168,7 +12168,7 @@ class ConversationRightArea extends mixins.wl {
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-link-filled"
-    }), external_React_default().createElement("span", null, scheduledMeeting ? l.share_meeting_button : l[20481])) : null, scheduledMeeting ? external_React_default().createElement("div", {
+    }), external_React_default().createElement("span", null, scheduledMeeting ? l.share_meeting_button : room.isMeeting ? l.meeting_get_link : l[20481])) : null, scheduledMeeting ? external_React_default().createElement("div", {
       className: `
                                                 link-button
                                                 light
@@ -12231,7 +12231,7 @@ class ConversationRightArea extends mixins.wl {
       className: "sprite-fm-mono icon-remove"
     }), external_React_default().createElement("span", {
       className: "accordion-clear-history-text"
-    }, l[8871])), retentionHistoryBtn, room.iAmOperator() && room.type === 'public' && !scheduledMeeting ? external_React_default().createElement("div", {
+    }, room.isMeeting ? l.meeting_clear_hist : l[8871])), retentionHistoryBtn, room.iAmOperator() && room.type === 'public' && !scheduledMeeting ? external_React_default().createElement("div", {
       className: "chat-enable-key-rotation-paragraph"
     }, AVseperator, external_React_default().createElement("div", {
       className: `
@@ -12286,7 +12286,7 @@ class ConversationRightArea extends mixins.wl {
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-disabled-filled"
-    }), external_React_default().createElement("span", null, l[8633])) : null)), external_React_default().createElement(SharedFilesAccordionPanel, {
+    }), external_React_default().createElement("span", null, room.isMeeting ? l.meeting_leave : l[8633])) : null)), external_React_default().createElement(SharedFilesAccordionPanel, {
       key: "sharedFiles",
       title: l[19796] || 'Shared Files',
       chatRoom: room,
@@ -12300,8 +12300,8 @@ class ConversationRightArea extends mixins.wl {
       megaChat: room.megaChat,
       multiple: true,
       className: "popup add-participant-selector",
-      singleSelectedButtonLabel: l[8869],
-      multipleSelectedButtonLabel: l[8869],
+      singleSelectedButtonLabel: room.isMeeting ? l.meeting_add_participant : l[8869],
+      multipleSelectedButtonLabel: room.isMeeting ? l.meeting_add_participant : l[8869],
       nothingSelectedButtonLabel: l[8870],
       onSelectDone: selected => {
         this.props.onAddParticipantSelected(selected);
@@ -12874,8 +12874,8 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     if (self.state.truncateDialog === true) {
       confirmDeleteDialog = external_React_default().createElement(modalDialogs.Z.ConfirmDialog, {
         chatRoom: room,
-        title: l[8871],
-        subtitle: l[8881],
+        title: room.isMeeting ? l.meeting_clear_hist : l[8871],
+        subtitle: room.isMeeting ? l.meeting_trunc_txt : l[8881],
         icon: "sprite-fm-uni icon-question",
         name: "truncate-conversation",
         pref: "3",
@@ -12897,8 +12897,8 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     if (self.state.archiveDialog === true) {
       confirmDeleteDialog = external_React_default().createElement(modalDialogs.Z.ConfirmDialog, {
         chatRoom: room,
-        title: l[19068],
-        subtitle: l[19069],
+        title: room.isMeeting ? l.meeting_archive_dlg : l[19068],
+        subtitle: room.isMeeting ? l.meeting_archive_dlg_text : l[19069],
         icon: "sprite-fm-uni icon-question",
         name: "archive-conversation",
         pref: "4",
@@ -12919,8 +12919,8 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     if (self.state.unarchiveDialog === true) {
       confirmDeleteDialog = external_React_default().createElement(modalDialogs.Z.ConfirmDialog, {
         chatRoom: room,
-        title: l[19063],
-        subtitle: l[19064],
+        title: room.isMeeting ? l.meeting_unarchive_dlg : l[19063],
+        subtitle: room.isMeeting ? l.meeting_unarchive_dlg_text : l[19064],
         icon: "sprite-fm-uni icon-question",
         name: "unarchive-conversation",
         pref: "5",
@@ -12952,7 +12952,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       var renameDialogValue = typeof self.state.renameDialogValue !== 'undefined' ? self.state.renameDialogValue : self.props.chatRoom.getRoomTitle();
       confirmDeleteDialog = external_React_default().createElement(modalDialogs.Z.ModalDialog, {
         chatRoom: room,
-        title: l[9080],
+        title: room.isMeeting ? l.rename_meeting : l[9080],
         name: "rename-group",
         className: "chat-rename-dialog dialog-template-main",
         onClose: () => {
@@ -16361,6 +16361,9 @@ class AltPartsConvMessage extends ConversationMessageMixin {
       });
       var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
       var text = h === contact.u ? l[23756] : l[8907].replace("%s", `<strong>${megaChat.html(displayName)}</strong>`);
+      if (self.props.chatRoom.isMeeting) {
+        text = h === contact.u ? l.meeting_mgmt_user_joined : l.meeting_mgmt_user_added.replace('%s', `<strong>${megaChat.html(displayName)}</strong>`);
+      }
       self._ensureNameIsLoaded(otherContact.u);
       messages.push(React.createElement("div", {
         className: "message body",
@@ -16392,9 +16395,9 @@ class AltPartsConvMessage extends ConversationMessageMixin {
       self._ensureNameIsLoaded(otherContact.u);
       var text;
       if (otherContact.u === contact.u) {
-        text = l[8908];
+        text = self.props.chatRoom.isMeeting ? l.meeting_mgmt_left : l[8908];
       } else {
-        text = l[8906].replace("%s", `<strong>${megaChat.html(displayName)}</strong>`);
+        text = (self.props.chatRoom.isMeeting ? l.meeting_mgmt_kicked : l[8906]).replace("%s", `<strong>${megaChat.html(displayName)}</strong>`);
       }
       messages.push(React.createElement("div", {
         className: "message body",
@@ -23696,6 +23699,7 @@ var getMessageString;
 (function () {
   var MESSAGE_STRINGS;
   var MESSAGE_STRINGS_GROUP;
+  let MESSAGE_STRINGS_MEETING;
   var _sanitizeStrings = function (arg) {
     if (typeof arg === "undefined") {
       return arg;
@@ -23712,7 +23716,7 @@ var getMessageString;
     }
     return arg;
   };
-  getMessageString = function (type, isGroupCall) {
+  getMessageString = function (type, isGroupCall, isMeeting) {
     if (!MESSAGE_STRINGS) {
       MESSAGE_STRINGS = {
         'outgoing-call': l[5891].replace("[X]", "[[[X]]]"),
@@ -23747,7 +23751,20 @@ var getMessageString;
       };
       _sanitizeStrings(MESSAGE_STRINGS_GROUP);
     }
-    return !isGroupCall ? MESSAGE_STRINGS[type] : MESSAGE_STRINGS_GROUP[type] ? MESSAGE_STRINGS_GROUP[type] : MESSAGE_STRINGS[type];
+    if (isMeeting && !MESSAGE_STRINGS_MEETING) {
+      MESSAGE_STRINGS_MEETING = {
+        'call-ended': [l.meeting_mgmt_call_ended, l[7208]],
+        'remoteCallEnded': [l.meeting_mgmt_call_ended, l[7208]],
+        'call-started': l.meeting_mgmt_call_started
+      };
+    }
+    if (isMeeting && MESSAGE_STRINGS_MEETING[type]) {
+      return MESSAGE_STRINGS_MEETING[type];
+    }
+    if (isGroupCall && MESSAGE_STRINGS_GROUP[type]) {
+      return MESSAGE_STRINGS_GROUP[type];
+    }
+    return MESSAGE_STRINGS[type];
   };
 })();
 mega.ui = mega.ui || {};
@@ -23858,7 +23875,7 @@ class Local extends AbstractGenericMessage {
       message
     } = this.props;
     const IS_GROUP = this._roomIsGroup();
-    let messageText = getMessageString(message.type, IS_GROUP);
+    let messageText = getMessageString(message.type, IS_GROUP, message.chatRoom.isMeeting);
     if (!messageText) {
       return console.error(`Message with type: ${message.type} -- no text string defined. Message: ${message}`);
     }
@@ -24994,7 +25011,7 @@ class MetaRichpreviewMegaLinks extends mixin.y {
         var desc;
         var is_icon = megaLinkInfo.is_dir ? true : !(megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url);
         if (megaLinkInfo.is_chatlink) {
-          desc = l[8876] + ": " + megaLinkInfo.info.ncm;
+          desc = l[8876].replace('%1', megaLinkInfo.info.ncm);
         } else if (!megaLinkInfo.is_dir) {
           desc = bytesToSize(megaLinkInfo.info.size);
         } else {

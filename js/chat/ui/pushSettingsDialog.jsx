@@ -58,7 +58,9 @@ export default class PushSettingsDialog extends MegaRenderMixin {
                 {...this.state}
                 name="push-settings"
                 title={l.dnd_mute_title /* `Mute` */}
-                subtitle={l[22015] /* `Mute chat notifications for` */}
+                subtitle={this.props.room.isMeeting
+                    ? l.meeting_dnd_subtitle /* `Mute meeting notifications for` */
+                    : l[22015] /* `Mute chat notifications for` */}
                 className="push-settings-dialog"
                 dialogName="push-settings-chat-dialog"
                 dialogType="tool"

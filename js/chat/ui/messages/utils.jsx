@@ -5,6 +5,7 @@ var getMessageString;
 (function() {
     var MESSAGE_STRINGS;
     var MESSAGE_STRINGS_GROUP;
+    let MESSAGE_STRINGS_MEETING;
     var _sanitizeStrings = function(arg) {
         if (typeof arg === "undefined") {
             return arg;
@@ -25,7 +26,7 @@ var getMessageString;
         return arg;
     };
 
-    getMessageString = function(type, isGroupCall) {
+    getMessageString = function(type, isGroupCall, isMeeting) {
         if (!MESSAGE_STRINGS) {
             MESSAGE_STRINGS = {
                 'outgoing-call': l[5891].replace("[X]", "[[[X]]]"),
@@ -60,9 +61,20 @@ var getMessageString;
             };
             _sanitizeStrings(MESSAGE_STRINGS_GROUP);
         }
-        return !isGroupCall ? MESSAGE_STRINGS[type] : (
-            MESSAGE_STRINGS_GROUP[type] ? MESSAGE_STRINGS_GROUP[type] : MESSAGE_STRINGS[type]
-        );
+        if (isMeeting && !MESSAGE_STRINGS_MEETING) {
+            MESSAGE_STRINGS_MEETING = {
+                'call-ended': [l.meeting_mgmt_call_ended /* `Meeting ended` */, l[7208] /* `Call duration: [X]` */],
+                'remoteCallEnded': [l.meeting_mgmt_call_ended /* `Meeting ended` */, l[7208]/* `Call duration: [X]` */],
+                'call-started': l.meeting_mgmt_call_started /* `Meeting started` */,
+            };
+        }
+        if (isMeeting && MESSAGE_STRINGS_MEETING[type]) {
+            return MESSAGE_STRINGS_MEETING[type];
+        }
+        if (isGroupCall && MESSAGE_STRINGS_GROUP[type]) {
+            return MESSAGE_STRINGS_GROUP[type];
+        }
+        return MESSAGE_STRINGS[type];
     };
 })();
 

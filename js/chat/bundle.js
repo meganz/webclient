@@ -13031,7 +13031,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       className: "content"
     }, external_React_default().createElement(perfectScrollbar.F, {
       className: "description-scroller"
-    }, external_React_default().createElement(utils.Cw, null, room.scheduledMeeting.description.replace(/\n/g, '<br>') || l.schedule_no_desc)))) : null;
+    }, external_React_default().createElement(utils.dy, null, room.scheduledMeeting.description.replace(/\n/g, '<br>') || l.schedule_no_desc)))) : null;
     var topicInfo = null;
     const isUpcoming = room.scheduledMeeting && room.scheduledMeeting.isUpcoming;
     const isRecurring = room.scheduledMeeting && room.scheduledMeeting.isRecurring;
@@ -26392,10 +26392,9 @@ class ScheduleMetaChange extends _mixin_jsx1__.y {
     }, mode === MODE.CANCELLED ? react0().createElement("s", null, meta.topic || chatRoom.topic) : meta.topic || chatRoom.topic), this.renderTimingBlock()), chatRoom.iAmInRoom() && scheduledMeeting && mode !== MODE.CANCELLED && react0().createElement(_ui_buttons_jsx4__.z, {
       className: "mega-button",
       onClick: () => this.onAddToCalendar()
-    }, react0().createElement("span", null, mode === MODE.CREATED && !meta.occurrence ? l.schedule_add_calendar : l.schedule_update_calendar))), mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description && react0().createElement(_ui_utils_jsx3__.Cw, {
-      tag: "div",
+    }, react0().createElement("span", null, mode === MODE.CREATED && !meta.occurrence ? l.schedule_add_calendar : l.schedule_update_calendar))), mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description && react0().createElement("div", {
       className: "schedule-description"
-    }, scheduledMeeting.description.replace(/\n/g, '<br>')), link && react0().createElement("div", null, react0().createElement("div", {
+    }, react0().createElement(_ui_utils_jsx3__.dy, null, scheduledMeeting.description.replace(/\n/g, '<br>'))), link && react0().createElement("div", null, react0().createElement("div", {
       className: "schedule-meeting-link"
     }, react0().createElement("span", null, link), react0().createElement(_ui_buttons_jsx4__.z, {
       className: "mega-button positive",

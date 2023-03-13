@@ -1229,7 +1229,9 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
     for (const event of this.schedListeners) {
       this.megaChat.off(event);
     }
-    this.megaChat.trigger(conversations.F1.NAV_RENDER_VIEW, conversations.vN.MEETINGS);
+    if (M.chat && megaChatIsReady) {
+      this.megaChat.trigger(conversations.F1.NAV_RENDER_VIEW, conversations.vN.MEETINGS);
+    }
     delete this.schedListeners;
   }
   showOccurrencesDialog() {

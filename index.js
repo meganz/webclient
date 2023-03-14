@@ -1369,32 +1369,44 @@ function init_page() {
         }
     }
     else if (page === 'wiretransfer') {
-        parsepage(pages['placeholder']);
 
-        if (u_type === 3) {
-            wireTransferDialog
-                .init(function onClose() {
-                    loadSubPage('fm');
-                });
-        }
-        else if (is_mobile) {
-            login_next = 'wiretransfer';
-            loadSubPage('login');
+        api_req({ a: 'ufpqfull', t: 0, d: 0 }, {
 
-        }
-        else {
-            mega.ui.showLoginRequiredDialog({
-                minUserType: 3,
-                skipInitialDialog: 1
-            })
-                .done(init_page)
-                .fail(function (aError) {
-                    if (aError) {
-                        alert(aError);
-                    }
-                    loadSubPage('start');
-                });
-        }
+            callback: function(gatewayOptions) {
+
+                // if wiretransfer method is disabled by api, redirect to fm.
+                if (!gatewayOptions.some(gateway => gateway.gatewayId === 999)) {
+                    return loadSubPage('fm');
+                }
+
+                parsepage(pages.placeholder);
+
+                if (u_type === 3) {
+                    wireTransferDialog
+                        .init(function onClose() {
+                            loadSubPage('fm');
+                        });
+                }
+                else if (is_mobile) {
+                    login_next = 'wiretransfer';
+                    loadSubPage('login');
+
+                }
+                else {
+                    mega.ui.showLoginRequiredDialog({
+                        minUserType: 3,
+                        skipInitialDialog: 1
+                    })
+                        .done(init_page)
+                        .fail(aError => {
+                            if (aError) {
+                                alert(aError);
+                            }
+                            loadSubPage('start');
+                        });
+                }
+            }
+        });
     }
 
     // Initial recovery process page to choose whether to recover with Master/Recovery Key or park the account

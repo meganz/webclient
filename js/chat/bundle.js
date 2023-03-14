@@ -12107,7 +12107,7 @@ class ConversationRightArea extends mixins.wl {
       className: "observers-count"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-eye-reveal"
-    }), room.observers)) : external_React_default().createElement("div", null), isRecurring && isUpcoming && external_React_default().createElement(AccordionPanel, {
+    }), room.observers)) : external_React_default().createElement("div", null), isRecurring && isUpcoming && scheduledMeeting.occurrences.some(o => !o.canceled) && external_React_default().createElement(AccordionPanel, {
       key: "occurrences",
       className: "chat-occurrences-panel",
       accordionClass: "chatroom-occurrences-panel",

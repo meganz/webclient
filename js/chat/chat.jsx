@@ -347,8 +347,8 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             self.registerUploadListeners();
             self.trigger("onInit");
             mBroadcaster.sendMessage('chat_initialized');
-            setInterval(self._syncDnd.bind(self), 60000);
-            setInterval(self.removeMessagesByRetentionTime.bind(self, null), 20000);
+            setInterval(self._syncChats.bind(self), 6e4);
+            setInterval(self.removeMessagesByRetentionTime.bind(self, null), 2e4);
 
             self.autoJoinIfNeeded();
 
@@ -367,16 +367,29 @@ Chat.prototype.init = promisify(function(resolve, reject) {
         .catch(reject);
 });
 
-Chat.prototype._syncDnd = function() {
-    const chats = this.chats;
-    if (chats && chats.length > 0) {
-        chats.forEach(({ chatId }) => {
+Chat.prototype._syncChats = function() {
+    const { chats, logger } = this;
+    if (chats && chats.length) {
+        chats.forEach(({ chatId, scheduledMeeting }) => {
+            // Sync push notification settings -- disable the mute notifications setting for the given room if
+            // the selected mute until time have been reached.
             const dnd = pushNotificationSettings.getDnd(chatId);
             if (dnd && dnd < unixtime()) {
-                if (this.logger) {
-                    this.logger.debug(`Chat.prototype._syncDnd chatId=${chatId}`);
-                }
                 pushNotificationSettings.disableDnd(chatId);
+                if (logger) {
+                    logger.debug(`Chat.prototype._syncDnd chatId=${chatId}`);
+                }
+            }
+
+            // Sync scheduled meetings -- mark one-off meetings that have already passed, and update recurring
+            // meetings with their immediate next occurrence.
+            const { isUpcoming, chatRoom, id } = scheduledMeeting || {};
+            if (isUpcoming) {
+                scheduledMeeting.setNextOccurrence();
+                chatRoom.trackDataChange();
+                if (logger) {
+                    logger.debug(`Chat.prototype.__syncScheduledMeetings id=${id} chatId=${chatId}`);
+                }
             }
         });
     }

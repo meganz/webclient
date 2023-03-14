@@ -115,8 +115,9 @@ lazy(mega, 'fileRequest', () => {
                 $('.file-request-description', this.$sectionPrimary), {
                     validations: {
                         limit: {
-                            max: 250,
-                            message: l.file_request_dialog_label_desc_invalid
+                            max: 500,
+                            message: l.file_request_dialog_label_desc_invalid,
+                            formatMessage: true
                         },
                     },
                     namespace: this.namespace
@@ -447,8 +448,9 @@ lazy(mega, 'fileRequest', () => {
                 $('.file-request-description', this.$dialog), {
                     validations: {
                         limit: {
-                            max: 250,
-                            message: l.file_request_dialog_label_desc_invalid
+                            max: 500,
+                            message: l.file_request_dialog_label_desc_invalid,
+                            formatMessage: true
                         },
                     },
                     namespace: namespace,

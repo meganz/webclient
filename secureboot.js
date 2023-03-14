@@ -1061,7 +1061,7 @@ tmp = getCleanSitePath(location.hash || undefined);
 if (tmp.substr(0, 12) === 'sitetransfer') {
     try {
         sessionStorage.sitet = tmp;
-        location.hash = 'home';
+        location.hash = 'hashtransfer';
     }
     catch (ex) {
         console.warn(ex);

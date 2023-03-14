@@ -2006,6 +2006,12 @@ function init_page() {
         login_txt = l[1298];
         loadSubPage('login', 'override');
     }
+    else if (page === 'hashtransfer') {
+
+        // The site transfer defaults to here and we are waiting for that to finish before redirecting elsewhere
+        parsepage(pages.placeholder);
+        return false;
+    }
     else {
         // Due to the new mega.io site there is no more /start page (and no more ephemeral accounts)
         if (is_extension) {

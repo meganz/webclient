@@ -38,6 +38,10 @@
         &.invalid-aligned {
             margin-bottom: 30px;
         }
+
+        textarea {
+            white-space: pre-wrap;
+        }
     }
 
     .recurring-edit-banner {

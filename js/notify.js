@@ -530,6 +530,9 @@ var notify = {
      */
     getUserEmailByTheirHandle: function(userHandle, data, skipFetch) {
         'use strict';
+        if (typeof userHandle !== 'string' || userHandle.length !== 11) {
+            return l[7381];
+        }
         if (typeof this.userEmails[userHandle] === 'string' && this.userEmails[userHandle]) {
             // Previously found and not an empty string.
             return this.userEmails[userHandle];

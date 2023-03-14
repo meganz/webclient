@@ -2402,6 +2402,9 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 #schedule-dialog .schedule-dialog-row.invalid-aligned {
   margin-bottom: 30px;
 }
+#schedule-dialog .schedule-dialog-row textarea {
+  white-space: pre-wrap;
+}
 #schedule-dialog .recurring-edit-banner {
   width: 100%;
   margin: 0 0 20px;

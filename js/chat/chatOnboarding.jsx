@@ -134,7 +134,9 @@ class ChatOnboarding {
         for (const event of this.schedListeners) {
             this.megaChat.off(event);
         }
-        this.megaChat.trigger(CONVERSATIONS_APP_EVENTS.NAV_RENDER_VIEW, CONVERSATIONS_APP_VIEWS.MEETINGS);
+        if (M.chat && megaChatIsReady) {
+            this.megaChat.trigger(CONVERSATIONS_APP_EVENTS.NAV_RENDER_VIEW, CONVERSATIONS_APP_VIEWS.MEETINGS);
+        }
         delete this.schedListeners;
     }
 

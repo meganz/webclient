@@ -2832,13 +2832,6 @@ body.loading .light-overlay {
 .taken-down .file-status-icon, .taken-down .file-status-icon.star {
     background-position: -9px -4934px;
 }
-.undecryptable .grid-status-icon, .undecryptable .grid-status-icon.star {
-    background-repeat: no-repeat;
-    background-position: -9px -2637px;
-}
-.undecryptable .file-status-icon, .undecryptable .file-status-icon.star {
-    background-position: -10px -2637px;
-}
 
 /* Out Shares */
 
@@ -2872,7 +2865,8 @@ body.loading .light-overlay {
 }
 .fm-notification-block.almost-full,
 .fm-notification-block.payment-card-almost-expired,
-.fm-notification-block.grace-business {
+.fm-notification-block.grace-business,
+.fm-notification-block.unverified-share {
     background-color: var(--label-orange);
 }
 .fm-notification-block.business-next-tier {
@@ -8591,6 +8585,16 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     height: 37px;
     position: absolute;
 }
+.inbound-share .shared-folder-icon.icon-warning-after::after {
+    display: none;
+}
+.inbound-share.unverified-share .shared-folder-icon.icon-warning-after::after {
+    display: inline-block;
+    right: -2px;
+    position: absolute;
+    top: -3px;
+    --icon-size: 20px;
+}
 .shared-folder-info-block {
     padding: 0 0 0 51px;
     font: var(--text-body1);
@@ -8637,6 +8641,13 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-repeat: no-repeat;
     background-image: url(../images/mega/files-icons.png);
     margin: 15px 0 0 36px;
+    position: relative;
+}
+.shared-details-icon.sprite-fm-uni-after.icon-warning-after::after {
+    position: absolute;
+    top: -3px;
+    right: -5px;
+    --icon-size: 40px;
 }
 .shared-details-info-block {
     margin-left: 133px;

@@ -8845,7 +8845,7 @@ class ColumnSharedFolderName extends genericNodePropsComponent.L {
       className: "shared-folder-info-block"
     }, external_React_default().createElement("div", {
       className: "shared-folder-name"
-    }, nodeAdapter.nodeProps.title), external_React_default().createElement("div", {
+    }, missingkeys[node.h] ? l[8686] : nodeAdapter.nodeProps.title), external_React_default().createElement("div", {
       className: "shared-folder-info"
     }, fm_contains(node.tf, node.td))));
   }
@@ -29957,7 +29957,7 @@ class ColumnFavIcon extends _genericNodePropsComponent1__.L {
       megatype: ColumnFavIcon.megatype,
       className: ColumnFavIcon.megatype
     }, react0().createElement("span", {
-      className: "grid-status-icon sprite-fm-mono " + (nodeAdapter.nodeProps.fav ? " icon-favourite-filled" : " icon-dot") + (!isFavouritable && " disabled" || ""),
+      className: "grid-status-icon sprite-fm-mono " + (missingkeys[node.h] ? " icon-info" : nodeAdapter.nodeProps.fav ? " icon-favourite-filled" : " icon-dot") + (!isFavouritable && " disabled" || ""),
       onClick: () => {
         if (isFavouritable) {
           M.favourite([node.h], !node.fav);

@@ -1825,7 +1825,7 @@ function openContactInfoLink(contactLink) {
  */
 function shareDialogContentCheck() {
 
-    var dc = '.mega-dialog.share-dialog';
+    var dc = document.querySelector('.mega-dialog.share-dialog');
     var itemsNum = $('.share-dialog-access-list .share-dialog-access-node', dc).length;
     var $doneBtn = $('.done-share', dc);
     var $removeBtn = $('.remove-share', dc);
@@ -1850,6 +1850,19 @@ function shareDialogContentCheck() {
     else {
         $doneBtn.addClass('disabled');
     }
+
+    if (!dc) {
+        return;
+    }
+
+    const cvw = dc.querySelector('.contact-verify-warning');
+
+    cvw.classList.add('hidden');
+
+    // if any unverified contact
+    if (dc.querySelector('.unverified-contact')) {
+        cvw.classList.remove('hidden');
+    }
 }
 
 /**
@@ -1872,17 +1885,20 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
         presence = M.onlineStatusClass(M.d[id].presence === 'unavailable' ? 1 : M.d[id].presence)[1];
     }
 
-    let ownerClass = '';
+    let extraClass = '';
     if (type === '1') {
         userName += ` (${l[8885]})`;
         permClass = 'owner';
-        ownerClass = ' owner';
+        extraClass = ' owner';
     }
     else if (type === '2') {
         userName = l.contact_request_pending.replace('%1', userName);
     }
+    else if (!mega.keyMgr.haveVerifiedKeyFor(id)) {
+        extraClass += ' unverified-contact';
+    }
 
-    html =  `<div class="share-dialog-access-node${ownerClass}" id="${id}">
+    html =  `<div class="share-dialog-access-node${extraClass}" id="${id}">
                 <div class="access-node-info-block">
                     ${av}
                     <div class="access-node-username">
@@ -1891,6 +1907,9 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
                     <div class="access-node-status ustatus ${id} ${presence}">
                         <div class="nw-contact-status"></div>
                     </div>
+                </div>
+                <div class="access-node-contact-verify">
+                    <button class="mega-button small">${l[1960]}</button>
                 </div>
                 <div class="access-node-permission-wrapper">
                     <button
@@ -2203,6 +2222,15 @@ function shareDialogAccessListBinds() {
     $('.share-dialog-access-list', $shareDialog).rebind('scroll.closeMenu', () => {
         hideShareDialogPermMenu();
     });
+
+    $('.access-node-contact-verify button', $shareDialog).rebind('click', function() {
+
+        const contact = this.closest('.unverified-contact');
+
+        if (contact) {
+            fingerprintDialog(this.closest('.unverified-contact').id);
+        }
+    });
 }
 
 /**
@@ -2433,7 +2461,7 @@ function renderShareDialogAccessList() {
     "use strict";
 
     const $shareDialog = $('.mega-dialog.share-dialog', '.mega-dialog-container');
-    const $warning = $('.mega-banner', $shareDialog);
+    const $warning = $('.mega-banner', $shareDialog).eq(1);
     let readonly = false;
 
     // Remove all contacts from the access list
@@ -2747,6 +2775,9 @@ function closeDialog(ev) {
     }
     else if ($.dialog === 'share-add') {
         $('.mega-dialog.share-add-dialog').addClass('hidden');
+    }
+    else if ($.dialog === 'fingerprint-dialog' && document.querySelector('.share-dialog.arrange-to-back')) {
+        document.querySelector('.fingerprint-dialog').classList.add('hidden');
     }
     else {
         if ($.dialog === 'properties') {
@@ -3546,6 +3577,10 @@ function sharedFolderUI() {
 
         $(rightPanelView).addClass('shared-folder-content');
 
+        if (!mega.keyMgr.haveVerifiedKeyFor(ownersHandle)) {
+            $('.shared-details-block .shared-details-icon').addClass('sprite-fm-uni-after icon-warning-after');
+        }
+
         if (M.d[M.currentdirid] !== nodeData || M.d[nodeData.p]) {
             // hide leave-share under non-root shares
             $('.fm-leave-share').addClass('hidden');
@@ -3736,6 +3771,30 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
 
                 if (M.u[userid]) {
                     M.u[userid].trackDataChange(M.u[userid], "fingerprint");
+
+                    if (M.currentdirid === 'shares' && M.c[userid]) {
+
+                        for (const h in M.c[userid]) {
+                            if (M.megaRender) {
+                                M.megaRender.revokeDOMNode(h, true);
+                            }
+                        }
+
+                        M.renderMain(true);
+                    }
+
+                    if ($.dialog === 'share') {
+
+                        const contact = document.querySelector(`.share-dialog-access-list #${userid}`);
+
+                        if (contact) {
+
+                            contact.classList.remove('unverified-contact');
+                            contact.querySelector('.avatar-wrapper').classList.add('verified');
+                        }
+
+                        shareDialogContentCheck();
+                    }
                 }
             })
             .catch((ex) => {

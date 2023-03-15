@@ -1885,6 +1885,8 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
         presence = M.onlineStatusClass(M.d[id].presence === 'unavailable' ? 1 : M.d[id].presence)[1];
     }
 
+    const ed = authring.getContactAuthenticated(id, 'Ed25519');
+
     let extraClass = '';
     if (type === '1') {
         userName += ` (${l[8885]})`;
@@ -1894,7 +1896,7 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
     else if (type === '2') {
         userName = l.contact_request_pending.replace('%1', userName);
     }
-    else if (!mega.keyMgr.haveVerifiedKeyFor(id)) {
+    else if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
         extraClass += ' unverified-contact';
     }
 
@@ -3577,7 +3579,9 @@ function sharedFolderUI() {
 
         $(rightPanelView).addClass('shared-folder-content');
 
-        if (!mega.keyMgr.haveVerifiedKeyFor(ownersHandle)) {
+        const ed = authring.getContactAuthenticated(ownersHandle, 'Ed25519');
+
+        if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
             $('.shared-details-block .shared-details-icon').addClass('sprite-fm-uni-after icon-warning-after');
         }
 

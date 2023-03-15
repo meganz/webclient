@@ -1885,8 +1885,6 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
         presence = M.onlineStatusClass(M.d[id].presence === 'unavailable' ? 1 : M.d[id].presence)[1];
     }
 
-    const ed = authring.getContactAuthenticated(id, 'Ed25519');
-
     let extraClass = '';
     if (type === '1') {
         userName += ` (${l[8885]})`;
@@ -1896,8 +1894,12 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
     else if (type === '2') {
         userName = l.contact_request_pending.replace('%1', userName);
     }
-    else if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
-        extraClass += ' unverified-contact';
+    else {
+        const ed = authring.getContactAuthenticated(id, 'Ed25519');
+
+        if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
+            extraClass += ' unverified-contact';
+        }
     }
 
     html =  `<div class="share-dialog-access-node${extraClass}" id="${id}">

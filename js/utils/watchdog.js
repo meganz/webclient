@@ -298,8 +298,7 @@ lazy(self, 'watchdog', () => Object.freeze({
 
             case 'logout':
                 if (!M.hasPendingTransfers()) {
-                    u_logout(-0xDEADF);
-                    location.reload();
+                    u_logout(-0xDEADF).then(() => location.reload());
                 }
                 break;
 

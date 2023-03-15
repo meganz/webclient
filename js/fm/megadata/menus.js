@@ -992,6 +992,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         }
                     }
 
+                    if (M.d[id].su && !mega.keyMgr.haveVerifiedKeyFor(M.d[id].su) &&
+                        M.currentdirid !== `chat/contacts/${M.d[id].su}`) {
+                        $menuCMI.filter('.verify-credential').removeClass('hidden');
+                    }
+
                     // Hide Info item if properties dialog is opened
                     if ($.dialog === 'properties') {
                         $menuCMI.filter('.properties-item').addClass('hidden');

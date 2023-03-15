@@ -144,6 +144,19 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         });
     }
 
+    const unverifiedShareBanner = document.querySelector('.fm-notification-block.unverified-share');
+
+    if (unverifiedShareBanner) {
+
+        unverifiedShareBanner.classList.remove('visible');
+
+        if (M.currentdirid === 'shares' && this.megaRender.unverifiedShare) {
+
+            unverifiedShareBanner.querySelector('span').textContent = l.undec_share_warning_banner;
+            unverifiedShareBanner.classList.add('visible');
+        }
+    }
+
     if (!u) {
 
         if (this.currentrootid === 'shares') {

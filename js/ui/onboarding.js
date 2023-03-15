@@ -69,8 +69,8 @@ mBroadcaster.addListener('fm:initialized', () => {
         if (u_attr.since >= 1659398400) {
             flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);
             flagMap.safeCommit();
-            mBroadcaster.once('chat_initialized', () => {
-                // Show the new user onboarding dot when chat is ready.
+            // Show the new user onboarding dot when chat is ready.
+            const handleFirstChatStep = () => {
                 const $mcNavDot = $('.nw-fm-left-icon.conversations .onboarding-highlight-dot', fmholder);
                 if (!flagMap.getSync(OBV4_FLAGS.CHAT_OPEN) && !M.chat) {
                     $('.dark-tooltip', $mcNavDot.parent().addClass('w-onboard')).addClass('hidden');
@@ -87,11 +87,24 @@ mBroadcaster.addListener('fm:initialized', () => {
                         return 0xDEAD;
                     }
                 });
-            });
+            };
+            if (megaChatIsReady) {
+                if (M.chat) {
+                    // Already on chat so just skip
+                    flagMap.setSync(OBV4_FLAGS.CHAT_OPEN, 1);
+                    flagMap.safeCommit();
+                }
+                else {
+                    handleFirstChatStep();
+                }
+            }
+            else {
+                mBroadcaster.once('chat_initialized', () => handleFirstChatStep());
+            }
         }
         else {
             let upgraded = false;
-            if (upgradeFrom < 1) {
+            if (upgradedFrom !== false && upgradeFrom < 1) {
                 // This is the version where the new chat path was added so convert to it.
                 // Existing users shall only see the scheduled meetings changes
                 flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);

@@ -2109,6 +2109,8 @@ FileManager.prototype.initContextUI = function() {
         M.openFolder(target);
     });
 
+    $(c + '.verify-credential').rebind('click', () => fingerprintDialog(M.d[$.selected[0]].su));
+
     $(`${c}.open-gallery`).rebind('click', () => {
         var target = $.selected[0];
         M.openFolder(`discovery/${target}`);
@@ -4761,7 +4763,7 @@ FileManager.prototype.cameraUploadUI = function() {
         register: ['terms'],
         selectFolder: ['createfolder'],
         saveAs: ['createfolder'],
-        share: ['share-add'],
+        share: ['share-add', 'fingerprint-dialog'],
         'stripe-pay': ['stripe-pay-success', 'stripe-pay-failure']
     };
 

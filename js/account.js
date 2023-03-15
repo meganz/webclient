@@ -404,7 +404,7 @@ async function u_checklogin4(sid) {
 // erase all local user/session information
 function u_logout(logout) {
     // Send some data to mega.io that we logged out
-    initMegaIoIframe(false);
+    const promise = initMegaIoIframe(false);
 
     var a = [localStorage, sessionStorage];
     for (var i = 2; i--;) {
@@ -483,6 +483,8 @@ function u_logout(logout) {
 
         mBroadcaster.sendMessage('logout');
     }
+
+    return promise;
 }
 
 // true if user was ever logged in with a non-anonymous account
@@ -1002,39 +1004,68 @@ function initMegaIoIframe(loginStatus, planNum) {
     'use strict';
 
     // Set constants for URLs (easier to change for local testing)
-    const iframeUrl = 'https://mega.io';
+    const megapagesUrl = 'https://mega.io';
     const parentUrl = 'https://mega.nz';
+
+    const megapagesPromise = new MegaPromise();
 
     tryCatch(() => {
         const megaIoIframe = document.getElementById('i-ping');
 
         // Check iframe is available
         if (!megaIoIframe) {
-            console.error('The mega.io iframe is not available');
+            console.error('[webclient->megapages] The iframe is not available. Cannot send user details.');
+            megapagesPromise.resolve();
             return;
         }
 
         // We only want to inform the mega.io site if on live domain
         if (is_iframed || is_extension || location.origin !== parentUrl) {
-            console.error('The mega.io iframe was not initialised');
+            console.warn(`[webclient->megapages] The iframe was not initialised.
+                Is iframed: ${is_iframed}. Is extension: ${is_extension}.
+                Origin unexpected: ${location.origin !== parentUrl} (was ${location.origin}, expecting ${parentUrl}).`);
+            megapagesPromise.resolve();
             return;
         }
 
+        // Give mega.io five seconds to provide receipt before allowing other processes to continue
+        const timeout = setTimeout(() => {
+            megapagesPromise.resolve();
+        }, 5000);
+
+        const sendMessage = (messageData) => {
+            // Send the data
+            megaIoIframe.contentWindow.postMessage(messageData, megapagesUrl);
+
+            // Wait for receipt
+            window.addEventListener('message', (e) => {
+                if (e.source === megaIoIframe.contentWindow && e.origin === megapagesUrl) {
+                    console.info('[megapages] megapages hook receipt received. Success:', e.data);
+                    megapagesPromise.resolve();
+                    clearTimeout(timeout);
+                }
+            });
+        };
+
         // Once the mega.io iframe has loaded
-        megaIoIframe.onload = (ev) => {
+        megaIoIframe.onload = () => {
+            console.info('[webclient->megapages] iframe loaded. Preparing message...');
 
-            console.info('Inside mega.nz iframe onload event', ev.contentWindow, ev);
-
-            let postMessageData = {};
+            let postMessageData = { };
 
             // If logging in, encode the first name to Base64 and set the plan num if available (NB: Free is undefined)
             if (loginStatus) {
                 postMessageData = {
                     firstName: base64urlencode(to8(u_attr.firstname)),
-                    planNum: (planNum || u_attr.p || undefined)
+                    planNum: planNum || u_attr.p || undefined
                 };
 
-                // Get the avatar
+                const avatarMeta = generateAvatarMeta(u_handle);
+                if (avatarMeta && avatarMeta.color) {
+                    postMessageData.avatarColourKey = avatarMeta.color;
+                }
+
+                // Get the custom avatar
                 mega.attr.get(u_handle, 'a', true, false)
                     .done((res) => {
 
@@ -1044,39 +1075,31 @@ function initMegaIoIframe(loginStatus, planNum) {
                         }
                     })
                     .always(() => {
-
-                        console.info('Sending postMessage data to mega.io iframe', postMessageData);
-
-                        // Send the data
-                        megaIoIframe.contentWindow.postMessage(postMessageData, iframeUrl);
+                        console.info('[webclient->megapages] Sending loggedin message to iframe.', postMessageData);
+                        sendMessage(postMessageData);
                     });
             }
             else {
-                // Logout data so the localStorage data on mega.io gets cleared
-                postMessageData = {
-                    clearUser: true
-                };
-
-                console.info('Sending logout postMessage data to mega.io iframe', postMessageData);
-
-                // Send the data
-                megaIoIframe.contentWindow.postMessage(postMessageData, iframeUrl);
+                console.info('[webclient->megapages] Sending loggedout message to iframe.', postMessageData);
+                sendMessage(postMessageData);
             }
         };
 
         // If they logged out, inform the logged out mega.io URL
         if (!loginStatus) {
-            console.info('Setting mega.io iframe source to logged out URL');
+            console.info('[webclient->megapages] Setting iframe source to loggedout endpoint.');
 
-            megaIoIframe.src = iframeUrl + '/webclient/loggedout.html';
+            megaIoIframe.src = `${megapagesUrl}/webclient/loggedout.html`;
         }
         else {
-            console.info('Setting mega.io iframe source to logged in URL');
+            console.info('[webclient->megapages] Setting iframe source to loggedin endpoint');
 
             // Set the source to the logged in mega.io URL
-            megaIoIframe.src = iframeUrl + '/webclient/loggedin.html';
+            megaIoIframe.src = `${megapagesUrl}/webclient/loggedin.html`;
         }
     })();
+
+    return megapagesPromise;
 }
 
 (function(exportScope) {

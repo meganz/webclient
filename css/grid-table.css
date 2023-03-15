@@ -498,7 +498,7 @@ table.grid-table .undecryptable .tranfer-filetype-txt,
 .undecryptable .shared-folder-name,
 .undecryptable .shared-folder-info,
 .undecryptable .propreties-dark-txt {
-    color: var(--secondary-orange);
+    color: var(--secondary-orange) !important;
 }
 table.grid-table .ver-col-container {
     line-height: 30px;
@@ -601,7 +601,7 @@ table.grid-table .grid-status-icon {
 }
 
 table.grid-table .grid-status-icon.icon-info {
-    background-color: var(--secondary-orange);
+    --mask-color: var(--secondary-orange);
 }
 
 table.grid-table .grid-status-icon.icon-takedown {
@@ -1033,7 +1033,6 @@ table.out-shares .shared-folder-info-block .shared-folder-info {
     text-overflow: ellipsis;
     overflow: hidden;
 }
-
 table.out-shares .fm-chat-users-wrapper.simpletip {
     display: inline-block;
     max-width: 100%;

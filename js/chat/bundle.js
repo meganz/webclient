@@ -1229,7 +1229,9 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
     for (const event of this.schedListeners) {
       this.megaChat.off(event);
     }
-    this.megaChat.trigger(conversations.F1.NAV_RENDER_VIEW, conversations.vN.MEETINGS);
+    if (M.chat && megaChatIsReady) {
+      this.megaChat.trigger(conversations.F1.NAV_RENDER_VIEW, conversations.vN.MEETINGS);
+    }
     delete this.schedListeners;
   }
   showOccurrencesDialog() {
@@ -8845,7 +8847,7 @@ class ColumnSharedFolderName extends genericNodePropsComponent.L {
       className: "shared-folder-info-block"
     }, external_React_default().createElement("div", {
       className: "shared-folder-name"
-    }, nodeAdapter.nodeProps.title), external_React_default().createElement("div", {
+    }, missingkeys[node.h] ? l[8686] : nodeAdapter.nodeProps.title), external_React_default().createElement("div", {
       className: "shared-folder-info"
     }, fm_contains(node.tf, node.td))));
   }
@@ -11180,8 +11182,7 @@ class Join extends mixins.wl {
       megaChat.destroy();
       return mega.ui.sendSignupLinkDialog(JSON.parse(localStorage.awaitingConfirmationAccount), () => {
         delete localStorage.awaitingConfirmationAccount;
-        u_logout(true);
-        location.reload();
+        u_logout(true).then(() => location.reload());
       });
     };
     this.Ephemeral = () => {
@@ -11204,9 +11205,8 @@ class Join extends mixins.wl {
           label: l[507],
           className: 'positive',
           onClick: () => {
-            u_logout(true);
+            u_logout(true).then(() => location.reload());
             sessionStorage.guestForced = true;
-            location.reload();
           }
         }],
         onClose: onCancel
@@ -12107,7 +12107,7 @@ class ConversationRightArea extends mixins.wl {
       className: "observers-count"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-eye-reveal"
-    }), room.observers)) : external_React_default().createElement("div", null), isRecurring && isUpcoming && external_React_default().createElement(AccordionPanel, {
+    }), room.observers)) : external_React_default().createElement("div", null), isRecurring && isUpcoming && scheduledMeeting.occurrences.some(o => !o.canceled) && external_React_default().createElement(AccordionPanel, {
       key: "occurrences",
       className: "chat-occurrences-panel",
       accordionClass: "chatroom-occurrences-panel",
@@ -13031,7 +13031,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       className: "content"
     }, external_React_default().createElement(perfectScrollbar.F, {
       className: "description-scroller"
-    }, external_React_default().createElement(utils.Cw, null, room.scheduledMeeting.description.replace(/\n/g, '<br>') || l.schedule_no_desc)))) : null;
+    }, external_React_default().createElement(utils.dy, null, room.scheduledMeeting.description.replace(/\n/g, '<br>') || l.schedule_no_desc)))) : null;
     var topicInfo = null;
     const isUpcoming = room.scheduledMeeting && room.scheduledMeeting.isUpcoming;
     const isRecurring = room.scheduledMeeting && room.scheduledMeeting.isRecurring;
@@ -26392,10 +26392,9 @@ class ScheduleMetaChange extends _mixin_jsx1__.y {
     }, mode === MODE.CANCELLED ? react0().createElement("s", null, meta.topic || chatRoom.topic) : meta.topic || chatRoom.topic), this.renderTimingBlock()), chatRoom.iAmInRoom() && scheduledMeeting && mode !== MODE.CANCELLED && react0().createElement(_ui_buttons_jsx4__.z, {
       className: "mega-button",
       onClick: () => this.onAddToCalendar()
-    }, react0().createElement("span", null, mode === MODE.CREATED && !meta.occurrence ? l.schedule_add_calendar : l.schedule_update_calendar))), mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description && react0().createElement(_ui_utils_jsx3__.Cw, {
-      tag: "div",
+    }, react0().createElement("span", null, mode === MODE.CREATED && !meta.occurrence ? l.schedule_add_calendar : l.schedule_update_calendar))), mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description && react0().createElement("div", {
       className: "schedule-description"
-    }, scheduledMeeting.description.replace(/\n/g, '<br>')), link && react0().createElement("div", null, react0().createElement("div", {
+    }, react0().createElement(_ui_utils_jsx3__.dy, null, scheduledMeeting.description.replace(/\n/g, '<br>'))), link && react0().createElement("div", null, react0().createElement("div", {
       className: "schedule-meeting-link"
     }, react0().createElement("span", null, link), react0().createElement(_ui_buttons_jsx4__.z, {
       className: "mega-button positive",
@@ -29958,7 +29957,7 @@ class ColumnFavIcon extends _genericNodePropsComponent1__.L {
       megatype: ColumnFavIcon.megatype,
       className: ColumnFavIcon.megatype
     }, react0().createElement("span", {
-      className: "grid-status-icon sprite-fm-mono " + (nodeAdapter.nodeProps.fav ? " icon-favourite-filled" : " icon-dot") + (!isFavouritable && " disabled" || ""),
+      className: "grid-status-icon sprite-fm-mono " + (missingkeys[node.h] ? " icon-info" : nodeAdapter.nodeProps.fav ? " icon-favourite-filled" : " icon-dot") + (!isFavouritable && " disabled" || ""),
       onClick: () => {
         if (isFavouritable) {
           M.favourite([node.h], !node.fav);
@@ -31189,7 +31188,7 @@ function _extends() {
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -31203,16 +31202,16 @@ function _extends() {
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	(() => {
 /******/ 		// getDefaultExport function for compatibility with non-harmony modules
 /******/ 		__webpack_require__.n = (module) => {
@@ -31223,8 +31222,8 @@ function _extends() {
 /******/ 			return getter;
 /******/ 		};
 /******/ 	})();
-/******/ 	
-/******/ 	
+/******/
+/******/
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
 /******/ 		__webpack_require__.d = (exports, definition) => {
@@ -31235,13 +31234,13 @@ function _extends() {
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
-/******/ 	
+/******/
+/******/
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
-/******/ 	
+/******/
+/******/
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
 /******/ 		__webpack_require__.r = (exports) => {
@@ -31251,14 +31250,14 @@ function _extends() {
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	__webpack_require__(51);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __webpack_require__(222);
-/******/ 	
+/******/
 /******/ })()
 ;

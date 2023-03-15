@@ -786,7 +786,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 <div/>
                             }
 
-                            {isRecurring && isUpcoming &&
+                            {isRecurring && isUpcoming && scheduledMeeting.occurrences.some(o => !o.canceled) &&
                                 <AccordionPanel
                                     key="occurrences"
                                     className="chat-occurrences-panel"
@@ -1930,12 +1930,12 @@ export class ConversationPanel extends MegaRenderMixin {
             </header>
             <section className="content">
                 <PerfectScrollbar className="description-scroller">
-                    <ParsedHTML>
+                    <Emoji>
                         {
                             room.scheduledMeeting.description.replace(/\n/g, '<br>')
                             || l.schedule_no_desc /* `The description has been removed` */
                         }
-                    </ParsedHTML>
+                    </Emoji>
 
                 </PerfectScrollbar>
             </section>

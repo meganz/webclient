@@ -936,8 +936,7 @@ function api_reqfailed(channel, error) {
                 var setLogOutOnNavigation = function() {
                     onIdle(function() {
                         mBroadcaster.once('pagechange', function() {
-                            u_logout();
-                            location.reload(true);
+                            u_logout().then(() => location.reload(true));
                         });
                     });
                     window.doUnloadLogOut = 0x9001;

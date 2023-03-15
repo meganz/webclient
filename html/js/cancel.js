@@ -63,8 +63,7 @@
 
             if (code === 0) {
                 // Account successfully canceled/deleted
-                u_logout(true);
-                location.reload();
+                u_logout(true).then(() => location.reload());
             }
             else if (code === EEXPIRED || code === ENOENT) {
                 delete localStorage.beingAccountCancellation;

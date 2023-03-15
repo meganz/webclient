@@ -1118,8 +1118,7 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
     M.logoutAbortTransfers().then(function() {
         var step = 2;
         var finishLogout = function() {
-            if (--step === 0) {
-                u_logout(true);
+            const afterLogout = () => {
                 if (is_extension) {
                     location.reload();
                 }
@@ -1140,6 +1139,10 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                 else {
                     location.reload();
                 }
+            };
+
+            if (--step === 0) {
+                u_logout(true).then(() => afterLogout());
             }
         };
 

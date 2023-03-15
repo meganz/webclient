@@ -111,8 +111,7 @@ mobile.account.cancel = {
 
             // If account was successfully canceled, logout the user and force reload the page
             if (code === 0) {
-                u_logout(true);
-                location.reload();
+                u_logout(true).then(() => location.reload());
             }
 
             // If the code has expired

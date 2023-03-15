@@ -1247,7 +1247,9 @@
 
                 }
 
-                if (!mega.keyMgr.haveVerifiedKeyFor(aNode.su)) {
+                const ed = authring.getContactAuthenticated(aNode.su, 'Ed25519');
+
+                if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
 
                     this.unverifiedShare = (this.unverifiedShare || 0) + 1;
                     aTemplate.classList.add('unverified-share');

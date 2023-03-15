@@ -136,7 +136,7 @@ class ChatOnboarding {
             this.megaChat.off(event);
         }
         if (M.chat && megaChatIsReady) {
-            this.megaChat.trigger(CONVERSATIONS_APP_EVENTS.NAV_RENDER_VIEW, CONVERSATIONS_APP_VIEWS.MEETINGS);
+            this.checkAndShowStep();
         }
         delete this.schedListeners;
     }
@@ -320,6 +320,9 @@ class ChatOnboarding {
                     this.checkAndShowStep();
                 });
                 return;
+            }
+            if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_ADDED && !this.isMeetingsTab) {
+                this.megaChat.trigger(CONVERSATIONS_APP_EVENTS.NAV_RENDER_VIEW, CONVERSATIONS_APP_VIEWS.MEETINGS);
             }
             const res = obChat.startNextOpenSteps(nextIdx);
             if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_CONF && res !== false) {

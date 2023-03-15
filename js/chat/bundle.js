@@ -1225,7 +1225,7 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
       this.megaChat.off(event);
     }
     if (M.chat && megaChatIsReady) {
-      this.megaChat.trigger(conversations.F1.NAV_RENDER_VIEW, conversations.vN.MEETINGS);
+      this.checkAndShowStep();
     }
     delete this.schedListeners;
   }
@@ -1349,6 +1349,9 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
           this.checkAndShowStep();
         });
         return;
+      }
+      if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_ADDED && !this.isMeetingsTab) {
+        this.megaChat.trigger(conversations.F1.NAV_RENDER_VIEW, conversations.vN.MEETINGS);
       }
       const res = obChat.startNextOpenSteps(nextIdx);
       if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_CONF && res !== false) {

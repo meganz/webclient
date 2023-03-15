@@ -1308,7 +1308,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[22882] = escapeHTML(l[22882]).replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>')
         .replace('[S]', '<span class="no-buisness">').replace('[/S]', '</span>')
         .replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[22898] = escapeHTML(l[22898]).replace('[A]', '<a class="clickurl" href="/mobile">').replace('[/A]', '</a>')
+    l[22898] = escapeHTML(l[22898]).replace('[A]', '<a class="clickurl" href="/mobile" target="_blank">')
+        .replace('[/A]', '</a>')
         .replace('[BR]', '<br>');
     l[22900] = escapeHTML(l[22900]).replace('[A]', '<a class="reg-success-change-email-btn">').replace('[/A]', '</a>');
     l['23062.k'] = escapeHTML(l[23062]).replace('[%s]', l[7049]);

@@ -1095,7 +1095,13 @@ var initialscfetch;
 function sc_residue(sc) {
     "use strict";
 
+    if (d) {
+        console.info('sc-residue', [sc], initialscfetch, scqtail, scqhead);
+    }
+
     if (sc.sn) {
+        const didLoadFromAPI = mega.loadReport.mode === 2;
+
         // enqueue new sn
         if (initialscfetch || currsn !== sc.sn || scqhead !== scqtail) {
             currsn = sc.sn;
@@ -1109,6 +1115,11 @@ function sc_residue(sc) {
             scq[scqhead++] = [{ a: '_fm' }];
             initialscfetch = false;
             resumesc();
+
+            if (didLoadFromAPI && !pfid) {
+
+                mega.keyMgr.pendingpullkey = true;
+            }
         }
 
         // we're done, wait for more
@@ -1878,7 +1889,12 @@ function api_setshare1(ctx, params) {
         if (u && u !== 'EXP') {
             if (M.opc[u]) {
                 console.error('Check this, got an outgoing pending contact...', u, M.opc[u]);
+
                 u = M.opc[u].m;
+                if (typeof u !== 'string' || !u.includes('@')) {
+                    console.assert(false, 'Invalid outgoing pending contact email...');
+                    continue;
+                }
             }
             users.add(u);
         }
@@ -1886,15 +1902,16 @@ function api_setshare1(ctx, params) {
 
     for (i = req.s.length; i--;) {
         if (typeof req.s[i].r !== 'undefined') {
-            // @todo if (mega.keyMgr.isTrusted(ctx.node)) {
+
             if (mega.keyMgr.secure) {
-                // @tod improve/fixup/amend/recheck
-                newkey = req.s[i].u === 'EXP' || mega.keyMgr.hasNewShareKey(ctx.node);
+                newkey = mega.keyMgr.hasNewShareKey(ctx.node);
+
                 // dummy key/handleauth - FIXME: remove
                 req.ok = a32_to_base64([0, 0, 0, 0]);
                 req.ha = a32_to_base64([0, 0, 0, 0]);
                 break;
             }
+
             if (!req.ok) {
                 if (u_sharekeys[ctx.node]) {
                     sharekey = u_sharekeys[ctx.node][0];
@@ -1947,6 +1964,8 @@ function api_setshare1(ctx, params) {
     /** Callback for API interactions. */
     ctx.callback = function (res, ctx) {
         if (typeof res === 'object') {
+
+            mega.keyMgr.setUsedNewShareKey(ctx.node).catch(dump);
             masterPromise.resolve(res);
 
             /* sharekey clashes will be resolved via ^!keys
@@ -1993,7 +2012,10 @@ function api_setshare1(ctx, params) {
         .then(() => {
             api_req(ctx.req, ctx);
         })
-        .catch(dump); // @todo api3, tell
+        .catch((ex) => {
+            logger.error(ex);
+            masterPromise.reject(ex);
+        });
 
     return masterPromise;
 }
@@ -3037,26 +3059,34 @@ function api_pfaerror(handle) {
 
 // generate crypto request response for the given nodes/shares matrix
 function crypto_makecr(source, shares, source_is_nodes) {
-    var nk;
-    var cr = [shares, [], []];
+    'use strict';
+    const cr = [shares, [], []];
 
     // if we have node handles, include in cr - otherwise, we have nodes
     if (source_is_nodes) {
         cr[1] = source;
     }
 
-    // TODO: optimize - keep track of pre-existing/sent keys, only send new ones
-    for (var i = shares.length; i--;) {
-        if (u_sharekeys[shares[i]]) {
-            var aes = u_sharekeys[shares[i]][1];
+    for (let i = shares.length; i--;) {
+        const sk = u_sharekeys[shares[i]];
 
-            for (var j = source.length; j--;) {
-                if (source_is_nodes ? (nk = M.d[source[j]].k) : (nk = source[j].k)) {
-                    if (nk.length === 8 || nk.length === 4) {
-                        cr[2].push(i, j, a32_to_base64(encrypt_key(aes, nk)));
-                    }
+        if (sk) {
+            const aes = sk[1];
+
+            for (let j = source.length; j--;) {
+                const nk = source_is_nodes ? M.getNodeByHandle(source[j]).k : source[j].k;
+
+                if (nk && (nk.length === 8 || nk.length === 4)) {
+
+                    cr[2].push(i, j, a32_to_base64(encrypt_key(aes, nk)));
+                }
+                else {
+                    console.warn(`crypto_makecr(): Node-key unavailable for ${shares[i]}->${source[j]}`, nk);
                 }
             }
+        }
+        else {
+            console.warn(`crypto_makecr(): Share-key unavailable for ${shares[i]}`);
         }
     }
 
@@ -3438,7 +3468,7 @@ function crypto_setsharekey(h, k, ignoreDB, fromKeyMgr) {
         crypto_fixmissingkeys(sharemissing[h]);
     }
 
-    if (M.c.shares[h] && !M.c.shares[h].sk) {
+    if (M.c.shares[h]) {
         M.c.shares[h].sk = a32_to_base64(k);
 
         if (fmdb && !ignoreDB) {

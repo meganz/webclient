@@ -37,7 +37,7 @@ describe("authring unit test", function() {
                                   + 'KqWMI8OX3eXT45+IyWCTTA5yeip/GThvkS8O2HBF'
                                   + 'aNLvSAFq5/5lQG');
 
-    var SERIALISED_RING_ED25519 = atob('you456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwI=');
+    var SERIALISED_RING_ED25519 = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LAg==');
     var RING_ED25519 = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                         method: ns.AUTHENTICATION_METHOD.SEEN,
                                         confidence: ns.KEY_CONFIDENCE.UNSURE},
@@ -106,13 +106,14 @@ describe("authring unit test", function() {
 
         it('_splitSingleTAuthRecord()', function() {
             var result = ns._deserialiseRecord(SERIALISED_RING_ED25519);
-            assert.strictEqual(result.userhandle, 'you456789xw');
-            assert.deepEqual(result.value, RING_ED25519['you456789xw']);
-            assert.strictEqual(result.rest, '');
+            assert.strictEqual(result.userhandle, 'me3456789xw');
+            assert.deepEqual(result.value, RING_ED25519['me3456789xw']);
+            assert.strictEqual(result.rest,
+                base64urldecode('you456789xw') + ED25519_STRING_FINGERPRINT + String.fromCharCode(0x02));
         });
 
         it('deserialise()', function() {
-            assert.deepEqual(ns.deserialise(SERIALISED_RING_ED25519), {you456789xw: RING_ED25519.you456789xw});
+            assert.deepEqual(ns.deserialise(SERIALISED_RING_ED25519), RING_ED25519);
         });
     });
 

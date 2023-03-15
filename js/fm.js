@@ -3707,8 +3707,7 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
         loadingDialog.show();
 
         if (!authring.getContactAuthenticated(userid, 'Cu25519')) {
-            delete pubCu25519[userid];
-            promises.push(crypt.getPubCu25519(userid));
+            promises.push(crypt.getPubCu25519(userid, true));
         }
 
         // Generate fingerprint

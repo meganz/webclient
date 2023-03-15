@@ -1525,7 +1525,7 @@ var notify = {
                     diffCounter++;
                 }
                 if (meta.topicChange) {
-                    string = core.name.update.replace('%1', meta.oldTopic).replace('%s', `\u201c${meta.topic}\u201d`);
+                    string = core.name.update.replace('%1', meta.oldTopic).replace('%s', meta.topic);
                     diffCounter++;
                     showTitle = false;
                 }

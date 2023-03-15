@@ -130,6 +130,17 @@
     display: inline-block;
     vertical-align: middle;
     width: 428px;
+    min-width: 0;
+    -webkit-margin-end: auto;
+    margin-inline-end: auto;
+}
+
+.share-dialog-access-node .access-node-contact-verify {
+    display: none;
+}
+
+.share-dialog-access-node.unverified-contact .access-node-contact-verify {
+    display: inline-block;
 }
 
 .share-dialog-access-node .access-node-avatar {
@@ -226,6 +237,10 @@
     padding: 2px 8px;
     text-align: center;
     width: calc(100% - 48px);
+}
+
+.mega-dialog.share-dialog .mega-banner.contact-verify-warning {
+    margin-bottom: 16px;
 }
 
 .mega-dialog.share-dialog .warning-template span {

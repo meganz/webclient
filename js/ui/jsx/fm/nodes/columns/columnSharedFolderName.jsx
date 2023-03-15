@@ -12,9 +12,9 @@ export class ColumnSharedFolderName extends GenericNodePropsComponent {
         let {node} = nodeAdapter.props;
 
         return <td megatype={ColumnSharedFolderName.megatype} className={ColumnSharedFolderName.megatype}>
-            <div className="shared-folder-icon"></div>
+            <div className="shared-folder-icon sprite-fm-uni-after icon-warning-after"></div>
             <div className="shared-folder-info-block">
-                <div className="shared-folder-name">{nodeAdapter.nodeProps.title}</div>
+                <div className="shared-folder-name">{missingkeys[node.h] ? l[8686] : nodeAdapter.nodeProps.title}</div>
                 <div className="shared-folder-info">{fm_contains(node.tf, node.td)}</div>
             </div>
         </td>;

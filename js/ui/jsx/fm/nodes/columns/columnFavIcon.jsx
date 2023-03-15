@@ -17,10 +17,9 @@ export class ColumnFavIcon extends GenericNodePropsComponent {
 
         return <td megatype={ColumnFavIcon.megatype} className={ColumnFavIcon.megatype}>
             <span className={
-                "grid-status-icon sprite-fm-mono " +
-                (nodeAdapter.nodeProps.fav ? " icon-favourite-filled" : " icon-dot") + (
-                    !isFavouritable && " disabled" || ""
-                )
+                "grid-status-icon sprite-fm-mono " + (missingkeys[node.h] ? " icon-info" :
+                    (nodeAdapter.nodeProps.fav ? " icon-favourite-filled" : " icon-dot")) +
+                    (!isFavouritable && " disabled" || "")
             } onClick={() => {
                 if (isFavouritable) {
                     M.favourite([node.h], !node.fav);

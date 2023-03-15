@@ -65,7 +65,7 @@
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td>' +
-                        '<div class="shared-folder-icon"></div>' +
+                        '<div class="shared-folder-icon sprite-fm-uni-after icon-warning-after"></div>' +
                         '<div class="shared-folder-info-block">' +
                             '<div class="shared-folder-name"></div>' +
                             '<div class="shared-folder-info"></div>' +
@@ -720,6 +720,10 @@
                 const node = this.nodeMap[aHandle];
                 delete this.nodeMap[aHandle];
 
+                if (this.unverifiedShare && node.classList.contains('unverified-share')) {
+                    this.unverifiedShare--;
+                }
+
                 if (aRemove) {
                     node.remove();
                 }
@@ -1243,6 +1247,12 @@
 
                 }
 
+                if (!mega.keyMgr.haveVerifiedKeyFor(aNode.su)) {
+
+                    this.unverifiedShare = (this.unverifiedShare || 0) + 1;
+                    aTemplate.classList.add('unverified-share');
+                }
+
                 return aTemplate;
             },
             'out-shares': function(aNode, aProperties, aTemplate) {
@@ -1287,7 +1297,6 @@
                         avatar.parentNode.insertBefore(avatarElement, avatar);
 
                     }
-
 
                     if (aProperties.icon) {
                         aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);

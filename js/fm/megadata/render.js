@@ -150,7 +150,7 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
 
         unverifiedShareBanner.classList.remove('visible');
 
-        if (M.currentdirid === 'shares' && this.megaRender.unverifiedShare) {
+        if (M.currentdirid === 'shares' && this.megaRender && this.megaRender.unverifiedShare) {
 
             unverifiedShareBanner.querySelector('span').textContent = l.undec_share_warning_banner;
             unverifiedShareBanner.classList.add('visible');

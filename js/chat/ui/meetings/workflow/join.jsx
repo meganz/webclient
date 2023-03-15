@@ -60,17 +60,15 @@ export default class Join extends MegaRenderMixin {
         megaChat.destroy();
         return mega.ui.sendSignupLinkDialog(JSON.parse(localStorage.awaitingConfirmationAccount), () => {
             delete localStorage.awaitingConfirmationAccount;
-            u_logout(true);
-            location.reload();
+            u_logout(true).then(() => location.reload());
         });
     };
 
     Ephemeral = () => {
         const onCancel = () => this.setState({ ephemeralDialog: false });
         const onConfirm = () => {
-            u_logout(true);
+            u_logout(true).then(() => location.reload());
             sessionStorage.guestForced = true;
-            location.reload();
         };
         const msgFragments = l.ephemeral_data_lost.split(/\[A]|\[\/A]/);
 

@@ -210,7 +210,9 @@ function u_checklogin3a(res, ctx) {
             document.body.classList.remove('not-logged');
 
             // Send some data to mega.io that we logged in
-            initMegaIoIframe(true);
+            if (!is_iframed) {
+                initMegaIoIframe(true);
+            }
         }
 
         // Recovery key has been saved
@@ -1007,7 +1009,7 @@ function initMegaIoIframe(loginStatus, planNum) {
     const megapagesUrl = 'https://mega.io';
     const parentUrl = 'https://mega.nz';
 
-    const megapagesPromise = new MegaPromise();
+    const megapagesPromise = mega.promise;
 
     tryCatch(() => {
         const megaIoIframe = document.getElementById('i-ping');

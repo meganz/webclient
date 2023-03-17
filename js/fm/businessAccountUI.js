@@ -471,7 +471,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             }
             else {
                 $currUser.find('.fm-user-management-user .admin-icon').removeClass('hidden');
-                $currUser.find('.edit-icon, .disabled-icon').addClass('disabled');
+                $('.edit-icon', $currUser).removeClass('disabled');
+                $('.disabled-icon', $currUser).addClass('disabled');
             }
 
             $currUserLeftPane.removeClass('selected');

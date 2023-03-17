@@ -259,7 +259,6 @@ export default class Stream extends MegaRenderMixin {
                             chatRoom={chatRoom}
                             menu={true}
                             ephemeralAccounts={ephemeralAccounts}
-                            isCallOnHold={isOnHold}
                             onCallMinimize={onCallMinimize}
                             onSpeakerChange={onSpeakerChange}
                             onDoubleClick={(e, streamNode) => {
@@ -311,7 +310,6 @@ export default class Stream extends MegaRenderMixin {
                                             chatRoom={chatRoom}
                                             menu={true}
                                             ephemeralAccounts={ephemeralAccounts}
-                                            isCallOnHold={isOnHold}
                                             onCallMinimize={onCallMinimize}
                                             onSpeakerChange={onSpeakerChange}
                                             didMount={ref => {
@@ -368,7 +366,6 @@ export default class Stream extends MegaRenderMixin {
                     chatRoom={chatRoom}
                     menu={true}
                     ephemeralAccounts={ephemeralAccounts}
-                    isCallOnHold={isOnHold}
                     onCallMinimize={onCallMinimize}
                 /> :
                 null

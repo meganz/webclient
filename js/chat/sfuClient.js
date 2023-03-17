@@ -4,7 +4,7 @@
 /******/ 	"use strict";
 /******/ 	// The require scope
 /******/ 	var __webpack_require__ = {};
-/******/
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
@@ -17,12 +17,12 @@
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 
@@ -922,7 +922,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '4efe813891';
+const COMMIT_ID = '7a2d27038a';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -2918,7 +2918,7 @@ class SfuClient {
         ];
     }
 }
-SfuClient.kProtocolVersion = 1;
+SfuClient.kProtocolVersion = 2;
 SfuClient.debugSdp = localStorage.debugSdp ? 1 : 0;
 SfuClient.kMaxVideoSlotsDefault = 24;
 SfuClient.kSpatialLayerCount = 3;
@@ -2937,6 +2937,7 @@ SfuClient.ConnState = ConnState;
 SfuClient.TermCode = termCodes;
 SfuClient.ScreenShareType = ScreenShareType;
 SfuClient.Av = Av;
+SfuClient.kZeroIv128 = new Uint8Array(16);
 SfuClient.msgHandlerMap = {
     "HELLO": SfuClient.prototype.msgHello,
     "AV": SfuClient.prototype.msgAv,
@@ -3319,6 +3320,7 @@ class Peer {
         this.handler = client.app;
         this.cid = info.cid;
         this.userId = info.userId;
+        this.version = info.v;
         this.av = info.av;
         this.strIvs = info.ivs;
         this.keyDecryptIv = hexToBin(this.strIvs[0] + this.strIvs[1].substring(0, 8));
@@ -3373,7 +3375,7 @@ class Peer {
             name: "HKDF", hash: "SHA-256",
             salt: hexToBin([this.strIvs[1], this.strIvs[2], this.client.strIvs[1], this.client.strIvs[2]].sort().join('')),
             info: new Uint8Array([])
-        }, hkdfKey, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+        }, hkdfKey, { name: this.version === 1 ? "AES-GCM" : "AES-CBC", length: 256 }, false, ["encrypt", "decrypt"]);
     }
     async encryptKey(key) {
         let encKey;
@@ -3389,7 +3391,23 @@ class Peer {
                 sharedKey = this.sessSharedKey;
             }
             client_assert(sharedKey.usages);
-            const encKeyBin = await crypto.subtle.encrypt({ name: "AES-GCM", iv: this.client.keyEncryptIv, tagLength: 32 }, sharedKey, key);
+            let encKeyBin;
+            if (this.version === 1) {
+                encKeyBin = await crypto.subtle.encrypt({ name: "AES-GCM", iv: this.client.keyEncryptIv, tagLength: 32 }, sharedKey, key);
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Encrypting key with AES-GCM for protocol v1 peer");
+                    }
+                } while (0);
+            }
+            else {
+                encKeyBin = await crypto.subtle.encrypt({ name: "AES-CBC", iv: SfuClient.kZeroIv128 }, sharedKey, key);
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Encrypting key with AES-CBC for protocol v2 peer");
+                    }
+                } while (0);
+            }
             encKey = base64ArrEncode(encKeyBin);
         }
         else { // old clients, using chat keys
@@ -3424,7 +3442,9 @@ class Peer {
                 sharedKey = this.sessSharedKey;
             }
             client_assert(sharedKey.usages);
-            return crypto.subtle.decrypt({ name: "AES-GCM", iv: this.keyDecryptIv, tagLength: 32 }, sharedKey, base64DecodeToArr(key).buffer);
+            return this.version === 1
+                ? crypto.subtle.decrypt({ name: "AES-GCM", iv: this.keyDecryptIv, tagLength: 32 }, sharedKey, base64DecodeToArr(key).buffer)
+                : crypto.subtle.decrypt({ name: "AES-CBC", iv: SfuClient.kZeroIv128 }, sharedKey, base64DecodeToArr(key).buffer);
         }
         else { // old clients, using chat keys
             return this.client.app.decryptKeyFromUser(key, this.userId);

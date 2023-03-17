@@ -1159,7 +1159,7 @@ mega.tpw = new function TransferProgressWidget() {
         if (!$rowsContainer || !$(tpwRowSelector, $rowsContainer).length) {
             return;
         }
-        if (M.getTransferElements() && !pfid) {
+        if (u_type !== false && M.getTransferElements() && !pfid) {
             $('.js-tpm-open', $widgetHeadAndBody).removeClass('hidden');
         }
         else {

@@ -8,46 +8,104 @@ export default class StreamNode extends MegaRenderMixin {
     nodeRef = React.createRef();
     contRef = React.createRef();
     statsHudRef = React.createRef();
+    presenterCamRef = React.createRef();
 
     constructor(props) {
         super(props);
         this.state = { loading: false };
         const { stream, externalVideo } = props;
         if (!externalVideo) {
-            this.clonedVideo = document.createElement("video");
+            this.createOwnVideo();
         }
+        this.stream = stream;
         if (!stream.isFake) {
             stream.registerConsumer(this);
 
             if (stream instanceof CallManager2.Peer) {
+                this.av = stream.av;
+                this.haveScreenAndCam = stream.haveScreenAndCam && !(stream.av & Av.onHold);
                 this._streamListener = stream.addChangeListener((peer, data, key) => {
                     // console.warn("change listener");
                     // force re-request if video stream changed
-                    if (key === "haveScreenshare" || key === "videoMuted" || key === "isOnHold") {
+                    if (key === "av") {
                         this._lastResizeWidth = null;
+                        const streamHasScreenAndCam = stream.haveScreenAndCam && !(stream.av & Av.onHold);
+                        const bigChange =
+                            (this.haveScreenAndCam !== streamHasScreenAndCam) || ((this.av ^ stream.av) & Av.onHold);
+                        this.av = stream.av;
+                        this.haveScreenAndCam = streamHasScreenAndCam;
+                        if (bigChange) {
+                            if (this.isMounted()) {
+                                this.forceUpdate();
+                            }
+                        }
+                        else {
+                            this.requestVideo();
+                        }
                     }
-                    this.requestVideo();
                 });
             }
         }
+        if (CallManager2.Call.VIDEO_DEBUG_MODE) {
+            this.onRxStats = this._onRxStats;
+        }
     }
-
-    requestVideo(forceVisible) {
-        const {stream} = this.props;
-        if (stream.isFake || stream.isDestroyed) {
+    createOwnVideo() {
+        if (this.ownVideo) {
             return;
         }
-        if ((stream.isStreaming() || stream.isLocal) && this.isMounted()
-           && (this.isComponentVisible() || forceVisible)) {
-            var node = this.findDOMNode();
+        this.ownVideo = document.createElement("video");
+    }
+    requestDynamicVideo(enable) {
+        if (enable) {
+            const node = this.findDOMNode();
             this.requestVideoBySize(node.offsetWidth, node.offsetHeight);
         }
         else {
             this.requestVideoBySize(0, 0);
+        }
+    }
+    requestFixedThumbVideo(enable) {
+        if (enable) {
+            if (this.fixedThumbPlayer) {
+                this.playFixedThumbVideo();
+            }
+            else {
+                this.addFixedThumbVideo();
+                this.fixedThumbPlayer = this.stream.sfuPeer.getThumbVideo((player) => {
+                    this.fixedThumbPlayer = player;
+                    return this;
+                });
+            }
+        }
+    }
+    requestVideo(forceVisible) {
+        const {stream} = this;
+        if (stream.isFake || stream.isDestroyed) {
+            return;
+        }
+        const enable = ((stream.isStreaming() || stream.isLocal) && this.isMounted()
+            && (this.isComponentVisible() || forceVisible));
+
+        if (!this.haveScreenAndCam) {
+            if (this.fixedThumbPlayer) {
+                this.fixedThumbPlayer.destroy();
+            }
+            this.requestDynamicVideo(enable);
+        }
+        else {
+            this.requestFixedThumbVideo(enable);
+            if (this.props.isThumb) {
+                this.requestedQ = 0;
+            }
+            else {
+                this.requestDynamicVideo(enable);
+            }
+        }
+        if (!enable) {
             this.displayStats(null);
         }
     }
-
     setupVideoElement(video) {
         if (video._snSetup) {
             return; // already done
@@ -64,7 +122,6 @@ export default class StreamNode extends MegaRenderMixin {
         };
         video.onloadeddata = (ev) => {
             // Trigger fake onResize when video finishes loading
-            this.requestVideo();
             if (this.props.onLoadedData) {
                 this.props.onLoadedData(ev);
             }
@@ -78,7 +135,7 @@ export default class StreamNode extends MegaRenderMixin {
         video.onloadeddata = null;
         video.ondblclick = null;
     }
-    updateVideoElem() {
+    updateDynamicVideoElem() {
         // console.warn(`updateVideoElem[${this.props.stream.clientId}]`);
         const vidCont = this.contRef.current;
         if (!this.isMounted() || !vidCont) {
@@ -86,8 +143,13 @@ export default class StreamNode extends MegaRenderMixin {
             return;
         }
 
+        const { stream, externalVideo, isThumb } = this.props;
+        if (this.haveScreenAndCam && isThumb) {
+            // no dynamic video when peer has screen&cam - otherwise it will switch back and forth
+            // between screen and cam thumbnail
+            return;
+        }
         const currVideo = vidCont.firstChild; // current video in the DOM
-        const { stream, externalVideo } = this.props;
         const { source } = stream;
         if (!source) {
             if (currVideo) {
@@ -105,14 +167,14 @@ export default class StreamNode extends MegaRenderMixin {
             vidCont.replaceChildren(source);
         }
         else { // use cloned video
-            const cloned = this.clonedVideo;
+            const cloned = this.ownVideo;
             if (!currVideo) {
                 // insert our cloned video in the DOM
                 this.setupVideoElement(cloned);
                 vidCont.replaceChildren(cloned);
             }
             else {
-                assert(currVideo === this.clonedVideo);
+                assert(currVideo === cloned);
             }
             if (cloned.paused || cloned.srcObject !== source.srcObject) {
                 cloned.srcObject = source.srcObject;
@@ -120,7 +182,63 @@ export default class StreamNode extends MegaRenderMixin {
             }
         }
     }
-
+    addFixedThumbVideo() {
+        assert(this.haveScreenAndCam);
+        const vidCont = (this.props.isThumb ? this.contRef : this.presenterCamRef).current;
+        if (!vidCont) {
+            console.warn("addFixedThumbVideo: No video container present");
+            return;
+        }
+        this.createOwnVideo();
+        if (vidCont.firstChild !== this.ownVideo) {
+            vidCont.replaceChildren(this.ownVideo);
+        }
+    }
+    delFixedThumbVideo() {
+        if (!this.ownVideo) {
+            console.warn("delFixedThumbVideo: no ownVideo");
+            return;
+        }
+        SfuClient.playerStop(this.ownVideo);
+        const vidCont = (this.props.isThumb ? this.contRef : this.presenterCamRef).current;
+        if (!vidCont) {
+            return;
+        }
+        vidCont.replaceChildren();
+    }
+    // SfuClient IVIdeoPlayerGui interface
+    attachToTrack(track) {
+        if (!this.haveScreenAndCam) {
+            return;
+        }
+        SfuClient.playerPlay(this.ownVideo, track);
+    }
+    playFixedThumbVideo() {
+        const track = this.fixedThumbPlayer.slot?.inTrack;
+        if (!track) {
+            return;
+        }
+        if (this.ownVideo.paused || this.ownVideo.srcObject.getVideoTracks()[0] !== track) {
+            console.warn("play()");
+            SfuClient.playerPlay(this.ownVideo, track);
+        }
+    }
+    detachFromTrack() {
+        this.delFixedThumbVideo();
+    }
+    onPlayerDestroy() {
+        delete this.fixedThumbPlayer;
+        const { externalVideo } = this.props;
+        if (externalVideo && !this.haveScreenAndCam) {
+            delete this.ownVideo;
+        }
+    }
+    _onRxStats(track, info, raw) {
+        if (!this.stream.source) {
+            this.displayStats(CallManager2.Call.rxStatsToText(track, info, raw));
+        }
+    }
+    // ====
     displayStats(stats) {
         const elem = this.statsHudRef.current;
         if (!elem) {
@@ -134,7 +252,6 @@ export default class StreamNode extends MegaRenderMixin {
         if (this.props.didMount) {
             this.props.didMount(this.nodeRef?.current);
         }
-        // this.updateVideoElem();
         this.requestVideo(true);
     }
 
@@ -143,6 +260,7 @@ export default class StreamNode extends MegaRenderMixin {
     }
 
     componentDidUpdate() {
+     // console.warn("did update");
         super.componentDidUpdate();
         if (this.props.didUpdate) {
             this.props.didUpdate(this.nodeRef?.current);
@@ -168,9 +286,8 @@ export default class StreamNode extends MegaRenderMixin {
     requestVideoQuality(quality) {
         this.requestedQ = (quality && CallManager2.FORCE_LOWQ) ? 1 : quality;
         if (!this.props.stream.updateVideoQuality()) {
-            // if recalcCommonVideoQuality() returns true, stream has changed synchronously
-            // and an update was already broadcast
-            this.updateVideoElem();
+            // if it returns true, stream has changed synchronously and an update was already broadcast
+            this.updateDynamicVideoElem();
         }
     }
     requestVideoBySize(w) {
@@ -209,7 +326,6 @@ export default class StreamNode extends MegaRenderMixin {
         }
         this.requestVideoQuality(newQ);
     }
-
     renderVideoDebugMode() {
         const { stream, isLocal } = this.props;
 
@@ -234,19 +350,20 @@ export default class StreamNode extends MegaRenderMixin {
     }
 
     renderContent() {
-        const { stream } = this.props;
-        const { loading } = this.state;
-
+        const {stream} = this;
         if (stream.isStreaming()) {
             return (
                 <>
-                    {loading && (
-                        <i className="sprite-fm-theme icon-loading-spinner loading-icon"/>
-                    )}
                     <div
                         ref={this.contRef}
                         className="stream-node-holder"
                     />
+                    {(this.haveScreenAndCam && !this.props.isThumb) &&
+                        <div
+                            ref={this.presenterCamRef}
+                            className="presenter-video-holder"
+                        />
+                    }
                 </>
             );
         }
@@ -268,7 +385,7 @@ export default class StreamNode extends MegaRenderMixin {
     }
 
     renderStatus() {
-        const { mode, stream, chatRoom, localAudioMuted } = this.props;
+        const { mode, stream, chatRoom, localAudioMuted, isThumb } = this.props;
         const { audioMuted, hasSlowNetwork, isOnHold, userHandle } = stream;
         const $$CONTAINER = ({ children }) => <div className="stream-node-status theme-dark-forced">{children}</div>;
         const onHoldLabel = l[23542].replace('%s', M.getNameByHandle(userHandle)); /* `%s has put the call on hold` */
@@ -292,6 +409,7 @@ export default class StreamNode extends MegaRenderMixin {
                     {muted ? this.getStatusIcon('icon-audio-off', l.muted /* `Muted` */) : null}
                     {hasSlowNetwork ?
                         this.getStatusIcon('icon-weak-signal', l.poor_connection /* `Poor connection` */) : null}
+                    {(this.haveScreenAndCam && isThumb) ? this.getStatusIcon('icon-pc-linux', "Sharing screen") : null }
                 </$$CONTAINER>
             </>
         );

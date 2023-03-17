@@ -1153,6 +1153,19 @@
   width: 100%;
   height: 100%;
 }
+.stream-node-content .presenter-video-holder {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 15%;
+  height: 15%;
+  /* z-index: 11; */
+  background-color: black;
+  border-top-left-radius: 6px;
+}
+.stream-node-content .presenter-video-holder video {
+  border-radius: inherit;
+}
 .stream-node-content .avatar-wrapper {
   position: absolute;
   top: 50%;

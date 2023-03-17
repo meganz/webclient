@@ -62,19 +62,21 @@
         return asmCrypto.AES_ECB.decrypt(base64urldecode(key), userSharedKey, false).buffer;
     };
 
+    Call.rxStatsToText = function(track, info, raw) {
+        if (!window.sfuClient) {
+            return;
+        }
+        let text = `${track.peer.cid}: `;
+        if (raw.frameWidth) {
+            text += `${raw.frameWidth}x${raw.frameHeight} `;
+        }
+        text += `${raw.framesPerSecond || 0}fps ${Math.round(info.keyfps)}kfs ${Math.round(info.kbps)
+            }kbps rtt: ${sfuClient.rtcStats.rtt}, pl: ${Math.round(info.plost)}, rxq: ${sfuClient.rxQuality}`;
+        return text;
+    };
     if (Call.VIDEO_DEBUG_MODE) {
-        Call.PlayerData.prototype.onRxStats = function(track, info, raw) {
-            if (!window.sfuClient) {
-                return;
-            }
-            let text = `${track.peer.cid}: `;
-            if (raw.frameWidth) {
-                text += `${raw.frameWidth}x${raw.frameHeight} `;
-            }
-            text += `${raw.framesPerSecond || 0}fps ${Math.round(info.keyfps)}kfs ${Math.round(info.kbps)
-                }kbps rtt: ${sfuClient.rtcStats.rtt}, apl: ${track.peer.audioPktLoss.toFixed(1)
-                }%, vpl: ${info.plost.toFixed(1)}%, rxq: ${sfuClient.rxQuality}`;
-
+        Call.PlayerCtx.prototype.onRxStats = function(track, info, raw) {
+            const text = Call.rxStatsToText(track, info, raw);
             for (const cons of this.appPeer.consumers) {
                 cons.displayStats(text);
             }
@@ -91,7 +93,7 @@
             if (sfuClient.isSendingScreenHiRes()) {
                 text += `\ntxq: ${sfuClient.txQuality}`;
             }
-            for (const cons of this.callManagerCall.localPeerStream.consumers) {
+            for (const cons of this.localPeerStream.consumers) {
                 cons.displayStats(text);
             }
         };

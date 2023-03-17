@@ -262,7 +262,6 @@ class Stream extends MegaRenderMixin {
     renderOnHoldStreamNode = () =>
         <StreamNode
             stream={this.props.call.getLocalStream()}
-            isCallOnHold={this.props.isOnHold}
             isLocal={true}
         />;
 
@@ -339,9 +338,9 @@ class Stream extends MegaRenderMixin {
     };
 
     renderMiniMode = () => {
-        const { call, mode, isOnHold, forcedLocal, onLoadedData } = this.props;
+        const { call, mode, forcedLocal, onLoadedData } = this.props;
 
-        if (isOnHold) {
+        if (call.sfuClient.isOnHold()) {
             return this.renderOnHoldStreamNode();
         }
 
@@ -349,7 +348,7 @@ class Stream extends MegaRenderMixin {
             <StreamNode
                 className={forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : ''}
                 mode={mode}
-                isLocal={true}
+                externalVideo={true}
                 stream={this.getStreamSource()}
                 onLoadedData={onLoadedData}
             />

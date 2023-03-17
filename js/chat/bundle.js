@@ -740,7 +740,7 @@ class MeetingsManager {
       }
     }
     if (!!meetingInfo.link !== !!publicLink) {
-      chatRoom.updatePublicHandle(!meetingInfo.link);
+      chatRoom.updatePublicHandle(!meetingInfo.link, meetingInfo.link);
     }
     if (meetingInfo.openInvite !== options.oi) {
       chatRoom.toggleOpenInvite();
@@ -8842,7 +8842,7 @@ class ColumnSharedFolderName extends genericNodePropsComponent.L {
       megatype: ColumnSharedFolderName.megatype,
       className: ColumnSharedFolderName.megatype
     }, external_React_default().createElement("div", {
-      className: "shared-folder-icon"
+      className: "shared-folder-icon sprite-fm-uni-after icon-warning-after"
     }), external_React_default().createElement("div", {
       className: "shared-folder-info-block"
     }, external_React_default().createElement("div", {
@@ -10865,7 +10865,7 @@ class ChatlinkDialog extends mixins.wl {
         delete this.loading;
         return;
       }
-      this.loading = chatRoom.updatePublicHandle(undefined).always(() => {
+      this.loading = chatRoom.updatePublicHandle(false, true).always(() => {
         if (chatRoom.publicLink) {
           this.setState({
             'link': getBaseUrl() + '/' + chatRoom.publicLink
@@ -12463,7 +12463,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
             'chatLinkDialog': true
           });
         } else {
-          self.props.chatRoom.updatePublicHandle();
+          self.props.chatRoom.updatePublicHandle(false, true);
         }
       });
     });
@@ -31188,7 +31188,7 @@ function _extends() {
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/
+/******/ 	
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -31202,16 +31202,16 @@ function _extends() {
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/
+/******/ 	
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/
+/******/ 	
 /************************************************************************/
-/******/
+/******/ 	
 /******/ 	(() => {
 /******/ 		// getDefaultExport function for compatibility with non-harmony modules
 /******/ 		__webpack_require__.n = (module) => {
@@ -31222,8 +31222,8 @@ function _extends() {
 /******/ 			return getter;
 /******/ 		};
 /******/ 	})();
-/******/
-/******/
+/******/ 	
+/******/ 	
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
 /******/ 		__webpack_require__.d = (exports, definition) => {
@@ -31234,13 +31234,13 @@ function _extends() {
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/
-/******/
+/******/ 	
+/******/ 	
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/
-/******/
+/******/ 	
+/******/ 	
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
 /******/ 		__webpack_require__.r = (exports) => {
@@ -31250,14 +31250,14 @@ function _extends() {
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /************************************************************************/
-/******/
+/******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	__webpack_require__(51);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __webpack_require__(222);
-/******/
+/******/ 	
 /******/ })()
 ;

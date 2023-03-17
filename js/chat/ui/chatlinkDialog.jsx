@@ -32,7 +32,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
             return;
         }
 
-        this.loading = chatRoom.updatePublicHandle(undefined)
+        this.loading = chatRoom.updatePublicHandle(false, true)
             .always(() => {
                 if (chatRoom.publicLink) {
                     this.setState({ 'link': getBaseUrl() + '/' + chatRoom.publicLink });

@@ -1250,7 +1250,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     }
                     else {
                         // not visible anymore, proceed w/ generating a link silently.
-                        self.props.chatRoom.updatePublicHandle();
+                        self.props.chatRoom.updatePublicHandle(false, true);
                     }
                 });
         });

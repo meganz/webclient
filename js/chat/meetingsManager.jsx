@@ -404,7 +404,7 @@ class MeetingsManager {
 
         // Public link
         if (!!meetingInfo.link !== !!publicLink) {
-            chatRoom.updatePublicHandle(!meetingInfo.link);
+            chatRoom.updatePublicHandle(!meetingInfo.link, meetingInfo.link);
         }
 
         // Open invite

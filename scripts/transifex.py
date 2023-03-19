@@ -561,11 +561,14 @@ def has_locked_msgs(is_prod):
         print("SUCCESS ... checking for Locked strings in PROD. None found")
     return False
 
-def lock_resource(branch_resource_name, keys, update_time = 0):
+def lock_resource(branch_resource_name, keys, branch, update_time = 0):
     url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:" + branch_resource_name
     languages = get_languages()
     if languages:
         lockedTags = ["do_not_translate"]
+        if branch:
+            lockedTags.append('feature-in-feature')
+            lockedTags.append('locked')
         for language in languages:
             lockedTags.append("locked_" + language["attributes"]["code"])
         while url != 0:
@@ -699,6 +702,7 @@ def main():
     parser.add_argument("-u", "--update", nargs="?", help="Parse new strings in a JSON file and update branch resource file", type=str, const="update")
     parser.add_argument("-fp", "--filepath", nargs="?", help="Custom file path for updating resource file", type=str)
     parser.add_argument("-c", "--clean", nargs="?", help="Activate pruning", const=True)
+    parser.add_argument("-br", "--branch", nargs="?", help="Optional git branch with strings to merge with the current branch file", type=str)
     args = parser.parse_args()
     if args.clean:
         pruning()
@@ -770,7 +774,7 @@ def main():
             success = send_upload_request(url, payload)
             if success:
                 print("Locking resource")
-                lock_resource(branch_resource_name, new_strings.keys(), now)
+                lock_resource(branch_resource_name, new_strings.keys(), args.branch, now)
                 print("Completed")
         print("~ Import completed ~")
         print("")
@@ -785,13 +789,34 @@ def main():
     print("")
     if not branch_resource_name:
         branch_resource_name = get_branch_resource_name()
-    if not is_prod and branch_resource_name and branch_resource_name != "prod" and fetch_branch:
-        print("Fetching Branch Language Files...")
-        lang_branch = download_languages(branch_resource_name, languages)
-        if lang_branch:
-            merge_language(lang, lang_branch)
-        else:
-            print("Failed to fetch branch language files.")
+    if not is_prod and (branch_resource_name and branch_resource_name != "prod" and fetch_branch or args.branch):
+        if branch_resource_name and branch_resource_name != "prod" and fetch_branch:
+            print("Fetching Branch Language Files...")
+            lang_branch = download_languages(branch_resource_name, languages)
+            if lang_branch:
+                merge_language(lang, lang_branch)
+            else:
+                print("Failed to fetch branch language files.")
+        if args.branch:
+            print("Fetching additional specified resource")
+            other_resource = RESOURCE + "-" + re.sub('[^A-Za-z0-9]+', '', args.branch)
+            if other_resource in ["master", "develop", branch_resource_name]:
+                print("Specified resource is already included in the language files")
+            else:
+                try:
+                    url = BASE_URL + "/resources/" + PROJECT_ID + ":r:" + other_resource
+                    request = Request(url, headers=HEADER)
+                    response = urlopen(request)
+                    if response.code == 200:
+                        lang_other = download_languages(other_resource, languages)
+                        if lang_other:
+                            merge_language(lang, lang_other)
+                        else:
+                            print("Failed to fetch additional specified resource")
+                    else:
+                        print("Failed to check if resource exists")
+                except HTTPError:
+                    print("Failed to find additional resource")
         print("")
     else:
         merge_language(lang, lang)

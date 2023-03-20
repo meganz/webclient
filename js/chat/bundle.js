@@ -1658,6 +1658,9 @@ Chat.prototype.init = promisify(function (resolve, reject) {
         delete Chat.mcsm[scheduledMeeting.id];
       }
     }
+    if (notify) {
+      notify.countAndShowNewNotifications();
+    }
     return true;
   }).then(resolve).catch(reject);
 });

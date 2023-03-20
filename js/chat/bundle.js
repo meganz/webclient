@@ -21983,12 +21983,14 @@ class Recurring extends _mixins1__.wl {
       className: "recurring-field-row"
     }, react0().createElement("div", {
       className: "recurring-radio-buttons",
-      onChange: ({
-        target
-      }) => {
-        if (target.name === `${Recurring.NAMESPACE}-radio-monthRule`) {
+      onClick: ev => {
+        const {
+          name,
+          value
+        } = ev.target;
+        if (name === `${Recurring.NAMESPACE}-radio-monthRule`) {
           this.setState({
-            monthRule: target.value
+            monthRule: value
           });
         }
       }

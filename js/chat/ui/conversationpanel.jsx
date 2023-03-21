@@ -2019,7 +2019,10 @@ export class ConversationPanel extends MegaRenderMixin {
                             {isUpcoming && isRecurring && <i className="sprite-fm-mono icon-repeat" />}
                         </span>
                         <span className="txt small">
-                            {isUpcoming ? this.renderUpcomingInfo() : <MembersAmount chatRoom={room} />}
+                            {is_chatlink && isUpcoming && !isRecurring ?
+                                this.renderUpcomingInfo() :
+                                <MembersAmount chatRoom={room} />
+                            }
                         </span>
                     </div>
                 </div>;

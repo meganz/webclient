@@ -261,7 +261,10 @@ export default class Invite extends MegaRenderMixin {
                                     className={`mega-button large positive ${publicLink ? '' : 'disabled'}`}
                                     onClick={() =>
                                         publicLink &&
-                                        copyToClipboard(publicLink, l[371] /* `Copied to clipboard` */)
+                                        copyToClipboard(
+                                            `${getBaseUrl()}/${publicLink}`,
+                                            l[371] /* `Copied to clipboard` */
+                                        )
                                     }>
                                     {!publicLink ? l[7006] /* `Loading...` */ : l[1394] /* `Copy link` */}
                                 </Button>
@@ -275,7 +278,7 @@ export default class Invite extends MegaRenderMixin {
                                 {field && publicLink && (
                                     <div className="chat-link-input">
                                         <i className="sprite-fm-mono icon-link"/>
-                                        <input type="text" readOnly={true} value={publicLink}/>
+                                        <input type="text" readOnly={true} value={`${getBaseUrl()}/${publicLink}`}/>
                                     </div>
                                 )}
                             </div>

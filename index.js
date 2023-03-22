@@ -2787,10 +2787,17 @@ function topmenuUI() {
                     'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
                     'achievements', 'objectstorage', 'megabackup'
                 ];
+                const ioPages = [
+                    'about', 'cmd', 'contact', 'copyright', 'corporate', 'desktop', 'doc', 'extensions', 'privacy',
+                    'mobileapp', 'mobile', 'sdk', 'sourcecode', 'takedown', 'terms', 'security', 'affiliate', 'nas',
+                    'cookie', 'securechat', 'collaboration', 'storage', 'achievements', 'objectstorage', 'megabackup',
+                ];
                 var moveTo = {
-                    'account': 'fm/account',
-                    'affiliate': 'refer',
-                    'corporate': 'corporate/media'
+                    account: 'fm/account',
+                    affiliate: 'refer',
+                    corporate: 'media',
+                    collaboration: 'share',
+                    securechat: 'chatandmeetings',
                 };
 
                 for (var i = subPages.length; i--;) {
@@ -2807,6 +2814,10 @@ function topmenuUI() {
                     M.showRecoveryKeyDialog(2);
                 }
                 else if (subpage) {
+                    if (ioPages.includes(subpage)) {
+                        mega.redirect('mega.io', moveTo[subpage] || subpage, false, false);
+                        return false;
+                    }
                     // Clear login_next variable before load subpages each time
                     login_next = false;
                     loadSubPage(moveTo[subpage] || subpage);

@@ -396,33 +396,53 @@ export class ConversationRightArea extends MegaRenderMixin {
         $(document).trigger('closeDropdowns');
     }
 
-    cancelScheduledMeeting() {
+    handleCancelMeeting = () => {
         const { chatRoom } = this.props;
-        const { scheduledMeeting, chatId } = chatRoom;
+        const { scheduledMeeting, chatId } = chatRoom || {};
 
         if (scheduledMeeting) {
-            const doCancel = () => megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, chatId);
-            return (
-                scheduledMeeting.isRecurring ?
-                    msgDialog(
-                        `confirmation:!^${l.cancel_meeting_series_button}!${l.schedule_cancel_abort}`,
-                        null,
-                        l.schedule_cancel_series_dlg_title,
-                        l.schedule_cancel_series_dlg_text,
-                        cb => cb && doCancel(),
-                        1
-                    ) :
+            const { isRecurring, title } = scheduledMeeting;
+            const doConfirm = res => res && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, chatId);
+
+            if (isRecurring) {
+                return chatRoom.hasUserMessages() ?
                     msgDialog(
                         `confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`,
                         null,
-                        l.schedule_cancel_dlg_title,
-                        l.schedule_cancel_dlg_text,
-                        cb => cb && doCancel(),
+                        l.schedule_cancel_dialog_title.replace('%s', title),
+                        l.schedule_cancel_dialog_move_recurring,
+                        doConfirm,
                         1
-                    )
-            );
+                    ) :
+                    msgDialog(
+                        `confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`,
+                        null,
+                        l.schedule_cancel_dialog_title.replace('%s', title),
+                        l.schedule_cancel_dialog_archive_recurring,
+                        doConfirm,
+                        1
+                    );
+            }
+
+            return chatRoom.hasUserMessages() ?
+                msgDialog(
+                    `confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`,
+                    null,
+                    l.schedule_cancel_dialog_title.replace('%s', title),
+                    l.schedule_cancel_dialog_move_single,
+                    doConfirm,
+                    1
+                ) :
+                msgDialog(
+                    `confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`,
+                    null,
+                    l.schedule_cancel_dialog_title.replace('%s', title),
+                    l.schedule_cancel_dialog_archive_single,
+                    doConfirm,
+                    1
+                );
         }
-    }
+    };
 
     componentDidMount() {
         super.componentDidMount();
@@ -894,7 +914,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                             `}
                                             onClick={() => {
                                                 if (room.iAmOperator() && !scheduledMeeting.canceled) {
-                                                    this.cancelScheduledMeeting();
+                                                    this.handleCancelMeeting();
                                                 }
                                             }}>
                                             <i className="sprite-fm-mono icon-bin-filled"/>

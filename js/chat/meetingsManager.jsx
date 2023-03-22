@@ -453,10 +453,9 @@ class MeetingsManager {
 
     archiveMeeting(scheduledMeeting) {
         const { chatRoom } = scheduledMeeting;
-        const { messages } = chatRoom.messagesBuff;
-        // TODO: temp timeout, ping API and remove re: race condition where `mcfpc` is received twice
+        // TODO: temp timeout, ping api and remove re: race condition where `mcfpc` is received twice
         // w/ toggled `f` attribute?
-        tSleep(2).then(() => (messages.length === 0 || messages.every(m => !m.messageHtml)) && chatRoom.archive());
+        tSleep(2).then(() => chatRoom.hasUserMessages() ? null : chatRoom.archive());
     }
 
     // --

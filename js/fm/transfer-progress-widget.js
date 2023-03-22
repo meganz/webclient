@@ -330,11 +330,15 @@ mega.tpw = new function TransferProgressWidget() {
                 else {
                     id = 'zip_' + id;
                 }
-                dlmanager.abort(id);
+                if (GlobalProgress[id]) {
+                    dlmanager.abort(id);
+                }
             }
             else {
                 id = 'ul_' + id;
-                ulmanager.abort(id);
+                if (GlobalProgress[id]) {
+                    ulmanager.abort(id);
+                }
             }
             $('.transfer-table tr#' + id).remove();
             if ($.clearTransferPanel) {

@@ -61,9 +61,7 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td>' +
-                        '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
-                    '</td>' +
+                    '<td></td>' +
                     '<td>' +
                         '<div class="shared-folder-icon sprite-fm-uni-after icon-warning-after"></div>' +
                         '<div class="shared-folder-info-block">' +
@@ -1063,7 +1061,7 @@
                 const isBackup = this.location === 'backups'
                     || this.location === 'mixed-content' && M.getNodeRoot(aNode.h) === M.InboxID;
 
-                if (aNode.fav && !folderlink && this.location !== 'trashcan') {
+                if (aNode.fav && !folderlink && this.location !== 'trashcan' && M.currentrootid !== 'shares') {
                     elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
                     elm.classList.add('icon-favourite-filled');
                     elm.classList.remove('icon-dot');
@@ -1181,20 +1179,6 @@
                 return aTemplate;
             },
             'shares': function(aNode, aProperties, aTemplate) {
-
-                let elm;
-
-                if (!this.viewmode) {
-                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
-                    elm.classList.add(aProperties.accessRightsClass);
-                }
-
-                if (aNode.fav && !folderlink) {
-                    elm = elm || aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
-                    elm.classList.add('icon-favourite-filled');
-                    elm.classList.remove('icon-dot');
-                }
-
                 aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
 
                 var tmp = aTemplate.querySelector('.shared-folder-access');

@@ -212,6 +212,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     const isSearch = page.startsWith('fm/search');
     const sourceRoot = M.getSelectedSourceRoot(isSearch);
     let restrictedFolders = false;
+    const isInShare = M.currentrootid === 'shares';
 
     if (selNode && selNode.su && !M.d[selNode.p]) {
         items['.leaveshare-item'] = 1;
@@ -298,14 +299,17 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
 
         if (M.getNodeRights(selNode.h) > 1) {
             items['.rename-item'] = 1;
-            items['.add-star-item'] = 1;
             items['.colour-label-items'] = 1;
 
-            if (M.isFavourite(selNode.h)) {
-                $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@', l[5872]);
-            }
-            else {
-                $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite"></i>@@', l[5871]);
+            if (!isInShare) {
+                items['.add-star-item'] = 1;
+
+                if (M.isFavourite(selNode.h)) {
+                    $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@', l[5872]);
+                }
+                else {
+                    $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite"></i>@@', l[5871]);
+                }
             }
 
             M.colourLabelcmUpdate(selNode.h);
@@ -321,9 +325,12 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
 
     // Allow to mark as Favourite/Labeled from multi-selection
     if ($.selected.length > 1) {
-        items['.add-star-item'] = 1;
         items['.colour-label-items'] = 1;
-        let allAreFavourite = true;
+        let allAreFavourite = !isInShare;
+
+        if (!isInShare) {
+            items['.add-star-item'] = 1;
+        }
 
         for (let i = 0; i < $.selected.length; i++) {
 

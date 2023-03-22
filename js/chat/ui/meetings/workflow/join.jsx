@@ -5,7 +5,6 @@ import utils, { Emoji, ParsedHTML } from '../../../../ui/utils.jsx';
 import Button from '../button.jsx';
 import Preview from './preview.jsx';
 import HistoryPanel from "../../historyPanel.jsx";
-import MeetingsCallEndedDialog from '../meetingsCallEndedDialog.jsx';
 import Link from '../../link.jsx';
 
 export default class Join extends MegaRenderMixin {
@@ -366,9 +365,6 @@ export default class Join extends MegaRenderMixin {
         this.hidePanels();
         megaChat._joinDialogIsShown = true;
         alarm.hideAllWarningPopups();
-        if ($.dialog === MeetingsCallEndedDialog.dialogName) {
-            closeDialog();
-        }
         sessionStorage.removeItem('guestForced');
         if (!megaChat.hasSupportForCalls) {
             this.setState({ view: Join.VIEW.UNSUPPORTED });

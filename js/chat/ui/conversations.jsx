@@ -6,7 +6,6 @@ import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import { Start as StartMeetingDialog } from './meetings/workflow/start.jsx';
 import { Schedule as ScheduleMeetingDialog } from './meetings/schedule/schedule.jsx';
 import { StartGroupChatWizard } from './startGroupChatWizard.jsx';
-import MeetingsCallEndedDialog from "./meetings/meetingsCallEndedDialog.jsx";
 import { inProgressAlert } from './meetings/call.jsx';
 import ChatToaster from './chatToaster.jsx';
 import LeftPanel from './leftPanel/leftPanel.jsx';
@@ -233,42 +232,6 @@ class ConversationsApp extends MegaRenderMixin {
         megaChat.plugins.chatOnboarding.checkAndShowStep();
     }
 
-    createMeetingEndDlgIfNeeded() {
-        if (megaChat.initialPubChatHandle || megaChat.initialChatId) {
-            const chatRoom = megaChat.getCurrentRoom();
-
-            if (
-                !chatRoom ||
-                chatRoom.scheduledMeeting ||
-                !chatRoom.initialMessageHistLoaded /* haven't received the CALL info yet */ ||
-                megaChat.meetingDialogClosed === chatRoom.chatId
-            ) {
-                return null;
-            }
-
-            const activeCallIds = chatRoom.activeCallIds.keys();
-            if (
-                chatRoom.isMeeting &&
-                activeCallIds.length === 0 &&
-                (
-                    megaChat.initialPubChatHandle && chatRoom.publicChatHandle === megaChat.initialPubChatHandle ||
-                    chatRoom.chatId === megaChat.initialChatId
-                )
-            ) {
-                return (
-                    <MeetingsCallEndedDialog
-                        onClose={() => {
-                            // temporary, only available during the Standalone page when anonymous
-                            megaChat.meetingDialogClosed = chatRoom.chatId;
-                            megaChat.trackDataChange();
-                        }}
-                    />
-                );
-            }
-        }
-        return null;
-    }
-
     renderView(view) {
         this.setState({ view }, () => {
             const { $chatTreePanePs, routingSection } = megaChat;
@@ -306,7 +269,6 @@ class ConversationsApp extends MegaRenderMixin {
                     <ContactsPanel megaChat={megaChat} contacts={M.u} received={M.ipc} sent={M.opc}/>
                 )}
                 {!isLoading && routingSection === 'notFound' && <span><center>Section not found</center></span>}
-                {!isLoading && this.createMeetingEndDlgIfNeeded()}
                 {!isLoading && isEmpty &&
                     <EmptyConvPanel
                         isMeeting={view === MEETINGS}

@@ -139,7 +139,6 @@ class ChatRouting {
   reinitAndOpenExistingChat(chatId, publicChatHandle = false, cbBeforeOpen = undefined) {
     const chatUrl = "fm/chat/c/" + chatId;
     publicChatHandle = publicChatHandle || megaChat.initialPubChatHandle;
-    const meetingDialogClosed = megaChat.meetingDialogClosed;
     megaChat.destroy();
     is_chatlink = false;
     loadingDialog.pshow();
@@ -147,7 +146,6 @@ class ChatRouting {
       this.initFmAndChat(chatId).always(() => {
         megaChat.initialPubChatHandle = publicChatHandle;
         megaChat.initialChatId = chatId;
-        megaChat.meetingDialogClosed = meetingDialogClosed;
         const next = () => {
           mBroadcaster.once('pagechange', () => {
             onIdle(() => {
@@ -186,7 +184,6 @@ class ChatRouting {
   }
   reinitAndJoinPublicChat(chatId, initialPubChatHandle, publicChatKey) {
     initialPubChatHandle = initialPubChatHandle || megaChat.initialPubChatHandle;
-    const meetingDialogClosed = megaChat.meetingDialogClosed;
     megaChat.destroy();
     is_chatlink = false;
     loadingDialog.pshow();
@@ -194,7 +191,6 @@ class ChatRouting {
       this.initFmAndChat(chatId).then(() => {
         megaChat.initialPubChatHandle = initialPubChatHandle;
         megaChat.initialChatId = chatId;
-        megaChat.meetingDialogClosed = meetingDialogClosed;
         const mciphReq = megaChat.plugins.chatdIntegration.getMciphReqFromHandleAndKey(initialPubChatHandle, publicChatKey);
         const isReady = chatRoom => {
           if (chatRoom.state === ChatRoom.STATE.READY) {
@@ -11140,12 +11136,9 @@ Loading.NAMESPACE = 'meetings-loading';
 var meetings_button = __webpack_require__(193);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/workflow/preview.jsx
 var preview = __webpack_require__(889);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/meetingsCallEndedDialog.jsx
-var meetingsCallEndedDialog = __webpack_require__(238);
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 var ui_link = __webpack_require__(941);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/join.jsx
-
 
 
 
@@ -11425,9 +11418,6 @@ class Join extends mixins.wl {
     this.hidePanels();
     megaChat._joinDialogIsShown = true;
     alarm.hideAllWarningPopups();
-    if ($.dialog === meetingsCallEndedDialog.Z.dialogName) {
-      closeDialog();
-    }
     sessionStorage.removeItem('guestForced');
     if (!megaChat.hasSupportForCalls) {
       this.setState({
@@ -14038,8 +14028,6 @@ window.StartGroupChatDialogUI = {
 const startGroupChatWizard = ({
   StartGroupChatWizard
 });
-// EXTERNAL MODULE: ./js/chat/ui/meetings/meetingsCallEndedDialog.jsx
-var meetingsCallEndedDialog = __webpack_require__(238);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
 var call = __webpack_require__(200);
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
@@ -15535,7 +15523,6 @@ LeftPanel.NAMESPACE = 'lhp';
 
 
 
-
 const CONVERSATIONS_APP_VIEWS = {
   CHATS: 0x00,
   MEETINGS: 0x01,
@@ -15695,24 +15682,6 @@ class ConversationsApp extends mixins.wl {
     }
     megaChat.plugins.chatOnboarding.checkAndShowStep();
   }
-  createMeetingEndDlgIfNeeded() {
-    if (megaChat.initialPubChatHandle || megaChat.initialChatId) {
-      const chatRoom = megaChat.getCurrentRoom();
-      if (!chatRoom || chatRoom.scheduledMeeting || !chatRoom.initialMessageHistLoaded || megaChat.meetingDialogClosed === chatRoom.chatId) {
-        return null;
-      }
-      const activeCallIds = chatRoom.activeCallIds.keys();
-      if (chatRoom.isMeeting && activeCallIds.length === 0 && (megaChat.initialPubChatHandle && chatRoom.publicChatHandle === megaChat.initialPubChatHandle || chatRoom.chatId === megaChat.initialChatId)) {
-        return external_React_default().createElement(meetingsCallEndedDialog.Z, {
-          onClose: () => {
-            megaChat.meetingDialogClosed = chatRoom.chatId;
-            megaChat.trackDataChange();
-          }
-        });
-      }
-    }
-    return null;
-  }
   renderView(view) {
     this.setState({
       view
@@ -15760,7 +15729,7 @@ class ConversationsApp extends mixins.wl {
       contacts: M.u,
       received: M.ipc,
       sent: M.opc
-    }), !isLoading && routingSection === 'notFound' && external_React_default().createElement("span", null, external_React_default().createElement("center", null, "Section not found")), !isLoading && this.createMeetingEndDlgIfNeeded(), !isLoading && isEmpty && external_React_default().createElement(conversationpanel.L2, {
+    }), !isLoading && routingSection === 'notFound' && external_React_default().createElement("span", null, external_React_default().createElement("center", null, "Section not found")), !isLoading && isEmpty && external_React_default().createElement(conversationpanel.L2, {
       isMeeting: view === MEETINGS,
       onNewChat: () => this.setState({
         startGroupChatDialog: true
@@ -21189,85 +21158,6 @@ Call.isModerator = (chatRoom, handle) => {
 };
 Call.isExpanded = () => document.body.classList.contains(EXPANDED_FLAG);
 Call.getUnsupportedBrowserMessage = () => navigator.userAgent.match(/Chrom(e|ium)\/(\d+)\./) ? l.alert_unsupported_browser_version : l.alert_unsupported_browser;
-
-/***/ }),
-
-/***/ 238:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.d(__webpack_exports__, {
-"Z": () => (MeetingsCallEndedDialog)
-});
-var react0__ = __webpack_require__(363);
-var react0 = __webpack_require__.n(react0__);
-var _ui_modalDialogs_jsx1__ = __webpack_require__(182);
-var _mixins2__ = __webpack_require__(503);
-
-
-
-class MeetingsCallEndedDialog extends _mixins2__.wl {
-  constructor(props) {
-    super(props);
-    this.state = {
-      'safeShowDialogRendered': false
-    };
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    M.safeShowDialog(MeetingsCallEndedDialog.dialogName, () => {
-      this.setState({
-        'safeShowDialogRendered': true
-      });
-      return this.findDOMNode();
-    });
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    if ($.dialog === MeetingsCallEndedDialog.dialogName) {
-      closeDialog();
-    }
-  }
-  render() {
-    const {
-      onClose
-    } = this.props;
-    if (!this.state.safeShowDialogRendered) {
-      return null;
-    }
-    return react0().createElement(_ui_modalDialogs_jsx1__.Z.ModalDialog, {
-      className: "meetings-call-ended-dialog",
-      dialogType: "message",
-      title: l.meeting_ended,
-      buttons: [{
-        label: l.view_history,
-        key: "view",
-        className: "action",
-        onClick: onClose
-      }, {
-        label: l[81],
-        key: "ok",
-        className: "negative",
-        onClick: () => {
-          if (is_chatlink) {
-            is_chatlink = false;
-            delete megaChat.initialPubChatHandle;
-            megaChat.destroy();
-          }
-          loadSubPage(u_type === 0 ? 'register' : 'securechat');
-        }
-      }],
-      iconElement: react0().createElement("div", {
-        className: "avatar"
-      }, react0().createElement("div", {
-        "data-color": "color12",
-        className: "avatar-wrapper small-rounded-avatar color12"
-      }, "X")),
-      onClose: onClose
-    });
-  }
-}
-MeetingsCallEndedDialog.dialogName = 'meetings-ended-dialog';
 
 /***/ }),
 

@@ -191,7 +191,6 @@ export default class ChatRouting {
     reinitAndOpenExistingChat(chatId, publicChatHandle = false, cbBeforeOpen = undefined) {
         const chatUrl = "fm/chat/c/" + chatId;
         publicChatHandle = publicChatHandle || megaChat.initialPubChatHandle;
-        const meetingDialogClosed = megaChat.meetingDialogClosed;
         megaChat.destroy();
         is_chatlink = false;
 
@@ -202,7 +201,6 @@ export default class ChatRouting {
                 .always(() => {
                     megaChat.initialPubChatHandle = publicChatHandle;
                     megaChat.initialChatId = chatId;
-                    megaChat.meetingDialogClosed = meetingDialogClosed;
 
                     const next = () => {
                         mBroadcaster.once('pagechange', () => {
@@ -252,7 +250,6 @@ export default class ChatRouting {
     }
     reinitAndJoinPublicChat(chatId, initialPubChatHandle, publicChatKey) {
         initialPubChatHandle = initialPubChatHandle || megaChat.initialPubChatHandle;
-        const meetingDialogClosed = megaChat.meetingDialogClosed;
         megaChat.destroy();
         is_chatlink = false;
 
@@ -263,7 +260,6 @@ export default class ChatRouting {
                 .then(() => {
                     megaChat.initialPubChatHandle = initialPubChatHandle;
                     megaChat.initialChatId = chatId;
-                    megaChat.meetingDialogClosed = meetingDialogClosed;
 
                     // generate key for mciphReq
                     const mciphReq = megaChat.plugins.chatdIntegration.getMciphReqFromHandleAndKey(

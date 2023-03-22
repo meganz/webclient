@@ -1898,6 +1898,17 @@ ChatRoom.prototype.getMessageById = function(messageId) {
 };
 
 /**
+ * hasUserMessages
+ * @description Check if the current room has any chat history, excl. management messages
+ * @returns boolean
+ */
+
+ChatRoom.prototype.hasUserMessages = function() {
+    const { messages } = this.messagesBuff;
+    return !!messages.length && messages.some(m => m.messageHtml);
+};
+
+/**
  * Used to update the DOM element containing data about this room.
  * E.g. unread count
  */

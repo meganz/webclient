@@ -1620,7 +1620,7 @@ function init_page() {
         mega.redirect('mega.io', 'cmd', false, false);
     }
     else if (page == 'resellers') {
-        parsepage(pages['resellers']);
+        mega.redirect('mega.io', 'resellers', false, false);
     }
     else if (page === 'storage') {
         mega.redirect('mega.io', 'storage', false, false);
@@ -2782,7 +2782,7 @@ function topmenuUI() {
                     'about', 'account', 'keybackup', 'cmd', 'contact',
                     'copyright', 'corporate', 'credits', 'desktop', 'doc', 'extensions',
                     'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
-                    'mobile', 'register', 'resellers', 'sdk', 'sitemap', 'sourcecode',
+                    'mobile', 'register', 'sdk', 'sitemap', 'sourcecode',
                     'support', 'takedown', 'terms', 'start', 'security', 'affiliate',
                     'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
                     'achievements', 'objectstorage', 'megabackup'
@@ -2844,6 +2844,9 @@ function topmenuUI() {
                 }
                 else if (className.includes('blog')) {
                     window.open('https://blog.mega.io');
+                }
+                else if (className.includes('resellers')) {
+                    window.open('https://mega.io/resellers', '_blank', 'noopener,noreferrer');
                 }
             }
             return false;

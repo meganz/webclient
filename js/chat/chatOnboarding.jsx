@@ -3,86 +3,87 @@ import { CONVERSATIONS_APP_EVENTS, CONVERSATIONS_APP_VIEWS } from "./ui/conversa
 
 class ChatOnboarding {
 
-    scheduledOccurrencesMap = {
-        flag: OBV4_FLAGS.CHAT_SCHEDULE_OCCUR,
-        actions: [
-            {
-                type: 'showDialog',
-                dialogClass: 'mcob',
-                dialogTitle: l.onboard_megachat_dlg7b_title,
-                dialogDesc: l.onboard_megachat_dlg7b_text,
-                targetElmClass: `.conversationsApp .conversation-panel:not(.hidden)
-                                 .chatroom-occurrences-panel .chat-dropdown.header`,
-                targetElmPosition: 'left',
-                ignoreBgClick: true,
-                markComplete: true,
-            }
-        ],
-    };
-
-    feedbackMap = {
-        flag: OBV4_FLAGS.CHAT_FEEDBACK_NEW,
-        actions: [
-            {
-                type: 'showDialog',
-                dialogClass: 'mcob',
-                dialogTitle: l.onboard_megachat_dlg10_title,
-                dialogDesc: l.onboard_megachat_dlg10_text,
-                targetElmClass: '#fmholder button.js-more-menu.js-top-buttons',
-                targetElmPosition: 'left bottom',
-                targetHotSpot: true,
-                markComplete: true,
-                skipHidden: true,
-                ignoreBgClick: '.conversationsApp',
-                dialogNext: l[726],
-            }
-        ]
-    };
-
-    state = {
-        [OBV4_FLAGS.CHAT]: -1,
-        [OBV4_FLAGS.CHAT_SCHEDULE_NEW]: -1,
-        [OBV4_FLAGS.CHAT_SCHEDULE_ADDED]: -1,
-        [OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]: -1,
-        [OBV4_FLAGS.CHAT_SCHEDULE_CONF]: -1,
-        [OBV4_FLAGS.CHAT_FEEDBACK_NEW]: -1,
-        [OBV4_FLAGS.CHAT_CONTACT_PANE]: -1,
-    };
-
-    actions = {
-        [OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]: null,
-        [OBV4_FLAGS.CHAT_FEEDBACK_NEW]: null,
-    };
-
     finished = false;
 
     currentChatIsScheduled = false;
 
     constructor(megaChat) {
-        this.megaChat = megaChat;
-        this.flagMap = attribCache.bitMapsManager.exists('obv4')
-            ? attribCache.bitMapsManager.get('obv4')
-            : new MegaDataBitMap('obv4', false, Object.values(OBV4_FLAGS));
+        if (u_type === 3 && !is_mobile) {
+            this.scheduledOccurrencesMap = {
+                flag: OBV4_FLAGS.CHAT_SCHEDULE_OCCUR,
+                actions: [
+                    {
+                        type: 'showDialog',
+                        dialogClass: 'mcob',
+                        dialogTitle: l.onboard_megachat_dlg7b_title,
+                        dialogDesc: l.onboard_megachat_dlg7b_text,
+                        targetElmClass: `.conversationsApp .conversation-panel:not(.hidden)
+                                 .chatroom-occurrences-panel .chat-dropdown.header`,
+                        targetElmPosition: 'left',
+                        ignoreBgClick: true,
+                        markComplete: true,
+                    }
+                ],
+            };
 
-        // Fetch the current values of these keys to start tracking them
-        const keys = Object.keys(this.state);
-        const promises = keys.map(key => this.flagMap.get(key));
-        Promise.allSettled(promises).then(res => {
-            for (let i = 0; i < res.length; ++i) {
-                const v = res[i];
-                if (v.status === 'fulfilled') {
-                    this.state[keys[i]] = v.value;
+            this.feedbackMap = {
+                flag: OBV4_FLAGS.CHAT_FEEDBACK_NEW,
+                actions: [
+                    {
+                        type: 'showDialog',
+                        dialogClass: 'mcob',
+                        dialogTitle: l.onboard_megachat_dlg10_title,
+                        dialogDesc: l.onboard_megachat_dlg10_text,
+                        targetElmClass: '#fmholder button.js-more-menu.js-top-buttons',
+                        targetElmPosition: 'left bottom',
+                        targetHotSpot: true,
+                        markComplete: true,
+                        skipHidden: true,
+                        ignoreBgClick: '.conversationsApp',
+                        dialogNext: l[726],
+                    }
+                ]
+            };
+
+            this.state = {
+                [OBV4_FLAGS.CHAT]: -1,
+                [OBV4_FLAGS.CHAT_SCHEDULE_NEW]: -1,
+                [OBV4_FLAGS.CHAT_SCHEDULE_ADDED]: -1,
+                [OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]: -1,
+                [OBV4_FLAGS.CHAT_SCHEDULE_CONF]: -1,
+                [OBV4_FLAGS.CHAT_FEEDBACK_NEW]: -1,
+                [OBV4_FLAGS.CHAT_CONTACT_PANE]: -1,
+            };
+
+            this.actions = {
+                [OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]: null,
+                [OBV4_FLAGS.CHAT_FEEDBACK_NEW]: null,
+            };
+            this.megaChat = megaChat;
+            this.flagMap = attribCache.bitMapsManager.exists('obv4')
+                ? attribCache.bitMapsManager.get('obv4')
+                : new MegaDataBitMap('obv4', false, Object.values(OBV4_FLAGS));
+
+            // Fetch the current values of these keys to start tracking them
+            const keys = Object.keys(this.state);
+            const promises = keys.map(key => this.flagMap.get(key));
+            Promise.allSettled(promises).then(res => {
+                for (let i = 0; i < res.length; ++i) {
+                    const v = res[i];
+                    if (v.status === 'fulfilled') {
+                        this.state[keys[i]] = v.value;
+                    }
                 }
-            }
-        });
+            });
 
-        this.interval = setInterval(() => {
-            if (!$.dialog) {
-                this.checkAndShowStep();
-            }
-        }, 10000);
+            this.interval = setInterval(() => {
+                if (!$.dialog) {
+                    this.checkAndShowStep();
+                }
+            }, 10000);
 
-        this.initListeners();
+            this.initListeners();
+        }
     }
 
     initListeners() {
@@ -248,7 +249,7 @@ class ChatOnboarding {
 
     @SoonFcWrap(1000)
     checkAndShowStep() {
-        if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active) {
+        if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active || u_type < 3 || is_mobile) {
             // Invalid state to show or onboarding isn't ready
             return;
         }

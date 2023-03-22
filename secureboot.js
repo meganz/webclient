@@ -857,8 +857,7 @@ var mega = {
             }
         }
 
-        window.onload = window.onerror = null;
-        location.replace(to + (urlQs || ''));
+        window.open(to + (urlQs || ''), '_blank', 'noopener,noreferrer');
     },
 
     /**

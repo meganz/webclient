@@ -20622,7 +20622,7 @@ class Invite extends mixins.wl {
       className: "link-input-container"
     }, external_React_default().createElement(meetings_button.Z, {
       className: `mega-button large positive ${publicLink ? '' : 'disabled'}`,
-      onClick: () => publicLink && copyToClipboard(publicLink, l[371])
+      onClick: () => publicLink && copyToClipboard(`${getBaseUrl()}/${publicLink}`, l[371])
     }, !publicLink ? l[7006] : l[1394]), external_React_default().createElement(ui_link.Z, {
       className: "view-link-control",
       field: field,
@@ -20638,7 +20638,7 @@ class Invite extends mixins.wl {
     }), external_React_default().createElement("input", {
       type: "text",
       readOnly: true,
-      value: publicLink
+      value: `${getBaseUrl()}/${publicLink}`
     })))), HAS_CONTACTS() && external_React_default().createElement(Search, {
       value: value,
       placeholder: contactsInitial.length,

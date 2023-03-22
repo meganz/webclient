@@ -1930,12 +1930,12 @@ export class ConversationPanel extends MegaRenderMixin {
             </header>
             <section className="content">
                 <PerfectScrollbar className="description-scroller">
-                    <Emoji>
+                    <ParsedHTML>
                         {
-                            room.scheduledMeeting.description.replace(/\n/g, '<br>')
+                            megaChat.html(room.scheduledMeeting.description).replace(/\n/g, '<br>')
                             || l.schedule_no_desc /* `The description has been removed` */
                         }
-                    </Emoji>
+                    </ParsedHTML>
 
                 </PerfectScrollbar>
             </section>

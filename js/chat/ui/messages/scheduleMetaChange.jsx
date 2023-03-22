@@ -236,7 +236,9 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
                             </div>}
                             {mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description &&
                                 <div className="schedule-description">
-                                    <Emoji>{scheduledMeeting.description.replace(/\n/g, '<br>')}</Emoji>
+                                    <ParsedHTML>
+                                        {megaChat.html(scheduledMeeting.description).replace(/\n/g, '<br>')}
+                                    </ParsedHTML>
                                 </div>
                             }
                             {link && (

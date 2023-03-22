@@ -58,9 +58,10 @@ Message._getTextContentsForDialogType = function(message) {
         )
     ) {
         var textMessage = mega.ui.chat.getMessageString(
-                message.type || message.dialogType,
-                message.chatRoom.type === "group" || message.chatRoom.type === "public"
-            ) || "";
+            message.type || message.dialogType,
+            message.chatRoom.type === "group" || message.chatRoom.type === "public",
+            message.chatRoom.isMeeting
+        ) || "";
 
         // if is an array.
         var contact = Message.getContactForMessage(message);
@@ -87,10 +88,15 @@ Message._getTextContentsForDialogType = function(message) {
                 otherContact = M.u[message.meta.excluded[0]];
                 if (otherContact) {
                     if (otherContact.u === contact.u) {
-                        textMessage = l[8908];
+                        textMessage = message.chatRoom.isMeeting
+                            ? l.meeting_mgmt_left /* `Left the meeting.` */
+                            : l[8908] /* `Left the group chat.` */;
                     }
                     else {
-                        textMessage = l[8906].replace("%s", contactName);
+                        textMessage = (message.chatRoom.isMeeting
+                            ? l.meeting_mgmt_kicked /* `Was removed from the meeting by %s.` */
+                            : l[8906] /* `Was removed from the group chat by %s.` */)
+                            .replace("%s", contactName);
                     }
                 }
             }
@@ -100,6 +106,12 @@ Message._getTextContentsForDialogType = function(message) {
                     textMessage = (contact.u === otherContact.u) ?
                         l[23756] :
                         l[8907].replace("%s", contactName);
+                    if (message.chatRoom.isMeeting) {
+                        textMessage = contact.u === otherContact.u
+                            ? l.meeting_mgmt_user_joined /* `Joined the meeting` */
+                            : l.meeting_mgmt_user_added /* `Joined the meeting by invitation from %s.` */
+                                .replace('%s', contactName);
+                    }
                 }
             }
             else {
@@ -115,7 +127,8 @@ Message._getTextContentsForDialogType = function(message) {
         else if (message.dialogType === "remoteCallStarted") {
             textMessage = mega.ui.chat.getMessageString(
                 "call-started",
-                message.chatRoom.type === "group" || message.chatRoom.type === "public"
+                message.chatRoom.type === "group" || message.chatRoom.type === "public",
+                message.chatRoom.isMeeting
             );
 
             if (textMessage.splice) {
@@ -138,31 +151,32 @@ Message._getTextContentsForDialogType = function(message) {
             var meta = message.meta;
 
             var isGroupOrPublic = message.chatRoom.type === "group" || message.chatRoom.type === "public";
+            const { isMeeting } = message.chatRoom;
             if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CALL_ENDED || (
                 meta.reason === CallManager2.CALL_END_REMOTE_REASON.FAILED && meta.duration >= 5
             )) {
-                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.REJECTED) {
-                textMessage = mega.ui.chat.getMessageString("call-rejected", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-rejected", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CANCELED && contact.u === u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-canceled", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-canceled", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CANCELED && contact.u !== u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u !== u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u === u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-timeout", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-timeout", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.FAILED) {
-                textMessage = mega.ui.chat.getMessageString("call-failed", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-failed", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CALL_ENDED_BY_MODERATOR) {
-                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic, isMeeting);
             }
             else {
                 if (d) {

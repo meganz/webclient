@@ -442,6 +442,9 @@ function u_logout(logout) {
         localStorage.removeItem('registeremail');
 
         fminitialized = false;
+        if ($.leftPaneResizable) {
+            tryCatch(() => $.leftPaneResizable.destroy())();
+        }
         if (typeof mDBcls === 'function') {
             mDBcls(); // close fmdb
         }

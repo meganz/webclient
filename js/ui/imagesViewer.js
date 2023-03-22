@@ -252,10 +252,14 @@ var slideshowid;
         var $favButton = $('.context-menu .favourite', $overlay);
         var root = M.getNodeRoot(n && n.h || false);
 
-        if (!n || !n.p || root === M.InboxID || root === 'shares' && M.getNodeRights(n.p) < 2 ||
-            folderlink || root === M.RubbishID ||
-            (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)) {
-
+        if (!n
+            || !n.p
+            || root === M.InboxID
+            || root === 'shares'
+            || folderlink
+            || root === M.RubbishID
+            || (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)
+        ) {
             $favButton.addClass('hidden');
         }
         else {

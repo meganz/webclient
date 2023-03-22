@@ -4,7 +4,7 @@
 /******/ 	"use strict";
 /******/ 	// The require scope
 /******/ 	var __webpack_require__ = {};
-/******/
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
@@ -17,12 +17,12 @@
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 
@@ -866,10 +866,10 @@ class SvcDriver {
             if ((peer.av & Av.onHold)) {
                 continue;
             }
-            const player = peer.hiResPlayer;
-            if (player && player.slot) {
-                const props = player.slot.inTrack.getSettings();
-                area += props.width * props.height;
+            const slot = peer.hiResSlot;
+            if (slot) {
+                const props = slot.inTrack.getSettings();
+                area += (props.width || 0) * (props.height || 0);
             }
         }
         return area;
@@ -922,7 +922,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '4efe813891';
+const COMMIT_ID = '7a2d27038a';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -976,6 +976,9 @@ var TxTrackIndex;
 class SfuClient {
     constructor(userId, app, callKey, options) {
         this.peers = new Map();
+        this._numRxHiRes = 0;
+        this._numRxVthumb = 0;
+        this._numRxAudio = 0;
         this._isSharingScreen = false;
         this._muteCamera = false;
         this._muteAudio = false;
@@ -1046,13 +1049,13 @@ class SfuClient {
             delete this.keySetPromise;
         }
     }
-    isModerator() {
+    get isModerator() {
         return this.moderators ? this.moderators.has(this.userId) : true;
     }
-    isJoining() {
+    get isJoining() {
         return this._connState < ConnState.kCallJoined;
     }
-    isLeavingCall() {
+    get isLeavingCall() {
         return !isNaN(this.termCode);
     }
     get connState() {
@@ -1060,6 +1063,15 @@ class SfuClient {
     }
     get callJoinPermission() {
         return this._callJoinPermission;
+    }
+    get numRxHiRes() {
+        return this._numRxHiRes;
+    }
+    get numRxVthumb() {
+        return this._numRxVthumb;
+    }
+    get numRxAudio() {
+        return this._numRxAudio;
     }
     willReconnect() {
         if (this._forcedDisconnect) {
@@ -2183,7 +2195,6 @@ class SfuClient {
         }
     }
     _removePeer(peer) {
-        this._speakerDetector.unregisterPeer(peer);
         this.peers.delete(peer.cid);
         this.cryptoWorker.postMessage(['dpk', this.cid]);
     }
@@ -2779,30 +2790,9 @@ class SfuClient {
         let stats = this.rtcStats;
         stats.q = this._svcDriver.currRxQuality | (this._svcDriver.currTxQuality << 8);
         stats.av = this._sentAv;
-        let nrxa = 0;
-        let nrxl = 0;
-        let nrxh = 0;
-        for (let peer of this.peers.values()) {
-            if (peer.isSpeaker) {
-                nrxa++;
-            }
-            if ((peer.av & Av.onHold) === 0) {
-                let player = peer.hiResPlayer;
-                if (player && player.slot) {
-                    nrxh++;
-                }
-                player = peer.vThumbPlayer;
-                if (player) {
-                    let slot = player.slot;
-                    if (slot && !slot.isHiRes) {
-                        nrxl++;
-                    }
-                }
-            }
-        }
-        stats.nrxh = nrxh;
-        stats.nrxl = nrxl;
-        stats.nrxa = nrxa;
+        stats.nrxh = this._numRxHiRes;
+        stats.nrxl = this._numRxVthumb;
+        stats.nrxa = this._numRxAudio;
     }
     parseTxVideoStats(stats, isHiRes) {
         let getConnTotals = !this.hasConnStats;
@@ -2918,7 +2908,7 @@ class SfuClient {
         ];
     }
 }
-SfuClient.kProtocolVersion = 1;
+SfuClient.kProtocolVersion = 2;
 SfuClient.debugSdp = localStorage.debugSdp ? 1 : 0;
 SfuClient.kMaxVideoSlotsDefault = 24;
 SfuClient.kSpatialLayerCount = 3;
@@ -2937,6 +2927,7 @@ SfuClient.ConnState = ConnState;
 SfuClient.TermCode = termCodes;
 SfuClient.ScreenShareType = ScreenShareType;
 SfuClient.Av = Av;
+SfuClient.kZeroIv128 = new Uint8Array(16);
 SfuClient.msgHandlerMap = {
     "HELLO": SfuClient.prototype.msgHello,
     "AV": SfuClient.prototype.msgAv,
@@ -3082,7 +3073,6 @@ class Slot {
 class VideoSlot extends Slot {
     constructor(client, xponder, generateIv) {
         super(client, xponder, generateIv);
-        this.players = new Set();
         this.isHiRes = false;
         this.sentLayers = SfuClient.kSpatialLayerCount;
         this.rxStatsCallbacks = new Map; // key is a VideoPlayer object that receives the stats
@@ -3091,10 +3081,21 @@ class VideoSlot extends Slot {
     reassignV(peer, iv, isHiRes, trackReused, releaseCb) {
         this.isHiRes = isHiRes;
         if (peer !== this.peer || !trackReused) {
-            this._detachAllPlayers();
+            this.release();
         }
         this._releaseTrackCb = releaseCb;
         super.reassign(peer, iv);
+        if (this.isHiRes) {
+            this.players = peer.hiResPlayers;
+            this.client._numRxHiRes++;
+        }
+        else {
+            this.players = peer.vThumbPlayers;
+            this.client._numRxVthumb++;
+        }
+        for (const player of this.players) {
+            player._attachToTrack(this);
+        }
     }
     setEncoderParams(cb) {
         let sender = this.xponder.sender;
@@ -3133,18 +3134,25 @@ class VideoSlot extends Slot {
         return sender.setParameters(params);
     }
     */
-    _detachAllPlayers() {
-        if (!this.players.size) {
+    /** Detaches all players and marks the slot as unused */
+    release() {
+        if (!this.players) {
+            this.active = false;
             return;
         }
-        for (let player of this.players) {
-            player._onTrackGone(this);
-        }
         if (this.players.size) {
-            console.error("Soft assert: not all players destroyed");
+            for (const player of this.players) {
+                player._onTrackGone(this);
+            }
+            if (this.players.size) {
+                console.error("Soft assert: not all players destroyed");
+            }
         }
+        delete this.players;
     }
+    /** Called by video players when they are detached */
     _onDetachedFromPlayer(player) {
+        client_assert(this.players);
         if (!this.players.has(player)) {
             do {
                 if (window.d) {
@@ -3153,31 +3161,39 @@ class VideoSlot extends Slot {
             } while (0);
             return;
         }
+        this.rxStatsCallbacks.delete(player);
         this.players.delete(player);
         // LOGW(`slot ${this.isHiRes ? "hires":"lores"} detach from player -> refcnt =`, this.players.size);
-        if (!this.players.size && this._releaseTrackCb) {
+        if (!this.players.size) {
             this.active = false;
+            delete this.players;
             this._releaseTrackCb();
+            if (this.isHiRes) {
+                this.client._numRxHiRes--;
+            }
+            else {
+                this.client._numRxVthumb--;
+            }
         }
-    }
-    _onAttachedToPlayer(player) {
-        if (this.players.has(player)) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "Slot.attachToPlayer: Already attached to that player");
-                }
-            } while (0);
-            return;
-        }
-        this.players.add(player);
-        // LOGW("slot ${this.isHiRes ? "hires":"lores"} attach to player -> refcnt =", this.players.size);
     }
 }
 class VideoPlayer {
-    constructor(peer, isHiRes) {
+    constructor(peer, isHiRes, guiCreateCb) {
         this.peer = peer;
         this._isHiRes = !!isHiRes;
-        this.gui = peer.client.app.onNewPlayer(this);
+        this.gui = guiCreateCb(this);
+        if (isHiRes) {
+            peer.hiResPlayers.add(this);
+            if (peer.hiResSlot) {
+                this._attachToTrack(peer.hiResSlot);
+            }
+        }
+        else {
+            peer.vThumbPlayers.add(this);
+            if (peer.vThumbSlot) {
+                this._attachToTrack(peer.vThumbSlot);
+            }
+        }
     }
     get isHiRes() {
         return this._isHiRes;
@@ -3188,12 +3204,12 @@ class VideoPlayer {
     get track() {
         return this.slot ? this.slot.inTrack : null;
     }
-    attachToTrack(slot) {
+    _attachToTrack(slot) {
         client_assert(slot);
         if (slot === this.slot) {
             do {
                 if (window.d) {
-                    console.warn(client_kLogTag, "VideoPlayer.attachToTrack: Already attached to that slot");
+                    console.warn(client_kLogTag, "VideoPlayer._attachToTrack: Already attached to that slot");
                 }
             } while (0);
             return;
@@ -3207,7 +3223,6 @@ class VideoPlayer {
             } while (0);
         }
         this.slot = slot;
-        slot._onAttachedToPlayer(this);
         this.gui.attachToTrack(slot.inTrack);
         if (this.gui.onRxStats) {
             slot.rxStatsCallbacks.set(this, this.gui.onRxStats.bind(this.gui));
@@ -3223,54 +3238,61 @@ class VideoPlayer {
             return;
         }
         this.gui.detachFromTrack();
-        slot.rxStatsCallbacks.delete(this);
         slot._onDetachedFromPlayer(this);
         delete this.slot;
         return true;
     }
     destroy() {
-        this._detachFromCurrentTrack();
-        this.gui.onDestroy();
+        if (this.isDestroyed) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "VideoPlayer.destroy: Already destroyed");
+                }
+            } while (0);
+            return;
+        }
+        this._detachFromCurrentTrack(); // manages refcounting and deletion from vThumbPlayers and hiResPlayers sets
+        this.gui.onPlayerDestroy();
         this.isDestroyed = true;
     }
 }
-class ThumbPlayer extends VideoPlayer {
-    constructor(peer) {
-        super(peer);
-        peer.vThumbPlayer = this;
+class AudioPlayer {
+    constructor(peer, slot) {
+        this.slowAudioLevel = 0.0;
+        this.peer = peer;
+        this.slot = slot;
+        peer.client._numRxAudio++;
+        this.onAudioLevel = peer._onAudioLevel;
+        // connect track to a player
+        const rx = this.receiver = slot.xponder.receiver;
+        const player = this.playerElem = document.createElement("audio");
+        this.peer.client._speakerDetector.registerPeer(this);
+        playerPlay(player, rx.track);
+    }
+    pollAudioLevel(trackSlow) {
+        if (!this.receiver) {
+            return 0.0;
+        }
+        const info = this.receiver.getSynchronizationSources()[0];
+        if (!info) {
+            return 0.0;
+        }
+        let currLevel = info.audioLevel;
+        if (currLevel === undefined) {
+            currLevel = 0.0;
+        }
+        if (this.onAudioLevel) {
+            this.onAudioLevel(currLevel);
+        }
+        return trackSlow
+            ? (this.slowAudioLevel = (this.slowAudioLevel * 9 + currLevel) / 10)
+            : undefined;
     }
     destroy() {
-        if (this.isDestroyed) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "ThumbPlayer.destroy: already destroyed");
-                }
-            } while (0);
-            return;
-        }
-        client_assert(this.peer.vThumbPlayer === this);
-        super.destroy();
-        this.peer.onVthumbPlayerDestroy();
-    }
-}
-class HiResPlayer extends VideoPlayer {
-    constructor(peer, resDivider) {
-        super(peer, true);
-        this.resDivider = resDivider || 0;
-        peer.hiResPlayer = this;
-    }
-    destroy() {
-        if (this.isDestroyed) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "HiResPlayer.destroy: already destroyed");
-                }
-            } while (0);
-            return;
-        }
-        super.destroy();
-        client_assert(this.peer.hiResPlayer === this);
-        this.peer.onHiResPlayerDestroy();
+        const client = this.peer.client;
+        client._speakerDetector.unregisterPeer(this);
+        playerStop(this.playerElem);
+        client._numRxAudio--;
     }
 }
 function playerPlay(player, track) {
@@ -3310,8 +3332,10 @@ class Peer {
         this._isSpeaker = false;
         this._audioLevel = 0;
         this._speakReq = false;
+        this.vThumbPlayers = new Set();
+        this.hiResPlayers = new Set();
+        this.hiResDivider = 0;
         this.audioPktLoss = 0;
-        this.slowAudioLevel = 0;
         client_assert(info.cid);
         client_assert(info.userId);
         client_assert(info.av != null);
@@ -3319,6 +3343,7 @@ class Peer {
         this.handler = client.app;
         this.cid = info.cid;
         this.userId = info.userId;
+        this.version = info.v;
         this.av = info.av;
         this.strIvs = info.ivs;
         this.keyDecryptIv = hexToBin(this.strIvs[0] + this.strIvs[1].substring(0, 8));
@@ -3338,6 +3363,7 @@ class Peer {
     get isSpeaker() { return this._isSpeaker; }
     get audioLevel() { return this._audioLevel; }
     get speakRequested() { return this._speakReq; }
+    get isLeavingCall() { return this.isLeaving; }
     setSpeakReq() {
         if (this._speakReq) {
             return;
@@ -3373,7 +3399,7 @@ class Peer {
             name: "HKDF", hash: "SHA-256",
             salt: hexToBin([this.strIvs[1], this.strIvs[2], this.client.strIvs[1], this.client.strIvs[2]].sort().join('')),
             info: new Uint8Array([])
-        }, hkdfKey, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+        }, hkdfKey, { name: this.version === 1 ? "AES-GCM" : "AES-CBC", length: 256 }, false, ["encrypt", "decrypt"]);
     }
     async encryptKey(key) {
         let encKey;
@@ -3389,7 +3415,23 @@ class Peer {
                 sharedKey = this.sessSharedKey;
             }
             client_assert(sharedKey.usages);
-            const encKeyBin = await crypto.subtle.encrypt({ name: "AES-GCM", iv: this.client.keyEncryptIv, tagLength: 32 }, sharedKey, key);
+            let encKeyBin;
+            if (this.version === 1) {
+                encKeyBin = await crypto.subtle.encrypt({ name: "AES-GCM", iv: this.client.keyEncryptIv, tagLength: 32 }, sharedKey, key);
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Encrypting key with AES-GCM for protocol v1 peer");
+                    }
+                } while (0);
+            }
+            else {
+                encKeyBin = await crypto.subtle.encrypt({ name: "AES-CBC", iv: SfuClient.kZeroIv128 }, sharedKey, key);
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Encrypting key with AES-CBC for protocol v2 peer");
+                    }
+                } while (0);
+            }
             encKey = base64ArrEncode(encKeyBin);
         }
         else { // old clients, using chat keys
@@ -3424,91 +3466,78 @@ class Peer {
                 sharedKey = this.sessSharedKey;
             }
             client_assert(sharedKey.usages);
-            return crypto.subtle.decrypt({ name: "AES-GCM", iv: this.keyDecryptIv, tagLength: 32 }, sharedKey, base64DecodeToArr(key).buffer);
+            return this.version === 1
+                ? crypto.subtle.decrypt({ name: "AES-GCM", iv: this.keyDecryptIv, tagLength: 32 }, sharedKey, base64DecodeToArr(key).buffer)
+                : crypto.subtle.decrypt({ name: "AES-CBC", iv: SfuClient.kZeroIv128 }, sharedKey, base64DecodeToArr(key).buffer);
         }
         else { // old clients, using chat keys
             return this.client.app.decryptKeyFromUser(key, this.userId);
-        }
-    }
-    onVthumbPlayerDestroy() {
-        delete this.vThumbPlayer;
-    }
-    onHiResPlayerDestroy() {
-        delete this.hiResPlayer;
-        if (this.isLeaving) {
-            return;
-        }
-        const vtp = this.vThumbPlayer;
-        if (vtp && vtp.slot && vtp.slot.isHiRes) {
-            this.client.send({ a: "GET_VTHUMBS", cids: [this.cid] });
         }
     }
     destroy(reason) {
         this.isLeaving = true;
         this.delSpeakReq();
         this.client._removePeer(this);
-        if (this.hiResPlayer) {
-            this.hiResPlayer.destroy();
-            client_assert(!this.hiResPlayer);
-        }
-        if (this.vThumbPlayer) {
-            this.vThumbPlayer.destroy();
-            client_assert(!this.vThumbPlayer);
-        }
         if (this.audioPlayer) {
-            this.client._speakerDetector.unregisterPeer(this);
-            playerStop(this.audioPlayer);
+            this.audioPlayer.destroy();
             delete this.audioPlayer;
         }
+        for (const player of this.hiResPlayers) {
+            player.destroy();
+        }
+        client_assert(!this.hiResPlayers.size);
+        for (const player of this.vThumbPlayers) {
+            player.destroy();
+        }
+        client_assert(!this.vThumbPlayers.size);
         this._fire("onPeerLeft", reason);
     }
-    get hasThumbnailVideo() { return this.vThumbPlayer != null; }
-    get hasHiresVideo() { return this.hiResPlayer != null; }
-    requestThumbnailVideo() {
-        if (this.vThumbPlayer) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "Peer.requestThumbnailVideo: Already requested (player exists)");
-                }
-            } while (0);
-            return this.vThumbPlayer.gui;
+    get receivingThumbVideo() { return this.vThumbPlayers.size > 0; }
+    get receivingHiResVideo() { return this.hiResPlayers.size > 0; }
+    getThumbVideo(guiCreateCb, reuseHiRes) {
+        const player = new VideoPlayer(this, false, guiCreateCb);
+        if (this.vThumbPlayers.size === 1 || reuseHiRes) {
+            // we had no vthumb track and players, or we had all vthumb players hooked to the hi-res track
+            this.client.send({ a: "GET_VTHUMBS", cids: [this.cid], ...(reuseHiRes && { r: 1 }) });
         }
-        let player = new ThumbPlayer(this);
-        this.client.send({ a: "GET_VTHUMBS", cids: [this.cid] });
-        return player.gui;
+        return player;
     }
-    requestHiResVideo(resDivider, reuseVthumb) {
-        let player = this.hiResPlayer;
-        if (player) {
-            if (player.resDivider != resDivider) {
-                do {
-                    if (window.d) {
-                        console.warn(client_kLogTag, "Peer.requestHiResVideo: Already requested, but with different res divider, updating it");
-                    }
-                } while (0);
-                this.setHiResDivider(resDivider || 0);
-            }
-            else {
-                do {
-                    if (window.d) {
-                        console.warn(client_kLogTag, "Peer.requestHiResVideo: Already requested (player exists)");
-                    }
-                } while (0);
-            }
-            return player.gui;
+    stopThumbVideo() {
+        for (const player of this.vThumbPlayers) {
+            player.destroy();
         }
-        player = new HiResPlayer(this, resDivider);
-        let cmd = { a: "GET_HIRES", cid: this.cid };
-        if (resDivider) {
-            cmd.lo = resDivider;
+    }
+    getHiResVideo(resDivider, guiCreateCb, reuseVthumb) {
+        const player = new VideoPlayer(this, true, guiCreateCb);
+        if (this.hiResPlayers.size === 1 || reuseVthumb) {
+            this.hiResDivider = resDivider;
+            this.client.send({
+                a: "GET_HIRES",
+                cid: this.cid,
+                ...(resDivider && { lo: resDivider }),
+                ...(reuseVthumb && { r: 1 })
+            });
         }
-        if (reuseVthumb) {
-            cmd.r = 1;
+        else if (this.hiResDivider !== resDivider) {
+            this.setHiResDivider(resDivider);
         }
-        this.client.send(cmd);
-        return player.gui;
+        return player;
+    }
+    stopHiResVideo() {
+        for (const player of this.hiResPlayers) {
+            player.destroy();
+        }
+    }
+    _sendDelVthumbs() {
+        if (!this.isLeaving) {
+            this.client.send({ a: "DEL_VTHUMBS", cids: [this.cid] });
+        }
     }
     incomingVthumbTrack(mid, reused) {
+        if (!this.vThumbPlayers.size) { // all players were deleted before the server responded
+            this._sendDelVthumbs();
+            return;
+        }
         const slot = this.client.inVideoTracks.get(mid);
         if (!slot) {
             this.client.logError("Unknown vtrack mid", mid);
@@ -3519,17 +3548,19 @@ class Peer {
             if (slot === this.vThumbSlot) {
                 delete this.vThumbSlot;
             }
-            if (!this.isLeaving) {
-                this.client.send({ a: "DEL_VTHUMBS", cids: [this.cid] });
-            }
+            this._sendDelVthumbs();
         });
-        if (!this.vThumbPlayer) {
-            new ThumbPlayer(this);
-            client_assert(this.vThumbPlayer);
+    }
+    _sendDelHires() {
+        if (!this.isLeaving) {
+            this.client.send({ a: "DEL_HIRES", cids: [this.cid] });
         }
-        this.vThumbPlayer.attachToTrack(slot);
     }
     incomingHiResVideoTrack(mid, reused) {
+        if (!this.hiResPlayers.size) {
+            this._sendDelHires();
+            return;
+        }
         const slot = this.client.inVideoTracks.get(mid);
         if (!slot) {
             this.client.logError("Unknown vtrack mid", mid);
@@ -3538,31 +3569,20 @@ class Peer {
         this.hiResSlot = slot;
         if (this.vThumbSlot === slot) {
             client_assert(reused);
-            delete this.vThumbSlot;
         }
         slot.reassignV(this, this.strIvs[TxTrackIndex.kHiRes], true, reused, () => {
-            if (this.hiResSlot === slot) {
+            if (slot === this.hiResSlot) {
                 delete this.hiResSlot;
             }
-            if (!this.isLeaving) {
-                this.client.send({ a: "DEL_HIRES", cids: [this.cid] });
+            this._sendDelHires();
+            if (this.vThumbSlot === slot) { // reused for vthumb, re-request vthumb
+                delete this.vThumbSlot;
+                slot.release(); // not strictly needed, but makes things more explicit
+                this.client.send({ a: "GET_VTHUMBS", cids: [this.cid], r: 1 });
             }
         });
-        if (!this.hiResPlayer) {
-            new HiResPlayer(this);
-            client_assert(this.hiResPlayer);
-        }
-        this.hiResPlayer.attachToTrack(slot);
     }
     setHiResDivider(divider) {
-        if (!this.hiResPlayer) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "setHiResDivider: Currently not receiving a hi-res stream for this peer");
-                }
-            } while (0);
-            return;
-        }
         if (divider < 0 || divider > 2) {
             do {
                 if (window.d) {
@@ -3571,8 +3591,13 @@ class Peer {
             } while (0);
             return;
         }
-        this.hiResPlayer.resDivider = divider;
-        this.client.send({ a: "HIRES_SET_LO", cid: this.cid, lo: divider });
+        if (divider === this.hiResDivider) {
+            return;
+        }
+        this.hiResDivider = divider;
+        if (this.hiResPlayers.size) {
+            this.client.send({ a: "HIRES_SET_LO", cid: this.cid, lo: divider });
+        }
     }
     onAvChange(msg) {
         const av = msg.av;
@@ -3607,18 +3632,18 @@ class Peer {
         }
     }
     _notifyPlayers(event, ...args) {
-        if (this.vThumbPlayer) {
-            let playerGui = this.vThumbPlayer.gui;
-            let handler = playerGui[event];
+        for (const player of this.vThumbPlayers) {
+            const gui = player.gui;
+            const handler = gui[event];
             if (handler) {
-                handler.call(playerGui, ...args);
+                handler.call(gui, ...args);
             }
         }
-        if (this.hiResPlayer) {
-            let playerGui = this.hiResPlayer.gui;
-            let handler = playerGui[event];
+        for (const player of this.hiResPlayers) {
+            const gui = player.gui;
+            const handler = gui[event];
             if (handler) {
-                handler.call(playerGui, ...args);
+                handler.call(gui, ...args);
             }
         }
     }
@@ -3645,13 +3670,7 @@ class Peer {
             return;
         }
         slot.reassign(this, this.strIvs[TxTrackIndex.kAudio]);
-        // connect track to a player
-        const rx = this.audioReceiver = slot.xponder.receiver;
-        const player = this.audioPlayer = document.createElement("audio");
-        playerPlay(player, rx.track);
-        // setup speaker detector
-        this.slowAudioLevel = 0.0;
-        this.client._speakerDetector.registerPeer(this);
+        this.audioPlayer = new AudioPlayer(this, slot);
     }
     onNoSpeaker() {
         if (!this._isSpeaker) {
@@ -3674,32 +3693,16 @@ class Peer {
             } while (0);
             return;
         }
-        playerStop(this.audioPlayer);
-        this.client._speakerDetector.unregisterPeer(this);
+        if (this.audioPlayer) {
+            this.audioPlayer.destroy(); // audioPlayer must exist, but just in case
+        }
         delete this.audioPlayer;
-        delete this.audioReceiver;
     }
     requestAudioLevel(cb) {
-        this._onAudioLevel = cb;
-    }
-    pollAudioLevel(trackSlow) {
-        if (!this.audioReceiver) {
-            return 0.0;
+        this._onAudioLevel = cb; // need this saved in Peer, to survive between AudioPlayer instances
+        if (this.audioPlayer) {
+            this.audioPlayer.onAudioLevel = cb;
         }
-        let info = this.audioReceiver.getSynchronizationSources()[0];
-        if (!info) {
-            return 0.0;
-        }
-        let currLevel = info.audioLevel;
-        if (currLevel == null) {
-            currLevel = 0.0;
-        }
-        if (this._onAudioLevel) {
-            this._onAudioLevel(currLevel);
-        }
-        return trackSlow
-            ? this.slowAudioLevel = (this.slowAudioLevel * 9 + currLevel) / 10
-            : undefined;
     }
     _fire(evName, ...args) {
         let method = this.handler[evName];
@@ -3859,14 +3862,14 @@ MicMuteMonitor.kMicMutedDetectThreshold = 0.00001;
 MicMuteMonitor.kWarningTimeoutMs = 16000;
 class SpeakerDetector {
     constructor(client) {
-        this.peers = new Set();
+        this.players = new Set();
         this.tsLastChange = 0;
         this.client = client;
         this.enable(false);
     }
     enable(enable) {
         this.enabled = enable;
-        if (!this.peers.size) {
+        if (!this.players.size) {
             return;
         }
         this.deleteTimer();
@@ -3880,61 +3883,63 @@ class SpeakerDetector {
         clearInterval(this.timer);
         delete this.timer;
     }
-    registerPeer(peer) {
-        this.peers.add(peer);
+    registerPeer(player) {
+        this.players.add(player);
         if (!this.timer) {
             this.enable(this.enabled);
         }
     }
-    unregisterPeer(peer) {
-        this.peers.delete(peer);
-        if (this.currSpeaker === peer) {
+    unregisterPeer(player) {
+        this.players.delete(player);
+        if (this.currSpeaker === player) {
             delete this.currSpeaker;
         }
-        if (!this.peers.size) {
+        if (!this.players.size) {
             this.deleteTimer();
         }
     }
     _onTimerTick_passive() {
-        for (let peer of this.peers) {
-            peer.pollAudioLevel();
+        for (const player of this.players) {
+            player.pollAudioLevel();
         }
     }
     _onTimerTick_active() {
         let maxLevel = SfuClient.kSpeakerVolThreshold;
-        let maxPeer = null;
-        for (let peer of this.peers) {
-            let level = peer.pollAudioLevel(true);
+        let maxPlayer = null;
+        for (const player of this.players) {
+            const level = player.pollAudioLevel(true);
             if (level > maxLevel) {
                 maxLevel = level;
-                maxPeer = peer;
+                maxPlayer = player;
             }
         }
-        if (!maxPeer) {
+        if (!maxPlayer) {
             return;
         }
         let now = Date.now();
         let client = this.client;
         let ourLevel = (now - client.tsMicAudioLevel < 1500) ? client.micAudioLevel : 0;
         if (ourLevel > maxLevel) {
-            maxPeer = null;
+            maxPlayer = null;
         }
-        if (maxPeer === this.currSpeaker) {
+        if (maxPlayer === this.currSpeaker) {
             return;
         }
         if (now - this.tsLastChange < SfuClient.kSpeakerChangeMinInterval) {
             return;
         }
         this.tsLastChange = now;
-        let prev = this.currSpeaker;
-        this.currSpeaker = maxPeer;
-        if (maxPeer) {
+        const prev = this.currSpeaker ? this.currSpeaker.peer : null;
+        this.currSpeaker = maxPlayer;
+        if (maxPlayer) {
+            const peer = maxPlayer.peer;
             do {
                 if (window.d) {
-                    console.warn(client_kLogTag, "Active speaker changed to", maxPeer.userId);
+                    console.warn(client_kLogTag, "Active speaker changed to", peer.userId);
                 }
             } while (0);
-            client_assert(this.client.peers.get(maxPeer.cid));
+            client_assert(this.client.peers.get(peer.cid));
+            this.client.app.onActiveSpeakerChange(peer, prev);
         }
         else {
             do {
@@ -3942,8 +3947,8 @@ class SpeakerDetector {
                     console.warn(client_kLogTag, "Active speaker changed to us");
                 }
             } while (0);
+            this.client.app.onActiveSpeakerChange(null, prev);
         }
-        this.client.app.onActiveSpeakerChange(maxPeer, prev);
     }
 }
 class StatsRecorder {

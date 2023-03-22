@@ -307,9 +307,10 @@ export default class Recurring extends MegaRenderMixin {
                 <div className="recurring-field-row">
                     <div
                         className="recurring-radio-buttons"
-                        onChange={({ target }) => {
-                            if (target.name === `${Recurring.NAMESPACE}-radio-monthRule`) {
-                                this.setState({ monthRule: target.value });
+                        onClick={ev => {
+                            const { name, value } = ev.target;
+                            if (name === `${Recurring.NAMESPACE}-radio-monthRule`) {
+                                this.setState({ monthRule: value });
                             }
                         }}>
                         <div className="recurring-label-wrap">

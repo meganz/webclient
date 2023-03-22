@@ -68,10 +68,7 @@
             super({
                 'clientId': null,
                 'userHandle': null,
-                'audioMuted': null,
-                'videoMuted': null,
-                'haveScreenshare': null,
-                'isOnHold': null,
+                'av': null,
                 'isVisible': null,
                 'isActive': null,
                 'lastSpeaktime': null,
@@ -98,17 +95,12 @@
         get name() {
             return M.getNameByHandle(this.userHandle);
         }
-        setResState(newState, video) {
+        setResState(newState) {
             const oldSource = this.source;
             this.resState = newState;
-            if (video) {
-                this.source = video;
-            }
-            else {
-                this.source = (newState === RES_STATE.HD || newState === RES_STATE.THUMB_PENDING)
-                    ? (this.sfuPeer.hiResPlayer && this.sfuPeer.hiResPlayer.gui.video)
-                    : (this.sfuPeer.vThumbPlayer && this.sfuPeer.vThumbPlayer.gui.video);
-            }
+            this.source = (newState === RES_STATE.HD || newState === RES_STATE.THUMB_PENDING)
+                ? (this.hiResPlayer && this.hiResPlayer.gui.video)
+                : (this.vThumbPlayer && this.vThumbPlayer.gui.video);
             // console.warn(`setResState[${this.clientId}]: ->`, newState, this.source);
             if (this.source !== oldSource) {
                 this.updateConsumerVideos();
@@ -120,10 +112,12 @@
             return !(av & Av.onHold) && (av & Av.Video);
         }
         onAvChange(av) {
-            this.audioMuted = !(av & SfuClient.Av.Audio);
-            this.videoMuted = !(av & SfuClient.Av.Camera);
-            this.haveScreenshare = !!(av & SfuClient.Av.Screen);
-            this.isOnHold = !!(av & SfuClient.Av.onHold);
+            const Av = SfuClient.Av;
+            this.audioMuted = !(av & Av.Audio);
+            this.videoMuted = !(av & Av.Camera);
+            this.haveScreenAndCam = (av & Av.ScreenHiRes) && (av & Av.CameraLowRes);
+            this.isOnHold = !!(av & Av.onHold);
+            this.av = av;
         }
         registerConsumer(consumerGui) {
             this.consumers.add(consumerGui);
@@ -166,7 +160,8 @@
             this.doGetVideoWithQuality(newQ);
         }
         noVideoSlotsForSmoothSwitch() {
-            return this.call.numVideoTracksUsed < SfuClient.numInputVideoTracks - 1;
+            const sfuClient = this.call.sfuClient;
+            return sfuClient.numRxHiRes + sfuClient.numRxVthumb >= sfuClient.numInputVideoTracks - 1;
         }
         /** Get a video stream that satisfies the quality minimum for all consumers
          * @returns {boolean} - true if video source changed synchronously, which can happen only if video was disabled,
@@ -216,87 +211,105 @@
                 this.requestHdStream(4 - newQuality); // convert quality to resolution divider
             }
             else if (newQuality === VIDEO_QUALITY.THUMB) {
-                this.requestThumbStream();
+                if (this.haveScreenAndCam) {
+                    this.requestHdStream(2);
+                }
+                else {
+                    this.requestThumbStream();
+                }
             }
             else if (newQuality === VIDEO_QUALITY.NO_VIDEO) {
                 this.setResState(RES_STATE.NO_VIDEO);
                 const { sfuPeer } = this;
-                if (sfuPeer.hiResPlayer) {
-                    sfuPeer.hiResPlayer.destroy();
-                }
-                if (sfuPeer.vThumbPlayer) {
-                    sfuPeer.vThumbPlayer.destroy();
-                }
+                sfuPeer.stopHiResVideo();
+                this.delVthumbPlayer();
             }
         }
         updateConsumerVideos() {
             for (const cons of this.consumers) {
-                cons.updateVideoElem();
+                cons.updateDynamicVideoElem();
             }
             this._consumersUpdated = true;
         }
+        delVthumbPlayer() {
+            if (this.vThumbPlayer) {
+                this.vThumbPlayer.destroy();
+            }
+        }
         requestHdStream(resDivider) {
             const peer = this.sfuPeer;
-            if (this.noVideoSlotsForSmoothSwitch() && peer.vThumbPlayer) {
-                peer.vThumbPlayer.destroy();
+            if (peer.isLeavingCall) {
+                console.error("SoftAssert: requestHdStream on a deleted peer");
+                return;
             }
-            const hdPlayer = peer.hiResPlayer;
-            if (hdPlayer) {
+            if (this.hiResPlayer) {
                 this.setResState(RES_STATE.HD);
-                if (resDivider !== hdPlayer.resDivider) {
-                    peer.setHiResDivider(resDivider);
-                }
+                peer.setHiResDivider(resDivider);
                 return;
             }
             // request hi-res stream
-            this.setResState(RES_STATE.HD_PENDING);
-            const gui = peer.requestHiResVideo(resDivider);
-            if (!gui) {
-                console.error("SoftAssert: requestHiResVideo on a deleted peer");
-                return;
+            if (this.noVideoSlotsForSmoothSwitch()) { // FIXME: disable this if .presenterVideo ?
+                this.delVthumbPlayer();
             }
-            gui.onPlay = () => {
+            this.setResState(RES_STATE.HD_PENDING);
+            this.hiResPlayer = peer.getHiResVideo(resDivider, (sfuPlayer) => {
+                return new PlayerCtx(this.call, sfuPlayer);
+            });
+            this.hiResPlayer.gui.onPlay = () => {
                 if (this.resState !== RES_STATE.HD_PENDING) {
                     return false;
                 }
-                if (peer.vThumbPlayer) {
-                    peer.vThumbPlayer.destroy();
-                }
+                this.delVthumbPlayer();
                 this.setResState(RES_STATE.HD);
                 return true;
             };
         }
         requestThumbStream() {
             const peer = this.sfuPeer;
-            if (peer.vThumbPlayer) {
-                this.setResState(RES_STATE.THUMB);
-                if (peer.hiResPlayer) {
-                    peer.hiResPlayer.destroy();
-                }
+            if (peer.isLeavingCall) {
+                console.error("softAssert: requestThumbStream on a deleted peer");
                 return;
             }
-            if (this.noVideoSlotsForSmoothSwitch() && peer.hiResPlayer) {
-                peer.hiResPlayer.destroy();
+            if (this.vThumbPlayer) {
+                this.setResState(RES_STATE.THUMB);
+                peer.stopHiResVideo();
+                return;
+            }
+            if (this.noVideoSlotsForSmoothSwitch()) {
+                peer.stopHiResVideo();
             }
             this.setResState(RES_STATE.THUMB_PENDING);
-            const gui = peer.requestThumbnailVideo();
-            if (!gui) {
-                console.error("SoftAssert: requestThumbnailVideo on a deleted peer");
-                return;
-            }
-            gui.onPlay = () => {
+            this.vThumbPlayer = peer.getThumbVideo((player) => {
+                return new PlayerCtx(this.call, player);
+            });
+            this.vThumbPlayer.gui.onPlay = () => {
                 if (this.resState !== RES_STATE.THUMB_PENDING) {
-                    if (this.resState === RES_STATE.HD && peer.vThumbPlayer) {
+                    if (this.resState === RES_STATE.HD) {
                         // vthumb request was aborted meanwhile, hd re-used. Delete the vthumb stream
-                        peer.vThumbPlayer.destroy();
+                        this.delVthumbPlayer();
                     }
                     return;
                 }
-                if (peer.hiResPlayer) {
-                    peer.hiResPlayer.destroy();
-                }
+                peer.stopHiResVideo();
                 this.setResState(RES_STATE.THUMB);
             };
+        }
+        onPlayerDestroy(player) {
+            if (player === this.hiResPlayer) {
+                delete this.hiResPlayer;
+            }
+            else if (player === this.vThumbPlayer) {
+                delete this.vThumbPlayer;
+            }
+            else {
+                return;
+            }
+            // clean up cached quality, if there are no players
+            if (!this.hiResPlayer && !this.vThumbPlayer) {
+                assert(!this.presenterPlayer);
+                this.currentQuality = VIDEO_QUALITY.NO_VIDEO;
+                // console.warn("No video from peer, setting quality to NO_VIDEO");
+            }
         }
     }
 
@@ -361,7 +374,6 @@
             this.chatRoom = chatRoom;
             this.callId = callId;
             this.peers = new Peers(this);
-            this.numVideoTracksUsed = 0;
             // eslint-disable-next-line no-use-before-define
             this.localPeerStream = new LocalPeerStream(this);
             this.viewMode = CALL_VIEW_MODES.GRID;
@@ -377,9 +389,6 @@
 // SfuClient.IClientEventListener interface
         onServerError(errCode) {
             console.error('onServerError!!!', errCode);
-        }
-        onNewPlayer(sfuPlayer) {
-            return new PlayerData(this, sfuPlayer);
         }
         onJoined() {
             for (const peer of this.sfuClient.peers.values()) {
@@ -425,7 +434,7 @@
                 });
             }
             // Peer is left alone in a group call -> mute mic
-            if (peer.client.isLeavingCall()) {
+            if (peer.client.isLeavingCall) {
                 this.muteIfAlone();
             }
         }
@@ -512,20 +521,6 @@
         getLocalStream() {
             return this.localPeerStream;
         }
-        onTrackAllocated(playerData) {
-            this.numVideoTracksUsed++;
-        }
-        onTrackReleased(playerData) {
-            this.numVideoTracksUsed--;
-            // console.log("onTrackRelease:", this.numVideoTracksUsed);
-            const peer = playerData.appPeer.sfuPeer;
-            // clean up cached quality, if there are no players
-            if ((peer.hiResPlayer && peer.hiResPlayer.slot) || (peer.vThumbPlayer && peer.vThumbPlayer.slot)) {
-                return;
-            }
-            appPeer.currentQuality = VIDEO_QUALITY.NO_VIDEO;
-            // console.warn("No video from peer, setting quality to NO_VIDEO");
-        }
         onLocalMediaChange(diffFlag) {
             if (diffFlag & SfuClient.Av.Video) {
                 this.localPeerStream.onStreamChange();
@@ -544,12 +539,14 @@
             this.onLocalMediaChange(SfuClient.Av.Audio);
         }
         toggleVideo() {
+            // remove the if() for enabling presenter video feed
             if (this.isSharingScreen()) {
                 this.sfuClient.enableScreenshare(false);
             }
             this.sfuClient.muteCamera(!!(this.av & SfuClient.Av.Camera));
         }
         toggleScreenSharing() {
+            // remove the if() for enabling presenter video feed
             if (this.av & SfuClient.Av.Camera) {
                 this.sfuClient.muteCamera(true);
             }
@@ -718,7 +715,7 @@
             return false;
         }
     }
-    class PlayerData { // implements IVideoPlayerGui
+    class PlayerCtx { // implements IVideoPlayerGui
         constructor(call, player) {
             this.call = call;
             this.player = player;
@@ -727,7 +724,6 @@
             this.video = document.createElement("video");
         }
         attachToTrack(track) { // we wait for player to sync and start, so nothing to do here
-            this.call.onTrackAllocated(this);
             this.video.onplaying = () => {
                 // console.warn("source video: onPlaying");
                 if (this.onPlay) {
@@ -743,12 +739,12 @@
         detachFromTrack() {
             delete this.video.onpause;
             SfuClient.playerStop(this.video);
-            this.call.onTrackReleased(this);
         }
-        onDestroy() {
+        onPlayerDestroy() {
+            this.appPeer.onPlayerDestroy(this.player);
         }
     }
-    Call.PlayerData = PlayerData;
+    Call.PlayerCtx = PlayerCtx;
 
     class LocalPeerStream {
         constructor(call) {
@@ -773,6 +769,9 @@
                 }
                 this.source = null;
             }
+            for (const cons of this.consumers) {
+                cons.updateDynamicVideoElem();
+            }
         }
         get audioMuted() {
             return this.sfuClient.localAudioMuted();
@@ -789,6 +788,9 @@
         }
         isStreaming() {
             return this.sfuClient.availAv & Av.Video;
+        }
+        get isOnHold() {
+            return this.sfuClient.isOnHold();
         }
         updateVideoQuality() {
             return false; // returing false will cause the caller StreamNode to update itself

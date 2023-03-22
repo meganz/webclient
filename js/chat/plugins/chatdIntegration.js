@@ -222,7 +222,7 @@ ChatdIntegration.prototype.updateChatPublicHandle = function(h, d, cim, callback
         a: 'mcph',
         id: h,
         d: d || undefined,
-        cim,
+        cim: cim ? 1 : 0,
         v: Chatd.VERSION
     })
         .done(r => {
@@ -691,7 +691,7 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                             createTimeoutPromise(validate2, 300, 2000)
                                 .always(() => {
                                     if (chatRoom.isMeeting) {
-                                        chatRoom.updatePublicHandle();
+                                        chatRoom.updatePublicHandle(false, true);
                                         return chatRoom.scheduledMeeting ? null : chatRoom.trigger('onNewMeetingReady');
                                     }
                                     chatRoom.trigger('showGetChatLinkDialog');

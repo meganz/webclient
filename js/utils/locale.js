@@ -161,7 +161,7 @@ function setDateTimeFormat(locales, format) {
         options.day = format === 3 || format === 6 ? undefined : 'numeric';
         options.weekday = format === 4 || format === 5 ? 'long' : undefined;
 
-        if (format === 0 || format === 5) {
+        if (format === 0 || format === 5 || format === 7) {
             options.minute = 'numeric';
             options.hour = 'numeric';
             if (format === 5) {
@@ -172,6 +172,10 @@ function setDateTimeFormat(locales, format) {
 
         if (format === 6) {
             options.month = 'short';
+        }
+        if (format === 7) {
+            options.weekday = 'long';
+            options.timeZoneName = 'short';
         }
     }
     // Set non full date format
@@ -1040,8 +1044,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A2]', '</a>');
     l[6976] = escapeHTML(l[6976]).replace('%1', '<span class="plan-name"></span>');
     l[7156] = escapeHTML(l[7156]).replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');
-    l[7202] = escapeHTML(l[7202]).replace('[A]', '<a href="/resellers" class="voucher-reseller-link clickurl">')
-                     .replace('[/A]', '</a>');
+    l[7202] = escapeHTML(l[7202]).replace(
+        '[A]',
+        '<a href="https://mega.io/resellers" target="_blank" rel="noopener noreferrer" class="voucher-reseller-link">'
+    ).replace('[/A]', '</a>');
     l[7709] = escapeHTML(l[7709]).replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
     l[7945] = escapeHTML(l[7945]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[7991] = escapeHTML(l[7991])

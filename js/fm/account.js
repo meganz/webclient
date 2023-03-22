@@ -2403,7 +2403,7 @@ accountUI.plan = {
             });
 
             $('.fm-purchase-voucher, button.topup').rebind('click', function() {
-                loadSubPage('resellers');
+                mega.redirect('mega.io', 'resellers', false, false);
             });
         }
     },

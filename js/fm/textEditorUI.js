@@ -260,7 +260,8 @@ mega.textEditorUI = new function TextEditorUI() {
                 if (editor) {
                     $saveButton.addClass('disabled');
 
-                    if (M.getNodeRights(fileHandle) < 1) {
+                    const rights = M.getNodeRights(fileHandle);
+                    if (rights < 1) {
                         $saveAsBtn.trigger('click');
                         $saveButton.removeClass('disabled');
                         return false;
@@ -291,6 +292,21 @@ mega.textEditorUI = new function TextEditorUI() {
                             cb();
                         }
                     };
+
+                    if (rights === 1 && M.getNodeRoot(fileHandle) === 'shares') {
+                        const name = fileconflict.findNewName(M.getSafeName(M.d[fileHandle].name), M.d[fileHandle].p);
+                        const val = editor.getValue();
+                        (
+                            val
+                                ? mega.fileTextEditor.saveFileAs(name, M.d[fileHandle].p, val)
+                                : M.addNewFile(name, M.d[fileHandle].p)
+                        )
+                            .then(getSavedFile)
+                            .catch(() => {
+                                loadingDialog.hide();
+                            });
+                        return;
+                    }
 
                     M.getStorageQuota().then(data => {
                         if (data.isFull) {

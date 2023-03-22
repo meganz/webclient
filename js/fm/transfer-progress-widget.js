@@ -330,11 +330,15 @@ mega.tpw = new function TransferProgressWidget() {
                 else {
                     id = 'zip_' + id;
                 }
-                dlmanager.abort(id);
+                if (GlobalProgress[id]) {
+                    dlmanager.abort(id);
+                }
             }
             else {
                 id = 'ul_' + id;
-                ulmanager.abort(id);
+                if (GlobalProgress[id]) {
+                    ulmanager.abort(id);
+                }
             }
             $('.transfer-table tr#' + id).remove();
             if ($.clearTransferPanel) {
@@ -902,7 +906,7 @@ mega.tpw = new function TransferProgressWidget() {
         }
         $finishedAction = $transferActionTemplate.clone(true).addClass('cancel');
         $('i.transfer-progress-icon', $finishedAction).addClass('cancel icon-close-component')
-            .attr('data-simpletip', l.tfw_transfer_cancel);
+            .attr('data-simpletip', l.tfw_transfer_remove);
         $actionsRow.append($finishedAction);
 
         if (unHide) {
@@ -1159,7 +1163,7 @@ mega.tpw = new function TransferProgressWidget() {
         if (!$rowsContainer || !$(tpwRowSelector, $rowsContainer).length) {
             return;
         }
-        if (M.getTransferElements() && !pfid) {
+        if (u_type !== false && M.getTransferElements() && !pfid) {
             $('.js-tpm-open', $widgetHeadAndBody).removeClass('hidden');
         }
         else {

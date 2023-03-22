@@ -3790,7 +3790,7 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
 
                     if ($.dialog === 'share') {
 
-                        const contact = document.querySelector(`.share-dialog-access-list #${userid}`);
+                        const contact = document.querySelector(`.share-dialog-access-list [id="${userid}"]`);
 
                         if (contact) {
 

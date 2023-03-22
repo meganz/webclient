@@ -72,6 +72,11 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                     "%s",
                     `<strong>${megaChat.html(displayName)}</strong>`
                 );
+            if (self.props.chatRoom.isMeeting) {
+                text = h === contact.u
+                    ? l.meeting_mgmt_user_joined
+                    : l.meeting_mgmt_user_added.replace('%s', `<strong>${megaChat.html(displayName)}</strong>`);
+            }
 
             self._ensureNameIsLoaded(otherContact.u);
             messages.push(
@@ -110,10 +115,16 @@ class AltPartsConvMessage extends ConversationMessageMixin {
 
             var text;
             if (otherContact.u === contact.u) {
-                text = l[8908];
+                text = self.props.chatRoom.isMeeting
+                    ? l.meeting_mgmt_left /* `Left the meeting` */
+                    : l[8908]; /* `Left the group chat` */
             }
             else {
-                text = l[8906].replace(
+                text = (
+                    self.props.chatRoom.isMeeting
+                        ? l.meeting_mgmt_kicked /* `Was removed from the meeting by %s.` */
+                        : l[8906] /* `Was removed from the group chat by %s.` */
+                ).replace(
                     "%s",
                     `<strong>${megaChat.html(displayName)}</strong>`
                 );

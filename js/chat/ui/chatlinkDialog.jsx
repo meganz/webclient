@@ -32,7 +32,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
             return;
         }
 
-        this.loading = chatRoom.updatePublicHandle(undefined)
+        this.loading = chatRoom.updatePublicHandle(false, true)
             .always(() => {
                 if (chatRoom.publicLink) {
                     this.setState({ 'link': getBaseUrl() + '/' + chatRoom.publicLink });
@@ -98,7 +98,10 @@ export class ChatlinkDialog extends MegaRenderMixin {
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
-                title={chatRoom.iAmOperator() && !chatRoom.topic ? l[9080] /* `Rename Group` */ : ''}
+                title={chatRoom.iAmOperator() && !chatRoom.topic
+                    ? chatRoom.isMeeting
+                        ? l.rename_meeting /* `Rename Meeting` */
+                        : l[9080] /* `Rename Group` */ : ''}
                 className={`
                     chat-rename-dialog
                     export-chat-links-dialog

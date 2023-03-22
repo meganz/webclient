@@ -276,7 +276,7 @@ class ChatToastIntegration {
                     })
                     .rebind('onCallPeerLeft.cTI', (e, { userHandle }) => {
                         if (navigator.onLine) {
-                            if (window.sfuClient && window.sfuClient.isLeavingCall()) {
+                            if (window.sfuClient && window.sfuClient.isLeavingCall) {
                                 // Don't show leaving toasts if we are leaving.
                                 return;
                             }

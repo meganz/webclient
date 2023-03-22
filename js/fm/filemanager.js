@@ -3486,7 +3486,10 @@ FileManager.prototype.addGridUI = function(refresh) {
                 }
             }
 
-            if (M.currentrootid === M.RubbishID) {
+            if (
+                M.currentrootid === M.RubbishID
+                || M.currentrootid === 'shares'
+            ) {
                 M.columnsWidth.cloud.fav.disabled = true;
                 M.columnsWidth.cloud.fav.viewed = false;
             }

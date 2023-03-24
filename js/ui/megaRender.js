@@ -1231,7 +1231,7 @@
 
                 }
 
-                const ed = authring.getContactAuthenticated(aNode.su, 'Ed25519');
+                const ed = aNode.su && authring.getContactAuthenticated(aNode.su, 'Ed25519');
 
                 if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
 

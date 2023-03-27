@@ -22574,7 +22574,9 @@ class Schedule extends mixins.wl {
       isEdit: false,
       isDirty: false,
       isLoading: false,
-      topicInvalid: false
+      topicInvalid: false,
+      invalidTopicMsg: '',
+      descriptionInvalid: false
     };
     this.handleToggle = prop => {
       return Object.keys(this.state).includes(prop) && this.setState(state => ({
@@ -22746,7 +22748,9 @@ class Schedule extends mixins.wl {
       isEdit,
       isDirty,
       isLoading,
-      topicInvalid
+      topicInvalid,
+      invalidTopicMsg,
+      descriptionInvalid
     } = this.state;
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       id: NAMESPACE,
@@ -22769,13 +22773,32 @@ class Schedule extends mixins.wl {
       placeholder: l.schedule_title_input,
       value: topic,
       invalid: topicInvalid,
-      invalidMessage: l.schedule_title_missing,
+      invalidMessage: invalidTopicMsg,
       autoFocus: true,
       isLoading: isLoading,
       onFocus: () => topicInvalid && this.setState({
         topicInvalid: false
       }),
-      onChange: this.handleChange
+      onChange: val => {
+        if (val.length > ChatRoom.TOPIC_MAX_LENGTH) {
+          this.setState({
+            invalidTopicMsg: l.err_schedule_title_long,
+            topicInvalid: true
+          });
+          val = val.substring(0, ChatRoom.TOPIC_MAX_LENGTH);
+        } else if (val.length === 0) {
+          this.setState({
+            invalidTopicMsg: l.schedule_title_missing,
+            topicInvalid: true
+          });
+        } else if (this.state.invalidTopicMsg) {
+          this.setState({
+            invalidTopicMsg: '',
+            topicInvalid: false
+          });
+        }
+        this.handleChange('topic', val);
+      }
     }), external_React_default().createElement(DateTime, {
       name: "startDateTime",
       altField: "startTime",
@@ -22887,16 +22910,33 @@ class Schedule extends mixins.wl {
       onToggle: this.handleToggle
     }), external_React_default().createElement(Textarea, {
       name: "description",
+      invalid: descriptionInvalid,
       placeholder: l.schedule_description_input,
       value: description,
-      onChange: this.handleChange
+      onFocus: () => descriptionInvalid && this.setState({
+        descriptionInvalid: false
+      }),
+      onChange: val => {
+        if (val.length > 3000) {
+          this.setState({
+            descriptionInvalid: true
+          });
+          val = val.substring(0, 3000);
+        } else if (this.state.descriptionInvalid) {
+          this.setState({
+            descriptionInvalid: false
+          });
+        }
+        this.handleChange('description', val);
+      }
     })), external_React_default().createElement(Footer, {
       isLoading: isLoading,
       isEdit: isEdit,
       topic: topic,
       onSubmit: this.handleSubmit,
       onInvalid: () => this.setState({
-        topicInvalid: !topic
+        topicInvalid: !topic,
+        invalidTopicMsg: l.schedule_title_missing
       })
     }), closeDialog && external_React_default().createElement(CloseDialog, {
       onToggle: this.handleToggle,
@@ -22990,13 +23030,12 @@ const Input = ({
     className: isLoading ? 'disabled' : '',
     autoFocus: autoFocus,
     autoComplete: "off",
-    maxLength: ChatRoom.TOPIC_MAX_LENGTH,
     placeholder: placeholder,
     value: value,
     onFocus: onFocus,
     onChange: ({
       target
-    }) => onChange('topic', target.value)
+    }) => onChange(target.value)
   }), invalid && external_React_default().createElement("div", {
     className: "message-container mega-banner"
   }, invalidMessage))));
@@ -23095,24 +23134,30 @@ const Textarea = ({
   placeholder,
   isLoading,
   value,
-  onChange
+  invalid,
+  onChange,
+  onFocus
 }) => {
   return external_React_default().createElement(Row, {
     className: "start-aligned"
   }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
     className: "sprite-fm-mono icon-description"
   })), external_React_default().createElement(Column, null, external_React_default().createElement("div", {
-    className: "mega-input box-style textarea"
+    className: `mega-input box-style textarea ${invalid ? 'error' : ''}`
   }, external_React_default().createElement("textarea", {
     name: `${Schedule.NAMESPACE}-${name}`,
     className: isLoading ? 'disabled' : '',
     placeholder: placeholder,
     value: value,
-    maxLength: 4000,
     onChange: ({
       target
-    }) => onChange('description', target.value)
-  }))));
+    }) => onChange(target.value),
+    onFocus: onFocus
+  })), invalid && external_React_default().createElement("div", {
+    className: "mega-input error msg textarea-error"
+  }, external_React_default().createElement("div", {
+    className: "message-container mega-banner"
+  }, l.err_schedule_desc_long))));
 };
 const Footer = ({
   isLoading,

@@ -2484,6 +2484,13 @@ body.theme-dark #schedule-dialog .recurring-edit-banner a {
   overflow: auto;
   white-space: normal;
 }
+#schedule-dialog .textarea-error {
+  position: absolute;
+  top: 72px;
+}
+#schedule-dialog .textarea-error::before {
+  display: none;
+}
 #schedule-dialog footer {
   border-top: 1px solid var(--stroke-grey-2);
   background: var(--surface-grey-1);

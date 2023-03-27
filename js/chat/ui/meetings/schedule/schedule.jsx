@@ -37,7 +37,9 @@ export class Schedule extends MegaRenderMixin {
         isEdit: false,
         isDirty: false,
         isLoading: false,
-        topicInvalid: false
+        topicInvalid: false,
+        invalidTopicMsg: '',
+        descriptionInvalid: false,
     };
 
     /**
@@ -282,7 +284,7 @@ export class Schedule extends MegaRenderMixin {
         const { NAMESPACE, dialogName } = Schedule;
         const {
             topic, startDateTime, endDateTime, recurring, participants, link, sendInvite, openInvite, description,
-            closeDialog, isEdit, isDirty, isLoading, topicInvalid
+            closeDialog, isEdit, isDirty, isLoading, topicInvalid, invalidTopicMsg, descriptionInvalid
         } = this.state;
 
         return (
@@ -308,11 +310,25 @@ export class Schedule extends MegaRenderMixin {
                         placeholder={l.schedule_title_input /* `Meeting name` */}
                         value={topic}
                         invalid={topicInvalid}
-                        invalidMessage={l.schedule_title_missing /* `Meeting name is required` */}
+                        invalidMessage={invalidTopicMsg}
                         autoFocus={true}
                         isLoading={isLoading}
                         onFocus={() => topicInvalid && this.setState({ topicInvalid: false })}
-                        onChange={this.handleChange}
+                        onChange={val => {
+                            if (val.length > ChatRoom.TOPIC_MAX_LENGTH) {
+                                /* `Enter fewer than 30 characters` */
+                                this.setState({ invalidTopicMsg: l.err_schedule_title_long, topicInvalid: true });
+                                val = val.substring(0, ChatRoom.TOPIC_MAX_LENGTH);
+                            }
+                            else if (val.length === 0) {
+                                /* `Meeting name is required` */
+                                this.setState({ invalidTopicMsg: l.schedule_title_missing, topicInvalid: true });
+                            }
+                            else if (this.state.invalidTopicMsg) {
+                                this.setState({ invalidTopicMsg: '', topicInvalid: false });
+                            }
+                            this.handleChange('topic', val);
+                        }}
                     />
 
                     {/* --- */}
@@ -441,9 +457,20 @@ export class Schedule extends MegaRenderMixin {
 
                     <Textarea
                         name="description"
+                        invalid={descriptionInvalid}
                         placeholder={l.schedule_description_input /* `Add a description` */}
                         value={description}
-                        onChange={this.handleChange}
+                        onFocus={() => descriptionInvalid && this.setState({ descriptionInvalid: false })}
+                        onChange={val => {
+                            if (val.length > 3000) {
+                                this.setState({ descriptionInvalid: true });
+                                val = val.substring(0, 3000);
+                            }
+                            else if (this.state.descriptionInvalid) {
+                                this.setState({ descriptionInvalid: false });
+                            }
+                            this.handleChange('description', val);
+                        }}
                     />
                 </PerfectScrollbar>
 
@@ -452,7 +479,10 @@ export class Schedule extends MegaRenderMixin {
                     isEdit={isEdit}
                     topic={topic}
                     onSubmit={this.handleSubmit}
-                    onInvalid={() => this.setState({ topicInvalid: !topic })}
+                    onInvalid={() => this.setState({
+                        topicInvalid: !topic,
+                        invalidTopicMsg: l.schedule_title_missing /* `Meeting name is required` */
+                    })}
                 />
 
                 {closeDialog &&
@@ -560,11 +590,10 @@ const Input = ({ name, placeholder, value, invalid, invalidMessage, autoFocus, i
                         className={isLoading ? 'disabled' : ''}
                         autoFocus={autoFocus}
                         autoComplete="off"
-                        maxLength={ChatRoom.TOPIC_MAX_LENGTH}
                         placeholder={placeholder}
                         value={value}
                         onFocus={onFocus}
-                        onChange={({ target }) => onChange('topic', target.value)}
+                        onChange={({ target }) => onChange(target.value)}
                     />
                     {invalid &&
                         <div className="message-container mega-banner">
@@ -730,23 +759,30 @@ const Switch = ({ name, toggled, label, isLoading, onToggle }) => {
  * @return {React.Element}
  */
 
-const Textarea = ({ name, placeholder, isLoading, value, onChange }) => {
+const Textarea = ({ name, placeholder, isLoading, value, invalid, onChange, onFocus }) => {
     return (
         <Row className="start-aligned">
             <Column>
                 <i className="sprite-fm-mono icon-description"/>
             </Column>
             <Column>
-                <div className="mega-input box-style textarea">
+                <div className={`mega-input box-style textarea ${invalid ? 'error' : ''}`}>
                     <textarea
                         name={`${Schedule.NAMESPACE}-${name}`}
                         className={isLoading ? 'disabled' : ''}
                         placeholder={placeholder}
                         value={value}
-                        maxLength={4000}
-                        onChange={({ target }) => onChange('description', target.value)}
+                        onChange={({ target }) => onChange(target.value)}
+                        onFocus={onFocus}
                     />
                 </div>
+                {invalid &&
+                    <div className="mega-input error msg textarea-error">
+                        <div className="message-container mega-banner">
+                            {l.err_schedule_desc_long /* `Enter fewer than 3000 characters` */}
+                        </div>
+                    </div>
+                }
             </Column>
         </Row>
     );

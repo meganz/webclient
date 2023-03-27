@@ -467,7 +467,7 @@ mBroadcaster.addListener('fm:initialized', () => {
             }
 
             for (var i = obflags.length; i--;) {
-                this.flagStorage.set(obflags[i], 0);
+                this.flagStorage.setSync(obflags[i], 0);
             }
             this.flagStorage.safeCommit();
         }

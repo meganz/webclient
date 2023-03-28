@@ -16608,7 +16608,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
       label: topicChange_React.createElement(utils.dy, null, displayName)
     }), datetime, topicChange_React.createElement("div", {
       className: "message text-block"
-    }, topicChange_React.createElement(utils.Cw, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>\u201c${topic}\u201d</strong>`))))));
+    }, topicChange_React.createElement(utils.Cw, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>${topic}</strong>`))))));
     return topicChange_React.createElement("div", null, messages);
   }
 }

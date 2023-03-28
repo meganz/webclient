@@ -57,13 +57,6 @@
     };
 
     /**
-     * Checking if the current folder is a share
-     * @private
-     * @returns {Boolean}
-     */
-    const isInShares = () => M.currentrootid === 'shares' || M.currentrootid === 'out-shares';
-
-    /**
      * Disable circular references and read-only shared folders.
      * @private
      */
@@ -379,15 +372,6 @@
 
         $('.summary-title.summary-selected-title', $dialog).text(l[19180]);
 
-        const setTitle = () => {
-            const title = mega.icu.format(
-                (isInShares()) ? l.upload_to_share : l[19339],
-                items.length
-            );
-
-            $('header h2', $dialog).text(title);
-        };
-
         if ($.saveToDialogNode) {
             items = [$.saveToDialogNode.h];
             names[$.saveToDialogNode.h] = $.saveToDialogNode.name;
@@ -418,7 +402,6 @@
                 for (var j = items.length; j--;) {
                     items[j].uuid = makeUUID();
                 }
-                setTitle();
             }
         }
 
@@ -607,10 +590,16 @@
 
         if ($.copyToUpload) {
             var len = $.copyToUpload[0].length;
-            return mega.icu.format(
-                (isInShares()) ? l.upload_to_share : l[19339],
-                len
-            );
+
+            if (section === 'conversations') {
+                return mega.icu.format(l.upload_to_conversation, len);
+            }
+
+            if (section === 'shared-with-me') {
+                return mega.icu.format(l.upload_to_share, len);
+            }
+
+            return mega.icu.format(l.upload_to_cd, len);
         }
 
         if ($.saveToDialog) {
@@ -945,6 +934,8 @@
         section = dialogTabClass || 'cloud-drive';
         buttonLabel = buttonLabel || getActionButtonLabel();
 
+        let title = '';
+
         var $pickerButtons = $('.fm-picker-dialog-button', $dialog).removeClass('active');
         $('.dialog-sorting-menu', $dialog).addClass('hidden');
         $('.dialog-empty-block', $dialog).removeClass('active');
@@ -1038,8 +1029,6 @@
 
         // If copying from contacts tab (Ie, sharing)
         if (!$.saveToDialog && section === 'cloud-drive' && (M.currentrootid === 'chat' || $.copyToShare)) {
-
-            $('header h2', $dialog).text(l[1344]);
             $('.dialog-newfolder-button', $dialog).addClass('hidden');
             $permissionSelect.removeClass('hidden');
             bindDropdownEvents($permissionSelect);
@@ -1055,25 +1044,25 @@
             $permissionSelect.addClass('hidden');
             if ($.fileRequestNew) {
                 $dialog.addClass('fm-picker-file-request');
-                $('header h2', $dialog).text(l.file_request_select_folder_title);
+
                 $('.fm-picker-dialog-desc', $dialog)
                     .removeClass('hidden');
                 $('.fm-picker-dialog-desc p', $dialog)
                     .text(l.file_request_select_folder_desc);
                 $('button.js-close', $dialog).removeClass('hidden');
+
+                title = l.file_request_select_folder_title;
             }
             else {
-                $('header h2', $dialog).text(l[16533]);
+                title = l[16533];
             }
         }
         else {
             $permissionSelect.addClass('hidden');
-            $('header h2', $dialog).text(getDialogTitle());
         }
 
         if ($.chatAttachmentShare && section !== 'conversations') {
             $permissionSelect.addClass('hidden');
-            $('header h2', $dialog).text(getDialogTitle());
         }
 
         // 'New contact' button
@@ -1086,6 +1075,8 @@
 
         // Activate tab
         $('.fm-picker-dialog-button[data-section="' + section + '"]', $dialog).addClass('active');
+
+        $('header h2', $dialog).text(title || getDialogTitle());
     };
 
     /**

@@ -125,9 +125,7 @@ lazy(mega, 'backupCenter', () => {
 
                 mCreateElement('i', {
                     'class': 'sprite-fm-uni icon-hazard simpletip',
-                    'data-simpletip': l.offline_device_tip.includes('{count}') ? // Temp solution for missing string
-                        mega.icu.format(l.offline_device_tip, daysNum).replace('{count}', daysNum) :
-                        l.offline_device_tip,
+                    'data-simpletip': mega.icu.format(l.offline_device_tip, daysNum),
                     'data-simpletipposition': 'top',
                     'data-simpletipoffset': 2
                 }, statusParentNode);

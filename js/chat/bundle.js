@@ -1644,8 +1644,8 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     self.registerUploadListeners();
     self.trigger("onInit");
     mBroadcaster.sendMessage('chat_initialized');
-    setInterval(self._syncDnd.bind(self), 60000);
-    setInterval(self.removeMessagesByRetentionTime.bind(self, null), 20000);
+    setInterval(self._syncChats.bind(self), 6e4);
+    setInterval(self.removeMessagesByRetentionTime.bind(self, null), 2e4);
     self.autoJoinIfNeeded();
     const scheduledMeetings = Object.values(Chat.mcsm);
     if (scheduledMeetings && scheduledMeetings.length) {
@@ -1658,18 +1658,34 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     return true;
   }).then(resolve).catch(reject);
 });
-Chat.prototype._syncDnd = function () {
-  const chats = this.chats;
-  if (chats && chats.length > 0) {
+Chat.prototype._syncChats = function () {
+  const {
+    chats,
+    logger
+  } = this;
+  if (chats && chats.length) {
     chats.forEach(({
-      chatId
+      chatId,
+      scheduledMeeting
     }) => {
       const dnd = pushNotificationSettings.getDnd(chatId);
       if (dnd && dnd < unixtime()) {
-        if (this.logger) {
-          this.logger.debug(`Chat.prototype._syncDnd chatId=${chatId}`);
-        }
         pushNotificationSettings.disableDnd(chatId);
+        if (logger) {
+          logger.debug(`Chat.prototype._syncDnd chatId=${chatId}`);
+        }
+      }
+      const {
+        isUpcoming,
+        chatRoom,
+        id
+      } = scheduledMeeting || {};
+      if (isUpcoming) {
+        scheduledMeeting.setNextOccurrence();
+        chatRoom.trackDataChange();
+        if (logger) {
+          logger.debug(`Chat.prototype.__syncScheduledMeetings id=${id} chatId=${chatId}`);
+        }
       }
     });
   }

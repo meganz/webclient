@@ -240,16 +240,39 @@ class Occurrences extends MegaRenderMixin {
     }
 
     renderCancelConfirmation(occurrence) {
-        return (
+        const { scheduledMeeting, chatRoom } = this.props;
+        const nextOccurrences = Object.values(scheduledMeeting.occurrences).filter(o => o.isUpcoming);
+
+        if (nextOccurrences.length > 1) {
+            return (
+                msgDialog(
+                    `confirmation:!^${l.cancel_meeting_occurrence_button}!${l.schedule_cancel_abort}`,
+                    'cancel-occurrence',
+                    l.schedule_cancel_occur_dlg_title,
+                    l.schedule_cancel_occur_dlg_text,
+                    cb => cb && occurrence.cancel(),
+                    1
+                )
+            );
+        }
+
+        return chatRoom.hasUserMessages() ?
             msgDialog(
-                `confirmation:!^${l.cancel_meeting_occurrence_button}!${l.schedule_cancel_abort}`,
+                `confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`,
                 'cancel-occurrence',
-                l.schedule_cancel_occur_dlg_title,
-                l.schedule_cancel_occur_dlg_text,
-                cb => cb && occurrence.cancel(),
+                l.schedule_cancel_all_dialog_title,
+                l.schedule_cancel_all_dialog_move,
+                cb => cb && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, scheduledMeeting.chatId),
                 1
-            )
-        );
+            ) :
+            msgDialog(
+                `confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`,
+                'cancel-occurrence',
+                l.schedule_cancel_all_dialog_title,
+                l.schedule_cancel_all_dialog_archive,
+                cb => cb && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, scheduledMeeting.chatId),
+                1
+            );
     }
 
     renderLoading() {

@@ -488,6 +488,7 @@
             .on('keydown', function(event) {
                 /* jshint -W074 */
 
+                const expectedKeys = ['Tab', ' ', 'Enter', ',', ';'];
                 var next_token;
                 var previous_token;
 
@@ -583,6 +584,12 @@
                     case KEY.NUMPAD_ENTER:
                     case KEY.COMMA:
                     case KEY.SEMICOLON:
+
+                        if (!expectedKeys.includes(event.key) && String.fromCharCode(event.which)) {
+                            // set a timeout just long enough to let this function finish.
+                            onIdle(() => do_search());
+                            return true;
+                        }
 
                         // preventDefault to remove default behaviour from the keydown.
                         event.preventDefault();

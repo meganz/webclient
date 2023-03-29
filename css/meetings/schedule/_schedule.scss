@@ -124,6 +124,15 @@
         white-space: normal;
     }
 
+    .textarea-error {
+        position: absolute;
+        top: 72px;
+
+        &::before {
+            display: none;
+        }
+    }
+
     footer {
         border-top: 1px solid var(--stroke-grey-2);
         background: var(--surface-grey-1);

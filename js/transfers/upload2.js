@@ -1158,7 +1158,16 @@ var ulmanager = {
                     ulmanager.ulStart(File);
                 }
                 else if (ctx.skipfile) {
-                    uq.skipfile = !File.file.chatid;
+                    if (!(uq.skipfile = !File.file.chatid)) {
+                        const eventData = ulmanager.ulEventData[File.file.id];
+                        if (eventData) {
+                            if (d) {
+                                ulmanager.logger.info('[%s] Cleaning efa on deduplication ' +
+                                    'for the chat to be aware...', ctx.n.h, eventData.efa);
+                            }
+                            eventData.efa = 0;
+                        }
+                    }
                     ulmanager.ulIDToNode[ulmanager.getGID(uq)] = ctx.n.h;
                     M.ulcomplete(uq, ctx.n.h);
                     File.file.ul_failed = false;

@@ -333,56 +333,67 @@ export class Schedule extends MegaRenderMixin {
 
                     {/* --- */}
 
-                    <DateTime
-                        name="startDateTime"
-                        altField="startTime"
-                        startDate={startDateTime}
-                        value={startDateTime}
-                        filteredTimeIntervals={this.getFilteredTimeIntervals(startDateTime)}
-                        icon="sprite-fm-mono icon-recents-filled"
-                        label={l.schedule_duration_separator}
-                        isLoading={isLoading}
-                        onMount={datepicker => {
-                            this.datepickerRefs.startDateTime = datepicker;
-                        }}
-                        onSelectDate={startDateTime => {
-                            this.handleDateSelect({ startDateTime }, () => {
-                                const { startDateTime, endDateTime } = this.state;
-                                if (startDateTime > endDateTime) {
-                                    this.datepickerRefs.endDateTime.selectDate(new Date(startDateTime + this.interval));
-                                }
-                            });
-                        }}
-                        onSelectTime={({ value: startDateTime }) => {
-                            this.handleTimeSelect({ startDateTime });
-                        }}
-                    />
+                    <Row className="start-aligned">
+                        <Column>
+                            <i className="sprite-fm-mono icon-recents-filled" />
+                        </Column>
+                        <div className="schedule-date-container">
+                            <DateTime
+                                name="startDateTime"
+                                altField="startTime"
+                                startDate={startDateTime}
+                                value={startDateTime}
+                                filteredTimeIntervals={this.getFilteredTimeIntervals(startDateTime)}
+                                label={l.schedule_start_date /* `Start date` */}
+                                isLoading={isLoading}
+                                onMount={datepicker => {
+                                    this.datepickerRefs.startDateTime = datepicker;
+                                }}
+                                onSelectDate={startDateTime => {
+                                    this.handleDateSelect({ startDateTime }, () => {
+                                        const { startDateTime, endDateTime } = this.state;
+                                        if (startDateTime > endDateTime) {
+                                            this.datepickerRefs.endDateTime.selectDate(
+                                                new Date(startDateTime + this.interval)
+                                            );
+                                        }
+                                    });
+                                }}
+                                onSelectTime={({ value: startDateTime }) => {
+                                    this.handleTimeSelect({ startDateTime });
+                                }}
+                            />
 
-                    <DateTime
-                        name="endDateTime"
-                        altField="endTime"
-                        isLoading={isLoading}
-                        startDate={endDateTime}
-                        value={endDateTime}
-                        filteredTimeIntervals={this.getFilteredTimeIntervals(endDateTime, startDateTime)}
-                        onMount={datepicker => {
-                            this.datepickerRefs.endDateTime = datepicker;
-                        }}
-                        onSelectDate={endDateTime => {
-                            this.handleDateSelect({ endDateTime }, () => {
-                                const { startDateTime, endDateTime } = this.state;
-                                if (endDateTime < startDateTime) {
-                                    if (endDateTime < Date.now()) {
-                                        return this.setState({ endDateTime: startDateTime + this.interval });
-                                    }
-                                    this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
-                                }
-                            });
-                        }}
-                        onSelectTime={({ value: endDateTime }) => {
-                            this.handleTimeSelect({ endDateTime });
-                        }}
-                    />
+                            <DateTime
+                                name="endDateTime"
+                                altField="endTime"
+                                isLoading={isLoading}
+                                startDate={endDateTime}
+                                value={endDateTime}
+                                filteredTimeIntervals={this.getFilteredTimeIntervals(endDateTime, startDateTime)}
+                                label={l.schedule_end_date /* `End date` */}
+                                onMount={datepicker => {
+                                    this.datepickerRefs.endDateTime = datepicker;
+                                }}
+                                onSelectDate={endDateTime => {
+                                    this.handleDateSelect({ endDateTime }, () => {
+                                        const { startDateTime, endDateTime } = this.state;
+                                        if (endDateTime < startDateTime) {
+                                            if (endDateTime < Date.now()) {
+                                                return this.setState({ endDateTime: startDateTime + this.interval });
+                                            }
+                                            this.datepickerRefs.startDateTime.selectDate(
+                                                new Date(endDateTime - this.interval)
+                                            );
+                                        }
+                                    });
+                                }}
+                                onSelectTime={({ value: endDateTime }) => {
+                                    this.handleTimeSelect({ endDateTime });
+                                }}
+                            />
+                        </div>
+                    </Row>
 
                     {/* --- */}
 
@@ -536,7 +547,14 @@ export const Row = ({ children, className }) =>
         {children}
     </div>;
 
-export const Column = ({ children }) => <div className={`${Schedule.NAMESPACE}-column`}>{children}</div>;
+export const Column = ({ children, className }) =>
+    <div
+        className={`
+            ${Schedule.NAMESPACE}-column
+            ${className || ''}
+        `}>
+        {children}
+    </div>;
 
 /**
  * Header
@@ -615,7 +633,6 @@ const Input = ({ name, placeholder, value, invalid, invalidMessage, autoFocus, i
  * @param value
  * @param minDate
  * @param filteredTimeIntervals
- * @param icon
  * @param label
  * @param onMount
  * @param onSelectDate
@@ -630,7 +647,6 @@ export const DateTime = ({
     value,
     minDate,
     filteredTimeIntervals,
-    icon,
     label,
     isLoading,
     onMount,
@@ -638,30 +654,27 @@ export const DateTime = ({
     onSelectTime
 }) => {
     return (
-        <Row>
-            <Column>{icon && <i className={icon} />}</Column>
-            <div className="schedule-date-container">
-                <Datepicker
-                    name={`${Datepicker.NAMESPACE}-${name}`}
-                    className={isLoading ? 'disabled' : ''}
-                    startDate={startDate}
-                    altField={`${Select.NAMESPACE}-${altField}`}
-                    value={value}
-                    minDate={minDate}
-                    onMount={onMount}
-                    onSelect={onSelectDate}
-                />
-                <Select
-                    name={`${Select.NAMESPACE}-${altField}`}
-                    className={isLoading ? 'disabled' : ''}
-                    options={filteredTimeIntervals}
-                    value={value}
-                    format={toLocaleTime}
-                    onSelect={onSelectTime}
-                />
-                {label && <div>{label}</div>}
-            </div>
-        </Row>
+        <>
+            {label && <span>{label}</span>}
+            <Datepicker
+                name={`${Datepicker.NAMESPACE}-${name}`}
+                className={isLoading ? 'disabled' : ''}
+                startDate={startDate}
+                altField={`${Select.NAMESPACE}-${altField}`}
+                value={value}
+                minDate={minDate}
+                onMount={onMount}
+                onSelect={onSelectDate}
+            />
+            <Select
+                name={`${Select.NAMESPACE}-${altField}`}
+                className={isLoading ? 'disabled' : ''}
+                options={filteredTimeIntervals}
+                value={value}
+                format={toLocaleTime}
+                onSelect={onSelectTime}
+            />
+        </>
     );
 };
 

@@ -1,6 +1,6 @@
 #schedule-dialog {
     width: 500px;
-    height: 712px;
+    height: 745px;
 
     &.fluid {
         height: auto;
@@ -25,13 +25,13 @@
         position: relative;
         display: flex;
         align-items: center;
-        margin: 0 0 15px 0;
+        margin: 0 0 20px 0;
 
         &.start-aligned {
             align-items: start;
 
             .schedule-dialog-column {
-                margin-top: 0;
+                margin-top: 8px;
             }
         }
 
@@ -70,7 +70,7 @@
             display: block;
             width: 20px;
             height: 20px;
-            margin-top: -3px;
+            margin-top: -2px;
             margin-inline: 0 16px;
 
             i {
@@ -94,13 +94,11 @@
     }
 
     .schedule-date-container {
-        display: flex;
-        align-items: center;
         width: 100%;
-
-        & > div {
-            margin: 0 16px 0 0;
-        }
+        display: inline-grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 16px;
+        align-items: center;
     }
 
     .schedule-timepicker-container {

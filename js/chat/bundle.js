@@ -21423,6 +21423,7 @@ class Datepicker extends _mixins_js1__.wl {
     } = Datepicker;
     const {
       value,
+      name,
       className,
       placeholder
     } = this.props;
@@ -21434,7 +21435,7 @@ class Datepicker extends _mixins_js1__.wl {
     }, react0().createElement("input", {
       ref: this.inputRef,
       type: "text",
-      name: "account-firstname",
+      name: name,
       className: `
                             dialog-input
                             ${className || ''}
@@ -22185,14 +22186,19 @@ class Edit extends _mixins1__.wl {
         onClose();
         megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, chatRoom);
       }
-    })))), react0().createElement(_schedule_jsx3__.ou, {
+    })))), react0().createElement(_schedule_jsx3__.X2, {
+      className: "start-aligned"
+    }, react0().createElement(_schedule_jsx3__.sg, null, react0().createElement("i", {
+      className: "sprite-fm-mono icon-recents-filled"
+    })), react0().createElement("div", {
+      className: "schedule-date-container"
+    }, react0().createElement(_schedule_jsx3__.ou, {
       name: "startDateTime",
       altField: "startTime",
       startDate: startDateTime,
       value: startDateTime,
       filteredTimeIntervals: (0,_helpers_jsx9__.nl)(startDateTime),
-      icon: "sprite-fm-mono icon-recents-filled",
-      label: l.schedule_duration_separator,
+      label: l.schedule_start_date,
       onMount: datepicker => {
         this.datepickerRefs.startDateTime = datepicker;
       },
@@ -22223,6 +22229,7 @@ class Edit extends _mixins1__.wl {
       startDate: endDateTime,
       value: endDateTime,
       filteredTimeIntervals: (0,_helpers_jsx9__.nl)(endDateTime, startDateTime),
+      label: l.schedule_end_date,
       onMount: datepicker => {
         this.datepickerRefs.endDateTime = datepicker;
       },
@@ -22252,7 +22259,7 @@ class Edit extends _mixins1__.wl {
           endDateTime
         });
       }
-    })), react0().createElement("footer", null, react0().createElement("div", {
+    })))), react0().createElement("footer", null, react0().createElement("div", {
       className: "footer-container"
     }, react0().createElement(_button_jsx2__.Z, {
       className: "mega-button positive",
@@ -22799,14 +22806,19 @@ class Schedule extends mixins.wl {
         }
         this.handleChange('topic', val);
       }
-    }), external_React_default().createElement(DateTime, {
+    }), external_React_default().createElement(Row, {
+      className: "start-aligned"
+    }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-recents-filled"
+    })), external_React_default().createElement("div", {
+      className: "schedule-date-container"
+    }, external_React_default().createElement(DateTime, {
       name: "startDateTime",
       altField: "startTime",
       startDate: startDateTime,
       value: startDateTime,
       filteredTimeIntervals: this.getFilteredTimeIntervals(startDateTime),
-      icon: "sprite-fm-mono icon-recents-filled",
-      label: l.schedule_duration_separator,
+      label: l.schedule_start_date,
       isLoading: isLoading,
       onMount: datepicker => {
         this.datepickerRefs.startDateTime = datepicker;
@@ -22838,6 +22850,7 @@ class Schedule extends mixins.wl {
       startDate: endDateTime,
       value: endDateTime,
       filteredTimeIntervals: this.getFilteredTimeIntervals(endDateTime, startDateTime),
+      label: l.schedule_end_date,
       onMount: datepicker => {
         this.datepickerRefs.endDateTime = datepicker;
       },
@@ -22866,7 +22879,7 @@ class Schedule extends mixins.wl {
           endDateTime
         });
       }
-    }), external_React_default().createElement(Checkbox, {
+    }))), external_React_default().createElement(Checkbox, {
       name: "recurring",
       checked: recurring,
       label: l.schedule_recurring_label,
@@ -22988,9 +23001,13 @@ const Row = ({
         `
 }, children);
 const Column = ({
-  children
+  children,
+  className
 }) => external_React_default().createElement("div", {
-  className: `${Schedule.NAMESPACE}-column`
+  className: `
+            ${Schedule.NAMESPACE}-column
+            ${className || ''}
+        `
 }, children);
 const Header = ({
   chatRoom
@@ -23047,18 +23064,13 @@ const DateTime = ({
   value,
   minDate,
   filteredTimeIntervals,
-  icon,
   label,
   isLoading,
   onMount,
   onSelectDate,
   onSelectTime
 }) => {
-  return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, icon && external_React_default().createElement("i", {
-    className: icon
-  })), external_React_default().createElement("div", {
-    className: "schedule-date-container"
-  }, external_React_default().createElement(datepicker.Z, {
+  return external_React_default().createElement((external_React_default()).Fragment, null, label && external_React_default().createElement("span", null, label), external_React_default().createElement(datepicker.Z, {
     name: `${datepicker.Z.NAMESPACE}-${name}`,
     className: isLoading ? 'disabled' : '',
     startDate: startDate,
@@ -23074,7 +23086,7 @@ const DateTime = ({
     value: value,
     format: toLocaleTime,
     onSelect: onSelectTime
-  }), label && external_React_default().createElement("div", null, label)));
+  }));
 };
 const Checkbox = ({
   name,

@@ -2383,7 +2383,7 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 
 #schedule-dialog {
   width: 500px;
-  height: 712px;
+  height: 745px;
 }
 #schedule-dialog.fluid {
   height: auto;
@@ -2404,13 +2404,13 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   position: relative;
   display: flex;
   align-items: center;
-  margin: 0 0 15px 0;
+  margin: 0 0 20px 0;
 }
 #schedule-dialog .schedule-dialog-row.start-aligned {
   align-items: start;
 }
 #schedule-dialog .schedule-dialog-row.start-aligned .schedule-dialog-column {
-  margin-top: 0;
+  margin-top: 8px;
 }
 #schedule-dialog .schedule-dialog-row.invalid-aligned {
   margin-bottom: 30px;
@@ -2441,7 +2441,7 @@ body.theme-dark #schedule-dialog .recurring-edit-banner a {
   display: block;
   width: 20px;
   height: 20px;
-  margin-top: -3px;
+  margin-top: -2px;
   margin-inline: 0 16px;
 }
 #schedule-dialog .schedule-dialog-column:first-child i {
@@ -2460,12 +2460,11 @@ body.theme-dark #schedule-dialog .recurring-edit-banner a {
   color: var(--text-color-high);
 }
 #schedule-dialog .schedule-date-container {
-  display: flex;
-  align-items: center;
   width: 100%;
-}
-#schedule-dialog .schedule-date-container > div {
-  margin: 0 16px 0 0;
+  display: inline-grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
 }
 #schedule-dialog .schedule-timepicker-container {
   display: flex;
@@ -2522,7 +2521,13 @@ body.theme-dark #schedule-dialog .recurring-edit-banner a {
 #schedule-dialog .meetings-select .mega-input .mega-input-dropdown {
   position: absolute;
   top: 100%;
+  left: auto;
+  right: 0;
   height: 220px;
+}
+body.rtl #schedule-dialog .meetings-select .mega-input .mega-input-dropdown {
+  left: 0;
+  right: auto;
 }
 #schedule-dialog .meetings-invite {
   width: 100%;
@@ -2686,7 +2691,7 @@ body.theme-dark #schedule-dialog .recurring-edit-banner a {
 }
 
 .meetings-datepicker {
-  width: 50%;
+  /* [...] */
 }
 .meetings-datepicker .mega-input.datepicker-input {
   /* [...] */

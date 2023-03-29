@@ -1684,8 +1684,15 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
         M.ulprogress(ul, 100, ul.size, ul.size, 0);
     }
 
-    mBroadcaster.sendMessage('upload:completion', ul.id, h || -0xBADF, faid, ul.chatid);
-    mBroadcaster.sendMessage('trk:event', 'upload', 'completed');
+    // Ensure the node is on memory, e.g. when deduplicating to a chat-room
+    // @todo remove, this should not be required for chatRoom.attachNodes() but it's currently bugged..
+    const {id, chatid} = ul;
+    Promise.resolve(!h || M.d[h] || dbfetch.acquire(h))
+        .then(() => {
+
+            mBroadcaster.sendMessage('upload:completion', id, h || -0xBADF, faid, chatid);
+        })
+        .catch(dump);
 
     if (ul.skipfile) {
         showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');

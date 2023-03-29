@@ -1808,21 +1808,25 @@ Chat.prototype.registerUploadListeners = function () {
       }
       return;
     }
-    var n = M.d[handle];
-    var ul = ulmanager.ulEventData[uid] || false;
+    const n = M.getNodeByHandle(handle);
+    const ul = ulmanager.ulEventData[uid] || false;
     if (d) {
-      logger.debug('upload:completion', uid, handle, faid, ul, n);
+      logger.info('upload:completion', uid, handle, faid, ul, n);
     }
-    if (!ul || !n) {
+    if (!ul) {
       if (d) {
-        logger.error('Invalid state error...');
+        logger.error('Upload event data store missing...', uid, n, ul);
       }
     } else {
       ul.h = handle;
+      if (ul.efa && !n) {
+        logger.error('Invalid state, efa set on deduplication?', ul.efa, ul);
+        ul.efa = 0;
+      }
       if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
         ul.faid = faid;
         if (d) {
-          logger.debug('Waiting for file attribute to arrive.', handle, ul);
+          logger.info('Waiting for file attribute to arrive.', handle, ul);
         }
       } else {
         onUploadComplete(ul);

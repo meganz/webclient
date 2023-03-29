@@ -7026,11 +7026,7 @@ class MembersAmount extends _mixins1__._p {
     const {
       chatRoom
     } = this.props;
-    const memberKeys = Object.keys(chatRoom.members);
-    if (chatRoom && chatRoom.iAmInRoom() && memberKeys.length) {
-      return react0().createElement("span", null, mega.icu.format(l[20233], memberKeys.length));
-    }
-    return null;
+    return react0().createElement("span", null, mega.icu.format(l[20233], Object.keys(chatRoom.members).length));
   }
 }
 class ContactFingerprint extends _mixins1__.wl {
@@ -13078,7 +13074,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         className: "sprite-fm-mono icon-repeat"
       })), external_React_default().createElement("span", {
         className: "txt small"
-      }, isUpcoming ? this.renderUpcomingInfo() : external_React_default().createElement(ui_contacts.MembersAmount, {
+      }, is_chatlink && isUpcoming && !isRecurring ? this.renderUpcomingInfo() : external_React_default().createElement(ui_contacts.MembersAmount, {
         chatRoom: room
       }))));
     } else {

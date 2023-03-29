@@ -457,13 +457,7 @@ export class ContactAwareName extends ContactAwareComponent {
 export class MembersAmount extends ContactAwareComponent {
     render() {
         const { chatRoom } = this.props;
-        const memberKeys = Object.keys(chatRoom.members);
-
-        if (chatRoom && chatRoom.iAmInRoom() && memberKeys.length) {
-            return <span>{mega.icu.format(l[20233], memberKeys.length)}</span>;
-        }
-
-        return null;
+        return <span>{mega.icu.format(l[20233], Object.keys(chatRoom.members).length)}</span>;
     }
 }
 

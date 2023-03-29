@@ -363,10 +363,10 @@
     };
 
 
-    MegaNotification.prototype.forceStopSound = function() {
-        var self = this;
-        if (self.options.sound) {
-            ion.sound.stop(self.options.sound);
+    MegaNotification.prototype.forceStopSound = function(sound) {
+        sound = sound || this.options.sound;
+        if (sound) {
+            ion.sound.stop(sound);
         }
     };
 

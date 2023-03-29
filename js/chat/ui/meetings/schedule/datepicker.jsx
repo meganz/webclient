@@ -68,7 +68,7 @@ export default class Datepicker extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE } = Datepicker;
-        const { value, className, placeholder } = this.props;
+        const { value, name, className, placeholder } = this.props;
 
         return (
             <div
@@ -78,7 +78,7 @@ export default class Datepicker extends MegaRenderMixin {
                     <input
                         ref={this.inputRef}
                         type="text"
-                        name="account-firstname"
+                        name={name}
                         className={`
                             dialog-input
                             ${className || ''}

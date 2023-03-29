@@ -187,8 +187,8 @@ class ScheduledMeeting {
                 );
                 this.occurrences.set(occurrence.uid, occurrence);
             }
-            this.megaChat.trigger(meetingsManager.EVENTS.OCCURRENCES_UPDATE, this);
             this.setNextOccurrence();
+            this.megaChat.trigger(meetingsManager.EVENTS.OCCURRENCES_UPDATE, this);
         }
         return this.occurrences;
     }

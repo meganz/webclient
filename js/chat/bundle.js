@@ -452,8 +452,8 @@ class ScheduledMeeting {
         });
         this.occurrences.set(occurrence.uid, occurrence);
       }
-      this.megaChat.trigger(meetingsManager.EVENTS.OCCURRENCES_UPDATE, this);
       this.setNextOccurrence();
+      this.megaChat.trigger(meetingsManager.EVENTS.OCCURRENCES_UPDATE, this);
     }
     return this.occurrences;
   }
@@ -1225,7 +1225,7 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
       this.megaChat.off(event);
     }
     if (M.chat && megaChatIsReady) {
-      this.megaChat.trigger(conversations.F1.NAV_RENDER_VIEW, conversations.vN.MEETINGS);
+      this.checkAndShowStep();
     }
     delete this.schedListeners;
   }
@@ -1349,6 +1349,9 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
           this.checkAndShowStep();
         });
         return;
+      }
+      if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_ADDED && !this.isMeetingsTab) {
+        this.megaChat.trigger(conversations.F1.NAV_RENDER_VIEW, conversations.vN.MEETINGS);
       }
       const res = obChat.startNextOpenSteps(nextIdx);
       if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_CONF && res !== false) {
@@ -1641,8 +1644,8 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     self.registerUploadListeners();
     self.trigger("onInit");
     mBroadcaster.sendMessage('chat_initialized');
-    setInterval(self._syncDnd.bind(self), 60000);
-    setInterval(self.removeMessagesByRetentionTime.bind(self, null), 20000);
+    setInterval(self._syncChats.bind(self), 6e4);
+    setInterval(self.removeMessagesByRetentionTime.bind(self, null), 2e4);
     self.autoJoinIfNeeded();
     const scheduledMeetings = Object.values(Chat.mcsm);
     if (scheduledMeetings && scheduledMeetings.length) {
@@ -1655,18 +1658,34 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     return true;
   }).then(resolve).catch(reject);
 });
-Chat.prototype._syncDnd = function () {
-  const chats = this.chats;
-  if (chats && chats.length > 0) {
+Chat.prototype._syncChats = function () {
+  const {
+    chats,
+    logger
+  } = this;
+  if (chats && chats.length) {
     chats.forEach(({
-      chatId
+      chatId,
+      scheduledMeeting
     }) => {
       const dnd = pushNotificationSettings.getDnd(chatId);
       if (dnd && dnd < unixtime()) {
-        if (this.logger) {
-          this.logger.debug(`Chat.prototype._syncDnd chatId=${chatId}`);
-        }
         pushNotificationSettings.disableDnd(chatId);
+        if (logger) {
+          logger.debug(`Chat.prototype._syncDnd chatId=${chatId}`);
+        }
+      }
+      const {
+        isUpcoming,
+        chatRoom,
+        id
+      } = scheduledMeeting || {};
+      if (isUpcoming) {
+        scheduledMeeting.setNextOccurrence();
+        chatRoom.trackDataChange();
+        if (logger) {
+          logger.debug(`Chat.prototype.__syncScheduledMeetings id=${id} chatId=${chatId}`);
+        }
       }
     });
   }
@@ -1808,21 +1827,25 @@ Chat.prototype.registerUploadListeners = function () {
       }
       return;
     }
-    var n = M.d[handle];
-    var ul = ulmanager.ulEventData[uid] || false;
+    const n = M.getNodeByHandle(handle);
+    const ul = ulmanager.ulEventData[uid] || false;
     if (d) {
-      logger.debug('upload:completion', uid, handle, faid, ul, n);
+      logger.info('upload:completion', uid, handle, faid, ul, n);
     }
-    if (!ul || !n) {
+    if (!ul) {
       if (d) {
-        logger.error('Invalid state error...');
+        logger.error('Upload event data store missing...', uid, n, ul);
       }
     } else {
       ul.h = handle;
+      if (ul.efa && !n) {
+        logger.error('Invalid state, efa set on deduplication?', ul.efa, ul);
+        ul.efa = 0;
+      }
       if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
         ul.faid = faid;
         if (d) {
-          logger.debug('Waiting for file attribute to arrive.', handle, ul);
+          logger.info('Waiting for file attribute to arrive.', handle, ul);
         }
       } else {
         onUploadComplete(ul);
@@ -7003,11 +7026,7 @@ class MembersAmount extends _mixins1__._p {
     const {
       chatRoom
     } = this.props;
-    const memberKeys = Object.keys(chatRoom.members);
-    if (chatRoom && chatRoom.iAmInRoom() && memberKeys.length) {
-      return react0().createElement("span", null, mega.icu.format(l[20233], memberKeys.length));
-    }
-    return null;
+    return react0().createElement("span", null, mega.icu.format(l[20233], Object.keys(chatRoom.members).length));
   }
 }
 class ContactFingerprint extends _mixins1__.wl {
@@ -11699,7 +11718,15 @@ class Occurrences extends mixins.wl {
     }
   }
   renderCancelConfirmation(occurrence) {
-    return msgDialog(`confirmation:!^${l.cancel_meeting_occurrence_button}!${l.schedule_cancel_abort}`, 'cancel-occurrence', l.schedule_cancel_occur_dlg_title, l.schedule_cancel_occur_dlg_text, cb => cb && occurrence.cancel(), 1);
+    const {
+      scheduledMeeting,
+      chatRoom
+    } = this.props;
+    const nextOccurrences = Object.values(scheduledMeeting.occurrences).filter(o => o.isUpcoming);
+    if (nextOccurrences.length > 1) {
+      return msgDialog(`confirmation:!^${l.cancel_meeting_occurrence_button}!${l.schedule_cancel_abort}`, 'cancel-occurrence', l.schedule_cancel_occur_dlg_title, l.schedule_cancel_occur_dlg_text, cb => cb && occurrence.cancel(), 1);
+    }
+    return chatRoom.hasUserMessages() ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, 'cancel-occurrence', l.schedule_cancel_all_dialog_title, l.schedule_cancel_all_dialog_move, cb => cb && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, scheduledMeeting.chatId), 1) : msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, 'cancel-occurrence', l.schedule_cancel_all_dialog_title, l.schedule_cancel_all_dialog_archive, cb => cb && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, scheduledMeeting.chatId), 1);
   }
   renderLoading() {
     return external_React_default().createElement("div", {
@@ -13055,7 +13082,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         className: "sprite-fm-mono icon-repeat"
       })), external_React_default().createElement("span", {
         className: "txt small"
-      }, isUpcoming ? this.renderUpcomingInfo() : external_React_default().createElement(ui_contacts.MembersAmount, {
+      }, is_chatlink && isUpcoming && !isRecurring ? this.renderUpcomingInfo() : external_React_default().createElement(ui_contacts.MembersAmount, {
         chatRoom: room
       }))));
     } else {
@@ -16605,7 +16632,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
       label: topicChange_React.createElement(utils.dy, null, displayName)
     }), datetime, topicChange_React.createElement("div", {
       className: "message text-block"
-    }, topicChange_React.createElement(utils.Cw, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>\u201c${topic}\u201d</strong>`))))));
+    }, topicChange_React.createElement(utils.Cw, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>${topic}</strong>`))))));
     return topicChange_React.createElement("div", null, messages);
   }
 }
@@ -21404,6 +21431,7 @@ class Datepicker extends _mixins_js1__.wl {
     } = Datepicker;
     const {
       value,
+      name,
       className,
       placeholder
     } = this.props;
@@ -21415,7 +21443,7 @@ class Datepicker extends _mixins_js1__.wl {
     }, react0().createElement("input", {
       ref: this.inputRef,
       type: "text",
-      name: "account-firstname",
+      name: name,
       className: `
                             dialog-input
                             ${className || ''}
@@ -22166,14 +22194,19 @@ class Edit extends _mixins1__.wl {
         onClose();
         megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, chatRoom);
       }
-    })))), react0().createElement(_schedule_jsx3__.ou, {
+    })))), react0().createElement(_schedule_jsx3__.X2, {
+      className: "start-aligned"
+    }, react0().createElement(_schedule_jsx3__.sg, null, react0().createElement("i", {
+      className: "sprite-fm-mono icon-recents-filled"
+    })), react0().createElement("div", {
+      className: "schedule-date-container"
+    }, react0().createElement(_schedule_jsx3__.ou, {
       name: "startDateTime",
       altField: "startTime",
       startDate: startDateTime,
       value: startDateTime,
       filteredTimeIntervals: (0,_helpers_jsx9__.nl)(startDateTime),
-      icon: "sprite-fm-mono icon-recents-filled",
-      label: l.schedule_duration_separator,
+      label: l.schedule_start_date,
       onMount: datepicker => {
         this.datepickerRefs.startDateTime = datepicker;
       },
@@ -22204,6 +22237,7 @@ class Edit extends _mixins1__.wl {
       startDate: endDateTime,
       value: endDateTime,
       filteredTimeIntervals: (0,_helpers_jsx9__.nl)(endDateTime, startDateTime),
+      label: l.schedule_end_date,
       onMount: datepicker => {
         this.datepickerRefs.endDateTime = datepicker;
       },
@@ -22233,7 +22267,7 @@ class Edit extends _mixins1__.wl {
           endDateTime
         });
       }
-    })), react0().createElement("footer", null, react0().createElement("div", {
+    })))), react0().createElement("footer", null, react0().createElement("div", {
       className: "footer-container"
     }, react0().createElement(_button_jsx2__.Z, {
       className: "mega-button positive",
@@ -22555,7 +22589,9 @@ class Schedule extends mixins.wl {
       isEdit: false,
       isDirty: false,
       isLoading: false,
-      topicInvalid: false
+      topicInvalid: false,
+      invalidTopicMsg: '',
+      descriptionInvalid: false
     };
     this.handleToggle = prop => {
       return Object.keys(this.state).includes(prop) && this.setState(state => ({
@@ -22727,7 +22763,9 @@ class Schedule extends mixins.wl {
       isEdit,
       isDirty,
       isLoading,
-      topicInvalid
+      topicInvalid,
+      invalidTopicMsg,
+      descriptionInvalid
     } = this.state;
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       id: NAMESPACE,
@@ -22750,21 +22788,45 @@ class Schedule extends mixins.wl {
       placeholder: l.schedule_title_input,
       value: topic,
       invalid: topicInvalid,
-      invalidMessage: l.schedule_title_missing,
+      invalidMessage: invalidTopicMsg,
       autoFocus: true,
       isLoading: isLoading,
       onFocus: () => topicInvalid && this.setState({
         topicInvalid: false
       }),
-      onChange: this.handleChange
-    }), external_React_default().createElement(DateTime, {
+      onChange: val => {
+        if (val.length > ChatRoom.TOPIC_MAX_LENGTH) {
+          this.setState({
+            invalidTopicMsg: l.err_schedule_title_long,
+            topicInvalid: true
+          });
+          val = val.substring(0, ChatRoom.TOPIC_MAX_LENGTH);
+        } else if (val.length === 0) {
+          this.setState({
+            invalidTopicMsg: l.schedule_title_missing,
+            topicInvalid: true
+          });
+        } else if (this.state.invalidTopicMsg) {
+          this.setState({
+            invalidTopicMsg: '',
+            topicInvalid: false
+          });
+        }
+        this.handleChange('topic', val);
+      }
+    }), external_React_default().createElement(Row, {
+      className: "start-aligned"
+    }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-recents-filled"
+    })), external_React_default().createElement("div", {
+      className: "schedule-date-container"
+    }, external_React_default().createElement(DateTime, {
       name: "startDateTime",
       altField: "startTime",
       startDate: startDateTime,
       value: startDateTime,
       filteredTimeIntervals: this.getFilteredTimeIntervals(startDateTime),
-      icon: "sprite-fm-mono icon-recents-filled",
-      label: l.schedule_duration_separator,
+      label: l.schedule_start_date,
       isLoading: isLoading,
       onMount: datepicker => {
         this.datepickerRefs.startDateTime = datepicker;
@@ -22796,6 +22858,7 @@ class Schedule extends mixins.wl {
       startDate: endDateTime,
       value: endDateTime,
       filteredTimeIntervals: this.getFilteredTimeIntervals(endDateTime, startDateTime),
+      label: l.schedule_end_date,
       onMount: datepicker => {
         this.datepickerRefs.endDateTime = datepicker;
       },
@@ -22824,7 +22887,7 @@ class Schedule extends mixins.wl {
           endDateTime
         });
       }
-    }), external_React_default().createElement(Checkbox, {
+    }))), external_React_default().createElement(Checkbox, {
       name: "recurring",
       checked: recurring,
       label: l.schedule_recurring_label,
@@ -22868,16 +22931,33 @@ class Schedule extends mixins.wl {
       onToggle: this.handleToggle
     }), external_React_default().createElement(Textarea, {
       name: "description",
+      invalid: descriptionInvalid,
       placeholder: l.schedule_description_input,
       value: description,
-      onChange: this.handleChange
+      onFocus: () => descriptionInvalid && this.setState({
+        descriptionInvalid: false
+      }),
+      onChange: val => {
+        if (val.length > 3000) {
+          this.setState({
+            descriptionInvalid: true
+          });
+          val = val.substring(0, 3000);
+        } else if (this.state.descriptionInvalid) {
+          this.setState({
+            descriptionInvalid: false
+          });
+        }
+        this.handleChange('description', val);
+      }
     })), external_React_default().createElement(Footer, {
       isLoading: isLoading,
       isEdit: isEdit,
       topic: topic,
       onSubmit: this.handleSubmit,
       onInvalid: () => this.setState({
-        topicInvalid: !topic
+        topicInvalid: !topic,
+        invalidTopicMsg: l.schedule_title_missing
       })
     }), closeDialog && external_React_default().createElement(CloseDialog, {
       onToggle: this.handleToggle,
@@ -22929,9 +23009,13 @@ const Row = ({
         `
 }, children);
 const Column = ({
-  children
+  children,
+  className
 }) => external_React_default().createElement("div", {
-  className: `${Schedule.NAMESPACE}-column`
+  className: `
+            ${Schedule.NAMESPACE}-column
+            ${className || ''}
+        `
 }, children);
 const Header = ({
   chatRoom
@@ -22971,13 +23055,12 @@ const Input = ({
     className: isLoading ? 'disabled' : '',
     autoFocus: autoFocus,
     autoComplete: "off",
-    maxLength: ChatRoom.TOPIC_MAX_LENGTH,
     placeholder: placeholder,
     value: value,
     onFocus: onFocus,
     onChange: ({
       target
-    }) => onChange('topic', target.value)
+    }) => onChange(target.value)
   }), invalid && external_React_default().createElement("div", {
     className: "message-container mega-banner"
   }, invalidMessage))));
@@ -22989,18 +23072,13 @@ const DateTime = ({
   value,
   minDate,
   filteredTimeIntervals,
-  icon,
   label,
   isLoading,
   onMount,
   onSelectDate,
   onSelectTime
 }) => {
-  return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, icon && external_React_default().createElement("i", {
-    className: icon
-  })), external_React_default().createElement("div", {
-    className: "schedule-date-container"
-  }, external_React_default().createElement(datepicker.Z, {
+  return external_React_default().createElement((external_React_default()).Fragment, null, label && external_React_default().createElement("span", null, label), external_React_default().createElement(datepicker.Z, {
     name: `${datepicker.Z.NAMESPACE}-${name}`,
     className: isLoading ? 'disabled' : '',
     startDate: startDate,
@@ -23016,7 +23094,7 @@ const DateTime = ({
     value: value,
     format: toLocaleTime,
     onSelect: onSelectTime
-  }), label && external_React_default().createElement("div", null, label)));
+  }));
 };
 const Checkbox = ({
   name,
@@ -23076,24 +23154,30 @@ const Textarea = ({
   placeholder,
   isLoading,
   value,
-  onChange
+  invalid,
+  onChange,
+  onFocus
 }) => {
   return external_React_default().createElement(Row, {
     className: "start-aligned"
   }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
     className: "sprite-fm-mono icon-description"
   })), external_React_default().createElement(Column, null, external_React_default().createElement("div", {
-    className: "mega-input box-style textarea"
+    className: `mega-input box-style textarea ${invalid ? 'error' : ''}`
   }, external_React_default().createElement("textarea", {
     name: `${Schedule.NAMESPACE}-${name}`,
     className: isLoading ? 'disabled' : '',
     placeholder: placeholder,
     value: value,
-    maxLength: 4000,
     onChange: ({
       target
-    }) => onChange('description', target.value)
-  }))));
+    }) => onChange(target.value),
+    onFocus: onFocus
+  })), invalid && external_React_default().createElement("div", {
+    className: "mega-input error msg textarea-error"
+  }, external_React_default().createElement("div", {
+    className: "message-container mega-banner"
+  }, l.err_schedule_desc_long))));
 };
 const Footer = ({
   isLoading,

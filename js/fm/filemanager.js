@@ -313,7 +313,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         // Prevent drop behavior for the `Local` component
         // See: ui/meetings/local.jsx
-        if (ui.helper.hasClass('local-stream')) {
+        if (ui.helper.hasClass('local-stream') || !$(ui.draggable).hasClass('ui-draggable')) {
             return;
         }
 

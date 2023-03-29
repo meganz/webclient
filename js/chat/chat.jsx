@@ -347,8 +347,8 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             self.registerUploadListeners();
             self.trigger("onInit");
             mBroadcaster.sendMessage('chat_initialized');
-            setInterval(self._syncDnd.bind(self), 60000);
-            setInterval(self.removeMessagesByRetentionTime.bind(self, null), 20000);
+            setInterval(self._syncChats.bind(self), 6e4);
+            setInterval(self.removeMessagesByRetentionTime.bind(self, null), 2e4);
 
             self.autoJoinIfNeeded();
 
@@ -367,16 +367,29 @@ Chat.prototype.init = promisify(function(resolve, reject) {
         .catch(reject);
 });
 
-Chat.prototype._syncDnd = function() {
-    const chats = this.chats;
-    if (chats && chats.length > 0) {
-        chats.forEach(({ chatId }) => {
+Chat.prototype._syncChats = function() {
+    const { chats, logger } = this;
+    if (chats && chats.length) {
+        chats.forEach(({ chatId, scheduledMeeting }) => {
+            // Sync push notification settings -- disable the mute notifications setting for the given room if
+            // the selected mute until time have been reached.
             const dnd = pushNotificationSettings.getDnd(chatId);
             if (dnd && dnd < unixtime()) {
-                if (this.logger) {
-                    this.logger.debug(`Chat.prototype._syncDnd chatId=${chatId}`);
-                }
                 pushNotificationSettings.disableDnd(chatId);
+                if (logger) {
+                    logger.debug(`Chat.prototype._syncDnd chatId=${chatId}`);
+                }
+            }
+
+            // Sync scheduled meetings -- mark one-off meetings that have already passed, and update recurring
+            // meetings with their immediate next occurrence.
+            const { isUpcoming, chatRoom, id } = scheduledMeeting || {};
+            if (isUpcoming) {
+                scheduledMeeting.setNextOccurrence();
+                chatRoom.trackDataChange();
+                if (logger) {
+                    logger.debug(`Chat.prototype.__syncScheduledMeetings id=${id} chatId=${chatId}`);
+                }
             }
         });
     }
@@ -573,28 +586,33 @@ Chat.prototype.registerUploadListeners = function() {
             return;
         }
 
-        var n = M.d[handle];
-        var ul = ulmanager.ulEventData[uid] || false;
+        const n = M.getNodeByHandle(handle);
+        const ul = ulmanager.ulEventData[uid] || false;
 
         if (d) {
-            logger.debug('upload:completion', uid, handle, faid, ul, n);
+            logger.info('upload:completion', uid, handle, faid, ul, n);
         }
 
-        if (!ul || !n) {
+        if (!ul) {
             // This should not happen...
             if (d) {
-                logger.error('Invalid state error...');
+                logger.error('Upload event data store missing...', uid, n, ul);
             }
         }
         else {
             ul.h = handle;
+
+            if (ul.efa && !n) {
+                logger.error('Invalid state, efa set on deduplication?', ul.efa, ul);
+                ul.efa = 0;
+            }
 
             if (ul.efa && (!n.fa || String(n.fa).split('/').length < ul.efa)) {
                 // The fa was not yet attached to the node, wait for fa:* events
                 ul.faid = faid;
 
                 if (d) {
-                    logger.debug('Waiting for file attribute to arrive.', handle, ul);
+                    logger.info('Waiting for file attribute to arrive.', handle, ul);
                 }
             }
             else {

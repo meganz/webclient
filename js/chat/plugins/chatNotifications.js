@@ -195,58 +195,47 @@ var ChatNotifications = function(megaChat, options) {
                     };
                 });
         })
-        .rebind('onIncomingCall.chatNotifications', function(e, room, callId, userId, callManager) {
+        .rebind('onIncomingCall.chatNotifications', (e, chatRoom, callId, userId, callManager) => {
 
-            if (!pushNotificationSettings.isAllowedForChatId(room.chatId)) {
-                return;
-            }
-            if (
-                megaChat.initialPubChatHandle && megaChat.initialPubChatHandle === room.publicChatHandle ||
-                megaChat.initialChatId && megaChat.initialChatId === room.chatId
-            ) {
-                return;
-            }
-            if (is_chatlink) {
+            if (!pushNotificationSettings.isAllowedForChatId(chatRoom.chatId) || is_chatlink) {
                 return;
             }
 
-            let name = M.getNameByHandle(userId);
-            let avatar = useravatar.contact(userId, '', 'div');
-
-            var n = self.notifications.notify(
+            const notificationSound = 'incoming_voice_video_call';
+            const notification = this.notifications.notify(
                 'incoming-voice-video-call',
                 {
-                    'sound': window.sfuClient ? null : 'incoming_voice_video_call',
+                    'sound': window.sfuClient ? null : notificationSound,
                     'soundLoop': true,
                     'alwaysPlaySound': !window.sfuClient,
-                    'group': room.chatId,
+                    'group': chatRoom.chatId,
                     'incrementCounter': true,
                     'anfFlag': 'chat_enabled',
-                    'icon': avatar,
+                    'icon': useravatar.contact(userId, '', 'div', undefined),
                     'params': {
-                        'room': room,
-                        'from': name
+                        'room': chatRoom,
+                        'from': M.getNameByHandle(userId)
                     }
                 },
-                !room.isActive()
+                !chatRoom.isActive()
             );
 
-            n.on('onClick', function() {
+            notification.on('onClick', () => {
                 window.focus();
-                room.activateWindow();
-                room.show();
+                chatRoom.activateWindow();
+                chatRoom.show();
             });
 
-            var evtId = generateEventSuffixFromArguments("", "chatNotifStopSound", rand(10000));
-            var removeNotif = function(e) {
-                if (e.data.callId === callId || !room.ringingCalls.exists(callId)) {
-                    if (self._incomingDialogContainers[callId]) {
-                        const node = self._incomingDialogContainers[callId];
+            const evtId = generateEventSuffixFromArguments('', 'chatNotifStopSound', rand(10000));
+            const removeNotification = e => {
+                if (e.data.callId === callId || !chatRoom.ringingCalls.exists(callId)) {
+                    if (this._incomingDialogContainers[callId]) {
+                        const node = this._incomingDialogContainers[callId];
                         ReactDOM.unmountComponentAtNode(node);
                         node.parentNode.removeChild(node);
-                        delete self._incomingDialogContainers[callId];
+                        delete this._incomingDialogContainers[callId];
                     }
-                    n.forceStopSound();
+                    notification.forceStopSound(notificationSound);
                     callManager.off(`onRingingStopped${evtId}`);
                     callManager.off(`onRoomDisconnected${evtId}`);
                 }
@@ -256,51 +245,51 @@ var ChatNotifications = function(megaChat, options) {
 
             const dialogContainer = document.createElement('div');
             const triggerRingingStopped = () => {
-                room.ringingCalls.clear();
+                chatRoom.ringingCalls.clear();
                 megaChat.plugins.callManager2.trigger('onRingingStopped', {
                     callId: callId,
-                    chatRoom: room
+                    chatRoom: chatRoom
                 });
             };
             const dialog = React.createElement(ChatCallIncomingDialog, {
-                key: room.chatId,
-                chatRoom: room,
+                key: chatRoom.chatId,
+                chatRoom,
+                callerId: chatRoom.ringingCalls[callId],
                 onClose: () => triggerRingingStopped(),
-                callerId: room.ringingCalls[callId],
                 onAnswer: () => {
-                    room.activateWindow();
-                    room.show();
-                    room.joinCall(true, videoEnabled);
+                    chatRoom.activateWindow();
+                    chatRoom.show();
+                    chatRoom.joinCall(true, videoEnabled);
                     triggerRingingStopped();
                 },
                 onToggleVideo: newVal => {
                     videoEnabled = !newVal;
                 },
                 onReject: () => {
-                    room.rejectCall();
+                    chatRoom.rejectCall();
                     triggerRingingStopped();
                 },
                 onSwitch: () => {
                     if (window.sfuClient) {
                         window.sfuClient.app.destroy();
                     }
-                    room.activateWindow();
-                    room.show();
-                    room.joinCall(true, videoEnabled);
+                    chatRoom.activateWindow();
+                    chatRoom.show();
+                    chatRoom.joinCall(true, videoEnabled);
                     triggerRingingStopped();
                 }
             });
 
-            self._incomingDialogContainers[callId] = dialogContainer;
+            this._incomingDialogContainers[callId] = dialogContainer;
             document.body.append(dialogContainer);
             ReactDOM.render(dialog, dialogContainer);
 
-            callManager.on(`onRingingStopped${evtId}`, removeNotif);
-            room.on(`onRoomDisconnected${evtId}`, triggerRingingStopped);
-            room.on(`onCallLeft${evtId}`, () => {
-                n.setUnread(false);
+            callManager.on(`onRingingStopped${evtId}`, removeNotification);
+            chatRoom.on(`onRoomDisconnected${evtId}`, triggerRingingStopped);
+            chatRoom.on(`onCallLeft${evtId}`, () => {
+                notification.setUnread(false);
                 megaChat.updateSectionUnreadCount();
-                room.off(`onCallLeft${evtId}`);
+                chatRoom.off(`onCallLeft${evtId}`);
             });
         })
         .rebind('onOutgoingCallRinging', (e, megaRoom, callId, userId, callManager) => {

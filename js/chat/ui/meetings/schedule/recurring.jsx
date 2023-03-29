@@ -641,53 +641,65 @@ export class Edit extends MegaRenderMixin {
                             </div>
                         </div>
                     </Row>
-                    <DateTime
-                        name="startDateTime"
-                        altField="startTime"
-                        startDate={startDateTime}
-                        value={startDateTime}
-                        filteredTimeIntervals={getTimeIntervals(startDateTime)}
-                        icon="sprite-fm-mono icon-recents-filled"
-                        label={l.schedule_duration_separator}
-                        onMount={datepicker => {
-                            this.datepickerRefs.startDateTime = datepicker;
-                        }}
-                        onSelectDate={startDateTime => {
-                            this.setState({ startDateTime, isDirty: true }, () => {
-                                const { startDateTime, endDateTime } = this.state;
-                                if (startDateTime > endDateTime) {
-                                    this.datepickerRefs.endDateTime.selectDate(new Date(startDateTime + this.interval));
-                                }
-                            });
-                        }}
-                        onSelectTime={({ value: startDateTime }) => {
-                            this.handleTimeSelect({ startDateTime });
-                        }}
-                    />
-                    <DateTime
-                        name="endDateTime"
-                        altField="endTime"
-                        startDate={endDateTime}
-                        value={endDateTime}
-                        filteredTimeIntervals={getTimeIntervals(endDateTime, startDateTime)}
-                        onMount={datepicker => {
-                            this.datepickerRefs.endDateTime = datepicker;
-                        }}
-                        onSelectDate={endDateTime => {
-                            this.setState({ endDateTime, isDirty: true }, () => {
-                                const { startDateTime, endDateTime } = this.state;
-                                if (endDateTime < startDateTime) {
-                                    if (endDateTime < Date.now()) {
-                                        return this.setState({ endDateTime: startDateTime + this.interval });
-                                    }
-                                    this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
-                                }
-                            });
-                        }}
-                        onSelectTime={({ value: endDateTime }) => {
-                            this.handleTimeSelect({ endDateTime });
-                        }}
-                    />
+                    <Row className="start-aligned">
+                        <Column>
+                            <i className="sprite-fm-mono icon-recents-filled" />
+                        </Column>
+                        <div className="schedule-date-container">
+                            <DateTime
+                                name="startDateTime"
+                                altField="startTime"
+                                startDate={startDateTime}
+                                value={startDateTime}
+                                filteredTimeIntervals={getTimeIntervals(startDateTime)}
+                                label={l.schedule_start_date /* `Start date` */}
+                                onMount={datepicker => {
+                                    this.datepickerRefs.startDateTime = datepicker;
+                                }}
+                                onSelectDate={startDateTime => {
+                                    this.setState({ startDateTime, isDirty: true }, () => {
+                                        const { startDateTime, endDateTime } = this.state;
+                                        if (startDateTime > endDateTime) {
+                                            this.datepickerRefs.endDateTime.selectDate(
+                                                new Date(startDateTime + this.interval)
+                                            );
+                                        }
+                                    });
+                                }}
+                                onSelectTime={({ value: startDateTime }) => {
+                                    this.handleTimeSelect({ startDateTime });
+                                }}
+                            />
+
+                            <DateTime
+                                name="endDateTime"
+                                altField="endTime"
+                                startDate={endDateTime}
+                                value={endDateTime}
+                                filteredTimeIntervals={getTimeIntervals(endDateTime, startDateTime)}
+                                label={l.schedule_end_date /* `End date` */}
+                                onMount={datepicker => {
+                                    this.datepickerRefs.endDateTime = datepicker;
+                                }}
+                                onSelectDate={endDateTime => {
+                                    this.setState({ endDateTime, isDirty: true }, () => {
+                                        const { startDateTime, endDateTime } = this.state;
+                                        if (endDateTime < startDateTime) {
+                                            if (endDateTime < Date.now()) {
+                                                return this.setState({ endDateTime: startDateTime + this.interval });
+                                            }
+                                            this.datepickerRefs.startDateTime.selectDate(
+                                                new Date(endDateTime - this.interval)
+                                            );
+                                        }
+                                    });
+                                }}
+                                onSelectTime={({ value: endDateTime }) => {
+                                    this.handleTimeSelect({ endDateTime });
+                                }}
+                            />
+                        </div>
+                    </Row>
                 </div>
                 <footer>
                     <div className="footer-container">

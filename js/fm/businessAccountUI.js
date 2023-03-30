@@ -2026,7 +2026,10 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
     if (u_attr.pf) {
         $('.settings-menu-bar .settings-menu-item.suba-setting-profile', $accountContainer).addClass('hidden');
     }
-    if (u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+
+    // NB: u_attr.b (for Business) is not available in Pro Flexi, so always check for that
+    // before checking sub properties like u_attr.b.s otherwise an exception gets thrown
+    if (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
         $('.settings-menu-bar .settings-menu-item.suba-setting-inv', $accountContainer).addClass('hidden');
     }
 

@@ -431,7 +431,8 @@ RepayPage.prototype.initPage = function() {
                 }
             }
 
-            if (res.nb && futureAmount) {
+            // Show the previous & current invoice rows for Pro Flexi as well
+            if ((res.nb || u_attr.pf) && futureAmount) {
                 const $futurePaymentRow = rowTemplate.clone();
                 nbOfUsers = res.nb;
 

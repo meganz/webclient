@@ -1,4 +1,4 @@
-.local-stream {
+.float-video {
     position: fixed;
     bottom: 24px;
     right: 24px;
@@ -39,7 +39,7 @@
     }
 
     &:hover {
-        .local-stream-self-overlay {
+        .float-video-self-overlay {
             position: absolute;
             width: 100%;
             height: 100%;
@@ -48,7 +48,7 @@
         }
     }
 
-    .local-stream-options-control {
+    .float-video-options-control {
         position: absolute;
         top: 15px;
         left: 15px;
@@ -69,7 +69,7 @@
         }
     }
 
-    .local-stream-options {
+    .float-video-options {
         display: block;
         position: absolute;
         top: 50%;
@@ -160,12 +160,12 @@
 
         &.ratio-16-9 { width: 334px; height: 188px; }
 
-        &:hover .local-stream-overlay,
-        &.active .local-stream-overlay {
+        &:hover .float-video-overlay,
+        &.active .float-video-overlay {
             display: block;
         }
 
-        &:hover .local-stream-notifications {
+        &:hover .float-video-notifications {
             display: none;
         }
 
@@ -173,11 +173,11 @@
             display: none;
         }
 
-        &:hover .stream-node-status {
+        &:hover .video-node-status {
             display: none;
         }
 
-        .local-stream-overlay {
+        .float-video-overlay {
             display: none;
             position: absolute;
             top: 0;
@@ -187,7 +187,7 @@
             border-radius: 24px;
             background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0, rgba(0, 0, 0, 0) 100%);
 
-            .local-stream-controls {
+            .float-video-controls {
                 display: flex;
                 align-items: center;
                 justify-content: space-evenly;
@@ -231,7 +231,7 @@
             }
         }
 
-        .local-stream-notifications {
+        .float-video-notifications {
             position: absolute;
             left: 8px;
             bottom: 8px;
@@ -294,7 +294,7 @@
         }
     }
 
-    .stream-node {
+    .video-node {
         overflow: hidden;
         border-radius: 24px;
         background: transparent;

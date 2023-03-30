@@ -243,23 +243,23 @@ export default class Call extends MegaRenderMixin {
     bindCallEvents = () => {
         const { chatRoom } = this.props;
         chatRoom.rebind('onCallPeerLeft.callComp', () => {
-            const { minimized, streams, call } = this.props;
+            const { minimized, peers, call } = this.props;
             if (minimized) {
-                this.setState({ mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI }, () => {
+                this.setState({ mode: peers.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI }, () => {
                     call.setViewMode(this.state.mode);
                 });
             }
             else if (this.state.mode === Call.MODE.SPEAKER && call.forcedActiveStream &&
-                !streams[call.forcedActiveStream]) {
+                !peers[call.forcedActiveStream]) {
                 this.setState({ mode: Call.MODE.THUMBNAIL }, () => {
                     call.setViewMode(this.state.mode);
                 });
             }
         });
         chatRoom.rebind('onCallPeerJoined.callComp', () => {
-            const { minimized, streams, call } = this.props;
+            const { minimized, peers, call } = this.props;
             if (minimized) {
-                this.setState({ mode: streams.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI }, () => {
+                this.setState({ mode: peers.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI }, () => {
                     call.setViewMode(this.state.mode);
                 });
             }
@@ -291,7 +291,7 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleCallMinimize = () => {
-        const { call, streams, onCallMinimize } = this.props;
+        const { call, peers, onCallMinimize } = this.props;
         const { mode, sidebar, view } = this.state;
         const { stayOnEnd } = call;
         // Cache previous state only when `Local` is not already minimized
@@ -304,7 +304,7 @@ export default class Call extends MegaRenderMixin {
         };
 
         return (
-            streams.length > 0 ?
+            peers.length > 0 ?
                 // There are peers, i.e. other call participants -> render `Local` in `mini mode`
                 this.setState({ mode: Call.MODE.MINI, sidebar: false }, () => {
                     onCallMinimize();
@@ -335,36 +335,36 @@ export default class Call extends MegaRenderMixin {
 
     /**
      * handleStreamToggle
-     * @description Temporary debug method used to add or remove fake streams.
+     * @description Temporary debug method used to add or remove fake peers.
      * @param {number} action flag indicating the toggle action
      * @returns {void|boolean}
      */
 
     handleStreamToggle = action => {
-        const { streams } = this.props;
+        const { peers } = this.props;
 
-        if (action === STREAM_ACTIONS.ADD && streams.length === MAX_STREAMS) {
+        if (action === STREAM_ACTIONS.ADD && peers.length === MAX_STREAMS) {
             return;
         }
 
-        return action === STREAM_ACTIONS.ADD ? streams.addFakeDupStream() : streams.removeFakeDupStream();
+        return action === STREAM_ACTIONS.ADD ? peers.addFakeDupStream() : peers.removeFakeDupStream();
     };
 
     /**
      * handleSpeakerChange
      * @description Handles the selection of active speaker when in `Speaker Mode`.
-     * @param {Peer|StreamNode} streamNode the selected stream to set as active
+     * @param {Peer|VideoNode} VideoNode the selected stream to set as active
      * @see Sidebar.renderSpeakerMode
      * @see Local.renderOptionsDialog
-     * @see StreamNode.Pin
+     * @see VideoNode.Pin
      * @returns {void}
      */
 
-    handleSpeakerChange = streamNode => {
-        if (streamNode) {
+    handleSpeakerChange = videoNode => {
+        if (videoNode) {
             this.handleModeChange(Call.MODE.SPEAKER);
-            this.props.call.setForcedActiveStream(streamNode.clientId);
-            this.setState({ forcedLocal: streamNode.isLocal });
+            this.props.call.setForcedActiveStream(videoNode.clientId);
+            this.setState({ forcedLocal: videoNode.isLocal });
         }
     };
 
@@ -516,7 +516,7 @@ export default class Call extends MegaRenderMixin {
      * handles of the ephemeral accounts on which the `Add contact` was invoked on, and displays info dialog.
      * @param {string} handle the user handle of the account on which `Add Contact` was fired on
      * @see Ephemeral
-     * @see StreamNodeMenu.Contact
+     * @see VideoNodeMenu.Contact
      * @returns {false|void}
      */
 
@@ -584,14 +584,14 @@ export default class Call extends MegaRenderMixin {
     }
 
     render() {
-        const { minimized, streams, call, chatRoom, parent, onDeleteMessage } = this.props;
+        const { minimized, peers, call, chatRoom, parent, onDeleteMessage } = this.props;
         const {
             mode, view, sidebar, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
             offline, everHadPeers
         } = this.state;
         const { stayOnEnd } = call;
         const STREAM_PROPS = {
-            mode, streams, sidebar, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
+            mode, peers, sidebar, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
             everHadPeers,
             hasOtherParticipants: call.hasOtherParticipant(),
             isOnHold: call.sfuClient.isOnHold(), onSpeakerChange: this.handleSpeakerChange,
@@ -618,7 +618,7 @@ export default class Call extends MegaRenderMixin {
                     onVideoClick={() => call.toggleVideo()}
                     onScreenSharingClick={this.handleScreenSharingToggle}
                     onHoldClick={this.handleHoldToggle}
-                    onThumbnailDoubleClick={(streamNode) => this.handleSpeakerChange(streamNode)}
+                    onThumbnailDoubleClick={(videoNode) => this.handleSpeakerChange(videoNode)}
                 />
 
                 {sidebar && (

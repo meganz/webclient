@@ -3,8 +3,8 @@
 
 // Global components, i.e. may be rendered in the in-call container OR the body
 @import 'meetings/_streamHead.scss';
-@import 'meetings/_streamNode.scss';
-@import 'meetings/_local.scss';
+@import 'meetings/_videoNode.scss';
+@import 'meetings/_float.scss';
 @import 'meetings/_streamExtendedControls.scss';
 @import 'meetings/_micObserver.scss';
 @import 'meetings/_chatToaster.scss';

@@ -4,7 +4,7 @@ import Button from './button.jsx';
 import Call from './call.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 
-export default class StreamNodeMenu extends MegaRenderMixin {
+export default class VideoNodeMenu extends MegaRenderMixin {
     static NAMESPACE = 'node-menu';
 
     constructor(props) {
@@ -104,7 +104,7 @@ export default class StreamNodeMenu extends MegaRenderMixin {
     }
 
     render() {
-        const { NAMESPACE } = StreamNodeMenu;
+        const { NAMESPACE } = VideoNodeMenu;
         const { userHandle } = this.props.stream;
 
         if (userHandle !== u_handle) {

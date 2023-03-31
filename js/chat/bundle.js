@@ -8435,17 +8435,6 @@ class ColumnContactButtons extends genericNodePropsComponent.L {
       })).catch(() => d && console.warn('Already in a call.'))
     }), external_React_default().createElement(buttons.z, {
       className: "mega-button action simpletip",
-      icon: "sprite-fm-mono icon-video-call-filled",
-      attrs: {
-        'data-simpletip': !megaChat.hasSupportForCalls ? l.unsupported_browser_video : l[5897]
-      },
-      disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
-      onClick: () => (0,call.xt)().then(() => megaChat.createAndShowPrivateRoom(handle).then(room => {
-        room.setActive();
-        room.startVideoCall();
-      })).catch(() => d && console.warn('Already in a call.'))
-    }), external_React_default().createElement(buttons.z, {
-      className: "mega-button action simpletip",
       icon: "sprite-fm-mono icon-chat",
       attrs: {
         'data-simpletip': l[8632]
@@ -8453,11 +8442,11 @@ class ColumnContactButtons extends genericNodePropsComponent.L {
       onClick: () => loadSubPage('fm/chat/p/' + handle)
     }), external_React_default().createElement(buttons.z, {
       className: "mega-button action simpletip",
-      icon: "sprite-fm-mono icon-folder-outgoing-share",
+      icon: "sprite-fm-mono icon-send-files",
       attrs: {
-        'data-simpletip': l[5631]
+        'data-simpletip': l[6834]
       },
-      onClick: () => openCopyShareDialog(handle)
+      onClick: () => megaChat.openChatAndSendFilesDialog(handle)
     }), external_React_default().createElement(buttons.z, {
       ref: node => {
         this.props.onContextMenuRef(handle, node);
@@ -9204,32 +9193,15 @@ class ContactProfile extends mixins.wl {
         onClick: () => loadSubPage(`fm/chat/p/${handle}`)
       }), external_React_default().createElement(buttons.z, {
         className: "mega-button round simpletip",
-        icon: "sprite-fm-mono icon-share-filled",
+        icon: "sprite-fm-mono icon-send-files",
         attrs: {
-          'data-simpletip': l[5631]
+          'data-simpletip': l[6834]
         },
         onClick: () => {
           if (M.isInvalidUserStatus()) {
             return;
           }
-          openCopyShareDialog(handle);
-        }
-      }), external_React_default().createElement(buttons.z, {
-        className: "mega-button round simpletip",
-        icon: "sprite-fm-mono icon-video-call-filled",
-        disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
-        attrs: {
-          'data-simpletipposition': 'top',
-          'data-simpletip': !megaChat.hasSupportForCalls ? l.unsupported_browser_video : l[5897]
-        },
-        onClick: () => {
-          if (M.isInvalidUserStatus()) {
-            return;
-          }
-          return (0,call.xt)().then(() => megaChat.createAndShowPrivateRoom(handle).then(room => {
-            room.setActive();
-            room.startVideoCall();
-          })).catch(() => d && console.warn('Already in a call.'));
+          megaChat.openChatAndSendFilesDialog(handle);
         }
       }), external_React_default().createElement(buttons.z, {
         className: "mega-button round",

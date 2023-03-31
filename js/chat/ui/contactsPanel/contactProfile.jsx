@@ -192,38 +192,13 @@ export default class ContactProfile extends MegaRenderMixin {
                                     />
                                     <Button
                                         className="mega-button round simpletip"
-                                        icon="sprite-fm-mono icon-share-filled"
-                                        attrs={{ 'data-simpletip': l[5631] /* `Share folder` */ }}
+                                        icon="sprite-fm-mono icon-send-files"
+                                        attrs={{ 'data-simpletip': l[6834] /* `Send files` */ }}
                                         onClick={() => {
                                             if (M.isInvalidUserStatus()) {
                                                 return;
                                             }
-                                            openCopyShareDialog(handle);
-                                        }}
-                                    />
-                                    <Button
-                                        className="mega-button round simpletip"
-                                        icon="sprite-fm-mono icon-video-call-filled"
-                                        disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
-                                        attrs={{
-                                            'data-simpletipposition': 'top',
-                                            'data-simpletip': !megaChat.hasSupportForCalls ?
-                                                l.unsupported_browser_video : l[5897]
-                                            /* `Your browser doesn't support video calls. Please try a different one!`
-                                            : `Start Video Call` */ }}
-                                        onClick={() => {
-                                            if (M.isInvalidUserStatus()) {
-                                                return;
-                                            }
-                                            return inProgressAlert()
-                                                .then(() =>
-                                                    megaChat.createAndShowPrivateRoom(handle)
-                                                        .then(room => {
-                                                            room.setActive();
-                                                            room.startVideoCall();
-                                                        })
-                                                )
-                                                .catch(() => d && console.warn('Already in a call.'));
+                                            megaChat.openChatAndSendFilesDialog(handle);
                                         }}
                                     />
                                     <Button

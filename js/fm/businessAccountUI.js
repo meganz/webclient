@@ -50,7 +50,17 @@ function BusinessAccountUI() {
     this.initUItoRender = function () {
 
         // dealing with non-confirmed accounts, non Pro Flexi accounts and not paid business ones
-        if (!u_attr || !u_privk || (!u_attr.pf && (!u_attr.b || u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED))) {
+        if (
+            !u_attr
+            || !u_privk
+            || (
+                !u_attr.pf
+                && (
+                    !u_attr.b
+                    || u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED && M.currentdirid !== 'user-management/account'
+                )
+            )
+        ) {
             loadSubPage('start');
             return false;
         }
@@ -120,6 +130,9 @@ function BusinessAccountUI() {
 
             // Don't show some buttons in the top right panel
             $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
+        }
+        if (u_attr && u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+            $('.user-management-main-page-buttons', '.fm-right-header-user-management').addClass('hidden');
         }
 
         return true;
@@ -510,6 +523,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
             $detailListTable.append($currUser);
 
+            if (u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+                $currUserLeftPane.addClass('disabled');
+            }
             // left pane part
             $usersLeftPanel.append($currUserLeftPane);
         }
@@ -526,6 +542,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.grid-table-user-management .view-icon, .content-panel.user-management .nw-user-management-item,' +
             '.grid-table-user-management tbody tr')
             .rebind('click.subuser', function subUserViewInfoClickHandler() {
+
+                if ($(this).hasClass('disabled')) {
+                    return;
+                }
 
                 $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
 
@@ -2006,6 +2026,9 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
     if (u_attr.pf) {
         $('.settings-menu-bar .settings-menu-item.suba-setting-profile', $accountContainer).addClass('hidden');
     }
+    if (u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+        $('.settings-menu-bar .settings-menu-item.suba-setting-inv', $accountContainer).addClass('hidden');
+    }
 
     // event handler for header clicking
     $('.settings-menu-bar .settings-menu-item', $accountContainer).off('click.suba').on('click.suba',
@@ -2529,13 +2552,15 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     );
 
     // event handler for clicking on header
-    $('.acc-home', $pageHeader).rebind('click.suba',
-        function invoiceListHeaderClick() {
-            var $me = $(this);
-            if ($me.hasClass('acc-home')) {
-                return mySelf.viewSubAccountListUI();
-            }
-        });
+    $('.acc-home', $pageHeader).rebind('click.suba', function invoiceListHeaderClick() {
+        if (u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+            return;
+        }
+        const $me = $(this);
+        if ($me.hasClass('acc-home')) {
+            return mySelf.viewSubAccountListUI();
+        }
+    });
 
     // event handler for country select changing
     $('.cnt-ddl .option', $profileContainer).rebind('click.suba',
@@ -4214,6 +4239,9 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
                 .addClass('disabled');
             // $userRow.addClass('hidden');
             leftPanelClass = 'disabled-accounts';
+        }
+        if (u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+            $userRow.addClass('disabled');
         }
         self.updateSubUserLeftPanel($('.user-management-tree-panel-header.' + leftPanelClass)[0]);
     };

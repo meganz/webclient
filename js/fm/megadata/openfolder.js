@@ -642,6 +642,10 @@
                     if (!new BusinessAccount().isBusinessMasterAcc()) {
                         return M.openFolder('cloudroot');
                     }
+                    const subPage = id.replace('/', '').split('user-management')[1];
+                    if (u_attr.b.s === -1 && !(subPage && subPage === 'account')) {
+                        return M.openFolder('cloudroot');
+                    }
 
                     var usersM = new BusinessAccountUI();
 
@@ -654,7 +658,7 @@
                     else if (usersM.isRedrawNeeded(M.suba, usersM.business.previousSubList)) {
                         usersM.viewSubAccountListUI(undefined, undefined, true);
                     }
-                    var subPage = id.replace('/', '').split('user-management')[1];
+
                     if (subPage && subPage.length > 2) {
                         if (subPage === 'account') {
                             usersM.viewBusinessAccountPage();

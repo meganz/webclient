@@ -45,11 +45,29 @@ RepayPage.prototype.initPage = function() {
             if (result[0].status === 'fulfilled') {
                 u_attr['%name'] = result[0].value.v || from8(base64urldecode(result[0].value));
             }
+            else {
+                throw Error('Name failed to fetch for business account');
+            }
             if (result[1].status === 'fulfilled') {
                 u_attr['%email'] = result[1].value.v || from8(base64urldecode(result[1].value));
             }
+            else {
+                throw Error('Email failed to fetch for business account');
+            }
             mySelf.initPage();
-        });
+        })
+            .catch(ex => {
+                console.warn(ex.message);
+                msgDialog(
+                    `error:!^${l.bus_view_profile}!${l[82]}`,
+                    '',
+                    l.bus_repay_fetch_err,
+                    l.bus_repay_fetch_err_desc,
+                    e => {
+                        loadSubPage(e ? 'fm' : 'fm/user-management/account');
+                    }
+                );
+            });
         return false;
     }
 

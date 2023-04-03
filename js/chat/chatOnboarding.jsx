@@ -321,7 +321,11 @@ class ChatOnboarding {
                 });
                 return;
             }
-            if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_ADDED && !this.isMeetingsTab) {
+            if (
+                obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_ADDED
+                && this.hasDisplayableScheduleMeeting
+                && !this.isMeetingsTab
+            ) {
                 this.megaChat.trigger(CONVERSATIONS_APP_EVENTS.NAV_RENDER_VIEW, CONVERSATIONS_APP_VIEWS.MEETINGS);
             }
             const res = obChat.startNextOpenSteps(nextIdx);
@@ -348,6 +352,16 @@ class ChatOnboarding {
                 delete this.interval;
             }
         }
+    }
+
+    get hasDisplayableScheduleMeeting() {
+        return !!Object.values(this.megaChat.chats.toJS())
+            .filter(c =>
+                c.isDisplayable() &&
+                c.isMeeting &&
+                c.scheduledMeeting &&
+                c.scheduledMeeting.isUpcoming
+            ).length;
     }
 
     get isMeetingsTab() {

@@ -2028,22 +2028,17 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
     meetings: 0
   };
   var havePendingCall = false;
-  self.haveAnyActiveCall() === false && self.chats.forEach(function (megaRoom) {
-    if (megaRoom.state == ChatRoom.STATE.LEFT) {
+  self.chats.forEach(chatRoom => {
+    if (chatRoom.isArchived() || chatRoom.state === ChatRoom.STATE.LEFT) {
       return;
     }
-    if (megaRoom.isArchived()) {
-      return;
+    const unreads = parseInt(chatRoom.messagesBuff.getUnreadCount(), 10);
+    unreadCount += unreads;
+    if (unreads) {
+      notifications[chatRoom.isMeeting ? 'meetings' : 'chats'] += unreads;
     }
-    var c = parseInt(megaRoom.messagesBuff.getUnreadCount(), 10);
-    unreadCount += c;
-    if (c) {
-      notifications[megaRoom.isMeeting ? 'meetings' : 'chats'] += c;
-    }
-    if (!havePendingCall) {
-      if (megaRoom.havePendingCall() && megaRoom.uniqueCallParts && !megaRoom.uniqueCallParts[u_handle]) {
-        havePendingCall = true;
-      }
+    if (!havePendingCall && chatRoom.havePendingCall() && chatRoom.uniqueCallParts && !chatRoom.uniqueCallParts[u_handle]) {
+      havePendingCall = true;
     }
   });
   unreadCount = unreadCount > 9 ? "9+" : unreadCount;

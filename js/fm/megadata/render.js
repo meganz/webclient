@@ -309,10 +309,9 @@ MegaData.prototype.renderTree = function() {
 };
 
 MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
-
     'use strict';
-
-    $('.fm-empty-section:not(.transfer-panel-empty-txt):not(.fm-recents)').addClass('hidden');
+    const excluded = ['.transfer-panel-empty-txt', '.fm-recents', '.fm-empty-contacts'];
+    $(`.fm-empty-section:not(${excluded.join(',')})`).addClass('hidden');
     $('.fm-empty-section.fm-empty-sharef').remove();
 };
 

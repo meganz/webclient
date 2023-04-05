@@ -156,7 +156,9 @@ export class Start extends MegaRenderMixin {
                         onClick={this.startMeeting}>
                         <span>{l[7315] /* `Start` */}</span>
                     </Button>
-                    <Link to="/securechat">{l.how_meetings_work /* `Learn more about MEGA Meetings` */}</Link>
+                    <Link to="https://mega.io/chatandmeetings" target="_blank">
+                        {l.how_meetings_work /* `Learn more about MEGA Meetings` */}
+                    </Link>
                 </div>
             </ModalDialogsUI.ModalDialog>
         );

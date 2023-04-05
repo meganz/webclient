@@ -277,7 +277,7 @@ accountUI.general = {
 
             // If this is Linux send them to desktop page to select linux type
             if (pf.indexOf('LINUX') > -1) {
-                loadSubPage('desktop');
+                mega.redirect('mega.io', 'desktop', false, false, false);
             }
             // else directly give link of the file.
             else {
@@ -2403,7 +2403,7 @@ accountUI.plan = {
             });
 
             $('.fm-purchase-voucher, button.topup').rebind('click', function() {
-                mega.redirect('mega.io', 'resellers', false, false);
+                mega.redirect('mega.io', 'resellers', false, false, false);
             });
         }
     },

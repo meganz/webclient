@@ -2304,7 +2304,11 @@ var dlmanager = {
                     megasync.download(dlpage_ph, dlpage_key);
                 }
                 else {
-                    open(megasync.getMegaSyncUrl() || (getAppBaseUrl() + '#sync'));
+                    window.open(
+                        megasync.getMegaSyncUrl() || 'https://mega.io/desktop',
+                        '_blank',
+                        'noopener,noreferrer'
+                    );
                 }
             }
             if ($('.download.download-page').hasClass('video')) {
@@ -2412,7 +2416,11 @@ var dlmanager = {
                     megasync.download(dlpage_ph, dlpage_key);
                 }
                 else {
-                    open(megasync.getMegaSyncUrl() || (getAppBaseUrl() + '#sync'));
+                    window.open(
+                        megasync.getMegaSyncUrl() || 'https://mega.io/desktop',
+                        '_blank',
+                        'noopener,noreferrer'
+                    );
                     hideOverlay();
                 }
             }

@@ -4018,7 +4018,7 @@ function initDownloadDesktopAppDialog() {
                 break;
             case "Linux":
                 $('aside', $dialog).addClass('hidden');
-                loadSubPage('/desktop');
+                mega.redirect('mega.io', '/desktop', false, false, false);
                 break;
         }
     });

@@ -804,11 +804,12 @@ var mega = {
         this.state |= window.MEGAFLAG_LOADINGCLOUD;
     },
 
-    redirect: function(to, page, kv, urlQs) {
+    redirect: function(to, page, kv, urlQs, st) {
         'use strict';
         var storage = localStorage;
         var toMegaIo = to === 'mega.io';
         var getCount = 0;
+        st = typeof st === 'undefined' || st;
 
         to = (String(to).indexOf('//') < 0 ? 'https://' : '') + to;
 
@@ -856,7 +857,10 @@ var mega = {
                 }
             }
         }
-
+        if (st) {
+            window.onload = window.onerror = null;
+            return location.replace(to + (urlQs || ''));
+        }
         window.open(to + (urlQs || ''), '_blank', 'noopener,noreferrer');
     },
 
@@ -1161,17 +1165,17 @@ if (!browserUpdate && is_extension)
 }
 
 var page;
-window.redirect = ['achievements', 'android', 'bird', 'business', 'chrome', 'cmd',
-                   'contact', 'copyright', 'desktop', 'dev',
-                   'developers', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
+window.redirect = ['about', 'achievements', 'android', 'bird', 'business', 'chrome', 'cmd', 'collaboration',
+                   'contact', 'cookie', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
+                   'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
                    'megabackup', 'mobile', 'nas', 'objectstorage',
-                   'plugin', 'privacy', 'resellers', 'sdkterms',
-                   'security', 'start', 'storage', 'takedown', 'terms', 'uwp', 'wp'];
+                   'plugin', 'privacy', 'refer', 'resellers', 'sdk', 'securechat',
+                   'security', 'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
 var isStaticPage = function(page) {
     'use strict';
     if (page) {
         var excludedPages = {copyrightnotice: 1, disputenotice: 1, businesssignup: 1, businessinvite: 1};
-        if (excludedPages[page] || page.indexOf('businesssignup') > -1 || page.indexOf('businessinvite') > -1) {
+        if (excludedPages[page] || page.indexOf('businesssignup') > -1 || page.indexOf('businessinvite') > -1 || page.indexOf('about/jobs') > -1) {
             return false;
         }
         for (var k = redirect.length; k--;) {

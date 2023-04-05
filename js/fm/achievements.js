@@ -34,11 +34,13 @@ Object.defineProperty(mega, 'achievem', {
                                     open('https://mega.nz/MEGAsyncSetup.dmg');
                                     break;
                                 }
-
-                                action = 'sync';
-                                /** Fallthrough */
-
+                                mega.redirect('mega.io', 'desktop', false, false, false);
+                                break;
                             case '/':
+                                if (action === '/mobile') {
+                                    mega.redirect('mega.io', 'mobile', false, false, false);
+                                    break;
+                                }
                                 loadSubPage(action);
                                 break;
 

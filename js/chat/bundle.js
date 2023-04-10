@@ -660,6 +660,31 @@ class MeetingsManager {
       }
     });
   }
+  checkForNotifications() {
+    const time = Date.now();
+    const upcomingMeetings = Object.values(this.scheduledMeetings.toJS()).filter(c => c.isUpcoming);
+    for (const meeting of upcomingMeetings) {
+      if (pushNotificationSettings.isAllowedForChatId(meeting.chatId)) {
+        if (meeting.nextOccurrenceStart >= time + 9e5 && meeting.nextOccurrenceStart <= time + 96e4) {
+          const ss = Math.floor(meeting.nextOccurrenceStart / 1000);
+          const ns = Math.floor(time / 1000) + 900;
+          if (ss - ns <= 10) {
+            this.megaChat.trigger('onScheduleUpcoming', meeting);
+          } else {
+            tSleep(ss - ns).always(() => {
+              this.megaChat.trigger('onScheduleUpcoming', meeting);
+            });
+          }
+        } else if (meeting.nextOccurrenceStart >= time && meeting.nextOccurrenceStart < time + 6e4) {
+          const ss = Math.floor(meeting.nextOccurrenceStart / 1000);
+          const ns = Math.floor(time / 1000);
+          tSleep(ss - ns).always(() => {
+            this.megaChat.trigger('onScheduleStarting', meeting);
+          });
+        }
+      }
+    }
+  }
   encodeData(data) {
     return data && base64urlencode(to8(data));
   }
@@ -1408,6 +1433,8 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
   }
 }, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "checkAndShowStep", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "checkAndShowStep"), _class.prototype)), _class));
 
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
+var call = __webpack_require__(200);
 ;// CONCATENATED MODULE: ./js/chat/chat.jsx
 
 
@@ -1415,6 +1442,7 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
 __webpack_require__(62);
 __webpack_require__(778);
 __webpack_require__(336);
+
 
 
 
@@ -1515,6 +1543,24 @@ function Chat() {
             return notificationObj.options.icon;
           },
           body: ''
+        },
+        'upcoming-scheduled-occurrence': {
+          title: ({
+            options
+          }) => {
+            return options.meeting.title;
+          },
+          icon: `${staticpath}/images/mega/mega-icon.svg`,
+          body: l.notif_body_scheduled_upcoming
+        },
+        'starting-scheduled-occurrence': {
+          title: ({
+            options
+          }) => {
+            return options.meeting.title;
+          },
+          icon: `${staticpath}/images/mega/mega-icon.svg`,
+          body: l.notif_body_scheduled_starting
         }
       },
       'sounds': ['alert_info_message', 'error_message', 'incoming_chat_message', 'incoming_contact_request', 'incoming_file_transfer', 'incoming_voice_video_call', 'hang_out', 'user_join_call', 'user_left_call', 'reconnecting', 'end_call']
@@ -1539,6 +1585,9 @@ function Chat() {
       return typeof SfuClient !== 'undefined' && typeof TransformStream !== 'undefined' && window.RTCRtpSender && !!RTCRtpSender.prototype.createEncodedStreams;
     }
   });
+  this.minuteClockInterval = setInterval(() => {
+    this._syncChats();
+  }, 6e4);
   return this;
 }
 inherits(Chat, MegaDataObject);
@@ -1647,7 +1696,6 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     self.registerUploadListeners();
     self.trigger("onInit");
     mBroadcaster.sendMessage('chat_initialized');
-    setInterval(self._syncChats.bind(self), 6e4);
     setInterval(self.removeMessagesByRetentionTime.bind(self, null), 2e4);
     self.autoJoinIfNeeded();
     const scheduledMeetings = Object.values(Chat.mcsm);
@@ -1665,6 +1713,10 @@ Chat.prototype.init = promisify(function (resolve, reject) {
   }).then(resolve).catch(reject);
 });
 Chat.prototype._syncChats = function () {
+  if (!this.is_initialized) {
+    return;
+  }
+  this.plugins.meetingsManager.checkForNotifications();
   const {
     chats,
     logger
@@ -2081,6 +2133,9 @@ Chat.prototype.destroy = function (isLogout) {
     if (plugin.destroy) {
       plugin.destroy();
     }
+  }
+  if (this.minuteClockInterval) {
+    clearInterval(this.minuteClockInterval);
   }
 };
 Chat.prototype.getContacts = function () {
@@ -3443,6 +3498,28 @@ Chat.prototype.autoJoinIfNeeded = function () {
     } else {
       localStorage.removeItem("autoJoinOnLoginChat");
     }
+  }
+};
+Chat.prototype.openScheduledMeeting = function (meetingId, toCall) {
+  const meeting = this.scheduledMeetings[meetingId];
+  if (!meeting) {
+    console.warn('Meeting does not exist', meetingId);
+    return;
+  }
+  window.focus();
+  meeting.chatRoom.activateWindow();
+  meeting.chatRoom.show();
+  if (toCall && megaChat.hasSupportForCalls) {
+    if (this.haveAnyActiveCall() && window.sfuClient) {
+      const {
+        chatRoom
+      } = megaChat.activeCall;
+      const peers = chatRoom ? chatRoom.getCallParticipants() : [];
+      if (peers.includes(u_handle)) {
+        return d && console.warn('Already in this call');
+      }
+    }
+    (0,call.xt)(true, meeting.chatRoom).then(() => meeting.chatRoom.startAudioCall(true)).catch(ex => d && console.warn('Already in a call.', ex));
   }
 };
 window.Chat = Chat;

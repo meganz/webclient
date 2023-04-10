@@ -2657,6 +2657,20 @@ else if (!browserUpdate) {
         return enLang;
     };
 
+    tryCatch(function() {
+        if (!is_mobile && 'serviceWorker' in navigator) {
+            // The service worker isn't listened to until much later so just queue any messages for now.
+            var handler = function(ev) {
+                mega.pendingServiceWorkerMsgs.push({data: ev.data});
+            };
+            navigator.serviceWorker.addEventListener('message', handler);
+
+            mega.pendingServiceWorkerMsgs = [];
+            mega.pendingServiceWorkerHandler = handler;
+        }
+    })();
+
+
     var lang = sessionStorage.lang || localStorage.lang;
     var jsl = [];
 

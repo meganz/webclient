@@ -3391,6 +3391,15 @@ mBroadcaster.once('boot_done', () => {
         }
     });
 
+    // Currently only used in chat so don't bother trying to register for mobile browsers.
+    if (!is_mobile) {
+        onIdle(tryCatch(() => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(`${is_extension ? '' : '/'}sw.js?v=1`).catch(dump);
+            }
+        }));
+    }
+
     if (d) {
         if (!window.crossOriginIsolated) {
             if (window.crossOriginIsolated === false) {

@@ -9,6 +9,14 @@
 var ChatNotifications = function(megaChat, options) {
     var self = this;
 
+    // Service worker events.
+    const chatNotifActions = {
+        CLICK: 'click',
+        CLOSE: 'close',
+        SCHED_STARTING_JOIN: 'sched_starting_join',
+        SCHED_STARTING_MSG: 'sched_starting_msg',
+    };
+
     options = options || {};
 
     options.parentLogger = megaChat.logger;
@@ -341,6 +349,103 @@ var ChatNotifications = function(megaChat, options) {
                     true
                 );
             }
+        })
+        .rebind('onScheduleUpcoming.chatNotifications', ({ data: meeting }) => {
+            const n = this.notifications.notify(
+                'upcoming-scheduled-occurrence',
+                { anfFlag: 'chat_enabled', meeting, sound: 'incoming_chat_message', group: `schedUp-${meeting.id}`, },
+                true
+            );
+            n.on('onClick', () => {
+                window.focus();
+                meeting.chatRoom.activateWindow();
+                meeting.chatRoom.show();
+            });
+        })
+        .rebind('onScheduleStarting.chatNotifications', ({ data: meeting }) => {
+            this.notifications.notify(
+                'starting-scheduled-occurrence',
+                {
+                    anfFlag: 'chat_enabled',
+                    group: `schedStart-${meeting.id}`,
+                    sound: 'incoming_chat_message',
+                    actions: [
+                        {
+                            action: chatNotifActions.SCHED_STARTING_JOIN,
+                            title: l.join_chat_button, /* `Join` */
+                        },
+                        {
+                            action: chatNotifActions.SCHED_STARTING_MSG,
+                            title: l.notif_opt_message, /* `Message` */
+                        }
+                    ],
+                    meeting,
+                    data: {
+                        meetingId: meeting.id,
+                        url: `${getBaseUrl()}/${meeting.chatRoom.getRoomUrl()}`,
+                    }
+                },
+                true
+            );
         });
-};
 
+    const serviceWorkerHandler = (ev) => {
+        const {action, data} = ev.data;
+        switch (action) {
+            case chatNotifActions.CLICK: {
+                if (data && data.meetingId) {
+                    megaChat.openScheduledMeeting(data.meetingId, true);
+                }
+                else if (d) {
+                    megaChat.logger.warn('Invalid message action from service worker.', ev.data);
+                }
+                break;
+            }
+            case chatNotifActions.SCHED_STARTING_MSG: {
+                if (data && data.meetingId) {
+                    megaChat.openScheduledMeeting(data.meetingId);
+                }
+                else if (d) {
+                    megaChat.logger.warn('Invalid service worker reply for SCHED_STARTING_MSG', ev.data);
+                }
+                break;
+            }
+            case chatNotifActions.SCHED_STARTING_JOIN: {
+                if (data && data.meetingId) {
+                    megaChat.openScheduledMeeting(data.meetingId, true);
+                }
+                else if (d) {
+                    megaChat.logger.warn('Invalid service worker reply for SCHED_STARTING_JOIN', ev.data);
+                }
+                break;
+            }
+            case chatNotifActions.CLOSE: {
+                // Be aware that this will be triggered in addition to any other actions.
+                break;
+            }
+            default: {
+                megaChat.logger.warn('Invalid message action from service worker.', ev.data);
+            }
+        }
+    };
+
+    if (mega.pendingServiceWorkerHandler) {
+
+        // Process the pending messages when chat has finished loading.
+        megaChat.rebind('onInit.swPending', SoonFc(500, () => {
+            megaChat.off('onInit.swPending');
+
+            const msg = mega.pendingServiceWorkerMsgs;
+
+            for (let i = 0; i < msg.length; i++) {
+                const data = msg[i];
+                serviceWorkerHandler({data});
+            }
+            navigator.serviceWorker.addEventListener('message', serviceWorkerHandler);
+            navigator.serviceWorker.removeEventListener('message', mega.pendingServiceWorkerHandler);
+
+            delete mega.pendingServiceWorkerMsgs;
+            delete mega.pendingServiceWorkerHandler;
+        }));
+    }
+};

@@ -2617,7 +2617,7 @@ MegaDexie.prototype.__checkStaleDBNames = function() {
                 console.debug('Checking stale databases...');
             }
 
-            indexedDB.databases()
+            Promise.resolve(indexedDB.databases())
                 .then(function(r) {
                     for (var i = r.length; i--;) {
                         console.assert(r[i].name);

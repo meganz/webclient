@@ -62,6 +62,9 @@
 .sprite-fm-uni.icon-backup-90, .sprite-fm-uni-before.icon-backup-90-before::before, .sprite-fm-uni-after.icon-backup-90-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-backup-90");
 }
+.sprite-fm-uni.icon-backup-selected, .sprite-fm-uni-before.icon-backup-selected-before::before, .sprite-fm-uni-after.icon-backup-selected-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-backup-selected");
+}
 .sprite-fm-uni.icon-bucket-24, .sprite-fm-uni-before.icon-bucket-24-before::before, .sprite-fm-uni-after.icon-bucket-24-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-bucket-24");
 }
@@ -70,6 +73,9 @@
 }
 .sprite-fm-uni.icon-business, .sprite-fm-uni-before.icon-business-before::before, .sprite-fm-uni-after.icon-business-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-business");
+}
+.sprite-fm-uni.icon-business-selected, .sprite-fm-uni-before.icon-business-selected-before::before, .sprite-fm-uni-after.icon-business-selected-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-business-selected");
 }
 .sprite-fm-uni.icon-cad-24, .sprite-fm-uni-before.icon-cad-24-before::before, .sprite-fm-uni-after.icon-cad-24-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-cad-24");
@@ -97,6 +103,9 @@
 }
 .sprite-fm-uni.icon-chat-new-group, .sprite-fm-uni-before.icon-chat-new-group-before::before, .sprite-fm-uni-after.icon-chat-new-group-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-chat-new-group");
+}
+.sprite-fm-uni.icon-chat-selected, .sprite-fm-uni-before.icon-chat-selected-before::before, .sprite-fm-uni-after.icon-chat-selected-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-chat-selected");
 }
 .sprite-fm-uni.icon-chat-send, .sprite-fm-uni-before.icon-chat-send-before::before, .sprite-fm-uni-after.icon-chat-send-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-chat-send");
@@ -227,6 +236,9 @@
 .sprite-fm-uni.icon-files, .sprite-fm-uni-before.icon-files-before::before, .sprite-fm-uni-after.icon-files-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-files");
 }
+.sprite-fm-uni.icon-files-selected, .sprite-fm-uni-before.icon-files-selected-before::before, .sprite-fm-uni-after.icon-files-selected-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-files-selected");
+}
 .sprite-fm-uni.icon-folder-24, .sprite-fm-uni-before.icon-folder-24-before::before, .sprite-fm-uni-after.icon-folder-24-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-24");
 }
@@ -292,6 +304,9 @@
 }
 .sprite-fm-uni.icon-gallery, .sprite-fm-uni-before.icon-gallery-before::before, .sprite-fm-uni-after.icon-gallery-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-gallery");
+}
+.sprite-fm-uni.icon-gallery-selected, .sprite-fm-uni-before.icon-gallery-selected-before::before, .sprite-fm-uni-after.icon-gallery-selected-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-gallery-selected");
 }
 .sprite-fm-uni.icon-generic-24, .sprite-fm-uni-before.icon-generic-24-before::before, .sprite-fm-uni-after.icon-generic-24-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-generic-24");
@@ -649,6 +664,9 @@
 }
 .sprite-fm-uni.icon-transfers, .sprite-fm-uni-before.icon-transfers-before::before, .sprite-fm-uni-after.icon-transfers-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-transfers");
+}
+.sprite-fm-uni.icon-transfers-selected, .sprite-fm-uni-before.icon-transfers-selected-before::before, .sprite-fm-uni-after.icon-transfers-selected-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-transfers-selected");
 }
 .sprite-fm-uni.icon-twitter, .sprite-fm-uni-before.icon-twitter-before::before, .sprite-fm-uni-after.icon-twitter-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-twitter");

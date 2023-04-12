@@ -3222,6 +3222,7 @@ else if (!browserUpdate) {
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
         'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
         'copyright_js': {f:'html/js/copyright.js', n: 'copyright_js', j:1},
+        'terms': {f:'html/terms.html', n: 'terms', j:0},
         'keybackup': {f:'html/backup.html', n: 'keybackup', j:0},
         'keybackup_js': {f:'html/js/backup.js', n: 'keybackup_js', j:1},
         'cancel': {f:'html/cancel.html', n: 'cancel', j:0},
@@ -3340,6 +3341,7 @@ else if (!browserUpdate) {
 
     var subpages =
     {
+        'terms': ['terms'],
         'keybackup': ['keybackup', 'keybackup_js', 'filesaver'],
         'recovery': ['recovery', 'recovery_js'],
         'reset': ['reset', 'reset_js'],

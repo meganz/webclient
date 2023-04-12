@@ -9,7 +9,7 @@ var signin = {
     old: {
 
         /**
-         * Starts the login proceedure
+         * Starts the login proceedure for v1 accounts
          * @param {String} email The user's email address
          * @param {String} password The user's password
          * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if N/A
@@ -19,11 +19,16 @@ var signin = {
 
             'use strict';
 
-
             postLogin(email, password, pinCode, rememberMe, (result) => {
 
-                // Otherwise proceed with regular login
-                signin.proceedWithLogin(result);
+                // Check if we can upgrade the account to v2
+                security.login.checkToUpgradeAccountVersion(result, u_k, password, () => {
+
+                    loadingDialog.hide();
+
+                    // Otherwise proceed with regular login
+                    signin.proceedWithLogin(result);
+                });
             });
         }
     },
@@ -92,6 +97,7 @@ var signin = {
             else {
                 // Otherwise proceed with regular login
                 u_type = result;
+
                 passwordManager('#login_form');
 
                 if (login_next) {

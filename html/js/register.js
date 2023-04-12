@@ -36,7 +36,15 @@ var loginFromEphemeral = {
 
             'use strict';
 
-            postLogin(email, password, pinCode, rememberMe, loginFromEphemeral.completeLogin);
+            postLogin(email, password, pinCode, rememberMe, (result) => {
+
+                // Check if we can upgrade the account to v2
+                security.login.checkToUpgradeAccountVersion(result, u_k, password, () => {
+
+                    // Otherwise proceed with regular login
+                    loginFromEphemeral.completeLogin(result);
+                });
+            });
         }
     },
 

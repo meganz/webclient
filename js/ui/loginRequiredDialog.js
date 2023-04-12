@@ -211,7 +211,15 @@
      */
     function startOldLogin(email, password, pinCode, rememberMe) {
 
-        postLogin(email, password, pinCode, rememberMe, completeLogin);
+        postLogin(email, password, pinCode, rememberMe, (result) => {
+
+            // Check if we can upgrade the account to v2
+            security.login.checkToUpgradeAccountVersion(result, u_k, password, () => {
+
+                // Otherwise proceed with regular login
+                completeLogin(result);
+            });
+        });
     }
 
     /**

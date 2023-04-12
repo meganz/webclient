@@ -2692,7 +2692,7 @@ lazy(mega.gallery, 'mdReporter', () => {
      * @property {Number} 1 EventId
      */
     const marks = [
-        [10, 99753],
+        [10, 99753], // This timeout value is also being used for Fav reporter
         [30, 99754],
         [60, 99755],
         [180, 99756]
@@ -2713,6 +2713,8 @@ lazy(mega.gallery, 'mdReporter', () => {
      * @type {Number[]}
      */
     let passedSessionMarks = [];
+    let sessionTimer = null;
+    let favTimer = null;
 
     let fmStats = null;
     let disposeVisibilityChange = null;
@@ -2736,10 +2738,8 @@ lazy(mega.gallery, 'mdReporter', () => {
 
     return {
         runId: 0,
-        notApplicable(currentPage, runId) {
-            return this.runId !== runId
-                || document.visibilityState === 'hidden'
-                || window.M.currentdirid !== currentPage;
+        sameRun(runId) {
+            return runId === this.runId && document.visibilityState !== 'hidden';
         },
         report(skipReset) {
             if (!skipReset && this.runId) {
@@ -2747,7 +2747,7 @@ lazy(mega.gallery, 'mdReporter', () => {
             }
 
             this.runId = Date.now();
-            const {runId} = this;
+            const { runId } = this;
 
             disposeVisibilityChange = MComponent.listen(
                 document,
@@ -2759,22 +2759,28 @@ lazy(mega.gallery, 'mdReporter', () => {
                 }
             );
 
-            this.reportSessionMarks(marks[0][0], M.currentdirid, 0, runId);
-            this.processSectionFavourite(M.currentdirid, runId);
+            sessionTimer = this.reportSessionMarks(marks[0][0], 0, runId);
+            favTimer = this.processSectionFavourite(runId);
+
+            mBroadcaster.once('pagechange', () => {
+                this.stop();
+            });
         },
         /**
          * Sending time marks if the session time is surpassing a specific value
          * @param {Number} timeout
-         * @param {String} currentPage
          * @param {Number} diff Timeout to the next mark
          * @param {Number} runId Current report run id to check
          */
-        reportSessionMarks(timeout, currentPage, diff, runId) {
+        reportSessionMarks(timeout, diff, runId) {
             const eventIndex = marks.findIndex(([to]) => to === timeout);
 
-            tSleep(timeout - diff).then(
+            const timer = tSleep(timeout - diff);
+
+            timer.then(
                 () => {
-                    if (this.notApplicable(currentPage, runId)) {
+                    if (!this.sameRun(runId)) {
+                        sessionTimer = null;
                         return;
                     }
 
@@ -2789,19 +2795,26 @@ lazy(mega.gallery, 'mdReporter', () => {
 
                     const nextIndex = eventIndex + 1;
                     if (marks[nextIndex]) {
-                        this.reportSessionMarks(marks[nextIndex][0], currentPage, timeout, runId);
+                        sessionTimer = this.reportSessionMarks(marks[nextIndex][0], timeout, runId);
+                    }
+                    else {
+                        sessionTimer = null;
                     }
                 }
             );
+
+            return timer;
         },
         /**
          * Report if user visited a specific section/page more than timesOver times
-         * @param {String} currentPage
          * @param {Number} runId Current report run id to check
          */
-        processSectionFavourite(currentPage, runId) {
-            tSleep(marks[0][0]).then(() => {
-                if (this.notApplicable(currentPage, runId)) {
+        processSectionFavourite(runId) {
+            const timer = tSleep(marks[0][0]);
+
+            timer.then(() => {
+                if (!this.sameRun(runId)) {
+                    favTimer = null;
                     return;
                 }
 
@@ -2832,6 +2845,8 @@ lazy(mega.gallery, 'mdReporter', () => {
                     }
                 });
             });
+
+            return timer;
         },
         stop() {
             if (typeof disposeVisibilityChange === 'function') {
@@ -2840,6 +2855,14 @@ lazy(mega.gallery, 'mdReporter', () => {
 
             this.runId = 0;
             passedSessionMarks = [];
+
+            if (sessionTimer) {
+                sessionTimer.abort();
+            }
+
+            if (favTimer) {
+                favTimer.abort();
+            }
         }
     };
 });

@@ -388,7 +388,14 @@
         }
 // SfuClient.IClientEventListener interface
         onServerError(errCode) {
-            console.error('onServerError!!!', errCode);
+            console.error('onServerError:', errCode);
+            if (errCode === SfuClient.TermCode.kProtocolVersion) {
+                return is_extension ?
+                    // `An update is available`, `MEGA Chat has been upgraded and it will now only be supported in...`
+                    msgDialog('warningb', l[1900], l[8841]) :
+                    // `An update is available`, `MEGA Chat has been upgraded and requires a reload. Do you reload...`
+                    msgDialog('confirmation', l[1900], l[8840], '', cb => cb && location.reload());
+            }
         }
         onJoined() {
             for (const peer of this.sfuClient.peers.values()) {

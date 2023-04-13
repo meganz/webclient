@@ -148,30 +148,26 @@ mobile.account.changePassword = {
             }
         };
 
-        var registerationMethod = 1;
+        // Check their current Account Authentication Version before proceeding
+        security.changePassword.checkAccountVersion((accountAuthVersion) => {
 
-        if (u_attr && u_attr.aav === 2) {
-            registerationMethod = 2;
-        }
+            var checkPassPromise = security.changePassword.isPasswordTheSame($.trim(newPassword), accountAuthVersion);
 
-        var checkPassPromise = security.changePassword.isPasswordTheSame($.trim(newPassword),
-            registerationMethod);
-
-        checkPassPromise.fail(failingAction);
-
-        checkPassPromise.done(
-            function() {
-                if (registerationMethod === 2) {
-                    security.changePassword.newMethod(
-                        newPassword, twoFactorPin, mobile.account.changePassword.completeChangePassword
-                    );
-                }
-                else {
-                    security.changePassword.oldMethod(
-                        newPassword, twoFactorPin, mobile.account.changePassword.completeChangePassword
-                    );
-                }
-            });
+            checkPassPromise.fail(failingAction);
+            checkPassPromise.done(
+                () => {
+                    if (accountAuthVersion === 2) {
+                        security.changePassword.newMethod(
+                            newPassword, twoFactorPin, mobile.account.changePassword.completeChangePassword
+                        );
+                    }
+                    else {
+                        security.changePassword.oldMethod(
+                            newPassword, twoFactorPin, mobile.account.changePassword.completeChangePassword
+                        );
+                    }
+                });
+        });
     },
 
     /**

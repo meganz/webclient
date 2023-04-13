@@ -386,7 +386,22 @@ var notify = {
 
             // If it hasn't been seen yet increment the count
             if (notify.notifications[i].seen === false) {
-                newNotifications++;
+                // Don't count chat notifications until chat has loaded and can verify them.
+                if (notify.notifications[i].type === 'mcsmp') {
+                    const { data } = notify.notifications[i];
+                    if (megaChatIsReady) {
+                        const res = notify.getScheduledNotifOrReject(data);
+                        if (
+                            res !== false
+                            && (res === 0 || !(res.mode === ScheduleMetaChange.MODE.CREATED && data.ou === u_handle))
+                        ) {
+                            newNotifications++;
+                        }
+                    }
+                }
+                else {
+                    newNotifications++;
+                }
             }
         }
 
@@ -1449,7 +1464,7 @@ var notify = {
             // If the ap flag is set the occurrence state is not known.
             // A future render should be able to get past this step when all occurrences are known
             // If the gone flag is set then the occurrence no longer exists so skip it.
-            return false;
+            return meta.gone ? false : 0;
         }
 
         const { MODE } = ScheduleMetaChange;
@@ -1483,6 +1498,9 @@ var notify = {
         let now;
         let prev;
         const { MODE } = ScheduleMetaChange;
+        if (meta.mode === MODE.CREATED && data.ou === u_handle) {
+            return false;
+        }
 
         if (meta.timeRules.startTime && meta.timeRules.endTime) {
             const prevMode = meta.mode;

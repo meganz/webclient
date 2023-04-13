@@ -240,7 +240,9 @@ export default class Join extends MegaRenderMixin {
             <div className="card-body">
                 {children}
                 <div>
-                    <Link to="/securechat">{l.how_meetings_work /* `Learn more about MEGA Meetings` */}</Link>
+                    <Link to="https://mega.io/chatandmeetings" target="_blank">
+                        {l.how_meetings_work /* `Learn more about MEGA Meetings` */}
+                    </Link>
                 </div>
             </div>
             <div className="card-preview">
@@ -338,7 +340,7 @@ export default class Join extends MegaRenderMixin {
                     <li>
                         <ParsedHTML>
                             {l.join_via_mobile
-                                .replace('[A]', '<a href="/mobile" class="clickurl">')
+                                .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
                                 .replace('[/A]', '</a>')}
                         </ParsedHTML>
                     </li>

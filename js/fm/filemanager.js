@@ -1578,7 +1578,7 @@ FileManager.prototype.initContextUI = function() {
                 break;
             }
         }
-        loadSubPage('dispute');
+        mega.redirect('mega.io', 'dispute', false, false, false);
     });
 
     $(c + '.rename-item').rebind('click', function() {
@@ -2116,8 +2116,7 @@ FileManager.prototype.initContextUI = function() {
         M.openFolder(`discovery/${target}`);
     });
 
-    $(c + '.open-cloud-item').rebind('click', function() {
-
+    $(c + '.open-cloud-item, ' + c + '.open-in-location').rebind('click', () => {
         const node = M.d[$.selected[0]];
 
         // Incoming Shares section if shared folder doestn't have parent

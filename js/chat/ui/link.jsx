@@ -6,7 +6,7 @@ export default class Link extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
-        this.IS_CLICK_URL = this.props.to && this.props.to.startsWith('/');
+        this.IS_CLICK_URL = this.props.to && (this.props.to.startsWith('/') || this.props.to.includes('mega.io'));
     }
 
     componentDidMount() {

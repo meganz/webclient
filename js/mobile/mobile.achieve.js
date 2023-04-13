@@ -336,30 +336,8 @@ mobile.achieve = {
         // On clicking/tapping the Install a mobile app button
         mobile.achieve.$page.find('.install-mobile-app').off('tap').on('tap', function() {
 
-            var pageToLoad = '';
-
-            // Choose the page to load based on what OS they're currently running
-            switch (ua.details.os) {
-                case 'iPad':
-                case 'iPhone':
-                    pageToLoad = 'ios';
-                    break;
-
-                case 'Windows Phone':
-                    pageToLoad = 'wp';
-                    break;
-
-                case 'Android':
-                    pageToLoad = 'android';
-                    break;
-
-                default:
-                    pageToLoad = 'android';
-                    break;
-            }
-
             // Load the page
-            loadSubPage(pageToLoad);
+            mega.redirect('mega.io', 'mobile', false, false, false);
             return false;
         });
     },
@@ -375,7 +353,7 @@ mobile.achieve = {
         mobile.achieve.$page.find('.install-mega-sync').off('tap').on('tap', function() {
 
             // Load the page
-            loadSubPage('desktop');
+            mega.redirect('mega.io', 'desktop', false, false, false);
             return false;
         });
     },

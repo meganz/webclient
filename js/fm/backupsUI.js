@@ -335,7 +335,7 @@ lazy(mega, 'backupCenter', () => {
                                         return false;
                                     }
                                     open(
-                                        megasync.getMegaSyncUrl() || `${getAppBaseUrl()}#sync`,
+                                        megasync.getMegaSyncUrl() || 'https://mega.io/desktop',
                                         '_blank',
                                         'noopener,noreferrer'
                                     );
@@ -1477,7 +1477,7 @@ lazy(mega, 'backupCenter', () => {
             // Open mobile apps page
             $('.mobile a', this.$emptyBlock).rebind('click.openMobile', (e) => {
                 e.preventDefault();
-                loadSubPage('mobile');
+                mega.redirect('mega.io', 'mobile', false, false, false);
             });
         }
 

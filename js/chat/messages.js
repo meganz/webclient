@@ -1141,7 +1141,7 @@ function MessagesBuff(chatRoom, chatdInt) {
                 self.retrievedAllMessages = true;
             }
             else if (
-                self.expectedMessagesCount
+                self.expectedMessagesCount > 0
             ) {
                 self.haveMessages = true;
                 // if the expectedMessagesCount is not 0 and < requested, then...chatd/idb returned < then the
@@ -1858,10 +1858,13 @@ MessagesBuff.prototype.retrieveSharedFilesHistory = async function(len) {
     var self = this;
     len = parseInt(len) || 32;
 
+    if (this.$sharedFilesLoading || this.$isDecryptingSharedFiles) {
+        return d > 1 && this.logger.warn('Already retrieving shared files...');
+    }
+
     if (d > 1) {
         this.logger.warn('Retrieving %s shared files...', len, this.haveMoreSharedFiles);
     }
-    // @todo prevent concurrent calls
 
     await Promise.all([
         this.$msgsHistoryLoading,

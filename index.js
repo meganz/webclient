@@ -393,7 +393,7 @@ function init_page() {
 
     // Redirect url to extensions when it tries to go plugin or chrome or firefox
     if (page === 'plugin') {
-        loadSubPage('extensions');
+        mega.redirect('mega.io', 'extensions', false, false);
         return false;
     }
 
@@ -433,7 +433,9 @@ function init_page() {
         page = page.slice(0, 36);
         const [publicChatHandle, publicChatKey] = page.replace('chat/', '').split('#');
         if (!publicChatHandle || publicChatHandle.length !== 8 || !publicChatKey || publicChatKey.length !== 22) {
-            return u_type ? loadSubPage('fm/chat') : loadSubPage('securechat');
+            return u_type
+                ? loadSubPage('fm/chat')
+                : mega.redirect('mega.io', 'chatandmeetings', false, false);
         }
 
         if (typeof is_chatlink !== 'object') {
@@ -2688,7 +2690,7 @@ function topmenuUI() {
     });
 
     $headerDownloadMega.rebind('click.downloadmega', function() {
-        loadSubPage('desktop');
+        mega.redirect('mega.io', 'desktop', false, false, false);
     });
 
     // try individual button in business mode
@@ -2707,7 +2709,7 @@ function topmenuUI() {
             if (folderlink) {
                 eventlog(99750);
             }
-            mega.redirect('mega.io', 'business', false, false);
+            mega.redirect('mega.io', 'business', false, false, false);
         }
     });
 
@@ -2815,7 +2817,7 @@ function topmenuUI() {
                 }
                 else if (subpage) {
                     if (ioPages.includes(subpage)) {
-                        mega.redirect('mega.io', moveTo[subpage] || subpage, false, false);
+                        mega.redirect('mega.io', moveTo[subpage] || subpage, false, false, false);
                         return false;
                     }
                     // Clear login_next variable before load subpages each time

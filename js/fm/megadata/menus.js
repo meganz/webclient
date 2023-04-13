@@ -294,7 +294,12 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         }
 
         if (M.currentCustomView || M.currentdirid.startsWith('search/')) {
-            items['.open-cloud-item'] = 1;
+            if (folderlink) {
+                items['.open-in-location'] = 1;
+            }
+            else {
+                items['.open-cloud-item'] = 1;
+            }
         }
 
         if (M.getNodeRights(selNode.h) > 1) {
@@ -393,6 +398,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.embedcode-item'];
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
+        delete items['.open-in-location'];
     }
 
     if (selNode.t && !folderlink && M.currentrootid !== M.RubbishID &&
@@ -521,6 +527,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.copy-item'];
         delete items['.open-gallery'];
         delete items['.open-cloud-item'];
+        delete items['.open-in-location'];
         delete items['.getlink-item'];
         delete items['.embedcode-item'];
         delete items['.removelink-item'];
@@ -532,6 +539,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         && M.getNodeRoot($.selected[0]) === M.InboxID) {
 
         delete items['.open-cloud-item'];
+        delete items['.open-in-location'];
         delete items['.move-item'];
         delete items['.rename-item'];
         delete items['.add-star-item'];

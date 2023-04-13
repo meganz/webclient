@@ -11337,7 +11337,8 @@ class Join extends mixins.wl {
     }, external_React_default().createElement("div", {
       className: "card-body"
     }, children, external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
-      to: "/securechat"
+      to: "https://mega.io/chatandmeetings",
+      target: "_blank"
     }, l.how_meetings_work))), external_React_default().createElement("div", {
       className: "card-preview"
     }, external_React_default().createElement(preview.Z, {
@@ -11424,7 +11425,7 @@ class Join extends mixins.wl {
       className: "sprite-fm-uni icon-error"
     }), external_React_default().createElement("div", {
       className: "unsupported-info"
-    }, external_React_default().createElement("h3", null, l.heading_unsupported_browser), external_React_default().createElement("h3", null, l.join_meeting_methods), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, l.join_via_link), external_React_default().createElement("li", null, external_React_default().createElement(utils.Cw, null, l.join_via_mobile.replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>'))))));
+    }, external_React_default().createElement("h3", null, l.heading_unsupported_browser), external_React_default().createElement("h3", null, l.join_meeting_methods), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, l.join_via_link), external_React_default().createElement("li", null, external_React_default().createElement(utils.Cw, null, l.join_via_mobile.replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">').replace('[/A]', '</a>'))))));
     this.View = view => {
       switch (view) {
         default:
@@ -13686,7 +13687,8 @@ class Start extends mixins.wl {
       className: "mega-button positive large start-meeting-button",
       onClick: this.startMeeting
     }, external_React_default().createElement("span", null, l[7315])), external_React_default().createElement(ui_link.Z, {
-      to: "/securechat"
+      to: "https://mega.io/chatandmeetings",
+      target: "_blank"
     }, l.how_meetings_work)));
   }
 }
@@ -17496,7 +17498,7 @@ class Link extends _mixins1__.wl {
   constructor(props) {
     super(props);
     this.IS_CLICK_URL = undefined;
-    this.IS_CLICK_URL = this.props.to && this.props.to.startsWith('/');
+    this.IS_CLICK_URL = this.props.to && (this.props.to.startsWith('/') || this.props.to.includes('mega.io'));
   }
   componentDidMount() {
     super.componentDidMount();

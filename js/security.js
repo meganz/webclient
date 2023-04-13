@@ -752,15 +752,18 @@ var security = {
                     $(this).unbind('click.ve').addClass('disabled');
                     M.req('era').always(function(res) {
                         $('aside.status', $dialog).addClass('hidden');
+                        const contactPage = () => {
+                            mega.redirect('mega.io', 'contact', false, false, false);
+                        };
 
                         if (res === 0) {
                             $('aside.status', $dialog).removeClass('hidden');
                         }
                         else if (res === ETEMPUNAVAIL) {
-                            msgDialog('warninga', l[135], l[23628], l[23629], loadSubPage.bind(null, 'contact'));
+                            msgDialog('warninga', l[135], l[23628], l[23629], contactPage);
                         }
                         else {
-                            msgDialog('warninga', l[135], l[47], api_strerror(res), loadSubPage.bind(null, 'contact'));
+                            msgDialog('warninga', l[135], l[47], api_strerror(res), contactPage);
                         }
                     });
                     return false;

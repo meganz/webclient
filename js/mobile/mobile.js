@@ -269,7 +269,7 @@ var mobile = {
                 }
             }
             else {
-                window.open('/terms', '_blank');
+                mega.redirect('mega.io', '/terms', false, false, false);
             }
 
             // Prevent double clicks

@@ -1578,7 +1578,7 @@ FileManager.prototype.initContextUI = function() {
                 break;
             }
         }
-        loadSubPage('dispute');
+        mega.redirect('mega.io', 'dispute', false, false, false);
     });
 
     $(c + '.rename-item').rebind('click', function() {

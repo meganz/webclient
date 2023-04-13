@@ -225,7 +225,8 @@ var redeem = {
             })
             .catch(function() {
                 redeem.hideBackgroundOverlay();
-                loadSubPage('contact');
+                mega.redirect('mega.io', 'contact', false, false, false);
+                loadSubPage('fm');
             });
     },
 
@@ -256,7 +257,7 @@ var redeem = {
                         loadingDialog.hide();
                         msgDialog('warninga', l[135], l[714], '', function() {
                             redeem.hideBackgroundOverlay();
-                            loadSubPage('contact');
+                            mega.redirect('mega.io', 'contact', false, false, false);
                         });
                     }
 
@@ -265,7 +266,7 @@ var redeem = {
                         loadingDialog.hide();
                         msgDialog('warninga', l[135], l[473], '', function() {
                             redeem.hideBackgroundOverlay();
-                            loadSubPage('contact');
+                            mega.redirect('mega.io', 'contact', false, false, false);
                         });
                     }
 

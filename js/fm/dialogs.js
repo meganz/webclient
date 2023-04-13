@@ -1774,12 +1774,39 @@
         });
 
         const handleCopyToChat = async(chats, selectedNodes) => {
-            selectedNodes = selectedNodes.map(n => {
-                if (M.isFileNode(n)) {
-                    return n;
+            const files = [];
+            const folders = [];
+            const foreignNodes = [];
+            for (const sel of selectedNodes) {
+                if (M.isFileNode(sel)) {
+                    if (M.d[sel.h]) {
+                        files.push(sel);
+                    }
+                    else {
+                        foreignNodes.push(sel);
+                    }
                 }
-                return M.getNodeByHandle(n);
-            });
+                else {
+                    const node = M.getNodeByHandle(sel);
+                    if (M.d[node.h]) {
+                        if (node.t) {
+                            folders.push(node.h);
+                        }
+                        else {
+                            files.push(node);
+                        }
+                    }
+                    else {
+                        foreignNodes.push(node);
+                    }
+                }
+            }
+            if (!foreignNodes.length) {
+                const noOpen = $.noOpenChatFromPreview;
+                delete $.noOpenChatFromPreview;
+                megaChat.openChatAndAttachNodes(chats, [...folders, ...files], noOpen).dump();
+                return;
+            }
             const mcf = await M.myChatFilesFolder.get(true).catch(() => {
                 if (d) {
                     console.error('Failed to allocate "My chat files" folder');
@@ -1787,11 +1814,11 @@
                 throw ENOENT;
             });
 
-            M.injectNodes(selectedNodes, mcf.h, res => {
+            M.injectNodes(foreignNodes, mcf.h, res => {
                 if (Array.isArray(res) && res.length) {
                     const noOpen = $.noOpenChatFromPreview;
                     delete $.noOpenChatFromPreview;
-                    megaChat.openChatAndAttachNodes(chats, res, noOpen).dump();
+                    megaChat.openChatAndAttachNodes(chats, [...res, ...folders, ...files], noOpen).dump();
                 }
                 else if (d) {
                     console.warn('Unable to inject nodes... no longer existing?', res);

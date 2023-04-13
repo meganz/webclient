@@ -3593,8 +3593,11 @@ MegaData.prototype.createPublicLink = promisify(function(resolve, reject, handle
     'use strict';
 
     dbfetch.get(handle).then(function() {
-        return M.getNodeShare(handle).h === handle || !M.d[handle].t || M.getNodes(handle, 1);
-    }).then(function(nodes) {
+        return M.getNodeShare(handle).h === handle || !M.d[handle].t || mega.keyMgr.setShareSnapshot(handle);
+    }).then(nodes => {
+        if (typeof nodes === 'undefined') {
+            nodes = mega.keyMgr.getShareSnapshot(handle);
+        }
         return Array.isArray(nodes) ? api_setshare(handle, [{u: 'EXP', r: 0}], nodes) : {r: [0]};
     }).then(function(res) {
         return M.d[handle].ph || res.r && res.r[0] === 0 && M.req({a: 'l', i: requesti, n: handle});

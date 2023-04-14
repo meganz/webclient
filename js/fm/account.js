@@ -478,19 +478,23 @@ accountUI.general = {
         // Show Membership plan
         $('.account .plan-icon', $dashboardPane).removeClass('pro1 pro2 pro3 pro4 pro100 pro101 free');
 
-        if (u_attr.p) {
+        let planClass = 'free';
+        let planText = l[1150];
 
-            // LITE/PRO account
-            var planNum = u_attr.p;
-            var planText = pro.getProPlanName(planNum);
+        // If Business always show the Business icon & name (even if expired, which is when u_attr.p is undefined)
+        if (u_attr.b) {
+            planClass = 'pro' + pro.ACCOUNT_LEVEL_BUSINESS;
+            planText = pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS);
+        }
 
-            $('.account.membership-plan', $dashboardPane).text(planText);
-            $('.account .plan-icon', $dashboardPane).addClass('pro' + planNum);
+        // Otherwise if it's an active Pro I-III/Lite/Flexi account
+        else if (u_attr.p) {
+            planClass = 'pro' + u_attr.p;
+            planText = pro.getProPlanName(u_attr.p);
         }
-        else {
-            $('.account .plan-icon', $dashboardPane).addClass('free');
-            $('.account.membership-plan', $dashboardPane).text(l[1150]);
-        }
+
+        $('.account .plan-icon', $dashboardPane).addClass(planClass);
+        $('.account.membership-plan', $dashboardPane).text(planText);
 
         // update avatar
         $('.fm-account-avatar', $fmContent).safeHTML(useravatar.contact(u_handle, '', 'div', false));
@@ -1983,6 +1987,14 @@ accountUI.plan = {
                 else {
                     $('.account.plan-info.bandwidth', $planContent).parent().addClass('hidden');
                 }
+            }
+
+            // If Business, override to show the Business name (even if expired, which is when u_attr.p is undefined)
+            if (u_attr.b) {
+                $('.account.plan-info.accounttype', $planContent).addClass('business');
+                $('.account.plan-info.accounttype span', $planContent).text(
+                    pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS)
+                );
             }
 
             /* achievements */

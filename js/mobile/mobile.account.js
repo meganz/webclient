@@ -171,8 +171,9 @@ mobile.account = {
 
         'use strict';
 
-        // Get the Pro name and icon class
-        var proNum = u_attr.p;
+        // Get the Pro name and icon class (NB: if Business always show the Business
+        // icon & name (even if expired, which is when u_attr.p is undefined))
+        const proNum = u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : u_attr.p;
         var proClassName = proNum >= 1 ? 'pro' + proNum : 'free';
         var proPlanName = pro.getProPlanName(proNum);
 

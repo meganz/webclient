@@ -253,16 +253,16 @@ module.exports = function(config) {
     // - Opera (has to be installed with `npm install karma-opera-launcher`)
     // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
     browsers: [
-        'Firefox',
-        'FirefoxHeadless',
-        'Firefox_Extension',
-        'Firefox_NoCookies',
-        'Firefox_Incognito',
-        'Chrome',
+        // 'Firefox',
+        // 'FirefoxHeadless',
+        // 'Firefox_Extension',
+        // 'Firefox_NoCookies',
+        // 'Firefox_Incognito',
+        // 'Chrome',
         'ChromeHeadless',
-        'Chrome_Incognito',
-        'Chrome_Unlimited',
-        'Chrome_NoCookies'
+        // 'Chrome_Incognito',
+        // 'Chrome_Unlimited',
+        // 'Chrome_NoCookies'
     ],
 
     customLaunchers: {

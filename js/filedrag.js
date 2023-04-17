@@ -667,3 +667,29 @@ function ulDummyFiles(count, len) {
 
     M.addUpload(ul, true);
 }
+
+async function ulDummyImages(count, type) {
+    'use strict';
+
+    const ul = [];
+    const ext = (type = type || 'image/jpeg').split('/').pop();
+
+    eventlog = dump;
+    for (let i = count || 210; i--;) {
+        const rnd = Math.random();
+        const wdh = 320 + rnd * 2345 | 0;
+        const buf = await webgl.createImage(i % 2 ? rnd * Date.now() : null, wdh, wdh / 1.777 | 0, type)
+            .catch((ex) => {
+                console.error(i, wdh, ex.message || ex, ex.data, [ex]);
+            });
+
+        if (buf) {
+            ul.push(new File([buf], `${makeUUID().slice(-17)}.${ext}`, {type, lastModified: 9e11}));
+        }
+
+        if (!(i % 48)) {
+            M.addUpload([...ul], true);
+            ul.length = 0;
+        }
+    }
+}

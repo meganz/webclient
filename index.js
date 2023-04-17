@@ -3423,7 +3423,7 @@ mBroadcaster.once('boot_done', () => {
     });
 
     // Currently only used in chat so don't bother trying to register for mobile browsers.
-    if (window.isSecureContext && !is_mobile) {
+    if (window.isSecureContext && !is_mobile && !is_karma) {
         onIdle(tryCatch(() => {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register(`${is_extension ? '' : '/'}sw.js?v=1`).catch(dump);

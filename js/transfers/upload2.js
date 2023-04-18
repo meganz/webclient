@@ -107,7 +107,7 @@ var ulmanager = {
 
         // Inform user that upload file request is not available anymore
         if (page.substr(0, 11) === 'filerequest') {
-            mBroadcaster.sendMessage('FileRequest:overquota');
+            mBroadcaster.sendMessage('FileRequest:overquota', 0);
             return; // Disable quota dialog
         }
 

@@ -1058,10 +1058,10 @@ function initMegaIoIframe(loginStatus, planNum) {
 
             let postMessageData = { };
 
-            // If logging in, encode the first name to Base64 and set the plan num if available (NB: Free is undefined)
+            // If logging in, assign the first name and set the plan num if available (NB: Free is undefined)
             if (loginStatus) {
                 postMessageData = {
-                    firstName: base64urlencode(to8(u_attr.firstname)),
+                    firstName: u_attr.firstname,
                     planNum: planNum || u_attr.p || undefined
                 };
 

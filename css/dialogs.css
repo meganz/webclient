@@ -10320,19 +10320,15 @@ body.de .mega-dialog.new-group-chat {
 }
 
 .mega-dialog.file-request header {
-    padding-bottom: 24px;
+    padding-bottom: 2px;
 }
 
 .mega-dialog.file-request header .dialog-title {
     margin-top: 38px;
-    margin-bottom: 12px;
 }
 
-.mega-dialog.file-request.file-request-manage-dialog header {
-    padding-bottom: 2px;
-}
-.mega-dialog.file-request.file-request-manage-dialog header .dialog-title {
-    margin-bottom: 0;
+.mega-dialog.file-request header .dialog-caption {
+    margin-top: 12px;
 }
 
 .mega-dialog.file-request .content {
@@ -10363,11 +10359,11 @@ body.de .mega-dialog.new-group-chat {
     padding-bottom: 20px;
 }
 
-.mega-dialog.file-request.file-request-manage-dialog .content-block .form-row.create-success {
+.mega-dialog.file-request.file-request-manage-dialog .content-block.secondary .form-row {
     margin-bottom: 22px;
 }
 
-.mega-dialog.file-request .content-block.primary {
+.mega-dialog.file-request.file-request-manage-dialog .content-block.primary {
     padding-bottom: 36px;
 }
 
@@ -10442,25 +10438,29 @@ body.de .mega-dialog.new-group-chat {
     margin-bottom: 26px;
 }
 
+.mega-dialog.file-request .content-block .form-row.select-folder {
+    padding-top: 22px;
+}
+
 .mega-dialog.file-request .content-block .form-row.create {
     margin-bottom: 24px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success {
+.mega-dialog.file-request .content-block.secondary .form-row {
     margin-bottom: 18px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success label {
+.mega-dialog.file-request .content-block.secondary .form-row label {
     font-family: var(--text-font-family-bold);
     margin-bottom: 10px;
     display: block;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success.manage {
+.mega-dialog.file-request .content-block.secondary .form-row.manage {
     margin-bottom: 0;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input {
     display: flex;
     width: 100%;
     position: relative;
@@ -10468,7 +10468,7 @@ body.de .mega-dialog.new-group-chat {
     border-radius: 4px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input .input-wrapper {
     flex: 1;
     vertical-align: top;
     width: 100%;
@@ -10476,7 +10476,7 @@ body.de .mega-dialog.new-group-chat {
     padding: 8px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper i {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input .input-wrapper i {
     position: absolute;
     left: 10px;
     top: 8px;
@@ -10484,7 +10484,7 @@ body.de .mega-dialog.new-group-chat {
     --mask-color: var(--text-color-medium);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper input {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input .input-wrapper input {
     height: 24px;
     border: 0;
     padding-inline-start: 34px;
@@ -10496,7 +10496,7 @@ body.de .mega-dialog.new-group-chat {
     color: var(--text-color-medium);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .button-wrapper button {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input .button-wrapper button {
     --height: 100%;
     font: var(--text-body1);
     padding: 2px 12px;
@@ -10505,33 +10505,33 @@ body.de .mega-dialog.new-group-chat {
     margin: 0;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input.input-code {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input.input-code {
     border-radius: 4px;
     margin-top: 12px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-embed-button-container {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-embed-button-container {
     padding: 20px;
     background-color: var(--surface-grey-1);
     text-align: center;
     border-radius: 8px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-header {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-header {
     font-family: var(--text-font-family-bold);
     margin-bottom: 20px;
     color: var(--text-color-high);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-selection {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-selection {
     display: flex;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-selection .embed-block {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-selection .embed-block {
     width: 50%;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-content-wrapper {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-centre .embed-content-wrapper {
     width: 156px;
     border-radius: 5px;
     background-color: var(--surface-grey-2);
@@ -10540,7 +10540,7 @@ body.de .mega-dialog.new-group-chat {
     margin: 0 auto 12px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-mega-icon {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-centre .embed-mega-icon {
     border-radius: 50%;
     background-color: var(--file-request-red);
     height: 24px;
@@ -10548,7 +10548,7 @@ body.de .mega-dialog.new-group-chat {
     display: inline-block;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-action-text {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-centre .embed-action-text {
     margin: 6px 0 6px 6px;
     width: 98px;
     background-color: rgba(196, 196, 196, 1);
@@ -10556,19 +10556,19 @@ body.de .mega-dialog.new-group-chat {
     display: inline-block;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-block.dark-theme .embed-content-wrapper {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-block.dark-theme .embed-content-wrapper {
     background-color: var(--file-request-red);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-block.dark-theme .embed-mega-icon {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-block.dark-theme .embed-mega-icon {
     background-color: var(--surface-main);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-block.dark-theme .embed-action-text {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-block.dark-theme .embed-action-text {
     background-color: var(--surface-main);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-button-select {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-centre .embed-button-select {
     display: inline-flex;
     margin-bottom: 4px;
     color: var(--text-color-medium);
@@ -10576,7 +10576,7 @@ body.de .mega-dialog.new-group-chat {
     cursor: pointer;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-block.active .embed-button-select {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-block.active .embed-button-select {
     color: var(--text-color-high);
 }
 
@@ -10599,10 +10599,13 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog.file-request .footer-container .button-container {
     display: inline-flex;
     gap: 8px;
+    margin-inline-start: auto;
+    -webkit-margin-start: auto;
 }
 
 .mega-dialog.file-request .footer-container .button-container button {
     margin-inline-start: 0;
+    -webkit-margin-start: 0;
 }
 
 .mega-dialog.fm-picker-dialog.fm-picker-file-request header {

@@ -150,6 +150,7 @@ lazy(mega, 'fileRequestUI', () => {
                 namespace: ''
             };
 
+            this.action = is_mobile ? 'tap' : 'click';
             this.setOptions(options);
             this.addEventHandlers();
         }
@@ -158,11 +159,6 @@ lazy(mega, 'fileRequestUI', () => {
             let namespace = this.options.namespace || '';
             if (namespace.length) {
                 namespace = `.${namespace}`;
-            }
-
-            let action = 'click';
-            if (is_mobile) {
-                action = 'tap';
             }
 
             const clickHandler = (evt) => {
@@ -183,10 +179,10 @@ lazy(mega, 'fileRequestUI', () => {
             };
 
             if (this.options.onOff) {
-                this.$input.off(`${action}`).on(`${action}`, clickHandler);
+                this.$input.off(`${this.action}`).on(`${this.action}`, clickHandler);
             }
             else {
-                this.$input.rebind(`${action}${namespace}`, clickHandler);
+                this.$input.rebind(`${this.action}${namespace}`, clickHandler);
             }
 
             return namespace;
@@ -213,13 +209,7 @@ lazy(mega, 'fileRequestUI', () => {
         }
 
         off() {
-            const namespace = this.options.namespace || '';
-            if (namespace.length) {
-                this.$input.off(`${namespace}`);
-                return;
-            }
-
-            this.$input.off();
+            this.$input.off(`.${this.options.namespace}` || null);
         }
     }
 
@@ -496,6 +486,14 @@ lazy(mega, 'fileRequestUI', () => {
                 .val(newValue)
                 .trigger(`input${namespace}`);
         }
+
+        reset() {
+            this.setValue('');
+            this.resetErrorMessage();
+            this.getInput()
+                .closest(megaInputSelector)
+                .removeClass(activeClass);
+        }
     }
 
     class ValidatableMobileComponent extends ValidatableInputComponent {
@@ -581,6 +579,10 @@ lazy(mega, 'fileRequestUI', () => {
                     }
                 },
             });
+        }
+
+        off() {
+            this.$selectFolderButton.off();
         }
     }
 

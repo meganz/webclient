@@ -1076,8 +1076,10 @@ lazy(mega.gallery, 'albums', () => {
             this.rowIndexCache = {};
             this.cellCache = {};
             this.initialRender = true;
+
             this.selections = {};
             this.selectArea = null;
+            this.shiftSelectedIndexes = [];
 
             this.onSelectToggle = onSelectToggle;
             this.onDoubleClick = onDoubleClick;
@@ -1218,26 +1220,29 @@ lazy(mega.gallery, 'albums', () => {
                 const { shiftKey } = evt;
                 const { el, isSelected } = cell;
 
-                if (shiftKey) {
-                    this.selectNode(el.ref.node);
+                this.lastNavNode = el.ref.node;
 
+                if (shiftKey) {
                     if (this.selectStartNode && this.selectStartNode.h !== el.ref.node.h) {
-                        this.selectElementsRange(this.selectStartNode, el.ref.node);
+                        this.selectElementsRange(this.selectStartNode, el.ref.node, true);
                     }
                     else {
                         this.clearSiblingSelections(el.ref.node.h);
+                        this.selectStartNode = el.ref.node;
                     }
-
-                    this.lastNavNode = el.ref.node;
-                }
-                else if (isSelected) {
-                    this.deselectNode(el.ref.node);
-                    this.selectStartNode = null;
                 }
                 else {
-                    this.selectNode(el.ref.node);
-                    this.selectStartNode = el.ref.node;
-                    this.lastNavNode = el.ref.node;
+                    if (isSelected) {
+                        this.deselectNode(el.ref.node);
+                        this.selectStartNode = null;
+                        this.lastNavNode = null;
+                    }
+                    else {
+                        this.selectNode(el.ref.node);
+                        this.selectStartNode = el.ref.node;
+                    }
+
+                    this.shiftSelectedIndexes = [];
                 }
             };
 
@@ -1293,6 +1298,7 @@ lazy(mega.gallery, 'albums', () => {
                         for (let j = 0; j < row.children.length; j++) {
                             if (isInSelectArea(row.children[j], posArr, this.sidePadding)) {
                                 this.selectNode(row.children[j].ref.node);
+                                this.lastNavNode = row.children[j].ref.node;
                             }
                             else {
                                 this.deselectNode(row.children[j].ref.node);
@@ -1350,7 +1356,11 @@ lazy(mega.gallery, 'albums', () => {
                             && (target === this.el || target.classList.contains('MegaDynamicListItem'))) {
                             this.clearSiblingSelections();
                             this.selectArea = null;
+                            this.lastNavNode = null;
                         }
+
+                        this.selectStartNode = null;
+                        this.shiftSelectedIndexes = [];
                     },
                     onScrollUp: () => {
                         this.dynamicList.scrollToYPosition(this.dynamicList.getScrollTop() - 20);
@@ -1363,9 +1373,22 @@ lazy(mega.gallery, 'albums', () => {
             );
         }
 
-        resetLastNavNode() {
-            if (!this.lastNavNode && this.selectStartNode) {
-                this.lastNavNode = this.selectStartNode;
+        resetLastNavNode(shiftKey) {
+            if (!this.lastNavNode) {
+                if (this.selectStartNode) {
+                    this.lastNavNode = this.selectStartNode;
+                    return;
+                }
+
+                const selections = Object.keys(this.selections);
+
+                if (selections.length) {
+                    this.lastNavNode = M.d[selections[selections.length - 1]];
+                }
+            }
+
+            if (shiftKey && !this.selectStartNode) {
+                this.selectStartNode = this.lastNavNode || this._nodes[0].list[0];
             }
         }
 
@@ -1379,22 +1402,8 @@ lazy(mega.gallery, 'albums', () => {
                     return;
                 }
 
-                const { key, shiftKey, metaKey, ctrlKey } = evt;
-                let rowIndex = -1;
-                let inRowIndex = -1;
-                let skipSelfSelect = false;
+                const { key, shiftKey } = evt;
                 const isCtrl = getCtrlKeyStatus(evt);
-
-                this.resetLastNavNode();
-
-                if (this.lastNavNode) {
-                    rowIndex = this.rowIndexCache[this.lastNavNode.h];
-                    inRowIndex = this._nodes[this.rowIndexCache[this.lastNavNode.h]].list
-                        .findIndex(({ h }) => h === this.lastNavNode.h);
-                }
-                else {
-                    rowIndex++;
-                }
 
                 const events = {
                     ArrowLeft: () => {
@@ -1466,6 +1475,7 @@ lazy(mega.gallery, 'albums', () => {
                             }
                         }
 
+                        this.lastNavNode = null;
                         skipSelfSelect = true;
                     },
                     Escape: () => {
@@ -1504,13 +1514,32 @@ lazy(mega.gallery, 'albums', () => {
                     }
                 };
 
-                if (isCtrl && events[key]) {
+                if (!events[key]) {
+                    return;
+                }
+
+                let rowIndex = -1;
+                let inRowIndex = -1;
+                let skipSelfSelect = false;
+
+                this.resetLastNavNode(shiftKey);
+
+                if (this.lastNavNode) {
+                    rowIndex = this.rowIndexCache[this.lastNavNode.h];
+
+                    inRowIndex = this._nodes[this.rowIndexCache[this.lastNavNode.h]].list
+                        .findIndex(({ h }) => h === this.lastNavNode.h);
+                }
+                else {
+                    rowIndex++;
+                }
+
+                if (isCtrl) {
                     evt.preventDefault();
                     evt.stopPropagation();
                 }
 
-                if (!events[key]
-                    || events[key]() === true
+                if (events[key]() === true
                     || rowIndex < 0
                     || rowIndex >= this._nodes.length) {
                     return true;
@@ -1518,26 +1547,20 @@ lazy(mega.gallery, 'albums', () => {
 
                 this.lastNavNode = this._nodes[rowIndex].list[inRowIndex];
 
-                if (skipSelfSelect) {
+                if (skipSelfSelect || !this.cellCache[this.lastNavNode.h]) {
                     return;
                 }
 
-                this.scrollToSelectedRow(rowIndex);
-
                 const { el } = this.cellCache[this.lastNavNode.h];
 
-                if (!isCtrl || !el.mComponent.isSelected) {
-                    el.dispatchEvent(
-                        new MouseEvent(
-                            'mouseup',
-                            {
-                                shiftKey,
-                                metaKey,
-                                ctrlKey
-                            }
-                        )
-                    );
+                if (shiftKey) {
+                    this.selectElementsRange(this.selectStartNode, this.lastNavNode);
                 }
+                else if (!isCtrl || !el.mComponent.isSelected) {
+                    this.selectNode(this.lastNavNode);
+                }
+
+                this.scrollToSelectedRow(rowIndex);
 
                 if (!shiftKey && !isCtrl) {
                     this.clearSiblingSelections(this.lastNavNode.h);
@@ -1564,6 +1587,10 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
 
+        /**
+         * @param {Meganode} node Node to select
+         * @returns {void}
+         */
         selectNode(node) {
             if (!this.selections[node.h]) {
                 this.selections[node.h] = true;
@@ -1580,6 +1607,10 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
 
+        /**
+         * @param {Meganode} node Node to deselect
+         * @returns {void}
+         */
         deselectNode(node) {
             if (this.selections[node.h]) {
                 delete this.selections[node.h];
@@ -1684,18 +1715,24 @@ lazy(mega.gallery, 'albums', () => {
          * Selecting all nodes in between
          * @param {MegaNode} nodeA First node in the range
          * @param {MegaNode} nodeB Last node in the range
+         * @param {Number} direction Selecting as 1 (from left to right) or -1 (from right to left)
          * @returns {void}
          */
         selectElementsRange(nodeA, nodeB) {
             const nodes = this._nodes.map(({ list }) => list).flat();
             let indexA = false;
             let indexB = false;
+            const newIndexes = [];
 
             for (let i = 0; i < nodes.length; i++) {
                 const { h } = nodes[i];
 
                 if (h === nodeA.h) {
                     indexA = i;
+
+                    if (nodeA.h === nodeB.h) {
+                        indexB = i;
+                    }
                 }
                 else if (h === nodeB.h) {
                     indexB = i;
@@ -1712,14 +1749,18 @@ lazy(mega.gallery, 'albums', () => {
                 indexA -= indexB;
             }
 
-            for (let i = 0; i < nodes.length; i++) {
-                if (i >= indexA && i <= indexB) {
-                    this.selectNode(nodes[i]);
-                }
-                else {
-                    this.deselectNode(nodes[i]);
+            for (let i = indexA; i <= indexB; i++) {
+                this.selectNode(nodes[i]);
+                newIndexes.push(i);
+            }
+
+            for (let i = 0; i < this.shiftSelectedIndexes.length; i++) {
+                if (!newIndexes.includes(this.shiftSelectedIndexes[i])) {
+                    this.deselectNode(nodes[this.shiftSelectedIndexes[i]]);
                 }
             }
+
+            this.shiftSelectedIndexes = newIndexes;
         }
 
         adjustToBottomBar() {

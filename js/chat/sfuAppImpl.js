@@ -90,7 +90,7 @@
                 : `loc: ${stats.vtxw}x${stats.vtxh}:${sfuClient.sentTracksString()} ${Math.round(stats._vtxkbps)
                     }kbps\n${stats.vtxfps || 0}fps ${Math.round(stats._vtxkfps)}kfs rtt: ${stats.rtt} dly: ${stats.vtxdly}`;
 
-            if (sfuClient.isSendingScreenHiRes()) {
+            if (isHiRes && sfuClient.isSendingScreenHiRes()) {
                 text += `\ntxq: ${sfuClient.txQuality}`;
             }
             for (const cons of this.localPeerStream.consumers) {

@@ -31,7 +31,7 @@
         grid-gap: 8px;
         padding: 8px 16px;
 
-        .stream-node {
+        .video-node {
             overflow: hidden;
             border: 0 none;
             border-radius: 8px;
@@ -44,7 +44,7 @@
             &.active {
                 border: 2px solid #6FD7FF;
 
-                .stream-node-content {
+                .video-node-content {
                     overflow: hidden;
                     border: 2px solid #222;
                     border-radius: 8px;

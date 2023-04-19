@@ -1647,7 +1647,7 @@ MegaData.prototype.ulerror = function(ul, error) {
 
             // Inform user that upload File request is not available anymore
             if (page.substr(0, 11) === 'filerequest') {
-                mBroadcaster.sendMessage('FileRequest:overquota');
+                mBroadcaster.sendMessage('FileRequest:overquota', error);
             }
         }
         else {

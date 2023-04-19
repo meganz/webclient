@@ -1180,7 +1180,7 @@ function init_page() {
         else if (page.indexOf('phone-achievement-intro') > -1) {
             mobile.sms.achievement.init();
         }
-        else if (page.indexOf('add-phone-achievement') > -1) {
+        else {
             mobile.sms.phoneInput.init();
         }
 

@@ -17,43 +17,51 @@
         HD_PENDING: 4
     };
     const DOWNGRADING_QUALITY_INTRVL = 2000;
+    const NO_SIMUL_SCRSHARE_AND_CAMERA = true;
 
  /**                        ==== Overview of peer & local video rendering ====
- * The app creates a StreamNode React component for each video it wants to display - for peers, local camera,
- * thumbnail and large viewports. The StreamNode is passed a "stream" object (implementing an imaginary
- * StreamSource interface), which is responsible for providing the video. For peers, this is the Peer object.
- * For local video, this is a LocalPeerStream object. A single StreamSource can have multiple StreamNode-s
- * attached to it. StreamNode-s are regarded as "consumers" by the StreamSource. A StreamSource keeps track of all
- * its consumers and the video resolution they need. It requests from the SFU a resolution that satisfies
- * the requirement of all consumers, i.e. is higher or equal to the resolution each of them demands.
- * The most important parts of the interface between the StreamNode and the StreamSource are:
- * - StreamSource.source property, which is a video element managed by the StreamSource. This is the actual video
- *   source. The lifetime of this object is independent of the lifetime of the GUI/consumers, and is external to React.
- * - StreamNode.requestedQuality property - informs the StreamSource object what resolution the StreamNode consumer
+ * The app creates a VideoNode-derived React component for each video it wants to display - for peers (PeerVideoThumb
+ * or PeerVideoHiRes), local camera (LocalVideoThumb and LocalVideoHiRes). Video components are passed a "source"
+ * object (implementing an imaginary StreamSource interface), which is responsible for providing the video stream.
+ * For peers, this is the Peer object. For local video, this is a LocalPeerStream object. A single StreamSource can
+ * have multiple VideoNode-s attached to it.
+ * Most of the VideoNode components implement the "dynamic video" mechanism, in which the GUI displays an externally
+ * provided video player, which may be changed externally at any time. The purpose if this is to have the player exist
+ * and load the video stream before it is rendered in the GUI, allowing for smooth switching between video sources, i.e.
+ * when changing the selected peer in MainView mode.
+ * Such video components are derived from the DynVideo react class. These components are registered with the
+ * StreamSource as "consumers". A StreamSource keeps track of all its consumers and the video resolution they need.
+ * It requests from the SFU a resolution that satisfies the requirement of all consumers, i.e. is higher or equal
+ * to the resolution each of them demands. The most important parts of the interface between the VideoNode and the
+ * StreamSource are:
+ * - StreamSource.player is the video element managed by the StreamSource. This is the actual video source.
+ *   The lifetime of this object is independent of the lifetime of the GUI/consumers, and is external to React.
+ * - VideoNode.requestedQuality - informs the StreamSource object what resolution the VideoNode consumer
  *   requires
- * - StreamSource.updateVideoQuality() - calculates the quality needed to satisfy all consumers and requests it
- *   from the SFU. When a StreamNode changes its demanded video quality, it updates its .requestedQuality property
- *   and calls StreamSource.updateVideoQuality()
- * - StreamNode.updateVideoElem() - updates the DOM of the StreamNode to display the video of the current
- *   StreamSource.source. This is called both internally by the StreamNode, and externally by Stream, when
- *   StreamSource.source changes asynchronously
+ * - StreamSource.dynUpdateVideoQuality() - calculates the quality needed to satisfy all consumers and requests it
+ *   from the SFU. When a DynVideo component wants to changes its demanded video quality, it updates its
+ *  .requestedQuality property and calls StreamSource.dynUpdateVideoQuality()
+ * - DynVideo.dynUpdateVideoElem() - updates the DOM of the DynVideo to display the current StreamSource.player video.
+ *   This is called both internally by the DynVideo, and externally by StreamSource, when StreamSource.player changes
+ *   asynchronously
  *
  * Direct and cloned video display
- * Ideally, all consumers of a StreamSource would simply display the StreamSource.source video. However,
- * a DOM element can't be mounted more than once in the DOM, so each StreamNode consumer must display a different
- * <video> player. For efficiency, one of them is the "original" external StreamSource.source <video> element,
- * and the others are "clones", managed by React and having their .srcObject equal assigned to that of
- * the original .source element. Hence, the StreamNode renders the video in one of two modes - "external" or "cloned".
- * The mode flag is passed upon construction, via the .externalVideo React property.
+ * Ideally, all consumers of a StreamSource would simply display the StreamSource.player video. However,
+ * a DOM element can't be mounted more than once in the DOM, so each VideoNode consumer must display a different
+ * <video> player. So one of them displays the "original" external StreamSource.player <video> element,
+ * and the others are "clones", managed by React and having their .srcObject assigned to that of the original .player
+ * element. Hence, the DynVideo renders the video in one of two modes - "external" or "cloned". The Hi-Res versions of
+ * the video components display the external player, so that they can start rendering the video immediately. Thumbnail
+ * videos use cloned players.
  *
  * Smooth video switching
  * When switching a StreamSource between thumbnail and hi-res track, it takes a bit of time for the newly requested
  * track to start playing. If the track is directly fed into the visible <video> player, this will cause a short
  * blackout before the new resolution video starts. To avoid this, two indenepdent <video> players are used while
- * switching, and StreamSource.source points to the one currently displayed. The current track and video player
+ * switching, and StreamSource.player points to the one currently displayed. The current track and video player
  * are kept running and displayed while the newly requested track is being buffered. When the player of the new
  * track fires the "onplay" event, the "old" player is swapped with the "new" one instantly, by changing the
- * Stream.source property and calling updateVideoElem() on all consumers. The old track can then be stopped
+ * .player property and calling dynUpdateVideoElem() on all consumers. The old track can then be stopped
  * and the old player destroyed.
  *
  * Gradual resolution downgrade
@@ -68,11 +76,9 @@
             super({
                 'clientId': null,
                 'userHandle': null,
-                'av': null,
                 'isVisible': null,
                 'isActive': null,
-                'lastSpeaktime': null,
-                'hasSlowNetwork': null,
+                'lastSpeaktime': null
             });
             this.call = call;
             this.userHandle = userHandle;
@@ -82,7 +88,7 @@
             this.consumers = new Set();
             this.currentQuality = VIDEO_QUALITY.NO_VIDEO;
             this.resState = RES_STATE.NO_VIDEO;
-            this.source = null;
+            this.player = null;
             this.onHdReleaseTimer = this._onHdReleaseTimer.bind(this);
             this.onAvChange(av);
             call.peers.push(this);
@@ -96,13 +102,13 @@
             return M.getNameByHandle(this.userHandle);
         }
         setResState(newState) {
-            const oldSource = this.source;
+            const oldPlayer = this.player;
             this.resState = newState;
-            this.source = (newState === RES_STATE.HD || newState === RES_STATE.THUMB_PENDING)
+            this.player = (newState === RES_STATE.HD || newState === RES_STATE.THUMB_PENDING)
                 ? (this.hiResPlayer && this.hiResPlayer.gui.video)
                 : (this.vThumbPlayer && this.vThumbPlayer.gui.video);
-            // console.warn(`setResState[${this.clientId}]: ->`, newState, this.source);
-            if (this.source !== oldSource) {
+            // console.warn(`setResState[${this.clientId}]: ->`, newState, this.player);
+            if (this.player !== oldPlayer) {
                 this.updateConsumerVideos();
             }
         }
@@ -113,22 +119,31 @@
         }
         onAvChange(av) {
             const Av = SfuClient.Av;
-            this.audioMuted = !(av & Av.Audio);
-            this.videoMuted = !(av & Av.Camera);
-            this.haveScreenAndCam = (av & Av.ScreenHiRes) && (av & Av.CameraLowRes);
             this.isOnHold = !!(av & Av.onHold);
+            if (this.onHold) {
+                this.audioMuted = this.videoMuted = true;
+                this.hasScreenAndCam = false;
+            }
+            else {
+                this.audioMuted = !(av & Av.Audio);
+                this.videoMuted = !(av & Av.Camera);
+                this.hasScreenAndCam = (av & Av.ScreenHiRes) && (av & Av.CameraLowRes);
+            }
             this.av = av;
-        }
-        registerConsumer(consumerGui) {
-            this.consumers.add(consumerGui);
-            if (this.source && !consumerGui.clonedVideo) {
-                Promise.resolve(this.source.play()).catch(nop);
+            for (const cons of this.consumers) {
+                cons.onAvChange();
             }
         }
-        deregisterConsumer(consumerGui) {
-            this.consumers.delete(consumerGui);
-            if (!this.isDestroyed) {
-                this.updateVideoQuality();
+        registerConsumer(cons) {
+            this.consumers.add(cons);
+            if (cons.isDirect && this.player) {
+                Promise.resolve(this.player.play()).catch(nop);
+            }
+        }
+        deregisterConsumer(cons) {
+            this.consumers.delete(cons);
+            if (cons.requestedQ !== undefined && !this.isDestroyed) {
+                this.dynUpdateVideoQuality();
             }
         }
         hdReleaseTimerStop() {
@@ -167,12 +182,15 @@
          * @returns {boolean} - true if video source changed synchronously, which can happen only if video was disabled,
          * or if there was no free slot for parallel request to change hi-res<->vthumb quality
          */
-        updateVideoQuality() {
+        dynUpdateVideoQuality() {
             // if no free tracks, change the quality "in-place", rather than using a second track for smooth switching
             // leave 2 tracks for race conditions, etc
             this._consumersUpdated = false;
             var maxQ = 0;
             for (const { requestedQ } of this.consumers) {
+                if (requestedQ === undefined) {
+                    continue; // not a dynamic video consumer
+                }
                 if (requestedQ > maxQ) {
                     maxQ = requestedQ;
                     if (requestedQ === VIDEO_QUALITY.HIGH) {
@@ -211,7 +229,7 @@
                 this.requestHdStream(4 - newQuality); // convert quality to resolution divider
             }
             else if (newQuality === VIDEO_QUALITY.THUMB) {
-                if (this.haveScreenAndCam) {
+                if (this.hasScreenAndCam) {
                     this.requestHdStream(2);
                 }
                 else {
@@ -227,7 +245,9 @@
         }
         updateConsumerVideos() {
             for (const cons of this.consumers) {
-                cons.updateDynamicVideoElem();
+                if (cons.dynUpdateVideoElem) {
+                    cons.dynUpdateVideoElem();
+                }
             }
             this._consumersUpdated = true;
         }
@@ -384,7 +404,7 @@
         }
         setSfuClient(sfuClient) { // Call and sfuClient reference each other and need post-construction linking
             this.sfuClient = sfuClient;
-            this.localPeerStream.sfuClient = sfuClient;
+            this.localPeerStream.setSfuClient(sfuClient);
         }
 // SfuClient.IClientEventListener interface
         onServerError(errCode) {
@@ -528,11 +548,9 @@
         getLocalStream() {
             return this.localPeerStream;
         }
-        onLocalMediaChange(diffFlag) {
-            if (diffFlag & SfuClient.Av.Video) {
-                this.localPeerStream.onStreamChange();
-            }
+        onLocalMediaChange(diffAv) {
             this.av = this.sfuClient.availAv;
+            this.localPeerStream.onAvChange(diffAv);
         }
         onLocalMediaError(errObj) {
             megaChat.trigger('onLocalMediaError', errObj);
@@ -546,15 +564,13 @@
             this.onLocalMediaChange(SfuClient.Av.Audio);
         }
         toggleVideo() {
-            // remove the if() for enabling presenter video feed
-            if (this.isSharingScreen()) {
+            if (this.isSharingScreen() && NO_SIMUL_SCRSHARE_AND_CAMERA) {
                 this.sfuClient.enableScreenshare(false);
             }
             this.sfuClient.muteCamera(!!(this.av & SfuClient.Av.Camera));
         }
         toggleScreenSharing() {
-            // remove the if() for enabling presenter video feed
-            if (this.av & SfuClient.Av.Camera) {
+            if ((this.av & SfuClient.Av.Camera) && NO_SIMUL_SCRSHARE_AND_CAMERA) {
                 this.sfuClient.muteCamera(true);
             }
             this.sfuClient.enableScreenshare(!this.sfuClient.isSharingScreen());
@@ -756,38 +772,53 @@
     class LocalPeerStream {
         constructor(call) {
             this.isLocal = true;
-            this.hasSlowNetwork = null;
-            this.source = null; // local video player
+            this.player = null; // local video player
             this.call = call;
             this.userHandle = u_handle;
             this.consumers = new Set();
         }
-        onStreamChange() {
-            const vtrack = this.sfuClient.mainSentVtrack();
-            if (vtrack) {
-                if (!this.source) {
-                    this.source = document.createElement("video");
+        setSfuClient(sfuClient) {
+            this.sfuClient = sfuClient;
+            this.av = sfuClient.availAv;
+        }
+        onAvChange(avDiff) {
+            this.av = this.sfuClient.availAv;
+            if (avDiff & SfuClient.Av.Video) {
+                // we are managing the hi-res local player, which displays screen video if available
+                const vtrack = this.sfuClient.localScreenTrack() || this.sfuClient.localCameraTrack();
+                if (vtrack) {
+                    this.isScreen = vtrack._isScreen;
+                    if (!this.player) {
+                        this.player = document.createElement("video");
+                    }
+                    SfuClient.playerPlay(this.player, vtrack, true);
                 }
-                SfuClient.playerPlay(this.source, vtrack);
-            }
-            else {
-                if (this.source) {
-                    SfuClient.playerStop(this.source);
+                else {
+                    if (this.player) {
+                        SfuClient.playerStop(this.player);
+                    }
+                    this.player = null;
                 }
-                this.source = null;
             }
             for (const cons of this.consumers) {
-                cons.updateDynamicVideoElem();
+                cons.onAvChange();
             }
         }
         get audioMuted() {
             return this.sfuClient.localAudioMuted();
         }
+        get videoMuted() {
+            return (this.sfuClient.availAv & Av.Video) === 0;
+        }
+        get hasScreenAndCam() {
+            const av = this.sfuClient.availAv;
+            return (av & Av.ScreenHiRes) && (av & Av.CameraLowRes);
+        }
         registerConsumer(consumer) {
             this.consumers.add(consumer);
             // player may have stopped when the last non-clone consumer was unmounted from the DOM
-            if (this.source && !consumer.clonedVideo) { // && this.source.paused - just in case, don't check if paused
-                Promise.resolve(this.source.play()).catch(nop);
+            if (consumer.isDirect && this.player) { // && this.player.paused - just in case, don't check if paused
+                Promise.resolve(this.player.play()).catch(nop);
             }
         }
         deregisterConsumer(consumer) {
@@ -799,11 +830,11 @@
         get isOnHold() {
             return this.sfuClient.isOnHold();
         }
-        updateVideoQuality() {
-            return false; // returing false will cause the caller StreamNode to update itself
+        dynUpdateVideoQuality() {
+            return false; // returing false will cause the caller VideoNode to update itself
         }
         destroy() {
-            this.isDestroyed = true; // let StreamNode know we are destroyed
+            this.isDestroyed = true; // let VideoNode know we are destroyed
         }
     }
     /**

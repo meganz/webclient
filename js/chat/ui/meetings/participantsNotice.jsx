@@ -2,7 +2,7 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Button from './button';
 import Call from './call';
-import StreamNode from './streamNode';
+import {LocalVideoHiRes} from './videoNode';
 import {ParsedHTML} from "../../../ui/utils";
 
 export default class ParticipantsNotice extends MegaRenderMixin {
@@ -126,7 +126,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
 
     render() {
-        const { call, hasLeft, streamContainer, isOnHold } = this.props;
+        const { call, hasLeft, streamContainer, chatRoom } = this.props;
 
         if (call.isDestroyed) {
             return null;
@@ -135,9 +135,10 @@ export default class ParticipantsNotice extends MegaRenderMixin {
         return (
             <>
                 {call.isSharingScreen() ? null : (
-                    <StreamNode
+                    <LocalVideoHiRes
                         className="local-stream-mirrored"
-                        stream={call.getLocalStream()}
+                        chatRoom={chatRoom}
+                        source={call.getLocalStream()}
                     />
                 )}
                 {streamContainer(hasLeft ? this.renderUserAlone() : this.renderUserWaiting())}

@@ -36,7 +36,7 @@ class StreamControls extends MegaRenderMixin {
                 <Button
                     className="mega-button round small theme-dark-forced negative"
                     simpletip={{ ...this.SIMPLETIP, label: 'Remove Stream' }}
-                    onClick={() => this.props.streams.length > 1 && this.props.onStreamToggle(STREAM_ACTIONS.REMOVE)}>
+                    onClick={() => this.props.peers.length > 1 && this.props.onStreamToggle(STREAM_ACTIONS.REMOVE)}>
                     <span>{l[83]}</span>
                 </Button>
             </div>
@@ -44,7 +44,7 @@ class StreamControls extends MegaRenderMixin {
     };
 
     renderEndCall = () => {
-        const { chatRoom, streams, onCallEnd } = this.props;
+        const { chatRoom, peers, onCallEnd } = this.props;
         return (
             <div
                 ref={this.endContainerRef}
@@ -81,7 +81,7 @@ class StreamControls extends MegaRenderMixin {
                         this.endButtonRef = button.buttonRef;
                     }}
                     onClick={() =>
-                        chatRoom.type !== 'private' && streams.length && Call.isModerator(chatRoom, u_handle) ?
+                        chatRoom.type !== 'private' && peers.length && Call.isModerator(chatRoom, u_handle) ?
                             this.setState(state => ({ endCallOptions: !state.endCallOptions }), () =>
                                 this.endButtonRef && $(this.endButtonRef.current).trigger('simpletipClose')
                             ) :

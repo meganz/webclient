@@ -6,7 +6,7 @@ import Call from './call.jsx';
 import Collapse from './collapse.jsx';
 import Participants from './participants.jsx';
 import Button from './button.jsx';
-import StreamNode from './streamNode.jsx';
+import { LocalVideoThumb, PeerVideoThumb } from './videoNode.jsx';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar';
 import Guest from './guest.jsx';
 
@@ -52,7 +52,7 @@ export default class Sidebar extends MegaRenderMixin {
     };
 
     renderSpeakerMode = () => {
-        const { mode, call, streams, guest, chatRoom, forcedLocal, isOnHold, onSpeakerChange } = this.props;
+        const { mode, call, peers, guest, chatRoom, forcedLocal, onSpeakerChange } = this.props;
         const localStream = call.getLocalStream();
         const SIMPLE_TIP = {className: 'theme-dark-forced'};
         return (
@@ -65,14 +65,12 @@ export default class Sidebar extends MegaRenderMixin {
                     <Collapse
                         {...this.props}
                         heading={l[16217] /* `Participants` */}
-                        badge={streams.length + 1}>
+                        badge={peers.length + 1}>
                         <div className="sidebar-streams">
-                            <StreamNode
+                            <LocalVideoThumb
                                 mode={mode}
                                 chatRoom={chatRoom}
-                                stream={localStream}
-                                isLocal={true}
-                                isThumb={true}
+                                source={localStream}
                                 simpletip={{...SIMPLE_TIP, label: l[8885]}}
                                 localAudioMuted={!(call.av & SfuClient.Av.Audio)}
                                 className={
@@ -84,17 +82,16 @@ export default class Sidebar extends MegaRenderMixin {
                                     onSpeakerChange(localStream);
                                 }}
                             />
-                            {streams.map((stream, index) => {
+                            {peers.map((peer, index) => {
                                 return (
-                                    <StreamNode
+                                    <PeerVideoThumb
                                         key={index}
                                         mode={mode}
                                         chatRoom={chatRoom}
-                                        stream={stream}
-                                        isThumb={true}
-                                        simpletip={{...SIMPLE_TIP, label: M.getNameByHandle(stream.userHandle)}}
+                                        source={peer}
+                                        simpletip={{...SIMPLE_TIP, label: M.getNameByHandle(peer.userHandle)}}
                                         className={
-                                            stream.isActive || stream.clientId === call.forcedActiveStream ?
+                                            peer.isActive || peer.clientId === call.forcedActiveStream ?
                                                 'active' :
                                                 ''
                                         }
@@ -127,10 +124,10 @@ export default class Sidebar extends MegaRenderMixin {
     };
 
     renderParticipantsView = () => {
-        const { call, streams, guest, chatRoom } = this.props;
+        const { call, peers, guest, chatRoom } = this.props;
         return (
             <Participants
-                streams={streams}
+                peers={peers}
                 call={call}
                 chatRoom={chatRoom}
                 guest={guest}

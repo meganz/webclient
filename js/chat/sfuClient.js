@@ -922,7 +922,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '7a2d27038a';
+const COMMIT_ID = '6202754293';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1072,6 +1072,9 @@ class SfuClient {
     }
     get numRxAudio() {
         return this._numRxAudio;
+    }
+    get haveBadNetwork() {
+        return this._svcDriver.hasBadNetwork;
     }
     willReconnect() {
         if (this._forcedDisconnect) {
@@ -1283,8 +1286,13 @@ class SfuClient {
         let keyData = key.key;
         let promises = [];
         for (let peer of this.peers.values()) {
-            promises.push(peer.encryptKey(keyData));
-            peer.lastKeySent = key;
+            if (!peer.lastKeySent || peer.lastKeySent !== key) {
+                promises.push(peer.encryptKey(keyData));
+                peer.lastKeySent = key;
+            }
+        }
+        if (promises.length === 0) {
+            return;
         }
         let results = await Promise.all(promises);
         this.send({ a: "KEY", id: key.id & 0xff, data: results });
@@ -1665,12 +1673,6 @@ class SfuClient {
             } while (0);
             return false;
         }
-        const tsStart = Date.now();
-        do {
-            if (window.d) {
-                console.log(client_kLogTag, "Getting local media...");
-            }
-        } while (0);
         let errors = null;
         // delete the tracks we disable, and prepare options for getting the ones we enable
         let promises = [];
@@ -1693,6 +1695,12 @@ class SfuClient {
         let gettingAudio = audioChange && audio;
         let gettingCam = camChange && camera && !self.fakeLocalVideoCanvas;
         let gettingScreen = screenChange && screen;
+        const tsStart = Date.now();
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "Getting local media...");
+            }
+        } while (0);
         if (gettingAudio) {
             promises.push(navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(function (stream) {
@@ -1749,6 +1757,14 @@ class SfuClient {
                 self.logError("Error getting local screen video:", err);
                 return Promise.reject(err);
             }));
+        }
+        if (!promises.length) {
+            do {
+                if (window.d) {
+                    console.log(client_kLogTag, "...nothing to get");
+                }
+            } while (0);
+            return true;
         }
         await Promise.allSettled(promises);
         do {
@@ -3295,7 +3311,11 @@ class AudioPlayer {
         client._numRxAudio--;
     }
 }
-function playerPlay(player, track) {
+function playerPlay(player, track, dontRestart) {
+    if (dontRestart && !player.paused && player.srcObject &&
+        player.srcObject.getTracks()[0] === track) {
+        return;
+    }
     player.srcObject = new MediaStream([track]);
     let ts = Date.now();
     player.play()
@@ -4034,6 +4054,7 @@ class StatsRecorder {
             peers: client.maxPeers,
             samples: arrs,
             trsn: termReason,
+            v: SfuClient.kProtocolVersion
         };
         if (!this.client.micInputSeen) {
             data.nomic = 1;

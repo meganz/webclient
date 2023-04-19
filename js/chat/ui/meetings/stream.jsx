@@ -2,10 +2,10 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Call from './call.jsx';
 import StreamHead from './streamHead.jsx';
-import StreamNode from './streamNode.jsx';
+import { PeerVideoHiRes, LocalVideoHiRes } from './videoNode.jsx';
 import SidebarControls  from './sidebarControls.jsx';
 import StreamControls from './streamControls.jsx';
-import Local from './local.jsx';
+import FloatingVideo from './float.jsx';
 import ParticipantsNotice from './participantsNotice.jsx';
 import ChatToaster from "../chatToaster";
 
@@ -139,12 +139,12 @@ export default class Stream extends MegaRenderMixin {
      */
 
     scaleNodes(columns, forced = false) {
-        const { streams, minimized, mode } = this.props;
+        const { peers, minimized, mode } = this.props;
         const container = this.containerRef.current;
         this.lastRescaledCache = forced ? null : this.lastRescaledCache;
 
         if (minimized || !container) {
-            // No streams rendered, e.g. In minimized state
+            // No peers rendered, e.g. In minimized state
             return;
         }
 
@@ -153,7 +153,7 @@ export default class Stream extends MegaRenderMixin {
         const extraVerticalMargin = parseInt(parentStyle.paddingTop) + parseInt(parentStyle.paddingBottom);
         let containerWidth = parentRef.offsetWidth;
         let containerHeight = parentRef.offsetHeight - extraVerticalMargin;
-        const streamsInUI = streams.length > MAX_STREAMS_PER_PAGE ? this.chunks[this.state.page] : streams;
+        const streamsInUI = peers.length > MAX_STREAMS_PER_PAGE ? this.chunks[this.state.page] : peers;
 
         if (streamsInUI) {
             const streamCountInUI = streamsInUI.length;
@@ -226,12 +226,11 @@ export default class Stream extends MegaRenderMixin {
     renderNodes() {
         const {
             mode,
-            streams,
+            peers,
             call,
             forcedLocal,
             chatRoom,
             ephemeralAccounts,
-            isOnHold,
             onCallMinimize,
             onSpeakerChange,
             onThumbnailDoubleClick
@@ -244,37 +243,36 @@ export default class Stream extends MegaRenderMixin {
         if (mode === Call.MODE.THUMBNAIL) {
 
             //
-            // Default, i.e. streams aligned within single page grid.
+            // Default, i.e. videos aligned within single page grid.
             // ------------------------------------------------------
 
-            if (streams.length <= MAX_STREAMS_PER_PAGE) {
+            if (peers.length <= MAX_STREAMS_PER_PAGE) {
                 const $$STREAMS = [];
-                streams.forEach((stream, i) => {
-                    const cacheKey = `${mode}_${stream.clientId}_${i}`;
+                peers.forEach((peer, i) => {
+                    const cacheKey = `${mode}_${peer.clientId}_${i}`;
 
                     $$STREAMS.push(
-                        <StreamNode
+                        <PeerVideoHiRes
                             mode={mode}
-                            externalVideo={true}
                             chatRoom={chatRoom}
                             menu={true}
                             ephemeralAccounts={ephemeralAccounts}
                             onCallMinimize={onCallMinimize}
                             onSpeakerChange={onSpeakerChange}
-                            onDoubleClick={(e, streamNode) => {
+                            onDoubleClick={(e, videoNode) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                onThumbnailDoubleClick(streamNode);
+                                onThumbnailDoubleClick(videoNode);
                             }}
                             key={cacheKey}
-                            stream={stream}
+                            source={peer}
                             didMount={ref => {
-                                this.nodeRefs.push({ clientId: stream.clientId, cacheKey, ref });
+                                this.nodeRefs.push({ clientId: peer.clientId, cacheKey, ref });
                                 this.scaleNodes(undefined, true);
                             }}
                             willUnmount={() => {
                                 this.nodeRefs = this.nodeRefs.filter(
-                                    nodeRef => nodeRef.clientId !== stream.clientId
+                                    nodeRef => nodeRef.clientId !== peer.clientId
                                 );
                             }}
                         />
@@ -288,7 +286,7 @@ export default class Stream extends MegaRenderMixin {
             // ------------------------------------------------------------------------------
 
             const { page } = this.state;
-            this.chunks = this.chunkNodes(streams, MAX_STREAMS_PER_PAGE);
+            this.chunks = this.chunkNodes(peers, MAX_STREAMS_PER_PAGE);
             this.chunksLength = this.chunks.length;
 
             return (
@@ -302,11 +300,10 @@ export default class Stream extends MegaRenderMixin {
                                         carousel-page
                                         ${i === page ? 'active' : ''}
                                     `}>
-                                    {chunk.map(stream =>
-                                        <StreamNode
-                                            key={stream.clientId}
-                                            stream={stream}
-                                            externalVideo={true}
+                                    {chunk.map(peer =>
+                                        <PeerVideoHiRes
+                                            key={peer.clientId}
+                                            source={peer}
                                             chatRoom={chatRoom}
                                             menu={true}
                                             ephemeralAccounts={ephemeralAccounts}
@@ -316,11 +313,11 @@ export default class Stream extends MegaRenderMixin {
                                                 if (!this.nodeRefs[i]) {
                                                     this.nodeRefs[i] = [];
                                                 }
-                                                this.nodeRefs[i].push({ clientId: stream.clientId, ref });
+                                                this.nodeRefs[i].push({ clientId: peer.clientId, ref });
                                             }}
                                             willUnmount={() => {
                                                 this.nodeRefs = this.nodeRefs.map(chunk =>
-                                                    chunk.filter(nodeRef => nodeRef.clientId !== stream.clientId)
+                                                    chunk.filter(nodeRef => nodeRef.clientId !== peer.clientId)
                                                 );
                                             }}
                                         />
@@ -353,22 +350,28 @@ export default class Stream extends MegaRenderMixin {
         //  `Speaker Mode`
         // -------------------------------------------------------------------------
 
-        const activeStream = call.getActiveStream();
-        const targetStream = forcedLocal ? call.getLocalStream() : activeStream;
-
+        let source;
+        let VideoType;
+        if (forcedLocal) {
+            VideoType = LocalVideoHiRes;
+            source = call.getLocalStream();
+        }
+        else {
+            VideoType = PeerVideoHiRes;
+            source = call.getActiveStream();
+            if (!source) {
+                return null;
+            }
+        }
         return (
-            forcedLocal || activeStream ?
-                <StreamNode
-                    key={targetStream.clientId}
-                    className={forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : ''}
-                    stream={targetStream}
-                    externalVideo={true}
-                    chatRoom={chatRoom}
-                    menu={true}
-                    ephemeralAccounts={ephemeralAccounts}
-                    onCallMinimize={onCallMinimize}
-                /> :
-                null
+            <VideoType
+                key={source.clientId}
+                chatRoom={chatRoom}
+                source={source}
+                menu={true}
+                ephemeralAccounts={ephemeralAccounts}
+                onCallMinimize={onCallMinimize}
+            />
         );
     }
 
@@ -403,7 +406,7 @@ export default class Stream extends MegaRenderMixin {
 
     renderStreamContainer() {
         const {
-            call, chatRoom, streams, stayOnEnd, everHadPeers, isOnHold, hasOtherParticipants,
+            call, chatRoom, peers, stayOnEnd, everHadPeers, isOnHold, hasOtherParticipants,
             onInviteToggle, onStayConfirm, onCallEnd
         } = this.props;
         const streamContainer = content =>
@@ -411,12 +414,12 @@ export default class Stream extends MegaRenderMixin {
                 ref={this.containerRef}
                 className={`
                     ${NAMESPACE}-container
-                    ${streams.length === 0 || !hasOtherParticipants ? 'with-notice' : ''}
+                    ${peers.length === 0 || !hasOtherParticipants ? 'with-notice' : ''}
                 `}>
                 {content}
             </div>;
 
-        if (streams.length === 0 || !hasOtherParticipants) {
+        if (peers.length === 0 || !hasOtherParticipants) {
             return (
                 <ParticipantsNotice
                     call={call}
@@ -468,7 +471,7 @@ export default class Stream extends MegaRenderMixin {
     render() {
         const { hovered, overlayed } = this.state;
         const {
-            mode, call, chatRoom, minimized, streams, sidebar, forcedLocal, view, isOnHold, onCallMinimize,
+            mode, call, chatRoom, minimized, peers, sidebar, forcedLocal, view, isOnHold, onCallMinimize,
             onCallExpand, onStreamToggle, onModeChange, onChatToggle, onParticipantsToggle, onAudioClick, onVideoClick,
             onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange
         } = this.props;
@@ -514,7 +517,7 @@ export default class Stream extends MegaRenderMixin {
                         <StreamControls
                             call={call}
                             minimized={minimized}
-                            streams={streams}
+                            peers={peers}
                             chatRoom={chatRoom}
                             onAudioClick={onAudioClick}
                             onVideoClick={onVideoClick}
@@ -526,7 +529,7 @@ export default class Stream extends MegaRenderMixin {
 
                         <SidebarControls
                             chatRoom={chatRoom}
-                            streams={streams.length}
+                            npeers={peers.length}
                             mode={mode}
                             view={view}
                             sidebar={sidebar}
@@ -535,9 +538,9 @@ export default class Stream extends MegaRenderMixin {
                         />
                     </div>
                 )}
-                <Local
+                <FloatingVideo
                     call={call}
-                    streams={streams}
+                    peers={peers}
                     mode={mode}
                     view={view}
                     isOnHold={isOnHold}

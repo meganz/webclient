@@ -311,9 +311,9 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $.doDD = function(e, ui, a, type) {
 
-        // Prevent drop behavior for the `Local` component
-        // See: ui/meetings/local.jsx
-        if (ui.helper.hasClass('local-stream') || !$(ui.draggable).hasClass('ui-draggable')) {
+        // Prevent drop behavior for the `FloatingVideo` component
+        // See: ui/meetings/float.jsx
+        if (ui.helper.hasClass('float-video') || !$(ui.draggable).hasClass('ui-draggable')) {
             return;
         }
 

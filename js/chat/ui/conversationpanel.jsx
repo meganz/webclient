@@ -2085,7 +2085,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 {room.call && (
                     <Call
                         chatRoom={room}
-                        streams={room.call.peers}
+                        peers={room.call.peers}
                         call={room.call}
                         minimized={this.state.callMinimized}
                         onCallMinimize={() => {

@@ -15,7 +15,7 @@ export class Schedule extends MegaRenderMixin {
 
     wrapperRef = React.createRef();
     scheduledMeetingRef = null;
-    localStreamRef = '.local-stream';
+    localStreamRef = '.float-video';
     datepickerRefs = [];
 
     interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;

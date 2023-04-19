@@ -5,7 +5,7 @@ import Call from './call.jsx';
 
 export default class SidebarControls extends MegaRenderMixin {
     render() {
-        const { streams, view, sidebar, chatRoom, onChatToggle, onParticipantsToggle } = this.props;
+        const { npeers, view, sidebar, chatRoom, onChatToggle, onParticipantsToggle } = this.props;
         const SIMPLETIP = { position: 'left', offset: 5, className: 'theme-dark-forced' };
         const notifications = chatRoom.getUnreadCount();
 
@@ -47,7 +47,7 @@ export default class SidebarControls extends MegaRenderMixin {
                             onClick={onParticipantsToggle}>
                             <span>{l[16217] /* `Participants` */}</span>
                         </Button>
-                        <span className="participants-count">{streams + 1}</span>
+                        <span className="participants-count">{npeers + 1}</span>
                     </li>
                 </ul>
             </div>

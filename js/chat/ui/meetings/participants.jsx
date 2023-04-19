@@ -8,31 +8,17 @@ import { Emoji } from '../../../ui/utils.jsx';
 
 class Participant extends MegaRenderMixin {
     baseIconClass = 'sprite-fm-mono';
-
-    audioMuted() {
-        const { call, stream } = this.props;
-
-        // Local stream (me)
-        if (call) {
-            return !(call.av & SfuClient.Av.Audio);
-        }
-
-        // Participant streams
-        return stream && stream.audioMuted;
+    componentDidMount() {
+        super.componentDidMount();
+        this.props.source.registerConsumer(this);
     }
-
-    videoMuted() {
-        const { call, stream } = this.props;
-
-        // Local stream (me)
-        if (call) {
-            return !(call.av & SfuClient.Av.Camera);
-        }
-
-        // Participant streams
-        return stream && stream.videoMuted;
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        this.props.source.deregisterConsumer(this);
     }
-
+    onAvChange() {
+        this.safeForceUpdate();
+    }
     render() {
         const { chatRoom, handle, name } = this.props;
         return (
@@ -50,13 +36,13 @@ class Participant extends MegaRenderMixin {
                     <i
                         className={`
                             ${this.baseIconClass}
-                            ${this.audioMuted() ? 'icon-audio-off inactive' : 'icon-audio-filled'}
+                            ${this.props.source.audioMuted ? 'icon-audio-off inactive' : 'icon-audio-filled'}
                          `}
                     />
                     <i
                         className={`
                             ${this.baseIconClass}
-                            ${this.videoMuted() ? 'icon-video-off inactive' : 'icon-video-call-filled'}
+                            ${this.props.source.videoMuted ? 'icon-video-off inactive' : 'icon-video-call-filled'}
                         `}
                     />
                 </div>
@@ -67,13 +53,13 @@ class Participant extends MegaRenderMixin {
 
 export default class Participants extends MegaRenderMixin {
     render() {
-        const { streams, call, guest, chatRoom } = this.props;
+        const { peers, call, guest, chatRoom } = this.props;
         return (
             <div className="participants">
                 <Collapse
                     {...this.props}
                     heading={l[16217] /* `Participants` */}
-                    badge={streams.length + 1}>
+                    badge={peers.length + 1}>
                     <div
                         className={`
                             participants-list
@@ -85,17 +71,18 @@ export default class Participants extends MegaRenderMixin {
                                     <Participant
                                         call={call}
                                         chatRoom={chatRoom}
+                                        source={call.getLocalStream()}
                                         handle={u_handle}
                                         name={M.getNameByHandle(u_handle)}
                                     />
                                 </li>
-                                {streams.map((stream, i) =>
-                                    <li key={`${stream.clientId}_${i}`}>
+                                {peers.map(peer =>
+                                    <li key={`${peer.clientId}-${peer.userHandle}`}>
                                         <Participant
                                             chatRoom={chatRoom}
-                                            stream={stream}
-                                            handle={stream.userHandle}
-                                            name={stream.name}
+                                            source={peer}
+                                            handle={peer.userHandle}
+                                            name={peer.name}
                                         />
                                     </li>
                                 )}

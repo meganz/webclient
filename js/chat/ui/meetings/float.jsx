@@ -3,15 +3,15 @@ import { compose, MegaRenderMixin } from '../../mixins';
 import utils from '../../../ui/utils.jsx';
 import Button from './button.jsx';
 import Call from './call.jsx';
-import StreamNode from './streamNode.jsx';
+import { LocalVideoThumb, LocalVideoHiRes, PeerVideoHiRes } from './videoNode.jsx';
 import StreamExtendedControls from './streamExtendedControls.jsx';
 import { withMicObserver } from './micObserver';
 import { withPermissionsObserver } from './permissionsObserver';
 
-export default class Local extends MegaRenderMixin {
+export default class FloatingVideo extends MegaRenderMixin {
     collapseListener = null;
 
-    static NAMESPACE = 'local-stream';
+    static NAMESPACE = 'float-video';
     static POSITION_MODIFIER = 'with-sidebar';
 
     state = {
@@ -52,15 +52,16 @@ export default class Local extends MegaRenderMixin {
     }
 
     render() {
-        const { streams, minimized, call } = this.props;
+        const { peers, minimized, call } = this.props;
 
-        // Only one call participant (i.e. me) -> render `Local` only if the call is minimized or if I am sharing screen
-        if (streams.length === 0 && !minimized && !call.isSharingScreen()) {
+        // Only one call participant (i.e. me) -> render `FloatingVideo` only if the call is minimized or if
+        // I am sharing screen
+        if (peers.length === 0 && !minimized && !call.isSharingScreen()) {
             return null;
         }
 
         //
-        // `Local`
+        // `FloatingVideo`
         // -------------------------------------------------------------------------
 
         const STREAM_PROPS = {
@@ -154,12 +155,7 @@ class Stream extends MegaRenderMixin {
 
     getStreamSource = () => {
         const { call, mode, forcedLocal } = this.props;
-
-        if (mode === Call.MODE.MINI) {
-            return forcedLocal ? call.getLocalStream() : call.getActiveStream();
-        }
-
-        return call.getLocalStream();
+        return (mode === Call.MODE.MINI && !forcedLocal) ? call.getActiveStream() : call.getLocalStream();
     };
 
     unbindEvents = () => {
@@ -195,7 +191,7 @@ class Stream extends MegaRenderMixin {
             });
         }
 
-        // Close the options menu on click outside the `Local` component
+        // Close the options menu on click outside the `FloatingVideo` component
         document.addEventListener('click', this.handleOptionsClose);
     };
 
@@ -215,8 +211,8 @@ class Stream extends MegaRenderMixin {
 
     /**
      * repositionDraggable
-     * @description Updates the position of the `Local` component. The position update is applied only if `Local` is
-     * positioned above the sidebar.
+     * @description Updates the position of the `FloatingVideo` component. The position update is applied
+     * only if `FloatingVideo` is positioned above the sidebar.
      */
 
     repositionDraggable = () => {
@@ -252,17 +248,16 @@ class Stream extends MegaRenderMixin {
     handleOptionsToggle = () => this.setState({ options: !this.state.options });
 
     /**
-     * renderOnHoldStreamNode
-     * @description Renders `StreamNode` with empty stream source that displays the user's avatar only.
-     * @see StreamNode
+     * renderOnHoldVideoNode
+     * @description Renders `VideoNode` with empty stream source that displays the user's avatar only.
+     * @see VideoNode
      * @see renderContent
      * @returns {JSX.Element}
      */
 
-    renderOnHoldStreamNode = () =>
-        <StreamNode
-            stream={this.props.call.getLocalStream()}
-            isLocal={true}
+    renderOnHoldVideoNode = () =>
+        <LocalVideoHiRes
+            chatRoom={this.props.chatRoom}
         />;
 
     renderOptionsDialog = () => {
@@ -282,7 +277,7 @@ class Stream extends MegaRenderMixin {
         return (
             <div
                 className={`
-                     ${Local.NAMESPACE}-options
+                     ${FloatingVideo.NAMESPACE}-options
                      ${POSITION.left < 200 ? 'options-top' : ''}
                      ${POSITION.left < 200 && POSITION.top < 100 ? 'options-bottom' : ''}
                      theme-dark-forced
@@ -338,43 +333,40 @@ class Stream extends MegaRenderMixin {
     };
 
     renderMiniMode = () => {
-        const { call, mode, forcedLocal, onLoadedData } = this.props;
+        const { call, mode, onLoadedData } = this.props;
 
         if (call.sfuClient.isOnHold()) {
-            return this.renderOnHoldStreamNode();
+            return this.renderOnHoldVideoNode();
         }
-
+        const source = this.getStreamSource();
+        const VideoClass = source.isLocal ? LocalVideoThumb : PeerVideoHiRes;
         return (
-            <StreamNode
-                className={forcedLocal && !call.isSharingScreen() ? 'local-stream-mirrored' : ''}
+            <VideoClass
+                chatRoom={this.props.chatRoom}
                 mode={mode}
-                externalVideo={true}
-                stream={this.getStreamSource()}
                 onLoadedData={onLoadedData}
+                source={source} // ignored for LocalVideoHiRes
             />
         );
     };
 
     renderSelfView = () => {
-        const { call, isOnHold, minimized, onLoadedData } = this.props;
+        const { isOnHold, minimized, onLoadedData, chatRoom } = this.props;
         const { options } = this.state;
 
         if (isOnHold) {
-            return this.renderOnHoldStreamNode();
+            return this.renderOnHoldVideoNode();
         }
 
         return (
             <>
-                <StreamNode
+                <LocalVideoThumb
                     isSelfOverlay={true}
-                    className={call.isSharingScreen() ? '' : 'local-stream-mirrored'}
                     minimized={minimized}
-                    stream={this.getStreamSource()}
-                    isLocal={true}
+                    chatRoom={chatRoom}
                     onLoadedData={onLoadedData}
-                    localAudioMuted={!(call.av & SfuClient.Av.Audio)}
                 />
-                <div className={`${Local.NAMESPACE}-self-overlay`}>
+                <div className={`${FloatingVideo.NAMESPACE}-self-overlay`}>
                     {minimized ?
                         null :
                         <Button
@@ -383,7 +375,7 @@ class Stream extends MegaRenderMixin {
                                 theme-light-forced
                                 action
                                 small
-                                local-stream-options-control
+                                float-video-options-control
                                 ${options ? 'active' : ''}
                             `}
                             icon="sprite-fm-mono icon-options"
@@ -409,7 +401,7 @@ class Stream extends MegaRenderMixin {
             this.initDraggable();
         }
 
-        // Reposition the `Local` if the sidebar had been toggled and it's currently open
+        // Reposition the `FloatingVideo` if the sidebar had been toggled and it's currently open
         if (this.props.sidebar !== prevProps.sidebar && this.props.sidebar) {
             this.repositionDraggable();
         }
@@ -422,7 +414,7 @@ class Stream extends MegaRenderMixin {
     }
 
     render() {
-        const { NAMESPACE, POSITION_MODIFIER } = Local;
+        const { NAMESPACE, POSITION_MODIFIER } = FloatingVideo;
         const { mode, minimized, sidebar, ratioClass, collapsed, toggleCollapsedMode, onCallExpand } = this.props;
         const IS_MINI_MODE = mode === Call.MODE.MINI;
         const IS_SELF_VIEW = !IS_MINI_MODE;
@@ -456,19 +448,19 @@ class Stream extends MegaRenderMixin {
                 `}
                 onClick={({ target }) =>
                     // Expand back the in-call UI if:
-                    // - `Local` is in minimized mode
+                    // - `FloatingVideo` is in minimized mode
                     // - clicked on the overlay area (excl. the options menu, audio/video/end call controls)
                     minimized && target.classList.contains(`${NAMESPACE}-overlay`) && onCallExpand()
                 }>
                 {IS_MINI_MODE &&
-                    // `Local` in **mini mode** is rendered when the call is minimized and displays the active
+                    // `FloatingVideo` in **mini mode** is rendered when the call is minimized and displays the active
                     // speaker. The current user's video/screen sharing stream can be displayed in mini mode only when
                     // the current user is set as active speaker manually (`forcedLocal`).
                     this.renderMiniMode()
                 }
                 {IS_SELF_VIEW &&
-                    // `Local` in **self view** is rendered only when the call is expanded, displaying the current
-                    // user's video/screen sharing stream.
+                    // `FloatingVideo` in **self view** is rendered only when the call is expanded, displaying
+                    // the current user's video/screen sharing stream.
                     this.renderSelfView()
                 }
                 {minimized && <__Minimized {...this.props} onOptionsToggle={this.handleOptionsToggle} />}
@@ -480,7 +472,7 @@ class Stream extends MegaRenderMixin {
 // --
 
 class Minimized extends MegaRenderMixin {
-    static NAMESPACE = 'local-stream-minimized';
+    static NAMESPACE = 'float-video-minimized';
     static UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
 
     state = {
@@ -524,7 +516,7 @@ class Minimized extends MegaRenderMixin {
 
         return (
             <>
-                <div className={`${Local.NAMESPACE}-overlay`}>
+                <div className={`${FloatingVideo.NAMESPACE}-overlay`}>
                     <Button
                         simpletip={{ ...SIMPLETIP_PROPS, label: l.expand_mini_call /* Expand */ }}
                         className="mega-button theme-light-forced action small expand"
@@ -535,7 +527,7 @@ class Minimized extends MegaRenderMixin {
                         }}
                     />
 
-                    <div className={`${Local.NAMESPACE}-controls`}>
+                    <div className={`${FloatingVideo.NAMESPACE}-controls`}>
                         <div className="meetings-signal-container">
                             <Button
                                 simpletip={{ ...SIMPLETIP_PROPS, label: audioLabel }}
@@ -607,7 +599,7 @@ class Minimized extends MegaRenderMixin {
                     </div>
                 </div>
                 {unread ? (
-                    <div className={`${Local.NAMESPACE}-notifications`}>
+                    <div className={`${FloatingVideo.NAMESPACE}-notifications`}>
                         <Button
                             className="mega-button round large chat-control"
                             icon="icon-chat-filled">

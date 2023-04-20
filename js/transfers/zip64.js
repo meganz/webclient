@@ -631,7 +631,7 @@ ZipWriter.prototype._eof = function() {
     }
     else if (this.eblocked) {
         msg = mega.icu.format(l[20820],  this.nfiles - this.eblocked)
-            .replace('%1', this.nfiles);
+            .replace('%1', mega.icu.format(l.download_and_import_items_count,  this.nfiles));
         msgDialog('warninga', 'Warning', escapeHTML(msg));
     }
 

@@ -369,14 +369,14 @@ function geoStaticPath(cms) {
             // Set which countries will use which static server
             var northAmericaStaticCountries = 'AG AI AR BB BL BO BR BS BZ CA CL CO CO CR CU DO EC FK GD GF GL GT GY HN HT IS JM KN LC MX NI PA PE PR PY SR SR TT US UY VC VE VE VG VI';
             var newZealandStaticCountries = 'AU FJ NC NZ';
-            var singaporeStaticCountries = 'BD BN BT HK ID IN JP KR LK MM MY NP PH SG TH VN';
+            var japanStaticCountries = 'JP TW PH HK MO KR SG KP BN BT MM MY TH VN';
 
             // Match on cookie e.g. "geoip=SG" returns array ['geoip=SG', 'SG']
             var cookieMatch = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
 
             // Check the country code to return a closer static server
-            if (cookieMatch && cookieMatch[1] && singaporeStaticCountries.indexOf(cookieMatch[1]) > -1) {
-                return 'https://sg.static.mega.co.nz/' + finalPath;
+            if (cookieMatch && cookieMatch[1] && japanStaticCountries.indexOf(cookieMatch[1]) > -1) {
+                return 'https://jp.static.mega.co.nz/' + finalPath;
             }
             else if (cookieMatch && cookieMatch[1] && northAmericaStaticCountries.indexOf(cookieMatch[1]) > -1) {
                 return 'https://na.static.mega.co.nz/' + finalPath;

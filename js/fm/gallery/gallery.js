@@ -616,7 +616,6 @@ class MegaGallery {
     }
 
     updateMonthMaxAndOrder() {
-
         const monthKeys = Object.keys(this.groups.m).sort((a, b) => b - a);
         let triEvenCount = 0;
 
@@ -691,6 +690,7 @@ class MegaGallery {
             }
 
             this.clearRenderCache(`m${ts}`);
+            this.updateMonthMaxAndOrder();
 
             if (this.dynamicList && this.mode === 'm' && (group.extn !== compareGroup.extn ||
                 !group.n.every(h => compareGroup.n.includes(h)))) {
@@ -792,19 +792,13 @@ class MegaGallery {
         this.groups.d[key].c++;
 
         if (this.groups.d[key].c <= 5) {
-
-            if (this.groups.d[key].n.length === 4) {
-
-                const itemsToMove = this.groups.d[key].n.splice(2, 2);
-
-                this.groups.d[key - 0.5] = {l: '', c: 0, mc: 0,  n: [...itemsToMove]};
-                this.groups.d[key - 0.5].n.push(h);
-            }
-            else {
-                this.groups.d[key].n.push(h);
-            }
-
+            this.groups.d[key].n.push(h);
             this.groups.d[key].n.sort(this.sortByMtime.bind(this));
+
+            if (this.groups.d[key].n.length === 5) {
+                const itemsToMove = this.groups.d[key].n.splice(2, 3);
+                this.groups.d[key - 0.5] = {l: '', c: 0, mc: 0,  n: [...itemsToMove]};
+            }
         }
         else {
             this.groups.d[key - 0.5].mc++;

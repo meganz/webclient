@@ -98,6 +98,12 @@
     margin: 0;
     padding: 18px;
 }
+.mobile .media-viewer-container.video footer .v-btn.slideshow,
+.mobile .media-viewer-container.pdf footer .v-btn.slideshow,
+.mobile .media-viewer-container.video footer .zoom-slider-wrap,
+.mobile .media-viewer-container.pdf footer .zoom-slider-wrap {
+    display: none;
+}
 .mobile .download-page .media-viewer .bar > li > button.download {
     display: none;
 }

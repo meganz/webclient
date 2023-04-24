@@ -193,6 +193,14 @@
                 width: 100%;
             }
 
+            #fmholder #pdfpreviewdiv1 {
+                margin: 62px 0 60px;
+            }
+
+            #fmholder #docxpreviewdiv1 {
+                margin-top: 62px;
+            }
+
         /* Images viewer controls */
 
             .media-viewer .image-controls {

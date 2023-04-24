@@ -4,7 +4,7 @@ class DocxViewer {
      * Waits for the document to be ready before signalling the iframe is ready for rendering.
      */
     constructor() {
-        this.ROOT_ID = 'docxContainer';
+        this.ROOT_ID = 'docx-container';
         if (document.readyState === "interactive" || document.readyState === "complete") {
             this.prepare();
         }
@@ -25,6 +25,7 @@ class DocxViewer {
 
         document.addEventListener('docxviewerload', this.handleLoad.bind(this));
         document.addEventListener('docxviewercleanup', this.destroy.bind(this));
+        window.addEventListener('resize', this.resize);
 
         const loadedEv = new Event('docxviewerready');
         document.dispatchEvent(loadedEv);
@@ -45,7 +46,7 @@ class DocxViewer {
         this.config = ev.data.options;
         this.source = ev.data.blob;
         if (this.source) {
-            this.render().catch(ex => {
+            this.render().then(this.resize).catch(ex => {
                 console.error('Exception rendering docx', ex);
                 const errEv = new Event('docxviewererror');
                 errEv.data = { error: -1 };
@@ -83,6 +84,22 @@ class DocxViewer {
             // eslint-disable-next-line local-rules/open
             document.open();
             document.close();
+        }
+    }
+
+    resize() {
+
+        document.body.classList.add('scaled');
+
+        const contentWidth = document.getElementById('docx-container').scrollWidth;
+        const frameSize = document.documentElement.offsetWidth;
+
+        if (contentWidth > frameSize) {
+            document.documentElement.style.transform = `scale(${frameSize / contentWidth})`;
+        }
+        else {
+            document.documentElement.style.transform = '';
+            document.body.classList.remove('scaled');
         }
     }
 }

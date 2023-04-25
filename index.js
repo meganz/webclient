@@ -1894,6 +1894,10 @@ function init_page() {
             }
         }
 
+        if (localStorage.keycomplete) {
+            delete localStorage.keycomplete;
+        }
+
         if (!fminitialized) {
             if (id) {
                 M.currentdirid = id;

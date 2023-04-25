@@ -51,7 +51,10 @@ lazy(pro, 'proplan2', () => {
             }
             $proPlans.toggleClass('hidden', !visibilityState);
 
-            $freeBanner.toggleClass('hidden', !visibilityState || typeof u_handle !== 'undefined');
+            $freeBanner.toggleClass(
+                'hidden',
+                !visibilityState || (typeof u_handle !== 'undefined' && !localStorage.keycomplete)
+            );
 
             if (visibilityState) {
                 setFooterBannerTxt(l.pr_get_started_now, '', l.pr_try_mega);

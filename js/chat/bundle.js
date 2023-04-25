@@ -19368,6 +19368,11 @@ class Stream extends mixins.wl {
 class Minimized extends mixins.wl {
   constructor(...args) {
     super(...args);
+    this.SIMPLETIP_PROPS = {
+      position: 'top',
+      offset: 5,
+      className: 'theme-dark-forced'
+    };
     this.state = {
       unread: 0
     };
@@ -19382,6 +19387,94 @@ class Minimized extends mixins.wl {
         unread: chatRoom.getUnreadCount()
       }, () => this.safeForceUpdate()));
     };
+    this.renderSignalWarning = () => this.props.signal ? null : this.props.renderSignalWarning();
+    this.renderPermissionsWarning = type => {
+      const {
+        hasToRenderPermissionsWarning,
+        renderPermissionsWarning
+      } = this.props;
+      if (hasToRenderPermissionsWarning(type)) {
+        return renderPermissionsWarning(type, this);
+      }
+      return null;
+    };
+    this.renderStreamControls = () => {
+      const {
+        call,
+        chatRoom,
+        resetError,
+        onAudioClick,
+        onVideoClick,
+        onScreenSharingClick,
+        onHoldClick,
+        onCallEnd
+      } = this.props;
+      const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] : l[16708];
+      const videoLabel = this.isActive(SfuClient.Av.Camera) ? l[22894] : l[22893];
+      return external_React_default().createElement("div", {
+        className: `${FloatingVideo.NAMESPACE}-controls`
+      }, external_React_default().createElement("div", {
+        className: "meetings-signal-container"
+      }, external_React_default().createElement(meetings_button.Z, {
+        simpletip: {
+          ...this.SIMPLETIP_PROPS,
+          label: audioLabel
+        },
+        className: `
+                            mega-button
+                            theme-light-forced
+                            round
+                            large
+                            ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
+                            ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
+                        `,
+        icon: this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off',
+        onClick: ev => {
+          ev.stopPropagation();
+          resetError(Av.Audio);
+          onAudioClick();
+        }
+      }, external_React_default().createElement("span", null, audioLabel)), this.renderSignalWarning(), this.renderPermissionsWarning(Av.Audio)), external_React_default().createElement("div", {
+        className: "meetings-signal-container"
+      }, external_React_default().createElement(meetings_button.Z, {
+        simpletip: {
+          ...this.SIMPLETIP_PROPS,
+          label: videoLabel
+        },
+        className: `
+                            mega-button
+                            theme-light-forced
+                            round
+                            large
+                            ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
+                            ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
+                        `,
+        icon: this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off',
+        onClick: ev => {
+          ev.stopPropagation();
+          resetError(Av.Camera);
+          onVideoClick();
+        }
+      }, external_React_default().createElement("span", null, videoLabel)), this.renderPermissionsWarning(Av.Camera)), external_React_default().createElement("div", {
+        className: "meetings-signal-container"
+      }, external_React_default().createElement(streamExtendedControls, {
+        call: call,
+        chatRoom: chatRoom,
+        onScreenSharingClick: onScreenSharingClick,
+        onHoldClick: onHoldClick
+      }), this.renderPermissionsWarning(Av.Screen)), external_React_default().createElement(meetings_button.Z, {
+        simpletip: {
+          ...this.SIMPLETIP_PROPS,
+          label: l[5884]
+        },
+        className: "mega-button theme-dark-forced round large end-call",
+        icon: "icon-end-call",
+        onClick: ev => {
+          ev.stopPropagation();
+          onCallEnd();
+        }
+      }, external_React_default().createElement("span", null, l[5884])));
+    };
   }
   componentDidMount() {
     super.componentDidMount();
@@ -19395,33 +19488,11 @@ class Minimized extends mixins.wl {
     const {
       unread
     } = this.state;
-    const {
-      call,
-      signal,
-      chatRoom,
-      renderSignalWarning,
-      resetError,
-      hasToRenderPermissionsWarning,
-      renderPermissionsWarning,
-      onCallExpand,
-      onCallEnd,
-      onAudioClick,
-      onVideoClick,
-      onScreenSharingClick,
-      onHoldClick
-    } = this.props;
-    const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] : l[16708];
-    const videoLabel = this.isActive(SfuClient.Av.Camera) ? l[22894] : l[22893];
-    const SIMPLETIP_PROPS = {
-      position: 'top',
-      offset: 5,
-      className: 'theme-dark-forced'
-    };
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
       className: `${FloatingVideo.NAMESPACE}-overlay`
     }, external_React_default().createElement(meetings_button.Z, {
       simpletip: {
-        ...SIMPLETIP_PROPS,
+        ...this.SIMPLETIP_PROPS,
         label: l.expand_mini_call
       },
       className: "mega-button theme-light-forced action small expand",
@@ -19430,71 +19501,7 @@ class Minimized extends mixins.wl {
         ev.stopPropagation();
         onCallExpand();
       }
-    }), external_React_default().createElement("div", {
-      className: `${FloatingVideo.NAMESPACE}-controls`
-    }, external_React_default().createElement("div", {
-      className: "meetings-signal-container"
-    }, external_React_default().createElement(meetings_button.Z, {
-      simpletip: {
-        ...SIMPLETIP_PROPS,
-        label: audioLabel
-      },
-      className: `
-                                    mega-button
-                                    theme-light-forced
-                                    round
-                                    large
-                                    ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
-                                    ${this.isActive(SfuClient.Av.Audio) ? '' : 'inactive'}
-                                `,
-      icon: `${this.isActive(SfuClient.Av.Audio) ? 'icon-audio-filled' : 'icon-audio-off'}`,
-      onClick: ev => {
-        ev.stopPropagation();
-        resetError(Av.Audio);
-        onAudioClick();
-      }
-    }, external_React_default().createElement("span", null, audioLabel)), signal ? null : renderSignalWarning(), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null), external_React_default().createElement("div", {
-      className: "meetings-signal-container"
-    }, external_React_default().createElement(meetings_button.Z, {
-      simpletip: {
-        ...SIMPLETIP_PROPS,
-        label: videoLabel
-      },
-      className: `
-                                    mega-button
-                                    theme-light-forced
-                                    round
-                                    large
-                                    ${this.isActive(SfuClient.Av.onHold) ? 'disabled' : ''}
-                                    ${this.isActive(SfuClient.Av.Camera) ? '' : 'inactive'}
-                                `,
-      icon: `
-                                    ${this.isActive(SfuClient.Av.Camera) ? 'icon-video-call-filled' : 'icon-video-off'}
-                                `,
-      onClick: ev => {
-        ev.stopPropagation();
-        resetError(Av.Camera);
-        onVideoClick();
-      }
-    }, external_React_default().createElement("span", null, videoLabel)), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null), external_React_default().createElement("div", {
-      className: "meetings-signal-container"
-    }, external_React_default().createElement(streamExtendedControls, {
-      call: call,
-      chatRoom: chatRoom,
-      onScreenSharingClick: onScreenSharingClick,
-      onHoldClick: onHoldClick
-    }), hasToRenderPermissionsWarning(Av.Screen) ? renderPermissionsWarning(Av.Screen) : null), external_React_default().createElement(meetings_button.Z, {
-      simpletip: {
-        ...SIMPLETIP_PROPS,
-        label: l[5884]
-      },
-      className: "mega-button theme-dark-forced round large end-call",
-      icon: "icon-end-call",
-      onClick: ev => {
-        ev.stopPropagation();
-        onCallEnd();
-      }
-    }, external_React_default().createElement("span", null, l[5884])))), unread ? external_React_default().createElement("div", {
+    }), this.renderStreamControls()), unread ? external_React_default().createElement("div", {
       className: `${FloatingVideo.NAMESPACE}-notifications`
     }, external_React_default().createElement(meetings_button.Z, {
       className: "mega-button round large chat-control",
@@ -21242,18 +21249,16 @@ Call.getUnsupportedBrowserMessage = () => navigator.userAgent.match(/Chrom(e|ium
 __webpack_require__.d(__webpack_exports__, {
 "Q": () => (withPermissionsObserver)
 });
-var _extends4__ = __webpack_require__(462);
+var _extends3__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
-var _ui_utils_jsx2__ = __webpack_require__(79);
-var _ui_modalDialogs3__ = __webpack_require__(182);
+var _mixins_js1__ = __webpack_require__(503);
+var _ui_modalDialogs_jsx2__ = __webpack_require__(182);
 
 
 
 
-
-const withPermissionsObserver = Component => class extends _mixins1__.wl {
+const withPermissionsObserver = Component => class extends _mixins_js1__.wl {
   constructor(props) {
     super(props);
     this.namespace = `PO-${Component.NAMESPACE}`;
@@ -21315,28 +21320,25 @@ const withPermissionsObserver = Component => class extends _mixins1__.wl {
     }
     return false;
   }
-  renderPermissionsDialog(av) {
-    return react0().createElement(_ui_utils_jsx2__.ZP.RenderTo, {
-      element: document.body
-    }, react0().createElement(_ui_modalDialogs3__.Z.ModalDialog, {
+  renderPermissionsDialog(av, child) {
+    const doClose = () => this.setState({
+      [`dialog-${av}`]: false
+    }, () => child && child.isMounted() && child.safeForceUpdate());
+    return react0().createElement(_ui_modalDialogs_jsx2__.Z.ModalDialog, {
       dialogName: `${this.namespace}-permissions-${av}`,
       className: `
-                            dialog-template-message
-                            with-close-btn
-                            warning
-                        `,
+                        dialog-template-message
+                        with-close-btn
+                        warning
+                    `,
       buttons: [{
         key: 'ok',
         label: l[81],
         className: 'positive',
-        onClick: () => this.setState({
-          [`dialog-${av}`]: false
-        })
+        onClick: doClose
       }],
-      hideOverlay: this.props.context === 'start-meeting',
-      onClose: () => this.setState({
-        [`dialog-${av}`]: false
-      })
+      hideOverlay: this.props.child === 'start-meeting',
+      onClose: doClose
     }, react0().createElement("header", null, react0().createElement("div", {
       className: "graphic"
     }, react0().createElement("i", {
@@ -21347,9 +21349,9 @@ const withPermissionsObserver = Component => class extends _mixins1__.wl {
       id: "msgDialog-title"
     }, this.content[av].title), react0().createElement("p", {
       className: "text"
-    }, this.content[av].info)))));
+    }, this.content[av].info))));
   }
-  renderPermissionsWarning(av) {
+  renderPermissionsWarning(av, child) {
     return react0().createElement("div", {
       className: `
                         ${this.namespace}
@@ -21365,7 +21367,7 @@ const withPermissionsObserver = Component => class extends _mixins1__.wl {
       })
     }, react0().createElement("i", {
       className: "sprite-fm-mono icon-exclamation-filled"
-    }), this.state[`dialog-${av}`] && this.renderPermissionsDialog(av));
+    }), this.state[`dialog-${av}`] && this.renderPermissionsDialog(av, child));
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -21382,7 +21384,7 @@ const withPermissionsObserver = Component => class extends _mixins1__.wl {
     });
   }
   render() {
-    return react0().createElement(Component, (0,_extends4__.Z)({}, this.props, this.state, {
+    return react0().createElement(Component, (0,_extends3__.Z)({}, this.props, this.state, {
       errMic: this.state.errMic,
       errCamera: this.state.errCamera,
       errScreen: this.state.errScreen,

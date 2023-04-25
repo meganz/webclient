@@ -658,12 +658,9 @@ export class Edit extends MegaRenderMixin {
                                 }}
                                 onSelectDate={startDateTime => {
                                     this.setState({ startDateTime, isDirty: true }, () => {
-                                        const { startDateTime, endDateTime } = this.state;
-                                        if (startDateTime > endDateTime) {
-                                            this.datepickerRefs.endDateTime.selectDate(
-                                                new Date(startDateTime + this.interval)
-                                            );
-                                        }
+                                        this.datepickerRefs.endDateTime.selectDate(
+                                            new Date(startDateTime + this.interval)
+                                        );
                                     });
                                 }}
                                 onSelectTime={({ value: startDateTime }) => {

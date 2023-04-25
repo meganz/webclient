@@ -351,12 +351,9 @@ export class Schedule extends MegaRenderMixin {
                                 }}
                                 onSelectDate={startDateTime => {
                                     this.handleDateSelect({ startDateTime }, () => {
-                                        const { startDateTime, endDateTime } = this.state;
-                                        if (startDateTime > endDateTime) {
-                                            this.datepickerRefs.endDateTime.selectDate(
-                                                new Date(startDateTime + this.interval)
-                                            );
-                                        }
+                                        this.datepickerRefs.endDateTime.selectDate(
+                                            new Date(startDateTime + this.interval)
+                                        );
                                     });
                                 }}
                                 onSelectTime={({ value: startDateTime }) => {

@@ -1043,7 +1043,6 @@ li.active .call-duration i {
 }
 
 .contact-item-controls {
-    display: none;
     text-align: right;
     width: calc(100% - 10px);
 }

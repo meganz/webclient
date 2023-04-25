@@ -1,7 +1,6 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
-import utils from '../../../ui/utils.jsx';
-import ModalDialogsUI from '../../../ui/modalDialogs';
+import { MegaRenderMixin } from '../../mixins.js';
+import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
 
 export const withPermissionsObserver = Component =>
     class extends MegaRenderMixin {
@@ -66,41 +65,43 @@ export const withPermissionsObserver = Component =>
             return false;
         }
 
-        renderPermissionsDialog(av) {
+        renderPermissionsDialog(av, child) {
+            const doClose = () => this.setState({ [`dialog-${av}`]: false }, () =>
+                child && child.isMounted() && child.safeForceUpdate()
+            );
+
             return (
-                <utils.RenderTo element={document.body}>
-                    <ModalDialogsUI.ModalDialog
-                        dialogName={`${this.namespace}-permissions-${av}`}
-                        className={`
-                            dialog-template-message
-                            with-close-btn
-                            warning
-                        `}
-                        buttons={[
-                            {
-                                key: 'ok',
-                                label: l[81] /* `Ok` */,
-                                className: 'positive',
-                                onClick: () => this.setState({ [`dialog-${av}`]: false })
-                            }
-                        ]}
-                        hideOverlay={this.props.context === 'start-meeting'}
-                        onClose={() => this.setState({ [`dialog-${av}`]: false })}>
-                        <header>
-                            <div className="graphic">
-                                <i className="warning sprite-fm-uni icon-warning" />
-                            </div>
-                            <div className="info-container">
-                                <h3 id="msgDialog-title">{this.content[av].title}</h3>
-                                <p className="text">{this.content[av].info}</p>
-                            </div>
-                        </header>
-                    </ModalDialogsUI.ModalDialog>
-                </utils.RenderTo>
+                <ModalDialogsUI.ModalDialog
+                    dialogName={`${this.namespace}-permissions-${av}`}
+                    className={`
+                        dialog-template-message
+                        with-close-btn
+                        warning
+                    `}
+                    buttons={[
+                        {
+                            key: 'ok',
+                            label: l[81] /* `Ok` */,
+                            className: 'positive',
+                            onClick: doClose
+                        }
+                    ]}
+                    hideOverlay={this.props.child === 'start-meeting'}
+                    onClose={doClose}>
+                    <header>
+                        <div className="graphic">
+                            <i className="warning sprite-fm-uni icon-warning" />
+                        </div>
+                        <div className="info-container">
+                            <h3 id="msgDialog-title">{this.content[av].title}</h3>
+                            <p className="text">{this.content[av].info}</p>
+                        </div>
+                    </header>
+                </ModalDialogsUI.ModalDialog>
             );
         }
 
-        renderPermissionsWarning(av) {
+        renderPermissionsWarning(av, child) {
             return (
                 <div
                     className={`
@@ -114,7 +115,7 @@ export const withPermissionsObserver = Component =>
                     data-simpletip-class="theme-dark-forced"
                     onClick={() => this.setState({ [`dialog-${av}`]: true })}>
                     <i className="sprite-fm-mono icon-exclamation-filled"/>
-                    {this.state[`dialog-${av}`] && this.renderPermissionsDialog(av)}
+                    {this.state[`dialog-${av}`] && this.renderPermissionsDialog(av, child)}
                 </div>
             );
         }

@@ -1,13 +1,14 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../mixins';
 import Button from '../button.jsx';
-import { CloseDialog, Column, DateTime, Row, Schedule } from './schedule.jsx';
+import { CloseDialog, Column, Row, Schedule } from './schedule.jsx';
 import Datepicker from './datepicker.jsx';
 import Select from './select.jsx';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import { addMonths, getTimeIntervals, isSameDay } from './helpers.jsx';
 import Link from '../../link.jsx';
 import { reactStringWrap } from "../../../../ui/utils.jsx";
+import { DateTime } from './datetime.jsx';
 
 export default class Recurring extends MegaRenderMixin {
     static NAMESPACE = 'meetings-recurring';
@@ -583,6 +584,24 @@ export class Edit extends MegaRenderMixin {
         this.state.endDateTime = this.occurrenceRef.end;
     }
 
+    onStartDateSelect = startDateTime => {
+        this.setState({ startDateTime, isDirty: true }, () => {
+            this.datepickerRefs.endDateTime.selectDate(new Date(startDateTime + this.interval));
+        });
+    };
+
+    onEndDateSelect = endDateTime => {
+        this.setState({ endDateTime, isDirty: true }, () => {
+            const { startDateTime, endDateTime } = this.state;
+            if (endDateTime < startDateTime) {
+                if (endDateTime < Date.now()) {
+                    return this.setState({ endDateTime: startDateTime + this.interval });
+                }
+                this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+            }
+        });
+    };
+
     // [...] TODO: unify w/ the behavior on `Schedule` re: date/time selection handing
     handleTimeSelect = ({ startDateTime, endDateTime }) => {
         startDateTime = startDateTime || this.state.startDateTime;
@@ -649,6 +668,7 @@ export class Edit extends MegaRenderMixin {
                             <DateTime
                                 name="startDateTime"
                                 altField="startTime"
+                                datepickerRef={this.datepickerRefs.startDateTime}
                                 startDate={startDateTime}
                                 value={startDateTime}
                                 filteredTimeIntervals={getTimeIntervals(startDateTime)}
@@ -656,21 +676,21 @@ export class Edit extends MegaRenderMixin {
                                 onMount={datepicker => {
                                     this.datepickerRefs.startDateTime = datepicker;
                                 }}
-                                onSelectDate={startDateTime => {
-                                    this.setState({ startDateTime, isDirty: true }, () => {
-                                        this.datepickerRefs.endDateTime.selectDate(
-                                            new Date(startDateTime + this.interval)
-                                        );
-                                    });
-                                }}
-                                onSelectTime={({ value: startDateTime }) => {
-                                    this.handleTimeSelect({ startDateTime });
+                                onSelectDate={startDateTime => this.onStartDateSelect(startDateTime)}
+                                onSelectTime={({ value: startDateTime }) => this.handleTimeSelect({ startDateTime })}
+                                onChange={value => this.setState({ startDateTime: value })}
+                                onBlur={timestamp => {
+                                    if (timestamp) {
+                                        timestamp = timestamp < Date.now() ? this.occurrenceRef.start : timestamp;
+                                        this.onStartDateSelect(timestamp);
+                                    }
                                 }}
                             />
 
                             <DateTime
                                 name="endDateTime"
                                 altField="endTime"
+                                datepickerRef={this.datepickerRefs.endDateTime}
                                 startDate={endDateTime}
                                 value={endDateTime}
                                 filteredTimeIntervals={getTimeIntervals(endDateTime, startDateTime)}
@@ -678,22 +698,10 @@ export class Edit extends MegaRenderMixin {
                                 onMount={datepicker => {
                                     this.datepickerRefs.endDateTime = datepicker;
                                 }}
-                                onSelectDate={endDateTime => {
-                                    this.setState({ endDateTime, isDirty: true }, () => {
-                                        const { startDateTime, endDateTime } = this.state;
-                                        if (endDateTime < startDateTime) {
-                                            if (endDateTime < Date.now()) {
-                                                return this.setState({ endDateTime: startDateTime + this.interval });
-                                            }
-                                            this.datepickerRefs.startDateTime.selectDate(
-                                                new Date(endDateTime - this.interval)
-                                            );
-                                        }
-                                    });
-                                }}
-                                onSelectTime={({ value: endDateTime }) => {
-                                    this.handleTimeSelect({ endDateTime });
-                                }}
+                                onSelectDate={endDateTime => this.onEndDateSelect(endDateTime)}
+                                onSelectTime={({ value: endDateTime }) => this.handleTimeSelect({ endDateTime })}
+                                onChange={timestamp => this.setState({ endDateTime: timestamp })}
+                                onBlur={timestamp => timestamp && this.onEndDateSelect(timestamp)}
                             />
                         </div>
                     </Row>

@@ -1,4 +1,33 @@
 /**
+ * stringToDate
+ * @param string
+ * @returns {*}
+ * [...] TODO: add documentation
+ */
+
+export const stringToDate = string => {
+    const formats = [
+        'DD MMM YYYY',
+        'DD-MM-YYYY',
+        'DD.MM.YYYY',
+        'MMM DD YYYY',
+        'YYYY MMM DD',
+        'YYYY DD MMM',
+    ];
+
+    return moment(string, formats);
+};
+
+/**
+ * stringToTime
+ * @param string
+ * @returns {*}
+ * [...] TODO: add documentation
+ */
+
+export const stringToTime = string => moment(string, ['HH:mm', 'hh:mm A']);
+
+/**
  * isSameDay
  * @param {number} a
  * @param {number} b
@@ -107,7 +136,7 @@ export const getTimeIntervals = (timestamp, offsetFrom, interval = 30) => {
 
         while (targetDate.getDate() === initialDate.getDate()) {
             const timestamp = targetDate.getTime();
-            // `duration` is available if `offsetFrom` is passed *and* both dates are the same day
+            // `duration` is set only if `offsetFrom` is passed *and* both dates are the same day
             const diff = offsetFrom && isSameDay(timestamp, offsetFrom) && timestamp - offsetFrom;
             increments.push({
                 value: timestamp,

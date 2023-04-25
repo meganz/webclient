@@ -2518,6 +2518,19 @@ body.theme-dark #schedule-dialog .recurring-edit-banner a {
   position: relative;
   min-width: 52px;
 }
+#schedule-dialog .meetings-select .mega-input.typeable {
+  /* [...] */
+}
+#schedule-dialog .meetings-select .mega-input.typeable:before {
+  cursor: default;
+}
+#schedule-dialog .meetings-select .mega-input.typeable input {
+  display: block;
+  position: relative;
+  width: 65px;
+  height: auto;
+  text-align: center;
+}
 #schedule-dialog .meetings-select .mega-input .mega-input-dropdown {
   position: absolute;
   top: 100%;
@@ -2879,5 +2892,3 @@ body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button
 .meetings-recurring-content .meetings-recurring-monthly {
   /* [...] */
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

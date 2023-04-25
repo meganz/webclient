@@ -36,7 +36,9 @@ export default class Invite extends MegaRenderMixin {
     }
 
     handleMousedown = ({ target }) =>
-        this.containerRef?.current.contains(target) ? null : this.setState({ expanded: false });
+        this.containerRef &&
+        this.containerRef.current &&
+        this.containerRef.current.contains(target) ? null : this.setState({ expanded: false });
 
     getSortedContactsList = frequents => {
         const filteredContacts = [];

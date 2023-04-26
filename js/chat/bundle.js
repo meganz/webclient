@@ -618,19 +618,19 @@ class MeetingsManager {
             pos: [[l.schedule_recur_time_first_day_month_6, l.schedule_recur_time_first_day_month_0, l.schedule_recur_time_first_day_month_1, l.schedule_recur_time_first_day_month_2, l.schedule_recur_time_first_day_month_3, l.schedule_recur_time_first_day_month_4, l.schedule_recur_time_first_day_month_5], [l.schedule_recur_time_second_day_month_6, l.schedule_recur_time_second_day_month_0, l.schedule_recur_time_second_day_month_1, l.schedule_recur_time_second_day_month_2, l.schedule_recur_time_second_day_month_3, l.schedule_recur_time_second_day_month_4, l.schedule_recur_time_second_day_month_5], [l.schedule_recur_time_third_day_month_6, l.schedule_recur_time_third_day_month_0, l.schedule_recur_time_third_day_month_1, l.schedule_recur_time_third_day_month_2, l.schedule_recur_time_third_day_month_3, l.schedule_recur_time_third_day_month_4, l.schedule_recur_time_third_day_month_5], [l.schedule_recur_time_fourth_day_month_6, l.schedule_recur_time_fourth_day_month_0, l.schedule_recur_time_fourth_day_month_1, l.schedule_recur_time_fourth_day_month_2, l.schedule_recur_time_fourth_day_month_3, l.schedule_recur_time_fourth_day_month_4, l.schedule_recur_time_fourth_day_month_5], [l.schedule_recur_time_fifth_day_month_6, l.schedule_recur_time_fifth_day_month_0, l.schedule_recur_time_fifth_day_month_1, l.schedule_recur_time_fifth_day_month_2, l.schedule_recur_time_fifth_day_month_3, l.schedule_recur_time_fifth_day_month_4, l.schedule_recur_time_fifth_day_month_5]]
           }
         },
-        [scheduleMetaChange.Z.MODE.CANCELLED]: {
+        [scheduleMetaChange["default"].MODE.CANCELLED]: {
           occur: l.schedule_occurrence_time,
           all: ''
         }
       },
       once: {
-        [scheduleMetaChange.Z.MODE.CREATED]: {
+        [scheduleMetaChange["default"].MODE.CREATED]: {
           occur: l.schedule_occurrence_time
         },
-        [scheduleMetaChange.Z.MODE.EDITED]: {
+        [scheduleMetaChange["default"].MODE.EDITED]: {
           occur: l.schedule_occurrence_time_recur
         },
-        [scheduleMetaChange.Z.MODE.CANCELLED]: {
+        [scheduleMetaChange["default"].MODE.CANCELLED]: {
           occur: ''
         }
       }
@@ -790,7 +790,7 @@ class MeetingsManager {
     } = meta;
     const {
       MODE
-    } = scheduleMetaChange.Z;
+    } = scheduleMetaChange["default"];
     if (!mode) {
       return res;
     }
@@ -876,7 +876,7 @@ class MeetingsManager {
   getFormattingMeta(scheduledId, data, chatRoom) {
     const {
       MODE
-    } = scheduleMetaChange.Z;
+    } = scheduleMetaChange["default"];
     const meta = {
       userId: data.sender || false,
       timeRules: {},
@@ -988,7 +988,7 @@ class MeetingsManager {
     const toS = ms => Math.floor(ms / 1000);
     const {
       MODE
-    } = scheduleMetaChange.Z;
+    } = scheduleMetaChange["default"];
     meta.timeRules.startTime = toS(meeting.start);
     meta.timeRules.endTime = toS(meeting.end);
     meta.topic = meeting.title;
@@ -7889,7 +7889,7 @@ class ContactPickerWidget extends _mixins1__.wl {
       className: "sprite-fm-mono icon-close-component"
     }))), react0().createElement("div", {
       className: "contacts-search-header-separator"
-    })), contactsList, selectFooter, _contactsPanel_contactsPanel_jsx6__.Z.hasContacts() && this.props.showAddContact && react0().createElement("div", {
+    })), contactsList, selectFooter, _contactsPanel_contactsPanel_jsx6__["default"].hasContacts() && this.props.showAddContact && react0().createElement("div", {
       className: "contacts-search-bottom"
     }, react0().createElement(_ui_buttons_jsx4__.z, {
       className: "mega-button action positive",
@@ -7964,7 +7964,7 @@ class ContactPickerDialog extends _mixins1__.wl {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "Z": () => (ContactsPanel)
+  "default": () => (ContactsPanel)
 });
 
 // EXTERNAL MODULE: external "React"
@@ -14892,7 +14892,7 @@ class Actions extends mixins.wl {
         icon: 'sprite-fm-mono icon-chat-filled',
         onClick: createGroupChat
       }],
-      showAddContact: contactsPanel.Z.hasContacts()
+      showAddContact: contactsPanel["default"].hasContacts()
     })), view === MEETINGS && routingSection !== 'contacts' && external_React_default().createElement(buttons.z, {
       className: "mega-button action",
       icon: "sprite-fm-mono icon-add-circle",
@@ -15287,6 +15287,9 @@ class Toggle extends mixins.wl {
   componentDidMount() {
     super.componentDidMount();
     megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.toggle`, (ev, scheduledMeeting) => {
+      if (!M.chat || !this.isMounted()) {
+        return;
+      }
       if (scheduledMeeting && scheduledMeeting.chatRoom && scheduledMeeting.iAmOwner) {
         this.setState({
           expanded: TogglePanel.KEYS.UPCOMING
@@ -15771,7 +15774,7 @@ class ConversationsApp extends mixins.wl {
                 `
     }, !isLoading && external_React_default().createElement(chatToaster.Z, {
       isRootToaster: true
-    }), !isLoading && routingSection === 'contacts' && external_React_default().createElement(contactsPanel.Z, {
+    }), !isLoading && routingSection === 'contacts' && external_React_default().createElement(contactsPanel["default"], {
       megaChat: megaChat,
       contacts: M.u,
       received: M.ipc,
@@ -17320,7 +17323,7 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
                   chatRoom: v.chatRoom
                 }));
               }
-              messageInstance = external_React_default().createElement(scheduleMetaChange.Z, {
+              messageInstance = external_React_default().createElement(scheduleMetaChange["default"], {
                 message: v,
                 key: v.messageId,
                 mode: v.meta.mode,
@@ -26278,7 +26281,7 @@ class ConversationMessageMixin extends _mixins1__._p {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"Z": () => (ScheduleMetaChange)
+"default": () => (ScheduleMetaChange)
 });
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);

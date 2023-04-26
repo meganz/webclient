@@ -770,7 +770,8 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree, qui
                     msgDialog(
                         'warninga',
                         l[882],
-                        l[8683].replace('%1', nodesCount).replace('%2', importNodes)
+                        mega.icu.format(l[8683], nodesCount)
+                            .replace('%1', mega.icu.format(l.download_and_import_items_count, importNodes))
                     );
                 }
                 else {

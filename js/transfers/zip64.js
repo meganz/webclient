@@ -630,7 +630,8 @@ ZipWriter.prototype._eof = function() {
         return false;
     }
     else if (this.eblocked) {
-        msg = l[20820].replace('%1', this.nfiles - this.eblocked).replace('%2', this.nfiles);
+        msg = mega.icu.format(l[20820],  this.nfiles - this.eblocked)
+            .replace('%1', mega.icu.format(l.download_and_import_items_count,  this.nfiles));
         msgDialog('warninga', 'Warning', escapeHTML(msg));
     }
 

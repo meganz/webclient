@@ -409,7 +409,7 @@
 // SfuClient.IClientEventListener interface
         onServerError(errCode) {
             console.error('onServerError:', errCode);
-            if (errCode === SfuClient.TermCode.kProtocolVersion) {
+            if (errCode === SfuClient.TermCode.kErrorProtocolVersion) {
                 return is_extension ?
                     // `An update is available`, `MEGA Chat has been upgraded and it will now only be supported in...`
                     msgDialog('warningb', l[1900], l[8841]) :
@@ -505,8 +505,28 @@
                 chatId: this.chatRoom.chatId,
                 showCallFeedback: true
             });
+
             if (termCode === SfuClient.TermCode.kTooManyParticipants) {
                 msgDialog('warningb', '', l[20200]);
+            }
+
+            if (termCode === SfuClient.TermCode.kNoMediaPath) {
+                msgDialog(
+                    'warningb',
+                    null,
+                    l[19966], /* `Call failed` */
+                    l.call_failed_firewall
+                        .replace(
+                            '[A]',
+                            `<a
+                                href="${l.mega_help_host}/chats-meetings/chats/firewall-blocking-call"
+                                target="_blank"
+                                class="clickurl">`
+                        )
+                        .replace('[/A]', '</a>'),
+                    undefined,
+                    0
+                );
             }
         }
         get isPublic() {

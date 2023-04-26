@@ -15331,6 +15331,9 @@ class Toggle extends mixins.wl {
   componentDidMount() {
     super.componentDidMount();
     megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.toggle`, (ev, scheduledMeeting) => {
+      if (!M.chat || !this.isMounted()) {
+        return;
+      }
       if (scheduledMeeting && scheduledMeeting.chatRoom && scheduledMeeting.iAmOwner) {
         this.setState({
           expanded: TogglePanel.KEYS.UPCOMING

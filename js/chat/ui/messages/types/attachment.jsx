@@ -239,8 +239,8 @@ export default class Attachment extends AbstractGenericMessage {
             var preview =
                 <div
                     className={"data-block-view medium " + noThumbPrev}
-                    onClick={({target, currentTarget}) => {
-                        if (isPreviewable && target === currentTarget) {
+                    onClick={({target}) => {
+                        if (isPreviewable && !target.classList.contains('tiny-button')) {
                             this.props.onPreviewStart(v);
                         }
                     }}>

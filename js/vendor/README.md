@@ -51,6 +51,13 @@ Unless otherwise noted, they were released under a [MIT License].
 > NB: To compile from C source, fork the repo and run `build.sh`.
 
 ---
+
+[docx-preview.js]: Volodymyr Baydalka's Docx rendering library
+
+> **This is a fork**, [See the changes](https://github.com/VolodymyrBaydalka/docxjs/compare/master...meganz:master)  
+> Released under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+
+---
 [encoding.js, encoding-indexes.js]: Polyfill for the Living Standard's Encoding API
 
 > **This is a fork** to remove UTF characters, [see the changes](https://github.com/inexorabletash/text-encoding/compare/master...meganz:master)
@@ -246,6 +253,7 @@ characters were removed from the files
 [datepicker.js]: <https://github.com/meganz/air-datepicker>
 [dexie.js]: <https://github.com/dfahlander/Dexie.js>
 [dcraw.js]: <https://github.com/meganz/dcraw.js>
+[docx-preview.js]: <https://github.com/meganz/docxjs>
 [encoding.js, encoding-indexes.js]: <https://github.com/inexorabletash/text-encoding/tree/v0.6.3>
 [es6-shim]: <https://github.com/meganz/es6-shim>
 [exif-js]: <https://github.com/meganz/exif-js>

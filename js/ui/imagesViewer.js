@@ -18,6 +18,7 @@ var slideshowid;
     var switchedSides = false;
     var fitToWindow = Object.create(null);
     var _pdfSeen = false;
+    var _docxSeen = false;
     var optionsMenu;
     var settingsMenu;
     var preselection;
@@ -916,6 +917,13 @@ var slideshowid;
                     document.getElementById('pdfpreviewdiv1').contentDocument.body.dispatchEvent(ev);
                 })();
             }
+            if (_docxSeen) {
+                _docxSeen = false;
+                tryCatch(() => {
+                    const ev = new Event('docxviewercleanup');
+                    document.getElementById('docxpreviewdiv1').contentDocument.dispatchEvent(ev);
+                })();
+            }
 
             return false;
         }
@@ -952,7 +960,7 @@ var slideshowid;
         zoom_mode = false;
         switchedSides = false;
         $('header .file-name', $overlay).text(n.name);
-        $('.viewer-error, #pdfpreviewdiv1', $overlay).addClass('hidden');
+        $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1', $overlay).addClass('hidden');
         $('.viewer-progress', $overlay).addClass('vo-hidden');
 
         if (is_mobile) {
@@ -1485,15 +1493,19 @@ var slideshowid;
             console.debug('slideshow.fetchsrc', id, n, n.h);
         }
 
-        if (fileext(n.name) === 'pdf') {
+        if (['pdf', 'docx'].includes(fileext(n.name))) {
             if (!preqs[n.h]) {
                 preqs[n.h] = 1;
 
+                const ext = fileext(n.name);
                 M.gfsfetch(n.link || n.h, 0, -1).then((data) => {
-                    preview({type: 'application/pdf'}, n.h, data.buffer);
+                    const type = ext === 'pdf' ? 'application/pdf' : extmime.docx;
+
+                    preview({ type }, n.h, data.buffer);
+
                 }).catch((ex) => {
                     if (d) {
-                        console.warn('Failed to retrieve PDF, failing back to broken eye image...', ex);
+                        console.warn(`Failed to retrieve ${ext}, failing back to broken eye image...`, ex);
                     }
 
                     previewimg(n.h, null);
@@ -1843,6 +1855,57 @@ var slideshowid;
         });
     }
 
+    function prepareAndViewDocxViewer(data) {
+        const signal = tryCatch(() => {
+            const elem = document.getElementById('docxpreviewdiv1');
+            elem.classList.remove('hidden');
+            const ev = new Event('docxviewerload');
+            ev.data = {
+                blob: data.blob
+            };
+            elem.contentDocument.dispatchEvent(ev);
+        });
+
+        if (_docxSeen) {
+            signal();
+            return;
+        }
+
+        M.require('docxpreview_js', 'docxviewer_js', 'docxviewer', 'docxviewercss').then(() => {
+            const myPage = translate(pages.docxviewer)
+                .replace('viewer.css', window.docxviewercss)
+                .replace('docx.js', window.docxviewer_js)
+                .replace('docx-preview.js', window.docxpreview_js);
+            const id = 'docxpreviewdiv1';
+            const iframe = document.getElementById(id);
+            const newIframe = document.createElement('iframe');
+            newIframe.id = id;
+            newIframe.src = 'about:blank';
+            iframe.parentNode.replaceChild(newIframe, iframe);
+            const doc = newIframe.contentWindow.document;
+            // eslint-disable-next-line local-rules/open
+            doc.open();
+            doc.write(myPage);
+            doc.addEventListener('docxviewerready', function ready() {
+                doc.removeEventListener('docxviewerready', ready);
+                queueMicrotask(signal);
+            });
+            doc.addEventListener('docxviewererror', (ev) => {
+                const { data } = ev;
+                let errBody = '';
+                if (data.error === -1) {
+                    errBody = l.preview_failed_support;
+                }
+                else if (data.error === -2) {
+                    errBody = l.preview_failed_temp;
+                }
+                msgDialog('error', '', l.preview_failed_title, errBody);
+            });
+            doc.close();
+            _docxSeen = true;
+        });
+    }
+
     function previewsrc(id) {
         var $overlay = $('.media-viewer-container', 'body');
         var $content = $('.content', $overlay);
@@ -1864,7 +1927,7 @@ var slideshowid;
         $('embed', $content).addClass('hidden');
         $('video', $content).addClass('hidden');
         $imgWrap.removeClass('hidden');
-        $('#pdfpreviewdiv1', $content).addClass('hidden');
+        $('#pdfpreviewdiv1, #docxpreviewdiv1', $content).addClass('hidden');
         $bottomBar.removeClass('hidden');
 
         if (previews[id].type === 'application/pdf') {
@@ -1877,6 +1940,16 @@ var slideshowid;
             // to fix pdf compatibility - Bug #7796
             prepareAndViewPdfViewer(previews[id]);
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
+            return;
+        }
+        if (previews[id].type === extmime.docx) {
+            $overlay.addClass('docx');
+            $pendingBlock.addClass('hidden');
+            $progressBlock.addClass('vo-hidden');
+            $bottomBar.addClass('hidden');
+            $imgWrap.addClass('hidden');
+            prepareAndViewDocxViewer(previews[id]);
+            eventlog(99819);
             return;
         }
 

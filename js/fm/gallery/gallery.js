@@ -1415,7 +1415,7 @@ class MegaGallery {
                 this.clearRenderCache();
 
                 // Clear thumbnails to free memory if target page is not gallery anymore
-                if (M.isCustomView(tpage).type !== 'gallery') {
+                if (!M.isGalleryPage(tpage)) {
                     mBroadcaster.removeListener(this.beforePageChangeListener);
                     delete this.beforePageChangeListener;
 
@@ -1898,18 +1898,16 @@ class MegaMediaTypeGallery extends MegaGallery {
                 }
             }
 
-            dbfetch.geta(handles)
-                .then(() => {
-                    MegaGallery.dbActionPassed = true;
+            await dbfetch.geta(handles).catch(nop);
 
-                    this.updNode = {};
+            MegaGallery.dbActionPassed = true;
 
-                    // Initializing albums here for the performace's sake
-                    if (mega.gallery.albums.awaitingDbAction) {
-                        mega.gallery.albums.init();
-                    }
-                })
-                .catch(nop);
+            this.updNode = {};
+
+            // Initializing albums here for the performace's sake
+            if (mega.gallery.albums.awaitingDbAction) {
+                mega.gallery.albums.init();
+            }
         }
 
         // This sort is needed for building groups, do not remove
@@ -1994,12 +1992,33 @@ class MegaMediaTypeGallery extends MegaGallery {
 
 mega.gallery = Object.create(null);
 mega.gallery.nodeUpdated = false;
-mega.gallery.albumsRendered = false;
 mega.gallery.titleControl = null;
 mega.gallery.emptyBlock = null;
 mega.gallery.rootMode = {photos: 'a', images: 'a', videos: 'a'};
 mega.gallery.pendingFaBlocks = {};
 mega.gallery.pendingThumbBlocks = {};
+mega.gallery.disallowedExtensions = { 'PSD': true, 'PDF': true, 'SVG': true };
+
+Object.defineProperty(mega.gallery, 'albumsRendered', {
+    get() {
+        'use strict';
+        return this._albumsRendered;
+    },
+    set(value) {
+        'use strict';
+        if (this._albumsRendered && value === false) {
+            for (const id in this.albums.store) {
+                const album = this.albums.store[id];
+
+                if (album.cellEl) {
+                    album.cellEl.dropBackground();
+                }
+            }
+        }
+
+        this._albumsRendered = value;
+    }
+});
 
 mega.gallery.secKeys = {
     cuphotos: 'camera-uploads-photos',
@@ -2014,14 +2033,26 @@ mega.gallery.secKeys = {
  * Same as is_image3(), additionally checking whether the node meet requirements for photo/media gallery.
  * @param {String|MegaNode|Object} n An ufs-node, or filename
  * @param {String} [ext] Optional filename extension
+ * @returns {Boolean}
+ */
+mega.gallery.isImage = (n, ext) => {
+    'use strict';
+
+    ext = ext || fileext(n && n.name || n, true, true);
+    return !mega.gallery.disallowedExtensions[ext] && is_image2(n, ext);
+};
+
+/**
+ * Checking if the file is even available for the gallery
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
  * @returns {Number|String|Function|Boolean}
  */
 mega.gallery.isGalleryNode = (n, ext) => {
     'use strict';
 
     ext = ext || fileext(n && n.name || n, true, true);
-
-    return ext !== 'PSD' && is_image3(n, ext) || mega.gallery.isGalleryVideo(n);
+    return mega.gallery.isImage(n, ext) || mega.gallery.isGalleryVideo(n);
 };
 
 /**
@@ -2251,7 +2282,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
     }
 
     const isLocationCorrect = () => {
-        if (M.currentCustomView.type !== 'gallery' && M.currentCustomView.type !== 'albums') {
+        if (!M.isGalleryPage() && !M.isAlbumsPage()) {
             console.log(`Cancelling the thumbnail request...`);
             return false;
         }
@@ -2485,7 +2516,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             if (!blocks[key]) {
                 return;
             }
-            const weAreOnGallery = M.currentCustomView.type === 'gallery' || M.currentCustomView.type === 'albums';
+            const weAreOnGallery = M.isGalleryPage() || M.isAlbumsPage();
 
             if (d) {
                 console.assert(weAreOnGallery, `This should not be running!`);
@@ -2639,7 +2670,7 @@ lazy(mega.gallery, 'sections', () => {
             icon: 'photos',
             root: 'photos',
             filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p)
-                && (is_image3(n) || mega.gallery.isGalleryVideo(n)),
+                && (mega.gallery.isImage(n) || mega.gallery.isGalleryVideo(n)),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdphotos]: {
@@ -2647,28 +2678,28 @@ lazy(mega.gallery, 'sections', () => {
             icon: 'photos',
             root: 'photos',
             filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p))
-                && (is_image3(n) || mega.gallery.isGalleryVideo(n)),
+                && (mega.gallery.isImage(n) || mega.gallery.isGalleryVideo(n)),
             title: l.gallery_from_cloud_drive
         },
         images: {
             path: 'images',
             icon: 'images',
             root: 'images',
-            filterFn: n => is_image3(n),
+            filterFn: n => mega.gallery.isImage(n),
             title: l.gallery_all_locations
         },
         [mega.gallery.secKeys.cuimages]: {
             path: mega.gallery.secKeys.cuimages,
             icon: 'images',
             root: 'images',
-            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && is_image3(n),
+            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && mega.gallery.isImage(n),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdimages]: {
             path: mega.gallery.secKeys.cdimages,
             icon: 'images',
             root: 'images',
-            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && is_image3(n),
+            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && mega.gallery.isImage(n),
             title: l.gallery_from_cloud_drive
         },
         videos: {
@@ -2696,7 +2727,7 @@ lazy(mega.gallery, 'sections', () => {
             path: 'favourites',
             icon: 'favourite-filled',
             root: 'favourites',
-            filterFn: n => is_image3(n) || mega.gallery.isGalleryVideo(n),
+            filterFn: n => mega.gallery.isImage(n) || mega.gallery.isGalleryVideo(n),
             title: l.gallery_favourites
         }
     };

@@ -2637,6 +2637,7 @@ function dbfetchfm() {
             }
             console.assert(window.fmdb, 'check what is going on here...');
         })
+        .then(mega.sets.buildTmp)
         .then(finish)
         .catch((ex) => {
             console.error(ex);

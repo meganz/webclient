@@ -703,8 +703,7 @@ function fmtopUI() {
                 showUploadBlock();
             }
         }
-        else if (M.currentCustomView.type === 'gallery') {
-
+        else if (M.isGalleryPage()) {
             $galleryTabBlock.removeClass('hidden');
 
             if (M.currentdirid === 'favourites') {
@@ -982,7 +981,7 @@ function FMShortcuts() {
             !selectionManager ||
             M.currentrootid === 'chat' || // prevent shortcut for chat
             M.currentrootid === undefined || // prevent shortcut for file transfer, dashboard, settings
-            M.currentCustomView.type === 'gallery'
+            M.isGalleryPage()
         ) {
             return true;
         }

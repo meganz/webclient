@@ -109,14 +109,14 @@ class MMenuSelectItem extends MComponent {
 
     addLeftIcon(icon) {
         const i = document.createElement('i');
-        i.className = 'mr-4 sprite-fm-mono icon-' + icon;
+        i.className = 'mr-4 ml-0 sprite-fm-mono icon-' + icon;
 
         this.el.prepend(i);
     }
 
     addRightIcon(icon) {
         const i = document.createElement('i');
-        i.className = 'ml-3 sprite-fm-mono icon-' + icon;
+        i.className = 'ml-3 mr-0 sprite-fm-mono icon-' + icon;
 
         this.el.append(i);
     }

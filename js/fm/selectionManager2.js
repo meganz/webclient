@@ -780,7 +780,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      * @returns {Boolean}
      */
     selectionNotification(nodeId, isAddToSelection, scrollTo = true) {
-        if (M.chat || M.currentCustomView.type === 'gallery' || typeof nodeId !== 'number' && !M.d[nodeId]) {
+        if (M.chat || M.isGalleryPage() || typeof nodeId !== 'number' && !M.d[nodeId]) {
             return false;
         }
         let itemsNum = this.selected_list.filter(h => h !== this.currentdirid).length;
@@ -925,7 +925,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             return false;
         }
 
-        const isAlbums = M.currentCustomView.type === 'albums';
+        const isAlbums = M.isAlbumsPage();
 
         const allButtons = selectionLinkWrapper.querySelectorAll(
             isAlbums ? '.js-statusbarbtn' : '.js-statusbarbtn:not(.options)'

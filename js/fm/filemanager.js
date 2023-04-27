@@ -2631,7 +2631,7 @@ FileManager.prototype.initUIKeyEvents = function() {
     "use strict";
 
     $(window).rebind('keydown.uikeyevents', function(e) {
-        if ((M.chat && !$.dialog) || M.currentCustomView.type === 'albums') {
+        if ((M.chat && !$.dialog) || M.isAlbumsPage()) {
             return true;
         }
 
@@ -2755,7 +2755,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             s.length > 0 &&
             !$.dialog &&
             (M.getNodeRights(M.currentdirid) > 1 || M.currentCustomView) &&
-            M.currentCustomView.type !== 'gallery' &&
+            !M.isGalleryPage() &&
             M.currentrootid !== M.InboxID &&
             M.currentdirid !== 'devices'
         ) {
@@ -2881,7 +2881,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             e.keyCode == 65 &&
             e.ctrlKey &&
             !$.dialog &&
-            M.currentCustomView.type !== 'gallery'
+            !M.isGalleryPage()
         ) {
             if (is_transfers_or_accounts) {
                 return;
@@ -3309,7 +3309,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         initPerfectScrollbar($(viewModeClass));
     }
     // user management ui update is handled in Business Account classes.
-    else if (this.v.length && M.currentCustomView.type !== 'gallery') {
+    else if (this.v.length && !M.isGalleryPage()) {
 
         $('.fm-blocks-view.fm').removeClass('hidden');
         $('.fm-blocks-view.fm').removeClass('out-shares-view public-links-view file-requests-view');
@@ -3408,7 +3408,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         $.selectddUIgrid = '.out-shared-blocks-scrolling';
         $.selectddUIitem = 'a';
     }
-    else if (M.currentCustomView.type === 'gallery') {
+    else if (M.isGalleryPage()) {
         $.selectddUIgrid = '.gallery-view';
     }
     else {
@@ -3536,8 +3536,7 @@ FileManager.prototype.addGridUI = function(refresh) {
         $('.files-grid-view.fm').removeClass('out-shares-view public-links-view file-requests-view');
 
         if (this.currentCustomView) {
-            if (this.currentCustomView.type === 'gallery'
-                || this.currentCustomView.type === 'albums') {
+            if (M.isGalleryPage() || M.isAlbumsPage()) {
                 $('.files-grid-view.fm').addClass('hidden');
             }
             else {
@@ -3733,7 +3732,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     else if (this.currentdirid === 'out-shares') {
         $.selectddUIgrid = '.out-shared-grid-view .grid-scrolling-table';
     }
-    else if (M.currentCustomView.type === 'gallery') {
+    else if (M.isGalleryPage()) {
         $.selectddUIgrid = '.gallery-view';
     }
     else {
@@ -3819,7 +3818,7 @@ FileManager.prototype.getDDhelper = function getDDhelper() {
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
 
-    if (this.currentdirid && (this.currentdirid.substr(0, 7) === 'account' || M.currentCustomView.type === 'gallery')) {
+    if (this.currentdirid && (this.currentdirid.substr(0, 7) === 'account' || M.isGalleryPage())) {
         return false;
     }
 
@@ -4111,7 +4110,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     var tmpId;
     var $fmholder = $('#fmholder', 'body');
-    const isAlbums = M.currentCustomView.type === 'albums';
+    const isAlbums = M.isAlbumsPage();
 
     if (d) {
         console.log('sectionUIopen', id, folderlink);
@@ -4290,7 +4289,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             $('.fm-right-header-user-management').removeClass('hidden');
             M.hideEmptyGrids();
         }
-        else if (M.isCustomView(id).type === 'gallery' || isAlbums) {
+        else if (M.isGalleryPage(id) || isAlbums) {
             $('.fm-right-header').addClass('hidden');
             $('.fm-right-header-user-management').addClass('hidden');
         }
@@ -4346,8 +4345,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.gallery-view').addClass('hidden');
     }
 
-    if (M.previousdirid && M.previousdirid.startsWith('albums')) {
-        if (M.currentCustomView.type === 'gallery') {
+    if (M.previousdirid && M.isAlbumsPage(0, M.previousdirid)) {
+        if (M.isGalleryPage()) {
             mega.gallery.albums.disposeInteractions();
         }
         else if (isAlbums && mega.gallery.albums && mega.gallery.albums.grid) {
@@ -4515,7 +4514,7 @@ FileManager.prototype.initStatusBarLinks = function() {
 
     $('.js-statusbarbtn').rebind('click', function(e){
         if (this.classList.contains('download')) {
-            if (M.currentCustomView.type === 'albums') {
+            if (M.isAlbumsPage()) {
                 mega.gallery.albums.downloadSelectedElements();
             }
             else {
@@ -4552,7 +4551,7 @@ FileManager.prototype.initStatusBarLinks = function() {
             this.classList.add('c-opened');
         }
         else if (this.classList.contains('preview')) {
-            if (M.currentCustomView.type === 'albums') {
+            if (M.isAlbumsPage()) {
                 mega.gallery.albums.previewSelectedElements();
             }
             else {
@@ -4560,7 +4559,7 @@ FileManager.prototype.initStatusBarLinks = function() {
             }
         }
         else if (this.classList.contains('delete-from-album')) {
-            mega.gallery.albums.removeSelectedElements();
+            mega.gallery.albums.requestAlbumElementsRemoval();
         }
 
         return false;
@@ -4570,9 +4569,9 @@ FileManager.prototype.initStatusBarLinks = function() {
 FileManager.prototype.initLeftPanel = function() {
     'use strict';
 
-    const isGallery = M.currentCustomView.type === 'gallery';
+    const isGallery = M.isGalleryPage();
     const isDiscovery = isGallery && M.currentCustomView.prefixPath === 'discovery/';
-    const isAlbums = M.currentCustomView.type === 'albums';
+    const isAlbums = M.isAlbumsPage();
 
     let elements = document.getElementsByClassName('js-lpbtn');
 
@@ -4622,7 +4621,7 @@ FileManager.prototype.initLeftPanel = function() {
     else if (M.isDynPage(M.currentdirid)) {
         $(`.js-lpbtn[data-link="${M.currentdirid}"]`, '.js-myfiles-panel').addClass('active');
     }
-    else if (isGallery && mega.gallery.sections[M.currentdirid]) {
+    else if (isGallery && mega.gallery.sections[M.currentdirid]) { // If gallery and is not Discovery
         $(`.js-lpbtn[data-link="${mega.gallery.sections[M.currentdirid].root}"]`).addClass('active');
     }
 
@@ -4654,7 +4653,7 @@ FileManager.prototype.initLeftPanel = function() {
         else if (link === 'upgrade') {
             loadSubPage('pro');
         }
-        else if (M.isCustomView(link).type === 'gallery') {
+        else if (M.isGalleryPage(link)) {
 
             onIdle(() => {
 

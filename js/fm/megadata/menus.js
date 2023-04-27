@@ -383,7 +383,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         items['.getlink-item'] = 1;
     }
 
-    if (M.currentCustomView.type === 'gallery') {
+    if (M.isGalleryPage()) {
 
         items['.open-cloud-item'] = 1;
 
@@ -405,7 +405,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         M.currentrootid !== 'out-shares' && M.currentrootid !== 'shares' &&
         M.currentrootid !== 'public-links' && M.currentdirid !== 'recents' &&
         $.selected.length === 1 &&
-        (M.currentCustomView.type !== 'gallery' || selNode.h !== M.currentCustomView.nodeID)) {
+        (!M.isGalleryPage() || selNode.h !== M.currentCustomView.nodeID)) {
         items['.open-gallery'] = 1;
     }
 

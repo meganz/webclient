@@ -40,7 +40,12 @@
                 this.onDragEnd = onDragEnd || nop;
 
                 this.getOffsetTop = typeof getOffsetTop === 'function' ? getOffsetTop : () => el.offsetTop;
+                this._disabled = false;
             }
+        }
+
+        get disabled() {
+            return this._disabled;
         }
 
         /**

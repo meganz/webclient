@@ -271,7 +271,7 @@
         const dictionary = function _(handle) {
 
             // If this is gallery view, make it default to root path instead
-            if (M.isCustomView(handle).type === 'gallery') {
+            if (M.isGalleryPage(handle) || M.isAlbumsPage(0, handle)) {
                 return _(M.RootID);
             }
 

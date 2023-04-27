@@ -1328,7 +1328,7 @@
                     M.cameraUploadUI();
                     mega.gallery.nodeUpdated = true;
 
-                    if (M.currentCustomView.type === 'gallery') {
+                    if (M.isGalleryPage()) {
                         galleryUI();
                     }
                 }

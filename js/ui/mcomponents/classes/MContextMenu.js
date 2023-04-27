@@ -9,7 +9,7 @@ class MContextMenu extends MComponent {
 
     buildElement() {
         this.el = document.createElement('div');
-        this.el.className = 'dropdown body context m-context';
+        this.el.className = 'dropdown body context m-context tooltip-popin';
     }
 
     /**

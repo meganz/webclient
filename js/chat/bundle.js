@@ -5005,6 +5005,7 @@ ChatRoom.prototype.subscribeForCallEvents = function () {
     if (d) {
       console.warn("onChatdCallEnd:", JSON.stringify(data));
     }
+    this.meetingsLoading = false;
     this.activeCallIds.remove(data.callId);
     this.stopRinging(data.callId);
     this.callParticipantsUpdated();

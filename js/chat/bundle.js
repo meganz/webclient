@@ -24683,10 +24683,9 @@ class Attachment extends AbstractGenericMessage {
       var preview = external_React_default().createElement("div", {
         className: "data-block-view medium " + noThumbPrev,
         onClick: ({
-          target,
-          currentTarget
+          target
         }) => {
-          if (isPreviewable && target === currentTarget) {
+          if (isPreviewable && !target.classList.contains('tiny-button')) {
             this.props.onPreviewStart(v);
           }
         }
@@ -25857,7 +25856,7 @@ class GenericConversationMessage extends mixin.y {
       if (e.target.classList.contains('button')) {
         return;
       }
-      if (e.target.classList.contains('no-thumb-prev')) {
+      if (e.target.classList.contains('no-thumb-prev') || $(e.target).parents('no-thumb-prev')) {
         return;
       }
       var $block;

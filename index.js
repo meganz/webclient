@@ -88,6 +88,7 @@ mBroadcaster.once('startMega:desktop', function() {
 
     if ((p = document.querySelector('.media-viewer .content'))) {
         mCreateElement('iframe', {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'pdfpreviewdiv1'}, p);
+        mCreateElement('iframe', {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'docxpreviewdiv1'}, p);
     }
 });
 
@@ -1693,6 +1694,15 @@ function init_page() {
 
         if (is_mobile) {
             parsepage(pages.mobile);
+            const p = document.querySelector('.media-viewer .content');
+            if (p) {
+                // Inject docx previewer iframe. This may be handled better post mobile revamp.
+                mCreateElement(
+                    'iframe',
+                    {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'docxpreviewdiv1'},
+                    p
+                );
+            }
         }
         else {
             parsepage(pages.download);

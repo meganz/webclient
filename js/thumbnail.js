@@ -90,6 +90,9 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
         if (thumbHandler) {
             const res = await thumbHandler(buffer);
+            if (!res) {
+                throw new Error(`Thumbnail-handler failed for ${(n || file || !1).name}`);
+            }
             source = res.buffer || res;
         }
         else if (isRawImage) {
@@ -189,6 +192,11 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
         sendToPreview(node);
         mBroadcaster.sendMessage('fa:error', id, ex, false, 2);
+
+        if (String(ex && ex.message || ex).includes('Thumbnail-handler')) {
+            // @todo mute above debug() if too noisy..
+            return;
+        }
 
         if (!window.pfid && canStoreAttr && String(typeGuess).startsWith('image/')) {
             eventlog(99665, JSON.stringify([

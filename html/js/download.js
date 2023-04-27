@@ -644,6 +644,9 @@ function dl_g(res, ctx) {
 
 
             }
+            else if (fileext(dl_node.name, true) === 'DOCX') {
+                prevBut = true;
+            }
 
             if (prevBut) {
                 showPreviewButton();

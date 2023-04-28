@@ -320,6 +320,39 @@ class MeetingsManager {
         });
     }
 
+    // @TODO Web push notifications?
+    checkForNotifications() {
+        const time = Date.now();
+        const upcomingMeetings = Object.values(this.scheduledMeetings.toJS()).filter(c => c.isUpcoming);
+        for (const meeting of upcomingMeetings) {
+            if (pushNotificationSettings.isAllowedForChatId(meeting.chatId)) {
+                if (meeting.nextOccurrenceStart >= time + 9e5 && meeting.nextOccurrenceStart <= time + 96e4) {
+                    // The next occurrence is at least 15 minutes away but less than 16 minutes away.
+                    const ss = Math.floor(meeting.nextOccurrenceStart / 1000);
+                    const ns = Math.floor(time / 1000) + 15 * 60;
+                    if (ss - ns <= 10) {
+                        // Is within 10 secs so dispatch now
+                        this.megaChat.trigger('onScheduleUpcoming', meeting);
+                    }
+                    else {
+                        // Sleep the difference and dispatch;
+                        tSleep(ss - ns).always(() => {
+                            this.megaChat.trigger('onScheduleUpcoming', meeting);
+                        });
+                    }
+                }
+                else if (meeting.nextOccurrenceStart >= time && meeting.nextOccurrenceStart < time + 6e4) {
+                    // The occurrence starts when the next clock event happens
+                    const ss = Math.floor(meeting.nextOccurrenceStart / 1000);
+                    const ns = Math.floor(time / 1000);
+                    tSleep(ss - ns).always(() => {
+                        this.megaChat.trigger('onScheduleStarting', meeting);
+                    });
+                }
+            }
+        }
+    }
+
     encodeData(data) {
         return data && base64urlencode(to8(data));
     }

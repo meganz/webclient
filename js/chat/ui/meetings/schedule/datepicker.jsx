@@ -52,6 +52,13 @@ export default class Datepicker extends MegaRenderMixin {
         this.OPTIONS.altField = `input.${this.props.altField}`;
     }
 
+    formatValue = value => {
+        if (typeof value === 'number') {
+            return time2date(value / 1000, 18);
+        }
+        return value;
+    };
+
     initialize() {
         const inputRef = this.inputRef && this.inputRef.current;
         if (inputRef) {
@@ -61,14 +68,31 @@ export default class Datepicker extends MegaRenderMixin {
         }
     }
 
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if (this.containerRef && this.containerRef.current) {
+            $(this.containerRef.current).unbind(`keyup.${Datepicker.NAMESPACE}`);
+        }
+    }
+
     componentDidMount() {
         super.componentDidMount();
         M.require('datepicker_js').done(() => this.initialize());
+
+        if (this.containerRef && this.containerRef.current) {
+            $(this.containerRef.current).rebind(`keyup.${Datepicker.NAMESPACE}`, ({ keyCode }) => {
+                if (keyCode === 13 /* RET */) {
+                    this.datepicker.hide();
+                    return false;
+                }
+            });
+        }
     }
 
     render() {
         const { NAMESPACE } = Datepicker;
-        const { value, name, className, placeholder } = this.props;
+        const { value, name, className, placeholder, onFocus, onChange, onBlur } = this.props;
+        const formattedValue = this.formatValue(value);
 
         return (
             <div
@@ -85,8 +109,10 @@ export default class Datepicker extends MegaRenderMixin {
                         `}
                         autoComplete="off"
                         placeholder={placeholder || ''}
-                        value={value && time2date(value / 1000, 18)}
-                        onChange={() => false}
+                        value={formattedValue}
+                        onFocus={ev => onFocus?.(ev)}
+                        onChange={ev => onChange?.(ev)}
+                        onBlur={ev => onBlur?.(ev)}
                     />
                     <i
                         className="sprite-fm-mono icon-calendar1"

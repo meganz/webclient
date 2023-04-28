@@ -35,14 +35,11 @@ function removeUInode(h, parent) {
         }
     }
 
-    if (M.currentCustomView.type === 'albums') {
+    if (M.isAlbumsPage()) {
         mega.gallery.albums.onCDNodeRemove(n);
+        mega.gallery.nodeUpdated = true;
     }
-    else {
-        mega.gallery.albumsRendered = false;
-    }
-
-    if (M.currentCustomView.type === 'gallery') {
+    else if (M.isGalleryPage()) {
         mega.gallery.checkEveryGalleryDelete(h);
         mega.gallery.albums.onCDNodeRemove(n);
     }
@@ -134,8 +131,7 @@ function removeUInode(h, parent) {
             }
             break;
         default:
-            if (M.chat || M.currentdirid.indexOf('user-management') >= 0
-                || M.currentCustomView.type === 'albums') {
+            if (M.chat || M.currentdirid.indexOf('user-management') >= 0 || M.isAlbumsPage()) {
                 break;
             }
             if (!hasSubFolders) {

@@ -88,6 +88,7 @@ mBroadcaster.once('startMega:desktop', function() {
 
     if ((p = document.querySelector('.media-viewer .content'))) {
         mCreateElement('iframe', {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'pdfpreviewdiv1'}, p);
+        mCreateElement('iframe', {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'docxpreviewdiv1'}, p);
     }
 });
 
@@ -1693,6 +1694,15 @@ function init_page() {
 
         if (is_mobile) {
             parsepage(pages.mobile);
+            const p = document.querySelector('.media-viewer .content');
+            if (p) {
+                // Inject docx previewer iframe. This may be handled better post mobile revamp.
+                mCreateElement(
+                    'iframe',
+                    {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'docxpreviewdiv1'},
+                    p
+                );
+            }
         }
         else {
             parsepage(pages.download);
@@ -1892,6 +1902,10 @@ function init_page() {
             if (typeof mDBcls === 'function') {
                 mDBcls(); // close fmdb
             }
+        }
+
+        if (localStorage.keycomplete) {
+            delete localStorage.keycomplete;
         }
 
         if (!fminitialized) {
@@ -3387,6 +3401,15 @@ mBroadcaster.once('boot_done', () => {
         }
     });
 
+    // Currently only used in chat so don't bother trying to register for mobile browsers.
+    if (!is_mobile) {
+        onIdle(tryCatch(() => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(`${is_extension ? '' : '/'}sw.js?v=1`).catch(dump);
+            }
+        }));
+    }
+
     if (d) {
         if (!window.crossOriginIsolated) {
             if (window.crossOriginIsolated === false) {
@@ -3420,7 +3443,7 @@ mBroadcaster.once('mega:openfolder', function() {
     'use strict';
 
     // No need to re-initiate preview when on Album page
-    if (M.currentCustomView.type === 'albums') {
+    if (M.isAlbumsPage()) {
         sessionStorage.removeItem('previewNode');
         return;
     }

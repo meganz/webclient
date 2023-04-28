@@ -1,13 +1,12 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../mixins';
+import { MegaRenderMixin } from '../../../mixins.js';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';
 import { PerfectScrollbar } from '../../../../ui/perfectScrollbar.jsx';
-import Datepicker from './datepicker.jsx';
-import Select from './select.jsx';
 import Invite from './invite.jsx';
 import { getTimeIntervals, getNearestHalfHour, getUserTimezone, addMonths } from './helpers.jsx';
 import Recurring from './recurring.jsx';
+import { DateTime } from './datetime.jsx';
 
 export class Schedule extends MegaRenderMixin {
     static NAMESPACE = 'schedule-dialog';
@@ -95,6 +94,64 @@ export class Schedule extends MegaRenderMixin {
         });
     }
 
+    /**
+     * onTopicChange
+     * @param value
+     * [...] TODO: add documentation
+     */
+
+    onTopicChange = value => {
+        if (value.length > ChatRoom.TOPIC_MAX_LENGTH) {
+            /* `Enter fewer than 30 characters` */
+            this.setState({ invalidTopicMsg: l.err_schedule_title_long, topicInvalid: true });
+            value = value.substring(0, ChatRoom.TOPIC_MAX_LENGTH);
+        }
+        else if (value.length === 0) {
+            /* `Meeting name is required` */
+            this.setState({ invalidTopicMsg: l.schedule_title_missing, topicInvalid: true });
+        }
+        else if (this.state.invalidTopicMsg) {
+            this.setState({ invalidTopicMsg: '', topicInvalid: false });
+        }
+        this.handleChange('topic', value);
+    };
+
+    onTextareaChange = value => {
+        const maxLength = 3000;
+        if (value.length > maxLength) {
+            this.setState({ descriptionInvalid: true });
+            value = value.substring(0, maxLength);
+        }
+        else if (this.state.descriptionInvalid) {
+            this.setState({ descriptionInvalid: false });
+        }
+        this.handleChange('description', value);
+    };
+
+    /**
+     * onStartDateSelect
+     * [...] TODO: add documentation
+     */
+
+    onStartDateSelect = () => {
+        this.datepickerRefs.endDateTime.selectDate(new Date(this.state.startDateTime + this.interval));
+    };
+
+    /**
+     * onEndDateSelect
+     * [...] TODO: add documentation
+     */
+
+    onEndDateSelect = () => {
+        const { startDateTime, endDateTime } = this.state;
+        if (endDateTime < startDateTime) {
+            if (endDateTime < Date.now()) {
+                return this.setState({ endDateTime: startDateTime + this.interval });
+            }
+            this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+        }
+    };
+
     // --
 
     /**
@@ -144,14 +201,15 @@ export class Schedule extends MegaRenderMixin {
                 isDirty: true
             }),
             () => {
-                if (callback) {
-                    callback();
-                }
                 // Sync the recurring `End` field based on the selected start date for the main meeting
                 const { recurring } = this.state;
                 if (recurring && recurring.end) {
                     const recurringEnd = addMonths(this.state.startDateTime, 6);
                     this.datepickerRefs.recurringEnd.selectDate(new Date(recurringEnd));
+                }
+
+                if (callback) {
+                    callback();
                 }
             }
         );
@@ -171,6 +229,7 @@ export class Schedule extends MegaRenderMixin {
     handleTimeSelect = ({ startDateTime, endDateTime }) => {
         startDateTime = startDateTime || this.state.startDateTime;
         endDateTime = endDateTime || this.state.endDateTime;
+
         this.setState(state => {
             return {
                 startDateTime: endDateTime <= state.startDateTime ? endDateTime - this.interval : startDateTime,
@@ -250,9 +309,11 @@ export class Schedule extends MegaRenderMixin {
     componentDidMount() {
         super.componentDidMount();
         this.syncPublicLink();
+
         if ($.dialog === 'onboardingDialog') {
             closeDialog();
         }
+
         M.safeShowDialog(Schedule.dialogName, () => {
             if (!this.isMounted()) {
                 throw new Error(`${Schedule.dialogName} dialog: component ${Schedule.NAMESPACE} not mounted.`);
@@ -281,18 +342,31 @@ export class Schedule extends MegaRenderMixin {
     }
 
     render() {
-        const { NAMESPACE, dialogName } = Schedule;
         const {
-            topic, startDateTime, endDateTime, recurring, participants, link, sendInvite, openInvite, description,
-            closeDialog, isEdit, isDirty, isLoading, topicInvalid, invalidTopicMsg, descriptionInvalid
+            topic,
+            startDateTime,
+            endDateTime,
+            recurring,
+            participants,
+            link,
+            sendInvite,
+            openInvite,
+            description,
+            closeDialog,
+            isEdit,
+            isDirty,
+            isLoading,
+            topicInvalid,
+            invalidTopicMsg,
+            descriptionInvalid
         } = this.state;
 
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
-                id={NAMESPACE}
+                id={Schedule.NAMESPACE}
                 className={closeDialog ? 'with-confirmation-dialog' : ''}
-                dialogName={dialogName}
+                dialogName={Schedule.dialogName}
                 dialogType="main"
                 onClose={() => {
                     return isDirty ? this.handleToggle('closeDialog') : this.props.onClose();
@@ -314,21 +388,7 @@ export class Schedule extends MegaRenderMixin {
                         autoFocus={true}
                         isLoading={isLoading}
                         onFocus={() => topicInvalid && this.setState({ topicInvalid: false })}
-                        onChange={val => {
-                            if (val.length > ChatRoom.TOPIC_MAX_LENGTH) {
-                                /* `Enter fewer than 30 characters` */
-                                this.setState({ invalidTopicMsg: l.err_schedule_title_long, topicInvalid: true });
-                                val = val.substring(0, ChatRoom.TOPIC_MAX_LENGTH);
-                            }
-                            else if (val.length === 0) {
-                                /* `Meeting name is required` */
-                                this.setState({ invalidTopicMsg: l.schedule_title_missing, topicInvalid: true });
-                            }
-                            else if (this.state.invalidTopicMsg) {
-                                this.setState({ invalidTopicMsg: '', topicInvalid: false });
-                            }
-                            this.handleChange('topic', val);
-                        }}
+                        onChange={this.onTopicChange}
                     />
 
                     {/* --- */}
@@ -341,6 +401,7 @@ export class Schedule extends MegaRenderMixin {
                             <DateTime
                                 name="startDateTime"
                                 altField="startTime"
+                                datepickerRef={this.datepickerRefs.startDateTime}
                                 startDate={startDateTime}
                                 value={startDateTime}
                                 filteredTimeIntervals={this.getFilteredTimeIntervals(startDateTime)}
@@ -350,23 +411,28 @@ export class Schedule extends MegaRenderMixin {
                                     this.datepickerRefs.startDateTime = datepicker;
                                 }}
                                 onSelectDate={startDateTime => {
-                                    this.handleDateSelect({ startDateTime }, () => {
-                                        const { startDateTime, endDateTime } = this.state;
-                                        if (startDateTime > endDateTime) {
-                                            this.datepickerRefs.endDateTime.selectDate(
-                                                new Date(startDateTime + this.interval)
-                                            );
-                                        }
-                                    });
+                                    this.handleDateSelect({ startDateTime }, this.onStartDateSelect);
                                 }}
                                 onSelectTime={({ value: startDateTime }) => {
-                                    this.handleTimeSelect({ startDateTime });
+                                    this.handleTimeSelect({
+                                        startDateTime: startDateTime < Date.now() ?
+                                            this.nearestHalfHour :
+                                            startDateTime
+                                    });
+                                }}
+                                onChange={value => this.handleChange('startDateTime', value)}
+                                onBlur={timestamp => {
+                                    if (timestamp) {
+                                        const startDateTime = timestamp < Date.now() ? this.nearestHalfHour : timestamp;
+                                        this.handleDateSelect({ startDateTime }, this.onStartDateSelect);
+                                    }
                                 }}
                             />
 
                             <DateTime
                                 name="endDateTime"
                                 altField="endTime"
+                                datepickerRef={this.datepickerRefs.endDateTime}
                                 isLoading={isLoading}
                                 startDate={endDateTime}
                                 value={endDateTime}
@@ -376,20 +442,18 @@ export class Schedule extends MegaRenderMixin {
                                     this.datepickerRefs.endDateTime = datepicker;
                                 }}
                                 onSelectDate={endDateTime => {
-                                    this.handleDateSelect({ endDateTime }, () => {
-                                        const { startDateTime, endDateTime } = this.state;
-                                        if (endDateTime < startDateTime) {
-                                            if (endDateTime < Date.now()) {
-                                                return this.setState({ endDateTime: startDateTime + this.interval });
-                                            }
-                                            this.datepickerRefs.startDateTime.selectDate(
-                                                new Date(endDateTime - this.interval)
-                                            );
-                                        }
-                                    });
+                                    this.handleDateSelect({ endDateTime }, this.onEndDateSelect);
                                 }}
                                 onSelectTime={({ value: endDateTime }) => {
-                                    this.handleTimeSelect({ endDateTime });
+                                    this.handleTimeSelect({
+                                        endDateTime: endDateTime < Date.now() ?
+                                            this.nearestHalfHour + this.interval :
+                                            endDateTime
+                                    });
+                                }}
+                                onChange={value => this.handleChange('endDateTime', value)}
+                                onBlur={timestamp => {
+                                    this.handleDateSelect({ endDateTime: timestamp }, this.onEndDateSelect);
                                 }}
                             />
                         </div>
@@ -472,16 +536,7 @@ export class Schedule extends MegaRenderMixin {
                         placeholder={l.schedule_description_input /* `Add a description` */}
                         value={description}
                         onFocus={() => descriptionInvalid && this.setState({ descriptionInvalid: false })}
-                        onChange={val => {
-                            if (val.length > 3000) {
-                                this.setState({ descriptionInvalid: true });
-                                val = val.substring(0, 3000);
-                            }
-                            else if (this.state.descriptionInvalid) {
-                                this.setState({ descriptionInvalid: false });
-                            }
-                            this.handleChange('description', val);
-                        }}
+                        onChange={this.onTextareaChange}
                     />
                 </PerfectScrollbar>
 
@@ -625,60 +680,6 @@ const Input = ({ name, placeholder, value, invalid, invalidMessage, autoFocus, i
 };
 
 /**
- * DateTime
- * @param name
- * @param isLoading
- * @param startDate
- * @param altField
- * @param value
- * @param minDate
- * @param filteredTimeIntervals
- * @param label
- * @param onMount
- * @param onSelectDate
- * @param onSelectTime
- * @return {React.Element}
- */
-
-export const DateTime = ({
-    name,
-    startDate,
-    altField,
-    value,
-    minDate,
-    filteredTimeIntervals,
-    label,
-    isLoading,
-    onMount,
-    onSelectDate,
-    onSelectTime
-}) => {
-    return (
-        <>
-            {label && <span>{label}</span>}
-            <Datepicker
-                name={`${Datepicker.NAMESPACE}-${name}`}
-                className={isLoading ? 'disabled' : ''}
-                startDate={startDate}
-                altField={`${Select.NAMESPACE}-${altField}`}
-                value={value}
-                minDate={minDate}
-                onMount={onMount}
-                onSelect={onSelectDate}
-            />
-            <Select
-                name={`${Select.NAMESPACE}-${altField}`}
-                className={isLoading ? 'disabled' : ''}
-                options={filteredTimeIntervals}
-                value={value}
-                format={toLocaleTime}
-                onSelect={onSelectTime}
-            />
-        </>
-    );
-};
-
-/**
  * Checkbox
  * @param name
  * @param checked
@@ -768,7 +769,9 @@ const Switch = ({ name, toggled, label, isLoading, onToggle }) => {
  * @param placeholder
  * @param isLoading
  * @param value
+ * @param invalid
  * @param onChange
+ * @param onFocus
  * @return {React.Element}
  */
 

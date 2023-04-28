@@ -81,7 +81,7 @@ function is_image2(n, ext) {
 function is_image3(n, ext) {
     'use strict';
     ext = ext || fileext(n && n.name || n, true, true);
-    return ext !== 'PDF' && is_image2(n, ext);
+    return ext !== 'PDF' && ext !== 'DOCX' && is_image2(n, ext);
 }
 
 /**
@@ -213,6 +213,13 @@ var mThumbHandler = {
         return this.sup[ext];
     }
 };
+
+mThumbHandler.add('DOCX', function DOCXThumbHandler(ab, cb) {
+    'use strict';
+
+    // @todo ..
+    cb(null);
+});
 
 mThumbHandler.add('PSD', function PSDThumbHandler(ab, cb) {
     'use strict';

@@ -46,7 +46,8 @@
         flex-shrink: 0;
     }
 
-    .toast-rack .toast button {
+    .toast-rack .toast button,
+    .timeline-tooltip button {
         border: none;
         cursor: pointer;
         outline: none;
@@ -182,7 +183,8 @@
         margin: 0 12px;
     }
 
-    .global-toast-container .toast-rack .toast button {
+    .global-toast-container .toast-rack .toast button,
+    .timeline-tooltip button {
         background: var(--surface-grey-2);
         border-radius: 4px;
         color: var(--text-color-high);

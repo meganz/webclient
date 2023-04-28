@@ -208,14 +208,16 @@ MegaData.prototype.delIndex = function(p, h) {
     }
 };
 
-MegaData.prototype.getPath = function(id) {
+// eslint-disable-next-line complexity
+MegaData.prototype.getPath = function(path) {
+    'use strict';
 
     var result = [];
     var loop = true;
     var inshare;
-    var cv = this.isCustomView(id);
+    var cv = this.isCustomView(path);
 
-    id = cv ? cv.nodeID : id;
+    let id = cv ? cv.nodeID : path;
 
     while (loop) {
         if ((id === 'contacts') && (result.length > 1)) {
@@ -235,7 +237,7 @@ MegaData.prototype.getPath = function(id) {
             || (id === 'public-links')
             || (id === this.InboxID)
             || (id === 'contacts')
-            || (id === 'albums' || (cv && cv.type === 'albums'))
+            || M.isAlbumsPage(0, path)
             || M.isDynPage(id)
             || (mega.gallery.sections[id])
             || id === 'file-requests'
@@ -411,6 +413,50 @@ MegaData.prototype.isCustomView = function(pathOrID) {
     }
     return result;
 };
+
+/**
+ * Checking if is the page is in Gallery section
+ * @param {String} [path] Path to check or M.currentdirid
+ * @returns {Boolean}
+ */
+MegaData.prototype.isGalleryPage = (() => {
+    'use strict';
+
+    return (path = M.currentdirid) => {
+        const customView = (path === M.currentdirid)
+            ? M.currentCustomView || M.isCustomView(path)
+            : M.isCustomView(path);
+
+        return customView && customView.type === 'gallery';
+    };
+})();
+
+/**
+ * Checking if is the page is in Gallery section
+ * @param {Number} [type] Type to check the page against: Any album (0), Albums main index (1), Specific album (2)
+ * @param {String} [path] Path to check or M.currentdirid
+ * @returns {Boolean}
+ */
+MegaData.prototype.isAlbumsPage = (() => {
+    'use strict';
+
+    return (type = 0, path = M.currentdirid) => {
+        const customView = (path === M.currentdirid)
+            ? M.currentCustomView || M.isCustomView(path)
+            : M.isCustomView(path);
+
+        if (!customView || customView.type !== 'albums') {
+            return false;
+        }
+
+        switch (type) {
+            case 0: return true;
+            case 1: return path === 'albums';
+            case 2: return path.startsWith('albums/');
+            default: return false;
+        }
+    };
+})();
 
 /**
  * Handle rubbish bin permanent items removal
@@ -770,7 +816,8 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree, qui
                     msgDialog(
                         'warninga',
                         l[882],
-                        l[8683].replace('%1', nodesCount).replace('%2', importNodes)
+                        mega.icu.format(l[8683], nodesCount)
+                            .replace('%1', mega.icu.format(l.download_and_import_items_count, importNodes))
                     );
                 }
                 else {
@@ -1951,14 +1998,11 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             mega.fileTextEditor.clearCachedFileData(n.h);
         }
 
-        if (M.currentCustomView.type === 'albums') {
+        if (M.isAlbumsPage()) {
             mega.gallery.albums.onCDNodeUpdate(n);
+            mega.gallery.nodeUpdated = true;
         }
-        else {
-            mega.gallery.albumsRendered = false;
-        }
-
-        if (M.currentCustomView.type === 'gallery') {
+        else if (M.isGalleryPage()) {
             mega.gallery.checkEveryGalleryUpdate(n);
             mega.gallery.albums.onCDNodeUpdate(n);
         }

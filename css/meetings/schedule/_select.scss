@@ -23,6 +23,22 @@
         position: relative;
         min-width: 52px;
 
+        &.typeable {
+            /* [...] */
+
+            &:before {
+                cursor: default;
+            }
+
+            input {
+                display: block;
+                position: relative;
+                width: 65px;
+                height: auto;
+                text-align: center;
+            }
+        }
+
         .mega-input-dropdown {
             position: absolute;
             top: 100%;

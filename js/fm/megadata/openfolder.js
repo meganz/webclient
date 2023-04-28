@@ -346,8 +346,9 @@
             }
 
             if (id === 'transfers'
-                || this.currentCustomView.type === 'gallery'
-                || this.currentCustomView.type === 'albums') {
+                || M.isGalleryPage()
+                || M.isAlbumsPage()
+            ) {
                 this.v = [];
             }
             else if ($.ofShowNoFolders) {

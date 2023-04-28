@@ -13,6 +13,7 @@ require("./ui/meetings/workflow/incoming.jsx");
 import ChatRouting from "./chatRouting.jsx";
 import MeetingsManager from './meetingsManager.jsx';
 import { ChatOnboarding } from "./chatOnboarding.jsx";
+import { inProgressAlert } from "./ui/meetings/call.jsx";
 
 const EMOJI_DATASET_VERSION = 4;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
@@ -153,6 +154,20 @@ function Chat() {
                         return notificationObj.options.icon;
                     },
                     body: '',
+                },
+                'upcoming-scheduled-occurrence': {
+                    title: ({ options }) => {
+                        return options.meeting.title;
+                    },
+                    icon: `${staticpath}/images/mega/mega-icon.svg`,
+                    body: l.notif_body_scheduled_upcoming, /* `Meeting starts in 15 minutes` */
+                },
+                'starting-scheduled-occurrence': {
+                    title: ({ options }) => {
+                        return options.meeting.title;
+                    },
+                    icon: `${staticpath}/images/mega/mega-icon.svg`,
+                    body: l.notif_body_scheduled_starting, /* `Meeting starts now` */
                 }
             },
             'sounds': [
@@ -200,6 +215,11 @@ function Chat() {
                 !!RTCRtpSender.prototype.createEncodedStreams;
         }
     });
+
+    // Just have the one interval (per minute) for the whole chat.
+    this.minuteClockInterval = setInterval(() => {
+        this._syncChats();
+    }, 6e4);
 
     return this;
 };
@@ -347,7 +367,6 @@ Chat.prototype.init = promisify(function(resolve, reject) {
             self.registerUploadListeners();
             self.trigger("onInit");
             mBroadcaster.sendMessage('chat_initialized');
-            setInterval(self._syncChats.bind(self), 6e4);
             setInterval(self.removeMessagesByRetentionTime.bind(self, null), 2e4);
 
             self.autoJoinIfNeeded();
@@ -371,6 +390,10 @@ Chat.prototype.init = promisify(function(resolve, reject) {
 });
 
 Chat.prototype._syncChats = function() {
+    if (!this.is_initialized) {
+        return;
+    }
+    this.plugins.meetingsManager.checkForNotifications();
     const { chats, logger } = this;
     if (chats && chats.length) {
         chats.forEach(({ chatId, scheduledMeeting }) => {
@@ -789,24 +812,25 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
     var havePendingCall = false;
     var haveCall = false;
-    self.haveAnyActiveCall() === false && self.chats.forEach(function(megaRoom) {
-        if (megaRoom.state == ChatRoom.STATE.LEFT) {
-            // skip left rooms.
-            return;
-        }
-        if (megaRoom.isArchived()) {
+    self.chats.forEach(chatRoom => {
+        if (chatRoom.isArchived() || chatRoom.state === ChatRoom.STATE.LEFT) {
             return;
         }
 
-        var c = parseInt(megaRoom.messagesBuff.getUnreadCount(), 10);
-        unreadCount += c;
-        if (c) {
-            notifications[megaRoom.isMeeting ? 'meetings' : 'chats'] += c;
+        const unreads = parseInt(chatRoom.messagesBuff.getUnreadCount(), 10);
+        unreadCount += unreads;
+
+        if (unreads) {
+            notifications[chatRoom.isMeeting ? 'meetings' : 'chats'] += unreads;
         }
-        if (!havePendingCall) {
-            if (megaRoom.havePendingCall() && megaRoom.uniqueCallParts && !megaRoom.uniqueCallParts[u_handle]) {
-                havePendingCall = true;
-            }
+
+        if (
+            !havePendingCall &&
+            chatRoom.havePendingCall() &&
+            chatRoom.uniqueCallParts &&
+            !chatRoom.uniqueCallParts[u_handle]
+        ) {
+            havePendingCall = true;
         }
     });
 
@@ -964,6 +988,9 @@ Chat.prototype.destroy = function(isLogout) {
         }
     }
 
+    if (this.minuteClockInterval) {
+        clearInterval(this.minuteClockInterval);
+    }
 };
 
 /**
@@ -3028,6 +3055,29 @@ Chat.prototype.autoJoinIfNeeded = function() {
         else {
             localStorage.removeItem("autoJoinOnLoginChat");
         }
+    }
+};
+
+Chat.prototype.openScheduledMeeting = function(meetingId, toCall) {
+    const meeting = this.scheduledMeetings[meetingId];
+    if (!meeting) {
+        console.warn('Meeting does not exist', meetingId);
+        return;
+    }
+    window.focus();
+    meeting.chatRoom.activateWindow();
+    meeting.chatRoom.show();
+    if (toCall && megaChat.hasSupportForCalls) {
+        if (this.haveAnyActiveCall() && window.sfuClient) {
+            const { chatRoom } = megaChat.activeCall;
+            const peers = chatRoom ? chatRoom.getCallParticipants() : [];
+            if (peers.includes(u_handle)) {
+                return d && console.warn('Already in this call');
+            }
+        }
+        inProgressAlert(true, meeting.chatRoom)
+            .then(() => meeting.chatRoom.startAudioCall(true))
+            .catch(ex => d && console.warn('Already in a call.', ex));
     }
 };
 

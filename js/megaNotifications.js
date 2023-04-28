@@ -279,16 +279,27 @@
         self.type = type;
         self.options = options;
         self.unread = unread ? unread : false;
+        if (Array.isArray(this.options.actions)) {
+            // Service worker notifications should have these options set as below.
+            this.options.incrementCount = false;
+            this.options.soundLoop = false;
+        }
 
         self.megaNotifications.trigger('onNotificationCreated', self);
 
-        if (options.incrementCounter === true) {
+        if (this.options.incrementCounter === true) {
             self.setUnread(unread);
         }
 
         if (!self.megaNotifications.isBusy() && (unread === true || self.options.alwaysPlaySound === true)) {
             if (self.options.anfFlag && mega.notif.has(self.options.anfFlag) !== 0) {
-                if (self.options.sound) {
+                if (
+                    self.options.sound
+                    && !(
+                        ['upcoming-scheduled-occurrence', 'starting-scheduled-occurrence'].includes(this.type)
+                        && Notification.permission !== 'granted'
+                    )
+                ) {
                     var playSound = function() {
                         ion.sound.stop(self.options.sound);
                         ion.sound.play(self.options.sound, {
@@ -376,41 +387,70 @@
      * @private
      */
     MegaNotification.prototype._showDesktopNotification = function() {
-        var self = this;
-        if (self.megaNotifications.options.desktopNotifications) {
+        if (this.megaNotifications.options.desktopNotifications) {
             if (Notification.permission !== 'granted') {
                 Notification.requestPermission();
             }
 
-
-            var params = self.options.params;
-
-            var textMessage = self.megaNotifications.options.textMessages[self.type];
+            const textMessage = this.megaNotifications.options.textMessages[this.type];
             if (textMessage) {
-                var title = $.isFunction(textMessage.title) ? textMessage.title(self, params) : textMessage.title;
-                var body = $.isFunction(textMessage.body) ? textMessage.body(self, params) : textMessage.body;
-                var icon = $.isFunction(textMessage.icon) ? textMessage.icon(self, params) : textMessage.icon;
+                const { params, group, actions, data } = this.options;
+                const title = typeof textMessage.title === 'function'
+                    ? textMessage.title(this, params) : textMessage.title;
+                const body = typeof textMessage.body === 'function' ? textMessage.body(this, params) : textMessage.body;
+                let icon = typeof textMessage.icon === 'function' ? textMessage.icon(this, params) : textMessage.icon;
 
                 if (icon === null) {
                     icon = undefined;
                 }
 
-                self._desktopNotification = new Notification(title, {
-                    body: body,
-                    icon: icon,
-                    tag: self.type + "_" + self.options.group
+                if (Array.isArray(actions)) {
+                    if (navigator.serviceWorker) {
+                        navigator.serviceWorker.ready
+                            .then(swr => {
+                                return swr.showNotification(
+                                    title,
+                                    {
+                                        body,
+                                        icon,
+                                        tag: `${this.type}_${group}}`,
+                                        actions,
+                                        data: data || {}
+                                    }
+                                );
+                            })
+                            .catch(() => {
+                                this.megaNotifications.logger.error(
+                                    'Service worker failed to be ready. Using default notification'
+                                );
+                                delete this.options.actions;
+                                this._showDesktopNotification();
+                            });
+                        return;
+                    }
+                    this.megaNotifications.logger.warn('Service worker unavailable. Using default notification');
+                }
+
+                this._desktopNotification = new Notification(title, {
+                    body,
+                    icon,
+                    tag: `${this.type}_${group}`
                 });
 
-                self._desktopNotification.onclick = function() {
-                    self.trigger('onClick');
+                this._desktopNotification.onclick = () => {
+                    this.trigger('onClick');
                 };
-                self._desktopNotification.onclose = function() {
-                    delete self._desktopNotification;
-                    self.setUnread(false);
-                    self.trigger('onClose');
+                this._desktopNotification.onclose = () => {
+                    delete this._desktopNotification;
+                    this.setUnread(false);
+                    this.trigger('onClose');
                 };
             } else {
-                self.megaNotifications.logger.warn("Will skip showing desktop notification, since the text message is missing for type: ", self.type, self);
+                this.megaNotifications.logger.warn(
+                    "Will skip showing desktop notification, since the text message is missing for type: ",
+                    this.type,
+                    this
+                );
             }
         }
 

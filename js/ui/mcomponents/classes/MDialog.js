@@ -1,8 +1,8 @@
 class MDialog extends MComponent {
     /**
      * @param {Object.<String, any>} data An enclosing data object
-     * @param {Boolean|{label: String, callback: Function?}} data.ok Either boolean for show/hide or an object
-     * @param {Boolean|{label: String, callback: Function?}} data.cancel Either boolean for show/hide or an object
+     * @param {Boolean|{label: String, callback: Function?, classes: String}} data.ok
+     * @param {Boolean|{label: String, callback: Function?, classes: String}} data.cancel
      * @param {String} [data.dialogClasses] Additional classes for dialog
      * @param {String} [data.contentClasses] Additional classes for dialog content
      * @param {String} [data.leftIcon] Classes for the side icon on the left
@@ -107,11 +107,11 @@ class MDialog extends MComponent {
 
         if (this.leftIcon) {
             this.el.prepend(this.leftIcon);
-            this.el.classList.add('pl-18');
+            this.el.classList.add('with-icon');
             this._contentWrapper.classList.add('px-6');
         }
         else {
-            this.el.classList.remove('pl-18');
+            this.el.classList.remove('with-icon');
             this._contentWrapper.classList.remove('px-6');
         }
 
@@ -122,8 +122,15 @@ class MDialog extends MComponent {
         });
     }
 
-    hide() {
+    hide(ignoreNewOnes = false) {
         assert($.dialog === 'm-dialog');
+
+        const nextDialog = this.el.nextElementSibling;
+
+        if (!ignoreNewOnes && nextDialog && nextDialog.classList.contains('m-dialog')) {
+            return; // No need to close this dialog, as it will be closed by the new opened one
+        }
+
         closeDialog();
     }
 

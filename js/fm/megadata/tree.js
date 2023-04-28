@@ -1365,7 +1365,7 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     else if (M.isDynPage(id_s)) {
         this.onSectionUIOpen(id_s);
     }
-    else if (M.isCustomView(id_s).type === 'gallery') {
+    else if (M.isGalleryPage(id_s)) {
         this.onSectionUIOpen(id_s);
     }
 

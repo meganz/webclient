@@ -70,9 +70,6 @@
 .p-6 {
     padding: 1.5rem;
 }
-.pl-18 {
-    padding-left: 4.5rem;
-}
 .pr-7 {
     padding-right: 1.75rem;
 }
@@ -103,6 +100,12 @@
 .py-10 {
     padding-top: 2.5rem;
     padding-bottom: 2.5rem;
+}
+.bottom-0 {
+    bottom: 0;
+}
+.left-0 {
+    left: 0;
 }
 .w-full {
     width: 100%;
@@ -146,6 +149,18 @@
 }
 .m-dropdown-item i {
     --icon-size: 24px;
+}
+body.rtl .m-dropdown-item i.mr-0 {
+    margin-left: 0;
+}
+body.rtl .m-dropdown-item i.ml-0 {
+    margin-right: 0;
+}
+body.rtl .m-dropdown-item i.mr-4 {
+    margin-left: 1rem;
+}
+body.rtl .m-dropdown-item i.ml-3 {
+    margin-right: 0.75rem;
 }
 .m-dropdown-item:not(.item-bold) {
     font-family: var(--text-font-family);
@@ -226,15 +241,21 @@
     top: 1.5rem;
     left: 1.75rem;
 }
+body.rtl .mega-dialog.m-dialog i.icon-left {
+    right: 1.75rem;
+}
+.mega-dialog.m-dialog.with-icon {
+    padding-left: 4.5rem;
+}
+body.rtl .mega-dialog.m-dialog.with-icon {
+    padding-right: 4.5rem;
+}
 .mega-dialog button.m-dialog-close {
     top: 1.5rem;
     right: 1.5rem;
 }
 .m-dialog-overlay {
     animation: fadein 0.3s ease;
-}
-.m-context {
-    animation: contextpopin 0.2s ease;
 }
 .grid-3-cols {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -257,6 +278,24 @@ i.text-color-medium {
 .rotating {
     animation: rotate 0.8s infinite linear;
 }
+.absolute {
+    position: absolute;
+}
+.relative {
+    position: relative;
+}
+.tooltip-popin {
+    animation: tooltippopin 0.2s ease;
+}
+.bg-surface-main {
+    background: var(--surface-main);
+}
+.rounded-2xl {
+    border-radius: 1rem;
+}
+.opacity-50 {
+    opacity: 0.5;
+}
 
 @keyframes dialogpopin
 {
@@ -270,7 +309,7 @@ i.text-color-medium {
     }
 }
 
-@keyframes contextpopin
+@keyframes tooltippopin
 {
     from {
         opacity: 0;

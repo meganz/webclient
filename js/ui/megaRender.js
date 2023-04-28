@@ -490,7 +490,7 @@
                         M.emptySharefolderUI(aListSelector);
                     }
                 }
-                else if (M.currentCustomView.type === 'gallery') {
+                else if (M.isGalleryPage()) {
                     const pagetype = M.currentdirid === M.currentCustomView.nodeID ? M.currentdirid : 'discovery';
 
                     $(`.fm-empty-${pagetype}`).removeClass('hidden');

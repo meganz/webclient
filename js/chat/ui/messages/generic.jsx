@@ -76,7 +76,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                     // prevent recursion
                     return;
                 }
-                if (e.target.classList.contains('no-thumb-prev')) {
+                if (e.target.classList.contains('no-thumb-prev') || $(e.target).parents('no-thumb-prev')) {
                     // do now show the dropdown clicking a previeable item without thumbnail
                     return;
                 }

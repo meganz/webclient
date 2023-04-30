@@ -1353,9 +1353,9 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.about_countries_info_text = escapeHTML(l.about_countries_info_text)
         .replace('[S]', '<span class="num">').replace('[/S]', '</span>')
         .replace('%1', '<span></span>');
-    l[23120] = escapeHTML(l[23120].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"');
-    l[23126] = escapeHTML(l[23126].replace(/&quot;|"/g, '%1')).replace(/\[BR]/g, '<br/>').replace(/%1/g, '"');
-    l[23181] = escapeHTML(l[23181].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"')
+    l[23120] = escapeHTML(l[23120]);
+    l[23126] = escapeHTML(l[23126]).replace(/\[BR]/g, '<br/>');
+    l[23181] = escapeHTML(l[23181])
         .replace('[A]', '<a class="clickurl" href="https://mega.io/terms" target="_blank">')
         .replace('[/A]', '</a>');
     l['23181.d'] = l[23181]
@@ -1577,7 +1577,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[BR]', '<br>');
     ['empty_call_dlg_text', 'empty_call_dlg_text_min', 'empty_call_dlg_text_sec'].forEach(s => {
         // Prevent double escaping
-        l[s] = escapeHTML(l[s].replace(/&gt;/g, '>'))
+        l[s] = escapeHTML(`${l[s]}`.replace(/&gt;/g, '>'))
             .replace(/\[S1]/g, '<span class="stay-dlg-counter">')
             .replace(/\[\/S1]/g, '</span>')
             .replace(/\[S2]/g, '<div class="stay-dlg-subtext">')
@@ -1616,10 +1616,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[i1]', '<i class="small-icon tab-icon"></i>')
         .replace('[i2]', '<i class="small-icon enter-icon left-pad"></i>');
 
-    l.file_request_upload_empty = l.file_request_upload_empty
+    l.file_request_upload_empty = escapeHTML(l.file_request_upload_empty)
         .replace('[A]', '<a class="upload-btn block-empty-upload-link" href="#">')
         .replace('[/A]', '</a>');
-    l.file_request_upload_caption_2 = l.file_request_upload_caption_2
+    l.file_request_upload_caption_2 = escapeHTML(l.file_request_upload_caption_2)
         .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/upload-file-request">')
         .replace('[/A]', '</a>');
 

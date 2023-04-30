@@ -2905,6 +2905,7 @@ function api_fareq(res, ctx, xhr) {
                 };
 
             faxhrs[slot].onreadystatechange = function (ev) {
+                if (faxhrs[this.fa_slot] && this.fah instanceof fa_handler && this.fah.done) {
                     this.onprogress(ev);
 
                     if (this.readyState === 4) {
@@ -2919,7 +2920,8 @@ function api_fareq(res, ctx, xhr) {
                         // no longer reusable to prevent memory leaks...
                         faxhrs[this.fa_slot] = null;
                     }
-                };
+                }
+            };
 
             if (ctx.p) {
                 var dp = 8 * Math.floor(m / pp.length * ctx.p.length / 8);

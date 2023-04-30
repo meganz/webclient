@@ -1977,6 +1977,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 var audio = s.hasAudio || '~' + s.hasUnsupportedAudio;
                 eventlog(99738, JSON.stringify([1, s.hasVideo, audio, s.options.type]));
             }
+            if (s.hasAudio && /\b[ae]+c-?3\b/i.test(s.hasAudio)) {
+                eventlog(99820, JSON.stringify([1, s.hasVideo, s.hasAudio, s.options.type]));
+            }
             mBroadcaster.sendMessage('trk:event', 'videostream', 'playing');
 
             if (!is_audio(node)) {

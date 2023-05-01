@@ -3431,7 +3431,7 @@ accountUI.fileManagement = {
             accountUI.inputs.switch.init(
                 '#hideProExpired',
                 $('#hideProExpired', accountUI.$contentBlock).parent(),
-                !((await mega.attr.get(u_handle, 'hideProExpired', false, true))[0] | 0),
+                (await Promise.resolve(mega.attr.get(u_handle, 'hideProExpired', false, true)).catch(() => []))[0] ^ 1,
                 val => {
                     mega.attr.set('hideProExpired', val ? '0' : '1', false, true);
                     showToast('settings', l[16168]);

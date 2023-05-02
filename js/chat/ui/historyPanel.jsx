@@ -1,17 +1,17 @@
 import React from 'react';
-import {MegaRenderMixin, SoonFcWrap} from "../mixins";
-import utils, { ParsedHTML } from "../../ui/utils.jsx";
-import {AltPartsConvMessage} from "./messages/alterParticipants.jsx";
-import {TruncatedMessage} from "./messages/truncated.jsx";
-import {PrivilegeChange} from "./messages/privilegeChange.jsx";
-import {TopicChange} from "./messages/topicChange.jsx";
-import {CloseOpenModeMessage} from "./messages/closeOpenMode.jsx";
-import {ChatHandleMessage} from "./messages/chatHandle.jsx";
+import { MegaRenderMixin, SoonFcWrap } from "../mixins.js";
+import { ParsedHTML } from "../../ui/utils.jsx";
+import { AltPartsConvMessage } from "./messages/alterParticipants.jsx";
+import { TruncatedMessage } from "./messages/truncated.jsx";
+import { PrivilegeChange } from "./messages/privilegeChange.jsx";
+import { TopicChange } from "./messages/topicChange.jsx";
+import { CloseOpenModeMessage } from "./messages/closeOpenMode.jsx";
+import { ChatHandleMessage } from "./messages/chatHandle.jsx";
 import GenericConversationMessage from "./messages/generic.jsx";
-import {PerfectScrollbar} from "../../ui/perfectScrollbar.jsx";
-import {RetentionChange} from "./messages/retentionChange.jsx";
+import { PerfectScrollbar } from "../../ui/perfectScrollbar.jsx";
+import { RetentionChange } from "./messages/retentionChange.jsx";
 import Call from './meetings/call.jsx';
-import ScheduleMetaChange from "./messages/scheduleMetaChange";
+import ScheduleMetaChange from "./messages/scheduleMetaChange.jsx";
 
 export default class HistoryPanel extends MegaRenderMixin {
     $container = null;
@@ -24,7 +24,7 @@ export default class HistoryPanel extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
-        this.handleWindowResize = SoonFc(80, (ev) => this._handleWindowResize(ev));
+        this.handleWindowResize = this._handleWindowResize.bind(this);
     }
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
@@ -251,44 +251,6 @@ export default class HistoryPanel extends MegaRenderMixin {
             }
         }
     }
-
-    @utils.SoonFcWrap(50)
-        onMessagesScrollReinitialise = (ps, $elem, forced, scrollPositionYPerc, scrollToElement) => {
-            const { chatRoom } = this.props;
-
-            // don't do anything if history is being retrieved at the moment.
-            if (this.scrollPullHistoryRetrieval || chatRoom.messagesBuff.isRetrievingHistory) {
-                return;
-            }
-
-            if (forced) {
-                if (!scrollPositionYPerc && !scrollToElement) {
-                    if (chatRoom.scrolledToBottom && !this.editDomElement) {
-                        // wait for the DOM update, if such.
-                        ps.scrollToBottom(true);
-                        return true;
-                    }
-                }
-                else {
-                    // don't do anything if the UI was forced to scroll to a specific pos.
-                    return;
-                }
-            }
-
-            if (this.isComponentEventuallyVisible()
-                && !this.editDomElement && !chatRoom.isScrollingToMessageId) {
-
-                if (chatRoom.scrolledToBottom) {
-                    ps.scrollToBottom(true);
-                    return true;
-                }
-
-                if (this.lastScrollPosition && this.lastScrollPosition !== ps.getScrollPositionY()) {
-                    ps.scrollToY(this.lastScrollPosition, true);
-                    return true;
-                }
-            }
-        };
 
     onMessagesScrollUserScroll = (ps, offset = 5) => {
         const { chatRoom } = this.props;
@@ -811,7 +773,6 @@ export default class HistoryPanel extends MegaRenderMixin {
                         ps.scrollToBottom(true);
                         this.props.chatRoom.scrolledToBottom = 1;
                     }}
-                    onReinitialise={this.onMessagesScrollReinitialise}
                     onUserScroll={this.onMessagesScrollUserScroll}
                     className="js-messages-scroll-area perfectScrollbarContainer"
                     messagesToggledInCall={this.state.messagesToggledInCall}

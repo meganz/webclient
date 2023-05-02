@@ -2891,7 +2891,9 @@ lazy(mega.gallery, 'albums', () => {
 
             this.el.album = scope.albums.store[albumId];
             this.el.album.setThumb = (dataUrl, fa) => {
-                this.setThumb(dataUrl, fa);
+                if (M.isAlbumsPage(1)) {
+                    this.setThumb(dataUrl, fa);
+                }
             };
 
             this.attachEvent('click', (evt) => {

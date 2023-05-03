@@ -272,19 +272,25 @@ mega.textEditorUI = new function TextEditorUI() {
                     const getSavedFile = function(fh) {
                         if (versionHandle) {
                             mega.fileTextEditor.removeOldVersion(versionHandle);
+                            versionHandle = fh;
                         }
                         else if (M.d[fileHandle] && M.d[fileHandle].s === 0) {
                             mega.fileTextEditor.removeOldVersion(fileHandle);
                             fileHandle = fh;
-                            fh = '';
+                            versionHandle = '';
                         }
-                        versionHandle = fh;
+                        else {
+                            versionHandle = fh;
+                        }
+
                         savedFileData = editor.getValue();
 
                         bindEventsListner();
 
                         if (fh) {
                             selectionManager.resetTo(fh, true);
+                            fileName = M.d[fh].name;
+                            $('.text-editor-file-name span', $editorContainer).text(fileName);
                         }
 
                         loadingDialog.hide();

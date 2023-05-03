@@ -11925,6 +11925,45 @@ class ConversationRightArea extends mixins.wl {
     chatRoom.setRetention(retentionTime);
     $(document).trigger('closeDropdowns');
   }
+  renderPushSettingsButton() {
+    const {
+      pushSettingsValue,
+      chatRoom,
+      onPushSettingsToggled,
+      onPushSettingsClicked
+    } = this.props;
+    const icon = pushSettingsValue || pushSettingsValue === 0 ? 'icon-notification-off-filled' : 'icon-notification-filled';
+    return external_React_default().createElement("div", {
+      className: "push-settings"
+    }, external_React_default().createElement("div", {
+      className: "chat-button-separator"
+    }), external_React_default().createElement(buttons.z, {
+      className: `
+                        link-button
+                        light
+                        push-settings-button
+                        ${chatRoom.isReadOnly() ? 'disabled' : ''}
+                    `,
+      icon: `
+                        sprite-fm-mono
+                        ${icon}
+                    `,
+      label: chatRoom.isMeeting ? l.meeting_notifications : l[16709],
+      secondLabel: (() => {
+        if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
+          return pushSettingsValue === 0 ? PushSettingsDialog.options[Infinity] : l[23539].replace('%s', toLocaleTime(pushSettingsValue));
+        }
+      })(),
+      secondLabelClass: "label--green",
+      toggle: chatRoom.isReadOnly() ? null : {
+        enabled: !pushSettingsValue && pushSettingsValue !== 0,
+        onClick: () => !pushSettingsValue && pushSettingsValue !== 0 ? onPushSettingsClicked() : onPushSettingsToggled()
+      },
+      onClick: () => chatRoom.isReadOnly() ? null : onPushSettingsClicked()
+    }), external_React_default().createElement("div", {
+      className: "chat-button-separator"
+    }));
+  }
   componentDidMount() {
     super.componentDidMount();
     megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => {
@@ -11938,7 +11977,8 @@ class ConversationRightArea extends mixins.wl {
     const {
       chatRoom: room,
       onStartCall,
-      occurrencesLoading
+      occurrencesLoading,
+      onShowScheduledDescription
     } = self.props;
     if (!room || !room.roomId) {
       return null;
@@ -12039,39 +12079,6 @@ class ConversationRightArea extends mixins.wl {
         }
       }, 1)
     });
-    const {
-      pushSettingsValue,
-      onPushSettingsToggled,
-      onPushSettingsClicked,
-      onShowScheduledDescription
-    } = this.props;
-    const pushSettingsIcon = pushSettingsValue || pushSettingsValue === 0 ? 'icon-notification-off-filled' : 'icon-notification-filled';
-    const pushSettingsBtn = !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && external_React_default().createElement("div", {
-      className: "push-settings"
-    }, AVseperator, external_React_default().createElement(buttons.z, {
-      className: `
-                        link-button
-                        light
-                        push-settings-button
-                        ${call.ZP.isGuest() ? 'disabled' : ''}
-                    `,
-      icon: `
-                        sprite-fm-mono
-                        ${pushSettingsIcon}
-                    `,
-      label: room.isMeeting ? l.meeting_notifications : l[16709],
-      secondLabel: (() => {
-        if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
-          return pushSettingsValue === 0 ? PushSettingsDialog.options[Infinity] : l[23539].replace('%s', toLocaleTime(pushSettingsValue));
-        }
-      })(),
-      secondLabelClass: "label--green",
-      toggle: call.ZP.isGuest() ? null : {
-        enabled: !pushSettingsValue && pushSettingsValue !== 0,
-        onClick: () => !pushSettingsValue && pushSettingsValue !== 0 ? onPushSettingsClicked() : onPushSettingsToggled()
-      },
-      onClick: () => call.ZP.isGuest() ? null : onPushSettingsClicked()
-    }), AVseperator);
     const openInviteBtn = room.type !== 'private' && external_React_default().createElement("div", {
       className: "open-invite-settings"
     }, external_React_default().createElement(buttons.z, {
@@ -12312,7 +12319,7 @@ class ConversationRightArea extends mixins.wl {
       onClick: () => {
         this.props.onAttachFromComputerClicked();
       }
-    })))), pushSettingsBtn, openInviteBtn, external_React_default().createElement(buttons.z, {
+    })))), this.renderPushSettingsButton(), openInviteBtn, external_React_default().createElement(buttons.z, {
       className: "link-button light clear-history-button",
       disabled: dontShowTruncateButton || !room.members.hasOwnProperty(u_handle),
       onClick: () => {

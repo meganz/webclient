@@ -25856,19 +25856,20 @@ class GenericConversationMessage extends mixin.y {
       }
     }
     $node.rebind('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES, function (e) {
-      if (e.target.classList.contains('button')) {
+      const $target = $(e.target);
+      if ($target.hasClass('button')) {
         return;
       }
-      if (e.target.classList.contains('no-thumb-prev') || $(e.target).parents('no-thumb-prev')) {
+      if ($target.hasClass('no-thumb-prev') || $target.parents('.no-thumb-prev').length) {
         return;
       }
-      var $block;
-      if ($(e.target).is('.shared-data')) {
-        $block = $(e.target);
-      } else if ($(e.target).is(".shared-info") || $(e.target).parents(".shared-info").length > 0) {
-        $block = $(e.target).is(".shared-info") ? $(e.target).next() : $(e.target).parents(".shared-info").next();
+      let $block;
+      if ($target.is('.shared-data')) {
+        $block = $target;
+      } else if ($target.is(".shared-info") || $target.parents(".shared-info").length > 0) {
+        $block = $target.is(".shared-info") ? $target.next() : $target.parents(".shared-info").next();
       } else {
-        $block = $(e.target).parents('.message.shared-data');
+        $block = $target.parents('.message.shared-data');
       }
       Soon(function () {
         $('.tiny-button', $block).trigger('click');

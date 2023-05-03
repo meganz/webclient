@@ -72,27 +72,31 @@ export default class GenericConversationMessage extends ConversationMessageMixin
             'click.dropdownShortcut',
             CLICKABLE_ATTACHMENT_CLASSES,
             function(e){
-                if (e.target.classList.contains('button')) {
+                const $target = $(e.target);
+                if ($target.hasClass('button')) {
                     // prevent recursion
                     return;
                 }
-                if (e.target.classList.contains('no-thumb-prev') || $(e.target).parents('no-thumb-prev')) {
-                    // do now show the dropdown clicking a previeable item without thumbnail
+                if (
+                    $target.hasClass('no-thumb-prev')
+                    || $target.parents('.no-thumb-prev').length
+                ) {
+                    // don't show the dropdown clicking an item without thumbnail but do when clicking the meta info
                     return;
                 }
 
-                var $block;
-                if ($(e.target).is('.shared-data')) {
-                    $block = $(e.target);
+                let $block;
+                if ($target.is('.shared-data')) {
+                    $block = $target;
                 }
                 else if (
-                    $(e.target).is(SHARED_INFO_CLS) || $(e.target).parents(SHARED_INFO_CLS).length > 0
+                    $target.is(SHARED_INFO_CLS) || $target.parents(SHARED_INFO_CLS).length > 0
                 ) {
-                    $block = $(e.target).is(SHARED_INFO_CLS) ?
-                        $(e.target).next() : $(e.target).parents(SHARED_INFO_CLS).next();
+                    $block = $target.is(SHARED_INFO_CLS) ?
+                        $target.next() : $target.parents(SHARED_INFO_CLS).next();
                 }
                 else {
-                    $block = $(e.target).parents('.message.shared-data');
+                    $block = $target.parents('.message.shared-data');
                 }
 
 

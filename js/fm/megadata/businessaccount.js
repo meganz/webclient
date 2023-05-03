@@ -1704,7 +1704,9 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
         }
     };
 
-    if (businessPlan.totalUsers > 0) {
+    // We need to make the uts request to add multiple sale IDs for Business,
+    // also for Pro Flexi (if there is previous invoice to be added to the total)
+    if (businessPlan.totalUsers > 0 || (u_attr.pf && businessPlan.currInvoice.et > 0)) {
         api_req(request, {
             callback: utcApiCallback
         });

@@ -4196,13 +4196,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     this.currentTreeType = M.treePanelType();
 
-    if (tmpId === 'cloud-drive' || tmpId === 'gallery') {
-        $('.nw-fm-left-icon.gallery', $fmholder).removeClass('hidden');
-    }
-    else {
-        $('.nw-fm-left-icon.gallery', $fmholder).addClass('hidden');
-    }
-
     $('.fm.fm-right-header, .fm-import-donwload-buttons', $fmholder).addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).off('click');
 

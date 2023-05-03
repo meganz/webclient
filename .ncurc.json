@@ -1,0 +1,8 @@
+{
+    "peer": true,
+    "cache": true,
+    "format": "ownerChanged, time",
+    "reject": [
+        "@types/react"
+    ]
+}

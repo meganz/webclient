@@ -71,14 +71,14 @@ class ChatOnboarding {
                 for (let i = 0; i < res.length; ++i) {
                     const v = res[i];
                     if (v.status === 'fulfilled') {
-                        this.state[keys[i]] = v.value;
+                        this.handleFlagChange(null, null, keys[i], v.value);
                     }
                 }
             });
 
             this.interval = setInterval(() => {
                 if (!$.dialog) {
-                    this.checkAndShowStep();
+                    this._checkAndShowStep();
                 }
             }, 10000);
 
@@ -93,7 +93,7 @@ class ChatOnboarding {
             if (this.megaChat.chatUIFlags.convPanelCollapse && $.dialog === 'onboardingDialog') {
                 closeDialog();
             }
-            this.checkAndShowStep();
+            this._checkAndShowStep();
         }));
 
         this.megaChat.addChangeListener(() => {
@@ -249,6 +249,10 @@ class ChatOnboarding {
 
     @SoonFcWrap(1000)
     checkAndShowStep() {
+        this._checkAndShowStep();
+    }
+
+    _checkAndShowStep() {
         if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active || u_type < 3 || is_mobile) {
             // Invalid state to show or onboarding isn't ready
             return;
@@ -317,7 +321,7 @@ class ChatOnboarding {
                 this.flagMap.isReady().always(() => {
                     this.flagMap.setSync(OBV4_FLAGS.CHAT_SCHEDULE_START, 1);
                     this.flagMap.safeCommit();
-                    this.checkAndShowStep();
+                    this._checkAndShowStep();
                 });
                 return;
             }

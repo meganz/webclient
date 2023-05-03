@@ -478,19 +478,23 @@ accountUI.general = {
         // Show Membership plan
         $('.account .plan-icon', $dashboardPane).removeClass('pro1 pro2 pro3 pro4 pro100 pro101 free');
 
-        if (u_attr.p) {
+        let planClass = 'free';
+        let planText = l[1150];
 
-            // LITE/PRO account
-            var planNum = u_attr.p;
-            var planText = pro.getProPlanName(planNum);
+        // If Business always show the Business icon & name (even if expired, which is when u_attr.p is undefined)
+        if (u_attr.b) {
+            planClass = 'pro' + pro.ACCOUNT_LEVEL_BUSINESS;
+            planText = pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS);
+        }
 
-            $('.account.membership-plan', $dashboardPane).text(planText);
-            $('.account .plan-icon', $dashboardPane).addClass('pro' + planNum);
+        // Otherwise if it's an active Pro I-III/Lite/Flexi account
+        else if (u_attr.p) {
+            planClass = 'pro' + u_attr.p;
+            planText = pro.getProPlanName(u_attr.p);
         }
-        else {
-            $('.account .plan-icon', $dashboardPane).addClass('free');
-            $('.account.membership-plan', $dashboardPane).text(l[1150]);
-        }
+
+        $('.account .plan-icon', $dashboardPane).addClass(planClass);
+        $('.account.membership-plan', $dashboardPane).text(planText);
 
         // update avatar
         $('.fm-account-avatar', $fmContent).safeHTML(useravatar.contact(u_handle, '', 'div', false));
@@ -1985,6 +1989,14 @@ accountUI.plan = {
                 }
             }
 
+            // If Business, override to show the Business name (even if expired, which is when u_attr.p is undefined)
+            if (u_attr.b) {
+                $('.account.plan-info.accounttype', $planContent).addClass('business');
+                $('.account.plan-info.accounttype span', $planContent).text(
+                    pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS)
+                );
+            }
+
             /* achievements */
             if (!account.maf ||
                 (u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS && u_attr.b && u_attr.b.m) ||
@@ -3068,6 +3080,18 @@ accountUI.fileManagement = {
         // Drag and Drop
         this.dragAndDrop.render();
 
+        // Delete confirmation
+        this.delConfirm.render();
+
+        // Password reminder dialog
+        this.passReminder.render();
+
+        // Chat related dialogs (multiple option but share attribute)
+        this.chatDialogs.render();
+
+        // Pro expiry
+        this.proExpiry.render();
+
         // Public Links
         this.publicLinks.render();
     },
@@ -3348,6 +3372,85 @@ accountUI.fileManagement = {
         }
     },
 
+    delConfirm: {
+
+        render: function() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#skipDelWarning',
+                $('#skipDelWarning', accountUI.$contentBlock).parent(),
+                !mega.config.get('skipDelWarning'),
+                val => mega.config.setn('skipDelWarning', val ? undefined : 1)
+            );
+        }
+    },
+
+    passReminder: {
+
+        render: function() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#prd',
+                $('#prd', accountUI.$contentBlock).parent(),
+                !mega.ui.passwordReminderDialog.passwordReminderAttribute.dontShowAgain,
+                val => {
+                    mega.ui.passwordReminderDialog.passwordReminderAttribute.dontShowAgain = val ^ 1;
+                    showToast('settings', l[16168]);
+                });
+        }
+    },
+
+    chatDialogs: {
+
+        render: function() {
+            'use strict';
+
+            const $switches = $('.dialog-options .chat-dialog', accountUI.$contentBlock);
+            const rawVal = mega.config.get('xcod');
+            const _set = (id, val, subtype) => {
+
+                if (val) {
+                    mega.config.setn('xcod', mega.config.get(id) & ~(1 << subtype));
+                }
+                else {
+                    mega.config.setn('xcod', mega.config.get(id) | 1 << subtype);
+                }
+            };
+
+            for (let i = $switches.length; i--;) {
+
+                const elm = $switches[i];
+                const [id, subtype] = elm.id.split('-');
+                const currVal = rawVal >> subtype & 1;
+
+                accountUI.inputs.switch.init(
+                    '.mega-switch',
+                    $(elm).parent(),
+                    !currVal,
+                    val => _set(id, val, subtype)
+                );
+            }
+        }
+    },
+
+    proExpiry: {
+
+        render: async function() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#hideProExpired',
+                $('#hideProExpired', accountUI.$contentBlock).parent(),
+                (await Promise.resolve(mega.attr.get(u_handle, 'hideProExpired', false, true)).catch(() => []))[0] ^ 1,
+                val => {
+                    mega.attr.set('hideProExpired', val ? '0' : '1', false, true);
+                    showToast('settings', l[16168]);
+                });
+        }
+    },
+
     publicLinks: {
         render: function() {
             'use strict';
@@ -3357,10 +3460,9 @@ accountUI.fileManagement = {
             accountUI.inputs.switch.init(
                 warnplinkId,
                 $(warnplinkId, accountUI.$contentBlock).parent(),
-                mega.config.get('nowarnpl'),
-                (val) => {
-                    mega.config.setn('nowarnpl', val);
-                });
+                !mega.config.get('nowarnpl'),
+                val => mega.config.setn('nowarnpl', val ^ 1)
+            );
         }
     },
 };

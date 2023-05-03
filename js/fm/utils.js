@@ -1873,7 +1873,11 @@ MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
         storageBlock.classList.add('warning');
     }
 
-    if (u_attr.p) {
+    // If Business always show the Business name (even if expired, which is when u_attr.p is undefined)
+    if (u_attr.b) {
+        storageBlock.querySelector('.plan').textContent = pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS);
+    }
+    else if (u_attr.p) {
         storageBlock.querySelector('.plan').textContent = pro.getProPlanName(u_attr.p);
     }
     else {

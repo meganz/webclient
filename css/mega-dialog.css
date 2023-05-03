@@ -35,7 +35,9 @@
             z-index: 1111;
         }
 
-        .mega-dialog-container.msg-dialog-container,
+        .mega-dialog-container.msg-dialog-container {
+            z-index: 1116;
+        }
         .fm-modal-dialog {
             z-index: 1115;
         }

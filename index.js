@@ -2429,8 +2429,16 @@ function topmenuUI() {
             $menuPricingItem.addClass('hidden');
         }
 
+        document.body.classList.remove('free', 'lite', 'pro-user');
+
+        // If Business always show the Business icon & name (even if expired, which is when u_attr.p is undefined)
+        if (u_attr.b) {
+            $('.plan', $menuLoggedBlock).text(pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS));
+            document.body.classList.add('pro-user');
+        }
+
         // If a Lite/Pro plan has been purchased
-        if (u_attr.p) {
+        else if (u_attr.p) {
 
             // Set the plan text
             var proNum = u_attr.p;
@@ -2439,15 +2447,12 @@ function topmenuUI() {
             // Set colour of plan and body class
             var cssClass;
 
-            document.body.classList.remove('free');
-
             if (proNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
                 cssClass = 'lite';
                 document.body.classList.add('lite');
             }
             else {
                 cssClass = 'pro' + proNum;
-                document.body.classList.remove('lite');
             }
 
             // Show the Pro badge
@@ -2458,7 +2463,6 @@ function topmenuUI() {
             // Show the free badge
             $('.plan', $menuLoggedBlock).text(l[1150]);
             $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
-            document.body.classList.remove('lite', 'pro-user');
             document.body.classList.add('free');
         }
 
@@ -2917,7 +2921,7 @@ function topmenuUI() {
                     }
                 }
                 $tooltip.addClass('hovered');
-            }, 1000);
+            }, 100);
     })
         .rebind('mouseout.nw-fm-left-icon', function () {
             $(this).find('.dark-tooltip').removeClass('hovered');

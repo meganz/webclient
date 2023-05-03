@@ -609,7 +609,7 @@ class Minimized extends MegaRenderMixin {
                         icon="sprite-fm-mono icon-fullscreen-enter"
                         onClick={ev => {
                             ev.stopPropagation();
-                            onCallExpand();
+                            this.props.onCallExpand();
                         }}
                     />
                     {this.renderStreamControls()}

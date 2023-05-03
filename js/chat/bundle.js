@@ -15,8 +15,8 @@ var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: external "ReactDOM"
 var external_ReactDOM_ = __webpack_require__(533);
 var external_ReactDOM_default = __webpack_require__.n(external_ReactDOM_);
-// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 14 modules
-var conversations = __webpack_require__(222);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 20 modules
+var conversations = __webpack_require__(978);
 ;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
 class ChatRouting {
   constructor(megaChatInstance) {
@@ -1201,13 +1201,13 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
         for (let i = 0; i < res.length; ++i) {
           const v = res[i];
           if (v.status === 'fulfilled') {
-            this.state[keys[i]] = v.value;
+            this.handleFlagChange(null, null, keys[i], v.value);
           }
         }
       });
       this.interval = setInterval(() => {
         if (!$.dialog) {
-          this.checkAndShowStep();
+          this._checkAndShowStep();
         }
       }, 10000);
       this.initListeners();
@@ -1219,7 +1219,7 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
       if (this.megaChat.chatUIFlags.convPanelCollapse && $.dialog === 'onboardingDialog') {
         closeDialog();
       }
-      this.checkAndShowStep();
+      this._checkAndShowStep();
     }));
     this.megaChat.addChangeListener(() => {
       const room = this.megaChat.getCurrentRoom();
@@ -1327,6 +1327,9 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
     mega.ui.onboarding.$hotSpotNode = $(this.feedbackMap.actions[0].targetElmClass);
   }
   checkAndShowStep() {
+    this._checkAndShowStep();
+  }
+  _checkAndShowStep() {
     if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active || u_type < 3 || is_mobile) {
       return;
     }
@@ -1371,7 +1374,7 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
         this.flagMap.isReady().always(() => {
           this.flagMap.setSync(OBV4_FLAGS.CHAT_SCHEDULE_START, 1);
           this.flagMap.safeCommit();
-          this.checkAndShowStep();
+          this._checkAndShowStep();
         });
         return;
       }
@@ -11564,13 +11567,10 @@ Alert.TYPE = {
 };
 // EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
 var helpers = __webpack_require__(435);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/recurring.jsx
-var recurring = __webpack_require__(340);
 ;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
 var conversationpanel_dec, _dec2, conversationpanel_class;
-
 
 
 
@@ -11835,10 +11835,7 @@ class Occurrences extends mixins.wl {
       }, external_React_default().createElement(buttons.z, {
         icon: "sprite-fm-mono icon-rename",
         onClick: () => {
-          this.setState({
-            editDialog: true,
-            occurrenceId: occurrence.uid
-          });
+          megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, occurrence);
         }
       })), external_React_default().createElement("div", {
         className: "chat-occurrence-control simpletip",
@@ -11876,16 +11873,7 @@ class Occurrences extends mixins.wl {
       }
     }, external_React_default().createElement("div", {
       className: "chat-occurrences-list-inner"
-    }, this.renderOccurrences()))), editDialog && external_React_default().createElement(recurring.I, {
-      chatRoom: chatRoom,
-      scheduledMeeting: scheduledMeeting,
-      occurrenceId: occurrenceId,
-      onClose: () => {
-        this.setState({
-          editDialog: false
-        });
-      }
-    }));
+    }, this.renderOccurrences()))));
   }
 }
 class ConversationRightArea extends mixins.wl {
@@ -12487,6 +12475,9 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     }
   }
   toggleExpandedFlag() {
+    if (this.props.onToggleExpandedFlag) {
+      this.props.onToggleExpandedFlag();
+    }
     return document.body.classList[call.ZP.isExpanded() ? 'remove' : 'add'](call.F3);
   }
   startCall(type, scheduled) {
@@ -13472,7 +13463,8 @@ class ConversationPanels extends mixins.wl {
   render() {
     const {
       className,
-      chatUIFlags
+      chatUIFlags,
+      onToggleExpandedFlag
     } = this.props;
     const now = Date.now();
     return external_React_default().createElement("div", {
@@ -13491,6 +13483,7 @@ class ConversationPanels extends mixins.wl {
           messagesBuff: chatRoom.messagesBuff,
           chatUIFlags: chatUIFlags,
           alert: this.state.alert,
+          onToggleExpandedFlag: onToggleExpandedFlag,
           onAlertClose: this.handleAlertClose
         });
       }
@@ -13554,7 +13547,7 @@ function isStartCallDisabled(room) {
 
 /***/ }),
 
-/***/ 222:
+/***/ 978:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -13746,8 +13739,2106 @@ Start.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
-// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx + 1 modules
-var schedule = __webpack_require__(158);
+// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
+var perfectScrollbar = __webpack_require__(285);
+// EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
+var ui_contacts = __webpack_require__(13);
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/invite.jsx
+
+
+
+
+
+class Invite extends mixins.wl {
+  constructor(props) {
+    super(props);
+    this.containerRef = external_React_default().createRef();
+    this.wrapperRef = external_React_default().createRef();
+    this.state = {
+      value: '',
+      expanded: false,
+      loading: true,
+      frequents: [],
+      frequentsInitial: [],
+      contacts: [],
+      contactsInitial: [],
+      selected: []
+    };
+    this.handleMousedown = ({
+      target
+    }) => this.containerRef && this.containerRef.current && this.containerRef.current.contains(target) ? null : this.setState({
+      expanded: false
+    });
+    this.getSortedContactsList = frequents => {
+      const filteredContacts = [];
+      M.u.forEach(contact => {
+        if (contact.c === 1 && !frequents.includes(contact.u) && !this.state.selected.includes(contact.u)) {
+          filteredContacts.push(contact);
+        }
+      });
+      const sortFn = M.getSortByNameFn2(1);
+      filteredContacts.sort((a, b) => sortFn(a, b));
+      return filteredContacts;
+    };
+    this.doMatch = (value, collection) => {
+      value = value.toLowerCase();
+      return collection.filter(contact => {
+        contact = typeof contact === 'string' ? M.getUserByHandle(contact) : contact;
+        const name = M.getNameByHandle(contact.u).toLowerCase();
+        const email = contact.m && contact.m.toLowerCase();
+        return name.includes(value) || email.includes(value);
+      });
+    };
+    this.handleSearch = this.handleSearch.bind(this);
+    this.state.selected = this.props.participants || [];
+  }
+  reinitializeWrapper() {
+    const wrapperRef = this.wrapperRef && this.wrapperRef.current;
+    if (wrapperRef) {
+      wrapperRef.reinitialise();
+      wrapperRef.scrollToY(0);
+    }
+  }
+  buildContactsList() {
+    megaChat.getFrequentContacts().then(frequentContacts => {
+      if (this.isMounted()) {
+        const frequents = frequentContacts.slice(-ui_contacts.MAX_FREQUENTS).map(c => c.userId);
+        const contacts = this.getSortedContactsList(frequents);
+        this.setState({
+          frequents,
+          frequentsInitial: frequents,
+          contacts,
+          contactsInitial: contacts,
+          loading: false
+        });
+      }
+    });
+  }
+  handleSearch(ev) {
+    const {
+      value
+    } = ev.target;
+    const searching = value.length >= 2;
+    const frequents = searching ? this.doMatch(value, this.state.frequentsInitial) : this.state.frequentsInitial;
+    const contacts = searching ? this.doMatch(value, this.state.contactsInitial) : this.state.contactsInitial;
+    this.setState({
+      value,
+      contacts,
+      frequents
+    }, () => this.reinitializeWrapper());
+  }
+  handleSelect(userHandle, expanded = false) {
+    this.setState(state => ({
+      value: '',
+      expanded,
+      selected: state.selected.includes(userHandle) ? state.selected.filter(c => c !== userHandle) : [...state.selected, userHandle]
+    }), () => {
+      this.props.onSelect(this.state.selected);
+      this.buildContactsList();
+      this.reinitializeWrapper();
+    });
+  }
+  getFilteredContacts(contacts) {
+    if (contacts && contacts.length) {
+      return contacts.map(contact => {
+        contact = contact instanceof MegaDataMap ? contact : M.u[contact];
+        return this.state.selected.includes(contact.u) ? null : external_React_default().createElement("div", {
+          key: contact.u,
+          className: "invite-section-item",
+          onClick: () => {
+            this.handleSelect(contact.u);
+          }
+        }, external_React_default().createElement(ui_contacts.Avatar, {
+          contact: contact
+        }), external_React_default().createElement("div", {
+          className: "invite-item-data"
+        }, external_React_default().createElement("div", {
+          className: "invite-item-name"
+        }, external_React_default().createElement(utils.a0, {
+          simpletip: {
+            offset: 10
+          }
+        }, M.getNameByHandle(contact.u))), external_React_default().createElement("div", {
+          className: "invite-item-mail"
+        }, contact.m)));
+      });
+    }
+    return null;
+  }
+  renderContent() {
+    const {
+      frequents,
+      contacts,
+      selected
+    } = this.state;
+    const hasMoreFrequents = frequents.length && frequents.some(h => !selected.includes(h));
+    const $$SECTION = (title, children) => external_React_default().createElement("div", {
+      className: "invite-section"
+    }, external_React_default().createElement("div", {
+      className: "invite-section-title"
+    }, title), children && external_React_default().createElement("div", {
+      className: "invite-section-list"
+    }, children));
+    if (hasMoreFrequents || contacts.length) {
+      return external_React_default().createElement(perfectScrollbar.F, {
+        ref: this.wrapperRef,
+        className: "invite-scroll-wrapper",
+        options: {
+          'suppressScrollX': true
+        }
+      }, hasMoreFrequents ? $$SECTION(l.recent_contact_label, this.getFilteredContacts(frequents)) : '', contacts.length ? $$SECTION(l.all_contact_label, this.getFilteredContacts(contacts)) : '', frequents.length === 0 && contacts.length === 0 && $$SECTION(l.invite_no_results_found, null));
+    }
+    return $$SECTION(l.invite_no_contacts_to_add, null);
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    document.removeEventListener('mousedown', this.handleMousedown);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    document.addEventListener('mousedown', this.handleMousedown);
+    this.buildContactsList();
+  }
+  render() {
+    const {
+      value,
+      expanded,
+      loading,
+      selected
+    } = this.state;
+    return external_React_default().createElement("div", {
+      ref: this.containerRef,
+      className: `
+                    ${Invite.NAMESPACE}
+                    ${this.props.className || ''}
+                `
+    }, external_React_default().createElement("div", {
+      className: "multiple-input"
+    }, external_React_default().createElement("ul", {
+      className: "token-input-list-mega",
+      onClick: ev => ev.target.classList.contains('token-input-list-mega') && this.setState({
+        expanded: true
+      })
+    }, selected.map(handle => {
+      return external_React_default().createElement("li", {
+        key: handle,
+        className: "token-input-token-mega"
+      }, external_React_default().createElement("div", {
+        className: "contact-tag-item"
+      }, external_React_default().createElement(ui_contacts.Avatar, {
+        contact: M.u[handle],
+        className: "avatar-wrapper box-avatar"
+      }), external_React_default().createElement(utils.a0, null, M.getNameByHandle(handle)), external_React_default().createElement("i", {
+        className: "sprite-fm-mono icon-close-component",
+        onClick: () => {
+          this.handleSelect(handle);
+        }
+      })));
+    }), external_React_default().createElement("li", {
+      className: "token-input-input-token-mega"
+    }, external_React_default().createElement("input", {
+      type: "text",
+      name: "participants",
+      className: `${Invite.NAMESPACE}-input`,
+      autoComplete: "off",
+      placeholder: selected.length ? '' : l.schedule_participant_input,
+      value: value,
+      onFocus: () => this.setState({
+        expanded: true
+      }),
+      onChange: this.handleSearch,
+      onKeyDown: ({
+        target,
+        keyCode
+      }) => {
+        const {
+          selected
+        } = this.state;
+        return keyCode === 8 && target.value === '' && selected.length && this.handleSelect(selected[selected.length - 1], true);
+      }
+    })))), loading ? null : external_React_default().createElement("div", {
+      className: `mega-input-dropdown ${expanded ? '' : 'hidden'}`
+    }, this.renderContent()));
+  }
+}
+Invite.NAMESPACE = 'meetings-invite';
+// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
+var helpers = __webpack_require__(435);
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/datepicker.jsx
+
+
+class Datepicker extends mixins.wl {
+  constructor(props) {
+    super(props);
+    this.OPTIONS = {
+      classes: 'meetings-datepicker-calendar',
+      dateFormat: '@',
+      minDate: null,
+      startDate: null,
+      selectedDates: [],
+      prevHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
+      nextHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
+      altField: null,
+      firstDay: 0,
+      autoClose: true,
+      toggleSelected: false,
+      position: 'bottom left',
+      language: {
+        daysMin: [l[8763], l[8764], l[8765], l[8766], l[8767], l[8768], l[8769]],
+        months: [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]],
+        monthsShort: [l[24035], l[24037], l[24036], l[24038], l[24047], l[24039], l[24040], l[24041], l[24042], l[24043], l[24044], l[24045]]
+      },
+      onSelect: dateText => {
+        const prevDate = new Date(+this.props.value);
+        const nextDate = new Date(+dateText);
+        nextDate.setHours(prevDate.getHours(), prevDate.getMinutes());
+        return this.props.onSelect(nextDate.getTime());
+      }
+    };
+    this.containerRef = external_React_default().createRef();
+    this.inputRef = external_React_default().createRef();
+    this.datepicker = null;
+    this.formatValue = value => {
+      if (typeof value === 'number') {
+        return time2date(value / 1000, 18);
+      }
+      return value;
+    };
+    this.OPTIONS.startDate = new Date(this.props.startDate);
+    this.OPTIONS.selectedDates = this.props.selectedDates || [this.OPTIONS.startDate];
+    this.OPTIONS.minDate = this.props.minDate ? new Date(this.props.minDate) : new Date();
+    this.OPTIONS.position = this.props.position || this.OPTIONS.position;
+    this.OPTIONS.altField = `input.${this.props.altField}`;
+  }
+  initialize() {
+    const inputRef = this.inputRef && this.inputRef.current;
+    if (inputRef) {
+      var _this$props$onMount, _this$props;
+      $(inputRef).datepicker(this.OPTIONS);
+      this.datepicker = $(inputRef).data('datepicker');
+      (_this$props$onMount = (_this$props = this.props).onMount) == null ? void 0 : _this$props$onMount.call(_this$props, this.datepicker);
+    }
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if (this.containerRef && this.containerRef.current) {
+      $(this.containerRef.current).unbind(`keyup.${Datepicker.NAMESPACE}`);
+    }
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    M.require('datepicker_js').done(() => this.initialize());
+    if (this.containerRef && this.containerRef.current) {
+      $(this.containerRef.current).rebind(`keyup.${Datepicker.NAMESPACE}`, ({
+        keyCode
+      }) => {
+        if (keyCode === 13) {
+          this.datepicker.hide();
+          return false;
+        }
+      });
+    }
+  }
+  render() {
+    const {
+      NAMESPACE
+    } = Datepicker;
+    const {
+      value,
+      name,
+      className,
+      placeholder,
+      onFocus,
+      onChange,
+      onBlur
+    } = this.props;
+    const formattedValue = this.formatValue(value);
+    return external_React_default().createElement("div", {
+      ref: this.containerRef,
+      className: NAMESPACE
+    }, external_React_default().createElement("div", {
+      className: "mega-input datepicker-input"
+    }, external_React_default().createElement("input", {
+      ref: this.inputRef,
+      type: "text",
+      name: name,
+      className: `
+                            dialog-input
+                            ${className || ''}
+                        `,
+      autoComplete: "off",
+      placeholder: placeholder || '',
+      value: formattedValue,
+      onFocus: ev => onFocus == null ? void 0 : onFocus(ev),
+      onChange: ev => onChange == null ? void 0 : onChange(ev),
+      onBlur: ev => onBlur == null ? void 0 : onBlur(ev)
+    }), external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-calendar1",
+      onClick: () => this.datepicker && this.datepicker.show()
+    })));
+  }
+}
+Datepicker.NAMESPACE = 'meetings-datepicker';
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/select.jsx
+
+
+
+
+class Select extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.containerRef = external_React_default().createRef();
+    this.inputRef = external_React_default().createRef();
+    this.menuRef = external_React_default().createRef();
+    this.optionRefs = {};
+    this.state = {
+      expanded: false,
+      manualTimeInput: '',
+      timestamp: ''
+    };
+    this.handleMousedown = ({
+      target
+    }) => {
+      var _this$containerRef;
+      return (_this$containerRef = this.containerRef) != null && _this$containerRef.current.contains(target) ? null : this.setState({
+        expanded: false
+      });
+    };
+    this.handleToggle = () => {
+      const {
+        value
+      } = this.props;
+      this.setState(state => ({
+        expanded: !state.expanded
+      }), () => {
+        if (value && this.optionRefs[value]) {
+          this.menuRef.current.scrollToElement(this.optionRefs[value]);
+        }
+      });
+    };
+  }
+  getFormattedDuration(duration) {
+    duration = moment.duration(duration);
+    const hours = duration.get('hours');
+    const minutes = duration.get('minutes');
+    if (!hours && !minutes) {
+      return '';
+    }
+    if (!hours && minutes) {
+      return '([[MINUTES]]\u00a0m)'.replace('[[MINUTES]]', minutes);
+    }
+    return (minutes ? '([[HOURS]]\u00a0h [[MINUTES]]\u00a0m)' : '([[HOURS]]\u00a0h)').replace('[[HOURS]]', hours).replace('[[MINUTES]]', minutes);
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    document.removeEventListener('mousedown', this.handleMousedown);
+    if (this.inputRef && this.inputRef.current) {
+      $(this.inputRef.current).unbind(`keyup.${Select.NAMESPACE}`);
+    }
+  }
+  componentDidMount() {
+    var _this$inputRef;
+    super.componentDidMount();
+    document.addEventListener('mousedown', this.handleMousedown);
+    const inputRef = (_this$inputRef = this.inputRef) == null ? void 0 : _this$inputRef.current;
+    if (inputRef) {
+      $(inputRef).rebind(`keyup.${Select.NAMESPACE}`, ({
+        keyCode
+      }) => {
+        if (keyCode === 13) {
+          this.handleToggle();
+          inputRef.blur();
+          return false;
+        }
+      });
+    }
+  }
+  render() {
+    const {
+      NAMESPACE
+    } = Select;
+    const {
+      name,
+      className,
+      icon,
+      typeable,
+      options,
+      value,
+      format,
+      onChange,
+      onBlur,
+      onSelect
+    } = this.props;
+    return external_React_default().createElement("div", {
+      ref: this.containerRef,
+      className: `
+                    ${NAMESPACE}
+                    ${className || ''}
+                `
+    }, external_React_default().createElement("div", {
+      className: `
+                        mega-input
+                        dropdown-input
+                        ${typeable ? 'typeable' : ''}
+                    `,
+      onClick: this.handleToggle
+    }, typeable ? null : value && external_React_default().createElement("span", null, format ? format(value) : value), external_React_default().createElement("input", {
+      ref: this.inputRef,
+      type: "text",
+      className: `
+                            ${NAMESPACE}-input
+                            ${name}
+                        `,
+      value: (() => {
+        if (this.state.manualTimeInput) {
+          return this.state.manualTimeInput;
+        }
+        return format ? format(value) : value;
+      })(),
+      onFocus: ({
+        target
+      }) => {
+        this.setState({
+          manualTimeInput: '',
+          timestamp: ''
+        }, () => target.select());
+      },
+      onChange: ({
+        target
+      }) => {
+        const {
+          value: manualTimeInput
+        } = target;
+        const {
+          value
+        } = this.props;
+        const prevDate = moment(value);
+        const inputTime = (0,helpers.K6)(manualTimeInput);
+        prevDate.set({
+          hours: inputTime.get('hours'),
+          minutes: inputTime.get('minutes')
+        });
+        const timestamp = prevDate.valueOf();
+        onChange == null ? void 0 : onChange(timestamp);
+        if (this.optionRefs[value]) {
+          this.menuRef.current.scrollToElement(this.optionRefs[value]);
+        }
+        this.setState({
+          manualTimeInput,
+          timestamp
+        });
+      },
+      onBlur: () => {
+        onBlur(this.state.timestamp);
+        this.setState({
+          manualTimeInput: '',
+          timestamp: ''
+        });
+      }
+    }), icon && external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-dropdown"
+    }), options && external_React_default().createElement("div", {
+      className: `
+                                mega-input-dropdown
+                                ${this.state.expanded ? '' : 'hidden'}
+                            `
+    }, external_React_default().createElement(perfectScrollbar.F, {
+      ref: this.menuRef,
+      options: {
+        suppressScrollX: true
+      }
+    }, options.map(option => {
+      return external_React_default().createElement("div", {
+        ref: ref => {
+          this.optionRefs[option.value] = ref;
+        },
+        key: option.value,
+        className: `
+                                                option
+                                                ${option.value === value || option.label === value ? 'active' : ''}
+                                            `,
+        onClick: () => onSelect(option)
+      }, option.label, "\xA0", option.duration && this.getFormattedDuration(option.duration));
+    })))));
+  }
+}
+Select.NAMESPACE = 'meetings-select';
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/datetime.jsx
+
+
+
+
+
+class DateTime extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.state = {
+      datepickerRef: undefined,
+      manualDateInput: '',
+      manualTimeInput: '',
+      initialDate: ''
+    };
+    this.handleChange = ev => {
+      const {
+        onChange
+      } = this.props;
+      const {
+        datepickerRef,
+        initialDate
+      } = this.state;
+      if (!datepickerRef) {
+        return;
+      }
+      const {
+        value
+      } = ev.target;
+      const date = (0,helpers.p6)(value);
+      const timestamp = date.valueOf();
+      const dateObj = new Date(timestamp);
+      dateObj.setHours(initialDate.getHours(), initialDate.getMinutes());
+      datepickerRef.selectedDates = [dateObj];
+      datepickerRef.currentDate = dateObj;
+      datepickerRef.nav._render();
+      datepickerRef.views.days._render();
+      onChange == null ? void 0 : onChange(value);
+      this.setState({
+        manualDateInput: dateObj.getTime()
+      });
+    };
+  }
+  render() {
+    const {
+      name,
+      startDate,
+      altField,
+      value,
+      minDate,
+      filteredTimeIntervals,
+      label,
+      isLoading,
+      onMount,
+      onSelectDate,
+      onSelectTime,
+      onBlur
+    } = this.props;
+    return external_React_default().createElement((external_React_default()).Fragment, null, label && external_React_default().createElement("span", null, label), external_React_default().createElement(Datepicker, {
+      name: `${Datepicker.NAMESPACE}-${name}`,
+      className: isLoading ? 'disabled' : '',
+      startDate: startDate,
+      altField: `${Select.NAMESPACE}-${altField}`,
+      value: value,
+      minDate: minDate,
+      onMount: datepickerRef => this.setState({
+        datepickerRef
+      }, () => onMount(datepickerRef)),
+      onSelect: onSelectDate,
+      onFocus: ({
+        target
+      }) => {
+        this.setState({
+          manualDateInput: undefined,
+          manualTimeInput: undefined,
+          initialDate: new Date(value)
+        }, () => target.select());
+      },
+      onChange: this.handleChange,
+      onBlur: () => onBlur(this.state.manualDateInput)
+    }), external_React_default().createElement(Select, {
+      name: `${Select.NAMESPACE}-${altField}`,
+      className: isLoading ? 'disabled' : '',
+      typeable: true,
+      options: filteredTimeIntervals,
+      value: (() => typeof value === 'number' ? value : this.state.datepickerRef.currentDate.getTime())(),
+      format: toLocaleTime,
+      onSelect: onSelectTime,
+      onChange: () => false,
+      onBlur: timestamp => {
+        if (timestamp) {
+          onSelectTime({
+            value: timestamp
+          });
+        }
+      }
+    }));
+  }
+}
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/recurring.jsx
+
+
+
+
+
+
+
+
+
+
+
+
+class Recurring extends mixins.wl {
+  constructor(props) {
+    var _Object$values$find;
+    super(props);
+    this.VIEWS = {
+      DAILY: 0x00,
+      WEEKLY: 0x01,
+      MONTHLY: 0x02
+    };
+    this.FREQUENCIES = {
+      DAILY: 'd',
+      WEEKLY: 'w',
+      MONTHLY: 'm'
+    };
+    this.WEEK_DAYS = {
+      MONDAY: {
+        value: 1,
+        label: l.schedule_day_control_mon,
+        name: l.schedule_occur_mon
+      },
+      TUESDAY: {
+        value: 2,
+        label: l.schedule_day_control_tue,
+        name: l.schedule_occur_tue
+      },
+      WEDNESDAY: {
+        value: 3,
+        label: l.schedule_day_control_wed,
+        name: l.schedule_occur_wed
+      },
+      THURSDAY: {
+        value: 4,
+        label: l.schedule_day_control_thu,
+        name: l.schedule_occur_thu
+      },
+      FRIDAY: {
+        value: 5,
+        label: l.schedule_day_control_fri,
+        name: l.schedule_occur_fri
+      },
+      SATURDAY: {
+        value: 6,
+        label: l.schedule_day_control_sat,
+        name: l.schedule_occur_sat
+      },
+      SUNDAY: {
+        value: 7,
+        label: l.schedule_day_control_sun,
+        name: l.schedule_occur_sun
+      }
+    };
+    this.OFFSETS = {
+      FIRST: {
+        value: 1,
+        label: l.recurring_frequency_offset_first
+      },
+      SECOND: {
+        value: 2,
+        label: l.recurring_frequency_offset_second
+      },
+      THIRD: {
+        value: 3,
+        label: l.recurring_frequency_offset_third
+      },
+      FOURTH: {
+        value: 4,
+        label: l.recurring_frequency_offset_fourth
+      },
+      FIFTH: {
+        value: 5,
+        label: l.recurring_frequency_offset_fifth
+      }
+    };
+    this.MONTH_RULES = {
+      DAY: 'day',
+      OFFSET: 'offset'
+    };
+    this.initialEnd = (0,helpers.zI)(this.props.startDateTime, 6);
+    this.initialWeekDays = Object.values(this.WEEK_DAYS).map(d => d.value);
+    this.initialMonthDay = this.props.startDateTime ? new Date(this.props.startDateTime).getDate() : undefined;
+    this.state = {
+      view: this.VIEWS.DAILY,
+      frequency: this.FREQUENCIES.DAILY,
+      end: this.initialEnd,
+      prevEnd: undefined,
+      interval: 0,
+      weekDays: this.initialWeekDays,
+      monthRule: this.MONTH_RULES.DAY,
+      monthDays: [this.initialMonthDay],
+      offset: {
+        value: this.OFFSETS.FIRST.value,
+        weekDay: this.WEEK_DAYS.MONDAY.value
+      },
+      monthDaysWarning: false
+    };
+    this.toggleView = (view, frequency, state) => this.setState({
+      view,
+      frequency,
+      ...state
+    });
+    const {
+      chatRoom,
+      startDateTime
+    } = this.props;
+    const weekDay = new Date(startDateTime).getDay();
+    this.state.offset.weekDay = ((_Object$values$find = Object.values(this.WEEK_DAYS).find(d => d.value === weekDay)) == null ? void 0 : _Object$values$find.value) || this.WEEK_DAYS.SUNDAY.value;
+    if (chatRoom && chatRoom.scheduledMeeting && chatRoom.scheduledMeeting.isRecurring) {
+      const {
+        frequency,
+        interval,
+        end,
+        weekDays,
+        monthDays,
+        offset
+      } = chatRoom.scheduledMeeting.recurring;
+      this.state.view = frequency === 'd' ? this.VIEWS.DAILY : frequency === 'w' ? this.VIEWS.WEEKLY : this.VIEWS.MONTHLY;
+      this.state.frequency = frequency;
+      this.state.end = end;
+      this.state.interval = interval;
+      this.state.weekDays = weekDays && weekDays.length ? weekDays : this.initialWeekDays;
+      this.state.monthRule = monthDays && monthDays.length ? this.MONTH_RULES.DAY : this.MONTH_RULES.OFFSET;
+      this.state.monthDays = monthDays && monthDays.length ? [monthDays[0]] : [this.initialMonthDay];
+      this.state.offset = offset && Object.keys(offset).length ? offset : this.state.offset;
+    }
+  }
+  getFormattedState(state) {
+    const {
+      frequency,
+      end,
+      interval,
+      weekDays,
+      monthRule,
+      monthDays,
+      offset
+    } = state;
+    switch (true) {
+      case frequency === this.FREQUENCIES.DAILY:
+        return {
+          frequency,
+          end,
+          weekDays
+        };
+      case frequency === this.FREQUENCIES.WEEKLY:
+        return {
+          frequency,
+          end,
+          ...(interval && {
+            interval
+          }),
+          weekDays
+        };
+      case frequency === this.FREQUENCIES.MONTHLY:
+        return {
+          frequency,
+          end,
+          ...(interval && {
+            interval
+          }),
+          ...(monthRule === this.MONTH_RULES.DAY ? {
+            monthDays
+          } : {
+            offset: [[offset.value, offset.weekDay]]
+          })
+        };
+    }
+  }
+  renderDayControls() {
+    const {
+      weekDays,
+      view
+    } = this.state;
+    const handleWeeklySelection = (weekDay, remove) => {
+      this.setState(state => {
+        if (remove) {
+          return {
+            weekDays: state.weekDays.length === 1 ? state.weekDays : state.weekDays.filter(d => d !== weekDay)
+          };
+        }
+        return {
+          weekDays: [...state.weekDays, weekDay]
+        };
+      }, () => {
+        const {
+          weekDays
+        } = this.state;
+        if (weekDays.length === Object.keys(this.WEEK_DAYS).length) {
+          this.toggleView(this.VIEWS.DAILY, this.FREQUENCIES.DAILY);
+        }
+      });
+    };
+    const handleDailySelection = weekDay => {
+      this.toggleView(this.VIEWS.WEEKLY, this.FREQUENCIES.WEEKLY, {
+        weekDays: weekDays.filter(d => d !== weekDay)
+      });
+    };
+    return external_React_default().createElement("div", {
+      className: "recurring-field-row"
+    }, Object.values(this.WEEK_DAYS).map(({
+      value,
+      label
+    }) => {
+      const isCurrentlySelected = weekDays.includes(value);
+      return external_React_default().createElement(meetings_button.Z, {
+        key: value,
+        className: `
+                                mega-button
+                                action
+                                recurring-toggle-button
+                                ${isCurrentlySelected ? 'active' : ''}
+                                ${weekDays.length === 1 && isCurrentlySelected ? 'disabled' : ''}
+                            `,
+        onClick: () => {
+          if (view === this.VIEWS.WEEKLY) {
+            return handleWeeklySelection(value, isCurrentlySelected);
+          }
+          return handleDailySelection(value);
+        }
+      }, label);
+    }));
+  }
+  renderIntervalControls() {
+    const {
+      view,
+      interval
+    } = this.state;
+    return external_React_default().createElement("div", {
+      className: "recurring-field-row"
+    }, external_React_default().createElement("span", null, l.recur_rate), external_React_default().createElement("div", {
+      className: "mega-input inline recurring-interval"
+    }, external_React_default().createElement(Select, {
+      name: `${Recurring.NAMESPACE}-interval`,
+      value: interval > 0 ? interval : 1,
+      icon: true,
+      options: [...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
+        value += 1;
+        return {
+          value: value,
+          label: value
+        };
+      }),
+      onSelect: ({
+        value
+      }) => {
+        this.setState({
+          interval: value === 1 ? 0 : value
+        });
+      }
+    })), view === this.VIEWS.WEEKLY && external_React_default().createElement("span", null, mega.icu.format(l.plural_week, interval)), view === this.VIEWS.MONTHLY && external_React_default().createElement("span", null, mega.icu.format(l.plural_month, interval)));
+  }
+  renderEndControls() {
+    const {
+      end,
+      prevEnd
+    } = this.state;
+    return external_React_default().createElement("div", {
+      className: "recurring-field-row"
+    }, external_React_default().createElement("div", {
+      className: "recurring-title-heading"
+    }, l.recurring_ends), external_React_default().createElement("div", {
+      className: "recurring-radio-buttons"
+    }, external_React_default().createElement("div", {
+      className: "recurring-label-wrap"
+    }, external_React_default().createElement("div", {
+      className: `
+                                uiTheme
+                                ${end ? 'radioOff' : 'radioOn'}
+                            `
+    }, external_React_default().createElement("input", {
+      type: "radio",
+      name: `${Recurring.NAMESPACE}-radio-end`,
+      className: `
+                                    uiTheme
+                                    ${end ? 'radioOff' : 'radioOn'}
+                                `,
+      onChange: () => {
+        this.setState(state => ({
+          end: undefined,
+          prevEnd: state.end || state.prevEnd
+        }));
+      }
+    })), external_React_default().createElement("div", {
+      className: "radio-txt"
+    }, external_React_default().createElement("span", {
+      className: "recurring-radio-label",
+      onClick: () => {
+        this.setState(state => ({
+          end: undefined,
+          prevEnd: state.end || state.prevEnd
+        }));
+      }
+    }, l.recurring_never))), external_React_default().createElement("div", {
+      className: "recurring-label-wrap"
+    }, external_React_default().createElement("div", {
+      className: `
+                                uiTheme
+                                ${end ? 'radioOn' : 'radioOff'}
+                            `
+    }, external_React_default().createElement("input", {
+      type: "radio",
+      name: `${Recurring.NAMESPACE}-radio-end`,
+      className: `
+                                    uiTheme
+                                    ${end ? 'radioOn' : 'radioOff'}
+                                `,
+      onChange: () => {
+        this.setState({
+          end: prevEnd || this.initialEnd
+        });
+      }
+    })), external_React_default().createElement("div", {
+      className: "radio-txt"
+    }, external_React_default().createElement("span", {
+      className: "recurring-radio-label",
+      onClick: () => {
+        return end ? null : this.setState({
+          end: prevEnd || this.initialEnd
+        });
+      }
+    }, l.recurring_on), external_React_default().createElement(Datepicker, {
+      name: `${Recurring.NAMESPACE}-endDateTime`,
+      position: "top left",
+      startDate: end || this.initialEnd,
+      selectedDates: [new Date(end)],
+      value: end || prevEnd || '',
+      placeholder: time2date(end || prevEnd || this.initialEnd / 1000, 18),
+      onMount: this.props.onMount,
+      onSelect: timestamp => {
+        this.setState({
+          end: timestamp
+        }, () => {
+          this.safeForceUpdate();
+        });
+      }
+    })))));
+  }
+  renderDaily() {
+    return external_React_default().createElement("div", {
+      className: `${Recurring.NAMESPACE}-daily`
+    }, this.renderDayControls(), this.renderEndControls());
+  }
+  renderWeekly() {
+    return external_React_default().createElement("div", {
+      className: `${Recurring.NAMESPACE}-weekly`
+    }, this.renderIntervalControls(), this.renderDayControls(), this.renderEndControls());
+  }
+  renderMonthly() {
+    const {
+      monthRule,
+      monthDays,
+      monthDaysWarning,
+      offset
+    } = this.state;
+    return external_React_default().createElement("div", {
+      className: `${Recurring.NAMESPACE}-monthly`
+    }, this.renderIntervalControls(), external_React_default().createElement("div", {
+      className: "recurring-field-row"
+    }, external_React_default().createElement("div", {
+      className: "recurring-radio-buttons",
+      onClick: ev => {
+        const {
+          name,
+          value
+        } = ev.target;
+        if (name === `${Recurring.NAMESPACE}-radio-monthRule`) {
+          this.setState({
+            monthRule: value
+          });
+        }
+      }
+    }, external_React_default().createElement("div", {
+      className: "recurring-label-wrap"
+    }, external_React_default().createElement("div", {
+      className: `
+                                    uiTheme
+                                    ${monthRule === 'day' ? 'radioOn' : 'radioOff'}
+                                `
+    }, external_React_default().createElement("input", {
+      type: "radio",
+      name: `${Recurring.NAMESPACE}-radio-monthRule`,
+      value: "day",
+      className: `
+                                        uiTheme
+                                        ${monthRule === 'day' ? 'radioOn' : 'radioOff'}
+                                    `
+    })), external_React_default().createElement("div", {
+      className: "radio-txt"
+    }, external_React_default().createElement("span", {
+      className: "recurring-radio-label",
+      onClick: () => {
+        this.setState({
+          monthRule: this.MONTH_RULES.DAY
+        });
+      }
+    }, l.recurring_frequency_day), external_React_default().createElement("div", {
+      className: "mega-input inline recurring-day"
+    }, external_React_default().createElement(Select, {
+      name: `${Recurring.NAMESPACE}-monthDay`,
+      icon: true,
+      value: monthDays[0],
+      options: [...Array(31).keys()].map(value => {
+        value += 1;
+        return {
+          value,
+          label: value
+        };
+      }),
+      onSelect: ({
+        value
+      }) => {
+        this.setState({
+          monthRule: this.MONTH_RULES.DAY,
+          monthDays: [value],
+          monthDaysWarning: value > 28
+        });
+      }
+    })))), monthDaysWarning && external_React_default().createElement("div", {
+      className: "recurring-label-wrap"
+    }, external_React_default().createElement("div", {
+      className: "mega-banner body with-btn"
+    }, external_React_default().createElement("div", {
+      className: "green-notification cell text-cell"
+    }, external_React_default().createElement("div", {
+      className: "versioning-body-text"
+    }, l.recurring_monthdays_warning.replace('%n', monthDays[0]))))), external_React_default().createElement("div", {
+      className: "recurring-label-wrap"
+    }, external_React_default().createElement("div", {
+      className: `
+                                    uiTheme
+                                    ${monthRule === this.MONTH_RULES.OFFSET ? 'radioOn' : 'radioOff'}
+                                `
+    }, external_React_default().createElement("input", {
+      type: "radio",
+      name: `${Recurring.NAMESPACE}-radio-monthRule`,
+      value: "offset",
+      className: `
+                                        uiTheme
+                                        ${monthRule === this.MONTH_RULES.OFFSET ? 'radioOn' : 'radioOff'}
+                                    `
+    })), external_React_default().createElement("div", {
+      className: "radio-txt"
+    }, external_React_default().createElement(Select, {
+      name: "recurring-offset-value",
+      className: "inline",
+      icon: true,
+      value: offset && offset.value && Object.values(this.OFFSETS).find(o => o.value === offset.value).label || this.OFFSETS.FIRST.label,
+      options: Object.values(this.OFFSETS),
+      onSelect: option => {
+        this.setState(state => ({
+          monthRule: this.MONTH_RULES.OFFSET,
+          offset: {
+            value: option.value,
+            weekDay: state.offset.weekDay || this.WEEK_DAYS.MONDAY.value
+          }
+        }));
+      }
+    }), external_React_default().createElement(Select, {
+      name: "recurring-offset-day",
+      className: "inline",
+      icon: true,
+      value: offset && offset.weekDay && Object.values(this.WEEK_DAYS).find(o => o.value === offset.weekDay).name || this.WEEK_DAYS.MONDAY.name,
+      options: Object.values(this.WEEK_DAYS).map(({
+        value,
+        name
+      }) => ({
+        value,
+        label: name
+      })),
+      onSelect: option => {
+        this.setState(state => ({
+          monthRule: this.MONTH_RULES.OFFSET,
+          offset: {
+            value: state.offset.value || this.OFFSETS.FIRST.value,
+            weekDay: option.value
+          }
+        }));
+      }
+    }))))), this.renderEndControls());
+  }
+  renderNavigation(view) {
+    return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(meetings_button.Z, {
+      className: `
+                        mega-button
+                        action
+                        recurring-nav-button
+                        ${view === this.VIEWS.DAILY ? 'active' : ''}
+                    `,
+      onClick: () => this.toggleView(this.VIEWS.DAILY, this.FREQUENCIES.DAILY)
+    }, l.recurring_daily), external_React_default().createElement(meetings_button.Z, {
+      className: `
+                        mega-button
+                        action
+                        recurring-nav-button
+                        ${view === this.VIEWS.WEEKLY ? 'active' : ''}
+                    `,
+      onClick: () => this.toggleView(this.VIEWS.WEEKLY, this.FREQUENCIES.WEEKLY)
+    }, l.recurring_weekly), external_React_default().createElement(meetings_button.Z, {
+      className: `
+                        mega-button
+                        action
+                        recurring-nav-button
+                        ${view === this.VIEWS.MONTHLY ? 'active' : ''}
+                    `,
+      onClick: () => this.toggleView(this.VIEWS.MONTHLY, this.FREQUENCIES.MONTHLY)
+    }, l.recurring_monthly));
+  }
+  renderContent(view) {
+    switch (view) {
+      case this.VIEWS.DAILY:
+        return this.renderDaily();
+      case this.VIEWS.WEEKLY:
+        return this.renderWeekly();
+      case this.VIEWS.MONTHLY:
+        return this.renderMonthly();
+    }
+  }
+  componentWillUpdate(nextProps, nextState) {
+    if (this.state.view !== this.VIEWS.DAILY && nextState.view === this.VIEWS.DAILY) {
+      nextState.weekDays = this.initialWeekDays;
+    }
+    if (nextState.weekDays.length === Object.keys(this.WEEK_DAYS).length && this.state.view !== this.VIEWS.WEEKLY && nextState.view === this.VIEWS.WEEKLY || !(0,helpers.KC)(nextProps.startDateTime, this.props.startDateTime) && this.state.view === this.VIEWS.WEEKLY) {
+      const weekday = new Date(nextProps.startDateTime).getDay();
+      nextState.weekDays = [weekday === 0 ? 7 : weekday];
+    }
+    if (!(0,helpers.KC)(nextProps.startDateTime, this.props.startDateTime) && this.state.view === this.VIEWS.MONTHLY) {
+      var _Object$values$find2;
+      const nextDate = new Date(nextProps.startDateTime);
+      nextState.monthDays = [nextDate.getDate()];
+      nextState.offset.weekDay = ((_Object$values$find2 = Object.values(this.WEEK_DAYS).find(d => d.value === nextDate.getDay())) == null ? void 0 : _Object$values$find2.value) || this.WEEK_DAYS.SUNDAY.value;
+    }
+    if (nextState.view === this.VIEWS.MONTHLY && this.state.interval > 12) {
+      nextState.interval = 12;
+    }
+    this.props.onUpdate(this.getFormattedState(nextState));
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this.props.onUpdate(this.getFormattedState(this.state));
+  }
+  render() {
+    const {
+      NAMESPACE
+    } = Recurring;
+    const {
+      view
+    } = this.state;
+    return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null), external_React_default().createElement(Column, null, external_React_default().createElement("div", {
+      className: NAMESPACE
+    }, external_React_default().createElement("div", {
+      className: `${NAMESPACE}-container`
+    }, external_React_default().createElement("div", {
+      className: `${NAMESPACE}-navigation`
+    }, this.renderNavigation(view)), external_React_default().createElement("div", {
+      className: `${NAMESPACE}-content`
+    }, this.renderContent(view))))));
+  }
+}
+Recurring.NAMESPACE = 'meetings-recurring';
+class Edit extends mixins.wl {
+  constructor(props) {
+    super(props);
+    this.occurrenceRef = null;
+    this.datepickerRefs = [];
+    this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
+    this.state = {
+      startDateTime: undefined,
+      endDateTime: undefined,
+      isDirty: false,
+      closeDialog: false,
+      overlayed: false
+    };
+    this.onStartDateSelect = startDateTime => {
+      this.setState({
+        startDateTime,
+        isDirty: true
+      }, () => {
+        this.datepickerRefs.endDateTime.selectDate(new Date(startDateTime + this.interval));
+      });
+    };
+    this.onEndDateSelect = endDateTime => {
+      this.setState({
+        endDateTime,
+        isDirty: true
+      }, () => {
+        const {
+          startDateTime,
+          endDateTime
+        } = this.state;
+        if (endDateTime < startDateTime) {
+          if (endDateTime < Date.now()) {
+            return this.setState({
+              endDateTime: startDateTime + this.interval
+            });
+          }
+          this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+        }
+      });
+    };
+    this.handleTimeSelect = ({
+      startDateTime,
+      endDateTime
+    }) => {
+      startDateTime = startDateTime || this.state.startDateTime;
+      endDateTime = endDateTime || this.state.endDateTime;
+      this.setState(state => {
+        return {
+          startDateTime: endDateTime <= state.startDateTime ? endDateTime - this.interval : startDateTime,
+          endDateTime: startDateTime >= state.endDateTime ? startDateTime + this.interval : endDateTime,
+          isDirty: true
+        };
+      });
+    };
+    const {
+      scheduledMeeting,
+      occurrenceId
+    } = this.props;
+    this.occurrenceRef = scheduledMeeting.occurrences[occurrenceId];
+    this.state.startDateTime = this.occurrenceRef.start;
+    this.state.endDateTime = this.occurrenceRef.end;
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if (this.callDlgListener) {
+      megaChat.off(this.callDlgListener);
+    }
+    if ($.dialog === Schedule.dialogName) {
+      closeDialog();
+    }
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    M.safeShowDialog(Schedule.dialogName, () => {
+      if (!this.isMounted()) {
+        throw Error(`Edit dialog: component not mounted.`);
+      }
+      this.callDlgListener = 'onIncomingCall.recurringedit';
+      megaChat.rebind(this.callDlgListener, ({
+        data
+      }) => {
+        if (this.isMounted() && !is_chatlink && pushNotificationSettings.isAllowedForChatId(data[0].chatId)) {
+          this.setState({
+            overlayed: true,
+            closeDialog: false
+          });
+          megaChat.plugins.callManager2.rebind('onRingingStopped.recurringedit', () => {
+            megaChat.plugins.callManager2.off('onRingingStopped.recurringedit');
+            this.setState({
+              overlayed: false
+            });
+            fm_showoverlay();
+          });
+        }
+      });
+      return $(`#${Schedule.NAMESPACE}`);
+    });
+  }
+  componentDidUpdate(prevProps) {
+    if (prevProps.callExpanded && !this.props.callExpanded) {
+      if (!$.dialog) {
+        M.safeShowDialog(Schedule.dialogName, `#${Schedule.NAMESPACE}`);
+      }
+      fm_showoverlay();
+      this.setState({
+        closeDialog: false
+      });
+    }
+    if (!prevProps.callExpanded && this.props.callExpanded) {
+      this.setState({
+        closeDialog: false
+      });
+    }
+  }
+  render() {
+    const {
+      chatRoom,
+      callExpanded,
+      onClose
+    } = this.props;
+    const {
+      startDateTime,
+      endDateTime,
+      isDirty,
+      closeDialog,
+      overlayed
+    } = this.state;
+    const dialogClasses = ['fluid'];
+    if (closeDialog) {
+      dialogClasses.push('with-confirmation-dialog');
+    }
+    if (callExpanded || overlayed) {
+      dialogClasses.push('hidden');
+    }
+    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+      id: Schedule.NAMESPACE,
+      className: dialogClasses.join(' '),
+      dialogName: Schedule.dialogName,
+      dialogType: "main",
+      onClose: () => {
+        return isDirty ? this.setState({
+          closeDialog: true
+        }) : onClose();
+      }
+    }), external_React_default().createElement("header", null, external_React_default().createElement("h2", null, l.edit_meeting_title)), external_React_default().createElement("div", {
+      className: "fm-dialog-body"
+    }, external_React_default().createElement(Row, null, external_React_default().createElement("div", {
+      className: "mega-banner body recurring-edit-banner"
+    }, external_React_default().createElement("div", {
+      className: "cell"
+    }, (0,utils.hV)(l.scheduled_edit_occurrence_note, '[A]', ui_link.Z, {
+      onClick: () => {
+        onClose();
+        megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, chatRoom);
+      }
+    })))), external_React_default().createElement(Row, {
+      className: "start-aligned"
+    }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-recents-filled"
+    })), external_React_default().createElement("div", {
+      className: "schedule-date-container"
+    }, external_React_default().createElement(DateTime, {
+      name: "startDateTime",
+      altField: "startTime",
+      datepickerRef: this.datepickerRefs.startDateTime,
+      startDate: startDateTime,
+      value: startDateTime,
+      filteredTimeIntervals: (0,helpers.nl)(startDateTime),
+      label: l.schedule_start_date,
+      onMount: datepicker => {
+        this.datepickerRefs.startDateTime = datepicker;
+      },
+      onSelectDate: startDateTime => this.onStartDateSelect(startDateTime),
+      onSelectTime: ({
+        value: startDateTime
+      }) => this.handleTimeSelect({
+        startDateTime
+      }),
+      onChange: value => this.setState({
+        startDateTime: value
+      }),
+      onBlur: timestamp => {
+        if (timestamp) {
+          timestamp = timestamp < Date.now() ? this.occurrenceRef.start : timestamp;
+          this.onStartDateSelect(timestamp);
+        }
+      }
+    }), external_React_default().createElement(DateTime, {
+      name: "endDateTime",
+      altField: "endTime",
+      datepickerRef: this.datepickerRefs.endDateTime,
+      startDate: endDateTime,
+      value: endDateTime,
+      filteredTimeIntervals: (0,helpers.nl)(endDateTime, startDateTime),
+      label: l.schedule_end_date,
+      onMount: datepicker => {
+        this.datepickerRefs.endDateTime = datepicker;
+      },
+      onSelectDate: endDateTime => this.onEndDateSelect(endDateTime),
+      onSelectTime: ({
+        value: endDateTime
+      }) => this.handleTimeSelect({
+        endDateTime
+      }),
+      onChange: timestamp => this.setState({
+        endDateTime: timestamp
+      }),
+      onBlur: timestamp => timestamp && this.onEndDateSelect(timestamp)
+    })))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
+      className: "footer-container"
+    }, external_React_default().createElement(meetings_button.Z, {
+      className: "mega-button positive",
+      onClick: () => {
+        const {
+          startDateTime,
+          endDateTime
+        } = this.state;
+        if (startDateTime !== this.occurrenceRef.start || endDateTime !== this.occurrenceRef.end) {
+          this.occurrenceRef.update(startDateTime, endDateTime);
+        }
+        onClose();
+      }
+    }, external_React_default().createElement("span", null, l.update_meeting_button)))), !(overlayed || callExpanded) && closeDialog && external_React_default().createElement(CloseDialog, {
+      onToggle: () => this.setState({
+        closeDialog: false
+      }),
+      onClose: onClose
+    }));
+  }
+}
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx
+
+
+
+
+
+
+
+
+
+
+class Schedule extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.wrapperRef = external_React_default().createRef();
+    this.scheduledMeetingRef = null;
+    this.localStreamRef = '.float-video';
+    this.datepickerRefs = [];
+    this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
+    this.nearestHalfHour = (0,helpers.Ny)();
+    this.state = {
+      topic: '',
+      startDateTime: this.nearestHalfHour,
+      endDateTime: this.nearestHalfHour + this.interval,
+      timezone: (0,helpers.Sv)(),
+      recurring: false,
+      participants: [],
+      link: false,
+      sendInvite: false,
+      openInvite: true,
+      description: '',
+      closeDialog: false,
+      isEdit: false,
+      isDirty: false,
+      isLoading: false,
+      topicInvalid: false,
+      invalidTopicMsg: '',
+      descriptionInvalid: false,
+      overlayed: false
+    };
+    this.onTopicChange = value => {
+      if (value.length > ChatRoom.TOPIC_MAX_LENGTH) {
+        this.setState({
+          invalidTopicMsg: l.err_schedule_title_long,
+          topicInvalid: true
+        });
+        value = value.substring(0, ChatRoom.TOPIC_MAX_LENGTH);
+      } else if (value.length === 0) {
+        this.setState({
+          invalidTopicMsg: l.schedule_title_missing,
+          topicInvalid: true
+        });
+      } else if (this.state.invalidTopicMsg) {
+        this.setState({
+          invalidTopicMsg: '',
+          topicInvalid: false
+        });
+      }
+      this.handleChange('topic', value);
+    };
+    this.onTextareaChange = value => {
+      if (value.length > 3000) {
+        this.setState({
+          descriptionInvalid: true
+        });
+        value = value.substring(0, 3000);
+      } else if (this.state.descriptionInvalid) {
+        this.setState({
+          descriptionInvalid: false
+        });
+      }
+      this.handleChange('description', value);
+    };
+    this.onStartDateSelect = () => {
+      this.datepickerRefs.endDateTime.selectDate(new Date(this.state.startDateTime + this.interval));
+    };
+    this.onEndDateSelect = () => {
+      const {
+        startDateTime,
+        endDateTime
+      } = this.state;
+      if (endDateTime < startDateTime) {
+        if (endDateTime < Date.now()) {
+          return this.setState({
+            endDateTime: startDateTime + this.interval
+          });
+        }
+        this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+      }
+    };
+    this.handleToggle = prop => {
+      return Object.keys(this.state).includes(prop) && this.setState(state => ({
+        [prop]: !state[prop],
+        isDirty: true
+      }));
+    };
+    this.handleChange = (prop, value) => {
+      return Object.keys(this.state).includes(prop) && this.setState({
+        [prop]: value,
+        isDirty: true
+      });
+    };
+    this.handleDateSelect = ({
+      startDateTime,
+      endDateTime
+    }, callback) => {
+      this.setState(state => ({
+        startDateTime: startDateTime || state.startDateTime,
+        endDateTime: endDateTime || state.endDateTime,
+        isDirty: true
+      }), () => {
+        const {
+          recurring
+        } = this.state;
+        if (recurring && recurring.end) {
+          const recurringEnd = (0,helpers.zI)(this.state.startDateTime, 6);
+          this.datepickerRefs.recurringEnd.selectDate(new Date(recurringEnd));
+        }
+        if (callback) {
+          callback();
+        }
+      });
+    };
+    this.handleTimeSelect = ({
+      startDateTime,
+      endDateTime
+    }) => {
+      startDateTime = startDateTime || this.state.startDateTime;
+      endDateTime = endDateTime || this.state.endDateTime;
+      this.setState(state => {
+        return {
+          startDateTime: endDateTime <= state.startDateTime ? endDateTime - this.interval : startDateTime,
+          endDateTime: startDateTime >= state.endDateTime ? startDateTime + this.interval : endDateTime,
+          isDirty: true
+        };
+      });
+    };
+    this.handleParticipantSelect = participants => {
+      return participants && Array.isArray(participants) && this.setState({
+        participants,
+        isDirty: true
+      }, () => {
+        const wrapperRef = this.wrapperRef && this.wrapperRef.current;
+        if (wrapperRef) {
+          wrapperRef.reinitialise();
+        }
+      });
+    };
+    this.handleSubmit = () => {
+      this.setState({
+        isLoading: true
+      }, async () => {
+        const {
+          chatRoom,
+          onClose
+        } = this.props;
+        await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](this.state, chatRoom);
+        this.setState({
+          isLoading: false
+        }, () => onClose());
+      });
+    };
+  }
+  syncPublicLink() {
+    if (this.state.isEdit) {
+      const {
+        chatRoom
+      } = this.props;
+      chatRoom.getPublicLink(() => this.isMounted() && this.setState({
+        link: !!chatRoom.publicLink
+      }));
+    }
+  }
+  getFilteredTimeIntervals(timestamp, offsetFrom) {
+    const timeIntervals = (0,helpers.nl)(timestamp, offsetFrom);
+    const {
+      end
+    } = this.scheduledMeetingRef || {};
+    if (this.state.isEdit && end < Date.now()) {
+      return timeIntervals;
+    }
+    return timeIntervals.filter(o => {
+      return offsetFrom ? o.value > this.nearestHalfHour : o.value > Date.now();
+    });
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if (this.callDlgListener) {
+      megaChat.off(this.callDlgListener);
+    }
+    if ($.dialog === Schedule.dialogName) {
+      closeDialog();
+    }
+    [document, this.localStreamRef].map(el => $(el).unbind(`.${Schedule.NAMESPACE}`));
+  }
+  componentWillMount() {
+    const {
+      chatRoom
+    } = this.props;
+    if (chatRoom) {
+      const {
+        scheduledMeeting,
+        publicLink,
+        options
+      } = chatRoom;
+      this.state.topic = scheduledMeeting.title;
+      this.state.startDateTime = scheduledMeeting.start;
+      this.state.endDateTime = scheduledMeeting.end;
+      this.state.timezone = scheduledMeeting.timezone || (0,helpers.Sv)();
+      this.state.recurring = scheduledMeeting.recurring;
+      this.state.participants = chatRoom.getParticipantsExceptMe();
+      this.state.link = !!publicLink;
+      this.state.description = scheduledMeeting.description || '';
+      this.state.sendInvite = scheduledMeeting.flags;
+      this.state.openInvite = options.oi;
+      this.state.isEdit = true;
+      this.scheduledMeetingRef = scheduledMeeting;
+    }
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this.syncPublicLink();
+    if ($.dialog === 'onboardingDialog') {
+      closeDialog();
+    }
+    M.safeShowDialog(Schedule.dialogName, () => {
+      if (!this.isMounted()) {
+        throw new Error(`${Schedule.dialogName} dialog: component ${Schedule.NAMESPACE} not mounted.`);
+      }
+      $(document).rebind(`keyup.${Schedule.NAMESPACE}`, ({
+        keyCode,
+        target
+      }) => {
+        return this.state.closeDialog || target instanceof HTMLTextAreaElement ? null : keyCode === 13 && this.handleSubmit();
+      });
+      $(this.localStreamRef).rebind(`click.${Schedule.NAMESPACE}`, () => {
+        if (this.state.isDirty) {
+          this.handleToggle('closeDialog');
+          return false;
+        }
+      });
+      this.callDlgListener = 'onIncomingCall.scheduledlg';
+      megaChat.rebind(this.callDlgListener, ({
+        data
+      }) => {
+        if (this.isMounted() && !is_chatlink && pushNotificationSettings.isAllowedForChatId(data[0].chatId)) {
+          this.setState({
+            overlayed: true,
+            closeDialog: false
+          });
+          megaChat.plugins.callManager2.rebind('onRingingStopped.scheduledlg', () => {
+            megaChat.plugins.callManager2.off('onRingingStopped.scheduledlg');
+            this.setState({
+              overlayed: false
+            });
+            fm_showoverlay();
+          });
+        }
+      });
+      return $(`#${Schedule.NAMESPACE}`);
+    });
+  }
+  componentDidUpdate(prevProps) {
+    if (prevProps.callExpanded && !this.props.callExpanded) {
+      if (!$.dialog) {
+        M.safeShowDialog(Schedule.dialogName, `#${Schedule.NAMESPACE}`);
+      }
+      fm_showoverlay();
+      this.setState({
+        closeDialog: false
+      });
+    }
+    if (!prevProps.callExpanded && this.props.callExpanded) {
+      this.setState({
+        closeDialog: false
+      });
+    }
+  }
+  render() {
+    const {
+      topic,
+      startDateTime,
+      endDateTime,
+      recurring,
+      participants,
+      link,
+      sendInvite,
+      openInvite,
+      description,
+      closeDialog,
+      isEdit,
+      isDirty,
+      isLoading,
+      topicInvalid,
+      invalidTopicMsg,
+      descriptionInvalid,
+      overlayed
+    } = this.state;
+    const {
+      callExpanded
+    } = this.props;
+    const dialogClasses = [];
+    if (closeDialog) {
+      dialogClasses.push('with-confirmation-dialog');
+    }
+    if (callExpanded || overlayed) {
+      dialogClasses.push('hidden');
+    }
+    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+      id: Schedule.NAMESPACE,
+      className: dialogClasses.join(' '),
+      dialogName: Schedule.dialogName,
+      dialogType: "main",
+      onClose: () => {
+        return isDirty ? this.handleToggle('closeDialog') : this.props.onClose();
+      }
+    }), external_React_default().createElement(Header, {
+      chatRoom: isEdit && this.props.chatRoom
+    }), external_React_default().createElement(perfectScrollbar.F, {
+      ref: this.wrapperRef,
+      className: "fm-dialog-body",
+      options: {
+        suppressScrollX: true
+      }
+    }, external_React_default().createElement(Input, {
+      name: "topic",
+      placeholder: l.schedule_title_input,
+      value: topic,
+      invalid: topicInvalid,
+      invalidMessage: invalidTopicMsg,
+      autoFocus: true,
+      isLoading: isLoading,
+      onFocus: () => topicInvalid && this.setState({
+        topicInvalid: false
+      }),
+      onChange: this.onTopicChange
+    }), external_React_default().createElement(Row, {
+      className: "start-aligned"
+    }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-recents-filled"
+    })), external_React_default().createElement("div", {
+      className: "schedule-date-container"
+    }, external_React_default().createElement(DateTime, {
+      name: "startDateTime",
+      altField: "startTime",
+      datepickerRef: this.datepickerRefs.startDateTime,
+      startDate: startDateTime,
+      value: startDateTime,
+      filteredTimeIntervals: this.getFilteredTimeIntervals(startDateTime),
+      label: l.schedule_start_date,
+      isLoading: isLoading,
+      onMount: datepicker => {
+        this.datepickerRefs.startDateTime = datepicker;
+      },
+      onSelectDate: startDateTime => {
+        this.handleDateSelect({
+          startDateTime
+        }, this.onStartDateSelect);
+      },
+      onSelectTime: ({
+        value: startDateTime
+      }) => {
+        this.handleTimeSelect({
+          startDateTime: startDateTime < Date.now() ? this.nearestHalfHour : startDateTime
+        });
+      },
+      onChange: value => this.handleChange('startDateTime', value),
+      onBlur: timestamp => {
+        if (timestamp) {
+          const startDateTime = timestamp < Date.now() ? this.nearestHalfHour : timestamp;
+          this.handleDateSelect({
+            startDateTime
+          }, this.onStartDateSelect);
+        }
+      }
+    }), external_React_default().createElement(DateTime, {
+      name: "endDateTime",
+      altField: "endTime",
+      datepickerRef: this.datepickerRefs.endDateTime,
+      isLoading: isLoading,
+      startDate: endDateTime,
+      value: endDateTime,
+      filteredTimeIntervals: this.getFilteredTimeIntervals(endDateTime, startDateTime),
+      label: l.schedule_end_date,
+      onMount: datepicker => {
+        this.datepickerRefs.endDateTime = datepicker;
+      },
+      onSelectDate: endDateTime => {
+        this.handleDateSelect({
+          endDateTime
+        }, this.onEndDateSelect);
+      },
+      onSelectTime: ({
+        value: endDateTime
+      }) => {
+        this.handleTimeSelect({
+          endDateTime: endDateTime < Date.now() ? this.nearestHalfHour + this.interval : endDateTime
+        });
+      },
+      onChange: value => this.handleChange('endDateTime', value),
+      onBlur: timestamp => {
+        this.handleDateSelect({
+          endDateTime: timestamp
+        }, this.onEndDateSelect);
+      }
+    }))), external_React_default().createElement(Checkbox, {
+      name: "recurring",
+      checked: recurring,
+      label: l.schedule_recurring_label,
+      isLoading: isLoading,
+      onToggle: this.handleToggle
+    }), recurring && external_React_default().createElement(Recurring, {
+      chatRoom: this.props.chatRoom,
+      startDateTime: startDateTime,
+      endDateTime: endDateTime,
+      onMount: datepicker => {
+        this.datepickerRefs.recurringEnd = datepicker;
+      },
+      onUpdate: state => {
+        this.setState({
+          recurring: state
+        });
+      }
+    }), external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-contacts"
+    })), external_React_default().createElement(Column, null, external_React_default().createElement(Invite, {
+      className: isLoading ? 'disabled' : '',
+      participants: participants,
+      onSelect: this.handleParticipantSelect
+    }))), external_React_default().createElement(Switch, {
+      name: "link",
+      toggled: link,
+      label: l.schedule_link_label,
+      isLoading: isLoading,
+      onToggle: this.handleToggle
+    }), external_React_default().createElement(Checkbox, {
+      name: "sendInvite",
+      checked: sendInvite,
+      label: l.schedule_invite_label,
+      isLoading: isLoading,
+      onToggle: this.handleToggle
+    }), external_React_default().createElement(Checkbox, {
+      name: "openInvite",
+      checked: openInvite,
+      label: l.open_invite_desc,
+      isLoading: isLoading,
+      onToggle: this.handleToggle
+    }), external_React_default().createElement(Textarea, {
+      name: "description",
+      invalid: descriptionInvalid,
+      placeholder: l.schedule_description_input,
+      value: description,
+      onFocus: () => descriptionInvalid && this.setState({
+        descriptionInvalid: false
+      }),
+      onChange: this.onTextareaChange
+    })), external_React_default().createElement(Footer, {
+      isLoading: isLoading,
+      isEdit: isEdit,
+      topic: topic,
+      onSubmit: this.handleSubmit,
+      onInvalid: () => this.setState({
+        topicInvalid: !topic,
+        invalidTopicMsg: l.schedule_title_missing
+      })
+    }), !(overlayed || callExpanded) && closeDialog && external_React_default().createElement(CloseDialog, {
+      onToggle: this.handleToggle,
+      onClose: this.props.onClose
+    }));
+  }
+}
+Schedule.NAMESPACE = 'schedule-dialog';
+Schedule.dialogName = `meetings-${Schedule.NAMESPACE}`;
+const CloseDialog = ({
+  onToggle,
+  onClose
+}) => {
+  return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+    name: `${Schedule.NAMESPACE}-confirmation`,
+    dialogType: "message",
+    className: `
+                    with-close-btn
+                    ${Schedule.NAMESPACE}-confirmation
+                `,
+    title: l.schedule_discard_dlg_title,
+    icon: "sprite-fm-uni icon-question",
+    buttons: [{
+      key: 'n',
+      label: l.schedule_discard_cancel,
+      onClick: () => onToggle('closeDialog')
+    }, {
+      key: 'y',
+      label: l.schedule_discard_confirm,
+      className: 'positive',
+      onClick: onClose
+    }],
+    noCloseOnClickOutside: true,
+    stopKeyPropagation: true,
+    hideOverlay: true,
+    onClose: () => onToggle('closeDialog')
+  }), external_React_default().createElement("div", {
+    className: `${Schedule.NAMESPACE}-confirmation-overlay`,
+    onClick: () => onToggle('closeDialog')
+  }));
+};
+const Row = ({
+  children,
+  className
+}) => external_React_default().createElement("div", {
+  className: `
+            ${Schedule.NAMESPACE}-row
+            ${className || ''}
+        `
+}, children);
+const Column = ({
+  children,
+  className
+}) => external_React_default().createElement("div", {
+  className: `
+            ${Schedule.NAMESPACE}-column
+            ${className || ''}
+        `
+}, children);
+const Header = ({
+  chatRoom
+}) => {
+  const $$container = title => external_React_default().createElement("header", null, external_React_default().createElement("h2", null, title));
+  if (chatRoom) {
+    const {
+      scheduledMeeting
+    } = chatRoom;
+    return $$container(scheduledMeeting.isRecurring ? l.edit_meeting_series_title : l.edit_meeting_title);
+  }
+  return $$container(l.schedule_meeting_title);
+};
+const Input = ({
+  name,
+  placeholder,
+  value,
+  invalid,
+  invalidMessage,
+  autoFocus,
+  isLoading,
+  onFocus,
+  onChange
+}) => {
+  return external_React_default().createElement(Row, {
+    className: invalid ? 'invalid-aligned' : ''
+  }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+    className: "sprite-fm-mono icon-rename"
+  })), external_React_default().createElement(Column, null, external_React_default().createElement("div", {
+    className: `
+                        mega-input
+                        ${invalid ? 'error msg' : ''}
+                    `
+  }, external_React_default().createElement("input", {
+    type: "text",
+    name: `${Schedule.NAMESPACE}-${name}`,
+    className: isLoading ? 'disabled' : '',
+    autoFocus: autoFocus,
+    autoComplete: "off",
+    placeholder: placeholder,
+    value: value,
+    onFocus: onFocus,
+    onChange: ({
+      target
+    }) => onChange(target.value)
+  }), invalid && external_React_default().createElement("div", {
+    className: "message-container mega-banner"
+  }, invalidMessage))));
+};
+const Checkbox = ({
+  name,
+  checked,
+  label,
+  isLoading,
+  onToggle
+}) => {
+  return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("div", {
+    className: `
+                        checkdiv
+                        ${checked ? 'checkboxOn' : 'checkboxOff'}
+                    `
+  }, external_React_default().createElement("input", {
+    name: `${Schedule.NAMESPACE}-${name}`,
+    className: isLoading ? 'disabled' : '',
+    type: "checkbox",
+    onChange: () => onToggle(name)
+  }))), external_React_default().createElement(Column, null, external_React_default().createElement("label", {
+    htmlFor: `${Schedule.NAMESPACE}-${name}`,
+    className: isLoading ? 'disabled' : '',
+    onClick: () => onToggle(name)
+  }, label)));
+};
+const Switch = ({
+  name,
+  toggled,
+  label,
+  isLoading,
+  onToggle
+}) => {
+  return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+    className: "sprite-fm-uni icon-mega-logo"
+  })), external_React_default().createElement(Column, null, external_React_default().createElement("span", {
+    className: `
+                        schedule-label
+                        ${isLoading ? 'disabled' : ''}
+                    `,
+    onClick: () => onToggle(name)
+  }, label), external_React_default().createElement("div", {
+    className: `
+                        mega-switch
+                        ${toggled ? 'toggle-on' : ''}
+                        ${isLoading ? 'disabled' : ''}
+                    `,
+    onClick: () => onToggle(name)
+  }, external_React_default().createElement("div", {
+    className: `
+                            mega-feature-switch
+                            sprite-fm-mono-after
+                            ${toggled ? 'icon-check-after' : 'icon-minimise-after'}
+                        `
+  }))));
+};
+const Textarea = ({
+  name,
+  placeholder,
+  isLoading,
+  value,
+  invalid,
+  onChange,
+  onFocus
+}) => {
+  return external_React_default().createElement(Row, {
+    className: "start-aligned"
+  }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
+    className: "sprite-fm-mono icon-description"
+  })), external_React_default().createElement(Column, null, external_React_default().createElement("div", {
+    className: `mega-input box-style textarea ${invalid ? 'error' : ''}`
+  }, external_React_default().createElement("textarea", {
+    name: `${Schedule.NAMESPACE}-${name}`,
+    className: isLoading ? 'disabled' : '',
+    placeholder: placeholder,
+    value: value,
+    onChange: ({
+      target
+    }) => onChange(target.value),
+    onFocus: onFocus
+  })), invalid && external_React_default().createElement("div", {
+    className: "mega-input error msg textarea-error"
+  }, external_React_default().createElement("div", {
+    className: "message-container mega-banner"
+  }, l.err_schedule_desc_long))));
+};
+const Footer = ({
+  isLoading,
+  isEdit,
+  topic,
+  onSubmit,
+  onInvalid
+}) => {
+  return external_React_default().createElement("footer", null, external_React_default().createElement("div", {
+    className: "footer-container"
+  }, external_React_default().createElement(meetings_button.Z, {
+    className: `
+                        mega-button
+                        positive
+                        ${isLoading ? 'disabled' : ''}
+                    `,
+    onClick: () => {
+      if (!isLoading) {
+        return topic ? onSubmit() : onInvalid();
+      }
+    },
+    topic: topic
+  }, external_React_default().createElement("span", null, isEdit ? l.update_meeting_button : l.schedule_meeting_button))));
+};
 ;// CONCATENATED MODULE: ./js/ui/miniui.jsx
 
 
@@ -13786,8 +15877,6 @@ class ToggleCheckbox extends mixins.wl {
 const miniui = ({
   ToggleCheckbox
 });
-// EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var ui_contacts = __webpack_require__(13);
 ;// CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
 var React = __webpack_require__(363);
 
@@ -14596,8 +16685,6 @@ SearchField.select = () => {
 SearchField.focus = () => SearchField.inputRef && SearchField.inputRef.current && SearchField.inputRef.current.focus();
 SearchField.hasValue = () => SearchField.inputRef && SearchField.inputRef.current && !!SearchField.inputRef.current.value.length;
 SearchField.isVisible = () => SearchField.inputRef && SearchField.inputRef.current && elementIsVisible(SearchField.inputRef.current);
-// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
 ;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchPanel.jsx
 
 
@@ -15617,6 +17704,7 @@ LeftPanel.NAMESPACE = 'lhp';
 
 
 
+
 const CONVERSATIONS_APP_VIEWS = {
   CHATS: 0x00,
   MEETINGS: 0x01,
@@ -15629,6 +17717,7 @@ class ConversationsApp extends mixins.wl {
   constructor(props) {
     super(props);
     this.chatRoomRef = null;
+    this.occurrenceRef = null;
     this.VIEWS = CONVERSATIONS_APP_VIEWS;
     this.EVENTS = CONVERSATIONS_APP_EVENTS;
     this.state = {
@@ -15636,7 +17725,9 @@ class ConversationsApp extends mixins.wl {
       startGroupChatDialog: false,
       startMeetingDialog: false,
       scheduleMeetingDialog: false,
-      view: this.VIEWS.LOADING
+      scheduleOccurrenceDialog: false,
+      view: this.VIEWS.LOADING,
+      callExpanded: false
     };
     this._cacheRouting();
     megaChat.rebind('onStartNewMeeting.convApp', () => this.startMeeting());
@@ -15749,11 +17840,18 @@ class ConversationsApp extends mixins.wl {
     } else {
       megaChat.$leftPane.removeClass('hidden');
     }
-    megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.EDIT, (ev, chatRoom) => {
-      this.chatRoomRef = chatRoom;
-      this.setState({
-        scheduleMeetingDialog: true
-      });
+    megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.EDIT, (ev, chatOrOccurrence) => {
+      if (chatOrOccurrence instanceof ChatRoom || !chatOrOccurrence) {
+        this.chatRoomRef = chatOrOccurrence;
+        this.setState({
+          scheduleMeetingDialog: true
+        });
+      } else {
+        this.occurrenceRef = chatOrOccurrence;
+        this.setState({
+          scheduleOccurrenceDialog: true
+        });
+      }
     });
     megaChat.rebind(this.EVENTS.NAV_RENDER_VIEW, (ev, view) => {
       if (Object.values(this.VIEWS).includes(view)) {
@@ -15806,7 +17904,9 @@ class ConversationsApp extends mixins.wl {
       startGroupChatDialog,
       startMeetingDialog,
       scheduleMeetingDialog,
-      leftPaneWidth
+      scheduleOccurrenceDialog,
+      leftPaneWidth,
+      callExpanded
     } = this.state;
     const isEmpty = chats && chats.every(c => c.isArchived()) && routingSection === 'chat' && !currentlyOpenedChat && !is_chatlink;
     const isLoading = !currentlyOpenedChat && megaChat.allChatsHadInitialLoadedHistory() === false && routingSection !== 'contacts';
@@ -15837,6 +17937,11 @@ class ConversationsApp extends mixins.wl {
       routingSection: routingSection,
       currentlyOpenedChat: currentlyOpenedChat,
       chatUIFlags: chatUIFlags,
+      onToggleExpandedFlag: () => {
+        this.setState(() => ({
+          callExpanded: call.ZP.isExpanded()
+        }));
+      },
       onMount: () => {
         const chatRoom = megaChat.getCurrentRoom();
         return chatRoom ? this.setState({
@@ -15868,13 +17973,26 @@ class ConversationsApp extends mixins.wl {
       onClose: () => this.setState({
         startMeetingDialog: false
       })
-    }), scheduleMeetingDialog && external_React_default().createElement(schedule.Pf, {
+    }), scheduleMeetingDialog && external_React_default().createElement(Schedule, {
       chatRoom: this.chatRoomRef,
+      callExpanded: callExpanded,
       onClose: () => {
         this.setState({
           scheduleMeetingDialog: false
         }, () => {
           this.chatRoomRef = null;
+        });
+      }
+    }), scheduleOccurrenceDialog && external_React_default().createElement(Edit, {
+      chatRoom: this.occurrenceRef.scheduledMeeting.chatRoom,
+      scheduledMeeting: this.occurrenceRef.scheduledMeeting,
+      occurrenceId: this.occurrenceRef.uid,
+      callExpanded: callExpanded,
+      onClose: () => {
+        this.setState({
+          scheduleOccurrenceDialog: false
+        }, () => {
+          this.occurrenceRef = null;
         });
       }
     }), external_React_default().createElement(LeftPanel, {
@@ -19502,7 +21620,7 @@ class Minimized extends mixins.wl {
       icon: "sprite-fm-mono icon-fullscreen-enter",
       onClick: ev => {
         ev.stopPropagation();
-        onCallExpand();
+        this.props.onCallExpand();
       }
     }), this.renderStreamControls()), unread ? external_React_default().createElement("div", {
       className: `${FloatingVideo.NAMESPACE}-notifications`
@@ -21400,247 +23518,6 @@ const withPermissionsObserver = Component => class extends _mixins_js1__.wl {
 
 /***/ }),
 
-/***/ 711:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.d(__webpack_exports__, {
-"Z": () => (Datepicker)
-});
-var react0__ = __webpack_require__(363);
-var react0 = __webpack_require__.n(react0__);
-var _mixins_js1__ = __webpack_require__(503);
-
-
-class Datepicker extends _mixins_js1__.wl {
-  constructor(props) {
-    super(props);
-    this.OPTIONS = {
-      classes: 'meetings-datepicker-calendar',
-      dateFormat: '@',
-      minDate: null,
-      startDate: null,
-      selectedDates: [],
-      prevHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
-      nextHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
-      altField: null,
-      firstDay: 0,
-      autoClose: true,
-      toggleSelected: false,
-      position: 'bottom left',
-      language: {
-        daysMin: [l[8763], l[8764], l[8765], l[8766], l[8767], l[8768], l[8769]],
-        months: [l[408], l[409], l[410], l[411], l[412], l[413], l[414], l[415], l[416], l[417], l[418], l[419]],
-        monthsShort: [l[24035], l[24037], l[24036], l[24038], l[24047], l[24039], l[24040], l[24041], l[24042], l[24043], l[24044], l[24045]]
-      },
-      onSelect: dateText => {
-        const prevDate = new Date(+this.props.value);
-        const nextDate = new Date(+dateText);
-        nextDate.setHours(prevDate.getHours(), prevDate.getMinutes());
-        return this.props.onSelect(nextDate.getTime());
-      }
-    };
-    this.containerRef = react0().createRef();
-    this.inputRef = react0().createRef();
-    this.datepicker = null;
-    this.formatValue = value => {
-      if (typeof value === 'number') {
-        return time2date(value / 1000, 18);
-      }
-      return value;
-    };
-    this.OPTIONS.startDate = new Date(this.props.startDate);
-    this.OPTIONS.selectedDates = this.props.selectedDates || [this.OPTIONS.startDate];
-    this.OPTIONS.minDate = this.props.minDate ? new Date(this.props.minDate) : new Date();
-    this.OPTIONS.position = this.props.position || this.OPTIONS.position;
-    this.OPTIONS.altField = `input.${this.props.altField}`;
-  }
-  initialize() {
-    const inputRef = this.inputRef && this.inputRef.current;
-    if (inputRef) {
-      var _this$props$onMount, _this$props;
-      $(inputRef).datepicker(this.OPTIONS);
-      this.datepicker = $(inputRef).data('datepicker');
-      (_this$props$onMount = (_this$props = this.props).onMount) == null ? void 0 : _this$props$onMount.call(_this$props, this.datepicker);
-    }
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    if (this.containerRef && this.containerRef.current) {
-      $(this.containerRef.current).unbind(`keyup.${Datepicker.NAMESPACE}`);
-    }
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    M.require('datepicker_js').done(() => this.initialize());
-    if (this.containerRef && this.containerRef.current) {
-      $(this.containerRef.current).rebind(`keyup.${Datepicker.NAMESPACE}`, ({
-        keyCode
-      }) => {
-        if (keyCode === 13) {
-          this.datepicker.hide();
-          return false;
-        }
-      });
-    }
-  }
-  render() {
-    const {
-      NAMESPACE
-    } = Datepicker;
-    const {
-      value,
-      name,
-      className,
-      placeholder,
-      onFocus,
-      onChange,
-      onBlur
-    } = this.props;
-    const formattedValue = this.formatValue(value);
-    return react0().createElement("div", {
-      ref: this.containerRef,
-      className: NAMESPACE
-    }, react0().createElement("div", {
-      className: "mega-input datepicker-input"
-    }, react0().createElement("input", {
-      ref: this.inputRef,
-      type: "text",
-      name: name,
-      className: `
-                            dialog-input
-                            ${className || ''}
-                        `,
-      autoComplete: "off",
-      placeholder: placeholder || '',
-      value: formattedValue,
-      onFocus: ev => onFocus == null ? void 0 : onFocus(ev),
-      onChange: ev => onChange == null ? void 0 : onChange(ev),
-      onBlur: ev => onBlur == null ? void 0 : onBlur(ev)
-    }), react0().createElement("i", {
-      className: "sprite-fm-mono icon-calendar1",
-      onClick: () => this.datepicker && this.datepicker.show()
-    })));
-  }
-}
-Datepicker.NAMESPACE = 'meetings-datepicker';
-
-/***/ }),
-
-/***/ 734:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.d(__webpack_exports__, {
-"o": () => (DateTime)
-});
-var react0__ = __webpack_require__(363);
-var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
-var _helpers_jsx4__ = __webpack_require__(435);
-var _datepicker_jsx2__ = __webpack_require__(711);
-var _select_jsx3__ = __webpack_require__(702);
-
-
-
-
-
-class DateTime extends _mixins1__.wl {
-  constructor(...args) {
-    super(...args);
-    this.state = {
-      datepickerRef: undefined,
-      manualDateInput: '',
-      manualTimeInput: '',
-      initialDate: ''
-    };
-    this.handleChange = ev => {
-      const {
-        onChange
-      } = this.props;
-      const {
-        datepickerRef,
-        initialDate
-      } = this.state;
-      if (!datepickerRef) {
-        return;
-      }
-      const {
-        value
-      } = ev.target;
-      const date = (0,_helpers_jsx4__.p6)(value);
-      const timestamp = date.valueOf();
-      const dateObj = new Date(timestamp);
-      dateObj.setHours(initialDate.getHours(), initialDate.getMinutes());
-      datepickerRef.selectedDates = [dateObj];
-      datepickerRef.currentDate = dateObj;
-      datepickerRef.nav._render();
-      datepickerRef.views.days._render();
-      onChange == null ? void 0 : onChange(value);
-      this.setState({
-        manualDateInput: dateObj.getTime()
-      });
-    };
-  }
-  render() {
-    const {
-      name,
-      startDate,
-      altField,
-      value,
-      minDate,
-      filteredTimeIntervals,
-      label,
-      isLoading,
-      onMount,
-      onSelectDate,
-      onSelectTime,
-      onBlur
-    } = this.props;
-    return react0().createElement((react0().Fragment), null, label && react0().createElement("span", null, label), react0().createElement(_datepicker_jsx2__.Z, {
-      name: `${_datepicker_jsx2__.Z.NAMESPACE}-${name}`,
-      className: isLoading ? 'disabled' : '',
-      startDate: startDate,
-      altField: `${_select_jsx3__.Z.NAMESPACE}-${altField}`,
-      value: value,
-      minDate: minDate,
-      onMount: datepickerRef => this.setState({
-        datepickerRef
-      }, () => onMount(datepickerRef)),
-      onSelect: onSelectDate,
-      onFocus: ({
-        target
-      }) => {
-        this.setState({
-          manualDateInput: undefined,
-          manualTimeInput: undefined,
-          initialDate: new Date(value)
-        }, () => target.select());
-      },
-      onChange: this.handleChange,
-      onBlur: () => onBlur(this.state.manualDateInput)
-    }), react0().createElement(_select_jsx3__.Z, {
-      name: `${_select_jsx3__.Z.NAMESPACE}-${altField}`,
-      className: isLoading ? 'disabled' : '',
-      typeable: true,
-      options: filteredTimeIntervals,
-      value: (() => typeof value === 'number' ? value : this.state.datepickerRef.currentDate.getTime())(),
-      format: toLocaleTime,
-      onSelect: onSelectTime,
-      onChange: () => false,
-      onBlur: timestamp => {
-        if (timestamp) {
-          onSelectTime({
-            value: timestamp
-          });
-        }
-      }
-    }));
-  }
-}
-
-/***/ }),
-
 /***/ 435:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -21709,1864 +23586,6 @@ const getTimeIntervals = (timestamp, offsetFrom, interval = 30) => {
   }
   return increments;
 };
-
-/***/ }),
-
-/***/ 340:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.d(__webpack_exports__, {
-"I": () => (Edit),
-"Z": () => (Recurring)
-});
-var _extends11__ = __webpack_require__(462);
-var react0__ = __webpack_require__(363);
-var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
-var _button_jsx2__ = __webpack_require__(193);
-var _schedule_jsx3__ = __webpack_require__(158);
-var _datepicker_jsx4__ = __webpack_require__(711);
-var _select_jsx5__ = __webpack_require__(702);
-var _ui_modalDialogs_jsx6__ = __webpack_require__(182);
-var _helpers_jsx10__ = __webpack_require__(435);
-var _link_jsx7__ = __webpack_require__(941);
-var _ui_utils_jsx8__ = __webpack_require__(79);
-var _datetime_jsx9__ = __webpack_require__(734);
-
-
-
-
-
-
-
-
-
-
-
-
-class Recurring extends _mixins1__.wl {
-  constructor(props) {
-    var _Object$values$find;
-    super(props);
-    this.VIEWS = {
-      DAILY: 0x00,
-      WEEKLY: 0x01,
-      MONTHLY: 0x02
-    };
-    this.FREQUENCIES = {
-      DAILY: 'd',
-      WEEKLY: 'w',
-      MONTHLY: 'm'
-    };
-    this.WEEK_DAYS = {
-      MONDAY: {
-        value: 1,
-        label: l.schedule_day_control_mon,
-        name: l.schedule_occur_mon
-      },
-      TUESDAY: {
-        value: 2,
-        label: l.schedule_day_control_tue,
-        name: l.schedule_occur_tue
-      },
-      WEDNESDAY: {
-        value: 3,
-        label: l.schedule_day_control_wed,
-        name: l.schedule_occur_wed
-      },
-      THURSDAY: {
-        value: 4,
-        label: l.schedule_day_control_thu,
-        name: l.schedule_occur_thu
-      },
-      FRIDAY: {
-        value: 5,
-        label: l.schedule_day_control_fri,
-        name: l.schedule_occur_fri
-      },
-      SATURDAY: {
-        value: 6,
-        label: l.schedule_day_control_sat,
-        name: l.schedule_occur_sat
-      },
-      SUNDAY: {
-        value: 7,
-        label: l.schedule_day_control_sun,
-        name: l.schedule_occur_sun
-      }
-    };
-    this.OFFSETS = {
-      FIRST: {
-        value: 1,
-        label: l.recurring_frequency_offset_first
-      },
-      SECOND: {
-        value: 2,
-        label: l.recurring_frequency_offset_second
-      },
-      THIRD: {
-        value: 3,
-        label: l.recurring_frequency_offset_third
-      },
-      FOURTH: {
-        value: 4,
-        label: l.recurring_frequency_offset_fourth
-      },
-      FIFTH: {
-        value: 5,
-        label: l.recurring_frequency_offset_fifth
-      }
-    };
-    this.MONTH_RULES = {
-      DAY: 'day',
-      OFFSET: 'offset'
-    };
-    this.initialEnd = (0,_helpers_jsx10__.zI)(this.props.startDateTime, 6);
-    this.initialWeekDays = Object.values(this.WEEK_DAYS).map(d => d.value);
-    this.initialMonthDay = this.props.startDateTime ? new Date(this.props.startDateTime).getDate() : undefined;
-    this.state = {
-      view: this.VIEWS.DAILY,
-      frequency: this.FREQUENCIES.DAILY,
-      end: this.initialEnd,
-      prevEnd: undefined,
-      interval: 0,
-      weekDays: this.initialWeekDays,
-      monthRule: this.MONTH_RULES.DAY,
-      monthDays: [this.initialMonthDay],
-      offset: {
-        value: this.OFFSETS.FIRST.value,
-        weekDay: this.WEEK_DAYS.MONDAY.value
-      },
-      monthDaysWarning: false
-    };
-    this.toggleView = (view, frequency, state) => this.setState({
-      view,
-      frequency,
-      ...state
-    });
-    const {
-      chatRoom,
-      startDateTime
-    } = this.props;
-    const weekDay = new Date(startDateTime).getDay();
-    this.state.offset.weekDay = ((_Object$values$find = Object.values(this.WEEK_DAYS).find(d => d.value === weekDay)) == null ? void 0 : _Object$values$find.value) || this.WEEK_DAYS.SUNDAY.value;
-    if (chatRoom && chatRoom.scheduledMeeting && chatRoom.scheduledMeeting.isRecurring) {
-      const {
-        frequency,
-        interval,
-        end,
-        weekDays,
-        monthDays,
-        offset
-      } = chatRoom.scheduledMeeting.recurring;
-      this.state.view = frequency === 'd' ? this.VIEWS.DAILY : frequency === 'w' ? this.VIEWS.WEEKLY : this.VIEWS.MONTHLY;
-      this.state.frequency = frequency;
-      this.state.end = end;
-      this.state.interval = interval;
-      this.state.weekDays = weekDays && weekDays.length ? weekDays : this.initialWeekDays;
-      this.state.monthRule = monthDays && monthDays.length ? this.MONTH_RULES.DAY : this.MONTH_RULES.OFFSET;
-      this.state.monthDays = monthDays && monthDays.length ? [monthDays[0]] : [this.initialMonthDay];
-      this.state.offset = offset && Object.keys(offset).length ? offset : this.state.offset;
-    }
-  }
-  getFormattedState(state) {
-    const {
-      frequency,
-      end,
-      interval,
-      weekDays,
-      monthRule,
-      monthDays,
-      offset
-    } = state;
-    switch (true) {
-      case frequency === this.FREQUENCIES.DAILY:
-        return {
-          frequency,
-          end,
-          weekDays
-        };
-      case frequency === this.FREQUENCIES.WEEKLY:
-        return {
-          frequency,
-          end,
-          ...(interval && {
-            interval
-          }),
-          weekDays
-        };
-      case frequency === this.FREQUENCIES.MONTHLY:
-        return {
-          frequency,
-          end,
-          ...(interval && {
-            interval
-          }),
-          ...(monthRule === this.MONTH_RULES.DAY ? {
-            monthDays
-          } : {
-            offset: [[offset.value, offset.weekDay]]
-          })
-        };
-    }
-  }
-  renderDayControls() {
-    const {
-      weekDays,
-      view
-    } = this.state;
-    const handleWeeklySelection = (weekDay, remove) => {
-      this.setState(state => {
-        if (remove) {
-          return {
-            weekDays: state.weekDays.length === 1 ? state.weekDays : state.weekDays.filter(d => d !== weekDay)
-          };
-        }
-        return {
-          weekDays: [...state.weekDays, weekDay]
-        };
-      }, () => {
-        const {
-          weekDays
-        } = this.state;
-        if (weekDays.length === Object.keys(this.WEEK_DAYS).length) {
-          this.toggleView(this.VIEWS.DAILY, this.FREQUENCIES.DAILY);
-        }
-      });
-    };
-    const handleDailySelection = weekDay => {
-      this.toggleView(this.VIEWS.WEEKLY, this.FREQUENCIES.WEEKLY, {
-        weekDays: weekDays.filter(d => d !== weekDay)
-      });
-    };
-    return react0().createElement("div", {
-      className: "recurring-field-row"
-    }, Object.values(this.WEEK_DAYS).map(({
-      value,
-      label
-    }) => {
-      const isCurrentlySelected = weekDays.includes(value);
-      return react0().createElement(_button_jsx2__.Z, {
-        key: value,
-        className: `
-                                mega-button
-                                action
-                                recurring-toggle-button
-                                ${isCurrentlySelected ? 'active' : ''}
-                                ${weekDays.length === 1 && isCurrentlySelected ? 'disabled' : ''}
-                            `,
-        onClick: () => {
-          if (view === this.VIEWS.WEEKLY) {
-            return handleWeeklySelection(value, isCurrentlySelected);
-          }
-          return handleDailySelection(value);
-        }
-      }, label);
-    }));
-  }
-  renderIntervalControls() {
-    const {
-      view,
-      interval
-    } = this.state;
-    return react0().createElement("div", {
-      className: "recurring-field-row"
-    }, react0().createElement("span", null, l.recur_rate), react0().createElement("div", {
-      className: "mega-input inline recurring-interval"
-    }, react0().createElement(_select_jsx5__.Z, {
-      name: `${Recurring.NAMESPACE}-interval`,
-      value: interval > 0 ? interval : 1,
-      icon: true,
-      options: [...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
-        value += 1;
-        return {
-          value: value,
-          label: value
-        };
-      }),
-      onSelect: ({
-        value
-      }) => {
-        this.setState({
-          interval: value === 1 ? 0 : value
-        });
-      }
-    })), view === this.VIEWS.WEEKLY && react0().createElement("span", null, mega.icu.format(l.plural_week, interval)), view === this.VIEWS.MONTHLY && react0().createElement("span", null, mega.icu.format(l.plural_month, interval)));
-  }
-  renderEndControls() {
-    const {
-      end,
-      prevEnd
-    } = this.state;
-    return react0().createElement("div", {
-      className: "recurring-field-row"
-    }, react0().createElement("div", {
-      className: "recurring-title-heading"
-    }, l.recurring_ends), react0().createElement("div", {
-      className: "recurring-radio-buttons"
-    }, react0().createElement("div", {
-      className: "recurring-label-wrap"
-    }, react0().createElement("div", {
-      className: `
-                                uiTheme
-                                ${end ? 'radioOff' : 'radioOn'}
-                            `
-    }, react0().createElement("input", {
-      type: "radio",
-      name: `${Recurring.NAMESPACE}-radio-end`,
-      className: `
-                                    uiTheme
-                                    ${end ? 'radioOff' : 'radioOn'}
-                                `,
-      onChange: () => {
-        this.setState(state => ({
-          end: undefined,
-          prevEnd: state.end || state.prevEnd
-        }));
-      }
-    })), react0().createElement("div", {
-      className: "radio-txt"
-    }, react0().createElement("span", {
-      className: "recurring-radio-label",
-      onClick: () => {
-        this.setState(state => ({
-          end: undefined,
-          prevEnd: state.end || state.prevEnd
-        }));
-      }
-    }, l.recurring_never))), react0().createElement("div", {
-      className: "recurring-label-wrap"
-    }, react0().createElement("div", {
-      className: `
-                                uiTheme
-                                ${end ? 'radioOn' : 'radioOff'}
-                            `
-    }, react0().createElement("input", {
-      type: "radio",
-      name: `${Recurring.NAMESPACE}-radio-end`,
-      className: `
-                                    uiTheme
-                                    ${end ? 'radioOn' : 'radioOff'}
-                                `,
-      onChange: () => {
-        this.setState({
-          end: prevEnd || this.initialEnd
-        });
-      }
-    })), react0().createElement("div", {
-      className: "radio-txt"
-    }, react0().createElement("span", {
-      className: "recurring-radio-label",
-      onClick: () => {
-        return end ? null : this.setState({
-          end: prevEnd || this.initialEnd
-        });
-      }
-    }, l.recurring_on), react0().createElement(_datepicker_jsx4__.Z, {
-      name: `${Recurring.NAMESPACE}-endDateTime`,
-      position: "top left",
-      startDate: end || this.initialEnd,
-      selectedDates: [new Date(end)],
-      value: end || prevEnd || '',
-      placeholder: time2date(end || prevEnd || this.initialEnd / 1000, 18),
-      onMount: this.props.onMount,
-      onSelect: timestamp => {
-        this.setState({
-          end: timestamp
-        }, () => {
-          this.safeForceUpdate();
-        });
-      }
-    })))));
-  }
-  renderDaily() {
-    return react0().createElement("div", {
-      className: `${Recurring.NAMESPACE}-daily`
-    }, this.renderDayControls(), this.renderEndControls());
-  }
-  renderWeekly() {
-    return react0().createElement("div", {
-      className: `${Recurring.NAMESPACE}-weekly`
-    }, this.renderIntervalControls(), this.renderDayControls(), this.renderEndControls());
-  }
-  renderMonthly() {
-    const {
-      monthRule,
-      monthDays,
-      monthDaysWarning,
-      offset
-    } = this.state;
-    return react0().createElement("div", {
-      className: `${Recurring.NAMESPACE}-monthly`
-    }, this.renderIntervalControls(), react0().createElement("div", {
-      className: "recurring-field-row"
-    }, react0().createElement("div", {
-      className: "recurring-radio-buttons",
-      onClick: ev => {
-        const {
-          name,
-          value
-        } = ev.target;
-        if (name === `${Recurring.NAMESPACE}-radio-monthRule`) {
-          this.setState({
-            monthRule: value
-          });
-        }
-      }
-    }, react0().createElement("div", {
-      className: "recurring-label-wrap"
-    }, react0().createElement("div", {
-      className: `
-                                    uiTheme
-                                    ${monthRule === 'day' ? 'radioOn' : 'radioOff'}
-                                `
-    }, react0().createElement("input", {
-      type: "radio",
-      name: `${Recurring.NAMESPACE}-radio-monthRule`,
-      value: "day",
-      className: `
-                                        uiTheme
-                                        ${monthRule === 'day' ? 'radioOn' : 'radioOff'}
-                                    `
-    })), react0().createElement("div", {
-      className: "radio-txt"
-    }, react0().createElement("span", {
-      className: "recurring-radio-label",
-      onClick: () => {
-        this.setState({
-          monthRule: this.MONTH_RULES.DAY
-        });
-      }
-    }, l.recurring_frequency_day), react0().createElement("div", {
-      className: "mega-input inline recurring-day"
-    }, react0().createElement(_select_jsx5__.Z, {
-      name: `${Recurring.NAMESPACE}-monthDay`,
-      icon: true,
-      value: monthDays[0],
-      options: [...Array(31).keys()].map(value => {
-        value += 1;
-        return {
-          value,
-          label: value
-        };
-      }),
-      onSelect: ({
-        value
-      }) => {
-        this.setState({
-          monthRule: this.MONTH_RULES.DAY,
-          monthDays: [value],
-          monthDaysWarning: value > 28
-        });
-      }
-    })))), monthDaysWarning && react0().createElement("div", {
-      className: "recurring-label-wrap"
-    }, react0().createElement("div", {
-      className: "mega-banner body with-btn"
-    }, react0().createElement("div", {
-      className: "green-notification cell text-cell"
-    }, react0().createElement("div", {
-      className: "versioning-body-text"
-    }, l.recurring_monthdays_warning.replace('%n', monthDays[0]))))), react0().createElement("div", {
-      className: "recurring-label-wrap"
-    }, react0().createElement("div", {
-      className: `
-                                    uiTheme
-                                    ${monthRule === this.MONTH_RULES.OFFSET ? 'radioOn' : 'radioOff'}
-                                `
-    }, react0().createElement("input", {
-      type: "radio",
-      name: `${Recurring.NAMESPACE}-radio-monthRule`,
-      value: "offset",
-      className: `
-                                        uiTheme
-                                        ${monthRule === this.MONTH_RULES.OFFSET ? 'radioOn' : 'radioOff'}
-                                    `
-    })), react0().createElement("div", {
-      className: "radio-txt"
-    }, react0().createElement(_select_jsx5__.Z, {
-      name: "recurring-offset-value",
-      className: "inline",
-      icon: true,
-      value: offset && offset.value && Object.values(this.OFFSETS).find(o => o.value === offset.value).label || this.OFFSETS.FIRST.label,
-      options: Object.values(this.OFFSETS),
-      onSelect: option => {
-        this.setState(state => ({
-          monthRule: this.MONTH_RULES.OFFSET,
-          offset: {
-            value: option.value,
-            weekDay: state.offset.weekDay || this.WEEK_DAYS.MONDAY.value
-          }
-        }));
-      }
-    }), react0().createElement(_select_jsx5__.Z, {
-      name: "recurring-offset-day",
-      className: "inline",
-      icon: true,
-      value: offset && offset.weekDay && Object.values(this.WEEK_DAYS).find(o => o.value === offset.weekDay).name || this.WEEK_DAYS.MONDAY.name,
-      options: Object.values(this.WEEK_DAYS).map(({
-        value,
-        name
-      }) => ({
-        value,
-        label: name
-      })),
-      onSelect: option => {
-        this.setState(state => ({
-          monthRule: this.MONTH_RULES.OFFSET,
-          offset: {
-            value: state.offset.value || this.OFFSETS.FIRST.value,
-            weekDay: option.value
-          }
-        }));
-      }
-    }))))), this.renderEndControls());
-  }
-  renderNavigation(view) {
-    return react0().createElement((react0().Fragment), null, react0().createElement(_button_jsx2__.Z, {
-      className: `
-                        mega-button
-                        action
-                        recurring-nav-button
-                        ${view === this.VIEWS.DAILY ? 'active' : ''}
-                    `,
-      onClick: () => this.toggleView(this.VIEWS.DAILY, this.FREQUENCIES.DAILY)
-    }, l.recurring_daily), react0().createElement(_button_jsx2__.Z, {
-      className: `
-                        mega-button
-                        action
-                        recurring-nav-button
-                        ${view === this.VIEWS.WEEKLY ? 'active' : ''}
-                    `,
-      onClick: () => this.toggleView(this.VIEWS.WEEKLY, this.FREQUENCIES.WEEKLY)
-    }, l.recurring_weekly), react0().createElement(_button_jsx2__.Z, {
-      className: `
-                        mega-button
-                        action
-                        recurring-nav-button
-                        ${view === this.VIEWS.MONTHLY ? 'active' : ''}
-                    `,
-      onClick: () => this.toggleView(this.VIEWS.MONTHLY, this.FREQUENCIES.MONTHLY)
-    }, l.recurring_monthly));
-  }
-  renderContent(view) {
-    switch (view) {
-      case this.VIEWS.DAILY:
-        return this.renderDaily();
-      case this.VIEWS.WEEKLY:
-        return this.renderWeekly();
-      case this.VIEWS.MONTHLY:
-        return this.renderMonthly();
-    }
-  }
-  componentWillUpdate(nextProps, nextState) {
-    if (this.state.view !== this.VIEWS.DAILY && nextState.view === this.VIEWS.DAILY) {
-      nextState.weekDays = this.initialWeekDays;
-    }
-    if (nextState.weekDays.length === Object.keys(this.WEEK_DAYS).length && this.state.view !== this.VIEWS.WEEKLY && nextState.view === this.VIEWS.WEEKLY || !(0,_helpers_jsx10__.KC)(nextProps.startDateTime, this.props.startDateTime) && this.state.view === this.VIEWS.WEEKLY) {
-      const weekday = new Date(nextProps.startDateTime).getDay();
-      nextState.weekDays = [weekday === 0 ? 7 : weekday];
-    }
-    if (!(0,_helpers_jsx10__.KC)(nextProps.startDateTime, this.props.startDateTime) && this.state.view === this.VIEWS.MONTHLY) {
-      var _Object$values$find2;
-      const nextDate = new Date(nextProps.startDateTime);
-      nextState.monthDays = [nextDate.getDate()];
-      nextState.offset.weekDay = ((_Object$values$find2 = Object.values(this.WEEK_DAYS).find(d => d.value === nextDate.getDay())) == null ? void 0 : _Object$values$find2.value) || this.WEEK_DAYS.SUNDAY.value;
-    }
-    if (nextState.view === this.VIEWS.MONTHLY && this.state.interval > 12) {
-      nextState.interval = 12;
-    }
-    this.props.onUpdate(this.getFormattedState(nextState));
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    this.props.onUpdate(this.getFormattedState(this.state));
-  }
-  render() {
-    const {
-      NAMESPACE
-    } = Recurring;
-    const {
-      view
-    } = this.state;
-    return react0().createElement(_schedule_jsx3__.X2, null, react0().createElement(_schedule_jsx3__.sg, null), react0().createElement(_schedule_jsx3__.sg, null, react0().createElement("div", {
-      className: NAMESPACE
-    }, react0().createElement("div", {
-      className: `${NAMESPACE}-container`
-    }, react0().createElement("div", {
-      className: `${NAMESPACE}-navigation`
-    }, this.renderNavigation(view)), react0().createElement("div", {
-      className: `${NAMESPACE}-content`
-    }, this.renderContent(view))))));
-  }
-}
-Recurring.NAMESPACE = 'meetings-recurring';
-class Edit extends _mixins1__.wl {
-  constructor(props) {
-    super(props);
-    this.occurrenceRef = null;
-    this.datepickerRefs = [];
-    this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
-    this.state = {
-      startDateTime: undefined,
-      endDateTime: undefined,
-      isDirty: false,
-      closeDialog: false
-    };
-    this.onStartDateSelect = startDateTime => {
-      this.setState({
-        startDateTime,
-        isDirty: true
-      }, () => {
-        this.datepickerRefs.endDateTime.selectDate(new Date(startDateTime + this.interval));
-      });
-    };
-    this.onEndDateSelect = endDateTime => {
-      this.setState({
-        endDateTime,
-        isDirty: true
-      }, () => {
-        const {
-          startDateTime,
-          endDateTime
-        } = this.state;
-        if (endDateTime < startDateTime) {
-          if (endDateTime < Date.now()) {
-            return this.setState({
-              endDateTime: startDateTime + this.interval
-            });
-          }
-          this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
-        }
-      });
-    };
-    this.handleTimeSelect = ({
-      startDateTime,
-      endDateTime
-    }) => {
-      startDateTime = startDateTime || this.state.startDateTime;
-      endDateTime = endDateTime || this.state.endDateTime;
-      this.setState(state => {
-        return {
-          startDateTime: endDateTime <= state.startDateTime ? endDateTime - this.interval : startDateTime,
-          endDateTime: startDateTime >= state.endDateTime ? startDateTime + this.interval : endDateTime,
-          isDirty: true
-        };
-      });
-    };
-    const {
-      scheduledMeeting,
-      occurrenceId
-    } = this.props;
-    this.occurrenceRef = scheduledMeeting.occurrences[occurrenceId];
-    this.state.startDateTime = this.occurrenceRef.start;
-    this.state.endDateTime = this.occurrenceRef.end;
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    if ($.dialog === _schedule_jsx3__.Pf.dialogName) {
-      closeDialog();
-    }
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    M.safeShowDialog(_schedule_jsx3__.Pf.dialogName, `#${_schedule_jsx3__.Pf.NAMESPACE}`);
-  }
-  render() {
-    const {
-      chatRoom,
-      onClose
-    } = this.props;
-    const {
-      startDateTime,
-      endDateTime,
-      isDirty,
-      closeDialog
-    } = this.state;
-    return react0().createElement(_ui_modalDialogs_jsx6__.Z.ModalDialog, (0,_extends11__.Z)({}, this.state, {
-      id: _schedule_jsx3__.Pf.NAMESPACE,
-      className: `
-                    fluid
-                    ${closeDialog ? 'with-confirmation-dialog' : ''}
-                `,
-      dialogName: _schedule_jsx3__.Pf.dialogName,
-      dialogType: "main",
-      onClose: () => {
-        return isDirty ? this.setState({
-          closeDialog: true
-        }) : onClose();
-      }
-    }), react0().createElement("header", null, react0().createElement("h2", null, l.edit_meeting_title)), react0().createElement("div", {
-      className: "fm-dialog-body"
-    }, react0().createElement(_schedule_jsx3__.X2, null, react0().createElement("div", {
-      className: "mega-banner body recurring-edit-banner"
-    }, react0().createElement("div", {
-      className: "cell"
-    }, (0,_ui_utils_jsx8__.hV)(l.scheduled_edit_occurrence_note, '[A]', _link_jsx7__.Z, {
-      onClick: () => {
-        onClose();
-        megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, chatRoom);
-      }
-    })))), react0().createElement(_schedule_jsx3__.X2, {
-      className: "start-aligned"
-    }, react0().createElement(_schedule_jsx3__.sg, null, react0().createElement("i", {
-      className: "sprite-fm-mono icon-recents-filled"
-    })), react0().createElement("div", {
-      className: "schedule-date-container"
-    }, react0().createElement(_datetime_jsx9__.o, {
-      name: "startDateTime",
-      altField: "startTime",
-      datepickerRef: this.datepickerRefs.startDateTime,
-      startDate: startDateTime,
-      value: startDateTime,
-      filteredTimeIntervals: (0,_helpers_jsx10__.nl)(startDateTime),
-      label: l.schedule_start_date,
-      onMount: datepicker => {
-        this.datepickerRefs.startDateTime = datepicker;
-      },
-      onSelectDate: startDateTime => this.onStartDateSelect(startDateTime),
-      onSelectTime: ({
-        value: startDateTime
-      }) => this.handleTimeSelect({
-        startDateTime
-      }),
-      onChange: value => this.setState({
-        startDateTime: value
-      }),
-      onBlur: timestamp => {
-        if (timestamp) {
-          timestamp = timestamp < Date.now() ? this.occurrenceRef.start : timestamp;
-          this.onStartDateSelect(timestamp);
-        }
-      }
-    }), react0().createElement(_datetime_jsx9__.o, {
-      name: "endDateTime",
-      altField: "endTime",
-      datepickerRef: this.datepickerRefs.endDateTime,
-      startDate: endDateTime,
-      value: endDateTime,
-      filteredTimeIntervals: (0,_helpers_jsx10__.nl)(endDateTime, startDateTime),
-      label: l.schedule_end_date,
-      onMount: datepicker => {
-        this.datepickerRefs.endDateTime = datepicker;
-      },
-      onSelectDate: endDateTime => this.onEndDateSelect(endDateTime),
-      onSelectTime: ({
-        value: endDateTime
-      }) => this.handleTimeSelect({
-        endDateTime
-      }),
-      onChange: timestamp => this.setState({
-        endDateTime: timestamp
-      }),
-      onBlur: timestamp => timestamp && this.onEndDateSelect(timestamp)
-    })))), react0().createElement("footer", null, react0().createElement("div", {
-      className: "footer-container"
-    }, react0().createElement(_button_jsx2__.Z, {
-      className: "mega-button positive",
-      onClick: () => {
-        const {
-          startDateTime,
-          endDateTime
-        } = this.state;
-        if (startDateTime !== this.occurrenceRef.start || endDateTime !== this.occurrenceRef.end) {
-          this.occurrenceRef.update(startDateTime, endDateTime);
-        }
-        onClose();
-      }
-    }, react0().createElement("span", null, l.update_meeting_button)))), closeDialog && react0().createElement(_schedule_jsx3__.sj, {
-      onToggle: () => this.setState({
-        closeDialog: false
-      }),
-      onClose: onClose
-    }));
-  }
-}
-
-/***/ }),
-
-/***/ 158:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  "sj": () => (CloseDialog),
-  "sg": () => (Column),
-  "X2": () => (Row),
-  "Pf": () => (Schedule)
-});
-
-// EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
-var esm_extends = __webpack_require__(462);
-// EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
-var external_React_default = __webpack_require__.n(external_React_);
-// EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
-// EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
-var modalDialogs = __webpack_require__(182);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
-var meetings_button = __webpack_require__(193);
-// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
-// EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var ui_contacts = __webpack_require__(13);
-// EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/invite.jsx
-
-
-
-
-
-class Invite extends mixins.wl {
-  constructor(props) {
-    super(props);
-    this.containerRef = external_React_default().createRef();
-    this.wrapperRef = external_React_default().createRef();
-    this.state = {
-      value: '',
-      expanded: false,
-      loading: true,
-      frequents: [],
-      frequentsInitial: [],
-      contacts: [],
-      contactsInitial: [],
-      selected: []
-    };
-    this.handleMousedown = ({
-      target
-    }) => this.containerRef && this.containerRef.current && this.containerRef.current.contains(target) ? null : this.setState({
-      expanded: false
-    });
-    this.getSortedContactsList = frequents => {
-      const filteredContacts = [];
-      M.u.forEach(contact => {
-        if (contact.c === 1 && !frequents.includes(contact.u) && !this.state.selected.includes(contact.u)) {
-          filteredContacts.push(contact);
-        }
-      });
-      const sortFn = M.getSortByNameFn2(1);
-      filteredContacts.sort((a, b) => sortFn(a, b));
-      return filteredContacts;
-    };
-    this.doMatch = (value, collection) => {
-      value = value.toLowerCase();
-      return collection.filter(contact => {
-        contact = typeof contact === 'string' ? M.getUserByHandle(contact) : contact;
-        const name = M.getNameByHandle(contact.u).toLowerCase();
-        const email = contact.m && contact.m.toLowerCase();
-        return name.includes(value) || email.includes(value);
-      });
-    };
-    this.handleSearch = this.handleSearch.bind(this);
-    this.state.selected = this.props.participants || [];
-  }
-  reinitializeWrapper() {
-    const wrapperRef = this.wrapperRef && this.wrapperRef.current;
-    if (wrapperRef) {
-      wrapperRef.reinitialise();
-      wrapperRef.scrollToY(0);
-    }
-  }
-  buildContactsList() {
-    megaChat.getFrequentContacts().then(frequentContacts => {
-      if (this.isMounted()) {
-        const frequents = frequentContacts.slice(-ui_contacts.MAX_FREQUENTS).map(c => c.userId);
-        const contacts = this.getSortedContactsList(frequents);
-        this.setState({
-          frequents,
-          frequentsInitial: frequents,
-          contacts,
-          contactsInitial: contacts,
-          loading: false
-        });
-      }
-    });
-  }
-  handleSearch(ev) {
-    const {
-      value
-    } = ev.target;
-    const searching = value.length >= 2;
-    const frequents = searching ? this.doMatch(value, this.state.frequentsInitial) : this.state.frequentsInitial;
-    const contacts = searching ? this.doMatch(value, this.state.contactsInitial) : this.state.contactsInitial;
-    this.setState({
-      value,
-      contacts,
-      frequents
-    }, () => this.reinitializeWrapper());
-  }
-  handleSelect(userHandle, expanded = false) {
-    this.setState(state => ({
-      value: '',
-      expanded,
-      selected: state.selected.includes(userHandle) ? state.selected.filter(c => c !== userHandle) : [...state.selected, userHandle]
-    }), () => {
-      this.props.onSelect(this.state.selected);
-      this.buildContactsList();
-      this.reinitializeWrapper();
-    });
-  }
-  getFilteredContacts(contacts) {
-    if (contacts && contacts.length) {
-      return contacts.map(contact => {
-        contact = contact instanceof MegaDataMap ? contact : M.u[contact];
-        return this.state.selected.includes(contact.u) ? null : external_React_default().createElement("div", {
-          key: contact.u,
-          className: "invite-section-item",
-          onClick: () => {
-            this.handleSelect(contact.u);
-          }
-        }, external_React_default().createElement(ui_contacts.Avatar, {
-          contact: contact
-        }), external_React_default().createElement("div", {
-          className: "invite-item-data"
-        }, external_React_default().createElement("div", {
-          className: "invite-item-name"
-        }, external_React_default().createElement(utils.a0, {
-          simpletip: {
-            offset: 10
-          }
-        }, M.getNameByHandle(contact.u))), external_React_default().createElement("div", {
-          className: "invite-item-mail"
-        }, contact.m)));
-      });
-    }
-    return null;
-  }
-  renderContent() {
-    const {
-      frequents,
-      contacts,
-      selected
-    } = this.state;
-    const hasMoreFrequents = frequents.length && frequents.some(h => !selected.includes(h));
-    const $$SECTION = (title, children) => external_React_default().createElement("div", {
-      className: "invite-section"
-    }, external_React_default().createElement("div", {
-      className: "invite-section-title"
-    }, title), children && external_React_default().createElement("div", {
-      className: "invite-section-list"
-    }, children));
-    if (hasMoreFrequents || contacts.length) {
-      return external_React_default().createElement(perfectScrollbar.F, {
-        ref: this.wrapperRef,
-        className: "invite-scroll-wrapper",
-        options: {
-          'suppressScrollX': true
-        }
-      }, hasMoreFrequents ? $$SECTION(l.recent_contact_label, this.getFilteredContacts(frequents)) : '', contacts.length ? $$SECTION(l.all_contact_label, this.getFilteredContacts(contacts)) : '', frequents.length === 0 && contacts.length === 0 && $$SECTION(l.invite_no_results_found, null));
-    }
-    return $$SECTION(l.invite_no_contacts_to_add, null);
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    document.removeEventListener('mousedown', this.handleMousedown);
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    document.addEventListener('mousedown', this.handleMousedown);
-    this.buildContactsList();
-  }
-  render() {
-    const {
-      value,
-      expanded,
-      loading,
-      selected
-    } = this.state;
-    return external_React_default().createElement("div", {
-      ref: this.containerRef,
-      className: `
-                    ${Invite.NAMESPACE}
-                    ${this.props.className || ''}
-                `
-    }, external_React_default().createElement("div", {
-      className: "multiple-input"
-    }, external_React_default().createElement("ul", {
-      className: "token-input-list-mega",
-      onClick: ev => ev.target.classList.contains('token-input-list-mega') && this.setState({
-        expanded: true
-      })
-    }, selected.map(handle => {
-      return external_React_default().createElement("li", {
-        key: handle,
-        className: "token-input-token-mega"
-      }, external_React_default().createElement("div", {
-        className: "contact-tag-item"
-      }, external_React_default().createElement(ui_contacts.Avatar, {
-        contact: M.u[handle],
-        className: "avatar-wrapper box-avatar"
-      }), external_React_default().createElement(utils.a0, null, M.getNameByHandle(handle)), external_React_default().createElement("i", {
-        className: "sprite-fm-mono icon-close-component",
-        onClick: () => {
-          this.handleSelect(handle);
-        }
-      })));
-    }), external_React_default().createElement("li", {
-      className: "token-input-input-token-mega"
-    }, external_React_default().createElement("input", {
-      type: "text",
-      name: "participants",
-      className: `${Invite.NAMESPACE}-input`,
-      autoComplete: "off",
-      placeholder: selected.length ? '' : l.schedule_participant_input,
-      value: value,
-      onFocus: () => this.setState({
-        expanded: true
-      }),
-      onChange: this.handleSearch,
-      onKeyDown: ({
-        target,
-        keyCode
-      }) => {
-        const {
-          selected
-        } = this.state;
-        return keyCode === 8 && target.value === '' && selected.length && this.handleSelect(selected[selected.length - 1], true);
-      }
-    })))), loading ? null : external_React_default().createElement("div", {
-      className: `mega-input-dropdown ${expanded ? '' : 'hidden'}`
-    }, this.renderContent()));
-  }
-}
-Invite.NAMESPACE = 'meetings-invite';
-// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
-var helpers = __webpack_require__(435);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/recurring.jsx
-var schedule_recurring = __webpack_require__(340);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/datetime.jsx
-var datetime = __webpack_require__(734);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx
-
-
-
-
-
-
-
-
-
-
-class Schedule extends mixins.wl {
-  constructor(...args) {
-    super(...args);
-    this.wrapperRef = external_React_default().createRef();
-    this.scheduledMeetingRef = null;
-    this.localStreamRef = '.float-video';
-    this.datepickerRefs = [];
-    this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
-    this.nearestHalfHour = (0,helpers.Ny)();
-    this.state = {
-      topic: '',
-      startDateTime: this.nearestHalfHour,
-      endDateTime: this.nearestHalfHour + this.interval,
-      timezone: (0,helpers.Sv)(),
-      recurring: false,
-      participants: [],
-      link: false,
-      sendInvite: false,
-      openInvite: true,
-      description: '',
-      closeDialog: false,
-      isEdit: false,
-      isDirty: false,
-      isLoading: false,
-      topicInvalid: false,
-      invalidTopicMsg: '',
-      descriptionInvalid: false
-    };
-    this.onTopicChange = value => {
-      if (value.length > ChatRoom.TOPIC_MAX_LENGTH) {
-        this.setState({
-          invalidTopicMsg: l.err_schedule_title_long,
-          topicInvalid: true
-        });
-        value = value.substring(0, ChatRoom.TOPIC_MAX_LENGTH);
-      } else if (value.length === 0) {
-        this.setState({
-          invalidTopicMsg: l.schedule_title_missing,
-          topicInvalid: true
-        });
-      } else if (this.state.invalidTopicMsg) {
-        this.setState({
-          invalidTopicMsg: '',
-          topicInvalid: false
-        });
-      }
-      this.handleChange('topic', value);
-    };
-    this.onTextareaChange = value => {
-      if (value.length > 3000) {
-        this.setState({
-          descriptionInvalid: true
-        });
-        value = value.substring(0, 3000);
-      } else if (this.state.descriptionInvalid) {
-        this.setState({
-          descriptionInvalid: false
-        });
-      }
-      this.handleChange('description', value);
-    };
-    this.onStartDateSelect = () => {
-      this.datepickerRefs.endDateTime.selectDate(new Date(this.state.startDateTime + this.interval));
-    };
-    this.onEndDateSelect = () => {
-      const {
-        startDateTime,
-        endDateTime
-      } = this.state;
-      if (endDateTime < startDateTime) {
-        if (endDateTime < Date.now()) {
-          return this.setState({
-            endDateTime: startDateTime + this.interval
-          });
-        }
-        this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
-      }
-    };
-    this.handleToggle = prop => {
-      return Object.keys(this.state).includes(prop) && this.setState(state => ({
-        [prop]: !state[prop],
-        isDirty: true
-      }));
-    };
-    this.handleChange = (prop, value) => {
-      return Object.keys(this.state).includes(prop) && this.setState({
-        [prop]: value,
-        isDirty: true
-      });
-    };
-    this.handleDateSelect = ({
-      startDateTime,
-      endDateTime
-    }, callback) => {
-      this.setState(state => ({
-        startDateTime: startDateTime || state.startDateTime,
-        endDateTime: endDateTime || state.endDateTime,
-        isDirty: true
-      }), () => {
-        const {
-          recurring
-        } = this.state;
-        if (recurring && recurring.end) {
-          const recurringEnd = (0,helpers.zI)(this.state.startDateTime, 6);
-          this.datepickerRefs.recurringEnd.selectDate(new Date(recurringEnd));
-        }
-        if (callback) {
-          callback();
-        }
-      });
-    };
-    this.handleTimeSelect = ({
-      startDateTime,
-      endDateTime
-    }) => {
-      startDateTime = startDateTime || this.state.startDateTime;
-      endDateTime = endDateTime || this.state.endDateTime;
-      this.setState(state => {
-        return {
-          startDateTime: endDateTime <= state.startDateTime ? endDateTime - this.interval : startDateTime,
-          endDateTime: startDateTime >= state.endDateTime ? startDateTime + this.interval : endDateTime,
-          isDirty: true
-        };
-      });
-    };
-    this.handleParticipantSelect = participants => {
-      return participants && Array.isArray(participants) && this.setState({
-        participants,
-        isDirty: true
-      }, () => {
-        const wrapperRef = this.wrapperRef && this.wrapperRef.current;
-        if (wrapperRef) {
-          wrapperRef.reinitialise();
-        }
-      });
-    };
-    this.handleSubmit = () => {
-      this.setState({
-        isLoading: true
-      }, async () => {
-        const {
-          chatRoom,
-          onClose
-        } = this.props;
-        await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](this.state, chatRoom);
-        this.setState({
-          isLoading: false
-        }, () => onClose());
-      });
-    };
-  }
-  syncPublicLink() {
-    if (this.state.isEdit) {
-      const {
-        chatRoom
-      } = this.props;
-      chatRoom.getPublicLink(() => this.isMounted() && this.setState({
-        link: !!chatRoom.publicLink
-      }));
-    }
-  }
-  getFilteredTimeIntervals(timestamp, offsetFrom) {
-    const timeIntervals = (0,helpers.nl)(timestamp, offsetFrom);
-    const {
-      end
-    } = this.scheduledMeetingRef || {};
-    if (this.state.isEdit && end < Date.now()) {
-      return timeIntervals;
-    }
-    return timeIntervals.filter(o => {
-      return offsetFrom ? o.value > this.nearestHalfHour : o.value > Date.now();
-    });
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    if ($.dialog === Schedule.dialogName) {
-      closeDialog();
-    }
-    [document, this.localStreamRef].map(el => $(el).unbind(`.${Schedule.NAMESPACE}`));
-  }
-  componentWillMount() {
-    const {
-      chatRoom
-    } = this.props;
-    if (chatRoom) {
-      const {
-        scheduledMeeting,
-        publicLink,
-        options
-      } = chatRoom;
-      this.state.topic = scheduledMeeting.title;
-      this.state.startDateTime = scheduledMeeting.start;
-      this.state.endDateTime = scheduledMeeting.end;
-      this.state.timezone = scheduledMeeting.timezone || (0,helpers.Sv)();
-      this.state.recurring = scheduledMeeting.recurring;
-      this.state.participants = chatRoom.getParticipantsExceptMe();
-      this.state.link = !!publicLink;
-      this.state.description = scheduledMeeting.description || '';
-      this.state.sendInvite = scheduledMeeting.flags;
-      this.state.openInvite = options.oi;
-      this.state.isEdit = true;
-      this.scheduledMeetingRef = scheduledMeeting;
-    }
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    this.syncPublicLink();
-    if ($.dialog === 'onboardingDialog') {
-      closeDialog();
-    }
-    M.safeShowDialog(Schedule.dialogName, () => {
-      if (!this.isMounted()) {
-        throw new Error(`${Schedule.dialogName} dialog: component ${Schedule.NAMESPACE} not mounted.`);
-      }
-      $(document).rebind(`keyup.${Schedule.NAMESPACE}`, ({
-        keyCode,
-        target
-      }) => {
-        return this.state.closeDialog || target instanceof HTMLTextAreaElement ? null : keyCode === 13 && this.handleSubmit();
-      });
-      $(this.localStreamRef).rebind(`click.${Schedule.NAMESPACE}`, () => {
-        if (this.state.isDirty) {
-          this.handleToggle('closeDialog');
-          return false;
-        }
-      });
-      return $(`#${Schedule.NAMESPACE}`);
-    });
-  }
-  render() {
-    const {
-      topic,
-      startDateTime,
-      endDateTime,
-      recurring,
-      participants,
-      link,
-      sendInvite,
-      openInvite,
-      description,
-      closeDialog,
-      isEdit,
-      isDirty,
-      isLoading,
-      topicInvalid,
-      invalidTopicMsg,
-      descriptionInvalid
-    } = this.state;
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
-      id: Schedule.NAMESPACE,
-      className: closeDialog ? 'with-confirmation-dialog' : '',
-      dialogName: Schedule.dialogName,
-      dialogType: "main",
-      onClose: () => {
-        return isDirty ? this.handleToggle('closeDialog') : this.props.onClose();
-      }
-    }), external_React_default().createElement(Header, {
-      chatRoom: isEdit && this.props.chatRoom
-    }), external_React_default().createElement(perfectScrollbar.F, {
-      ref: this.wrapperRef,
-      className: "fm-dialog-body",
-      options: {
-        suppressScrollX: true
-      }
-    }, external_React_default().createElement(Input, {
-      name: "topic",
-      placeholder: l.schedule_title_input,
-      value: topic,
-      invalid: topicInvalid,
-      invalidMessage: invalidTopicMsg,
-      autoFocus: true,
-      isLoading: isLoading,
-      onFocus: () => topicInvalid && this.setState({
-        topicInvalid: false
-      }),
-      onChange: this.onTopicChange
-    }), external_React_default().createElement(Row, {
-      className: "start-aligned"
-    }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-recents-filled"
-    })), external_React_default().createElement("div", {
-      className: "schedule-date-container"
-    }, external_React_default().createElement(datetime.o, {
-      name: "startDateTime",
-      altField: "startTime",
-      datepickerRef: this.datepickerRefs.startDateTime,
-      startDate: startDateTime,
-      value: startDateTime,
-      filteredTimeIntervals: this.getFilteredTimeIntervals(startDateTime),
-      label: l.schedule_start_date,
-      isLoading: isLoading,
-      onMount: datepicker => {
-        this.datepickerRefs.startDateTime = datepicker;
-      },
-      onSelectDate: startDateTime => {
-        this.handleDateSelect({
-          startDateTime
-        }, this.onStartDateSelect);
-      },
-      onSelectTime: ({
-        value: startDateTime
-      }) => {
-        this.handleTimeSelect({
-          startDateTime: startDateTime < Date.now() ? this.nearestHalfHour : startDateTime
-        });
-      },
-      onChange: value => this.handleChange('startDateTime', value),
-      onBlur: timestamp => {
-        if (timestamp) {
-          const startDateTime = timestamp < Date.now() ? this.nearestHalfHour : timestamp;
-          this.handleDateSelect({
-            startDateTime
-          }, this.onStartDateSelect);
-        }
-      }
-    }), external_React_default().createElement(datetime.o, {
-      name: "endDateTime",
-      altField: "endTime",
-      datepickerRef: this.datepickerRefs.endDateTime,
-      isLoading: isLoading,
-      startDate: endDateTime,
-      value: endDateTime,
-      filteredTimeIntervals: this.getFilteredTimeIntervals(endDateTime, startDateTime),
-      label: l.schedule_end_date,
-      onMount: datepicker => {
-        this.datepickerRefs.endDateTime = datepicker;
-      },
-      onSelectDate: endDateTime => {
-        this.handleDateSelect({
-          endDateTime
-        }, this.onEndDateSelect);
-      },
-      onSelectTime: ({
-        value: endDateTime
-      }) => {
-        this.handleTimeSelect({
-          endDateTime: endDateTime < Date.now() ? this.nearestHalfHour + this.interval : endDateTime
-        });
-      },
-      onChange: value => this.handleChange('endDateTime', value),
-      onBlur: timestamp => {
-        this.handleDateSelect({
-          endDateTime: timestamp
-        }, this.onEndDateSelect);
-      }
-    }))), external_React_default().createElement(Checkbox, {
-      name: "recurring",
-      checked: recurring,
-      label: l.schedule_recurring_label,
-      isLoading: isLoading,
-      onToggle: this.handleToggle
-    }), recurring && external_React_default().createElement(schedule_recurring.Z, {
-      chatRoom: this.props.chatRoom,
-      startDateTime: startDateTime,
-      endDateTime: endDateTime,
-      onMount: datepicker => {
-        this.datepickerRefs.recurringEnd = datepicker;
-      },
-      onUpdate: state => {
-        this.setState({
-          recurring: state
-        });
-      }
-    }), external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-contacts"
-    })), external_React_default().createElement(Column, null, external_React_default().createElement(Invite, {
-      className: isLoading ? 'disabled' : '',
-      participants: participants,
-      onSelect: this.handleParticipantSelect
-    }))), external_React_default().createElement(Switch, {
-      name: "link",
-      toggled: link,
-      label: l.schedule_link_label,
-      isLoading: isLoading,
-      onToggle: this.handleToggle
-    }), external_React_default().createElement(Checkbox, {
-      name: "sendInvite",
-      checked: sendInvite,
-      label: l.schedule_invite_label,
-      isLoading: isLoading,
-      onToggle: this.handleToggle
-    }), external_React_default().createElement(Checkbox, {
-      name: "openInvite",
-      checked: openInvite,
-      label: l.open_invite_desc,
-      isLoading: isLoading,
-      onToggle: this.handleToggle
-    }), external_React_default().createElement(Textarea, {
-      name: "description",
-      invalid: descriptionInvalid,
-      placeholder: l.schedule_description_input,
-      value: description,
-      onFocus: () => descriptionInvalid && this.setState({
-        descriptionInvalid: false
-      }),
-      onChange: this.onTextareaChange
-    })), external_React_default().createElement(Footer, {
-      isLoading: isLoading,
-      isEdit: isEdit,
-      topic: topic,
-      onSubmit: this.handleSubmit,
-      onInvalid: () => this.setState({
-        topicInvalid: !topic,
-        invalidTopicMsg: l.schedule_title_missing
-      })
-    }), closeDialog && external_React_default().createElement(CloseDialog, {
-      onToggle: this.handleToggle,
-      onClose: this.props.onClose
-    }));
-  }
-}
-Schedule.NAMESPACE = 'schedule-dialog';
-Schedule.dialogName = `meetings-${Schedule.NAMESPACE}`;
-const CloseDialog = ({
-  onToggle,
-  onClose
-}) => {
-  return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(modalDialogs.Z.ModalDialog, {
-    name: `${Schedule.NAMESPACE}-confirmation`,
-    dialogType: "message",
-    className: `
-                    with-close-btn
-                    ${Schedule.NAMESPACE}-confirmation
-                `,
-    title: l.schedule_discard_dlg_title,
-    icon: "sprite-fm-uni icon-question",
-    buttons: [{
-      key: 'n',
-      label: l.schedule_discard_cancel,
-      onClick: () => onToggle('closeDialog')
-    }, {
-      key: 'y',
-      label: l.schedule_discard_confirm,
-      className: 'positive',
-      onClick: onClose
-    }],
-    noCloseOnClickOutside: true,
-    stopKeyPropagation: true,
-    hideOverlay: true,
-    onClose: () => onToggle('closeDialog')
-  }), external_React_default().createElement("div", {
-    className: `${Schedule.NAMESPACE}-confirmation-overlay`,
-    onClick: () => onToggle('closeDialog')
-  }));
-};
-const Row = ({
-  children,
-  className
-}) => external_React_default().createElement("div", {
-  className: `
-            ${Schedule.NAMESPACE}-row
-            ${className || ''}
-        `
-}, children);
-const Column = ({
-  children,
-  className
-}) => external_React_default().createElement("div", {
-  className: `
-            ${Schedule.NAMESPACE}-column
-            ${className || ''}
-        `
-}, children);
-const Header = ({
-  chatRoom
-}) => {
-  const $$container = title => external_React_default().createElement("header", null, external_React_default().createElement("h2", null, title));
-  if (chatRoom) {
-    const {
-      scheduledMeeting
-    } = chatRoom;
-    return $$container(scheduledMeeting.isRecurring ? l.edit_meeting_series_title : l.edit_meeting_title);
-  }
-  return $$container(l.schedule_meeting_title);
-};
-const Input = ({
-  name,
-  placeholder,
-  value,
-  invalid,
-  invalidMessage,
-  autoFocus,
-  isLoading,
-  onFocus,
-  onChange
-}) => {
-  return external_React_default().createElement(Row, {
-    className: invalid ? 'invalid-aligned' : ''
-  }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
-    className: "sprite-fm-mono icon-rename"
-  })), external_React_default().createElement(Column, null, external_React_default().createElement("div", {
-    className: `
-                        mega-input
-                        ${invalid ? 'error msg' : ''}
-                    `
-  }, external_React_default().createElement("input", {
-    type: "text",
-    name: `${Schedule.NAMESPACE}-${name}`,
-    className: isLoading ? 'disabled' : '',
-    autoFocus: autoFocus,
-    autoComplete: "off",
-    placeholder: placeholder,
-    value: value,
-    onFocus: onFocus,
-    onChange: ({
-      target
-    }) => onChange(target.value)
-  }), invalid && external_React_default().createElement("div", {
-    className: "message-container mega-banner"
-  }, invalidMessage))));
-};
-const Checkbox = ({
-  name,
-  checked,
-  label,
-  isLoading,
-  onToggle
-}) => {
-  return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("div", {
-    className: `
-                        checkdiv
-                        ${checked ? 'checkboxOn' : 'checkboxOff'}
-                    `
-  }, external_React_default().createElement("input", {
-    name: `${Schedule.NAMESPACE}-${name}`,
-    className: isLoading ? 'disabled' : '',
-    type: "checkbox",
-    onChange: () => onToggle(name)
-  }))), external_React_default().createElement(Column, null, external_React_default().createElement("label", {
-    htmlFor: `${Schedule.NAMESPACE}-${name}`,
-    className: isLoading ? 'disabled' : '',
-    onClick: () => onToggle(name)
-  }, label)));
-};
-const Switch = ({
-  name,
-  toggled,
-  label,
-  isLoading,
-  onToggle
-}) => {
-  return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
-    className: "sprite-fm-uni icon-mega-logo"
-  })), external_React_default().createElement(Column, null, external_React_default().createElement("span", {
-    className: `
-                        schedule-label
-                        ${isLoading ? 'disabled' : ''}
-                    `,
-    onClick: () => onToggle(name)
-  }, label), external_React_default().createElement("div", {
-    className: `
-                        mega-switch
-                        ${toggled ? 'toggle-on' : ''}
-                        ${isLoading ? 'disabled' : ''}
-                    `,
-    onClick: () => onToggle(name)
-  }, external_React_default().createElement("div", {
-    className: `
-                            mega-feature-switch
-                            sprite-fm-mono-after
-                            ${toggled ? 'icon-check-after' : 'icon-minimise-after'}
-                        `
-  }))));
-};
-const Textarea = ({
-  name,
-  placeholder,
-  isLoading,
-  value,
-  invalid,
-  onChange,
-  onFocus
-}) => {
-  return external_React_default().createElement(Row, {
-    className: "start-aligned"
-  }, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
-    className: "sprite-fm-mono icon-description"
-  })), external_React_default().createElement(Column, null, external_React_default().createElement("div", {
-    className: `mega-input box-style textarea ${invalid ? 'error' : ''}`
-  }, external_React_default().createElement("textarea", {
-    name: `${Schedule.NAMESPACE}-${name}`,
-    className: isLoading ? 'disabled' : '',
-    placeholder: placeholder,
-    value: value,
-    onChange: ({
-      target
-    }) => onChange(target.value),
-    onFocus: onFocus
-  })), invalid && external_React_default().createElement("div", {
-    className: "mega-input error msg textarea-error"
-  }, external_React_default().createElement("div", {
-    className: "message-container mega-banner"
-  }, l.err_schedule_desc_long))));
-};
-const Footer = ({
-  isLoading,
-  isEdit,
-  topic,
-  onSubmit,
-  onInvalid
-}) => {
-  return external_React_default().createElement("footer", null, external_React_default().createElement("div", {
-    className: "footer-container"
-  }, external_React_default().createElement(meetings_button.Z, {
-    className: `
-                        mega-button
-                        positive
-                        ${isLoading ? 'disabled' : ''}
-                    `,
-    onClick: () => {
-      if (!isLoading) {
-        return topic ? onSubmit() : onInvalid();
-      }
-    },
-    topic: topic
-  }, external_React_default().createElement("span", null, isEdit ? l.update_meeting_button : l.schedule_meeting_button))));
-};
-
-/***/ }),
-
-/***/ 702:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.d(__webpack_exports__, {
-"Z": () => (Select)
-});
-var react0__ = __webpack_require__(363);
-var react0 = __webpack_require__.n(react0__);
-var _mixins_js1__ = __webpack_require__(503);
-var _ui_perfectScrollbar_jsx2__ = __webpack_require__(285);
-var _helpers_jsx3__ = __webpack_require__(435);
-
-
-
-
-class Select extends _mixins_js1__.wl {
-  constructor(...args) {
-    super(...args);
-    this.containerRef = react0().createRef();
-    this.inputRef = react0().createRef();
-    this.menuRef = react0().createRef();
-    this.optionRefs = {};
-    this.state = {
-      expanded: false,
-      manualTimeInput: '',
-      timestamp: ''
-    };
-    this.handleMousedown = ({
-      target
-    }) => {
-      var _this$containerRef;
-      return (_this$containerRef = this.containerRef) != null && _this$containerRef.current.contains(target) ? null : this.setState({
-        expanded: false
-      });
-    };
-    this.handleToggle = () => {
-      const {
-        value
-      } = this.props;
-      this.setState(state => ({
-        expanded: !state.expanded
-      }), () => {
-        if (value && this.optionRefs[value]) {
-          this.menuRef.current.scrollToElement(this.optionRefs[value]);
-        }
-      });
-    };
-  }
-  getFormattedDuration(duration) {
-    duration = moment.duration(duration);
-    const hours = duration.get('hours');
-    const minutes = duration.get('minutes');
-    if (!hours && !minutes) {
-      return '';
-    }
-    if (!hours && minutes) {
-      return '([[MINUTES]]\u00a0m)'.replace('[[MINUTES]]', minutes);
-    }
-    return (minutes ? '([[HOURS]]\u00a0h [[MINUTES]]\u00a0m)' : '([[HOURS]]\u00a0h)').replace('[[HOURS]]', hours).replace('[[MINUTES]]', minutes);
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    document.removeEventListener('mousedown', this.handleMousedown);
-    if (this.inputRef && this.inputRef.current) {
-      $(this.inputRef.current).unbind(`keyup.${Select.NAMESPACE}`);
-    }
-  }
-  componentDidMount() {
-    var _this$inputRef;
-    super.componentDidMount();
-    document.addEventListener('mousedown', this.handleMousedown);
-    const inputRef = (_this$inputRef = this.inputRef) == null ? void 0 : _this$inputRef.current;
-    if (inputRef) {
-      $(inputRef).rebind(`keyup.${Select.NAMESPACE}`, ({
-        keyCode
-      }) => {
-        if (keyCode === 13) {
-          this.handleToggle();
-          inputRef.blur();
-          return false;
-        }
-      });
-    }
-  }
-  render() {
-    const {
-      NAMESPACE
-    } = Select;
-    const {
-      name,
-      className,
-      icon,
-      typeable,
-      options,
-      value,
-      format,
-      onChange,
-      onBlur,
-      onSelect
-    } = this.props;
-    return react0().createElement("div", {
-      ref: this.containerRef,
-      className: `
-                    ${NAMESPACE}
-                    ${className || ''}
-                `
-    }, react0().createElement("div", {
-      className: `
-                        mega-input
-                        dropdown-input
-                        ${typeable ? 'typeable' : ''}
-                    `,
-      onClick: this.handleToggle
-    }, typeable ? null : value && react0().createElement("span", null, format ? format(value) : value), react0().createElement("input", {
-      ref: this.inputRef,
-      type: "text",
-      className: `
-                            ${NAMESPACE}-input
-                            ${name}
-                        `,
-      value: (() => {
-        if (this.state.manualTimeInput) {
-          return this.state.manualTimeInput;
-        }
-        return format ? format(value) : value;
-      })(),
-      onFocus: ({
-        target
-      }) => {
-        this.setState({
-          manualTimeInput: '',
-          timestamp: ''
-        }, () => target.select());
-      },
-      onChange: ({
-        target
-      }) => {
-        const {
-          value: manualTimeInput
-        } = target;
-        const {
-          value
-        } = this.props;
-        const prevDate = moment(value);
-        const inputTime = (0,_helpers_jsx3__.K6)(manualTimeInput);
-        prevDate.set({
-          hours: inputTime.get('hours'),
-          minutes: inputTime.get('minutes')
-        });
-        const timestamp = prevDate.valueOf();
-        onChange == null ? void 0 : onChange(timestamp);
-        if (this.optionRefs[value]) {
-          this.menuRef.current.scrollToElement(this.optionRefs[value]);
-        }
-        this.setState({
-          manualTimeInput,
-          timestamp
-        });
-      },
-      onBlur: () => {
-        onBlur(this.state.timestamp);
-        this.setState({
-          manualTimeInput: '',
-          timestamp: ''
-        });
-      }
-    }), icon && react0().createElement("i", {
-      className: "sprite-fm-mono icon-dropdown"
-    }), options && react0().createElement("div", {
-      className: `
-                                mega-input-dropdown
-                                ${this.state.expanded ? '' : 'hidden'}
-                            `
-    }, react0().createElement(_ui_perfectScrollbar_jsx2__.F, {
-      ref: this.menuRef,
-      options: {
-        suppressScrollX: true
-      }
-    }, options.map(option => {
-      return react0().createElement("div", {
-        ref: ref => {
-          this.optionRefs[option.value] = ref;
-        },
-        key: option.value,
-        className: `
-                                                option
-                                                ${option.value === value || option.label === value ? 'active' : ''}
-                                            `,
-        onClick: () => onSelect(option)
-      }, option.label, "\xA0", option.duration && this.getFormattedDuration(option.duration));
-    })))));
-  }
-}
-Select.NAMESPACE = 'meetings-select';
 
 /***/ }),
 
@@ -25853,19 +25872,20 @@ class GenericConversationMessage extends mixin.y {
       }
     }
     $node.rebind('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES, function (e) {
-      if (e.target.classList.contains('button')) {
+      const $target = $(e.target);
+      if ($target.hasClass('button')) {
         return;
       }
-      if (e.target.classList.contains('no-thumb-prev') || $(e.target).parents('no-thumb-prev')) {
+      if ($target.hasClass('no-thumb-prev') || $target.parents('.no-thumb-prev').length) {
         return;
       }
-      var $block;
-      if ($(e.target).is('.shared-data')) {
-        $block = $(e.target);
-      } else if ($(e.target).is(".shared-info") || $(e.target).parents(".shared-info").length > 0) {
-        $block = $(e.target).is(".shared-info") ? $(e.target).next() : $(e.target).parents(".shared-info").next();
+      let $block;
+      if ($target.is('.shared-data')) {
+        $block = $target;
+      } else if ($target.is(".shared-info") || $target.parents(".shared-info").length > 0) {
+        $block = $target.is(".shared-info") ? $target.next() : $target.parents(".shared-info").next();
       } else {
-        $block = $(e.target).parents('.message.shared-data');
+        $block = $target.parents('.message.shared-data');
       }
       Soon(function () {
         $('.tiny-button', $block).trigger('click');
@@ -31613,7 +31633,7 @@ function _extends() {
 /******/ 	// Load entry module and return exports
 /******/ 	__webpack_require__(51);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__(222);
+/******/ 	var __webpack_exports__ = __webpack_require__(978);
 /******/ 	
 /******/ })()
 ;

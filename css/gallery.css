@@ -1,21 +1,3 @@
-/* Gallery Style override for left navigation */
-.nw-fm-left-icon.cloud-drive.active::after,
-.nw-fm-left-icon.gallery.active::after {
-	content: "";
-    background-color: var(--surface-black);
-    width: 100%;
-    height: calc(200% + 2px);
-    position: absolute;
-    z-index: -1;
-    left: 0;
-    bottom: 0;
-    border-radius: 8px;
-}
-.nw-fm-left-icon.cloud-drive.active::after {
-    bottom: auto;
-    top: 0;
-}
-
 /* Gallery Wrapper */
 .gallery-view {
     box-sizing: border-box;

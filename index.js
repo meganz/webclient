@@ -2907,7 +2907,7 @@ function topmenuUI() {
                     }
                 }
                 $tooltip.addClass('hovered');
-            }, 1000);
+            }, 100);
     })
         .rebind('mouseout.nw-fm-left-icon', function () {
             $(this).find('.dark-tooltip').removeClass('hovered');

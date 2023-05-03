@@ -2591,17 +2591,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     display: block;
 }
 .nw-fm-left-icon {
-    width: 52px;
+    width: 64px;
     height: 52px;
     cursor: pointer;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     position: relative;
-    margin: 2px 6px;
-    padding: 2px;
+    padding: 2px 7px;
     transition: background-color 200ms ease-in-out;
-    border-radius: 8px;
 }
 .nw-fm-left-icon:nth-of-type(1) {
     margin-top: 6px;
@@ -2609,11 +2607,16 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .bottom-icons .nw-fm-left-icon.transfers {
     margin-bottom: 8px;
 }
+.bottom-icons .nw-fm-left-icon.transfering .transfer-bar-overlay i,
+.bottom-icons .nw-fm-left-icon.active .transfer-bar-overlay i {
+    --mask-color: var(--icon-active);
+    opacity: 1;
+}
 .nw-fm-left-icon::before {
     width: 48px;
     height: 48px;
     content: '';
-    opacity: 0.5;
+    opacity: 0.7;
     position: absolute;
     transition: opacity 200ms ease-in-out;
 }
@@ -2622,6 +2625,21 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .nw-fm-left-icon:hover::before, .nw-fm-left-icon.active::before {
     opacity: 1;
+}
+.sprite-fm-uni-before.icon-files-before.active::before {
+    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-files-selected");
+}
+.sprite-fm-uni-before.icon-gallery-before.active::before {
+    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-gallery-selected");
+}
+.sprite-fm-uni-before.icon-chat-before.active::before {
+    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-chat-selected");
+}
+.sprite-fm-uni-before.icon-business-before.active::before {
+    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-business-selected");
+}
+.sprite-fm-uni-before.icon-backup-before.active::before {
+    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-backup-selected");
 }
 .nw-fm-left-icon.dashboard::before {
     opacity: 1;
@@ -2632,21 +2650,8 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     width: 48px;
     height: 48px;
 }
-.nw-fm-left-icon .nw-fm-left-border {
-    width: 2px;
-    height: 32px;
-    position: absolute;
-    top: 10px;
-    box-sizing: border-box;
-    border: 0;
-    transition: all 200ms ease-in-out;
-    border-radius: 1px;
-}
 .transfers .nw-fm-left-border {
     z-index: 100;
-}
-.nw-fm-left-icon.active .nw-fm-left-border {
-    background-color: var(--secondary-blue);
 }
 .dark-tooltip {
     height: 24px;
@@ -2656,11 +2661,11 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     line-height: 23px;
     color: var(--text-color-high-inverted);
     position: absolute;
-    margin: 12px 0 0 0;
+    margin: 12px 0 0 4px;
     border-radius: 8px;
     white-space: nowrap;
     left: 46px;
-    transition: left 200ms ease-in-out, opacity 200ms ease-in-out, visibility 200ms ease-in-out;
+    transition: left 100ms ease-in-out, opacity 100ms ease-in-out, visibility 100ms ease-in-out;
     opacity: 0;
     z-index: 1130;
     visibility: hidden;
@@ -9701,6 +9706,7 @@ body.pro:after {
 .transfer-bar-overlay i {
     --mask-color: var(--icon-rest);
     --icon-size: 20px;
+    opacity: 0.7;
     transition: opacity 200ms ease-in-out 0s;
 }
 .nw-fm-left-icon.transfers:hover .transfer-bar-overlay i {

@@ -22,7 +22,6 @@ import Loading from "./meetings/workflow/loading.jsx";
 import Join from "./meetings/workflow/join.jsx";
 import Alert from './meetings/workflow/alert.jsx';
 import { isSameDay, isToday, isTomorrow } from './meetings/schedule/helpers.jsx';
-import { Edit } from './meetings/schedule/recurring.jsx';
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -336,10 +335,10 @@ class Occurrences extends MegaRenderMixin {
                                                 <Button
                                                     icon="sprite-fm-mono icon-rename"
                                                     onClick={() => {
-                                                        this.setState({
-                                                            editDialog: true,
-                                                            occurrenceId: occurrence.uid
-                                                        });
+                                                        megaChat.trigger(
+                                                            megaChat.plugins.meetingsManager.EVENTS.EDIT,
+                                                            occurrence
+                                                        );
                                                     }}
                                                 />
                                             </div>
@@ -385,16 +384,6 @@ class Occurrences extends MegaRenderMixin {
                         <div className="chat-occurrences-list-inner">{this.renderOccurrences()}</div>
                     </PerfectScrollbar>
                 </div>
-                {editDialog &&
-                    <Edit
-                        chatRoom={chatRoom}
-                        scheduledMeeting={scheduledMeeting}
-                        occurrenceId={occurrenceId}
-                        onClose={() => {
-                            this.setState({ editDialog: false });
-                        }}
-                    />
-                }
             </>
         );
     }
@@ -1241,6 +1230,9 @@ export class ConversationPanel extends MegaRenderMixin {
     }
 
     toggleExpandedFlag() {
+        if (this.props.onToggleExpandedFlag) {
+            this.props.onToggleExpandedFlag();
+        }
         return document.body.classList[Call.isExpanded() ? 'remove' : 'add'](EXPANDED_FLAG);
     }
 
@@ -2512,7 +2504,7 @@ export class ConversationPanels extends MegaRenderMixin {
     }
 
     render() {
-        const { className, chatUIFlags } = this.props;
+        const { className, chatUIFlags, onToggleExpandedFlag } = this.props;
         const now = Date.now();
 
         return (
@@ -2533,6 +2525,7 @@ export class ConversationPanels extends MegaRenderMixin {
                                 messagesBuff={chatRoom.messagesBuff}
                                 chatUIFlags={chatUIFlags}
                                 alert={this.state.alert}
+                                onToggleExpandedFlag={onToggleExpandedFlag}
                                 onAlertClose={this.handleAlertClose}
                             />
                         );

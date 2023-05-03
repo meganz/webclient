@@ -5,8 +5,9 @@ import { ConversationPanels, EmptyConvPanel } from './conversationpanel.jsx';
 import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import { Start as StartMeetingDialog } from './meetings/workflow/start.jsx';
 import { Schedule as ScheduleMeetingDialog } from './meetings/schedule/schedule.jsx';
+import { Edit as ScheduleOccurrenceDialog } from './meetings/schedule/recurring.jsx';
 import { StartGroupChatWizard } from './startGroupChatWizard.jsx';
-import { inProgressAlert } from './meetings/call.jsx';
+import Call, { inProgressAlert } from './meetings/call.jsx';
 import ChatToaster from './chatToaster.jsx';
 import LeftPanel from './leftPanel/leftPanel.jsx';
 
@@ -22,6 +23,7 @@ export const CONVERSATIONS_APP_EVENTS = {
 
 class ConversationsApp extends MegaRenderMixin {
     chatRoomRef = null;
+    occurrenceRef = null;
 
     VIEWS = CONVERSATIONS_APP_VIEWS;
     EVENTS = CONVERSATIONS_APP_EVENTS;
@@ -31,7 +33,9 @@ class ConversationsApp extends MegaRenderMixin {
         startGroupChatDialog: false,
         startMeetingDialog: false,
         scheduleMeetingDialog: false,
-        view: this.VIEWS.LOADING
+        scheduleOccurrenceDialog: false,
+        view: this.VIEWS.LOADING,
+        callExpanded: false,
     };
 
     constructor(props) {
@@ -202,9 +206,15 @@ class ConversationsApp extends MegaRenderMixin {
 
         // --
 
-        megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.EDIT, (ev, chatRoom) => {
-            this.chatRoomRef = chatRoom;
-            this.setState({ scheduleMeetingDialog: true });
+        megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.EDIT, (ev, chatOrOccurrence) => {
+            if ((chatOrOccurrence instanceof ChatRoom) || !chatOrOccurrence) {
+                this.chatRoomRef = chatOrOccurrence;
+                this.setState({ scheduleMeetingDialog: true });
+            }
+            else {
+                this.occurrenceRef = chatOrOccurrence;
+                this.setState({ scheduleOccurrenceDialog: true });
+            }
         });
 
         megaChat.rebind(this.EVENTS.NAV_RENDER_VIEW, (ev, view) => {
@@ -245,7 +255,10 @@ class ConversationsApp extends MegaRenderMixin {
     render() {
         const { CHATS, MEETINGS } = this.VIEWS;
         const { routingSection, chatUIFlags, currentlyOpenedChat, chats } = megaChat;
-        const { view, startGroupChatDialog, startMeetingDialog, scheduleMeetingDialog, leftPaneWidth } = this.state;
+        const {
+            view, startGroupChatDialog, startMeetingDialog, scheduleMeetingDialog, scheduleOccurrenceDialog,
+            leftPaneWidth, callExpanded
+        } = this.state;
         const isEmpty =
             chats &&
             chats.every(c => c.isArchived()) &&
@@ -284,6 +297,9 @@ class ConversationsApp extends MegaRenderMixin {
                         routingSection={routingSection}
                         currentlyOpenedChat={currentlyOpenedChat}
                         chatUIFlags={chatUIFlags}
+                        onToggleExpandedFlag={() => {
+                            this.setState(() => ({ callExpanded: Call.isExpanded() }));
+                        }}
                         onMount={() => {
                             const chatRoom = megaChat.getCurrentRoom();
                             return chatRoom ?
@@ -321,9 +337,24 @@ class ConversationsApp extends MegaRenderMixin {
                 {scheduleMeetingDialog && (
                     <ScheduleMeetingDialog
                         chatRoom={this.chatRoomRef}
+                        callExpanded={callExpanded}
                         onClose={() => {
                             this.setState({ scheduleMeetingDialog: false }, () => {
                                 this.chatRoomRef = null;
+                            });
+                        }}
+                    />
+                )}
+
+                {scheduleOccurrenceDialog && (
+                    <ScheduleOccurrenceDialog
+                        chatRoom={this.occurrenceRef.scheduledMeeting.chatRoom}
+                        scheduledMeeting={this.occurrenceRef.scheduledMeeting}
+                        occurrenceId={this.occurrenceRef.uid}
+                        callExpanded={callExpanded}
+                        onClose={() => {
+                            this.setState({ scheduleOccurrenceDialog: false }, () => {
+                                this.occurrenceRef = null;
                             });
                         }}
                     />

@@ -39,6 +39,7 @@ export class Schedule extends MegaRenderMixin {
         topicInvalid: false,
         invalidTopicMsg: '',
         descriptionInvalid: false,
+        overlayed: false,
     };
 
     /**
@@ -279,6 +280,9 @@ export class Schedule extends MegaRenderMixin {
 
     componentWillUnmount() {
         super.componentWillUnmount();
+        if (this.callDlgListener) {
+            megaChat.off(this.callDlgListener);
+        }
         if ($.dialog === Schedule.dialogName) {
             closeDialog();
         }
@@ -337,8 +341,40 @@ export class Schedule extends MegaRenderMixin {
                 }
             });
 
+            this.callDlgListener = 'onIncomingCall.scheduledlg';
+            megaChat.rebind(this.callDlgListener, ({ data }) => {
+                // If the incoming call dialog will show mark this as overlayed.
+                if (
+                    this.isMounted()
+                    && !is_chatlink
+                    && pushNotificationSettings.isAllowedForChatId(data[0].chatId)
+                ) {
+                    this.setState({ overlayed: true, closeDialog: false });
+                    // Clear when ringing stops.
+                    megaChat.plugins.callManager2.rebind('onRingingStopped.scheduledlg', () => {
+                        megaChat.plugins.callManager2.off('onRingingStopped.scheduledlg');
+                        this.setState({ overlayed: false });
+                        fm_showoverlay();
+                    });
+                }
+            });
+
             return $(`#${Schedule.NAMESPACE}`);
         });
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.callExpanded && !this.props.callExpanded) {
+            if (!$.dialog) {
+                // The call opening clears $.dialog so since the dialog is still mounted update it.
+                M.safeShowDialog(Schedule.dialogName, `#${Schedule.NAMESPACE}`);
+            }
+            fm_showoverlay();
+            this.setState({ closeDialog: false });
+        }
+        if (!prevProps.callExpanded && this.props.callExpanded) {
+            this.setState({ closeDialog: false });
+        }
     }
 
     render() {
@@ -358,14 +394,24 @@ export class Schedule extends MegaRenderMixin {
             isLoading,
             topicInvalid,
             invalidTopicMsg,
-            descriptionInvalid
+            descriptionInvalid,
+            overlayed,
         } = this.state;
+        const { callExpanded } = this.props;
+
+        const dialogClasses = [];
+        if (closeDialog) {
+            dialogClasses.push('with-confirmation-dialog');
+        }
+        if (callExpanded || overlayed) {
+            dialogClasses.push('hidden');
+        }
 
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
                 id={Schedule.NAMESPACE}
-                className={closeDialog ? 'with-confirmation-dialog' : ''}
+                className={dialogClasses.join(' ')}
                 dialogName={Schedule.dialogName}
                 dialogType="main"
                 onClose={() => {
@@ -551,7 +597,7 @@ export class Schedule extends MegaRenderMixin {
                     })}
                 />
 
-                {closeDialog &&
+                {!(overlayed || callExpanded) && closeDialog &&
                     <CloseDialog
                         onToggle={this.handleToggle}
                         onClose={this.props.onClose}

@@ -570,7 +570,8 @@ export class Edit extends MegaRenderMixin {
         startDateTime: undefined,
         endDateTime: undefined,
         isDirty: false,
-        closeDialog: false
+        closeDialog: false,
+        overlayed: false,
     };
 
     constructor(props) {
@@ -617,6 +618,9 @@ export class Edit extends MegaRenderMixin {
 
     componentWillUnmount() {
         super.componentWillUnmount();
+        if (this.callDlgListener) {
+            megaChat.off(this.callDlgListener);
+        }
         if ($.dialog === Schedule.dialogName) {
             closeDialog();
         }
@@ -624,21 +628,63 @@ export class Edit extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        M.safeShowDialog(Schedule.dialogName, `#${Schedule.NAMESPACE}`);
+        M.safeShowDialog(Schedule.dialogName, () => {
+            if (!this.isMounted()) {
+                throw Error(`Edit dialog: component not mounted.`);
+            }
+            this.callDlgListener = 'onIncomingCall.recurringedit';
+            megaChat.rebind(this.callDlgListener, ({ data }) => {
+                // If the incoming call dialog will show mark this as overlayed.
+                if (
+                    this.isMounted()
+                    && !is_chatlink
+                    && pushNotificationSettings.isAllowedForChatId(data[0].chatId)
+                ) {
+                    this.setState({ overlayed: true, closeDialog: false });
+                    // Clear when ringing stops.
+                    megaChat.plugins.callManager2.rebind('onRingingStopped.recurringedit', () => {
+                        megaChat.plugins.callManager2.off('onRingingStopped.recurringedit');
+                        this.setState({ overlayed: false });
+                        fm_showoverlay();
+                    });
+                }
+            });
+
+            return $(`#${Schedule.NAMESPACE}`);
+        });
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.callExpanded && !this.props.callExpanded) {
+            if (!$.dialog) {
+                // The call opening clears $.dialog so since the dialog is still mounted update it.
+                M.safeShowDialog(Schedule.dialogName, `#${Schedule.NAMESPACE}`);
+            }
+            fm_showoverlay();
+            this.setState({ closeDialog: false });
+        }
+        if (!prevProps.callExpanded && this.props.callExpanded) {
+            this.setState({ closeDialog: false });
+        }
     }
 
     render() {
-        const { chatRoom, onClose } = this.props;
-        const { startDateTime, endDateTime, isDirty, closeDialog } = this.state;
+        const { chatRoom, callExpanded, onClose } = this.props;
+        const { startDateTime, endDateTime, isDirty, closeDialog, overlayed } = this.state;
+
+        const dialogClasses = ['fluid'];
+        if (closeDialog) {
+            dialogClasses.push('with-confirmation-dialog');
+        }
+        if (callExpanded || overlayed) {
+            dialogClasses.push('hidden');
+        }
 
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
                 id={Schedule.NAMESPACE}
-                className={`
-                    fluid
-                    ${closeDialog ? 'with-confirmation-dialog' : ''}
-                `}
+                className={dialogClasses.join(' ')}
                 dialogName={Schedule.dialogName}
                 dialogType="main"
                 onClose={() => {
@@ -724,7 +770,7 @@ export class Edit extends MegaRenderMixin {
                     </div>
                 </footer>
 
-                {closeDialog &&
+                {!(overlayed || callExpanded) && closeDialog &&
                     <CloseDialog
                         onToggle={() => this.setState({ closeDialog: false })}
                         onClose={onClose}

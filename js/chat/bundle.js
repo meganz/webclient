@@ -19502,7 +19502,7 @@ class Minimized extends mixins.wl {
       icon: "sprite-fm-mono icon-fullscreen-enter",
       onClick: ev => {
         ev.stopPropagation();
-        onCallExpand();
+        this.props.onCallExpand();
       }
     }), this.renderStreamControls()), unread ? external_React_default().createElement("div", {
       className: `${FloatingVideo.NAMESPACE}-notifications`

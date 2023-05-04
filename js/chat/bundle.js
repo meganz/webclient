@@ -1481,6 +1481,21 @@ function Chat() {
   this._queuedChatRoomEvents = {};
   this.handleToId = Object.create(null);
   this.publicChatKeys = Object.create(null);
+  this.CONSTANTS = {
+    SOUNDS: {
+      ALERT: 'alert_info_message',
+      ERROR: 'error_message',
+      INCOMING_MSG: 'incoming_chat_message',
+      INCOMING_CONTACT: 'incoming_contact_request',
+      INCOMING_FILE: 'incoming_file_transfer',
+      INCOMING_CALL: 'incoming_voice_video_call',
+      HANG_OUT: 'hang_out',
+      CALL_JOIN: 'user_join_call',
+      CALL_LEFT: 'user_left_call',
+      CALL_END: 'end_call',
+      RECONNECT: 'reconnecting'
+    }
+  };
   this.options = {
     'delaySendMessageIfRoomNotAvailableTimeout': 3000,
     filePickerOptions: {},
@@ -1566,7 +1581,7 @@ function Chat() {
           body: l.notif_body_scheduled_starting
         }
       },
-      'sounds': ['alert_info_message', 'error_message', 'incoming_chat_message', 'incoming_contact_request', 'incoming_file_transfer', 'incoming_voice_video_call', 'hang_out', 'user_join_call', 'user_left_call', 'reconnecting', 'end_call']
+      sounds: Object.values(this.CONSTANTS.SOUNDS)
     },
     'chatStoreOptions': {
       'autoPurgeMaxMessagesPerRoom': 1024
@@ -22951,7 +22966,7 @@ class Call extends mixins.wl {
       if (this.props.call.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
         this.handleCallEnd();
         this.props.chatRoom.trigger('onRetryTimeout');
-        ion.sound.play('end_call');
+        ion.sound.play(SOUNDS.CALL_END);
       }
     };
     this.handleCallOnline = () => {
@@ -23210,7 +23225,10 @@ class Call extends mixins.wl {
     chatRoom.megaChat.rebind('sfuConnOpen.call', this.handleCallOnline);
     chatRoom.megaChat.rebind('sfuConnClose.call', () => this.handleCallOffline());
     this.bindCallEvents();
-    ['reconnecting', 'end_call'].map(sound => ion.sound.preload(sound));
+    const {
+      SOUNDS
+    } = megaChat.CONSTANTS;
+    [SOUNDS.RECONNECT, SOUNDS.CALL_END].map(sound => ion.sound.preload(sound));
     this.callStartTimeout = setTimeout(() => {
       const {
         call

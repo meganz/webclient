@@ -3296,7 +3296,7 @@ window.addEventListener('beforeunload', () => {
     }
 
     if (megaChatIsReady && megaChat.activeCall) {
-        ion.sound.play('alert_info_message');
+        ion.sound.play(megaChat.CONSTANTS.SOUNDS.ALERT);
         return false;
     }
 

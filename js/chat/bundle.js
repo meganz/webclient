@@ -15326,6 +15326,13 @@ class Schedule extends mixins.wl {
       });
     };
     this.handleSubmit = () => {
+      if (!this.state.topic) {
+        this.setState({
+          topicInvalid: true,
+          invalidTopicMsg: l.schedule_title_missing
+        });
+        return;
+      }
       this.setState({
         isLoading: true
       }, async () => {
@@ -15637,11 +15644,7 @@ class Schedule extends mixins.wl {
       isLoading: isLoading,
       isEdit: isEdit,
       topic: topic,
-      onSubmit: this.handleSubmit,
-      onInvalid: () => this.setState({
-        topicInvalid: !topic,
-        invalidTopicMsg: l.schedule_title_missing
-      })
+      onSubmit: this.handleSubmit
     }), !(overlayed || callExpanded) && closeDialog && external_React_default().createElement(CloseDialog, {
       onToggle: this.handleToggle,
       onClose: this.props.onClose
@@ -15835,8 +15838,7 @@ const Footer = ({
   isLoading,
   isEdit,
   topic,
-  onSubmit,
-  onInvalid
+  onSubmit
 }) => {
   return external_React_default().createElement("footer", null, external_React_default().createElement("div", {
     className: "footer-container"
@@ -15846,11 +15848,7 @@ const Footer = ({
                         positive
                         ${isLoading ? 'disabled' : ''}
                     `,
-    onClick: () => {
-      if (!isLoading) {
-        return topic ? onSubmit() : onInvalid();
-      }
-    },
+    onClick: () => !isLoading && onSubmit(),
     topic: topic
   }, external_React_default().createElement("span", null, isEdit ? l.update_meeting_button : l.schedule_meeting_button))));
 };

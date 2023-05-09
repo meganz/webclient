@@ -215,6 +215,7 @@ class ChatToastIntegration {
 
     constructor(megaChat) {
         const { chatd } = megaChat.plugins.chatdIntegration;
+        const { SOUNDS } = megaChat.CONSTANTS;
         if (chatd) {
             chatd.rebind('onOpen.cTI', () => {
                 if (!megaChat.allChatsHadInitialLoadedHistory() || !mega.active) {
@@ -252,8 +253,8 @@ class ChatToastIntegration {
                                 close: true,
                                 cb: () => {
                                     if (!playingSound && !mega.config.get('callinout')) {
-                                        ion.sound.stop('user_join_call');
-                                        ion.sound.play('user_join_call');
+                                        ion.sound.stop(SOUNDS.CALL_JOIN);
+                                        ion.sound.play(SOUNDS.CALL_JOIN);
                                     }
                                 },
                                 joiner: (arr) => {
@@ -293,9 +294,9 @@ class ChatToastIntegration {
                                     cb: () => {
                                         if (!mega.config.get('callinout')) {
                                             playingSound = true;
-                                            ion.sound.stop('user_join_call');
-                                            ion.sound.stop('user_left_call');
-                                            ion.sound.play('user_left_call');
+                                            ion.sound.stop(SOUNDS.CALL_JOIN);
+                                            ion.sound.stop(SOUNDS.CALL_LEFT);
+                                            ion.sound.play(SOUNDS.CALL_LEFT);
                                         }
 
                                         onIdle(() => {

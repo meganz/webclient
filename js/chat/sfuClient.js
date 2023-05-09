@@ -922,7 +922,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '6202754293';
+const COMMIT_ID = '344be1149f';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1087,7 +1087,7 @@ class SfuClient {
             termCode === termCodes.kSigDisconn; // || termCode === TermCode.kSfuShuttingDown;
         // TODO: handle SFU shutdown gracefully and reconnect
     }
-    async onWsClose(event) {
+    onWsClose(event) {
         if (event && event.target !== this.conn) {
             do {
                 if (window.d) {
@@ -3095,10 +3095,10 @@ class VideoSlot extends Slot {
         this.isVideo = true;
     }
     reassignV(peer, iv, isHiRes, trackReused, releaseCb) {
-        this.isHiRes = isHiRes;
         if (peer !== this.peer || !trackReused) {
             this.release();
         }
+        this.isHiRes = isHiRes;
         this._releaseTrackCb = releaseCb;
         super.reassign(peer, iv);
         if (this.isHiRes) {
@@ -3152,35 +3152,36 @@ class VideoSlot extends Slot {
     */
     /** Detaches all players and marks the slot as unused */
     release() {
-        if (!this.players) {
-            this.active = false;
-            return;
-        }
-        if (this.players.size) {
+        if (this.players) {
             for (const player of this.players) {
                 player._onTrackGone(this);
             }
             if (this.players.size) {
                 console.error("Soft assert: not all players destroyed");
             }
+            delete this.players;
         }
-        delete this.players;
+        this.active = false;
+    }
+    _onPlayerAttached(player) {
+        if (player.gui.onRxStats) {
+            this.rxStatsCallbacks.set(this, player.gui.onRxStats.bind(player.gui));
+        }
     }
     /** Called by video players when they are detached */
-    _onDetachedFromPlayer(player) {
+    _onPlayerDetached(player) {
         client_assert(this.players);
         if (!this.players.has(player)) {
             do {
                 if (window.d) {
-                    console.warn(client_kLogTag, "Slot.detachFromPlayer: Was not attached to that player");
+                    console.warn(client_kLogTag, "Slot._onPlayerDetached: Was not attached to that player");
                 }
             } while (0);
             return;
         }
         this.rxStatsCallbacks.delete(player);
-        this.players.delete(player);
         // LOGW(`slot ${this.isHiRes ? "hires":"lores"} detach from player -> refcnt =`, this.players.size);
-        if (!this.players.size) {
+        if (this.players.size === 1) {
             this.active = false;
             delete this.players;
             this._releaseTrackCb();
@@ -3193,21 +3194,32 @@ class VideoSlot extends Slot {
         }
     }
 }
+/** Video players are created synchronously upon calling getHiResVideo/getVthumbVideo, added to the peer's
+ * hiResPlayers/vThumbPlayers, and are temorarily left unattached to a track, because the track's mid is not yet known.
+ * When the SFU responds with the mid, the peer's hiresPlayers/vThumbPlayers are attached to the track. This means that
+ * the lifetime of players is independent of Slots
+ */
 class VideoPlayer {
     constructor(peer, isHiRes, guiCreateCb) {
         this.peer = peer;
         this._isHiRes = !!isHiRes;
         this.gui = guiCreateCb(this);
         if (isHiRes) {
-            peer.hiResPlayers.add(this);
             if (peer.hiResSlot) {
                 this._attachToTrack(peer.hiResSlot);
             }
+            else {
+                this.players = peer.hiResPlayers;
+                this.players.add(this);
+            }
         }
         else {
-            peer.vThumbPlayers.add(this);
             if (peer.vThumbSlot) {
                 this._attachToTrack(peer.vThumbSlot);
+            }
+            else {
+                this.players = peer.vThumbPlayers;
+                this.players.add(this);
             }
         }
     }
@@ -3222,6 +3234,13 @@ class VideoPlayer {
     }
     _attachToTrack(slot) {
         client_assert(slot);
+        client_assert(slot.players);
+        if (this.players !== slot.players) {
+            this.players.delete(this);
+        }
+        this.players = slot.players;
+        this.players.add(this);
+        // slot.players may have changed even if this.slot hasn't. That's why the check is at this late stage
         if (slot === this.slot) {
             do {
                 if (window.d) {
@@ -3230,19 +3249,18 @@ class VideoPlayer {
             } while (0);
             return;
         }
-        let prevSlot = this.slot;
-        if (this._detachFromCurrentTrack()) {
+        if (this.slot) {
+            const prevSlot = this.slot;
+            this._detachFromCurrentTrack();
             do {
                 if (window.d) {
-                    console.warn(client_kLogTag, `VideoPlayer: replacing slot ${prevSlot ? prevSlot.mid : "(null)"} with ${slot.mid}`);
+                    console.warn(client_kLogTag, `VideoPlayer: replacing slot ${prevSlot.mid} with ${slot.mid}`);
                 }
             } while (0);
         }
         this.slot = slot;
         this.gui.attachToTrack(slot.inTrack);
-        if (this.gui.onRxStats) {
-            slot.rxStatsCallbacks.set(this, this.gui.onRxStats.bind(this.gui));
-        }
+        slot._onPlayerAttached(this);
     }
     _onTrackGone(slot) {
         client_assert(slot === this.slot);
@@ -3250,13 +3268,12 @@ class VideoPlayer {
     }
     _detachFromCurrentTrack() {
         let slot = this.slot;
-        if (!slot) {
-            return;
+        if (slot) {
+            this.gui.detachFromTrack();
+            slot._onPlayerDetached(this);
+            delete this.slot;
         }
-        this.gui.detachFromTrack();
-        slot._onDetachedFromPlayer(this);
-        delete this.slot;
-        return true;
+        this.players.delete(this); // safe, even if already be deleted from players
     }
     destroy() {
         if (this.isDestroyed) {

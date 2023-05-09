@@ -271,6 +271,13 @@ export class Schedule extends MegaRenderMixin {
      */
 
     handleSubmit = () => {
+        if (!this.state.topic) {
+            this.setState({
+                topicInvalid: true,
+                invalidTopicMsg: l.schedule_title_missing /* `Meeting name is required` */
+            });
+            return;
+        }
         this.setState({ isLoading: true }, async() => {
             const { chatRoom, onClose } = this.props;
             await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](this.state, chatRoom);
@@ -591,10 +598,6 @@ export class Schedule extends MegaRenderMixin {
                     isEdit={isEdit}
                     topic={topic}
                     onSubmit={this.handleSubmit}
-                    onInvalid={() => this.setState({
-                        topicInvalid: !topic,
-                        invalidTopicMsg: l.schedule_title_missing /* `Meeting name is required` */
-                    })}
                 />
 
                 {!(overlayed || callExpanded) && closeDialog &&
@@ -860,7 +863,7 @@ const Textarea = ({ name, placeholder, isLoading, value, invalid, onChange, onFo
  * @return {React.Element}
  */
 
-const Footer = ({ isLoading, isEdit, topic, onSubmit, onInvalid }) => {
+const Footer = ({ isLoading, isEdit, topic, onSubmit }) => {
     return (
         <footer>
             <div className="footer-container">
@@ -870,11 +873,7 @@ const Footer = ({ isLoading, isEdit, topic, onSubmit, onInvalid }) => {
                         positive
                         ${isLoading ? 'disabled' : ''}
                     `}
-                    onClick={() => {
-                        if (!isLoading) {
-                            return topic ? onSubmit() : onInvalid();
-                        }
-                    }}
+                    onClick={() => !isLoading && onSubmit()}
                     topic={topic}>
                     <span>{isEdit ? l.update_meeting_button : l.schedule_meeting_button}</span>
                 </Button>

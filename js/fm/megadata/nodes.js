@@ -4286,7 +4286,10 @@ MegaData.prototype.getDashboardData = function() {
         xfiles: this.d[this.BackupsId] ? this.d[this.BackupsId].tf : 0
     };
     res.links = { cnt: s.links.folders, size: s.links.bytes, xfiles: s.links.files };
-    res.versions = { cnt: s[this.RootID].vfiles, size: s[this.RootID].vbytes };
+    res.versions = {
+        cnt: s[this.RootID].vfiles + s[this.InboxID].vfiles,
+        size: s[this.RootID].vbytes + s[this.InboxID].vbytes
+    };
 
     return res;
 };

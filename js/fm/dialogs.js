@@ -966,19 +966,22 @@
         // if is not def.
         $.selected = $.selected || [];
 
-        // check if we will enable conversation tab
-        var allowConversationTab = section === 'conversations' && $.dialog === 'copy' && $.selected.length;
-        if (allowConversationTab || $.copyToUpload || $.saveToDialogNode) {
-            $rubbishBin.addClass('hidden');
+        $conversations.addClass('hidden');
+        $rubbishBin.addClass('hidden');
+
+        if (
+            ($.dialog === 'copy' && $.selected.length && !$.saveToDialog || $.copyToUpload)
+            && !(
+                // Don't allow copying incoming shared folders to chat as it is currently not functional
+                $.dialog === 'copy'
+                && $.selected.filter(n => !M.isFileNode(M.getNodeByHandle(n)) && M.getNodeRoot(n) === 'shares').length
+            )
+        ) {
             $conversations.removeClass('hidden');
-        }
-        else {
-            $conversations.addClass('hidden');
-            $rubbishBin.removeClass('hidden');
         }
 
         const nodeRoot = M.getNodeRoot($.selected[0]);
-        if (!u_type || $.saveToDialog || $.copyToShare || $.mcImport || $.selectFolderDialog
+        if (!u_type || $.copyToShare || $.mcImport || $.selectFolderDialog
             || $.saveAsDialog) {
             $rubbishBin.addClass('hidden');
             $conversations.addClass('hidden');
@@ -1094,6 +1097,7 @@
             /** @name $.copyDialog */
             /** @name $.moveDialog */
             /** @name $.selectFolderDialog */
+            /** @name $.saveAsDialog */
             $[$.dialog + 'Dialog'] = $.dialog;
 
             if (aMode) {
@@ -1179,6 +1183,7 @@
      * @global
      */
     global.openCopyShareDialog = function openCopyShareDialog(u_id) {
+        // Not allowed chats
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('copy', function() {
                 $.shareToContactId = u_id;
@@ -1197,6 +1202,7 @@
      * @global
      */
     global.openCopyUploadDialog = function openCopyUploadDialog(files, emptyFolders) {
+        // Is allowed chats
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('copy', function() {
                 var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ? 'shared-with-me' : 'cloud-drive';
@@ -1215,6 +1221,7 @@
      * @global
      */
     global.openCopyDialog = function openCopyDialog(activeTab, onBeforeShown) {
+        // Is allowed chats
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('copy', function() {
                 if (typeof activeTab === 'function') {
@@ -1237,6 +1244,7 @@
      * @global
      */
     global.openMoveDialog = function openMoveDialog() {
+        // Not allowed chats
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('move', function() {
                 handleOpenDialog(0, M.RootID);
@@ -1252,6 +1260,7 @@
      * @global
      */
     global.openSaveToDialog = function openSaveToDialog(node, cb, activeTab) {
+        // Not allowed chats
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('copy', function() {
                 $.saveToDialogCb = cb;
@@ -1272,6 +1281,7 @@
      * @returns {Object}        The jquery object of the dialog
      */
     global.openSaveAsDialog = function(node, content, cb) {
+        // Not allowed chats
         M.safeShowDialog('saveAs', function() {
             const ltWSpaceWarning = new InputFloatWarning($dialog);
             ltWSpaceWarning.hide();
@@ -1292,6 +1302,7 @@
      * @returns {Object}        The jquery object of the dialog
      */
     global.openNewSharedFolderDialog = function openNewSharedFolderDialog() {
+        // Not allowed chats
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('selectFolder', function() {
                 $.selected = [];
@@ -1316,6 +1327,7 @@
      * @returns {Object} The jquery object of the dialog
      */
     global.selectFolderDialog = function selectedFolderDialog(cb, aMode) {
+        // Not allowed chats.
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog(aMode || 'selectFolder', () => {
 
@@ -1335,6 +1347,7 @@
      * @returns {Object} The jquery object of the dialog
      */
     global.openNewFileRequestDialog = function(options) {
+        // Not allowed chats.
         if (!isUserAllowedToOpenDialogs()) {
             return false;
         }

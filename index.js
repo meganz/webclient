@@ -2345,16 +2345,21 @@ function topmenuUI() {
     }
     else if (section) {
         // just in case, a payment provider appended any ?returnurl vars
-        section = section.split("?")[0];
-        section = section.replace(/[^a-zA-Z\-\_]/g, "");
+        const selector = section.split('?')[0].replace(/[^A-Z_a-z-]/g, "");
 
-        var $menuItem = $topMenuItems.filter('.' + section);
-        $menuItem.addClass('active');
+        if (selector.length) {
+            const $menuItem = $topMenuItems.filter(`.${selector}`);
+            const $parent = $menuItem.parent('.top-submenu');
 
-        if ($menuItem.parent('.top-submenu').length) {
-            $menuItem.parent('.top-submenu').prev().addClass('expanded');
+            $menuItem.addClass('active');
+
+            if ($parent.length) {
+                $parent.prev().addClass('expanded');
+            }
         }
-        $menuItem = undefined;
+        else if (d) {
+            console.error('Invalid section...', section);
+        }
     }
 
 
@@ -3296,7 +3301,7 @@ window.addEventListener('beforeunload', () => {
     }
 
     if (megaChatIsReady && megaChat.activeCall) {
-        ion.sound.play('alert_info_message');
+        ion.sound.play(megaChat.CONSTANTS.SOUNDS.ALERT);
         return false;
     }
 

@@ -195,7 +195,7 @@ export default class Call extends MegaRenderMixin {
         if (this.props.call.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
             this.handleCallEnd();
             this.props.chatRoom.trigger('onRetryTimeout');
-            ion.sound.play('end_call');
+            ion.sound.play(SOUNDS.CALL_END);
         }
     };
 
@@ -562,7 +562,8 @@ export default class Call extends MegaRenderMixin {
         chatRoom.megaChat.rebind('sfuConnOpen.call', this.handleCallOnline);
         chatRoom.megaChat.rebind('sfuConnClose.call', () => this.handleCallOffline());
         this.bindCallEvents();
-        ['reconnecting', 'end_call'].map(sound => ion.sound.preload(sound));
+        const { SOUNDS } = megaChat.CONSTANTS;
+        [SOUNDS.RECONNECT, SOUNDS.CALL_END].map(sound => ion.sound.preload(sound));
         this.callStartTimeout = setTimeout(() => {
             const { call } = this.props;
             if (

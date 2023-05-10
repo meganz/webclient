@@ -528,6 +528,10 @@
                     0
                 );
             }
+
+            if (termCode === SfuClient.TermCode.kCallEndedByModerator) {
+                ion.sound.play(megaChat.CONSTANTS.SOUNDS.CALL_END);
+            }
         }
         get isPublic() {
             const type = this.chatRoom && this.chatRoom.type;

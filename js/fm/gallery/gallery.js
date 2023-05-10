@@ -2481,6 +2481,10 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
 
         // In case fa is not arrived yet, placing the node to the buffer
         if (!fa) {
+            if (!mega.gallery.pendingFaBlocks[h]) {
+                mega.gallery.pendingFaBlocks[h] = Object.create(null);
+            }
+
             mega.gallery.pendingFaBlocks[h][width] = nodeBlocks[i];
             continue;
         }

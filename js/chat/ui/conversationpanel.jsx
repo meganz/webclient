@@ -456,6 +456,62 @@ export class ConversationRightArea extends MegaRenderMixin {
         }
     };
 
+    renderPushSettingsButton() {
+        const { pushSettingsValue, chatRoom, onPushSettingsToggled, onPushSettingsClicked } = this.props;
+        const icon = pushSettingsValue || pushSettingsValue === 0 ?
+            'icon-notification-off-filled' :
+            'icon-notification-filled';
+
+        return (
+            <div className="push-settings">
+                <div className="chat-button-separator" />
+                <Button
+                    className={`
+                        link-button
+                        light
+                        push-settings-button
+                        ${chatRoom.isReadOnly() ? 'disabled' : ''}
+                    `}
+                    icon={`
+                        sprite-fm-mono
+                        ${icon}
+                    `}
+                    label={
+                        chatRoom.isMeeting ?
+                            l.meeting_notifications /* `Meeting notifications` */ :
+                            l[16709] /* `Chat notifications` */
+                    }
+                    secondLabel={(() => {
+                        if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
+                            return pushSettingsValue === 0 ?
+                                // `Until I Turn It On Again``
+                                PushSettingsDialog.options[Infinity] :
+                                // `Muted until %s`
+                                l[23539].replace(
+                                    '%s',
+                                    toLocaleTime(pushSettingsValue)
+                                );
+                        }
+                    })()}
+                    secondLabelClass="label--green"
+                    toggle={
+                        chatRoom.isReadOnly() ?
+                            null :
+                            {
+                                enabled: !pushSettingsValue && pushSettingsValue !== 0,
+                                onClick: () =>
+                                    !pushSettingsValue && pushSettingsValue !== 0 ?
+                                        onPushSettingsClicked() :
+                                        onPushSettingsToggled()
+                            }
+                    }
+                    onClick={() => chatRoom.isReadOnly() ? null : onPushSettingsClicked()}
+                />
+                <div className="chat-button-separator" />
+            </div>
+        );
+    }
+
     componentDidMount() {
         super.componentDidMount();
         megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => {
@@ -467,7 +523,7 @@ export class ConversationRightArea extends MegaRenderMixin {
 
     render() {
         const self = this;
-        const { chatRoom: room, onStartCall, occurrencesLoading } = self.props;
+        const { chatRoom: room, onStartCall, occurrencesLoading, onShowScheduledDescription } = self.props;
 
         if (!room || !room.roomId) {
             // destroyed
@@ -609,58 +665,6 @@ export class ConversationRightArea extends MegaRenderMixin {
                 }
             >
             </Button>
-        );
-
-        //
-        // Push notification settings
-        // ----------------------------------------------------------------------
-
-        const { pushSettingsValue, onPushSettingsToggled, onPushSettingsClicked, onShowScheduledDescription }
-            = this.props;
-        const pushSettingsIcon = pushSettingsValue || pushSettingsValue === 0 ?
-            'icon-notification-off-filled' :
-            'icon-notification-filled';
-        const pushSettingsBtn = !is_chatlink && room.membersSetFromApi.members.hasOwnProperty(u_handle) && (
-            <div className="push-settings">
-                {AVseperator}
-                <Button
-                    className={`
-                        link-button
-                        light
-                        push-settings-button
-                        ${Call.isGuest() ? 'disabled' : ''}
-                    `}
-                    icon={`
-                        sprite-fm-mono
-                        ${pushSettingsIcon}
-                    `}
-                    label={room.isMeeting
-                        ? l.meeting_notifications /* `Meeting notifications` */
-                        : l[16709] /* `Chat notifications` */}
-                    secondLabel={(() => {
-                        if (pushSettingsValue !== null && pushSettingsValue !== undefined) {
-                            return pushSettingsValue === 0 ?
-                                // `Until I Turn It On Again``
-                                PushSettingsDialog.options[Infinity] :
-                                // `Muted until %s`
-                                l[23539].replace(
-                                    '%s',
-                                    toLocaleTime(pushSettingsValue)
-                                );
-                        }
-                    })()}
-                    secondLabelClass="label--green"
-                    toggle={Call.isGuest() ? null : {
-                        enabled: !pushSettingsValue && pushSettingsValue !== 0,
-                        onClick: () =>
-                            !pushSettingsValue && pushSettingsValue !== 0 ?
-                                onPushSettingsClicked() :
-                                onPushSettingsToggled()
-                    }}
-                    onClick={() => Call.isGuest() ? null : onPushSettingsClicked()}>
-                </Button>
-                {AVseperator}
-            </div>
         );
 
         const openInviteBtn = room.type !== 'private' && (
@@ -1005,7 +1009,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                             </Button>
                                         </>
                                     }
-                                    {pushSettingsBtn}
+                                    {this.renderPushSettingsButton()}
                                     {openInviteBtn}
                                     <Button
                                         className="link-button light clear-history-button"

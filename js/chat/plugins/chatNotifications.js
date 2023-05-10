@@ -25,6 +25,8 @@ var ChatNotifications = function(megaChat, options) {
     self.notifications = new MegaNotifications(options);
     self._incomingDialogContainers = {};
 
+    const { SOUNDS } = megaChat.CONSTANTS;
+
     megaChat
         .rebind('onRoomInitialized.chatNotifications', function(e, megaRoom) {
             var resetChatNotificationCounters = function() {
@@ -110,7 +112,7 @@ var ChatNotifications = function(megaChat, options) {
                             n = self.notifications.notify(
                                 'incoming-chat-message',
                                 {
-                                    'sound': 'incoming_chat_message',
+                                    sound: SOUNDS.INCOMING_MSG,
                                     'group': megaRoom.chatId,
                                     'incrementCounter': unreadFlag,
                                     'icon': avatarUrl,
@@ -147,7 +149,7 @@ var ChatNotifications = function(megaChat, options) {
                         n = self.notifications.notify(
                             'alert-info-message',
                             {
-                                'sound': 'alert_info_message',
+                                sound: SOUNDS.ALERT,
                                 'group': megaRoom.chatId,
                                 'incrementCounter': true,
                                 'anfFlag': 'chat_enabled',
@@ -193,7 +195,7 @@ var ChatNotifications = function(megaChat, options) {
                 .rebind('ChatDisconnected.chatNotifications', ev => {
                     const chatRoom = ev.data;
                     self.disconnectNotification = new Notification(chatRoom.getRoomTitle(), { body: l.chat_offline });
-                    ion.sound.play('reconnecting');
+                    ion.sound.play(SOUNDS.RECONNECT);
                     if (chatRoom.call.isSharingScreen()) {
                         chatRoom.call.toggleScreenSharing();
                     }
@@ -209,7 +211,7 @@ var ChatNotifications = function(megaChat, options) {
                 return;
             }
 
-            const notificationSound = 'incoming_voice_video_call';
+            const notificationSound = SOUNDS.INCOMING_CALL;
             const notification = this.notifications.notify(
                 'incoming-voice-video-call',
                 {
@@ -305,7 +307,7 @@ var ChatNotifications = function(megaChat, options) {
             var n = self.notifications.notify(
                 'outgoing-call',
                 {
-                    'sound': 'incoming_voice_video_call',
+                    'sound': SOUNDS.INCOMING_CALL,
                     'soundLoop': true,
                     'alwaysPlaySound': true,
                     'group': megaRoom.chatId,
@@ -353,7 +355,7 @@ var ChatNotifications = function(megaChat, options) {
         .rebind('onScheduleUpcoming.chatNotifications', ({ data: meeting }) => {
             const n = this.notifications.notify(
                 'upcoming-scheduled-occurrence',
-                { anfFlag: 'chat_enabled', meeting, sound: 'incoming_chat_message', group: `schedUp-${meeting.id}`, },
+                { anfFlag: 'chat_enabled', meeting, sound: SOUNDS.INCOMING_MSG, group: `schedUp-${meeting.id}`, },
                 true
             );
             n.on('onClick', () => {
@@ -368,7 +370,7 @@ var ChatNotifications = function(megaChat, options) {
                 {
                     anfFlag: 'chat_enabled',
                     group: `schedStart-${meeting.id}`,
-                    sound: 'incoming_chat_message',
+                    sound: SOUNDS.INCOMING_MSG,
                     actions: [
                         {
                             action: chatNotifActions.SCHED_STARTING_JOIN,

@@ -1585,6 +1585,12 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 });
             $customChartLegend.removeClass('disabled');
         });
+
+        // If Pro Flexi expired we want to hide the Storage Usage Breakdown and storage/transfer pie charts
+        if (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED) {
+            $storageAnalysisPie.addClass('hidden');
+            $stgeTrfAnalysisContainer.addClass('hidden');
+        }
     };
 
     // Private function to determine the scale unit of the bar chart
@@ -1850,6 +1856,12 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
 
         // If Pro Flexi
         if (u_attr.pf) {
+
+            // If they are expired, hide the next bill container (similar to Business)
+            if (u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED) {
+                $nbPriceContainer.addClass('hidden');
+                return;
+            }
 
             // Add special class for Pro Flexi specific changes to the UI in this section
             $nbPriceContainer.addClass('pro-iv');

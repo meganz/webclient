@@ -12,9 +12,11 @@ function traverse(node) {
             case 'Identifier':
                 return node;
             default:
-                return null;
+                node = null;
+                break;
         }
     }
+    return false;
 }
 
 function xpath(node, path) {
@@ -24,7 +26,16 @@ function xpath(node, path) {
     var l = path.length;
 
     while (node && l > i) {
-        node = node[path[i++]];
+        const loc = path[i++].split('[');
+
+        if ((node = node[loc[0]]) && loc.length > 1) {
+            const [prop, value] = loc[1].slice(0, -1).split('=');
+
+            if (node[prop] !== value) {
+                node = null;
+                break;
+            }
+        }
     }
 
     return node || false;
@@ -86,6 +97,65 @@ module.exports = {
                                 context.report(node,
                                     'If this is a window.open() call, it must be explicitly invoked with noopener|noreferrer.'
                                 );
+                            }
+                        }
+                    }
+                },
+            };
+        }
+    },
+    'good-boy': {
+        meta: {
+            docs: {
+                description: 'Eslint rules for some safe practices.',
+                category: 'possible-errors',
+                recommended: true
+            },
+            schema: []
+        },
+        create(context) {
+            return {
+                FunctionExpression(node) {
+
+                    if (node.id && node.id.name === 'populate_l') {
+                        const escaped = new Set();
+                        const unescaped = new Map();
+                        const {body = false} = node.body;
+
+                        for (let i = body.length; i--;) {
+                            let {left, right} = xpath(body[i], 'expression[type=AssignmentExpression]');
+
+                            if ((left = traverse(left)).name === 'l') {
+
+                                switch ((right = traverse(right)).name) {
+                                    case 'l': {
+                                        const p = xpath(right, 'parent/property');
+                                        unescaped.set(right, p.name || p.value);
+                                        break;
+                                    }
+                                    case 'escapeHTML': {
+                                        const p = xpath(left, 'parent/property');
+                                        escaped.add(p.name || p.value);
+
+                                        const [a0] = xpath(right, 'parent/arguments');
+                                        if (a0.type === 'CallExpression' && traverse(a0).name === 'l') {
+
+                                            context.report(a0,
+                                                'This will yield a TypeError if the locale string becomes ' +
+                                                'unavailable, wrap it in a template-literal if you do *really* ' +
+                                                'have to mutate it prior to the escapeHTML() call.');
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        for (const [node, value] of unescaped) {
+
+                            if (!escaped.has(value)) {
+
+                                context.report(node, `Missing call to escapeHTML(l['${value}'])`);
                             }
                         }
                     }

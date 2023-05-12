@@ -1852,15 +1852,31 @@ accountUI.plan = {
             $('.btn-achievements', $planContent).addClass('hidden');
             $('.data-block.account-balance', $planContent).addClass('hidden');
             $('.acc-setting-menu-balance-acc', '.content-panel.account').addClass('hidden');
-            if (!u_attr.b.m || u_attr.b.s !== -1) {
-                $('.upgrade-to-pro', $planContent).addClass('hidden');
+            $('.upgrade-to-pro', $planContent).addClass('hidden');
+
+            // If Business Master account and if Expired or in Grace Period, show the Upgrade Account button
+            if (u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED) {
+                $('.upgrade-to-pro', $planContent).removeClass('hidden');
             }
         }
 
-        // If Pro Flexi, hide the Upgrade Account button and Account Balance section on the Plan page
+        // If Pro Flexi
         if (u_attr && u_attr.pf) {
+
+            // Hide the Upgrade Account button and Account Balance section on the Plan page
             $('.upgrade-to-pro', $planContent).addClass('hidden');
             $('.data-block.account-balance', $planContent).addClass('hidden');
+
+            // Hide Storage space and Transfer quota blocks like Business (otherwise shows 4096 PB which is incorrect)
+            if (u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED) {
+                $('.acc-storage-space', $planContent).addClass('hidden');
+                $('.acc-bandwidth-vol', $planContent).addClass('hidden');
+            }
+
+            // If Expired or in Grace Period, show the Upgrade Account button
+            if (u_attr.pf.s !== pro.ACCOUNT_STATUS_ENABLED) {
+                $('.upgrade-to-pro', $planContent).removeClass('hidden');
+            }
         }
     },
 

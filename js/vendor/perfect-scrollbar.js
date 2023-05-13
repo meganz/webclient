@@ -1,4 +1,4 @@
-/* perfect-scrollbar v0.8.1 */
+/* perfect-scrollbar v0.8.2 */
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
@@ -92,6 +92,11 @@ DOM.queryChildren = function (element, selector) {
   });
 };
 
+DOM.getActiveElement = tryCatch(function(node, tryDoc) {
+    const docAE = tryDoc !== false && tryCatch(() => document.activeElement)();
+    return tryDoc && docAE || node && node.activeElement || docAE || !1;
+});
+
 module.exports = DOM;
 
 },{}],3:[function(require,module,exports){
@@ -102,12 +107,14 @@ var EventElement = function (element) {
   this.events = {};
 };
 
+EventElement.eventListenerOptions = Object.assign({ passive: false }, window.evPsOptions);
+
 EventElement.prototype.bind = function (eventName, handler) {
   if (typeof this.events[eventName] === 'undefined') {
     this.events[eventName] = [];
   }
   this.events[eventName].push(handler);
-  this.element.addEventListener(eventName, handler, false);
+  this.element.addEventListener(eventName, handler, EventElement.eventListenerOptions);
 };
 
 EventElement.prototype.unbind = function (eventName, handler) {
@@ -116,7 +123,7 @@ EventElement.prototype.unbind = function (eventName, handler) {
     if (isHandlerProvided && hdlr !== handler) {
       return true;
     }
-    this.element.removeEventListener(eventName, hdlr, false);
+    this.element.removeEventListener(eventName, hdlr, EventElement.eventListenerOptions);
     return false;
   }, this);
 };
@@ -164,6 +171,15 @@ EventManager.prototype.once = function (element, eventName, handler) {
   };
   ee.bind(eventName, onceHandler);
 };
+
+EventManager.prototype.preventDefault = function(ev, stop) {
+    if (stop !== false) {
+      ev.stopPropagation();
+    }
+    if (!EventElement.eventListenerOptions.passive) {
+        ev.preventDefault();
+    }
+}
 
 module.exports = EventManager;
 
@@ -387,8 +403,7 @@ function bindMouseScrollXHandler(element, i) {
   var mouseMoveHandler = function (e) {
     updateScrollLeft(e.pageX - currentPageX);
     updateGeometry(element);
-    e.stopPropagation();
-    e.preventDefault();
+    i.event.preventDefault(e);
   };
 
   var mouseUpHandler = function () {
@@ -406,9 +421,7 @@ function bindMouseScrollXHandler(element, i) {
 
     i.event.bind(i.ownerDocument, 'mousemove', mouseMoveHandler);
     i.event.once(i.ownerDocument, 'mouseup', mouseUpHandler);
-
-    e.stopPropagation();
-    e.preventDefault();
+    i.event.preventDefault(e);
   });
 }
 
@@ -435,8 +448,7 @@ function bindMouseScrollYHandler(element, i) {
   var mouseMoveHandler = function (e) {
     updateScrollTop(e.pageY - currentPageY);
     updateGeometry(element);
-    e.stopPropagation();
-    e.preventDefault();
+    i.event.preventDefault(e);
   };
 
   var mouseUpHandler = function () {
@@ -454,9 +466,7 @@ function bindMouseScrollYHandler(element, i) {
 
     i.event.bind(i.ownerDocument, 'mousemove', mouseMoveHandler);
     i.event.once(i.ownerDocument, 'mouseup', mouseUpHandler);
-
-    e.stopPropagation();
-    e.preventDefault();
+    i.event.preventDefault(e);
   });
 }
 
@@ -523,17 +533,17 @@ function bindKeyboardHandler(element, i) {
       return;
     }
 
-    var activeElement = document.activeElement ? document.activeElement : i.ownerDocument.activeElement;
+    var activeElement = dom.getActiveElement(i.ownerDocument, true);
     if (activeElement) {
       if (activeElement.tagName === 'IFRAME') {
-        activeElement = activeElement.contentDocument.activeElement;
+        activeElement = dom.getActiveElement(activeElement.contentDocument, false);
       } else {
         // go deeper if element is a webcomponent
         while (activeElement.shadowRoot) {
-          activeElement = activeElement.shadowRoot.activeElement;
+          activeElement = dom.getActiveElement(activeElement.shadowRoot, false) || !1;
         }
       }
-      if (_.isEditable(activeElement)) {
+      if (activeElement && _.isEditable(activeElement)) {
         return;
       }
     }
@@ -615,7 +625,7 @@ function bindKeyboardHandler(element, i) {
 
     shouldPrevent = shouldPreventDefault(deltaX, deltaY);
     if (shouldPrevent) {
-      e.preventDefault();
+      i.event.preventDefault(e, false);
     }
   });
 }
@@ -720,7 +730,7 @@ function bindMouseWheelHandler(element, i) {
 
     function mousewheelHandler(e) {
         if (element.classList.contains("ps-disabled") ) {
-            e.preventDefault();
+            i.event.preventDefault(e, false);
             return;
         }
     var delta = getDeltaFromEvent(e);
@@ -762,8 +772,7 @@ function bindMouseWheelHandler(element, i) {
 
     shouldPrevent = (shouldPrevent || shouldPreventDefault(deltaX, deltaY));
     if (shouldPrevent) {
-      e.stopPropagation();
-      e.preventDefault();
+      i.event.preventDefault(e);
     }
   }
 
@@ -803,6 +812,7 @@ module.exports = function (element) {
 'use strict';
 
 var _ = require('../../lib/helper');
+var dom = require('../../lib/dom');
 var instances = require('../instances');
 var updateGeometry = require('../update-geometry');
 var updateScroll = require('../update-scroll');
@@ -811,14 +821,16 @@ function bindSelectionHandler(element, i) {
   function getRangeNode() {
     var selection = window.getSelection ? window.getSelection() :
                     document.getSelection ? document.getSelection() : '';
-    if (
-        !selection.toString().length
-        && document.activeElement
-        && document.activeElement.selectionStart < document.activeElement.selectionEnd
-    ) {
-        selection = {
-            anchorNode: document.activeElement,
-        };
+
+    if (!selection.toString().length) {
+        var activeElement = dom.getActiveElement();
+
+        if (activeElement && activeElement.selectionStart < activeElement.selectionEnd) {
+
+            selection = {
+                anchorNode: activeElement,
+            };
+        }
     }
     if (selection.toString().length === 0) {
       return null;
@@ -852,8 +864,9 @@ function bindSelectionHandler(element, i) {
   }
 
   var isSelected = false;
+  var isClicked = false;
     i.event.bind(i.ownerDocument, 'selectionchange', function() {
-        if (element.classList.contains("ps-disabled") ) {
+        if (!isClicked || element.classList.contains("ps-disabled")) {
             return;
         }
     if (element.contains(getRangeNode())) {
@@ -864,10 +877,14 @@ function bindSelectionHandler(element, i) {
     }
   });
   i.event.bind(window, 'mouseup', function () {
+    isClicked = false;
     if (isSelected) {
       isSelected = false;
       stopScrolling();
     }
+  });
+  i.event.bind(window, 'mousedown', function () {
+    isClicked = true;
   });
   i.event.bind(window, 'keyup', function () {
     if (isSelected) {
@@ -930,7 +947,7 @@ module.exports = function (element) {
   bindSelectionHandler(element, i);
 };
 
-},{"../../lib/helper":5,"../instances":17,"../update-geometry":18,"../update-scroll":19}],15:[function(require,module,exports){
+},{"../../lib/dom":2,"../../lib/helper":5,"../instances":17,"../update-geometry":18,"../update-scroll":19}],15:[function(require,module,exports){
 'use strict';
 
 var _ = require('../../lib/helper');
@@ -1054,8 +1071,7 @@ function bindTouchHandler(element, i, supportsTouch, supportsIePointer) {
       }
 
       if (shouldPreventDefault(differenceX, differenceY)) {
-        e.stopPropagation();
-        e.preventDefault();
+        i.event.preventDefault(e);
       }
     }
   }

@@ -249,12 +249,6 @@ export default class Call extends MegaRenderMixin {
                     call.setViewMode(this.state.mode);
                 });
             }
-            else if (this.state.mode === Call.MODE.SPEAKER && call.forcedActiveStream &&
-                !peers[call.forcedActiveStream]) {
-                this.setState({ mode: Call.MODE.THUMBNAIL }, () => {
-                    call.setViewMode(this.state.mode);
-                });
-            }
         });
         chatRoom.rebind('onCallPeerJoined.callComp', () => {
             const { minimized, peers, call } = this.props;

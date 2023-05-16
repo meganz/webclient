@@ -405,7 +405,7 @@ lazy(mega.gallery, 'albums', () => {
     };
 
     const sortAlbumsArray = (a, b) => {
-        if ((a.filterFn && b.filterFn) || a.t === b.t) {
+        if ((a.filterFn && b.filterFn) || a.cts === b.cts) {
             return sortLabels(a.label, b.label);
         }
 
@@ -416,7 +416,7 @@ lazy(mega.gallery, 'albums', () => {
             return 1;
         }
 
-        return b.t - a.t;
+        return b.cts - a.cts;
     };
 
     const sortStore = () => {
@@ -4530,11 +4530,10 @@ lazy(mega.gallery, 'albums', () => {
          * @param {Object.<String, Boolean>} ignoreHandles Handles to ignore when add to the album
          * @returns {void}
          */
-        createAlbumData({ e, at, k, id, ts }, ignoreHandles) {
+        createAlbumData({ e, at, k, id, ts, cts }, ignoreHandles) {
             const attr = mega.sets.decryptAttr(at, k);
             const label = attr.n || l.unknown_album_name;
             const coverHandle = attr.c || '';
-            const t = ts;// @TODO: Use `cts` once it is available on live
             let album = this.store[id];
             const nodes = [];
             const eHandles = Object.create(null);
@@ -4570,7 +4569,7 @@ lazy(mega.gallery, 'albums', () => {
                 album.at = attr;
                 album.k = k;
                 album.label = label;
-                album.t = t;
+                album.ts = ts;
                 album.button.label = label;
                 album.nodes = nodes;
                 album.node = node;
@@ -4587,7 +4586,7 @@ lazy(mega.gallery, 'albums', () => {
                     node,
                     button: AlbumsTree.createButton(id, label),
                     ts,
-                    t,
+                    cts,
                     eHandles,
                     eIds
                 };

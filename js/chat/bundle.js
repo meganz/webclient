@@ -21405,7 +21405,8 @@ class Stream extends mixins.wl {
         chatRoom: this.props.chatRoom,
         mode: mode,
         onLoadedData: onLoadedData,
-        source: source
+        source: source,
+        key: source
       });
     };
     this.renderSelfView = () => {
@@ -22996,12 +22997,6 @@ class Call extends mixins.wl {
         if (minimized) {
           this.setState({
             mode: peers.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI
-          }, () => {
-            call.setViewMode(this.state.mode);
-          });
-        } else if (this.state.mode === Call.MODE.SPEAKER && call.forcedActiveStream && !peers[call.forcedActiveStream]) {
-          this.setState({
-            mode: Call.MODE.THUMBNAIL
           }, () => {
             call.setViewMode(this.state.mode);
           });

@@ -346,6 +346,7 @@ class Stream extends MegaRenderMixin {
                 mode={mode}
                 onLoadedData={onLoadedData}
                 source={source} // ignored for LocalVideoHiRes
+                key={source}
             />
         );
     };

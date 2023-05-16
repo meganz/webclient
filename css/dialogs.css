@@ -446,7 +446,7 @@ body.de .mega-dialog.new-group-chat {
     margin: 0 auto;
 }
 .fm-dialog-table.grid-table {
-    width: calc(100% - 32px);
+    width: calc(100% - 34px);
     margin: 0 24px 0 8px;
 }
 .fm-dialog-table.grid-table td.extras-column {

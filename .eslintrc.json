@@ -187,6 +187,7 @@
         "jquery/no-ready": 2,
 
         "local-rules/classes": 2,
+        "local-rules/good-boy": 2,
         "local-rules/hints": 2,
         "local-rules/jquery-replacements": 2,
         "local-rules/jquery-scopes": 1,

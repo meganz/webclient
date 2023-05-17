@@ -2124,8 +2124,12 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
     }
 
     return asyncApiReq(opts)
-        .then((r) => {
+        .then(r => {
             this.startOrJoinCall(r.callId, r.sfu, audio, video);
+        })
+        .catch(ex => {
+            this.meetingsLoading = false;
+            this.logger.error(`Failed to start call: ${ex}`);
         });
 });
 

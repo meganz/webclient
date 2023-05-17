@@ -134,6 +134,7 @@ export default class Local extends AbstractGenericMessage {
             messageText.splice ? messageText : [messageText],
             true
         );
+        messageText = megaChat.html(messageText);
 
         message.textContents = String(messageText)
             .replace("[[", "<span class=\"bold\">")

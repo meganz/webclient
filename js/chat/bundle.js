@@ -4948,6 +4948,9 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
   }
   return asyncApiReq(opts).then(r => {
     this.startOrJoinCall(r.callId, r.sfu, audio, video);
+  }).catch(ex => {
+    this.meetingsLoading = false;
+    this.logger.error(`Failed to start call: ${ex}`);
   });
 });
 ChatRoom.prototype.subscribeForCallEvents = function () {
@@ -11175,8 +11178,8 @@ PushSettingsDialog.options = {
 PushSettingsDialog.default = PushSettingsDialog.options[PushSettingsDialog.options.length - 1];
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
 var call = __webpack_require__(582);
-// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
-var historyPanel = __webpack_require__(638);
+// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
+var historyPanel = __webpack_require__(192);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 var composedTextArea = __webpack_require__(813);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/loading.jsx
@@ -18505,7 +18508,7 @@ class GifPanel extends mixins.wl {
 
 /***/ }),
 
-/***/ 638:
+/***/ 192:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -18515,16 +18518,6 @@ __webpack_require__.d(__webpack_exports__, {
   "Z": () => (HistoryPanel)
 });
 
-;// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/initializerDefineProperty.js
-function _initializerDefineProperty(target, property, descriptor, context) {
-  if (!descriptor) return;
-  Object.defineProperty(target, property, {
-    enumerable: descriptor.enumerable,
-    configurable: descriptor.configurable,
-    writable: descriptor.writable,
-    value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
-  });
-}
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
 var applyDecoratedDescriptor = __webpack_require__(229);
 // EXTERNAL MODULE: external "React"
@@ -18979,9 +18972,7 @@ var call = __webpack_require__(582);
 var scheduleMetaChange = __webpack_require__(97);
 ;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
-
-
-var _dec, _dec2, _class, _descriptor;
+var _dec, _class;
 
 
 
@@ -18996,7 +18987,7 @@ var _dec, _dec2, _class, _descriptor;
 
 
 
-let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, true), (_class = class HistoryPanel extends mixins.wl {
+let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPanel extends mixins.wl {
   constructor(props) {
     super(props);
     this.$container = null;
@@ -19030,7 +19021,6 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
         }
       }
     };
-    _initializerDefineProperty(this, "onMessagesScrollReinitialise", _descriptor, this);
     this.onMessagesScrollUserScroll = (ps, offset = 5) => {
       const {
         chatRoom
@@ -19106,7 +19096,7 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
         className: "sprite-fm-mono icon-down"
       }), unreadCount > 0 && external_React_default().createElement("span", null, unreadCount > 9 ? '9+' : unreadCount));
     };
-    this.handleWindowResize = SoonFc(80, ev => this._handleWindowResize(ev));
+    this.handleWindowResize = this._handleWindowResize.bind(this);
   }
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
@@ -19583,7 +19573,6 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
         ps.scrollToBottom(true);
         this.props.chatRoom.scrolledToBottom = 1;
       },
-      onReinitialise: this.onMessagesScrollReinitialise,
       onUserScroll: this.onMessagesScrollUserScroll,
       className: "js-messages-scroll-area perfectScrollbarContainer",
       messagesToggledInCall: this.state.messagesToggledInCall,
@@ -19629,41 +19618,7 @@ let HistoryPanel = (_dec = utils.ZP.SoonFcWrap(50), _dec2 = (0,mixins.M9)(450, t
       }
     })), messagesList))), this.renderToast());
   }
-}, (_descriptor = (0,applyDecoratedDescriptor.Z)(_class.prototype, "onMessagesScrollReinitialise", [_dec], {
-  configurable: true,
-  enumerable: true,
-  writable: true,
-  initializer: function () {
-    return (ps, $elem, forced, scrollPositionYPerc, scrollToElement) => {
-      const {
-        chatRoom
-      } = this.props;
-      if (this.scrollPullHistoryRetrieval || chatRoom.messagesBuff.isRetrievingHistory) {
-        return;
-      }
-      if (forced) {
-        if (!scrollPositionYPerc && !scrollToElement) {
-          if (chatRoom.scrolledToBottom && !this.editDomElement) {
-            ps.scrollToBottom(true);
-            return true;
-          }
-        } else {
-          return;
-        }
-      }
-      if (this.isComponentEventuallyVisible() && !this.editDomElement && !chatRoom.isScrollingToMessageId) {
-        if (chatRoom.scrolledToBottom) {
-          ps.scrollToBottom(true);
-          return true;
-        }
-        if (this.lastScrollPosition && this.lastScrollPosition !== ps.getScrollPositionY()) {
-          ps.scrollToY(this.lastScrollPosition, true);
-          return true;
-        }
-      }
-    };
-  }
-}), (0,applyDecoratedDescriptor.Z)(_class.prototype, "enableScrollbar", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype)), _class));
+}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "enableScrollbar", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype)), _class));
 
 
 /***/ }),
@@ -21405,7 +21360,8 @@ class Stream extends mixins.wl {
         chatRoom: this.props.chatRoom,
         mode: mode,
         onLoadedData: onLoadedData,
-        source: source
+        source: source,
+        key: source
       });
     };
     this.renderSelfView = () => {
@@ -22198,8 +22154,8 @@ class stream_Stream extends mixins.wl {
 }
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 var composedTextArea = __webpack_require__(813);
-// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 8 modules
-var historyPanel = __webpack_require__(638);
+// EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
+var historyPanel = __webpack_require__(192);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/collapse.jsx
 
 
@@ -22996,12 +22952,6 @@ class Call extends mixins.wl {
         if (minimized) {
           this.setState({
             mode: peers.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI
-          }, () => {
-            call.setViewMode(this.state.mode);
-          });
-        } else if (this.state.mode === Call.MODE.SPEAKER && call.forcedActiveStream && !peers[call.forcedActiveStream]) {
-          this.setState({
-            mode: Call.MODE.THUMBNAIL
           }, () => {
             call.setViewMode(this.state.mode);
           });
@@ -24265,6 +24215,7 @@ class Local extends AbstractGenericMessage {
       return console.error(`Message with type: ${message.type} -- no text string defined. Message: ${message}`);
     }
     messageText = CallManager2._getMltiStrTxtCntsForMsg(message, messageText.splice ? messageText : [messageText], true);
+    messageText = megaChat.html(messageText);
     message.textContents = String(messageText).replace("[[", "<span class=\"bold\">").replace("]]", "</span>");
     if (IS_GROUP) {
       messageText = `

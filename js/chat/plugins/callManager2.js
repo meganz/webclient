@@ -1027,7 +1027,6 @@
                     otherContactsName.push(message.chatRoom.topic);
                 }
             }
-            otherContactsName = otherContactsName.map(name => megaChat.html(name));
         }
 
         if (message.chatRoom.type === "private") {

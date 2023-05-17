@@ -24212,6 +24212,7 @@ class Local extends AbstractGenericMessage {
       return console.error(`Message with type: ${message.type} -- no text string defined. Message: ${message}`);
     }
     messageText = CallManager2._getMltiStrTxtCntsForMsg(message, messageText.splice ? messageText : [messageText], true);
+    messageText = megaChat.html(messageText);
     message.textContents = String(messageText).replace("[[", "<span class=\"bold\">").replace("]]", "</span>");
     if (IS_GROUP) {
       messageText = `

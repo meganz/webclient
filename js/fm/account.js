@@ -2088,7 +2088,14 @@ accountUI.plan = {
             $dialog: null,
             $dialogSuccess: null,
             $accountPageCancelButton: null,
+            $options: null,
+            $formContent: null,
+            $selectReasonDialog: null,
+            $invalidDetailsDialog: null,
+            $skipContinueButton: null,
             $continueButton: null,
+            $textareaAndErrorDialog: null,
+            $textarea: null,
             $cancelReason: null,
             $expiryTextBlock: null,
             $expiryDateBlock: null,
@@ -2104,8 +2111,15 @@ accountUI.plan = {
                 this.$dialog = $('.cancel-subscription-st1');
                 this.$dialogSuccess = $('.cancel-subscription-st2');
                 this.$accountPageCancelButton = $('.btn-cancel-sub');
-                this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
-                this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
+                this.$options = this.$dialog.find('.label-wrap');
+                this.$formContent = this.$dialog.find('section.content');
+                this.$selectReasonDialog = this.$dialog.find('.error-banner.select-reason');
+                this.$invalidDetailsDialog = this.$dialog.find('.error-banner.invalid-details');
+                this.$skipContinueButton = this.$dialog.find('.skip-cancel-subscription');
+                this.$continueButton = this.$dialog.find('.cancel-subscription');
+                this.$textareaAndErrorDialog = this.$dialog.find('.textarea-and-banner');
+                this.$textarea = this.$dialog.find('textarea');
+                this.$cancelReason = $('.cancel-textarea-bl', this.$textareaAndErrorDialog);
                 this.$backgroundOverlay = $('.fm-dialog-overlay');
                 this.$expiryTextBlock = $('.account.plan-info.expiry-txt');
                 this.$expiryDateBlock = $('.account.plan-info.expiry');
@@ -2117,30 +2131,84 @@ accountUI.plan = {
                 // Init textarea scrolling
                 initTextareaScrolling($('.cancel-textarea textarea', this.$dialog));
 
+                // Init section scrolling
+                if (this.$formContent.is('.ps')) {
+                    Ps.update(this.$formContent[0]);
+                }
+                else {
+                    Ps.initialize(this.$formContent[0]);
+                }
+
+                // Init focus textarea if "Other" option is selected (and make it empty)
+                if ($('input.radioOn', this.$options).val() === "8") {
+                    this.$invalidDetailsDialog.addClass('hidden');
+                    this.$cancelReason.removeClass('error');
+                    this.$formContent.scrollTop(this.$formContent.height());
+                    this.$textarea.trigger('focus').val('');
+                }
+
                 // Init functionality
-                this.enableButtonWhenReasonEntered();
-                this.initSendingReasonToApi();
-                this.initCloseAndBackButtons();
+                this.checkReasonEnteredIsValid();
+                this.initClickReason();
+                this.initCloseAndDontCancelButtons();
+
+                this.$continueButton.add(this.$skipContinueButton).rebind('click', (e) => {
+                    const $buttonClicked = $(e.currentTarget);
+                    this.sendSubCancelRequestToApi($buttonClicked.hasClass('skip-cancel-subscription'));
+                });
             },
 
             /**
-             * Close the dialog when either the close or back buttons are clicked
+             * Close the dialog when either the close or "Don't cancel" buttons are clicked
              */
-            initCloseAndBackButtons: function() {
+            initCloseAndDontCancelButtons: function() {
 
                 'use strict';
 
                 var self = this;
 
                 // Close main dialog
-                this.$dialog.find('button.cancel, button.js-close').rebind('click', function() {
+                self.$dialog.find('button.dont-cancel, button.js-close').rebind('click', () => {
                     self.$dialog.addClass('hidden');
                     self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 });
+            },
 
-                // Prevent clicking on the background overlay which closes it unintentionally
-                self.$backgroundOverlay.rebind('click', function(event) {
-                    event.stopPropagation();
+            /**
+             * Set the radio button classes when a radio button or its text are clicked
+             */
+            initClickReason: function() {
+                'use strict';
+
+                this.$options.rebind('click', (e) => {
+                    const $option = $(e.currentTarget);
+                    const value = $('input', $option).val();
+                    const valueIsOtherOption = value === "8";
+
+                    $('.cancel-option', this.$options).addClass('radioOff').removeClass('radioOn');
+                    $('.cancel-option', $option).addClass('radioOn').removeClass('radioOff');
+
+                    this.$selectReasonDialog.addClass('hidden');
+                    this.$dialog.removeClass('select-reason');
+                    this.$textareaAndErrorDialog.toggleClass('hidden', !valueIsOtherOption);
+                    this.$dialog.toggleClass('textbox-open', valueIsOtherOption);
+
+                    if (valueIsOtherOption) {
+                        this.$invalidDetailsDialog.toggleClass('hidden', !(this.$cancelReason.hasClass('error')));
+
+                        this.$formContent.scrollTop(this.$formContent.height());
+                        this.$textarea.trigger('focus');
+                    }
+                    else {
+                        if (this.$formContent.is('.ps')) {
+                            this.$formContent.scrollTop(0);
+                            Ps.destroy(this.$formContent[0]);
+                            Ps.initialize(this.$formContent[0]);
+                        }
+
+                        this.$invalidDetailsDialog.addClass('hidden');
+                        this.$textarea.trigger('blur');
+                    }
                 });
             },
 
@@ -2153,90 +2221,135 @@ accountUI.plan = {
 
                 var self = this;
 
-                this.$dialogSuccess.find('button.js-close').rebind('click', function() {
+                self.$dialogSuccess.find('button.js-close').rebind('click', () => {
                     self.$dialogSuccess.addClass('hidden');
                     self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
                 });
             },
 
             /**
-             * Make sure text has been entered before making the button available
+             * Check the user has entered between 1 and 1000 characters into the text field
              */
-            enableButtonWhenReasonEntered: function() {
+            checkReasonEnteredIsValid: function() {
 
                 'use strict';
 
                 var self = this;
 
-                this.$cancelReason.rebind('keyup', function() {
-
+                self.$textarea.rebind('keyup', function() {
                     // Trim for spaces
                     var reason = $(this).val();
                     reason = $.trim(reason);
 
-                    // Make sure at least 1 character
-                    if (reason.length > 0) {
-                        self.$continueButton.removeClass('disabled');
+                    const responseIsValid = reason.length > 0 && reason.length <= 1000;
+
+                    // Make sure response is between 1 and 1000 characters
+                    if (responseIsValid) {
+                        self.$invalidDetailsDialog.addClass('hidden');
+                        self.$cancelReason.removeClass('error');
                     }
                     else {
-                        self.$continueButton.addClass('disabled');
+                        self.showTextareaError(!reason.length);
                     }
                 });
             },
 
             /**
-             * Send the cancellation reason
+             * Show the user an error message below the text field if their input is
+             * invalid, or too long
              */
-            initSendingReasonToApi: function() {
-
+            showTextareaError: function(emptyReason) {
                 'use strict';
 
                 var self = this;
 
-                this.$continueButton.rebind('click', function() {
+                self.$invalidDetailsDialog.removeClass('hidden');
 
-                    // Get the cancellation reason
-                    var reason = self.$cancelReason.val();
+                if (emptyReason) {
+                    self.$invalidDetailsDialog.text(l.cancel_sub_empty_textarea_error_msg);
+                }
+                else {
+                    self.$invalidDetailsDialog.text(l.cancel_sub_too_much_textarea_input_error_msg);
+                }
 
-                    // Hide the dialog and show loading spinner
-                    self.$dialog.addClass('hidden');
-                    self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                    loadingDialog.show();
+                self.$cancelReason.addClass('error');
+                self.$formContent.scrollTop(self.$formContent.height());
+            },
 
-                    // Setup standard request to 'cccs' = Credit Card Cancel Subscriptions
-                    const requests = [
-                        { a: 'cccs', r: reason }
-                    ];
+            /**
+             * Send the subscription cancellation request to the API
+             */
+            sendSubCancelRequestToApi: function(skippedReason) {
+                'use strict';
 
-                    // If they were Pro Flexi, we need to also downgrade the user from Pro Flexi to Free
-                    if (u_attr && u_attr.pf) {
-                        requests.push({ a: 'urpf' });
+                var reason = '';
+
+                if (!skippedReason) {
+                    const $optionSelected = $('.cancel-option.radioOn', this.$options);
+
+                    if (!($optionSelected.length)) {
+                        this.$selectReasonDialog.removeClass('hidden');
+                        this.$dialog.addClass('select-reason');
+                        return;
                     }
 
-                    // Cancel the subscription/s
-                    api_req(requests, {
-                        callback: function() {
+                    const value = $('input', $optionSelected).val();
+                    const radioText = $('.radio-txt', $optionSelected.parent()).text().trim();
 
-                            // Hide loading dialog and cancel subscription button on account page, set expiry date
-                            loadingDialog.hide();
-                            self.$accountPageCancelButton.addClass('hidden');
-                            self.$expiryTextBlock.text(l[987]);
-                            self.$expiryDateBlock
-                                .safeHTML('<span class="red">@@</span>',
-                                    time2date(account.expiry, 2));
+                    // The cancellation reason (r) sent to the API is the radio button text, or
+                    // when the chosen option is "Other (please provide details)" it is
+                    // what the user enters in the text field
+                    if (value === "8") {
+                        reason = this.$textarea.val().trim();
 
-                            // Show success dialog
-                            self.$dialogSuccess.removeClass('hidden');
-                            self.$backgroundOverlay.removeClass('hidden');
-                            self.$backgroundOverlay.addClass('payment-dialog-overlay');
-                            self.initCloseButtonSuccessDialog();
-
-                            // Reset account cache so all account data will be refetched
-                            // and re-render the account page UI
-                            M.account.lastupdate = 0;
-                            accountUI();
+                        if (!reason.length || reason.length > 1000) {
+                            this.showTextareaError(!reason.length);
+                            return;
                         }
-                    });
+                    }
+                    else {
+                        reason = value + ' - ' + radioText;
+                    }
+                }
+
+                // Hide the dialog and show loading spinner
+                this.$dialog.addClass('hidden');
+                this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                loadingDialog.show();
+
+                // Setup standard request to 'cccs' = Credit Card Cancel Subscriptions
+                const requests = [
+                    { a: 'cccs', r: reason }
+                ];
+
+                // If they were Pro Flexi, we need to also downgrade the user from Pro Flexi to Free
+                if (u_attr && u_attr.pf) {
+                    requests.push({ a: 'urpf' });
+                }
+
+                // Cancel the subscription/s
+                api_req(requests, {
+                    callback: () => {
+
+                        // Hide loading dialog and cancel subscription button on
+                        // account page, set expiry date
+                        loadingDialog.hide();
+                        this.$accountPageCancelButton.addClass('hidden');
+                        this.$expiryTextBlock.text(l[987]);
+                        this.$expiryDateBlock
+                            .safeHTML('<span class="red">@@</span>', time2date(account.expiry, 2));
+
+                        // Show success dialog
+                        this.$dialogSuccess.removeClass('hidden');
+                        this.$backgroundOverlay.removeClass('hidden');
+                        this.$backgroundOverlay.addClass('payment-dialog-overlay');
+                        this.initCloseButtonSuccessDialog();
+
+                        // Reset account cache so all account data will be refetched
+                        // and re-render the account page UI
+                        M.account.lastupdate = 0;
+                        accountUI();
+                    }
                 });
             }
         }

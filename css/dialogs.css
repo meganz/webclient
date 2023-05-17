@@ -5099,18 +5099,87 @@ body.de .mega-dialog.new-group-chat {
 /* cancel-subscription-st1 */
 
     .mega-dialog.cancel-subscription-st1 {
-        width: 444px;
+        width: 704px;
+    }
+    .mega-dialog.cancel-subscription-st1 button.close {
+        top: 27px;
+        right: 27px;
     }
     .mega-dialog.cancel-subscription-st1 header {
-        margin-bottom: 10px;
+        margin-bottom: 24px;
+        padding: 24px 48px;
+        border-bottom: var(--dropdown-border);
     }
-    .mega-dialog.cancel-subscription-st1 .reset-small-txt {
-        padding: 25px 0 15px 0;
-        font-size: 13px;
+    .mega-dialog.cancel-subscription-st1 section {
+        position: relative;
+        height: 400px;
+    }
+    .mega-dialog.cancel-subscription-st1.select-reason section {
+        height: 442px;
+    }
+    .mega-dialog.cancel-subscription-st1 section .content-block {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .mega-dialog.cancel-subscription-st1 section .content-block > * {
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .mega-dialog.cancel-subscription-st1 .cancel-option-prompt {
+        padding: 0;
+        font-family: var(--text-font-family-bold);
     }
     .mega-dialog.cancel-subscription-st1 form {
         padding: 0;
-        display: block;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .mega-dialog.cancel-subscription-st1 form .label-wrap {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        align-items: center;
+    }
+    .mega-dialog.cancel-subscription-st1 form .textarea-and-banner {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .mega-dialog.cancel-subscription-st1 form .label-wrap > * {
+        cursor: pointer;
+    }
+    .mega-dialog.cancel-subscription-st1 form .label-wrap div.cancel-option {
+        margin: 3px;
+    }
+    .mega-dialog.cancel-subscription-st1 form .label-wrap .radio-txt {
+        padding: 2px 0;
+    }
+    .mega-dialog.cancel-subscription-st1 .error-banner {
+        padding: 2px 16px;
+        text-align: center;
+        background-color: var(--banner-background-error);
+        border: 1px solid var(--banner-border-error);
+        border-radius: 4px;
+        color: var(--banner-text-error);
+    }
+    .mega-dialog.cancel-subscription-st1.select-reason footer {
+        margin-top: 16px;
+    }
+    .mega-dialog.cancel-subscription-st1.textbox-open footer {
+        margin-top: 26px;
+    }
+    .mega-dialog.cancel-subscription-st1 footer {
+        margin-top: 56px;
+        padding: 24px 48px;
+        border-top: var(--dropdown-border);
+    }
+    .mega-dialog.cancel-subscription-st1 footer .footer-container {
+        padding: 0;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
     }
 
 /* end cancel-subscription-st1 */

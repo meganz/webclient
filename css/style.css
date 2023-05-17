@@ -4283,11 +4283,12 @@ body.loading .light-overlay {
     margin-top: 16px;
     margin-bottom: 16px;
 }
-.cancel-subscription-txt {
-    padding: 16px 8px 0 8px;
-}
 .cancel-textarea-bl.mega-textarea {
-    margin: -4px 0 0;
+    border-radius: 4px;
+    margin: 0;
+}
+.cancel-textarea-bl.error {
+    border: 1px solid var(--secondary-red);
 }
 .cancel-textarea-bl .cancel-textarea.textarea-scroll {
     max-height: 140px;

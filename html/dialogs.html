@@ -3466,28 +3466,82 @@
                 <div class="fm-dialog-top-text">
                     [$6996]
                 </div>
-                <div class="reset-small-txt">[$7005]:</div>
+                <div class="cancel-option-prompt">[$7005]</div>
                 <form>
-                    <div class="cancel-textarea-bl mega-textarea">
-                        <div class="cancel-textarea textarea-scroll">
-                            <textarea></textarea>
+                    <div class="error-banner select-reason hidden">[$select_cancel_sub_reason_error_msg]</div>
+                    <div class="label-wrap">
+                        <div class="cancel-option radioOff" id="subcancel1_div">
+                            <input type="radio" id="subcancel1" class="cancel-option radioOff" value="1">
                         </div>
+                        <div class="radio-txt">[$cancel_sub_temp_plan_reason]</div>
+                    </div>
+                    <div class="label-wrap">
+                        <div class="cancel-option radioOff" id="subcancel2_div">
+                            <input type="radio" id="subcancel2" class="cancel-option radioOff" value="2">
+                        </div>
+                        <div class="radio-txt">[$cancel_sub_too_expensive_reason]</div>
+                    </div>
+                    <div class="label-wrap">
+                        <div class="cancel-option radioOff" id="subcancel3_div">
+                            <input type="radio" id="subcancel3" class="cancel-option radioOff" value="3">
+                        </div>
+                        <div class="radio-txt">[$cancel_sub_too_much_storage_quota_reason]</div>
+                    </div>
+                    <div class="label-wrap">
+                        <div class="cancel-option radioOff" id="subcancel4_div">
+                            <input type="radio" id="subcancel4" class="cancel-option radioOff" value="4">
+                        </div>
+                        <div class="radio-txt">[$cancel_sub_lack_of_features_reason]</div>
+                    </div>
+                    <div class="label-wrap">
+                        <div class="cancel-option radioOff" id="subcancel5_div">
+                            <input type="radio" id="subcancel5" class="cancel-option radioOff" value="5">
+                        </div>
+                        <div class="radio-txt">[$cancel_sub_switching_provider_reason]</div>
+                    </div>
+                    <div class="label-wrap">
+                        <div class="cancel-option radioOff" id="subcancel6_div">
+                            <input type="radio" id="subcancel6" class="cancel-option radioOff" value="6">
+                        </div>
+                        <div class="radio-txt">[$cancel_sub_difficult_to_use_reason]</div>
+                    </div>
+                    <div class="label-wrap">
+                        <div class="cancel-option radioOff" id="subcancel7_div">
+                            <input type="radio" id="subcancel7" class="cancel-option radioOff" value="7">
+                        </div>
+                        <div class="radio-txt">[$cancel_sub_poor_support_reason]</div>
+                    </div>
+                    <div class="label-wrap">
+                        <div class="cancel-option radioOff" id="subcancel8_div">
+                            <input type="radio" id="subcancel8" class="cancel-option radioOff" value="8">
+                        </div>
+                        <div class="radio-txt">[$cancel_sub_other_reason]</div>
+                    </div>
+                    <div class="textarea-and-banner hidden">
+                        <div class="cancel-textarea-bl mega-textarea">
+                            <div class="cancel-textarea textarea-scroll">
+                                <textarea></textarea>
+                            </div>
+                        </div>
+                        <div class="error-banner invalid-details hidden"></div>
                     </div>
                 </form>
-                <div class="cancel-subscription-txt">
-                    [$6998]
-                </div>
             </div>
         </section>
 
         <footer>
             <div class="footer-container">
-                <button class="mega-button cancel">
-                    <span>[$822]</span>
+                <button class="mega-button dont-cancel">
+                    <span>[$dont_cancel_sub_btn_label]</span>
                 </button>
-                <button class="mega-button positive continue-cancel-subscription disabled">
-                    <span>[$507]</span>
-                </button>
+                <div class="cancel-buttons">
+                    <button class="mega-button skip-cancel-subscription">
+                        <span>[$skip_and_cancel_sub_btn_label]</span>
+                    </button>
+                    <button class="mega-button positive cancel-subscription">
+                        <span>[$cancel_sub_btn_label]</span>
+                    </button>
+                </div>
             </div>
         </footer>
     </div>

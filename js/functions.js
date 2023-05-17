@@ -11,7 +11,14 @@ function clickURLs() {
         $(nodeList).rebind('click', function() {
             var $this = $(this);
             var url = $this.attr('href') || $this.data('fxhref');
+            let eventid = $this.attr('data-eventid') || false;
             const redirect = $this.attr('redirect');
+            if (eventid) {
+                eventid = parseInt(eventid);
+                if (!isNaN(eventid)) {
+                    delay(`clickurlevlog${eventid}`, () => eventlog(eventid));
+                }
+            }
 
             if (url) {
                 var target = $this.attr('target');

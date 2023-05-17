@@ -2214,7 +2214,7 @@ mega.gallery.arrayBufferContainsAlpha = (ab) => {
 mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
     'use strict';
 
-    const {dbLoading} = mega.gallery;
+    const { dbLoading } = mega.gallery;
 
     if (!MegaGallery.workerBranch) {
         MegaGallery.workerBranch = await webgl.worker.attach();
@@ -2223,16 +2223,34 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
     if (dbLoading) {
         await dbLoading;
     }
-    const {workerBranch} = MegaGallery;
+
+    const { workerBranch } = MegaGallery;
+
+    const isLocationCorrect = () => {
+        if (!M.isGalleryPage() && !M.isAlbumsPage()) {
+            console.log(`Cancelling the thumbnail request...`);
+            return false;
+        }
+
+        return true;
+    };
 
     const processBlob = (key, blob) => {
-
         webgl.readAsArrayBuffer(blob)
             .then((ab) => {
+                if (!isLocationCorrect()) {
+                    return;
+                }
+
                 ab.type = blob.type;
 
-                onLoad(key, ab);
-                return mega.gallery.lru.set(key, ab);
+                mega.gallery.lru.set(key, ab).then(() => {
+                    if (!isLocationCorrect()) {
+                        return;
+                    }
+
+                    onLoad(key, ab);
+                });
             })
             .catch(dump);
     };
@@ -2242,6 +2260,10 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
     const faData = {};
 
     for (let i = 0; i < keys.length; i++) {
+        if (!isLocationCorrect()) {
+            return;
+        }
+
         const key = keys[i];
 
         // Fetching already stored thumbnail
@@ -2269,7 +2291,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
         const ext = fileext(node.name || node, true, true);
         const type = inThumbSize || GalleryNodeBlock.allowsTransparent[ext] || ext === 'SVG' ? 0 : 1;
 
-        faData[fa] = {
+        faData[key] = {
             key,
             handle: node.h,
             byteSize: node.s,
@@ -2278,16 +2300,112 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
             ext
         };
 
-        fetchTypes[type][node.fa] = node;
+        fetchTypes[type][key] = node;
     }
 
-    const isLocationCorrect = () => {
-        if (!M.isGalleryPage() && !M.isAlbumsPage()) {
-            console.log(`Cancelling the thumbnail request...`);
-            return false;
+    const isAbAvailable = ab => ab !== 0xDEAD && ab.byteLength > 0;
+
+    const adjustBlobToConditions = async(key, thumbAB, type, size) => {
+        let blob;
+
+        const {
+            handle,
+            byteSize,
+            inThumbSize,
+            ext
+        } = faData[key];
+
+        // Checking if we can use the already received thumbAB, or we need to load the original
+        if (
+            byteSize < 8e6 // 8MB. The file size allows it to be fetched
+            && (
+                (!isAbAvailable(thumbAB) && type === 0) // Thumbnail is not available
+                || (
+                    !inThumbSize // Need bigger than the thumbnail
+                    && mega.gallery.arrayBufferContainsAlpha(thumbAB) // AB contains transparent pixels
+                    && GalleryNodeBlock.allowsTransparent[ext] // The image is designed to allow transparency
+                )
+            )
+        ) {
+            // The thumbnail and preview did not qualify for conditions, so original image must be fetched
+            const original = await M.gfsfetch(handle, 0, -1).catch(dump);
+
+            if (!isLocationCorrect()) {
+                return;
+            }
+
+            if (original) {
+                blob = await webgl.getDynamicThumbnail(original, size, workerBranch).catch(dump);
+            }
         }
 
-        return true;
+        return blob;
+    };
+
+    const processUint8 = async(ctx, key, thumbAB, type) => {
+        if (!isLocationCorrect()) {
+            return;
+        }
+
+        const abIsEmpty = !isAbAvailable(thumbAB);
+        const {
+            handle,
+            pxSize
+        } = faData[key];
+
+        if (abIsEmpty && type === 1) { // Preview fetch is not successful
+            api_getfileattr(
+                { [key]: M.d[faData[key].handle] },
+                0,
+                (ctx1, key1, thumbAB1) => {
+                    processUint8(ctx1, key1, thumbAB1, 0);
+                }
+            );
+
+            onErr('The basic thumbnail image seems to be tainted...');
+            return;
+        }
+
+        const size = parseInt(pxSize) | 0;
+
+        let blob = await adjustBlobToConditions(key, thumbAB, type, size);
+
+        if (!isLocationCorrect()) {
+            return;
+        }
+
+        if (!blob && abIsEmpty) {
+            console.warn('Could not fetch neither of the available image options...');
+            return;
+        }
+
+        if (!blob) {
+            const bak = new ArrayBuffer(thumbAB.byteLength);
+            new Uint8Array(bak).set(new Uint8Array(thumbAB));
+
+            if (bak.byteLength) {
+                blob = await webgl.getDynamicThumbnail(bak, size, workerBranch).catch(dump);
+            }
+
+            if (!blob) {
+                blob = new Blob([thumbAB], { type: 'image/webp' });
+
+                if (!blob.size) {
+                    blob = null;
+                }
+            }
+        }
+
+        if (!isLocationCorrect()) {
+            return;
+        }
+
+        if (blob) {
+            processBlob(key, blob);
+        }
+        else {
+            onErr(`Could not generate dynamic thumbnail of ${size}px for ${handle}`);
+        }
     };
 
     fetchTypes.forEach((nodes, type) => {
@@ -2298,68 +2416,8 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
         api_getfileattr(
             nodes,
             type,
-            async(thumbCtx, thumbFa, thumbAB) => {
-                if (!isLocationCorrect()) {
-                    return;
-                }
-
-                let blob;
-
-                if (thumbAB === 0xDEAD || thumbAB.length === 0) {
-                    if (d) {
-                        console.log(`Cannot make thumbnail for ${thumbFa}`);
-                    }
-
-                    onErr('The basic thumbnail image seems to be tainted...');
-                    return;
-                }
-
-                const {
-                    key,
-                    handle,
-                    pxSize,
-                    byteSize,
-                    inThumbSize,
-                    ext
-                } = faData[thumbFa];
-
-                const size = parseInt(pxSize) | 0;
-
-                // Checking when we can use the already receieved thumbAB (either `:0*` or `:1*`)
-                if (
-                    !inThumbSize // The image px size is bigger than the one we already have
-                    && byteSize < 8e6 // 8MB. The image size allows the network fetch
-                    && GalleryNodeBlock.allowsTransparent[ext] // The image is designed to be transparent
-                    && mega.gallery.arrayBufferContainsAlpha(thumbAB)  // The image contains alpha channel
-                ) {
-                    // The thumbnail did not qualify for `:0*` or `:1*`, so original image must be fetched
-                    const original = await M.gfsfetch(handle, 0, -1).catch(dump);
-
-                    if (!isLocationCorrect()) {
-                        return;
-                    }
-
-                    if (original) {
-                        blob = await webgl.getDynamicThumbnail(original, size, workerBranch).catch(dump);
-                    }
-                }
-
-                if (!isLocationCorrect()) {
-                    return;
-                }
-
-                blob = blob || await webgl.getDynamicThumbnail(thumbAB, size, workerBranch).catch(dump);
-
-                if (!isLocationCorrect()) {
-                    return;
-                }
-
-                if (blob) {
-                    processBlob(key, blob);
-                }
-                else {
-                    onErr(`Could not generate dynamic thumbnail of ${size}px for ${handle}`);
-                }
+            (ctx, key, thumbAB) => {
+                processUint8(ctx, key, thumbAB, type);
             }
         );
     });

@@ -2517,6 +2517,9 @@ function topmenuUI() {
                 loadSubPage('registerb');
             }
             else {
+                if (page === 'login') {
+                    delay('loginregisterevlog', () => eventlog(99798));
+                }
                 loadSubPage('register');
             }
         });
@@ -2528,6 +2531,9 @@ function topmenuUI() {
             else {
                 var c = $('.dropdown.top-login-popup', $topHeader).attr('class');
                 if (c && c.indexOf('hidden') > -1) {
+                    if (page === 'register') {
+                        delay('registerloginevlog', () => eventlog(99818));
+                    }
                     tooltiplogin.init();
                 }
                 else {
@@ -2703,11 +2709,15 @@ function topmenuUI() {
             loadSubPage('register');
         }
         else if (page === 'register') {
+            delay('registermovebusevlog', () => eventlog(99794));
             loadSubPage('registerb');
         }
         else {
             if (folderlink) {
                 eventlog(99750);
+            }
+            if (page === 'login') {
+                delay('loginmovebusevlog', () => eventlog(99795));
             }
             mega.redirect('mega.io', 'business', false, false, false);
         }

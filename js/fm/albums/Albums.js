@@ -1854,7 +1854,7 @@ lazy(mega.gallery, 'albums', () => {
             const div = document.createElement('div');
             div.className = 'flex flex-row';
 
-            const toFetchAttributes = [];
+            const elements = [];
 
             if (this._nodes[rowKey]) {
                 const sizePx = this.cellSize + 'px';
@@ -1884,13 +1884,25 @@ lazy(mega.gallery, 'albums', () => {
 
                     tCell.el.ref.el = tCell.el;
 
-                    toFetchAttributes.push(tCell.el.ref);
+                    elements.push(tCell.el);
                 }
             }
 
-            if (toFetchAttributes.length) {
-                delay('album_timeline:render_row' + rowKey, () => MegaGallery.addThumbnails(toFetchAttributes));
-            }
+            delay(`album_timeline:render_row_${rowKey}`, () => {
+                const toFetchAttributes = [];
+
+                for (let i = 0; i < elements.length; i++) {
+                    const element = elements[i];
+
+                    if (element.clientWidth && element.clientHeight) {
+                        toFetchAttributes.push(element.ref);
+                    }
+                }
+
+                if (toFetchAttributes.length) {
+                    MegaGallery.addThumbnails(toFetchAttributes);
+                }
+            });
 
             return div;
         }

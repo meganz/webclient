@@ -4948,6 +4948,9 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
   }
   return asyncApiReq(opts).then(r => {
     this.startOrJoinCall(r.callId, r.sfu, audio, video);
+  }).catch(ex => {
+    this.meetingsLoading = false;
+    this.logger.error(`Failed to start call: ${ex}`);
   });
 });
 ChatRoom.prototype.subscribeForCallEvents = function () {

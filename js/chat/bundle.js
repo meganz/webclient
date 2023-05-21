@@ -3522,17 +3522,29 @@ Chat.prototype.openScheduledMeeting = function (meetingId, toCall) {
   window.focus();
   meeting.chatRoom.activateWindow();
   meeting.chatRoom.show();
-  if (toCall && megaChat.hasSupportForCalls) {
-    if (this.haveAnyActiveCall() && window.sfuClient) {
-      const {
-        chatRoom
-      } = megaChat.activeCall;
-      const peers = chatRoom ? chatRoom.getCallParticipants() : [];
-      if (peers.includes(u_handle)) {
-        return d && console.warn('Already in this call');
+  if (toCall && this.hasSupportForCalls) {
+    this.openScheduledMeeting._queue = this.openScheduledMeeting._queue || [];
+    this.openScheduledMeeting._queue.push(meetingId);
+    delay('megachat:openScheduledMeetingCall', () => {
+      const meetingId = this.openScheduledMeeting._queue[0];
+      delete this.openScheduledMeeting._queue;
+      const meetingRoom = this.scheduledMeetings[meetingId].chatRoom;
+      meetingRoom.activateWindow();
+      meetingRoom.show();
+      const haveCall = this.haveAnyActiveCall();
+      if (haveCall && window.sfuClient) {
+        const {
+          chatRoom
+        } = this.activeCall;
+        if (chatRoom && chatRoom.chatId === meetingRoom.chatId) {
+          const peers = chatRoom.getCallParticipants();
+          if (peers.includes(u_handle)) {
+            return d && console.warn('Already in this call');
+          }
+        }
       }
-    }
-    (0,call.xt)(true, meeting.chatRoom).then(() => meeting.chatRoom.startAudioCall(true)).catch(ex => d && console.warn('Already in a call.', ex));
+      (0,call.xt)(true, meetingRoom).then(() => meetingRoom.startAudioCall(true)).catch(ex => d && console.warn('Already in a call.', ex));
+    });
   }
 };
 window.Chat = Chat;

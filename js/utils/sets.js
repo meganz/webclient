@@ -143,19 +143,24 @@ lazy(mega, 'sets', () => {
 
     /**
      * @param {Object.<String, any>} attrData Attribute data to encrypt
-     * @param {String} [key] - The already generated key in Base64 format, used when re-encryption is needed
+     * @param {String} [key] The already generated key in Base64 format, used when re-encryption is needed
+     * @param {Number} [length] The key length to generate (either 4 for Sets or 8 for elements as of now)
      * @returns {Object.<String, String>}
      */
-    const encryptAttr = (attrData, key) => {
+    const encryptAttr = (attrData, key = undefined, length = 8) => {
         const keyArr = (typeof key === 'string')
             ? decrypt_key(u_k_aes, base64_to_a32(key))
-            : [rand(0x100000000), rand(0x100000000), rand(0x100000000), rand(0x100000000)];
+            : Array.from({ length }, () => rand(0x100000000));
 
         return {
             at: tlvstore.encrypt(attrData, true, keyArr),
             k: key || a32_to_base64(encrypt_key(u_k_aes, keyArr))
         };
     };
+
+    const encryptSetAttr = (attrData, key) => encryptAttr(attrData, key, 4);
+
+    const encryptElementAttr = (attrData, key) => encryptAttr(attrData, key, 8);
 
     /**
      * Getting all sets from the database and storing them into the memory for the future use
@@ -212,7 +217,7 @@ lazy(mega, 'sets', () => {
          * @param {Number} [ts] Indicates when the album was created
          * @returns {function(...[*]): Promise<void>}
          */
-        add: (name, ts) => sendReq('asp', encryptAttr({ n: name || '', t: (ts || Date.now()).toString() })),
+        add: (name, ts) => sendReq('asp', encryptSetAttr({ n: name || '', t: (ts || Date.now()).toString() })),
         /**
          * @param {String} set Set to update
          * @param {String} key Key for the set attribute
@@ -227,7 +232,7 @@ lazy(mega, 'sets', () => {
 
             at[key] = value;
 
-            return sendReq('asp', { id, at: encryptAttr(at, k).at });
+            return sendReq('asp', { id, at: encryptSetAttr(at, k).at });
         },
         /**
          * @param {String} setId Set id to remove
@@ -342,7 +347,7 @@ lazy(mega, 'sets', () => {
              * @param {String} s Set id to add the element to
              * @returns {function(...[*]): Promise<void>}
              */
-            add: (h, s) => sendReq('aep', { h, s, k: encryptAttr('').k }),
+            add: (h, s) => sendReq('aep', { h, s, k: encryptElementAttr('').k }),
             /**
              * @param {String[]} handles Node handles to assosiate with the set
              * @param {String} s Set id to add elements to
@@ -353,7 +358,7 @@ lazy(mega, 'sets', () => {
                 {
                     s,
                     e: handles.map(({ h, o }) => {
-                        return { h, o, k: encryptAttr('').k };
+                        return { h, o, k: encryptElementAttr('').k };
                     })
                 }
             ),

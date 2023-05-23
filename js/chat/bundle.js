@@ -23114,14 +23114,9 @@ class Call extends mixins.wl {
       }
       return call.toggleScreenSharing();
     };
-    this.handleCallEnd = l => {
-      const {
-        call
-      } = this.props;
-      if (l) {
-        eventlog(99760, JSON.stringify([call.callId, 0]));
-      }
-      call.destroy();
+    this.handleCallEnd = () => {
+      var _this$props$call;
+      (_this$props$call = this.props.call) == null ? void 0 : _this$props$call.destroy();
     };
     this.handleEphemeralAdd = handle => handle && this.setState(state => ({
       ephemeral: true,

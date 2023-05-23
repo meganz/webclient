@@ -4,7 +4,7 @@
 /******/ 	"use strict";
 /******/ 	// The require scope
 /******/ 	var __webpack_require__ = {};
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
@@ -17,12 +17,12 @@
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
 var __webpack_exports__ = {};
 
@@ -61,6 +61,7 @@ var TermCode;
     TermCode[TermCode["kErrApiTimeout"] = 131] = "kErrApiTimeout";
     TermCode[TermCode["kErrSdp"] = 132] = "kErrSdp";
     TermCode[TermCode["kErrorProtocolVersion"] = 133] = "kErrorProtocolVersion";
+    TermCode[TermCode["kErrCrypto"] = 134] = "kErrCrypto";
     TermCode[TermCode["kErrClientGeneral"] = 190] = "kErrClientGeneral";
     TermCode[TermCode["kErrSfuGeneral"] = 191] = "kErrSfuGeneral";
 })(TermCode || (TermCode = {}));
@@ -922,7 +923,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '344be1149f';
+const COMMIT_ID = '9620630f93';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1718,6 +1719,7 @@ class SfuClient {
                     self._muteAudio = true;
                     errors = addNullObjProperty(errors, "mic", err);
                     self.logError("Error getting local mic:", err);
+                    self._fire("onLocalMediaQueryError", "mic", err);
                     return Promise.reject(err);
                 }
                 else {
@@ -1737,6 +1739,7 @@ class SfuClient {
                 self._muteCamera = true;
                 errors = addNullObjProperty(errors, "camera", err);
                 self.logError("Error getting local camera:", err);
+                self._fire("onLocalMediaQueryError", "camera", err);
                 return Promise.reject(err);
             }));
         }
@@ -1755,6 +1758,7 @@ class SfuClient {
                 self._isSharingScreen = false;
                 errors = addNullObjProperty(errors, "screen", err);
                 self.logError("Error getting local screen video:", err);
+                self._fire("onLocalMediaQueryError", "screen", err);
                 return Promise.reject(err);
             }));
         }

@@ -2013,7 +2013,11 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
         return this.showMissingUnifiedKeyDialog();
     }
 
-    this.meetingsLoading = l.joining /* `Joining` */;
+    this.meetingsLoading = {
+        title: l.joining /* `Joining` */,
+        audio,
+        video
+    };
 
     callId = callId || this.activeCallIds.keys()[0];
     return asyncApiReq({'a': 'mcmj', 'cid': this.chatId, "mid": callId})
@@ -2099,7 +2103,11 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
         return this.showMissingUnifiedKeyDialog();
     }
 
-    this.meetingsLoading = l.starting /* `Starting` */;
+    this.meetingsLoading = {
+        title: l.starting /* `Starting` */,
+        audio,
+        video
+    };
 
     const opts = { a: 'mcms', cid: this.chatId, sm: scheduled && this.scheduledMeeting && this.scheduledMeeting.id };
     if (localStorage.sfuId) {

@@ -2314,6 +2314,9 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   --icon-size: 48px;
   --mask-color: #FFF;
 }
+.meetings-loading-content h2 {
+  color: var(--secondary-white);
+}
 .meetings-loading-content h3 {
   color: var(--secondary-white);
 }

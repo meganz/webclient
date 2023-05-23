@@ -2077,7 +2077,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 className={conversationPanelClasses}
                 onMouseMove={() => self.onMouseMove()}
                 data-room-id={self.props.chatRoom.chatId}>
-                {room.meetingsLoading && <Loading chatRoom={room} title={room.meetingsLoading} />}
+                {room.meetingsLoading && <Loading chatRoom={room} title={room.meetingsLoading.title} />}
                 {room.call && (
                     <Call
                         chatRoom={room}

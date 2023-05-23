@@ -1,5 +1,5 @@
 import { SoonFcWrap } from "./mixins.js";
-import { CONVERSATIONS_APP_EVENTS, CONVERSATIONS_APP_VIEWS } from "./ui/conversations.jsx";
+import { VIEWS as CONVERSATIONS_APP_VIEWS, EVENTS as CONVERSATIONS_APP_EVENTS } from "./ui/conversations.jsx";
 
 class ChatOnboarding {
 

@@ -1379,7 +1379,7 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
         return;
       }
       if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_ADDED && this.hasDisplayableScheduleMeeting && !this.isMeetingsTab) {
-        this.megaChat.trigger(conversations.F1.NAV_RENDER_VIEW, conversations.vN.MEETINGS);
+        this.megaChat.trigger(conversations.FP.NAV_RENDER_VIEW, conversations.nk.MEETINGS);
       }
       const res = obChat.startNextOpenSteps(nextIdx);
       if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_CONF && res !== false) {
@@ -1469,6 +1469,7 @@ function Chat() {
   this.chatUIFlags = new MegaDataMap();
   this.initChatUIFlagsManagement();
   this.currentlyOpenedChat = null;
+  this.currentlyOpenedView = null;
   this.lastOpenedChat = null;
   this.archivedChatsCount = 0;
   this.FORCE_EMAIL_LOADING = localStorage.fel;
@@ -2520,12 +2521,11 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
   M.onSectionUIOpen('conversations');
   let room;
   if (!location && this.chats.length) {
-    var valid = room => room && room._leaving !== true && room.isDisplayable() && room;
+    const valid = room => room && room._leaving !== true && room.isDisplayable() && room;
     room = valid(this.chats[this.lastOpenedChat]);
     if (!room) {
-      var idx = 0;
-      var rooms = Object.values(this.chats.toJS());
-      rooms.sort(M.sortObjFn("lastActivity", -1));
+      let idx = 0;
+      const rooms = Object.values(this.chats).filter(r => r.isMeeting === !!this.currentlyOpenedView).sort(M.sortObjFn('lastActivity', -1));
       do {
         room = valid(rooms[idx]);
       } while (!room && ++idx < rooms.length);
@@ -3621,11 +3621,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     members: {},
     membersSet: false,
     membersLoaded: false,
-    topic: "",
+    topic: '',
     flags: 0x00,
     publicLink: null,
-    archivedSelected: false,
-    showArchived: false,
     observers: 0,
     dnd: null,
     alwaysNotify: null,
@@ -4130,7 +4128,7 @@ ChatRoom.prototype.isAnonymous = function () {
   return is_chatlink && this.type === "public" && this.publicChatHandle && this.publicChatKey && this.publicChatHandle === megaChat.initialPubChatHandle;
 };
 ChatRoom.prototype.isDisplayable = function () {
-  return this.showArchived === true || !this.isArchived() || this.call;
+  return !this.isArchived() || this.call;
 };
 ChatRoom.prototype.persistToFmdb = function () {
   var self = this;
@@ -4167,10 +4165,8 @@ ChatRoom.prototype.updateFlags = function (f, updateUI) {
   var self = this;
   var flagChange = self.flags !== f;
   self.flags = f;
-  self.archivedSelected = false;
   if (self.isArchived()) {
     megaChat.archivedChatsCount++;
-    self.showArchived = false;
   } else {
     megaChat.archivedChatsCount--;
   }
@@ -4289,26 +4285,16 @@ ChatRoom.prototype.setRoomTitle = function (newTopic, allowEmpty) {
     return false;
   }
 };
-ChatRoom.prototype.leave = function (triggerLeaveRequest) {
-  var self = this;
-  self._leaving = true;
-  self._closing = triggerLeaveRequest;
-  self.topic = null;
-  if (triggerLeaveRequest) {
-    if (self.type === "group" || self.type === "public") {
-      self.trigger('onLeaveChatRequested');
-    } else {
-      self.logger.error("Can't leave room of type: " + self.type);
-      return;
-    }
+ChatRoom.prototype.leave = function (notify) {
+  assert(this.type === 'group' || this.type === 'public', `Can't leave room "${this.roomId}" of type "${this.type}"`);
+  this._leaving = true;
+  this.topic = '';
+  if (notify) {
+    this.trigger('onLeaveChatRequested');
   }
-  if (self.roomId.indexOf("@") != -1) {
-    if (self.state !== ChatRoom.STATE.LEFT) {
-      self.setState(ChatRoom.STATE.LEAVING);
-      self.setState(ChatRoom.STATE.LEFT);
-    }
-  } else {
-    self.setState(ChatRoom.STATE.LEFT);
+  if (this.state !== ChatRoom.STATE.LEFT) {
+    this.setState(ChatRoom.STATE.LEAVING);
+    this.setState(ChatRoom.STATE.LEFT);
   }
 };
 ChatRoom.prototype.archive = function () {
@@ -4441,7 +4427,6 @@ ChatRoom.prototype.show = function () {
   });
   self.isCurrentlyActive = true;
   self.lastShownInUI = Date.now();
-  self.showArchived = self.isArchived();
   self.megaChat.setAttachments(self.roomId);
   self.megaChat.lastOpenedChat = self.roomId;
   self.megaChat.currentlyOpenedChat = self.roomId;
@@ -13580,8 +13565,8 @@ function isStartCallDisabled(room) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "F1": () => (CONVERSATIONS_APP_EVENTS),
-  "vN": () => (CONVERSATIONS_APP_VIEWS),
+  "FP": () => (conversations_EVENTS),
+  "nk": () => (VIEWS),
   "ZP": () => (conversations)
 });
 
@@ -17411,6 +17396,21 @@ class Toggle extends mixins.wl {
     };
     this.state.expanded = this.props.expanded || null;
   }
+  onMeetingInitialize(scheduledMeeting) {
+    assert(scheduledMeeting, 'Failed to initialize scheduled meeting.');
+    if (!M.chat || !this.isMounted() || !ChatdPersist.isMasterTab()) {
+      return;
+    }
+    const {
+      chatRoom,
+      iAmOwner
+    } = scheduledMeeting;
+    if (chatRoom && iAmOwner) {
+      this.setState({
+        expanded: TogglePanel.KEYS.UPCOMING
+      }, () => chatRoom.setActive());
+    }
+  }
   specShouldComponentUpdate() {
     return !this.props.loading;
   }
@@ -17441,16 +17441,7 @@ class Toggle extends mixins.wl {
   }
   componentDidMount() {
     super.componentDidMount();
-    megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.toggle`, (ev, scheduledMeeting) => {
-      if (!M.chat || !this.isMounted()) {
-        return;
-      }
-      if (scheduledMeeting && scheduledMeeting.chatRoom && scheduledMeeting.iAmOwner) {
-        this.setState({
-          expanded: TogglePanel.KEYS.UPCOMING
-        }, () => scheduledMeeting.chatRoom.setActive());
-      }
-    });
+    megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.toggle`, (ev, scheduledMeeting) => this.onMeetingInitialize(scheduledMeeting));
   }
   render() {
     const {
@@ -17729,12 +17720,12 @@ LeftPanel.NAMESPACE = 'lhp';
 
 
 
-const CONVERSATIONS_APP_VIEWS = {
+const VIEWS = {
   CHATS: 0x00,
   MEETINGS: 0x01,
   LOADING: 0x02
 };
-const CONVERSATIONS_APP_EVENTS = {
+const conversations_EVENTS = {
   NAV_RENDER_VIEW: 'navRenderView'
 };
 class ConversationsApp extends mixins.wl {
@@ -17742,15 +17733,13 @@ class ConversationsApp extends mixins.wl {
     super(props);
     this.chatRoomRef = null;
     this.occurrenceRef = null;
-    this.VIEWS = CONVERSATIONS_APP_VIEWS;
-    this.EVENTS = CONVERSATIONS_APP_EVENTS;
     this.state = {
       leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
       startGroupChatDialog: false,
       startMeetingDialog: false,
       scheduleMeetingDialog: false,
       scheduleOccurrenceDialog: false,
-      view: this.VIEWS.LOADING,
+      view: VIEWS.LOADING,
       callExpanded: false
     };
     this._cacheRouting();
@@ -17877,8 +17866,8 @@ class ConversationsApp extends mixins.wl {
         });
       }
     });
-    megaChat.rebind(this.EVENTS.NAV_RENDER_VIEW, (ev, view) => {
-      if (Object.values(this.VIEWS).includes(view)) {
+    megaChat.rebind(conversations_EVENTS.NAV_RENDER_VIEW, (ev, view) => {
+      if (Object.values(VIEWS).includes(view)) {
         this.renderView(view);
       }
     });
@@ -17893,7 +17882,7 @@ class ConversationsApp extends mixins.wl {
     this.handleOnboardingStep();
   }
   handleOnboardingStep() {
-    if (this.state.view === this.VIEWS.LOADING) {
+    if (this.state.view === VIEWS.LOADING) {
       return;
     }
     megaChat.plugins.chatOnboarding.checkAndShowStep();
@@ -17910,13 +17899,14 @@ class ConversationsApp extends mixins.wl {
       if (routingSection !== 'chat') {
         loadSubPage('fm/chat');
       }
+      megaChat.currentlyOpenedView = view;
     });
   }
   render() {
     const {
       CHATS,
       MEETINGS
-    } = this.VIEWS;
+    } = VIEWS;
     const {
       routingSection,
       chatUIFlags,
@@ -17968,10 +17958,11 @@ class ConversationsApp extends mixins.wl {
       },
       onMount: () => {
         const chatRoom = megaChat.getCurrentRoom();
-        return chatRoom ? this.setState({
-          view: chatRoom.isMeeting ? MEETINGS : CHATS
-        }) : this.setState({
-          view: CHATS
+        const view = chatRoom && chatRoom.isMeeting ? MEETINGS : CHATS;
+        this.setState({
+          view
+        }, () => {
+          megaChat.currentlyOpenedView = view;
         });
       }
     })));
@@ -18021,7 +18012,7 @@ class ConversationsApp extends mixins.wl {
       }
     }), external_React_default().createElement(LeftPanel, {
       view: view,
-      views: this.VIEWS,
+      views: VIEWS,
       routingSection: routingSection,
       conversations: chats,
       leftPaneWidth: leftPaneWidth,

@@ -65,6 +65,29 @@ export default class Toggle extends MegaRenderMixin {
         this.state.expanded = this.props.expanded || null;
     }
 
+    /**
+     * onMeetingInitialize
+     * @description Toggles the `Upcoming` section in the LHP and opens the given meeting. Fired after the user
+     * creates a new scheduled meeting.
+     * @param {ScheduledMeeting} scheduledMeeting
+     * @returns {void}
+     */
+
+    onMeetingInitialize(scheduledMeeting) {
+        assert(scheduledMeeting, 'Failed to initialize scheduled meeting.');
+
+        // Don't switch to the given scheduled meeting in the LHP
+        // if the chat is currently not active or this is not the main browser tab.
+        if (!M.chat || !this.isMounted() || !ChatdPersist.isMasterTab()) {
+            return;
+        }
+
+        const { chatRoom, iAmOwner } = scheduledMeeting;
+        if (chatRoom && iAmOwner) {
+            this.setState({ expanded: TogglePanel.KEYS.UPCOMING }, () => chatRoom.setActive());
+        }
+    }
+
     specShouldComponentUpdate() {
         return !this.props.loading;
     }
@@ -90,14 +113,10 @@ export default class Toggle extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.toggle`, (ev, scheduledMeeting) => {
-            if (!M.chat || !this.isMounted()) {
-                return;
-            }
-            if (scheduledMeeting && scheduledMeeting.chatRoom && scheduledMeeting.iAmOwner) {
-                this.setState({ expanded: TogglePanel.KEYS.UPCOMING }, () => scheduledMeeting.chatRoom.setActive());
-            }
-        });
+        megaChat.rebind(
+            `${megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.toggle`,
+            (ev, scheduledMeeting) => this.onMeetingInitialize(scheduledMeeting)
+        );
     }
 
     render() {

@@ -11,22 +11,19 @@ import Call, { inProgressAlert } from './meetings/call.jsx';
 import ChatToaster from './chatToaster.jsx';
 import LeftPanel from './leftPanel/leftPanel.jsx';
 
-export const CONVERSATIONS_APP_VIEWS = {
+export const VIEWS = {
     CHATS: 0x00,
     MEETINGS: 0x01,
     LOADING: 0x02
 };
 
-export const CONVERSATIONS_APP_EVENTS = {
-    NAV_RENDER_VIEW: 'navRenderView',
+export const EVENTS = {
+    NAV_RENDER_VIEW: 'navRenderView'
 };
 
 class ConversationsApp extends MegaRenderMixin {
     chatRoomRef = null;
     occurrenceRef = null;
-
-    VIEWS = CONVERSATIONS_APP_VIEWS;
-    EVENTS = CONVERSATIONS_APP_EVENTS;
 
     state = {
         leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
@@ -34,7 +31,7 @@ class ConversationsApp extends MegaRenderMixin {
         startMeetingDialog: false,
         scheduleMeetingDialog: false,
         scheduleOccurrenceDialog: false,
-        view: this.VIEWS.LOADING,
+        view: VIEWS.LOADING,
         callExpanded: false,
     };
 
@@ -217,8 +214,8 @@ class ConversationsApp extends MegaRenderMixin {
             }
         });
 
-        megaChat.rebind(this.EVENTS.NAV_RENDER_VIEW, (ev, view) => {
-            if (Object.values(this.VIEWS).includes(view)) {
+        megaChat.rebind(EVENTS.NAV_RENDER_VIEW, (ev, view) => {
+            if (Object.values(VIEWS).includes(view)) {
                 this.renderView(view);
             }
         });
@@ -236,7 +233,7 @@ class ConversationsApp extends MegaRenderMixin {
     }
 
     handleOnboardingStep() {
-        if (this.state.view === this.VIEWS.LOADING) {
+        if (this.state.view === VIEWS.LOADING) {
             return;
         }
         megaChat.plugins.chatOnboarding.checkAndShowStep();
@@ -249,11 +246,12 @@ class ConversationsApp extends MegaRenderMixin {
             if (routingSection !== 'chat') {
                 loadSubPage('fm/chat');
             }
+            megaChat.currentlyOpenedView = view;
         });
     }
 
     render() {
-        const { CHATS, MEETINGS } = this.VIEWS;
+        const { CHATS, MEETINGS } = VIEWS;
         const { routingSection, chatUIFlags, currentlyOpenedChat, chats } = megaChat;
         const {
             view, startGroupChatDialog, startMeetingDialog, scheduleMeetingDialog, scheduleOccurrenceDialog,
@@ -302,9 +300,10 @@ class ConversationsApp extends MegaRenderMixin {
                         }}
                         onMount={() => {
                             const chatRoom = megaChat.getCurrentRoom();
-                            return chatRoom ?
-                                this.setState({ view: chatRoom.isMeeting ? MEETINGS : CHATS }) :
-                                this.setState({ view: CHATS });
+                            const view = chatRoom && chatRoom.isMeeting ? MEETINGS : CHATS;
+                            this.setState({ view }, () => {
+                                megaChat.currentlyOpenedView = view;
+                            });
                         }}
                     />
                 )}
@@ -362,7 +361,7 @@ class ConversationsApp extends MegaRenderMixin {
 
                 <LeftPanel
                     view={view}
-                    views={this.VIEWS}
+                    views={VIEWS}
                     routingSection={routingSection}
                     conversations={chats}
                     leftPaneWidth={leftPaneWidth}

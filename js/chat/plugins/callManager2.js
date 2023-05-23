@@ -740,9 +740,7 @@
                         return;
                     }
                     eventlog(99760, JSON.stringify([this.callId, 0]));
-                    if (this.sfuApp) {
-                        this.sfuApp.destroy();
-                    }
+                    this.hangUp();
                 },
                 1
             );

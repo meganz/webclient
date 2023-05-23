@@ -492,16 +492,11 @@ export default class Call extends MegaRenderMixin {
     /**
      * handleCallEnd
      * @description Handles the call end behavior
-     * @see CallManager.Call
      * @returns {void}
      */
 
-    handleCallEnd = l => {
-        const { call } = this.props;
-        if (l) {
-            eventlog(99760, JSON.stringify([call.callId, 0]));
-        }
-        call.destroy();
+    handleCallEnd = () => {
+        this.props.call?.destroy();
     };
 
     /**

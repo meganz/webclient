@@ -1613,11 +1613,13 @@ var addressDialog = {
         const $titleElemTaxCode = $('.mega-input-title', $taxcodeMegaInput.$input.parent());
         const $titleElemPostCode = $('.mega-input-title', $postcodeInput.$input.parent());
 
+        const countryCode = $('.option[data-state="active"]', $countriesSelect).attr('data-value');
+        const fullTaxName = `${getTaxName(countryCode)} ${l[7347]}`;
         if ($titleElemTaxCode.length) {
-            $taxcodeMegaInput.updateTitle('VAT ' + l[7347]);
+            $taxcodeMegaInput.updateTitle(fullTaxName);
         }
         else {
-            $taxcodeMegaInput.$input.attr('placeholder','VAT ' + l[7347]);
+            $taxcodeMegaInput.$input.attr('placeholder', fullTaxName);
         }
 
         // Change the States depending on the selected country

@@ -56,11 +56,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             members: {},
             membersSet: false,
             membersLoaded: false,
-            topic: "",
+            topic: '',
             flags: 0x00,
             publicLink: null,
-            archivedSelected: false,
-            showArchived: false,
             observers: 0,
             dnd: null,
             alwaysNotify: null,
@@ -825,12 +823,13 @@ ChatRoom.prototype.isAnonymous = function() {
 };
 
 /**
- * Check whether a chat is displayable.
- *
- * @returns {Boolean}
+ * isDisplayable
+ * @description Check whether a chat is displayable
+ * @returns {boolean}
  */
+
 ChatRoom.prototype.isDisplayable = function() {
-    return this.showArchived === true || !this.isArchived() || this.call;
+    return !this.isArchived() || this.call;
 };
 
 /**
@@ -876,10 +875,8 @@ ChatRoom.prototype.updateFlags = function(f, updateUI) {
     var self = this;
     var flagChange = (self.flags !== f);
     self.flags = f;
-    self.archivedSelected = false;
     if (self.isArchived()) {
         megaChat.archivedChatsCount++;
-        self.showArchived = false;
     }
     else {
         megaChat.archivedChatsCount--;
@@ -1136,37 +1133,24 @@ ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
 
 /**
  * Leave this chat room
- *
- * @param [triggerLeaveRequest] {boolean|undefined} true if you want to notify other devices, falsy value if you don't want action to be sent
- * @returns {undefined|Deferred}
+ * @param {boolean} [notify] Boolean flag indicating whether to notify other clients. `mcr` action is **not** invoked
+ * given a falsy value is passed.
+ * @returns {undefined}
  */
-ChatRoom.prototype.leave = function(triggerLeaveRequest) {
-    var self = this;
 
-    self._leaving = true;
-    self._closing = triggerLeaveRequest;
-    self.topic = null;
+ChatRoom.prototype.leave = function(notify) {
+    assert(this.type === 'group' || this.type === 'public', `Can't leave room "${this.roomId}" of type "${this.type}"`);
 
+    this._leaving = true;
+    this.topic = '';
 
-    if (triggerLeaveRequest) {
-        if (self.type === "group" || self.type === "public") {
-            self.trigger('onLeaveChatRequested');
-        }
-        else {
-            self.logger.error("Can't leave room of type: " + self.type);
-            return;
-        }
+    if (notify) {
+        this.trigger('onLeaveChatRequested');
     }
 
-
-    if (self.roomId.indexOf("@") != -1) {
-        if (self.state !== ChatRoom.STATE.LEFT) {
-            self.setState(ChatRoom.STATE.LEAVING);
-            self.setState(ChatRoom.STATE.LEFT);
-        }
-    }
-    else {
-        self.setState(ChatRoom.STATE.LEFT);
+    if (this.state !== ChatRoom.STATE.LEFT) {
+        this.setState(ChatRoom.STATE.LEAVING);
+        this.setState(ChatRoom.STATE.LEFT);
     }
 };
 
@@ -1377,7 +1361,6 @@ ChatRoom.prototype.show = function() {
     });
     self.isCurrentlyActive = true;
     self.lastShownInUI = Date.now();
-    self.showArchived = self.isArchived();
     self.megaChat.setAttachments(self.roomId);
     self.megaChat.lastOpenedChat = self.roomId;
     self.megaChat.currentlyOpenedChat = self.roomId;

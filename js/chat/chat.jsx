@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import ConversationsUI from "./ui/conversations.jsx";
+import ConversationsUI from './ui/conversations.jsx';
 
 require("./chatGlobalEventManager.jsx");
 // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
@@ -49,6 +49,7 @@ function Chat() {
     this.initChatUIFlagsManagement();
 
     this.currentlyOpenedChat = null;
+    this.currentlyOpenedView = null;
     this.lastOpenedChat = null;
     this.archivedChatsCount = 0;
 
@@ -1652,13 +1653,14 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
 
     let room;
     if (!location && this.chats.length) {
-        var valid = (room) => room && room._leaving !== true && room.isDisplayable() && room;
+        const valid = (room) => room && room._leaving !== true && room.isDisplayable() && room;
         room = valid(this.chats[this.lastOpenedChat]);
 
         if (!room) {
-            var idx = 0;
-            var rooms = Object.values(this.chats.toJS());
-            rooms.sort(M.sortObjFn("lastActivity", -1));
+            let idx = 0;
+            const rooms = Object.values(this.chats)
+                .filter(r => r.isMeeting === !!this.currentlyOpenedView)
+                .sort(M.sortObjFn('lastActivity', -1));
 
             do {
                 room = valid(rooms[idx]);

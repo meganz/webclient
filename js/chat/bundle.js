@@ -4847,7 +4847,11 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
   if (this.hasInvalidKeys()) {
     return this.showMissingUnifiedKeyDialog();
   }
-  this.meetingsLoading = l.joining;
+  this.meetingsLoading = {
+    title: l.joining,
+    audio,
+    video
+  };
   callId = callId || this.activeCallIds.keys()[0];
   return asyncApiReq({
     'a': 'mcmj',
@@ -4922,7 +4926,11 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
   if (this.hasInvalidKeys()) {
     return this.showMissingUnifiedKeyDialog();
   }
-  this.meetingsLoading = l.starting;
+  this.meetingsLoading = {
+    title: l.starting,
+    audio,
+    video
+  };
   const opts = {
     a: 'mcms',
     cid: this.chatId,
@@ -11173,6 +11181,38 @@ var composedTextArea = __webpack_require__(813);
 class Loading extends mixins.wl {
   constructor(...args) {
     super(...args);
+    this.PERMISSIONS = {
+      VIDEO: 'camera',
+      AUDIO: 'microphone'
+    };
+    this.state = {
+      pendingPermissions: false
+    };
+    this.queryPermissions = name => {
+      navigator.permissions.query({
+        name
+      }).then(status => {
+        const {
+          name,
+          state
+        } = status;
+        status.onchange = () => name === 'audio_capture' && this.queryPermissions(this.PERMISSIONS.VIDEO);
+        if (state === 'prompt') {
+          return this.isMounted() && this.setState({
+            pendingPermissions: name
+          });
+        }
+      }).catch(ex => console.warn(`Failed to get permissions state: ${ex}`));
+    };
+    this.renderLoading = () => {
+      return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("span", null, external_React_default().createElement("i", {
+        className: "sprite-fm-mono icon-video-call-filled"
+      })), external_React_default().createElement("h3", null, this.props.title || l.starting), external_React_default().createElement("div", {
+        className: "loading-container"
+      }, external_React_default().createElement("div", {
+        className: "loading-indication"
+      })));
+    };
     this.renderDebug = () => {
       const {
         chatRoom
@@ -11184,6 +11224,10 @@ class Loading extends mixins.wl {
       }
     };
   }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    megaChat.unbind(`onLocalMediaQueryError.${Loading.NAMESPACE}`);
+  }
   componentDidMount() {
     var _notify, _alarm;
     super.componentDidMount();
@@ -11194,22 +11238,39 @@ class Loading extends mixins.wl {
     document.querySelectorAll('.js-dropdown-account').forEach(({
       classList
     }) => classList.contains('show') && classList.remove('show'));
+    const {
+      chatRoom
+    } = this.props;
+    const {
+      audio,
+      video
+    } = chatRoom.meetingsLoading;
+    const isVideoCall = audio && video;
+    if (audio && !video) {
+      this.queryPermissions(this.PERMISSIONS.AUDIO);
+    }
+    if (isVideoCall) {
+      Object.values(this.PERMISSIONS).forEach(name => this.queryPermissions(name));
+    }
+    megaChat.rebind(`onLocalMediaQueryError.${Loading.NAMESPACE}`, (ev, {
+      type,
+      err
+    }) => {
+      err = err.toString();
+      if (isVideoCall && type === 'mic' && err.includes('dismissed')) {
+        this.queryPermissions(this.PERMISSIONS.VIDEO);
+      }
+    });
   }
   render() {
     const {
-      title
-    } = this.props;
+      pendingPermissions
+    } = this.state;
     return external_React_default().createElement("div", {
       className: Loading.NAMESPACE
     }, external_React_default().createElement("div", {
       className: `${Loading.NAMESPACE}-content`
-    }, external_React_default().createElement("span", null, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-video-call-filled"
-    })), external_React_default().createElement("h3", null, title || l.starting), external_React_default().createElement("div", {
-      className: "loading-container"
-    }, external_React_default().createElement("div", {
-      className: "loading-indication"
-    }))), d ? this.renderDebug() : '');
+    }, pendingPermissions ? external_React_default().createElement("h2", null, pendingPermissions === 'audio_capture' ? l.permissions_allow_mic : l.permissions_allow_camera) : this.renderLoading()), d ? this.renderDebug() : '');
   }
 }
 Loading.NAMESPACE = 'meetings-loading';
@@ -13171,7 +13232,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       "data-room-id": self.props.chatRoom.chatId
     }, room.meetingsLoading && external_React_default().createElement(Loading, {
       chatRoom: room,
-      title: room.meetingsLoading
+      title: room.meetingsLoading.title
     }), room.call && external_React_default().createElement(call.ZP, {
       chatRoom: room,
       peers: room.call.peers,

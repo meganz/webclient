@@ -90,7 +90,12 @@ lazy(mega, 'keyMgr', () => {
         }
     };
 
-    const isValidMasterKey = (key) => Array.isArray(key) && key.length === 4 && Math.max(...key) >>> 0;
+    // @todo exceptionally allowing All-0 mk since some ancient 3rd-party Android app may created those (confirm/remove)
+    const isValidMasterKey = (k) =>
+        Array.isArray(k) && k.length === 4
+        && (
+            Math.max(...k) >>> 0 || k[0] === 0 && k[1] === 0 && k[2] === 0 && k[3] === 0
+        );
 
     if (!window.is_karma) {
         let gMasterKey = window.u_k;

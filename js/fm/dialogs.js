@@ -511,7 +511,7 @@
                             break;
                         }
                     }
-                    setTitle();
+                    $('header h2', $dialog).text(getDialogTitle());
                 }
                 else {
                     array.remove(items, data);

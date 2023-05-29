@@ -580,7 +580,9 @@ mBroadcaster.addListener('fm:initialized', () => {
             $('.onboarding-step-link', this.$obControlPanel).rebind('mouseenter.onboarding', e => {
 
                 const stepIndex = e.currentTarget.querySelector('.onboarding-step-count').textContent;
-                this.steps[stepIndex - 1].checkPrerequisite();
+                if (this.steps && this.steps[stepIndex - 1]) {
+                    this.steps[stepIndex - 1].checkPrerequisite();
+                }
             });
         }
 

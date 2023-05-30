@@ -7,6 +7,7 @@ import { LocalVideoThumb, LocalVideoHiRes, PeerVideoHiRes } from './videoNode.js
 import StreamExtendedControls from './streamExtendedControls.jsx';
 import { withMicObserver } from './micObserver';
 import { withPermissionsObserver } from './permissionsObserver';
+import { withHostsObserver } from './hostsObserver';
 
 export default class FloatingVideo extends MegaRenderMixin {
     collapseListener = null;
@@ -520,6 +521,27 @@ class Minimized extends MegaRenderMixin {
         const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] : l[16708];
         // `Disable video` || `Enable video`
         const videoLabel = this.isActive(SfuClient.Av.Camera) ? l[22894] : l[22893];
+        const LeaveButton = withHostsObserver(({ hasHost, chatRoom, confirmLeave, onLeave }) => {
+            return (
+                <Button
+                    simpletip={{ ...this.SIMPLETIP_PROPS, label: l[5884] /* `End call` */ }}
+                    className="mega-button theme-dark-forced round large end-call"
+                    icon="icon-end-call"
+                    onClick={ev => {
+                        ev.stopPropagation();
+                        const callParticipants = chatRoom.getCallParticipants();
+                        return hasHost(callParticipants) || callParticipants.length === 1 ?
+                            onLeave() :
+                            confirmLeave({
+                                title: l.assign_host_leave_call /* `Assign host to leave call` */,
+                                body: l.assign_host_leave_call_details /* `You're the only host on this call...` */,
+                                cta: l.assign_host_button /* `Assign host` */
+                            });
+                    }}>
+                    <span>{l[5884] /* `End call` */}</span>
+                </Button>
+            );
+        });
 
         return (
             <div className={`${FloatingVideo.NAMESPACE}-controls`}>
@@ -575,16 +597,11 @@ class Minimized extends MegaRenderMixin {
                     />
                     {this.renderPermissionsWarning(Av.Screen)}
                 </div>
-                <Button
-                    simpletip={{ ...this.SIMPLETIP_PROPS, label: l[5884] /* `End call` */ }}
-                    className="mega-button theme-dark-forced round large end-call"
-                    icon="icon-end-call"
-                    onClick={ev => {
-                        ev.stopPropagation();
-                        onCallEnd();
-                    }}>
-                    <span>{l[5884] /* `End call` */}</span>
-                </Button>
+                <LeaveButton
+                    chatRoom={chatRoom}
+                    participants={chatRoom.getCallParticipants()}
+                    onLeave={onCallEnd}
+                />
             </div>
         );
     };

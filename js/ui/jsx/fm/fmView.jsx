@@ -101,7 +101,9 @@ export default class FMView extends MegaRenderMixin {
         // onAttachClicked={this.onAttachClicked}
         selectedList = [...selectedList];
         let highlighted = selectedList;
-        if (this.props.folderSelectNotAllowed) {
+        // If folderSelectNotAllowed and folderSelectable select a single folder
+        // Browser entries should handle only allowing a single folder selection in this case.
+        if (this.props.folderSelectNotAllowed && !this.props.folderSelectable) {
             selectedList = selectedList.filter((nodeId) => this.dataSource[nodeId].t !== 1);
         }
 

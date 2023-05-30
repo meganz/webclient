@@ -47,10 +47,12 @@ export default class BrowserEntries extends MegaRenderMixin {
         super.componentDidMount();
         this.bindEvents();
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         this.unbindEvents();
     }
+
     componentDidUpdate(oldProps, oldState) {
         if (
             oldProps.sortBy && (
@@ -61,7 +63,14 @@ export default class BrowserEntries extends MegaRenderMixin {
             this.setState({'sortBy': this.props.sortBy});
         }
     }
+
     handleKeyNavigation(selectionManager, shiftKey, keyCode, viewMode) {
+        let curr;
+        const { folderSelectNotAllowed } = this.props;
+        if (shiftKey && folderSelectNotAllowed) {
+            curr = selectionManager.last_selected;
+        }
+
         let KEYS = BrowserEntries.KEYS;
         if (viewMode) {
             if (keyCode === KEYS.LEFT) {
@@ -83,26 +92,65 @@ export default class BrowserEntries extends MegaRenderMixin {
         else {
             selectionManager.select_next(shiftKey, true);
         }
+
+        if (shiftKey && folderSelectNotAllowed && $.selected.length > 1) {
+            const folderNodes = $.selected.filter(n => !M.isFileNode(M.getNodeByHandle(n)));
+            // To not suddenly lose a selection remove any other folders so only one is selected.
+            if (folderNodes.length > 1) {
+                if (!M.isFileNode(M.getNodeByHandle(curr))) {
+                    array.remove(folderNodes, curr);
+                }
+                if (folderNodes.length) {
+                    const newCurr = selectionManager.last_selected;
+                    for (let i = 0; i < folderNodes.length; i++) {
+                        selectionManager.remove_from_selection(folderNodes[i]);
+                    }
+                    // Reset the selectionManager to have the last_selected be an appropriate node.
+                    if (M.isFileNode(M.getNodeByHandle(newCurr))) {
+                        selectionManager.set_currently_selected(curr);
+                    }
+                    else if (curr && $.selected.includes(curr)) {
+                        selectionManager.set_currently_selected(curr);
+                    }
+                    else if ($.selected.length) {
+                        selectionManager.set_currently_selected($.selected[0]);
+                    }
+                }
+            }
+        }
     }
+
+    _invalidKeydownTarget(e) {
+        return e.target && (
+            e.target.tagName === 'INPUT' ||
+            e.target.tagName === 'BUTTON' ||
+            (e.target.tagName === 'TEXTAREA' && !e.target.classList.contains('messages-textarea')) ||
+            e.target.tagName === 'SELECT');
+    }
+
+    _isNavigationKeyDown(e, keyCode) {
+        const { KEYS } = BrowserEntries;
+        const { viewMode } = this.props;
+        return !e.metaKey &&
+        (
+            !viewMode && (keyCode === KEYS.UP || keyCode === KEYS.DOWN) ||
+            viewMode && (
+                keyCode === KEYS.UP || keyCode === KEYS.DOWN || keyCode === KEYS.LEFT || keyCode === KEYS.RIGHT
+            )
+        );
+    }
+
     bindEvents() {
-        var self = this;
-        let KEYS = BrowserEntries.KEYS;
+        const { KEYS } = BrowserEntries;
 
+        $(document.body).rebind(`keydown.be${this.getUniqueId()}`, (e) => {
+            let charTyped = false;
+            const keyCode = e.which || e.keyCode;
+            const $searchField = $('div.fm-files-search input');
+            const $typingArea = $('textarea.messages-textarea');
+            const { selectionManager, viewMode } = this.props;
 
-
-        $(document.body).rebind('keydown.be' + this.getUniqueId(), (e) => {
-            var charTyped = false;
-            var keyCode = e.which || e.keyCode;
-            var $searchField = $('div.fm-files-search input');
-            var $typingArea = $('textarea.messages-textarea');
-            let { selectionManager } = this.props;
-
-            if (e.target && (
-                e.target.tagName === "INPUT" ||
-                e.target.tagName === "BUTTON" ||
-                (e.target.tagName === "TEXTAREA" && !e.target.classList.contains("messages-textarea")) ||
-                e.target.tagName === "SELECT"
-            )) {
+            if (this._invalidKeydownTarget(e)) {
                 return;
             }
             // prevent further behavior if currently interacting w/ the dialog search field
@@ -116,31 +164,15 @@ export default class BrowserEntries extends MegaRenderMixin {
                 $typingArea.trigger('blur');
             }
 
-            var viewMode = this.props.viewMode;
-
             if (keyCode === KEYS.A && (e.ctrlKey || e.metaKey)) {
-                // select all
-                selectionManager.select_all();
+                this.handleSelectAll();
                 e.preventDefault();
                 e.stopPropagation();
             }
             else if (e.metaKey && keyCode === KEYS.UP || keyCode === KEYS.BACKSPACE) {
-                if (!viewMode) {
-                    // back
-                    var currentFolder = M.getNode(self.props.currentlyViewedEntry);
-                    if (currentFolder.p) {
-                        self.expandFolder(currentFolder.p);
-                    }
-                }
+                this.handleKeyBack();
             }
-            else if (!e.metaKey &&
-                (
-                    !viewMode && (keyCode === KEYS.UP || keyCode === KEYS.DOWN) ||
-                    viewMode && (
-                        keyCode === KEYS.UP || keyCode === KEYS.DOWN || keyCode === KEYS.LEFT || keyCode === KEYS.RIGHT
-                    )
-                )
-            ) {
+            else if (this._isNavigationKeyDown(e, keyCode)) {
                 this.handleKeyNavigation(selectionManager, e.shiftKey, keyCode, viewMode);
             }
             else if (
@@ -149,138 +181,169 @@ export default class BrowserEntries extends MegaRenderMixin {
                 keyCode > 255
             ) {
                 charTyped = String.fromCharCode(keyCode).toLowerCase();
-
-                var foundMatchingNodes = self.props.entries.filter(function(node) {
-                    return node.name && node.name.substr(0, 1).toLowerCase() === charTyped;
-                });
-
-                if (self.lastCharKeyPressed === charTyped) {
-                    self.lastCharKeyIndex++;
-                }
-
-                self.lastCharKeyPressed = charTyped;
-
-                if (foundMatchingNodes.length > 0) {
-                    if (!foundMatchingNodes[self.lastCharKeyIndex]) {
-                        // start from the first entry
-                        self.lastCharKeyIndex = 0;
-                    }
-                    var foundNode = foundMatchingNodes[self.lastCharKeyIndex];
-                    selectionManager.clear_selection();
-                    selectionManager.set_currently_selected(foundNode[self.props.keyProp], true);
-                }
+                this.handleCharTyped(charTyped);
             }
             else if (keyCode === KEYS.ENTER || e.metaKey && keyCode === KEYS.DOWN) {
-                var selectedNodes = [];
-
-                if (self.props.folderSelectNotAllowed === true) {
-                    // remove all folders from highlighted
-                    self.props.highlighted.forEach(function(h) {
-                        var node = self.props.entries.find((entry) => {
-                            return entry[self.props.keyProp] === h;
-                        });
-
-                        if (node && node.t === 0) {
-                            selectedNodes.push(h);
-                        }
-                    });
-                    // if only folders were selected and no files..do open the cursor OR first folder selected
-                    if (selectedNodes.length === 0) {
-                        var cursorNode = this.props.highlighted[0] && M.getNodeByHandle(this.props.highlighted[0]);
-                        if (cursorNode.t === 1) {
-                            self.expandFolder(cursorNode[self.props.keyProp]);
-                            return;
-                        }
-                        else if (self.props.highlighted.length > 0) {
-                            // open/expand the first node, we know its a folder already.
-                            var firstNodeId = self.props.highlighted[0];
-                            self.expandFolder(firstNodeId);
-                            return;
-                        }
-                        // else, nothing selected, do nothing.
-                        return;
-                    }
-                }
-                else {
-                    selectedNodes = self.props.highlighted;
-                }
-                self.props.onAttachClicked(selectedNodes);
-            }
-            else {
-                // do nothing.
+                this.handleAttach();
             }
 
             // reset the quick finding feature vars if this was not a "quick find", e.g. charTyped was left empty.
             if (!charTyped) {
-                self.lastCharKeyPressed = false;
-                self.lastCharKeyIndex = -1;
+                this.lastCharKeyPressed = false;
+                this.lastCharKeyIndex = -1;
             }
             // enter
         });
     }
+
+    handleSelectAll() {
+        const { selectionManager, folderSelectNotAllowed, entries } = this.props;
+        selectionManager.select_all();
+        if (folderSelectNotAllowed) {
+            const folders = entries.filter(h => !M.isFileNode(M.getNodeByHandle(h)));
+            for (let i = 0; i < folders.length; i++) {
+                selectionManager.remove_from_selection(folders[i].h);
+            }
+        }
+    }
+
+    handleKeyBack() {
+        const { viewMode, currentlyViewedEntry } = this.props;
+        if (!viewMode) {
+            const currentFolder = M.getNode(currentlyViewedEntry);
+            if (currentFolder.p) {
+                this.expandFolder(currentFolder.p);
+            }
+        }
+    }
+
+    handleCharTyped(charTyped) {
+        const { entries, keyProp, selectionManager } = this.props;
+        const foundMatchingNodes = entries.filter((node) => {
+            return node.name && node.name.substring(0, 1).toLowerCase() === charTyped;
+        });
+
+        if (this.lastCharKeyPressed === charTyped) {
+            this.lastCharKeyIndex++;
+        }
+
+        this.lastCharKeyPressed = charTyped;
+
+        if (foundMatchingNodes.length > 0) {
+            if (!foundMatchingNodes[this.lastCharKeyIndex]) {
+                // start from the first entry
+                this.lastCharKeyIndex = 0;
+            }
+            const foundNode = foundMatchingNodes[this.lastCharKeyIndex];
+            selectionManager.clear_selection();
+            selectionManager.set_currently_selected(foundNode[keyProp], true);
+        }
+    }
+
+    handleAttach() {
+        const { highlighted, folderSelectNotAllowed, entries, keyProp, onAttachClicked } = this.props;
+        let selectedNodes = highlighted;
+
+        if (folderSelectNotAllowed) {
+            // remove all folders from highlighted
+            selectedNodes = highlighted.filter(h => {
+                const node = entries.find(e => e[keyProp] === h);
+                return node && node.t === 0;
+            });
+            // if only folders were selected and no files do open the cursor OR first folder selected
+            if (selectedNodes.length === 0) {
+                const cursorNode = highlighted[0] && M.getNodeByHandle(highlighted[0]);
+                if (cursorNode.t === 1) {
+                    this.expandFolder(cursorNode[keyProp]);
+                    return;
+                }
+                else if (highlighted.length > 0) {
+                    // open/expand the first node, we know it's a folder already.
+                    this.expandFolder(highlighted[0]);
+                    return;
+                }
+                // else, nothing selected, do nothing.
+                return;
+            }
+        }
+        onAttachClicked(selectedNodes);
+    }
+
     unbindEvents() {
         $(document.body).off('keydown.be' + this.getUniqueId());
     }
-    onEntryClick(e, node) {
-        var self = this;
-        let { selectionManager } = this.props;
 
-        self.lastCharKeyPressed = false;
-        self.lastCharKeyIndex = -1;
+    onEntryClick(e, node) {
+        const { selectionManager, keyProp, folderSelectNotAllowed, highlighted = [] } = this.props;
+
+        this.lastCharKeyPressed = false;
+        this.lastCharKeyIndex = -1;
 
         e.stopPropagation();
         e.preventDefault();
 
         if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
             selectionManager.clear_selection();
-            selectionManager.set_currently_selected(node[self.props.keyProp]);
+            selectionManager.set_currently_selected(node[keyProp]);
         }
         else if (e.shiftKey) {
             if ($.selected && $.selected.length) {
-                selectionManager.shift_select_to(node[self.props.keyProp], false, true, false);
+                let selFolders;
+                if (folderSelectNotAllowed) {
+                    selFolders = $.selected.filter(n => !M.isFileNode(M.getNodeByHandle(n)));
+                }
+                selectionManager.shift_select_to(node[keyProp], false, true, false);
+                if (folderSelectNotAllowed && $.selected.length > 1) {
+                    const folderNodes = $.selected.filter(n => !M.isFileNode(M.getNodeByHandle(n)));
+                    if (folderNodes.length > 1) {
+                        array.remove(folderNodes, selFolders[0] || folderNodes[0]);
+                        for (let i = 0; i < folderNodes.length; i++) {
+                            selectionManager.remove_from_selection(folderNodes[i]);
+                        }
+                    }
+                }
             }
             else {
-                selectionManager.set_currently_selected(node[self.props.keyProp]);
+                selectionManager.set_currently_selected(node[keyProp]);
             }
         }
         else if (e.ctrlKey || e.metaKey) {
             // ctrl or cmd/meta, e.g. add to selection
-            if (!self.props.highlighted || self.props.highlighted.indexOf(node[self.props.keyProp]) === -1) {
-                let  highlighted = clone(self.props.highlighted || []);
-                if (self.props.folderSelectNotAllowed) {
+            if (!highlighted || !highlighted.includes(node[keyProp])) {
+                if (folderSelectNotAllowed) {
                     if (node.t === 1 && highlighted.length > 0) {
                         return;
                     }
                     else if (
-                        highlighted.filter(function(nodeId) {
-                            var node = M.getNodeByHandle(nodeId);
+                        highlighted.some((nodeId) => {
+                            const node = M.getNodeByHandle(nodeId);
                             return node && node.t === 1;
-                        }).length > 0) {
+                        })) {
                         // contains folders in selection
                         selectionManager.clear_selection();
                     }
                 }
-                selectionManager.add_to_selection(node[self.props.keyProp]);
+                selectionManager.add_to_selection(node[keyProp]);
             }
-            else if (self.props.highlighted && self.props.highlighted.indexOf(node[self.props.keyProp]) !== -1) {
-                let highlighted = clone(self.props.highlighted || []);
-                if (self.props.folderSelectNotAllowed) {
+            else if (highlighted && highlighted.includes(node[keyProp])) {
+                if (folderSelectNotAllowed) {
                     if (node.t === 1) {
                         return;
                     }
                     else if (
-                        highlighted.filter(function(nodeId) {
-                            var node = M.getNodeByHandle(nodeId);
+                        highlighted.some((nodeId) => {
+                            const node = M.getNodeByHandle(nodeId);
                             return node && node.t === 1;
-                        }).length > 0) {
+                        })) {
                         // contains folders in selection
                         selectionManager.clear();
                     }
                 }
-                selectionManager.remove_from_selection(node[self.props.keyProp]);
+                selectionManager.remove_from_selection(node[keyProp]);
             }
         }
     }
+
     expandFolder(nodeId) {
         var self = this;
         var node = M.getNodeByHandle(nodeId);
@@ -295,6 +358,7 @@ export default class BrowserEntries extends MegaRenderMixin {
             self.forceUpdate();
         }
     }
+
     onEntryDoubleClick(e, node) {
         var self = this;
 
@@ -320,9 +384,11 @@ export default class BrowserEntries extends MegaRenderMixin {
             self.props.onAttachClicked();
         }
     }
+
     customIsEventuallyVisible() {
         return true;
     }
+
     toggleSortBy(colId) {
         var newState = {};
         if (this.state.sortBy[0] === colId) {
@@ -336,6 +402,7 @@ export default class BrowserEntries extends MegaRenderMixin {
 
         this.props.onSortByChanged(newState.sortBy);
     }
+
     render() {
         var viewMode = this.props.viewMode;
 

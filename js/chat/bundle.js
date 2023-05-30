@@ -3581,8 +3581,8 @@ const chat = ({
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
-"MCO_FLAGS": () => (MCO_FLAGS),
-"RETENTION_FORMAT": () => (RETENTION_FORMAT),
+MCO_FLAGS: () => (MCO_FLAGS),
+RETENTION_FORMAT: () => (RETENTION_FORMAT),
 "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 });
 const RETENTION_FORMAT = {
@@ -5358,11 +5358,11 @@ const __WEBPACK_DEFAULT_EXPORT__ = ({
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"LY": () => (timing),
-"M9": () => (SoonFcWrap),
-"_p": () => (ContactAwareComponent),
-"qC": () => (compose),
-"wl": () => (MegaRenderMixin)
+LY: () => (timing),
+M9: () => (SoonFcWrap),
+_p: () => (ContactAwareComponent),
+qC: () => (compose),
+wl: () => (MegaRenderMixin)
 });
 
 var _applyDecoratedDescriptor2__ = __webpack_require__(229);
@@ -6109,7 +6109,7 @@ ContactAwareComponent.unavailableNames = Object.create(null);
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"Z": () => (ChatToaster)
+Z: () => (ChatToaster)
 });
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
@@ -6497,7 +6497,7 @@ class ChatToastMsg extends _mixins1__.wl {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "Z": () => (ComposedTextArea)
+  Z: () => (ComposedTextArea)
 });
 
 // EXTERNAL MODULE: external "React"
@@ -6735,19 +6735,19 @@ class ComposedTextArea extends mixins.wl {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
-"Avatar": () => (Avatar),
-"ContactAwareName": () => (ContactAwareName),
-"ContactButton": () => (ContactButton),
-"ContactCard": () => (ContactCard),
-"ContactFingerprint": () => (ContactFingerprint),
-"ContactItem": () => (ContactItem),
-"ContactPickerDialog": () => (ContactPickerDialog),
-"ContactPickerWidget": () => (ContactPickerWidget),
-"ContactPresence": () => (ContactPresence),
-"ContactVerified": () => (ContactVerified),
-"LastActivity": () => (LastActivity),
-"MAX_FREQUENTS": () => (MAX_FREQUENTS),
-"MembersAmount": () => (MembersAmount)
+Avatar: () => (Avatar),
+ContactAwareName: () => (ContactAwareName),
+ContactButton: () => (ContactButton),
+ContactCard: () => (ContactCard),
+ContactFingerprint: () => (ContactFingerprint),
+ContactItem: () => (ContactItem),
+ContactPickerDialog: () => (ContactPickerDialog),
+ContactPickerWidget: () => (ContactPickerWidget),
+ContactPresence: () => (ContactPresence),
+ContactVerified: () => (ContactVerified),
+LastActivity: () => (LastActivity),
+MAX_FREQUENTS: () => (MAX_FREQUENTS),
+MembersAmount: () => (MembersAmount)
 });
 var _extends8__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
@@ -9420,10 +9420,10 @@ ContactsPanel.getUserFingerprint = handle => {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "GY": () => (ConversationPanels),
-  "L2": () => (EmptyConvPanel),
-  "R7": () => (allContactsInChat),
-  "hU": () => (excludedParticipants)
+  GY: () => (ConversationPanels),
+  L2: () => (EmptyConvPanel),
+  R7: () => (allContactsInChat),
+  hU: () => (excludedParticipants)
 });
 
 // UNUSED EXPORTS: ConversationPanel, ConversationRightArea, JoinCallNotification
@@ -9996,6 +9996,7 @@ class CloudBrowserDialog extends mixins.wl {
       sortFoldersFirst: true,
       currentlyViewedEntry: this.state.currentlyViewedEntry,
       folderSelectNotAllowed: this.props.folderSelectNotAllowed,
+      folderSelectable: this.props.folderSelectable,
       onSelected: this.onSelected,
       onHighlighted: this.onHighlighted,
       onAttachClicked: this.onAttachClicked,
@@ -11256,8 +11257,7 @@ class Loading extends mixins.wl {
       type,
       err
     }) => {
-      err = err.toString();
-      if (isVideoCall && type === 'mic' && err.includes('dismissed')) {
+      if (isVideoCall && type === 'mic' && String(err).includes('dismissed')) {
         this.queryPermissions(this.PERMISSIONS.VIDEO);
       }
     });
@@ -13626,9 +13626,9 @@ function isStartCallDisabled(room) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "FP": () => (conversations_EVENTS),
-  "nk": () => (VIEWS),
-  "ZP": () => (conversations)
+  FP: () => (conversations_EVENTS),
+  nk: () => (VIEWS),
+  ZP: () => (conversations)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
@@ -18102,9 +18102,9 @@ const conversations = ({
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "bl": () => (API),
-  "wS": () => (LABELS),
-  "ZP": () => (GifPanel)
+  bl: () => (API),
+  wS: () => (LABELS),
+  ZP: () => (GifPanel)
 });
 
 // EXTERNAL MODULE: external "React"
@@ -18567,7 +18567,7 @@ class GifPanel extends mixins.wl {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "Z": () => (HistoryPanel)
+  Z: () => (HistoryPanel)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
@@ -19680,7 +19680,7 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"Z": () => (Link)
+Z: () => (Link)
 });
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
@@ -19738,7 +19738,7 @@ class Link extends _mixins1__.wl {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"Z": () => (__WEBPACK_DEFAULT_EXPORT__)
+Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 });
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
@@ -19868,9 +19868,9 @@ const __WEBPACK_DEFAULT_EXPORT__ = (Button);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "F3": () => (EXPANDED_FLAG),
-  "ZP": () => (Call),
-  "xt": () => (inProgressAlert)
+  F3: () => (EXPANDED_FLAG),
+  ZP: () => (Call),
+  xt: () => (inProgressAlert)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
@@ -23389,7 +23389,7 @@ Call.getUnsupportedBrowserMessage = () => navigator.userAgent.match(/Chrom(e|ium
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"Q": () => (withPermissionsObserver)
+Q: () => (withPermissionsObserver)
 });
 var _extends3__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
@@ -23544,15 +23544,15 @@ const withPermissionsObserver = Component => class extends _mixins_js1__.wl {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"K6": () => (stringToTime),
-"KC": () => (isSameDay),
-"Ny": () => (getNearestHalfHour),
-"Pm": () => (isTomorrow),
-"Sv": () => (getUserTimezone),
-"nl": () => (getTimeIntervals),
-"p6": () => (stringToDate),
-"zI": () => (addMonths),
-"zk": () => (isToday)
+K6: () => (stringToTime),
+KC: () => (isSameDay),
+Ny: () => (getNearestHalfHour),
+Pm: () => (isTomorrow),
+Sv: () => (getUserTimezone),
+nl: () => (getTimeIntervals),
+p6: () => (stringToDate),
+zI: () => (addMonths),
+zk: () => (isToday)
 });
 
 const stringToDate = string => {
@@ -23790,7 +23790,7 @@ window.ChatCallIncomingDialog = Incoming;
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"Z": () => (__WEBPACK_DEFAULT_EXPORT__)
+Z: () => (__WEBPACK_DEFAULT_EXPORT__)
 });
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
@@ -23993,7 +23993,7 @@ const __WEBPACK_DEFAULT_EXPORT__ = ((0,_mixins_js1__.qC)(_permissionsObserver5__
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "Z": () => (GenericConversationMessage)
+  Z: () => (GenericConversationMessage)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
@@ -26223,7 +26223,7 @@ class GenericConversationMessage extends mixin.y {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"y": () => (ConversationMessageMixin)
+y: () => (ConversationMessageMixin)
 });
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
@@ -26816,7 +26816,7 @@ window.ScheduleMetaChange = ScheduleMetaChange;
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"F": () => (MetaRichpreviewLoading)
+F: () => (MetaRichpreviewLoading)
 });
 var React = __webpack_require__(363);
 var ConversationMessageMixin = (__webpack_require__(416).y);
@@ -26840,7 +26840,7 @@ class MetaRichpreviewLoading extends ConversationMessageMixin {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "j": () => (TypingArea)
+  j: () => (TypingArea)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
@@ -27731,7 +27731,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"z": () => (Button)
+z: () => (Button)
 });
 var _extends2__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
@@ -27946,9 +27946,9 @@ class Button extends _chat_mixins1__.wl {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
-"Dropdown": () => (Dropdown),
-"DropdownContactsSelector": () => (DropdownContactsSelector),
-"DropdownItem": () => (DropdownItem)
+Dropdown: () => (Dropdown),
+DropdownContactsSelector: () => (DropdownContactsSelector),
+DropdownItem: () => (DropdownItem)
 });
 var _utils_jsx0__ = __webpack_require__(79);
 var _chat_mixins1__ = __webpack_require__(503);
@@ -28323,7 +28323,7 @@ DropdownItem.defaultProps = {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"l": () => (DropdownEmojiSelector)
+l: () => (DropdownEmojiSelector)
 });
 var _extends1__ = __webpack_require__(462);
 var _chat_mixins0__ = __webpack_require__(503);
@@ -28764,7 +28764,7 @@ DropdownEmojiSelector.defaultProps = {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "Z": () => (FMView)
+  Z: () => (FMView)
 });
 
 // EXTERNAL MODULE: external "React"
@@ -29683,6 +29683,13 @@ class BrowserEntries extends mixins.wl {
     }
   }
   handleKeyNavigation(selectionManager, shiftKey, keyCode, viewMode) {
+    let curr;
+    const {
+      folderSelectNotAllowed
+    } = this.props;
+    if (shiftKey && folderSelectNotAllowed) {
+      curr = selectionManager.last_selected;
+    }
     let KEYS = BrowserEntries.KEYS;
     if (viewMode) {
       if (keyCode === KEYS.LEFT) {
@@ -29699,19 +29706,54 @@ class BrowserEntries extends mixins.wl {
     } else {
       selectionManager.select_next(shiftKey, true);
     }
+    if (shiftKey && folderSelectNotAllowed && $.selected.length > 1) {
+      const folderNodes = $.selected.filter(n => !M.isFileNode(M.getNodeByHandle(n)));
+      if (folderNodes.length > 1) {
+        if (!M.isFileNode(M.getNodeByHandle(curr))) {
+          array.remove(folderNodes, curr);
+        }
+        if (folderNodes.length) {
+          const newCurr = selectionManager.last_selected;
+          for (let i = 0; i < folderNodes.length; i++) {
+            selectionManager.remove_from_selection(folderNodes[i]);
+          }
+          if (M.isFileNode(M.getNodeByHandle(newCurr))) {
+            selectionManager.set_currently_selected(curr);
+          } else if (curr && $.selected.includes(curr)) {
+            selectionManager.set_currently_selected(curr);
+          } else if ($.selected.length) {
+            selectionManager.set_currently_selected($.selected[0]);
+          }
+        }
+      }
+    }
+  }
+  _invalidKeydownTarget(e) {
+    return e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'TEXTAREA' && !e.target.classList.contains('messages-textarea') || e.target.tagName === 'SELECT');
+  }
+  _isNavigationKeyDown(e, keyCode) {
+    const {
+      KEYS
+    } = BrowserEntries;
+    const {
+      viewMode
+    } = this.props;
+    return !e.metaKey && (!viewMode && (keyCode === KEYS.UP || keyCode === KEYS.DOWN) || viewMode && (keyCode === KEYS.UP || keyCode === KEYS.DOWN || keyCode === KEYS.LEFT || keyCode === KEYS.RIGHT));
   }
   bindEvents() {
-    var self = this;
-    let KEYS = BrowserEntries.KEYS;
-    $(document.body).rebind('keydown.be' + this.getUniqueId(), e => {
-      var charTyped = false;
-      var keyCode = e.which || e.keyCode;
-      var $searchField = $('div.fm-files-search input');
-      var $typingArea = $('textarea.messages-textarea');
-      let {
-        selectionManager
+    const {
+      KEYS
+    } = BrowserEntries;
+    $(document.body).rebind(`keydown.be${this.getUniqueId()}`, e => {
+      let charTyped = false;
+      const keyCode = e.which || e.keyCode;
+      const $searchField = $('div.fm-files-search input');
+      const $typingArea = $('textarea.messages-textarea');
+      const {
+        selectionManager,
+        viewMode
       } = this.props;
-      if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "BUTTON" || e.target.tagName === "TEXTAREA" && !e.target.classList.contains("messages-textarea") || e.target.tagName === "SELECT")) {
+      if (this._invalidKeydownTarget(e)) {
         return;
       }
       if ($searchField.is(':focus')) {
@@ -29720,119 +29762,163 @@ class BrowserEntries extends mixins.wl {
       if ($typingArea.is(':focus')) {
         $typingArea.trigger('blur');
       }
-      var viewMode = this.props.viewMode;
       if (keyCode === KEYS.A && (e.ctrlKey || e.metaKey)) {
-        selectionManager.select_all();
+        this.handleSelectAll();
         e.preventDefault();
         e.stopPropagation();
       } else if (e.metaKey && keyCode === KEYS.UP || keyCode === KEYS.BACKSPACE) {
-        if (!viewMode) {
-          var currentFolder = M.getNode(self.props.currentlyViewedEntry);
-          if (currentFolder.p) {
-            self.expandFolder(currentFolder.p);
-          }
-        }
-      } else if (!e.metaKey && (!viewMode && (keyCode === KEYS.UP || keyCode === KEYS.DOWN) || viewMode && (keyCode === KEYS.UP || keyCode === KEYS.DOWN || keyCode === KEYS.LEFT || keyCode === KEYS.RIGHT))) {
+        this.handleKeyBack();
+      } else if (this._isNavigationKeyDown(e, keyCode)) {
         this.handleKeyNavigation(selectionManager, e.shiftKey, keyCode, viewMode);
       } else if (keyCode >= 48 && keyCode <= 57 || keyCode >= 65 && keyCode <= 123 || keyCode > 255) {
         charTyped = String.fromCharCode(keyCode).toLowerCase();
-        var foundMatchingNodes = self.props.entries.filter(function (node) {
-          return node.name && node.name.substr(0, 1).toLowerCase() === charTyped;
-        });
-        if (self.lastCharKeyPressed === charTyped) {
-          self.lastCharKeyIndex++;
-        }
-        self.lastCharKeyPressed = charTyped;
-        if (foundMatchingNodes.length > 0) {
-          if (!foundMatchingNodes[self.lastCharKeyIndex]) {
-            self.lastCharKeyIndex = 0;
-          }
-          var foundNode = foundMatchingNodes[self.lastCharKeyIndex];
-          selectionManager.clear_selection();
-          selectionManager.set_currently_selected(foundNode[self.props.keyProp], true);
-        }
+        this.handleCharTyped(charTyped);
       } else if (keyCode === KEYS.ENTER || e.metaKey && keyCode === KEYS.DOWN) {
-        var selectedNodes = [];
-        if (self.props.folderSelectNotAllowed === true) {
-          self.props.highlighted.forEach(function (h) {
-            var node = self.props.entries.find(entry => {
-              return entry[self.props.keyProp] === h;
-            });
-            if (node && node.t === 0) {
-              selectedNodes.push(h);
-            }
-          });
-          if (selectedNodes.length === 0) {
-            var cursorNode = this.props.highlighted[0] && M.getNodeByHandle(this.props.highlighted[0]);
-            if (cursorNode.t === 1) {
-              self.expandFolder(cursorNode[self.props.keyProp]);
-              return;
-            } else if (self.props.highlighted.length > 0) {
-              var firstNodeId = self.props.highlighted[0];
-              self.expandFolder(firstNodeId);
-              return;
-            }
-            return;
-          }
-        } else {
-          selectedNodes = self.props.highlighted;
-        }
-        self.props.onAttachClicked(selectedNodes);
+        this.handleAttach();
       }
       if (!charTyped) {
-        self.lastCharKeyPressed = false;
-        self.lastCharKeyIndex = -1;
+        this.lastCharKeyPressed = false;
+        this.lastCharKeyIndex = -1;
       }
     });
+  }
+  handleSelectAll() {
+    const {
+      selectionManager,
+      folderSelectNotAllowed,
+      entries
+    } = this.props;
+    selectionManager.select_all();
+    if (folderSelectNotAllowed) {
+      const folders = entries.filter(h => !M.isFileNode(M.getNodeByHandle(h)));
+      for (let i = 0; i < folders.length; i++) {
+        selectionManager.remove_from_selection(folders[i].h);
+      }
+    }
+  }
+  handleKeyBack() {
+    const {
+      viewMode,
+      currentlyViewedEntry
+    } = this.props;
+    if (!viewMode) {
+      const currentFolder = M.getNode(currentlyViewedEntry);
+      if (currentFolder.p) {
+        this.expandFolder(currentFolder.p);
+      }
+    }
+  }
+  handleCharTyped(charTyped) {
+    const {
+      entries,
+      keyProp,
+      selectionManager
+    } = this.props;
+    const foundMatchingNodes = entries.filter(node => {
+      return node.name && node.name.substring(0, 1).toLowerCase() === charTyped;
+    });
+    if (this.lastCharKeyPressed === charTyped) {
+      this.lastCharKeyIndex++;
+    }
+    this.lastCharKeyPressed = charTyped;
+    if (foundMatchingNodes.length > 0) {
+      if (!foundMatchingNodes[this.lastCharKeyIndex]) {
+        this.lastCharKeyIndex = 0;
+      }
+      const foundNode = foundMatchingNodes[this.lastCharKeyIndex];
+      selectionManager.clear_selection();
+      selectionManager.set_currently_selected(foundNode[keyProp], true);
+    }
+  }
+  handleAttach() {
+    const {
+      highlighted,
+      folderSelectNotAllowed,
+      entries,
+      keyProp,
+      onAttachClicked
+    } = this.props;
+    let selectedNodes = highlighted;
+    if (folderSelectNotAllowed) {
+      selectedNodes = highlighted.filter(h => {
+        const node = entries.find(e => e[keyProp] === h);
+        return node && node.t === 0;
+      });
+      if (selectedNodes.length === 0) {
+        const cursorNode = highlighted[0] && M.getNodeByHandle(highlighted[0]);
+        if (cursorNode.t === 1) {
+          this.expandFolder(cursorNode[keyProp]);
+          return;
+        } else if (highlighted.length > 0) {
+          this.expandFolder(highlighted[0]);
+          return;
+        }
+        return;
+      }
+    }
+    onAttachClicked(selectedNodes);
   }
   unbindEvents() {
     $(document.body).off('keydown.be' + this.getUniqueId());
   }
   onEntryClick(e, node) {
-    var self = this;
-    let {
-      selectionManager
+    const {
+      selectionManager,
+      keyProp,
+      folderSelectNotAllowed,
+      highlighted = []
     } = this.props;
-    self.lastCharKeyPressed = false;
-    self.lastCharKeyIndex = -1;
+    this.lastCharKeyPressed = false;
+    this.lastCharKeyIndex = -1;
     e.stopPropagation();
     e.preventDefault();
     if (!e.shiftKey && !e.ctrlKey && !e.metaKey) {
       selectionManager.clear_selection();
-      selectionManager.set_currently_selected(node[self.props.keyProp]);
+      selectionManager.set_currently_selected(node[keyProp]);
     } else if (e.shiftKey) {
       if ($.selected && $.selected.length) {
-        selectionManager.shift_select_to(node[self.props.keyProp], false, true, false);
+        let selFolders;
+        if (folderSelectNotAllowed) {
+          selFolders = $.selected.filter(n => !M.isFileNode(M.getNodeByHandle(n)));
+        }
+        selectionManager.shift_select_to(node[keyProp], false, true, false);
+        if (folderSelectNotAllowed && $.selected.length > 1) {
+          const folderNodes = $.selected.filter(n => !M.isFileNode(M.getNodeByHandle(n)));
+          if (folderNodes.length > 1) {
+            array.remove(folderNodes, selFolders[0] || folderNodes[0]);
+            for (let i = 0; i < folderNodes.length; i++) {
+              selectionManager.remove_from_selection(folderNodes[i]);
+            }
+          }
+        }
       } else {
-        selectionManager.set_currently_selected(node[self.props.keyProp]);
+        selectionManager.set_currently_selected(node[keyProp]);
       }
     } else if (e.ctrlKey || e.metaKey) {
-      if (!self.props.highlighted || self.props.highlighted.indexOf(node[self.props.keyProp]) === -1) {
-        let highlighted = clone(self.props.highlighted || []);
-        if (self.props.folderSelectNotAllowed) {
+      if (!highlighted || !highlighted.includes(node[keyProp])) {
+        if (folderSelectNotAllowed) {
           if (node.t === 1 && highlighted.length > 0) {
             return;
-          } else if (highlighted.filter(function (nodeId) {
-            var node = M.getNodeByHandle(nodeId);
+          } else if (highlighted.some(nodeId => {
+            const node = M.getNodeByHandle(nodeId);
             return node && node.t === 1;
-          }).length > 0) {
+          })) {
             selectionManager.clear_selection();
           }
         }
-        selectionManager.add_to_selection(node[self.props.keyProp]);
-      } else if (self.props.highlighted && self.props.highlighted.indexOf(node[self.props.keyProp]) !== -1) {
-        let highlighted = clone(self.props.highlighted || []);
-        if (self.props.folderSelectNotAllowed) {
+        selectionManager.add_to_selection(node[keyProp]);
+      } else if (highlighted && highlighted.includes(node[keyProp])) {
+        if (folderSelectNotAllowed) {
           if (node.t === 1) {
             return;
-          } else if (highlighted.filter(function (nodeId) {
-            var node = M.getNodeByHandle(nodeId);
+          } else if (highlighted.some(nodeId => {
+            const node = M.getNodeByHandle(nodeId);
             return node && node.t === 1;
-          }).length > 0) {
+          })) {
             selectionManager.clear();
           }
         }
-        selectionManager.remove_from_selection(node[self.props.keyProp]);
+        selectionManager.remove_from_selection(node[keyProp]);
       }
     }
   }
@@ -30060,7 +30146,7 @@ class FMView extends mixins.wl {
   onSelectionUpdated(selectedList) {
     selectedList = [...selectedList];
     let highlighted = selectedList;
-    if (this.props.folderSelectNotAllowed) {
+    if (this.props.folderSelectNotAllowed && !this.props.folderSelectable) {
       selectedList = selectedList.filter(nodeId => this.dataSource[nodeId].t !== 1);
     }
     this.setState({
@@ -30335,7 +30421,7 @@ class FMView extends mixins.wl {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"l": () => (ColumnFavIcon)
+l: () => (ColumnFavIcon)
 });
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
@@ -30380,7 +30466,7 @@ ColumnFavIcon.headerClassName = "grid-first-th fav";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "L": () => (GenericNodePropsComponent)
+  L: () => (GenericNodePropsComponent)
 });
 
 // EXTERNAL MODULE: ./js/chat/mixins.js
@@ -30603,7 +30689,7 @@ class GenericNodePropsComponent extends mixins.wl {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "Z": () => (modalDialogs)
+  Z: () => (modalDialogs)
 });
 
 // UNUSED EXPORTS: ExtraFooterElement
@@ -31065,7 +31151,7 @@ const modalDialogs = ({
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"F": () => (PerfectScrollbar)
+F: () => (PerfectScrollbar)
 });
 var _applyDecoratedDescriptor1__ = __webpack_require__(229);
 var _chat_mixins0__ = __webpack_require__(503);
@@ -31350,13 +31436,13 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_cha
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"Cw": () => (ParsedHTML),
-"ZP": () => (__WEBPACK_DEFAULT_EXPORT__),
-"a0": () => (OFlowEmoji),
-"dy": () => (Emoji),
-"hV": () => (reactStringWrap),
-"nF": () => (OFlowParsedHTML),
-"pQ": () => (withOverflowObserver)
+Cw: () => (ParsedHTML),
+ZP: () => (__WEBPACK_DEFAULT_EXPORT__),
+a0: () => (OFlowEmoji),
+dy: () => (Emoji),
+hV: () => (reactStringWrap),
+nF: () => (OFlowParsedHTML),
+pQ: () => (withOverflowObserver)
 });
 var _chat_mixins0__ = __webpack_require__(503);
 var React = __webpack_require__(363);
@@ -31530,7 +31616,7 @@ module.exports = ReactDOM;
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"Z": () => (_applyDecoratedDescriptor)
+Z: () => (_applyDecoratedDescriptor)
 });
 function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
   var desc = {};
@@ -31563,7 +31649,7 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-"Z": () => (_extends)
+Z: () => (_extends)
 });
 function _extends() {
   _extends = Object.assign ? Object.assign.bind() : function (target) {

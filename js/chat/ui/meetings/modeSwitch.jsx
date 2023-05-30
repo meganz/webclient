@@ -13,7 +13,10 @@ export default class ModeSwitch extends MegaRenderMixin {
         expanded: false
     };
 
-    handleMousedown = ({ target }) => this.containerRef?.current.contains(target) ? null : this.doClose();
+    handleMousedown = ({ target }) =>
+        this.containerRef &&
+        this.containerRef.current &&
+        this.containerRef.current.contains(target) ? null : this.doClose();
 
     handleKeydown = ({ keyCode }) => keyCode && keyCode === 27 /* ESC */ && this.doClose();
 

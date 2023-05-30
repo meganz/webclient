@@ -358,7 +358,7 @@ export class DropdownItem extends MegaRenderMixin {
         });
     }
     onClick(ev) {
-        const { children, onClick } = this.props;
+        const { children, persistent, onClick } = this.props;
 
         if (children) {
             ev.stopPropagation();
@@ -366,7 +366,9 @@ export class DropdownItem extends MegaRenderMixin {
             this.setState({ isClicked: !this.state.isClicked });
         }
 
-        $(document).trigger('closeDropdowns');
+        if (!persistent) {
+            $(document).trigger('closeDropdowns');
+        }
 
         return onClick && onClick(ev);
     }

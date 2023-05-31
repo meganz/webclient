@@ -478,19 +478,22 @@ accountUI.general = {
         // Show Membership plan
         $('.account .plan-icon', $dashboardPane).removeClass('pro1 pro2 pro3 pro4 pro100 pro101 free');
 
+        // Default is Free (proNum undefined)
+        let proNum = u_attr.p;
         let planClass = 'free';
         let planText = l[1150];
 
-        // If Business always show the Business icon & name (even if expired, which is when u_attr.p is undefined)
-        if (u_attr.b) {
-            planClass = 'pro' + pro.ACCOUNT_LEVEL_BUSINESS;
-            planText = pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS);
+        // If Business or Pro Flexi, always show the icon & name (even if expired, which is when u_attr.p is undefined)
+        if (u_attr.b || u_attr.pf) {
+            proNum = u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI;
+            planClass = 'pro' + proNum;
+            planText = pro.getProPlanName(proNum);
         }
 
-        // Otherwise if it's an active Pro I-III/Lite/Flexi account
-        else if (u_attr.p) {
-            planClass = 'pro' + u_attr.p;
-            planText = pro.getProPlanName(u_attr.p);
+        // Otherwise if it's an active Pro account
+        else if (proNum) {
+            planClass = 'pro' + proNum;
+            planText = pro.getProPlanName(proNum);
         }
 
         $('.account .plan-icon', $dashboardPane).addClass(planClass);
@@ -2005,11 +2008,11 @@ accountUI.plan = {
                 }
             }
 
-            // If Business, override to show the Business name (even if expired, which is when u_attr.p is undefined)
-            if (u_attr.b) {
+            // If Business or Pro Flexi, override to show the name (even if expired i.e. when u_attr.p is undefined)
+            if (u_attr.b || u_attr.pf) {
                 $('.account.plan-info.accounttype', $planContent).addClass('business');
                 $('.account.plan-info.accounttype span', $planContent).text(
-                    pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS)
+                    pro.getProPlanName(u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI)
                 );
             }
 

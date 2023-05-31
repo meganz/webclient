@@ -171,11 +171,19 @@ mobile.account = {
 
         'use strict';
 
-        // Get the Pro name and icon class (NB: if Business always show the Business
-        // icon & name (even if expired, which is when u_attr.p is undefined))
-        const proNum = u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : u_attr.p;
-        var proClassName = proNum >= 1 ? 'pro' + proNum : 'free';
-        var proPlanName = pro.getProPlanName(proNum);
+        let proNum = u_attr.p;
+
+        // If Business or Pro Flexi we override the u_attr.p because it's undefined when these plans are expired.
+        // We don't want to show as Free because they are still on that account and they must pay to reactivate.
+        if (u_attr.b) {
+            proNum = pro.ACCOUNT_LEVEL_BUSINESS;
+        }
+        else if (u_attr.pf) {
+            proNum = pro.ACCOUNT_LEVEL_PRO_FLEXI;
+        }
+
+        const proClassName = proNum >= 1 ? 'pro' + proNum : 'free';
+        const proPlanName = pro.getProPlanName(proNum);
 
         // Show the Pro name and icon class
         $('.plan-icon', $page).addClass(proClassName);

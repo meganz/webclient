@@ -588,4 +588,9 @@ h3.verify-email.header-txt {
     .mega-dialog > section {
         flex-shrink: 0;
     }
+
+    /* Exclude chat dialogs */
+    .fm-modal-dialog .mega-dialog > section {
+        flex-shrink: unset;
+    }
 }

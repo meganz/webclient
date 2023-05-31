@@ -107,7 +107,6 @@ lazy(pro, 'proplan2', () => {
         // If they clicked the plan immediately after completing registration,
         // set the flag so it can be logged
         if (localStorage.keycomplete) {
-            localStorage.removeItem('keycomplete');
             pro.propay.planChosenAfterRegistration = true;
         }
 

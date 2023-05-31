@@ -1546,6 +1546,9 @@ pro.propay = {
         if (pro.propay.planChosenAfterRegistration) {
             utsRequest.fr = 1;
         }
+        if (localStorage.keycomplete) {
+            delete localStorage.keycomplete;
+        }
 
         // Add the discount information to the User Transaction Sale request
         if (mega.discountInfo && mega.discountInfo.dc) {

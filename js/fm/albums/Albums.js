@@ -629,11 +629,7 @@ lazy(mega.gallery, 'albums', () => {
             return defaultAlbumName;
         }
 
-        if (currentNames[defaultAlbumName] && namesCount === 1) {
-            return defaultAlbumName + ' (1)';
-        }
-
-        for (let i = 2; i <= maxLabelPropositions; i++) {
+        for (let i = 1; i <= maxLabelPropositions; i++) {
             const newName = defaultAlbumName + ' (' + i + ')';
 
             if (!currentNames[newName]) {

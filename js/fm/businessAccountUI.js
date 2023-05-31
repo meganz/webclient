@@ -255,12 +255,12 @@ function getReportDates(leadingDate) {
     "use strict";
 
     const today = leadingDate || new Date();
-    const todayMonth = today.getUTCMonth() + 1;
+    const todayMonth = today.getMonth() + 1;
     let currMonth = String(todayMonth);
     if (currMonth.length < 2) {
         currMonth = `0${currMonth}`;
     }
-    const currYear = String(today.getUTCFullYear());
+    const currYear = String(today.getFullYear());
 
     const startDate = `${currYear}${currMonth}01`;
 
@@ -268,7 +268,7 @@ function getReportDates(leadingDate) {
     if (!endDate) {
         return;
     }
-    const endDateStr = String(endDate.getUTCFullYear()) + currMonth + String(endDate.getDate());
+    const endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate());
 
     return { fromDate: startDate, toDate: endDateStr };
 }
@@ -1942,6 +1942,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
     const populateMonthDropDownList = function($targetContainer) {
         const adminCreationDate = new Date(u_attr.since * 1000);
         const nowDate = new Date();
+        nowDate.setDate(1);
         const monthLimit = 12; // 1 year back max
         const $monthDropdown = $('.chart-month-selector', $targetContainer);
         const $dropdownScroll = $('.dropdown-scroll', $monthDropdown);

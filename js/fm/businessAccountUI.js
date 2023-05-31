@@ -4253,7 +4253,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         updateLeftSubUserPanel(subuser);
     }
 
-    if (M.currentdirid && M.currentdirid.indexOf('user-management') === -1) {
+    if (!String(M.currentdirid).includes('user-management')) {
         return;
     }
 

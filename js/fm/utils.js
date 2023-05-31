@@ -1873,15 +1873,17 @@ MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
         storageBlock.classList.add('warning');
     }
 
-    // If Business always show the Business name (even if expired, which is when u_attr.p is undefined)
-    if (u_attr.b) {
-        storageBlock.querySelector('.plan').textContent = pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS);
+    // If Business or Pro Flexi always show the plan name (even if expired, which is when u_attr.p is undefined)
+    if (u_attr.b || u_attr.pf) {
+        storageBlock.querySelector('.plan').textContent = pro.getProPlanName(
+            u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI
+        );
     }
     else if (u_attr.p) {
         storageBlock.querySelector('.plan').textContent = pro.getProPlanName(u_attr.p);
     }
     else {
-        storageBlock.querySelector('.plan').textContent = l[1150];
+        storageBlock.querySelector('.plan').textContent = l[1150]; // Free
     }
 
     // Show only space_used for Business and Pro Flexi accounts

@@ -149,28 +149,31 @@
 }
 
 /* Send Contact Dialog */
-.mega-dialog.new-group-chat .content-block {
+.mega-dialog.contact-picker-widget .content-block {
     padding: 0;
 }
-.mega-dialog.new-group-chat .group-chat-dialog.content {
+.mega-dialog.contact-picker-widget .group-chat-dialog.content {
     padding: 0 48px;
 }
-.mega-dialog.send-contact, .mega-dialog.new-group-chat {
+.mega-dialog.send-contact,
+.mega-dialog.contact-picker-widget {
     width: 420px;
 }
-.fr.fontsize2 .mega-dialog.new-group-chat {
+.fr.fontsize2 .mega-dialog.contact-picker-widget {
     width: 382px;
 }
-body.de .mega-dialog.new-group-chat {
+body.de .mega-dialog.contact-picker-widget {
     width: 440px;
 }
 .mega-dialog .contacts-search-scroll {
     height: 336px !important;
 }
-.mega-dialog.send-contact .fm-dialog-content, .mega-dialog.new-group-chat .fm-dialog-content {
+.mega-dialog.send-contact .fm-dialog-content,
+.mega-dialog.contact-picker-widget .fm-dialog-content {
     padding: 0 0 0 12px;
 }
-.mega-dialog.send-contact .contacts-search-scroll, .mega-dialog.new-group-chat .contacts-search-scroll {
+.mega-dialog.send-contact .contacts-search-scroll,
+.mega-dialog.contact-picker-widget .contacts-search-scroll {
     margin: 8px auto 0;
     height: 320px !important;
 }
@@ -217,7 +220,8 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog .group-chat-dialog .radio-txt {
     padding-top: 12px;
 }
-.mega-dialog.new-group-chat .contacts-search-scroll.short, .mega-dialog.new-group-chat .group-chat-dialog.checkbox + .contacts-search-scroll {
+.mega-dialog.contact-picker-widget .contacts-search-scroll.short,
+.mega-dialog.contact-picker-widget .group-chat-dialog.checkbox + .contacts-search-scroll {
     height: 226px !important;
 }
 .toggle-checkbox {

@@ -56,6 +56,12 @@ function dashboardUI(updProcess) {
         if (u_attr.pf) {
             $('.overall-usage-container', $bsnDashboard).addClass('admin');
         }
+
+        // If Pro Flexi expired/grace period
+        if (u_attr.pf && (u_attr.pf.s !== pro.ACCOUNT_STATUS_ENABLED)) {
+            $('.left-pane.small-txt.plan-date-info', '.dashboard').addClass('hidden');
+            $('.left-pane.big-txt.plan-date-val', '.dashboard').addClass('hidden');
+        }
     }
     else {
         // Show regular dashboard
@@ -165,7 +171,8 @@ function dashboardUI(updProcess) {
         }
 
         // Elements for free/pro accounts. Expires date / Registration date
-        if (u_attr.p || (u_attr.b && u_attr.b.s === -1)) {
+        if (u_attr.p || (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) ||
+            (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)) {
 
             var timestamp;
             // Subscription
@@ -203,15 +210,19 @@ function dashboardUI(updProcess) {
                 }
             }
 
-            if (u_attr.b && (u_attr.p === 100 || u_attr.b.s === -1)) {
+            // If Business or Pro Flexi expired status
+            if ((u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) ||
+                (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)) {
+
                 // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
                 $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();
                 var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');
-                if (u_attr.b.s === 1) {
+
+                if (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_ENABLED) {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
                         .text(l[7666]);
                 }
-                else if (u_attr.b.s === 2 && u_attr.b.m) {
+                else if (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_GRACE_PERIOD && u_attr.b.m) {
                     $('.suba-status', $businessLeft).addClass('pending').removeClass('disabled active')
                         .text(l[19609]);
                     if (u_attr.b.sts && u_attr.b.sts[0] && u_attr.b.sts[0].s === -1) {
@@ -228,18 +239,25 @@ function dashboardUI(updProcess) {
                     $('.suba-status', $businessLeft).addClass('disabled').removeClass('pending active')
                         .text(l[19608]);
 
-                    if (u_attr.b.m) {
+                    if (u_attr.b && u_attr.b.m) {
                         $('.suba-pay-bill', $businessLeft).removeClass('hidden');
                     }
                 }
 
-                if (u_attr.b.m) { // master
-                    $businessLeft.find('.suba-role').text(l[19610]);
+                // For Pro Flexi, hide the Role block
+                if (u_attr.pf) {
+                    $('.suba-role', $businessLeft).parent().addClass('hidden');
+                }
+
+                // Otherwise for Business Master and User show the Role block
+                if (u_attr.b && u_attr.b.m) {
+                    $('.suba-role', $businessLeft).text(l[19610]); // Administrator
                 }
                 else {
-                    $businessLeft.find('.suba-role').text(l[5568]);
+                    $('.suba-role', $businessLeft).text(l[5568]); // User
                 }
-                if (u_attr.b.s !== 1 || !u_attr.b.m) {
+
+                if (u_attr.b && (u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED || !u_attr.b.m)) {
                     $('.left-pane.small-txt.plan-date-info', '.dashboard').addClass('hidden');
                     $('.left-pane.big-txt.plan-date-val', '.dashboard').addClass('hidden');
                 }

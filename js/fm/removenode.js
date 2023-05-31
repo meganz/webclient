@@ -131,7 +131,7 @@ function removeUInode(h, parent) {
             }
             break;
         default:
-            if (M.chat || M.currentdirid.indexOf('user-management') >= 0 || M.isAlbumsPage()) {
+            if (M.chat || String(M.currentdirid).includes('user-management') || M.isAlbumsPage()) {
                 break;
             }
             if (!hasSubFolders) {

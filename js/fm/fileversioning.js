@@ -309,6 +309,8 @@ var versiondialogid;
                     var curTimeMarker;
                     var msgDate = new Date(v.ts * 1000 || 0);
                     var iso = (msgDate.toISOString());
+                    const isCurrentVersion = i === 0;
+
                     if (todayOrYesterday(iso)) {
                         // if in last 2 days, use the time2lastSeparator
                         curTimeMarker = time2lastSeparator(iso);
@@ -337,7 +339,7 @@ var versiondialogid;
                         }
                     }
 
-                    var mostRecentHtml = (i === 0) ? '<span class="current">(' + l[17149] + ')</span>' : '';
+                    var mostRecentHtml = isCurrentVersion ? '<span class="current">(' + l[17149] + ')</span>' : '';
                     var activeClass  = current_sel_version.includes(v.h) ? 'active' : '';
                     var downBtnHtml =
                         `<div class="mega-button small action download-file simpletip"
@@ -389,6 +391,15 @@ var versiondialogid;
                                 <i class="sprite-fm-mono icon-bin disabled nonclickable"></i>
                             </div>`;
                     }
+
+                    // If from backup
+                    if (M.getNodeRoot(v.h) === M.InboxID) {
+                        revertBtnHtml = ``;
+                        if (isCurrentVersion) {
+                            deleteBtnHtml = ``;
+                        }
+                    }
+
                     html += // <!-- File Data Row !-->
                             `<tr class="fm-versioning file-info-row ${activeClass}" id=v_${v.h}>
                                 <td class="fm-versioning file-icon">
@@ -461,7 +472,11 @@ var versiondialogid;
                 else if (a2[i] === M.RubbishID) {
                     name = l[167];
                 }
-                else if (a2[i] === 'messages' || a2[i] === M.InboxID) {
+                else if (M.BackupsId && a2[i] === M.BackupsId) {
+                    name = l.restricted_folder_button;
+                    hasArrow = false;
+                }
+                else if (a2[i] === 'messages') {
                     name = l[166];
                 }
                 else {
@@ -471,12 +486,15 @@ var versiondialogid;
                         hasArrow = true;
                     }
                 }
-                name = htmlentities(name);
-                pathHtml =
-                    `<span>
-                        ${hasArrow ? '<i class="sprite-fm-mono icon-arrow-right"></i>' : ''}
-                        <span class="simpletip" data-simpletip="${name}">${name}</span>
-                    </span>` + pathHtml;
+
+                if (name) {
+                    name = htmlentities(name);
+                    pathHtml =
+                        `<span>
+                            ${hasArrow ? '<i class="sprite-fm-mono icon-arrow-right"></i>' : ''}
+                            <span class="simpletip" data-simpletip="${name}">${name}</span>
+                        </span>` + pathHtml;
+                }
             }
 
             var refreshHeader = function(fileHandle) {
@@ -485,16 +503,19 @@ var versiondialogid;
                 const $rvtBtn = $('button.js-revert', headerSelect);
                 const $delBtn = $('button.js-delete', headerSelect);
                 const $clrBtn = $('button.js-clear-previous', headerSelect);
+                const topNodeHandle = fileversioning.getTopNodeSync(fileHandle);
 
                 if (current_sel_version.length > 1
-                    || current_sel_version[0] === fileversioning.getTopNodeSync(fileHandle)
-                    || nodeData && nodeData.r < 2) {
+                    || current_sel_version[0] === topNodeHandle
+                    || nodeData && nodeData.r < 2
+                ) {
 
                     $rvtBtn.addClass("disabled nonclickable");
                 }
                 else {
                     $rvtBtn.removeClass("disabled nonclickable");
                 }
+
                 if (nodeData && (nodeData.r < 2)) {
                     $delBtn.addClass("disabled nonclickable");
                     $clrBtn.addClass("disabled nonclickable");
@@ -511,6 +532,14 @@ var versiondialogid;
                     }
                     else {
                         $clrBtn.addClass("disabled nonclickable");
+                    }
+                }
+
+                // If from backup
+                if (M.getNodeRoot(fileHandle) === M.InboxID) {
+                    $rvtBtn.addClass("disabled nonclickable");
+                    if (current_sel_version.includes(topNodeHandle)) {
+                        $delBtn.addClass("disabled nonclickable");
                     }
                 }
 

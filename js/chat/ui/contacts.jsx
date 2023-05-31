@@ -849,6 +849,7 @@ export class ContactItem extends ContactAwareComponent {
 export class ContactPickerWidget extends MegaRenderMixin {
     contactLinkListener = null;
     containerRef = React.createRef();
+
     static defaultProps = {
         multipleSelectedButtonLabel: false,
         singleSelectedButtonLabel: false,
@@ -862,18 +863,63 @@ export class ContactPickerWidget extends MegaRenderMixin {
         newEmptySearchResult: false,
         newNoContact: false,
         emailTooltips: false
-    }
-    constructor(props) {
-        super(props);
-        this.state = {
-            searchValue: '',
-            selected: this.props.selected || false,
-            publicLink: M.account && M.account.contactLink || undefined
-        };
-    }
+    };
+
+    state = {
+        searchValue: '',
+        selected: this.props.selected || [],
+        publicLink: M.account && M.account.contactLink || undefined
+    };
+
     onSearchChange = ev => {
         this.setState({ searchValue: ev.target.value });
     };
+
+    renderParticipantsList = () => {
+        const { contacts, emailTooltips, onSelect } = this.props;
+        const { selected } = this.state;
+        const $$list =
+            contacts.map(handle => {
+                const added = selected.includes(handle);
+                return (
+                    <ContactCard
+                        key={handle}
+                        className={`
+                            contacts-search short
+                            ${added ? 'selected' : ''}
+                        `}
+                        contact={M.u[handle]}
+                        selectable={true}
+                        emailTooltips={emailTooltips}
+                        noContextButton={true}
+                        noContextMenu={true}
+                        onClick={() => {
+                            this.setState(
+                                { selected: added ? selected.filter(h => h !== handle) : [...selected, handle] },
+                                () => onSelect(this.state.selected)
+                            );
+                        }}
+                    />
+                );
+            });
+
+        return (
+            <PerfectScrollbar
+                className="contacts-search-scroll"
+                selected={selected}
+                contacts={contacts}>
+                <div className="contacts-search-subsection">
+                    <div className="contacts-list-header">
+                        {megaChat.activeCall ?
+                            l.call_participants /* `Participants in the call` */ :
+                            l[16217] /* `Participants` */}
+                    </div>
+                    <div className="contacts-search-list">{$$list}</div>
+                </div>
+            </PerfectScrollbar>
+        );
+    };
+
     componentDidMount() {
         super.componentDidMount();
         setContactLink(this.containerRef && this.containerRef.current);
@@ -881,6 +927,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
             this.state.publicLink ? null : this.setState({ publicLink })
         );
     }
+
     componentDidUpdate() {
 
         var self = this;
@@ -893,6 +940,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
             self.searchContactsScroll.reinitialise();
         }
     }
+
     componentWillMount() {
         if (super.componentWillMount) {
             super.componentWillMount();
@@ -931,6 +979,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
             self.safeForceUpdate();
         });
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         var self = this;
@@ -946,6 +995,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
             mBroadcaster.removeListener(this.contactLinkListener);
         }
     }
+
     _eventuallyAddContact(v, contacts, selectableContacts, forced) {
         var self = this;
         if (!forced && (v.c !== 1 || v.u === u_handle)) {
@@ -1055,7 +1105,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                             self.setState({'searchValue': ''});
                         }
                         if (self.props.autoFocusSearchField) {
-                            self.contactSearchField.focus();
+                            self.contactSearchField?.focus();
                         }
                     }
                     self.clickTime = new Date();
@@ -1073,6 +1123,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
         return true;
     }
+
     render() {
         var self = this;
 
@@ -1161,7 +1212,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         self.setState({'searchValue': ''});
                     }
                     if (self.props.autoFocusSearchField) {
-                        self.contactSearchField.focus();
+                        self.contactSearchField?.focus();
                     }
                 }
                 self.clickTime = new Date();
@@ -1272,11 +1323,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
         var innerDivStyles = {};
 
-        // if (contacts.length < 6) {
-            // innerDivStyles['height'] = Math.max(48, contacts.length * 48);
-            // innerDivStyles['overflow'] = "visible";
-        // }
-
         if (this.props.showMeAsSelected) {
             self._eventuallyAddContact(M.u[u_handle], contacts, selectableContacts, true);
         }
@@ -1322,44 +1368,50 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 }
             }
             else {
-                contactsList = <PerfectScrollbar className="contacts-search-scroll"
-                    selected={this.state.selected}
-                    changedHashProp={this.props.changedHashProp}
-                    contacts={contacts}
-                    frequentContacts={frequentContacts}
-                    ref={(ref) => {
-                        self.searchContactsScroll = ref;
-                    }}
-                    searchValue={this.state.searchValue}>
-                    <div>
-                        <div className="contacts-search-subsection"
-                             style={{'display': (!hideFrequents ? "" : "none")}}>
-                            <div className="contacts-list-header">
-                                {l[20141]}
+                contactsList =
+                    <PerfectScrollbar
+                        ref={ref => {
+                            self.searchContactsScroll = ref;
+                        }}
+                        className="contacts-search-scroll"
+                        selected={this.state.selected}
+                        changedHashProp={this.props.changedHashProp}
+                        contacts={contacts}
+                        frequentContacts={frequentContacts}
+                        searchValue={this.state.searchValue}>
+                        <>
+                            <div
+                                className="contacts-search-subsection"
+                                style={{ display: hideFrequents ? 'none' : '' }}>
+                                <div className="contacts-list-header">{l[20141] /* `Recents` */}</div>
+                                {frequentsLoading ?
+                                    <div className="loading-spinner">...</div> :
+                                    <div
+                                        className="contacts-search-list"
+                                        style={innerDivStyles}>
+                                        {frequentContacts}
+                                    </div>
+                                }
                             </div>
-
-                            {frequentsLoading ?
-                                <div className="loading-spinner">...</div> :
-                                <div className="contacts-search-list" style={innerDivStyles}>
-                                    {frequentContacts}
-                                </div>
+                            {contacts.length > 0 ?
+                                <div className="contacts-search-subsection">
+                                    <div className="contacts-list-header">
+                                        {frequentContacts && frequentContacts.length === 0 ?
+                                            /* `Participants` || `Contacts` */
+                                            this.props.readOnly ? l[16217] : l[165] :
+                                            l[165] /* `Contacts` */
+                                        }
+                                    </div>
+                                    <div
+                                        className="contacts-search-list"
+                                        style={innerDivStyles}>
+                                        {contacts}
+                                    </div>
+                                </div> :
+                                undefined
                             }
-                        </div>
-
-                        {contacts.length > 0 ?
-                            <div className="contacts-search-subsection">
-                                <div className="contacts-list-header">
-                                    {frequentContacts && frequentContacts.length === 0 ? (
-                                        self.props.readOnly ? l[16217] : l[165]
-                                    ) : l[165]}
-                                </div>
-
-                                <div className="contacts-search-list" style={innerDivStyles}>
-                                    {contacts}
-                                </div>
-                            </div> : undefined}
-                    </div>
-                </PerfectScrollbar>;
+                        </>
+                    </PerfectScrollbar>;
             }
         }
         else if (self.props.newNoContact) {
@@ -1436,7 +1488,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     </div>
                 )}
                 {multipleContacts}
-                {!this.props.readOnly && haveContacts && (
+                {!this.props.readOnly && haveContacts && !this.props.hideSearch && (
                     <>
                         <div
                             className={`
@@ -1461,7 +1513,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                                 `}
                                 onClick={() => {
                                     this.setState({ searchValue: '' }, () =>
-                                        this.contactSearchField.focus()
+                                        this.contactSearchField?.focus()
                                     );
                                 }}>
                                 <i className="sprite-fm-mono icon-close-component"/>
@@ -1470,7 +1522,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         <div className="contacts-search-header-separator" />
                     </>
                 )}
-                {contactsList}
+                {this.props.participantsList ? this.renderParticipantsList() : contactsList}
                 {selectFooter}
                 {ContactsPanel.hasContacts() && this.props.showAddContact && (
                     <div className="contacts-search-bottom">

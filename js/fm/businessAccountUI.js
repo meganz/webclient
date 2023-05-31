@@ -255,12 +255,12 @@ function getReportDates(leadingDate) {
     "use strict";
 
     const today = leadingDate || new Date();
-    const todayMonth = today.getUTCMonth() + 1;
+    const todayMonth = today.getMonth() + 1;
     let currMonth = String(todayMonth);
     if (currMonth.length < 2) {
         currMonth = `0${currMonth}`;
     }
-    const currYear = String(today.getUTCFullYear());
+    const currYear = String(today.getFullYear());
 
     const startDate = `${currYear}${currMonth}01`;
 
@@ -268,7 +268,7 @@ function getReportDates(leadingDate) {
     if (!endDate) {
         return;
     }
-    const endDateStr = String(endDate.getUTCFullYear()) + currMonth + String(endDate.getDate());
+    const endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate());
 
     return { fromDate: startDate, toDate: endDateStr };
 }
@@ -1585,6 +1585,12 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 });
             $customChartLegend.removeClass('disabled');
         });
+
+        // If Pro Flexi expired we want to hide the Storage Usage Breakdown and storage/transfer pie charts
+        if (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED) {
+            $storageAnalysisPie.addClass('hidden');
+            $stgeTrfAnalysisContainer.addClass('hidden');
+        }
     };
 
     // Private function to determine the scale unit of the bar chart
@@ -1851,6 +1857,12 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         // If Pro Flexi
         if (u_attr.pf) {
 
+            // If they are expired, hide the next bill container (similar to Business)
+            if (u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED) {
+                $nbPriceContainer.addClass('hidden');
+                return;
+            }
+
             // Add special class for Pro Flexi specific changes to the UI in this section
             $nbPriceContainer.addClass('pro-iv');
 
@@ -1930,6 +1942,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
     const populateMonthDropDownList = function($targetContainer) {
         const adminCreationDate = new Date(u_attr.since * 1000);
         const nowDate = new Date();
+        nowDate.setDate(1);
         const monthLimit = 12; // 1 year back max
         const $monthDropdown = $('.chart-month-selector', $targetContainer);
         const $dropdownScroll = $('.dropdown-scroll', $monthDropdown);
@@ -4253,7 +4266,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         updateLeftSubUserPanel(subuser);
     }
 
-    if (M.currentdirid && M.currentdirid.indexOf('user-management') === -1) {
+    if (!String(M.currentdirid).includes('user-management')) {
         return;
     }
 

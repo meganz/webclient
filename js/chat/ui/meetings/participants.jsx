@@ -8,19 +8,24 @@ import { Emoji } from '../../../ui/utils.jsx';
 
 class Participant extends MegaRenderMixin {
     baseIconClass = 'sprite-fm-mono';
+
     componentDidMount() {
         super.componentDidMount();
         this.props.source.registerConsumer(this);
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         this.props.source.deregisterConsumer(this);
     }
+
     onAvChange() {
         this.safeForceUpdate();
     }
+
     render() {
-        const { chatRoom, handle, name } = this.props;
+        const { chatRoom, handle, name, source } = this.props;
+
         return (
             <>
                 <Avatar contact={M.u[handle]} />
@@ -36,13 +41,13 @@ class Participant extends MegaRenderMixin {
                     <i
                         className={`
                             ${this.baseIconClass}
-                            ${this.props.source.audioMuted ? 'icon-audio-off inactive' : 'icon-audio-filled'}
+                            ${source.audioMuted ? 'icon-audio-off inactive' : 'icon-audio-filled'}
                          `}
                     />
                     <i
                         className={`
                             ${this.baseIconClass}
-                            ${this.props.source.videoMuted ? 'icon-video-off inactive' : 'icon-video-call-filled'}
+                            ${source.videoMuted ? 'icon-video-off inactive' : 'icon-video-call-filled'}
                         `}
                     />
                 </div>

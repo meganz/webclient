@@ -629,11 +629,7 @@ lazy(mega.gallery, 'albums', () => {
             return defaultAlbumName;
         }
 
-        if (currentNames[defaultAlbumName] && namesCount === 1) {
-            return defaultAlbumName + ' (1)';
-        }
-
-        for (let i = 2; i <= maxLabelPropositions; i++) {
+        for (let i = 1; i <= maxLabelPropositions; i++) {
             const newName = defaultAlbumName + ' (' + i + ')';
 
             if (!currentNames[newName]) {
@@ -1432,7 +1428,7 @@ lazy(mega.gallery, 'albums', () => {
                             this.dynamicList.scrollToYPosition(this.dynamicList.getScrollTop() + 20);
                         }
                     },
-                    getOffsetTop: () => this.dynamicList.getScrollTop()
+                    getScrollTop: () => this.dynamicList.getScrollTop()
                 }
             );
         }
@@ -2411,7 +2407,7 @@ lazy(mega.gallery, 'albums', () => {
                             }
 
                             if (pendingName && album.label === pendingName) {
-                                pendingName = 0;
+                                pendingName = '';
                             }
 
                             loadingDialog.show('AlbumRemoval');
@@ -4232,6 +4228,7 @@ lazy(mega.gallery, 'albums', () => {
                 mega.sets.subscribe('asp', 'albums', (data) => {
                     const { id, at, k } = data;
                     const isPending = pendingName !== '' && mega.sets.decryptAttr(at, k).n === pendingName;
+
                     let prevName = '';
                     const album = this.store[id];
                     const isExisting = !!album;
@@ -4239,7 +4236,7 @@ lazy(mega.gallery, 'albums', () => {
                     if (isPending) {
                         this.grid.clearPendingCell();
                         this.tree.clearPendingButton();
-                        this.pendingName = '';
+                        pendingName = '';
                     }
                     else if (album) {
                         prevName = album.label;

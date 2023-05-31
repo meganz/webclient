@@ -1075,7 +1075,7 @@
                     }
                 }
 
-                if (!aNode.t && aNode.tvf && !isBackup) {
+                if (!aNode.t && aNode.tvf) {
                     aTemplate.classList.add('versioning');
                     var vTemplate = aTemplate.querySelector('.hd-versions');
                     if (vTemplate) {

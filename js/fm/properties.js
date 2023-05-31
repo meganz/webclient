@@ -178,11 +178,6 @@
             var star = '';
             const rootHandle = M.getNodeRoot(n.h);
 
-            if (rootHandle === M.InboxID) {
-                versioningFlag = false;
-                $dialog.removeClass('versioning');
-            }
-
             if (n.fav && !folderlink && rootHandle !== M.RubbishID) {
                 star = ' sprite-fm-mono icon-favourite-filled';
             }
@@ -311,7 +306,7 @@
                     p.t11 = fm_contains(sfilecnt, sfoldercnt, true);
                 }
             }
-            if (filecnt && versioningFlag && M.currentdirid !== M.RubbishID) {
+            if (filecnt && versioningFlag && M.currentrootid !== M.RubbishID) {
                 p.t14 = '<a id="previousversions">' + p.t14 + '</a>';
             }
         }
@@ -413,7 +408,7 @@
 
         if ((filecnt === 1) && (foldercnt === 0)) {
             $('#previousversions').rebind('click', function(ev) {
-                if (M.currentdirid !== M.RubbishID) {
+                if (M.currentrootid !== M.RubbishID) {
                     if (slideshowid) {
                         slideshow(n.h, 1);
                     }

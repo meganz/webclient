@@ -22,6 +22,7 @@ import Loading from "./meetings/workflow/loading.jsx";
 import Join from "./meetings/workflow/join.jsx";
 import Alert from './meetings/workflow/alert.jsx';
 import { isSameDay, isToday, isTomorrow } from './meetings/schedule/helpers.jsx';
+import { withHostsObserver } from './meetings/hostsObserver.jsx';
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -44,6 +45,28 @@ class EndCallButton extends MegaRenderMixin {
         super.componentDidMount();
         this.EVENTS.map(ev => this.props.chatRoom.rebind(ev, () => this.safeForceUpdate()));
     }
+
+    LeaveButton = withHostsObserver(
+        ({ hasHost, chatRoom, confirmLeave, onLeave }) => {
+            return (
+                <DropdownItem
+                    className="link-button"
+                    icon="sprite-fm-mono icon-leave-call"
+                    label={l.leave}
+                    persistent={true}
+                    onClick={() =>
+                        hasHost(chatRoom.getCallParticipants()) ?
+                            onLeave() :
+                            confirmLeave({
+                                title: l.assign_host_leave_call /* `Assign host to leave call` */,
+                                body: l.assign_host_leave_call_details /* `You're the only host on...` */,
+                                cta: l.assign_host_button /* `Assign host` */
+                            })
+                    }
+                />
+            );
+        }
+    );
 
     renderButton({ label, onClick, children = null }) {
         return (
@@ -76,15 +99,14 @@ class EndCallButton extends MegaRenderMixin {
                     onClick: peers ? null : () => call.hangUp(),
                     children: peers && (
                         <Dropdown
-                            className="wide-dropdown send-files-selector light"
+                            className="wide-dropdown light end-call-selector"
                             noArrow="true"
                             vertOffset={4}
                             horizOffset={0}>
-                            <DropdownItem
-                                className="link-button"
-                                icon="sprite-fm-mono icon-leave-call"
-                                label={l.leave}
-                                onClick={() => call.hangUp()}
+                            <this.LeaveButton
+                                chatRoom={chatRoom}
+                                participants={chatRoom.getCallParticipants()}
+                                onLeave={() => call.hangUp()}
                             />
                             <DropdownItem
                                 className="link-button"
@@ -407,6 +429,50 @@ export class ConversationRightArea extends MegaRenderMixin {
         chatRoom.setRetention(retentionTime);
         $(document).trigger('closeDropdowns');
     }
+
+    LeaveButton = withHostsObserver(
+        ({ chatRoom, hasHost, confirmLeave, onLeave }) => {
+            const isDisabled = chatRoom.call || chatRoom.isReadOnly() || is_chatlink;
+            const participants = chatRoom.getParticipantsExceptMe();
+
+            return (
+                <div
+                    className={`
+                        link-button
+                        light
+                        ${isDisabled ? 'disabled' : ''}
+                    `}
+                    onClick={
+                        isDisabled ?
+                            null :
+                            () =>
+                                hasHost(participants) || !participants.length ?
+                                    // Leave the given room directly w/o any further actions if
+                                    // there are other hosts already present or if the user is alone in the room.
+                                    onLeave() :
+                                    // Show the `Assign host and leave` confirmation dialog
+                                    confirmLeave({
+                                        title: chatRoom.isMeeting ?
+                                            /* `Assign host to leave meeting` */
+                                            l.assign_host_to_leave :
+                                            /* `Assign host to leave group` */
+                                            l.assign_host_to_leave_group,
+                                        /* `You're the only host in this...` */
+                                        body: chatRoom.isMeeting ?
+                                            l.assign_host_to_details :
+                                            l.assign_host_to_details_group,
+                                        /* `Assign host` */
+                                        cta: l.assign_host_button
+                                    })
+                    }>
+                    <i className="sprite-fm-mono icon-disabled-filled"/>
+                    <span>
+                        {chatRoom.isMeeting ? l.meeting_leave /* `Leave Meeting` */ : l[8633] /* `Leave Chat` */}
+                    </span>
+                </div>
+            );
+        }
+    );
 
     handleCancelMeeting = () => {
         const { chatRoom } = this.props;
@@ -1088,31 +1154,13 @@ export class ConversationRightArea extends MegaRenderMixin {
                                             </span>
                                         </div>
                                     }
-                                    {
-                                        room.type !== 'private' ?
-                                            <div
-                                                className={`
-                                                    link-button
-                                                    light
-                                                    ${room.type !== 'private' && !is_chatlink &&
-                                                    room.membersSetFromApi.members.hasOwnProperty(u_handle) &&
-                                                    room.membersSetFromApi.members[u_handle] !== -1 &&
-                                                    !room.call ? '' : 'disabled'}
-                                                `}
-                                                onClick={(e) => {
-                                                    if ($(e.target).closest('.disabled').length > 0) {
-                                                        return false;
-                                                    }
-                                                    if (self.props.onLeaveClicked) {
-                                                        self.props.onLeaveClicked();
-                                                    }
-                                                }}>
-                                                <i className="sprite-fm-mono icon-disabled-filled"/>
-                                                <span>{room.isMeeting
-                                                    ? l.meeting_leave /* `Leave Meeting` */
-                                                    : l[8633] /* `Leave Chat` */}</span>
-                                            </div> :
-                                            null
+                                    {room.type === 'private' ?
+                                        null :
+                                        <this.LeaveButton
+                                            chatRoom={room}
+                                            participants={room.getParticipantsExceptMe()}
+                                            onLeave={() => room.leave(true)}
+                                        />
                                     }
                                 </>
                             </AccordionPanel>
@@ -2077,7 +2125,7 @@ export class ConversationPanel extends MegaRenderMixin {
                 className={conversationPanelClasses}
                 onMouseMove={() => self.onMouseMove()}
                 data-room-id={self.props.chatRoom.chatId}>
-                {room.meetingsLoading && <Loading chatRoom={room} title={room.meetingsLoading} />}
+                {room.meetingsLoading && <Loading chatRoom={room} title={room.meetingsLoading.title} />}
                 {room.call && (
                     <Call
                         chatRoom={room}
@@ -2227,9 +2275,6 @@ export class ConversationPanel extends MegaRenderMixin {
                         }}
                         onMakePrivateClicked={function() {
                             self.setState({'privateChatDialog': true});
-                        }}
-                        onLeaveClicked={function() {
-                            room.leave(true);
                         }}
                         onCloseClicked={function() {
                             room.destroy();

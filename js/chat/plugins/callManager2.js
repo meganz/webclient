@@ -497,6 +497,9 @@
                 this.handleDisconnect(termCode);
             }
         }
+        onLocalMediaQueryError(type, err) {
+            megaChat.trigger('onLocalMediaQueryError', { type, err });
+        }
 // == end SfuClientIClientEventListener interface
         handleDisconnect(termCode) {
             this.isDisconnecting = true;

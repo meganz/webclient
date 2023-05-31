@@ -6,6 +6,7 @@ import StreamExtendedControls from './streamExtendedControls.jsx';
 import { withMicObserver } from './micObserver.jsx';
 import { withPermissionsObserver } from './permissionsObserver.jsx';
 import Call from './call.jsx';
+import { withHostsObserver } from './hostsObserver.jsx';
 
 class StreamControls extends MegaRenderMixin {
     static NAMESPACE = 'stream-controls';
@@ -19,8 +20,33 @@ class StreamControls extends MegaRenderMixin {
         endCallPending: false
     };
 
+    LeaveButton = withHostsObserver(
+        ({ hasHost, chatRoom, confirmLeave, onLeave }) => {
+            return (
+                <Button
+                    className="mega-button"
+                    onClick={() =>
+                        hasHost(chatRoom.getCallParticipants()) ?
+                            // Leave the call directly w/o any further actions if
+                            // there are other hosts already present in the call.
+                            onLeave() :
+                            // Show the `Assign host and leave call` confirmation dialog
+                            confirmLeave({
+                                title: l.assign_host_leave_call /* `Assign host to leave call` */,
+                                body: l.assign_host_leave_call_details /* `You're the only host on this call...` */,
+                                cta: l.assign_host_button /* `Assign host` */
+                            })
+                    }>
+                    <span>{l.leave /* `Leave` */}</span>
+                </Button>
+            );
+        }
+    );
+
     handleMousedown = ({ target }) =>
-        this.endContainerRef?.current.contains(target) ? null : this.setState({ endCallOptions: false });
+        this.endContainerRef &&
+        this.endContainerRef.current &&
+        this.endContainerRef.current.contains(target) ? null : this.setState({ endCallOptions: false });
 
     renderDebug = () => {
         return (
@@ -43,36 +69,48 @@ class StreamControls extends MegaRenderMixin {
         );
     };
 
+    renderEndCallOptions = () => {
+        const { chatRoom, onCallEnd } = this.props;
+        const { endCallOptions, endCallPending } = this.state;
+
+        return (
+            <div
+                className={`
+                    end-options
+                    theme-dark-forced
+                    ${endCallOptions ? '' : 'hidden'}
+                `}>
+                <div className="end-options-content">
+                    <this.LeaveButton
+                        chatRoom={chatRoom}
+                        participants={chatRoom.getCallParticipants()}
+                        onLeave={onCallEnd}
+                    />
+                    <Button
+                        className={`
+                            mega-button
+                            positive
+                            ${endCallPending ? 'disabled' : ''}
+                        `}
+                        onClick={() =>
+                            endCallPending ?
+                                null :
+                                this.setState({ endCallPending: true }, () => chatRoom.endCallForAll())
+                        }>
+                        <span>{l.end_for_all /* `End for all` */}</span>
+                    </Button>
+                </div>
+            </div>
+        );
+    };
+
     renderEndCall = () => {
         const { chatRoom, peers, onCallEnd } = this.props;
         return (
             <div
                 ref={this.endContainerRef}
                 className="end-call-container">
-                {this.state.endCallOptions &&
-                    <div className="end-options theme-dark-forced">
-                        <div className="end-options-content">
-                            <Button
-                                className="mega-button"
-                                onClick={onCallEnd}>
-                                <span>{l.leave}</span>
-                            </Button>
-                            <Button
-                                className={`
-                                    mega-button
-                                    positive
-                                    ${this.state.endCallPending ? 'disabled' : ''}
-                                `}
-                                onClick={() =>
-                                    this.state.endCallPending ?
-                                        null :
-                                        this.setState({ endCallPending: true }, () => chatRoom.endCallForAll())
-                                }>
-                                <span>{l.end_for_all}</span>
-                            </Button>
-                        </div>
-                    </div>
-                }
+                {this.renderEndCallOptions()}
                 <Button
                     simpletip={{ ...this.SIMPLETIP, label: l[5884] /* `End call` */ }}
                     className="mega-button theme-dark-forced round large negative end-call"

@@ -2683,8 +2683,8 @@ function getLastDayofTheMonth(dateObj) {
     }
 
     var day;
-    var month = dateObj.getUTCMonth();
-    var year = dateObj.getUTCFullYear();
+    var month = dateObj.getMonth();
+    var year = dateObj.getFullYear();
     if ([0, 2, 4, 6, 7, 9, 11].indexOf(month) >= 0) {
         day = 31;
     }

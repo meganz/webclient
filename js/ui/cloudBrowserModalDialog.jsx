@@ -400,6 +400,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                             sortFoldersFirst={true}
                             currentlyViewedEntry={this.state.currentlyViewedEntry}
                             folderSelectNotAllowed={this.props.folderSelectNotAllowed}
+                            folderSelectable={this.props.folderSelectable}
                             onSelected={this.onSelected}
                             onHighlighted={this.onHighlighted}
                             onAttachClicked={this.onAttachClicked}

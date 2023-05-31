@@ -81,7 +81,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
     render() {
         var self = this;
 
-        var classes = "new-group-chat contrast small-footer " + self.props.className;
+        var classes = "new-group-chat contrast small-footer contact-picker-widget " + self.props.className;
 
         var contacts = M.u;
         var haveContacts = self.state.haveContacts;

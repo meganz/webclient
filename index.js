@@ -2436,9 +2436,11 @@ function topmenuUI() {
 
         document.body.classList.remove('free', 'lite', 'pro-user');
 
-        // If Business always show the Business icon & name (even if expired, which is when u_attr.p is undefined)
-        if (u_attr.b) {
-            $('.plan', $menuLoggedBlock).text(pro.getProPlanName(pro.ACCOUNT_LEVEL_BUSINESS));
+        // If Business or Pro Flexi always show the name (even if expired, which is when u_attr.p is undefined)
+        if (u_attr.b || u_attr.pf) {
+            $('.plan', $menuLoggedBlock).text(
+                pro.getProPlanName(u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI)
+            );
             document.body.classList.add('pro-user');
         }
 
@@ -3421,7 +3423,7 @@ mBroadcaster.once('boot_done', () => {
     });
 
     // Currently only used in chat so don't bother trying to register for mobile browsers.
-    if (!is_mobile) {
+    if (window.isSecureContext && !is_mobile) {
         onIdle(tryCatch(() => {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register(`${is_extension ? '' : '/'}sw.js?v=1`).catch(dump);

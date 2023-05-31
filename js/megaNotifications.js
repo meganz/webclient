@@ -419,10 +419,18 @@
                                     }
                                 );
                             })
-                            .catch(() => {
+                            .catch((ex) => {
                                 this.megaNotifications.logger.error(
                                     'Service worker failed to be ready. Using default notification'
                                 );
+                                const report = [
+                                    1,
+                                    buildVersion.website || 'dev',
+                                    is_extension | 0,
+                                    is_mobile | 0,
+                                    String(ex && ex.message || ex).replace(/\s+/g, ' ').substr(0, 64),
+                                ];
+                                eventlog(99830, JSON.stringify(report));
                                 delete this.options.actions;
                                 this._showDesktopNotification();
                             });

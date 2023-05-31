@@ -540,11 +540,11 @@ RichpreviewsFilter.syncFromAttribute = function() {
             RichpreviewsFilter.confirmationCount = 0;
         })
         .always(function() {
-            if (M.currentdirid && M.currentdirid.indexOf("account") > -1) {
+            const path = String(M.currentdirid);
+
+            if (path.includes("account") && !path.includes('user-management')) {
                 // below if statment is to exlude URLs having user-management (Business)
-                if (M.currentdirid.indexOf('user-management') === -1) {
-                    accountUI();
-                }
+                accountUI();
             }
         });
 };

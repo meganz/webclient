@@ -1843,6 +1843,10 @@ mBroadcaster.addListener('fm:initialized', () => {
 
         Promise.all([authring.onAuthringReady('KeyMgr'), mega.keyMgr.getGeneration()])
             .then(([, keyMgrGeneration]) => {
+                console.assert(window.u_attr, `u(attr) cleaned(?) check this.. (${keyMgrGeneration})`);
+                if (!window.u_attr) {
+                    return;
+                }
                 const keys = u_attr['^!keys'];
 
                 state = [

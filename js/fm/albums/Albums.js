@@ -1428,7 +1428,7 @@ lazy(mega.gallery, 'albums', () => {
                             this.dynamicList.scrollToYPosition(this.dynamicList.getScrollTop() + 20);
                         }
                     },
-                    getOffsetTop: () => this.dynamicList.getScrollTop()
+                    getScrollTop: () => this.dynamicList.getScrollTop()
                 }
             );
         }

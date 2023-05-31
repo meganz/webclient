@@ -2411,7 +2411,7 @@ lazy(mega.gallery, 'albums', () => {
                             }
 
                             if (pendingName && album.label === pendingName) {
-                                pendingName = 0;
+                                pendingName = '';
                             }
 
                             loadingDialog.show('AlbumRemoval');
@@ -4232,6 +4232,7 @@ lazy(mega.gallery, 'albums', () => {
                 mega.sets.subscribe('asp', 'albums', (data) => {
                     const { id, at, k } = data;
                     const isPending = pendingName !== '' && mega.sets.decryptAttr(at, k).n === pendingName;
+
                     let prevName = '';
                     const album = this.store[id];
                     const isExisting = !!album;
@@ -4239,7 +4240,7 @@ lazy(mega.gallery, 'albums', () => {
                     if (isPending) {
                         this.grid.clearPendingCell();
                         this.tree.clearPendingButton();
-                        this.pendingName = '';
+                        pendingName = '';
                     }
                     else if (album) {
                         prevName = album.label;

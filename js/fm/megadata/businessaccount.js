@@ -578,6 +578,10 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
                 for (var repDay in res) {
                     mega.buinsessAccount.quotaReport[repDay] = res[repDay];
                 }
+                if (Array.isArray(res) && res.length === 0) {
+                    // Empty result still needs to create an entry to show the graph.
+                    mega.buinsessAccount.quotaReport[ctx.context.dates.fromDate] = Object.create(null);
+                }
 
                 var orderedDates = Object.keys(mega.buinsessAccount.quotaReport);
                 orderedDates.sort();

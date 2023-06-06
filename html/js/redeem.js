@@ -762,9 +762,8 @@ var redeem = {
                 $('.voucher-logo', $dlg).addClass('business-v');
                 $('.plan-icon', $dlg).removeClass('pro1 pro2 pro3 pro4 pro101').addClass('business');
 
-                const titleText = mega.voucher.businessmonths === 12 ? l[23491]
-                    : mega.icu.format(l.month_business_voucher, mega.voucher.businessmonths);
-                $dlgTitle.text(titleText);
+                const titleText = mega.voucher.businessmonths === 12 ? l.account_voucher_year : l.account_voucher_month;
+                $dlgTitle.text(mega.icu.format(titleText, mega.voucher.businessmonths).replace('%1', l[19530]));
                 descText = l.redeem_bus_acc;
 
                 greenBtnText = l[19516];
@@ -776,6 +775,16 @@ var redeem = {
             }
             else {
                 // Pro I-IV and Lite
+                const voucherLength = mega.voucher.months;
+                const voucherType = pro.getProPlanName(mega.voucher.item.al);
+
+                // Calculate whether to use month or year text for the voucher e.g. 1 years or 1 months Pro plan
+                const useYearString = voucherLength % 12 === 0;
+                const titleText = useYearString ? l.account_voucher_year : l.account_voucher_month;
+                const monthsOrYears = useYearString ? voucherLength / 12 : voucherLength;
+
+                $dlgTitle.text(mega.icu.format(titleText, monthsOrYears).replace('%1', voucherType));
+
                 var storageBytes = mega.voucher.storage * 1024 * 1024 * 1024;
                 var storageFormatted = numOfBytes(storageBytes, 0);
                 var storageValue = Math.round(storageFormatted.size) + ' ' + storageFormatted.unit;
@@ -800,8 +809,6 @@ var redeem = {
                 else {
                     $('.voucher-logo', $dlg).removeClass('pro-l');
                 }
-
-                $dlgTitle.text(l[22114]);
 
                 // pro voucher redemption
                 if (u_type === 3) {

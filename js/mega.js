@@ -4323,9 +4323,9 @@ function fm_thumbnails(mode, nodeList, callback)
             treq[0][handle] = data;
 
             delay('fm:thumbnails.requeue', () => {
-                api_getfileattr(treq[0], 0, callback);
+                api_getfileattr(treq[0], 0, callback).catch(dump);
                 treq[0] = {};
-            }, 4321);
+            }, 1e3);
         };
 
         // validate we can render a node

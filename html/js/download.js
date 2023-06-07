@@ -410,6 +410,9 @@ function dl_g(res, ctx) {
             $('.js-default-download, .js-standard-download, .js-megasync-download,' +
                 '.js-resume-download, .js-save-download, .mobile.dl-browser')
                 .rebind('click', (event) => {
+                    if (event.detail > 1) {
+                        return false;
+                    }
 
                     $('.download.progress-bar').width('0%');
                     $('.open-in-folder').addClass('hidden');

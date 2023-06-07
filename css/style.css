@@ -11443,7 +11443,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     height: 160px;
     border-radius: 8px;
     transition: 0.1s;
-    overflow: hidden;
 }
 
 .user-management-subuser-profile-container .subaccount-img-big .avatar-wrapper.small-rounded-avatar {

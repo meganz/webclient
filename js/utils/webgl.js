@@ -199,7 +199,7 @@ class MEGAImageElement {
 
         const convertImage = () => {
             if (d) {
-                console.log(`${filename} has no thumbnail, converting whole image...`);
+                this.debug(`${filename} has no thumbnail, converting whole image...`);
                 console.time('dcraw-conv');
             }
 
@@ -361,7 +361,7 @@ class MEGAImageElement {
 
                     default:
                         if (self.d) {
-                            dump('Unrecognized image format.', dv);
+                            this.debug('Unrecognized image format.', dv);
                         }
                         res.format = 'UNK';
                 }
@@ -407,7 +407,7 @@ class MEGAImageElement {
         const exif = EXIF.readFromArrayBuffer(buffer, true);
 
         if (self.d) {
-            console.debug('readEXIFMetaData', exif);
+            this.debug('readEXIFMetaData', exif);
             console.timeEnd('exif');
         }
         return tag ? exif[tag] : exif;
@@ -447,7 +447,7 @@ class MEGAImageElement {
             const bitmap = await createImageBitmap(source)
                 .catch(ex => {
                     if (self.d) {
-                        dump(`Failed to create ImageBitmap from ${source[Symbol.toStringTag]}...`, ex, source);
+                        this.debug(`Failed to create ImageBitmap from ${source[Symbol.toStringTag]}...`, ex, source);
                     }
                 });
 
@@ -497,6 +497,14 @@ class MEGAImageElement {
         return exifImageRotation(source, rv);
     }
 
+    debug(m, ...args) {
+        if (!this.pid) {
+            this.pid = `${this[Symbol.toStringTag]}:${Math.random().toString(36).slice(-7).toUpperCase()}`;
+        }
+
+        return self.dump(`[${this.pid}] ${m}`, ...args);
+    }
+
     assert(expr, message) {
         if (!expr) {
             throw new MEGAException(message || 'Failed assertion.');
@@ -505,6 +513,10 @@ class MEGAImageElement {
 
     getError() {
         return 0;
+    }
+
+    getErrorString(code) {
+        return String(code);
     }
 
     tryCatch(cb, onerror) {
@@ -548,9 +560,10 @@ class MEGACanvasElement extends MEGAImageElement {
             options = ctx;
             ctx = '2d';
         }
-        // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=801176
-        if (self.supOffscreenCanvas) {
-            this.ctx = new OffscreenCanvas(width, height).getContext(ctx, options || undefined);
+
+        if (self.supOffscreenCanvas > 1 || self.supOffscreenCanvas && ctx === '2d') {
+
+            this.ctx = this.getRenderingContext(new OffscreenCanvas(width, height), ctx, options);
         }
         else {
             if (typeof document === 'undefined') {
@@ -560,12 +573,31 @@ class MEGACanvasElement extends MEGAImageElement {
             canvas.width = width;
             canvas.height = height;
 
-            this.ctx = canvas.getContext(ctx, options);
+            this.ctx = this.getRenderingContext(canvas, ctx, options);
         }
 
         this.faced = null;
         this.bitmaprenderer = null;
         this.renderingContextType = this.ctx && (ctx === 'webgl2' ? 'webgl' : ctx) || null;
+
+        /** @property MEGACanvasElement.engine */
+        lazy(this, 'engine', () => {
+            let res = 'Unknown';
+
+            if (self.isWorkerScope) {
+                res = self.engine;
+            }
+            else if (self.ua && self.ua.details) {
+                res = self.ua.details.engine;
+            }
+            else if ('mozInnerScreenX' in self) {
+                res = 'Gecko';
+            }
+            else if (self.d) {
+                self.dump(`Unknown engine.`);
+            }
+            return res;
+        });
     }
 
     get [Symbol.toStringTag]() {
@@ -604,6 +636,22 @@ class MEGACanvasElement extends MEGAImageElement {
     getDrawingContext(width, height) {
         this.viewport(width, height);
         return this;
+    }
+
+    getRenderingContext(canvas, type, options, rec) {
+        let ctx = null;
+
+        if (options && typeof options === 'object') {
+            ctx = this.tryCatch(() => canvas.getContext(type, options))();
+
+            if (!ctx && !rec) {
+                const opt = {...options};
+                delete opt.willReadFrequently;
+                return this.getRenderingContext(canvas, type, Object.keys(opt).length && opt, 1);
+            }
+        }
+
+        return ctx || canvas.getContext(type);
     }
 
     async getIntrinsicImage(source, maxSize = 2160) {
@@ -651,8 +699,7 @@ class MEGACanvasElement extends MEGAImageElement {
     }
 
     isTainted(aImageData) {
-        aImageData = aImageData || this.getImageData(0, 0, 0, 0, false);
-        const {data, width} = aImageData;
+        const {data, width, height} = aImageData || this.getImageData(0, 0, 0, 0, false);
         let result = true;
 
         let len = data.byteLength;
@@ -663,7 +710,7 @@ class MEGACanvasElement extends MEGAImageElement {
             }
         }
 
-        if (!result && width > 7 && data.byteLength > 32) {
+        if (!result && width > 7 && data.byteLength > 63) {
             // Detect randomness pattern used by Firefox..
             const fv2 = (v) => Math.floor(v / 4) << 2;
             const u32 = new Uint32Array(data.buffer.slice(0, fv2(data.byteLength)));
@@ -671,6 +718,12 @@ class MEGACanvasElement extends MEGAImageElement {
 
             const cmp = (i) => {
                 let l = wl4;
+                let j = l;
+                while (!(u32[i] === u32[0] && u32[i + 1] === u32[1]) && --j) {
+                    if (u32.length < ++i + l) {
+                        return false;
+                    }
+                }
                 while (l--) {
                     if (u32[l] !== u32[i + l]) {
                         return true;
@@ -679,15 +732,39 @@ class MEGACanvasElement extends MEGAImageElement {
                 return false;
             };
 
-            let i = width;
-            while (i < u32.length) {
-                if (cmp(i)) {
+            let solid = true;
+            for (let i = width << 3, p = data.length - i, ed = 0; i > 4;) {
+                ed += Math.pow(data[i - 4] - data[p], 2)
+                    + Math.pow(data[i - 3] - data[p + 1], 2)
+                    + Math.pow(data[i - 2] - data[p + 2], 2);
+
+                if (Math.sqrt(ed) > 9) {
+                    solid = false;
                     break;
                 }
-                i += width;
+
+                i -= 4;
+                p += 4;
             }
 
-            result = i >= u32.length;
+            if (!solid) {
+
+                let i = width;
+                while (i < u32.length) {
+                    if (cmp(i)) {
+                        break;
+                    }
+                    i += width;
+                }
+
+                result = i >= u32.length;
+            }
+        }
+
+        if (self.d > 2 && result) {
+            this.debug('isTainted?', result, width, height, [data], new Uint32Array(data.buffer));
+
+            // webgl.putImageDataIntoTerminal(aImageData);
         }
 
         return result;
@@ -727,7 +804,7 @@ class MEGACanvasElement extends MEGAImageElement {
         if (ratio > 1) {
             maxHeight = maxWidth *= ratio;// Math.max(1, ratio >> 1);
             if (self.d) {
-                dump('ratio', ratio, {maxWidth, maxHeight}, source.width, source.height);
+                this.debug('ratio', ratio, {maxWidth, maxHeight}, source.width, source.height);
             }
         }
 
@@ -741,7 +818,7 @@ class MEGACanvasElement extends MEGAImageElement {
             sh = Math.min(sh + (cy << 1), source.height - sy);
 
             if (self.d) {
-                dump('scale', {sx, sy, sw, sh}, cx, cy);
+                this.debug('scale', {sx, sy, sw, sh}, cx, cy);
             }
             scale = 1 / sc(sw, sx, 1 / (sw / maxWidth), source.width);
             fscale = 1 / sc(sh, sy, 1 / (sh / maxHeight), source.height);
@@ -790,7 +867,7 @@ class MEGACanvasElement extends MEGAImageElement {
             }
 
             if (self.d) {
-                dump(`maxWH of ${maxWidth}px changed to ${targetSize}px for ${sw}x${sh} image.`);
+                this.debug(`maxWH of ${maxWidth}px changed to ${targetSize}px for ${sw}x${sh} image.`);
             }
 
             maxWidth = maxHeight = targetSize;
@@ -835,7 +912,7 @@ class MEGACanvasElement extends MEGAImageElement {
                     }
 
                     if (self.d) {
-                        dump('FACEdS', faces, {sx, sy, sw, sh}, source);
+                        this.debug('FACEdS', faces, {sx, sy, sw, sh}, source);
                     }
 
                     if (sx | sy | sw | sh) {
@@ -843,7 +920,7 @@ class MEGACanvasElement extends MEGAImageElement {
                             this.getScaledCropArea(source, sx, sy, sw - sx, sh - sy, maxWidth, maxHeight);
 
                         if (self.d) {
-                            dump('FACEdSr', {sx, sy, sw, sh});
+                            this.debug('FACEdSr', {sx, sy, sw, sh});
                         }
                         return {sx, sy, sw, sh};
                     }
@@ -1002,7 +1079,7 @@ class MEGACanvasElement extends MEGAImageElement {
             return this.resample(image, dw, dh, type, quality);
         }
         else*/ if (self.d > 1) {
-            dump(
+            this.debug(
                 `Creating ${dw}x${dh} image using ${this.renderingContextType}...`,
                 {sx, sy, sw, sh}, {dx, dy, dw, dh}, source
             );
@@ -1062,7 +1139,22 @@ class MEGACanvasElement extends MEGAImageElement {
             sh = image.height;
         }
 
-        return this._drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh, type, quality);
+        return this._drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh, type, quality)
+            .catch((ex) => {
+
+                if (this instanceof WebGLMEGAContext) {
+                    if (self.d) {
+                        const error = typeof ex === 'number' ? `${this.getErrorString(ex)} (${ex})` : ex;
+
+                        this.debug(`WebGL Error: ${error}, trying to fall back to canvas...`);
+                    }
+
+                    type = type === 'thumb' ? 'broken' : type;
+                    return new MEGACanvasElement()._drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh, type, quality);
+                }
+
+                throw ex;
+            });
     }
 
     async _drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh, type, quality = MEGAImageElement.DEFAULT_QUALITY) {
@@ -1119,7 +1211,7 @@ class MEGACanvasElement extends MEGAImageElement {
 
         const data = this.getImageData(0, 0, 0, 0, false);
         if (this.isTainted(data)) {
-            throw new MEGAException('The image is tainted!', 'SecurityError');
+            throw new MEGAException('The image is tainted!', {data, ctx: this}, 'SecurityError');
         }
 
         if (type === 'broken') {
@@ -1128,7 +1220,17 @@ class MEGACanvasElement extends MEGAImageElement {
         else if (type === 'thumb') {
             type = this.isTransparent(data) ? MEGAImageElement.ALPHA_FORMAT : MEGAImageElement.THUMBNAIL_TYPE;
         }
-        return this.convertToBlob(type, quality);
+        const blob = await this.convertToBlob(type, quality);
+
+        if (this.engine === 'Gecko' && !this.postTaintedChecked) {
+            const t = this.isTainted(await this.createImage(blob, 0, 0, 'imaged'));
+            if (t) {
+                throw new MEGAException('The image is tainted', this, 'SecurityError');
+            }
+            this.postTaintedChecked = 1;
+        }
+
+        return blob;
     }
 
     convertToBlob(type, quality) {
@@ -1163,7 +1265,7 @@ class MEGACanvasElement extends MEGAImageElement {
 
                 if (format === 'TIFF' || format === 'UNK') {
                     if (self.d) {
-                        dump(`Attempting to decode RAW image...`);
+                        this.debug(`Attempting to decode RAW image...`, format);
                     }
                     const image = this.decodeRAWImage('raw', await this.readAsArrayBuffer(data)).data;
 
@@ -1184,19 +1286,51 @@ class MEGACanvasElement extends MEGAImageElement {
         return data;
     }
 
+    async createPattern(image, repetition) {
+        const source = await this.getCanvasImageSource(image);
+
+        // Safari may unexpectedly throw a mysterious 'Type error', e.g., by providing an ImageBitmap
+        // eslint-disable-next-line local-rules/hints -- @todo https://bugs.webkit.org/show_bug.cgi?id=149986
+        try {
+            return this.ctx.createPattern(source, repetition);
+        }
+        catch (ex) {
+            if (!self.supImageBitmap || !(source instanceof ImageBitmap)) {
+
+                this.debug('Unexpected createPattern() failure...', ex);
+            }
+            else {
+                image = await this.createImage(source);
+                return this.ctx.createPattern(await this.loadImage(image), repetition);
+            }
+
+            throw ex;
+        }
+    }
+
     async createImage(data, width = 27, height = 31, type = 'image/webp', quality = 1) {
         if (data === 'pattern') {
             const patterns = [];
             const bw = width / 4 | 0;
-            const bh = height / 6 | 0;
+            const bh = height / 4 | 0;
             const canvas = new MEGACanvasElement(width, height);
+            const safari = window.safari && new Uint32Array(width * height);
             for (let x = bw; x--;) {
-                const source = await canvas.getCanvasImageSource(this.createImageData(mega.getRandomValues(4), 1, 1));
-                patterns.push(canvas.ctx.createPattern(source, 'repeat'));
+                let source = this.createImageData(mega.getRandomValues(4), 1, 1);
+                if (safari) {
+                    safari.fill(new Uint32Array(source.data.buffer)[0]);
+                    source = this.createImageData(safari.buffer, width, height);
+                }
+
+                const pattern = await canvas.createPattern(source, 'repeat').catch(nop);
+                if (pattern && patterns.push(pattern) > 15) {
+                    break;
+                }
             }
-            for (let x = bh, sy = 0; x--;) {
-                for (let i = bw, sx = 0; i--;) {
-                    canvas.ctx.fillStyle = patterns[Math.random() * patterns.length | 0];
+            const n = patterns.length >> 2;
+            for (let x = n, sy = 0; x--;) {
+                for (let i = n, sx = 0; i--;) {
+                    canvas.ctx.fillStyle = patterns.pop();
                     canvas.ctx.fillRect(sx, sy, bw, bh);
                     sx += bw;
                 }
@@ -1207,7 +1341,6 @@ class MEGACanvasElement extends MEGAImageElement {
         else if (typeof data === 'number') {
             const pixel = (data < 0x100 ? data << 24 | data >> 4 << 16 | (data & 15) << 8 | 0xff : data) >>> 0;
             data = new Uint32Array(width * height).fill(pixel);
-            data[width - 1] = pixel >>> 16; // anti tainted watermark
             data = this.createImageData(data.buffer, width, height);
             if (self.d > 1) {
                 console.debug('createImage, %s (0x%s)', pixel >>> 0, pixel.toString(16), pixel >>> 16, data);
@@ -1257,7 +1390,50 @@ class WebGLMEGAContext extends MEGACanvasElement {
         });
 
         const gl = this.ctx;
-        if (gl && (this.program = this.createProgram(gl))) {
+        if (gl) {
+            this.setupWebGLContext(gl);
+        }
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'WebGLMEGAContext';
+    }
+
+    setupWebGLContext(gl) {
+        const {canvas} = gl;
+
+        if (self.d > 1) {
+            this.debug('Setting up new WebGL context...', [this]);
+        }
+
+        this.onContextLost = tryCatch((ev) => {
+            ev.preventDefault();
+
+            this.cleanup();
+            this.didLoseContext = true;
+            this.debug('context lost.');
+
+            setTimeout(() => this.restoreContext(), 300);
+        });
+
+        this.onContextRestore = tryCatch(() => {
+            this.debug('context restored.');
+
+            this.initWebGLContext(gl);
+        });
+
+        canvas.addEventListener('webglcontextlost', this.onContextLost, false);
+        canvas.addEventListener('webglcontextrestored', this.onContextRestore, false);
+
+        this.glLoseExtension = gl.getExtension('WEBGL_lose_context');
+
+        return this.initWebGLContext(gl);
+    }
+
+    initWebGLContext(gl) {
+        this.didLoseContext = false;
+
+        if ((this.program = this.createProgram(gl))) {
             this.loc = {
                 position: gl.getAttribLocation(this.program, "a_position"),
                 texcoord: gl.getAttribLocation(this.program, "a_texcoord"),
@@ -1270,13 +1446,26 @@ class WebGLMEGAContext extends MEGACanvasElement {
         this.ready = false;
     }
 
-    get [Symbol.toStringTag]() {
-        return 'WebGLMEGAContext';
+    restoreContext() {
+        if (this.gl.isContextLost() && this.glLoseExtension) {
+
+            this.glLoseExtension.restoreContext();
+        }
+    }
+
+    cleanup() {
+        if (this.program) {
+            if (this.gl) {
+                this.gl.deleteProgram(this.program);
+            }
+            this.program = null;
+        }
+        this.ready = false;
     }
 
     getDrawingContext(width, height) {
         let ctx = this.ctx && this;
-        if (!ctx) {
+        if (!ctx || ctx.gl.isContextLost()) {
             // WebGL2 is not available.
             ctx = new MEGACanvasElement(width, height, '2d');
         }
@@ -1318,9 +1507,10 @@ class WebGLMEGAContext extends MEGACanvasElement {
         this.attachShader(gl, program, gl.FRAGMENT_SHADER, fragmentSource);
 
         gl.linkProgram(program);
+        gl.validateProgram(program);
 
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-            console.error('Cannot create program.', gl.getProgramInfoLog(program));
+            this.debug('Error linking program.', gl.getProgramInfoLog(program));
             gl.deleteProgram(program);
             return null;
         }
@@ -1405,7 +1595,29 @@ class WebGLMEGAContext extends MEGACanvasElement {
     }
 
     getError() {
-        return this.gl.getError();
+        const rc = this.gl.getError();
+        const LOST = WebGL2RenderingContext.CONTEXT_LOST_WEBGL;
+
+        if (rc === LOST && !this.didLoseContext) {
+            this.didLoseContext = true;
+            queueMicrotask(() => this.cleanup());
+        }
+
+        return rc || this.didLoseContext && LOST;
+    }
+
+    getErrorString(code) {
+        if (!WebGLMEGAContext.glContextErrorMap) {
+            WebGLMEGAContext.glContextErrorMap = Object.keys(WebGL2RenderingContext)
+                .reduce((o, p) => {
+                    const n = WebGL2RenderingContext[p];
+                    if (typeof n === 'number') {
+                        o[n] = p;
+                    }
+                    return o;
+                }, Object.create(null));
+        }
+        return WebGLMEGAContext.glContextErrorMap[code | 0] || 'Unknown error';
     }
 
     clearRect(sx, sy, sw, sh) {
@@ -1419,7 +1631,6 @@ class WebGLMEGAContext extends MEGACanvasElement {
         const {gl, program, ready} = this;
         if (!ready) {
             if (!program) {
-                // @todo shall we gracefully fallback to getDrawingContext(?)
                 throw new MEGAException('WebGL2 cannot be used.');
             }
             this.ready = true;
@@ -1434,32 +1645,20 @@ class WebGLMEGAContext extends MEGACanvasElement {
         gl.flush();
 
         let error = this.getError();
-        let result = !error && type && await this.convertTo(type, quality);
+        let result = false;
+
+        if (!error && type) {
+            result = await this.convertTo(type, quality)
+                .catch((ex) => {
+                    error = ex;
+                });
+        }
 
         gl.deleteBuffer(b1);
         gl.deleteBuffer(b2);
 
         if (error) {
-            error = `WebGL Error: ${error}`;
-            if (self.d) {
-                dump(error, '--- Trying to fallback to canvas...');
-            }
-
-            type = type === 'thumb' ? 'broken' : type;
-            result = await new MEGACanvasElement()
-                ._drawImage(image, sx, sy, sw, sh, dx, dy, dw, dh, type, quality)
-                .then((res) => {
-                    if (self.d) {
-                        dump('Falling back succeed!', res);
-                    }
-                    return res;
-                })
-                .catch(ex => {
-                    if (self.d) {
-                        dump('Falling back failed...', ex);
-                    }
-                    throw new MEGAException(error);
-                });
+            throw error;
         }
 
         return result;
@@ -1545,6 +1744,24 @@ class MEGAWorker extends Array {
 
     get busy() {
         return this.running.size || this.pending.length;
+    }
+
+    get stats() {
+        const res = [
+            this.running.size,
+            this.pending.length,
+            this.wkCompletedJobs,
+            this.wkDisposalThreshold,
+            Object.isFrozen(this) | 0
+        ];
+
+        for (let i = this.length; i--;) {
+            const {wkc, jobs} = this[i];
+
+            res.push([wkc, jobs]);
+        }
+
+        return res;
     }
 
     kill(error, payloads, freeze) {
@@ -1831,6 +2048,9 @@ class MEGAWorkerController {
         }
 
         let result = await this.branches[branch].queue(command, payload).catch(echo);
+        if (result === 'unstable') {
+            this.branches[branch] = result = null;
+        }
         if (!this.catchFailure(result)) {
             if (self.d) {
                 dump('Worker failed, falling back to main thread..', command, result);
@@ -1952,13 +2172,23 @@ if (self.isWorkerScope) {
 lazy(self, 'isWebGLSupported', () => {
     let result = false;
     if (typeof WebGL2RenderingContext !== 'undefined') {
-        const {ctx} = new MEGACanvasElement(1, 1, 'webgl2', {antialias: true});
-        if (ctx instanceof WebGL2RenderingContext) {
-            if (typeof ctx.getContextAttributes === 'function') {
-                result = ctx.getContextAttributes().antialias === true;
+        tryCatch(() => {
+            const {ctx} = new MEGACanvasElement(1, 1, 'webgl2', {antialias: true});
+
+            if (ctx instanceof WebGL2RenderingContext) {
+
+                if (typeof ctx.getContextAttributes === 'function') {
+                    result = ctx.getContextAttributes().antialias === true;
+                }
+
+                tryCatch(() => {
+                    const glCtx = ctx.getExtension('WEBGL_lose_context');
+                    if (glCtx) {
+                        glCtx.loseContext();
+                    }
+                })();
             }
-            ctx.getExtension('WEBGL_lose_context').loseContext();
-        }
+        })();
     }
     return result;
 });
@@ -1973,13 +2203,14 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
 ((self) => {
     'use strict';
     let waiter = false;
+    const stats = [[]];
     const debug = self.d > 0 ? self.d : self.is_karma || self.location.host !== 'mega.nz';
 
     const dump = (() => {
         if (!self.isWorkerScope) {
             return (m, ...a) => console.warn(`[webgl] ${m}`, ...a);
         }
-        const pid = `${Math.random().toString(26).slice(-6)}-${self.location.href.split('/').pop()}`;
+        const pid = `${Math.random().toString(26).slice(-6)}-${self.location.href.split('/').pop().slice(-17)}`;
         const rgb = [
             `color:#${((r) => (r() << 16 | r() << 8 | r()).toString(16))(() => ~~(Math.random() * 0x9f + 96))}`,
             'color:inherit'
@@ -1988,12 +2219,24 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
     })();
 
     if (self.OffscreenCanvas) {
+        // @todo https://bugs.webkit.org/show_bug.cgi?id=183720
         // @todo https://bugzilla.mozilla.org/show_bug.cgi?id=801176
-        tryCatch(() => {
-            self.supOffscreenCanvas = Boolean(new self.OffscreenCanvas(1, 1).getContext('2d'));
+        const res = tryCatch(() => {
+            let value = Boolean(new self.OffscreenCanvas(1, 1).getContext('2d'));
+
+            if (typeof WebGL2RenderingContext !== 'undefined') {
+                const ctx = new self.OffscreenCanvas(1, 1).getContext('webgl2');
+
+                if (ctx instanceof WebGL2RenderingContext) {
+
+                    value = 2;
+                }
+            }
+            return value;
         }, (ex) => {
             dump('This browser does lack proper OffscreenCanvas support.', [ex]);
         })();
+        Object.defineProperty(self, 'supOffscreenCanvas', {value: res | 0});
     }
 
     if (!self.isWorkerScope && self.ImageBitmap && typeof createImageBitmap === 'function') {
@@ -2104,7 +2347,7 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
      */
     lazy(self, 'webgl', () => {
         const props = lazy(Object.create(null), 'canUseWorker', () => {
-            return !self.isWorkerScope && self.supOffscreenCanvas && self.supImageBitmap;
+            return !self.isWorkerScope && self.supOffscreenCanvas > 1 && self.supImageBitmap;
         });
         const MEGARenderingContext = self.isWebGLSupported ? WebGLMEGAContext : MEGACanvasElement;
         const webgl = new MEGARenderingContext();
@@ -2140,7 +2383,12 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
          */
         lazy(webgl, 'worker', () => {
             const parity = lazy(Object.create(null), 'worker', () => {
-                const data = {d: debug, supImageBitmap: !!self.supImageBitmap, apipath};
+                const data = {
+                    apipath,
+                    d: debug,
+                    supImageBitmap: !!self.supImageBitmap,
+                    engine: self.ua && self.ua.details.engine
+                };
                 return new MEGAWorkerController(gMessageHandler, props.canUseWorker ? data : false);
             });
             const wrap = (method) => {
@@ -2156,6 +2404,21 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
             }
 
             Object.defineProperties(handler, {
+                stats: {
+                    get() {
+                        const res = [...stats];
+                        const {branches} = parity.worker;
+
+                        if (branches.main) {
+                            res.push(branches.main.stats);
+                        }
+
+                        res[0] = res[0].join('');
+                        res.push($.len(branches));
+
+                        return res;
+                    }
+                },
                 attach: {
                     value: wrap('attach')
                 },
@@ -2170,6 +2433,7 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
             const res = [];
             const colors = [];
             const check = (feat, msg) => {
+                stats[0].push((self[feat] && (self[feat] | 0 || 1)) | 0);
                 res.push(`%c${msg || feat} ${self[feat] ? "\u2714" : "\u2716"}`);
                 colors.push(self[feat] ? 'color:#0f0' : 'color:#f00', 'color:inherit');
                 MEGACanvasElement.sup |= self[feat] && MEGACanvasElement[`SUPPORT_${(msg || feat).toUpperCase()}`];
@@ -2216,8 +2480,16 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
                 else {
                     let ua = '';
                     if (self.ua) {
-                        const {engine, browser, version} = self.ua.details;
-                        ua = `${browser}${parseInt(version)}/${engine} `;
+                        const oss = {
+                            'Windows': 'x',
+                            'Apple': 'y',
+                            'Linux': 'z',
+                            'Android': 'a',
+                            'iPhone': 'b',
+                            'iPad': 'c'
+                        };
+                        const {engine, browser, version, os} = self.ua.details;
+                        ua = `${browser}${parseInt(version)}${oss[os] || '!'}${engine} `;
                     }
                     dump(`${ua}components support:  ${res.join('%c   ')}`, ...colors.slice(0, -1));
                 }
@@ -2228,7 +2500,22 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
             });
         })();
 
-        return webgl;
+        return Object.defineProperties(webgl, {
+            sendTimeoutError: {
+                value() {
+                    const {gLastError: ex, worker: {stats}} = this;
+                    const payload = JSON.stringify([
+                        1,
+                        buildVersion.version || 'dev',
+                        stats,
+                        String(ex && ex.message || ex || 'na').split('\n')[0].substr(0, 98)
+                    ]);
+
+                    dump(payload);
+                    return eventlog(99829, payload, true);
+                }
+            }
+        });
     });
 
     if (self.isWorkerScope) {
@@ -2307,7 +2594,7 @@ Object.defineProperties(MEGACanvasElement, {
             width: MEGAImageElement.THUMBNAIL_SIZE,
             height: MEGAImageElement.THUMBNAIL_SIZE,
             canvasFactory(width, height) {
-                return new MEGACanvasElement(width, height).ctx.canvas;
+                return new MEGACanvasElement(width, height, {willReadFrequently: true}).ctx.canvas;
             },
             get resampleWithImageBitmap() {
                 return webgl.doesSupport('BitmapOptions');

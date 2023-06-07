@@ -94,12 +94,33 @@ describe("webgl.js test", function() {
         }
     };
 
+    const getReadFrequentlyCanvasElement = (width = 1, height = 1, options = false) => {
+        // Multiple read-back operations using getImageData are faster with the willReadFrequently attribute set.
+        return new MEGACanvasElement(width, height, '2d', {...options, willReadFrequently: true});
+    };
+
+    /**
+     * When privacy.resistFingerprinting.randomDataOnCanvasExtract is true, tries to generate random
+     * canvas data by sampling 32 bytes and then repeating those bytes many times to fill the buffer.
+     * If this fails, returns all-white, opaque pixel data.
+     */
+    const generatePlaceholderCanvasData = (width, height) => {
+        const buf = new Uint8ClampedArray(4 * width * height);
+        const rnd = crypto.getRandomValues(new Uint32Array(8));
+
+        for (let i = 0; i < buf.byteLength; i += rnd.byteLength) {
+            buf.set(new Uint8Array(rnd.buffer, 0, Math.min(buf.byteLength - i, rnd.byteLength)), i);
+        }
+
+        return webgl.createImageData(buf, width, height);
+    };
+
     const doWebGLAndCanvasTest = (name, test) => {
         if (self.isWebGLSupported) {
             it(`${name} (WebGL)`, async() => test(webgl));
         }
 
-        const canvas = new MEGACanvasElement();
+        const canvas = getReadFrequentlyCanvasElement();
         it(`${name} (Canvas)`, async() => test(canvas));
     };
 
@@ -223,8 +244,20 @@ describe("webgl.js test", function() {
         chai.expect(image.width).to.eql(8);
         chai.expect(image.height).to.eql(2);
 
-        const imageData = await webgl.drawImage(image, 0, 0, image.width, image.height, 'imaged');
+        let imageData = await webgl.drawImage(image, 0, 0, image.width, image.height, 'imaged');
         chai.expect(webgl.isTainted(imageData)).to.eql(true);
+
+        for (let i = 353; i < 5e3; i <<= 1) {
+            imageData = generatePlaceholderCanvasData(i, i / 1.777 | 0);
+            chai.expect(webgl.isTainted(imageData)).to.eql(true);
+
+            // we shall not detect images with a single color as tainted (except pure black/white)
+            imageData.data.fill(Math.min(0xFE, 0x3F | imageData.data[Math.random() * imageData.data.byteLength | 0]));
+            chai.expect(webgl.isTainted(imageData)).to.eql(false);
+
+            new Uint32Array(imageData.data.buffer).fill(2929824849);
+            chai.expect(webgl.isTainted(imageData)).to.eql(false);
+        }
     });
 
     it('can work with WebGLMEGAContext even if WebGL is not supported', async() => {
@@ -248,22 +281,89 @@ describe("webgl.js test", function() {
 
         const gl = new WebGLMEGAContext();
         return gl.drawImage(image, 0, 0, image.width, image.height)
-            .then(() => {
-                throw new MEGAException('Invalid path.');
-            })
-            .catch((res) => {
-                chai.expect(res).to.be.instanceOf(Error);
-                chai.expect(res.message).to.be.eql('WebGL2 cannot be used.');
+            .then((res) => {
+                chai.expect(res).to.be.eql(false);
 
                 const ctx = gl.getDrawingContext(image.width, image.height);
-                return ctx.drawImage(image, 0, 0, image.width, image.height, 'buffer', 'image/jpeg')
-                    .then((jpeg) => {
-                        chai.expect(jpeg).to.be.instanceOf(ArrayBuffer);
-                        chai.expect(jpeg.byteLength).to.be.lessThan(900);
-                        chai.expect(jpeg.byteLength).to.be.greaterThan(600);
-                        chai.expect(webgl.identify(jpeg).format).to.eql('JPEG');
-                    });
+                return ctx.drawImage(image, 0, 0, image.width, image.height, 'buffer', 'image/jpeg');
+            })
+            .then((jpeg) => {
+                chai.expect(jpeg).to.be.instanceOf(ArrayBuffer);
+                chai.expect(jpeg.byteLength).to.be.lessThan(900);
+                chai.expect(jpeg.byteLength).to.be.greaterThan(600);
+                chai.expect(webgl.identify(jpeg).format).to.eql('JPEG');
             });
+    });
+
+    it('can restore lost WebGL context', async() => {
+        if (!webgl.doesSupport('webgl2')) {
+            if (!self.is_karma) {
+                throw new MEGAException('WebGL is not supported', 'NotSupportedError');
+            }
+            return;
+        }
+
+        const gl = new WebGLMEGAContext();
+        const ext = gl.ctx.getExtension('WEBGL_lose_context');
+        if (!ext) {
+            if (!self.is_karma) {
+                throw new MEGAException('WEBGL_lose_context is not supported', 'NotSupportedError');
+            }
+            return;
+        }
+        await tSleep(1 / 10);
+
+        const contextLost = new Promise((resolve) => {
+            gl.ctx.canvas.addEventListener('webglcontextlost', resolve);
+        });
+        const restoreContext = new Promise((resolve) => {
+            gl.ctx.canvas.addEventListener('webglcontextrestored', resolve);
+        });
+        ext.loseContext();
+
+        // If the WebGL context is lost, this error is returned on the first call to getError.
+        // Afterward and until the context has been restored, it returns gl.NO_ERROR.
+        expect(gl.getError()).to.eql(WebGL2RenderingContext.CONTEXT_LOST_WEBGL);
+        expect(gl.ctx.isContextLost()).to.eql(true);
+
+        // ensure didLoseContext is set.
+        await contextLost;
+
+        expect(gl.ready).to.eql(false);
+        expect(gl.program).to.eql(null);
+        expect(gl.didLoseContext).to.eql(true);
+
+        // we must always give a usable drawing context no matter what.
+        expect(gl.getDrawingContext(1, 1).renderingContextType).to.eql('2d');
+        expect(gl.getDrawingContext(1, 1)).to.be.instanceOf(MEGACanvasElement);
+
+        // at this point, we must fall back to canvas, being our-getError() consistently returning CONTEXT_LOST_WEBGL
+        expect(gl.getErrorString(gl.getError())).to.eql(`CONTEXT_LOST_WEBGL`);
+        expect(gl.getError()).to.eql(WebGL2RenderingContext.CONTEXT_LOST_WEBGL);
+
+        const image = await gl.loadImage(samplePNGImage);
+        const imageData = await gl.drawImage(image, 0, 0, image.width, image.height, 'imaged');
+
+        // if CONTEXT_LOST_WEBGL wasn't returned there, this would be detected as tainted.
+        expect(gl.isTainted(imageData)).to.eql(false);
+
+        const data = new Uint32Array(imageData.data.buffer);
+        expect(data[0]).to.eql(0xe000ffff);
+        expect(data[2]).to.eql(0x80000000);
+        expect(data[1] >>> 16).to.eql(0xc000);
+
+        await restoreContext;
+        expect(gl.ctx.isContextLost()).to.eql(false);
+
+        // this same instance must be reusable normally again.
+        expect(gl.getDrawingContext(1, 1)).to.eql(gl);
+        expect(gl.getDrawingContext(1, 1)).to.be.instanceOf(WebGLMEGAContext);
+        expect(gl.program).to.be.instanceOf(WebGLProgram);
+
+        const blob = await gl.drawImage(image, 0, 0, image.width, image.height, 'image/jpeg');
+        chai.expect(blob).to.be.instanceOf(Blob);
+        chai.expect(blob.size).to.be.greaterThan(600);
+        chai.expect(blob.type).to.be.eql('image/jpeg');
     });
 
     it('can decode TIFF Images', async() => {
@@ -396,7 +496,7 @@ describe("webgl.js test", function() {
             await test(gWebGLContext);
         }
 
-        const gCanvasContext = new MEGACanvasElement();
+        const gCanvasContext = getReadFrequentlyCanvasElement();
         return test(gCanvasContext);
     });
 
@@ -788,6 +888,7 @@ describe("webgl.js test", function() {
         blob.name = `${h}.jpg`;
 
         const store = {};
+        const opi = window.previewimg;
         window.previewimg = (h, buffer) => store[h] = buffer;
 
         return createthumbnail(blob, !1, h, !1, h)
@@ -805,6 +906,9 @@ describe("webgl.js test", function() {
                 chai.expect(preview.height).to.eql(600);
                 chai.expect(thumbnail.width).to.eql(MEGAImageElement.THUMBNAIL_SIZE);
                 chai.expect(thumbnail.height).to.eql(MEGAImageElement.THUMBNAIL_SIZE);
+            })
+            .finally(() => {
+                window.previewimg = opi;
             });
     });
 });

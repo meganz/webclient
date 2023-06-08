@@ -2152,21 +2152,12 @@ accountUI.plan = {
 
                 // Init section scrolling
                 if (this.$formContent.is('.ps')) {
-                    Ps.update(this.$formContent[0]);
-                }
-                else {
-                    Ps.initialize(this.$formContent[0]);
-                }
-
-                // Init focus textarea if "Other" option is selected (and make it empty)
-                if ($('input.radioOn', this.$options).val() === "8") {
-                    this.$invalidDetailsDialog.addClass('hidden');
-                    this.$cancelReason.removeClass('error');
-                    this.$formContent.scrollTop(this.$formContent.height());
-                    this.$textarea.trigger('focus').val('');
+                    this.$formContent.scrollTop(0);
+                    Ps.destroy(this.$formContent[0]);
                 }
 
                 // Init functionality
+                this.resetCancelSubscriptionForm();
                 this.checkReasonEnteredIsValid();
                 this.initClickReason();
                 this.initCloseAndDontCancelButtons();
@@ -2175,6 +2166,23 @@ accountUI.plan = {
                     const $buttonClicked = $(e.currentTarget);
                     this.sendSubCancelRequestToApi($buttonClicked.hasClass('skip-cancel-subscription'));
                 });
+            },
+
+            /**
+             * Reset the form incase the user changes their mind and closes it,
+             * so they always see a blank form if they choose to cancel their subscription again
+             */
+            resetCancelSubscriptionForm: function() {
+
+                'use strict';
+
+                this.$selectReasonDialog.addClass('hidden');
+                this.$invalidDetailsDialog.addClass('hidden');
+                this.$textareaAndErrorDialog.addClass('hidden');
+                this.$dialog.removeClass('textbox-open');
+                this.$cancelReason.removeClass('error');
+                this.$textarea.val('');
+                $('.cancel-option', this.$options).addClass('radioOff').removeClass('radioOn');
             },
 
             /**
@@ -2213,6 +2221,7 @@ accountUI.plan = {
                     this.$dialog.toggleClass('textbox-open', valueIsOtherOption);
 
                     if (valueIsOtherOption) {
+                        Ps.initialize(this.$formContent[0]);
                         this.$invalidDetailsDialog.toggleClass('hidden', !(this.$cancelReason.hasClass('error')));
 
                         this.$formContent.scrollTop(this.$formContent.height());
@@ -2222,7 +2231,6 @@ accountUI.plan = {
                         if (this.$formContent.is('.ps')) {
                             this.$formContent.scrollTop(0);
                             Ps.destroy(this.$formContent[0]);
-                            Ps.initialize(this.$formContent[0]);
                         }
 
                         this.$invalidDetailsDialog.addClass('hidden');
@@ -2301,7 +2309,7 @@ accountUI.plan = {
             sendSubCancelRequestToApi: function(skippedReason) {
                 'use strict';
 
-                var reason = '';
+                var reason = 'No reason (user skipped the survey)';
 
                 if (!skippedReason) {
                     const $optionSelected = $('.cancel-option.radioOn', this.$options);

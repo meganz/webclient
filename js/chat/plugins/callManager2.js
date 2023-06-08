@@ -409,7 +409,7 @@
 // SfuClient.IClientEventListener interface
         onServerError(errCode) {
             console.error('onServerError:', errCode);
-            if (errCode === SfuClient.TermCode.kErrorProtocolVersion) {
+            if (errCode === SfuClient.TermCode.kErrProtocolVersion) {
                 return is_extension ?
                     // `An update is available`, `MEGA Chat has been upgraded and it will now only be supported in...`
                     msgDialog('warningb', l[1900], l[8841]) :

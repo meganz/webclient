@@ -60,7 +60,7 @@ var TermCode;
     TermCode[TermCode["kErrAuth"] = 130] = "kErrAuth";
     TermCode[TermCode["kErrApiTimeout"] = 131] = "kErrApiTimeout";
     TermCode[TermCode["kErrSdp"] = 132] = "kErrSdp";
-    TermCode[TermCode["kErrorProtocolVersion"] = 133] = "kErrorProtocolVersion";
+    TermCode[TermCode["kErrProtocolVersion"] = 133] = "kErrProtocolVersion";
     TermCode[TermCode["kErrCrypto"] = 134] = "kErrCrypto";
     TermCode[TermCode["kErrClientGeneral"] = 190] = "kErrClientGeneral";
     TermCode[TermCode["kErrSfuGeneral"] = 191] = "kErrSfuGeneral";
@@ -923,7 +923,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '9620630f93';
+const COMMIT_ID = 'c1bf5411a4';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts

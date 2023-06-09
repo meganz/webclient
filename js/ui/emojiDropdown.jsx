@@ -38,14 +38,14 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             'rolling_eyes',
             'stuck_out_tongue',
             'smiling_face_with_3_hearts',
+            'heart_eyes',
             'kissing_heart',
             'sob',
-            'mask',
-            'eyes',
+            'pleading_face',
             'thumbsup',
             'pray',
             'wave',
-            'white_check_mark',
+            'fire',
             'sparkles',
         ];
         this.heightDefs = {

@@ -3201,7 +3201,7 @@ function loadSubPage(tpage, event) {
         // clear the flag if navigating to an static page..
         M.chat = tpage.substr(0, 2) === 'fm';
         if (!M.chat) {
-            megaChat.cleanup();
+            megaChat.cleanup(true);
         }
     }
 

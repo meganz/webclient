@@ -296,9 +296,7 @@ i.text-color-medium {
 .opacity-50 {
     opacity: 0.5;
 }
-.pointer-events-none {
-    pointer-events: none;
-}
+
 @keyframes dialogpopin
 {
     from {

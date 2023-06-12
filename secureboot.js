@@ -2938,7 +2938,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/ui/mcomponents.css', n: 'm_components_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/ui/mcomponents/classes/MComponent.js', n: 'm_component_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MButton.js', n: 'm_button_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MCheckbox.js', n: 'm_checkbox_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MContextMenu.js', n: 'm_context_menu_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MDialog.js', n: 'm_dialog_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MEmptyPad.js', n: 'm_empty_pad_js', j:1});

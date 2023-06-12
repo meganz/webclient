@@ -615,6 +615,13 @@
 .gallery-tabs-bl .gallery-section-title .sprite-fm-mono.icon-favourite-filled {
     --mask-color: var(--secondary-red);
 }
+.m-menu-select .remember-location-pref > span {
+    font: var(--text-body1);
+}
+.m-menu-select .remember-location-pref .checkdiv {
+    -webkit-margin-end: 0;
+    margin-inline-end: 0;
+}
 .gallery-view .data-block-fav-icon {
     display: none;
 }

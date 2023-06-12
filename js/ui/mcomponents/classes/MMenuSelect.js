@@ -2,12 +2,14 @@ class MMenuSelect extends MContextMenu {
     /**
      * @param {HTMLElement|String?} parent Parent element to attach the menu to
      * @param {String[]} additionalItemClasses Additional classes to use for all items enclosed
+     * @param {Boolean} [autoDismiss] Whether to close the popup on option click or not
      */
-    constructor(parent, additionalItemClasses) {
+    constructor(parent, additionalItemClasses, autoDismiss = true) {
         super(parent);
 
         this.el.classList.add('m-menu-select');
         this.additionalItemClasses = additionalItemClasses;
+        this.autoDismiss = autoDismiss;
     }
 
     get options() {
@@ -16,9 +18,10 @@ class MMenuSelect extends MContextMenu {
 
     /**
      * @param {Object[]} list Options to work with
-     * @param {String} list[].label Label of the option
+     * @param {String|function(): String|HTMLElement} list[].label Label of the option
      * @param {Function} list[].click A specific behaviour when option is clicked
      * @param {Boolean} list[].selected Checking if the option is selected initially
+     * @param {Boolean} list[].selectable Checking if the option is actually selectable
      * @param {Boolean} list[].icon Icon on the left for the item
      * @param {Boolean} list[].iconRight Icon on the right for the item
      * @param {String[]} list[].classes Additional classes for a single option
@@ -39,6 +42,7 @@ class MMenuSelect extends MContextMenu {
                 label,
                 click,
                 selected,
+                selectable,
                 icon,
                 iconRight,
                 classes,
@@ -56,8 +60,6 @@ class MMenuSelect extends MContextMenu {
                 this.el.append(section);
             }
 
-            const isSelected = selected === true;
-
             const itemClasses = [];
 
             if (this.additionalItemClasses) {
@@ -71,7 +73,8 @@ class MMenuSelect extends MContextMenu {
             const item = new MMenuSelectItem({
                 label,
                 selectFn: typeof click === 'function' ? (item) => this.onItemSelect(i, item, click) : null,
-                selected: isSelected,
+                selected,
+                selectable,
                 leftIcon: icon,
                 rightIcon: iconRight,
                 additionalClasses: itemClasses,
@@ -80,7 +83,7 @@ class MMenuSelect extends MContextMenu {
 
             this._options.push(item);
 
-            if (isSelected) {
+            if (selected === true) {
                 this.selectedIndex = i;
             }
 
@@ -106,7 +109,10 @@ class MMenuSelect extends MContextMenu {
         }
 
         this.selectedIndex = index;
-        this.hide(true);
+
+        if (this.autoDismiss) {
+            this.hide(true);
+        }
 
         if (typeof clickFn === 'function') {
             clickFn();

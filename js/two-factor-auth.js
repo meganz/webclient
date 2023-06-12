@@ -261,7 +261,9 @@ twofactor.loginDialog = {
 
         // Close the modal dialog
         $dialog.addClass('hidden');
-        fm_hideoverlay();
+        if (!($.dialog && $.dialog === 'pro-login-dialog')) {
+            fm_hideoverlay();
+        }
     }
 };
 

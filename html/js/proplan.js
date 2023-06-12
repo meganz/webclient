@@ -1583,6 +1583,7 @@ function completeProLogin(result) {
         }
     }
     else {
+        fm_showoverlay();
         $emailField.megaInputsShowError();
         $passwordField.megaInputsShowError(l[7431]);
 

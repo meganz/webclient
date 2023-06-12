@@ -210,9 +210,8 @@ function dashboardUI(updProcess) {
                 }
             }
 
-            // If Business or Pro Flexi expired status
-            if ((u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) ||
-                (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)) {
+            // If active/grace/expired Business or Pro Flexi expired status
+            if ((u_attr.b) || (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)) {
 
                 // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
                 $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();

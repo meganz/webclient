@@ -2,7 +2,7 @@ class MMenuSelectItem extends MComponent {
     /**
      * Creating the menu item
      * @param {Object.<String, any>} props Item Options
-     * @param {String|function(): String|HTMLElement} props.label Main item text
+     * @param {String} props.label Main item text
      * @param {Function} props.selectFn Callback to trigger when the item is clicked
      * @param {Boolean} props.selected Whether to render the item as selected from the beginning or not
      * @param {String} props.leftIcon Icon on the left of the text
@@ -14,15 +14,12 @@ class MMenuSelectItem extends MComponent {
         label,
         selectFn,
         selected,
-        selectable,
         leftIcon,
         rightIcon,
         additionalClasses,
         children
     }) {
         super();
-
-        this.selectable = selectable === true;
 
         // This is a clickable item
         if (typeof selectFn === 'function') {
@@ -42,21 +39,8 @@ class MMenuSelectItem extends MComponent {
         }
 
         const labelDiv = document.createElement('div');
-        labelDiv.className = 'flex flex-1 text-ellipsis';
-
-        if (label) {
-            if (typeof label === 'function') {
-                label = label();
-            }
-
-            if (label instanceof HTMLElement) {
-                labelDiv.appendChild(label);
-            }
-            else if (typeof label === 'string') {
-                labelDiv.textContent = label;
-            }
-        }
-
+        labelDiv.className = 'flex flex-1 text-ellipsis mr-4';
+        labelDiv.textContent = label;
         this.el.append(labelDiv);
 
         if (leftIcon) {
@@ -67,11 +51,8 @@ class MMenuSelectItem extends MComponent {
             this.addRightIcon(leftIcon);
         }
 
-        if (selected === true) {
+        if (selected) {
             this.selectItem();
-        }
-        else if (this.selectable) {
-            this.deselectItem();
         }
 
         if (Array.isArray(children) && children.length) {
@@ -119,33 +100,11 @@ class MMenuSelectItem extends MComponent {
         this.el.setAttribute('class', 'flex flex-row items-center');
     }
 
-    createCheck() {
-        if (!this.checkEl) {
-            this.checkEl = document.createElement('div');
-            this.el.prepend(this.checkEl);
-        }
-    }
-
-    removeCheck() {
-        if (this.checkEl) {
-            this.el.removeChild(this.checkEl);
-            delete this.checkEl;
-        }
-    }
-
     selectItem() {
-        this.createCheck();
-        this.checkEl.className = 'radioOn';
-    }
+        this.checkEl = document.createElement('i');
+        this.checkEl.setAttribute('class', 'sprite-fm-uni icon-check-circle');
 
-    deselectItem() {
-        if (this.selectable) {
-            this.createCheck();
-            this.checkEl.className = 'radioOff';
-        }
-        else {
-            this.removeCheck();
-        }
+        this.el.append(this.checkEl);
     }
 
     addLeftIcon(icon) {
@@ -162,8 +121,20 @@ class MMenuSelectItem extends MComponent {
         this.el.append(i);
     }
 
+    removeCheck() {
+        if (this.checkEl) {
+            this.el.removeChild(this.checkEl);
+            delete this.checkEl;
+        }
+    }
+
+    deselectItem() {
+        this.removeCheck();
+    }
+
     remove() {
         this.disposeEvent('pointerenter');
+        this.removeCheck();
         this.detachEl();
     }
 }

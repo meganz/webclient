@@ -14,7 +14,7 @@ class MComponent {
 
         if (parent) {
             if (appendToParent) {
-                parent.append(this.el);
+                parent.appendChild(this.el);
             }
 
             this._parent = parent;
@@ -79,6 +79,12 @@ class MComponent {
         $(this.el).off('dialog-closed.mDialog');
 
         delete this.el;
+    }
+
+    appendCss(classes) {
+        if (classes) {
+            this.el.classList.add(...classes.split(' '));
+        }
     }
 
     /**

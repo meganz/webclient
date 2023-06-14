@@ -4,7 +4,7 @@
 /******/ 	"use strict";
 /******/ 	// The require scope
 /******/ 	var __webpack_require__ = {};
-/******/
+/******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
@@ -17,12 +17,12 @@
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 
@@ -923,7 +923,7 @@ SvcDriver.TxQuality = [
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'c1bf5411a4';
+const COMMIT_ID = '1c16eb99e3';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -935,11 +935,6 @@ const COMMIT_ID = 'c1bf5411a4';
 
 
 const client_kLogTag = "sfuClient:";
-function client_assert(cond) {
-    if (!cond) {
-        throw new Error("Assertion failed");
-    }
-}
 var SpeakerState;
 (function (SpeakerState) {
     SpeakerState[SpeakerState["kNoSpeaker"] = 0] = "kNoSpeaker";
@@ -1006,7 +1001,7 @@ class SfuClient {
         if (!window.nacl) {
             throw new Error("Nacl library not present in global namespace");
         }
-        client_assert(options);
+        this.assert(options);
         this.userId = userId;
         this.app = app;
         this._reqBarrier = new RequestBarrier;
@@ -1031,12 +1026,22 @@ class SfuClient {
     }
     logError(...args) {
         console.error.apply(console, args);
-        let msg = args.join(' ');
+        this.remoteLogError(args.join(' '));
+    }
+    remoteLogError(msg) {
         let url = `${SfuClient.kStatServerUrl}/msglog?userid=${this.userId}&t=e`;
         if (this.callId) {
             url += `&callid=${this.callId}`;
         }
         fetch(url, { method: "POST", body: msg });
+    }
+    assert(cond) {
+        if (cond) {
+            return;
+        }
+        const ex = new Error("Assertion failed");
+        this.remoteLogError(ex.stack);
+        throw ex;
     }
     onCryptoWorkerEvent(event) {
         let msg = event.data;
@@ -1205,7 +1210,7 @@ class SfuClient {
     */
     async newKeyImmediate() {
         let key = this.currKey = await this.generateKey();
-        client_assert(!this.keySetPromise); // previous calls must await for completion as well, which deletes the promise
+        this.assert(!this.keySetPromise); // previous calls must await for completion as well, which deletes the promise
         let pms = this.keySetPromise = createPromiseWithResolveMethods();
         pms.keyId = key.id;
         this.cryptoWorker.postMessage(['ek', key.id, key.keyObj, true]);
@@ -1249,7 +1254,7 @@ class SfuClient {
         });
     }
     setCallKey(key) {
-        client_assert(key);
+        this.assert(key);
         var callKey = key instanceof ArrayBuffer ?
             new Uint32Array(key) :
             new Uint32Array(hexToBin(key).buffer);
@@ -1257,14 +1262,14 @@ class SfuClient {
             this.logError("Invalid format of call key: length is not 16 bytes");
             return;
         }
-        client_assert(callKey.length === 4);
+        this.assert(callKey.length === 4);
         this.callKey = callKey;
     }
     xorWithCallKeyIfNeeded(key) {
         if (!this.callKey) {
             return;
         }
-        client_assert(key.byteLength === 16);
+        this.assert(key.byteLength === 16);
         let arr = new Uint32Array(key);
         let callKey = this.callKey;
         arr[0] ^= callKey[0];
@@ -1309,7 +1314,7 @@ class SfuClient {
             return;
         }
         const keyId = msg.id;
-        client_assert(!isNaN(keyId) && (keyId >= 0) && (keyId < 256));
+        this.assert(!isNaN(keyId) && (keyId >= 0) && (keyId < 256));
         const key = await peer.decryptKey(msg.key);
         this.xorWithCallKeyIfNeeded(key);
         this.cryptoWorker.postMessage(['dk', msg.from, keyId, key]);
@@ -1327,8 +1332,8 @@ class SfuClient {
     }
     connect(url, callId, config) {
         url = this.url = this.addVersionToUrl(url);
-        client_assert(callId);
-        client_assert(config);
+        this.assert(callId);
+        this.assert(config);
         this.callId = callId;
         this.callConfig = config;
         this._joinRetries = 0;
@@ -1336,8 +1341,8 @@ class SfuClient {
         this.doConnect(this.url);
     }
     reconnect() {
-        client_assert(!this._forcedDisconnect);
-        client_assert(this.url);
+        this.assert(!this._forcedDisconnect);
+        this.assert(this.url);
         let url = this.url;
         if (!isNaN(this.cid)) {
             url += "&cid=" + this.cid;
@@ -1394,7 +1399,7 @@ class SfuClient {
             } while (0);
             if (track.kind === "video") {
                 if (!slot) {
-                    client_assert(xponder.direction === "recvonly");
+                    this.assert(xponder.direction === "recvonly");
                     slot = new VideoSlot(this, xponder);
                     slot.createDecryptor();
                 }
@@ -1402,9 +1407,9 @@ class SfuClient {
                 this.inVideoTracks.set(slot.mid, slot);
             }
             else {
-                client_assert(track.kind === "audio");
+                this.assert(track.kind === "audio");
                 if (!slot) {
-                    client_assert(xponder.direction === "recvonly");
+                    this.assert(xponder.direction === "recvonly");
                     slot = new Slot(this, xponder);
                     slot.createDecryptor();
                 }
@@ -1534,8 +1539,8 @@ class SfuClient {
         this._fire("onConnected");
     }
     msgHello(msg) {
-        client_assert(msg.cid);
-        client_assert(msg.na);
+        this.assert(msg.cid);
+        this.assert(msg.na);
         this.cid = msg.cid;
         this.numInputAudioTracks = msg.na;
         if (msg.mods) {
@@ -1595,7 +1600,7 @@ class SfuClient {
         let options = this.options;
         this._speakerState = (options && options.moderator && options.speak) ? SpeakerState.kPending : SpeakerState.kNoSpeaker;
         await this._updateSentTracks(); // at this point we are not sending anything: no key should be sent out
-        client_assert(this.sentAv === 0);
+        this.assert(this.sentAv === 0);
         let offerCmd = {
             a: "JOIN",
             sdp: sdp,
@@ -1624,14 +1629,14 @@ class SfuClient {
         // the rest 4 bytes are the first from the hi-res video track IV
         const first = this.outVThumbTrack.iv;
         const second = this.outVSpeakerTrack.iv;
-        client_assert(first.length === 8 && second.length === 8);
+        this.assert(first.length === 8 && second.length === 8);
         const arr = new Uint8Array(12);
         arr.set(first);
         arr.set(second.subarray(0, 4), 8);
         return arr;
     }
     async generateSessionKeyPair() {
-        client_assert(this.cid);
+        this.assert(this.cid);
         const tsStart = Date.now();
         const keyPair = window.nacl.box.keyPair();
         this.privSessKey = keyPair.secretKey;
@@ -2056,7 +2061,7 @@ class SfuClient {
             if (!this._onHold) {
                 return;
             }
-            client_assert(this._availAv & Av.onHold);
+            this.assert(this._availAv & Av.onHold);
             let oh = this._onHold;
             this._muteCamera = oh.muteCamera;
             this._muteAudio = oh.muteAudio;
@@ -2194,7 +2199,7 @@ class SfuClient {
         }
     }
     processInputQueue() {
-        client_assert(this.inputPacketQueue);
+        this.assert(this.inputPacketQueue);
         for (;;) {
             let msg = this.inputPacketQueue.shift();
             if (!msg) {
@@ -2220,7 +2225,7 @@ class SfuClient {
     }
     async msgAnswer(msg) {
         this.inputPacketQueue = [];
-        client_assert(msg.cid);
+        this.assert(msg.cid);
         this.assignCid(msg.cid);
         if (msg.mods) {
             this.moderators = new Set(msg.mods);
@@ -2295,7 +2300,7 @@ class SfuClient {
                 height = SfuClient.kVideoCaptureOptions.height;
             }
         }
-        client_assert(height);
+        this.assert(height);
         let scale = height / SfuClient.kVthumbHeight;
         this.outVThumbTrack.setEncoderParams((params) => {
             params.scaleResolutionDownBy = scale;
@@ -2440,7 +2445,7 @@ class SfuClient {
         this._fire("onNoSpeaker");
     }
     addPeerSpeaker(cid) {
-        client_assert(cid !== this.cid);
+        this.assert(cid !== this.cid);
         let peer = this.peers.get(cid);
         if (!peer) {
             this.logError("addPeerSpeaker: Unknown cid", cid);
@@ -2530,7 +2535,7 @@ class SfuClient {
     }
     msgAv(msg) {
         let cid = msg.cid;
-        client_assert(cid);
+        this.assert(cid);
         if (cid === this.cid) {
             do {
                 if (window.d) {
@@ -2569,7 +2574,7 @@ class SfuClient {
         }
     }
     msgModAdd(msg) {
-        client_assert(msg.user);
+        this.assert(msg.user);
         if (!this.moderators) {
             this.logError("BUG: msgModAdd: moderators list does not exist, creating it");
             this.moderators = new Set();
@@ -2578,7 +2583,7 @@ class SfuClient {
         this._fire("onModeratorAdd", msg.user);
     }
     msgModDel(msg) {
-        client_assert(msg.user);
+        this.assert(msg.user);
         if (!this.moderators) {
             this.logError("BUG: msgModDel: moderators list does not exist");
         }
@@ -2602,8 +2607,8 @@ class SfuClient {
         this._fire("wrOnUserDump", users);
     }
     msgWrEnter(msg) {
-        client_assert(msg.users);
-        client_assert(this.waitingRoomUsers);
+        this.assert(msg.users);
+        this.assert(this.waitingRoomUsers);
         const users = msg.users;
         for (let userId in users) {
             this.waitingRoomUsers.set(userId, users[userId]);
@@ -2611,13 +2616,13 @@ class SfuClient {
         this._fire("wrOnUsersEntered", users);
     }
     msgWrLeave(msg) {
-        client_assert(msg.user);
-        client_assert(this.waitingRoomUsers);
+        this.assert(msg.user);
+        this.assert(this.waitingRoomUsers);
         this.waitingRoomUsers.delete(msg.user);
         this._fire("wrOnUserLeft", msg.user);
     }
     wrSetUserPermissions(users, allow) {
-        client_assert(this.waitingRoomUsers);
+        this.assert(this.waitingRoomUsers);
         for (let userId of users) {
             this.waitingRoomUsers.set(userId, allow);
         }
@@ -2634,7 +2639,7 @@ class SfuClient {
     }
     // Waiting room greeting - allow or deny call access
     msgWrAllow(msg) {
-        client_assert(msg.cid);
+        this.assert(msg.cid);
         if (this._connState !== ConnState.kInWaitingRoom) {
             return;
         }
@@ -2658,18 +2663,18 @@ class SfuClient {
     // ====
     msgBye(msg) {
         if (msg.wr) { // pushed from call to waiting room
-            client_assert(this._callJoinPermission || this._callJoinPermission === 0);
+            this.assert(this._callJoinPermission || this._callJoinPermission === 0);
             do {
                 if (window.d) {
                     console.warn(client_kLogTag, "Leaving call and entering waiting room");
                 }
             } while (0);
-            this.leaveCall(msg.trsn, ConnState.kInWaitingRoom);
+            this.leaveCall(msg.rsn, ConnState.kInWaitingRoom);
             this.reinit();
             this._fire("wrOnPushedFromCall");
         }
         else { // completely disconnected
-            this.disconnect(msg.trsn, false);
+            this.disconnect(msg.rsn, false);
         }
     }
     handleDeny(msg) {
@@ -3099,9 +3104,7 @@ class VideoSlot extends Slot {
         this.isVideo = true;
     }
     reassignV(peer, iv, isHiRes, trackReused, releaseCb) {
-        if (peer !== this.peer || !trackReused) {
-            this.release();
-        }
+        this.release();
         this.isHiRes = isHiRes;
         this._releaseTrackCb = releaseCb;
         super.reassign(peer, iv);
@@ -3160,10 +3163,13 @@ class VideoSlot extends Slot {
             for (const player of this.players) {
                 player._onTrackGone(this);
             }
-            if (this.players.size) {
-                console.error("Soft assert: not all players destroyed");
+            // NOTE: We may already be destroyed via onTrackGone()
+            if (this.players) {
+                if (this.players.size) {
+                    this.client.logError("Soft assert: not all players destroyed, remaining:", this.players.size);
+                }
+                delete this.players;
             }
-            delete this.players;
         }
         this.active = false;
     }
@@ -3174,7 +3180,7 @@ class VideoSlot extends Slot {
     }
     /** Called by video players when they are detached */
     _onPlayerDetached(player) {
-        client_assert(this.players);
+        this.client.assert(this.players);
         if (!this.players.has(player)) {
             do {
                 if (window.d) {
@@ -3187,8 +3193,8 @@ class VideoSlot extends Slot {
         // LOGW(`slot ${this.isHiRes ? "hires":"lores"} detach from player -> refcnt =`, this.players.size);
         if (this.players.size === 1) {
             this.active = false;
-            delete this.players;
             this._releaseTrackCb();
+            delete this.players;
             if (this.isHiRes) {
                 this.client._numRxHiRes--;
             }
@@ -3237,9 +3243,10 @@ class VideoPlayer {
         return this.slot ? this.slot.inTrack : null;
     }
     _attachToTrack(slot) {
-        client_assert(slot);
-        client_assert(slot.players);
-        if (this.players !== slot.players) {
+        const client = this.peer.client;
+        client.assert(slot);
+        client.assert(slot.players);
+        if (this.players && this.players !== slot.players) {
             this.players.delete(this);
         }
         this.players = slot.players;
@@ -3267,7 +3274,7 @@ class VideoPlayer {
         slot._onPlayerAttached(this);
     }
     _onTrackGone(slot) {
-        client_assert(slot === this.slot);
+        this.peer.client.assert(slot === this.slot);
         this.destroy(); //TODO: Maybe not destroy even if track is gone
     }
     _detachFromCurrentTrack() {
@@ -3377,9 +3384,9 @@ class Peer {
         this.hiResPlayers = new Set();
         this.hiResDivider = 0;
         this.audioPktLoss = 0;
-        client_assert(info.cid);
-        client_assert(info.userId);
-        client_assert(info.av != null);
+        client.assert(info.cid);
+        client.assert(info.userId);
+        client.assert(!isNaN(info.av));
         this.client = client;
         this.handler = client.app;
         this.cid = info.cid;
@@ -3455,7 +3462,7 @@ class Peer {
                 await sharedKey;
                 sharedKey = this.sessSharedKey;
             }
-            client_assert(sharedKey.usages);
+            this.client.assert(sharedKey.usages);
             let encKeyBin;
             if (this.version === 1) {
                 encKeyBin = await crypto.subtle.encrypt({ name: "AES-GCM", iv: this.client.keyEncryptIv, tagLength: 32 }, sharedKey, key);
@@ -3506,7 +3513,7 @@ class Peer {
                 await sharedKey;
                 sharedKey = this.sessSharedKey;
             }
-            client_assert(sharedKey.usages);
+            this.client.assert(sharedKey.usages);
             return this.version === 1
                 ? crypto.subtle.decrypt({ name: "AES-GCM", iv: this.keyDecryptIv, tagLength: 32 }, sharedKey, base64DecodeToArr(key).buffer)
                 : crypto.subtle.decrypt({ name: "AES-CBC", iv: SfuClient.kZeroIv128 }, sharedKey, base64DecodeToArr(key).buffer);
@@ -3526,11 +3533,11 @@ class Peer {
         for (const player of this.hiResPlayers) {
             player.destroy();
         }
-        client_assert(!this.hiResPlayers.size);
+        this.client.assert(!this.hiResPlayers.size);
         for (const player of this.vThumbPlayers) {
             player.destroy();
         }
-        client_assert(!this.vThumbPlayers.size);
+        this.client.assert(!this.vThumbPlayers.size);
         this._fire("onPeerLeft", reason);
     }
     get receivingThumbVideo() { return this.vThumbPlayers.size > 0; }
@@ -3584,13 +3591,17 @@ class Peer {
             this.client.logError("Unknown vtrack mid", mid);
             return;
         }
+        // if Peer.vThumbSlot/hiResSlot is set, the slot must have its .players property set as well
         this.vThumbSlot = slot;
         slot.reassignV(this, this.strIvs[TxTrackIndex.kVthumb], false, reused, () => {
-            if (slot === this.vThumbSlot) {
-                delete this.vThumbSlot;
+            if (slot !== this.vThumbSlot) {
+                return;
             }
+            delete this.vThumbSlot;
             this._sendDelVthumbs();
         });
+        // reassignV sets the .players property of the slot
+        this.client.assert(this.vThumbSlot && this.vThumbSlot.players);
     }
     _sendDelHires() {
         if (!this.isLeaving) {
@@ -3609,19 +3620,16 @@ class Peer {
         }
         this.hiResSlot = slot;
         if (this.vThumbSlot === slot) {
-            client_assert(reused);
+            this.client.assert(reused);
         }
         slot.reassignV(this, this.strIvs[TxTrackIndex.kHiRes], true, reused, () => {
-            if (slot === this.hiResSlot) {
-                delete this.hiResSlot;
+            if (slot !== this.hiResSlot) {
+                return;
             }
+            delete this.hiResSlot;
             this._sendDelHires();
-            if (this.vThumbSlot === slot) { // reused for vthumb, re-request vthumb
-                delete this.vThumbSlot;
-                slot.release(); // not strictly needed, but makes things more explicit
-                this.client.send({ a: "GET_VTHUMBS", cids: [this.cid], r: 1 });
-            }
         });
+        this.client.assert(this.hiResSlot && this.hiResSlot.players);
     }
     setHiResDivider(divider) {
         if (divider < 0 || divider > 2) {
@@ -3979,7 +3987,7 @@ class SpeakerDetector {
                     console.warn(client_kLogTag, "Active speaker changed to", peer.userId);
                 }
             } while (0);
-            client_assert(this.client.peers.get(peer.cid));
+            this.client.assert(this.client.peers.get(peer.cid));
             this.client.app.onActiveSpeakerChange(peer, prev);
         }
         else {

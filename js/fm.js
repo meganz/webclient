@@ -2743,10 +2743,6 @@ function closeDialog(ev) {
         return false;
     }
 
-    if (mega.ui.FeedbackDialog._instance) {
-        mega.ui.FeedbackDialog._instance.hide();
-    }
-
     if ($.dialog === 'passwordlink-dialog') {
         if (String(page).substr(0, 2) === 'P!') {
             // do nothing while on the password-link page
@@ -2922,6 +2918,11 @@ function closeDialog(ev) {
         // if the share-add dialog was closed from the share dialog
         // eslint-disable-next-line local-rules/hints
         $.dialog = $.shareDialog;
+    }
+
+    // this will close the FeedbackDialog correctly when clicking back arrow
+    if (mega.ui.FeedbackDialog._instance && mega.ui.FeedbackDialog._instance.visible) {
+        mega.ui.FeedbackDialog._instance.hide();
     }
 
     mBroadcaster.sendMessage('closedialog');

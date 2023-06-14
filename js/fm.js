@@ -2743,6 +2743,10 @@ function closeDialog(ev) {
         return false;
     }
 
+    if (mega.ui.FeedbackDialog._instance) {
+        mega.ui.FeedbackDialog._instance.hide();
+    }
+
     if ($.dialog === 'passwordlink-dialog') {
         if (String(page).substr(0, 2) === 'P!') {
             // do nothing while on the password-link page

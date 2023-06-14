@@ -269,6 +269,7 @@
             }
             // request hi-res stream
             if (this.noVideoSlotsForSmoothSwitch()) { // FIXME: disable this if .presenterVideo ?
+                console.warn("requestHdStream: No free video slots, freeing vthumb one if used");
                 this.delVthumbPlayer();
             }
             this.setResState(RES_STATE.HD_PENDING);
@@ -296,6 +297,7 @@
                 return;
             }
             if (this.noVideoSlotsForSmoothSwitch()) {
+                console.warn("requestThumbStream: No free video slot, freeing hires one if used");
                 peer.stopHiResVideo();
             }
             this.setResState(RES_STATE.THUMB_PENDING);
@@ -409,7 +411,7 @@
 // SfuClient.IClientEventListener interface
         onServerError(errCode) {
             console.error('onServerError:', errCode);
-            if (errCode === SfuClient.TermCode.kErrorProtocolVersion) {
+            if (errCode === SfuClient.TermCode.kErrProtocolVersion) {
                 return is_extension ?
                     // `An update is available`, `MEGA Chat has been upgraded and it will now only be supported in...`
                     msgDialog('warningb', l[1900], l[8841]) :

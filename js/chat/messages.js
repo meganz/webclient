@@ -1120,6 +1120,8 @@ function MessagesBuff(chatRoom, chatdInt) {
                 self.$sharedFilesLoading.resolve();
                 delete self.$sharedFilesLoading;
             }
+            delete self.expectedMessagesCount;
+            delete self.requestedMessagesCount;
         }
         else {
             requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;

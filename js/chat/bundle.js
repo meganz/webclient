@@ -1329,8 +1329,27 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
   checkAndShowStep() {
     this._checkAndShowStep();
   }
-  _checkAndShowStep() {
+  _shouldSkipShow() {
     if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active || u_type < 3 || is_mobile) {
+      return true;
+    }
+    this.$topRightMenu = this.$topRightMenu || $('.top-menu-popup', '#topmenu');
+    if (!this.$topRightMenu.hasClass('o-hidden')) {
+      return true;
+    }
+    this.$topAccDropdown = this.$topAccDropdown || $('.js-dropdown-account', '#topmenu');
+    if (this.$topAccDropdown.hasClass('show')) {
+      return true;
+    }
+    this.$topNotifDropdown = this.$topNotifDropdown || $('.js-dropdown-notification', '#topmenu');
+    if (this.$topNotifDropdown.hasClass('show')) {
+      return true;
+    }
+    this.$searchPanel = this.$searchPanel || $('.search-panel', '.conversationsApp');
+    return this.$searchPanel.hasClass('expanded');
+  }
+  _checkAndShowStep() {
+    if (this._shouldSkipShow()) {
       return;
     }
     const {
@@ -1343,10 +1362,6 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
       chat: obChat
     } = sections;
     if (!obChat) {
-      return;
-    }
-    this.$searchPanel = this.$searchPanel || $('.search-panel', '.conversationsApp');
-    if (this.$searchPanel.hasClass('expanded')) {
       return;
     }
     if (this.state[OBV4_FLAGS.CHAT_FEEDBACK_NEW] !== 1 && this.state[OBV4_FLAGS.CHAT_CONTACT_PANE] === 1) {

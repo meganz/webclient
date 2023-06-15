@@ -252,9 +252,34 @@ class ChatOnboarding {
         this._checkAndShowStep();
     }
 
-    _checkAndShowStep() {
+    _shouldSkipShow() {
         if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active || u_type < 3 || is_mobile) {
             // Invalid state to show or onboarding isn't ready
+            return true;
+        }
+
+        // Specific UI elements that should prevent showing the dialogs.
+        this.$topRightMenu = this.$topRightMenu || $('.top-menu-popup', '#topmenu');
+        if (!this.$topRightMenu.hasClass('o-hidden')) {
+            return true;
+        }
+
+        this.$topAccDropdown = this.$topAccDropdown || $('.js-dropdown-account', '#topmenu');
+        if (this.$topAccDropdown.hasClass('show')) {
+            return true;
+        }
+
+        this.$topNotifDropdown = this.$topNotifDropdown || $('.js-dropdown-notification', '#topmenu');
+        if (this.$topNotifDropdown.hasClass('show')) {
+            return true;
+        }
+
+        this.$searchPanel = this.$searchPanel || $('.search-panel', '.conversationsApp');
+        return this.$searchPanel.hasClass('expanded');
+    }
+
+    _checkAndShowStep() {
+        if (this._shouldSkipShow()) {
             return;
         }
 
@@ -265,11 +290,6 @@ class ChatOnboarding {
 
         const { chat: obChat } = sections;
         if (!obChat) {
-            return;
-        }
-
-        this.$searchPanel = this.$searchPanel || $('.search-panel', '.conversationsApp');
-        if (this.$searchPanel.hasClass('expanded')) {
             return;
         }
 

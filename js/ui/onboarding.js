@@ -1063,8 +1063,10 @@ mBroadcaster.addListener('fm:initialized', () => {
             });
 
             // Drag drop file will close the dialog and continue upload process
-            $('body').rebind('drop.onboarding', () => {
-
+            $('body').rebind('drop.onboarding', (e) => {
+                if (e.originalEvent && $(e.originalEvent.target).parents('.float-video').length) {
+                    return;
+                }
                 __closeDialogAction();
                 this.parentStep.parentSection.hotspotNextStep();
             });

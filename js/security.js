@@ -921,6 +921,7 @@ security.register = {
                 if (result === 0) {
                     security.register.sendAdditionalInformation(firstName, lastName);
                 }
+                security.register.sendEmailRequestParams = false;
 
                 // Run the callback requested by the calling function to show a check email dialog or show error
                 completeCallback(result, firstName, lastName, email);

@@ -232,6 +232,7 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                                 p: node.p,
                                 n: base64urlencode(to8(M.getSafeName(node.name))),
                                 s: node.s,
+                                c: node.hash,
                                 ts: node.mtime || node.ts,
                                 k: a32_to_base64(node.k)
                             });

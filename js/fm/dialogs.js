@@ -1223,6 +1223,9 @@
     global.openCopyDialog = function openCopyDialog(activeTab, onBeforeShown) {
         // Is allowed chats
         if (isUserAllowedToOpenDialogs()) {
+            if ($.dialog === 'onboardingDialog') {
+                closeDialog();
+            }
             M.safeShowDialog('copy', function() {
                 if (typeof activeTab === 'function') {
                     onBeforeShown = activeTab;

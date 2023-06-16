@@ -246,6 +246,9 @@ export default class GenericConversationMessage extends ConversationMessageMixin
     _addToCloudDrive(v, openSendToChat) {
         $.selected = [v.h];
         $.chatAttachmentShare = true;
+        if ($.dialog === 'onboardingDialog') {
+            closeDialog();
+        }
         openSaveToDialog(v, function(node, target) {
             if (Array.isArray(target)) {
                 M.myChatFilesFolder.get(true)

@@ -131,6 +131,10 @@
             versioningFlag = true;
         }
 
+        if ($.dialog === 'onboardingDialog') {
+            closeDialog();
+        }
+
         M.safeShowDialog('properties', function() {
             $.propertiesDialog = 'properties';
 

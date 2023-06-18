@@ -160,7 +160,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
 
         this.doCancelRetry(e, msg);
         chatRoom._sendMessageToTransport(msg)
-            .done(internalId => {
+            .then(internalId => {
                 msg.internalId = internalId;
                 this.safeForceUpdate();
             });

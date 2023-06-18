@@ -24,6 +24,15 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
             if (megaLinkInfo.hadLoaded() === false) {
                 if (megaLinkInfo.startedLoading() === false) {
                     megaLinkInfo.getInfo()
+                        .then(() => {
+                            const { megaLinks } = this.props.message;
+                            const contactLinkHandles = megaLinks
+                                .filter(link => link.is_contactlink)
+                                .map(link => link.info.h);
+                            if (contactLinkHandles.length) {
+                                this.addContactListenerIfMissing(contactLinkHandles);
+                            }
+                        })
                         .always(function() {
                             Soon(function() {
                                 message.trackDataChange();

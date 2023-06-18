@@ -163,7 +163,7 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
     var self = this;
     var user = userId in this.u && this.u[userId] || false;
 
-    if (!user || user.firstName || user.lastName) {
+    if (!user || ((user.firstName || user.lastName) && user.c)) {
         // already loaded.
         return promise ? promise.resolve(user && user.name) : false;
     }
@@ -277,6 +277,8 @@ MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
             // Re-render the content of access list in share dialog to update contacts' latest names
             renderShareDialogAccessList();
         }
+
+        M.u[userId].trackDataChange();
 
         if (promise) {
             promise.resolve(user.name);
@@ -407,7 +409,7 @@ MegaData.prototype.syncContactEmail = function(userHash, promise, forced) {
                 attribCache.removeItem(user.u + "_lastname");
             }
 
-            this.syncUsersFullname(user.u);
+            this.syncUsersFullname(user.u, is_chatlink ? is_chatlink.ph : undefined);
             if (megaChatIsReady && megaChat.plugins.presencedIntegration) {
                 megaChat.plugins.presencedIntegration.eventuallyAddPeer(user.u);
             }

@@ -4,6 +4,9 @@ import {Button} from "../../../ui/buttons.jsx";
 import {DropdownEmojiSelector} from "../../../ui/emojiDropdown.jsx";
 
 class ConversationMessageMixin extends ContactAwareComponent {
+
+    attachRerenderCallbacks  = false;
+
     constructor(props) {
         super(props);
         this.__cmmUpdateTickCount = 0;
@@ -28,7 +31,9 @@ class ConversationMessageMixin extends ContactAwareComponent {
             && msg.isSentOrReceived()
             && !Object.hasOwnProperty.call(msg, 'reacts')) {
 
-            msg.reacts.forceLoad().then(nop).catch(dump.bind(null, 'reactions.load.' + msg.messageId));
+            msg.reacts.forceLoad().then(() => {
+                this.addContactListenerIfMissing(this._reactionContacts());
+            }).catch(dump.bind(null, `reactions.load.${msg.messageId}`));
         }
     }
 
@@ -74,6 +79,17 @@ class ConversationMessageMixin extends ContactAwareComponent {
         this._contactChangeListeners = false;
     }
 
+    _reactionContacts() {
+        const { message } = this.props;
+        const { reacts } = message;
+        const handles = [];
+        const reactions = Object.values(reacts.reactions);
+        for (let i = 0; i < reactions.length; i++) {
+            handles.push(...Object.keys(reactions[i]));
+        }
+        return array.unique(handles);
+    }
+
     addContactListeners() {
         const users = this._contactChangeListeners || [];
         const addUser = (user) => {
@@ -102,6 +118,25 @@ class ConversationMessageMixin extends ContactAwareComponent {
             users[i].addChangeListener(this);
         }
         this._contactChangeListeners = users;
+    }
+
+    addContactListenerIfMissing(contacts) {
+        if (!Array.isArray(contacts)) {
+            contacts = [contacts];
+        }
+        const added = [];
+
+        for (let i = 0; i < contacts.length; i++) {
+            const user = M.u[contacts[i]];
+            if (user && !this._contactChangeListeners.includes(user)) {
+                this._contactChangeListeners.push(user);
+                user.addChangeListener(this);
+                added.push(user.h);
+            }
+        }
+        if (d > 1) {
+            console.warn('%s.addContactListenerIfMissing', this.getReactId(), [this], added);
+        }
     }
 
     handleChangeEvent(x, z, k) {

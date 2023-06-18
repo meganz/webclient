@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../mixins';
 import ModalDialogsUI from '../../../../ui/modalDialogs';
-import { Emoji } from '../../../../ui/utils';
+import { ContactAwareName } from "../../contacts.jsx";
 
 export default class Ephemeral extends MegaRenderMixin {
     static NAMESPACE = 'ephemeral-dialog';
@@ -13,7 +13,6 @@ export default class Ephemeral extends MegaRenderMixin {
     render() {
         const { ephemeralAccounts, onClose } = this.props;
         const ephemeralAccount = ephemeralAccounts && ephemeralAccounts[ephemeralAccounts.length - 1];
-        const ephemeralName = M.getNameByHandle(ephemeralAccount);
 
         return (
             <ModalDialogsUI.ModalDialog
@@ -21,7 +20,10 @@ export default class Ephemeral extends MegaRenderMixin {
                 dialogType="message"
                 icon="sprite-fm-uni icon-info"
                 title={
-                    <Emoji>{ephemeralName}</Emoji>
+                    <ContactAwareName
+                        emoji={true}
+                        contact={M.u[ephemeralAccount]}
+                    />
                 }
                 noCloseOnClickOutside={true}
                 buttons={this.buttons}

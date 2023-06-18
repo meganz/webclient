@@ -88,7 +88,7 @@ class MessageRow extends MegaRenderMixin {
         const { data, matches, room, index, onResultOpen } = this.props;
         const isGroup = room && roomIsGroup(room);
         const contact = room.getParticipantsExceptMe();
-        const summary = data.renderableSummary || room.messagesBuff.getRenderableSummary(data);
+        const summary = room.messagesBuff.getRenderableSummary(data);
 
         return (
             <div
@@ -111,9 +111,11 @@ class MessageRow extends MegaRenderMixin {
                 </div>
                 <div className="user-card">
                     <span className="title">
-                        <ContactAwareName contact={isGroup || M.u[contact]}>
-                            <OFlowEmoji>{room.getRoomTitle()}</OFlowEmoji>
-                        </ContactAwareName>
+                        {
+                            isGroup
+                                ? <OFlowEmoji>{room.getRoomTitle()}</OFlowEmoji>
+                                : <ContactAwareName contact={M.u[contact]} overflow={true} />
+                        }
                     </span>
                     {isGroup ? null : <ContactPresence contact={M.u[contact]}/>}
                     <div className="clear"/>

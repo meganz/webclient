@@ -253,6 +253,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                     self.trigger('onMembersUpdatedUI', eventData);
                 };
 
+                if (is_chatlink) {
+                    megaChat.initContacts([eventData.userId]);
+                }
                 ChatdIntegration._waitForProtocolHandler(self, addParticipant);
                 queuedMembersUpdatedEvent = true;
             }
@@ -318,8 +321,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
      * Manually proxy contact related data change events, for more optimal UI rerendering.
      */
     self.rebind('onMembersUpdatedUI.chatRoomMembersSync', function(e, eventData) {
-        var roomRequiresUpdate = false;
-
         if (eventData.userId === u_handle) {
             self.messagesBuff.joined = true;
             if (eventData.priv === 255 || eventData.priv === -1) {
@@ -332,30 +333,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                     self.setState(ChatRoom.STATE.READY);
                 }
             }
-            roomRequiresUpdate = true;
         }
-        else {
-            var contact = M.u[eventData.userId];
-            if (contact instanceof MegaDataMap) {
-                if (eventData.priv === 255 || eventData.priv === -1) {
-                    if (contact._onMembUpdUIListener) {
-                        contact.removeChangeListener(contact._onMembUpdUIListener);
-                        roomRequiresUpdate = true;
-                    }
-                }
-                else if (!contact._onMembUpdUIListener) {
-                    contact._onMembUpdUIListener = contact.addChangeListener(function() {
-                        self.trackDataChange.apply(self, arguments);
-                    });
-                    roomRequiresUpdate = true;
-                }
-            }
-        }
-
-        if (roomRequiresUpdate) {
-            self.trackDataChange();
-        }
-
+        self.trackDataChange();
     });
 
     self.getParticipantsExceptMe().forEach(function(userHandle) {

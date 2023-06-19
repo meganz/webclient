@@ -441,6 +441,12 @@
                         alert(l[7717]);
                         return;
                     }
+                    if (res === EEXIST) {
+                        $('.reg-resend-email-meg', $dialog).text(l[19562]);
+                        $('input', $dialog).parent().addClass('error');
+                        $('input', $dialog).focus();
+                        return false;
+                    }
                     if (res !== 0) {
                         console.error('sendsignuplink failed', res);
 
@@ -479,6 +485,7 @@
                 // Hide the loading spinner
                 loadingDialog.hide();
 
+                $('.reg-resend-email-meg', $dialog).text(l[1100]);
                 $('input', $dialog).parent().addClass('error');
                 $('input', $dialog).focus();
                 return false;

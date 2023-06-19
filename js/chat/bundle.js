@@ -18730,9 +18730,14 @@ class AltPartsConvMessage extends ConversationMessageMixin {
         className: "message avatar-wrapper small-rounded-avatar"
       });
       var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
-      var text = h === contact.u ? l[23756] : l[8907].replace("%s", `<strong>${megaChat.html(displayName)}</strong>`);
+      const isSelfJoin = h === contact.u;
+      let text = isSelfJoin ? l[23756] : l[8907];
       if (self.props.chatRoom.isMeeting) {
-        text = h === contact.u ? l.meeting_mgmt_user_joined : l.meeting_mgmt_user_added.replace('%s', `<strong>${megaChat.html(displayName)}</strong>`);
+        text = isSelfJoin ? l.meeting_mgmt_user_joined : l.meeting_mgmt_user_added;
+      }
+      text = text.replace('%1', megaChat.html(otherDisplayName));
+      if (!isSelfJoin) {
+        text = text.replace('%2', `<strong>${megaChat.html(displayName)}</strong>`);
       }
       self._ensureNameIsLoaded(otherContact.u);
       messages.push(React.createElement("div", {

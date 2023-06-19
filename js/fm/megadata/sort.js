@@ -345,8 +345,12 @@ MegaData.prototype.sortByOwner = function(d) {
 
         if (typeof usera.name === 'string' && typeof userb.name === 'string') {
 
-            var namea = usera.name === userb.name ? usera.name + a.su : usera.name;
-            var nameb = usera.name === userb.name ? userb.name + b.su : userb.name;
+            // If nickname exist, use nickname for sorting
+            var namea = usera.nickname || usera.name;
+            var nameb = userb.nickname || userb.name;
+
+            namea = namea === nameb ? namea + a.su : namea;
+            nameb = namea === nameb ? nameb + b.su : nameb;
 
             return namea.localeCompare(nameb) * d;
         }

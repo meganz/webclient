@@ -15,7 +15,7 @@ import MeetingsManager from './meetingsManager.jsx';
 import { ChatOnboarding } from "./chatOnboarding.jsx";
 import { inProgressAlert } from "./ui/meetings/call.jsx";
 
-const EMOJI_DATASET_VERSION = 4;
+const EMOJI_DATASET_VERSION = 5;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 
 const LOAD_ORIGINALS = {

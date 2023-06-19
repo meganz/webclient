@@ -28591,7 +28591,7 @@ class DropdownEmojiSelector extends _chat_mixins0__.wl {
     this.data_emojis = null;
     this.data_emojiByCategory = null;
     this.customCategoriesOrder = ["frequently_used", "people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
-    this.frequentlyUsedEmojis = ['slight_smile', 'grinning', 'smile', 'rofl', 'wink', 'yum', 'rolling_eyes', 'stuck_out_tongue', 'smiling_face_with_3_hearts', 'kissing_heart', 'sob', 'mask', 'eyes', 'thumbsup', 'pray', 'wave', 'white_check_mark', 'sparkles'];
+    this.frequentlyUsedEmojis = ['slight_smile', 'grinning', 'smile', 'rofl', 'wink', 'yum', 'rolling_eyes', 'stuck_out_tongue', 'smiling_face_with_3_hearts', 'heart_eyes', 'kissing_heart', 'sob', 'pleading_face', 'thumbsup', 'pray', 'wave', 'fire', 'sparkles'];
     this.heightDefs = {
       'categoryTitleHeight': 55,
       'emojiRowHeight': 35,

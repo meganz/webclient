@@ -1449,7 +1449,7 @@ __webpack_require__(336);
 
 
 
-const EMOJI_DATASET_VERSION = 4;
+const EMOJI_DATASET_VERSION = 5;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 const LOAD_ORIGINALS = {
   'image/gif': 25e6,
@@ -2917,60 +2917,66 @@ Chat.prototype._leaveAllGroupChats = function () {
     });
   });
 };
-Chat.prototype.getEmojiDataSet = function (name) {
-  var self = this;
+Chat.prototype.getEmojiDataSet = async function (name) {
   assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");
-  if (!self._emojiDataLoading) {
-    self._emojiDataLoading = {};
+  if (!this._emojiDataLoading) {
+    this._emojiDataLoading = Object.create(null);
   }
-  if (!self._emojiData) {
-    self._emojiData = {
-      'emojisUtf': {},
-      'emojisSlug': {}
+  if (!this._emojiData) {
+    this._emojiData = {
+      'emojisUtf': Object.create(null),
+      'emojisSlug': Object.create(null)
     };
   }
-  if (self._emojiData[name]) {
-    return MegaPromise.resolve(self._emojiData[name]);
-  } else if (self._emojiDataLoading[name]) {
-    return self._emojiDataLoading[name];
-  } else if (name === "categories") {
-    self._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
-    return MegaPromise.resolve(self._emojiData[name]);
-  } else {
-    var promise = new MegaPromise();
-    self._emojiDataLoading[name] = promise;
-    M.xhr({
-      type: 'json',
-      url: staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json"
-    }).then(function (ev, data) {
-      self._emojiData[name] = data;
-      delete self._emojiDataLoading[name];
-      if (name === "emojis") {
-        self._mapEmojisToAliases();
-      }
-      promise.resolve(data);
-    }).catch(function (ev, error) {
-      if (d) {
-        self.logger.warn('Failed to load emoji data "%s": %s', name, error, [ev]);
-      }
-      delete self._emojiDataLoading[name];
-      promise.reject(error);
-    });
-    return promise;
+  if (this._emojiData[name]) {
+    return this._emojiData[name];
   }
+  if (this._emojiDataLoading[name]) {
+    return this._emojiDataLoading[name];
+  }
+  if (name === "categories") {
+    this._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
+    return this._emojiData[name];
+  }
+  const {
+    promise
+  } = mega;
+  this._emojiDataLoading[name] = promise;
+  M.xhr({
+    type: 'json',
+    url: `${staticpath}js/chat/emojidata/${name}_v${EMOJI_DATASET_VERSION}.json`
+  }).then((ev, data) => {
+    if (!data) {
+      promise.reject(EFAILED);
+      return;
+    }
+    this._emojiData[name] = data;
+    delete this._emojiDataLoading[name];
+    if (name === "emojis") {
+      this._mapEmojisToAliases();
+    }
+    promise.resolve(data);
+  }).catch((ex, error) => {
+    if (d) {
+      this.logger.warn('Failed to load emoji data "%s": %s', name, error, [ex]);
+    }
+    delete this._emojiDataLoading[name];
+    promise.reject(error || ex);
+  });
+  return promise;
 };
 Chat.prototype._mapEmojisToAliases = function () {
-  var self = this;
-  var emojis = self._emojiData.emojis;
-  if (!emojis) {
-    return;
-  }
-  self._emojiData.emojisSlug = {};
-  self._emojiData.emojisUtf = {};
-  for (var i = 0; i < emojis.length; i++) {
-    var emoji = emojis[i];
-    self._emojiData.emojisSlug[emoji.n] = emoji;
-    self._emojiData.emojisUtf[emoji.u] = emoji;
+  const {
+    emojis
+  } = this._emojiData;
+  if (emojis) {
+    this._emojiData.emojisUtf = Object.create(null);
+    this._emojiData.emojisSlug = Object.create(null);
+    for (let i = emojis.length; i--;) {
+      const emoji = emojis[i];
+      this._emojiData.emojisUtf[emoji.u] = emoji;
+      this._emojiData.emojisSlug[emoji.n] = emoji;
+    }
   }
 };
 Chat.prototype.isValidEmojiSlug = function (slug) {
@@ -28693,21 +28699,10 @@ class DropdownEmojiSelector extends _chat_mixins0__.wl {
     if (nextState.isActive === true) {
       var self = this;
       if (nextState.isLoading === true || !self.loadingPromise && (!self.data_categories || !self.data_emojis)) {
-        self.loadingPromise = MegaPromise.allDone([megaChat.getEmojiDataSet('categories').done(function (categories) {
-          self.data_categories = categories;
-        }), megaChat.getEmojiDataSet('emojis').done(function (emojis) {
-          self.data_emojis = emojis;
-        })]).done(function (results) {
-          if (!results[0] || results[0][1] && results[0][1] === "error" || !results[1] || results[1][1] && results[1][1] === "error") {
-            if (d) {
-              console.error("Emoji loading failed.", results);
-            }
-            self.setState({
-              'loadFailed': true,
-              'isLoading': false
-            });
-            return;
-          }
+        const p = [megaChat.getEmojiDataSet('categories'), megaChat.getEmojiDataSet('emojis')];
+        this.loadingPromise = Promise.all(p).then(([categories, emojis]) => {
+          this.data_emojis = emojis;
+          this.data_categories = categories;
           self.data_categories.push('frequently_used');
           self.data_categoriesWithCustomOrder = [];
           self.customCategoriesOrder.forEach(function (catName) {
@@ -28739,19 +28734,26 @@ class DropdownEmojiSelector extends _chat_mixins0__.wl {
           self.setState({
             'isLoading': false
           });
+        }).catch(ex => {
+          if (d) {
+            console.error("Emoji loading failed.", ex);
+          }
+          this.setState({
+            'loadFailed': true,
+            'isLoading': false
+          });
         });
       }
     } else if (nextState.isActive === false) {
-      var self = this;
-      if (self.data_emojis) {
-        self.data_emojis.forEach(function (emoji) {
-          delete emoji.element;
-        });
+      if (this.data_emojis) {
+        for (let i = this.data_emojis.length; i--;) {
+          delete this.data_emojis[i].element;
+        }
       }
-      self.data_emojis = null;
-      self.data_categories = null;
-      self.data_emojiByCategory = null;
-      self.loadingPromise = null;
+      this.data_emojis = null;
+      this.data_categories = null;
+      this.data_emojiByCategory = null;
+      this.loadingPromise = null;
     }
   }
   onSearchChange(e) {

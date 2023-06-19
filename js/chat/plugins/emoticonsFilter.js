@@ -12,12 +12,17 @@ var EmoticonsFilter = function(megaChat) {
     self.map = {};
 
     self.emoticonsLoading = megaChat.getEmojiDataSet('emojis')
-        .done(function(emojis) {
+        .then((emojis) => {
             self.emojis = emojis;
             $.each(emojis, function(k, meta) {
                 self.map[meta.n.toLowerCase()] = meta.u;
             });
+        })
+        .catch(dump)
+        .finally(() => {
+            delete this.emoticonsLoading;
         });
+
     self.reservedEmotions = {};
     self.reservedEmotions["tm"] = '\u2122';
 
@@ -32,19 +37,18 @@ var EmoticonsFilter = function(megaChat) {
     return this;
 };
 
-EmoticonsFilter.prototype.processMessage = function(e, eventData) {
+EmoticonsFilter.prototype.processMessage = async function(e, eventData) {
+    'use strict';
     var self = this;
 
     if (eventData.message.decrypted === false) {
         return;
     }
 
-    if (self.emoticonsLoading.state() === 'pending') {
-        self.emoticonsLoading.done(function() {
-            self.processMessage(e, eventData);
-        });
-        return;
+    if (this.emoticonsLoading) {
+        await this.emoticonsLoading;
     }
+
     // ignore if emoticons are already processed
     if (!eventData.message.processedBy) {
         eventData.message.processedBy = {};
@@ -162,13 +166,12 @@ EmoticonsFilter.prototype.processHtmlMessage = function(messageContents) {
     return messageContents;
 };
 
-EmoticonsFilter.prototype.processOutgoingMessage = function(e, messageObject) {
+EmoticonsFilter.prototype.processOutgoingMessage = async function(e, messageObject) {
+    'use strict';
     var self = this;
-    if (self.emoticonsLoading.state() === 'pending') {
-        self.emoticonsLoading.done(function() {
-            self.processMessage(e, eventData);
-        });
-        return;
+
+    if (this.emoticonsLoading) {
+        await this.emoticonsLoading;
     }
 
     var contents = messageObject.textContents;

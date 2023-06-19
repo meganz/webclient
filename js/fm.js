@@ -3791,6 +3791,10 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
 
                         M.renderMain(true);
                     }
+                    else if (M.c[userid] && M.c[userid][M.currentdirid]) {
+                        $('.shared-details-icon').removeClass('icon-warning-after sprite-fm-uni-after');
+                        $('.' + userid).addClass('verified');
+                    }
 
                     if ($.dialog === 'share') {
 

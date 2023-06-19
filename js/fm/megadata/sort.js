@@ -558,6 +558,7 @@ MegaData.prototype.sortByInteraction = function(d) {
 MegaData.prototype.doSort = function(n, d) {
     "use strict";
     $('.grid-table thead .arrow').removeClass('asc desc');
+    $('.dropdown-section.sort-by .sprite-fm-mono.sort-arrow').removeClass('icon-up icon-down');
     $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
 
     const sortIconClassPrefix = 'icon-';
@@ -577,6 +578,12 @@ MegaData.prototype.doSort = function(n, d) {
     n = String(n).replace(/\W/g, '');
 
     $('.arrow.' + n + ':not(.is-chat)').addClass(arrowDirection);
+    if (n === "name") {
+        $('#name-sort-arrow.sprite-fm-mono.sort-arrow').addClass(sortIconClassPrefix + sortIconAddClass);
+    }
+    else if (n === "label") {
+        $('#label-sort-arrow.sprite-fm-mono.sort-arrow').addClass(sortIconClassPrefix + sortIconAddClass);
+    }
 
     const sortItemPrefix = '.dropdown-item.sort-grid-item.sort-';
     let subMenuSortClass = '';

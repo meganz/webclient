@@ -1415,13 +1415,13 @@ var notify = {
         var handle = notification.data.h;
         var node = M.d[handle] || {};
         var name = (node.name) ? '(' + notify.shortenNodeName(node.name) + ')' : '';
-        var type = (node.t === 0) ? l[5557] : l[5561];
 
         // Takedown notice
         // Your publicly shared %1 (%2) has been taken down.
         if (notification.data.down === 1) {
             header = l[8521];
-            title = l[8522].replace('%1', type).replace('(%2)', name);
+            title = (node.t === 0) ? l.publicly_shared_file_taken_down.replace('(%1)', name)
+                : l.publicly_shared_folder_taken_down.replace('(%1)', name);
             cssClass = 'nt-takedown-notification';
         }
 
@@ -1429,7 +1429,8 @@ var notify = {
         // Your taken down %1 (%2) has been reinstated.
         else if (notification.data.down === 0) {
             header = l[8524];
-            title = l[8523].replace('%1', type).replace('(%2)', name);
+            title = (node.t === 0) ? l.taken_down_file_reinstated.replace('(%1)', name)
+                : l.taken_down_folder_reinstated.replace('(%1)', name);
             cssClass = 'nt-takedown-reinstated-notification';
         }
         else {

@@ -72,7 +72,7 @@ class Group extends MegaRenderMixin {
                                 data-simpletipposition="top"
                                 data-simpletipoffset="5"
                                 data-simpletip-class="theme-dark-forced">
-                                <div className="sprite-fm-mono icon-exclamation-filled" />
+                                <i className="sprite-fm-mono icon-exclamation-filled" />
                             </div>
                         )}
                         <i

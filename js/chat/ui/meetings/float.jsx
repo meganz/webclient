@@ -510,6 +510,8 @@ class Minimized extends MegaRenderMixin {
         const {
             call,
             chatRoom,
+            hasToRenderPermissionsWarning,
+            renderPermissionsWarning,
             resetError,
             onAudioClick,
             onVideoClick,
@@ -594,6 +596,9 @@ class Minimized extends MegaRenderMixin {
                         chatRoom={chatRoom}
                         onScreenSharingClick={onScreenSharingClick}
                         onHoldClick={onHoldClick}
+                        hasToRenderPermissionsWarning={hasToRenderPermissionsWarning}
+                        renderPermissionsWarning={renderPermissionsWarning}
+                        resetError={resetError}
                     />
                     {this.renderPermissionsWarning(Av.Screen)}
                 </div>

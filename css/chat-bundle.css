@@ -842,6 +842,50 @@
   transform: scaleX(-1);
 }
 
+.mega-dialog.meetings-permissions-dialog {
+  /* [...] */
+}
+.mega-dialog.meetings-permissions-dialog .info-container {
+  /* [...] */
+}
+.mega-dialog.meetings-permissions-dialog header {
+  padding-inline-end: 24px;
+}
+.mega-dialog.meetings-permissions-dialog .permissions-warning-cover {
+  padding: 18px 0;
+  width: 100%;
+  height: 280px;
+}
+.mega-dialog.meetings-permissions-dialog .permissions-warning-cover span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+.mega-dialog.meetings-permissions-dialog .permissions-warning-cover span.permissions-mic {
+  background-image: url(../../images/mega/permissions/mic-mac-light.svg);
+}
+body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-cover span.permissions-mic {
+  background-image: url(../../images/mega/permissions/mic-mac-dark.svg);
+}
+.mega-dialog.meetings-permissions-dialog .permissions-warning-cover span.permissions-camera {
+  background-image: url(../../images/mega/permissions/camera-mac-light.svg);
+}
+body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-cover span.permissions-camera {
+  background-image: url(../../images/mega/permissions/camera-mac-dark.svg);
+}
+.mega-dialog.meetings-permissions-dialog .permissions-warning-info {
+  /* [...] */
+}
+.mega-dialog.meetings-permissions-dialog .permissions-warning-info i {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-size: 16px 16px;
+}
+
 .mode {
   float: left;
 }
@@ -1433,9 +1477,6 @@
   top: -1px;
   right: 2px;
 }
-.float-video.minimized .float-video-overlay .float-video-controls .meetings-signal-issue {
-  right: -10px;
-}
 .float-video.minimized .float-video-notifications {
   position: absolute;
   left: 8px;
@@ -1514,7 +1555,6 @@
 }
 .stream-controls .button-group-menu .button-group-item,
 .float-video-controls .button-group-menu .button-group-item {
-  position: relative;
   margin: 0 0 10px 0;
 }
 .stream-controls .button-group .info-indicator,
@@ -1534,24 +1574,35 @@
 .float-video-controls .button-group .info-indicator.warn {
   background: var(--surface-black);
 }
-.stream-controls .button-group .info-indicator.warn div,
-.float-video-controls .button-group .info-indicator.warn div {
+.stream-controls .button-group .info-indicator.warn i,
+.float-video-controls .button-group .info-indicator.warn i {
   --icon-size: 24px;
   --mask-color: var(--secondary-orange);
 }
 
 .meetings-signal-issue {
   position: absolute;
-  right: 1px;
-  bottom: -4px;
+  top: 0;
+  width: 48px;
+  height: 48px;
   border-radius: 200px;
   cursor: pointer;
 }
+.meetings-signal-issue.with-small-area {
+  width: 10px;
+  height: 10px;
+  right: 10px;
+}
 .button-group-item .meetings-signal-issue {
-  bottom: 3px;
-  right: -6px;
+  z-index: 1;
+}
+.button-group-item .meetings-signal-issue i {
+  /* [...] */
 }
 .meetings-signal-issue i {
+  position: absolute;
+  top: -4px;
+  right: -10px;
   --icon-size: 24px;
   --mask-color: var(--secondary-orange);
 }
@@ -2023,9 +2074,6 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 }
 .preview-meeting-controls button {
   display: inline;
-}
-.preview-meeting-controls button:first-child {
-  margin-right: 32px;
 }
 .preview-meeting-controls button i {
   margin: 0 auto;
@@ -2895,5 +2943,3 @@ body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button
 .meetings-recurring-content .meetings-recurring-monthly {
   /* [...] */
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

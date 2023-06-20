@@ -203,10 +203,14 @@ class StreamControls extends MegaRenderMixin {
                         </li>
                         <li>
                             <StreamExtendedControls
+                                {...this.props}
                                 call={call}
                                 chatRoom={chatRoom}
                                 onScreenSharingClick={onScreenSharingClick}
                                 onHoldClick={onHoldClick}
+                                hasToRenderPermissionsWarning={hasToRenderPermissionsWarning}
+                                renderPermissionsWarning={renderPermissionsWarning}
+                                resetError={resetError}
                             />
                         </li>
                         <li>

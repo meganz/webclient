@@ -281,7 +281,7 @@ function browserdetails(useragent) {
     }
     else if (useragent.indexOf('megasync') > 0) {
         icon = 'mega.png';
-        browser = 'MEGAsync';
+        browser = 'Desktop app';
     }
     else if (useragent.indexOf('megacmd') > 0) {
         icon = 'mega.png';

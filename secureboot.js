@@ -4110,7 +4110,7 @@ else if (!browserUpdate) {
                 var request = [
                     {a: 'uavq', f: 1, v: code},
                     {a: 'uq', pro: 1, gc: 1},
-                    {a: 'utqa', nf: 2, p: 1}
+                    {a: 'utqa', nf: 2, p: 1, r: 1}
                 ];
 
                 xhr(u_sid ? ('&sid=' + u_sid) : false, request, function(res) {

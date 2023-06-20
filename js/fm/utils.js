@@ -1129,7 +1129,10 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                 }
 
                 var sitePath = getSitePath();
-                if (sitePath.indexOf('fm/search/') > -1 || sitePath.indexOf('/chat') > -1) {
+                if (sitePath.includes('fm/search/')
+                    || sitePath.includes('/chat')
+                    || sitePath.includes('keybackup')) {
+
                     location.replace(getBaseUrl());
                 }
                 else if (location.href.indexOf('fm/user-management/invdet') > -1) {

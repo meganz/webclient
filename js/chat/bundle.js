@@ -19890,7 +19890,7 @@ class Group extends _mixins1__.wl {
         "data-simpletipposition": "top",
         "data-simpletipoffset": "5",
         "data-simpletip-class": "theme-dark-forced"
-      }, react0().createElement("div", {
+      }, react0().createElement("i", {
         className: "sprite-fm-mono icon-exclamation-filled"
       })), react0().createElement("i", {
         className: `
@@ -20881,10 +20881,7 @@ class SidebarControls extends mixins.wl {
     }, npeers + 1))));
   }
 }
-// EXTERNAL MODULE: ./js/chat/ui/meetings/permissionsObserver.jsx
-var permissionsObserver = __webpack_require__(209);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamExtendedControls.jsx
-
 
 
 
@@ -20933,10 +20930,10 @@ class StreamExtendedControls extends mixins.wl {
                     `,
       icon: this.isActive(Screen) ? 'icon-end-screenshare' : 'icon-screen-share',
       onClick: () => {
-        resetError(Screen);
+        resetError(Av.Screen);
         onScreenSharingClick();
       }
-    }, external_React_default().createElement("span", null, screenSharingLabel)), hasToRenderPermissionsWarning(Screen) ? renderPermissionsWarning(Screen) : null, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, screenSharingLabel)), hasToRenderPermissionsWarning(Screen) ? renderPermissionsWarning(Screen, this) : null, external_React_default().createElement(meetings_button.Z, {
       key: "call-hold",
       simpletip: {
         ...this.simpletip,
@@ -20955,7 +20952,8 @@ class StreamExtendedControls extends mixins.wl {
     }, external_React_default().createElement("span", null, callHoldLabel)));
   }
 }
-const streamExtendedControls = ((0,mixins.qC)(permissionsObserver.Q)(StreamExtendedControls));
+StreamExtendedControls.NAMESPACE = 'stream-extended-controls';
+const streamExtendedControls = (StreamExtendedControls);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/micObserver.jsx
 
 
@@ -21052,9 +21050,12 @@ const withMicObserver = Component => class extends mixins.wl {
     }));
   }
 };
+// EXTERNAL MODULE: ./js/chat/ui/meetings/permissionsObserver.jsx
+var permissionsObserver = __webpack_require__(209);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/hostsObserver.jsx
 var hostsObserver = __webpack_require__(419);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamControls.jsx
+
 
 
 
@@ -21244,12 +21245,15 @@ class StreamControls extends mixins.wl {
         resetError(Av.Camera);
         onVideoClick();
       }
-    }, external_React_default().createElement("span", null, videoLabel)), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null), external_React_default().createElement("li", null, external_React_default().createElement(streamExtendedControls, {
+    }, external_React_default().createElement("span", null, videoLabel)), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null), external_React_default().createElement("li", null, external_React_default().createElement(streamExtendedControls, (0,esm_extends.Z)({}, this.props, {
       call: call,
       chatRoom: chatRoom,
       onScreenSharingClick: onScreenSharingClick,
-      onHoldClick: onHoldClick
-    })), external_React_default().createElement("li", null, this.renderEndCall()))));
+      onHoldClick: onHoldClick,
+      hasToRenderPermissionsWarning: hasToRenderPermissionsWarning,
+      renderPermissionsWarning: renderPermissionsWarning,
+      resetError: resetError
+    }))), external_React_default().createElement("li", null, this.renderEndCall()))));
   }
 }
 StreamControls.NAMESPACE = 'stream-controls';
@@ -21673,6 +21677,8 @@ class Minimized extends mixins.wl {
       const {
         call,
         chatRoom,
+        hasToRenderPermissionsWarning,
+        renderPermissionsWarning,
         resetError,
         onAudioClick,
         onVideoClick,
@@ -21756,7 +21762,10 @@ class Minimized extends mixins.wl {
         call: call,
         chatRoom: chatRoom,
         onScreenSharingClick: onScreenSharingClick,
-        onHoldClick: onHoldClick
+        onHoldClick: onHoldClick,
+        hasToRenderPermissionsWarning: hasToRenderPermissionsWarning,
+        renderPermissionsWarning: renderPermissionsWarning,
+        resetError: resetError
       }), this.renderPermissionsWarning(Av.Screen)), external_React_default().createElement(LeaveButton, {
         chatRoom: chatRoom,
         participants: chatRoom.getCallParticipants(),
@@ -23645,150 +23654,313 @@ const withHostsObserver = Component => {
 __webpack_require__.d(__webpack_exports__, {
 Q: () => (withPermissionsObserver)
 });
-var _extends3__ = __webpack_require__(462);
+var _extends4__ = __webpack_require__(462);
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
 var _mixins_js1__ = __webpack_require__(503);
 var _ui_modalDialogs_jsx2__ = __webpack_require__(182);
+var _ui_utils_jsx3__ = __webpack_require__(79);
 
 
 
 
-const withPermissionsObserver = Component => class extends _mixins_js1__.wl {
-  constructor(props) {
-    super(props);
-    this.namespace = `PO-${Component.NAMESPACE}`;
-    this.observer = `onLocalMediaError.${this.namespace}`;
-    this.content = {
-      [Av.Audio]: {
-        title: l.no_mic_title,
-        info: l.no_mic_info
-      },
-      [Av.Camera]: {
-        title: l.no_camera_title,
-        info: l.no_camera_info
-      },
-      [Av.Screen]: {
-        title: l.no_screen_title,
-        info: l.no_screen_info
-      }
-    };
-    this.state = {
-      errMic: null,
-      errCamera: null,
-      errScreen: null,
-      [`dialog-${Av.Audio}`]: null,
-      [`dialog-${Av.Camera}`]: null,
-      [`dialog-${Av.Screen}`]: null
-    };
-    this.resetError = this.resetError.bind(this);
-    this.hasToRenderPermissionsWarning = this.hasToRenderPermissionsWarning.bind(this);
-    this.renderPermissionsWarning = this.renderPermissionsWarning.bind(this);
-  }
-  resetError(av) {
-    this.setState({
-      errMic: av === Av.Audio ? null : this.state.errMic,
-      errCamera: av === Av.Camera ? null : this.state.errCamera,
-      errScreen: av === Av.Screen ? null : this.state.errScreen
-    });
-  }
-  isUserActionError(error) {
-    return error && error.message === "Permission denied";
-  }
-  hasToRenderPermissionsWarning(av) {
-    const CONFIG = {
-      [Av.Audio]: {
-        showOnUserActionError: true,
-        err: this.state.errMic
-      },
-      [Av.Camera]: {
-        showOnUserActionError: true,
-        err: this.state.errCamera
-      },
-      [Av.Screen]: {
-        showOnUserActionError: false,
-        err: this.state.errScreen
-      }
-    };
-    const current = CONFIG[av];
-    if (current) {
-      return this.isUserActionError(current.err) ? current.showOnUserActionError : current.err;
+
+const errors = {
+  browser: 'NotAllowedError: Permission denied',
+  system: 'NotAllowedError: Permission denied by system',
+  dismissed: 'NotAllowedError: Permission dismissed',
+  nil: 'NotFoundError: Requested device not found'
+};
+const isUserActionError = error => {
+  return error && error === errors.browser;
+};
+const withPermissionsObserver = Component => {
+  return class extends _mixins_js1__.wl {
+    constructor(props) {
+      super(props);
+      this.namespace = `PO-${Component.NAMESPACE}`;
+      this.observer = `onLocalMediaError.${this.namespace}`;
+      this.childRef = undefined;
+      this.platform = ua.details.os;
+      this.helpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-camera-mic-browser-system-permission`;
+      this.macURI = 'x-apple.systempreferences:com.apple.preference.security';
+      this.winURI = 'ms-settings';
+      this.CONTENT = {
+        [Av.Audio]: {
+          system: {
+            title: l.no_mic_title,
+            info: this.platform === 'Windows' ? l.no_mic_system_windows.replace('[A]', `<a href=${this.helpURL} target="_blank" class="clickurl">`).replace('[/A]', '</a>') : l.no_mic_system_mac.replace('[A]', `<a href="${this.helpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>'),
+            buttons: [this.platform === 'Apple' || this.platform === 'Windows' ? {
+              key: 'open-settings',
+              label: l.open_system_settings,
+              className: 'positive',
+              onClick: () => {
+                window.open(this.platform === 'Apple' ? `${this.macURI}?Privacy_Microphone` : `${this.winURI}:privacy-microphone`, '_blank', 'noopener,noreferrer');
+                this.closePermissionsDialog(Av.Audio);
+              }
+            } : {
+              key: 'ok',
+              label: l.ok_button,
+              className: 'positive',
+              onClick: () => this.closePermissionsDialog(Av.Audio)
+            }]
+          },
+          browser: {
+            title: l.no_mic_title,
+            cover: 'permissions-mic',
+            info: l.allow_mic_access.replace('[X]', '<i class="sprite-fm-theme icon-mic-disabled"></i>'),
+            buttons: [{
+              key: 'ok',
+              label: l.ok_button,
+              className: 'positive',
+              onClick: () => this.closePermissionsDialog(Av.Audio)
+            }]
+          },
+          nil: {
+            title: l.no_mic_detected_title,
+            info: l.no_mic_detected_info,
+            buttons: [{
+              key: 'ok',
+              label: l.ok_button,
+              className: 'positive',
+              onClick: () => this.closePermissionsDialog(Av.Audio)
+            }]
+          }
+        },
+        [Av.Camera]: {
+          system: {
+            title: l.no_camera_title,
+            info: this.platform === 'Windows' ? l.no_camera_system_windows.replace('[A]', `<a href="${this.helpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>') : l.no_camera_system_mac.replace('[A]', `<a href="${this.helpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>'),
+            buttons: [this.platform === 'Apple' || this.platform === 'Windows' ? {
+              key: 'open-settings',
+              label: l.open_system_settings,
+              className: 'positive',
+              onClick: () => {
+                window.open(this.platform === 'Apple' ? `${this.macURI}?Privacy_Camera` : `${this.winURI}:privacy-webcam`, '_blank', 'noopener,noreferrer');
+                this.closePermissionsDialog(Av.Camera);
+              }
+            } : {
+              key: 'ok',
+              label: l.ok_button,
+              className: 'positive',
+              onClick: () => this.closePermissionsDialog(Av.Camera)
+            }]
+          },
+          browser: {
+            title: l.no_camera_title,
+            cover: 'permissions-camera',
+            info: l.allow_camera_access.replace('[X]', '<i class="sprite-fm-theme icon-camera-disabled"></i>'),
+            buttons: [{
+              key: 'ok',
+              label: l.ok_button,
+              className: 'positive',
+              onClick: () => this.closePermissionsDialog(Av.Camera)
+            }]
+          },
+          nil: {
+            title: l.no_camera_detected_title,
+            info: l.no_camera_detected_info,
+            buttons: [{
+              key: 'ok',
+              label: l.ok_button,
+              className: 'positive',
+              onClick: () => this.closePermissionsDialog(Av.Camera)
+            }]
+          }
+        },
+        [Av.Screen]: {
+          title: l.no_screen_title,
+          info: l.no_screen_system.replace('[A]', `<a href="${this.helpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>'),
+          buttons: [{
+            key: 'open-settings',
+            label: l.open_system_settings,
+            className: 'positive',
+            onClick: () => {
+              window.open(`${this.macURI}?Privacy_ScreenCapture`, '_blank', 'noopener,noreferrer');
+              this.closePermissionsDialog(Av.Screen);
+            }
+          }]
+        }
+      };
+      this.state = {
+        errMic: '',
+        errCamera: '',
+        errScreen: '',
+        [`dialog-${Av.Audio}`]: null,
+        [`dialog-${Av.Camera}`]: null,
+        [`dialog-${Av.Screen}`]: null
+      };
+      this.getPermissionsDialogContent = () => {
+        const {
+          CONTENT,
+          state
+        } = this;
+        const {
+          errMic,
+          errCamera
+        } = state;
+        const {
+          browser,
+          system,
+          nil
+        } = errors;
+        return {
+          [Av.Audio]: {
+            ...(errMic === browser && CONTENT[Av.Audio].browser),
+            ...(errMic === system && CONTENT[Av.Audio].system),
+            ...(errMic === nil && CONTENT[Av.Audio].nil)
+          },
+          [Av.Camera]: {
+            ...(errCamera === browser && CONTENT[Av.Camera].browser),
+            ...(errCamera === system && CONTENT[Av.Camera].system),
+            ...(errCamera === nil && CONTENT[Av.Camera].nil)
+          },
+          [Av.Screen]: CONTENT[Av.Screen]
+        };
+      };
+      this.resetError = av => {
+        this.setState({
+          errMic: av === Av.Audio ? '' : this.state.errMic,
+          errCamera: av === Av.Camera ? '' : this.state.errCamera,
+          errScreen: av === Av.Screen ? '' : this.state.errScreen
+        });
+      };
+      this.hasToRenderPermissionsWarning = this.hasToRenderPermissionsWarning.bind(this);
+      this.renderPermissionsWarning = this.renderPermissionsWarning.bind(this);
     }
-    return false;
-  }
-  renderPermissionsDialog(av, child) {
-    const doClose = () => this.setState({
-      [`dialog-${av}`]: false
-    }, () => child && child.isMounted() && child.safeForceUpdate());
-    return react0().createElement(_ui_modalDialogs_jsx2__.Z.ModalDialog, {
-      dialogName: `${this.namespace}-permissions-${av}`,
-      className: `
+    hasToRenderPermissionsWarning(av) {
+      const CONFIG = {
+        [Av.Audio]: {
+          showOnUserActionError: true,
+          err: this.state.errMic
+        },
+        [Av.Camera]: {
+          showOnUserActionError: true,
+          err: this.state.errCamera
+        },
+        [Av.Screen]: {
+          showOnUserActionError: false,
+          err: this.state.errScreen
+        }
+      };
+      const current = CONFIG[av];
+      if (current) {
+        return isUserActionError(current.err) ? current.showOnUserActionError : current.err;
+      }
+      return false;
+    }
+    closePermissionsDialog(av) {
+      this.setState({
+        [`dialog-${av}`]: false
+      }, () => {
+        var _this$childRef;
+        return (_this$childRef = this.childRef) == null ? void 0 : _this$childRef.safeForceUpdate();
+      });
+    }
+    renderPermissionsDialog(av, child) {
+      const content = this.getPermissionsDialogContent();
+      const {
+        title,
+        info,
+        buttons,
+        cover
+      } = content[av] || {};
+      return react0().createElement(_ui_modalDialogs_jsx2__.Z.ModalDialog, {
+        dialogName: `${this.namespace}-permissions-${av}`,
+        className: `
+                        meetings-permissions-dialog
                         dialog-template-message
                         with-close-btn
                         warning
                     `,
-      buttons: [{
-        key: 'ok',
-        label: l[81],
-        className: 'positive',
-        onClick: doClose
-      }],
-      hideOverlay: this.props.child === 'start-meeting',
-      onClose: doClose
-    }, react0().createElement("header", null, react0().createElement("div", {
-      className: "graphic"
-    }, react0().createElement("i", {
-      className: "warning sprite-fm-uni icon-warning"
-    })), react0().createElement("div", {
-      className: "info-container"
-    }, react0().createElement("h3", {
-      id: "msgDialog-title"
-    }, this.content[av].title), react0().createElement("p", {
-      className: "text"
-    }, this.content[av].info))));
-  }
-  renderPermissionsWarning(av, child) {
-    return react0().createElement("div", {
-      className: `
+        buttons: buttons,
+        hideOverlay: Component.NAMESPACE === 'preview-meeting' && !document.body.classList.contains('not-logged'),
+        onClose: () => {
+          this.setState({
+            [`dialog-${av}`]: false
+          }, () => child && child.safeForceUpdate());
+        }
+      }, react0().createElement("header", null, cover ? null : react0().createElement("div", {
+        className: "graphic"
+      }, react0().createElement("i", {
+        className: "warning sprite-fm-uni icon-warning"
+      })), react0().createElement("div", {
+        className: "info-container"
+      }, react0().createElement("h3", {
+        id: "msgDialog-title"
+      }, title), cover && react0().createElement("div", {
+        className: "permissions-warning-cover"
+      }, react0().createElement("span", {
+        className: cover
+      })), react0().createElement(_ui_utils_jsx3__.Cw, {
+        tag: "p",
+        className: "permissions-warning-info",
+        content: info
+      }))));
+    }
+    renderPermissionsWarning(av, child) {
+      const {
+        errMic,
+        errCamera
+      } = this.state;
+      const dismissed = errMic === errors.dismissed || errCamera === errors.dismissed;
+      return react0().createElement("div", {
+        className: `
                         ${this.namespace}
                         meetings-signal-issue
                         simpletip
+                        ${dismissed ? 'with-small-area' : ''}
                     `,
-      "data-simpletip": l.show_info,
-      "data-simpletipposition": "top",
-      "data-simpletipoffset": "5",
-      "data-simpletip-class": "theme-dark-forced",
-      onClick: () => this.setState({
-        [`dialog-${av}`]: true
-      })
-    }, react0().createElement("i", {
-      className: "sprite-fm-mono icon-exclamation-filled"
-    }), this.state[`dialog-${av}`] && this.renderPermissionsDialog(av, child));
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    megaChat.unbind(this.observer);
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    megaChat.rebind(this.observer, (ev, errAv) => {
-      this.setState({
-        errMic: errAv && errAv.mic ? errAv.mic : this.state.errMic,
-        errCamera: errAv && errAv.camera ? errAv.camera : this.state.errCamera,
-        errScreen: errAv && errAv.screen ? errAv.screen : this.state.errScreen
+        "data-simpletip": l.show_info,
+        "data-simpletipposition": "top",
+        "data-simpletipoffset": "5",
+        "data-simpletip-class": "theme-dark-forced",
+        onClick: () => dismissed ? null : this.setState({
+          [`dialog-${av}`]: true
+        }, () => {
+          if (child) {
+            this.childRef = child;
+          }
+        })
+      }, react0().createElement("i", {
+        className: "sprite-fm-mono icon-exclamation-filled"
+      }), this.state[`dialog-${av}`] && this.renderPermissionsDialog(av, child));
+    }
+    componentWillUnmount() {
+      super.componentWillUnmount();
+      megaChat.unbind(this.observer);
+    }
+    componentDidMount() {
+      super.componentDidMount();
+      megaChat.rebind(this.observer, (ev, errAv) => {
+        this.setState({
+          errMic: errAv && errAv.mic ? String(errAv.mic) : this.state.errMic,
+          errCamera: errAv && errAv.camera ? String(errAv.camera) : this.state.errCamera,
+          errScreen: errAv && errAv.screen ? String(errAv.screen) : this.state.errScreen
+        });
       });
-    });
-  }
-  render() {
-    return react0().createElement(Component, (0,_extends3__.Z)({}, this.props, this.state, {
-      errMic: this.state.errMic,
-      errCamera: this.state.errCamera,
-      errScreen: this.state.errScreen,
-      hasToRenderPermissionsWarning: this.hasToRenderPermissionsWarning,
-      renderPermissionsWarning: this.renderPermissionsWarning,
-      resetError: this.resetError
-    }));
-  }
+      megaChat.rebind(`onLocalMediaQueryError.${this.namespace}`, (ev, {
+        type,
+        err
+      }) => {
+        if (type === 'screen' && String(err) === errors.system) {
+          this.setState({
+            [`dialog-${Av.Screen}`]: true
+          }, () => this.safeForceUpdate());
+        }
+      });
+    }
+    render() {
+      return react0().createElement(Component, (0,_extends4__.Z)({}, this.props, this.state, {
+        errMic: this.state.errMic,
+        errCamera: this.state.errCamera,
+        errScreen: this.state.errScreen,
+        hasToRenderPermissionsWarning: this.hasToRenderPermissionsWarning,
+        resetError: this.resetError,
+        renderPermissionsWarning: this.renderPermissionsWarning
+      }));
+    }
+  };
 };
 
 /***/ }),
@@ -24110,6 +24282,7 @@ class Preview extends _mixins_js1__.wl {
       }
     };
     this.toggleStream = type => {
+      var _this$props$resetErro, _this$props;
       const stream = type === Preview.STREAMS.AUDIO ? 'audio' : 'video';
       this.setState(state => ({
         [stream]: !state[stream]
@@ -24119,6 +24292,7 @@ class Preview extends _mixins_js1__.wl {
         }
         return this.state[stream] ? this.startStream(type) : this.stopStream(type);
       });
+      (_this$props$resetErro = (_this$props = this.props).resetError) == null ? void 0 : _this$props$resetErro.call(_this$props, type === Preview.STREAMS.AUDIO ? Av.Audio : Av.Camera);
     };
     this.renderAvatar = () => {
       if (_call_jsx3__.ZP.isGuest()) {
@@ -24209,7 +24383,6 @@ class Preview extends _mixins_js1__.wl {
                             `,
       icon: audio ? 'icon-audio-filled' : 'icon-audio-off',
       onClick: () => {
-        resetError(Av.Audio);
         this.toggleStream(Preview.STREAMS.AUDIO);
       }
     }, react0().createElement("span", null, audio ? l[16214] : l[16708])), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null), react0().createElement("div", {

@@ -93,8 +93,6 @@
         button {
             display: inline;
 
-            &:first-child { margin-right: 32px; }
-
             i {
                 margin: 0 auto;
                 --icon-size: 32px;
@@ -109,3 +107,4 @@
         }
     }
 }
+

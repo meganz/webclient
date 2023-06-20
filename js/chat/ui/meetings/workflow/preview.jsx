@@ -70,6 +70,7 @@ class Preview extends MegaRenderMixin {
             }
             return this.state[stream] ? this.startStream(type) : this.stopStream(type);
         });
+        this.props.resetError?.(type === Preview.STREAMS.AUDIO ? Av.Audio : Av.Camera);
     };
 
     renderAvatar = () => {
@@ -144,7 +145,6 @@ class Preview extends MegaRenderMixin {
                             `}
                             icon={audio ? 'icon-audio-filled' : 'icon-audio-off'}
                             onClick={() => {
-                                resetError(Av.Audio);
                                 this.toggleStream(Preview.STREAMS.AUDIO);
                             }}>
                             <span>{audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */}</span>

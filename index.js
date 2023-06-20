@@ -1297,16 +1297,9 @@ function init_page() {
         return false;
     }
     else if (page === 'keybackup' && !u_type) {
-        if (is_mobile) {
-            login_next = page;
-            loadSubPage('login');
-            return false;
-        }
-        else {
-            login_txt = l[1298];
-            parsepage(pages['login']);
-            init_login();
-        }
+        login_next = page;
+        login_txt = l[1298];
+        return loadSubPage('login');
     }
     else if (page === 'keybackup') {
         if (is_mobile) {

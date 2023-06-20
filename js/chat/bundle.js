@@ -19480,7 +19480,7 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
       room.megaChat.refreshConversations();
       room.trigger('RefreshUI');
       if (room.scrolledToBottom) {
-        delay('hp:reinit-scroll', () => {
+        delay(`hp:reinit-scroll:${this.getUniqueId()}`, () => {
           if (this.messagesListScrollable) {
             this.messagesListScrollable.reinitialise(true, true);
           }
@@ -26348,7 +26348,8 @@ class Giphy extends AbstractGenericMessage {
       width: w,
       height: h,
       style: {
-        cursor: autoPlay ? 'default' : 'pointer'
+        cursor: autoPlay ? 'default' : 'pointer',
+        height: `${h}px`
       },
       onClick: () => !autoPlay && this.toggle(),
       src: hideActionButtons ? gifPanel.bl.convert(src) : this.state.src

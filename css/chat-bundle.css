@@ -751,6 +751,7 @@
   margin: 0 8px 0 8px;
 }
 .meetings-call .sidebar.chat-opened .giphy-block {
+  object-fit: cover;
   max-width: 100%;
   height: 100%;
 }

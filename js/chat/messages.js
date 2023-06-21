@@ -103,14 +103,18 @@ Message._getTextContentsForDialogType = function(message) {
             else if (message.meta.included && message.meta.included.length > 0) {
                 otherContact = M.u[message.meta.included[0]];
                 if (contact && otherContact) {
-                    textMessage = (contact.u === otherContact.u) ?
-                        l[23756] :
-                        l[8907].replace("%s", contactName);
+                    const isSelfJoin = contact.u === otherContact.u;
+                    textMessage = isSelfJoin
+                        ? l[23756] /* `%1 joined the group chat.` */
+                        : l[8907]; /* `%1 joined the group chat by invitation from %2.` */
                     if (message.chatRoom.isMeeting) {
-                        textMessage = contact.u === otherContact.u
-                            ? l.meeting_mgmt_user_joined /* `Joined the meeting` */
-                            : l.meeting_mgmt_user_added /* `Joined the meeting by invitation from %s.` */
-                                .replace('%s', contactName);
+                        textMessage = isSelfJoin
+                            ? l.meeting_mgmt_user_joined /* `%1 joined the meeting.` */
+                            : l.meeting_mgmt_user_added; /* `%1 joined the meeting by invitation from %2.` */
+                    }
+                    textMessage = textMessage.replace('%1', htmlentities(M.getNameByHandle(otherContact.h)));
+                    if (!isSelfJoin) {
+                        textMessage = textMessage.replace('%2', contactName);
                     }
                 }
             }

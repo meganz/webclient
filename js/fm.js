@@ -2920,6 +2920,11 @@ function closeDialog(ev) {
         $.dialog = $.shareDialog;
     }
 
+    // this will close the FeedbackDialog correctly when clicking back arrow
+    if (mega.ui.FeedbackDialog._instance && mega.ui.FeedbackDialog._instance.visible) {
+        mega.ui.FeedbackDialog._instance.hide();
+    }
+
     mBroadcaster.sendMessage('closedialog');
 }
 

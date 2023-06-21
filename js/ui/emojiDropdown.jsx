@@ -38,14 +38,14 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             'rolling_eyes',
             'stuck_out_tongue',
             'smiling_face_with_3_hearts',
+            'heart_eyes',
             'kissing_heart',
             'sob',
-            'mask',
-            'eyes',
+            'pleading_face',
             'thumbsup',
             'pray',
             'wave',
-            'white_check_mark',
+            'fire',
             'sparkles',
         ];
         this.heightDefs = {
@@ -176,27 +176,12 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
                 nextState.isLoading === true ||
                 (!self.loadingPromise && (!self.data_categories || !self.data_emojis))
             ) {
-                self.loadingPromise = MegaPromise.allDone([
-                    megaChat.getEmojiDataSet('categories')
-                        .done(function (categories) {
-                            self.data_categories = categories;
-                        }),
-                    megaChat.getEmojiDataSet('emojis')
-                        .done(function (emojis) {
-                            self.data_emojis = emojis;
-                        })
-                ])
-                    .done(function (results) {
-                        if (
-                            (!results[0] || results[0][1] && results[0][1] === "error") ||
-                            (!results[1] || results[1][1] && results[1][1] === "error")
-                        ) {
-                            if (d) {
-                                console.error("Emoji loading failed.", results);
-                            }
-                            self.setState({'loadFailed': true, 'isLoading': false});
-                            return;
-                        }
+                const p = [megaChat.getEmojiDataSet('categories'), megaChat.getEmojiDataSet('emojis')];
+
+                this.loadingPromise = Promise.all(p)
+                    .then(([categories, emojis]) => {
+                        this.data_emojis = emojis;
+                        this.data_categories = categories;
 
                         // custom categories order
                         self.data_categories.push('frequently_used');
@@ -244,22 +229,27 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
                         self._onScrollChanged(0);
 
                         self.setState({'isLoading': false});
+                    })
+                    .catch((ex) => {
+                        if (d) {
+                            console.error("Emoji loading failed.", ex);
+                        }
+                        this.setState({'loadFailed': true, 'isLoading': false});
                     });
             }
         }
         else if (nextState.isActive === false) {
-            var self = this;
 
-            if (self.data_emojis) {
+            if (this.data_emojis) {
                 // cleanup cached React/DOM elements from the emoji set
-                self.data_emojis.forEach(function (emoji) {
-                    delete emoji.element;
-                });
+                for (let i = this.data_emojis.length; i--;) {
+                    delete this.data_emojis[i].element;
+                }
             }
-            self.data_emojis = null;
-            self.data_categories = null;
-            self.data_emojiByCategory = null;
-            self.loadingPromise = null;
+            this.data_emojis = null;
+            this.data_categories = null;
+            this.data_emojiByCategory = null;
+            this.loadingPromise = null;
         }
     }
     onSearchChange(e) {

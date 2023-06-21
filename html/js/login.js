@@ -117,7 +117,7 @@ var signin = {
             $('#login-name2').megaInputsShowError().blur();
             $('#login-password2').megaInputsShowError(l[7431]).val('').blur();
 
-            msgDialog('warninga', l[135], l[7431] + '.', false, function() {
+            msgDialog('warninga', l[135], l[7431], false, () => {
                 $('#login-name2').select();
             });
         }

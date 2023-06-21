@@ -13,7 +13,6 @@
             }
 
             .button-group-item {
-                position: relative;
                 margin: 0 0 10px 0;
             }
         }
@@ -31,7 +30,7 @@
             &.warn {
                 background: var(--surface-black);
 
-                div {
+                i {
                     --icon-size: 24px;
                     --mask-color: var(--secondary-orange);
                 }

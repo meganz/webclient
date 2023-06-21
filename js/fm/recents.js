@@ -926,6 +926,9 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         else if (fileIcon(node) === 'pdf') {
             $(".block-view-file-type", $newThumb).removeClass("image").addClass("pdf");
         }
+        else if (fileIcon(node) === 'word') {
+            $(".block-view-file-type", $newThumb).removeClass("image").addClass("word");
+        }
 
         if (node.fav) {
             $('.file-status-icon', $newThumb).addClass('sprite-fm-mono icon-favourite-filled');

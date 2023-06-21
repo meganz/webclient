@@ -519,7 +519,7 @@ copyright.init_cndispute = function() {
         var localStorageKey = 'takedownDisputeNodeURL';
         var disputeNodeURL = localStorage.getItem(localStorageKey);
         if (disputeNodeURL) {
-            $('.bottom-page .copyrightdisputeform .contenturl', '.dn-form').val(disputeNodeURL);
+            $('input.contenturl', '.dn-form').val(disputeNodeURL);
             localStorage.removeItem(localStorageKey);
         }
     }

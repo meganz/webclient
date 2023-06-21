@@ -15,7 +15,7 @@ import MeetingsManager from './meetingsManager.jsx';
 import { ChatOnboarding } from "./chatOnboarding.jsx";
 import { inProgressAlert } from "./ui/meetings/call.jsx";
 
-const EMOJI_DATASET_VERSION = 4;
+const EMOJI_DATASET_VERSION = 5;
 const CHAT_ONHISTDECR_RECNT = "onHistoryDecrypted.recent";
 
 const LOAD_ORIGINALS = {
@@ -2224,75 +2224,79 @@ Chat.prototype._leaveAllGroupChats = function() {
  * @param name
  * @returns {MegaPromise}
  */
-Chat.prototype.getEmojiDataSet = function(name) {
-    var self = this;
+Chat.prototype.getEmojiDataSet = async function(name) {
     assert(name === "categories" || name === "emojis", "Invalid emoji dataset name passed.");
 
-    if (!self._emojiDataLoading) {
-        self._emojiDataLoading = {};
+    if (!this._emojiDataLoading) {
+        this._emojiDataLoading = Object.create(null);
     }
-    if (!self._emojiData) {
-        self._emojiData = {
-            'emojisUtf': {},
-            'emojisSlug': {}
+    if (!this._emojiData) {
+        this._emojiData = {
+            'emojisUtf': Object.create(null),
+            'emojisSlug': Object.create(null)
         };
     }
 
-    if (self._emojiData[name]) {
-        return MegaPromise.resolve(
-            self._emojiData[name]
-        );
+    if (this._emojiData[name]) {
+        return this._emojiData[name];
     }
-    else if (self._emojiDataLoading[name]) {
-        return self._emojiDataLoading[name];
+
+    if (this._emojiDataLoading[name]) {
+        return this._emojiDataLoading[name];
     }
-    else if (name === "categories") {
+
+    if (name === "categories") {
         // reduce the XHRs by one, by simply moving the categories_v2.json to be embedded inline here:
-        self._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
+        this._emojiData[name] = ["people", "nature", "food", "activity", "travel", "objects", "symbols", "flags"];
         // note, when updating categories_vX.json, please update this ^^ manually.
 
-        return MegaPromise.resolve(self._emojiData[name]);
+        return this._emojiData[name];
     }
-    else {
-        var promise = new MegaPromise();
-        self._emojiDataLoading[name] = promise;
 
-        M.xhr({
-            type: 'json',
-            url: staticpath + "js/chat/emojidata/" + name + "_v" + EMOJI_DATASET_VERSION + ".json"
-        }).then(function(ev, data) {
-            self._emojiData[name] = data;
-            delete self._emojiDataLoading[name];
-            if (name === "emojis") {
-                self._mapEmojisToAliases();
-            }
-            promise.resolve(data);
-        }).catch(function(ev, error) {
-            if (d) {
-                self.logger.warn('Failed to load emoji data "%s": %s', name, error, [ev]);
-            }
-            delete self._emojiDataLoading[name];
-            promise.reject(error);
-        });
+    const {promise} = mega;
+    this._emojiDataLoading[name] = promise;
 
-        return promise;
-    }
+    // @todo get rid of MegaPromise in M.xhr() (and probably, move that to fetch())
+
+    M.xhr({
+        type: 'json',
+        url: `${staticpath}js/chat/emojidata/${name}_v${EMOJI_DATASET_VERSION}.json`
+    }).then((ev, data) => {
+        if (!data) {
+            promise.reject(EFAILED);
+            return;
+        }
+        this._emojiData[name] = data;
+        delete this._emojiDataLoading[name];
+        if (name === "emojis") {
+            this._mapEmojisToAliases();
+        }
+        promise.resolve(data);
+    }).catch((ex, error) => {
+        if (d) {
+            this.logger.warn('Failed to load emoji data "%s": %s', name, error, [ex]);
+        }
+        delete this._emojiDataLoading[name];
+        promise.reject(error || ex);
+    });
+
+    return promise;
 };
 
 
 Chat.prototype._mapEmojisToAliases = function() {
-    var self = this;
-    var emojis = self._emojiData.emojis;
-    if (!emojis) {
-        return;
-    }
+    const {emojis} = this._emojiData;
 
-    self._emojiData.emojisSlug = {};
-    self._emojiData.emojisUtf = {};
-    for (var i = 0; i < emojis.length; i++) {
-        var emoji = emojis[i];
-        self._emojiData.emojisSlug[emoji.n] = emoji;
-        self._emojiData.emojisUtf[emoji.u] = emoji;
+    if (emojis) {
+        this._emojiData.emojisUtf = Object.create(null);
+        this._emojiData.emojisSlug = Object.create(null);
+
+        for (let i = emojis.length; i--;) {
+            const emoji = emojis[i];
+
+            this._emojiData.emojisUtf[emoji.u] = emoji;
+            this._emojiData.emojisSlug[emoji.n] = emoji;
+        }
     }
 };
 

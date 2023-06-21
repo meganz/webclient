@@ -54,7 +54,7 @@ var pro = {
      * Load pricing plan information from the API. The data will be loaded into 'pro.membershipPlans'.
      * @param {Function} loadedCallback The function to call when the data is loaded
      */
-    loadMembershipPlans: function(loadedCallback) {
+    loadMembershipPlans: async function(loadedCallback) {
         "use strict";
 
         // Set default
@@ -66,7 +66,22 @@ var pro = {
         }
         else {
             // Get the membership plans.
-            api_req({ a: 'utqa', nf: 2, p: 1 }, {
+
+            const payload = {a: 'utqa', nf: 2, p: 1};
+
+            await Promise.resolve(M.req({a: 'uq', pro: 1, gc: 1}))
+                .then(({balance}) => {
+                    if (balance) {
+                        balance = parseFloat(balance[0][0]);
+
+                        if (balance >= 4.99 && balance <= 9.98) {
+                            payload.r = 1;
+                        }
+                    }
+                })
+                .catch(dump);
+
+            api_req(payload, {
                 callback: function(results) {
 
                     // The rest of the webclient expects this data in an array format

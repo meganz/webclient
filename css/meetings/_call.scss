@@ -17,3 +17,57 @@
 .local-stream-mirrored video {
     transform: scaleX(-1);
 }
+
+.mega-dialog.meetings-permissions-dialog {
+    /* [...] */
+
+    .info-container {
+        /* [...] */
+    }
+
+    header {
+        padding-inline-end: 24px;
+    }
+
+    .permissions-warning-cover {
+        padding: 18px 0;
+        width: 100%;
+        height: 280px;
+
+        span {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center center;
+
+            &.permissions-mic {
+                background-image: url(../../images/mega/permissions/mic-mac-light.svg);
+
+                body.theme-dark & {
+                    background-image: url(../../images/mega/permissions/mic-mac-dark.svg);
+                }
+            }
+
+            &.permissions-camera {
+                background-image: url(../../images/mega/permissions/camera-mac-light.svg);
+
+                body.theme-dark & {
+                    background-image: url(../../images/mega/permissions/camera-mac-dark.svg);
+                }
+            }
+        }
+    }
+
+    .permissions-warning-info {
+        /* [...] */
+
+        i {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-size: 16px 16px;
+        }
+    }
+}

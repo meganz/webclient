@@ -329,7 +329,7 @@ var redeem = {
 
         // This call will return an array of arrays. Each array contains this data:
         // [api_id, account_level, storage, transfer, months, price, currency, description, ios_id, google_id]
-        api_req({ a : 'utqa', nf: 2, p: 1 }, {
+        api_req({ a : 'utqa', nf: 2, p: 1, r: 1 }, {
             callback: function (result) {
                 // Update the list of plans
                 redeem.membershipPlans = redeem.parseProPlans(result);
@@ -1038,7 +1038,7 @@ var redeem = {
             var request = [
                 {a: 'uavq', f: 1, v: code},
                 {a: 'uq', pro: 1, gc: 1},
-                {a: 'utqa', nf: 2, b: 1, p: 1 }     // Return Business and Pro Flexi plans
+                {a: 'utqa', nf: 2, b: 1, p: 1, r: 1}
             ];
 
             var callback = function(meh, ctx, rr, res) {

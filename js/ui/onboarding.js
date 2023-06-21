@@ -355,7 +355,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             return false;
                         }
                         const room = megaChat.getCurrentRoom();
-                        return !!room.scheduledMeeting && room.state === ChatRoom.STATE.READY;
+                        return room && !!room.scheduledMeeting && room.state === ChatRoom.STATE.READY;
                     },
                     actions: [
                         {

@@ -1420,8 +1420,8 @@ var notify = {
         // Your publicly shared %1 (%2) has been taken down.
         if (notification.data.down === 1) {
             header = l[8521];
-            title = (node.t === 0) ? l.publicly_shared_file_taken_down.replace('(%1)', name)
-                : l.publicly_shared_folder_taken_down.replace('(%1)', name);
+            title = (node.t === 0) ? l.publicly_shared_file_taken_down.replace('%1', name)
+                : l.publicly_shared_folder_taken_down.replace('%1', name);
             cssClass = 'nt-takedown-notification';
         }
 
@@ -1429,8 +1429,8 @@ var notify = {
         // Your taken down %1 (%2) has been reinstated.
         else if (notification.data.down === 0) {
             header = l[8524];
-            title = (node.t === 0) ? l.taken_down_file_reinstated.replace('(%1)', name)
-                : l.taken_down_folder_reinstated.replace('(%1)', name);
+            title = (node.t === 0) ? l.taken_down_file_reinstated.replace('%1', name)
+                : l.taken_down_folder_reinstated.replace('%1', name);
             cssClass = 'nt-takedown-reinstated-notification';
         }
         else {

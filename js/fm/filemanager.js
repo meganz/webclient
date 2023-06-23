@@ -999,8 +999,11 @@ FileManager.prototype.initFileManagerUI = function() {
         var activeTab = self.fmTabState[activeClass];
 
         if (activeTab) {
-            if (activeTab.root === M.currentrootid || activeTab.root === 'chat' ||
-                activeTab.subpages && activeTab.subpages.indexOf(M.currentrootid || M.currentdirid) !== -1) {
+            if (activeTab.root === M.currentrootid
+                || activeTab.root === 'chat'
+                || M.isAlbumsPage()
+                || activeTab.subpages && activeTab.subpages.includes(M.currentrootid || M.currentdirid)
+            ) {
                 activeTab.prev = M.currentdirid;
                 M.lastActiveTab = activeClass;
             }

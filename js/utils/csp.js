@@ -173,10 +173,10 @@ lazy(self, 'csp', () => {
                 const qsa = (sel, cb) => dialog.querySelectorAll(sel).forEach(cb);
                 const all = (sel = '.current') => {
                     sel += ' .mega-switch:not(.all)';
-                    const total = dialog.querySelectorAll(sel).length;
+                    const total = dialog.querySelectorAll(`.settings-row:not(.hidden) ${sel}`).length;
 
                     if (total) {
-                        const active = dialog.querySelectorAll(`${sel}.toggle-on`).length;
+                        const active = dialog.querySelectorAll(`.settings-row:not(.hidden) ${sel}.toggle-on`).length;
 
                         const toggleSwitch = dialog.querySelector(`${sel.split(':')[0]}.all`);
                         toggleSwitch.classList[total === active ? 'add' : 'remove']('toggle-on');

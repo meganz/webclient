@@ -863,7 +863,8 @@ FileManager.prototype.initFileManagerUI = function() {
             return;
         }
         var $target = $(e.target);
-        var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red, a.mailto, a.top-social-button';
+        var exclude =
+            '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red, a.mailto, a.top-social-button, .notif-help';
 
         if ($target.attr('type') !== 'file'
             && !$target.is(exclude)

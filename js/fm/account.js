@@ -2745,6 +2745,7 @@ accountUI.notifications = {
         'use strict';
 
         this.render();
+        this.handleChatNotifications().catch(dump);
     },
 
     render: function() {
@@ -2779,7 +2780,6 @@ accountUI.notifications = {
                 $section,
                 mega.notif.has($this.attr('name'), sectionName),
                 function(val) {
-
                     var notifChange = val ? mega.notif.set : mega.notif.unset;
                     notifChange($this.attr('name'), sectionName);
 
@@ -2875,6 +2875,52 @@ accountUI.notifications = {
         });
         return String(section).split('-').shift();
 
+    },
+
+    async handleChatNotifications() {
+        'use strict';
+        const $container = $('.switch-container.chat', accountUI.$contentBlock);
+        const $banner = $('.chat-permissions-banner', $container);
+        const helpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-notification-browser-system-permission`;
+
+        // Set the copy for the browser permissions banner
+        $('.versioning-body-text', $banner).safeHTML(
+            l.notifications_permissions_denied_info
+                .replace('[A]', `<a href="${helpURL}" target="_blank" class="clickurl notif-help">`)
+                .replace('[/A]', '</a>')
+        );
+
+        // Toggle the inline browser permissions banner based
+        // on the current browser permissions state
+        if (mega.notif.has('enabled', 'chat')) {
+            return (
+                Notification.permission !== 'granted' &&
+                Notification.requestPermission()
+                    .then(permission => {
+                        $banner[permission === 'granted' ? 'addClass' : 'removeClass']('hidden');
+                        if (permission === 'granted') {
+                            // Show confirmation dialog and demo notification once
+                            // the notification permissions are allowed
+                            msgDialog(
+                                'info',
+                                '',
+                                l.notifications_permissions_granted_title,
+                                l.notifications_permissions_granted_info
+                                    .replace('[A]', `<a href="${helpURL}" target="_blank" class="clickurl">`)
+                                    .replace('[/A]', '</a>')
+                            );
+                            return (
+                                new Notification(l.notification_granted_title, { body: l.notification_granted_body })
+                            );
+                        }
+                    })
+                    .catch(ex => d && console.warn(`Failed to retrieve permissions: ${ex}`))
+            );
+        }
+
+        // Don't display the browser permissions banner if
+        // `Chat notifications` are disabled
+        return $banner.addClass('hidden');
     }
 };
 

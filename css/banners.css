@@ -37,6 +37,13 @@
     color: var(--banner-text-info);
     font: var(--text-body1);
 }
+.mega-banner.warning-template .cell {
+    color: var(--banner-text-warning);
+}
+.mega-banner.warning-template .cell a {
+    color: var(--banner-text-warning);;
+    text-decoration: underline;
+}
 .account .mega-banner button {
     margin: 8px 0;
     -webkit-margin-start: 24px;
@@ -51,6 +58,9 @@
 }
 .mega-banner i.sprite-fm-mono {
     --mask-color: var(--banner-text-info);
+}
+.mega-banner.warning-template i.sprite-fm-mono {
+    --mask-color: var(--banner-text-warning);
 }
 .mega-banner.cell i.sprite-fm-mono {
     margin-top: 0;

@@ -2035,6 +2035,10 @@ var exportExpiry = {
         $('.rounded-tip-button .tip-text', $linksTab)
             .text(mega.icu.format(l.export_link_decrypt_tip, Object($.itemExport).length || 0));
 
+        if ($.dialog === 'onboardingDialog') {
+            closeDialog();
+        }
+
         // Show export dialog
         M.safeShowDialog('links', function() {
 
@@ -2984,6 +2988,9 @@ var exportExpiry = {
         // Cache selector
         var $copyrightDialog = $('.copyrights-dialog');
 
+        if ($.dialog === 'onboardingDialog') {
+            closeDialog();
+        }
         // Otherwise show the copyright warning dialog
         M.safeShowDialog('copyrights', function() {
 

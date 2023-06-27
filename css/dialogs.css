@@ -298,14 +298,13 @@ body.de .mega-dialog.contact-picker-widget {
 }
 .mega-dialog.add-from-cloud .content-block {
     position: relative;
-    min-height: 500px;
+    max-height: 566px;
+    height: 100%;
 }
 .mega-dialog.add-from-cloud .content-block .content-container {
+    height: calc(100% - 106px);
     position: relative;
     z-index: 1;
-}
-.mega-dialog.add-from-cloud .megaList2.megaListContainer {
-    height: 434px !important;
 }
 .mega-dialog.add-from-cloud .megaListContainer .data-block-bg {
     width: 192px;

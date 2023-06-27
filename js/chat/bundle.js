@@ -2378,7 +2378,9 @@ Chat.prototype.smartOpenChat = function (...args) {
     if (args[0].length === 2 && args[1] === 'private') {
       var chatRoom = self.chats[array.one(args[0], u_handle)];
       if (chatRoom) {
-        chatRoom.show();
+        if (args[5]) {
+          chatRoom.show();
+        }
         return waitForReadyState(chatRoom, args[5]);
       }
     }
@@ -3128,7 +3130,7 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes, noOpen) {
     };
     var attachNodes = function (roomId) {
       return new MegaPromise(function (resolve, reject) {
-        self.smartOpenChat(roomId).then(function (room) {
+        self.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, !noOpen).then(room => {
           room.attachNodes(fileNodes).then(resolve.bind(self, room)).catch(reject);
         }).catch(ex => {
           handleRejct(reject, roomId, ex);
@@ -3145,7 +3147,7 @@ Chat.prototype.openChatAndAttachNodes = function (targets, nodes, noOpen) {
             resolve(room);
           }).catch(reject);
         };
-        self.smartOpenChat(roomId).then(room => {
+        self.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, !noOpen).then(room => {
           for (var i = folderNodes.length; i--;) {
             createPublicLink(folderNodes[i], room);
           }

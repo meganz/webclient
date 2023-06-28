@@ -599,11 +599,11 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     return;
                 }
 
-                $this.addClass('disabled');
-
                 if (!mySelf.checkCu25519(userHandle, mySelf.viewSubAccountInfoUI.bind(mySelf))) {
                     return false;
                 }
+
+                $this.addClass('disabled');
 
                 var isDisable = false;
                 if (M.suba[userHandle].s === 10 || M.suba[userHandle].s === 0) {

@@ -786,6 +786,8 @@ mBroadcaster.once('fm:initialized', function () {
     'use strict';
 
     var $banner;
+
+    // If Business
     if (u_attr && u_attr.b) {
         if (u_attr.b.m) {
             var msg = '';
@@ -819,7 +821,32 @@ mBroadcaster.once('fm:initialized', function () {
                 $banner.$alertBanner.off('tap').on('tap', function() { loadSubPage('registerb'); });
             }
         }
+    }
 
+    // If Pro Flexi
+    if (u_attr && u_attr.pf) {
+        let msg = '';
+
+        // If expired, show red banner
+        if (u_attr.pf.s === -1) {
+            msg = l.pro_flexi_expired_banner;
+            $banner = mobile.alertBanner.showError(msg);
+            $banner.$alertBanner.addClass('business');
+            $banner.$alertBanner.rebind('tap.alertbanner', () => {
+                loadSubPage('repay');
+            });
+        }
+
+        // If in grace period, show yellow banner
+        else if (u_attr.pf.s === 2) {
+            msg = l.pro_flexi_grace_period_banner.replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
+                .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
+            $banner = mobile.alertBanner.showWarning(msg);
+            $banner.$alertBanner.addClass('business');
+            $banner.$alertBanner.rebind('tap.alertbanner', () => {
+                loadSubPage('repay');
+            });
+        }
     }
 });
 

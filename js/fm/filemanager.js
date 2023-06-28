@@ -950,6 +950,7 @@ FileManager.prototype.initFileManagerUI = function() {
     }
 
     var isMegaSyncTransfer = true;
+
     $('.js-fm-tab').rebind('click.fmTabState', function() {
         treesearch = false;
         var clickedClass = this.className;
@@ -1047,6 +1048,9 @@ FileManager.prototype.initFileManagerUI = function() {
             return false;
         }
 
+        const isGalleryRedirect = this.dataset.locationPref
+            && (M.isAlbumsPage() || M.isGalleryPage() || this.matches('.nw-fm-left-icon.gallery'));
+
         for (var tab in self.fmTabState) {
             if (~clickedClass.indexOf(tab)) {
                 tab = self.fmTabState[tab];
@@ -1058,7 +1062,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
                 // Clicked on the currently active tab, should open the root (e.g. go back)
                 else if (clickedClass.indexOf(activeClass) !== -1) {
-                    targetFolder = tab.root;
+                    targetFolder = (isGalleryRedirect) ? this.dataset.locationPref : tab.root;
 
                     // special case handling for the chat, re-render current conversation
                     if (
@@ -1072,6 +1076,9 @@ FileManager.prototype.initFileManagerUI = function() {
                 else if (tab.prev && (M.d[tab.prev] || M.isCustomView(tab.prev) ||
                     (tab.subpages && tab.subpages.indexOf(tab.prev) > -1))) {
                     targetFolder = tab.prev;
+                }
+                else if (isGalleryRedirect) {
+                    targetFolder = this.dataset.locationPref;
                 }
                 else {
                     targetFolder = tab.root;
@@ -4617,6 +4624,44 @@ FileManager.prototype.initLeftPanel = function() {
     }
     else if (isGallery && mega.gallery.sections[M.currentdirid]) { // If gallery and is not Discovery
         $(`.js-lpbtn[data-link="${mega.gallery.sections[M.currentdirid].root}"]`).addClass('active');
+    }
+
+    const galleryBtn = document.querySelector('.nw-fm-left-icon.gallery');
+
+    if (galleryBtn && (!galleryBtn.dataset.locationPref || isGallery)) {
+        const galleryRoots = {
+            photos: true,
+            images: true,
+            videos: true
+        };
+
+        mega.gallery.prefs.init().then(({ getItem }) => {
+            const res = getItem('web.locationPref');
+
+            if (!res || typeof res !== 'object' || !elements[0].querySelector) {
+                return;
+            }
+
+            const keys = Object.keys(res);
+
+            for (let i = 0; i < keys.length; i++) {
+                const pathKey = keys[i];
+
+                if (!galleryRoots[pathKey]) {
+                    continue;
+                }
+
+                const btn = elements[0].querySelector(`.btn-galleries[data-link=${pathKey}]`);
+
+                if (btn) {
+                    btn.dataset.locationPref = res[pathKey];
+                }
+
+                if (pathKey === 'photos') {
+                    galleryBtn.dataset.locationPref = res[pathKey];
+                }
+            }
+        });
     }
 
     $('.js-lpbtn').rebind('click.openSubTab', function(e) {

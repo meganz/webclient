@@ -57,7 +57,12 @@ class MContextMenu extends MComponent {
         });
 
         this.pageChangeListener = mBroadcaster.addListener('beforepagechange', () => {
-            this.hide();
+            if (this.ignorePageNavigationOnce) {
+                this.ignorePageNavigationOnce = false;
+            }
+            else {
+                this.hide();
+            }
         });
 
         this.toggleScrolls(false);

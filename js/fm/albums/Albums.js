@@ -261,6 +261,23 @@ lazy(mega.gallery, 'albums', () => {
         }
     };
 
+    const storeLastActiveTab = () => {
+        const activeBtn = document.querySelector('.lp-content-wrap.library-panel > button.active');
+
+        if (!activeBtn) {
+            return;
+        }
+
+        const activeClass = [...activeBtn.classList].find(c => !!M.fmTabState[c]);
+
+        if (!activeClass) {
+            return;
+        }
+
+        M.fmTabState[activeClass].prev = M.currentdirid;
+        M.lastActiveTab = activeClass;
+    };
+
     /**
      * @param {String} text Text to use inside the toast
      * @returns {HTMLElement}
@@ -4018,6 +4035,8 @@ lazy(mega.gallery, 'albums', () => {
                 l.albums,
                 'icon-album',
                 () => {
+                    storeLastActiveTab();
+
                     if (!M.isAlbumsPage(1)) {
                         M.openFolder('albums');
                     }
@@ -4164,6 +4183,8 @@ lazy(mega.gallery, 'albums', () => {
             label,
             'icon-album',
             () => {
+                storeLastActiveTab();
+
                 const nextFolder = 'albums/' + albumId;
 
                 if (M.currentdirid !== nextFolder) {

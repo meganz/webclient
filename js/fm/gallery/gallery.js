@@ -1446,7 +1446,7 @@ class MegaGallery {
                 mega.gallery.titleControl.hide();
             }
 
-            if (e.originalEvent.state.galleryMode && this.id === M.currentdirid) {
+            if (!this.inPreview && e.originalEvent.state.galleryMode && this.id === M.currentdirid) {
                 this.setMode(e.originalEvent.state.galleryMode, undefined, true);
                 this.render(false);
             }

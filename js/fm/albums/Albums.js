@@ -1219,7 +1219,6 @@ lazy(mega.gallery, 'albums', () => {
             this.dynamicList = new MegaDynamicList(this.el, {
                 itemRenderFunction: this.renderRow.bind(this),
                 itemHeightCallback: () => this.rowHeight,
-                onResize: this.onResize.bind(this),
                 perfectScrollOptions: {
                     handlers: ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
                     minScrollbarLength: 50
@@ -1275,6 +1274,10 @@ lazy(mega.gallery, 'albums', () => {
             if (this.zoomControls) {
                 this.el.parentNode.prepend(this.zoomControls);
             }
+
+            delay('album_timeline:set_nodes', () => {
+                this.dynamicList.options.onResize = this.onResize.bind(this);
+            });
         }
 
         clearSiblingSelections(ignoreHandle) {

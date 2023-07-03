@@ -85,7 +85,10 @@ lazy(mega, 'fileRequest', () => {
             this.$selectFolder = new mega.fileRequestUI.SelectFolderComponent(this.$dialog);
 
             this.$previewButtonContainer = $('.footer-container.preview', this.$sectionPrimary);
-            this.$previewButton = new mega.fileRequestUI.PreviewButtonComponent(
+            this.$previewButtonFooter = new mega.fileRequestUI.PreviewButtonComponent(
+                $('footer .file-request-preview-button', this.$dialog)
+            );
+            this.$previewButtons = new mega.fileRequestUI.PreviewButtonComponent(
                 $('.file-request-preview-button', this.$dialog)
             );
 
@@ -216,7 +219,7 @@ lazy(mega, 'fileRequest', () => {
             });
 
             // Secondary
-            this.$previewButton.setOptions({
+            this.$previewButtons.setOptions({
                 namespace: this.namespace,
                 callback: () => {
                     const title = this.$inputTitle.getValue();
@@ -297,7 +300,7 @@ lazy(mega, 'fileRequest', () => {
             this.$sectionSecondary.addClass('hidden');
 
             // Footer
-            this.$previewButton.getInput().addClass('hidden');
+            this.$previewButtonFooter.getInput().addClass('hidden');
             this.$removeButton.getInput().addClass('hidden');
             this.$closeButtonFooter.addClass('hidden').removeClass('positive');
             this.$saveButton.getInput().addClass('hidden').removeClass('positive');
@@ -331,7 +334,7 @@ lazy(mega, 'fileRequest', () => {
 
         setFooter() {
             if (this.previewButtonFooter) {
-                this.$previewButton.getInput().removeClass('hidden');
+                this.$previewButtonFooter.getInput().removeClass('hidden');
             }
 
             if (this.close) {

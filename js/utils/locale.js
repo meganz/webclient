@@ -1106,6 +1106,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[12487] = escapeHTML(l[12487]).replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>')
         .replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
     l[12488] = escapeHTML(l[12488]).replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
+    l.megasync_upload_wrong_user = escapeHTML(l.megasync_upload_wrong_user).replace(/\[BR]/g, '<br>');
     l[16116] = escapeHTML(l[16116]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
 
     l.bus_acc_delete_msg = escapeHTML(l.bus_acc_delete_msg)

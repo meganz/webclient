@@ -564,11 +564,17 @@ var mobile = {
             if (this.classList.contains('icon-eye-reveal')) {
 
                 $('input[type="password"]', this.parentNode).attr('type', 'text');
+                if ($('input', this.parentNode).attr('style')) {
+                    $('input', this.parentNode).attr('style', '-webkit-text-security: none;');
+                }
                 this.classList.remove('icon-eye-reveal');
                 this.classList.add('icon-eye-hidden');
             }
             else {
                 $('input[type="text"]', this.parentNode).attr('type', 'password');
+                if ($('input', this.parentNode).attr('style')) {
+                    $('input', this.parentNode).attr('style', '-webkit-text-security: disc;');
+                }
                 this.classList.add('icon-eye-reveal');
                 this.classList.remove('icon-eye-hidden');
             }

@@ -287,6 +287,7 @@ body.de .mega-dialog.contact-picker-widget {
 .mega-dialog.add-from-cloud .content {
     border-bottom: 1px solid var(--stroke-grey-2);
     overflow: hidden;
+    flex: 1 1;
 }
 .mega-dialog.add-from-cloud .fm-dialog-tabs:after {
     display: block;

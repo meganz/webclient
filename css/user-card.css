@@ -140,7 +140,10 @@ button.user-card-name:hover {
     display: block;
 }
 .group-chat .chat-contacts-list .user-card-presence {
-    margin: 7px 0 5px 8px;
+    margin-inline-start: 8px;
+    -webkit-margin-start: 8px;
+    margin-top: 7px;
+    margin-bottom: 5px;
 }
 .group-chat .chat-contacts-list .user-card-name, .right-chat-contact-card .user-card-name {
     display: inline-block;

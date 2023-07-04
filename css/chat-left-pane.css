@@ -106,7 +106,10 @@
 .content-panel.conversations span.empty-conversations {
     overflow: hidden;
     display: block;
-    margin: 5px 0 5px 40px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-inline-start: 40px;
+    -webkit-margin-start: 40px;
     padding: 0 0 4px;
     width: calc(100% - 46px);
     font: var(--text-body2);
@@ -142,8 +145,14 @@
 .conversations-pane .conversation-avatar {
     float: left;
     width: 32px;
-    margin: 4px 10px 4px 0;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    margin-inline-end: 10px;
+    -webkit-margin-end: 10px;
     border-radius: 4px;
+}
+.rtl .conversations-pane .conversation-avatar {
+    float: right;
 }
 .conversations-pane .conversation-avatar .avatar-wrapper,
 .result-table .result-table-row .avatar-wrapper {
@@ -525,11 +534,19 @@ li.active .call-duration i {
     top: 4px;
     left: 8px;
 }
+.rtl .search-field i.search-icon-find {
+    left: unset;
+    right: 8px;
+}
 
 .search-field i.search-icon-reset {
     top: 4px;
     right: 8px;
     cursor: pointer;
+}
+.rtl .search-field i.search-icon-reset {
+    right: unset;
+    left: 8px;
 }
 
 .search-field i.tiny-searching {
@@ -543,12 +560,21 @@ li.active .call-duration i {
     right: 36px;
     --icon-size: 20px;
 }
+.rtl .search-field i.icon-check,
+.rtl .search-field i.icon-pause {
+    left: 36px;
+    right: unset;
+}
 
 .search-field i.icon-resume {
     top: 8px;
     right: 39px;
     --icon-size: 17px;
     cursor: pointer;
+}
+.rtl .search-field i.icon-resume {
+    left: 39px;
+    right: unset;
 }
 
 .search-field .clickable {
@@ -563,9 +589,17 @@ li.active .call-duration i {
     height: 32px;
     cursor: pointer;
 }
+.rtl .search-field .progress-controls {
+    left: 32px;
+    right: unset;
+}
 
 .search-field .progress-controls i {
     right: 6px;
+}
+.rtl .search-field .progress-controls i {
+    left: 6px;
+    right: unset;
 }
 
 .search-field input {
@@ -576,7 +610,12 @@ li.active .call-duration i {
     box-sizing: border-box;
     font: var(--text-body1);
     line-height: 24px;
-    padding: 4px 30px 4px 40px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-inline-start: 40px;
+    -webkit-padding-start: 40px;
+    padding-inline-end: 30px;
+    -webkit-padding-end: 30px;
     width: 100%;
 }
 .search-field input::-webkit-input-placeholder { color: var(--text-color-low); }
@@ -585,7 +624,11 @@ li.active .call-duration i {
 
 .search-field .search-field-status {
     position: relative;
-    margin: 4px 8px 0 7px;
+    margin-top: 4px;
+    margin-inline-start: 7px;
+    -webkit-margin-start: 7px;
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
     padding: 4px 30px;
     border-radius: 4px;
     font: var(--text-body1-bold);
@@ -957,8 +1000,14 @@ li.active .call-duration i {
 }
 
 .contacts-actions {
-    margin: 10px 20px 0 0;
+    margin-top: 10px;
+    margin-inline-end: 20px;
+    -webkit-margin-end: 20px;
     text-align: right;
+}
+.rtl .contacts-actions {
+    direction: rtl;
+    text-align: left;
 }
 
 .contacts-actions button i {
@@ -975,6 +1024,12 @@ li.active .call-duration i {
 .contacts-table tr.active .contact-item-controls {
     display: block;
     margin: 0 10px 0 0;
+}
+.rtl .contacts-table tr:hover .contact-item-controls,
+.rtl .contacts-table tr.ui-selected .contact-item-controls,
+.rtl .contacts-table tr.active .contact-item-controls {
+    display: block;
+    margin: unset;
 }
 .contacts-table th {
     position: relative;
@@ -1038,12 +1093,17 @@ li.active .call-duration i {
     display: block;
     float: left;
     --icon-size: 24px;
-    margin: -3px 7px 0 0;
+    margin-top: -3px;
+    margin-inline-end: 7px;
+    -webkit-margin-end: 7px;
     --mask-color: var(--icon-rest);
+}
+.rtl .contacts-table .contact-item-time i {
+    float: right;
 }
 
 .contact-item-controls {
-    text-align: right;
+    text-align: end;
     width: calc(100% - 10px);
 }
 
@@ -1095,6 +1155,10 @@ li.active .call-duration i {
     background: var(--surface-main);
 }
 
+.rtl .contacts-table thead th:last-child {
+    width: 5%;
+}
+
 .contacts-table-results tr {
     position: relative;
     border-top: 3px solid var(--stroke-main);
@@ -1121,6 +1185,12 @@ li.active .call-duration i {
     border-top-right-radius: 6px;
     border-bottom-right-radius: 6px;
 }
+.rtl .contacts-table-results tr td:first-child::before {
+    border-radius: 0 6px 6px 0;
+}
+.rtl .contacts-table-results tr td:last-child::before {
+    border-radius: 6px 0 0 6px;
+}
 .contacts-table-results tr.ui-selected td::before {
     display: block;
     background: var(--surface-grey-4);
@@ -1139,6 +1209,14 @@ li.active .call-duration i {
 .contacts-table-results tr:not(tr.ui-selected):hover td:last-child::before {
     border-right-color: var(--stroke-grey-2);
 }
+.rtl .contacts-table-results tr:not(.ui-selected):hover td:first-child::before {
+    border-left-color: var(--stroke-grey-3);
+    border-right-color: var(--stroke-grey-2);
+}
+.rtl .contacts-table-results tr:not(.ui-selected):hover td:last-child::before {
+    border-right-color: var(--stroke-grey-3);
+    border-left-color: var(--stroke-grey-2);
+}
 
 .contacts-table-results td {
     height: 55px;
@@ -1150,13 +1228,15 @@ li.active .call-duration i {
 }
 
 .contacts-table th {
-    padding: 0 0 0 8px;
+    padding: 0;
+    padding-inline-start: 8px;
+    -webkit-padding-start: 8px;
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
     font: var(--text-body2);
     color: var(--text-color-medium);
-    text-align: left;
+    text-align: start;
     cursor: pointer;
     position: sticky;
     position: -webkit-sticky;
@@ -1165,8 +1245,13 @@ li.active .call-duration i {
 
 .contacts-table th i {
     float: right;
-    padding: 0 5px 0 0;
+    padding-inline-end: 5px;
+    -webkit-padding-end: 5px;
     --mask-color: var(--icon-rest);
+}
+
+.rtl .contacts-table th i {
+    float: left;
 }
 
 .contacts-table th:after {
@@ -1201,13 +1286,19 @@ li.active .call-duration i {
 }
 
 .contacts-table .user-card-presence {
-    margin: 0 8px 1px 0;
+    margin-bottom: 1px;
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
 }
 
 .contacts-content {
     height: 100%;
     flex-grow: 1;
     overflow: hidden;
+}
+
+.rtl .contacts-content {
+    direction: rtl;
 }
 
 .contacts-content .mega-button.action i {
@@ -1288,7 +1379,11 @@ li.active .call-duration i {
 .profile-head .profile-photo {
     position: relative;
     float: left;
-    margin: 0 25px 0 0;
+    margin-inline-end: 25px;
+    -webkit-margin-end: 25px;
+}
+.rtl .profile-head .profile-photo {
+    float: right;
 }
 
 .profile-head .profile-photo .user-card-verified {
@@ -1300,6 +1395,9 @@ li.active .call-duration i {
 .profile-head .profile-info {
     float: left;
     max-width: 400px;
+}
+.rtl .profile-head .profile-info {
+    float: right;
 }
 
 .profile-head .profile-info h2 {
@@ -1323,7 +1421,8 @@ li.active .call-duration i {
 .profile-head .profile-controls button,
 .profile-head .profile-controls button:hover,
 .profile-head .profile-controls button:focus {
-    margin: 0 15px 0 0;
+    margin-inline-end: 15px;
+    -webkit-margin-end: 15px;
     background: linear-gradient(180deg, rgba(86, 210, 241, 1) 0%, rgba(43, 166, 222, 1) 100%);
 }
 
@@ -1360,6 +1459,10 @@ li.active .call-duration i {
     border-radius: 12px;
     text-align: center;
     background: var(--surface-grey-2);
+}
+.rtl .profile-head .profile-credentials {
+    left: 25px;
+    right: unset;
 }
 
 .profile-head .profile-credentials .credentials-head {
@@ -1528,7 +1631,9 @@ li.active .call-duration i {
 .profile-shared-folders table.grid-table th.fav {
     width: 75px;
     margin: 0 auto;
-    padding: 0 0 3px 32px;
+    padding-bottom: 3px;
+    padding-inline-start: 32px;
+    -webkit-padding-start: 32px;
 }
 .profile-shared-folders table.shared-with-me td.fav {
     width: 75px;
@@ -1537,8 +1642,12 @@ li.active .call-duration i {
 .profile-shared-folders table.shared-with-me td.grid-url-header-nw {
     float: right;
     width: 100px;
-    margin: 0 20px 0 0;
-    text-align: right;
+    margin-inline-end: 20px;
+    -webkit-margin-end: 20px;
+    text-align: end;
+}
+.rtl .profile-shared-folders table.shared-with-me td.grid-url-header-nw {
+    float: left;
 }
 .profile-shared-folders .contact-item-controls {
     display: block;
@@ -1651,7 +1760,9 @@ li.active .call-duration i {
 .conversationsApp .lhp-action-buttons {
     font: var(--text-body1);
     color: var(--text-color-high);
-    margin: 0 0 4px 10px;
+    margin-bottom: 4px;
+    margin-inline-start: 10px;
+    -webkit-margin-start: 10px;
 }
 
 .conversationsApp .lhp-action-buttons button.loading-sketch {
@@ -1733,7 +1844,8 @@ li.active .call-duration i {
 .lhp-conversations .toggle-panel .toggle-panel-heading {
     display: flex;
     align-items: center;
-    padding: 0 0 0 10px;
+    padding-inline-start: 10px;
+    -webkit-padding-start: 10px;
     font: var(--text-body2);
     cursor: pointer;
 }

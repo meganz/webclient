@@ -42,12 +42,22 @@
             .name {
                 overflow: hidden;
                 float: left;
-                padding: 9px 0 0 10px;
+                padding-top: 9px;
+                padding-inline-start: 10px;
+                -webkit-padding-start: 10px;
                 width: calc(100% - 100px);
+
+                body.rtl & {
+                    float: right;
+                }
 
                 span {
                     display: block;
                     float: left;
+
+                    body.rtl & {
+                        float: right;
+                    }
 
                     &:first-child {
                         overflow: hidden;
@@ -76,9 +86,15 @@
                 float: right;
                 margin: 5px 0 0 0;
 
+                body.rtl & {
+                    float: left;
+                }
+
                 i {
                     display: inline-block;
-                    margin: 0 0 0 3px;
+                    margin-inline-start: 3px;
+                    -webkit-margin-start: 3px;
+
                     --icon-size: 24px;
                     --mask-color: var(--icon-rest);
 

@@ -485,6 +485,9 @@
   background: var(--surface-main);
   z-index: 12;
 }
+.rtl .meetings-call .sidebar {
+  direction: rtl;
+}
 .meetings-call .sidebar .collapse {
   height: 100%;
 }
@@ -569,12 +572,20 @@
 .meetings-call .sidebar .participants ul li .name {
   overflow: hidden;
   float: left;
-  padding: 9px 0 0 10px;
+  padding-top: 9px;
+  padding-inline-start: 10px;
+  -webkit-padding-start: 10px;
   width: calc(100% - 100px);
+}
+body.rtl .meetings-call .sidebar .participants ul li .name {
+  float: right;
 }
 .meetings-call .sidebar .participants ul li .name span {
   display: block;
   float: left;
+}
+body.rtl .meetings-call .sidebar .participants ul li .name span {
+  float: right;
 }
 .meetings-call .sidebar .participants ul li .name span:first-child {
   overflow: hidden;
@@ -598,9 +609,13 @@
   float: right;
   margin: 5px 0 0 0;
 }
+body.rtl .meetings-call .sidebar .participants ul li .status {
+  float: left;
+}
 .meetings-call .sidebar .participants ul li .status i {
   display: inline-block;
-  margin: 0 0 0 3px;
+  margin-inline-start: 3px;
+  -webkit-margin-start: 3px;
   --icon-size: 24px;
   --mask-color: var(--icon-rest);
 }
@@ -668,6 +683,9 @@
   width: 100%;
   background: var(--surface-main);
   z-index: 2;
+}
+body.rtl .meetings-call .sidebar.chat-opened .sidebar-head {
+  width: calc(100% - 32px);
 }
 .meetings-call .sidebar.chat-opened .in-call {
   /* [...] */
@@ -790,6 +808,10 @@
   bottom: 5px;
   left: 5px;
 }
+body.rtl .meetings-call .sidebar-streams .video-node-status {
+  left: unset;
+  right: 5px;
+}
 .meetings-call .sidebar-streams .video-node-status span {
   width: 24px;
   height: 24px;
@@ -814,7 +836,10 @@
   padding: 16px;
 }
 .meetings-call .sidebar-head h2 {
-  margin: 0 0 0 5px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-inline-start: 5px;
+  -webkit-margin-start: 5px;
   color: var(--text-color-high);
 }
 .meetings-call .sidebar-head button {
@@ -827,6 +852,10 @@
 }
 .meetings-call .sidebar-head button.add i {
   --mask-color: var(--secondary-white) ;
+}
+body.rtl .meetings-call .sidebar-head button.add {
+  left: 20px;
+  right: unset;
 }
 .meetings-call .sidebar-head button i {
   margin: 0 auto;
@@ -2076,6 +2105,10 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 .preview-meeting-controls button {
   display: inline;
 }
+.preview-meeting-controls button:first-child {
+  margin-inline-end: 32px;
+  -webkit-margin-end: 32px;
+}
 .preview-meeting-controls button i {
   margin: 0 auto;
   --icon-size: 32px;
@@ -2969,3 +3002,5 @@ body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button
 .meetings-recurring-content .meetings-recurring-monthly {
   /* [...] */
 }
+
+/*# sourceMappingURL=chat-bundle.css.map */

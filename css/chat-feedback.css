@@ -1,8 +1,13 @@
 .feedback.call-status-block {
     position: relative;
     float: left;
-    margin: 5px 0 0 2px;
+    margin-top: 5px;
+    margin-inline-start: 2px;
+    -webkit-margin-start: 2px;
     z-index: 1;
+}
+.rtl .feedback.call-status-block {
+    float: right;
 }
 
 .feedback.call-status-block i {

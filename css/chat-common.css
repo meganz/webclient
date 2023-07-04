@@ -65,6 +65,9 @@
     position: absolute;
     right: 0;
 }
+.rtl .chat-right-area {
+    direction: rtl;
+}
 .chat-right-area::after {
     content: '';
     width: 1px;
@@ -227,10 +230,12 @@
 }
 .contacts-info .user-card-data {
     line-height: 0;
-    padding-right: 15px;
+    padding-inline-start: 10px;
+    -webkit-padding-start: 10px;
+    padding-inline-end: 15px;
+    -webkit-padding-end: 15px;
 }
 .rtl .contacts-info .user-card-data {
-    padding-right: 20px;
     max-width: 74%;
 }
 .chat-right-area .buttons-block {
@@ -250,6 +255,10 @@
     --icon-size: 24px;
     --mask-color: var(--icon-rest);
 }
+.rtl .chat-right-area .link-button i {
+    float: right;
+    margin: 4px 6px 0 0;
+}
 .chat-right-area .link-button.light:not(.disabled):hover i,
 .chat-right-area .dropdown-item.link-button.light:not(.disabled):hover i {
     --mask-color: var(--icon-active);
@@ -261,6 +270,10 @@
     position: absolute;
     top: 4px;
     right: 6px;
+}
+.rtl .chat-right-area .link-button .mega-switch {
+    left: 6px;
+    right: unset;
 }
 .chat-right-area .link-button.push-settings-button {
     height: auto;
@@ -276,7 +289,8 @@
 }
 .chat-right-area .link-button.open-invite-settings-button span.label--green {
     display: block;
-    padding-left: 0;
+    padding-inline-start: 0;
+    -webkit-padding-start: 0;
     line-height: 18px;
     color: var(--text-color-low);
 }
@@ -337,7 +351,12 @@
 }
 .contacts-info .contacts-icon {
     float: right;
-    margin: 5px 4px 0 0;
+    margin-top: 5px;
+    margin-inline-end: 4px;
+    -webkit-margin-end: 4px;
+}
+.rtl .contacts-info .contacts-icon {
+    float: left;
 }
 .contacts-info .contacts-icon:hover {
     border-radius: 4px;
@@ -529,8 +548,13 @@
 }
 .chat-dropdown .link-button.light span,
 .chat-dropdown .dropdown-item.link-button.light span {
-    padding-left: 35px;
-    padding-right: 0px;
+    padding-inline-start: 35px;
+    -webkit-padding-start: 35px;
+    padding-inline-end: 0;
+    -webkit-padding-end: 0;
+}
+.rtl .chat-dropdown .link-button.light span {
+    text-align: right;
 }
 .chat-shared-block {
     padding: 5px 0;
@@ -978,7 +1002,8 @@ button.fm-empty-button {
     cursor: pointer;
 }
 .main-start-chat-dropdown.lhp-contact-selector .button-wrapper .button-title {
-    padding: 0 0 0 8px;
+    padding-inline-start: 8px;
+    -webkit-padding-start: 8px;
 }
 
 .dropdown.body.popup.contacts-search > div {
@@ -1195,7 +1220,9 @@ button.fm-empty-button {
 }
 
 .chat-occurrences-list-inner {
-    padding: 5px 12px 0 0;
+    padding-top: 5px;
+    padding-inline-end: 12px;
+    -webkit-padding-end: 12px;
 }
 
 .chat-occurrences-list-inner .loading-sketch {
@@ -1274,11 +1301,20 @@ button.fm-empty-button {
     --icon-size: 18px;
     opacity: 0;
 }
+.rtl .chat-occurrence-controls {
+    left: 0;
+    right: unset;
+}
 
 .chat-occurrence-control {
     float: left;
-    margin: 0 8px 0 0;
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
     cursor: pointer;
+}
+
+.rtl .chat-occurrence-control {
+    float: right;
 }
 
 .mega-dialog.scheduled-description-dialog header h3 {

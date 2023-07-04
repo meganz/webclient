@@ -93,6 +93,11 @@
         button {
             display: inline;
 
+            &:first-child {
+                margin-inline-end: 32px;
+                -webkit-margin-end: 32px;
+            }
+
             i {
                 margin: 0 auto;
                 --icon-size: 32px;

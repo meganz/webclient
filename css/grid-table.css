@@ -919,12 +919,13 @@ table.shared-with-me .avatar-wrapper {
 }
 
 table.shared-with-me .shared-folder-info-block {
-    padding: 0 0 0 51px;
+    padding-inline-start: 51px;
+    -webkit-padding-start: 51px;
     font: var(--text-body2);
     display: block;
     box-sizing: border-box;
     position: relative;
-    text-align: left;
+    text-align: start;
 }
 
 table.shared-with-me .shared-folder-info-block .shared-folder-name {
@@ -979,7 +980,8 @@ table.shared-with-me .shared-folder-access {
 }
 table.shared-with-me .shared-folder-access i {
     display: inline-block;
-    margin-right: 5px;
+    margin-inline-end: 5px;
+    -webkit-margin-end: 5px;
     --icon-size: 22px;
 }
 table.shared-with-me .shared-folder-access span {

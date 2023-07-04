@@ -114,6 +114,9 @@
     overflow: hidden;
     z-index: 1;
 }
+.rtl .messages.scroll-area {
+    direction: rtl;
+}
 .messages.error.scroll-area {
     height: 100%;
 }
@@ -128,6 +131,10 @@
     z-index: -1;
     transition: all 50ms ease-in-out;
     opacity: 0;
+}
+.rtl .messages.scroll-area .messages-toast {
+    left: 20px;
+    right: unset;
 }
 .messages.scroll-area .messages-toast.active {
     bottom: 10px;
@@ -191,7 +198,9 @@
 .messages.notification .info p {
     position: relative;
     margin: 0;
-    padding: 24px 0 0 48px;
+    padding-top: 24px;
+    padding-inline-start: 48px;
+    -webkit-padding-start: 48px;
     font: var(--text-body1);
 }
 .messages.notification .info p i {
@@ -200,6 +209,10 @@
     --icon-size: 36px;
     margin: 2px 0 0 0;
     --mask-color: var(--icon-rest);
+}
+.rtl .messages.notification .info p i {
+    left: unset;
+    right: 0;
 }
 .messages.notification .info p strong {
     display: block;
@@ -213,7 +226,8 @@
     clear: both;
 }
 .message.content-area {
-    margin: 0 0 0 48px;
+    margin-inline-start: 48px;
+    -webkit-margin-start: 48px;
     font-size: 0;
     line-height: 0;
     color: #666666;
@@ -253,7 +267,8 @@
 .message.text-block {
     font: var(--text-body1);
     color: var(--text-color-higher);
-    margin: 0 30px 0 0;
+    margin-inline-end: 30px;
+    -webkit-margin-end: 30px;
     word-wrap: break-word;
     min-height: 20px;
     position: relative;
@@ -320,9 +335,13 @@
 .message i.call-info-icon {
     display: block;
     float: left;
-    margin: 0 20px 0 0;
+    margin-inline-end: 20px;
+    -webkit-margin-end: 20px;
     --icon-size: 32px;
     --mask-color: var(--icon-rest);
+}
+.rtl .message i.call-info-icon {
+    float: right;
 }
 .message .call-info-message {
     display: block;
@@ -385,7 +404,8 @@
     display: inline-block;
     max-width: calc(100% - 60px);
     height: 19px;
-    padding: 0 10px 0 0;
+    padding-inline-end: 10px;
+    -webkit-padding-end: 10px;
     font: var(--text-body1-bold);
     vertical-align: top;
     color: var(--text-color-high);
@@ -397,7 +417,10 @@
 .message.date-divider {
     font: var(--text-h3);
     color: var(--text-color-info);
-    padding: 47px 0 9px 71px;
+    padding-top: 47px;
+    padding-bottom: 9px;
+    padding-inline-start: 71px;
+    -webkit-padding-start: 71px;
 }
 .message.shared-block {
     position: relative;
@@ -436,7 +459,8 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    padding: 0 70px 0 0;
+    padding-inline-end: 70px;
+    -webkit-padding-end: 70px;
     box-sizing: border-box;
     max-width: 100%;
 }
@@ -446,14 +470,17 @@
 }
 .message.data-title .file-name {
     color: var(--text-color-high);
-    padding-left: 5px;
+    padding-inline-start: 5px;
+    -webkit-padding-start: 5px;
 }
 .message.data-title.red {
     color: var(--text-color-error);
 }
 .message.file-size {
     display: inline-block;
-    margin: 3px 0 0 -60px;
+    margin-top: 3px;
+    margin-inline-start: -60px;
+    -webkit-margin-start: -60px;
     vertical-align: top;
     font: var(--text-body2);
     color: var(--text-color-low);
@@ -599,7 +626,8 @@
     padding: 10px 0 0 0;
 }
 .message.content-area .buttons-block button:not(:last-of-type) {
-    margin-right: 8px;
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
 }
 
 .shared-link.thumb.video.no-thumb img {
@@ -654,6 +682,9 @@
     margin-bottom: 8px;
     transition: all 200ms ease-in-out;
     box-sizing: border-box;
+}
+.rtl .message.richpreview.container {
+    float: right;
 }
 .message.richpreview.container.done-loading:hover {
     z-index: 100;
@@ -726,7 +757,9 @@
     font: var(--text-body1-bold);
     color: var(--text-color-high);
 }
-
+.rtl .message.richpreview.title {
+    float: right;
+}
 .message.richpreview.body {
     display: table;
     table-layout: fixed;
@@ -747,9 +780,15 @@
     padding: 0;
     float: left;
 }
+.rtl .message.richpreview.img-wrapper {
+    float: right;
+}
 .message.richpreview.inner-wrapper {
     float: right;
     width: calc(100% - 166px);
+}
+.rtl .message.richpreview.inner-wrapper {
+    float: left;
 }
 .message.richpreview.url {
     text-decoration: none;
@@ -759,8 +798,12 @@
 }
 .message.richpreview.url-favicon {
     margin-top: 2px;
-    padding-right: 8px;
+    padding-inline-end: 8px;
+    -webkit-padding-end: 8px;
     float: left;
+}
+.rtl .message.richpreview.url-favicon {
+    float: right;
 }
 .message.richpreview.loading-message {
     text-align: center;
@@ -1096,6 +1139,9 @@ body.theme-dark .message .audio-player {
     position: relative;
     z-index: 1;
     margin-top: -16px;
+}
+.rtl .message.content-area > .right-aligned-msg-buttons {
+    float: left;
 }
 .message.content-area:hover > .right-aligned-msg-buttons,
 .force-show-message-action-buttons .message.content-area > .right-aligned-msg-buttons,

@@ -178,6 +178,11 @@ a.shared-link.show-more {
     color: var(--text-color-high);
     background: var(--surface-grey-2);
 }
+.rtl .thumb-overlay .video-thumb-details {
+    padding: 1px 1px 1px 4px;
+    left: unset;
+    right: 4px;
+}
 .thumb-overlay .video-thumb-details i {
     --icon-size: 16px;
     --mask-color: var(--icon-rest);
@@ -189,6 +194,10 @@ a.shared-link.show-more {
     bottom: 4px;
     right: 4px;
     margin: 0;
+}
+.rtl .shared-link.thumb .tiny-button {
+    left: 4px;
+    right: unset;
 }
 .message.shared-block .data-title,
 .message.shared-block .file-size,

@@ -2394,13 +2394,19 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 }
 
 .meetings-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: absolute;
   top: 5px;
   left: 8px;
   width: calc(100% - 22px);
   border-radius: 12px;
   background: var(--secondary-orange);
-  z-index: 15;
+  z-index: 120;
+}
+.meetings-alert-light {
+  background: var(--secondary-blue);
 }
 .meetings-alert-neutral {
   background: var(--secondary-grey);
@@ -2411,12 +2417,31 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 .meetings-alert-high {
   background: var(--secondary-red);
 }
+.meetings-alert-notifications {
+  top: 57px;
+  width: calc(100% - 282px);
+}
+.meetings-alert-notifications.empty-state {
+  top: 5px;
+  width: calc(100% - 18px);
+}
+.meetings-alert-notifications.full-span {
+  width: calc(100% - 18px);
+}
 .meetings-alert-content {
   padding: 12px 40px 12px 12px;
   color: var(--secondary-white);
 }
 .meetings-alert-content a {
   color: var(--secondary-white);
+  text-decoration: underline;
+}
+.meetings-alert-control {
+  margin-inline-end: 46px;
+}
+.meetings-alert-control a {
+  color: var(--secondary-white);
+  font-family: var(--text-font-family-semibold);
   text-decoration: underline;
 }
 .meetings-alert-close {

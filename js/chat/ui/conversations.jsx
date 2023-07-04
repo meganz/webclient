@@ -32,7 +32,7 @@ class ConversationsApp extends MegaRenderMixin {
         scheduleMeetingDialog: false,
         scheduleOccurrenceDialog: false,
         view: VIEWS.LOADING,
-        callExpanded: false,
+        callExpanded: false
     };
 
     constructor(props) {
@@ -294,6 +294,7 @@ class ConversationsApp extends MegaRenderMixin {
                         className={routingSection === 'chat' ? '' : 'hidden'}
                         routingSection={routingSection}
                         currentlyOpenedChat={currentlyOpenedChat}
+                        isEmpty={isEmpty}
                         chatUIFlags={chatUIFlags}
                         onToggleExpandedFlag={() => {
                             this.setState(() => ({ callExpanded: Call.isExpanded() }));

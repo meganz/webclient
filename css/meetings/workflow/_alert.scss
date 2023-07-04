@@ -1,15 +1,33 @@
 .meetings-alert {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     position: absolute;
     top: 5px;
     left: 8px;
     width: calc(100% - 22px);
     border-radius: 12px;
     background: var(--secondary-orange);
-    z-index: 15;
+    z-index: 120;
 
+    &-light { background: var(--secondary-blue); }
     &-neutral { background: var(--secondary-grey); }
     &-medium { background: var(--secondary-orange); }
     &-high { background: var(--secondary-red); }
+
+    &-notifications {
+        top: 57px;
+        width: calc(100% - 282px);
+
+        &.empty-state {
+            top: 5px;
+            width: calc(100% - 18px);
+        }
+
+        &.full-span {
+           width: calc(100% - 18px);
+        }
+    }
 
     &-content {
         padding: 12px 40px 12px 12px;
@@ -17,6 +35,16 @@
 
         a {
             color: var(--secondary-white);
+            text-decoration: underline;
+        }
+    }
+
+    &-control {
+        margin-inline-end: 46px;
+
+        a {
+            color: var(--secondary-white);
+            font-family: var(--text-font-family-semibold);
             text-decoration: underline;
         }
     }

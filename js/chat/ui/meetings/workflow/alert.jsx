@@ -5,9 +5,10 @@ const NAMESPACE = 'meetings-alert';
 
 export default class Alert extends MegaRenderMixin {
     static TYPE = {
+        LIGHT: 'light',
         NEUTRAL: 'neutral',
         MEDIUM: 'medium',
-        HIGH: 'high'
+        HIGH: 'high',
     };
 
     render() {

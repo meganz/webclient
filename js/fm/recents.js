@@ -86,9 +86,6 @@ function RecentsRender() {
 
     var self = this;
 
-    // Init Dependencies
-    M.initShortcutsAndSelection(this.$container);
-
     // Default click handlers
     this.$container.rebind("click contextmenu", function(e) {
         $.hideTopMenu(e);
@@ -140,6 +137,8 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
         selectionManager.clear_selection();
         this.clearSelected();
     }
+
+    M.initShortcutsAndSelection(this.$container);
 
     M.getRecentActionsList(this.currentLimit, this.currentUntil).then(function(actions) {
         self.getMaxFitOnScreen(true);

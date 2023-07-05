@@ -170,6 +170,32 @@ if (typeof window.queueMicrotask !== "function") {
     };
 }
 
+if (typeof requestIdleCallback !== 'function') {
+
+    Object.defineProperties(self, {
+        requestIdleCallback: {
+            value(handler) {
+                'use strict';
+                const startTime = performance.now();
+                return setTimeout(() => {
+                    handler({
+                        didTimeout: false,
+                        timeRemaining() {
+                            return Math.max(0, 50.0 - (performance.now() - startTime));
+                        }
+                    });
+                }, 1);
+            }
+        },
+        cancelIdleCallback: {
+            value(id) {
+                'use strict';
+                clearTimeout(id);
+            }
+        }
+    });
+}
+
 (() => {
     'use strict';
     Promise.prototype.always = function(fc) {

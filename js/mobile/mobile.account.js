@@ -61,6 +61,11 @@ mobile.account = {
             $upgradeBtn.addClass('hidden');
         }
         else {
+            // If this is Pro Flexi or Business and Expired or in Grace Period, show the Reactive button
+            if (u_attr && (u_attr.b && u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED
+                || u_attr.pf && u_attr.pf.s !== pro.ACCOUNT_STATUS_ENABLED)) {
+                $('.account-upgrade-block .account-upgrade-text', $page).text(l.reactivate_account);
+            }
             // Show the button and add click/tap handler to load the Pro page
             $upgradeBtn.removeClass('hidden');
             $upgradeBtn.rebind('tap', () => {

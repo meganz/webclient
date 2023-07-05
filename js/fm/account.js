@@ -1857,9 +1857,10 @@ accountUI.plan = {
             $('.acc-setting-menu-balance-acc', '.content-panel.account').addClass('hidden');
             $('.upgrade-to-pro', $planContent).addClass('hidden');
 
-            // If Business Master account and if Expired or in Grace Period, show the Upgrade Account button
+            // If Business Master account and if Expired or in Grace Period, show the Reactive Account button
             if (u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED) {
                 $('.upgrade-to-pro', $planContent).removeClass('hidden');
+                $('.upgrade-to-pro span', $planContent).text(l.reactivate_account);
             }
         }
 
@@ -1876,9 +1877,10 @@ accountUI.plan = {
                 $('.acc-bandwidth-vol', $planContent).addClass('hidden');
             }
 
-            // If Expired or in Grace Period, show the Upgrade Account button
+            // If Expired or in Grace Period, show the Reactive Account button
             if (u_attr.pf.s !== pro.ACCOUNT_STATUS_ENABLED) {
                 $('.upgrade-to-pro', $planContent).removeClass('hidden');
+                $('.upgrade-to-pro span', $planContent).text(l.reactivate_account);
             }
         }
     },

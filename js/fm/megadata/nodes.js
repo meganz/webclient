@@ -2002,7 +2002,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             mega.gallery.albums.onCDNodeUpdate(n);
             mega.gallery.nodeUpdated = true;
         }
-        else if (M.isGalleryPage()) {
+        else if (M.gallery) {
             mega.gallery.checkEveryGalleryUpdate(n);
             mega.gallery.albums.onCDNodeUpdate(n);
         }

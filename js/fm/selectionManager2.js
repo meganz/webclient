@@ -871,7 +871,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 '.file-block-scrolling.ps--active-y' : '.grid-scrolling-table.ps--active-y';
         }
 
-        if (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0) {
+        if (
+            !M.gallery
+            && (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0)
+        ) {
             $selectionBar.removeClass('hidden');
         }
 

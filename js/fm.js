@@ -1001,7 +1001,7 @@ function FMShortcuts() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped === "a" && (e.ctrlKey || e.metaKey)) {
-            if (typeof selectionManager != 'undefined' && selectionManager) {
+            if (typeof selectionManager != 'undefined' && selectionManager && !M.gallery) {
                 selectionManager.select_all();
             }
             return false; // stop prop.

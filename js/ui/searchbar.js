@@ -38,6 +38,10 @@
                         $('#main-search-fake-form .js-filesearcher', $topbar).trigger('focus');
                         $('.js-btnclearSearch', $topbar).removeClass('hidden');
 
+                        if (pfid && mega.gallery) {
+                            mega.gallery.clearMdView();
+                        }
+
                         // fix a redirect from a bottompage with an 'old' class on it
                         $('body').removeClass('old');
                     });

@@ -753,10 +753,14 @@ FileManager.prototype.initFileManagerUI = function() {
         else {
             fmviewmode(M.currentdirid, viewValue);
         }
+        $('.fm-files-view-icon').removeClass('active');
 
         if (folderlink && M.currentdirid.substr(0, 6) === 'search') {
             M.viewmode = viewValue;
             M.renderMain();
+        }
+        else if (folderlink && $(this).hasClass('media-view')) {
+            galleryUI();
         }
         else {
             M.openFolder(M.currentdirid, true).then(reselect.bind(null, 1));
@@ -3299,8 +3303,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         $('.files-menu.context .dropdown-item.sort-timeAd span').safeHTML(dateLabel);
     }
 
-    $('.fm-files-view-icon.block-view').addClass('active');
-    $('.fm-files-view-icon.listing-view').removeClass('active');
+    $('.fm-files-view-icon').removeClass('active').filter('.block-view').addClass('active');
     $('.shared-grid-view').addClass('hidden');
     $('.out-shared-grid-view').addClass('hidden');
     $('.files-grid-view.fm').addClass('hidden');
@@ -3437,7 +3440,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
 FileManager.prototype.addGridUI = function(refresh) {
     "use strict";
 
-    if (this.chat) {
+    if (this.chat || this.gallery) {
         return;
     }
     if (d) {
@@ -3463,8 +3466,7 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     // $.gridDragging=false;
     $.gridLastSelected = false;
-    $('.fm-files-view-icon.listing-view').addClass('active');
-    $('.fm-files-view-icon.block-view').removeClass('active');
+    $('.fm-files-view-icon').removeClass('active').filter('.listing-view').addClass('active');
 
     $.gridHeader = function() {
         if (folderlink) {

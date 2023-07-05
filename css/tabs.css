@@ -2,7 +2,7 @@
 .gallery-tabs-bl {
     background-color: var(--surface-main);
     border-bottom: 1px solid var(--surface-grey-2);
-    padding: 16px 16px 0 12px;
+    padding: 0 15px;
     box-sizing: border-box;
     margin: 0;
     display: table;
@@ -12,10 +12,13 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    height: 49px;
+    height: 48px;
     flex-shrink: 0;
     border-bottom: 1px solid var(--surface-main);
     min-width: 700px;
+}
+.gallery-tabs-bl .gallery-section-tabs {
+    padding-top: 14px;
 }
 .rtl .gallery-tabs-bl {
     direction: rtl;

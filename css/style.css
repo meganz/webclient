@@ -4169,11 +4169,6 @@ body.loading .light-overlay {
     height: 24px;
     display: block;
     float: right;
-    margin: 6px 0;
-    -webkit-margin-end: 11px;
-    margin-inline-end: 11px;
-    -webkit-margin-start: 16px;
-    margin-inline-start: 16px;
     transition: opacity 200ms ease-in-out;
     cursor: pointer;
 }
@@ -4195,17 +4190,20 @@ body.loading .light-overlay {
 .fm-files-view-icon.listing-view {
     background-image: none;
 }
+.fm-files-view-icon.listing-view,
 .fm-files-view-icon.block-view {
     background-image: none;
     margin: 0;
 }
 .fm-files-view-icon.listing-view.active,
-.fm-files-view-icon.block-view.active {
+.fm-files-view-icon.block-view.active,
+.fm-files-view-icon.media-view.active {
     border-bottom: 2px solid var(--secondary-blue);
 }
 
 .fm-files-view-icon.listing-view.active i,
-.fm-files-view-icon.block-view.active i {
+.fm-files-view-icon.block-view.active i,
+.fm-files-view-icon.media-view.active i {
     --mask-color: var(--icon-active);
 }
 

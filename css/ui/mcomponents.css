@@ -70,6 +70,9 @@
 .p-6 {
     padding: 1.5rem;
 }
+.pl-4 {
+    padding-left: 1rem;
+}
 .pr-7 {
     padding-right: 1.75rem;
 }
@@ -295,6 +298,9 @@ i.text-color-medium {
 }
 .opacity-50 {
     opacity: 0.5;
+}
+.gap-3 {
+    gap: 0.75rem;
 }
 .pointer-events-none {
     pointer-events: none;

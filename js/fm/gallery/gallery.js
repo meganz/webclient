@@ -120,7 +120,7 @@ class MegaGallery {
     }
 
     get onpage() {
-        return this.id === M.currentCustomView.nodeID;
+        return this.id === M.currentCustomView.nodeID || (pfid && M.gallery);
     }
 
     setObserver() {
@@ -210,7 +210,10 @@ class MegaGallery {
 
         this.dropDynamicList();
 
-        if (pushHistory === 2) {
+        if (pfid) {
+            pushHistoryState(true, Object.assign({}, history.state, {galleryMode: this.mode}));
+        }
+        else if (pushHistory === 2) {
             pushHistoryState(true, {subpage: page, galleryMode: this.mode});
         }
         else if (pushHistory === 1) {
@@ -1140,7 +1143,7 @@ class MegaGallery {
             this.removeNodeFromGroups(M.d[h]);
         }
         else {
-            this.removeNodeFromGroups({h: h, mtime: this.nodes[h]});
+            this.removeNodeFromGroups({ h, mtime: this.nodes[h] });
         }
     }
 
@@ -1165,6 +1168,7 @@ class MegaGallery {
     }
 
     initDynamicList() {
+        const container = document.querySelector('.gallery-view-scrolling');
 
         this.slideShowCloseLister = mBroadcaster.addListener('slideshow:close', () => {
             delay('galleryCloseSlideShow', () => {
@@ -1180,7 +1184,7 @@ class MegaGallery {
             this.galleryBlock.classList.add(`zoom-${this.zoom}`);
         }
 
-        this.dynamicList = new MegaDynamicList(document.querySelector('.gallery-view-scrolling'), {
+        this.dynamicList = new MegaDynamicList(container, {
             'contentContainerClasses': 'content',
             'itemRenderFunction': this.renderGroup.bind(this),
             'itemHeightCallback': this.getGroupHeight.bind(this),
@@ -1191,6 +1195,8 @@ class MegaGallery {
                 'minScrollbarLength': 20
             }
         });
+
+        M.initShortcutsAndSelection(container);
     }
 
     render(rewriteModeByRoot, reset) {
@@ -1212,6 +1218,27 @@ class MegaGallery {
                 && this.mode !== mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root]) {
                 this.setMode(mega.gallery.rootMode[mega.gallery.sections[M.currentdirid].root], 2);
             }
+        }
+
+        const rfBlock = $('.fm-right-files-block', '.fmholder');
+        const galleryHeader = $('.gallery-tabs-bl', rfBlock);
+
+        galleryHeader.removeClass('hidden');
+        $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-right-header, .fm-empty-section', rfBlock).addClass('hidden');
+        $('.fm-files-view-icon').removeClass('active').filter('.media-view').addClass('active');
+
+        if (pfid && !M.v) {
+            $('.fm-empty-section', rfBlock).removeClass('hidden');
+        }
+
+        if (window.selectionManager) {
+            window.selectionManager.hideSelectionBar();
+        }
+
+        if (!mega.gallery.viewBtns) {
+            const viewBtns = $('.fm-header-buttons .view-links', rfBlock);
+            mega.gallery.viewBtns = viewBtns.clone(true);
+            galleryHeader.append(mega.gallery.viewBtns);
         }
 
         if (M.v.length > 0) {
@@ -1408,16 +1435,23 @@ class MegaGallery {
 
         if (!this.beforePageChangeListener) {
             this.beforePageChangeListener = mBroadcaster.addListener('beforepagechange', tpage => {
+                if (!this.inPreview) {
+                    this.dropDynamicList();
 
-                this.dropDynamicList();
+                    // Clear render cache to free memory
+                    this.clearRenderCache();
 
-                // Clear render cache for free memory
-                this.clearRenderCache();
+                    if (pfid && !tpage.startsWith('folder/')) {
+                        $('.fm-files-view-icon.media-view').addClass('hidden');
+                    }
+                }
 
                 // Clear thumbnails to free memory if target page is not gallery anymore
-                if (!M.isGalleryPage(tpage)) {
-                    mBroadcaster.removeListener(this.beforePageChangeListener);
-                    delete this.beforePageChangeListener;
+                if (!M.gallery || pfid) {
+                    if (!this.inPreview) {
+                        mBroadcaster.removeListener(this.beforePageChangeListener);
+                        delete this.beforePageChangeListener;
+                    }
 
                     // Clear discovery
                     if (this.isDiscovery) {
@@ -1441,21 +1475,31 @@ class MegaGallery {
             });
         }
 
-        $(window).rebind('popstate.galleryview', e => {
+        $(window).rebind('popstate.galleryview', (ev) => {
             if (mega.gallery.titleControl) {
                 mega.gallery.titleControl.hide();
             }
 
-            if (!this.inPreview && e.originalEvent.state.galleryMode && this.id === M.currentdirid) {
-                this.setMode(e.originalEvent.state.galleryMode, undefined, true);
-                this.render(false);
+            if (!this.inPreview) {
+                const {state = false} = ev.originalEvent || !1;
+
+                if (state.galleryMode && this.onpage) {
+                    this.setMode(state.galleryMode, undefined, true);
+                    this.render(false);
+
+                    this.inPreview = !!state.view;
+                }
             }
         });
 
-        if (this.isDiscovery) {
-            $('.gallery-close-discovery').rebind('click.exitDiscovery', () => {
-                M.openFolder(this.id);
-            });
+        if (!pfid && this.isDiscovery) {
+            $('.gallery-close-discovery', '.gallery-tabs-bl')
+                .removeClass('hidden')
+                .rebind('click.exitDiscovery', () => {
+
+                    M.openFolder(this.id).catch(dump);
+                    return false;
+                });
 
             $(window).rebind('keyup.exitDiscovery', e => {
                 if (e.keyCode === 27 && !this.inPreview) { // ESC key pressed
@@ -1731,7 +1775,6 @@ class MegaGallery {
     }
 
     setView() {
-
         if (this.nodes) {
 
             M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
@@ -1769,7 +1812,6 @@ class MegaGallery {
 class MegaTargetGallery extends MegaGallery {
 
     async setView() {
-
         if (super.setView() === false) {
             return false;
         }
@@ -1777,11 +1819,15 @@ class MegaTargetGallery extends MegaGallery {
         const handles = this.id === 'photos' ? MegaGallery.getCameraHandles() : M.getTreeHandles(this.id);
         let subs = [];
 
-        await dbfetch.geta(handles).catch(nop);
+        if (self.fmdb) {
+            await dbfetch.geta(handles).catch(nop);
+        }
 
         for (let i = handles.length; i--;) {
             if (!M.c[handles[i]]) {
-                console.error(`Gallery cannot find handle ${handles[i]}`);
+                if (self.d && !M.d[handles[i]]) {
+                    console.error(`Gallery cannot find handle ${handles[i]}`);
+                }
                 continue;
             }
 
@@ -1813,6 +1859,28 @@ class MegaTargetGallery extends MegaGallery {
     }
 
     checkGalleryUpdate(n) {
+        if (pfid) {
+            delay(`pfid_discovery:node_update${n.h}`, () => {
+                if (M.currentdirid === n.p) {
+                    if (this.nodes[n.h]) {
+                        this.updateNodeName(n);
+                    }
+                    else {
+                        if (!M.v.length) {
+                            $('.fm-empty-folder, .fm-empty-folder-link', '.fm-right-files-block').addClass('hidden');
+                        }
+
+                        this.addNodeToGroups(n);
+                    }
+                }
+                else if (this.nodes[n.h]) {
+                    this.removeNodeFromGroups(n);
+                }
+            });
+
+            return;
+        }
+
         if (!n.t && mega.gallery.isGalleryNode(n)) {
             const cameraTree = M.getTreeHandles(this.isDiscovery ? this.id : M.CameraId);
             const rubTree = M.getTreeHandles(M.RubbishID);
@@ -2136,6 +2204,20 @@ mega.gallery.checkEveryGalleryDelete = h => {
     }
 };
 
+mega.gallery.clearMdView = () => {
+    'use strict';
+    const $mediaIcon = $('.fm-files-view-icon.media-view').addClass('hidden');
+
+    if (M.gallery) {
+        $mediaIcon.removeClass('active');
+        $('.gallery-tabs-bl').addClass('hidden');
+        $(`.fm-files-view-icon.${M.viewmode ? 'block-view' : 'listing-view'}`).addClass('active');
+
+        assert(pfid);
+        M.gallery = false;
+    }
+};
+
 mega.gallery.resetAll = () => {
     'use strict';
 
@@ -2161,20 +2243,17 @@ mega.gallery.resetAll = () => {
 mega.gallery.showEmpty = (type) => {
     'use strict';
 
+    if (pfid) {
+        $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
+        return;
+    }
+
     if (!mega.gallery.emptyBlock) {
         mega.gallery.emptyBlock = new GalleryEmptyBlock('.fm-main.default > .fm-right-files-block');
     }
 
     mega.gallery.emptyBlock.type = type;
     mega.gallery.emptyBlock.show();
-};
-
-mega.gallery.hideEmpty = () => {
-    'use strict';
-
-    if (mega.gallery.emptyBlock) {
-        mega.gallery.emptyBlock.hide();
-    }
 };
 
 /**
@@ -2227,12 +2306,12 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
     const { workerBranch } = MegaGallery;
 
     const isLocationCorrect = () => {
-        if (!M.isGalleryPage() && !M.isAlbumsPage()) {
-            console.log(`Cancelling the thumbnail request...`);
-            return false;
+        if (pfid || M.isGalleryPage() || M.isAlbumsPage()) {
+            return true;
         }
 
-        return true;
+        console.log(`Cancelling the thumbnail request...`);
+        return false;
     };
 
     const processBlob = (key, blob) => {
@@ -2424,8 +2503,11 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
 };
 
 async function galleryUI(id) {
-
     'use strict';
+    if (self.d) {
+        console.group(`Setting up gallery-view...`, M.currentdirid, id);
+        console.time('gallery-ui');
+    }
 
     loadingDialog.show('MegaGallery');
 
@@ -2435,15 +2517,33 @@ async function galleryUI(id) {
 
     let gallery = mega.gallery[M.currentdirid];
 
-    const $closeDiscovery = $('.gallery-close-discovery').addClass('hidden');
+    $('.gallery-close-discovery', '.gallery-tabs-bl').addClass('hidden');
 
     if (!mega.gallery.titleControl) {
         mega.gallery.titleControl = new GalleryTitleControl('.gallery-tabs-bl .gallery-section-title');
     }
 
+    // cleanup existing (FM-side) MegaRender and such.
+    M.v = [];
+    $.selected = [];
+    M.gallery |= 1;
+    M.renderMain();
+    delay.cancel('rmSetupUI');
+
+    M.onTreeUIOpen(M.currentdirid);
+
+    if (pfid) {
+        id = !id || typeof id !== 'string' ? M.currentdirid : id;
+    }
+    else {
+        $('.view-links', '.gallery-tabs-bl').addClass('hidden');
+    }
+
     // This is media discovery
     if (id) {
-        mega.gallery.mdReporter.report();
+        if (!pfid) {
+            mega.gallery.mdReporter.report();
+        }
 
         if (!M.getNodeByHandle(id) || M.getNodeRoot(id) === M.RubbishID) {
 
@@ -2458,8 +2558,6 @@ async function galleryUI(id) {
         mega.gallery.titleControl.addTooltipToTitle();
 
         gallery = mega.gallery.discovery;
-
-        $closeDiscovery.removeClass('hidden');
     }
     else {
         mega.gallery.titleControl.filterSection = M.currentdirid;
@@ -2469,9 +2567,11 @@ async function galleryUI(id) {
     }
 
     if (!gallery) {
-        await M.getCameraUploads().catch(nop);
+        if (!pfid) {
+            await M.getCameraUploads().catch(nop);
+        }
 
-        if (id !== undefined) {
+        if (id) {
             gallery = mega.gallery.discovery = new MegaTargetGallery(id);
         }
         else if (mega.gallery.sections[M.currentdirid]) {
@@ -2486,11 +2586,7 @@ async function galleryUI(id) {
         gallery.galleryBlock.classList.remove('gallery-type-fav');
     }
 
-    onIdle(async() => {
-
-        await gallery.setView().catch((ex) => {
-            console.error(ex);
-        });
+    gallery.setView().catch(dump).finally(() => {
 
         if (mega.gallery.modeBeforeReset && mega.gallery.modeBeforeReset[M.currentdirid]) {
 
@@ -2502,12 +2598,12 @@ async function galleryUI(id) {
         gallery.render(true, true);
         gallery.bindEvents();
 
-        M.viewmode = 1;
-
-        $.selectddUIgrid = '.gallery-view';
-        $.selectddUIitem = 'a';
-
         loadingDialog.hide('MegaGallery');
+
+        if (self.d) {
+            console.timeEnd('gallery-ui');
+            console.groupEnd();
+        }
     });
 }
 
@@ -2578,7 +2674,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             if (!blocks[key]) {
                 return;
             }
-            const weAreOnGallery = M.isGalleryPage() || M.isAlbumsPage();
+            const weAreOnGallery = pfid || M.isGalleryPage() || M.isAlbumsPage();
 
             if (d) {
                 console.assert(weAreOnGallery, `This should not be running!`);

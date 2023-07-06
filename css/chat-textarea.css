@@ -318,7 +318,9 @@
     padding: 0 5px 6px 2px;
 }
 .emoji-preview.shadow {
-    margin: 5px 0 0 4px;
+    margin-top: 5px;
+    margin-inline-start: 4px;
+    -webkit-margin-start: 4px;
     border-radius: 1px;
     position: relative;
     padding: 0 0 0 0;
@@ -329,6 +331,9 @@
     -o-transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
     -ms-transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
     transition: box-shadow 200ms ease-in-out, background-color 200ms ease-in-out;
+}
+.rtl .emoji-preview.shadow {
+    float: right;
 }
 .emoji-preview.shadow.active, .emoji-preview.shadow:hover {
     -webkit-box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
@@ -360,7 +365,12 @@
     display: block;
 }
 .emoji-preview.shadow img {
-    margin: 4px 0px 4px 6px !important;
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
+    margin-inline-start: 6px !important;
+    -webkit-margin-start: 6px !important;
+    margin-inline-end: 0 !important;
+    -webkit-margin-end: 0 !important;
 }
 .emoji-preview.shadow .emoji.title {
     margin: 5px 6px 0px 8px;

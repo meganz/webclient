@@ -1310,7 +1310,8 @@ body.theme-dark .message .audio-player {
     color: var(--text-color-high);
     flex: 0 0 52px;
     height: 52px;
-    margin-right: 24px;
+    margin-inline-end: 24px;
+    -webkit-margin-end: 24px;
     text-align: center;
 }
 

@@ -1992,6 +1992,7 @@ lazy(mega.gallery, 'albums', () => {
                 () => {
                     if (this.interactiveCells) {
                         this.el.style.height = (this.selCount) ? 'calc(100% - 65px)' : null;
+                        this.el.style.minHeight = (this.selCount) ? '280px' : null;
                         this.resizeDynamicList();
                         Ps.update(this.el);
                     }

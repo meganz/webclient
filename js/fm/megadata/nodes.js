@@ -852,9 +852,10 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree, qui
         objj.i = mRandomToken('pn');
 
         this.scAckQueue[objj.i] = onScDone;
-        var s = this.getShareNodesSync(d);
-        if (s && s.length) {
-            objj.cr = crypto_makecr(opsArr[d], s, false);
+
+        const sn = this.getShareNodesSync(d, null, true);
+        if (sn.length) {
+            objj.cr = crypto_makecr(opsArr[d], sn, false);
         }
         objj.sm = 1;
         // eventually append 'cauth' ticket in the objj req.
@@ -2744,7 +2745,6 @@ MegaData.prototype.getNode = function(idOrObj) {
  */
 MegaData.prototype.getNodes = async function fm_getnodes(root, includeroot, excludebad, excludeverions) {
     'use strict';
-    await dbfetch.acquire(root);
     await dbfetch.coll([root]);
     return M.getNodesSync(root, includeroot, excludebad, excludeverions);
 };
@@ -2979,13 +2979,13 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
  * @param {Object} [root]  output object to get the path root
  * @returns {MegaPromise}
  */
-MegaData.prototype.getShareNodes = async function fm_getsharenodes(h, root) {
+MegaData.prototype.getShareNodes = async function fm_getsharenodes(h, root, findShareKeys) {
     'use strict';
     if (!this.d[h]) {
         await dbfetch.acquire(h);
     }
     const out = root || {};
-    const sharenodes = this.getShareNodesSync(h, out);
+    const sharenodes = this.getShareNodesSync(h, out, findShareKeys);
     return {sharenodes, root: out.handle};
 };
 
@@ -2994,24 +2994,17 @@ MegaData.prototype.getShareNodes = async function fm_getsharenodes(h, root) {
  *
  * @param {String} h       Node handle
  * @param {Object} [root]  output object to get the path root
+ * @param {Boolean} [findShareKeys] check if the node was ever shared, not just currently shared.
  * @returns {Array}
  */
-MegaData.prototype.getShareNodesSync = function fm_getsharenodessync(h, root) {
-    var sn = [];
-    var n = this.d[h];
+MegaData.prototype.getShareNodesSync = function fm_getsharenodessync(h, root, findShareKeys) {
+    'use strict';
 
-    while (n && n.p) {
-        if (u_sharekeys[n.h]) {
-            sn.push(n.h);
-        }
-        n = this.d[n.p];
-    }
+    const sn = [h, []];
 
-    if (root) {
-        root.handle = n && n.h;
-    }
+    mega.keyMgr.setRefShareNodes(sn, root, findShareKeys);
 
-    return sn;
+    return sn[1];
 };
 
 /**
@@ -3455,7 +3448,7 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
         var attr = ab_to_base64(crypto_makeattr(n));
         var key = a32_to_base64(encrypt_key(u_k_aes, n.k));
         var req = {a: 'p', t: target, n: [{h: 'xxxxxxxx', t: 1, a: attr, k: key}], i: requesti};
-        var sn = M.getShareNodesSync(target);
+        var sn = M.getShareNodesSync(target, null, true);
 
         if (sn.length) {
             req.cr = crypto_makecr([n], sn, false);
@@ -3939,6 +3932,11 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
         if (!a) {
             delete this.d[h].shares;
             updnode = true;
+
+            if (!M.ps[h]) {
+                // out-share revoked, clear bit from trusted-share-keys
+                mega.keyMgr.revokeUsedNewShareKey(h).catch(dump);
+            }
         }
 
         if (updnode) {
@@ -3950,21 +3948,11 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
         }
     }
 
-    if (okd === -0x9f) {
+    if (okd) {
         // The node is no longer shared with anybody, ensure it's properly cleared..
-        const users = this.getNodeShareUsers(h);
 
-        if (users.length) {
-            if (d) {
-                console.warn(`Removing users left on share revocation for ${h}...`, users);
-            }
-
-            for (let u = users.length; u--;) {
-                M.delNodeShare(h, users[u]);
-            }
-        }
-
-        mega.keyMgr.enqueueShareRevocation([h]);
+        // nb: ref to commit history.
+        console.error(`The 'okd' flag is discontinued.`);
     }
 };
 
@@ -4565,7 +4553,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
             n.a = ab_to_base64(crypto_makeattr(srcNode));
 
             openSaveToDialog(srcNode, function(srcNode, target) {
-                M.getShareNodes(target).then(({sharenodes}) => {
+                M.getShareNodes(target, null, true).then(({sharenodes}) => {
                     const {name} = srcNode;
 
                     fileconflict.check([srcNode], target, 'import').always(function(files) {

@@ -995,7 +995,7 @@ var ulmanager = {
             for (let i = q.length; i--;) {
                 const [n, req, ctx] = q[i];
 
-                let sn = M.getShareNodesSync(req.t);
+                const sn = M.getShareNodesSync(req.t, null, true);
                 if (sn.length) {
                     req.cr = crypto_makecr([n], sn, false);
                     req.cr[1][0] = req.n[0].h;

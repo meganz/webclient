@@ -270,7 +270,8 @@ var authring = (function () {
             });
         }
 
-        attributePromise.done(function _attributePromiseResolve(result) {
+        attributePromise.always(tryCatch((result) => {
+
             if (typeof result !== 'number') {
                 // Authring is in the empty-name record.
                 u_authring[keyType] = fromKeys === true ? result : ns.deserialise(result['']);
@@ -281,31 +282,20 @@ var authring = (function () {
                 // This authring is missing. Let's make it.
                 logger.debug(`No authentication ring for key type ${keyType}, making one.`);
                 u_authring[keyType] = {};
-                ns.setContacts(keyType);
-                masterPromise.resolve(u_authring[keyType]);
-            }
-            else {
-                logger.error('Error retrieving authentication ring for key type '
-                             + keyType + ': ' + result);
-                masterPromise.reject(result);
-            }
-        });
 
-        attributePromise.fail(function _attributePromiseReject(result) {
-            if (result === ENOENT) {
-                // This authring is missing. Let's make it.
-                logger.debug('No authentication ring for key type '
-                             + keyType + ', making one.');
-                u_authring[keyType] = {};
-                ns.setContacts(keyType);
+                if (!mega.keyMgr.secure || keyType !== 'RSA') {
+                    ns.setContacts(keyType);
+                }
                 masterPromise.resolve(u_authring[keyType]);
             }
             else {
-                logger.error('Error retrieving authentication ring for key type '
-                             + keyType + ': ' + result);
+                logger.error(`Error retrieving authentication ring for key type ${keyType}: ${result}`);
                 masterPromise.reject(result);
             }
-        });
+        }, (ex) => {
+            logger.error(ex);
+            masterPromise.reject(ex);
+        }));
 
         return masterPromise;
     };

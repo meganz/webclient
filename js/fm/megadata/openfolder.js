@@ -542,7 +542,6 @@
      */
     MegaData.prototype.openFolder = function(id, force) {
         var fetchdbnodes;
-        var fetchshares;
         var firstopen;
         var cv = M.isCustomView(id);
 
@@ -790,7 +789,9 @@
                 promise.resolve(id);
             }
         };
-        var loadend = function() {
+        const loadend = async() => {
+            let fetchshares = false;
+
             // Check this is valid custom view page. If not head to it's root page.
             if (cv && !M.getPath(cv.original).length) {
                 cv = M.isCustomView(cv.type);
@@ -806,21 +807,26 @@
             }
 
             if (fetchshares) {
-                var handles = Object.keys(M.c.shares || {});
-                for (var i = handles.length; i--;) {
+                const handles = Object.keys(M.c.shares || {});
+
+                for (let i = handles.length; i--;) {
                     if (M.d[handles[i]]) {
                         handles.splice(i, 1);
                     }
                 }
-                dbfetch.geta(handles)
-                    .always(function() {
-                        if (!$.inSharesRebuild) {
-                            $.inSharesRebuild = Date.now();
-                            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                        }
-                        finish();
+
+                if (handles.length) {
+                    await dbfetch.geta(handles).catch(dump);
+                }
+
+                if (!$.inSharesRebuild) {
+                    $.inSharesRebuild = Date.now();
+
+                    queueMicrotask(() => {
+                        mega.keyMgr.decryptInShares().catch(dump);
                     });
-                return;
+                    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+                }
             }
 
             finish();

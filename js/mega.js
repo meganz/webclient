@@ -2996,7 +2996,7 @@ function processmove(apireq) {
 
     var root = {};
     var tsharepath = M.getShareNodesSync(apireq.t);
-    var nsharepath = M.getShareNodesSync(apireq.n, root);
+    var nsharepath = M.getShareNodesSync(apireq.n, root, true);
     var movingnodes = false;
 
     // is the node to be moved in an outshare (or possibly multiple nested ones)?
@@ -3006,22 +3006,11 @@ function processmove(apireq) {
             // we are not - check for any foreign nodes being moved
             movingnodes = M.getNodesSync(apireq.n, true);
 
-            var foreignnodes = [];
-
-            for (var i = movingnodes.length; i--; ) {
-                if (M.d[movingnodes[i]].u !== u_handle) {
-                    foreignnodes.push(movingnodes[i]);
-                }
-            }
-
-            if (foreignnodes.length) {
-                if (d) console.log('rekeying foreignnodes', foreignnodes.length);
-
-                // update all foreign nodes' keys and take ownership
-                api_updfkey(movingnodes);
-            }
+            // update all foreign nodes' keys and take ownership
+            api_updfkey(movingnodes).catch(dump);
         }
     }
+    tsharepath = M.getShareNodesSync(apireq.t, null, true);
 
     // is the target location in any shares? add CR element.
     if (tsharepath.length) {
@@ -3831,10 +3820,16 @@ function loadfm_callback(res) {
         crypto_fixmissingkeys(missingkeys);
 
         if (res.cr) {
+            if (d) {
+                console.warn(`f.cr`, res.cr);
+            }
             crypto_procmcr(res.cr);
         }
 
         if (res.sr) {
+            if (d) {
+                console.warn(`f.sr`, res.sr);
+            }
             crypto_procsr(res.sr);
         }
         setsn(currsn = res.sn);

@@ -257,7 +257,7 @@ var versiondialogid;
 
                 var ea = ab_to_base64(crypto_makeattr(n));
                 var dir = M.d[current_node].p || M.RootID;
-                var share = M.getShareNodesSync(dir);
+                var share = M.getShareNodesSync(dir, null, true);
                 var req = {
                     a: 'p',
                     t: dir,

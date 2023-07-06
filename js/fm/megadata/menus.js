@@ -379,6 +379,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.colour-label-items'];
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
+
         items['.import-item'] = 1;
         items['.getlink-item'] = 1;
     }
@@ -1002,6 +1003,25 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
 
                         if (items['.remove-item']) {
                             $('span', $menuCMI.filter('.remove-item')).text(M.getSelectedRemoveLabel($.selected));
+                        }
+
+                        if (items['.import-item']) {
+                            const $importItem = $menuCMI.filter('.import-item');
+
+                            if (u_type) {
+                                $('i', $importItem)
+                                    .removeClass('icon-mega-thin-outline')
+                                    .addClass('icon-upload-to-cloud-drive');
+
+                                $('span', $importItem).text(l.context_menu_import);
+                            }
+                            else {
+                                $('i', $importItem)
+                                    .removeClass('icon-upload-to-cloud-drive')
+                                    .addClass('icon-mega-thin-outline');
+
+                                $('span', $importItem).text(l.btn_imptomega);
+                            }
                         }
                     }
 

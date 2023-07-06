@@ -504,6 +504,12 @@
 }
 
 
+/* Settings content. Notifications section. */
+.account.account-notification .chat-permissions-banner {
+    margin: 0 0 20px;
+}
+
+
 /* Settings content. Security section */
 
 /* Settings content. Security section. Download button */

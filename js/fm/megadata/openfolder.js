@@ -324,6 +324,7 @@
         }
         // Skip M.renderMain and clear folder nodes for sections without viewmode switchers
         else if (this.chat || !id ||
+            this.gallery ||
             id.substr(0, 7) === 'account' ||
             id.substr(0, 7) === 'devices' ||
             id.substr(0, 9) === 'dashboard' ||
@@ -336,6 +337,12 @@
                 // Remove shares-specific UI.
                 sharedFolderUI();
             }
+
+            if (this.gallery) {
+                onIdle(() => {
+                    galleryUI(this.gallery > 1 && this.currentCustomView.nodeID);
+                });
+            }
         }
         else {
 
@@ -345,10 +352,7 @@
                 console.time('time for rendering');
             }
 
-            if (id === 'transfers'
-                || M.isGalleryPage()
-                || M.isAlbumsPage()
-            ) {
+            if (id === 'transfers') {
                 this.v = [];
             }
             else if ($.ofShowNoFolders) {
@@ -543,7 +547,6 @@
         var cv = M.isCustomView(id);
 
         document.documentElement.classList.remove('wait-cursor');
-        $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {
             console.warn('openFolder(%s, %s), currentdir=%s, fmloaded=%s',
@@ -564,10 +567,19 @@
         }
 
         $('.fm-right-account-block, .fm-right-block, .gallery-tabs-bl').addClass('hidden');
+        const $viewIcons = $(`.fm-files-view-icon${pfid ? '' : ':not(.media-view)'}`).removeClass('hidden');
 
         this.chat = false;
         this.search = false;
         this.recents = false;
+
+        if (this.gallery && pfid && $viewIcons.filter('.media-view').hasClass('active')) {
+            // @todo call completion (?)
+            $('.gallery-tabs-bl', '.fm-right-files-block').removeClass('hidden');
+        }
+        else {
+            this.gallery = false;
+        }
 
         if (id === 'rubbish') {
             id = this.RubbishID;
@@ -727,14 +739,11 @@
             fetchdbnodes = true;
             id = cv.nodeID;
 
-            M.onFileManagerReady(() => {
-                galleryUI(cv.nodeID || '');
-            });
+            this.gallery = 2;
         }
         else if (cv.type === 'gallery') {
-            M.onFileManagerReady(() => {
-                galleryUI();
-            });
+
+            this.gallery = 1;
         }
         else if (
             id &&

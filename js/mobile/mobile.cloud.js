@@ -675,7 +675,7 @@ mobile.cloud = {
             mobile.cloud.deselect();
 
             // If this is an image, load the preview slideshow
-            if (isVideo || is_image3(node)) {
+            if (isVideo || is_image2(node)) {
                 if (isVideo) {
                     $.autoplay = nodeHandle;
                 }

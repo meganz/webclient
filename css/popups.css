@@ -159,6 +159,10 @@ body.tl .dropdown.body.popup.contacts-search {
     max-width: 80%;
     padding-inline-start: 10px;
 }
+.rtl .invite-meeting-contacts .contacts-search-list .contacts-info .user-card-data,
+.rtl .add-participant-selector .contacts-search-list .contacts-info .user-card-data {
+    padding-inline-start: 15px;
+}
 .contacts-search-list .user-card-data .user-card-name {
     margin: 0 5px 0 0;
 }
@@ -196,7 +200,8 @@ body.tl .dropdown.body.popup.contacts-search {
     height: 24px;
     font: var(--text-body1);
 }
-.rtl .contacts-search-list .contacts-info.body.contacts-search .avatar-wrapper {
+.rtl .add-participant-selector .contacts-search-list .contacts-info.body.contacts-search .avatar-wrapper,
+.rtl .invite-meeting-contacts .contacts-search-list .contacts-info.body.contacts-search .avatar-wrapper {
     right: 12px;
 }
 .contacts-search-list .contacts-info.body.contacts-search img {
@@ -490,6 +495,9 @@ body.tl .dropdown.body.popup.contacts-search {
 .popup-scroll-content.emoji {
     padding: 12px;
     min-height: 312px;
+}
+.rtl .popup-scroll-content.emoji .emoji-category-container {
+    left: 12px;
 }
 /* End of Emoji one popup */
 

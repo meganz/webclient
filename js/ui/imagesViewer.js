@@ -61,7 +61,6 @@ var slideshowid;
         const $overlay = $('.media-viewer-container');
         const $controls = $('.gallery-btn', $overlay);
         const $counter = $('header .counter', $overlay);
-        const $slideshowButton = $('footer .v-btn.slideshow', $overlay);
         const forward = [];
         const backward = [];
 
@@ -76,9 +75,6 @@ var slideshowid;
         else if (preselection) {
             index = (i) => preselection[i].h;
             filter = () => true;
-        }
-        else if (is_mobile) {
-            filter = (n) => (n.fa || !M.getNodeShare(n).down) && (is_video(n) || is_image3(n));
         }
 
         const list = preselection || M.v;
@@ -114,9 +110,6 @@ var slideshowid;
                     backward.push(index(pos[n - 1]));
             }
 
-            if (!is_video(list[current])) {
-                $slideshowButton.removeClass('hidden');
-            }
             $counter.removeClass('hidden');
             $controls.removeClass('hidden');
 
@@ -125,7 +118,6 @@ var slideshowid;
         else {
             $counter.addClass('hidden');
             $controls.addClass('hidden');
-            $slideshowButton.addClass('hidden');
         }
 
         if (_hideCounter) {
@@ -963,16 +955,7 @@ var slideshowid;
         $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1', $overlay).addClass('hidden');
         $('.viewer-progress', $overlay).addClass('vo-hidden');
 
-        if (is_mobile) {
-            $('.v-btn.slideshow', $imageControls).addClass('hidden');
-            if (is_video(n)) {
-                $('.zoom-slider-wrap', $imageControls).addClass('hidden');
-            }
-            else {
-                $('.zoom-slider-wrap', $imageControls).removeClass('hidden');
-            }
-        }
-        else {
+        if (!is_mobile) {
             $imageControls.addClass('hidden');
         }
         $prevNextButtons.addClass('hidden');
@@ -1832,17 +1815,30 @@ var slideshowid;
         }
 
         M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').then(() => {
-            var myPage = pages['pdfviewer'];
-            myPage = myPage.replace('viewer.css', window.pdfviewercss);
-            myPage = myPage.replace('../build/pdf.js', window.pdfjs2);
-            myPage = myPage.replace('viewer.js', window.pdfviewerjs);
-            // remove then re-add iframe to avoid History changes [push]
-            var pdfIframe = document.getElementById('pdfpreviewdiv1');
-            var newPdfIframe = document.createElement('iframe');
-            newPdfIframe.id = 'pdfpreviewdiv1';
+            const myPage = pages.pdfviewer
+                .replace('viewer.css', window.pdfviewercss)
+                .replace('../build/pdf.js', window.pdfjs2)
+                .replace('viewer.js', window.pdfviewerjs);
+            const id = 'pdfpreviewdiv1';
+            const pdfIframe = document.getElementById(id);
+            const newPdfIframe = document.createElement('iframe');
+            newPdfIframe.id = id;
             newPdfIframe.src = 'about:blank';
-            var pdfIframeParent = pdfIframe.parentNode;
-            pdfIframeParent.replaceChild(newPdfIframe, pdfIframe);
+
+            if (pdfIframe) {
+
+                // replace existing iframe to avoid History changes [push]
+                pdfIframe.parentNode.replaceChild(newPdfIframe, pdfIframe);
+            }
+            else {
+                // making pdf iframe for initial start
+                const p = document.querySelector('.pdf .media-viewer .content');
+
+                if (p) {
+                    p.appendChild(newPdfIframe);
+                }
+            }
+
             var doc = newPdfIframe.contentWindow.document;
             doc.open();
             doc.write(myPage);
@@ -1881,7 +1877,21 @@ var slideshowid;
             const newIframe = document.createElement('iframe');
             newIframe.id = id;
             newIframe.src = 'about:blank';
-            iframe.parentNode.replaceChild(newIframe, iframe);
+
+            if (iframe) {
+
+                // replace existing iframe to avoid History changes [push]
+                iframe.parentNode.replaceChild(newIframe, iframe);
+            }
+            else {
+                // making docx iframe for initial start
+                const p = document.querySelector('.docx .media-viewer .content');
+
+                if (p) {
+                    p.appendChild(newIframe);
+                }
+            }
+
             const doc = newIframe.contentWindow.document;
             // eslint-disable-next-line local-rules/open
             doc.open();
@@ -1934,7 +1944,9 @@ var slideshowid;
             $overlay.addClass('pdf');
             $pendingBlock.addClass('hidden');
             $progressBlock.addClass('vo-hidden');
-            $bottomBar.addClass('hidden');
+            if (!is_mobile) {
+                $bottomBar.addClass('hidden');
+            }
             $imgWrap.addClass('hidden');
             // preview pdfs using pdfjs for all browsers #8036
             // to fix pdf compatibility - Bug #7796

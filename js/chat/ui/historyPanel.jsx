@@ -243,7 +243,7 @@ export default class HistoryPanel extends MegaRenderMixin {
             room.megaChat.refreshConversations();
             room.trigger('RefreshUI');
             if (room.scrolledToBottom) {
-                delay('hp:reinit-scroll', () => {
+                delay(`hp:reinit-scroll:${this.getUniqueId()}`, () => {
                     if (this.messagesListScrollable) {
                         this.messagesListScrollable.reinitialise(true, true);
                     }

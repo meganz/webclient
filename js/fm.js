@@ -1001,7 +1001,7 @@ function FMShortcuts() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped === "a" && (e.ctrlKey || e.metaKey)) {
-            if (typeof selectionManager != 'undefined' && selectionManager) {
+            if (typeof selectionManager != 'undefined' && selectionManager && !M.gallery) {
                 selectionManager.select_all();
             }
             return false; // stop prop.
@@ -3790,6 +3790,10 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
                         }
 
                         M.renderMain(true);
+                    }
+                    else if (M.c[userid] && M.c[userid][M.currentdirid]) {
+                        $('.shared-details-icon').removeClass('icon-warning-after sprite-fm-uni-after');
+                        $('.' + userid).addClass('verified');
                     }
 
                     if ($.dialog === 'share') {

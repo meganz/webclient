@@ -85,11 +85,6 @@ mBroadcaster.once('startMega:desktop', function() {
             delete pages[p[i]];
         }
     }
-
-    if ((p = document.querySelector('.media-viewer .content'))) {
-        mCreateElement('iframe', {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'pdfpreviewdiv1'}, p);
-        mCreateElement('iframe', {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'docxpreviewdiv1'}, p);
-    }
 });
 
 function startMega() {
@@ -1685,21 +1680,8 @@ function init_page() {
             }
         }
 
-        if (is_mobile) {
-            parsepage(pages.mobile);
-            const p = document.querySelector('.media-viewer .content');
-            if (p) {
-                // Inject docx previewer iframe. This may be handled better post mobile revamp.
-                mCreateElement(
-                    'iframe',
-                    {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'docxpreviewdiv1'},
-                    p
-                );
-            }
-        }
-        else {
-            parsepage(pages.download);
-        }
+        parsepage(pages[is_mobile ? 'mobile' : 'download']);
+
         dlinfo(dlid, dlkey, false);
         topmenuUI();
     }
@@ -2423,8 +2405,18 @@ function topmenuUI() {
 
         // If Pro Flexi, hide the Upgrade button and Pricing link
         if (u_attr.pf) {
-            $menuUpgradeAccount.addClass('hidden');
-            $menuPricingItem.addClass('hidden');
+            if (u_attr.pf.s === pro.ACCOUNT_STATUS_ENABLED) {
+                $menuUpgradeAccount.addClass('hidden');
+                $menuPricingItem.addClass('hidden');
+            }
+
+            // If Pro Flexi Expired or in Grace Period, show the Reactive button and Pricing link
+            else if (is_mobile) {
+                $('.upgrade-your-account', $topMenu).text(l.reactivate_account_short);
+            }
+            else {
+                $('.upgrade-your-account span', $topMenu).text(l.reactivate_account_short);
+            }
         }
 
         document.body.classList.remove('free', 'lite', 'pro-user');
@@ -2493,6 +2485,16 @@ function topmenuUI() {
                 $menuPricingItem.addClass('hidden');
             }
             document.body.classList.add('business-user');
+
+            // If Business Expired or in Grace Period, show the Reactive button
+            if (u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED) {
+                if (is_mobile) {
+                    $('.upgrade-your-account', $topMenu).text(l.reactivate_account_short);
+                }
+                else {
+                    $('.upgrade-your-account span', $topMenu).text(l.reactivate_account_short);
+                }
+            }
         }
         else {
             document.body.classList.remove('business-user');

@@ -39,7 +39,7 @@ function removeUInode(h, parent) {
         mega.gallery.albums.onCDNodeRemove(n);
         mega.gallery.nodeUpdated = true;
     }
-    else if (M.isGalleryPage()) {
+    else if (M.gallery) {
         mega.gallery.checkEveryGalleryDelete(h);
         mega.gallery.albums.onCDNodeRemove(n);
     }

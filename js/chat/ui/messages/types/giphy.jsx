@@ -79,7 +79,7 @@ export default class Giphy extends AbstractGenericMessage {
                 controls={false}
                 width={w}
                 height={h}
-                style={{ cursor: autoPlay ? 'default' : 'pointer' }}
+                style={{ cursor: autoPlay ? 'default' : 'pointer', height: `${h}px` }}
                 onClick={() => !autoPlay && this.toggle()}
                 src={
                     /* hideActionButtons -> message preview rendered within the delete confirmation dialog */

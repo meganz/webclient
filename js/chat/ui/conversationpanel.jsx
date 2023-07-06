@@ -2434,13 +2434,6 @@ export class ConversationPanel extends MegaRenderMixin {
                                 onClose={() => this.setState({ invalidKeysBanner: false })}
                             />
                         )}
-                        {this.props.alert && !mega.config.get('nocallsup') && !room.havePendingCall() && (
-                            <Alert
-                                type={Alert.TYPE.MEDIUM}
-                                content={Call.getUnsupportedBrowserMessage()}
-                                onClose={this.props.onAlertClose}
-                            />
-                        )}
 
                         <HistoryPanel
                             {...this.props}
@@ -2530,20 +2523,115 @@ export class ConversationPanel extends MegaRenderMixin {
 }
 
 export class ConversationPanels extends MegaRenderMixin {
+    notificationGranted = undefined;
+    notificationHelpURL =
+        `${l.mega_help_host}/chats-meetings/meetings/enable-notification-browser-system-permission`;
+
     state = {
-        alert: undefined
+        supportAlert: undefined,
+        notificationsPermissions: undefined
     };
 
     constructor(props) {
         super(props);
-        this.state.alert = !megaChat.hasSupportForCalls;
+        this.state.supportAlert = !megaChat.hasSupportForCalls;
+        this.state.notificationsPermissions = Notification.permission;
     }
 
-    handleAlertClose = () => this.setState({ alert: false }, () => mega.config.set('nocallsup', 1));
+    closeSupportAlert = () => this.setState({ supportAlert: false }, () => mega.config.set('nocallsup', 1));
+
+    onNotificationsGranted = () => {
+        msgDialog(
+            'info',
+            '',
+            l.notifications_permissions_granted_title,
+            l.notifications_permissions_granted_info
+                .replace('[A]', `<a href="${this.notificationHelpURL}" target="_blank" class="clickurl">`)
+                .replace('[/A]', '</a>')
+        );
+        this.notificationGranted =
+            new Notification(l.notification_granted_title, { body: l.notification_granted_body });
+    };
+
+    renderNotificationsPending() {
+        return (
+            <div
+                className={`
+                    meetings-alert
+                    meetings-alert-light
+                    meetings-alert-notifications
+                    ${this.props.isEmpty ? 'empty-state' : ''}
+                    ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
+                `}>
+                <div className="meetings-alert-content">{l.notifications_permissions_pending}</div>
+                <div className="meetings-alert-control">
+                    <a
+                        href="#"
+                        onClick={(ev) => {
+                            ev.preventDefault();
+                            Notification.requestPermission()
+                                .then(status => {
+                                    this.setState({ notificationsPermissions: status }, () =>
+                                        onIdle(() =>
+                                            this.state.notificationsPermissions === 'granted' &&
+                                            this.onNotificationsGranted()
+                                        )
+                                    );
+                                })
+                                .catch(ex => d && console.warn(`Failed to retrieve permissions: ${ex}`));
+                        }}>
+                        {l.notifications_permissions_enable}
+                    </a>
+                </div>
+                <span
+                    className="meetings-alert-close"
+                    onClick={() =>
+                        this.setState({ notificationsPermissions: undefined }, () => {
+                            showToast(
+                                'success',
+                                l.notifications_permissions_toast_title,
+                                l.notifications_permissions_toast_control,
+                                '',
+                                () => loadSubPage('fm/account/notifications')
+                            );
+                        })
+                    }>
+                    <i className="sprite-fm-mono icon-close-component"/>
+                </span>
+            </div>
+        );
+    }
+
+    renderNotificationsBlocked() {
+        const title = l.notifications_permissions_denied_info
+            .replace('[A]', `<a href="${this.notificationHelpURL}" target="_blank" class="clickurl">`)
+            .replace('[/A]', '</a>');
+
+        return (
+            <div
+                className={`
+                    meetings-alert
+                    meetings-alert-medium
+                    meetings-alert-notifications
+                    ${this.props.isEmpty ? 'empty-state' : ''}
+                    ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
+                `}>
+                <div className="meetings-alert-content">
+                    <ParsedHTML>{title}</ParsedHTML>
+                </div>
+                <span
+                    className="meetings-alert-close"
+                    onClick={() => this.setState({ notificationsPermissions: undefined })}>
+                    <i className="sprite-fm-mono icon-close-component"/>
+                </span>
+            </div>
+        );
+    }
 
     componentDidMount() {
         super.componentDidMount();
         this.props.onMount?.();
+
         megaChat.chats.forEach(chatRoom => {
             const { scheduledMeeting } = chatRoom;
             if (scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring) {
@@ -2553,15 +2641,28 @@ export class ConversationPanels extends MegaRenderMixin {
     }
 
     render() {
-        const { className, chatUIFlags, onToggleExpandedFlag } = this.props;
+        const { routingSection, chatUIFlags, onToggleExpandedFlag } = this.props;
+        const { notificationsPermissions, supportAlert } = this.state;
         const now = Date.now();
 
         return (
-            <div
-                className={`
-                    conversation-panels
-                    ${className || ''}
-                `}>
+            <div className="conversation-panels">
+                {routingSection === 'contacts' || supportAlert && !mega.config.get('nocallsup') ?
+                    null :
+                    <>
+                        {notificationsPermissions === 'default' && this.renderNotificationsPending()}
+                        {notificationsPermissions === 'denied' && this.renderNotificationsBlocked()}
+                    </>
+                }
+
+                {routingSection !== 'contacts' && supportAlert && !mega.config.get('nocallsup') &&
+                    <Alert
+                        type={Alert.TYPE.MEDIUM}
+                        content={Call.getUnsupportedBrowserMessage()}
+                        onClose={this.closeSupportAlert}
+                    />
+                }
+
                 {megaChat.chats.map(chatRoom => {
                     if (chatRoom.isCurrentlyActive || now - chatRoom.lastShownInUI < 15 * 60 * 1000) {
                         return (
@@ -2573,9 +2674,8 @@ export class ConversationPanels extends MegaRenderMixin {
                                 isActive={chatRoom.isCurrentlyActive}
                                 messagesBuff={chatRoom.messagesBuff}
                                 chatUIFlags={chatUIFlags}
-                                alert={this.state.alert}
+                                supportAlert={supportAlert}
                                 onToggleExpandedFlag={onToggleExpandedFlag}
-                                onAlertClose={this.handleAlertClose}
                             />
                         );
                     }

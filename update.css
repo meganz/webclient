@@ -61,10 +61,7 @@ a, a:link, a:visited, a:hover, a:active {
 .top-head {
     height: 50px;
 }
-.logo {
-    background-image: url('https://eu.static.mega.co.nz/3/images/mega/browsers-page-v3.png');
-    background-position: -50px -165px;
-    background-repeat: no-repeat;
+.logo.icon-mega-logo {
     cursor: pointer;
     display: block;
     float: left;

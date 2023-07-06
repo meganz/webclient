@@ -1,4 +1,8 @@
 .sidebar {
+
+    .rtl & {
+        direction: rtl;
+    }
     position: relative;
     float: left;
     width: 300px;
@@ -55,6 +59,10 @@
                 bottom: 5px;
                 left: 5px;
 
+                body.rtl & {
+                    left: unset;
+                    right: 5px;
+                }
                 span {
                     width: 24px;
                     height: 24px;
@@ -88,7 +96,10 @@
         padding: 16px;
 
         h2 {
-            margin: 0 0 0 5px;
+            margin-top: 0;
+            margin-bottom: 0;
+            margin-inline-start: 5px;
+            -webkit-margin-start: 5px;
             color: var(--text-color-high);
         }
 
@@ -101,6 +112,11 @@
                 right: 20px;
 
                 i { --mask-color: var(--secondary-white) }
+
+                body.rtl & {
+                    left: 20px;
+                    right: unset;
+                }
             }
 
             i {

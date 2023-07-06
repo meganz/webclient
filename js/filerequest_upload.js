@@ -154,8 +154,6 @@ lazy(mega, 'fileRequestUpload', () => {
             this.checkEvent(event);
             optionReference.touchedElement = 0;
 
-            let file;
-            let filesize = 0;
             const targetId = mega.fileRequestUpload
                 .getUploadPagePuHandle();
 
@@ -165,10 +163,7 @@ lazy(mega, 'fileRequestUpload', () => {
             const dataTransfer = Object(event.dataTransfer);
             const files = event.target.files || dataTransfer.files;
 
-            const isGecko = dataTransfer && ("mozItemCount" in dataTransfer
-                || browserdetails(ua).browser === 'Firefox');
-
-            if ((!files || files.length === 0) && (!is_chrome_firefox || !dataTransfer.mozItemCount)) {
+            if (!files || files.length === 0) {
                 return false;
             }
 
@@ -180,9 +175,8 @@ lazy(mega, 'fileRequestUpload', () => {
             }
 
             for (let i = 0; files[i]; i++) {
-                file = files[i];
+                const file = files[i];
                 let path = null;
-                let gecko = null;
 
                 if (file.webkitRelativePath) {
                     path = String(file.webkitRelativePath)
@@ -192,34 +186,29 @@ lazy(mega, 'fileRequestUpload', () => {
                         );
                 }
 
-                if (isGecko) {
-                    gecko = true;
-                }
-
                 if (file.name !== '.') {
                     // FIXME: Improve
                     // eslint-disable-next-line local-rules/hints
                     try {
-                        // this could throw NS_ERROR_FILE_NOT_FOUND
-                        filesize = file.size;
                         const newName = mega.fileRequestUpload.uploadPage.getName(file.name);
-                        const newFile = new File([file], newName, { type: file.type });
-                        newFile.target = targetId;
-                        newFile.flashid = false;
-                        newFile.id = this.uploadId++;
-                        newFile.ownerId = ownerHandle;
-                        newFile.path = path;
-                        newFile.gecko = gecko;
+                        if (newName !== file.name) {
+                            Object.defineProperty(file, 'name', {
+                                value: newName,
+                                writable: true,
+                                configurable: true
+                            });
+                        }
+                        file.target = targetId;
+                        file.id = this.uploadId++;
+                        file.ownerId = ownerHandle;
+                        file.path = path;
 
-                        ul_queue.push(newFile);
+                        ul_queue.push(file);
 
-                        const status = l[7227];
-                        mega.fileRequestUpload
-                            .uploadPage
-                            .addItem(newFile.id, newFile.name, status, filesize);
+                        mega.fileRequestUpload.uploadPage.addItem(file.id, file.name, l[7227], file.size);
 
                         if (is_mobile) {
-                            M.addToTransferTable('ul_' + file.id, file);
+                            M.addToTransferTable(`ul_${file.id}`, file);
                         }
                     }
                     catch (ex) {

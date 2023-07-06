@@ -75,6 +75,9 @@ MegaData.prototype.renderMain = function(aUpdate) {
  */
 MegaData.prototype.rmSetupUI = function(u, refresh) {
     'use strict';
+    if (this.gallery) {
+        return;
+    }
 
     if (this.viewmode === 1) {
         M.addIconUI(u, refresh);

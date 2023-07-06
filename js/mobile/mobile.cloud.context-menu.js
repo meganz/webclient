@@ -272,7 +272,7 @@ mobile.cloud.contextMenu = {
         var node = M.d[nodeHandle];
 
         // If the file is previewable, show the preview button
-        if (is_image3(node)) {
+        if (is_image2(node)) {
             // This is an image file
             $previewButton.find('.fm-icon').removeClass('playvideo playaudio').addClass('preview');
             $previewButton.find('.text').text(l[1899]); // Preview

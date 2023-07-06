@@ -12,6 +12,10 @@
         width: 100%;
         background: var(--surface-main);
         z-index: 2;
+
+        body.rtl & {
+            width: calc(100% - 32px);
+        }
     }
 
     .in-call {
@@ -116,6 +120,7 @@
     }
 
     .giphy-block {
+        object-fit: cover;
         max-width: 100%;
         height: 100%;
     }

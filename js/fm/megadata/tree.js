@@ -1240,6 +1240,11 @@ MegaData.prototype.addTreeUI = function() {
         else {
             // plain click, remove all .selected from e.shiftKey
             $('#treesub_' + M.currentrootid + ' .nw-fm-tree-item').removeClass('selected');
+
+            if (pfid && M.gallery) {
+                $('#treeli_' + M.currentrootid + ' .nw-fm-tree-item').first().removeClass('selected');
+            }
+
             $this.addClass('selected');
 
             if ($target.hasClass('opened')) {

@@ -600,7 +600,7 @@
     -webkit-padding-end: 8px;
     padding-inline-end: 8px;
     position: relative;
-    top: -4px;
+    top: 4px;
     min-height: 32px;
 }
 .gallery-close-discovery i {

@@ -68,13 +68,19 @@ class EndCallButton extends MegaRenderMixin {
         }
     );
 
-    renderButton({ label, onClick, children = null }) {
+    renderButton({ label, onClick, children = null, disabled }) {
         return (
             <Button
-                className="link-button light red dropdown-element"
+                className={`
+                    link-button
+                    light
+                    red
+                    dropdown-element
+                    ${disabled ? 'disabled' : ''}
+                `}
                 icon="small-icon colorized horizontal-red-handset"
                 label={label}
-                onClick={onClick}>
+                onClick={disabled ? null : onClick}>
                 {children}
             </Button>
         );
@@ -144,7 +150,8 @@ class EndCallButton extends MegaRenderMixin {
                                 l.end_call_for_all_title,
                                 l.end_call_for_all_text,
                                 cb => cb ? chatRoom.endCallForAll() : 0xDEAD
-                            )
+                            ),
+                        disabled: !chatRoom.iAmInRoom()
                     }) :
                     null
             );

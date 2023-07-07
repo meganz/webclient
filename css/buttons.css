@@ -209,7 +209,7 @@ button:not(.mega-button) .icon {
 .link-button.red {
     color: #E44C51
 }
-.link-button.red:hover {
+.link-button.red:hover:not(.disabled) {
     color: #D90007;
 }
 .link-button i, .button i, .default-white-button i {

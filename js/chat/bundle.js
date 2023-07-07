@@ -11873,13 +11873,20 @@ class EndCallButton extends mixins.wl {
   renderButton({
     label,
     onClick,
-    children = null
+    children = null,
+    disabled
   }) {
     return external_React_default().createElement(buttons.z, {
-      className: "link-button light red dropdown-element",
+      className: `
+                    link-button
+                    light
+                    red
+                    dropdown-element
+                    ${disabled ? 'disabled' : ''}
+                `,
       icon: "small-icon colorized horizontal-red-handset",
       label: label,
-      onClick: onClick
+      onClick: disabled ? null : onClick
     }, children);
   }
   render() {
@@ -11927,7 +11934,8 @@ class EndCallButton extends mixins.wl {
     if (chatRoom.havePendingGroupCall()) {
       return this.IS_MODERATOR ? this.renderButton({
         label: l.end_call_for_all,
-        onClick: () => msgDialog('confirmation', null, l.end_call_for_all_title, l.end_call_for_all_text, cb => cb ? chatRoom.endCallForAll() : 0xDEAD)
+        onClick: () => msgDialog('confirmation', null, l.end_call_for_all_title, l.end_call_for_all_text, cb => cb ? chatRoom.endCallForAll() : 0xDEAD),
+        disabled: !chatRoom.iAmInRoom()
       }) : null;
     }
     return null;

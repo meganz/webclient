@@ -1100,6 +1100,14 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 }
             });
 
+            if (syncData && syncData.u !== u_handle) {
+                $('.megasync-title span', '.megasync-upload-overlay').text(l.msync_upload_wrong_user_title);
+                $('.megasync-info', '.megasync-upload-overlay').safeHTML(l.megasync_upload_wrong_user);
+            }
+            else {
+                $('.megasync-title span', '.megasync-upload-overlay').text(l[19639]);
+                $('.megasync-info', '.megasync-upload-overlay').safeHTML(l[12488]);
+            }
             delay(tag, () => {
                 if (!elementIsVisible(document.querySelector('.megasync-upload-overlay'))) {
                     onclick();
@@ -1108,7 +1116,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
         };
         dlmanager.isMEGAsyncRunning('3.0', 1)
             .done(function(ms, syncData) {
-                showMEGAsyncDialog(l[8912], syncData);
+                showMEGAsyncDialog(u_handle === syncData.u ? l[8912] : l.megasync_check_logins, syncData);
             })
             .fail(function() {
                 showMEGAsyncDialog(l.desktopapp_dialog_btn);

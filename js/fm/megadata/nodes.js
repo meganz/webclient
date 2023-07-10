@@ -743,7 +743,11 @@ MegaData.prototype.copyNodes = function copynodes(cn, t, del, promise, tree, qui
             }
 
             // Confirm with the user the operation will revoke shares and he wants to
-            msgDialog('confirmation', l[870], l[34] + ' ' + l[7410], l[6994], function(yes) {
+            const heading = M.d[cn].t ?
+                l.move_linked_folder_to_shared_folder.replace('%1', M.d[cn].name).replace('%2', M.d[t].name) :
+                l.move_linked_file_to_shared_folder.replace('%1', M.d[cn].name).replace('%2', M.d[t].name);
+            msgDialog(`confirmation:!^${l[62]}!${l[16499]}`, l[870], heading, l.shares_links_will_be_remove,
+                      (yes) => {
                 if (yes) {
                     M.revokeShares(shared).always(M.copyNodes.bind(M, cn, t, del, promise, tree));
                 }

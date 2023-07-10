@@ -2186,11 +2186,11 @@ affiliateUI.purchaseIndex = {
                 self.monthCount++;
             }
 
-            if (item.b) {
+            const index = proPlanIDMap[item.si];
+            if (item.b && index !== 101) {
                 self.countedData.b = ++self.countedData.b || 1;
             }
             else {
-                var index = proPlanIDMap[item.si];
                 self.countedData[index] = ++self.countedData[index] || 1;
             }
         });
@@ -2210,6 +2210,9 @@ affiliateUI.purchaseIndex = {
         $('.list-item.pro3 .label', this.$purchaseChartBlock)
             .text(formatPercentage(this.countedData[3] / this.totalCount || 0));
         $('.list-item.pro3 .num', this.$purchaseChartBlock).text(this.countedData[3] || 0);
+        $('.list-item.pro101 .label', this.$purchaseChartBlock)
+            .text(formatPercentage(this.countedData[101] / this.totalCount || 0));
+        $('.list-item.pro101 .num', this.$purchaseChartBlock).text(this.countedData[101] || 0);
         $('.list-item.business .label', this.$purchaseChartBlock)
             .text(formatPercentage(this.countedData.b / this.totalCount || 0));
         $('.list-item.business .num', this.$purchaseChartBlock).text(this.countedData.b || 0);
@@ -2239,6 +2242,7 @@ affiliateUI.purchaseIndex = {
                         this.countedData[1],
                         this.countedData[2],
                         this.countedData[3],
+                        this.countedData[101],
                         this.countedData.b,
                         $.isEmptyObject(this.countedData) ? 1  : 0
                     ],
@@ -2248,6 +2252,7 @@ affiliateUI.purchaseIndex = {
                         $ctx.css('--label-red'),
                         $ctx.css('--label-purple'),
                         $ctx.css('--label-blue'),
+                        $ctx.css('--label-green'),
                         $ctx.css('--surface-grey-2')
                     ],
                     borderWidth: 0

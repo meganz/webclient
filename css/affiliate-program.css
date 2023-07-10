@@ -472,6 +472,9 @@
 .fm-affiliate.list-item .label.blue {
     background-color: var(--label-blue);
 }
+.fm-affiliate.list-item .label.green {
+    background-color: var(--label-green);
+}
 .fm-affiliate.list-item.list-item .num {
     color: var(--text-color-high);
 }

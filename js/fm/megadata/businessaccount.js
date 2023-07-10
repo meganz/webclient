@@ -658,7 +658,8 @@ BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
 
     var request = {
         "a": "sbu", // business sub account operation
-        "aa": "q" // get quota info
+        "aa": "q", // get quota info
+        ps: 1, // Split links and shares data.
     };
 
     api_req(request, {

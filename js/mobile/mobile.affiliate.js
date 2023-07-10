@@ -898,7 +898,9 @@ mobile.affiliate = {
         }
 
         // IOS hack to display long options
-        contentHtml += '<optgroup label=""></optgroup>';
+        if (is_ios) {
+            contentHtml += '<optgroup label=""></optgroup>';
+        }
 
         $countrySelect.safeHTML(contentHtml);
 

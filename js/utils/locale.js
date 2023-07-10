@@ -244,8 +244,8 @@ function setDateTimeFormat(locales, format) {
 
         // If locale is Arabic and country is non-Arabic country, not set, or not logged in
         if (locale === 'ar' && (!u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0)) {
-            // To avoid Chrome bug, set Egypt as default country.
-            $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat('ar-EG', options);
+            // To avoid Firefox bug, set Egypt as default country.
+            $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat('ar-AE', options);
         }
     }
     catch (e) {
@@ -340,9 +340,9 @@ function setAccDateTimeFormat(locales) {
 
         // If locale is Arabic and country is non-Arabic country or non set,
         if (locale === 'ar' && (!u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0)) {
-            // To avoid Chrome bug, set Egypt as default country.
-            $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat('ar-EG', options);
-            $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat('ar-EG', nYOptions);
+            // To avoid Firefox bug, set Egypt as default country.
+            $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat('ar-AE', options);
+            $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat('ar-AE', nYOptions);
         }
     }
     catch (e) {
@@ -517,7 +517,7 @@ function getDateStructure() {
         var options_m = {month: 'numeric'}; // Format only Month
         var options_d = {day: 'numeric'}; // Format only Year
 
-        locales = !u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0 ? 'ar-EG' : locales;
+        locales = !u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0 ? 'ar-AE' : locales;
 
         try {
             if (typeof Intl !== 'undefined') {
@@ -794,14 +794,7 @@ function formatCurrency(value, currency, display, noDecimals) {
         narrowSymbol = currency !== 'EUR'; // Euro cannot have country
     }
 
-    const cnl = getCountryAndLocales();
-    let locales = cnl.locales;
-
-    // If locale is Arabic and country is non-Arabic country or non set,
-    if (locale === 'ar' && arabics.indexOf(cnl.country) < 0) {
-        // To avoid Chrome bug, set Egypt as default country.
-        locales = 'ar-EG';
-    }
+    const {country, locales} = getCountryAndLocales();
 
     var options = {'style': 'currency', 'currency': currency, currencyDisplay: display};
 
@@ -818,6 +811,10 @@ function formatCurrency(value, currency, display, noDecimals) {
         // Romanian with Euro Symbol currency display is currently buggy on all browsers, so doing this to polyfill it
         if (locales.startsWith('ro')) {
             result = value.toLocaleString('fr', options);
+        }
+        else if (locales.startsWith('ar') && !arabics.includes(country)) {
+            // To avoid Firefox bug, set UAE as default country.
+            result = value.toLocaleString('ar-AE', options);
         }
         else {
             result = value.toLocaleString(locale, options);
@@ -897,6 +894,12 @@ function getCountryAndLocales() {
     }
 
     locales = mega.intl.test(locales) || mega.intl.test(locale) || 'ISO';
+
+    // If locale is Arabic and country is non-Arabic country or non set,
+    if (locale === 'ar' && !arabics.includes(country)) {
+        // To avoid Firefox bug, set UAE as default country.
+        locales = 'ar-AE';
+    }
 
     return $.cnl = {country: country, locales: locales};
 }

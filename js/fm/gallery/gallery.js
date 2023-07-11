@@ -2065,7 +2065,7 @@ mega.gallery.emptyBlock = null;
 mega.gallery.rootMode = {photos: 'a', images: 'a', videos: 'a'};
 mega.gallery.pendingFaBlocks = {};
 mega.gallery.pendingThumbBlocks = {};
-mega.gallery.disallowedExtensions = { 'PSD': true, 'PDF': true, 'SVG': true };
+mega.gallery.disallowedExtensions = { 'PSD': true, 'SVG': true };
 
 Object.defineProperty(mega.gallery, 'albumsRendered', {
     get() {
@@ -2107,7 +2107,7 @@ mega.gallery.isImage = (n, ext) => {
     'use strict';
 
     ext = ext || fileext(n && n.name || n, true, true);
-    return !mega.gallery.disallowedExtensions[ext] && is_image2(n, ext);
+    return !mega.gallery.disallowedExtensions[ext] && is_image3(n, ext);
 };
 
 /**

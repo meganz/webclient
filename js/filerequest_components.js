@@ -438,7 +438,7 @@ lazy(mega, 'fileRequestUI', () => {
                 const { formatMessage } = limitOption;
 
                 if (formatMessage) {
-                    validationMessage = validationMessage.replace('[X]', maxLength);
+                    validationMessage = mega.icu.format(validationMessage, maxLength);
                 }
 
                 if (this.getValue() && this.getValue().length > maxLength) {

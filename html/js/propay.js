@@ -119,6 +119,9 @@ pro.propay = {
         if (login_next && login_next.indexOf('discount') > -1) {
             login_next = false;
         }
+        if (pro.propay.planNum === 101) {
+            $('.bottom-page .bottom-page.stores-desc', this.$page).addClass('hidden');
+        }
 
         // Initialise the main purchase button
         $purchaseButton.rebind('click.purchase', () => {
@@ -138,7 +141,7 @@ pro.propay = {
         // Initialise some extra stuff just for mobile
         if (is_mobile) {
             mobile.propay.init();
-            if (discountInfo && discountInfo.pd) {
+            if ((discountInfo && discountInfo.pd) || (pro.propay.planNum === 101)) {
                 $('.mobile.external-payment-options', '.mobile.fm-content').addClass('hidden');
             }
         }

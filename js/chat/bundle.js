@@ -19227,7 +19227,8 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
     this.$messages = null;
     this.state = {
       editing: false,
-      toast: false
+      toast: false,
+      pusherHeight: 0
     };
     this.onKeyboardScroll = ({
       keyCode
@@ -19483,6 +19484,21 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
         delay(`hp:reinit-scroll:${this.getUniqueId()}`, () => {
           if (this.messagesListScrollable) {
             this.messagesListScrollable.reinitialise(true, true);
+            if (this.state.pusherHeight || this.messagesListScrollable.getScrollHeight() === 0) {
+              if (room.messagesBuff.haveMoreHistory()) {
+                const innerHeight = $('.messages.content-area > div', this.findDOMNode()).not('.hp-pusher').toArray().map(a => a.getBoundingClientRect().height).reduce((a, b) => a + b);
+                const pusherHeight = Math.max(this.messagesListScrollable.getClientHeight() - innerHeight + 50, 0);
+                if (Math.abs(this.state.pusherHeight - pusherHeight) > 50) {
+                  this.setState({
+                    pusherHeight
+                  });
+                }
+              } else {
+                this.setState({
+                  pusherHeight: 0
+                });
+              }
+            }
           }
         }, 30);
       }
@@ -19849,7 +19865,12 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
         'top': '50%',
         'left': '50%'
       }
-    })), messagesList))), this.renderToast());
+    })), !!this.state.pusherHeight && external_React_default().createElement("div", {
+      className: "hp-pusher",
+      style: {
+        height: this.state.pusherHeight
+      }
+    }), messagesList))), this.renderToast());
   }
 }, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "enableScrollbar", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype)), _class));
 

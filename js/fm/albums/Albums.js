@@ -4450,6 +4450,8 @@ lazy(mega.gallery, 'albums', () => {
 
         init(handles) {
             const gallerySidebar = document.querySelector('.js-lp-gallery.lp-gallery .js-gallery-panel');
+            const gallerySidebarWrap =
+                document.querySelector('.js-lp-gallery.lp-gallery .js-gallery-panel .lp-content-wrap-wrap');
             const isAlbums = M.isAlbumsPage();
             const isGallery = M.isGalleryPage();
 
@@ -4458,7 +4460,7 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
-            this.initTree(gallerySidebar);
+            this.initTree(gallerySidebarWrap);
             delay('render:albums_sidebar', () => {
                 applyPs(gallerySidebar);
             });

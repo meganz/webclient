@@ -257,6 +257,7 @@
 .gallery-view-zoom-control i {
     --icon-size: 20px;
     --mask-color: var(--text-color-higher-inverted);
+    margin: 2px 0;
 }
 
 /* Block view - Day */
@@ -640,6 +641,9 @@
     padding-left: 21px;
     padding-right: 21px;
 }
+.rtl .albums-header {
+    direction: rtl;
+}
 .albums-grid {
     display: grid;
     grid-gap: 1.25rem;
@@ -841,6 +845,7 @@ body.rtl .js-lp-gallery .btn-galleries.expansion-btn:not(.expansion-btn-open) i.
     position: relative;
     top: -0.125rem;
     left: -0.125rem;
+    right: -0.125rem;
 }
 .album-timeline-cell.show-date i.icon-check-circle {
     display: none;
@@ -860,6 +865,11 @@ body.rtl .js-lp-gallery .btn-galleries.expansion-btn:not(.expansion-btn-open) i.
     z-index: 10;
     display: flex;
     gap: 0.25rem;
+}
+.rtl .album-content-grid .gallery-view-zoom-control {
+    left: 1.25rem;
+    right: auto;
+    direction: rtl;
 }
 .timeline-tooltip {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);

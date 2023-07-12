@@ -1053,7 +1053,7 @@ function FMShortcuts() {
             charCode === 8 &&
             !isShareRoot
         ) {
-            if (M.isInvalidUserStatus()) {
+            if (M.isInvalidUserStatus() || $.msgDialog === 'remove') {
                 return;
             }
 

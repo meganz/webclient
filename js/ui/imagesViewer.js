@@ -1029,6 +1029,11 @@ var slideshowid;
                     }
                     else if ($.msgDialog) {
                         closeMsg();
+
+                        if ($.warningCallback) {
+                            $.warningCallback(false);
+                            $.warningCallback = null;
+                        }
                     }
                     else if (slideshowplay) {
                         slideshow_imgControls(1);

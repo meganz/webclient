@@ -1048,7 +1048,8 @@ var slideshowid;
                         return false;
                     }
                 }
-                else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage && !$.copyDialog) {
+                else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage && !$.copyDialog
+                        && !$.dialog && !$.msgDialog) {
                     history.back();
                     return false;
                 }

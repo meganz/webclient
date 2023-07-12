@@ -776,7 +776,11 @@ var redeem = {
             else {
                 // Pro I-IV and Lite
                 const voucherLength = mega.voucher.months;
-                const voucherType = pro.getProPlanName(mega.voucher.item.al);
+                const voucherType = pro.getProPlanName(
+                    mega.voucher.hasOwnProperty('item')
+                        ? mega.voucher.item.al
+                        : mega.voucher.proNum
+                );
 
                 // Calculate whether to use month or year text for the voucher e.g. 1 years or 1 months Pro plan
                 const useYearString = voucherLength % 12 === 0;

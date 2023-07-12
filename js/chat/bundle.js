@@ -9142,7 +9142,7 @@ class ContactProfile extends mixins.wl {
     this.onAttachClicked = () => {
       const {
         selected
-      } = this.state.selected;
+      } = this.state;
       if (selected[0]) {
         this.onExpand(selected[0]);
       }
@@ -26493,7 +26493,7 @@ class GenericConversationMessage extends mixin.y {
     e.stopPropagation(e);
     const chatRoom = this.props.message.chatRoom;
     this.doCancelRetry(e, msg);
-    chatRoom._sendMessageToTransport(msg).done(internalId => {
+    chatRoom._sendMessageToTransport(msg).then(internalId => {
       msg.internalId = internalId;
       this.safeForceUpdate();
     });

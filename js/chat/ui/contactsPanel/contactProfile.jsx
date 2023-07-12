@@ -63,7 +63,7 @@ export default class ContactProfile extends MegaRenderMixin {
     }
 
     onAttachClicked = () => {
-        const { selected } = this.state.selected;
+        const { selected } = this.state;
         if (selected[0]) {
             this.onExpand(selected[0]);
         }

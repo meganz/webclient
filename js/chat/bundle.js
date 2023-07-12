@@ -2580,8 +2580,8 @@ Chat.prototype.setAttachments = function (roomId) {
     }
     M.v = Object.values(M.chc[roomId] || {});
     if (M.v.length) {
-      var _this$chats$roomId, _this$chats$roomId$me, _this$chats$roomId$me2;
-      const sv = (_this$chats$roomId = this.chats[roomId]) == null ? void 0 : (_this$chats$roomId$me = _this$chats$roomId.messagesBuff) == null ? void 0 : (_this$chats$roomId$me2 = _this$chats$roomId$me.sharedFiles) == null ? void 0 : _this$chats$roomId$me2._sortedVals;
+      var _this$chats$roomId;
+      const sv = (_this$chats$roomId = this.chats[roomId]) == null || (_this$chats$roomId = _this$chats$roomId.messagesBuff) == null || (_this$chats$roomId = _this$chats$roomId.sharedFiles) == null ? void 0 : _this$chats$roomId._sortedVals;
       if (sv && sv.length === M.v.length) {
         M.v.sort((a, b) => sv.indexOf(a.m) - sv.indexOf(b.m));
       } else {
@@ -11685,21 +11685,44 @@ Join.VIEW = {
 
 const NAMESPACE = 'meetings-alert';
 class Alert extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.alertRef = external_React_default().createRef();
+  }
+  componentWillUnmount() {
+    var _this$props$onTransit, _this$props;
+    super.componentWillUnmount();
+    (_this$props$onTransit = (_this$props = this.props).onTransition) == null ? void 0 : _this$props$onTransit.call(_this$props);
+  }
+  componentDidUpdate() {
+    var _this$props$onTransit2, _this$props2;
+    super.componentDidUpdate();
+    (_this$props$onTransit2 = (_this$props2 = this.props).onTransition) == null ? void 0 : _this$props$onTransit2.call(_this$props2, this.alertRef);
+  }
+  componentDidMount() {
+    var _this$props$onTransit3, _this$props3;
+    super.componentDidMount();
+    (_this$props$onTransit3 = (_this$props3 = this.props).onTransition) == null ? void 0 : _this$props$onTransit3.call(_this$props3, this.alertRef);
+  }
   render() {
     const {
       type,
+      className,
       content,
+      children,
       onClose
     } = this.props;
-    if (content) {
+    if (content || children) {
       return external_React_default().createElement("div", {
+        ref: this.alertRef,
         className: `
                         ${NAMESPACE}
                         ${type ? `${NAMESPACE}-${type}` : ''}
+                        ${className || ''}
                     `
       }, external_React_default().createElement("div", {
         className: `${NAMESPACE}-content`
-      }, content), onClose && external_React_default().createElement("span", {
+      }, content || children), onClose && external_React_default().createElement("span", {
         className: `${NAMESPACE}-close`,
         onClick: onClose
       }, external_React_default().createElement("i", {
@@ -11855,6 +11878,7 @@ class StartMeetingNotification extends mixins.wl {
   render() {
     const {
       chatRoom,
+      offset,
       onStartCall
     } = this.props;
     if (chatRoom.call || !megaChat.hasSupportForCalls) {
@@ -11862,6 +11886,9 @@ class StartMeetingNotification extends mixins.wl {
     }
     return external_React_default().createElement("div", {
       className: "in-call-notif neutral start",
+      style: {
+        marginTop: offset
+      },
       onClick: () => onStartCall(call.ZP.TYPE.AUDIO)
     }, external_React_default().createElement("button", {
       className: "mega-button positive small"
@@ -11874,7 +11901,8 @@ class JoinCallNotification extends mixins.wl {
   }
   render() {
     const {
-      chatRoom
+      chatRoom,
+      offset
     } = this.props;
     if (chatRoom.call) {
       return null;
@@ -11886,7 +11914,10 @@ class JoinCallNotification extends mixins.wl {
       });
     }
     return external_React_default().createElement("div", {
-      className: "in-call-notif neutral join"
+      className: "in-call-notif neutral join",
+      style: {
+        marginTop: offset
+      }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-phone"
     }), external_React_default().createElement(utils.Cw, {
@@ -13586,11 +13617,13 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       onDeleteClicked: msg => this.handleDeleteDialog(msg)
     })), !is_chatlink && room.state !== ChatRoom.STATE.LEFT && navigator.onLine && room.scheduledMeeting && !room.isArchived() && !startCallDisabled ? external_React_default().createElement(StartMeetingNotification, {
       chatRoom: room,
+      offset: this.props.offset,
       onStartCall: mode => {
         return startCallDisabled ? null : (0,call.xt)(true, room).then(() => this.startCall(mode, true)).catch(ex => d && console.warn(`Already in a call. ${ex}`));
       }
     }) : null, !is_chatlink && room.state !== ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ? external_React_default().createElement(JoinCallNotification, {
-      chatRoom: room
+      chatRoom: room,
+      offset: this.props.offset
     }) : null, room.isAnonymous() ? external_React_default().createElement("div", {
       className: "join-chat-block"
     }, external_React_default().createElement("div", {
@@ -13620,11 +13653,13 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
 class ConversationPanels extends mixins.wl {
   constructor(props) {
     super(props);
+    this.alertsOffset = 4;
     this.notificationGranted = undefined;
     this.notificationHelpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-notification-browser-system-permission`;
     this.state = {
       supportAlert: undefined,
-      notificationsPermissions: undefined
+      notificationsPermissions: undefined,
+      alertsOffset: this.alertsOffset
     };
     this.closeSupportAlert = () => this.setState({
       supportAlert: false
@@ -13639,17 +13674,23 @@ class ConversationPanels extends mixins.wl {
     this.state.notificationsPermissions = Notification.permission;
   }
   renderNotificationsPending() {
-    return external_React_default().createElement("div", {
+    return external_React_default().createElement(Alert, {
+      type: Alert.TYPE.LIGHT,
       className: `
-                    meetings-alert
-                    meetings-alert-light
-                    meetings-alert-notifications
-                    ${this.props.isEmpty ? 'empty-state' : ''}
                     ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
-                `
-    }, external_React_default().createElement("div", {
-      className: "meetings-alert-content"
-    }, l.notifications_permissions_pending), external_React_default().createElement("div", {
+                    ${this.props.isEmpty ? 'empty-state' : ''}
+                `,
+      onTransition: ref => this.setState({
+        alertsOffset: ref ? ref.current.offsetHeight : this.alertsOffset
+      }),
+      onClose: () => {
+        this.setState({
+          notificationsPermissions: undefined
+        }, () => {
+          showToast('success', l.notifications_permissions_toast_title, l.notifications_permissions_toast_control, '', () => loadSubPage('fm/account/notifications'));
+        });
+      }
+    }, l.notifications_permissions_pending, external_React_default().createElement("div", {
       className: "meetings-alert-control"
     }, external_React_default().createElement("a", {
       href: "#",
@@ -13661,37 +13702,24 @@ class ConversationPanels extends mixins.wl {
           }, () => onIdle(() => this.state.notificationsPermissions === 'granted' && this.onNotificationsGranted()));
         }).catch(ex => d && console.warn(`Failed to retrieve permissions: ${ex}`));
       }
-    }, l.notifications_permissions_enable)), external_React_default().createElement("span", {
-      className: "meetings-alert-close",
-      onClick: () => this.setState({
-        notificationsPermissions: undefined
-      }, () => {
-        showToast('success', l.notifications_permissions_toast_title, l.notifications_permissions_toast_control, '', () => loadSubPage('fm/account/notifications'));
-      })
-    }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-close-component"
-    })));
+    }, l.notifications_permissions_enable)));
   }
   renderNotificationsBlocked() {
-    const title = l.notifications_permissions_denied_info.replace('[A]', `<a href="${this.notificationHelpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>');
-    return external_React_default().createElement("div", {
+    return external_React_default().createElement(Alert, {
+      type: Alert.TYPE.MEDIUM,
       className: `
-                    meetings-alert
-                    meetings-alert-medium
-                    meetings-alert-notifications
-                    ${this.props.isEmpty ? 'empty-state' : ''}
                     ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
-                `
-    }, external_React_default().createElement("div", {
-      className: "meetings-alert-content"
-    }, external_React_default().createElement(utils.Cw, null, title)), external_React_default().createElement("span", {
-      className: "meetings-alert-close",
-      onClick: () => this.setState({
+                    ${this.props.isEmpty ? 'empty-state' : ''}
+                `,
+      onTransition: ref => this.setState({
+        alertsOffset: ref ? ref.current.offsetHeight : this.alertsOffset
+      }),
+      onClose: () => this.setState({
         notificationsPermissions: undefined
       })
-    }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-close-component"
-    })));
+    }, external_React_default().createElement(utils.Cw, {
+      content: l.notifications_permissions_denied_info.replace('[A]', `<a href="${this.notificationHelpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>')
+    }));
   }
   componentDidMount() {
     var _this$props$onMount, _this$props;
@@ -13710,17 +13738,23 @@ class ConversationPanels extends mixins.wl {
     const {
       routingSection,
       chatUIFlags,
+      isEmpty,
       onToggleExpandedFlag
     } = this.props;
     const {
       notificationsPermissions,
-      supportAlert
+      supportAlert,
+      alertsOffset
     } = this.state;
     const now = Date.now();
     return external_React_default().createElement("div", {
       className: "conversation-panels"
-    }, routingSection === 'contacts' || supportAlert && !mega.config.get('nocallsup') ? null : external_React_default().createElement((external_React_default()).Fragment, null, notificationsPermissions === 'default' && this.renderNotificationsPending(), notificationsPermissions === 'denied' && this.renderNotificationsBlocked()), routingSection !== 'contacts' && supportAlert && !mega.config.get('nocallsup') && external_React_default().createElement(Alert, {
+    }, routingSection === 'contacts' || notificationsPermissions === 'granted' ? null : external_React_default().createElement((external_React_default()).Fragment, null, notificationsPermissions === 'default' && this.renderNotificationsPending(), notificationsPermissions === 'denied' && this.renderNotificationsBlocked()), routingSection === 'contacts' ? null : supportAlert && !mega.config.get('nocallsup') && !notificationsPermissions && external_React_default().createElement(Alert, {
       type: Alert.TYPE.MEDIUM,
+      className: `
+                                ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
+                                ${isEmpty ? 'empty-state' : ''}
+                            `,
       content: call.ZP.getUnsupportedBrowserMessage(),
       onClose: this.closeSupportAlert
     }), megaChat.chats.map(chatRoom => {
@@ -13733,7 +13767,7 @@ class ConversationPanels extends mixins.wl {
           isActive: chatRoom.isCurrentlyActive,
           messagesBuff: chatRoom.messagesBuff,
           chatUIFlags: chatUIFlags,
-          supportAlert: supportAlert,
+          offset: alertsOffset,
           onToggleExpandedFlag: onToggleExpandedFlag
         });
       }
@@ -24872,8 +24906,8 @@ class Local extends AbstractGenericMessage {
     return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON;
   }
   getMessageTimestamp() {
-    var _this$props$message, _this$props$message$m;
-    const callId = (_this$props$message = this.props.message) == null ? void 0 : (_this$props$message$m = _this$props$message.meta) == null ? void 0 : _this$props$message$m.callId;
+    var _this$props$message;
+    const callId = (_this$props$message = this.props.message) == null || (_this$props$message = _this$props$message.meta) == null ? void 0 : _this$props$message.callId;
     let debugMsg = "";
     if (d && callId) {
       debugMsg = `: callId: ${callId}`;
@@ -26318,8 +26352,8 @@ class Giphy extends AbstractGenericMessage {
     this.setState({
       src: isIntersecting ? gifPanel.bl.convert(this.props.message.meta.src) : undefined
     }, () => {
-      var _this$gifRef, _this$gifRef$current;
-      (_this$gifRef = this.gifRef) == null ? void 0 : (_this$gifRef$current = _this$gifRef.current) == null ? void 0 : _this$gifRef$current[isIntersecting ? 'load' : 'pause']();
+      var _this$gifRef;
+      (_this$gifRef = this.gifRef) == null || (_this$gifRef = _this$gifRef.current) == null ? void 0 : _this$gifRef[isIntersecting ? 'load' : 'pause']();
       this.safeForceUpdate();
     });
   }
@@ -30620,10 +30654,10 @@ class FMView extends mixins.wl {
     super(props);
     let initialSortBy = props.initialSortBy || ['name', 'asc'];
     if (props.fmConfigSortEnabled) {
-      var _fmconfig$sortmodes, _fmconfig$sortmodes$s;
+      var _fmconfig$sortmodes;
       const sortId = props.fmConfigSortId;
       assert(sortId, 'missing fmConfigSortId');
-      if ((_fmconfig$sortmodes = fmconfig.sortmodes) != null && (_fmconfig$sortmodes$s = _fmconfig$sortmodes[sortId]) != null && _fmconfig$sortmodes$s.n) {
+      if ((_fmconfig$sortmodes = fmconfig.sortmodes) != null && (_fmconfig$sortmodes = _fmconfig$sortmodes[sortId]) != null && _fmconfig$sortmodes.n) {
         var _fmconfig$sortmodes2;
         initialSortBy = this._translateFmConfigSortMode((_fmconfig$sortmodes2 = fmconfig.sortmodes) == null ? void 0 : _fmconfig$sortmodes2[sortId]);
       }
@@ -30674,8 +30708,8 @@ class FMView extends mixins.wl {
   }
   initSelectionManager(entries) {
     this.selectionManager = new SelectionManager2_React(entries || this.state.entries, this.props.currentdirid || "cloud-drive", () => {
-      var _this$browserEntries, _this$browserEntries$, _this$browserEntries$2;
-      return (_this$browserEntries = this.browserEntries) == null ? void 0 : (_this$browserEntries$ = _this$browserEntries.megaList) == null ? void 0 : (_this$browserEntries$2 = _this$browserEntries$._calculated) == null ? void 0 : _this$browserEntries$2.itemsPerRow;
+      var _this$browserEntries;
+      return (_this$browserEntries = this.browserEntries) == null || (_this$browserEntries = _this$browserEntries.megaList) == null || (_this$browserEntries = _this$browserEntries._calculated) == null ? void 0 : _this$browserEntries.itemsPerRow;
     }, nodeHandle => {
       if (this.browserEntries && this.browserEntries.megaList) {
         this.browserEntries.megaList.scrollToItem(nodeHandle);

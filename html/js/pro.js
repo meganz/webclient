@@ -411,7 +411,8 @@ var pro = {
                 }
 
                 // If in development and on staging, add some extra info for seeing which provider E.g. ECP/Sabadell/AP
-                if (d && (apipath === 'https://staging.api.mega.co.nz/')) {
+                // mega.flags.bid can be passed from API to ask us to turn on "extra info" showing for providers.
+                if (d && (apipath === 'https://staging.api.mega.co.nz/' || mega.flags.bid)) {
                     gateways[gatewayId].displayName += ' (via ' + gateways[gatewayId].name + ')';
                 }
             }

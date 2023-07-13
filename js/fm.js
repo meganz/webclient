@@ -1053,7 +1053,7 @@ function FMShortcuts() {
             charCode === 8 &&
             !isShareRoot
         ) {
-            if (M.isInvalidUserStatus()) {
+            if (M.isInvalidUserStatus() || $.msgDialog === 'remove') {
                 return;
             }
 
@@ -2852,6 +2852,7 @@ function closeDialog(ev) {
                 onIdle($.warningCallback.bind(null, null));
                 $.warningCallback = null;
             }
+            $('#msgDialog').parent().removeClass('msg-dialog-container');
             delete $.msgDialog;
         }
         if ($.dialog === 'onboardingDialog') {

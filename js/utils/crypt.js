@@ -448,8 +448,11 @@ var crypt = (function() {
         // 2023-03-09: let's think that twice...
         var isNonContact = !is_karma && M.getUserByHandle(userhandle).c !== 1;
         if (isNonContact) {
+            const seen = d && authring.getContactAuthenticated(userhandle, keyType);
 
-            logger.warn('Performing %s verification for non-contact "%s"', keyType, userhandle);
+            if (d && !seen || d > 2) {
+                logger.warn('Performing %s verification for non-contact "%s"', keyType, userhandle);
+            }
         }
 
         getPubKeyPromise.done(function __resolvePubKey(result) {
@@ -555,7 +558,7 @@ var crypt = (function() {
             masterPromise.linkFailTo(getPubKeyPromise);
         }
         else {
-            var pubEd25519KeyPromise = ns.getPubKey(userhandle, 'Ed25519');
+            var pubEd25519KeyPromise = ns.getPubKey(userhandle, 'Ed25519', ignoreCache);
             var signaturePromise = mega.attr.get(userhandle, ns.PUBKEY_SIGNATURE_MAPPING[keyType], true, false);
 
             // Signing key and signature required for verification.

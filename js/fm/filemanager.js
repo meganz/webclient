@@ -2776,7 +2776,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             M.currentdirid !== 'devices'
         ) {
             const nodes = s.filter(h => !M.d[h] || M.getNodeRoot(M.d[h].h) !== M.InboxID);
-            if (M.isInvalidUserStatus()) {
+            if (M.isInvalidUserStatus() || $.msgDialog === 'remove') {
                 return;
             }
 
@@ -4701,11 +4701,9 @@ FileManager.prototype.initLeftPanel = function() {
         else if (M.isGalleryPage(link)) {
 
             onIdle(() => {
-
                 const gallery = mega.gallery[link];
 
-                if (gallery && link === M.previousdirid) {
-
+                if (gallery && link === M.previousdirid && link !== M.currentdirid) {
                     gallery.mode = false;
                     gallery.setMode('a', 1);
                 }

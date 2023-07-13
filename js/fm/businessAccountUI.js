@@ -1249,6 +1249,8 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var outshareInfo = subUserStats["ose"] || emptyArray;
         var outshareInternalInfo = subUserStats["osi"] || emptyArray;
         const backupsInfo = subUserStats["3"] || emptyArray;
+        const publicFolderInfo = subUserStats.ps || emptyArray;
+        const publicFileInfo = subUserStats.pf || emptyArray;
 
         totalStorage = subUserStats["ts"] || 0;
         totalBandwidth = subUserStats["dl"] || 0;
@@ -1268,6 +1270,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var outshareTotalFormatted = numOfBytes(outshareInfo[0] - (outshareInfo[3] || 0), 2);
         var outshareTotalInternalFormatted = numOfBytes(outshareInternalInfo[0], 2);
         const backupsTotalFormatted = numOfBytes(backupsInfo[0], 2);
+        const linksTotalFormatted = numOfBytes(publicFolderInfo[0] + publicFileInfo[0], 2);
 
         var versionsTotalFormatted = numOfBytes(rootInfo[3] + rubbishInfo[3]
             + inshareInternalInfo[3] + inshareExternalInfo[3] + backupsInfo[3], 2);
@@ -1292,6 +1295,10 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             ' .used-storage-info.ba-backups', $subAccountContainer);
         var $rubbishSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-rubbish', $subAccountContainer);
+        const $linksSection = $(
+            '.user-management-view-data .subaccount-view-used-data .used-storage-info.ba-pub-links',
+            $subAccountContainer
+        );
         var $versionsSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-version', $subAccountContainer);
 
@@ -1347,6 +1354,12 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $('.ff-occupy', $rubbishSection).text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
         $('.folder-number', $rubbishSection).text(rubbishFolderNumText);
         $('.file-number', $rubbishSection).text(rubbishFileNumText);
+
+        const linksFolderNumText = ffNumText(publicFolderInfo[2], 'folder');
+        const linksFileNumText = ffNumText(publicFileInfo[1], 'file');
+        $('.ff-occupy', $linksSection).text(`${linksTotalFormatted.size} ${linksTotalFormatted.unit}`);
+        $('.folder-number', $linksSection).text(linksFolderNumText);
+        $('.file-number', $linksSection).text(linksFileNumText);
 
         var versionsFileNumText = ffNumText(rootInfo[4] + rubbishInfo[4]
             + inshareInternalInfo[4] + inshareExternalInfo[4], 'file');

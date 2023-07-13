@@ -2261,9 +2261,6 @@ if (typeof sjcl !== 'undefined') {
                 }
             }
 
-            closeDialog();
-            $('.export-links-warning').addClass('hidden');
-
             // Add new contacts to folder share
             if (targets.length > 0) {
                 promise = doShare(selectedNode, targets, true);
@@ -2287,6 +2284,10 @@ if (typeof sjcl !== 'undefined') {
                     promises.push(doShare($.selected[0], Object.values($.changedPermissions), true));
                 }
                 promises.push(self.addContactToFolderShare());
+
+                $('.export-links-warning').addClass('hidden');
+                console.assert($.dialog === 'share');
+                closeDialog();
 
                 MegaPromise.allDone(promises)
                     .always(function() {

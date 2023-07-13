@@ -2020,6 +2020,17 @@ MegaUtils.prototype.decompress = async function(data, format) {
 };
 
 /**
+ * Save to disk the current's account tree (fetch-nodes response)
+ * @param {Number} [ca] set to 1 to not clear the tree-cache
+ * @returns {Promise<*>}
+ */
+MegaUtils.prototype.saveFTree = async function(ca) {
+    'use strict';
+    const ts = new Date().toISOString().replace(/\W/g, '');
+    return M.saveAs(await this.req({a: 'f', c: 1, r: 1, ca}), `tree-${ts}.json`);
+};
+
+/**
  * Save files locally
  * @param {*} data The data to save to disk
  * @param {String} [filename] The file name

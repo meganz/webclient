@@ -1056,6 +1056,8 @@
                 true
             ).done(function(r) {
                 bitMapInstance.mergeFrom(r, false);
+                bitMapInstance.setVersion(version);
+                attribCache.setItem(`${u_handle}_${attrName}`, JSON.stringify([bitMapInstance.toString(), 0]));
             });
         }
     };

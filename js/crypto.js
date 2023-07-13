@@ -3165,46 +3165,32 @@ function crypto_procsr(sr) {
     ctx.callback(false, ctx);
 }
 
-function api_updfkey(h) {
-    // deprecated
-    if (mega.keyMgr.secure) {
-        return;
+async function api_updfkey(sn) {
+    'use strict';
+
+    if (typeof sn === 'string') {
+        sn = await M.getNodes(sn, true).catch(dump);
     }
 
-    if (typeof h === 'string') {
-        M.getNodes(h, true).always(api_updfkeysync);
-    }
-    else {
-        api_updfkeysync(h);
-    }
-}
-function api_updfkeysync(sn) {
-    // deprecated
-    if (mega.keyMgr.secure) {
-        return;
-    }
+    if (Array.isArray(sn) && sn.length) {
+        const nk = [];
 
-    var nk = [];
+        for (let i = sn.length; i--;) {
+            const h = sn[i];
+            const n = M.getNodeByHandle(h);
 
-    if (d) {
-        console.debug('api_updfkey', sn);
-    }
+            if (n.u && n.u !== u_handle && crypto_keyok(n)) {
 
-    for (var i = sn.length; i--;) {
-        var h = sn[i];
-        if (M.d[h].u != u_handle && crypto_keyok(M.d[h])) {
-            nk.push(h, a32_to_base64(encrypt_key(u_k_aes, M.d[h].k)));
+                nk.push(h, a32_to_base64(encrypt_key(u_k_aes, n.k)));
+            }
         }
-    }
 
-    if (nk.length) {
-        if (d) {
-            console.debug('api_updfkey.r', nk);
+        if (nk.length) {
+            if (d) {
+                console.warn('re-keying foreign nodes...', sn, nk);
+            }
+            return M.req({a: 'k', nk});
         }
-        api_req({
-            a: 'k',
-            nk: nk
-        });
     }
 }
 
@@ -3438,6 +3424,7 @@ function crypto_keyfixed(h) {
 // successfully decrypted node will be redrawn and marked as no longer missing.
 function crypto_fixmissingkeys(hs) {
     'use strict';
+    const res = [];
 
     if (hs) {
         for (var h in hs) {
@@ -3448,11 +3435,14 @@ function crypto_fixmissingkeys(hs) {
             }
 
             if (crypto_keyok(n)) {
+                res.push(h);
                 fm_updated(n);
                 crypto_keyfixed(h);
             }
         }
     }
+
+    return res.length ? res : false;
 }
 
 // set a newly received sharekey - apply to relevant missing key nodes, if any.

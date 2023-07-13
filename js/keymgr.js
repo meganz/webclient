@@ -17,6 +17,40 @@ lazy(mega, 'keyMgr', () => {
     };
     let sNodeUsers = Object.create(null);
 
+    const decryptShareKeys = async(h) => {
+        let n;
+        const debug = d > 0 && [];
+        const nodes = await M.getNodes(h, true);
+
+        for (let i = nodes.length; i--;) {
+            n = M.getNodeByHandle(nodes[i]);
+
+            if (crypto_keyok(n)) {
+
+                nodes.splice(i, 1);
+            }
+            else if (debug && !String(n.k).startsWith(h)) {
+
+                debug.push(`Invalid key on ${h}/${n.h}, ${n.k}`);
+            }
+        }
+
+        if (nodes.length) {
+            if (debug) {
+                console.group(`${logger.name}: Trying to decrypt ${h}/${nodes}...`);
+                debug.map(m => logger.error(m));
+            }
+            const fixed = crypto_fixmissingkeys(array.to.object(nodes));
+
+            if (debug) {
+                logger.info(`Decrypted: ${fixed || 'none'}`);
+                console.groupEnd();
+            }
+        }
+
+        return debug && JSON.stringify([h, crypto_keyok(n) || n]);
+    };
+
     const expungePendingOutShares = (u8, nodes, users = false, emails = false) => {
         const sub = $.len(users) || $.len(emails);
         const any = !sub && nodes === false;
@@ -1010,20 +1044,14 @@ lazy(mega, 'keyMgr', () => {
 
         // returns a shared node's path back to root
         async pathShares(node) {
-            const sharedNodes = [];
+            const sharedNodes = [node, []];
 
             if (!M.d[node]) {
-                await dbfetch.get(node);
+                await dbfetch.acquire(node);
             }
+            this.setRefShareNodes(sharedNodes);
 
-            while (M.d[node]) {
-                if (u_sharekeys[node]) {
-                    sharedNodes.push(node);
-                }
-                node = M.d[node].p;
-            }
-
-            return sharedNodes;
+            return sharedNodes[1];
         }
 
         async cacheVerifiedPeerKeys(userHandle) {
@@ -1115,20 +1143,18 @@ lazy(mega, 'keyMgr', () => {
         // try decrypting inshares based on the current key situation
         async decryptInShares() {
             const promises = [];
+            const shares = Object.keys(u_sharekeys);
 
-            const fix = async(h) => {
-                const nodes = await M.getNodes(h, true);
-                crypto_fixmissingkeys(array.to.object(nodes));
-            };
-
-            for (const node in u_sharekeys) {
-                if (M.d[node] && M.d[node].name === undefined) {
-
-                    promises.push(fix(node));
-                }
+            if (d) {
+                logger.debug(`Checking missing keys for... ${shares}`);
             }
 
-            return Promise.all(promises);
+            for (let i = shares.length; i--;) {
+
+                promises.push(decryptShareKeys(shares[i]));
+            }
+
+            return Promise.allSettled(promises).dump('decryptInShares');
         }
 
         // pending inshare keys (from this.pendinginshares)
@@ -1158,7 +1184,11 @@ lazy(mega, 'keyMgr', () => {
 
                         if (d) {
                             if (k) {
-                                logger.info('share-key decrypted and replaced for %s', node, k);
+                                const k1 = Uint32Array.from(k);
+                                const k2 = Uint32Array.from(u_sharekeys[node][0]);
+                                const eq = this.equal(k1, k2);
+
+                                logger.info('share-key decrypted and replaced for %s', node, eq || [k1, k2]);
                             }
                             else {
                                 logger.info('share-key decrypted for %s', node);
@@ -1195,9 +1225,11 @@ lazy(mega, 'keyMgr', () => {
             }
 
             await Promise.all(Object.keys(users).map(uh => this.cacheVerifiedPeerKeys(uh)));
-            await this.acceptPendingInShareCacheKeys(stub);
 
-            return this.decryptInShares();
+            const res = this.acceptPendingInShareCacheKeys(stub);
+
+            this.decryptInShares().catch(dump);
+            return res;
         }
 
         // fetch pending inshare keys from the API, decrypt inshares for trusted sender keys, store in ^!keys otherwise
@@ -1210,6 +1242,7 @@ lazy(mega, 'keyMgr', () => {
                 return;
             }
             pkPull.lock = true;
+            this.pendingpullkey = false;
 
             return this._fetchPendingInShareKeys(pkPull.smbl)
                 .finally(() => {
@@ -1312,6 +1345,8 @@ lazy(mega, 'keyMgr', () => {
 
         // write out a new share-key was successfully used in s/s2.cr
         async setUsedNewShareKey(node) {
+            this.removeShareSnapshot(node);
+
             if (!this.trustedsharekeys[node]) {
                 return;
             }
@@ -1322,6 +1357,24 @@ lazy(mega, 'keyMgr', () => {
                 }
 
                 this.trustedsharekeys[node] |= 2;
+            }
+            while (!await this.commit());
+        }
+
+        // write out an out-share was successfully revoked, so s/s2.cr shall be used when sharing again.
+        async revokeUsedNewShareKey(node) {
+            if (!this.trustedsharekeys[node]) {
+                return;
+            }
+
+            logger.warn(`Out-Share ${node} revoked, cleaning bit 1 flag...`);
+
+            do {
+                if (!(this.trustedsharekeys[node] & 2)) {
+                    break;
+                }
+
+                this.trustedsharekeys[node] &= ~2;
             }
             while (!await this.commit());
         }
@@ -1486,9 +1539,12 @@ lazy(mega, 'keyMgr', () => {
 
         // retrieve previously created share-nodes snapshot
         getShareSnapshot(node) {
-            const res = this.sharechildren[node];
+            return this.sharechildren[node];
+        }
+
+        // remove previously created share-nodes snapshot
+        removeShareSnapshot(node) {
             delete this.sharechildren[node];
-            return res;
         }
 
         // create pending outshare key records and try to send them to
@@ -1753,7 +1809,7 @@ lazy(mega, 'keyMgr', () => {
 
         // this replaces MegaData.getShareNodesSync
         // if a backupid or an uploadid are supplied, only authorised share nodes are returned
-        setRefShareNodes(sn, root) {
+        setRefShareNodes(sn, root, all) {
             const sh = [];
             const [h, a] = sn;
             const ss = a.join(',');
@@ -1761,7 +1817,14 @@ lazy(mega, 'keyMgr', () => {
             let n = M.d[h];
             while (n && n.p) {
                 if (u_sharekeys[n.h]) {
-                    sh.push(n.h);
+
+                    if (all || n.su || n.shares || M.ps[n.h]) {
+
+                        sh.push(n.h);
+                    }
+                    else if (d) {
+                        logger.warn(`Skipping share-key for ${n.h} which seems no longer shared...`);
+                    }
                 }
                 n = M.d[n.p];
             }

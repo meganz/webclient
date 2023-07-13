@@ -125,12 +125,13 @@ class ChatOnboarding {
 
     handleNewScheduledMeeting() {
         if (this.state[OBV4_FLAGS.CHAT_SCHEDULE_NEW] !== 1) {
-            this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_NEW, 1);
-            this.flagMap.safeCommit();
-            if ($.dialog === 'onboardingDialog') {
-                closeDialog();
-            }
-            this.checkAndShowStep();
+            this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_NEW, 1).always(() => {
+                this.flagMap.safeCommit();
+                if ($.dialog === 'onboardingDialog') {
+                    closeDialog();
+                }
+                this.checkAndShowStep();
+            });
         }
         for (const event of this.schedListeners) {
             this.megaChat.off(event);
@@ -163,10 +164,11 @@ class ChatOnboarding {
              */
             const parent = {
                 markDone: () => {
-                    this.occurrenceDialogShown = false;
-                    this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_OCCUR, 1);
-                    this.flagMap.safeCommit();
-                    this.checkAndShowStep();
+                    this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_OCCUR, 1).always(() => {
+                        this.flagMap.safeCommit();
+                        this.occurrenceDialogShown = false;
+                        this.checkAndShowStep();
+                    });
                 },
                 markDeactive: () => {
                     this.occurrenceDialogShown = false;
@@ -215,10 +217,11 @@ class ChatOnboarding {
              */
             const parent = {
                 markDone: () => {
-                    this.flagMap.set(OBV4_FLAGS.CHAT_FEEDBACK_NEW, 1);
-                    this.flagMap.safeCommit();
-                    delete mega.ui.onboarding.$hotSpotNode;
-                    this.checkAndShowStep();
+                    this.flagMap.set(OBV4_FLAGS.CHAT_FEEDBACK_NEW, 1).always(() => {
+                        this.flagMap.safeCommit();
+                        delete mega.ui.onboarding.$hotSpotNode;
+                        this.checkAndShowStep();
+                    });
                 },
                 markDeactive: () => {
                     delete mega.ui.onboarding.$hotSpotNode;

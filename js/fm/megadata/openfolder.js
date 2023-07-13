@@ -542,7 +542,6 @@
      */
     MegaData.prototype.openFolder = function(id, force) {
         var fetchdbnodes;
-        var fetchshares;
         var firstopen;
         var cv = M.isCustomView(id);
 
@@ -566,14 +565,20 @@
             return MegaPromise.resolve(EEXIST);
         }
 
-        $('.fm-right-account-block, .fm-right-block, .gallery-tabs-bl').addClass('hidden');
+        $('.fm-right-account-block, .fm-right-block').addClass('hidden');
         const $viewIcons = $(`.fm-files-view-icon${pfid ? '' : ':not(.media-view)'}`).removeClass('hidden');
 
         this.chat = false;
         this.search = false;
         this.recents = false;
 
-        if (this.gallery && pfid && $viewIcons.filter('.media-view').hasClass('active')) {
+        if (
+            this.gallery
+            && (
+                mega.gallery.sections[id]
+                || (pfid && $viewIcons.filter('.media-view').hasClass('active'))
+            )
+        ) {
             // @todo call completion (?)
             $('.gallery-tabs-bl', '.fm-right-files-block').removeClass('hidden');
         }
@@ -790,7 +795,9 @@
                 promise.resolve(id);
             }
         };
-        var loadend = function() {
+        const loadend = async() => {
+            let fetchshares = false;
+
             // Check this is valid custom view page. If not head to it's root page.
             if (cv && !M.getPath(cv.original).length) {
                 cv = M.isCustomView(cv.type);
@@ -806,21 +813,26 @@
             }
 
             if (fetchshares) {
-                var handles = Object.keys(M.c.shares || {});
-                for (var i = handles.length; i--;) {
+                const handles = Object.keys(M.c.shares || {});
+
+                for (let i = handles.length; i--;) {
                     if (M.d[handles[i]]) {
                         handles.splice(i, 1);
                     }
                 }
-                dbfetch.geta(handles)
-                    .always(function() {
-                        if (!$.inSharesRebuild) {
-                            $.inSharesRebuild = Date.now();
-                            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                        }
-                        finish();
+
+                if (handles.length) {
+                    await dbfetch.geta(handles).catch(dump);
+                }
+
+                if (!$.inSharesRebuild) {
+                    $.inSharesRebuild = Date.now();
+
+                    queueMicrotask(() => {
+                        mega.keyMgr.decryptInShares().catch(dump);
                     });
-                return;
+                    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+                }
             }
 
             finish();

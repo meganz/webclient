@@ -1239,12 +1239,13 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
   }
   handleNewScheduledMeeting() {
     if (this.state[OBV4_FLAGS.CHAT_SCHEDULE_NEW] !== 1) {
-      this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_NEW, 1);
-      this.flagMap.safeCommit();
-      if ($.dialog === 'onboardingDialog') {
-        closeDialog();
-      }
-      this.checkAndShowStep();
+      this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_NEW, 1).always(() => {
+        this.flagMap.safeCommit();
+        if ($.dialog === 'onboardingDialog') {
+          closeDialog();
+        }
+        this.checkAndShowStep();
+      });
     }
     for (const event of this.schedListeners) {
       this.megaChat.off(event);
@@ -1265,10 +1266,11 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
     if (!this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]) {
       const parent = {
         markDone: () => {
-          this.occurrenceDialogShown = false;
-          this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_OCCUR, 1);
-          this.flagMap.safeCommit();
-          this.checkAndShowStep();
+          this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_OCCUR, 1).always(() => {
+            this.flagMap.safeCommit();
+            this.occurrenceDialogShown = false;
+            this.checkAndShowStep();
+          });
         },
         markDeactive: () => {
           this.occurrenceDialogShown = false;
@@ -1301,10 +1303,11 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
     if (!this.actions[OBV4_FLAGS.CHAT_FEEDBACK_NEW]) {
       const parent = {
         markDone: () => {
-          this.flagMap.set(OBV4_FLAGS.CHAT_FEEDBACK_NEW, 1);
-          this.flagMap.safeCommit();
-          delete mega.ui.onboarding.$hotSpotNode;
-          this.checkAndShowStep();
+          this.flagMap.set(OBV4_FLAGS.CHAT_FEEDBACK_NEW, 1).always(() => {
+            this.flagMap.safeCommit();
+            delete mega.ui.onboarding.$hotSpotNode;
+            this.checkAndShowStep();
+          });
         },
         markDeactive: () => {
           delete mega.ui.onboarding.$hotSpotNode;
@@ -9139,7 +9142,7 @@ class ContactProfile extends mixins.wl {
     this.onAttachClicked = () => {
       const {
         selected
-      } = this.state.selected;
+      } = this.state;
       if (selected[0]) {
         this.onExpand(selected[0]);
       }
@@ -19227,7 +19230,8 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
     this.$messages = null;
     this.state = {
       editing: false,
-      toast: false
+      toast: false,
+      pusherHeight: 0
     };
     this.onKeyboardScroll = ({
       keyCode
@@ -19483,6 +19487,21 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
         delay(`hp:reinit-scroll:${this.getUniqueId()}`, () => {
           if (this.messagesListScrollable) {
             this.messagesListScrollable.reinitialise(true, true);
+            if (this.state.pusherHeight || this.messagesListScrollable.getScrollHeight() === 0) {
+              if (room.messagesBuff.haveMoreHistory()) {
+                const innerHeight = $('.messages.content-area > div', this.findDOMNode()).not('.hp-pusher').toArray().map(a => a.getBoundingClientRect().height).reduce((a, b) => a + b);
+                const pusherHeight = Math.max(this.messagesListScrollable.getClientHeight() - innerHeight + 50, 0);
+                if (Math.abs(this.state.pusherHeight - pusherHeight) > 50) {
+                  this.setState({
+                    pusherHeight
+                  });
+                }
+              } else {
+                this.setState({
+                  pusherHeight: 0
+                });
+              }
+            }
           }
         }, 30);
       }
@@ -19849,7 +19868,12 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
         'top': '50%',
         'left': '50%'
       }
-    })), messagesList))), this.renderToast());
+    })), !!this.state.pusherHeight && external_React_default().createElement("div", {
+      className: "hp-pusher",
+      style: {
+        height: this.state.pusherHeight
+      }
+    }), messagesList))), this.renderToast());
   }
 }, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "enableScrollbar", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype)), _class));
 
@@ -26469,7 +26493,7 @@ class GenericConversationMessage extends mixin.y {
     e.stopPropagation(e);
     const chatRoom = this.props.message.chatRoom;
     this.doCancelRetry(e, msg);
-    chatRoom._sendMessageToTransport(msg).done(internalId => {
+    chatRoom._sendMessageToTransport(msg).then(internalId => {
       msg.internalId = internalId;
       this.safeForceUpdate();
     });

@@ -54,10 +54,26 @@ MegaData.prototype.openSharingDialog = function() {
     });
 
     var showShareDlg = function() {
-        // Checking if the selection is still the same after dialog rendering
-        if (!Array.isArray($.selected) || $.selected[0] !== targetHandle) {
-            return;
-        }
+        const scl = mBroadcaster.addListener('statechange', () => {
+
+            if ($.dialog === 'fingerprint-dialog') {
+                closeDialog();
+            }
+
+            if ($.dialog === 'share-add') {
+                $('.cancel-add-share').trigger('click');
+            }
+
+            console.assert($.dialog === 'share');
+            closeDialog();
+        });
+
+        $dialog.rebind('dialog-closed.share', () => {
+            $dialog.off('dialog-closed.share');
+
+            mBroadcaster.removeListener(scl);
+            mega.keyMgr.removeShareSnapshot(targetHandle);
+        });
 
         $.hideContextMenu();
 

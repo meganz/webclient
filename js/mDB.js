@@ -3432,7 +3432,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 node_inflight.add(h);
             }
 
-            if (d) {
+            if (d > 1) {
                 console.debug('acquiring node', h);
             }
 
@@ -3552,7 +3552,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
             }
 
             // fetch nodes and their path to root
-            await this.geta(handles);
+            await this.acquire(handles);
 
             const folders = [];
             for (let i = handles.length; i--;) {

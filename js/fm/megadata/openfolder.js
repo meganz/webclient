@@ -566,14 +566,20 @@
             return MegaPromise.resolve(EEXIST);
         }
 
-        $('.fm-right-account-block, .fm-right-block, .gallery-tabs-bl').addClass('hidden');
+        $('.fm-right-account-block, .fm-right-block').addClass('hidden');
         const $viewIcons = $(`.fm-files-view-icon${pfid ? '' : ':not(.media-view)'}`).removeClass('hidden');
 
         this.chat = false;
         this.search = false;
         this.recents = false;
 
-        if (this.gallery && pfid && $viewIcons.filter('.media-view').hasClass('active')) {
+        if (
+            this.gallery
+            && (
+                mega.gallery.sections[id]
+                || (pfid && $viewIcons.filter('.media-view').hasClass('active'))
+            )
+        ) {
             // @todo call completion (?)
             $('.gallery-tabs-bl', '.fm-right-files-block').removeClass('hidden');
         }

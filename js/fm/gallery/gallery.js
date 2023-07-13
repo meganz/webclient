@@ -1224,6 +1224,7 @@ class MegaGallery {
         const galleryHeader = $('.gallery-tabs-bl', rfBlock);
 
         galleryHeader.removeClass('hidden');
+        rfBlock.removeClass('hidden');
         $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-right-header, .fm-empty-section', rfBlock).addClass('hidden');
         $('.fm-files-view-icon').removeClass('active').filter('.media-view').addClass('active');
 
@@ -1435,31 +1436,42 @@ class MegaGallery {
 
         if (!this.beforePageChangeListener) {
             this.beforePageChangeListener = mBroadcaster.addListener('beforepagechange', tpage => {
-                if (!this.inPreview) {
-                    this.dropDynamicList();
+                if (this.inPreview) {
+                    return;
+                }
 
-                    // Clear render cache to free memory
-                    this.clearRenderCache();
+                this.dropDynamicList();
 
-                    if (pfid && !tpage.startsWith('folder/')) {
-                        $('.fm-files-view-icon.media-view').addClass('hidden');
-                    }
+                // Clear render cache to free memory
+                this.clearRenderCache();
+
+                if (pfid && !tpage.startsWith('folder/')) {
+                    $('.fm-files-view-icon.media-view').addClass('hidden');
+                }
+
+                const id = tpage.replace(/^fm\//, '');
+
+                if (!mega.gallery.sections[id] && !id.startsWith('discovery/')) {
+                    $('.gallery-tabs-bl', '.fm-right-files-block').addClass('hidden');
                 }
 
                 // Clear thumbnails to free memory if target page is not gallery anymore
-                if (!M.gallery || pfid) {
-                    if (!this.inPreview) {
-                        mBroadcaster.removeListener(this.beforePageChangeListener);
-                        delete this.beforePageChangeListener;
-                    }
+                mBroadcaster.removeListener(this.beforePageChangeListener);
+                delete this.beforePageChangeListener;
 
-                    // Clear discovery
-                    if (this.isDiscovery) {
-                        delete mega.gallery.discovery;
+                // Clear discovery when it's not applicable anymore
+                if (
+                    this.isDiscovery
+                    && (
+                        !M.gallery
+                        || pfid
+                        || M.currentdirid !== tpage
+                    )
+                ) {
+                    delete mega.gallery.discovery;
 
-                        if (mega.gallery.mdReporter.runId) {
-                            mega.gallery.mdReporter.stop();
-                        }
+                    if (mega.gallery.mdReporter.runId) {
+                        mega.gallery.mdReporter.stop();
                     }
                 }
 
@@ -2504,6 +2516,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
 
 async function galleryUI(id) {
     'use strict';
+
     if (self.d) {
         console.group(`Setting up gallery-view...`, M.currentdirid, id);
         console.time('gallery-ui');

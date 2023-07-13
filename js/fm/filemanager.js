@@ -4701,11 +4701,9 @@ FileManager.prototype.initLeftPanel = function() {
         else if (M.isGalleryPage(link)) {
 
             onIdle(() => {
-
                 const gallery = mega.gallery[link];
 
-                if (gallery && link === M.previousdirid) {
-
+                if (gallery && link === M.previousdirid && link !== M.currentdirid) {
                     gallery.mode = false;
                     gallery.setMode('a', 1);
                 }

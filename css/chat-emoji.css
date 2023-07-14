@@ -47,7 +47,12 @@
     line-height: 18px;
     color: #666666;
     float: left;
-    margin: 15px 0 0 10px;
+    margin-top: 15px;
+    margin-inline-start: 10px;
+    -webkit-margin-start: 10px;
+}
+.rtl .emoji.title {
+    float: right;
 }
 
 .emoji.emoji-loading {
@@ -63,6 +68,9 @@
     display: inline-block;
     vertical-align: top;
     margin: 14px 0px 0 0 !important;
+}
+.rtl .emoji-preview img {
+    float: right;
 }
 .dropdown.emoji .loading {
     position: absolute;

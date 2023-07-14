@@ -498,6 +498,7 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .rtl .popup-scroll-content.emoji .emoji-category-container {
     left: 12px;
+    width: calc(100% - 24px);
 }
 /* End of Emoji one popup */
 

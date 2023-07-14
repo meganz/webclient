@@ -8915,7 +8915,7 @@ class ColumnContactRequestsSentBtns extends mixins.wl {
       megatype: ColumnContactRequestsSentBtns.megatype,
       className: ColumnContactRequestsSentBtns.megatype
     }, external_React_default().createElement("div", {
-      className: "contact-item-controls"
+      className: "contact-item-controls contact-request-sent"
     }, !node.dts && this.reinviteAllowed(node.rts) && external_React_default().createElement(buttons.z, {
       className: "mega-button action",
       icon: "sprite-fm-mono icon-rewind",
@@ -27476,6 +27476,9 @@ class EmojiAutocomplete extends mixins.wl {
         return;
       }
       var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
+      if (document.body.classList.contains('rtl') && (key === 37 || key === 39)) {
+        key = key === 37 ? 39 : 37;
+      }
       var handled = false;
       if (!e.shiftKey && (key === 37 || key === 38)) {
         selected = selected - 1;

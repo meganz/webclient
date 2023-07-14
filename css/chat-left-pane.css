@@ -1083,10 +1083,19 @@ li.active .call-duration i {
     width: 100%;
 }
 
+@media only screen and (width <= 1170px) {
+    .rtl .contacts-table .contact-item-user {
+        width: 180px;
+    }
+}
+
 .contacts-table .contact-item-status,
 .contacts-table .contact-item-time {
     font: var(--text-body2);
     color: var(--text-color-medium);
+}
+.contacts-table .contact-item-time {
+    display: flex;
 }
 
 .contacts-table .contact-item-time i {
@@ -1105,6 +1114,9 @@ li.active .call-duration i {
 .contact-item-controls {
     text-align: end;
     width: calc(100% - 10px);
+}
+.contact-item-controls.contact-request-sent {
+    width: 100%;
 }
 
 .contact-item-controls .mega-button.action {
@@ -1157,6 +1169,7 @@ li.active .call-duration i {
 
 .rtl .contacts-table thead th:last-child {
     width: 5%;
+    min-width: 204px;
 }
 
 .contacts-table-results tr {
@@ -1354,6 +1367,9 @@ li.active .call-duration i {
     margin: 0 8px;
     vertical-align: middle;
     --mask-color: var(--icon-rest);
+}
+.rtl .profile-breadcrumb ul li i.icon-arrow-right {
+    transform: rotateY(180deg);
 }
 
 .profile-content {

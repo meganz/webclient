@@ -4,32 +4,12 @@ var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
 
 class AltPartsConvMessage extends ConversationMessageMixin {
-    _ensureNameIsLoaded(h) {
-        var self = this;
-        var contact = M.u[h] ? M.u[h] : {
-            'u': h,
-            'h': h,
-            'c': 0,
-        };
-        var displayName = generateAvatarMeta(contact.u).fullName;
-
-
-        if (!displayName) {
-            M.u.addChangeListener(function () {
-                displayName = generateAvatarMeta(contact.u).fullName;
-                if (displayName) {
-                    self.safeForceUpdate();
-
-                    return 0xDEAD;
-                }
-            });
-        }
-    }
     haveMoreContactListeners() {
         if (!this.props.message || !this.props.message.meta) {
             return false;
         }
-        return this.props.message.meta.included || this.props.message.meta.excluded;
+        const { included, excluded } = this.props.message.meta;
+        return array.unique([...included || [], ...excluded || []]);
     }
     render() {
         var self = this;
@@ -80,7 +60,6 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                 text = text.replace('%2', `<strong>${megaChat.html(displayName)}</strong>`);
             }
 
-            self._ensureNameIsLoaded(otherContact.u);
             messages.push(
                 <div className="message body" data-id={"id" + message.messageId} key={message.messageId + "_" + h}>
                     {avatar}
@@ -112,8 +91,6 @@ class AltPartsConvMessage extends ConversationMessageMixin {
                 chatRoom={self.props.chatRoom}
                 className="message avatar-wrapper small-rounded-avatar"/>;
             var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
-
-            self._ensureNameIsLoaded(otherContact.u);
 
             var text;
             if (otherContact.u === contact.u) {

@@ -1166,30 +1166,7 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
     var $promise = new MegaPromise();
 
     if (type === "private") {
-        // validate that ALL jids are contacts
-        var allValid = true;
-        userHandles.forEach(function(user_handle) {
-            if (!(user_handle in M.u)) {
-                M.u.set(user_handle, new MegaDataObject(MEGA_USER_STRUCT, {
-                    'h': user_handle,
-                    'u': user_handle,
-                    'm': '',
-                    'c': 2
-                }));
-            }
-            // if (!contact || (contact.c !== 1 && contact.c !== 2 && contact.c !== 0)) {
-            //     debugger;
-            //     // this can happen in case the other contact is not in the contact list anymore, e.g. parked account,
-            //     // removed contact, etc
-            //     allValid = false;
-            //     $promise.reject();
-            //     return false;
-            // }
-        });
-        if (allValid === false) {
-            $promise.reject();
-            return $promise;
-        }
+        this.initContacts(userHandles, 2);
         roomId = array.one(userHandles, u_handle);
         if (!roomId) {
             // found a chat where I'm the only user in?
@@ -1200,9 +1177,6 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
             $promise.resolve(roomId, self.chats[roomId]);
             return [roomId, self.chats[roomId], $promise];
         }
-        else {
-            // open new chat
-        }
     }
     else {
         assert(roomId, 'Tried to create a group chat, without passing the chatId.');
@@ -1210,33 +1184,10 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
     }
 
     if (type === "group" || type === "public") {
-        var newUsers = [];
-
         if (d) {
             console.time('openchat:' + chatId + '.' + type);
         }
-        for (var i = userHandles.length; i--;) {
-            var contactHash = userHandles[i];
-            if (!(contactHash in M.u)) {
-                M.u.set(
-                    contactHash,
-                    new MegaDataObject(MEGA_USER_STRUCT, {
-                        'h': contactHash,
-                        'u': contactHash,
-                        'm': '',
-                        'c': undefined
-                    })
-                );
-
-                if (type === "group") {
-                    M.syncUsersFullname(contactHash);
-                    M.syncContactEmail(contactHash);
-                }
-
-                // self.processNewUser(contactHash, true);
-                newUsers.push(contactHash);
-            }
-        }
+        const newUsers = this.initContacts(userHandles);
 
         if (newUsers.length) {
             var chats = self.chats._data;
@@ -1332,6 +1283,61 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
             this.processQueuedMcsmPackets();
         })
     ];
+};
+
+Chat.prototype.initContacts = function(userHandles, cvalue) {
+    const newUsers = [];
+    for (let i = userHandles.length; i--;) {
+        const userHandle = userHandles[i];
+        let isNew = false;
+        if (!(userHandle in M.u)) {
+            // Store in fmdb to save time on subsequent loads
+            M.addUser(new MegaDataObject(MEGA_USER_STRUCT, {
+                h: userHandle,
+                u: userHandle,
+                m: '',
+                c: cvalue
+            }));
+            isNew = true;
+        }
+
+        if (!M.u[userHandle]._chatListener) {
+            // Handle one off setups like adding listeners
+            M.u[userHandle]._chatListener = M.u[userHandle].addChangeListener(() => {
+                this.proxyUserChangeToRooms(userHandle);
+            });
+            if (!is_chatlink && !M.u[userHandle].m) {
+                // If the email isn't already present try fetch it.
+                M.syncContactEmail(userHandle, undefined, true);
+            }
+            if (!M.u[userHandle].c && !isNew) {
+                // Existing non-contacts should check the stored name is still correct.
+                // Remove only from attribCache so rendering doesn't break while allowing the request.
+                attribCache.removeItem(`${userHandle}_firstname`);
+                attribCache.removeItem(`${userHandle}_lastname`);
+                M.syncUsersFullname(userHandle);
+            }
+        }
+        if (isNew) {
+            newUsers.push(userHandle);
+        }
+    }
+    return newUsers;
+};
+
+Chat.prototype.proxyUserChangeToRooms = function(handle) {
+    // There will likely be a performance hit during the room/contact loading phase as user updates come in
+    // Beyond that it shouldn't impact the performance of chat much as fewer updates would be expected.
+    const rooms = Object.values(this.chats);
+    if (d > 1) {
+        console.debug('userChange', handle);
+    }
+    for (let i = 0; i < rooms.length; i++) {
+        const chatRoom = rooms[i];
+        if (Object.keys(chatRoom.members).includes(handle)) {
+            chatRoom.trackDataChange('user-updated', handle);
+        }
+    }
 };
 
 /**

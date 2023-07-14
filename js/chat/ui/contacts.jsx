@@ -9,18 +9,6 @@ import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import ModalDialogs from "../../ui/modalDialogs";
 
 export const MAX_FREQUENTS = 3;
-const EMPTY_ARR = [];
-
-let _attchRerenderCbContacts = function(others) {
-    this.addDataStructListenerForProperties(this.props.contact, [
-        'name',
-        'firstName',
-        'lastName',
-        'nickname',
-        'm',
-        'avatar'
-    ].concat(others ? others : EMPTY_ARR));
-};
 
 const closeDropdowns = () => {
     document.dispatchEvent(new Event('closeDropdowns'));
@@ -31,8 +19,6 @@ export class ContactButton extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     };
-
-    attachRerenderCallbacks = _attchRerenderCbContacts;
 
     constructor(props) {
         super(props);
@@ -50,7 +36,6 @@ export class ContactButton extends ContactAwareComponent {
         let { contact, dropdowns, chatRoom, dropdownRemoveButton } = this.props;
         dropdowns = dropdowns ? dropdowns : [];
         const moreDropdowns = [];
-        const username = <OFlowEmoji>{M.getNameByHandle(contact.u)}</OFlowEmoji>;
 
         const onContactClicked = () => {
             if (contact.c === 2) {
@@ -74,7 +59,7 @@ export class ContactButton extends ContactAwareComponent {
                 />
                 <div className="dropdown-user-name" >
                     <div className="name">
-                        {username}
+                        <ContactAwareName overflow={true} contact={contact} />
                         <ContactPresence className="small" contact={contact} />
                     </div>
                     {contact && (
@@ -406,6 +391,11 @@ export class ContactPresence extends MegaRenderMixin {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
+
+    attachRerenderCallbacks() {
+        this.addDataStructListenerForProperties(this.props.contact, ['presence']);
+    }
+
     render() {
         var contact = this.props.contact;
         var className = this.props.className || '';
@@ -424,6 +414,13 @@ export class ContactPresence extends MegaRenderMixin {
 };
 
 export class LastActivity extends ContactAwareComponent {
+    attachRerenderCallbacks() {
+        this._attachRerenderCbContacts([
+            'ats',
+            'lastGreen',
+            'presence',
+        ]);
+    }
 
     render() {
         const { contact, showLastGreen } = this.props;
@@ -450,7 +447,16 @@ export class LastActivity extends ContactAwareComponent {
 
 export class ContactAwareName extends ContactAwareComponent {
     render() {
-        return this.props.contact ? <span>{this.props.children}</span> : null;
+        const { contact, emoji, overflow } = this.props;
+        if (!contact || !M.u[contact.u || contact.h]) {
+            return null;
+        }
+        const name = M.getNameByHandle(contact.u || contact.h);
+        if (emoji || overflow) {
+            const EmojiComponent = overflow ? OFlowEmoji : Emoji;
+            return <EmojiComponent {...this.props}>{name}</EmojiComponent>;
+        }
+        return <span>{name}</span>;
     }
 }
 
@@ -531,7 +537,7 @@ export class Avatar extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks = _attchRerenderCbContacts;
+
     render() {
         var self = this;
         var contact = this.props.contact;
@@ -626,7 +632,7 @@ export class ContactCard extends ContactAwareComponent {
         'skipQueuedUpdatesOnResize': true
     }
     attachRerenderCallbacks() {
-        _attchRerenderCbContacts.call(this, ['presence']);
+        this._attachRerenderCbContacts(['presence']);
     }
     specShouldComponentUpdate(nextProps, nextState) {
         var self = this;
@@ -809,7 +815,7 @@ export class ContactItem extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks = _attchRerenderCbContacts;
+
     render() {
         var self = this;
         var contact = this.props.contact;

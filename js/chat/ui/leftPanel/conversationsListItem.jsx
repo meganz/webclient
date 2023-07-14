@@ -1,9 +1,14 @@
 import React from 'react';
 import { MegaRenderMixin, timing } from '../../mixins';
 import utils, { OFlowParsedHTML, ParsedHTML } from '../../../ui/utils.jsx';
-import { Avatar, ContactAwareName } from '../contacts.jsx';
+import { Avatar } from '../contacts.jsx';
 
 export default class ConversationsListItem extends MegaRenderMixin {
+
+    state = {
+        isLoading: true,
+    };
+
     isLoading() {
         const mb = this.props.chatRoom.messagesBuff;
 
@@ -14,33 +19,30 @@ export default class ConversationsListItem extends MegaRenderMixin {
         return mb.messagesHistoryIsLoading() || mb.joined === false && mb.isDecrypting;
     }
 
-    specShouldComponentUpdate() {
-        return !this.loadingShown;
-    }
-
-    componentWillMount() {
-        this.chatRoomChangeListener = SoonFc(200 + Math.random() * 400 | 0, () => {
-            if (d > 2) {
-                console.debug('%s: loading:%s', this.getReactId(), this.loadingShown, this.isLoading(), [this]);
-            }
-            this.safeForceUpdate();
-        });
-        this.props.chatRoom.rebind('onUnreadCountUpdate.conversationsListItem', () => {
-            delete this.lastMessageId;
-            this.safeForceUpdate();
-        });
-        this.props.chatRoom.addChangeListener(this.chatRoomChangeListener);
+    shouldComponentUpdate(nextProps, nextState) {
+        return super.shouldComponentUpdate(nextProps, nextState) || this.state.isLoading && !nextState.isLoading;
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        this.props.chatRoom.removeChangeListener(this.chatRoomChangeListener);
         this.props.chatRoom.unbind('onUnreadCountUpdate.conversationsListItem');
     }
 
     componentDidMount() {
         super.componentDidMount();
         this.eventuallyScrollTo();
+        const promise = this.isLoading();
+        if (promise && promise.always) {
+            promise.always(() => {
+                this.setState({ isLoading: false });
+            });
+        }
+        else if (promise === false) {
+            this.setState({ isLoading: false });
+        }
+        this.props.chatRoom.rebind('onUnreadCountUpdate.conversationsListItem', () => {
+            this.safeForceUpdate();
+        });
     }
 
     componentDidUpdate() {
@@ -134,7 +136,6 @@ export default class ConversationsListItem extends MegaRenderMixin {
         else {
             return "unknown room type: " + chatRoom.roomId;
         }
-        this.loadingShown = this.isLoading();
 
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
         var isUnread = false;
@@ -161,22 +162,9 @@ export default class ConversationsListItem extends MegaRenderMixin {
         var lastMessage = showHideMsg ? '' : chatRoom.messagesBuff.getLatestTextMessage();
         var lastMsgDivClasses;
 
-        if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
-            lastMsgDivClasses = this._lastMsgDivClassesCache;
-            lastMessageDiv = this._lastMessageDivCache;
-            lastMsgDivClasses += (isUnread ? " unread" : "");
-            if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
-                lastMsgDivClasses += " call";
-                classString += " call-exists";
-            }
-        }
-        else if (lastMessage) {
+        if (lastMessage) {
             lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
-            // safe some CPU cycles...
-            var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(
-                lastMessage
-            );
-            lastMessage.renderableSummary = renderableSummary;
+            const renderableSummary = chatRoom.messagesBuff.getRenderableSummary(lastMessage);
 
             if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
                 lastMsgDivClasses += " call";
@@ -188,11 +176,10 @@ export default class ConversationsListItem extends MegaRenderMixin {
                         {renderableSummary}
                     </ParsedHTML>
                 </div>;
-            const voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
 
             if (
                 lastMessage.textContents &&
-                lastMessage.textContents[1] === voiceClipType &&
+                lastMessage.textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP &&
                 lastMessage.getAttachmentMeta()[0]
             ) {
                 const playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
@@ -224,15 +211,9 @@ export default class ConversationsListItem extends MegaRenderMixin {
             lastMessageDiv = showHideMsg
                 ? '' :
                 <div className={lastMsgDivClasses}>
-                    {this.loadingShown ? l[7006] : l[8000]}
+                    {this.state.isLoading ? l[7006] : l[8000]}
                 </div>;
         }
-
-        this.lastMessageId = lastMessage && lastMessage.messageId;
-        this._lastMsgDivClassesCache = lastMsgDivClasses
-            .replace(" call-exists", "")
-            .replace(" unread", "");
-        this._lastMessageDivCache = lastMessageDiv;
 
         if (chatRoom.type !== "public") {
             nameClassString += " privateChat";
@@ -240,11 +221,11 @@ export default class ConversationsListItem extends MegaRenderMixin {
         let roomTitle = <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>;
         if (chatRoom.type === "private") {
             roomTitle =
-                <ContactAwareName contact={this.props.contact}>
+                <span>
                     <div className="user-card-wrapper">
                         <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>
                     </div>
-                </ContactAwareName>;
+                </span>;
         }
         nameClassString += chatRoom.type === "private" || chatRoom.type === "group" ? ' badge-pad' : '';
 

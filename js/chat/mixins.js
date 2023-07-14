@@ -928,13 +928,39 @@ export class ContactAwareComponent extends MegaRenderMixin {
         this.loadContactInfo();
     }
 
-    loadContactInfo() {
-        const contact = this.props.contact;
-        const contactHandle = contact && (contact.h || contact.u);
+    _validContact() {
+        const { contact } = this.props;
+        if (!contact) {
+            return false;
+        }
+        return (contact.h || contact.u) in M.u;
+    }
 
-        if (!(contactHandle in M.u)) {
+    _attachRerenderCbContacts(others) {
+        if (!this._validContact()) {
             return;
         }
+        this.addDataStructListenerForProperties(this.props.contact, [
+            'name',
+            'firstName',
+            'lastName',
+            'nickname',
+            'm',
+            'avatar'
+        ].concat(Array.isArray(others) ? others : []));
+    }
+
+    attachRerenderCallbacks() {
+        this._attachRerenderCbContacts();
+    }
+
+    loadContactInfo() {
+        if (!this._validContact()) {
+            return;
+        }
+
+        const { contact, chatRoom } = this.props;
+        const contactHandle = contact.h || contact.u;
 
         const syncName = !ContactAwareComponent.unavailableNames[contactHandle] && !contact.firstName &&
             !contact.lastName;
@@ -957,7 +983,7 @@ export class ContactAwareComponent extends MegaRenderMixin {
             }
 
             const promises = [];
-            const chatHandle = is_chatlink.ph || (this.props.chatRoom && this.props.chatRoom.publicChatHandle);
+            const chatHandle = is_chatlink.ph || (chatRoom && chatRoom.publicChatHandle);
 
             if (syncName) {
                 promises.push(M.syncUsersFullname(contactHandle, chatHandle, new MegaPromise()));

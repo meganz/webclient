@@ -2407,9 +2407,9 @@ MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
 MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
     "use strict";
 
-    var renderableSummary;
-    if (lastMessage.renderableSummary) {
-        renderableSummary = lastMessage.renderableSummary;
+    let renderableSummary;
+    if (lastMessage._renderableSummary) {
+        renderableSummary = lastMessage._renderableSummary;
     }
     else {
         if (lastMessage.isManagement && lastMessage.isManagement()) {
@@ -2458,6 +2458,7 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
         renderableSummary = renderableSummary || "";
         renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
         renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
+        lastMessage._renderableSummary = renderableSummary;
     }
 
     var author;

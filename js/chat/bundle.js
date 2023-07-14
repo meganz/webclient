@@ -13687,6 +13687,7 @@ class ConversationPanels extends mixins.wl {
   constructor(props) {
     super(props);
     this.alertsOffset = 4;
+    this.notificationListener = 'meetings:notificationPermissions';
     this.notificationGranted = undefined;
     this.notificationHelpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-notification-browser-system-permission`;
     this.state = {
@@ -13754,6 +13755,10 @@ class ConversationPanels extends mixins.wl {
       content: l.notifications_permissions_denied_info.replace('[A]', `<a href="${this.notificationHelpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>')
     }));
   }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    mBroadcaster.removeListener(this.notificationListener);
+  }
   componentDidMount() {
     var _this$props$onMount, _this$props;
     super.componentDidMount();
@@ -13766,6 +13771,9 @@ class ConversationPanels extends mixins.wl {
         scheduledMeeting.getOccurrences().catch(nop);
       }
     });
+    mBroadcaster.addListener(this.notificationListener, notificationsPermissions => this.isMounted() && this.setState({
+      notificationsPermissions
+    }));
   }
   render() {
     const {

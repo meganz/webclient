@@ -9982,10 +9982,13 @@ class CloudBrowserDialog extends mixins.wl {
       buttons.push({
         "label": this.props.openLabel,
         "key": "select",
-        className: "positive " + className,
+        className: `positive ${className} ${highlighted.length > 1 ? 'disabled' : ''}`,
         onClick: e => {
           e.preventDefault();
           e.stopPropagation();
+          if (highlighted.length > 1) {
+            return;
+          }
           this.setState({
             currentlyViewedEntry: highlightedNode
           });
@@ -10004,17 +10007,41 @@ class CloudBrowserDialog extends mixins.wl {
         onClick: () => {
           this.props.onClose();
           onIdle(() => {
-            const createPublicLink = () => {
-              M.createPublicLink(highlightedNode).then(({
+            const createPublicLink = h => {
+              M.createPublicLink(h).then(({
                 link
               }) => this.props.room.sendMessage(link));
             };
-            const name = M.getNameByHandle(highlightedNode) || l[1049];
-            return mega.fileRequestCommon.storage.isDropExist(highlightedNode).length ? msgDialog('confirmation', l[1003], l[17403].replace('%1', escapeHTML(name)), l[18229], e => {
-              if (e) {
-                mega.fileRequest.removeList([highlightedNode]).then(createPublicLink).catch(dump);
+            const frs = [];
+            const files = [];
+            for (let i = 0; i < highlighted.length; i++) {
+              const node = M.getNodeByHandle(highlighted[i]);
+              if (node && M.isFileNode(node)) {
+                if (!M.getNodeShare(node).down) {
+                  files.push(node);
+                }
+              } else if (mega.fileRequestCommon.storage.isDropExist(highlighted[i]).length) {
+                frs.push(highlighted[i]);
+              } else {
+                createPublicLink(highlighted[i]);
               }
-            }) : createPublicLink();
+            }
+            if (files.length) {
+              this.props.onSelected(files);
+              this.props.onAttachClicked();
+            }
+            if (frs.length) {
+              const fldName = frs.length > 1 ? l[17626] : l[17403].replace('%1', escapeHTML(M.getNameByHandle(frs[0])) || l[1049]);
+              msgDialog('confirmation', l[1003], fldName, l[18229], e => {
+                if (e) {
+                  mega.fileRequest.removeList(frs).then(() => {
+                    for (let i = 0; i < frs.length; i++) {
+                      createPublicLink(frs[i]);
+                    }
+                  }).catch(dump);
+                }
+              });
+            }
           });
         }
       } : null);
@@ -12944,7 +12971,6 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     if (self.state.attachCloudDialog === true) {
       var selected = [];
       attachCloudDialog = external_React_default().createElement(cloudBrowserModalDialog.CloudBrowserDialog, {
-        folderSelectNotAllowed: true,
         allowAttachFolders: true,
         room: room,
         onClose: () => {

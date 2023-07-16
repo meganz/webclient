@@ -1553,7 +1553,6 @@ export class ConversationPanel extends MegaRenderMixin {
         if (self.state.attachCloudDialog === true) {
             var selected = [];
             attachCloudDialog = <CloudBrowserModalDialog.CloudBrowserDialog
-                folderSelectNotAllowed={true}
                 allowAttachFolders={true}
                 room={room}
                 onClose={() => {

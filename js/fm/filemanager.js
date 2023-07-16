@@ -2549,7 +2549,6 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
             classes: 'no-incoming', // Hide incoming share tab
             selectLabel: l[1523],
             folderSelectable: true, // Can select folder(s)
-            folderSelectNotAllowed: true, // Don't allow multi-selecting folders
             onAttach: function() {
                 doClose(true);
                 $.selected = selected;

@@ -208,11 +208,6 @@ function u_checklogin3a(res, ctx) {
         if (r === 3) {
             document.body.classList.add('logged');
             document.body.classList.remove('not-logged');
-
-            // Send some data to mega.io that we logged in
-            if (!is_iframed) {
-                initMegaIoIframe(true);
-            }
         }
 
         // Recovery key has been saved

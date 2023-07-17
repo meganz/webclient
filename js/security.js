@@ -980,9 +980,6 @@ security.register = {
                 if (is_mobile && result === 0) {
                     mobile.messageOverlay.show(l[16351]);    // The email was sent successfully.
                 }
-                else if (is_mobile && result < 0) {
-                    mobile.messageOverlay.show(l[47]);    // Oops, something went wrong. Sorry about that!
-                }
 
                 // Run the callback requested by the calling function to show a check email dialog or whatever
                 completeCallback(result, firstName, lastName, newEmail);

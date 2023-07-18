@@ -1354,7 +1354,7 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (chatOnboarding_class = class 
     this._checkAndShowStep();
   }
   _shouldSkipShow() {
-    if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active || u_type < 3 || is_mobile) {
+    if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active || u_type < 3 || is_mobile || $.msgDialog) {
       return true;
     }
     this.$topRightMenu = this.$topRightMenu || $('.top-menu-popup', '#topmenu');

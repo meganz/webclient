@@ -10,6 +10,12 @@ lazy(mega.gallery, 'albums', () => {
      */
     let disposeKeyboardEvents = null;
 
+    const timemarks = {
+        albumCreateStarted: 0,
+        albumItemsSelectStarted: 0,
+        albumCreateNamed: 0
+    };
+
     /**
      * Indicates which files should not be considered as raw as of now to match other platforms
      * @type {Object.<String, Boolean>}
@@ -123,6 +129,8 @@ lazy(mega.gallery, 'albums', () => {
         const onlySelection = scope.albums.grid.timeline && scope.albums.grid.timeline.selCount > 0;
         eventlog((onlySelection) ? 99793 : 99792);
     };
+
+    const getAlbumsCount = () => Object.values(scope.albums.store).filter(({ filterFn }) => !filterFn).length;
 
     /**
      * @param {HTMLElement} el DOM element to apply PerfectScroll to
@@ -2128,18 +2136,28 @@ lazy(mega.gallery, 'albums', () => {
                 ok: {
                     label: l.add,
                     callback: () => {
-                        if (this.timeline && scope.albums.store[albumId]) {
+                        const album = scope.albums.store[albumId];
+                        this.confirmed = true;
+
+                        if (this.timeline && album) {
                             const handles = Object.keys(this.timeline.selections);
 
                             if (handles.length > 0) {
                                 const existingHandles = {};
                                 const handlesToAdd = [];
 
-                                const { nodes, label } = scope.albums.store[albumId];
+                                const { nodes, label } = album;
                                 let addedCount = 0;
 
                                 for (let i = 0; i < nodes.length; i++) {
                                     existingHandles[nodes[i].h] = true;
+
+                                    if (mega.gallery.isGalleryVideo(nodes[i])) {
+                                        this.currentVideosCount++;
+                                    }
+                                    else {
+                                        this.currentImagesCount++;
+                                    }
                                 }
 
                                 for (let i = 0; i < handles.length; i++) {
@@ -2148,6 +2166,13 @@ lazy(mega.gallery, 'albums', () => {
                                     if (!existingHandles[h]) {
                                         addedCount++;
                                         handlesToAdd.push({ h, o: (nodes.length + handlesToAdd.length + 1) * 1000 });
+
+                                        if (M.d[h] && mega.gallery.isGalleryVideo(M.d[h])) {
+                                            this.videosCount++;
+                                        }
+                                        else {
+                                            this.imagesCount++;
+                                        }
                                     }
                                 }
 
@@ -2180,8 +2205,48 @@ lazy(mega.gallery, 'albums', () => {
                 },
                 cancel: true,
                 dialogClasses: 'album-items-dialog',
-                contentClasses: 'px-1'
+                contentClasses: 'px-1',
+                onclose: () => {
+                    const seqEnd = Date.now();
+
+                    if (timemarks.albumCreateNamed) {
+                        delay(
+                            'albums_stat_99828',
+                            eventlog.bind(null, 99828, JSON.stringify({
+                                videosCount: this.videosCount,
+                                imagesCount: this.imagesCount,
+                                start: timemarks.albumCreateStarted,
+                                end: seqEnd,
+                                lifetime: seqEnd - timemarks.albumCreateStarted
+                            }))
+                        );
+                    }
+                    else if (this.confirmed && (this.videosCount || this.imagesCount)) {
+                        delay(
+                            'albums_stat_99827',
+                            eventlog.bind(null, 99827, JSON.stringify({
+                                videosCount: this.videosCount,
+                                imagesCount: this.imagesCount,
+                                totalImagesCount: this.currentImagesCount + this.imagesCount,
+                                totalVideosCount: this.currentVideosCount + this.videosCount,
+                                start: timemarks.albumItemsSelectStarted,
+                                end: seqEnd,
+                                lifetime: seqEnd - timemarks.albumItemsSelectStarted
+                            }))
+                        );
+                    }
+
+                    timemarks.albumCreateNamed = 0;
+                    timemarks.albumItemsSelectStarted = 0;
+                    reinitiateEvents();
+                }
             });
+
+            this.videosCount = 0;
+            this.imagesCount = 0;
+            this.currentVideosCount = 0;
+            this.currentImagesCount = 0;
+            this.confirmed = false;
 
             this.setContent(scope.albums.store[albumId].label);
             this.keepEnabled = keepEnabled;
@@ -2311,7 +2376,7 @@ lazy(mega.gallery, 'albums', () => {
                 }
             });
 
-            mBroadcaster.once('closedialog', reinitiateEvents);
+            timemarks.albumItemsSelectStarted = Date.now();
         }
     }
 
@@ -2331,7 +2396,10 @@ lazy(mega.gallery, 'albums', () => {
                 },
                 cancel: true,
                 dialogClasses: 'album-items-dialog',
-                contentClasses: 'px-1'
+                contentClasses: 'px-1',
+                onclose: () => {
+                    reinitiateEvents();
+                }
             });
 
             this.setContent();
@@ -2389,8 +2457,6 @@ lazy(mega.gallery, 'albums', () => {
                     this.timeline.nodes = nodes;
                 }
             });
-
-            mBroadcaster.once('closedialog', reinitiateEvents);
 
             this.disable();
         }
@@ -2555,6 +2621,18 @@ lazy(mega.gallery, 'albums', () => {
                                 scope.albums.grid.setPendingCell(value);
                                 pendingName = value;
 
+                                timemarks.albumCreateNamed = Date.now();
+
+                                delay(
+                                    'albums_stat_99826',
+                                    eventlog.bind(null, 99826, JSON.stringify({
+                                        albumsCount: getAlbumsCount() + 1,
+                                        start: timemarks.albumCreateStarted,
+                                        end: timemarks.albumCreateNamed,
+                                        lifetime: timemarks.albumCreateNamed - timemarks.albumCreateStarted
+                                    }))
+                                );
+
                                 mega.sets.add(value)
                                     .then(() => {
                                         this.hide();
@@ -2571,7 +2649,10 @@ lazy(mega.gallery, 'albums', () => {
                 },
                 cancel: true,
                 dialogClasses: 'create-folder-dialog',
-                contentClasses: 'px-2'
+                contentClasses: 'px-2',
+                onclose: () => {
+                    reinitiateEvents();
+                }
             });
 
             this.albumId = albumId;
@@ -2584,7 +2665,9 @@ lazy(mega.gallery, 'albums', () => {
 
             scope.albums.removeKeyboardListener();
 
-            mBroadcaster.once('closedialog', reinitiateEvents);
+            if (!albumId) {
+                timemarks.albumCreateStarted = Date.now();
+            }
         }
 
         triggerInputSaveguard() {

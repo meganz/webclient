@@ -2995,9 +2995,9 @@ lazy(mega.gallery, 'mdReporter', () => {
                     if (!passedSessionMarks.includes(timeout)) {
                         passedSessionMarks.push(timeout);
 
-                        window.eventlog(
-                            marks[eventIndex][1],
-                            `Session mark: ${mdPageKey} | ${timeout}s`
+                        delay(
+                            `gallery_stat_${marks[eventIndex][1]}`,
+                            eventlog.bind(null, marks[eventIndex][1], `Session mark: ${mdPageKey} | ${timeout}s`)
                         );
                     }
 
@@ -3044,7 +3044,10 @@ lazy(mega.gallery, 'mdReporter', () => {
                     if (!section.reported) {
                         if (section.count >= timesOver) {
                             section.reported = true;
-                            eventlog(99757, `${mdPageKey} has been visited ${section.count} times`);
+                            delay(
+                                'gallery_stat_99757',
+                                eventlog.bind(null, 99757, `${mdPageKey} has been visited ${section.count} times`)
+                            );
                         }
 
                         M.setPersistentData(statsStorageKey, fmStats).catch(() => {

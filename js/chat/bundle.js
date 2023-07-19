@@ -25346,7 +25346,7 @@ class Attachment extends AbstractGenericMessage {
           label: l[1187],
           disabled: mega.paywall,
           onClick: () => this.props.onDownloadStart(v)
-        }), this._isUserRegistered() && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(dropdowns.DropdownItem, {
+        }), !is_chatlink && this._isUserRegistered() && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(dropdowns.DropdownItem, {
           icon: "sprite-fm-mono icon-cloud",
           label: l[1988],
           disabled: mega.paywall,

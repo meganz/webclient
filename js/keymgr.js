@@ -250,12 +250,12 @@ lazy(mega, 'keyMgr', () => {
                 // inform the user not to accept this message more than once
                 // and remind him of his outgoing shared folders, if any.
 
-                // eslint-disable-next-line max-len -- @todo Transifex
-                let msg = `Your account's security is now being upgraded. This will happen only once. If you have seen this message for this account before, press Cancel.`;
+                let msg = l.security_upgrade_message;
 
                 const shared = Object.values(M.getOutShareTree()).map(n => n.name).filter(Boolean);
                 if (shared.length) {
-                    msg += `\n\nYou are currently sharing the following ${shared.length} folders: ${shared.join(', ')}`;
+                    msg += '\n\n' + mega.icu.format(l.security_upgrade_shared_folders, shared.length)
+                        .replace('%1', shared.join(', '));
                 }
 
                 // eslint-disable-next-line no-alert -- @todo non-alert blocking method..

@@ -295,6 +295,9 @@
 .dropdown-item.contains-submenu.icon-arrow-right-after.opened::after {
    --mask-color: var(--icon-active);
 }
+.rtl .dropdown-item.contains-submenu.icon-arrow-right-before i.icon-arrow-right {
+    transform: rotateY(180deg);
+}
 /*  Item with tick */
 .dropdown-item.tick-item.active .status-text {
     -webkit-margin-end: 8px;

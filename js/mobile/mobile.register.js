@@ -555,14 +555,16 @@ mobile.register.new = {
         }
 
         // Show an error if the email is already in use
-        else if (result === EACCESS || result === EEXIST) {
-            loginFromEphemeral.init();
-            /*mobile.messageOverlay.show(l[9000], '', function() {
+        else if (result === EEXIST) {
+            mobile.messageOverlay.show(l[7869], '', () => {
                 if (isEphemeral()) {
                     // Prevent the ephemeral session in mobile web if the email has been registered
                     u_logout(true);
                 }
-            });  */  // Error. This email address is already in use.
+            });    // Error. This email address is already in use.
+        }
+        else if (result === EACCESS) {
+            loginFromEphemeral.init();
         }
         else {
             // Show an error

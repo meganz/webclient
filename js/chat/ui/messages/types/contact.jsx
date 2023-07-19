@@ -1,6 +1,6 @@
 import React from 'react';
 import AbstractGenericMessage from '../abstractGenericMessage.jsx';
-import { Avatar, ContactFingerprint, ContactPresence, ContactVerified } from '../../contacts.jsx';
+import { Avatar, ContactAwareName, ContactFingerprint, ContactPresence, ContactVerified } from '../../contacts.jsx';
 import { Dropdown, DropdownItem } from '../../../../ui/dropdowns.jsx';
 import { Button } from '../../../../ui/buttons.jsx';
 import { Emoji } from '../../../../ui/utils.jsx';
@@ -15,6 +15,18 @@ export default class Contact extends AbstractGenericMessage {
             // `Invite already sent, waiting for response.`
             msgDialog('warningb', '', l[17545])
     };
+
+    haveMoreContactListeners() {
+        const { message } = this.props;
+        const textContents = message.textContents.substring(2, message.textContents.length);
+        const attachmentMeta = JSON.parse(textContents);
+        if (!attachmentMeta) {
+            return false;
+        }
+
+        const contacts = attachmentMeta.map(v => v.u);
+        return contacts.length ? contacts : false;
+    }
 
     _doAddContact(contactEmail) {
         return M.inviteContact(M.u[u_handle] ? M.u[u_handle].m : u_attr.email, contactEmail);
@@ -66,7 +78,7 @@ export default class Contact extends AbstractGenericMessage {
 
     _getContactCard(message, contact, contactEmail) {
         const HAS_RELATIONSHIP = M.u[contact.u].c === 1;
-        let name = <Emoji>{M.getNameByHandle(contact.u)}</Emoji>;
+        let name = <ContactAwareName emoji={true} contact={M.u[contact.u]} />;
         const { chatRoom } = this.props;
         const isAnonView = chatRoom.isAnonymous();
         if (megaChat.FORCE_EMAIL_LOADING) {

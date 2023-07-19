@@ -2250,16 +2250,7 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
   }
   var $promise = new MegaPromise();
   if (type === "private") {
-    userHandles.forEach(function (user_handle) {
-      if (!(user_handle in M.u)) {
-        M.u.set(user_handle, new MegaDataObject(MEGA_USER_STRUCT, {
-          'h': user_handle,
-          'u': user_handle,
-          'm': '',
-          'c': 2
-        }));
-      }
-    });
+    this.initContacts(userHandles, 2);
     roomId = array.one(userHandles, u_handle);
     if (!roomId) {
       $promise.reject();
@@ -2274,26 +2265,10 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
     roomId = chatId;
   }
   if (type === "group" || type === "public") {
-    var newUsers = [];
     if (d) {
       console.time('openchat:' + chatId + '.' + type);
     }
-    for (var i = userHandles.length; i--;) {
-      var contactHash = userHandles[i];
-      if (!(contactHash in M.u)) {
-        M.u.set(contactHash, new MegaDataObject(MEGA_USER_STRUCT, {
-          'h': contactHash,
-          'u': contactHash,
-          'm': '',
-          'c': undefined
-        }));
-        if (type === "group") {
-          M.syncUsersFullname(contactHash);
-          M.syncContactEmail(contactHash);
-        }
-        newUsers.push(contactHash);
-      }
-    }
+    const newUsers = this.initContacts(userHandles);
     if (newUsers.length) {
       var chats = self.chats._data;
       if (d) {
@@ -2350,6 +2325,51 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
     }
     this.processQueuedMcsmPackets();
   })];
+};
+Chat.prototype.initContacts = function (userHandles, cvalue) {
+  const newUsers = [];
+  for (let i = userHandles.length; i--;) {
+    const userHandle = userHandles[i];
+    let isNew = false;
+    if (!(userHandle in M.u)) {
+      M.addUser(new MegaDataObject(MEGA_USER_STRUCT, {
+        h: userHandle,
+        u: userHandle,
+        m: '',
+        c: cvalue
+      }));
+      isNew = true;
+    }
+    if (!M.u[userHandle]._chatListener) {
+      M.u[userHandle]._chatListener = M.u[userHandle].addChangeListener(() => {
+        this.proxyUserChangeToRooms(userHandle);
+      });
+      if (!is_chatlink && !M.u[userHandle].m) {
+        M.syncContactEmail(userHandle, undefined, true);
+      }
+      if (!M.u[userHandle].c && !isNew) {
+        attribCache.removeItem(`${userHandle}_firstname`);
+        attribCache.removeItem(`${userHandle}_lastname`);
+        M.syncUsersFullname(userHandle);
+      }
+    }
+    if (isNew) {
+      newUsers.push(userHandle);
+    }
+  }
+  return newUsers;
+};
+Chat.prototype.proxyUserChangeToRooms = function (handle) {
+  const rooms = Object.values(this.chats);
+  if (d > 1) {
+    console.debug('userChange', handle);
+  }
+  for (let i = 0; i < rooms.length; i++) {
+    const chatRoom = rooms[i];
+    if (Object.keys(chatRoom.members).includes(handle)) {
+      chatRoom.trackDataChange('user-updated', handle);
+    }
+  }
 };
 Chat.prototype.smartOpenChat = function (...args) {
   var self = this;
@@ -2580,8 +2600,8 @@ Chat.prototype.setAttachments = function (roomId) {
     }
     M.v = Object.values(M.chc[roomId] || {});
     if (M.v.length) {
-      var _this$chats$roomId, _this$chats$roomId$me, _this$chats$roomId$me2;
-      const sv = (_this$chats$roomId = this.chats[roomId]) == null ? void 0 : (_this$chats$roomId$me = _this$chats$roomId.messagesBuff) == null ? void 0 : (_this$chats$roomId$me2 = _this$chats$roomId$me.sharedFiles) == null ? void 0 : _this$chats$roomId$me2._sortedVals;
+      var _this$chats$roomId;
+      const sv = (_this$chats$roomId = this.chats[roomId]) == null || (_this$chats$roomId = _this$chats$roomId.messagesBuff) == null || (_this$chats$roomId = _this$chats$roomId.sharedFiles) == null ? void 0 : _this$chats$roomId._sortedVals;
       if (sv && sv.length === M.v.length) {
         M.v.sort((a, b) => sv.indexOf(a.m) - sv.indexOf(b.m));
       } else {
@@ -3793,6 +3813,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
           ChatdIntegration._ensureContactExists([eventData.userId]);
           self.trigger('onMembersUpdatedUI', eventData);
         };
+        if (is_chatlink) {
+          megaChat.initContacts([eventData.userId]);
+        }
         ChatdIntegration._waitForProtocolHandler(self, addParticipant);
         queuedMembersUpdatedEvent = true;
       }
@@ -3838,7 +3861,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     });
   }
   self.rebind('onMembersUpdatedUI.chatRoomMembersSync', function (e, eventData) {
-    var roomRequiresUpdate = false;
     if (eventData.userId === u_handle) {
       self.messagesBuff.joined = true;
       if (eventData.priv === 255 || eventData.priv === -1) {
@@ -3850,26 +3872,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
           self.setState(ChatRoom.STATE.READY);
         }
       }
-      roomRequiresUpdate = true;
-    } else {
-      var contact = M.u[eventData.userId];
-      if (contact instanceof MegaDataMap) {
-        if (eventData.priv === 255 || eventData.priv === -1) {
-          if (contact._onMembUpdUIListener) {
-            contact.removeChangeListener(contact._onMembUpdUIListener);
-            roomRequiresUpdate = true;
-          }
-        } else if (!contact._onMembUpdUIListener) {
-          contact._onMembUpdUIListener = contact.addChangeListener(function () {
-            self.trackDataChange.apply(self, arguments);
-          });
-          roomRequiresUpdate = true;
-        }
-      }
     }
-    if (roomRequiresUpdate) {
-      self.trackDataChange();
-    }
+    self.trackDataChange();
   });
   self.getParticipantsExceptMe().forEach(function (userHandle) {
     var contact = M.u[userHandle];
@@ -6080,13 +6084,34 @@ class ContactAwareComponent extends MegaRenderMixin {
     super(props);
     this.loadContactInfo();
   }
-  loadContactInfo() {
-    var _contact$avatar;
-    const contact = this.props.contact;
-    const contactHandle = contact && (contact.h || contact.u);
-    if (!(contactHandle in M.u)) {
+  _validContact() {
+    const {
+      contact
+    } = this.props;
+    if (!contact) {
+      return false;
+    }
+    return (contact.h || contact.u) in M.u;
+  }
+  _attachRerenderCbContacts(others) {
+    if (!this._validContact()) {
       return;
     }
+    this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar'].concat(Array.isArray(others) ? others : []));
+  }
+  attachRerenderCallbacks() {
+    this._attachRerenderCbContacts();
+  }
+  loadContactInfo() {
+    var _contact$avatar;
+    if (!this._validContact()) {
+      return;
+    }
+    const {
+      contact,
+      chatRoom
+    } = this.props;
+    const contactHandle = contact.h || contact.u;
     const syncName = !ContactAwareComponent.unavailableNames[contactHandle] && !contact.firstName && !contact.lastName;
     const syncMail = megaChat.FORCE_EMAIL_LOADING || (contact.c === 1 || contact.c === 2) && !contact.m && !is_chatlink;
     const syncAvtr = (is_chatlink && (!contact.avatar || ((_contact$avatar = contact.avatar) == null ? void 0 : _contact$avatar.type) === "text") || !contact.avatar) && !avatars[contactHandle] && !ContactAwareComponent.unavailableAvatars[contactHandle];
@@ -6097,7 +6122,7 @@ class ContactAwareComponent extends MegaRenderMixin {
         return;
       }
       const promises = [];
-      const chatHandle = is_chatlink.ph || this.props.chatRoom && this.props.chatRoom.publicChatHandle;
+      const chatHandle = is_chatlink.ph || chatRoom && chatRoom.publicChatHandle;
       if (syncName) {
         promises.push(M.syncUsersFullname(contactHandle, chatHandle, new MegaPromise()));
       }
@@ -6808,17 +6833,12 @@ var _ui_modalDialogs7__ = __webpack_require__(182);
 
 
 const MAX_FREQUENTS = 3;
-const EMPTY_ARR = [];
-let _attchRerenderCbContacts = function (others) {
-  this.addDataStructListenerForProperties(this.props.contact, ['name', 'firstName', 'lastName', 'nickname', 'm', 'avatar'].concat(others ? others : EMPTY_ARR));
-};
 const closeDropdowns = () => {
   document.dispatchEvent(new Event('closeDropdowns'));
 };
 class ContactButton extends _mixins1__._p {
   constructor(props) {
     super(props);
-    this.attachRerenderCallbacks = _attchRerenderCbContacts;
     this.dropdownItemGenerator = this.dropdownItemGenerator.bind(this);
   }
   customIsEventuallyVisible() {
@@ -6836,7 +6856,6 @@ class ContactButton extends _mixins1__._p {
     } = this.props;
     dropdowns = dropdowns ? dropdowns : [];
     const moreDropdowns = [];
-    const username = react0().createElement(_ui_utils_jsx2__.a0, null, M.getNameByHandle(contact.u));
     moreDropdowns.push(react0().createElement("div", {
       className: "dropdown-avatar rounded",
       key: "mainContactInfo",
@@ -6857,7 +6876,10 @@ class ContactButton extends _mixins1__._p {
       className: "dropdown-user-name"
     }, react0().createElement("div", {
       className: "name"
-    }, username, react0().createElement(ContactPresence, {
+    }, react0().createElement(ContactAwareName, {
+      overflow: true,
+      contact: contact
+    }), react0().createElement(ContactPresence, {
       className: "small",
       contact: contact
     })), contact && (megaChat.FORCE_EMAIL_LOADING || contact.c === 1 || contact.c === 2) && react0().createElement("span", {
@@ -7115,6 +7137,9 @@ ContactVerified.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class ContactPresence extends _mixins1__.wl {
+  attachRerenderCallbacks() {
+    this.addDataStructListenerForProperties(this.props.contact, ['presence']);
+  }
   render() {
     var contact = this.props.contact;
     var className = this.props.className || '';
@@ -7132,6 +7157,9 @@ ContactPresence.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class LastActivity extends _mixins1__._p {
+  attachRerenderCallbacks() {
+    this._attachRerenderCbContacts(['ats', 'lastGreen', 'presence']);
+  }
   render() {
     const {
       contact,
@@ -7149,7 +7177,20 @@ class LastActivity extends _mixins1__._p {
 }
 class ContactAwareName extends _mixins1__._p {
   render() {
-    return this.props.contact ? react0().createElement("span", null, this.props.children) : null;
+    const {
+      contact,
+      emoji,
+      overflow
+    } = this.props;
+    if (!contact || !M.u[contact.u || contact.h]) {
+      return null;
+    }
+    const name = M.getNameByHandle(contact.u || contact.h);
+    if (emoji || overflow) {
+      const EmojiComponent = overflow ? _ui_utils_jsx2__.a0 : _ui_utils_jsx2__.dy;
+      return react0().createElement(EmojiComponent, this.props, name);
+    }
+    return react0().createElement("span", null, name);
   }
 }
 class MembersAmount extends _mixins1__._p {
@@ -7210,10 +7251,6 @@ ContactFingerprint.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class Avatar extends _mixins1__._p {
-  constructor(...args) {
-    super(...args);
-    this.attachRerenderCallbacks = _attchRerenderCbContacts;
-  }
   render() {
     var self = this;
     var contact = this.props.contact;
@@ -7289,7 +7326,7 @@ Avatar.defaultProps = {
 };
 class ContactCard extends _mixins1__._p {
   attachRerenderCallbacks() {
-    _attchRerenderCbContacts.call(this, ['presence']);
+    this._attachRerenderCbContacts(['presence']);
   }
   specShouldComponentUpdate(nextProps, nextState) {
     var self = this;
@@ -7455,10 +7492,6 @@ ContactCard.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class ContactItem extends _mixins1__._p {
-  constructor(...args) {
-    super(...args);
-    this.attachRerenderCallbacks = _attchRerenderCbContacts;
-  }
   render() {
     var self = this;
     var contact = this.props.contact;
@@ -8915,7 +8948,7 @@ class ColumnContactRequestsSentBtns extends mixins.wl {
       megatype: ColumnContactRequestsSentBtns.megatype,
       className: ColumnContactRequestsSentBtns.megatype
     }, external_React_default().createElement("div", {
-      className: "contact-item-controls"
+      className: "contact-item-controls contact-request-sent"
     }, !node.dts && this.reinviteAllowed(node.rts) && external_React_default().createElement(buttons.z, {
       className: "mega-button action",
       icon: "sprite-fm-mono icon-rewind",
@@ -11685,21 +11718,44 @@ Join.VIEW = {
 
 const NAMESPACE = 'meetings-alert';
 class Alert extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.alertRef = external_React_default().createRef();
+  }
+  componentWillUnmount() {
+    var _this$props$onTransit, _this$props;
+    super.componentWillUnmount();
+    (_this$props$onTransit = (_this$props = this.props).onTransition) == null ? void 0 : _this$props$onTransit.call(_this$props);
+  }
+  componentDidUpdate() {
+    var _this$props$onTransit2, _this$props2;
+    super.componentDidUpdate();
+    (_this$props$onTransit2 = (_this$props2 = this.props).onTransition) == null ? void 0 : _this$props$onTransit2.call(_this$props2, this.alertRef);
+  }
+  componentDidMount() {
+    var _this$props$onTransit3, _this$props3;
+    super.componentDidMount();
+    (_this$props$onTransit3 = (_this$props3 = this.props).onTransition) == null ? void 0 : _this$props$onTransit3.call(_this$props3, this.alertRef);
+  }
   render() {
     const {
       type,
+      className,
       content,
+      children,
       onClose
     } = this.props;
-    if (content) {
+    if (content || children) {
       return external_React_default().createElement("div", {
+        ref: this.alertRef,
         className: `
                         ${NAMESPACE}
                         ${type ? `${NAMESPACE}-${type}` : ''}
+                        ${className || ''}
                     `
       }, external_React_default().createElement("div", {
         className: `${NAMESPACE}-content`
-      }, content), onClose && external_React_default().createElement("span", {
+      }, content || children), onClose && external_React_default().createElement("span", {
         className: `${NAMESPACE}-close`,
         onClick: onClose
       }, external_React_default().createElement("i", {
@@ -11855,6 +11911,7 @@ class StartMeetingNotification extends mixins.wl {
   render() {
     const {
       chatRoom,
+      offset,
       onStartCall
     } = this.props;
     if (chatRoom.call || !megaChat.hasSupportForCalls) {
@@ -11862,6 +11919,9 @@ class StartMeetingNotification extends mixins.wl {
     }
     return external_React_default().createElement("div", {
       className: "in-call-notif neutral start",
+      style: {
+        marginTop: offset
+      },
       onClick: () => onStartCall(call.ZP.TYPE.AUDIO)
     }, external_React_default().createElement("button", {
       className: "mega-button positive small"
@@ -11874,7 +11934,8 @@ class JoinCallNotification extends mixins.wl {
   }
   render() {
     const {
-      chatRoom
+      chatRoom,
+      offset
     } = this.props;
     if (chatRoom.call) {
       return null;
@@ -11886,7 +11947,10 @@ class JoinCallNotification extends mixins.wl {
       });
     }
     return external_React_default().createElement("div", {
-      className: "in-call-notif neutral join"
+      className: "in-call-notif neutral join",
+      style: {
+        marginTop: offset
+      }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-phone"
     }), external_React_default().createElement(utils.Cw, {
@@ -13586,11 +13650,13 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       onDeleteClicked: msg => this.handleDeleteDialog(msg)
     })), !is_chatlink && room.state !== ChatRoom.STATE.LEFT && navigator.onLine && room.scheduledMeeting && !room.isArchived() && !startCallDisabled ? external_React_default().createElement(StartMeetingNotification, {
       chatRoom: room,
+      offset: this.props.offset,
       onStartCall: mode => {
         return startCallDisabled ? null : (0,call.xt)(true, room).then(() => this.startCall(mode, true)).catch(ex => d && console.warn(`Already in a call. ${ex}`));
       }
     }) : null, !is_chatlink && room.state !== ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ? external_React_default().createElement(JoinCallNotification, {
-      chatRoom: room
+      chatRoom: room,
+      offset: this.props.offset
     }) : null, room.isAnonymous() ? external_React_default().createElement("div", {
       className: "join-chat-block"
     }, external_React_default().createElement("div", {
@@ -13620,11 +13686,14 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
 class ConversationPanels extends mixins.wl {
   constructor(props) {
     super(props);
+    this.alertsOffset = 4;
+    this.notificationListener = 'meetings:notificationPermissions';
     this.notificationGranted = undefined;
     this.notificationHelpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-notification-browser-system-permission`;
     this.state = {
       supportAlert: undefined,
-      notificationsPermissions: undefined
+      notificationsPermissions: undefined,
+      alertsOffset: this.alertsOffset
     };
     this.closeSupportAlert = () => this.setState({
       supportAlert: false
@@ -13639,17 +13708,23 @@ class ConversationPanels extends mixins.wl {
     this.state.notificationsPermissions = Notification.permission;
   }
   renderNotificationsPending() {
-    return external_React_default().createElement("div", {
+    return external_React_default().createElement(Alert, {
+      type: Alert.TYPE.LIGHT,
       className: `
-                    meetings-alert
-                    meetings-alert-light
-                    meetings-alert-notifications
-                    ${this.props.isEmpty ? 'empty-state' : ''}
                     ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
-                `
-    }, external_React_default().createElement("div", {
-      className: "meetings-alert-content"
-    }, l.notifications_permissions_pending), external_React_default().createElement("div", {
+                    ${this.props.isEmpty ? 'empty-state' : ''}
+                `,
+      onTransition: ref => this.setState({
+        alertsOffset: ref ? ref.current.offsetHeight : this.alertsOffset
+      }),
+      onClose: () => {
+        this.setState({
+          notificationsPermissions: undefined
+        }, () => {
+          showToast('success', l.notifications_permissions_toast_title, l.notifications_permissions_toast_control, '', () => loadSubPage('fm/account/notifications'));
+        });
+      }
+    }, l.notifications_permissions_pending, external_React_default().createElement("div", {
       className: "meetings-alert-control"
     }, external_React_default().createElement("a", {
       href: "#",
@@ -13661,37 +13736,28 @@ class ConversationPanels extends mixins.wl {
           }, () => onIdle(() => this.state.notificationsPermissions === 'granted' && this.onNotificationsGranted()));
         }).catch(ex => d && console.warn(`Failed to retrieve permissions: ${ex}`));
       }
-    }, l.notifications_permissions_enable)), external_React_default().createElement("span", {
-      className: "meetings-alert-close",
-      onClick: () => this.setState({
-        notificationsPermissions: undefined
-      }, () => {
-        showToast('success', l.notifications_permissions_toast_title, l.notifications_permissions_toast_control, '', () => loadSubPage('fm/account/notifications'));
-      })
-    }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-close-component"
-    })));
+    }, l.notifications_permissions_enable)));
   }
   renderNotificationsBlocked() {
-    const title = l.notifications_permissions_denied_info.replace('[A]', `<a href="${this.notificationHelpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>');
-    return external_React_default().createElement("div", {
+    return external_React_default().createElement(Alert, {
+      type: Alert.TYPE.MEDIUM,
       className: `
-                    meetings-alert
-                    meetings-alert-medium
-                    meetings-alert-notifications
-                    ${this.props.isEmpty ? 'empty-state' : ''}
                     ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
-                `
-    }, external_React_default().createElement("div", {
-      className: "meetings-alert-content"
-    }, external_React_default().createElement(utils.Cw, null, title)), external_React_default().createElement("span", {
-      className: "meetings-alert-close",
-      onClick: () => this.setState({
+                    ${this.props.isEmpty ? 'empty-state' : ''}
+                `,
+      onTransition: ref => this.setState({
+        alertsOffset: ref ? ref.current.offsetHeight : this.alertsOffset
+      }),
+      onClose: () => this.setState({
         notificationsPermissions: undefined
       })
-    }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-close-component"
-    })));
+    }, external_React_default().createElement(utils.Cw, {
+      content: l.notifications_permissions_denied_info.replace('[A]', `<a href="${this.notificationHelpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>')
+    }));
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    mBroadcaster.removeListener(this.notificationListener);
   }
   componentDidMount() {
     var _this$props$onMount, _this$props;
@@ -13705,22 +13771,31 @@ class ConversationPanels extends mixins.wl {
         scheduledMeeting.getOccurrences().catch(nop);
       }
     });
+    mBroadcaster.addListener(this.notificationListener, notificationsPermissions => this.isMounted() && this.setState({
+      notificationsPermissions
+    }));
   }
   render() {
     const {
       routingSection,
       chatUIFlags,
+      isEmpty,
       onToggleExpandedFlag
     } = this.props;
     const {
       notificationsPermissions,
-      supportAlert
+      supportAlert,
+      alertsOffset
     } = this.state;
     const now = Date.now();
     return external_React_default().createElement("div", {
       className: "conversation-panels"
-    }, routingSection === 'contacts' || supportAlert && !mega.config.get('nocallsup') ? null : external_React_default().createElement((external_React_default()).Fragment, null, notificationsPermissions === 'default' && this.renderNotificationsPending(), notificationsPermissions === 'denied' && this.renderNotificationsBlocked()), routingSection !== 'contacts' && supportAlert && !mega.config.get('nocallsup') && external_React_default().createElement(Alert, {
+    }, routingSection === 'contacts' || notificationsPermissions === 'granted' ? null : external_React_default().createElement((external_React_default()).Fragment, null, notificationsPermissions === 'default' && this.renderNotificationsPending(), notificationsPermissions === 'denied' && this.renderNotificationsBlocked()), routingSection === 'contacts' ? null : supportAlert && !mega.config.get('nocallsup') && !notificationsPermissions && external_React_default().createElement(Alert, {
       type: Alert.TYPE.MEDIUM,
+      className: `
+                                ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
+                                ${isEmpty ? 'empty-state' : ''}
+                            `,
       content: call.ZP.getUnsupportedBrowserMessage(),
       onClose: this.closeSupportAlert
     }), megaChat.chats.map(chatRoom => {
@@ -13733,7 +13808,7 @@ class ConversationPanels extends mixins.wl {
           isActive: chatRoom.isCurrentlyActive,
           messagesBuff: chatRoom.messagesBuff,
           chatUIFlags: chatUIFlags,
-          supportAlert: supportAlert,
+          offset: alertsOffset,
           onToggleExpandedFlag: onToggleExpandedFlag
         });
       }
@@ -13998,7 +14073,6 @@ var ui_contacts = __webpack_require__(13);
 
 
 
-
 class Invite extends mixins.wl {
   constructor(props) {
     super(props);
@@ -14104,11 +14178,13 @@ class Invite extends mixins.wl {
           className: "invite-item-data"
         }, external_React_default().createElement("div", {
           className: "invite-item-name"
-        }, external_React_default().createElement(utils.a0, {
+        }, external_React_default().createElement(ui_contacts.ContactAwareName, {
+          overflow: true,
           simpletip: {
             offset: 10
-          }
-        }, M.getNameByHandle(contact.u))), external_React_default().createElement("div", {
+          },
+          contact: contact
+        })), external_React_default().createElement("div", {
           className: "invite-item-mail"
         }, contact.m)));
       });
@@ -14178,7 +14254,10 @@ class Invite extends mixins.wl {
       }, external_React_default().createElement(ui_contacts.Avatar, {
         contact: M.u[handle],
         className: "avatar-wrapper box-avatar"
-      }), external_React_default().createElement(utils.a0, null, M.getNameByHandle(handle)), external_React_default().createElement("i", {
+      }), external_React_default().createElement(ui_contacts.ContactAwareName, {
+        contact: M.u[handle],
+        overflow: true
+      }), external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-close-component",
         onClick: () => {
           this.handleSelect(handle);
@@ -16531,7 +16610,7 @@ class MessageRow extends mixins.wl {
     } = this.props;
     const isGroup = room && roomIsGroup(room);
     const contact = room.getParticipantsExceptMe();
-    const summary = data.renderableSummary || room.messagesBuff.getRenderableSummary(data);
+    const summary = room.messagesBuff.getRenderableSummary(data);
     return external_React_default().createElement("div", {
       ref: node => {
         this.nodeRef = node;
@@ -16557,9 +16636,10 @@ class MessageRow extends mixins.wl {
       className: "user-card"
     }, external_React_default().createElement("span", {
       className: "title"
-    }, external_React_default().createElement(ui_contacts.ContactAwareName, {
-      contact: isGroup || M.u[contact]
-    }, external_React_default().createElement(utils.a0, null, room.getRoomTitle()))), isGroup ? null : external_React_default().createElement(ui_contacts.ContactPresence, {
+    }, isGroup ? external_React_default().createElement(utils.a0, null, room.getRoomTitle()) : external_React_default().createElement(ui_contacts.ContactAwareName, {
+      contact: M.u[contact],
+      overflow: true
+    })), isGroup ? null : external_React_default().createElement(ui_contacts.ContactPresence, {
       contact: M.u[contact]
     }), external_React_default().createElement("div", {
       className: "clear"
@@ -17312,6 +17392,12 @@ var _dec, _dec2, _class;
 
 
 let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mixins.LY)(0.7, 8), (_class = class ConversationsListItem extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.state = {
+      isLoading: true
+    };
+  }
   isLoading() {
     const mb = this.props.chatRoom.messagesBuff;
     if (mb.haveMessages) {
@@ -17319,30 +17405,31 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
     }
     return mb.messagesHistoryIsLoading() || mb.joined === false && mb.isDecrypting;
   }
-  specShouldComponentUpdate() {
-    return !this.loadingShown;
-  }
-  componentWillMount() {
-    this.chatRoomChangeListener = SoonFc(200 + Math.random() * 400 | 0, () => {
-      if (d > 2) {
-        console.debug('%s: loading:%s', this.getReactId(), this.loadingShown, this.isLoading(), [this]);
-      }
-      this.safeForceUpdate();
-    });
-    this.props.chatRoom.rebind('onUnreadCountUpdate.conversationsListItem', () => {
-      delete this.lastMessageId;
-      this.safeForceUpdate();
-    });
-    this.props.chatRoom.addChangeListener(this.chatRoomChangeListener);
+  shouldComponentUpdate(nextProps, nextState) {
+    return super.shouldComponentUpdate(nextProps, nextState) || this.state.isLoading && !nextState.isLoading;
   }
   componentWillUnmount() {
     super.componentWillUnmount();
-    this.props.chatRoom.removeChangeListener(this.chatRoomChangeListener);
     this.props.chatRoom.unbind('onUnreadCountUpdate.conversationsListItem');
   }
   componentDidMount() {
     super.componentDidMount();
     this.eventuallyScrollTo();
+    const promise = this.isLoading();
+    if (promise && promise.always) {
+      promise.always(() => {
+        this.setState({
+          isLoading: false
+        });
+      });
+    } else if (promise === false) {
+      this.setState({
+        isLoading: false
+      });
+    }
+    this.props.chatRoom.rebind('onUnreadCountUpdate.conversationsListItem', () => {
+      this.safeForceUpdate();
+    });
   }
   componentDidUpdate() {
     super.componentDidUpdate();
@@ -17426,7 +17513,6 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
     } else {
       return "unknown room type: " + chatRoom.roomId;
     }
-    this.loadingShown = this.isLoading();
     var unreadCount = chatRoom.messagesBuff.getUnreadCount();
     var isUnread = false;
     var notificationItems = [];
@@ -17446,18 +17532,9 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
     const showHideMsg = mega.config.get('showHideChat');
     var lastMessage = showHideMsg ? '' : chatRoom.messagesBuff.getLatestTextMessage();
     var lastMsgDivClasses;
-    if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
-      lastMsgDivClasses = this._lastMsgDivClassesCache;
-      lastMessageDiv = this._lastMessageDivCache;
-      lastMsgDivClasses += isUnread ? " unread" : "";
-      if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
-        lastMsgDivClasses += " call";
-        classString += " call-exists";
-      }
-    } else if (lastMessage) {
+    if (lastMessage) {
       lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
-      var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(lastMessage);
-      lastMessage.renderableSummary = renderableSummary;
+      const renderableSummary = chatRoom.messagesBuff.getRenderableSummary(lastMessage);
       if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
         lastMsgDivClasses += " call";
         classString += " call-exists";
@@ -17465,8 +17542,7 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
       lastMessageDiv = external_React_default().createElement("div", {
         className: lastMsgDivClasses
       }, external_React_default().createElement(utils.Cw, null, renderableSummary));
-      const voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
-      if (lastMessage.textContents && lastMessage.textContents[1] === voiceClipType && lastMessage.getAttachmentMeta()[0]) {
+      if (lastMessage.textContents && lastMessage.textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP && lastMessage.getAttachmentMeta()[0]) {
         const playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
         lastMessageDiv = external_React_default().createElement("div", {
           className: lastMsgDivClasses
@@ -17485,19 +17561,14 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
       lastMsgDivClasses = "conversation-message";
       lastMessageDiv = showHideMsg ? '' : external_React_default().createElement("div", {
         className: lastMsgDivClasses
-      }, this.loadingShown ? l[7006] : l[8000]);
+      }, this.state.isLoading ? l[7006] : l[8000]);
     }
-    this.lastMessageId = lastMessage && lastMessage.messageId;
-    this._lastMsgDivClassesCache = lastMsgDivClasses.replace(" call-exists", "").replace(" unread", "");
-    this._lastMessageDivCache = lastMessageDiv;
     if (chatRoom.type !== "public") {
       nameClassString += " privateChat";
     }
     let roomTitle = external_React_default().createElement(utils.nF, null, megaChat.html(chatRoom.getRoomTitle()));
     if (chatRoom.type === "private") {
-      roomTitle = external_React_default().createElement(ui_contacts.ContactAwareName, {
-        contact: this.props.contact
-      }, external_React_default().createElement("div", {
+      roomTitle = external_React_default().createElement("span", null, external_React_default().createElement("div", {
         className: "user-card-wrapper"
       }, external_React_default().createElement(utils.nF, null, megaChat.html(chatRoom.getRoomTitle()))));
     }
@@ -18764,29 +18835,15 @@ var ContactsUI = __webpack_require__(13);
 var ConversationMessageMixin = (__webpack_require__(416).y);
 
 class AltPartsConvMessage extends ConversationMessageMixin {
-  _ensureNameIsLoaded(h) {
-    var self = this;
-    var contact = M.u[h] ? M.u[h] : {
-      'u': h,
-      'h': h,
-      'c': 0
-    };
-    var displayName = generateAvatarMeta(contact.u).fullName;
-    if (!displayName) {
-      M.u.addChangeListener(function () {
-        displayName = generateAvatarMeta(contact.u).fullName;
-        if (displayName) {
-          self.safeForceUpdate();
-          return 0xDEAD;
-        }
-      });
-    }
-  }
   haveMoreContactListeners() {
     if (!this.props.message || !this.props.message.meta) {
       return false;
     }
-    return this.props.message.meta.included || this.props.message.meta.excluded;
+    const {
+      included,
+      excluded
+    } = this.props.message.meta;
+    return array.unique([...(included || []), ...(excluded || [])]);
   }
   render() {
     var self = this;
@@ -18826,7 +18883,6 @@ class AltPartsConvMessage extends ConversationMessageMixin {
       if (!isSelfJoin) {
         text = text.replace('%2', `<strong>${megaChat.html(displayName)}</strong>`);
       }
-      self._ensureNameIsLoaded(otherContact.u);
       messages.push(React.createElement("div", {
         className: "message body",
         "data-id": "id" + message.messageId,
@@ -18854,7 +18910,6 @@ class AltPartsConvMessage extends ConversationMessageMixin {
         className: "message avatar-wrapper small-rounded-avatar"
       });
       var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
-      self._ensureNameIsLoaded(otherContact.u);
       var text;
       if (otherContact.u === contact.u) {
         text = self.props.chatRoom.isMeeting ? l.meeting_mgmt_left : l[8908];
@@ -20262,9 +20317,11 @@ class StreamHead extends mixins.wl {
     };
     this.Dialog = () => {
       const link = `${getBaseUrl()}/${this.props.chatRoom.publicLink}`;
+      const mods = this.getModerators();
       return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({
         ref: this.dialogRef
       }, this.state, {
+        mods: mods,
         name: "meeting-info-dialog",
         title: l[18132],
         className: "group-chat-link dialog-template-main theme-dark-forced in-call-info",
@@ -20275,7 +20332,7 @@ class StreamHead extends mixins.wl {
         className: "content-block"
       }, external_React_default().createElement(utils.dy, {
         className: "info"
-      }, this.getModerators()), external_React_default().createElement("div", {
+      }, mods), external_React_default().createElement("div", {
         className: "info"
       }, l.copy_and_share), external_React_default().createElement("div", {
         className: "link-input-container"
@@ -23136,12 +23193,14 @@ class Ephemeral extends mixins.wl {
       onClose
     } = this.props;
     const ephemeralAccount = ephemeralAccounts && ephemeralAccounts[ephemeralAccounts.length - 1];
-    const ephemeralName = M.getNameByHandle(ephemeralAccount);
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, {
       name: Ephemeral.NAMESPACE,
       dialogType: "message",
       icon: "sprite-fm-uni icon-info",
-      title: external_React_default().createElement(utils.dy, null, ephemeralName),
+      title: external_React_default().createElement(ui_contacts.ContactAwareName, {
+        emoji: true,
+        contact: M.u[ephemeralAccount]
+      }),
       noCloseOnClickOutside: true,
       buttons: this.buttons,
       onClose: onClose
@@ -24281,6 +24340,7 @@ class Incoming extends _mixins1__.wl {
       return react0().createElement(_ui_modalDialogs_jsx3__.Z.ModalDialog, (0,_extends7__.Z)({}, this.state, {
         name: NAMESPACE,
         className: NAMESPACE,
+        roomName: chatRoom.getRoomTitle(),
         onClose: () => onClose()
       }), react0().createElement("div", {
         className: "fm-dialog-body"
@@ -24872,8 +24932,8 @@ class Local extends AbstractGenericMessage {
     return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON;
   }
   getMessageTimestamp() {
-    var _this$props$message, _this$props$message$m;
-    const callId = (_this$props$message = this.props.message) == null ? void 0 : (_this$props$message$m = _this$props$message.meta) == null ? void 0 : _this$props$message$m.callId;
+    var _this$props$message;
+    const callId = (_this$props$message = this.props.message) == null || (_this$props$message = _this$props$message.meta) == null ? void 0 : _this$props$message.callId;
     let debugMsg = "";
     if (d && callId) {
       debugMsg = `: callId: ${callId}`;
@@ -24949,6 +25009,18 @@ class Contact extends AbstractGenericMessage {
       DUPLICATE: () => msgDialog('warningb', '', l[17545])
     };
   }
+  haveMoreContactListeners() {
+    const {
+      message
+    } = this.props;
+    const textContents = message.textContents.substring(2, message.textContents.length);
+    const attachmentMeta = JSON.parse(textContents);
+    if (!attachmentMeta) {
+      return false;
+    }
+    const contacts = attachmentMeta.map(v => v.u);
+    return contacts.length ? contacts : false;
+  }
   _doAddContact(contactEmail) {
     return M.inviteContact(M.u[u_handle] ? M.u[u_handle].m : u_attr.email, contactEmail);
   }
@@ -24977,7 +25049,10 @@ class Contact extends AbstractGenericMessage {
   }
   _getContactCard(message, contact, contactEmail) {
     const HAS_RELATIONSHIP = M.u[contact.u].c === 1;
-    let name = external_React_default().createElement(utils.dy, null, M.getNameByHandle(contact.u));
+    let name = external_React_default().createElement(ui_contacts.ContactAwareName, {
+      emoji: true,
+      contact: M.u[contact.u]
+    });
     const {
       chatRoom
     } = this.props;
@@ -25875,7 +25950,15 @@ class MetaRichpreviewMegaLinks extends mixin.y {
       }
       if (megaLinkInfo.hadLoaded() === false) {
         if (megaLinkInfo.startedLoading() === false) {
-          megaLinkInfo.getInfo().always(function () {
+          megaLinkInfo.getInfo().then(() => {
+            const {
+              megaLinks
+            } = this.props.message;
+            const contactLinkHandles = megaLinks.filter(link => link.is_contactlink).map(link => link.info.h);
+            if (contactLinkHandles.length) {
+              this.addContactListenerIfMissing(contactLinkHandles);
+            }
+          }).always(function () {
             Soon(function () {
               message.trackDataChange();
               self.safeForceUpdate();
@@ -26318,8 +26401,8 @@ class Giphy extends AbstractGenericMessage {
     this.setState({
       src: isIntersecting ? gifPanel.bl.convert(this.props.message.meta.src) : undefined
     }, () => {
-      var _this$gifRef, _this$gifRef$current;
-      (_this$gifRef = this.gifRef) == null ? void 0 : (_this$gifRef$current = _this$gifRef.current) == null ? void 0 : _this$gifRef$current[isIntersecting ? 'load' : 'pause']();
+      var _this$gifRef;
+      (_this$gifRef = this.gifRef) == null || (_this$gifRef = _this$gifRef.current) == null ? void 0 : _this$gifRef[isIntersecting ? 'load' : 'pause']();
       this.safeForceUpdate();
     });
   }
@@ -26781,6 +26864,7 @@ var _ui_emojiDropdown_jsx3__ = __webpack_require__(768);
 class ConversationMessageMixin extends _mixins1__._p {
   constructor(props) {
     super(props);
+    this.attachRerenderCallbacks = false;
     this.__cmmUpdateTickCount = 0;
     this._contactChangeListeners = false;
     this.onAfterRenderWasTriggered = false;
@@ -26793,7 +26877,9 @@ class ConversationMessageMixin extends _mixins1__._p {
       message: msg
     } = this.props;
     if (msg instanceof Message && msg._reactions && msg.messageId.length === 11 && msg.isSentOrReceived() && !Object.hasOwnProperty.call(msg, 'reacts')) {
-      msg.reacts.forceLoad().then(nop).catch(dump.bind(null, 'reactions.load.' + msg.messageId));
+      msg.reacts.forceLoad().then(() => {
+        this.addContactListenerIfMissing(this._reactionContacts());
+      }).catch(dump.bind(null, `reactions.load.${msg.messageId}`));
     }
   }
   componentWillMount() {
@@ -26827,6 +26913,20 @@ class ConversationMessageMixin extends _mixins1__._p {
     }
     this._contactChangeListeners = false;
   }
+  _reactionContacts() {
+    const {
+      message
+    } = this.props;
+    const {
+      reacts
+    } = message;
+    const handles = [];
+    const reactions = Object.values(reacts.reactions);
+    for (let i = 0; i < reactions.length; i++) {
+      handles.push(...Object.keys(reactions[i]));
+    }
+    return array.unique(handles);
+  }
   addContactListeners() {
     const users = this._contactChangeListeners || [];
     const addUser = user => {
@@ -26851,6 +26951,23 @@ class ConversationMessageMixin extends _mixins1__._p {
       users[i].addChangeListener(this);
     }
     this._contactChangeListeners = users;
+  }
+  addContactListenerIfMissing(contacts) {
+    if (!Array.isArray(contacts)) {
+      contacts = [contacts];
+    }
+    const added = [];
+    for (let i = 0; i < contacts.length; i++) {
+      const user = M.u[contacts[i]];
+      if (user && !this._contactChangeListeners.includes(user)) {
+        this._contactChangeListeners.push(user);
+        user.addChangeListener(this);
+        added.push(user.h);
+      }
+    }
+    if (d > 1) {
+      console.warn('%s.addContactListenerIfMissing', this.getReactId(), [this], added);
+    }
   }
   handleChangeEvent(x, z, k) {
     if (k === 'ts' || k === 'ats') {
@@ -27442,6 +27559,9 @@ class EmojiAutocomplete extends mixins.wl {
         return;
       }
       var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
+      if (document.body.classList.contains('rtl') && (key === 37 || key === 39)) {
+        key = key === 37 ? 39 : 37;
+      }
       var handled = false;
       if (!e.shiftKey && (key === 37 || key === 38)) {
         selected = selected - 1;
@@ -30620,10 +30740,10 @@ class FMView extends mixins.wl {
     super(props);
     let initialSortBy = props.initialSortBy || ['name', 'asc'];
     if (props.fmConfigSortEnabled) {
-      var _fmconfig$sortmodes, _fmconfig$sortmodes$s;
+      var _fmconfig$sortmodes;
       const sortId = props.fmConfigSortId;
       assert(sortId, 'missing fmConfigSortId');
-      if ((_fmconfig$sortmodes = fmconfig.sortmodes) != null && (_fmconfig$sortmodes$s = _fmconfig$sortmodes[sortId]) != null && _fmconfig$sortmodes$s.n) {
+      if ((_fmconfig$sortmodes = fmconfig.sortmodes) != null && (_fmconfig$sortmodes = _fmconfig$sortmodes[sortId]) != null && _fmconfig$sortmodes.n) {
         var _fmconfig$sortmodes2;
         initialSortBy = this._translateFmConfigSortMode((_fmconfig$sortmodes2 = fmconfig.sortmodes) == null ? void 0 : _fmconfig$sortmodes2[sortId]);
       }
@@ -30674,8 +30794,8 @@ class FMView extends mixins.wl {
   }
   initSelectionManager(entries) {
     this.selectionManager = new SelectionManager2_React(entries || this.state.entries, this.props.currentdirid || "cloud-drive", () => {
-      var _this$browserEntries, _this$browserEntries$, _this$browserEntries$2;
-      return (_this$browserEntries = this.browserEntries) == null ? void 0 : (_this$browserEntries$ = _this$browserEntries.megaList) == null ? void 0 : (_this$browserEntries$2 = _this$browserEntries$._calculated) == null ? void 0 : _this$browserEntries$2.itemsPerRow;
+      var _this$browserEntries;
+      return (_this$browserEntries = this.browserEntries) == null || (_this$browserEntries = _this$browserEntries.megaList) == null || (_this$browserEntries = _this$browserEntries._calculated) == null ? void 0 : _this$browserEntries.itemsPerRow;
     }, nodeHandle => {
       if (this.browserEntries && this.browserEntries.megaList) {
         this.browserEntries.megaList.scrollToItem(nodeHandle);

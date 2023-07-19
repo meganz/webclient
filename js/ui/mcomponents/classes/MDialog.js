@@ -6,8 +6,9 @@ class MDialog extends MComponent {
      * @param {String} [data.dialogClasses] Additional classes for dialog
      * @param {String} [data.contentClasses] Additional classes for dialog content
      * @param {String} [data.leftIcon] Classes for the side icon on the left
+     * @param {Function} [onclose] Callback to trigger when the dialog is closed
      */
-    constructor({ ok, cancel, dialogClasses, contentClasses, leftIcon }) {
+    constructor({ ok, cancel, dialogClasses, contentClasses, leftIcon, onclose }) {
         super('section.mega-dialog-container:not(.common-container)', false);
 
         this._ok = ok;
@@ -17,6 +18,8 @@ class MDialog extends MComponent {
 
         this._title = document.createElement('h3');
         this._title.className = 'text-ellipsis';
+
+        this.onclose = onclose;
 
         if (leftIcon) {
             this.leftIcon = document.createElement('i');
@@ -119,6 +122,10 @@ class MDialog extends MComponent {
 
         $(this.el).rebind('dialog-closed.mDialog', () => {
             this.detachEl();
+
+            if (typeof this.onclose === 'function') {
+                this.onclose();
+            }
         });
     }
 

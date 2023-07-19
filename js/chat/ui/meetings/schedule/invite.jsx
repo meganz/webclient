@@ -1,8 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../mixins';
 import { PerfectScrollbar } from '../../../../ui/perfectScrollbar.jsx';
-import { Avatar, MAX_FREQUENTS } from '../../contacts';
-import { OFlowEmoji } from '../../../../ui/utils';
+import { Avatar, ContactAwareName, MAX_FREQUENTS } from '../../contacts.jsx';
 
 export default class Invite extends MegaRenderMixin {
     static NAMESPACE = 'meetings-invite';
@@ -121,7 +120,7 @@ export default class Invite extends MegaRenderMixin {
                         <Avatar contact={contact}/>
                         <div className="invite-item-data">
                             <div className="invite-item-name">
-                                <OFlowEmoji simpletip={{ offset: 10 }}>{M.getNameByHandle(contact.u)}</OFlowEmoji>
+                                <ContactAwareName overflow={true} simpletip={{ offset: 10 }} contact={contact} />
                             </div>
                             <div className="invite-item-mail">{contact.m}</div>
                         </div>
@@ -190,7 +189,7 @@ export default class Invite extends MegaRenderMixin {
                                     className="token-input-token-mega">
                                     <div className="contact-tag-item">
                                         <Avatar contact={M.u[handle]} className="avatar-wrapper box-avatar"/>
-                                        <OFlowEmoji>{M.getNameByHandle(handle)}</OFlowEmoji>
+                                        <ContactAwareName contact={M.u[handle]} overflow={true} />
                                         <i
                                             className="sprite-fm-mono icon-close-component"
                                             onClick={() => {

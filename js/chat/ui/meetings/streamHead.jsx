@@ -135,17 +135,19 @@ export default class StreamHead extends MegaRenderMixin {
 
     Dialog = () => {
         const link = `${getBaseUrl()}/${this.props.chatRoom.publicLink}`;
+        const mods = this.getModerators();
         return (
             <ModalDialogsUI.ModalDialog
                 ref={this.dialogRef}
                 {...this.state}
+                mods={mods}
                 name="meeting-info-dialog"
                 title={l[18132] /* `Information` */}
                 className="group-chat-link dialog-template-main theme-dark-forced in-call-info"
                 hideOverlay={true}>
                 <section className="content">
                     <div className="content-block">
-                        <Emoji className="info">{this.getModerators()}</Emoji>
+                        <Emoji className="info">{mods}</Emoji>
                         <div className="info">{l.copy_and_share /* `Copy this link to send your invite` */}</div>
                         <div className="link-input-container">
                             <div className="mega-input with-icon box-style">

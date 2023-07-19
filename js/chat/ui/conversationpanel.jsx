@@ -160,7 +160,7 @@ class StartMeetingNotification extends MegaRenderMixin {
     }
 
     render() {
-        const { chatRoom, onStartCall } = this.props;
+        const { chatRoom, offset, onStartCall } = this.props;
 
         if (chatRoom.call || !megaChat.hasSupportForCalls) {
             return null;
@@ -169,6 +169,7 @@ class StartMeetingNotification extends MegaRenderMixin {
         return (
             <div
                 className="in-call-notif neutral start"
+                style={{ marginTop: offset }}
                 onClick={() => onStartCall(Call.TYPE.AUDIO)}>
                 <button className="mega-button positive small">{l.schedule_start_aot}</button>
             </div>
@@ -182,7 +183,7 @@ export class JoinCallNotification extends MegaRenderMixin {
     }
 
     render() {
-        const { chatRoom } = this.props;
+        const { chatRoom, offset } = this.props;
 
         if (chatRoom.call) {
             return null;
@@ -194,7 +195,9 @@ export class JoinCallNotification extends MegaRenderMixin {
         }
 
         return (
-            <div className="in-call-notif neutral join">
+            <div
+                className="in-call-notif neutral join"
+                style={{ marginTop: offset }}>
                 <i className="sprite-fm-mono icon-phone"/>
                 <ParsedHTML
                     onClick={() =>
@@ -2455,6 +2458,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             !startCallDisabled ?
                                 <StartMeetingNotification
                                     chatRoom={room}
+                                    offset={this.props.offset}
                                     onStartCall={mode => {
                                         return startCallDisabled ?
                                             null :
@@ -2471,7 +2475,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             room.state !== ChatRoom.STATE.LEFT &&
                             (room.havePendingGroupCall() || room.havePendingCall()) &&
                             navigator.onLine ?
-                                <JoinCallNotification chatRoom={room}/> :
+                                <JoinCallNotification chatRoom={room} offset={this.props.offset} /> :
                                 null
                         }
 
@@ -2523,13 +2527,16 @@ export class ConversationPanel extends MegaRenderMixin {
 }
 
 export class ConversationPanels extends MegaRenderMixin {
+    alertsOffset = 4;
+    notificationListener = 'meetings:notificationPermissions';
     notificationGranted = undefined;
     notificationHelpURL =
         `${l.mega_help_host}/chats-meetings/meetings/enable-notification-browser-system-permission`;
 
     state = {
         supportAlert: undefined,
-        notificationsPermissions: undefined
+        notificationsPermissions: undefined,
+        alertsOffset: this.alertsOffset
     };
 
     constructor(props) {
@@ -2555,19 +2562,31 @@ export class ConversationPanels extends MegaRenderMixin {
 
     renderNotificationsPending() {
         return (
-            <div
+            <Alert
+                type={Alert.TYPE.LIGHT}
                 className={`
-                    meetings-alert
-                    meetings-alert-light
-                    meetings-alert-notifications
-                    ${this.props.isEmpty ? 'empty-state' : ''}
                     ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
-                `}>
-                <div className="meetings-alert-content">{l.notifications_permissions_pending}</div>
+                    ${this.props.isEmpty ? 'empty-state' : ''}
+                `}
+                onTransition={ref =>
+                    this.setState({ alertsOffset: ref ? ref.current.offsetHeight : this.alertsOffset })
+                }
+                onClose={() => {
+                    this.setState({ notificationsPermissions: undefined }, () => {
+                        showToast(
+                            'success',
+                            l.notifications_permissions_toast_title,
+                            l.notifications_permissions_toast_control,
+                            '',
+                            () => loadSubPage('fm/account/notifications')
+                        );
+                    });
+                }}>
+                {l.notifications_permissions_pending}
                 <div className="meetings-alert-control">
                     <a
                         href="#"
-                        onClick={(ev) => {
+                        onClick={ev => {
                             ev.preventDefault();
                             Notification.requestPermission()
                                 .then(status => {
@@ -2583,49 +2602,39 @@ export class ConversationPanels extends MegaRenderMixin {
                         {l.notifications_permissions_enable}
                     </a>
                 </div>
-                <span
-                    className="meetings-alert-close"
-                    onClick={() =>
-                        this.setState({ notificationsPermissions: undefined }, () => {
-                            showToast(
-                                'success',
-                                l.notifications_permissions_toast_title,
-                                l.notifications_permissions_toast_control,
-                                '',
-                                () => loadSubPage('fm/account/notifications')
-                            );
-                        })
-                    }>
-                    <i className="sprite-fm-mono icon-close-component"/>
-                </span>
-            </div>
+            </Alert>
         );
     }
 
     renderNotificationsBlocked() {
-        const title = l.notifications_permissions_denied_info
-            .replace('[A]', `<a href="${this.notificationHelpURL}" target="_blank" class="clickurl">`)
-            .replace('[/A]', '</a>');
-
         return (
-            <div
+            <Alert
+                type={Alert.TYPE.MEDIUM}
                 className={`
-                    meetings-alert
-                    meetings-alert-medium
-                    meetings-alert-notifications
-                    ${this.props.isEmpty ? 'empty-state' : ''}
                     ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
-                `}>
-                <div className="meetings-alert-content">
-                    <ParsedHTML>{title}</ParsedHTML>
-                </div>
-                <span
-                    className="meetings-alert-close"
-                    onClick={() => this.setState({ notificationsPermissions: undefined })}>
-                    <i className="sprite-fm-mono icon-close-component"/>
-                </span>
-            </div>
+                    ${this.props.isEmpty ? 'empty-state' : ''}
+                `}
+                onTransition={ref =>
+                    this.setState({ alertsOffset: ref ? ref.current.offsetHeight : this.alertsOffset })
+                }
+                onClose={() => this.setState({ notificationsPermissions: undefined })}>
+                <ParsedHTML
+                    content={
+                        l.notifications_permissions_denied_info
+                            .replace(
+                                '[A]',
+                                `<a href="${this.notificationHelpURL}" target="_blank" class="clickurl">`
+                            )
+                            .replace('[/A]', '</a>')
+                    }
+                />
+            </Alert>
         );
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        mBroadcaster.removeListener(this.notificationListener);
     }
 
     componentDidMount() {
@@ -2638,16 +2647,20 @@ export class ConversationPanels extends MegaRenderMixin {
                 scheduledMeeting.getOccurrences().catch(nop);
             }
         });
+
+        mBroadcaster.addListener(this.notificationListener, notificationsPermissions =>
+            this.isMounted() && this.setState({ notificationsPermissions })
+        );
     }
 
     render() {
-        const { routingSection, chatUIFlags, onToggleExpandedFlag } = this.props;
-        const { notificationsPermissions, supportAlert } = this.state;
+        const { routingSection, chatUIFlags, isEmpty, onToggleExpandedFlag } = this.props;
+        const { notificationsPermissions, supportAlert, alertsOffset } = this.state;
         const now = Date.now();
 
         return (
             <div className="conversation-panels">
-                {routingSection === 'contacts' || supportAlert && !mega.config.get('nocallsup') ?
+                {routingSection === 'contacts' || notificationsPermissions === 'granted' ?
                     null :
                     <>
                         {notificationsPermissions === 'default' && this.renderNotificationsPending()}
@@ -2655,12 +2668,18 @@ export class ConversationPanels extends MegaRenderMixin {
                     </>
                 }
 
-                {routingSection !== 'contacts' && supportAlert && !mega.config.get('nocallsup') &&
-                    <Alert
-                        type={Alert.TYPE.MEDIUM}
-                        content={Call.getUnsupportedBrowserMessage()}
-                        onClose={this.closeSupportAlert}
-                    />
+                {routingSection === 'contacts' ?
+                    null :
+                    supportAlert && !mega.config.get('nocallsup') && !notificationsPermissions &&
+                        <Alert
+                            type={Alert.TYPE.MEDIUM}
+                            className={`
+                                ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
+                                ${isEmpty ? 'empty-state' : ''}
+                            `}
+                            content={Call.getUnsupportedBrowserMessage()}
+                            onClose={this.closeSupportAlert}
+                        />
                 }
 
                 {megaChat.chats.map(chatRoom => {
@@ -2674,7 +2693,7 @@ export class ConversationPanels extends MegaRenderMixin {
                                 isActive={chatRoom.isCurrentlyActive}
                                 messagesBuff={chatRoom.messagesBuff}
                                 chatUIFlags={chatUIFlags}
-                                supportAlert={supportAlert}
+                                offset={alertsOffset}
                                 onToggleExpandedFlag={onToggleExpandedFlag}
                             />
                         );

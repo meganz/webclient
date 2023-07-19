@@ -2432,9 +2432,9 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   align-items: center;
   justify-content: space-between;
   position: absolute;
-  top: 5px;
+  top: 57px;
   left: 8px;
-  width: calc(100% - 22px);
+  width: calc(100% - 282px);
   border-radius: 12px;
   background: var(--secondary-orange);
   z-index: 120;
@@ -2451,15 +2451,11 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 .meetings-alert-high {
   background: var(--secondary-red);
 }
-.meetings-alert-notifications {
-  top: 57px;
-  width: calc(100% - 282px);
-}
-.meetings-alert-notifications.empty-state {
+.meetings-alert.empty-state {
   top: 5px;
   width: calc(100% - 18px);
 }
-.meetings-alert-notifications.full-span {
+.meetings-alert.full-span {
   width: calc(100% - 18px);
 }
 .meetings-alert-content {
@@ -2471,7 +2467,8 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   text-decoration: underline;
 }
 .meetings-alert-control {
-  margin-inline-end: 46px;
+  display: inline-block;
+  padding-inline-start: 8px;
 }
 .meetings-alert-control a {
   color: var(--secondary-white);
@@ -3002,5 +2999,3 @@ body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button
 .meetings-recurring-content .meetings-recurring-monthly {
   /* [...] */
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

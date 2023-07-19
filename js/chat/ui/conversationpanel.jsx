@@ -2528,6 +2528,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
 export class ConversationPanels extends MegaRenderMixin {
     alertsOffset = 4;
+    notificationListener = 'meetings:notificationPermissions';
     notificationGranted = undefined;
     notificationHelpURL =
         `${l.mega_help_host}/chats-meetings/meetings/enable-notification-browser-system-permission`;
@@ -2631,15 +2632,25 @@ export class ConversationPanels extends MegaRenderMixin {
         );
     }
 
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        mBroadcaster.removeListener(this.notificationListener);
+    }
+
     componentDidMount() {
         super.componentDidMount();
         this.props.onMount?.();
+
         megaChat.chats.forEach(chatRoom => {
             const { scheduledMeeting } = chatRoom;
             if (scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring) {
                 scheduledMeeting.getOccurrences().catch(nop);
             }
         });
+
+        mBroadcaster.addListener(this.notificationListener, notificationsPermissions =>
+            this.isMounted() && this.setState({ notificationsPermissions })
+        );
     }
 
     render() {

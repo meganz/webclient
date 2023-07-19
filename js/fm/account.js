@@ -2742,12 +2742,19 @@ accountUI.plan = {
 
 accountUI.notifications = {
 
+    helpURL: 'chats-meetings/meetings/enable-notification-browser-system-permission',
+    permissions: {
+        granted: 'granted',
+        denied: 'denied',
+        pending: 'default'
+    },
+
     init: function() {
 
         'use strict';
 
         this.render();
-        this.handleChatNotifications().catch(dump);
+        this.handleChatNotifications();
     },
 
     render: function() {
@@ -2767,33 +2774,38 @@ accountUI.notifications = {
         }
 
         // Handle account notification switches
-        var $notifictionContent = $('.fm-account-notifications', accountUI.$contentBlock);
-        var $NToggleAll = $('.account-notification .mega-switch.toggle-all', $notifictionContent);
-        var $NToggle = $('.account-notification .switch-container .mega-switch', $notifictionContent);
+        const { notif } = mega;
+        const $notificationContent = $('.fm-account-notifications', accountUI.$contentBlock);
+        const $NToggleAll = $('.account-notification .mega-switch.toggle-all', $notificationContent);
+        const $NToggle = $('.account-notification .switch-container .mega-switch', $notificationContent);
 
-        // Toggle Individual Notifications
-        $NToggle.each(function() {
-            var $this = $(this);
-            var $section = $this.closest('.switch-container');
-            var sectionName = accountUI.notifications.getSectionName($section);
+        // Toggle individual notifications
+        for (let i = $NToggle.length; i--;) {
+            const el = $NToggle[i];
+            const sectionEl = $(el).closest('.switch-container');
+            const section = accountUI.notifications.getSectionName(sectionEl);
 
             accountUI.inputs.switch.init(
-                '#' + this.id,
-                $section,
-                mega.notif.has($this.attr('name'), sectionName),
-                function(val) {
-                    var notifChange = val ? mega.notif.set : mega.notif.unset;
-                    notifChange($this.attr('name'), sectionName);
+                `#${el.id}`,
+                sectionEl,
+                notif.has(el.getAttribute('name'), section),
+                val => {
+                    notif[val ? 'set' : 'unset'](el.getAttribute('name'), section);
 
                     if (val) {
                         $NToggleAll.addClass('toggle-on');
-                    } else {
+                        if (section === 'chat') {
+                            this.renderNotification();
+                        }
+                    }
+                    else {
                         ($NToggle.hasClass('toggle-on') ? $.fn.addClass : $.fn.removeClass)
                             .apply($NToggleAll, ['toggle-on']);
                     }
                     $NToggleAll.trigger('update.accessibility');
-                });
-        });
+                }
+            );
+        }
 
         // Toggle All Notifications
         accountUI.inputs.switch.init(
@@ -2820,8 +2832,8 @@ accountUI.notifications = {
         }
 
         // Handle email notification switches.
-        var $EToggleAll = $('.email-notification .mega-switch.toggle-all', $notifictionContent);
-        var $EToggle = $('.email-notification .switch-container .mega-switch', $notifictionContent);
+        var $EToggleAll = $('.email-notification .mega-switch.toggle-all', $notificationContent);
+        var $EToggle = $('.email-notification .switch-container .mega-switch', $notificationContent);
 
         mega.enotif.all().then(function(enotifStates) {
             // Toggle Individual Emails
@@ -2856,7 +2868,7 @@ accountUI.notifications = {
             );
 
             if (accountUI.plan.paymentCard.validateUser(M.account)) {
-                $('.switch-container.card-exp-switch', $notifictionContent).removeClass('hidden');
+                $('.switch-container.card-exp-switch', $notificationContent).removeClass('hidden');
             }
 
             // Hide the loading screen.
@@ -2879,45 +2891,106 @@ accountUI.notifications = {
 
     },
 
-    async handleChatNotifications() {
+    renderNotification() {
         'use strict';
-        const $container = $('.switch-container.chat', accountUI.$contentBlock);
-        const $banner = $('.chat-permissions-banner', $container);
-        const helpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-notification-browser-system-permission`;
+        return new Notification(l.notification_granted_title, { body: l.notification_granted_body });
+    },
 
-        // Set the copy for the browser permissions banner
-        $('.versioning-body-text', $banner).safeHTML(
-            l.notifications_permissions_denied_info
-                .replace('[A]', `<a href="${helpURL}" target="_blank" class="clickurl notif-help">`)
+    onPermissionsGranted() {
+        'use strict';
+        msgDialog(
+            'info',
+            '',
+            l.notifications_permissions_granted_title,
+            l.notifications_permissions_granted_info
+                .replace(
+                    '[A]',
+                    `<a href="${l.mega_help_host}/${this.helpURL}" target="_blank" class="clickurl">`
+                )
                 .replace('[/A]', '</a>')
         );
+        this.renderNotification();
+    },
 
-        // Toggle the inline browser permissions banner based
-        // on the current browser permissions state
+    requestPermission() {
+        'use strict';
+        Notification.requestPermission()
+            .then(permission => {
+                if (permission === this.permissions.granted) {
+                    this.onPermissionsGranted();
+                }
+                mBroadcaster.sendMessage('meetings:notificationPermissions', permission);
+            })
+            .then(() => this.handleChatNotifications())
+            .catch(ex => d && console.warn(`Failed to retrieve permissions: ${ex}`));
+    },
+
+    handleChatNotifications() {
+        'use strict';
+
+        const $container = $('.switch-container.chat', accountUI.$contentBlock);
+        const $banner = $('.chat-permissions-banner', $container);
+        const $body = $('.versioning-body-text', $banner);
+
         if (mega.notif.has('enabled', 'chat')) {
-            return (
-                Notification.permission !== 'granted' &&
-                Notification.requestPermission()
-                    .then(permission => {
-                        $banner[permission === 'granted' ? 'addClass' : 'removeClass']('hidden');
-                        if (permission === 'granted') {
-                            // Show confirmation dialog and demo notification once
-                            // the notification permissions are allowed
-                            msgDialog(
-                                'info',
-                                '',
-                                l.notifications_permissions_granted_title,
-                                l.notifications_permissions_granted_info
-                                    .replace('[A]', `<a href="${helpURL}" target="_blank" class="clickurl">`)
-                                    .replace('[/A]', '</a>')
-                            );
-                            return (
-                                new Notification(l.notification_granted_title, { body: l.notification_granted_body })
-                            );
-                        }
-                    })
-                    .catch(ex => d && console.warn(`Failed to retrieve permissions: ${ex}`))
-            );
+            const { permission } = Notification;
+            const { granted, denied, pending } = this.permissions;
+            Object.values(this.permissions).forEach(p => $banner.removeClass(`permission--${p}`));
+
+            // Toggle the inline browser permissions banner based
+            // on the current browser permissions state
+            switch (true) {
+                case permission === granted:
+                    $body.safeHTML(
+                        l.notification_settings_granted
+                            .replace(
+                                '[A]',
+                                `<a
+                                    href="${l.mega_help_host}/${this.helpURL}"
+                                    target="_blank"
+                                    class="clickurl notif-help">
+                                `
+                            )
+                            .replace('[/A]', '</a>')
+                    );
+                    $banner.addClass(`permission--${granted}`);
+                    break;
+                case permission === denied:
+                    $body.safeHTML(
+                        l.notifications_permissions_denied_info
+                            .replace(
+                                '[A]',
+                                `<a
+                                    href="${l.mega_help_host}/${this.helpURL}"
+                                    target="_blank"
+                                    class="clickurl notif-help">
+                                `
+                            )
+                            .replace('[/A]', '</a>')
+                    );
+                    $banner.addClass(`permission--${denied} warning-template`);
+                    break;
+                default:
+                    $body.safeHTML(
+                        l.notification_settings_pending
+                            .replace(
+                                '[1]',
+                                `<a
+                                    href="${l.mega_help_host}/${this.helpURL}"
+                                    target="_blank"
+                                    class="clickurl notif-help">
+                                `
+                            )
+                            .replace('[/1]', '</a>')
+                            .replace('[2]', '<a href="#" class="request-notification-permissions">')
+                            .replace('[/2]', '</a>')
+                    );
+                    $('.request-notification-permissions', $banner).rebind('click', () => this.requestPermission());
+                    $banner.addClass(`permission--${pending}`);
+                    break;
+            }
+
+            return $banner.removeClass('hidden');
         }
 
         // Don't display the browser permissions banner if

@@ -508,7 +508,33 @@
 .account.account-notification .chat-permissions-banner {
     margin: 0 0 20px;
 }
-
+.account.account-notification .chat-permissions-banner.permission--default i {
+    display: none;
+}
+.account.account-notification .chat-permissions-banner.permission--default a,
+.account.account-notification .chat-permissions-banner.permission--default a:visited {
+    color: var(--secondary-blue);
+    text-decoration: underline;
+}
+.account.account-notification .chat-permissions-banner.permission--granted {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.account.account-notification .chat-permissions-banner.permission--granted .cell {
+    color: var(--text-color-medium);
+    border: 0 none;
+}
+.account.account-notification .chat-permissions-banner.permission--granted i {
+    display: none;
+}
+.account.account-notification .chat-permissions-banner.permission--granted a,
+.account.account-notification .chat-permissions-banner.permission--granted a:visited {
+    color: var(--secondary-blue);
+}
+.account.account-notification .chat-permissions-banner.permission--granted .versioning-body-text {
+    padding-inline-start: 0;
+}
 
 /* Settings content. Security section */
 

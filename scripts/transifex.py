@@ -442,6 +442,7 @@ def merge_language(main, branch):
     print("Completed.")
 
 def string_validation(new_strings):
+    branch_name = subprocess.check_output(['git', 'symbolic-ref', '--short','-q','HEAD'], universal_newlines=True).strip()
     valid_strings = True
     for key, data in new_strings.items():
         if 'string' not in data:
@@ -455,6 +456,9 @@ def string_validation(new_strings):
             valid_strings = False
         elif re.sub('\s', '', data['string']) == '' and re.sub('\s', '', data['developer_comment']) != '':
             print('ERROR: String with key {} has no string content'.format(key))
+            valid_strings = False
+        elif 'hotfix' not in branch_name.lower() and re.search("^[A-Z]{2,4}-\d+:", data['developer_comment']) is None:
+            print('ERROR: Developer comment for string with key {} does not start with a JIRA ticket id e.g: WEB-16334: Comment content'.format(key))
             valid_strings = False
         else:
             new_strings[key]['string'] = sanitise_string(data['string'], True, False)

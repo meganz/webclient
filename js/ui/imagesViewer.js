@@ -556,6 +556,7 @@ var slideshowid;
             zoom_mode = false;
 
             if (is_mobile) {
+                eventlog(99835);
                 M.noSleep().catch(dump);
             }
 

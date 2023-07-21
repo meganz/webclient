@@ -287,6 +287,9 @@ mobile.linkOverlay = {
                 }
                 return false;
             }
+
+            eventlog(99850);
+
             const media = is_video(M.d[nodeHandle]) === 1;
             const mediaRemoveLink = () => {
                 msgDialog('confirmation', l[882], l[17824], 0, removeLink);

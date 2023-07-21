@@ -70,6 +70,7 @@ mobile.account = {
             $upgradeBtn.removeClass('hidden');
             $upgradeBtn.rebind('tap', () => {
 
+                eventlog(99836);
                 loadSubPage('pro');
                 return false;
             });
@@ -97,6 +98,8 @@ mobile.account = {
 
             // Hide the account page
             $page.addClass('hidden');
+
+            eventlog(99837);
 
             // Render the achievements information
             loadSubPage('fm/account/achievements');
@@ -430,6 +433,8 @@ mobile.account = {
         // On clicking/tapping the Upgrade Account button
         $page.find('.account-recovery-key-block').off('tap').on('tap', function() {
 
+            eventlog(99838);
+
             // Load the Backup page
             loadSubPage('keybackup');
             return false;
@@ -490,6 +495,8 @@ mobile.account = {
                 loadSubPage('twofactor/verify-disable');
             }
             else {
+                eventlog(99839);
+
                 // Load the Intro page to setup the 2FA
                 loadSubPage('twofactor/intro');
             }
@@ -530,6 +537,7 @@ mobile.account = {
 
         // On clicking/tapping the button
         $buttonBlock.off('tap').on('tap', function() {
+            eventlog(99841);
 
             // Load the Session History page
             loadSubPage('fm/account/history');
@@ -570,6 +578,8 @@ mobile.account = {
         'use strict';
         const $buttonBlock = $('.account-file-management-block', $page);
         $buttonBlock.rebind('click.acc', () => {
+            eventlog(99842);
+
             loadSubPage('fm/account/file-management');
             return false;
         });
@@ -587,6 +597,7 @@ mobile.account = {
 
         // On clicking/tapping the button
         $buttonBlock.off('tap').on('tap', function() {
+            eventlog(99843);
 
             // Load the Session History page
             loadSubPage('fm/account/security/change-password');
@@ -611,6 +622,8 @@ mobile.account = {
         'use strict';
 
         $page.find('.account-notifications-block').off('tap').on('tap', function() {
+            eventlog(99840);
+
             loadSubPage('fm/account/notifications');
             return false;
         });
@@ -632,6 +645,7 @@ mobile.account = {
             var cancelBlock = $page.find('.acount-cancellation-block').removeClass('hidden');
             // On clicking/tapping the Upgrade Account button
             cancelBlock.off('tap').on('tap', function() {
+                eventlog(99844);
 
                 // Please confirm that all your data will be deleted
                 var confirmMessage = l[1974];

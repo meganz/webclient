@@ -335,6 +335,7 @@ mobile.achieve = {
 
         // On clicking/tapping the Install a mobile app button
         mobile.achieve.$page.find('.install-mobile-app').off('tap').on('tap', function() {
+            eventlog(99847);
 
             // Load the page
             mega.redirect('mega.io', 'mobile', false, false, false);
@@ -351,6 +352,7 @@ mobile.achieve = {
 
         // On clicking/tapping the Install MEGAsync button
         mobile.achieve.$page.find('.install-mega-sync').off('tap').on('tap', function() {
+            eventlog(99848);
 
             // Load the page
             mega.redirect('mega.io', 'desktop', false, false, false);

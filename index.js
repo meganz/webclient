@@ -3484,4 +3484,9 @@ mBroadcaster.once('mega:openfolder', function() {
         sessionStorage.removeItem('previewNode');
         slideshow(previewNode);
     }
+
+    // Send some data to mega.io that we logged in
+    if (u_type > 2) {
+        initMegaIoIframe(true);
+    }
 });

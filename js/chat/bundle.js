@@ -17431,8 +17431,8 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
     }
     return mb.messagesHistoryIsLoading() || mb.joined === false && mb.isDecrypting;
   }
-  shouldComponentUpdate(nextProps, nextState) {
-    return super.shouldComponentUpdate(nextProps, nextState) || this.state.isLoading && !nextState.isLoading;
+  specShouldComponentUpdate() {
+    return !this.state.isLoading;
   }
   componentWillUnmount() {
     super.componentWillUnmount();

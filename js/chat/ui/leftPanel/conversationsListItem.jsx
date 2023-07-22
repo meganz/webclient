@@ -19,8 +19,8 @@ export default class ConversationsListItem extends MegaRenderMixin {
         return mb.messagesHistoryIsLoading() || mb.joined === false && mb.isDecrypting;
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        return super.shouldComponentUpdate(nextProps, nextState) || this.state.isLoading && !nextState.isLoading;
+    specShouldComponentUpdate() {
+        return !this.state.isLoading;
     }
 
     componentWillUnmount() {

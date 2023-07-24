@@ -37,6 +37,15 @@
 .rtl .lp-myfiles .content-area .lp-content-wrap {
     direction: rtl;
 }
+.rtl .lp-gallery .content-area {
+    direction: initial;
+}
+.rtl .lp-gallery .content-area .lp-content-wrap-wrap {
+    direction: rtl;
+}
+.lp-gallery .content-area .lp-content-wrap-wrap {
+    display: inline-block;
+}
 .lp-myfiles .content-area.ps--active-y:hover {
     border-top: 2px solid var(--stroke-main);
 }

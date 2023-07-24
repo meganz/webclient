@@ -147,6 +147,11 @@ module.exports = {
                                         }
                                         break;
                                     }
+                                    default:
+                                        if (right.type === 'Identifier') {
+
+                                            context.report(right, `Missing call to escapeHTML(${right.name}*)`);
+                                        }
                                 }
                             }
                         }

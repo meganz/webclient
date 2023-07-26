@@ -2509,6 +2509,19 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
             type,
             (ctx, key, thumbAB) => {
                 processUint8(ctx, key, thumbAB, type);
+            },
+            (key) => {
+                if (type) {
+                    console.warn(`Could not receive preview image for ${key}, reverting back to thumbnail...`);
+
+                    api_getfileattr(
+                        { [key]: M.d[faData[key].handle] },
+                        0,
+                        (ctx1, key1, thumbAB1) => {
+                            processUint8(ctx1, key1, thumbAB1, 0);
+                        }
+                    );
+                }
             }
         );
     });

@@ -2972,6 +2972,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
+        jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
         jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
         jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
 
@@ -3023,6 +3024,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/tables.css', n: 'tables_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/recents.css', n: 'recents_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/vpn.css', n: 'vpn_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/transfer-widget.css', n: 'transfer_widget_css', j:2, w:30, c:1, d:1, cache:1});
 
         // CSS Revamp changes

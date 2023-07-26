@@ -59,12 +59,14 @@ mobile.titleMenu = {
 
         $rubbishBinLink.off('tap').on('tap', function() {
             mobile.titleMenu.close();
+            eventlog(99846);
             loadSubPage("fm/rubbish");
             return false;
         });
 
         $affiliateLink.rebind('tap', function() {
             mobile.titleMenu.close();
+            eventlog(99845);
             loadSubPage("fm/refer");
             return false;
         });

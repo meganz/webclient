@@ -2852,6 +2852,11 @@ function topmenuUI() {
                     }
                     // Clear login_next variable before load subpages each time
                     login_next = false;
+
+                    if (is_mobile && subpage === 'keybackup') {
+                        eventlog(99853);
+                    }
+
                     loadSubPage(moveTo[subpage] || subpage);
                 }
                 else if (className.indexOf('feedback') > -1) {
@@ -2860,12 +2865,18 @@ function topmenuUI() {
                     feedbackDialog._type = 'top-button';
                 }
                 else if (className.indexOf('refresh') > -1) {
+                    if (is_mobile) {
+                        eventlog(99852);
+                    }
                     M.reload(ev.ctrlKey || ev.metaKey);
                 }
                 else if (!is_mobile && className.indexOf('languages') > -1) {
                     langDialog.show();
                 }
                 else if (className.indexOf('logout') > -1) {
+                    if (is_mobile) {
+                        eventlog(99854, true);
+                    }
                     mLogout();
                 }
                 else if (className.indexOf('transparency') > -1) {
@@ -2890,6 +2901,10 @@ function topmenuUI() {
     });
 
     $menuUpgradeAccount.rebind('click.openpricing', function() {
+        if (is_mobile) {
+            eventlog(99851);
+        }
+
         topMenu(1);
         loadSubPage('pro');
     });
@@ -3468,5 +3483,10 @@ mBroadcaster.once('mega:openfolder', function() {
     if (previewNode) {
         sessionStorage.removeItem('previewNode');
         slideshow(previewNode);
+    }
+
+    // Send some data to mega.io that we logged in
+    if (u_type > 2) {
+        initMegaIoIframe(true);
     }
 });

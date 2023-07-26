@@ -157,6 +157,10 @@ class MContextMenu extends MComponent {
         if (this._minWidth > 0) {
             this.el.style.minWidth = this._minWidth + 'px';
         }
+
+        if (locale === 'ar') {
+            this.el.style.left = `${rect.right - this.el.getBoundingClientRect().width}px`;
+        }
     }
 }
 

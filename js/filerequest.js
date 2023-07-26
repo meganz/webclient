@@ -979,6 +979,8 @@ lazy(mega, 'fileRequest', () => {
                     return false;
                 }
 
+                eventlog(99833);
+
                 mobile.cloud.contextMenu.hide();
                 mega.fileRequest.showCreateMobileDialog(this.nodeHandle);
 
@@ -1081,6 +1083,8 @@ lazy(mega, 'fileRequest', () => {
                     this.$inputTitle.getValue(),
                     this.$inputDescription.getValue()
                 );
+
+                eventlog(99834);
 
                 return false;
             });

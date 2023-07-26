@@ -867,8 +867,8 @@ FileManager.prototype.initFileManagerUI = function() {
             return;
         }
         var $target = $(e.target);
-        var exclude =
-            '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red, a.mailto, a.top-social-button, .notif-help';
+        var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, '
+            + 'a.red, a.mailto, a.top-social-button, .notif-help, .vpn-link';
 
         if ($target.attr('type') !== 'file'
             && !$target.is(exclude)
@@ -2549,7 +2549,6 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
             classes: 'no-incoming', // Hide incoming share tab
             selectLabel: l[1523],
             folderSelectable: true, // Can select folder(s)
-            folderSelectNotAllowed: true, // Don't allow multi-selecting folders
             onAttach: function() {
                 doClose(true);
                 $.selected = selected;

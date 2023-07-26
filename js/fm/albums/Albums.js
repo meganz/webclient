@@ -1219,7 +1219,6 @@ lazy(mega.gallery, 'albums', () => {
             this.dynamicList = new MegaDynamicList(this.el, {
                 itemRenderFunction: this.renderRow.bind(this),
                 itemHeightCallback: () => this.rowHeight,
-                onResize: this.onResize.bind(this),
                 perfectScrollOptions: {
                     handlers: ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
                     minScrollbarLength: 50
@@ -1275,6 +1274,10 @@ lazy(mega.gallery, 'albums', () => {
             if (this.zoomControls) {
                 this.el.parentNode.prepend(this.zoomControls);
             }
+
+            delay('album_timeline:set_nodes', () => {
+                this.dynamicList.options.onResize = this.onResize.bind(this);
+            });
         }
 
         clearSiblingSelections(ignoreHandle) {
@@ -1992,6 +1995,7 @@ lazy(mega.gallery, 'albums', () => {
                 () => {
                     if (this.interactiveCells) {
                         this.el.style.height = (this.selCount) ? 'calc(100% - 65px)' : null;
+                        this.el.style.minHeight = (this.selCount) ? '280px' : null;
                         this.resizeDynamicList();
                         Ps.update(this.el);
                     }
@@ -4449,6 +4453,8 @@ lazy(mega.gallery, 'albums', () => {
 
         init(handles) {
             const gallerySidebar = document.querySelector('.js-lp-gallery.lp-gallery .js-gallery-panel');
+            const gallerySidebarWrap =
+                document.querySelector('.js-lp-gallery.lp-gallery .js-gallery-panel .lp-content-wrap-wrap');
             const isAlbums = M.isAlbumsPage();
             const isGallery = M.isGalleryPage();
 
@@ -4457,7 +4463,7 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
-            this.initTree(gallerySidebar);
+            this.initTree(gallerySidebarWrap);
             delay('render:albums_sidebar', () => {
                 applyPs(gallerySidebar);
             });

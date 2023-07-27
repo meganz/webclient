@@ -381,6 +381,8 @@ html .theme-light-forced {
     /* Safari only accept same rgb valued transparent for linear gradient otherwise has weird shadow */
         --surface-tree-iconwrap: linear-gradient(90deg, rgba(237, 237, 237, 0), rgba(237, 237, 237, 1) 12px, rgba(237, 237, 237, 1));
         --surface-tree-iconwrap-active: linear-gradient(90deg, rgba(250, 250, 250, 0), rgba(250, 250, 250, 1) 12px, rgba(250, 250, 250, 1));
+        --surface-tree-iconwrap-rtl: linear-gradient(270deg, rgba(237, 237, 237, 0), rgba(237, 237, 237, 1) 12px, rgba(237, 237, 237, 1));
+        --surface-tree-iconwrap-active-rtl: linear-gradient(270deg, rgba(250, 250, 250, 0), rgba(250, 250, 250, 1) 12px, rgba(250, 250, 250, 1));
 }
 
 /* dark theme */
@@ -604,4 +606,6 @@ html .theme-dark-forced {
     /* Safari gradient bug fix - Safari only accept same rgb valued transparent for linear gradient otherwise has weird shadow */
         --surface-tree-iconwrap: linear-gradient(90deg, rgba(68, 68, 68, 0), rgba(68, 68, 68, 1) 12px, rgba(68, 68, 68, 1));
         --surface-tree-iconwrap-active: linear-gradient(90deg, rgba(34, 34, 34, 0), rgba(34, 34, 34, 1) 12px, rgba(34, 34, 34, 1));
+        --surface-tree-iconwrap-rtl: linear-gradient(270deg, rgba(68, 68, 68, 0), rgba(68, 68, 68, 1) 12px, rgba(68, 68, 68, 1));
+        --surface-tree-iconwrap-active-rtl: linear-gradient(270deg, rgba(34, 34, 34, 0), rgba(34, 34, 34, 1) 12px, rgba(34, 34, 34, 1));
 }

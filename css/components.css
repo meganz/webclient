@@ -141,6 +141,32 @@
     margin-inline-end: 8px;
 }
 
+.btn-galleries.subalbum-btn::after {
+    content: "";
+    vertical-align: middle;
+    position: sticky;
+    right: -1px;
+    background: var(--surface-tree-iconwrap);
+    padding: 7px 16px 7px 4px;
+}
+
+.rtl .btn-galleries.subalbum-btn::after {
+    left: -1px;
+    background: var(--surface-tree-iconwrap-rtl);
+}
+
+.btn-galleries.subalbum-btn.active::after,
+.btn-galleries.subalbum-btn:hover::after,
+.btn-galleries.subalbum-btn.selected::after {
+    background: var(--surface-tree-iconwrap-active);
+}
+
+.rtl .btn-galleries.subalbum-btn.active::after,
+.rtl .btn-galleries.subalbum-btn:hover::after,
+.rtl .btn-galleries.subalbum-btn.selected::after {
+    background: var(--surface-tree-iconwrap-active-rtl);
+}
+
 .btn-icon {
     cursor: pointer;
     margin: 2px 0;

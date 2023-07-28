@@ -2511,7 +2511,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
                 processUint8(ctx, key, thumbAB, type);
             },
             (key) => {
-                if (type) {
+                if (faData[key] && type) {
                     console.warn(`Could not receive preview image for ${key}, reverting back to thumbnail...`);
 
                     api_getfileattr(

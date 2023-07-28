@@ -4209,7 +4209,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     this.currentTreeType = M.treePanelType();
 
-    $('.fm.fm-right-header, .fm-import-donwload-buttons', $fmholder).addClass('hidden');
+    $('.fm.fm-right-header, .fm-import-donwload-buttons, .gallery-tabs-bl', $fmholder).addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).off('click');
 
     $fmholder.removeClass('affiliate-program');

@@ -597,7 +597,9 @@ lazy(mega.gallery, 'albums', () => {
                             grid.timeline.nodes = album.nodes;
                         }
 
-                        grid.header.update(albumId);
+                        if (M.currentdirid === albumId) {
+                            grid.header.update(albumId);
+                        }
                     });
                 }
                 else if (album.filterFn) {

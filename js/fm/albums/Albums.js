@@ -746,6 +746,9 @@ lazy(mega.gallery, 'albums', () => {
                     M.v = tmp;
                     const selCount = Object.keys(selHandles).length;
 
+                    // double click will mess _selCount, so we need to reset here
+                    scope.albums.grid.timeline._selCount = selCount;
+
                     reinitiateEvents();
 
                     if (window.selectionManager.clearSlideshowSelections) {
@@ -764,6 +767,8 @@ lazy(mega.gallery, 'albums', () => {
                             mega.icu.format(l.album_selected_items_count, album.nodes.length)
                                 .replace('%1', selCount)
                         );
+
+                        scope.albums.grid.timeline.adjustToBottomBar();
                     }
                 });
             });

@@ -7855,10 +7855,58 @@ body.de .mega-dialog.contact-picker-widget {
 
     .mega-dialog.affiliate-redeem {
         text-align: center;
+    }
+    .mega-dialog.affiliate-redeem.dialog-normal {
+        text-align: center;
         width: 770px;
+    }
+    .mega-dialog.affiliate-redeem > section.content {
+        flex-shrink: initial;
+    }
+    .mega-dialog.affiliate-redeem.dialog-normal:has(.step1.bitcoin:not(.hidden)) {
+        text-align: center;
+        width: 736px;
+    }
+    .mega-dialog.affiliate-redeem.dialog-normal:has(.step1.bitcoin:not(.hidden)) footer .footer-container {
+        padding-top: 21px;
+    }
+    .mega-dialog.affiliate-redeem.dialog-small {
+        width: 583px;
+        height: 364px;
+    }
+    .mega-dialog.affiliate-redeem.dialog-medium {
+        text-align: center;
+        width: 736px;
+        height: 515px;
+    }
+    .mega-dialog.affiliate-redeem.dialog-tall {
+        text-align: center;
+        height: 567px;
+    }
+    .mega-dialog.affiliate-redeem .dialog-commisison-title {
+        font: var(--text-h3);
+        margin-top: 4px;
+    }
+    .mega-dialog.affiliate-redeem .content-block:has(.step0:not(.hidden)) {
+        padding: 0 38px;
+    }
+    .mega-dialog.affiliate-redeem .cells.left.megaquota {
+        margin-left: -9px;
     }
     .mega-dialog.affiliate-redeem .next-btn {
         margin-inline-start: auto;
+    }
+    .mega-dialog.affiliate-redeem .next-btn.small {
+        min-width: 54px;
+        height: 36px;
+    }
+    .mega-dialog.affiliate-redeem .next-btn.wide {
+        width: 150px;
+        height: 36px;
+        padding: 0;
+    }
+    .mega-dialog.affiliate-redeem .prev-btn {
+        padding-left: 2px;
     }
     .mega-dialog.affiliate-redeem .prev-btn i {
         --icon-size: 16px;
@@ -7893,20 +7941,53 @@ body.de .mega-dialog.contact-picker-widget {
         border-radius: 4px;
         text-align: start;
         box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
     .rtl .mega-dialog.affiliate-redeem .cells {
         float: right;
     }
     .mega-dialog.affiliate-redeem .cells.left {
+        margin: 22px 0 0;
+        -webkit-margin-start: -12px;
+        margin-inline-start: -12px;
+    }
+    .mega-dialog.affiliate-redeem .bitcoin.cells.left.step2 {
         margin: 24px 0 0 0;
         -webkit-margin-start: -12px;
         margin-inline-start: -12px;
+    }
+    .mega-dialog.affiliate-redeem .megaquota.cells.left.step1 {
+        -webkit-margin-start: -20px;
+        margin-inline-start: -20px;
+    }
+    .mega-dialog.affiliate-redeem .megaquota.cells.left {
+        margin: 20px 0 -9px;
+        -webkit-margin-start: -12px;
+        margin-inline-start: -12px;
+    }
+    .mega-dialog.affiliate-redeem .cells.left.step0 {
+        margin-top: 10px;
     }
     .mega-dialog.affiliate-redeem .cells.scrollable {
         position: relative;
     }
     .mega-dialog.affiliate-redeem .cells .cell-content {
+        padding: 6px 20px;
+        max-height: 400px;
+        position: relative;
+    }
+    .mega-dialog.affiliate-redeem .cells.step0 .cell-content {
+        padding: 6px 22px;
+    }
+    .mega-dialog.affiliate-redeem .cells.bitcoin .cell-content {
         padding: 4px 20px;
+        max-height: 400px;
+        position: relative;
+    }
+    .mega-dialog.affiliate-redeem .cells.bitcoin.step1 .cell-content {
+        padding: 6px 38px 6px 12px;
         max-height: 400px;
         position: relative;
     }
@@ -7915,17 +7996,36 @@ body.de .mega-dialog.contact-picker-widget {
         border-radius: 12px;
     }
     .mega-dialog.affiliate-redeem .cells:not(.step2) .ps .header {
-        padding: 20px 0 24px;
+        padding-bottom: 12px;
     }
     .mega-dialog.affiliate-redeem .cells.step3 {
         min-height: 290px;
     }
-    .mega-dialog.affiliate-redeem .cells.step4 .cell-content {
-        padding: 0 18px;
+    .mega-dialog.affiliate-redeem .cells.step4 .cell-content.megaquota {
+        padding: 0 11px;
     }
-    .mega-dialog.affiliate-redeem .cells.right {
+    .mega-dialog.affiliate-redeem .cells.step4.megaquota .cell-content {
+        padding: 0 18px 0 13px;
+    }
+    .mega-dialog.affiliate-redeem .cells.left.step4.megaquota .cell-content {
+        margin-left: -18px;
+    }
+    .mega-dialog.affiliate-redeem .cells.right.bitcoin {
         float: right;
         margin-top: 24px;
+    }
+    .mega-dialog.affiliate-redeem .cells.right.megaquota {
+        width: 312px;
+        float: right;
+        margin-top: 19px;
+    }
+    .mega-dialog.affiliate-redeem .cells.right.megaquota .plan-info-header .plan-name {
+        font: var(--text-body2-bold);
+    }
+    .mega-dialog.affiliate-redeem .cells .cell-content-quota {
+        padding: 0 20px;
+        max-height: 400px;
+        position: relative;
     }
     .rtl .mega-dialog.affiliate-redeem .cells.right {
         float: left;
@@ -7941,11 +8041,14 @@ body.de .mega-dialog.contact-picker-widget {
         color: var(--text-color-high);
         background: var(--surface-main);
     }
+    .mega-dialog.affiliate-redeem .step2 .header.details {
+        margin-top: 8px;
+    }
     .mega-dialog.affiliate-redeem .summary {
         background: var(--surface-main);
     }
     .mega-dialog.affiliate-redeem .header + .mega-input {
-        margin: 8px  0;
+        margin: 8px 0 5px;
     }
     .mega-dialog.affiliate-redeem .template {
         display: none;
@@ -7954,9 +8057,18 @@ body.de .mega-dialog.contact-picker-widget {
         align-items: baseline;
         padding: 12px 24px;
         display: flex;
+        gap: 10px;
+    }
+    .mega-dialog.affiliate-redeem .cells.right.bitcoin.step1 {
+        float: right;
+        margin-top: 18px;
+        width: 312px;
     }
     .mega-dialog.affiliate-redeem .summary-wrap .header {
         padding: 24px 24px 12px;
+    }
+    .mega-dialog.affiliate-redeem .right.step1.bitcoin .summary-wrap .header {
+        padding: 20px 24px 12px;
     }
     .mega-dialog.affiliate-redeem .summary-wrap .info {
         color: var(--text-color-low);
@@ -7991,6 +8103,7 @@ body.de .mega-dialog.contact-picker-widget {
         display: flex;
         align-items: baseline;
         font: var(--text-body2);
+        gap: 10px;
     }
     .mega-dialog.affiliate-redeem .amount .info {
         color: var(--text-color-high);
@@ -8001,13 +8114,13 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.affiliate-redeem .local-info {
         font: var(--text-body2);
-        color: var(--text-color-medium);
-        padding: 10px 0 0 0;
+        color: var(--text-color-low);
+        padding: 6px 0 0;
     }
     .mega-dialog.affiliate-redeem .commission-wrap {
         display: flex;
         width: 100%;
-        margin-bottom: 40px;
+        margin-bottom: 17px;
         white-space: nowrap;
         flex-wrap: wrap;
         justify-content: space-between;
@@ -8022,8 +8135,30 @@ body.de .mega-dialog.contact-picker-widget {
         -webkit-margin-end: 8px;
         margin-inline-end: 8px;
     }
+    .mega-dialog.affiliate-redeem .available-comission span span {
+        font: var(--text-body2);
+    }
+    .mega-dialog.affiliate-redeem .available-comission .available-commission-local {
+        font: var(--text-body2-bold);
+    }
+    .mega-dialog.affiliate-redeem .available-comission .available-commission-euro {
+        font: var(--text-body2);
+        color: var(--text-color-low);
+    }
+    .mega-dialog.affiliate-redeem .available-comission.pro-choice-commission {
+        margin-top: 9px;
+        font: var(--text-body1-bold);
+        margin-bottom: 3px;
+    }
+    .mega-dialog.affiliate-redeem .available-comission.bitcoin .available-commission-euro {
+        font: var(--text-body2);
+        color: var(--text-color-success);
+    }
+    .mega-dialog.affiliate-redeem .available-comission.pro-choice-commission .available-commission-local {
+        font: var(--text-body1-bold);
+    }
     .mega-dialog.affiliate-redeem .amount-message-container {
-        margin: -32px 0 32px;
+        margin: 0;
         color: var(--banner-text-error);
         border: 1px solid var(--banner-border-error);
         background: var(--banner-background-error);
@@ -8033,25 +8168,149 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.affiliate-redeem .available-comission span {
         white-space: nowrap;
         color: var(--text-color-success);
+        font: var(--text-body1-bold);
     }
     .mega-dialog.affiliate-redeem .affiliate-redeem .payment-type-wrapper {
         float: left;
+        display: flex;
+        flex-direction: column;
+        margin-top: 12px;
+        margin-bottom: 12px;
+        margin-left: 2px;
+        gap: 18px;
+    }
+    .mega-dialog.affiliate-redeem .cell-content.megaquota {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+    .mega-dialog.affiliate-redeem .redemption-methods-wrapper {
+        padding: 0;
+    }
+    .mega-dialog.affiliate-redeem .payment-type-header {
+        color: var(--text-color-high);
+        font: var(--text-h3-bold);
     }
     .mega-dialog.affiliate-redeem .payment-type {
         margin-top: 16px;
+        display: flex;
+        flex-direction: column;
     }
     .mega-dialog.affiliate-redeem .payment-type .radio-txt {
         color: var(--text-color-high);
         vertical-align: baseline;
+        font: var(--text-body1-bold);
+    }
+    .mega-dialog.affiliate-redeem .bitcoin-redemption-amount-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+    .mega-dialog.affiliate-redeem .megaquota .redeem-data-quota {
+        display: flex;
+        flex-direction: column;
+
+    }
+    .mega-dialo.affiliate-redeem .megaquota.cells .cell-content {
+        padding: 0 20px;
+    }
+    .mega-dialog.affiliate-redeem .megaquota .duration-dropdown {
+        margin-top: 18px;
+    }
+    .mega-dialog.affiliate-redeem .quota-summary .quota-summary.sub-item {
+        padding: 6px 24px;
+        gap: 10px;
+    }
+    .mega-dialog.affiliate-redeem .quota-summary .quota-summary.sub-item.storage {
+        margin-top: 6px;
+    }
+    .mega-dialog.affiliate-redeem .quota-summary {
+        padding-bottom: 6px;
+    }
+    .mega-dialog.affiliate-redeem .quota-summary .plan-info-title {
+        color: var(--text-color-medium);
+    }
+    .mega-dialog.affiliate-redeem .quota-summary .plan-info-title.plan-info-name {
+        font: var(--text-body2-bold);
+    }
+    .mega-dialog.affiliate-redeem .quota-summary .info.plan-info {
+        font: var(--text-body2-bold);
+    }
+    .mega-dialog.affiliate-redeem .duration-dropdown .option {
+        display: flex;
+        justify-content: space-between;
+    }
+    .mega-dialog.affiliate-redeem .duration-dropdown .redemption-duration-base {
+        color: var(--text-color-high);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .mega-dialog.affiliate-redeem .duration-dropdown .redemption-duration-default {
+        color: var(--text-color-medium);
+    }
+    .mega-dialog.affiliate-redeem .duration-dropdown .dropdown-item-save {
+        display: flex;
+        align-items: flex-start;
+        padding: 0.5px 8px 0 9px;
+        height: 18px;
+        border-radius: 9px;
+        background-color: #FF625C;
+        font: var(--text-body2);
+        color: var(--text-color-white-high);
+        flex: none;
+    }
+    .mega-dialog.affiliate-redeem .megaquota .megaquota-options-wrapper {
+        margin-top: 22px;
+        margin-left: 3px;
+        gap: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+    .mega-dialog.affiliate-redeem .fm-affiliate .redeem-data-quota {
+        border-top: none;
+    }
+    .mega-dialog.affiliate-redeem .megaquota .plan-select-message {
+        border-radius: 4px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 312px;
+        flex: none;
+        flex-grow: 0;
+        padding: 2px 16px;
+        gap: 10px;
+        margin-top: 6px;
+    }
+    .mega-dialog.affiliate-redeem .megaquota .insufficient-quota-warning {
+        background: var(--banner-background-error);
+        border: 1px solid var(--banner-border-error);
+        color: var(--banner-text-error);
+    }
+    .mega-dialog.affiliate-redeem .megaquota .under-price-warning {
+        background: var(--banner-background-warning);
+        border: 1px solid var(--banner-border-warning);
+        color: var(--banner-text-warning);
+    }
+    .mega-dialog.affiliate-redeem .megaquota .meqaquota-option-name {
+        color: var(--text-color-high);
+        font: var(--text-body1-bold);
+    }
+    .mega-dialog.affiliate-redeem .megaquota .meqaquota-option-information {
+        color: var(--text-color-medium);
+        font: var(--text-caption);
     }
     .mega-dialog.affiliate-redeem .withdraw-txt {
         font: var(--text-body1);
         color: var(--text-color-medium);
+    }
+    .mega-dialog.affiliate-redeem .bitcoin.step2 .withdraw-txt {
         padding: 16px 0 40px 0;
     }
     .mega-dialog.affiliate-redeem .withdraw-txt a,
     .mega-dialog.affiliate-redeem .withdraw-txt a:visited {
-        font: var(--text-body1);
+        font: var(--text-body2);
         float: right;
         color: var(--text-color-success);
         cursor: pointer;
@@ -8073,6 +8332,7 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.affiliate-redeem .withdraw-details {
         padding: 16px 0 0 0;
+
     }
     .mega-dialog.affiliate-redeem .withdraw-details label {
         color: var(--text-color-low);
@@ -8111,7 +8371,8 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.affiliate-redeem .bitcoin-org {
         padding: 0;
-        margin-top: 16px;
+        margin-top: 11px;
+        margin-bottom: 40px;
     }
     .mega-dialog.affiliate-redeem .bitcoin-org a {
         color: var(--text-color-low);
@@ -8131,6 +8392,9 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.affiliate-redeem label.radio-txt {
         color: var(--text-color-low);
+    }
+    .mega-dialog.affiliate-redeem .green-active {
+        margin-right: 9px;
     }
     .mega-dialog.affiliate-redeem .save-data-checkbox,
     .mega-dialog.affiliate-redeem .auto-fill-checkbox {
@@ -8400,6 +8664,10 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.affiliate-request {
         width: 630px;
     }
+    .mega-dialog.affiliate-request-quota {
+        width: 594px;
+        height: 342px;
+    }
     .mega-dialog.affiliate-request .status-cells {
         display: flex;
         position: relative;
@@ -8430,6 +8698,19 @@ body.de .mega-dialog.contact-picker-widget {
         background: linear-gradient(to bottom, #eeeeee 0%, #d8d8d8 100%);
         border-radius: 100%;
         overflow: hidden;
+    }
+    .mega-dialog.affiliate-request-quota .info {
+        width: 21px;
+        height: 21px;
+        position: relative;
+        background: #3ED8B2;
+        /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+        background: linear-gradient(180deg, #3ED8B2 0.2%, #1DB07B 100%);
+        border-radius: 100%;
+        overflow: hidden;
+    }
+    .mega-dialog.affiliate-request-quota .info-cells .info-txt {
+        font: var(--text-body2);
     }
     .mega-dialog.affiliate-request .status-txt {
         font: var(--text-h3);
@@ -8468,6 +8749,72 @@ body.de .mega-dialog.contact-picker-widget {
         height: 4px;
         background-position: 0 -6708px;
         background-repeat: repeat-x;
+    }
+    .mega-dialog.affiliate-redeem .mega-button.next-btn,
+    .mega-dialog.affiliate-request .mega-button.next-btn {
+        background: linear-gradient(180deg, #3ED8B2 0%, #1DB07B 100%);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        box-shadow: none;
+        justify-content: center;
+        align-items: center;
+    }
+    .mega-dialog.affiliate-request-quota .affiliate-request-title {
+        font: var(--text-h3);
+    }
+    .mega-dialog.affiliate-request-quota .complete .progress span {
+        background-position: 4px -4832px;
+        background-size: 115px auto;
+    }
+    .mega-dialog.affiliate-request-quota .complete .progress {
+        background: linear-gradient(180deg, #3ED8B2 0.2%, #1DB07B 100%);
+    }
+    .mega-dialog.affiliate-request-quota .content .content-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .mega-dialog.affiliate-request-quota .content .info-cells {
+        display: flex;
+        gap: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-right: 21px;
+    }
+    .mega-dialog.affiliate-request-quota .content .info-support {
+        margin-top: 21px;
+        margin-bottom: 16px;
+        font: var(--text-body2);
+    }
+    .mega-dialog.affiliate-request-quota .content .info-support span {
+        color: var(--text-color-high);
+    }
+    .mega-dialog.affiliate-request-quota .content .info-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .mega-dialog.affiliate-request-quota .content .plan-name {
+        margin-bottom: 18px;
+        color: var(--text-color-high);
+    }
+    .mega-dialog.affiliate-request-quota footer .mega-button {
+        min-height: 36px;
+        min-width: 45px;
+        justify-content: center;
+        align-items: center;
+    }
+    .mega-dialog.affiliate-request-quota footer .mega-button span {
+        margin: 0 var(--horizontal-padding);
+    }
+    .mega-dialog.affiliate-request-quota .footer-container-quota {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 48px 24px;
+    }
+    .mega-dialog.affiliate-request-quota header {
+        padding-bottom: 40px;
     }
 
 /* end affiliate-request dialog */
@@ -8523,7 +8870,23 @@ body.de .mega-dialog.contact-picker-widget {
 /* affiliate-guide dialog */
 
     .mega-dialog.affiliate-guide {
-        width: 750px;
+        width: 708px;
+    }
+    .mega-dialog.affiliate-guide:has(.step1.active) {
+        width: 708px;
+        height: 532px;
+    }
+    .mega-dialog.affiliate-guide > section.content {
+        flex-shrink: initial;
+        display: flex;
+        flex-direction: column;
+    }
+    .mega-dialog.affiliate-guide header {
+        padding-top: 16px;
+        padding-bottom: 14px;
+    }
+    .mega-dialog.affiliate-guide .affiliate-guide-title {
+        font: var(--text-h3)
     }
     .mega-dialog.affiliate-guide .step {
         display: none;
@@ -8531,13 +8894,28 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.affiliate-guide .step.active {
         display: block;
     }
+    .mega-dialog.affiliate-guide .referral-guide-title {
+        font: var(--text-h3);
+    }
+    .mega-dialog.affiliate-guide footer .how-it-works {
+        justify-content: center;
+    }
     .mega-dialog.affiliate-guide footer button.next i,
     .mega-dialog.affiliate-guide footer button.back i {
         --icon-size: 16px;
     }
     .mega-dialog.affiliate-guide footer .step.active {
         display: flex;
-        padding-top: 24px;
+        padding-top: 12px;
+        padding-bottom: 0;
+    }
+    .mega-dialog.affiliate-guide footer .step2.active {
+        padding: 12px 44px 16px;
+    }
+    .mega-dialog.affiliate-guide footer .step.active.step1 {
+        padding-top: 42px;
+        padding-bottom: 24px;
+        align-items: flex-end;
     }
     .mega-dialog.affiliate-guide footer {
         border-top: 1px solid transparent;
@@ -8550,15 +8928,15 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.affiliate-guide .illustration {
         height: 148px;
-        margin: 20px auto 8px;
-        width: 434px;
+        margin: 22px auto 8px;
+        width: 450px;
         --width: 434px;
     }
     .mega-dialog.affiliate-guide .big-header {
         font: var(--text-h1);
         text-align: center;
         color: var(--text-color-high);
-        padding: 18px 0 6px 0;
+        padding: 18px 8px;
     }
     .mega-dialog.affiliate-guide .affiliate-guide-content {
         display: table;
@@ -8580,8 +8958,17 @@ body.de .mega-dialog.contact-picker-widget {
         display: table-cell;
         vertical-align: middle;
     }
+    .mega-dialog.affiliate-guide .content .step2:not(.slides) {
+        padding: 0 18px;
+    }
     .mega-dialog.affiliate-guide .step2 .cell {
         padding: 0 32px;
+    }
+    .mega-dialog.affiliate-guide .step2 .slide3 .rules {
+        padding: 89px 0;
+    }
+    .mega-dialog.affiliate-guide .step2 .slide1:not(.nav-button) {
+        padding: 0 26px;
     }
     .mega-dialog.affiliate-guide .slide1 .cell {
         padding: 0;
@@ -8594,26 +8981,52 @@ body.de .mega-dialog.contact-picker-widget {
         --mask-color: var(--secondary-green);
         float: left;
         --icon-size: 24px;
-        margin: 7px 0 0 0;
+        margin: 4px 0 0;
+    }
+    .mega-dialog.affiliate-guide .slide3 .cell i {
+        margin: 4px 0 0;
     }
     .rtl .mega-dialog.affiliate-guide .cell i {
         float: right;
     }
     .mega-dialog.affiliate-guide .cell .feature-block i {
-        --icon-size: 64px;
+        --icon-size: 70px;
         margin-bottom: 12px;
+    }
+    .mega-dialog.affiliate-guide .cell .feature-block .icon-add-users {
+        --icon-size: 70px;
+        margin-bottom: 6px;
+        margin-top: 6px;
+    }
+    .mega-dialog.affiliate-guide .cell .feature-block .icon-web-link {
+        --icon-size: 79px;
+        margin-bottom: 4px;
     }
     .mega-dialog.affiliate-guide .header {
         font: var(--text-body1);
-        color: var(--text-color-medium);
+        color: var(--text-color-high);
         padding: 10px 0;
     }
+    .mega-dialog.affiliate-guide .step1 .cell {
+        display: flex;
+        flex-direction: row;
+        padding-left: 32px;
+        padding-top: 3px; 
+        gap: 34px;
+    }
+    .mega-dialog.affiliate-guide .step1 .cell .header {
+        padding: 5px 0 15px;
+        width: 200px;
+    }
+    .mega-dialog.affiliate-guide .step1 .cell .affiliate-guide-check-item {
+        display: flex;
+    }
+    
     .mega-dialog.affiliate-guide .info {
         box-sizing: border-box;
-        color: var(--text-color-medium);
         padding-bottom: 10px;
-        -webkit-padding-start: 28px;
-        padding-inline-start: 28px;
+        -webkit-padding-start: 34px;
+        padding-inline-start: 34px;
     }
     .mega-dialog.affiliate-guide .info strong,
     .mega-dialog.affiliate-guide .info a {
@@ -8632,8 +9045,9 @@ body.de .mega-dialog.contact-picker-widget {
         padding-inline-end: 28px;
     }
     .mega-dialog.affiliate-guide .cell i + .header {
-        -webkit-padding-start: 28px;
-        padding-inline-start: 28px;
+        -webkit-padding-start: 34px;
+        padding-inline-start: 34px;
+        color: var(--text-color-high);
     }
     .mega-dialog.affiliate-guide .slides {
         position: relative;
@@ -8645,6 +9059,7 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.affiliate-guide .step1 .half-sized {
         padding: 0;
+        width: auto;
         -webkit-padding-start: 12px;
         padding-inline-start: 12px;
     }
@@ -8687,7 +9102,6 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.affiliate-guide .nav-button.active {
         border-color: var(--secondary-blue);
         color: var(--text-color-high);
-        font: var(--text-body1-bold);
     }
 
     /* Slide 1 */
@@ -8695,7 +9109,7 @@ body.de .mega-dialog.contact-picker-widget {
         box-sizing: border-box;
         color: var(--text-color-medium);
         float: left;
-        padding: 10px 20px;
+        padding: 11px 20px 18px;
         text-align: center;
         width: 50%;
     }
@@ -8718,16 +9132,15 @@ body.de .mega-dialog.contact-picker-widget {
 
     /* Slide 2 */
     .mega-dialog.affiliate-guide .slide2 i {
-        margin: 10px 0 0 0;
+        margin: 12px 0 0;
     }
     .mega-dialog.affiliate-guide .slide2 .header {
         color: var(--text-color-high);
         font: var(--text-h3);
-        padding: 10px 0;
+        padding: 12px 0 7px;
     }
     .mega-dialog.affiliate-guide .slide2 .info {
-        min-height: 96px;
-        padding-bottom: 16px;
+        padding-bottom: 29px;
     }
     .mega-dialog.affiliate-guide .slide2 .info:last-child {
         min-height: auto;
@@ -8737,22 +9150,20 @@ body.de .mega-dialog.contact-picker-widget {
     /* Slide 3 */
     .mega-dialog.affiliate-guide .affiliate-guide-content.slide3 {
         display: block;
-        width: calc(100% + 48px);
-        max-width: calc(100% + 48px);
-        padding-right: 48px;
+        width: calc(100% + 15px);
+        max-width: calc(100% + 15px);
+        padding-right: 15px;
     }
     .mega-dialog.affiliate-guide .slide3 .cell.info {
         color: var(--text-color-higher);
         font: var(--text-body1);
-        padding-bottom: 0;
-        padding-top: 28px;
+        padding: 24px 17px 24px 30px;
     }
     .mega-dialog.affiliate-guide .slide3 .info .note {
         font: var(--text-body2);
     }
-    .mega-dialog.affiliate-guide .affiliate-guide.info {
-        color: var(--text-color-medium);
-        padding: 10px 0 4px 31px;
+    .mega-dialog.affiliate-guide .slide3 .affiliate-guide.info {
+        padding: 6px 0 4px 31px;
     }
 
 /* end affiliate-guide dialog */
@@ -10703,6 +11114,13 @@ body.de .mega-dialog.contact-picker-widget {
 .mega-dialog.fm-picker-dialog.fm-picker-file-request header p {
     max-width: 359px;
     margin: 16px auto;
+}
+
+.duration-discount-dropdown {
+    width: 97px;
+    height: 18px;
+    background-color: #FF625C;
+    border-radius: 9px;
 }
 
 /* File Request Dialog End */

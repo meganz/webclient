@@ -1225,16 +1225,6 @@
                 </div>
 
                 <div class="mobile button-block no-bg">
-                    <div class="mobile fm-icon big-linked-folder"></div>
-                    <div class="mobile label grey">[$22772][$22724]</div>
-                </div>
-
-                <div class="mobile button-block no-bg">
-                    <div class="mobile fm-icon big-linked-chat"></div>
-                    <div class="mobile label grey">[$22725.m]</div>
-                </div>
-
-                <div class="mobile button-block no-bg">
                     <div class="mobile fm-icon big-new-user"></div>
                     <div class="mobile label grey">[$22726.m]</div>
                 </div>
@@ -1275,7 +1265,7 @@
                 <div class="mobile fm-icon right-arrow"></div>
             </div>
             <div class="full-info">
-                [$23181.m]
+                [$referral_program_rules.m]
             </div>
         </div>
     </div>
@@ -1392,15 +1382,43 @@
 
     <!-- Redeem Step 1. Select transfer type. !-->
     <div class="mobile affiliate redeem-body step1 hidden">
+        <div class="templates hidden">
+            <span class="available-comission-template hidden">
+                <span class="available-commission-local hidden"></span>
+                <span class="available-commission-euro hidden"></span>
+            </span>
+         </div>
         <div class="mobile affiliate redeem-wrap payment-type">
             <div class="mobile affiliate redeem-header">
-                [$23405]
+                [$redemption_method_options]
             </div>
-            <div class="payment-type-wrapper hidden">
-                <div class="radioOn small">
-                    <input type="radio" id="affiliate-payment-type2" class="radioOn" value="2" name="affiliate-payment-type">
+            <div class="redemption-options-wrapper">
+                <div class="payment-type-wrapper hidden">
+                    <div class="radioOn small">
+                        <input type="radio" id="affiliate-payment-type2" class="radioOn" value="2" name="affiliate-payment-type">
+                    </div>
+                    <label class="radio-txt" for="affiliate-payment-type2">[$6802]</label>
                 </div>
-                <label class="radio-txt" for="affiliate-payment-type2">[$6802]</label>
+
+                <div class="payment-type-wrapper">
+                    <div class="radioOff small disabled">
+                        <input type="radio" id="affiliate-payment-temp" class="radioOff" value="100" name="affiliate-payment-temp">
+                    </div>
+                    <label class="radio-txt disabled" for="affiliate-payment-temp">Pro Plan</label>
+                </div>
+            </div>
+            <div class="redemption-choice-info">
+                <div class="pro-only-through-computer">
+                    [$referral_program_computer_only]
+                </div>
+                <div class="affiliate-redeem commission-wrap">
+                    <div class="affiliate-redeem available-commission available-comission-quota">
+                        [$23299]
+                    </div>
+                </div>
+                <div>
+                    [$estimated_price_text_min_50]
+                </div>
             </div>
             <div class="hr"></div>
             <div class="payment-type-wrapper hidden">

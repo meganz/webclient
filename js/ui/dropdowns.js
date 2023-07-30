@@ -126,7 +126,8 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
 
             $hiddenInput.trigger('focus');
         }
-        else if ($target.closest('.option').length || $target.is('.option')) {
+        else if (($target.closest('.option').length || $target.is('.option'))
+            && !($target.hasClass('disabled') || $target.closest('.option').hasClass('disabled'))) {
             closeDropdown();
         }
     });

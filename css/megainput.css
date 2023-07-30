@@ -399,7 +399,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.mega-input-dropdown .option:hover,
+.mega-input-dropdown .option:not(.disabled):hover,
 .mega-input-dropdown .option.active {
     --mask-color: var(--icon-active);
     background: var(--button-hover);

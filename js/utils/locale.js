@@ -769,7 +769,8 @@ function daysSince1Jan2000() {
  *                  'code' - use the ISO currency code such as "NZD",
  *                  'name' - use a localized currency name such as "dollar"
  *                  'number' - just number with correct decimal
- * @param {Boolean} noDecimals If the number should be displayed without decimals
+ * @param {*} noDecimals True if no decimals wanted, otherwise it is the maximum number of decimals wanted
+ * @param {Number} maxDecimalPlaces Set the maximum decimal places that will be printed
  * @returns {String} formated currency value
  */
 function formatCurrency(value, currency, display, noDecimals) {
@@ -779,6 +780,7 @@ function formatCurrency(value, currency, display, noDecimals) {
     value = typeof value === 'string' ? parseFloat(value) : value;
     currency = currency || 'EUR';
     display = display || 'symbol';
+    noDecimals = noDecimals === true ? 0 : noDecimals;
 
     var displayNumber = false;
     var narrowSymbol = false;
@@ -805,8 +807,8 @@ function formatCurrency(value, currency, display, noDecimals) {
     var options = {'style': 'currency', 'currency': currency, currencyDisplay: display};
 
     if (noDecimals) {
-        options.maximumFractionDigits = 0;
         options.minimumFractionDigits = 0;
+        options.maximumFractionDigits = noDecimals;
     }
 
     var result = value.toLocaleString(locales, options);
@@ -1361,12 +1363,12 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[23181] = escapeHTML(l[23181])
         .replace('[A]', '<a class="clickurl" href="https://mega.io/terms" target="_blank">')
         .replace('[/A]', '</a>');
-    l['23181.d'] = l[23181]
+    l['referral_program_rules.d'] = l[23181]
         .replace(/\[P]/g, '').replace(/\[\/P]/g, '')
         .replace(/\[L]/g, '<i class="sprite-fm-mono icon-check"></i><div class="affiliate-guide info">')
         .replace(/\[\/L]/g, '</div>')
         .replace(/\[BLOCK]/g, '').replace(/\[\/BLOCK]/g, '').replace(/\[BR]/g, '<br>');
-    l['23181.m'] = l[23181]
+    l['referral_program_rules.m'] = l[23181]
         .replace(/\[P]/g, '<div class="mobile button-block no-bg"><div class="mobile label-info no-icon">')
         .replace(/\[\/P]/g, '</div></div>')
         .replace(/\[L]/g, '<div class="mobile button-block no-bg"><div class="mobile fm-icon green-tick">' +
@@ -1625,6 +1627,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.file_request_upload_caption_2 = escapeHTML(l.file_request_upload_caption_2)
         .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/upload-file-request">')
         .replace('[/A]', '</a>');
+    l.redemption_support_email = escapeHTML(l.redemption_support_email)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
 
 
     const common = [

@@ -4238,7 +4238,7 @@
     "redemption_confirmation_pro_plan_name": "Se ha aplicado el plan %1. Tienes:",
     "redemption_confirmation_pro_storage": "%1 de cuota de almacenamiento",
     "redemption_confirmation_pro_transfer": "%1 de cuota de transferencia",
-    "redemption_cost_too_low": "Your selected plan value is lower than the minimum \u20ac50 required to redeem. Select a higher plan value to continue redemption.",
+    "redemption_cost_too_low": "Your chosen plan duration costs less than the minimum \u20ac50 required to redeem. Choose a higher plan or duration to continue commission redemption.",
     "redemption_info_higher_plan": "El plan que has elegido es distinto al plan que tienes ahora. Si confirmas el canje, tu plan nuevo comenzar\u00e1 de inmediato. Tu plan actual se reanudar\u00e1 una vez que expire el plan nuevo.",
     "redemption_info_lower_plan": "El plan que has elegido es distinto al plan que tienes ahora. Si confirmas el canje, tu plan nuevo comenzar\u00e1 una vez que expire el actual.",
     "redemption_info_same_plan": "Si confirmas el canje, tu plan nuevo comenzar\u00e1 una vez que expire el actual.",

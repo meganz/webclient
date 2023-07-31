@@ -4238,7 +4238,7 @@
     "redemption_confirmation_pro_plan_name": "U heeft het %1 abonnement. Uw gegevens zijn:",
     "redemption_confirmation_pro_storage": "%1 aan opslagtegoed",
     "redemption_confirmation_pro_transfer": "%1 aan overdrachtstegoed",
-    "redemption_cost_too_low": "Your selected plan value is lower than the minimum \u20ac50 required to redeem. Select a higher plan value to continue redemption.",
+    "redemption_cost_too_low": "Your chosen plan duration costs less than the minimum \u20ac50 required to redeem. Choose a higher plan or duration to continue commission redemption.",
     "redemption_info_higher_plan": "Uw geselecteerde abonnement verschilt van uw huidige abonnement. Als u uw aankoop bevestigt, gaat uw gekochte abonnement onmiddellijk in. Uw huidige abonnement wordt hervat zodra uw aangeschafte abonnement afloopt.",
     "redemption_info_lower_plan": "Uw geselecteerde abonnement verschilt van uw huidige abonnement. Als u uw aankoop bevestigt, gaat uw aangeschafte abonnement in nadat uw huidige abonnement is verlopen.",
     "redemption_info_same_plan": "Als u uw aankoop bevestigt, gaat uw aangeschafte abonnement in nadat uw huidige abonnement is verlopen.",

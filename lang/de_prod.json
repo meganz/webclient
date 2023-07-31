@@ -4238,7 +4238,7 @@
     "redemption_confirmation_pro_plan_name": "You\u2019re on the %1 plan. Your details are:",
     "redemption_confirmation_pro_storage": "%1 of storage quota",
     "redemption_confirmation_pro_transfer": "%1 of transfer quota",
-    "redemption_cost_too_low": "Your selected plan value is lower than the minimum \u20ac50 required to redeem. Select a higher plan value to continue redemption.",
+    "redemption_cost_too_low": "Your chosen plan duration costs less than the minimum \u20ac50 required to redeem. Choose a higher plan or duration to continue commission redemption.",
     "redemption_info_higher_plan": "Your selected plan is different from your current plan. If you confirm your purchase, your purchased plan will start immediately. Your current plan will resume once your purchased plan expires.",
     "redemption_info_lower_plan": "Your selected plan is different from your current plan. If you confirm your purchase, your purchased plan will start after your current plan expires.",
     "redemption_info_same_plan": "If you confirm your purchase, your purchased plan will start after your current plan expires.",

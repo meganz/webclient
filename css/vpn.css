@@ -161,14 +161,12 @@
     margin-top: 12px;
 }
 
-.fm-right-account-block .fm-account-vpn .disclaimer-heading {
-    margin-top: 32px;
+.fm-right-account-block .fm-account-vpn .contact-support {
+    display: flex;
+    align-items: center;
 }
-
-.fm-right-account-block .fm-account-vpn .disclaimer {
-    height: 80px;
-    padding-right: 10px;
-    overflow: auto;
+.fm-right-account-block .fm-account-vpn .contact-support .icon-email-filled {
+    --mask-color: var(--icon-rest);
 }
 
 .fm-right-account-block .fm-account-vpn .page-heading {
@@ -270,12 +268,6 @@
 }
 .fm-right-account-block .fm-account-vpn .post-create-section .view-ini-config:hover {
     color: var(--label-blue-hover);
-}
-
-.fm-right-account-block .fm-account-vpn .email-support {
-    position: absolute;
-    bottom: 0;
-    left: 0;
 }
 
 /* endregion */

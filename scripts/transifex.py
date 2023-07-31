@@ -538,9 +538,9 @@ def has_locked_msgs(is_prod):
                 taggedStrings = content["data"]
                 for string in taggedStrings:
                     if(string["attributes"] and string["attributes"]["tags"]):
-                        if "old_string" in lockingTag:
+                        if "old_string" in string["attributes"]["tags"]:
                             continue
-                        if "lock_allowed" in lockingTag:
+                        if "lock_allowed" in string["attributes"]["tags"]:
                             continue
                         for strTag in string["attributes"]["tags"]:
                             if strTag in lockingTag:

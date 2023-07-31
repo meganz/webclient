@@ -349,7 +349,7 @@ accountUI.general = {
             var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
             var usedB = bytesToSize(account.tfsq.used);
             $('.chart.data .size-txt', $bandwidthChart).text(usedB);
-            $('.chart.data .pecents-txt', $bandwidthChart).text(bytesToSize(account.tfsq.max, 0));
+            $('.chart.data .pecents-txt', $bandwidthChart).text(bytesToSize(account.tfsq.max, 3, 4));
             $('.chart.data .of-txt', $bandwidthChart).text('/');
             $('.account.chart.data', $bandwidthChart).removeClass('hidden');
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {

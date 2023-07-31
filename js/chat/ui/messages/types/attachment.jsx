@@ -211,7 +211,7 @@ export default class Attachment extends AbstractGenericMessage {
                             disabled={mega.paywall}
                             onClick={() => this.props.onDownloadStart(v)}
                         />
-                        {this._isUserRegistered() &&
+                        {!is_chatlink && this._isUserRegistered() &&
                             <>
                                 <DropdownItem
                                     icon="sprite-fm-mono icon-cloud"

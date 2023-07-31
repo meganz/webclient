@@ -6,6 +6,7 @@ var pro = {
 
     /** An array of the possible membership plans from the API */
     membershipPlans: [],
+    conversionRate: 0,
 
     lastLoginStatus: -99, // a var to store the user login status when prices feteched
 
@@ -91,6 +92,8 @@ var pro = {
                     var minPlan = null;
                     var lmbps = {};
 
+                    const conversionRate = results[0].l.lc === "EUR" ? 1 : results[0].l.exch;
+
                     for (var i = 1; i < results.length; i++) {
 
                         let discount = 0;
@@ -155,6 +158,7 @@ var pro = {
                     pro.lastLoginStatus = u_type;
                     pro.maxPlan = maxPlan;
                     pro.minPlan = minPlan;
+                    pro.conversionRate = conversionRate;
 
                     // Run the callback function
                     loadedCallback();

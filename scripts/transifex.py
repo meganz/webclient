@@ -535,9 +535,13 @@ def has_locked_msgs(is_prod):
             response = urlopen(request)
             if response.code == 200:
                 content = json.loads(response.read().decode("utf8"))
-                tagedStrings = content["data"]
-                for string in tagedStrings:
+                taggedStrings = content["data"]
+                for string in taggedStrings:
                     if(string["attributes"] and string["attributes"]["tags"]):
+                        if "old_string" in string["attributes"]["tags"]:
+                            continue
+                        if "lock_allowed" in string["attributes"]["tags"]:
+                            continue
                         for strTag in string["attributes"]["tags"]:
                             if strTag in lockingTag:
                                 flaggedStrings.append(string["attributes"]["key"])

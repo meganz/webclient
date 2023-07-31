@@ -145,7 +145,7 @@ mobile.affiliate = {
                 $('.non-euro-only', $overlay).addClass('hidden');
             }
 
-            if (u_attr.b) {
+            if (u_attr.b || u_attr.pf) {
                 $('.no-buisness', $overlay).addClass('hidden');
             }
 
@@ -391,15 +391,24 @@ mobile.affiliate = {
 
             $('.affiliate-empty-data', $page).addClass('hidden');
 
-            var methodIconClass = ['', 'red-bank', 'bitcoin'];
+            var methodIconClass = ['pro-plan', 'red-bank', 'bitcoin'];
             var $template =  $('.mobile.affiliate-redemption-item.template', $page);
             var html = '';
 
             for (var i = 0; i < this.historyList.length; i++) {
 
                 var item = this.historyList[i];
+                let proSuccessful;
+                if (item.gw === 0) {
+                    if (item.hasOwnProperty('state')) {
+                        proSuccessful = item.state === 4;
+                    }
+                    else {
+                        proSuccessful = item.s === 4;
+                    }
+                }
                 var $item = $template.clone().removeClass('template');
-                var status = affiliateRedemption.getRedemptionStatus(item.s);
+                var status = affiliateRedemption.getRedemptionStatus(item.s, proSuccessful);
                 var la = parseFloat(item.la);
 
                 $('.method-icon', $item).addClass(methodIconClass[item.gw]);
@@ -412,7 +421,7 @@ mobile.affiliate = {
                 }
 
                 $('.date', $item).text(time2date(item.ts, 1));
-                $('.status', $item).addClass(status.c).text(status.s);
+                $('.status', $item).removeClass('red').addClass(status.c).text(status.s);
 
                 html += $item.prop('outerHTML');
             }
@@ -424,8 +433,12 @@ mobile.affiliate = {
             $list.rebind('tap.toRedemptionDetail', function() {
 
                 var i = $list.index(this);
+                const rid = self.historyList[i].rid;
+                const state = self.historyList[i].hasOwnProperty('state')
+                    ? self.historyList[i].state
+                    : self.historyList[i].s;
 
-                M.affiliate.getRedemptionDetail(self.historyList[i].rid).then(function(res) {
+                M.affiliate.getRedemptionDetail(rid, state).then((res) => {
 
                     $page.addClass('hidden');
 
@@ -550,7 +563,11 @@ mobile.affiliate = {
         // Show the guide page content
         $detailsPage.removeClass('hidden');
 
-        affiliateRedemption.fillBasicHistoryInfo($detailsPage, data);
+        const state = data.hasOwnProperty('state')
+            ? data.state
+            : data.s;
+
+        affiliateRedemption.fillBasicHistoryInfo($detailsPage, data, state);
         affiliateRedemption.redemptionAccountDetails($detailsPage, data.gw, data);
 
         // Init Go back to History page
@@ -817,6 +834,37 @@ mobile.affiliate = {
                     .parents('.payment-type-wrapper').removeClass('hidden');
             }
         }
+
+        const balance = M.affiliate.balance;
+
+        const euro = formatCurrency(balance.available);
+
+        const $availableComissionTemplates = $('.templates .available-comission-template', self.$step1);
+        const $euroTemplate = $('.available-commission-euro', $availableComissionTemplates)
+            .clone()
+            .removeClass('hidden');
+        const $localTemplate = $('.available-commission-local', $availableComissionTemplates)
+            .clone()
+            .removeClass('hidden');
+        const $availableComissionArea = $('.available-comission-quota span', self.$step1).empty();
+        const $availableBitcoinArea = $('.available-comission-bitcoin span', self.$step1).empty();
+
+        $euroTemplate.text(euro);
+
+        if (balance.localCurrency && balance.localCurrency !== 'EUR') {
+            const local = balance.localCurrency + ' ' +
+                formatCurrency(balance.localAvailable, balance.localCurrency, 'narrowSymbol') + '* ';
+            $localTemplate.text(local);
+            $availableComissionArea
+                .safeAppend($localTemplate.prop('outerHTML'))
+                .safeAppend($euroTemplate.prop('outerHTML'));
+        }
+        else {
+            $localTemplate.text(euro);
+            $availableComissionArea.safeAppend($localTemplate.prop('outerHTML'));
+        }
+
+        $availableBitcoinArea.safeAppend($localTemplate.text(euro).prop('outerHTML'));
     },
 
     redeemStep2: function(comeback) {

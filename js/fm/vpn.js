@@ -34,8 +34,6 @@ class VpnCredsManager {
     }
 
     static getLocations() {
-        console.debug('[VPN Manager] Fetching VPN locations.');
-
         this._vpnrRequest = this._vpnrRequest || M.req({ a: 'vpnr' }); // reuse existing requests
 
         return new Promise((resolve) => {
@@ -58,8 +56,6 @@ class VpnCredsManager {
     }
 
     static getActiveCredentials() {
-        console.debug('[VPN Manager] Fetching active credentials.');
-
         this._vpngRequest = this._vpngRequest || M.req({ a: 'vpng' }); // reuse existing requests
 
         return new Promise((resolve) => {
@@ -73,7 +69,6 @@ class VpnCredsManager {
                 resolve(response);
             }).catch((ex) => {
                 if (ex === ENOENT) {
-                    console.debug('[VPN Manager] ENOENT when fetching active credentials.');
                     resolve(ex);
                     return;
                 }
@@ -88,8 +83,6 @@ class VpnCredsManager {
     }
 
     static createCredential() {
-        console.debug('[VPN Manager] Generating a credential.');
-
         const keypair = nacl.box.keyPair();
 
         return new Promise((resolve) => {
@@ -134,8 +127,6 @@ class VpnCredsManager {
     }
 
     static async deactivateCredential(slotNum) {
-        console.debug(`[VPN Manager] Deactivating a credential with number "${slotNum}".`);
-
         return new Promise((resolve) => {
             M.req({ a: 'vpnd', s: slotNum }).then((response) => {
                 if (response !== 0) {
@@ -155,8 +146,6 @@ class VpnCredsManager {
     }
 
     static generateIniConfig(cred, locationIndex = 0) {
-        console.debug(`[VPN Manager] Generating INI config with VPN credential #${cred.credNum}.`);
-
         // assemble endpoint
         let endpoint = `${cred.locations[locationIndex]}.vpn`;
         if (cred.vpnSubclusterId > 1) {
@@ -179,8 +168,6 @@ class VpnCredsManager {
 
 class VpnPage {
     constructor() {
-        console.debug('[VPN UI] Initialising VPN settings section.');
-
         this.page = document.querySelector('.fm-right-account-block .fm-account-vpn');
         this.credsContainer = this.page.querySelector('.creds-container');
         this.credTpl = this.page.querySelector('template#cred-slot-tpl');
@@ -337,8 +324,6 @@ class VpnPage {
     }
 
     async show() {
-        console.debug('[VPN UI] Rendering VPN settings section.');
-
         this.reset();
 
         loadingDialog.show('vpn-show-page');
@@ -347,8 +332,6 @@ class VpnPage {
     }
 
     async populateCredsList() {
-        console.debug('[VPN UI] Repopulating credentials list.');
-
         let response = await VpnCredsManager.getActiveCredentials();
         response = response === ENOENT ? [] : response; // ENOENT is an expected response; => no creds available
         if (!Array.isArray(response)) {
@@ -386,8 +369,6 @@ class VpnPage {
             return;
         }
 
-        console.debug('[VPN UI] Creating credential.');
-
         this.reset();
 
         loadingDialog.show('vpn-create');
@@ -402,7 +383,7 @@ class VpnPage {
                 l.vpn_eaccess_dialog_msg,
                 (answer) => {
                     if (answer === false) {
-                        M.req({a: 'log', e: 99855}); // "VPN page upgrade acct (via eaccess dlg)"
+                        M.req({a: 'log', e: 99857}); // "VPN page upgrade acct (via eaccess dlg)"
                         loadSubPage('/pro');
                     }
                 });
@@ -421,16 +402,12 @@ class VpnPage {
     }
 
     async removeCred(credNum) {
-        console.debug(`[VPN UI] Removing credential "${credNum}".`);
-
         loadingDialog.show('vpn-deactivate');
         await VpnCredsManager.deactivateCredential(credNum);
         loadingDialog.hide('vpn-deactivate');
     }
 
     showStep2(cred) {
-        console.debug('[VPN UI] Showing step 2.');
-
         const location = getDropdownValue(this.$locationDropdown);
         const locationIndex = cred.locations.indexOf(location) || 0;
         const config = VpnCredsManager.generateIniConfig(cred, locationIndex);
@@ -454,8 +431,6 @@ class VpnPage {
     }
 
     reset() {
-        console.debug('[VPN UI] Resetting post-create section.');
-
         this.postCreateSection.classList.add('hidden');
 
         this.recentSlot = undefined;
@@ -488,7 +463,6 @@ class VpnPage {
     }
 
     _removeCredElement(credNum) {
-        console.debug(`[VPN UI] Removing credential UI element with number "${credNum}".`);
         const credElement = this.credsContainer.querySelector(`[data-num="${credNum}"]`);
         if (credElement) {
             if (credNum > this.knownSlotCount) {
@@ -508,12 +482,10 @@ class VpnPage {
     }
 
     _onCredCreated(cred) {
-        console.debug(`[VPN UI] Credential ${cred.credNum} was created.`);
         this.populateCredsList();
     }
 
     _onCredDeactivated(credNum) {
-        console.debug('[VPN UI] A credential was deactivated.');
         this._removeCredElement(credNum);
 
         if (parseInt(this.downloadConfigBtn.dataset.credNum) === credNum) {

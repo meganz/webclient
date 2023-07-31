@@ -747,9 +747,11 @@ lazy(mega.gallery, 'albums', () => {
                 mBroadcaster.once('slideshow:close', () => {
                     M.v = tmp;
                     const selCount = Object.keys(selHandles).length;
-
+                    const is_timeline = scope.albums.grid && scope.albums.grid.timeline;
                     // double click will mess _selCount, so we need to reset here
-                    scope.albums.grid.timeline._selCount = selCount;
+                    if (is_timeline) {
+                        scope.albums.grid.timeline._selCount = selCount;
+                    }
 
                     reinitiateEvents();
 
@@ -770,7 +772,9 @@ lazy(mega.gallery, 'albums', () => {
                                 .replace('%1', selCount)
                         );
 
-                        scope.albums.grid.timeline.adjustToBottomBar();
+                        if (is_timeline) {
+                            scope.albums.grid.timeline.adjustToBottomBar();
+                        }
                     }
                 });
             });

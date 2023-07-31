@@ -1385,7 +1385,7 @@ affiliateUI.redemptionDialog = {
             la: formatCurrency(la, c, 'narrowSymbol'),
             f: formatCurrency(f),
             lf: formatCurrency(lf),
-            c: c,
+            c: c || 'EUR',
             m: monthsTxt,
             s: storageTxt,
             t: bandwidthTxt,
@@ -1542,14 +1542,20 @@ affiliateUI.redemptionDialog = {
             t: planInfo.transferQuota * numMonths
         };
 
-        const {a, la, m, s, t} = affiliateUI.redemptionDialog.getFormattedPlanData(true, dataToFormat);
+        const {a, la, m, s, t, c} = affiliateUI.redemptionDialog.getFormattedPlanData(true, dataToFormat);
 
         $('.pro-plan .plan-info', $summaryTable).text(planName);
         $('.pro-storage .plan-info', $summaryTable).text(s);
         $('.pro-quota .plan-info', $summaryTable).text(t);
         $('.pro-duration .plan-info', $summaryTable).text(m);
-        $('.affiliate-redeem .summary-wrap .pro-price .plan-info', this.$dialog).text(la + '*');
-        $('.affiliate-redeem .summary-wrap .pro-price .euro', this.$dialog).text(a).removeClass('hidden');
+        if (!c || c === 'EUR') {
+            $('.affiliate-redeem .summary-wrap .pro-price .plan-info', this.$dialog).text(a + '*');
+            $('.affiliate-redeem .summary-wrap .pro-price .euro', this.$dialog).addClass('hidden');
+        }
+        else {
+            $('.affiliate-redeem .summary-wrap .pro-price .plan-info', this.$dialog).text(la + '*');
+            $('.affiliate-redeem .summary-wrap .pro-price .euro', this.$dialog).text(a).removeClass('hidden');
+        }
 
         affiliateRedemption.plan.planName = planName;
         affiliateRedemption.plan.planPriceRedeem = totalCostEuros;

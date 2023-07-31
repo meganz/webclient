@@ -2404,11 +2404,11 @@ MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
 };
 
 // eslint-disable-next-line complexity
-MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
+MessagesBuff.prototype.getRenderableSummary = function(lastMessage, rawContent) {
     "use strict";
 
     let renderableSummary;
-    if (lastMessage._renderableSummary) {
+    if (lastMessage._renderableSummary && rawContent !== 0xBADF) {
         renderableSummary = lastMessage._renderableSummary;
     }
     else {
@@ -2424,41 +2424,43 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
         else {
             renderableSummary = lastMessage.textContents;
         }
-        renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
+        if (rawContent !== 0xBADF) {
+            renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
 
-        var escapeUnescapeArgs = [
-            {'type': 'onPreBeforeRenderMessage', 'textOnly': true},
-            {'message': {'textContents': renderableSummary}},
-            ['textContents', 'messageHtml'],
-            'messageHtml'
-        ];
+            const escapeUnescapeArgs = [
+                {'type': 'onPreBeforeRenderMessage', 'textOnly': true},
+                {'message': {'textContents': renderableSummary}},
+                ['textContents', 'messageHtml'],
+                'messageHtml'
+            ];
 
-        megaChat.plugins.btRtfFilter.escapeAndProcessMessage(
-            escapeUnescapeArgs[0],
-            escapeUnescapeArgs[1],
-            escapeUnescapeArgs[2],
-            escapeUnescapeArgs[3]
-        );
-        renderableSummary = escapeUnescapeArgs[1].message.textContents;
+            megaChat.plugins.btRtfFilter.escapeAndProcessMessage(
+                escapeUnescapeArgs[0],
+                escapeUnescapeArgs[1],
+                escapeUnescapeArgs[2],
+                escapeUnescapeArgs[3]
+            );
+            renderableSummary = escapeUnescapeArgs[1].message.textContents;
 
-        renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
-        renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
+            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+            renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
 
-        escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
+            escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
 
-        escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
+            escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
 
-        renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(
-            escapeUnescapeArgs[0],
-            escapeUnescapeArgs[1],
-            escapeUnescapeArgs[2],
-            escapeUnescapeArgs[3]
-        );
+            renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(
+                escapeUnescapeArgs[0],
+                escapeUnescapeArgs[1],
+                escapeUnescapeArgs[2],
+                escapeUnescapeArgs[3]
+            );
 
-        renderableSummary = renderableSummary || "";
-        renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
-        renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
-        lastMessage._renderableSummary = renderableSummary;
+            renderableSummary = renderableSummary || "";
+            renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
+            renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
+            lastMessage._renderableSummary = renderableSummary;
+        }
     }
 
     var author;
@@ -2485,7 +2487,9 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
                 renderableSummary = l[19285] + " " + renderableSummary;
             }
             else {
-                var name = megaChat.html(M.getNameByHandle(author.u));
+                const name = rawContent === 0xBADF
+                    ? M.getNameByHandle(author.u)
+                    : megaChat.html(M.getNameByHandle(author.u));
                 if (name) {
                     renderableSummary = l.user_message_preview.replace('%NAME', name).replace('%s', renderableSummary);
                 }
@@ -2878,4 +2882,38 @@ MessagesBuff.prototype.onReactionSn = async function(eventData) {
 MessagesBuff.prototype.onReactionReject = function(eventData) {
     "use strict";
     Reactions.clearQueuedReactionsForChat(eventData.chatId, eventData.msgId);
+};
+
+MessagesBuff.prototype.getExportContent = function(media) {
+    'use strict';
+    // NB: Will only export the content that is loaded into memory.
+    const data = {
+        stringNodes: [],
+        attachNodes: [],
+    };
+
+    const nameList = handles => handles.map(h => M.getNameByHandle(h));
+    const emojiString = l[24069].replace(/\[G]/g, '').replace(/\[\/G]/g, '');
+    this.messages.forEach(msg => {
+        const content = [time2date(msg.delay), this.getRenderableSummary(msg, 0xBADF)];
+        if (media && msg.hasAttachments()) {
+            const nodes = msg.getAttachmentMeta().filter(n => {
+                const share = M.getNodeShare(n);
+                return !share || !share.down;
+            });
+            if (nodes.length) {
+                data.attachNodes.push(...nodes);
+            }
+        }
+        if (msg.reacts && $.len(msg.reacts.reactions)) {
+            for (const [emoji, handles] of Object.entries(msg.reacts.reactions)) {
+                content.push(mega.utils.trans.listToString(
+                    nameList(Object.keys(handles)),
+                    emojiString.replace('%s2', emoji)
+                ));
+            }
+        }
+        data.stringNodes.push(content.join('; '));
+    });
+    return data;
 };

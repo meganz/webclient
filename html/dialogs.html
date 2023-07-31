@@ -5996,11 +5996,11 @@
         </button>
 
         <header class="step step1 active">
-            <h2 id="affiliate-guide-title">[$22682]</h2>
+            <h2 id="affiliate-guide-title" class="affiliate-guide-title">[$referral_prog_title]</h2>
         </header>
 
         <header class="step step2 alt-background">
-            <h2>[$22718]</h2>
+            <h2 class="referral-guide-title">[$22718]</h2>
         </header>
 
         <section class="content">
@@ -6012,22 +6012,30 @@
                 <div class="affiliate-guide-content active">
                     <div class="cell">
                         <div class="half-sized">
-                            <i class="sprite-fm-mono icon-check"></i>
-                            <div class="header">[$22713]</div>
-                            <i class="sprite-fm-mono icon-check"></i>
-                            <div class="header">[$22714]</div>
+                            <div class="affiliate-guide-check-item">
+                                <i class="sprite-fm-mono icon-check"></i>
+                                <div class="header">[$22713]</div>
+                            </div>
+                            <div class="affiliate-guide-check-item">
+                                <i class="sprite-fm-mono icon-check"></i>
+                                <div class="header">[$22714]</div>
+                            </div>
                         </div>
                         <div class="half-sized">
-                            <i class="sprite-fm-mono icon-check"></i>
-                            <div class="header">[$22715]</div>
-                            <i class="sprite-fm-mono icon-check"></i>
-                            <div class="header">[$22716]</div>
+                            <div class="affiliate-guide-check-item">
+                                <i class="sprite-fm-mono icon-check"></i>
+                                <div class="header">[$22715]</div>
+                            </div>
+                            <div class="affiliate-guide-check-item">
+                                <i class="sprite-fm-mono icon-check"></i>
+                                <div class="header">[$22716]</div>
+                            </div>
                         </div>
                         <div class="clear"></div>
                     </div>
                 </div>
             </div>
-            <div class="content-block step step2 alt-background">
+            <div class="content-block step step2 slides alt-background">
                 <div class="top-block">
                     <div class="nav-button slide1 active" data-slide="1">
                         <span class="num">1.</span>
@@ -6052,14 +6060,6 @@
                                 [$22771][$22723]
                             </div>
                             <div class="feature-block">
-                                <i class="sprite-fm-uni icon-share-file"></i>
-                                [$22772][$22724]
-                            </div>
-                            <div class="feature-block">
-                                <i class="sprite-fm-uni icon-chat-link"></i>
-                                [$22725]
-                            </div>
-                            <div class="feature-block">
                                 <i class="sprite-fm-uni icon-add-users"></i>
                                 [$22726]
                             </div>
@@ -6078,7 +6078,7 @@
                     </div>
                     <div class="affiliate-guide-content slide3">
                         <div class="cell info rules">
-                            [$23181.d]
+                            [$referral_program_rules.d]
                         </div>
                     </div>
                 </div>
@@ -6098,7 +6098,7 @@
                         <div>
                             <i class="sprite-fm-mono icon-arrow-left"></i>
                         </div>
-                        <span>[$18068]</span>
+                        <span>[$822]</span>
                     </button>
                 </div>
                 <div>
@@ -6217,17 +6217,31 @@
 
     <!-- Dialog: affiliate-redeem -->
     <!-- Affiliate program redemption dialog !-->
-    <div class="mega-dialog dialog-template-tool affiliate-redeem contrast hidden"
+    <div class="mega-dialog dialog-template-tool affiliate-redeem contrast dialog-small hidden"
          role="dialog"
          aria-labelledby="affiliate-redeem-title"
          aria-modal="true">
+
+         <div class="templates hidden">
+            <span class="available-comission-template hidden">
+                <span class="available-commission-local hidden"></span>
+                <span class="available-commission-euro hidden"></span>
+            </span>
+            <div class="dropdown-templates hidden">
+                <div class="select-item-template option" data-state="" data-type="">
+                    <span class="dropdown-item-text"></span>
+                    <div class="dropdown-item-save hidden"></div>
+                </div>
+                
+            </div>
+         </div>
 
         <button class="close js-close" aria-label="[$148]">
             <i class="sprite-fm-mono icon-dialog-close"></i>
         </button>
 
         <header>
-            <h2 id="affiliate-redeem-title">[$23295]</h2>
+            <h2 id="affiliate-redeem-title" class="dialog-commisison-title">[$23295]</h2>
         </header>
 
         <section class="content">
@@ -6240,48 +6254,72 @@
                 <!-- Steps !-->
                 <!-- Add class "scrollable" to any cell if we want to init scrolling !-->
 
-                <!-- Step1 block. Payment !-->
-                <div class="affiliate-redeem cells left step1">
+                <!-- Step0 block. Select MEGAquota redemption or Bitcoin redemption -->
+                <div class="affiliate-redeem cells left step0 ">
                     <div class="affiliate-redeem cell-content">
-                        <div class="affiliate-redeem header">
-                            [$23297]
-                        </div>
-                        <input class="currencyField redeem-amount" type="number" name="affiliate-redemption-amount" id="affiliate-redemption-amount" step="any" data-prefix="&euro;">
-                        <div class="affiliate-redeem commission-wrap">
-                            <div class="affiliate-redeem available-comission">
-                                [$23299]
-                            </div>
-                            <button class="mega-button small positive redeem-all-btn">
-                                <span>[$23298]</span>
-                            </button>
-                        </div>
-                        <div class="amount-message-container hidden"></div>
-                        <div class="affiliate-redeem header">
-                            [$23300]
-                        </div>
                         <div class="affiliate-redeem payment-type">
-                            <div class="affiliate-redeem payment-type-wrapper hidden">
-                                <div class="radioOn green-active">
-                                    <input type="radio" id="affiliate-payment-type2" name="affiliate-payment-type" class="radioOn" value="2">
-                                </div>
-                                <label for="affiliate-payment-type2" class="radio-txt">[$6802]</label>
+                            <div class="affiliate-redeem payment-type-header">
+                                [$redemption_method_options]
                             </div>
-                            <div class="affiliate-redeem payment-type-wrapper hidden">
+                            <div class="affiliate-payment-template hidden">
                                 <div class="radioOff green-active">
-                                    <input type="radio" id="affiliate-payment-type1" name="affiliate-payment-type" class="radioOff" value="1">
+                                    <input type="radio" id="affiliate-payment-template-id" name="affiliate-payment-type" class="radioOn" value="1">
                                 </div>
-                                <label for="affiliate-payment-type1" class="radio-txt">[$23301]</label>
+                                <label for="affiliate-payment-template-id" class="radio-txt"></label>
+                            </div>
+
+                            <!-- This wrapper is filled by affiliate.js with the redemption options in the above template -->
+                            <div class="affiliate-redeem payment-type-wrapper"></div>
+
+                            <div class="affiliate-redeem commission-wrap">
+                                <div class="affiliate-redeem available-comission available-comission-quota">
+                                    [$23299]
+                                </div>
+                            </div>
+                            <div class="affiliate-redeem local-info">[$estimated_price_text_min_50]</div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step1 block. Bitcoin enter amount-->
+                <div class="affiliate-redeem cells left step1 bitcoin">
+                    <div class="affiliate-redeem cell-content">
+                        <div class="affiliate-redeem redemption-methods-wrapper">
+                            <div class="affiliate-redeem header">
+                                [$23302]
+                            </div>
+                            <div class="affiliate-redeem withdraw-txt">
+                                <div class="method-chosen"></div>
+                                <a href="">[$1776]</a>
                             </div>
                             <div class="clear"></div>
                             <div class="affiliate-redeem bitcoin-org">
                                 <a href="https://bitcoin.org/" target="_blank" rel="noopener noreferrer">[$23536]</a>
                             </div>
                         </div>
+
+                        <div class="affiliate-redeem bitcoin-redemption-amount-wrapper">  
+                            <div class="affiliate-redeem header">
+                                [$23297]
+                            </div>
+                            <input class="currencyField redeem-amount" type="number" name="affiliate-redemption-amount" id="affiliate-redemption-amount" step="any" data-prefix="&euro;">
+                            <div class="affiliate-redeem commission-wrap">
+                                <div class="affiliate-redeem available-comission-bitcoin available-comission">
+                                    [$23299]
+                                    <!-- -avail-commis2 -->
+                                </div>
+                                <button class="mega-button small positive redeem-all-btn">
+                                    <span>[$23298]</span>
+                                </button>
+                            </div>
+                            <div class="amount-message-container hidden"></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Step2. Withdraw details !-->
-                <div class="affiliate-redeem cells left step2 scrollable hidden">
+                <div class="affiliate-redeem cells left step2 scrollable bitcoin hidden">
                     <div class="affiliate-redeem cell-content">
                         <div class="affiliate-redeem header">
                             [$23302]
@@ -6291,7 +6329,7 @@
                             <a href="">[$1776]</a>
                             <div class="clear"></div>
                         </div>
-                        <div class="affiliate-redeem header">
+                        <div class="affiliate-redeem header details">
                             [$23303]
                         </div>
                         <form autocomplete="disabled" class="withdraw-details">
@@ -6315,8 +6353,8 @@
                             </div>
 
                             <!-- Bitcoin address input and tip !-->
-                            <div class="affiliate-redeem bitcoin-data hidden">
-                                <div class="affiliate-redeem bitcoin-fill-checkbox hidden">
+                            <div class="affiliate-redeem bitcoin-data">
+                                <div class="affiliate-redeem bitcoin-fill-checkbox">
                                     <div class="checkdiv checkboxOn">
                                         <input type="checkbox" id="affi-bitcoin-fill" />
                                     </div>
@@ -6324,14 +6362,14 @@
                                     <div class="clear"></div>
                                 </div>
                                 <input type="text" class="underlinedText" value="" title="[$23361]" name="affi-bitcoin-address" id="affi-bitcoin-address" />
-                                <div class="affiliate-redeem save-bitcoin-checkbox hidden">
+                                <div class="affiliate-redeem save-bitcoin-checkbox">
                                     <div class="checkdiv checkboxOn">
                                         <input type="checkbox" id="affi-save-bitcoin" />
                                     </div>
                                     <label for="affi-save-bitcoin" class="radio-txt"> [$referral_bitcoin_save] </label>
                                     <div class="clear"></div>
                                 </div>
-                                <div class="affiliate-redeem save-data-tip hidden">
+                                <div class="affiliate-redeem save-data-tip">
                                     <div>[$referral_bitcoin_update]</div>
                                     <div class="right accept">[$78]</div>
                                     <div class="right cancel">[$79]</div>
@@ -6350,57 +6388,17 @@
                 <div class="affiliate-redeem cells left step3 scrollable hidden">
                     <div class="affiliate-redeem cell-content">
                         <div class="affiliate-redeem header">
-                            [$427]
+                            [$23302]
                         </div>
-                        <form class="account-details">
-
-                            <!-- Auto fill checkbox. Please add/remove "hidden" class !-->
-                            <div class="affiliate-redeem auto-fill-checkbox hidden">
-                                <div class="checkdiv checkboxOn">
-                                    <input type="checkbox" id="affi-auto-fill" />
-                                </div>
-                                <label for="affi-auto-fill" class="radio-txt"> [$23305] </label>
-                                <div class="clear"></div>
-                            </div>
-
-                            <input type="text" class="affi-dynamic-acc-input underlinedText template" value="" title="" name="" id="" />
-
-                            <div class="mega-input dropdown-input title-ontop affi-dynamic-acc-select template">
-                                <div class="mega-input-title"></div>
-                                <span></span>
-                                <i class="sprite-fm-mono icon-dropdown"></i>
-                                <div class="mega-input-dropdown hidden"><div class="dropdown-scroll"></div></div>
-                            </div>
-
-                            <div class="affi-dynamic-acc-name">
-                                <input type="text" class="underlinedText" value="" title="[$23362]" name="affi-account-name" id="affi-account-name" />
-                            </div>
-                            <div class="affi-dynamic-acc-type"></div>
-                            <div class="affi-dynamic-acc-info"></div>
-
-                            <!-- Save information checkbox. Please add/remove "hidden" class !-->
-                            <div class="affiliate-redeem save-data-checkbox">
-                                <div class="checkdiv checkboxOff">
-                                    <input type="checkbox" id="affi-save-info" />
-                                </div>
-                                <label for="affi-save-info" class="radio-txt"> [$23306] </label>
-                                <div class="clear"></div>
-                            </div>
-
-                            <!-- Save information green tip. Please add/remove "hidden" class !-->
-                            <div class="affiliate-redeem save-data-tip hidden">
-                                <div>[$23307]</div>
-                                <div class="right accept">[$78]</div>
-                                <div class="right cancel">[$79]</div>
-                                <div class="clear"></div>
-                            </div>
-                        </form>
+                        <div class="affiliate-redeem header">
+                            [$23303]
+                        </div>
                     </div>
                 </div>
 
                 <!-- Step4. Transfer info !-->
                 <div class="affiliate-redeem cells left step4 scrollable hidden">
-                    <div class="affiliate-redeem cell-content">
+                    <div class="affiliate-redeem cell-content bitcoin hidden">
                         <div class="fm-affiliate redeem-data">
                             <span class="strong">[$23308]</span>
                             <span class="method"></span>
@@ -6416,9 +6414,143 @@
                             <span class="strong full-size">[$23310]</span>
                         </div>
                     </div>
+                    <div class="affiliate-redeem cell-content megaquota hidden">
+                        <div class="fm-affiliate redeem-data redeem-data-quota redemption-method-wrapper">
+                            <span class="strong redemption-method redeem-method-quota">[$23302]</span>
+                            <div class="change-method megaquota">
+                                <span class="method"></span>
+                                <div class="affiliate-redeem withdraw-txt">
+                                    <div class="method-chosen"></div>
+                                    <a href="">[$1776]</a>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fm-affiliate redeem-data redeem-data-quota">
+                            <span class="strong full-size">[$23303]</span>
+                            <span class="selected-plan-account full-size">[$redemption_account_plan_for]</span>
+                            <span class="email full-size"></span>
+                            
+                        </div>
+                        <div class="fm-affiliate selected-plan-warning selected-plan-warning1 hidden">
+                            [$redemption_info_higher_plan]
+                        </div>
+                        <div class="fm-affiliate selected-plan-warning selected-plan-warning2 hidden">
+                            [$redemption_info_lower_plan]
+                        </div>
+                        <div class="fm-affiliate selected-plan-warning selected-plan-warning3 hidden">
+                            [$redemption_info_same_plan]
+                        </div>
+                    </div>
                 </div>
 
-                <div class="affiliate-redeem cells right">
+                <!-- MEGAquota redemption step 1: choose plan and duration -->
+                <div class="affiliate-redeem cells left step1 megaquota scrollable hidden">
+                    <div class="affiliate-redeem cell-content-quota">
+                    <!-- <div class="affiliate-redeem cell-content"> -->
+                        <div class="affiliate-redeem plan-selection-wrapper">
+                            <div class="affiliate-redeem header">
+                                [$redemption_plan_selection_title]
+                            </div>
+                            
+                            <!-- Select which mega plan you would like to redeem for -->
+                            <div>
+                                <div class="megaquota-option-template hidden">
+                                    <div class="radioOff green-active megaquota-option-radio">
+                                        <input type="radio" name="plan-redeem-type-lite" class="" value="lite" />
+                                    </div>
+                                    <label for="plan-redeem-type" class="megaquota-option-label radio-txt">
+                                        <div class="meqaquota-option-name">Pro Lite template</div>
+                                        <div class="meqaquota-option-information">2400 GB Storage template / 1TB Transfer template</div>
+                                    </label>
+                                </div>
+                                <div class="megaquota-options-wrapper">
+                                    
+                                </div>
+                                <!-- Duration Dropdown -->
+                                <div class="affiliate-redeem duration-dropdown">
+                                    <div class="templates hidden">
+                                        <div class="save-percent-template">
+                                            <span class="dropdown-item-save">[$redemption_save_16_percent]</span>
+                                        </div>
+                                    </div>
+                                    <div class="mega-input title-ontop dropdown-input redemption-plan-duration" id="affi-redemption-plans">
+                                        <div class="mega-input-title">[$duration]</div>
+                                        <span class="redemption-duration-base redemption-duration-default">
+                                            <span class="dropdown-text"></span>
+                                            <span class="dropdown-item-save hidden">[$redemption_save_16_percent]</span>
+                                        </span>
+                                        <i class="sprite-fm-mono icon-dropdown"></i>
+                                        <div class="mega-input-dropdown hidden"><div class="dropdown-scroll"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steps 2 and 3 are skipped as they are irrelevant to the MEGAquota pro plan redemption -->
+
+
+                <!-- Summary page for if the user is redeeming a pro plan -->
+                <div class="affiliate-redeem cells right megaquota">
+                    <div class="affiliate-redeem summary-wrap">
+                        <div class="affiliate-redeem header">
+                            [$23311]
+                        </div>
+                        <div class="affiliate-redeem summary quota-summary">
+                            <div class="plan-info-header">
+                                <div class="info plan-info-title plan-info-name">
+                                    [$redemption_summary_name]
+                                </div>
+                                <div class="info price pro-plan">
+                                    <span class="plan-info plan-name">Pro Lite Example</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="quota-summary sub-item storage">
+                                <div class="info plan-info-title">
+                                    [$redemption_summary_storage]
+                                </div>
+                                <div class="info price pro-storage">
+                                    <span class="plan-info"></span>
+                                </div>
+                            </div>
+                            <div class="quota-summary sub-item">
+                                <div class="info plan-info-title">
+                                    [$redemption_summary_quota]
+                                </div>
+                                <div class="info price pro-quota">
+                                    <span class="plan-info"></span>
+                                </div>
+                            </div>
+                            <div class="quota-summary sub-item">
+                                <div class="info plan-info-title">
+                                    [$redemption_summary_duration]
+                                </div>
+                                <div class="info price pro-duration">
+                                    <span class="plan-info"></span><span class="euro hidden">------</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="affiliate-redeem amount">
+                            <div class="info">
+                                [$redemption_summary_cost]
+                            </div>
+                            <div class="info price pro-price">
+                                <span class="plan-info">-</span><span class="euro hidden">------</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="affiliate-redeem-quota plan-select-message hidden">
+                    </div>
+                    <div class="affiliate-redeem available-comission available-comission-quota pro-choice-commission">
+                        [$23299]
+                    </div>
+                    <div class="affiliate-redeem local-info">[$estimated_price_text_min_50]</div>
+                </div>
+
+                <div class="affiliate-redeem cells right bitcoin">
                     <div class="affiliate-redeem summary-wrap">
                         <div class="affiliate-redeem header">
                             [$23311]
@@ -6451,16 +6583,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="affiliate-redeem local-info hidden">
-                        [$23315]
-                    </div>
+                    <div class="affiliate-redeem local-info ">[$estimated_price_text_min_50]</div>
                 </div>
             </div>
         </section>
 
         <footer>
             <div class="footer-container space-between">
-                <button class="mega-button prev-btn action hidden">
+                <button class="mega-button prev-btn action ">
                     <div>
                         <i class="sprite-fm-mono icon-arrow-left"></i>
                     </div>
@@ -6475,7 +6605,7 @@
 
     <!-- Dialog: affiliate-request -->
     <!-- Affiliate program redemption request dialog !-->
-    <div class="mega-dialog dialog-template-action affiliate-request hidden"
+    <div class="mega-dialog dialog-template-action affiliate-request bitcoin hidden"
          role="dialog"
          aria-labelledby="affiliate-request-title"
          aria-modal="true">
@@ -6535,6 +6665,59 @@
             </div>
         </footer>
     </div>
+
+    <!-- Affiliate program redemption request dialog for Pro Plan Redemption!-->
+    <div class="mega-dialog dialog-template-action affiliate-request-quota affiliate-request hidden"
+         role="dialog"
+         aria-labelledby="affiliate-request-quota-title"
+         aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <h2 class="affiliate-request-title" id="affiliate-request-quota-title">[$redemption_confirmation_header]</h2>
+        </header>
+
+        <section class="content">
+            <div class="content-block">
+                <div class="plan-name"></div>
+                <div class="info-cells">
+                    <div class="affiliate-request info-cell complete">
+                        <div class="affiliate-request info">
+                            <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+                        </div>
+                        <div class="affiliate-request info-txt plan-storage"></div>
+                    </div>
+                    <div class="affiliate-request info-cell complete">
+                        <div class="affiliate-request info">
+                            <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+                        </div>
+                        <div class="affiliate-request info-txt plan-quota"></div>
+                    </div>
+                    <div class="affiliate-request info-cell complete">
+                        <div class="affiliate-request info">
+                            <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+                        </div>
+                        <div class="affiliate-request info-txt plan-duration"></div>
+                    </div>
+                </div>
+                <div class="affiliate-request info-support">
+                    [$redemption_support_email]
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-container-quota">
+                <button class="mega-button positive">
+                    <span>[$81]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
 
     <div class="mega-dialog dialog-template-action pro-discount hidden"
          role="dialog"

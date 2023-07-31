@@ -348,6 +348,12 @@
             loadingDialog.show();
 
             var req = Object.assign({a: 'affr1'}, affiliateRedemption.requests.first);
+            // var req = Object.assign({a: 'affr1'}, {c: "ZMW", cc: "NZ", m: 0, p: 18});
+            if (affiliateRedemption.requests.first.m === 0) {
+                req = Object.assign({a: 'affr1',
+                                     extra: {al: affiliateRedemption.plan.chosenPlan}},
+                                    affiliateRedemption.requests.first);
+            }
 
             api_req(req, {
                 affiliate: self,
@@ -550,20 +556,23 @@
 
         return this.redemptionHistory.r.filter(function(item) {
 
+            const s = item.hasOwnProperty('state')
+                ? item.state
+                : item.s;
             switch (filter) {
                 case 'processing':
-                    return item.s > 0 && item.s < 4;
+                    return s > 0 && s < 4;
                 case 'complete':
-                    return item.s === 4;
+                    return s === 4 || s === 400;
                 case 'failed':
-                    return item.s > 4;
+                    return s > 4 && s !== 400;
             }
 
             return false;
         });
     };
 
-    AffiliateData.prototype.getRedemptionDetail = function(rid) {
+    AffiliateData.prototype.getRedemptionDetail = function(rid, state) {
 
         var self = this;
 
@@ -586,6 +595,9 @@
 
                     loadingDialog.hide();
 
+                    if (state) {
+                        res[0].state = state;
+                    }
                     if (typeof res === 'object') {
 
                         ctx.affiliate.redemptionHistory.r[redi]

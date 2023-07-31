@@ -1,4 +1,52 @@
 /* TODO: FIX once revamped left/top panes are merged */
+.fm-affiliate .change-method.megaquota {
+    display: flex;
+    flex-direction: row;
+    width: 280px;
+    justify-content: space-between;
+}
+.mega-dialog.affiliate-redeem .megaquota .redeem-data-quota {
+    display: flex;
+    flex-direction: column;
+
+}
+.fm-affiliate.redeem-data.redemption-method-wrapper {
+    padding-top: 1px;
+}
+.fm-affiliate.redeem-data:first-child {
+    display: flex;
+}
+.fm-affiliate.redeem-data span.strong.redeem-method-quota {
+    width: 280px;
+}
+.fm-affiliate.redeem-data span.selected-plan-account {
+    color: var(--text-color-low);
+    padding-bottom: 4px;
+    padding-top: 2px;
+}
+.fm-affiliate.redeem-data-quota span.redeem-method-quota {
+    margin-bottom: 5px;
+}
+.fm-affiliate.redeem-data span.email {
+    font: var(--text-body1);
+    padding-top: 0;
+}
+.fm-affiliate.selected-plan-warning {
+    width: 288px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px 16px;
+    gap: 10px;
+    text-align: center;
+    background-color: var(--banner-background-info);
+    border: 1px solid var(--banner-border-info);
+    border-radius: 4px;
+    color: var(--text-color-info);
+    font: var(--text-body1);
+}
+
 .affiliate-program#fmholder {
     min-width: 600px;
 }
@@ -79,6 +127,7 @@
 .fm-affiliate .columns-wrapper {
     display: flex;
     overflow: hidden;
+    justify-content: center;
 }
 .fm-affiliate .boxes-wrapper {
     display: flex;
@@ -98,12 +147,12 @@
     box-sizing: border-box;
     cursor: pointer;
     display: flex;
-    flex: 1;
     flex-direction: column;
     padding: 0 12px 12px 12px;
     position: relative;
     text-align: center;
     transition: var(--transition-shadow);
+    width: 240px;
 }
 .fm-affiliate .refer-block:hover {
     box-shadow: 1px 1px 10px 1px var(--button-hover);
@@ -128,7 +177,7 @@
     color: var(--secondary-green);
     display: block;
     font: var(--text-body1);
-    padding: 8px 0 10px 0;
+    padding: 28px 0 10px;
 }
 
 /* Comission block */
@@ -299,7 +348,7 @@
     width: 55%;
 }
 .fm-affiliate.redeem-data span.strong {
-    font: var(--text-body1-bold);
+    font: var(--text-h3-bold);
     width: 45%;
 }
 .fm-affiliate.redeem-data span.grey {

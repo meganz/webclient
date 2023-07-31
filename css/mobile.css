@@ -1661,6 +1661,10 @@ ul, li {
     height: 48px;
     background-position: -66px -3476px;
 }
+.mobile.fm-icon.pro-plan {
+    background-position: -57px -757px;
+    background-size: 200px;
+}
 .mobile.fm-icon.red-bank {
     background-position: 9px -3661px;
 }
@@ -12824,9 +12828,6 @@ code, c {
     float: right;
     font-family: 'LatoWebBold', 'source_sans_probold', Arial;
 }
-.mobile.affiliate-redemptions-list .affiliate-transfer .sum {
-    padding: 0;
-}
 .mobile.affiliate-transfer .status {
     display: inline-block;
     font-size: 14px;
@@ -13052,6 +13053,35 @@ code, c {
     text-transform: uppercase;
     position: absolute;
     left: 12px;
+}
+.mobile.affiliate.redeem-body.step1 .redemption-choice-info {
+    font: var(--text-body2);
+    color: var(--text-color-low);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 10px;
+}
+.mobile.affiliate.redeem-body.step1 .redemption-options-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 2px;
+}
+.mobile.affiliate.redeem-body.step1 .commission-wrap .available-commission-local {
+    font: var(--text-body2-bold);
+    color: var(--text-color-success);
+}
+.mobile.affiliate.redeem-body.step1 .commission-wrap .available-commission-euro {
+    font: var(--text-body2);
+    color: var(--text-color-low);
+}
+.mobile.affiliate.redeem-body.step1 .commission-wrap .available-commission{
+    color: var(--text-color-high);
+}
+.mobile.affiliate.redeem-body.step1 .affiliate-bitcoin-org {
+    font: var(--text-body2);
+    padding-left: 12px;
 }
 .mobile.affiliate.redeem-body.step2 .clean-megainputs .mega-input {
     padding: 0;

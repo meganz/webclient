@@ -367,6 +367,11 @@ function bytesToSize(bytes, precision, format) {
         resultUnit = s_b;
     }
 
+    // Format 4 will return bytes to precision, with trailing 0s
+    if (format === 4) {
+        resultSize = parseFloat(resultSize);
+    }
+
     if (window.lang !== 'en') {
         // @todo measure the performance degradation by invoking this here now..
         resultSize = mega.intl.decimal.format(resultSize);
@@ -379,7 +384,7 @@ function bytesToSize(bytes, precision, format) {
     else if (format === 3) {
         return resultSize;
     }
-    else if (format) {
+    else if (format && format !== 4) {
         return '<span>' + resultSize + '</span>' + resultUnit;
     }
     else {

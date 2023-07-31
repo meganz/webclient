@@ -4238,7 +4238,7 @@
     "redemption_confirmation_pro_plan_name": "Vous profitez d\u2019un abonnement %1. Voici vos d\u00e9tails\u00a0:",
     "redemption_confirmation_pro_storage": "%1 de quota d\u2019espace de stockage",
     "redemption_confirmation_pro_transfer": "%1 de quota de transfert",
-    "redemption_cost_too_low": "Your selected plan value is lower than the minimum \u20ac50 required to redeem. Select a higher plan value to continue redemption.",
+    "redemption_cost_too_low": "Your chosen plan duration costs less than the minimum \u20ac50 required to redeem. Choose a higher plan or duration to continue commission redemption.",
     "redemption_info_higher_plan": "L\u2019abonnement que vous avez choisi diff\u00e8re de votre abonnement actuel. Si vous confirmez votre achat, l\u2019abonnement achet\u00e9 commencera imm\u00e9diatement. Votre abonnement actuel reprendra \u00e0 l\u2019expiration de l\u2019abonnement achet\u00e9.",
     "redemption_info_lower_plan": "L\u2019abonnement que vous avez choisi diff\u00e8re de votre abonnement actuel. Si vous confirmez votre achat, l\u2019abonnement achet\u00e9 commencera apr\u00e8s expiration de votre abonnement actuel.",
     "redemption_info_same_plan": "Si vous confirmez votre achat, l\u2019abonnement achet\u00e9 d\u00e9butera apr\u00e8s expiration de votre abonnement actuel.",

@@ -4238,7 +4238,7 @@
     "redemption_confirmation_pro_plan_name": "Anda berada di paket %1. Detail anda adalah:",
     "redemption_confirmation_pro_storage": "%1 dari kuota penyimpanan",
     "redemption_confirmation_pro_transfer": "%1 dari kuota pemindahan",
-    "redemption_cost_too_low": "Your selected plan value is lower than the minimum \u20ac50 required to redeem. Select a higher plan value to continue redemption.",
+    "redemption_cost_too_low": "Your chosen plan duration costs less than the minimum \u20ac50 required to redeem. Choose a higher plan or duration to continue commission redemption.",
     "redemption_info_higher_plan": "Paket yang anda pilih berbeda dengan paket anda saat ini. Jika anda mengonfirmasi pembelian, paket yang anda beli akan segera dimulai. Paket anda saat ini akan dilanjutkan setelah paket yang anda beli kedaluwarsa.",
     "redemption_info_lower_plan": "Paket yang anda pilih berbeda dengan paket anda saat ini. Jika anda mengonfirmasi pembelian, paket yang anda beli akan dimulai setelah paket anda saat ini kedaluwarsa.",
     "redemption_info_same_plan": "Jika anda mengonfirmasi pembelian, paket yang anda beli akan dimulai setelah paket anda saat ini kedaluwarsa.",

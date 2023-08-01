@@ -1347,14 +1347,13 @@ lazy(mega, 'keyMgr', () => {
         async setUsedNewShareKey(node) {
             this.removeShareSnapshot(node);
 
-            if (!this.trustedsharekeys[node]) {
+            if (!this.trustedsharekeys[node]
+                || this.trustedsharekeys[node] & 2) {
+
                 return;
             }
 
             do {
-                if (this.trustedsharekeys[node] & 2) {
-                    break;
-                }
 
                 this.trustedsharekeys[node] |= 2;
             }
@@ -1369,10 +1368,12 @@ lazy(mega, 'keyMgr', () => {
 
             logger.warn(`Out-Share ${node} revoked, cleaning bit 1 flag...`);
 
+            if (!(this.trustedsharekeys[node] & 2)) {
+                logger.warn('... the flag was not set, though.');
+                return;
+            }
+
             do {
-                if (!(this.trustedsharekeys[node] & 2)) {
-                    break;
-                }
 
                 this.trustedsharekeys[node] &= ~2;
             }

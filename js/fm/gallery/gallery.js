@@ -1224,6 +1224,7 @@ class MegaGallery {
         const galleryHeader = $('.gallery-tabs-bl', rfBlock);
 
         galleryHeader.removeClass('hidden');
+        $('.gallery-section-tabs', galleryHeader).toggleClass('hidden', M.currentdirid === 'favourites');
         rfBlock.removeClass('hidden');
         $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-right-header, .fm-empty-section', rfBlock).addClass('hidden');
         $('.fm-files-view-icon').removeClass('active').filter('.media-view').addClass('active');

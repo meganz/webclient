@@ -1629,6 +1629,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l.redemption_support_email = escapeHTML(l.redemption_support_email)
         .replace('[S]', '<span>').replace('[/S]', '</span>');
+    l.estimated_price_text_min_50 = escapeHTML(l.estimated_price_text_min_50)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
 
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,

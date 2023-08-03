@@ -372,7 +372,7 @@ mBroadcaster.once('boot_done', function radSetup() {
     localStorage.d = d |= 1;
     localStorage.minLogLevel |= 0;
 
-    if (Date.now() < 167198e7) {
+    if (Date.now() < 173e10) {
         localStorage.chatdLogger = 1;
     }
     else if (d) {
@@ -420,7 +420,7 @@ mBroadcaster.once('boot_done', function radSetup() {
                     value = `Array[${value.map(stringify).join(';')}]`;
                 }
                 else if (name === 'Object') {
-                    let max = 7;
+                    let max = 15;
                     const srz = [];
                     for (const p in value) {
                         if (!--max) {

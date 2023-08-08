@@ -3728,6 +3728,9 @@ lazy(mega.gallery, 'albums', () => {
                 const albumCell = this.prepareAlbumCell(albumKeys[i]);
 
                 if (albumCell) {
+                    if (albumCell.el.classList.contains('ui-selected')) {
+                        albumCell.el.classList.remove('ui-selected');
+                    }
                     this.el.append(albumCell.el);
                     albumsCount++;
 

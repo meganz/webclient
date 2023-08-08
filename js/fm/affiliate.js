@@ -2800,7 +2800,28 @@ affiliateUI.purchaseIndex = {
         this.$purchaseChartBlock = $('.mega-data-box.purchase', affiliateUI.$body);
 
         this.count();
-        this.drawChart();
+    },
+
+    getPlans: function(updatePurchaseIndex) {
+
+        'use strict';
+
+        // Set r: 1 so that pro-lite will also be shown
+        const payload = {a: 'utqa', nf: 2, p: 1, r: 1};
+        api_req(payload, {
+            callback: function(results) {
+
+                const plans = [];
+
+                for (var i = 1; i < results.length; i++) {
+                    plans.push([
+                        results[i].id,
+                        results[i].al,
+                    ]);
+                }
+                updatePurchaseIndex(plans);
+            }
+        });
     },
 
     /**
@@ -2820,45 +2841,53 @@ affiliateUI.purchaseIndex = {
         this.monthCount = 0;
         this.countedData = {};
 
-        pro.membershipPlans.forEach(function(item) {
-            proPlanIDMap[item[0]] = item[1];
-        });
+        const updatePurchaseIndex = (plans) => {
 
-        creditList.forEach(function(item) {
-            if (thisMonth.start <= item.gts && item.gts <= thisMonth.end) {
-                self.monthCount++;
-            }
+            plans.forEach((item) => {
+                proPlanIDMap[item[0]] = item[1];
+            });
 
-            const index = proPlanIDMap[item.si];
-            if (item.b && index !== 101) {
-                self.countedData.b = ++self.countedData.b || 1;
-            }
-            else {
-                self.countedData[index] = ++self.countedData[index] || 1;
-            }
-        });
+            creditList.forEach((item) => {
+                if (thisMonth.start <= item.gts && item.gts <= thisMonth.end) {
+                    self.monthCount++;
+                }
 
-        $('.affiliate-total-pur', this.$purchaseChartBlock).text(this.totalCount);
-        $('.charts-head .compare span', this.$purchaseChartBlock).text(this.monthCount);
+                const index = proPlanIDMap[item.si];
+                if (item.b && index !== 101) {
+                    self.countedData.b = ++self.countedData.b || 1;
+                }
+                else {
+                    self.countedData[index] = ++self.countedData[index] || 1;
+                }
+            });
 
-        $('.list-item.prol .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData[4] / this.totalCount || 0));
-        $('.list-item.prol .num', this.$purchaseChartBlock).text(this.countedData[4] || 0);
-        $('.list-item.pro1 .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData[1] / this.totalCount || 0));
-        $('.list-item.pro1 .num', this.$purchaseChartBlock).text(this.countedData[1] || 0);
-        $('.list-item.pro2 .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData[2] / this.totalCount || 0));
-        $('.list-item.pro2 .num', this.$purchaseChartBlock).text(this.countedData[2] || 0);
-        $('.list-item.pro3 .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData[3] / this.totalCount || 0));
-        $('.list-item.pro3 .num', this.$purchaseChartBlock).text(this.countedData[3] || 0);
-        $('.list-item.pro101 .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData[101] / this.totalCount || 0));
-        $('.list-item.pro101 .num', this.$purchaseChartBlock).text(this.countedData[101] || 0);
-        $('.list-item.business .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData.b / this.totalCount || 0));
-        $('.list-item.business .num', this.$purchaseChartBlock).text(this.countedData.b || 0);
+            $('.affiliate-total-pur', this.$purchaseChartBlock).text(this.totalCount);
+            $('.charts-head .compare span', this.$purchaseChartBlock).text(this.monthCount);
+
+            $('.list-item.prol .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData[4] / this.totalCount || 0));
+            $('.list-item.prol .num', this.$purchaseChartBlock).text(this.countedData[4] || 0);
+            $('.list-item.pro1 .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData[1] / this.totalCount || 0));
+            $('.list-item.pro1 .num', this.$purchaseChartBlock).text(this.countedData[1] || 0);
+            $('.list-item.pro2 .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData[2] / this.totalCount || 0));
+            $('.list-item.pro2 .num', this.$purchaseChartBlock).text(this.countedData[2] || 0);
+            $('.list-item.pro3 .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData[3] / this.totalCount || 0));
+            $('.list-item.pro3 .num', this.$purchaseChartBlock).text(this.countedData[3] || 0);
+            $('.list-item.pro101 .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData[101] / this.totalCount || 0));
+            $('.list-item.pro101 .num', this.$purchaseChartBlock).text(this.countedData[101] || 0);
+            $('.list-item.business .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData.b / this.totalCount || 0));
+            $('.list-item.business .num', this.$purchaseChartBlock).text(this.countedData.b || 0);
+
+            affiliateUI.purchaseIndex.drawChart();
+        };
+
+        // Needs to use a version of the membership plans that includes the pro-lite plan
+        affiliateUI.purchaseIndex.getPlans(updatePurchaseIndex);
     },
 
     /**

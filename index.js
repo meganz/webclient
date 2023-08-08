@@ -2472,21 +2472,22 @@ function topmenuUI() {
             megaChat._renderMyStatus();
         }
 
-        // if this is a business account sub-user
+        // if this is a business account
         if (u_attr && u_attr.b) {
             $menuLoggedBlock.addClass('business-acc');
+            $menuUpgradeAccount.addClass('hidden');
 
             if (u_attr.b.s !== -1) {
 
                 $headerAchievements.addClass('hidden');
-                $menuUpgradeAccount.addClass('hidden');
 
                 // Hide Pricing menu item for Business sub accounts and admin expired
                 $menuPricingItem.addClass('hidden');
             }
             document.body.classList.add('business-user');
 
-            // If Business Expired or in Grace Period, show the Reactive button
+            // If Business Expired or in Grace Period, and this is the business master account,
+            // show the Reactivate button
             if (u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED) {
                 if (is_mobile) {
                     $('.upgrade-your-account', $topMenu).text(l.reactivate_account_short);
@@ -2494,6 +2495,7 @@ function topmenuUI() {
                 else {
                     $('.upgrade-your-account span', $topMenu).text(l.reactivate_account_short);
                 }
+                $menuUpgradeAccount.removeClass('hidden');
             }
         }
         else {

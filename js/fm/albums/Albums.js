@@ -4637,6 +4637,10 @@ lazy(mega.gallery, 'albums', () => {
                 }
             }
 
+            if (this.tree && this.tree.treeList.children.length > 0) {
+                this.tree.clear();
+            }
+
             this.setPredefinedAlbums(nodesArr);
             await this.setUserAlbums();
 

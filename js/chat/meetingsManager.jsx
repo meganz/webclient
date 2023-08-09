@@ -642,6 +642,16 @@ class MeetingsManager {
                             l.schedule_recur_time_fifth_day_month_4_cont, // Friday
                             l.schedule_recur_time_fifth_day_month_5_cont, // Saturday
                         ],
+                    ],
+                    last: [
+                        /* `Last Sunday of every # month(s) effective %3 from %1 to %2` */
+                        l.schedule_recur_time_fifth_day_month_6_cont,
+                        l.schedule_recur_time_fifth_day_month_0_cont, // Monday
+                        l.schedule_recur_time_fifth_day_month_1_cont, // Tuesday
+                        l.schedule_recur_time_fifth_day_month_2_cont, // Wednesday
+                        l.schedule_recur_time_fifth_day_month_3_cont, // Thursday
+                        l.schedule_recur_time_fifth_day_month_4_cont, // Friday
+                        l.schedule_recur_time_fifth_day_month_5_cont, // Saturday
                     ]
                 },
                 limited: {
@@ -698,6 +708,16 @@ class MeetingsManager {
                             l.schedule_recur_time_fifth_day_month_4, // Friday
                             l.schedule_recur_time_fifth_day_month_5, // Saturday
                         ],
+                    ],
+                    last: [
+                        /* `Last Sunday of every # month(s) effective %3 until %4 from %1 to %2` */
+                        l.schedule_recur_time_last_day_month_6,
+                        l.schedule_recur_time_last_day_month_0, // Monday
+                        l.schedule_recur_time_last_day_month_1, // Tuesday
+                        l.schedule_recur_time_last_day_month_2, // Wednesday
+                        l.schedule_recur_time_last_day_month_3, // Thursday
+                        l.schedule_recur_time_last_day_month_4, // Friday
+                        l.schedule_recur_time_last_day_month_5, // Saturday
                     ]
                 }
             },
@@ -793,7 +813,10 @@ class MeetingsManager {
         else if (month) {
             // What position in the month, the day of the occurrence, how many months apart
             const { count, occur } = month;
-            string = mega.icu.format(recur.monthly[occurrenceEnd].pos[count][occur], interval);
+            string =
+                count < 0
+                    ? mega.icu.format(recur.monthly[occurrenceEnd].last[occur], interval)
+                    : mega.icu.format(recur.monthly[occurrenceEnd].pos[count][occur], interval);
             return string
                 .replace('%1', toLocaleTime(startTime))
                 .replace('%2', toLocaleTime(endTime))

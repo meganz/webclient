@@ -3728,6 +3728,9 @@ lazy(mega.gallery, 'albums', () => {
                 const albumCell = this.prepareAlbumCell(albumKeys[i]);
 
                 if (albumCell) {
+                    if (albumCell.el.classList.contains('ui-selected')) {
+                        albumCell.el.classList.remove('ui-selected');
+                    }
                     this.el.append(albumCell.el);
                     albumsCount++;
 
@@ -4635,6 +4638,10 @@ lazy(mega.gallery, 'albums', () => {
                 if (!filterFn) {
                     delete this.store[id];
                 }
+            }
+
+            if (this.tree && this.tree.treeList.children.length > 0) {
+                this.tree.clear();
             }
 
             this.setPredefinedAlbums(nodesArr);

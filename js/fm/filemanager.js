@@ -4484,7 +4484,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.gallery-view').addClass('hidden');
     }
 
-    if (M.previousdirid && M.isAlbumsPage(0, M.previousdirid)) {
+    if (M.previousdirid && M.isAlbumsPage(0, M.previousdirid)
+        || !$('#albums-view', $('.fm-right-files-block')).hasClass('hidden')) {
         if (M.isGalleryPage()) {
             mega.gallery.albums.disposeInteractions();
         }
@@ -4492,7 +4493,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             mega.gallery.albums.grid.clear();
         }
         else {
-            $('.albums-view', $('.fm-right-files-block')).addClass('hidden');
+            $('#albums-view', $('.fm-right-files-block')).addClass('hidden');
 
             if (mega.gallery.albums) {
                 mega.gallery.albums.disposeAll();

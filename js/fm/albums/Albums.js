@@ -98,6 +98,9 @@ lazy(mega.gallery, 'albums', () => {
      */
     let pendingName = '';
 
+    let tmpMv = [];
+    let previewMvLength = 0;
+
     /**
      * Checking whether an event is being dispatched with Ctrl key in hold
      * @param {Event} evt Event object to check
@@ -704,8 +707,9 @@ lazy(mega.gallery, 'albums', () => {
                 }
             }
 
-            const tmp = M.v;
+            tmpMv = M.v;
             M.v = [...album.nodes];
+            previewMvLength = M.v.length;
 
             slideshow(firstNode, false);
 
@@ -745,7 +749,7 @@ lazy(mega.gallery, 'albums', () => {
                 }
 
                 mBroadcaster.once('slideshow:close', () => {
-                    M.v = tmp;
+                    M.v = tmpMv;
                     const selCount = Object.keys(selHandles).length;
                     const is_timeline = scope.albums.grid && scope.albums.grid.timeline;
                     // double click will mess _selCount, so we need to reset here
@@ -3486,7 +3490,12 @@ lazy(mega.gallery, 'albums', () => {
                 delete this.timeline;
             }
 
-            if (M.v.length) {
+            let mvLength = M.v.length;
+            if (slideshowid) {
+                mvLength = tmpMv.length - (previewMvLength - M.v.length);
+            }
+
+            if (mvLength) {
                 this.updateGridState(0, false);
 
                 this.addEmptyBlock(new AlbumsEmpty(

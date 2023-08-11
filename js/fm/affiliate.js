@@ -267,9 +267,11 @@ affiliateUI.referralUrlDialog = {
         if (is_extension || M.execCommandUsable()) {
             $copyBtn.removeClass('hidden');
             $copyBtn.rebind('click.copy-to-clipboard', function() {
-                var links = $.trim($urlBlock.text());
-                var toastTxt = l[7654];
-                copyToClipboard(links, toastTxt);
+                if (!$copyBtn.hasClass('disabled')){
+                    const links = $.trim($urlBlock.text());
+                    const toastTxt = l[7654];
+                    copyToClipboard(links, toastTxt);
+                }
             });
         }
         else {
@@ -350,14 +352,17 @@ affiliateUI.referralUrlDialog = {
 
         var targetPage = $('.page-names .active', this.$dialog).data('page');
         var $urlBlock = $('.url', this.$dialog);
+        const $copyBtn = $('.copy-button', this.$dialog);
 
         $('.custom-block', this.$dialog).removeClass('error');
 
         if (clear) {
             $urlBlock.empty();
             $('.url-input', this.$dialog).val('');
+            $copyBtn.addClass('disabled');
             return Promise.resolve();
         }
+        $copyBtn.removeClass('disabled');
 
         if (targetPage === 'start') {
             targetPage = '';

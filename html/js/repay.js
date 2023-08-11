@@ -215,7 +215,10 @@ RepayPage.prototype.initPage = function() {
                         </div></div>`;
 
         if (!list.length) {
-            return failureExit(l[20431]);
+            if (u_attr.b) {
+                return failureExit(l[20431]);
+            }
+            return failureExit(l.no_payment_providers);
         }
 
         let paymentGatewayToAdd = '';

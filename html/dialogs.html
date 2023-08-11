@@ -1883,7 +1883,7 @@
         <header>
             <!-- Or [$8734] for multiple links !-->
             <h2 class="get-link" id="export-links-title">
-                [$59]
+                [$share_link]
             </h2>
 
             <h2 class="embed-header">
@@ -1894,60 +1894,65 @@
         <section class="content">
             <div class="content-block links-content">
                 <div class="options">
-                    <div class="key">
-                        <div class="checkdiv checkboxOff">
-                            <input type="checkbox" name="export-keys-opt" id="export-keys-opt">
-                        </div>
+                    <div class="key export-keys-separately-block">
                         <label for="export-keys-opt" class="radio-txt">
-                            [$23620]
+                            [$send_decryption_key_separately]
                         </label>
-
-                        <div class="rounded-tip-button">
-                            <i class="sprite-fm-theme icon-question-grey"></i>
-                            <div class="dropdown body dropdown-arrow down-arrow keys-tip">
-                                <i class="dropdown-white-arrow"></i>
-                                <div class="illustration sprite-fm-illustration img-dialog-decryption-key"></div>
-                                <div class="tip-header">
-                                    [$1028]
-                                </div>
-                                <div class="tip-text">
-                                    [$23621]
-                                </div>
-                                <a href="[$mega_help_host]/files-folders/sharing/encrypted-links" target="_blank" rel="noopener noreferrer" class="tip-link">[$8742]</a>
-                            </div>
+                        <a href="[$mega_help_host]/files-folders/sharing/encrypted-links" target="_blank" rel="noopener noreferrer" class="learn-more-text">[$8742]</a>
+                        <div class="mega-switch toggle-off export-keys-switch js-export-keys-switch" id="export-keys-opt">
+                            <div class="mega-feature-switch no-trans-init"></div>
                         </div>
                         <div class="clear"></div>
                     </div>
 
-                    <div class="pro">
-                        <div class="half-sized-block">
-                            <div class="sub-header expiry">
-                                <span class="info">[$23622]</span> <span class="pro-only-feature">[$8695]</span>
-                            </div>
-                            <div class="expiry-container">
-                                <button class="mega-button expiry">
-                                    <span class="label">[$8953]</span>
+                    <div class="content-block links-content links alt-background">
+                        <!-- Please use "separately" classname if its available to copy keys separately !-->
+                        <div class="links-scroll"></div>
+                        <div class="links-scroll-overlays"></div>
+                        <div class="update-success-banner js-update-success-banner hidden">[$links_updated_copy_again]</div>
+                    </div>
 
-                                </button>
-                                <input type="text" class="set-date common" value="" />
+                    <div class="pro">
+                        <div class="pro-section-header">
+                            <div class="pro-header-text">[$link_access]</div>
+                            <div class="link-access-text js-link-access-text">[$link_access_explainer]</div>
+                        </div>
+                        <div class="pro-feature-block first-feature-block">
+                            <div class="sub-header">
+                                <span class="info">[$expiry_date]</span> <span class="pro-only-feature">[$8695]</span>
                             </div>
-                            <button class="mega-button square remove-date hidden">
-                                <div>
-                                    <i class="sprite-fm-mono icon-close-component"></i>
+                            <div class="mega-switch toggle-off expiry-switch js-expiry-switch" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch no-trans-init sprite-fm-mono-after icon-minimise-after"></div>
+                            </div>
+                            <div class="expiry-container hidden">
+                                <div class="mega-input datepicker-input">
+                                    <input type="text" name="share-link-expiry-datepicker" class="dialog-input set-date" autocomplete="off" placeholder="[$8953]" value="">
+                                    <i class="sprite-fm-mono icon-calendar2 js-datepicker-calendar-icon"></i>
                                 </div>
-                            </button>
+                            </div>
                             <div class="clear"></div>
                         </div>
-                        <div class="half-sized-block">
+                        <div class="pro-feature-block">
                             <div class="sub-header">
-                                <span class="info">[$23623]</span> <span class="pro-only-feature">[$8695]</span>
+                                <span class="info">[$17454]</span> <span class="pro-only-feature">[$8695]</span>
                             </div>
-                            <button class="mega-button password">
-                                <span>[$17454]</span>
-                            </button>
-                            <button class="mega-button remove hidden">
-                                <span>[$83]</span>
-                            </button>
+                            <div class="mega-switch toggle-off password-switch js-password-switch" role="switch" aria-checked="false" tabindex="1">
+                                <div class="mega-feature-switch no-trans-init sprite-fm-mono-after icon-minimise-after"></div>
+                            </div>
+                            <div class="password-container hidden">
+                                <div class="mega-input with-icon good1 valued">
+                                    <input class="underlinedText with-icon enter-pass megaInputs js-password-input" type="password" placeholder="[$9074]" data-icon="sprite-fm-mono icon-lock">
+                                    <div class="message-container mega-banner"></div>
+                                    <i class="sprite-fm-mono icon-eye-reveal toggle-password-visible js-toggle-password-visible"></i>
+                                    <div class="strength-indicator js-strength-indicator"></div>
+                                    <div class="error-text-block hidden"></div>
+                                </div>
+                                <div class="clear"></div>
+                                <button class="mega-button positive confirm-password js-confirm-password">
+                                    <span>[$870]</span>
+                                </button>
+                                <a href="#" class="reset-password js-reset-password hidden">[$737]</a>
+                            </div>
                             <div class="clear"></div>
                         </div>
                         <div class="clear"></div>
@@ -1974,12 +1979,6 @@
                         <span>[$6821]</span>
                     </div>
                 </div>
-            </div>
-
-            <div class="content-block links-content links alt-background">
-                <!-- Please use "separately" classname if its availbable to copy keys separately !-->
-                <div class="links-scroll"></div>
-                <div class="links-scroll-overlays"></div>
             </div>
 
             <!-- Embed code block - Hidden unless it is selected from the context menu via Embed video or when the tab is selected !-->
@@ -2072,19 +2071,34 @@
 
         <footer class="alt-background">
             <div class="footer-container links-footer">
-                <button class="mega-button positive copy links">
-                    <span>[$20840]</span>
-                </button>
-                <button class="mega-button positive copy keys hidden">
-                    <span>[$23624]</span>
-                </button>
-
+                <div class="left-block">
+                    <div class="remove-link-button-container js-remove-link-button">
+                        <i class="sprite-fm-mono icon-link-remove"></i>
+                        <a href="#" class="remove-link-text"></a>
+                    </div>
+                </div>
+                <div class="right-block">
+                    <button class="mega-button positive copy links">
+                        <span>[$23625]</span>
+                    </button>
+                    <button class="mega-button positive copy keys">
+                        <span>[$23624]</span>
+                    </button>
+                </div>
             </div>
 
             <div class="footer-container embed-footer hidden">
-                <button class="mega-button positive copy links">
-                    <span>[$17408]</span>
-                </button>
+                <div class="left-block">
+                    <div class="remove-link-button-container js-remove-link-button">
+                        <i class="sprite-fm-mono icon-link-remove"></i>
+                        <a href="#" class="remove-link-text"></a>
+                    </div>
+                </div>
+                <div class="right-block">
+                    <button class="mega-button positive copy links">
+                        <span>[$17408]</span>
+                    </button>
+                </div>
             </div>
         </footer>
     </div>
@@ -2119,7 +2133,7 @@
                     <input class="underlinedText with-icon enter-pass" type="password" placeholder="[$9074]" data-icon="sprite-fm-mono icon-lock" />
                     <div class="set-password-dialog strength"></div>
                     <div class="retype">
-                        <input class="underlinedText with-icon confirm-pass" type="password" placeholder="[$1114]" data-icon="sprite-fm-mono icon-lock-2" />
+                        <input class="underlinedText with-icon confirm-pass" type="password" placeholder="[$870]" data-icon="sprite-fm-mono icon-lock-2" />
                     </div>
                 </div>
             </div>
@@ -6232,7 +6246,7 @@
                     <span class="dropdown-item-text"></span>
                     <div class="dropdown-item-save hidden"></div>
                 </div>
-                
+
             </div>
          </div>
 
@@ -6299,7 +6313,7 @@
                             </div>
                         </div>
 
-                        <div class="affiliate-redeem bitcoin-redemption-amount-wrapper">  
+                        <div class="affiliate-redeem bitcoin-redemption-amount-wrapper">
                             <div class="affiliate-redeem header">
                                 [$23297]
                             </div>
@@ -6430,7 +6444,7 @@
                             <span class="strong full-size">[$23303]</span>
                             <span class="selected-plan-account full-size">[$redemption_account_plan_for]</span>
                             <span class="email full-size"></span>
-                            
+
                         </div>
                         <div class="fm-affiliate selected-plan-warning selected-plan-warning1 hidden">
                             [$redemption_info_higher_plan]
@@ -6452,7 +6466,7 @@
                             <div class="affiliate-redeem header">
                                 [$redemption_plan_selection_title]
                             </div>
-                            
+
                             <!-- Select which mega plan you would like to redeem for -->
                             <div>
                                 <div class="megaquota-option-template hidden">
@@ -6465,7 +6479,7 @@
                                     </label>
                                 </div>
                                 <div class="megaquota-options-wrapper">
-                                    
+
                                 </div>
                                 <!-- Duration Dropdown -->
                                 <div class="affiliate-redeem duration-dropdown">

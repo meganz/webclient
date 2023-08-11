@@ -483,7 +483,7 @@ var mobile = {
         // Make sure the library is loaded
         if (typeof zxcvbn === 'undefined') {
 
-            // Show loading spinner
+            // Show loading spinner (for mobile web)
             var $loader = $page.find('.estimator-loading-icon').addClass('loading');
 
             // On completion of loading, hide the loading spinner

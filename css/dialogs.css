@@ -2004,6 +2004,28 @@ body.de .mega-dialog.contact-picker-widget {
     .de .mega-dialog.export-links-dialog {
         width: 760px;
     }
+    .mega-dialog.export-links-dialog .alt-background {
+        background: var(--surface-main);
+    }
+    .theme-dark .mega-dialog.export-links-dialog .alt-background {
+        background: inherit;
+    }
+    .mega-dialog.export-links-dialog .content-block {
+        padding: 0;
+    }
+    .mega-dialog.export-links-dialog .export-keys-separately-block {
+        padding: 0 48px;
+    }
+    .mega-dialog.export-links-dialog .learn-more-text {
+        color: #2ba6de;
+        cursor: pointer;
+        display: inline-block;
+        text-decoration: underline;
+        vertical-align: middle;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .learn-more-text {
+        color: #6fd7ff;
+    }
     .mega-dialog.export-links-dialog .settings-row .info-icon {
         vertical-align: middle;
         display: inline-block;
@@ -2020,6 +2042,9 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.export-links-dialog .half-sized-block,
     .mega-dialog.export-links-dialog .half-sized-block:first-child {
         padding: 0;
+    }
+    .mega-dialog.export-links-dialog.embed .embed-content {
+        padding: 0 48px;
     }
     .mega-dialog.export-links-dialog.embed header {
         display: block;
@@ -2043,17 +2068,17 @@ body.de .mega-dialog.contact-picker-widget {
         opacity: 1;
     }
     .mega-dialog.export-links-dialog.embed .options {
-        padding-top: 10px;
+        padding-top: 16px;
     }
     .mega-dialog.export-links-dialog .links-content .options {
         margin-bottom: 24px;
     }
-    .mega-dialog.export-links-dialog .checkdiv.disabled,
-    .export-links-dialog .checkdiv.disabled + label {
+    .mega-dialog.export-links-dialog .export-keys-switch.disabled,
+    .mega-dialog.export-links-dialog .export-keys-switch.disabled + label {
         opacity: 0.6;
         cursor: default;
     }
-    .mega-dialog.export-links-dialog .checkdiv.disabled input {
+    .mega-dialog.export-links-dialog .export-keys-switch.disabled {
         cursor: default;
     }
     .mega-dialog.export-links-dialog .rounded-tip-button {
@@ -2106,9 +2131,66 @@ body.de .mega-dialog.contact-picker-widget {
         cursor: pointer;
         position: relative;
     }
+    .mega-dialog.export-links-dialog .update-success-banner {
+        background: rgba(43, 166, 222, 0.1);
+        border: 1px solid rgba(43, 166, 222, 0.5);
+        border-radius: 4px;
+        color: #299cd1;
+        margin: 0 48px 28px;
+        padding: 2px 16px;
+        text-align: center;
+    }
     .mega-dialog.export-links-dialog .pro {
-        padding: 38px 0 0;
+        background: #fff;
+        border: 2px solid #eee;
+        border-radius: 12px;
+        margin: 20px 48px 0;
         position: relative;
+    }
+    .mega-dialog.export-links-dialog .pro.disabled {
+        opacity: 1;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .pro {
+        background: #333;
+        border-color: #444;
+    }
+    .mega-dialog.export-links-dialog .pro-section-header {
+        background: #fafafa;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        padding: 16px;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .pro-section-header {
+        background: #444;
+    }
+    .mega-dialog.export-links-dialog .pro-header-text {
+        display: inline-block;
+        color: var(--text-color-higher);
+        font: var(--text-body1-bold);
+        font-size: 14px;
+        line-height: 20px;
+        width: 35%;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .pro-header-text {
+        color: #fff;
+    }
+    .mega-dialog.export-links-dialog .link-access-text {
+        color: #2ba6de;
+        display: inline-block;
+        font: var(--text-body1-bold);
+        font-size: 14px;
+        line-height: 20px;
+        text-align: right;
+        width: 64%;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .link-access-text {
+        color: #6fd7ff;
+    }
+    .mega-dialog.export-links-dialog .pro-feature-block {
+        padding: 0 16px 16px;
+    }
+    .mega-dialog.export-links-dialog .pro-feature-block.first-feature-block {
+        padding-top: 16px;
     }
     .mega-dialog.export-links-dialog .pro.disabled::before {
         content: '';
@@ -2127,37 +2209,221 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.export-links-dialog .pro-only-feature {
         color: var(--text-color-error);
+        font-size: 14px;
+        line-height: 20px;
+        border: 1px solid var(--text-color-error);
         display: none;
+        padding: 3px 6px;
+        margin-left: 5px;
     }
     .mega-dialog.export-links-dialog .disabled .pro-only-feature {
         display: inline;
     }
-    .mega-dialog.export-links-dialog .pro .expiry-container {
+    .mega-dialog.export-links-dialog .pro .password-container {
+        float: right;
+    }
+    .mega-dialog.export-links-dialog .pro-feature-block .mega-input {
+        width: 284px;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .pro-feature-block .mega-input {
+        background: #000;
+    }
+    .mega-dialog.export-links-dialog .expiry-container input,
+    .mega-dialog.export-links-dialog .password-container input {
+        width: 284px;
+    }
+    .mega-dialog.export-links-dialog .password-container .mega-input {
         position: relative;
-        display: inline-block;
-        margin-top: 15px;
+    }
+    .mega-dialog.export-links-dialog .expiry-container .datepicker-input,
+    .mega-dialog.export-links-dialog .password-container .mega-input {
+        border: 1px solid var(--light-mode-surfaces-grey-2, #eee);
+        border-radius: 4px;
+    }
+    .mega-dialog.export-links-dialog .expiry-container .datepicker-input:focus-within,
+    .mega-dialog.export-links-dialog .password-container .mega-input:focus-within {
+        border: 1px solid #2ba6de;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .expiry-container .datepicker-input,
+    .theme-dark .mega-dialog.export-links-dialog .password-container .mega-input {
+        border: none;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .expiry-container .datepicker-input:focus-within,
+    .theme-dark .mega-dialog.export-links-dialog .password-container .mega-input:focus-within {
+        border: 1px solid #2ba6de;
+    }
+    .mega-dialog.export-links-dialog .toggle-password-visible {
+        opacity: 0.7;
+        margin-right: 1px;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .toggle-password-visible {
+        opacity: 1;
+    }
+    .mega-dialog.export-links-dialog .strength-indicator {
+        background-color: green;
+        border-radius: 12px;
+        color: white;
+        font-size: 14px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 10px;
+        position: absolute;
+        right: 30px;
+        top: 5px;
+        z-index: 12;
+    }
+    .mega-dialog.export-links-dialog .strength-indicator:empty {
+        display: none;
+    }
+    .mega-dialog.export-links-dialog .good1 .strength-indicator {
+        background-color: var(--password-status-veryweak);
+    }
+    .mega-dialog.export-links-dialog .good2 .strength-indicator {
+        background-color: var(--password-status-weak);
+    }
+    .mega-dialog.export-links-dialog .good3 .strength-indicator {
+        background-color: var(--password-status-medium);
+    }
+    .mega-dialog.export-links-dialog .good4 .strength-indicator {
+        background-color: var(--password-status-good);
+    }
+    .mega-dialog.export-links-dialog .good5 .strength-indicator {
+        background-color: var(--password-status-strong);
+    }
+    .mega-dialog.export-links-dialog .password-container .mega-input::before {
+        border: none;
+    }
+    .mega-dialog.export-links-dialog .mega-button.confirm-password {
+        font-size: 14px;
+        float: right;
+        line-height: 20px;
+        margin-top: 16px;
+        min-height: initial;
+        padding: 0;
+    }
+    .mega-dialog.export-links-dialog .mega-button.confirm-password span {
+        line-height: 20px;
+        padding: 2px;
+    }
+    .mega-dialog.export-links-dialog .reset-password {
+        color: #333;
+        font-size: 12px;
+        float: right;
+        line-height: 18px;
+        margin-top: 8px;
+        min-height: initial;
+        padding: 0;
+        text-decoration: underline;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .reset-password {
+        color: #fff;
+    }
+    .mega-dialog.export-links-dialog .pro .expiry-container {
+        float: right;
+    }
+    .mega-dialog.export-links-dialog .pro .expiry-container .mega-input::before {
+        border: none;
+    }
+    .mega-dialog.export-links-dialog .mega-input.datepicker-input i {
+        --mask-color: var(--icon-rest);
+        cursor: pointer;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .mega-input.datepicker-input i {
+        --mask-color: #ccc;
     }
     .mega-dialog.export-links-dialog .pro input.set-date {
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        position: absolute;
-        z-index: 9;
-        opacity: 0;
         cursor: pointer;
+    }
+    .share-link-expiry-calendar {
+        position: absolute;
+        padding: 8px 0;
+        min-width: 300px;
+        border: var(--context-menu-border);
+        border-radius: 20px;
+        box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+        background: var(--surface-main);
+        transition: var(--transition-opacity);
+        z-index: 150;
+    }
+    .share-link-expiry-calendar .datepicker--pointer {
+        display: none;
+    }
+    .share-link-expiry-calendar .datepicker--content {
+        padding: 7px 7px 7px 10px;
+    }
+    .share-link-expiry-calendar .datepicker--days-names .datepicker--day-name {
+        margin: 2px;
+        width: 36px;
+        color: var(--text-color-low);
+    }
+    .share-link-expiry-calendar .datepicker--cell {
+        width: 36px;
+        height: 36px;
+        margin: 2px;
+        font-size: 12px;
+        line-height: 36px;
+    }
+    .share-link-expiry-calendar .datepicker--cell.-selected- {
+        color: var(--secondary-white);
+    }
+    .share-link-expiry-calendar .datepicker--cell.-disabled- {
+        color: var(--text-color-low);
+    }
+    .share-link-expiry-calendar .datepicker--cell.-disabled-.-selected- {
+        color: var(--secondary-white);
+    }
+    .share-link-expiry-calendar .datepicker--cell.-current- {
+        border: 1px solid #333;
+        background: linear-gradient(180deg, #F2F2F2 0%, #EDEDED 100%);
+        color: var(--text-color-high);
+    }
+    body.theme-dark .share-link-expiry-calendar .datepicker--cell.-current- {
+        border: 1px solid #FFF;
+        background: transparent;
+    }
+    .share-link-expiry-calendar .datepicker--cell.-other-month- {
+        color: var(--text-color-low);
+    }
+    .mega-dialog.export-links-dialog .content-block .sub-header {
+        display: inline-block;
+        min-width: 23%;
+        line-height: 36px;
+        vertical-align: middle;
     }
     .mega-dialog.export-links-dialog .sub-header ~ button {
         margin: 0 0 0;
     }
     .mega-dialog.export-links-dialog .sub-header + button,
     .mega-dialog.export-links-dialog .sub-header ~ button.remove {
-        margin-top: 15px;
+        margin-top: 0;
+    }
+    .mega-dialog.export-links-dialog .sub-header .info {
+        color: #333;
+        display: inline-block;
+        font: var(--text-body1);
+        font-size: 14px;
+        line-height: 20px;
+        width: 82px;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .sub-header .info {
+        color: #fff;
+    }
+    .mega-dialog.export-links-dialog .mega-switch.expiry-switch,
+    .mega-dialog.export-links-dialog .mega-switch.password-switch {
+        float: initial;
+        vertical-align: middle;
+    }
+    .mega-dialog.export-links-dialog .pro.disabled .expiry-switch,
+    .mega-dialog.export-links-dialog .pro.disabled .password-switch {
+        display: none;
     }
     .mega-dialog.export-links-dialog button.expiry {
         -webkit-margin-end: 4px;
         margin-inline-end: 4px;
         z-index: 1;
+    }
+    .mega-dialog.export-links-dialog .pro.disabled button {
+        visibility: hidden;
     }
     .mega-dialog.export-links-dialog button.expiry .label {
         z-index: 1;
@@ -2189,21 +2455,58 @@ body.de .mega-dialog.contact-picker-widget {
         left: -4px;
         z-index: 1200;
     }
+    .mega-dialog.export-links-dialog > footer .footer-container {
+        display: flex;
+        position: relative;
+    }
+    .mega-dialog.export-links-dialog .footer-container .left-block {
+        width: 50%;
+    }
+    .mega-dialog.export-links-dialog .footer-container .right-block {
+        width: 50%;
+        text-align: right;
+    }
+    .mega-dialog.export-links-dialog .remove-link-button-container {
+        cursor: pointer;
+        display: inline-block;
+        line-height: 36px;
+        padding-right: 10px;
+        position: relative;
+    }
+    .mega-dialog.export-links-dialog .remove-link-button-container .icon-link-remove {
+        position: absolute;
+        left: 0;
+        top: 5px;
+        --icon-size: 24px;
+        --mask-color: var(--text-color-medium);
+    }
+    .mega-dialog.export-links-dialog .remove-link-button-container .remove-link-text {
+        color: #333;
+        font: var(--text-body1-bold);
+        font-size: 14px;
+        line-height: 20px;
+        margin-left: 30px;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .remove-link-button-container .remove-link-text {
+        color: #fff;
+    }
     .mega-dialog.export-links-dialog .links {
         position: relative;
         padding: 0;
     }
     .mega-dialog.export-links-dialog .links-scroll {
-        max-height: 398px;
-        padding: 24px 48px 0;
-        position: relative;
+        background: var(--surface-main);
         box-sizing: border-box;
+        margin: 24px 0 0;
+        max-height: 215px;  /* Restricted to keep the dialog height short and keep the datepicker fully visible */
+        padding: 0 48px;
+        position: relative;
     }
     .mega-dialog.export-links-dialog .item {
         background: var(--surface-main);
         border-radius: 4px;
         position: relative;
-        padding: 12px;
+        padding: 12px 0;
         white-space: nowrap;
         margin-top: 8px;
     }
@@ -2217,7 +2520,7 @@ body.de .mega-dialog.contact-picker-widget {
         margin-bottom: 12px;
     }
     .mega-dialog.export-links-dialog .item .transfer-filetype-icon {
-        left: 20px;
+        left: 0;
         top: 12px;
     }
     .rtl .mega-dialog.export-links-dialog .item .transfer-filetype-icon {
@@ -2227,8 +2530,8 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.export-links-dialog .item-title {
         display: inline-block;
         max-width: calc(100% - 230px);
-        -webkit-margin-start: 36px;
-        margin-inline-start: 36px;
+        -webkit-margin-start: 26px;
+        margin-inline-start: 26px;
         -webkit-margin-end: 3px;
         margin-inline-end: 3px;
         vertical-align: top;
@@ -2241,10 +2544,21 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.export-links-dialog .item-size {
         display: inline-block;
+        font-size: 12px;
         -webkit-margin-start: 8px;
         margin-inline-start: 8px;
         vertical-align: top;
         padding-top: 3px;
+    }
+    .mega-dialog.export-links-dialog .item-size.hide-separator::before {
+        display: none;
+    }
+    .mega-dialog.export-links-dialog .item-size::before {
+        border-left: 1px solid #eee;
+        content: "";
+        display: inline-block;
+        height: 12px;
+        width: 8px;
     }
     .mega-dialog.export-links-dialog .item-link {
         display: flex;
@@ -2271,6 +2585,7 @@ body.de .mega-dialog.contact-picker-widget {
         right: 6px;
     }
     .mega-dialog.export-links-dialog .item-link input {
+        font-size: 12px;
         height: 38px;
         box-sizing: border-box;
         width: 100%;
@@ -2294,16 +2609,17 @@ body.de .mega-dialog.contact-picker-widget {
         display: none;
     }
     .mega-dialog.export-links-dialog .separately .item:not(.password-protect-link) .item-link {
-        width: calc(50% - 10px);
-        float: left;
-    }
-    .rtl .mega-dialog.export-links-dialog .separately .item:not(.password-protect-link) .item-link {
-        float: right;
+        margin-bottom: 8px;
     }
     .mega-dialog.export-links-dialog .separately .item:not(.password-protect-link) .item-link.key {
         display: flex;
-        -webkit-margin-start: 20px;
-        margin-inline-start: 20px;
+    }
+    .mega-dialog.export-links-dialog .multiple-links .item-link .mega-button.positive {
+        background: none;
+        border-left: 1px solid var(--stroke-grey-2);
+        box-shadow: none;
+        color: #2ba6de;
+        font-size: 14px;
     }
     .mega-dialog.export-links-dialog .icons {
         float: right;
@@ -2336,7 +2652,7 @@ body.de .mega-dialog.contact-picker-widget {
         opacity: 0;
     }
     .mega-dialog.export-links-dialog .icons i.cog {
-        opacity: 0.7;
+        display: none;
     }
     .mega-dialog.export-links-dialog .dropdown.export {
         min-width: 190px;
@@ -2567,11 +2883,11 @@ body.de .mega-dialog.contact-picker-widget {
         padding-inline-end: 4px;
         color: var(--text-color-high);
     }
-    .mega-dialog.export-links-dialog .key .checkdiv {
+    .mega-dialog.export-links-dialog .key .export-keys-switch {
         -webkit-margin-end: 4px;
         margin-inline-end: 4px;
     }
-    .mega-dialog.export-links-dialog .key .checkdiv::after {
+    .mega-dialog.export-links-dialog .key .export-keys-switch::after {
         pointer-events: none;
     }
     .mega-dialog.export-links-dialog footer {
@@ -9011,7 +9327,7 @@ body.de .mega-dialog.contact-picker-widget {
         display: flex;
         flex-direction: row;
         padding-left: 32px;
-        padding-top: 3px; 
+        padding-top: 3px;
         gap: 34px;
     }
     .mega-dialog.affiliate-guide .step1 .cell .header {
@@ -9021,7 +9337,7 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.affiliate-guide .step1 .cell .affiliate-guide-check-item {
         display: flex;
     }
-    
+
     .mega-dialog.affiliate-guide .info {
         box-sizing: border-box;
         padding-bottom: 10px;

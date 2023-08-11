@@ -4518,7 +4518,12 @@ FileManager.prototype.getLinkAction = function() {
 FileManager.prototype.initStatusBarLinks = function() {
     "use strict";
 
-    $('.js-statusbarbtn').rebind('click', function(e){
+    // Set hover text to Share link or Share links depending on number selected
+    const linkHoverText = mega.icu.format(l.share_link, $.selected.length);
+    const $selectionStatusBar = $('.selection-status-bar');
+
+    $('.js-statusbarbtn.link', $selectionStatusBar).attr('data-simpletip', linkHoverText);
+    $('.js-statusbarbtn', $selectionStatusBar).rebind('click', function(e) {
         if (this.classList.contains('download')) {
             if (M.isAlbumsPage()) {
                 mega.gallery.albums.downloadSelectedElements();

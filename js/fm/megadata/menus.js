@@ -1091,8 +1091,8 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
         getLinkText = numOfSelectedNodes > 1 ? l[17520] : l[6909];
     }
     else {
-        // Otherwise change text to 'Get links' or 'Get link' if there are selected nodes without links
-        getLinkText = (numOfSelectedNodes > 1) ? l[8734] : l[59];
+        // Otherwise change text to 'Share links' or 'Share link' if there are selected nodes without links
+        getLinkText = mega.icu.format(l.share_link, numOfSelectedNodes);
     }
 
     // If there are multiple nodes with existing links selected, set text to 'Remove links', otherwise 'Remove link'

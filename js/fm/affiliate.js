@@ -658,7 +658,8 @@ affiliateUI.redemptionDialog = {
                     .safeAppend($euroTemplate.prop('outerHTML'));
             }
             else {
-                $localTemplate.text(euro);
+                $('.affiliate-redeem.local-info span', self.$dialog).addClass('hidden');
+                $localTemplate.text(euro + '*');
                 $availableComissionArea.safeAppend($localTemplate.prop('outerHTML'));
             }
 

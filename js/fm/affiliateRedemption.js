@@ -1,6 +1,7 @@
 // Note: Referral Program is called as affiliate program at begining, so all systemic names are under word affiliate
 // i.e. affiliate === referral
 
+// Can't set chosenPlan to min plan, as pro.minPlan hasn't been created yet.
 var affiliateRedemption = {
     currentStep: 0,
     requests: {
@@ -10,7 +11,7 @@ var affiliateRedemption = {
     req1res: {},
     dynamicInputs: {},
     plan : {
-        chosenPlan: 4,
+        chosenPlan: undefined,
         planName: '',
         planStorage: -1,
         planQuota: -1,
@@ -183,6 +184,10 @@ affiliateRedemption.processSteps = function() {
 affiliateRedemption.__processBlock1 = function() {
 
     'use strict';
+
+    // Update chosenPlan default to the min available pro plan, as it has now been created
+    const minPlanNum = pro.minPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+    affiliateRedemption.plan.chosenPlan = affiliateRedemption.plan.chosenPlan || minPlanNum;
 
     this.requests.first.m = $('.payment-type .radioOn input', this.$dialog).val() | 0;
     const $nextBtn = $('.next-btn', this.$dialog);

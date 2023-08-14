@@ -2,7 +2,6 @@ import React from 'react';
 import { compose, MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
 import { STREAM_ACTIONS } from './stream.jsx';
-import StreamExtendedControls from './streamExtendedControls.jsx';
 import { withMicObserver } from './micObserver.jsx';
 import { withPermissionsObserver } from './permissionsObserver.jsx';
 import Call from './call.jsx';
@@ -149,6 +148,10 @@ class StreamControls extends MegaRenderMixin {
         const avFlags = call.av;
         const audioLabel = avFlags & Av.Audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */;
         const videoLabel = avFlags & Av.Camera ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
+        const screenSharingLabel = avFlags & Av.Screen
+            ? l[22890] /* `End screen sharing` */
+            : l[22889]; /* `Start screen sharing` */
+        const callHoldLabel = avFlags & Av.onHold ? l[23459] /* `Resume call` */ : l[23460] /* `Hold call` */;
 
         //
         // `StreamControls`
@@ -202,16 +205,45 @@ class StreamControls extends MegaRenderMixin {
                             {hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null}
                         </li>
                         <li>
-                            <StreamExtendedControls
-                                {...this.props}
-                                call={call}
-                                chatRoom={chatRoom}
-                                onScreenSharingClick={onScreenSharingClick}
-                                onHoldClick={onHoldClick}
-                                hasToRenderPermissionsWarning={hasToRenderPermissionsWarning}
-                                renderPermissionsWarning={renderPermissionsWarning}
-                                resetError={resetError}
-                            />
+                            <Button
+                                key="screen-sharing"
+                                simpletip={{ ...this.SIMPLETIP, label: screenSharingLabel }}
+                                className={`
+                                    mega-button
+                                    theme-light-forced
+                                    round
+                                    large
+                                    ${avFlags & Av.onHold ? 'disabled' : ''}
+                                    ${avFlags & Av.Screen ? 'active' : ''}
+                                `}
+                                icon={avFlags & Av.Screen ? 'icon-end-screenshare' : 'icon-screen-share'}
+                                onClick={() => {
+                                    resetError(Av.Screen);
+                                    onScreenSharingClick();
+                                }}>
+                                <span>{screenSharingLabel}</span>
+                            </Button>
+                            {
+                                hasToRenderPermissionsWarning(Av.Screen)
+                                    ? renderPermissionsWarning(Av.Screen, this)
+                                    : null
+                            }
+                        </li>
+                        <li>
+                            <Button
+                                key="call-hold"
+                                simpletip={{ ...this.SIMPLETIP, label: callHoldLabel }}
+                                className={`
+                                    mega-button
+                                    theme-light-forced
+                                    round
+                                    large
+                                    ${avFlags & Av.onHold ? 'active' : ''}
+                                `}
+                                icon={avFlags & Av.onHold ? 'icon-play' : 'icon-pause'}
+                                onClick={onHoldClick}>
+                                <span>{callHoldLabel}</span>
+                            </Button>
                         </li>
                         <li>
                             {this.renderEndCall()}

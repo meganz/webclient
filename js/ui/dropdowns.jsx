@@ -126,7 +126,7 @@ export class Dropdown extends MegaRenderMixin {
                 of: $positionToElement,
                 my: self.props.positionMy ? self.props.positionMy : "center top",
                 at: self.props.positionAt ? self.props.positionAt : "center bottom",
-                collision: "flipfit",
+                collision: this.props.collision || 'flipfit',
                 within: $container,
                 using: function(obj, info) {
                     self.reposElementUsing(this, obj, info);

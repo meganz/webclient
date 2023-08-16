@@ -562,7 +562,11 @@
             }
         }
         setForcedActiveStream(clientId) {
-            this.forcedActiveStream = (this.forcedActiveStream === clientId) ? null : clientId;
+            const newCid = (this.forcedActiveStream === clientId) ? null : clientId;
+            this.forcedActiveStream = newCid;
+            if (this.sfuClient.callRecorder) {
+                this.sfuClient.recordingForcePeerVideo(newCid || null);
+            }
         }
         setActiveStream(clientId) {
             this.activeStream = clientId;

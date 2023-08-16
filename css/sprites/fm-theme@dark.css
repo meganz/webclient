@@ -16,6 +16,10 @@
 .theme-dark-forced .sprite-fm-theme.icon-camera-disabled, .theme-dark-forced .sprite-fm-theme-before.icon-camera-disabled-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-camera-disabled-after::after {
    background-image: url("../../images/sprites/fm-theme@dark.svg#icon-camera-disabled");
 }
+.theme-dark .sprite-fm-theme.icon-dlocal, .theme-dark .sprite-fm-theme-before.icon-dlocal-before::before, .theme-dark .sprite-fm-theme-after.icon-dlocal-after::after,
+.theme-dark-forced .sprite-fm-theme.icon-dlocal, .theme-dark-forced .sprite-fm-theme-before.icon-dlocal-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-dlocal-after::after {
+   background-image: url("../../images/sprites/fm-theme@dark.svg#icon-dlocal");
+}
 .theme-dark .sprite-fm-theme.icon-emoji, .theme-dark .sprite-fm-theme-before.icon-emoji-before::before, .theme-dark .sprite-fm-theme-after.icon-emoji-after::after,
 .theme-dark-forced .sprite-fm-theme.icon-emoji, .theme-dark-forced .sprite-fm-theme-before.icon-emoji-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-emoji-after::after {
    background-image: url("../../images/sprites/fm-theme@dark.svg#icon-emoji");

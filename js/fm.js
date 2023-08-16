@@ -1345,10 +1345,11 @@ function renameDialog() {
  * @param {String} submsg Addition text (Optional)
  * @param {Function} callback The function to invoke on button click
  * @param {Boolean|String} checkboxSetting Show "Do not show again" block if True
+ * @param {Boolean} showCloseButton Optional toggle to show the close icon in the top right
  * @returns {void}
  */
 // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
-function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
+function msgDialog(type, title, msg, submsg, callback, checkboxSetting, showCloseButton) {
     'use strict';
     var doneButton  = l.ok_button;
     var extraButton = String(type).split(':');
@@ -1385,6 +1386,11 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     $('#msgDialog aside').addClass('hidden');
 
     if (checkboxSetting === 1) {
+        $dialog.addClass('with-close-btn');
+    }
+
+    // Show the top right close (x) button
+    if (showCloseButton) {
         $dialog.addClass('with-close-btn');
     }
 
@@ -1533,7 +1539,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                             id="confirmation-checkbox" class="checkboxOff">
                     </div>
                     <label for="confirmation-checkbox" class="radio-txt">@@</label>
-                </div>`, l[229]);
+                </div>`, l.do_not_show_this_again);
         $('#msgDialog aside').removeClass('hidden');
 
         // eslint-disable-next-line sonarjs/no-identical-functions

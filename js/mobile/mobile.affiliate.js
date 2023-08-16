@@ -860,8 +860,9 @@ mobile.affiliate = {
                 .safeAppend($euroTemplate.prop('outerHTML'));
         }
         else {
-            $localTemplate.text(euro);
+            $localTemplate.text(euro + '*');
             $availableComissionArea.safeAppend($localTemplate.prop('outerHTML'));
+            $('.redemption-choice-info .estimated-price-min-50 span', self.$step1).addClass('hidden');
         }
 
         $availableBitcoinArea.safeAppend($localTemplate.text(euro).prop('outerHTML'));

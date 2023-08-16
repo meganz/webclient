@@ -1360,27 +1360,67 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('%1', '<span></span>');
     l[23120] = escapeHTML(l[23120]);
     l[23126] = escapeHTML(l[23126]).replace(/\[BR]/g, '<br/>');
-    l[23181] = escapeHTML(l[23181])
-        .replace('[A]', '<a class="clickurl" href="https://mega.io/terms" target="_blank">')
-        .replace('[/A]', '</a>');
-    l['referral_program_rules.d'] = l[23181]
+    let referral_program_rules = '';
+    const breaks = '[BR][BR]';
+    const referralProgramStrings = [
+        l.referral_program_rules_p0,
+        '[BR]',
+        l.referral_program_rules_l0,
+        l.referral_program_rules_l1,
+        l.referral_program_rules_l2,
+        '[BR]',
+        l.referral_program_rules_p1,
+        breaks,
+        l.referral_program_rules_p2,
+        breaks,
+        l.referral_program_rules_p3,
+        breaks,
+        l.referral_program_rules_p4,
+        breaks,
+        l.referral_program_rules_p5,
+        breaks,
+        l.referral_program_rules_p6,
+        breaks,
+        l.referral_program_rules_p7,
+        breaks,
+        l.referral_program_rules_p8,
+        breaks,
+        l.referral_program_rules_p9,
+        breaks,
+        l.referral_program_rules_p10,
+        breaks,
+        l.referral_program_rules_p11,
+        breaks,
+        l.referral_program_rules_p12,
+        breaks,
+        l.referral_program_rules_p13,
+        breaks,
+        l.referral_program_rules_p14,
+        breaks,
+        l.referral_program_rules_p15,
+        breaks,
+        l.referral_program_rules_p16,
+        breaks,
+        l.referral_program_rules_p17
+    ];
+    for (let i = 0; i < referralProgramStrings.length; i++){
+        referral_program_rules += referralProgramStrings[i];
+    }
+    l['referral_program_rules.d'] = escapeHTML(referral_program_rules)
         .replace(/\[P]/g, '').replace(/\[\/P]/g, '')
         .replace(/\[L]/g, '<i class="sprite-fm-mono icon-check"></i><div class="affiliate-guide info">')
         .replace(/\[\/L]/g, '</div>')
-        .replace(/\[BLOCK]/g, '').replace(/\[\/BLOCK]/g, '').replace(/\[BR]/g, '<br>');
-    l['referral_program_rules.m'] = l[23181]
+        .replace(/\[BR]/g, '<br>')
+        .replace(/\[A]/g, '<a class="clickurl" href="https://mega.io/terms" target="_blank">')
+        .replace(/\[\/A]/g, '</a>');
+    l['referral_program_rules.m'] = escapeHTML(referral_program_rules)
         .replace(/\[P]/g, '<div class="mobile button-block no-bg"><div class="mobile label-info no-icon">')
         .replace(/\[\/P]/g, '</div></div>')
         .replace(/\[L]/g, '<div class="mobile button-block no-bg"><div class="mobile fm-icon green-tick">' +
             '</div><div class="mobile label-info">').replace(/\[\/L]/g, '</div></div>')
-        .replace(/\[BLOCK]/g, '').replace(/\[\/BLOCK]/g, '').replace(/\[BR]/g, '');
-    l[23181] = l[23181]
-        .replace(/\[P]/g, '').replace(/\[\/P]/g, '')
-        .replace(/\[L]/g, '<div class="bottom-page list-item">' +
-            '<i class="bottom-page icon x12 new-pages-sprite tick"></i>').replace(/\[\/L]/g, '</div>')
-        .replace(/\[BR]/g, '<br>')
-        .replace(/\[BLOCK]/g, '<div class="inline-block col-2 affiliate-list"><div class="bottom-page fadein list">')
-        .replace(/\[\/BLOCK]/g, '</div></div>');
+        .replace(/\[BR]/g, '')
+        .replace(/\[A]/g, '<a class="clickurl" href="https://mega.io/terms" target="_blank">')
+        .replace(/\[\/A]/g, '</a>');
     l[23214] = escapeHTML(l[23214]).replace('[A]', '<a class="fm-affiliate guide-dialog to-rules">')
         .replace('[/A]', '</a>');
     l[23243] = escapeHTML(l[23243])
@@ -1629,7 +1669,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l.redemption_support_email = escapeHTML(l.redemption_support_email)
         .replace('[S]', '<span>').replace('[/S]', '</span>');
-
+    l.estimated_price_text_min_50 = escapeHTML(l.estimated_price_text_min_50)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
 
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,

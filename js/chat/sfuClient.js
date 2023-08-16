@@ -48,6 +48,7 @@ var TermCode;
     TermCode[TermCode["kPushedToWaitingRoom"] = 6] = "kPushedToWaitingRoom";
     TermCode[TermCode["kKickedFromWaitingRoom"] = 7] = "kKickedFromWaitingRoom";
     TermCode[TermCode["kTooManyUserClients"] = 8] = "kTooManyUserClients";
+    TermCode[TermCode["kWaitingRoomAllowTimeout"] = 9] = "kWaitingRoomAllowTimeout";
     // Disconnects
     TermCode[TermCode["kRtcDisconn"] = 64] = "kRtcDisconn";
     TermCode[TermCode["kSigDisconn"] = 65] = "kSigDisconn";
@@ -90,6 +91,9 @@ class Av {
         if (av & Av.ScreenLowRes) {
             result += "s";
         }
+        if (av & Av.Recording) {
+            result += "R";
+        }
         return result;
     }
 }
@@ -103,7 +107,9 @@ Av.Screen = 24;
 Av.LowResVideo = 10;
 Av.HiResVideo = 20;
 Av.Video = 30;
+Av.Recording = 64;
 Av.onHold = 128;
+/* harmony default export */ const shared_av = (Av);
 
 ;// CONCATENATED MODULE: ../shared/sdpCompress.ts
 const endl = "\r\n";
@@ -493,7 +499,7 @@ function base64DecodeToArr(str) {
 ;// CONCATENATED MODULE: ./adaptation.ts
 
 
-const kLogTag = "sfuAdapt:";
+const adaptation_kLogTag = "sfuAdapt:";
 class SvcDriver {
     constructor(client) {
         this.currRxQuality = 4; // start at half resolution, full fps
@@ -525,7 +531,7 @@ class SvcDriver {
         plost = this.fmaPlost = (this.fmaPlost * 2 + plost) / 3;
         do {
             if (window.dSfuAdapt) {
-                console.log(kLogTag, "rtt:", rtt.toFixed(1), "rttLower:", this.rttLower.toFixed(1), "rttUpper:", this.rttUpper.toFixed(1), "plost:", plost.toFixed(1), "fmaPlost:", this.fmaPlost.toFixed(1), "plostLower", this.plostLower.toFixed(1), "plostUpper:", this.plostUpper.toFixed(1));
+                console.log(adaptation_kLogTag, "rtt:", rtt.toFixed(1), "rttLower:", this.rttLower.toFixed(1), "rttUpper:", this.rttUpper.toFixed(1), "plost:", plost.toFixed(1), "fmaPlost:", this.fmaPlost.toFixed(1), "plostLower", this.plostLower.toFixed(1), "plostUpper:", this.plostUpper.toFixed(1));
             }
         } while (0);
         const tsNow = Date.now();
@@ -545,7 +551,7 @@ class SvcDriver {
             }
             do {
                 if (window.dSfuAdapt) {
-                    console.log(kLogTag, "scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
+                    console.log(adaptation_kLogTag, "scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
                 }
             } while (0);
         }
@@ -555,7 +561,7 @@ class SvcDriver {
         if (plost > this.plostUpper) {
             do {
                 if (window.d) {
-                    console.warn(kLogTag, "Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
+                    console.warn(adaptation_kLogTag, "Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
                 }
             } while (0);
             this.decRxQuality(plost >= SvcDriver.kPlostCap);
@@ -586,7 +592,7 @@ class SvcDriver {
             else if (stats.vtxdly > 2500) {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
+                        console.warn(adaptation_kLogTag, `scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
                     }
                 } while (0);
                 this.switchTxQuality(-1, "scr");
@@ -633,7 +639,7 @@ class SvcDriver {
         this.rttUpper = rtt + SvcDriver.kRttUpperHeadroom;
         do {
             if (window.d) {
-                console.warn(kLogTag, "Rtt floor set to", rtt.toFixed(2));
+                console.warn(adaptation_kLogTag, "Rtt floor set to", rtt.toFixed(2));
             }
         } while (0);
     }
@@ -674,14 +680,14 @@ class SvcDriver {
                 hist.tsValidTill = now + span;
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: Marking rx quality switch up attempt as failed: critcal: ${!!critical}, for period: ${span}`);
+                        console.warn(adaptation_kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: Marking rx quality switch up attempt as failed: critcal: ${!!critical}, for period: ${span}`);
                     }
                 } while (0);
             }
             else {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: not marking as failed: areaMatch: ${hist.hiArea === this.rxTotalArea()}, timeMatch: ${Date.now() - hist.tsMonitorTill}`);
+                        console.warn(adaptation_kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: not marking as failed: areaMatch: ${hist.hiArea === this.rxTotalArea()}, timeMatch: ${Date.now() - hist.tsMonitorTill}`);
                     }
                 } while (0);
             }
@@ -706,7 +712,7 @@ class SvcDriver {
             if (histMatch && (hist.tsValidTill - now) >= 0) {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Not increasing rxQ, have failed recently`);
+                        console.warn(adaptation_kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Not increasing rxQ, have failed recently`);
                     }
                 } while (0);
                 return;
@@ -714,7 +720,7 @@ class SvcDriver {
             else {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: not failed(recently): upFails:${hist.upFails}, timeMatch: ${(hist.tsValidTill - now)}, kbpsMatch: ${kbpsMatch} (hist: ${hist.kbps}, curr: ${stats.rx}), rttMatch: ${rttMatch} (hist: ${hist.rtt.toFixed()}, curr: ${this.maRtt.toFixed()}), areaDiff: ${this.rxTotalArea() - hist.lowArea}`);
+                        console.warn(adaptation_kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: not failed(recently): upFails:${hist.upFails}, timeMatch: ${(hist.tsValidTill - now)}, kbpsMatch: ${kbpsMatch} (hist: ${hist.kbps}, curr: ${stats.rx}), rttMatch: ${rttMatch} (hist: ${hist.rtt.toFixed()}, curr: ${this.maRtt.toFixed()}), areaDiff: ${this.rxTotalArea() - hist.lowArea}`);
                     }
                 } while (0);
             }
@@ -725,7 +731,7 @@ class SvcDriver {
             hist.rtt = stats.rtt;
             do {
                 if (window.d) {
-                    console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Same up-fail parameters, preserving fail descriptor`);
+                    console.warn(adaptation_kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Same up-fail parameters, preserving fail descriptor`);
                 }
             } while (0);
         }
@@ -737,7 +743,7 @@ class SvcDriver {
             };
             do {
                 if (window.d) {
-                    console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Created new up-fail descriptor`);
+                    console.warn(adaptation_kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Created new up-fail descriptor`);
                 }
             } while (0);
         }
@@ -758,7 +764,7 @@ class SvcDriver {
         this.rxqSwitchSeqNo++;
         do {
             if (window.d) {
-                console.warn(kLogTag, `Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: ${JSON.stringify(params)}`);
+                console.warn(adaptation_kLogTag, `Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: ${JSON.stringify(params)}`);
             }
         } while (0);
         this.currRxQuality = newQ;
@@ -769,7 +775,7 @@ class SvcDriver {
             if (this.currRxQuality > 0) {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `Decreasing rxQ due to HIGH RTT of ${this.maRtt.toFixed()}, saving checkpoint`);
+                        console.warn(adaptation_kLogTag, `Decreasing rxQ due to HIGH RTT of ${this.maRtt.toFixed()}, saving checkpoint`);
                     }
                 } while (0);
                 this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
@@ -787,7 +793,7 @@ class SvcDriver {
                 // rtt did not change
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt didnt change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
+                        console.warn(adaptation_kLogTag, `Decreased rxQ by ${nSteps} steps: rtt didnt change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
                     }
                 } while (0);
                 this.setRttWindow(this.maRtt);
@@ -801,7 +807,7 @@ class SvcDriver {
                 // because of network conditions. Either way, we should further downgrade quality
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
+                        console.warn(adaptation_kLogTag, `Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
                     }
                 } while (0);
                 this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
@@ -838,7 +844,7 @@ class SvcDriver {
                 ar = this.client.screenAspectRatio = res.width / res.height;
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
+                        console.warn(adaptation_kLogTag, `Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
                     }
                 } while (0);
             }
@@ -846,7 +852,7 @@ class SvcDriver {
                 ar = 1.78;
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, "setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
+                        console.warn(adaptation_kLogTag, "setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
                     }
                 } while (0);
             }
@@ -854,7 +860,7 @@ class SvcDriver {
         params.width = Math.round(params.height * ar);
         do {
             if (window.d) {
-                console.warn(kLogTag, `Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)} (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`);
+                console.warn(adaptation_kLogTag, `Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)} (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`);
             }
         } while (0);
         this.currTxQuality = newQ;
@@ -864,7 +870,7 @@ class SvcDriver {
     rxTotalArea() {
         let area = 0;
         for (const peer of this.client.peers.values()) {
-            if ((peer.av & Av.onHold)) {
+            if ((peer.av & shared_av.onHold)) {
                 continue;
             }
             const slot = peer.hiResSlot;
@@ -907,7 +913,7 @@ SvcDriver.RxQuality = [
     [1, 1, 1],
     [1, 2, 1],
     [2, 1, 2],
-    [2, 2, 2],
+    [2, 2, 2], //6
 ];
 SvcDriver.kMaxRxQualityIndex = SvcDriver.RxQuality.length - 1;
 // minKbps, maxKbps, scr: constraints for applyConstraints() on sent screen track
@@ -921,13 +927,319 @@ SvcDriver.TxQuality = [
     { minKbps: 1900, maxKbps: 4000, scr: { height: 1440, frameRate: 8 } } // 6
 ];
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
+/* harmony default export */ const adaptation = (SvcDriver);
+
+;// CONCATENATED MODULE: ./recordingLogo.ts
+//export default const kLogoImageBlobUrl = "data:image/svg+xml,%3Csvg xml:space='preserve' width='362' height='361.39999' viewBox='0 0 362 361.39998' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23d9272e' d='M 180.7,0 C 80.9,0 0,80.9 0,180.7 c 0,99.8 80.9,180.7 180.7,180.7 99.8,0 180.7,-80.9 180.7,-180.7 C 361.4,80.9 280.5,0 180.7,0 Z m 93.8,244.6 c 0,3.1 -2.5,5.6 -5.6,5.6 h -23.6 c -3.1,0 -5.6,-2.5 -5.6,-5.6 v -72.7 c 0,-0.6 -0.7,-0.9 -1.2,-0.5 l -50,50 c -4.3,4.3 -11.4,4.3 -15.7,0 l -50,-50 c -0.4,-0.4 -1.2,-0.1 -1.2,0.5 v 72.7 c 0,3.1 -2.5,5.6 -5.6,5.6 H 92.4 c -3.1,0 -5.6,-2.5 -5.6,-5.6 V 116.8 c 0,-3.1 2.5,-5.6 5.6,-5.6 h 16.2 c 2.9,0 5.8,1.2 7.9,3.3 l 62.2,62.2 c 1.1,1.1 2.8,1.1 3.9,0 l 62.2,-62.2 c 2.1,-2.1 4.9,-3.3 7.9,-3.3 h 16.2 c 3.1,0 5.6,2.5 5.6,5.6 z' id='path2' /%3E%3C/svg%3E%0A";
+const kLogoImageBlobUrl = "data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 105.83333 105.83333' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cellipse style='fill:%23d9272e;stroke:%23d9272e;stroke-width:0.3;image-rendering:optimizeQuality' cx='52.916664' cy='52.916668' rx='52.766827' ry='52.766823' /%3E%3Cpath fill='%232c2b2b' d='M 71.754659,33.510404 53.517721,51.730323 c -0.322518,0.322218 -0.820956,0.322218 -1.143473,0 L 34.10799,33.510404 c -0.615717,-0.615142 -1.436672,-0.966652 -2.316267,-0.966652 h -4.749814 c -0.908914,0 -1.641911,0.732313 -1.641911,1.640379 v 37.465075 c 0,0.908067 0.732997,1.640378 1.641911,1.640378 h 6.919481 c 0.908916,0 1.641911,-0.732311 1.641911,-1.640378 V 50.353577 c 0,-0.175755 0.205239,-0.263633 0.351838,-0.146462 l 14.659918,14.646237 c 1.260753,1.259576 3.342462,1.259576 4.603214,0 L 69.878189,50.207115 c 0.117279,-0.117171 0.351838,-0.02929 0.351838,0.146462 v 21.295629 c 0,0.908067 0.732996,1.640378 1.64191,1.640378 h 6.919482 c 0.908915,0 1.641911,-0.732311 1.641911,-1.640378 V 34.184131 c 0,-0.908066 -0.732996,-1.640379 -1.641911,-1.640379 h -4.749813 c -0.850276,0.02929 -1.671231,0.35151 -2.286947,0.966652 z' style='fill:%23ffffff;stroke-width:0.293061' /%3E%3C/svg%3E%0A";
+/* harmony default export */ const recordingLogo = (kLogoImageBlobUrl);
+
+;// CONCATENATED MODULE: ./recorder.ts
+
+
+class RecorderFileSink {
+    constructor() {
+        this.file = null;
+        this.output = null;
+    }
+    async init() {
+        this.file = await window.showSaveFilePicker({
+            suggestedName: "call-recording.webm",
+            types: [{ description: "WEBM video", accept: { "video/webm": [".webm"] } }]
+        });
+        this.output = await this.file.createWritable({ keepExistingData: false });
+    }
+    onData(data) {
+        if (!this.output) {
+            do {
+                if (window.d) {
+                    console.warn(kLogTag, "RecorderFileSink.onData: Not initialized");
+                }
+            } while (0);
+            return;
+        }
+        this.output.write(data);
+    }
+    close() {
+        if (!this.output) {
+            return;
+        }
+        this.output.close();
+        this.output = this.file = null;
+    }
+}
+class CallRecorder {
+    constructor(sender, sink, videoHeight) {
+        this.peerAudioInNodes = [];
+        this.videoHeight = 720;
+        this.recorder = null;
+        this.localAv = -1;
+        this.sender = sender;
+        this.sink = sink;
+        if (videoHeight) {
+            this.videoHeight = videoHeight;
+        }
+    }
+    async init(peerTracks) {
+        this.initAudio(peerTracks);
+        await this.initWebrtcConn();
+        await this.initRecording();
+    }
+    initAudio(peerTracks) {
+        this.audioCtx = new AudioContext();
+        this.audioMixer = this.audioCtx.createChannelMerger(peerTracks.length + 1);
+        this.audioDestNode = this.audioCtx.createMediaStreamDestination();
+        this.audioMixer.connect(this.audioDestNode);
+        this.updatePeerInputs(peerTracks);
+    }
+    updatePeerInputs(peerTracks) {
+        if (this.peerAudioInNodes.length) {
+            for (const node of this.peerAudioInNodes) {
+                node.disconnect();
+            }
+            this.peerAudioInNodes = [];
+        }
+        for (const track of peerTracks) {
+            const node = this.audioCtx.createMediaStreamSource(new MediaStream([track]));
+            node.connect(this.audioMixer);
+            this.peerAudioInNodes.push(node);
+        }
+    }
+    async initWebrtcConn() {
+        let resolve;
+        const pms = new Promise((aResolve) => {
+            resolve = aResolve;
+        });
+        const config = { sdpSemantics: 'unified-plan', optional: [{ "googCpuOveruseDetection": false }] };
+        const pc1 = this.pc1 = new RTCPeerConnection(config);
+        const pc2 = this.pc2 = new RTCPeerConnection(config);
+        pc1.onicecandidate = (evt) => pc2.addIceCandidate(evt.candidate);
+        pc2.onicecandidate = (evt) => pc1.addIceCandidate(evt.candidate);
+        pc2.ontrack = (evt) => {
+            resolve(evt.track);
+        };
+        pc1.addTransceiver("video", { direction: "sendonly" });
+        const offer = await pc1.createOffer();
+        await pc1.setLocalDescription(offer);
+        await pc2.setRemoteDescription(pc1.localDescription);
+        const answer = await pc2.createAnswer();
+        await pc2.setLocalDescription(answer);
+        await pc1.setRemoteDescription(pc2.localDescription);
+        await pms;
+        this.videoTx = pc1.getTransceivers()[0].sender;
+        this.videoRx = pc2.getTransceivers()[0].receiver;
+        const params = this.videoTx.getParameters();
+        params.degradationPreference = "maintain-resolution";
+        params.maxBitrate = 1024000000;
+        await this.videoTx.setParameters(params);
+    }
+    async initRecording() {
+        const recStream = new MediaStream([this.audioDestNode.stream.getAudioTracks()[0], this.videoRx.track]);
+        const recorder = this.recorder = new MediaRecorder(recStream);
+        recorder.onstop = () => {
+            this.sink.close();
+            this.recorder = null;
+        };
+        recorder.ondataavailable = (ev) => {
+            // console.log("ondata");
+            this.sink.onData(ev.data);
+        };
+    }
+    recordLocalAudio() {
+        if (!this.localAudioInNode) {
+            // the local audio track, once obtained, never changes, so we create the stream source node only once
+            this.localAudioInNode = this.audioCtx.createMediaStreamSource(new MediaStream([this.sender.localAudioTrack()]));
+        }
+        this.localAudioInNode.connect(this.audioMixer);
+    }
+    stopRecordingLocalAudio() {
+        if (!this.localAudioInNode) {
+            return;
+        }
+        this.localAudioInNode.disconnect();
+    }
+    async setVideoTrack(vTrack) {
+        this.deinitStaticVideo();
+        const cloned = vTrack.clone();
+        try {
+            await cloned.applyConstraints({
+                resizeMode: "crop-and-scale",
+                height: this.videoHeight
+                // width: this.videoHeight * 16 / 10
+            });
+        }
+        catch (ex) {
+            do {
+                if (window.d) {
+                    console.warn(kLogTag, "Can't convert input video track to recording video resolution, video file may get broken:", ex.message);
+                }
+            } while (0);
+        }
+        if (this.isDestroyed()) { // destroyed meanwhile
+            return;
+        }
+        return this.videoTx.replaceTrack(cloned);
+    }
+    switchToLocalVideo() {
+        this.setVideoTrack((this.localAv & shared_av.Screen)
+            ? this.sender.localScreenTrack()
+            : this.sender.localCameraTrack());
+    }
+    forceVideoTrack(vTrack) {
+        if (!vTrack) {
+            if (!this.forcedVideoTrack) {
+                return;
+            }
+            delete this.forcedVideoTrack;
+            this.switchToLocalOrStaticVideo();
+        }
+        else {
+            this.forcedVideoTrack = vTrack;
+            this.setVideoTrack(vTrack);
+        }
+    }
+    async switchToStaticVideo() {
+        if (this.canvas) {
+            do {
+                if (window.d) {
+                    console.warn(kLogTag, "switchToStaticVideo: Already in static video mode");
+                }
+            } while (0);
+            return;
+        }
+        const logo = new Image;
+        const pms = new Promise((resolve) => {
+            logo.onload = resolve;
+        });
+        logo.src = recordingLogo;
+        await pms;
+        if (this.isDestroyed()) {
+            return; // destroyed meanwhile
+        }
+        const canv = this.canvas = window.document.createElement("canvas");
+        canv.height = this.videoHeight;
+        canv.width = this.videoHeight * 16 / 9;
+        const ctx = canv.getContext('2d');
+        ctx.drawImage(logo, (canv.width - logo.width) / 2, (canv.height - logo.height) / 2);
+        let tsPrev = Date.now();
+        this.staticVideoRefreshTimer = setInterval(() => {
+            this.canvas.getContext('2d').fillRect(0, 0, 1, 1);
+            const now = Date.now();
+            const period = now - tsPrev;
+            tsPrev = now;
+            if (period > 70) {
+                do {
+                    if (window.d) {
+                        console.warn(kLogTag, "recorder: slow draw:", period);
+                    }
+                } while (0);
+            }
+        }, 60);
+        const staticVtrack = this.canvas.captureStream(20).getVideoTracks()[0];
+        do {
+            if (window.d) {
+                console.log(kLogTag, `static vtrack resolution: ${staticVtrack.getSettings().width}x${staticVtrack.getSettings().height}`);
+            }
+        } while (0);
+        return this.videoTx.replaceTrack(staticVtrack);
+    }
+    deinitStaticVideo() {
+        if (!this.canvas) {
+            return;
+        }
+        clearInterval(this.staticVideoRefreshTimer);
+        delete this.staticVideoRefreshTimer;
+        delete this.canvas;
+    }
+    destroy() {
+        if (!this.videoRx) {
+            do {
+                if (window.d) {
+                    console.warn(kLogTag, "CallRecorder.destroy: already destroyed");
+                }
+            } while (0);
+            return;
+        }
+        if (this.recorder) {
+            this.recorder.stop();
+        }
+        this.pc1.close();
+        this.pc2.close();
+        delete this.pc1;
+        delete this.pc2;
+        this.deinitStaticVideo();
+        if (this.localAudioInNode) {
+            this.localAudioInNode.disconnect();
+            delete this.localAudioInNode;
+        }
+        for (const node of this.peerAudioInNodes) {
+            node.disconnect();
+        }
+        delete this.peerAudioInNodes;
+        this.audioMixer.disconnect();
+        delete this.audioMixer;
+        delete this.audioDestNode;
+        this.audioCtx.close();
+        delete this.audioCtx;
+        if (this.videoTx) {
+            if (this.videoTx.track) {
+                this.videoTx.track.stop();
+            }
+            delete this.videoTx;
+        }
+        if (this.videoRx) {
+            if (this.videoRx.track) {
+                this.videoRx.track.stop();
+            }
+            delete this.videoRx;
+        }
+    }
+    isDestroyed() {
+        return !this.videoRx;
+    }
+    onLocalMediaChange() {
+        const av = this.sender.availAv;
+        const change = (this.localAv === -1) ? (shared_av.Audio | shared_av.Video) : this.localAv ^ av;
+        this.localAv = av;
+        if (change & shared_av.Audio) {
+            if (av & shared_av.Audio) {
+                this.recordLocalAudio();
+            }
+            else {
+                this.stopRecordingLocalAudio();
+            }
+        }
+        if (!this.forcedVideoTrack && (change & shared_av.Video)) {
+            this.switchToLocalOrStaticVideo();
+        }
+    }
+    switchToLocalOrStaticVideo() {
+        if ((this.localAv & shared_av.Video) === 0) {
+            this.switchToStaticVideo();
+        }
+        else {
+            this.switchToLocalVideo();
+        }
+    }
+    start() {
+        this.onLocalMediaChange();
+        this.recorder.start(2000);
+    }
+    pause() {
+        this.recorder.pause();
+    }
+    resume() {
+        this.recorder.resume();
+    }
+}
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '1c16eb99e3';
+const COMMIT_ID = '507b653f22';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
 /* Mega SFU Client library */
+
 
 
 
@@ -970,6 +1282,30 @@ var TxTrackIndex;
     TxTrackIndex[TxTrackIndex["kAudio"] = 2] = "kAudio";
 })(TxTrackIndex || (TxTrackIndex = {}));
 class SfuClient {
+    get micInputSeen() { return this.micMuteMonitor.micInputSeen; }
+    static platformHasSupport() {
+        return window.RTCRtpSender &&
+            !!RTCRtpSender.prototype.createEncodedStreams;
+    }
+    logError(...args) {
+        console.error.apply(console, args);
+        this.remoteLogError(args.join(' '));
+    }
+    remoteLogError(msg) {
+        let url = `${SfuClient.kStatServerUrl}/msglog?userid=${this.userId}&t=e`;
+        if (this.callId) {
+            url += `&callid=${this.callId}`;
+        }
+        fetch(url, { method: "POST", body: msg });
+    }
+    assert(cond) {
+        if (cond) {
+            return;
+        }
+        const ex = new Error("Assertion failed");
+        this.remoteLogError(ex.stack);
+        throw ex;
+    }
     constructor(userId, app, callKey, options) {
         this.peers = new Map();
         this._numRxHiRes = 0;
@@ -1007,41 +1343,17 @@ class SfuClient {
         this._reqBarrier = new RequestBarrier;
         this._speakerState = SpeakerState.kNoSpeaker;
         this._connState = ConnState.kDisconnected;
-        this.options = options;
+        this.options = options || {};
         if (callKey) {
             this.setCallKey(callKey);
         }
         this.numInputVideoTracks = options.numVideoSlots || SfuClient.kMaxVideoSlotsDefault;
         this.cryptoWorker = new Worker(SfuClient.kWorkerUrl);
         this.cryptoWorker.addEventListener("message", this.onCryptoWorkerEvent.bind(this));
-        this._svcDriver = new SvcDriver(this);
+        this._svcDriver = new adaptation(this);
         this._speakerDetector = new SpeakerDetector(this);
         this._statsRecorder = new StatsRecorder(this);
         this.micMuteMonitor = new MicMuteMonitor(this);
-    }
-    get micInputSeen() { return this.micMuteMonitor.micInputSeen; }
-    static platformHasSupport() {
-        return window.RTCRtpSender &&
-            !!RTCRtpSender.prototype.createEncodedStreams;
-    }
-    logError(...args) {
-        console.error.apply(console, args);
-        this.remoteLogError(args.join(' '));
-    }
-    remoteLogError(msg) {
-        let url = `${SfuClient.kStatServerUrl}/msglog?userid=${this.userId}&t=e`;
-        if (this.callId) {
-            url += `&callid=${this.callId}`;
-        }
-        fetch(url, { method: "POST", body: msg });
-    }
-    assert(cond) {
-        if (cond) {
-            return;
-        }
-        const ex = new Error("Assertion failed");
-        this.remoteLogError(ex.stack);
-        throw ex;
     }
     onCryptoWorkerEvent(event) {
         let msg = event.data;
@@ -1104,7 +1416,7 @@ class SfuClient {
         }
         do {
             if (window.d) {
-                console.warn(client_kLogTag, "SfuClient: Signaling connection closed");
+                console.warn(client_kLogTag, "Signaling connection closed");
             }
         } while (0);
         delete this.conn;
@@ -1115,6 +1427,9 @@ class SfuClient {
         }
         else {
             this.leaveCall(termCodes.kSigDisconn, ConnState.kDisconnected);
+            if (this.callRecorder) {
+                this.recordingStop();
+            }
             this._stopLocalTracks();
         }
         this._fire("onDisconnect", this.termCode, willReconnect);
@@ -1354,7 +1669,6 @@ class SfuClient {
         this._setConnState(ConnState.kConnecting);
         this._fire("onConnecting");
         const ws = this.conn = new WebSocket(url, "svc");
-        ws.onopen = this.onConnect.bind(this);
         ws.onmessage = this.onPacket.bind(this);
         ws.onclose = this.onWsClose.bind(this);
     }
@@ -1414,6 +1728,9 @@ class SfuClient {
                     slot.createDecryptor();
                 }
                 this.inAudioTracks.set(slot.mid, slot);
+            }
+            if (this.callRecorder) {
+                this.callRecorder.updatePeerInputs(this.getPeerInputTracks());
             }
         };
         pc.onaddstream = (event) => {
@@ -1535,9 +1852,6 @@ class SfuClient {
             }
         } while (0);
     }
-    async onConnect() {
-        this._fire("onConnected");
-    }
     msgHello(msg) {
         this.assert(msg.cid);
         this.assert(msg.na);
@@ -1546,6 +1860,8 @@ class SfuClient {
         if (msg.mods) {
             this.moderators = new Set(msg.mods);
         }
+        this.speakApproval = !!msg.sr;
+        this._fire("onConnected");
         const wr = msg.wr;
         if (wr) {
             this._setConnState(ConnState.kInWaitingRoom);
@@ -1597,9 +1913,8 @@ class SfuClient {
             binToHex(this.outASpeakerTrack.iv.buffer)
         ];
         const sessSignedPubKey = await this.generateSessionKeyPair();
-        let options = this.options;
-        this._speakerState = (options && options.moderator && options.speak) ? SpeakerState.kPending : SpeakerState.kNoSpeaker;
-        await this._updateSentTracks(); // at this point we are not sending anything: no key should be sent out
+        this._speakerState = this.options.speak ? SpeakerState.kPending : SpeakerState.kNoSpeaker;
+        await this._updateSentTracks(null); // at this point we are not sending anything: no key should be sent out
         this.assert(this.sentAv === 0);
         let offerCmd = {
             a: "JOIN",
@@ -1614,12 +1929,7 @@ class SfuClient {
         if (this.initialVthumbCount) {
             offerCmd.vthumbs = this.initialVthumbCount;
         }
-        /*
-        if (this.options.moderator) {
-            offerCmd.mod = 1;
-        }
-        */
-        if (this.options.speak) {
+        if (this._speakerState === SpeakerState.kPending) {
             offerCmd.spk = 1;
         }
         this.send(offerCmd);
@@ -1789,15 +2099,15 @@ class SfuClient {
     _getLocalTracks() {
         return this._reqBarrier.callFunc(this, this._doGetLocalTracks);
     }
-    _updateSentTracks(pre) {
+    _updateSentTracks(pre, dontSendAv) {
         if (pre) {
             return this._reqBarrier.callFunc(this, () => {
                 pre.call(this);
-                return this._doUpdateSentTracks();
+                return this._doUpdateSentTracks(dontSendAv);
             });
         }
         else {
-            return this._reqBarrier.callFunc(this, this._doUpdateSentTracks);
+            return this._reqBarrier.callFunc(this, this._doUpdateSentTracks, dontSendAv);
         }
     }
     getFakeCamTrack() {
@@ -1811,7 +2121,7 @@ class SfuClient {
     Sets SfuClient._localAudio/Video/ScreenTrack
     During the process sets SfuClient._isChangingLocalTracks
     */
-    async _doUpdateSentTracks() {
+    async _doUpdateSentTracks(dontSendAv) {
         var self = this;
         const oldAvailAv = this.availAv;
         const oldSentAv = this.sentAv;
@@ -1877,8 +2187,13 @@ class SfuClient {
             self.handleStartStopSend(oldSentAv);
             let av = self.availAv;
             if (av !== oldAvailAv) {
-                self._sendAvState();
+                if (!dontSendAv) {
+                    self._sendAvState();
+                }
                 self._fire("onLocalMediaChange", av ^ oldAvailAv);
+                if (this.callRecorder) {
+                    this.callRecorder.onLocalMediaChange();
+                }
             }
         }
     }
@@ -1905,29 +2220,32 @@ class SfuClient {
         if (this._onHold) {
             return;
         }
-        let sentAv = this.outASpeakerTrack.sentTrack ? Av.Audio : 0;
+        let sentAv = this.outASpeakerTrack.sentTrack ? shared_av.Audio : 0;
         let availAv = sentAv;
         if (this._screenTrack) {
             if (this._cameraTrack) {
-                availAv |= Av.ScreenHiRes | Av.CameraLowRes;
+                availAv |= shared_av.ScreenHiRes | shared_av.CameraLowRes;
             }
             else {
-                availAv |= Av.ScreenHiRes | Av.ScreenLowRes;
+                availAv |= shared_av.ScreenHiRes | shared_av.ScreenLowRes;
             }
         }
         else {
             if (this._cameraTrack) {
-                availAv |= Av.Camera; // both high-res and low-res
+                availAv |= shared_av.Camera; // both high-res and low-res
             }
+        }
+        if (this.callRecorder) {
+            availAv |= shared_av.Recording;
         }
         this._availAv = availAv;
         let track = this.outVThumbTrack.sentTrack;
         if (track) {
-            sentAv |= ((track === this._cameraTrack) ? Av.CameraLowRes : Av.ScreenLowRes);
+            sentAv |= ((track === this._cameraTrack) ? shared_av.CameraLowRes : shared_av.ScreenLowRes);
         }
         track = this.outVSpeakerTrack.sentTrack;
         if (track) {
-            sentAv |= ((track === this._cameraTrack) ? Av.CameraHiRes : Av.ScreenHiRes);
+            sentAv |= ((track === this._cameraTrack) ? shared_av.CameraHiRes : shared_av.ScreenHiRes);
         }
         this._sentAv = sentAv;
     }
@@ -1943,6 +2261,90 @@ class SfuClient {
     get txQuality() {
         return this._svcDriver ? this._svcDriver.currTxQuality : -1;
     }
+    getPeerInputTracks() {
+        const peerTracks = [];
+        for (const slot of this.inAudioTracks.values()) {
+            peerTracks.push(slot.xponder.receiver.track);
+        }
+        return peerTracks;
+    }
+    async recordingStart(sink, videoHeight) {
+        if (this.callRecorder) {
+            throw new Error("Already recording call");
+        }
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "Starting call recording");
+            }
+        } while (0);
+        if (!sink) {
+            sink = new RecorderFileSink;
+            await sink.init();
+        }
+        this.callRecorder = new CallRecorder(this, sink, videoHeight);
+        await this.callRecorder.init(this.getPeerInputTracks());
+        this.callRecorder.start();
+        this._availAv |= shared_av.Recording;
+        this._sendAvState();
+    }
+    throwIfNotRecording() {
+        if (!this.callRecorder) {
+            throw new Error("Not recording");
+        }
+    }
+    recordingPause() {
+        this.throwIfNotRecording();
+        this.callRecorder.pause();
+    }
+    recordingResume() {
+        this.throwIfNotRecording();
+        this.callRecorder.resume();
+    }
+    recordingStop() {
+        if (!this.callRecorder) {
+            return;
+        }
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "Stopping call recording");
+            }
+        } while (0);
+        this.callRecorder.destroy();
+        delete this.callRecorder;
+        this._availAv &= ~shared_av.Recording;
+        this._sendAvState();
+    }
+    recordingForcePeerVideo(cid) {
+        const rec = this.callRecorder;
+        if (cid === null) {
+            if (rec) {
+                delete rec.forcedVideoPeerCid;
+                rec.forceVideoTrack(null);
+            }
+            return;
+        }
+        if (!rec) {
+            throw new Error("Not recording");
+        }
+        const peer = this.peers.get(cid);
+        if (!peer) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Peer not found");
+                }
+            } while (0);
+            return;
+        }
+        rec.forcedVideoPeerCid = this.cid;
+        if (!peer.hiResSlot) {
+            return;
+        }
+        const track = peer.hiResSlot.inTrack;
+        if (!track) {
+            return;
+        }
+        rec.forceVideoTrack(track);
+    }
     sentTracksString() {
         let result = "";
         if (this.outASpeakerTrack.sentTrack) {
@@ -1957,12 +2359,12 @@ class SfuClient {
         return result;
     }
     obtainedAv() {
-        let av = this._audioTrack ? Av.Audio : 0;
+        let av = this._audioTrack ? shared_av.Audio : 0;
         if (this._cameraTrack) {
-            av |= Av.Camera;
+            av |= shared_av.Camera;
         }
         if (this._screenTrack) {
-            av |= Av.Screen;
+            av |= shared_av.Screen;
         }
         return av;
     }
@@ -2013,7 +2415,7 @@ class SfuClient {
             } while (0);
             return Promise.resolve();
         }
-        return this._updateSentTracks(() => this._muteCamera = mute);
+        return this._updateSentTracks(() => { this._muteCamera = mute; });
     }
     muteAudio(mute) {
         if (this._onHold) {
@@ -2032,15 +2434,15 @@ class SfuClient {
             } while (0);
             return Promise.resolve();
         }
-        return this._updateSentTracks(() => this._muteAudio = mute);
+        return this._updateSentTracks(() => { this._muteAudio = mute; });
     }
     async putOnHold() {
         await this._updateSentTracks(() => {
             if (this._onHold) {
                 return;
             }
-            this._availAv |= Av.onHold;
-            this._sentAv = Av.onHold;
+            this._availAv |= shared_av.onHold;
+            this._sentAv = shared_av.onHold;
             this._onHold = {
                 muteCamera: this._muteCamera,
                 muteAudio: this._muteAudio,
@@ -2054,14 +2456,14 @@ class SfuClient {
         // updateSentTracks() does not register avflags and local media change because it sees the on-hold availAv,
         // which is constant before and after the media change. So, we have to fire the event manually
         this._sendAvState();
-        this._fire("onLocalMediaChange", Av.onHold);
+        this._fire("onLocalMediaChange", shared_av.onHold);
     }
     async releaseHold() {
         await this._updateSentTracks(() => {
             if (!this._onHold) {
                 return;
             }
-            this.assert(this._availAv & Av.onHold);
+            this.assert(this._availAv & shared_av.onHold);
             let oh = this._onHold;
             this._muteCamera = oh.muteCamera;
             this._muteAudio = oh.muteAudio;
@@ -2070,7 +2472,7 @@ class SfuClient {
             this._sendVthumb = oh.sendVthumb;
             delete this._onHold;
             // reflect the actual state of the sent tracks, so that the actual delta is seen correctly
-            this._availAv = Av.onHold;
+            this._availAv = shared_av.onHold;
         });
     }
     isOnHold() {
@@ -2089,7 +2491,7 @@ class SfuClient {
             } while (0);
             return Promise.resolve();
         }
-        await this._updateSentTracks(() => this._isSharingScreen = enable);
+        await this._updateSentTracks(() => { this._isSharingScreen = enable; });
         if (this._isSharingScreen !== enable) { // failed to enable/disable or something interfered
             return;
         }
@@ -2235,6 +2637,14 @@ class SfuClient {
         this.joinToffs = msg.t;
         this._statsRecorder.start();
         await this.newKeyImmediate();
+        if (this.connState !== ConnState.kCallJoining) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "msgAnswer: Disconnected while joining(generating new key), aborting");
+                }
+            } while (0);
+            return;
+        }
         if (msg.peers) {
             for (let peerCid of msg.peers) {
                 new Peer(this, peerCid, true);
@@ -2250,6 +2660,7 @@ class SfuClient {
                     console.log(client_kLogTag, "Setting answer SDP...");
                 }
             } while (0);
+            this.assert(this.rtcConn);
             await this.rtcConn.setRemoteDescription(new RTCSessionDescription({
                 type: 'answer',
                 sdp: sdp
@@ -2402,6 +2813,32 @@ class SfuClient {
     isSendingScreenHiRes() {
         return this._screenTrack && this.outVSpeakerTrack.sentTrack === this._screenTrack;
     }
+    mutePeer(cid) {
+        if (!this.isModerator) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "mutePeer: We don't have moderator privilege");
+                }
+            } while (0);
+            return;
+        }
+        const msg = { a: "MUTE", av: shared_av.Audio };
+        if (cid) {
+            msg.cid = cid;
+        }
+        this.send(msg);
+    }
+    revokePeerSpeaker(cid) {
+        if (!this.isModerator) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "mutePeer: We don't have moderator privilege");
+                }
+            } while (0);
+            return;
+        }
+        this.send({ a: "SPEAKER_DEL", cid });
+    }
     sendSpeakRequest(cid) {
         let cmd = { a: "SPEAK_RQ" };
         if (cid) {
@@ -2434,14 +2871,14 @@ class SfuClient {
         if (this._speakerState !== SpeakerState.kPending) {
             return; // we should have just sent a cancel message, which will stop the SFU from treating us as speaker
         }
-        await this._updateSentTracks(() => this._speakerState = SpeakerState.kActive);
+        await this._updateSentTracks(() => { this._speakerState = SpeakerState.kActive; });
         this._fire("onSpeaker");
     }
     async onStopSpeaking() {
         if (!this._speakerState) {
             return;
         }
-        await this._updateSentTracks(() => this._speakerState = SpeakerState.kNoSpeaker);
+        await this._updateSentTracks(() => { this._speakerState = SpeakerState.kNoSpeaker; }, true);
         this._fire("onNoSpeaker");
     }
     addPeerSpeaker(cid) {
@@ -2476,33 +2913,44 @@ class SfuClient {
             peer.delSpeakReq();
         }
     }
+    msgMuted(msg) {
+        if ((msg.av & shared_av.Audio) === 0) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "MUTED received without audio flag");
+                }
+            } while (0);
+            return;
+        }
+        this._updateSentTracks(() => { this._muteAudio = true; }, true);
+    }
     msgHiresStart(msg) {
         if (this._onHold) {
             this._onHold.sendHires = true;
             return;
         }
-        this._updateSentTracks(() => this._sendHires = true);
+        this._updateSentTracks(() => { this._sendHires = true; });
     }
     msgHiresStop(msg) {
         if (this._onHold) {
             this._onHold.sendHires = false;
             return;
         }
-        this._updateSentTracks(() => this._sendHires = false);
+        this._updateSentTracks(() => { this._sendHires = false; });
     }
     msgVthumbStart(msg) {
         if (this._onHold) {
             this._onHold.sendVthumb = true;
             return;
         }
-        this._updateSentTracks(() => this._sendVthumb = true);
+        this._updateSentTracks(() => { this._sendVthumb = true; });
     }
     msgVthumbStop(msg) {
         if (this._onHold) {
             this._onHold.sendVthumb = false;
             return;
         }
-        this._updateSentTracks(() => this._sendVthumb = false);
+        this._updateSentTracks(() => { this._sendVthumb = false; });
     }
     msgSpeakOn(msg) {
         if (!msg.cid) {
@@ -2517,21 +2965,17 @@ class SfuClient {
             this.onStopSpeaking();
         }
         else {
-            this.delPeerSpeaker(msg.cid);
+            const peer = this.peers.get(msg.cid);
+            if (!peer) {
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "delPeerSpeaker: Unknown peer cid", msg.cid);
+                    }
+                } while (0);
+                return null;
+            }
+            peer.onNoSpeaker();
         }
-    }
-    delPeerSpeaker(cid) {
-        let peer = this.peers.get(cid);
-        if (!peer) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "delPeerSpeaker: Unknown peer cid", cid);
-                }
-            } while (0);
-            return null;
-        }
-        peer.onNoSpeaker();
-        return peer;
     }
     msgAv(msg) {
         let cid = msg.cid;
@@ -2937,7 +3381,7 @@ SfuClient.kProtocolVersion = 2;
 SfuClient.debugSdp = localStorage.debugSdp ? 1 : 0;
 SfuClient.kMaxVideoSlotsDefault = 24;
 SfuClient.kSpatialLayerCount = 3;
-SfuClient.kVideoCaptureOptions = { height: 540 };
+SfuClient.kVideoCaptureOptions = { height: 720 };
 SfuClient.kScreenCaptureOptions = { video: { height: { max: 1440 } } };
 SfuClient.kVthumbHeight = 90;
 SfuClient.kRotateKeyUseDelay = 100;
@@ -2951,7 +3395,7 @@ SfuClient.SpeakerState = SpeakerState;
 SfuClient.ConnState = ConnState;
 SfuClient.TermCode = termCodes;
 SfuClient.ScreenShareType = ScreenShareType;
-SfuClient.Av = Av;
+SfuClient.Av = shared_av;
 SfuClient.kZeroIv128 = new Uint8Array(16);
 SfuClient.msgHandlerMap = {
     "HELLO": SfuClient.prototype.msgHello,
@@ -2969,6 +3413,9 @@ SfuClient.msgHandlerMap = {
     "SPEAK_RQ_DEL": SfuClient.prototype.msgSpeakRequestDel,
     "SPEAK_ON": SfuClient.prototype.msgSpeakOn,
     "SPEAK_OFF": SfuClient.prototype.msgSpeakOff,
+    "MOD_ADD": SfuClient.prototype.msgModAdd,
+    "MOD_DEL": SfuClient.prototype.msgModDel,
+    "MUTED": SfuClient.prototype.msgMuted,
     "KEY": SfuClient.prototype.msgKey,
     "BYE": SfuClient.prototype.msgBye,
     "WR_ALLOW": SfuClient.prototype.msgWrAllow,
@@ -3365,7 +3812,7 @@ function playerStop(player) {
 }
 function logReplacerFunc(name, val) {
     if (name === "av") {
-        return `${val}(${Av.toString(val)})`;
+        return `${val}(${shared_av.toString(val)})`;
     }
     else if (name === "sdp") {
         return SfuClient.debugSdp ? val : compressedSdpToString(val);
@@ -3626,10 +4073,19 @@ class Peer {
             if (slot !== this.hiResSlot) {
                 return;
             }
+            const recorder = this.client.callRecorder;
+            if (recorder && (recorder.forcedVideoTrack === slot.inTrack)) {
+                recorder.forceVideoTrack(null);
+            }
             delete this.hiResSlot;
             this._sendDelHires();
         });
         this.client.assert(this.hiResSlot && this.hiResSlot.players);
+        // if we want to record this peer's video
+        const rec = this.client.callRecorder;
+        if (rec && rec.forcedVideoPeerCid === this.cid && !rec.forcedVideoTrack) {
+            rec.forceVideoTrack(slot.inTrack);
+        }
     }
     setHiResDivider(divider) {
         if (divider < 0 || divider > 2) {
@@ -3661,8 +4117,8 @@ class Peer {
         const oldAv = this.av;
         this.av = av;
         try {
-            if ((oldAv ^ av) & Av.Audio) { // change in audio
-                if (av & Av.Audio) { // peer starts sending audio
+            if ((oldAv ^ av) & shared_av.Audio) { // change in audio
+                if (av & shared_av.Audio) { // peer starts sending audio
                     const mid = msg.amid;
                     if (isNaN(mid)) {
                         this.client.logError("Peer.onAvChange: No 'amid' specified when started sending audio");
@@ -3697,7 +4153,7 @@ class Peer {
         }
     }
     sendsCameraAndScreen() {
-        return Av.hasCamAndScreen(this.av);
+        return shared_av.hasCamAndScreen(this.av);
     }
     onSpeaker() {
         if (this._isSpeaker) {
@@ -4159,7 +4615,7 @@ ns.hexToBin = hexToBin;
 ns.base64ArrEncode = base64ArrEncode;
 ns.base64DecodeToArr = base64DecodeToArr;
 window.SfuClient = SfuClient;
-window.Av = Av;
+window.Av = shared_av;
 
 /******/ })()
 ;

@@ -196,7 +196,7 @@
 
         "optimize-regex/optimize-regex": 2,
         "sonarjs/cognitive-complexity": [1, 48],
-        "sonarjs/no-duplicate-string": [1, 5],
+        "sonarjs/no-duplicate-string": [1, { "threshold": 6 }],
 
         "unicorn/catch-error-name": [2, {"name": "ex"}],
         "unicorn/consistent-destructuring": 1,

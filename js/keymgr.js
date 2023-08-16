@@ -105,6 +105,12 @@ lazy(mega, 'keyMgr', () => {
 
                 return keyMgr.importKeysContainer(result);
             })
+            .then(() => {
+                if (d) {
+                    logger.debug('Remote attribute synced, checking pending shares and missing keys...');
+                }
+                keyMgr.acceptPendingInShares().catch(dump);
+            })
             .catch((ex) => {
                 cleanupCachedAttribute().catch(dump);
                 throw ex;
@@ -590,7 +596,7 @@ lazy(mega, 'keyMgr', () => {
                     p += 4;
                 }
 
-                obj[name] = new Uint8Array(blob.buffer, p + 2, size);
+                obj[name] = new Uint8Array(blob.buffer, blob.byteOffset + p + 2, size);
                 p += size + 2;
             }
 
@@ -1136,8 +1142,8 @@ lazy(mega, 'keyMgr', () => {
             if (Array.isArray(r)) {
                 return r[0];
             }
-            return false;
 
+            return false;
         }
 
         // try decrypting inshares based on the current key situation
@@ -1163,6 +1169,25 @@ lazy(mega, 'keyMgr', () => {
             if (!this.generation) {
                 return;
             }
+            const getEncryptedKey = (n, t) => {
+                let key = null;
+
+                if (t.byteLength - 8 > 16) {
+                    key = tryCatch(() => base64urldecode(ab_to_str(new Uint8Array(t.buffer, t.byteOffset + 8, 22))))();
+
+                    if (self.d) {
+                        logger.warn('long key for %s, trying base64->binary...', n, key && key.length, key, [t]);
+                    }
+                }
+
+                return [key, ab_to_str(new Uint8Array(t.buffer, t.byteOffset + 8, 16))];
+            };
+            const decryptFrom = tryCatch((s, u) => this.decryptFrom(s, u));
+            const decrypt = tryCatch((n, u, t) => {
+                const [k1, k2] = getEncryptedKey(n, t);
+
+                return k1 && decryptFrom(k1, u) || decryptFrom(k2, u);
+            });
 
             // (new users appearing during the commit attempts will not be cached and have to wait for the next round)
             do {
@@ -1170,11 +1195,10 @@ lazy(mega, 'keyMgr', () => {
 
                 for (const node in this.pendinginshares) {
                     const t = this.pendinginshares[node];
-                    const s = ab_to_str(new Uint8Array(t.buffer, t.byteOffset + 8));
                     const u = ab_to_base64(new Uint8Array(t.buffer, t.byteOffset, 8));
                     const k = u_sharekeys[node];
 
-                    const sharekey = this.decryptFrom(s, u);
+                    const sharekey = decrypt(node, u, t);
 
                     if (sharekey) {
                         // decrypted successfully - set key and delete record
@@ -1184,7 +1208,7 @@ lazy(mega, 'keyMgr', () => {
 
                         if (d) {
                             if (k) {
-                                const k1 = Uint32Array.from(k);
+                                const k1 = Uint32Array.from(k[0]);
                                 const k2 = Uint32Array.from(u_sharekeys[node][0]);
                                 const eq = this.equal(k1, k2);
 
@@ -1297,6 +1321,10 @@ lazy(mega, 'keyMgr', () => {
 
                             changed = true;
                             this.pendinginshares[node] = t;
+
+                            if (d) {
+                                logger.info('Creating pending incoming share record for %s, %s', node, ab_to_base64(t));
+                            }
                         }
                     }
 
@@ -1836,6 +1864,58 @@ lazy(mega, 'keyMgr', () => {
 
             sn[1] = sh;
             return sh.join(',') !== ss;
+        }
+
+        async setWarningValue(key, value) {
+            assert(typeof key === 'string' && key.length > 1 && key.length < 5, `Invalid key name (${key})`);
+
+            do {
+                if (value === undefined) {
+                    if (!(key in this.warnings)) {
+                        // nothing to do, doesn't exist.
+                        return;
+                    }
+                    delete this.warnings[key];
+                }
+                else {
+                    if (!(value instanceof Uint8Array)) {
+
+                        if (typeof value === 'number') {
+                            // we got a raw number, store as 32-bits integer.
+                            value = this.uint32u8(value);
+                        }
+                        else {
+                            if (typeof value === 'boolean') {
+                                value = String(+value);
+                            }
+
+                            // threat anything else as raw 8-bit ASCII strings.
+                            value = this.str2u8(`${value}`);
+                        }
+                    }
+
+                    this.warnings[key] = value;
+                }
+            }
+            while (!await this.commit());
+        }
+
+        async removeWarningValue(key) {
+            return this.setWarningValue(key);
+        }
+
+        getWarningValue(key, type) {
+            if (key in this.warnings) {
+                const val = this.warnings[key];
+
+                if (type) {
+                    return this.u8uint32(val);
+                }
+
+                return this.u82str(val);
+            }
+            return false;
+
         }
 
         // record share situation at the beginning of an ordinary (non-backup) upload

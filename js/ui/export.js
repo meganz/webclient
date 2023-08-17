@@ -1603,6 +1603,7 @@ function logExportEvt(type, target) {
         var $linksTab = $('section .content-block.links-content', $linksDialog);
         var $linksHeader = $('header .get-link', $linksDialog);
         var $linkContent = $('.links-content.links', $linksDialog);
+        const $separateKeysBlock = $('.export-keys-separately-block', $linksDialog);
         const $separateKeysToggle = $('.js-export-keys-switch', $linksTab);
         const $removeLinkButton = $('.js-remove-link-button', $linksDialog);
         const $removeLinkButtonText = $('.remove-link-text', $removeLinkButton);
@@ -2204,12 +2205,22 @@ function logExportEvt(type, target) {
         // Show and init options
         if (page === 'download') {
 
+            // Show options/features
+            $options.removeClass('hidden');
+
+            // Hide certain blocks not applicable for download page
+            $separateKeysBlock.addClass('hidden');
+            $removeLinkButton.addClass('hidden');
+
             return false;
         }
         else if (folderlink) {
 
             // Show options/features
             $options.removeClass('hidden');
+
+            // Hide certain blocks not applicable for download page
+            $removeLinkButton.addClass('hidden');
         }
         // Init FREE options
         else if (!u_attr.p) {
@@ -2339,6 +2350,9 @@ function logExportEvt(type, target) {
                 fileUrlNodeHandle = (item.t ? '!' : '?') + item.h;
             }
             fileSize = item.s && htmlentities(bytesToSize(item.s)) || '';
+
+            // Hide the | separator after the folder name
+            hideSeparatorClass = ' hide-separator';
         }
         else if (item.t) {
             // Shared item type is folder

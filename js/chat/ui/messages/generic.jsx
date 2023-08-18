@@ -213,7 +213,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
 
         var haveLink = self._isNodeHavingALink(h) === true;
 
-        var getManageLinkText = haveLink ? l[6909] : l[59];
+        var getManageLinkText = haveLink ? l[6909] : l[5622];
 
         arr.push(
             <DropdownItem

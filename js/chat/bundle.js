@@ -26695,7 +26695,7 @@ class GenericConversationMessage extends mixin.y {
   _addLinkButtons(h, arr) {
     var self = this;
     var haveLink = self._isNodeHavingALink(h) === true;
-    var getManageLinkText = haveLink ? l[6909] : l[59];
+    var getManageLinkText = haveLink ? l[6909] : l[5622];
     arr.push(external_React_default().createElement(dropdowns.DropdownItem, {
       icon: "sprite-fm-mono icon-link",
       key: "getLinkButton",

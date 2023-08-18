@@ -1020,8 +1020,7 @@ pro.proplan = {
         M.req({ a: 'dci', dc: mega.discountCode }).then((res) => {
             loadingDialog.hide();
             if (res && res.al && res.pd) {
-                mega.discountInfo = res;
-                mega.discountInfo.dc = mega.discountCode;
+                DiscountPromo.storeDiscountInfo(res);
                 return loadSubPage('propay_' + res.al);
             }
             msgDialog('warninga', l[135], l[24674], false, () => {

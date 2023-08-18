@@ -75,8 +75,7 @@ class DiscountPromo {
             loadingDialog.hide();
 
             if (res && res.al && res.pd) {
-                mega.discountInfo = res;
-                mega.discountCode = mega.discountInfo.dc;
+                DiscountPromo.storeDiscountInfo(res);
                 completeCallback();
                 return true;
             }
@@ -106,6 +105,23 @@ class DiscountPromo {
             });
         });
         return false;
+    }
+
+    static storeDiscountInfo(res) {
+
+        mega.discountInfo = res;
+        mega.discountCode = mega.discountCode || res.dc;
+
+        // if user move to page other than discount propay page, clear discount info
+        const token = mBroadcaster.addListener('beforepagechange', tpage => {
+
+            if (tpage !== 'propay_' + res.al) {
+
+                delete mega.discountCode;
+                delete mega.discountInfo;
+                mBroadcaster.removeListener(token);
+            }
+        });
     }
 
     /**

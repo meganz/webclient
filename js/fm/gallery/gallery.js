@@ -1240,6 +1240,7 @@ class MegaGallery {
             const viewBtns = $('.fm-header-buttons .view-links', rfBlock);
             mega.gallery.viewBtns = viewBtns.clone(true);
             galleryHeader.append(mega.gallery.viewBtns);
+            $('.view-links', galleryHeader).toggleClass('hidden', M.isGalleryPage());
         }
 
         if (M.v.length > 0) {

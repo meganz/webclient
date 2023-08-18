@@ -1935,7 +1935,25 @@ function init_page() {
                 uldl_hold = true;
 
                 if (!is_mobile) {
-                    bottomPageDialog(false, 'terms'); // show terms dialog
+                    M.safeShowDialog('terms', () => {
+                        msgDialog(
+                            `confirmation:!^${l[1037]}!${l[82]}`,
+                            '',
+                            l.terms_dialog_title,
+                            l.terms_dialog_text,
+                            e => {
+                                if (e) {
+                                    $.termsAgree();
+                                }
+                                else {
+                                    $.termsDeny();
+                                }
+                                onIdle(() => closeDialog());
+                            }
+                        );
+                        return $('#msgDialog');
+                    });
+
                 }
             }
         }

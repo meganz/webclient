@@ -541,12 +541,8 @@ pro.propay = {
         'use strict';
 
         // Change wording depending on number of months
-        let monthsWording = l[922];     // 1 month
         const numOfMonths = discountInfo.m;
-
-        if (numOfMonths > 1) {
-            monthsWording = l[6803].replace('%1', numOfMonths);     // x months
-        }
+        const monthsWording = mega.icu.format(l[922], numOfMonths);
 
         let currencyCode = 'EUR';
         let discountedTotalPrice = discountInfo.edtp;   // Euro Discounted Total Price

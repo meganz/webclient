@@ -1036,16 +1036,17 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
   background: transparent;
   cursor: pointer;
   border: 0 none;
+  font: var(--text-h3);
+  color: var(--text-color-medium);
+}
+.stream-head-content .stream-head-controls button.head-control div {
+  float: left;
 }
 .stream-head-content .stream-head-controls button.head-control i {
-  margin: 0 auto;
+  float: left;
+  margin: 0 8px 0 0;
   --icon-size: 24px;
   --mask-color: var(--icon-rest);
-}
-.stream-head-content .stream-head-controls button.head-control span {
-  position: fixed;
-  bottom: -9999px;
-  visibility: hidden;
 }
 
 .in-call-info {
@@ -1573,20 +1574,6 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
 .float-video-controls .button-group {
   position: relative;
 }
-.stream-controls .button-group-menu,
-.float-video-controls .button-group-menu {
-  display: none;
-  position: absolute;
-  transform: translateY(-100%);
-}
-.stream-controls .button-group-menu.expanded,
-.float-video-controls .button-group-menu.expanded {
-  display: block;
-}
-.stream-controls .button-group-menu .button-group-item,
-.float-video-controls .button-group-menu .button-group-item {
-  margin: 0 0 10px 0;
-}
 .stream-controls .button-group .info-indicator,
 .float-video-controls .button-group .info-indicator {
   position: absolute;
@@ -1608,6 +1595,32 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
 .float-video-controls .button-group .info-indicator.warn i {
   --icon-size: 24px;
   --mask-color: var(--secondary-orange);
+}
+
+.dropdown.body.button-group-menu {
+  display: none;
+  z-index: 1126;
+}
+.dropdown.body.button-group-menu:hover {
+  display: block;
+}
+.dropdown.body.button-group-menu div.button {
+  display: flex;
+  --icon-size: 24px;
+  font: var(--text-body-1);
+  padding: 2px 4px;
+}
+.dropdown.body.button-group-menu div.button div {
+  margin-inline-end: 8px;
+  -webkit-margin-end: 8px;
+}
+.dropdown.body.button-group-menu div.button span {
+  margin: auto 0;
+}
+
+body div:has(.float-video:hover) + .dropdown.body.button-group-menu,
+body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .float-video-overlay {
+  display: block;
 }
 
 .meetings-signal-issue {
@@ -1635,6 +1648,11 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
   right: -10px;
   --icon-size: 24px;
   --mask-color: var(--secondary-orange);
+}
+.dropdown.button-group-menu .meetings-signal-issue {
+  top: 34px;
+  width: 34px;
+  z-index: 11;
 }
 
 .meetings-signal-container {

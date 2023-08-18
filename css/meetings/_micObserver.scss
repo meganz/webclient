@@ -27,6 +27,12 @@
         --icon-size: 24px;
         --mask-color: var(--secondary-orange);
     }
+
+    .dropdown.button-group-menu & {
+        top: 34px;
+        width: 34px;
+        z-index: 11;
+    }
 }
 
 .meetings-signal-container {

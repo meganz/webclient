@@ -537,6 +537,9 @@ export default class Call extends MegaRenderMixin {
             clearTimeout(this.callStartTimeout);
         }
         delay.cancel('callOffline');
+        if (this.pageChangeListener) {
+            mBroadcaster.removeListener(this.pageChangeListener);
+        }
     }
 
     componentDidMount() {
@@ -548,6 +551,11 @@ export default class Call extends MegaRenderMixin {
         this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle =>
             this.handleEphemeralAdd(handle)
         );
+        this.pageChangeListener = mBroadcaster.addListener('pagechange', () => {
+            if (Call.isExpanded() && (!M.chat || megaChat.getCurrentRoom().chatId !== chatRoom.chatId)) {
+                this.handleCallMinimize();
+            }
+        });
         chatRoom.megaChat.rebind('sfuConnOpen.call', this.handleCallOnline);
         chatRoom.megaChat.rebind('sfuConnClose.call', () => this.handleCallOffline());
         this.bindCallEvents();

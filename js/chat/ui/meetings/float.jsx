@@ -4,7 +4,7 @@ import utils from '../../../ui/utils.jsx';
 import Button from './button.jsx';
 import Call from './call.jsx';
 import { LocalVideoThumb, LocalVideoHiRes, PeerVideoHiRes } from './videoNode.jsx';
-import StreamExtendedControls from './streamExtendedControls.jsx';
+import FloatExtendedControls from './floatExtendedControls.jsx';
 import { withMicObserver } from './micObserver';
 import { withPermissionsObserver } from './permissionsObserver';
 import { withHostsObserver } from './hostsObserver';
@@ -103,6 +103,7 @@ class Stream extends MegaRenderMixin {
                 if (this.state.options) {
                     this.handleOptionsToggle();
                 }
+                $(document.body).trigger('closeAllDropdownsExcept');
             },
             stop: (event, ui) => {
                 this.DRAGGABLE.POSITION = ui.position;
@@ -591,7 +592,7 @@ class Minimized extends MegaRenderMixin {
                     {this.renderPermissionsWarning(Av.Camera)}
                 </div>
                 <div className="meetings-signal-container">
-                    <StreamExtendedControls
+                    <FloatExtendedControls
                         call={call}
                         chatRoom={chatRoom}
                         onScreenSharingClick={onScreenSharingClick}
@@ -599,6 +600,7 @@ class Minimized extends MegaRenderMixin {
                         hasToRenderPermissionsWarning={hasToRenderPermissionsWarning}
                         renderPermissionsWarning={renderPermissionsWarning}
                         resetError={resetError}
+                        showScreenDialog={!!this.props[`dialog-${Av.Screen}`]}
                     />
                     {this.renderPermissionsWarning(Av.Screen)}
                 </div>
@@ -629,7 +631,7 @@ class Minimized extends MegaRenderMixin {
                     <Button
                         simpletip={{ ...this.SIMPLETIP_PROPS, label: l.expand_mini_call /* Expand */ }}
                         className="mega-button theme-light-forced action small expand"
-                        icon="sprite-fm-mono icon-fullscreen-enter"
+                        icon="sprite-fm-mono icon-call-expand-mode"
                         onClick={ev => {
                             ev.stopPropagation();
                             this.props.onCallExpand();

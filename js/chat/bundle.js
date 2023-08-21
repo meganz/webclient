@@ -17731,9 +17731,11 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
     const promise = this.isLoading();
     if (promise && promise.always) {
       promise.always(() => {
-        this.setState({
-          isLoading: false
-        });
+        if (this.isMounted()) {
+          this.setState({
+            isLoading: false
+          });
+        }
       });
     } else if (promise === false) {
       this.setState({

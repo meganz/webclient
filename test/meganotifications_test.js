@@ -35,7 +35,9 @@ describe("MegaNotifications Unit Test", function() {
             sinon.spy(this, 'close');
             return this;
         };
-        _notification.requestPermission = sinon.stub();
+        _notification.requestPermission = sinon.stub().callsFake(() => {
+            return Promise.resolve('granted');
+        });
         _notification.permission = 'granted';
         mStub(window, 'Notification', _notification);
         mStub(window, 'Favico', function() {

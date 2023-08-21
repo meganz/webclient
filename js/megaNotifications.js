@@ -389,7 +389,20 @@
     MegaNotification.prototype._showDesktopNotification = function() {
         if (this.megaNotifications.options.desktopNotifications) {
             if (Notification.permission !== 'granted') {
-                Notification.requestPermission();
+                if (Notification.permission === 'denied') {
+                    this.megaNotifications.logger.warn('Notification permission denied.');
+                }
+                else {
+                    Notification.requestPermission().then(res => {
+                        if (res === 'granted') {
+                            this._showDesktopNotification();
+                        }
+                        else {
+                            this.megaNotifications.logger.warn('Notification permission rejected: ', res);
+                        }
+                    });
+                }
+                return;
             }
 
             const textMessage = this.megaNotifications.options.textMessages[this.type];

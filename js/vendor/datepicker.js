@@ -339,14 +339,20 @@
                 case 'days':
                     this.date = new Date(d.year, d.month + 1, 1);
                     if (o.onChangeMonth) o.onChangeMonth(this.parsedDate.month, this.parsedDate.year);
+                    this.update();
+                    this._triggerOnChange();
                     break;
                 case 'months':
                     this.date = new Date(d.year + 1, d.month, 1);
                     if (o.onChangeYear) o.onChangeYear(this.parsedDate.year);
+                    this.update();
+                    this._triggerOnChange();
                     break;
                 case 'years':
                     this.date = new Date(d.year + 10, 0, 1);
                     if (o.onChangeDecade) o.onChangeDecade(this.curDecade);
+                    this.update();
+                    this._triggerOnChange();
                     break;
             }
         },
@@ -358,14 +364,20 @@
                 case 'days':
                     this.date = new Date(d.year, d.month - 1, 1);
                     if (o.onChangeMonth) o.onChangeMonth(this.parsedDate.month, this.parsedDate.year);
+                    this.update();
+                    this._triggerOnChange();
                     break;
                 case 'months':
                     this.date = new Date(d.year - 1, d.month, 1);
                     if (o.onChangeYear) o.onChangeYear(this.parsedDate.year);
+                    this.update();
+                    this._triggerOnChange();
                     break;
                 case 'years':
                     this.date = new Date(d.year - 10, 0, 1);
                     if (o.onChangeDecade) o.onChangeDecade(this.curDecade);
+                    this.update();
+                    this._triggerOnChange();
                     break;
             }
         },
@@ -787,7 +799,21 @@
 
             switch (main) {
                 case 'top':
-                    top = dims.top - selfDims.height - offset;
+                    if (this.view == 'days') {
+                        // If calendar is in date picking mode, calculate the top normally
+                        // Datepicker usually has 5 rows, so no adjustments are necessary
+                        top = dims.top - selfDims.height - offset;
+                        
+                        // If datepicker has 6 rows, increase the gap (example: December 2023)
+                        if (selfDims.height >= 330) top = top - offset/7;
+
+                        // If datepicker has 4 rows, decrease the gap (example: February 2026)
+                        else if (selfDims.height <= 280) top = top + offset/7;
+                    }
+                    else {
+                        // In month/year picking mode, this reduces the gap between input and calendar
+                        top = dims.top - selfDims.height/1.85 - offset;
+                    }
                     break;
                 case 'right':
                     left = dims.left + dims.width + offset;
@@ -1220,6 +1246,9 @@
             if (code == 27) {
                 this.hide();
             }
+
+            this.update();
+            this._triggerOnChange();
         },
 
         _onKeyUp: function (e) {
@@ -1229,6 +1258,8 @@
 
         _onHotKey: function (e, hotKey) {
             this._handleHotKey(hotKey);
+            this.update();
+            this._triggerOnChange();
         },
 
         _onMouseEnterCell: function (e) {
@@ -1371,7 +1402,10 @@
                 if (this.opts.onChangeView) {
                     this.opts.onChangeView(val)
                 }
-                if (this.elIsInput && this.visible) this.setPosition();
+                if (this.elIsInput && this.visible) {
+                    this.update();
+                    this._triggerOnChange();
+                }
             }
 
             return val
@@ -1967,7 +2001,7 @@
             if ($(e.target).hasClass('-disabled-')) return;
 
             if (this.d.view == 'days') {
-                return this.d.view = 'months'
+                return this.d.view = 'months';
             }
 
             this.d.view = 'years';

@@ -2566,6 +2566,9 @@ async function galleryUI(id) {
         $('.view-links', '.gallery-tabs-bl').addClass('hidden');
     }
 
+    // This keeps the banner persistent when navigating from Recents to Gallery
+    $('.fm-right-files-block').addClass('visible-notification');
+
     // This is media discovery
     if (id) {
         if (!pfid) {

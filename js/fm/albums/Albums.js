@@ -2944,13 +2944,15 @@ lazy(mega.gallery, 'albums', () => {
                 });
             }
 
-            options.push({
-                label: l.album_open,
-                icon: 'preview-reveal',
-                click: () => {
-                    M.openFolder('albums/' + albumId);
-                }
-            });
+            if (M.currentdirid !== `albums/${albumId}`) {
+                options.push({
+                    label: l.album_open,
+                    icon: 'preview-reveal',
+                    click: () => {
+                        M.openFolder(`albums/${albumId}`);
+                    }
+                });
+            }
 
             if (isUserAlbum) {
                 options.push(

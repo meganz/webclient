@@ -1393,6 +1393,9 @@ var exportExpiry = {
                 // Update the datepicker and input
                 exportExpiry.updateDatepickerAndTextInput();
 
+                // Show the date picker dropdown when toggle is on
+                $setDateInput.trigger('focus');
+
                 // Log to see if "Set an expiry date" is clicked much
                 logExportEvt(2, $selectedLink);
             }

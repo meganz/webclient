@@ -890,7 +890,7 @@ mega.tpw = new function TransferProgressWidget() {
             const root = M.getNodeRoot(handle || dId);
             if (root && root !== 'shares') {
                 $('i.transfer-progress-icon', $finishedAction).removeClass('sprite-fm-mono')
-                    .addClass('sprite-fm-mono link icon-link').attr('data-simpletip', l.tfw_transfer_get_link);
+                    .addClass('sprite-fm-mono link icon-link').attr('data-simpletip', l[5622]);
                 $finishedActionsRow.append($finishedAction);
             }
             if (type === this.UPLOAD) {

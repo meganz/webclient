@@ -94,7 +94,7 @@
     font-size: 14px;
     margin: 1px;
     border-radius: 100%;
-    transition: background-color 200ms ease-in-out 0s, color 200ms ease-in-out 0s;
+    transition: background-color 200ms ease-in-out 0s;
     z-index: 1;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
@@ -116,7 +116,7 @@
     background: var(--surface-grey-2);
 }
 .datepicker--cell.-current- {
-    color: var(--text-solor-red);
+    color: var(--text-color-red);
     background: transparent;
 }
 .datepicker--cell.-disabled- {

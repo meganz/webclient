@@ -1136,6 +1136,11 @@ ChatRoom.prototype.leave = function(notify) {
         this.setState(ChatRoom.STATE.LEAVING);
         this.setState(ChatRoom.STATE.LEFT);
     }
+    if (this.activeCallIds.length) {
+        for (const activeCallId of this.activeCallIds.keys()) {
+            this.activeCallIds.remove(activeCallId);
+        }
+    }
 };
 
 /**

@@ -4481,6 +4481,8 @@
     "schedule_update_calendar": "Mettre l\u2019agenda \u00e0 jour",
     "schedule_view_desc": "Visualiser la description",
     "scheduled_edit_occurrence_note": "Vous modifiez une occurrence de la s\u00e9rie. [A]Modifier la s\u00e9rie[/A]",
+    "scheduled_recur_time_daily_skip": "{count, plural, one {Tous les jours du %3 au %4 de %1 \u00e0 %2} many {Tous les # de jours du %3 au %4 de %1 \u00e0 %2} other {Tous les #\u00a0jours du %3 au %4 de %1 \u00e0 %2}}",
+    "scheduled_recur_time_daily_skip_cont": "{count, plural, one {Tous les jours \u00e0 partir du %3 de %1 \u00e0 %2} many {Tous les jours \u00e0 partir du %3 de %1 \u00e0 %2} other {Tous les jours \u00e0 partir du %3 de %1 \u00e0 %2}}",
     "screen_share_crop_tip": "Le partage d\u2019\u00e9cran pourrait rogner votre fen\u00eatre",
     "screenshare_failed_notif": "Vous avez cess\u00e9 de partager votre \u00e9cran",
     "search_contact_placeholder": "{count, plural, one {Chercher un contact\u2026} many {Chercher parmi # contacts\u2026} other {Chercher parmi # contacts\u2026}}",

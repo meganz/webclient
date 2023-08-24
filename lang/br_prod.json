@@ -4481,6 +4481,8 @@
     "schedule_update_calendar": "Atualizar o calend\u00e1rio",
     "schedule_view_desc": "Ver descri\u00e7\u00e3o",
     "scheduled_edit_occurrence_note": "Voc\u00ea est\u00e1 editando um agendamento da reuni\u00e3o. [A]Editar reuni\u00e3o[/A]",
+    "scheduled_recur_time_daily_skip": "{count, plural, one {Todos os dias, de %3 a %4, das %1 \u00e0s %2} many {A cada # de dias, de %3 a %4, das %1 \u00e0s %2} other {A cada # dias, de %3 a %4, das %1 \u00e0s %2}}",
+    "scheduled_recur_time_daily_skip_cont": "{count, plural, one {Todos os dias a partir de %3, das %1 \u00e0s %2} many {A cada # de dias a partir de %3, das %1 \u00e0s %2} other {A cada # dias a partir de %3, das %1 \u00e0s %2}}",
     "screen_share_crop_tip": "O compartilhamento de tela pode recortar a sua janela",
     "screenshare_failed_notif": "Voc\u00ea deixou de compartilhar a sua tela",
     "search_contact_placeholder": "{count, plural, one {Pesquisar # contato\u2026} many {Pesquisar em # contatos\u2026} other {Pesquisar em # contatos\u2026}}",

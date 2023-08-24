@@ -4481,6 +4481,8 @@
     "schedule_update_calendar": "C\u1eadp nh\u1eadt l\u1ecbch",
     "schedule_view_desc": "Xem n\u1ed9i\u00a0dung m\u00f4\u00a0t\u1ea3",
     "scheduled_edit_occurrence_note": "B\u1ea1n \u0111ang ch\u1ec9nh\u00a0s\u1eeda m\u1ed9t th\u1eddi\u00a0di\u1ec3m t\u00e1i\u00a0di\u1ec5n cu\u1ed9c h\u1ecdp. [A]Chuy\u1ec3n sang ch\u1ec9nh\u00a0s\u1eeda h\u00e0ng\u00a0lo\u1ea1t[/A]",
+    "scheduled_recur_time_daily_skip": "{count, plural, other {M\u1ed7i # ng\u00e0y, c\u00f3 hi\u1ec7u\u00a0l\u1ef1c t\u1eeb %3 cho \u0111\u1ebfn %4 l\u00fac %1 \u0111\u1ebfn %2}}",
+    "scheduled_recur_time_daily_skip_cont": "{count, plural, other {M\u1ed7i # ng\u00e0y, c\u00f3 hi\u1ec7u\u00a0l\u1ef1c t\u1eeb %3 l\u00fac %1 \u0111\u1ebfn %2}}",
     "screen_share_crop_tip": "Chia s\u1ebb m\u00e0n h\u00ecnh c\u00f3 th\u1ec3 s\u1ebd x\u00e9n b\u1edbt khung c\u1eeda s\u1ed5 c\u1ee7a b\u1ea1n",
     "screenshare_failed_notif": "B\u1ea1n \u0111\u00e3 ch\u1ea5m\u00a0d\u1ee9t chia\u00a0s\u1ebb xem m\u00e0n\u00a0h\u00ecnh",
     "search_contact_placeholder": "{count, plural, other {T\u00ecm trong # t\u00ean li\u00ean l\u1ea1c\u2026}}",

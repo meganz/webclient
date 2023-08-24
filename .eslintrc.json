@@ -164,6 +164,7 @@
 
         "es/no-atomics": 2,
         "es/no-exponential-operators": 2,
+        "es/no-object-fromentries": "off",
         "es/no-promise-all-settled": "off",
         "es/no-regexp-lookbehind-assertions": 2,
         "es/no-regexp-named-capture-groups": 2,

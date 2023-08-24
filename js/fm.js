@@ -655,6 +655,9 @@ function fmtopUI() {
                 console.log('Inbox');
             }
         }
+        else if (M.isDynPage(M.currentdirid)) {
+            $('.fm-right-files-block').addClass('visible-notification');
+        }
         else if (M.currentrootid === 'shares') {
 
             M.sharesUI();

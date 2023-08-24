@@ -2944,13 +2944,15 @@ lazy(mega.gallery, 'albums', () => {
                 });
             }
 
-            options.push({
-                label: l.album_open,
-                icon: 'preview-reveal',
-                click: () => {
-                    M.openFolder('albums/' + albumId);
-                }
-            });
+            if (M.currentdirid !== `albums/${albumId}`) {
+                options.push({
+                    label: l.album_open,
+                    icon: 'preview-reveal',
+                    click: () => {
+                        M.openFolder(`albums/${albumId}`);
+                    }
+                });
+            }
 
             if (isUserAlbum) {
                 options.push(
@@ -3206,6 +3208,9 @@ lazy(mega.gallery, 'albums', () => {
             parent.classList.remove('hidden');
 
             this.setBreadcrumbs();
+
+            // Only 'Albums' section needs this. Otherwise the banner does not appear in albums
+            $('.fm-right-files-block').addClass('visible-notification');
         }
 
         setBreadcrumbs(albumId) {

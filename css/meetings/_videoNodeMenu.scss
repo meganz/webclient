@@ -5,6 +5,7 @@
     right: 8px;
     text-align: right;
     z-index: 2;
+    width: max-content;
 
     &:hover .node-menu-content {
         display: block;
@@ -45,6 +46,9 @@
         border: var(--context-menu-border);
         background: var(--surface-grey-2);
         box-shadow: var(--dropdown-shadow);
+        position: absolute;
+        right: 0;
+        width: max-content;
 
         ul {
             margin: 0;

@@ -1240,6 +1240,7 @@ class MegaGallery {
             const viewBtns = $('.fm-header-buttons .view-links', rfBlock);
             mega.gallery.viewBtns = viewBtns.clone(true);
             galleryHeader.append(mega.gallery.viewBtns);
+            $('.view-links', galleryHeader).toggleClass('hidden', M.isGalleryPage());
         }
 
         if (M.v.length > 0) {
@@ -2564,6 +2565,9 @@ async function galleryUI(id) {
     else {
         $('.view-links', '.gallery-tabs-bl').addClass('hidden');
     }
+
+    // This keeps the banner persistent when navigating from Recents to Gallery
+    $('.fm-right-files-block').addClass('visible-notification');
 
     // This is media discovery
     if (id) {

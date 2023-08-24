@@ -63,17 +63,17 @@
                 background: transparent;
                 cursor: pointer;
                 border: 0 none;
+                font: var(--text-h3);
+                color: var(--text-color-medium);
 
+                div {
+                    float: left;
+                }
                 i {
-                    margin: 0 auto;
+                    float: left;
+                    margin: 0 8px 0 0;
                     --icon-size: 24px;
                     --mask-color: var(--icon-rest);
-                }
-
-                span {
-                    position: fixed;
-                    bottom: -9999px;
-                    visibility: hidden;
                 }
             }
         }

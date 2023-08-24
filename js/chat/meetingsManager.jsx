@@ -569,10 +569,14 @@ class MeetingsManager {
                 continuous: {
                     /* `Everyday effective %3 from %1 to %2` */
                     occur: l.schedule_recur_time_daily_cont,
+                    /* `Every # days effective %3 from %1 to %2` */
+                    skip: l.scheduled_recur_time_daily_skip_cont,
                 },
                 limited: {
                     /* `Everyday effective %3 until %4 from %1 to %2` */
                     occur: l.schedule_recur_time_daily,
+                    /* `Every # days effective %3 until %4 from %1 to %2` */
+                    skip: l.scheduled_recur_time_daily_skip,
                 }
             },
             weekly: {
@@ -797,7 +801,7 @@ class MeetingsManager {
     }
 
     _parseOccurrence(timeRules, mode, occurrence) {
-        const { startTime, endTime, days, dayInt, interval, month, recurEnd } = timeRules;
+        const { startTime, endTime, days, dayInt, interval, month, recurEnd, skipDay } = timeRules;
         const { recur, once } = this.OCCUR_STRINGS;
         const occurrenceEnd = recurEnd ? 'limited' : 'continuous';
 
@@ -860,6 +864,14 @@ class MeetingsManager {
                 .replace('%3', time2date(startTime, 2))
                 .replace('%4', time2date(recurEnd, 2))
                 .replace('%5', dayInt);
+        }
+        else if (skipDay) {
+            string = mega.icu.format(recur.daily[occurrenceEnd].skip, interval);
+            return string
+                .replace('%1', toLocaleTime(startTime))
+                .replace('%2', toLocaleTime(endTime))
+                .replace('%3', time2date(startTime, 2))
+                .replace('%4', time2date(recurEnd, 2));
         }
 
         string = once[mode].occur;
@@ -1026,6 +1038,14 @@ class MeetingsManager {
                 };
             })[0];
         }
+
+        if (meta.f === 'd' && meta.i > 1) {
+            obj.skipDay = true;
+        }
+        else if (meta.f === 'd' && meta.i === 1) {
+            obj.days = [1, 2, 3, 4, 5, 6, 0];
+        }
+
         return obj;
     }
 
@@ -1110,10 +1130,17 @@ class MeetingsManager {
         }
         else if (meta.recurring) {
             // Created a recurring meeting
-            const { end, weekDays = [], interval, monthDays = [], offset } = meeting.recurring;
+            const { end, weekDays = [], interval, monthDays = [], offset, frequency } = meeting.recurring;
             meta.recurring = true;
             meta.timeRules.recurEnd = end ? toS(end) : false;
             meta.timeRules.interval = interval || 1;
+
+            if (frequency === 'd' && interval > 1) {
+                meta.timeRules.skipDay = true;
+            }
+            else if (frequency === 'd' && interval === 1) {
+                meta.timeRules.days = [1, 2, 3, 4, 5, 6, 0];
+            }
 
             if (weekDays.length) {
                 // Sort into Mon-Sun order then fix index for strings

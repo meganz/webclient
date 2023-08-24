@@ -594,10 +594,12 @@ class MeetingsManager {
       recur: {
         daily: {
           continuous: {
-            occur: l.schedule_recur_time_daily_cont
+            occur: l.schedule_recur_time_daily_cont,
+            skip: l.scheduled_recur_time_daily_skip_cont
           },
           limited: {
-            occur: l.schedule_recur_time_daily
+            occur: l.schedule_recur_time_daily,
+            skip: l.scheduled_recur_time_daily_skip
           }
         },
         weekly: {
@@ -861,7 +863,8 @@ class MeetingsManager {
       dayInt,
       interval,
       month,
-      recurEnd
+      recurEnd,
+      skipDay
     } = timeRules;
     const {
       recur,
@@ -898,6 +901,9 @@ class MeetingsManager {
     } else if (dayInt) {
       string = mega.icu.format(recur.monthly[occurrenceEnd].num, interval);
       return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%3', time2date(startTime, 2)).replace('%4', time2date(recurEnd, 2)).replace('%5', dayInt);
+    } else if (skipDay) {
+      string = mega.icu.format(recur.daily[occurrenceEnd].skip, interval);
+      return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%3', time2date(startTime, 2)).replace('%4', time2date(recurEnd, 2));
     }
     string = once[mode].occur;
     return string.replace('%1', toLocaleTime(startTime)).replace('%2', toLocaleTime(endTime)).replace('%6', time2date(startTime, 20)).replace('%s', time2date(startTime, 11));
@@ -996,6 +1002,11 @@ class MeetingsManager {
         };
       })[0];
     }
+    if (meta.f === 'd' && meta.i > 1) {
+      obj.skipDay = true;
+    } else if (meta.f === 'd' && meta.i === 1) {
+      obj.days = [1, 2, 3, 4, 5, 6, 0];
+    }
     return obj;
   }
   noCsMeta(scheduledId, data, chatRoom) {
@@ -1062,11 +1073,17 @@ class MeetingsManager {
         weekDays = [],
         interval,
         monthDays = [],
-        offset
+        offset,
+        frequency
       } = meeting.recurring;
       meta.recurring = true;
       meta.timeRules.recurEnd = end ? toS(end) : false;
       meta.timeRules.interval = interval || 1;
+      if (frequency === 'd' && interval > 1) {
+        meta.timeRules.skipDay = true;
+      } else if (frequency === 'd' && interval === 1) {
+        meta.timeRules.days = [1, 2, 3, 4, 5, 6, 0];
+      }
       if (weekDays.length) {
         meta.timeRules.days = weekDays.sort((a, b) => a - b).map(wd => wd === 7 ? 0 : wd);
       }

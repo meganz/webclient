@@ -4481,6 +4481,8 @@
     "schedule_update_calendar": "Perbarui kalender",
     "schedule_view_desc": "Lihat deskripsi",
     "scheduled_edit_occurrence_note": "Anda sedang mengubah satu kejadian dalam rangkaian. [A]Ubah seri[/A]",
+    "scheduled_recur_time_daily_skip": "{count, plural, one {Every day effective %3 until %4 from %1 to %2} other {Every # days effective %3 until %4 from %1 to %2}}",
+    "scheduled_recur_time_daily_skip_cont": "{count, plural, one {Every day effective %3 from %1 to %2} other {Every # days effective %3 from %1 to %2}}",
     "screen_share_crop_tip": "Berbagi layar dapat memotong jendela anda",
     "screenshare_failed_notif": "Anda telah berhenti membagikan layar anda",
     "search_contact_placeholder": "{count, plural, other {Cari # kontak\u2026}}",

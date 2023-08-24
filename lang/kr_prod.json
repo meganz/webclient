@@ -4481,6 +4481,8 @@
     "schedule_update_calendar": "\ub2ec\ub825 \uc218\uc815\ud568",
     "schedule_view_desc": "\uc124\uba85 \ubcf4\uae30",
     "scheduled_edit_occurrence_note": "\ub2f9\uc2e0\uc740 \ub418\ud480\uc774\uc758 \ud55c \ud56d\ubaa9\uc744 \ud3b8\uc9d1\ud558\uace0 \uc788\uc2b5\ub2c8\ub2e4 [A]\ub418\ud480\uc774 \ud3b8\uc9d1[/A]",
+    "scheduled_recur_time_daily_skip": "{count, plural, one {Every day effective %3 until %4 from %1 to %2} other {Every # days effective %3 until %4 from %1 to %2}}",
+    "scheduled_recur_time_daily_skip_cont": "{count, plural, one {Every day effective %3 from %1 to %2} other {Every # days effective %3 from %1 to %2}}",
     "screen_share_crop_tip": "\ud654\uba74 \uacf5\uc720\ub294 \ub2f9\uc2e0\uc758 \ucc3d\uc774 \uc798\ub9b4 \uc218 \uc788\uc2b5\ub2c8\ub2e4",
     "screenshare_failed_notif": "\ud654\uba74 \uacf5\uc720\ub97c \uba48\ucd94\uc5c8\uc2b5\ub2c8\ub2e4",
     "search_contact_placeholder": "{count, plural, other {\uc5f0\ub77d\ucc98 #\uac1c \uac80\uc0c9\u2026}}",

@@ -4481,6 +4481,8 @@
     "schedule_update_calendar": "\u30ab\u30ec\u30f3\u30c0\u30fc\u3092\u66f4\u65b0",
     "schedule_view_desc": "\u8aac\u660e\u3092\u8868\u793a",
     "scheduled_edit_occurrence_note": "\u30b7\u30ea\u30fc\u30ba\u306e\u958b\u50ac\u30921\u3064\u7de8\u96c6\u3057\u3066\u3044\u307e\u3059\u3002[A]\u30b7\u30ea\u30fc\u30ba\u3092\u7de8\u96c6[/A]",
+    "scheduled_recur_time_daily_skip": "{count, plural, other {%3\u304b\u3089%4\u307e\u3067\u3001#\u65e5\u3054\u3068\u306b\u3001%1\u304b\u3089%2}}",
+    "scheduled_recur_time_daily_skip_cont": "{count, plural, other {%3\u304b\u3089#\u65e5\u3054\u3068\u306b\u3001%1\u304b\u3089%2}}",
     "screen_share_crop_tip": "\u753b\u9762\u5171\u6709\u3067\u30a6\u30a3\u30f3\u30c9\u30a6\u304c\u30c8\u30ea\u30df\u30f3\u30b0\u3055\u308c\u308b\u5834\u5408\u304c\u3042\u308a\u307e\u3059",
     "screenshare_failed_notif": "\u753b\u9762\u306e\u5171\u6709\u3092\u505c\u6b62\u3057\u307e\u3057\u305f",
     "search_contact_placeholder": "{count, plural, other {#\u4ef6\u306e\u9023\u7d61\u5148\u3092\u691c\u7d22\u2026}}",

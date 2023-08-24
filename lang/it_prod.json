@@ -4481,6 +4481,8 @@
     "schedule_update_calendar": "Calendario aggiornato",
     "schedule_view_desc": "Vedi la descrizione",
     "scheduled_edit_occurrence_note": "Stai modificando un evento all'interno della serie. [A]Modifica l'intera serie[/A]",
+    "scheduled_recur_time_daily_skip": "{count, plural, one {Every day effective %3 until %4 from %1 to %2} other {Every # days effective %3 until %4 from %1 to %2}}",
+    "scheduled_recur_time_daily_skip_cont": "{count, plural, one {Every day effective %3 from %1 to %2} other {Every # days effective %3 from %1 to %2}}",
     "screen_share_crop_tip": "La condivisione dello schermo potrebbe ritagliare la tua finestra",
     "screenshare_failed_notif": "Hai smesso di condividere lo schermo",
     "search_contact_placeholder": "{count, plural, one {Cercando # contatto\u2026} many {Cercando # contatti\u2026} other {Cercando # contatti\u2026}}",

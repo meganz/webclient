@@ -4665,7 +4665,7 @@
     "version_file_summary": "{count, plural, one {Tienes # versi\u00f3n de archivo que ocupa un total de [X].} many {Tienes # versiones de archivo que ocupan un total de [X].} other {Tienes # versiones de archivo que ocupan un total de [X].}}",
     "version_preview": "Vista previa",
     "view_in_bc": "Ver en el Centro de backup",
-    "vpn_created_dialog_close_btn": "Close",
+    "vpn_created_dialog_close_btn": "Cerrar",
     "vpn_created_dialog_config_qr_caption": "Your VPN configuration",
     "vpn_created_dialog_disclaimer": "We don\u2019t store the private keys of the credentials, so you won\u2019t be able to generate this configuration again. If you lose the configuration, you can remove the credential and add a new one.",
     "vpn_created_dialog_heading": "Credential %s created",

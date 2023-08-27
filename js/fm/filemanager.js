@@ -249,6 +249,11 @@ FileManager.prototype.initFileManagerUI = function() {
         });
         $.hideContextMenu();
 
+        if (is_eplusplus && megaChatIsReady && megaChat.activeCall) {
+            // In call permissions dialog may have been shown. Don't leave the call UI.
+            return;
+        }
+
         // For ephemeral session redirect to 'fm' page
         // if user clicks overlay instead Yes/No or close icon 'x'
         // One situation when this is used, is when ephemeral user

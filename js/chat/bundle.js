@@ -15106,7 +15106,7 @@ class Recurring extends mixins.wl {
         value: this.OFFSETS.FIRST.value,
         weekDay: this.WEEK_DAYS.MONDAY.value
       },
-      monthDaysWarning: false
+      monthDaysWarning: this.initialMonthDay > 28
     };
     this.toggleView = (view, frequency, state) => this.setState({
       view,

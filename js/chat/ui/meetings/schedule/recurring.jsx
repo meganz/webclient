@@ -65,7 +65,7 @@ export default class Recurring extends MegaRenderMixin {
             value: this.OFFSETS.FIRST.value,
             weekDay: this.WEEK_DAYS.MONDAY.value
         },
-        monthDaysWarning: false
+        monthDaysWarning: this.initialMonthDay > 28
     };
 
     constructor(props) {

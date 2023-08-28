@@ -58,6 +58,9 @@ mobile.proSignupPrompt = {
         // Add click/tap handler
         $closeButton.off('tap').on('tap', function() {
 
+            // Trigger close event
+            delay('logindlg.close', eventlog.bind(null, 99861));
+
             // They don't want to continue with the Registration/Login so remove the flag
             sessionStorage.removeItem('proPageContinuePlanNum');
 
@@ -84,6 +87,9 @@ mobile.proSignupPrompt = {
 
         // Add click/tap handler
         $registerButton.off('tap').on('tap', function() {
+
+            // Trigger register event
+            delay('logindlg.register', eventlog.bind(null, 99860));
 
             // Set the plan number they selected into sessionStorage for use after Registration/Login
             self.setSelectedPlanNum();
@@ -114,6 +120,9 @@ mobile.proSignupPrompt = {
 
         // Add click/tap handler
         $loginButton.off('tap').on('tap', function() {
+
+            // Trigger register event
+            delay('logindlg.login', eventlog.bind(null, 99859));
 
             // Set the plan number they selected into sessionStorage for use after Registration/Login
             self.setSelectedPlanNum();

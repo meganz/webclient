@@ -1653,6 +1653,9 @@ function showRegisterDialog(aPromise) {
     }, aPromise);
 }
 
+// Flag to check if (not logged in) user has clicked Login / Register when selecting a pricing plan
+var attemptingLoginOrRegister = false;
+
 var signupPromptDialog = null;
 var showSignupPromptDialog = function() {
 
@@ -1681,6 +1684,8 @@ var showSignupPromptDialog = function() {
 
             $('.pro-login', this.$dialog)
                 .rebind('click.loginrequired', function() {
+                    delay('logindlg.login', eventlog.bind(null, 99859));
+                    attemptingLoginOrRegister = true;
                     signupPromptDialog.hide();
                     showLoginDialog();
                     return false;
@@ -1688,6 +1693,8 @@ var showSignupPromptDialog = function() {
 
             $('.pro-register', this.$dialog)
                 .rebind('click.loginrequired', function() {
+                    delay('logindlg.register', eventlog.bind(null, 99860));
+                    attemptingLoginOrRegister = true;
                     signupPromptDialog.hide();
 
                     if (!u_wasloggedin()) {
@@ -1713,6 +1720,12 @@ var showSignupPromptDialog = function() {
         });
 
         signupPromptDialog.rebind('onHide', function() {
+
+            // If login/register was pressed, do not trigger a close event
+            if (!attemptingLoginOrRegister) {
+                delay('logindlg.close', eventlog.bind(null, 99861));
+            }
+
             this.$dialog.removeClass('with-close-btn');
 
             // Set default icon
@@ -1720,5 +1733,6 @@ var showSignupPromptDialog = function() {
         });
     }
 
+    attemptingLoginOrRegister = false;
     signupPromptDialog.show();
 };

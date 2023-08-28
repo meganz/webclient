@@ -20339,6 +20339,12 @@ class StreamHead extends mixins.wl {
         this.durationRef.current.innerText = this.durationString;
       }
     };
+    this.closeTooltips = () => {
+      for (const node of this.headRef.current.querySelectorAll('.simpletip')) {
+        node.dispatchEvent(StreamHead.EVENTS.SIMPLETIP);
+      }
+    };
+    this.toggleFullscreen = () => this.fullscreen ? document.exitFullscreen() : document.documentElement.requestFullscreen();
     this.toggleBanner = callback => this.setState(state => ({
       banner: !state.banner
     }), () => callback && callback());
@@ -20420,6 +20426,9 @@ class StreamHead extends mixins.wl {
       })));
     };
   }
+  get fullscreen() {
+    return document.fullscreenElement;
+  }
   get duration() {
     return (Date.now() - this.props.call.ts) / 1000;
   }
@@ -20429,11 +20438,13 @@ class StreamHead extends mixins.wl {
   componentWillUnmount() {
     super.componentWillUnmount();
     clearInterval(this.durationInterval);
+    document.removeEventListener(StreamHead.EVENTS.FULLSCREEN, this.closeTooltips);
     document.removeEventListener(StreamHead.EVENTS.CLICK_DIALOG, this.handleDialogClose);
   }
   componentDidMount() {
     super.componentDidMount();
     this.durationInterval = setInterval(this.updateDurationDOM, 1000);
+    document.addEventListener(StreamHead.EVENTS.FULLSCREEN, this.closeTooltips);
     document.addEventListener(StreamHead.EVENTS.CLICK_DIALOG, this.handleDialogClose);
   }
   render() {
@@ -20449,6 +20460,11 @@ class StreamHead extends mixins.wl {
       onCallMinimize,
       onModeChange
     } = this.props;
+    const SIMPLETIP = {
+      position: 'bottom',
+      offset: 5,
+      className: 'theme-dark-forced'
+    };
     return external_React_default().createElement("div", {
       ref: this.headRef,
       className: `
@@ -20485,11 +20501,15 @@ class StreamHead extends mixins.wl {
     }), external_React_default().createElement(meetings_button.Z, {
       className: "head-control",
       simpletip: {
-        ...{
-          position: 'bottom',
-          offset: 5,
-          className: 'theme-dark-forced'
-        },
+        ...SIMPLETIP,
+        label: this.fullscreen ? l.exit_fullscreen : l[17803]
+      },
+      icon: `${this.fullscreen ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'}`,
+      onClick: this.toggleFullscreen
+    }, external_React_default().createElement("span", null, this.fullscreen ? l.exit_fullscreen : l[17803])), external_React_default().createElement(meetings_button.Z, {
+      className: "head-control",
+      simpletip: {
+        ...SIMPLETIP,
         label: l.minimize
       },
       icon: "icon-call-min-mode",
@@ -20499,6 +20519,7 @@ class StreamHead extends mixins.wl {
 }
 StreamHead.NAMESPACE = 'stream-head';
 StreamHead.EVENTS = {
+  FULLSCREEN: 'fullscreenchange',
   SIMPLETIP: new Event('simpletipClose'),
   CLICK_DIALOG: 'click'
 };

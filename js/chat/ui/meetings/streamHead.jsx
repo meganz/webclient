@@ -10,6 +10,7 @@ export default class StreamHead extends MegaRenderMixin {
 
     static NAMESPACE = 'stream-head';
     static EVENTS = {
+        FULLSCREEN: 'fullscreenchange',
         SIMPLETIP: new Event('simpletipClose'),
         CLICK_DIALOG: 'click'
     };
@@ -25,6 +26,10 @@ export default class StreamHead extends MegaRenderMixin {
         duration: undefined,
         banner: false
     };
+
+    get fullscreen() {
+        return document.fullscreenElement;
+    }
 
     get duration() {
         return (Date.now() - this.props.call.ts) / 1000;
@@ -44,7 +49,28 @@ export default class StreamHead extends MegaRenderMixin {
         if (this.durationRef) {
             this.durationRef.current.innerText = this.durationString;
         }
-    }
+    };
+
+    /**
+     * closeTooltips
+     * @description Helper that is invoked when the call enters fullscreen mode -- closes all tooltips that are
+     * currently rendered across the UI.
+     * @returns {void}
+     */
+
+    closeTooltips = () => {
+        for (const node of this.headRef.current.querySelectorAll('.simpletip')) {
+            node.dispatchEvent(StreamHead.EVENTS.SIMPLETIP);
+        }
+    };
+
+    /**
+     * toggleFullscreen
+     * @description Toggles fullscreen.
+     * @returns {Promise<void>}
+     */
+
+    toggleFullscreen = () => this.fullscreen ? document.exitFullscreen() : document.documentElement.requestFullscreen();
 
     /**
      * toggleBanner
@@ -163,12 +189,14 @@ export default class StreamHead extends MegaRenderMixin {
     componentWillUnmount() {
         super.componentWillUnmount();
         clearInterval(this.durationInterval);
+        document.removeEventListener(StreamHead.EVENTS.FULLSCREEN, this.closeTooltips);
         document.removeEventListener(StreamHead.EVENTS.CLICK_DIALOG, this.handleDialogClose);
     }
 
     componentDidMount() {
         super.componentDidMount();
         this.durationInterval = setInterval(this.updateDurationDOM, 1000);
+        document.addEventListener(StreamHead.EVENTS.FULLSCREEN, this.closeTooltips);
         document.addEventListener(StreamHead.EVENTS.CLICK_DIALOG, this.handleDialogClose);
     }
 
@@ -221,6 +249,18 @@ export default class StreamHead extends MegaRenderMixin {
                     </div>
                     <div className={`${NAMESPACE}-controls`}>
                         <ModeSwitch mode={mode} onModeChange={onModeChange} />
+                        <Button
+                            className="head-control"
+                            simpletip={{ ...SIMPLETIP, label: this.fullscreen ? l.exit_fullscreen : l[17803] }}
+                            icon={`${this.fullscreen ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'}`}
+                            onClick={this.toggleFullscreen}>
+                            <span>
+                                {this.fullscreen ?
+                                    l.exit_fullscreen /* `Exit full screen` */ :
+                                    l[17803] /* `Full screen` */
+                                }
+                            </span>
+                        </Button>
                         <Button
                             className="head-control"
                             simpletip={{ ...SIMPLETIP, label: l.minimize /* `Minimize` */}}

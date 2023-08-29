@@ -131,7 +131,11 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
 
         if (mega.ui.onboarding) {
-            mBroadcaster.addListener('pagechange', mega.ui.onboarding.start.bind(mega.ui.onboarding));
+            mBroadcaster.addListener('pagechange', () => {
+                // Hide the control panel while the page change is finishing up.
+                $('.onboarding-control-panel').addClass('hidden');
+                onIdle(mega.ui.onboarding.start.bind(mega.ui.onboarding));
+            });
             mega.ui.onboarding.start();
         }
     }).catch(dump);

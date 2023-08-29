@@ -1,3 +1,5 @@
+import { prepareExportIo, prepareExportStreams } from "../utils.jsx";
+
 export const RETENTION_FORMAT = { HOURS: 'hour', DAYS: 'day', WEEKS: 'week', MONTHS: 'month', DISABLED: 'none' };
 export const MCO_FLAGS = { OPEN_INVITE: 'oi', SPEAK_REQUEST: 'sr', WAITING_ROOM: 'w' };
 window.RETENTION_FORMAT = RETENTION_FORMAT;
@@ -2645,6 +2647,177 @@ ChatRoom.prototype.toggleSpeakRequest = function() {
     //     return;
     // }
     // this.setMcoFlags({ [MCO_FLAGS.SPEAK_REQUEST]: Math.abs(this.options[MCO_FLAGS.SPEAK_REQUEST] - 1) });
+};
+
+ChatRoom.prototype.exportToFile = function() {
+    if (this.messagesBuff.messages.length === 0 || this.exportIo) {
+        return;
+    }
+
+    loadingDialog.show('chat_export');
+    eventlog(99874);
+    this._exportChat()
+        .then(() => {
+            eventlog(99875, JSON.stringify([1]));
+        })
+        .catch(ex => {
+            if (d) {
+                console.error('Chat export: ', ex);
+            }
+            const report = [
+                String(ex && ex.message || ex).replace(/\s+/g, '').substring(0, 64),
+            ];
+            report.unshift(report[0] === 'Aborted' ? 1 : 0);
+            if (!report[0]) {
+                msgDialog('error', '', l.export_chat_failed, '', undefined, undefined, true);
+            }
+            eventlog(99875, JSON.stringify(report));
+        })
+        .finally(() => {
+            loadingDialog.hide('chat_export');
+            this.isScrollingToMessageId = false;
+            onIdle(() => this.messagesBuff.detachMessages());
+        });
+};
+
+ChatRoom.prototype._exportChat = async function() {
+    // Fetch messages into memory
+    this.isScrollingToMessageId = true; // Stop detach from running while this is processing.
+    while (this.messagesBuff.haveMoreHistory()) {
+        await this.messagesBuff.retrieveChatHistory(1000);
+    }
+
+    // Check if the user wants the shared nodes if applicable
+    let withMedia = !!M.v.length;
+    if (withMedia) {
+        withMedia = await asyncConfirmationDialog(
+            '',
+            l.export_chat_media_dlg_title,
+            l.export_chat_media_dlg_text,
+            undefined,
+            true,
+            l.export_chat_media_dlg_conf,
+            l.export_chat_media_dlg_rej
+        );
+        if (withMedia === null) {
+            throw new Error('Aborted');
+        }
+    }
+    let { attachNodes, stringNodes } = this.messagesBuff.getExportContent(withMedia);
+    stringNodes = stringNodes.join('\n');
+    const basename = M.getSafeName(this.getRoomTitle());
+    const zname = l.export_chat_zip_file.replace('%s', basename);
+    const bufferName = l.export_chat_text_file.replace('%s', basename);
+
+    if (attachNodes.length) {
+        const p = [];
+        const n = [];
+        let s = 0;
+        for (const node of attachNodes) {
+            s += node.s;
+            if (node.ph) {
+                p.push(node.ph);
+            }
+            else {
+                n.push(node.h);
+            }
+        }
+        const res = await asyncApiReq({ a: 'qbq', s, n, p });
+        if (res === 1 || res === 2) {
+            // Overquota. Offer to just save the chat history
+            const fallback = await asyncConfirmationDialog(
+                '',
+                l.export_chat_media_obq_title,
+                l.export_chat_media_obq_text
+            );
+            if (fallback) {
+                return M.saveAs(stringNodes, bufferName);
+            }
+        }
+        else if (res === 0) {
+            await M.require('clientzip_js');
+            // Prepare the chat history to be added to the zip file from memory
+            const data = new TextEncoder().encode(stringNodes);
+            const dl = {
+                size: data.byteLength + s,
+                n: bufferName,
+                t: unixtime(),
+                id: this.chatId,
+                p: '',
+                io: Object.create(null),
+                writer: Object.create(null),
+                offset: 0,
+                zname,
+            };
+
+            const io = await prepareExportIo(dl);
+            const t = new Date((this.lastActivity || this.ctime) * 1000);
+            let failedCount = 0;
+
+            const src = prepareExportStreams(attachNodes, (size) => {
+                failedCount++;
+                // Fake progress for empty file.
+                dl.done += size;
+            });
+            src.unshift({
+                name: bufferName,
+                lastModified: t,
+                input: data.buffer,
+            });
+
+            // Rudimentary progress tracking since we are skipping the normal transfer flow.
+            dl.done = 0;
+            const reader = clientZip.downloadZip(src).body.getReader();
+            dl.nextChunk = async() => {
+                const read = await reader.read().catch(dump);
+                if (!read) {
+                    reader.cancel().catch(ex => {
+                        if (ex === EOVERQUOTA) {
+                            dlmanager.showOverQuotaDialog();
+                        }
+                        else {
+                            msgDialog('error', '', l.export_chat_failed, '', undefined, undefined, true);
+                        }
+                    });
+                    io.abort();
+                    delete this.exportIo;
+                    return;
+                }
+                if (read.done) {
+                    loadingDialog.hideProgress();
+                    io.download(zname);
+                    delete this.exportIo;
+                    if (failedCount) {
+                        msgDialog(
+                            'error',
+                            '',
+                            l.export_chat_failed,
+                            l.export_chat_partial_fail,
+                            undefined,
+                            undefined,
+                            true
+                        );
+                    }
+                }
+                else {
+                    dl.done += read.value.byteLength;
+                    loadingDialog.showProgress((dl.done / dl.size) * 100);
+                    io.write(read.value, dl.offset, dl.nextChunk);
+                    dl.offset += read.value.length;
+                }
+            };
+            io.begin = dl.nextChunk;
+            io.setCredentials(false, dl.size, zname);
+            this.exportIo = io;
+        }
+        else {
+            throw new Error(`Unexpected qbq response ${res}`);
+        }
+    }
+    else {
+        // Download the chat history.
+        return M.saveAs(stringNodes, bufferName);
+    }
 };
 
 window.ChatRoom = ChatRoom;

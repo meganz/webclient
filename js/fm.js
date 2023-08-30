@@ -811,6 +811,11 @@ function doClearbin(all) {
     msgDialog('clear-bin', l[14], l[15], l[1007], function(e) {
         if (e) {
             M.clearRubbish(all);
+
+            // Navigate to root of rubbish bin
+            if (all) {
+                M.openFolder(M.RubbishID, true);
+            }
         }
     });
 }

@@ -34,7 +34,9 @@ export default class ConversationsListItem extends MegaRenderMixin {
         const promise = this.isLoading();
         if (promise && promise.always) {
             promise.always(() => {
-                this.setState({ isLoading: false });
+                if (this.isMounted()) {
+                    this.setState({ isLoading: false });
+                }
             });
         }
         else if (promise === false) {

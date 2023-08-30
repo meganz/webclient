@@ -2140,7 +2140,6 @@ accountUI.plan = {
                 this.$dialog = $('.cancel-subscription-st1');
                 this.$dialogSuccess = $('.cancel-subscription-st2');
                 this.$accountPageCancelButton = $('.btn-cancel-sub');
-                this.$options = this.$dialog.find('.label-wrap');
                 this.$formContent = this.$dialog.find('section.content');
                 this.$selectReasonDialog = this.$dialog.find('.error-banner.select-reason');
                 this.$invalidDetailsDialog = this.$dialog.find('.error-banner.invalid-details');
@@ -2152,6 +2151,37 @@ accountUI.plan = {
                 this.$backgroundOverlay = $('.fm-dialog-overlay');
                 this.$expiryTextBlock = $('.account.plan-info.expiry-txt');
                 this.$expiryDateBlock = $('.account.plan-info.expiry');
+
+                const options = {
+                    temp_plan: 1,
+                    too_expensive: 2,
+                    too_much_storage_quota: 3,
+                    lack_of_features: 4,
+                    switching_provider: 5,
+                    difficult_to_use: 6,
+                    poor_support: 7
+                };
+
+                // Shuffle the options
+                const optionArray = Object.keys(options);
+                for (let i = optionArray.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [optionArray[i], optionArray[j]] = [optionArray[j], optionArray[i]];
+                }
+
+                const $template = $('.cancel-subscription-radio-template', this.$dialog);
+                const $optionArea = $('.content-block form', this.$dialog);
+                $optionArea.children('.built-option').remove();
+
+                for (let i = 0; i < optionArray.length; i++) {
+                    const $radio = $template.clone().removeClass('hidden cancel-subscription-radio-template');
+                    $('#subcancel_div', $radio).removeAttr('id');
+                    $('#subcancel', $radio).val(options[optionArray[i]]).removeAttr('id');
+                    $('.radio-txt', $radio).text(l['cancel_sub_' + optionArray[i] + '_reason']);
+                    $('.content-block form', this.$dialog).safePrepend($radio.prop('outerHTML'));
+                }
+
+                this.$options = this.$dialog.find('.label-wrap');
 
                 // Show the dialog
                 this.$dialog.removeClass('hidden');

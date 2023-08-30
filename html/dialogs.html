@@ -3467,12 +3467,18 @@
          aria-labelledby="cancel-subscription-st1-title"
          aria-modal="true">
 
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
+        <div class="label-wrap built-option cancel-subscription-radio-template hidden">
+            <div class="cancel-option radioOff" id="subcancel_div">
+                <input type="radio" id="subcancel" class="cancel-option radioOff" value="">
+            </div>
+            <div class="radio-txt"></div>
+        </div>
 
-        <header>
+        <header class="cancel-subscription-header">
             <h2 id="cancel-subscription-st1-title">[$6822]</h2>
+            <button class="close js-close" aria-label="[$148]">
+                <i class="sprite-fm-mono icon-dialog-close"></i>
+            </button>
         </header>
 
         <section class="content">
@@ -3483,48 +3489,6 @@
                 <div class="cancel-option-prompt">[$7005]</div>
                 <form>
                     <div class="error-banner select-reason hidden">[$select_cancel_sub_reason_error_msg]</div>
-                    <div class="label-wrap">
-                        <div class="cancel-option radioOff" id="subcancel1_div">
-                            <input type="radio" id="subcancel1" class="cancel-option radioOff" value="1">
-                        </div>
-                        <div class="radio-txt">[$cancel_sub_temp_plan_reason]</div>
-                    </div>
-                    <div class="label-wrap">
-                        <div class="cancel-option radioOff" id="subcancel2_div">
-                            <input type="radio" id="subcancel2" class="cancel-option radioOff" value="2">
-                        </div>
-                        <div class="radio-txt">[$cancel_sub_too_expensive_reason]</div>
-                    </div>
-                    <div class="label-wrap">
-                        <div class="cancel-option radioOff" id="subcancel3_div">
-                            <input type="radio" id="subcancel3" class="cancel-option radioOff" value="3">
-                        </div>
-                        <div class="radio-txt">[$cancel_sub_too_much_storage_quota_reason]</div>
-                    </div>
-                    <div class="label-wrap">
-                        <div class="cancel-option radioOff" id="subcancel4_div">
-                            <input type="radio" id="subcancel4" class="cancel-option radioOff" value="4">
-                        </div>
-                        <div class="radio-txt">[$cancel_sub_lack_of_features_reason]</div>
-                    </div>
-                    <div class="label-wrap">
-                        <div class="cancel-option radioOff" id="subcancel5_div">
-                            <input type="radio" id="subcancel5" class="cancel-option radioOff" value="5">
-                        </div>
-                        <div class="radio-txt">[$cancel_sub_switching_provider_reason]</div>
-                    </div>
-                    <div class="label-wrap">
-                        <div class="cancel-option radioOff" id="subcancel6_div">
-                            <input type="radio" id="subcancel6" class="cancel-option radioOff" value="6">
-                        </div>
-                        <div class="radio-txt">[$cancel_sub_difficult_to_use_reason]</div>
-                    </div>
-                    <div class="label-wrap">
-                        <div class="cancel-option radioOff" id="subcancel7_div">
-                            <input type="radio" id="subcancel7" class="cancel-option radioOff" value="7">
-                        </div>
-                        <div class="radio-txt">[$cancel_sub_poor_support_reason]</div>
-                    </div>
                     <div class="label-wrap">
                         <div class="cancel-option radioOff" id="subcancel8_div">
                             <input type="radio" id="subcancel8" class="cancel-option radioOff" value="8">

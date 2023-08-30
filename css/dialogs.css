@@ -5421,8 +5421,7 @@ body.de .mega-dialog.contact-picker-widget {
         width: 704px;
     }
     .mega-dialog.cancel-subscription-st1 button.close {
-        top: 27px;
-        right: 27px;
+        position: initial;
     }
     .mega-dialog.cancel-subscription-st1 header {
         margin-bottom: 24px;
@@ -5431,7 +5430,8 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.cancel-subscription-st1 section {
         position: relative;
-        height: 400px;
+        height: calc(100% + 36px);
+        max-height: 436px;
     }
     .mega-dialog.cancel-subscription-st1.select-reason section {
         height: 442px;
@@ -5499,6 +5499,11 @@ body.de .mega-dialog.contact-picker-widget {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+    }
+    .mega-dialog.cancel-subscription-st1 .cancel-subscription-header {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
     }
 
 /* end cancel-subscription-st1 */

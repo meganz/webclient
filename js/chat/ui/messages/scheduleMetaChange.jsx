@@ -193,7 +193,7 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
                             {this.getTimestampAsString()}
                         </div>
                         <div className="message text-block">
-                            {ScheduleMetaChange.getTitleText(meta)} {d && meta.handle}
+                            {ScheduleMetaChange.getTitleText(meta)} {!!d && meta.handle}
                         </div>
                         <div className="message body-block">
                             {(

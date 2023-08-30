@@ -27527,7 +27527,7 @@ class ScheduleMetaChange extends _mixin_jsx1__.y {
       "data-simpletip": time2date(this.getTimestamp())
     }, this.getTimestampAsString()), react0().createElement("div", {
       className: "message text-block"
-    }, ScheduleMetaChange.getTitleText(meta), " ", d && meta.handle), react0().createElement("div", {
+    }, ScheduleMetaChange.getTitleText(meta), " ", !!d && meta.handle), react0().createElement("div", {
       className: "message body-block"
     }, (meta.prevTiming || meta.calendar || meta.topic && meta.onlyTitle || meta.recurring) && react0().createElement("div", {
       className: "schedule-detail-block"

@@ -3209,8 +3209,6 @@ lazy(mega.gallery, 'albums', () => {
 
             this.setBreadcrumbs();
 
-            // Only 'Albums' section needs this. Otherwise the banner does not appear in albums
-            $('.fm-right-files-block').addClass('visible-notification');
         }
 
         setBreadcrumbs(albumId) {
@@ -3372,6 +3370,9 @@ lazy(mega.gallery, 'albums', () => {
         update(albumId, handles) {
             this.setRightControls(albumId, handles);
             this.setBreadcrumbs(albumId);
+
+            // Only 'Albums' section needs this. Otherwise the banner does not appear in albums
+            $('.fm-right-files-block').addClass('visible-notification');
         }
 
         setRightControls(albumId, handles) {

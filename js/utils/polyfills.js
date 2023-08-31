@@ -289,6 +289,7 @@ mBroadcaster.once('startMega', tryCatch(() => {
 
             delete window.megaecmastest;
             Object.defineProperty(mega, 'es2020', {value: true});
+            delete sessionStorage.mecmatst;
         });
 
     if (typeof BigInt === 'undefined') {

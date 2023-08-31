@@ -811,6 +811,11 @@ function doClearbin(all) {
     msgDialog('clear-bin', l[14], l[15], l[1007], function(e) {
         if (e) {
             M.clearRubbish(all);
+
+            // Navigate to root of rubbish bin
+            if (all) {
+                M.openFolder(M.RubbishID, true);
+            }
         }
     });
 }
@@ -1729,6 +1734,21 @@ function closeMsg() {
 
     delete $.msgDialog;
     mBroadcaster.sendMessage('msgdialog-closed');
+}
+
+function asyncConfirmationDialog(title, msg, submsg, checkboxSetting, showCloseButton, affirmButton, rejectButton) {
+    'use strict';
+    return new Promise((resolve, reject) => {
+        tryCatch(() => {
+            let type = 'confirmation';
+            if (affirmButton && rejectButton) {
+                type = `confirmation:!^${affirmButton}!${rejectButton}`;
+            }
+            msgDialog(type, title, msg, submsg, (e) => {
+                resolve(e);
+            }, checkboxSetting, showCloseButton);
+        }, reject)();
+    });
 }
 
 /**

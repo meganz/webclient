@@ -235,7 +235,6 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'discount-offer'
             || $.dialog === 'voucher-info-dlg'
             || $.dialog === "chat-incoming-call"
-            || $.dialog === 'onboardingDialog'
             || $.dialog === 'stripe-pay'
             || $.dialog === 'start-meeting-dialog'
             || $.dialog === 'fingerprint-admin-dlg'

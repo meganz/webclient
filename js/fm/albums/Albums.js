@@ -751,10 +751,11 @@ lazy(mega.gallery, 'albums', () => {
                 mBroadcaster.once('slideshow:close', () => {
                     M.v = tmpMv;
                     const selCount = Object.keys(selHandles).length;
-                    const is_timeline = scope.albums.grid && scope.albums.grid.timeline;
+
                     // double click will mess _selCount, so we need to reset here
-                    if (is_timeline) {
+                    if (scope.albums.grid && scope.albums.grid.timeline) {
                         scope.albums.grid.timeline._selCount = selCount;
+                        scope.albums.grid.timeline.adjustToBottomBar();
                     }
 
                     reinitiateEvents();
@@ -775,10 +776,6 @@ lazy(mega.gallery, 'albums', () => {
                             mega.icu.format(l.album_selected_items_count, album.nodes.length)
                                 .replace('%1', selCount)
                         );
-
-                        if (is_timeline) {
-                            scope.albums.grid.timeline.adjustToBottomBar();
-                        }
                     }
                 });
             });
@@ -857,12 +854,12 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         clearSlideshowSelections() {
-            const cells = this.timeline.querySelectorAll('.album-timeline-cell.ui-selected');
+            const cells = scope.albums.grid.timeline.cellCache;
 
-            for (let i = 0; i < cells.length; i++) {
-                const { mComponent } = cells[i];
+            for (let i = 0; i < Object.keys(cells).length; i++) {
+                const mComponent = cells[Object.keys(cells)[i]];
 
-                if (!mComponent.isSelected) {
+                if (!mComponent._selected) {
                     mComponent.el.classList.remove('ui-selected');
                 }
             }
@@ -3209,8 +3206,6 @@ lazy(mega.gallery, 'albums', () => {
 
             this.setBreadcrumbs();
 
-            // Only 'Albums' section needs this. Otherwise the banner does not appear in albums
-            $('.fm-right-files-block').addClass('visible-notification');
         }
 
         setBreadcrumbs(albumId) {
@@ -3372,6 +3367,9 @@ lazy(mega.gallery, 'albums', () => {
         update(albumId, handles) {
             this.setRightControls(albumId, handles);
             this.setBreadcrumbs(albumId);
+
+            // Only 'Albums' section needs this. Otherwise the banner does not appear in albums
+            $('.fm-right-files-block').addClass('visible-notification');
         }
 
         setRightControls(albumId, handles) {

@@ -256,7 +256,15 @@ class ChatOnboarding {
     }
 
     _shouldSkipShow() {
-        if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active || u_type < 3 || is_mobile) {
+        if (
+            !M.chat
+            || !mega.ui.onboarding
+            || $.dialog
+            || loadingDialog.active
+            || u_type < 3
+            || is_mobile
+            || $.msgDialog
+        ) {
             // Invalid state to show or onboarding isn't ready
             return true;
         }

@@ -1354,7 +1354,7 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (chatOnboarding_class = class 
     this._checkAndShowStep();
   }
   _shouldSkipShow() {
-    if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active || u_type < 3 || is_mobile) {
+    if (!M.chat || !mega.ui.onboarding || $.dialog || loadingDialog.active || u_type < 3 || is_mobile || $.msgDialog) {
       return true;
     }
     this.$topRightMenu = this.$topRightMenu || $('.top-menu-popup', '#topmenu');
@@ -1482,7 +1482,7 @@ var call = __webpack_require__(755);
 
 
 __webpack_require__(62);
-__webpack_require__(778);
+__webpack_require__(455);
 __webpack_require__(336);
 
 
@@ -3654,16 +3654,125 @@ const chat = ({
 
 /***/ }),
 
-/***/ 778:
+/***/ 455:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-MCO_FLAGS: () => (MCO_FLAGS),
-RETENTION_FORMAT: () => (RETENTION_FORMAT),
-"default": () => (__WEBPACK_DEFAULT_EXPORT__)
+  MCO_FLAGS: () => (MCO_FLAGS),
+  RETENTION_FORMAT: () => (RETENTION_FORMAT),
+  "default": () => (chatRoom)
 });
+
+;// CONCATENATED MODULE: ./js/utils.jsx
+function altersData(fn) {
+  fn.altersData = true;
+  return fn;
+}
+function prefixedKeyMirror(prefix, vals) {
+  var result = {};
+  Object.keys(vals).forEach(function (k) {
+    result[k] = prefix + ":" + k;
+  });
+  return result;
+}
+function extendActions(prefix, src, toBeAppended) {
+  var actions = Object.keys(src).concat(Object.keys(toBeAppended));
+  var result = {};
+  actions.forEach(function (k) {
+    result[k] = prefix + ":" + k;
+  });
+  return result;
+}
+async function prepareExportIo(dl) {
+  const {
+    zname,
+    size
+  } = dl;
+  if (window.isSecureContext && typeof showSaveFilePicker === 'function' && typeof FileSystemFileHandle !== 'undefined' && 'createWritable' in FileSystemFileHandle.prototype && typeof FileSystemWritableFileStream !== 'undefined' && 'seek' in FileSystemWritableFileStream.prototype) {
+    const file = await window.showSaveFilePicker({
+      suggestedName: zname
+    }).catch(dump);
+    if (file) {
+      const stream = await file.createWritable().catch(dump);
+      if (stream) {
+        return {
+          stream,
+          write: function (data, position, done) {
+            this.stream.write({
+              type: 'write',
+              position,
+              data
+            }).then(done).catch(dump);
+          },
+          download: function () {
+            this.abort();
+          },
+          abort: function () {
+            this.stream.close();
+          },
+          setCredentials: function () {
+            this.begin();
+          }
+        };
+      }
+    }
+  }
+  if (MemoryIO.usable() && Math.min(MemoryIO.fileSizeLimit, 94371840) > size) {
+    return new MemoryIO('chat_0', dl);
+  } else if (window.requestFileSystem) {
+    return new FileSystemAPI('chat_0', dl);
+  }
+  throw new Error('Download methods are unsupported');
+}
+function prepareExportStreams(attachNodes, onEmpty) {
+  const CHUNK_SIZE = 1048576;
+  const nextChunk = async function (controller, handle, start, size) {
+    const fetched = await M.gfsfetch(handle, start, start + size).catch(ex => {
+      if (ex === EOVERQUOTA || Object(ex.target).status === 509) {
+        return controller.error(ex);
+      }
+    });
+    const input = fetched && fetched.buffer || new ArrayBuffer(0);
+    if (!fetched || !fetched.buffer) {
+      onEmpty(size);
+    }
+    controller.enqueue(new Uint8Array(input));
+  };
+  return attachNodes.map(node => {
+    return {
+      name: node.name,
+      lastModified: new Date((node.mtime || node.ts) * 1000),
+      input: new ReadableStream({
+        offset: 0,
+        start(controller) {
+          this.offset = Math.min(node.s, CHUNK_SIZE);
+          return nextChunk(controller, node.h, 0, this.offset);
+        },
+        pull(controller) {
+          if (this.offset >= node.s) {
+            controller.close();
+            return;
+          }
+          if (node.s - this.offset >= CHUNK_SIZE) {
+            const chunk = nextChunk(controller, node.h, this.offset, CHUNK_SIZE);
+            this.offset += CHUNK_SIZE;
+            return chunk;
+          }
+          const chunk = nextChunk(controller, node.h, this.offset, node.s - this.offset);
+          this.offset = node.s;
+          return chunk;
+        }
+      })
+    };
+  });
+}
+;// CONCATENATED MODULE: ./js/chat/chatRoom.jsx
+
 const RETENTION_FORMAT = {
   HOURS: 'hour',
   DAYS: 'day',
@@ -5409,8 +5518,141 @@ ChatRoom.prototype.toggleOpenInvite = function () {
 };
 ChatRoom.prototype.toggleWaitingRoom = function () {};
 ChatRoom.prototype.toggleSpeakRequest = function () {};
+ChatRoom.prototype.exportToFile = function () {
+  if (this.messagesBuff.messages.length === 0 || this.exportIo) {
+    return;
+  }
+  loadingDialog.show('chat_export');
+  eventlog(99874);
+  this._exportChat().then(() => {
+    eventlog(99875, JSON.stringify([1]));
+  }).catch(ex => {
+    if (d) {
+      console.error('Chat export: ', ex);
+    }
+    const report = [String(ex && ex.message || ex).replace(/\s+/g, '').substring(0, 64)];
+    report.unshift(report[0] === 'Aborted' ? 1 : 0);
+    if (!report[0]) {
+      msgDialog('error', '', l.export_chat_failed, '', undefined, undefined, true);
+    }
+    eventlog(99875, JSON.stringify(report));
+  }).finally(() => {
+    loadingDialog.hide('chat_export');
+    this.isScrollingToMessageId = false;
+    onIdle(() => this.messagesBuff.detachMessages());
+  });
+};
+ChatRoom.prototype._exportChat = async function () {
+  this.isScrollingToMessageId = true;
+  while (this.messagesBuff.haveMoreHistory()) {
+    await this.messagesBuff.retrieveChatHistory(1000);
+  }
+  let withMedia = !!M.v.length;
+  if (withMedia) {
+    withMedia = await asyncConfirmationDialog('', l.export_chat_media_dlg_title, l.export_chat_media_dlg_text, undefined, true, l.export_chat_media_dlg_conf, l.export_chat_media_dlg_rej);
+    if (withMedia === null) {
+      throw new Error('Aborted');
+    }
+  }
+  let {
+    attachNodes,
+    stringNodes
+  } = this.messagesBuff.getExportContent(withMedia);
+  stringNodes = stringNodes.join('\n');
+  const basename = M.getSafeName(this.getRoomTitle());
+  const zname = l.export_chat_zip_file.replace('%s', basename);
+  const bufferName = l.export_chat_text_file.replace('%s', basename);
+  if (attachNodes.length) {
+    const p = [];
+    const n = [];
+    let s = 0;
+    for (const node of attachNodes) {
+      s += node.s;
+      if (node.ph) {
+        p.push(node.ph);
+      } else {
+        n.push(node.h);
+      }
+    }
+    const res = await asyncApiReq({
+      a: 'qbq',
+      s,
+      n,
+      p
+    });
+    if (res === 1 || res === 2) {
+      const fallback = await asyncConfirmationDialog('', l.export_chat_media_obq_title, l.export_chat_media_obq_text);
+      if (fallback) {
+        return M.saveAs(stringNodes, bufferName);
+      }
+    } else if (res === 0) {
+      await M.require('clientzip_js');
+      const data = new TextEncoder().encode(stringNodes);
+      const dl = {
+        size: data.byteLength + s,
+        n: bufferName,
+        t: unixtime(),
+        id: this.chatId,
+        p: '',
+        io: Object.create(null),
+        writer: Object.create(null),
+        offset: 0,
+        zname
+      };
+      const io = await prepareExportIo(dl);
+      const t = new Date((this.lastActivity || this.ctime) * 1000);
+      let failedCount = 0;
+      const src = prepareExportStreams(attachNodes, size => {
+        failedCount++;
+        dl.done += size;
+      });
+      src.unshift({
+        name: bufferName,
+        lastModified: t,
+        input: data.buffer
+      });
+      dl.done = 0;
+      const reader = clientZip.downloadZip(src).body.getReader();
+      dl.nextChunk = async () => {
+        const read = await reader.read().catch(dump);
+        if (!read) {
+          reader.cancel().catch(ex => {
+            if (ex === EOVERQUOTA) {
+              dlmanager.showOverQuotaDialog();
+            } else {
+              msgDialog('error', '', l.export_chat_failed, '', undefined, undefined, true);
+            }
+          });
+          io.abort();
+          delete this.exportIo;
+          return;
+        }
+        if (read.done) {
+          loadingDialog.hideProgress();
+          io.download(zname);
+          delete this.exportIo;
+          if (failedCount) {
+            msgDialog('error', '', l.export_chat_failed, l.export_chat_partial_fail, undefined, undefined, true);
+          }
+        } else {
+          dl.done += read.value.byteLength;
+          loadingDialog.showProgress(dl.done / dl.size * 100);
+          io.write(read.value, dl.offset, dl.nextChunk);
+          dl.offset += read.value.length;
+        }
+      };
+      io.begin = dl.nextChunk;
+      io.setCredentials(false, dl.size, zname);
+      this.exportIo = io;
+    } else {
+      throw new Error(`Unexpected qbq response ${res}`);
+    }
+  } else {
+    return M.saveAs(stringNodes, bufferName);
+  }
+};
 window.ChatRoom = ChatRoom;
-const __WEBPACK_DEFAULT_EXPORT__ = ({
+const chatRoom = ({
   'ChatRoom': ChatRoom
 });
 
@@ -10205,8 +10447,8 @@ window.CloudBrowserModalDialogUI = {
 const cloudBrowserModalDialog = ({
   CloudBrowserDialog
 });
-// EXTERNAL MODULE: ./js/chat/chatRoom.jsx
-var chat_chatRoom = __webpack_require__(778);
+// EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
+var chat_chatRoom = __webpack_require__(455);
 ;// CONCATENATED MODULE: ./js/ui/historyRetentionDialog.jsx
 
 
@@ -12619,7 +12861,15 @@ class ConversationRightArea extends mixins.wl {
       onClick: () => {
         this.props.onAttachFromComputerClicked();
       }
-    })))), this.renderPushSettingsButton(), openInviteBtn, external_React_default().createElement(buttons.z, {
+    })))), this.renderPushSettingsButton(), openInviteBtn, mega.es2020 && external_React_default().createElement(buttons.z, {
+      className: "link-button light export-chat-button",
+      disabled: room.messagesBuff.messages.length === 0 || room.exportIo,
+      onClick: () => {
+        room.exportToFile();
+      }
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-export-chat-filled"
+    }), external_React_default().createElement("span", null, room.isMeeting ? l.export_meeting_rhp : l.export_chat_rhp)), external_React_default().createElement(buttons.z, {
       className: "link-button light clear-history-button",
       disabled: dontShowTruncateButton || !room.members.hasOwnProperty(u_handle),
       onClick: () => {
@@ -14856,7 +15106,7 @@ class Recurring extends mixins.wl {
         value: this.OFFSETS.FIRST.value,
         weekDay: this.WEEK_DAYS.MONDAY.value
       },
-      monthDaysWarning: false
+      monthDaysWarning: this.initialMonthDay > 28
     };
     this.toggleView = (view, frequency, state) => this.setState({
       view,
@@ -17481,9 +17731,11 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
     const promise = this.isLoading();
     if (promise && promise.always) {
       promise.always(() => {
-        this.setState({
-          isLoading: false
-        });
+        if (this.isMounted()) {
+          this.setState({
+            isLoading: false
+          });
+        }
       });
     } else if (promise === false) {
       this.setState({
@@ -20339,6 +20591,12 @@ class StreamHead extends mixins.wl {
         this.durationRef.current.innerText = this.durationString;
       }
     };
+    this.closeTooltips = () => {
+      for (const node of this.headRef.current.querySelectorAll('.simpletip')) {
+        node.dispatchEvent(StreamHead.EVENTS.SIMPLETIP);
+      }
+    };
+    this.toggleFullscreen = () => this.fullscreen ? document.exitFullscreen() : document.documentElement.requestFullscreen();
     this.toggleBanner = callback => this.setState(state => ({
       banner: !state.banner
     }), () => callback && callback());
@@ -20420,6 +20678,9 @@ class StreamHead extends mixins.wl {
       })));
     };
   }
+  get fullscreen() {
+    return document.fullscreenElement;
+  }
   get duration() {
     return (Date.now() - this.props.call.ts) / 1000;
   }
@@ -20429,11 +20690,13 @@ class StreamHead extends mixins.wl {
   componentWillUnmount() {
     super.componentWillUnmount();
     clearInterval(this.durationInterval);
+    document.removeEventListener(StreamHead.EVENTS.FULLSCREEN, this.closeTooltips);
     document.removeEventListener(StreamHead.EVENTS.CLICK_DIALOG, this.handleDialogClose);
   }
   componentDidMount() {
     super.componentDidMount();
     this.durationInterval = setInterval(this.updateDurationDOM, 1000);
+    document.addEventListener(StreamHead.EVENTS.FULLSCREEN, this.closeTooltips);
     document.addEventListener(StreamHead.EVENTS.CLICK_DIALOG, this.handleDialogClose);
   }
   render() {
@@ -20449,6 +20712,11 @@ class StreamHead extends mixins.wl {
       onCallMinimize,
       onModeChange
     } = this.props;
+    const SIMPLETIP = {
+      position: 'bottom',
+      offset: 5,
+      className: 'theme-dark-forced'
+    };
     return external_React_default().createElement("div", {
       ref: this.headRef,
       className: `
@@ -20485,11 +20753,15 @@ class StreamHead extends mixins.wl {
     }), external_React_default().createElement(meetings_button.Z, {
       className: "head-control",
       simpletip: {
-        ...{
-          position: 'bottom',
-          offset: 5,
-          className: 'theme-dark-forced'
-        },
+        ...SIMPLETIP,
+        label: this.fullscreen ? l.exit_fullscreen : l[17803]
+      },
+      icon: `${this.fullscreen ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'}`,
+      onClick: this.toggleFullscreen
+    }, external_React_default().createElement("span", null, this.fullscreen ? l.exit_fullscreen : l[17803])), external_React_default().createElement(meetings_button.Z, {
+      className: "head-control",
+      simpletip: {
+        ...SIMPLETIP,
         label: l.minimize
       },
       icon: "icon-call-min-mode",
@@ -20499,6 +20771,7 @@ class StreamHead extends mixins.wl {
 }
 StreamHead.NAMESPACE = 'stream-head';
 StreamHead.EVENTS = {
+  FULLSCREEN: 'fullscreenchange',
   SIMPLETIP: new Event('simpletipClose'),
   CLICK_DIALOG: 'click'
 };
@@ -27527,7 +27800,7 @@ class ScheduleMetaChange extends _mixin_jsx1__.y {
       "data-simpletip": time2date(this.getTimestamp())
     }, this.getTimestampAsString()), react0().createElement("div", {
       className: "message text-block"
-    }, ScheduleMetaChange.getTitleText(meta), " ", d && meta.handle), react0().createElement("div", {
+    }, ScheduleMetaChange.getTitleText(meta), " ", !!d && meta.handle), react0().createElement("div", {
       className: "message body-block"
     }, (meta.prevTiming || meta.calendar || meta.topic && meta.onlyTitle || meta.recurring) && react0().createElement("div", {
       className: "schedule-detail-block"

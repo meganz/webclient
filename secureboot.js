@@ -3299,6 +3299,7 @@ else if (!browserUpdate) {
         'docxviewer_js': {f:'js/ui/docx.viewer.js', n: 'docxviewer_js', j:4},
         'docxviewer': {f:'html/docx.viewer.html', n: 'docxviewer', j:0},
         'docxviewercss': {f:'css/docx.viewer.css', n: 'docxviewercss', j:4},
+        'clientzip_js': {f:'js/vendor/client-zip.js', n: 'clientzip_js', j:1},
     };
 
     /* eslint-disable max-len */

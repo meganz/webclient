@@ -36,6 +36,11 @@ Unless otherwise noted, they were released under a [MIT License].
 > The bitcoin-math library is released under the [BSD 2-Clause License](https://opensource.org/licenses/BSD-2-Clause).
 
 ---
+[client-zip.js]: A lightweight zip archive creation library.
+
+> **This is a fork**, [See the changes](https://github.com/Touffy/client-zip/compare/master...meganz:master)
+
+---
 [datepicker.js]: A Lightweight customizable cross-browser jQuery datepicker
 
 > **This is a fork**, [See the changes](https://github.com/t1m0n/air-datepicker/compare/master...meganz:master)
@@ -54,7 +59,7 @@ Unless otherwise noted, they were released under a [MIT License].
 
 [docx-preview.js]: Volodymyr Baydalka's Docx rendering library
 
-> **This is a fork**, [See the changes](https://github.com/VolodymyrBaydalka/docxjs/compare/master...meganz:master)  
+> **This is a fork**, [See the changes](https://github.com/VolodymyrBaydalka/docxjs/compare/master...meganz:master)
 > Released under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
 ---

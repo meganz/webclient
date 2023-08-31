@@ -474,6 +474,23 @@ lazy(mega, 'keyMgr', () => {
             }
             this.other = this.tlvConcat([], unk);
 
+            // @todo deprecate the global 'u_authrings'..
+            const {u_authring} = window;
+            if (u_authring) {
+                Object.assign(u_authring, this.authrings);
+
+                queueMicrotask(() => {
+                    const users = array.unique(Object.values(u_authring).flatMap((o) => Object.keys(o)));
+
+                    for (let i = users.length; i--;) {
+                        const user = M.u[users[i]];
+                        if (user) {
+                            user.trackDataChange();
+                        }
+                    }
+                });
+            }
+
             return true;
         }
 

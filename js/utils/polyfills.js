@@ -256,6 +256,15 @@ if (typeof requestIdleCallback !== 'function') {
             }
         });
     }
+
+    if (!Array.prototype.flatMap) {
+        Object.defineProperty(Array.prototype, 'flatMap', {
+            configurable: !!window.is_karma,
+            value(cb, s) {
+                return this.map(cb.bind(s || this)).flat();
+            }
+        });
+    }
 })();
 
 mBroadcaster.once('boot_done', function() {

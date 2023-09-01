@@ -40,13 +40,16 @@ export default class Select extends MegaRenderMixin {
     handleMousedown = ({ target }) =>
         this.containerRef?.current.contains(target) ? null : this.setState({ expanded: false });
 
-    handleToggle = () => {
-        const { value } = this.props;
-        this.setState(state => ({ expanded: !state.expanded }), () => {
-            if (value && this.optionRefs[value]) {
-                this.menuRef.current.scrollToElement(this.optionRefs[value]);
-            }
-        });
+    handleToggle = ({ target }) => {
+        const menuRef = this.menuRef && this.menuRef.current;
+        if (target !== menuRef.domNode) {
+            const { value } = this.props;
+            this.setState(state => ({ expanded: !state.expanded }), () => {
+                if (value && this.optionRefs[value]) {
+                    menuRef.scrollToElement(this.optionRefs[value]);
+                }
+            });
+        }
     };
 
     componentWillUnmount() {

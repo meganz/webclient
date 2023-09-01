@@ -14742,7 +14742,10 @@ class Select extends mixins.wl {
         expanded: false
       });
     };
-    this.handleToggle = () => {
+    this.handleToggle = e => {
+      if (e.target === this.menuRef.current.domNode) {
+        return;
+      }
       const {
         value
       } = this.props;

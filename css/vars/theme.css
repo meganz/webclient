@@ -35,6 +35,8 @@ body,
 
         /* left main navbar */
             --navbar-background: rgba(51, 51, 51, var(--navbar-alpha, 1));
+            --navbar-item-hover-background: rgba(34, 34, 34, var(--navbar-alpha, 1));
+
 
         /* icons */
 

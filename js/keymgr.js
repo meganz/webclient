@@ -480,7 +480,7 @@ lazy(mega, 'keyMgr', () => {
                 Object.assign(u_authring, this.authrings);
 
                 queueMicrotask(() => {
-                    const users = array.unique(Object.values(u_authring).flatMap((o) => Object.keys(o)));
+                    const users = array.unique(Object.values(u_authring).flatMap((o) => Object.keys(o || {})));
 
                     for (let i = users.length; i--;) {
                         const user = M.u[users[i]];

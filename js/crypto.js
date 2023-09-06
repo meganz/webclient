@@ -951,10 +951,10 @@ function api_reqfailed(channel, error) {
 
                 if (reasonCode === 200) {
                     dialogTitle = l[6789];// Suspended account
-                    reasonText = l[17741];// Your account has been suspended due to multiple breaches of Mega's Terms..
+                    reasonText = l.blocked_rsn_copyright;
                 }
                 else if (reasonCode === 300) {
-                    reasonText = l[17740];// Your account was terminated due to breach of Mega's Terms of Service...
+                    reasonText = l.blocked_rsn_terminated;
                 }
                 else if (reasonCode === 400) {
                     reasonText = l[19748];// Your account is disabled by administrator

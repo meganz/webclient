@@ -288,16 +288,11 @@ function initAddDialogMultiInputPlugin() {
                     itemNum = itemNum + 1;
                 }
 
-                if (itemNum > 1) {
+                if (itemNum > 0) {
                     $addButtonSpan.text(mega.icu.format(l[19113], itemNum));
                     $addButton.removeClass('hidden');
                 }
-                else if (itemNum === 1) {
-                    $addButtonSpan.text(l[19112]);
-                    $addButton.removeClass('hidden');
-                }
                 else {
-                    $addButtonSpan.text(l[19112]);
                     $addButton.addClass('hidden');
                 }
 
@@ -308,12 +303,7 @@ function initAddDialogMultiInputPlugin() {
             var itemNum = $inputTokens.length;
 
             if (itemNum === 0) {
-                $addButtonSpan.text(l[19112]);
                 $addButton.addClass('hidden');
-            }
-            else if (itemNum === 1) {
-                $addButtonSpan.text(l[19112]);
-                $addButton.removeClass('hidden');
             }
             else {
                 var $multiInput = $scope.find('.multiple-input');
@@ -334,12 +324,7 @@ function initAddDialogMultiInputPlugin() {
             itemNum = $inputTokens.length;
 
             if (itemNum === 0) {
-                $addButtonSpan.text(l[148]);
                 $addButton.addClass('hidden');
-            }
-            else if (itemNum === 1) {
-                $addButtonSpan.text(l[19112]);
-                $addButton.removeClass('hidden');
             }
             else {
                 $addButtonSpan.text(mega.icu.format(l[19113], itemNum));
@@ -547,7 +532,7 @@ function contactAddDialog(close, dontWarnBusiness) {
         $('.add-contact-multiple-input input', $d).trigger("focus");
     });
 
-    $('.add-user-popup-button span', $d).text(l[19112]);
+    $('.add-user-popup-button span', $d).text(mega.icu.format(l[19113], 1));
     $('.add-user-popup-button', $d).addClass('hidden');
 
     if (u_attr && u_attr.b) {

@@ -183,6 +183,7 @@ html .theme-light-forced {
         --surface-grey-4: rgba(238, 238, 238, var(--surface-alpha, 1));
         --surface-grey-5: var(--surface-main);
         --surface-grey-6: var(--surface-grey-2);
+        --surface-grey-7: var(--surface-main);
         --surface-light-grey: /* not present in this theme */;
         --surface-mid-grey: rgba(204, 204, 204, var(--surface-alpha, 1));
         --surface-dark-grey: linear-gradient(180deg, rgba(85, 85, 85, var(--surface-alpha, 1)) 0%, rgba(68, 68, 68, var(--surface-alpha, 1)) 100%);
@@ -410,6 +411,7 @@ html .theme-dark-forced {
         --surface-grey-4: rgba(34, 34, 34, var(--surface-alpha, 1));
         --surface-grey-5: var(--surface-grey-2);
         --surface-grey-6: var(--surface-black);
+        --surface-grey-7: var(--surface-black);
         --surface-light-grey: linear-gradient(180deg, rgba(230, 230, 230, var(--surface-alpha, 1)) 0%, rgba(204, 204, 204, var(--surface-alpha, 1)) 100%);
         --surface-mid-grey: rgba(102, 102, 102, var(--surface-alpha, 1));
         --surface-dark-grey: linear-gradient(180deg, rgba(230, 230, 230, var(--surface-alpha, 1)) 0%, rgba(204, 204, 204, var(--surface-alpha, 1)) 100%);

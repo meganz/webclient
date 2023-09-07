@@ -200,56 +200,36 @@ var exportPassword = {
 
                 // If toggle is currently on, we will turn it off
                 if (passwordToggleIsOn) {
-                    const $items = $('.item', this.$dialog);
-                    const linkCount = $.itemExport.length;
 
-                    // If a password has actually been set
-                    if ($items.first().hasClass('password-protect-link')) {
-
-                        // Show a success banner telling them to re-copy the links now it is reverted back to link/key
-                        $updateSuccessBanner.text(mega.icu.format(l.links_updated_copy_again, linkCount));
-                        $updateSuccessBanner.removeClass('hidden');
-
-                        // Hide again after 3 seconds
-                        setTimeout(() => {
-                            $updateSuccessBanner.addClass('hidden');
-                        }, 3000);
+                    // If no password has been entered, no need to recreate links,
+                    // so just reset the password UI elements to default off state
+                    if ($passwordInput.val() === '') {
+                        exportPassword.encrypt.turnOffPasswordUI();
+                        return;
                     }
 
-                    // Set links and keys into text boxes
-                    $items.removeClass('password-protect-link');
+                    // Remove the existing links and re-add them
+                    exportPassword.removeLinksAndReAdd($.itemExport, () => {
 
-                    // Update Password buttons and links UI
-                    exportPassword.encrypt.updatePasswordComponentsUI();
+                        const $items = $('.item', this.$dialog);
+                        const linkCount = $.itemExport.length;
 
-                    // Update Link input values
-                    exportPassword.encrypt.updateLinkInputValues();
+                        // If a password has actually been set
+                        if ($items.first().hasClass('password-protect-link')) {
 
-                    // Turn off toggle and hide the password section
-                    $passwordToggleSwitch.addClass('toggle-off').removeClass('toggle-on');
-                    $passwordToggleIcon.addClass('icon-minimise-after').removeClass('icon-check-after');
-                    $passwordContainer.addClass('hidden');
+                            // Show success banner telling them to re-copy the links now it's reverted back to link/key
+                            $updateSuccessBanner.text(mega.icu.format(l.links_updated_copy_again, linkCount));
+                            $updateSuccessBanner.removeClass('hidden');
 
-                    // Re-enable the separate link/key toggle
-                    $exportKeysSwitch.removeClass('disabled');
+                            // Hide again after 3 seconds
+                            setTimeout(() => {
+                                $updateSuccessBanner.addClass('hidden');
+                            }, 3000);
+                        }
 
-                    // Reset password input to default state
-                    $passwordInput.val('');
-                    $passwordInput.prop('readonly', false);
-                    $passwordStrengthText.text('');
-                    $passwordInputWrapper.removeClass('good1 good2 good3 good4 good5');
-
-                    // Prepare MegaInput field and hide previous errors
-                    mega.ui.MegaInputs($passwordInput);
-                    $passwordInput.data('MegaInputs').hideError();
-
-                    // Revert to default state for the password visibility 'eye' icon
-                    if ($passwordVisibilityToggle.hasClass('icon-eye-hidden')) {
-                        $passwordVisibilityToggle.trigger('click');
-                    }
-
-                    // Change link access description back to 'Anyone with this link can view and download your data'
-                    $linkAccessText.text(mega.icu.format(l.link_access_explainer, linkCount));
+                        // Reset the password UI elements to default off state
+                        exportPassword.encrypt.turnOffPasswordUI();
+                    });
                 }
                 else {
                     // The toggle is currently off, so we will turn it on
@@ -273,6 +253,64 @@ var exportPassword = {
         },
 
         /**
+         * Turns off the password related UI, used in initialisation of the dialog to reset the password elements,
+         * also in turning off the toggle switch. It was useful to be able to reset the UI elements to the off state
+         * without triggering the toggle switch to off (which has a side effect of recreating the password links).
+         * @returns {undefined}
+         */
+        turnOffPasswordUI: function() {
+
+            'use strict';
+
+            const $exportKeysSwitch = $('.js-export-keys-switch', this.$dialog);
+            const $linkAccessText = $('.js-link-access-text', this.$dialog);
+            const $passwordContainer = $('.password-container', this.$dialog);
+            const $passwordInput = $('.js-password-input', this.$dialog);
+            const $passwordInputWrapper = $passwordInput.parent();
+            const $passwordToggleSwitch = $('.js-password-switch', this.$dialog);
+            const $passwordToggleIcon = $('.mega-feature-switch', $passwordToggleSwitch);
+            const $passwordVisibilityToggle = $('.js-toggle-password-visible', this.$dialog);
+            const $passwordStrengthText = $('.js-strength-indicator', this.$dialog);
+            const $items = $('.item', this.$dialog);
+            const linkCount = $.itemExport.length;
+
+            // Set links and keys into text boxes
+            $items.removeClass('password-protect-link');
+
+            // Update Password buttons and links UI
+            exportPassword.encrypt.updatePasswordComponentsUI();
+
+            // Update Link input values
+            exportPassword.encrypt.updateLinkInputValues();
+
+            // Turn off toggle and hide the password section
+            $passwordToggleSwitch.addClass('toggle-off').removeClass('toggle-on');
+            $passwordToggleIcon.addClass('icon-minimise-after').removeClass('icon-check-after');
+            $passwordContainer.addClass('hidden');
+
+            // Re-enable the separate link/key toggle
+            $exportKeysSwitch.removeClass('disabled');
+
+            // Reset password input to default state
+            $passwordInput.val('');
+            $passwordInput.prop('readonly', false);
+            $passwordStrengthText.text('');
+            $passwordInputWrapper.removeClass('good1 good2 good3 good4 good5');
+
+            // Prepare MegaInput field and hide previous errors
+            mega.ui.MegaInputs($passwordInput);
+            $passwordInput.data('MegaInputs').hideError();
+
+            // Revert to default state for the password visibility 'eye' icon
+            if ($passwordVisibilityToggle.hasClass('icon-eye-hidden')) {
+                $passwordVisibilityToggle.trigger('click');
+            }
+
+            // Change link access description back to 'Anyone with this link can view and download your data'
+            $linkAccessText.text(mega.icu.format(l.link_access_explainer, linkCount));
+        },
+
+        /**
          * Setup Set remove password button
          */
         initResetPasswordButton: function() {
@@ -287,34 +325,38 @@ var exportPassword = {
             const $passwordStrengthText = $('.js-strength-indicator', this.$dialog);
 
             // On Remove password click
-            $removePasswordBtn.rebind('click.removePass', function() {
+            $removePasswordBtn.rebind('click.removePass', () => {
 
-                const $items = $('.item', this.$dialog);
-                const linkCount = $.itemExport.length;
+                // Remove the existing links and re-add them
+                exportPassword.removeLinksAndReAdd($.itemExport, () => {
 
-                // Set links and keys into text boxes
-                $items.removeClass('password-protect-link');
+                    const $items = $('.item', this.$dialog);
+                    const linkCount = $.itemExport.length;
 
-                // Update Password buttons and links UI
-                exportPassword.encrypt.updatePasswordComponentsUI();
+                    // Set links and keys into text boxes
+                    $items.removeClass('password-protect-link');
 
-                // Update Link input values
-                exportPassword.encrypt.updateLinkInputValues();
+                    // Update Password buttons and links UI
+                    exportPassword.encrypt.updatePasswordComponentsUI();
 
-                // Change link access description back to 'Anyone with this link can view and download your data'
-                $linkAccessText.text(mega.icu.format(l.link_access_explainer, linkCount));
+                    // Update Link input values
+                    exportPassword.encrypt.updateLinkInputValues();
 
-                // Reset password input to default state
-                $passwordInput.val('');
-                $passwordInput.focus();
-                $passwordInput.prop('readonly', false);
-                $passwordStrengthText.text('');
-                $passwordInputWrapper.removeClass('good1 good2 good3 good4 good5');
+                    // Change link access description back to 'Anyone with this link can view and download your data'
+                    $linkAccessText.text(mega.icu.format(l.link_access_explainer, linkCount));
 
-                // Revert to default state for the password visibility 'eye' icon
-                if ($passwordVisibilityToggle.hasClass('icon-eye-hidden')) {
-                    $passwordVisibilityToggle.trigger('click');
-                }
+                    // Reset password input to default state
+                    $passwordInput.val('');
+                    $passwordInput.focus();
+                    $passwordInput.prop('readonly', false);
+                    $passwordStrengthText.text('');
+                    $passwordInputWrapper.removeClass('good1 good2 good3 good4 good5');
+
+                    // Revert to default state for the password visibility 'eye' icon
+                    if ($passwordVisibilityToggle.hasClass('icon-eye-hidden')) {
+                        $passwordVisibilityToggle.trigger('click');
+                    }
+                });
             });
         },
 
@@ -327,7 +369,11 @@ var exportPassword = {
 
             // Add click handler to the confirm button
             $('.js-confirm-password', this.$dialog).rebind('click.setPass', () => {
-                exportPassword.encrypt.startEncryption();
+
+                // Remove the existing links and re-add them
+                exportPassword.removeLinksAndReAdd($.itemExport, () => {
+                    exportPassword.encrypt.startEncryption();
+                });
             });
         },
 
@@ -928,6 +974,164 @@ var exportPassword = {
     /**
      * Common functions for encryption and decryption
      */
+
+    /**
+     * Remove existing links and recreate them as a security measure. This is done when turning off the password
+     * toggle, resetting the password and creating a new password. When we remove the existing links and recreate them
+     * a new public handle is created. This makes the old links cease to work and only the new one will now work. NB:
+     * when removing the links, the existing expiry dates will be removed and will need to be re-added so we keep a copy
+     * of those before the operation.
+     *
+     * @param {Array} nodesToRecreate The node handles of the links to be removed and recreated
+     * @param {Function} completeCallback The function to be called once done
+     * @returns {undefined}
+     */
+    removeLinksAndReAdd: function(nodesToRecreate, completeCallback) {
+
+        'use strict';
+
+        loadingDialog.show();
+
+        // Contains a backup of all the expiry dates for each node before we recreate links
+        const nodeExpiryTimestamps = [];
+
+        // For each selected file/folder
+        for (const i in nodesToRecreate) {
+            if (nodesToRecreate.hasOwnProperty(i)) {
+
+                // Get the node handle
+                const node = M.d[nodesToRecreate[i]];
+                const nodeHandle = node.h;
+                const expiryTimestamp = M.getNodeShare(node).ets;
+
+                // If it has an expiry time, add it to the array
+                if (expiryTimestamp) {
+                    nodeExpiryTimestamps.push({ nodeHandle: nodeHandle, expiryTimestamp: expiryTimestamp });
+                }
+            }
+        }
+
+        // Disable sharing on links / perform the remove links operation
+        const oldExportLinks = new mega.Share.ExportLink({
+            'updateUI': false,
+            'nodesToProcess': nodesToRecreate
+        });
+        oldExportLinks.removeExportLink(true).always(() => {
+
+            // Recreate the share for the links (old password links will be invalidated because of new share key)
+            const newExportLinks = new mega.Share.ExportLink({
+                'updateUI': false,
+                'nodesToProcess': nodesToRecreate
+            });
+
+            const createLinkPromises = [];
+
+            // Create the new links
+            for (let i = 0; i < nodesToRecreate.length; i++) {
+                const nodeHandle = nodesToRecreate[i];
+                const node = M.d[nodeHandle];
+
+                if (node) {
+                    if (node.t) {
+                        // Create folder share link
+                        createLinkPromises.push(newExportLinks._getFolderExportLinkRequest(nodeHandle));
+                    }
+                    else {
+                        // Create file share link
+                        createLinkPromises.push(newExportLinks._getExportLinkRequest(nodeHandle));
+                    }
+                }
+                else {
+                    this.logger.warn('Invalid node to export...', nodeHandle);
+                }
+            }
+
+            // When all links are finished being recreated
+            Promise.all(createLinkPromises).then((values) => {
+
+                const addExpiryPromises = [];
+
+                // Update the links API side with the previous expiry timestamps for each node
+                for (let i = 0; i < nodeExpiryTimestamps.length; i++) {
+
+                    const { nodeHandle, expiryTimestamp } = nodeExpiryTimestamps[i];
+
+                    addExpiryPromises.push(exportPassword.setExpiryOnNode(nodeHandle, expiryTimestamp));
+                }
+
+                // When all expiry dates are added, update the links in the UI
+                Promise.all(addExpiryPromises).then(() => {
+
+                    // Go through each link handle
+                    for (let i = 0; i < $.itemExport.length; i++) {
+
+                        const nodeHandle = $.itemExport[i];
+                        const node = M.d[nodeHandle];
+                        const nodePubHandle = node.ph;
+                        const nodeType = node.t;
+
+                        // Create the links
+                        const newLink = getBaseUrl() + (nodeType ? '/folder/' : '/file/') + htmlentities(nodePubHandle);
+
+                        // Update UI
+                        const $item = $(`.item[data-node-handle='${nodeHandle}']`, exportPassword.encrypt.$dialog);
+                        const $itemInputLink = $('.item-link.link input', $item);
+
+                        // Update data attribute - text input value is updated later
+                        $itemInputLink.data('link', newLink);
+                    }
+
+                    loadingDialog.hide();
+
+                    // Call callback to let the calling function know everything is all done
+                    completeCallback(values);
+                });
+            });
+        });
+    },
+
+    /**
+     * Sets an expiry timestamp on a share link node
+     * @param {String} nodeHandle The node handle to set the expiry for
+     * @param {Number} expiryTimestamp The expiry timestamp
+     * @returns {Promise} The promise to be resolved/rejected once the API operation is complete
+     */
+    setExpiryOnNode: function(nodeHandle, expiryTimestamp) {
+
+        'use strict';
+
+        let promiseResolve;
+        let promiseReject;
+
+        // Set up a promise to be resolved when the whole operation is complete
+        const promise = new Promise((resolve, reject) => {
+            promiseResolve = resolve;
+            promiseReject = reject;
+        });
+
+        // The data to send in the API request
+        var request = {
+            a: 'l',             // Link
+            n: nodeHandle,
+            i: requesti,
+            ets: expiryTimestamp
+        };
+
+        // Update the link with the new expiry timestamp
+        api_req(request, {
+            callback: function(result) {
+
+                if (typeof result === 'number' && result < 0) {
+                    promiseReject(nodeHandle);
+                }
+                else {
+                    promiseResolve(nodeHandle);
+                }
+            }
+        });
+
+        return promise;
+    },
 
     /**
      * A wrapper function used for deriving a key from a password.
@@ -1719,7 +1923,7 @@ function logExportEvt(type, target) {
 
         // Revert to off state for password feature
         if ($passwordToggleSwitch.hasClass('toggle-on')) {
-            $passwordToggleSwitch.trigger('click');
+            exportPassword.encrypt.turnOffPasswordUI();
         }
 
         // Revert to default state for the password visibility 'eye' icon
@@ -2632,6 +2836,15 @@ function logExportEvt(type, target) {
         var self = this;
         var share = M.getNodeShare(nodeId);
 
+        let promiseResolve;
+        let promiseReject;
+
+        // Set up a promise to be resolved when the whole operation is complete
+        const promise = new Promise((resolve, reject) => {
+            promiseResolve = resolve;
+            promiseReject = reject;
+        });
+
         // No need to perform an API call if this folder was already exported (Ie, we're updating)
         if (share.h === nodeId) {
             if (!M.d[nodeId].t || u_sharekeys[nodeId]) {
@@ -2653,7 +2866,10 @@ function logExportEvt(type, target) {
                 sharePromise.done(function _sharePromiseDone(result) {
                     if (result.r && result.r[0] === 0) {
 
-                        self._getExportLinkRequest(nodeId);
+                        // Resolve the outer promise to signify the whole folder share process is done
+                        self._getExportLinkRequest(nodeId).then(() => {
+                            promiseResolve(nodeId);
+                        });
 
                         if (!self.nodesLeft) {
                             loadingDialog.hide();
@@ -2661,15 +2877,19 @@ function logExportEvt(type, target) {
                     }
                     else {
                         self.logger.warn('_getFolderExportLinkRequest', nodeId, 'Error code: ', result);
+                        promiseReject(nodeId);
                         loadingDialog.hide();
                     }
                 });
                 sharePromise.fail(function _sharePromiseFailed(result) {
                     self.logger.warn('Get folder link failed: ' + result);
+                    promiseReject(nodeId);
                     // FIXME: this seem to lack some handling code for this condition
                 });
             })
             .catch(dump);
+
+        return promise;
     };
 
     /**
@@ -2677,6 +2897,15 @@ function logExportEvt(type, target) {
      * @param {String} nodeId The node ID.
      */
     ExportLink.prototype._getExportLinkRequest = function(nodeId) {
+
+        let promiseResolve;
+        let promiseReject;
+
+        // Create a promise for the calling function to know when everything is done
+        const promise = new Promise((resolve, reject) => {
+            promiseResolve = resolve;
+            promiseReject = reject;
+        });
 
         var self = this;
         var done = function(handle) {
@@ -2693,7 +2922,6 @@ function logExportEvt(type, target) {
                     exportLinkDialog.linksDialog();
                 }
 
-                console.assert($.getExportLinkInProgress);
                 if ($.getExportLinkInProgress) {
                     mBroadcaster.sendMessage('export-link:completed', handle);
                     $.getExportLinkInProgress = false;
@@ -2703,6 +2931,9 @@ function logExportEvt(type, target) {
             // A hook for the mobile web to show the public link and the remove button
             if (is_mobile) {
                 mobile.linkOverlay.showPublicLinkAndEnableButtons(nodeId);
+            }
+            else {
+                promiseResolve(nodeId);
             }
         };
         var share = M.getNodeShare(nodeId);
@@ -2735,11 +2966,14 @@ function logExportEvt(type, target) {
                 }
                 else { // Error
                     self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);
+                    promiseReject(nodeId);
                 }
 
                 done(typeof result !== 'number' && this.nodeId);
             }
         });
+
+        return promise;
     };
 
     /**

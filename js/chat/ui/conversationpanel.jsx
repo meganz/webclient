@@ -1586,9 +1586,7 @@ export class ConversationPanel extends MegaRenderMixin {
 
                     self.props.chatRoom.scrolledToBottom = true;
 
-                    room.attachNodes(
-                        selected
-                    );
+                    room.attachNodes(selected).catch(dump);
                 }}
             />;
         }
@@ -1760,9 +1758,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP) {
                                 const attachmentMetadata = msg.getAttachmentMeta() || [];
 
-                                attachmentMetadata.forEach((v) => {
-                                    M.moveToRubbish(v.h);
-                                });
+                            Promise.all(attachmentMetadata.map((v) => M.moveToRubbish(v.h))).catch(dump);
                             }
 
                             chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
@@ -2174,7 +2170,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         didMount={() => {
                             this.toggleExpandedFlag();
                             if (room.isMeeting) {
-                                room.getPublicLink();
+                                room.updatePublicHandle().catch(dump);
                             }
                         }}
                         willUnmount={minimised =>

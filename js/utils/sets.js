@@ -198,7 +198,7 @@ lazy(mega, 'sets', () => {
      * @param {Object<String, String|Number>} options options to pass with the action
      * @returns {function(...[*]): Promise<void>}
      */
-    const sendReq = (a, options) => M.req({ a, ...options });
+    const sendReq = (a, options) => api.req({a, ...options}).then(({result}) => result);
 
     return {
         decryptAttr,

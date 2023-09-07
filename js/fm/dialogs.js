@@ -198,7 +198,7 @@
      * @param {String} h The node handle
      */
     var selectTreeItem = function(h) {
-        onIdle(function() {
+        queueMicrotask(() => {
             if (section === 'conversations') {
                 $('#cpy-dlg-chat-itm-spn-' + h, $dialog).trigger('click');
             }
@@ -1302,45 +1302,52 @@
     /**
      * A version of the select a folder dialog used for "New Shared Folder" in out-shares.
      * @global
-     * @returns {Object}        The jquery object of the dialog
      */
-    global.openNewSharedFolderDialog = function openNewSharedFolderDialog() {
-        // Not allowed chats
-        if (isUserAllowedToOpenDialogs()) {
-            M.safeShowDialog('selectFolder', function() {
-                $.selected = [];
-                handleOpenDialog(0, M.RootID);
-                $.selectFolderCallback = function() {
-                    closeDialog();
-                    $.selected = [$.mcselected];
-                    M.openSharingDialog();
-                };
-                return $dialog;
-            });
+    global.openNewSharedFolderDialog = async function openNewSharedFolderDialog() {
+        const target = await selectFolderDialog().catch(dump);
+        if (target) {
+            M.addSelectedNodes(target);
+            return M.openSharingDialog(target);
         }
-
-        return false;
     };
 
     /**
      * A version of the select a folder dialog used for selecting target folder
      * @global
-     * @param {Function} cb A callback to be called when the user "Select"
-     * @param {String} aMode Dialog mode (copy, move, share, save, etc)
+     * @param {String} [dialogName] Dialog name (copy, move, share, save, etc)
+     * @param {String|Object} [mode] dialog mode (share, save, etc)
+     * @param {String} [target] initial target folder, M.RootID by default.
      * @returns {Object} The jquery object of the dialog
      */
-    global.selectFolderDialog = function selectedFolderDialog(cb, aMode) {
-        // Not allowed chats.
-        if (isUserAllowedToOpenDialogs()) {
-            M.safeShowDialog(aMode || 'selectFolder', () => {
+    global.selectFolderDialog = function(dialogName = 'selectFolder', mode = false, target = null) {
+        return new Promise((resolve, reject) => {
+            if (!isUserAllowedToOpenDialogs()) {
+                return resolve(null);
+            }
 
-                handleOpenDialog(0, M.RootID);
-                $.selectFolderCallback = cb;
-                return $dialog;
-            });
-        }
+            const dsp = () => {
+                const res = tryCatch(() => {
+                    if (dialogName === 'selectFolder') {
+                        M.clearSelectedNodes();
+                    }
+                    handleOpenDialog(0, target || M.RootID, mode);
 
-        return false;
+                    $.selectFolderCallback = (target) => {
+                        $dialog.off('dialog-closed.sfd');
+                        delete $.selectFolderCallback;
+
+                        // fulfill with null if dialog was closed/canceled
+                        resolve(target || null);
+                    };
+                    return $dialog.rebind('dialog-closed.sfd', () => $.selectFolderCallback());
+                }, reject)();
+
+                assert(res, '[selectFolderDialog] caught exception');
+                return res;
+            };
+
+            M.safeShowDialog(dialogName, dsp);
+        });
     };
 
     /**
@@ -1349,33 +1356,8 @@
      * @param {Object} options Additional settings for new file request dialog
      * @returns {Object} The jquery object of the dialog
      */
-    global.openNewFileRequestDialog = function(options) {
-        // Not allowed chats.
-        if (!isUserAllowedToOpenDialogs()) {
-            return false;
-        }
-
-        const postEventHandler = options && options.post || null;
-        const closeEventHandler = options && options.close || null;
-        if (postEventHandler) {
-            const aMode = options && options.mode || 'fileRequestNew';
-
-            M.safeShowDialog('selectFolder', () => {
-                handleOpenDialog(0, options && options.selectedNodeHandle || M.RootID, aMode);
-                $.selectFolderCallback = function() {
-                    closeDialog();
-                    postEventHandler($.mcselected);
-                };
-
-                if (closeEventHandler) {
-                    closeEventHandler($dialog, options && options.selectedNodeHandle);
-                }
-
-                return $dialog;
-            });
-        }
-
-        return false;
+    global.openNewFileRequestDialog = async function(target, options = false) {
+        return selectFolderDialog('selectFolder', options.mode || options || 'fileRequestNew', target).catch(dump);
     };
 
     mBroadcaster.addListener('fm:initialized', function copyMoveDialogs() {
@@ -1590,23 +1572,26 @@
         $('.dialog-newfolder-button', $dialog).rebind('click', function() {
             $dialog.addClass('arrange-to-back');
 
-            $.cfpromise = new MegaPromise();
-            $.cftarget = $.mcselected || (section === 'cloud-drive' ? M.RootID : M.RubbishID);
             $.cfsection = section;
+            $.cftarget = $.mcselected || (section === 'cloud-drive' ? M.RootID : M.RubbishID);
+            ($.cfpromise = mega.promise)
+                .then((h) => {
+                    // Auto-select the created folder.
+                    const p = Object(M.d[h]).p || $.cftarget;
+
+                    // Refresh list (moved from sc-parser)
+                    refreshDialogContent();
+
+                    // Make sure parent has selected class to make it expand
+                    $(`#mctreea_${p}`, $dialog).addClass('selected');
+                    selectTreeItem(p);
+                    selectTreeItem(h);
+                })
+                .catch(nop);
 
             createFolderDialog();
 
             $('.mega-dialog.create-folder-dialog .create-folder-size-icon').addClass('hidden');
-
-            // Auto-select the created folder.
-            $.cfpromise.done(function(h) {
-                var p = Object(M.d[h]).p || $.cftarget;
-
-                // Make sure parent has selected class to make it expand
-                $('#mctreea_' + p, $dialog).addClass('selected');
-                selectTreeItem(p);
-                selectTreeItem(h);
-            });
         });
 
         $('.dialog-newcontact-button', $dialog).rebind('click', function() {
@@ -1789,58 +1774,6 @@
             setDialogButtonState($btn);
         });
 
-        const handleCopyToChat = async(chats, selectedNodes) => {
-            const files = [];
-            const folders = [];
-            const foreignNodes = [];
-            for (const sel of selectedNodes) {
-                if (M.isFileNode(sel)) {
-                    if (M.d[sel.h]) {
-                        files.push(sel);
-                    }
-                    else {
-                        foreignNodes.push(sel);
-                    }
-                }
-                else {
-                    const node = M.getNodeByHandle(sel);
-                    if (M.d[node.h]) {
-                        if (node.t) {
-                            folders.push(node.h);
-                        }
-                        else {
-                            files.push(node);
-                        }
-                    }
-                    else {
-                        foreignNodes.push(node);
-                    }
-                }
-            }
-            if (!foreignNodes.length) {
-                const noOpen = $.noOpenChatFromPreview;
-                delete $.noOpenChatFromPreview;
-                megaChat.openChatAndAttachNodes(chats, [...folders, ...files], noOpen).dump();
-                return;
-            }
-            const mcf = await M.myChatFilesFolder.get(true).catch(() => {
-                if (d) {
-                    console.error('Failed to allocate "My chat files" folder');
-                }
-                throw ENOENT;
-            });
-
-            M.injectNodes(foreignNodes, mcf.h, res => {
-                if (Array.isArray(res) && res.length) {
-                    const noOpen = $.noOpenChatFromPreview;
-                    delete $.noOpenChatFromPreview;
-                    megaChat.openChatAndAttachNodes(chats, [...res, ...folders, ...files], noOpen).dump();
-                }
-                else if (d) {
-                    console.warn('Unable to inject nodes... no longer existing?', res);
-                }
-            });
-        };
         // Handle copy/move/share button action
         $btn.rebind('click', function() {
             var chats = getSelectedChats();
@@ -1849,14 +1782,22 @@
             if (skip || $(this).hasClass('disabled')) {
                 return false;
             }
-            var selectedNodes = ($.selected || []).concat();
+            let selectedNodes = [];
+            if (Array.isArray($.selected)) {
+                selectedNodes = [...$.selected];
+            }
 
             // closeDialog would cleanup some $.* variables, so we need them cloned here
-            var saveToDialogNode = $.saveToDialogNode;
-            var saveToDialogCb = $.saveToDialogCb;
-            var saveToDialog = $.saveToDialog || saveToDialogNode;
-            var shareToContactId = $.shareToContactId;
+            const {
+                saveToDialogCb,
+                saveToDialogNode,
+                shareToContactId,
+                noOpenChatFromPreview
+            } = $;
+            const saveToDialog = $.saveToDialog || saveToDialogNode;
+
             delete $.saveToDialogPromise;
+            delete $.noOpenChatFromPreview;
 
             if ($.copyToUpload) {
                 var data = $.copyToUpload;
@@ -1887,8 +1828,10 @@
                 return false;
             }
 
-            if (typeof $.selectFolderCallback === 'function') {
-                $.selectFolderCallback();
+            if ($.selectFolderCallback) {
+                tryCatch(() => $.selectFolderCallback($.mcselected))();
+                delete $.selectFolderCallback;
+                closeDialog();
                 return false;
             }
 
@@ -1899,7 +1842,7 @@
                     $tooltip.hide();
                 }
                 closeDialog();
-                M.safeMoveNodes($.mcselected);
+                M.safeMoveNodes($.mcselected).catch(dump);
                 return false;
             }
 
@@ -1961,14 +1904,14 @@
                         return false;
                     }
 
-                    mega.fileTextEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, nodeToSave).done(
-                        (handle) => {
+                    mega.fileTextEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, nodeToSave)
+                        .then((handle) => {
                             if ($.saveAsCallBack) {
                                 $.selected = Array.isArray(handle) ? handle : [handle];
                                 $.saveAsCallBack(handle);
                             }
-                        }
-                    );
+                        })
+                        .catch(tell);
                 });
 
                 return false;
@@ -1998,26 +1941,27 @@
                     else {
                         user.r = 0;
                     }
-                    mega.keyMgr.setShareSnapshot($.mcselected)
-                        .then(() => {
-                            doShare($.mcselected, [user], true);
-                        })
-                        .catch(dump);
+                    const target = $.mcselected;
+                    mega.keyMgr.setShareSnapshot(target)
+                        .then(() => doShare(target, [user]))
+                        .catch(tell);
                 }
                 else {
-                    M.copyNodes(selectedNodes, $.mcselected);
+                    M.copyNodes(selectedNodes, $.mcselected).catch(tell);
                 }
             }
             else if (section === 'shared-with-me') {
-                M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected);
+                M.copyNodes(getNonCircularNodes(selectedNodes), $.mcselected).catch(tell);
             }
             else if (section === 'conversations') {
                 if (window.megaChatIsReady) {
-                    handleCopyToChat(chats, selectedNodes).catch(dump);
+
+                    megaChat.openChatAndAttachNodes(chats, selectedNodes, !!noOpenChatFromPreview).dump('attach');
                 }
                 else if (d) {
                     console.error('MEGAchat is not ready');
                 }
+
             }
 
             delete $.onImportCopyNodes;

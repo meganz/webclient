@@ -13,25 +13,10 @@ var maxDownloadSize = Math.pow(2, 53);
 function dlinfo(ph,key,next)
 {
     $('.widget-block').addClass('hidden');
-
-    if (dlMethod === FlashIO) {
-        $('.mega-dialog.download-dialog').removeClass('hidden');
-        $('.mega-dialog.download-dialog').css('left','-1000px');
-        $('.download-save-your-file').safeHTML('<object data="'
-            + document.location.origin
-            + '/downloader.swf" id="dlswf_' + htmlentities(ph)
-            + '" typeex="application/x-shockwave-flash" height="'
-            + $('.download-save-your-file').height() + '"  width="'
-            + $('.download-save-your-file').width()
-            + '"><param name="wmode" value="transparent">'
-            + '<param value="always" name="allowscriptaccess">'
-            + '<param value="all" name="allowNetworking">'
-            + '<param name=FlashVars value="buttonclick=1" /></object>');
-    }
     loadingDialog.show();
 
-    dlpage_ph   = ph;
-    dlpage_key  = key;
+    dlpage_ph = ph;
+    dlpage_key = key;
 
     if (is_mobile) {
         $('.mobile.dl-browser, .mobile.dl-megaapp').addClass('disabled');
@@ -40,14 +25,18 @@ function dlinfo(ph,key,next)
         watchdog.query('dlsize', 2100, true).catch(nop);
     }
 
-    if (dl_res)
-    {
-        dl_g(dl_res);
+    if (dl_res) {
+        setupSingleDownloadPage(dl_res)
+            .catch(tell);
+
         dl_res = false;
     }
     else {
         // Fetch the file information and optionally the download URL
-        M.req({a: 'g', p: ph, 'ad': localStorage.adflag || 1, au: ["wphl", "wphr", "wpht"]}).always(dl_g);
+        api.req({a: 'g', p: ph})
+            .then(({result}) => result)
+            .always(setupSingleDownloadPage)
+            .catch(tell);
     }
 
     if (is_mobile) {
@@ -66,7 +55,7 @@ function dlinfo(ph,key,next)
 }
 
 // eslint-disable-next-line complexity
-function dl_g(res, ctx) {
+async function setupSingleDownloadPage(res) {
     'use strict';
 
     var msg;
@@ -93,9 +82,6 @@ function dl_g(res, ctx) {
     //  Hide Register Panel
     $('.widget-block').addClass('hidden');
 
-    if (ctx && ctx.v2APIError) {
-        res = ctx.v2APIError;
-    }
     if (typeof res === 'object' && res.err < 0 && res.u !== 7) {
         res = res.err;
     }
@@ -390,12 +376,19 @@ function dl_g(res, ctx) {
 
             $('.viewer-button.right.share, .js-video-share').rebind('click', () => {
                 $(document).fullScreen(false);
-                $.itemExport = [dlpage_ph];
-                var exportLink = new mega.Share.ExportLink({
-                    'showExportLinkDialog': true,
-                    'nodesToProcess': $.itemExport
-                });
-                exportLink.getExportLink();
+
+                if (!$(this).hasClass('disabled')) {
+                    $(this).addClass('disabled');
+
+                    // @todo get rid of this '$.itemExport' ...
+                    $.itemExport = [dlpage_ph];
+
+                    mega.Share.ExportLink.pullShareLink($.itemExport, {showExportLinkDialog: true})
+                        .catch(tell)
+                        .finally(() => {
+                            $(this).removeClass('disabled');
+                        });
+                }
                 return false;
             });
 
@@ -658,19 +651,11 @@ function dl_g(res, ctx) {
             // This file link is valid to affiliate
             M.affiliate.storeAffiliate(dlpage_ph, 2);
         }
-        else if (is_mobile) {
-            // Load the missing file decryption key dialog for mobile
-            parsepage(pages['mobile']);
-            mobile.decryptionKeyOverlay.show(dlpage_ph, false, key);
-            fm_hideoverlay();
-            return false;
-        }
         else {
-            // Otherwise load the regular file decryption key dialog
-            mKeyDialog(dlpage_ph, false, key)
-                .fail(function() {
+            return mKeyDialog(dlpage_ph, false, key)
+                .catch(() => {
                     $('.download.error-text.message').text(l[7427]).removeClass('hidden');
-                    $('.info-block .block-view-file-type').addClass(fileIcon({name:'unknown'}));
+                    $('.info-block .block-view-file-type').addClass(fileIcon({name: 'unknown'}));
                     $('.download.buttons-block, .download.checkbox-bl').addClass('hidden');
                     $('.js-file-info .download.info-txt').text('Unknown');
                 });
@@ -1020,36 +1005,14 @@ function start_anoimport()
 function dlcomplete(dl) {
     'use strict';
 
-    var id = dl.dl_id;
     if (d) {
         console.log('dlcomplete', dl);
     }
 
+    onIdle(M.resetUploadDownload);
     $('.download.progress-bar').width('100%');
-
-    if ($('#dlswf_' + id).length > 0)
-    {
-        $('.fm-dialog-overlay').removeClass('hidden');
-        $('body').addClass('overlayed');
-        $('.mega-dialog.download-dialog').css('left','50%');
-        $('.mega-dialog.download-dialog button.js-close').rebind('click', function() {
-            $('.mega-dialog.download-dialog').css('left','-1000px');
-            msgDialog('confirmation', l[1196], l[1197], l[1198], function(e)
-            {
-                if (e) {
-                    $('.mega-dialog.download-dialog').addClass('hidden');
-                }
-                else {
-                    $('.mega-dialog.download-dialog').css('left','50%');
-                    $('.fm-dialog-overlay').removeClass('hidden');
-                    $('body').addClass('overlayed');
-                }
-            });
-        });
-    }
-    Soon(M.resetUploadDownload);
     $('.download.download-page').removeClass('downloading').addClass('download-complete');
-    tfsheadupdate({f: `dl_${id}`});
+    tfsheadupdate({f: dlmanager.getGID(dl)});
     if (mega.tpw) {
         mega.tpw.finishDownloadUpload(mega.tpw.DOWNLOAD, dl);
     }

@@ -109,12 +109,11 @@ export default class ContactsPanel extends MegaRenderMixin {
     };
 
     handleAcceptAllRequests = () => {
-        const { received } = this.props;
-        let receivedKeys = Object.keys(received);
-        if (received && receivedKeys.length) {
-            const promises = [];
-            for (let i = 0; i < receivedKeys.length; i++) {
-                promises.push(M.acceptPendingContactRequest(receivedKeys[i]));
+        const {received} = this.props;
+        const receivedKeys = Object.keys(received || {});
+        if (receivedKeys.length) {
+            for (let i = receivedKeys.length; i--;) {
+                M.acceptPendingContactRequest(receivedKeys[i]);
             }
         }
     };

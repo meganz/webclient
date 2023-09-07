@@ -19,17 +19,13 @@ var signin = {
 
             'use strict';
 
-            postLogin(email, password, pinCode, rememberMe, (result) => {
+            postLogin(email, password, pinCode, rememberMe)
+                .then((result) => {
 
-                // Check if we can upgrade the account to v2
-                security.login.checkToUpgradeAccountVersion(result, u_k, password, () => {
-
-                    loadingDialog.hide();
-
-                    // Otherwise proceed with regular login
                     signin.proceedWithLogin(result);
-                });
-            });
+                })
+                .catch(tell)
+                .finally(() => loadingDialog.hide());
         }
     },
 
@@ -128,23 +124,24 @@ var login_txt = false;
 var login_email = false;
 
 
-function postLogin(email, password, pinCode, remember, loginCompletionCallback) {
+function postLogin(email, password, pinCode, remember) {
     'use strict';
+    return new Promise((resolve) => {
+        var ctx = {
+            checkloginresult(ctx, result) {
+                const {u_k} = window;
 
-    // A little helper to pass only the final result of the User Get (ug) API request
-    // i.e. the (user type or error code) back to the loginCompletionCallback function
-    var ctx = {
-        callback2: loginCompletionCallback,
-        checkloginresult: function(ctx, result) {
-            if (ctx.callback2) {
-                ctx.callback2(result);
+                // Check if we can upgrade the account to v2
+                security.login.checkToUpgradeAccountVersion(result, u_k, password)
+                    .catch(dump)
+                    .finally(() => resolve(result));
             }
-        }
-    };
-    var passwordaes = new sjcl.cipher.aes(prepare_key_pw(password));
-    var uh = stringhash(email.toLowerCase(), passwordaes);
+        };
+        var passwordaes = new sjcl.cipher.aes(prepare_key_pw(password));
+        var uh = stringhash(email.toLowerCase(), passwordaes);
 
-    u_login(ctx, email, password, uh, pinCode, remember);
+        u_login(ctx, email, password, uh, pinCode, remember);
+    });
 }
 
 function pagelogin() {
@@ -262,8 +259,4 @@ function init_login() {
 
     // Init inputs events
     accountinputs.init($formWrapper);
-
-    if (is_chrome_firefox) {
-        Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'login_form'));
-    }
 }

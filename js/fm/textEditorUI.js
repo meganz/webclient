@@ -308,7 +308,8 @@ mega.textEditorUI = new function TextEditorUI() {
                                 : M.addNewFile(name, M.d[fileHandle].p)
                         )
                             .then(getSavedFile)
-                            .catch(() => {
+                            .catch(tell)
+                            .finally(() => {
                                 loadingDialog.hide();
                             });
                         return;

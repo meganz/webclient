@@ -61,7 +61,7 @@ function Chat() {
     this._queuedMccPackets = [];
     this._queuedMcsmPackets = {};
     this._queuedMessageUpdates = [];
-    this._queuedChatRoomEvents = {};
+    this._queuedChatRoomEvents = Object.create(null);
 
     this.handleToId = Object.create(null);
     this.publicChatKeys = Object.create(null);
@@ -601,7 +601,7 @@ Chat.prototype.registerUploadListeners = function() {
                 if (d) {
                     logger.debug('Attaching node[%s] to chat room[%s]...', ul.h, room.chatId, ul.uid, ul, M.d[ul.h]);
                 }
-                room.attachNodes([ul.h]);
+                room.attachNodes([ul.h]).catch(dump);
             });
 
             delete ulmanager.ulEventData[ul.uid];
@@ -705,7 +705,7 @@ Chat.prototype.registerUploadListeners = function() {
             // has this upload finished?
             if (ul.h) {
                 // Yes, check whether we must attach the node
-                var n = M.d[ul.h] || false;
+                const n = M.getNodeByHandle(ul.h);
 
                 if (!ul.efa || (n.fa && String(n.fa).split('/').length >= ul.efa)) {
                     onUploadComplete(ul);
@@ -1272,12 +1272,18 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
             this.trigger('onRoomInitialized', [room, resolve, reject]);
             room.setState(ChatRoom.STATE.JOINING);
 
-            if (this._queuedChatRoomEvents[chatId]) {
-                for (const event of this._queuedChatRoomEvents[chatId]) {
-                    room.trigger(event[0], event[1]);
-                }
+            const q = this._queuedChatRoomEvents[chatId];
+            if (q) {
                 delete this._queuedChatRoomEvents[chatId];
-                delete this._queuedChatRoomEvents[`${chatId}_timer`];
+
+                for (let i = 0; i < q.length; ++i) {
+                    const [event, data] = q[i];
+                    if (d) {
+                        this.logger.debug(`Dispatching deferred event '${event}'`, data);
+                    }
+                    room.trigger(event, data);
+                }
+                q.timer.abort();
             }
 
             this.processQueuedMcsmPackets();
@@ -1285,59 +1291,43 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
     ];
 };
 
-Chat.prototype.initContacts = function(userHandles, cvalue) {
+/**
+ * @param {Array} userHandles Array of user-handles
+ * @param {Number} [c] contact type relationship, as per M.u[].c
+ * @return {Array} newly seen users
+ */
+Chat.prototype.initContacts = function(userHandles, c) {
     const newUsers = [];
-    for (let i = userHandles.length; i--;) {
-        const userHandle = userHandles[i];
-        let isNew = false;
-        if (!(userHandle in M.u)) {
-            // Store in fmdb to save time on subsequent loads
-            M.addUser(new MegaDataObject(MEGA_USER_STRUCT, {
-                h: userHandle,
-                u: userHandle,
-                m: '',
-                c: cvalue
-            }));
-            isNew = true;
-        }
 
-        if (!M.u[userHandle]._chatListener) {
-            // Handle one off setups like adding listeners
-            M.u[userHandle]._chatListener = M.u[userHandle].addChangeListener(() => {
-                this.proxyUserChangeToRooms(userHandle);
-            });
-            if (!is_chatlink && !M.u[userHandle].m) {
-                // If the email isn't already present try fetch it.
-                M.syncContactEmail(userHandle, undefined, true);
-            }
-            if (!M.u[userHandle].c && !isNew) {
-                // Existing non-contacts should check the stored name is still correct.
-                // Remove only from attribCache so rendering doesn't break while allowing the request.
-                attribCache.removeItem(`${userHandle}_firstname`);
-                attribCache.removeItem(`${userHandle}_lastname`);
-                M.syncUsersFullname(userHandle);
-            }
-        }
-        if (isNew) {
-            newUsers.push(userHandle);
-        }
+    for (let i = userHandles.length; i--;) {
+        const u = userHandles[i];
+        const e = u in M.u;
+
+        M.addUser(e ? {u} : {u, c}, e || !newUsers.push(u));
     }
+
     return newUsers;
 };
 
 Chat.prototype.proxyUserChangeToRooms = function(handle) {
     // There will likely be a performance hit during the room/contact loading phase as user updates come in
     // Beyond that it shouldn't impact the performance of chat much as fewer updates would be expected.
-    const rooms = Object.values(this.chats);
-    if (d > 1) {
-        console.debug('userChange', handle);
-    }
-    for (let i = 0; i < rooms.length; i++) {
-        const chatRoom = rooms[i];
-        if (Object.keys(chatRoom.members).includes(handle)) {
-            chatRoom.trackDataChange('user-updated', handle);
+
+    delay(`chat:proxy-user-change-to-rooms.${handle}`, () => {
+        const rooms = Object.values(this.chats);
+
+        if (d) {
+            this.logger.debug('userChange', handle);
         }
-    }
+
+        for (let i = rooms.length; i--;) {
+            const chatRoom = rooms[i];
+
+            if (handle in chatRoom.members) {
+                chatRoom.trackDataChange('user-updated', handle);
+            }
+        }
+    }, 350);
 };
 
 /**
@@ -2085,9 +2075,13 @@ Chat.prototype.onChatsHistoryReady = promisify(function(resolve, reject, timeout
     const chatd = this.plugins.chatdIntegration.chatd;
     const eventName = 'onMessagesHistoryDone.ochr' + makeid(16);
     const ready = () => {
-        onIdle(resolve);
-        clearTimeout(timer);
+        queueMicrotask(resolve);
         chatd.off(eventName);
+
+        if (timer) {
+            timer.abort();
+            timer = null;
+        }
     };
 
     chatd.on(eventName, () => {
@@ -2097,7 +2091,7 @@ Chat.prototype.onChatsHistoryReady = promisify(function(resolve, reject, timeout
     });
 
     if (timeout > 0) {
-        timer = setTimeout(ready, timeout);
+        (timer = tSleep(timeout / 1e3)).then(ready);
     }
 });
 
@@ -2187,7 +2181,7 @@ Chat.prototype.createAndStartMeeting = function(topic, audio, video) {
 Chat.prototype._destroyAllChatsFromChatd = function() {
     var self = this;
 
-    asyncApiReq({'a': 'mcf', 'v': Chatd.VERSION}).done(function(r) {
+    asyncApiReq({'a': 'mcf', 'v': Chatd.VERSION}).then((r) => {
         r.c.forEach(function(chatRoomMeta) {
             if (chatRoomMeta.g === 1) {
                 chatRoomMeta.u.forEach(function (u) {
@@ -2212,7 +2206,7 @@ Chat.prototype._destroyAllChatsFromChatd = function() {
 };
 
 Chat.prototype._leaveAllGroupChats = function() {
-    asyncApiReq({'a': 'mcf', 'v': Chatd.VERSION}).done(function(r) {
+    asyncApiReq({'a': 'mcf', 'v': Chatd.VERSION}).then((r) => {
         r.c.forEach(function(chatRoomMeta) {
             if (chatRoomMeta.g === 1) {
                 asyncApiReq({
@@ -2492,131 +2486,62 @@ Chat.prototype.openChatAndSendFilesDialog = function(user_handle) {
  * Wrapper around Chat.openChat and ChatRoom.attachNodes as a single helper function
  * @param {Array|String} targets Where to send the nodes
  * @param {Array} nodes The list of nodes to attach into the room(s)
- * @param {boolean|undefined} noOpen If the chatroom shouldn't be opened after nodes are attached
- * @returns {MegaPromise}
+ * @param {Boolean} [silent] prevent redirection to the chat room after nodes are attached
+ * @returns {Promise<*>} chat rooms.
  * @see Chat.openChat
  * @see ChatRoom.attachNodes
  */
-Chat.prototype.openChatAndAttachNodes = function(targets, nodes, noOpen) {
-    'use strict';
-    var self = this;
+Chat.prototype.openChatAndAttachNodes = async function(targets, nodes, silent) {
+    const promises = [];
 
     if (d) {
         console.group('Attaching nodes to chat room(s)...', targets, nodes);
     }
 
-    return new MegaPromise(function(resolve, reject) {
-        var promises = [];
-        var folderNodes = [];
-        var fileNodes = [];
-
-        var handleRejct = function(reject, roomId, ex) {
-            if (d) {
-                self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
-            }
-            reject(ex);
-        };
-
-        var attachNodes = function(roomId) {
-            return new MegaPromise(function(resolve, reject) {
-                self.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, !noOpen)
-                    .then(room => {
-                        room.attachNodes(fileNodes).then(resolve.bind(self, room)).catch(reject);
-                    }).catch(ex => {
-                        handleRejct(reject, roomId, ex);
-                    });
-            });
-        };
-
-        var attachFolders = roomId => {
-            return new MegaPromise((resolve, reject) => {
-
-                var createPublicLink = (nodeId, room) => {
-                    M.createPublicLink(nodeId)
-                        .then(({ link }) => {
-                            room.sendMessage(link);
-                            resolve(room);
-                        })
-                        .catch(reject);
-                };
-
-                self.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, !noOpen)
-                    .then(room => {
-                        for (var i = folderNodes.length; i--;) {
-                            createPublicLink(folderNodes[i], room);
-                        }
-                    }).catch(ex => {
-                        handleRejct(reject, roomId, ex);
-                    });
-            });
-        };
-
-        if (!Array.isArray(targets)) {
-            targets = [targets];
-        }
-
-        for (var i = nodes.length; i--;) {
-            if (M.d[nodes[i]].t) {
-                folderNodes.push(nodes[i]);
-            }
-            else {
-                fileNodes.push(nodes[i]);
-            }
-        }
-
-        var _afterMDcheck = () => {
-            for (var i = targets.length; i--;) {
-                if (fileNodes.length > 0) {
-                    promises.push(attachNodes(targets[i]));
-                }
-                if (folderNodes.length > 0) {
-                    promises.push(attachFolders(targets[i]));
-                }
-            }
-
-            MegaPromise.allDone(promises).unpack(function(result) {
-                var room;
-
-                for (var i = result.length; i--;) {
-                    if (result[i] instanceof ChatRoom) {
-                        room = result[i];
-                        showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-                        if (noOpen) {
-                            resolve();
-                        }
-                        else {
-                            var roomUrl = room.getRoomUrl().replace("fm/", "");
-                            M.openFolder(roomUrl).always(resolve);
-                        }
-                        if (d) {
-                            console.groupEnd();
-                        }
-                        return;
-                    }
-                }
-
-                if (d) {
-                    self.logger.warn('openChatAndAttachNodes failed in whole...', result);
-                    console.groupEnd();
-                }
-                reject(result);
-            });
-        };
-
-        if (mega.fileRequestCommon.storage.isDropExist(folderNodes).length) {
-            mega.fileRequest.showRemoveWarning(folderNodes)
-                .then(_afterMDcheck)
-                .catch((ex) => {
-                    if (ex) {
-                        dump(ex);
-                        showToast('warning2', l[253]);
+    const attachNodes = (roomId) => this.smartOpenChat(roomId)
+        .then((room) => {
+            return room.attachNodes(nodes)
+                .then((res) => {
+                    if (res !== EBLOCKED) {
+                        return room;
                     }
                 });
+        })
+        .catch((ex) => {
+            if (d) {
+                this.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
+            }
+            throw ex;
+        });
+
+    if (!Array.isArray(targets)) {
+        targets = [targets];
+    }
+
+    for (let i = targets.length; i--;) {
+        promises.push(attachNodes(targets[i]));
+    }
+    const result = (await Promise.allSettled(promises)).map(e => e.value).filter(Boolean);
+
+    for (let i = result.length; i--;) {
+        if (result[i] instanceof ChatRoom) {
+            const room = result[i];
+
+            showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
+
+            if (!silent) {
+                await M.openFolder(room.getRoomUrl().replace('fm/', '')).catch(dump);
+            }
+
+            break;
         }
-        else {
-            _afterMDcheck();
-        }
-    });
+    }
+
+    if (d) {
+        console.groupEnd();
+    }
+
+    return result;
 };
 
 Chat.prototype.toggleUIFlag = function(name) {
@@ -2750,23 +2675,22 @@ Chat.prototype.getFrequentContacts = function() {
         }
     });
 
-    var masterPromise = new MegaPromise();
-    MegaPromise.allDone(promises).always(function () {
-        var result = obj_values(recentContacts).sort(function(a, b) {
-            return a.ts < b.ts ? 1 : (b.ts < a.ts ? -1 : 0);
-        });
-        masterPromise.resolve(result.reverse());
+    Chat._frequentsCache = new Promise((resolve, reject) => {
+        Promise.allSettled(promises)
+            .then(() => {
+                const result = Object.values(recentContacts)
+                    .sort((a, b) => a.ts < b.ts ? 1 : b.ts < a.ts ? -1 : 0)
+                    .reverse();
+
+                tSleep(300).then(() => {
+                    delete Chat._frequentsCache;
+                });
+                return result;
+            })
+            .then(resolve)
+            .catch(reject);
     });
-    Chat._frequentsCache = masterPromise;
-    masterPromise.always(function() {
-        if (Chat._frequentsCacheTimer) {
-            clearTimeout(Chat._frequentsCacheTimer);
-        }
-        Chat._frequentsCacheTimer = setTimeout(function() {
-            delete Chat._frequentsCache;
-        }, 6e4 * 5);
-    });
-    return masterPromise;
+    return Chat._frequentsCache;
 };
 
 
@@ -3033,18 +2957,19 @@ Chat.prototype.enqueueChatRoomEvent = function(eventName, eventData) {
         // was destroyed
         return;
     }
-    const chatId = eventData.chatId;
+    const {chatId} = eventData;
 
-    if (this._queuedChatRoomEvents[chatId + "_timer"]) {
-        clearTimeout(this._queuedChatRoomEvents[chatId + "_timer"]);
+    if (!this._queuedChatRoomEvents[chatId]) {
+        this._queuedChatRoomEvents[chatId] = [];
+
+        (this._queuedChatRoomEvents[chatId].timer = tSleep(15))
+            .then(() => {
+                if (d) {
+                    this.logger.warn('Timer ran out, events lost...', this._queuedChatRoomEvents[chatId]);
+                }
+                delete this._queuedChatRoomEvents[chatId];
+            });
     }
-    // cleanup if room not initialized in 15s
-    this._queuedChatRoomEvents[chatId + "_timer"] = setTimeout(() => {
-        delete this._queuedChatRoomEvents[chatId + "_timer"];
-        delete this._queuedChatRoomEvents[chatId];
-    }, 15e3);
-
-    this._queuedChatRoomEvents[chatId] = this._queuedChatRoomEvents[chatId] || [];
     this._queuedChatRoomEvents[chatId].push([eventName, eventData]);
 };
 
@@ -3071,7 +2996,7 @@ Chat.prototype.autoJoinIfNeeded = function() {
             });
 
             // send the join mciph
-            M.req(req);
+            asyncApiReq(req).catch(dump);
         }
         else {
             localStorage.removeItem("autoJoinOnLoginChat");

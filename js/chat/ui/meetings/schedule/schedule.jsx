@@ -50,8 +50,11 @@ export class Schedule extends MegaRenderMixin {
 
     syncPublicLink() {
         if (this.state.isEdit) {
-            const { chatRoom } = this.props;
-            chatRoom.getPublicLink(() => this.isMounted() && this.setState({ link: !!chatRoom.publicLink }));
+            const {chatRoom} = this.props;
+
+            chatRoom.updatePublicHandle()
+                .then(() => this.isMounted() && this.setState({link: !!chatRoom.publicLink}))
+                .catch(dump);
         }
     }
 

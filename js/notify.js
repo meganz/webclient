@@ -58,13 +58,11 @@ var notify = {
         notify.notifications = [];
 
         // Call API to fetch the most recent notifications
-        api_req('c=' + notify.numOfNotifications, {
-            callback: function(result) {
+        api.req(`c=${this.numOfNotifications}`, 3)
+            .then(({result}) => {
 
                 // Check it wasn't a negative number error response
-                if (typeof result !== 'object') {
-                    return false;
-                }
+                assert(typeof result === 'object');
 
                 // Get the current UNIX timestamp and the last time delta (the last time the user saw a notification)
                 var currentTime = unixtime();
@@ -121,15 +119,16 @@ var notify = {
                 if (!notify.$popup.hasClass('hidden')) {
                     notify.renderNotifications();
                 }
-            }
-        }, 3);  // Channel 3
+            })
+            .catch(dump);
     },
 
     /**
      * Adds a notification from an Action Packet
      * @param {Object} actionPacket The action packet object
      */
-    notifyFromActionPacket: function(actionPacket) {
+    notifyFromActionPacket: async function(actionPacket) {
+        'use strict';
 
         // We should not show notifications if we haven't yet done the initial notifications load yet
         if (!notify.initialLoadComplete || notify.isUnwantedNotification(actionPacket)) {
@@ -155,15 +154,9 @@ var notify = {
         // some sharing scenarios where a user is part of a share then another user adds files to the share but they
         // are not contacts with that other user so the local state has no information about them and would display a
         // broken notification if the email is not known.
-        if (
-            newNotification.type === 'put'
-            && !this.getUserEmailByTheirHandle(newNotification.userHandle, undefined, true)
-        ) {
-            console.assert(newNotification.userHandle && newNotification.userHandle.length === 11);
+        if (newNotification.type === 'put' && String(newNotification.userHandle).length === 11) {
 
-            // Once the email is fetched it will re-call the notifyFromActionPacket function with the same actionPacket
-            notify.fetchUserEmailFromApi(newNotification.userHandle, actionPacket);
-            return false;
+            this.getUserEmailByTheirHandle(newNotification.userHandle);
         }
 
         // Combines the current new notification with the previous one if it meets certain criteria
@@ -176,28 +169,6 @@ var notify = {
         if (!notify.$popup.hasClass('hidden')) {
             notify.renderNotifications();
         }
-    },
-
-    /**
-     * Fetches the user's email address from the API based on the user handle
-     * @param {String} userHandle The user handle to fetch the email address for e.g. 555wupYjkMU
-     * @param {Object} actionPacket An action packet which will be resent to the notifyFromActionPacket function after
-     *                              the user's email has been returned. An example 'put' action packet for testing is:
-     *                              {"a":"put","n":"U8oHEL7Q","u":"555wupYjkMU","f":[{"h":"F5QQSDJR","t":0}]}
-     */
-    fetchUserEmailFromApi: function(userHandle, actionPacket) {
-
-        'use strict';
-
-        // Make User Get Email (uge) request to get the user's email address from the user handle
-        M.req({a: 'uge', 'u': userHandle}).done(function(result) {
-
-            // Update the local state with the user's email
-            notify.userEmails[userHandle] = result;
-
-            // Re-call the notify function with the action packet now that the email has been stored
-            notify.notifyFromActionPacket(actionPacket);
-        });
     },
 
     /**
@@ -446,7 +417,7 @@ var notify = {
         // Send 'set last acknowledged' API request to inform it which notifications have been seen
         // up to this point then they won't show these notifications as new next time they are fetched
         if (!remote) {
-            api_req({ a: 'sla', i: requesti });
+            api.screq('sla').catch(dump);
         }
     },
 
@@ -567,8 +538,8 @@ var notify = {
         // Fetch data from API
         M.setUser(userHandle);
         const promises = [
-            M.syncUsersFullname(userHandle, undefined, new MegaPromise()),
-            M.syncContactEmail(userHandle, new MegaPromise(), true)
+            M.syncUsersFullname(userHandle),
+            M.syncContactEmail(userHandle, true)
         ];
         this.userEmails[userHandle] = Promise.allSettled(promises)
             .then(() => {
@@ -786,9 +757,10 @@ var notify = {
             var pendingContactId = $this.attr('data-pending-contact-id');
 
             // Send the User Pending Contact Action (upca) API 2.0 request to accept the request
-            M.acceptPendingContactRequest(pendingContactId).fail(() => {
-                notify.acceptedContactRequests.splice(notify.acceptedContactRequests.indexOf(pendingContactId), 1);
-            });
+            M.acceptPendingContactRequest(pendingContactId)
+                .catch(() => {
+                    notify.acceptedContactRequests.splice(notify.acceptedContactRequests.indexOf(pendingContactId), 1);
+                });
 
             // Show the Accepted icon and text
             $this.closest('.notification-item').addClass('accepted');

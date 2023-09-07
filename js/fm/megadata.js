@@ -55,30 +55,28 @@
 mBroadcaster.once('boot_done', function() {
     'use strict';
 
-    var struct = {
+    const value = freeze({
         "u": undefined,
-        "b": undefined,
         "c": undefined,
         "m": undefined,
-        "m2": undefined,
+        // "m2": undefined,
         "name": undefined,
         "h": undefined,
         "t": undefined,
         "p": undefined,
         "presence": 'unavailable',
         "presenceMtime": undefined,
-        "shortName": "",
         "firstName": "",
         "lastName": "",
         "nickname": "",
         "ts": undefined,
         "ats": undefined,
-        "rTimeStamp": undefined,
+        // "rTimeStamp": undefined,
         "avatar": undefined,
         "lastGreen": undefined
-    };
+    });
 
-    Object.defineProperty(window, 'MEGA_USER_STRUCT', {value: Object.freeze(Object.setPrototypeOf(struct, null))});
+    Object.defineProperty(window, 'MEGA_USER_STRUCT', {value});
 });
 
 
@@ -91,7 +89,6 @@ function MegaData() {
     this.csort = 'name';
     this.storageQuotaCache = null;
     this.tfsdomqueue = Object.create(null);
-    this.scAckQueue = Object.create(null);
     this.sortTreePanel = Object.create(null);
     this.lastColumn = null;
     this.account = false;
@@ -163,137 +160,29 @@ function MegaData() {
 
     if (is_mobile) {
         /* eslint-disable no-useless-concat */
-        var dummy = function() {
-            return MegaPromise.resolve();
-        };
-        this['init' + 'UIKeyEvents'] = dummy;
-        this['abort' + 'Transfers'] = dummy;
-        this['search' + 'Path'] = dummy;
-
-        this['initFile' + 'ManagerUI'] = function() {
-            if (typeof window.InitFileDrag === 'function') {
-                window.InitFileDrag();
-                delete window.InitFileDrag;
-            }
-        };
-        mobile.uploadOverlay.shim(this);
-
-        this['addWeb' + 'Download'] = function(nodes) {
-            // @see filesystem.js/abortAndStartOver
-            if (d) {
-                console.assert(Array.isArray(nodes) && nodes.length === 1 && arguments.length === 1, 'bogus usage');
-            }
-            M.resetUploadDownload();
-            later(function() {
-                mobile.downloadOverlay.startDownload(nodes[0]);
-            });
-        };
-
-        // this['check' + 'StorageQuota'] = dummy;
-        this['show' + 'OverStorageQuota'] = function(data) {
-            if (data && (data === EPAYWALL || (data.isFull && Object(u_attr).uspw))) {
-                data = Object.create(null);
-                data.isFull = data.isAlmostFull = data.EPAYWALL = true;
-            }
-            if (data.isAlmostFull) {
-                var ab = mobile.alertBanner;
-                var isPro = Object(u_attr).p;
-
-                var action = function() {
-                    if (data.EPAYWALL) {
-                        if (!M.account) {
-                            M.accountData(function() {
-                                action();
-                            });
-                            return;
-                        }
-                        var overlayTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
-                        ab.showError(overlayTexts.fmBannerText);
-                        mobile.overStorageQuotaOverlay.show(overlayTexts.dialogText, overlayTexts.dlgFooterText);
-                        ab.onTap(function() {
-                            loadSubPage('pro');
-                        });
-                    }
-                    else {
-                        var mStoragePossible = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
-                            ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
-
-                        var msg = isPro ? l[22667].replace('%1', mStoragePossible) :
-                            l[22671].replace('%1', mStoragePossible);
-
-                        if (data.isFull) {
-
-                            ab.showError(msg); // Your account is full
-
-                            mobile.overStorageQuotaOverlay.show(msg);
-                        }
-                        else {
-                            ab.showWarning(isPro ? l[22668].replace('%1', mStoragePossible) :
-                                l[22672].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
-                                    .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
-                            ); // Your account is almost full.
-                        }
-                        // When the banner is taped, show pro page.
-                        ab.onTap(function() {
-                            loadSubPage('pro');
-                        });
-                    }
-                };
-
-                if (!pro.membershipPlans || !pro.membershipPlans.length) {
-                    pro.loadMembershipPlans(action);
-                }
-                else {
-                    action();
-                }
-            }
-        };
-
-        this['render' + 'Main'] = function(aUpdate) {
-            if (aUpdate) {
-                mobile.cloud.renderUpdate();
-            }
-            else {
-                mobile.cloud.renderLayout();
-            }
-            return true;
-        };
-
-        this['updFile' + 'ManagerUI'] = mobile.updFileManagerUI;
-
-        var tf = [
-            "renderTree", "buildtree", "initTreePanelSorting",
-            "treePanelType", "addTreeUI", "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen",
-            "treeSortUI", "treeFilterUI"
-        ];
-
-        for (var i = tf.length; i--;) {
-            this[tf[i]] = dummy;
-        }
+        mobile.shim(this);
     }
+    else if (is_megadrop) {
+        Object.defineProperty(this, 'ul' + 'progress', {
+            value: function(ul, perc, bl, bt, bps) {
+                if (!bl || !ul.starttime || uldl_hold) {
+                    return false;
+                }
 
-    if (is_filerequest_page) {
-        this['ul' + 'progress'] = function(ul, perc, bl, bt, bps) {
-            if (!bl || !ul.starttime || uldl_hold) {
-                return false;
+                if (d) {
+                    console.assert(mega.fileRequestUpload.isUploadPageInitialized(), 'Check this...');
+                }
+
+                const {id} = ul;
+                const remainingTime = bps > 1000 ? (bt - bl) / bps : -1;
+
+                $.transferprogress[`ul_${id}`] = [bl, bt, bps];
+
+                delay('percent_megatitle', percent_megatitle, 50);
+
+                mega.fileRequestUpload.onItemUploadProgress(ul, bps, remainingTime, perc, bl);
             }
-
-            if (d) {
-                console.assert(
-                    mega.fileRequestUpload.isUploadPageInitialized(),
-                    'Check this...'
-                );
-            }
-
-            const { id } = ul;
-            const remainingTime = bps > 1000 ? (bt - bl) / bps : -1;
-
-            $.transferprogress['ul_' + id] = [bl, bt, bps];
-
-            delay('percent_megatitle', percent_megatitle, 50);
-
-            mega.fileRequestUpload.onItemUploadProgress(ul, bps, remainingTime, perc, bl);
-        };
+        });
     }
 
     /** @name M.IS_TREE */
@@ -302,6 +191,29 @@ function MegaData() {
     /** @name M.IS_SHARED */
     /** @name M.IS_TAKENDOWN */
     makeEnum(['TREE', 'FAV', 'LINKED', 'SHARED', 'TAKENDOWN'], 'IS_', this);
+
+    const seal = new Set();
+    (function shield(ctx) {
+        const proto = Object.getPrototypeOf(ctx);
+        if (proto) {
+            const desc = Object.getOwnPropertyDescriptors(proto);
+            for (const p in desc) {
+                if (typeof desc[p].value === 'function') {
+                    seal.add(p);
+                }
+            }
+            shield(proto);
+        }
+    })(this);
+
+    return new Proxy(this, {
+        defineProperty(target, prop, descriptor) {
+            if (seal.has(prop)) {
+                throw new MEGAException('Invariant', prop, 'DataCloneError');
+            }
+            return Reflect.defineProperty(target, prop, descriptor);
+        }
+    });
 }
 
 MegaData.prototype = new MegaUtils();

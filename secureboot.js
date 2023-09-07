@@ -78,31 +78,21 @@ tmp = getCleanSitePath();
 var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
 var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
 var is_drop = location.pathname === '/filerequest' || location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
-var is_iframed = is_embed || is_drop;
+var is_megadrop = (tmp.substr(0, 9) === 'megadrop/' || tmp.substr(0, 12) === 'filerequest/') && tmp.split('/')[1];
+var is_iframed = is_embed || is_drop || is_megadrop;
 var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
 
-var is_chrome_firefox = document.location.protocol === 'chrome:' &&       // Only true for Palemoon/Legacy FF extension
-    document.location.host === 'mega' || document.location.protocol === 'mega:';
 var location_sub = document.location.href.substr(0, 16);
 var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
 var is_firefox_web_ext = location_sub === 'moz-extension://';
-var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
+var is_extension = is_electron || is_chrome_web_ext || is_firefox_web_ext;
 var is_microsoft = /msie|edge|trident/i.test(ua);
 var is_bot = !is_extension && /bot|crawl/i.test(ua);
 var is_webcache = location.host === 'webcache.googleusercontent.com';
+var is_chatlink = tmp.substr(0, 5) === 'chat/' && tmp.replace(/[#?].*$/, '').split('/')[1];
 var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
     || location.host === 'smoketest.mega.nz' || is_extension;
 var is_eplusplus = false;
-var is_filerequest_page = String(location.pathname).substr(0, 13) === '/filerequest/' ||
-    String(location.pathname).substr(0, 10) === '/megadrop/';
-
-
-self.fetchStreamSupport = (
-    window.fetch && !window.MSBlobBuilder
-    && typeof ReadableStream === 'function'
-    && typeof AbortController === 'function'
-    && typeof Object(AbortController.prototype).abort === 'function'
-);
 
 var staticServerLoading = {
     loadFailuresOriginal: 0,        // Count of failures on the original static server (from any thread)
@@ -120,6 +110,71 @@ var load_error_types = {
     /** A file loading issue, network issue or the static server is down */
     file_load_error: 2
 };
+
+if (is_karma) {
+    Object.freeze = echo;
+}
+Object.freeze(Object);
+
+Object.defineProperties(self, {
+    'freeze': {
+        value: function freeze(obj) {
+            Object.setPrototypeOf(obj, null);
+            return Object.freeze(obj);
+        }
+    },
+
+    'gClearTimeout': {
+        value: self.clearTimeout
+    },
+
+    'gSetTimeout': {
+        value: self.setTimeout
+    },
+
+    'lazy': {
+        value: function lazy(target, property, stub) {
+            return Object.defineProperty(target, property, {
+                get: function() {
+                    Object.defineProperty(this, property, {
+                        value: stub.call(this),
+                        enumerable: property[0] !== '_'
+                    });
+                    return this[property];
+                },
+                configurable: true
+            });
+        }
+    },
+
+    'megaChatIsDisabled': ((function() {
+        var status = localStorage.testChatDisabled;
+        return {
+            set: function(val) {
+                status = val;
+                if (status) {
+                    $(document.body).addClass("megaChatDisabled");
+                }
+                else {
+                    $(document.body).removeClass("megaChatDisabled");
+                }
+            },
+            get: function() {
+                return status || window.mega.flags.mcs === 0;
+            }
+        };
+    })()),
+
+    'megaChatIsReady': {
+        get: function() {
+            return !self.megaChatIsDisabled && typeof megaChat !== 'undefined' && megaChat.is_initialized;
+        }
+    }
+});
+
+// auto-shield
+freeze(freeze);
+freeze(lazy);
 
 function getMobileStoreLink() {
     'use strict';
@@ -391,39 +446,6 @@ function geoStaticPath(cms) {
     return cms ? defaultCMSStaticPath : defaultStaticPath;
 }
 
-if (is_chrome_firefox) {
-    var Cu = Components.utils;
-    var Cc = Components.classes;
-    var Ci = Components.interfaces;
-
-    Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
-    Cu['import']("resource://gre/modules/Services.jsm");
-
-    ['userAgent', 'appName', 'appVersion', 'platform', 'oscpu']
-        .forEach(function(k) {
-            var pref = 'general.' + k.toLowerCase() + '.override';
-
-            if (Services.prefs.prefHasUserValue(pref)
-                    && Services.prefs.getPrefType(pref) === 32) {
-
-                try {
-                    var value = Services.prefs.getCharPref(pref);
-                    Services.prefs.clearUserPref(pref);
-
-                    Object.defineProperty(navigator, k, {
-                        enumerable: true,
-                        value: Cc["@mozilla.org/network/protocol;1?name=http"]
-                                    .getService(Ci.nsIHttpProtocolHandler)[k]
-                    });
-                    Services.prefs.setCharPref(pref, value);
-                }
-                catch (e) {}
-            }
-        });
-
-    ua = navigator.userAgent.toLowerCase();
-}
-
 var myURL = window.URL;
 
 // Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
@@ -437,100 +459,14 @@ if (!String.prototype.trim) {
         return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
     };
 }
-if (!String.prototype.localeCompare) {
-    String.prototype.localeCompare = function(to) {
-        var s1 = this.toLowerCase();
-        var s2 = String(to).toLowerCase();
-        return s1 > s2 ? 1 : (s1 < s2 ? -1 : 0);
-    };
-}
 if (!String.trim) {
     String.trim = function(s) {
         return String(s).trim();
     };
 }
-if (!Date.now) {
-    Date.now = function now() {
-        return new Date().getTime();
-    };
-}
-
-try {
-    // Browser compatibility
-    // Fx 4.0   Chrome 5   MSIE 9   Opera 11.60   Safari 5.1
-    Object.defineProperty(this, 'megaChatIsDisabled', (function() {
-        var status;
-        return {
-            set: function(val) {
-                status = val;
-                if (status) {
-                    $(document.body).addClass("megaChatDisabled");
-                }
-                else {
-                    $(document.body).removeClass("megaChatDisabled");
-                }
-            },
-            get: function() {
-                return status || localStorage.testChatDisabled || window.mega.flags.mcs === 0;
-            }
-        };
-    })());
-
-    // Check whether Mega Chat is enabled *and* initialized
-    Object.defineProperty(this, 'megaChatIsReady', {
-        get: function() {
-            return !megaChatIsDisabled
-                && typeof megaChat !== 'undefined'
-                && megaChat.is_initialized;
-        }
-    });
-}
-catch (ex) {
-    console.error(ex);
-    window.megaChatIsReady = false;
-    window.megaChatIsDisabled = false;
-    browserUpdate = true;
-}
 
 if (!browserUpdate) try
 {
-    if (is_chrome_firefox)
-    {
-        XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
-
-        (function(global) {
-            global.loadSubScript = function(file,scope) {
-                var loader = Services.scriptloader;
-
-                if (global.d && loader.loadSubScriptWithOptions) {
-                    loader.loadSubScriptWithOptions(file, {
-                        charset: "UTF-8",
-                        ignoreCache: true,
-                        target: scope || global
-                    });
-                } else {
-                    loader.loadSubScript(file, scope || global);
-                }
-            };
-        })(this);
-
-        try {
-            var mozBrowserID =
-            [   Services.appinfo.name,
-                Services.appinfo.platformVersion,
-                Services.appinfo.platformBuildID,
-                Services.appinfo.OS,
-                Services.appinfo.XPCOMABI].join(" ");
-        } catch(e) {
-            var mozBrowserID = ua;
-        }
-
-        loadSubScript('chrome://mega/content/strg.js');
-
-        if (!(localStorage instanceof Ci.nsIDOMStorage)) {
-            throw new Error('Invalid DOM Storage instance.');
-        }
-    }
     try {
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
@@ -722,7 +658,7 @@ var mega = {
     whoami: 'We make secure cloud storage simple. Create an account and get up to 50 GB ' +
             'free on MEGA\'s end-to-end encrypted cloud collaboration platform today!',
 
-    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 6),
+    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 16),
 
     /** An object with flags detailing which features are enabled on the API
      *  XXX: This is now meant to be a legacy private property, use `mega.flags` instead.
@@ -785,7 +721,9 @@ var mega = {
                     fm_forcerefresh(true);
                 }
                 else {
-                    api_req({a: 'log', e: 99679}); // sc processing took too long
+                    onIdle(function() {
+                        eventlog(99679, true); // sc processing took too long
+                    });
 
                     msgDialog('warninga:!^' + l[17704] + '!' + l[17705], l[882], l[17706], 0, function(yes) {
                         if (yes) {
@@ -903,35 +841,6 @@ var mega = {
         var mappedLang = mappings[userLang];
 
         return typeof mappedLang === 'undefined' ? '' : mappedLang;
-    },
-
-    /** Parameters to append to API requests */
-    urlParams: function() {
-        if (!this._urlParams) {
-            var params = '&domain=meganz'; // domain origin
-            if (location.host === 'mega.io') {
-                params = '&domain=megaio';
-            }
-
-            // If using an extension, the version is passed through to the API for the helpdesk tool
-            if (is_extension) {
-                params += '&ext=' + (is_chrome_web_ext ? buildVersion.chrome : buildVersion.firefox);
-            }
-
-            // Append browser brand for easier troubleshoting
-            var brand = this.getBrowserBrandID();
-            if (brand) {
-                params += '&bb=' + parseInt(brand);
-            }
-
-            var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
-            params += apiut;
-
-            params += '&v=2&lang=' + window.lang;
-            this._urlParams = params;
-        }
-
-        return this._urlParams;
     }
 };
 
@@ -990,6 +899,17 @@ Object.defineProperty(mega, 'active', {
     })()
 });
 
+/** @property mega.infinity */
+lazy(mega, 'infinity', function() {
+    return mega.flags.inf > 0 || !!localStorage.mInfinity;
+});
+
+/** @property mega.viewID */
+lazy(mega, 'viewID', function() {
+    'use strict';
+    return (Date.now() / 1e3 >>> 0).toString(16).slice(-8) + makeUUID().slice(-8);
+});
+
 (function(chrome) {
     'use strict';
     delete mega.chrome;
@@ -1030,7 +950,19 @@ if (window.crypto && typeof crypto.getRandomValues === 'function') {
             return rand.call(crypto, seed);
         };
         mega.getRandomValues.strong = true;
+
+        if (window.isSecureContext && typeof crypto.randomUUID === 'function') {
+            Object.defineProperty(window, 'makeUUID', {
+                value: function() {
+                    return crypto.randomUUID();
+                }
+            });
+        }
     })(crypto, crypto.getRandomValues);
+}
+
+if (!window.AudioContext && window.webkitAudioContext) {
+    window.AudioContext = window.webkitAudioContext;
 }
 
 // nb: can overflow..
@@ -1080,35 +1012,7 @@ if (!browserUpdate && is_extension)
     hashLogic = true;
     nocontentcheck=true;
 
-    if (is_chrome_firefox)
-    {
-        bootstaticpath = 'chrome://mega/content/';
-        urlrootfile = 'secure.html';
-        if (d > 1) {
-            staticpath = bootstaticpath;
-        }
-        else {
-            staticpath = defaultStaticPath;
-        }
-        try {
-            loadSubScript(bootstaticpath + 'fileapi.js');
-        } catch(e) {
-            browserUpdate = 1;
-            Cu.reportError(e);
-            alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
-        }
-        if (location.protocol === 'mega:') {
-            try {
-                var url = mObjectURL([""]);
-                myURL.revokeObjectURL(url);
-            }
-            catch (e) {
-                console.error('mObjectURL failed, is this TOR?', e);
-                document.location = bootstaticpath + urlrootfile + location.hash;
-            }
-        }
-    }
-    else if (is_electron) {
+    if (is_electron) {
         urlrootfile = 'index.html';
         bootstaticpath = location.href.replace(urlrootfile, '');
     }
@@ -1521,11 +1425,13 @@ function mObjectURL(data, type)
                 try {
                     rc = ev.callback.apply(ev.scope, args);
                 } catch (ex) {
-                    if (d) console.error(ex);
+                    console.error(ex);
 
-                    onIdle(function() {
-                        throw ex;
-                    });
+                    if (typeof reportError === 'function'
+                        && buildVersion.timestamp * 1000 + 8e7 > Date.now()) {
+
+                        reportError(ex);
+                    }
                 }
                 if (ev.once || rc === 0xDEAD)
                     idr.push(id);
@@ -1555,54 +1461,6 @@ function mObjectURL(data, type)
             once : true,
             callback : callback
         });
-    },
-
-    /**
-     * Send message when there is listener for it, if there is not listener for it,
-     * wait for listener to be initialize and send message at that point.
-     * Reason for this function is make sure callback is executed,
-     * even there is race condition between sender and listener.
-     * This function should be paired with 'onceAfterReady'.
-     * @param {String} topic A string representing the event type to listen for.
-     * @param {Interger} [timeout] Time for waiting listener to be init in ms, if it passed destroy awaiting.
-     * @memberOf mBroadcaster
-     */
-    sendMessageAfterReady: function mBroadcaster_sendMessageAfterReady(topic, timeout) {
-        'use strict';
-
-        if (this.hasListener(topic)) {
-            this.sendMessage(topic);
-        }
-        else {
-            this.once(topic + '_awaiting_listener', this.sendMessage.bind(this, topic));
-            if (timeout) {
-                setTimeout(function() {
-                    if (this.hasListener(topic + '_awaiting_listener')) {
-                        this.removeListener(topic + '_awaiting_listener');
-                    }
-                }, timeout);
-            }
-        }
-    },
-
-    /**
-     * Add once listener and if there is sendMessage waiting for listner to be init,
-     * made it init and trigger message to be sent so it can execute callback
-     * Reason for this function is make sure callback is executed,
-     * even there is race condition between sender and listener.
-     * This function should be paired with 'sendMessageAfterReady'.
-     * @param {String} topic A string representing the event type to listen for.
-     * @param {Function} callback The function to invoke
-     * @memberOf mBroadcaster
-     */
-    onceAfterReady: function mBroadcaster_onceAfterReady(topic, callback) {
-        'use strict';
-
-        this.once(topic, callback);
-
-        if (this.hasListener(topic + '_awaiting_listener')) {
-            this.sendMessage(topic + '_awaiting_listener');
-        }
     },
 
     crossTab: {
@@ -1989,10 +1847,10 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
     // and due to the onIdle timeout below it hasn't actually sent the log yet
     onIdle(function() {
         var xhr = getxhr();
-        xhr.open('POST', apipath + 'cs?id=0' + mega.urlParams(), true);
+        xhr.open('POST', apipath + 'cs?id=0', true);
         xhr.send(
             JSON.stringify(
-                [{ a: 'log', e: 99723, m: JSON.stringify([1, errorType, filename, staticPathToLog]) }]
+                [{a: 'log', e: 99723, m: JSON.stringify([1, errorType, filename, staticPathToLog])}]
             )
         );
     });
@@ -2307,7 +2165,7 @@ else if (!browserUpdate) {
                 return;
             }
 
-            var expectedSourceOrigin = url || ln > 10;
+            var expectedSourceOrigin = url || ln > 999;
             if (url === '@srvlog') {
                 url = '';
             }
@@ -2383,7 +2241,7 @@ else if (!browserUpdate) {
                 if (!/SyntaxError|Script\serror/.test(dump.m)) {
                     onIdle(function() {
                         var xhr = getxhr();
-                        xhr.open('POST', apipath + 'cs?id=0' + mega.urlParams(), true);
+                        xhr.open('POST', apipath + 'cs?id=0', true);
                         xhr.send(
                             JSON.stringify(
                                 [{a: 'log', e: 99806, m: JSON.stringify([1, dump.m, url + ':' + ln])}]
@@ -2397,7 +2255,7 @@ else if (!browserUpdate) {
             var version = buildVersion.website;
 
             if (is_extension) {
-                if (is_chrome_firefox || is_firefox_web_ext) {
+                if (is_firefox_web_ext) {
                     version = buildVersion.firefox;
                 }
                 else if (mega.chrome) {
@@ -2460,7 +2318,7 @@ else if (!browserUpdate) {
             }
             if (cn) dump.c = cn;
 
-            if (/Access to (?:the script at )?'.*(?:' from script|is) denied/.test(dump.m)) {
+            if (/Access to (?:the script at )?'.*(?:' from script|'?is) denied|origin 'null'/.test(dump.m)) {
                 console.error(dump.m, dump);
                 return false;
             }
@@ -2535,10 +2393,6 @@ else if (!browserUpdate) {
                 report.ud = uds;
                 report.cc = cc;
 
-                if (is_chrome_firefox)
-                {
-                    report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
-                }
                 report = JSON.stringify(r? report:{});
 
                 for (var i = __cdumps.length; i--;)
@@ -2700,6 +2554,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/jquery-ui.extra.js', n: 'jquery_ui_extra_js', j:1});
 
     jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
+    jsl.push({f:'js/utils/api.js', n: 'js_utils_api_js', j: 1});
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
     jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
     jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
@@ -2797,22 +2652,15 @@ else if (!browserUpdate) {
     jsl.push({f:'css/dialogs/cookie-dialog.css', n: 'cookie-dialog_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/metatags.js', n: 'metatags_js', j:1 });
     jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
+    jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
+    jsl.push({f:'js/ui/languageDialog.js', n: 'languageDialog_js', j:1,w:7});
     jsl.push({f:'css/jquery-ui.extra.css', n: 'jquery_ui_extra_css', j:2,w:5,c:1,d:1,cache:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
-
-        // This is not used anymore, unless we process and store credit card details for renewals again
-        // jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
-
-        // Desktop notifications
-        jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
-
-        // Other
         jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
-        jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
 
         // UI Elements
         jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
@@ -2822,7 +2670,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
         jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
-        jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
@@ -2831,11 +2678,6 @@ else if (!browserUpdate) {
         // Bottom pages for desktop
         jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5,c:1,d:1,cache:1});
     } // !is_mobile
-
-    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
-        is_chrome_firefox |= 4;
-        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
-    }
 
     // TextEditor
     jsl.push({f:'js/fm/fileTextEditor.js', n: 'filetexteditor_js', j:1});
@@ -2848,7 +2690,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
     jsl.push({f:'js/transfers/utils.js', n: 'tutils', j:1,w:4});
     jsl.push({f:'js/transfers/meths/cache.js', n: 'dl_cache', j:1,w:3});
-    jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
     jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
     jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
     // jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
@@ -2904,6 +2745,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/filerequest_common.js', n: 'filerequest_common_js', j:1});
     jsl.push({f:'js/filerequest_components.js', n: 'filerequest_components_js', j:1});
     jsl.push({f:'js/filerequest.js', n: 'filerequest_js', j:1});
+    jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
 
     // Variables which can be used across all stylesheets
     jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2927,9 +2769,9 @@ else if (!browserUpdate) {
     jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
 
     jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
 
     if (!is_mobile) {
-        jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
 
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
@@ -3009,11 +2851,9 @@ else if (!browserUpdate) {
         jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/share-dialog.css', n: 'share_dialog_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/filerequest.css', n: 'filerequest_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
 
-        jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/recovery.css', n: 'recovery_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3046,7 +2886,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/utils.js', n: 'fm_utils_js', j: 1});
     jsl.push({f:'js/fm/megadata.js', n: 'fm_megadata_js', j: 1});
     jsl.push({f:'js/fm/megadata/account.js', n: 'fm_megadata_account_js', j: 1});
-    jsl.push({f:'js/fm/megadata/avatars.js', n: 'fm_megadata_avatars_js', j: 1});
     jsl.push({f:'js/fm/megadata/contacts.js', n: 'fm_megadata_contacts_js', j: 1});
     jsl.push({f:'js/fm/megadata/filters.js', n: 'fm_megadata_filters_js', j: 1});
     jsl.push({f:'js/fm/megadata/menus.js', n: 'fm_megadata_menus_js', j: 1});
@@ -3054,11 +2893,11 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/megadata/openfolder.js', n: 'fm_megadata_openfolder_js', j: 1});
     jsl.push({f:'js/fm/megadata/render.js', n: 'fm_megadata_render_js', j: 1});
     jsl.push({f:'js/fm/megadata/render-breadcrumbs.js', n: 'fm_megadata_render_breadcrumbs_js', j: 1});
-    jsl.push({f:'js/fm/megadata/reset.js', n: 'fm_megadata_reset_js', j: 1});
     jsl.push({f:'js/fm/megadata/shares.js', n: 'fm_megadata_shares_js', j: 1});
     jsl.push({f:'js/fm/megadata/sort.js', n: 'fm_megadata_sort_js', j: 1});
     jsl.push({f:'js/fm/megadata/transfers.js', n: 'fm_megadata_transfers_js', j: 1});
     jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
+    jsl.push({f:'js/fm/megadata/reset.js', n: 'fm_megadata_reset_js', j: 1});
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
     jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
     jsl.push({f:'js/fm/affiliatedata.js', n: 'fm_affiliatedata_js', j: 1});
@@ -3109,7 +2948,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.cloud.context-menu.js', n: 'mobile_cloud_context_menu_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.sort.js', n: 'mobile_cloud_context_sort_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.create-folder-overlay.js', n: 'mobile_create_folder_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.decryption-key-overlay.js', n: 'mobile_mobile_dec_key_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.decryption-password-overlay.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.delete-overlay.js', n: 'mobile_delete_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.download-overlay.js', n: 'mobile_download_overlay_js', j: 1, w: 1});
@@ -3153,15 +2991,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.resume-transfers-overlay.js', n: 'mobile_resume_transfers_overlay_js', j: 1, w: 1});
         jsl.push({f:'html/mvoucherinfo.html', n: 'mvoucherinfo', j: 0, w: 1});
         jsl.push({f:'js/mobile/mobile.verify.js', n: 'mobile_verify_js', j: 1, w:1});
-
-        if (is_filerequest_page) {
-            jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
-            jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
-            jsl.push({f:'js/ui/languageDialog.js', n: 'languagedialog_js', j:1});
-            jsl.push({f:'css/filerequest.css', n: 'filerequest_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/filerequest-mobile.css', n: 'filerequest_mobile_css', j:2,w:5,c:1,d:1,cache:1});
-        }
+        jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j: 1, w: 3});
     }
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3169,6 +2999,19 @@ else if (!browserUpdate) {
     jsl.push({f:'css/megainput.css', n: 'megainput_css', j:2, w:5, c:1, d:1, cache: 1});
     jsl.push({f:'css/vars/text-input.css', n: 'vars_text_input_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+
+    if (is_megadrop) {
+        // @todo FIXME: we *should* load required resources only!
+
+        jsl.push({f:'js/filerequest_upload.js', n: 'filerequest_upload_js', j:1 });
+
+        jsl.push({f:'html/filerequest.html', n: 'filerequest', j:0 });
+        jsl.push({f:'css/filerequest.css', n: 'filerequest_css', j:2,w:5});
+
+        if (is_mobile) {
+            jsl.push({f:'css/filerequest-mobile.css', n: 'filerequest_mobile_css', j:2, w:5});
+        }
+    }
 
     // We need to keep a consistent order in loaded resources, so that if users
     // send us logs we won't get different line numbers on stack-traces from
@@ -3186,6 +3029,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
 
         jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
+        jsl.push({f:'js/utils/api.js', n: 'js_utils_api_js', j: 1});
         jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
         jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
         jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
@@ -3218,8 +3062,10 @@ else if (!browserUpdate) {
     else {
         jsl.push({f:'js/vendor/asmcrypto.js', n: 'asmcrypto_js', j: 1, w: 5});
 
-        if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
-            jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j: 1});
+        if (typeof ReadableStreamDefaultController === 'undefined'
+            || !Object.hasOwnProperty.call(ReadableStreamDefaultController.prototype || {}, 'enqueue')) {
+
+            jsl.push({f:'js/vendor/web-streams-polyfill.js', n: 'web_streams_polyfill_js', j: 1});
         }
     }
 
@@ -3744,7 +3590,7 @@ else if (!browserUpdate) {
                 xhr_stack[xhri].timeout = xhr_timeout;
             }
 
-            if (is_chrome_firefox || is_firefox_web_ext) {
+            if (is_firefox_web_ext) {
                 xhr_stack[xhri].overrideMimeType('text/plain');
             }
             xhr_stack[xhri].send(null);
@@ -3778,6 +3624,7 @@ else if (!browserUpdate) {
             'es6s =' +
             ' ({...{a:23}}).a === 23' + // C60 E79 F55 O47 S11
             ' && Promise.prototype.finally' + // C63 E18 F58 O50 S11
+            ' && typeof ReadableStream === "function"' + // C43 E14 F65 O30 S10
             ' && (Array.prototype.values === Array.prototype[Symbol.iterator])' + // C66 E12 F60 O53 S9
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {
@@ -3934,12 +3781,7 @@ else if (!browserUpdate) {
                 boot_done();
             }
             if (jsar.length) {
-                if (is_chrome_firefox) {
-                    console.error('jsar must be empty here...');
-                }
-                else {
-                    addScript(jsar);
-                }
+                addScript(jsar);
             }
             jsar=undefined;
             cssar=undefined;
@@ -3958,9 +3800,6 @@ else if (!browserUpdate) {
     // The loading-sprite images are embedded inside the extensions
     if (is_chrome_web_ext || is_firefox_web_ext) {
         istaticpath = '../images/mega/';
-    }
-    else if (is_chrome_firefox) {
-        istaticpath = 'chrome://mega/content/images/mega/';
     }
 
     mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;}.main-blur-block,.bottom-page.scroll-block{display:none}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;position: fixed;height: 158px;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: 0 0;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'loading-sprite_v4@2x.png);    background-size: 222px auto;}}';
@@ -4031,7 +3870,7 @@ else if (!browserUpdate) {
                 }
             };
 
-            xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams() + (params || ''), true);
+            xhr.open("POST", apipath + 'cs?id=0' + (params || ''), true);
             xhr.send(JSON.stringify([].concat(data)));
         };
 
@@ -4044,26 +3883,8 @@ else if (!browserUpdate) {
                     mega.apiMiscFlags = result[0];
                     mBroadcaster.sendMessage('global-mega-flags');
                 }
-                else {
-                    if (d) {
-                        console.error('API request error, no flags given...');
-                    }
-
-                    mBroadcaster.once('startMega', function() {
-                        setTimeout(function() {
-                            if (typeof M.req === 'function') {
-                                M.req('gmf').always(function(result) {
-                                    if (typeof result === 'object') {
-                                        mega.apiMiscFlags = result;
-                                        mBroadcaster.sendMessage('global-mega-flags');
-                                    }
-                                    else if (d) {
-                                        console.error('Giving up retrieving API flags...');
-                                    }
-                                });
-                            }
-                        }, 700);
-                    });
+                else if (d) {
+                    console.error('API request error, no flags given...', result);
                 }
                 gmf_res = false;
             });
@@ -4105,6 +3926,22 @@ else if (!browserUpdate) {
                 xhr(u_sid ? '&sid=' + u_sid : false, g, function(response) {
                     dl_res = Array.isArray(response) && response[0];
                 });
+            }
+
+            if (is_chatlink) {
+                xhr(u_sid ? '&sid=' + u_sid : false, {a: "mcphurl", v: 1, ph: is_chatlink}, function(response) {
+                    is_chatlink = Array.isArray(response) && response[0] || -1;
+                });
+
+                is_chatlink = true;
+            }
+
+            if (is_megadrop) {
+                xhr(u_sid ? '&sid=' + u_sid : false, {a: "pg", p: is_megadrop.substr(0, 11)}, function(response) {
+                    is_megadrop = Array.isArray(response) && response[0] || -1;
+                });
+
+                is_megadrop = true;
             }
 
             if (voucher) {
@@ -4254,8 +4091,14 @@ else if (!browserUpdate) {
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
-        // eslint-disable-next-line max-len
-        if (loginresponse === true || dl_res === true || gmf_res === true || voucher === true || !jsl_done || !jj_done) {
+        if (!jsl_done
+            || !jj_done
+            || dl_res === true
+            || gmf_res === true
+            || voucher === true
+            || is_chatlink === true
+            || is_megadrop === true
+            || loginresponse === true) {
             return;
         }
 
@@ -4384,25 +4227,9 @@ function wchecksum(data, seed) {
     return seed >>> 0;
 }
 
-var onIdle = function(handler) {
-        var startTime = Date.now();
-
-        return setTimeout(function() {
-            handler({
-                didTimeout: false,
-                timeRemaining: function() {
-                    return Math.max(0, 50.0 - (Date.now() - startTime));
-                }
-            });
-        }, 1);
-    };
-
-if (window.requestIdleCallback) {
-    onIdle = function onIdle(callback) {
-        'use strict';
-
-        return window.requestIdleCallback(callback, {timeout: 20});
-    };
+function onIdle(callback) {
+    'use strict';
+    return window.requestIdleCallback(callback, {timeout: 51});
 }
 
 function makeUUID(a) {
@@ -4442,21 +4269,6 @@ function inherits(target, source) {
     if (source) {
         Object.setPrototypeOf(target, source);
     }
-}
-
-// eslint-disable-next-line strict
-function lazy(target, property, stub) {
-    Object.defineProperty(target, property, {
-        get: function() {
-            Object.defineProperty(this, property, {
-                value: stub.call(this),
-                enumerable: property[0] !== '_'
-            });
-            return this[property];
-        },
-        configurable: true
-    });
-    return target;
 }
 
 function b64encode(str) {
@@ -4503,6 +4315,15 @@ function echo(a) {
     return a;
 }
 
+// Promise.catch helper
+function tell(ex) {
+    'use strict';
+    if (d) {
+        console.error(ex);
+    }
+    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
+}
+
 var dump = nop;
 mBroadcaster.once('startMega', function() {
     'use strict';
@@ -4520,8 +4341,8 @@ mBroadcaster.once('startMega', function() {
         var mt = window.uTagMT;
         delete window.uTagMT;
 
-        setTimeout(function() {
-            M.req({a: 'mrt', t: mt}).dump('uTagMT');
+        onIdle(function() {
+            api.req({a: 'mrt', t: mt}).dump('uTagMT');
         });
     }
 

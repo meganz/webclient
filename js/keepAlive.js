@@ -1,6 +1,4 @@
-(function(scope) {
-    "use strict";
-
+class KeepAlive {
     /**
      * KeepAlive utility class.
      *
@@ -8,46 +6,46 @@
      * to writedown this helper (which includes unit tests!) to reduce the repeatable (and hard to test) code in our
      * codebase
      *
-     * @param interval {Number} The interval in ms
-     * @param cb {Function} The actual function that would be called after the end of each interval
+     * @param {Number} interval The interval in ms
+     * @param {Function} cb The actual function that would be called after the end of each interval
      * @constructor
      */
-    var KeepAlive = function (interval, cb) {
+    constructor(interval, cb) {
         assert(interval >= 1000, 'Intervals < 1000ms are not allowed, most likely this is a typo!');
-        assert(cb, 'Missing cb');
+        assert(typeof cb === 'function', 'Invalid callback.');
 
-        this.interval = interval;
-        this.cb = cb;
-        this.pid = '__keepalive_' + String(Math.random()).substr(2);
+        Object.defineProperty(this, 'interval', {value: interval / 1e3});
+
+        this.timer = null;
+        this.callback = ((callback) => () => callback(this.restart()))(tryCatch(cb));
 
         this.restart();
-    };
+    }
 
     /**
      * Call this when you want to restart the KeepAlive interval.
      */
-    KeepAlive.prototype.restart = function () {
-        var self = this;
-        delay(self.pid, function keepAliveTimerFn() {
-            self.restart();
-            self.cb();
-        }, self.interval);
-    };
+    restart() {
+        this.timer = tSleep.schedule(this.interval, this, this.callback);
+        return this;
+    }
 
     /**
      * Call this when you want to stop the KeepAlive interval.
      */
-    KeepAlive.prototype.stop = function () {
-        delay.cancel(this.pid);
-    };
+    stop() {
+        if (this.timer) {
+            this.timer.abort();
+            this.timer = null;
+        }
+    }
 
     /**
      * Only used for unit tests
      */
-    KeepAlive.prototype.destroy = function () {
-        var self = this;
-        self.stop();
-    };
-
-    scope.KeepAlive = KeepAlive;
-})(window);
+    destroy() {
+        this.stop();
+        delete this.callback;
+        freeze(this);
+    }
+}

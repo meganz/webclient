@@ -69,8 +69,8 @@ mobile.messageOverlay = {
         $firstMessage.safeHTML(message);
 
         // If there is a second message, set that
-        if (typeof subMessage === 'string' && subMessage.length) {
-            $optionalSecondMessage.safeHTML(subMessage);
+        if (subMessage) {
+            $optionalSecondMessage.safeHTML(`${subMessage.message || subMessage}`);
         }
 
         // set image icon, if any

@@ -118,9 +118,6 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
 
     M.viewmode = 1;
     M.v = this._view;
-    if (!this._rendered) {
-        loadingDialog.show();
-    }
     this.currentLimit = limit || this._defaultRangeLimit;
     this.currentUntil = until || this._defaultRangeTimestamp;
 
@@ -138,6 +135,13 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
         this.clearSelected();
     }
 
+    if (!this._showRecents) {
+        return this._initialRender([]);
+    }
+
+    if (!this._rendered) {
+        loadingDialog.show();
+    }
     M.initShortcutsAndSelection(this.$container);
 
     M.getRecentActionsList(this.currentLimit, this.currentUntil).then(function(actions) {
@@ -146,7 +150,8 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
         self._injectDates(actions);
         if (!self._rendered || !self._dynamicList || forceInit) {
             self._initialRender(actions);
-        } else {
+        }
+        else {
             self._updateState(actions);
         }
         loadingDialog.hide();
@@ -1242,7 +1247,30 @@ RecentsRender.prototype._getConfigShow = function() {
  */
 RecentsRender.prototype._setConfigShow = function(val) {
     'use strict';
-    mega.config.setn('showRecents', val);
+    mega.config.set('showRecents', val ? 1 : undefined);
+
+    queueMicrotask(() => {
+        this.checkStatusChange(1);
+    });
+};
+
+/**
+ * Check status change.
+ */
+RecentsRender.prototype.checkStatusChange = function(force) {
+    'use strict';
+    let res = false;
+
+    if (force || this.hasConfigChanged()) {
+        this.onConfigChange();
+
+        res = page.includes('fm/recents');
+        if (res++) {
+            openRecents();
+        }
+    }
+
+    return res;
 };
 
 /**

@@ -70,7 +70,7 @@ class DiscountPromo {
         loadingDialog.show();
         delete mega.discountInfo;
 
-        M.req({ a: 'dci', dc: mega.discountCode, su: mega.shortUrl, extra: true }).then((res) => {
+        api.req({a: 'dci', dc: mega.discountCode, su: mega.shortUrl, extra: true}).then(({result: res}) => {
 
             loadingDialog.hide();
 

@@ -90,10 +90,6 @@ pro.propay = {
             return;
         }
 
-        if (typeof page !== 'undefined' && page !== 'chat') {
-            megaAnalytics.log('pro', 'proc');
-        }
-
         // If the plan number is not set in the URL e.g. propay_4, go back to Pro page step 1 so they can choose a plan
         if (!pro.propay.setProPlanFromUrl()) {
             loadSubPage('pro');
@@ -353,7 +349,6 @@ pro.propay = {
         });
     },
 
-    /* eslint-disable complexity */
     /**
      * Renders the pro plan prices into the Plan Duration dropdown
      * @param {Object}  discountInfo    Discount info object if any
@@ -528,7 +523,6 @@ pro.propay = {
         $('.membership-radio', $selectedOption).addClass('checked');
         $('.membership-radio-label', $selectedOption).addClass('checked');
     },
-    /* eslint-enable complexity */
 
     /**
      * Renders the single option for the new discount scheme which can be redeemed by multiple users
@@ -627,7 +621,7 @@ pro.propay = {
             pro.propay.updateTextDependingOnRecurring();
         });
     },
-    /* eslint-disable complexity */
+
     /**
      * Updates the main price
      * @param {Number} planIndex    The array index of the plan in pro.membershipPlans
@@ -814,9 +808,6 @@ pro.propay = {
             $euroPrice.text(newEuroText);
         }
     },
-    /* eslint-enable complexity */
-
-    /* jshint -W074 */  // Old code, refactor another day
 
     /**
      * Updates the text on the page depending on the payment option they've selected and
@@ -1039,7 +1030,6 @@ pro.propay = {
         $('.payment-buy-now span', $paymentDialog).text(subscribeOrPurchase);
         $('.payment-buy-now span', $paymentAddressDialog).text(subscribeOrPurchase);
     },
-    /* jshint +W074 */
 
     /**
      * Gets the recurring wording for the new multi-discount system, used in a few places
@@ -1498,7 +1488,6 @@ pro.propay = {
     /**
      * Continues the Pro purchase and initiates the
      */
-    /* jshint -W074 */  // Old code, refactor another day
     sendPurchaseToApi: function() {
 
         // Show different loading animation text depending on the payment methods
@@ -1554,99 +1543,83 @@ pro.propay = {
             utsRequest.dc = mega.discountInfo.dc;
         }
 
-        // Setup the 'uts' API request
-        api_req(utsRequest, {
-            callback: function (utsResult) {
+        const setValues = (extra, saleId) => {
 
-                // Store the sale ID to check with API later
-                var saleId = utsResult;
+            if (pro.propay.proPaymentMethod === 'voucher' || pro.propay.proPaymentMethod === 'pro_prepaid') {
+                pro.lastPaymentProviderId = 0;
+            }
+            else if (pro.propay.proPaymentMethod === 'bitcoin') {
+                pro.lastPaymentProviderId = 4;
+            }
+            else if (pro.propay.proPaymentMethod === 'perfunctio') {
+                pro.lastPaymentProviderId = 8;
+            }
+            else if (pro.propay.proPaymentMethod === 'dynamicpay') {
+                pro.lastPaymentProviderId = 5;
+            }
+            else if (pro.propay.proPaymentMethod === 'fortumo') {
+                // pro.lastPaymentProviderId = 6;
+                // Fortumo does not do a utc request, we immediately redirect
+                fortumo.redirectToSite(saleId);
+                return false;
+            }
+            else if (pro.propay.proPaymentMethod === 'infobip') {
+                // pro.lastPaymentProviderId = 9;
+                // Centili does not do a utc request, we immediately redirect
+                centili.redirectToSite(saleId);
+                return false;
+            }
+            else if (pro.propay.proPaymentMethod === 'paysafecard') {
+                pro.lastPaymentProviderId = 10;
+            }
+            else if (pro.propay.proPaymentMethod === 'tpay') {
+                pro.lastPaymentProviderId = tpay.gatewayId; // 14
+            }
+            else if (pro.propay.proPaymentMethod.indexOf('directreseller') === 0) {
+                pro.lastPaymentProviderId = directReseller.gatewayId; // 15
+            }
+
+            // If AstroPay, send extra details
+            else if (pro.propay.proPaymentMethod.indexOf('astropay') > -1) {
+                pro.lastPaymentProviderId = astroPayDialog.gatewayId;
+                extra.bank = astroPayDialog.selectedProvider.extra.code;
+                extra.name = astroPayDialog.fullName;
+                extra.address = astroPayDialog.address;
+                extra.city = astroPayDialog.city;
+                extra.cpf = astroPayDialog.taxNumber;
+            }
+
+            // If Ecomprocessing, send extra details
+            else if (pro.propay.proPaymentMethod.indexOf('ecp') === 0) {
+                pro.lastPaymentProviderId = addressDialog.gatewayId;
+                Object.assign(extra, addressDialog.extraDetails);
+            }
+            else if (pro.propay.proPaymentMethod.indexOf('sabadell') === 0) {
+                pro.lastPaymentProviderId = sabadell.gatewayId; // 17
+
+                // Get the value for whether the user wants the plan to renew automatically
+                var autoRenewCheckedValue = $('.renewal-options-list input:checked', '.payment-section').val();
+
+                // If the provider supports recurring payments and the user wants the plan to renew automatically
+                extra.recurring = autoRenewCheckedValue === 'yes';
+            }
+            else if (pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
+                Object.assign(extra, addressDialog.extraDetails);
+                pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
+            }
+
+            return true;
+        };
+
+        // Setup the 'uts' API request
+        api.screq(utsRequest)
+            .then(({result: saleId}) => {
 
                 // Extra gateway specific details for UTC call
                 var extra = {};
 
-                // Show an error
-                if ((typeof saleId === 'number') && (saleId < 0)) {
-
-                    // Default error is "Something went wrong. Try again later..."
-                    let errorMessage = l[200] + ' ' + l[253];
-
-                    // Handle specific discount errors
-                    if (saleId === EEXPIRED) {
-                        errorMessage = l[24675];    // The discount code has expired.
-                    }
-                    else if (saleId === EEXIST) {
-                        errorMessage = l[24678];    // This discount code has already been redeemed.
-                    }
-
-                    // Hide the loading overlay and show an error
-                    pro.propay.hideLoadingOverlay();
-                    msgDialog('warninga', l[7235], errorMessage);
+                if (!setValues(extra, saleId)) {
                     return false;
-                }
-
-                if (pro.propay.proPaymentMethod === 'voucher' || pro.propay.proPaymentMethod === 'pro_prepaid') {
-                    pro.lastPaymentProviderId = 0;
-                }
-                else if (pro.propay.proPaymentMethod === 'bitcoin') {
-                    pro.lastPaymentProviderId = 4;
-                }
-                else if (pro.propay.proPaymentMethod === 'perfunctio') {
-                    pro.lastPaymentProviderId = 8;
-                }
-                else if (pro.propay.proPaymentMethod === 'dynamicpay') {
-                    pro.lastPaymentProviderId = 5;
-                }
-                else if (pro.propay.proPaymentMethod === 'fortumo') {
-                    // pro.lastPaymentProviderId = 6;
-                    // Fortumo does not do a utc request, we immediately redirect
-                    fortumo.redirectToSite(saleId);
-                    return false;
-                }
-                else if (pro.propay.proPaymentMethod === 'infobip') {
-                    // pro.lastPaymentProviderId = 9;
-                    // Centili does not do a utc request, we immediately redirect
-                    centili.redirectToSite(saleId);
-                    return false;
-                }
-                else if (pro.propay.proPaymentMethod === 'paysafecard') {
-                    pro.lastPaymentProviderId = 10;
-                }
-                else if (pro.propay.proPaymentMethod === 'tpay') {
-                    pro.lastPaymentProviderId = tpay.gatewayId; // 14
-                }
-                else if (pro.propay.proPaymentMethod.indexOf('directreseller') === 0) {
-                    pro.lastPaymentProviderId = directReseller.gatewayId; // 15
-                }
-
-                // If AstroPay, send extra details
-                else if (pro.propay.proPaymentMethod.indexOf('astropay') > -1) {
-                    pro.lastPaymentProviderId = astroPayDialog.gatewayId;
-                    extra.bank = astroPayDialog.selectedProvider.extra.code;
-                    extra.name = astroPayDialog.fullName;
-                    extra.address = astroPayDialog.address;
-                    extra.city = astroPayDialog.city;
-                    extra.cpf = astroPayDialog.taxNumber;
-                }
-
-                // If Ecomprocessing, send extra details
-                else if (pro.propay.proPaymentMethod.indexOf('ecp') === 0) {
-                    pro.lastPaymentProviderId = addressDialog.gatewayId;
-                    extra = addressDialog.extraDetails;
-                }
-                else if (pro.propay.proPaymentMethod.indexOf('sabadell') === 0) {
-                    pro.lastPaymentProviderId = sabadell.gatewayId; // 17
-
-                    // Get the value for whether the user wants the plan to renew automatically
-                    var autoRenewCheckedValue = $('.renewal-options-list input:checked', '.payment-section').val();
-
-                    // If the provider supports recurring payments and the user wants the plan to renew automatically
-                    if (autoRenewCheckedValue === 'yes') {
-                        extra.recurring = true;
-                    }
-                }
-                else if (pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
-                    extra = addressDialog.extraDetails;
-                    pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
                 }
 
                 // If saleId is already an array of sale IDs use that, otherwise add to an array
@@ -1664,25 +1637,36 @@ pro.propay = {
                 if (discountInfo && discountInfo.dc) {
                     utcReqObj.dc = discountInfo.dc;
                 }
-                api_req(utcReqObj, {
-                    m: pro.lastPaymentProviderId,
-                    callback: tryCatch(function(utcResult, ctx) {
-                        pro.propay.processUtcResults(utcResult, saleId);
 
-                        if (typeof utcResult === 'number' && utcResult < 0) {
-                            mBroadcaster.sendMessage('trk:event', 'account', 'upg', 'error', utcResult);
-                        }
-                        else {
-                            if ('trk' in window) {
-                                trk({ec_id: saleId, revenue: price}).dump('trk:utc');
-                            }
+                return api.screq(utcReqObj).then(({result}) => this.processUtcResults(result, saleId));
+            })
+            .catch((ex) => {
+                // Default error is "Something went wrong. Try again later..."
+                let errorMessage;
 
-                            mBroadcaster.sendMessage('trk:event', 'account', 'upg', u_attr.b ? 'bus' : 'norm', ctx.m);
-                        }
-                    })
-                });
-            }
-        });
+                // Handle specific discount errors
+                if (ex === EEXPIRED) {
+                    // The discount code has expired.
+                    errorMessage = l[24675];
+                }
+                else if (ex === EEXIST) {
+                    // This discount code has already been redeemed.
+                    errorMessage = l[24678];
+                }
+                else if (ex === EOVERQUOTA && pro.lastPaymentProviderId === voucherDialog.gatewayId) {
+
+                    // Insufficient balance, try again...
+                    errorMessage = l[514];
+                }
+                else {
+                    errorMessage = ex < 0 ? api_strerror(ex) : ex;
+                }
+
+                // Hide the loading overlay and show an error
+                pro.propay.hideLoadingOverlay();
+
+                tell(errorMessage);
+            });
     },
 
     /**
@@ -1692,23 +1676,6 @@ pro.propay = {
      */
     processUtcResults: function(utcResult, saleId) {
         'use strict';
-        // Check for insufficient balance error, other errors will fall through
-        if (utcResult === EOVERQUOTA && pro.lastPaymentProviderId === voucherDialog.gatewayId) {
-
-            // Hide the loading animation and show an error
-            pro.propay.hideLoadingOverlay();
-            msgDialog('warninga', l[6804], l[514], '');             // Insufficient balance, try again...
-            return false;
-        }
-
-        // If other negative number response from the API
-        else if (utcResult < 0) {
-
-            // Hide the loading animation and show an error
-            pro.propay.hideLoadingOverlay();
-            msgDialog('warninga', l[7235], l[200] + ' ' + l[253]);   // Something went wrong. Try later...
-            return false;
-        }
 
         // Handle results for different payment providers
         switch (pro.lastPaymentProviderId) {
@@ -1768,7 +1735,6 @@ pro.propay = {
                 break;
         }
     },
-    /* jshint +W074 */
 
     /**
      * Generic function to show the bouncing megacoin icon while loading
@@ -1834,7 +1800,7 @@ pro.propay = {
 
         return monthsWording;
     },
-    /* eslint-disable complexity */
+
     /** This function to show the discount offer dialog if applies */
     showDiscountOffer: function() {
         'use strict';
@@ -1948,7 +1914,6 @@ pro.propay = {
             }
         }
     }
-    /* eslint-enable complexity */
 };
 mBroadcaster.once('login2', () => {
     'use strict';

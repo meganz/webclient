@@ -62,7 +62,7 @@ lazy(self, 'watchdog', () => Object.freeze({
         this.drain();
         data = {origin: this.wdID, data: data, sid: ++mIncID};
         localStorage.setItem(this.eTag + msg, JSON.stringify(data));
-        if (d) {
+        if (d > 2) {
             console.log('mWatchDog Notifying', this.eTag + msg, msg === 'setsid' ? '' : localStorage[this.eTag + msg]);
         }
     }),
@@ -358,6 +358,9 @@ lazy(self, 'watchdog', () => Object.freeze({
 
 mBroadcaster.once('boot_done', () => {
     'use strict';
-
     watchdog.setup();
+
+    api.observe('setsid', (sid) => {
+        watchdog.notify('setsid', sid);
+    });
 });

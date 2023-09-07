@@ -37,8 +37,8 @@
  *
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
+/* eslint-disable no-use-before-define */
 var uldl_hold = false;
-var ul_queue = false;
 
 var ulmanager = {
     ulFaId: 0,
@@ -106,8 +106,8 @@ var ulmanager = {
         }
 
         // Inform user that upload file request is not available anymore
-        if (page.substr(0, 11) === 'filerequest') {
-            mBroadcaster.sendMessage('FileRequest:overquota', 0);
+        if (is_megadrop) {
+            mBroadcaster.sendMessage('FileRequest:overquota');
             return; // Disable quota dialog
         }
 
@@ -184,7 +184,7 @@ var ulmanager = {
                 else {
                     // re-fire the putnodes api request for which we got the -17
                     console.assert(Object(aFileUpload[0]).a === 'p', 'check this...');
-                    api_req.apply(null, aFileUpload);
+                    ulmanager.ulComplete(...aFileUpload);
                 }
             });
         }
@@ -628,9 +628,6 @@ var ulmanager = {
         if (d) {
             ulmanager.logger.info(file.name, "ul_finalize", file.target, target);
         }
-        if (is_chrome_firefox && file._close) {
-            file._close();
-        }
         if (file.repair) {
             file.target = target = M.RubbishID;
         }
@@ -650,11 +647,13 @@ var ulmanager = {
         }
 
         if (file._replaces) {
-            if (M.d[file._replaces].fav) {
-                n.fav = M.d[file._replaces].fav;
+            const r = M.getNodeByHandle(file._replaces);
+
+            if (r.fav) {
+                n.fav = r.fav;
             }
-            if (M.d[file._replaces].lbl) {
-                n.lbl = M.d[file._replaces].lbl;
+            if (r.lbl) {
+                n.lbl = r.lbl;
             }
         }
 
@@ -662,13 +661,14 @@ var ulmanager = {
         var dir = target;
 
         // Put to public upload folder
-        if (page.substr(0, 11) === 'filerequest') {
+        if (is_megadrop) {
             req_type = 'pp';
             target = mega.fileRequestUpload.getUploadPageOwnerHandle();
             dir = mega.fileRequestUpload.getUploadPagePuHandle();
         }
 
         var req = {
+            v: 3,
             a: req_type,
             t: dir,
             n: [{
@@ -688,35 +688,11 @@ var ulmanager = {
             size: file.size,
             faid: file.faid,
             ul_queue_num: file.pos,
-            callback: function(res, ctx) {
-                if (!req.v || typeof res === 'number') {
-                    if (res === EOVERQUOTA && req_type === 'p') {
-                        if (sharer(req.t)) {
-                            ctx.inShareOQ = true;
-                        }
-                        else {
-                            return ulmanager.ulShowOverStorageQuotaDialog([req, ctx]);
-                        }
-                    }
-                    ulmanager.ulCompletePending2.apply(ulmanager, arguments);
-                }
-                else {
-                    // accelerate arrival of SC-conveyed new nodes by directly issuing a fetch
-                    delay('ul:getsc', getsc, 750);
-                }
-            }
         };
 
         if (file._replaces) {
-            req.v = 3;
-            req.i = mRandomToken('fv');
             req.n[0].ov = file._replaces;
-
-            M.scAckQueue['t.' + req.i] = function(packet, nodes) {
-                ulmanager.ulCompletePending2({f: 'pv3', n: nodes[0]}, ctx);
-            };
         }
-
         if (file.faid) {
             req.n[0].fa = api_getfa(file.faid);
         }
@@ -725,7 +701,7 @@ var ulmanager = {
             req.n[0].fa = file.ddfa;
         }
 
-        onIdle(function() {
+        queueMicrotask(() => {
             for (var k in M.tfsdomqueue) {
                 if (k[0] === 'u') {
                     addToTransferTable(k, M.tfsdomqueue[k], 1);
@@ -744,7 +720,7 @@ var ulmanager = {
             this.ulCompletingPhase[file.owner.gid] = Date.now();
         }
 
-        if (this.ulFinalizeQueue.push([n, req, ctx]) > 19 || window.ulQueue.isFinalising()) {
+        if (this.ulFinalizeQueue.push([n, req, ctx]) > ulQueue.maxActiveTransfers || ulQueue.isFinalising()) {
             this.ulCompletePending();
         }
         else {
@@ -753,6 +729,7 @@ var ulmanager = {
     },
 
     ulGetPostURL: function UM_ul_get_posturl(File) {
+        'use strict';
         return function(res, ctx) {
 
             // If cancelled
@@ -805,6 +782,8 @@ var ulmanager = {
     },
 
     ulStart: function UM_ul_start(File) {
+        'use strict';
+
         if (!File.file) {
             return false;
         }
@@ -815,7 +794,7 @@ var ulmanager = {
         var next = ulmanager.ulGetPostURL(File);
         var total = 0;
         var len = ul_queue.length;
-        var max = File.file.pos + 8;
+        var max = File.file.pos + Math.max(21, ulQueue.maxActiveTransfers >> 1);
 
         for (var i = File.file.pos; i < len && i < max && maxpf > 0; i++) {
             var cfile = ul_queue[i];
@@ -973,13 +952,23 @@ var ulmanager = {
         }
     },
 
+    ulComplete: function(req, ctx) {
+        'use strict';
+        api.screq(req)
+            .catch(echo)
+            .then((res) => {
+                ulmanager.ulCompletePending2(res, ctx);
+            })
+            .catch(reportError);
+    },
+
     ulCompletePending: function() {
         'use strict';
         const self = this;
         delay.cancel('ul.finalize:dsp');
 
         // Ensure no -3s atm..
-        M.req('ping').always(function dsp() {
+        api.req({a: 'ping'}).always(function dsp() {
             // @todo per target folder rather!
             if ($.getExportLinkInProgress) {
                 if (d) {
@@ -1001,7 +990,7 @@ var ulmanager = {
                     req.cr[1][0] = req.n[0].h;
                 }
 
-                api_req(req, ctx);
+                ulmanager.ulComplete(req, ctx);
             }
         });
     },
@@ -1013,8 +1002,13 @@ var ulmanager = {
             ulmanager.logger.info("ul_completepending2", res, ctx);
         }
 
-        var onSuccess = function(h) {
+        if (typeof res === 'object' && 'st' in res) {
+            const h = res.handle;
+
+            console.assert(res.result !== 0 || String(ctx.target).length === 11, 'unexpected upload completion reply.');
+
             if (ctx.faid && h) {
+                // @todo should we fire 'pp' in v2 mode for this to work?..
                 api_attachfileattr(h, ctx.faid);
             }
 
@@ -1053,31 +1047,20 @@ var ulmanager = {
                 ctx.file.ul_failed = false;
                 ctx.file.retries = 0;
             }
-        };
-
-        if (typeof res === 'object' && res.f) {
-            var n = res.f === 'pv3' ? res.n : res.f[0];
-
-            if (ctx.faid) {
-                storedattr[ctx.faid].target = n.h;
-            }
-
-            // Don't execute if file request upload window exist
-            if (res.f !== 'pv3' && page.substr(0, 11) !== 'filerequest') {
-                newnodes = [];
-                process_f(res.f);
-                M.updFileManagerUI();
-            }
-
-            onSuccess(n.h);
-        }
-        else if (res === 0) {
-            if (String(ctx.target).length !== 11) {
-                ulmanager.logger.warn('unexpected upload completion reply.');
-            }
-            onSuccess();
         }
         else {
+            let inShareOQ = false;
+            const {payload, result} = res;
+
+            res = result;
+            if (res === EOVERQUOTA && payload.a === 'p') {
+                if (sharer(ctx.target)) {
+                    inShareOQ = true;
+                }
+                else {
+                    return ulmanager.ulShowOverStorageQuotaDialog([payload, ctx]);
+                }
+            }
             var ul = ul_queue[ctx.ul_queue_num];
 
             if (!ul && res === EACCESS) {
@@ -1085,7 +1068,7 @@ var ulmanager = {
                 ul = ctx.file;
             }
 
-            M.ulerror(ul, ctx.inShareOQ ? ESHAREROVERQUOTA : res);
+            M.ulerror(ul, inShareOQ ? ESHAREROVERQUOTA : res);
 
             if (res !== EOVERQUOTA && res !== EGOINGOVERQUOTA) {
                 srvlog('Unexpected upload completion server response (' + res
@@ -1115,7 +1098,10 @@ var ulmanager = {
             return ulmanager.ulStart(File);
         }
         else if (M.h[uq.hash]) {
-            n = mNode || M.d[M.h[uq.hash].first];
+            if (!(n = mNode)) {
+                const [h] = M.h[uq.hash];
+                n = M.d[h];
+            }
 
             if (!identical && n && uq.size !== n.s) {
                 if (d) {
@@ -1267,13 +1253,18 @@ var ulmanager = {
             }
         };
 
+        if (is_megadrop) {
+            return startUpload();
+        }
+
         var promises = [];
 
         if (!M.c[aFile.target]) {
             promises.push(dbfetch.get(aFile.target));
         }
 
-        if ((!M.h[aFile.hash] || !M.d[M.h[aFile.hash].first]) && page.substr(0, 11) !== 'filerequest') {
+        const [h] = M.h[aFile.hash] || [];
+        if (!M.d[h]) {
             promises.push(dbfetch.hash(aFile.hash).then(node => (hashNode = node)));
         }
 
@@ -1711,9 +1702,6 @@ FileUpload.prototype.destroy = function(mul) {
     if (d) {
         ASSERT(GlobalProgress[this.gid].working.length === 0, 'Huh, there are working upload chunks?..');
     }
-    if (is_chrome_firefox && this.file._close) {
-        this.file._close();
-    }
     ASSERT(this.file.owner === this, 'Invalid FileUpload Owner...');
     window.ulQueue.poke(this.file, mul === -0xbeef ? mul : 0xdead);
     if (this.file.done_starting) {
@@ -1936,7 +1924,7 @@ Object.defineProperty(ulQueue, 'maxActiveTransfers', {
             return 1;
         }
         : function() {
-            return Math.min(Math.floor(M.getTransferTableLengths().size / 1.6), 20);
+            return Math.min(Math.floor(M.getTransferTableLengths().size / 1.6), 36);
         }
 });
 

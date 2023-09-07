@@ -707,9 +707,18 @@
         }
     };
 
-    CloudRaidRequest.prototype.loadPart = function (partNum, pos, endpos, skipchunkcount) {
-        var self = this;
-        var part = this.part[partNum];
+    CloudRaidRequest.prototype.loadPart = function(partNum, pos, endpos, skipchunkcount) {
+        const part = this.part[partNum];
+
+        this._loadPart(part, pos, endpos, skipchunkcount)
+            .catch((ex) => {
+                part.reading = false;
+                this.fetchReadExceptionHandler(ex, partNum);
+            });
+    };
+
+    CloudRaidRequest.prototype._loadPart = async function(part, pos, endpos, skipchunkcount) {
+        const {partNum, baseUrl} = part;
 
         if (pos >= endpos) {
             // put one more 0-size piece on the end, which makes it easy to rebuild the last raidline of the file
@@ -725,7 +734,7 @@
             return;
         }
 
-        var chunksize = endpos - pos;
+        const chunksize = endpos - pos;
 
         // -1 indicates no skipping, load all data.
         // -2 indicates skipping all which is used when one channel has had a failure
@@ -739,13 +748,13 @@
                 'skipped': true,
                 'buffer': new Uint8Array(chunksize)
             };
-            this.part[partNum].lastPos = pos + filePiece.buffer.byteLength;
+            const lastPos = pos + chunksize;
+            this.part[partNum].lastPos = lastPos;
             this.queueReceivedPiece(partNum, filePiece);
-            this.loadPart(partNum, pos + filePiece.buffer.byteLength, endpos, skipchunkcount);
-            return;
+            return this._loadPart(part, lastPos, endpos, skipchunkcount);
         }
 
-        var pieceUrl = part.baseUrl + "/" + pos + "-" + (pos + chunksize - 1);
+        const pieceUrl = `${baseUrl}/${pos}-${pos + chunksize - 1}`;
 
         if (DEBUG_VERBOSE) {
             this.logger.log("Part %s pos: %s chunksize: %s from: %s", partNum, pos, chunksize, pieceUrl);
@@ -762,21 +771,11 @@
         part.skipchunkcount = skipchunkcount;
 
         part.reading = true;
-        try {
-            fetch(pieceUrl, {signal: part.signal})
-                .then(function(fetchresponse) {
-                    part.reading = false;
-                    self.processFetchResponse(partNum, fetchresponse);
-                })
-                .catch(function(ex) {
-                    part.reading = false;
-                    self.fetchReadExceptionHandler(ex, partNum);
-                });
-        }
-        catch (ex) {
-            part.reading = false;
-            self.fetchReadExceptionHandler(ex, partNum);
-        }
+        return fetch(pieceUrl, {signal: part.signal})
+            .then((response) => {
+                part.reading = false;
+                return this.processFetchResponse(partNum, response);
+            });
     };
 
     CloudRaidRequest.prototype.processFetchResponse = function(partNum, fetchResponse) {
@@ -828,14 +827,22 @@
         }
 
         // stream the reply body
-        this.part[partNum].reader = fetchResponse.body.getReader();
-        this.readFetchData(partNum);
+        const part = this.part[partNum];
+        part.reader = fetchResponse.body.getReader();
+        return this._readFetchData(part);
     };
 
     CloudRaidRequest.prototype.readFetchData = function(partNum) {
+        const part = this.part[partNum];
 
-        var self = this;
-        var part = self.part[partNum];
+        this._readFetchData(part)
+            .catch((ex) => {
+                part.reading = false;
+                this.fetchReadExceptionHandler(ex, partNum);
+            });
+    };
+
+    CloudRaidRequest.prototype._readFetchData = async function(part) {
 
         part.timedout = false;
         part.readTimeoutId = setTimeout(function() {
@@ -844,22 +851,11 @@
         }, this.FETCH_DATA_TIMEOUT_MS);
 
         part.reading = true;
-
-        try {
-            part.reader.read()
-                .then(function processPartStream(r) {
-                    part.reading = false;
-                    self.processFetchData(partNum, r.done, r.value);
-                })
-                .catch(function(ex) {
-                    part.reading = false;
-                    self.fetchReadExceptionHandler(ex, partNum);
-                });
-        }
-        catch (ex) {
-            part.reading = false;
-            self.fetchReadExceptionHandler(ex, partNum);
-        }
+        return part.reader.read()
+            .then((r) => {
+                part.reading = false;
+                this.processFetchData(part.partNum, r.done, r.value);
+            });
     };
 
     CloudRaidRequest.prototype.processFetchData = function(partNum, done, value) {

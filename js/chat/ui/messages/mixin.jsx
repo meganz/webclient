@@ -18,8 +18,6 @@ class ConversationMessageMixin extends ContactAwareComponent {
             return this.getUniqueId() + '--' + String(Math.random()).slice(-7);
         });
 
-
-
         this._emojiOnActiveStateChange = this._emojiOnActiveStateChange.bind(this);
         this.emojiSelected = this.emojiSelected.bind(this);
 
@@ -68,7 +66,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
     removeContactListeners() {
         const users = this._contactChangeListeners;
 
-        if (d > 1) {
+        if (d > 3) {
             console.warn('%s.removeContactListeners', this.getReactId(), [this], users);
         }
 
@@ -110,7 +108,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
             }
         }
 
-        if (d > 1) {
+        if (d > 3) {
             console.warn('%s.addContactListeners', this.getReactId(), [this], users);
         }
 

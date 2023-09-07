@@ -92,12 +92,10 @@
         }
 
         // Save via mega.attr
-        this.savingPromise = this.save();
-
-        var self = this;
-        self.savingPromise.always(function() {
-            delete self.savingPromise;
-        });
+        this.savingPromise = this.save()
+            .finally(() => {
+                delete this.savingPromise;
+            });
     };
 
     PasswordReminderAttribute.prototype.hasBeenMerged = function() {
@@ -117,21 +115,12 @@
     };
 
     PasswordReminderAttribute.prototype.save = function() {
-        var proxyPromise = new MegaPromise();
-        var self = this;
+        return new Promise((resolve, reject) => {
 
-        delay('pra_save', function() {
-            proxyPromise.linkDoneAndFailTo(
-                mega.attr.set(
-                    "prd",
-                    self.toString(),
-                    -2,
-                    true
-                )
-            );
-        }, 500);
-
-        return proxyPromise;
+            M.onFileManagerReady(() => {
+                mega.attr.set("prd", this.toString(), -2, true).then(resolve).catch(reject);
+            });
+        });
     };
 
     PasswordReminderAttribute.prototype.loadFromAttribute = function() {
@@ -472,19 +461,33 @@
         }
     };
 
+    PasswordReminderDialog.prototype._scheduleRecheck = function() {
+        if (this.recheckInterval) {
+            this.recheckInterval.abort();
+            this.recheckInterval = null;
+        }
+
+        (this.recheckInterval = tSleep(RECHECK_INTERVAL))
+            .then(() => {
+                onIdle(() => this._scheduleRecheck());
+                this.recheckInterval = null;
+                this.recheck();
+            })
+            .catch(dump);
+    };
+
     PasswordReminderDialog.prototype._initFromString = function(str) {
         var self = this;
 
         self.passwordReminderAttribute.mergeFromString(str);
 
         if (self.recheckInterval) {
-            clearInterval(self.recheckInterval);
+            this.recheckInterval.abort();
+            this.recheckInterval = null;
         }
 
         if (!self.passwordReminderAttribute.dontShowAgain) {
-            self.recheckInterval = setInterval(function () {
-                self.recheck();
-            }, RECHECK_INTERVAL * 1000);
+            this._scheduleRecheck();
 
             self.recheck();
         }

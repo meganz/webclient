@@ -31,7 +31,7 @@ class PrivilegeChange extends ConversationMessageMixin {
 
         var displayName;
         if (contact) {
-            displayName = generateAvatarMeta(contact.u).fullName;
+            displayName = M.getNameByHandle(contact.u);
         }
         else {
             displayName = contact;
@@ -50,7 +50,7 @@ class PrivilegeChange extends ConversationMessageMixin {
         var avatar = <ContactsUI.Avatar contact={otherContact}
             className="message avatar-wrapper small-rounded-avatar"
             chatRoom={chatRoom} />;
-        var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+        var otherDisplayName = M.getNameByHandle(otherContact.u);
 
         var newPrivilegeText = "";
         if (message.meta.privilege === 3) {

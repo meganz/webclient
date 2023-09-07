@@ -28,7 +28,7 @@ function FMDB(plainname, schema, channelmap) {
     this.name = false;
 
     // DB schema - https://github.com/dfahlander/Dexie.js/wiki/TableSchema
-    this.schema = schema;
+    Object.defineProperty(this, 'schema', {value: freeze(schema)});
 
     // the table names contained in the schema (set at open)
     this.tables = null;
@@ -95,7 +95,7 @@ function FMDB(plainname, schema, channelmap) {
         'ERROR': '#fe000b',
         'DEBUG': '#005aff',
         'WARN':  '#d66d00',
-        'INFO':  '#2ca100',
+        'INFO':  '#2c6a4e',
         'LOG':   '#5b5352'
     };
 
@@ -116,15 +116,11 @@ FMDB.$usePostSerialz = 2;
 // @private increase to drop/recreate *all* databases.
 FMDB.version = 1;
 
-// @private
-Object.defineProperty(FMDB, 'capabilities', {
-    value: FMDB.iDBv2 << 4 | (FMDB.$useBinaryKeys | FMDB.$usePostSerialz /* | ... */)
+/** @property FMDB.perspex -- @private persistence prefix */
+lazy(FMDB, 'perspex', () => {
+    'use strict';
+    return `.${(mega.infinity << 5 | FMDB.iDBv2 << 4 | FMDB.$usePostSerialz | FMDB.version).toString(16)}`;
 });
-// @private persistence prefix
-Object.defineProperty(FMDB, 'perspex', {value: '.' + FMDB.version + FMDB.capabilities.toString(32)});
-
-// initialise cross-tab access arbitration identity
-FMDB.prototype.identity = Date.now() + Math.random().toString(26);
 
 /** @property fmdb.memoize */
 lazy(FMDB.prototype, 'memoize', () => {
@@ -136,191 +132,95 @@ lazy(FMDB.prototype, 'memoize', () => {
 // set up and check fm DB for user u
 // calls result(sn) if found and sn present
 // wipes DB an calls result(false) otherwise
-FMDB.prototype.init = function fmdb_init(result, wipe) {
+FMDB.prototype.init = async function(wipe) {
     "use strict";
+    assert(!this.db && !this.opening, 'Something went wrong... FMDB is already ongoing...');
 
-    var fmdb = this;
-    var dbpfx = 'fm31_';
-    var slave = !mBroadcaster.crossTab.master;
+    // prefix database name with options/capabilities, plus making it dependent on the current schema.
+    const dbpfx = `fm32${FMDB.perspex.substr(1)}${MurmurHash3(JSON.stringify(this.schema), 0x6f01f).toString(16)}`;
 
-    fmdb.crashed = false;
-    fmdb.inval_cb = false;
-    fmdb.inval_ready = false;
+    this.crashed = false;
+    this.inval_cb = false;
+    this.inval_ready = false;
 
-    // prefix database name with options/capabilities
-    dbpfx += FMDB.perspex.substr(1);
+    if (d) {
+        this.logger.log('Collecting database names...');
+    }
+    this.opening = true;
 
-    // Make the database name dependent on the current schema.
-    dbpfx += MurmurHash3(JSON.stringify(this.schema), 0x6f01f).toString(16);
-
-    // Notify completion invoking the provided callback
-    var resolve = function(sn, error) {
-        fmdb.opening = false;
-
-        if (typeof result === 'function') {
-            if (error) {
-                fmdb.crashed = 2;
-                fmdb.logger.warn('Marking DB as crashed.', error);
-
-                if (fmdb.db) {
-                    const {db} = fmdb;
-                    queueMicrotask(() => db.delete());
-                }
-
-                fmdb.db = null;
-                fmdb.evento(`$init:${error}`);
+    return Promise.race([tSleep(3, EEXPIRED), Dexie.getDatabaseNames()])
+        .then((r) => {
+            if (r === EEXPIRED) {
+                this.logger.warn('getDatabaseNames() timed out...');
             }
+            const dbs = [];
 
-            result(sn);
-
-            // prevent this from being called twice..
-            result = null;
-        }
-    };
-
-    // Catch errors, mark DB as crashed, and move forward without indexedDB support
-    var reject = function(e) {
-        resolve(false, e || EFAILED);
-    };
-
-    // Database opening logic
-    var openDataBase = function() {
-        // start inter-tab heartbeat
-        // fmdb.beacon();
-        fmdb.db = new Dexie(dbpfx + fmdb.name, {chromeTransactionDurability: 'relaxed'});
-
-        // There is some inconsistency in Chrome 58.0.3029.110 that could cause indexedDB OPs to take ages...
-        setTimeout(function() {
-            // if not resolved already...
-            if (result !== null) {
-                if (d) {
-                    fmdb.logger.warn('Opening the database timed out.');
-                }
-
-                reject(ETEMPUNAVAIL);
-            }
-        }, 15000);
-
-        var dbSchema = {};
-        if (!Array.isArray(fmdb.schema)) {
-            fmdb.schema = [fmdb.schema];
-        }
-
-        for (var i = 0; i < fmdb.schema.length; i++) {
-            var schema = fmdb.schema[i];
-            for (var k in schema) {
-                if (schema.hasOwnProperty(k)) {
-                    dbSchema[k] = schema[k];
-                }
-            }
-            fmdb.db.version(i + 1).stores(dbSchema);
-        }
-        fmdb.tables = Object.keys(dbSchema);
-
-        fmdb.db.open().then(function() {
-            if (fmdb.crashed) {
-                // Opening timed out.
-                return;
-            }
-            fmdb.get('_sn').always(function(r) {
-                if (!wipe && r[0] && r[0].length === 11) {
-                    if (d) {
-                        fmdb.logger.log("DB sn: " + r[0]);
-                    }
-                    resolve(r[0]);
-                }
-                else if (slave || fmdb.crashed) {
-                    fmdb.crashed = 2;
-                    resolve(false);
-                }
-                else {
-                    if (d) {
-                        fmdb.logger.log("No sn found in DB, wiping...");
-                    }
-                    fmdb.db.delete().then(function() {
-                        fmdb.db.open().then(function() {
-                            resolve(false);
-                        }).catch(reject);
-                    }).catch(reject);
-                }
-            });
-        }).catch(Dexie.MissingAPIError, function(e) {
-            fmdb.logger.error("IndexedDB unavailable", e);
-            reject(e);
-        }).catch(reject);
-    };
-    openDataBase = tryCatch(openDataBase, reject);
-
-    // Enumerate databases and collect those not prefixed with 'dbpfx' (which is the current format)
-    var collectDataBaseNames = function() {
-        var timer;
-        var todrop = [];
-        var done = function() {
-            clearTimeout(timer);
-            fmdb.dropall(todrop, openDataBase);
-            done = null;
-        };
-
-        if (d) {
-            fmdb.logger.log('Collecting database names...');
-        }
-
-        Dexie.getDatabaseNames(function(r) {
-            if (sessionStorage.fmdbDropALL) {
-                todrop = r;
-                fmdb.logger.warn('drop all...', r);
-                return;
-            }
-            for (var i = r.length; i--;) {
+            for (let i = r && r.length; i--;) {
                 // drop only fmX related databases and skip slkv's
                 if (r[i][0] !== '$' && r[i].substr(0, dbpfx.length) !== dbpfx
                     && r[i].substr(-FMDB.perspex.length) !== FMDB.perspex) {
 
-                    todrop.push(r[i]);
-                }
-            }
-        }).finally(function() {
-            if (d) {
-                if (todrop.length) {
-                    fmdb.logger.log("Deleting obsolete DBs: " + todrop.join(', '));
-                }
-                else {
-                    fmdb.logger.log('No databases collected...');
+                    dbs.push(r[i]);
                 }
             }
 
-            if (done) {
-                done();
+            if (dbs.length) {
+                if (d) {
+                    this.logger.info(`Deleting obsolete databases: ${dbs.join(', ')}`);
+                }
+
+                return Promise.race([tSleep(5), Promise.allSettled(dbs.map(n => Dexie.delete(n)))]);
             }
+        })
+        .then((res) => res && self.d && this.logger.debug(res))
+        .catch((ex) => this.logger.warn(ex && ex.message || ex, [ex]))
+        .then(() => {
+            this.db = new Dexie(dbpfx + this.name, {chromeTransactionDurability: 'relaxed'});
+
+            this.db.version(1).stores(this.schema);
+            this.tables = Object.keys(this.schema);
+
+            return Promise.race([tSleep(15, ETEMPUNAVAIL), this.get('_sn').catch(dump)]);
+        })
+        .then((res) => {
+            if (res === ETEMPUNAVAIL) {
+                if (d) {
+                    this.logger.warn('Opening the database timed out.');
+                }
+                throw res;
+            }
+            const [sn] = res || [];
+
+            if (!wipe && sn && sn.length === 11) {
+                if (d) {
+                    this.logger.info(`DB sn: ${sn}`);
+                }
+                return sn;
+            }
+            if (!mBroadcaster.crossTab.master || this.crashed) {
+
+                throw new Error(`unusable (${this.crashed | 0})`);
+            }
+
+            if (d) {
+                this.logger.log("No sn found in DB, wiping...");
+            }
+
+            // eslint-disable-next-line local-rules/open -- no, this is not a window.open() call.
+            return this.db.delete().then(() => this.db.open());
+        })
+        .catch((ex) => {
+            const {db, logger} = this;
+
+            onIdle(() => db.delete().catch(nop));
+            logger.warn('Marking DB as crashed.', ex);
+
+            this.db = false;
+            this.crashed = 2;
+        })
+        .finally(() => {
+            this.opening = false;
         });
-
-        timer = setTimeout(function() {
-            if (d) {
-                fmdb.logger.warn('Dexie.getDatabaseNames timed out...');
-            }
-            done();
-        }, 3000);
-    };
-    collectDataBaseNames = tryCatch(collectDataBaseNames, openDataBase);
-
-    // Let's start the fun...
-    if (fmdb.crashed) {
-        resolve(false);
-    }
-    else if (!fmdb.db) {
-        if (fmdb.opening) {
-            fmdb.logger.error('Something went wrong... a DB is already opening...');
-        }
-        else {
-            // Collect obsolete databases to remove them, and proceed opening our current database
-            collectDataBaseNames();
-
-            fmdb.opening = true;
-        }
-    }
-    else {
-        console.error('fmdb.db is already set...');
-    }
 };
 
 // send failure event
@@ -351,37 +251,6 @@ FMDB.prototype.drop = async function fmdb_drop() {
         await this.invalidate();
         await this.db.delete().catch(dump);
         this.db = null;
-    }
-};
-
-// drop random databases
-FMDB.prototype.dropall = function fmdb_dropall(dbs, cb) {
-    if (!dbs || !dbs.length) {
-        cb();
-    }
-    else {
-        var fmdb = this;
-        var db = new Dexie(dbs.pop());
-        var next = function(ev) {
-            next = function() {};
-            if (ev && ev.type === 'blocked') {
-                fmdb.logger.warn('Cannot delete blocked indexedDB: ' + db.name);
-            }
-            fmdb.dropall(dbs, cb);
-        };
-
-        // If the DB is blocked, Dexie will try to delete it as soon there are no locks on it.
-        // However, we'll resolve immediately without waiting for it, since that will happen in
-        // an undetermined amount of time which needless to say is an odd UX experience...
-        db.on('blocked', next);
-
-        db.delete().then(function() {
-            fmdb.logger.log("Deleted IndexedDB " + db.name);
-        }).catch(function(err){
-            fmdb.logger.error("Unable to delete IndexedDB " + db.name, err);
-        }).finally(function() {
-            next();
-        });
     }
 };
 
@@ -560,7 +429,7 @@ FMDB.prototype._transactionErrorHandled = function(ch, ex) {
     }
     this.evento(eventMsg);
 
-    if (mega.is.loading && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
+    if (error.name === 'TimeoutError' || error.name === 'AbortError') {
         if (d) {
             this.logger.info("Transaction %s, retrying...", error.name, ex);
 
@@ -568,6 +437,7 @@ FMDB.prototype._transactionErrorHandled = function(ch, ex) {
                 this.logger.info('loadReport', JSON.stringify(mega.loadReport));
             }
         }
+        const {loading} = mega.is;
 
         res = true;
         sessionStorage[tag] = 1 + state;
@@ -576,14 +446,17 @@ FMDB.prototype._transactionErrorHandled = function(ch, ex) {
             case 0:
             case 1:
             case 2:
+                if (mega.loadReport && mega.loadReport.invisibleTime > 0 || !loading) {
+                    sessionStorage[tag]--;
+                }
                 if (!this.crashed) {
                     this.state = -1;
                     this.writing = 0;
                     this.writepending(ch);
-
-                    if (mega.loadReport && mega.loadReport.invisibleTime > 0) {
-                        sessionStorage[tag]--;
-                    }
+                    break;
+                }
+                if (!loading) {
+                    res = false;
                     break;
                 }
             /* fallthrough */
@@ -619,10 +492,10 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
     // signal when we start/finish to save stuff
     if (!ch) {
         if (this.tail[ch] === this.head[ch] - 1) {
-            document.documentElement.classList.add('fmdb-working');
+            mLoadingSpinner.show('fmdb', 'Storing account into local database...');
         }
         else if (this.tail[ch] === this.head[ch]) {
-            document.documentElement.classList.remove('fmdb-working');
+            mLoadingSpinner.hide('fmdb', true);
             this.pending[ch] = this.pending[ch].filter(Boolean);
             this.tail[ch] = this.head[ch] = 0;
             this._cache = Object.create(null);
@@ -686,6 +559,11 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
         }).catch((ex) => {
             if (d) {
                 console.timeEnd('fmdb-transaction');
+            }
+
+            if (this.inval_cb && ex.name === 'DatabaseClosedError') {
+
+                return this.inval_cb();
             }
 
             if (fmdb.cantransact < 0) {
@@ -943,7 +821,7 @@ FMDB.prototype.writepending = function fmdb_writepending(ch) {
                     onIdle(dispatchputs);
                 }
                 else {
-                    setTimeout(dispatchputs, 2600);
+                    tSleep(3).then(dispatchputs);
                 }
                 return;
             }
@@ -1174,13 +1052,18 @@ FMDB.prototype.stripnode = Object.freeze({
     u: function(usr) {
         'use strict';
         delete usr.u;
+        delete usr.h;
+        delete usr.p;
+        delete usr.t;
+        delete usr.m2;
         delete usr.ats;
         delete usr.name;
+        delete usr.pubk;
         delete usr.avatar;
+        delete usr.nickname;
         delete usr.presence;
         delete usr.lastName;
         delete usr.firstName;
-        delete usr.shortName;
         delete usr.presenceMtime;
     },
 
@@ -1286,6 +1169,12 @@ FMDB.prototype.restorenode = Object.freeze({
     u: function(usr, index) {
         'use strict';
         usr.u = index.u;
+
+        if (usr.c === 1) {
+            usr.t = 1;
+            usr.h = usr.u;
+            usr.p = 'contacts';
+        }
     },
 
     h: function(out, index) {
@@ -1451,6 +1340,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
         return [];
     }
 
+    let p = false;
     const ch = this.channelmap[table] || 0;
     const writing = this.writing || this.head[ch] !== this.tail[ch];
     const debug = d && (x => (m, ...a) => this.logger.warn(`[${x}] ${m}`, ...a))(Math.random().toString(28).slice(-7));
@@ -1465,6 +1355,14 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
     if (!index) {
         // No index provided, fallback to primary key
         index = t.schema.primKey.keyPath;
+    }
+
+    if (table === 'f' && index === 'h' && fminitialized && mega.infinity) {
+        p = [];
+
+        if (anyof && (anyof[0] === 'p' || anyof[0] === 'h')) {
+            p.push(...anyof[1]);
+        }
     }
 
     if (anyof) {
@@ -1502,6 +1400,9 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
         for (let k = where.length; k--;) {
             // encrypt the filter values (logical AND is commutative, so we can reverse the order)
             if (typeof where[k][1] === 'string') {
+                if (p && where[k][0] === 'p') {
+                    p.push(where[k][1]);
+                }
                 if (!this._cache[where[k][1]]) {
                     this._cache[where[k][1]] = this.toStore(where[k][1]);
                 }
@@ -1553,6 +1454,8 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
             }
         }
         const dbRecords = !!r.length;
+
+        console.time(`dirty-${pending.length}`);
 
         // iterate transactions in reverse chronological order
         for (let tid = pending.length; tid--;) {
@@ -1648,6 +1551,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                 }
             }
         }
+        console.timeEnd(`dirty-${pending.length}`);
 
         // scan the result for updates/deletions/additions arising out of the matches found
         if (match) {
@@ -1711,6 +1615,34 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
 
     if (!r) {
         await this.invalidate(1);
+    }
+    else if (p.length) {
+        const s = new Set();
+
+        // prepare to request missing nodes.
+        for (let x, i = r.length; i--;) {
+            const n = r[i];
+
+            if ((x = p.indexOf(n.h)) >= 0) {
+                s.add(n.p);
+                p.splice(x, 1);
+            }
+
+            if ((x = p.indexOf(n.p)) >= 0) {
+                p.splice(x, 1);
+            }
+        }
+
+        for (let i = r.length; i--;) {
+            if (s.has(r[i].h)) {
+                s.delete(r[i].h);
+            }
+        }
+        p.push(...s);
+
+        if (p.length) {
+            await api.tree(p);
+        }
     }
     return r || [];
 };
@@ -2161,7 +2093,7 @@ FMDB.prototype.invalidate = promisify(function(resolve, reject, readop) {
         }
 
         this.pending = [[]];
-        document.documentElement.classList.remove('fmdb-working');
+        mLoadingSpinner.hide('fmdb');
     };
 });
 
@@ -2196,9 +2128,20 @@ class MegaDexie extends Dexie {
             this.version(1).stores(args[3]);
         }
 
-        if (d > 2) {
-            MegaDexie.__dbConnections.push(this);
+        if (d) {
+            this._uname = args[0];
         }
+
+        const b = (this.__dbUniqueID & 0xdf).toString(16);
+        this.logger = new MegaLogger(() => `${this[Symbol.toStringTag]}(${this})`, {
+            levelColors: {
+                ERROR: `#${b}2222`,
+                DEBUG: `#4444${b}`,
+                WARN: `#${b}${b}33`,
+                INFO: `#00${b}00`,
+                LOG: '#444'
+            }
+        });
 
         this.onerror = null;
         Object.defineProperty(this, '__bulkPutQueue', {value: Object.create(null)});
@@ -2214,67 +2157,75 @@ class MegaDexie extends Dexie {
     }
 
     put(table, data) {
-        const {promise} = mega;
 
-        if (!this.__bulkPutQueue[table]) {
-            this.__bulkPutQueue[table] = [];
+        if (this.__bulkPutQueue[table]) {
+
+            // @todo deduplicate? benchmark!
+            this.__bulkPutQueue[table].push(data);
         }
-
-        // @todo deduplicate? benchmark!
-        this.__bulkPutQueue[table].push([promise, data]);
+        else {
+            this.__bulkPutQueue[table] = [data];
+            Object.defineProperty(this.__bulkPutQueue[table], 'promise', {value: mega.promise});
+        }
 
         delay(this.__ident_0 + table, () => {
             const queue = this.__bulkPutQueue[table];
             delete this.__bulkPutQueue[table];
 
-            const promises = [];
-            const release = (res, error) => {
-                let meth = 'resolve';
-                if (error) {
-                    res = error;
-                    meth = 'reject';
-                }
-                for (let i = promises.length; i--;) {
-                    promises[i][meth](res);
-                }
-            };
-
-            for (let i = queue.length; i--;) {
-                const [promise, data] = queue[i];
-                promises.push(promise);
-                queue[i] = data;
+            if (!(queue && queue.length)) {
+                this.logger.assert(false, 'invalid queue state.', queue);
+                return;
             }
 
-            const bulkPut = () => this[table].bulkPut(queue).then(release);
+            if (d) {
+                this.logger.debug(`Storing ${queue.length} entries...`);
+            }
 
-            bulkPut().catch(async(ex) => {
-                let res = 0;
-                let failure = new MEGAException(ex.inner || ex, this, ex.name);
+            const release = (res, error) => {
+                queue.length = 0;
+                queue.promise[error ? 'reject' : 'resolve'](error || res);
+            };
 
-                if (failure.name === 'DatabaseClosedError') {
-                    // eslint-disable-next-line local-rules/open
-                    res = await this.open().then(bulkPut).catch(echo);
-                    if (!res) {
-                        if (d) {
-                            console.debug('DB closed unexpectedly and re-opened...', this);
+            this.fireOperationPromise(() => this[table].bulkPut(queue).then(release))
+                .catch((ex) => {
+                    let res = 0;
+                    let failure = new MEGAException(ex.inner || ex, this, ex.name);
+
+                    if (this.onerror) {
+                        res = this.onerror(ex);
+                        if (res) {
+                            failure = null;
                         }
-                        return;
                     }
+
+                    this.error = ex;
+                    return release(res, failure);
+                });
+        }, 911);
+
+        return this.__bulkPutQueue[table].promise;
+    }
+
+    async fireOperationPromise(aOperationCallback) {
+
+        return aOperationCallback()
+            .catch(async(ex) => {
+                if (d) {
+                    this.logger.error(ex);
                 }
 
-                if (this.onerror) {
-                    res = this.onerror(ex);
-                    if (res) {
-                        failure = null;
+                if (ex.name === 'DatabaseClosedError') {
+                    // eslint-disable-next-line local-rules/open
+                    const res = await this.open().then(aOperationCallback);
+
+                    if (d) {
+                        this.logger.info('DB closed unexpectedly and re-opened, resuming operation...', res);
                     }
+                    return res;
                 }
 
-                this.error = ex;
-                return release(res, failure);
-            }).catch(dump);
-        }, 60);
-
-        return promise;
+                throw ex;
+            });
     }
 
     async export() {
@@ -2610,7 +2561,7 @@ MegaDexie.prototype.__checkStaleDBNames = function() {
     MegaDexie.__staleDBsChecked = canQueryDatabases ? true : -1;
 
     if (canQueryDatabases) {
-        setTimeout(function() {
+        tSleep(40).then(() => {
             var databases = [];
 
             if (d) {
@@ -2648,7 +2599,7 @@ MegaDexie.prototype.__checkStaleDBNames = function() {
                     }
                 })
                 .catch(nop);
-        }, 4e4);
+        });
     }
 };
 
@@ -2712,9 +2663,6 @@ lazy(MegaDexie, 'getDatabaseNames', () => {
     };
 });
 
-// @private
-MegaDexie.__dbConnections = [];
-
 /**
  * Creates a new database layer, which may change at anytime, and thus with
  * the only assertion the instance returned will have set/get/remove methods
@@ -2742,7 +2690,6 @@ class LRUMegaDexie extends MegaDexie {
         this.options = options;
 
         if (LRUMegaDexie.wSet) {
-            this._uname = name;
             LRUMegaDexie.wSet.add(this);
         }
 
@@ -2834,7 +2781,7 @@ class LRUMegaDexie extends MegaDexie {
     async set(h, data) {
         assert(data.byteLength > 16);
         data = await this.encrypt(data);
-        delay(this.name, () => this.drain(), 9e3);
+        delay(this.name, () => this.drain(), 4e3);
         return this.put('data', {h, data, ts: Date.now()});
     }
 
@@ -2843,10 +2790,10 @@ class LRUMegaDexie extends MegaDexie {
         const res = Object.create(null);
 
         if (bulk) {
-            bulk = await this.data.bulkGet(bulk);
+            bulk = await this.fireOperationPromise(() => this.data.bulkGet(bulk));
         }
         else {
-            bulk = await this.data.orderBy('ts').toArray();
+            bulk = await this.fireOperationPromise(() => this.data.orderBy('ts').toArray());
         }
 
         for (let i = bulk.length; i--;) {
@@ -2974,10 +2921,11 @@ Object.defineProperties(LRUMegaDexie, {
     errorHandler: {
         value: (ev) => {
             'use strict';
+            const dbname = ev.target && ev.target.name || 'unk';
             const message = String(((ev.target || ev).error || ev.inner || ev).message || ev.type || ev);
 
             if (d) {
-                console.warn(`LRUMegaDexie error (${ev.type || ev.name})`, message, [ev]);
+                console.warn(`LRUMegaDexie(${dbname}) error:${ev.type || ev.name}`, message, [ev]);
             }
 
             if (ev.type !== 'close' && !/\s(?:clos[ei]|delet[ei])/.test(message)) {
@@ -3138,7 +3086,18 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
             emplace(r);
             if (!r.length || !M.RootID) {
-                throw new Error('indexedDB corruption!');
+                if (sessionStorage.dbcrpt) {
+                    delete sessionStorage.dbcrpt;
+                    throw new Error('indexedDB corruption!');
+                }
+
+                if (d) {
+                    console.warn('Force-reloading due to indexedDB corruption...', r);
+                }
+                sessionStorage.dbcrpt = 1;
+                fm_forcerefresh(true);
+
+                return tSleep(15).then(() => location.reload());
             }
 
             // fetch all top-level nodes
@@ -3251,7 +3210,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
                 fmdb.getchunk('f', opts, (r) => {
                     if (!opts.offset) {
-                        M.c[n.h] = Object.create(null);
+                        M.c[n.h] = M.c[n.h] || Object.create(null);
                     }
 
                     opts.offset += opts.limit;
@@ -3331,12 +3290,24 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * @memberOf dbfetch
          */
         async geta(handles) {
-            // if (handles.length < 2) {
-            //     return handles.length && this.get(handles[0]);
-            // }
-            emplace(await fmdb.getbykey('f', 'h', ['h', handles.filter(h => !M.d[h])]), true);
+            let bulk = handles.filter(h => !M.d[h]);
 
-            let bulk = handles.filter(h => M.d[h] && M.d[h].t && !M.c[h]);
+            if (bulk.length) {
+                if (fmdb.hasPendingWrites('f')) {
+                    if (d) {
+                        fmdb.logger.warn('Holding data retrieval until there are no pending writes...', bulk);
+                    }
+                    // @todo we have to do something about the dirty-reads procedure becoming a nefarious bottleneck
+                    do {
+
+                        await tSleep(4);
+                    }
+                    while (fmdb.hasPendingWrites('f'));
+                }
+                emplace(await fmdb.getbykey('f', 'h', ['h', bulk]), true);
+            }
+
+            bulk = handles.filter(h => M.d[h] && M.d[h].t && !M.c[h]);
             if (bulk.length) {
                 await this.tree(bulk, 0);
             }
@@ -3393,7 +3364,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
                         // M.c should be set when *all direct* children have
                         // been fetched from the DB (even if there are none)
-                        M.c[p[i]] = Object.create(null);
+                        M.c[p[i]] = M.c[p[i]] || Object.create(null);
                     }
 
                     emplace(r);
@@ -3435,9 +3406,13 @@ Object.defineProperty(self, 'dbfetch', (function() {
             if (d > 1) {
                 console.debug('acquiring node', h);
             }
+            let backoff = 32 + Math.random() * 88;
 
             do {
-                await tSleep(0.2);
+                if (backoff < 4e3) {
+                    backoff *= 1.6;
+                }
+                await tSleep(backoff / 1e3);
             }
             while (node_inflight.lock);
 

@@ -35,7 +35,7 @@ window.toastRack = (() => {
 
         const rack = document.createElement('section');
         rack.className = 'toast-rack';
-        rack.cleanupTimer = 'toast-rack:' + makeUUID();
+        rack.cleanupTimer = `toast-rack:${makeUUID()}`;
         rack.expiry = Infinity;
 
         // set direction
@@ -312,14 +312,14 @@ window.toastRack = (() => {
      */
     function resetCleanupTimer(rack) {
         if (!rack.timerPaused) {
-            delay.cancel(rack.cleanupTimer);
-            if (rack.expiry < Date.now()) {
+            const now = Date.now();
+
+            if (rack.expiry < now) {
+                delay.cancel(rack.cleanupTimer);
                 removeColdToast(rack);
             }
             else {
-                delay(rack.cleanupTimer, () => {
-                    removeColdToast(rack);
-                }, rack.expiry - Date.now());
+                delay(rack.cleanupTimer, () => removeColdToast(rack), rack.expiry - now);
             }
         }
     }

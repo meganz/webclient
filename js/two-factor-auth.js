@@ -27,29 +27,13 @@ var twofactor = {
     /**
      * Checks if 2FA is enabled on the user's account
      * @param {Function} callbackFunction The function to call when the results are returned,
-     *                                    it passes the result of true for enabled and false for disabled
+     * @returns {Promise<Boolean>} true for enabled and false for disabled
      */
-    isEnabledForAccount: function(callbackFunction) {
-
+    isEnabledForAccount: async function() {
         'use strict';
 
-        loadingDialog.show();
-
         // Make Multi-Factor Auth Get request
-        api_req({ a: 'mfag', e: u_attr.email }, {
-            callback: function(result) {
-
-                loadingDialog.hide();
-
-                // Pass the result to the callback
-                if (result === 1) {
-                    callbackFunction(true);
-                }
-                else {
-                    callbackFunction(false);
-                }
-            }
-        });
+        return (await api.req({a: 'mfag', e: u_attr.email})).result === 1;
     }
 };
 
@@ -301,7 +285,7 @@ twofactor.account = {
             $twoFactorSection.removeClass('hidden');
 
             // Check if 2FA is enabled on their account
-            twofactor.isEnabledForAccount(function(result) {
+            twofactor.isEnabledForAccount().then((result) => {
                 // If enabled, show red button, disable PIN entry text box and Deactivate text
                 if (result) {
                     $button.addClass('toggle-on enabled').trigger('update.accessibility');
@@ -313,7 +297,7 @@ twofactor.account = {
 
                 // Init the click handler now for the button now that the enabled/disabled status has been retrieved
                 twofactor.account.initEnableDeactivateButton();
-            });
+            }).catch(tell);
         }
     },
 
@@ -333,10 +317,12 @@ twofactor.account = {
             // If 2FA is enabled
             if ($button.hasClass('enabled')) {
                 // Show the verify 2FA dialog to collect the user's PIN
-                twofactor.verifyActionDialog.init(function(twoFactorPin) {
-                    // Disable 2FA
-                    twofactor.account.disableTwoFactorAuthentication(twoFactorPin);
-                });
+                twofactor.verifyActionDialog.init()
+                    .then((twoFactorPin) => {
+                        // Disable 2FA
+                        return twofactor.account.disableTwoFactorAuthentication(twoFactorPin);
+                    })
+                    .catch(tell);
             }
             else {
                 // Setup 2FA
@@ -423,27 +409,12 @@ twofactor.setupDialog = {
         var $qrCode = this.$dialog.find('.two-factor-qr-code');
 
         // Run Multi-Factor Auth Setup (mfas) request
-        api_req({ a: 'mfas' }, {
-            callback: function(response) {
-
-                // If the Two-Factor has already been setup, show a warning dialog
-                if (response === EEXIST) {
-                    msgDialog(
-                        'warninga',
-                        l[19219],
-                        l['2fa_already_enabled'],
-                        '',
-                        function() {
-                            // Close the dialog on click of OK button
-                            twofactor.setupDialog.closeDialog();
-                        }
-                    );
-
-                    return false;
-                }
+        api.send('mfas')
+            .then((res) => {
+                assert(res && typeof res === 'string');
 
                 // Set Base32 seed into text box
-                $seedInput.val(response);
+                $seedInput.val(res);
 
                 // Configure the QR code rendering library
                 // Appears as: MEGA (name@email.com) in authenticator app
@@ -453,13 +424,25 @@ twofactor.setupDialog = {
                     correctLevel: QRErrorCorrectLevel.H,    // High
                     background: '#f2f2f2',
                     foreground: '#151412',
-                    text: 'otpauth://totp/MEGA:' + u_attr.email + '?secret=' + response + '&issuer=MEGA'
+                    text: `otpauth://totp/MEGA:${u_attr.email}?secret=${res}&issuer=MEGA`
                 };
 
                 // Render the QR code
                 $qrCode.text('').qrcode(options);
-            }
-        });
+
+            })
+            .catch((ex) => {
+                twofactor.setupDialog.closeDialog();
+
+                // If the Two-Factor has already been setup, show a warning dialog
+                if (ex === EEXIST) {
+
+                    msgDialog('warninga', l[19219], l['2fa_already_enabled']);
+                }
+                else {
+                    tell(ex);
+                }
+            });
     },
 
     /**
@@ -718,6 +701,11 @@ twofactor.verifySetupDialog = {
         // On button click
         $verifyButton.rebind('click', function() {
 
+            if ($verifyButton.hasClass('disabled')) {
+                return false;
+            }
+            $verifyButton.addClass('disabled');
+
             // Hide old warning
             $warningText.addClass('hidden');
 
@@ -728,19 +716,28 @@ twofactor.verifySetupDialog = {
                 var pinCode = $.trim($pinCodeInput.val());
 
                 // Run Multi-Factor Auth Setup (mfas) request
-                api_req({ a: 'mfas', mfa: pinCode }, {
-                    callback: function(response) {
+                api.req({a: 'mfas', mfa: pinCode})
+                    .then((res) => {
+                        console.info(res);
+
+                        // Disable the back button and hide the close button to force them to go to the next step
+                        // to backup their Recovery Key. Also now that 2FA is activated, show the success message
+                        $backButton.addClass('disabled');
+                        $closeButton.addClass('hidden');
+                        $successText.removeClass('hidden');
+
+                    })
+                    .catch((ex) => {
 
                         // If the Two-Factor has already been setup, show a warning dialog
-                        if (response === EEXIST) {
-                            msgDialog('warninga', l[19219], l['2fa_already_enabled'], null,
-                                function() {
-                                    // Close the dialog on click of OK button
-                                    twofactor.verifySetupDialog.closeDialog();
-                                }
-                            );
+                        if (ex === EEXIST) {
+                            msgDialog('warninga', l[19219], l['2fa_already_enabled'], null, () => {
+                                // Close the dialog on click of OK button
+                                twofactor.verifySetupDialog.closeDialog();
+                            });
                         }
-                        else if (response < 0) {
+                        else {
+                            console.error(ex);
 
                             // If there was an error, show message that the code was incorrect and clear the text field
                             $warningText.removeClass('hidden');
@@ -749,15 +746,10 @@ twofactor.verifySetupDialog = {
                             // Put the focus back in the PIN input field
                             $pinCodeInput.trigger('focus');
                         }
-                        else {
-                            // Disable the back button and hide the close button to force them to go to the next step
-                            // to backup their Recovery Key. Also now that 2FA is activated, show the success message
-                            $backButton.addClass('disabled');
-                            $closeButton.addClass('hidden');
-                            $successText.removeClass('hidden');
-                        }
-                    }
-                });
+                    })
+                    .finally(() => {
+                        $verifyButton.removeClass('disabled');
+                    });
             }
             else {
                 // If the operation to activate succeeded, load next dialog to backup the recovery key
@@ -845,28 +837,30 @@ twofactor.verifyActionDialog = {
 
     /**
      * Intialise the dialog
-     * @param {Function} completeCallback The callback to run after 2FA verify
+     * @returns {Promise<String>} 2-fa pin code.
      */
-    init: function(completeCallback) {
-
+    init: function() {
         'use strict';
+        return new Promise((resolve, reject) => {
 
-        // Cache selectors
-        this.$dialog = $('.mega-dialog.two-factor-verify-action');
+            // Cache selectors
+            this.$dialog = $('.mega-dialog.two-factor-verify-action');
+            this.reject = reject;
 
-        // Initialise functionality
-        this.resetState();
-        this.initKeyupFunctionality();
-        this.initSubmitButton(completeCallback);
-        this.initLostAuthenticatorDeviceButton();
-        this.initCloseButton();
+            // Initialise functionality
+            this.resetState();
+            this.initKeyupFunctionality();
+            this.initSubmitButton(resolve);
+            this.initLostAuthenticatorDeviceButton();
+            this.initCloseButton();
 
-        // Show the modal dialog
-        this.$dialog.removeClass('hidden');
-        fm_showoverlay();
+            // Show the modal dialog
+            this.$dialog.removeClass('hidden');
+            fm_showoverlay();
 
-        // Put the focus in the PIN input field after its visible
-        this.$dialog.find('.pin-input').trigger('focus');
+            // Put the focus in the PIN input field after its visible
+            this.$dialog.find('.pin-input').trigger('focus');
+        });
     },
 
     /**
@@ -967,8 +961,13 @@ twofactor.verifyActionDialog = {
      * Closes the dialog
      */
     closeDialog: function() {
-
         'use strict';
+        const {reject} = this;
+
+        if (reject) {
+            onIdle(() => reject(EINCOMPLETE));
+            delete this.reject;
+        }
 
         // Hide the dialog and background
         this.$dialog.addClass('hidden');

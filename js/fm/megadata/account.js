@@ -1,8 +1,8 @@
 MegaData.prototype.accountData = function(cb, blockui, force) {
     "use strict";
 
-    var account = Object(this.account);
-    var reuseData = (account.lastupdate > Date.now() - 10000) && !force;
+    const account = Object(this.account);
+    let reuseData = account.lastupdate > Date.now() - 10000 && !force;
 
     if (reuseData && (!account.stats || !account.stats[M.RootID])) {
         if (d) {
@@ -12,392 +12,393 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
     }
 
     if (reuseData && cb) {
-        cb(account);
+        return cb(account);
     }
-    else {
-        var uqres = false;
-        var pstatus = Object(window.u_attr).p;
-        var mRootID = M.RootID;
 
+    const promises = [];
+    const mRootID = M.RootID;
+    const pstatus = Object(window.u_attr).p;
+
+    const sendAPIRequest = (payload, always, handler) => {
+        if (typeof always === 'function') {
+            handler = always;
+            always = false;
+        }
+        const promise = api.req(payload)
+            .then(({result}) => {
+                return handler(result);
+            })
+            .catch((ex) => {
+                if (always) {
+                    return handler(ex);
+                }
+                throw ex;
+            });
+        const slot = promises.push(promise) - 1;
+
+        Object.defineProperty(promises, `<${slot}>`, {value: payload.a});
+    };
+
+    if (d) {
         if (!window.fminitialized) {
             console.warn('You should not use this function outside the fm...');
         }
         console.assert(mRootID, 'I told you...');
+    }
 
-        if (blockui) {
-            loadingDialog.show();
+    if (blockui) {
+        loadingDialog.show();
+    }
+
+    // Fetch extra storage/transfer base data Pro Flexi or Business master
+    const b = typeof u_attr !== 'undefined' && (u_attr.pf || u_attr.b && u_attr.b.m) ? 1 : 0;
+
+    /** DO NOT place any sendAPIRequest() call before, this 'uq' MUST BE the FIRST one */
+
+    sendAPIRequest({a: 'uq', strg: 1, xfer: 1, pro: 1, v: 1, b}, (res) => {
+        Object.assign(account, res);
+
+        account.type = res.utype;
+        // account.stime = res.scycle;
+        // account.scycle = res.snext;
+        account.expiry = res.suntil;
+        account.space = Math.round(res.mstrg);
+        account.space_used = Math.round(res.cstrg);
+        account.bw = Math.round(res.mxfer);
+        account.servbw_used = Math.round(res.csxfer);
+        account.downbw_used = Math.round(res.caxfer);
+        account.servbw_limit = Math.round(res.srvratio);
+        account.isFull = res.cstrg / res.mstrg >= 1;
+        account.isAlmostFull = res.cstrg / res.mstrg >= res.uslw / 10000;
+
+        // Business base/extra quotas:
+        if (res.utype === pro.ACCOUNT_LEVEL_BUSINESS || res.utype === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+            account.space_bus_base = res.b ? res.b.bstrg : undefined; // unit TB
+            account.space_bus_ext = res.b ? res.b.estrg : undefined; // unit TB
+            account.tfsq_bus_base = res.b ? res.b.bxfer : undefined; // unit TB
+            account.tfsq_bus_ext = res.b ? res.b.exfer : undefined; // unit TB
+            account.tfsq_bus_used = res.b ? res.b.xfer : undefined; // unit B
+            account.space_bus_used = res.b ? res.b.strg : undefined; // unit B
         }
 
-        let fetchBusinessStorage = 0;
-
-        // Fetch extra storage/transfer base data Pro Flexi or Business master
-        if (typeof u_attr !== 'undefined') {
-            fetchBusinessStorage = (u_attr.pf || (u_attr.b && u_attr.b.m)) ? 1 : 0;
+        if (res.nextplan) {
+            account.nextplan = res.nextplan;
         }
 
-        api_req({
-            a: 'uq', strg: 1, xfer: 1, pro: 1, v: 1,
-            b: fetchBusinessStorage
-        }, {
-            account: account,
-            callback: function(res, ctx) {
-
-                loadingDialog.hide();
-
-                if (typeof res === 'object') {
-                    for (var i in res) {
-                        ctx.account[i] = res[i];
-                    }
-                    ctx.account.type = res.utype;
-                    // ctx.account.stime = res.scycle;
-                    // ctx.account.scycle = res.snext;
-                    ctx.account.expiry = res.suntil;
-                    ctx.account.space = Math.round(res.mstrg);
-                    ctx.account.space_used = Math.round(res.cstrg);
-                    ctx.account.bw = Math.round(res.mxfer);
-                    ctx.account.servbw_used = Math.round(res.csxfer);
-                    ctx.account.downbw_used = Math.round(res.caxfer);
-                    ctx.account.servbw_limit = Math.round(res.srvratio);
-                    ctx.account.isFull = res.cstrg / res.mstrg >= 1;
-                    ctx.account.isAlmostFull = res.cstrg / res.mstrg >= res.uslw / 10000;
-
-                    // Business base/extra quotas:
-                    if (res.utype === pro.ACCOUNT_LEVEL_BUSINESS || res.utype === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-                        ctx.account.space_bus_base = res.b ? res.b.bstrg : undefined; // unit TB
-                        ctx.account.space_bus_ext = res.b ? res.b.estrg : undefined; // unit TB
-                        ctx.account.tfsq_bus_base = res.b ? res.b.bxfer : undefined; // unit TB
-                        ctx.account.tfsq_bus_ext = res.b ? res.b.exfer : undefined; // unit TB
-                        ctx.account.tfsq_bus_used = res.b ? res.b.xfer : undefined; // unit B
-                        ctx.account.space_bus_used = res.b ? res.b.strg : undefined; // unit B
-                    }
-
-                    if (res.nextplan) {
-                        ctx.account.nextplan = res.nextplan;
-                    }
-
-                    if (res.mxfer === undefined) {
-                        delete ctx.account.mxfer;
-                    }
-
-                    // If a subscription, get the timestamp it will be renewed
-                    if (res.stype === 'S') {
-                        ctx.account.srenew = res.srenew;
-                    }
-
-                    if (!Object(res.balance).length) {
-                        ctx.account.balance = [['0.00', 'EUR']];
-                    }
-
-                    uqres = res;
-                }
-            }
-        });
-
-        api_req({a: 'uavl'}, {
-            account: account,
-            callback: function(res, ctx) {
-                if (typeof res !== 'object') {
-                    res = [];
-                }
-                ctx.account.vouchers = voucherData(res);
-            }
-        });
-
-        api_req({a: 'maf', v: mega.achievem.RWDLVL}, {
-            account: account,
-            callback: function(res, ctx) {
-                if (typeof res === 'object') {
-                    ctx.account.maf = res;
-                }
-            }
-        });
-        if (!is_chatlink) {
-            api_req({a: 'uga', u: u_handle, ua: '^!rubbishtime', v: 1}, {
-                account: account,
-                callback: function(res, ctx) {
-                    if (typeof res === 'object') {
-                        ctx.account.ssrs = base64urldecode(String(res.av || res)) | 0;
-                    }
-                }
-            });
+        if (res.mxfer === undefined) {
+            delete account.mxfer;
         }
-        api_req({a: 'utt'}, {
-            account: account,
-            callback: function(res, ctx) {
-                if (typeof res !== 'object') {
-                    res = [];
-                }
-                ctx.account.transactions = res;
-            }
-        });
 
-        // getting contact link [QR]
-        // api_req : a=clc     contact link create api method
-        //           f=1       a flag to tell the api to create a new link if it doesnt exist.
-        //                     but if a previous link was deleted, then dont return any thing (empty)
-        api_req({ a: 'clc', f: 1 }, {
-            account: account,
-            callback: function (res, ctx) {
-                if (typeof res !== 'string') {
-                    res = '';
-                }
-                else {
-                    res = 'C!' + res;
-                }
-                ctx.account.contactLink = res;
-            }
-        });
+        // If a subscription, get the timestamp it will be renewed
+        if (res.stype === 'S') {
+            account.srenew = res.srenew;
+        }
 
+        if (!Object(res.balance).length) {
+            account.balance = [['0.00', 'EUR']];
+        }
 
-        // Get (f)ull payment history
-        // [[payment id, timestamp, price paid, currency, payment gateway id, payment plan id, num of months purchased]]
-        api_req({a: 'utp', f: 1}, {
-            account: account,
-            callback: function(res, ctx) {
-                if (typeof res !== 'object') {
-                    res = [];
-                }
-                ctx.account.purchases = res;
-            }
-        });
+        return res;
+    });
 
-        /* x: 1, load the session ids
-         useful to expire the session from the session manager */
-        api_req({a: 'usl', x: 1}, {
-            account: account,
-            callback: function(res, ctx) {
-                if (typeof res !== 'object') {
-                    res = [];
-                }
-                ctx.account.sessions = res;
-            }
-        });
+    sendAPIRequest({a: 'uavl'}, true, (res) => {
+        if (!Array.isArray(res)) {
+            res = [];
+        }
+        account.vouchers = voucherData(res);
+    });
 
-        api_req({a: 'ug'}, {
-            cb: cb,
-            account: account,
-            callback: function(res, ctx) {
-                let tmUpdate = false;
+    sendAPIRequest({a: 'maf', v: mega.achievem.RWDLVL}, (res) => {
 
-                if (typeof res === 'object') {
-                    if (res.p) {
-                        u_attr.p = res.p;
-                        if (u_attr.p) {
-                            tmUpdate = true;
-                        }
-                    }
-                    else {
-                        delete u_attr.p;
-                        if (pstatus) {
-                            tmUpdate = true;
-                        }
-                    }
-                    if (res.pf) {
-                        u_attr.pf = res.pf;
-                        tmUpdate = true;
-                    }
-                    if (res.b) {
-                        u_attr.b = res.b;
-                        tmUpdate = true;
-                    }
-                    if (res.uspw) {
-                        u_attr.uspw = res.uspw;
-                    }
-                    else {
-                        delete u_attr.uspw;
-                    }
-                    if (res.mkt) {
-                        u_attr.mkt = res.mkt;
-                        if (Array.isArray(u_attr.mkt.dc) && u_attr.mkt.dc.length) {
-                            delay('ShowDiscountOffer', pro.propay.showDiscountOffer, 7000);
-                        }
-                    }
-                    else {
-                        delete u_attr.mkt;
-                    }
-                    if (res['^!discountoffers']) {
-                        u_attr['^!discountoffers'] = base64urldecode(res['^!discountoffers']);
-                    }
-                }
+        account.maf = res;
+    });
 
-                if (!ctx.account.downbw_used) {
-                    ctx.account.downbw_used = 0;
-                }
+    if (!is_chatlink) {
 
-                if (pstatus !== u_attr.p) {
-                    ctx.account.justUpgraded = Date.now();
+        sendAPIRequest({a: 'uga', u: u_handle, ua: '^!rubbishtime', v: 1}, (res) => {
 
-                    M.checkStorageQuota(2);
-
-                    // If pro status change is recognised revoke storage quota cache
-                    M.storageQuotaCache = null;
-                }
-
-                if (tmUpdate) {
-                    topmenuUI();
-                }
-
-                if (uqres) {
-                    if (!u_attr.p) {
-                        if (uqres.tal) {
-                            ctx.account.bw = uqres.tal;
-                        }
-                        ctx.account.servbw_used = 0;
-                    }
-
-                    if (uqres.tah) {
-                        var bwu = 0;
-
-                        for (var w in uqres.tah) {
-                            bwu += uqres.tah[w];
-                        }
-
-                        ctx.account.downbw_used += bwu;
-                    }
-                }
-
-                // Prepare storage footprint stats.
-                var cstrgn = ctx.account.cstrgn = Object(ctx.account.cstrgn);
-                var stats = ctx.account.stats = Object.create(null);
-                var groups = [M.RootID, M.InboxID, M.RubbishID];
-                var root = array.to.object(groups);
-                var exp = Object(M.su.EXP);
-
-                groups = groups.concat(['inshares', 'outshares', 'links']);
-                for (var i = groups.length; i--;) {
-                    stats[groups[i]] = array.to.object(['items', 'bytes', 'files', 'folders', 'vbytes', 'vfiles'], 0);
-                    // stats[groups[i]].nodes = [];
-                }
-
-                // Add pending out-shares that has no user on cstrgn variable
-                const ps = Object.keys(M.ps || {});
-                if (ps.length) {
-                    cstrgn = {
-                        ...cstrgn,
-                        ...ps
-                            .map(h => M.getNodeByHandle(h))
-                            .reduce((o, n) => {
-                                o[n.h] = [n.tb || 0, n.tf || 0, n.td || 0, n.tvb || 0, n.tvf || 0];
-                                return o;
-                            }, {})
-                    };
-                }
-
-                for (var handle in cstrgn) {
-                    var data = cstrgn[handle];
-                    var target = 'outshares';
-
-                    if (root[handle]) {
-                        target = handle;
-                    }
-                    else if (M.c.shares[handle]) {
-                        target = 'inshares';
-                    }
-                    // stats[target].nodes.push(handle);
-
-                    if (exp[handle] && !M.getNodeShareUsers(handle, 'EXP').length) {
-                        continue;
-                    }
-
-                    stats[target].items++;
-                    stats[target].bytes += data[0];
-                    stats[target].files += data[1];
-                    stats[target].folders += data[2];
-                    stats[target].vbytes += data[3];
-                    stats[target].vfiles += data[4];
-                }
-
-                // calculate root's folders size
-                if (M.c[M.RootID]) {
-                    var t = Object.keys(M.c[M.RootID]);
-                    var s = Object(stats[M.RootID]);
-
-                    s.fsize = s.bytes;
-                    for (var i = t.length; i--;) {
-                        var node = M.d[t[i]] || false;
-
-                        if (!node.t) {
-                            s.fsize -= node.s;
-                        }
-                    }
-                }
-
-                // calculate public links items/size
-                var links = stats.links;
-                Object.keys(exp)
-                    .forEach(function(h) {
-                        if (M.d[h]) {
-                            if (M.d[h].t) {
-                                links.folders++;
-                                links.bytes += M.d[h].tb || 0;
-                            }
-                            else {
-                                links.bytes += M.d[h].s || 0;
-                                links.files++;
-                            }
-                        }
-                        else {
-                            if (d) {
-                                console.error('Not found public node ' + h);
-                            }
-                            links.files++;
-                        }
-                    });
-
-                ctx.account.lastupdate = Date.now();
-
-                if (d) {
-                    console.log('stats', JSON.stringify(stats));
-                }
-
-                if (!ctx.account.bw) {
-                    ctx.account.bw = 1024 * 1024 * 1024 * 1024 * 1024 * 10;
-                }
-                if (!ctx.account.servbw_used) {
-                    ctx.account.servbw_used = 0;
-                }
-                if (!ctx.account.downbw_used) {
-                    ctx.account.downbw_used = 0;
-                }
-
-                M.account = ctx.account;
-
-                if (res.ut) {
-                    localStorage.apiut = res.ut;
-                }
-
-                // transfers quota
-                var tfsq = {max: account.bw, used: account.downbw_used};
-
-                if (u_attr.p) {
-                    tfsq.used += account.servbw_used;
-                }
-                else if (M.maf) {
-                    tfsq.used += account.servbw_used;
-                    var max = (M.maf.transfer.base + M.maf.transfer.current);
-                    if (max) {
-                        // has achieved quota
-                        tfsq.ach = true;
-                        tfsq.max = max;
-                    }
-                }
-
-                tfsq.left = Math.max(tfsq.max - tfsq.used, 0);
-                tfsq.perc = Math.floor(tfsq.used * 100 / tfsq.max);
-
-                M.account.tfsq = tfsq;
-
-                if (mRootID !== M.RootID) {
-                    // TODO: Check if this really could happen and fix it...
-                    console.error('mRootID changed while loading...', mRootID, M.RootID);
-                }
-
-                if (ctx.cb) {
-                    ctx.cb(ctx.account);
-                }
-            }
+            account.ssrs = base64urldecode(String(res.av || res)) | 0;
         });
     }
+
+    sendAPIRequest({a: 'utt'}, true, (res) => {
+        if (!Array.isArray(res)) {
+            res = [];
+        }
+        account.transactions = res;
+    });
+
+    // getting contact link [QR]
+    // api_req : a=clc     contact link create api method
+    //           f=1       a flag to tell the api to create a new link if it doesnt exist.
+    //                     but if a previous link was deleted, then dont return any thing (empty)
+    sendAPIRequest({a: 'clc', f: 1}, (res) => {
+
+        account.contactLink = typeof res === 'string' ? `C!${res}` : '';
+    });
+
+    // Get (f)ull payment history
+    // [[payment id, timestamp, price paid, currency, payment gateway id, payment plan id, num of months purchased]]
+    sendAPIRequest({a: 'utp', f: 1}, true, (res) => {
+        if (!Array.isArray(res)) {
+            res = [];
+        }
+        account.purchases = res;
+    });
+
+    /* x: 1, load the session ids
+     useful to expire the session from the session manager */
+    sendAPIRequest({a: 'usl', x: 1}, true, (res) => {
+        if (!Array.isArray(res)) {
+            res = [];
+        }
+        account.sessions = res;
+    });
+
+
+    /**
+     * DO NOT place any sendAPIRequest() call AFTER, this 'ug' MUST BE the LAST one!
+     */
+    /* eslint-disable complexity -- @todo revamp the below mumbo-jumbo */
+
+    promises.push(M.getAccountDetails());
+
+    Promise.allSettled(promises)
+        .then((res) => {
+            let tmUpdate = false;
+
+            for (let i = res.length; i--;) {
+                if (res[i].status !== 'fulfilled') {
+                    const a = promises[`<${i}>`];
+
+                    console.warn(`API Request ${a} failed...`, res[i].reason);
+                }
+            }
+
+            // get 'uq' reply.
+            const uqres = res[0].value;
+
+            // override with 'ug' reply.
+            res = res.pop().value;
+
+            if (typeof res === 'object') {
+                if (res.p) {
+                    u_attr.p = res.p;
+                    if (u_attr.p) {
+                        tmUpdate = true;
+                    }
+                }
+                else {
+                    delete u_attr.p;
+                    if (pstatus) {
+                        tmUpdate = true;
+                    }
+                }
+                if (res.pf) {
+                    u_attr.pf = res.pf;
+                    tmUpdate = true;
+                }
+                if (res.b) {
+                    u_attr.b = res.b;
+                    tmUpdate = true;
+                }
+                if (res.uspw) {
+                    u_attr.uspw = res.uspw;
+                }
+                else {
+                    delete u_attr.uspw;
+                }
+                if (res.mkt) {
+                    u_attr.mkt = res.mkt;
+                    if (Array.isArray(u_attr.mkt.dc) && u_attr.mkt.dc.length) {
+                        delay('ShowDiscountOffer', pro.propay.showDiscountOffer, 7000);
+                    }
+                }
+                else {
+                    delete u_attr.mkt;
+                }
+                if (res['^!discountoffers']) {
+                    u_attr['^!discountoffers'] = base64urldecode(res['^!discountoffers']);
+                }
+            }
+
+            if (!account.downbw_used) {
+                account.downbw_used = 0;
+            }
+
+            if (pstatus !== u_attr.p) {
+                account.justUpgraded = Date.now();
+
+                M.checkStorageQuota(2);
+
+                // If pro status change is recognised revoke storage quota cache
+                M.storageQuotaCache = null;
+            }
+
+            if (tmUpdate) {
+                onIdle(topmenuUI);
+            }
+
+            if (uqres) {
+                if (!u_attr.p) {
+                    if (uqres.tal) {
+                        account.bw = uqres.tal;
+                    }
+                    account.servbw_used = 0;
+                }
+
+                if (uqres.tah) {
+                    let bwu = 0;
+
+                    for (const w in uqres.tah) {
+                        bwu += uqres.tah[w];
+                    }
+
+                    account.downbw_used += bwu;
+                }
+            }
+
+            // Prepare storage footprint stats.
+            let cstrgn = account.cstrgn = Object(account.cstrgn);
+            const stats = account.stats = Object.create(null);
+            let groups = [M.RootID, M.InboxID, M.RubbishID];
+            const root = array.to.object(groups);
+            const exp = Object(M.su.EXP);
+
+            groups = [...groups, 'inshares', 'outshares', 'links'];
+            for (let i = groups.length; i--;) {
+                stats[groups[i]] = array.to.object(['items', 'bytes', 'files', 'folders', 'vbytes', 'vfiles'], 0);
+                // stats[groups[i]].nodes = [];
+            }
+
+            // Add pending out-shares that has no user on cstrgn variable
+            const ps = Object.keys(M.ps || {});
+            if (ps.length) {
+                cstrgn = {
+                    ...cstrgn,
+                    ...ps
+                        .map(h => M.getNodeByHandle(h))
+                        .reduce((o, n) => {
+                            o[n.h] = [n.tb || 0, n.tf || 0, n.td || 0, n.tvb || 0, n.tvf || 0];
+                            return o;
+                        }, {})
+                };
+            }
+
+            for (const handle in cstrgn) {
+                const data = cstrgn[handle];
+                let target = 'outshares';
+
+                if (root[handle]) {
+                    target = handle;
+                }
+                else if (M.c.shares[handle]) {
+                    target = 'inshares';
+                }
+                // stats[target].nodes.push(handle);
+
+                if (exp[handle] && !M.getNodeShareUsers(handle, 'EXP').length) {
+                    continue;
+                }
+
+                stats[target].items++;
+                stats[target].bytes += data[0];
+                stats[target].files += data[1];
+                stats[target].folders += data[2];
+                stats[target].vbytes += data[3];
+                stats[target].vfiles += data[4];
+            }
+
+            // calculate root's folders size
+            if (M.c[M.RootID]) {
+                const t = Object.keys(M.c[M.RootID]);
+                const s = Object(stats[M.RootID]);
+
+                s.fsize = s.bytes;
+                for (let i = t.length; i--;) {
+                    const node = M.d[t[i]] || false;
+
+                    if (!node.t) {
+                        s.fsize -= node.s;
+                    }
+                }
+            }
+
+            // calculate public links items/size
+            const {links} = stats;
+            Object.keys(exp)
+                .forEach((h) => {
+                    if (M.d[h]) {
+                        if (M.d[h].t) {
+                            links.folders++;
+                            links.bytes += M.d[h].tb || 0;
+                        }
+                        else {
+                            links.bytes += M.d[h].s || 0;
+                            links.files++;
+                        }
+                    }
+                    else {
+                        if (d) {
+                            console.error(`Not found public node ${h}`);
+                        }
+                        links.files++;
+                    }
+                });
+
+            account.lastupdate = Date.now();
+
+            if (d) {
+                console.log('stats', JSON.stringify(stats));
+            }
+
+            if (!account.bw) {
+                account.bw = 1024 * 1024 * 1024 * 1024 * 1024 * 10;
+            }
+            if (!account.servbw_used) {
+                account.servbw_used = 0;
+            }
+            if (!account.downbw_used) {
+                account.downbw_used = 0;
+            }
+
+            M.account = account;
+
+            // transfers quota
+            const tfsq = {max: account.bw, used: account.downbw_used};
+
+            if (u_attr.p) {
+                tfsq.used += account.servbw_used;
+            }
+            else if (M.maf) {
+                tfsq.used += account.servbw_used;
+                const max = M.maf.transfer.base + M.maf.transfer.current;
+                if (max) {
+                    // has achieved quota
+                    tfsq.ach = true;
+                    tfsq.max = max;
+                }
+            }
+
+            tfsq.left = Math.max(tfsq.max - tfsq.used, 0);
+            tfsq.perc = Math.floor(tfsq.used * 100 / tfsq.max);
+
+            M.account.tfsq = tfsq;
+
+            if (mRootID !== M.RootID) {
+                // TODO: Check if this really could happen and fix it...
+                console.error('mRootID changed while loading...', mRootID, M.RootID);
+            }
+
+            if (typeof cb === 'function') {
+
+                cb(account);
+            }
+        })
+        .catch(reportError)
+        .finally(() => {
+            loadingDialog.hide();
+        });
 };
 
 MegaData.prototype.refreshSessionList = function(callback) {
@@ -406,35 +407,75 @@ MegaData.prototype.refreshSessionList = function(callback) {
     if (d) {
         console.log('Refreshing session list');
     }
-    if (M.account) {
-        api_req({a: 'usl', x: 1}, {
-            account: M.account,
-            callback: function(res, ctx) {
-                if (typeof res !== 'object') {
-                    res = [];
+
+    const {account} = this;
+
+    if (account) {
+        api.req({a: 'usl', x: 1})
+            .then(({result}) => {
+                if (Array.isArray(result)) {
+                    result.sort((a, b) => a[0] < b[0] ? 1 : -1);
                 }
                 else {
-                    res.sort(function(a, b) {
-                        if (a[0] < b[0]) {
-                            return 1;
-                        }
-                        else {
-                            return -1;
-                        }
-                    });
+                    result = [];
                 }
 
-                ctx.account.sessions = res;
-                M.account = ctx.account;
+                account.sessions = result;
+            })
+            .finally(() => {
                 if (typeof callback === 'function') {
                     callback();
                 }
-            }
-        });
+            });
     }
     else {
         M.accountData(callback);
     }
+};
+
+
+/**
+ * Retrieve general user information once a session has been established.
+ * The webclient calls this method after every 'us' request and also upon any session resumption (page reload).
+ * Only account information that would be useful for clients in the general pages of the site/apps is returned,
+ * with other more specific commands available when the user wants
+ * to delve deeper in the account sections of the site/apps.
+ * @return {Promise<Object>} user get result
+ */
+MegaData.prototype.getAccountDetails = function() {
+    'use strict';
+
+    return api.req({a: 'ug'})
+        .then(({result}) => {
+            const {u_attr} = window;
+
+            if (u_attr && typeof result === 'object') {
+                const upd = `b,mkt,p,pf,uspw`.split(',');
+
+                for (let i = upd.length; i--;) {
+                    const k = upd[i];
+
+                    if (result[k]) {
+                        u_attr[k] = result[k];
+                    }
+                    else {
+                        delete u_attr[k];
+                    }
+                }
+
+                if (result.ut) {
+                    localStorage.apiut = result.ut;
+                }
+
+                Object.defineProperty(u_attr, 'flags', {
+                    configurable: true,
+                    value: freeze(result.flags || {})
+                });
+                mBroadcaster.sendMessage('global-mega-flags', u_attr.flags);
+            }
+
+            return result;
+        });
 };
 
 /**
@@ -455,10 +496,10 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
         return;
     }
 
-    M.safeShowDialog('recovery-key-dialog', function() {
+    M.safeShowDialog('recovery-key-dialog', () => {
 
         $('.skip-button, button.js-close', $dialog).removeClass('hidden').rebind('click', closeDialog);
-        $('.copy-recovery-key-button', $dialog).removeClass('hidden').rebind('click', function() {
+        $('.copy-recovery-key-button', $dialog).removeClass('hidden').rebind('click', () => {
             // Export key showing a toast message
             u_exportkey(l[6040]);
         });
@@ -472,7 +513,7 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
                 $('button.js-close', $dialog).addClass('hidden');
                 $('.copy-recovery-key-button', $dialog).addClass('hidden');
                 $('i.js-key', $dialog).addClass('shiny');
-                $dialog.addClass('post-register').rebind('dialog-closed', function() {
+                $dialog.addClass('post-register').rebind('dialog-closed', () => {
                     eventlog(localStorage.recoverykey ? 99718 : 99719);
                     $dialog.unbind('dialog-closed');
                 });
@@ -489,9 +530,9 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
                 break;
         }
 
-        $('.save-recovery-key-button', $dialog).rebind('click', function() {
+        $('.save-recovery-key-button', $dialog).rebind('click', () => {
             if ($dialog.hasClass('post-register')) {
-                M.safeShowDialog('recovery-key-info', function() {
+                M.safeShowDialog('recovery-key-info', () => {
                     // Show user recovery key info warning
                     $dialog.addClass('hidden').removeClass('post-register');
                     $dialog = $('.mega-dialog.recovery-key-info');
@@ -533,29 +574,30 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
 
         });
 
-        $('a.toResetLink', $dialog).rebind('click', function() {
+        $('a.toResetLink', $dialog).rebind('click', () => {
             loadingDialog.show();
 
-            M.req({a: 'erm', m: u_attr.email, t: 9}).always(function(res) {
-                closeDialog();
-                loadingDialog.hide();
-
-                if (res === ENOENT) {
-                    msgDialog('warningb', l[1513], l[1946]);
-                }
-                else if (res === 0) {
-                    if (!is_mobile) {
+            api.req({a: 'erm', m: u_attr.email, t: 9})
+                .then(({result}) => {
+                    assert(result === 0);
+                    if (is_mobile) {
+                        msgDialog('info', '', l[735]);
+                    }
+                    else {
                         fm_showoverlay();
                         $('.mega-dialog.account-reset-confirmation').removeClass('hidden');
                     }
-                    else {
-                        msgDialog('info', '', l[735]);
+                })
+                .catch((ex) => {
+                    if (ex === ENOENT) {
+                        return msgDialog('warningb', l[1513], l[1946]);
                     }
-                }
-                else {
-                    msgDialog('warningb', l[135], l[200]);
-                }
-            });
+                    tell(ex);
+                })
+                .finally(() => {
+                    closeDialog();
+                    loadingDialog.hide();
+                });
 
             return false;
         });
@@ -564,67 +606,6 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
 
         return $dialog;
     });
-};
-
-MegaData.prototype.hideClickHint = function() {
-    'use strict';
-
-    if (mega.cttHintTimer) {
-        clearTimeout(mega.cttHintTimer);
-        delete mega.cttHintTimer;
-    }
-
-    // implicitly invoking this function will cause that the hint won't be seen anymore.
-    onIdle(function() {
-        mega.config.set('ctt', 1);
-    });
-
-    $('.show-hints').removeAttr('style');
-    $('.dropdown.click-hint').addClass('hidden').removeAttr('style');
-};
-
-MegaData.prototype.showClickHint = function(force) {
-    'use strict';
-
-    // Temporarily disabled. This will be added back in future with new design changes.
-    return false;
-
-    this.hideClickHint();
-
-    // if the click-tooltip was not seen already
-    if (force || !mega.config.get('ctt')) {
-        mega.cttHintTimer = setTimeout(function() {
-            $('.show-hints').fadeIn(300, function() {
-                $(this).removeClass('hidden');
-
-                var $hint = $('.dropdown.click-hint');
-                var $thumb = $('.hint-thumb', $hint);
-                $hint.position({
-                    of: this,
-                    my: 'left top-5px',
-                    at: 'left+27px top'
-                });
-                $hint.fadeIn(450, function() {
-                    $(this).removeClass('hidden');
-                    $('.close-button', $hint).rebind('click', M.hideClickHint.bind(M));
-                });
-
-                var imageSwapTimer = setInterval(function() {
-                    if (!mega.cttHintTimer) {
-                        return clearInterval(imageSwapTimer);
-                    }
-                    if ($thumb.hasClass('left-click')) {
-                        $thumb.switchClass("left-click", "right-click", 1000, "easeInOutQuad");
-                    }
-                    else {
-                        $thumb.switchClass("right-click", "left-click", 1000, "easeInOutQuad");
-                    }
-                }, 5e3);
-            }).rebind('click', M.showClickHint.bind(M, true));
-        }, force || 300);
-    }
-
-    return false;
 };
 
 MegaData.prototype.showPaymentCardBanner = function(status) {
@@ -721,18 +702,23 @@ MegaData.prototype.showPaymentCardBanner = function(status) {
 MegaData.prototype.showOverStorageQuota = function(quota, options) {
     'use strict';
 
-    var promise = new MegaPromise();
     if (quota === undefined && options === undefined) {
-        return promise.reject();
+        return Promise.reject(EARGS);
     }
 
     if (!pro.membershipPlans || !pro.membershipPlans.length) {
-        pro.loadMembershipPlans(function() {
-            M.showOverStorageQuota(quota, options);
+        return new Promise((resolve, reject) => {
+            pro.loadMembershipPlans(() => {
+                if (!pro.membershipPlans || !pro.membershipPlans.length) {
+                    reject(EINCOMPLETE);
+                }
+                else {
+                    M.showOverStorageQuota(quota, options).then(resolve).catch(reject);
+                }
+            });
         });
-        // no caller relay on the promise really, 1 call has .always
-        return promise.reject();
     }
+    const {promise} = mega;
 
     if (quota && quota.isFull && Object(u_attr).uspw) {
         // full quota, and uspw exist --> overwrite the full quota warning.
@@ -752,11 +738,15 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
     if (quota === EPAYWALL) { // ODQ paywall
 
-        if (!M.account) {
-            M.accountData(function() {
-                M.showOverStorageQuota(quota, options);
+        if (!this.account) {
+            return new Promise((resolve, reject) => {
+                this.accountData(() => {
+                    if (!this.account) {
+                        return reject(EINTERNAL);
+                    }
+                    this.showOverStorageQuota(quota, options).then(resolve).catch(reject);
+                });
             });
-            return promise.reject();
         }
         $('.fm-main').addClass('fm-notification full');
 
@@ -858,8 +848,10 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
                 window.closeDialog();
             }
             $('.fm-main').removeClass('fm-notification almost-full full');
-            return promise.reject();
+
+            return Promise.reject();
         }
+
         $('.fm-notification-block.full')
             .safeHTML(
                 `<i class="notification-block-icon sprite-fm-mono icon-offline"></i>
@@ -999,7 +991,7 @@ mBroadcaster.once('fm:initialized', () => {
             M.showPaymentCardBanner(M.account.cce);
         }
         else {
-            M.req({ a: 'uq', pro: 1 }).then((res) => {
+            api.req({a: 'uq', pro: 1}).then(({result: res}) => {
                 if (typeof res === 'object' && res.cce) {
                     M.showPaymentCardBanner(res.cce);
                 }

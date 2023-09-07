@@ -138,7 +138,7 @@ RichpreviewsFilter.retrievePreview = function(url) {
 
     if (!RichpreviewsFilter._requests[url]) {
 
-        RichpreviewsFilter._requests[url] = asyncApiReq({"a":"erlsd", "url": url});
+        RichpreviewsFilter._requests[url] = asyncApiReq({a: "erlsd", url}).catch(dump);
     }
 
     return RichpreviewsFilter._requests[url];
@@ -293,11 +293,11 @@ RichpreviewsFilter._updateMessageToPreview = function(chatRoom, msgObj, response
             return;
         }
         else {
-            setTimeout(function() {
+            tSleep(0.6).then(() => {
                 // try again a bit later, since this message may be still not "confirmed" in the messagesBuff,
                 // because of throttling
                 RichpreviewsFilter._updateMessageToPreview(chatRoom, msgObj, responses, true);
-            }, 500);
+            });
         }
         return;
     }
@@ -388,12 +388,12 @@ RichpreviewsFilter.prototype.onPendingMessageConfirmed = function(chatRoom, msgO
     var retrievePromises = [];
     var responses = [];
 
-    var urlLoaded = function (response) {
+    const urlLoaded = (response) => {
         responses.push(response);
     };
-    var urlFailedToLoad = function () {
+    const urlFailedToLoad = (url, ex) => {
         if (d) {
-            console.error("rich preview fail", arguments);
+            console.error("rich preview fail", [url], ex);
         }
     };
 
@@ -405,8 +405,8 @@ RichpreviewsFilter.prototype.onPendingMessageConfirmed = function(chatRoom, msgO
             for (var x = 0; x < urls.length; x++) {
                 retrievePromises.push(
                     RichpreviewsFilter.retrievePreview(urls[x])
-                        .done(urlLoaded)
-                        .fail(urlFailedToLoad)
+                        .then(urlLoaded)
+                        .catch(urlFailedToLoad.bind(null, urls[x]))
                 );
                 delete RichpreviewsFilter._waitConfirm[key];
             }
@@ -423,11 +423,11 @@ RichpreviewsFilter.prototype.onPendingMessageConfirmed = function(chatRoom, msgO
     }
 
     return retrievePromises.length > 0 ?
-        MegaPromise.allDone(retrievePromises)
-            .done(function() {
+        Promise.allSettled(retrievePromises)
+            .then(() => {
                 RichpreviewsFilter._updateMessageToPreview(chatRoom, msgObj, responses, false);
             })
-            .always(function() {
+            .finally(() => {
                 for (var i = 0; i < keys.length; i++) {
                     delete RichpreviewsFilter._waitConfirm[keys[i]];
                 }
@@ -457,12 +457,12 @@ RichpreviewsFilter.prototype.cancelLoading = function(chatRoom, msgObj) {
     if (url) {
         RichpreviewsFilter._canceled[key] = true;
         if (RichpreviewsFilter._requests[url]) {
-            RichpreviewsFilter._requests[url].always(function () {
-                setTimeout(function () {
+            RichpreviewsFilter._requests[url]
+                .then(() => tSleep(1.5))
+                .then(() => {
                     // cleanup
                     delete RichpreviewsFilter._canceled[url];
-                }, 1500);
-            });
+                });
         }
         if (msgObj.meta && msgObj.meta.isLoading) {
             msgObj.meta.isLoading = false;

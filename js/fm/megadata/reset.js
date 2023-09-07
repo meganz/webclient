@@ -1,4 +1,6 @@
 MegaData.prototype.reset = function() {
+    'use strict';
+
     this.v = [];
     this.d = Object.create(null);
     this.c = Object.create(null);
@@ -35,10 +37,17 @@ MegaData.prototype.reset = function() {
     this.RubbishID = undefined;
     this.InboxID = undefined;
     this.viewmode = 0; // 0 list view, 1 block view
+    this.currentdirid = false;
+    this.currentrootid = false;
     this.currentCustomView = false;
+    this.recentsRender = null;
 
     var tree$tmpl = document.getElementById('template-tree-item');
     this.tree$tmpl = tree$tmpl && tree$tmpl.firstElementChild.cloneNode(true) || document.createElement('li');
 
     mBroadcaster.sendMessage("MegaDataReset");
+
+    return this;
 };
+
+Object.freeze(MegaData.prototype);

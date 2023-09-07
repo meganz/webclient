@@ -33,8 +33,7 @@ var register_txt = false;
 var login_next = false;
 var loggedout = false;
 var flhashchange = false;
-var is_chatlink = false;
-var avatars = {};
+var avatars = Object.create(null);
 var mega_title = 'MEGA';
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
@@ -47,10 +46,6 @@ pages.placeholder = '<div class="bottom-page scroll-block placeholder selectable
 
 mBroadcaster.once('startMega', function() {
     'use strict';
-
-    if (is_mobile) {
-        pages.placeholder = pages.mobile || '';
-    }
 
     if (pages['dialogs-common']) {
         $('body').safeAppend(translate(pages['dialogs-common'].replace(/{staticpath}/g, staticpath)));
@@ -70,6 +65,22 @@ mBroadcaster.once('startMega', function() {
 
     if (({'fa': 1,'ar': 1,'he': 1})[lang]) {
         document.body.classList.add('rtl');
+    }
+
+
+    if (is_mobile) {
+        delete pages.placeholder;
+        pages = new Proxy(pages, {
+            get(target, prop) {
+                if (target[prop] === undefined) {
+                    if (d) {
+                        console.info(`[proxy] providing 'mobile' page for '${prop}'`);
+                    }
+                    return target.mobile || '';
+                }
+                return target[prop] || '';
+            }
+        });
     }
 });
 
@@ -176,7 +187,7 @@ function topMenu(close) {
                     topMenuDataUpdate(data);
 
                     if (fminitialized && !folderlink && M.currentTreeType === 'cloud-drive') {
-                        M.checkLeftStorageBlock(data);
+                        return M.checkLeftStorageBlock(data);
                     }
                 }).catch(dump);
             }
@@ -269,7 +280,9 @@ function scrollMenu() {
 }
 
 function topPopupAlign(button, popup, topPos) {
-    $.popupAlign = function () {
+    'use strict';
+
+    const popupAlign = () => {
         var $button = $(button),
             $popup = $(popup),
             $popupArrow = $popup.children('.dropdown-white-arrow'),
@@ -322,19 +335,18 @@ function topPopupAlign(button, popup, topPos) {
 
     // If top menu is opened - set timeout to count correct positions
     if (!$('.top-menu-popup').hasClass('o-hidden') || $('body').hasClass('hidden')) {
-        setTimeout(function () {
-            $.popupAlign();
-        }, 250);
+
+        tSleep(0.2).then(() => requestAnimationFrame(popupAlign));
     }
     else {
-        $.popupAlign();
+        requestAnimationFrame(popupAlign);
     }
 }
 
 function init_page() {
     page = page || (u_type ? 'fm' : 'start');
 
-    if (!window.M) {
+    if (!window.M || is_megadrop) {
         return console.warn('Something went wrong, the initialization did not completed...');
     }
 
@@ -501,7 +513,7 @@ function init_page() {
             init();
         }
 
-        mega.ui.theme.setWithUA();
+        mega.ui.setTheme();
 
         return;
     }
@@ -631,32 +643,24 @@ function init_page() {
 
             if (pfkey.length === 22) {
                 api_setfolder(n_h);
-                if (waitxhr) {
-                    waitsc();
-                }
+                waitsc.poke();
                 u_n = pfid;
             }
             else {
-                // If mobile, show the decryption key overlay
-                if (is_mobile) {
-                    mobile.initDOM();
-                    mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
-                    fm_hideoverlay();
-                }
-                else {
-                    // Insert placeholder background page while waiting for user input
-                    parsepage(pages.placeholder);
+                // Insert placeholder background page while waiting for user input
+                parsepage(pages.placeholder);
 
-                    // Lets apply theme for this dialog
-                    mega.ui.theme.setWithUA();
+                // Let's apply theme for this dialog
+                mega.ui.setTheme();
+                onIdle(topmenuUI);
 
-                    // Show the decryption key dialog on top
-                    mKeyDialog(pfid, true, pfkey, newLinkSelector)
-                        .fail(function() {
-                            loadSubPage('start');
-                        });
-                    pfkey = false;
-                }
+                // Show the decryption key dialog on top
+                mKeyDialog(pfid, true, pfkey, newLinkSelector)
+                    .catch(() => {
+                        loadSubPage('start');
+                    });
+
+                pfkey = false;
                 return false;
             }
 
@@ -800,7 +804,7 @@ function init_page() {
             exportPassword.decrypt.init(page);
 
             // lets set them for the dialog.
-            mega.ui.theme.setWithUA();
+            mega.ui.setTheme();
         }
     }
     else if (page.substr(0, 4) === 'blog') {
@@ -890,113 +894,49 @@ function init_page() {
     else if (page === 'confirm') {
 
         loadingDialog.show();
+        security.register.verifyEmailConfirmCode(confirmcode)
+            .then(({email}) => {
 
-        // A callback for when the email confirm code was valid
-        var signUpSucceededCallback = function(email) {
+                page = 'login';
+                confirmok = true;
+                parsepage(pages.login);
+                onIdle(topmenuUI);
 
-            loadingDialog.hide();
-            confirmok = true;
-            page = 'login';
-
-            if (is_mobile) {
-                mobile.initDOM();
-                mobile.register.showConfirmAccountScreen(email);
-            }
-            else {
-                parsepage(pages['login']);
-                login_txt = l[378];
-
-                init_login();
-                if (email) {
-                    $('#login-name2').val(email).blur();
-                    $('.register-st2-button').addClass('active');
-                    $('#login-name2').prop('readonly', true);
-                }
-                topmenuUI();
-            }
-        };
-
-        // A callback for when the email confirm code was invalid
-        var signUpFailedCallback = function(result) {
-
-            loadingDialog.hide();
-            page = 'login';
-
-            if (is_mobile) {
-                parsepage(pages['mobile']);
-                mobile.register.showConfirmAccountFailure(result);
-            }
-            else {
-                if (result === EINCOMPLETE) {
-                    alert(l[703]);
-                }
-                else if (result === ENOENT) {
-                    login_txt = l[19788];
-                }
-                else {
-                    alert(l[705] + result);
-                }
-
-                parsepage(pages['login']);
-                init_login();
-                topmenuUI();
-            }
-        };
-
-        // Decode the email confirm code
-        var decodedConfirmCode = base64urldecode(confirmcode);
-
-        // Check if they registered using the new registration process (version 2)
-        if (decodedConfirmCode.substr(0, 13) === 'ConfirmCodeV2') {
-
-            // If already logged into an account
-            if (u_type === 3) {
-
-                // Ask them to log out and click on the confirmation link again
                 if (is_mobile) {
-                    parsepage(pages['mobile']);
-                    mobile.messageOverlay.show(l[2480], l[12440], function() {
-                        loadSubPage('fm');
-                    });
+                    mobile.register.showConfirmAccountScreen(email);
                 }
                 else {
-                    msgDialog('warningb', l[2480], l[12440], false, function() {
-                        loadSubPage('fm');
-                    });
-                }
-                return false;
-            }
+                    login_txt = l[378];
+                    init_login();
 
-            // Verify the confirm code using the new process
-            security.register.verifyEmailConfirmCode(confirmcode, function(result, email) {
-
-                // If successful
-                if (typeof email === 'string') {
-
-                    if (u_handle && u_handle === result[2]) {
-                        // same account still in active session, let's end.
-                        if ('csp' in window) {
-                            const storage = localStorage;
-                            const value = storage[`csp.${u_handle}`];
-
-                            if (value) {
-                                storage.csp = value;
-                            }
-                        }
-                        u_logout(1);
+                    if (email) {
+                        $('#login-name2').val(email).blur();
+                        $('.register-st2-button').addClass('active');
+                        $('#login-name2').prop('readonly', true);
                     }
+                }
+            })
+            .catch((ex) => {
+                if (ex === EROLLEDBACK) {
+                    return;
+                }
 
-                    signUpSucceededCallback(email);
+                page = 'login';
+                parsepage(pages.login);
+
+                if (is_mobile) {
+                    mobile.register.showConfirmAccountFailure(ex);
                 }
                 else {
-                    signUpFailedCallback(result);
+                    login_txt = ex === ENOENT ? l[19788] : String(ex).includes(l[703]) && l[703] || `${l[705]} ${ex}`;
+
+                    init_login();
+                    topmenuUI();
                 }
+            })
+            .finally(() => {
+                loadingDialog.hide();
             });
-        }
-        else {
-            console.error("Unsupported verification code.");
-            signUpFailedCallback(EINCOMPLETE);
-        }
     }
     else if (page.startsWith('emailverify')) {
         return security.showVerifyEmailDialog('login-to-account');
@@ -1195,13 +1135,6 @@ function init_page() {
     }
     else if (page == 'account') {
         loadSubPage('fm/account');
-        return false;
-    }
-    else if (page.substr(0, 11) === 'filerequest') {
-        mega.fileRequestUpload.handlePublicUploadPage(page.substr(12));
-    }
-    else if (page.substr(0, 8) === 'megadrop') {
-        loadSubPage(`filerequest/${page.substr(9)}`);
         return false;
     }
     else if (page == 'dashboard') {
@@ -1813,12 +1746,12 @@ function init_page() {
         };
 
         if ((unixtime() - TWO_HOURS_IN_SECONDS) < contactRequestTime) {
-            M.syncContactEmail(contactHandle, new MegaPromise(), true)
+            M.syncContactEmail(contactHandle, true)
                 .then(function(email) {
                     addContact(u_attr.email, email);
                 })
                 .catch(function(ex) {
-                    console.error(ex);
+                    console.error(contactHandle, ex);
                     localStorage.removeItem('addContact');
                 });
         }
@@ -1837,7 +1770,7 @@ function init_page() {
 
         // Set System default theme or any previously selected
         if (!is_mobile) {
-            mega.ui.theme.setWithUA();
+            mega.ui.setTheme();
         }
 
         if (!id && fminitialized) {
@@ -1852,30 +1785,14 @@ function init_page() {
         // switch between FM & folderlinks (completely reinitialize)
         if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
 
-            M.reset();
+            u_reset();
             folderlink = 0;
-            fminitialized = false;
-            loadfm.loaded = false;
-            loadfm.loading = false;
-
-            stopapi();
-            api_reset();
-            initworkerpool();
 
             if (u_sid) {
                 api_setsid(u_sid);
             }
             if (pfid) {
                 api_setfolder(n_h);
-            }
-
-            // re-initialize waitd connection when switching.
-            if (waitxhr) {
-                waitsc();
-            }
-
-            if (typeof mDBcls === 'function') {
-                mDBcls(); // close fmdb
             }
         }
 
@@ -1884,9 +1801,6 @@ function init_page() {
         }
 
         if (!fminitialized) {
-            if (id) {
-                M.currentdirid = id;
-            }
             if (is_mobile) {
                 $('#fmholder').safeHTML(translate(pages['mobile'].replace(/{staticpath}/g, staticpath)));
             }
@@ -1897,6 +1811,10 @@ function init_page() {
             assert(!is_chatlink);
             mega.initLoadReport();
             loadfm();
+
+            if (id) {
+                M.currentdirid = id;
+            }
         }
         else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start')) {
             M.openFolder(id, true);
@@ -1988,9 +1906,8 @@ function init_page() {
             if (!$('.transfer-table tr#dl_' + Object(fdl_queue_var).ph).length) {
                 var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
                 if (fdl && fdl_queue_var.dlkey === dlpage_key) {
-                    $.tapioca = Array.isArray(fdl.url);
 
-                    Soon(function () {
+                    onIdle(() => {
                         M.putToTransferTable(fdl);
                         M.onDownloadAdded(1, dlQueue.isPaused(dlmanager.getGID(fdl)));
 
@@ -2035,12 +1952,6 @@ function init_page() {
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
     }
-
-    // Hide click-tooltip
-    if (mega.cttHintTimer) {
-        M.hideClickHint();
-    }
-
     topmenuUI();
 
     if (!window.is_karma && mega.metatags) {
@@ -2382,17 +2293,18 @@ function topmenuUI() {
     // Show version in top menu
     var $versionButton = $('.top-mega-version', $topMenu).text('v. ' + M.getSiteVersion());
 
-    var versionClickCounter = 0;
-    var versionClickTimeout = null;
-    $versionButton.rebind('click.versionupdate', () => {
-        clearTimeout(versionClickTimeout);
-        if (++versionClickCounter >= 3) {
-            mega.developerSettings.show();
-        }
-        versionClickTimeout = setTimeout(() => {
-            versionClickCounter = 0;
-        }, 1000);
-    });
+    if ($versionButton.length) {
+        let versionClickCounter = 0;
+
+        $versionButton.rebind('click.versionupdate', () => {
+            if (++versionClickCounter >= 3) {
+                mega.developerSettings.show();
+            }
+            delay('top-version-click', () => {
+                versionClickCounter = 0;
+            }, 1000);
+        });
+    }
 
     if (u_type > 0) {
 
@@ -2405,10 +2317,12 @@ function topmenuUI() {
 
         // for top menu, load avatar and show for logged in user
         if (!$topBarAvatar.hasClass('rendered')) {
-            useravatar.loadAvatar(u_handle).always(function(){
+
+            delay('load-own-avatar', async() => {
                 $topBarAvatar.addClass('rendered');
-                $('.avatar',$topBarAvatar).safeHTML(useravatar.contact(u_handle));
-            });
+                await Promise.resolve(useravatar.loadAvatar(u_handle)).catch(nop);
+                $('.avatar', $topBarAvatar).safeHTML(useravatar.contact(u_handle));
+            }, 888);
         }
 
         $headerButtons.addClass('hidden');
@@ -3145,8 +3059,7 @@ function parsepage(pagehtml) {
 
     // if this is bottom page & not Download Page we have to enforce light mode for now.
     if (page === 'download' && !is_mobile) {
-        const theme = u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : 0;
-        mega.ui.theme.set(theme);
+        mega.ui.setTheme();
     }
     else {
         document.body.classList.remove('theme-dark');
@@ -3472,6 +3385,12 @@ mBroadcaster.once('boot_done', () => {
         }));
     }
 
+    if (!u_sid) {
+        mBroadcaster.sendMessage('update-api-search-params');
+    }
+
+    // ---------------------------------------------------------------------
+
     if (d) {
         if (!window.crossOriginIsolated) {
             if (window.crossOriginIsolated === false) {
@@ -3501,23 +3420,53 @@ mBroadcaster.once('boot_done', () => {
 });
 
 // After open folder call, check if we should restore any previously opened preview node.
-mBroadcaster.once('mega:openfolder', function() {
+mBroadcaster.once('mega:openfolder', () => {
     'use strict';
-
-    // No need to re-initiate preview when on Album page
-    if (M.isAlbumsPage()) {
-        sessionStorage.removeItem('previewNode');
-        return;
-    }
 
     const {previewNode} = sessionStorage;
     if (previewNode) {
         sessionStorage.removeItem('previewNode');
-        slideshow(previewNode);
+
+        // No need to re-initiate preview when on Album page
+        if (!M.isAlbumsPage()) {
+            slideshow(previewNode);
+        }
     }
 
     // Send some data to mega.io that we logged in
     if (u_type > 2) {
         initMegaIoIframe(true);
     }
+});
+
+mBroadcaster.addListener('global-mega-flags', () => {
+    'use strict';
+
+    mBroadcaster.sendMessage('update-api-search-params');
+});
+
+mBroadcaster.addListener('update-api-search-params', async() => {
+    'use strict';
+    if (!self.M) {
+        return;
+    }
+
+    let qs = null;
+    const {apiut: ut, jid} = localStorage;
+
+    if (mega.flags.jid && !localStorage.njt) {
+        let j = jid || await M.getPersistentData('jid').catch(nop);
+        if (!j) {
+            localStorage.jid = j = mega.flags.jid;
+            M.setPersistentData('jid', j).catch(dump);
+        }
+        qs = {...qs, j};
+    }
+
+    if (ut) {
+
+        qs = {...qs, ut};
+    }
+
+    api.recycleURLSearchParams('ut,j', qs);
 });

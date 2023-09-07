@@ -50,11 +50,11 @@ function addNewContact($addButton, cd) {
             var currentContactsEmails = [];
 
             var pushAsAddedEmails = function() {
-                if (currentContactsEmails.indexOf(email) === -1) {
+                if (!currentContactsEmails.includes(email) && !M.findOutgoingPendingContactIdByEmail(email)) {
                     // if invitation is sent, push as added Emails.
-                    promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
-                        addedEmails.push(res);
-                    }));
+                    promises.push(
+                        M.inviteContact(M.u[u_handle].m, email, emailText).then((res) => addedEmails.push(res))
+                    );
                 }
             };
 
@@ -86,7 +86,7 @@ function addNewContact($addButton, cd) {
             }
 
             // after all process is done, and there is added email(s), show invitation sent dialog.
-            MegaPromise.allDone(promises).always(function() {
+            Promise.allSettled(promises).always(() => {
                 if (addedEmails.length > 0) {
                     title = mega.icu.format(l.contacts_invited_title, addedEmails.length);
                     msg = addedEmails.length === 1 ? l[5898] : l[5899];
@@ -119,8 +119,19 @@ function addNewContact($addButton, cd) {
  *
  * Handle shared/export link icons in Cloud Drive
  * @param {String} nodeHandle selected node id
+ * @param {*} [force] no delay
  */
-function sharedUInode(nodeHandle) {
+// eslint-disable-next-line complexity
+function sharedUInode(nodeHandle, force) {
+    'use strict';
+
+    if (!fminitialized) {
+        return;
+    }
+
+    if (!force) {
+        return delay(`sharedUInode:${nodeHandle}`, () => sharedUInode(nodeHandle, true), 666);
+    }
 
     var oShares;
     var bExportLink = false;
@@ -128,16 +139,6 @@ function sharedUInode(nodeHandle) {
     var UiExportLink = new mega.UI.Share.ExportLink();
     var share = new mega.Share();
     var target;
-
-    if (!fminitialized) {
-        if (d) {
-            UiExportLink.logger.warn('Skipping sharedUInode call...');
-        }
-        return;
-    }
-    if (d) {
-        UiExportLink.logger.debug('Entering sharedUInode...');
-    }
 
     // Is there a full share or pending share available
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
@@ -421,16 +422,16 @@ function setContactLink($container) {
         $publicLink.attr('data-lnk', 'https://mega.nz/' + contactPrefix + M.account.contactLink);
     }
     else {
-        api_req({ a: 'clc' }, {
-            callback: function(res) {
+        api.send('clc')
+            .then((res) => {
                 if (typeof res === 'string') {
-                    contactPrefix =  res.match('^C!') ? '' : 'C!';
+                    contactPrefix = res.match('^C!') ? '' : 'C!';
                     res = 'https://mega.nz/' + contactPrefix + res;
                     $publicLink.attr('data-lnk', res);
                     mBroadcaster.sendMessage('contact:setContactLink', res);
                 }
-            }
-        });
+            })
+            .catch(tell);
     }
 
     $publicLink.rebind('mouseout.publiclnk', function() {
@@ -617,10 +618,12 @@ function fmtopUI() {
         $('.fm-new-folder').removeClass('hidden');
         $('.fm-file-upload').removeClass('hidden');
         $('.fm-uploads').removeClass('hidden');
-        if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
-            $('.fm-folder-upload').removeClass('hidden');
+
+        if ($.hasWebKitDirectorySupport === undefined) {
+            $.hasWebKitDirectorySupport = 'webkitdirectory' in document.createElement('input');
         }
-        else if (ua.details.engine === 'Gecko') {
+
+        if ($.hasWebKitDirectorySupport) {
             $('.fm-folder-upload').removeClass('hidden');
         }
         else {
@@ -724,6 +727,7 @@ function fmtopUI() {
     if (M.currentrootid === 'file-requests') {
         mega.fileRequest.rebindTopMenuCreateIcon();
     }
+    $.tresizer();
 }
 
 /**
@@ -795,12 +799,7 @@ function doClearbin(all) {
 
     msgDialog('clear-bin', l[14], l[15], l[1007], function(e) {
         if (e) {
-            M.clearRubbish(all);
-
-            // Navigate to root of rubbish bin
-            if (all) {
-                M.openFolder(M.RubbishID, true);
-            }
+            M.clearRubbish(all).catch(dump);
         }
     });
 }
@@ -1033,10 +1032,10 @@ function FMShortcuts() {
             op = op === 'cut' && dir === M.currentdirid ? 'copy' : op;
 
             if (op === "copy") {
-                M.copyNodes(handles, M.currentdirid);
+                M.copyNodes(handles, M.currentdirid).catch(tell);
             }
             else if (op === "cut") {
-                M.moveNodes(handles, M.currentdirid);
+                M.moveNodes(handles, M.currentdirid).catch(tell);
                 current_operation = null;
             }
 
@@ -1110,30 +1109,26 @@ function fm_showoverlay() {
 }
 
 /**
- * Looking for a already existing name of URL (M.v)
+ * Search for an existing node name
  * @param {String} value New file/folder name
- * @param {String} target {optional}Target handle to check the duplication inside. if not provided M.v will be used
+ * @param {String} [target] Target folder to check for duplication. If not provided, M.v will be used.
+ * @returns {Boolean} Whether it does exist.
  */
 function duplicated(value, target) {
     "use strict";
     if (!target) {
-        var items = M.v.filter(function (item) {
-            return item.name === value;
-        });
-
-        return items.length !== 0;
+        return M.v.some((n) => n.name === value);
     }
-    else {
-        if (M.c[target]) {
-            // Check if a folder/file with the same name already exists.
-            for (var handle in M.c[target]) {
-                if (M.d[handle] && M.d[handle].name === value) {
-                    return true;
-                }
+
+    if (M.c[target]) {
+        for (const handle in M.c[target]) {
+            if (M.d[handle] && M.d[handle].name === value) {
+                return true;
             }
         }
-        return false;
     }
+
+    return false;
 }
 
 /**
@@ -1250,7 +1245,7 @@ function renameDialog() {
                             errMsg = l[23219];
                         }
                         else {
-                            M.rename(n.h, value);
+                            M.rename(n.h, value).catch(tell);
                         }
                     }
                     else if (value.length > 250) {
@@ -1335,17 +1330,24 @@ function renameDialog() {
  * @param {String} type Dialog type. May also contain button labels: "remove:!^$Cancel!Delete"
  * @param {String} title Header text
  * @param {String} msg Main information text
- * @param {String} submsg Addition text (Optional)
- * @param {Function} callback The function to invoke on button click
- * @param {Boolean|String} checkboxSetting Show "Do not show again" block if True
- * @param {Boolean} showCloseButton Optional toggle to show the close icon in the top right
+ * @param {String} [submsg] Addition text (Optional)
+ * @param {Function} [callback] The function to invoke on button click
+ * @param {Boolean|String} [checkboxSetting] Show "Do not show again" block if True
  * @returns {void}
  */
 // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
-function msgDialog(type, title, msg, submsg, callback, checkboxSetting, showCloseButton) {
+function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     'use strict';
-    var doneButton  = l.ok_button;
-    var extraButton = String(type).split(':');
+    let doneButton = l.ok_button;
+    let showCloseButton = checkboxSetting === 1;
+
+    type = String(type);
+    if (type[0] === '*') {
+        type = type.slice(1);
+        showCloseButton = true;
+    }
+    let extraButton = type.split(':');
+
     if (extraButton.length === 1) {
         extraButton = null;
     }
@@ -1365,8 +1367,8 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting, showClos
             }
         }
     }
-    if (d) {
-        console.assert(!$.warningCallback, 'Check this out...');
+    if (d && $.warningCallback) {
+        console.warn(`There is another dialog open!.. ${$.msgDialog}, ${$.warningCallback}`);
     }
     $.msgDialog = type;
     $.warningCallback = typeof callback === 'function' && ((res) => onIdle(callback.bind(null, res, null)));
@@ -1377,10 +1379,6 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting, showClos
 
     $dialog.parent().addClass('msg-dialog-container');
     $('#msgDialog aside').addClass('hidden');
-
-    if (checkboxSetting === 1) {
-        $dialog.addClass('with-close-btn');
-    }
 
     // Show the top right close (x) button
     if (showCloseButton) {
@@ -1563,6 +1561,11 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting, showClos
 
         checkboxSetting = checkboxSetting === 1 ? null : checkboxSetting;
         if (checkboxSetting) {
+            assert(
+                checkboxSetting === 'cslrem'
+                || checkboxSetting === 'nowarnpl'
+                || checkboxSetting === 'skipDelWarning', checkboxSetting);
+
             $('#msgDialog .checkbox-block .checkdiv,' +
                 '#msgDialog .checkbox-block input')
                     .removeClass('checkboxOn').addClass('checkboxOff');
@@ -1705,6 +1708,17 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting, showClos
     }
 }
 
+// eslint-disable-next-line strict -- see {@link msgDialog}
+function asyncMsgDialog(...args) {
+    return new Promise((resolve, reject) => {
+        const callback = args[4] || echo;
+        args[4] = tryCatch((value) => {
+            Promise.resolve(callback(value)).then(resolve).catch(reject);
+        }, reject);
+        msgDialog(...args);
+    });
+}
+
 function closeMsg() {
     var $dialog = $('#msgDialog').addClass('hidden');
     $dialog.parent().removeClass('msg-dialog-container');
@@ -1721,21 +1735,6 @@ function closeMsg() {
     mBroadcaster.sendMessage('msgdialog-closed');
 }
 
-function asyncConfirmationDialog(title, msg, submsg, checkboxSetting, showCloseButton, affirmButton, rejectButton) {
-    'use strict';
-    return new Promise((resolve, reject) => {
-        tryCatch(() => {
-            let type = 'confirmation';
-            if (affirmButton && rejectButton) {
-                type = `confirmation:!^${affirmButton}!${rejectButton}`;
-            }
-            msgDialog(type, title, msg, submsg, (e) => {
-                resolve(e);
-            }, checkboxSetting, showCloseButton);
-        }, reject)();
-    });
-}
-
 /**
  * opens a contact link dialog, after getting all needed info from API
  *
@@ -1744,12 +1743,19 @@ function asyncConfirmationDialog(title, msg, submsg, checkboxSetting, showCloseB
  */
 function openContactInfoLink(contactLink) {
     var $dialog = $('.mega-dialog.qr-contact');
-    var QRContactDialogPrepare = function QRContactDialogPrepare(em, fullname, ctHandle) {
+    var QRContactDialogPrepare = function QRContactDialogPrepare(em, fullname, ctHandle, avatar) {
         $('.qr-contact-name', $dialog).text(fullname);
         $('.qr-contact-email', $dialog).text(em);
 
-        var curAvatar = useravatar.contact(em, 'small-rounded-avatar square');
-        $('.avatar-container-qr-contact', $dialog).html(curAvatar);
+        if (avatar && avatar.length > 5) {
+            useravatar.setUserAvatar(em, base64_to_ab(avatar));
+
+            avatar = `<div class="avatar-wrapper small-rounded-avatar"><img src="${avatars[em].url}"></div>`;
+        }
+        else {
+            avatar = useravatar.contact(em, 'small-rounded-avatar square');
+        }
+        $('.avatar-container-qr-contact', $dialog).safeHTML(avatar);
 
         var contactStatus = 1;
         if (u_handle) {
@@ -1806,28 +1812,24 @@ function openContactInfoLink(contactLink) {
                 return loadSubPage('login');
             });
         }
-        $dialog.removeClass('hidden');
     };
-    $('button.js-close', $dialog)
-        .rebind('click', function () {
-            closeDialog();
-            return false;
-        });
-    var req = { a: 'clg', cl: contactLink };
-    api_req(req, {
-        callback: function (res, ctx) {
-            if (typeof res === 'object') {
-                M.safeShowDialog('qr-contact', function () {
-                    QRContactDialogPrepare(res.e, res.fn + ' ' + res.ln, res.h);
-                    return $dialog;
-                });
 
-            }
-            else {
-                msgDialog('warningb', l[8531], l[17865]);
-            }
-        }
-    });
+
+    api.req({a: 'clg', cl: contactLink})
+        .then(({result}) => {
+
+            M.safeShowDialog('qr-contact', () => {
+                QRContactDialogPrepare(result.e, `${result.fn || ''} ${result.ln || ''}`, result.h, result['+a']);
+
+                $('button.js-close', $dialog).rebind('click', () => loadSubPage('fm'));
+                return $dialog.removeClass('hidden');
+            });
+
+        })
+        .catch((ex) => {
+            console.error(ex);
+            msgDialog('warningb', l[8531], l[17865]);
+        });
 }
 
 /**
@@ -2844,7 +2846,6 @@ function closeDialog(ev) {
         delete $.saveToDialogCb;
         delete $.saveToDialogNode;
         delete $.saveToDialog;
-        delete $.selectFolderCallback;
         delete $.chatAttachmentShare;
 
         if ($.saveToDialogPromise) {
@@ -2899,10 +2900,6 @@ function closeDialog(ev) {
         delete $.mcImport;
     }
 
-    if ($.dialog === 'selectFolder') {
-        delete $.selectFolderCallback;
-    }
-
     if (typeof redeem !== 'undefined' && redeem.$dialog) {
         redeem.$dialog.addClass('hidden');
     }
@@ -2933,11 +2930,6 @@ function closeDialog(ev) {
         // if the share-add dialog was closed from the share dialog
         // eslint-disable-next-line local-rules/hints
         $.dialog = $.shareDialog;
-    }
-
-    // this will close the FeedbackDialog correctly when clicking back arrow
-    if (mega.ui.FeedbackDialog._instance && mega.ui.FeedbackDialog._instance.visible) {
-        mega.ui.FeedbackDialog._instance.hide();
     }
 
     mBroadcaster.sendMessage('closedialog');
@@ -3002,34 +2994,34 @@ function createFolderDialog(close) {
         loadingDialog.pshow();
 
         M.createFolder(target, v)
-            .then(function(h) {
+            .then((h) => {
                 if (d) {
                     console.log('Created new folder %s->%s', target, h);
                 }
-                loadingDialog.phide();
+                createFolderDialog(1);
 
                 if (awaitingPromise) {
                     // dispatch an awaiting promise expecting to perform its own action instead of the default one
-                    awaitingPromise.resolve(h);
+                    queueMicrotask(() => awaitingPromise.resolve(h));
+                    return awaitingPromise;
                 }
-                else {
-                    // By default auto-select the newly created folder as long no awaiting promise
-                    M.openFolder(Object(M.d[h]).p || target)
-                        .always(function() {
-                            $.selected = [h];
-                            reselect(1);
-                        });
-                }
-                createFolderDialog(1);
-            })
-            .catch(function(ex) {
-                loadingDialog.phide();
 
+                // By default, auto-select the newly created folder as long no awaiting promise
+                return M.openFolder(Object(M.d[h]).p || target)
+                    .always(() => {
+                        $.selected = [h];
+                        reselect(1);
+                    });
+            })
+            .catch((ex) => {
                 msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex, function() {
                     if (awaitingPromise) {
                         awaitingPromise.reject(ex);
                     }
                 });
+            })
+            .finally(() => {
+                loadingDialog.phide();
             });
     };
 
@@ -3383,8 +3375,7 @@ function savecomplete(id)
 {
     $('.mega-dialog.download-dialog').addClass('hidden');
     fm_hideoverlay();
-    if (!$.dialog)
-        $('#dlswf_' + id).remove();
+
     var dl = dlmanager.getDownloadByHandle(id);
     if (dl) {
         M.dlcomplete(dl);
@@ -3677,17 +3668,22 @@ function enableVerifyFingerprintsButton(userHandle) {
 function fingerprintDialog(userid, isAdminVerify, callback) {
     'use strict';
 
-    // Add log to see how often they open the verify dialog
-    api_req({ a: 'log', e: 99601, m: 'Fingerprint verify dialog opened' });
-
     userid = userid.u || userid;
     const user = M.u[userid];
     if (!user || !user.u) {
         return -5;
     }
 
+    if (d) {
+        console.warn('fingerprint-dialog', user.h, [user], isAdminVerify, [callback]);
+    }
+
+    // Add log to see how often they open the verify dialog
+    eventlog(99601, !!isAdminVerify);
+
     const $dialog = $('.fingerprint-dialog');
 
+    $dialog.toggleClass('e-modal', isAdminVerify === null);
     $dialog.toggleClass('admin-verify', isAdminVerify === true);
     let titleTxt = l[6783];
     let subTitleTxt = l[6779];
@@ -3717,7 +3713,7 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
         }
         else {
             const bus = new BusinessAccount();
-            bus.sendSubMKey();
+            bus.sendSubMKey().catch(tell);
         }
     };
 

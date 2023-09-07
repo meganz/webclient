@@ -45,24 +45,26 @@ IndexedDBKVStorage.prototype.load = async function() {
 // will be a no-op if no fmdb set
 IndexedDBKVStorage.prototype.flush = function() {
     'use strict';
-    var k;
-    var fmdb = window.fmdb || false;
+    let v = 0;
+    const {fmdb} = window;
 
-    for (k in this.delcache) {
+    for (const k in this.delcache) {
         if (is_eplusplus) {
             M.delPersistentData('e++' + this.name + '!' + k).always(nop);
         }
         else if (fmdb) {
+            ++v;
             fmdb.del(this.name, k);
         }
         delete this.dbcache[k];
     }
 
-    for (k in this.newcache) {
+    for (const k in this.newcache) {
         if (is_eplusplus) {
             M.setPersistentData('e++' + this.name + '!' + k, this.newcache[k]).always(nop);
         }
         else if (fmdb) {
+            ++v;
             fmdb.add(this.name, {k: k, d: {v: this.newcache[k]}});
         }
         this.dbcache[k] = this.newcache[k];
@@ -70,18 +72,23 @@ IndexedDBKVStorage.prototype.flush = function() {
 
     this.delcache = Object.create(null);
     this.newcache = Object.create(null);
+
+    return v;
 };
 
 // set item in DB/cache
 // (must only be called in response to an API response triggered by an actionpacket)
 IndexedDBKVStorage.prototype.setItem = function __IDBKVSetItem(k, v) {
     'use strict';
-    var self = this;
     console.assert(v !== undefined);
-    return new MegaPromise(function(resolve) {
-        delete self.delcache[k];
-        self.newcache[k] = v;
-        self.saveState();
+
+    return new MegaPromise((resolve) => {
+        delete this.delcache[k];
+
+        if (this.dbcache[k] !== v) {
+            this.newcache[k] = v;
+            this.saveState();
+        }
         resolve([k, v]);
     });
 };
@@ -111,12 +118,16 @@ IndexedDBKVStorage.prototype.getItem = function __IDBKVGetItem(k) {
 
 // remove item from DB/cache
 // (must only be called in response to an API response triggered by an actionpacket)
-IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
+IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k, save) {
     'use strict';
 
     this.delcache[k] = true;
     delete this.newcache[k];
-    this.saveState();
+
+    // if save = false we do defer to the upcoming setItem() call, to prevent unnecessary DB ops.
+    if (save !== false) {
+        this.saveState();
+    }
 
     return MegaPromise.resolve();
 };
@@ -124,19 +135,19 @@ IndexedDBKVStorage.prototype.removeItem = function __IDBKVRemoveItem(k) {
 // enqueue explicit flush
 IndexedDBKVStorage.prototype.saveState = function() {
     'use strict';
-    var self = this;
 
-    delay('attribcache:savestate', function() {
+    delay('attribcache:savestate', () => {
+        const {fmdb, currsn} = window;
+
         if (d) {
             console.debug('attribcache:savestate(%s)...', currsn, fminitialized);
         }
 
         if (fminitialized && currsn || is_eplusplus) {
-            if (window.fmdb) {
+            const v = this.flush();
+
+            if (v && fmdb) {
                 setsn(currsn);
-            }
-            else {
-                self.flush();
             }
         }
     }, 2600);

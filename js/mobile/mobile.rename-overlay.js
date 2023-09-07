@@ -115,14 +115,13 @@ mobile.renameOverlay = {
             else if (M.isSafeName(trimmedRenameInputValue) === false) {
                 errMsg = l[24708];
             }
-            else {
-                M.rename(node.h, trimmedRenameInputValue);
-                this.$fileManagerBlock.removeClass('hidden disable-scroll');
-                $renameInput.trigger("blur");
-            }
             if (errMsg) {
                 $renameWarningBlock.removeClass('hidden');
                 $renameWarningText.text(errMsg);
+            }
+            else {
+                M.rename(node.h, trimmedRenameInputValue).catch(tell);
+                return this.closeRenameOverlay();
             }
         });
     },

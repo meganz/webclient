@@ -52,19 +52,9 @@ mobile.twofactor.setup = {
         loadingDialog.show();
 
         // Run Multi-Factor Auth Setup (mfas) request
-        api_req({ a: 'mfas' }, {
-            callback: function(response) {
-
-                loadingDialog.hide();
-
-                // The Two-Factor has already been setup, return to the My Account page to disable
-                if (response === EEXIST) {
-                    mobile.messageOverlay.show(l[19219], l['2fa_already_enabled_mob'], () => {
-                        loadSubPage('fm/account/');
-                    });
-
-                    return false;
-                }
+        api.send({a: 'mfas'})
+            .then((response) => {
+                assert(response && typeof response === 'string');
 
                 // Set Base32 seed into text box
                 $seedInput.text(response);
@@ -77,13 +67,29 @@ mobile.twofactor.setup = {
                     correctLevel: QRErrorCorrectLevel.H,    // High
                     background: '#f2f2f2',
                     foreground: '#151412',
-                    text: 'otpauth://totp/MEGA:' + u_attr.email + '?secret=' + response + '&issuer=MEGA'
+                    text: `otpauth://totp/MEGA:${u_attr.email}?secret=${response}&issuer=MEGA`
                 };
 
                 // Render the QR code
                 $qrCode.text('').qrcode(options);
-            }
-        });
+
+            })
+            .catch((ex) => {
+
+                // The Two-Factor has already been setup, return to the My Account page to disable
+                if (ex === EEXIST) {
+                    mobile.messageOverlay.show(l[19219], l['2fa_already_enabled_mob'], () => {
+                        loadSubPage('fm/account/');
+                    });
+                }
+                else {
+                    tell(ex);
+                }
+
+            })
+            .finally(() => {
+                loadingDialog.hide();
+            });
     },
 
     /**

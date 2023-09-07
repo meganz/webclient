@@ -205,7 +205,7 @@ $.widget.extend($.ui.selectable.prototype, {
             pageY += this.element.scrollTop() - this.elementPos.top;
         }
 
-        var tmp;
+        let tmp, maxX, maxY;
         var options = this.options;
         var x1 = this.opos[0];
         var y1 = this.opos[1];
@@ -225,8 +225,8 @@ $.widget.extend($.ui.selectable.prototype, {
         // Lets limit drag within container only
         if (this.options.appendTo) {
 
-            var maxX = this.element[0].scrollWidth - 2;
-            var maxY = this.element[0].scrollHeight - 2;
+            maxX = this.element[0].scrollWidth - 2;
+            maxY = this.element[0].scrollHeight - 2;
 
             x1 = Math.max(0, x1);
             x2 = Math.min(maxX, x2);
@@ -375,7 +375,7 @@ $.widget.extend($.ui.selectable.prototype, {
                     this._mouseDrag(event);
                     this.refresh();
                 }
-            }, 20);
+            }, 50);
 
             if (M.megaRender && M.megaRender.megaList) {
                 M.megaRender.megaList.throttledOnScroll({target: this.element[0]});

@@ -21,6 +21,7 @@
         '+puEd255': 6,
         '+sigPubk': 6
     };
+    const DEBUG = window.d > 2;
 
     /**
      * Assemble property name on Mega API.
@@ -88,15 +89,13 @@
     var revokeRequest = function(cacheKey) {
         if (_inflight[cacheKey]) {
             if (REVOKE_INFLIGHT) {
-                if (d > 1) {
+                if (DEBUG) {
                     logger.info('Revoking Inflight Request...', cacheKey);
                 }
                 _inflight[cacheKey].revoked = true;
             }
-            else {
-                if (d > 1) {
-                    logger.info('Invalidating Inflight Request...', cacheKey);
-                }
+            else if (DEBUG) {
+                logger.info('Invalidating Inflight Request...', cacheKey);
             }
             delete _inflight[cacheKey];
             return true;
@@ -214,14 +213,20 @@
         attribute = buildAttribute(attribute, pub, nonHistoric, decodeValues);
 
         // Prevent firing API requests when API already gave the attribute value with 'ug'
-        if (attribute[0] === '^' && Object(window.u_attr).u === userhandle && u_attr[attribute]) {
-            if (d > 1) {
-                logger.info('Attribute retrieval "%s" ug-provided.', attribute);
+        if ((attribute[0] === '^' || attribute[0] === '+') && userhandle in M.u) {
+
+            const data = Object(window.u_attr).u === userhandle && u_attr[attribute]
+                || M.getUserByHandle(userhandle)[attribute];
+
+            if (data) {
+                if (DEBUG) {
+                    logger.info('Attribute "%s" supplied from memory.', buildCacheKey(userhandle, attribute));
+                }
+                if (callback) {
+                    callback(data, {u: userhandle, ua: attribute});
+                }
+                return MegaPromise.resolve(data);
             }
-            if (callback) {
-                callback(u_attr[attribute], {u: userhandle, ua: attribute});
-            }
-            return MegaPromise.resolve(u_attr[attribute]);
         }
 
         var self = this;
@@ -232,7 +237,7 @@
         var cacheKey = buildCacheKey(userhandle, attribute);
 
         if (_inflight[cacheKey]) {
-            if (d > 1) {
+            if (DEBUG) {
                 logger.warn('Attribute retrieval "%s" already pending,...', cacheKey);
             }
             return _inflight[cacheKey];
@@ -294,7 +299,7 @@
                     res = base64urldecode(res);
                 }
 
-                if (d > 1 || is_karma) {
+                if (DEBUG || is_karma) {
                     var loggerValueOutput = pub ? JSON.stringify(res) : '-- hidden --';
                     if (loggerValueOutput.length > 256) {
                         loggerValueOutput = loggerValueOutput.substr(0, 256) + '...';
@@ -306,7 +311,7 @@
             }
             else {
                 // Got back an error (a number).
-                if (d > 1 || is_karma) {
+                if (DEBUG || is_karma) {
                     logger.warn(tag + 'attribute "%s" for user "%s" could not be retrieved: %d!',
                         attribute, userhandle, res);
                 }
@@ -334,6 +339,29 @@
             if (isRevoked()) {
                 return;
             }
+
+            // v3-style reply?..
+            if (Array.isArray(res)) {
+                if (res.length === 2) {
+                    const [st, result] = res;
+
+                    if (typeof st !== 'number') {
+                        logger.warn(`Unexpected 'st' for %s...`, attribute, res);
+                        res = result;
+                    }
+                    else if (st === 0) {
+                        res = result;
+                    }
+                    else {
+                        logger.warn('Got v3-style error for %s...', attribute, res);
+                        res = st;
+                    }
+                }
+                else {
+                    logger.error('Unexpected response for %s...', attribute, res);
+                }
+            }
+
             // Cache all returned values, except errors other than ENOENT
             if (typeof res !== 'number' || res === ENOENT) {
                 var exp = 0;
@@ -484,34 +512,118 @@
             delete u_attr[attribute];
         }
 
-        var self = this;
-        var req = {'a': 'upr', 'ua': attribute, 'v': 1};
-        if (self._versions[cacheKey]) {
-            // req['av'] = self._versions[cacheKey];
-        }
-
         attribCache.removeItem(cacheKey)
-            .always(function() {
-                api_req(req, {
-                    callback: function(res) {
+            .always(() => {
+                api.screq({a: 'upr', ua: attribute, v: 1})
+                    .then(({result}) => {
+
+                        if (this._versions[cacheKey] && typeof result === 'string') {
+                            this._versions[cacheKey] = result;
+                        }
+                        logger.info(`Removed user attribute "%s", result: ${result}`, attribute);
+                        resolve(result);
+                    })
+                    .catch((ex) => {
+                        logger.warn('Error removing user attribute "%s", result: %s!', attribute, ex);
+                        reject(ex);
+                    })
+                    .finally(() => {
                         // Revoke pending attribute retrieval, if any.
                         revokeRequest(cacheKey);
-
-                        if (typeof res === 'number' || res < 0) {
-                            logger.warn('Error removing user attribute "%s", result: %s!', attribute, res);
-                            reject(res);
-                        }
-                        else {
-                            if (self._versions[cacheKey] && typeof res === 'string') {
-                                self._versions[cacheKey] = res;
-                            }
-                            logger.info('Removed user attribute "%s", result: ' + res, attribute);
-                            resolve();
-                        }
-                    }
-                }, ATTR_REQ_CHANNEL[attribute]);
+                    });
             });
     });
+
+    // @private set2 helper
+    ns.set2response = function(attribute, res) {
+        let error = typeof res === 'number' || res instanceof Error;
+        if (!error) {
+            const {result} = res.batch ? res.batch.pop() : res;
+
+            res = result;
+            error = typeof result === 'number' && result < 0;
+        }
+        if (error) {
+            logger.warn(`Error setting user attribute "${attribute}", result: ${res}!`);
+            throw res;
+        }
+
+        return res;
+    };
+
+    // send commands and attribute updates in batched mode
+    // @see {@link mega.attr.set}
+    ns.set2 = async function(cmds, attribute, value, pub, nonHistoric, useVersion, options) {
+        let savedValue = value;
+        const attrName = attribute;
+
+        options = {
+            utf8: false,
+            mode: tlvstore.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16,
+            ...options
+        };
+        attribute = buildAttribute(attribute, pub, nonHistoric, options.utf8);
+
+        if (attribute[0] === '^') {
+            savedValue = base64urlencode(value);
+        }
+        else if (attribute[0] === '*') {
+            savedValue = tlvstore.encrypt(value, options.utf8, u_k, options.mode);
+        }
+        const cacheKey = buildCacheKey(u_handle, attribute);
+
+        revokeRequest(cacheKey);
+        attribCache.removeItem(cacheKey, false);
+
+        const req = {a: 'up', [attribute]: savedValue};
+
+        if (useVersion) {
+            let version = this._versions[cacheKey];
+
+            if (!version) {
+                await Promise.resolve(this.get(u_handle, attrName, pub, nonHistoric)).catch(nop);
+
+                version = this._versions[cacheKey];
+            }
+
+            req[attribute] = version ? [savedValue, version] : [savedValue];
+            req.a = 'upv';
+        }
+
+        if (cmds && !Array.isArray(cmds)) {
+            cmds = [cmds];
+        }
+        let res = await api.screq(cmds ? [...cmds, req] : req).catch(echo);
+
+        if (res === EEXPIRED && useVersion && this._conflictHandlers[attribute]) {
+            logger.error(
+                `Server returned version conflict for attribute "${attribute}"`, this._versions[cacheKey]
+            );
+            attribCache.removeItem(cacheKey, false);
+
+            const attrVal = await this.get(u_handle, attrName, pub, nonHistoric, false, false, false, options.utf8);
+            const valObj = {
+                localValue: value,
+                mergedValue: value,
+                remoteValue: attrVal,
+                latestVersion: this._versions[cacheKey]
+            };
+            const matched = this._conflictHandlers[attribute].some((cb, index) => cb(valObj, index));
+
+            if (matched) {
+                res = await this.set2(attrName, valObj.mergedValue, pub, nonHistoric, true, options);
+            }
+        }
+        const result = this.set2response(attribute, res);
+
+        attribCache.setItem(cacheKey, JSON.stringify([{av: savedValue, v: result[attribute]}, 0]));
+        if (result[attribute]) {
+            this._versions[cacheKey] = result[attribute];
+        }
+        logger.info(`Setting user attribute "${attribute}"`, result, [res]);
+
+        return res;
+    };
 
     /**
      * Stores a user attribute for oneself.
@@ -553,6 +665,7 @@
      *     A promise that is resolved when the original asynch code is settled.
      *     Can be used to use promises instead of callbacks for asynchronous
      *     dependencies.
+     * @deprecated
      */
     ns.set = function _setUserAttribute(
             attribute, value, pub, nonHistoric, callback, ctx, mode, useVersion, encodeValues) {
@@ -602,7 +715,7 @@
         // clear when the value is being sent to the API server, during that period
         // the value should be retrieved from the server, because of potential
         // race conditions
-        attribCache.removeItem(cacheKey);
+        attribCache.removeItem(cacheKey, false);
 
         var settleFunction = function(res) {
             if (typeof res !== 'number') {
@@ -629,7 +742,7 @@
                     }
                     else {
                         // ensure that this attr's value is not cached and up-to-date.
-                        attribCache.removeItem(cacheKey);
+                        attribCache.removeItem(cacheKey, false);
 
                         self.get(
                             u_handle,
@@ -1143,7 +1256,7 @@
                 ) {
                     mega.attr.handleBitMapAttribute(attrName, version);
                 }
-                else if (d > 1) {
+                else if (DEBUG) {
                     logger.debug('uaPacketParser: No handler for "%s"', attrName);
                 }
             });
@@ -1164,7 +1277,7 @@
         uaPacketParserHandler.lastname = uaPacketParserHandler.firstname;
 
         uaPacketParserHandler['+a'] = function(userHandle) {
-            M.avatars(userHandle);
+            useravatar.refresh(userHandle).catch(dump);
         };
         uaPacketParserHandler['*!authring'] = function() {
             if (!mega.keyMgr.generation) {
@@ -1186,14 +1299,7 @@
         };
         uaPacketParserHandler['*!fmconfig'] = function() {
             if (fminitialized) {
-                mega.config.fetch()
-                    .then(() => {
-                        // @todo move this to config->refresh.ui()?
-                        if (page === 'fm/account/transfers') {
-                            accountUI.transfers.transferTools.megasync.render();
-                        }
-                    })
-                    .dump('fmconfig.sync');
+                mega.config.fetch().dump('fmconfig.sync');
             }
         };
         uaPacketParserHandler['*!>alias'] = function() {
@@ -1296,7 +1402,7 @@
                 u_attr[ctx.ua] = res;
 
                 if (!is_mobile && is_fm()) {
-                    mega.ui.theme.set(res | 0);
+                    mega.ui.setTheme(res | 0);
                 }
             });
         };
@@ -1354,7 +1460,7 @@
                 console.log(`*** KEYS UPDATED for ${userHandle}`);
             }
 
-            if (userHandle === u_handle && 'keyMgr' in mega) {
+            if (userHandle === u_handle && !pfid && 'keyMgr' in mega) {
 
                 const shouldLoad = fminitialized || !mega.keyMgr.generation;
 
@@ -1538,7 +1644,7 @@
                 if (M[attribute].p === M.RubbishID) {
                     M[attribute] = false;
                 } else if (M[attribute].name !== localeName) {
-                    M.rename(M[attribute].h, localeName);
+                    M.rename(M[attribute].h, localeName).catch(dump);
                 }
                 if (d) {
                     log.info("Updating folder...", M[attribute]);
@@ -1563,7 +1669,7 @@
                         }
                         factory.set(n.h).dump(attribute);
                         if (n.name !== localeName) {
-                            M.rename(n.h, localeName);
+                            M.rename(n.h, localeName).catch(dump);
                         }
                         break;
                     }

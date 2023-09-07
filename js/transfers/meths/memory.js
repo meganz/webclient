@@ -38,7 +38,6 @@
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
 (function(scope) {
-    var msie = typeof MSBlobBuilder === 'function';
     var hasDownloadAttr = "download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a");
 
     function MemoryIO(dl_id, dl) {
@@ -52,19 +51,14 @@
 
         this.write = function(buffer, position, done) {
             try {
-                if (msie) {
-                    dblob.append(have_ab ? buffer : buffer.buffer);
-                }
-                else {
-                    dblob.push(new Blob([buffer]));
-                }
+                dblob.push(new Blob([buffer]));
             }
             catch (e) {
                 dlFatalError(dl, e);
             }
-            offset += (have_ab ? buffer : buffer.buffer).length;
+            offset += buffer.length;
             buffer = null;
-            onIdle(done);
+            queueMicrotask(done);
         };
 
         this.download = function(name, path) {
@@ -74,23 +68,6 @@
                 if (d) {
                     console.log('Transfer already completed...', dl);
                 }
-            }
-            else if (is_chrome_firefox) {
-                requestFileSystem(0, blob.size, function(fs) {
-                    var opt = {
-                        create: !0,
-                        fxo: dl
-                    };
-                    fs.root.getFile(dl_id, opt, function(fe) {
-                        fe.createWriter(function(fw) {
-                            fw.onwriteend = fe.toURL.bind(fe);
-                            fw.write(blob);
-                        });
-                    });
-                });
-            }
-            else if (msie) {
-                navigator.msSaveOrOpenBlob(blob, name);
             }
             else if (hasDownloadAttr) {
                 var blob_url = myURL.createObjectURL(blob);
@@ -165,34 +142,16 @@
                 }
             }
             else {
-                dblob = msie ? new MSBlobBuilder() : [];
+                dblob = [];
                 this.begin();
             }
         };
 
         this.abort = function() {
-            if (dblob) {
-                if (!this.completed) {
-                    try {
-                        if (msie) {
-                            dblob.getBlob().msClose();
-                        }
-                        else {
-                            for (var i = dblob.length; i--;) {
-                                dblob[i].close();
-                            }
-                        }
-                    }
-                    catch (e) {}
-                }
-                dblob = undefined;
-            }
+            dblob = undefined;
         };
 
         this.getBlob = function(name) {
-            if (msie) {
-                return dblob.getBlob();
-            }
             try {
                 return new File(dblob, name, {type: filemime(name)});
             }
@@ -212,7 +171,7 @@
 
     Object.defineProperty(MemoryIO, 'canSaveToDisk', {
         get: function() {
-            return is_chrome_firefox || navigator.msSaveOrOpenBlob || hasDownloadAttr;
+            return !!hasDownloadAttr;
         }
     });
 

@@ -163,7 +163,7 @@ lazy(mega, 'fileRequestUpload', () => {
             const dataTransfer = Object(event.dataTransfer);
             const files = event.target.files || dataTransfer.files;
 
-            if (!files || files.length === 0) {
+            if (!files || !files.length) {
                 return false;
             }
 
@@ -279,9 +279,12 @@ lazy(mega, 'fileRequestUpload', () => {
             this.initialized = false;
             this.error = false;
             this.errorHandlerInitialized = false;
-            this.id = null;
             this.itemCompleted = Object.create(null);
             this.stopped = false;
+
+            lazy(this, 'id', () => {
+                return getCleanSitePath().includes('!uid=0') ? '' : makeid(6);
+            });
         }
 
         init() {
@@ -442,7 +445,7 @@ lazy(mega, 'fileRequestUpload', () => {
                     .text(formattedName);
             }
 
-            this.$wrapperDetail.removeClass('content-error');
+            this.$wrapperDetail.removeClass('hidden content-error');
             this.$labelTitle
                 .addClass('hidden')
                 .text('');
@@ -454,9 +457,6 @@ lazy(mega, 'fileRequestUpload', () => {
                 this.$wrapperDetail.addClass('content-error');
             }
 
-            this.initId();
-            this.$labelUploadId.text(this.id);
-
             if (title) {
                 this.$labelTitle.removeClass('hidden');
                 this.$labelTitle.text(title);
@@ -464,6 +464,13 @@ lazy(mega, 'fileRequestUpload', () => {
             if (description) {
                 this.$labelDescription.removeClass('hidden');
                 this.$labelDescription.text(description);
+            }
+
+            if (this.id) {
+                this.$labelUploadId.text(this.id);
+            }
+            else if (!(error || title || description)) {
+                this.$wrapperDetail.addClass('hidden');
             }
         }
 
@@ -801,14 +808,6 @@ lazy(mega, 'fileRequestUpload', () => {
             this.errorHandlerInitialized = true;
         }
 
-        initId() {
-            if (this.id !== null) {
-                return;
-            }
-
-            this.id = makeid(6);
-        }
-
         getName(name) {
             if (!this.duplicates[name]) {
                 this.duplicates[name] = 0;
@@ -818,12 +817,13 @@ lazy(mega, 'fileRequestUpload', () => {
             const nameArray = name.split('.');
             const ext = nameArray.pop();
             const newName = nameArray.join('.');
+            const id = this.id ? `_${this.id}` : '';
 
             if (index === 1) {
-                return  `${newName}_${this.id}.${ext}`;
+                return `${newName}${id}.${ext}`;
             }
 
-            return `${newName} (${index - 1})_${this.id}.${ext}`;
+            return `${newName} (${index - 1})${id}.${ext}`;
         }
 
         showEmptyBlockError() {
@@ -842,8 +842,8 @@ lazy(mega, 'fileRequestUpload', () => {
             this.parameters = null;
             this.ownerPublicKey = null;
 
-            lazy(this, 'api', () => mega.fileRequestCommon.api);
-            lazy(this, 'uploadPage', () =>  new FileRequestUploadPage());
+            lazy(this, 'fileRequestApi', () => mega.fileRequestCommon.fileRequestApi);
+            lazy(this, 'uploadPage', () => new FileRequestUploadPage());
 
             this.addEventHandlers();
         }
@@ -854,28 +854,31 @@ lazy(mega, 'fileRequestUpload', () => {
                 this.handlePreview(parameters);
                 return;
             }
+            const {puPageId} = parameters;
 
-            if (!parameters.puPageId) {
+            if (!puPageId) {
                 mBroadcaster.sendMessage('FileRequest:invalid', 0);
                 return;
             }
+            eventlog(99775);
 
-            delay('filerequest.log', eventlog.bind(null, 99775)); // open upload page - general
-            loadingDialog.show(); // Show the loading
+            let data = is_megadrop.p === puPageId && is_megadrop;
+            if (!data) {
+                loadingDialog.show();
 
-            // Get page
-            this.api
-                .getPuPage(parameters.puPageId)
-                .then((puPage) => {
-                    this.handle(puPage);
-                })
-                .catch((ex) => {
-                    this.handleException(ex, parameters.puPageId);
-                    dump(ex);
-                })
-                .finally(() => {
-                    loadingDialog.hide();
-                });
+                data = await this.fileRequestApi.getPuPage(puPageId)
+                    .catch((ex) => {
+                        logger.error(ex);
+                        this.handleException(ex, puPageId);
+                    })
+                    .finally(() => {
+                        loadingDialog.hide();
+                    });
+            }
+
+            if (data) {
+                this.handle(data);
+            }
         }
 
         initDragAndDrop() {
@@ -930,14 +933,6 @@ lazy(mega, 'fileRequestUpload', () => {
             mBroadcaster.addListener(`FileRequest:overquota`, (error) => {
                 this.handleOverQuota(error);
             });
-
-            mBroadcaster.addListener(`FileRequest:initialized`, () => {
-                this.handleInitialized();
-            });
-
-            mBroadcaster.addListener(`FileRequest:checked`, () => {
-                this.handleChecked();
-            });
         }
 
         handleDisabled(error) {
@@ -960,7 +955,7 @@ lazy(mega, 'fileRequestUpload', () => {
             if (!this.uploadPage || !this.uploadPage.isInitialized()) {
                 this.parsePage();
 
-                mega.ui.theme.set(0);
+                mega.ui.setTheme(0);
             }
 
             this.uploadPage.setError(true);
@@ -970,8 +965,10 @@ lazy(mega, 'fileRequestUpload', () => {
         }
 
         handleInitialized() {
-            api_create_u_k();// Creates global var u_k
-            u_k_aes = new sjcl.cipher.aes(u_k); // Create key for encrption
+            if (!window.u_k_aes) {
+                api_create_u_k();
+                u_k_aes = new sjcl.cipher.aes(u_k);
+            }
             u_pubkeys[this.ownerHandle] = this.ownerPublicKey; // Store public key for owner
 
             this.uploadPage.initUploadEventHandler();
@@ -980,7 +977,7 @@ lazy(mega, 'fileRequestUpload', () => {
             this.uploadPage.initUploadErrorEventHandler();
         }
 
-        handleChecked() {
+        async handleChecked() {
             this.parsePage();
 
             let {name, description, msg: title} = this.puHandleObjectData;
@@ -988,49 +985,22 @@ lazy(mega, 'fileRequestUpload', () => {
 
             this.uploadPage.init();
             if (this.parameters && this.parameters.isUpdate) {
-                name = this.parameters.name || '';
-                title = this.parameters.title || '';
-                description = this.parameters.description || '';
-                theme = this.parameters.theme !== '' && parseInt(this.parameters.theme) || 0;
+                name = this.parameters.name || name;
+                title = this.parameters.title || title;
+                description = this.parameters.description || description;
+                theme = this.parameters.theme;
             }
 
-            mega.ui.theme.set(theme);
+            mega.ui.setTheme(theme);
             this.uploadPage.setLabel(name, title, description);
 
-            this.api
+            return this.fileRequestApi
                 .getOwnerPublicKey(this.ownerHandle)
-                .then((res) => {
-                    if (res < 0) {// Get owner privk failed
-                        msgDialog('warninga', l[135], l[47], api_strerror(res));
-                        if (d) {
-                            logger.info(
-                                'Api.getOwnerPublicKey - Failed',
-                                this.ownerHandle,
-                                api_strerror(res)
-                            );
-                        }
-                    }
-                    else {
-                        this.ownerPublicKey = crypto_decodepubkey(base64urldecode(res.pubk));
-                        if (d) {
-                            logger.info(
-                                'Api.getOwnerPublicKey - PUBK',
-                                res
-                            );
-                        }
+                .then((pubk) => {
 
-                        mBroadcaster
-                            .sendMessage('FileRequest:initialized');
-                    }
-                })
-                .catch((ex) => {
-                    dump(ex);
-                    if (d) {
-                        logger.info(
-                            'Api.getOwnerPublicKey - Failed',
-                            ex
-                        );
-                    }
+                    this.ownerPublicKey = crypto_decodepubkey(base64urldecode(pubk));
+
+                    return this.handleInitialized();
                 });
         }
 
@@ -1042,7 +1012,7 @@ lazy(mega, 'fileRequestUpload', () => {
             const description = parameters.description || '';
             const theme = parameters.theme !== '' && parseInt(parameters.theme) || 0;
 
-            mega.ui.theme.set(theme);
+            mega.ui.setTheme(theme);
             this.uploadPage.setError(true);
 
             this.uploadPage.init();
@@ -1098,8 +1068,7 @@ lazy(mega, 'fileRequestUpload', () => {
             this.puHandleObjectData = puPageObject.d;
             this.puPagePublicHandle = puPagePublicHandle;
 
-            mBroadcaster
-                .sendMessage('FileRequest:checked');
+            this.handleChecked().catch(tell);
 
             if (d) {
                 logger.info('Upload - Api.getPuPage - Handle', puPageObject);
@@ -1189,3 +1158,19 @@ lazy(mega, 'fileRequestUpload', () => {
         }
     };
 });
+
+function init_page() {
+    "use strict";
+
+    if (!is_megadrop) {
+        throw new Error("Unexpected access...");
+    }
+    const page = getCleanSitePath();
+
+    mega.fileRequestUpload.handlePublicUploadPage(page.split('/')[1]).catch(tell);
+}
+
+function topmenuUI() {
+    'use strict';
+    /* nop */
+}

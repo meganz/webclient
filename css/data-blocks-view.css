@@ -67,6 +67,7 @@
 .data-block-view.medium {
     width: 128px;
 }
+
 .fm-blocks-view .data-block-view,
 .shared-blocks-view .data-block-view,
 .out-shared-blocks-view .data-block-view {
@@ -76,11 +77,21 @@
 .data-block-view:hover {
     box-shadow: 0 0 0 4px var(--stroke-grey-2);
 }
+
+.data-block-view.highlight1 {
+    box-shadow: 0 0 0 5px #f00;
+}
+
+.data-block-view.highlight2 {
+    box-shadow: 0 0 0 5px #f90;
+}
+
 .data-block-view.ui-selected,
 .data-block-view.ui-selecting,
 .data-block-view.dragover {
     box-shadow: 0 0 0 4px var(--secondary-blue);
 }
+
 .data-block-bg {
     height: 192px;
     width: 192px;

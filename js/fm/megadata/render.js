@@ -88,7 +88,7 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
     if (!u) {
         fm_thumbnails();
     }
-    Soon(fmtopUI);
+    onIdle(fmtopUI);
 
     if (this.onRenderFinished) {
         onIdle(this.onRenderFinished);
@@ -306,9 +306,6 @@ MegaData.prototype.renderTree = function() {
     build(M.RubbishID);
 
     M.addTreeUIDelayed();
-
-    // TODO: refactor this back to no-promises
-    return MegaPromise.resolve();
 };
 
 MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {

@@ -49,7 +49,7 @@ var psa = {
         psa.lastSeenPsaId = parseInt(seen[1].value || seen[0].value) | 0;
 
         // Make Get PSA (gpsa) API request
-        const result = await Promise.resolve(M.req({a: 'gpsa', n: psa.lastSeenPsaId})).catch(echo);
+        const {result} = await api.req({a: 'gpsa', n: psa.lastSeenPsaId});
 
         // If there is an announcement to be shown
         if (typeof result === 'object' && 'id' in result) {
@@ -59,9 +59,6 @@ var psa = {
 
             // Show the announcement
             psa.configureAndShowAnnouncement();
-        }
-        else if (parseInt(result) !== ENOENT) {
-            throw new Error(`Unexpected GPSA result, ${result}`);
         }
     },
 

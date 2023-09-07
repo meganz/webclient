@@ -24,9 +24,7 @@ describe("KeepAlive test", function() {
             calls++;
         });
         expect(calls).to.eql(0);
-        expect(delay.has(keepAlive.pid)).to.eql(true);
         keepAlive.destroy();
-        expect(delay.has(keepAlive.pid)).to.eql(false);
     });
 
     /** @todo

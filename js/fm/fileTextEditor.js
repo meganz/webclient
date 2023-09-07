@@ -193,19 +193,16 @@ mega.fileTextEditor = new function FileTextEditor() {
      * @param {String} nodeToSaveAs     Original node's handle
      * @returns {MegaPromise}           Operation Promise
      */
-    this.saveFileAs = function(newName, directory, content, nodeToSaveAs) {
-        // eslint-disable-next-line local-rules/hints
-        var operationPromise = new MegaPromise();
+    this.saveFileAs = async function(newName, directory, content, nodeToSaveAs) {
 
         if (!newName || !directory || !(nodeToSaveAs || content)) {
             if (d) {
                 console.error('saveFileAs is called incorrectly newName=' + newName +
                     ' dir=' + directory + ' !content=' + !content + ' nodetoSave=' + nodeToSaveAs);
             }
-            return operationPromise.reject();
+            throw EARGS;
         }
 
-        loadingDialog.show();
         // if content is not changed, then do a copy operation with new name
         if (typeof content === 'undefined' || content === null) {
             if (typeof nodeToSaveAs === 'string') {
@@ -226,27 +223,24 @@ mega.fileTextEditor = new function FileTextEditor() {
             var opTree = [nNode];
             opTree.opSize = node.s || 0;
 
-            M.copyNodes([nodeToSaveAs], directory, null, operationPromise, opTree);
+            return M.copyNodes([nodeToSaveAs], directory, null, opTree);
         }
         // if content changed then do upload operation
         else {
             var fType = filemime(newName);
-            var nFile = new File([content], newName, { type: fType });
+            var nFile = new File([content], newName, {type: fType});
             nFile.target = directory;
             nFile.id = ++__ul_id;
             nFile.path = '';
             nFile.isCreateFile = true;
-            nFile.promiseToInvoke = operationPromise;
-
-            operationPromise.done(function(nHandle) {
-                storeFileData(nHandle, content);
-            });
+            (nFile.promiseToInvoke = mega.promise)
+                .then((nHandle) => {
+                    storeFileData(nHandle, content);
+                });
 
             ul_queue.push(nFile);
+            return nFile.promiseToInvoke;
         }
-
-
-        return operationPromise;
     };
 
     /**

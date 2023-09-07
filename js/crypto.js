@@ -60,7 +60,6 @@ var xxtea = (function() {
 }());
 
 var use_ssl = window.is_extension && !window.is_iframed ? 0 : 1;
-var have_ab = typeof ArrayBuffer !== 'undefined' && typeof DataView !== 'undefined';
 
 // general errors
 var EINTERNAL = -1;
@@ -92,8 +91,8 @@ var EGOINGOVERQUOTA = -24;
 
 var EROLLEDBACK = -25;
 var EMFAREQUIRED = -26;     // Multi-Factor Authentication Required
-var EMASTERONLY = -27;
-var EBUSINESSPASTDUE = -28;
+var EMASTERONLY = -27;      // Access denied for sub-users (only for business accounts)
+var EBUSINESSPASTDUE = -28; // Business account expired
 var EPAYWALL = -29;     // ODQ paywall state
 
 // custom errors
@@ -135,31 +134,23 @@ function a32_to_base64(a) {
     return base64urlencode(a32_to_str(a));
 }
 
-var firefox_boost = is_chrome_firefox && !!localStorage.fxboost;
-
 // ArrayBuffer to binary string
-var ab_to_str = function abToStr1(ab) {
-    return ab.buffer;
-};
+function ab_to_str(ab) {
+    'use strict';
+    const u8 = new Uint8Array(ab);
 
-if (firefox_boost) {
-    ab_to_str = mozAB2S;
-}
-else if (have_ab) {
-    ab_to_str = function abToStr2(ab) {
-        var u8 = new Uint8Array(ab);
+    /**
+     if (u8.length < 0x10000) {
+        return String.fromCharCode.apply(String, u8);
+    }
+     /**/
 
-        /*if (u8.length < 0x10000) {
-         return String.fromCharCode.apply(String, u8);
-         }*/
+    let b = '';
+    for (let i = 0; i < u8.length; i++) {
+        b += String.fromCharCode(u8[i]);
+    }
 
-        var b = '';
-        for (var i = 0; i < u8.length; i++) {
-            b = b + String.fromCharCode(u8[i]);
-        }
-
-        return b;
-    };
+    return b;
 }
 
 // random number between 0 .. n -- based on repeated calls to rc
@@ -227,58 +218,6 @@ var crypto_rsagenkey = promisify(function _crypto_rsagenkey(resolve, reject, aSe
     }
 });
 
-function ApiQueue() { // double storage
-    'use strict';
-    this._head = 0;
-    this._tail = 0;
-    this._storage1 = Object.create(null);
-    this._storage2 = Object.create(null);
-}
-ApiQueue.prototype.size = function () {
-    'use strict';
-    return this._tail - this._head;
-};
-ApiQueue.prototype.sneak = function () {
-    'use strict';
-    if (this._head !== this._tail) {
-        return { st1: this._storage1[this._head], st2: this._storage2[this._head] };
-    }
-};
-ApiQueue.prototype.enqueue = function (data1, data2) {
-    'use strict';
-    // reset to 0 index, we dont want indexes to keep getting bigger
-    // this is very safe, since it takes place during enqueue,
-    // and it is not possible to have another undergoing dequeue(because head=tail)
-    if (this._head === this._tail) {
-        this._head = 0;
-        this._tail = 0;
-    }
-    this._storage1[this._tail] = data1;
-    this._storage2[this._tail++] = data2;
-};
-ApiQueue.prototype.clear = function () {
-    'use strict';
-    this._head = 0;
-    this._tail = 0;
-    this._storage1 = Object.create(null);
-    this._storage2 = Object.create(null);
-};
-ApiQueue.prototype.dequeue = function (onlySingle) {
-    'use strict';
-    if (this._head !== this._tail) {
-        var data1 = this._storage1[this._head];
-        if (onlySingle && data1.length) {
-            return null;
-        }
-        var data2 = this._storage2[this._head];
-        delete this._storage1[this._head];
-        delete this._storage2[this._head++];
-
-        return { st1: data1, st2: data2 };
-    }
-};
-
-
 /**
  * Converts a Unicode string to a UTF-8 cleanly encoded string.
  *
@@ -287,550 +226,59 @@ ApiQueue.prototype.dequeue = function (onlySingle) {
  * @return {String}
  *     UTF-8 encoded string (8-bit characters only).
  */
-var to8 = firefox_boost ? mozTo8 : function (unicode) {
+function to8(unicode) {
+    'use strict';
     return unescape(encodeURIComponent(unicode));
-};
-
-// API command queueing
-// All commands are executed in sequence, with no overlap
-// FIXME: show user warning after backoff > 1000
-
-var apixs = [];
-
-function api_reset() {
-    "use strict";
-
-    // user account API interface
-    api_init(0, 'cs');
-
-    // folder link API interface
-    api_init(1, 'cs');
-
-    // active view's SC interface (chunked mode)
-    api_init(2, 'sc', { '{[a{'      : sc_packet,     // SC command
-                        '{[a{{t[f{' : sc_node,       // SC node
-                        '{[a{{t[f2{': sc_node,       // SC node (versioned)
-                        '{'         : sc_residue,    // SC residue
-                        '#'         : api_esplit }); // numeric error code
-
-
-    // user account event notifications
-    api_init(3, 'sc');
-
-    // active view's initial tree fetch (chunked mode)
-    api_init(4, 'cs', { '[{[ok0{' : tree_ok0,        // tree shareownerkey
-                        '[{[f{'   : tree_node,       // tree node
-                        '[{[f2{'  : tree_node,       // tree node (versioned)
-                        '['       : tree_residue,    // tree residue
-                        '#'       : api_esplit });   // numeric error code
-
-    // WSC interface (chunked mode)
-    api_init(5, 'wsc', {
-        '{[a{': sc_packet,     // SC command
-        '{[a{{t[f{': sc_node,       // SC node
-        '{[a{{t[f2{': sc_node,       // SC node (versioned)
-        '{': sc_residue,    // SC residue
-        '#': api_esplit // numeric error code
-    });
-
-    // off band attribute requests (keys) for chat
-    api_init(6, 'cs');
-
 }
 
-mBroadcaster.once('boot_done', api_reset);
-
-// a chunked request received a purely numerical response - handle it the usual way
-function api_esplit(e) {
-    api_reqerror(this.q, e, false);
-}
-
+// @deprecated
 function api_setsid(sid) {
     "use strict";
-
-    if (sid !== false) {
-        watchdog.notify('setsid', sid);
-
-        if (typeof dlmanager === 'object') {
-
-            delay('overquota:retry', () => dlmanager._onOverQuotaAttemptRetry(sid));
-        }
-        sid = 'sid=' + sid;
-    }
-    else {
-        sid = '';
-    }
-
-    apixs[0].sid = sid;
-    apixs[2].sid = sid;
-    apixs[3].sid = sid;
-    apixs[4].sid = sid;
-    apixs[5].sid = sid;
-    apixs[6].sid = sid;
-
-    if (self.fetchStreamSupport && mega.requestStatusMonitor) {
-        mega.requestStatusMonitor.init();
-    }
+    api.setSID(sid);
 }
 
+// @deprecated
 function api_setfolder(h) {
     "use strict";
-
-    h = 'n=' + h;
-
-    if (u_sid) {
-        h += '&sid=' + u_sid;
-    }
-
-    apixs[1].sid = h;
-    apixs[2].sid = h;
-    apixs[4].sid = h;
-    apixs[5].sid = h;
+    api.setFolderSID(h, window.u_sid);
 }
 
-function stopapi() {
-    "use strict";
-
-    if (typeof M === 'object' && $.len(M._apiReqInflight)) {
-        if (d) {
-            console.warn('Aborting in-flight API requests...', M._apiReqInflight);
-        }
-
-        M._apiReqInflight = Object.create(null);
-        M._apiReqPollCache = Object.create(null);
-    }
-
-    for (var i = apixs.length; i--;) {
-        api_cancel(apixs[i]);
-        apixs[i].cmdsQueue.clear();
-        apixs[i].cmdsBuffer = [];
-        apixs[i].ctxsBuffer = [];
-    }
-}
-
-function api_cancel(q) {
-    "use strict";
-
-    if (q) {
-        if (q.xhr) {
-            // setting the "cancelled" flag ensures that
-            // subsequent onerror/onload/onprogress callbacks are ignored.
-            q.xhr.cancelled = true;
-            q.xhr.onprogress = q.xhr.onloadend = null;
-            if (q.xhr.abort) q.xhr.abort();
-            q.xhr = false;
-        }
-        if (q.timer) {
-            clearTimeout(q.timer);
-        }
-    }
-}
-
-function api_init(channel, service, split) {
-    "use strict";
-
-    if (apixs[channel]) {
-        api_cancel(apixs[channel]);
-    }
-
-    apixs[channel] = {
-        c: channel,                 // channel
-        cmdsQueue: new ApiQueue(),    // queued executing commands + contexts
-        cmdsBuffer: [],               // pulled cmds from queue (under processing)
-        ctxsBuffer: [],               // pulled ctxs from queue
-        i: 0,                       // currently executing buffer
-        seqno: -Math.floor(Math.random() * 0x100000000), // unique request start ID
-        xhr: false,                 // channel XMLHttpRequest
-        timer: false,               // timer for exponential backoff
-        failhandler: api_reqfailed, // request-level error handler
-        backoff: 0,                 // timer backoff
-        service: service,           // base URI component
-        sid: '',                    // sid URI component (optional)
-        split: split,               // associated JSON splitter rules, presence triggers progressive/chunked mode
-        splitter: false,            // JSONSplitter instance implementing .split
-        rawreq: false,
-        setimmediate: false
-    };
-}
-
-
-/**
- * queue request on API channel
- * @param {Object} request              request object to be sent to API
- * @param {Object} context              context object to be returned with response, has 'callback' func to be called
- * @param {Number} channel              optional - channel number to use (default =0)
- */
+// @deprecated
 function api_req(request, context, channel) {
     "use strict";
 
     if (channel === undefined) {
         channel = 0;
     }
+    const {a} = request || !1;
+    const options = {channel, progress: context && context.progress, dedup: false};
 
-    if (d) console.debug("API request on " + channel + ": " + JSON.stringify(request));
+    (a === 'up' || a === 'upv' ? api.screq(request, options) : api.req(request, options))
+        .always((reply) => {
+            if (reply instanceof Error) {
+                throw reply;
+            }
+            if (context && context.callback) {
+                const xhr = self.d > 0 && new Proxy({}, {
+                    get(target, prop) {
+                        console.warn(`[api] The XHR object is deprecated, trying to access ${prop}...`);
+                        return false;
+                    }
+                });
 
-    if (context === undefined) {
-        context = Object.create(null);
-    }
+                let {result, responses} = reply || false;
 
-    var q = apixs[channel];
+                if (typeof reply === 'number' || reply instanceof window.APIRequestError) {
 
-    q.cmdsQueue.enqueue(request, context);
-
-    if (!q.setimmediate) {
-        q.setimmediate = setTimeout(api_proc, 0, q);
-    }
+                    result = Number(reply);
+                }
+                context.callback(result, context, xhr, responses);
+            }
+        })
+        .catch(reportError);
 }
 
-// indicates whether this is a Firefox supporting the moz-chunked-*
-// responseType or a Chrome derivative supporting the fetch API
-// values: unknown: -1, no: 0, moz-chunked: 1, fetch: 2
-// FIXME: check for fetch on !Firefox, not just on Chrome
-var chunked_method = window.chrome ? (self.fetch ? 2 : 0) : -1;
-
-if (typeof Uint8Array.prototype.indexOf !== 'function' || is_firefox_web_ext) {
-    if (d) {
-        console.debug('No chunked method on this browser: ' + ua);
-    }
-    chunked_method = 0;
-}
-
-// this kludge emulates moz-chunked-arraybuffer with XHR-style callbacks
-async function chunkedfetch(xhr, uri, body) {
-    'use strict';
-
-    let signal;
-    if (typeof AbortController !== 'undefined') {
-        const controller = new AbortController();
-        xhr.abort = async() => controller.abort();
-        signal = controller.signal;
-    }
-    const evt = {loaded: 0};
-    const highWaterMark = BACKPRESSURE_HIGHWATERMARK;
-    const response = await fetch(uri, {method: body ? 'POST' : 'GET', body, signal});
-
-    xhr.status = response.status;
-    xhr.totalBytes = response.headers.get('Original-Content-Length') | 0;
-
-    if (typeof WritableStream !== 'undefined' && mega.shouldApplyNetworkBackPressure(xhr.totalBytes)) {
-        const queueingStrategy =
-            typeof ByteLengthQueuingStrategy !== 'undefined'
-            && 'highWaterMark' in ByteLengthQueuingStrategy.prototype
-            && new ByteLengthQueuingStrategy({highWaterMark});
-
-        return response.body.pipeTo(new WritableStream({
-            async write(chunk) {
-                // console.warn('fetch/write', chunk.byteLength);
-
-                xhr.response = chunk;
-                evt.loaded += chunk.byteLength;
-                xhr.onprogress(evt);
-
-                while (decWorkerPool.busy || fmdb && fmdb.busy) {
-                    if (d) {
-                        console.info('fetch/backpressure (%d%%)', evt.loaded * 100 / xhr.totalBytes);
-                    }
-                    // apply backpressure
-                    await sleep(BACKPRESSURE_WAIT_TIME);
-                }
-            },
-            close() {
-                xhr.response = null;
-                console.debug('fetch/close');
-            },
-            abort(ex) {
-                xhr.response = null;
-                console.error('fetch/abort', ex);
-            }
-        }, queueingStrategy));
-    }
-
-    const reader = response.body.getReader();
-    while (true) {
-        const {value, done} = await reader.read();
-
-        if (done) {
-            break;
-        }
-
-        // feed received chunk to JSONSplitter via .onprogress()
-        xhr.response = value;
-        evt.loaded += value.length;
-        xhr.onprogress(evt);
-    }
-
-    xhr.response = null;
-}
-
-// send pending API request on channel q
-function api_proc(q) {
-    "use strict";
-
-    if (q.setimmediate) {
-        clearTimeout(q.setimmediate);
-        q.setimmediate = false;
-    }
-
-    if (q.cmdsQueue.size() === 0 || q.cmdsBuffer.length && q.cmdsBuffer.length > 0) {
-        return;
-    }
-    var currCmd = [];
-    var currCtx = [];
-    var element = q.cmdsQueue.dequeue(); // only first element alone
-    if (element) {
-        currCmd.push(element.st1);
-        currCtx.push(element.st2);
-        if (!element.st1.length) { // we will distinguish String + array of CMDs
-            element = q.cmdsQueue.dequeue(true);
-            while (element) {
-                currCmd.push(element.st1);
-                currCtx.push(element.st2);
-                element = q.cmdsQueue.dequeue(true);
-            }
-        }
-    }
-
-    q.cmdsBuffer = currCmd;
-    q.ctxsBuffer = currCtx;
-
-
-    if (!q.xhr) {
-        // we need a real XHR only if we don't use fetch for this channel
-        q.xhr = (!q.split || chunked_method != 2) ? getxhr() : Object.create(null);
-
-        q.xhr.q = q;
-
-        // JSON splitters are keen on processing the data as soon as it arrives,
-        // so route .onprogress to it.
-        if (q.split) {
-            q.xhr.onprogress = function(evt) {
-                if (!this.cancelled) {
-                    // caller wants progress updates? give caller progress updates!
-                    if (this.q.ctxsBuffer[0] && this.q.ctxsBuffer[0].progress) {
-                        var progressPercent = 0;
-                        var bytes = evt.total || this.totalBytes;
-
-                        if (!bytes) {
-                            // this may throw an exception if the header doesn't exist
-                            try {
-                                bytes = this.getResponseHeader('Original-Content-Length') | 0;
-                                this.totalBytes = bytes;
-                            }
-                            catch (e) {}
-                        }
-
-                        if (evt.loaded > 0 && bytes > 2) {
-                            this.q.ctxsBuffer[0].progress(evt.loaded / bytes * 100);
-                        }
-                    }
-
-                    // update number of bytes received in .onprogress() for subsequent check
-                    // in .onloadend() whether it contains more data
-
-                    var chunk = this.response;
-
-                    // is this an ArrayBuffer? turn into a Uint8Array
-                    if (!(chunk.length >= 0)) chunk = new Uint8Array(chunk);
-
-                    if (!chunked_method) {
-                        // unfortunately, we're receiving a growing response
-                        this.q.received = chunk.length;
-                    }
-                    else {
-                        // wonderful, we're receiving a chunked response
-                        this.q.received += chunk.length;
-                    }
-
-                    // send incoming live data to splitter
-                    // for maximum flexibility, the splitter ctx will be the XHR
-                    if (!this.q.splitter.chunkproc(chunk, chunk.length === this.totalBytes)) {
-                        // a JSON syntax error occurred: hard reload
-                        fm_fullreload(this.q, 'onerror JSON Syntax Error');
-                    }
-                }
-            };
-        }
-
-        q.xhr.onloadend = function onAPIProcXHRLoad(ev) {
-            if (!this.cancelled) {
-                var t;
-                var status = this.status;
-
-                if (status == 200) {
-                    var response = this.response;
-
-                    // is this residual data that hasn't gone to the splitter yet?
-                    if (this.q.splitter) {
-                        // we process the full response if additional bytes were received
-                        // FIXME: in moz-chunked transfers, if onload() can contain chars beyond
-                        // the last onprogress(), send .substr(this.q.received) instead!
-                        // otherwise, we send false to indicate no further input
-                        // in all cases, set the inputcomplete flag to catch incomplete API responses
-                        if (!this.q.splitter.chunkproc((response && (response.length > this.q.received || typeof this.totalBytes === 'undefined')) ? response : false, true)) {
-                            fm_fullreload(this.q, 'onload JSON Syntax Error');
-                        }
-                        return;
-                    }
-
-                    if (d) {
-                        console.debug('API response:', response);
-                    }
-
-                    try {
-                        t = JSON.parse(response);
-                        if (response[0] == '{') {
-                            t = [t];
-                        }
-
-                        status = true;
-                    } catch (e) {
-                        // bogus response, try again
-                        if (d) {
-                            console.debug(`Bad JSON data in response: ${response}`);
-                        }
-                        t = EAGAIN;
-                    }
-                }
-                else {
-                    if (d) {
-                        console.debug(`API server connection failed (error ${status})`);
-                    }
-                    t = ERATELIMIT;
-                }
-
-                if (typeof t === 'object') {
-                    var ctxs = this.q.ctxsBuffer;
-                    var paywall;
-                    for (var i = 0; i < ctxs.length; i++) {
-                        var ctx = ctxs[i];
-
-                        if (typeof ctx.callback === 'function') {
-                            var res = t[i];
-
-                            if (res && res.err < 0) {
-                                // eslint-disable-next-line max-depth
-                                if (d) {
-                                    console.debug('APIv2 Custom Error Detail', res, this.q.cmdsBuffer[i]);
-                                }
-                                ctx.v2APIError = res;
-                                res = res.err;
-                            }
-                            if (res === EPAYWALL) {
-                                paywall = true;
-                            }
-                            ctx.callback(res, ctx, this, t);
-                        }
-                    }
-                    if (paywall) {
-                        api_reqerror(this.q, EPAYWALL, status);
-                    }
-
-                    // reset state for next request
-                    api_ready(this.q);
-                    api_proc(this.q);
-                }
-                else {
-                    if (ev && ev.type === 'error') {
-                        if (d) {
-                            console.debug("API request error - retrying");
-                        }
-                    }
-                    api_reqerror(this.q, t, status);
-                }
-            }
-        };
-    }
-
-    if (q.rawreq === false) {
-        q.url = apipath + q.service
-              + '?id=' + (q.seqno++)
-              + '&' + q.sid
-              + (q.split ? '&ec' : '')  // encoding: chunked if splitter attached
-              + mega.urlParams();       // additional parameters
-
-        if (typeof q.cmdsBuffer[0] === 'string') {
-            q.url += '&' + q.cmdsBuffer[0];
-            delete q.rawreq;
-        }
-        else {
-            if (q.cmdsBuffer.length === 1 && q.cmdsBuffer[0].length) {
-                q.url += '&bc=1';
-                q.rawreq = JSON.stringify(q.cmdsBuffer[0]);
-            }
-            else {
-                q.rawreq = JSON.stringify(q.cmdsBuffer);
-            }
-        }
-    }
-
-    api_send(q);
-}
-
-function api_send(q) {
-    "use strict";
-
-    q.timer = false;
-
-    if (q.xhr === false) {
-        if (d) {
-            console.debug(`API request aborted: ${q.rawreq} to ${q.url}`);
-        }
-        return;
-    }
-
-    if (d) {
-        console.debug(
-            'Sending API request: %s', q.rawreq || q.cmdsBuffer[0],
-            String(q.url).replace(/sid=[\w-]+/, 'sid=\u2026'));
-    }
-
-    // reset number of bytes received and response size
-    q.received = 0;
-    delete q.xhr.totalBytes;
-
-    q.xhr.cancelled = false;
-
-    if (q.split && chunked_method == 2) {
-        // use chunked fetch with JSONSplitter input type Uint8Array
-        q.splitter = new JSONSplitter(q.split, q.xhr, true);
-
-        chunkedfetch(q.xhr, q.url, q.rawreq)
-            .then(() => q.xhr && q.xhr.onloadend())
-            .catch(ex => {
-                if (d) {
-                    console.error('Fetch error.', ex);
-                }
-
-                if (q.xhr) {
-                    // at this point fake a partial data to trigger a retry..
-                    q.xhr.status = 206;
-                    q.xhr.onloadend();
-                }
-            });
-    }
-    else {
-        // use legacy XHR API
-        q.xhr.open('POST', q.url, true);
-
-        if (q.split) {
-            if (chunked_method) {
-                // FIXME: use Fetch API if more efficient than this
-                q.xhr.responseType = 'moz-chunked-arraybuffer';
-
-                // first try? record success
-                if (chunked_method < 0) {
-                    chunked_method = q.xhr.responseType == 'moz-chunked-arraybuffer';
-                }
-            }
-
-            // at this point, chunked_method being logically true implies arraybuffer
-            q.splitter = new JSONSplitter(q.split, q.xhr, chunked_method);
-         }
-
-        q.xhr.send(q.rawreq);
-    }
-}
-
+// @todo remove
 function api_reqerror(q, e, status) {
     'use strict';
     var c = e | 0;
@@ -869,43 +317,30 @@ function api_reqerror(q, e, status) {
     }
 }
 
-function api_ready(q) {
-    q.rawreq = false;
-    q.backoff = 0; // request succeeded - reset backoff timer
-    q.cmdsBuffer = [];
-    q.ctxsBuffer = [];
-}
-
-var apiFloorCap = 3000;
-
-function api_retry() {
-    "use strict";
-
-    for (var i = apixs.length; i--; ) {
-        if (apixs[i].timer && apixs[i].backoff > apiFloorCap) {
-            clearTimeout(apixs[i].timer);
-            apixs[i].backoff = apiFloorCap;
-            apixs[i].timer = setTimeout(api_send, apiFloorCap, apixs[i]);
-        }
-    }
-}
-
+// @todo refactor
 function api_reqfailed(channel, error) {
     'use strict';
 
     var e = error | 0;
     var c = channel | 0;
-    if (d) {
-        console.error('API req failed. Channel=' + c + '  Error: ', e);
-    }
-    if (typeof error === 'object' && error.err < 0) {
-        e = error.err | 0;
+
+    if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
+        if (this.status === true && e === EAGAIN) {
+            mega.loadReport.EAGAINs++;
+        }
+        else if (this.status === 500) {
+            mega.loadReport.e500s++;
+        }
+        else {
+            mega.loadReport.errs++;
+        }
     }
 
     // does this failure belong to a folder link, but not on the SC channel?
-    if (apixs[c].sid[0] === 'n' && c !== 2) {
+    if (this.sid[0] === 'n' && c !== 2) {
         // yes: handle as a failed folder link access
-        return folderreqerr(c, error);
+        api.reset(c);
+        return folderreqerr(c, this.error || error);
     }
 
     if (e === ESID) {
@@ -920,16 +355,11 @@ function api_reqfailed(channel, error) {
     }
     else if ((c === 2 || c === 5) && e === ETOOMANY) {
         // too many pending SC requests - reload from scratch
-        fm_fullreload(this.q, 'ETOOMANY');
+        return fm_fullreload(this, 'ETOOMANY');
     }
     // if suspended account
     else if (e === EBLOCKED) {
-        var queue = apixs[c];
-        queue.rawreq = false;
-        queue.cmdsQueue.clear();
-        queue.cmdsBuffer = [];
-        queue.ctxsBuffer = [];
-        queue.setimmediate = false;
+        api.reset(c);
 
         api_req({ a: 'whyamiblocked' }, {
             callback: function whyAmIBlocked(reasonCode) {
@@ -1014,11 +444,14 @@ function api_reqfailed(channel, error) {
             if (window.loadingDialog) {
                 loadingDialog.hide();
             }
-            M.showOverStorageQuota(e);
+            M.showOverStorageQuota(e).catch(dump);
         }
     }
     else {
-        api_reqerror(apixs[c], EAGAIN, 0);
+        if (d) {
+            console.assert(e !== EARGS);
+        }
+        return e === EARGS ? e : EAGAIN;
     }
 }
 
@@ -1052,28 +485,6 @@ function api_reportfailure(hostname, callback) {
     };
 
     failxhr.send(hostname);
-}
-
-var waiturl;
-var waitxhr;
-var waitbackoff = 125;
-var waittimeout;
-var waitbegin;
-var waitid = 0;
-var cmsNotifHandler = localStorage.cmsNotificationID || 'Nc4AFJZK';
-
-function stopsc() {
-    "use strict";
-
-    if (waitxhr && waitxhr.readyState !== waitxhr.DONE) {
-        waitxhr.abort();
-        waitxhr = false;
-    }
-
-    if (waittimeout) {
-        delay.cancel(waittimeout);
-        waittimeout = false;
-    }
 }
 
 // if set, further sn updates are disallowed (the local state has become invalid)
@@ -1120,18 +531,16 @@ function sc_residue(sc) {
                 mega.keyMgr.pendingpullkey = true;
             }
         }
+        window.gettingsc = false;
 
         // we're done, wait for more
         if (sc.w) {
-            waiturl = sc.w + '?' + apixs[5].sid + '&sn=' + currsn;
+            waitsc.setURL(`${sc.w}?${this.sid}&sn=${currsn}`);
         }
-        else if (!waiturl) {
+        else if (!waitsc.ok) {
             console.error("Strange error, we dont know WSC url and we didnt get it");
-            waitbackoff = Math.min(9e3, waitbackoff << 1);
-            waittimeout = setTimeout(getsc, waitbackoff, true);
-            return;
+            return tSleep(2 + Math.random() * 7).then(() => getsc(true));
         }
-        waittimeout = delay('reinit:wsc', waitsc, waitbackoff);
 
         if ((mega.state & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
             mega.loadReport.recvAPs = Date.now() - mega.loadReport.stepTimeStamp;
@@ -1143,12 +552,6 @@ function sc_residue(sc) {
         // FIXME: add one single retry if !sscount: Clear scq, clear worker state,
         // then reissue getsc() (difficult to get right - be cautious)
         return fm_fullreload(null, 'malformed SC response');
-    }
-
-    // (mandatory steps at the conclusion of a successful split response)
-    if (this.q) {
-        api_ready(this.q);
-        api_proc(this.q);
     }
 }
 
@@ -1162,16 +565,35 @@ function getsc(force) {
     "use strict";
 
     if (force) {
+        let timer = null;
         gettingsc = true;
+        waitsc.stop();
 
-        if (waitxhr) {
-            waitxhr.abort();
+        if (initialscfetch) {
+
+            (timer = tSleep(77)).then((res) => {
+                timer = null;
+                if (initialscfetch) {
+                    if (d) {
+                        if (res) {
+                            console.error(`Unexpected API response for w/sc request (${res.result})`, res);
+                        }
+                        else {
+                            console.error('w/sc connection is taking too long, aborting...');
+                        }
+                    }
+                    return waitsc.recover();
+                }
+            }).catch(dump);
         }
 
-        api_cancel(apixs[5]);   // retire existing XHR that may still be completing the request
+        // retire existing channel that may still be completing the request
+        api.reset(5);
+
         if (currsn) {
-            api_ready(apixs[5]);
-            api_req('sn=' + currsn, {}, 5);
+            api.req(`sn=${currsn}`, 5)
+                .then((res) => timer && timer.expedite(res))
+                .catch(dump);
 
             if (window.loadingInitDialog.progress) {
                 window.loadingInitDialog.step3(loadfm.fromapi ? 40 : 1, 55);
@@ -1193,93 +615,100 @@ function getsc(force) {
 function waitsc() {
     "use strict";
 
-    var MAX_WAIT = 40e3;
-    var newid = ++waitid;
+    if (!waitsc.kas) {
+        waitsc.kas = new MEGAKeepAliveStream(function(buffer) {
+            let res = buffer.byteLength < 6 && String.fromCharCode.apply(null, new Uint8Array(buffer)) || '';
 
-    stopsc();
-
-    if (!waitxhr) {
-        waitxhr = getxhr();
-    }
-    waitxhr.waitid = newid;
-
-    waittimeout = delay('reinit:wsc', waitsc, MAX_WAIT);
-
-    waitxhr.onloadend = function(ev) {
-        if (this.waitid === waitid) {
-            if (this.status !== 200) {
-                if (d) {
-                    console.info('waitsc(%s:%s)', this.status, ev.type, ev);
-                }
-
-                waitbackoff = Math.min(MAX_WAIT, waitbackoff << 1);
-                waittimeout = delay('reinit:wsc', waitsc, waitbackoff);
+            if (res === '0') {
+                // immediately re-connect.
+                return this.restart('server-request');
             }
-            else {
-                // Increase backoff if we do keep receiving packets is rapid succession, so that we maintain
-                // smaller number of connections to process more data at once - backoff up to 4 seconds.
-                stopsc();
-                if (Date.now() - waitbegin < 1000) {
-                    waitbackoff = Math.min(4e3, waitbackoff << 1);
-                }
-                else {
-                    waitbackoff = 250;
-                }
 
-                var delieveredResponse = this.response;
-                if (delieveredResponse === '0') {
-                    // clearTimeout(waittimeout); mo need for clearing, we stopped
-                    // immediately re-connect.
-                    waittimeout = delay('reinit:wsc', waitsc, 1);
+            if (res[0] === '-' && (res |= 0) < 0) {
+                // WSC is stopped at the beginning.
+                if (d) {
+                    this.logger.warn('wsc error %s, %s...', res, api_strerror(res));
                 }
-                else if ($.isNumeric(delieveredResponse)) {
-                    if (delieveredResponse == ETOOMANY) {
-                        // WSC is stopped at the beginning.
-                        fm_fullreload(null, 'ETOOMANY');
-                    }
-                    else if (delieveredResponse == EAGAIN || delieveredResponse == ERATELIMIT) {
-                        // WSC is stopped at the beginning.
-                        waittimeout = delay('reinit:wsc', waitsc, waitbackoff);
-                    }
-                    else if (delieveredResponse == EBLOCKED) {
-                        // == because API response will be in a string
-                        api_reqfailed(5, EBLOCKED);
-                    }
-                }
-                else if (!apixs[5].split) {
-                    console.error('WSC has no splitter !!!!');
-                }
-                else {
-                    var wscSplitter = new JSONSplitter(apixs[5].split, waitxhr, false);
-                    if (!wscSplitter.chunkproc(delieveredResponse, true)) {
-                        fm_fullreload(null, 'onload JSON Syntax Error');
-                    }
-                }
+                return res === ETOOMANY && fm_fullreload(null, 'ETOOMANY');
+            }
+
+            return api.deliver(5, buffer);
+        });
+    }
+
+    // re/set initial backoff value.
+    waitsc.kas.backoff = 1e4 + Math.random() * 9e3;
+}
+
+Object.defineProperties(waitsc, {
+    kas: {
+        value: null,
+        writable: true
+    },
+    stop: {
+        value() {
+            'use strict';
+            if (this.kas) {
+                this.kas.destroy('stop-request');
+                this.kas = null;
             }
         }
-    };
+    },
+    poke: {
+        value(reason) {
+            'use strict';
+            if (this.kas) {
+                this.kas.restart(reason || 'poke');
+            }
+        }
+    },
+    setURL: {
+        value(url) {
+            'use strict';
+            waitsc();
+            this.kas.setURL(url);
+            this.poke('switching url');
+        }
+    },
+    recover: {
+        async value() {
+            'use strict';
+            assert(!this.kas, 'Invalid recover state..');
 
-    waitxhr.onprogress = function() {
-        waittimeout = delay('reinit:wsc', waitsc, MAX_WAIT);
-    };
+            api.reset(5);
+            if (!navigator.onLine) {
+                // @todo show a toast indicating we're offline?
 
-    waitbegin = Date.now();
-    waitxhr.open('POST', waiturl, true);
-    waitxhr.send();
-}
-mBroadcaster.once('startMega', function() {
+                await new Promise((resolve) => {
+                    const onOnline = () => {
+                        later(resolve);
+                        window.removeEventListener('online', onOnline);
+                    };
+                    window.addEventListener('online', onOnline);
+                });
+            }
+
+            return initialscfetch && sc_residue({sn: currsn});
+        }
+    },
+    ok: {
+        get() {
+            'use strict';
+            return this.kas && this.kas.url;
+        }
+    },
+    running: {
+        get() {
+            'use strict';
+            return !!this.kas || gettingsc;
+        }
+    }
+});
+
+mBroadcaster.once('startMega', () => {
     'use strict';
 
-    window.addEventListener('online', function(ev) {
-        if (d) {
-            console.info(ev);
-        }
-        api_retry();
-
-        if (waiturl) {
-            waitsc();
-        }
-    });
+    window.addEventListener('online', () => api.retry());
 
     var invisibleTime;
     document.addEventListener('visibilitychange', function(ev) {
@@ -1311,11 +740,10 @@ function api_create_u_k() {
 
 // If the user triggers an action that requires an account, but hasn't logged in,
 // we create an anonymous preliminary account. Returns userhandle and passwordkey for permanent storage.
-function api_createuser(ctx, invitecode, invitename, uh) {
-    var logger = MegaLogger.getLogger('crypt');
-    var i;
+async function api_createuser(ctx, invitecode, invitename) {
+    'use strict';
+    let i;
     var ssc = Array(4); // session self challenge, will be used to verify password
-    var req, res;
 
     if (!ctx.passwordkey) {
         ctx.passwordkey = Array(4);
@@ -1332,61 +760,46 @@ function api_createuser(ctx, invitecode, invitename, uh) {
         ssc[i] = rand(0x100000000);
     }
 
-    logger.debug("api_createuser - masterkey: " + u_k + " passwordkey: " + ctx.passwordkey);
+    if (d) {
+        console.debug(`api_createuser - mk: '${u_k}', pk: '${ctx.passwordkey}'`);
+    }
 
     // in business sub-users API team decided to hack "UP" command to include "UC2" new arguments.
     // so now. we will check if this is a business sub-user --> we will add extra arguments to "UP" (crv,hak,v)
-
-    var doApiRequest = function (request) {
-        if (mega.affid) {
-            req.aff = mega.affid;
-        }
-        logger.debug("Storing key: " + request.k);
-
-        api_req(request, ctx);
-        watchdog.notify('createuser');
+    const req = {
+        a: 'up',
+        k: a32_to_base64(encrypt_key(new sjcl.cipher.aes(ctx.passwordkey), u_k)),
+        ts: base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k), ssc)))
     };
-
-    req = {
-            a: 'up',
-            k: a32_to_base64(encrypt_key(new sjcl.cipher.aes(ctx.passwordkey), u_k)),
-            ts: base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k), ssc)))
-        };
 
     // invite code usage is obsolete. it's only used in case of business sub-users
     // therefore, if it exists --> we are registering a business sub-user
     if (invitecode) {
+        req.v = 2;
         req.ic = invitecode;
         req.name = invitename;
 
-        security.deriveKeysFromPassword(ctx.businessUser, u_k,
-            function (clientRandomValueBytes, encryptedMasterKeyArray32,
-                hashedAuthenticationKeyBytes, derivedAuthenticationKeyBytes) {
-                req.crv = ab_to_base64(clientRandomValueBytes);
-                req.hak = ab_to_base64(hashedAuthenticationKeyBytes);
-                req.v = 2;
-                req.k = a32_to_base64(encryptedMasterKeyArray32);
-                ctx.uh = ab_to_base64(derivedAuthenticationKeyBytes);
+        const {
+            clientRandomValueBytes,
+            encryptedMasterKeyArray32,
+            hashedAuthenticationKeyBytes,
+            derivedAuthenticationKeyBytes
+        } = await security.deriveKeysFromPassword(ctx.businessUser, u_k);
 
-                doApiRequest(req);
-            }
-        );
-
-    }
-    else {
-        doApiRequest(req);
+        req.crv = ab_to_base64(clientRandomValueBytes);
+        req.k = a32_to_base64(encryptedMasterKeyArray32);
+        req.hak = ab_to_base64(hashedAuthenticationKeyBytes);
+        ctx.uh = ab_to_base64(derivedAuthenticationKeyBytes);
     }
 
+    if (mega.affid) {
+        req.aff = mega.affid;
+    }
+
+    watchdog.notify('createuser');
+    return api.screq(req, ctx);
 }
 
-function api_checkconfirmcode(ctx, c) {
-    res = api_req({
-        a: 'uc',
-        c: c
-    }, ctx);
-}
-
-/* jshint -W098 */  // It is used in another file
 function api_resetuser(ctx, emailCode, email, password) {
 
     // start fresh account
@@ -1406,102 +819,6 @@ function api_resetuser(ctx, emailCode, email, password) {
         y: stringhash(email.toLowerCase(), pw_aes),
         z: base64urlencode(a32_to_str(ssc) + a32_to_str(encrypt_key(new sjcl.cipher.aes(u_k), ssc)))
     }, ctx);
-}
-
-function api_resetkeykey(ctx, code, key, email, pw) {
-
-    'use strict';
-
-    ctx.c = code;
-    ctx.email = email;
-    ctx.k = key;
-    ctx.pw = pw;
-    ctx.callback = api_resetkeykey2;
-
-    api_req({
-        a: 'erx',
-        r: 'gk',
-        c: code
-    }, ctx);
-}
-/* jshint +W098 */
-
-function api_resetkeykey2(res, ctx) {
-    try {
-        api_resetkeykey3(res, ctx);
-    }
-    catch (ex) {
-        ctx.result(EKEY);
-    }
-}
-
-function api_resetkeykey3(res, ctx) {
-
-    'use strict';
-
-    if (typeof res === 'string') {
-
-        if (!verifyPrivateRsaKeyDecryption(res, ctx.k)) {
-            ctx.result(EKEY);
-        }
-        else if (ctx.email && ctx.pw) {
-            var pw_aes = new sjcl.cipher.aes(prepare_key_pw(ctx.pw));
-
-            ctx.callback = ctx.result;
-            api_req({
-                a: 'erx',
-                r: 'sk',
-                c: ctx.c,
-                x: a32_to_base64(encrypt_key(pw_aes, ctx.k)),
-                y: stringhash(ctx.email.toLowerCase(), pw_aes)
-            }, ctx);
-        }
-        else {
-            ctx.result(0);
-        }
-    }
-    else {
-        ctx.result(res);
-    }
-}
-
-/**
- * Verify that the Private RSA key was decrypted successfully by the Master/Recovery Key
- * @param {String} encryptedPrivateRsaKeyBase64 The encrypted Private RSA key as a Base64 string
- * @param {Array} masterKeyArray32 The Master/Recovery Key
- * @returns {Boolean} Returns true if the decryption succeeded, false if it failed
- */
-function verifyPrivateRsaKeyDecryption(encryptedPrivateRsaKeyBase64, masterKeyArray32) {
-
-    'use strict';
-
-    try {
-        // Decrypt the RSA key
-        var privateRsaKeyArray32 = base64_to_a32(encryptedPrivateRsaKeyBase64);
-        var cipherObject = new sjcl.cipher.aes(masterKeyArray32);
-        var decryptedPrivateRsaKey = decrypt_key(cipherObject, privateRsaKeyArray32);
-        var privateRsaKeyStr = a32_to_str(decryptedPrivateRsaKey);
-
-        // Verify the integrity of the decrypted private key
-        for (var i = 0; i < 4; i++) {
-            var l = ((privateRsaKeyStr.charCodeAt(0) * 256 + privateRsaKeyStr.charCodeAt(1) + 7) >> 3) + 2;
-
-            if (privateRsaKeyStr.substr(0, l).length < 2) {
-                break;
-            }
-            privateRsaKeyStr = privateRsaKeyStr.substr(l);
-        }
-
-        // If invalid
-        if (i !== 4 || privateRsaKeyStr.length >= 16) {
-            return false;
-        }
-
-        return true;
-    }
-    catch (exception) {
-        return false;
-    }
 }
 
 // We query the sid using the supplied user handle (or entered email address, if already attached)
@@ -1662,55 +979,25 @@ function api_getuser(ctx) {
 
 /**
  * Send current node attributes to the API
- * @param {Object} n Updated node
- * @param {String} idtag mRandomToken
- * @return {MegaPromise}
+ * @param {MegaNode} n Updated node
+ * @return {Promise} <st, *>
  */
-function api_setattr(n, idtag) {
+async function api_setattr(n) {
     "use strict";
 
-    var promise = new MegaPromise();
-    var logger = MegaLogger.getLogger('crypt');
-
-    var ctx = {
-        callback: function(res) {
-            if (res !== 0) {
-                logger.error('api_setattr', res);
-                promise.reject(res);
-            }
-            else {
-                promise.resolve(res);
-            }
-        }
-    };
-
     if (!crypto_keyok(n)) {
-        logger.warn('Unable to set node attributes, invalid key on %s', n.h, n);
-        return MegaPromise.reject(EKEY);
+        console.warn('Unable to set node attributes, invalid key on %s', n.h, n);
+        return Promise.reject(EKEY);
     }
 
-    try {
-        var at = ab_to_base64(crypto_makeattr(n));
-        const ops = {a: 'a', n: n.h, at: at, i: idtag};
-
-        if (M.getNodeRoot(n.h) === M.InboxID) {
-            mega.backupCenter.ackVaultWriteAccess(n.h, ops);
-        }
-
-        logger.debug('Setting node attributes for "%s"...', n.h, idtag);
-
-        api_req(ops, ctx);
-
-        if (idtag) {
-            M.scAckQueue[idtag] = Date.now();
-        }
+    if (d) {
+        console.debug('Updating node attributes for "%s"...', n.h);
     }
-    catch (ex) {
-        logger.error(ex);
-        promise.reject(ex);
+    const req = {a: 'a', n: n.h, at: ab_to_base64(crypto_makeattr(n))};
+    if (M.getNodeRoot(n.h) === M.InboxID) {
+        mega.backupCenter.ackVaultWriteAccess(n.h, req);
     }
-
-    return promise;
+    return api.screq(req);
 }
 
 function stringhash(s, aes) {
@@ -1746,50 +1033,24 @@ var u_pubkeys = Object.create(null);
 /**
  * Query missing keys for the given users.
  *
- * @return {MegaPromise}
+ * @return {Promise}
  */
-function api_cachepubkeys(users) {
+async function api_cachepubkeys(users) {
+    'use strict';
 
-    var logger = MegaLogger.getLogger('crypt');
-    var u = [];
-    var i;
+    users = users.filter((user) => user !== 'EXP' && !u_pubkeys[user]);
 
-    for (i = users.length; i--;) {
-        if (users[i] !== 'EXP' && !u_pubkeys[users[i]]) {
-            u.push(users[i]);
+    if (users.length) {
+        await Promise.allSettled(users.map((user) => Promise.resolve(crypt.getPubRSA(user))));
+
+        if (users.some((user) => !u_pubkeys[user] && !user.includes('@'))) {
+            throw new Error(`Failed to cache RSA pub keys for users ${JSON.stringify(users)}`);
+        }
+
+        if (d) {
+            console.debug(`Cached RSA pub keys for users ${JSON.stringify(users)}`);
         }
     }
-
-    // Fire off the requests and track them.
-    var keyPromises = [];
-    for (i = u.length; i--;) {
-        keyPromises.push(crypt.getPubRSA(u[i]));
-    }
-
-    var gotPubRSAForEveryone = function() {
-        for (i = u.length; i--;) {
-            if (!u_pubkeys[u[i]]) {
-                return false;
-            }
-        }
-        return true;
-    };
-    var promise = new MegaPromise();
-
-    // Make a promise for the bunch of them, and define settlement handlers.
-    MegaPromise.allDone(keyPromises)
-        .always(function __getKeysDone() {
-            if (gotPubRSAForEveryone()) {
-                logger.debug('Cached RSA pub keys for users ' + JSON.stringify(u));
-                promise.resolve.apply(promise, arguments);
-            }
-            else {
-                logger.warn('Failed to cache RSA pub keys for users' + JSON.stringify(u), arguments);
-                promise.reject.apply(promise, arguments);
-            }
-        });
-
-    return promise;
 }
 
 /**
@@ -1826,66 +1087,21 @@ function encryptto(user, data) {
  *     Selected node id.
  * @param {Array} targets
  *     List of user email or user handle and access permission.
- * @param {Array} sharenodes
+ * @param {Array} [sharenodes]
  *     Holds complete directory tree starting from given node.
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
-function api_setshare(node, targets, sharenodes) {
+// eslint-disable-next-line complexity
+async function api_setshare(node, targets, sharenodes) {
+    'use strict';
 
-    var masterPromise  = new MegaPromise();
-
-    // cache all targets' public keys
-    var targetsPubKeys = [];
-
-    for (var i = targets.length; i--;) {
-        targetsPubKeys.push(targets[i].u);
-    }
-
-    var cachePromise = api_cachepubkeys(targetsPubKeys);
-    cachePromise.done(function _cacheDone() {
-        var setSharePromise = api_setshare1({ node: node, targets: targets, sharenodes: sharenodes });
-        masterPromise.linkDoneAndFailTo(setSharePromise);
-    });
-    masterPromise.linkFailTo(cachePromise);
-
-    return masterPromise;
-}
-
-/**
- * Actually enacts the setting/cancelling of shares.
- *
- * @param {Object} ctx
- *     Context for API commands.
- * @param {Array} params
- *     Additional parameters.
- * @returns {MegaPromise}
- */
-function api_setshare1(ctx, params) {
-    var logger = MegaLogger.getLogger('crypt');
-    var i, j, n, nk, sharekey, ssharekey;
-    var req, res;
-    var newkey = true;
-    var masterPromise = new MegaPromise();
-
-    req = {
-        a: 's2',
-        n: ctx.node,
-        s: ctx.targets,
-        i: requesti
-    };
-
-    if (params) {
-        logger.debug('api_setshare1.extend', params);
-        for (i in params) {
-            req[i] = params[i];
-        }
-    }
-
+    const pubKeys = [];
     const users = new Set();
-    for (i = ctx.targets.length; i--;) {
-        let {u} = ctx.targets[i];
+    for (i = targets.length; i--;) {
+        let {u} = targets[i];
 
         if (u && u !== 'EXP') {
+
             if (M.opc[u]) {
                 console.error('Check this, got an outgoing pending contact...', u, M.opc[u]);
 
@@ -1896,14 +1112,33 @@ function api_setshare1(ctx, params) {
                 }
             }
             users.add(u);
+
+            if (!mega.keyMgr.secure && !u_pubkeys[u]) {
+                pubKeys.push(u);
+            }
         }
     }
 
-    for (i = req.s.length; i--;) {
-        if (typeof req.s[i].r !== 'undefined') {
+    if (pubKeys.length) {
+        await api_cachepubkeys(pubKeys);
+    }
 
+    let exp = false;
+    let maxretry = 5;
+    let backoff = 196;
+    let newkey = true;
+    let sharekey, ssharekey;
+
+    const req = {
+        a: 's2',
+        n: node,
+        s: targets
+    };
+
+    for (let i = req.s.length; i--;) {
+        if (typeof req.s[i].r !== 'undefined') {
             if (mega.keyMgr.secure) {
-                newkey = mega.keyMgr.hasNewShareKey(ctx.node);
+                newkey = mega.keyMgr.hasNewShareKey(node);
 
                 // dummy key/handleauth - FIXME: remove
                 req.ok = a32_to_base64([0, 0, 0, 0]);
@@ -1911,112 +1146,122 @@ function api_setshare1(ctx, params) {
                 break;
             }
 
-            if (!req.ok) {
-                if (u_sharekeys[ctx.node]) {
-                    sharekey = u_sharekeys[ctx.node][0];
-                    newkey = mega.keyMgr.hasNewShareKey(ctx.node);
-                }
-                else {
-                    // we only need to generate a key if one or more shares are being added to a previously unshared node
-                    sharekey = [];
-                    for (j = 4; j--;) {
-                        sharekey.push(rand(0x100000000));
-                    }
-                    crypto_setsharekey(ctx.node, sharekey, true);
-                }
-
-                req.ok = a32_to_base64(encrypt_key(u_k_aes, sharekey));
-                req.ha = crypto_handleauth(ctx.node);
-                ssharekey = a32_to_str(sharekey);
+            if (u_sharekeys[node]) {
+                sharekey = u_sharekeys[node][0];
+                newkey = mega.keyMgr.hasNewShareKey(node);
             }
+            else {
+                // we only need to generate a key if one or more shares are being added to a previously unshared node
+                sharekey = [];
+                for (let j = 4; j--;) {
+                    sharekey.push(rand(0x100000000));
+                }
+                crypto_setsharekey(node, sharekey, true);
+            }
+
+            req.ok = a32_to_base64(encrypt_key(u_k_aes, sharekey));
+            req.ha = crypto_handleauth(node);
+            ssharekey = a32_to_str(sharekey);
+            break;
         }
     }
 
     if (newkey) {
-        req.cr = crypto_makecr(ctx.sharenodes, [ctx.node], true);
+        if (!sharenodes) {
+            if (d) {
+                console.warn(`Acquiring share-nodes for ${node}...`, targets);
+            }
+
+            await mega.keyMgr.setShareSnapshot(node);
+            sharenodes = mega.keyMgr.getShareSnapshot(node);
+        }
+
+        assert(Array.isArray(sharenodes) && sharenodes.includes(node), `Provided share-nodes seems invalid...`);
+        req.cr = crypto_makecr(sharenodes, [node], true);
     }
 
-    ctx.backoff = 97;
-    ctx.maxretry = 4;
-    ctx.ssharekey = ssharekey;
-
     // encrypt ssharekey to known users
-    for (i = req.s.length; i--;) {
-        if (!mega.keyMgr.secure && u_pubkeys[req.s[i].u]) {
+    for (let i = req.s.length; i--;) {
+        if (req.s[i].u === 'EXP') {
+            assert(!exp);
+            exp = {a: 'l', n: node};
+
+            if (req.s[i].w) {
+                exp.w = 1;
+                exp.sk = a32_to_base64(sharekey);
+                req.s[i].r = 2;
+                delete req.s[i].w;
+            }
+            else {
+                assert(!req.s[i].r);
+            }
+        }
+        else if (!mega.keyMgr.secure && u_pubkeys[req.s[i].u]) {
             req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey, u_pubkeys[req.s[i].u]));
         }
+
         if (typeof req.s[i].m !== 'undefined') {
             req.s[i].u = req.s[i].m;
         }
 
         if (M.opc[req.s[i].u]) {
             if (d) {
-                logger.warn(req.s[i].u + ' is an outgoing pending contact, fixing to email...', M.opc[req.s[i].u].m);
+                console.warn(`${req.s[i].u} is an outgoing pending contact, fixing to email...`, M.opc[req.s[i].u].m);
             }
             // the caller incorrectly passed a handle for a pending contact, so fixup..
             req.s[i].u = M.opc[req.s[i].u].m;
         }
     }
 
-    ctx.req = req;
+    if (users.size) {
+        await mega.keyMgr.sendShareKeys(node, [...users]);
+    }
 
-    /** Callback for API interactions. */
-    ctx.callback = function (res, ctx) {
-        if (typeof res === 'object') {
+    while (1) {
+        const res = await api.screq(exp ? [req, exp] : req).catch(echo);
+        if (d) {
+            console.debug('api_setshare(%s)', node, res);
+        }
 
-            mega.keyMgr.setUsedNewShareKey(ctx.node).catch(dump);
-            masterPromise.resolve(res);
+        if (typeof res.result === 'object') {
+            const {ok} = res.result;
 
-            /* sharekey clashes will be resolved via ^!keys
-            if (res.ok) {
-                logger.debug('Share key clash: Set returned key and try again.');
-                ctx.req.ok = res.ok;
-                var k = decrypt_key(u_k_aes, base64_to_a32(res.ok));
-                crypto_setsharekey(ctx.node, k);
-                ctx.req.ha = crypto_handleauth(ctx.node);
+            if (!ok) {
+                mega.keyMgr.setUsedNewShareKey(node).catch(dump);
+                return res.result;
+            }
 
-                var ssharekey = a32_to_str(k);
-
-                for (var i = ctx.req.s.length; i--;) {
-                    if (u_pubkeys[ctx.req.s[i].u]) {
-                        ctx.req.s[i].k = base64urlencode(crypto_rsaencrypt(ssharekey,
-                            u_pubkeys[ctx.req.s[i].u]));
-                    }
+            if (mega.keyMgr.secure) {
+                if (d) {
+                    console.error('Share key clash: Will be resolved via ^!keys');
                 }
-                logger.info('Retrying share operation.');
-                api_req(ctx.req, ctx);
+                // @todo retry when resolved (?)..
+                return res.result;
             }
-            else {
-                logger.info('Share succeeded.');
-                masterPromise.resolve(res);
+
+            if (d) {
+                console.warn('Share key clash: Set returned key and try again.');
             }
-*/
+            let key = decrypt_key(u_k_aes, base64_to_a32(ok));
+
+            crypto_setsharekey(node, key);
+            req.ha = crypto_handleauth(node);
+            req.ok = ok;
+
+            key = a32_to_str(key);
+            for (let i = req.s.length; i--;) {
+                if (u_pubkeys[req.s[i].u]) {
+                    req.s[i].k = base64urlencode(crypto_rsaencrypt(key, u_pubkeys[req.s[i].u]));
+                }
+            }
         }
-        else if (!--ctx.maxretry || res === EARGS) {
-            logger.error('Share operation failed.', res);
-            masterPromise.reject(res);
+
+        if (!--maxretry || res === EARGS) {
+            throw new MEGAException(`Share operation failed for ${node}: ${api.strerror(res)}`, res);
         }
-        else {
-            logger.info('Retrying share operation...');
 
-            setTimeout(function() {
-                api_req(ctx.req, ctx);
-            }, ctx.backoff <<= 1);
-        }
-    };
-
-    logger.info('Invoking share operation.');
-
-    mega.keyMgr.sendShareKeys(ctx.node, [...users])
-        .then(() => {
-            api_req(ctx.req, ctx);
-        })
-        .catch((ex) => {
-            logger.error(ex);
-            masterPromise.reject(ex);
-        });
-
-    return masterPromise;
+        await tSleep(Math.min(2e4, backoff <<= 1) / 1e3);
+    }
 }
 
 function crypto_handleauth(h) {
@@ -3004,7 +2249,7 @@ function api_getfa(id) {
     }
     storedattr[id] = Object.create(null);
 
-    return f.length ? f.join('/') : false;
+    return f.length ? f.join('/') : undefined;
 }
 
 function api_attachfileattr(node, id) {
@@ -3026,15 +2271,15 @@ function api_attachfileattr(node, id) {
             req.n = node;
         }
 
-        M.req(req)
-            .fail(function(res) {
-                if (res === EACCESS) {
+        api.screq(req)
+            .then(() => {
+                mBroadcaster.sendMessage('pfa:complete', id, node, fa);
+            })
+            .catch((ex) => {
+                if (ex === EACCESS) {
                     api_pfaerror(node);
                 }
-                mBroadcaster.sendMessage('pfa:error', id, node, res);
-            })
-            .done(function() {
-                mBroadcaster.sendMessage('pfa:complete', id, node, fa);
+                mBroadcaster.sendMessage('pfa:error', id, node, ex);
             });
     }
 
@@ -3189,7 +2434,7 @@ async function api_updfkey(sn) {
             if (d) {
                 console.warn('re-keying foreign nodes...', sn, nk);
             }
-            return M.req({a: 'k', nk});
+            return api.send({a: 'k', nk});
         }
     }
 }
@@ -3218,7 +2463,7 @@ function crypto_node_rsa2aes() {
 
     var nk = [];
 
-    for (h in rsa2aes) {
+    for (const h in rsa2aes) {
         // confirm that the key is good and actually decrypted the attribute
         // string before rewriting
         if (crypto_keyok(M.d[h]) && !M.d[h].a) {
@@ -3363,7 +2608,7 @@ async function crypto_reqmissingkeys() {
         // if (d) {
         //     console.debug('Requesting missing keys...', cr);
         // }
-        const res = await Promise.resolve(M.req({a: 'k', cr, i: requesti})).catch(dump);
+        const {result: res} = await api.req({a: 'k', cr, i: requesti}).catch(echo);
 
         if (typeof res === 'object' && typeof res[0] === 'object') {
             if (d) {
@@ -3563,59 +2808,83 @@ function crypto_share_rsa2aes() {
         });
     }
 }
-/* eslint-disable indent */
+
 // FIXME: add to translations?
 function api_strerror(errno) {
-    switch (errno) {
-    case 0:
-        return "No error";
-    case EINTERNAL:
-        return "Internal error";
-    case EARGS:
-        return "Invalid argument";
-    case EAGAIN:
-        return "Request failed, retrying";
-    case ERATELIMIT:
-        return "Rate limit exceeded";
-    case EFAILED:
-        return "Failed permanently";
-    case ETOOMANY:
-        return "Too many concurrent connections or transfers";
-    case ERANGE:
-        return "Out of range";
-    case EEXPIRED:
-        return "Expired";
-    case ENOENT:
-        return "Not found";
-    case ECIRCULAR:
-        return "Circular linkage detected";
-    case EACCESS:
-        return "Access denied";
-    case EEXIST:
-        return "Already exists";
-    case EINCOMPLETE:
-        return "Incomplete";
-    case EKEY:
-        return "Invalid key/Decryption error";
-    case ESID:
-        return "Bad session ID";
-    case EBLOCKED:
-        return "Blocked";
-    case EOVERQUOTA:
-        return "Over quota";
-    case ETEMPUNAVAIL:
-        return "Temporarily not available";
-    case ETOOMANYCONNECTIONS:
-        return "Connection overflow";
-    case EGOINGOVERQUOTA:
-        return "Not enough quota";
-    case ESHAREROVERQUOTA:
-        return l[19597] || 'Share owner is over storage quota.';
-    case EPAYWALL:
-        return "Over Disk Quota paywall";
-    default:
-        break;
-    }
-    return "Unknown error (" + errno + ")";
+    'use strict';
+    const eno = parseInt(errno);
+
+    return eno === 0 ? '<//NO_ERROR>' : api_strerror.map[eno] || `Unknown error (${errno})`;
 }
-/* eslint-enable indent */
+
+/** @property api_strerror.map */
+lazy(api_strerror, 'map', () => {
+    'use strict';
+
+    return freeze({
+        [EINTERNAL]: 'Internal error.',
+        [EARGS]: 'Invalid argument.',
+        [EAGAIN]: 'Request failed, retrying',
+        [ERATELIMIT]: 'Rate limit exceeded.',
+        [EFAILED]: 'Failed permanently.',
+        [ETOOMANY]: 'Too many concurrent connections or transfers',
+        [ERANGE]: 'Resource access out of range.',
+        [EEXPIRED]: 'Resource expired.',
+        [ENOENT]: 'Resource does not exist.',
+        [ECIRCULAR]: 'Circular linkage detected.',
+        [EACCESS]: 'Access denied.',
+        [EEXIST]: 'Resource already exists.',
+        [EINCOMPLETE]: 'Request incomplete.',
+        [EKEY]: 'Cryptographic error, invalid key.',
+        [ESID]: 'Bad session ID.',
+        [EBLOCKED]: 'Resource administratively blocked.',
+        [EOVERQUOTA]: 'Quota exceeded.',
+        [ETEMPUNAVAIL]: 'Resource temporarily not available.',
+        [ETOOMANYCONNECTIONS]: 'Too many connections.',
+        [EGOINGOVERQUOTA]: 'Not enough quota.',
+        [EROLLEDBACK]: 'Request rolled back.',
+        [EMFAREQUIRED]: 'Multi-Factor Authentication Required.',
+        [EMASTERONLY]: 'Access denied for sub-users.',
+        [EBUSINESSPASTDUE]: 'Business account expired.',
+        [EPAYWALL]: 'Over Disk Quota Paywall.',
+        [ETOOERR]: 'Too many concurrent errors.',
+        [ESHAREROVERQUOTA]: l[19597] || 'Share owner is over storage quota.'
+    });
+});
+
+/**
+ * Helper class able to hold a so called APIv2 Custom Error Detail
+ * @param {Number} code API error number.
+ * @param {*} [args] object(s) holding such error details.
+ */
+class APIRequestError {
+    constructor(code, ...args) {
+        if (d) {
+            console.assert(api_strerror.map[code], `Unexpected error code: ${code}`, args);
+        }
+        Object.assign(this, ...args);
+        Object.defineProperty(this, 'code', {value: code | 0});
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'APIRequestError';
+    }
+
+    toString() {
+        return api_strerror(this.code);
+    }
+
+    toJSON() {
+        return {err: this.code, ...this};
+    }
+
+    valueOf() {
+        return this.code;
+    }
+}
+
+freeze(APIRequestError.prototype);
+freeze(APIRequestError);
+
+// @todo remove whenever api_req() is.
+window.APIRequestError = APIRequestError;

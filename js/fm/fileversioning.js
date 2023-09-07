@@ -11,16 +11,9 @@ var versiondialogid;
          * @return It returns a list of handles of all the versions if everything works fine,
          * otherwise it returns list with current version.
          */
-        getAllVersions: function(h) {
-            var pms = new MegaPromise();
-
-            dbfetch.tree([h], -1)
-                .always(function() {
-                    var versions = fileversioning.getAllVersionsSync(h);
-                    pms.resolve(versions);
-                });
-
-            return pms;
+        async getAllVersions(h) {
+            await dbfetch.tree([h], -1).catch(dump);
+            return this.getAllVersionsSync(h);
         },
 
         /**
@@ -125,17 +118,15 @@ var versiondialogid;
 
         /**
          * delete all previous versions of a file.
-         * @param {hanlde} h file hanle.
+         * @param {String} h ufs-node handle
+         * @returns {Promise<*>}
          */
         clearPreviousVersions: function (h) {
-            fileversioning.getAllVersions(h).done(
-                function(versions) {
-                    var previousVersion = (versions && versions.length > 1) ? versions[1] : false;
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    var previousVersion = versions && versions.length > 1 ? versions[1] : false;
                     if (previousVersion) {
-                        api_req({
-                                    a: 'd',
-                                    n: previousVersion.h
-                                });
+                        return api.screq({a: 'd', n: previousVersion.h});
                     }
                 });
         },
@@ -146,15 +137,13 @@ var versiondialogid;
          * @param {Number} newFavState Favourites state 0 or 1
          */
         favouriteVersions: function (h, newFavState) {
-            fileversioning.getAllVersions(h).done(
-                function(versions) {
-                    for (var i = 1; i < versions.length; i++) {
-                        versions[i].fav = newFavState | 0;
-                        if (!versions[i].fav) {
-                            delete versions[i].fav;
-                        }
-                        api_setattr(versions[i], mRandomToken('fav'));
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    const promises = [];
+                    for (let i = 1; i < versions.length; i++) {
+                        promises.push(api.setNodeAttributes(versions[i], {fav: newFavState | 0}));
                     }
+                    return Promise.allSettled(promises);
                 });
         },
 
@@ -164,15 +153,13 @@ var versiondialogid;
          * @param {Number} labelId Numeric value of label
          */
         labelVersions: function (h, labelId) {
-            fileversioning.getAllVersions(h).done(
-                function(versions) {
-                    for (var i = 1; i < versions.length; i++) {
-                        versions[i].lbl = labelId | 0;
-                        if (!versions[i].lbl) {
-                            delete versions[i].lbl;
-                        }
-                        api_setattr(versions[i], mRandomToken('lbl'));
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    const promises = [];
+                    for (let i = 1; i < versions.length; i++) {
+                        promises.push(api.setNodeAttributes(versions[i], {lbl: labelId | 0}));
                     }
+                    return Promise.allSettled(promises);
                 });
         },
 
@@ -266,6 +253,7 @@ var versiondialogid;
                         t: 0,
                         a: ea,
                         k: a32_to_base64(encrypt_key(u_k_aes, file.k)),
+                        fa: file.fa,
                         ov: current_node
                     }]
                 };
@@ -288,14 +276,13 @@ var versiondialogid;
                     revertedNode.t = n.t;
                     req.cr = crypto_makecr([revertedNode], share, false);
                 }
-                api_req(req, {
-                    callback: function(res) {
-                        if (typeof res === 'object' && res.f) {
-                            selectionManager.clear_selection();
-                            selectionManager.add_to_selection(res.f[0].h);
-                        }
-                    }
-                });
+
+                api.screq(req)
+                    .then(({handle}) => {
+                        $.selected = [handle];
+                        reselect();
+                    })
+                    .catch(dump);
             };
 
             var fillVersionList = function(versionList) {
@@ -568,24 +555,15 @@ var versiondialogid;
                     if (M.isInvalidUserStatus()) {
                         return;
                     }
-
                     $('.fm-versioning.overlay').addClass('arrange-to-back');
-                    var apiReq = function(handles) {
-                        for (let i = handles.length; i--;) {
-                            api_req({
-                                a: 'd',
-                                n: handles[i],
-                                v: 1
-                            });
-                        }
-                    };
+
                     if (!$(this).hasClass('disabled')) {
 
                         const msg = mega.icu.format(l[13750], current_sel_version.length);
 
                         msgDialog('remove', l[1003], msg, l[1007], e => {
                             if (e) {
-                                apiReq(current_sel_version);
+                                api.screq(current_sel_version.map((n) => ({n, a: 'd', v: 1}))).catch(dump);
                                 current_sel_version = [];
                             }
                             $('.fm-versioning.overlay').removeClass('arrange-to-back');
@@ -607,8 +585,8 @@ var versiondialogid;
                 fileversioning.previewFile(current_sel_version[0]);
             });
 
-            fileversioning.getAllVersions(fh).done(
-                function(versions) {
+            fileversioning.getAllVersions(fh)
+                .then((versions) => {
                     var vh = fillVersionList(versions);
                     const $scrollBlock = $('.fm-versioning.scroll-bl', '.fm-versioning .body');
 
@@ -669,15 +647,8 @@ var versiondialogid;
                         if (M.isInvalidUserStatus()) {
                             return;
                         }
-
-                        var apiReq = function(handle) {
-                            api_req({a: 'd',
-                                     n: handle,
-                                     v: 1
-                                    });
-                        };
-                        var self = this;
                         if (!$(this).hasClass('disabled')) {
+                            const n = this.id.substr(4);
 
                             if (e.shiftKey && current_sel_version.length > 0) {
                                 $('.fm-versioning .body .file-info-row').removeClass('active');
@@ -687,8 +658,8 @@ var versiondialogid;
                             $('.fm-versioning.overlay').addClass('arrange-to-back');
                             msgDialog('remove', l[1003], mega.icu.format(l[13750], 1), l[1007], e => {
                                 if (e) {
-                                    apiReq(self.id.substring(4));
                                     current_sel_version = [];
+                                    api.screq({a: 'd', n, v: 1}).catch(dump);
                                 }
                                 $('.fm-versioning.overlay').removeClass('arrange-to-back');
                             });
@@ -804,7 +775,7 @@ var versiondialogid;
                     .fail(loadingDialog.hide);
             }
             else if (is_video(M.d[previewHandle]) || is_image2(M.d[previewHandle])) {
-                fileversioning.getAllVersions(versionHandle).done((res) => {
+                fileversioning.getAllVersions(versionHandle).then((res) => {
                     fileversioning.closeFileVersioningDialog(versionHandle);
                     if (is_video(M.d[previewHandle])) {
                         $.autoplay = previewHandle;

@@ -187,9 +187,6 @@ var tooltiplogin = {
                 topPopupAlign('.top-login-button:visible', '.dropdown.top-login-popup', 60);
             }
         }
-        if (is_chrome_firefox) {
-            mozLoginManager.fillForm.bind(mozLoginManager, 'form_login_header');
-        }
 
         // Init inputs events
         accountinputs.init($dialog);
@@ -260,18 +257,11 @@ var tooltiplogin = {
          * @param {Boolean} rememberMe Whether the user clicked the Remember me checkbox or not
          */
         startLogin: function(email, password, pinCode, rememberMe) {
-
             'use strict';
 
-            postLogin(email, password, pinCode, rememberMe, (result) => {
-
-                // Check if we can upgrade the account to v2
-                security.login.checkToUpgradeAccountVersion(result, u_k, password, () => {
-
-                    // Otherwise proceed with regular login
-                    tooltiplogin.completeLogin(result);
-                });
-            });
+            postLogin(email, password, pinCode, rememberMe)
+                .then((res) => tooltiplogin.completeLogin(res))
+                .catch(tell);
         }
     },
 

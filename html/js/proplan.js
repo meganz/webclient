@@ -247,9 +247,6 @@ pro.proplan = {
 
         // If not logged in, show the login/register prompt
         if (!u_handle) {
-            if (typeof page !== 'undefined' && page !== 'chat') {
-                megaAnalytics.log('pro', 'loginreq');
-            }
             showSignupPromptDialog();
             return false;
         }
@@ -1017,7 +1014,7 @@ pro.proplan = {
         }
         loadingDialog.show();
         delete mega.discountInfo;
-        M.req({ a: 'dci', dc: mega.discountCode }).then((res) => {
+        api.req({a: 'dci', dc: mega.discountCode}).then(({result: res}) => {
             loadingDialog.hide();
             if (res && res.al && res.pd) {
                 DiscountPromo.storeDiscountInfo(res);
@@ -1077,7 +1074,8 @@ pro.proplan = {
         M.require('businessAcc_js').done(function afterLoadingBusinessClass() {
             const business = new BusinessAccount();
 
-            business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
+            // eslint-disable-next-line complexity
+            business.getBusinessPlanInfo(false).then((info) => {
 
                 pro.proplan.businessPlanData = info;
 
@@ -1469,10 +1467,6 @@ function showLoginDialog(email, password) {
 
 var doProLogin = function($dialog) {
 
-    if (typeof page !== 'undefined' && page !== 'chat') {
-        megaAnalytics.log('pro', 'doLogin');
-    }
-
     loadingDialog.show();
 
     var $formWrapper = $dialog.find('form');
@@ -1511,18 +1505,8 @@ var doProLogin = function($dialog) {
  * @param {Boolean} rememberMe Whether the user clicked the Remember me checkbox or not
  */
 function startOldProLogin(email, password, pinCode, rememberMe) {
-
     'use strict';
-
-    postLogin(email, password, pinCode, rememberMe, (result) => {
-
-        // Check if we can upgrade the account to v2
-        security.login.checkToUpgradeAccountVersion(result, u_k, password, () => {
-
-            // Otherwise proceed with regular login
-            completeProLogin(result);
-        });
-    });
+    postLogin(email, password, pinCode, rememberMe).then(completeProLogin).catch(tell);
 }
 
 /**
@@ -1601,18 +1585,8 @@ function completeProLogin(result) {
 function showRegisterDialog(aPromise) {
     'use strict';
 
-    if (typeof page !== 'undefined' && page !== 'chat') {
-        megaAnalytics.log("pro", "regDialog");
-    }
-
     mega.ui.showRegisterDialog({
         title: l[5840],
-
-        onCreatingAccount: function() {
-            if (typeof page !== 'undefined' && page !== 'chat') {
-                megaAnalytics.log("pro", "doRegister");
-            }
-        },
 
         onLoginAttemptFailed: function(registerData) {
             msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {

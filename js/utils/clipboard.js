@@ -33,42 +33,11 @@ function selectText(elementId) {
  */
 function copyToClipboard(content, toastText, classname, timeout) {
     'use strict';
-    var success = true;
-
-    if (is_chrome_firefox) {
-        mozSetClipboard(content);
-    }
-    else {
-        var elm = document.getElementById('chromeclipboard');
-
-        if (elm) {
-            elm.textContent = content;
-            // selectText(elm.id);
-
-            try {
-                elm.focus();
-                elm.setSelectionRange(0, content.length);
-
-                success = document.execCommand('copy');
-            }
-            catch (ex) {
-                console.error(ex);
-                success = false;
-            }
-
-            elm.textContent = '';
-        }
-    }
+    const success = clip(content);
 
     if (success && toastText) {
-        showToast(
-            classname ? classname : 'clipboard',
-            toastText,
-            "",
-            "",
-            null,
-            null,
-            timeout);
+
+        showToast(classname || 'clipboard', toastText, "", "", null, null, timeout);
     }
 
     return success;

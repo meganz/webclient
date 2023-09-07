@@ -181,50 +181,28 @@ function removeUInode(h, parent) {
  * @param {Boolean} [skipDelWarning] skip..del..warning..
  * @returns {MegaPromise}
  */
-function fmremove(selectedNodes, skipDelWarning) {
-    'use strict';
-
-    var promise = new MegaPromise();
-    var handles;
-
-    if (selectedNodes) {
-        if (!Array.isArray(selectedNodes)) {
-            selectedNodes = [selectedNodes];
-        }
-    }
-    else {
-        selectedNodes = $.selected || [];
-    }
-    handles = selectedNodes.concat();
-
-    dbfetch.coll(handles)
-        .always(function() {
-            var doRemoveShare = handles.some(function(h) {
-                return M.d[h] && M.d[h].su;
-            });
-
-            if (doRemoveShare) {
-                var promises = [];
-
-                for (var i = handles.length; i--;) {
-                    promises.push(M.leaveShare(handles[i]));
-                }
-
-                promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
-            }
-            else {
-                fmremove.sync(selectedNodes, skipDelWarning);
-                promise.resolve();
-            }
-        });
-
-    return promise;
-}
-
 // @todo make eslint happy..
 // eslint-disable-next-line complexity,sonarjs/cognitive-complexity
-fmremove.sync = function(selectedNodes, skipDelWarning) {
+async function fmremove(selectedNodes, skipDelWarning) {
     'use strict';
+
+    selectedNodes = selectedNodes || $.selected;
+    if (!Array.isArray(selectedNodes)) {
+        selectedNodes = selectedNodes ? [selectedNodes] : [];
+    }
+
+    const handles = [...selectedNodes];
+    await dbfetch.coll(handles).catch(nop);
+
+    if (handles.some((h) => M.d[h] && M.d[h].su)) {
+        const promises = [];
+
+        for (let i = handles.length; i--;) {
+            promises.push(M.leaveShare(handles[i]));
+        }
+
+        return Promise.all(promises);
+    }
 
     var i = 0;
     var filecnt = 0;
@@ -278,23 +256,25 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
             sharedFoldersAlertMessage = sharedFoldersAlertMessage.replace('[X]', contactName);
         }
 
-        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), sharedFoldersAlertMessage,
-            function(e) {
-                if (e) {
-                    for (i = 0; i < selectedNodes.length; i++) {
-                        var selected = selectedNodes[i];
+        const ack = async(yes) => {
+            const promises = [];
+            const leave = (h) => M.leaveShare(h);
 
-                        if (M.c[selected]) {
-                            Object.keys(M.c[selected])
-                                .forEach(function(sharenode) {
-                                    M.leaveShare(sharenode);
-                                });
-                        }
+            for (let i = yes && selectedNodes.length; i--;) {
+                const h = selectedNodes[i];
 
-                        api_req({a: 'ur2', u: selected, l: '0', i: requesti});
-                    }
+                if (M.c[h]) {
+                    promises.push(...Object.keys(M.c[h]).map(leave));
                 }
-            });
+
+                promises.push(api.screq({a: 'ur2', u: h, l: '0'}));
+            }
+
+            return Promise.allSettled(promises).dump('delete-contact');
+        };
+
+        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), sharedFoldersAlertMessage, ack);
+
         if (c > 1) {
             $('#msgDialog').addClass('multiple');
             $('#msgDialog .fm-del-contact-avatar')
@@ -340,15 +320,18 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
                     tmp = M.currentdirid;
                     M.currentdirid = M.getNodeByHandle(selectedNodes[0]).p || M.RubbishID;
                 }
+
                 M.clearRubbish(false)
-                    .always(function() {
+                    .finally(() => {
                         if (tmp) {
                             M.currentdirid = tmp;
                         }
                     })
-                    .done(function() {
+                    .then((res) => {
+                        console.debug('clear-bin', res);
                         showToast('settings', toastMessage);
-                    });
+                    })
+                    .catch(dump);
             }
         });
     }
@@ -356,7 +339,7 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
     // Remove contacts
     else if (M.getNodeRoot(selectedNodes[0]) === 'contacts') {
         if (skipDelWarning) {
-            M.copyNodes(selectedNodes, M.RubbishID, true);
+            M.copyNodes(selectedNodes, M.RubbishID, true).catch(tell);
         }
         else {
             title = l[1003];
@@ -372,20 +355,25 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
 
             msgDialog('confirmation', title, message, false, function(e) {
                     if (e) {
-                        M.copyNodes(selectedNodes, M.RubbishID, 1);
+                    M.copyNodes(selectedNodes, M.RubbishID, true).catch(tell);
                     }
             }, 'skipDelWarning');
         }
     }
     else {
         var moveToRubbish = function() {
-            loadingDialog.pshow();
-            M.moveToRubbish(selectedNodes).always(loadingDialog.phide.bind(loadingDialog)).done(function () {
-                // Re-render the search result / faves page after files being removed
-                if (M.currentdirid.split("/")[0] === "search" || M.currentdirid === 'faves') {
-                    M.openFolder(M.currentdirid, true);
-                }
-            });
+            mLoadingSpinner.show('move-to-rubbish');
+
+            M.moveToRubbish(selectedNodes)
+                .catch(tell)
+                .finally(() => {
+                    mLoadingSpinner.hide('move-to-rubbish');
+
+                    // Re-render the search result page after files being removed
+                    if (String(M.currentdirid).startsWith("search") || M.isDynPage(M.currentdirid)) {
+                        M.openFolder(M.currentdirid, true);
+                    }
+                });
         };
 
         if (skipDelWarning) {

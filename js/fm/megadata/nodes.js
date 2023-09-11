@@ -547,6 +547,100 @@ MegaData.prototype.clearRubbish = async function(all) {
     return res;
 };
 
+/**
+ * Confirm newly established nodes at specific locations retains expected validity.
+ * @param {String|Array} nodes ufs-node's handle, or an array of them.
+ * @name confirmNodesAtLocation
+ * @memberOf MegaData.prototype
+ * @returns {Promise<*>} ack
+ */
+lazy(MegaData.prototype, 'confirmNodesAtLocation', () => {
+    'use strict';
+    let promise;
+    const bulk = new Set();
+    const sml = `NAL.${makeUUID()}`;
+
+    const attachS4Bucket = async(n) => {
+        return s4.kernel.bucket.create(n.p, n)
+            .catch((ex) => {
+                if (d) {
+                    console.error(`Failed to establish S4 Bucket from existing node (${n.h})...`, ex, n);
+                }
+                return M.moveToRubbish(n.h);
+            });
+    };
+
+    const dequeue = async(nodes) => {
+        const promises = [];
+        const parents = Object.create(null);
+
+        for (let i = nodes.length; i--;) {
+            const n = M.getNodeByHandle(nodes[i]);
+
+            if (n) {
+                const p = M.getNodeByHandle(n.p);
+                const ps4t = p.s4 && s4.kernel.getS4NodeType(p);
+
+                if (n.s4) {
+                    if (d) {
+                        console.warn(`Revoking S4 attribute for ${n.h}`);
+                    }
+
+                    if (ps4t !== 'container') {
+                        promises.push(api.setNodeAttributes(n, {s4: undefined}));
+                    }
+                }
+
+                if (ps4t) {
+
+                    if (ps4t === 'container') {
+                        promises.push(attachS4Bucket(n));
+                    }
+                    else if (ps4t === 'bucket') {
+
+                        // @todo if type is bucket, validate expected object-type
+                    }
+                }
+
+                parents[n.p] = n;
+            }
+        }
+
+        if (promises.length) {
+            await Promise.all(promises);
+        }
+
+        return parents;
+    };
+
+    const dispatcher = () => {
+        const {resolve, reject} = promise;
+
+        dequeue([...bulk])
+            .then(resolve)
+            .catch((ex) => {
+                if (d) {
+                    console.error('confirmNodesAtLocation', ex);
+                }
+                reject(ex);
+            });
+
+        bulk.clear();
+        promise = null;
+    };
+
+    return (nodes) => {
+        if (Array.isArray(nodes)) {
+            nodes.map(bulk.add, bulk);
+        }
+        else {
+            bulk.add(nodes);
+        }
+        delay(sml, dispatcher);
+        return promise || (promise = mega.promise);
+    };
+});
+
 // This function has a special hacky purpose, don't use it if you don't know what it does, use M.copyNodes instead.
 MegaData.prototype.injectNodes = function(nodes, target, callback) {
     'use strict';
@@ -836,6 +930,9 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
                 }
             }
 
+            // @todo better error handling..
+            this.confirmNodesAtLocation(result).catch(tell);
+
             return result;
 
         })
@@ -1048,7 +1145,7 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
                         nodes[i] = h;
                     }
 
-                    return Promise.all(promises).then(() => st);
+                    return Promise.all(promises).then(() => M.confirmNodesAtLocation(nodes)).then(() => st);
                 })
                 .then((res) => {
                     $.tresizer();
@@ -1804,8 +1901,20 @@ MegaData.prototype.rename = async function(itemHandle, newItemName) {
     }
 
     if (n && n.name !== newItemName) {
+        const prop = {name: newItemName};
 
-        return api.setNodeAttributes(n, {name: newItemName});
+        if (n.s4) {
+            const res = s4.kernel.validateForeignAction('rename', {node: n, ...prop});
+
+            if (res) {
+                if (res instanceof Promise) {
+                    return res;
+                }
+                prop.name = res;
+            }
+        }
+
+        return api.setNodeAttributes(n, prop);
     }
 };
 
@@ -2919,7 +3028,7 @@ MegaData.prototype.isFolder = function(nodesId) {
  * @param {String|Array} name Either a string with the folder name to create, or an array of them.
  * @return {Promise} the handle of the deeper created folder.
  */
-MegaData.prototype.createFolder = promisify(function(resolve, reject, target, name) {
+MegaData.prototype.createFolder = promisify(function(resolve, reject, target, name, attrs) {
     "use strict";
     var self = this;
     var inflight = self.cfInflightR;
@@ -2998,7 +3107,11 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
             }
         }
 
-        var n = {name: name};
+        const n = {...attrs, name};
+        if (M.d[target].s4) {
+            s4.kernel.setNodeAttributesByRef(target, n);
+        }
+
         var attr = ab_to_base64(crypto_makeattr(n));
         var key = a32_to_base64(encrypt_key(u_k_aes, n.k));
         var req = {a: 'p', t: target, n: [{h: 'xxxxxxxx', t: 1, a: attr, k: key}], i: requesti};

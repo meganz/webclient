@@ -1656,6 +1656,10 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
     if (id && is_megadrop) {
         mega.fileRequestUpload.onItemUploadCompletion(id);
     }
+    else if (h) {
+        // @todo better error handling..
+        M.confirmNodesAtLocation(h).catch(tell);
+    }
 
     delay('tfscomplete', function() {
         M.resetUploadDownload();

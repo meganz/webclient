@@ -1,13 +1,12 @@
 {
     "env": {
         "browser": true,
-        "es6": true,
+        "es2020": true,
         "jquery": true,
         "mocha": true,
         "worker": true
     },
     "parserOptions": {
-        "ecmaVersion": 2018,
         "ecmaFeatures": {
             "jsx": true
         }
@@ -175,6 +174,7 @@
         "compat/compat": 1,
 
         "es/no-atomics": 2,
+        "es/no-bigint": "off",
         "es/no-exponential-operators": 2,
         "es/no-object-fromentries": "off",
         "es/no-promise-all-settled": "off",

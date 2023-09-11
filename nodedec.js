@@ -392,6 +392,9 @@ function crypto_makeattr(n, nn) {
     if (typeof n.rr !== 'undefined') {
         ar.rr = n.rr;
     }
+    if (typeof n.s4 !== 'undefined') {
+        ar.s4 = JSON.stringify(n.s4);
+    }
 
     const buf = str_to_ab(`MEGA${to8(JSON.stringify(ar))}`);
     const key = a32_to_ab([nn.k[0] ^ nn.k[4], nn.k[1] ^ nn.k[5], nn.k[2] ^ nn.k[6], nn.k[3] ^ nn.k[7]]);
@@ -402,7 +405,11 @@ function crypto_makeattr(n, nn) {
 // clear all node attributes, including derived ones
 function crypto_clearattr(n) {
     // derived node attr directory, see crypto_procattr()
-    const dattrs = ['ar', 'name', 'hash', 'mtime', 'fav', 'lbl', 'f', 'rr', 'gps', 'devid', 'drvid', 'sds'];
+    const dattrs = [
+        'ar', 'devid', 'drvid', 'f', 'fav', 'gps',
+        'hash', 'lbl', 'mtime', 'name',
+        'rr', 's4', 'sds'
+    ];
     const old = {};
 
     for (let i = dattrs.length; i--;) {
@@ -490,6 +497,11 @@ function crypto_procattr(n, key) {
             if (typeof o.rr !== 'undefined') {
                 n.rr = o.rr;
                 delete o.rr;
+            }
+
+            if (typeof o.s4 !== 'undefined') {
+                n.s4 = tryCatch(() => JSON.parse(o.s4))();
+                delete o.s4;
             }
 
             if (o.l && o.l.length === 8 || o.gp && o.gp.length === 16) {

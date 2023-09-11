@@ -449,10 +449,7 @@ function geoStaticPath(cms) {
 var myURL = window.URL;
 
 // Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
-browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' || window.MSBlobBuilder
-    || typeof history !== 'object' || typeof history.replaceState !== 'function'
-    || window.chrome && !document.exitPointerLock
-;
+browserUpdate = browserUpdate || typeof BigInt === 'undefined';
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -778,11 +775,11 @@ var mega = {
         }
 
         if (storage.csp) {
-            to += `${_getSeperator()}csp=${storage.csp}`;
+            to += _getSeperator() + 'csp=' + storage.csp;
         }
 
         if (storage.utm) {
-            to += `${_getSeperator()}sra=${b64encode(storage.utm)}`;
+            to += _getSeperator() + 'sra=' + b64encode(storage.utm);
         }
 
         if (Array.isArray(kv)) {
@@ -2566,8 +2563,10 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
     jsl.push({f:'js/keymgr.js', n: 'keymgr_js', j:1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
+    jsl.push({f:'js/utils/md5.js', n: 'js_utils_md5_js', j: 1});
     jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
     jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
+    jsl.push({f:'js/utils/s4.js', n: 'js_utils_s4_js', j: 1});
     jsl.push({f:'js/utils/splitter.js', n: 'js_utils_splitter_js', j: 1});
     jsl.push({f:'js/utils/test.js', n: 'js_utils_test_js', j: 1});
     jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
@@ -3622,9 +3621,7 @@ else if (!browserUpdate) {
 
         scriptTest(
             'es6s =' +
-            ' ({...{a:23}}).a === 23' + // C60 E79 F55 O47 S11
-            ' && Promise.prototype.finally' + // C63 E18 F58 O50 S11
-            ' && typeof ReadableStream === "function"' + // C43 E14 F65 O30 S10
+            ' BigInt(Math.pow(2, 48)) << 16n === 18446744073709551616n' + // C67 E79 F68 O54 S14
             ' && (Array.prototype.values === Array.prototype[Symbol.iterator])' + // C66 E12 F60 O53 S9
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {
@@ -4356,3 +4353,5 @@ mBroadcaster.once('startMega', function() {
 
     Object.defineProperty(window, 'dump', {value: console.warn.bind(console, '[dump]')});
 });
+
+Object.defineProperty(self, 's4', {value: Object.create(null)});

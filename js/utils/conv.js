@@ -341,6 +341,37 @@ function hex2bin(hex) {
 
 })(self);
 
+(() => {
+    'use strict';
+    /**
+     * Utility functions to convert ufs-node's handles from/to their decimal number representation.
+     */
+
+    Object.defineProperties(mega, {
+        hton: {
+            value(h, pad = 15) {
+                let res = 0;
+
+                for (let s = base64urldecode(h), i = s.length; i--;) {
+                    res = res * 256 + s.charCodeAt(i);
+                }
+                return pad ? String(res).padStart(pad, '0') : res;
+            }
+        },
+        ntoh: {
+            value(n) {
+                let s = '';
+                while (n > 1) {
+                    s += String.fromCharCode(n & 255);
+                    n /= 256;
+                }
+                return base64urlencode(s);
+            }
+        }
+    });
+
+})();
+
 
 /**
  * Instantiates an enum-like list on the provided target object

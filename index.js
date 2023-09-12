@@ -2150,6 +2150,10 @@ function topbarUI(holderId) {
             container.classList.remove("show");
         }
         else {
+            if (fmconfig.rvonbrddl === 1) {
+                $('.js-accountbtn.feedback', topbar).removeClass('highlight');
+            }
+
             const $accountAvatar = $('.js-account-avatar', topbar);
             if (!$accountAvatar.hasClass('rendered')) {
                 $accountAvatar.addClass('rendered').safeHTML(useravatar.contact(u_handle));
@@ -2186,7 +2190,14 @@ function topbarUI(holderId) {
         else if (this.classList.contains('logout')) {
             mLogout();
         }
-
+        else if (this.classList.contains('feedback')) {
+            mega.config.set('rvonbrddl', 1);
+            window.open(
+                'https://survey.mega.co.nz/index.php?r=survey/index&sid=765691&lang=en',
+                '_blank',
+                'noopener,noreferrer'
+            );
+        }
         var dropdown = document.getElementsByClassName('js-dropdown-account');
 
         for (i = dropdown.length; i--;) {

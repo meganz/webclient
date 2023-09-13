@@ -22450,8 +22450,8 @@ const MAX_STREAMS = 19;
 const NAMESPACE = 'stream';
 const MAX_STREAMS_PER_PAGE = 9;
 const PAGINATION = {
-  PREV: 1,
-  NEXT: 2
+  PREV: -1,
+  NEXT: 1
 };
 const MOUSE_OUT_DELAY = 2500;
 class stream_Stream extends mixins.wl {
@@ -22473,9 +22473,15 @@ class stream_Stream extends mixins.wl {
     this.handleMouseOut = this.handleMouseOut.bind(this);
   }
   movePage(direction) {
-    return this.setState(state => ({
-      page: direction === PAGINATION.NEXT ? state.page + 1 : state.page - 1
-    }));
+    let page = this.state.page + direction;
+    if (page < 0) {
+      page = 0;
+    } else if (page > this.chunksLength - 1) {
+      page = this.chunksLength - 1;
+    }
+    this.setState({
+      page
+    });
   }
   handleMouseMove() {
     this.setState({

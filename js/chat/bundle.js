@@ -7993,7 +7993,7 @@ class ContactPickerWidget extends _mixins1__.wl {
           }
           if (self.props.autoFocusSearchField) {
             var _self$contactSearchFi;
-            (_self$contactSearchFi = self.contactSearchField) == null ? void 0 : _self$contactSearchFi.focus();
+            (_self$contactSearchFi = self.contactSearchField) == null || _self$contactSearchFi.focus();
           }
         }
         self.clickTime = new Date();
@@ -8083,7 +8083,7 @@ class ContactPickerWidget extends _mixins1__.wl {
           }
           if (self.props.autoFocusSearchField) {
             var _self$contactSearchFi2;
-            (_self$contactSearchFi2 = self.contactSearchField) == null ? void 0 : _self$contactSearchFi2.focus();
+            (_self$contactSearchFi2 = self.contactSearchField) == null || _self$contactSearchFi2.focus();
           }
         }
         self.clickTime = new Date();
@@ -11642,9 +11642,9 @@ class Loading extends mixins.wl {
     var _notify, _alarm;
     super.componentDidMount();
     document.dispatchEvent(new Event('closeDropdowns'));
-    closeDialog == null ? void 0 : closeDialog();
-    (_notify = notify) == null ? void 0 : _notify.closePopup();
-    (_alarm = alarm) == null ? void 0 : _alarm.hideAllWarningPopups();
+    closeDialog == null || closeDialog();
+    (_notify = notify) == null || _notify.closePopup();
+    (_alarm = alarm) == null || _alarm.hideAllWarningPopups();
     document.querySelectorAll('.js-dropdown-account').forEach(({
       classList
     }) => classList.contains('show') && classList.remove('show'));
@@ -12017,17 +12017,17 @@ class Alert extends mixins.wl {
   componentWillUnmount() {
     var _this$props$onTransit, _this$props;
     super.componentWillUnmount();
-    (_this$props$onTransit = (_this$props = this.props).onTransition) == null ? void 0 : _this$props$onTransit.call(_this$props);
+    (_this$props$onTransit = (_this$props = this.props).onTransition) == null || _this$props$onTransit.call(_this$props);
   }
   componentDidUpdate() {
     var _this$props$onTransit2, _this$props2;
     super.componentDidUpdate();
-    (_this$props$onTransit2 = (_this$props2 = this.props).onTransition) == null ? void 0 : _this$props$onTransit2.call(_this$props2, this.alertRef);
+    (_this$props$onTransit2 = (_this$props2 = this.props).onTransition) == null || _this$props$onTransit2.call(_this$props2, this.alertRef);
   }
   componentDidMount() {
     var _this$props$onTransit3, _this$props3;
     super.componentDidMount();
-    (_this$props$onTransit3 = (_this$props3 = this.props).onTransition) == null ? void 0 : _this$props$onTransit3.call(_this$props3, this.alertRef);
+    (_this$props$onTransit3 = (_this$props3 = this.props).onTransition) == null || _this$props$onTransit3.call(_this$props3, this.alertRef);
   }
   render() {
     const {
@@ -14069,7 +14069,7 @@ class ConversationPanels extends mixins.wl {
   componentDidMount() {
     var _this$props$onMount, _this$props;
     super.componentDidMount();
-    (_this$props$onMount = (_this$props = this.props).onMount) == null ? void 0 : _this$props$onMount.call(_this$props);
+    (_this$props$onMount = (_this$props = this.props).onMount) == null || _this$props$onMount.call(_this$props);
     megaChat.chats.forEach(chatRoom => {
       const {
         scheduledMeeting
@@ -14654,7 +14654,7 @@ class Datepicker extends mixins.wl {
       var _this$props$onMount, _this$props;
       $(inputRef).datepicker(this.OPTIONS);
       this.datepicker = $(inputRef).data('datepicker');
-      (_this$props$onMount = (_this$props = this.props).onMount) == null ? void 0 : _this$props$onMount.call(_this$props, this.datepicker);
+      (_this$props$onMount = (_this$props = this.props).onMount) == null || _this$props$onMount.call(_this$props, this.datepicker);
     }
   }
   componentWillUnmount() {
@@ -14742,20 +14742,22 @@ class Select extends mixins.wl {
         expanded: false
       });
     };
-    this.handleToggle = e => {
-      if (e.target === this.menuRef.current.domNode) {
-        return;
+    this.handleToggle = ({
+      target
+    }) => {
+      const menuRef = this.menuRef && this.menuRef.current;
+      if (target !== menuRef.domNode) {
+        const {
+          value
+        } = this.props;
+        this.setState(state => ({
+          expanded: !state.expanded
+        }), () => {
+          if (value && this.optionRefs[value]) {
+            menuRef.scrollToElement(this.optionRefs[value]);
+          }
+        });
       }
-      const {
-        value
-      } = this.props;
-      this.setState(state => ({
-        expanded: !state.expanded
-      }), () => {
-        if (value && this.optionRefs[value]) {
-          this.menuRef.current.scrollToElement(this.optionRefs[value]);
-        }
-      });
     };
   }
   getFormattedDuration(duration) {
@@ -14860,7 +14862,7 @@ class Select extends mixins.wl {
           minutes: inputTime.get('minutes')
         });
         const timestamp = prevDate.valueOf();
-        onChange == null ? void 0 : onChange(timestamp);
+        onChange == null || onChange(timestamp);
         if (this.optionRefs[value]) {
           this.menuRef.current.scrollToElement(this.optionRefs[value]);
         }
@@ -14941,7 +14943,7 @@ class DateTime extends mixins.wl {
       datepickerRef.currentDate = dateObj;
       datepickerRef.nav._render();
       datepickerRef.views.days._render();
-      onChange == null ? void 0 : onChange(value);
+      onChange == null || onChange(value);
       this.setState({
         manualDateInput: dateObj.getTime()
       });
@@ -16787,7 +16789,7 @@ class StartGroupChatWizard extends mixins.wl {
       popupDidMount: elem => {
         if (this.props.extraContent) {
           var _elem$querySelector;
-          (_elem$querySelector = elem.querySelector('.content-block.imported')) == null ? void 0 : _elem$querySelector.appendChild(this.props.extraContent);
+          (_elem$querySelector = elem.querySelector('.content-block.imported')) == null || _elem$querySelector.appendChild(this.props.extraContent);
         }
         if (this.props.onExtraContentDidMount) {
           this.props.onExtraContentDidMount(elem);
@@ -18523,7 +18525,7 @@ class ConversationsApp extends mixins.wl {
         $chatTreePanePs,
         routingSection
       } = megaChat;
-      $chatTreePanePs == null ? void 0 : $chatTreePanePs.reinitialise();
+      $chatTreePanePs == null || $chatTreePanePs.reinitialise();
       if (routingSection !== 'chat') {
         loadSubPage('fm/chat');
       }
@@ -18739,12 +18741,12 @@ class Result extends mixins.wl {
   componentDidMount() {
     var _this$props$onMount, _this$props;
     super.componentDidMount();
-    (_this$props$onMount = (_this$props = this.props).onMount) == null ? void 0 : _this$props$onMount.call(_this$props, this.resultRef.current);
+    (_this$props$onMount = (_this$props = this.props).onMount) == null || _this$props$onMount.call(_this$props, this.resultRef.current);
   }
   componentWillUnmount() {
     var _this$props$onUnmount, _this$props2;
     super.componentWillUnmount();
-    (_this$props$onUnmount = (_this$props2 = this.props).onUnmount) == null ? void 0 : _this$props$onUnmount.call(_this$props2, this.resultRef.current, 'unobserve');
+    (_this$props$onUnmount = (_this$props2 = this.props).onUnmount) == null || _this$props$onUnmount.call(_this$props2, this.resultRef.current, 'unobserve');
   }
   render() {
     const {
@@ -23349,8 +23351,8 @@ class Invite extends mixins.wl {
         onClose
       } = this.props;
       if (selected.length > 0) {
-        chatRoom == null ? void 0 : chatRoom.trigger('onAddUserRequest', [selected]);
-        onClose == null ? void 0 : onClose();
+        chatRoom == null || chatRoom.trigger('onAddUserRequest', [selected]);
+        onClose == null || onClose();
       }
     };
     this.getFrequentContacts = () => megaChat.getFrequentContacts().then(response => {
@@ -23849,7 +23851,7 @@ class Call extends mixins.wl {
     };
     this.handleCallEnd = () => {
       var _this$props$call;
-      (_this$props$call = this.props.call) == null ? void 0 : _this$props$call.destroy();
+      (_this$props$call = this.props.call) == null || _this$props$call.destroy();
     };
     this.handleEphemeralAdd = handle => handle && this.setState(state => ({
       ephemeral: true,
@@ -23910,7 +23912,8 @@ class Call extends mixins.wl {
     }
     this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle => this.handleEphemeralAdd(handle));
     this.pageChangeListener = mBroadcaster.addListener('pagechange', () => {
-      if (Call.isExpanded() && (!M.chat || megaChat.getCurrentRoom().chatId !== chatRoom.chatId)) {
+      const currentRoom = megaChat.getCurrentRoom();
+      if (Call.isExpanded() && (!M.chat || currentRoom && currentRoom.chatId !== chatRoom.chatId)) {
         this.handleCallMinimize();
       }
     });
@@ -24166,7 +24169,7 @@ const withHostsObserver = Component => {
           chatRoom.trigger('alterUserPrivilege', [selected[i], ChatRoom.MembersSet.PRIVILEGE_STATE.FULL]);
         }
         this.toggleDialog();
-        onLeave == null ? void 0 : onLeave();
+        onLeave == null || onLeave();
         $(document).trigger('closeDropdowns');
       };
       this.confirmLeave = ({
@@ -24834,7 +24837,7 @@ class Preview extends _mixins_js1__.wl {
         }
         return this.state[stream] ? this.startStream(type) : this.stopStream(type);
       });
-      (_this$props$resetErro = (_this$props = this.props).resetError) == null ? void 0 : _this$props$resetErro.call(_this$props, type === Preview.STREAMS.AUDIO ? Av.Audio : Av.Camera);
+      (_this$props$resetErro = (_this$props = this.props).resetError) == null || _this$props$resetErro.call(_this$props, type === Preview.STREAMS.AUDIO ? Av.Audio : Av.Camera);
     };
     this.renderAvatar = () => {
       if (_call_jsx3__.ZP.isGuest()) {
@@ -26777,7 +26780,7 @@ class Giphy extends AbstractGenericMessage {
       src: isIntersecting ? gifPanel.bl.convert(this.props.message.meta.src) : undefined
     }, () => {
       var _this$gifRef;
-      (_this$gifRef = this.gifRef) == null || (_this$gifRef = _this$gifRef.current) == null ? void 0 : _this$gifRef[isIntersecting ? 'load' : 'pause']();
+      (_this$gifRef = this.gifRef) == null || (_this$gifRef = _this$gifRef.current) == null || _this$gifRef[isIntersecting ? 'load' : 'pause']();
       this.safeForceUpdate();
     });
   }
@@ -29246,7 +29249,7 @@ class DropdownContactsSelector extends _chat_mixins1__.wl {
       onClose: this.props.closeDropdown,
       onEventuallyUpdated: () => {
         var _self$dropdownRef;
-        (_self$dropdownRef = self.dropdownRef) == null ? void 0 : _self$dropdownRef.doRerender();
+        (_self$dropdownRef = self.dropdownRef) == null || _self$dropdownRef.doRerender();
       },
       active: this.props.active,
       className: "popup contacts-search tooltip-blur small-footer",
@@ -29705,7 +29708,7 @@ class DropdownEmojiSelector extends _chat_mixins0__.wl {
           const categoryPosition = this.data_categoryPositions[this.data_categories.indexOf(categoryName)] + 10;
           this.scrollableArea.scrollToY(categoryPosition);
           this._onScrollChanged(categoryPosition);
-          (_this$emojiSearchFiel = this.emojiSearchField) == null ? void 0 : _this$emojiSearchFiel.current.focus();
+          (_this$emojiSearchFiel = this.emojiSearchField) == null || _this$emojiSearchFiel.current.focus();
         }
       }, React.createElement("i", {
         className: `sprite-fm-mono ${categoryIcons[categoryName]}`
@@ -30045,7 +30048,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       if (img && (img = img.querySelector('img'))) {
         var _img$parentNode$paren;
         img.src = src;
-        (_img$parentNode$paren = img.parentNode.parentNode) == null ? void 0 : _img$parentNode$paren.classList.add('thumb');
+        (_img$parentNode$paren = img.parentNode.parentNode) == null || _img$parentNode$paren.classList.add('thumb');
       }
     };
     const setSource = n => {
@@ -31352,7 +31355,7 @@ class FMView extends mixins.wl {
     super.componentWillUnmount();
     if (this._listener) {
       var _this$dataSource4;
-      (_this$dataSource4 = this.dataSource) == null ? void 0 : _this$dataSource4.removeChangeListener(this._listener);
+      (_this$dataSource4 = this.dataSource) == null || _this$dataSource4.removeChangeListener(this._listener);
     }
     if (this._rawListener) {
       mBroadcaster.removeListener(this._rawListener);
@@ -31709,12 +31712,12 @@ class GenericNodePropsComponent extends mixins.wl {
     if (super.componentWillMount) {
       super.componentWillMount();
     }
-    (_this$nodeProps = this.nodeProps) == null ? void 0 : _this$nodeProps.use(this.changeListener);
+    (_this$nodeProps = this.nodeProps) == null || _this$nodeProps.use(this.changeListener);
   }
   componentWillUnmount() {
     var _this$nodeProps2;
     super.componentWillUnmount();
-    (_this$nodeProps2 = this.nodeProps) == null ? void 0 : _this$nodeProps2.unuse(this.changeListener);
+    (_this$nodeProps2 = this.nodeProps) == null || _this$nodeProps2.unuse(this.changeListener);
   }
 }
 

@@ -26264,7 +26264,6 @@ var metaRichPreviewLoading = __webpack_require__(480);
 
 class MetaRichpreviewMegaLinks extends mixin.y {
   render() {
-    var self = this;
     var message = this.props.message;
     var chatRoom = this.props.message.chatRoom;
     var previewContainer;
@@ -26285,10 +26284,10 @@ class MetaRichpreviewMegaLinks extends mixin.y {
             if (contactLinkHandles.length) {
               this.addContactListenerIfMissing(contactLinkHandles);
             }
-          }).always(function () {
-            Soon(function () {
-              message.trackDataChange();
-              self.safeForceUpdate();
+          }).catch(reportError).finally(() => {
+            message.trackDataChange();
+            onIdle(() => {
+              this.safeForceUpdate();
             });
           });
         }

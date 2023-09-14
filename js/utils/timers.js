@@ -624,13 +624,13 @@ mBroadcaster.once('boot_done', tryCatch(() => {
     window.setInterval = function(f, ms, ...args) {
         dspInterval(++pid, Math.max(ms | 0, 1e3) / 1e3, tryCatch(() => f(...args))).catch(dump);
 
-        logger.warn('setInterval', pid, ms);
+        // logger.warn('setInterval', pid, ms);
         return pid;
     };
 
     window.clearInterval = function(pid) {
 
-        logger.warn('clearInterval', pid, running[pid]);
+        // logger.warn('clearInterval', pid, running[pid]);
         delete running[pid];
     };
 

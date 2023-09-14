@@ -369,7 +369,7 @@ MegaData.prototype.syncContactEmail = async function(userHash, forced) {
                 fmdb.add('u', {u: u.u, d: {...user.toJS()}});
             }
 
-            if (fminitialized) {
+            if (fminitialized || user.u === window.u_handle) {
 
                 if (!user.c && !ignoreDB) {
                     user.lastName = '';

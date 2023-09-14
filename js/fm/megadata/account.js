@@ -132,7 +132,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
     // api_req : a=clc     contact link create api method
     //           f=1       a flag to tell the api to create a new link if it doesnt exist.
     //                     but if a previous link was deleted, then dont return any thing (empty)
-    sendAPIRequest({a: 'clc', f: 1}, (res) => {
+    sendAPIRequest({a: 'clc', f: 1}, ([, res]) => {
 
         account.contactLink = typeof res === 'string' ? `C!${res}` : '';
     });

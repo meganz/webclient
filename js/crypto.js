@@ -278,45 +278,6 @@ function api_req(request, context, channel) {
         .catch(reportError);
 }
 
-// @todo remove
-function api_reqerror(q, e, status) {
-    'use strict';
-    var c = e | 0;
-
-    if (typeof e === 'object' && e.err < 0) {
-        c = e.err | 0;
-    }
-
-    if (c === EAGAIN || c === ERATELIMIT) {
-        // request failed - retry with exponential backoff
-        if (q.backoff) {
-            q.backoff = Math.min(600000, q.backoff << 1);
-        }
-        else {
-            q.backoff = 125+Math.floor(Math.random()*600);
-        }
-
-        q.timer = setTimeout(api_send, q.backoff, q);
-
-        c = EAGAIN;
-    }
-    else {
-        q.failhandler(q.c, e);
-    }
-
-    if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
-        if (status === true && c === EAGAIN) {
-            mega.loadReport.EAGAINs++;
-        }
-        else if (status === 500) {
-            mega.loadReport.e500s++;
-        }
-        else {
-            mega.loadReport.errs++;
-        }
-    }
-}
-
 // @todo refactor
 function api_reqfailed(channel, error) {
     'use strict';

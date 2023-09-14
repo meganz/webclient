@@ -94,14 +94,16 @@ class MEGADeferredController extends Promise {
  * Auto Renew Time-Offset
  */
 class AutoRenewTimeOffset {
-    constructor(offset = 166) {
+    constructor(offset = 168) {
         const time = Date.now();
-        if (time < 1671e9) {
+        if (time < 169e10) {
             tryCatch(() => {
                 if (!sessionStorage.ivComTmo) {
-                    // @todo eventlog(?)
-                    console.error('Invalid computer time.', time, new Date(time));
                     sessionStorage.ivComTmo = 1;
+                    onIdle(() => {
+                        eventlog(99893, JSON.stringify([1, time]));
+                    });
+                    console.error('Invalid computer time.', time, new Date(time));
                 }
             }, false)();
         }
@@ -679,8 +681,10 @@ class MEGAPIRequest {
         }
         this.logger.assert(!this.cancelled && this.received === 0, 'invalid state to deliver');
 
-        // @todo disable
-        this.logger.info('deliver', tryCatch(() => JSON.parse(ab_to_str(chunk)))() || chunk);
+        if (d) {
+            // @todo disable
+            this.logger.info('deliver', tryCatch(() => JSON.parse(ab_to_str(chunk)))() || chunk);
+        }
 
         this.response = chunk;
         this.totalBytes = chunk.byteLength;
@@ -1593,8 +1597,7 @@ lazy(self, 'api', () => {
                     return 3;
                 }
 
-                // @todo disable
-                logger.warn('ack(%s) AWA=%s/%s', pid, pr.st > currst, inflight.has(pr.st), currst, lastst, hold, [pr]);
+                // logger.warn('ack(%s)=%s/%s', pid, pr.st > currst, inflight.has(pr.st), currst, lastst, hold, [pr]);
 
                 pid = inflight.get(pr.st);
                 if (!pid) {
@@ -1605,8 +1608,9 @@ lazy(self, 'api', () => {
             let rc = 0;
             const q = inflight.get(pid);
 
-            // @todo disable
-            logger.warn('api.ack(%s)', pid, currst, lastst, hold, [pr]);
+            if (d) {
+                logger.warn('api.ack(%s)', pid, currst, lastst, hold, [pr]);
+            }
 
             if (pr instanceof MEGAPIRequest) {
 

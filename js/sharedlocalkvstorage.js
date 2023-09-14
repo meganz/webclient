@@ -588,13 +588,13 @@ SharedLocalKVStorage.Utils._requiresMutex = function SLKVMutexWrapper(origFunc, 
             mutex.lock(name)
                 .then((unlock) => {
                     const wrap = (dsp) => (arg) => {
-                        if (d > 1) {
+                        if (d > 3) {
                             this.logger.warn('Releasing lock(%s) from %s...', name, methodName);
                             console.timeEnd(name);
                         }
                         unlock().then(() => dsp(arg)).catch(reject);
                     };
-                    if (d > 1) {
+                    if (d > 3) {
                         this.logger.warn('Lock(%s) acquired for %s...', name, methodName, [this, ...args]);
                         console.time(name);
                     }

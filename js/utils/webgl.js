@@ -3,6 +3,16 @@
 
 if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
     Object.defineProperty(self, 'isWorkerScope', {value: true});
+
+    self.echo = (v) => v;
+    self.lazy = (t, p, s) => Object.defineProperty(t, p, {
+        get() {
+            Object.defineProperty(this, p, {value: s.call(this)});
+            return this[p];
+        },
+        configurable: true
+    });
+    self.eventlog = (e) => fetch(`${apipath}cs?id=0&wwk=1`, {method: 'post', body: JSON.stringify([{a: 'log', e}])});
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,7 +38,7 @@ class MEGAException extends DOMException {
         }
         super(ex, name);
 
-        if (data) {
+        if (data !== null) {
             if (typeof data === 'object') {
                 const ref = new WeakRef(data);
                 Object.defineProperty(this, 'data', {
@@ -44,11 +54,28 @@ class MEGAException extends DOMException {
 
         if (!stack) {
             stack = new Error(ex).stack;
+
             if (stack && typeof stack === 'string') {
-                stack = stack.replace('Error:', `${name}:`);
+                stack = stack.replace('Error:', `${name}:`)
+                    .split('\n')
+                    .filter(MEGAException.stackFilter)
+                    .join('\n');
             }
         }
-        this.stack = stack;
+
+        Object.defineProperty(this, 'stack', {
+            configurable: true,
+            value: String(stack || '')
+        });
+    }
+
+    toString() {
+        return `${this.name}: ${this.message}`;
+    }
+
+    valueOf() {
+        const {stack, name} = this;
+        return stack.startsWith(name) ? stack : `${this.toString()}\n${stack}`;
     }
 
     get [Symbol.toStringTag]() {
@@ -57,11 +84,19 @@ class MEGAException extends DOMException {
 }
 
 Object.defineProperty(MEGAException, 'assert', {
-    value: (expr, msg, ...args) => {
+    value: function assert(expr, msg, ...args) {
         if (!expr) {
             throw new MEGAException(msg || 'Failed assertion.', ...args);
         }
     }
+});
+
+/** @property MEGAException.stackFilter */
+lazy(MEGAException, 'stackFilter', () => {
+    'use strict';
+    const assert = self.ua && ua.details.engine === 'Gecko' ? 'assert@' : 'assert ';
+
+    return (ln) => !ln.includes('MEGAException') && !ln.includes(assert);
 });
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1343,7 +1378,7 @@ class MEGACanvasElement extends MEGAImageElement {
             data = new Uint32Array(width * height).fill(pixel);
             data = this.createImageData(data.buffer, width, height);
             if (self.d > 1) {
-                console.debug('createImage, %s (0x%s)', pixel >>> 0, pixel.toString(16), pixel >>> 16, data);
+                this.debug('createImage, %s (0x%s)', pixel >>> 0, pixel.toString(16), pixel >>> 16, data);
             }
         }
         else if (!data) {
@@ -1812,7 +1847,7 @@ class MEGAWorker extends Array {
                 }
                 this.kill();
             }
-        }, -Math.log(Math.random()) * ++this.wkDisposalThreshold);
+        }, 450 + -Math.log(Math.random()) * ++this.wkDisposalThreshold);
     }
 
     dispatch({token, result, error}) {
@@ -2156,16 +2191,7 @@ WebGLMEGAContext.test = async(...files) => {
 };
 
 if (self.isWorkerScope) {
-    echo = (v) => v;
-    lazy = (t, p, s) => Object.defineProperty(t, p, {
-        get() {
-            Object.defineProperty(this, p, {value: s.call(this)});
-            return this[p];
-        },
-        configurable: true
-    });
     self.tryCatch = MEGAImageElement.prototype.tryCatch;
-    eventlog = (e) => fetch(`${apipath}cs?id=0&wwk=1`, {method: 'post', body: JSON.stringify([{a: 'log', e}])});
 }
 
 /** @property self.isWebGLSupported */
@@ -2506,7 +2532,7 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
                     const {gLastError: ex, worker: {stats}} = this;
                     const payload = JSON.stringify([
                         1,
-                        buildVersion.version || 'dev',
+                        buildVersion.website || 'dev',
                         stats,
                         String(ex && ex.message || ex || 'na').split('\n')[0].substr(0, 98)
                     ]);

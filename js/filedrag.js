@@ -363,10 +363,8 @@
 
         var dataTransfer = Object(e.dataTransfer);
         var files = e.target.files || dataTransfer.files;
-        if (!files || files.length == 0) {
-            if (!is_chrome_firefox || !dataTransfer.mozItemCount) {
-                return false;
-            }
+        if (!files || !files.length) {
+            return false;
         }
 
         if (localStorage.testWebGL) {
@@ -443,30 +441,6 @@
                         traverseFileTree(item, '', item.isFile && items[i].getAsFile());
                     }
                 }
-            }
-        }
-        else if (is_chrome_firefox && e.dataTransfer) {
-            try {
-                for (var i = 0, m = e.dataTransfer.mozItemCount; i < m; ++i) {
-                    var file = e.dataTransfer.mozGetDataAt("application/x-moz-file", i);
-                    if (file instanceof Ci.nsIFile) {
-                        filedrag_u = [];
-                        if (i == m - 1) {
-                            $.dostart = true;
-                        }
-                        traverseFileTree(new mozDirtyGetAsEntry(file /*,e.dataTransfer*/ ));
-                    }
-                    else {
-                        if (d) {
-                            console.log('FileSelectHandler: Not a nsIFile', file);
-                        }
-                    }
-                    // e.dataTransfer.mozClearDataAt("application/x-moz-file", i);
-                }
-            }
-            catch (e) {
-                alert(e);
-                Cu.reportError(e);
             }
         }
         else {
@@ -594,38 +568,7 @@
             // https://bugzilla.mozilla.org/show_bug.cgi?id=1456557
             $('input[multiple]').removeAttr('multiple');
         }
-
-
-        if (is_chrome_firefox) {
-            $('input[webkitdirectory], .fm-folder-upload input').click(function(e) {
-                var file = mozFilePicker(0, 2, { /*gfp:1,*/
-                    title: l[98]
-                });
-
-                if (file) {
-                    e.target = {
-                        files: [-1]
-                    };
-                    e.dataTransfer = {
-                        mozItemCount: 1,
-                        mozGetDataAt: function() {
-                            return file;
-                        }
-                    };
-                    FileSelectHandler(e);
-                    file = undefined;
-                }
-                else {
-                    if (e.stopPropagation) {
-                        e.stopPropagation();
-                    }
-                    if (e.preventDefault) {
-                        e.preventDefault();
-                    }
-                }
-            });
-        }
-    }
+    };
 
 })(this);
 

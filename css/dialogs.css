@@ -4070,7 +4070,10 @@ body.de .mega-dialog.contact-picker-widget {
         justify-content: center;
         align-items: center;
     }
-    .mega-dialog.fingerprint-dialog.admin-verify button.close {
+    .mega-dialog.fingerprint-dialog.e-modal button.js-close,
+    .mega-dialog.fingerprint-dialog.e-modal button.dialog-skip-button,
+    .mega-dialog.fingerprint-dialog.admin-verify button.js-close,
+    .mega-dialog.fingerprint-dialog.admin-verify button.dialog-skip-button {
         display: none;
     }
 

@@ -690,7 +690,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, waitForPromise, n
                     }
 
                     state = 'expired';
-                    throw new Error('Timed out.');
+                    throw new Error(`${name} timed out.`);
                 }
 
                 if (state === 'aborted') {
@@ -705,7 +705,6 @@ function createTimeoutPromise(validateFunction, tick, timeout, waitForPromise, n
                     log(`Resolved timeout promise after waiting ${duration}ms...`, promise);
                 }
                 state = 'fulfilled';
-
             })
             .then((a0) => resolve(a0))
             .catch(reject);
@@ -770,21 +769,6 @@ lazy(createTimeoutPromise, 'instances', () => {
 });
 
 /**
- * Assertion exception.
- * @param message
- *     Message for exception on failure.
- * @constructor
- */
-function AssertionFailed(message) {
-    this.message = message;
-    // karma env?
-    this.stack = M && M.getStack ? M.getStack() : String(new Error().stack);
-}
-
-AssertionFailed.prototype = Object.create(Error.prototype);
-AssertionFailed.prototype.name = 'AssertionFailed';
-
-/**
  * Assert a given test condition.
  *
  * Throws an AssertionFailed exception with a given message, in case the condition is false.
@@ -792,34 +776,17 @@ AssertionFailed.prototype.name = 'AssertionFailed';
  *
  * @param test
  *     Test statement.
+ * @param args
  */
-function assert(test) {
-    if (test) {
-        return;
-    }
-    //assemble message from parameters
-    var message = '';
-    var last = arguments.length - 1;
-    for (var i = 1; i <= last; i++) {
-        message += arguments[i];
-        if (i < last) {
-            message += ' ';
+// eslint-disable-next-line strict
+function assert(test, ...args) {
+    if (!test) {
+        if (d) {
+            console.error('assertion failed', ...args);
         }
+        MegaLogger.rootLogger.assert(test, ...args);
     }
-    if (MegaLogger && MegaLogger.rootLogger) {
-        MegaLogger.rootLogger.error("assertion failed: ", message);
-    }
-    else if (window.d) {
-        console.error(message);
-    }
-
-    if (localStorage.stopOnAssertFail) {
-        debugger;
-    }
-
-    throw new AssertionFailed(message);
 }
-
 
 /**
  * Assert that a user handle is potentially valid (e. g. not an email address).
@@ -900,10 +867,7 @@ function srvlog2(type /*, ...*/) {
         var version = buildVersion.website;
 
         if (is_extension) {
-            if (is_chrome_firefox) {
-                version = window.mozMEGAExtensionVersion || buildVersion.firefox;
-            }
-            else if (is_firefox_web_ext) {
+            if (is_firefox_web_ext) {
                 version = buildVersion.firefox;
             }
             else if (mega.chrome) {
@@ -1002,14 +966,15 @@ function MurmurHash3(key, seed) {
 /**
  * Ask the user for a decryption key
  * @param {String} ph   The node's handle
- * @param {String} fl   Whether is a folderlink
- * @param {String} keyr If a wrong key was used
- * @return {MegaPromise}
+ * @param {Boolean} [fl] Whether is a folderlink
+ * @param {Boolean} [keyr] If a wrong key was used
+ * @param {String} [selector] DOM node selector
+ * @return {Promise}
  */
-function mKeyDialog(ph, fl, keyr, selector) {
+async function mKeyDialog(ph, fl, keyr, selector) {
     "use strict";
 
-    var promise = new MegaPromise();
+    const {promise} = mega;
     var $dialog = $(is_mobile ? '#mobile-decryption-key-overlay' : '.mega-dialog.dlkey-dialog');
     var $button = $(is_mobile ? '.mobile.decrypt-button' : '.fm-dialog-new-folder-button', $dialog);
     var $input = $(is_mobile ? '.mobile.decryption-key' : 'input', $dialog);
@@ -1033,7 +998,20 @@ function mKeyDialog(ph, fl, keyr, selector) {
     $button.addClass('disabled').removeClass('active');
 
     if (is_mobile) {
-        fm_showoverlay();
+        const $initialMessage = $('.initial-message');
+        const $errorMessage = $('.error-message');
+
+        // If the previous folder key was incorrect, show an error message for them to try again
+        if (keyr) {
+            $initialMessage.addClass('hidden');
+            $errorMessage.removeClass('hidden');
+        }
+        else {
+            // Show a first message
+            $initialMessage.removeClass('hidden');
+            $errorMessage.addClass('hidden');
+        }
+
         $dialog.removeClass('hidden');
     }
     else {
@@ -1108,11 +1086,6 @@ function mKeyDialog(ph, fl, keyr, selector) {
     });
 
     return promise;
-}
-
-function mRandomToken(pfx) {
-    'use strict';
-    return `${pfx || ''}!${Math.random().toString(28).slice(-9)}`;
 }
 
 function str_mtrunc(str, len) {
@@ -1253,11 +1226,20 @@ function moveCursortoToEnd(el) {
     }
 }
 
-function asyncApiReq(data) {
+/**
+ *  @deprecated
+ *  @todo move to e.g. megaChat.sendApiRequest()
+ */
+function asyncApiReq(payload, options) {
     'use strict';
-
-    // TODO: find&replace all occurences
-    return M.req(data);
+    let cache = -15;
+    switch (payload.a) {
+        case 'mcr':
+        case 'mcph':
+            cache = null;
+            break;
+    }
+    return api.req(payload, {channel: 6, cache, ...options}).then(({result}) => result);
 }
 
 // Returns pixels position of element relative to document (top left corner) OR to the parent (IF the parent and the
@@ -1290,32 +1272,6 @@ function getHtmlElemPos(elem, n) {
         x: xPos,
         y: yPos
     };
-}
-
-/**
- * Detects if Flash is enabled or disabled in the user's browser
- * From http://stackoverflow.com/a/20095467
- * @returns {Boolean}
- */
-function flashIsEnabled() {
-
-    var flashEnabled = false;
-
-    try {
-        var flashObject = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
-        if (flashObject) {
-            flashEnabled = true;
-        }
-    }
-    catch (e) {
-        if (navigator.mimeTypes
-                && (navigator.mimeTypes['application/x-shockwave-flash'] !== undefined)
-                && (navigator.mimeTypes['application/x-shockwave-flash'].enabledPlugin)) {
-            flashEnabled = true;
-        }
-    }
-
-    return flashEnabled;
 }
 
 /**
@@ -1465,16 +1421,13 @@ function generateAnonymousReport() {
         report.chatRoomState = chatStates;
     };
 
-    if (is_chrome_firefox) {
-        report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
-    }
-
     var apireqHaveBackOffs = {};
-    apixs.forEach(function(v, k) {
-        if (v.backoff > 0) {
-            apireqHaveBackOffs[k] = v.backoff;
-        }
-    });
+    // @todo
+    // apixs.forEach(function(v, k) {
+    //     if (v.backoff > 0) {
+    //         apireqHaveBackOffs[k] = v.backoff;
+    //     }
+    // });
 
     if (Object.keys(apireqHaveBackOffs).length > 0) {
         report.apireqbackoffs = apireqHaveBackOffs;
@@ -1524,46 +1477,6 @@ function generateAnonymousReport() {
 
     return $promise;
 }
-
-(function(scope) {
-    var MegaAnalytics = function(id) {
-        this.loggerId = id;
-        this.sessionId = makeid(16);
-    };
-    MegaAnalytics.prototype.log = function(c, e, data) {
-
-        data = data || {};
-        data = $.extend(
-            true, {}, {
-                'aid': this.sessionId,
-                'lang': typeof lang !== 'undefined' ? lang : null,
-                'browserlang': navigator.language,
-                'u_type': typeof u_type !== 'undefined' ? u_type : null
-            },
-            data
-        );
-
-        var msg = JSON.stringify({
-            'c': c,
-            'e': e,
-            'data': data
-        });
-
-        if (d) {
-            console.log("megaAnalytics: ", c, e, data);
-        }
-        if (window.location.toString().indexOf("mega.dev") !== -1) {
-            return;
-        }
-        api_req({
-            a: 'log',
-            e: this.loggerId,
-            m: msg
-        }, {});
-    };
-    scope.megaAnalytics = new MegaAnalytics(99999);
-})(this);
-
 
 function constStateToText(enumMap, state) {
     "use strict";
@@ -1627,33 +1540,30 @@ function mLogout(aCallback, force) {
         return;
     }
 
-    if (!force && mega.ui.passwordReminderDialog) {
-        var passwordReminderLogout = mega.ui.passwordReminderDialog.recheckLogoutDialog();
-
-        passwordReminderLogout
-            .done(function() {
-                mLogout(aCallback, true);
-            });
-
-        return;
-    }
-
-    var cnt = 0;
-    if (M.c[M.RootID] && u_type === 0) {
-        for (var i in M.c[M.RootID]) {
-            cnt++;
-        }
-    }
-    if (u_type === 0 && cnt > 0) {
-        msgDialog('confirmation', l[1057], l[1058], l[1059], function (e) {
-            if (e) {
-                M.logout();
+    Promise.resolve(u_type === 0 && Object.keys(M.c[M.RootID] || {}).length)
+        .then((cnt) => {
+            return cnt < 1 || asyncMsgDialog('confirmation', l[1057], l[1058], l[1059]);
+        })
+        .then((proceed) => {
+            if (proceed && mega.ui.passwordReminderDialog) {
+                if (window.waitsc) {
+                    waitsc.stop();
+                }
+                return Promise.resolve(mega.ui.passwordReminderDialog.recheckLogoutDialog()).then(() => true);
+            }
+            return proceed;
+        })
+        .then((logout) => {
+            return logout && M.logout();
+        })
+        .catch((ex) => {
+            if (u_type > 2 && window.waitsc) {
+                waitsc();
+            }
+            if (ex) {
+                dump(ex);
             }
         });
-    }
-    else {
-        M.logout();
-    }
 }
 
 // Initialize Rubbish-Bin Cleaning Scheduler
@@ -1975,14 +1885,6 @@ function passwordManager(form) {
         return false;
     }
 
-    if (is_chrome_firefox) {
-        var creds = passwordManager.pickFormFields(form);
-        if (creds) {
-            mozRunAsync(mozLoginManager.saveLogin.bind(mozLoginManager, creds.usr, creds.pwd));
-        }
-        $form.find('input').val('');
-        return;
-    }
     if (typeof history !== "object") {
         return false;
     }
@@ -2240,25 +2142,19 @@ if (typeof sjcl !== 'undefined') {
      * Add verified email addresses to folder shares.
      */
     Share.prototype.addContactToFolderShare = function addContactToFolderShare() {
-
-        var promise = MegaPromise.resolve();
-        var targets = [];
-        var $shareDialog = $('.share-dialog');
-        var selectedNode;
-        var userEmail;
-        var permissionLevel;
+        let promise;
 
         // Share button enabled
-        if ($.dialog === 'share' && !$('.done-share', $shareDialog).is('.disabled')) {
-            selectedNode = $.selected[0];
+        if ($.dialog === 'share' && !$('.done-share', '.share-dialog').is('.disabled')) {
+            const targets = [];
+            const [selectedNode] = $.selected;
 
             // Is there a new contacts planned for addition to share
             if (Object.keys($.addContactsToShare).length > 0) {
 
                 // Add new planned contact to list
                 for (var i in $.addContactsToShare) {
-                    userEmail = $.addContactsToShare[i].u;
-                    permissionLevel = $.addContactsToShare[i].r;
+                    const {u: userEmail, r: permissionLevel} = $.addContactsToShare[i];
 
                     if (userEmail && permissionLevel !== undefined) {
                         targets.push({u: userEmail, r: permissionLevel});
@@ -2272,36 +2168,29 @@ if (typeof sjcl !== 'undefined') {
             }
         }
 
-        return promise;
+        return promise || Promise.resolve();
     };
 
     Share.prototype.updateNodeShares = function() {
 
-        var self = this;
-        var promise = new MegaPromise();
-
         loadingDialog.show();
-        this.removeContactFromShare()
-            .always(function() {
-                var promises = [];
+        return this.removeContactFromShare()
+            .then(() => {
+                const promises = [];
 
                 if (Object.keys($.changedPermissions).length > 0) {
                     promises.push(doShare($.selected[0], Object.values($.changedPermissions), true));
                 }
-                promises.push(self.addContactToFolderShare());
+                promises.push(this.addContactToFolderShare());
 
                 $('.export-links-warning').addClass('hidden');
                 console.assert($.dialog === 'share');
                 closeDialog();
 
-                MegaPromise.allDone(promises)
-                    .always(function() {
-                        loadingDialog.hide();
-                        promise.resolve.apply(promise, arguments);
-                    });
-            });
+                return Promise.all(promises);
+            })
+            .finally(() => loadingDialog.hide());
 
-        return promise;
     };
 
 
@@ -2312,99 +2201,60 @@ if (typeof sjcl !== 'undefined') {
         }
     };
 
-    Share.prototype.removeContactFromShare = function() {
+    Share.prototype.removeContactFromShare = async function() {
+        const reqs = Object.create(null);
+        const shares = $.removedContactsFromShare ? Object.values($.removedContactsFromShare) : [];
 
-        var self = this;
-        var promises = [];
+        for (let i = shares.length; i--;) {
+            const {userEmailOrHandle, selectedNodeHandle} = shares[i];
 
-        if (Object.keys($.removedContactsFromShare).length > 0) {
-
-            Object.values($.removedContactsFromShare).forEach(function(elem) {
-                var userEmailOrHandle = elem.userEmailOrHandle;
-                var selectedNodeHandle = elem.selectedNodeHandle;
-                var userHandle = elem.userHandle;
-                var step = 2;
-                var packet = false;
-                var idtag = mRandomToken('s2');
-                var promise = new MegaPromise();
-                var resolve = function() {
-                    if (!--step) {
-                        if (!u_sharekeys[selectedNodeHandle]) {
-                            console.error('The share-key should not have been removed...', packet.okd, [packet]);
-                        }
-                        promise.resolve(packet);
-                    }
-                };
-
-                promises.push(promise);
-                M.scAckQueue[idtag] = requesti;
-
-                // Wait for action-packet acknowledge, this is needed so that removing the last user
-                // from a share will issue an `okd` flag which removes the associated sharekey that we
-                // have to wait for *if* we're going to re-share to a different user next...
-                mBroadcaster.once('share-packet.' + idtag, function(a) {
-                    packet = a;
-                    resolve();
-                });
-
-                // The s2 api call can remove both shares and pending shares
-                api_req({
-                    a: 's2',
-                    n:  selectedNodeHandle,
-                    s: [{ u: userEmailOrHandle, r: ''}],
-                    ha: '',
-                    i: idtag
-                }, {
-                    userEmailOrHandle: userEmailOrHandle,
-                    selectedNodeHandle: selectedNodeHandle,
-                    userHandle: userHandle,
-
-                    callback : function(res, ctx) {
-
-                        if (typeof res === 'object') {
-                            if (res.r && res.r[0] === ENOENT) {
-                                if (d) {
-                                    console.error('User %s not found as part of this share.', ctx.userHandle, ctx);
-                                }
-                                onIdle(() => msgDialog('warninga', l[135], l[47], l[23433]));
-                                delete M.scAckQueue[idtag];
-                                --step;
-                            }
-
-                            // If it was a user handle, the share is a full share
-                            if (M.u[ctx.userHandle]) {
-                                M.delNodeShare(ctx.selectedNodeHandle, ctx.userHandle);
-                                setLastInteractionWith(ctx.userHandle, "0:" + unixtime());
-
-                                self.removeFromPermissionQueue(ctx.userHandle);
-                            }
-                            // Pending share
-                            else {
-                                var pendingContactId = M.findOutgoingPendingContactIdByEmail(ctx.userEmailOrHandle);
-                                M.deletePendingShare(ctx.selectedNodeHandle, pendingContactId);
-
-                                self.removeFromPermissionQueue(pendingContactId);
-                            }
-
-                            resolve();
-                        }
-                        else {
-                            // FIXME: display error to user
-
-                            promise.reject(res);
-                        }
-                    }
-                });
-            });
+            if (!reqs[selectedNodeHandle]) {
+                reqs[selectedNodeHandle] = {a: 's2', n: selectedNodeHandle, s: [], ha: ''};
+            }
+            reqs[selectedNodeHandle].s.push({u: userEmailOrHandle, r: ''});
         }
 
-        return MegaPromise.allDone(promises);
+        // Wait for action-packet acknowledge, this is needed so that removing the last user
+        // from a share will issue an `okd` flag which removes the associated sharekey that we
+        // have to wait for *if* we're going to re-share to a different user next...
+
+        const reject = (err) => {
+            const msg = api_strerror(err);
+
+            onIdle(() => msgDialog('warninga', l[135], l[47], err < 0 ? msg : l[23433]));
+            throw new Error(`Failed to revoke share, ${msg}`);
+        };
+
+        const resolve = ({result: res, pkt}) => {
+            for (let i = pkt.length; i--;) {
+                const packet = pkt[i];
+
+                if (d) {
+                    console.assert(u_sharekeys[packet.n], 'Share-key removed...', packet);
+                }
+
+                // Known [u]ser, or [p]ending-contact
+                this.removeFromPermissionQueue(packet.u || packet.p);
+            }
+
+            if (typeof res !== 'object') {
+                res = {r: [parseInt(res) || EACCESS]};
+            }
+
+            for (let i = Object(res.r).length; i--;) {
+                if (res.r[i] !== 0) {
+                    reject(res.r[i]);
+                }
+            }
+        };
+
+        return Promise.all(Object.values(reqs).map((s2) => api.screq(s2).then(resolve)));
     };
 
     /**
      * Removes any shares (including pending) from the selected node.
      *
-     * @returns {MegaPromise} promise to remove contacts from share
+     * @returns {Promise} promise to remove contacts from share
      */
     Share.prototype.removeSharesFromSelected = function() {
         'use strict';

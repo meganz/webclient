@@ -410,13 +410,13 @@
     border-radius: 20px;
     box-shadow: var(--dialog-shadow);
     box-sizing: border-box;
-    display: none;
-    left: 56px;
+    position: absolute;
+    left: 64px;
     max-width: 316px;
     padding: 24px;
-    position: relative;
     top: -32px;
     width: 316px;
+    display: none;
 }
 .nw-fm-left-icon.conversations.w-onboard:hover .onboarding-highlight-dot + .onboarding-mc-nv,
 .nw-fm-left-icon.conversations.w-onboard .onboarding-highlight-dot + .onboarding-mc-nv:hover {

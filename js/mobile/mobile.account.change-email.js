@@ -68,7 +68,7 @@
 
                 // If there is text in the email field and it doesn't match the existing one
                 if (newEmail && u_attr.email !== newEmail) {
-                    this.processChange(newEmail);
+                    this.processChange(newEmail).catch((ex) => this.showError(ex));
                 }
                 else {
                     this.showError(l.m_change_email_same);
@@ -81,22 +81,18 @@
             this.$inputContainer.addClass('error');
         },
 
-        processChange: function(newEmail) {
-            loadingDialog.show();
-            mobile.twofactor.isEnabledForAccount((result) => {
-                loadingDialog.hide();
-                if (result) {
-                    mobile.account.changeEmail.$page.addClass('hidden');
-                    mobile.twofactor.verifyAction.init((twoFactorPin) => {
-                        mobile.twofactor.verifyAction.$page.addClass('hidden');
-                        mobile.account.changeEmail.$page.removeClass('hidden');
-                        mobile.account.changeEmail.continueChangeEmail(newEmail, twoFactorPin);
-                    });
-                }
-                else {
-                    mobile.account.changeEmail.continueChangeEmail(newEmail, null);
-                }
-            });
+        async processChange(newEmail) {
+            let twoFactorPin = null;
+
+            if (await twofactor.isEnabledForAccount()) {
+                mobile.account.changeEmail.$page.addClass('hidden');
+
+                twoFactorPin = await mobile.twofactor.verifyAction.init();
+
+                mobile.twofactor.verifyAction.$page.addClass('hidden');
+                mobile.account.changeEmail.$page.removeClass('hidden');
+            }
+            mobile.account.changeEmail.continueChangeEmail(newEmail, twoFactorPin);
         },
 
         /**

@@ -25,7 +25,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
         this.retrieveChatLink();
     }
 
-    retrieveChatLink = () => {
+    retrieveChatLink() {
         const { chatRoom } = this.props;
         if (!chatRoom.topic) {
             delete this.loading;
@@ -34,14 +34,18 @@ export class ChatlinkDialog extends MegaRenderMixin {
 
         this.loading = chatRoom.updatePublicHandle(false, true)
             .always(() => {
-                if (chatRoom.publicLink) {
-                    this.setState({ 'link': getBaseUrl() + '/' + chatRoom.publicLink });
-                }
-                else {
-                    this.setState({ link: l[20660] /* `No chat link available.` */ });
+                this.loading = false;
+
+                if (this.isMounted()) {
+                    if (chatRoom.publicLink) {
+                        this.setState({'link': `${getBaseUrl()}/${chatRoom.publicLink}`});
+                    }
+                    else {
+                        this.setState({link: l[20660] /* `No chat link available.` */});
+                    }
                 }
             });
-    };
+    }
 
     componentDidUpdate() {
         const { chatRoom } = this.props;
@@ -148,7 +152,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                     <input
                                         type="text"
                                         readOnly={true}
-                                        value={!chatRoom.topic ? l[20660] /* `No chat link available.` */ : link}
+                                        value={this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link}
                                     />
                                 </div>
                                 {/* `People can join your group by using this link.` */}
@@ -166,7 +170,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                 className={`
                                     mega-button
                                     links-button
-                                    ${this.loading && this.loading.state() === 'pending' ? 'disabled' : ''}
+                                    ${this.loading ? 'disabled' : ''}
                                 `}
                                 onClick={() => {
                                     chatRoom.updatePublicHandle(1);
@@ -183,7 +187,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                         mega-button
                                         positive
                                         copy-to-clipboard
-                                        ${this.loading && this.loading.state() === 'pending' ? 'disabled' : ''}
+                                        ${this.loading ? 'disabled' : ''}
                                     `}>
                                     <span>{l[63] /* `Copy` */}</span>
                                 </button> :

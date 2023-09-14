@@ -221,11 +221,11 @@ export class EmojiAutocomplete extends MegaRenderMixin {
         this.found = found;
 
         if (!found || found.length === 0) {
-            setTimeout(function() {
+            queueMicrotask(() => {
                 // onCancel may need to do a .setState on parent component, so need to run it in a separate
                 // thread/stack
                 self.props.onCancel();
-            }, 0);
+            });
             return null;
         }
 

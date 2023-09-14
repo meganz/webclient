@@ -26,7 +26,7 @@ class TopicChange extends ConversationMessageMixin {
 
         var displayName;
         if (contact) {
-            displayName = generateAvatarMeta(contact.u).fullName;
+            displayName = M.getNameByHandle(contact.u);
         }
         else {
             displayName = contact;

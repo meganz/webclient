@@ -20,12 +20,12 @@
  *
  * @returns {MegaPromise}
  * @constructor
+ * @deprecated DO NOT USE FOR NEW CREATED CODE!
  */
 function MegaPromise(fn) {
     var self = this;
 
     this.$deferred = new $.Deferred();
-    this.state$deferred = this.$deferred;
 
     if (fn) {
         var resolve = function() {
@@ -104,10 +104,11 @@ MegaPromise.getTraceableReject = function($promise, origPromise) {
     'use strict';
     // Save the current stack pointer in case of an async call behind
     // the promise.reject (Ie, onAPIProcXHRLoad shown as initial call)
-    var preStack = d > 1 && M.getStack();
+    const debug = window.d > 3;
+    const preStack = debug && M.getStack();
 
     return function __mpTraceableReject(aResult) {
-        if (window.d > 1) {
+        if (debug) {
             var postStack = M.getStack();
             if (typeof console.group === 'function') {
                 console.group('PROMISE REJECTED');
@@ -222,7 +223,7 @@ MegaPromise.prototype.catch = MegaPromise.prototype.fail;
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.resolve = function() {
-    this.state$deferred.resolve.apply(this.state$deferred, arguments);
+    this.$deferred.resolve.apply(this.$deferred, arguments);
     return this;
 };
 
@@ -232,7 +233,7 @@ MegaPromise.prototype.resolve = function() {
  * @returns {MegaPromise}
  */
 MegaPromise.prototype.reject = function() {
-    this.state$deferred.reject.apply(this.state$deferred, arguments);
+    this.$deferred.reject.apply(this.$deferred, arguments);
     return this;
 };
 
@@ -244,17 +245,6 @@ MegaPromise.prototype.reject = function() {
 MegaPromise.prototype.always = function() {
     this.$deferred.always.apply(this.$deferred, arguments);
     return this;
-};
-
-/**
- * Alias of .then, which works like .always and exchanges the internal Deferred promise.
- *
- * @returns {MegaPromise}
- */
-MegaPromise.prototype.pipe = function(resolve, reject) {
-    var pipe = this.then(resolve, reject || resolve);
-    this.$deferred = pipe.$deferred;
-    return pipe;
 };
 
 /**

@@ -793,7 +793,7 @@ var voucherDialog = {
             .then(function() {
                 return redeem.redeemVoucher(voucherCode);
             })
-            .then(function(data, res) {
+            .then(({data, res}) => {
                 loadingDialog.hide();
 
                 if (d) {
@@ -1290,14 +1290,16 @@ var addressDialog = {
         loadingDialog.show();
 
         this.fetchBillingInfo().always(function (billingInfo) {
-            billingInfo = billingInfo || {};
-            var selectedState = ((billingInfo.country === 'US' || billingInfo.country === 'CA')
-                && billingInfo.hasOwnProperty('state')) ? billingInfo.state : false;
+            billingInfo = billingInfo || Object.create(null);
+
+            const selectedState =
+                (billingInfo.country === 'US' || billingInfo.country === 'CA') && billingInfo.state || false;
 
             self.showDialog();
             self.prefillInfo(billingInfo);
             self.initStateDropDown(selectedState, billingInfo.country);
             self.initCountryDropDown(billingInfo.country);
+
             loadingDialog.hide();
             self.initCountryDropdownChangeHandler();
             self.initBuyNowButton();
@@ -1626,10 +1628,9 @@ var addressDialog = {
         var changeStates = function(selectedCountryCode) {
 
             // If postcode translations not set, then decalre them.
-            if (addressDialog.localePostalCodeName === undefined
-                || addressDialog.localePostalCodeName === null) {
+            if (!addressDialog.localePostalCodeName) {
 
-                addressDialog.localePostalCodeName = {
+                addressDialog.localePostalCodeName = freeze({
                     "US": "ZIP Code",
                     "CA": "Postal Code",
                     "PH": "ZIP Code",
@@ -1639,17 +1640,17 @@ var addressDialog = {
                     "IE": "Eircode",
                     "BR": "CEP",
                     "IT": "CAP"
-                };
+                });
             }
 
             // If selecting a country whereby the postcode is named differently, update the placeholder value.
-            if (addressDialog.localePostalCodeName.hasOwnProperty(selectedCountryCode)) {
+            if (addressDialog.localePostalCodeName[selectedCountryCode]) {
                 if ($titleElemPostCode.length) {
                     $postcodeInput
                         .updateTitle(addressDialog.localePostalCodeName[selectedCountryCode]);
                 }
                 else {
-                    $postcodeInput.$input.attr('placeholder',addressDialog.localePostalCodeName[selectedCountryCode]);
+                    $postcodeInput.$input.attr('placeholder', addressDialog.localePostalCodeName[selectedCountryCode]);
                 }
             }
             else if ($titleElemPostCode.length) {
@@ -1744,6 +1745,7 @@ var addressDialog = {
      * Attempt to prefill the info based on the user_attr information.
      */
     prefillInfo: function(billingInfo) {
+        'use strict';
 
         const prefillMultipleInputs = (inputs, value) => {
             if (Array.isArray(inputs)) {
@@ -1756,7 +1758,6 @@ var addressDialog = {
             }
         };
 
-        'use strict';
 
         const getBillingProp = (propName, encoded) => {
             if (!billingInfo[propName] || !encoded) {
@@ -1772,7 +1773,7 @@ var addressDialog = {
             if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty(businessAttrName)) {
                 prefillMultipleInputs($input, this.userInfo[businessAttrName]);
             }
-            else if (u_attr && u_attr.hasOwnProperty(Atrrname)) {
+            else if (window.u_attr && u_attr[Atrrname]) {
                 prefillMultipleInputs($input, u_attr[Atrrname]);
             }
             else {
@@ -1784,35 +1785,35 @@ var addressDialog = {
         let noLname = true;
 
         if (billingInfo) {
-            const encodedVer = billingInfo.hasOwnProperty('version');
+            const encodedVer = !!billingInfo.version;
 
-            if (billingInfo.hasOwnProperty('firstname')) {
+            if (billingInfo.firstname) {
                 prefillMultipleInputs(this.firstNameMegaInput, getBillingProp('firstname', encodedVer));
                 noFname = false;
             }
 
-            if (billingInfo.hasOwnProperty('lastname')) {
+            if (billingInfo.lastname) {
                 prefillMultipleInputs(this.lastNameMegaInput, getBillingProp('lastname', encodedVer));
                 noLname = false;
             }
 
-            if (billingInfo.hasOwnProperty('address1')) {
+            if (billingInfo.address1) {
                 prefillMultipleInputs(this.addressMegaInput, getBillingProp('address1', encodedVer));
             }
 
-            if (billingInfo.hasOwnProperty('address2')) {
+            if (billingInfo.address2) {
                 prefillMultipleInputs(this.address2MegaInput, getBillingProp('address2', encodedVer));
             }
 
-            if (billingInfo.hasOwnProperty('city')) {
+            if (billingInfo.city) {
                 prefillMultipleInputs(this.cityMegaInput, getBillingProp('city', encodedVer));
             }
 
-            if (billingInfo.hasOwnProperty('postcode')) {
+            if (billingInfo.postcode) {
                 prefillMultipleInputs(this.postCodeMegaInput, getBillingProp('postcode', encodedVer));
             }
 
-            if (billingInfo.hasOwnProperty('taxCode')) {
+            if (billingInfo.taxCode) {
                 prefillMultipleInputs(this.taxCodeMegaInput, getBillingProp('taxCode', encodedVer));
             }
         }
@@ -1838,7 +1839,7 @@ var addressDialog = {
             }
 
             var finished = function() {
-                if (!billingInfo.hasOwnProperty('country') || !billingInfo.country) {
+                if (!billingInfo.country) {
                     billingInfo.country = u_attr.country ? u_attr.country : u_attr.ipcc;
                 }
                 promise.resolve(billingInfo);
@@ -1846,15 +1847,15 @@ var addressDialog = {
 
             if (self.businessPlan && u_attr.b) {
                 self.fetchBusinessInfo().always(function(businessInfo) {
-                    businessInfo = businessInfo || {};
-                    var attributes = ["address1","address2","city","state","country","postcode"];
+                    const attributes = ["address1", "address2", "city", "state", "country", "postcode"];
+
+                    businessInfo = businessInfo || Object.create(null);
                     for (var i = 0; i < attributes.length; i++) {
                         var attr = attributes[i];
                         var battr = attr === "postcode" ? '%zip' : '%' + attr;
-                        if (!billingInfo.hasOwnProperty(attr) || !billingInfo[attr]) {
-                            if (businessInfo.hasOwnProperty(battr) && businessInfo[battr]) {
-                                billingInfo[attr] = businessInfo[battr];
-                            }
+
+                        if (!billingInfo[attr] && businessInfo[battr]) {
+                            billingInfo[attr] = businessInfo[battr];
                         }
                     }
                     finished();
@@ -1879,8 +1880,8 @@ var addressDialog = {
             '%name', '%address1', '%address2', '%city', '%state', '%country', '%zip'
         ];
         var done = 0;
-        var businessInfo = {};
         var timeout = null;
+        const businessInfo = Object.create(null);
 
         var loaded = function(res, ctx) {
             if (typeof res !== 'number') {
@@ -2157,10 +2158,11 @@ var addressDialog = {
         // If saleId is already an array of sale IDs use that, otherwise add to an array
         const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
 
-        api_req({ a: 'utd', s: saleIdArray }, {
-            callback: (res) => {
+        api.screq({a: 'utd', s: saleIdArray})
+            .then(({result}) => {
+                assert(typeof result === 'string');
 
-                if (typeof res === 'string') {
+                if (typeof result === 'string') {
                     // success
                     const $stripeDialog = $('.payment-stripe-dialog');
                     const $stripeSuccessDialog = $('.payment-stripe-success-dialog');
@@ -2183,12 +2185,17 @@ var addressDialog = {
                     $stripeDialog.addClass('hidden');
                     M.safeShowDialog('stripe-pay-success', $stripeSuccessDialog);
                 }
-                else {
+
+            })
+            .catch((ex) => {
+                if (ex === ENOENT) {
                     pro.propay.paymentStatusChecker =
                         setTimeout(addressDialog.stripePaymentChecker.bind(addressDialog, saleId), nextTick);
                 }
-            }
-        });
+                else {
+                    tell(ex);
+                }
+            });
     },
 
     stripeFrameHandler: function(event) {
@@ -2313,6 +2320,11 @@ var addressDialog = {
     processUtcResult: function(utcResult, isStripe, saleId) {
         'use strict';
         this.gatewayOrigin = null;
+
+        if (!utcResult.EUR) {
+            console.error('unexpected result...', utcResult);
+            utcResult.EUR = false;
+        }
 
         if (isStripe) {
             this.stripeSaleId = null;
@@ -3253,22 +3265,6 @@ var bitcoinDialog = {
         });
     }
 };
-
-if (is_chrome_firefox) {
-    mBroadcaster.once('startMega', function() {
-        "use strict";
-
-        unionPay.redirectToSite =
-        sabadell.redirectToSite =
-            tryCatch(function(res) {
-                mozSendPOSTRequest(res.EUR.url, res.EUR.postdata);
-            }, function(error) {
-                msgDialog('warninga', l[135], l[47], error, function() {
-                    pro.propay.hideLoadingOverlay();
-                });
-            });
-    });
-}
 
 var insertEmailToPayResult = function($overlay) {
     "use strict";

@@ -11,31 +11,31 @@ mobile.twofactor.verifyAction = {
 
     /**
      * Initialise the page
-     * @param {Function} completeCallback The callback to run after 2FA verify
      */
-    init: function(completeCallback) {
-
+    init: function() {
         'use strict';
+        return new Promise((resolve) => {
 
-        // Cache selector
-        this.$page = $('.mobile.two-factor-page.verify-action-page');
+            // Cache selector
+            this.$page = $('.mobile.two-factor-page.verify-action-page');
 
-        // Initialise mega icon and back button functionality
-        mobile.initHeaderMegaIcon();
-        mobile.initBackButton(this.$page, 'twofactor/intro');
+            // Initialise mega icon and back button functionality
+            mobile.initHeaderMegaIcon();
+            mobile.initBackButton(this.$page, 'twofactor/intro');
 
-        // Initialise verify button functionality
-        this.initVerifyButton(completeCallback);
+            // Initialise verify button functionality
+            this.initVerifyButton(resolve);
 
-        // Show the account page content
-        this.$page.removeClass('hidden');
+            // Show the account page content
+            this.$page.removeClass('hidden');
 
-        // Put the focus in the PIN input field after its visible
-        this.$page.find('.two-factor-seed-input input').trigger('focus');
+            // Put the focus in the PIN input field after its visible
+            this.$page.find('.two-factor-seed-input input').trigger('focus');
 
-        // Initialise max length on input
-        mobile.initNumberMaxlength(this.$page);
+            // Initialise max length on input
+            mobile.initNumberMaxlength(this.$page);
 
+        });
     },
 
     /**

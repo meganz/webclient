@@ -710,6 +710,7 @@ var authring = (function () {
      * @param {string} userHandle The user handle e.g. EWh7LzU3Zf0
      */
     ns.resetFingerprintsForUser = async function(userHandle) {
+        assert(userHandle !== u_handle);
 
         if (!u_authring.Ed25519) {
             logger.warn('Auth-ring is not initialized, yet.');
@@ -780,7 +781,7 @@ var authring = (function () {
 
             this.onAuthringReady(id)
                 .then(() => {
-                    if (megaChatIsReady) {
+                    if (is_mobile || megaChatIsReady) {
                         return resolve();
                     }
                     mBroadcaster.once('chat_initialized', resolve);
@@ -1303,6 +1304,69 @@ var authring = (function () {
             })
             .catch(reject);
     });
+
+    ns.bloat = async(iter = 3072) => {
+        const types = Object.keys(u_authring);
+        const users = [];
+
+        console.group('auth-ring.bloat');
+
+        while (iter--) {
+            let uh;
+            do {
+                uh = `T35T-${makeUUID().slice(-6)}`;
+            }
+            while (uh in M.u);
+
+            users.push(uh);
+            process_u([{c: 1, u: uh, name: 'dc', m: `dc+${uh}@mega.nz`}], false);
+        }
+
+        for (let i = types.length; i--;) {
+            const type = types[i];
+            const store = u_authring[type];
+            const [[, data]] = Object.entries(store);
+
+            for (let x = users.length; x--;) {
+                assert(!store[users[x]]);
+                store[users[x]] = data;
+            }
+            await Promise.resolve(ns.setContacts(type).dump(`setContacts.${type}`)).catch(dump);
+        }
+        await tSleep(2);
+
+        console.warn('bloat.done');
+        console.groupEnd();
+    };
+
+    ns.debloat = async() => {
+        console.group('auth-ring.de-bloat');
+
+        const users = M.u.keys().filter(n => n.startsWith('T35T-'));
+        if (users.length) {
+            await api.screq(users.map(u => ({u, a: 'ur2', l: '0'}))).catch(dump);
+
+            scparser.$helper.c({ou: u_handle, u: users.map(u => ({u, c: 0}))});
+
+            for (let i = users.length; i--;) {
+                const userHandle = users[i];
+                delete u_authring.RSA[userHandle];
+                delete u_authring.Ed25519[userHandle];
+                delete u_authring.Cu25519[userHandle];
+            }
+
+            await ns.setContacts('Ed25519').dump('setContacts.Ed25519');
+            await ns.setContacts('Cu25519').dump('setContacts.Cu25519');
+            await ns.setContacts('RSA').dump('setContacts.RSA');
+            await tSleep(2);
+
+            for (let i = users.length; i--;) {
+                fmdb.del('u', users[i]);
+            }
+        }
+        console.warn('de-bloat.done');
+        console.groupEnd();
+    };
 
     return ns;
 }());

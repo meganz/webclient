@@ -7,7 +7,7 @@ function startMega() {
         startMega.eventlog = 1;
         var xhr = getxhr();
         xhr.onloadend = console.debug.bind(console);
-        xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
+        xhr.open("POST", `${apipath}cs?id=0`, true);
         xhr.send(JSON.stringify([{a: 'log', e: 99690}]));
     }
     init_page();

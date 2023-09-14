@@ -55,6 +55,7 @@ var dlmanager = {
     dlLastQuotaWarning: 0,
     dlRetryInterval: 1000,
     dlMaxChunkSize: 16 * 1048576,
+    dlResumeThreshold: 0x200000,
     fsExpiryThreshold: 172800,
     isDownloading: false,
     dlZipID: 0,
@@ -225,19 +226,6 @@ var dlmanager = {
                     resolve(metadata.size);
                 }).catch(reject);
         }
-        else if (is_chrome_firefox && typeof OS !== 'undefined') {
-            try {
-                var root = mozGetDownloadsFolder();
-
-                OS.File.stat(OS.Path.join(root.path, filename))
-                    .then(function(info) {
-                        resolve(info.size);
-                    }, reject);
-            }
-            catch (ex) {
-                reject(ex);
-            }
-        }
         else {
             reject(EACCESS);
         }
@@ -248,22 +236,25 @@ var dlmanager = {
      * @param {ClassFile} file The class file instance
      * @param {Object} gres The API reply to the `g` request
      * @param {Object} resumeInfo Resumable info, if any
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
     initDownload: function(file, gres, resumeInfo) {
         'use strict';
 
         if (!(file instanceof ClassFile)) {
-            return MegaPromise.reject(EARGS);
+            return Promise.reject(EARGS);
         }
         if (!file.dl || !Object(file.dl.io).setCredentials) {
-            return MegaPromise.reject(EACCESS);
+            return Promise.reject(EACCESS);
         }
         if (!gres || typeof gres !== 'object' || file.dl.size !== gres.s) {
-            return MegaPromise.reject(EFAILED);
+            return Promise.reject(EFAILED);
         }
-        var dl = file.dl;
-        var promise = new MegaPromise();
+        if (file.dl.cancelled) {
+            return Promise.reject(EEXPIRED);
+        }
+        const {dl} = file;
+        const {promise} = mega;
 
         var dl_urls = [];
         var dl_chunks = [];
@@ -444,8 +435,10 @@ var dlmanager = {
         if (d) {
             dlmanager.logger.info("Retrieving New URLs for", gid);
         }
+        const {dlQueue} = window;
 
         dlQueue.pause();
+        delete dl.dlTicketData;
         dlmanager.dlGetUrl(dl, function(error, res, o) {
             if (error) {
                 return later(this.newUrl.bind(this, dl));
@@ -454,9 +447,10 @@ var dlmanager = {
 
             var changed = 0;
             for (var i = 0; i < dlQueue._queue.length; i++) {
-                if (dlQueue._queue[i][0].dl === dl) {
-                    dlQueue._queue[i][0].url = res.g + "/" +
-                        dlQueue._queue[i][0].url.replace(/.+\//, '');
+                const e = dlQueue._queue[i][0];
+
+                if (e.dl === dl) {
+                    e.url = `${res.g}/${String(e.url).replace(/.+\//, '')}`;
                     changed++;
                 }
             }
@@ -528,6 +522,72 @@ var dlmanager = {
 
     getGID: function DM_GetGID(dl) {
         return dl.zipid ? 'zip_' + dl.zipid : 'dl_' + (dl.dl_id || dl.ph);
+    },
+
+    dlGetUrl: function DM_dlGetUrl(dl, callback) {
+        'use strict';
+
+        if (dl.byteOffset && dl.byteOffset === dl.size) {
+            // Completed download.
+            return callback(false, {s: dl.size, g: dl.url || 'https://localhost.save-file.mega.nz/dl/1234'});
+        }
+
+        const ctx = {
+            object: dl,
+            next: callback,
+            dl_key: dl.key
+        };
+
+        if (typeof dl.dlTicketData === 'object') {
+
+            return this.dlGetUrlDone(dl.dlTicketData, ctx);
+        }
+        this.preFetchDownloadTickets(dl.pos);
+
+        return megaUtilsGFSFetch.getTicketData(dl)
+            .then((res) => {
+
+                this.dlGetUrlDone(res, ctx);
+
+                return res;
+            })
+            .catch((ex) => {
+                this.logger.error('Failed to retrieve download ticket.', ex, [dl]);
+                callback(ex);
+            });
+    },
+
+    preFetchDownloadTickets(index, limit, queue, space, ridge) {
+        'use strict';
+
+        index = index || 0;
+        limit = limit || 7;
+        queue = queue || dl_queue;
+        space = space || 96 * 1024;
+        ridge = ridge || limit << 3;
+
+        if (d) {
+            this.logger.info('prefetching download tickets...', index, limit, ridge, space, [queue]);
+        }
+
+        let c = 0;
+        for (let i = index; queue[i]; ++i) {
+            const dl = queue[i].dl || queue[i];
+
+            if (!('dlTicketData' in dl) && dl.byteOffset !== dl.size) {
+
+                ++c;
+                megaUtilsGFSFetch.getTicketData(dl).catch(dump);
+
+                if (!--ridge || dl.size > space && !--limit) {
+                    break;
+                }
+            }
+        }
+
+        if (d) {
+            this.logger.info('...queued %d download tickets.', c);
+        }
     },
 
     _clearGp: function() {
@@ -695,10 +755,7 @@ var dlmanager = {
                 var w = GlobalProgress[gid].working;
                 while ((chunk = w.pop())) {
                     var result = chunk.isCancelled();
-                    if (!result) {
-                        this.logger.error('Download chunk %s(%s) should have been cancelled itself.', gid, chunk);
-                        if (d) debugger;
-                    }
+                    this.logger.assert(result, 'Download chunk %s(%s) should have been cancelled itself.', gid, chunk);
                 }
             }
 
@@ -708,147 +765,65 @@ var dlmanager = {
         }
     },
 
-    dlGetUrl: function DM_dlGetUrl(dl, callback) {
-        'use strict';
-
-        if (dl.byteOffset && dl.byteOffset === dl.size) {
-            // Completed download.
-            return callback(false, {s: dl.size, g: 'https://localhost.save-file.mega.nz/dl/1234'});
-        }
-
-        var req = {
-            a: 'g',
-            g: 1,
-            ssl: use_ssl
-        };
-
-        var ctx = {
-            object: dl,
-            next: callback,
-            dl_key: dl.key,
-            callback: this.dlGetUrlDone.bind(this)
-        };
-
-        // IF this is an anonymous chat OR a chat that I'm not a part of
-        if (M.chat && megaChatIsReady) {
-            megaChat.eventuallyAddDldTicketToReq(req);
-        }
-
-        if (d && String(apipath).indexOf('staging') > 0) {
-            const s = sessionStorage;
-            if (s.dltfefq || s.dltflimit) {
-                req.f = [s.dltfefq | 0, s.dltflimit | 0];
-            }
-        }
-
-        if (window.fetchStreamSupport) {
-            // can handle CloudRAID downloads.
-            req.v = 2;
-        }
-
-        if (dl.ph) {
-            req.p = dl.ph;
-        }
-        else if (dl.id) {
-            req.n = dl.id;
-        }
-
-        if (folderlink || !dl.nauth) {
-            api_req(req, ctx, dl.nauth ? 1 : 0);
-        }
-        else {
-            req.enp = dl.nauth;
-            api_req(req, ctx);
-        }
-    },
-
     dlGetUrlDone: function DM_dlGetUrlDone(res, ctx) {
-        var error = EAGAIN;
-        var dl = ctx.object;
+        'use strict';
+        let error = res.e;
+        const dl = ctx.object;
 
-        if (typeof res === 'number') {
-            error = res;
-        }
-        else if (typeof res === 'object') {
-            if (res.efq) {
-                dlmanager.efq = true;
-            }
-            else {
-                delete dlmanager.efq;
-            }
-            if (res.g && typeof res.g === 'object') {
-                // API may gives a fake array...
-                res.g = Object.values(res.g);
+        if (!res.e) {
+            const key = [
+                ctx.dl_key[0] ^ ctx.dl_key[4],
+                ctx.dl_key[1] ^ ctx.dl_key[5],
+                ctx.dl_key[2] ^ ctx.dl_key[6],
+                ctx.dl_key[3] ^ ctx.dl_key[7]
+            ];
+            const attr = dec_attr(base64_to_ab(res.at), key);
 
-                if (res.g[0] < 0) {
-                    res.e = res.e || res.g[0];
+            if (typeof attr === 'object' && typeof attr.n === 'string') {
+                const minSize = 1e3;
+
+                if (d) {
+                    console.assert(res.s > minSize || !ctx.object.preview, 'What are we previewing?');
                 }
-                else {
-                    dlQueue.setSize(1);
-                }
-            }
-            if (res.d) {
-                error = (res.d ? 2 : 1); // XXX: ???
-            }
-            else if (res.e) {
-                error = res.e;
-            }
-            else if (res.g) {
-                var key = [
-                    ctx.dl_key[0] ^ ctx.dl_key[4],
-                    ctx.dl_key[1] ^ ctx.dl_key[5],
-                    ctx.dl_key[2] ^ ctx.dl_key[6],
-                    ctx.dl_key[3] ^ ctx.dl_key[7]
-                ];
-                var ab = base64_to_ab(res.at);
-                var attr = dec_attr(ab, key);
 
-                if (typeof attr === 'object' && typeof attr.n === 'string') {
-                    const minSize = 1e3;
+                if (page !== 'download'
+                    && (
+                        !res.fa
+                        || !String(res.fa).includes(':0*')
+                        || !String(res.fa).includes(':1*')
+                        || ctx.object.preview === -1
+                    )
+                    && res.s > minSize
+                    && !sessionStorage.gOOMtrap) {
 
-                    if (d) {
-                        console.assert(res.s > minSize || !ctx.object.preview, 'What are we previewing?');
-                    }
+                    const image = is_image(attr.n);
+                    const audio = !image && is_audio(attr.n);
+                    const video = !audio && is_video(attr.n);
+                    const limit = 96 * 1048576;
 
-                    if (page !== 'download'
-                        && (
-                            !res.fa
-                            || !String(res.fa).includes(':0*')
-                            || !String(res.fa).includes(':1*')
-                            || ctx.object.preview === -1
-                        )
-                        && res.s > minSize
-                        && !sessionStorage.gOOMtrap) {
-
-                        const image = is_image(attr.n);
-                        const audio = !image && is_audio(attr.n);
-                        const video = !audio && is_video(attr.n);
-                        const limit = 96 * 1048576;
-
-                        if (res.s < limit && (image || audio) || video) {
-                            // eslint-disable-next-line max-depth
-                            if (d) {
-                                this.logger.warn(
-                                    '[%s] Missing thumb/prev, will try to generate...', attr.n, [res], [attr]
-                                );
-                            }
-
-                            tryCatch(() => {
-                                Object.defineProperty(ctx.object, 'misThumbData', {
-                                    writable: true,
-                                    value: new ArrayBuffer(Math.min(res.s, limit))
-                                });
-                            }, () => {
-                                sessionStorage.gOOMtrap = 1;
-                            })();
+                    if (res.s < limit && (image || audio) || video) {
+                        if (d) {
+                            this.logger.warn(
+                                '[%s] Missing thumb/prev, will try to generate...', attr.n, [res], [attr]
+                            );
                         }
-                    }
 
-                    // dlmanager.onNolongerOverquota();
-                    return ctx.next(false, res, attr, ctx.object);
+                        tryCatch(() => {
+                            Object.defineProperty(ctx.object, 'misThumbData', {
+                                writable: true,
+                                value: new ArrayBuffer(Math.min(res.s, limit))
+                            });
+                        }, () => {
+                            sessionStorage.gOOMtrap = 1;
+                        })();
+                    }
                 }
+
+                // dlmanager.onNolongerOverquota();
+                return ctx.next(false, res, attr, ctx.object);
             }
         }
+        error = error < 0 && parseInt(error) || EKEY;
 
         dlmanager.dlReportStatus(dl, error);
 
@@ -912,11 +887,13 @@ var dlmanager = {
         }
 
         var eekey = code === EKEY;
-        if (eekey || code === EACCESS || code === ETOOMANY) {
+        if (eekey || code === EACCESS || code === ETOOMANY || code === ENOENT) {
             // TODO: Check if other codes should raise abort()
-            later(function() {
+
+            later(() => {
                 dlmanager.abort(dl, eekey);
             });
+
             if (M.chat) {
                 window.toaster.main.hideAll().then(() => {
                     showToast('download', eekey ? l[24] : l[20228]);
@@ -1218,6 +1195,11 @@ var dlmanager = {
                         task.offset,
                         abLen
                     ).set(task.data);
+                }
+
+                if (dlmanager.dlResumeThreshold > dl.size) {
+
+                    return finish_write(task, done);
                 }
 
                 dlmanager.setResumeInfo(dl, dl.writer.pos)
@@ -1527,7 +1509,7 @@ var dlmanager = {
             }
         };
 
-        M.req.poll(-10, {a: 'uq', xfer: 1}).then((res) => {
+        api.req({a: 'uq', xfer: 1}, {cache: -10}).then(({result: res}) => {
             delay('overquotainfo:reply.success', () => {
                 if (typeof res === "number") {
                     // Error, just keep retrying
@@ -1708,10 +1690,10 @@ var dlmanager = {
             if ($pan.length && !$pan.hasClass('flag-pcset')) {
                 $pan.addClass('flag-pcset');
 
-                M.req('efqb').done(function(val) {
+                api.req({a: 'efqb'}).then(({result: val}) => {
                     if (val) {
                         $dialog.removeClass('hidden-bottom').addClass('gotEFQb');
-                        $pan.text(String($pan.text()).replace('10%', val + '%'));
+                        $pan.text(String($pan.text()).replace('10%', `${val | 0}%`));
                     }
                 });
             }
@@ -2004,8 +1986,9 @@ var dlmanager = {
                                 if (ui.value < account.servbw_limit) {
                                     // retry download if less quota was chosen...
                                     loadingDialog.show();
-                                    M.req({a: 'up', srvratio: ui.value})
-                                        .always(function() {
+                                    api.req({a: 'up', srvratio: ui.value})
+                                        .catch(dump)
+                                        .finally(() => {
                                             loadingDialog.hide();
                                             dlmanager._onQuotaRetry(true);
                                         });
@@ -2261,26 +2244,11 @@ var dlmanager = {
                             var $dialog = $('.megasync-overlay');
                             $('.megasync-close, button.js-close, .fm-dialog-close', $dialog).click();
 
-                            msgDialog('warningb', l[882], l[7157], 0, function(yes) {
+                            msgDialog('warningb', l[882], l[7157], 0, async(yes) => {
                                 if (yes) {
-                                    var logged = false;
-
                                     loadingDialog.show();
-                                    M.req({a: 'log', e: 99682}).always(function() { logged = true; });
-
-                                    M.clearFileSystemStorage()
-                                        .always(function() {
-                                            var reload = function() {
-                                                location.reload(true);
-                                            };
-
-                                            if (logged) {
-                                                reload();
-                                            }
-                                            else {
-                                                setTimeout(reload, 3000);
-                                            }
-                                        });
+                                    await Promise.allSettled([eventlog(99682), M.clearFileSystemStorage()]);
+                                    location.reload(true);
                                 }
                             });
                             return false;
@@ -2559,3 +2527,11 @@ DownloadQueue.prototype.push = function() {
 
     return pos;
 };
+
+mBroadcaster.once('startMega', () => {
+    'use strict';
+
+    api.observe('setsid', (sid) => {
+        delay('overquota:retry', () => dlmanager._onOverQuotaAttemptRetry(sid));
+    });
+});

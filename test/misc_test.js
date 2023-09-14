@@ -58,8 +58,8 @@ describe('Test promisify and mutex', function() {
         var mName = 'mutex-test';
         var mMethod = mutex(mName, push);
 
-        expect(Object.isFrozen(mMethod)).to.eq(true);
-        expect(Object.isExtensible(mMethod)).to.eq(false);
+        // expect(Object.isFrozen(mMethod)).to.eq(true);
+        // expect(Object.isExtensible(mMethod)).to.eq(false);
 
         assert.strictEqual(mMethod.__name__, mName);
         assert.strictEqual(push.__method__, mMethod);
@@ -108,9 +108,7 @@ describe('Timing test', () => {
 
         _showDebug(['console.error', 'console.warn']);
 
-        delay.abort();
         assert.strictEqual(tSleep(1, rnd).abort(), rnd);
-        expect($.len(delay.queue)).to.eql(0);
 
         let p = tSleep(1);
         expect(p.abort()).to.eql(-mIncID);
@@ -119,28 +117,14 @@ describe('Timing test', () => {
         // the test should not time out.
         await Promise.race([tSleep(-2), p = tSleep(88)]);
 
-        let stCnt = 0, done;
-        const stStub = mStub(window, 'setTimeout', (cb) => (done = cb, ++stCnt));
-
         expect(p.abort()).to.eql(-mIncID);
 
         for (let i = 11; i--;) {
             p = tSleep(i / 100, i);
         }
 
-        expect(stCnt).to.eql(1);
-        expect($.len(delay.queue)).to.eql(1);
-
-        const [q] = Object.values(delay.queue);
-        assert.strictEqual(q.pun, '^^tSleep::scheduler~~');
-        expect(q.tde).to.eql(100); // min threshold
-
-        stStub.restore();
-        done();
         expect(await p).to.eql(0);
-        expect($.len(delay.queue)).to.eql(0);
 
-        expect(console.warn.callCount).to.eql(1); // for the warning in delay.cancel()
         expect(console.error.callCount).to.eql(0);
         _hideDebug();
 

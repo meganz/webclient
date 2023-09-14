@@ -140,34 +140,34 @@ mobile.sms.verifyCode = {
             var verificationCode = $verificationCode.val();
 
             // Send code to the API for verification
-            api_req({ a: 'smsv', c: verificationCode }, {
-                callback: function(result) {
+            api.send({a: 'smsv', c: verificationCode})
+                .then(() => {
+                    // Hide the current page
+                    mobile.sms.verifyCode.$page.addClass('hidden');
+
+                    // Load the success page
+                    loadSubPage('sms/verify-success');
+                })
+                .catch((ex) => {
 
                     // Check for errors
-                    if (result === EACCESS) {
+                    if (ex === EACCESS) {
                         $warningMessage.removeClass('hidden').text(l[20223]);
                     }
-                    else if (result === EEXPIRED) {
+                    else if (ex === EEXPIRED) {
                         $warningMessage.removeClass('hidden').text(l[20224]);
                     }
-                    else if (result === EFAILED) {
+                    else if (ex === EFAILED) {
                         $warningMessage.removeClass('hidden').text(l[20225]);
                     }
-                    else if (result === EEXIST || result === ENOENT) {
+                    else if (ex === EEXIST || ex === ENOENT) {
                         $warningMessage.removeClass('hidden').text(l[20226]);
                     }
-                    else if (result < 0) {
+                    else {
+                        console.error(ex);
                         $warningMessage.removeClass('hidden').text(l[47]);  // Oops, something went wrong...
                     }
-                    else {
-                        // Hide the current page
-                        mobile.sms.verifyCode.$page.addClass('hidden');
-
-                        // Load the success page
-                        loadSubPage('sms/verify-success');
-                    }
-                }
-            });
+                });
 
             // Prevent double taps
             return false;

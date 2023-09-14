@@ -54,7 +54,7 @@ MegaData.prototype.filterByParent = function(id) {
         }
     }
     // We should have a parent's childs into M.c, no need to traverse the whole M.d
-    else if (id === 'public-links' || id === 'out-shares' || this.c[id]) {
+    else if (this.c[id] || id === 'public-links' || id === 'out-shares' || id === 'file-requests') {
         var list;
 
         if (id === 'public-links') {
@@ -63,37 +63,23 @@ MegaData.prototype.filterByParent = function(id) {
         else if (id === 'out-shares') {
             list = this.getOutShareTree();
         }
+        else if (id === 'file-requests') {
+            list = mega.fileRequest.getPuHandleList();
+        }
         else {
             list = this.c[id];
         }
 
         this.v = Object.keys(list)
-            .map(function(h) {
-                return M.d[h];
-            })
-            .filter(function(n) {
+            .map((h) => M.d[h])
+            .filter((n) => {
                 // Filter versioned file or undefined node.
-                if (!n || n.fv) {
+                if (!n || n.fv /* || n.s4*/) { // @todo
                     return false;
                 }
 
                 // Filter label applies here.
-                if (M.currentLabelFilter && !M.filterByLabel(n)){
-                    return false;
-                }
-                return true;
-            });
-    }
-    // We should have a parent's childs into M.c, no need to traverse the whole M.d
-    else if (id === 'file-requests') {
-        const list = this.getFileRequestsTree();
-
-        this.v = Object.keys(list)
-            .map((h) => {
-                return M.d[h];
-            })
-            .filter((n) => {
-                return !(!n || M.currentLabelFilter && !M.filterByLabel(n));
+                return !(this.currentLabelFilter && !this.filterByLabel(n));
             });
     }
     else {
@@ -104,18 +90,19 @@ MegaData.prototype.filterByParent = function(id) {
 };
 
 MegaData.prototype.filterBySearch = function (str) {
+    'use strict';
+
+    str = String(str || '').replace('search/', '').trim();
+
     if (hashLogic) {
-        str = decodeURIComponent(String(str || '').replace('search/', '')).toLowerCase();
-    }
-    else {
-        str = String(str || '').replace('search/', '').toLowerCase();
+        str = decodeURIComponent(str);
     }
 
-    if (str[0] === '~') {
-        var command = str.substr(1);
+    const pfx = '--';
+    if (str.startsWith(pfx)) {
+        const command = str.slice(pfx.length);
         str = null;
 
-        /*jshint -W089 */
         if (command === 'findupes') {
             var nodesByHash = {};
 
@@ -177,11 +164,39 @@ MegaData.prototype.filterBySearch = function (str) {
                 loadingDialog.hide();
             };
         }
+        else if (command.startsWith('find') || command.startsWith('ctag')) {
+            const handles = command.split(/[^\w-]+/).slice(1);
+
+            this.v = [];
+            loadingDialog.show();
+            Promise.resolve(window.fmdb && dbfetch.geta(handles))
+                .then(() => {
+                    const v = handles.map((h) => M.d[h]).filter(Boolean);
+
+                    if (pfid && command.startsWith('ctag')) {
+                        for (let i = v.length; i--;) {
+                            let n = v[i];
+
+                            do {
+                                $(`#${n.h}`).removeClassWith('highlight').addClass(`highlight${n.vhl = 1}`);
+
+                            } while ((n = M.d[n.p]));
+                        }
+                    }
+                    else {
+                        this.currentdirid = `search/${pfx}${command}`;
+                        this.v = v;
+                        this.sort();
+                        this.renderMain();
+                    }
+                })
+                .catch(tell)
+                .finally(() => loadingDialog.hide());
+        }
         else {
             console.error('Unknown search command', command);
-            str = '~' + command;
+            str = `${pfx}${command}`;
         }
-        /*jshint +W089 */
     }
 
     if (str) {

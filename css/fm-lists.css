@@ -4,8 +4,17 @@
 .megaList-content > * {
     position: absolute;
 }
+
 .megaListContainer tr {
     width: 100%;
+}
+
+.megaListContainer tr.highlight1 {
+    background-color: #d00;
+}
+
+.megaListContainer tr.highlight2 {
+    background-color: #d90;
 }
 
 /* ============================ *\

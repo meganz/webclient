@@ -15,19 +15,15 @@ lazy(mega, 'fileRequest', () => {
     };
 
     const openCreateDialogFromSelect = (selectedNodeHandle) => {
-        mega.fileRequest.dialogs.createDialog.init(selectedNodeHandle);
+        if (selectedNodeHandle) {
+            mega.fileRequest.dialogs.createDialog.init(selectedNodeHandle);
+        }
     };
 
     const openNewDialogHandler = () => {
-        if (M.currentrootid === 'file-requests') {
-            // We clear the selection as its useless on file requests list page
-            // and will default to M.RootID once dialog is opened
-            selectionManager.clear_selection();
-        }
-
-        openNewFileRequestDialog({
-            post: openCreateDialogFromSelect
-        });
+        openNewFileRequestDialog()
+            .then(openCreateDialogFromSelect)
+            .catch(dump);
         return false;
     };
 
@@ -539,11 +535,10 @@ lazy(mega, 'fileRequest', () => {
 
                 closeDialog();
 
-                mega.fileRequest.create(
-                    this.context.nodeHandle,
-                    this.commonDialog.$inputTitle.getValue(),
-                    this.commonDialog.$inputDescription.getValue()
-                );
+                const title = this.commonDialog.$inputTitle.getValue();
+                const description = this.commonDialog.$inputDescription.getValue();
+
+                mega.fileRequest.create(this.context.nodeHandle, title, description).catch(dump);
             });
         }
 
@@ -567,13 +562,13 @@ lazy(mega, 'fileRequest', () => {
             if (context) {
                 this.setContext(context);
             }
+            loadingDialog.hide();
 
             this.puHandleObject = mega.fileRequest.storage.getPuHandleByPublicHandle(context.ph);
             if (!this.puHandleObject) {
                 if (d) {
                     logger.info('CreateSuccessDialog.init - No puHandleObject found', context);
                 }
-                loadingDialog.hide();
                 return;
             }
 
@@ -631,13 +626,13 @@ lazy(mega, 'fileRequest', () => {
             if (context) {
                 this.setContext(context);
             }
+            loadingDialog.hide();
 
             this.puHandleObject = mega.fileRequest.storage.getPuHandleByNodeHandle(context.h);
             if (!this.puHandleObject) {
                 if (d) {
                     logger.info('ManageDialog.init - No puHandleObject found', context);
                 }
-                loadingDialog.hide();
                 return;
             }
 
@@ -646,31 +641,33 @@ lazy(mega, 'fileRequest', () => {
             }
             this.puPagePublicHandle = this.puHandleObject.p;
 
-            // Reset fields
-            this.commonDialog.reset();
-            this.setDialog();
-            this.commonDialog.init();
-            this.addEventHandlers();
+            M.safeShowDialog('file-request-manage-dialog', () => {
+                eventlog(99774);
 
-            this.commonDialog.setShareLink();
-            this.commonDialog.setEmbedCode();
+                // Reset fields
+                this.commonDialog.reset();
+                this.setDialog();
+                this.commonDialog.init();
+                this.addEventHandlers();
 
-            // Reset fields
-            const puHandleObjectData = this.puHandleObject.d;
-            if (puHandleObjectData) {
-                this.commonDialog.$inputTitle.setValue(puHandleObjectData.t);
-                this.commonDialog.$inputDescription.setValue(puHandleObjectData.d);
-            }
-            else {
-                const message = this.puHandleObject.fn || '';
-                this.commonDialog.$inputTitle.setValue(message);
-                this.commonDialog.$inputDescription.setValue('');
-            }
+                this.commonDialog.setShareLink();
+                this.commonDialog.setEmbedCode();
 
-            delay('filerequest.log', eventlog.bind(null, 99774)); // manage event
-            M.safeShowDialog('file-request-manage-dialog', this.commonDialog.$dialog);
-            this.commonDialog.initScrollbar();
-            loadingDialog.hide();
+                // Reset fields
+                const puHandleObjectData = this.puHandleObject.d;
+                if (puHandleObjectData) {
+                    this.commonDialog.$inputTitle.setValue(puHandleObjectData.t);
+                    this.commonDialog.$inputDescription.setValue(puHandleObjectData.d);
+                }
+                else {
+                    const message = this.puHandleObject.fn || '';
+                    this.commonDialog.$inputTitle.setValue(message);
+                    this.commonDialog.$inputDescription.setValue('');
+                }
+
+                this.commonDialog.initScrollbar();
+                return this.commonDialog.$dialog;
+            });
         }
 
         setDialog() {
@@ -808,7 +805,7 @@ lazy(mega, 'fileRequest', () => {
         }
 
         addEventHandlers() {
-            if (d) {
+            if (d > 1) {
                 logger.info(
                     '#file-request #context-menu - Add Folder context menu event handlers',
                     this.$createButton.length
@@ -853,34 +850,30 @@ lazy(mega, 'fileRequest', () => {
             });
 
             const showRemoveDialog = (selectedNodeHandle, title, message, description) => {
-                msgDialog(
-                    `confirmation:!^${l.file_request_action_remove_prompt_button}!${l[82]}`,
-                    title,
-                    message,
-                    description,
-                    (res) => {
-                        if (!res) {
-                            return;
-                        }
+                const type = `confirmation:!^${l.file_request_action_remove_prompt_button}!${l[82]}`;
 
-                        loadingDialog.show();
-                        mega.fileRequest.remove(selectedNodeHandle)
-                            .catch((ex) => {
-                                if (typeof ex !== 'number' || ex && ex !== ENOENT) {
-                                    return;
-                                }
+                const _remove = () => {
+                    mLoadingSpinner.show('puf-remove');
 
-                                mega.fileRequest.storage.removePuPageByNodeHandle(selectedNodeHandle);
+                    mega.fileRequest.remove(selectedNodeHandle, true)
+                        .catch((ex) => {
+                            if (ex !== ENOENT) {
+                                logger.error(ex);
+                                return;
+                            }
 
-                                refreshFileRequestPageList();
-                            })
-                            .finally(() => {
-                                showToast('warning2', l.file_request_action_remove);
-                                selectionManager.clear_selection();
-                            });
-                    },
-                    1
-                );
+                            onIdle(refreshFileRequestPageList);
+                            return mega.fileRequest.storage.removePuPageByNodeHandle(selectedNodeHandle);
+                        })
+                        .finally(() => {
+                            mLoadingSpinner.hide('puf-remove');
+                        });
+
+                    selectionManager.clear_selection();
+                    showToast('warning2', l.file_request_action_remove);
+                };
+
+                msgDialog(type, title, message, description, (res) => res && _remove(), 1);
             };
 
             this.$removeButton.eventOnClick(() => {
@@ -1078,11 +1071,10 @@ lazy(mega, 'fileRequest', () => {
 
                 this.$closeButton.closeDialog();
 
-                mega.fileRequest.create(
-                    this.context.nodeHandle,
-                    this.$inputTitle.getValue(),
-                    this.$inputDescription.getValue()
-                );
+                const title = this.$inputTitle.getValue();
+                const description = this.$inputDescription.getValue();
+
+                mega.fileRequest.create(this.context.nodeHandle, title, description).catch(tell);
 
                 eventlog(99834);
 
@@ -1197,13 +1189,13 @@ lazy(mega, 'fileRequest', () => {
             if (context) {
                 this.setContext(context);
             }
+            loadingDialog.hide();
 
             this.puHandleObject = mega.fileRequest.storage.getPuHandleByNodeHandle(context.h);
             if (!this.puHandleObject) {
                 if (d) {
                     logger.info('ManageMobileDialog.init - No puHandleObject found', context);
                 }
-                loadingDialog.hide();
                 return;
             }
 
@@ -1237,8 +1229,6 @@ lazy(mega, 'fileRequest', () => {
 
             this.$dialog.removeClass('hidden').addClass('overlay');
             mobile.initOverlayPopstateHandler(this.$dialog);
-
-            loadingDialog.hide();
         }
 
         hasChanges() {
@@ -1305,6 +1295,7 @@ lazy(mega, 'fileRequest', () => {
             if (context) {
                 this.setContext(context);
             }
+            loadingDialog.hide();
 
             let dialogTitle = l.file_request_dialog_create_success_title;
             if (update) {
@@ -1318,7 +1309,6 @@ lazy(mega, 'fileRequest', () => {
                 if (d) {
                     logger.info('SuccessMobileDialog.init - No puHandleObject found', context);
                 }
-                loadingDialog.hide();
                 return;
             }
 
@@ -1334,7 +1324,6 @@ lazy(mega, 'fileRequest', () => {
 
             // Show the overlay
             this.$dialog.removeClass('hidden').addClass('overlay');
-            loadingDialog.hide();
         }
 
         setContext(context) {
@@ -1407,6 +1396,7 @@ lazy(mega, 'fileRequest', () => {
         }
     }
 
+    /** @class mega.fileRequest */
     return new class FileRequest {
         constructor() {
             this.contextMenu = new FileRequestContextMenu();
@@ -1414,8 +1404,8 @@ lazy(mega, 'fileRequest', () => {
             lazy(this, 'mobileContextMenu', () => new MobileContextMenu());
             lazy(this, 'actionHandler', () => mega.fileRequestCommon.actionHandler);
             lazy(this, 'storage', () => mega.fileRequestCommon.storage);
-            lazy(this, 'api', () =>  mega.fileRequestCommon.api);
-            lazy(this, 'generator', () =>  mega.fileRequestCommon.generator);
+            lazy(this, 'fileRequestApi', () => mega.fileRequestCommon.fileRequestApi);
+            lazy(this, 'generator', () => mega.fileRequestCommon.generator);
 
             this.dialogs = {};
 
@@ -1433,70 +1423,31 @@ lazy(mega, 'fileRequest', () => {
         }
 
         async create(handle, title, description) {
-            const puHandleObject = this.storage.getPuHandleByNodeHandle(handle);
+            let puHandleObject = this.storage.getPuHandleByNodeHandle(handle);
 
-            if (puHandleObject) {
-                if (is_mobile) {
-                    mega.fileRequest.dialogs.SuccessMobileDialog.init({
-                        ph: puHandleObject.ph,
-                        p: puHandleObject.p,
-                        h: puHandleObject.h
+            if (!puHandleObject) {
+
+                puHandleObject = await this.fileRequestApi.create(handle, title, description)
+                    .then((res) => {
+                        const {pkt: {pup: {p}}, result: [ph, puf]} = res;
+                        const c = this.storage.getPuHandleByNodeHandle(handle);
+
+                        assert(c && c.p === p && c.ph === ph && c.p === puf, 'Invalid API response.', res, [c]);
+
+                        onIdle(refreshFileRequestPageList);
+                        this.storage.updatePuPage(c.p, title, description);
+                        this.storage.updatePuHandle(c.h, title, description);
+
+                        return c;
                     });
-                    return;
-                }
-
-                mega.fileRequest.dialogs.createSuccessDialog.init({
-                    ph: puHandleObject.ph,
-                    p: puHandleObject.p,
-                    h: puHandleObject.h
-                });
-                return;
             }
 
-            loadingDialog.show();
-
-            delay('filerequest.log', eventlog.bind(null, 99773)); // create event
-            const response = await this
-                .api
-                .create(handle, title, description)
-                .catch((ex) => {
-                    dump(ex);
-                    loadingDialog.hide();
-                    msgDialog('warninga', l[135], l[47], api_strerror(ex));
-                });
-
-            if (!Array.isArray(response)) {
-                // Page is already existing but the local data was not updated
-                // or maybe encountered an error
-                const publicHandle = response;
-                await this.api
-                    .remove(handle)
-                    .catch(dump);
-
-                await this.storage.addPuHandle(
-                    handle,
-                    publicHandle, {
-                        msg: title,
-                        description: description
-                    },
-                    null,
-                    requesti
-                ).catch(dump);
-                return;
+            if (is_mobile) {
+                mega.fileRequest.dialogs.successMobileDialog.init({...puHandleObject});
             }
-
-            const publicHandle = response[0];
-            const pagePublicHandle = response[1];
-
-            await this.storage.addPuHandle(
-                handle,
-                publicHandle, {
-                    msg: title,
-                    description: description
-                },
-                pagePublicHandle,
-                requesti
-            ).catch(dump);
+            else {
+                mega.fileRequest.dialogs.createSuccessDialog.init({...puHandleObject});
+            }
         }
 
         async update(handle, title, description) {
@@ -1507,23 +1458,12 @@ lazy(mega, 'fileRequest', () => {
             }
 
             loadingDialog.show(); // Show dialog
-            await this.api
+            await this.fileRequestApi
                 .update(puHandleObject.p, title, description)
                 .catch(dump);
 
-            this.storage
-                .updatePuHandle(
-                    handle,
-                    title,
-                    description
-                );
-
-            this.storage
-                .updatePuPage(
-                    puHandleObject.p,
-                    title,
-                    description
-                );
+            this.storage.updatePuHandle(handle, title, description);
+            this.storage.updatePuPage(puHandleObject.p, title, description);
 
             if (is_mobile) {
                 this.dialogs.successMobileDialog.init({
@@ -1542,7 +1482,7 @@ lazy(mega, 'fileRequest', () => {
             return e && e.s !== 1 && (!p || e.p);
         }
 
-        removeList(handles, quiet) {
+        async removeList(handles, quiet) {
             if (typeof handles === 'string') {
                 handles = [handles];
             }
@@ -1551,58 +1491,22 @@ lazy(mega, 'fileRequest', () => {
                 handles = [];
             }
 
-            const promises = [];
-            const responses = {
-                error: 0,
-                success: 0,
-                items: Object.create(null)
-            };
-
             if (handles.length && !quiet) {
-                loadingDialog.show();
+                loadingDialog.pshow();
             }
 
+            const promises = [];
             for (let index = handles.length; index--;) {
                 const puHandleNodeHandle = handles[index];
-
                 const puHandleObject = this.storage.getPuHandleByNodeHandle(puHandleNodeHandle);
 
-                const promise = puHandleObject ?
-                    new Promise((resolve, reject) => {
-                        this.api
-                            .remove(puHandleNodeHandle)
-                            .then((res) => {
-                                responses.success++;
-                                responses.items[puHandleNodeHandle] = {
-                                    response: res
-                                };
-                                resolve(res);
-                            })
-                            .catch((ex) => {
-                                responses.error++;
-                                responses[puHandleNodeHandle] = {
-                                    error: ex
-                                };
-                                reject(ex);
-                            });
-                    }) :
-                    Promise.reject(new MEGAException(`Public Handle Object not found Node: ${puHandleNodeHandle}`));
-
-                promises.push(promise);
+                if (!puHandleObject) {
+                    logger.warn(`Public Handle Object not found for Node: ${puHandleNodeHandle}`);
+                }
+                promises.push(this.fileRequestApi.remove(puHandleNodeHandle));
             }
 
-            if (promises.length) {
-                return Promise.allSettled(promises)
-                    .finally(() => {
-                        if (!quiet && responses.error) {
-                            if (d) {
-                                logger.error('PUF Remove List Error', responses);
-                            }
-                            loadingDialog.hide();
-                        }
-                        return responses.items;
-                    });
-            }
+            return Promise.allSettled(promises).finally(() => !quiet && loadingDialog.phide());
         }
 
         async remove(handle, quiet) {
@@ -1616,26 +1520,17 @@ lazy(mega, 'fileRequest', () => {
                 loadingDialog.show(); // Show dialog
             }
 
-            return this.api
-                .remove(handle)
-                .catch((ex) => {
+            return this.fileRequestApi.remove(handle)
+                .finally(() => {
                     if (!quiet) {
-                        loadingDialog.hide(); // Hide dialog
+                        loadingDialog.hide();
                     }
-                    dump(ex);
-                    throw ex;
                 });
         }
 
         removePuPage(publicUploadPage) {
-            const nodeHandle = this
-                .storage
-                .removePuPage(publicUploadPage.p, publicUploadPage.ph);
 
-            if (nodeHandle) {
-                mBroadcaster
-                    .sendMessage(`FileRequest:pufRemoved_${nodeHandle}`);
-            }
+            return this.storage.removePuPage(publicUploadPage.p, publicUploadPage.ph);
         }
 
         processPuPageFromDB(dbData) {
@@ -1646,12 +1541,36 @@ lazy(mega, 'fileRequest', () => {
             return this.storage.processPuHandleFromDB(dbData);
         }
 
-        async refreshPuPageList() {
-            const puPageList = await this.api.getPuPageList().catch(dump);
+        async getPuPage(puPageId, puHandleId) {
 
-            const errorNonExistent = ENOENT;
-            const isDebug = d;
-            const fileRequestCommonObject = mega.fileRequestCommon;
+            return this.fileRequestApi.getPuPage(puPageId)
+                .then(({result: puPage}) => {
+                    this.storage.addPuPage(puPage);
+
+                    const currentPuPage = this.storage.getPuPageByPageId(puPage.p);
+                    if (currentPuPage && puPage.d) {
+                        this.storage.updatePuHandle(currentPuPage.h, puPage.d.msg, puPage.d.description);
+                    }
+
+                    return puPage;
+                })
+                .catch((ex) => {
+                    if (ex === ENOENT) {
+                        this.storage.removePuPage(puPageId, puHandleId);
+
+                        if (d) {
+                            logger.warn('getPuPage(%s) Not found.', puPageId, puHandleId, ex);
+                        }
+                        return;
+                    }
+
+                    throw ex;
+                });
+        }
+
+        async refreshPuPageList() {
+            const promises = [];
+            const {result: puPageList} = await this.fileRequestApi.getPuPageList();
 
             for (let index = puPageList.length; index--;) {
                 const puPageId = puPageList[index].p;
@@ -1659,14 +1578,14 @@ lazy(mega, 'fileRequest', () => {
                 const puHandleState = puPageList[index].s;
 
                 if (!puPageId) {
-                    if (isDebug) {
+                    if (d) {
                         logger.error(
                             'FileRequest.refreshPuPageList - Abnormal state - no puPageId',
                             puPageList[index]
                         );
                     }
 
-                    return;
+                    continue;
                 }
 
                 this.storage.saveOrUpdatePuHandle(
@@ -1677,56 +1596,16 @@ lazy(mega, 'fileRequest', () => {
                     }
                 );
 
-                this.api.getPuPage(puPageId)
-                    .then((puPage) => {
-                        this.storage.addPuPage(puPage);
-
-                        const currentPuPage = this.storage.getPuPageByPageId(puPage.p);
-                        if (currentPuPage && puPage.d) {
-                            this.storage
-                                .updatePuHandle(
-                                    currentPuPage.h,
-                                    puPage.d.msg,
-                                    puPage.d.description
-                                );
-                        }
-
-                        fileRequestCommonObject.addFileRequestIcon(puHandleId);
-                    })
-                    .catch(
-                        (ex) => {
-                            if (ex === errorNonExistent) {
-                                this.storage.removePuPage(puPageId, puHandleId);
-
-                                if (isDebug) {
-                                    logger.warn(
-                                        'FileRequest.refreshPuPageList - Api.getPuPage - Page does not exist',
-                                        puHandleId,
-                                        puPageId,
-                                        ex
-                                    );
-                                }
-                                return;
-                            }
-
-                            if (isDebug) {
-                                logger.warn(
-                                    'FileRequest.refreshPuPageList - Api.getPuPage - Something went wrong',
-                                    puHandleId,
-                                    puPageId,
-                                    ex
-                                );
-                            }
-                        }
-                    );
+                promises.push(this.getPuPage(puPageId, puHandleId));
             }
+
+            return Promise.all(promises);
         }
 
-        async processUploadedPuHandles(actionPacket) {
-            await this.actionHandler
-                .processUploadedPuHandles(actionPacket);
+        async processUploadedPuHandles(fetchNodesResponse) {
 
-            this.refreshPuPageList();
+            return this.actionHandler.processUploadedPuHandles(fetchNodesResponse)
+                .then(() => this.refreshPuPageList());
         }
 
         getPuHandleList() {
@@ -1781,14 +1660,13 @@ lazy(mega, 'fileRequest', () => {
                 }
                 else {
                     msgDialog('confirmation', l[1003], fldName, l[18229], (result) => {
+
                         if (result) {
                             return ack();
                         }
-                        reject();
+                        reject(EBLOCKED);
                     });
                 }
-
-
             });
         }
 
@@ -1806,34 +1684,29 @@ lazy(mega, 'fileRequest', () => {
          * Make sure that user knows that FileRequest wiil be cancelled if any
          * full shares or public links are available for target
          * @param {Array} handles Array of nodes id which will be moved
-         * @param {Boolean} target Target node
+         * @param {String} target Target node
          *
          * @returns {Promise} returns premove check promise
          */
         async preMoveCheck(handles, target) {
+            const list = [];
             const selected = Array.isArray(handles) ? handles : [handles];
-            let list = [];
 
             // Is there any FileRequest active for given handles?
             // Count for precise dlg message, will loop to the
             // end in case there is not FileRequest or if only 1 found
             for (let i = selected.length; i--;) {
-                list = list.concat(mega.fileRequestCommon.storage.isDropExist(selected[i]));
+                list.push(...mega.fileRequestCommon.storage.isDropExist(selected[i]));
             }
 
-            if (!list.length) {
-                return [selected, target];
-            }
+            if (list.length) {
+                const isShared = await shared(target) || new mega.Share({}).isShareExist([target], false, true);
 
-            const isShared = await shared(target);
-            if (!isShared) {
-                const share = new mega.Share({});
-                if (!share.isShareExist([target], false, true)) { // Search pending shares .ps
-                    return [selected, target];
+                if (isShared) {
+                    await this.showRemoveWarning(list);
                 }
             }
 
-            await this.showRemoveWarning(list);
             return [selected, target];
         }
 
@@ -1875,7 +1748,7 @@ lazy(mega, 'fileRequest', () => {
                     break;
             }
 
-            await this.api
+            await this.fileRequestApi
                 .update(
                     puHandleObject.p,
                     msg,

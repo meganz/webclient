@@ -12,7 +12,6 @@ var slideshowid;
     var slideshowpause;
     var origImgHeight;
     var slideshowTimer;
-    var mouseIdleTimer;
     var fullScreenManager;
     var _hideCounter = false;
     var switchedSides = false;
@@ -23,6 +22,7 @@ var slideshowid;
     var settingsMenu;
     var preselection;
     const broadcasts = [];
+    const MOUSE_IDLE_TID = 'auto-hide-previewer-controls';
 
     const onConfigChange = (name) => {
         if (name === 'speed') {
@@ -393,6 +393,12 @@ var slideshowid;
 
                 $getLinkBtn.removeClass('hidden');
                 $getLinkBtn.rebind('click.mediaviewer', function() {
+                    if ($getLinkBtn.hasClass('disabled')) {
+                        return;
+                    }
+                    $getLinkBtn.addClass('disabled');
+                    tSleep(3).then(() => $getLinkBtn.removeClass('disabled'));
+
                     if (is_mobile) {
                         mobile.linkOverlay.show(n.h);
                     }
@@ -1251,7 +1257,7 @@ var slideshowid;
 
             const idleAction = is_mobile ? 'touchstart' : 'mousemove';
 
-            clearTimeout(mouseIdleTimer);
+            delay.cancel(MOUSE_IDLE_TID);
             $document.off(`${idleAction}.idle`);
             $controls.off('mousemove.idle');
 
@@ -1261,18 +1267,15 @@ var slideshowid;
 
                 // Autohide controls
                 (function _() {
-                    clearTimeout(mouseIdleTimer);
                     $overlay.removeClass('mouse-idle');
-                    mouseIdleTimer = setTimeout(function() {
-                        $overlay.addClass('mouse-idle');
-                    }, 2000);
+                    delay(MOUSE_IDLE_TID, () => $overlay.addClass('mouse-idle'), 2e3);
                     $document.rebind(`${idleAction}.idle`, _);
                 })();
 
                 if (!is_mobile) {
                     $controls.rebind('mousemove.idle', () => {
                         onIdle(() => {
-                            clearTimeout(mouseIdleTimer);
+                            delay.cancel(MOUSE_IDLE_TID);
                         });
                     });
                 }
@@ -2174,7 +2177,7 @@ var slideshowid;
         }
 
         // Ensure we are not eating too much memory...
-        delay('slideshow:freemem', slideshow_freemem, 6e3);
+        tSleep.schedule(7, slideshow_freemem);
     }
 
     function slideshow_freemem() {

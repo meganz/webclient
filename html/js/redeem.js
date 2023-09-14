@@ -45,45 +45,26 @@ var redeem = {
             }
         }
 
-        this.getVoucherData().then(function(data) {
-            var promise;
+        this.getVoucherData()
+            .then((data) => {
 
-            // If any vouchers are used on a business user, we want to show this error message
-            if (u_attr && u_attr.b && !window.bCreatedVoucher && !window.busUpgrade) {
-                msgDialog(
-                    'error',
-                    l[1578],
-                    l[22888],
-                    '',
-                    function() {
-                        redeem.goToCloud();
-                    }
-                );
-                return;
-            }
+                // If any vouchers are used on a business user, we want to show this error message
+                assert(!(u_attr && u_attr.b && !window.bCreatedVoucher && !window.busUpgrade), l[22888]);
 
-            // If any vouchers are attempted to be redeemed for a current Pro Flexi user, show this error message
-            if (u_attr && u_attr.pf) {
-                msgDialog('error', l[1578], l.pro_flexi_cannot_redeem_voucher, '', () => {
-                    redeem.goToCloud();
-                });
-                return;
-            }
+                // If any vouchers are attempted to be redeemed for a current Pro Flexi user, show this error message
+                assert(!(u_attr && u_attr.pf), l.pro_flexi_cannot_redeem_voucher);
 
-            redeem.voucherData = data;
+                redeem.voucherData = data;
 
-            // Was the user already logged-in?
-            if (!sessionStorage.signinorup && !window.bCreatedVoucher && !window.busUpgrade) {
+                // Was the user already logged-in? otherwise if they just signed in/up no confirm needed.
+                if (!sessionStorage.signinorup && !window.bCreatedVoucher && !window.busUpgrade) {
 
-                // Show confirm dialog asking the user if he wants to redeem the voucher for this account.
-                promise = redeem.showConfirmAccountDialog();
-            }
-            else {
-                // The user just signed in/up, no confirm needed.
-                promise = MegaPromise.resolve();
-            }
-
-            var addVoucher = function() {
+                    // Show confirm dialog asking the user if he wants to redeem the voucher for this account.
+                    return redeem.showConfirmAccountDialog();
+                }
+            })
+            .then(() => {
+                const data = redeem.voucherData;
 
                 // if Business voucher with individual account, stop and collect needed data.
                 if (!window.busUpgrade && !window.bCreatedVoucher && data.businessmonths && u_attr && !u_attr.b
@@ -95,11 +76,18 @@ var redeem = {
                     return false;
                 }
 
+                // No longer needed.
                 delete window.busUpgrade;
+                delete localStorage.voucher;
+                delete localStorage[data.code];
+
+                if (window.u_attr && u_attr['^!promocode']) {
+                    Promise.resolve(mega.attr.remove('promocode', -2, true)).dump(`promo-code-removal`);
+                }
 
                 // Make API call to redeem voucher
-                M.req({a: 'promoter' in data ? 'epcr' : 'uavr', v: data.code, p: data.promoter})
-                    .then(function() {
+                return api.req({a: 'promoter' in data ? 'epcr' : 'uavr', v: data.code, p: data.promoter})
+                    .then(() => {
 
                         if (data.promotional) {
 
@@ -112,27 +100,16 @@ var redeem = {
                             data.balance += data.value;
                             redeem.displayDialog();
                         }
-                    })
-                    .catch(function(ex) {
-                        console.error('uavr failed...', ex);
-                        redeem.showErrorDialog(ex);
                     });
-
-                // No longer needed.
-                delete localStorage.voucher;
-                delete localStorage[data.code];
-                if (u_attr['^!promocode']) {
-                    mega.attr.remove('promocode', -2, true).dump();
+            })
+            .catch((ex) => {
+                if (!ex) {
+                    // cancelled confirm dialog.
+                    return redeem.goToCloud();
                 }
-
-            };
-
-            promise.then(addVoucher).catch(redeem.goToCloud.bind(redeem));
-
-        }).catch(function(ex) {
-            console.error('Redemption error.', ex);
-            redeem.showErrorDialog();
-        });
+                console.error('Redemption error.', ex);
+                redeem.showErrorDialog(ex);
+            });
     },
 
     /**
@@ -141,7 +118,7 @@ var redeem = {
     showConfirmAccountDialog: function() {
         'use strict';
 
-        return new MegaPromise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
 
             // Are you sure you want to redeem this voucher for the email@domain.com account?
             var message = String(l[19328]).replace('%1', window.u_attr && u_attr.email || '');
@@ -184,10 +161,13 @@ var redeem = {
             buttons = [buttons /* CANCEL */, l[81] /* OK */];
         }
 
-        return new MegaPromise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             if (is_mobile) {
                 var icon = (error ? 'invalid-' : '') + 'voucher';
-                message = submessage || message;
+                if (submessage) {
+                    title = message;
+                    message = submessage;
+                }
                 return mobile.messageOverlay.show(title, message, icon, buttons).then(resolve).catch(reject);
             }
 
@@ -213,13 +193,11 @@ var redeem = {
     showErrorDialog: function(message) {
         'use strict';
         if (message < 0) {
-            message = message === ETOOMANY ? l.redeem_etoomany : l[473];
+            message = message === ETOOMANY ? l.redeem_etoomany : `${api_strerror(message)} (${message})`;
         }
         // Show 'Oops, that does not seem to be a valid voucher code.' if none given
-        message = message || l[473];
-
         // With buttons, 'Contact Support' & 'Cloud Drive'
-        this.showDialog(l[20416], l[47], message, [l[18148], l[19266]], true)
+        this.showDialog(l[20416], l[473], String(message || ''), [l[18148], l[19266]], true)
             .then(function() {
                 redeem.goToCloud();
             })
@@ -583,48 +561,22 @@ var redeem = {
         loadingDialog.show();
 
         // User Transaction Sale API call
-        api_req({ a: 'uts', it: 0, si: apiId, p: price, c: currency, aff: aff }, {
-            callback: function (utsResult) {
-
-                // Store the sale ID to check with API later
-                var saleId = utsResult;
-
-                // If an error
-                if (typeof saleId === 'number' && saleId < 0) {
-
-                    loadingDialog.hide();
-                    alert(l[200]);
-
-                    return false;
-                }
+        api.screq({a: 'uts', it: 0, si: apiId, p: price, c: currency, aff})
+            .then(({result: saleId}) => {
 
                 // User Transaction Complete API call
-                api_req({ a: 'utc', s: [saleId], m: gatewayId }, {
-                    callback: function(utcResult) {
+                return api.screq({a: 'utc', s: [saleId], m: gatewayId});
+            })
+            .then(() => {
 
-                        // Hide the loading dialog
-                        loadingDialog.hide();
+                // Show success dialog
+                redeem.showSuccessfulPayment();
+            })
+            .catch((ex) => {
 
-                        // If an error code
-                        if (typeof utcResult === 'number' && utcResult < 0) {
-
-                            // Insufficient balance, please try again
-                            if (utcResult == EOVERQUOTA) {
-                                alert(l[514]);
-                            }
-                            else {
-                                // Oops, something went wrong
-                                alert(l[200]);
-                            }
-                        }
-                        else {
-                            // Show success dialog
-                            redeem.showSuccessfulPayment();
-                        }
-                    }
-                });
-            }
-        });
+                tell(ex === EOVERQUOTA ? l[514] : ex);
+            })
+            .finally(() => loadingDialog.hide());
     },
 
     /**
@@ -980,7 +932,7 @@ var redeem = {
     getVoucherData: function(code, promo) {
         'use strict';
 
-        return new MegaPromise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
             var parse = function(v) {
 
                 var b = v.promotional ? v.value : (v.balance + v.value);
@@ -1052,7 +1004,7 @@ var redeem = {
                 {a: 'utqa', nf: 2, b: 1, p: 1, r: 1}
             ];
 
-            var callback = function(meh, ctx, rr, res) {
+            const callback = ({responses: res}) => {
                 if (res && typeof res[0] === 'object') {
                     var v = res[0];
                     v.balance = parseFloat((((res[1] || []).balance || [])[0] || [])[0]) || 0;
@@ -1091,7 +1043,7 @@ var redeem = {
                 request[0].a = 'epcq';
             }
 
-            api_req(request, {callback: tryCatch(callback, reject)});
+            api.req(request).then(callback).catch(reject);
         });
     },
 
@@ -1107,7 +1059,7 @@ var redeem = {
             self.getVoucherData(code)
                 .then(function(data) {
                     var redeem = function() {
-                        M.req({a: 'uavr', v: code}).then(resolve.bind(null, data)).catch(reject);
+                        api.req({a: 'uavr', v: code}).then(({result: res}) => resolve({res, data})).catch(reject);
                     };
 
                     if (data.promotional) {

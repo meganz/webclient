@@ -203,8 +203,8 @@ export class ContactButton extends ContactAwareComponent {
                         }
                         else {
                             loadingDialog.show();
-                            M.syncContactEmail(contact.u, new MegaPromise(), true)
-                                .done(email => {
+                            M.syncContactEmail(contact.u, true)
+                                .then(email => {
                                     if (Object.values(M.opc || {}).some(cr => cr.m === email)) {
                                         closeDialog();
                                         msgDialog(
@@ -222,7 +222,6 @@ export class ContactButton extends ContactAwareComponent {
                                         msgDialog('info', title, msg.replace('[X]', email));
                                     }
                                 })
-                                .always(() => loadingDialog.hide())
                                 .catch(() => {
                                     const { chatRoom } = this.props;
                                     const { u: userHandle } = contact;
@@ -242,7 +241,8 @@ export class ContactButton extends ContactAwareComponent {
                                         /* `Please add them to your contact list once they register their account.` */
                                         l.ephemeral_info
                                     );
-                                });
+                                })
+                                .finally(() => loadingDialog.hide());
                         }
                     }}
                 />
@@ -973,17 +973,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 }
             });
         }
-
-        self._frequents = megaChat.getFrequentContacts();
-        self._frequents.always(function(r) {
-            if (self.props.disableFrequents) {
-                self._foundFrequents = [];
-            }
-            else {
-                self._foundFrequents = r.slice(Math.max(r.length - 30, 0), r.length).reverse();
-            }
-            self.safeForceUpdate();
-        });
     }
 
     componentWillUnmount() {
@@ -991,7 +980,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
         var self = this;
 
         delete self._foundFrequents;
-        delete self._frequents;
 
         if (self.props.multiple) {
             $(document.body).off('keypress.contactPicker' + self.getUniqueId());
@@ -1034,19 +1022,19 @@ export class ContactPickerWidget extends MegaRenderMixin {
             return false;
         }
 
-        var avatarMeta = generateAvatarMeta(v.u);
-
         if (self.state.searchValue && self.state.searchValue.length > 0) {
-            var userName = ChatSearch._normalize_str(avatarMeta.fullName.toLowerCase());
-            var userRealName = ChatSearch._normalize_str(v.name.toLowerCase());
-            var userEmail = ChatSearch._normalize_str(v.m.toLowerCase());
+            const norm = (s) => ChatSearch._normalize_str(String(s || '').toLowerCase());
+            const sv = norm(this.state.searchValue);
+
+            const skip =
+                !norm(v.name).includes(sv) &&
+                !norm(v.nickname).includes(sv) &&
+                !norm(v.fullname).includes(sv) &&
+                !norm(M.getNameByHandle(v.u)).includes(sv) &&
+                (this.props.notSearchInEmails || !norm(v.m).includes(sv));
 
             // DON'T add to the contacts list if the contact's name or email does not match the search value
-            if (
-                userName.indexOf(self.state.searchValue.toLowerCase()) === -1 &&
-                userRealName.indexOf(self.state.searchValue.toLowerCase()) === -1 &&
-                (userEmail.indexOf(self.state.searchValue.toLowerCase()) === -1 || self.props.notSearchInEmails)
-            ) {
+            if (skip) {
                 return false;
             }
         }
@@ -1298,22 +1286,34 @@ export class ContactPickerWidget extends MegaRenderMixin {
         var alreadyAdded = {};
         var hideFrequents = !self.props.readOnly && !self.state.searchValue && frequentContacts.length > 0;
         var frequentsLoading = false;
-        if (self._frequents && !self._foundFrequents) {
-            if (self._frequents.state() === 'pending') {
-                hideFrequents = false;
-                frequentsLoading = true;
+
+        if (this.props.readOnly || this.props.disableFrequents) {
+            hideFrequents = true;
+            this._foundFrequents = [];
+        }
+        else if (!self._foundFrequents) {
+            frequentsLoading = true;
+            this._foundFrequents = [];
+
+            megaChat.getFrequentContacts()
+                .then((res) => {
+                    this._foundFrequents = res.slice(Math.max(res.length - 30, 0), res.length).reverse();
+                })
+                .catch(dump)
+                .finally(() => {
+                    if (this.isMounted()) {
+                        this.safeForceUpdate();
+                    }
+                });
+        }
+
+        for (let i = this._foundFrequents.length, total = 0; total < MAX_FREQUENTS && i--;) {
+            const v = this._foundFrequents[i];
+
+            if (v.userId in M.u && this._eventuallyAddContact(M.u[v.userId], frequentContacts, selectableContacts)) {
+                alreadyAdded[v.userId] = 1;
+                total++;
             }
-        } else if (!self.props.readOnly && self._foundFrequents) {
-            var totalFound = 0;
-            self._foundFrequents.forEach(function(v) {
-                if (
-                    totalFound < MAX_FREQUENTS && v.userId in M.u &&
-                    self._eventuallyAddContact(M.u[v.userId], frequentContacts, selectableContacts)
-                ) {
-                    alreadyAdded[v.userId] = 1;
-                    totalFound++;
-                }
-            });
         }
 
         self.props.contacts.forEach(function(v, k) {

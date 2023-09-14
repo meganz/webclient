@@ -10,8 +10,11 @@ export default class SentRequests extends MegaRenderMixin {
 
     handleReinvite = mail => {
         this.setState({ reinvited: true }, () => {
-            M.reinvitePendingContactRequest(mail);
-            contactsInfoDialog(l[19126], mail, l[19127]);
+            M.reinvitePendingContactRequest(mail)
+                .then(() => {
+                    contactsInfoDialog(l[19126], mail, l[19127]);
+                })
+                .catch(tell);
         });
     };
     drawSentRequests = () => {
@@ -37,7 +40,15 @@ export default class SentRequests extends MegaRenderMixin {
                 ColumnContactRequestsRts,
                 [ColumnContactRequestsSentBtns, {
                     onReject: (email) => {
-                        M.cancelPendingContactRequest(email);
+                        M.cancelPendingContactRequest(email)
+                            .catch((ex) => {
+                                if (ex === EARGS) {
+                                    msgDialog('info', '', 'This pending contact is already deleted.');
+                                }
+                                else {
+                                    tell(ex);
+                                }
+                            });
                     },
                     onReinvite: (email) => {
                         this.handleReinvite(email);

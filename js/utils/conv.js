@@ -39,12 +39,7 @@
      * @memberOf array
      */
     array.unique = function(input) {
-        return input.reduce(function(out, value) {
-            if (out.indexOf(value) < 0) {
-                out.push(value);
-            }
-            return out;
-        }, []);
+        return [...new Set(input)];
     };
 
     /**

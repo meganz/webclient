@@ -23,12 +23,16 @@
  * - The menu should be put in a positioned parent element, and the menu will appear above/below the parent element
  *
  * @global
- * @module contextMenu
+ * @name contextMenu
+ * @memberOf window
  * @param {boolean} defaultIsRTL - the default value for whether the menu should have a RTL layout
  * @param {number} defaultAnimationDuration - value to use for the animationDuration if not specified
  */
-const contextMenu = (function(defaultIsRTL, defaultAnimationDuration) {
+lazy(window, 'contextMenu', () => {
     'use strict';
+
+    const defaultAnimationDuration = 150;
+    const defaultIsRTL = document.body.classList.contains('rtl');
 
     /**
      * Attaches the menu to the DOM.
@@ -81,10 +85,13 @@ const contextMenu = (function(defaultIsRTL, defaultAnimationDuration) {
                     open(submenu);
                     closeOtherSubmenus(submenu);
                 }
-                clearTimeout(closeTimer);
+                if (closeTimer) {
+                    closeTimer.abort();
+                    closeTimer = null;
+                }
             });
             li.addEventListener('mouseleave', () => {
-                closeTimer = setTimeout(() => close(submenu), 500);
+                (closeTimer = tSleep(0.5)).then(() => close(submenu));
             });
         });
     }
@@ -188,6 +195,21 @@ const contextMenu = (function(defaultIsRTL, defaultAnimationDuration) {
     }
 
     /**
+     * @param {HTMLElement} menu - The menu/submenu to clean up
+     * @private
+     */
+    const _cleanup = (menu) => {
+        if (menu.openingTimeout) {
+            menu.openingTimeout.abort();
+            menu.openingTimeout = null;
+        }
+        if (menu.closingTimeout) {
+            menu.closingTimeout.abort();
+            menu.closingTimeout = null;
+        }
+    };
+
+    /**
      * Open a menu or submenu.
      *
      * @private
@@ -195,24 +217,17 @@ const contextMenu = (function(defaultIsRTL, defaultAnimationDuration) {
      * @param {HTMLElement} menu - The menu/submenu to open
      * @returns {Promise} Resolves after the animation is complete
      */
-    function open(menu) {
-        return new Promise(resolve => {
-            const menuRoot = menu.closest('[data-menu-root]');
+    async function open(menu) {
+        const menuRoot = menu.closest('[data-menu-root]');
 
-            clearTimeout(menu.openingTimeout);
-            clearTimeout(menu.closingTimeout);
-            menu.classList.remove('closing');
-            menu.classList.add('opening');
-            menu.setAttribute('aria-expanded', 'true');
-            setOpenDirection(menu);
-            setTimeout(menu => {
-                menu.classList.add('visible');
-            }, 10, menu);
-            menu.openingTimeout = setTimeout((menu, resolve) => {
-                menu.classList.remove('opening');
-                resolve();
-            }, menuRoot.animationDuration + 10, menu, resolve);
-        });
+        _cleanup(menu);
+        menu.classList.remove('closing');
+        menu.classList.add('opening');
+        menu.setAttribute('aria-expanded', 'true');
+        setOpenDirection(menu);
+        requestAnimationFrame(() => menu.classList.add('visible'));
+        menu.openingTimeout = tSleep((menuRoot.animationDuration + 10) / 1e3);
+        return menu.openingTimeout.then(() => menu.classList.remove('opening'));
     }
 
     /**
@@ -222,25 +237,21 @@ const contextMenu = (function(defaultIsRTL, defaultAnimationDuration) {
      * @param {HTMLElement} menu - The menu/submenu to close
      * @returns {Promise} Resolves after the animation is complete
      */
-    function close(menu) {
-        return new Promise(resolve => {
-            const menuRoot = menu ? menu.closest('[data-menu-root]') : null;
+    async function close(menu) {
+        if (menu) {
+            _cleanup(menu);
+            const menuRoot = menu.closest('[data-menu-root]');
 
-            if (menu && menuRoot) {
-                clearTimeout(menu.openingTimeout);
-                clearTimeout(menu.closingTimeout);
+            if (menuRoot) {
                 menu.classList.add('closing');
                 menu.classList.remove('opening', 'visible');
-                menu.closingTimeout = setTimeout((menu, resolve) => {
+                menu.closingTimeout = tSleep(menuRoot.animationDuration / 1e3);
+                return menu.closingTimeout.then(() => {
                     menu.classList.remove('closing');
                     menu.setAttribute('aria-expanded', false);
-                    resolve();
-                }, menuRoot.animationDuration, menu, resolve);
+                });
             }
-            else {
-                resolve();
-            }
-        });
+        }
     }
 
     /**
@@ -279,7 +290,7 @@ const contextMenu = (function(defaultIsRTL, defaultAnimationDuration) {
     }
 
     // API
-    return {
+    return freeze({
         /**
          * Create the menu from a template and append it to a parent element
          *
@@ -321,6 +332,5 @@ const contextMenu = (function(defaultIsRTL, defaultAnimationDuration) {
          * @see destroy
          */
         destroy
-    };
-
-})(document.body.classList.contains('rtl'), 150);
+    });
+});

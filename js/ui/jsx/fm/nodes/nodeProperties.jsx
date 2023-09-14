@@ -30,11 +30,12 @@ export class NodeProperties {
         assert(node.h, 'missing handle for node');
 
         if (NodeProperties._globalCleanupTimer) {
-            clearTimeout(NodeProperties._globalCleanupTimer);
+            NodeProperties._globalCleanupTimer.abort();
         }
-        NodeProperties._globalCleanupTimer = setTimeout(() => {
-            NodeProperties.cleanup(0);
-        }, 120e3);
+        (NodeProperties._globalCleanupTimer = tSleep(120))
+            .then(() => {
+                NodeProperties.cleanup(0);
+            });
 
         let nodeProps;
         if (!NodeProperties._cache.has(node.h)) {

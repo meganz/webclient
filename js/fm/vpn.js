@@ -34,115 +34,83 @@ class VpnCredsManager {
     }
 
     static getLocations() {
-        this._vpnrRequest = this._vpnrRequest || M.req({ a: 'vpnr' }); // reuse existing requests
 
-        return new Promise((resolve) => {
-            this._vpnrRequest.then((response) => {
-                if (!Array.isArray(response)) {
-                    console.error('[VPN Manager] Unexpected response from API when fetching locations.');
-                    resolve();
-                }
+        return api.req({a: 'vpnr'})
+            .then(({result}) => {
+                assert(Array.isArray(result));
 
-                resolve(response);
-            }).catch((ex) => {
-                console.error('[VPN Manager] Unexpected error from API when fetching locations.',
-                              Number.isInteger(ex) ? `Code: ${ex}` : '');
-
-                resolve();
-            }).finally(() => {
-                this._vpnrRequest = null;
+                return result;
+            })
+            .catch((ex) => {
+                console.error('[VPN Manager] Unexpected error from API when fetching locations.', ex);
             });
-        });
     }
 
     static getActiveCredentials() {
-        this._vpngRequest = this._vpngRequest || M.req({ a: 'vpng' }); // reuse existing requests
 
-        return new Promise((resolve) => {
-            this._vpngRequest.then((response) => {
-                if (typeof response !== 'object') {
-                    console.error('[VPN Manager] Unexpected response from API when fetching active credentials.');
-                    resolve();
-                    return;
-                }
+        return api.req({a: 'vpng'})
+            .then(({result}) => {
+                assert(typeof result === 'object');
 
-                resolve(response);
-            }).catch((ex) => {
+                return result;
+            })
+            .catch((ex) => {
                 if (ex === ENOENT) {
-                    resolve(ex);
-                    return;
+                    return ex;
                 }
 
-                console.error('[VPN Manager] Unexpected error from API when fetching active credentials.',
-                              Number.isInteger(ex) ? `Code: ${ex}` : '');
-                resolve();
-            }).finally(() => {
-                this._vpngRequest = null;
+                console.error('[VPN Manager] Unexpected error from API when fetching active credentials.', ex);
             });
-        });
     }
 
-    static createCredential() {
+    static async createCredential() {
         const keypair = nacl.box.keyPair();
 
-        return new Promise((resolve) => {
-            M.req({ a: 'vpnp', k: ab_to_base64(keypair.publicKey) }).then((response) => {
-                if (typeof response !== 'object') {
-                    console.error('[VPN Manager] Unexpected response from API when creating a credential.');
-                    resolve();
-                    return;
-                }
+        return api.req({a: 'vpnp', k: ab_to_base64(keypair.publicKey)})
+            .then(({result}) => {
+                assert(typeof result === 'object');
 
                 const cred = {
-                    credNum: response[0],
-                    vpnSubclusterId: response[1],
-                    interfaceV4Address: response[2],
-                    interfaceV6Address: response[3],
-                    peerPublicKey: response[4],
-                    locations: response[5],
+                    credNum: result[0],
+                    vpnSubclusterId: result[1],
+                    interfaceV4Address: result[2],
+                    interfaceV6Address: result[3],
+                    peerPublicKey: result[4],
+                    locations: result[5],
                     keypair: keypair,
                 };
 
                 VpnCredsManager.credentialCreated.invoke(cred);
-                resolve(cred);
-            }).catch((ex) => {
+                return cred;
+            })
+            .catch((ex) => {
                 if (ex === EACCESS) {
                     console.warn('[VPN Manager] You are not authorised to create VPN credentials. '
                         + 'Upgrade to Pro, then try again.');
-                    resolve(ex);
-                    return;
+                    return ex;
                 }
                 if (ex === ETOOMANY) {
                     console.warn('[VPN Manager] You have exceeded your credential limit. '
                         + 'Please deactivate one credential, then try again.');
-                    resolve(ex);
-                    return;
+                    return ex;
                 }
 
-                console.error('[VPN Manager] Unexpected error from API when creating a credential.',
-                              Number.isInteger(ex) ? `Code: ${ex}` : '');
-                resolve();
+                console.error('[VPN Manager] Unexpected error from API when creating a credential.', ex);
             });
-        });
     }
 
-    static async deactivateCredential(slotNum) {
-        return new Promise((resolve) => {
-            M.req({ a: 'vpnd', s: slotNum }).then((response) => {
-                if (response !== 0) {
-                    console.error('[VPN Manager] Unexpected response from API when deactivating a credential.');
-                    resolve();
-                    return;
-                }
+    static deactivateCredential(slotNum) {
+
+        return api.req({a: 'vpnd', s: slotNum})
+            .then(({result}) => {
+                assert(result === 0);
 
                 this.credentialDeactivated.invoke(slotNum);
-                resolve(response);
-            }).catch((ex) => {
-                console.error('[VPN Manager] Unexpected error from API when deactivating a credential.',
-                              Number.isInteger(ex) ? `Code: ${ex}` : '');
-                resolve();
+                return result;
+            })
+            .catch((ex) => {
+                console.error('[VPN Manager] Unexpected error from API when deactivating a credential.', ex);
             });
-        });
     }
 
     static generateIniConfig(cred, locationIndex = 0) {
@@ -225,11 +193,11 @@ class VpnPage {
         const desktopDownloadBtn = this.page.querySelector('.js-vpn-client-desktop');
         desktopDownloadBtn.href = clientLinks[ua.details.os] || 'https://www.wireguard.com/install/';
         desktopDownloadBtn.addEventListener('click', () => {
-            M.req({a: 'log', e: 99858}); // "VPN page dl desktop client"
+            eventlog(99858); // "VPN page dl desktop client"
         });
 
         this.page.querySelector('.upgrade-to-pro').addEventListener('click', () => {
-            M.req({a: 'log', e: 99856}); // "VPN page upgrade acct (via page)"
+            eventlog(99856); // "VPN page upgrade acct (via page)"
         });
         this.page.querySelector('.js-download-config').addEventListener('click', () => {
             // Avoid OS behaviour of adding (x) to duplicate downloaded files
@@ -247,10 +215,10 @@ class VpnPage {
             this.page.querySelector('.settings-left-block .free-info').classList.add('hidden');
             this.page.querySelector('.settings-left-block .pro-info').classList.remove('hidden');
             this.page.querySelector('.step2-out').classList.remove('hidden');
-            M.req({a: 'log', e: 99855}); // "VPN page open (Pro acct)"
+            eventlog(99855); // "VPN page open (Pro acct)"
         }
         else {
-            M.req({a: 'log', e: 99849}); // "VPN page open (Free acct)"
+            eventlog(99849); // "VPN page open (Free acct)"
         }
 
         initPerfectScrollbar($('.settings-left-block .disclaimer'));
@@ -383,7 +351,7 @@ class VpnPage {
                 l.vpn_eaccess_dialog_msg,
                 (answer) => {
                     if (answer === false) {
-                        M.req({a: 'log', e: 99857}); // "VPN page upgrade acct (via eaccess dlg)"
+                        eventlog(99857); // "VPN page upgrade acct (via eaccess dlg)"
                         loadSubPage('/pro');
                     }
                 });

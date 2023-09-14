@@ -26,8 +26,6 @@ if (typeof importScripts !== 'undefined') {
 
         jobs = 0;
         d = !!debug;
-        u_sharekeys = Object.create(null);
-        missingkeys = false;
 
         // Set global to allow all-0 keys to be used (for those users that set localStorage flag)
         if (allowNullKeys) {
@@ -111,11 +109,15 @@ if (typeof importScripts !== 'undefined') {
         else {
             // unfortunately, we have to discard the SJCL AES cipher
             // because it does not fit in a worker message
-            for (var h in u_sharekeys) u_sharekeys[h] = u_sharekeys[h][0];
+            const sharekeys = Object.create(null);
+            for (const h in u_sharekeys) {
+                sharekeys[h] = u_sharekeys[h][0];
+            }
+            jobs--;
 
             // done - post state back to main thread
-            self.postMessage({ done: 1, sharekeys: u_sharekeys, jobs });
-            init();
+            self.postMessage({done: 1, jobs, sharekeys});
+            init(self);
         }
     };
 
@@ -341,30 +343,42 @@ function crypto_decryptnode(n) {
 // (also generates random (folder-type) key if missing)
 // nn is an optional target node to which the attributes will be encrypted
 function crypto_makeattr(n, nn) {
-    if (!nn) nn = n;
+    'use strict';
+    if (!nn) {
+        nn = n;
+    }
 
     // if node is keyless, generate one
     if (!nn.k || !nn.k.length) {
-        nn.k = [];
-        for (var i = 4; i--; ) nn.k[i] = rand(0x100000000);
-    } else {
+
+        nn.k = [...crypto.getRandomValues(new Uint32Array(4))];
+    }
+    else if (nn.k.length !== 4 && nn.k.length !== 8) {
         // node does not have a valid key
-        if (nn.k.length != 4 && nn.k.length != 8) {
-            throw new Error("Invalid key on " + n.h);
-        }
+        throw new SecurityError(`Invalid key on ${nn.h} (${nn.k.length})`);
     }
 
     // construct full set of transport attributes
     // NOTE: changes must be replicated to crypto_procaddr()
-    var ar = clone(n.ar) || {};
+    const ar = {...n.ar};
 
-    if (n.hash) ar.c = n.hash;
-    else if (n.mtime) ar.t = n.mtime;
-
-    if (typeof n.name != 'undefined') ar.n = n.name;
-    if (typeof n.f != 'undefined') ar.f = n.f;
+    if (n.hash) {
+        ar.c = n.hash;
+    }
+    else if (n.mtime) {
+        ar.t = n.mtime;
+    }
     if (n.fav | 0) {
         ar.fav = n.fav | 0;
+    }
+    if (n.lbl | 0) {
+        ar.lbl = n.lbl | 0;
+    }
+    if (typeof n.name != 'undefined') {
+        ar.n = n.name;
+    }
+    if (typeof n.f != 'undefined') {
+        ar.f = n.f;
     }
     if (typeof n.devid !== 'undefined') {
         ar['dev-id'] = n.devid;
@@ -375,22 +389,14 @@ function crypto_makeattr(n, nn) {
     if (typeof n.sds !== 'undefined') {
         ar.sds = n.sds;
     }
-    if (n.lbl | 0) {
-        ar.lbl = n.lbl | 0;
-    }
     if (typeof n.rr !== 'undefined') {
         ar.rr = n.rr;
     }
 
-    try {
-        var ab = str_to_ab('MEGA' + to8(JSON.stringify(ar)));
-    } catch (e) {
-        msgDialog('warningb', l[135], e.message || e);
-        throw e;
-    }
+    const buf = str_to_ab(`MEGA${to8(JSON.stringify(ar))}`);
+    const key = a32_to_ab([nn.k[0] ^ nn.k[4], nn.k[1] ^ nn.k[5], nn.k[2] ^ nn.k[6], nn.k[3] ^ nn.k[7]]);
 
-    return asmCrypto.AES_CBC.encrypt(ab,
-        a32_to_ab([nn.k[0] ^ nn.k[4], nn.k[1] ^ nn.k[5], nn.k[2] ^ nn.k[6], nn.k[3] ^ nn.k[7]]), false);
+    return asmCrypto.AES_CBC.encrypt(buf, key, false);
 }
 
 // clear all node attributes, including derived ones
@@ -542,6 +548,10 @@ function encrypt_key(cipher, a) {
     if (!a) {
         a = [];
     }
+    if (!cipher) {
+        console.error('No encryption cipher provided!');
+        return false;
+    }
     if (a.length == 4) {
         return cipher.encrypt(a);
     }
@@ -553,6 +563,10 @@ function encrypt_key(cipher, a) {
 }
 
 function decrypt_key(cipher, a) {
+    if (!cipher) {
+        console.error('No decryption cipher provided!');
+        return false;
+    }
     if (a.length == 4) {
         return cipher.decrypt(a);
     }
@@ -1003,7 +1017,32 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
             this.kill();
 
             let errorHandler = (ex) => {
-                queueMicrotask(() => this.kill());
+                queueMicrotask(() => {
+                    this.kill();
+
+                    if (String(ex.message || ex).includes('SyntaxError')) {
+                        const cnt = sessionStorage.decWorkerError | 0;
+                        sessionStorage.decWorkerError = cnt + 1;
+
+                        if (cnt > 1) {
+                            // hmm..
+                            if (cnt > 7) {
+                                delete sessionStorage.decWorkerError;
+                            }
+                            tSleep(333).then(() =>
+                                delay('decWorkerPool.error', () => {
+                                    if (mega.is.loading) {
+                                        siteLoadError(ex.message || ex, this.url);
+                                    }
+                                }, 2e3)
+                            );
+                        }
+                        else {
+                            fm_forcerefresh(!cnt);
+                        }
+                    }
+                });
+
                 console.error(`FATAL: ${this.url} worker error.`, ex);
             };
 

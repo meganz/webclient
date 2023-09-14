@@ -1,127 +1,77 @@
+/* eslint-disable no-debugger,strict */
 /**
- * Simple wrapper function that will log all calls of `fnName`.
- * This function is intended to be used for dev/debugging/testing purposes only.
- *
- * @param ctx
- * @param fnName
- * @param loggerFn
+ * Watch Object mutations/accesses.
+ * @param {Object} obj THe object to watch
+ * @param {String} [name] object identification.
+ * @param {Number} [flags] bitfield options
+ * @returns {{}|any} proxied obj
  */
-function callLoggerWrapper(ctx, fnName, loggerFn, textPrefix, parentLogger) {
-    if (!window.d) {
-        return;
+function watcho(obj, name, flags = 10) {
+    if (!d) {
+        return obj;
     }
+    name = name || makeUUID().slice(-17);
+    const log = console.warn.bind(console, `[watcho:${name}]`);
 
-    var origFn = ctx[fnName];
-    textPrefix = textPrefix || "missing-prefix";
-
-    var logger = MegaLogger.getLogger(textPrefix + "[" + fnName + "]", {}, parentLogger);
-    var logFnName = loggerFn === console.error ? "error" : "debug";
-
-    if (ctx[fnName].haveCallLogger) { // recursion
-        return;
-    }
-    ctx[fnName] = function() {
-        // loggerFn.apply(console, [prefix1, prefix2, "Called: ", fnName, arguments]);
-        logger[logFnName].apply(logger, ["(calling) arguments: "].concat(toArray.apply(null, arguments)));
-
-        var res = origFn.apply(this, arguments);
-        // loggerFn.apply(console, [prefix1, prefix2, "Got result: ", fnName, arguments, res]);
-        logger[logFnName].apply(logger, ["(end call) arguments: "].concat(toArray.apply(null, arguments)).concat([
-            "returned: ", res
-        ]));
-
-        return res;
-    };
-    ctx[fnName].haveCallLogger = true; // recursion
-}
-
-/**
- * Simple Object instance call log helper
- * This function is intended to be used for dev/debugging/testing purposes only.
- *
- *
- * WARNING: This function will create tons of references in the window.callLoggerObjects & also may flood your console.
- *
- * @param ctx
- * @param [loggerFn] {Function}
- * @param [recursive] {boolean}
- */
-function logAllCallsOnObject(ctx, loggerFn, recursive, textPrefix, parentLogger) {
-    if (!window.d) {
-        return;
-    }
-    loggerFn = loggerFn || console.debug;
-
-    if (typeof parentLogger === "undefined") {
-        var logger = new MegaLogger(textPrefix);
-    }
-    if (!window.callLoggerObjects) {
-        window.callLoggerObjects = [];
-    }
-
-    $.each(ctx, function(k, v) {
-        if (typeof v === "function") {
-            callLoggerWrapper(ctx, k, loggerFn, textPrefix, parentLogger);
-        }
-        else if (typeof v === "object"
-            && !$.isArray(v) && v !== null && recursive && !$.inArray(window.callLoggerObjects)) {
-            window.callLoggerObjects.push(v);
-            logAllCallsOnObject(v, loggerFn, recursive, textPrefix + ":" + k, parentLogger);
+    return new Proxy(obj, {
+        get(target, prop) {
+            const value = Reflect.get(target, prop);
+            if (flags & 1) {
+                debugger;
+            }
+            if (flags & 2) {
+                log(`get(${prop})`, value);
+            }
+            return value;
+        },
+        set(target, prop, value) {
+            const type = typeof value;
+            if (flags & 4) {
+                debugger;
+            }
+            if (flags & 8) {
+                log(`set(${type}:${prop})`, value);
+            }
+            return Reflect.set(target, prop, type === 'object' ? watcho(value, `${name}:${prop}`, flags) : value);
         }
     });
 }
 
-/**
- * Trace function call usages
- * @param {Object} ctr The desired object to trace.
- */
-function dcTracer(ctr) {
-    var name = ctr.name || 'unknown',
-        proto = ctr.prototype || ctr;
-    for (var fn in proto) {
-        if (proto.hasOwnProperty(fn) && typeof proto[fn] === 'function') {
-            console.log('Tracing ' + name + '.' + fn);
-            proto[fn] = (function(fn, fc) {
-                fc.dbg = function() {
-                    try {
-                        console.log('Entering ' + name + '.' + fn,
-                            this, '~####~', Array.prototype.slice.call(arguments));
-                        var r = fc.apply(this, arguments);
-                        console.log('Leaving ' + name + '.' + fn, r);
-                        return r;
-                    }
-                    catch (e) {
-                        console.error(e);
-                    }
-                };
-                return fc.dbg;
-            })(fn, proto[fn]);
-        }
-    }
-}
-
-function tryCatch(func, onerror) {
+self.tryCatch = (() => {
     'use strict';
+    const fcl = Symbol('__function__');
     const sml = Symbol('__tryCatcher__');
 
-    func[sml] = function __tryCatcher() {
-        // eslint-disable-next-line local-rules/hints
-        try {
-            return func.apply(this, arguments);
-        }
-        catch (ex) {
-            if (onerror !== false) {
-                console.error(ex);
-            }
+    return (func, onerror) => {
+        if (!func[sml]) {
+            func[sml] = function tryCatcher() {
+                // eslint-disable-next-line local-rules/hints
+                try {
+                    return func.apply(this, arguments);
+                }
+                catch (ex) {
+                    if (onerror !== false) {
+                        console.error(ex);
+                    }
+                    if (typeof onerror === 'function') {
+                        queueMicrotask(() => onerror(ex));
+                    }
+                }
+            };
 
-            if (typeof onerror === 'function') {
-                onIdle(onerror.bind(null, ex));
+            // eslint-disable-next-line local-rules/hints
+            try {
+                Object.defineProperty(func[sml], 'name', {value: `tryCatcher(${func.name || '<anonymous>'})`});
             }
+            catch (ex) {
+                /* noop */
+            }
+            func[sml][fcl] = func;
         }
+
+        return func[sml];
     };
-    func[sml][Symbol('__function__')] = func;
-    return func[sml];
-}
+})();
 
 lazy(self, 'runKarmaTests', () => {
     'use strict';
@@ -208,10 +158,14 @@ lazy(self, 'runKarmaTests', () => {
                 const details = String(ex.stack).includes(ex.message) ? '' : ` (${ex.message})`;
                 const status = partial ? `\uD83C\uDF15 (${ex.message})` : `\u2716${details}`;
                 super(`${name}: ${status}`, null, ex.name);
-                this.stack = ex.stack || this.stack;
+
                 this.color = partial ? 'fd0' : 'f00';
                 this.took = performance.now() - took;
                 this.soft = partial;
+
+                if (ex.stack) {
+                    Object.defineProperty(this, 'stack', {value: ex.stack});
+                }
             }
         };
 
@@ -266,9 +220,26 @@ lazy(self, 'runKarmaTests', () => {
 mBroadcaster.once('startMega', async() => {
     'use strict';
 
-    console.group('[DEBUG] ' + new Date().toISOString());
+    console.group(`[DEBUG] ${new Date().toISOString()}`);
     console.table({apipath, staticpath, bootstaticpath, cmsStaticPath, defaultStaticPath, defaultCMSStaticPath});
     console.table(staticServerLoading);
+
+    const data = {};
+    const keys = Object.keys(localStorage).sort();
+    const exclude = new Set(['sid', 'k', 'privk', 'v', 'handle', 'attr', 'randseed']);
+    for (let i = keys.length; i--;) {
+        const k = keys[i];
+
+        if (!exclude.has(k) && !/sid/i.test(k)) {
+            const v = localStorage[k];
+
+            if (v !== undefined) {
+                data[k] = v;
+            }
+        }
+    }
+    console.table(data);
+
 
     if (d && window.chrome) {
         var usages = Object.create(null);
@@ -309,7 +280,8 @@ mBroadcaster.once('startMega', async() => {
             var now = Date.now();
             var known = [
                 '1:setUserAvatar', '1:previewimg', '1:onload', '2:onload', '3:procfa', '3:addScript',
-                '1:MediaElementWrapper', '2:chatImageParser', '2:initall', '3:initall', '2:MEGAWorkerController'
+                '1:MediaElementWrapper', '2:chatImageParser', '2:initall', '3:initall', '2:MEGAWorkerController',
+                '2:/gallery.js'
             ];
             // ^ think twice before whitelisting anything new here...
 
@@ -617,7 +589,7 @@ mBroadcaster.once('boot_done', function radSetup() {
         flush().catch(dump);
     });
 
-    setTimeout(function setup() {
+    tSleep(7).then(function setup() {
         M.onFileManagerReady(flush);
         console.info('%cretroactive-logging enabled.', 'font: 18px LatoWebBold');
 
@@ -641,8 +613,7 @@ mBroadcaster.once('boot_done', function radSetup() {
         if (!window.u_sid) {
             mBroadcaster.once('login2', () => M.onFileManagerReady(setup));
         }
-
-    }, 7e3);
+    });
 
     /** @property mega.rad */
     lazy(mega, 'rad', () => {
@@ -681,3 +652,41 @@ mBroadcaster.once('boot_done', function radSetup() {
         return Object.freeze(Object.setPrototypeOf(Object.defineProperties(rad, rad), null));
     });
 });
+
+
+((global, debug) => {
+    'use strict';
+    if (!debug) {
+        return;
+    }
+    const seen = new Map();
+    const stag = 'unhandled.promise.rejection.handler';
+    const warn = (m, ...args) => console.warn(`PromiseRejectionEvent \u26a0\u26a0 ${m}`, m && m.stack, ...args);
+    const info = (m, ...args) => console.info(`PromiseRejectionEvent \u26a0\u26a0 ${m}`, m && m.stack, ...args);
+
+    const scheduler = () => delay(stag, () => {
+        if (seen.size) {
+            for (const [promise, ex] of seen) {
+                warn(ex, promise);
+                reportError(new Error(`Unhandled Promise Rejection :x: ${ex instanceof Error && ex.stack || ex}`));
+            }
+            seen.clear();
+        }
+    }, 2e4);
+
+    global.addEventListener('unhandledrejection', ({promise, reason}) => {
+        queueMicrotask(scheduler);
+        seen.set(promise, reason);
+    });
+
+    global.addEventListener('rejectionhandled', ({promise, reason}) => {
+        if (seen.has(promise)) {
+            seen.delete(promise);
+            warn('Rejection handling was mistakenly deferred!', reason);
+        }
+        else {
+            info(reason, promise);
+        }
+    });
+
+})(self, self.d);

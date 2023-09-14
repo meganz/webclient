@@ -40,21 +40,22 @@ module.exports = function(config) {
         // Other.
         'js/vendor/autolinker.js',
         'js/vendor/qrcode.js',
-        'js/vendor/megaLogger.js',
 
         // == Test helpers and test configuration ==
         'test/lang_dummy.js',
         'test/config.js',
 
         // Shim for ES6 features some browsers may not have (PhantomJS, MSIE).
-        'js/vendor/es6-shim.js',
+        'js/vendor/web-streams-polyfill.js',
         'js/vendor/dexie.js',
 
         // == Our code ==
         'secureboot.js',
         'index.js',
         'nodedec.js',
+        'js/vendor/megaLogger.js',
         'js/utils/polyfills.js',
+        'js/utils/api.js',
         'js/utils/browser.js',
         'js/utils/debug.js',
         'js/utils/conv.js',
@@ -81,7 +82,6 @@ module.exports = function(config) {
         'js/fm/utils.js',
         'js/fm/megadata.js',
         'js/fm/megadata/account.js',
-        'js/fm/megadata/avatars.js',
         'js/fm/megadata/contacts.js',
         'js/fm/megadata/filters.js',
         'js/fm/megadata/menus.js',

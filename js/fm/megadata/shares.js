@@ -15,20 +15,10 @@ MegaData.prototype.sharesUI = function() {
 /**
  * Open the share dialog
  */
-MegaData.prototype.openSharingDialog = function() {
+MegaData.prototype.openSharingDialog = function(target) {
     'use strict';
 
-    if (!Array.isArray($.selected)) {
-        return;
-    }
-
-    const targetHandle = $.selected[0];
-
-    if (!targetHandle // Nothing is selected
-        || !M.d[targetHandle] // Node does not exist anymore
-        || M.d[targetHandle].t === 0 // Node is not a folder
-        || M.isInvalidUserStatus() // User does not have permissions
-    ) {
+    if (M.isInvalidUserStatus()) {
         return;
     }
     if (u_type === 0) {
@@ -72,7 +62,7 @@ MegaData.prototype.openSharingDialog = function() {
             $dialog.off('dialog-closed.share');
 
             mBroadcaster.removeListener(scl);
-            mega.keyMgr.removeShareSnapshot(targetHandle);
+            mega.keyMgr.removeShareSnapshot(target);
         });
 
         $.hideContextMenu();
@@ -84,7 +74,7 @@ MegaData.prototype.openSharingDialog = function() {
 
         // @todo refactor!
         // eslint-disable-next-line no-use-before-define
-        fillShareDlg(targetHandle).catch(dump);
+        fillShareDlg(target).catch(dump);
 
         // Show the share dialog
         return $dialog.removeClass('hidden');
@@ -134,24 +124,15 @@ MegaData.prototype.openSharingDialog = function() {
         return $dialog;
     };
 
-    const fire = () => {
-        mega.keyMgr.setShareSnapshot(targetHandle)
-            .then(() => M.safeShowDialog('share', showShareDlg))
-            .catch(dump);
-    };
-
-    const mdList = mega.fileRequestCommon.storage.isDropExist($.selected);
-    if (mdList.length) {
-        mega.fileRequest.showRemoveWarning(mdList).then(fire).catch((ex) => {
-            if (ex) {
-                dump(ex);
-                showToast('warning2', l[253]);
+    Promise.resolve(mega.fileRequestCommon.storage.isDropExist(target))
+        .then((res) => {
+            if (res.length) {
+                return mega.fileRequest.showRemoveWarning(res);
             }
-        });
-    }
-    else {
-        fire();
-    }
+        })
+        .then(() => mega.keyMgr.setShareSnapshot(target))
+        .then(() => M.safeShowDialog('share', showShareDlg))
+        .catch(dump);
 };
 
 /**

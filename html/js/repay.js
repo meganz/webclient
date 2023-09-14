@@ -38,36 +38,21 @@ RepayPage.prototype.initPage = function() {
     if (!u_attr.pf && (!u_attr['%name'] || !u_attr['%email'])) {
 
         Promise.allSettled([
-            u_attr['%name'] ? Promise.resolve({ v: u_attr['%name'] }) : mega.attr.get(u_attr.b.bu, '%name', -1),
-            u_attr['%email'] ? Promise.resolve({ v: u_attr['%email'] }) : mega.attr.get(u_attr.b.bu, '%email', -1)
-        ]).then((result) => {
-            // To reduce complexity of encapsulating all of below code inside the "then" handler.
-            if (result[0].status === 'fulfilled') {
-                u_attr['%name'] = result[0].value.v || from8(base64urldecode(result[0].value));
-            }
-            else {
-                throw Error('Name failed to fetch for business account');
-            }
-            if (result[1].status === 'fulfilled') {
-                u_attr['%email'] = result[1].value.v || from8(base64urldecode(result[1].value));
-            }
-            else {
-                throw Error('Email failed to fetch for business account');
-            }
+            u_attr['%name'] || mega.attr.get(u_attr.b.bu, '%name', -1),
+            u_attr['%email'] || mega.attr.get(u_attr.b.bu, '%email', -1)
+        ]).then(([{value: name}, {value: email}]) => {
+
+            name = u_attr['%name'] = name && from8(base64urldecode(name) || name) || '';
+            email = u_attr['%email'] = email && from8(base64urldecode(email) || email) || u_attr.email;
+
+            assert(name && email, `Invalid account state (${name}:${email})`);
+
             mySelf.initPage();
-        })
-            .catch(ex => {
-                console.warn(ex.message);
-                msgDialog(
-                    `error:!^${l.bus_view_profile}!${l[82]}`,
-                    '',
-                    l.bus_repay_fetch_err,
-                    l.bus_repay_fetch_err_desc,
-                    e => {
-                        loadSubPage(e ? 'fm' : 'fm/user-management/account');
-                    }
-                );
-            });
+
+        }).catch((ex) => {
+            loadingDialog.hide();
+            msgDialog('warninga', l[135], l[47], ex);
+        });
         return false;
     }
 
@@ -106,7 +91,7 @@ RepayPage.prototype.initPage = function() {
                     loadingDialog.show();
 
                     // Downgrade the user to Free
-                    M.req({ a: 'urpf', r: 1 })
+                    api.req({a: 'urpf', r: 1})
                         .catch(dump)
                         .finally(() => {
 
@@ -486,31 +471,18 @@ RepayPage.prototype.initPage = function() {
 
             business.getListOfPaymentGateways(false).always(fillPaymentGateways);
 
-            // Change to the getProFlexiPlanInfo function if we are Pro Flexi
-            if (u_attr && u_attr.pf) {
-                business.getProFlexiPlanInfo().then(function planInfoReceived(st, info) {
-                    mySelf.planInfo = info;
+            business.getBusinessPlanInfo(false, u_attr.pf)
+                .then((plan) => {
+                    mySelf.planInfo = plan;
                     mySelf.planInfo.pastInvoice = res.inv[0];
-                    mySelf.planInfo.currInvoice = { et: res.et || 0, t: res.t };
+                    mySelf.planInfo.currInvoice = {et: res.et || 0, t: res.t};
                     mySelf.userInfo = {
                         fname: '',
                         lname: '',
                         nbOfUsers: res.nb || 0
                     };
-                });
-            }
-            else {
-                business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
-                    mySelf.planInfo = info;
-                    mySelf.planInfo.pastInvoice = res.inv[0];
-                    mySelf.planInfo.currInvoice = { et: res.et || 0, t: res.t };
-                    mySelf.userInfo = {
-                        fname: '',
-                        lname: '',
-                        nbOfUsers: res.nb || 0
-                    };
-                });
-            }
+                })
+                .catch(tell);
         });
     });
 };

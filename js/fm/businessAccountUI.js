@@ -276,7 +276,7 @@ function getReportDates(leadingDate) {
 BusinessAccountUI.prototype.checkCu25519 = function(userHandle, callback) {
     if (!pubCu25519[userHandle]) {
         if (!authring.getContactAuthenticated(userHandle, 'Cu25519')) {
-            const ret = fingerprintDialog(userHandle, false, callback);
+            const ret = fingerprintDialog(userHandle, null, callback);
             if (ret === -5) {
                 // not confimed account
                 return true;
@@ -303,22 +303,12 @@ BusinessAccountUI.prototype.checkCu25519 = function(userHandle, callback) {
 BusinessAccountUI.prototype.decodeFields = function(encodedUser, fields) {
     'use strict';
     const decodedUser = {};
+    const decode = tryCatch((encodedField) => from8(base64urldecode(encodedField)), false);
 
-    const decode = encodedField => {
-        return from8(base64urldecode(encodedField));
-    };
-
-    tryCatch(() => {
-        for (let field of fields) {
-            decodedUser[field] = 'Error';
-            if (typeof encodedUser[field] !== 'undefined' && encodedUser[field] !== null) {
-                decodedUser[field] = decode(encodedUser[field]);
-            }
-            else {
-                decodedUser[field] = null;
-            }
-        }
-    })();
+    for (let i = fields.length; i--;) {
+        const field = fields[i];
+        decodedUser[field] = String(encodedUser[field] && decode(encodedUser[field]) || encodedUser[field] || '');
+    }
 
     return decodedUser;
 };
@@ -1169,7 +1159,31 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             if ($(this).hasClass('disabled')) {
                 return;
             }
-            mySelf.migrateSubUserData(subUserHandle);
+            var $migrateDialog = $('.user-management-migrate-process-dialog.user-management-dialog');
+
+            mySelf.migrateSubUserData(subUserHandle)
+                .then((n) => {
+                    M.safeShowDialog('migration-success-dlg', () => {
+                        const $dialog = $('.user-management-able-user-dialog.mig-success.user-management-dialog');
+
+                        $('.yes-answer', $dialog).rebind('click.suba', closeDialog);
+                        $('.dialog-text-one', $dialog)
+                            .safeHTML(l[19149].replace('{0}', `<b>${M.suba[subUserHandle].e}</b>`)
+                                .replace('{1}', `<b>${escapeHTML(n.name)}</b>`));
+
+                        return $dialog;
+                    });
+                })
+                .catch((ex) => {
+                    if (ex && ex.name === 'AbortError') {
+                        return msgDialog('warningb', '', `${ex.message}`);
+                    }
+                    console.error(ex);
+                    msgDialog('warningb', l[135], l[19146], api.strerror(ex));
+                })
+                .finally(() => {
+                    $migrateDialog.addClass('hidden');
+                });
         });
 
     // event handler for edit sub-user button
@@ -2208,7 +2222,7 @@ BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
 
 
 /** view business account page */
-BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
+BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
     "use strict";
     if (!this.initUItoRender()) {
         return;
@@ -2607,8 +2621,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     });
 
     unhideSection();
-
-};
+});
 
 
 /** show business account page (Settings and invoices)
@@ -3625,41 +3638,30 @@ BusinessAccountUI.prototype.showResetPasswordSubUserDialog = function(subUserHan
     $copyPassBtn.off('click.subuser').on('click.subuser', copyGeneratedPass);
     $tempPass.off('copy.subuser').on('copy.subuser', copyGeneratedPass);
 
-    var resetPasswordResultHandler = function(c, res, txt) {
-        if (c) {
+    $confirmBtn.rebind('click.subuser', function confirmResetPassBtn() {
+        if ($(this).hasClass('disabled')) {
+            return;
+        }
+        closeDialog();
 
-            M.safeShowDialog('pass-reset-success-subuser-dlg', function() {
-                var $resetDialog =
-                    $('.user-management-able-user-dialog.mig-success.user-management-dialog');
-                $('.yes-answer', $resetDialog).off('click.suba').on('click.suba', closeDialog);
-                $resetDialog.find('.dialog-text-one')
-                    .safeHTML(l[22081].replace('{0}', '<b>' + subUser.e + '</b>'));
+        mySelf.business.resetSubUserPassword(subUserHandle, mySelf.lastGeneratedPass)
+            .then(() => {
 
-                return $resetDialog;
+                M.safeShowDialog('pass-reset-success-subuser-dlg', () => {
+                    const $resetDialog = $('.user-management-able-user-dialog.mig-success.user-management-dialog');
+
+                    $('.yes-answer', $resetDialog).rebind('click.suba', closeDialog);
+                    $('.dialog-text-one', $resetDialog)
+                        .safeHTML(l[22081].replace('{0}', `<b>${subUser.e}</b>`));
+
+                    return $resetDialog;
+                });
+
+            })
+            .catch((ex) => {
+                msgDialog('info', '', l[22082], api.strerror(ex));
             });
-        }
-        else {
-            if (d) {
-                console.error(txt + ' ' + res);
-            }
-            msgDialog('info', '', l[22082]);
-        }
-
-    };
-
-    $confirmBtn.off('click.subuser').on('click.subuser',
-        function confirmResetPassBtn() {
-            if ($(this).hasClass('disabled')) {
-                return;
-            }
-
-            closeDialog();
-
-            var resetPassOperation = mySelf.business.resetSubUserPassword(subUserHandle, mySelf.lastGeneratedPass);
-
-            resetPassOperation.always(resetPasswordResultHandler);
-
-        });
+    });
 
     M.safeShowDialog('sub-user-resetPass-dlg', function() {
         return $dialog;
@@ -3991,21 +3993,17 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
  * Start data migration of a sub-user
  * @param {String} subUserHandle            sub-user's handle
  */
-BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
+BusinessAccountUI.prototype.migrateSubUserData = async function(subUserHandle) {
     "use strict";
-    if (!subUserHandle || subUserHandle.length !== 11) {
-        return;
+    if (!subUserHandle || subUserHandle.length !== 11 || !M.suba[subUserHandle]) {
+        throw new MEGAException(`Invalid data-migration sub-user handle, ${subUserHandle}`);
     }
-    if (!M.suba[subUserHandle]) {
-        return;
-    }
-    var mySelf = this;
+    const subUser = M.suba[subUserHandle];
+    const $migrateDialog = $('.user-management-migrate-process-dialog.user-management-dialog');
 
-    var subUser = M.suba[subUserHandle];
-    var $migrateDialog = $('.user-management-migrate-process-dialog.user-management-dialog');
-
-    const decodedUser = mySelf.decodeFields(subUser, ['firstname', 'lastname']);
+    const decodedUser = this.decodeFields(subUser, ['firstname', 'lastname']);
     const subName = `${decodedUser.firstname} ${decodedUser.lastname}`.trim();
+
     $migrateDialog.find('.sub-user-name-from').text(subName);
     $migrateDialog.find('.process-percentage').text('0%');
     $migrateDialog.find('.data-migrate.progress-bar').attr('style', 'width:0');
@@ -4026,132 +4024,40 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
      * 3- decrypting
      * 4- copying to master account
      */
-    // failed
-    var failing = function (msg) {
-        $migrateDialog.addClass('hidden');
-        msgDialog('warningb', '', msg);
-        return;
-    };
+    changePercentage(10);
 
     // getting sub-user tree.
-    var gettingSubTreePromise = this.business.getSubUserTree(subUserHandle);
+    const [f, {k, k2}] = await Promise.all([
+        this.business.getSubUserTree(subUserHandle),
+        this.business.getSubAccountMKey(subUserHandle)
+    ]);
+    changePercentage(20);
 
-    gettingSubTreePromise.fail(
-        function getTreefailed(st, res, m) {
-            if (d) {
-                console.error("getting sub-user tree has failed! " + res + " --" + m);
-            }
-            return failing(l[19146]);
-        }
-    );
+    // sub-user tree decrypting
+    const {tree, errors, warns} = this.business.decrypteSubUserTree(f, k || k2, k ? 0 : subUserHandle);
 
-    gettingSubTreePromise.done(
-        function getTreeOk(st, treeResult) {
-            changePercentage(10);
-            // getting sub-user master-key
-            var gettingSubMasterKey = mySelf.business.getSubAccountMKey(subUserHandle);
-            changePercentage(15);
-            gettingSubMasterKey.fail(
-                function getMKeyfailed(mkSt, mkRes, mkM) {
-                    if (d) {
-                        console.error("getting sub-user Master key has failed! " + mkRes + " --" + mkM);
-                    }
-                    var failMsg = l[22083].replace('{0}', '<b>' + subUser.e + '</b></br></br>');
-                    return failing(failMsg);
+    if (errors.length || warns.length) {
+        // operation contains errors and/or warning
+        const msg = l[19147].replace(/\[Br]/g, '<br/>')
+            .replace('{0}', M.suba[subUserHandle].e)
+            .replace('{1}', errors.length)
+            .replace('{2}', warns.length);
+
+        await new Promise((resolve, reject) => {
+            msgDialog('confirmation', '', msg, l[18229], (yes) => {
+                if (!yes) {
+                    return reject(new MEGAException(l[19148].replace('{0}', subUser.e), subUser, 'AbortError'));
                 }
-            );
+                resolve();
+            });
+        });
+    }
+    changePercentage(30);
 
-            gettingSubMasterKey.done(
-                function getMKeyOK(st2, MKeyResult) {
-                    changePercentage(20);
-                    // sub-user tree decrypting
+    // name the folder as the sub-user email + timestamp.
+    const folderName = `${subUser.e}_${Date.now()}`;
 
-                    let treeObj;
-
-                    if (MKeyResult.k) {
-                        treeObj = mySelf.business.decrypteSubUserTree(treeResult, MKeyResult.k);
-                    }
-                    else if (MKeyResult.k2) {
-                        treeObj = mySelf.business.decrypteSubUserTree(treeResult, MKeyResult.k2, subUserHandle);
-                    }
-                    else {
-                        if (d) {
-                            console.error(`couldnt find a key for sub user ${JSON.stringify(MKeyResult)}`);
-                        }
-                        return failing('No master key found for the subuser');
-                    }
-
-                    changePercentage(30);
-                    if (!treeObj) {
-                        if (d) {
-                            console.error("decrypting sub-user tree with the Master key has failed! "
-                                + "although the key and tree fetching succeeded");
-                        }
-                        return failing(l[19146]);
-                    }
-                    else {
-
-                        var doMigrateSubUserDate = function (isOK) {
-                            if (!isOK) {
-                                return failing(l[19148].replace('{0}', M.suba[subUserHandle].e));
-                            }
-
-                            // name the folder as the sub-user email + timestamp.
-                            var folderName = M.suba[subUserHandle].e;
-                            folderName += '_' + Date.now();
-
-                            var cpyPromise = mySelf.business.copySubUserTreeToMasterRoot(treeObj.tree,
-                                folderName, changePercentage);
-
-                            cpyPromise.fail(
-                                function copySubUserFailHandler(stF, errF, desF) {
-                                    if (d) {
-                                        console.error("copying sub-user data key has failed! " + errF + " --" + desF);
-                                    }
-                                    return failing(l[19146]);
-                                }
-                            );
-
-                            cpyPromise.done(
-                                function copySubUserSuccHandler() {
-                                    changePercentage(100);
-                                    $migrateDialog.addClass('hidden');
-
-                                    M.safeShowDialog('migration-success-dlg', function () {
-                                        var $dialog =
-                                            $('.user-management-able-user-dialog.mig-success.user-management-dialog');
-                                        $('.yes-answer', $dialog).off('click.suba').on('click.suba', closeDialog);
-                                        $dialog.find('.dialog-text-one')
-                                            .safeHTML(l[19149].replace('{0}', '<b>' + M.suba[subUserHandle].e + '</b>')
-                                                .replace('{1}', '<b>' + escapeHTML(folderName) + '</b>'));
-                                        return $dialog;
-                                    });
-                                    return;
-                                }
-                            );
-
-                        };
-
-                        if (treeObj.errors.length || treeObj.warns.length) {
-                            // operation contains errors and/or warning
-                            var msgMsg = l[19147].replace(/\[Br\]/g, '<br/>');
-                            var msgQuestion = l[18229]; // Do you want to proceed?
-                            msgMsg = msgMsg.replace('{0}', M.suba[subUserHandle].e)
-                                .replace('{1}', treeObj.errors.length).replace('{2}', treeObj.warns.length);
-
-                            msgDialog('confirmation', '', msgMsg, msgQuestion, doMigrateSubUserDate);
-                        }
-                        else {
-                            doMigrateSubUserDate(true);
-                        }
-
-
-                    }
-                }
-            );
-
-        }
-    );
+    return this.business.copySubUserTreeToMasterRoot(tree, folderName, changePercentage);
 };
 
 /**

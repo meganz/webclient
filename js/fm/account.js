@@ -1149,7 +1149,11 @@ accountUI.account = {
                     $removeNumberButton.rebind('click.gsmremove', () => {
                         msgDialog('confirmation', '', l[23425], l[23426], answer => {
                             if (answer) {
-                                accountUI.account.profiles.removePhoneNumber(true).catch(dump);
+                                accountUI.account.profiles.removePhoneNumber()
+                                    .then(() => {
+                                        msgDialog('info', '', l[23427]);
+                                    })
+                                    .catch(dump);
                             }
                         });
                     });
@@ -1192,45 +1196,25 @@ accountUI.account = {
          * Send remove command to API, and update UI if needed
          * @param {Boolean} showSuccessMsg      Show message dialog on success
          */
-        removePhoneNumber: promisify((resolve, reject, showSuccessMsg) => {
-
+        async removePhoneNumber() {
             'use strict';
+            const res = await api.req({a: 'smsr'}).catch(echo);
 
-            // lock UI
-            loadingDialog.show();
+            if (res && res.result === 0) {
+                // success
+                // no APs, we need to rely on this response.
+                delete u_attr.smsv;
 
-            api_req(
-                { a: 'smsr' },
-                {
-                    callback: tryCatch(res => {
-                        // Unlock UI regardless of the result
-                        loadingDialog.hide();
-                        if (res === 0) {
-                            // success
-                            // no APs, we need to rely on this response.
-                            delete u_attr.smsv;
+                // update only relevant sections in UI
+                accountUI.account.profiles.renderPhoneBanner();
+                accountUI.account.profiles.renderPhoneDetails();
+            }
+            else {
+                msgDialog('warningb', '', l[23428], `${res < 0 ? api_strerror(res) : res}`);
 
-                            // update only relevant sections in UI
-                            accountUI.account.profiles.renderPhoneBanner();
-                            accountUI.account.profiles.renderPhoneDetails();
-
-                            if (showSuccessMsg) {
-                                msgDialog('info', '', l[23427]);
-                            }
-                            resolve();
-                        }
-                        else {
-                            msgDialog('warningb', '', l[23428]);
-                            reject(res);
-                        }
-                    }, () => {
-                        loadingDialog.hide();
-                        msgDialog('warningb', '', l[23428]);
-                        reject('Failed to remove the phone number.');
-                    })
-                }
-            );
-        }),
+                throw new MEGAException(l[23428], res);
+            }
+        },
 
         resetProfileForm: function() {
 
@@ -1453,8 +1437,8 @@ accountUI.account = {
                 };
 
                 if (checkUpdated()) {
-                    api_req(userAttrRequest, {
-                        callback: function (res) {
+                    api.screq(userAttrRequest)
+                        .then(({result: res}) => {
                             if (res === u_handle) {
                                 $('.user-name').text(u_attr.name);
                                 $('.name', '.account-dialog').text(u_attr.fullname)
@@ -1465,8 +1449,8 @@ accountUI.account = {
                                 // update file request username for existing folder
                                 mega.fileRequest.onUpdateUserName(u_attr.fullname);
                             }
-                        }
-                    });
+                        })
+                        .catch(tell);
                 }
 
                 // Reset current Internationalization API usage upon save.
@@ -1534,13 +1518,12 @@ accountUI.account = {
                             .add('.qr-block', accountUI.account.qrcode.$QRSettings)
                             .parent().removeClass('closed');
 
-                        api_req({ a: 'clc' }, {
-                            myAccount: account,
-                            callback: function (res, ctx) {
-                                ctx.myAccount.contactLink = typeof res === 'string' ? 'C!' + res : '';
+                        api.send('clc')
+                            .then((res) => {
+                                account.contactLink = typeof res === 'string' ? `C!${res}` : '';
                                 accountUI.account.qrcode.render(M.account);
-                            }
-                        });
+                            })
+                            .catch(dump);
                     }
                     else {
                         $('.access-qr-container', accountUI.account.qrcode.$QRSettings)
@@ -1624,34 +1607,20 @@ accountUI.account = {
 
                 if (regenQR) {
                     loadingDialog.show();
-                    var delQR = {
-                        a: 'cld',
-                        cl: M.account.contactLink.substring(2, M.account.contactLink.length)
-                    };
-                    var reGenQR = { a: 'clc' };
 
-                    api_req(delQR, {
-                        callback: function (res) {
-                            if (res === 0) { // success
-                                api_req(reGenQR, {
-                                    callback: function (res2) {
-                                        if (typeof res2 !== 'string') {
-                                            res2 = '';
-                                        }
-                                        else {
-                                            res2 = 'C!' + res2;
-                                        }
-                                        M.account.contactLink = res2;
-                                        accountUI.account.qrcode.render(M.account);
-                                        loadingDialog.hide();
-                                    }
-                                });
-                            }
-                            else {
-                                loadingDialog.hide();
-                            }
-                        }
-                    });
+                    api.req({a: 'cld', cl: M.account.contactLink.substring(2)})
+                        .then(({result}) => {
+                            assert(result === 0);
+                            return api.send('clc');
+                        })
+                        .then((res) => {
+                            M.account.contactLink = typeof res === 'string' ? `C!${res}` : '';
+                            accountUI.account.qrcode.render(M.account);
+                        })
+                        .catch(dump)
+                        .finally(() => {
+                            loadingDialog.hide();
+                        });
                 }
             });
         }
@@ -1693,7 +1662,7 @@ accountUI.account = {
                 u_attr['^!webtheme'] || 0,
                 function(val) {
                     mega.attr.set('webtheme', val, -2, 1);
-                    mega.ui.theme.set(val);
+                    mega.ui.setTheme(val);
                 }
             );
 
@@ -1804,25 +1773,19 @@ accountUI.account = {
                 msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
                     if (event) {
 
-                        loadingDialog.show();
-
                         // Check if 2FA is enabled on their account
-                        twofactor.isEnabledForAccount(function(result) {
+                        twofactor.isEnabledForAccount()
+                            .then((result) => {
 
-                            loadingDialog.hide();
+                                // If 2FA is enabled on their account
+                                if (result) {
 
-                            // If 2FA is enabled on their account
-                            if (result) {
-
-                                // Show the verify 2FA dialog to collect the user's PIN
-                                twofactor.verifyActionDialog.init(function(twoFactorPin) {
-                                    continueCancelAccount(twoFactorPin);
-                                });
-                            }
-                            else {
-                                continueCancelAccount(null);
-                            }
-                        });
+                                    // Show the verify 2FA dialog to collect the user's PIN
+                                    return twofactor.verifyActionDialog.init();
+                                }
+                            })
+                            .then((twoFactorPin) => continueCancelAccount(twoFactorPin || null))
+                            .catch(tell);
                     }
                 });
             });
@@ -2501,24 +2464,15 @@ accountUI.plan = {
 
                     loadingDialog.show();
 
-                    api_req({ a: 'gw19_ccc' }, {
-                        callback: (res) => {
-                            loadingDialog.hide();
-
-                            if ($.isNumeric(res)) {
-                                msgDialog('warninga', '', l.edit_card_error.replace('%1', res), l.edit_card_error_des);
-                            }
-                            else if (typeof res === 'string') {
-                                addressDialog.processUtcResult(
-                                    {
-                                        EUR: res,
-                                        edit: true
-                                    },
-                                    true
-                                );
-                            }
-                        }
-                    });
+                    api.send('gw19_ccc')
+                        .then((res) => {
+                            assert(typeof res === 'string');
+                            addressDialog.processUtcResult({EUR: res, edit: true}, true);
+                        })
+                        .catch((ex) => {
+                            msgDialog('warninga', '', l.edit_card_error.replace('%1', ex), l.edit_card_error_des);
+                        })
+                        .finally(() => loadingDialog.hide());
                 });
 
                 this.$paymentSection.removeClass('hidden');
@@ -2586,10 +2540,21 @@ accountUI.plan = {
                     .catch(function(ex) {
                         loadingDialog.hide();
                         if (ex) {
+                            let sub;
                             if (ex === ETOOMANY) {
                                 ex = l.redeem_etoomany;
                             }
-                            msgDialog('warninga', l[135], l[47], ex);
+                            else if (ex === EACCESS) {
+                                ex = l[714];
+                            }
+                            else if (ex < 0) {
+                                ex = `${l[473]} (${ex})`;
+                            }
+                            else {
+                                sub = ex;
+                                ex = l[47];
+                            }
+                            msgDialog('warninga', l[135], ex, sub);
                         }
                     });
             });
@@ -3193,8 +3158,8 @@ accountUI.security = {
                         loadingDialog.show();
                         var $activeSessionsRows = $('.active-session-txt', $securitySection).parents('tr');
                         // Expire all sessions but not the current one
-                        api_req({a: 'usr', ko: 1}, {
-                            callback: function() {
+                        api.screq({a: 'usr', ko: 1})
+                            .then(() => {
                                 M.account = null;
                                 /* clear account cache */
                                 $('.settings-logout', $activeSessionsRows).remove();
@@ -3202,8 +3167,7 @@ accountUI.security = {
                                     .removeClass('active-session-txt').addClass('expired-session-txt').text(l[25016]);
                                 $('.fm-close-all-sessions', $securitySection).addClass('hidden');
                                 loadingDialog.hide();
-                            }
-                        });
+                            });
                     }
                 });
             });
@@ -3222,16 +3186,15 @@ accountUI.security = {
                      * remove a session Id from the current user,
                      * usually other than the current session
                      */
-                    api_req({a: 'usr', s: [sessionId]}, {
-                        callback: function() {
+                    api.screq({a: 'usr', s: [sessionId]})
+                        .then(() => {
                             M.account = null;
                             /* clear account cache */
                             $this.find('.settings-logout').remove();
                             $this.find('.active-session-txt').removeClass('active-session-txt')
                                 .addClass('expired-session-txt').text(l[25016]);
                             loadingDialog.hide();
-                        }
-                    });
+                        });
                 }
             });
 
@@ -3445,27 +3408,25 @@ accountUI.fileManagement = {
 
             $('#delete-all-versions', accountUI.$contentBlock).rebind('click', function() {
 
-                if (!$(this).hasClass('disabled')) {
-                    if (M.isInvalidUserStatus()) {
-                        return;
-                    }
-                    msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
-
-                        if (e) {
-                            loadingDialog.show();
-                            var req = {a: 'dv'};
-                            api_req(req, {
-                                callback: function(res) {
-                                    if (res === 0) {
-                                        M.accountData(function() {
-                                            fileversioning.updateVersionInfo();
-                                        }, false, true);
-                                    }
-                                }
-                            });
-                        }
-                    });
+                if ($(this).hasClass('disabled') || M.isInvalidUserStatus()) {
+                    return;
                 }
+
+                msgDialog('remove', l[1003], l[17581], l[1007], (e) => {
+
+                    if (e) {
+                        mLoadingSpinner.show('delete-all-versions', l[17147]);
+
+                        api.screq({a: 'dv'})
+                            .then(() => {
+                                M.accountData(() => fileversioning.updateVersionInfo(), false, true);
+                            })
+                            .catch(dump)
+                            .finally(() => {
+                                mLoadingSpinner.hide('delete-all-versions');
+                            });
+                    }
+                });
             });
         }
     },
@@ -3652,7 +3613,17 @@ accountUI.fileManagement = {
                 '#hide-recents',
                 $('#hide-recents', accountUI.$contentBlock).parent(),
                 !mega.config.get('showRecents'),
-                (val) => mega.config.setn('showRecents', val ? undefined : 1));
+                (val) => {
+                    val = val ? undefined : 1;
+
+                    if (M.recentsRender) {
+                        showToast('settings', l[16168]);
+                        M.recentsRender._setConfigShow(val);
+                    }
+                    else {
+                        mega.config.setn('showRecents', val);
+                    }
+                });
         }
     },
 
@@ -3785,12 +3756,33 @@ accountUI.transfers = {
 
         // Transfer Tools - Megasync
         this.transferTools.megasync.render();
-
-        // Download folder setting for PaleMoon ext
-        this.addDownloadFolderSetting();
     },
 
     uploadAndDownload: {
+
+        setSlider($container, sliderSelector, sliderOptions) {
+            'use strict';
+
+            const wrap = $('.slider.numbers-wrap', $container).get(0);
+            const template = wrap.firstElementChild.cloneNode(true);
+
+            wrap.textContent = '';
+            for (let i = 0; i < sliderOptions.max;) {
+                const elm = template.cloneNode(true);
+                wrap.appendChild(elm);
+                elm.querySelector('span').textContent = ++i;
+            }
+
+            const $slider = $(sliderSelector, $container).slider(sliderOptions);
+
+            $('.ui-slider-handle', $slider)
+                .addClass('sprite-fm-mono icon-arrow-left sprite-fm-mono-after icon-arrow-right-after');
+
+            $('.numbers.active', $container).removeClass('active');
+            $(`.numbers:nth-child(${$slider.slider('value')})`, $container).addClass('active');
+
+            return $slider;
+        },
 
         bandwidth: {
 
@@ -3871,14 +3863,12 @@ accountUI.transfers = {
         upload: {
 
             render: function() {
-
                 'use strict';
 
                 var $uploadSettings = $('.upload-settings', accountUI.$contentBlock);
 
-                // Parallel upload slider
-                var $slider = $('#slider-range-max', $uploadSettings).slider({
-                    min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
+                accountUI.transfers.uploadAndDownload.setSlider($uploadSettings, '#slider-range-max', {
+                    min: 1, max: 8, range: "min", value: fmconfig.ul_maxSlots || 4,
                     change: function(e, ui) {
                         if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
                             mega.config.setn('ul_maxSlots', ui.value);
@@ -3891,13 +3881,6 @@ accountUI.transfers = {
                             .addClass('active');
                     }
                 });
-
-                $('.ui-slider-handle', $slider).addClass('sprite-fm-mono icon-arrow-left ' +
-                    'sprite-fm-mono-after icon-arrow-right-after');
-
-                $('.numbers.active', $uploadSettings).removeClass('active');
-                $(' .numbers:nth-child(' + $slider.slider('value') + ')', $uploadSettings)
-                    .addClass('active');
             },
         },
 
@@ -3909,9 +3892,8 @@ accountUI.transfers = {
 
                 var $downloadSettings = $('.download-settings', accountUI.$contentBlock);
 
-                // Parallel download slider
-                var $slider = $('#slider-range-max2', $downloadSettings).slider({
-                    min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
+                accountUI.transfers.uploadAndDownload.setSlider($downloadSettings, '#slider-range-max2', {
+                    min: 1, max: 12, range: "min", value: fmconfig.dl_maxSlots || 4,
                     change: function(e, ui) {
                         if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.dl_maxSlots) {
                             mega.config.setn('dl_maxSlots', ui.value);
@@ -3924,13 +3906,6 @@ accountUI.transfers = {
                             .addClass('active');
                     }
                 });
-
-                $('.ui-slider-handle', $slider).addClass('sprite-fm-mono icon-arrow-left ' +
-                    'sprite-fm-mono-after icon-arrow-right-after');
-
-                $('.numbers.active', $downloadSettings).removeClass('active');
-                $('.numbers:nth-child(' + $slider.slider('value') + ')', $downloadSettings)
-                    .addClass('active');
             }
         }
     },
@@ -3969,33 +3944,6 @@ accountUI.transfers = {
                     }
                 });
             }
-        }
-    },
-
-    addDownloadFolderSetting: function() {
-
-        'use strict';
-
-        if (is_chrome_firefox && !$('#acc_dls_folder', accountUI.$contentBlock).length) {
-            $('.fm-account-transfers').safeAppend(
-                '<div class="account data-block">' +
-                '<div class="settings-left-block">' +
-                '<div id="acc_dls_folder">' +
-                '<div class="fm-account-header">Downloads folder:</div></div></div>' +
-                '<div class="settings-right-block"><div class="settings-sub-section">' +
-                '<input type="button" value="Browse..." style="-moz-appearance:' +
-                'button;margin-right:12px;cursor:pointer" />' +
-                '</div></div></div>');
-            var fld = mozGetDownloadsFolder();
-            $('#acc_dls_folder', accountUI.$contentBlock).safeAppend($('<span/>').text(fld && fld.path));
-            $('#acc_dls_folder input', accountUI.$contentBlock).click(function() {
-
-                var fs = mozFilePicker(0, 2);
-                if (fs) {
-                    mozSetDownloadsFolder(fs);
-                    $(this).next().text(fs.path);
-                }
-            });
         }
     }
 };
@@ -4172,14 +4120,14 @@ accountUI.contactAndChat = {
 
         render: function() {
             'use strict';
-            const curr = mega.config.get('showHideChat');
+            const curr = mega.config.get('showHideChat') | 0;
 
             accountUI.inputs.radioCard.init(
                 '.card',
                 $('.card', accountUI.$contentBlock).parent(),
-                typeof curr === 'undefined' ? 0 : 1,
+                curr,
                 (val) => {
-                    mega.config.setn('showHideChat', val);
+                    mega.config.setn('showHideChat', val | 0 || undefined);
                 }
             );
         }

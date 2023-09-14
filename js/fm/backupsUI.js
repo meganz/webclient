@@ -286,7 +286,7 @@ lazy(mega, 'backupCenter', () => {
 
             this.lastupdate = Date.now();
 
-            const res = await M.req('sf');
+            const {result: res} = await api.req({a: 'sf'});
 
             if (d) {
                 console.log('Backup/sync folders API response: sf ->');
@@ -382,10 +382,10 @@ lazy(mega, 'backupCenter', () => {
 
             // If `id` is not a folder handle, stop the sync/backup
             if (id && id !== h) {
-                const res = await M.req({a: 'sr', id: id});
+                const {result} = await api.req({a: 'sr', id: id});
 
                 if (d) {
-                    console.log(`Remove backup/sync response: sr -> ${res}`);
+                    console.log(`Remove backup/sync response: sr -> ${result}`);
                 }
             }
 
@@ -393,8 +393,8 @@ lazy(mega, 'backupCenter', () => {
 
                 // Set `sds` attr to make sure that SDK will try to clear heartbeat record too
                 if (id && id !== h) {
-                    node.sds = node.sds ? node.sds += `,${id}:8` : `${id}:8`;
-                    await api_setattr(node, mRandomToken('sds'));
+                    const sds = node.sds ? `${node.sds},${id}:8` : `${id}:8`;
+                    await api.setNodeAttributes(node, {sds});
                 }
 
                 // Backup/stopped backup folder
@@ -403,7 +403,7 @@ lazy(mega, 'backupCenter', () => {
                     // Move backup to target folder
                     if (target) {
 
-                        await M.moveNodes([h], target, true, 3);
+                        await M.moveNodes([h], target, 3);
                     }
                     // Remove
                     else {
@@ -497,7 +497,6 @@ lazy(mega, 'backupCenter', () => {
             $changePathButton.addClass('disabled');
             $confirmButton.addClass('disabled');
             $input.val(inputValue);
-            $.mcselected = '';
 
             $closeButton.rebind('click.closeDialog', () => {
 
@@ -530,26 +529,18 @@ lazy(mega, 'backupCenter', () => {
 
                 closeDialog();
 
-                selectFolderDialog(async() => {
-                    closeDialog();
-                    target = M.RootID;
-                    inputValue = ``;
-                    M.safeShowDialog('stop-backup', $backupDialog);
+                selectFolderDialog('move')
+                    .then((folder) => {
+                        folder = folder || target;
 
-                    if ($.mcselected) {
-
-                        target = $.mcselected;
-                        await dbfetch.geta([target]);
-                    }
-
-                    const path = M.getPath(target).reverse();
-
-                    for (let i = 0; i < path.length; i++) {
-
-                        inputValue += path[i] === M.RootID ? `${l[18051]}/` : `${M.d[path[i]].name}/`;
-                    }
-                    $input.val(inputValue);
-                }, 'move');
+                        M.safeShowDialog('stop-backup', $backupDialog);
+                        return folder === M.RootID ? folder : dbfetch.get(folder).then(() => folder);
+                    })
+                    .then((folder) => {
+                        target = folder;
+                        $input.val(M.getPath(folder).reverse().map(h => M.getNameByHandle(h)).join('/'));
+                    })
+                    .catch(tell);
             });
 
             $confirmButton.rebind('click.stopBackup', (e) => {
@@ -561,15 +552,11 @@ lazy(mega, 'backupCenter', () => {
 
                 const deleteFolder = $('input:checked', $radioWrappers).val();
 
-                loadingDialog.pshow();
                 closeDialog();
-                $.mcselected = '';
+                loadingDialog.pshow();
 
                 this.stopSync(this.selectedSync.id, this.selectedSync.nodeHandle, deleteFolder !== '1' && target)
-                    .then(nop)
-                    .catch((ex) => {
-                        msgDialog('warninga', l[135], l[47], ex);
-                    })
+                    .catch(tell)
                     .finally(() => {
 
                         loadingDialog.phide();

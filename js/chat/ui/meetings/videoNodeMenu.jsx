@@ -41,8 +41,8 @@ export default class VideoNodeMenu extends MegaRenderMixin {
                     return (
                         IS_GUEST ?
                             false :
-                            M.syncContactEmail(userHandle, new MegaPromise(), true)
-                                .done(email => {
+                            M.syncContactEmail(userHandle, true)
+                                .then(email => {
                                     const OPC = Object.values(M.opc);
                                     if (OPC && OPC.length && OPC.some(opc => opc.m === email)) {
                                         return msgDialog('warningb', '', l[17545]);

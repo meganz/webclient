@@ -1,4 +1,4 @@
-import { prepareExportIo, prepareExportStreams } from "../utils.jsx";
+import {prepareExportIo, prepareExportStreams} from "./utils.jsx";
 
 export const RETENTION_FORMAT = { HOURS: 'hour', DAYS: 'day', WEEKS: 'week', MONTHS: 'month', DISABLED: 'none' };
 export const MCO_FLAGS = { OPEN_INVITE: 'oi', SPEAK_REQUEST: 'sr', WAITING_ROOM: 'w' };
@@ -84,6 +84,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.chatShard = chatShard;
     this.chatdUrl = chatdUrl;
+    this.publicLink = null;
     this.publicChatHandle = publicChatHandle;
     this.publicChatKey = publicChatKey;
     this.ck = ck;
@@ -95,7 +96,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     this.retentionTime = retentionTime;
 
     this.activeSearches = 0;
-    self.members = {};
     this.activeCallIds = new MegaDataMap(this);
     this.ringingCalls = new MegaDataMap(this);
     this.ringingCalls.addChangeListener(() => {
@@ -104,6 +104,15 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     });
 
     this.isMeeting = isMeeting;
+
+    this.members = Object.create(null);
+
+    // @todo was lazy to replace all hasOwn()s...
+    Object.defineProperty(this.members, 'hasOwnProperty', {
+        value(p) {
+            return p in this;
+        }
+    });
 
     if (type === "private") {
         users.forEach(function(userHandle) {
@@ -378,7 +387,10 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     var _historyIsAvailable = (ev) => {
         self.initialMessageHistLoaded = ev ? true : -1;
 
-        clearTimeout(timer);
+        if (timer) {
+            timer.abort();
+            timer = null;
+        }
         self.unbind('onMarkAsJoinRequested.initHist');
         self.unbind('onHistoryDecrypted.initHist');
         self.unbind('onMessagesHistoryDone.initHist');
@@ -389,12 +401,13 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     self.rebind('onMessagesHistoryDone.initHist', _historyIsAvailable);
 
     self.rebind('onMarkAsJoinRequested.initHist', () => {
-        timer = setTimeout(function() {
+        (timer = tSleep(300)).then(() => {
             if (d) {
                 self.logger.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
             }
+            timer = null;
             _historyIsAvailable(false);
-        }, 3e5);
+        });
     });
 
     self.rebind('onRoomDisconnected', () => {
@@ -446,6 +459,20 @@ ChatRoom.ANONYMOUS_PARTICIPANT = mega.BID;
 ChatRoom.ARCHIVED = 0x01;
 ChatRoom.TOPIC_MAX_LENGTH = 30;
 ChatRoom.SCHEDULED_MEETINGS_INTERVAL = 1.8e6; /* 30 minutes */
+
+ChatRoom._fnRequireParticipantKeys = function(fn, scope) {
+    return function(...args) {
+        const participants = this.protocolHandler.getTrackedParticipants();
+
+        return ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
+            .then(() => {
+                return fn.apply(scope || this, args);
+            })
+            .catch((ex) => {
+                this.logger.error("Failed to retrieve keys..", ex);
+            });
+    };
+};
 
 ChatRoom.MembersSet = function(chatRoom) {
     this.chatRoom = chatRoom;
@@ -1062,21 +1089,14 @@ ChatRoom.prototype.getTruncatedRoomTopic = function(maxLength = ChatRoom.TOPIC_M
 ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
     var self = this;
     newTopic = allowEmpty ? newTopic : String(newTopic);
-    var masterPromise = new MegaPromise();
 
     if (
         (allowEmpty || newTopic.trim().length > 0) &&
         newTopic !== self.getRoomTitle()
     ) {
         self.scrolledToBottom = true;
-
-
         var participants = self.protocolHandler.getTrackedParticipants();
-        var promises = [];
-        promises.push(
-            ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-        );
-        var _runUpdateTopic = function() {
+        return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).then(() => {
             // self.state.value
             var topic = self.protocolHandler.embeddedEncryptTo(
                 newTopic,
@@ -1087,25 +1107,9 @@ ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
             );
 
             if (topic) {
-                masterPromise.linkDoneAndFailTo(
-                    asyncApiReq({
-                        "a":"mcst",
-                        "id":self.chatId,
-                        "ct":base64urlencode(topic),
-                        "v": Chatd.VERSION
-                    })
-                );
+                return asyncApiReq({a: "mcst", id: self.chatId, ct: base64urlencode(topic), v: Chatd.VERSION});
             }
-            else {
-                masterPromise.reject();
-            }
-        };
-        MegaPromise.allDone(promises).done(
-            function () {
-                _runUpdateTopic();
-            }
-        );
-        return masterPromise;
+        }).catch(dump);
     }
     else {
         return false;
@@ -1151,7 +1155,7 @@ ChatRoom.prototype.archive = function() {
         'f' : flags,
         'v' : Chatd.VERSION}
         )
-        .done(function(r) {
+        .then((r) => {
             if (r === 0) {
                 self.updateFlags(flags, true);
             }
@@ -1173,8 +1177,8 @@ ChatRoom.prototype.unarchive = function() {
         'm':mask, 'f':flags,
         'v': Chatd.VERSION}
         )
-        .done(function(r) {
-            if (r === 0) {
+        .then((res) => {
+            if (res === 0) {
                 self.updateFlags(flags, true);
             }
         });
@@ -1215,20 +1219,25 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
 
 /**
  * Create a public handle of a chat
- * @param {boolean|undefined} [d]  if d is specified, then it will delete the public chat link.
- * @param {boolean|undefined} [cim]  create chat link if missing
- * @param {function} [callback] call back function.
- * @return {void}
+ * @param {Boolean} [remove] if specified, then it will delete the public chat link.
+ * @param {Boolean} [cim] create chat link if missing
+ * @returns {Promise<*>}
  */
-ChatRoom.prototype.updatePublicHandle = function(d, cim, callback) {
-    return megaChat.plugins.chatdIntegration.updateChatPublicHandle(this.chatId, d, cim, callback);
-};
+ChatRoom.prototype.updatePublicHandle = async function(remove, cim) {
+    if (!remove && this.publicLink) {
+        return this.publicLink;
+    }
 
-// [...] TODO: -- REMOVE
-ChatRoom.prototype.getPublicLink = function(callback) {
-    return this.publicLink || this.updatePublicHandle(false, false, callback);
+    return asyncApiReq({a: 'mcph', id: this.chatId, v: Chatd.VERSION, cim: cim ? 1 : 0, d: remove ? 1 : undefined})
+        .then((res) => {
+            assert(remove && res === 0 || Array.isArray(res) && res[1].length === 8);
+            this.publicLink = remove ? null : `chat/${res[1]}#${this.protocolHandler.getUnifiedKey()}`;
+        })
+        .catch((ex) => {
+            this.logger.warn('updatePublicHandle', ex);
+            this.publicLink = null;
+        });
 };
-
 
 /**
  * Returns true if the current user is in the members list
@@ -1271,54 +1280,25 @@ ChatRoom.prototype.joinViaPublicHandle = function() {
 /**
  * Switch off the public mode of an open chat.
  */
-ChatRoom.prototype.switchOffPublicMode = function() {
-    var self = this;
-    var participants = self.protocolHandler.getTrackedParticipants();
-    var promises = [];
-    promises.push(
-        ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-    );
-    var onSwitchDone = function() {
-        self.protocolHandler.switchOffOpenMode();
-    };
+ChatRoom.prototype.switchOffPublicMode = ChatRoom._fnRequireParticipantKeys(function() {
+    let {topic, protocolHandler, chatId} = this;
 
-    var _runSwitchOffPublicMode = function() {
-        // self.state.value
-        var topic = null;
-        if (self.topic) {
-            topic = self.protocolHandler.embeddedEncryptTo(
-                self.topic,
-                strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
-                participants,
-                true,
-                false /* hardcoded to false, to ensure the encryption DOES includes keys in the new topic */
-            );
-            topic = base64urlencode(topic);
+    if (topic) {
+        topic = protocolHandler.embeddedEncryptTo(
+            topic,
+            strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
+            protocolHandler.getTrackedParticipants(),
+            true,
+            false /* hardcoded to false, to ensure the encryption DOES include keys in the new topic */
+        );
+        topic = base64urlencode(topic);
+    }
 
-            asyncApiReq({
-                a: 'mcscm',
-                id: self.chatId,
-                ct: topic,
-                v: Chatd.VERSION
-            })
-                .done(onSwitchDone);
-        }
-        else {
-            asyncApiReq({
-                a: 'mcscm',
-                id: self.chatId,
-                v: Chatd.VERSION
-            })
-                .done(onSwitchDone);
-        }
-    };
-    MegaPromise.allDone(promises).done(
-        function () {
-            _runSwitchOffPublicMode();
-        }
-    );
-
-};
+    return asyncApiReq({a: 'mcscm', id: chatId, ct: topic || undefined, v: Chatd.VERSION})
+        .then(() => {
+            protocolHandler.switchOffOpenMode();
+        });
+});
 
 /**
  * Show UI elements of this room
@@ -1639,55 +1619,89 @@ ChatRoom.prototype._sendNodes = function(nodeids, users) {
         });
     }
 
-    return MegaPromise.allDone(promises);
+    return Promise.allSettled(promises);
 };
 
 
 /**
  * Attach/share (send as message) file/folder nodes to the chat
  * @param {Array|String} nodes ufs-node handle, or an array of them.
+ * @param {Object} [names] in place node rename
  * @returns {Promise}
  */
-ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resolve, reject, nodes) {
+ChatRoom.prototype.attachNodes = async function(nodes, names) {
+
+    if (!Array.isArray(nodes)) {
+        nodes = [nodes];
+    }
+    const handles = new Set();
+
+    for (let i = nodes.length; i--;) {
+        const n = nodes[i];
+        const h = String(crypto_keyok(n) && n.h || n);
+
+        if (!M.getNodeByHandle(h)) {
+            handles.add(h);
+        }
+    }
+
+    if (handles.size) {
+        await dbfetch.acquire([...handles]);
+    }
+
+    return this._attachNodes(nodes, names);
+};
+
+// @private -- see {@link ChatRoom.attachNodes}
+ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(resolve, reject, nodes, names) {
     var i;
     var step = 0;
     var users = [];
     var self = this;
+    let result = null;
     var copy = Object.create(null);
     var send = Object.create(null);
+    let link = Object.create(null);
+    let nmap = Object.create(null);
     var members = self.getParticipantsExceptMe();
-    var attach = promisify(function(resolve, reject, nodes) {
+    var attach = (nodes) => {
         console.assert(self.type === 'public' || users.length, 'No users to send to?!');
 
-        self._sendNodes(nodes, users).then(function() {
+        return this._sendNodes(nodes, users).then(() => {
             for (var i = nodes.length; i--;) {
-                var n = M.getNodeByHandle(nodes[i]);
-                console.assert(n.h, 'wtf..');
+                const n = nmap[nodes[i]] || M.getNodeByHandle(nodes[i]);
+                console.assert(n.h, `Node not found... ${nodes[i]}`);
 
                 if (n.h) {
+                    const name = names && (names[n.hash] || names[n.h]) || n.name;
+
                     // 1b, 1b, JSON
                     self.sendMessage(
                         Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
                         Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
                         JSON.stringify([
                             {
-                                h: n.h, k: n.k, t: n.t, s: n.s, fa: n.fa, ts: n.ts, hash: n.hash, name: n.name
+                                h: n.h, k: n.k, t: n.t, s: n.s, fa: n.fa, ts: n.ts, hash: n.hash, name
                             }
                         ])
                     );
                 }
             }
-            resolve();
-        }).catch(reject);
-    });
+        });
+    };
 
     var done = function() {
         if (--step < 1) {
-            resolve();
+            nmap = null;
+            resolve(result);
         }
     };
     var fail = function(ex) {
-        if (d) {
+        if (ex === EBLOCKED) {
+            // User didn't want to revoke FR.
+            result = ex;
+        }
+        else if (d) {
             _.logger.error(ex);
         }
         done();
@@ -1704,19 +1718,54 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
         }
     }
 
-    if (!Array.isArray(nodes)) {
-        nodes = [nodes];
-    }
-
     for (i = nodes.length; i--;) {
-        var n = M.getNodeByHandle(nodes[i]);
-        (n && (n.u !== u_handle || M.getNodeRoot(n.h) === "shares") ? copy : send)[n.h] = 1;
+        const h = nodes[i];
+        const n = crypto_keyok(h) ? h : M.getNodeByHandle(h);
+
+        if (n.t) {
+            link[n.h] = 1;
+            continue;
+        }
+
+        if (n.hash) {
+            nmap[n.hash] = n;
+
+            if (names && names[n.h]) {
+                names[n.hash] = names[n.h];
+            }
+        }
+
+        let op = send;
+        if (!n.ch && (n.u !== u_handle || M.getNodeRoot(n.h) === 'shares')) {
+            op = copy;
+        }
+
+        op[n.h] = 1;
+        nmap[n.h] = n;
     }
     copy = Object.keys(copy);
     send = Object.keys(send);
+    link = Object.keys(link);
 
     if (d) {
-        _.logger.debug('copy:%d, send:%d', copy.length, send.length, copy, send);
+        _.logger.debug('copy:%d, send:%d, link:%d', copy.length, send.length, link.length, copy, send, link);
+    }
+
+    if (link.length) {
+        ++step;
+        Promise.resolve(mega.fileRequestCommon.storage.isDropExist(link))
+            .then((res) => {
+                if (res.length) {
+                    return mega.fileRequest.showRemoveWarning(res);
+                }
+            })
+            .then(() => {
+                const createLink = (h) => M.createPublicLink(h).then(({link}) => this.sendMessage(link));
+
+                return Promise.all(link.map(createLink));
+            })
+            .then(done)
+            .catch(fail);
     }
 
     if (send.length) {
@@ -1726,83 +1775,83 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
 
     if (copy.length) {
         step++;
-        M.myChatFilesFolder.get(true)
-            .then(function(target) {
-                var rem = [];
-                var c = Object.keys(M.c[target.h] || {});
-
-                for (var i = copy.length; i--;) {
-                    var n = M.getNodeByHandle(copy[i]);
-                    console.assert(n.h, 'wtf..');
-
-                    for (var y = c.length; y--;) {
-                        var b = M.getNodeByHandle(c[y]);
-
-                        if (n.h === b.h || b.hash === n.hash) {
-                            if (d) {
-                                _.logger.info('deduplication %s:%s', n.h, b.h, [n], [b]);
-                            }
-                            rem.push(n.h);
-                            copy.splice(i, 1);
-                            break;
-                        }
-                    }
-                }
-
-                var next = function(res) {
-                    if (!Array.isArray(res)) {
-                        return fail(res);
-                    }
-                    const [h] = res;
-                    res = [...rem, ...res];
-
-                    if (!res.length) {
-                        // Something went wrong with copyNodes()?..
-                        return fail('Nothing to attach...?!');
-                    }
-
-                    for (let i = res.length; i--;) {
-                        const n = M.getNodeByHandle(res[i]);
-
-                        if (n.fv) {
-
-                            if (d) {
-                                _.logger.info('Skipping file-version %s', n.h, n);
-                            }
-                            res.splice(i, 1);
-                        }
-                    }
-
-                    if (h && !res.length) {
-                        if (d) {
-                            _.logger.info('Adding nothing but a file-version?..', h);
-                        }
-                        res = [h];
-                    }
-
-                    attach(res).then(done).catch(fail);
-                };
-
-                if (copy.length) {
-                    M.copyNodes(copy, target.h, false, next).dump('attach-nodes');
-                }
-                else {
-                    if (d) {
-                        _.logger.info('No new nodes to copy.', [rem]);
-                    }
-                    next([]);
-                }
-            })
-            .catch(fail);
+        this._copyNodesToAttach(copy, nmap).then((res) => attach(res)).then(done).catch(fail);
     }
 
     if (!step) {
         if (d) {
             _.logger.warn('Nothing to do here...');
         }
-        onIdle(done);
+        queueMicrotask(done);
     }
 });
+
+// @private -- see {@link ChatRoom.attachNodes}
+ChatRoom.prototype._copyNodesToAttach = async function(copy, nmap) {
+    const {h: target} = await M.myChatFilesFolder.get(true);
+
+    if (!M.c[target]) {
+        await dbfetch.get(target);
+    }
+    const dir = Object.keys(M.c[target] || {});
+    const rem = [];
+
+    for (let i = copy.length; i--;) {
+        const n = nmap[copy[i]] || M.getNodeByHandle(copy[i]);
+        console.assert(n.h, `Node not found.. ${copy[i]}`);
+
+        for (let y = dir.length; y--;) {
+            const b = M.getNodeByHandle(dir[y]);
+
+            if (n.h === b.h || b.hash === n.hash) {
+                if (d) {
+                    this.logger.info('deduplication %s:%s', n.h, b.h, [n], [b]);
+                }
+                rem.push(n.h);
+                copy.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    let res = [];
+    if (copy.length) {
+
+        res = await M.copyNodes(copy, target);
+    }
+    else if (d) {
+
+        this.logger.info('No new nodes to copy.', rem);
+    }
+    assert(Array.isArray(res), `Unexpected response, ${res && res.message || res}`, res);
+
+    const [h] = res;
+    res = [...rem, ...res];
+
+    // Something went wrong with copyNodes()?..
+    assert(res.length, 'Unexpected condition... nothing to attach ?!');
+
+    for (let i = res.length; i--;) {
+        const n = nmap[res[i]] || M.getNodeByHandle(res[i]);
+
+        if (n.fv) {
+
+            if (d) {
+                this.logger.info('Skipping file-version %s', n.h, n);
+            }
+            res.splice(i, 1);
+        }
+    }
+
+    if (h && !res.length) {
+        if (d) {
+            this.logger.info('Adding nothing but a file-version?..', h);
+        }
+        res = [h];
+    }
+
+    return res;
+};
 
 ChatRoom.prototype.onUploadStart = function(data) {
     var self = this;
@@ -1929,20 +1978,6 @@ ChatRoom.prototype.recover = function() {
     }
 };
 
-ChatRoom._fnRequireParticipantKeys = function(fn, scope) {
-    return function(...args) {
-        const participants = this.protocolHandler.getTrackedParticipants();
-
-        return ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-            .then(() => {
-                return fn.apply(scope || this, args);
-            })
-            .catch((ex) => {
-                this.logger.error("Failed to retrieve keys..", ex);
-            });
-    };
-};
-
 ChatRoom.prototype.showMissingUnifiedKeyDialog = function() {
     return (
         msgDialog(
@@ -1969,7 +2004,7 @@ ChatRoom.prototype.hasInvalidKeys = function() {
                 99751,
                 JSON.stringify([
                     1,
-                    buildVersion.version || 'dev',
+                    buildVersion.website || 'dev',
                     String(this.chatId).length | 0,
                     this.type | 0,
                     this.isMeeting | 0,
@@ -1978,7 +2013,8 @@ ChatRoom.prototype.hasInvalidKeys = function() {
                     typeof this.ck,
                     String(this.ck).length | 0,
                     (!!master) | 0,
-                    Object(slaves).length | 0])
+                    Object(slaves).length | 0
+                ])
             );
             return true;
         }
@@ -2407,8 +2443,8 @@ ChatRoom.prototype.truncate = function() {
                 m: lastChatMessageId,
                 v: Chatd.VERSION
             })
-                .fail(function(r) {
-                    if (r === -2) {
+                .catch((ex) => {
+                    if (ex === -2) {
                         msgDialog(
                             'warninga',
                             l[135],
@@ -2562,9 +2598,9 @@ ChatRoom.prototype.scrollToMessageId = function(msgId, index, retryActive) {
     var self = this;
     if (!self.isCurrentlyActive && !retryActive) {
         // room not shown yet, retry only once again after 1.5s
-        setTimeout(function() {
+        tSleep(1.5).then(() => {
             self.scrollToMessageId(msgId, index, true);
-        }, 1500);
+        });
         return;
     }
 
@@ -2690,14 +2726,11 @@ ChatRoom.prototype._exportChat = async function() {
     // Check if the user wants the shared nodes if applicable
     let withMedia = !!M.v.length;
     if (withMedia) {
-        withMedia = await asyncConfirmationDialog(
+        withMedia = await asyncMsgDialog(
+            `*confirmation:!^${l.export_chat_media_dlg_conf}!${l.export_chat_media_dlg_rej}`,
             '',
             l.export_chat_media_dlg_title,
-            l.export_chat_media_dlg_text,
-            undefined,
-            true,
-            l.export_chat_media_dlg_conf,
-            l.export_chat_media_dlg_rej
+            l.export_chat_media_dlg_text
         );
         if (withMedia === null) {
             throw new Error('Aborted');
@@ -2725,7 +2758,8 @@ ChatRoom.prototype._exportChat = async function() {
         const res = await asyncApiReq({ a: 'qbq', s, n, p });
         if (res === 1 || res === 2) {
             // Overquota. Offer to just save the chat history
-            const fallback = await asyncConfirmationDialog(
+            const fallback = await asyncMsgDialog(
+                'confirmation',
                 '',
                 l.export_chat_media_obq_title,
                 l.export_chat_media_obq_text

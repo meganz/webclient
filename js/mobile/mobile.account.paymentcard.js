@@ -39,31 +39,21 @@ mobile.account.paymentCard = new function() {
             $('.payment-card-bottom a.payment-card-edit', $page).rebind('tap', () => {
 
                 loadingDialog.show();
-
-                api_req({ a: 'gw19_ccc' }, {
-                    callback: (res) => {
-                        loadingDialog.hide();
-
-                        if ($.isNumeric(res)) {
-                            msgDialog(
-                                'warninga',
-                                '',
-                                l.edit_card_error.replace('%1', res),
-                                l.edit_card_error_des,
-                                loadSubPage.bind(null, 'fm/account')
-                            );
-                        }
-                        else if (typeof res === 'string') {
-                            addressDialog.processUtcResult(
-                                {
-                                    EUR: res,
-                                    edit: true
-                                },
-                                true
-                            );
-                        }
-                    }
-                });
+                api.send('gw19_ccc')
+                    .then((res) => {
+                        assert(typeof res === 'string');
+                        addressDialog.processUtcResult({EUR: res, edit: true}, true);
+                    })
+                    .catch((ex) => {
+                        msgDialog(
+                            'warninga',
+                            '',
+                            l.edit_card_error.replace('%1', ex),
+                            l.edit_card_error_des,
+                            loadSubPage.bind(null, 'fm/account')
+                        );
+                    })
+                    .finally(() => loadingDialog.hide());
             });
 
             // Initialise back button to go back to My Account page

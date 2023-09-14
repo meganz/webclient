@@ -18,17 +18,22 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
 
     componentDidMount() {
         super.componentDidMount();
+
         if (this.props.mode === ScheduleMetaChange.MODE.CREATED) {
-            const val = is_chatlink ? `chat/${is_chatlink.ph}#${is_chatlink.key}` : this.props.chatRoom.getPublicLink();
-            if (typeof val === 'string') {
-                this.setState({ link: `${getBaseUrl()}/${val}`});
+
+            if (is_chatlink) {
+                this.setState({link: `chat/${is_chatlink.ph}#${is_chatlink.key}`});
             }
-            else if (val instanceof MegaPromise) {
-                val.done(() => {
-                    if (this.isMounted() && !this.state.link && this.props.chatRoom.publicLink) {
-                        this.setState({ link: `${getBaseUrl()}/${this.props.chatRoom.publicLink}`});
-                    }
-                });
+            else {
+                const {chatRoom} = this.props;
+
+                chatRoom.updatePublicHandle()
+                    .then(() => {
+                        if (this.isMounted() && !this.state.link && chatRoom.publicLink) {
+                            this.setState({link: `${getBaseUrl()}/${chatRoom.publicLink}`});
+                        }
+                    })
+                    .catch(dump);
             }
         }
         if (this.props.message.meta.ap) {

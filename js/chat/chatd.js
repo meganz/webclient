@@ -458,11 +458,11 @@ Chatd.Shard = function(chatd, shard) {
     });
 
     var ooa = window.onactivity;
-    window.onactivity = function() {
+    window.onactivity = () => {
         if (ooa) {
             onIdle(ooa);
         }
-        delay('chatd:shard:activity.' + shard, function() {
+        tSleep.schedule(30, this, () => {
             // restart would also "start" the keepalive tracker, which is
             // not something we want in case chatd is not yet connected.
             if (self.isOnline()) {
@@ -470,7 +470,7 @@ Chatd.Shard = function(chatd, shard) {
                 self.keepAlive.restart();
                 self.keepAlivePing.restart();
             }
-        }, 3e4);
+        });
     };
 
     // HistoryDone queue manager
@@ -533,7 +533,7 @@ Chatd.Shard.prototype.triggerEventOnAllChats = function(evtName) {
 };
 
 
-Chatd.Shard.prototype.retrieveMcurlAndExecOnce = promisify(function(resolve, reject, chatId) {
+Chatd.Shard.prototype.retrieveMcurlAndExecOnce = async function(chatId) {
     'use strict';
     var chatHandleOrId = chatId;
     let publicChatHandle = is_chatlink.ph;
@@ -551,20 +551,13 @@ Chatd.Shard.prototype.retrieveMcurlAndExecOnce = promisify(function(resolve, rej
         }
     }
 
-    megaChat.plugins.chatdIntegration._retrieveShardUrl(publicChatHandle, chatHandleOrId)
-        .then(function(ret) {
-            if (typeof ret === "string") {
-                resolve(ret);
-            }
-            else if (ret && ret.url) {
-                resolve(ret.url);
-            }
-            else {
-                reject(ret);
-            }
-        })
-        .catch(reject);
-});
+    return megaChat.plugins.chatdIntegration._retrieveShardUrl(publicChatHandle, chatHandleOrId)
+        .then((res) => {
+            const url = typeof res === "string" ? res : res && res.url;
+            assert(url && url.includes('://'));
+            return url;
+        });
+};
 
 // is this chatd connection currently active?
 Chatd.Shard.prototype.isOnline = function() {

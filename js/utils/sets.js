@@ -142,15 +142,14 @@ lazy(mega, 'sets', () => {
     };
 
     /**
-     * @param {Object.<String, any>} attrData Attribute data to encrypt
+     * @param {Object.<String, any>} attrData Set attribute data to encrypt
      * @param {String} [key] The already generated key in Base64 format, used when re-encryption is needed
-     * @param {Number} [length] The key length to generate (either 4 for Sets or 8 for elements as of now)
      * @returns {Object.<String, String>}
      */
-    const encryptAttr = (attrData, key = undefined, length = 8) => {
+    const encryptSetAttr = (attrData, key = undefined) => {
         const keyArr = (typeof key === 'string')
             ? decrypt_key(u_k_aes, base64_to_a32(key))
-            : Array.from({ length }, () => rand(0x100000000));
+            : [...crypto.getRandomValues(new Uint32Array(4))];
 
         return {
             at: tlvstore.encrypt(attrData, true, keyArr),
@@ -158,9 +157,13 @@ lazy(mega, 'sets', () => {
         };
     };
 
-    const encryptSetAttr = (attrData, key) => encryptAttr(attrData, key, 4);
-
-    const encryptElementAttr = (attrData, key) => encryptAttr(attrData, key, 8);
+    /**
+     * Decrypting the User's private set attribute
+     * @param {String} attr Encrypted set's attribute
+     * @param {String} key Decryption key
+     * @returns {Object.<String, any>}
+     */
+    const decryptSetAttr = (attr, key) => tlvstore.decrypt(attr, true, decrypt_key(u_k_aes, base64_to_a32(key)));
 
     /**
      * Getting all sets from the database and storing them into the memory for the future use
@@ -186,22 +189,15 @@ lazy(mega, 'sets', () => {
     };
 
     /**
-     * @param {String} attr Encrypted set's attribute
-     * @param {String} key Decryption key
-     * @returns {Object.<String, any>}
-     */
-    const decryptAttr = (attr, key) => tlvstore.decrypt(attr, true, decrypt_key(u_k_aes, base64_to_a32(key)));
-
-    /**
      * Send a specific Set or Element command to API
      * @param {String} a Action to send to API
      * @param {Object<String, String|Number>} options options to pass with the action
      * @returns {function(...[*]): Promise<void>}
      */
-    const sendReq = (a, options) => M.req({ a, ...options });
+    const sendReq = (a, options) => api.req({a, ...options}).then(({result}) => result);
 
     return {
-        decryptAttr,
+        decryptSetAttr,
         buildTmp,
         getElementsByIds: () => {
             return [];
@@ -344,24 +340,81 @@ lazy(mega, 'sets', () => {
         elements: {
             /**
              * @param {String} h Node handle to assosiate with the set
-             * @param {String} s Set id to add the element to
+             * @param {String} setId Set id to add the element to
+             * @param {String} setKey Set key to use for encryption
              * @returns {function(...[*]): Promise<void>}
              */
-            add: (h, s) => sendReq('aep', { h, s, k: encryptElementAttr('').k }),
+            add: (h, setId, setKey) => {
+                const n = M.d[h];
+
+                if (!n) {
+                    throw new Error('Cannot find the node to add to the set...');
+                }
+
+                return sendReq('aep', {
+                    h,
+                    s: setId,
+                    k: ab_to_base64(
+                        asmCrypto.AES_CBC.encrypt(
+                            a32_to_ab(n.k),
+                            a32_to_ab(decrypt_key(u_k_aes, base64_to_a32(setKey))),
+                            false
+                        )
+                    )
+                });
+            },
             /**
              * @param {String[]} handles Node handles to assosiate with the set
-             * @param {String} s Set id to add elements to
+             * @param {String} setId Set id to add elements to
+             * @param {String} setKey Set key (encrypted) to use for element key encryption
              * @returns {function(...[*]): Promise<void>}
              */
-            bulkAdd: (handles, s) => sendReq(
-                'aepb',
-                {
-                    s,
-                    e: handles.map(({ h, o }) => {
-                        return { h, o, k: encryptElementAttr('').k };
-                    })
+            bulkAdd: async(handles, setId, setKey) => {
+                const setPubKey = a32_to_ab(decrypt_key(u_k_aes, base64_to_a32(setKey)));
+                const e = [];
+                const savingEls = {};
+
+                for (let i = 0; i < handles.length; i++) {
+                    const { h, o } = handles[i];
+                    const n = M.d[h];
+
+                    if (!n) {
+                        dump(`Node ${h} cannot be added to the set...`);
+                        continue;
+                    }
+
+                    const el = {
+                        h,
+                        o,
+                        k: ab_to_base64(
+                            asmCrypto.AES_CBC.encrypt(
+                                a32_to_ab(n.k),
+                                setPubKey,
+                                false
+                            )
+                        )
+                    };
+
+                    savingEls[o] = el;
+                    e.push(el);
                 }
-            ),
+
+                const res = await sendReq('aepb', { s: setId, e });
+
+                for (let i = 0; i < res.length; i++) {
+                    if (!res[i] || !res[i].id) {
+                        continue;
+                    }
+
+                    const { id, o } = res[i];
+
+                    if (savingEls[o]) {
+                        savingEls[o].id = id;
+                    }
+                }
+
+                return Object.values(savingEls);
+            },
             /**
              * @param {String} id Element id to remove
              * @param {String} s Set id to remove from

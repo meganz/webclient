@@ -15,8 +15,6 @@ contrib/*
 scripts/*
 rsaasm.js
 sjcl.js
-e10s.js
-fileapi.js
 aesasm.js
 keygen.js
 makecache.js
@@ -32,4 +30,3 @@ contrib/Electron/main.js
 js/chat/emojidata/emojis.json
 eslint-local-rules.js
 Gruntfile.js
-

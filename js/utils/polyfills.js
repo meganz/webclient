@@ -170,6 +170,26 @@ if (typeof window.queueMicrotask !== "function") {
     };
 }
 
+if (typeof window.reportError !== "function") {
+
+    window.reportError = (exception) => {
+        'use strict';
+        queueMicrotask(() => {
+            // reach window.onerror
+            throw exception;
+        });
+    };
+}
+
+if (typeof structuredClone !== 'function') {
+
+    lazy(self, 'structuredClone', () => {
+        'use strict';
+        console.warn('Using weak structuredClone() method...', ua.details.prod);
+        return window.Dexie && Dexie.deepClone || window.clone;
+    });
+}
+
 if (typeof requestIdleCallback !== 'function') {
 
     Object.defineProperties(self, {
@@ -177,7 +197,7 @@ if (typeof requestIdleCallback !== 'function') {
             value(handler) {
                 'use strict';
                 const startTime = performance.now();
-                return setTimeout(() => {
+                return gSetTimeout(() => {
                     handler({
                         didTimeout: false,
                         timeRemaining() {
@@ -190,8 +210,17 @@ if (typeof requestIdleCallback !== 'function') {
         cancelIdleCallback: {
             value(id) {
                 'use strict';
-                clearTimeout(id);
+                gClearTimeout(id);
             }
+        }
+    });
+}
+
+if (Object.fromEntries === undefined) {
+    Object.defineProperty(Object, 'fromEntries', {
+        value(iter) {
+            'use strict';
+            return [...iter].reduce((obj, [k, v]) => ({...obj, [k]: v}), {});
         }
     });
 }
@@ -206,6 +235,20 @@ if (typeof requestIdleCallback !== 'function') {
         this.then(console.debug.bind(console, tag || 'OK'))
             .catch(console.warn.bind(console, tag || 'FAIL'));
         return this;
+    };
+    Promise.lock = function({name, resolve, reject, handler}) {
+        const rack = [[resolve], [reject || dump]];
+
+        const wrap = (type, i) => (a0) => {
+            type = rack[type];
+            i = type.length;
+            while (i--) {
+                type[i](a0);
+            }
+        };
+        const push = (type, callback) => wrap(type, rack[type].push(callback));
+
+        return mutex(name, (resolve, reject, a0) => handler(push(0, resolve), push(1, reject), a0));
     };
 
     // @todo remove once Fx60 is upgraded on Jenkins
@@ -235,15 +278,6 @@ if (typeof requestIdleCallback !== 'function') {
         };
     }
 
-    Object.defineProperty(Set.prototype, 'first', {
-        get: function first() {
-            for (const item of this) {
-                return item;
-            }
-            return false;
-        }
-    });
-
     if (!Array.prototype.flat) {
         const reduce = Array.prototype.reduce;
         const concat = Array.prototype.concat.bind([]);
@@ -266,6 +300,49 @@ if (typeof requestIdleCallback !== 'function') {
         });
     }
 })();
+
+mBroadcaster.once('boot_done', tryCatch(() => {
+    'use strict';
+    if (!window.ReadableStream) {
+        console.error('ReadableStream is not available.');
+        return;
+    }
+
+    // https://github.com/whatwg/streams/issues/1019
+    if (!Object.hasOwnProperty.call(ReadableStream.prototype, 'arrayBuffer')) {
+        let shim = async function() {
+            return new Response(this).arrayBuffer();
+        };
+        if ('WebStreamsPolyfill' in window) {
+            if (window.ReadableStream !== window.WebStreamsPolyfill.ReadableStream) {
+                console.error('Unexpected ReadableStream instance.');
+                return;
+            }
+
+            shim = async function() {
+                let size = 0;
+                const chunks = [];
+                for await (const chunk of this) {
+                    chunks.push(chunk);
+                    size += chunk.byteLength;
+                }
+                const res = new Uint8Array(size);
+
+                for (let i = 0, offset = 0; i < chunks.length; ++i) {
+                    res.set(chunks[i], offset);
+                    offset += chunks[i].byteLength;
+                }
+                chunks.length = 0;
+                return res.buffer;
+            };
+        }
+        Object.defineProperty(ReadableStream.prototype, 'arrayBuffer', {
+            value: shim,
+            writable: true,
+            configurable: true
+        });
+    }
+}));
 
 mBroadcaster.once('boot_done', function() {
     'use strict';
@@ -387,7 +464,7 @@ class LRUMap extends Map {
     constructor(capacity = 250, notifier = null) {
         super();
         Object.defineProperty(this, 'capacity', {value: capacity});
-        Object.defineProperty(this, 'notifier', {value: notifier || self.d > 0 && dump.bind(null, [this])});
+        Object.defineProperty(this, 'notifier', {value: notifier || self.d > 1 && dump.bind(null, [this])});
     }
     get(key) {
         if (super.has(key)) {
@@ -410,8 +487,45 @@ class LRUMap extends Map {
         }
         super.set(key, value);
     }
+
     get [Symbol.toStringTag]() {
         return 'LRUMap';
+    }
+}
+
+class LRULapse extends LRUMap {
+    constructor(seconds = 8, capacity = 15, notifier = null) {
+        super(capacity, notifier);
+        Object.defineProperty(this, 'lapse', {value: seconds});
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'LRULapse';
+    }
+
+    has(key) {
+        if (super.has(key)) {
+            const {lapse} = super.get(key);
+
+            if (lapse > Date.now()) {
+                return true;
+            }
+
+            super.delete(key);
+            return false;
+        }
+    }
+
+    get(key) {
+        // xxx: we shall require has() always precedes a call to
+        // get(), otherwise we will unnecessarily invoke it twice.
+        if (super.has(key)) {
+            return super.get(key).value;
+        }
+    }
+
+    set(key, value, lapse) {
+        return super.set(key, {value, lapse: Date.now() + (lapse || this.lapse) * 1e3});
     }
 }
 
@@ -588,6 +702,131 @@ tryCatch((mock) => {
     }
 });
 
+/** @function window.deepFreeze */
+lazy(self, 'deepFreeze', () => {
+    'use strict';
+    let refs = null;
+    const freeze = tryCatch((o) => self.freeze(o));
+    const TypedArray = Object.getPrototypeOf(Uint16Array);
+    const innerDeepFreeze = (obj) => {
+        if (!obj || typeof obj !== 'object' && typeof obj !== 'function' || refs.has(obj)) {
+
+            return obj;
+        }
+        refs.add(obj);
+
+        if (!Object.isExtensible(obj) || obj instanceof TypedArray) {
+
+            return obj;
+        }
+
+        if (Array.isArray(obj)) {
+
+            for (let i = obj.length; i--;) {
+
+                obj[i] = innerDeepFreeze(obj[i]);
+            }
+        }
+        else {
+            const ownKeys = Reflect.ownKeys(obj);
+
+            for (let i = ownKeys.length; i--;) {
+                const p = ownKeys[i];
+
+                if (Reflect.getOwnPropertyDescriptor(obj, p).value) {
+
+                    innerDeepFreeze(obj[p]);
+                }
+            }
+        }
+
+        return freeze(obj) || obj;
+    };
+
+    return (obj) => {
+        refs = new WeakSet();
+        const rv = tryCatch(innerDeepFreeze)(obj);
+        refs = null;
+        return rv || false;
+    };
+});
+
 // }}} END: Helpers, with direct dependency on polyfills or latest ECMAScript
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
+
+if (!self.is_karma && self.LockManager && navigator.locks instanceof self.LockManager) {
+    self.mutex = (name, handler) => {
+        'use strict';
+        return function(...args) {
+            // console.warn(`mutex-lock.${name}`, args);
+            return navigator.locks.request(`mega-mutex:${name}`, async() => {
+                return new Promise((resolve, reject) => {
+                    Promise.resolve(handler.apply(this, [resolve, reject, ...args])).catch(reject);
+                });
+            });
+        };
+    };
+    self.mutex.lock = async(name) => {
+        'use strict';
+        const locker = mega.promise;
+        navigator.locks.request(`mega-mutex-lock:${name}`, async() => {
+            const helder = mega.promise;
+            const unlock = async() => helder.resolve();
+            // @todo this could lead to deadlocks, but just like the former mutex.lock()..
+            // locker.finally(unlock);
+            locker.resolve(unlock);
+            return helder;
+        });
+        return locker;
+    };
+}
+else if (!navigator.locks) {
+    // Web Locks API Shim.
+    Object.defineProperty(navigator, 'locks', {
+        value: freeze({
+            async query() {
+                'use strict';
+                const held = [];
+                const pending = [];
+                const add = (where, name) => where.push({clientId: requesti, mode: 'exclusive', name});
+
+                for (const name in mutex.queue) {
+                    add(held, name);
+                    for (let i = mutex.queue[name].length; i--;) {
+                        add(pending, name);
+                    }
+                }
+                return {held, pending};
+            },
+
+            async request(name, callback) {
+                'use strict';
+                assert(typeof callback === 'function', 'The options parameter is not supported.');
+                return mutex(`web-lock:${name}`, (resolve, reject) => {
+                    // navigator.locks.query().dump('l.query')
+                    Promise.resolve(callback()).then(resolve).catch(reject);
+                })();
+            }
+        })
+    });
+}
+
+function mWebLockWrap(proto, method, name) {
+    'use strict';
+
+    const func = proto[method];
+    const ident = name || makeUUID();
+
+    proto[method] = async function(...args) {
+        const name = this.__ident_0 || ident;
+
+        // eslint-disable-next-line compat/compat
+        return navigator.locks.request(name, async(lock) => {
+            if (d > 1) {
+                console.debug(`web-lock '${name}' acquired...`, lock, args);
+            }
+            return func.apply(this, args);
+        });
+    };
+}

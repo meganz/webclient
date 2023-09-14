@@ -26,7 +26,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
 
         var displayName;
         if (contact) {
-            displayName = generateAvatarMeta(contact.u).fullName;
+            displayName = M.getNameByHandle(contact.u);
         }
         else {
             displayName = contact;
@@ -44,7 +44,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
             var avatar = <ContactsUI.Avatar contact={otherContact}
                 chatRoom={self.props.chatRoom}
                 className="message avatar-wrapper small-rounded-avatar"/>;
-            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+            var otherDisplayName = M.getNameByHandle(otherContact.u);
 
             const isSelfJoin = h === contact.u;
             let text = isSelfJoin
@@ -90,7 +90,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
             var avatar = <ContactsUI.Avatar contact={otherContact}
                 chatRoom={self.props.chatRoom}
                 className="message avatar-wrapper small-rounded-avatar"/>;
-            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+            var otherDisplayName = M.getNameByHandle(otherContact.u);
 
             var text;
             if (otherContact.u === contact.u) {

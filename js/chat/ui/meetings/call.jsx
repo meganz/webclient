@@ -180,6 +180,7 @@ export default class Call extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
+        this.pCallTimer = null;
         this.state.mode = props.call.viewMode;
         this.state.sidebar = props.chatRoom.type === 'public';
     }
@@ -207,12 +208,12 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleCallOffline() {
-        if (this.offlineDelayed) {
-            return;
+        if (!this.pCallTimer) {
+            (this.pCallTimer = tSleep(30))
+                .then(() => {
+                    this.setState({offline: true});
+                });
         }
-        this.offlineDelayed = delay('callOffline', () => {
-            this.setState({offline: true});
-        }, 3e4);
     }
 
     /**
@@ -222,9 +223,11 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleCallOnline = () => {
-        delay.cancel(this.offlineDelayed);
-        delete this.offlineDelayed;
-        this.setState({ offline: false });
+        if (this.pCallTimer) {
+            this.pCallTimer.abort();
+            this.pCallTimer = null;
+        }
+        this.setState({offline: false});
     };
 
     // Force as always visible.
@@ -552,7 +555,8 @@ export default class Call extends MegaRenderMixin {
             this.handleEphemeralAdd(handle)
         );
         this.pageChangeListener = mBroadcaster.addListener('pagechange', () => {
-            if (Call.isExpanded() && (!M.chat || megaChat.getCurrentRoom().chatId !== chatRoom.chatId)) {
+            const currentRoom = megaChat.getCurrentRoom();
+            if (Call.isExpanded() && (!M.chat || currentRoom && currentRoom.chatId !== chatRoom.chatId)) {
                 this.handleCallMinimize();
             }
         });

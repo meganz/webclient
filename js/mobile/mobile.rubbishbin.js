@@ -12,11 +12,11 @@ mobile.rubbishBin = {
         'use strict';
 
         mobile.rubbishBin.isRestoring = true;
-        var p = M.revertRubbishNodes(nodeHandle);
-        p.always(function() {
-            mobile.rubbishBin.isRestoring = false;
-        });
-        return p;
+        return M.revertRubbishNodes(nodeHandle)
+            .catch(tell)
+            .finally(() => {
+                mobile.rubbishBin.isRestoring = false;
+            });
     },
 
     /**

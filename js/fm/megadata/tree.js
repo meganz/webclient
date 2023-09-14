@@ -152,7 +152,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
         }
     }
 
-    var btd = d > 1;
+    const btd = d > 2;
     if (btd) {
         console.group('BUILDTREE for "' + n.h + '"');
     }
@@ -258,6 +258,8 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 node.classList.add('contains-folders');
             }
         }
+        const tn = fmconfig.treenodes || Object.create(null);
+        const dn = $.openedDialogNodes || Object.create(null);
 
         for (var idx = 0; idx < folders.length; idx++) {
             buildnode = false;
@@ -265,8 +267,8 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
             containsc = this.tree[curItemHandle] || '';
             name = folders[idx].name;
 
-            if (curItemHandle === M.RootID || Object(fmconfig.treenodes).hasOwnProperty(typefix + curItemHandle) ||
-                dialog && Object($.openedDialogNodes).hasOwnProperty(curItemHandle)) {
+            if (curItemHandle === M.RootID || tn[typefix + curItemHandle] || dialog && dn[curItemHandle]) {
+
                 if (containsc) {
                     buildnode = true;
                 }
@@ -351,11 +353,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 else if (folders[idx].t & M.IS_SHARED) {
                     node.classList.add('shared-folder');
                 }
-                else if (
-                    mega.fileRequestCommon.storage.cache.puHandle[curItemHandle]
-                    && mega.fileRequestCommon.storage.cache.puHandle[curItemHandle].s !== 1
-                    && mega.fileRequestCommon.storage.cache.puHandle[curItemHandle].p
-                ) {
+                else if (mega.fileRequest.publicFolderExists(curItemHandle, true)) {
                     node.classList.add('file-request-folder');
                 }
                 else if (curItemHandle === M.CameraId) {
@@ -1074,24 +1072,6 @@ MegaData.prototype.getOutShareTree = function() {
 };
 
 /**
- * Create tree of file-request's children. Same structure as M.tree
- * @return {Object} file requests tree
- */
-MegaData.prototype.getFileRequestsTree = function() {
-    'use strict';
-
-    const fileRequestsTree = {};
-    const currentPuFolders = mega.fileRequest.getPuHandleList();
-    for (const puHandleKey in currentPuFolders) {
-        if (currentPuFolders[puHandleKey] && M.d[puHandleKey]) {
-            fileRequestsTree[puHandleKey] = Object.assign({}, M.d[puHandleKey]);
-        }
-    }
-
-    return fileRequestsTree;
-};
-
-/**
  * Get t value of custom view trees
  * @return {MegaNode} An ufs-node
  */
@@ -1324,7 +1304,7 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     var scrollTo = false;
     var stickToTop;
     if (d) {
-        console.group('onTreeUIOpen', id);
+        console.group('onTreeUIOpen', id, event, ignoreScroll);
         console.time('onTreeUIOpen');
     }
 
@@ -1392,7 +1372,10 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
         $.hideContextMenu(event);
     }
 
-    $('.fm-tree-panel .nw-fm-tree-item').removeClass('selected on-gallery');
+    const elms = document.querySelectorAll('.fm-tree-panel .nw-fm-tree-item');
+    for (let i = elms.length; i--;) {
+        elms[i].classList.remove('selected', 'on-gallery');
+    }
 
     if (cv) {
         target = document.querySelector(`#treea_${cv.prefixTree}${id.split('/')[1]}`);

@@ -33,18 +33,11 @@ var loginFromEphemeral = {
          * @param {Boolean} rememberMe Whether the user clicked the Remember me checkbox or not
          */
         startLogin: function(email, password, pinCode, rememberMe) {
-
             'use strict';
 
-            postLogin(email, password, pinCode, rememberMe, (result) => {
-
-                // Check if we can upgrade the account to v2
-                security.login.checkToUpgradeAccountVersion(result, u_k, password, () => {
-
-                    // Otherwise proceed with regular login
-                    loginFromEphemeral.completeLogin(result);
-                });
-            });
+            postLogin(email, password, pinCode, rememberMe)
+                .then((res) => loginFromEphemeral.completeLogin(res))
+                .catch(tell);
         }
     },
 
@@ -107,15 +100,18 @@ var loginFromEphemeral = {
                 var msg = l[16517].replace('%1', rv.email);
 
                 // On dialog confirm, import the ephemeral session files to the user's Inbox
-                msgDialog('info', l[761], msg, null, function() {
-                    $.onImportCopyNodes = $.ephNodes;
-                    M.copyNodes(['meh'], u_handle, false, function(e) {
-                        if (!Array.isArray(e)) {
-                            console.error(e);
-                        }
-                        queueMicrotask(reload);
-                    });
-                });
+                msgDialog('info', l[761], msg, null, tryCatch(() => {
+
+                    const req = {a: 'p', n: $.ephNodes, v: 3};
+
+                    for (let i = req.n.length; i--;) {
+                        const n = req.n[i];
+                        n.k = a32_to_base64(encrypt_key(u_k_aes, n.k));
+                    }
+
+                    return api.req(req).catch(tell).finally(reload);
+
+                }, reload));
             }
             else {
                 // Show message that they've been successfully logged in then on OK reload the page
@@ -159,7 +155,7 @@ function registeraccount() {
         names[M.RootID] = 'ephemeral-account';
 
         M.getCopyNodes([M.RootID], null, names)
-            .done((nodes) => {
+            .then((nodes) => {
                 if (Array.isArray(nodes) && nodes.length) {
                     $.ephNodes = nodes;
                     $.ephNodes[0].t = 1; // change RootID's t2 to t1
@@ -288,7 +284,7 @@ function pageregister() {
                                 signin.new.startLogin);
 
                             // I need this event handler to be triggered only once after successful sub-user login
-                            mBroadcaster.once('fm:initialized', M.importWelcomePDF);
+                            mBroadcaster.once('fm:initialized', () => M.importWelcomePDF().catch(dump));
                             delete localStorage.businessSubAc;
                         }
                     },

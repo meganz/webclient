@@ -82,32 +82,27 @@ function SoonFc(ms, global, callback) {
  */
 function delay(aProcID, aFunction, aTimeout) {
     'use strict';
-
-    // Let aProcID be optional...
-    if (typeof aProcID === 'function') {
-        aTimeout = aFunction;
-        aFunction = aProcID;
-        aProcID = aFunction.name || MurmurHash3(String(aFunction));
-    }
+    let q = delay.queue[aProcID];
+    const t = Math.max(aTimeout | 0 || 200, 40);
 
     if (d > 2) {
-        console.debug("delay'ing", aProcID, delay.queue[aProcID]);
+        console.warn(`delaying <<${aProcID}>> for ${aTimeout}ms...`, q);
     }
 
-    var t = aTimeout | 0 || 350;
-    var q = delay.queue[aProcID];
     if (!q) {
         q = delay.queue[aProcID] = Object.create(null);
 
         q.pun = aProcID;
         q.tid = setTimeout(() => {
+            const rem = q.tde - (performance.now() - q.tik);
+            const rdy = rem < 50 || rem * 100 / q.tde < 2;
+
             if (d > 2) {
-                console.debug('dispatching delayed function...', aProcID);
+                console.warn('dispatching delayed function...', aProcID, q.tde, rem, rdy);
             }
             delete delay.queue[q.pun];
 
-            var rem = q.tde - (performance.now() - q.tik);
-            if (rem < 20) {
+            if (rdy) {
                 queueMicrotask(q.tsk);
             }
             else {
@@ -154,21 +149,27 @@ lazy(self, 'tSleep', function tSleep() {
     const RFP_THRESHOLD = 20;
     const MIN_THRESHOLD = 100;
     const MAX_THRESHOLD = 4e7;
-    const TID = `^^tSleep::scheduler~~`;
 
     const pending = new Set();
+    const symbol = Symbol('^^tSleep::scheduler~~');
+
+    let tid = null;
     let threshold = MAX_THRESHOLD;
 
-    const dispatcher = () => {
+    const dequeue = () => {
         const tick = performance.now();
 
+        tid = null;
         threshold = MAX_THRESHOLD;
+
         for (const resolve of pending) {
             const {ts, now, data} = resolve;
             const elapsed = tick - now;
 
             if (elapsed + RFP_THRESHOLD > ts) {
-                resolve(data);
+                if (ts !== -1) {
+                    resolve(data);
+                }
                 pending.delete(resolve);
             }
             else {
@@ -177,8 +178,18 @@ lazy(self, 'tSleep', function tSleep() {
         }
 
         if (pending.size) {
-            delay(TID, dispatcher, threshold);
+            if (self.d > 2) {
+                console.warn(`tSleep rescheduled for ${threshold | 0}ms`, pending);
+            }
+            tid = gSetTimeout(dequeue, threshold);
         }
+    };
+
+    const dispatcher = () => {
+        if (tid) {
+            gClearTimeout(tid);
+        }
+        dequeue();
     };
 
     const schedule = (resolve, ts, data) => {
@@ -190,36 +201,164 @@ lazy(self, 'tSleep', function tSleep() {
         resolve.now = performance.now();
         pending.add(resolve);
 
-        if (ts < threshold || !delay.has(TID)) {
-            delay.cancel(TID);
-            delay(TID, dispatcher, threshold = ts);
+        if (ts < threshold || !tid) {
+
+            dispatcher();
         }
 
         return mIncID;
     };
 
-    const abort = (pid, promise) => {
-        Object.defineProperty(promise, 'aborted', {value: -pid | 1});
-
-        for (const resolve of pending) {
-            if (resolve.id === pid) {
-                pending.delete(resolve);
-
-                if (!pending.size) {
-                    delay.cancel(TID);
-                }
-                return resolve.data || -pid;
+    const lookup = (pid) => {
+        for (const obj of pending) {
+            if (obj.id === pid) {
+                return obj;
             }
         }
     };
 
-    return (ts, data) => {
+    const restart = (promise) => {
+        const timer = lookup(promise.pid);
+        if (timer) {
+            const tick = performance.now();
+            const elapsed = tick - timer.now;
+
+            if (self.d > 2) {
+                const {id, ts} = timer;
+                console.warn(`tSleep(${id}) restarted after ${elapsed | 0}/${ts}ms elapsed...`, promise);
+            }
+
+            timer.now = tick;
+            return elapsed;
+        }
+
+        console.error('Unknown timer...', promise);
+    };
+
+    const abort = (promise, state = 'aborted', data = null) => {
+        let res = false;
+
+        if (!Object.isFrozen(promise)) {
+            const {pid} = promise;
+            const timer = lookup(pid);
+
+            if (timer) {
+                res = timer.data || -pid;
+
+                if (state === 'aborted') {
+                    timer.ts = -1;
+                    timer.data = null;
+                }
+                else {
+                    queueMicrotask(dispatcher);
+
+                    timer.ts = 0;
+                    timer.data = data || timer.data;
+                }
+                Object.defineProperty(promise, state, {value: -pid | 1});
+            }
+
+            freeze(promise);
+        }
+
+        return res;
+    };
+
+    /**
+     * Promise-based setTimeout() replacement.
+     * @param {Number} ts time to wait in seconds.
+     * @param {*} [data] arbitrary data to pass through.
+     * @returns {Promise<*>} promise
+     * @name tSleep
+     * @memberOf window
+     */
+    const tSleep = (ts, data) => {
         let pid;
         const promise = new Promise((resolve) => {
             pid = schedule(resolve, ts * 1e3, data);
         });
-        return Object.defineProperty(promise, 'abort', {value: () => abort(pid, promise)});
+        return Object.defineProperties(promise, {
+            'pid': {
+                value: pid
+            },
+            'abort': {
+                value() {
+                    return abort(this);
+                }
+            },
+            'expedite': {
+                value(data) {
+                    return this.signal('expedited', data);
+                }
+            },
+            'restart': {
+                value() {
+                    return restart(this);
+                }
+            },
+            'signal': {
+                value(state, data) {
+                    return abort(this, state, data);
+                }
+            }
+        });
     };
+
+    /**
+     * Scheduler helper. This is similar to delay(), but without adding new setTimeout()s per call.
+     * @param {Number} timeout in seconds (9s min recommended, to prevent unnecessary abort()s)
+     * @param {Object|*} instance holder to attach private timer properties
+     * @param {Function} [callback] function notifier
+     * @memberOf tSleep
+     * @returns {*} timer
+     */
+    tSleep.schedule = (timeout, instance, callback) => {
+        const obj = instance[symbol] = instance[symbol] || {timer: null, tick: Date.now() / 1e3, timeout};
+
+        if (obj.timer) {
+            const now = Date.now() / 1e3;
+
+            if (obj.timer.aborted) {
+                obj.tick = now;
+                obj.timer = null;
+            }
+            else if (timeout < obj.timeout) {
+                obj.tick = now;
+                obj.timer.abort();
+                obj.timer = null;
+            }
+            else if (now - obj.tick > timeout >> 3) {
+                obj.tick = now;
+                obj.timer.restart();
+            }
+        }
+
+        if (!obj.timer) {
+            if (callback === undefined) {
+                assert(typeof instance === 'function');
+                callback = instance;
+            }
+            (obj.timer = tSleep(obj.timeout = timeout))
+                .then(() => {
+                    if (obj === instance[symbol]) {
+                        instance[symbol] = null;
+
+                        if (!obj.timer.aborted) {
+                            queueMicrotask(callback);
+                            obj.timer.aborted = -1;
+                        }
+                    }
+                    else if (d) {
+                        console.warn('tSleep() instance hot-swapped', obj, instance);
+                    }
+                })
+                .catch(nop);
+        }
+
+        return obj.timer;
+    };
+
+    return freeze(tSleep);
 });
 
 /**
@@ -308,7 +447,9 @@ lazy(self, 'sleep', function sleep() {
 
     Promise.race([
         mega.worklet, tSleep(11).then(() => {
-            throw new SecurityError('Timed out.');
+            if (!worklet.ready) {
+                throw new SecurityError('Timed out.');
+            }
         })
     ]).then((ctx) => {
         // override as the only class instance.
@@ -382,3 +523,151 @@ lazy(self, 'sleep', function sleep() {
         })());
     });
 })();
+
+tryCatch(() => {
+    'use strict';
+    window.setInterval = () => {
+
+        throw new TypeError(`Invalid setInterval() invocation at runtime.`);
+    };
+})();
+
+mBroadcaster.once('boot_done', tryCatch(() => {
+    'use strict';
+    let pid = Math.random() * Date.now() >>> 9;
+
+    const running = Object.create(null);
+    const logger = new MegaLogger(`GTR:${pid.toString(16)}`);
+    const dump = (ex) => logger.error(ex, reportError(ex));
+
+    const IDLE_TIMEOUT = freeze({timeout: 100});
+    const IDLE_PIPELINE = {ts: 0, pid: 0, tasks: []};
+
+    const idleCallbackTaskSorter = (a, b) => b.ms - a.ms || b.pri - a.pri;
+
+    const idleCallbackTaskDispatcher = (pid, ms, f, args) => {
+
+        if (ms < 30) {
+            if (self.d > 2) {
+                logger.warn('Expediting ICTask...', ms, pid);
+            }
+            delete running[pid];
+            queueMicrotask(() => f(...args));
+        }
+        else {
+
+            (running[pid] = tSleep(ms / 1e3))
+                .then(() => {
+                    if (running[pid]) {
+                        running[pid] = 'dispatching';
+                        return f(...args);
+                    }
+                })
+                .catch(dump)
+                .finally(() => {
+                    delete running[pid];
+                });
+        }
+    };
+
+    const idleCallbackHandler = (res) => {
+        const {ts, tasks} = IDLE_PIPELINE;
+        const elapsed = performance.now() - ts;
+
+        // Sort tasks so that there can only be ONE tSleep()'s dispatcher invocation.
+        tasks.sort(idleCallbackTaskSorter);
+
+        for (let i = tasks.length; i--;) {
+            const {ms, f, args, pid} = tasks[i];
+
+            if (running[pid] === 'starting') {
+
+                idleCallbackTaskDispatcher(pid, ms - elapsed, f, args);
+            }
+        }
+
+        if (self.d > 2) {
+            const rem = res.didTimeout ? -1 : res.timeRemaining();
+
+            // Print out a warning if there are less than 5ms left until the next re-paint.
+            logger[rem < 0 ? 'debug' : rem < 5 ? 'warn' : 'info'](`${tasks.length} ICTask(s) handled...`, elapsed, rem);
+        }
+
+        IDLE_PIPELINE.pid = null;
+        IDLE_PIPELINE.tasks = [];
+    };
+
+    const scheduleIdleCallback = (task) => {
+        IDLE_PIPELINE.tasks.push(task);
+
+        if (!IDLE_PIPELINE.pid) {
+            IDLE_PIPELINE.ts = performance.now();
+            IDLE_PIPELINE.pid = requestIdleCallback(idleCallbackHandler, IDLE_TIMEOUT);
+        }
+    };
+
+    const dspInterval = async(pid, ms, callback) => {
+        running[pid] = 1;
+
+        do {
+            await tSleep(ms);
+
+            if (running[pid]) {
+
+                // logger.warn('tick', pid);
+                callback();
+            }
+        }
+        while (running[pid]);
+    };
+
+    window.setInterval = function(f, ms, ...args) {
+        dspInterval(++pid, Math.max(ms | 0, 1e3) / 1e3, tryCatch(() => f(...args))).catch(dump);
+
+        logger.warn('setInterval', pid, ms);
+        return pid;
+    };
+
+    window.clearInterval = function(pid) {
+
+        logger.warn('clearInterval', pid, running[pid]);
+        delete running[pid];
+    };
+
+    window.setTimeout = function(f, ms, ...args) {
+
+        if ((ms |= 0) < 30) {
+            // logger.warn(`Short timeout (${ms}ms), dispatching micro-task...`);
+            queueMicrotask(() => f(...args));
+            return 0;
+        }
+        const pid = makeUUID();
+
+        running[pid] = 'starting';
+        scheduleIdleCallback({ms, f, args, pid, pri: ++mIncID});
+
+        // logger.warn('setTimeout', pid, ms);
+        return pid;
+    };
+
+    window.clearTimeout = function(pid) {
+        // logger.warn('clearTimeout', pid, running[pid]);
+
+        if (pid) {
+            if (typeof pid === 'string') {
+
+                if (running[pid]) {
+
+                    if (running[pid] instanceof Promise) {
+
+                        running[pid].abort();
+                    }
+                    delete running[pid];
+                }
+            }
+            else {
+                gClearTimeout(pid);
+            }
+        }
+    };
+}));

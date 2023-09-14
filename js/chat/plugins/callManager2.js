@@ -148,7 +148,7 @@
         }
         hdReleaseTimerStop() {
             if (this.hdReleaseTimer) {
-                clearTimeout(this.hdReleaseTimer);
+                clearInterval(this.hdReleaseTimer);
                 delete this.hdReleaseTimer;
                 delete this.targetQuality;
             }
@@ -396,13 +396,13 @@
             this.chatRoom = chatRoom;
             this.callId = callId;
             this.peers = new Peers(this);
-            // eslint-disable-next-line no-use-before-define
             this.localPeerStream = new LocalPeerStream(this);
             this.viewMode = CALL_VIEW_MODES.GRID;
+            this.stayOnEnd = !!mega.config.get('callemptytout');
+
             chatRoom.meetingsLoading = l.joining;
             // Peer is alone in a group call after 1 min -> mute mic
-            delay('call:init', this.muteIfAlone.bind(this), 6e4);
-            this.stayOnEnd = !!mega.config.get('callemptytout');
+            tSleep(60).then(() => this.muteIfAlone()).catch(dump);
         }
         setSfuClient(sfuClient) { // Call and sfuClient reference each other and need post-construction linking
             this.sfuClient = sfuClient;

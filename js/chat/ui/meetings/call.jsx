@@ -552,7 +552,8 @@ export default class Call extends MegaRenderMixin {
             this.handleEphemeralAdd(handle)
         );
         this.pageChangeListener = mBroadcaster.addListener('pagechange', () => {
-            if (Call.isExpanded() && (!M.chat || megaChat.getCurrentRoom().chatId !== chatRoom.chatId)) {
+            const currentRoom = megaChat.getCurrentRoom();
+            if (Call.isExpanded() && (!M.chat || currentRoom && currentRoom.chatId !== chatRoom.chatId)) {
                 this.handleCallMinimize();
             }
         });

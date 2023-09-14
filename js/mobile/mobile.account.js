@@ -458,7 +458,7 @@ mobile.account = {
             $twoFactorBlock.removeClass('hidden');
 
             // Check if 2FA is enabled on the account
-            mobile.twofactor.isEnabledForAccount(function(result) {
+            mobile.twofactor.isEnabledForAccount().then((result) => {
 
                 // If enabled, show green icon and text to Disable 2FA
                 if (result) {
@@ -696,25 +696,24 @@ mobile.account = {
             loadingDialog.show();
 
             // Check if 2FA is enabled on their account
-            mobile.twofactor.isEnabledForAccount(function(result) {
+            mobile.twofactor.isEnabledForAccount()
+                .then((result) => {
 
-                loadingDialog.hide();
+                    loadingDialog.hide();
 
-                // If 2FA is enabled
-                if (result) {
+                    // If 2FA is enabled
+                    if (result) {
 
-                    // Show the verify 2FA page to collect the user's PIN
-                    mobile.twofactor.verifyAction.init(function(twoFactorPin) {
+                        // Show the verify 2FA page to collect the user's PIN
+                        return mobile.twofactor.verifyAction.init();
+                    }
+                })
+                .then((twoFactorPin) => {
 
-                        // Complete the cancellation process
-                        mobile.account.continueAccountCancelProcess($page, twoFactorPin);
-                    });
-                }
-                else {
                     // Complete the cancellation process
-                    mobile.account.continueAccountCancelProcess($page, null);
-                }
-            });
+                    mobile.account.continueAccountCancelProcess($page, twoFactorPin || null);
+                })
+                .catch(tell);
         },
         // Close button callback to re-show the My Account page
         function() {

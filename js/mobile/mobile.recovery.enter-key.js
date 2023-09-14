@@ -106,36 +106,14 @@ mobile.recovery.enterKey = {
         loadingDialog.show();
 
         // Send the recovery code back to the API for verification (ERX / email request validate and execute)
-        security.resetKey(recoveryCode, recoveryKeyArray, recoveryEmail, null, function(result) {
-
-            loadingDialog.hide();
-
-            // If success
-            if (result === 0) {
-
+        security.resetKey(recoveryCode, recoveryKeyArray, recoveryEmail)
+            .then(() => {
                 // Store for use by the next page
                 mobile.recovery.enterKey.recoveryKeyArray = recoveryKeyArray;
 
                 // Load the change password screen
                 loadSubPage('recoverykeychangepass');
-            }
-
-            // If invalid master key, show error
-            else if (result === EKEY) {
-                mobile.messageOverlay.show(l[1977], l[1978]);
-            }
-
-            // If the account they are trying to reset is blocked, show an error
-            else if (result === EBLOCKED) {
-                mobile.messageOverlay.show(l[1979], l[1980]);
-            }
-
-            // If an invalid/expired/already used code, show an error
-            else if (result === EEXPIRED || result === ENOENT) {
-                mobile.messageOverlay.show(l[1966], l[1967], function() {
-                    loadSubPage('login');
-                });
-            }
-        });
+            })
+            .catch(tell);
     }
 };

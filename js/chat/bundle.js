@@ -223,10 +223,8 @@ class ChatRouting {
           }
         };
         join();
-        M.req(mciphReq).then(() => {
-          join();
-        }).catch(ex => {
-          if (ex === -12) {
+        asyncApiReq(mciphReq).then(join).catch(ex => {
+          if (ex === EEXIST) {
             join();
           } else {
             loadingDialog.phide();
@@ -1482,7 +1480,7 @@ var call = __webpack_require__(755);
 
 
 __webpack_require__(62);
-__webpack_require__(455);
+__webpack_require__(804);
 __webpack_require__(336);
 
 
@@ -1518,7 +1516,7 @@ function Chat() {
   this._queuedMccPackets = [];
   this._queuedMcsmPackets = {};
   this._queuedMessageUpdates = [];
-  this._queuedChatRoomEvents = {};
+  this._queuedChatRoomEvents = Object.create(null);
   this.handleToId = Object.create(null);
   this.publicChatKeys = Object.create(null);
   this.CONSTANTS = {
@@ -1930,7 +1928,7 @@ Chat.prototype.registerUploadListeners = function () {
         if (d) {
           logger.debug('Attaching node[%s] to chat room[%s]...', ul.h, room.chatId, ul.uid, ul, M.d[ul.h]);
         }
-        room.attachNodes([ul.h]);
+        room.attachNodes([ul.h]).catch(dump);
       });
       delete ulmanager.ulEventData[ul.uid];
       unregisterListeners();
@@ -2001,7 +1999,7 @@ Chat.prototype.registerUploadListeners = function () {
     if (ul) {
       ul.efa = Math.max(0, ul.efa - nFAiled) | 0;
       if (ul.h) {
-        var n = M.d[ul.h] || false;
+        const n = M.getNodeByHandle(ul.h);
         if (!ul.efa || n.fa && String(n.fa).split('/').length >= ul.efa) {
           onUploadComplete(ul);
         }
@@ -2337,60 +2335,48 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
   return [roomId, room, new Promise((resolve, reject) => {
     this.trigger('onRoomInitialized', [room, resolve, reject]);
     room.setState(ChatRoom.STATE.JOINING);
-    if (this._queuedChatRoomEvents[chatId]) {
-      for (const event of this._queuedChatRoomEvents[chatId]) {
-        room.trigger(event[0], event[1]);
-      }
+    const q = this._queuedChatRoomEvents[chatId];
+    if (q) {
       delete this._queuedChatRoomEvents[chatId];
-      delete this._queuedChatRoomEvents[`${chatId}_timer`];
+      for (let i = 0; i < q.length; ++i) {
+        const [event, data] = q[i];
+        if (d) {
+          this.logger.debug(`Dispatching deferred event '${event}'`, data);
+        }
+        room.trigger(event, data);
+      }
+      q.timer.abort();
     }
     this.processQueuedMcsmPackets();
   })];
 };
-Chat.prototype.initContacts = function (userHandles, cvalue) {
+Chat.prototype.initContacts = function (userHandles, c) {
   const newUsers = [];
   for (let i = userHandles.length; i--;) {
-    const userHandle = userHandles[i];
-    let isNew = false;
-    if (!(userHandle in M.u)) {
-      M.addUser(new MegaDataObject(MEGA_USER_STRUCT, {
-        h: userHandle,
-        u: userHandle,
-        m: '',
-        c: cvalue
-      }));
-      isNew = true;
-    }
-    if (!M.u[userHandle]._chatListener) {
-      M.u[userHandle]._chatListener = M.u[userHandle].addChangeListener(() => {
-        this.proxyUserChangeToRooms(userHandle);
-      });
-      if (!is_chatlink && !M.u[userHandle].m) {
-        M.syncContactEmail(userHandle, undefined, true);
-      }
-      if (!M.u[userHandle].c && !isNew) {
-        attribCache.removeItem(`${userHandle}_firstname`);
-        attribCache.removeItem(`${userHandle}_lastname`);
-        M.syncUsersFullname(userHandle);
-      }
-    }
-    if (isNew) {
-      newUsers.push(userHandle);
-    }
+    const u = userHandles[i];
+    const e = (u in M.u);
+    M.addUser(e ? {
+      u
+    } : {
+      u,
+      c
+    }, e || !newUsers.push(u));
   }
   return newUsers;
 };
 Chat.prototype.proxyUserChangeToRooms = function (handle) {
-  const rooms = Object.values(this.chats);
-  if (d > 1) {
-    console.debug('userChange', handle);
-  }
-  for (let i = 0; i < rooms.length; i++) {
-    const chatRoom = rooms[i];
-    if (Object.keys(chatRoom.members).includes(handle)) {
-      chatRoom.trackDataChange('user-updated', handle);
+  delay(`chat:proxy-user-change-to-rooms.${handle}`, () => {
+    const rooms = Object.values(this.chats);
+    if (d) {
+      this.logger.debug('userChange', handle);
     }
-  }
+    for (let i = rooms.length; i--;) {
+      const chatRoom = rooms[i];
+      if (handle in chatRoom.members) {
+        chatRoom.trackDataChange('user-updated', handle);
+      }
+    }
+  }, 350);
 };
 Chat.prototype.smartOpenChat = function (...args) {
   var self = this;
@@ -2870,9 +2856,12 @@ Chat.prototype.onChatsHistoryReady = promisify(function (resolve, reject, timeou
   const chatd = this.plugins.chatdIntegration.chatd;
   const eventName = 'onMessagesHistoryDone.ochr' + makeid(16);
   const ready = () => {
-    onIdle(resolve);
-    clearTimeout(timer);
+    queueMicrotask(resolve);
     chatd.off(eventName);
+    if (timer) {
+      timer.abort();
+      timer = null;
+    }
   };
   chatd.on(eventName, () => {
     if (this.allChatsHadInitialLoadedHistory()) {
@@ -2880,7 +2869,7 @@ Chat.prototype.onChatsHistoryReady = promisify(function (resolve, reject, timeou
     }
   });
   if (timeout > 0) {
-    timer = setTimeout(ready, timeout);
+    (timer = tSleep(timeout / 1e3)).then(ready);
   }
 });
 Chat.prototype.allChatsHadLoadedHistory = function () {
@@ -2939,7 +2928,7 @@ Chat.prototype._destroyAllChatsFromChatd = function () {
   asyncApiReq({
     'a': 'mcf',
     'v': Chatd.VERSION
-  }).done(function (r) {
+  }).then(r => {
     r.c.forEach(function (chatRoomMeta) {
       if (chatRoomMeta.g === 1) {
         chatRoomMeta.u.forEach(function (u) {
@@ -2966,7 +2955,7 @@ Chat.prototype._leaveAllGroupChats = function () {
   asyncApiReq({
     'a': 'mcf',
     'v': Chatd.VERSION
-  }).done(function (r) {
+  }).then(r => {
     r.c.forEach(function (chatRoomMeta) {
       if (chatRoomMeta.g === 1) {
         asyncApiReq({
@@ -3155,106 +3144,44 @@ Chat.prototype.openChatAndSendFilesDialog = function (user_handle) {
     room.setActive();
   }).catch(this.logger.error.bind(this.logger));
 };
-Chat.prototype.openChatAndAttachNodes = function (targets, nodes, noOpen) {
-  'use strict';
-
-  var self = this;
+Chat.prototype.openChatAndAttachNodes = async function (targets, nodes, silent) {
+  const promises = [];
   if (d) {
     console.group('Attaching nodes to chat room(s)...', targets, nodes);
   }
-  return new MegaPromise(function (resolve, reject) {
-    var promises = [];
-    var folderNodes = [];
-    var fileNodes = [];
-    var handleRejct = function (reject, roomId, ex) {
-      if (d) {
-        self.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
+  const attachNodes = roomId => this.smartOpenChat(roomId).then(room => {
+    return room.attachNodes(nodes).then(res => {
+      if (res !== EBLOCKED) {
+        return room;
       }
-      reject(ex);
-    };
-    var attachNodes = function (roomId) {
-      return new MegaPromise(function (resolve, reject) {
-        self.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, !noOpen).then(room => {
-          room.attachNodes(fileNodes).then(resolve.bind(self, room)).catch(reject);
-        }).catch(ex => {
-          handleRejct(reject, roomId, ex);
-        });
-      });
-    };
-    var attachFolders = roomId => {
-      return new MegaPromise((resolve, reject) => {
-        var createPublicLink = (nodeId, room) => {
-          M.createPublicLink(nodeId).then(({
-            link
-          }) => {
-            room.sendMessage(link);
-            resolve(room);
-          }).catch(reject);
-        };
-        self.smartOpenChat([u_handle, roomId], 'private', undefined, undefined, undefined, !noOpen).then(room => {
-          for (var i = folderNodes.length; i--;) {
-            createPublicLink(folderNodes[i], room);
-          }
-        }).catch(ex => {
-          handleRejct(reject, roomId, ex);
-        });
-      });
-    };
-    if (!Array.isArray(targets)) {
-      targets = [targets];
+    });
+  }).catch(ex => {
+    if (d) {
+      this.logger.warn('Cannot openChat for %s and hence nor attach nodes to it.', roomId, ex);
     }
-    for (var i = nodes.length; i--;) {
-      if (M.d[nodes[i]].t) {
-        folderNodes.push(nodes[i]);
-      } else {
-        fileNodes.push(nodes[i]);
-      }
-    }
-    var _afterMDcheck = () => {
-      for (var i = targets.length; i--;) {
-        if (fileNodes.length > 0) {
-          promises.push(attachNodes(targets[i]));
-        }
-        if (folderNodes.length > 0) {
-          promises.push(attachFolders(targets[i]));
-        }
-      }
-      MegaPromise.allDone(promises).unpack(function (result) {
-        var room;
-        for (var i = result.length; i--;) {
-          if (result[i] instanceof ChatRoom) {
-            room = result[i];
-            showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
-            if (noOpen) {
-              resolve();
-            } else {
-              var roomUrl = room.getRoomUrl().replace("fm/", "");
-              M.openFolder(roomUrl).always(resolve);
-            }
-            if (d) {
-              console.groupEnd();
-            }
-            return;
-          }
-        }
-        if (d) {
-          self.logger.warn('openChatAndAttachNodes failed in whole...', result);
-          console.groupEnd();
-        }
-        reject(result);
-      });
-    };
-    if (mega.fileRequestCommon.storage.isDropExist(folderNodes).length) {
-      mega.fileRequest.showRemoveWarning(folderNodes).then(_afterMDcheck).catch(ex => {
-        if (ex) {
-          dump(ex);
-          showToast('warning2', l[253]);
-        }
-      });
-    } else {
-      _afterMDcheck();
-    }
+    throw ex;
   });
+  if (!Array.isArray(targets)) {
+    targets = [targets];
+  }
+  for (let i = targets.length; i--;) {
+    promises.push(attachNodes(targets[i]));
+  }
+  const result = (await Promise.allSettled(promises)).map(e => e.value).filter(Boolean);
+  for (let i = result.length; i--;) {
+    if (result[i] instanceof ChatRoom) {
+      const room = result[i];
+      showToast('send-chat', nodes.length > 1 ? l[17767] : l[17766]);
+      if (!silent) {
+        await M.openFolder(room.getRoomUrl().replace('fm/', '')).catch(dump);
+      }
+      break;
+    }
+  }
+  if (d) {
+    console.groupEnd();
+  }
+  return result;
 };
 Chat.prototype.toggleUIFlag = function (name) {
   this.chatUIFlags.set(name, this.chatUIFlags[name] ? 0 : 1);
@@ -3362,23 +3289,16 @@ Chat.prototype.getFrequentContacts = function () {
       _calculateLastTsFor(chatRoom, 32);
     }
   });
-  var masterPromise = new MegaPromise();
-  MegaPromise.allDone(promises).always(function () {
-    var result = obj_values(recentContacts).sort(function (a, b) {
-      return a.ts < b.ts ? 1 : b.ts < a.ts ? -1 : 0;
-    });
-    masterPromise.resolve(result.reverse());
+  Chat._frequentsCache = new Promise((resolve, reject) => {
+    Promise.allSettled(promises).then(() => {
+      const result = Object.values(recentContacts).sort((a, b) => a.ts < b.ts ? 1 : b.ts < a.ts ? -1 : 0).reverse();
+      tSleep(300).then(() => {
+        delete Chat._frequentsCache;
+      });
+      return result;
+    }).then(resolve).catch(reject);
   });
-  Chat._frequentsCache = masterPromise;
-  masterPromise.always(function () {
-    if (Chat._frequentsCacheTimer) {
-      clearTimeout(Chat._frequentsCacheTimer);
-    }
-    Chat._frequentsCacheTimer = setTimeout(function () {
-      delete Chat._frequentsCache;
-    }, 300000);
-  });
-  return masterPromise;
+  return Chat._frequentsCache;
 };
 Chat.prototype.eventuallyAddDldTicketToReq = function (req) {
   if (!u_handle) {
@@ -3550,15 +3470,18 @@ Chat.prototype.enqueueChatRoomEvent = function (eventName, eventData) {
   if (!this.is_initialized) {
     return;
   }
-  const chatId = eventData.chatId;
-  if (this._queuedChatRoomEvents[chatId + "_timer"]) {
-    clearTimeout(this._queuedChatRoomEvents[chatId + "_timer"]);
+  const {
+    chatId
+  } = eventData;
+  if (!this._queuedChatRoomEvents[chatId]) {
+    this._queuedChatRoomEvents[chatId] = [];
+    (this._queuedChatRoomEvents[chatId].timer = tSleep(15)).then(() => {
+      if (d) {
+        this.logger.warn('Timer ran out, events lost...', this._queuedChatRoomEvents[chatId]);
+      }
+      delete this._queuedChatRoomEvents[chatId];
+    });
   }
-  this._queuedChatRoomEvents[chatId + "_timer"] = setTimeout(() => {
-    delete this._queuedChatRoomEvents[chatId + "_timer"];
-    delete this._queuedChatRoomEvents[chatId];
-  }, 15e3);
-  this._queuedChatRoomEvents[chatId] = this._queuedChatRoomEvents[chatId] || [];
   this._queuedChatRoomEvents[chatId].push([eventName, eventData]);
 };
 Chat.prototype.autoJoinIfNeeded = function () {
@@ -3574,7 +3497,7 @@ Chat.prototype.autoJoinIfNeeded = function () {
           localStorage.removeItem("autoJoinOnLoginChat");
         }
       });
-      M.req(req);
+      asyncApiReq(req).catch(dump);
     } else {
       localStorage.removeItem("autoJoinOnLoginChat");
     }
@@ -3654,7 +3577,7 @@ const chat = ({
 
 /***/ }),
 
-/***/ 455:
+/***/ 804:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -3668,26 +3591,7 @@ __webpack_require__.d(__webpack_exports__, {
   "default": () => (chatRoom)
 });
 
-;// CONCATENATED MODULE: ./js/utils.jsx
-function altersData(fn) {
-  fn.altersData = true;
-  return fn;
-}
-function prefixedKeyMirror(prefix, vals) {
-  var result = {};
-  Object.keys(vals).forEach(function (k) {
-    result[k] = prefix + ":" + k;
-  });
-  return result;
-}
-function extendActions(prefix, src, toBeAppended) {
-  var actions = Object.keys(src).concat(Object.keys(toBeAppended));
-  var result = {};
-  actions.forEach(function (k) {
-    result[k] = prefix + ":" + k;
-  });
-  return result;
-}
+;// CONCATENATED MODULE: ./js/chat/utils.jsx
 async function prepareExportIo(dl) {
   const {
     zname,
@@ -3831,6 +3735,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
   this.chatIdBin = chatId ? base64urldecode(chatId) : "";
   this.chatShard = chatShard;
   this.chatdUrl = chatdUrl;
+  this.publicLink = null;
   this.publicChatHandle = publicChatHandle;
   this.publicChatKey = publicChatKey;
   this.ck = ck;
@@ -3839,13 +3744,18 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
   this.shownMessages = {};
   this.retentionTime = retentionTime;
   this.activeSearches = 0;
-  self.members = {};
   this.activeCallIds = new MegaDataMap(this);
   this.ringingCalls = new MegaDataMap(this);
   this.ringingCalls.addChangeListener(() => {
     megaChat.safeForceUpdate();
   });
   this.isMeeting = isMeeting;
+  this.members = Object.create(null);
+  Object.defineProperty(this.members, 'hasOwnProperty', {
+    value(p) {
+      return p in this;
+    }
+  });
   if (type === "private") {
     users.forEach(function (userHandle) {
       self.members[userHandle] = 3;
@@ -4032,7 +3942,10 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
   var timer = null;
   var _historyIsAvailable = ev => {
     self.initialMessageHistLoaded = ev ? true : -1;
-    clearTimeout(timer);
+    if (timer) {
+      timer.abort();
+      timer = null;
+    }
     self.unbind('onMarkAsJoinRequested.initHist');
     self.unbind('onHistoryDecrypted.initHist');
     self.unbind('onMessagesHistoryDone.initHist');
@@ -4041,12 +3954,13 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
   self.rebind('onHistoryDecrypted.initHist', _historyIsAvailable);
   self.rebind('onMessagesHistoryDone.initHist', _historyIsAvailable);
   self.rebind('onMarkAsJoinRequested.initHist', () => {
-    timer = setTimeout(function () {
+    (timer = tSleep(300)).then(() => {
       if (d) {
         self.logger.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
       }
+      timer = null;
       _historyIsAvailable(false);
-    }, 3e5);
+    });
   });
   self.rebind('onRoomDisconnected', () => {
     if (!self.call) {
@@ -4076,6 +3990,16 @@ ChatRoom.ANONYMOUS_PARTICIPANT = mega.BID;
 ChatRoom.ARCHIVED = 0x01;
 ChatRoom.TOPIC_MAX_LENGTH = 30;
 ChatRoom.SCHEDULED_MEETINGS_INTERVAL = 1.8e6;
+ChatRoom._fnRequireParticipantKeys = function (fn, scope) {
+  return function (...args) {
+    const participants = this.protocolHandler.getTrackedParticipants();
+    return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).then(() => {
+      return fn.apply(scope || this, args);
+    }).catch(ex => {
+      this.logger.error("Failed to retrieve keys..", ex);
+    });
+  };
+};
 ChatRoom.MembersSet = function (chatRoom) {
   this.chatRoom = chatRoom;
   this.members = {};
@@ -4430,29 +4354,20 @@ ChatRoom.prototype.getTruncatedRoomTopic = function (maxLength = ChatRoom.TOPIC_
 ChatRoom.prototype.setRoomTitle = function (newTopic, allowEmpty) {
   var self = this;
   newTopic = allowEmpty ? newTopic : String(newTopic);
-  var masterPromise = new MegaPromise();
   if ((allowEmpty || newTopic.trim().length > 0) && newTopic !== self.getRoomTitle()) {
     self.scrolledToBottom = true;
     var participants = self.protocolHandler.getTrackedParticipants();
-    var promises = [];
-    promises.push(ChatdIntegration._ensureKeysAreLoaded(undefined, participants));
-    var _runUpdateTopic = function () {
+    return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).then(() => {
       var topic = self.protocolHandler.embeddedEncryptTo(newTopic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, undefined, self.type === "public");
       if (topic) {
-        masterPromise.linkDoneAndFailTo(asyncApiReq({
-          "a": "mcst",
-          "id": self.chatId,
-          "ct": base64urlencode(topic),
-          "v": Chatd.VERSION
-        }));
-      } else {
-        masterPromise.reject();
+        return asyncApiReq({
+          a: "mcst",
+          id: self.chatId,
+          ct: base64urlencode(topic),
+          v: Chatd.VERSION
+        });
       }
-    };
-    MegaPromise.allDone(promises).done(function () {
-      _runUpdateTopic();
-    });
-    return masterPromise;
+    }).catch(dump);
   } else {
     return false;
   }
@@ -4479,7 +4394,7 @@ ChatRoom.prototype.archive = function () {
     'm': 1,
     'f': flags,
     'v': Chatd.VERSION
-  }).done(function (r) {
+  }).then(r => {
     if (r === 0) {
       self.updateFlags(flags, true);
     }
@@ -4495,8 +4410,8 @@ ChatRoom.prototype.unarchive = function () {
     'm': 1,
     'f': 0,
     'v': Chatd.VERSION
-  }).done(function (r) {
-    if (r === 0) {
+  }).then(res => {
+    if (res === 0) {
       self.updateFlags(0, true);
     }
   });
@@ -4523,11 +4438,23 @@ ChatRoom.prototype.destroy = function (notifyOtherDevices, noRedirect) {
     }
   });
 };
-ChatRoom.prototype.updatePublicHandle = function (d, cim, callback) {
-  return megaChat.plugins.chatdIntegration.updateChatPublicHandle(this.chatId, d, cim, callback);
-};
-ChatRoom.prototype.getPublicLink = function (callback) {
-  return this.publicLink || this.updatePublicHandle(false, false, callback);
+ChatRoom.prototype.updatePublicHandle = async function (remove, cim) {
+  if (!remove && this.publicLink) {
+    return this.publicLink;
+  }
+  return asyncApiReq({
+    a: 'mcph',
+    id: this.chatId,
+    v: Chatd.VERSION,
+    cim: cim ? 1 : 0,
+    d: remove ? 1 : undefined
+  }).then(res => {
+    assert(remove && res === 0 || Array.isArray(res) && res[1].length === 8);
+    this.publicLink = remove ? null : `chat/${res[1]}#${this.protocolHandler.getUnifiedKey()}`;
+  }).catch(ex => {
+    this.logger.warn('updatePublicHandle', ex);
+    this.publicLink = null;
+  });
 };
 ChatRoom.prototype.iAmInRoom = function () {
   return !(!this.members.hasOwnProperty(u_handle) || this.members[u_handle] === -1);
@@ -4552,37 +4479,25 @@ ChatRoom.prototype.joinViaPublicHandle = function () {
   }
   return Promise.reject();
 };
-ChatRoom.prototype.switchOffPublicMode = function () {
-  var self = this;
-  var participants = self.protocolHandler.getTrackedParticipants();
-  var promises = [];
-  promises.push(ChatdIntegration._ensureKeysAreLoaded(undefined, participants));
-  var onSwitchDone = function () {
-    self.protocolHandler.switchOffOpenMode();
-  };
-  var _runSwitchOffPublicMode = function () {
-    var topic = null;
-    if (self.topic) {
-      topic = self.protocolHandler.embeddedEncryptTo(self.topic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, participants, true, false);
-      topic = base64urlencode(topic);
-      asyncApiReq({
-        a: 'mcscm',
-        id: self.chatId,
-        ct: topic,
-        v: Chatd.VERSION
-      }).done(onSwitchDone);
-    } else {
-      asyncApiReq({
-        a: 'mcscm',
-        id: self.chatId,
-        v: Chatd.VERSION
-      }).done(onSwitchDone);
-    }
-  };
-  MegaPromise.allDone(promises).done(function () {
-    _runSwitchOffPublicMode();
+ChatRoom.prototype.switchOffPublicMode = ChatRoom._fnRequireParticipantKeys(function () {
+  let {
+    topic,
+    protocolHandler,
+    chatId
+  } = this;
+  if (topic) {
+    topic = protocolHandler.embeddedEncryptTo(topic, strongvelope.MESSAGE_TYPES.TOPIC_CHANGE, protocolHandler.getTrackedParticipants(), true, false);
+    topic = base64urlencode(topic);
+  }
+  return asyncApiReq({
+    a: 'mcscm',
+    id: chatId,
+    ct: topic || undefined,
+    v: Chatd.VERSION
+  }).then(() => {
+    protocolHandler.switchOffOpenMode();
   });
-};
+});
 ChatRoom.prototype.show = function () {
   var self = this;
   if (self.isCurrentlyActive) {
@@ -4781,23 +4696,44 @@ ChatRoom.prototype._sendNodes = function (nodeids, users) {
       });
     });
   }
-  return MegaPromise.allDone(promises);
+  return Promise.allSettled(promises);
 };
-ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resolve, reject, nodes) {
+ChatRoom.prototype.attachNodes = async function (nodes, names) {
+  if (!Array.isArray(nodes)) {
+    nodes = [nodes];
+  }
+  const handles = new Set();
+  for (let i = nodes.length; i--;) {
+    const n = nodes[i];
+    const h = String(crypto_keyok(n) && n.h || n);
+    if (!M.getNodeByHandle(h)) {
+      handles.add(h);
+    }
+  }
+  if (handles.size) {
+    await dbfetch.acquire([...handles]);
+  }
+  return this._attachNodes(nodes, names);
+};
+ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(resolve, reject, nodes, names) {
   var i;
   var step = 0;
   var users = [];
   var self = this;
+  let result = null;
   var copy = Object.create(null);
   var send = Object.create(null);
+  let link = Object.create(null);
+  let nmap = Object.create(null);
   var members = self.getParticipantsExceptMe();
-  var attach = promisify(function (resolve, reject, nodes) {
+  var attach = nodes => {
     console.assert(self.type === 'public' || users.length, 'No users to send to?!');
-    self._sendNodes(nodes, users).then(function () {
+    return this._sendNodes(nodes, users).then(() => {
       for (var i = nodes.length; i--;) {
-        var n = M.getNodeByHandle(nodes[i]);
-        console.assert(n.h, 'wtf..');
+        const n = nmap[nodes[i]] || M.getNodeByHandle(nodes[i]);
+        console.assert(n.h, `Node not found... ${nodes[i]}`);
         if (n.h) {
+          const name = names && (names[n.hash] || names[n.h]) || n.name;
           self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify([{
             h: n.h,
             k: n.k,
@@ -4806,20 +4742,22 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
             fa: n.fa,
             ts: n.ts,
             hash: n.hash,
-            name: n.name
+            name
           }]));
         }
       }
-      resolve();
-    }).catch(reject);
-  });
+    });
+  };
   var done = function () {
     if (--step < 1) {
-      resolve();
+      nmap = null;
+      resolve(result);
     }
   };
   var fail = function (ex) {
-    if (d) {
+    if (ex === EBLOCKED) {
+      result = ex;
+    } else if (d) {
       _.logger.error(ex);
     }
     done();
@@ -4833,17 +4771,44 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
       users.push(usr.u);
     }
   }
-  if (!Array.isArray(nodes)) {
-    nodes = [nodes];
-  }
   for (i = nodes.length; i--;) {
-    var n = M.getNodeByHandle(nodes[i]);
-    (n && (n.u !== u_handle || M.getNodeRoot(n.h) === "shares") ? copy : send)[n.h] = 1;
+    const h = nodes[i];
+    const n = crypto_keyok(h) ? h : M.getNodeByHandle(h);
+    if (n.t) {
+      link[n.h] = 1;
+      continue;
+    }
+    if (n.hash) {
+      nmap[n.hash] = n;
+      if (names && names[n.h]) {
+        names[n.hash] = names[n.h];
+      }
+    }
+    let op = send;
+    if (!n.ch && (n.u !== u_handle || M.getNodeRoot(n.h) === 'shares')) {
+      op = copy;
+    }
+    op[n.h] = 1;
+    nmap[n.h] = n;
   }
   copy = Object.keys(copy);
   send = Object.keys(send);
+  link = Object.keys(link);
   if (d) {
-    _.logger.debug('copy:%d, send:%d', copy.length, send.length, copy, send);
+    _.logger.debug('copy:%d, send:%d, link:%d', copy.length, send.length, link.length, copy, send, link);
+  }
+  if (link.length) {
+    ++step;
+    Promise.resolve(mega.fileRequestCommon.storage.isDropExist(link)).then(res => {
+      if (res.length) {
+        return mega.fileRequest.showRemoveWarning(res);
+      }
+    }).then(() => {
+      const createLink = h => M.createPublicLink(h).then(({
+        link
+      }) => this.sendMessage(link));
+      return Promise.all(link.map(createLink));
+    }).then(done).catch(fail);
   }
   if (send.length) {
     step++;
@@ -4851,67 +4816,66 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
   }
   if (copy.length) {
     step++;
-    M.myChatFilesFolder.get(true).then(function (target) {
-      var rem = [];
-      var c = Object.keys(M.c[target.h] || {});
-      for (var i = copy.length; i--;) {
-        var n = M.getNodeByHandle(copy[i]);
-        console.assert(n.h, 'wtf..');
-        for (var y = c.length; y--;) {
-          var b = M.getNodeByHandle(c[y]);
-          if (n.h === b.h || b.hash === n.hash) {
-            if (d) {
-              _.logger.info('deduplication %s:%s', n.h, b.h, [n], [b]);
-            }
-            rem.push(n.h);
-            copy.splice(i, 1);
-            break;
-          }
-        }
-      }
-      var next = function (res) {
-        if (!Array.isArray(res)) {
-          return fail(res);
-        }
-        const [h] = res;
-        res = [...rem, ...res];
-        if (!res.length) {
-          return fail('Nothing to attach...?!');
-        }
-        for (let i = res.length; i--;) {
-          const n = M.getNodeByHandle(res[i]);
-          if (n.fv) {
-            if (d) {
-              _.logger.info('Skipping file-version %s', n.h, n);
-            }
-            res.splice(i, 1);
-          }
-        }
-        if (h && !res.length) {
-          if (d) {
-            _.logger.info('Adding nothing but a file-version?..', h);
-          }
-          res = [h];
-        }
-        attach(res).then(done).catch(fail);
-      };
-      if (copy.length) {
-        M.copyNodes(copy, target.h, false, next).dump('attach-nodes');
-      } else {
-        if (d) {
-          _.logger.info('No new nodes to copy.', [rem]);
-        }
-        next([]);
-      }
-    }).catch(fail);
+    this._copyNodesToAttach(copy, nmap).then(res => attach(res)).then(done).catch(fail);
   }
   if (!step) {
     if (d) {
       _.logger.warn('Nothing to do here...');
     }
-    onIdle(done);
+    queueMicrotask(done);
   }
 });
+ChatRoom.prototype._copyNodesToAttach = async function (copy, nmap) {
+  const {
+    h: target
+  } = await M.myChatFilesFolder.get(true);
+  if (!M.c[target]) {
+    await dbfetch.get(target);
+  }
+  const dir = Object.keys(M.c[target] || {});
+  const rem = [];
+  for (let i = copy.length; i--;) {
+    const n = nmap[copy[i]] || M.getNodeByHandle(copy[i]);
+    console.assert(n.h, `Node not found.. ${copy[i]}`);
+    for (let y = dir.length; y--;) {
+      const b = M.getNodeByHandle(dir[y]);
+      if (n.h === b.h || b.hash === n.hash) {
+        if (d) {
+          this.logger.info('deduplication %s:%s', n.h, b.h, [n], [b]);
+        }
+        rem.push(n.h);
+        copy.splice(i, 1);
+        break;
+      }
+    }
+  }
+  let res = [];
+  if (copy.length) {
+    res = await M.copyNodes(copy, target);
+  } else if (d) {
+    this.logger.info('No new nodes to copy.', rem);
+  }
+  assert(Array.isArray(res), `Unexpected response, ${res && res.message || res}`, res);
+  const [h] = res;
+  res = [...rem, ...res];
+  assert(res.length, 'Unexpected condition... nothing to attach ?!');
+  for (let i = res.length; i--;) {
+    const n = nmap[res[i]] || M.getNodeByHandle(res[i]);
+    if (n.fv) {
+      if (d) {
+        this.logger.info('Skipping file-version %s', n.h, n);
+      }
+      res.splice(i, 1);
+    }
+  }
+  if (h && !res.length) {
+    if (d) {
+      this.logger.info('Adding nothing but a file-version?..', h);
+    }
+    res = [h];
+  }
+  return res;
+};
 ChatRoom.prototype.onUploadStart = function (data) {
   var self = this;
   if (d) {
@@ -4982,16 +4946,6 @@ ChatRoom.prototype.recover = function () {
     return MegaPromise.reject();
   }
 };
-ChatRoom._fnRequireParticipantKeys = function (fn, scope) {
-  return function (...args) {
-    const participants = this.protocolHandler.getTrackedParticipants();
-    return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).then(() => {
-      return fn.apply(scope || this, args);
-    }).catch(ex => {
-      this.logger.error("Failed to retrieve keys..", ex);
-    });
-  };
-};
 ChatRoom.prototype.showMissingUnifiedKeyDialog = function () {
   return msgDialog(`warningb:!^${l[82]}!${l[23433]}`, null, l[200], l.chat_key_failed_dlg_text, reload => reload ? M.reload() : null, 1);
 };
@@ -5006,7 +4960,7 @@ ChatRoom.prototype.hasInvalidKeys = function () {
         master,
         slaves
       } = mBroadcaster.crossTab;
-      eventlog(99751, JSON.stringify([1, buildVersion.version || 'dev', String(this.chatId).length | 0, this.type | 0, this.isMeeting | 0, typeof unifiedKey, String(unifiedKey || '').length | 0, typeof this.ck, String(this.ck).length | 0, !!master | 0, Object(slaves).length | 0]));
+      eventlog(99751, JSON.stringify([1, buildVersion.website || 'dev', String(this.chatId).length | 0, this.type | 0, this.isMeeting | 0, typeof unifiedKey, String(unifiedKey || '').length | 0, typeof this.ck, String(this.ck).length | 0, !!master | 0, Object(slaves).length | 0]));
       return true;
     }
   }
@@ -5347,8 +5301,8 @@ ChatRoom.prototype.truncate = function () {
         id: self.chatId,
         m: lastChatMessageId,
         v: Chatd.VERSION
-      }).fail(function (r) {
-        if (r === -2) {
+      }).catch(ex => {
+        if (ex === -2) {
           msgDialog('warninga', l[135], l[8880]);
         }
       });
@@ -5460,9 +5414,9 @@ ChatRoom.prototype.detachSearch = function () {
 ChatRoom.prototype.scrollToMessageId = function (msgId, index, retryActive) {
   var self = this;
   if (!self.isCurrentlyActive && !retryActive) {
-    setTimeout(function () {
+    tSleep(1.5).then(() => {
       self.scrollToMessageId(msgId, index, true);
-    }, 1500);
+    });
     return;
   }
   assert(self.isCurrentlyActive, 'chatRoom is not visible');
@@ -5549,7 +5503,7 @@ ChatRoom.prototype._exportChat = async function () {
   }
   let withMedia = !!M.v.length;
   if (withMedia) {
-    withMedia = await asyncConfirmationDialog('', l.export_chat_media_dlg_title, l.export_chat_media_dlg_text, undefined, true, l.export_chat_media_dlg_conf, l.export_chat_media_dlg_rej);
+    withMedia = await asyncMsgDialog(`*confirmation:!^${l.export_chat_media_dlg_conf}!${l.export_chat_media_dlg_rej}`, '', l.export_chat_media_dlg_title, l.export_chat_media_dlg_text);
     if (withMedia === null) {
       throw new Error('Aborted');
     }
@@ -5581,7 +5535,7 @@ ChatRoom.prototype._exportChat = async function () {
       p
     });
     if (res === 1 || res === 2) {
-      const fallback = await asyncConfirmationDialog('', l.export_chat_media_obq_title, l.export_chat_media_obq_text);
+      const fallback = await asyncMsgDialog('confirmation', '', l.export_chat_media_obq_title, l.export_chat_media_obq_text);
       if (fallback) {
         return M.saveAs(stringNodes, bufferName);
       }
@@ -5972,7 +5926,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
     if (INTERSECTION_OBSERVER_AVAILABLE && !this.customIsEventuallyVisible) {
       if (node) {
         this.__intersectionVisibility = false;
-        setTimeout(() => {
+        onIdle(() => {
           this.__intersectionObserverInstance = new IntersectionObserver(([entry]) => {
             if (entry.intersectionRatio < 0.2 && !entry.isIntersecting) {
               this.__intersectionVisibility = false;
@@ -5989,7 +5943,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
             threshold: 0.1
           });
           this.__intersectionObserverInstance.observe(node);
-        }, 150);
+        });
       }
     }
     if (this.onResizeObserved) {
@@ -6387,17 +6341,17 @@ class ContactAwareComponent extends MegaRenderMixin {
       const promises = [];
       const chatHandle = is_chatlink.ph || chatRoom && chatRoom.publicChatHandle;
       if (syncName) {
-        promises.push(M.syncUsersFullname(contactHandle, chatHandle, new MegaPromise()));
+        promises.push(M.syncUsersFullname(contactHandle, chatHandle));
       }
       if (syncMail) {
-        promises.push(M.syncContactEmail(contactHandle, new MegaPromise()));
+        promises.push(M.syncContactEmail(contactHandle));
       }
       if (syncAvtr) {
         promises.push(useravatar.loadAvatar(contactHandle, chatHandle).catch(function () {
           ContactAwareComponent.unavailableAvatars[contactHandle] = true;
         }));
       }
-      MegaPromise.allDone(promises).always(() => {
+      return Promise.allSettled(promises).always(() => {
         this.eventuallyUpdate();
         this.__isLoadingContactInfo = false;
         if (!contact.firstName && !contact.lastName) {
@@ -6406,7 +6360,7 @@ class ContactAwareComponent extends MegaRenderMixin {
       });
     };
     if (syncName || syncMail || syncAvtr) {
-      this.__isLoadingContactInfo = setTimeout(loader, 300);
+      (this.__isLoadingContactInfo = tSleep(0.3)).then(loader).catch(dump);
     }
   }
   componentDidUpdate() {
@@ -6418,7 +6372,8 @@ class ContactAwareComponent extends MegaRenderMixin {
   componentWillUnmount() {
     super.componentWillUnmount();
     if (this.__isLoadingContactInfo) {
-      clearTimeout(this.__isLoadingContactInfo);
+      this.__isLoadingContactInfo.abort();
+      this.__isLoadingContactInfo = false;
     }
   }
   isLoadingContactInfo() {
@@ -6851,21 +6806,24 @@ class WhosTyping extends mixins.wl {
       if (user_handle === u_handle) {
         return;
       }
-      var currentlyTyping = clone(self.state.currentlyTyping);
-      var u_h = user_handle;
+      const u_h = user_handle;
       if (u_h === u_handle) {
         return;
       } else if (!M.u[u_h]) {
         return;
       }
+      const currentlyTyping = {
+        ...self.state.currentlyTyping
+      };
       if (currentlyTyping[u_h]) {
-        clearTimeout(currentlyTyping[u_h][1]);
+        currentlyTyping[u_h].abort();
       }
       if (bCastCode === 1) {
-        var timer = setTimeout(function (u_h) {
+        const timer = tSleep(5);
+        timer.then(() => {
           self.stoppedTyping(u_h);
-        }, 5000, u_h);
-        currentlyTyping[u_h] = [unixtime(), timer];
+        });
+        currentlyTyping[u_h] = timer;
         self.setState({
           currentlyTyping: currentlyTyping
         });
@@ -6887,9 +6845,11 @@ class WhosTyping extends mixins.wl {
         currentlyTyping
       } = this.state;
       if (currentlyTyping[u_h]) {
-        const newState = clone(currentlyTyping);
-        if (newState[u_h]) {
-          clearTimeout(newState[u_h][1]);
+        const newState = {
+          ...currentlyTyping
+        };
+        if (!newState[u_h].aborted) {
+          newState[u_h].abort();
         }
         delete newState[u_h];
         this.setState({
@@ -6901,19 +6861,9 @@ class WhosTyping extends mixins.wl {
   render() {
     var self = this;
     var typingElement = null;
-    if (Object.keys(self.state.currentlyTyping).length > 0) {
-      var names = Object.keys(self.state.currentlyTyping).map(u_h => {
-        var contact = M.u[u_h];
-        if (contact && contact.firstName) {
-          if (contact.nickname !== '') {
-            return contact.nickname;
-          }
-          return contact.firstName;
-        } else {
-          var avatarMeta = generateAvatarMeta(u_h);
-          return avatarMeta.fullName.split(" ")[0];
-        }
-      });
+    const users = Object.keys(self.state.currentlyTyping);
+    if (users.length > 0) {
+      const names = users.map(u_h => M.getNameByHandle(u_h)).filter(String);
       var namesDisplay = "";
       var areMultipleUsersTyping = false;
       if (names.length > 1) {
@@ -7255,7 +7205,7 @@ class ContactButton extends _mixins1__._p {
             }
           } else {
             loadingDialog.show();
-            M.syncContactEmail(contact.u, new MegaPromise(), true).done(email => {
+            M.syncContactEmail(contact.u, true).then(email => {
               if (Object.values(M.opc || {}).some(cr => cr.m === email)) {
                 closeDialog();
                 msgDialog('warningb', '', l[17545]);
@@ -7266,7 +7216,7 @@ class ContactButton extends _mixins1__._p {
                 closeDialog();
                 msgDialog('info', title, msg.replace('[X]', email));
               }
-            }).always(() => loadingDialog.hide()).catch(() => {
+            }).catch(() => {
               const {
                 chatRoom
               } = this.props;
@@ -7278,7 +7228,7 @@ class ContactButton extends _mixins1__._p {
               }
               const name = M.getNameByHandle(userHandle);
               return msgDialog('info', '', l.ephemeral_title ? l.ephemeral_title.replace('%1', name) : `${name} is using an ephemeral session.`, l.ephemeral_info);
-            });
+            }).finally(() => loadingDialog.hide());
           }
         }
       }));
@@ -7889,21 +7839,11 @@ class ContactPickerWidget extends _mixins1__.wl {
         }
       });
     }
-    self._frequents = megaChat.getFrequentContacts();
-    self._frequents.always(function (r) {
-      if (self.props.disableFrequents) {
-        self._foundFrequents = [];
-      } else {
-        self._foundFrequents = r.slice(Math.max(r.length - 30, 0), r.length).reverse();
-      }
-      self.safeForceUpdate();
-    });
   }
   componentWillUnmount() {
     super.componentWillUnmount();
     var self = this;
     delete self._foundFrequents;
-    delete self._frequents;
     if (self.props.multiple) {
       $(document.body).off('keypress.contactPicker' + self.getUniqueId());
     }
@@ -7935,12 +7875,11 @@ class ContactPickerWidget extends _mixins1__.wl {
     } else if (self.wasMissingKeysForContacts[v.u] && (!pubCu25519[v.u] || !pubEd25519[v.u])) {
       return false;
     }
-    var avatarMeta = generateAvatarMeta(v.u);
     if (self.state.searchValue && self.state.searchValue.length > 0) {
-      var userName = ChatSearch._normalize_str(avatarMeta.fullName.toLowerCase());
-      var userRealName = ChatSearch._normalize_str(v.name.toLowerCase());
-      var userEmail = ChatSearch._normalize_str(v.m.toLowerCase());
-      if (userName.indexOf(self.state.searchValue.toLowerCase()) === -1 && userRealName.indexOf(self.state.searchValue.toLowerCase()) === -1 && (userEmail.indexOf(self.state.searchValue.toLowerCase()) === -1 || self.props.notSearchInEmails)) {
+      const norm = s => ChatSearch._normalize_str(String(s || '').toLowerCase());
+      const sv = norm(this.state.searchValue);
+      const skip = !norm(v.name).includes(sv) && !norm(v.nickname).includes(sv) && !norm(v.fullname).includes(sv) && !norm(M.getNameByHandle(v.u)).includes(sv) && (this.props.notSearchInEmails || !norm(v.m).includes(sv));
+      if (skip) {
         return false;
       }
     }
@@ -8147,19 +8086,26 @@ class ContactPickerWidget extends _mixins1__.wl {
     var alreadyAdded = {};
     var hideFrequents = !self.props.readOnly && !self.state.searchValue && frequentContacts.length > 0;
     var frequentsLoading = false;
-    if (self._frequents && !self._foundFrequents) {
-      if (self._frequents.state() === 'pending') {
-        hideFrequents = false;
-        frequentsLoading = true;
-      }
-    } else if (!self.props.readOnly && self._foundFrequents) {
-      var totalFound = 0;
-      self._foundFrequents.forEach(function (v) {
-        if (totalFound < MAX_FREQUENTS && v.userId in M.u && self._eventuallyAddContact(M.u[v.userId], frequentContacts, selectableContacts)) {
-          alreadyAdded[v.userId] = 1;
-          totalFound++;
+    if (this.props.readOnly || this.props.disableFrequents) {
+      hideFrequents = true;
+      this._foundFrequents = [];
+    } else if (!self._foundFrequents) {
+      frequentsLoading = true;
+      this._foundFrequents = [];
+      megaChat.getFrequentContacts().then(res => {
+        this._foundFrequents = res.slice(Math.max(res.length - 30, 0), res.length).reverse();
+      }).catch(dump).finally(() => {
+        if (this.isMounted()) {
+          this.safeForceUpdate();
         }
       });
+    }
+    for (let i = this._foundFrequents.length, total = 0; total < MAX_FREQUENTS && i--;) {
+      const v = this._foundFrequents[i];
+      if (v.userId in M.u && this._eventuallyAddContact(M.u[v.userId], frequentContacts, selectableContacts)) {
+        alreadyAdded[v.userId] = 1;
+        total++;
+      }
     }
     self.props.contacts.forEach(function (v) {
       alreadyAdded[v.h] || self._eventuallyAddContact(v, contacts, selectableContacts);
@@ -8670,7 +8616,7 @@ class ContextMenu extends mixins.wl {
     };
     this.handleSetNickname = handle => this.close(() => nicknames.setNicknameDialog.init(handle));
     this.handleAddContact = handle => {
-      M.syncContactEmail(handle, new MegaPromise(), true).done(email => {
+      M.syncContactEmail(handle, true).then(email => {
         const OPC = Object.values(M.opc);
         const ALREADY_SENT = OPC && OPC.length && OPC.some(opc => opc.m === email);
         this.close(() => {
@@ -8680,7 +8626,7 @@ class ContextMenu extends mixins.wl {
           msgDialog('info', l[150], l[5898]);
           M.inviteContact(M.u[u_handle].m, email);
         });
-      });
+      }).catch(nop);
     };
   }
   render() {
@@ -9252,8 +9198,9 @@ class SentRequests extends mixins.wl {
       this.setState({
         reinvited: true
       }, () => {
-        M.reinvitePendingContactRequest(mail);
-        contactsInfoDialog(l[19126], mail, l[19127]);
+        M.reinvitePendingContactRequest(mail).then(() => {
+          contactsInfoDialog(l[19126], mail, l[19127]);
+        }).catch(tell);
       });
     };
     this.drawSentRequests = () => {
@@ -9277,7 +9224,13 @@ class SentRequests extends mixins.wl {
           currView: "opc"
         }], ColumnContactRequestsRts, [ColumnContactRequestsSentBtns, {
           onReject: email => {
-            M.cancelPendingContactRequest(email);
+            M.cancelPendingContactRequest(email).catch(ex => {
+              if (ex === EARGS) {
+                msgDialog('info', '', 'This pending contact is already deleted.');
+              } else {
+                tell(ex);
+              }
+            });
           },
           onReinvite: email => {
             this.handleReinvite(email);
@@ -9661,11 +9614,10 @@ class ContactsPanel extends mixins.wl {
       const {
         received
       } = this.props;
-      let receivedKeys = Object.keys(received);
-      if (received && receivedKeys.length) {
-        const promises = [];
-        for (let i = 0; i < receivedKeys.length; i++) {
-          promises.push(M.acceptPendingContactRequest(receivedKeys[i]));
+      const receivedKeys = Object.keys(received || {});
+      if (receivedKeys.length) {
+        for (let i = receivedKeys.length; i--;) {
+          M.acceptPendingContactRequest(receivedKeys[i]);
         }
       }
     };
@@ -10448,7 +10400,7 @@ const cloudBrowserModalDialog = ({
   CloudBrowserDialog
 });
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
-var chat_chatRoom = __webpack_require__(455);
+var chat_chatRoom = __webpack_require__(804);
 ;// CONCATENATED MODULE: ./js/ui/historyRetentionDialog.jsx
 
 
@@ -11350,26 +11302,6 @@ class ChatlinkDialog extends mixins.wl {
     this.onPopupDidMount = $node => {
       this.$popupNode = $node;
     };
-    this.retrieveChatLink = () => {
-      const {
-        chatRoom
-      } = this.props;
-      if (!chatRoom.topic) {
-        delete this.loading;
-        return;
-      }
-      this.loading = chatRoom.updatePublicHandle(false, true).always(() => {
-        if (chatRoom.publicLink) {
-          this.setState({
-            'link': getBaseUrl() + '/' + chatRoom.publicLink
-          });
-        } else {
-          this.setState({
-            link: l[20660]
-          });
-        }
-      });
-    };
     this.onClose = () => {
       if (this.props.onClose) {
         this.props.onClose();
@@ -11392,6 +11324,29 @@ class ChatlinkDialog extends mixins.wl {
   }
   componentWillMount() {
     this.retrieveChatLink();
+  }
+  retrieveChatLink() {
+    const {
+      chatRoom
+    } = this.props;
+    if (!chatRoom.topic) {
+      delete this.loading;
+      return;
+    }
+    this.loading = chatRoom.updatePublicHandle(false, true).always(() => {
+      this.loading = false;
+      if (this.isMounted()) {
+        if (chatRoom.publicLink) {
+          this.setState({
+            'link': `${getBaseUrl()}/${chatRoom.publicLink}`
+          });
+        } else {
+          this.setState({
+            link: l[20660]
+          });
+        }
+      }
+    });
   }
   componentDidUpdate() {
     const {
@@ -11475,7 +11430,7 @@ class ChatlinkDialog extends mixins.wl {
     }), external_React_default().createElement("input", {
       type: "text",
       readOnly: true,
-      value: !chatRoom.topic ? l[20660] : link
+      value: this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link
     })), external_React_default().createElement("div", {
       className: "info"
     }, chatRoom.publicLink ? l[20644] : null)))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
@@ -11485,7 +11440,7 @@ class ChatlinkDialog extends mixins.wl {
       className: `
                                     mega-button
                                     links-button
-                                    ${this.loading && this.loading.state() === 'pending' ? 'disabled' : ''}
+                                    ${this.loading ? 'disabled' : ''}
                                 `,
       onClick: () => {
         chatRoom.updatePublicHandle(1);
@@ -11496,7 +11451,7 @@ class ChatlinkDialog extends mixins.wl {
                                         mega-button
                                         positive
                                         copy-to-clipboard
-                                        ${this.loading && this.loading.state() === 'pending' ? 'disabled' : ''}
+                                        ${this.loading ? 'disabled' : ''}
                                     `
     }, external_React_default().createElement("span", null, l[63])) : closeButton : chatRoom.iAmOperator() ? external_React_default().createElement("button", {
       key: "setTopic",
@@ -13268,7 +13223,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
             'attachCloudDialog': false
           });
           self.props.chatRoom.scrolledToBottom = true;
-          room.attachNodes(selected);
+          room.attachNodes(selected).catch(dump);
         }
       });
     }
@@ -13407,9 +13362,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
             const textContents = msg.textContents || '';
             if (textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP) {
               const attachmentMetadata = msg.getAttachmentMeta() || [];
-              attachmentMetadata.forEach(v => {
-                M.moveToRubbish(v.h);
-              });
+              Promise.all(attachmentMetadata.map(v => M.moveToRubbish(v.h))).catch(dump);
             }
             chatdint.deleteMessage(room, msg.internalId ? msg.internalId : msg.orderValue);
             msg.deleted = true;
@@ -13747,7 +13700,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       didMount: () => {
         this.toggleExpandedFlag();
         if (room.isMeeting) {
-          room.getPublicLink();
+          room.updatePublicHandle().catch(dump);
         }
       },
       willUnmount: minimised => this.setState({
@@ -15981,9 +15934,9 @@ class Schedule extends mixins.wl {
       const {
         chatRoom
       } = this.props;
-      chatRoom.getPublicLink(() => this.isMounted() && this.setState({
+      chatRoom.updatePublicHandle().then(() => this.isMounted() && this.setState({
         link: !!chatRoom.publicLink
-      }));
+      })).catch(dump);
     }
   }
   getFilteredTimeIntervals(timestamp, offsetFrom) {
@@ -19179,7 +19132,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
     }, timestamp);
     var displayName;
     if (contact) {
-      displayName = generateAvatarMeta(contact.u).fullName;
+      displayName = M.getNameByHandle(contact.u);
     } else {
       displayName = contact;
     }
@@ -19195,7 +19148,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
         chatRoom: self.props.chatRoom,
         className: "message avatar-wrapper small-rounded-avatar"
       });
-      var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+      var otherDisplayName = M.getNameByHandle(otherContact.u);
       const isSelfJoin = h === contact.u;
       let text = isSelfJoin ? l[23756] : l[8907];
       if (self.props.chatRoom.isMeeting) {
@@ -19231,7 +19184,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
         chatRoom: self.props.chatRoom,
         className: "message avatar-wrapper small-rounded-avatar"
       });
-      var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+      var otherDisplayName = M.getNameByHandle(otherContact.u);
       var text;
       if (otherContact.u === contact.u) {
         text = self.props.chatRoom.isMeeting ? l.meeting_mgmt_left : l[8908];
@@ -19277,7 +19230,7 @@ class TruncatedMessage extends truncated_ConversationMessageMixin {
     }, timestamp);
     var displayName;
     if (contact) {
-      displayName = generateAvatarMeta(contact.u).fullName;
+      displayName = M.getNameByHandle(contact.u);
     } else {
       displayName = contact;
     }
@@ -19341,7 +19294,7 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
     }, timestamp);
     var displayName;
     if (contact) {
-      displayName = generateAvatarMeta(contact.u).fullName;
+      displayName = M.getNameByHandle(contact.u);
     } else {
       displayName = contact;
     }
@@ -19356,7 +19309,7 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
       className: "message avatar-wrapper small-rounded-avatar",
       chatRoom: chatRoom
     });
-    var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+    var otherDisplayName = M.getNameByHandle(otherContact.u);
     var newPrivilegeText = "";
     if (message.meta.privilege === 3) {
       newPrivilegeText = l.priv_change_to_op;
@@ -19407,7 +19360,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
     }, timestamp);
     var displayName;
     if (contact) {
-      displayName = generateAvatarMeta(contact.u).fullName;
+      displayName = M.getNameByHandle(contact.u);
     } else {
       displayName = contact;
     }
@@ -19456,7 +19409,7 @@ class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
     }, timestamp);
     var displayName;
     if (contact) {
-      displayName = generateAvatarMeta(contact.u).fullName;
+      displayName = M.getNameByHandle(contact.u);
     } else {
       displayName = contact;
     }
@@ -19507,7 +19460,7 @@ class ChatHandleMessage extends chatHandle_ConversationMessageMixin {
     }, timestamp);
     var displayName;
     if (contact) {
-      displayName = generateAvatarMeta(contact.u).fullName;
+      displayName = M.getNameByHandle(contact.u);
     } else {
       displayName = contact;
     }
@@ -20819,7 +20772,7 @@ class VideoNodeMenu extends mixins.wl {
       className: IS_GUEST ? 'disabled' : '',
       icon: "sprite-fm-mono icon-add",
       onClick: () => {
-        return IS_GUEST ? false : M.syncContactEmail(userHandle, new MegaPromise(), true).done(email => {
+        return IS_GUEST ? false : M.syncContactEmail(userHandle, true).then(email => {
           const OPC = Object.values(M.opc);
           if (OPC && OPC.length && OPC.some(opc => opc.m === email)) {
             return msgDialog('warningb', '', l[17545]);
@@ -23667,8 +23620,10 @@ class Call extends mixins.wl {
       }
     };
     this.handleCallOnline = () => {
-      delay.cancel(this.offlineDelayed);
-      delete this.offlineDelayed;
+      if (this.pCallTimer) {
+        this.pCallTimer.abort();
+        this.pCallTimer = null;
+      }
       this.setState({
         offline: false
       });
@@ -23864,18 +23819,18 @@ class Call extends mixins.wl {
       call.handleStayConfirm();
       onIdle(() => this.safeForceUpdate());
     };
+    this.pCallTimer = null;
     this.state.mode = props.call.viewMode;
     this.state.sidebar = props.chatRoom.type === 'public';
   }
   handleCallOffline() {
-    if (this.offlineDelayed) {
-      return;
-    }
-    this.offlineDelayed = delay('callOffline', () => {
-      this.setState({
-        offline: true
+    if (!this.pCallTimer) {
+      (this.pCallTimer = tSleep(30)).then(() => {
+        this.setState({
+          offline: true
+        });
       });
-    }, 3e4);
+    }
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -25399,9 +25354,9 @@ class Contact extends AbstractGenericMessage {
   _handleAddContact(contactEmail) {
     var _this$props$chatRoom;
     if ((_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.isAnonymous()) {
-      return this._doAddContact(contactEmail).done(addedEmail => this.DIALOG.ADDED(addedEmail)).catch(this.DIALOG.DUPLICATE);
+      return this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail)).catch(this.DIALOG.DUPLICATE);
     }
-    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).done(addedEmail => this.DIALOG.ADDED(addedEmail));
+    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail));
   }
   _getContactAvatar(contact, className) {
     return external_React_default().createElement(ui_contacts.Avatar, {
@@ -27028,19 +26983,7 @@ class GenericConversationMessage extends mixin.y {
     }
     openSaveToDialog(v, function (node, target) {
       if (Array.isArray(target)) {
-        M.myChatFilesFolder.get(true).then(function (myChatFolder) {
-          M.injectNodes(node, myChatFolder.h, function (res) {
-            if (Array.isArray(res) && res.length) {
-              megaChat.openChatAndAttachNodes(target, res).dump();
-            } else if (d) {
-              console.warn('Unable to inject nodes... no longer existing?', res);
-            }
-          });
-        }).catch(function () {
-          if (d) {
-            console.error("Failed to allocate 'My chat files' folder.", arguments);
-          }
-        });
+        megaChat.openChatAndAttachNodes(target, node.ch || node.h).catch(tell);
       } else {
         target = target || M.RootID;
         M.injectNodes(node, target, function (res) {
@@ -27283,7 +27226,7 @@ class ConversationMessageMixin extends _mixins1__._p {
   }
   removeContactListeners() {
     const users = this._contactChangeListeners;
-    if (d > 1) {
+    if (d > 3) {
       console.warn('%s.removeContactListeners', this.getReactId(), [this], users);
     }
     for (let i = users.length; i--;) {
@@ -27322,7 +27265,7 @@ class ConversationMessageMixin extends _mixins1__._p {
         }
       }
     }
-    if (d > 1) {
+    if (d > 3) {
       console.warn('%s.addContactListeners', this.getReactId(), [this], users);
     }
     for (let i = users.length; i--;) {
@@ -27617,19 +27560,21 @@ class ScheduleMetaChange extends _mixin_jsx1__.y {
   componentDidMount() {
     super.componentDidMount();
     if (this.props.mode === ScheduleMetaChange.MODE.CREATED) {
-      const val = is_chatlink ? `chat/${is_chatlink.ph}#${is_chatlink.key}` : this.props.chatRoom.getPublicLink();
-      if (typeof val === 'string') {
+      if (is_chatlink) {
         this.setState({
-          link: `${getBaseUrl()}/${val}`
+          link: `chat/${is_chatlink.ph}#${is_chatlink.key}`
         });
-      } else if (val instanceof MegaPromise) {
-        val.done(() => {
-          if (this.isMounted() && !this.state.link && this.props.chatRoom.publicLink) {
+      } else {
+        const {
+          chatRoom
+        } = this.props;
+        chatRoom.updatePublicHandle().then(() => {
+          if (this.isMounted() && !this.state.link && chatRoom.publicLink) {
             this.setState({
-              link: `${getBaseUrl()}/${this.props.chatRoom.publicLink}`
+              link: `${getBaseUrl()}/${chatRoom.publicLink}`
             });
           }
-        });
+        }).catch(dump);
       }
     }
     if (this.props.message.meta.ap) {
@@ -28059,9 +28004,9 @@ class EmojiAutocomplete extends mixins.wl {
     this.maxFound = found.length;
     this.found = found;
     if (!found || found.length === 0) {
-      setTimeout(function () {
+      queueMicrotask(() => {
         self.props.onCancel();
-      }, 0);
+      });
       return null;
     }
     var emojisDomList = [];
@@ -31517,11 +31462,11 @@ class NodeProperties {
   static get(node, changeListener) {
     assert(node.h, 'missing handle for node');
     if (NodeProperties._globalCleanupTimer) {
-      clearTimeout(NodeProperties._globalCleanupTimer);
+      NodeProperties._globalCleanupTimer.abort();
     }
-    NodeProperties._globalCleanupTimer = setTimeout(() => {
+    (NodeProperties._globalCleanupTimer = tSleep(120)).then(() => {
       NodeProperties.cleanup(0);
-    }, 120e3);
+    });
     let nodeProps;
     if (!NodeProperties._cache.has(node.h)) {
       nodeProps = new NodeProperties(node, changeListener);

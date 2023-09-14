@@ -416,18 +416,20 @@ ZipEntryIO.prototype.setCredentials = function() {
 
 ZipEntryIO.prototype.push = function(obj) {
     'use strict';
-    if (oIsFrozen(this.zipWriter)) {
+    if (oIsFrozen(this) || oIsFrozen(this.zipWriter)) {
         console.warn('The ZipWriter instance have already been destroyed.', this);
         return;
     }
     this.queued++;
     obj.zfile = this;
-    this.zipWriter.zwriter.push(obj, function() {
-        this.queued--
-        if (Object(this.file).ready) {
-            this.file.ready();
+    this.zipWriter.zwriter.push(obj, () => {
+        if (this.queued) {
+            this.queued--;
+            if (Object(this.file).ready) {
+                this.file.ready();
+            }
         }
-    }.bind(this));
+    });
 };
 
 function ZipWriter(dl_id, dl) {
@@ -442,12 +444,7 @@ function ZipWriter(dl_id, dl) {
     this.file_offset = 0;
     this.eblocked = 0;
 
-    if ((dlMethod === FileSystemAPI) || ((typeof FirefoxIO !== 'undefined') && dlMethod === FirefoxIO)) {
-        this.io = new CacheIO(dl_id, dl);
-    }
-    else {
-        this.io = new dlMethod(dl_id, dl)
-    }
+    this.io = dlMethod === MemoryIO ? new dlMethod(dl_id, dl) : new CacheIO(dl_id, dl);
 
     this.io.is_zip = true;
     this.zwriter = new MegaQueue(dlZipWriterIOWorker.bind(this), 1, 'zip-writer');
@@ -502,7 +499,7 @@ ZipWriter.prototype.destroy = function(error) {
                 this.io.abort(error || this);
             }
         }
-        else if (dlMethod != FlashIO) {
+        else {
             dlmanager.cleanupUI(dl, true);
         }
         oDestroy(this);
@@ -510,7 +507,8 @@ ZipWriter.prototype.destroy = function(error) {
 }
 
 function dlZipWriterIOWorker(task, done) {
-    var file = task.zfile.file;
+    'use strict';
+    const {file} = task.zfile;
 
     if (typeof file === 'undefined') {
         if (d) {
@@ -522,7 +520,13 @@ function dlZipWriterIOWorker(task, done) {
     this.hashes[file.id] = crc32(task.data, this.hashes[file.id] || 0, task.data.byteLength)
     this.file_offset += task.data.byteLength;
 
-    var buffer = task.data;
+    const buffer = task.data;
+    const write = (buffer, done) => {
+        const pos = this.offset;
+
+        this.offset += buffer.byteLength;
+        this.io.write(buffer, pos, done);
+    };
 
     if (file.data) {
         try {
@@ -537,20 +541,16 @@ function dlZipWriterIOWorker(task, done) {
             file.size,
             file.t
         );
-        task.zfile.file.io.entryPos = this.offset;
-
-        /* prepend header data to the block */
-        var d = new Uint8Array(header.byteLength + buffer.byteLength);
-        d.set(header, 0);
-        d.set(buffer, header.byteLength);
+        file.io.entryPos = this.offset;
 
         /* replace task.data */
         delete task.data;
-        buffer = d
-    }
 
-    this.io.write(buffer, this.offset, done);
-    this.offset += buffer.byteLength;
+        write(header, () => write(buffer, done));
+    }
+    else {
+        write(buffer, done);
+    }
 }
 
 function dlZipWriterValidate(t) {

@@ -240,7 +240,7 @@ mega.achievem.enabled = function achievementsEnabled() {
     }
     else {
         this.achStatus[status] = promise;
-        M.req('ach').always(notify);
+        api.req({a: 'ach'}).then(({result}) => result).always(notify).catch(dump);
     }
 
     return promise;
@@ -693,13 +693,10 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
 
                 // Extract email addresses one by one
                 var email = $(value).text().replace(',', '');
+                const myEmail = Object(M.u[u_handle]).m || Object(window.u_attr).email;
 
-                if (M.u[u_handle]) {
-                    M.inviteContact(M.u[u_handle].m, email, emailText);
-                }
-                else if (u_type && typeof u_attr === 'object') {
-                    M.req({'a': 'upc', 'e': u_attr.email, 'u': email, 'msg': emailText, 'aa': 'a', i: requesti})
-                        .dump();
+                if (myEmail) {
+                    M.inviteContact(myEmail, email, emailText);
                 }
                 else {
                     error = true;
@@ -963,7 +960,7 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
         var opc = M.findOutgoingPendingContactIdByEmail(email);
 
         if (opc) {
-            M.reinvitePendingContactRequest(email);
+            M.reinvitePendingContactRequest(email).catch(tell);
         }
         else {
             console.warn('No outgoing pending contact request for %s', email);

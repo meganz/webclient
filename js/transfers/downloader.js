@@ -142,6 +142,7 @@ ClassChunk.prototype.shouldIReportDone = function(report_done) {
         }
         this.done = true;
         dlQueue.expand();
+        dlmanager.preFetchDownloadTickets(this.dl.pos);
     }
 
     return report_done;
@@ -343,7 +344,7 @@ ClassChunk.prototype.run = function(task_done) {
     }
 
     this.xhr.open('POST', this.url, true);
-    this.xhr.responseType = have_ab ? 'arraybuffer' : 'text';
+    this.xhr.responseType = 'arraybuffer';
     this.xhr.send();
 
     if (Object(this.xhr.constructor).name === 'HSBHttpRequest') {
@@ -403,7 +404,7 @@ ClassFile.prototype.toString = function() {
 ClassFile.prototype.abortTimers = function() {
     if (this.dl) {
         if (this.dl.retry_t) {
-            clearTimeout(this.dl.retry_t);
+            this.dl.retry_t.abort();
             delete this.dl.retry_t;
         }
     }
@@ -459,9 +460,7 @@ ClassFile.prototype.destroy = function() {
                 this.dl.io.download(this.dl.zipname || this.dl.n, this.dl.p || '');
             }
             this.dl.onDownloadComplete(this.dl);
-            if (dlMethod !== FlashIO) {
-                dlmanager.cleanupUI(this.dl, true);
-            }
+            dlmanager.cleanupUI(this.dl, true);
         }
     }
 
@@ -624,7 +623,7 @@ ClassFile.prototype.run = function(task_done) {
         }
     }.bind(this);
 
-    dlmanager.dlGetUrl(this.dl, function(error, res, o) {
+    dlmanager.dlGetUrl(this.dl, (error, res) => {
         var cancelOnInit = function(force) {
             if (!this.dl || this.dl.cancelled || force) {
                 if (d) {
@@ -682,6 +681,7 @@ ClassFile.prototype.run = function(task_done) {
             else {
                 var onGetUrlError = function onGetUrlError() {
                     if (!cancelOnInit()) {
+                        this.dl.retry_t = null;
                         dlmanager.logger.info(this + ' Retrying dlGetUrl for ' + this.dl.n);
                         dlmanager.dlQueuePushBack(this);
                     }
@@ -694,41 +694,49 @@ ClassFile.prototype.run = function(task_done) {
                 }
                 else {
                     dlmanager.dlRetryInterval *= 1.2;
-                    if (dlmanager.dlRetryInterval > 600000) {
-                        dlmanager.dlRetryInterval = 600000;
+                    if (dlmanager.dlRetryInterval > 2e5) {
+                        dlmanager.dlRetryInterval = 2e5;
                     }
-                    this.dl.retry_t = setTimeout(onGetUrlError, dlmanager.dlRetryInterval);
+                    (this.dl.retry_t = tSleep(dlmanager.dlRetryInterval / 1e3)).then(onGetUrlError).catch(dump);
                     dlmanager.logger.warn(this + ' Retry to fetch url in %dms, error:%s',
                                             dlmanager.dlRetryInterval, error);
                 }
             }
         }
         else {
-            var file = this;
-
-            dlmanager.getResumeInfo(this.dl, function(resumeInfo) {
-                dlmanager.initDownload(file, res, resumeInfo)
-                    .fail(function(error) {
-                        if (d) {
-                            dlmanager.logger.error('initDownload error', error);
+            const init = (resumeInfo) => {
+                dlmanager.initDownload(this, res, resumeInfo)
+                    .then((info) => {
+                        if (!onError(cancelOnInit()) && d > 1) {
+                            dlmanager.logger.debug('initDownload succeed', info, resumeInfo);
                         }
-                        dlFatalError(file.dl, escapeHTML(l[5945]).replace('{0}', error));
-                        cancelOnInit(true);
-                        onError(error);
                     })
-                    .done(function(info) {
-                        if (!onError(cancelOnInit())) {
-                            if (d) {
-                                dlmanager.logger.debug('initDownload succeed', info, resumeInfo);
-                            }
+                    .catch((ex) => {
+                        if (ex === EEXPIRED) {
+                            // already aborted.
+                            return;
                         }
+                        if (d) {
+                            dlmanager.logger.error('initDownload error', ex);
+                        }
+                        dlFatalError(this.dl, escapeHTML(l[5945]).replace('{0}', ex));
+                        cancelOnInit(true);
+                        onError(ex);
                     });
-            });
+            };
+
+            if (dlmanager.dlResumeThreshold > res.s) {
+
+                init(false);
+            }
+            else {
+                dlmanager.getResumeInfo(this.dl, init);
+            }
         }
 
         if (error) {
             onError(error);
         }
 
-    }.bind(this));
+    });
 };

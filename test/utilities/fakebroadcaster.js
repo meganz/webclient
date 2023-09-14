@@ -129,7 +129,7 @@ FakeBroadcasterWatchdog.prototype.notify = function(msg, data) {
  */
 FakeBroadcasterWatchdog.prototype.query = function(what, timeout, cache, data, expectsSingleAnswer) {
     var self = this;
-    var token = mRandomToken();
+    var token = Math.random().toString(36);
     var promise = new MegaPromise();
 
     self.logger.debug("SEND query: ", what, data, token, timeout, cache);

@@ -665,12 +665,12 @@ function deviceIcon(name, type) {
  * @returns {String} Folder Icon name
  */
 function folderIcon(node) {
-
     'use strict';
 
     let folderIcon = '';
+    const root = M.getNodeRoot(node.h);
 
-    if (M.getNodeRoot(node.h) === M.RubbishID) {
+    if (root === M.RubbishID) {
 
         folderIcon = 'rubbish-';
     }
@@ -680,14 +680,6 @@ function folderIcon(node) {
 
         // folderIcon += 'folder-outgoing'; for vector icon
         return `${folderIcon}folder-shared`;
-    }
-    // File request folder
-    else if (
-        mega.fileRequestCommon.storage.cache.puHandle[node.h]
-        && mega.fileRequestCommon.storage.cache.puHandle[node.h].s !== 1
-        && mega.fileRequestCommon.storage.cache.puHandle[node.h].p
-    ) {
-        return `${folderIcon}file-request-folder`;
     }
     // Incoming share
     else if (node.su) {
@@ -705,8 +697,15 @@ function folderIcon(node) {
 
         return `${folderIcon}folder-camera`;
     }
+    // File request folder
+    else if (mega.fileRequest.publicFolderExists(node.h)) {
+
+        return `${folderIcon}file-request-folder`;
+    }
+
+
     // Backups
-    if (M.getNodeRoot(node.h) === M.InboxID) {
+    if (root === M.InboxID) {
 
         // Backed up device icon
         if (node.devid) {

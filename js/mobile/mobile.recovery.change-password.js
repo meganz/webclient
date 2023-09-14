@@ -192,16 +192,9 @@ mobile.recovery.changePassword = {
         var recoveryCode = mobile.recovery.fromEmailLink.recoveryCode;
         var recoveryKeyArray = mobile.recovery.enterKey.recoveryKeyArray;
 
-        loadingDialog.show();
-
         // Change the password, re-encrypt the Master Key and send the encrypted key to the server
-        security.resetKey(recoveryCode, recoveryKeyArray, recoveryEmail, newPassword, function(responseCode) {
-
-            loadingDialog.hide();
-
-            // If successful
-            if (responseCode === 0) {
-
+        security.resetKey(recoveryCode, recoveryKeyArray, recoveryEmail, newPassword)
+            .then(() => {
                 // Show message that the password has been reset successfully
                 mobile.messageOverlay.show(l[1955], l[1981], function() {
 
@@ -211,25 +204,8 @@ mobile.recovery.changePassword = {
                     // Load the login page
                     loadSubPage('login');
                 });
-            }
-
-            // Show error that the Recovery Key you supplied does not match this account
-            else if (responseCode === EKEY) {
-                mobile.messageOverlay.show(l[1977], l[1978]);
-            }
-
-            // The account they're trying to reset is blocked
-            else if (responseCode === EBLOCKED) {
-                mobile.messageOverlay.show(l[1979], l[1980]);
-            }
-
-            // This recovery link has expired
-            else if (responseCode === EEXPIRED || responseCode === ENOENT) {
-                mobile.messageOverlay.show(l[1966], l[1967], function() {
-                    loadSubPage('login');
-                });
-            }
-        });
+            })
+            .catch(tell);
     },
 
     /**

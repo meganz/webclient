@@ -590,7 +590,7 @@ var aboutus = {
                 jobs: [],
                 cacheTimer: "",
             };
-            M.req({a: 'ttfj'}).then((jobs) => {
+            api.req({a: 'ttfj'}).then(({result: jobs}) => {
                 // If there is are jobs
                 if (jobs.length > 0) {
                     const transformedData = Object.create(null);

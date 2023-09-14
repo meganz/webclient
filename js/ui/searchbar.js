@@ -166,7 +166,7 @@
     }
 
     mBroadcaster.once('fm:initialized', () => {
-        initSearch();
+        later(initSearch);
     });
 
     // export

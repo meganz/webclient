@@ -55,15 +55,10 @@ mobile.deleteOverlay = {
         'use strict';
 
         // On delete button click/tap
-        this.$overlay.find('.first.delete').off('tap').on('tap', function() {
+        this.$overlay.find('.first.delete').rebind('tap', () => {
 
             // Delete the file
-            fmremove([nodeHandle]);
-
-            // Run the callback function on successful deletion
-            if (typeof successCallback !== 'undefined') {
-                successCallback();
-            }
+            fmremove([nodeHandle]).then(successCallback || (() => history.back())).catch(tell);
 
             // Prevent default anchor link behaviour
             return false;

@@ -391,7 +391,7 @@ export class MegaRenderMixin extends React.Component {
             if (node) {
                 this.__intersectionVisibility = false;
 
-                setTimeout(() => {
+                onIdle(() => {
                     // bug in IntersectionObserver, that caused the intersection observer to not fire the initial
                     // visibility call once its initialized
                     this.__intersectionObserverInstance = new IntersectionObserver(
@@ -415,7 +415,7 @@ export class MegaRenderMixin extends React.Component {
                         }
                     );
                     this.__intersectionObserverInstance.observe(node);
-                }, 150);
+                });
             }
         }
         if (this.onResizeObserved) {
@@ -986,11 +986,11 @@ export class ContactAwareComponent extends MegaRenderMixin {
             const chatHandle = is_chatlink.ph || (chatRoom && chatRoom.publicChatHandle);
 
             if (syncName) {
-                promises.push(M.syncUsersFullname(contactHandle, chatHandle, new MegaPromise()));
+                promises.push(M.syncUsersFullname(contactHandle, chatHandle));
             }
 
             if (syncMail) {
-                promises.push(M.syncContactEmail(contactHandle, new MegaPromise()));
+                promises.push(M.syncContactEmail(contactHandle));
             }
 
             if (syncAvtr) {
@@ -1005,7 +1005,7 @@ export class ContactAwareComponent extends MegaRenderMixin {
             // force stuck in "Loading" state
             // promises.push([function() { return new MegaPromise(); }]);
 
-            MegaPromise.allDone(promises)
+            return Promise.allSettled(promises)
                 .always(() => {
                     this.eventuallyUpdate();
                     this.__isLoadingContactInfo = false;
@@ -1016,7 +1016,7 @@ export class ContactAwareComponent extends MegaRenderMixin {
         };
 
         if (syncName || syncMail || syncAvtr) {
-            this.__isLoadingContactInfo = setTimeout(loader, 300);
+            (this.__isLoadingContactInfo = tSleep(0.3)).then(loader).catch(dump);
         }
     }
 
@@ -1033,7 +1033,8 @@ export class ContactAwareComponent extends MegaRenderMixin {
         super.componentWillUnmount();
 
         if (this.__isLoadingContactInfo) {
-            clearTimeout(this.__isLoadingContactInfo);
+            this.__isLoadingContactInfo.abort();
+            this.__isLoadingContactInfo = false;
         }
     }
 

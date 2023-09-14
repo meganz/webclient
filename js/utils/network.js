@@ -13,6 +13,11 @@ async function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
         aData = await megaUtilsGFSFetch.getTicketData(aData);
     }
 
+    if (aStartOffset === undefined) {
+        aEndOffset = -1;
+        aStartOffset = 0;
+    }
+
     aEndOffset = parseInt(aEndOffset);
     aStartOffset = parseInt(aStartOffset);
 
@@ -82,12 +87,21 @@ async function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
 
 megaUtilsGFSFetch.getTicket = (aData) => {
     'use strict';
-    let key, handle;
-    const req = {a: 'g', g: 1, ssl: use_ssl};
+    let key, n, handle;
+    const payload = {a: 'g', v: 2, g: 1, ssl: use_ssl};
+    const options = {
+        channel: pfid ? 1 : 0
+    };
 
     // If a ufs-node's handle provided
     if (String(aData).length === 8) {
         handle = aData;
+    }
+    else if (typeof aData === 'object') {
+        // if a download-instance provided.
+        handle = aData.dl_id;
+        n = aData.nauth && aData;
+        key = aData.ph && aData.key;
     }
     else {
         // if a public-link provided, eg #!<handle>!<key>
@@ -100,39 +114,56 @@ megaUtilsGFSFetch.getTicket = (aData) => {
     }
 
     if (key) {
-        req.p = handle;
+        payload.p = handle;
     }
     else {
-        req.n = handle;
-        key = M.getNodeByHandle(handle).k;
+        payload.n = handle;
+        key = (n = n || M.getNodeByHandle(handle)).k;
     }
 
     if (!handle || !Array.isArray(key) || key.length !== 8) {
         return {error: EARGS};
     }
 
-    if (window.fetchStreamSupport) {
-        // can handle CloudRAID downloads.
-        req.v = 2;
-    }
-
     // IF this is an anonymous chat OR a chat that I'm not a part of
     if (M.chat && megaChatIsReady) {
-        megaChat.eventuallyAddDldTicketToReq(req);
+        megaChat.eventuallyAddDldTicketToReq(payload);
     }
 
-    return {req, key, handle};
+    if (self.d && String(apipath).includes('staging')) {
+        const s = sessionStorage;
+        if (s.dltfefq || s.dltflimit) {
+            payload.f = [s.dltfefq | 0, s.dltflimit | 0];
+        }
+    }
+
+    if ((n = n || M.getNodeByHandle(handle))) {
+        const {foreign: f, nauth: a} = n;
+
+        if (a && (!pfid || f)) {
+            // options.queryString = `n=${n.nauth}`;
+            payload.enp = a;
+        }
+        if (f) {
+            options.channel = 6;
+        }
+    }
+
+    return {payload, key, handle, options};
 };
 
 megaUtilsGFSFetch.getTicketData = async(aData) => {
     'use strict';
-    const {req, key, handle, error} = megaUtilsGFSFetch.getTicket(aData);
-    if (error) {
-        return Promise.reject(error);
+
+    if (typeof aData === 'object') {
+        aData.dlTicketData = false;
     }
-    const res = await M.req(req, window.pfid ? 1 : 0);
+    const {payload, options, key, handle, error} = megaUtilsGFSFetch.getTicket(aData);
+    const res = error || (await api.req(payload, options)).result;
 
     if (typeof res === 'object' && res.g) {
+        let error = !!res.d;
+
         res.key = key;
         res.handle = handle;
 
@@ -141,20 +172,24 @@ megaUtilsGFSFetch.getTicketData = async(aData) => {
             res.g = Object.values(res.g);
 
             if (res.g[0] < 0) {
-                res.e = res.e || res.g[0];
+                error = res.g[0];
             }
         }
+        res.e = res.e || error || !res.g;
 
         if (!res.e) {
             delete dlmanager.efq;
             if (res.efq) {
                 dlmanager.efq = true;
             }
+            if (typeof aData === 'object') {
+                aData.dlTicketData = res;
+            }
             return res;
         }
     }
 
-    return Promise.reject(res && res.e || res);
+    throw res && res.e || res || EINTERNAL;
 };
 
 /**
@@ -235,10 +270,6 @@ function megaUtilsXHR(aURLOrOptions, aData) {
             options.beforeSend(xhr);
         }
 
-        if (is_chrome_firefox) {
-            xhr.setRequestHeader('Origin', getBaseUrl(), false);
-        }
-
         xhr.send(aData);
     }
     catch (ex) {
@@ -269,11 +300,18 @@ function eventlog(id, msg, once) {
     'use strict';
 
     if ((id = parseInt(id)) >= 99600) {
-        var req = {a: 'log', e: id};
+        const req = {a: 'log', e: id};
+        const {jid} = mega.flags;
 
         if (msg === true) {
             once = true;
             msg = 0;
+        }
+
+        if (jid) {
+            req.j = jid;
+            req.v = mega.viewID;
+            req.ms = Date.now();
         }
 
         if (msg) {
@@ -289,7 +327,7 @@ function eventlog(id, msg, once) {
 
         if (!once || !eventlog.sent[id]) {
             eventlog.sent[id] = [Date.now(), M.getStack()];
-            api_req(req);
+            return api.req(req).catch((ex) => dump(id, ex));
         }
     }
     else {

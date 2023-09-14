@@ -53,7 +53,7 @@ mobile.account.changePassword = {
         var $updateButton = this.$page.find('.update-password-button');
 
         // Add click/tap handler to button
-        $updateButton.off('tap').on('tap', function() {
+        $updateButton.rebind('tap', () => {
 
             // Get the current text field values
             var password = $passwordField.val();
@@ -82,8 +82,28 @@ mobile.account.changePassword = {
                 return false;
             }
 
+            const {$page} = mobile.account.changePassword;
+            const $verifyActionPage = $('.mobile.two-factor-page.verify-action-page');
+
             // Pass the encrypted password to the API
-            mobile.account.changePassword.updatePassword(password);
+            mobile.account.changePassword.updatePassword(password)
+                .then(() => {
+
+                    // Success
+                    $page.removeClass('hidden');
+                    $verifyActionPage.addClass('hidden');
+
+                    // Show 'Your password has been changed' message and load the account page on button click
+                    mobile.messageOverlay.show(l[725], null, () => loadSubPage('fm/account'));
+                })
+                .catch((ex) => {
+                    $page.removeClass('hidden');
+                    $verifyActionPage.addClass('hidden');
+                    tell(ex);
+                })
+                .finally(() => {
+                    $('.password-input, .password-confirm-input', $page).val('');
+                });
 
             // Prevent double taps
             return false;
@@ -94,80 +114,33 @@ mobile.account.changePassword = {
      * Updates the user's password, re-encrypts their Master Key, then sends to the server
      * @param {String} newPassword The user's new password
      */
-    updatePassword: function(newPassword) {
-
+    async updatePassword(newPassword) {
         'use strict';
-
-        loadingDialog.show();
+        let twoFactorPin = null;
+        const [
+            hasTwoFactor,
+            accountAuthVersion
+        ] = await Promise.all([twofactor.isEnabledForAccount(), security.changePassword.checkAccountVersion()]);
 
         // Check if 2FA is enabled on their account
-        mobile.twofactor.isEnabledForAccount(function(result) {
+        if (hasTwoFactor) {
 
-            loadingDialog.hide();
+            mobile.account.changePassword.$page.addClass('hidden');
 
-            // If 2FA is enabled on their account
-            if (result) {
+            // Show the verify 2FA action page to collect the user's PIN
+            twoFactorPin = await mobile.twofactor.verifyAction.init();
+        }
 
-                // Hide the current page
-                mobile.account.changePassword.$page.addClass('hidden');
+        const same = await security.changePassword.isPasswordTheSame($.trim(newPassword), accountAuthVersion);
 
-                // Show the verify 2FA action page to collect the user's PIN
-                mobile.twofactor.verifyAction.init(function(twoFactorPin) {
-                    mobile.account.changePassword.continueChangePassword(newPassword, twoFactorPin);
-                });
-            }
-            else {
-                // Otherwise change the password without 2FA
-                mobile.account.changePassword.continueChangePassword(newPassword, null);
-            }
-        });
-    },
+        // You have entered your current password, please enter a new password.
+        assert(!same, l[22126]);
 
-    /**
-     * Continue to change the user's password (e.g. immediately or after they've entered their 2FA PIN
-     * @param {String} newPassword The new password
-     * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
-     */
-    continueChangePassword: function(newPassword, twoFactorPin) {
+        if (accountAuthVersion === 2) {
+            return security.changePassword.newMethod(newPassword, twoFactorPin);
+        }
 
-        'use strict';
-
-        var self = this;
-        var $passwordField = this.$page.find('.password-input');
-        var $confirmPasswordField = this.$page.find('.password-confirm-input');
-
-        var failingAction = function(status) {
-            $passwordField.val('');
-            $confirmPasswordField.val('');
-            self.$page.find('.password-strength').removeClass('good1 good2 good3 good4 good5');
-
-
-            if (status === 1) {
-                mobile.messageOverlay.show(l[22126]);
-                $('#mobile-ui-error .text-button.cancel').addClass('hidden');
-            }
-        };
-
-        // Check their current Account Authentication Version before proceeding
-        security.changePassword.checkAccountVersion((accountAuthVersion) => {
-
-            var checkPassPromise = security.changePassword.isPasswordTheSame($.trim(newPassword), accountAuthVersion);
-
-            checkPassPromise.fail(failingAction);
-            checkPassPromise.done(
-                () => {
-                    if (accountAuthVersion === 2) {
-                        security.changePassword.newMethod(
-                            newPassword, twoFactorPin, mobile.account.changePassword.completeChangePassword
-                        );
-                    }
-                    else {
-                        security.changePassword.oldMethod(
-                            newPassword, twoFactorPin, mobile.account.changePassword.completeChangePassword
-                        );
-                    }
-                });
-        });
+        return security.changePassword.oldMethod(newPassword, twoFactorPin);
     },
 
     /**

@@ -1,14 +1,13 @@
+/* eslint-disable strict, max-depth, complexity */
+
 // JSON parser/splitter
 // (this is tailored to processing what the API actually generates
 // i.e.: NO whitespace, NO non-numeric/string constants ("null"), etc...)
 // accepts string and Uint8Array input, but not a mixture of the two
-(function() {
+(function(global) {
     "use strict";
 
-    var JSONSplitter = function json_splitter(filters, ctx, format_uint8array) {
-        if (!(this instanceof json_splitter)) {
-            return new json_splitter(filters, ctx, format_uint8array);
-        }
+    function JSONSplitter(filters, ctx, format_uint8array) {
 
         // position in source string
         this.p = 0;
@@ -40,6 +39,9 @@
 
             // convert input Uint8Array to string
             this.tostring = function(u8) {
+                if (u8.byteLength > 0x1ff && u8.byteLength < 0x10000) {
+                    return String.fromCharCode.apply(null, u8);
+                }
                 var b = '';
 
                 for (var i = 0; i < u8.length; i++) {
@@ -105,17 +107,18 @@
         }
 
         // console logging
-        this.logger = MegaLogger.getLogger('JSONSplitter');
-    };
+        this.logger = global.d && new MegaLogger('JSONSplitter', null, ctx && ctx.logger);
+    }
 
     // returns the position after the end of the JSON string at o or -1 if none found
     // (does not perform a full validity check on the string)
     JSONSplitter.prototype.strend = function strend(s, o) {
-        var oo = o;
+        let oo = o;
+        const ch = this.fromchar('"');
 
         // find non-escaped "
-        while ((oo = s.indexOf(this.fromchar('"'), oo + 1)) >= 0) {
-            var e = oo;
+        while ((oo = s.indexOf(ch, oo + 1)) >= 0) {
+            let e = oo;
             while (this.tochar(s[--e]) === '\\') {
                 /* noop */
             }
@@ -136,7 +139,7 @@
         var oo = o;
 
         // (we do not set lastIndex due to the potentially enormous length of s)
-        while ('0123456789-+eE.'.indexOf(this.tochar(s[oo])) >= 0) {
+        while ('0123456789-+eE.'.includes(this.tochar(s[oo]))) {
             oo++;
         }
 
@@ -155,9 +158,9 @@
     // FIXME: rewrite without large string concatenation
     JSONSplitter.prototype.chunkproc = function json_chunkproc(chunk, inputcomplete) {
         // we are not receiving responses incrementally: process as growing buffer
-        if (!chunked_method) {
-            return this.proc(chunk, inputcomplete);
-        }
+        // if (!chunked_method) {
+        //     return this.proc(chunk, inputcomplete);
+        // }
 
         // otherwise, we just retain the data that is still going to be needed in the
         // next round... enabling infinitely large accounts to be "streamed" to IndexedDB
@@ -194,40 +197,45 @@
         return r;
     };
 
-    // jshint -W074
     // returns -1 if it wants more data, 0 in case of a fatal error, 1 when done
     JSONSplitter.prototype.proc = function json_proc(json, inputcomplete) {
-        var node;
-        var filter;
-        var callback;
+        let node, filter, callback, usn;
 
-        if (inputcomplete && json && !this.p && json.length > 7 && this.tostring(this.sub(json, 0, 7)) === '{"err":') {
+        if (inputcomplete && !this.p && json.length > 7 && this.tostring(this.sub(json, 0, 7)) === '{"err":') {
             callback = this.filters['#'];
             node = JSON.parse(this.tostring(json));
 
-            if (d) {
+            if (global.d) {
                 this.logger.debug('APIv2 Custom Error Detail', node, [this.ctx]);
             }
             if (callback) {
                 callback.call(this.ctx, node);
             }
-            return 1;
+            if (this.ctx) {
+                this.ctx.error = node;
+            }
+            return (node.err << 1 | 1) >>> 0;
         }
 
         while (this.p < json.length) {
-            var c = this.tochar(json[this.p]);
+            const c = this.tochar(json[this.p]);
 
             if (c === '[' || c === '{') {
                 if (!this.expectvalue) {
-                    this.logger.error("Malformed JSON - unexpected object or array");
+                    if (global.d) {
+                        this.logger.error("Malformed JSON - unexpected object or array");
+                    }
                     return 0;
                 }
 
-                this.stack.push(this.tochar(json[this.p]) + this.lastname);
+                this.stack.push(c + this.lastname);
 
                 if (this.filters[this.stack.join('')]) {
                     // a filter is configured for this path - recurse
-                    this.buckets[0] += this.tostring(this.sub(json, this.lastpos, this.p - this.lastpos));
+                    const len = this.p - this.lastpos;
+                    if (len > 0) {
+                        this.buckets[0] += this.tostring(this.sub(json, this.lastpos, len));
+                    }
                     this.lastpos = this.p;
                     this.buckets.unshift('');
                 }
@@ -238,12 +246,16 @@
             }
             else if (c === ']' || c === '}') {
                 if (this.expectvalue < 0) {
-                    this.logger.error("Malformed JSON - premature array closure");
+                    if (global.d) {
+                        this.logger.error("Malformed JSON - premature array closure");
+                    }
                     return 0;
                 }
 
                 if (!this.stack.length || "]}".indexOf(c) !== "[{".indexOf(this.stack[this.stack.length - 1][0])) {
-                    this.logger.error("Malformed JSON - mismatched close");
+                    if (global.d) {
+                        this.logger.error("Malformed JSON - mismatched close");
+                    }
                     return 0;
                 }
 
@@ -255,19 +267,47 @@
                 this.p++;
 
                 if (callback) {
+                    let bucket;
                     // we have a filter configured for this object
+                    // eslint-disable-next-line local-rules/hints
                     try {
                         // pass filtrate to application and empty bucket
-                        node = JSON.parse(
-                            this.buckets[0] + this.tostring(this.sub(json, this.lastpos, this.p - this.lastpos))
-                        );
+                        bucket = this.buckets[0] + this.tostring(this.sub(json, this.lastpos, this.p - this.lastpos));
+
+                        node = JSON.parse(bucket);
+
                         if (filter === '[{[f2{' || filter === '{[a{{t[f2{') {
                             node.fv = 1; // file version
                         }
+                        else if (filter === '{[a{') {
+                            if (!usn && inputcomplete && json.length > 31) {
+                                usn = this.tostring(this.sub(json, json.length - 13, 11));
+                            }
+                            if (usn) {
+                                // inject upcoming sn into packet
+                                node.usn = usn;
+                            }
+                        }
                         callback.call(this.ctx, node);
                     }
-                    catch (e) {
-                        this.logger.error("Malformed JSON - parse error in filter element " + callback.name, e);
+                    catch (ex) {
+                        if (global.d) {
+                            this.logger.error(`Malformed JSON - parse error in filter element ${callback.name}`, ex);
+
+                            tryCatch(() => {
+                                const str = bucket || String.fromCharCode.apply(null, json);
+                                this.logger.error('JSON bucket/payload (%s/%s):', this.lastpos, this.p, [str]);
+
+                                if (bucket) {
+                                    let n = String(ex).match(/(?:position|column)\s+(\d+)/);
+                                    if (n) {
+                                        n = n[1] | 0;
+                                        this.logger.error(`${bucket.substr(Math.max(0, n - 15), 64)}...`);
+                                        this.logger.error('^^^'.padStart(17, ' '));
+                                    }
+                                }
+                            })();
+                        }
                         return 0;
                     }
 
@@ -280,7 +320,9 @@
             }
             else if (c === ',') {
                 if (this.expectvalue) {
-                    this.logger.error("Malformed JSON - stray comma");
+                    if (global.d) {
+                        this.logger.error("Malformed JSON - stray comma");
+                    }
                     return 0;
                 }
                 if (this.lastpos === this.p) {
@@ -290,7 +332,7 @@
                 this.expectvalue = this.stack[this.stack.length - 1][0] === '[';
             }
             else if (c === '"') {
-                var t = this.strend(json, this.p);
+                const t = this.strend(json, this.p);
                 if (t < 0) {
                     break;
                 }
@@ -306,7 +348,9 @@
                     }
 
                     if (this.tochar(json[t]) !== ':') {
-                        this.logger.error("Malformed JSON - no : found after property name");
+                        if (global.d) {
+                            this.logger.error("Malformed JSON - no : found after property name");
+                        }
                         return 0;
                     }
 
@@ -317,11 +361,13 @@
             }
             else if (c >= '0' && c <= '9' || c === '.' || c === '-') {
                 if (!this.expectvalue) {
-                    this.logger.error("Malformed JSON - unexpected number");
+                    if (global.d) {
+                        this.logger.error("Malformed JSON - unexpected number");
+                    }
                     return 0;
                 }
 
-                var j = this.numend(json, this.p);
+                const j = this.numend(json, this.p);
 
                 if (j === json.length) {
                     // numbers, on the face of them, do not tell whether they are complete yet
@@ -329,10 +375,12 @@
                     if (inputcomplete && !this.stack.length) {
                         // this is a stand-alone number, do we have a callback for them?
                         callback = this.filters['#'];
+                        node = this.tostring(json);
+
                         if (callback) {
-                            callback.call(this.ctx, this.tostring(json));
+                            callback.call(this.ctx, node);
                         }
-                        return 1;
+                        return (node << 1 | 1) >>> 0;
                     }
                     break;
                 }
@@ -350,14 +398,16 @@
                 this.p++;
             }
             else {
-                this.logger.error("Malformed JSON - bogus char at position " + this.p);
+                if (global.d) {
+                    this.logger.error(`Malformed JSON - bogus char at position ${this.p}`);
+                }
                 return 0;
             }
         }
 
-        return !this.expectvalue && !this.stack.length ? 1 : inputcomplete ? json === false : -1;
+        return !this.expectvalue && !this.stack.length ? 3 : inputcomplete ? json === false : -1;
     };
-    Object.freeze(JSONSplitter.prototype);
 
-    window.JSONSplitter = JSONSplitter;
-})();
+    freeze(JSONSplitter.prototype);
+    Object.defineProperty(global, 'JSONSplitter', {value: JSONSplitter});
+})(self);

@@ -77,7 +77,7 @@ var accountChangeEmail = {
 
         // On Change Email button click
         $changeEmailButton.rebind('click', function() {
-            
+
             if ($(this).hasClass('disabled')) {
                 return false;
             }
@@ -94,25 +94,19 @@ var accountChangeEmail = {
             // If there is text in the email field and it doesn't match the existing one
             if (newEmail !== '' && u_attr.email.toLowerCase() !== newEmail) {
 
-                loadingDialog.show();
-
                 // Check if 2FA is enabled on their account
-                twofactor.isEnabledForAccount(function(result) {
+                twofactor.isEnabledForAccount()
+                    .then((result) => {
 
-                    loadingDialog.hide();
+                        // If 2FA is enabled
+                        if (result) {
 
-                    // If 2FA is enabled
-                    if (result) {
-
-                        // Show the verify 2FA dialog to collect the user's PIN
-                        twofactor.verifyActionDialog.init(function(twoFactorPin) {
-                            accountChangeEmail.continueChangeEmail(newEmail, twoFactorPin);
-                        });
-                    }
-                    else {
-                        accountChangeEmail.continueChangeEmail(newEmail, null);
-                    }
-                });
+                            // Show the verify 2FA dialog to collect the user's PIN
+                            return twofactor.verifyActionDialog.init();
+                        }
+                    })
+                    .then((twoFactorPin) => accountChangeEmail.continueChangeEmail(newEmail, twoFactorPin || null))
+                    .catch(tell);
             }
         });
     },

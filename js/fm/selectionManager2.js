@@ -68,10 +68,15 @@ class SelectionManager2Base {
      * Clears the whole selection
      */
     clear_selection() {
+        const res = this.selected_list;
+
         this.selected_list = [];
         this.clear_last_selected();
+
         this.eventHandlers.onSelectedUpdated(this.selected_list);
         delete this.shiftFirst;
+
+        return res;
     }
 
     /**
@@ -651,7 +656,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
     }
 
     clear_selection() {
-        super.clear_selection();
+        const res = super.clear_selection();
 
         let $selectable = this._get_selectable_container();
         $('.ui-selected', $selectable).removeClass(this.CLS_UI_SELECTED);
@@ -662,6 +667,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 this.hideSelectionBar();
             }
         });
+
+        return res;
     }
     set_currently_selected(nodeId, scrollTo) {
         super.set_currently_selected(nodeId, scrollTo);
@@ -708,7 +715,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             else {
                 this.selectionNotification(selectionSize, false, false);
             }
-        }, 20);
+        }, 60);
 
         return res;
     }

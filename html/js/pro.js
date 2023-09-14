@@ -67,13 +67,12 @@ var pro = {
         }
         else {
             // Get the membership plans.
-
             const payload = {a: 'utqa', nf: 2, p: 1};
 
-            await Promise.resolve(M.req({a: 'uq', pro: 1, gc: 1}))
-                .then(({balance}) => {
+            await api.req({a: 'uq', pro: 1, gc: 1})
+                .then(({result: {balance}}) => {
                     if (balance) {
-                        balance = parseFloat(balance[0][0]);
+                        balance = balance.length && parseFloat(balance[0][0]);
 
                         if (balance >= 4.99 && balance <= 9.98) {
                             payload.r = 1;
@@ -82,8 +81,8 @@ var pro = {
                 })
                 .catch(dump);
 
-            api_req(payload, {
-                callback: function(results) {
+            api.req(payload)
+                .then(({result: results}) => {
 
                     // The rest of the webclient expects this data in an array format
                     // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
@@ -159,11 +158,11 @@ var pro = {
                     pro.maxPlan = maxPlan;
                     pro.minPlan = minPlan;
                     pro.conversionRate = conversionRate;
-
+                })
+                .finally(() => {
                     // Run the callback function
                     loadedCallback();
-                }
-            });
+                });
         }
     },
 

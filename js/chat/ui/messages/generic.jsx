@@ -251,23 +251,8 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         }
         openSaveToDialog(v, function(node, target) {
             if (Array.isArray(target)) {
-                M.myChatFilesFolder.get(true)
-                    .then(function(myChatFolder) {
-                        M.injectNodes(node, myChatFolder.h, function(res) {
-                            if (Array.isArray(res) && res.length) {
-                                megaChat.openChatAndAttachNodes(target, res).dump();
-                            }
-                            else if (d) {
-                                console.warn('Unable to inject nodes... no longer existing?', res);
-                            }
-                        });
-                    })
-                    .catch(function() {
-                        if (d) {
-                            // eslint-disable-next-line local-rules/hints
-                            console.error("Failed to allocate 'My chat files' folder.", arguments);
-                        }
-                    });
+
+                megaChat.openChatAndAttachNodes(target, node.ch || node.h).catch(tell);
             }
             else {
                 // is a save/copy to

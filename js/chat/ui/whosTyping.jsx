@@ -20,9 +20,7 @@ class WhosTyping extends MegaRenderMixin {
                 return;
             }
 
-            var currentlyTyping = clone(self.state.currentlyTyping);
-            var u_h = user_handle;
-
+            const u_h = user_handle;
             if (u_h === u_handle) {
                 // not my jid, but from other device (e.g. same user handle)
                 return;
@@ -31,16 +29,19 @@ class WhosTyping extends MegaRenderMixin {
                 // unknown user handle? no idea what to show in the "typing" are, so skip it.
                 return;
             }
+            const currentlyTyping = {...self.state.currentlyTyping};
+
             if (currentlyTyping[u_h]) {
-                clearTimeout(currentlyTyping[u_h][1]);
+                currentlyTyping[u_h].abort();
             }
 
             if (bCastCode === 1) {
-                var timer = setTimeout(function (u_h) {
+                const timer = tSleep(5);
+                timer.then(() => {
                     self.stoppedTyping(u_h);
-                }, 5000, u_h);
+                });
 
-                currentlyTyping[u_h] = [unixtime(), timer];
+                currentlyTyping[u_h] = timer;
 
                 self.setState({
                     currentlyTyping: currentlyTyping
@@ -64,12 +65,12 @@ class WhosTyping extends MegaRenderMixin {
         if (this.isMounted()) {
             const { currentlyTyping } = this.state;
             if (currentlyTyping[u_h]) {
-                const newState = clone(currentlyTyping);
-                if (newState[u_h]) {
-                    clearTimeout(newState[u_h][1]);
+                const newState = {...currentlyTyping};
+                if (!newState[u_h].aborted) {
+                    newState[u_h].abort();
                 }
                 delete newState[u_h];
-                this.setState({ currentlyTyping: newState });
+                this.setState({currentlyTyping: newState});
             }
         }
     }
@@ -78,20 +79,9 @@ class WhosTyping extends MegaRenderMixin {
 
         var typingElement = null;
 
-        if (Object.keys(self.state.currentlyTyping).length > 0) {
-            var names = Object.keys(self.state.currentlyTyping).map((u_h) => {
-                var contact = M.u[u_h];
-                if (contact && contact.firstName) {
-                    if (contact.nickname !== '') {
-                        return contact.nickname;
-                    }
-                    return contact.firstName;
-                }
-                else {
-                    var avatarMeta = generateAvatarMeta(u_h);
-                    return avatarMeta.fullName.split(" ")[0];
-                }
-            });
+        const users = Object.keys(self.state.currentlyTyping);
+        if (users.length > 0) {
+            const names = users.map((u_h) => M.getNameByHandle(u_h)).filter(String);
 
             var namesDisplay = "";
             var areMultipleUsersTyping = false;

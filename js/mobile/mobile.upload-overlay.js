@@ -42,10 +42,8 @@ mobile.uploadOverlay = {
 
             self.logger.debug('upload:abort[%s]', gid, id, res);
 
-            if (ulmanager.isUploadActive(gid)) {
-                if (!is_filerequest_page) {
-                    onIdle(self._dispatchNextUpload.bind(self));
-                }
+            if (!is_megadrop && ulmanager.isUploadActive(gid)) {
+                onIdle(self._dispatchNextUpload.bind(self));
             }
         });
 
@@ -224,7 +222,7 @@ mobile.uploadOverlay = {
         $('.upload-percents', $overlay).text('');
         $('.upload-speed', $overlay).text('');
 
-        if (!this._dispatchNextUpload() && !is_filerequest_page) {
+        if (!is_megadrop && !this._dispatchNextUpload()) {
             $('body').removeClass('uploading');
             var $viewFileButton = $('.upload-progress', $overlay);
             $('.text', $viewFileButton.addClass('complete')).removeClass('starting-upload').text(l[59]);
@@ -442,79 +440,85 @@ mobile.uploadOverlay = {
     shim: function(ctx) {
         'use strict';
         var self = this;
-
-        const addTemplateItemToTable = (gid, f, $overlay) => {
-            var template =
-            '<tr id="$' + gid + '" class="transfer-queued transfer-upload"><td>' +
-            '<div class="mobile fm-item file clear transfer-type upload">' +
-            ' <div class="mobile fm-item-img">' +
-            '  <img src="' + escapeHTML(mobile.imagePath + fileIcon(f) + '.png') + '"/>' +
-            ' </div>' +
-            ' <div class="mobile fm-icon right"></div>' +
-            ' <div class="mobile fm-item-info">' +
-            '  <div class="mobile fm-item-name">' + escapeHTML(f.name) + '</div>' +
-            '  <div class="mobile fm-item-details">' +
-            '   <span class="file-size uploaded-size transfer-size">' + bytesToSize(f.size) + '</span>,' +
-            '   <span class="date transfer-status">' + escapeHTML(l[7227]) + '</span>' +
-            '  </div></div></div></td></tr>';
-            $('.mobile-transfer-table', $overlay).safeAppend(template);
-        };
-
         /* eslint-disable no-useless-concat */
-        if (is_filerequest_page) {
+
+        if (is_megadrop) {
+            Object.defineProperty(ctx, 'addToTran' + 'sferTable', {value: nop});
+
             // We ignore other shims, we just use the normal process
-            ctx['addToTran' + 'sferTable'] = function() {
-                // Do nothing
-            };
             return;
         }
 
-        var _ulProgress = ctx.ulprogress;
-        ctx['ul' + 'progress'] = function() {
-            var res = _ulProgress.apply(this, arguments);
-            self.showUploadProgress.apply(self, arguments);
-            return res;
-        };
-
-        var _ulStart = ctx.ulstart;
-        ctx['ul' + 'start'] = function() {
-            var res = _ulStart.apply(this, arguments);
-            self.showUploadStarting.apply(self, arguments);
-            return res;
-        };
-
-        var _ulFinalize = ctx.ulfinalize;
-        ctx['ul' + 'finalize'] = function() {
-            var res = _ulFinalize.apply(this, arguments);
-            self.showUploadComplete.apply(self, arguments);
-            return res;
-        };
-
-        ctx['openTrans' + 'fersPanel'] = function() {
-            onIdle(function() {
-                if (ulmanager.isUploading) {
-                    var ul = ul_queue[0] || false;
-                    console.assert(ul.id);
-
-                    if (ul.id) {
-                        if (d) {
-                            self.logger.debug('Initializing upload(s)...', ul.id, [ul]);
-                        }
-
-                        self.showUploadStarting(ul);
-                        self.startTime = null;
-                    }
-                }
-            });
-        };
-
-        ctx['addToTran' + 'sferTable'] = function(gid, f) {
-            addTemplateItemToTable(gid, f, this.$overlay);
-            if (!self.uploading) {
-                // loadingDialog.show();
-                self.uploading = true;
-                self._dispatchNextUpload();
+        const _ulProgress = ctx.ulprogress;
+        Object.defineProperty(ctx, 'ul' + 'progress', {
+            value: function() {
+                var res = _ulProgress.apply(this, arguments);
+                self.showUploadProgress.apply(self, arguments);
+                return res;
             }
-        };
+        });
+
+        const _ulStart = ctx.ulstart;
+        Object.defineProperty(ctx, 'ul' + 'start', {
+            value: function() {
+                var res = _ulStart.apply(this, arguments);
+                self.showUploadStarting.apply(self, arguments);
+                return res;
+            }
+        });
+
+        const _ulFinalize = ctx.ulfinalize;
+        Object.defineProperty(ctx, 'ul' + 'finalize', {
+            value: function() {
+                var res = _ulFinalize.apply(this, arguments);
+                self.showUploadComplete.apply(self, arguments);
+                return res;
+            }
+        });
+
+        Object.defineProperty(ctx, 'openTrans' + 'fersPanel', {
+            value: function() {
+                onIdle(() => {
+                    if (ulmanager.isUploading) {
+                        var ul = ul_queue[0] || false;
+                        console.assert(ul.id);
+
+                        if (ul.id) {
+                            if (d) {
+                                self.logger.debug('Initializing upload(s)...', ul.id, [ul]);
+                            }
+
+                            self.showUploadStarting(ul);
+                            self.startTime = null;
+                        }
+                    }
+                });
+            }
+        });
+
+        Object.defineProperty(ctx, 'addToTran' + 'sferTable', {
+            value: function(gid, f) {
+                var template =
+                    '<tr id="$' + gid + '" class="transfer-queued transfer-upload"><td>' +
+                    '<div class="mobile fm-item file clear transfer-type upload">' +
+                    ' <div class="mobile fm-item-img">' +
+                    '  <img src="' + escapeHTML(mobile.imagePath + fileIcon(f) + '.png') + '"/>' +
+                    ' </div>' +
+                    ' <div class="mobile fm-icon right"></div>' +
+                    ' <div class="mobile fm-item-info">' +
+                    '  <div class="mobile fm-item-name">' + escapeHTML(f.name) + '</div>' +
+                    '  <div class="mobile fm-item-details">' +
+                    '   <span class="file-size uploaded-size transfer-size">' + bytesToSize(f.size) + '</span>,' +
+                    '   <span class="date transfer-status">' + escapeHTML(l[7227]) + '</span>' +
+                    '  </div></div></div></td></tr>';
+                $('.mobile-transfer-table', self.$overlay).safeAppend(template);
+
+                if (!self.uploading) {
+                    // loadingDialog.show();
+                    self.uploading = true;
+                    self._dispatchNextUpload();
+                }
+            }
+        });
     }
 };

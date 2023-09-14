@@ -15,39 +15,6 @@ var PresencedIntegration = function(megaChat) {
     var self = this;
     var loggerOpts = {};
 
-
-    if (localStorage.presencedDebug) {
-        loggerOpts['minLogLevel'] = function() { return MegaLogger.LEVELS.DEBUG; };
-        loggerOpts['transport'] = function(level, args) {
-            var fn = "log";
-
-            if (level === MegaLogger.LEVELS.DEBUG) {
-                fn = "debug";
-            }
-            else if (level === MegaLogger.LEVELS.LOG) {
-                fn = "log";
-            }
-            else if (level === MegaLogger.LEVELS.INFO) {
-                fn = "info";
-            }
-            else if (level === MegaLogger.LEVELS.WARN) {
-                fn = "warn";
-            }
-            else if (level === MegaLogger.LEVELS.ERROR) {
-                fn = "error";
-            }
-            else if (level === MegaLogger.LEVELS.CRITICAL) {
-                fn = "error";
-            }
-
-            args.push("[" + fn + "]");
-            console.debug.apply(console, args);
-        };
-    }
-    else {
-        loggerOpts['minLogLevel'] = function() { return MegaLogger.LEVELS.ERROR; };
-    }
-
     self.logger = MegaLogger.getLogger("presencedIntegration", loggerOpts, megaChat.logger);
 
     self.megaChat = megaChat;
@@ -289,8 +256,8 @@ PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isW
             contact.lastGreen = unixtime();
         }
 
-        M.syncUsersFullname(user_hash);
-        M.syncContactEmail(user_hash);
+        M.syncUsersFullname(user_hash).catch(dump);
+        M.syncContactEmail(user_hash).catch(nop);
     }
 
     self.trigger(

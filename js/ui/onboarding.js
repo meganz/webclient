@@ -54,15 +54,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                 }
                 flagMap.setSync(flag, val, true);
             }
-            flagMap.commit().then(() => {
-                // Migration succeeded so clear out of fmconfig
-                const flags = Object.values(OBV4_FLAGS);
-                flags.push('obrev');
-                for (const flag of flags) {
-                    mega.config.remove(flag);
-                }
-                // TODO eventually clear flags from config.js to reclaim space
-            }).catch(dump);
+            flagMap.commit().catch(dump);
         }
 
         // If new user then we can ignore the first chat step

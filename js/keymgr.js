@@ -797,8 +797,7 @@ lazy(mega, 'keyMgr', () => {
                     Your data cannot be accessed safely. Please try again later.
                 `);
             }
-            // @todo logger.assert() at api3
-            console.assert(this.generation > 0, `Unexpected generation... ${this.generation}`, typeof this.generation);
+            logger.assert(this.generation > 0, `Unexpected generation... ${this.generation}`, typeof this.generation);
 
             if (this.generation) {
                 const lastKnown = parseInt(await this.getGeneration().catch(dump));
@@ -892,26 +891,42 @@ lazy(mega, 'keyMgr', () => {
             return this.fetchPromise;
         }
 
-        // commit current state to ^!keys
-        // cmds is an array of supplemental API commands to run with the attribute put
-        // FIXME: run cmd in bc mode
-        async commit(cmds, ctx) {
+        // tells whether initialization took place and the keyrings are available.
+        unableToCommit() {
             if (!this.version) {
                 if (d) {
                     logger.warn('*** NOT LOADED, cannot commit.');
                 }
-                return true;
-            }
-            if (d) {
-                logger.warn('*** COMMIT', this.commitPromise, this.fetchPromise);
+                return -1;
             }
 
             if (!u_keyring || !u_privCu25519) {
                 if (d) {
-                    logger.warn('*** INCOMPLETE STATE');
+                    logger.warn('*** INCOMPLETE STATE, cannot commit.');
                 }
-                this.pendingcommit = true;
+                return -2;
+            }
+
+            if (window.pfid) {
+                if (d) {
+                    logger.error('*** INVALID STATE, cannot commit under a folder-link.');
+                }
+                return -3;
+            }
+
+            return false;
+        }
+
+        // commit current state to ^!keys
+        // cmds is an array of supplemental API commands to run with the attribute put
+        async commit(cmds) {
+            if (this.unableToCommit()) {
+                assert(!cmds);
+                this.pendingcommit = !!this.version;
                 return true;
+            }
+            if (d) {
+                logger.warn('*** COMMIT', this.commitPromise, this.fetchPromise);
             }
 
             // piggyback onto concurrent fetch() (it will signal a failed commit(), triggering a retry)
@@ -930,15 +945,15 @@ lazy(mega, 'keyMgr', () => {
 
             this.commitPromise = mega.promise;
 
-            kmWebLock(() => this.updateKeysAttribute(cmds, ctx))
-                .then(() => {
+            kmWebLock(() => this.updateKeysAttribute(cmds))
+                .then((res) => {
 
                     if (d && this.versionclash) {
                         logger.log('Resolved versioning clash after %d retries', this.versionclash | 0);
                     }
 
                     this.versionclash = false;
-                    this.resolveCommitFetchPromises(true);
+                    this.resolveCommitFetchPromises(res || true);
                 })
                 .catch((ex) => {
 
@@ -965,21 +980,15 @@ lazy(mega, 'keyMgr', () => {
             return this.commitPromise;
         }
 
-        async updateKeysAttribute(cmds, ctx) {
+        async updateKeysAttribute(cmds) {
             // tentatively increment generation and store
             const generation = ++this.generation;
 
             return this.getKeysContainer()
                 .then((result) => {
-                    if (cmds) {
-                        api_req(cmds, ctx);
-                    }
                     this.prevkeys = result;
 
-                    // FIXME: link cmds and mega.attr.set cmd in bc mode -- @todo api3
-                    return Promise.resolve(
-                        mega.attr.set('keys', result, -2, true, undefined, undefined, undefined, true)
-                    );
+                    return mega.attr.set2(cmds, 'keys', result, -2, true, true);
                 })
                 .then((result) => {
                     assert(generation === this.generation);
@@ -987,7 +996,7 @@ lazy(mega, 'keyMgr', () => {
                     if (d) {
                         logger.log(`new generation ${generation}`, result);
                     }
-                    return this.setGeneration(generation).catch(dump);
+                    return this.setGeneration(generation).catch(dump).then(() => result);
                 })
                 .catch(async(ex) => {
 
@@ -1286,6 +1295,12 @@ lazy(mega, 'keyMgr', () => {
             this.pendingpullkey = false;
 
             return this._fetchPendingInShareKeys(pkPull.smbl)
+                .catch((ex) => {
+                    if (ex !== ENOENT) {
+
+                        throw ex;
+                    }
+                })
                 .finally(() => {
 
                     pkPull.lock = false;
@@ -1311,7 +1326,7 @@ lazy(mega, 'keyMgr', () => {
             }
 
             // fetch pending inshare keys and add them to pendinginshares
-            const res = await Promise.resolve(M.req({a: 'pk'})).catch(echo);
+            const {result: res} = await api.req({a: 'pk'});
 
             if (typeof res == 'object') {
                 if (d) {
@@ -1354,7 +1369,7 @@ lazy(mega, 'keyMgr', () => {
 
             // we can now delete the fetched inshare keys from the queue
             // (if this operation fails, no problem, it's all idempotent)
-            return rem && M.req({a: 'pk', d: rem});
+            return rem && api.req({a: 'pk', d: rem});
         }
 
         // sanity check: don't allow inshare keys on cloud drive nodes
@@ -1801,13 +1816,13 @@ lazy(mega, 'keyMgr', () => {
 
         // adjust the permitted sharekeys for any backup or upload under
         // the nodes being moved through locally initiated action
-        async moveNodesApiReq(cmds, ctx) {
+        async moveNodesApiReq(cmds) {
             if (!this.generation) {
-                api_req(cmds, ctx);
-                return;
+                return api.screq(cmds);
             }
 
-            do {
+            while (1) {
+
                 // we temporarily instantly speculatively complete the moves
                 for (let i = 0; i < cmds.length; i++) {
                     const n = M.d[cmds[i].n];
@@ -1846,11 +1861,16 @@ lazy(mega, 'keyMgr', () => {
                         delete cmds[i].pp;
                     }
                 }
-                if (!changed) {
-                    api_req(cmds, ctx);
-                    return;
+
+                if (!changed || this.unableToCommit()) {
+                    return api.screq(cmds);
                 }
-            } while (!await this.commit(cmds, ctx));
+
+                const res = await this.commit(cmds);
+                if (res) {
+                    return res;
+                }
+            }
         }
 
         // this replaces MegaData.getShareNodesSync

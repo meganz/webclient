@@ -471,7 +471,7 @@
                     treeid = treeid.split('/')[0];
                 }
 
-                if ($('#treea_' + treeid).length === 0) {
+                if (!document.getElementById(`treea_${treeid}`)) {
                     n = this.d[nodeid];
                     if (n && n.p) {
                         M.onTreeUIOpen(prefixPath + n.p, false, true);
@@ -538,12 +538,10 @@
      *
      * @param {String}  id      The folder id
      * @param {Boolean} [force] If that folder is already open, re-render it
-     * @returns {MegaPromise} fulfilled on completion
+     * @returns {Promise} fulfilled on completion
      */
-    MegaData.prototype.openFolder = function(id, force) {
-        var fetchdbnodes;
-        var firstopen;
-        var cv = M.isCustomView(id);
+    MegaData.prototype.openFolder = async function(id, force) {
+        let isFirstOpen, fetchDBNodes, fetchDBShares;
 
         document.documentElement.classList.remove('wait-cursor');
 
@@ -554,19 +552,22 @@
 
         if (!loadfm.loaded) {
             console.error('Internal error, do not call openFolder before the cloud finished loading.');
-            return MegaPromise.reject(EACCESS);
+            throw EACCESS;
         }
 
         if (!fminitialized) {
-            firstopen = true;
+            isFirstOpen = true;
         }
         else if (id && id === this.currentdirid && !force) {
             // Do nothing if same path is chosen
-            return MegaPromise.resolve(EEXIST);
+            return EEXIST;
         }
+        let cv = this.isCustomView(id);
 
+        const $viewIcons =
+            $(`.fm-files-view-icon${pfid ? '' : ':not(.media-view)'}`)
+                .removeClass('hidden');
         $('.fm-right-account-block, .fm-right-block').addClass('hidden');
-        const $viewIcons = $(`.fm-files-view-icon${pfid ? '' : ':not(.media-view)'}`).removeClass('hidden');
 
         this.chat = false;
         this.search = false;
@@ -589,10 +590,10 @@
         if (id === 'rubbish') {
             id = this.RubbishID;
         }
-        else if (id === 'backups' && this.BackupsId) {
-            id = this.BackupsId;
+        else if (id === 'backups') {
+            id = this.BackupsId || this.RootID;
         }
-        else if (id === 'cloudroot' || id === this.InboxID) {
+        else if (id === 'cloudroot' || id === 'fm' || id === this.InboxID) {
             id = this.RootID;
         }
         else if (id && id.substr(0, 4) === 'chat') {
@@ -604,10 +605,10 @@
                 var self = this;
                 this.chat = true;
 
-                return new MegaPromise(function(resolve, reject) {
-                    _openFolderCompletion.call(self, id, firstopen);
+                return new Promise((resolve, reject) => {
+                    _openFolderCompletion.call(self, id, isFirstOpen);
 
-                    if (firstopen) {
+                    if (isFirstOpen) {
                         // do not wait for the chat to load on the first call
                         resolve(id);
                     }
@@ -741,7 +742,7 @@
                 return M.openFolder('cloudroot');
             }
 
-            fetchdbnodes = true;
+            fetchDBNodes = true;
             id = cv.nodeID;
 
             this.gallery = 2;
@@ -758,7 +759,7 @@
                 id.substr(0, 14) === 'file-requests/'
             )
         ) {
-            fetchdbnodes = true;
+            fetchDBNodes = true;
             id = cv.nodeID;
         }
         else if (String(id).length === 11) {
@@ -768,8 +769,7 @@
             else {
                 loadSubPage('fm/chat/contacts');
             }
-            return MegaPromise.reject(ENOENT);
-
+            return EAGAIN;
         }
         else if (id !== 'transfers') {
             if (id && id.substr(0, 9) === 'versions/') {
@@ -779,7 +779,8 @@
                 id = this.RootID;
             }
             else if (!this.d[id] || this.d[id].t && !this.c[id]) {
-                fetchdbnodes = !!window.fmdb;
+
+                fetchDBNodes = !id || id.length !== 8 ? -1 : !!window.fmdb;
             }
         }
 
@@ -787,62 +788,13 @@
             megaChat.cleanup();
         }
 
-        let {promise} = mega;
-        var finish = function() {
-            _openFolderCompletion.call(M, id = cv.original || id, firstopen);
-
-            if (promise) {
-                promise.resolve(id);
-            }
-        };
-        const loadend = async() => {
-            let fetchshares = false;
-
-            // Check this is valid custom view page. If not head to it's root page.
-            if (cv && !M.getPath(cv.original).length) {
-                cv = M.isCustomView(cv.type);
-                if (!cv) {
-                    id = M.RootID;
-                }
-            }
-            else if (M.getPath(id).pop() === 'shares') {
-                fetchshares = true;
-            }
-            else if (!M.d[id] && (pfid || fetchdbnodes)) {
-                id = M.RootID;
-            }
-
-            if (fetchshares) {
-                const handles = Object.keys(M.c.shares || {});
-
-                for (let i = handles.length; i--;) {
-                    if (M.d[handles[i]]) {
-                        handles.splice(i, 1);
-                    }
-                }
-
-                if (handles.length) {
-                    await dbfetch.geta(handles).catch(dump);
-                }
-
-                if (!$.inSharesRebuild) {
-                    $.inSharesRebuild = Date.now();
-
-                    queueMicrotask(() => {
-                        mega.keyMgr.decryptInShares().catch(dump);
-                    });
-                    M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                }
-            }
-
-            finish();
-        };
-
-        promise.then((h) => {
+        const {promise} = mega;
+        const masterPromise = promise.then((h) => {
             if (d) {
                 console.warn('openFolder completed for %s, currentdir=%s', maph(id), maph(M.currentdirid));
                 console.assert(String(id).endsWith(h));
             }
+
             delay(`mega:openfolder!${id}`, () => {
                 if (M.currentdirid !== id) {
                     return;
@@ -855,35 +807,78 @@
                 mBroadcaster.sendMessage('mega:openfolder', id);
                 $.tresizer();
             }, 90);
-        }).catch(dump);
-        const masterPromise = promise;
 
-        fetchdbnodes = fetchdbnodes || dbfetch.isLoading(id);
+            return h;
+        });
 
-        if (fetchdbnodes || $.ofShowNoFolders) {
-            var tp;
-            var stream = fminitialized && !is_mobile;
+        fetchDBNodes = fetchDBNodes || dbfetch.isLoading(id);
+
+        if (fetchDBNodes > 0 || $.ofShowNoFolders) {
 
             if ($.ofShowNoFolders) {
-                tp = dbfetch.tree([id]);
+                if (fmdb) {
+                    await dbfetch.tree([id]);
+                }
             }
-            else if (dynPages[id]) {
-                tp = {always: finish};
+            else if (!dynPages[id]) {
+                const stream = fminitialized && !is_mobile;
+
+                if (stream) {
+                    // eslint-disable-next-line local-rules/open -- not a window.open() call.
+                    await dbfetch.open(id, promise).catch(dump);
+                }
+                else if (!this.d[id] || this.d[id].t && !this.c[id]) {
+
+                    await dbfetch.get(id);
+                }
             }
-            else if (stream) {
-                tp = dbfetch.open(id, promise);
-                promise = null;
+        }
+
+        // Check this is valid custom view page. If not, head to its root page.
+        if (cv && !M.getPath(cv.original).length) {
+            cv = M.isCustomView(cv.type);
+
+            if (!cv) {
+                id = M.RootID;
             }
-            else {
-                tp = dbfetch.get(id);
+        }
+        else if (M.getPath(id).pop() === 'shares') {
+
+            fetchDBShares = true;
+        }
+        else if (!this.d[id] && !dynPages[id] && (pfid || fetchDBNodes)) {
+
+            id = M.RootID;
+        }
+
+        if (fetchDBShares) {
+            const handles = Object.keys(M.c.shares || {});
+
+            for (let i = handles.length; i--;) {
+                if (M.d[handles[i]]) {
+                    handles.splice(i, 1);
+                }
             }
 
-            tp.always(loadend);
-        }
-        else {
-            loadend();
+            if (handles.length) {
+                await dbfetch.geta(handles).catch(dump);
+            }
+
+            if (!$.inSharesRebuild) {
+                $.inSharesRebuild = Date.now();
+
+                queueMicrotask(() => {
+                    mega.keyMgr.decryptInShares().catch(dump);
+                });
+                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            }
         }
 
+        _openFolderCompletion.call(this, id = cv.original || id, isFirstOpen);
+
+        onIdle(() => {
+            promise.resolve(id);
+        });
         return masterPromise;
     };
 

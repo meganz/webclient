@@ -303,22 +303,17 @@ export default class ChatRouting {
                     };
                     join();
 
-
-                    M.req(mciphReq)
-                        .then(() => {
+                    asyncApiReq(mciphReq).then(join).catch((ex) => {
+                        if (ex === EEXIST) {
+                            // already in the room.
                             join();
-                        })
-                        .catch((ex) => {
-                            if (ex === -12) {
-                                // already in the room.
-                                join();
-                            }
-                            else {
-                                loadingDialog.phide();
-                                console.error("Bad response for mciphReq:", mciphReq, ex);
-                                rej(ex);
-                            }
-                        });
+                        }
+                        else {
+                            loadingDialog.phide();
+                            console.error("Bad response for mciphReq:", mciphReq, ex);
+                            rej(ex);
+                        }
+                    });
                 });
         });
     }

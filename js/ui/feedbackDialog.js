@@ -242,6 +242,12 @@
         }
         FeedbackDialog._instance.show($toggleButton);
 
+        mBroadcaster.addListener('closedialog', () => {
+            if (FeedbackDialog._instance && FeedbackDialog._instance.visible) {
+                FeedbackDialog._instance.hide();
+            }
+        });
+
         return FeedbackDialog._instance;
     };
 

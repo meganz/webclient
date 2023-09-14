@@ -1,60 +1,5 @@
-MegaData.prototype.makeDir = function(n) {
-    if (is_chrome_firefox & 4) {
-        return;
-    }
-
-    var dirs = [];
-
-    function getfolders(d, o) {
-        var c = 0;
-        for (var e in M.d) {
-            if (M.d[e].t == 1 && M.d[e].p == d) {
-                var p = o || [];
-                if (!o) {
-                    p.push(M.getSafeName(M.d[d].name));
-                }
-                p.push(M.getSafeName(M.d[e].name));
-                if (!getfolders(M.d[e].h, p)) {
-                    dirs.push(p);
-                }
-                ++c;
-            }
-        }
-        return c;
-    }
-
-    getfolders(n);
-
-    if (d) {
-        console.log('makedir', dirs);
-    }
-
-    if (is_chrome_firefox) {
-        var root = mozGetDownloadsFolder();
-        if (root) {
-            dirs.filter(String).forEach(function(p) {
-                try {
-                    p = mozFile(root, 0, p);
-                    if (!p.exists()) {
-                        p.create(Ci.nsIFile.DIRECTORY_TYPE, parseInt("0755", 8));
-                    }
-                }
-                catch (e) {
-                    Cu.reportError(e);
-                    console.log('makedir', e.message);
-                }
-            });
-        }
-    }
-    else {
-        // FIXME: add support once available
-    }
-};
 
 MegaData.prototype.getDownloadFolderNodes = function(n, md, nodes, paths) {
-    if (md) {
-        this.makeDir(n);
-    }
 
     var subids = this.getNodesSync(n, false, false, true);
 
@@ -108,18 +53,6 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
     else if (node.failed || node.dl_failed) {
         isFailed = true;
     }
-    var flashhtml = '';
-    if (dlMethod === FlashIO) {
-        flashhtml = '<object width="1" height="1" id="dlswf_'
-            + htmlentities(handle)
-            + '" type="application/x-shockwave-flash">'
-            + '<param name=FlashVars value="buttonclick=1" />'
-            + '<param name="movie" value="' + location.origin + '/downloader.swf"/>'
-            + '<param value="always" name="allowscriptaccess"/>'
-            + '<param name="wmode" value="transparent"/>'
-            + '<param value="all" name="allowNetworking">'
-            + '</object>';
-    }
 
     var dowloadedSize = node.loaded || 0;
     var rightRotate = '';
@@ -141,7 +74,7 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
         + '<td><div class="transfer-type download sprite-fm-mono-after icon-down-after">'
         + '<ul><li class="right-c"><p ' + rightRotate + '>'
         + '<span></span></p></li><li class="left-c"><p ' + leftRotate + '><span></span></p></li></ul>'
-        + '</div>' + flashhtml + '</td>'
+        + '</div></td>'
         + '<td><span class="transfer-filetype-icon ' + fileIcon(node) + '"></span>'
         + '<span class="tranfer-filetype-txt">' + htmlentities(node.name) + '</span></td>'
         + '<td>' + filetype(node) + '</td>'
@@ -310,7 +243,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     var entries = [];
     let quiet = false;
 
-    if (!is_extension && !preview && !z && (dlMethod === MemoryIO || dlMethod === FlashIO)) {
+    if (!is_extension && !preview && !z && dlMethod === MemoryIO) {
         var nf = [], cbs = [];
         for (var i in n) {
             if (this.d[n[i]] && this.d[n[i]].t) {
@@ -422,8 +355,9 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             $tr.remove();
         }
         var entry = {
+            ...n,
             size: n.s,
-            nauth: n_h,
+            nauth: n.nauth || n_h,
             id: n.h,
             key: n.k,
             n: n.name,
@@ -511,17 +445,12 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         tempEntry = null;
     }
 
-    var flashhtml = '';
-    if (dlMethod === FlashIO) {
-        flashhtml = '<object width="1" height="1" id="dlswf_zip_' + htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
-    }
-
     if (z && zipsize) {
         this.addToTransferTable('zip_' + z, ttl,
             '<tr id="zip_' + z + '" class="transfer-queued transfer-download ' + p + '">'
             + '<td><div class="transfer-type download sprite-fm-mono-after icon-down-after">'
             + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
-            + '</div>' + flashhtml + '</td>'
+            + '</div></td>'
             + '<td><span class="transfer-filetype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span>'
             + '<span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
             + '<td>' + filetype({name: 'archive.zip'}) + '</td>'
@@ -726,16 +655,6 @@ MegaData.prototype.dlcomplete = function(dl) {
     $tr.find('.transfer-status').text(l[1418]);
     $tr.find('.eta, .speed').text('').removeClass('unknown');
     $tr.find('.downloaded-size').html($tr.find('.transfer-size').text());
-
-    if ($('#dlswf_' + id.replace('dl_', '')).length > 0) {
-        var flashid = id.replace('dl_', '');
-        $('#dlswf_' + flashid).width(170);
-        $('#dlswf_' + flashid).height(22);
-        $('#' + id + ' .transfer-type')
-            .removeClass('download')
-            .addClass('safari-downloaded')
-            .text('Save File');
-    }
 
     if ($.transferprogress && $.transferprogress[id]) {
         if (!$.transferprogress['dlc']) {
@@ -1158,9 +1077,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             var filesize = f.size;
 
             ul_id = ++__ul_id;
-            if (!f.flashid) {
-                f.flashid = false;
-            }
             f.target = f.target || target;
             f.id = ul_id;
 
@@ -1311,7 +1227,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     }
 
     var uuid = makeUUID();
-    var makeDirPromise = new MegaPromise();
+    var makeDirPromise = mega.promise;
 
     if (d) {
         ulmanager.logger.info('[%s] Pre-upload preparation...', uuid, u.length, [u]);
@@ -1425,7 +1341,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
         });
     });
 
-    makeDirPromise.done(function() {
+    makeDirPromise.then(() => {
         var targets = Object.create(null);
 
         for (var i = u.length; i--;) {
@@ -1437,11 +1353,14 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             else if (paths[file.path]) {
                 file.target = paths[file.path];
             }
+            else if (!file.target) {
+                file.target = target;
+            }
 
             targets[file.target] = 1;
         }
 
-        dbfetch.geta(Object.keys(targets)).always(function(r) {
+        return dbfetch.geta(Object.keys(targets)).then((r) => {
             // loadingDialog.hide();
 
             if (!M.c[target] && String(target).length !== 11 && !toChat) {
@@ -1454,9 +1373,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             var to = toChat ? u[0].target : target;
             var op = fileversioning.dvState ? 'replace' : 'upload';
 
-            fileconflict.check(u, to, op, toChat ? fileconflict.KEEPBOTH : 0).done(startUpload);
+            return fileconflict.check(u, to, op, toChat ? fileconflict.KEEPBOTH : 0);
         });
-    }).always(function() {
+    }).then(startUpload).catch(tell).finally(() => {
         if (d) {
             console.timeEnd('makeDirPromise-' + uuid);
         }
@@ -1610,8 +1529,8 @@ MegaData.prototype.ulerror = function(ul, error) {
 
     if (error === EOVERQUOTA) {
         ulQueue.pause();
-        if (mega.fileRequestUpload && !mega.fileRequestUpload.isUploadPageInitialized()) {
-            M.showOverStorageQuota(-1);
+        if (!is_megadrop) {
+            M.showOverStorageQuota(-1).catch(nop);
         }
     }
     else if (error === EGOINGOVERQUOTA) {
@@ -1655,7 +1574,7 @@ MegaData.prototype.ulerror = function(ul, error) {
             $('.transfer-status', $rows).text(l[1010]);
 
             // Inform user that upload File request is not available anymore
-            if (page.substr(0, 11) === 'filerequest') {
+            if (is_megadrop) {
                 mBroadcaster.sendMessage('FileRequest:overquota', error);
             }
         }
@@ -1693,15 +1612,7 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
         M.ulprogress(ul, 100, ul.size, ul.size, 0);
     }
 
-    // Ensure the node is on memory, e.g. when deduplicating to a chat-room
-    // @todo remove, this should not be required for chatRoom.attachNodes() but it's currently bugged..
-    const {id, chatid} = ul;
-    Promise.resolve(!h || M.d[h] || dbfetch.acquire(h))
-        .then(() => {
-
-            mBroadcaster.sendMessage('upload:completion', id, h || -0xBADF, faid, chatid);
-        })
-        .catch(dump);
+    mBroadcaster.sendMessage('upload:completion', ul.id, h || -0xBADF, faid, ul.chatid);
 
     if (ul.skipfile) {
         showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
@@ -1742,7 +1653,7 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
     }
 
     // If File request windows exists and upload
-    if (id && mega.fileRequestUpload && mega.fileRequestUpload.isUploadPageInitialized()) {
+    if (id && is_megadrop) {
         mega.fileRequestUpload.onItemUploadCompletion(id);
     }
 

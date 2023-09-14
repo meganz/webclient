@@ -28,12 +28,12 @@
          * @param {String} target The target node handle
          * @param {String} op Operation, one of copy, move, or upload
          * @param {Number} [defaultAction] The optional default action to perform
-         * @returns {MegaPromise} Resolves with a non-conflicting array
+         * @returns {Promise} Resolves with a non-conflicting array
          * @memberof fileconflict
          */
         check: function(files, target, op, defaultAction, defaultActionFolders) {
             var noFileConflicts = !!localStorage.noFileConflicts;
-            var promise = new MegaPromise();
+            const {promise} = mega;
             var conflicts = [];
             var result = [];
             var merges = [];
@@ -53,7 +53,7 @@
                 var file = files[i];
 
                 if (typeof file === 'string') {
-                    file = clone(M.d[file] || false);
+                    file = clone(M.getNodeByHandle(file) || false);
                 }
 
                 if (!file) {
@@ -722,7 +722,7 @@
                             var newName;
                             if (olderNode) {
                                 newName = fileconflict.findNewName(name, target);
-                                M.rename(olderNode, newName);
+                                M.rename(olderNode, newName).catch(dump);
                             }
                             else {
                                 for (var h = 0; h < duplicateEntries[type][name].length; h++) {
@@ -730,7 +730,7 @@
                                         continue;
                                     }
                                     newName = fileconflict.findNewName(name, target);
-                                    M.rename(duplicateEntries[type][name][h], newName);
+                                    M.rename(duplicateEntries[type][name][h], newName).catch(dump);
                                 }
                             }
                             break;
@@ -742,12 +742,12 @@
                             // keep the newest
                             if (type === 'files') {
                                 if (olderNode) {
-                                    M.moveToRubbish(olderNode);
+                                    M.moveToRubbish(olderNode).catch(dump);
                                 }
                                 else {
                                     var nodeToRemove = duplicateEntries[type][name];
                                     nodeToRemove.splice(newestIndex, 1);
-                                    M.moveToRubbish(nodeToRemove);
+                                    M.moveToRubbish(nodeToRemove).catch(dump);
                                 }
                                 // hide bar
                                 $('.fm-notification-block.duplicated-items-found').removeClass('visible');
@@ -768,23 +768,18 @@
                                         msgDialog('warninga', 'Moving Error', l[17739], 'Error in Merging');
                                     }
                                     else {
-                                        var mergeOperation = M.moveNodes([olderNode],
-                                            M.RubbishID, true);
+                                        M.moveNodes([olderNode], M.RubbishID)
+                                            .then(() => M.moveNodes([olderNode], originalParent, fileconflict.REPLACE))
+                                            .then(() => {
+                                                // no need to updateUI,
+                                                // for optimization we will only hide the bar
+                                                $('.fm-notification-block.duplicated-items-found')
+                                                    .removeClass('visible');
 
-                                        mergeOperation.done(function() {
-
-                                            M.moveNodes([olderNode],
-                                                originalParent, true, fileconflict.REPLACE).done(
-                                                    function() {
-                                                        // no need to updateUI,
-                                                        // for optimization we will only hide the bar
-                                                        $('.fm-notification-block.duplicated-items-found')
-                                                            .removeClass('visible');
-                                                        resolveDup(duplicateEntries, keys, ++kIndex, type,
-                                                            (checked) ? action : null);
-                                                    }
-                                                );
-                                        });
+                                                const ata = checked ? action : null;
+                                                resolveDup(duplicateEntries, keys, ++kIndex, type, ata);
+                                            })
+                                            .catch(tell);
                                     }
 
                                 }
@@ -795,7 +790,7 @@
                                             continue;
                                         }
                                         var newFolderName = fileconflict.findNewName(name, target);
-                                        M.rename(duplicateEntries[type][name][z], newFolderName);
+                                        M.rename(duplicateEntries[type][name][z], newFolderName).catch(dump);
                                     }
                                 }
                             }

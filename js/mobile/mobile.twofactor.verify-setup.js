@@ -62,18 +62,23 @@ mobile.twofactor.verifySetup = {
             loadingDialog.show();
 
             // Run Multi-Factor Auth Setup (mfas) request
-            api_req({ a: 'mfas', mfa: pinCode }, {
-                callback: function(response) {
+            api.send({a: 'mfas', mfa: pinCode})
+                .then(() => {
 
-                    loadingDialog.hide();
+                    // Render the Enabled page
+                    loadSubPage('twofactor/enabled');
+
+                })
+                .catch((ex) => {
 
                     // The Two-Factor has already been setup
-                    if (response === EEXIST) {
+                    if (ex === EEXIST) {
                         mobile.messageOverlay.show(l[19219], l['2fa_already_enabled_mob'], () => {
                             loadSubPage('fm/account/');
                         });
                     }
-                    else if (response < 0) {
+                    else {
+                        console.error(ex);
 
                         // If there was an error, show a message that the code was incorrect and clear the text field
                         $warningText.removeClass('hidden');
@@ -82,12 +87,10 @@ mobile.twofactor.verifySetup = {
                         // Put the focus in the PIN input field
                         $pinCode.trigger('focus');
                     }
-                    else {
-                        // Render the Enabled page
-                        loadSubPage('twofactor/enabled');
-                    }
-                }
-            });
+                })
+                .finally(() => {
+                    loadingDialog.hide();
+                });
 
             // Prevent double taps
             return false;

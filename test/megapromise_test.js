@@ -305,49 +305,6 @@ describe("MegaPromise Unit Test", function() {
             });
     });
 
-    it('MegaPromise.pipe', function(done) {
-        var p1 = function() {
-            var p = new MegaPromise();
-            setTimeout(function() {
-                result.push('p1-resolved');
-                p.resolve(111);
-            }, 20);
-            return p;
-        };
-        var p2 = function(v) {
-            var p = new MegaPromise();
-            setTimeout(function() {
-                result.push('p2-resolved');
-                p.resolve(v<<1);
-            }, 80);
-            return p;
-        };
-        var track = function(tag) {
-            return function(res) {
-                result.push(tag + '$' + res);
-            };
-        };
-        var result = [];
-        var promise = p1().done(track('p1-done'));
-
-        // pipe will now transparently replace 'promise' to the one returned from its callback
-        promise.pipe(function(res) {
-            track('pipe')(res);
-
-            return p2(res);
-        });
-
-        // wait for p2 fulfilment
-        promise.done(track('p1-to-p2'));
-
-        promise.always(function(res) {
-            track('done')(res);
-            assert.strictEqual(JSON.stringify(result),
-                '["p1-resolved","p1-done$111","pipe$111","p2-resolved","p1-to-p2$222","done$222"]');
-            done();
-        });
-    });
-
     it('MegaPromise.unpack', function(done) {
         var p1 = new MegaPromise();
         var p2 = new MegaPromise();

@@ -779,6 +779,11 @@ var megasync = (function() {
     ns.syncPossible = function (handle, next) {
         SyncAPI({ a: "sp", h: handle }, next);
     };
+    ns.syncPossibleA = function(handle) {
+        return new Promise((resolve) => {
+            SyncAPI({ a: "sp", h: handle }, (error, response) => resolve({error, response}));
+        });
+    };
 
 	ns.downloadStatus = function(handle,next) {
         SyncAPI({"a":"t","h":handle}, next);

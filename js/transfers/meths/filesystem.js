@@ -92,20 +92,9 @@
         if (isSecurityError(e)) {
             window.Incognito = 0xC120E;
 
-            /**
-             * Apparently indexedDBs are handled in memory on
-             * Incognito windows, which turns it a non-suitable
-             * workaround for the 496MB Blob limit :(
+            assert(MemoryIO.usable(), 'No download method available...?!');
+            dlMethod = MemoryIO;
 
-            if (idbDownloadIO.usable()) {
-                dlMethod = idbDownloadIO;
-            }
-            else*/ if (MemoryIO.usable()) {
-                dlMethod = MemoryIO;
-            }
-            else {
-                dlMethod = FlashIO;
-            }
             if (d) {
                 console.warn('Switching to ' + dlMethod.name);
             }
@@ -449,14 +438,6 @@
                     logger.info("Opening file for writing: mega/" + dl_id);
                 }
 
-                if (is_chrome_firefox) {
-                    options.fxo = Object.create(dl, {
-                        size: {
-                            value: dl_filesize
-                        }
-                    });
-                }
-
                 fs.root.getFile('mega/' + dl_id, options, function(fileEntry) {
                     fileEntry.createWriter(function(fileWriter) {
                         var resumeOffset = dl.byteOffset || 0;
@@ -672,10 +653,7 @@
             wTimer = null;
 
             if (dl_fw) {
-                if (is_chrome_firefox) {
-                    dl_fw.close(err);
-                }
-                else if (err && !this.keepFileOnAbort) {
+                if (err && !this.keepFileOnAbort) {
                     try {
                         var onWriteEnd = (function(writer, entry) {
                             return function() {
@@ -792,9 +770,7 @@
                 // prevent the beforeunload dispatcher from showing a dialog
                 $.memIOSaveAttempt = dl_id;
 
-                if (!is_chrome_firefox) {
-                    node.click();
-                }
+                node.click();
 
                 if (link) {
                     later(function() {
@@ -849,7 +825,7 @@
         };
 
         this.keepFileOnAbort = false;
-        this.hasResumeSupport = !is_chrome_firefox;
+        this.hasResumeSupport = true;
     };
 
     if (window.d) {
@@ -873,7 +849,7 @@
                     dlMethod = MemoryIO;
                 }
                 else {
-                    dlMethod = FlashIO;
+                    dlMethod = false;
                 }
             }
         });

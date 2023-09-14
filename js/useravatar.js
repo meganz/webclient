@@ -20,7 +20,8 @@ var useravatar = (function() {
         "#FFEB00"
     ];
 
-    var logger = MegaLogger.getLogger('useravatar');
+    const DEBUG = window.d > 3;
+    const logger = DEBUG && MegaLogger.getLogger('useravatar');
 
     /**
      * List of TWO-letters avatars that we ever generated. It's useful to replace
@@ -174,7 +175,7 @@ var useravatar = (function() {
         }
         pendingVerifyQuery[userHandle] = Date.now();
 
-        if (d > 1) {
+        if (DEBUG) {
             logger.log('isUserVerified', userHandle);
         }
 
@@ -220,9 +221,55 @@ var useravatar = (function() {
             return ns.imgUrl(u_handle);
         }
         catch (ex) {
-            logger.error(ex);
+            if (DEBUG) {
+                logger.error(ex);
+            }
             return '';
         }
+    };
+
+    /**
+     * Refresh contact's avatar(s)
+     * @param {Array|String} [userPurgeList] list to invalidate user's avatars for
+     * @returns {Promise}
+     */
+    ns.refresh = async function(userPurgeList) {
+        if (u_type !== 3) {
+            return false;
+        }
+        if (!M.c.contacts) {
+            M.c.contacts = Object.create(null);
+        }
+        M.c.contacts[u_handle] = 1;
+
+        if (userPurgeList) {
+            // if provided, invalidate the pointed user avatars.
+            if (!Array.isArray(userPurgeList)) {
+                userPurgeList = [userPurgeList];
+            }
+            if (DEBUG) {
+                logger.debug('Invalidating user-avatar(s)...', userPurgeList);
+            }
+            for (let i = userPurgeList.length; i--;) {
+                this.invalidateAvatar(userPurgeList[i]);
+            }
+        }
+
+        const pending = [];
+        const users = M.u.keys();
+
+        for (let i = users.length; i--;) {
+            const usr = M.u[users[i]];
+            const uh = usr.h || usr.u;
+
+            if (!avatars[uh] && usr.c >= 0 && usr.c < 3) {
+
+                pending.push(this.loadAvatar(uh));
+            }
+        }
+
+        delete M.c.contacts[u_handle];
+        return pending.length && Promise.allSettled(pending);
     };
 
     /**
@@ -233,10 +280,12 @@ var useravatar = (function() {
     ns.loaded = function(user) {
 
         if (typeof user !== "string") {
-            logger.warn('Invalid user-handle provided!', user);
+            if (DEBUG) {
+                logger.warn('Invalid user-handle provided!', user);
+            }
             return false;
         }
-        if (d > 1) {
+        if (DEBUG) {
             logger.debug('Processing loaded user-avatar', user);
         }
 
@@ -357,25 +406,27 @@ var useravatar = (function() {
         ns.loadAvatar = function(handle, chathandle) {
             // Ensure this is a sane call...
             if (typeof handle !== 'string' || handle.length !== 11) {
-                logger.error('Unable to retrieve user-avatar, invalid handle!', handle);
+                if (DEBUG) {
+                    logger.error('Unable to retrieve user-avatar, invalid handle!', handle);
+                }
                 return MegaPromise.reject(EARGS);
             }
             if (missingAvatars[handle]) {
                 // If the retrieval already failed for the current session
-                if (d > 1) {
+                if (DEBUG) {
                     logger.warn('User-avatar retrieval for "%s" had failed...', handle, missingAvatars[handle]);
                 }
                 return MegaPromise.reject(missingAvatars[handle]);
             }
             if (pendingGetters[handle]) {
                 // It's already pending, return associated promise
-                if (d > 1) {
+                if (DEBUG) {
                     logger.warn('User-avatar retrieval for "%s" already pending...', handle);
                 }
                 return pendingGetters[handle];
             }
             if (avatars[handle]) {
-                if (d > 1) {
+                if (DEBUG) {
                     logger.warn('User-avatar for "%s" is already loaded...', handle, avatars[handle]);
                 }
                 return MegaPromise.resolve(EEXIST);
@@ -385,7 +436,7 @@ var useravatar = (function() {
             pendingGetters[handle] = promise;
 
             var reject = function(error) {
-                if (d > 1) {
+                if (DEBUG) {
                     logger.warn('User-avatar retrieval for "%s" failed...', handle, error);
                 }
 
@@ -393,7 +444,7 @@ var useravatar = (function() {
                 promise.reject.apply(promise, arguments);
             };
 
-            if (d > 1) {
+            if (DEBUG) {
                 logger.debug('Initiating user-avatar retrieval for "%s"...', handle);
             }
 
@@ -407,7 +458,7 @@ var useravatar = (function() {
                             var ab = base64_to_ab(res);
                             ns.setUserAvatar(handle, ab);
 
-                            if (d > 1) {
+                            if (DEBUG) {
                                 logger.info('User-avatar retrieval for "%s" successful.', handle, ab, avatars[handle]);
                             }
 
@@ -445,7 +496,9 @@ var useravatar = (function() {
                         myURL.revokeObjectURL(avatars[handle].url);
                     }
                     catch (ex) {
-                        logger.warn(ex);
+                        if (DEBUG) {
+                            logger.warn(ex);
+                        }
                     }
                 }
 
@@ -459,7 +512,7 @@ var useravatar = (function() {
                     M.u[handle].avatar = false;
                 }
             }
-            else {
+            else if (DEBUG) {
                 logger.warn('setUserAvatar: Provided data is not an ArrayBuffer.', ab);
             }
         };
@@ -469,11 +522,11 @@ var useravatar = (function() {
          * @param {String} handle The user handle
          */
         ns.invalidateAvatar = function(handle) {
-            if (d > 1) {
+            if (DEBUG) {
                 logger.debug('Invalidating user-avatar for "%s"...', handle);
             }
 
-            if (pendingGetters[handle]) {
+            if (DEBUG && pendingGetters[handle]) {
                 // this could indicate an out-of-sync flow, or calling M.avatars() twice...
                 logger.error('Invalidating user-avatar which is being retrieved!', handle);
             }
@@ -483,6 +536,8 @@ var useravatar = (function() {
             if (M.u[handle]) {
                 M.u[handle].avatar = false;
             }
+
+            attribCache.removeItem(`${handle}_+a`);
         };
 
         if (d) {

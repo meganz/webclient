@@ -38,7 +38,7 @@ export default class Contact extends AbstractGenericMessage {
         // based on the actual API response.
         if (this.props.chatRoom?.isAnonymous()) {
             return this._doAddContact(contactEmail)
-                .done(addedEmail => this.DIALOG.ADDED(addedEmail))
+                .then(addedEmail => this.DIALOG.ADDED(addedEmail))
                 .catch(this.DIALOG.DUPLICATE);
         }
 
@@ -47,7 +47,7 @@ export default class Contact extends AbstractGenericMessage {
             Object.values(M.opc).some(opc => opc.m === contactEmail) ?
                 this.DIALOG.DUPLICATE() :
                 this._doAddContact(contactEmail)
-                    .done(addedEmail => this.DIALOG.ADDED(addedEmail))
+                    .then(addedEmail => this.DIALOG.ADDED(addedEmail))
         );
     }
 

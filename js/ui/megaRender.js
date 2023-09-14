@@ -281,18 +281,6 @@
         }
     });
 
-    // Creates a new frozen object
-    var freeze = function(obj) {
-        var tmp = Object.create(null);
-
-        Object.keys(obj)
-            .forEach(function(name) {
-                tmp[name] = obj[name];
-            });
-
-        return Object.freeze(tmp);
-    };
-
     // Define object properties
     var define = function(target, property, value) {
         Object.defineProperty(target, property, {
@@ -1083,6 +1071,10 @@
                     }
                 }
 
+                if (aNode.vhl) {
+                    aTemplate.classList.add(`highlight${aNode.vhl}`);
+                }
+
                 if (this.viewmode || String(aProperties.name).length > 78 || aProperties.playtime !== undefined) {
                     if (aProperties.width) {
                         title.push(aProperties.width + 'x' + aProperties.height + ' @' + aProperties.fps + 'fps');
@@ -1326,14 +1318,11 @@
             'file-requests': function(aNode, aProperties, aTemplate) {
                 const renderTemplate = this.builders['cloud-drive'].call(this, aNode, aProperties, aTemplate);
 
-                if (aNode.t && mega.fileRequestCommon.storage.isPresent(aNode.h)) {
-                    const manageIcon = renderTemplate
-                        .querySelector('.grid-file-request-manage');
+                if (aNode.t && mega.fileRequest.publicFolderExists(aNode.h)) {
+                    const manageIcon = renderTemplate.querySelector('.grid-file-request-manage');
 
                     if (manageIcon) {
-                        manageIcon
-                            .classList
-                            .remove('hidden');
+                        manageIcon.classList.remove('hidden');
                     }
                 }
 

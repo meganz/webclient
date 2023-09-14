@@ -506,10 +506,6 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
     delete mThumbHandler.sup.SVG;
 }
 
-if (!window.fetchStreamSupport) {
-    delete mThumbHandler.sup.PDF;
-}
-
 mBroadcaster.once('startMega', function() {
     'use strict';
 
@@ -880,7 +876,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $playVideoButton = $('.play-video-button', $wrapper);
         var $document = $(document);
         var filters = Object.create(null);
-        let duration, timer, playevent;
+        let duration, playevent;
+        const MOUSE_IDLE_TID = 'auto-hide-media-controls';
 
         const props = Object.defineProperties(Object.create(null), {
             duration: {
@@ -991,8 +988,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var hideControls = function() {
             setIdle(false);
             if (dlmanager.isStreaming) {
-                clearTimeout(timer);
-                timer = setTimeout(function() {
+                delay(MOUSE_IDLE_TID, () => {
                     if (videoElement && !(videoElement.paused || videoElement.ended)) {
                         setIdle(true);
                     }
@@ -1161,14 +1157,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
         });
 
         $videoControls.rebind('mousemove.idle', function() {
-            onIdle(function() {
-                clearTimeout(timer);
+            onIdle(() => {
+                delay.cancel(MOUSE_IDLE_TID);
             });
         });
 
         $video.rebind('ended.idle pause.idle', function() {
             setIdle(false);
-            clearTimeout(timer);
+            delay.cancel(MOUSE_IDLE_TID);
             $document.off('mousemove.idle');
             if (streamer.currentTime + 0.01 >= props.duration) {
                 delete sessionStorage.previewTime;
@@ -1495,7 +1491,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $progress.off();
             $playpause.off();
             $volumeBar.off();
-            clearTimeout(timer);
+            delay.cancel(MOUSE_IDLE_TID);
 
             if (videoElement) {
                 videoElement.style.filter = 'none';
@@ -1623,7 +1619,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         else if (node.h) {
             req.h = node.h;
         }
-        M.req(req).always(function(res) {
+        api.req(req).always(({result: res}) => {
             if (d) {
                 console.debug('pra', res, [vAdInstance]);
             }
@@ -1920,10 +1916,14 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
 
                 switch (String(hint)) {
-                    case 'Blocked':
-                    case 'Not found':
-                    case 'Access denied':
-                        emsg = l[23];
+                    case api_strerror(EBLOCKED):
+                        if (!window.is_iframed) {
+                            emsg = l.not_avbl_tos_msg;
+                        }
+                    /* fallthrough */
+                    case api_strerror(ENOENT):
+                    case api_strerror(EACCESS):
+                        emsg = emsg || l[23];
                         break;
                     case 'The provided type is not supported':
                         emsg = l[17743];
@@ -2390,7 +2390,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         mediaCodecs = new Promise(function(resolve, reject) {
             var db;
-            var timer;
             var apiReq = function() {
                 var prc = function(res) {
                     if (!Array.isArray(res) || res.length !== 2) {
@@ -2441,29 +2440,19 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         return reject(EFAILED);
                     }
 
-                    mediaCodecs = data;
                     data.version = res[0] | 0;
+                    mediaCodecs = deepFreeze(data);
+
                     if (data.version < 3) {
                         console.error('Got unexpected mc-list version.', data.version, res);
                     }
-                    if (db) {
-                        db.kv.put({k: 'l', t: Date.now(), v: data});
-                    }
                     resolve(mediaCodecs);
-                };
-                api_req({a: 'mc'}, {callback: tryCatch(prc, reject)});
-            };
-            var read = function() {
-                db.kv.get('l').then(function(r) {
-                    if (r) {
-                        mediaCodecs = r.v;
 
-                        if (Date.now() < r.t + 864e6) {
-                            clearTimeout(timer);
-                            resolve(mediaCodecs);
-                        }
+                    if (db) {
+                        return db.kv.put({k: 'l', t: Date.now(), v: data});
                     }
-                });
+                };
+                return api.req({a: 'mc'}).then(({result}) => prc(result));
             };
 
             reject = (function(reject) {
@@ -2481,15 +2470,37 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 };
             })(reject);
 
-            if (typeof Dexie !== 'undefined') {
-                var dbname = '$mcv1';
-                db = new Dexie(dbname);
-                db.version(1).stores({kv: '&k'});
-                db.open().then(read).catch(console.warn.bind(console, dbname));
-                timer = setTimeout(apiReq, 1400);
+            if (typeof Dexie === 'undefined') {
+
+                apiReq().catch(reject);
             }
             else {
-                apiReq();
+                const timer = setTimeout(() => apiReq().catch(reject), 1400);
+
+                db = new Dexie('$mcv1');
+                db.version(1).stores({kv: '&k'});
+
+                db.kv.get('l')
+                    .then((r) => {
+                        if (!r) {
+                            throw ENOENT;
+                        }
+                        mediaCodecs = deepFreeze(r.v);
+
+                        if (Date.now() < r.t + 864e6) {
+                            clearTimeout(timer);
+                            resolve(mediaCodecs);
+                        }
+                    })
+                    .catch((ex) => {
+                        dump(db.name, ex);
+                        clearTimeout(timer);
+                        if (ex !== ENOENT) {
+                            db = null;
+                        }
+                        return apiReq();
+                    })
+                    .catch(reject);
             }
         });
 
@@ -3016,7 +3027,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
     var miCollectedBytes = 0;
     var miCollectRunning = 0;
     var miCollectProcess = function() {
-        if (localStorage.noMediaCollect || miCollectedBytes > 0x1000000 || M.chat) {
+        if (miCollectedBytes > 0x1000000 || M.chat) {
             return 0xDEAD;
         }
 
@@ -3101,8 +3112,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
         }, 4e3);
     };
 
-    mBroadcaster.addListener('mega:openfolder', miCollectProcess);
-    mBroadcaster.addListener('mediainfo:collect', miCollectProcess);
+    const dayOfMonth = new Date().getDate();
+
+    if (!localStorage.noMediaCollect && dayOfMonth > 27) {
+        mBroadcaster.addListener('mega:openfolder', miCollectProcess);
+        mBroadcaster.addListener('mediainfo:collect', miCollectProcess);
+    }
 
 })(self);
 
@@ -3599,12 +3614,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 console.debug('Storing media file attr for node.', req, res, self.fromAttributeString(req.fa));
             }
 
-            var success = function(fa) {
+            var success = function({result: fa}) {
+                MEGAException.assert(typeof fa === 'string' && /:\d+\*/.test(fa));
                 var n = M.d[req.n];
 
                 if (n) {
-                    n.fa = fa;
-                    M.nodeUpdated(n);
+                    // n.fa = fa;
+                    // M.nodeUpdated(n);
 
                     if (res.playtime && M.viewmode && n.p === M.currentdirid) {
                         $('#' + n.h)
@@ -3617,7 +3633,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 resolve(self);
             };
 
-            const promise = M.req(req).then(success).catch(reject);
+            const promise = api.screq(req).then(success).catch(reject);
 
             if (Object(res.General).InternetMediaType === 'video/mp4') {
                 const known = new Set(['qt  ', 'M4A ', ...mp4brands]);
@@ -3728,11 +3744,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
 mBroadcaster.once('startMega', function isAudioContextSupported() {
     'use strict';
-
-    // Safari AudioContext polyfill for audio streaming support
-    if (!window.AudioContext && window.webkitAudioContext) {
-        window.AudioContext = window.webkitAudioContext;
-    }
 
     if (isMediaSourceSupported()) {
         onIdle(tryCatch(() => {

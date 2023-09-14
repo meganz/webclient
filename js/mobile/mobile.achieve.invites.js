@@ -198,7 +198,7 @@ mobile.achieve.invites = {
                 emailPromises.push(self.requestSendEmail(trimmedEmail));
             });
 
-            MegaPromise.allDone(emailPromises).done(function() {
+            Promise.allSettled(emailPromises).then(() => {
 
                 // Hide the loading spinner
                 $inviteButton.removeClass('loading');
@@ -241,34 +241,30 @@ mobile.achieve.invites = {
      * @return {MegaPromise}
      */
     requestSendEmail: function(trimmedEmail) {
-
         'use strict';
 
-        var self = this;
-        var promise = new MegaPromise();
-
         // Make an invite API request
-        api_req({ a: 'upc', e: u_attr.email, u: trimmedEmail, msg: l[5878], aa: 'a', i: requesti }, {
-            callback: function(response) {
+        return api.screq({a: 'upc', e: u_attr.email, u: trimmedEmail, msg: l[5878], aa: 'a'})
+            .then(({result}) => {
+                assert(result === 0 || typeof result === 'object' && result.p);
+                this.successful.push(trimmedEmail);
+            })
+            .catch((ex) => {
 
                 // Check for error codes
-                if (response === -12) {
-                    self.alreadySent.push(trimmedEmail);
+                if (ex === -12) {
+                    this.alreadySent.push(trimmedEmail);
                 }
-                else if (response === -10) {
-                    self.alreadyReceived.push(trimmedEmail);
+                else if (ex === -10) {
+                    this.alreadyReceived.push(trimmedEmail);
                 }
-                else if (response === -2) {
-                    self.existOrOwn.push(trimmedEmail);
+                else if (ex === -2) {
+                    this.existOrOwn.push(trimmedEmail);
                 }
-                else if (response === 0 || typeof response === 'object' && response.p) {
-                    self.successful.push(trimmedEmail);
+                else if (d) {
+                    console.error('Unexpected result...', ex);
                 }
-                promise.resolve();
-            }
-        });
-
-        return promise;
+            });
     },
 
     /**

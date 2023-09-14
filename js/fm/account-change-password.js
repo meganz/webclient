@@ -107,7 +107,33 @@ var accountChangePassword = {
             accountChangePassword.emulateFormSubmission(password);
 
             // Proceed to change the password
-            accountChangePassword.changePassword(password);
+            accountChangePassword.changePassword(password)
+                .then(() => {
+
+                    // Success
+                    showToast('settings', l[725]);
+                })
+                .catch((ex) => {
+
+                    if (ex === EFAILED || ex === EEXPIRED) {
+                        msgDialog('warninga', l[135], l[19216]);
+                    }
+                    else if (String(ex).includes(l[22126])) {
+                        msgDialog('warninga', l[135], l[22126]);
+                    }
+                    else {
+                        tell(ex);
+                    }
+                })
+                .finally(() => {
+                    // Clear password fields
+                    accountChangePassword.resetForm();
+                    $('#account-new-password').val('');
+                    $('#account-confirm-password').val('');
+
+                    // Update the account page
+                    accountUI();
+                });
         });
     },
 
@@ -152,102 +178,34 @@ var accountChangePassword = {
      * Change the user's password
      * @param {String} newPassword The new password
      */
-    changePassword: function(newPassword) {
-
+    async changePassword(newPassword) {
         'use strict';
-
-        loadingDialog.show();
+        let twoFactorPin = null;
 
         // Check their current Account Authentication Version before proceeding
-        security.changePassword.checkAccountVersion((accountAuthVersion) => {
+        const [
+            hasTwoFactor,
+            accountAuthVersion
+        ] = await Promise.all([twofactor.isEnabledForAccount(), security.changePassword.checkAccountVersion()]);
 
-            // Check if 2FA is enabled on their account
-            twofactor.isEnabledForAccount((result) => {
+        // Check if 2FA is enabled on their account
+        if (hasTwoFactor) {
 
-                loadingDialog.hide();
-
-                // If 2FA is enabled on their account
-                if (result) {
-
-                    // Show the verify 2FA dialog to collect the user's PIN
-                    twofactor.verifyActionDialog.init((twoFactorPin) => {
-                        accountChangePassword.continueChangePassword(accountAuthVersion, newPassword, twoFactorPin);
-                    });
-                }
-                else {
-                    // Otherwise change the password without 2FA
-                    accountChangePassword.continueChangePassword(accountAuthVersion, newPassword, null);
-                }
-            });
-        });
-    },
-
-    /**
-     * Continue to change the user's password (e.g. immediately or after they've entered their 2FA PIN
-     * @param {Number} accountAuthVersion The current Account Authentication Version i.e. 1 or 2
-     * @param {String} newPassword The new password
-     * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
-     * @returns {void}
-     */
-    continueChangePassword: function(accountAuthVersion, newPassword, twoFactorPin) {
-
-        'use strict';
-
-        const checkPassPromise = security.changePassword.isPasswordTheSame($.trim(newPassword), accountAuthVersion);
-
-        checkPassPromise.fail((status) => {
-            if (status === 1) {
-                msgDialog('info', '', l[22126]); // You have entered your current password, please enter a new password
-            }
-            else {
-                msgDialog('info', '', l[200]); // Oops, something went wrong
-            }
-            this.resetForm();
-        });
-
-        checkPassPromise.done(() => {
-            if (accountAuthVersion === 1) {
-                security.changePassword.oldMethod(
-                    newPassword, twoFactorPin, accountChangePassword.completeChangePassword
-                );
-            }
-            if (accountAuthVersion === 2) {
-                security.changePassword.newMethod(
-                    newPassword, twoFactorPin, accountChangePassword.completeChangePassword
-                );
-            }
-        });
-    },
-
-    /**
-     * Update the UI after attempting to change the password and let the user know if it failed or was successful
-     * @param {Number} result The result from the change password API request
-     */
-    completeChangePassword: function(result) {
-
-        'use strict';
-
-        loadingDialog.hide();
-
-        // If something went wrong with the 2FA PIN
-        if (result === EFAILED || result === EEXPIRED) {
-            msgDialog('warninga', l[135], l[19216]);
+            // Show the verify 2FA dialog to collect the user's PIN
+            twoFactorPin = await twofactor.verifyActionDialog.init();
         }
 
-        // If something else went wrong, show an error
-        else if (typeof result === 'number' && result < 0) {
-            msgDialog('warninga', l[135], l[47]);
-        }
-        else {
-            // Success
-            showToast('settings', l[725]);
+        const same = await security.changePassword.isPasswordTheSame($.trim(newPassword), accountAuthVersion);
+
+        // You have entered your current password, please enter a new password.
+        if (same) {
+            throw l[22126];
         }
 
-        // Clear password fields
-        $('#account-new-password').val('');
-        $('#account-confirm-password').val('');
+        if (accountAuthVersion === 2) {
+            return security.changePassword.newMethod(newPassword, twoFactorPin);
+        }
 
-        // Update the account page
-        accountUI();
+        return security.changePassword.oldMethod(newPassword, twoFactorPin);
     }
 };

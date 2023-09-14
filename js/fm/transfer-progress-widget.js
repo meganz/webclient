@@ -540,7 +540,7 @@ mega.tpw = new function TransferProgressWidget() {
             return;
         }
         $targetedRow.removeClass('complete error progress paused overquota').addClass('inqueue');
-        setStatus($targetedRow, this.FROZEN);
+        setStatus($targetedRow, mySelf.FROZEN);
     };
 
     var getDownloadsRows = function() {

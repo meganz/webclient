@@ -69,11 +69,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > Released as public domain.
 
 ---
-[es6-shim]: ECMAScript 6 compatibility shims for legacy JavaScript engines.
-
-> **This is a fork**, [Compare the changes](https://github.com/paulmillr/es6-shim/compare/master...meganz:master)
-
----
 [exif-js]: JavaScript library for reading EXIF image metadata.
 
 > **This is a fork**, [Compare the changes](https://github.com/exif-js/exif-js/compare/master...meganz:master)
@@ -160,9 +155,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > This is released into the [public domain](https://en.wikipedia.org/wiki/Public_domain_software).
 
 ---
-[notification.js]: A shim polyfill for adding notifications to browsers which offer limited support.
-
----
 [pdf.js]: PDF Reader in JavaScript.
 
 > Released under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
@@ -201,6 +193,11 @@ characters were removed from the files
 [videostream.js]: Play html5 video from a file-like object.
 
 > **This is a fork**, [Compare the changes](https://github.com/jhiesey/videostream/compare/master...meganz:master)
+
+---
+[web-streams-polyfill.js]: Web Streams, based on the WHATWG spec reference implementation.
+
+> **This is a fork**, [Compare the changes](https://github.com/MattiasBuelens/web-streams-polyfill/compare/master...meganz:master)
 
 ---
 [webp.js]: library to encode and decode images in WebP format.
@@ -260,13 +257,12 @@ characters were removed from the files
 [dcraw.js]: <https://github.com/meganz/dcraw.js>
 [docx-preview.js]: <https://github.com/meganz/docxjs>
 [encoding.js, encoding-indexes.js]: <https://github.com/inexorabletash/text-encoding/tree/v0.6.3>
-[es6-shim]: <https://github.com/meganz/es6-shim>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>
 [filesaver.js]: <https://github.com/eligrey/FileSaver.js/tree/d8388a1a3c781821caae9110ee3d7c28aa7d6e0b>
 [int64.js]: <https://github.com/meganz/node-int64>
 [ion.sound.js]: <https://github.com/meganz/ion.sound>
-[jquery.js]: <https://github.com/jquery/jquery/blob/3.6.0/dist/jquery.js>
+[jquery.js]: <https://github.com/jquery/jquery/blob/3.7.0/dist/jquery.js>
 [jquery-ui.js]: <https://code.jquery.com/ui/1.12.1/jquery-ui.js>
 [jquery.fullscreen.js]: <https://github.com/meganz/jquery-fullscreen-plugin>
 [jquery.mousewheel.js]: <https://github.com/meganz/jquery-mousewheel>
@@ -278,13 +274,13 @@ characters were removed from the files
 [megapix.js]: <https://github.com/meganz/ios-imagefile-megapixel>
 [moment.js]: <https://github.com/moment/moment/tree/2.10.6>
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
-[notification.js]: <https://github.com/MrSwitch/notification.js/tree/v0.0.1>
 [pdf.js]: <https://github.com/mega.nz/pdf.js>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [react-dom.js, react.js]: https://github.com/facebook/react/releases/tag/v16.8.6
 [smartcrop.js]: <https://github.com/meganz/smartcrop.js>
 [tiff.js]: <https://github.com/seikichi/tiff.js>
 [videostream.js]: <https://github.com/meganz/videostream>
+[web-streams-polyfill.js]: <https://github.com/meganz/web-streams-polyfill>
 [webp.js]: <https://github.com/meganz/libwebp>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
 [chat/adapter.js]: <https://github.com/webrtc/adapter>

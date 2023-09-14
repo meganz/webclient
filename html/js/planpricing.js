@@ -768,7 +768,8 @@ lazy(pro, 'proplan2', () => {
 
         const business = new BusinessAccount();
 
-        business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
+        // eslint-disable-next-line complexity
+        return business.getBusinessPlanInfo(false).then((info) => {
 
             pro.proplan.businessPlanData = info;
 
@@ -785,7 +786,6 @@ lazy(pro, 'proplan2', () => {
 
             populateBusinessPlanData();
         });
-
     };
 
     const initPeriodPickHandler = () => {

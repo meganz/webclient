@@ -207,29 +207,35 @@ var exportPassword = {
                         exportPassword.encrypt.turnOffPasswordUI();
                         return;
                     }
+                    loadingDialog.show();
 
                     // Remove the existing links and re-add them
-                    exportPassword.removeLinksAndReAdd($.itemExport, () => {
+                    exportPassword.removeLinksAndReAdd($.itemExport)
+                        .then(() => {
 
-                        const $items = $('.item', this.$dialog);
-                        const linkCount = $.itemExport.length;
+                            const $items = $('.item', this.$dialog);
+                            const linkCount = $.itemExport.length;
 
-                        // If a password has actually been set
-                        if ($items.first().hasClass('password-protect-link')) {
+                            // If a password has actually been set
+                            if ($items.first().hasClass('password-protect-link')) {
 
-                            // Show success banner telling them to re-copy the links now it's reverted back to link/key
-                            $updateSuccessBanner.text(mega.icu.format(l.links_updated_copy_again, linkCount));
-                            $updateSuccessBanner.removeClass('hidden');
+                                // Show success banner telling them to re-copy the links
+                                $updateSuccessBanner.text(mega.icu.format(l.links_updated_copy_again, linkCount));
+                                $updateSuccessBanner.removeClass('hidden');
 
-                            // Hide again after 3 seconds
-                            setTimeout(() => {
-                                $updateSuccessBanner.addClass('hidden');
-                            }, 3000);
-                        }
+                                // Hide again after 3 seconds
+                                setTimeout(() => {
+                                    $updateSuccessBanner.addClass('hidden');
+                                }, 3000);
+                            }
 
-                        // Reset the password UI elements to default off state
-                        exportPassword.encrypt.turnOffPasswordUI();
-                    });
+                            // Reset the password UI elements to default off state
+                            return exportPassword.encrypt.turnOffPasswordUI();
+                        })
+                        .catch(tell)
+                        .finally(() => {
+                            loadingDialog.hide();
+                        });
                 }
                 else {
                     // The toggle is currently off, so we will turn it on
@@ -326,37 +332,42 @@ var exportPassword = {
 
             // On Remove password click
             $removePasswordBtn.rebind('click.removePass', () => {
+                loadingDialog.show();
 
                 // Remove the existing links and re-add them
-                exportPassword.removeLinksAndReAdd($.itemExport, () => {
+                exportPassword.removeLinksAndReAdd($.itemExport)
+                    .then(() => {
+                        const $items = $('.item', this.$dialog);
+                        const linkCount = $.itemExport.length;
 
-                    const $items = $('.item', this.$dialog);
-                    const linkCount = $.itemExport.length;
+                        // Set links and keys into text boxes
+                        $items.removeClass('password-protect-link');
 
-                    // Set links and keys into text boxes
-                    $items.removeClass('password-protect-link');
+                        // Update Password buttons and links UI
+                        exportPassword.encrypt.updatePasswordComponentsUI();
 
-                    // Update Password buttons and links UI
-                    exportPassword.encrypt.updatePasswordComponentsUI();
+                        // Update Link input values
+                        exportPassword.encrypt.updateLinkInputValues();
 
-                    // Update Link input values
-                    exportPassword.encrypt.updateLinkInputValues();
+                        // Change link access description back to 'Anyone with this link can view your data'
+                        $linkAccessText.text(mega.icu.format(l.link_access_explainer, linkCount));
 
-                    // Change link access description back to 'Anyone with this link can view and download your data'
-                    $linkAccessText.text(mega.icu.format(l.link_access_explainer, linkCount));
+                        // Reset password input to default state
+                        $passwordInput.val('');
+                        $passwordInput.focus();
+                        $passwordInput.prop('readonly', false);
+                        $passwordStrengthText.text('');
+                        $passwordInputWrapper.removeClass('good1 good2 good3 good4 good5');
 
-                    // Reset password input to default state
-                    $passwordInput.val('');
-                    $passwordInput.focus();
-                    $passwordInput.prop('readonly', false);
-                    $passwordStrengthText.text('');
-                    $passwordInputWrapper.removeClass('good1 good2 good3 good4 good5');
-
-                    // Revert to default state for the password visibility 'eye' icon
-                    if ($passwordVisibilityToggle.hasClass('icon-eye-hidden')) {
-                        $passwordVisibilityToggle.trigger('click');
-                    }
-                });
+                        // Revert to default state for the password visibility 'eye' icon
+                        if ($passwordVisibilityToggle.hasClass('icon-eye-hidden')) {
+                            $passwordVisibilityToggle.trigger('click');
+                        }
+                    })
+                    .catch(tell)
+                    .finally(() => {
+                        loadingDialog.hide();
+                    });
             });
         },
 
@@ -369,11 +380,18 @@ var exportPassword = {
 
             // Add click handler to the confirm button
             $('.js-confirm-password', this.$dialog).rebind('click.setPass', () => {
+                loadingDialog.show();
 
                 // Remove the existing links and re-add them
-                exportPassword.removeLinksAndReAdd($.itemExport, () => {
-                    exportPassword.encrypt.startEncryption();
-                });
+                exportPassword.removeLinksAndReAdd($.itemExport)
+                    .then(() => {
+                        // @todo revamp to get back the crypto promise
+                        return exportPassword.encrypt.startEncryption();
+                    })
+                    .catch(tell)
+                    .finally(() => {
+                        loadingDialog.hide();
+                    });
             });
         },
 
@@ -984,153 +1002,75 @@ var exportPassword = {
      *
      * @param {Array} nodesToRecreate The node handles of the links to be removed and recreated
      * @param {Function} completeCallback The function to be called once done
-     * @returns {undefined}
+     * @returns {Promise}
      */
-    removeLinksAndReAdd: function(nodesToRecreate, completeCallback) {
-
+    async removeLinksAndReAdd(nodesToRecreate) {
         'use strict';
 
-        loadingDialog.show();
-
         // Contains a backup of all the expiry dates for each node before we recreate links
-        const nodeExpiryTimestamps = [];
-
-        // For each selected file/folder
-        for (const i in nodesToRecreate) {
-            if (nodesToRecreate.hasOwnProperty(i)) {
-
+        const nodeExpiryTimestamps =
+            nodesToRecreate.map((h) => {
                 // Get the node handle
-                const node = M.d[nodesToRecreate[i]];
+                const node = M.d[h];
                 const nodeHandle = node.h;
                 const expiryTimestamp = M.getNodeShare(node).ets;
 
                 // If it has an expiry time, add it to the array
-                if (expiryTimestamp) {
-                    nodeExpiryTimestamps.push({ nodeHandle: nodeHandle, expiryTimestamp: expiryTimestamp });
-                }
-            }
-        }
+                return expiryTimestamp && {nodeHandle, expiryTimestamp};
+            }).filter(Boolean);
 
         // Disable sharing on links / perform the remove links operation
-        const oldExportLinks = new mega.Share.ExportLink({
+        const exportLink = new mega.Share.ExportLink({
             'updateUI': false,
             'nodesToProcess': nodesToRecreate
         });
-        oldExportLinks.removeExportLink(true).always(() => {
+        await exportLink.removeExportLink(true);
 
-            // Recreate the share for the links (old password links will be invalidated because of new share key)
-            const newExportLinks = new mega.Share.ExportLink({
-                'updateUI': false,
-                'nodesToProcess': nodesToRecreate
-            });
+        // When all links are finished being recreated
+        const res = await exportLink.getExportLink(true);
 
-            const createLinkPromises = [];
+        if (nodeExpiryTimestamps.length) {
+            // Update the link API side with the previous expiry timestamps for each node
 
-            // Create the new links
-            for (let i = 0; i < nodesToRecreate.length; i++) {
-                const nodeHandle = nodesToRecreate[i];
-                const node = M.d[nodeHandle];
+            await Promise.all(
+                nodeExpiryTimestamps.map(({nodeHandle, expiryTimestamp}) => {
 
-                if (node) {
-                    if (node.t) {
-                        // Create folder share link
-                        createLinkPromises.push(newExportLinks._getFolderExportLinkRequest(nodeHandle));
-                    }
-                    else {
-                        // Create file share link
-                        createLinkPromises.push(newExportLinks._getExportLinkRequest(nodeHandle));
-                    }
-                }
-                else {
-                    this.logger.warn('Invalid node to export...', nodeHandle);
-                }
-            }
+                    return exportPassword.setExpiryOnNode(nodeHandle, expiryTimestamp);
+                })
+            );
+        }
 
-            // When all links are finished being recreated
-            Promise.all(createLinkPromises).then((values) => {
+        // Go through each link handle
+        for (let i = 0; i < nodesToRecreate.length; i++) {
 
-                const addExpiryPromises = [];
+            const nodeHandle = nodesToRecreate[i];
+            const node = M.d[nodeHandle];
+            const nodePubHandle = node.ph;
+            const nodeType = node.t;
 
-                // Update the links API side with the previous expiry timestamps for each node
-                for (let i = 0; i < nodeExpiryTimestamps.length; i++) {
+            // Create the links
+            const newLink = getBaseUrl() + (nodeType ? '/folder/' : '/file/') + escapeHTML(nodePubHandle);
 
-                    const { nodeHandle, expiryTimestamp } = nodeExpiryTimestamps[i];
+            // Update UI
+            const $item = $(`.item[data-node-handle='${nodeHandle}']`, exportPassword.encrypt.$dialog);
+            const $itemInputLink = $('.item-link.link input', $item);
 
-                    addExpiryPromises.push(exportPassword.setExpiryOnNode(nodeHandle, expiryTimestamp));
-                }
+            // Update data attribute - text input value is updated later
+            $itemInputLink.data('link', newLink);
+        }
 
-                // When all expiry dates are added, update the links in the UI
-                Promise.all(addExpiryPromises).then(() => {
-
-                    // Go through each link handle
-                    for (let i = 0; i < $.itemExport.length; i++) {
-
-                        const nodeHandle = $.itemExport[i];
-                        const node = M.d[nodeHandle];
-                        const nodePubHandle = node.ph;
-                        const nodeType = node.t;
-
-                        // Create the links
-                        const newLink = getBaseUrl() + (nodeType ? '/folder/' : '/file/') + htmlentities(nodePubHandle);
-
-                        // Update UI
-                        const $item = $(`.item[data-node-handle='${nodeHandle}']`, exportPassword.encrypt.$dialog);
-                        const $itemInputLink = $('.item-link.link input', $item);
-
-                        // Update data attribute - text input value is updated later
-                        $itemInputLink.data('link', newLink);
-                    }
-
-                    loadingDialog.hide();
-
-                    // Call callback to let the calling function know everything is all done
-                    completeCallback(values);
-                });
-            });
-        });
+        return res;
     },
 
     /**
      * Sets an expiry timestamp on a share link node
-     * @param {String} nodeHandle The node handle to set the expiry for
-     * @param {Number} expiryTimestamp The expiry timestamp
+     * @param {String} n The node handle to set the expiry for
+     * @param {Number} ets The expiry timestamp
      * @returns {Promise} The promise to be resolved/rejected once the API operation is complete
      */
-    setExpiryOnNode: function(nodeHandle, expiryTimestamp) {
-
+    setExpiryOnNode(n, ets) {
         'use strict';
-
-        let promiseResolve;
-        let promiseReject;
-
-        // Set up a promise to be resolved when the whole operation is complete
-        const promise = new Promise((resolve, reject) => {
-            promiseResolve = resolve;
-            promiseReject = reject;
-        });
-
-        // The data to send in the API request
-        var request = {
-            a: 'l',             // Link
-            n: nodeHandle,
-            i: requesti,
-            ets: expiryTimestamp
-        };
-
-        // Update the link with the new expiry timestamp
-        api_req(request, {
-            callback: function(result) {
-
-                if (typeof result === 'number' && result < 0) {
-                    promiseReject(nodeHandle);
-                }
-                else {
-                    promiseResolve(nodeHandle);
-                }
-            }
-        });
-
-        return promise;
+        return api.screq({a: 'l', n, ets});
     },
 
     /**
@@ -1452,7 +1392,7 @@ var exportExpiry = {
                 $inputClicked.trigger('change.logDateChange');
 
                 // Update the link API side with the new expiry timestamp
-                exportExpiry.updateLinksOnApi(dateText / 1000);
+                exportExpiry.updateLinksOnApi(dateText / 1000 || undefined);
 
                 // Update the text input
                 exportExpiry.updateInputText(date);
@@ -1711,22 +1651,8 @@ var exportExpiry = {
                 var node = M.d[handles[i]];
                 var handle = node.h;
 
-                // The data to send in the API request
-                var request = {
-                    a: 'l',             // Link
-                    n: handle,
-                    i: requesti
-                };
-
-                // If the expiry timestamp is set
-                if (expiryTimestamp) {
-
-                    // Add it to be sent in the request
-                    request.ets = expiryTimestamp;
-                }
-
                 // Update the link with the new expiry timestamp
-                api_req(request);
+                api.screq({a: 'l', n: handle, ets: expiryTimestamp}).catch(dump);
             }
         }
     }
@@ -2208,8 +2134,6 @@ function logExportEvt(type, target) {
             const msg = mega.icu.format(l.remove_link_question, linkCount);
             const cancelButtonText = l.dont_remove;
             const confirmButtonText = l['83'];
-            const configKey = 'sharelinkremove';
-            const showCloseButton = true;
 
             let folderCount = 0;
             let fileCount = 0;
@@ -2250,17 +2174,17 @@ function logExportEvt(type, target) {
             };
 
             // If they have already checked the Don't show this again checkbox, just remove the link/s
-            if (mega.config.get(configKey)) {
+            if (mega.config.get('cslrem')) {
                 confirmFunction();
                 return false;
             }
 
             // Show confirmation dialog
-            msgDialog('confirmation:!^' + confirmButtonText + '!' + cancelButtonText, null, msg, subMsg, (res) => {
+            msgDialog(`*confirmation:!^${confirmButtonText}!${cancelButtonText}`, null, msg, subMsg, (res) => {
                 if (res) {
                     confirmFunction();
                 }
-            }, configKey, showCloseButton);
+            }, 'cslrem');
         });
 
         // Copy all links/keys to clipboard
@@ -2527,13 +2451,10 @@ function logExportEvt(type, target) {
      * @private
      */
     function itemExportLinkHtml(item) {
-
         "use strict";
-
         var key;
         var type;
         var fileSize;
-        var folderClass = '';
         var html = '';
         var nodeHandle = item.h;
         var fileUrlKey;
@@ -2542,11 +2463,16 @@ function logExportEvt(type, target) {
         let hideSeparatorClass = '';
         let folderContents = '';
 
-        // Add a hover text for the icon
-        var expiresTitleText = l[8698].replace('%1', '');   // Expires %1
-
         if (folderlink) {
-            if (mega.flags.nlfe) {
+            if (item.foreign) {
+                if (item.pfid) {
+                    fileUrlWithoutKey = `${getBaseUrl()}/folder/${item.pfid}`;
+                    fileUrlKey = `#${item.pfkey}`;
+                    fileUrlNodeHandle = (item.t ? '/folder/' : '/file/') + item.h;
+                }
+                key = item.k;
+            }
+            else if (mega.flags.nlfe) {
                 fileUrlWithoutKey = getBaseUrl() + '/folder/' + pfid;
                 fileUrlKey = '#' + pfkey;
                 fileUrlNodeHandle = (item.t ? '/folder/' : '/file/') + item.h;
@@ -2572,7 +2498,6 @@ function logExportEvt(type, target) {
 
             type = 'F';
             fileSize = '';
-            folderClass = ' folder-item';
 
             const numFolders = M.d[nodeHandle].td;
             const numFiles = M.d[nodeHandle].tf;
@@ -2703,6 +2628,41 @@ function logExportEvt(type, target) {
 
 
 (function($, scope) {
+    'use strict';
+
+    const broadcast = (handle) => {
+        console.assert($.getExportLinkInProgress === 'ongoing');
+
+        if ($.getExportLinkOngoing
+            && $.getExportLinkOngoing.length) {
+
+            $.getExportLinkOngoing.pop().resolve(handle);
+        }
+        else {
+            queueMicrotask(() => {
+                mBroadcaster.sendMessage('export-link:completed', handle);
+            });
+            $.getExportLinkOngoing = false;
+            $.getExportLinkInProgress = false;
+        }
+    };
+
+    // hold concurrent/ongoing share-link operations.
+    const ongoing = async() => {
+        const {promise} = mega;
+
+        assert($.getExportLinkInProgress);
+
+        if ($.getExportLinkOngoing) {
+            $.getExportLinkOngoing.push(promise);
+        }
+        else {
+            $.getExportLinkOngoing = [promise];
+        }
+
+        return promise;
+    };
+
     /**
      * ExportLink related operations.
      *
@@ -2710,8 +2670,6 @@ function logExportEvt(type, target) {
      *
      * @constructor
      */
-
-    'use strict';
     var ExportLink = function(opts) {
 
         var self = this;
@@ -2732,13 +2690,16 @@ function logExportEvt(type, target) {
     /**
      * Get public link for file or folder.
      */
-    ExportLink.prototype.getExportLink = function() {
+    ExportLink.prototype.getExportLink = async function(quiet) {
 
         var nodes = this.options.nodesToProcess || false;
 
         if (!nodes.length) {
             return this.logger.warn('No nodes provided to export...', this);
         }
+
+        // @todo FIXME those events must be fired when the operation actually succeed.
+        const eventlog = quiet ? nop : SoonFc(888, (eid) => window.eventlog(eid));
 
         // Add some logging for usage comparisons
         if (page === 'download') {
@@ -2758,27 +2719,44 @@ function logExportEvt(type, target) {
             eventlog(99635); // Created public link on regular webclient
         }
 
-        loadingDialog.show();
-        this.logger.debug('getExportLink');
+        if ($.getExportLinkInProgress) {
+            if (d) {
+                this.logger.warn('Ongoing link-export, holding...', nodes);
+            }
+
+            await ongoing();
+        }
+
+        if (d) {
+            console.group('--- get export link', nodes);
+        }
+
+        console.assert(!$.getExportLinkInProgress || $.getExportLinkInProgress === 'ongoing');
         $.getExportLinkInProgress = nodes;
 
+        const promises = [];
         for (var i = 0; i < nodes.length; i++) {
             var h = nodes[i];
             var n = M.d[h];
 
             if (n) {
                 if (n.t) {
-                    this._getFolderExportLinkRequest(h);
+                    promises.push(this._getFolderExportLinkRequest(h));
                 }
                 else {
-                    this._getExportLinkRequest(h);
+                    promises.push(this._getExportLinkRequest(h));
                 }
             }
             else {
-                loadingDialog.hide();
                 this.logger.warn('Invalid node to export...', h);
             }
         }
+
+        return Promise.all(promises)
+            .finally(() => {
+
+                return d && console.groupEnd();
+            });
     };
 
     /**
@@ -2790,7 +2768,7 @@ function logExportEvt(type, target) {
     ExportLink.prototype.removeExportLink = function(quiet, handle) {
 
         if (M.isInvalidUserStatus()) {
-            return MegaPromise.reject(EINTERNAL);
+            return Promise.reject(EINTERNAL);
         }
 
         var self = this;
@@ -2798,9 +2776,6 @@ function logExportEvt(type, target) {
         var handles = self.options.nodesToProcess || handle || [];
 
         if (handles.length) {
-            if (!quiet) {
-                loadingDialog.pshow();
-            }
             self.logger.debug('removeExportLink');
 
             $.each(handles, function(index, h) {
@@ -2821,10 +2796,10 @@ function logExportEvt(type, target) {
         }
 
         if (!promises.length) {
-            return MegaPromise.reject(EARGS);
+            return Promise.reject(EARGS);
         }
 
-        return MegaPromise.allDone(promises);
+        return Promise.allSettled(promises);
     };
 
     /**
@@ -2832,99 +2807,55 @@ function logExportEvt(type, target) {
      * @param {String} nodeId The node ID.
      */
     ExportLink.prototype._getFolderExportLinkRequest = function(nodeId) {
-
-        var self = this;
         var share = M.getNodeShare(nodeId);
-
-        let promiseResolve;
-        let promiseReject;
-
-        // Set up a promise to be resolved when the whole operation is complete
-        const promise = new Promise((resolve, reject) => {
-            promiseResolve = resolve;
-            promiseReject = reject;
-        });
 
         // No need to perform an API call if this folder was already exported (Ie, we're updating)
         if (share.h === nodeId) {
             if (!M.d[nodeId].t || u_sharekeys[nodeId]) {
-                return self._getExportLinkRequest(nodeId);
+                return this._getExportLinkRequest(nodeId);
             }
 
             if (d) {
                 console.warn('Missing sharekey for "%s" - relying on s2 to obtain it...', nodeId);
             }
         }
-        // FIXME: check this
 
         // Get all child nodes of root folder with nodeId
-        mega.keyMgr.setShareSnapshot(nodeId)
-            .then(() => {
-                const childNodes = mega.keyMgr.getShareSnapshot(nodeId);
+        return api_setshare(nodeId, [{u: 'EXP', r: 0}])
+            .then((result) => {
+                if (!result.r || result.r[0] !== 0) {
+                    throw result;
+                }
 
-                var sharePromise = api_setshare(nodeId, [{u: 'EXP', r: 0}], childNodes);
-                sharePromise.done(function _sharePromiseDone(result) {
-                    if (result.r && result.r[0] === 0) {
+                return this._getExportLinkRequest(nodeId);
 
-                        // Resolve the outer promise to signify the whole folder share process is done
-                        self._getExportLinkRequest(nodeId).then(() => {
-                            promiseResolve(nodeId);
-                        });
-
-                        if (!self.nodesLeft) {
-                            loadingDialog.hide();
-                        }
-                    }
-                    else {
-                        self.logger.warn('_getFolderExportLinkRequest', nodeId, 'Error code: ', result);
-                        promiseReject(nodeId);
-                        loadingDialog.hide();
-                    }
-                });
-                sharePromise.fail(function _sharePromiseFailed(result) {
-                    self.logger.warn('Get folder link failed: ' + result);
-                    promiseReject(nodeId);
-                    // FIXME: this seem to lack some handling code for this condition
-                });
             })
-            .catch(dump);
-
-        return promise;
+            .catch((ex) => {
+                this.logger.warn(`Get folder link failed: ${ex}`, ex);
+                throw ex;
+            });
     };
 
     /**
      * A 'Private' function, send public get-link request.
      * @param {String} nodeId The node ID.
      */
-    ExportLink.prototype._getExportLinkRequest = function(nodeId) {
+    ExportLink.prototype._getExportLinkRequest = async function(nodeId) {
 
-        let promiseResolve;
-        let promiseReject;
+        const done = (handle) => {
+            this.logger.warn('share-link progress...', this.nodesLeft, handle);
 
-        // Create a promise for the calling function to know when everything is done
-        const promise = new Promise((resolve, reject) => {
-            promiseResolve = resolve;
-            promiseReject = reject;
-        });
-
-        var self = this;
-        var done = function(handle) {
-
-            if (handle && self.options.updateUI) {
-                var UiExportLink = new mega.UI.Share.ExportLink();
-                UiExportLink.addExportLinkIcon(handle);
-            }
-
-            if (!--self.nodesLeft) {
-                loadingDialog.hide();
-                if (self.options.showExportLinkDialog) {
+            if (!--this.nodesLeft) {
+                if (this.options.showExportLinkDialog) {
                     var exportLinkDialog = new mega.Dialog.ExportLink();
                     exportLinkDialog.linksDialog();
                 }
 
+                console.assert($.getExportLinkInProgress);
                 if ($.getExportLinkInProgress) {
-                    mBroadcaster.sendMessage('export-link:completed', handle);
-                    $.getExportLinkInProgress = false;
+                    $.getExportLinkInProgress = 'ongoing';
+
+                    broadcast(handle);
                 }
             }
 
@@ -2932,9 +2863,8 @@ function logExportEvt(type, target) {
             if (is_mobile) {
                 mobile.linkOverlay.showPublicLinkAndEnableButtons(nodeId);
             }
-            else {
-                promiseResolve(nodeId);
-            }
+
+            return handle;
         };
         var share = M.getNodeShare(nodeId);
         var request = { a: 'l', n: nodeId, i: requesti };
@@ -2953,27 +2883,12 @@ function logExportEvt(type, target) {
             request.ets = share.ets;
         }
 
-        api_req(request, {
-            nodeId: nodeId,
-            callback: function(result) {
-                if (typeof result !== 'number') {
-                    M.nodeShare(this.nodeId, { h: this.nodeId, r: 0, u: 'EXP', ts: unixtime(), ph: result });
-                    var n = M.d[this.nodeId];
-                    if (n) {
-                        n.ph = result;
-                        M.nodeUpdated(n);
-                    }
-                }
-                else { // Error
-                    self.logger.warn('_getExportLinkRequest:', this.nodeId, 'Error code: ', result);
-                    promiseReject(nodeId);
-                }
-
-                done(typeof result !== 'number' && this.nodeId);
-            }
-        });
-
-        return promise;
+        return api.screq(request)
+            .then(({handle}) => done(handle))
+            .catch((ex) => {
+                done(null);
+                throw ex;
+            });
     };
 
     /**
@@ -2984,40 +2899,16 @@ function logExportEvt(type, target) {
      */
     ExportLink.prototype._removeFolderExportLinkRequest = function(nodeId, quiet) {
 
-        var self = this;
-        var masterPromise = new MegaPromise();
-
-        api_req({ a: 's2', n:  nodeId, s: [{ u: 'EXP', r: ''}], ha: '', i: requesti }, {
-            nodeId: nodeId,
-            callback: function(result) {
-                if (result.r && (result.r[0] === 0)) {
-                    M.delNodeShare(this.nodeId, 'EXP');
-
-                    if (self.options.updateUI) {
-                        var UiExportLink = new mega.UI.Share.ExportLink();
-                        UiExportLink.removeExportLinkIcon(this.nodeId);
+        return api.screq({a: 's2', n: nodeId, s: [{u: 'EXP', r: ''}], ha: ''})
+            .then(({result}) => {
+                if (!result.r || result.r[0] !== 0) {
+                    if (d) {
+                        this.logger.error('removeFolderExportLinkRequest failed for node %s', nodeId, result);
                     }
-
-                    // Hook for mobile web to show that removal completed successfully and then close the dialog
-                    if (is_mobile) {
-                        mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
-                    }
-
-                    masterPromise.resolve();
+                    throw result;
                 }
-                else {
-                    // Error
-                    self.logger.warn('_removeFolerExportLinkRequest failed for node:', this.nodeId, 'Error: ', result);
-                    masterPromise.reject(result);
-                }
-
-                if (!--self.nodesLeft && !quiet) {
-                    loadingDialog.phide();
-                }
-            }
-        });
-
-        return masterPromise;
+                console.assert(!M.su || !M.su.EXP || !M.su.EXP[nodeId], 'Invalid state..');
+            });
     };
 
     /**
@@ -3028,41 +2919,15 @@ function logExportEvt(type, target) {
      */
     ExportLink.prototype._removeFileExportLinkRequest = function(nodeId, quiet) {
 
-        var self = this;
-        var promise = new MegaPromise();
-
-        api_req({ a: 'l', n: nodeId, d: 1, i:requesti }, {
-            nodeId: nodeId,
-            callback: function(result) {
-
-                if (result === 0) {
-                    M.delNodeShare(this.nodeId, 'EXP');
-
-                    if (self.options.updateUI) {
-                        var UiExportLink = new mega.UI.Share.ExportLink();
-                        UiExportLink.removeExportLinkIcon(this.nodeId);
+        return api.screq({a: 'l', n: nodeId, d: 1})
+            .then(({result}) => {
+                if (result !== 0) {
+                    if (d) {
+                        this.logger.warn('removeFileExportLinkRequest failed for node %s', nodeId, result);
                     }
-
-                    // Hook for mobile web to show that removal completed successfully and then close the dialog
-                    if (is_mobile) {
-                        mobile.linkOverlay.completeLinkRemovalProcess(this.nodeId);
-                    }
-
-                    promise.resolve();
+                    throw result;
                 }
-                else {
-                    // Error
-                    self.logger.warn('_removeFileExportLinkRequest failed for node:', this.nodeId, 'Error: ', result);
-                    promise.reject(result);
-                }
-
-                if (!--self.nodesLeft && !quiet) {
-                    loadingDialog.phide();
-                }
-            }
-        });
-
-        return promise;
+            });
     };
 
     /**
@@ -3161,6 +3026,22 @@ function logExportEvt(type, target) {
         $('button.js-close', $copyrightDialog).rebind('click.closeDialog', closeDialog);
     };
 
+    Object.defineProperty(ExportLink, 'pullShareLink', {
+        value(handles, quiet, options) {
+
+            if (typeof quiet === 'object') {
+                options = quiet;
+                quiet = false;
+            }
+
+            const exportLink = new ExportLink({
+                nodesToProcess: Array.isArray(handles) ? handles : [handles],
+                ...options
+            });
+            return exportLink.getExportLink(quiet);
+        }
+    });
+
     // export
     scope.mega = scope.mega || {};
     scope.mega.Share = scope.mega.Share || {};
@@ -3213,7 +3094,9 @@ function logExportEvt(type, target) {
             return false;
         }
 
-        self.logger.debug('addExportLinkIcon', nodeId);
+        if (d) {
+            this.logger.debug('addExportLinkIcon', nodeId);
+        }
 
         $nodeId.addClass('linked');
 

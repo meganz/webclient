@@ -553,7 +553,7 @@ lazy(mega, 'fileRequestUI', () => {
             this.nodeHandle = nodeHandle;
         }
 
-        addEventHandlers(options) {
+        addEventHandlers(options = false) {
             const namespace = options && options.namespace || '';
             this.$selectFolderButton.setOptions({
                 namespace: namespace,
@@ -562,24 +562,12 @@ lazy(mega, 'fileRequestUI', () => {
                         if ($input.is(':disabled')) {
                             return false;
                         }
-
                         closeDialog();
-                        openNewFileRequestDialog({
-                            post: (selectedNodeHandle) => {
-                                if (options && typeof options.post === 'function') {
-                                    options.post(selectedNodeHandle);
-                                }
-                            },
-                            selectedNodeHandle: this.nodeHandle,
-                            close: ($dialog, selectedNode) => {
-                                $dialog.rebind('dialog-closed.fileRequestDialog', () => {
-                                    if (selectedNode && options && typeof options.post === 'function') {
-                                        options.post(selectedNode);
-                                    }
-                                    $dialog.off('dialog-closed.fileRequestDialog');
-                                });
-                            }
-                        });
+
+                        const {post} = options;
+                        if (typeof post === 'function') {
+                            openNewFileRequestDialog(this.nodeHandle).then(post).catch(dump);
+                        }
                         return false;
                     }
                 },

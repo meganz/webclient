@@ -15,13 +15,15 @@ var nicknames = {
 
     /**
      * Gets the user's nickname if it's available
-     * @param {String} userId The Base64 string of the user handle
+     * @param {String|Object} user The Base64 string of the user handle, or a user object
      * @returns {string} Returns the user's name if set, otherwise returns FirstName LastName,
      *                  or FirstName if the last name is not set
      */
-    getNickname: function(userId) {
+    getNickname: function(user) {
         'use strict';
-        const user = userId in M.u && M.u[userId] || userId === window.u_handle && window.u_attr;
+        if (typeof user === 'string') {
+            user = M.getUserByHandle(user);
+        }
         if (user) {
             // Set format to FirstName LastName (or just FirstName if the last name is not set)
             return String(user.nickname || user.fullname || user.name || user.m).trim();
@@ -101,6 +103,7 @@ var nicknames = {
                 if (typeof contactNicknames !== 'object') {
                     return false;
                 }
+                const users = [];
 
                 // Loop through all the properties in M.u
                 M.u.keys().forEach(function(key) {
@@ -114,11 +117,13 @@ var nicknames = {
                         var oldNickname = M.u[key].nickname;
                         if (oldNickname !== newNickname) {
                             M.u[key].nickname = newNickname;
-                            M.avatars([key]);
+                            users.push(key);
                         }
 
                     }
                 });
+
+                useravatar.refresh(users).catch(dump);
             });
     },
 
@@ -276,14 +281,14 @@ var nicknames = {
                     // If the nickname previously existed, delete it
                     if (M.u[contactUserHandle].nickname !== '') {
                         M.u[contactUserHandle].nickname = '';
-                        M.avatars([contactUserHandle]);
+                        useravatar.refresh(contactUserHandle).catch(dump);
                         updateApi = true;
                     }
                 }
                 else {
                     // Set the nickname
                     M.u[contactUserHandle].nickname = nickname;
-                    M.avatars([contactUserHandle]);
+                    useravatar.refresh(contactUserHandle).catch(dump);
                     updateApi = true;
                 }
 

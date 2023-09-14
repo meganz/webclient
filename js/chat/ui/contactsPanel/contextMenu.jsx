@@ -22,8 +22,8 @@ export default class ContextMenu extends MegaRenderMixin {
         );
 
     handleAddContact = handle => {
-        M.syncContactEmail(handle, new MegaPromise(), true)
-            .done(email => {
+        M.syncContactEmail(handle, true)
+            .then(email => {
                 const OPC = Object.values(M.opc);
                 const ALREADY_SENT = OPC && OPC.length && OPC.some(opc => opc.m === email);
                 this.close(() => {
@@ -33,7 +33,8 @@ export default class ContextMenu extends MegaRenderMixin {
                     msgDialog('info', l[150], l[5898]);
                     M.inviteContact(M.u[u_handle].m, email);
                 });
-            });
+            })
+            .catch(nop);
     };
 
     render() {

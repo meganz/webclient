@@ -91,6 +91,14 @@ var crypt = (function() {
         }
     };
 
+    // getPubKeyAttribute's async/await helper
+    ns.getRSAPubKeyAttribute = function(user, type = 'RSA') {
+        return new Promise((resolve, reject) => {
+            this.getPubKeyAttribute(user, type)
+                .done((meh, [res]) => resolve(res))
+                .fail((ex) => reject(ex));
+        });
+    };
 
     /**
      * Retrieves a users' pub keys through the Mega API.
@@ -117,11 +125,11 @@ var crypt = (function() {
         var masterPromise = new MegaPromise();
 
         if (keyType === 'RSA') {
-            var cacheKey = userhandle + "_@uk";
+            let fromCache = true;
+            const cacheKey = `${userhandle}_@uk`;
 
-            var myCtx = {};
             /** Function to settle the promise for the RSA pub key attribute. */
-            var __settleFunction = function(res, ctx, xhr, tResult, fromCache) {
+            const __settleFunction = function(res) {
                 if (typeof res === 'object' && res.pubk) {
 
                     var debugUserHandle = userhandle;
@@ -139,55 +147,62 @@ var crypt = (function() {
                     }
 
                     if (!fromCache && attribCache) {
+                        const cacheData = JSON.stringify(res);
+
                         // if an email was provided, cache it using the user-handle
                         if (String(userhandle).indexOf('@') > 0) {
-                            cacheKey = res.u + "_@uk";
+                            attribCache.setItem(`${res.u}_@uk`, cacheData);
                         }
-                        attribCache.setItem(cacheKey, JSON.stringify(res))
-                            .always(function() {
-                                masterPromise.resolve(pubKey, [res, userData]);
-                            });
+
+                        attribCache.setItem(cacheKey, cacheData);
                     }
-                    else {
-                        masterPromise.resolve(pubKey, [res, userData]);
-                    }
+
+                    masterPromise.resolve(pubKey, [res, userData]);
                 }
                 else {
                     if (d > 1 || is_karma || userhandle === window.u_handle) {
                         logger.warn(keyType + ' pub key for ' + userhandle + ' could not be retrieved: ' + res);
                     }
+
+                    if (!fromCache && res === ENOENT) {
+                        attribCache.setItem(cacheKey, JSON.stringify({error: res, ts: Date.now() + 3e4}));
+                    }
+
                     masterPromise.reject(res, [res, userData]);
                 }
             };
 
-            // Assemble context for this async API request.
-            myCtx.u = userhandle;
-            myCtx.callback = __settleFunction;
-
-            var __retrieveRsaKeyFunc = function() {
-                if (Object(window.u_attr).u === userhandle) {
-                    return __settleFunction({u: u_attr.u, pubk: u_attr.pubk});
-                }
-                // Fire it off.
-                api_req({a: 'uk', u: userhandle}, myCtx);
-            };
-
-            if (attribCache) {
-                attribCache.getItem(cacheKey)
-                    .done(function(r) {
-                        if (r && r.length !== 0) {
-                            __settleFunction(JSON.parse(r), undefined, undefined, undefined, true);
-                        }
-                        else {
-                            __retrieveRsaKeyFunc();
-                        }
-                    })
-                    .fail(function() {
-                        __retrieveRsaKeyFunc();
-                    });
+            if (window.is_karma) {
+                // @todo fix'em..
+                attribCache.getItem(cacheKey);
+                api_req({a: 'uk', u: userhandle}, {u: userhandle, callback: __settleFunction});
+            }
+            else if (Object(window.u_attr).u === userhandle) {
+                __settleFunction({u: u_attr.u, pubk: u_attr.pubk});
             }
             else {
-                __retrieveRsaKeyFunc();
+                attribCache.getItem(cacheKey)
+                    .then((res) => {
+                        res = JSON.parse(res);
+
+                        if (res.error) {
+                            if (Date.now() > res.ts) {
+                                // expired
+                                attribCache.removeItem(cacheKey);
+                                throw res.error;
+                            }
+                            res = res.error;
+                        }
+
+                        __settleFunction(res);
+                    })
+                    .catch(() => {
+                        fromCache = false;
+                        api.req({a: 'uk', u: userhandle})
+                            .then(({result}) => __settleFunction(result))
+                            .catch(__settleFunction);
+                    });
+
             }
         }
         else {
@@ -343,7 +358,9 @@ var crypt = (function() {
      *     for asynchronous dependencies.
      */
     ns.getPubKey = function(userhandle, keyType, callback) {
-        assertUserHandle(userhandle);
+        if (keyType !== 'RSA' || String(userhandle).indexOf('@') < 1) {
+            assertUserHandle(userhandle);
+        }
 
         let ignoreCache = false;
         if (callback === true) {
@@ -681,7 +698,9 @@ var crypt = (function() {
      *     The promise returns the RSA public key.
      */
     ns.getPubRSA = function(userhandle, callback) {
-        assertUserHandle(userhandle);
+        if (String(userhandle).indexOf('@') < 1) {
+            assertUserHandle(userhandle);
+        }
         return ns.getPubKey(userhandle, 'RSA', callback);
     };
 
@@ -690,25 +709,23 @@ var crypt = (function() {
      * @param {String} userHandle 11-chars-long user-handle
      * @returns {MegaPromise} fulfilled on completion
      */
-    ns.getAllPubKeys = function(userHandle) {
-        return new MegaPromise(function(resolve, reject) {
-            var promises = [];
-            assertUserHandle(userHandle);
+    ns.getAllPubKeys = async function(userHandle) {
+        const promises = [];
+        assertUserHandle(userHandle);
 
-            if (!pubCu25519[userHandle]) {
-                promises.push(crypt.getPubCu25519(userHandle));
-            }
+        if (!pubCu25519[userHandle]) {
+            promises.push(crypt.getPubCu25519(userHandle));
+        }
 
-            if (!pubEd25519[userHandle]) {
-                promises.push(crypt.getPubEd25519(userHandle));
-            }
+        if (!pubEd25519[userHandle]) {
+            promises.push(crypt.getPubEd25519(userHandle));
+        }
 
-            if (!u_pubkeys[userHandle]) {
-                promises.push(crypt.getPubRSA(userHandle));
-            }
+        if (!u_pubkeys[userHandle]) {
+            promises.push(crypt.getPubRSA(userHandle));
+        }
 
-            MegaPromise.allDone(promises).then(resolve).catch(reject);
-        });
+        return promises.length && Promise.allSettled(promises);
     };
 
 

@@ -53,7 +53,7 @@
 // peerpresencecb(userhandle, presencelevel, can_webrtc) will be called with any change of peer presence
 
 // DEBUG flag
-window.PRESENCE2_DEBUG = localStorage.presencedDebug;
+window.PRESENCE2_DEBUG = (window.d && localStorage.presencedDebug) | 0;
 
 var UserPresence = function userpresence(
     userhandle,
@@ -245,12 +245,12 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
 
 
     if (self.keepalivesendtimer) {
-        clearTimeout(self.keepalivesendtimer);
+        this.keepalivesendtimer.abort();
         self.keepalivesendtimer = false;
     }
 
     if (self.keepalivechecktimer) {
-        clearTimeout(self.keepalivechecktimer);
+        this.keepalivechecktimer.abort();
         self.keepalivechecktimer = false;
     }
 
@@ -309,12 +309,12 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
             self.trigger('onDisconnected');
 
             if (self.keepalivesendtimer) {
-                clearTimeout(self.keepalivesendtimer);
+                self.keepalivesendtimer.abort();
                 self.keepalivesendtimer = false;
             }
 
             if (self.keepalivechecktimer) {
-                clearTimeout(self.keepalivechecktimer);
+                self.keepalivechecktimer.abort();
                 self.keepalivechecktimer = false;
             }
             if (self.connectedcb) {
@@ -328,12 +328,12 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
             self.trigger('onDisconnected');
 
             if (self.keepalivesendtimer) {
-                clearTimeout(self.keepalivesendtimer);
+                self.keepalivesendtimer.abort();
                 self.keepalivesendtimer = false;
             }
 
             if (self.keepalivechecktimer) {
-                clearTimeout(self.keepalivechecktimer);
+                self.keepalivechecktimer.abort();
                 self.keepalivechecktimer = false;
             }
 
@@ -363,8 +363,8 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
                     switch (op) {
                         case 0: // OPCODE_KEEPALIVE
                             if (self.keepalivechecktimer) {
-                                clearTimeout(self.keepalivechecktimer);
-                                self.keepalivechecktimer = false;
+                                // self.logger.warn('Restarting keep-alive check-timer...');
+                                self.keepalivechecktimer.restart();
                             }
                             p++;
                             break;
@@ -450,17 +450,27 @@ UserPresence.prototype.reconnect = function presence_reconnect(self) {
             }
         };
     }
-    else if ((!self._puRequest || self._puRequest.state() !== "pending") && !is_chatlink) {
+    else if (!self._puRequest && !is_chatlink) {
+
         self.connectionRetryManager.pause();
+
         self._puRequest = asyncApiReq({'a': 'pu'})
-            .always(() => {
+            .always((res) => {
+                if (res && String(res[1]).includes('://')) {
+                    self.url = res[1];
+                }
+                if (!self.url) {
+                    if (d) {
+                        console.error('Unexpected response', res);
+                    }
+                    return tSleep(2 + -Math.log(Math.random()) * 5);
+                }
+            })
+            .finally(() => {
+                delete self._puRequest;
                 self.connectionRetryManager.unpause();
             })
-            .done((res) => {
-                if (typeof res == 'string') {
-                    self.url = res;
-                }
-
+            .then(() => {
                 self.reconnect();
             });
     }
@@ -480,12 +490,12 @@ UserPresence.prototype.disconnect = function(userForced) {
     self.open = false;
 
     if (self.keepalivesendtimer) {
-        clearTimeout(self.keepalivesendtimer);
+        self.keepalivesendtimer.abort();
         self.keepalivesendtimer = false;
     }
 
     if (self.keepalivechecktimer) {
-        clearTimeout(self.keepalivechecktimer);
+        self.keepalivechecktimer.abort();
         self.keepalivechecktimer = false;
     }
 
@@ -521,7 +531,7 @@ UserPresence.prototype.addremovepeers = function presence_addremovepeers(peers, 
 
 UserPresence.prototype.sendstring = function presence_sendstring(s) {
     if (!this.s || this.s.readyState !== 1) {
-        console.error("Called UserPresence.sendstring when offline.");
+        this.logger.warn("Called UserPresence.sendstring when offline.", s);
         return false;
     }
 
@@ -600,25 +610,18 @@ UserPresence.prototype.sendflags = function presence_sendflags(active) {
     }
 };
 
-UserPresence.prototype.sendkeepalive = function presence_sendkeepalive(self) {
-    if (!self) {
-        self = this;
+UserPresence.prototype.sendkeepalive = function presence_sendkeepalive() {
+    'use strict';
+    const timeout = this.KEEPALIVETIMEOUT / 1e3;
+
+    // this.logger.warn('sending keep-alive...', this.keepalivechecktimer, this.keepalivesendtimer);
+
+    this.sendstring("\x00");
+
+    if (!this.keepalivechecktimer) {
+        (this.keepalivechecktimer = tSleep(timeout)).then(() => this.reconnect());
     }
-
-    if (self.keepalivesendtimer) {
-        clearTimeout(self.keepalivesendtimer);
-    }
-
-    self.sendstring("\x00");
-    self.keepalivesendtimer = setTimeout(self.sendkeepalive, self.KEEPALIVETIMEOUT - 5000, self);
-
-    if (!self.keepalivechecktimer) {
-        self.keepalivechecktimer = setTimeout(self.keepalivetimeout, self.KEEPALIVETIMEOUT, self);
-    }
-};
-
-UserPresence.prototype.keepalivetimeout = function presence_keepalivetimeout(self) {
-    self.reconnect();
+    this.keepalivesendtimer = tSleep.schedule(timeout - 5, this, () => this.sendkeepalive());
 };
 
 UserPresence.prototype.ui_setstatus = function presence_ui_setstatus(presence) {
@@ -721,14 +724,19 @@ UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(f
         if (t - this.lastuiactivity > 50000) {
             this.lastuiactivity = t;
 
-            clearTimeout(this.autoawaytimer);
+            this.autoawaytimer.abort();
             this.autoawaytimer = false;
         }
     }
 
     if (timeout && !this.autoawaytimer) {
         // start timer if not running and timeout needed
-        this.autoawaytimer = setTimeout(this.autoaway, this.autoawaytimeout * 1000, this);
+        (this.autoawaytimer = tSleep(this.autoawaytimeout))
+            .then(() => {
+                this.sendflags(false);
+                this.wasinactive = true;
+                this.autoawaytimer = false;
+            });
     }
 
     if (!this.persist && this.presence != UserPresence.PRESENCE.OFFLINE) {
@@ -743,14 +751,6 @@ UserPresence.prototype.ui_signalactivity = function presence_ui_signalactivity(f
             this.sendflags(false);
         }
     }
-};
-
-// autoaway timer has fired
-UserPresence.prototype.autoaway = function presence_autoaway(self) {
-    // cancel volatile status flags (DND/ONLINE) and timer
-    self.sendflags(false);
-    self.autoawaytimer = false;
-    self.wasinactive = true;
 };
 
 // update UI with the current internal state

@@ -69,16 +69,7 @@ mobile.linkOverlay = {
 
         const mdList = mega.fileRequestCommon.storage.isDropExist(nodeHandle);
         if (mdList.length) {
-            mega.fileRequest.showRemoveWarning(mdList)
-                .then(() => {
-                    tmpFn.call(this);
-                })
-                .catch((ex) => {
-                    if (ex) {
-                        dump(ex);
-                        showToast('warning2', l[253]);
-                    }
-                });
+            mega.fileRequest.showRemoveWarning(mdList).then(() => tmpFn.call(this)).catch(dump);
         }
         else {
             tmpFn.call(this);
@@ -264,7 +255,7 @@ mobile.linkOverlay = {
                 'updateUI': false,
                 'nodesToProcess': [nodeHandle]
             });
-            exportLink.removeExportLink();
+            exportLink.removeExportLink().catch(dump).finally(() => this.completeLinkRemovalProcess(nodeHandle));
         };
         const toggleConfig = (toggle) => {
             if (toggle) {

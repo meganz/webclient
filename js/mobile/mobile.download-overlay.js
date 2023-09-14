@@ -227,7 +227,10 @@ mobile.downloadOverlay = {
         dlmanager.abort(null);
 
         // Hide overlay with download button options
-        mobile.downloadOverlay.$overlay.addClass('hidden');
+        if (this.$overlay) {
+            this.$overlay.addClass('hidden');
+            this.$overlay = false;
+        }
         $body.removeClass('wrong-file');
 
         // Hide downloading progress overlay

@@ -438,7 +438,7 @@ MegaDataMap.prototype._enqueueChangeListenersDsp = function(args) {
 MegaDataMap.prototype._dispatchChangeListeners = function(args) {
     var listeners = this._dataChangeListeners;
 
-    if (d > 1) {
+    if (d > 3) {
         console.debug('%s: dispatching %s awaiting listeners', this, listeners.length, [this]);
     }
     this._dataChangeIndex++;
@@ -1641,7 +1641,7 @@ Object.defineProperty(global, 'MegaDataBitMap', {value: MegaDataBitMap});
 Object.defineProperty(global, 'MegaDataBitMapManager', {value: MegaDataBitMapManager});
 
 if (d) {
-    if (d > 1) {
+    if (d > 2) {
         _timing(MegaDataMap);
         _timing(MegaDataObject);
         _timing(MegaDataEmitter);

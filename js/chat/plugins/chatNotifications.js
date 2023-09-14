@@ -78,9 +78,7 @@ var ChatNotifications = function(megaChat, options) {
 
                     let {avatarUrl, fullName} = fromContact ? generateAvatarMeta(fromContact.u) : {};
                     if (!fullName && fromContact) {
-                        fullName = await Promise.resolve(
-                            M.syncUsersFullname(fromContact.u, undefined, new MegaPromise())
-                        ).catch(dump);
+                        fullName = await M.syncUsersFullname(fromContact.u).catch(dump);
                     }
 
                     let n;
@@ -179,9 +177,9 @@ var ChatNotifications = function(megaChat, options) {
                             megaRoom.activateWindow();
                             megaRoom.show();
                             if (n.type === "incoming-text-message") {
-                                setTimeout(function() {
+                                tSleep(1).then(() => {
                                     $('.message-textarea:visible').trigger('focus');
-                                }, 1000);
+                                });
                             }
                         });
                     }
@@ -316,7 +314,7 @@ var ChatNotifications = function(megaChat, options) {
                     'anfFlag': 'chat_enabled',
                     'params': {
                         'room': megaRoom,
-                        'from': generateAvatarMeta(u_handle).fullName
+                        'from': M.getNameByHandle(u_handle)
                     }
                 },
                 !megaRoom.isActive()

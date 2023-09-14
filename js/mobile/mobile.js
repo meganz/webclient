@@ -1,3 +1,5 @@
+/* eslint-disable strict, no-empty-function, no-useless-concat */
+
 /**
  * Root namespace for the mobile web site, contains common variables and functions
  */
@@ -18,6 +20,123 @@ var mobile = {
         'use strict';
         parsepage(pages['mobile']);
         topmenuUI();
+    },
+
+    shim(ctx) {
+        'use strict';
+        const value = () => MegaPromise.resolve();
+
+        Object.defineProperty(ctx, 'search' + 'Path', {value});
+        Object.defineProperty(ctx, 'abort' + 'Transfers', {value});
+        Object.defineProperty(ctx, 'init' + 'UIKeyEvents', {value});
+
+        Object.defineProperty(ctx, 'initFile' + 'ManagerUI', {
+            value: function() {
+                if (typeof window.InitFileDrag === 'function') {
+                    window.InitFileDrag();
+                    delete window.InitFileDrag;
+                }
+            }
+        });
+        mobile.uploadOverlay.shim(ctx);
+
+        Object.defineProperty(ctx, 'addWeb' + 'Download', {
+            value: function(nodes) {
+                // @see filesystem.js/abortAndStartOver
+                if (d) {
+                    console.assert(Array.isArray(nodes) && nodes.length === 1 && arguments.length === 1, 'bogus usage');
+                }
+                M.resetUploadDownload();
+                later(() => {
+                    mobile.downloadOverlay.startDownload(nodes[0]);
+                });
+            }
+        });
+
+        Object.defineProperty(ctx, 'show' + 'OverStorageQuota', {
+            value: function(data) {
+                if (data && (data === EPAYWALL || (data.isFull && Object(u_attr).uspw))) {
+                    data = Object.create(null);
+                    data.isFull = data.isAlmostFull = data.EPAYWALL = true;
+                }
+                if (data.isAlmostFull) {
+                    var ab = mobile.alertBanner;
+                    var isPro = Object(u_attr).p;
+
+                    var action = function() {
+                        if (data.EPAYWALL) {
+                            if (!M.account) {
+                                M.accountData(() => {
+                                    action();
+                                });
+                                return;
+                            }
+                            var overlayTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
+                            ab.showError(overlayTexts.fmBannerText);
+                            mobile.overStorageQuotaOverlay.show(overlayTexts.dialogText, overlayTexts.dlgFooterText);
+                            ab.onTap(() => {
+                                loadSubPage('pro');
+                            });
+                        }
+                        else {
+                            var mStoragePossible = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
+                                ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+
+                            var msg = isPro ? l[22667].replace('%1', mStoragePossible) :
+                                l[22671].replace('%1', mStoragePossible);
+
+                            if (data.isFull) {
+
+                                ab.showError(msg); // Your account is full
+
+                                mobile.overStorageQuotaOverlay.show(msg);
+                            }
+                            else {
+                                ab.showWarning(isPro ? l[22668].replace('%1', mStoragePossible) :
+                                    l[22672].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
+                                        .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
+                                ); // Your account is almost full.
+                            }
+                            // When the banner is taped, show pro page.
+                            ab.onTap(() => {
+                                loadSubPage('pro');
+                            });
+                        }
+                    };
+
+                    if (!pro.membershipPlans || !pro.membershipPlans.length) {
+                        pro.loadMembershipPlans(action);
+                    }
+                    else {
+                        action();
+                    }
+                }
+            }
+        });
+
+        Object.defineProperty(ctx, 'render' + 'Main', {
+            value: function(aUpdate) {
+                if (aUpdate) {
+                    mobile.cloud.renderUpdate();
+                }
+                else {
+                    mobile.cloud.renderLayout();
+                }
+                return true;
+            }
+        });
+
+        Object.defineProperty(ctx, 'updFile' + 'ManagerUI', {value: mobile.updFileManagerUI});
+
+        const tf = [
+            "renderTree", "buildtree", "initTreePanelSorting",
+            "treePanelType", "addTreeUI", "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen",
+            "treeSortUI", "treeFilterUI"
+        ];
+
+        for (let i = tf.length; i--;) {
+            Object.defineProperty(ctx, tf[i], {value});
+        }
     },
 
     /**
@@ -611,7 +730,7 @@ var mobile = {
 
             if (this.value.length === parseInt($(this).attr('maxlength'))
                 && ((e.keyCode >= 48 && e.keyCode <= 57)
-                || (e.keyCode >= 96 && e.keyCode <= 105))
+                    || (e.keyCode >= 96 && e.keyCode <= 105))
                 || e.keyCode === 69) {
                 e.preventDefault();
             }
@@ -919,7 +1038,6 @@ mBroadcaster.once('startMega:mobile', function() {
 /**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
-/* eslint-disable strict */
 
 mega.tpw = {
     addDownloadUpload: function() {},
@@ -944,7 +1062,6 @@ mega.tpw = {
 
 var nicknames = {
     cache: {},
-    // eslint-disable-next-line no-empty-function
     getNickname: function() {},
     getNicknameAndName: function() {},
     decryptAndCacheNicknames: function() {},
@@ -1077,7 +1194,9 @@ function closeDialog() {
     mBroadcaster.sendMessage('closedialog');
 }
 
-// eslint-disable-next-line no-useless-concat
+window['selectFolder' + 'Dialog'] = () => Promise.resolve(M.RootID);
+
+mega.ui['set' + 'Theme'] = nop;
 mega.ui['showReg' + 'isterDialog'] = nop;
 
 /**
@@ -1091,10 +1210,6 @@ mega.ui.sendSignupLinkDialog = function(accountData) {
     parsepage(pages['mobile']);
     mobile.register.showConfirmEmailScreen(accountData);
     topmenuUI();
-};
-
-mega.ui.theme = {
-    setWithUA: nop
 };
 
 mega.loadReport = {};
@@ -1177,8 +1292,6 @@ function openRecents() {
     loadSubPage('fm');
 }
 
-/* eslint-disable strict, no-empty-function */
-
 // Not required for mobile
 function fmtopUI() {}
 function fmLeftMenuUI() {}
@@ -1241,7 +1354,7 @@ function validateUserAction(hideContext) {
             if (hideContext) {
                 mobile.cloud.contextMenu.hide();
             }
-            M.showOverStorageQuota(EPAYWALL);
+            M.showOverStorageQuota(EPAYWALL).catch(dump);
             return false;
         }
     }

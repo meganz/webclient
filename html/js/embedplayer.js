@@ -47,7 +47,9 @@ function init_page() {
         init(dl_res);
     }
     else {
-        api_req({a: 'g', p: ph}, {callback: init});
+        api.req({a: 'g', p: ph})
+            .then((p) => init(p.result))
+            .catch(init);
     }
 }
 
@@ -267,14 +269,14 @@ function topmenuUI() {
             .parent().find('i').addClass('hidden').end()
             .find('.login-text').text(name);
 
-        api_req({"a": "uga", "u": u_handle, "ua": "+a"}, {
-            callback: tryCatch(function(res) {
+        api.req({"a": "uga", "u": u_handle, "ua": "+a"})
+            .then(({result: res}) => {
                 var src = res.length > 5 && mObjectURL([base64_to_ab(res)], 'image/jpeg');
                 if (src) {
                     $avatarwrapper.safeHTML('<img src="@@"/>', src);
                 }
             })
-        });
+            .catch(nop);
     }
     else {
         $('.useravatar').addClass('hidden');
@@ -323,22 +325,14 @@ mBroadcaster.once('startMega', function() {
     loadingDialog = {show: dummy, hide: dummy};
 
     M = Object.create(null);
+    M.d = Object.create(null);
     M.xhr = megaUtilsXHR;
     M.gfsfetch = megaUtilsGFSFetch;
     M.getStack = function() {
         return String(new Error().stack);
     };
     M.hasPendingTransfers = dummy;
-    M.req = promisify(function(resolve, reject, params, ch) {
-        api_req(typeof params === 'string' ? {a: params} : params, {
-            callback: function(res) {
-                if (typeof res === 'number' && res < 0) {
-                    return reject(res);
-                }
-                resolve(res);
-            }
-        }, ch | 0);
-    });
+    M.getNodeByHandle = (h) => Object(M.d[h]);
 
     dlmanager = Object.create(null);
     dlmanager._quotaTasks = [];
@@ -459,6 +453,12 @@ mBroadcaster.once('startMega', function() {
     window.LRUMegaDexie = {
         create() {
             return {error: -1};
+        }
+    };
+    window.MEGAException = DOMException;
+    window.MEGAException.assert = (e, ...a) => {
+        if (!e) {
+            throw new MEGAException(...a);
         }
     };
 });

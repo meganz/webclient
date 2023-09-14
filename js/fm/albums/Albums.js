@@ -2162,7 +2162,7 @@ lazy(mega.gallery, 'albums', () => {
                                 const existingHandles = {};
                                 const handlesToAdd = [];
 
-                                const { nodes, label } = album;
+                                const { nodes, label, k } = album;
                                 let addedCount = 0;
 
                                 for (let i = 0; i < nodes.length; i++) {
@@ -2195,7 +2195,7 @@ lazy(mega.gallery, 'albums', () => {
                                 if (addedCount > 0) {
                                     loadingDialog.show('MegaAlbumsAddItems');
 
-                                    mega.sets.elements.bulkAdd(handlesToAdd, albumId)
+                                    mega.sets.elements.bulkAdd(handlesToAdd, albumId, k)
                                         .then(() => {
                                             toaster.main.show({
                                                 icons: ['sprite-fm-mono icon-check-circle text-color-medium'],
@@ -4361,7 +4361,7 @@ lazy(mega.gallery, 'albums', () => {
             this.setsSubscribers = [
                 mega.sets.subscribe('asp', 'albums', (data) => {
                     const { id, at, k } = data;
-                    const isPending = pendingName !== '' && mega.sets.decryptAttr(at, k).n === pendingName;
+                    const isPending = pendingName !== '' && mega.sets.decryptSetAttr(at, k).n === pendingName;
 
                     let prevName = '';
                     const album = this.store[id];
@@ -4680,7 +4680,7 @@ lazy(mega.gallery, 'albums', () => {
          * @returns {void}
          */
         createAlbumData({ e, at, k, id, ts, cts }, ignoreHandles) {
-            const attr = mega.sets.decryptAttr(at, k);
+            const attr = mega.sets.decryptSetAttr(at, k);
             const label = attr.n || l.unknown_album_name;
             const coverHandle = attr.c || '';
             let album = this.store[id];

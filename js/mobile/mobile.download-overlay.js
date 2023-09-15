@@ -294,12 +294,11 @@ mobile.downloadOverlay = {
 
         // Start download and show progress
         dl_queue.push({
-            ...n,
             id: n.h,
             key: n.k,
             size: n.s,
             n: n.name,
-            nauth: n.nauth || n_h,
+            nauth: n_h,
             t: n.mtime || n.ts,
             onDownloadProgress: self.onDownloadProgress.bind(self),
             onDownloadComplete: self.onDownloadComplete.bind(self),
@@ -381,9 +380,8 @@ mobile.downloadOverlay = {
             $.totalDL += n.s;
 
             var entry = {
-                ...n,
                 size: n.s,
-                nauth: n.nauth || n_h,
+                nauth: n_h,
                 id: n.h,
                 key: n.k,
                 n: n.name,

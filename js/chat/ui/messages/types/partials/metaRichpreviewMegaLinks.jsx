@@ -6,8 +6,6 @@ import {ContactVerified, ContactPresence, Avatar} from "../../../contacts.jsx";
 
 class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
     render() {
-        var self = this;
-
         var message = this.props.message;
         var chatRoom = this.props.message.chatRoom;
         var previewContainer;
@@ -33,10 +31,12 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                                 this.addContactListenerIfMissing(contactLinkHandles);
                             }
                         })
-                        .always(function() {
-                            Soon(function() {
-                                message.trackDataChange();
-                                self.safeForceUpdate();
+                        .catch(reportError)
+                        .finally(() => {
+                            message.trackDataChange();
+
+                            onIdle(() => {
+                                this.safeForceUpdate();
                             });
                         });
                 }

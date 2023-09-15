@@ -309,8 +309,8 @@ function eventlog(id, msg, once) {
         }
 
         if (jid) {
-            req.j = jid;
             req.v = mega.viewID;
+            req.j = localStorage.jid || jid;
             req.ms = Date.now();
         }
 

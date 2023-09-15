@@ -370,13 +370,17 @@ var security = {
                 return res;
             })
             .catch((ex) => {
+                console.warn(ex);
+                if (String(ex).includes('invalid aes key size')) {
+                    ex = EKEY;
+                }
                 const msg = String(messages[ex] || (ex < 0 ? api_strerror(ex) : ex));
 
                 if (newPassword && msg.includes(l[1978])) {
                     $('.recover-block.error').removeClass('hidden');
                 }
 
-                tell(msg);
+                throw msg;
             })
             .finally(() => {
                 loadingDialog.hide();

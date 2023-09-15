@@ -1477,7 +1477,7 @@ scparser.$add('d', function(a) {
         ulmanager.ulClearTargetDeleted(a.n);
     }
 
-    if (!a.m && fminitialized && !pfid) {
+    if (!a.m && fminitialized && !pfid && !is_mobile) {
         M.storageQuotaCache = null;
         delay('checkLeftStorageBlock', () => M.checkLeftStorageBlock().catch(dump));
     }

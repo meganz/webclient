@@ -3785,7 +3785,7 @@
     "inactive_users_detail": "{count, plural, one {plus # utilisateur d\u00e9sactiv\u00e9 r\u00e9cemment*} many {plus # utilisateurs d\u00e9sactiv\u00e9s r\u00e9cemment*} other {plus # utilisateurs d\u00e9sactiv\u00e9s r\u00e9cemment*}}",
     "initailizing_status": "Initialisation\u2026",
     "invalid_invitation_sent": "Un probl\u00e8me est survenu lors de l\u2019envoi de votre invitation, nous en sommes d\u00e9sol\u00e9s.",
-    "invite_from_contact_list": "Ou invitez des personnes dans votre liste de contacts",
+    "invite_from_contact_list": "Ou invitez des personnes de votre liste de contacts",
     "invite_no_contacts_to_add": "Aucun contact \u00e0 ajouter. Si vous voulez ajouter des participants, invitez-les d\u2019abord dans votre liste de contacts.",
     "invite_no_results_found": "Aucun r\u00e9sultat n\u2019a \u00e9t\u00e9 trouv\u00e9",
     "invite_participants": "Inviter des participants",

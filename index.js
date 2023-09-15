@@ -70,6 +70,7 @@ mBroadcaster.once('startMega', function() {
 
     if (is_mobile) {
         delete pages.placeholder;
+        delete pages.login;
         pages = new Proxy(pages, {
             get(target, prop) {
                 if (target[prop] === undefined) {
@@ -961,12 +962,11 @@ function init_page() {
             login_txt =  login_next === 'support' ? l.support_redirect_login : l[24766];
             delete window.nextPage;
         }
+        parsepage(pages.login);
         if (is_mobile) {
-            mobile.initDOM();
             mobile.signin.show();
         }
         else {
-            parsepage(pages['login']);
             init_login();
         }
     }

@@ -359,24 +359,24 @@ mBroadcaster.once('boot_done', function() {
 
 mBroadcaster.once('startMega', tryCatch(() => {
     'use strict';
-    const {buildOlderThan10Days, eventlog} = window;
-
-    if (buildOlderThan10Days || !eventlog || sessionStorage.mecmatst) {
-        return;
-    }
-    sessionStorage.mecmatst = 1;
+    const {mecmatst} = sessionStorage;
+    const {buildOlderThan10Days, eventlog = nop} = window;
 
     scriptTest(
         'megaecmastest = window.foo?.bar ?? -1',
         (error) => {
             if (error || window.megaecmastest !== -1) {
-                return eventlog(99777, JSON.stringify([1, 1]));
+                return mecmatst || eventlog(99777, JSON.stringify([1, 1]));
             }
 
             delete window.megaecmastest;
             Object.defineProperty(mega, 'es2020', {value: true});
-            delete sessionStorage.mecmatst;
         });
+
+    if (buildOlderThan10Days || mecmatst) {
+        return;
+    }
+    sessionStorage.mecmatst = 1;
 
     if (typeof BigInt === 'undefined') {
         eventlog(99778, JSON.stringify([1, 2]));

@@ -33,8 +33,6 @@ module.exports = function(config) {
         'js/vendor/jsbn.js',
         'js/vendor/jsbn2.js',
         'js/vendor/nacl-fast.js',
-        // For notifications.
-        'js/vendor/notification.js',
         'js/vendor/moment.js',
 
         // Other.

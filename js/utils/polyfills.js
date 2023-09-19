@@ -360,8 +360,11 @@ mBroadcaster.once('boot_done', function() {
 mBroadcaster.once('startMega', tryCatch(() => {
     'use strict';
     const {mecmatst} = sessionStorage;
-    const {buildOlderThan10Days, eventlog = nop} = window;
+    const {buildOlderThan10Days, eventlog = nop, is_karma} = window;
 
+    if (is_karma) {
+        return;
+    }
     scriptTest(
         'megaecmastest = window.foo?.bar ?? -1',
         (error) => {

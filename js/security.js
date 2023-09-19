@@ -1002,9 +1002,9 @@ security.register = {
         }
 
         // Send the confirmation code back to the API
-        return api.screq({a: 'ud2', c: confirmCode})
+        return api.req({a: 'ud2', c: confirmCode})
             .then(({result}) => {
-                const [email, name, uh] = result;
+                const [email, name, uh] = result[1];
 
                 if (window.u_handle && u_handle === uh) {
                     // same account still in active session, let's end.

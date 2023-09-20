@@ -74,7 +74,7 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
         if (id) {
             delay(`fetchical${id}`, () => {
                 asyncApiReq({ a: 'mcsmfical', id })
-                    .then(res => {
+                    .then(([, res]) => {
                         delay(`saveical${id}`, () => {
                             M.saveAs(base64urldecode(res), `${title.replace(/\W/g, '')}.ics`).then(nop).catch(() => {
                                 msgDialog('error', '', l.calendar_add_failed, '');

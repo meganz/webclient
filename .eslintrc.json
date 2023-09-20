@@ -158,6 +158,18 @@
             "ignoredNodes": ["JSXElement"]
         }],
 
+        "no-restricted-syntax": [
+            "error",
+            {
+                "selector": "CallExpression[callee.name='gSetTimeout']",
+                "message": "Forbidden function call."
+            },
+            {
+                "selector": "CallExpression[callee.name='api_req']",
+                "message": "This function is deprecated, use api.req(), api.screq() or api.send() depending your use-case."
+            }
+        ],
+
         // ESLint plugins configuration follows
 
         "compat/compat": 1,

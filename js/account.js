@@ -344,12 +344,9 @@ function u_checklogin3a(res, ctx) {
                     mBroadcaster.crossTab.initialize(() => ctx.checkloginresult(ctx, r));
                 }
                 else if ($.createanonuser === u_attr.u) {
-                    M.importWelcomePDF()
-                        .catch(dump)
-                        .finally(() => {
-                            ctx.checkloginresult(ctx, r);
-                        });
                     delete $.createanonuser;
+                    M.importWelcomePDF().catch(dump);
+                    ctx.checkloginresult(ctx, r);
                 }
                 else {
                     ctx.checkloginresult(ctx, r);
@@ -514,7 +511,7 @@ function u_reset() {
         mDBcls();
     }
 
-    if (window.M) {
+    if (window.M && M.reset) {
         M.reset();
     }
     if (window.loadfm) {

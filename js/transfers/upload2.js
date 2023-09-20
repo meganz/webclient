@@ -181,6 +181,9 @@ var ulmanager = {
                     ul.uReqFired = null;
                     ulmanager.ulStart(aFileUpload);
                 }
+                else if (oIsFrozen(aFileUpload)) {
+                    console.warn('Frozen upload while resuming...', aFileUpload);
+                }
                 else {
                     // re-fire the putnodes api request for which we got the -17
                     console.assert(Object(aFileUpload[0]).a === 'p', 'check this...');
@@ -734,6 +737,11 @@ var ulmanager = {
 
             // If cancelled
             if (!File.ul) {
+                return;
+            }
+
+            if (!ul_queue[ctx.reqindex] || Object.isFrozen(ul_queue[ctx.reqindex])) {
+                ulmanager.logger.warn(`Upload at ${ctx.reqindex} seems cancelled, but 'ul' did exist.`, res, ctx, File);
                 return;
             }
 
@@ -1596,7 +1604,7 @@ ChunkUpload.prototype.io_ready = function(res) {
     'use strict';
 
     if (res < 0 || !this.file || !this.file.ul_keyNonce) {
-        if (this.file) {
+        if (this.file && !oIsFrozen(this.file)) {
             if (d) {
                 this.logger.error('UL IO Error', res);
             }

@@ -751,7 +751,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             if (this.selected_list.length !== 0 && this.removing_list.length > 1) {
 
-                const cb = (pv, c) => pv + (M.d[c].tb === undefined ? M.d[c].s : M.d[c].tb);
+                const cb = (pv, c) => pv + (M.d[c] ? M.d[c].tb === undefined ? M.d[c].s : M.d[c].tb : 0);
                 const removingSize = this.removing_list.reduce(cb, 0);
                 nid = this.selected_totalSize - removingSize;
             }

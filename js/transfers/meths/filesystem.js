@@ -760,6 +760,11 @@
                 _logger.debug('download', name, path, dl_fw, zfileEntry);
             }
 
+            if (!zfileEntry) {
+                // aborted.
+                return;
+            }
+
             var saveLink = function(objectURL) {
                 var node = document.getElementById('dllink');
                 var link = typeof objectURL === 'string' && objectURL;

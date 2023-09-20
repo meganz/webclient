@@ -1294,7 +1294,8 @@ var slideshowid;
 
         $dlBut.rebind('click.media-viewer', function _dlButClick() {
 
-            if (this.classList.contains('disabled')) {
+            // @todo how?..
+            if (this.classList && this.classList.contains('disabled')) {
                 return false;
             }
 

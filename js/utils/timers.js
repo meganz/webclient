@@ -636,6 +636,11 @@ mBroadcaster.once('boot_done', tryCatch(() => {
 
     window.setTimeout = function(f, ms, ...args) {
 
+        if (typeof f !== 'function') {
+            console.error('Invalid call...', f, ms, args);
+            return 0;
+        }
+
         if ((ms |= 0) < 30) {
             // logger.warn(`Short timeout (${ms}ms), dispatching micro-task...`);
             queueMicrotask(() => f(...args));

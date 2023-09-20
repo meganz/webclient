@@ -373,7 +373,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
 
         // Checks selected/dragseleted items has folder on it
-        const hasFolder = ids.some((id) => M.getNodeByHandle(id).t);
+        const hasFolder = ids && ids.some((id) => M.getNodeByHandle(id).t);
 
         // Workaround a problem where we get over[1] -> over[2] -> out[1]
         if (a === 'out' && $.currentOver !== $(e.target).attr('id')) {
@@ -2329,27 +2329,6 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
         doClearbin(true);
-    });
-
-    $(c + '.move-up').rebind('click', function() {
-        $('.transfer-table tr.ui-selected')
-            .attrs('id')
-            .map(function(id) {
-                fm_tfsmove(id, -1);
-            });
-        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        delay('fm_tfsupdate', fm_tfsupdate);
-    });
-
-    $(c + '.move-down').rebind('click', function() {
-        $('.transfer-table tr.ui-selected')
-            .attrs('id')
-            .reverse()
-            .map(function(id) {
-                fm_tfsmove(id, 1);
-            });
-        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        delay('fm_tfsupdate', fm_tfsupdate);
     });
 
     $(c + '.transfer-play, ' + c + '.transfer-pause').rebind('click', function() {

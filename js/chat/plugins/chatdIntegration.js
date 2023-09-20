@@ -467,11 +467,7 @@ ChatdIntegration.prototype._retrieveShardUrl = function(isPublic, chatIdOrHandle
     }
 
     const req = asyncApiReq(apiReq)
-        .then((res) => {
-            // @todo assert it's an array with v3
-            if (Array.isArray(res)) {
-                res = res[1];
-            }
+        .then(([, res]) => {
             assert(res && String(res.url || res).includes('://'));
             return res;
         })

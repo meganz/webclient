@@ -845,9 +845,12 @@
     CloudRaidRequest.prototype._readFetchData = async function(part) {
 
         part.timedout = false;
-        part.readTimeoutId = setTimeout(function() {
+        part.readTimeoutId = setTimeout(() => {
             part.timedout = true;
-            part.abortController.abort();
+
+            if (part.abortController) {
+                tryCatch(() => part.abortController.abort())();
+            }
         }, this.FETCH_DATA_TIMEOUT_MS);
 
         part.reading = true;

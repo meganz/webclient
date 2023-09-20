@@ -1163,7 +1163,8 @@ function init_page() {
     "use strict";
 
     if (!is_megadrop) {
-        throw new Error("Unexpected access...");
+        console.error('Invalid FR Navigation...');
+        return location.replace(getBaseUrl());
     }
     const page = getCleanSitePath();
 

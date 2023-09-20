@@ -722,10 +722,12 @@ var mega = {
                         eventlog(99679, true); // sc processing took too long
                     });
 
+                    $.closeMsgDialog = 1;
                     msgDialog('warninga:!^' + l[17704] + '!' + l[17705], l[882], l[17706], 0, function(yes) {
                         if (yes) {
                             fm_forcerefresh();
                         }
+                        $.closeMsgDialog = 0;
                     });
 
                     r.scSent = now;
@@ -2163,10 +2165,6 @@ else if (!browserUpdate) {
             }
 
             var expectedSourceOrigin = url || ln > 999;
-            if (url === '@srvlog') {
-                url = '';
-            }
-
             var dump = {
                 l: ln,
                 f: mTrim(url),
@@ -2207,6 +2205,8 @@ else if (!browserUpdate) {
             dump.m = (
                 is_mobile ? '[mobile] ' :
                     is_embed ? '[embed] ' :
+                        window.pfid ? '[FL] ' :
+                            mega.infinity ? '[INF] ' :
                         is_drop ? '[drop] ' : ''
             ) + dump.m.replace(/\s+/g, ' ');
 
@@ -2262,7 +2262,6 @@ else if (!browserUpdate) {
 
             if (errobj)
             {
-                if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
                     var maxStackLines = 15;

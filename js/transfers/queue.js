@@ -56,6 +56,10 @@ function MegaQueue(worker, limit, name) {
     Object.defineProperty(this, '__identity', {
         value: `mQueue[${this.qname}.${makeUUID().substr(-12)}]`
     });
+    Object.defineProperty(this, 'tryProcess', {
+        value: tryCatch(() => this.process(), () => this._process())
+    });
+
     switch (name) {
         case 'downloader':
         case 'zip-writer':
@@ -266,9 +270,9 @@ MegaQueue.prototype.run_in_context = function(task) {
                     done.apply(scope || this, [data, args]);
                 }
 
-                if (this._queue && (!this.isEmpty() || $.len(this._qpaused))) {
+                if (this._queue && (!this.isEmpty() || Object.keys(this._qpaused).length)) {
 
-                    this.process();
+                    this.tryProcess();
                 }
             }
         }

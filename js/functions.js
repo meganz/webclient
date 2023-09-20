@@ -253,19 +253,16 @@ function ellipsis(text, location, maxCharacters) {
 }
 
 function megatitle(nperc) {
+    'use strict';
+
     if (!nperc) {
         nperc = '';
     }
-    var a = parseInt($('.notification-num:first').text());
-    if (a > 0) {
-        a = '(' + a + ') ';
-    }
-    else {
-        a = '';
-    }
-    if (document.title !== a + mega_title + nperc) {
-        document.title = a + mega_title + nperc;
-    }
+
+    let a = document.querySelector('.js-notification-num');
+    a = (a = a && parseInt(a.textContent)) > 0 ? `(${a}) ` : '';
+
+    document.title = a + mega_title + nperc;
 }
 
 function countrydetails(isocode) {
@@ -827,37 +824,19 @@ function addZeroIfLenLessThen(val, len) {
 }
 
 function ASSERT(what, msg, udata) {
+    'use strict';
+
     if (!what) {
-        var af = new Error('failed assertion; ' + msg);
-        if (udata) {
-            af.udata = udata;
-        }
-        Soon(function() {
-            throw af;
-        });
-        if (console.assert) {
-            console.assert(what, msg);
-        }
-        else {
-            console.error('FAILED ASSERTION', msg);
-        }
+        reportError(new Error(`failed assertion, ${msg}`));
     }
     return !!what;
 }
 
 // log failures through jscrashes system
 function srvlog(msg, data, silent) {
-    if (data && !(data instanceof Error)) {
-        data = {
-            udata: data
-        };
-    }
-    if (!silent && d) {
-        console.error(msg, data);
-    }
-    if (typeof window.onerror === 'function') {
-        window.onerror(msg, '@srvlog', data ? 1 : -1, 0, data || null);
-    }
+    'use strict';
+
+    reportError(msg);
 }
 
 // log failures through event id 99666

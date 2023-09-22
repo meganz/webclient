@@ -142,7 +142,10 @@ function removeUInode(h, parent) {
             if (!hasItems) {
 
                 __markEmptied();
-                if (sharedFolderUI()) {
+                if (M.dyh) {
+                    M.dyh('empty-ui');
+                }
+                else if (sharedFolderUI()) {
                     M.emptySharefolderUI();
                 }
                 else {
@@ -211,6 +214,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
     var removesharecnt = 0;
     var title = '';
     var message = '';
+    let s4Bucketcnt = 0;
 
     // If on mobile we will bypass the warning dialog prompts
     skipDelWarning = skipDelWarning || is_mobile ? 1 : mega.config.get('skipDelWarning');
@@ -229,6 +233,10 @@ async function fmremove(selectedNodes, skipDelWarning) {
         }
         else {
             filecnt++;
+        }
+
+        if (M.geS4NodeType(n) === 'bucket') {
+            s4Bucketcnt++;
         }
     }
 
@@ -380,22 +388,40 @@ async function fmremove(selectedNodes, skipDelWarning) {
             moveToRubbish();
         }
         else {
+            let note = l[7410];
             title = l[1003];
             if (filecnt > 0 && foldercnt === 0) {
-                message = mega.icu.format(l.move_rubbish_files, filecnt);
+                message = mega.icu.format(l.move_files_to_bin, filecnt);
             }
-            else if (filecnt === 0 && foldercnt > 0) {
-                message = mega.icu.format(l.move_rubbish_folders, foldercnt);
+            else if (!filecnt && s4Bucketcnt && foldercnt - s4Bucketcnt === 0) {
+                message = mega.icu.format(l.s4_move_bucket_to_bin, s4Bucketcnt);
+                note = selectedNodes.length === 1 ?
+                    `${l.s4_remove_bucket_note} <p>${l.s4_remove_bucket_tip}</p>` :
+                    `${l.s4_remove_items_note} <p>${l.s4_remove_items_tip}</p>`;
+            }
+            else if (filecnt === 0 && !s4Bucketcnt && foldercnt > 0) {
+                message = mega.icu.format(l.move_folders_to_bin, foldercnt);
             }
             else {
-                message = mega.icu.format(l.move_rubbish_items, filecnt + foldercnt);
+                message = mega.icu.format(l.move_files_to_bin, filecnt + foldercnt);
+
+                if (s4Bucketcnt) {
+                    note = `${l.s4_remove_items_note} <p>${l.s4_remove_items_tip}</p>`;
+                }
             }
 
-            msgDialog('remove', title, message, l[1952] + ' ' + l[7410], function(yes) {
-                if (yes) {
-                    moveToRubbish();
-                }
-            }, 'skipDelWarning');
+            if (filecnt + foldercnt === 1) {
+                message = message.replace('%1', M.d[selectedNodes[0]].name);
+            }
+
+            msgDialog(
+                `remove:!^${l[62]}!${l[16499]}`,  title, message, note,
+                (yes) => {
+                    if (yes) {
+                        moveToRubbish();
+                    }
+                }, 'skipDelWarning'
+            );
         }
     }
 };

@@ -675,8 +675,11 @@ function folderIcon(node) {
         folderIcon = 'rubbish-';
     }
 
-    // Outgoing share
     if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
+
+        if (M.geS4NodeType(node) === 'bucket') {
+            return 's4-bucket-shared';
+        }
 
         // folderIcon += 'folder-outgoing'; for vector icon
         return `${folderIcon}folder-shared`;
@@ -696,6 +699,10 @@ function folderIcon(node) {
     else if (node.h === M.CameraId) {
 
         return `${folderIcon}folder-camera`;
+    }
+    // S4 Object storage
+    else if (M.geS4NodeType(node) === 'bucket') {
+        return `${folderIcon}s4-bucket`;
     }
     // File request folder
     else if (mega.fileRequest.publicFolderExists(node.h)) {

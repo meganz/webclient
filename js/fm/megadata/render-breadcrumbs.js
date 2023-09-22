@@ -145,6 +145,15 @@
                         name = localeName;
                     }
                 }
+                else if (M.dyh) {
+                    const {type, localeName} = M.dyh('breadcrumb-properties', handle);
+                    if (type) {
+                        typeClass = type;
+                    }
+                    if (localeName) {
+                        name = localeName;
+                    }
+                }
             }
 
             return {
@@ -213,12 +222,15 @@
                         const n = this.d[handle];
                         if (n) {
                             id = n.h;
-                            typeClass = '';
-                            if (n.name) {
-                                name = n.name;
+                            name = n.name || '';
+                            typeClass = n.t && 'folder' || '';
+
+                            if (n.s4 && n.p === this.RootID) {
+                                name = l.obj_storage;
+                                typeClass = 's4-object-storage';
                             }
-                            if (n.t) {
-                                typeClass = 'folder';
+                            else if (this.d[n.p] && this.d[n.p].s4 && this.d[n.p].p === this.RootID) {
+                                typeClass = 's4-buckets';
                             }
                         }
                     }
@@ -262,7 +274,22 @@
 
             let icon = '';
 
-            if (item.type === 'cloud-drive') {
+            if (item.type === 's4-object-storage') {
+                icon = 'icon-object-storage';
+            }
+            else if (item.type === 's4-buckets') {
+                icon = 'icon-bucket-filled';
+            }
+            else if (item.type === 's4-policies') {
+                icon = 'icon-policy-filled';
+            }
+            else if (item.type === 's4-users') {
+                icon = 'icon-user-filled';
+            }
+            else if (item.type === 's4-groups') {
+                icon = 'icon-contacts';
+            }
+            else if (item.type === 'cloud-drive') {
                 icon = 'icon-cloud';
             }
             else if (item.type === 'backups') {
@@ -363,6 +390,8 @@
             isInfoBlock = true;
         }
 
+        const isDyhRoot = M.dyh ? M.dyh('is-breadcrumb-root', items) : false;
+
         for (let i = 0; i < items.length; i++) {
 
             let {name, typeClass, id} = dictionary(items[i]);
@@ -377,7 +406,7 @@
                 // if we won't have space, add it to the dropdown, but always render the current folder,
                 // and root if there are no extraItems
                 // for info block we show max 2 items in the in-view breadcrumb
-                if (!isLastItem &&
+                if (!isDyhRoot && !isLastItem &&
                     (currentPathLength > maxPathLength && !isInfoBlock) || (isInfoBlock && i > 1)) {
                     extraItems.push({
                         name,
@@ -390,7 +419,8 @@
                     name = escapeHTML(name);
                     item = escapeHTML(items[i]);
                     html =
-                        `<a class="fm-breadcrumbs ${escapeHTML(typeClass)} ${isRoot ? 'root' : ''} ui-droppable"
+                        `<a class="fm-breadcrumbs ${escapeHTML(typeClass)} ${
+                            isRoot || isDyhRoot ? 'root' : ''} ui-droppable"
                             data-id="${item}" id="pathbc-${item}">
                             <span
                                 class="right-arrow-bg simpletip simpletip-tc">
@@ -460,7 +490,7 @@
         ];
 
         // super special case (contact)
-        if (id in M.u) {
+        if (M.u.hasOwnProperty(id)) {
             loadSubPage("chat/contacts/" + id);
         }
         else if (n) {
@@ -490,6 +520,9 @@
         }
         else if (specialCases.includes(id)) {
             this.openFolder(id);
+        }
+        else if (M.dyh) {
+            M.dyh('breadcrumb-click', id);
         }
     }
 })();

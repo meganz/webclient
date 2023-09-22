@@ -1646,6 +1646,60 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.contact_support_email = escapeHTML(l.contact_support_email)
         .replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
+    l.s4_url_obj_level_subtxt = escapeHTML(l.s4_url_obj_level_subtxt)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_url_grant_subtxt = escapeHTML(l.s4_url_grant_subtxt)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_url_deny_subtxt = escapeHTML(l.s4_url_deny_subtxt)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_invalid_bucket_name = escapeHTML(l.s4_invalid_bucket_name)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/bucket-naming-conventions">`
+        ).replace('[/A]', '</a>');
+    l.s4_bkt_access_granted_tip = escapeHTML(l.s4_bkt_access_granted_tip)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_bkt_access_denied_tip = escapeHTML(l.s4_bkt_access_denied_tip)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_bkt_access_origin_tip = escapeHTML(l.s4_bkt_access_origin_tip)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_obj_access_granted_tip = escapeHTML(l.s4_obj_access_granted_tip)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_obj_access_denied_tip = escapeHTML(l.s4_obj_access_denied_tip)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
     l.pro_flexi_expired_banner = escapeHTML(l.pro_flexi_expired_banner)
         .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>')
         .replace('[S]', '<span>').replace('[/S]', '</span>');

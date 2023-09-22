@@ -595,9 +595,13 @@ function fmtopUI() {
     var $sharesTabBlock = $('.shares-tabs-bl');
     var $galleryTabBlock = $('.gallery-tabs-bl');
     const $galleryTabLink = $('.gallery-tab-lnk');
+    const $header = $('.fm-right-header', '.fmholder');
 
     $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
     $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
+
+    $('.fm-s4-new-bucket, .fm-s4-new-key, .fm-s4-new-user, .fm-s4-new-group', $header)
+        .addClass('hidden');
 
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
         .add('.fm-new-shared-folder,.fm-new-link')
@@ -707,6 +711,37 @@ function fmtopUI() {
             if (mega.gallery[M.currentdirid]) {
                 $('.gallery-tab-lnk', $galleryTabBlock).removeClass('active');
                 $(`.gallery-tab-lnk-${mega.gallery[M.currentdirid].mode}`, $galleryTabBlock).addClass('active');
+            }
+        }
+        else if (M.currentrootid === 's4') {
+            const {subType, original} = M.currentCustomView;
+            if (subType === 'container') {
+                $('.fm-s4-new-bucket').removeClass('hidden');
+            }
+            else if (subType === 'bucket') {
+                $('.fm-new-folder').removeClass('hidden');
+                $('.fm-uploads').removeClass('hidden');
+                $('.fm-file-upload').removeClass('hidden');
+                $('.fm-folder-upload').removeClass('hidden');
+            }
+            else if (subType === 'keys') {
+                $('.fm-files-view-icon').addClass('hidden');
+                $('.fm-s4-new-key').removeClass('hidden');
+            }
+            else if (subType === 'policies') {
+                $('.fm-files-view-icon').addClass('hidden');
+            }
+            else if (subType === 'users') {
+                $('.fm-files-view-icon').addClass('hidden');
+                if (original.endsWith('users')) {
+                    $('.fm-s4-new-user').removeClass('hidden');
+                }
+            }
+            else if (subType === 'groups') {
+                $('.fm-files-view-icon').addClass('hidden');
+                if (original.endsWith('groups')) {
+                    $('.fm-s4-new-group').removeClass('hidden');
+                }
             }
         }
         else if (String(M.currentdirid).length === 8
@@ -1244,7 +1279,8 @@ function renameDialog() {
                         if (duplicated(value, targetFolder)) {
                             errMsg = l[23219];
                         }
-                        else {
+                        else if (!n.s4 || !(errMsg = s4.ui.getInvalidNodeNameError(n, value))) {
+
                             M.rename(n.h, value).catch(tell);
                         }
                     }
@@ -1256,7 +1292,7 @@ function renameDialog() {
                     }
 
                     if (errMsg) {
-                        $dialog.find('.duplicated-input-warning span').text(errMsg);
+                        $('.duplicated-input-warning span', $dialog).safeHTML(errMsg);
                         $dialog.addClass('duplicate');
                         $input.addClass('error');
 
@@ -1275,7 +1311,7 @@ function renameDialog() {
             }
         });
 
-        $('header h2', $dialog).text(n.t ? l[425] : l[426]);
+        $('header h2', $dialog).text(n.t ? n.s4 ? l.s4_bucket_rename : l[425] : l[426]);
         $input.val(n.name);
 
         $('.transfer-filetype-icon', $dialog)
@@ -1304,13 +1340,13 @@ function renameDialog() {
             $dialog.removeClass('focused');
         });
 
-        $input.rebind('keydown', function (event) {
+        $input.rebind('keydown', (event) => {
             // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
             if (event.keyCode === 13) { // Enter
                 $('.rename-dialog-button.rename').click();
                 return;
             }
-            else if (event.keyCode === 27){ // ESC
+            else if (event.keyCode === 27) { // ESC
                 closeDialog();
             }
             else {
@@ -1338,6 +1374,7 @@ function renameDialog() {
 // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     'use strict';
+    let negate = false;
     let doneButton = l.ok_button;
     let showCloseButton = checkboxSetting === 1;
 
@@ -1345,6 +1382,10 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     if (type[0] === '*') {
         type = type.slice(1);
         showCloseButton = true;
+    }
+    if (type[0] === '-') {
+        type = type.slice(1);
+        negate = true;
     }
     let extraButton = type.split(':');
 
@@ -1510,13 +1551,15 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
         if (doneButton === l.ok_button) {
             doneButton = false;
         }
+
+        negate = negate || doneButton === l[23737];
         $('#msgDialog footer .footer-container')
             .safeHTML(
                 `<div class="space-between">
                     <button class="mega-button cancel">
                         <span>@@</span>
                     </button>
-                    <button class="mega-button ${doneButton === l[23737] ? 'negative' : 'positive'} confirm">
+                    <button class="mega-button ${negate ? 'negative' : 'positive'} confirm">
                         <span>@@</span>
                     </button>
                 </div>`,

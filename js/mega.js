@@ -1414,6 +1414,9 @@ scparser.$add('u', function(a) {
                 if (oldattr.name !== n.name) {
                     M.onRenameUIUpdate(n.h, n.name);
                 }
+                if (M.dyh) {
+                    M.dyh('check-node-update', n, oldattr);
+                }
             }
 
             // save modified node

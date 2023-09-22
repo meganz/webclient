@@ -191,6 +191,14 @@
                 $btn.removeClass('disabled');
             }
         }
+
+        // Set Create folder label
+        if (section === 's4' && M.tree.s4 && M.tree.s4[$.mcselected]) {
+            $('.dialog-newfolder-button span', $dialog).text(l.s4_create_bkt);
+        }
+        else {
+            $('.dialog-newfolder-button span', $dialog).text(l[68]);
+        }
     };
 
     /**
@@ -253,13 +261,17 @@
 
             if (el) {
                 path.push(aTarget);
-                names[aTarget] = el.querySelector('.nw-fm-tree-folder').textContent;
+                names[aTarget] = el.querySelector(
+                    '.nw-fm-tree-folder, .nw-fm-tree-icon-wrap'
+                ).textContent;
 
                 $(el).parentsUntil('.dialog-content-block', 'ul').each(function(i, elm) {
                     var h = String(elm.id).split('_')[1];
                     path.push(h);
 
-                    elm = dialog.querySelector('#mctreea_' + h + ' .nw-fm-tree-folder');
+                    elm = dialog.querySelector(
+                        `#mctreea_${h} .nw-fm-tree-folder, #mctreea_${h} .nw-fm-tree-icon-wrap`
+                    );
                     if (elm) {
                         names[h] = elm.textContent;
                     }
@@ -311,6 +323,23 @@
             }
             else if (typeClass === 'contact') {
                 name = '';
+            }
+
+            // Object storage icons
+            if (section === 's4' && M.tree.s4) {
+                if (M.tree.s4[handle]) {
+                    name = l.obj_storage;
+                    typeClass = 's4-object-storage';
+                }
+                else {
+                    const cn = Object.values(M.tree.s4);
+
+                    for (let i = 0; i < cn.length; ++i) {
+                        if (M.tree[cn[i].h] && M.tree[cn[i].h][handle]) {
+                            typeClass = 's4-buckets';
+                        }
+                    }
+                }
             }
 
             if (autoSelect) {
@@ -599,6 +628,10 @@
                 return mega.icu.format(l.upload_to_share, len);
             }
 
+            if (section === 's4') {
+                return mega.icu.format(l.upload_to_s4, len);
+            }
+
             return mega.icu.format(l.upload_to_cd, len);
         }
 
@@ -830,24 +863,15 @@
     };
 
     /**
-     * Handle DOM directly, no return value.
-     * @param {String} dialogTabClass dialog tab class name.
+     * Show content or empty block.
+     * @param {String} tabClass dialog tab class name.
      * @param {String} parentTag tag of source element.
-     * @param {String} htmlContent html content.
      * @private
      */
-    var handleDialogTabContent = function(dialogTabClass, parentTag, htmlContent) {
-        var tabClass = '.' + dialogTabClass;
-        var $tab = $('.fm-picker-dialog-tree-panel' + tabClass, $dialog);
+    const showDialogContent = (tabClass, parentTag) => {
+        const $tab = $(`.fm-picker-dialog-tree-panel.${tabClass}`, $dialog);
 
-        var html = String(htmlContent)
-            .replace(/treea_/ig, 'mctreea_')
-            .replace(/treesub_/ig, 'mctreesub_')
-            .replace(/treeli_/ig, 'mctreeli_');
-
-        $('.dialog-content-block', $tab).empty().safeHTML(html);
-
-        if ($('.dialog-content-block ' + parentTag, $tab).children().length) {
+        if ($(`.dialog-content-block ${parentTag}`, $tab).children().length) {
             // Items available, hide empty message
             $('.dialog-empty-block', $dialog).removeClass('active');
             $('.fm-picker-dialog-panel-header', $tab).removeClass('hidden');
@@ -855,9 +879,32 @@
         }
         else {
             // Empty message, no items available
-            $('.dialog-empty-block' + tabClass, $dialog).addClass('active');
+            $(`.dialog-empty-block.${tabClass}`, $dialog).addClass('active');
             $('.fm-picker-dialog-panel-header', $tab).addClass('hidden');
         }
+    };
+
+
+    /**
+     * Handle DOM directly, no return value.
+     * @param {String} tabClass dialog tab class name.
+     * @param {String} parentTag tag of source element.
+     * @param {String} htmlContent html content.
+     * @returns {void} void
+     * @private
+     */
+    const handleDialogTabContent = (tabClass, parentTag, htmlContent) => {
+        const $tab = $(`.fm-picker-dialog-tree-panel.${tabClass}`, $dialog);
+        const $contentBlock =  $('.dialog-content-block', $tab);
+        const html = String(htmlContent)
+            .replace(/treea_/ig, 'mctreea_')
+            .replace(/treesub_/ig, 'mctreesub_')
+            .replace(/treeli_/ig, 'mctreeli_');
+
+        $contentBlock.empty().safeHTML(html);
+        $('.s4-static-item', $contentBlock).remove();
+
+        showDialogContent(tabClass, parentTag);
     };
 
     /**
@@ -869,19 +916,7 @@
 
         if (section === 'cloud-drive' || section === 'folder-link') {
             M.buildtree(M.d[M.RootID], 'fm-picker-dialog', 'cloud-drive');
-
-            const $folderContainer = $('.folder-container', $dialog);
-            const $treePanel = $('.fm-picker-dialog-tree-panel', $folderContainer);
-            const $cloudDrive = $treePanel.filter('.cloud-drive');
-            const $cloudDriveFolders = $('.dialog-content-block ul li', $cloudDrive);
-            const $dialogPanelHeader = $('.fm-picker-dialog-panel-header', $treePanel);
-            const $emptyCloudDrive = $('.dialog-empty-block.cloud-drive', $folderContainer);
-
-            if ($cloudDriveFolders.length > 0) {
-                $emptyCloudDrive.removeClass('active');
-                $cloudDrive.addClass('active');
-                $dialogPanelHeader.removeClass('hidden');
-            }
+            showDialogContent('cloud-drive', 'ul');
         }
         else if (section === 'shared-with-me') {
             M.buildtree({h: 'shares'}, 'fm-picker-dialog');
@@ -899,10 +934,15 @@
                 console.error('MEGAchat is not ready');
             }
         }
+        else if (section === 's4') {
+            M.buildtree({h: 's4'}, 'fm-picker-dialog');
+            showDialogContent('s4', 'ul');
+        }
 
         if (!treesearch) {
-            $('.fm-picker-dialog .nw-fm-tree-item').removeClass('expanded active opened selected');
-            $('.fm-picker-dialog ul').removeClass('opened');
+            $('.nw-fm-tree-item', '.fm-picker-dialog')
+                .removeClass('expanded active opened selected');
+            $('.nw-fm-tree-item + ul', '.fm-picker-dialog').removeClass('opened');
         }
 
         disableFolders();
@@ -910,7 +950,8 @@
             initPerfectScrollbar($('.right-pane.active .dialog-tree-panel-scroll', $dialog));
 
             // Place tooltip for long names
-            const folderNames = $dialog[0].querySelectorAll('.nw-fm-tree-folder:not(.inbound-share)');
+            const folderNames = $dialog[0]
+                .querySelectorAll('.nw-fm-tree-folder:not(.inbound-share), .nw-fm-tree-icon-wrap');
 
             for (let i = folderNames.length; i--;) {
 
@@ -953,6 +994,7 @@
 
         // all the different buttons
         // var $cloudDrive = $pickerButtons.filter('[data-section="cloud-drive"]');
+        const $s4 = $pickerButtons.filter('[data-section="s4"]');
         var $sharedMe = $pickerButtons.filter('[data-section="shared-with-me"]');
         var $conversations = $pickerButtons.filter('[data-section="conversations"]');
         var $rubbishBin = $pickerButtons.filter('[data-section="rubbish-bin"]');
@@ -996,6 +1038,13 @@
         }
         else {
             $sharedMe.removeClass('hidden');
+        }
+
+        if (u_type && M.tree.s4 && ($.copyDialog || $.moveDialog || $.selectFolderDialog)) {
+            $s4.removeClass('hidden');
+        }
+        else {
+            $s4.addClass('hidden');
         }
 
         if ($.copyToUpload) {
@@ -1205,7 +1254,8 @@
         // Is allowed chats
         if (isUserAllowedToOpenDialogs()) {
             M.safeShowDialog('copy', function() {
-                var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ? 'shared-with-me' : 'cloud-drive';
+                var tab = M.chat ? 'conversations' : M.currentrootid === 'shares' ?
+                    'shared-with-me' : M.currentrootid === 's4' ? 's4' : 'cloud-drive';
                 var dir = M.currentdirid === 'transfers' ? M.lastSeenCloudFolder || M.RootID : M.currentdirid;
                 closeMsg();
                 handleOpenDialog(tab, dir, { key: 'copyToUpload', value: [files, emptyFolders] });
@@ -1379,7 +1429,8 @@
         // dialog sort
         $dialog.find('.fm-picker-dialog-panel-header').append($('.dialog-sorting-menu.hidden').clone());
 
-        $('.fm-picker-dialog-tree-panel.conversations .fm-picker-dialog-panel-header span:first').text(l[17765]);
+        $('.fm-picker-dialog-tree-panel.conversations .item-names', $dialog).text(l[17765]);
+        $('.fm-picker-dialog-tree-panel.s4 .item-names',  $dialog).text(l.s4_my_buckets);
 
         // close breadcrumb overflow menu
         $dialog.rebind('click.dialog', e => {
@@ -1418,6 +1469,12 @@
             }
             else if (section === 'cloud-drive' || section === 'folder-link') {
                 setDialogBreadcrumb(M.RootID);
+            }
+            else if (section === 's4') {
+                const cn = s4.utils.getContainersList();
+
+                // Select MEGA container handle if it's the only one
+                setDialogBreadcrumb(cn.length === 1 && cn[0].h || undefined);
             }
             else if (section === 'rubbish-bin') {
                 setDialogBreadcrumb(M.RubbishID);
@@ -1574,19 +1631,30 @@
 
             $.cfsection = section;
             $.cftarget = $.mcselected || (section === 'cloud-drive' ? M.RootID : M.RubbishID);
+
+            const callback = (h) => {
+                // Auto-select the created folder.
+                const p = Object(M.d[h]).p || $.cftarget;
+
+                // Refresh list (moved from sc-parser)
+                refreshDialogContent();
+
+                // Make sure parent has selected class to make it expand
+                $(`#mctreea_${p}`, $dialog).addClass('selected');
+                selectTreeItem(p);
+                selectTreeItem(h);
+            };
+
+            const target = $.mcselected || (section === 'cloud-drive' ? M.RootID : M.RubbishID);
+            const node = M.getNodeByHandle(target);
+
+            if (node.s4 && s4.kernel.getS4NodeType(node) === 'container') {
+                return s4.ui.showDialog(s4.buckets.dialogs.create, target, callback);
+            }
+
+            $.cftarget = target;
             ($.cfpromise = mega.promise)
-                .then((h) => {
-                    // Auto-select the created folder.
-                    const p = Object(M.d[h]).p || $.cftarget;
-
-                    // Refresh list (moved from sc-parser)
-                    refreshDialogContent();
-
-                    // Make sure parent has selected class to make it expand
-                    $(`#mctreea_${p}`, $dialog).addClass('selected');
-                    selectTreeItem(p);
-                    selectTreeItem(h);
-                })
+                .then((h) => callback(h))
                 .catch(nop);
 
             createFolderDialog();
@@ -1720,7 +1788,7 @@
                 return false;
             }
 
-            var $item = $(this).find('.nw-fm-tree-folder');
+            var $item = $('.nw-fm-tree-folder, .nw-fm-tree-icon-wrap', $(this));
             var itemLeftPos = $item.offset().left;
             var itemTopPos = $item.offset().top;
             var $tooltip = $('.contact-preview', $dialog);
@@ -1925,7 +1993,9 @@
             }
 
             // Get active tab
-            if (section === 'cloud-drive' || section === 'folder-link' || section === 'rubbish-bin') {
+            if (section === 'cloud-drive' || section === 'folder-link'
+                || section === 'rubbish-bin' || section === 's4') {
+
                 // If copying from contacts tab (Ie, sharing)
                 if ($(this).text().trim() === l[1344]) {
                     var user = {

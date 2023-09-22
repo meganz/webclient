@@ -82,7 +82,11 @@
     -webkit-padding-end: 16px;
     padding-inline-end: 16px;
 }
-.lp-myfiles .content-panel.cloud-drive.collapse {
+.lp-myfiles .content-panel.s4 {
+    display: block;
+}
+.lp-myfiles .content-panel.cloud-drive.collapse,
+.lp-myfiles .content-panel.s4.collapse {
     display: none;
 }
 .lp-myfiles .btn-myfiles {
@@ -198,7 +202,8 @@
     color: var(--stroke-link-inverted);
 }
 .nw-fm-tree-item.selected .nw-fm-tree-folder,
-.nw-fm-tree-item.selected .nw-fm-tree-arrow {
+.nw-fm-tree-item.selected .nw-fm-tree-arrow,
+.nw-fm-tree-item.selected .nw-fm-tree-icon-wrap {
     color: var(--stroke-main-inverted);
     --mask-color: var(--stroke-main-inverted);
 }
@@ -342,7 +347,8 @@
 /* Special tree icons relates for performance issue */
 .nw-fm-tree-folder::before,
 .nw-fm-tree-arrow::before,
-.file-status-ico::before {
+.file-status-ico::before,
+.nw-fm-tree-icon-wrap::before {
     font-family: 'fm-mono' !important;
     font-size: 24px;
     font-style: normal;
@@ -356,7 +362,8 @@
     vertical-align: top;
     --icon-size: 24px;
 }
-.nw-fm-tree-folder::before {
+.nw-fm-tree-folder::before,
+.nw-fm-tree-icon-wrap::before {
     left: 0;
     position: absolute;
 }

@@ -60,6 +60,7 @@
     .password-status-icon,
     .login-forgot-password,
     .checkboxOn::after,
+    .checkboxOn::before,
     .checkboxOff::after,
     .contains-value .top-clear-button,
     .account-history-drop-items.active,
@@ -253,7 +254,7 @@
     .shared-details-icon,
     .contact-share-notification::before {
         background-image: url(../images/mega/files-icons@2x.png);
-        background-size: 399px 7652px;
+        background-size: 399px 8305px;
     }
     .download.big-icon, .fm-dialog-close.big, .megasync-img::before, button.megasync-slider::after {
         background-image: url(../images/mega/download-dialog@2x.png);
@@ -262,7 +263,7 @@
     .properties-file-icon i,
     .mega-dialog.properties-dialog .properties-file-icon i {
         background-image: url(../images/mega/properties-sprite@2x.png);
-        background-size: 589px 8800px;
+        background-size: 589px 9636px;
     }
     .drag-n-drop.header, .drag-n-drop hr, .drag-n-drop.info-block i {
         background-image: url(../images/mega/overlay-sprite@2x.png);

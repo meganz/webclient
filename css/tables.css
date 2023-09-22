@@ -66,6 +66,22 @@
  *     </table>
  * </div>
  *
+ * Sticky Header Data Table Structure:
+ *
+ * Please be aware of the container div is necessary, and could define the customized max-height to it.
+ *
+ * <div class="sticky-header-table-container">
+ *      <table class="data-table">
+ *          <thead>
+ *              <tr><th></th></tr>
+ *          </thead>
+ *          <tbody>
+ *              <tr><td></td></tr>
+ *              <tr><td></td></tr>
+ *          </tbody>
+ *      </table>
+ * </div>
+ *
  * There are two addition components:
  * 1. '.link' for default link with underline
  * 2.  '.colored-label' for any statuses. Can be '.green', '.orange' and '.red'
@@ -461,7 +477,6 @@
 }
 
 /* Sticky header data table */
-
 .sticky-header-table-container {
     overflow: hidden;
 }

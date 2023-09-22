@@ -12,7 +12,9 @@
 .out-shared-blocks-view,
 .fm-blocks-view.out-shares-view,
 .fm-blocks-view.public-links-view,
-.files-grid-view {
+.files-grid-view,
+.s4-bucket-block,
+.s4-container-block {
     box-sizing: border-box;
     height: 100%;
     position: relative;
@@ -305,11 +307,7 @@
 .shared-blocks-view .data-block-view .data-block-bg,
 .out-shared-blocks-view .data-block-view .data-block-bg {
     border-radius: 10px 10px 0 0;
-}
-.shared-blocks-view .data-block-view .file-settings-icon,
-.out-shared-blocks-view .data-block-view .file-settings-icon {
-    right: 8px;
-    bottom: 64px;
+    position: relative;
 }
 
 .block-view-file-type {
@@ -324,6 +322,8 @@
     top: 45%;
     transform: translate(-50%, -50%);
 }
+.shared-blocks-view .data-block-view .block-view-file-type,
+.out-shared-blocks-view .data-block-view .block-view-file-type,
 .fm-recents .data-block-bg:not(.thumb) .block-view-file-type {
     top: 50%;
 }
@@ -524,4 +524,14 @@
 }
 .block-view-file-type.file-request-folder {
     background-position: -7px -7544px;
+}
+
+.block-view-file-type.s4-bucket {
+    background-position: -7px -7656px;
+}
+.block-view-file-type.s4-bucket-shared {
+    background-position: -7px -7878px;
+}
+.block-view-file-type.rubbish-s4 {
+    background-position: -7px -7768px;
 }

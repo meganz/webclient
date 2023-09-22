@@ -297,11 +297,16 @@ MegaData.prototype.renderTree = function() {
         M.buildtree({h: h}, M.buildtree.FORCE_REBUILD);
     });
 
+    if (s4.ui) {
+        build('s4');
+    }
     build('shares');
+
     // We are no longer build this tree, however, just leave this for potential later usage.
     // build('out-shares');
     // build('public-links');
     // build(M.InboxID);
+
     build(M.RootID);
     build(M.RubbishID);
 

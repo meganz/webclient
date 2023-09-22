@@ -704,6 +704,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 if ((n = M.d[n])) {
                     selectionSize += n.t ? n.tb : n.s;
                 }
+                else if (M.dyh) {
+                    selectionSize = 0;
+                }
                 if (e) {
                     e.classList.add(this.CLS_UI_SELECTED);
                 }
@@ -763,6 +766,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         var container = this._get_selectable_container().get(0);
         var nodeList = container && container.querySelectorAll('.megaListItem') || false;
+        const currentNode = M.d[this.currentdirid]
+            || M.currentrootid === 's4' && M.d[this.currentdirid.split('/').pop()];
 
         if (nodeList.length) {
             for (var i = nodeList.length; i--;) {
@@ -774,9 +779,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             // Not under a MegaList-powered view
             this.add_to_selection(this.selected_list.pop(), false, true);
         }
-
-        if (M.d[this.currentdirid]) {
-            this.selectionNotification(M.d[this.currentdirid].tb);
+        if (currentNode) {
+            this.selectionNotification(currentNode.tb);
         }
     }
 
@@ -819,15 +823,19 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             const totalHtml = `<span class="sel-notif-size-total">${itemsTotalSize}</span>`;
 
-            if (totalNodes === 1) { // Only one item exists
-                notificationText = l[24679].replace('%1', itemsNum).replace('%2', totalHtml);
-            }
-            else { // Multiple items here
-                itemsNum = mega.icu.format(l.selected_count, itemsNum);
+            if (totalNodes) {
+                if (totalNodes === 1) { // Only one item exists
+                    notificationText = l[24679].replace('%1', itemsNum).replace('%2', totalHtml);
+                }
+                else { // Multiple items here
+                    itemsNum = mega.icu.format(l.selected_count, itemsNum);
 
-                notificationText = mega.icu.format(l[24672], totalNodes)
-                    .replace('%1', `<span class="sel-notif-count-total">${itemsNum}</span>`).replace('%2', totalHtml);
+                    notificationText = mega.icu.format(l[24672], totalNodes)
+                        .replace('%1', `<span class="sel-notif-count-total">${itemsNum}</span>`)
+                        .replace('%2', totalHtml);
+                }
             }
+
             this.showSelectionBar(notificationText, itemsNum, itemsTotalSize, totalNodes);
 
             if (M.megaRender && M.megaRender.megaList) {
@@ -853,14 +861,19 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         let scrollBarYClass = '';
         const $selCountElm = $('.sel-notif-count-total', $selectionBar);
 
-        // if count is existing, lets using existing dom node not create new one.
-        if ($selCountElm.length && totalNodes === $selectionBar.data('total-node')) {
-            $selCountElm.text(itemSelected);
-            $('.sel-notif-size-total', $selectionBar).text(itemsTotalSize);
+        if (notificationText) {
+            // if count is existing, lets using existing dom node not create new one.
+            if ($selCountElm.length && totalNodes === $selectionBar.data('total-node')) {
+                $selCountElm.text(itemSelected);
+                $('.sel-notif-size-total', $selectionBar).text(itemsTotalSize);
+            }
+            else {
+                $('.selection-bar-col', $selectionBar).safeHTML(notificationText);
+                $selectionBar.data('total-node', totalNodes);
+            }
         }
         else {
-            $('.selection-bar-col', $selectionBar).safeHTML(notificationText);
-            $selectionBar.data('total-node', totalNodes);
+            $('.selection-bar-col', $selectionBar).empty();
         }
 
         this.vSelectionBar = $('b', $selectionBar).get(0);
@@ -936,7 +949,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
 
         const isAlbums = M.isAlbumsPage();
-
         const allButtons = selectionLinkWrapper.querySelectorAll(
             isAlbums ? '.js-statusbarbtn' : '.js-statusbarbtn:not(.options)'
         );
@@ -961,6 +973,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
         };
 
+        const isMegaList = M.dyh ? M.dyh('is-mega-list') : true;
+
         if (isAlbums) {
             if (
                 mega.gallery.albums.grid
@@ -980,7 +994,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 __showBtn('delete-from-album');
             }
         }
-        else {
+        else if (isMegaList) {
+            __showBtn('options');
             const isSearch = page.startsWith('fm/search');
             const selNode = M.getNodeByHandle($.selected[0]);
             const sourceRoot = M.getSelectedSourceRoot(isSearch);
@@ -995,13 +1010,15 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 spanTotal.classList.remove('hidden');
             }
 
-            // Set default "Share folder" string
-            shareButton.dataset.simpletip = l[5631];
+            // Set default "Share folder" / "Share bucket" string
+            shareButton.dataset.simpletip = sourceRoot === 's4'
+                && M.geS4NodeType(selNode) === 'bucket' && l.s4_share_bucket || l[5631];
 
             const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
             dataset.simpletip = M.getSelectedRemoveLabel($.selected);
 
-            if ((sourceRoot === M.RootID || M.isDynPage(sourceRoot)) && !folderlink) {
+            if ((sourceRoot === M.RootID || sourceRoot === 's4'
+                 || M.isDynPage(sourceRoot)) && !folderlink) {
 
                 const cl = new mega.Share.ExportLink();
 
@@ -1059,6 +1076,20 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 __hideButton('share');
                 __hideButton('sendto');
             }
+        }
+        else {
+            M.dyh('required-links')
+                .then((links) => {
+                    if (links) {
+                        const { show, hide } = links;
+                        for (const h of hide) {
+                            __hideButton(h);
+                        }
+                        for (const s of show) {
+                            __showBtn(s);
+                        }
+                    }
+                });
         }
 
         M.initStatusBarLinks();

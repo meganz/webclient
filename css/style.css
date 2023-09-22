@@ -1683,7 +1683,8 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-tree-item.contains-folders .nw-fm-arrow-icon {
     cursor: pointer;
 }
-.nw-fm-tree-folder {
+.nw-fm-tree-folder,
+.nw-fm-tree-icon-wrap {
     display: inline-block;
     -webkit-margin-start: 45px;
     margin-inline-start: 45px;
@@ -1771,6 +1772,22 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 }
 .transfer-filetype-icon.rubbish-folder-shared {
     background-position: -297px -957px;
+}
+
+.transfer-filetype-icon.s4 {
+    background-position: -336px -1599px;
+}
+.transfer-filetype-icon.rubbish-s4 {
+    background-position: -376px -1599px;
+}
+.transfer-filetype-icon.s4-bucket {
+    background-position: -337px -1558px;
+}
+.transfer-filetype-icon.s4-bucket-shared {
+    background-position: -297px -1599px;
+}
+.transfer-filetype-icon-rubbish-s4-bucket {
+    background-position: -377px -1558px;
 }
 
 .nw-fm-tree-item:hover .nw-fm-tree-folder,
@@ -3395,6 +3412,15 @@ body.loading .light-overlay {
     background-position: -215px -7322px;
 }
 
+.medium-file-icon.s4-bucket {
+    background-position: -214px -7662px;
+}
+.medium-file-icon.s4-bucket-shared,
+.share-dialog-shared-item .medium-file-icon.s4-bucket {
+    background-position: -214px -7885px;
+    height: 40px;
+}
+
 .transfer-filetype-icon img {
     display: none;
 }
@@ -3512,6 +3538,9 @@ body.loading .light-overlay {
 .create-folder-input-bl .transfer-filetype-icon.folder {
     background-position: -297px -717px;
     margin: 0;
+}
+.rename-input-bl i.sprite-fm-mono {
+    --icon-size: 24px;
 }
 .thumb .transfer-filetype-icon.image,
 .thumb .transfer-filetype-icon.pdf,
@@ -3743,6 +3772,22 @@ body.loading .light-overlay {
 .export-icon.rubbish-puf-folder,
 .share-folder-icon div.rubbish-puf-folder {
     background-position: -113px -5399px;
+}
+
+.export-icon.s4-bucket,
+.share-folder-icon div.s4-bucket {
+    background-position: -116px -7660px;
+    height: 62px;
+}
+.export-icon.s4-bucket-shared,
+.share-folder-icon div.s4-bucket-shared {
+        background-position: -116px -7881px;
+    height: 66px;
+}
+.export-icon.rubbish-s4-bucket,
+.share-folder-icon div.rubbish-s4-bucket {
+    background-position: -116px -7772px;
+    height: 62px;
 }
 
 .thumb .block-view-file-type,
@@ -4154,7 +4199,7 @@ body.loading .light-overlay {
   min-width: 200px;
   background-color: var(--context-menu-background);
   padding: 10px;
-  z-index: 99;
+  z-index: 999;
   border-radius: 12px;
   box-shadow: var(--dropdown-shadow);
   left: 24px;
@@ -8880,7 +8925,8 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     color: var(--text-color-high);
 }
 
-.shared-details-pad .avatar-wrapper {
+.shared-details-pad .avatar-wrapper,
+.bucket-details-pad .avatar-wrapper {
     margin: 10px 0 0 0;
     border-radius: 2px;
     width: 24px;
@@ -8899,11 +8945,13 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.shared-details-pad .fm-chat-user span {
+.shared-details-pad .fm-chat-user span,
+.bucket-details-pad .bucket-detail-user span {
     color: var(--text-color-low);
     padding-left: 12px;
 }
-.shared-details-pad .fm-chat-user span::before {
+.shared-details-pad .fm-chat-user span::before,
+.bucket-details-pad .bucket-detail-user span::before {
     content: '\00B7';
     position: relative;
     left: -6px;
@@ -8916,7 +8964,8 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     padding: 0 40px 0 0;
     background: var(--surface-grey-1);
 }
-.shared-details-buttons::before {
+.shared-details-buttons::before,
+.bucket-details-buttons::before {
     content: '';
     position: absolute;
     width: 20px;
@@ -8925,7 +8974,8 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     top: 0;
     background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, var(--stroke-grey-1) 100%);
 }
-.shared-details-buttons .mega-button {
+.shared-details-buttons .mega-button,
+.bucket-details-buttons .mega-button {
     min-width: 20px;
 }
 .files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
@@ -9087,12 +9137,14 @@ ul.token-input-list-mega {
 .multiple-input:hover {
     border-color: var(--stroke-info);
 }
-.multiple-input-warning, .duplicated-input-warning, .reg-resend-email-meg {
+.multiple-input-warning,
+.duplicated-input-warning,
+.reg-resend-email-meg {
     min-height: 24px;
     position: relative;
     background-color: var(--banner-background-error);
     border: 1px solid var(--banner-border-error);
-    padding: 2px 12px;
+    padding: 2px 16px;
     width: 100%;
     color: var(--banner-text-error);
     font: var(--text-body1);
@@ -9102,12 +9154,18 @@ ul.token-input-list-mega {
     z-index: 100;
     display: none;
 }
+.duplicated-input-warning a,
+.duplicated-input-warning a:link,
+.duplicated-input-warning a:visited {
+    color: inherit;
+    text-decoration: underline;
+}
 .whitespaces-input-warning {
     min-height: 24px;
     position: relative;
     background-color: var(--banner-background-warning);
     border: 1px solid var(--banner-border-warning);
-    padding: 2px 12px;
+    padding: 2px 16px;
     width: 100%;
     color: var(--banner-text-warning);
     font: var(--text-body1);
@@ -13624,7 +13682,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     border: 2px solid var(--stroke-main);
     border-radius: 8px;
     padding: 7px 13px 7px 13px;
-    margin: -34px 0 0 -65px;
+    margin: -34px 0 0 -55px;
     -webkit-background-clip: padding-box;
     -moz-background-clip: padding-box;
     background-clip: padding-box;
@@ -13638,10 +13696,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     word-break: keep-all;
     width: auto;
     position: relative;
-    padding-top: 4px;
+    padding: 2px 0;
     overflow: hidden;
     margin: 0;
-    margin-left: 24px;
+    -webkit-margin-start: 32px;
+    margin-inline-start: 32px;
     max-width: 160px;
 }
 .dragger-files-number {

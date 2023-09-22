@@ -459,6 +459,7 @@
 
             .mega-dialog.dialog-template-message > header h3 {
                 text-align: start;
+                word-break: break-word;
             }
 
             .mega-dialog.dialog-template-message > header p {

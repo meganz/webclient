@@ -468,6 +468,12 @@
     border-color: var(--banner-border-warning);
     background: var(--banner-background-warning);
 }
+.mega-input.error .message-container a,
+.mega-input.error .message-container a:link,
+.mega-input.error .message-container a:visited {
+    color: inherit;
+    text-decoration: underline;
+}
 .mega-input.msg .message-container,
 .mega-input.fix-msg .message-container {
     display: inline-block;

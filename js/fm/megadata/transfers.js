@@ -1393,7 +1393,7 @@ MegaData.prototype.addNewFile = function(fileName, dest) {
     // eslint-disable-next-line local-rules/hints
     var addFilePromise = new MegaPromise();
     dest = dest || M.currentdirid || M.RootID;
-    dest = dest.replace('public-links/', '').replace('out-shares/', '').replace('file-requests/', '');
+    dest = dest.split('/').pop();
 
     if ([8, 11].indexOf(String(dest).length) === -1) {
         return addFilePromise.reject(EACCESS);

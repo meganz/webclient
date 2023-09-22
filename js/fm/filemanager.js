@@ -18,6 +18,7 @@ function FileManager() {
     this.columnsWidth.cloud.versions = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.playtime = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
+    this.columnsWidth.cloud.accessCtrl = { max: 180, min: 130, curr: 130, viewed: true };
 
     this.columnsWidth.makeNameColumnStatic = function() {
 
@@ -151,6 +152,40 @@ FileManager.prototype.initFileManager = async function() {
 
     const path = $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage();
 
+    if (!pfid && !is_mobile && u_type) {
+        const s4e = u_attr.s4;
+
+        if (s4e) {
+            const hold = !!this.getNodeByHandle(path.slice(0, 8)).s4;
+
+            const s4load =
+                Promise.resolve(M.require('s4'))
+                    .then(() => {
+                        const cnt = Object.keys(this.c[this.RootID] || {})
+                            .map((h) => this.d[h]).filter((n) => n && n.s4);
+
+                        if (!cnt.length) {
+                            return s4.kernel.container.create(true);
+                        }
+                    })
+                    .then(() => {
+                        $('.js-s4-tree-panel').removeClass('hidden');
+                        return this.buildtree({h: 's4'}, this.buildtree.FORCE_REBUILD);
+                    })
+                    .catch((ex) => {
+                        reportError(ex);
+                        if (hold) {
+                            throw ex;
+                        }
+                    });
+
+            if (hold) {
+                // We're (re)loading over a s4-page, hold it up.
+                await s4load;
+            }
+        }
+    }
+
     if (path) {
         this.onFileManagerReady(fmLeftMenuUI);
     }
@@ -229,8 +264,8 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'fingerprint-admin-dlg'
             || $.dialog === 'meetings-schedule-dialog'
             || String($.dialog).startsWith('verify-email')
+            || String($.dialog).startsWith('s4-managed')
             || localStorage.awaitingConfirmationAccount) {
-
             return false;
         }
         showLoseChangesWarning().done(function() {
@@ -318,11 +353,11 @@ FileManager.prototype.initFileManagerUI = function() {
 
         var c = $(ui.draggable).attr('class');
         var t, ids, dd;
-
+        let id;
 
         if (c && c.indexOf('nw-fm-tree-item') > -1) {
             // tree dragged:
-            var id = $(ui.draggable).attr('id');
+            id = $(ui.draggable).attr('id');
             if (id.indexOf('treea_') > -1) {
                 ids = [id.replace('treea_', '')];
             }
@@ -347,7 +382,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         if (type == 1) {
             // tree dropped:
-            var c = $(e.target).attr('class');
+            c = $(e.target).attr('class');
             if (c && c.indexOf('nw-fm-left-icon') > -1) {
                 dd = 'nw-fm-left-icon';
                 if (a === 'drop') {
@@ -366,6 +401,17 @@ FileManager.prototype.initFileManagerUI = function() {
                 if (c.indexOf('cloud-drive') > -1) {
                     // Drag and drop to the cloud drive in the file manager left panel
                     t = M.RootID;
+                }
+                else if (c.includes('s4') && M.tree.s4) {
+                    const cn = s4.utils.getContainersList();
+
+                    // Drag and drop folder to the only container or skip
+                    if (cn.length === 1 && M.isFolder(ids)) {
+                        t = cn[0].h;
+                    }
+                    else {
+                        dd = 'noop';
+                    }
                 }
                 else if (c.indexOf('rubbish-bin') > -1) {
                     // Drag and drop to the rubbish bin in the file manager left panel
@@ -392,7 +438,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
             }
             else {
-                var t = $(e.target).attr('id');
+                t = $(e.target).attr('id');
                 if (t && t.indexOf('treea_') > -1) {
                     t = t.replace('treea_', '');
                 }
@@ -406,7 +452,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         else {
             // grid dropped:
-            var c = $(e.target).attr('class');
+            c = $(e.target).attr('class');
             if (c && c.indexOf('folder') > -1) {
                 t = $(e.target).attr('id');
             }
@@ -435,7 +481,7 @@ FileManager.prototype.initFileManagerUI = function() {
             // if (a !== 'noop') $('.dragger-block').addClass('drag');
         }
         else if (a === 'over') {
-            var id = $(e.target).attr('id');
+            id = $(e.target).attr('id');
             if (!id) {
                 $(e.target).uniqueId();
                 id = $(e.target).attr('id');
@@ -449,7 +495,7 @@ FileManager.prototype.initFileManagerUI = function() {
                         h = id.replace('treea_', '');
                     }
                     else {
-                        var c = $(id).attr('class');
+                        c = $(id).attr('class');
                         if (c && c.indexOf('cloud-drive-item') > -1) {
                             h = M.RootID;
                         }
@@ -482,7 +528,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 $.draggingClass = ('dndc-download');
             }
             else if (dd === 'nw-fm-left-icon') {
-                var c = '' + $(e.target).attr('class');
+                c = String($(e.target).attr('class'));
 
                 $.draggingClass = ('dndc-warning');
                 if (c.indexOf('rubbish-bin') > -1) {
@@ -522,7 +568,8 @@ FileManager.prototype.initFileManagerUI = function() {
                 $.draggingClass = ('dndc-to-conversations');
             }
             else {
-                $.draggingClass = M.d[t] ? 'dndc-warning' : 'dndc-move';
+                const {type} = M.isCustomView(t) || {};
+                $.draggingClass = M.d[t] || type === 's4' ? 'dndc-warning' : 'dndc-move';
             }
 
             $('body').addClass($.draggingClass);
@@ -648,6 +695,7 @@ FileManager.prototype.initFileManagerUI = function() {
         var ALLOWED_CLASSES = [
             'contact-details-user-name',
             'contact-details-email',
+            'js-selectable-text',
             'nw-conversations-name'
         ];
         var ALLOWED_PARENTS =
@@ -2139,6 +2187,9 @@ FileManager.prototype.initContextUI = function() {
         ) {
             target = M.currentrootid + '/' + target;
         }
+        else if (M.dyh) {
+            target = M.dyh('folder-id', target);
+        }
         $('.js-lpbtn').removeClass('active');
         M.openFolder(target);
     });
@@ -2150,7 +2201,9 @@ FileManager.prototype.initContextUI = function() {
         M.openFolder(`discovery/${target}`);
     });
 
-    $(c + '.open-cloud-item, ' + c + '.open-in-location').rebind('click', () => {
+    $(`${c}.open-cloud-item, ${c}.open-in-location, ${c}.open-s4-item`)
+        .rebind('click.openItem', () => {
+
         const node = M.d[$.selected[0]];
 
         // Incoming Shares section if shared folder doestn't have parent
@@ -2342,6 +2395,15 @@ FileManager.prototype.initContextUI = function() {
         });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
+
+    $(`${c}.new-bucket-item`)
+        .rebind('click.createBucket', () => s4.ui.showDialog(s4.buckets.dialogs.create));
+
+    $(`${c}.settings-item`)
+        .rebind('click.showSettings', () => s4.ui.showDialog(s4.buckets.dialogs.settings, M.d[$.selected[0]]));
+
+    $(`${c}.managepuburl-item`)
+        .rebind('click.managePA', () => s4.ui.showDialog(s4.objects.dialogs.access, M.d[$.selected[0]]));
 
     if (sessionStorage.folderLinkImport || $.onImportCopyNodes) {
         onIdle(M.importFolderLinkNodes.bind(M, false));
@@ -3349,11 +3411,11 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     // user management ui update is handled in Business Account classes.
     else if (this.v.length && !M.isGalleryPage()) {
 
-        $('.fm-blocks-view.fm').removeClass('hidden');
-        $('.fm-blocks-view.fm').removeClass('out-shares-view public-links-view file-requests-view');
+        $('.fm-blocks-view.fm', '.fmholder')
+            .removeClass('hidden out-shares-view public-links-view file-requests-view s4-view');
 
         if (this.currentCustomView) {
-            $('.fm-blocks-view.fm').addClass(this.currentCustomView.type + '-view');
+            $('.fm-blocks-view.fm', '.fmholder').addClass(`${this.currentCustomView.type}-view`);
         }
 
         if (!aQuiet) {
@@ -3361,7 +3423,8 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder,.shared-blocks-view, .out-shared-blocks-view')
+    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder,' +
+        '.shared-blocks-view, .out-shared-blocks-view, .fm-empty-s4-bucket')
         .rebind('contextmenu.fm', function(e) {
             if (page === "fm/links") { // Remove context menu option from filtered view
                 return false;
@@ -3529,6 +3592,15 @@ FileManager.prototype.addGridUI = function(refresh) {
                 M.columnsWidth.cloud.fav.disabled = true;
                 M.columnsWidth.cloud.fav.viewed = false;
             }
+
+            if (M.currentrootid === 's4' && M.d[M.currentdirid.split('/').pop()]) {
+                M.columnsWidth.cloud.accessCtrl.viewed = true;
+                M.columnsWidth.cloud.accessCtrl.disabled = false;
+            }
+            else {
+                M.columnsWidth.cloud.accessCtrl.viewed = false;
+                M.columnsWidth.cloud.accessCtrl.disabled = true;
+            }
         }
 
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
@@ -3569,19 +3641,22 @@ FileManager.prototype.addGridUI = function(refresh) {
         initPerfectScrollbar($(viewModeClass, '.shared-details-block'));
     }
     else if (this.v.length) {
-        $('.files-grid-view.fm').removeClass('hidden');
-        $('.files-grid-view.fm').removeClass('out-shares-view public-links-view file-requests-view');
+        $('.files-grid-view.fm', '.fmholder').removeClass('hidden');
+        $('.files-grid-view.fm', '.fmholder')
+            .removeClass('out-shares-view public-links-view file-requests-view');
 
         if (this.currentCustomView) {
             if (M.isGalleryPage() || M.isAlbumsPage()) {
-                $('.files-grid-view.fm').addClass('hidden');
+                $('.files-grid-view.fm', '.fmholder').addClass('hidden');
             }
             else {
-                $('.files-grid-view.fm').addClass(this.currentCustomView.type + '-view');
+                $('.files-grid-view.fm', '.fmholder')
+                    .addClass(`${this.currentCustomView.type}-view`);
             }
         }
         else {
-            $('.files-grid-view.fm').removeClass('out-shares-view public-links-view');
+            $('.files-grid-view.fm', '.fmholder')
+                .removeClass('out-shares-view public-links-view s4-view');
         }
 
         $.gridHeader();
@@ -3593,8 +3668,8 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.grid-url-arrow').show();
     $('.grid-url-header').text('');
 
-    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,' +
-        '.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content').rebind('contextmenu.fm', e => {
+    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,.fm-empty-cloud,' +
+        '.fm-empty-folder,.fm.shared-folder-content, .fm-empty-s4-bucket').rebind('contextmenu.fm', e => {
         if (page === "fm/links" && page === "fm/faves") { // Remove context menu option from filtered view
             return false;
         }
@@ -4096,6 +4171,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             ) {
                 h = M.currentrootid + '/' + h;
             }
+            else if (M.dyh) {
+                h = M.dyh('folder-id', h);
+            }
             M.openFolder(h);
         }
         else if (is_image2(n) || is_video(n)) {
@@ -4170,9 +4248,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     switch (id) {
         case 'opc':
         case 'ipc':
-        case 'devices':
-            tmpId = 'backup-center';
-            break;
         case 'recents':
         case 'search':
         case 'shared-with-me':
@@ -4180,8 +4255,12 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         case 'public-links':
         case 'backups':
         case 'rubbish-bin':
+        case 's4':
         case 'file-requests':
             tmpId = 'cloud-drive';
+            break;
+        case 'devices':
+            tmpId = 'backup-center';
             break;
         case 'affiliate':
             tmpId = 'dashboard';
@@ -4337,7 +4416,9 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         id !== 'public-links' &&
         !String(M.currentdirid).includes('public-links') &&
         id !== 'file-requests' &&
-        !String(M.currentdirid).includes('file-requests')
+        !String(M.currentdirid).includes('file-requests') &&
+        id !== 's4' &&
+        M.currentrootid !== 's4'
     ) {
         $('.files-grid-view.fm').addClass('hidden');
         $('.fm-blocks-view.fm').addClass('hidden');
@@ -4447,6 +4528,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         || id === 'rubbish-bin'
         || id === 'recents'
         || id === 'discovery'
+        || id === 's4'
         || isAlbums
         || M.isDynPage(id)
         || mega.gallery.sections[id]
@@ -4540,7 +4622,11 @@ FileManager.prototype.initStatusBarLinks = function() {
 
     $('.js-statusbarbtn.link', $selectionStatusBar).attr('data-simpletip', linkHoverText);
     $('.js-statusbarbtn', $selectionStatusBar).rebind('click', function(e) {
-        if (this.classList.contains('download')) {
+        const isMegaList = M.dyh ? M.dyh('is-mega-list') : true;
+        if (!isMegaList) {
+            M.dyh('init-status-bar-links', e, this.classList);
+        }
+        else if (this.classList.contains('download')) {
             if (M.isAlbumsPage()) {
                 mega.gallery.albums.downloadSelectedElements();
             }
@@ -4651,6 +4737,9 @@ FileManager.prototype.initLeftPanel = function() {
     else if (isGallery && mega.gallery.sections[M.currentdirid]) { // If gallery and is not Discovery
         $(`.js-lpbtn[data-link="${mega.gallery.sections[M.currentdirid].root}"]`).addClass('active');
     }
+    else if (M.currentrootid === 's4' && M.currentCustomView.subType === 'container') {
+        $('.js-lpbtn[data-link="s4"]').addClass('active');
+    }
 
     const galleryBtn = document.querySelector('.nw-fm-left-icon.gallery');
 
@@ -4729,7 +4818,32 @@ FileManager.prototype.initLeftPanel = function() {
                 }
             });
         }
+        else if (link === 's4' && 'ui' in s4) {
+            const $eTarget = $(this);
+            const $s4ContentPanel = $('.content-panel.s4', '.js-myfiles-panel');
+
+            if (M.dyh && M.dyh('is-section', 'container') || $(e.target).hasClass('js-cloudtree-expander')) {
+                $eTarget.toggleClass('collapse');
+                if ($s4ContentPanel.hasClass('collapse')) {
+                    $s4ContentPanel.removeClass('collapse');
+                    M.addTreeUIDelayed();
+                }
+                else {
+                    $s4ContentPanel.addClass('collapse');
+                }
+            }
+            else {
+                s4.ui.renderRoot();
+            }
+        }
     });
+
+    if (M.currentrootid === 's4') {
+        // Auto expand the tree pane if access any component pages of s4
+        $('.js-lpbtn.js-s4-btn', '.js-myfiles-panel').removeClass('collapse');
+        $('.content-panel.s4', '.js-myfiles-panel').removeClass('collapse');
+        M.addTreeUIDelayed();
+    }
 };
 
 

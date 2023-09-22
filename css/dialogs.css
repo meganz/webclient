@@ -289,7 +289,7 @@ body.de .mega-dialog.contact-picker-widget {
     overflow: hidden;
     flex: 1 1;
 }
-.mega-dialog.add-from-cloud .fm-dialog-tabs:after {
+.mega-dialog .fm-dialog-tabs::after {
     display: block;
     content: '';
     position: absolute;
@@ -605,7 +605,7 @@ body.de .mega-dialog.contact-picker-widget {
     border-bottom: 1px solid var(--stroke-grey-2);
     padding: 26px 0 0 0;
 }
-.add-from-cloud .fm-dialog-tab {
+.fm-dialog-tab {
     position: relative;
     cursor: pointer;
     font: var(--text-h3);
@@ -618,13 +618,13 @@ body.de .mega-dialog.contact-picker-widget {
     margin-bottom: -1px;
     z-index: 1;
 }
-.rtl .add-from-cloud .fm-dialog-tab {
+.rtl .fm-dialog-tab {
    float: right;
 }
 .add-from-cloud.no-incoming .fm-dialog-tab.incoming {
     display: none;
 }
-.add-from-cloud .fm-dialog-tab.active {
+.fm-dialog-tab.active {
     border-color: var(--stroke-info);
     color: var(--text-color-high);
     cursor: default;
@@ -3271,6 +3271,7 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll span {
         font: var(--text-body2);
         color: var(--text-color-high);
+        line-height: 24px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -3294,17 +3295,13 @@ body.de .mega-dialog.contact-picker-widget {
         transform: rotate(90deg);
         background-image: none;
     }
-    .mega-dialog.fm-picker-dialog .nw-fm-tree-folder {
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-folder,
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-icon-wrap {
         -webkit-padding-start: 30px;
         padding-inline-start: 30px;
         max-width: calc(100% - 40px);
         -webkit-margin-start: 24px;
         margin-inline-start: 24px;
-        height: 18px;
-        line-height: 18px;
-    }
-    .mega-dialog.fm-picker-dialog .nw-fm-tree-folder::before {
-        top: -3px;
     }
     .mega-dialog.fm-picker-dialog .nw-fm-tree-item .nw-fm-tree-arrow {
         -webkit-margin-start: 6px;
@@ -4585,6 +4582,17 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.properties-dialog .properties-file-icon i.rubbish-file-request-folder {
         background-position: -391px -8520px;
     }
+
+    .mega-dialog.properties-dialog .properties-file-icon i.s4-bucket {
+        background-position: 14px -8793px;
+    }
+    .mega-dialog.properties-dialog .properties-file-icon i.s4-bucket-shared {
+        background-position: 11px -9063px;
+    }
+    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-s4-bucket {
+        background-position: -386px -8793px;
+    }
+
 
 /* end properties-dialog */
 
@@ -11035,6 +11043,513 @@ body.de .mega-dialog.contact-picker-widget {
 }
 
 /* Report Abuse dialog End */
+
+/* S4 Dialogs Begin */
+
+.mega-dialog.s4 {
+    width: 592px;
+}
+.mega-dialog.s4 button.close {
+    --mask-color: var(--icon-active);
+}
+.mega-dialog.s4 button.regress {
+    margin-inline-end: auto;
+    -webkit-margin-end: auto;
+}
+.mega-dialog.s4 .spaced-margin {
+    margin: 8px 0 24px;
+}
+.mega-dialog.s4 .input-container {
+    background: var(--surface-main);
+    border: 1px solid var(--stroke-grey-2);
+    border-radius: 3px;
+    display: flex;
+    height: 38px;
+    margin-top: 4px;
+    position: relative;
+    width: 100%;
+}
+.mega-dialog.s4 .input-container .user-input-wrap {
+    flex: 1;
+    vertical-align: top;
+    width: 100%;
+}
+.mega-dialog.s4 .input-container i {
+    --icon-size: 24px;
+    left: 6px;
+    --mask-color: var(--icon-inactive);
+    position: absolute;
+    top: 6px;
+}
+.rtl .mega-dialog.s4 .input-container i {
+    left: auto;
+    right: 6px;
+}
+.mega-dialog.s4 .input-container input {
+    background: transparent;
+    border: 0;
+    box-sizing: border-box;
+    color: var(--text-color-medium);
+    font: var(--text-body1);
+    height: 36px;
+    margin: 0;
+    padding: 0 10px;
+    padding-inline-start: 36px;
+    -webkit-padding-start: 36px;
+    width: 100%;
+}
+.mega-dialog.s4 .input-container input:focus,
+.mega-dialog.s4 .input-container input:hover {
+    color: var(--text-color-high);
+}
+.mega-dialog.s4 .input-container input:focus + i,
+.mega-dialog.s4 .input-container input:hover + i,
+.mega-dialog.s4 .input-container i:hover {
+    --mask-color: var(--icon-active);
+}
+.mega-dialog.s4 .mega-input .message-container {
+    padding: 2px 16px;
+    text-align: start;
+}
+.mega-dialog.s4 div.offset-text {
+    color: var(--text-color-high);
+    font: var(--text-body2);
+    padding: 0 0 3px;
+    padding-inline-start: 40px;
+    -webkit-padding-start: 40px;
+}
+.mega-dialog.s4 .step-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+}
+.mega-dialog.s4 .step-head .head-title {
+    color: var(--text-color-high);
+    font: var(--text-h3-bold);
+}
+.mega-dialog.s4 .search-bar {
+    align-items: center;
+    background: var(--surface-grey-6);
+    border-radius: 50px;
+    display: flex;
+    justify-content: space-between;
+    min-height: 32px;
+    position: relative;
+    width: 240px;
+}
+.mega-dialog.s4 .search-bar i {
+    margin-inline-start: 8px;
+    -webkit-margin-start: 8px;
+}
+.mega-dialog.s4 .search-bar input {
+    background-color: transparent;
+    border: 0;
+    box-sizing: border-box;
+    color: var(--stroke-main-inverted);
+    font: var(--text-body1);
+    padding: 6px 0;
+    padding-inline-start: 12px;
+    -webkit-padding-start: 12px;
+    width: 100%;
+}
+.mega-dialog.s4 .sticky-header-table-container {
+    border: solid 1px var(--stroke-grey-2);
+    border-radius: 12px;
+}
+.mega-dialog.s4 .s4-table-scroll {
+    height: 184px;
+}
+.mega-dialog.s4 .sticky-header-table-container th {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    padding-top: 12px;
+    text-align: start;
+}
+.mega-dialog.s4 .sticky-header-table-container .no-pad-start {
+    padding-inline-start: 0;
+    -webkit-padding-start: 0;
+}
+.mega-dialog.s4 .dialog-table th:first-child,
+.mega-dialog.s4 .dialog-table td:first-child {
+    line-height: 0;
+    width: 28px;
+}
+.mega-dialog.s4 .dialog-table tr {
+    height: 32px;
+    width: 100%;
+}
+.mega-dialog.s4 .dialog-table td {
+    align-items: center;
+    padding-inline-start: 12px;
+    -webkit-padding-start: 12px;
+}
+.mega-dialog.s4 .dialog-table tr:hover td:first-child::before {
+    left: 4px;
+}
+.mega-dialog.s4 .dialog-table tr:hover td:last-child::before {
+    right: 4px;
+}
+.mega-dialog.s4 .dialog-table td:first-child::after {
+    width: calc(100% - 8px);
+}
+.mega-dialog.s4 .dialog-table td:nth-child(2) span {
+    color: var(--text-color-high);
+}
+.mega-dialog.s4 td span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.mega-dialog.s4 td span:first-child {
+    margin-right: 8px;
+}
+.mega-dialog.s4 .create-item-info {
+    margin-bottom: 24px;
+    max-width: 100%;
+}
+.mega-dialog.s4 .create-item-info td {
+    padding-bottom: 12px;
+}
+.mega-dialog.s4 .create-item-info td:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: wrap;
+    width: 115px;
+    max-width: 115px;
+}
+.mega-dialog.s4 .section-label {
+    color: var(--text-color-high);
+    font: var(--text-h3);
+}
+.mega-dialog.s4 .info-container-wrap {
+    margin-bottom: 16px;
+}
+.mega-dialog.s4 .badge-container {
+    margin-top: 8px;
+    max-width: 100%;
+}
+.mega-dialog.s4 .badge {
+    background: var(--badge-fill);
+    border: solid 2px var(--switch-handle-border);
+    border-radius: 12px;
+    color: var(--text-color-high);
+    display: inline-block;
+    font: var(--text-body1);
+    margin-bottom: 8px;
+    margin-inline-end: 8px;
+    padding-inline-end: 8px;
+    padding-inline-start: 10px;
+    -webkit-margin-end: 8px;
+    -webkit-padding-end: 8px;
+    -webkit-padding-start: 10px;
+}
+.mega-dialog.s4 .badge .badge-name {
+    display: inline-block;
+}
+.mega-dialog.s4 .badge button {
+    --height: 16px;
+    margin: 0 0 1px;
+    --mask-color: var(--icon-rest);
+    padding: 0;
+}
+.mega-dialog.s4 .badge button:hover,
+.mega-dialog.s4 .badge i:hover {
+    --mask-color: var(--icon-active);
+}
+.rtl .mega-dialog.s4 .badge i {
+    left: auto;
+    right: 4px;
+}
+.mega-dialog.s4 .create-success-text {
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    margin-bottom: 24px;
+}
+.mega-dialog.s4 .keys-table {
+    background: var(--surface-grey-1);
+    border: solid 2px var(--stroke-grey-2);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    padding: 12px 16px 2px;
+    width: 100%;
+}
+.mega-dialog.s4 .keys-table td {
+    padding-bottom: 12px;
+}
+.mega-dialog.s4 .keys-table td:first-child {
+    color: var(--text-color-high);
+    width: 90px;
+}
+.mega-dialog.s4 .keys-table td:nth-child(2) {
+    position: relative;
+    top: 2px;
+}
+.mega-dialog.s4 .keys-table .secret-key-value {
+    background: transparent;
+    border: 0;
+    color: var(--text-color-medium);
+    cursor: auto;
+    font: var(--text-body1);
+    padding: 0;
+}
+.mega-dialog.s4 .keys-table .secret-key-value[type="text"] {
+    text-overflow: ellipsis;
+}
+.mega-dialog.s4 .keys-table .mega-button.small {
+    --icon-size: 24px;
+    margin: 0;
+    --mask-color: var(--icon-rest);
+}
+.mega-dialog.s4 .mega-button.small:hover i {
+    --mask-color: var(--icon-active);
+}
+
+
+.mega-dialog.s4 .s4-table-scroll .ps__scrollbar-y-rail {
+    margin: 36px 0 4px;
+}
+.mega-dialog.s4 .radio-wrap {
+    display: flex;
+    white-space: nowrap;
+}
+
+.mega-dialog.s4-create-user-dialog .step-1,
+.mega-dialog.s4-create-group-dialog .step-1 {
+    margin: 16px 0 24px;
+}
+.mega-dialog.s4-create-user-dialog .step-4,
+.mega-dialog.s4-create-group-dialog .step-4 {
+    margin-top: 8px;
+}
+.mega-dialog.s4-create-user-dialog .step-2 .s4-table-scroll .col-2 {
+    width: 170px;
+}
+.mega-dialog.s4-create-user-dialog .step-2 .s4-table-scroll .col-3 {
+    width: 272px;
+}
+.mega-dialog.s4-create-user-dialog .step-2 .group-table .group-policies {
+    font: var(--text-body2);
+}
+.mega-dialog.s4-create-user-dialog .step-2 .group-table .group-name {
+    display: block;
+    max-width: 200px;
+}
+.mega-dialog.s4-create-user-dialog .step-2 .create-group-button {
+    height: 36px;
+    margin-top: 4px;
+}
+.mega-dialog.s4-create-user-dialog .step-2 button.create-group {
+    float: right;
+    margin: 0;
+}
+.mega-dialog.s4-create-user-dialog .step-2 button.save-group {
+    float: right;
+    margin: 10px 0 33px;
+}
+.rtl .mega-dialog.s4-create-user-dialog .step-2 button.create-group,
+.rtl .mega-dialog.s4-create-user-dialog .step-2 button.save-group {
+    float: left;
+}
+.mega-dialog.s4-create-user-dialog .step-3 .sticky-header-table-container th:nth-child(2) {
+    width: calc(100% - 50px);
+}
+.mega-dialog.s4-create-user-dialog .step-3 .policy-table td:nth-child(2) {
+    width: calc(100% - 44px);
+}
+.mega-dialog.s4-create-user-dialog .step-5 .created-title {
+    color: var(--text-color-high);
+    display: inline-block;
+    font: var(--text-h3-bold);
+    padding: 3px 6px;
+}
+.mega-dialog.s4-create-user-dialog .step-4 .container-user-name,
+.mega-dialog.s4-create-user-dialog .step-4 .container-user-arn,
+.mega-dialog.s4-create-group-dialog .step-4 .container-group-name,
+.mega-dialog.s4-create-group-dialog .step-4 .container-group-arn {
+    display: block;
+    max-width: 380px;
+}
+.mega-dialog.s4-create-group-dialog .s4-table-scroll td.col-2 {
+    width: calc(100% - 44px);
+}
+.mega-dialog.s4 .s4-table-scroll .data-table tr td:last-child::after {
+    width: calc(100% - 10px);
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .radio-buttons {
+    display: flex;
+    padding: 18px 0 0 3px;
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .radio-wrap {
+    cursor: pointer;
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .radio-txt {
+    color: var(--text-color-high);
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .user-select-wrap {
+    margin-top: 32px;
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .container-user-wrap {
+    border: solid 1px var(--stroke-grey-2);
+    border-radius: 12px;
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .list-header {
+    height: 36px;
+    padding-top: 12px;
+    position: relative;
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .list-header span {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    padding-inline-start: 16px;
+    -webkit-padding-start: 16px;
+}
+
+.mega-dialog.s4-create-access-key-dialog .step-1 .key-users-table.dialog-table td span {
+    padding-inline-start: 10px;
+    -webkit-padding-start: 10px;
+}
+.mega-dialog.s4-bucket-settings-dialog {
+    width: 704px;
+}
+.mega-dialog.s4-bucket-settings-dialog .fm-dialog-tabs {
+    margin-bottom: 24px;
+    padding-top: 8px;
+}
+.mega-dialog.s4-bucket-settings-dialog .fm-dialog-tab.active {
+    font-weight: bold;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-info {
+    margin-bottom: 154px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-info .label {
+    color: var(--text-color-high);
+    font-weight: bold;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-info .value {
+    margin-inline-start: 12px;
+    -webkit-margin-start: 12px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-info-field {
+    height: 24px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-info-field:not(:first-child) {
+    margin-top: 12px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-header-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-header {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policies a.examples {
+    text-decoration: none;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-editor {
+    height: 226px;
+    margin: 8px 0 -4px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-editor * {
+    font: var(--text-code1);
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-access {
+    margin-bottom: 25px;
+    min-height: 225px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-access .access-options {
+    margin-bottom: 24px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-access .radio-txt {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-access .offset-subtext {
+    color: var(--text-color-low);
+    font: var(--text-body2);
+    margin: 4px 30px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-access .offset-subtext a {
+    text-decoration: none;
+}
+.mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror {
+    border: 2px solid var(--surface-grey-2);
+    border-radius: 12px;
+}
+.mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror-scroll {
+    padding: 14px 0;
+}
+.mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror-linenumbers {
+    background-color: var(--surface-grey-2);
+    width: 48px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policy-warning {
+    color: var(--banner-text-error);
+    background-color: var(--banner-background-error);
+    border: 1px solid var(--banner-border-error);
+    border-radius: 4px;
+    margin: 8px 0 0;
+    padding: 1px 8px;
+} 
+.mega-dialog.s4-object-access-dialog {
+    width: 622px;
+}
+.mega-dialog.s4-object-access-dialog .object-access-entry {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 24px 0 0;
+}
+.mega-dialog.s4-object-access-dialog .content-txt {
+    display: block;
+    padding-inline-end: 72px;
+    -webkit-padding-end: 72px;
+}
+.mega-dialog.s4-object-access-dialog .subtitle-txt {
+    display: block;
+    font: var(--text-h3-bold);
+    margin-bottom: 4px;
+}
+.mega-dialog.s4-object-access-dialog .bucket-access-warning.fm-notification-block {
+    margin: 8px 0 0;
+}
+.mega-dialog.s4-object-access-dialog .file-info .subtitle-txt {
+    font: var(--text-body1);
+    line-height: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mega-dialog.s4-object-access-dialog .file-info .transfer-filetype-icon {
+    margin-left: 4px;
+}
+.mega-dialog.s4-object-access-dialog .file-info .file-name {
+    margin-left: 32px;
+}
+.mega-dialog.s4-object-access-dialog .file-info .file-size {
+    font: var(--text-body2);
+    color: var(--text-color-medium);
+    margin-left: 16px;
+}
+.mega-dialog.s4-object-access-dialog .input-container {
+    border-radius: 12px;
+}
+.mega-dialog.s4-object-access-dialog .input-container i {
+    --mask-color: var(--icon-active);
+}
+.mega-dialog.s4-object-access-dialog .input-container input {
+    background-color: transparent;
+    color: var(--text-color-high);
+    font: var(--text-body2);
+}
+.mega-dialog.s4-object-access-dialog footer .footer-container {
+    padding: 16px 48px 32px;
+}
+.mega-dialog.s4 .inactive .user-input-wrap {
+    opacity: 0.6;
+}
+
+/* S4 Dialogs End */
 
 /* Stop backup dialog Begin */
 

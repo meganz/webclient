@@ -350,6 +350,7 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table.fm.v-label [megatype="label"],
 .grid-table.fm.v-size [megatype="size"],
 .grid-table.fm.v-type [megatype="type"],
+.grid-table.fm.v-accessCtrl [megatype="accessCtrl"],
 .grid-table.fm.v-timeAd [megatype="timeAd"],
 .grid-table.fm.v-timeMd [megatype="timeMd"],
 .grid-table.fm.v-versions [megatype="versions"],

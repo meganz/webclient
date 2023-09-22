@@ -1,12 +1,16 @@
 .shares-tabs-bl,
-.gallery-tabs-bl {
+.gallery-tabs-bl,
+.s4-tabs-bl {
     background-color: var(--surface-main);
     border-bottom: 1px solid var(--surface-grey-2);
     padding: 0 15px;
     box-sizing: border-box;
     margin: 0;
-    display: table;
+    display: flex;
     width: 100%;
+}
+.shares-tabs-bl {
+    padding: 14px 4px 0;
 }
 .gallery-tabs-bl {
     display: flex;
@@ -20,7 +24,8 @@
 .gallery-tabs-bl .gallery-section-tabs {
     padding-top: 14px;
 }
-.rtl .gallery-tabs-bl {
+.rtl .gallery-tabs-bl,
+.rtl .s4-user-tabs-bl {
     direction: rtl;
 }
 .fm-right-files-block.emptied .gallery-tabs-bl button:not(.gallery-close-discovery) {
@@ -56,7 +61,8 @@ body:not(.rtl) .gallery-section-discovery {
     margin-inline-end: 8px;
 }
 .shares-tab-lnk,
-.gallery-tab-lnk {
+.gallery-tab-lnk,
+.s4-tab-lnk {
     cursor: pointer;
     font: var(--text-h3);
     color: var(--text-color-high);
@@ -74,11 +80,13 @@ body:not(.rtl) .gallery-section-discovery {
     margin-bottom: -1px;
 }
 .shares-tab-lnk.filled,
-.gallery-tab-lnk.filled {
+.gallery-tab-lnk.filled,
+.s4-tab-lnk.filled {
     padding: 4px 5px 0 24px;
 }
 .shares-tab-lnk span,
-.gallery-tab-lnk span {
+.gallery-tab-lnk span,
+.s4-tab-lnk span {
     font: var(--text-body2);
     line-height: 14px;
     height: 14px;
@@ -91,11 +99,13 @@ body:not(.rtl) .gallery-section-discovery {
     border-radius: 4px;
 }
 .shares-tab-lnk.filled span,
-.gallery-tab-lnk.filled span {
+.gallery-tab-lnk.filled span,
+.s4-tab-lnk.filled span {
     display: inline-block;
 }
 .shares-tab-lnk.active,
-.gallery-tab-lnk.active {
+.gallery-tab-lnk.active,
+.s4-tab-lnk.active {
     font: var(--text-h3-bold);
     border-color: var(--secondary-blue);
     color: var(--text-color-high);

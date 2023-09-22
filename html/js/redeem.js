@@ -728,7 +728,7 @@ var redeem = {
             else {
                 // Pro I-IV and Lite
                 const voucherLength = mega.voucher.months;
-                const voucherType = pro.getProPlanName(
+                let voucherType = pro.getProPlanName(
                     mega.voucher.hasOwnProperty('item')
                         ? mega.voucher.item.al
                         : mega.voucher.proNum
@@ -736,8 +736,15 @@ var redeem = {
 
                 // Calculate whether to use month or year text for the voucher e.g. 1 years or 1 months Pro plan
                 const useYearString = voucherLength % 12 === 0;
-                const titleText = useYearString ? l.account_voucher_year : l.account_voucher_month;
-                const monthsOrYears = useYearString ? voucherLength / 12 : voucherLength;
+                let titleText = useYearString ? l.account_voucher_year : l.account_voucher_month;
+                let monthsOrYears = useYearString ? voucherLength / 12 : voucherLength;
+
+                // Temporary S4 beta voucher
+                if (mega.voucher.s4) {
+                    voucherType = l.s4_beta_title;
+                    titleText = l.account_voucher_month;
+                    monthsOrYears = mega.voucher.businessmonths;
+                }
 
                 $dlgTitle.text(mega.icu.format(titleText, monthsOrYears).replace('%1', voucherType));
 

@@ -19,7 +19,7 @@
 .fm-empty-section i.section-icon,
 .fm-empty-pad i.section-icon,
 .fm-empty-sharef i.section-icon {
-    --icon-size: 192px;
+    --icon-size: 256px;
     --mask-color: var(--secondary-grey);
     display: inline-block;
 }

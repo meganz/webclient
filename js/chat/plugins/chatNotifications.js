@@ -429,7 +429,7 @@ var ChatNotifications = function(megaChat, options) {
         }
     };
 
-    if (mega.pendingServiceWorkerHandler) {
+    if (!is_chatlink && mega.pendingServiceWorkerHandler) {
 
         // Process the pending messages when chat has finished loading.
         megaChat.rebind('onInit.swPending', SoonFc(500, () => {

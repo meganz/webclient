@@ -33,7 +33,7 @@ function dlinfo(ph,key,next)
     }
     else {
         // Fetch the file information and optionally the download URL
-        api.req({a: 'g', p: ph})
+        api.req({a: 'g', p: ph, ad: 1})
             .then(({result}) => result)
             .always(setupSingleDownloadPage)
             .catch(tell);

@@ -3932,6 +3932,7 @@ else if (!browserUpdate) {
             if (dl_res) {
                 var g = {
                     a: 'g',
+                    ad: 1,
                     p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
                 };
 

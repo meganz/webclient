@@ -979,7 +979,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 2;
+            const WORKER_VERSION = 3;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

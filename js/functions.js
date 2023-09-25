@@ -253,19 +253,16 @@ function ellipsis(text, location, maxCharacters) {
 }
 
 function megatitle(nperc) {
+    'use strict';
+
     if (!nperc) {
         nperc = '';
     }
-    var a = parseInt($('.notification-num:first').text());
-    if (a > 0) {
-        a = '(' + a + ') ';
-    }
-    else {
-        a = '';
-    }
-    if (document.title !== a + mega_title + nperc) {
-        document.title = a + mega_title + nperc;
-    }
+
+    let a = document.querySelector('.js-notification-num');
+    a = (a = a && parseInt(a.textContent)) > 0 ? `(${a}) ` : '';
+
+    document.title = a + mega_title + nperc;
 }
 
 function countrydetails(isocode) {
@@ -827,37 +824,19 @@ function addZeroIfLenLessThen(val, len) {
 }
 
 function ASSERT(what, msg, udata) {
+    'use strict';
+
     if (!what) {
-        var af = new Error('failed assertion; ' + msg);
-        if (udata) {
-            af.udata = udata;
-        }
-        Soon(function() {
-            throw af;
-        });
-        if (console.assert) {
-            console.assert(what, msg);
-        }
-        else {
-            console.error('FAILED ASSERTION', msg);
-        }
+        reportError(new Error(`failed assertion, ${msg}`));
     }
     return !!what;
 }
 
 // log failures through jscrashes system
 function srvlog(msg, data, silent) {
-    if (data && !(data instanceof Error)) {
-        data = {
-            udata: data
-        };
-    }
-    if (!silent && d) {
-        console.error(msg, data);
-    }
-    if (typeof window.onerror === 'function') {
-        window.onerror(msg, '@srvlog', data ? 1 : -1, 0, data || null);
-    }
+    'use strict';
+
+    reportError(msg);
 }
 
 // log failures through event id 99666
@@ -2404,6 +2383,7 @@ function getFMColPrefs(pref) {
     columnsPreferences.timeMd = pref & 16;
     columnsPreferences.versions = pref & 2;
     columnsPreferences.playtime = pref & 128;
+    columnsPreferences.accessCtrl = pref & 256;
 
     return columnsPreferences;
 }
@@ -2424,6 +2404,7 @@ function getNumberColPrefs(colName) {
         case 'timeMd': return 16;
         case 'versions': return 2;
         case 'playtime': return 128;
+        case 'accessCtrl': return 256;
         default: return null;
     }
 }

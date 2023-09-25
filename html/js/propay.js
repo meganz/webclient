@@ -1451,13 +1451,15 @@ pro.propay = {
         else {
             // Store the gateway name for later
             pro.propay.proPaymentMethod = selectedPaymentGatewayName;
+            console.assert(pro.propay.proPaymentMethod, 'check this...invalid gateway');
 
             // For credit card we show the dialog first, then do the uts/utc calls
             if (pro.propay.proPaymentMethod === 'perfunctio') {
                 cardDialog.init();
             }
-            else if (pro.propay.proPaymentMethod.indexOf('ecp') === 0
-                || pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
+            else if (String(pro.propay.proPaymentMethod).indexOf('ecp') === 0
+                || String(pro.propay.proPaymentMethod).toLowerCase().indexOf('stripe') === 0) {
+
                 if (pro.propay.userSubsGatewayId === 2 || pro.propay.userSubsGatewayId === 3) {
                     // Detect the user has subscribed to a Pro plan with Google Play or Apple store
                     // pop up the warning dialog but let the user proceed with an upgrade

@@ -449,10 +449,7 @@ function geoStaticPath(cms) {
 var myURL = window.URL;
 
 // Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
-browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' || window.MSBlobBuilder
-    || typeof history !== 'object' || typeof history.replaceState !== 'function'
-    || window.chrome && !document.exitPointerLock
-;
+browserUpdate = browserUpdate || typeof BigInt === 'undefined';
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -725,10 +722,12 @@ var mega = {
                         eventlog(99679, true); // sc processing took too long
                     });
 
+                    $.closeMsgDialog = 1;
                     msgDialog('warninga:!^' + l[17704] + '!' + l[17705], l[882], l[17706], 0, function(yes) {
                         if (yes) {
                             fm_forcerefresh();
                         }
+                        $.closeMsgDialog = 0;
                     });
 
                     r.scSent = now;
@@ -778,11 +777,11 @@ var mega = {
         }
 
         if (storage.csp) {
-            to += `${_getSeperator()}csp=${storage.csp}`;
+            to += _getSeperator() + 'csp=' + storage.csp;
         }
 
         if (storage.utm) {
-            to += `${_getSeperator()}sra=${b64encode(storage.utm)}`;
+            to += _getSeperator() + 'sra=' + b64encode(storage.utm);
         }
 
         if (Array.isArray(kv)) {
@@ -2166,10 +2165,6 @@ else if (!browserUpdate) {
             }
 
             var expectedSourceOrigin = url || ln > 999;
-            if (url === '@srvlog') {
-                url = '';
-            }
-
             var dump = {
                 l: ln,
                 f: mTrim(url),
@@ -2210,6 +2205,8 @@ else if (!browserUpdate) {
             dump.m = (
                 is_mobile ? '[mobile] ' :
                     is_embed ? '[embed] ' :
+                        window.pfid ? '[FL] ' :
+                            mega.infinity ? '[INF] ' :
                         is_drop ? '[drop] ' : ''
             ) + dump.m.replace(/\s+/g, ' ');
 
@@ -2265,7 +2262,6 @@ else if (!browserUpdate) {
 
             if (errobj)
             {
-                if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
                     var maxStackLines = 15;
@@ -2566,6 +2562,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
     jsl.push({f:'js/keymgr.js', n: 'keymgr_js', j:1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
+    jsl.push({f:'js/utils/md5.js', n: 'js_utils_md5_js', j: 1});
     jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
     jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
     jsl.push({f:'js/utils/splitter.js', n: 'js_utils_splitter_js', j: 1});
@@ -2606,7 +2603,6 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/login.js', n: 'login_js', j:1});
     jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
     jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
-
 
     jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
@@ -2817,7 +2813,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
         jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
         jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
-
         jsl.push({f:'js/ui/dragselect.js', n: 'dargselect_js', j:1});
 
         // Gallery helpers
@@ -2832,7 +2827,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/fm/gallery/gallery.js', n: 'fm_gallery_js', j:1});
 
-        // Albums
         jsl.push({f:'js/fm/albums/Albums.js', n: 'fm_albums_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
@@ -3155,6 +3149,25 @@ else if (!browserUpdate) {
             'webgl:exif_js': {f:'js/vendor/exif.js', n: 'webgl:exif_js', j:5},
             'webgl:dcraw_js': {f:'js/vendor/dcraw.js', n: 'webgl:dcraw_js', j:5},
             'webgl:smartcrop_js': {f:'js/vendor/smartcrop.js', n: 'webgl:smartcrop_js', j:5}
+        },
+        's4': {
+            's4:s4_common_css': {f:'css/s4-common.css', n: 's4_common_css', j:2,w:5},
+            's4:s4_list_css': {f:'css/s4-list.css', n: 's4_list_css', j:2,w:5},
+            's4:s4_info_css': {f:'css/s4-info.css', n: 's4_info_css', j:2,w:5},
+            's4:s4_empty_css': {f:'css/s4-empty.css', n: 's4_empty_css', j:2,w:5},
+
+            's4:fm_s4_ui_js': {f:'js/fm/s4/ui.js', n: 'fm_s4_ui_js', j:1},
+            's4:fm_s4_utils_js': {f:'js/fm/s4/utils.js', n: 'fm_s4_utils_js', j:1},
+            's4:fm_s4_objects_js': {f:'js/fm/s4/objects.js', n: 'fm_s4_objects_js', j:1},
+            's4:fm_s4_buckets_js': {f:'js/fm/s4/buckets.js', n: 'fm_s4_buckets_js', j:1},
+            's4:fm_s4_keys_js': {f:'js/fm/s4/keys.js', n: 'fm_s4_keys_js', j:1},
+            's4:fm_s4_groups_js': {f:'js/fm/s4/groups.js', n: 'fm_s4_groups_js', j:1},
+            's4:fm_s4_group_properties_js': {f:'js/fm/s4/properties-group.js', n: 'fm_s4_group_properties_js', j:1},
+            's4:fm_s4_users_js': {f:'js/fm/s4/users.js', n: 'fm_s4_users_js', j:1},
+            's4:fm_s4_user_properties_js': {f:'js/fm/s4/properties-user.js', n: 'fm_s4_user_properties_js', j:1},
+            's4:fm_s4_policies_js': {f:'js/fm/s4/policies.js', n: 'fm_s4_policies_js', j:1},
+            's4:fm_s4_policy_properties_js': {f:'js/fm/s4/properties-policy.js', n: 'fm_s4_policy_properties_js', j:1},
+            's4:kernel': {f:'js/utils/s4.js', n: 'js_utils_s4_js', j: 1}
         },
         'chat': {
             /* chat related css */
@@ -3622,9 +3635,7 @@ else if (!browserUpdate) {
 
         scriptTest(
             'es6s =' +
-            ' ({...{a:23}}).a === 23' + // C60 E79 F55 O47 S11
-            ' && Promise.prototype.finally' + // C63 E18 F58 O50 S11
-            ' && typeof ReadableStream === "function"' + // C43 E14 F65 O30 S10
+            ' BigInt(Math.pow(2, 48)) << 16n === 18446744073709551616n' + // C67 E79 F68 O54 S14
             ' && (Array.prototype.values === Array.prototype[Symbol.iterator])' + // C66 E12 F60 O53 S9
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {
@@ -3920,6 +3931,7 @@ else if (!browserUpdate) {
             if (dl_res) {
                 var g = {
                     a: 'g',
+                    ad: 1,
                     p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
                 };
 
@@ -4356,3 +4368,5 @@ mBroadcaster.once('startMega', function() {
 
     Object.defineProperty(window, 'dump', {value: console.warn.bind(console, '[dump]')});
 });
+
+Object.defineProperty(self, 's4', {value: Object.create(null)});

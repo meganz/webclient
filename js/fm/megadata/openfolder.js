@@ -312,6 +312,29 @@
         if (this.currentrootid === this.RootID) {
             this.lastSeenCloudFolder = this.currentdirid;
         }
+        else if (this.currentrootid === 's4') {
+            let target = id;
+
+            if ('kernel' in s4) {
+                const {p} = s4.kernel.getS4BucketForObject(id);
+
+                if (p) {
+                    target = `${p}/${id}`;
+                }
+            }
+            else {
+                console.error('invalid code-path...');
+                return this.openFolder('fm').catch(dump);
+            }
+
+            if (target !== id) {
+                this.currentdirid = id = target;
+                this.currentCustomView = this.isCustomView(id);
+            }
+
+            // Render S4 section / S4 FM header
+            queueMicrotask(() => s4.ui.render());
+        }
 
         $('.nw-fm-tree-item.opened').removeClass('opened');
         $('.fm-notification-block.duplicated-items-found').removeClass('visible');
@@ -443,7 +466,6 @@
             else {
                 this.doSort('name', 1);
             }
-
             this.renderMain();
 
             if (fminitialized && !is_mobile) {
@@ -750,6 +772,21 @@
         else if (cv.type === 'gallery') {
 
             this.gallery = 1;
+        }
+        else if (cv.type === 's4') {
+            let target = null;
+
+            if ('kernel' in s4) {
+                const {length} = id.split('/');
+                target = length === 3 ? id : s4.utils.validateS4Url(id);
+            }
+
+            if (!target) {
+                return M.openFolder(M.RootID, true);
+            }
+
+            id = cv.nodeID;
+            fetchDBNodes = ['container', 'bucket'].includes(cv.subType) && id.length === 8;
         }
         else if (
             id &&

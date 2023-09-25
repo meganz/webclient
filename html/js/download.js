@@ -33,7 +33,7 @@ function dlinfo(ph,key,next)
     }
     else {
         // Fetch the file information and optionally the download URL
-        api.req({a: 'g', p: ph})
+        api.req({a: 'g', p: ph, ad: 1})
             .then(({result}) => result)
             .always(setupSingleDownloadPage)
             .catch(tell);
@@ -767,6 +767,11 @@ function dlPageStartDownload(isDlWithMegaSync) {
     else if (mediaCollectFn) {
         onIdle(mediaCollectFn);
         mediaCollectFn = null;
+    }
+
+    if (fdl_queue_var === false) {
+        console.error('This download did complete, fix the UI and set it up from scratch...');
+        return;
     }
 
     if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {

@@ -241,8 +241,14 @@ MegaData.prototype.getPath = function(id) {
             || M.isDynPage(id)
             || mega.gallery.sections[id]
             || id === 'file-requests'
+            || id === 's4'
         ) {
             result.push(id);
+        }
+        else if (cv.type === 's4' && 'utils' in s4) {
+            // Get S4 subpath for subpages other than Containers and Buckets
+            // Container and Bucket will using existing method as it's node handle exist in M.d.
+            return s4.utils.getS4SubPath(cv.original);
         }
         else if (!id || id.length !== 11) {
             return [];
@@ -268,8 +274,14 @@ MegaData.prototype.getPath = function(id) {
         }
 
         if (loop) {
-            if (!(this.d[id] && this.d[id].p)) {
+
+            if (id === 's4' || !(this.d[id] && this.d[id].p)) {
                 break;
+            }
+
+            if (this.d[id].s4 && this.d[id].p === this.RootID) {
+                id = 's4';
+                continue;
             }
 
             inshare = this.d[id].su;
@@ -294,6 +306,10 @@ MegaData.prototype.getPath = function(id) {
             }
             else if (cv.type === 'gallery' && cv.nodeID === result[i]) {
                 result[i + 1] = 'discovery';
+                break;
+            }
+            else if (cv.type === 's4' && cv.containerID === result[i]) {
+                result[i + 1] = 's4';
                 break;
             }
             else if (cv.type === 'file-requests' && mega.fileRequest.publicFolderExists(result[i], true)) {
@@ -321,8 +337,8 @@ MegaData.prototype.isCustomView = function(pathOrID) {
     if (!pathOrID || typeof pathOrID !== 'string') {
         return false;
     }
-
     var result = Object.create(null);
+    const node = M.getNodeByHandle(pathOrID.substr(0, 8));
     result.original = pathOrID;
 
     // Basic gallery view
@@ -331,6 +347,39 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.nodeID = pathOrID;
         result.prefixTree = '';
         result.prefixPath = '';
+    }
+    // Check whether the node is a bucket or a container
+    else if (node.s4 && node.t) {
+        result.original = pathOrID.replace(/_/g, '/');
+        const s4path = s4.utils && s4.utils.getS4SubPath(result.original).reverse() || [0, pathOrID];
+
+        result.original = s4path[1] === s4path[2] ? `${s4path[1]}/` : result.original;
+        result.prefixTree = '';
+        result.prefixPath = '';
+        result.containerID = s4path[1];
+        result.type = 's4';
+
+        if (s4path.length >= 3) {
+
+            result.nodeID = s4path[3] || s4path[2];
+            result.prefixPath = `${s4path[1]}/`;
+            result.subType = ['keys', 'policies', 'users', 'groups'].includes(s4path[2]) ? s4path[2] : 'bucket';
+            if (s4path.length === 4) {
+                result.nodeID = s4path[2];
+            }
+        }
+        else if (s4path.length === 2 && node.p !== M.RootID) {
+
+            result.containerID = node.p;
+            result.nodeID = s4path[1];
+            result.prefixPath = `${node.p}/`;
+            result.subType = 'bucket';
+        }
+        else {
+
+            result.nodeID = s4path[1];
+            result.subType = 'container';
+        }
     }
     // Media discovery view
     else if (pathOrID.startsWith('discovery')) {
@@ -546,6 +595,106 @@ MegaData.prototype.clearRubbish = async function(all) {
 
     return res;
 };
+
+/**
+ * Confirm newly established nodes at specific locations retains expected validity.
+ * @param {String|Array} nodes ufs-node's handle, or an array of them.
+ * @name confirmNodesAtLocation
+ * @memberOf MegaData.prototype
+ * @returns {Promise<*>} ack
+ */
+lazy(MegaData.prototype, 'confirmNodesAtLocation', () => {
+    'use strict';
+    let promise;
+    const bulk = new Set();
+    const sml = `NAL.${makeUUID()}`;
+
+    const attachS4Bucket = async(n) => {
+        const name = n.name;
+        return s4.kernel.bucket.create(n.p, n)
+            .then(() => {
+                if (name !== n.name) {
+                    showToast('info', l.s4_bucket_autorename.replace('%1', n.name));
+                }
+            })
+            .catch((ex) => {
+                if (d) {
+                    console.error(`Failed to establish S4 Bucket from existing node (${n.h})...`, ex, n);
+                }
+                return M.moveToRubbish(n.h);
+            });
+    };
+
+    const dequeue = async(nodes) => {
+        const promises = [];
+        const parents = Object.create(null);
+
+        for (let i = nodes.length; i--;) {
+            const n = M.getNodeByHandle(nodes[i]);
+
+            if (n) {
+                const p = M.getNodeByHandle(n.p);
+                const ps4t = p.s4 && s4.kernel.getS4NodeType(p);
+
+                if (n.s4) {
+                    if (d) {
+                        console.warn(`Revoking S4 attribute for ${n.h}`);
+                    }
+
+                    if (ps4t !== 'container') {
+                        promises.push(api.setNodeAttributes(n, {s4: undefined}));
+                    }
+                }
+
+                if (ps4t) {
+
+                    if (ps4t === 'container') {
+                        promises.push(attachS4Bucket(n));
+                    }
+                    else if (ps4t === 'bucket') {
+
+                        // @todo if type is bucket, validate expected object-type
+                    }
+                }
+
+                parents[n.p] = n;
+            }
+        }
+
+        if (promises.length) {
+            await Promise.all(promises);
+        }
+
+        return parents;
+    };
+
+    const dispatcher = () => {
+        const {resolve, reject} = promise;
+
+        dequeue([...bulk])
+            .then(resolve)
+            .catch((ex) => {
+                if (d) {
+                    console.error('confirmNodesAtLocation', ex);
+                }
+                reject(ex);
+            });
+
+        bulk.clear();
+        promise = null;
+    };
+
+    return (nodes) => {
+        if (Array.isArray(nodes)) {
+            nodes.map(bulk.add, bulk);
+        }
+        else {
+            bulk.add(nodes);
+        }
+        delay(sml, dispatcher);
+        return promise || (promise = mega.promise);
+    };
+});
 
 // This function has a special hacky purpose, don't use it if you don't know what it does, use M.copyNodes instead.
 MegaData.prototype.injectNodes = function(nodes, target, callback) {
@@ -836,6 +985,9 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
                 }
             }
 
+            // @todo better error handling..
+            this.confirmNodesAtLocation(result).catch(tell);
+
             return result;
 
         })
@@ -1048,7 +1200,7 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
                         nodes[i] = h;
                     }
 
-                    return Promise.all(promises).then(() => st);
+                    return Promise.all(promises).then(() => M.confirmNodesAtLocation(nodes)).then(() => st);
                 })
                 .then((res) => {
                     $.tresizer();
@@ -1804,8 +1956,20 @@ MegaData.prototype.rename = async function(itemHandle, newItemName) {
     }
 
     if (n && n.name !== newItemName) {
+        const prop = {name: newItemName};
 
-        return api.setNodeAttributes(n, {name: newItemName});
+        if (n.s4) {
+            const res = s4.kernel.validateForeignAction('rename', {node: n, ...prop});
+
+            if (res) {
+                if (res instanceof Promise) {
+                    return res;
+                }
+                prop.name = res;
+            }
+        }
+
+        return api.setNodeAttributes(n, prop);
     }
 };
 
@@ -2787,6 +2951,10 @@ MegaData.prototype.getNodeRights = function(id) {
         return false;
     }
 
+    if (this.geS4NodeType(id) === 'container') {
+        return 0;
+    }
+
     while (this.d[id] && this.d[id].p) {
         if (this.d[id].r >= 0) {
             if (missingkeys[id]) {
@@ -2919,7 +3087,7 @@ MegaData.prototype.isFolder = function(nodesId) {
  * @param {String|Array} name Either a string with the folder name to create, or an array of them.
  * @return {Promise} the handle of the deeper created folder.
  */
-MegaData.prototype.createFolder = promisify(function(resolve, reject, target, name) {
+MegaData.prototype.createFolder = promisify(function(resolve, reject, target, name, attrs) {
     "use strict";
     var self = this;
     var inflight = self.cfInflightR;
@@ -2998,7 +3166,11 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
             }
         }
 
-        var n = {name: name};
+        const n = {...attrs, name};
+        if (M.d[target].s4) {
+            s4.kernel.setNodeAttributesByRef(target, n);
+        }
+
         var attr = ab_to_base64(crypto_makeattr(n));
         var key = a32_to_base64(encrypt_key(u_k_aes, n.k));
         var req = {a: 'p', t: target, n: [{h: 'xxxxxxxx', t: 1, a: attr, k: key}], i: requesti};
@@ -3009,7 +3181,12 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
             req.cr[1][0] = 'xxxxxxxx';
         }
 
-        api.screq(req).then(({handle}) => resolve(handle)).catch(reject);
+        api.screq(req).then(({handle}) => resolve(handle))
+            .then(() => {
+                if (M.d[target].s4 && name !== n.name) {
+                    showToast('info', l.s4_bucket_autorename.replace('%1', n.name));
+                }
+            }).catch(reject);
     };
 
     if (M.c[target]) {
@@ -4355,6 +4532,32 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
             delete $.clearCopyNodeAttr;
         });
     }
+};
+
+/**
+ * Simplified check whether an object is a S4 container or bucket node
+ * @param {MegaNode|Object|String} n The object to check
+ * @returns {String} Node type
+ */
+MegaData.prototype.geS4NodeType = function(n) {
+    "use strict";
+
+    if (typeof n === 'string') {
+        n = this.getNodeByHandle(n);
+    }
+
+    if (crypto_keyok(n)) {
+
+        if (n.s4 && n.p === this.RootID) {
+            return 'container';
+        }
+
+        if ((n = M.d[n.p]) && n.s4 && n.p === this.RootID) {
+            return 'bucket';
+        }
+    }
+
+    return false;
 };
 
 /**

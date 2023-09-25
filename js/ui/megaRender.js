@@ -844,7 +844,12 @@
                     props.classNames.push('inbound-share');
                 }
 
-                if (aNode.t) {
+                if (aNode.s4 && M.geS4NodeType(aNode) === 'bucket') {
+                    props.type = l.s4_bucket_type;
+                    props.classNames.push('folder');
+                    props.size = bytesToSize(aNode.tb || 0);
+                }
+                else if (aNode.t) {
                     props.type = l[1049];
                     props.classNames.push('folder');
                     props.size = bytesToSize(aNode.tb || 0);
@@ -1005,6 +1010,7 @@
                     }
                 }
 
+                props.icon = fileIcon(aNode);
                 props.userNames = props.userNames.sort();
                 props.lastSharedAt = time2date(props.lastSharedAt);
                 props.folderSize = bytesToSize(aNode.tb + (aNode.tvb || 0));
@@ -1133,6 +1139,11 @@
 
                     tmp = aTemplate.querySelector('.transfer-filetype-icon');
 
+                    // Public URL Access for S4 Bucket or Object
+                    if (M.currentrootid === 's4' && s4.ui) {
+                        aTemplate = s4.ui.updateNodePublicAccess(aNode, aTemplate);
+                    }
+
                     if (aProperties.icon) {
                         tmp.classList.add(aProperties.icon);
                     }
@@ -1251,6 +1262,8 @@
                 aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
 
                 if (this.viewmode) {
+                    elm = aTemplate.querySelector('.block-view-file-type');
+
                     if (aProperties.avatars) {
 
                         var avatarElement;
@@ -1310,6 +1323,10 @@
 
                     if (String(aProperties.name).length > 78) {
                         aTemplate.setAttribute('title', aProperties.name);
+                    }
+
+                    if (aProperties.icon) {
+                        aTemplate.querySelector('.shared-folder-icon').classList.add(aProperties.icon);
                     }
                 }
 

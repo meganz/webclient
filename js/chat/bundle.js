@@ -13965,7 +13965,7 @@ class ConversationPanels extends mixins.wl {
       });
     };
     this.state.supportAlert = !megaChat.hasSupportForCalls;
-    this.state.notificationsPermissions = Notification.permission;
+    this.state.notificationsPermissions = window.Notification ? Notification.permission : 'granted';
   }
   renderNotificationsPending() {
     return external_React_default().createElement(Alert, {
@@ -27623,7 +27623,7 @@ class ScheduleMetaChange extends _mixin_jsx1__.y {
         asyncApiReq({
           a: 'mcsmfical',
           id
-        }).then(res => {
+        }).then(([, res]) => {
           delay(`saveical${id}`, () => {
             M.saveAs(base64urldecode(res), `${title.replace(/\W/g, '')}.ics`).then(nop).catch(() => {
               msgDialog('error', '', l.calendar_add_failed, '');

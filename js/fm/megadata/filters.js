@@ -74,7 +74,7 @@ MegaData.prototype.filterByParent = function(id) {
             .map((h) => M.d[h])
             .filter((n) => {
                 // Filter versioned file or undefined node.
-                if (!n || n.fv /* || n.s4*/) { // @todo
+                if (!n || n.fv || n.s4 && n.p === M.RootID) {
                     return false;
                 }
 
@@ -219,12 +219,14 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
 
     if (regex) {
         return function(node) {
-            return node.name && regex.test(node.name) && node.p !== 'contacts';
+            return node.name && regex.test(node.name)
+                && node.p !== 'contacts' && !(node.s4 && node.p === M.RootID);
         };
     }
 
     return function(node) {
-        return (node.name && node.name.toLowerCase().indexOf(str) !== -1 && node.p !== 'contacts');
+        return node.name && node.name.toLowerCase().includes(str)
+            && node.p !== 'contacts' && !(node.s4 && node.p === M.RootID);
     };
 };
 

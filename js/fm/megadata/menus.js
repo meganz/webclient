@@ -95,9 +95,11 @@ MegaData.prototype.buildSubMenu = function(id) {
 MegaData.prototype.getSelectedSourceRoot = function(isSearch) {
     'use strict';
 
-    let sourceRoot = isSearch || M.currentdirid === 'recents' ? M.getNodeRoot($.selected[0]) : M.currentrootid;
+    let sourceRoot = isSearch || M.currentdirid === 'recents'
+        || M.currentdirid === 'public-links' || M.currentdirid === 'out-shares'
+        ? M.getNodeRoot($.selected[0]) : M.currentrootid;
 
-    if (sourceRoot === 'public-links' || sourceRoot === 'out-shares' || sourceRoot === 'file-requests') {
+    if (sourceRoot === 'file-requests') {
         sourceRoot = M.RootID;
     }
 
@@ -115,8 +117,8 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
             let n = M.d[$.selected[i]];
             const nRoot = isSearch ? n && n.u === u_handle && M.getNodeRoot($.selected[i]) : sourceRoot;
 
-            if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID && !M.isDynPage(nRoot))
-                || nRoot === M.RubbishID) {
+            if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID && nRoot !== 's4'
+                && !M.isDynPage(nRoot)) || nRoot === M.RubbishID) {
 
                 return false;
             }
@@ -185,7 +187,9 @@ MegaData.prototype.menuItems = async function menuItems() {
                 items['.open-item'] = 1;
             }
 
-            if ((sourceRoot === M.RootID || M.isDynPage(M.currentrootid)) && !folderlink) {
+            if ((sourceRoot === M.RootID || sourceRoot === 's4'
+                || M.isDynPage(M.currentrootid)) && !folderlink) {
+
                 let exp = false;
                 const shares = this.getNodeShareUsers(selNode);
 
@@ -251,6 +255,7 @@ MegaData.prototype.menuItems = async function menuItems() {
         }
 
         if (M.currentCustomView || M.currentdirid.startsWith('search/')) {
+            items['.open-cloud-item'] = 1;
             if (folderlink) {
                 items['.open-in-location'] = 1;
             }
@@ -282,6 +287,10 @@ MegaData.prototype.menuItems = async function menuItems() {
         }
         else if (items['.edit-file-item']) {
             $('.dropdown-item.edit-file-item span').text(l[16797]);
+        }
+
+        if (selNode.vhl) {
+            items['.vhl-item'] = 1;
         }
     }
 
@@ -366,12 +375,15 @@ MegaData.prototype.menuItems = async function menuItems() {
     if (selNode.t && !folderlink && M.currentrootid !== M.RubbishID &&
         M.currentrootid !== 'out-shares' && M.currentrootid !== 'shares' &&
         M.currentrootid !== 'public-links' && M.currentdirid !== 'recents' &&
+        M.currentrootid !== 's4' &&
         $.selected.length === 1 &&
         (!M.isGalleryPage() || selNode.h !== M.currentCustomView.nodeID)) {
         items['.open-gallery'] = 1;
     }
 
-    if ((sourceRoot === M.RootID || M.isDynPage(M.currentrootid)) && !folderlink) {
+    if ((sourceRoot === M.RootID
+         || sourceRoot === 's4' || M.isDynPage(M.currentrootid)) && !folderlink) {
+
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
 
@@ -510,7 +522,7 @@ MegaData.prototype.menuItems = async function menuItems() {
     }
 
     if (restrictedFolders || $.selected.length === 1
-        && M.getNodeRoot($.selected[0]) === M.InboxID) {
+        && sourceRoot === M.InboxID) {
 
         delete items['.open-cloud-item'];
         delete items['.open-in-location'];
@@ -548,6 +560,36 @@ MegaData.prototype.menuItems = async function menuItems() {
             if (M.getNodeShareUsers(selNode, 'EXP').length || M.ps[selNode]) {
                 items['.removeshare-item'] = 1;
             }
+        }
+    }
+
+    // S4 Object Storage
+    if ($.selected.length === 1 && sourceRoot === 's4') {
+        const s4Type = s4.kernel.getS4NodeType(selNode);
+
+        delete items['.open-cloud-item'];
+
+        if (M.currentCustomView.type !== 's4' || M.currentdirid.startsWith('search/')) {
+            items['.open-s4-item'] = 1;
+        }
+
+        // Temporary block most of actions over the containers
+        if (s4Type === 'container') {
+            delete items['.move-item'];
+            delete items['.rename-item'];
+            delete items['.add-star-item'];
+            delete items['.colour-label-items'];
+            delete items['.embedcode-item'];
+            delete items['.properties-versions'];
+            delete items['.clearprevious-versions'];
+            delete items['.remove-item'];
+        }
+        else if (s4Type === 'bucket') {
+            delete items['.properties-item'];
+            items['.settings-item'] = 1;
+        }
+        else if (s4Type === 'object') {
+            items['.managepuburl-item'] = 1;
         }
     }
 
@@ -650,13 +692,18 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
 
             const nodeRights = M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid);
+            const h = M.currentdirid.split('/').pop();
+            const n = M.getNodeByHandle(h);
 
             if (nodeRights && M.currentrootid !== M.RubbishID && M.currentrootid !== M.InboxID
-                && M.getNodeRoot(M.currentdirid.split('/').pop()) !== M.InboxID) {
+                && M.getNodeRoot(h) !== M.InboxID) {
 
                 if (M.currentrootid === 'contacts') {
                     $(menuCMI).filter('.addcontact-item').removeClass('hidden');
                     ignoreGrideExtras = true;
+                }
+                else if (n.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(n) === 'container') {
+                    $(menuCMI).filter('.new-bucket-item').removeClass('hidden');
                 }
                 else {
                     $(menuCMI).filter('.fileupload-item,.newfolder-item').removeClass('hidden');
@@ -975,6 +1022,18 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         $('span', $importItem).text(l.btn_imptomega);
                     }
                 }
+
+                if (items['.open-item']) {
+                    const $openItem = $menuCMI.filter('.open-item');
+                    const n = M.getNodeByHandle(id);
+
+                    if (n.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(n) === 'bucket') {
+                        $('i', $openItem).removeClass('icon-folder-open').addClass('icon-bucket');
+                    }
+                    else {
+                        $('i', $openItem).removeClass('icon-bucket').addClass('icon-folder-open');
+                    }
+                }
             };
 
             M.menuItems()
@@ -1092,16 +1151,29 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
 MegaData.prototype.setContextMenuShareText = function() {
     'use strict';
 
-    const selectedNode = M.d[$.selected[0]] || false;
+    const n = M.d[$.selected[0]] || false;
+    const isS4Bucket = n.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(n) === 'bucket';
+    const shareItem = document.querySelector('.dropdown.body .sh4r1ng-item');
+    const removeItem = document.querySelector('.dropdown.body .removeshare-item');
     let getLinkText = M.currentrootid === M.InboxID
         || M.getNodeRoot($.selected[0]) === M.InboxID ? l.read_only_share : l[5631];
+    let manageIcon = 'icon-folder-outgoing-share';
+    let removeIcon = 'icon-folder-remove-share';
+
+    if (isS4Bucket) {
+        getLinkText = l.s4_share_bucket;
+        manageIcon = 'icon-bucket-outgoing-share';
+        removeIcon = 'icon-bucket-remove-share';
+    }
 
     // If the node has shares or pending shares, set to 'Manage share', else, 'Share folder'
-    if (selectedNode && M.getNodeShareUsers(selectedNode, 'EXP').length || M.ps[selectedNode]) {
+    if (n && M.getNodeShareUsers(n, 'EXP').length || M.ps[n]) {
         getLinkText = l.manage_share;
     }
 
-    $('.sh4r1ng-item span', '.dropdown.body').text(getLinkText);
+    shareItem.querySelector('span').textContent = getLinkText;
+    shareItem.querySelector('i').className = `sprite-fm-mono ${manageIcon}`;
+    removeItem.querySelector('i').className = `sprite-fm-mono ${removeIcon}`;
 };
 
 /**

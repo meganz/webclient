@@ -115,6 +115,7 @@ function startMega() {
     }
 
     if (silent_loading) {
+        loadingDialog.hide('jsl-loader');
         onIdle(silent_loading);
         silent_loading = false;
     }
@@ -424,7 +425,7 @@ function init_page() {
 
     $('#loading').hide();
     if (window.loadingDialog) {
-        loadingDialog.hide();
+        loadingDialog.hide('force');
     }
 
     if (is_chatlink || page.substr(0, 5) === 'chat/') {
@@ -3108,10 +3109,6 @@ function loadSubPage(tpage, event) {
         dlPageCleanup();
     }
 
-    if (silent_loading) {
-        return false;
-    }
-
     if (window.slideshowid) {
         slideshow(0, 1);
     }
@@ -3239,7 +3236,7 @@ function loadSubPage(tpage, event) {
     }
 
     if (jsl.length > 0) {
-        loadingDialog.show();
+        loadingDialog.show('jsl-loader');
         jsl_start();
     }
     else {

@@ -132,6 +132,10 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
         }
         stype = "rubbish-bin";
     }
+    else if (n.h === 's4' || n.s4 && n.p === M.RootID) {
+        s4.utils.renderContainerTree(dialog);
+        stype = 's4';
+    }
     /* eslint-enable local-rules/jquery-replacements */
 
     prefix = stype;
@@ -267,6 +271,10 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
             containsc = this.tree[curItemHandle] || '';
             name = folders[idx].name;
 
+            if (folders[idx].s4 && folders[idx].p === M.RootID) {
+                continue;
+            }
+
             if (curItemHandle === M.RootID || tn[typefix + curItemHandle] || dialog && dn[curItemHandle]) {
 
                 if (containsc) {
@@ -347,7 +355,11 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                     }
                 }
                 node = node.querySelector('.nw-fm-tree-folder');
-                if (folders[idx].su || Object(M.c.shares[curItemHandle]).su) {
+
+                if (folders[idx].s4 || M.tree.s4 && M.tree.s4[folders[idx].p]) {
+                    node.className = 'nw-fm-tree-icon-wrap sprite-fm-mono icon-bucket-filled';
+                }
+                else if (folders[idx].su || Object(M.c.shares[curItemHandle]).su) {
                     node.classList.add('inbound-share');
                 }
                 else if (folders[idx].t & M.IS_SHARED) {
@@ -374,7 +386,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 else {
                     node = document.getElementById(_sub + n.h);
 
-                    if (idx === 0 && (i = node && node.querySelector('li'))) {
+                    if (idx === 0 && (i = node && node.querySelector('li:not(.s4-static-item)'))) {
                         if (btd) {
                             console.debug('Buildtree, ' + curItemHandle + ' before ' + _sub + n.h, name);
                         }
@@ -510,7 +522,7 @@ MegaData.prototype.initTreePanelSorting = function() {
     const sections = [
         'folder-link', 'contacts', 'conversations', 'backups',
         'shared-with-me', 'cloud-drive', 'rubbish-bin',
-        'out-shares', 'public-links'
+        'out-shares', 'public-links', 's4'
     ];
     const byType = ['name', 'status', 'last-interaction', 'label', 'created', 'fav', 'ts', 'mtime'];
     const dialogs = ['Copy', 'Move', 'SelectFolder', 'SaveAs'];
@@ -1159,6 +1171,7 @@ MegaData.prototype.addTreeUI = function() {
     $(
         '.fm-tree-panel .nw-fm-tree-item,' +
         '.js-fm-left-panel .js-lpbtn.cloud-drive,' +
+        '.js-fm-left-panel .js-lpbtn.s4,' +
         '.rubbish-bin,' +
         '.fm-breadcrumbs,' +
         '.nw-fm-left-icons-panel .nw-fm-left-icon,' +
@@ -1229,6 +1242,10 @@ MegaData.prototype.addTreeUI = function() {
             }
 
             id = cv ? cv.prefixPath + id : id;
+
+            if (M.dyh && cv && cv.type === 's4' && cv.subType !== 'container') {
+                id = M.dyh('folder-id', id);
+            }
 
             $.hideTopMenu();
             M.openFolder(id, e.ctrlKey);
@@ -1311,6 +1328,9 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     if (id_r === 'shares') {
         this.onSectionUIOpen('shared-with-me');
     }
+    else if (id_r === 's4' || cv && cv.type === 's4') {
+        this.onSectionUIOpen('s4');
+    }
     else if (cv) {
         this.onSectionUIOpen(id_r || id_s);
     }
@@ -1382,6 +1402,19 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
 
         if (target && id.startsWith('discovery')) {
             target.classList.add('on-gallery');
+        }
+
+        if (cv.type === 's4') {
+            let linkName = cv.containerID;
+
+            if (cv.subType === 'bucket') {
+                linkName =  cv.nodeID;
+            }
+            else if (['keys', 'policies', 'users', 'groups'].includes(cv.subType)) {
+                linkName += `_${cv.subType}`;
+            }
+
+            target = document.getElementById(`treea_${linkName}`);
         }
     }
     else {

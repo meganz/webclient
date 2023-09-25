@@ -366,6 +366,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             zipname: zipname,
             preview: preview,
             p: path,
+            ph: undefined,
             onDownloadProgress: this.dlprogress.bind(this),
             onDownloadComplete: this.dlcomplete.bind(this),
             onBeforeDownloadComplete: this.dlbeforecomplete.bind(this),
@@ -475,7 +476,6 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
     if (!preview) {
         this.onDownloadAdded(entries.length, uldl_hold, z, zipsize);
-        setupTransferAnalysis();
     }
 
     delete $.dlhash;
@@ -840,7 +840,8 @@ MegaData.prototype.getTransferTableLengths = function() {
 };
 
 MegaData.prototype.getTransferElements = function() {
-    var obj = {};
+    'use strict';
+    const obj = Object.create(null);
     obj.domTransfersBlock = document.querySelector('.fm-transfers-block');
     if (!obj.domTransfersBlock) {
         return false;
@@ -858,9 +859,11 @@ MegaData.prototype.getTransferElements = function() {
     obj.domDownloadChart = obj.domDownloadBlock.querySelector('.progress-chart');
     obj.domUploadChart = obj.domUploadBlock.querySelector('.progress-chart');
 
-    this.getTransferElements = function() {
-        return obj;
-    };
+    Object.defineProperty(this, 'getTransferElements', {
+        value() {
+            return obj;
+        }
+    });
 
     return obj;
 };
@@ -1152,7 +1155,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
 
-        setupTransferAnalysis();
         if ((ulmanager.isUploading = Boolean(ul_queue.length))) {
             $('.transfer-pause-icon').removeClass('disabled');
             $('.transfer-clear-completed').removeClass('disabled');
@@ -1282,7 +1284,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                             if (d) {
                                 console.timeEnd('makeDirProc-' + uuid);
                             }
-                            return makeDirPromise.reject(EACCESS);
+                            return makeDirPromise.reject(EBLOCKED);
                         }
 
                         if (action === fileconflict.DONTCOPY) {
@@ -1375,7 +1377,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
 
             return fileconflict.check(u, to, op, toChat ? fileconflict.KEEPBOTH : 0);
         });
-    }).then(startUpload).catch(tell).finally(() => {
+    }).then(startUpload).catch((ex) => ex !== EBLOCKED && tell(ex)).finally(() => {
         if (d) {
             console.timeEnd('makeDirPromise-' + uuid);
         }
@@ -1393,7 +1395,7 @@ MegaData.prototype.addNewFile = function(fileName, dest) {
     // eslint-disable-next-line local-rules/hints
     var addFilePromise = new MegaPromise();
     dest = dest || M.currentdirid || M.RootID;
-    dest = dest.replace('public-links/', '').replace('out-shares/', '').replace('file-requests/', '');
+    dest = dest.split('/').pop();
 
     if ([8, 11].indexOf(String(dest).length) === -1) {
         return addFilePromise.reject(EACCESS);
@@ -1656,6 +1658,10 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
     if (id && is_megadrop) {
         mega.fileRequestUpload.onItemUploadCompletion(id);
     }
+    else if (h) {
+        // @todo better error handling..
+        M.confirmNodesAtLocation(h).catch(tell);
+    }
 
     delay('tfscomplete', function() {
         M.resetUploadDownload();
@@ -1700,155 +1706,6 @@ MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
 
     if ($('table.transfer-table tr').length > 1) {
         $('.transfer-clear-all-icon').removeClass('hidden');
-    }
-
-    if (!$.mSortableT) {
-        $.mSortableT = $('.transfer-table tbody');
-        $.mSortableT.sortable({
-            delay: 200,
-            revert: 100,
-            start: function() {
-                $('body').addClass('dndc-sort');
-            },
-            helper: function(ev, tr) {
-                if (!tr.hasClass('ui-selected')) {
-                    tr.addClass('ui-selected');
-                }
-                this.order = fm_tfsorderupd();
-                var $selected = tr.parent().children('.ui-selected').clone();
-                tr.data('multidrag', $selected).siblings('.ui-selected').hide();
-                var $helper = $('<tr/>');
-                return $helper.append($selected);
-            },
-            stop: function(ev, ui) {
-                var cancel = false;
-                $('body').removeClass('dndc-sort');
-
-                var $selected = ui.item.data('multidrag');
-                ui.item.after($selected).remove();
-                $('.transfer-table tr.ui-selected:not(:visible)').remove();
-                $.transferHeader(); // rebind cloned trs
-
-                // var $tr = $(ui.item[0]);
-                // var id = String($tr.attr('id'));
-                // var $next = $tr.next();
-
-                /*if ($selected.hasClass('started')) {
-                    cancel = true;
-                }
-                else {
-                    var $prev = $tr.prev();
-                    var pid = $prev.attr('id');
-                    var nid = $next.attr('id');
-
-                    cancel = ((id[0] === 'u' && nid && nid[0] !== 'u')
-                            || (id[0] !== 'u' && pid && pid[0] === 'u'));
-                }*/
-                if (cancel) {
-                    $.mSortableT.sortable('cancel');
-                }
-                else {
-                    var order = fm_tfsorderupd();
-
-                    if (JSON.stringify(order) !== JSON.stringify(this.order)) {
-                        var mDL = {
-                            pos: 0,
-                            etmp: [],
-                            oQueue: [],
-                            pQueue: {},
-                            mQueue: dlQueue,
-                            m_queue: dl_queue,
-                            prop: 'dl'
-                        };
-                        var mUL = {
-                            pos: 0,
-                            etmp: [],
-                            oQueue: [],
-                            pQueue: {},
-                            mQueue: ulQueue,
-                            m_queue: ul_queue,
-                            prop: 'ul'
-                        };
-                        var id;
-                        var dst;
-                        var i = 0;
-                        var len = Object.keys(order).length / 2;
-
-                        [dl_queue, ul_queue].forEach(function(queue) {
-                            var t_queue = queue.filter(isQueueActive);
-                            if (t_queue.length !== queue.length) {
-                                var m = t_queue.length;
-                                var i = 0;
-                                while (i < m) {
-                                    (queue[i] = t_queue[i]).pos = i;
-                                    ++i;
-                                }
-                                queue.length = i;
-                                while (queue[i]) {
-                                    delete queue[i++];
-                                }
-                            }
-                        });
-
-                        while (len > i) {
-                            id = M.t[i++];
-
-                            dst = id[0] === 'u' ? mUL : mDL;
-                            var mQ = dst.mQueue.slurp(id);
-                            // for (var x in mQ) {
-                            // if (mQ.hasOwnProperty(x)) {
-                            // var entry = mQ[x][0][dst.prop];
-                            // if (dst.etmp.indexOf(entry) === -1) {
-                            // (dst.m_queue[dst.pos] = entry).pos = dst.pos;
-                            // dst.etmp.push(entry);
-                            // dst.pos++;
-                            // }
-                            // }
-                            // }
-                            dst.oQueue = dst.oQueue.concat(mQ);
-
-                            if (dst.mQueue._qpaused.hasOwnProperty(id)) {
-                                dst.pQueue[id] = dst.mQueue._qpaused[id];
-                            }
-                        }
-
-                        dlQueue._queue = mDL.oQueue;
-                        ulQueue._queue = mUL.oQueue;
-                        dlQueue._qpaused = mDL.pQueue;
-                        ulQueue._qpaused = mUL.pQueue;
-
-                        // Check for transfers moved before any started one
-                        var $prev = $('.transfer-table tr.transfer-started')
-                            .first()
-                            .prevAll()
-                            .not('.transfer-paused');
-                        // XXX: we rely on the speed field being non-numeric
-                        if ($prev.length && !$prev.find('.speed').text().replace(/\D/g, '')) {
-                            var ids = $('.transfer-table tr:not(.transfer-paused)').attrs('id');
-                            ids.forEach(fm_tfspause);
-                            if (dlQueue._queue.length || ulQueue._queue.length) {
-                                dlmanager.logger.error('The move operation should have cleared the queues.');
-                            }
-                            ids.forEach(fm_tfsresume);
-                            i = 0;
-                            mDL.pQueue = {};
-                            mUL.pQueue = {};
-                            while (len > i) {
-                                id = M.t[i++];
-                                dst = id[0] === 'u' ? mUL : mDL;
-                                if (dst.mQueue._qpaused.hasOwnProperty(id)) {
-                                    dst.pQueue[id] = dst.mQueue._qpaused[id];
-                                }
-                            }
-                            dlQueue._qpaused = mDL.pQueue;
-                            ulQueue._qpaused = mUL.pQueue;
-                        }
-                    }
-                }
-
-                $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-            }
-        });
     }
 };
 
@@ -1955,27 +1812,6 @@ function resetOverQuotaTransfers(ids) {
 
     tfsheadupdate({t: ids});
     mega && mega.tpw && mega.tpw.resetErrorsAndQuotasUI(mega.tpw.DOWNLOAD);
-}
-
-function fm_tfsorderupd() {
-    'use strict';
-
-    M.t = {};
-    $('.transfer-table tr[id]:visible').each(function(pos, node) {
-        var t = String(node.id).split('_').shift();
-        if (['ul', 'dl', 'zip', 'LOCKed'].indexOf(t) === -1) {
-            dlmanager.logger.error('fm_tfsorderupd', 'Unexpected node id: ' + node.id);
-        }
-
-        // if (t !== 'LOCKed') {
-        M.t[pos] = node.id;
-        M.t[node.id] = pos;
-        // }
-    });
-    if (d) {
-        dlmanager.logger.info('M.t', M.t);
-    }
-    return M.t;
 }
 
 function fm_tfspause(gid, overquota) {
@@ -2105,132 +1941,6 @@ function fm_tfsresume(gid) {
         return true;
     }
     return false;
-}
-
-function fm_tfsmove(gid, dir) { // -1:up, 1:down
-    'use strict';
-    /* jshint -W074 */
-    var tfs = $('#' + gid);
-    var to;
-    var act;
-    var p1;
-    var p2;
-    var i;
-    var x;
-    var mng;
-    gid = String(gid);
-    mng = gid[0] === 'u' ? ulmanager : dlmanager;
-    if (tfs.length !== 1) {
-        mng.logger.warn('Invalid transfer node', gid, tfs);
-        return;
-    }
-
-    if (!GlobalProgress[gid] || GlobalProgress[gid].working.length) {
-        mng.logger.warn('Invalid transfer state', gid);
-        return;
-    }
-
-    if (dir !== -1) {
-        to = tfs.next();
-        act = 'after';
-    }
-    else {
-        to = tfs.prev();
-        act = 'before';
-    }
-
-    var id = to && to.attr('id') || 'x';
-
-    if (!GlobalProgress[id] || GlobalProgress[id].working.length) {
-        if (id !== 'x') {
-            mng.logger.warn('Invalid [to] transfer state', gid, id, to);
-        }
-        return;
-    }
-
-    if (id[0] === gid[0] || "zdz".indexOf(id[0] + gid[0]) !== -1) {
-        to[act](tfs);
-    }
-    else {
-        if (d) {
-            dlmanager.logger.error('Unable to move ' + gid);
-        }
-        return;
-    }
-
-    fm_tfsorderupd();
-
-    var m_prop;
-    var m_queue;
-    var mQueue = [];
-    if (gid[0] === 'z' || id[0] === 'z') {
-        var p = 0;
-        var trick = Object.keys(M.t).map(Number).filter(function(n) {
-            return !isNaN(n) && M.t[n][0] !== 'u';
-        });
-        for (i in trick) {
-            if (trick.hasOwnProperty(i)) {
-                ASSERT(i === trick[i] && M.t[i], 'Oops..');
-                var mQ = dlQueue.slurp(M.t[i]);
-                for (x in mQ) {
-                    if (mQ.hasOwnProperty(x)) {
-                        (dl_queue[p] = mQ[x][0].dl).pos = p;
-                        ++p;
-                    }
-                }
-                mQueue = mQueue.concat(mQ);
-            }
-        }
-        // we should probably fix our Array inheritance
-        for (var j = p, len = dl_queue.length; j < len; ++j) {
-            delete dl_queue[j];
-        }
-        dl_queue.length = p;
-        dlQueue._queue = mQueue;
-        return;
-    }
-
-    if (gid[0] === 'u') {
-        m_prop = 'ul';
-        mQueue = ulQueue._queue;
-        m_queue = ul_queue;
-    }
-    else {
-        m_prop = 'dl';
-        mQueue = dlQueue._queue;
-        m_queue = dl_queue;
-    }
-    var t_queue = m_queue.filter(isQueueActive);
-    if (t_queue.length !== m_queue.length) {
-        var m = t_queue.length;
-        i = 0;
-        while (i < m) {
-            (m_queue[i] = t_queue[i]).pos = i;
-            ++i;
-        }
-        m_queue.length = i;
-        while (m_queue[i]) {
-            delete m_queue[i++];
-        }
-    }
-    for (i in mQueue) {
-        if (mQueue[i][0][gid]) {
-            var tmp = mQueue[i];
-            var m_q = tmp[0][m_prop];
-            p1 = Number(i) + dir;
-            p2 = m_q.pos;
-            tmp[0][m_prop].pos = mQueue[p1][0][m_prop].pos;
-            mQueue[p1][0][m_prop].pos = p2;
-            mQueue[i] = mQueue[p1];
-            mQueue[p1] = tmp;
-            p1 = m_queue.indexOf(m_q);
-            tmp = m_queue[p1];
-            m_queue[p1] = m_queue[p1 + dir];
-            m_queue[p1 + dir] = tmp;
-            ASSERT(m_queue[p1].pos === mQueue[i][0][m_prop].pos, 'Huh, move sync error..');
-            break;
-        }
-    }
 }
 
 function fm_tfsupdate() {

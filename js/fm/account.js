@@ -2935,7 +2935,7 @@ accountUI.notifications = {
         const $banner = $('.chat-permissions-banner', $container);
         const $body = $('.versioning-body-text', $banner);
 
-        if (mega.notif.has('enabled', 'chat')) {
+        if (window.Notification && mega.notif.has('enabled', 'chat')) {
             const { permission } = Notification;
             const { granted, denied, pending } = this.permissions;
             Object.values(this.permissions).forEach(p => $banner.removeClass(`permission--${p}`));

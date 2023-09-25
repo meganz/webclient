@@ -1414,6 +1414,9 @@ scparser.$add('u', function(a) {
                 if (oldattr.name !== n.name) {
                     M.onRenameUIUpdate(n.h, n.name);
                 }
+                if (M.dyh) {
+                    M.dyh('check-node-update', n, oldattr);
+                }
             }
 
             // save modified node
@@ -2269,7 +2272,9 @@ function worker_procmsg(ev) {
             if (!scq[scni]) {
                 scq[scni] = [null, []];
             }
-            scq[scni][1][scqp] = node;
+            if (scq[scni][1]) {
+                scq[scni][1][scqp] = node;
+            }
 
             delete node.scni;
             delete node.scqp;
@@ -2354,7 +2359,12 @@ function worker_procmsg(ev) {
             if (decWorkerPool.inflight) {
                 for (const api of decWorkerPool.inflight) {
 
-                    api.residual[0].resolve();
+                    if (api.residual[0]) {
+                        api.residual[0].resolve();
+                    }
+                    else if (d) {
+                        console.error('Were two api4 channels running concurrently?', api.residual);
+                    }
                 }
                 decWorkerPool.inflight = null;
             }
@@ -3916,7 +3926,8 @@ function loadfm_done(mDBload) {
                 useravatar.refresh().catch(dump);
             }
         }
-        if ($.msgDialog) {
+        if ($.closeMsgDialog) {
+            delete $.closeMsgDialog;
             closeMsg();
         }
         clearInterval(mega.loadReport.aliveTimer);

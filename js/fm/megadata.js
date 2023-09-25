@@ -206,6 +206,14 @@ function MegaData() {
         }
     })(this);
 
+    // Think twice before adding anything new here.
+    const safe = [
+        'getTransferElements'
+    ];
+    for (let i = safe.length; i--;) {
+        seal.delete(safe[i]);
+    }
+
     return new Proxy(this, {
         defineProperty(target, prop, descriptor) {
             if (seal.has(prop)) {

@@ -54,7 +54,7 @@ var mobile = {
         });
 
         Object.defineProperty(ctx, 'show' + 'OverStorageQuota', {
-            value: function(data) {
+            async value(data) {
                 if (data && (data === EPAYWALL || (data.isFull && Object(u_attr).uspw))) {
                     data = Object.create(null);
                     data.isFull = data.isAlmostFull = data.EPAYWALL = true;
@@ -1070,7 +1070,8 @@ var nicknames = {
 
 var notify = {
     init: function() {},
-    notifyFromActionPacket: function() {},
+    async notifyFromActionPacket() {
+    },
     countAndShowNewNotifications: function() {},
     closePopup: function() {},
     markAllNotificationsAsSeen: function() {}

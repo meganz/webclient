@@ -1621,7 +1621,7 @@
             <div class="content-block">
                 <!-- Templates -->
                 <div class="fm-picker-dialog-panel-header">
-                    <span>[$5916]</span>
+                    <span class="item-names">[$5916]</span>
                     <div class="fm-picker-dialog-panel-arrows">
                         <i class="sprite-fm-mono icon-queue-down"></i>
                     </div>
@@ -1687,6 +1687,11 @@
                         <div class="tooltip">[$1687]</div>
                         <i class="sprite-fm-mono icon-cloud-drive"></i>
                     </div>
+                    <div class="fm-picker-dialog-button s4" data-section="s4">
+                        <div class="left-border"></div>
+                        <div class="tooltip">[$obj_storage]</div>
+                        <i class="sprite-fm-mono icon-object-storage"></i>
+                    </div>
                     <div class="fm-picker-dialog-button shared-with-me" data-section="shared-with-me">
                         <div class="left-border"></div>
                         <div class="tooltip">[$5589]</div>
@@ -1706,6 +1711,12 @@
 
                 <!-- Tab Sections -->
                 <div class="right-pane fm-picker-dialog-tree-panel cloud-drive">
+                    <!--div class="fm-picker-dialog-panel-header"></div-->
+                    <div class="dialog-tree-panel-scroll">
+                        <div class="dialog-content-block"></div>
+                    </div>
+                </div>
+                <div class="right-pane fm-picker-dialog-tree-panel s4">
                     <!--div class="fm-picker-dialog-panel-header"></div-->
                     <div class="dialog-tree-panel-scroll">
                         <div class="dialog-content-block"></div>
@@ -1736,6 +1747,14 @@
                         <i class="sprite-fm-mono icon-cloud-drive"></i>
                         <div class="dialog-empty-header">
                             [$20461]
+                        </div>
+                    </div>
+                </div>
+                <div class="dialog-empty-block s4">
+                    <div class="dialog-empty-pad">
+                        <i class="sprite-fm-mono icon-object-storage"></i>
+                        <div class="dialog-empty-header">
+                            [$obj_storage]
                         </div>
                     </div>
                 </div>
@@ -7422,7 +7441,6 @@
                 </div>
             </div>
         </section>
-
         <footer>
             <div class="footer-container">
                  <button class="mega-button js-close">
@@ -7585,6 +7603,620 @@
                     </button>
                 </div>
             </div>
+        </footer>
+    </div>
+
+<!--  S4 related dialogs  -->
+
+    <!-- Dialog: S4-create-bucket-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-create-bucket-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-create-bucket-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 class="s4-create-bucket-title">[$s4_create_bkt]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block spaced-margin">
+                <div class="offset-text">[$s4_enter_bkt_name]</div>
+                <div class="mega-input with-icon box-style">
+                    <i class="sprite-fm-mono icon-bucket-filled"></i>
+                    <input class="megaInputs underlinedText" name="bucket-name" type="text" placeholder="[$s4_bkt_name_txt]" autofocus />
+                    <div class="message-container mega-banner"></div>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button cancel">
+                    <span>[$82]</span>
+                </button>
+                <button class="mega-button positive progress disabled">
+                    <span>[$158]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dialog: S4-create-user-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-create-user-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-create-user-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 id="s4-create-user-title">[$s4_user_create]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="step-1 hidden">
+                    <div class="offset-text">[$s4_user_name_enter]</div>
+                    <div class="mega-input with-icon box-style">
+                        <i class="sprite-fm-mono icon-user-filled"></i>
+                        <input class="megaInputs underlinedText" name="user-name-input" type="text" placeholder="[$s4_user_name]" autocomplete="disabled"/>
+                        <div class="message-container mega-banner"></div>
+                    </div>
+                </div>
+                <div class="step-2 spaced-margin hidden">
+                    <div class="step-head">
+                        <div class="head-title">[$s4_user_add_to_group]</div>
+                        <div class="search-bar">
+                            <i class="sprite-fm-mono icon-preview-reveal"></i>
+                            <input class="group-search" placeholder="[$s4_group_search]">
+                        </div>
+                    </div>
+                    <div class="sticky-header-table-container">
+                        <div class="s4-table-scroll ps-container ps-theme-default">
+                            <table class="group-table data-table table-hover dialog-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-1"></th>
+                                        <th class="col-2 no-pad-start">[$s4_group_name]</th>
+                                        <th class="col-3 no-pad-start">[$s4_assigned_policies]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="group-row group-template hidden">
+                                        <td class="col-1">
+                                            <div class="group-check checkboxOff checkbox">
+                                                <input class="checkboxOff" type="checkbox" name="groupA">
+                                            </div>
+                                        </td>
+                                        <td class="col-2 no-pad-start">
+                                            <span class="group-name">Proxy devs</span>
+                                        </td>
+                                        <td class="col-3 no-pad-start">
+                                            <span class="group-policies">Policies</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="create-group-button">
+                        <button class="mega-button action create-group" title="Create new group">
+                            <div>
+                                <i class="sprite-fm-mono icon-add-circle icon-green"></i>
+                            </div>
+                            <span>[$s4_group_new]</span>
+                        </button>
+                    </div>
+                    <div class="create-group-container hidden">
+                        <div class="offset-text">[$18509]</div>
+                        <div class="mega-input with-icon box-style">
+                            <i class="sprite-fm-mono icon-contacts"></i>
+                            <input class="group-name megaInputs underlinedText" type="text" name="group-name-input" placeholder="[$s4_group_name]" autocomplete="disabled"/>
+                            <div class="message-container mega-banner"></div>
+                        </div>
+                        <button class="mega-button positive save-group disabled">
+                            <span>[$158]</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="step-3 spaced-margin hidden">
+                    <div class="step-head">
+                        <div class="head-title">[$s4_user_attach_policy]</div>
+                        <div class="search-bar">
+                            <i class="sprite-fm-mono icon-preview-reveal"></i>
+                            <input class="policies-search" placeholder="[$s4_policy_search]">
+                        </div>
+                    </div>
+                    <div class="sticky-header-table-container">
+                        <div class="s4-table-scroll ps-container ps-theme-default">
+                            <table class="policy-table data-table table-hover dialog-table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th class="no-pad-start">[$s4_policy_name]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="policy-row policy-template hidden">
+                                        <td>
+                                            <div class="policy-check checkboxOff checkbox">
+                                                <input class="checkboxOff" type="checkbox" name="policyA">
+                                            </div>
+                                        </td>
+                                        <td class="no-pad-start">
+                                            <span class="policy-name">Policy name</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-4 hidden">
+                    <table class="create-item-info">
+                        <tr class="create-user-name">
+                            <td>
+                                <div class="section-label">[$s4_user_name_label]</div>
+                            </td>
+                            <td>
+                                <span class="container-user-name"></span>
+                            </td>
+                        </tr>
+                        <tr class="create-user-arn">
+                            <td>
+                                <div class="section-label">[$s4_user_arn_label]</div>
+                            </td>
+                            <td>
+                                <span class="container-user-arn"></span>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="badge-template badge hidden">
+                        <div class="badge-name"></div>
+                        <button class="mega-button small action remove">
+                            <i class="sprite-fm-mono icon-dialog-close"></i>
+                        </button>
+                    </div>
+                    <div class="info-container-wrap group-info">
+                        <div class="section-label">[$s4_groups_label]</div>
+                        <div class="badge-container"></div>
+                    </div>
+                    <div class="info-container-wrap policy-info">
+                        <div class="section-label">[$s4_policies_label]</div>
+                        <div class="badge-container"></div>
+                    </div>
+                </div>
+                <div class="step-5 hidden">
+                    <div class="create-success-text user-success-text"></div>
+                    <table class="keys-table">
+                        <tr>
+                            <td>
+                                <span>[$s4_key_access_colon]</span>
+                            </td>
+                            <td>
+                                <span class="access-key-value"></span>
+                                <button class="mega-button small action copy" data-key="ak">
+                                    <i class="sprite-fm-mono icon-copy"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>[$s4_key_secret_colon]</span>
+                            </td>
+                            <td>
+                                <input class="secret-key-value" type="password" readonly>
+                                <button class="mega-button small action toggle-vis">
+                                    <i class="sprite-fm-mono icon-eye-reveal toggle-vis"></i>
+                                </button>
+                                <button class="mega-button small action copy" data-key="sk">
+                                    <i class="sprite-fm-mono icon-copy" ></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button action regress hidden">
+                    <i class="sprite-fm-mono icon-arrow-left"></i>
+                    <div>[$822]</div>
+                </button>
+                <button class="mega-button cancel">
+                    <span>[$82]</span>
+                </button>
+                <button class="mega-button positive progress disabled">
+                    <span>[$158]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dialog: S4-create-group-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-create-group-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-create-group-dialog-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 id="s4-create-group-dialog-title">[$s4_group_create]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="step-1 spaced-margin hidden">
+                    <div class="offset-text">[$18509]</div>
+                    <div class="mega-input with-icon box-style">
+                        <i class="sprite-fm-mono icon-contacts"></i>
+                        <input class="megaInputs underlinedText" name="group-name-input" type="text" placeholder="[$s4_group_name]" autocomplete="disabled"/>
+                        <div class="message-container mega-banner"></div>
+                    </div>
+                </div>
+                <div class="step-2 spaced-margin hidden">
+                    <div class="step-head">
+                        <div class="head-title">[$s4_group_attach_policy]</div>
+                        <div class="search-bar">
+                            <i class="sprite-fm-mono icon-preview-reveal"></i>
+                            <input class="policies-search" placeholder="[$s4_policy_search]">
+                        </div>
+                    </div>
+                    <div class="sticky-header-table-container">
+                        <div class="s4-table-scroll ps-container ps-theme-default">
+                            <table class="policy-table data-table table-hover dialog-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-1"></th>
+                                        <th class="col-2 no-pad-start">[$s4_policy_name]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="policy-row policy-template hidden">
+                                        <td class="col-1">
+                                            <div class="policy-check checkboxOff checkbox">
+                                                <input class="checkboxOff" type="checkbox" name="policyA">
+                                            </div>
+                                        </td>
+                                        <td class="col-2 no-pad-start">
+                                            <span class="policy-name">Policy name</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-3 spaced-margin hidden">
+                    <div class="step-head">
+                        <div class="head-title">[$s4_group_select_users]</div>
+                        <div class="search-bar">
+                            <i class="sprite-fm-mono icon-preview-reveal"></i>
+                            <input class="users-search" placeholder="[$s4_user_search]">
+                        </div>
+                    </div>
+                    <div class="sticky-header-table-container">
+                        <div class="s4-table-scroll ps-container ps-theme-default">
+                            <table class="group-users-table data-table table-hover dialog-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-1"></th>
+                                        <th class="col-2 no-pad-start">[$s4_user_name]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="group-user-row group-user-template hidden">
+                                        <td class="col-1">
+                                            <div class="group-user-check checkboxOff checkbox">
+                                                <input class="checkboxOff" type="checkbox" name="userA">
+                                            </div>
+                                        </td>
+                                        <td class="col-2 no-pad-start">
+                                            <span class="group-user-name">ABC DEF</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-4 hidden">
+                    <table class="create-item-info">
+                        <tr class="create-group-name">
+                            <td>
+                                <div class="section-label">[$s4_group_name_label]</div>
+                            </td>
+                            <td>
+                                <span class="container-group-name"></span>
+                            </td>
+                        </tr>
+                        <tr class="create-group-arn">
+                            <td>
+                                <div class="section-label">[$s4_group_arn_label]</div>
+                            </td>
+                            <td>
+                                <span class="container-group-arn"></span>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="badge-template badge hidden">
+                        <div class="badge-name"></div>
+                        <button class="mega-button small action remove">
+                            <i class="sprite-fm-mono icon-dialog-close"></i>
+                        </button>
+                    </div>
+                    <div class="info-container-wrap user-info">
+                        <div class="section-label">[$s4_users_label]</div>
+                        <div class="badge-container"></div>
+                    </div>
+                    <div class="info-container-wrap policy-info">
+                        <div class="section-label">[$s4_policies_label]</div>
+                        <div class="badge-container"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button action regress hidden">
+                    <i class="sprite-fm-mono icon-arrow-left"></i>
+                    <div>[$822]</div>
+                </button>
+                <button class="mega-button cancel">
+                    <span>[$82]</span>
+                </button>
+                <button class="mega-button positive progress disabled">
+                    <span>[$158]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dialog: S4-create-access-key-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-create-access-key-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-create-access-key-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 id="s4-create-access-key-title">[$s4_key_create]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="step-1 spaced-margin hidden">
+                    <div class="offset-text">[$s4_key_name_enter]</div>
+                    <div class="mega-input with-icon box-style">
+                        <i class="sprite-fm-mono icon-key"></i>
+                        <input class="megaInputs underlinedText" name="key-name-input" type="text" placeholder="[$s4_key_name]" autocomplete="disabled"/>
+                        <div class="message-container mega-banner"></div>
+                    </div>
+                    <div class="radio-buttons">
+                        <div class="radio-wrap">
+                            <div class="user-radio radioOn">
+                                <input type="radio" name="user" value="rootuser" checked>
+                            </div>
+                            <div class="radio-txt">[$s4_user_root]</div>
+                        </div>
+                        <div class="radio-wrap">
+                            <div class="user-radio radioOff">
+                                <input type="radio" name="user" value="subuser">
+                            </div>
+                            <div class="radio-txt">[$s4_user_sub]</div>
+                        </div>
+                    </div>
+                    <div class="user-select-wrap hidden">
+                        <div class="step-head">
+                            <div class="head-title">[$s4_user_assign_title]</div>
+                            <div class="search-bar">
+                                <i class="sprite-fm-mono icon-preview-reveal"></i>
+                                <input class="container-user-search" placeholder="[$s4_user_search]">
+                            </div>
+                        </div>
+                        <div class="sticky-header-table-container">
+                            <div class="s4-table-scroll ps-container ps-theme-default">
+                                <table class="key-users-table data-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-1">[$s4_user_name]</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="key-user-row key-user-template hidden">
+                                            <td class="col-1">
+                                                <span class="key-user-name">user name</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-2 hidden">
+                    <div class="create-success-text key-success-text"></div>
+                    <table class="keys-table">
+                        <tr>
+                            <td>
+                                <span>[$s4_key_access_colon]</span>
+                            </td>
+                            <td>
+                                <span class="access-key-value"></span>
+                                <button class="mega-button small action copy" data-key="ak">
+                                    <i class="sprite-fm-mono icon-copy"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>[$s4_key_secret_colon]</span>
+                            </td>
+                            <td>
+                                <input class="secret-key-value" type="password" readonly>
+                                <button class="mega-button small action toggle-vis">
+                                    <i class="sprite-fm-mono icon-eye-reveal"></i>
+                                </button>
+                                <button class="mega-button small action copy" data-key="sk">
+                                    <i class="sprite-fm-mono icon-copy"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button cancel">
+                    <span>[$82]</span>
+                </button>
+                <button class="mega-button positive progress disabled">
+                    <span>[$158]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dialog: S4-bucket-settings-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-bucket-settings-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-bucket-settings-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 id="s4-bucket-settings-title">[$s4_bkt_settings]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="fm-dialog-tabs">
+                    <div class="fm-dialog-tab info active" data-target="bucket-info">[$892]</div>
+                    <div class="fm-dialog-tab policies" data-target="bucket-policies">[$s4_policy_label]</div>
+                    <div class="fm-dialog-tab access" data-target="bucket-access">[$s4_url_access_label]</div>
+                    <div class="clear"></div>
+                </div>
+                <div class="content-container bucket-info">
+                    <div class="bucket-info-field name">
+                        <span class="label">[$1764]</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="bucket-info-field total-size">
+                        <span class="label">[$22130]</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="bucket-info-field contains">
+                        <span class="label">[$22147]</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="bucket-info-field date-added">
+                        <span class="label">[$22143]</span>
+                        <span class="value"></span>
+                    </div>
+                </div>
+                <div class="content-container bucket-policies hidden">
+                    <div class="policies-header-wrapper">
+                        <span class="policies-header">[$s4_policy_label]</span>
+                        <a class="examples clickurl hidden" target="_blank" href="https://help.mega.io">[$s4_policy_examples]</a>
+                    </div>
+                    <div class="policies-editor">
+                        <textarea class="txtar"></textarea>
+                    </div>
+                    <div class="fm-notification-block bucket-policy-warning">[$s4_invalid_policy]</div>
+                </div>
+                <div class="content-container bucket-access hidden">
+                    <div class="access-options">
+                        <div class="radio-wrap">
+                            <div class="access-radio radioOn">
+                                <input type="radio" name="bucket-access" value="0">
+                            </div>
+                            <div class="radio-txt">[$s4_url_obj_level_txt]</div>
+                        </div>
+                        <div class="offset-subtext">[$s4_url_obj_level_subtxt]</div>
+                    </div>
+                    <div class="access-options">
+                        <div class="radio-wrap">
+                            <div class="access-radio radioOff">
+                                <input type="radio" name="bucket-access" value="1">
+                            </div>
+                            <div class="radio-txt">[$s4_url_grant_txt]</div>
+                        </div>
+                        <div class="offset-subtext">[$s4_url_grant_subtxt]</div>
+                    </div>
+                    <div class="access-options">
+                        <div class="radio-wrap">
+                            <div class="access-radio radioOff">
+                                <input type="radio" name="bucket-access" value="2">
+                            </div>
+                            <div class="radio-txt">[$s4_url_deny_txt]</div>
+                        </div>
+                        <div class="offset-subtext">[$s4_url_deny_subtxt]</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button cancel">
+                    <span>[$82]</span>
+                </button>
+                <button class="mega-button positive progress">
+                    <span>[$707]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dialog: S4-object-access-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-object-access-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-object-access-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 id="s4-object-access-title">[$s4_access_dig_header]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="object-access-entry">
+                    <div>
+                        <div class="subtitle-txt">
+                            [$s4_public_url]
+                        </div>
+                        <div class="content-txt">
+                            [$s4_access_enable_msg]
+                        </div>
+                    </div>
+                    <div class="mega-switch pub-access-toggle toggle-off" role="switch" aria-checked="false" tabindex="0">
+                        <div class="mega-feature-switch"></div>
+                    </div>
+                </div>
+                <div class="fm-notification-block bucket-access-warning"></div>
+            </div>
+            <div class="content-block">
+                <div class="object-access-entry file-info inactive">
+                    <div class="subtitle-txt">
+                        <span class="transfer-filetype-icon audio file"><img alt=""/></span>
+                        <span class="file-name">Object 2</span>
+                        <span class="file-size">20 MB</span>
+                    </div>
+                    <div class="input-container">
+                        <div class="user-input-wrap">
+                            <i class="sprite-fm-mono icon-link chain"></i>
+                            <input type="text" readonly="" value="">
+                        </div>
+                        <button class="mega-button positive copy">
+                            <span>[$63]</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer class="">
+            <div class="footer-container"></div>
         </footer>
     </div>
 </section>

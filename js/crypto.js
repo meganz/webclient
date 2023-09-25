@@ -1149,7 +1149,7 @@ async function api_setshare(node, targets, sharenodes) {
 
             if (req.s[i].w) {
                 exp.w = 1;
-                exp.sk = a32_to_base64(sharekey);
+                exp.sk = a32_to_base64(u_sharekeys[node][0]);
                 req.s[i].r = 2;
                 delete req.s[i].w;
             }
@@ -1208,6 +1208,10 @@ async function api_setshare(node, targets, sharenodes) {
             crypto_setsharekey(node, key);
             req.ha = crypto_handleauth(node);
             req.ok = ok;
+
+            if (exp.sk) {
+                exp.sk = a32_to_base64(key);
+            }
 
             key = a32_to_str(key);
             for (let i = req.s.length; i--;) {

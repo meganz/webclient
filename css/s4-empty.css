@@ -1,0 +1,99 @@
+/* S4 empty pages */
+
+.fm-empty-s4-container {
+    background: none;
+    height: calc(100% - 156px);
+}
+.fm-empty-s4-container .empty-message {
+    font: var(--text-h1);
+    color: var(--text-color-high);
+    text-align: center;
+}
+.fm-empty-s4-container .create-new-bkt-block {
+    border: 2px solid var(--table-border);
+    border-radius: 12px;
+    margin-top: 24px;
+    margin-bottom: 60px;
+    height: 116px;
+    width: 648px;
+}
+.fm-empty-s4-container .create-new-bkt-wrapper {
+    display: flex;
+    align-items: center;
+    margin: 24px;
+}
+.fm-empty-s4-container .create-new-bkt-wrapper i {
+    --icon-size: 64px;
+}
+.fm-empty-s4-container .create-new-bkt-wrapper .new-bkt-message {
+    flex-grow: 1;
+    max-width: 428px;
+    text-align: start;
+    -webkit-margin-start: 16px;
+    margin-inline-start: 16px;
+    -webkit-margin-end: 44px;
+    margin-inline-end: 44px;
+}
+.fm-empty-s4-container .create-new-bkt-wrapper .new-bkt-title {
+    font: var(--text-h3-bold);
+    color: var(--text-color-high);
+}
+.fm-empty-s4-container .create-new-bkt-wrapper .new-bkt-txt {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+}
+.fm-empty-s4-container .create-new-bkt-wrapper .new-bkt-btn {
+    margin-top: 0;
+}
+.fm-empty-s4-container .create-new-bkt-wrapper .new-bkt-btn i {
+    --icon-size: 32px;
+    --mask-color: var(--icon-rest);
+}
+.fm-empty-s4-bucket {
+    background: none;
+    height: calc(100% - 128px);
+}
+.fm-empty-s4-bucket .fm-empty-pad {
+    width: 674px;
+    height: 388px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 2px dashed var(--stroke-grey-2);
+    border-radius: 12px;
+}
+.fm-empty-s4-bucket .fm-empty-pad:hover {
+    background: var(--surface-grey-1);
+}
+.fm-empty-section.fm-empty-s4-users,
+.fm-empty-section.fm-empty-s4-groups,
+.fm-empty-section.fm-empty-s4-keys,
+.fm-empty-section.fm-empty-s4-policies {
+    background: var(--surface-main);
+}
+.fm-empty-s4-users .fm-empty-s4-users-txt,
+.fm-empty-s4-groups .fm-empty-s4-groups-txt,
+.fm-empty-s4-keys .fm-empty-s4-keys-txt,
+.fm-empty-s4-policies .fm-empty-s4-policies-txt {
+    width: 520px;
+    text-align: center;
+    margin-top: 8px;
+}
+.fm-empty-s4-users .fm-empty-s4-users-title,
+.fm-empty-s4-groups .fm-empty-s4-groups-title,
+.fm-empty-s4-keys .fm-empty-s4-keys-title,
+.fm-empty-s4-policies .fm-empty-s4-policies-title {
+    color: var(--text-color-high);
+    font: var(--text-h0-bold);
+}
+.fm-empty-s4-users .fm-empty-s4-users-message,
+.fm-empty-s4-groups .fm-empty-s4-groups-message,
+.fm-empty-s4-keys .fm-empty-s4-keys-message,
+.fm-empty-s4-policies .fm-empty-s4-policies-message {
+    color: var(--text-color-medium);
+    font: var(--text-body1);
+    margin-top: 8px;
+}
+
+/* End: S4 keys pages */

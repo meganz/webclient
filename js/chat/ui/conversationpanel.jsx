@@ -2556,7 +2556,7 @@ export class ConversationPanels extends MegaRenderMixin {
     constructor(props) {
         super(props);
         this.state.supportAlert = !megaChat.hasSupportForCalls;
-        this.state.notificationsPermissions = Notification.permission;
+        this.state.notificationsPermissions = window.Notification ? Notification.permission : 'granted';
     }
 
     closeSupportAlert = () => this.setState({ supportAlert: false }, () => mega.config.set('nocallsup', 1));

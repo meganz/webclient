@@ -229,68 +229,6 @@ function chksum(buf) {
     return d;
 }
 
-function setupTransferAnalysis() {
-    if ($.mTransferAnalysis || 1) {
-        return;
-    }
-    var PROC_INTERVAL = 4.2 * 60 * 1000;
-    var logger = MegaLogger.getLogger('TransferAnalysis');
-
-    var prev = {},
-        tlen = {},
-        time = {},
-        chunks = {};
-    $.mTransferAnalysis = setInterval(function() {
-        if (uldl_hold || dlmanager.isOverQuota) {
-            prev = {};
-        }
-        else if ($.transferprogress) {
-            var tp = $.transferprogress;
-
-            for (var i in tp) {
-                if (tp.hasOwnProperty(i)) {
-                    var currentlyTransfered = tp[i][0];
-                    var totalToBeTransfered = tp[i][1];
-                    var currenTransferSpeed = tp[i][2];
-
-                    var finished = (currentlyTransfered === totalToBeTransfered);
-
-                    if (finished) {
-                        logger.info('Transfer "%s" has finished. \uD83D\uDC4D', i);
-                        continue;
-                    }
-
-                    var transfer = Object(GlobalProgress[i]);
-
-                    if (transfer.paused || !transfer.started) {
-                        logger.info('Transfer "%s" is not active.', i, transfer);
-                        continue;
-                    }
-
-                    if (prev[i] && prev[i] === currentlyTransfered) {
-                        var type = (i[0] === 'u'
-                            ? 'Upload'
-                            : (i[0] === 'z' ? 'ZIP' : 'Download'));
-
-                        srvlog(type + ' transfer seems stuck.');
-
-                        logger.warn('Transfer "%s" had no progress for the last minutes...', i, transfer);
-                    }
-                    else {
-                        logger.info('Transfer "%s" is in progress... %d% completed', i,
-                            Math.floor(currentlyTransfered / totalToBeTransfered * 100));
-
-                        time[i] = Date.now();
-                        tlen[i] = Math.max(tlen[i] | 0, currentlyTransfered);
-                        prev[i] = currentlyTransfered;
-                    }
-                }
-            }
-        }
-    }, PROC_INTERVAL);
-}
-
-
 (function __FileFingerprint(scope) {
     'use strict';
     var CRC_SIZE = 16;

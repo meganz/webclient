@@ -769,6 +769,11 @@ function dlPageStartDownload(isDlWithMegaSync) {
         mediaCollectFn = null;
     }
 
+    if (fdl_queue_var === false) {
+        console.error('This download did complete, fix the UI and set it up from scratch...');
+        return;
+    }
+
     if (ASSERT(fdl_queue_var, 'Cannot start download, fdl_queue_var is not set.')) {
         dlmanager.isDownloading = true;
         if (mega.tpw && !mega.tpw.initialized) {

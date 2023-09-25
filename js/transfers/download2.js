@@ -2442,7 +2442,7 @@ dlQueue.validateTask = function(pzTask) {
         }
 
         if ((r = (j === -1)) && $.len(this._qpaused)) {
-            fm_tfsorderupd();
+            // fm_tfsorderupd(); check commit history if we ever want to bring this back (with a good revamp in place)
 
             // About to start a new download, check if a previously paused dl was resumed.
             var p1 = M.t[pzTask.gid];

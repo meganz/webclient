@@ -13965,7 +13965,7 @@ class ConversationPanels extends mixins.wl {
       });
     };
     this.state.supportAlert = !megaChat.hasSupportForCalls;
-    this.state.notificationsPermissions = Notification.permission;
+    this.state.notificationsPermissions = window.Notification ? Notification.permission : 'granted';
   }
   renderNotificationsPending() {
     return external_React_default().createElement(Alert, {

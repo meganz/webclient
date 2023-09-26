@@ -185,22 +185,17 @@ function topMenu(close) {
 
             $('.top-menu-logged .loader', $topMenu).addClass('loading');
 
-            // M.storageQuotaCache is exist, fm is inited but not folder link,
-            // pulled storage data already and the data is not updated.
-            if (M.storageQuotaCache && !folderlink) {
-                topMenuDataUpdate(M.storageQuotaCache);
-            }
-            // M.storageQuotaCache is not exist, it is either not on fm or data was revoked by action packet.
-            else {
-                M.getStorageQuota().then(data => {
+            Promise.resolve(M.storageQuotaCache || M.getStorageQuota())
+                .then((data) => {
 
                     topMenuDataUpdate(data);
 
                     if (fminitialized && !folderlink && M.currentTreeType === 'cloud-drive') {
+
                         return M.checkLeftStorageBlock(data);
                     }
-                }).catch(dump);
-            }
+                })
+                .catch(dump);
         }
 
         if (!is_mobile) {

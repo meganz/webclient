@@ -585,7 +585,9 @@ lazy(pro, 'proplan2', () => {
     };
 
     const fillPlansInfo = (period) => {
-        period = period || 1;
+
+        const defaultPeriod = mega.flags.ab_bbyd ? 12 : 1;
+        period = period || defaultPeriod;
 
         if (!pro.membershipPlans.length) {
             console.error('Plans couldnt be loaded.');
@@ -804,7 +806,12 @@ lazy(pro, 'proplan2', () => {
         const $strgFlexInput = $('#esti-storage', $proflexiBlock);
         const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
-        const preSelectedPeriod = sessionStorage.getItem('pro.period') | 0;
+        // For active experiments call the API to inform them that the user is relevant to the experiment
+        if (typeof mega.flags.ab_bbyd !== 'undefined') {
+            api.send({a: 'abta', c: 'ab_bbyd'});
+        }
+        const defaultDuration = mega.flags.ab_bbyd ? 12 : 0;
+        const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || defaultDuration;
 
         if (preSelectedPeriod === 12) {
             $radioOptions.removeClass('selected');
@@ -816,6 +823,12 @@ lazy(pro, 'proplan2', () => {
 
             this.classList.add('selected');
             sessionStorage.setItem('pro.period', this.dataset.period);
+            if (this.dataset.period === '12') {
+                delay('pricing.plan', eventlog.bind(null, is_mobile ? 99867 : 99866));
+            }
+            else {
+                delay('pricing.plan', eventlog.bind(null, is_mobile ? 99869 : 99868));
+            }
 
             fillPlansInfo(this.dataset.period | 0);
             estimateFlexiPrice($strgFlexInput.val(), $transFlexInput.val());

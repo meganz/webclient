@@ -59,6 +59,10 @@ export default class ChatRouting {
         if (args[0] === 'chat') {
             args.shift();
         }
+        if (args[0].length > 8 && args[0].substring(0, 8) === 'contacts') {
+            location = location.replace(args[0], 'contacts');
+            args[0] = 'contacts';
+        }
 
         const [section] = args;
         const {megaChat} = this;
@@ -97,7 +101,7 @@ export default class ChatRouting {
                 room.show();
                 args.route.location = room.getRoomUrl();
             }
-            else if (!roomId || roomId === u_handle) {
+            else if (!roomId || roomId === u_handle || roomId.length !== 11) {
                 ChatRouting.gPageHandlers.redirect(args.route, 'fm/chat').then(resolve).catch(reject);
                 resolve = null;
             }

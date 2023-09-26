@@ -4467,12 +4467,15 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
                     kv.remove(key, true).dump(key);
                 })
                 .catch((ex) => {
-                    if (d) {
+                    if (ex && d) {
                         console.error(ex);
                     }
                     loadingDialog.hide('import');
                     kv.remove(key, true).dump(key);
-                    msgDialog('warninga', l[135], l[47]);
+
+                    if (ex) {
+                        tell(`${l[2507]}: ${ex}`);
+                    }
                 });
         }
         nodes = null;

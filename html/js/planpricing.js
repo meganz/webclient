@@ -72,7 +72,18 @@ lazy(pro, 'proplan2', () => {
         const $arrowIcon = $('i.chevron-down-icon', $showBtn);
         const $showBtnTxt = $('.pricing-plans-compare-table-txt', $showBtn);
 
+        if (mega.flags.ab_uspct !== 'undefined') {
+            api_req({a: 'abta', c: 'ab_uspct'});
+        }
+
+        if (mega.flags.ab_uspct) {
+            $dataTable.removeClass('hidden');
+            $arrowIcon.addClass('inv');
+            $showBtnTxt.text(l.pr_hide_plan);
+        }
+
         $showBtn.rebind('click.pricing', () => {
+            eventlog(is_mobile ? 99888 : 99887);
             $dataTable.toggleClass('hidden');
             $arrowIcon.toggleClass('inv');
 

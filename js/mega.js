@@ -3508,7 +3508,7 @@ function processMCSM(mcsm, ignoreDB) {
     'use strict';
 
     if (Array.isArray(mcsm)) {
-        for (let i = mcsm.length; i--;) {
+        for (let i = 0; i < mcsm.length; i++) {
             const scheduledMeeting = mcsm[i];
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('mcsm', { id: scheduledMeeting.id, d: scheduledMeeting });

@@ -574,11 +574,13 @@ var security = {
             }
             var showLoading = function() {
                 loadingDialog.show();
-                $dialog.addClass('arrange-to-back');
+                $('.mega-dialog-container.common-container').addClass('arrange-to-back');
             };
             var hideLoading = function() {
                 loadingDialog.hide();
-                $dialog.removeClass('arrange-to-back');
+                if (!$.msgDialog) {
+                    $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
+                }
             };
             var reset = function(step) {
                 hideLoading();
@@ -591,17 +593,19 @@ var security = {
                     security.showVerifyEmailDialog(step && step.to);
                 }
             };
+
+            hideLoading();
             $('.mega-dialog:visible').addClass('hidden');
 
             if (aStep === 'login-to-account') {
                 var code = String(page).substr(11);
 
-                onIdle(showLoading);
+                showLoading();
                 console.assert(String(page).startsWith('emailverify'));
 
                 api.req({a: 'erv', v: 2, c: code})
                     .then(({result: res}) => {
-                        loadingDialog.hide();
+                        hideLoading();
                         console.debug('erv', [res]);
 
                         if (!Array.isArray(res) || !res[6]) {
@@ -609,7 +613,6 @@ var security = {
                         }
 
                         u_logout(true);
-                        $dialog.removeClass('arrange-to-back');
 
                         u_handle = res[4];
                         u_attr = {u: u_handle, email: res[1], privk: res[6].privk, evc: code, evk: res[6].k};

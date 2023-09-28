@@ -1323,16 +1323,6 @@ scparser.$add('sd', {
     }
 });
 
-scparser.$add('e', function(a) {
-    // CMS update
-    var str = hex2bin(a.c || "");
-    if (str.substr(0, 5) === ".cms.") {
-        var cmsType = str.split(".")[2];
-        var cmsId = str.substr(6 + cmsType.length).split(".");
-        CMS.reRender(cmsType, cmsId);
-    }
-});
-
 scparser.$add('fa', function(a) {
     // file attribute change/addition
     var n = M.d[a.n];
@@ -3789,7 +3779,7 @@ function loadfm_done(mDBload) {
 
         window.loadingInitDialog.step3(100);
 
-        var hideLoadingDialog = !is_mobile && !CMS.isLoading();
+        var hideLoadingDialog = !is_mobile;
 
         if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
 

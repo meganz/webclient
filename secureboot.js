@@ -2607,7 +2607,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
     // Common desktop and mobile, bottom pages
     jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3095,7 +3094,6 @@ else if (!browserUpdate) {
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-        'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},

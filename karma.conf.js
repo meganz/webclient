@@ -123,7 +123,6 @@ module.exports = function(config) {
         'js/vendor/avatar.js',
         'js/vendor/int64.js',
         'js/keymgr.js',
-        'js/cms.js',
         'js/keepAlive.js',
         'js/metatags.js',
         'js/utils/trans.js',

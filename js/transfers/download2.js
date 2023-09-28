@@ -2379,18 +2379,16 @@ var dlmanager = {
             if (typeof megasync === 'undefined') {
                 console.error('Failed to load megasync.js');
             }
+            else if (typeof dlpage_ph === 'string' && megasync.getUserOS() !== 'linux') {
+                megasync.download(dlpage_ph, dlpage_key);
+            }
             else {
-                if (typeof dlpage_ph === 'string') {
-                    megasync.download(dlpage_ph, dlpage_key);
-                }
-                else {
-                    window.open(
-                        megasync.getMegaSyncUrl() || 'https://mega.io/desktop',
-                        '_blank',
-                        'noopener,noreferrer'
-                    );
-                    hideOverlay();
-                }
+                window.open(
+                    megasync.getMegaSyncUrl() || 'https://mega.io/desktop',
+                    '_blank',
+                    'noopener,noreferrer'
+                );
+                hideOverlay();
             }
 
             return false;

@@ -1678,7 +1678,12 @@ FileManager.prototype.initContextUI = function() {
         }
         mLoadingSpinner.show('restore-nodes');
         M.revertRubbishNodes($.selected)
-            .catch(tell)
+            .catch((ex) => {
+                if (ex !== EBLOCKED) {
+                    // user canceled file-conflict dialog.
+                    tell(ex);
+                }
+            })
             .finally(() => mLoadingSpinner.hide('restore-nodes'));
     });
 

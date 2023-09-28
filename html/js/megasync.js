@@ -29,20 +29,11 @@ var megasync = (function() {
         windows_x32: 'https://mega.nz/MEGAsyncSetup32.exe',
         mac: 'https://mega.nz/MEGAsyncSetup.dmg',
         mac_silicon: 'https://mega.nz/MEGAsyncSetupArm64.dmg',
+        linux: "https://mega.io/desktop"
     };
     var usemsync = localStorage.usemsync;
 
-    var linuxClients;
-    var listeners = [];
-    var pending;
-
-    ns.UILinuxDropdown = function(selected) {
-        linuxDropdown(selected);
-    };
-
-    ns.UIExtensionsDropdown = function(distroIndex, platform, onSelect) {
-        extensionsDropdown(distroIndex, platform, onSelect);
-    };
+    let userOS;
 
     /** a function to switch the url to communicate with MEGASync */
     function switchMegasyncUrlToHttpWhenPossible() {
@@ -89,191 +80,12 @@ var megasync = (function() {
 
     }
 
-    // Linux stuff {{{
-    /**
-     * Prepare Linux Dropdown with the list of distro.
-     *
-     * The are many Linux distributions, this function
-     * creates an HTML dropdown with the list of distros we support.
-     *
-     */
-    function linuxDropdown(selected, forMsyncDialog) {
-
-        var is64 = browserdetails().is64bit;
-        var $background = $('.bottom-page.scroll-block.megasync');
-        var $dropdown;
-        var $list;
-
-        if (forMsyncDialog) {
-            $background = $('.megasync-overlay', 'body');
-        }
-
-        $dropdown = $('.megasync-dropdown', $background);
-        $list = $('.dropdown-scroll', $dropdown);
-
-        $background.addClass('linux');
-        $('> span', $dropdown).text(l[7086]);
-        $dropdown.removeClass('hidden');
-
-        if (typeof selected !== "function") {
-            /**
-             * Default click handler
-             * @param {jquery} $element     Element that has been clicked.
-             */
-            selected = function followLink($element) {
-                window.location = $element.attr('data-link');
-            }
-        }
-
-        linuxClients.forEach(function(client, id) {
-
-            var icon = client.name.toLowerCase().match(/([a-z]+)/i)[1];
-            var clientName = client.name.replace(/\s\s+/g, ' ');
-
-            icon = (icon === 'red') ? 'redhat' : icon;
-
-            var data = {
-                'class': 'option',
-                'data-client': clientName,
-                'data-client-id': id,
-                'data-link': ns.getMegaSyncUrl(client.name + " " + (is64 ? "64" : "32"))
-            };
-            if (!$('.option[data-client-id="' + data['data-client-id'] + '"]').length) {
-                createAndAddToList($list, data, 0, clientName, icon);
-                createAndAddToList($list, data, 1, clientName, icon);
-            }
-        });
-
-        $('.option', $dropdown).rebind('click.selectapp', function() {
-            selected($(this));
-        });
-
-        if (forMsyncDialog) {
-            bindDropdownEvents($dropdown);
-        }
-        else {
-            bindDropdownEvents($dropdown, false, '.fmholder');
-        }
-    }
-
-    function extensionsDropdown(distroIndex, platform, onSelected, forMsyncDialog) {
-        'use strict';
-
-        var extensions = [];
-        var extensionNames = {
-            n: "Nautilus (Files)",
-            d: "Dolphin",
-            m: "Nemo",
-            t: "Thunar"
-        };
-
-        var distro = linuxClients[distroIndex];
-        Object.keys(extensionNames).forEach(function(key) {
-            var selector = platform + key;
-            if (distro.hasOwnProperty(selector) && distro[selector]) {
-                extensions.push({
-                    name: extensionNames[key],
-                    url: megasync.getMegaSyncUrl(distro['name'] + " " + selector)
-                });
-            }
-        });
-
-        var $background = $('.bottom-page.scroll-block.megasync');
-        var $dropdown;
-        var $dropdownLabel;
-        var $list;
-        var $header = $('.megaext-header');
-        var $infoButton = $('.megaext-info-hover');
-
-        if (forMsyncDialog) {
-            $background = $('.megasync-overlay', 'body');
-        }
-
-        $dropdown = $('.megaext-dropdown', $background);
-        $dropdownLabel = $('> span', $dropdown);
-        $list = $('.dropdown-scroll', $dropdown);
-
-        if (!extensions.length) {
-            $dropdown.addClass('disabled');
-            $header.addClass('disabled');
-            $dropdownLabel.text(l[20656]);
-            $infoButton.addClass('disabled');
-            return false;
-        }
-
-        $dropdown.removeClass('disabled');
-        $header.removeClass('disabled');
-        $infoButton.removeClass('disabled');
-
-        if (typeof onSelected !== "function") {
-            /**
-             * Default click handler
-             * @param {jquery} $element     Element that has been clicked.
-             */
-            onSelected = function followLink($element) {
-                window.location = $element.attr('data-link');
-            };
-        }
-
-        var preselected = null;
-
-        extensions.forEach(function(extension, id) {
-
-            var icon = extension.name.toLowerCase().match(/([a-z]+)/i)[1] || 'nautilus';
-            var itemNode;
-            var data = {
-                'class': 'option' + (id === 0 ? ' active' : ''),
-                'data-extension': extension.name,
-                'data-extension-id': id,
-                'data-link': extension.url
-            };
-            const $option = $(`.option[data-extension-id="${data['data-extension-id']}"]`);
-            if ($option.length === 0) {
-                createAndAddToList($list, data, 0, extension.name, icon);
-                createAndAddToList($list, data, 1, extension.name, icon);
-            }
-            else {
-                if (id !== 0) {
-                    $option.removeAttr('data-state');
-                    $option.removeClass('active');
-                }
-                $option.attr('data-link', extension.url);
-            }
-
-            if (id === 0) {
-                preselected = extension;
-            }
-        });
-
-        $('.option', $dropdown).rebind('click.selectextension', function() {
-            var $this = $(this);
-
-            onSelected({
-                name: $this.data('extension'),
-                url: $this.attr('data-link')
-            });
-        });
-
-        bindDropdownEvents($dropdown, false, '.fmholder');
-
-        if (preselected) {
-            $dropdownLabel.text(preselected.name);
-            onSelected(preselected);
-        }
-    }
-
-    function createAndAddToList($list, data, index, itemName, icon) {
-        var itemNode = mCreateElement('div', data, $list[index]);
-        mCreateElement('i', {'class': 'icon linux download-sprite ' + icon}, itemNode);
-        mCreateElement('span', undefined, itemNode).textContent = itemName;
-    }
-
     /**
      * The user attempted to download the current file using
      * MEGASync *but* they don't have it running (and most likely not installed)
      * show we show them a dialog for and we attempt to download the client.
      *
-     * If the user has Linux we shown them a dropbox with their distros.
+     * If the user has Linux we close the dialog and open a new window at https://mega.io/desktop.
      *
      * @return {void}
      */
@@ -288,6 +100,11 @@ var megasync = (function() {
         var url = ns.getMegaSyncUrl();
         if ($overlay.hasClass('downloading')) {
             return true;
+        }
+        const os = userOS || ns.getUserOS();
+        if (os === 'linux') {
+            window.open(ns.getMegaSyncUrl(os), '_blank', 'noopener,noreferrer');
+            return;
         }
 
         retryTimer = setInterval(function() {
@@ -321,19 +138,7 @@ var megasync = (function() {
             }
         });
 
-        if (url === '' || localStorage.isLinux) {
-            // It's linux!
-            var $modal = $overlay.addClass('hidden');
-            $('body').removeClass('overlayed');
-            loadingDialog.show();
-            ns.getLinuxReleases(function() {
-                loadingDialog.hide();
-                $modal.removeClass('hidden');
-                linuxDropdown(null, true);
-            });
-        } else {
-            window.location = url;
-        }
+        window.location = url;
     }
 
     // API Related things {{{
@@ -665,27 +470,19 @@ var megasync = (function() {
         return next(null, response);
     }
 
-    ns.getLinuxReleases = function(next) {
-        if (linuxClients) {
-            return next(linuxClients);
+    ns.getUserOS = () => {
+        const pf = navigator.platform.toUpperCase();
+        if (pf.includes('MAC')) {
+            os = "mac";
         }
-
-        CMS.scope = 'sync';
-        // Talk to the CMS server and get information
-        // about the `sync` (expect a JSON)
-        CMS.get('sync', function(err, content) {
-            linuxClients = content.object;
-            console.log(linuxClients);
-            var linux = 'https://mega.nz/linux/repo/';
-            linuxClients.forEach(function(val) {
-                ['64', '64n', '64d', '64m', '64t', '32', '32n', '32d', '32m', '32t'].forEach(function(platform) {
-                    if (val[platform]) {
-                        clients[val.name + " " + platform] = linux + val[platform];
-                    }
-                });
-            });
-            next(linuxClients);
-        });
+        else if (pf.includes('LINUX')) {
+            os = 'linux';
+        }
+        else {
+            os = "windows";
+        }
+        userOS = os;
+        return os;
     };
 
     /**
@@ -696,17 +493,7 @@ var megasync = (function() {
      * @return {Array}
      */
     ns.getMegaSyncUrl = function(os) {
-
-        if (!os) {
-            var pf = navigator.platform.toUpperCase();
-            if (pf.indexOf('MAC') >= 0) {
-                os = "mac";
-            } else if (pf.indexOf('LINUX') >= 0) {
-                return '';
-            } else {
-                os = "windows";
-            }
-        }
+        os = userOS || ns.getUserOS();
         return clients[os] ||  clients['windows'];
     };
 

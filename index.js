@@ -351,7 +351,7 @@ function topPopupAlign(button, popup, topPos) {
 }
 
 function init_page() {
-    page = page || (u_type ? 'fm' : 'start');
+    page = String(page || (u_type ? 'fm' : 'start'));
 
     if (!window.M || is_megadrop) {
         return console.warn('Something went wrong, the initialization did not completed...');
@@ -3038,9 +3038,12 @@ function loadSubPage(tpage, event) {
     mBroadcaster.sendMessage('beforepagechange', tpage);
     if (window.is_chatlink) {
         window.is_chatlink = false;
-        delete megaChat.initialPubChatHandle;
         delete M.currentdirid;
-        megaChat.destroy();
+
+        if (megaChatIsReady) {
+            delete megaChat.initialPubChatHandle;
+            megaChat.destroy();
+        }
     }
     dlid = false;
 
@@ -3246,7 +3249,7 @@ mBroadcaster.once('boot_done', () => {
     });
 
     // Currently only used in chat so don't bother trying to register for mobile browsers.
-    if (window.isSecureContext && !is_mobile && !is_karma) {
+    if (window.isSecureContext && !is_mobile && !is_karma && !is_iframed) {
         onIdle(tryCatch(() => {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register(`${is_extension ? '' : '/'}sw.js?v=1`).catch(dump);

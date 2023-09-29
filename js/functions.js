@@ -836,7 +836,7 @@ function ASSERT(what, msg, udata) {
 function srvlog(msg, data, silent) {
     'use strict';
 
-    reportError(msg);
+    reportError(msg instanceof Error ? msg : new Error(msg));
 }
 
 // log failures through event id 99666

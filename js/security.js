@@ -1229,6 +1229,7 @@ security.login = {
         u_k = masterKeyArray32;
         u_sid = temporarySessionIdBase64;
         u_k_aes = new sjcl.cipher.aes(masterKeyArray32);
+        watchdog.notify('login', [!security.login.rememberMe && masterKeyArray32, temporarySessionIdBase64]);
 
         // Set the Session ID for future API requests
         api_setsid(temporarySessionIdBase64);

@@ -3546,6 +3546,8 @@ FileManager.prototype.addGridUI = function(refresh) {
             M.columnsWidth.cloud.fav.disabled = true;
             M.columnsWidth.cloud.label.viewed = false;
             M.columnsWidth.cloud.label.disabled = true;
+            M.columnsWidth.cloud.accessCtrl.viewed = false;
+            M.columnsWidth.cloud.accessCtrl.disabled = true;
         }
         else {
             if (M.columnsWidth.cloud.fav.disabled) {

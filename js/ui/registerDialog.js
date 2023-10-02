@@ -37,6 +37,7 @@
             $dialog.removeClass('arrange-to-back');
         };
 
+        const $button = $('button:not(.js-close)', $dialog).addClass('disabled');
         if (options.onCreatingAccount) {
             options.onCreatingAccount($dialog);
         }
@@ -46,6 +47,7 @@
         if (u_type > 0) {
             hideOverlay();
             msgDialog('warninga', l[135], l[5843]);
+            $button.removeClass('disabled');
             return false;
         }
 
@@ -86,6 +88,7 @@
          * @param {Boolean} oldMethod Using old registration method.
          */
         const continueProRegistration = (result, oldMethod) => {
+            $button.removeClass('disabled');
             if (result === 0) {
                 if (oldMethod) {
                     var ops = {
@@ -257,6 +260,7 @@
         }
         if (err) {
             hideOverlay();
+            $button.removeClass('disabled');
         }
     }
 

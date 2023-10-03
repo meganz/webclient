@@ -131,11 +131,17 @@ lazy(s4, 'utils', () => {
             const allowedPages = new Set(['keys', 'policies', 'users', 'groups']);
             const path = M.getPath(urlPath).reverse();
 
-            if (path[0] !== 's4' || path.length >= 2 && !s4.kernel.getS4NodeType(path[1])) {
-                return false;
+            if (path[0] !== 's4' || s4.kernel.getS4NodeType(path[1]) !== 'container') {
+                const {p} = s4.kernel.getS4BucketForObject(path[1]);
+
+                return p ? `${p}/${path[1]}` : false;
             }
 
-            if (path.length > 2 && !allowedPages.has(path[1])) {
+            if (path.length > 2 && !(allowedPages.has(path[2]) || M.d[path[2]])) {
+                return path[1];
+            }
+
+            if (path.length > 2 && !allowedPages.has(path[2])) {
                 return `${path[1]}/${path[path.length - 1]}`;
             }
 

@@ -141,6 +141,14 @@ function u_checklogin3a(res, ctx) {
             configurable: false
         });
 
+        const {s4} = u_attr;
+        delete u_attr.s4;
+        Object.defineProperty(u_attr, 's4', {
+            value: !!s4,
+            writable: false,
+            configurable: false
+        });
+
         init_storage(u_storage);
 
         if (u_storage.k) {

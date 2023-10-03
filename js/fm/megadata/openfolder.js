@@ -315,14 +315,7 @@
         else if (this.currentrootid === 's4') {
             let target = id;
 
-            if ('kernel' in s4) {
-                const {p} = s4.kernel.getS4BucketForObject(id);
-
-                if (p) {
-                    target = `${p}/${id}`;
-                }
-            }
-            else {
+            if (!('kernel' in s4 && (target = s4.utils.validateS4Url(id)))) {
                 console.error('invalid code-path...');
                 return this.openFolder('fm').catch(dump);
             }
@@ -775,16 +768,6 @@
             this.gallery = 1;
         }
         else if (cv.type === 's4') {
-            let target = null;
-
-            if ('kernel' in s4) {
-                const {length} = id.split('/');
-                target = length === 3 ? id : s4.utils.validateS4Url(id);
-            }
-
-            if (!target) {
-                return M.openFolder(M.RootID, true);
-            }
 
             id = cv.nodeID;
             fetchDBNodes = ['container', 'bucket'].includes(cv.subType) && id.length === 8;

@@ -148,7 +148,9 @@ Object.defineProperties(self, {
     },
 
     'megaChatIsDisabled': ((function() {
-        var status = localStorage.testChatDisabled;
+        var status = tryCatch(function() {
+            return localStorage.testChatDisabled;
+        }, false)();
         return {
             set: function(val) {
                 status = val;
@@ -172,9 +174,14 @@ Object.defineProperties(self, {
     }
 });
 
+try {
 // auto-shield
-freeze(freeze);
-freeze(lazy);
+    freeze(freeze);
+    freeze(lazy);
+}
+catch (ex) {
+    console.warn('unsecure browser environment...', ex);
+}
 
 function getMobileStoreLink() {
     'use strict';
@@ -329,29 +336,39 @@ function getCleanSitePath(path) {
             target.uaoref = path.uao;
         }
         if (path.aff) {
-            if (!path.aff_time) {
-                sessionStorage.affid = path.aff;
-                sessionStorage.affts = Date.now();
-                sessionStorage.afftype = 1;
-            }
-            else if (!(sessionStorage.affts > (path.aff_time *= 1000))) {
-                sessionStorage.affid = path.aff;
-                sessionStorage.affts = path.aff_time;
+            tryCatch(function() {
+                if (!path.aff_time) {
+                    sessionStorage.affid = path.aff;
+                    sessionStorage.affts = Date.now();
+                    sessionStorage.afftype = 1;
+                }
+                else if (!(sessionStorage.affts > (path.aff_time *= 1000))) {
+                    sessionStorage.affid = path.aff;
+                    sessionStorage.affts = path.aff_time;
 
-                // Future proof, currently only public link affiliate data is coming from other agent.
-                // Later, url from other agents will contains type for it to support other type.
-                sessionStorage.afftype = path.aff_type || 2;
+                    // Future proof, currently only public link affiliate data is coming from other agent.
+                    // Later, url from other agents will contains type for it to support other type.
+                    sessionStorage.afftype = path.aff_type || 2;
+                }
+            }, false)();
+        }
+
+        tryCatch(function() {
+            if (path.csp) {
+                localStorage.csp = path.csp >>> 0 & 0xff;
             }
-        }
-        if (path.csp) {
-            localStorage.csp = path.csp >>> 0 & 0xff;
-        }
-        if (path.sra) {
-            localStorage.utm = b64decode(path.sra);
-        }
+            if (path.sra) {
+                localStorage.utm = b64decode(path.sra);
+            }
+            if (path.lang && path.lang.length < 6) {
+                localStorage.lang = path.lang;
+            }
+        }, false)();
+
         if (path.mt) {
             window.uTagMT = path.mt;
         }
+
         if (path.next) {
             window.nextPage = b64decode(path.next);
             if (path.plan) {
@@ -360,9 +377,6 @@ function getCleanSitePath(path) {
             else if (path.articleUrl) {
                 window.helpOrigin = b64decode(path.articleUrl);
             }
-        }
-        if (path.lang && path.lang.length < 6) {
-            localStorage.lang = path.lang;
         }
     }
 
@@ -449,7 +463,13 @@ function geoStaticPath(cms) {
 var myURL = window.URL;
 
 // Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
-browserUpdate = browserUpdate || typeof BigInt === 'undefined';
+browserUpdate = browserUpdate ||
+    (is_embed
+            ? (typeof ReadableStream === 'undefined' || typeof IntersectionObserver === 'undefined')
+            : typeof BigInt === 'undefined'
+    );
+// ReadableStream: C43 E14 F65 O30 S10.1
+// IntersectionObserver: C51 E15 F55 O38 S12.1
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
@@ -2186,7 +2206,7 @@ else if (!browserUpdate) {
                         return "'" + (a.origin !== 'null' && a.origin
                             || (a.protocol + '//' + a.hostname)) + "...'";
                     })
-                    .replace(/(Cannot read property )('[\w-]{8}')/, "$1'<h>?'")
+                    .replace(/(Cannot read propert[\w\s]+)\(?([\w\s]*'[\w-]{8}')/, "$1'<h>?'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
@@ -2234,6 +2254,14 @@ else if (!browserUpdate) {
                 // Some third party extension is injecting bogus script(s)...
                 console.warn('Your account is only as secure as your computer...');
                 console.warn('Check your installed extensions for the one injecting bogus scripts on this page...');
+                console.error(dump.m, dump, errobj);
+                return false;
+            }
+
+            if (/NS_ERR|out[\s_]+of[\s_]+mem|dead\s+object|allocation\s+failed/i.test(dump.m)
+                && (!window.ua || !ua.details || !ua.details.blink)) {
+
+                window.onerror = null;
                 console.error(dump.m, dump, errobj);
                 return false;
             }
@@ -2515,7 +2543,7 @@ else if (!browserUpdate) {
     };
 
     tryCatch(function() {
-        if (!is_mobile && 'serviceWorker' in navigator) {
+        if (!is_mobile && !is_iframed && 'serviceWorker' in navigator) {
             // The service worker isn't listened to until much later so just queue any messages for now.
             var handler = function(ev) {
                 mega.pendingServiceWorkerMsgs.push({data: ev.data});
@@ -3717,7 +3745,7 @@ else if (!browserUpdate) {
 
         scriptTest(
             'es6s =' +
-            ' BigInt(Math.pow(2, 48)) << 16n === 18446744073709551616n' + // C67 E79 F68 O54 S14
+            (is_embed || ' BigInt(Math.pow(2, 48)) << 16n === 18446744073709551616n') + // C67 E79 F68 O54 S14
             ' && (Array.prototype.values === Array.prototype[Symbol.iterator])' + // C66 E12 F60 O53 S9
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {

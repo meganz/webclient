@@ -50,6 +50,9 @@
         }
 
         this.write = function(buffer, position, done) {
+            if (!dblob) {
+                return done();
+            }
             try {
                 dblob.push(new Blob([buffer]));
             }
@@ -62,9 +65,9 @@
         };
 
         this.download = function(name, path) {
-            var blob = this.getBlob(name);
+            var blob = dblob && this.getBlob(name);
 
-            if (this.completed) {
+            if (!blob || this.completed) {
                 if (d) {
                     console.log('Transfer already completed...', dl);
                 }
@@ -122,7 +125,7 @@
             if (size > MemoryIO.fileSizeLimit) {
                 dlFatalError(dl, Error(l[16872]));
                 if (!this.is_zip) {
-                    ASSERT(!this.begin, "This should have been destroyed 'while initializing'");
+                    ASSERT(!this.begin || dl.awaitingPromise, "This should have been destroyed 'while initializing'");
                 }
             }
             else {

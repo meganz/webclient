@@ -994,7 +994,6 @@ function toLocaleTime(unixtime) {
 // eslint-disable-next-line complexity
 mBroadcaster.once('boot_done', function populate_l() {
     'use strict';
-    var i;
 
     if (d) {
         const loaded = l;
@@ -1845,7 +1844,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'pro_flexi_account_suspended_description',
         'cannot_leave_share_content'
     ];
-    for (i = common.length; i--;) {
+    for (let i = common.length; i--;) {
         var num = common[i];
 
         l[num] = escapeHTML(l[num])

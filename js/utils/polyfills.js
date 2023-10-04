@@ -251,8 +251,8 @@ if (Object.fromEntries === undefined) {
         return mutex(name, (resolve, reject, a0) => handler(push(0, resolve), push(1, reject), a0));
     };
 
-    // @todo remove once Fx60 is upgraded on Jenkins
     if (Promise.prototype.finally === undefined) {
+        // this must actually only be needed for the embed-player.
         Promise.prototype.finally = function(cb) {
             return this.then(
                 (res) => Promise.resolve(cb()).then(() => res),

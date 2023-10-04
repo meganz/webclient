@@ -139,7 +139,7 @@
     color: var(--text-color-high);
 }
 .m-dropdown-item.contains-submenu.icon-arrow-right-after::after {
-    content: "\f281";
+    content: "\f284";
     font-family: fm-mono, sans-serif;
     line-height: 1;
     font-size: var(--icon-size, 16px);

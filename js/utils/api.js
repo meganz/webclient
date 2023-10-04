@@ -1687,7 +1687,19 @@ lazy(self, 'api', () => {
             if (req instanceof MEGAPIRequest) {
                 let tick = 0;
 
+                if (req.service === 'cs') {
+                    const dk = [...inflight.keys()].filter(a => a[0] === '{');
+
+                    if (dk.length) {
+                        if (d) {
+                            logger.warn('Expunging de-dup records...', dk);
+                        }
+
+                        inflight.remove(...dk);
+                    }
+                }
                 api.webLockSummary();
+
                 lock(req.channel, async() => {
                     if (!req.idle) {
                         if (d) {

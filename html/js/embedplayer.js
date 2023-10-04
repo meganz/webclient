@@ -456,7 +456,7 @@ mBroadcaster.once('startMega', function() {
         }
     };
     window.MEGAException = DOMException;
-    window.MEGAException.assert = (e, ...a) => {
+    window.MEGAException.assert = window.assert = (e, ...a) => {
         if (!e) {
             throw new MEGAException(...a);
         }

@@ -1,7 +1,7 @@
 /**
  * My Account Change Password functionality
  */
-mobile.account.changePassword = {
+mobile.settings.account.changePassword = {
 
     /**
      * @param {Object} $page The jQuery selector object for the current page
@@ -22,7 +22,7 @@ mobile.account.changePassword = {
         }
 
         // Cache the selector for the page
-        this.$page = $('#startholder .mobile.my-account-change-password-page');
+        this.$page = $('.mobile.my-account-change-password-page');
 
         // Initialise page functionality
         this.initUpdateButton();
@@ -31,11 +31,7 @@ mobile.account.changePassword = {
         mobile.initPasswordFieldsKeyupEvent(this.$page);
         mobile.initPasswordEstimatorLibrary(this.$page);
         mobile.initPasswordStrengthCheck(this.$page);
-        mobile.initBackButton(this.$page, 'fm/account/');
         mobile.initPasswordVisibleToggle(this.$page);
-
-        // Initialise the top menu
-        topmenuUI();
 
         // Show the page
         this.$page.removeClass('hidden');
@@ -51,6 +47,9 @@ mobile.account.changePassword = {
         var $passwordField = this.$page.find('.password-input');
         var $confirmPasswordField = this.$page.find('.password-confirm-input');
         var $updateButton = this.$page.find('.update-password-button');
+
+        $passwordField.val('');
+        $confirmPasswordField.val('');
 
         // Add click/tap handler to button
         $updateButton.rebind('tap', () => {
@@ -82,11 +81,11 @@ mobile.account.changePassword = {
                 return false;
             }
 
-            const {$page} = mobile.account.changePassword;
+            const {$page} = mobile.settings.account.changePassword;
             const $verifyActionPage = $('.mobile.two-factor-page.verify-action-page');
 
             // Pass the encrypted password to the API
-            mobile.account.changePassword.updatePassword(password)
+            mobile.settings.account.changePassword.updatePassword(password)
                 .then(() => {
 
                     // Success
@@ -125,7 +124,7 @@ mobile.account.changePassword = {
         // Check if 2FA is enabled on their account
         if (hasTwoFactor) {
 
-            mobile.account.changePassword.$page.addClass('hidden');
+            mobile.settings.account.changePassword.$page.addClass('hidden');
 
             // Show the verify 2FA action page to collect the user's PIN
             twoFactorPin = await mobile.twofactor.verifyAction.init();
@@ -154,7 +153,7 @@ mobile.account.changePassword = {
         loadingDialog.hide();
 
         // Cache selector
-        var $page = mobile.account.changePassword.$page;
+        var $page = mobile.settings.account.changePassword.$page;
         var $verifyActionPage = $('.mobile.two-factor-page.verify-action-page');
 
         // If something went wrong with the 2FA PIN
@@ -175,6 +174,7 @@ mobile.account.changePassword = {
 
             // Show 'Your password has been changed' message and load the account page on button click
             mobile.messageOverlay.show(l[725], null, function() {
+                $page.addClass('hidden');
                 loadSubPage('fm/account');
             });
         }

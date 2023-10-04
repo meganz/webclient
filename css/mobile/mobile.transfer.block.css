@@ -1,0 +1,82 @@
+.mega-transfer-block {
+    display: flex;
+    flex-direction: column;
+    max-width: 382px;
+    width: 100%;
+}
+
+.mega-transfer-block .file-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+    margin-bottom: 12px;
+}
+.mega-transfer-block .file-info .file-name {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mega-transfer-block .file-info .file-actions {
+    display: flex;
+    align-items: center;
+    margin-inline-start: 12px;
+    -webkit-margin-start: 12px;
+}
+.mega-transfer-block .file-info .file-actions > *:not(:first-child) {
+    margin-inline-start: 16px;
+    -webkit-margin-start: 16px;
+}
+.mega-transfer-block .file-info .file-status {
+    display: flex;
+    flex-direction: row;
+    background: none;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+    white-space: nowrap;
+}
+.mega-transfer-block.error .file-info .file-status i {
+    color: var(--mobile-support-error);
+    --icon-size: 24px;
+    margin-inline-end: 12px;
+    -webkit-margin-end: 12px;
+}
+.mega-transfer-block .nav-elem.icon-only {
+    padding: 0;
+}
+.mega-transfer-block .file-progress {
+    height: 10px;
+    border-radius: 5px;
+    background-color: var(--mobile-surface-2);
+    display: block;
+}
+.mega-transfer-block .file-progress .bar {
+    height: 10px;
+    border-radius: 5px;
+    background: var(--mobile-support-success);
+    border-width: 0;
+    box-shadow: none;
+}
+.mega-transfer-block.error .file-progress .bar {
+    background: var(--mobile-support-error);
+}
+.mega-transfer-block .file-error {
+    display: none;
+}
+.mega-transfer-block.error .file-error {
+    display: flex;
+    flex-direction: row;
+    background: none;
+    color: var(--mobile-support-error);
+    font: var(--mobile-font-copy-regular);
+    margin-top: 12px;
+}
+.mega-transfer-block.error .file-error i {
+    --icon-size: 24px;
+    margin-inline-end: 12px;
+    -webkit-margin-end: 12px;
+}

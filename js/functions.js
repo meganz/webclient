@@ -836,7 +836,7 @@ function ASSERT(what, msg, udata) {
 function srvlog(msg, data, silent) {
     'use strict';
 
-    reportError(msg);
+    reportError(msg instanceof Error ? msg : new Error(msg));
 }
 
 // log failures through event id 99666
@@ -954,9 +954,9 @@ async function mKeyDialog(ph, fl, keyr, selector) {
     "use strict";
 
     const {promise} = mega;
-    var $dialog = $(is_mobile ? '#mobile-decryption-key-overlay' : '.mega-dialog.dlkey-dialog');
-    var $button = $(is_mobile ? '.mobile.decrypt-button' : '.fm-dialog-new-folder-button', $dialog);
-    var $input = $(is_mobile ? '.mobile.decryption-key' : 'input', $dialog);
+    var $dialog = $('.mega-dialog.dlkey-dialog');
+    var $button = $('.fm-dialog-new-folder-button', $dialog);
+    var $input = $('input', $dialog);
 
     if (keyr) {
         $('.mega-dialog.dlkey-dialog .instruction-message')
@@ -976,26 +976,7 @@ async function mKeyDialog(ph, fl, keyr, selector) {
 
     $button.addClass('disabled').removeClass('active');
 
-    if (is_mobile) {
-        const $initialMessage = $('.initial-message');
-        const $errorMessage = $('.error-message');
-
-        // If the previous folder key was incorrect, show an error message for them to try again
-        if (keyr) {
-            $initialMessage.addClass('hidden');
-            $errorMessage.removeClass('hidden');
-        }
-        else {
-            // Show a first message
-            $initialMessage.removeClass('hidden');
-            $errorMessage.addClass('hidden');
-        }
-
-        $dialog.removeClass('hidden');
-    }
-    else {
-        M.safeShowDialog('dlkey-dialog', $dialog);
-    }
+    M.safeShowDialog('dlkey-dialog', $dialog);
 
     const processKeyboardEvent = (evt) => {
         if (evt.key === 'Escape') {
@@ -1020,6 +1001,7 @@ async function mKeyDialog(ph, fl, keyr, selector) {
 
         if (length) {
             $button.removeClass('disabled').addClass('active');
+
             if (e.keyCode === 13) {
                 $button.click();
             }
@@ -2425,7 +2407,7 @@ function invalidLinkError() {
     }
     else {
         // Show file/folder not found overlay
-        mobile.notFoundOverlay.show();
+        mobile.notFound.show();
     }
 }
 

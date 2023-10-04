@@ -1465,7 +1465,7 @@ MegaUtils.prototype.getStorageState = async function(force) {
  */
 MegaUtils.prototype.getStorageQuota = async function() {
     'use strict';
-    const {result} = await api.req({a: 'uq', strg: 1, qc: 1});
+    const {result} = await api.req({a: 'uq', strg: 1, qc: 1}, {cache: -4});
 
     if (result.uslw === undefined) {
         result.uslw = 9000;
@@ -1495,8 +1495,8 @@ MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
                         ulmanager.ulResumeOverStorageQuotaState();
                     });
                 }
-                if (is_mobile) {
-                    mobile.overStorageQuotaOverlay.close();
+                if (is_mobile && mega.ui.sheet.name === 'over-storage') {
+                    mega.ui.sheet.hide();
                 }
                 if (u_attr) {
                     delete u_attr.uspw;

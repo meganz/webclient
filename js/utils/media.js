@@ -1980,6 +1980,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
             if (s.hasAudio && /\b[ae]+c-?3\b/i.test(s.hasAudio)) {
                 eventlog(99820, JSON.stringify([1, s.hasVideo, s.hasAudio, s.options.type]));
             }
+            if (is_embed) {
+                // Watch correlation with 99686
+                eventlog(99824, true);
+            }
             mBroadcaster.sendMessage('trk:event', 'videostream', 'playing');
 
             if (!is_audio(node)) {
@@ -2388,6 +2392,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return Promise.resolve(mediaCodecs);
         }
 
+        const cls = tryCatch(() => {
+            // This is 84KB, let's expunge it until the user comes back to an embed player.
+            delete localStorage['<mc>'];
+        });
+
         mediaCodecs = new Promise(function(resolve, reject) {
             var db;
             var apiReq = function() {
@@ -2449,8 +2458,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     resolve(mediaCodecs);
 
                     if (db) {
+                        queueMicrotask(cls);
                         return db.kv.put({k: 'l', t: Date.now(), v: data});
                     }
+
+                    tryCatch(() => {
+                        if (data.version > 2) {
+                            localStorage['<mc>'] = JSON.stringify([Date.now(), data]);
+                        }
+                    })();
                 };
                 return api.req({a: 'mc'}).then(({result}) => prc(result));
             };
@@ -2472,7 +2488,24 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             if (typeof Dexie === 'undefined') {
 
-                apiReq().catch(reject);
+                const data = tryCatch(() => {
+                    if (localStorage['<mc>']) {
+                        const [ts, data] = JSON.parse(localStorage['<mc>']);
+
+                        if (Date.now() < ts + 864e6) {
+
+                            return deepFreeze(data);
+                        }
+                    }
+                })();
+
+                if (data) {
+                    queueMicrotask(() => resolve(mediaCodecs = data));
+                }
+                else {
+                    queueMicrotask(cls);
+                    apiReq().catch(reject);
+                }
             }
             else {
                 const timer = setTimeout(() => apiReq().catch(reject), 1400);

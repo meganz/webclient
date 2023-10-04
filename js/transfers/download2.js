@@ -176,6 +176,7 @@ var dlmanager = {
 
         // These browsers do not support opening blob.
         if (ua.details.brand === 'FxiOS'
+            || ua.details.brand === 'CriOS'
             || ua.details.browser === 'Opera'
             || ua.details.browser === 'SamsungBrowser') {
 
@@ -1320,7 +1321,13 @@ var dlmanager = {
             $(window).trigger('resize');
         }
         else if (ids.length) {
-            resetOverQuotaTransfers(ids);
+            if (is_mobile) {
+                mega.ui.sheet.hide();
+                mobile.downloadOverlay.downloadTransfer.resetTransfer();
+            }
+            else {
+                resetOverQuotaTransfers(ids);
+            }
         }
 
         for (var i = 0; i < this._dlQuotaListener.length; ++i) {
@@ -1606,11 +1613,6 @@ var dlmanager = {
             $('.continue, .continue-download', $dialog)
                 .removeAttr('style')
                 .rebind('click', this.onLimitedBandwidth.bind(this));
-
-            if (is_mobile) {
-                // desktop has a 'continue' button, on mobile we do treat the close button as such
-                $('.fm-dialog-close', $dialog).rebind('click', this.onLimitedBandwidth.bind(this));
-            }
         }
         else {
 
@@ -1877,7 +1879,7 @@ var dlmanager = {
             this.lmtUserFlags = flags;
         }
 
-        M.safeShowDialog('download-pre-warning', function() {
+        M.safeShowDialog('download-pre-warning', () => {
             eventlog(99617);// overquota pre-warning shown.
 
             // Load the membership plans
@@ -2018,10 +2020,6 @@ var dlmanager = {
             dlmanager._overquotaClickListeners($dialog, flags);
 
             $('.fm-dialog-overlay').rebind('click.dloverq', doCloseModal);
-
-            if (is_mobile) {
-                $(window).trigger('orientationchange');
-            }
 
             $dialog
                 .addClass('exceeded')
@@ -2379,18 +2377,16 @@ var dlmanager = {
             if (typeof megasync === 'undefined') {
                 console.error('Failed to load megasync.js');
             }
+            else if (typeof dlpage_ph === 'string' && megasync.getUserOS() !== 'linux') {
+                megasync.download(dlpage_ph, dlpage_key);
+            }
             else {
-                if (typeof dlpage_ph === 'string') {
-                    megasync.download(dlpage_ph, dlpage_key);
-                }
-                else {
-                    window.open(
-                        megasync.getMegaSyncUrl() || 'https://mega.io/desktop',
-                        '_blank',
-                        'noopener,noreferrer'
-                    );
-                    hideOverlay();
-                }
+                window.open(
+                    megasync.getMegaSyncUrl() || 'https://mega.io/desktop',
+                    '_blank',
+                    'noopener,noreferrer'
+                );
+                hideOverlay();
             }
 
             return false;

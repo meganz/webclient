@@ -321,16 +321,16 @@ var slideshowid;
         else if (is_mobile) {
 
             $removeButtonV.rebind('click.mediaviewer', () => {
+            // TODO: work on this in view files ticket
+            //     // Show the folder/file delete overlay
+            //     mobile.deleteOverlay.show(n.h, () => {
 
-                // Show the folder/file delete overlay
-                mobile.deleteOverlay.show(n.h, () => {
+                //     // After successful delete, hide the preview slideshow
+                //     history.back();
+                // });
 
-                    // After successful delete, hide the preview slideshow
-                    history.back();
-                });
-
-                // Prevent double tap
-                return false;
+            //     // Prevent double tap
+            //     return false;
             });
         }
         else {
@@ -400,7 +400,7 @@ var slideshowid;
                     tSleep(3).then(() => $getLinkBtn.removeClass('disabled'));
 
                     if (is_mobile) {
-                        mobile.linkOverlay.show(n.h);
+                        mobile.linkManagement.showOverlay(n.h);
                     }
                     else {
                         $(document).fullScreen(false);
@@ -447,7 +447,7 @@ var slideshowid;
         }
     }
 
-    function slideshow_zoomSlider(value = 100) {
+    const slideshow_zoomSlider = is_mobile ? nop : (value = 100) => {
         const container = document.querySelector('.media-viewer-container');
         const wrapper = container && container.querySelector('.zoom-slider-wrap');
         const $elm = $('.zoom-slider', wrapper);
@@ -490,7 +490,7 @@ var slideshowid;
                 );
             }
         });
-    }
+    };
 
     // Inits Image viewer bottom control bar
     function slideshow_imgControls(slideshow_stop, close) {
@@ -564,6 +564,11 @@ var slideshowid;
             if (is_mobile) {
                 eventlog(99835);
                 M.noSleep().catch(dump);
+                if (is_ios) {
+                    // Due to the handling of the onload event with the previous image in iOS,
+                    // force the call to img position
+                    slideshow_imgPosition();
+                }
             }
 
             // hack to start the slideshow in full screen mode
@@ -627,6 +632,11 @@ var slideshowid;
         // Bind Slideshow Close button
         $('.sl-btn.close', is_mobile ? $slideshowControls : $slideshowControlsUpper).rebind('click.mediaviewer', () => {
             slideshowplay_close();
+            if (is_mobile && is_ios) {
+                // Due to the handling of the onload event with the previous image in iOS,
+                // force the call to img position
+                slideshow_imgPosition();
+            }
             return false;
         });
     }
@@ -867,7 +877,7 @@ var slideshowid;
             _hideCounter = false;
             slideshow_play(false, true);
             preselection = undefined;
-            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow fullscreen')
+            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow fullscreen fullimage')
                 .addClass('hidden');
             $playVideoButton.addClass('hidden');
             $videoControls.addClass('hidden');
@@ -905,6 +915,9 @@ var slideshowid;
 
             if (is_mobile) {
                 M.noSleep(true).catch(dump);
+                if (mega.ui.viewerOverlay) {
+                    mega.ui.viewerOverlay.hide();
+                }
             }
 
             if (_pdfSeen) {
@@ -1089,34 +1102,34 @@ var slideshowid;
 
             if (is_mobile) {
 
-                const isDownload = page === 'download';
-
-                if (isDownload) {
-
-                    $controls.addClass('hidden');
-                    $controls = $controls.not('button');
-                }
-
                 $('.img-wrap', $overlay).rebind('tap.media-viewer', () => {
 
                     if (slideshowplay) {
                         return;
                     }
 
-                    if (isDownload && !$overlay.hasClass('fullscreen')) {
-                        $overlay.addClass('fullscreen');
-                        $controls.addClass('hidden');
-                        slideshow_imgPosition($overlay);
-                    }
+                    $overlay.toggleClass('fullimage');
 
-                    if ($controls.hasClass('hidden')) {
-                        $controls.removeClass('hidden');
-                    }
-                    else {
-                        $controls.addClass('hidden');
-                    }
+                    slideshow_imgPosition($overlay);
 
                     return false;
+                });
+
+                $('.go-fullscreen', $overlay).rebind('click.media-viewer', () => {
+                    if (ua.details.os === "iPad") {
+                        // iPad does not allow fullscreen mode for now
+                        // therefore, we do not modify the header and imageControls
+                        // since otherwise, we will not be able to revoke this action.
+                        return;
+                    }
+                    if ($document.fullScreen()) {
+                        $('header', $overlay).removeClass('hidden');
+                        $imageControls.removeClass('hidden');
+                    }
+                    else {
+                        $('header', $overlay).addClass('hidden');
+                        $imageControls.addClass('hidden');
+                    }
                 });
             }
             else {
@@ -1376,29 +1389,7 @@ var slideshowid;
         $overlay.removeClass('hidden');
 
         if (is_mobile) {
-            const isVideo = is_video(n);
-            const listener = mBroadcaster.addListener('orientationchange', (mode) => {
-
-                requestAnimationFrame(() => {
-
-                    if (slideshowplay) {
-                        // If the image slideshow is in progress, disable the orientation change function
-                        return false;
-                    }
-
-                    if (isVideo) {
-
-                        if (mode === 'landscape') {
-
-                            $controls.addClass('hidden');
-                        }
-                        else {
-                            $controls.removeClass('hidden');
-                        }
-                    }
-                });
-            });
-            broadcasts.push(listener);
+            mega.ui.viewerOverlay.show(id);
         }
     }
 
@@ -1969,7 +1960,9 @@ var slideshowid;
             $overlay.addClass('docx');
             $pendingBlock.addClass('hidden');
             $progressBlock.addClass('vo-hidden');
-            $bottomBar.addClass('hidden');
+            if (!is_mobile) {
+                $bottomBar.addClass('hidden');
+            }
             $imgWrap.addClass('hidden');
             prepareAndViewDocxViewer(previews[id]);
             eventlog(99819);

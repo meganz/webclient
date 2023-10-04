@@ -2819,6 +2819,7 @@ lazy(mega.gallery, 'albums', () => {
 
             delay('focus:new_album_input', () => {
                 this.input.focus();
+                this.input.select();
             }, 200);
         }
 

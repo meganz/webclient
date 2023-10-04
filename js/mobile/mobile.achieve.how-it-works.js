@@ -21,14 +21,10 @@ mobile.achieve.howItWorks = {
             return false;
         }
 
+        $('.mobile.main-block:not(hidden)').addClass('hidden');
+
         // Cache selector
         this.$page = $('.mobile.achievements-how-it-works-page');
-
-        // Initialise back button to go back to the Invites page
-        mobile.initBackButton(this.$page, 'fm/account/invites');
-
-        // Initialise the top menu
-        topmenuUI();
 
         // Show the account page content
         this.$page.removeClass('hidden');

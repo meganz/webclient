@@ -1,0 +1,91 @@
+.mega-radio-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 12px 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mega-radio-button.align-right {
+    flex-direction: row-reverse;
+}
+
+.mega-radio-button.align-right .radio-wrapper {
+    margin-inline-start: auto;
+    -webkit-margin-start: auto;
+    margin-inline-end: 0;
+    -webkit-margin-end: 0;
+}
+
+.mega-radio-button .radio-wrapper {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    border: 1px solid var(--mobile-selection-control);
+    border-radius: var(--mobile-border-radius-circle);
+    background: var(--mobile-icon-inverse);
+    position: relative;
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
+}
+
+.mega-radio-button.on .radio-wrapper::after {
+    background: var(--mobile-selection-control);
+    border-radius: var(--mobile-border-radius-circle);
+    content: "";
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.mega-radio-button input {
+    opacity: 0;
+    cursor: pointer;
+    margin: 0;
+}
+
+.mega-radio-button .radio-action {
+    color: var(--mobile-text-primary);
+    height: auto;
+    flex: none;
+    order: 1;
+}
+
+.mega-radio-button .radio-action[for^="labels-"]::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border-radius: 100%;
+    display: inline-block;
+    vertical-align: middle;
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
+    margin-bottom: 3px;
+}
+.mega-radio-button .radio-action[for="labels-1"]::before {
+    background-color: var(--label-red);
+}
+.mega-radio-button .radio-action[for="labels-2"]::before {
+    background-color: var(--label-orange);
+}
+.mega-radio-button .radio-action[for="labels-3"]::before {
+    background-color: var(--label-yellow);
+}
+.mega-radio-button .radio-action[for="labels-4"]::before {
+    background-color: var(--label-green);
+}
+.mega-radio-button .radio-action[for="labels-5"]::before {
+    background-color: var(--label-blue);
+}
+.mega-radio-button .radio-action[for="labels-6"]::before {
+    background-color: var(--label-purple);
+}
+.mega-radio-button .radio-action[for="labels-7"]::before {
+    background-color: var(--label-grey);
+}

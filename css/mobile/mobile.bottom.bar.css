@@ -1,0 +1,36 @@
+.mega-bottom-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 100;
+    border-top: 1px solid var(--mobile-border-strong);
+    background: var(--mobile-page-background);
+    margin-top: auto;
+    position: fixed;
+    bottom: 0;
+}
+
+.mega-bottom-bar .text-actions,
+.mega-bottom-bar .icon-actions {
+    display: flex;
+    align-items: flex-start;
+}
+
+.mega-bottom-bar > *:not(:first-child),
+.mega-bottom-bar .text-actions > *:not(:first-child),
+.mega-bottom-bar .icon-actions > *:not(:first-child) {
+    margin-inline-start: 8px;
+    -webkit-margin-start: 8px;
+}
+
+.mega-bottom-bar .icon-actions:empty {
+    display: none;
+}
+
+.mega-bottom-bar .text-actions {
+    flex: 1;
+}

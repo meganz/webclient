@@ -1323,16 +1323,6 @@ scparser.$add('sd', {
     }
 });
 
-scparser.$add('e', function(a) {
-    // CMS update
-    var str = hex2bin(a.c || "");
-    if (str.substr(0, 5) === ".cms.") {
-        var cmsType = str.split(".")[2];
-        var cmsId = str.substr(6 + cmsType.length).split(".");
-        CMS.reRender(cmsType, cmsId);
-    }
-});
-
 scparser.$add('fa', function(a) {
     // file attribute change/addition
     var n = M.d[a.n];
@@ -1503,39 +1493,74 @@ scparser.$add('usc', function() {
 
 // Payment received
 scparser.$add('psts', function(a) {
+    'use strict';
 
-    if (!pfid && u_type) {
-        M.checkStorageQuota(2000);
+    onIdle(() => {
+        watchdog.notify('psts', (a.r === 's' && a.p) | 0);
+    });
+
+    if (fminitialized && !pfid) {
+        pro.processPaymentReceived(a);
     }
-    pro.processPaymentReceived(a);
+
+    this.sqac(a);
+});
+
+// Storage quota allowance changed.
+scparser.$add('sqac', (a) => {
+    'use strict';
+
+    if (d) {
+        console.info(a.a, [a]);
+    }
 
     if (ulmanager.ulOverStorageQuota) {
-        eventlog(99701);
-        onIdle(function() {
+        eventlog(99701, a.a, true);
+
+        delay('sqac:ul-resume', () => {
             ulmanager.ulResumeOverStorageQuotaState();
         });
     }
 
-    onIdle(function() {
-        dlmanager._onOverQuotaAttemptRetry();
-    });
+    if (dlmanager.isOverQuota) {
 
-    onIdle(function() {
-        watchdog.notify('psts', (a.r === 's' && a.p) | 0);
-    });
-
-    // If user is on FM, update account status with this packet.
-    if (fminitialized) {
-        onIdle(function() {
-            if (page.indexOf('fm/account') === 0) {
-                accountUI();
-            }
-            else {
-                M.accountData();
-            }
+        delay('sqac:dl-resume', () => {
+            dlmanager._onOverquotaDispatchRetry();
         });
+    }
 
-        M.storageQuotaCache = null;
+    // If a user is on FM, update the account status with this packet.
+    if (fminitialized) {
+
+        delay('sqac:ui-update', () => {
+
+            if (!pfid) {
+
+                if (page.indexOf('fm/account') === 0) {
+
+                    accountUI();
+                }
+                else if (page === 'fm/dashboard') {
+
+                    dashboardUI(true);
+                }
+                else {
+                    M.accountData();
+                }
+            }
+            M.storageQuotaCache = null;
+
+            if ($.topMenu) {
+
+                topMenu();
+            }
+            else if (!pfid) {
+
+                M.checkLeftStorageBlock();
+            }
+
+            M.checkStorageQuota(2e3);
+        });
     }
 });
 
@@ -3111,7 +3136,10 @@ function processPH(publicHandles) {
 
             if (fminitialized && M.currentdirid === 'public-links') {
                 removeUInode(nodeId, value.p);
-                selectionManager.remove_from_selection(nodeId);
+
+                if (typeof selectionManager !== 'undefined') {
+                    selectionManager.remove_from_selection(nodeId);
+                }
             }
 
             if (UiExportLink) {
@@ -3140,13 +3168,12 @@ function processPH(publicHandles) {
             }
         }
 
-        if (UiExportLink && (value.down !== undefined)) {
-            UiExportLink.updateTakenDownItem(nodeId, value.down);
+        if (is_mobile) {
+            mobile.cloud.updateLinkIcon(nodeId);
         }
 
-        // Update the public link icon for mobile
-        if (is_mobile) {
-            mobile.cloud.updateLinkStatus(nodeId);
+        if (UiExportLink && (value.down !== undefined)) {
+            UiExportLink.updateTakenDownItem(nodeId, value.down);
         }
 
         if (fminitialized && M.recentsRender) {
@@ -3477,6 +3504,8 @@ function folderreqerr(c, e) {
     }
 
     // If desktop site show "Folder link unavailable" dialog
+    parsepage(pages.placeholder);
+
     if (!is_mobile) {
         if (parseInt(e) === EARGS) {
             title = l[20198];
@@ -3486,7 +3515,6 @@ function folderreqerr(c, e) {
             message = l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>';
         }
 
-        parsepage(pages['placeholder']);
         msgDialog('warninga', title, message, false, function() {
 
             // If the user is logged-in, he'll be redirected to the cloud
@@ -3494,9 +3522,8 @@ function folderreqerr(c, e) {
         });
     }
     else {
-        // Show file/folder not found overlay
-        mobile.initDOM();
-        mobile.notFoundOverlay.show(message || parseInt(e && e.err || e));
+        // Show file/folder not found page
+        mobile.notFound.show(message || parseInt(e && e.err || e));
     }
 }
 
@@ -3588,6 +3615,9 @@ function loadfm_callback(res) {
 
             loadfm.loaded = false;
             loadfm.loading = false;
+
+            parsepage(pages.placeholder);
+            mega.ui.setTheme();
 
             return mKeyDialog(pfid, true, true).catch(() => loadSubPage('start'));
         }
@@ -3789,8 +3819,6 @@ function loadfm_done(mDBload) {
 
         window.loadingInitDialog.step3(100);
 
-        var hideLoadingDialog = !is_mobile && !CMS.isLoading();
-
         if ((location.host === 'mega.nz' || !megaChatIsDisabled) && !is_mobile) {
 
             if (!pfid && !loadfm.chatloading && (u_type === 3 || is_eplusplus)) {
@@ -3819,12 +3847,6 @@ function loadfm_done(mDBload) {
                         loadfm.chatloading = false;
                         loadfm.chatloaded  = Date.now();
                     });
-
-                /*
-                if (getSitePath().substr(0, 8) === '/fm/chat') {
-                    // Keep the "decrypting" step until the chat have loaded.
-                    hideLoadingDialog = false;
-                }*/
             }
         }
 
@@ -3856,15 +3878,13 @@ function loadfm_done(mDBload) {
             });
         }
 
-        if (hideLoadingDialog) {
-            onIdle(() => {
-                window.loadingInitDialog.hide();
+        onIdle(() => {
+            window.loadingInitDialog.hide();
 
-                // Reposition UI elements right after hiding the loading overlay,
-                // without waiting for the lazy $.tresizer() triggered by MegaRender
-                fm_resize_handler(true);
-            });
-        }
+            // Reposition UI elements right after hiding the loading overlay,
+            // without waiting for the lazy $.tresizer() triggered by MegaRender
+            fm_resize_handler(true);
+        });
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded
         if (mDBload !== -0x800e0fff && !is_mobile) {

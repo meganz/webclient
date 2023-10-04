@@ -309,7 +309,8 @@
 }
 .sprite-fm-illustration-wide.img-mega-logo-light,
 .sprite-fm-illustration-wide.img-mega-logo-light-before::before,
-.sprite-fm-illustration-wide.img-mega-logo-light-after::after {
+.sprite-fm-illustration-wide.img-mega-logo-light-after::after,
+.theme-light .sprite-fm-illustration-wide.img-mega-logo {
     background-position: calc(900% / 9) 0;
 }
 
@@ -317,6 +318,7 @@
 
 .sprite-fm-illustration-wide.mega-logo-dark,
 .sprite-fm-illustration-wide.mega-logo-dark-before::before,
-.sprite-fm-illustration-wide.mega-logo-dark-after::after {
+.sprite-fm-illustration-wide.mega-logo-dark-after::after,
+.theme-dark .sprite-fm-illustration-wide.img-mega-logo {
     background-position: 0 calc(var(--scale) * -250);
 }

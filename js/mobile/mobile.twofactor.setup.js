@@ -31,9 +31,6 @@ mobile.twofactor.setup = {
         this.initAppLinkButtons();
         this.initCloseAuthenticatorAppDialogButton();
 
-        // Initialise back button to go back to the My Account page
-        mobile.initBackButton(this.$page, 'fm/account');
-
         // Show the account page content
         this.$page.removeClass('hidden');
     },
@@ -79,7 +76,7 @@ mobile.twofactor.setup = {
                 // The Two-Factor has already been setup, return to the My Account page to disable
                 if (ex === EEXIST) {
                     mobile.messageOverlay.show(l[19219], l['2fa_already_enabled_mob'], () => {
-                        loadSubPage('fm/account/');
+                        loadSubPage('fm/account/security');
                     });
                 }
                 else {
@@ -100,10 +97,13 @@ mobile.twofactor.setup = {
         'use strict';
 
         // On button click/tap
-        mobile.twofactor.setup.$page.find('.two-factor-next-btn').off('tap').on('tap', function() {
+        mobile.twofactor.setup.$page.find('.two-factor-next-btn').off('tap').on('tap', () => {
+
+            // Hide this page
+            mobile.twofactor.setup.$page.addClass('hidden');
 
             // Render the Verify Setup page
-            loadSubPage('twofactor/verify-setup');
+            loadSubPage('fm/account/security/two-factor-authentication/verify-setup');
             return false;
         });
     },

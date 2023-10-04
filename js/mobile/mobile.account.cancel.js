@@ -1,7 +1,7 @@
 /**
  * Functionality for the mobile Cancel Account section
  */
-mobile.account.cancel = {
+mobile.settings.account.cancel = {
 
     /**
      * Initialise the page
@@ -80,7 +80,7 @@ mobile.account.cancel = {
             api_req({ a: 'clog', t: 'accClosureUserFeedback', d: feedbackJson });
 
             // Complete the cancellation process
-            mobile.account.cancel.completeCancellationProcess();
+            mobile.settings.account.cancel.completeCancellationProcess();
 
             // Prevent double taps
             return false;

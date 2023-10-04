@@ -1,0 +1,130 @@
+/* Banner rack */
+.mobile-rack.banner-rack {
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    flex-flow: column-reverse nowrap;
+}
+
+/* Banner inner content */
+.mega-component.banner {
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: center;
+    align-items: flex-start;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 24px;
+    top: 0;
+    overflow: hidden;
+    transition: top 1s ease-in;
+    font: var(--mobile-font-caption-regular);
+    width: 100%;
+    color: var(--mobile-text-primary);
+}
+
+.mega-component.banner > *:not(:last-child) {
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
+}
+
+/* Banner overarching types */
+.mega-component.banner,
+.mega-component.banner.alert {
+    border-radius: 0;
+}
+.mega-component.banner.inline {
+    border-radius: var(--mobile-border-radius-medium);
+    overflow: initial;
+}
+
+.mega-component.banner .content-box {
+    -webkit-margin-end: auto;
+    margin-inline-end: auto;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+    order: 5;
+}
+.mega-component.banner .end-box {
+    display: flex;
+    flex-flow: column nowrap;
+    align-content: center;
+    align-items: flex-end;
+    justify-content: center;
+    order: 10;
+}
+
+/* Gap for all non-empty spans */
+.mega-component.banner .content-box > span {
+    margin-bottom: 8px;
+}
+.mega-component.banner .content-box > span:empty {
+    margin-bottom: 0;
+}
+
+/* Custom button styles */
+.mega-component.banner .button.icon-only {
+    margin-left: auto;
+    padding: 0;
+    justify-self: flex-end;
+    align-self: flex-start;
+    order: 1;
+}
+.mega-component.banner .button.action-link .primary-text,
+.mega-component.banner .message-text .clickurl {
+    font: var(--mobile-font-copy-semibold);
+    text-decoration: underline;
+    color: var(--mobile-link-primary);
+}
+
+/* Component attribute styles */
+.mega-component.banner .title-text {    
+    font: var(--mobile-font-heading-h3);
+    color: var(--mobile-text-primary);
+}
+.mega-component.banner .message-text {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+}
+.mega-component.banner .banner.left-icon.icon-size-24 {
+    --icon-size: 24px;
+}
+.mega-component.banner .banner.left-icon.icon-size-48 {
+    --icon-size: 48px;
+}
+.mega-component.banner .banner.left-icon {
+    --icon-size: 24px;
+    color: var(--icon-color);
+    order: 1;
+}
+.mega-component.banner .banner.right-icon {
+    --icon-size: 96px;
+    grid-area: right-icon;
+    justify-self: flex-end;
+    align-self: center;
+    order: 10;
+}
+
+/* Component styles, default info */
+.mega-component.banner,
+.mega-component.banner.info {
+    background-color: var(--mobile-notification-info);
+    --icon-color: var(--mobile-support-info);
+}
+.mega-component.banner.success {
+    background-color: var(--mobile-notification-success);
+    --icon-color: var(--mobile-support-success);
+}
+.mega-component.banner.warning {
+    background-color: var(--mobile-notification-warning);
+    --icon-color: var(--mobile-support-warning);
+}
+.mega-component.banner.error {
+    background-color: var(--mobile-notification-error);
+    --icon-color: var(--mobile-support-error);
+}
+.mega-component.banner.advertisement {
+    background-color: var(--mobile-surface-2);
+    --icon-color: var(--mobile-support-info);
+}

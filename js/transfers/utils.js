@@ -48,7 +48,7 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
 
             if (is_mobile && lock !== 2 && dl) {
                 mobile.downloadOverlay.close();
-                mobile.messageOverlay.show(status);
+                mobile.downloadOverlay.handleFatalError(dl, status);
             }
         }
 

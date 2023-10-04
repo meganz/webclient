@@ -162,7 +162,7 @@ lazy(mega, 'fileRequestUI', () => {
             }
 
             const clickHandler = (evt) => {
-                if (is_mobile && !validateUserAction(true)) {
+                if (is_mobile && !this.options.doNotValidate && !validateUserAction()) {
                     return false;
                 }
 
@@ -330,6 +330,9 @@ lazy(mega, 'fileRequestUI', () => {
 
     class CloseMobileComponent extends ButtonComponent {
         constructor($selector, options) {
+
+            options.doNotValidate = true;
+
             super($selector, options);
             this.setOnClick();
         }

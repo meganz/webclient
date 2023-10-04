@@ -1,0 +1,6 @@
+.sheet .sub-message {
+    color: var(--mobile-text-secondary);
+    font-size: 14px;
+    word-break: break-word;
+    margin-top: 8px;
+}

@@ -171,6 +171,8 @@ pro.proplan = {
                 // events log range from 99780 --> 99783
                 // Pro1, Pro2, Pro3, Lite
                 delay('pricing.plan', eventlog.bind(null, 99779 + planType));
+
+                delay('pricing.plan', eventlog.bind(null, 99775 + planType));
             }
 
             // Continue to Step 2

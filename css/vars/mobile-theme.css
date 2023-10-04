@@ -1,0 +1,411 @@
+/**
+  * Please read wiki article 'CSS Variables and Themes' before editing this file.
+  *
+  * All variable names are based on the design system and serve the purpose of bridging between the design and
+  * development teams. Other variables should be put elsewhere.
+  *
+  * Variable format: --type-purpose-color-importance-state, e.g. --text-body1-black-high-hover. Not all parts need
+  * to be added for all variables, and some parts may have multiple words (e.g. `line-height`).
+  *
+  * When styling, always use the most specific variable, e.g. if you are styling an element which should have
+  * body (1) text, use `--text-color-high` rather than `--text-color-white-high` so that it changes with
+  * the theme.
+  *
+  * The variables at the bottom will update their value when switching theme, and the attributes can be assigned
+  * to the body, or any element within it to give that element and its children a different theme, e.g. to demo
+  * themes, or for sections which are inverted compared to the rest of the theme (accents, etc.).
+  *
+  * Themes can be forced so that they are always on using the `-forced` suffix, for example the nav bar is always
+  * dark mode.
+  *
+  * Color must be in RGBA format. e.g. rgba(0, 0, 0, 1)
+  *
+  * Custom Alpha Level can be added to override the alpha level when required.
+  * Custom alpha var name must be starts with color var {type}. e.g. --label-black: rgba(0, 0, 0, var(--label-alpha, 1))
+  */
+
+
+/*** Section 1: constants that will not vary by theme, but may only be used by one theme at the moment ***/
+
+body,
+.custom-alpha {
+
+    /* texts */
+
+        /* font family */
+
+            --mobile-font-family-main: "Inter";
+            --mobile-font-family-heading: "Poppins";
+
+
+        /* font weight */
+
+            --mobile-font-weight-bold: 700;
+            --mobile-font-weight-semibold: 600;
+            --mobile-font-weight-regular: 400;
+
+
+        /* line height */
+
+            --mobile-font-line-height-heading: 1.2;
+            --mobile-font-line-height-text: 1.5;
+
+
+        /* letter-spacing */
+
+            --mobile-font-letter-spacing-body: 0%;
+            --mobile-font-letter-spacing-caption: 2%;
+
+
+        /* font size */
+
+            --mobile-font-size-1: 10px;
+            --mobile-font-size-2: 12px;
+            --mobile-font-size-3: 14px;
+            --mobile-font-size-4: 16px;
+            --mobile-font-size-5: 18px;
+            --mobile-font-size-6: 20px;
+            --mobile-font-size-7: 24px;
+            --mobile-font-size-8: 32px;
+            --mobile-font-size-9: 40px;
+            --mobile-font-size-10: 48px;
+            --mobile-font-size-11: 60px;
+
+        /* font */
+
+            --mobile-font-heading-h1: var(--mobile-font-weight-bold) var(--mobile-font-size-6)/var(--mobile-font-line-height-heading) var(--mobile-font-family-heading);
+            --mobile-font-heading-h2: var(--mobile-font-weight-bold) var(--mobile-font-size-5)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+            --mobile-font-heading-h3: var(--mobile-font-weight-semibold) var(--mobile-font-size-5)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+
+            --mobile-font-copy-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-copy-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-copy-bold: var(--mobile-font-weight-bold) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+
+            --mobile-font-caption-large-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-caption-large-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-caption-large-bold: var(--mobile-font-weight-bold) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+
+            --mobile-font-caption-small-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-2)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+            --mobile-font-caption-small-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-2)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+            --mobile-font-caption-small-bold: var(--mobile-font-weight-bold) var(--mobile-font-size-2)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+
+            --mobile-font-link-large-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-link-large-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-link-large-bold: var(--mobile-font-weight-bold) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+
+            --mobile-font-link-small-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-link-small-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-link-small-bold: var(--mobile-font-weight-bold) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+
+            --mobile-font-label-bold: var(--mobile-font-weight-semibold) var(--mobile-font-size-4)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+            --mobile-font-label-underline: var(--mobile-font-weight-semibold) var(--mobile-font-size-4)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+
+            --mobile-font-input-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-4)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+
+
+    /* radius */
+
+        --mobile-border-radius-circle: 50%;
+        --mobile-border-radius-extra-large: 24px;
+        --mobile-border-radius-large: 16px;
+        --mobile-border-radius-medium: 8px;
+        --mobile-border-radius-small: 4px;
+        --mobile-border-radius-extra-small: 2px;
+
+
+    /* blur backgrounds */
+
+        /* color */
+
+            --mobile-background-blur: rgba(0, 0, 0, var(--mobile-background-alpha, 0.2));
+
+
+        /* effects */
+
+            --mobile-background-blur-subtle: blur(2px);
+            --mobile-background-blur-medium: blur(4px);
+            --mobile-background-blur-strong: blur(8px);
+}
+
+
+/*** Section 2: shorthand variables that will automatically update on changing theme ***/
+
+/* light theme */
+.theme-light,
+.theme-light .custom-alpha,
+html .theme-light-forced {
+
+    /* backgrounds */
+
+        --mobile-page-background: rgba(255, 255, 255, var(--mobile-background-alpha, 1));
+
+
+    /* surfaces */
+
+        --mobile-surface-1: rgba(250, 250, 250, var(--mobile-surface-alpha, 1));
+        --mobile-surface-2: rgba(243, 244, 244, var(--mobile-surface-alpha, 1));
+        --mobile-surface-3: rgba(216, 217, 219, var(--mobile-surface-alpha, 1));
+
+
+    /* inverses */
+
+        --mobile-background-inverse: rgba(73, 74, 77, var(--mobile-background-alpha, 1));
+
+
+    /* borders */
+
+        --mobile-border-interactive: rgba(221, 20, 5, var(--mobile-border-alpha, 1));
+        --mobile-border-strong: rgba(216, 217, 219, var(--mobile-border-alpha, 1));
+        --mobile-border-strong-selected: rgba(4, 16, 30, var(--mobile-border-alpha, 1));
+        --mobile-border-subtle: rgba(243, 244, 244, var(--mobile-border-alpha, 1));
+        --mobile-border-subtle-selected: rgba(4, 6, 30, var(--mobile-border-alpha, 1));
+        --mobile-border-disabled: rgba(216, 217, 219, var(--mobile-border-alpha, 1));
+
+
+    /* texts */
+
+        --mobile-text-primary: rgba(48, 50, 51, var(--mobile-text-alpha, 1));
+        --mobile-text-secondary: rgba(97, 99, 102, var(--mobile-text-alpha, 1));
+        --mobile-text-accent: rgba(4, 16, 30, var(--mobile-text-alpha, 1));
+        --mobile-text-placeholder: rgba(97, 99, 102, var(--mobile-text-alpha, 1));
+        --mobile-text-inverse-accent: rgba(250, 250, 251, var(--mobile-text-alpha, 1));
+        --mobile-text-on-color: rgba(250, 250, 250, var(--mobile-text-alpha, 1));
+        --mobile-text-on-color-disabled: rgba(169, 171, 173, var(--mobile-text-alpha, 1));
+        --mobile-text-error: rgba(227, 27, 87, var(--mobile-text-alpha, 1));
+        --mobile-text-success: rgba(0, 124, 62, var(--mobile-text-alpha, 1));
+        --mobile-text-info: rgba(0, 120, 164, var(--mobile-text-alpha, 1));
+        --mobile-text-warning: rgba(172, 85, 16, var(--mobile-text-alpha, 1));
+        --mobile-text-inverse: rgba(250, 250, 250, var(--mobile-text-alpha, 1));
+        --mobile-text-disabled: rgba(193, 194, 196, var(--mobile-text-alpha, 1));
+
+
+    /* links */
+
+        --mobile-link-primary: rgba(44, 91, 235, var(--mobile-link-alpha, 1));
+        --mobile-link-inverse: rgba(105, 163, 251, var(--mobile-link-alpha, 1));
+        --mobile-link-visited: rgba(35, 55, 131, var(--mobile-link-alpha, 1));
+
+
+    /* icons */
+
+        --mobile-icon-primary: rgba(48, 50, 51, var(--mobile-icon-alpha, 1));
+        --mobile-icon-secondary: rgba(97, 99, 102, var(--mobile-icon-alpha, 1));
+        --mobile-icon-accent: rgba(4, 16, 30, var(--mobile-icon-alpha, 1));
+        --mobile-icon-inverse-accent: rgba(250, 250, 251, var(--mobile-icon-alpha, 1));
+        --mobile-icon-on-color: rgba(250, 250, 250, var(--mobile-icon-alpha, 1));
+        --mobile-icon-on-color-disabled: rgba(169, 171, 173, var(--mobile-icon-alpha, 1));
+        --mobile-icon-inverse: rgba(250, 250, 250, var(--mobile-icon-alpha, 1));
+        --mobile-icon-disabled: rgba(193, 194, 196, var(--mobile-icon-alpha, 1));
+
+
+    /* buttons */
+
+        --mobile-button-primary: rgba(4, 16, 30, var(--mobile-button-alpha, 1));
+        --mobile-button-primary-pressed: rgba(83, 91, 101, var(--mobile-button-alpha, 1));
+
+        --mobile-button-brand: rgba(221, 20, 5, var(--mobile-button-alpha, 1));
+        --mobile-button-brand-pressed: rgba(147, 23, 21, var(--mobile-button-alpha, 1));
+
+        --mobile-button-secondary: rgba(243, 244, 244, var(--mobile-button-alpha, 1));
+        --mobile-button-secondary-pressed: rgba(193, 194, 196, var(--mobile-button-alpha, 1));
+
+        --mobile-button-outline: rgba(4, 16, 30, var(--mobile-button-alpha, 1));
+        --mobile-button-outline-pressed: rgba(83, 91, 101, var(--mobile-button-alpha, 1));
+
+        --mobile-button-error: rgba(227, 27, 87, var(--mobile-button-alpha, 1));
+        --mobile-button-error-pressed: rgba(161, 16, 69, var(--mobile-button-alpha, 1));
+
+        --mobile-button-disabled: rgba(0, 0, 0, var(--mobile-button-alpha, 0.1));
+
+
+    /* supports */
+
+        --mobile-support-success: rgba(0, 155, 72, var(--mobile-support-alpha, 1));
+        --mobile-support-warning: rgba(235, 159, 20, var(--mobile-support-alpha, 1));
+        --mobile-support-error: rgba(227, 27, 87, var(--mobile-support-alpha, 1));
+        --mobile-support-info: rgba(5, 186, 241, var(--mobile-support-alpha, 1));
+
+
+    /* controls */
+
+        --mobile-selection-control: rgba(4, 16, 30, var(--mobile-control-alpha, 1));
+
+
+    /* notifications */
+
+        --mobile-notification-success: rgba(207, 252, 219, var(--mobile-notification-alpha, 1));
+        --mobile-notification-warning: rgba(251, 242, 201, var(--mobile-notification-alpha, 1));
+        --mobile-notification-error: rgba(255, 228, 232, var(--mobile-notification-alpha, 1));
+        --mobile-notification-info: rgba(223, 244, 254, var(--mobile-notification-alpha, 1));
+
+
+    /* interactives */
+
+        --mobile-interactive: rgba(221, 20, 5, var(--mobile-interactive-alpha, 1));
+
+
+    /* indicators */
+
+        --mobile-indicator-pink: rgba(246, 61, 107, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-yellow: rgba(235, 159, 20, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-green: rgba(9, 191, 91, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-blue: rgba(5, 186, 241, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-indigo: rgba(71, 126, 247, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-magenta: rgba(226, 72, 194, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-orange: rgba(251, 101, 20, var(--mobile-indicator-alpha, 1));
+
+
+    /* shadows */
+
+        --mobile-shadow-subtle: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        --mobile-shadow-medium: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        --mobile-shadow-strong: 0px 8px 16px rgba(0, 0, 0, 0.15);
+
+
+    /* toasts */
+
+    --mobile-toast-background: rgba(73, 74, 77, var(--mobile-surface-alpha, 1));
+
+    /* node icons */
+    --mobile-surface-node-icon-background: rgba(250, 250, 250, var(--mobile-surface-alpha, 0.7));
+}
+
+/* dark theme */
+.theme-dark,
+.theme-dark .custom-alpha,
+html .theme-dark-forced {
+
+    /* backgrounds */
+
+        --mobile-page-background: rgba(24, 25, 26, var(--mobile-background-alpha, 1));
+
+
+    /* surfaces */
+
+        --mobile-surface-1: rgba(48, 50, 51, var(--mobile-surface-alpha, 1));
+        --mobile-surface-2: rgba(73, 74, 77, var(--mobile-surface-alpha, 1));
+        --mobile-surface-3: rgba(97, 99, 102, var(--mobile-surface-alpha, 1));
+
+
+    /* inverses */
+
+        --mobile-background-inverse: rgba(243, 244, 244, var(--mobile-background-alpha, 1));
+
+
+    /* borders */
+
+        --mobile-border-interactive: rgba(251, 99, 97, var(--mobile-border-alpha, 1));
+        --mobile-border-strong: rgba(97, 99, 102, var(--mobile-border-alpha, 1));
+        --mobile-border-strong-selected: rgba(244, 244, 245, var(--mobile-border-alpha, 1));
+        --mobile-border-subtle: rgba(48, 50, 51, var(--mobile-border-alpha, 1));
+        --mobile-border-subtle-selected: rgba(244, 244, 245, var(--mobile-border-alpha, 1));
+        --mobile-border-disabled: rgba(73, 74, 77, var(--mobile-border-alpha, 1));
+
+
+    /* texts */
+
+        --mobile-text-primary: rgba(243, 244, 244, var(--mobile-text-alpha, 1));
+        --mobile-text-secondary: rgba(169, 171, 173, var(--mobile-text-alpha, 1));
+        --mobile-text-accent: rgba(250, 250, 251, var(--mobile-text-alpha, 1));
+        --mobile-text-placeholder: rgba(193, 194, 196, var(--mobile-text-alpha, 1));
+        --mobile-text-inverse-accent: rgba(4, 16, 30, var(--mobile-text-alpha, 1));
+        --mobile-text-on-color: rgba(250, 250, 250, var(--mobile-text-alpha, 1));
+        --mobile-text-on-color-disabled: rgba(193, 194, 196, var(--mobile-text-alpha, 1));
+        --mobile-text-error: rgba(253, 111, 144, var(--mobile-text-alpha, 1));
+        --mobile-text-success: rgba(9, 191, 91, var(--mobile-text-alpha, 1));
+        --mobile-text-info: rgba(5, 186, 241, var(--mobile-text-alpha, 1));
+        --mobile-text-warning: rgba(235, 159, 20, var(--mobile-text-alpha, 1));
+        --mobile-text-inverse: rgba(48, 50, 51, var(--mobile-text-alpha, 1));
+        --mobile-text-disabled: rgba(121, 124, 128, var(--mobile-text-alpha, 1));
+
+
+    /* links */
+
+        --mobile-link-primary: rgba(105, 163, 251, var(--mobile-link-alpha, 1));
+        --mobile-link-inverse: rgba(44, 91, 235, var(--mobile-link-alpha, 1));
+        --mobile-link-visited: rgba(217, 232, 255, var(--mobile-link-alpha, 1));
+
+
+    /* icons */
+
+        --mobile-icon-primary: rgba(243, 244, 244, var(--mobile-icon-alpha, 1));
+        --mobile-icon-secondary: rgba(169, 171, 173, var(--mobile-icon-alpha, 1));
+        --mobile-icon-accent: rgba(250, 250, 251, var(--mobile-icon-alpha, 1));
+        --mobile-icon-inverse-accent: rgba(4, 16, 30, var(--mobile-icon-alpha, 1));
+        --mobile-icon-on-color: rgba(250, 250, 250, var(--mobile-icon-alpha, 1));
+        --mobile-icon-on-color-disabled: rgba(193, 194, 196, var(--mobile-icon-alpha, 1));
+        --mobile-icon-inverse: rgba(48, 50, 51, var(--mobile-icon-alpha, 1));
+        --mobile-icon-disabled: rgba(121, 124, 128, var(--mobile-icon-alpha, 1));
+
+
+    /* buttons */
+
+        --mobile-button-primary: rgba(244, 244, 245, var(--mobile-button-alpha, 1));
+        --mobile-button-primary-pressed: rgba(189, 192, 196, var(--mobile-button-alpha, 1));
+
+        --mobile-button-brand: rgba(242, 52, 51, var(--mobile-button-alpha, 1));
+        --mobile-button-brand-pressed: rgba(253, 153, 151, var(--mobile-button-alpha, 1));
+
+        --mobile-button-secondary: rgba(73, 74, 77, var(--mobile-button-alpha, 1));
+        --mobile-button-secondary-pressed: rgba(121, 124, 128, var(--mobile-button-alpha, 1));
+
+        --mobile-button-outline: rgba(244, 244, 245, var(--mobile-button-alpha, 1));
+        --mobile-button-outline-pressed: rgba(189, 192, 196, var(--mobile-button-alpha, 1));
+
+        --mobile-button-error: rgba(246, 61, 107, var(--mobile-button-alpha, 1));
+        --mobile-button-error-pressed: rgba(254, 163, 181, var(--mobile-button-alpha, 1));
+
+        --mobile-button-disabled: rgba(255, 255, 255, var(--mobile-button-alpha, 0.1));
+
+
+    /* supports */
+
+        --mobile-support-success: rgba(9, 191, 91, var(--mobile-support-alpha, 1));
+        --mobile-support-warning: rgba(235, 159, 20, var(--mobile-support-alpha, 1));
+        --mobile-support-error: rgba(253, 111, 144, var(--mobile-support-alpha, 1));
+        --mobile-support-info: rgba(0, 150, 201, var(--mobile-support-alpha, 1));
+
+
+    /* controls */
+
+        --mobile-selection-control: rgba(244, 244, 245, var(--mobile-control-alpha, 1));
+
+
+    /* notifications */
+
+        --mobile-notification-success: rgba(1, 83, 43, var(--mobile-notification-alpha, 1));
+        --mobile-notification-warning: rgba(140, 67, 19, var(--mobile-notification-alpha, 1));
+        --mobile-notification-error: rgba(137, 18, 64, var(--mobile-notification-alpha, 1));
+        --mobile-notification-info: rgba(8, 83, 113, var(--mobile-notification-alpha, 1));
+
+
+    /* interactives */
+
+        --mobile-interactive: rgba(251, 99, 97, var(--mobile-interactive-alpha, 1));
+
+
+    /* indicators */
+
+        --mobile-indicator-pink: rgba(253, 111, 144, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-yellow: rgba(242, 188, 44, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-green: rgba(41, 221, 116, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-blue: rgba(49, 208, 254, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-indigo: rgba(105, 163, 251, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-magenta: rgba(244, 168, 227, var(--mobile-indicator-alpha, 1));
+        --mobile-indicator-orange: rgba(254, 178, 115, var(--mobile-indicator-alpha, 1));
+
+
+    /* shadows */
+
+        --mobile-shadow-subtle: 0px 2px 4px rgba(0, 0, 0, 0.7);
+        --mobile-shadow-medium: 0px 4px 8px rgba(0, 0, 0, 0.7);
+        --mobile-shadow-strong: 0px 8px 16px rgba(0, 0, 0, 0.7);
+
+
+    /* toasts */
+
+    --mobile-toast-background: rgba(193, 194, 196, var(--mobile-surface-alpha, 1));
+
+    /* node icons */
+    --mobile-surface-node-icon-background: rgba(48, 50, 51, var(--mobile-surface-alpha, 0.7));
+}

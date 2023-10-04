@@ -1,0 +1,35 @@
+.mega-checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    width: 100%;
+}
+
+.mega-checkbox.align-right {
+    flex-direction: row-reverse;
+}
+
+.mega-checkbox .checkbox-wrapper {
+    width: 18px;
+    height: 18px;
+    order: 0;
+    flex-grow: 0;
+    border: 1px solid var(--mobile-border-strong-selected);
+    border-radius: 2px;
+    background: var(--mobile-icon-inverse);
+    margin-inline-end: 15px;
+    -webkit-margin-end: 15px;
+}
+
+.mega-checkbox .icon-check-after::after {
+    --icon-size: 18px;
+    background: var(--mobile-selection-control);
+    color: var(--mobile-icon-inverse);
+}
+
+.mega-checkbox .checkbox-action {
+    width: 200px;
+    order: 1;
+    flex-grow: 1;
+}

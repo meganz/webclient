@@ -19,6 +19,7 @@
         "max-empty-lines": 2,
         "property-disallowed-list": [ "text-transform" ],
         "selector-not-notation": "simple",
+        "media-feature-range-notation": "prefix",
         "length-zero-no-unit": [
             true,
             {
@@ -42,7 +43,8 @@
                     "css-gradients",
                     "css-masks",
                     "multicolumn",
-                    "css-sticky"
+                    "css-sticky",
+                    "intrinsic-width"
                 ],
                 "severity": "warning"
             }
@@ -116,7 +118,12 @@
         "value-no-vendor-prefix": [
             true,
             {
-                "ignoreValues": ["sticky"]
+                "ignoreValues": [
+                    "sticky",
+                    "max-content",
+                    "box",
+                    "fill-available"
+                ]
             }
         ],
         "property-no-vendor-prefix": [

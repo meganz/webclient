@@ -97,8 +97,8 @@ lazy(s4, 'utils', () => {
          * @memberOf s4
          */
         getContainersList() {
-            return M.tree.s4 && Object.keys(M.tree.s4).map(h => M.d[h])
-                .filter(n => n && n.s4 && n.p === M.RootID) || [];
+            return M.tree.s4 && Object.keys(M.tree.s4).map(h => M.d[h]).filter(n => n && n.s4
+                && n.p === M.RootID && s4.kernel.getS4NodeType(n) === 'container') || [];
         },
 
         /**

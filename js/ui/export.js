@@ -685,17 +685,22 @@ var exportPassword = {
             // Construct URL: #P! for password link + encoded(alg + folder/file + handle + salt + encrypted key + mac)
             var protectedUrl = getBaseUrl() + '/#P!' + dataBase64UrlEncoded;
 
-            // Get the HTML block for this link by using the node handle
-            var $item = $('.item[data-node-handle="' + linkInfo.handle + '"]', this.$dialog);
+            if (is_mobile) {
+                mobile.linkManagement.pwdProtectedLink = protectedUrl;
+            }
+            else {
+                // Get the HTML block for this link by using the node handle
+                var $item = $('.item[data-node-handle="' + linkInfo.handle + '"]', this.$dialog);
 
-            // Set the password into the text box and add a class for styling this block
-            $('.item-link.link input', $item).val(protectedUrl);
-            $('.item-link.key input', $item).val('');
-            $item.addClass('password-protect-link');
+                // Set the password into the text box and add a class for styling this block
+                $('.item-link.link input', $item).val(protectedUrl);
+                $('.item-link.key input', $item).val('');
+                $item.addClass('password-protect-link');
 
-            // Update Password buttons and links UI
-            exportPassword.encrypt.updatePasswordComponentsUI();
-            exportPassword.encrypt.initResetPasswordButton();
+                // Update Password buttons and links UI
+                exportPassword.encrypt.updatePasswordComponentsUI();
+                exportPassword.encrypt.initResetPasswordButton();
+            }
 
             // Log to see if encryption feature is used much
             eventlog(99618, JSON.stringify([1, linkInfo.type === exportPassword.LINK_TYPE_FOLDER ? 1 : 0]));
@@ -2707,10 +2712,14 @@ function logExportEvt(type, target) {
         }
         else if (folderlink) {
             eventlog(99715); // Share public link from folder-link.
-            if (!is_mobile) {
-                var exportLinkDialog = new mega.Dialog.ExportLink();
-                return exportLinkDialog.linksDialog();
+
+            // Return nothing for mobile as the link overlay will be shown
+            if (is_mobile) {
+                return;
             }
+
+            var exportLinkDialog = new mega.Dialog.ExportLink();
+            return exportLinkDialog.linksDialog();
         }
         else if (is_mobile) {
             eventlog(99634); // Created public link on mobile webclient
@@ -2732,6 +2741,7 @@ function logExportEvt(type, target) {
         }
 
         console.assert(!$.getExportLinkInProgress || $.getExportLinkInProgress === 'ongoing');
+
         $.getExportLinkInProgress = nodes;
 
         const promises = [];
@@ -2778,8 +2788,9 @@ function logExportEvt(type, target) {
         if (handles.length) {
             self.logger.debug('removeExportLink');
 
-            $.each(handles, function(index, h) {
-                var n = M.d[h];
+            for (let i = handles.length; i--;) {
+                const h = handles[i];
+                const n = M.d[h];
 
                 if (n) {
                     if (n.t) {
@@ -2792,7 +2803,7 @@ function logExportEvt(type, target) {
                 else if (d) {
                     console.warn('removeExportLink: node not found.', h);
                 }
-            });
+            }
         }
 
         if (!promises.length) {
@@ -2859,9 +2870,9 @@ function logExportEvt(type, target) {
                 }
             }
 
-            // A hook for the mobile web to show the public link and the remove button
+            // A hook for the mobile web to show the link icon
             if (is_mobile) {
-                mobile.linkOverlay.showPublicLinkAndEnableButtons(nodeId);
+                mobile.cloud.updateLinkIcon(nodeId);
             }
 
             return handle;

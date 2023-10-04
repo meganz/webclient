@@ -69,8 +69,16 @@ mBroadcaster.once('startMega', function() {
 
 
     if (is_mobile) {
-        delete pages.placeholder;
-        delete pages.login;
+
+        const usingMobPages = ['placeholder', 'change_email', 'register', 'key', 'support', 'keybackup',
+                               'disputenotice', 'download', 'reset', 'propay'];
+
+        for (let i = usingMobPages.length; i--;) {
+
+            delete pages[usingMobPages[i]];
+            jsl_loaded[usingMobPages[i]] = 1;
+        }
+
         pages = new Proxy(pages, {
             get(target, prop) {
                 if (target[prop] === undefined) {
@@ -177,31 +185,23 @@ function topMenu(close) {
 
             $('.top-menu-logged .loader', $topMenu).addClass('loading');
 
-            // M.storageQuotaCache is exist, fm is inited but not folder link,
-            // pulled storage data already and the data is not updated.
-            if (M.storageQuotaCache && !folderlink) {
-                topMenuDataUpdate(M.storageQuotaCache);
-            }
-            // M.storageQuotaCache is not exist, it is either not on fm or data was revoked by action packet.
-            else {
-                M.getStorageQuota().then(data => {
+            Promise.resolve(M.storageQuotaCache || M.getStorageQuota())
+                .then((data) => {
 
                     topMenuDataUpdate(data);
 
                     if (fminitialized && !folderlink && M.currentTreeType === 'cloud-drive') {
+
                         return M.checkLeftStorageBlock(data);
                     }
-                }).catch(dump);
-            }
+                })
+                .catch(dump);
         }
 
         if (!is_mobile) {
             topMenuScroll($scrollBlock);
         }
         else {
-            // Mobile
-            // Close the title menu
-            mobile.titleMenu.close();
 
             // Show the dark backround overlay behind the menu and if it's clicked, close the menu
             $('html').addClass('overlayed');
@@ -346,7 +346,7 @@ function topPopupAlign(button, popup, topPos) {
 }
 
 function init_page() {
-    page = page || (u_type ? 'fm' : 'start');
+    page = String(page || (u_type ? 'fm' : 'start'));
 
     if (!window.M || is_megadrop) {
         return console.warn('Something went wrong, the initialization did not completed...');
@@ -668,7 +668,7 @@ function init_page() {
 
             if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
                 // Clean up internal state in case we're navigating back to a folderlink
-                M.currentdirid = M.RootID = undefined;
+                M.currentdirid = M.RootID = M.currentCustomView = undefined;
                 delete $.onImportCopyNodes;
                 delete $.mcImport;
             }
@@ -764,16 +764,15 @@ function init_page() {
             delete localStorage.awaitingConfirmationAccount;
         }
         else {
+            parsepage(pages.placeholder);
+
             // Show signup link dialog for mobile
             if (is_mobile) {
-                mobile.initDOM();
                 mobile.register.showConfirmEmailScreen(acc);
                 return false;
             }
             else {
                 // Insert placeholder page while waiting for user input
-                parsepage(pages['placeholder']);
-
                 return mega.ui.sendSignupLinkDialog(acc, function () {
                     // The user clicked 'close', abort and start over...
                     delete localStorage.awaitingConfirmationAccount;
@@ -800,25 +799,24 @@ function init_page() {
         parsepage(pages.placeholder);
 
         if (is_mobile) {
-            mobile.decryptionPasswordOverlay.show(page);
+            mobile.passwordDecryption.show(page);
         }
         else {
             exportPassword.decrypt.init(page);
-
-            // lets set them for the dialog.
-            mega.ui.setTheme();
         }
+
+        // lets set them for the dialog.
+        mega.ui.setTheme();
     }
     else if (page.substr(0, 4) === 'blog') {
         window.location.replace('https://blog.mega.io');
     }
     else if (page.substr(0, 6) == 'verify') {
+        parsepage(pages.change_email);
         if (is_mobile) {
-            mobile.initDOM();
             mobile.verify.init();
         }
         else {
-            parsepage(pages.change_email);
             emailchange.main();
         }
     }
@@ -871,8 +869,9 @@ function init_page() {
     }
     else if (page.length > 14 && page.substr(0, 14) === 'businesssignup') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
-            mobile.decryptionPasswordOverlay.show(page, true);
+            parsepage(pages.mobile);
+            mega.ui.setTheme();
+            mobile.passwordDecryption.show();
         }
         else {
             var signupCodeEncrypted = page.substring(14, page.length);
@@ -885,7 +884,7 @@ function init_page() {
     }
     else if (page.length > 14 && page.substr(0, 14) === 'businessinvite') {
         if (is_mobile) {
-            mobile.initDOM();
+            parsepage(pages.mobile);
         }
         var signupCode = page.substring(14, page.length);
         M.require('businessAcc_js', 'businessAccUI_js').done(function () {
@@ -944,12 +943,9 @@ function init_page() {
         return security.showVerifyEmailDialog('login-to-account');
     }
     else if (u_type == 2) {
+        parsepage(pages.key);
         if (is_mobile) {
-            parsepage(pages['mobile']);
             mobile.register.showGeneratingKeysScreen();
-        }
-        else {
-            parsepage(pages['key']);
         }
         init_key();
     }
@@ -965,6 +961,7 @@ function init_page() {
         }
         parsepage(pages.login);
         if (is_mobile) {
+            MegaMobileHeader.init(true);
             mobile.signin.show();
         }
         else {
@@ -982,64 +979,10 @@ function init_page() {
         loadSubPage('fm');
         return false;
     }
-    else if (is_mobile && u_type && page === 'fm/account/invites/how-it-works') {
-        parsepage(pages['mobile']);
-        mobile.achieve.howItWorks.init();
-        return false;
-    }
-    else if (is_mobile && u_type && (page === 'fm/account/plan' || page === 'fm/account/security')) {
-        return loadSubPage('fm/account');
-    }
-    else if (is_mobile && u_type && page === 'fm/account/invites') {
-        parsepage(pages['mobile']);
-        mobile.achieve.invites.init();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/account/referrals') {
-        parsepage(pages['mobile']);
-        mobile.achieve.referrals.init();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/account/achievements') {
-        parsepage(pages['mobile']);
-        mobile.achieve.init();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/account/history') {
-        parsepage(pages['mobile']);
-        mobile.account.history.init();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/account/paymentcard') {
-        parsepage(pages.mobile);
-        mobile.account.paymentCard.init();
-        return false;
-    }
-    else if (is_mobile && u_type
-        && (page === 'fm/account/security/change-password' || page === 'fm/account/email-and-pass')) {
-        parsepage(pages['mobile']);
-        mobile.account.changePassword.init();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/account/security/change-email') {
-        mobile.initDOM();
-        mobile.account.changeEmail.init();
-        return false;
-    }
-    else if (is_mobile && fminitialized && u_type && page === 'fm/account/notifications') {
-        mobile.initDOM();
-        mobile.account.notifications.init();
-        return false;
-    }
-    else if (is_mobile && fminitialized && u_type && page === 'fm/account/file-management') {
-        mobile.initDOM();
-        mobile.account.filemanagement.init();
-        return false;
-    }
     else if (page === 'achievements') {
         mega.redirect('mega.io', 'achievements', false, false);
     }
-    else if (page === 'fm/account/achievements') {
+    else if (!is_mobile && page === 'fm/account/achievements') {
         $.openAchievemetsDialog = true;
         loadSubPage('fm/account/plan');
         return false;
@@ -1048,90 +991,18 @@ function init_page() {
         loadSubPage('fm');
         return false;
     }
-    else if (is_mobile && u_type && page === 'fm/refer') {
-        parsepage(pages.mobile);
-        mobile.affiliate.initMainPage();
+    else if (is_mobile && page.startsWith('twofactor/verify-login')) {
+        mobile.twofactor.verifyLogin.init();
         return false;
     }
-    else if (is_mobile && u_type && page === 'fm/refer/redeem') {
-        parsepage(pages.mobile);
-        mobile.affiliate.initRedeemPage();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/refer/guide') {
-        parsepage(pages.mobile);
-        mobile.affiliate.initGuidePage();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/refer/history') {
-        parsepage(pages.mobile);
-        mobile.affiliate.initHistoryPage();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/refer/distribution') {
-        parsepage(pages.mobile);
-        mobile.affiliate.initDistributionPage();
-        return false;
-    }
-    else if (is_mobile && page.substr(0, 9) === 'twofactor') {
-
-        parsepage(pages['mobile']);
-
-        if (page.indexOf('intro') > -1) {
-            mobile.twofactor.intro.init();
-        }
-        else if (page.indexOf('verify-setup') > -1) {
-            mobile.twofactor.verifySetup.init();
-        }
-        else if (page.indexOf('setup') > -1) {
-            mobile.twofactor.setup.init();
-        }
-        else if (page.indexOf('enabled') > -1) {
-            mobile.twofactor.enabled.init();
-        }
-        else if (page.indexOf('verify-disable') > -1) {
-            mobile.twofactor.verifyDisable.init();
-        }
-        else if (page.indexOf('disabled') > -1) {
-            mobile.twofactor.disabled.init();
-        }
-        else if (page.indexOf('verify-login') > -1) {
-            mobile.twofactor.verifyLogin.init();
-        }
-
-        return false;
-    }
-    else if (is_mobile && !isEphemeral() && page.substr(0, 3) === 'sms') {
-
-        parsepage(pages['mobile']);
-
-        if (page.indexOf('add-phone-suspended') > -1) {
-            mobile.sms.phoneInput.init();
-        }
-        else if (page.indexOf('verify-code') > -1) {
-            mobile.sms.verifyCode.init();
-        }
-        else if (page.indexOf('verify-success') > -1) {
-            mobile.sms.verifySuccess.init();
-        }
-        else if (page.indexOf('phone-achievement-intro') > -1) {
-            mobile.sms.achievement.init();
-        }
-        else {
-            mobile.sms.phoneInput.init();
-        }
-
+    else if (is_mobile && (page.startsWith('twofactor') || page.startsWith('sms'))) {
+        loadSubPage(`fm/account/${page}`);
         return false;
     }
     else if (page === 'fm/account/profile') {
 
         // Handle old invalid links from emails and redirect them back to fm/account
         loadSubPage('fm/account');
-        return false;
-    }
-    else if (is_mobile && page === 'fm/account') {
-        parsepage(pages['mobile']);
-        mobile.account.init();
         return false;
     }
     else if (page == 'account') {
@@ -1148,28 +1019,28 @@ function init_page() {
             return false;
         }
 
+        parsepage(pages.register);
+
         if (is_mobile) {
             if (window.pickedPlan) {
                 sessionStorage.proPageContinuePlanNum = window.pickedPlan;
                 delete window.pickedPlan;
             }
-            mobile.initDOM();
             mobile.register.show();
         }
         else {
-            parsepage(pages['register']);
             init_register();
         }
     }
     else if ((page.substr(0, 9) === 'registerb')) { // business register
         getUAOParameter(page, 'registerb');
 
-        parsepage(pages['registerb']);
+        parsepage(pages.registerb);
         document.body.classList.add('business');
         var regBusiness = new BusinessRegister();
         regBusiness.initPage();
     }
-    else if (page === 'fm/account/history') {
+    else if (!is_mobile && page === 'fm/account/history') {
         $.scrollIntoSection = '.session-history';
         loadSubPage('fm/account/security');
         return false;
@@ -1179,18 +1050,15 @@ function init_page() {
         return false;
     }
     else if (page == 'key') {
+        parsepage(pages.key);
         if (is_mobile) {
-            mobile.initDOM();
             mobile.register.showGeneratingKeysScreen();
-        }
-        else {
-            parsepage(pages['key']);
         }
         init_key();
     }
     else if (page === 'support') {
         if (is_mobile) {
-            mobile.initDOM();
+            parsepage(pages.support);
             mobile.support.init();
         }
         else if (u_type === 0) {
@@ -1198,7 +1066,7 @@ function init_page() {
             return false;
         }
         else {
-            parsepage(pages['support']);
+            parsepage(pages.support);
             support.initUI();
         }
     }
@@ -1231,12 +1099,11 @@ function init_page() {
         return loadSubPage('login');
     }
     else if (page === 'keybackup') {
+        parsepage(pages.keybackup);
         if (is_mobile) {
-            mobile.initDOM();
-            mobile.backup.init();
+            mobile.settings.backup.init();
         }
         else {
-            parsepage(pages.keybackup);
             init_backup();
         }
     }
@@ -1249,21 +1116,19 @@ function init_page() {
             // Validate code with current logged in session
             ac.validateCodeWithSession().done(function() {
                 if (is_mobile) {
-                    mobile.initDOM();
-                    mobile.account.cancel.init();
+                    parsepage(pages.mobile);
+                    mobile.settings.account.cancel.init();
                 }
                 else {
                     ac.handleFeedback();
                 }
-            })
-            .fail(function(res) {
-
+            }).fail((res) => {
                 // If this is not errored from server but failed verification
                 if (typeof res !== 'number') {
                     if (is_mobile) {
-                        mobile.initDOM();
+                        parsepage(pages.mobile);
                     }
-                    msgDialog('warninga', l[135], l[22001], false, function () {
+                    msgDialog('warninga', l[135], l[22001], false, () => {
                         loadSubPage('fm');
                     });
                 }
@@ -1272,7 +1137,7 @@ function init_page() {
         else {
             // Unable to cancel, not logged in
             if (is_mobile) {
-                mobile.initDOM();
+                parsepage(pages.mobile);
                 login_next = page;
                 msgDialog('warninga', l[6186], l[5841], false, function () {
                     loadSubPage('login');
@@ -1342,7 +1207,7 @@ function init_page() {
                 return false;
             }
             else {
-                parsepage(pages['recovery']);
+                parsepage(pages.recovery);
                 //mobile.recovery.init();
                 var recov = new AccountRecoveryControl();
                 mega.accountController = recov;
@@ -1355,7 +1220,7 @@ function init_page() {
                 return false;
             }
             else {
-                parsepage(pages['recovery']);
+                parsepage(pages.recovery);
                 //var accountRecovery = new mega.AccountRecovery();
                 //accountRecovery.initRecovery();
                 var recov = new AccountRecoveryControl();
@@ -1367,43 +1232,42 @@ function init_page() {
 
     // Page for mobile to let them recover by Master/Recovery Key
     else if (is_mobile && page === 'recoverybykey') {
-        mobile.initDOM();
+        parsepage(pages.mobile);
         mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_KEY);
     }
 
     // Page for mobile to let them park their account (start a new account with the same email)
     else if (is_mobile && page === 'recoverybypark') {
-        mobile.initDOM();
+        parsepage(pages.mobile);
         mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_PARK);
     }
 
     // Code for handling the return from a #recover email link
     else if (page.substr(0, 7) === 'recover' && page.length > 25) {
+        parsepage(pages.reset);
         if (is_mobile) {
-            mobile.initDOM();
             mobile.recovery.fromEmailLink.init();
         }
         else {
-            parsepage(pages['reset']);
             init_reset();
         }
     }
 
     // Page for mobile to enter (or upload) their Master/Recovery Key
     else if (is_mobile && page === 'recoveryenterkey') {
-        mobile.initDOM();
+        parsepage(pages.mobile);
         mobile.recovery.enterKey.init();
     }
 
     // Page for mobile to let them change their password after they have entered their Master/Recovery key
     else if (is_mobile && page === 'recoverykeychangepass') {
-        mobile.initDOM();
+        parsepage(pages.mobile);
         mobile.recovery.changePassword.init('key');
     }
 
     // Page for mobile to let the user change their password and finish parking their account
     else if (is_mobile && page === 'recoveryparkchangepass') {
-        mobile.initDOM();
+        parsepage(pages.mobile);
         mobile.recovery.changePassword.init('park');
     }
     else if (page === 'about/reliability') {
@@ -1437,7 +1301,7 @@ function init_page() {
         mega.redirect('mega.io', 'copyright', false, false);
     }
     else if (page === 'disputenotice') {
-        parsepage(is_mobile ? pages.mobile : pages.disputenotice);
+        parsepage(pages.disputenotice);
         copyright.init_cndispute();
     }
     else if (page === 'dispute') {
@@ -1447,7 +1311,7 @@ function init_page() {
 
         /* jshint -W018 */
         if (page.substr(0, 6) === 'propay') {
-            parsepage(pages[is_mobile ? 'mobile' : 'propay']);
+            parsepage(pages.propay);
             pro.propay.init();
         }
         else {
@@ -1459,7 +1323,7 @@ function init_page() {
 
         if (!isBussiness || is_mobile) {
             // Load the Pro page in the background
-            parsepage(pages['proplan']);
+            parsepage(pages.proplan);
             if (!isBussiness) {
                 pro.proplan.init();
             }
@@ -1493,7 +1357,7 @@ function init_page() {
             (typeof u_attr !== 'undefined' && u_attr.pf && pro.isExpiredOrInGracePeriod(u_attr.pf.s))) {
 
             getUAOParameter(page, 'repay');
-            parsepage(pages['repay']);
+            parsepage(pages.repay);
             var repayPage = new RepayPage();
             repayPage.initPage();
         }
@@ -1563,7 +1427,7 @@ function init_page() {
         mega.redirect('mega.io', 'megabackup', false, false);
     }
     else if (page == 'done') {
-        parsepage(pages['done']);
+        parsepage(pages.done);
         init_done();
     }
     else if (page === 'cookie') {
@@ -1592,7 +1456,7 @@ function init_page() {
     else if (page.substr(0, 5) === 'unsub') {
         // Non-registered user unsubsribe from emails.
         if (is_mobile) {
-            mobile.initDOM();
+            parsepage(pages.mobile);
         }
         M.require('unsub_js').done(function() {
             EmailUnsubscribe.unsubscribe();
@@ -1614,7 +1478,7 @@ function init_page() {
             }
         }
 
-        parsepage(pages[is_mobile ? 'mobile' : 'download']);
+        parsepage(pages.download);
 
         dlinfo(dlid, dlkey, false);
         topmenuUI();
@@ -1770,9 +1634,7 @@ function init_page() {
         }
 
         // Set System default theme or any previously selected
-        if (!is_mobile) {
-            mega.ui.setTheme();
-        }
+        mega.ui.setTheme();
 
         if (!id && fminitialized) {
             id = M.RootID;
@@ -2855,9 +2717,9 @@ function topmenuUI() {
         loadSubPage('pro');
     });
 
-    // Initialise the language sub menu for mobile
+    // Old version lang menu, need to deprecate it once new menu fully applied on logged out pages
     if (is_mobile) {
-        mobile.languageMenu.init();
+        mobile.languageMenu.oldMenu();
     }
 
     // Hover tooltip for top-menu elements and sidebar icons
@@ -3058,8 +2920,13 @@ function parsepage(pagehtml) {
 
     $('#startholder').safeHTML(pagehtml).removeClass('hidden');
 
+    // With new mobile page render, startholder page should not have M.currentdirid kept to avoid bug
+    if (is_mobile) {
+        delete M.currentdirid;
+    }
+
     // if this is bottom page & not Download Page we have to enforce light mode for now.
-    if (page === 'download' && !is_mobile) {
+    if (page === 'download') {
         mega.ui.setTheme();
     }
     else {
@@ -3166,9 +3033,12 @@ function loadSubPage(tpage, event) {
     mBroadcaster.sendMessage('beforepagechange', tpage);
     if (window.is_chatlink) {
         window.is_chatlink = false;
-        delete megaChat.initialPubChatHandle;
         delete M.currentdirid;
-        megaChat.destroy();
+
+        if (megaChatIsReady) {
+            delete megaChat.initialPubChatHandle;
+            megaChat.destroy();
+        }
     }
     dlid = false;
 
@@ -3374,7 +3244,7 @@ mBroadcaster.once('boot_done', () => {
     });
 
     // Currently only used in chat so don't bother trying to register for mobile browsers.
-    if (window.isSecureContext && !is_mobile && !is_karma) {
+    if (window.isSecureContext && !is_mobile && !is_karma && !is_iframed) {
         onIdle(tryCatch(() => {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register(`${is_extension ? '' : '/'}sw.js?v=1`).catch(dump);

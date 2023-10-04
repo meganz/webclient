@@ -626,3 +626,98 @@
     margin: 8px 0;
     max-height: 80px;
 }
+
+/* Mobile Revamp Version */
+.mobile.mega-input {
+    padding: 1px;
+}
+.mobile.mega-input::before {
+    display: none;
+}
+.mobile.mega-input.box-style {
+    width: 100%;
+    border-radius: var(--mobile-border-radius-medium);
+    height: 47px;
+    border: 1px solid var(--mobile-border-strong);
+    background: var(--mobile-page-background);
+}
+.mobile.mega-input.box-style.fixed-width {
+    max-width: 382px;
+}
+.mobile.mega-input.box-style.active {
+    border-color: var(--mobile-border-strong-selected);
+}
+.mobile.mega-input.box-style.msg {
+    border-color: var(--mobile-support-warning);
+}
+.mobile.mega-input.box-style.error {
+    border-color: var(--mobile-support-error);
+}
+.mobile.mega-input.box-style input,
+.mobile.mega-input input::placeholder {
+    font: var(--mobile-font-input-regular);
+    color: var(--mobile-text-placeholder);
+    -webkit-opacity: 1;
+}
+.mobile.mega-input.error .message-container,
+.mobile.mega-input-wrapper.error .message-container {
+    color: var(--mobile-support-error);
+}
+.mobile.mega-input.msg-left .message-container {
+    text-align: left;
+}
+.mobile.mega-input.error .message-container i {
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
+    vertical-align: text-bottom;
+}
+.mobile.mega-input input.megaInputs:not(:placeholder-shown) {
+    color: var(--mobile-text-primary);
+}
+.mobile.mega-input.title-ontop {
+    margin: 36px 0 16px;
+}
+.mobile.mega-input.with-icon i {
+    --icon-size: 20px;
+    padding: 2px;
+    --mask-color: var(--mobile-icon-secondary);
+}
+.mobile.mega-input i.clear-input {
+    color: var(--mobile-icon-primary);
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
+}
+.mobile.mega-input input {
+    padding: 14px 12px;
+    box-sizing: border-box;
+}
+.mobile.mega-input.title-ontop.box-style .mega-input-title {
+    font: var(--mobile-font-caption-large-bold);
+    padding-inline-start: 0;
+    -webkit-padding-start: 0;
+    color: var(--mobile-text-primary);
+    top: -24px
+}
+.mobile.mega-input .message-container {
+    font: var(--mobile-font-caption-large-regular);
+    border: 0;
+    background: none;
+    text-align: start;
+    top: 51px;
+}
+.mobile.mega-input.msg .message-container {
+    color: var(--mobile-text-warning);
+    display: flex;
+}
+.mobile.mega-input.error .message-container {
+    color: var(--mobile-text-error);
+    display: flex;
+}
+.mobile.mega-input.error .message-container .alert,
+.mobile.mega-input.msg .message-container .alert {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 3px;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+}

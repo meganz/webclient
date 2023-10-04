@@ -895,139 +895,6 @@ lazy(mega, 'fileRequest', () => {
         }
     }
 
-    class MobileContextMenu {
-        constructor() {
-            this.$contextMenu = null;
-            this.$createButton = null;
-            this.$manageButton = null;
-            this.$copyLinkButton = null;
-            this.$removeButton = null;
-            this.nodeHandle = null;
-        }
-
-        init($contextMenu, nodeHandle) {
-            this.nodeHandle = nodeHandle;
-            this.$contextMenu = $contextMenu;
-
-            this.reset();
-
-            this.$createButton = new mega.fileRequestUI.ButtonComponent(
-                $('.create-file-request', this.$contextMenu), {
-                    namespace: 'frcmm',
-                    propagate: false,
-                    onOff: true
-                }
-            );
-
-            this.$manageButton = new mega.fileRequestUI.ButtonComponent(
-                $('.manage-file-request', this.$contextMenu), {
-                    namespace: 'frcmm',
-                    propagate: false,
-                    onOff: true
-                }
-            );
-
-            this.$copyLinkButton = new mega.fileRequestUI.CopyButtonComponent(
-                $('.copy-file-request', this.$contextMenu), {
-                    namespace: 'frcm',
-                    toastText: l.file_request_action_copy_link,
-                    propagate: false,
-                    onOff: true
-                }
-            );
-
-            this.$removeButton = new mega.fileRequestUI.ButtonComponent(
-                $('.cancel-file-request', this.$contextMenu), {
-                    namespace: 'frcmm',
-                    propagate: false,
-                    onOff: true
-                }
-            );
-
-            this.addEventHandlers();
-        }
-
-        reset() {
-            if (this.$createButton) {
-                this.$createButton.off();
-                delete this.$createButton;
-            }
-            if (this.$manageButton) {
-                this.$manageButton.off();
-                delete this.$manageButton;
-            }
-            if (this.$copyLinkButton) {
-                this.$copyLinkButton.off();
-                delete this.$copyLinkButton;
-            }
-            if (this.$removeButton) {
-                this.$removeButton.off();
-                delete this.$removeButton;
-            }
-        }
-
-        addEventHandlers() {
-            this.$createButton.eventOnClick(() => {
-                if (!validateUserAction()) {
-                    return false;
-                }
-
-                eventlog(99833);
-
-                mobile.cloud.contextMenu.hide();
-                mega.fileRequest.showCreateMobileDialog(this.nodeHandle);
-
-                return false;
-            });
-
-            this.$manageButton.eventOnClick(() => {
-                if (!validateUserAction()) {
-                    return false;
-                }
-
-                mobile.cloud.contextMenu.hide();
-                mega.fileRequest.showManageMobileDialog(this.nodeHandle);
-
-                return false;
-            });
-
-            this.$copyLinkButton.setOptions({
-                callback: () => {
-                    const selectedNodeHandle = this.nodeHandle;
-                    const puPagePublicHandle = mega.fileRequest.storage
-                        .getPuHandleByNodeHandle(selectedNodeHandle);
-
-                    mobile.cloud.contextMenu.hide();
-
-                    if (puPagePublicHandle) {
-                        return mega.fileRequest.generator
-                            .generateUrl(puPagePublicHandle.p);
-                    }
-
-                    return null;
-                }
-            });
-
-            this.$removeButton.eventOnClick(() => {
-                if (!validateUserAction()) {
-                    return false;
-                }
-
-                const selectedNodeHandle = this.nodeHandle;
-                if (!selectedNodeHandle) {
-                    return false;
-                }
-
-                mobile.cloud.contextMenu.hide();
-                mega.fileRequest.dialogs.removeWarningMobileDialog.init({
-                    h: selectedNodeHandle
-                });
-
-                return false;
-            });
-        }
-    }
-
     class CreateMobileDialog extends CommonMobileDialog {
         constructor() {
             super();
@@ -1401,7 +1268,6 @@ lazy(mega, 'fileRequest', () => {
         constructor() {
             this.contextMenu = new FileRequestContextMenu();
 
-            lazy(this, 'mobileContextMenu', () => new MobileContextMenu());
             lazy(this, 'actionHandler', () => mega.fileRequestCommon.actionHandler);
             lazy(this, 'storage', () => mega.fileRequestCommon.storage);
             lazy(this, 'fileRequestApi', () => mega.fileRequestCommon.fileRequestApi);
@@ -1655,18 +1521,12 @@ lazy(mega, 'fileRequest', () => {
                     mega.fileRequest.removeList(list).always(dump).finally(resolve);
                 };
 
-                if (is_mobile) {
-                    mobile.messageOverlay.show(fldName, l[18229], false, ['No', 'Yes']).then(ack).catch(reject);
-                }
-                else {
-                    msgDialog('confirmation', l[1003], fldName, l[18229], (result) => {
-
-                        if (result) {
-                            return ack();
-                        }
-                        reject(EBLOCKED);
-                    });
-                }
+                msgDialog('confirmation', l[1003], fldName, l[18229], (result) => {
+                    if (result) {
+                        return ack();
+                    }
+                    reject(EBLOCKED);
+                });
             });
         }
 

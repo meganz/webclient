@@ -1,0 +1,27 @@
+/* These are temporary styles for empty rubbish bin page until we
+get some illustrations and designs at a later point */
+.clear-bin {
+    color: var(--mobile-button-error);
+}
+
+.empty-rubbishbin {
+    --icon-size: 120px;
+    margin: auto;
+    text-align: center;
+    color: var(--mobile-text-primary);
+    justify-content: center;
+}
+
+.empty-rubbishbin .icon-trash-thin-outline {
+    margin: auto;
+}
+
+.empty-bin-title {
+    font: var(--mobile-font-heading-h2);
+    padding-top: 16px;
+}
+
+.empty-bin-body {
+    font: var(--mobile-font-copy-regular);
+    padding: 16px 24px;
+}

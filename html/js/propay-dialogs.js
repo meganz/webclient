@@ -828,6 +828,8 @@ var voucherDialog = {
                     voucherDialog.$dialog.find('.voucher-buy-now').removeClass('hidden');
                     // Hide voucher input
                     $('.voucher-input-container', voucherDialog.$dialog).addClass('hidden');
+
+                    voucherDialog.showVoucherDialog();
                 });
             })
             .catch(function(ex) {
@@ -2259,14 +2261,19 @@ var addressDialog = {
                 if (addressDialog.stripeSaleId === 'EDIT') {
                     closeDialog();
 
-                    msgDialog('info', '', l.payment_card_update, l.payment_card_update_desc, () => {
-                        if (!is_mobile && page.includes('fm/account/plan')) {
-                            accountUI.plan.init(M.account);
+                    if (is_mobile) {
+                        if (page === 'fm/account/paymentcard') {
+                            mega.ui.toast.show(l.payment_card_update_desc, 6);
+                            loadSubPage('fm/account');
                         }
-                        else if (is_mobile && page === 'fm/account/paymentcard') {
-                            mobile.account.paymentCard.init();
-                        }
-                    });
+                    }
+                    else {
+                        msgDialog('info', '', l.payment_card_update, l.payment_card_update_desc, () => {
+                            if (page.startsWith('fm/account/plan')) {
+                                accountUI.plan.init(M.account);
+                            }
+                        });
+                    }
                 }
                 else {
                     addressDialog.stripeCheckerCounter = 0;
@@ -2331,7 +2338,8 @@ var addressDialog = {
             if (utcResult.EUR) {
                 const $stripeDialog = $('.payment-stripe-dialog');
                 const $iframeContainer =
-                    $('.fm-dialog.mobile.payment-stripe-dialog, .mega-dialog.payment-stripe-dialog .iframe-container');
+                    $('.mobile.payment-stripe-dialog .iframe-container,' +
+                          ' .mega-dialog.payment-stripe-dialog .iframe-container');
                 let $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
                 $stripeIframe.remove();
                 const sandBoxCSP = 'allow-scripts allow-same-origin allow-forms'

@@ -223,6 +223,9 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     if (n.s4 && n.p === M.RootID) {
         p = 's4';
     }
+    else if (M.tree.s4 && M.tree.s4[n.h]) {
+        delete M.tree.s4[n.h];
+    }
 
     if (!M.tree[p]) {
         M.tree[p] = Object.create(null);

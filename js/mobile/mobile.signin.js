@@ -339,6 +339,11 @@ mobile.signin.new = {
 
         // If email confirm code is ok
         if (confirmok) {
+            // Cleanup temporary login variables
+            security.login.email = null;
+            security.login.password = null;
+            security.login.rememberMe = false;
+
             if (result === EBLOCKED) {
                 mobile.messageOverlay.show(l[730]);
             }

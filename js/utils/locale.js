@@ -1709,6 +1709,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.transfer_quota_pct = escapeHTML(l.transfer_quota_pct).replace('[S]', '<span>').replace('[/S]', '</span>');
     l.pr_I_III_365_days = escapeHTML(l.pr_I_III_365_days).replace("[S]", "<span>").replace("[/S]", "</span>");
     l.pr_lite_90_days = escapeHTML(l.pr_lite_90_days).replace("[S]", "<span>").replace("[/S]", "</span>");
+    l.pr_save_tip = escapeHTML(l.pr_save_tip).replace('[S]', '<span>').replace('[/S]', '</span>');
     l.emoji_suggestion_instruction = escapeHTML(l.emoji_suggestion_instruction)
         .replace(/\[S]/g, '<strong>')
         .replace(/\[\/S]/g, '</strong>')

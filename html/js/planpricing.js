@@ -20,7 +20,7 @@ lazy(pro, 'proplan2', () => {
     let ProFlexiFound = false;
 
     const initTabHandlers = () => {
-        const $tabs = $('.indiviusal-team-tab-container .tabs-module-block', $page);
+        const $tabs = $('.individual-team-tab-container .tabs-module-block', $page);
 
         const proDivsSelector = '.pricing-pg.pick-period-container, .pricing-pg.pro-plans-cards-container, ' +
             '.pricing-pg.pricing-estimation-note-container';
@@ -62,6 +62,10 @@ lazy(pro, 'proplan2', () => {
             else {
                 setFooterBannerTxt(l.pr_business_started, l.pr_easily_add, l[24549]);
             }
+
+            const base = visibilityState ? 99862 : 99864;
+            delay('pricing.individual-team-tab', eventlog.bind(null, base + (is_mobile ? 1 : 0)));
+
         });
     };
 
@@ -142,6 +146,9 @@ lazy(pro, 'proplan2', () => {
                 const planId = selectedID.replace('pro', '') | 0;
 
                 if (planId) {
+                    if (is_mobile) {
+                        delay('pricing.plan-mobile', eventlog.bind(null, 99869 + planId));
+                    }
                     delay('pricing.plan', eventlog.bind(null, 99779 + planId));
 
                     moveToBuyStep(planId);
@@ -587,7 +594,14 @@ lazy(pro, 'proplan2', () => {
     const fillPlansInfo = (period) => {
 
         const defaultPeriod = mega.flags.ab_bbyd ? 12 : 1;
+        const ab_test_flag = mega.flags.ab_apmap;
+
         period = period || defaultPeriod;
+
+        // If user has ab_apmap flag, attach them to the experiment
+        if (typeof ab_test_flag !== 'undefined') {
+            api.req({a: 'abta', c: 'ab_apmap'});
+        }
 
         if (!pro.membershipPlans.length) {
             console.error('Plans couldnt be loaded.');
@@ -623,6 +637,12 @@ lazy(pro, 'proplan2', () => {
             $planCard.removeClass('hidden');
 
             let planPrice = currentPlan[pro.UTQA_RES_INDEX_PRICE];
+            const includeNoDiscount = (period === 12 && ab_test_flag);
+
+            const planPriceNoDiscount = includeNoDiscount
+                ? 12 * currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] * pro.conversionRate
+                : null;
+
             let priceCurrency = 'EUR';
 
             if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
@@ -634,13 +654,40 @@ lazy(pro, 'proplan2', () => {
             }
 
             const priceText = formatCurrency(planPrice, priceCurrency, 'narrowSymbol');
+            const noDiscountText = planPriceNoDiscount
+                ? formatCurrency(planPriceNoDiscount, priceCurrency, 'narrowSymbol')
+                : false;
+
+            const monthlyPriceText = includeNoDiscount
+                ? formatCurrency(planPrice / 12, priceCurrency, 'narrowSymbol')
+                : false;
+
             $('.pricing-plan-price span.vl', $planCard).text(priceText);
-            $('.pricing-plan-price-unit', $planCard).text(`${priceCurrency} / ${periodText}`);
+
+            const $planPriceUnit = $('.pricing-plan-price-unit', $planCard);
+            if (includeNoDiscount) {
+                $planPriceUnit.text(priceCurrency + ' ' + l.pr_billed_yearly).addClass('billed-yearly');
+            }
+            else {
+                $planPriceUnit.text(priceCurrency + ' / ' +  periodText).removeClass('billed-yearly');
+            }
 
             if (priceText) {
                 $planCard.toggleClass('long-currency1', priceText.length >= 9 && priceText.length <= 12);
                 $planCard.toggleClass('long-currency2', priceText.length >= 13 && priceText.length <= 16);
                 $planCard.toggleClass('long-currency3', priceText.length >= 17);
+            }
+            if (includeNoDiscount) {
+                const perMonthText = monthlyPriceText + '*';
+                $('.pricing-plan-only', $planCard).text(noDiscountText)
+                    .removeClass('hidden').addClass('strikethrough');
+                $('.pricing-plan-monthly ', $planCard).removeClass('hidden');
+                $('.pricing-plan-monthly span', $planCard).text(perMonthText).removeClass('hidden');
+
+            }
+            else {
+                $('.pricing-plan-monthly', $planCard).addClass('hidden');
+                $('.pricing-plan-only', $planCard).addClass('hidden').removeClass('strikethrough');
             }
 
             // get the storage/bandwidth, then convert it to bytes (it comes in GB) to format.
@@ -671,6 +718,13 @@ lazy(pro, 'proplan2', () => {
 
             $('.pricing-plan-title', $planCard).text(planName);
             $('.pricing-plan-btn', $planCard).text(l.buy_plan.replace('%1', planName));
+
+            if (ab_test_flag) {
+                $('.pricing-pg.pick-period-container .period-note-txt span').addClass('bold');
+            }
+            else {
+                $('.pricing-pg.pick-period-container .period-note-txt span').removeClass('bold');
+            }
         }
 
         localPriceInfo = localPriceInfo || 'EUR';
@@ -823,6 +877,7 @@ lazy(pro, 'proplan2', () => {
 
             this.classList.add('selected');
             sessionStorage.setItem('pro.period', this.dataset.period);
+
             if (this.dataset.period === '12') {
                 delay('pricing.plan', eventlog.bind(null, is_mobile ? 99867 : 99866));
             }

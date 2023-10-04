@@ -4009,11 +4009,11 @@ ChatRoom.MembersSet = function (chatRoom) {
   this.members = {};
 };
 ChatRoom.MembersSet.PRIVILEGE_STATE = {
-  'NOT_AVAILABLE': -5,
-  'FULL': 3,
-  'OPERATOR': 2,
-  'READONLY': 0,
-  'LEFT': -1
+  NOT_AVAILABLE: -5,
+  OPERATOR: 3,
+  FULL: 2,
+  READONLY: 0,
+  LEFT: -1
 };
 ChatRoom.encryptTopic = function (protocolHandler, newTopic, participants, isPublic = false) {
   if (protocolHandler instanceof strongvelope.ProtocolHandler && participants.size > 0) {
@@ -5211,10 +5211,7 @@ ChatRoom.prototype.isReadOnly = function () {
   return this.members && this.members[u_handle] <= 0 || !this.members.hasOwnProperty(u_handle) || this.privateReadOnlyChat || this.state === ChatRoom.STATE.LEAVING || this.state === ChatRoom.STATE.LEFT;
 };
 ChatRoom.prototype.iAmOperator = function () {
-  return this.type === "private" || this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL;
-};
-ChatRoom.prototype.iAmStandard = function () {
-  return this.type !== 'private' && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
+  return this.type === 'private' || this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
 };
 ChatRoom.prototype.iAmReadOnly = function () {
   return this.type !== 'private' && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
@@ -10819,8 +10816,8 @@ class ParticipantsListInner extends mixins.wl {
     var scrollPositionY = this.props.scrollPositionY;
     var scrollHeight = this.props.scrollHeight;
     const {
-      FULL,
       OPERATOR,
+      FULL,
       READONLY
     } = ChatRoom.MembersSet.PRIVILEGE_STATE;
     if (!room) {
@@ -10849,7 +10846,7 @@ class ParticipantsListInner extends mixins.wl {
       }
     };
     for (var i = 0; i < contacts.length; i++) {
-      var contactHash = contacts[i];
+      const contactHash = contacts[i];
       if (!(contactHash in M.u)) {
         continue;
       }
@@ -10879,33 +10876,42 @@ class ParticipantsListInner extends mixins.wl {
             key: "privOperator",
             icon: "sprite-fm-mono icon-admin-outline",
             label: l[8875],
-            className: "tick-item " + (room.members[contactHash] === FULL ? "active" : ""),
+            className: `
+                                tick-item
+                                ${room.members[contactHash] === OPERATOR ? 'active' : ''}
+                            `,
             disabled: contactHash === u_handle,
-            onClick: onSetPrivClicked.bind(this, contactHash, FULL)
+            onClick: () => onSetPrivClicked(contactHash, OPERATOR)
           }));
           dropdowns.push(external_React_default().createElement(DropdownsUI.DropdownItem, {
             key: "privFullAcc",
             icon: "sprite-fm-mono icon-chat",
-            className: "tick-item " + (room.members[contactHash] === OPERATOR ? "active" : ""),
+            className: `
+                                tick-item
+                                ${room.members[contactHash] === FULL ? 'active' : ''}
+                            `,
             disabled: contactHash === u_handle,
             label: l[8874],
-            onClick: onSetPrivClicked.bind(this, contactHash, OPERATOR)
+            onClick: () => onSetPrivClicked(contactHash, FULL)
           }));
           dropdowns.push(external_React_default().createElement(DropdownsUI.DropdownItem, {
             key: "privReadOnly",
             icon: "sprite-fm-mono icon-read-only",
-            className: "tick-item " + (room.members[contactHash] === READONLY ? "active" : ""),
+            className: `
+                                tick-item
+                                ${room.members[contactHash] === READONLY ? 'active' : ''}
+                            `,
             disabled: contactHash === u_handle,
             label: l[8873],
-            onClick: onSetPrivClicked.bind(this, contactHash, READONLY)
+            onClick: () => onSetPrivClicked(contactHash, READONLY)
           }));
         }
         const baseClassName = 'sprite-fm-mono';
         switch (room.members[contactHash]) {
-          case FULL:
+          case OPERATOR:
             dropdownIconClasses = `${baseClassName} icon-admin`;
             break;
-          case OPERATOR:
+          case FULL:
             dropdownIconClasses = `${baseClassName} icon-chat-filled`;
             break;
           case READONLY:
@@ -20587,7 +20593,7 @@ class StreamHead extends mixins.wl {
       if (members) {
         const moderators = [];
         for (const [handle, role] of Object.entries(members)) {
-          if (role === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL) {
+          if (role === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR) {
             moderators.push(M.getNameByHandle(handle));
           }
         }
@@ -20811,16 +20817,16 @@ class VideoNodeMenu extends mixins.wl {
     } = stream;
     if (call && call.isPublic) {
       const {
-        FULL,
-        OPERATOR
+        OPERATOR,
+        FULL
       } = ChatRoom.MembersSet.PRIVILEGE_STATE;
-      const currentUserModerator = chatRoom.members[u_handle] === FULL;
-      const targetUserModerator = chatRoom.members[userHandle] === FULL;
+      const currentUserModerator = chatRoom.members[u_handle] === OPERATOR;
+      const targetUserModerator = chatRoom.members[userHandle] === OPERATOR;
       return currentUserModerator && external_React_default().createElement(meetings_button.Z, {
         targetUserModerator: targetUserModerator,
         icon: "sprite-fm-mono icon-admin",
         onClick: () => {
-          ['alterUserPrivilege', 'onCallPrivilegeChange'].map(event => chatRoom.trigger(event, [userHandle, targetUserModerator ? OPERATOR : FULL]));
+          ['alterUserPrivilege', 'onCallPrivilegeChange'].map(event => chatRoom.trigger(event, [userHandle, targetUserModerator ? FULL : OPERATOR]));
         }
       }, external_React_default().createElement("span", null, targetUserModerator ? l.remove_moderator : l.make_moderator));
     }
@@ -24026,7 +24032,7 @@ Call.STATE = {
 Call.isGuest = () => !u_type;
 Call.isModerator = (chatRoom, handle) => {
   if (chatRoom && handle) {
-    return chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL;
+    return chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
   }
   return false;
 };
@@ -24063,7 +24069,7 @@ const withHostsObserver = Component => {
         dialog: false,
         selected: []
       };
-      this.hasHost = participants => participants.some(handle => this.props.chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL && handle !== u_handle);
+      this.hasHost = participants => participants.some(handle => this.props.chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR && handle !== u_handle);
       this.toggleDialog = () => {
         this.setState(state => ({
           dialog: !state.dialog,
@@ -24125,7 +24131,7 @@ const withHostsObserver = Component => {
           selected
         } = this.state;
         for (let i = selected.length; i--;) {
-          chatRoom.trigger('alterUserPrivilege', [selected[i], ChatRoom.MembersSet.PRIVILEGE_STATE.FULL]);
+          chatRoom.trigger('alterUserPrivilege', [selected[i], ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR]);
         }
         this.toggleDialog();
         onLeave == null || onLeave();

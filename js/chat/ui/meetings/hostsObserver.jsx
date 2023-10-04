@@ -14,7 +14,7 @@ export const withHostsObserver = Component => {
 
             hasHost = participants =>
                 participants.some(handle =>
-                    this.props.chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL &&
+                    this.props.chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR &&
                     handle !== u_handle
                 );
 
@@ -80,7 +80,7 @@ export const withHostsObserver = Component => {
                 for (let i = selected.length; i--;) {
                     chatRoom.trigger(
                         'alterUserPrivilege',
-                        [selected[i], ChatRoom.MembersSet.PRIVILEGE_STATE.FULL]
+                        [selected[i], ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR]
                     );
                 }
                 this.toggleDialog();

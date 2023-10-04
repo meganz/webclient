@@ -328,8 +328,8 @@ class ChatToastIntegration {
                             const { userId, priv } = data;
                             if (
                                 userId === u_handle &&
-                                priv === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL &&
-                                initialPriv !== ChatRoom.MembersSet.PRIVILEGE_STATE.FULL
+                                priv === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR &&
+                                initialPriv !== ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR
                             ) {
                                 ChatToast.quick(
                                     l.chosen_moderator /* `You were chosen to be the moderator of this call` */,
@@ -340,7 +340,7 @@ class ChatToastIntegration {
                     })
                     .rebind('onCallPrivilegeChange', (e, userHandle, privilege) => {
                         const name = nicknames.getNickname(userHandle);
-                        const role = privilege === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL
+                        const role = privilege === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR
                             ? l.chat_user_role_change_op
                             : l.chat_user_role_change_std;
 

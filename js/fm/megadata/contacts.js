@@ -218,7 +218,7 @@ MegaData.prototype.syncUsersFullname = async function(userId, chatHandle) {
         u_attr.name = user.name;
 
         $('.user-name, .top-menu-logged .name, .membership-big-txt.name').text(u_attr.fullname);
-        if (M.currentdirid === 'account') {
+        if (!is_mobile && M.currentdirid === 'account') {
             accountUI.account.profiles.renderFirstName();
             accountUI.account.profiles.renderLastName();
         }

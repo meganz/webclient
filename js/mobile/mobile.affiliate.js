@@ -19,12 +19,6 @@ mobile.affiliate = {
         // Cache selectors
         var $page = $('.mobile.affiliate-page');
 
-        // Initialise the top menu
-        topmenuUI();
-
-        // Init the titleMenu for this page.
-        mobile.titleMenu.init();
-
         // Show the account page content
         $page.removeClass('hidden');
 
@@ -258,7 +252,7 @@ mobile.affiliate = {
 
         'use strict';
 
-        var $dialog = $('#startholder .mobile.generate-url.overlay');
+        var $dialog = $('#fmholder .mobile.generate-url.overlay');
         var $urlBar = $('.mobile.generate-url.url-block', $dialog);
         var $doneButton = $('.mobile.generate-url.button.done');
         var $page = $('.mobile.affiliate-guide-page');
@@ -473,7 +467,7 @@ mobile.affiliate = {
         $overlay.removeClass('hidden');
 
         // Show Context menu
-        $contextMenu.removeClass('o-hidden');
+        $contextMenu.removeClass(['o-hidden', 'hidden']);
     },
 
     /**
@@ -631,6 +625,10 @@ mobile.affiliate = {
                 else if (currentStep) {
 
                     const isConfirmed = $(this).data('confirmUpdate');
+
+                    if (currentStep === 2) {
+                        $('#affiliate-redemption-amount', self.$page).trigger('blur');
+                    }
 
                     if (currentStep === 4 && !$('.auto-fill-checkbox', this.$page).hasClass('hidden') &&
                         isConfirmed && affiliateRedemption.validateDynamicAccInputs()) {
@@ -1481,7 +1479,7 @@ mobile.affiliate = {
 
         this.getMobileAffiliateData(function() {
             mobile.initBackButton($page, 'fm/refer/');
-            mobile.affiliate.initDistributionButtons();
+            mobile.affiliate.initDistributionButtons($page);
             mobile.affiliate.drawTable($page);
         });
     },

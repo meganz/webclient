@@ -1401,7 +1401,7 @@
 
                 u_attr[ctx.ua] = res;
 
-                if (!is_mobile && is_fm()) {
+                if (is_fm()) {
                     mega.ui.setTheme(res | 0);
                 }
             });

@@ -4,6 +4,7 @@
     'use strict';
 
     let $topbar;
+    let $searchforms;
 
     /**
      * Initialises the top searchbars and events attached to them
@@ -12,11 +13,14 @@
      * @return {undefined}
      */
     function initSearch(currentPage) {
-        $topbar = $('#startholder .js-topbar, #fmholder .js-topbar');
+        $topbar = is_mobile ?
+            $('.mega-header', '#fmholder') : $('.js-topbar', '#startholder, #fmholder');
 
         refreshSearch(currentPage);
 
-        $('#main-search-fake-form, #mini-search-fake-form', $topbar).rebind('submit.searchsubmit', function(e) {
+        $searchforms = is_mobile ?
+            $('#main-search-mobile-form', $topbar) : $('#main-search-fake-form, #mini-search-fake-form', $topbar);
+        $searchforms.rebind('submit.searchsubmit', function(e) {
             e.preventDefault();
             var val = $.trim($('.js-filesearcher', this).val());
 
@@ -32,7 +36,8 @@
                     }
                     onIdle(() => {
                         // get topbars again for switching between static and fm pages
-                        $topbar = $('#startholder .js-topbar, #fmholder .js-topbar');
+                        $topbar = is_mobile ?
+                            $('.mega-header', '#fmholder') : $('.js-topbar', '#startholder, #fmholder');
 
                         $('.js-filesearcher', $topbar).val(val);
                         $('#main-search-fake-form .js-filesearcher', $topbar).trigger('focus');
@@ -51,7 +56,7 @@
             return false;
         });
 
-        $('.js-btnclearSearch', $topbar).rebind('click.searchclear', function(e) {
+        $('.js-btnclearSearch, .js-btncloseSearch', $topbar).rebind('click.searchclear', (e) => {
             e.preventDefault();
 
             // if this is folderlink, open folderlink root;

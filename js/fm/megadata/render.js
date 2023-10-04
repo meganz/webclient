@@ -376,24 +376,26 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
         return false;
     }
 
-    if (!node.__hasMCV) {
-        node.__hasMCV = true;
-        megaRender.setDOMColumnsWidth(node);
-    }
-
-    var selList = selectionManager && selectionManager.selected_list ? selectionManager.selected_list : $.selected;
-
-    if (selList && selList.length) {
-        if (selList.indexOf(aHandle) > -1) {
-            node.classList.add('ui-selected');
+    if (!is_mobile) {
+        if (!node.__hasMCV) {
+            node.__hasMCV = true;
+            megaRender.setDOMColumnsWidth(node);
         }
-        else {
+
+        var selList = selectionManager && selectionManager.selected_list ? selectionManager.selected_list : $.selected;
+
+        if (selList && selList.length) {
+            if (selList.includes(aHandle)) {
+                node.classList.add('ui-selected');
+            }
+            else {
+                node.classList.remove('ui-selected');
+            }
+            node.classList.remove('ui-selectee');
+        }
+        else if (selList && selList.length === 0) {
             node.classList.remove('ui-selected');
         }
-        node.classList.remove('ui-selectee');
-    }
-    else if (selList && selList.length === 0) {
-        node.classList.remove('ui-selected');
     }
 
     if (M.d[aHandle]) {

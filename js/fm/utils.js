@@ -1495,8 +1495,8 @@ MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
                         ulmanager.ulResumeOverStorageQuotaState();
                     });
                 }
-                if (is_mobile) {
-                    mobile.overStorageQuotaOverlay.close();
+                if (is_mobile && mega.ui.sheet.name === 'over-storage') {
+                    mega.ui.sheet.hide();
                 }
                 if (u_attr) {
                     delete u_attr.uspw;

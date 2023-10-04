@@ -1,0 +1,6 @@
+.overlay-wrap .image i.dl-decrypt {
+    background-image: url("/images/mobile/dl-decrypt.png");
+    background-size: contain;
+    width: 96px;
+    height: 96px;
+}

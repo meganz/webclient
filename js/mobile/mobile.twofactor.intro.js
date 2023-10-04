@@ -40,10 +40,13 @@ mobile.twofactor.intro = {
         'use strict';
 
         // On Back button click/tap
-        mobile.twofactor.intro.$page.find('.setup-two-factor-button').off('tap').on('tap', function() {
+        mobile.twofactor.intro.$page.find('.setup-two-factor-button').off('tap').on('tap', () => {
+
+            // Hide this page
+            mobile.twofactor.intro.$page.addClass('hidden');
 
             // Render the Setup page
-            loadSubPage('twofactor/setup');
+            loadSubPage('fm/account/security/two-factor-authentication/setup');
             return false;
         });
     },
@@ -58,8 +61,10 @@ mobile.twofactor.intro = {
         // On Close icon/Cancel button click/tap
         mobile.twofactor.intro.$page.find('.mobile.cancel, .mobile.fm-dialog-close').off('tap').on('tap', function() {
 
+            mobile.twofactor.intro.$page.addClass('hidden');
+
             // Render the Account page again
-            loadSubPage('fm/account/');
+            loadSubPage('fm/account/security');
             return false;
         });
     }

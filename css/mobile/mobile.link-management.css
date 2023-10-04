@@ -1,0 +1,99 @@
+.link-mgmt-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.link-mgmt-container .selected-node {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 16px 0;
+}
+
+.link-mgmt-container .selected-node .node-details {
+    display: flex;
+    flex-direction: column;
+    margin-inline-start: 16px;
+    -webkit-margin-start: 16px;
+}
+
+.link-mgmt-container .selected-node .node-details .num-files {
+    margin-top: 2px;
+}
+
+.link-mgmt-container .share-link-info-msg {
+    margin: 16px 0;
+}
+
+.link-mgmt-container .toggle-container.password .mega-input,
+.link-mgmt-container .toggle-container.expiry-date .date-picker {
+    margin: 16px 0 24px;
+}
+
+.link-mgmt-container .toggle-container.expiry-date .date-picker.expired {
+    margin-bottom: 48px;
+}
+
+.link-mgmt-container .toggle-container .mega-input.with-icon i:not(.alert) {
+    order: 1;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+}
+
+.link-mgmt-container .toggle-container .mega-input.with-icon i.alert {
+    padding: 0;
+    --icon-size: unset;
+    --mask-color: unset;
+}
+
+.link-mgmt-container input::placeholder {
+    color: var(--mobile-text-placeholder);
+}
+
+.link-mgmt-container .toggle-container.expiry-date {
+    position: relative;
+}
+
+.link-mgmt-container .toggle-container.decryption-key .decryption-key-message {
+    font: var(--mobile-font-link-small-regular);
+    color: var(--mobile-text-secondary);
+}
+
+.link-mgmt-container .toggle-container.decryption-key .decryption-key-message a,
+.anchor-link {
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}
+
+.link-mgmt-container .toggle-container.decryption-key .title {
+    font: var(--mobile-font-link-small-bold);
+    padding: 16px 0 4px;
+}
+
+.link-mgmt-container .toggle-container:not(.decryption-key) .mega-input.msg .message-container {
+    flex-direction: row;
+    align-items: center;
+    padding-top: 10px;
+    font: var(--mobile-font-caption-large-regular);
+    background: none;
+    border: none;
+}
+
+.link-mgmt-container .toggle-container.password .mega-input i:not(.alert) {
+    --icon-size: 20px;
+}
+.link-mgmt-container .toggle-container.password .mega-input i:last-child {
+    right: 12px;
+    opacity: 1;
+}
+
+@media screen and (min-width: 769px) {
+    .link-mgmt-container .toggle-container.expiry-date .date-picker,
+    .mobile .link-mgmt-container .mega-input.box-style {
+        width: 327px;
+    }
+
+    .link-mgmt-container .toggle-container.expiry-date .date-picker input {
+        width: 320px;
+    }
+}

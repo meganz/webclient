@@ -105,29 +105,13 @@
         this.openInBrowser = function(name) {
             var blob = this.getBlob(name || dl.n);
 
-            if (/CriOS/i.test(navigator.userAgent)) {
-                var reader = new FileReader();
-                reader.onload = function() {
-                    window.open(reader.result, '_blank');
-                };
-                reader.onerror = function(ex) {
-                    alert(ex.message || ex);
-                };
-                reader.readAsDataURL(blob);
-            }
-            else {
-                // XXX: As of Chrome 69+ the object/blob uri may gets automatically revoked
-                //      when leaving the site, causing a later Download invocation to fail.
-                var blobURI = myURL.createObjectURL(blob);
+            // XXX: As of Chrome 69+ the object/blob uri may gets automatically revoked
+            //      when leaving the site, causing a later Download invocation to fail.
+            var blobURI = myURL.createObjectURL(blob);
 
-                mBroadcaster.once('visibilitychange:false', function() {
-                    later(function() {
-                        myURL.revokeObjectURL(blobURI);
-                    });
-                });
-
-                window.open(blobURI);
-            }
+            mBroadcaster.once('visibilitychange:false', () => later(() => myURL.revokeObjectURL(blobURI)));
+            // eslint-disable-next-line local-rules/open
+            window.open(blobURI);
         };
 
         this.setCredentials = function(url, size, filename, chunks, sizes) {

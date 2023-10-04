@@ -351,7 +351,8 @@
             id.substr(0, 7) === 'account' ||
             id.substr(0, 7) === 'devices' ||
             id.substr(0, 9) === 'dashboard' ||
-            id.substr(0, 15) === 'user-management') {
+            id.substr(0, 15) === 'user-management' ||
+            id.substr(0, 5) === 'refer') {
 
             this.v = [];
             delay.cancel('rmSetupUI');
@@ -752,7 +753,7 @@
         else if (id && id.substr(0, 7) === 'recents') {
             M.onFileManagerReady(openRecents);
         }
-        else if (id && id.substr(0, 9) === 'refer') {
+        else if (id && id.substr(0, 5) === 'refer') {
             M.onFileManagerReady(affiliateUI);
         }
         else if (id && id.substr(0, 7) === 'search/') {
@@ -816,7 +817,6 @@
                 id = this.RootID;
             }
             else if (!this.d[id] || this.d[id].t && !this.c[id]) {
-
                 fetchDBNodes = !id || id.length !== 8 ? -1 : !!window.fmdb;
             }
         }

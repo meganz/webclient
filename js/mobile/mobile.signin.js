@@ -99,7 +99,7 @@ mobile.signin = {
         var $signInButton = this.$screen.find('.signin-button');
 
         // Add keyup event to the email and password fields
-        $bothFields.rebind('keyup', function(event) {
+        $bothFields.rebind('keyup change paste', (event) => {
 
             // Change the button to red to enable it if they have entered something in the two fields
             if ($emailField.val().length > 0 && $passwordField.val().length > 0) {
@@ -237,6 +237,8 @@ mobile.signin.old = {
         // If the Two-Factor PIN is required
         if (result === EMFAREQUIRED) {
 
+            mobile.signin.$screen.addClass('hidden');
+
             // Load the Two-Factor PIN entry page
             loadSubPage('twofactor/verify-login');
             return false;
@@ -354,6 +356,8 @@ mobile.signin.new = {
         else {
             // If the Two-Factor PIN is required
             if (result === EMFAREQUIRED) {
+
+                mobile.signin.$screen.addClass('hidden');
 
                 // Load the Two-Factor PIN entry page
                 loadSubPage('twofactor/verify-login');

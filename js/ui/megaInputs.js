@@ -232,7 +232,7 @@
             return;
         }
 
-        this.$input.val(value).trigger('change');
+        this.$input.val(value).trigger('change').trigger('input');
     };
 
     // Export

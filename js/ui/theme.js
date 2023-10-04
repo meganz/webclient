@@ -32,7 +32,7 @@
                 || page.substr(0, 5) === 'chat/'
                 || is_chatlink
                 || (is_fm() && page.substr(0, 5) !== 'start')
-                || (page === 'download' && !is_mobile)
+                || page === 'download'
                 || page.substr(0, 11) === 'filerequest'
             )
         ) {

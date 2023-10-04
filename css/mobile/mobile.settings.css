@@ -1,0 +1,60 @@
+/* Settings page nodes */
+.mega-mobile-settings {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.mega-mobile-settings .mega-component span {
+   font: var(--mobile-font-link-large-regular);
+}
+
+.mega-mobile-settings .settings-heading {
+    font: var(--mobile-font-heading-h2);
+    padding: 24px;
+    margin: 0;
+}
+
+.mega-mobile-settings.notifications  .content-txt {
+    color: var(--mobile-text-primary);
+}
+
+body.bottom-pages .fmholder {
+    grid: initial;
+}
+
+.mobile .two-factor-page .two-factor-heading,
+.mobile .two-factor-page .two-factor-body-text {
+    text-align: left;
+}
+
+/* TODO: Remove when old mobile have been redone */
+.mobile.old-page {
+    background-color: #fff;
+}
+
+.mobile .old-page,
+.mobile .main-block,
+.mobile .my-account-page {
+    grid-row: -2/-1;
+    grid-column: -2/-1;
+}
+
+.mobile .affiliate-guide-page,
+.mobile .affiliate-history-page,
+.mobile .affiliate-page {
+    background: #F5F6F7;
+}
+
+.mobile.main-block.account-file-management-page .notification-setting-row {
+    padding-left: 20px;
+}
+
+.mobile.context-menu-container .fm-icon {
+    display: inline-block;
+    margin: 0 8px;
+    vertical-align: middle;
+}
+
+

@@ -201,26 +201,38 @@ affiliateRedemption.__processBlock2 = function() {
     var method = this.requests.first.m;
     var activeMethodMin = M.affiliate.redeemGateways[method].min || 50;
     let value;
+    let megaInput;
+    let errored;
+
     if (affiliateRedemption.requests.first.m === 0) {
         value = this.plan.planPriceRedeem;
     }
     else if (affiliateRedemption.requests.first.m === 2){
-        const megaInput = $('#affiliate-redemption-amount', this.$dialog).data('MegaInputs');
+        megaInput = $('#affiliate-redemption-amount', this.$dialog).data('MegaInputs');
         value = megaInput ? megaInput.getValue() : 0;
     }
     if (!value){
 
         msgDialog('warninga', '', l[23318]);
-        return Promise.reject();
+        errored = true;
     }
     else if (value < activeMethodMin){
 
         msgDialog('warninga', '', l[23319].replace('%1', formatCurrency(activeMethodMin)));
-        return Promise.reject();
+        errored = true;
     }
     else if (value > M.affiliate.balance.available) {
 
         msgDialog('warninga', '', l[23320]);
+        errored = true;
+    }
+
+    if (errored) {
+
+        if (megaInput) {
+            megaInput.$input.trigger('blur');
+        }
+
         return Promise.reject();
     }
 
@@ -267,6 +279,8 @@ affiliateRedemption.__processBlock3 = function() {
             else {
                 msgDialog('warninga', '', l[23322]);
             }
+
+            $('#affi-bitcoin-address', this.$step).trigger('blur');
 
             this.$rdmUI.removeClass('arrange-to-back');
 

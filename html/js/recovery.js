@@ -631,6 +631,7 @@ AccountRecoveryControl.prototype.startRecovery = function _startRecovery(email, 
                         );
                     }
                     else {
+                        closeDialog();
                         msgDialog('info', '', l.check_email_inbox);
                     }
                 }

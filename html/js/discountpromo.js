@@ -323,7 +323,7 @@ class DiscountPromo {
 
                 // If mobile, set the plan number so when they've completed Registration/Login they can proceed to pay.
                 if (is_mobile) {
-                    sessionStorage.setItem('proPageContinuePlanNum', accountLevel);
+                    login_next = page;
                     mobile.proSignupPrompt.init();
                     return;
                 }

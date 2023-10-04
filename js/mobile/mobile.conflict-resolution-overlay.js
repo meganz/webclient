@@ -24,6 +24,8 @@ mobile.conflictResolutionDialog = {
         var isFolder = file.t;
         var name = M.getSafeName(file.name);
 
+        loadingDialog.phide();
+
         if (isFolder) {
             this.$overlay = $('#mobile-ui-folder-conflict');
         } else {
@@ -34,7 +36,7 @@ mobile.conflictResolutionDialog = {
         this.$useSameAction.prop("checked", false);
         this.$useSameAction.parent().addClass('checkboxOff').removeClass('checkboxOn');
 
-        this._renderActionText(op);
+        this._renderActionText(op, isFolder);
 
         var promise = new MegaPromise();
         var done = function(file, name, action) {
@@ -48,6 +50,11 @@ mobile.conflictResolutionDialog = {
                     loadingDialog.hide();
                 });
             }
+
+            if (action === fileconflict.KEEPBOTH && mobile.nodeSelector[`${op}Renamed${file.h}`] === null) {
+                mobile.nodeSelector[`${op}Renamed${file.h}`] = name;
+            }
+
             onIdle(function() {
                 promise.resolve(file, name, action, repeatAction);
             });
@@ -58,10 +65,14 @@ mobile.conflictResolutionDialog = {
             return false;
         });
 
-        this.$overlay.find(".action-replace-item").rebind('tap', function() {
+        const $replaceBtn = $('.action-replace-item', this.$overlay).removeClass('hidden').rebind('tap', () => {
             done(file, file.name, fileconflict.REPLACE);
             return false;
         });
+
+        if (!isFolder && M.getNodeRights(target) < 2) {
+            $replaceBtn.addClass('hidden');
+        }
 
         this.$overlay.find(".action-skip-item").rebind('tap', function() {
             done(file, 0, fileconflict.DONTCOPY);
@@ -99,12 +110,18 @@ mobile.conflictResolutionDialog = {
             });
         }
 
+        this.$overlay.find(".detail-target-item-name").text(op === 'copy' ? file.name : '');
+        this.$overlay.find(".detail-original-item-name").text(file.name);
+
         if (remaining) {
             this.$overlay.find(".repeat-action-container")
                 .removeClass('hidden checkboxOn')
                 .find('.checkbox-label')
                 .safeHTML(escapeHTML(l[16494]).replace('%1', '<span>' + remaining + '</span>'));
             mobile.initCheckbox("repeat-action-container");
+        }
+        else {
+            this.$overlay.find(".repeat-action-container").addClass('hidden');
         }
 
         loadingDialog.phide();
@@ -113,7 +130,7 @@ mobile.conflictResolutionDialog = {
         return promise;
     },
 
-    _renderActionText: function(operation) {
+    _renderActionText: function(operation, isFolder) {
         'use strict';
 
         var self = this;
@@ -149,13 +166,37 @@ mobile.conflictResolutionDialog = {
                 $actions[2].$title.text(l[17094]);
                 $actions[2].$description.text(l[16493]);
                 break;
+            case 'copy':
+                if (isFolder) {
+                    $actions[0].$title.text(l[17551]);
+                    $actions[0].$description.safeHTML(l[17552]);
+                    $actions[1].$title.text(l[16500]);
+                    $actions[1].$description.text(l[19598]);
+                }
+                else {
+                    $actions[0].$title.text(l[16496]);
+                    $actions[0].$description.safeHTML(l[16498]);
+                    $actions[1].$title.text(l[16500]);
+                    $actions[1].$description.text(l[16491]);
+                    $actions[2].$title.text(l[17095]);
+                    $actions[2].$description.text(l[16515]);
+                }
+                break;
             default:
-                $actions[0].$title.text(l[16495]);
-                $actions[0].$description.text(l[16497]);
-                $actions[1].$title.text(l[16499]);
-                $actions[1].$description.text(l[19784]);
-                $actions[2].$title.text(l[17096]);
-                $actions[2].$description.text(l[16514]);
+                if (isFolder) {
+                    $actions[0].$title.text(l[17553]);
+                    $actions[0].$description.text(l[17554]);
+                    $actions[1].$title.text(l[16499]);
+                    $actions[1].$description.text(l[19598]);
+                }
+                else {
+                    $actions[0].$title.text(l[16495]);
+                    $actions[0].$description.text(l[16497]);
+                    $actions[1].$title.text(l[16499]);
+                    $actions[1].$description.text(l[19784]);
+                    $actions[2].$title.text(l[17096]);
+                    $actions[2].$description.text(l[16514]);
+                }
                 break;
         }
     },
@@ -166,6 +207,8 @@ mobile.conflictResolutionDialog = {
      */
     show: function() {
         'use strict';
+        // Hide sheet component
+        mega.ui.sheet.hide();
         // Disable scrolling of the file manager in the background to fix a bug on iOS Safari and show the overlay
         this.$fileManagerBlock.addClass('disable-scroll');
         this.$overlay.removeClass('hidden').addClass('overlay');

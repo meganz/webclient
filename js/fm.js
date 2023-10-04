@@ -2842,6 +2842,9 @@ function closeDialog(ev) {
     else if ($.dialog === 'fingerprint-dialog' && document.querySelector('.share-dialog.arrange-to-back')) {
         document.querySelector('.fingerprint-dialog').classList.add('hidden');
     }
+    else if ($.dialog === 'fingerprint-admin-dlg' && window.closeDlgMute) {
+        return false;
+    }
     else {
         if ($.dialog === 'properties') {
             propertiesDialog(2);
@@ -3733,12 +3736,21 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
     let subTitleTxt = l[6779];
     let approveBtnTxt = l[6777];
     let credentialsTitle = l[6780];
+    let listenerToken = null;
+    window.closeDlgMute = null;
 
     if (isAdminVerify) {
         titleTxt = l.bus_admin_ver;
         subTitleTxt = l.bus_admin_ver_sub;
         approveBtnTxt = l[1960];
         credentialsTitle = l.bus_admin_cred;
+        listenerToken = mBroadcaster.addListener('mega:openfolder', {
+            callback: () => {
+                fingerprintDialog(u_attr.b.mu[0], true);
+            },
+            once: true
+        });
+        window.closeDlgMute = true;
     }
 
     $('header h2', $dialog).text(titleTxt);
@@ -3747,6 +3759,7 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
     $('.fingerprint-code .contact-fingerprint-title', $dialog).text(credentialsTitle);
 
     const closeFngrPrntDialog = () => {
+        window.closeDlgMute = null;
         closeDialog();
         $('button.js-close', $dialog).off('click');
         $('.dialog-approve-button').off('click');
@@ -3757,7 +3770,11 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
         }
         else {
             const bus = new BusinessAccount();
-            bus.sendSubMKey().catch(tell);
+            bus.sendSubMKey()
+                .then(() => {
+                    mBroadcaster.removeListener(listenerToken);
+                })
+                .catch(tell);
         }
     };
 

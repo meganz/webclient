@@ -824,11 +824,8 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
 
                     // Confirm with the user the operation will revoke shares and he wants to
                     const type = `confirmation:!^${l[62]}!${l[16499]}`;
-                    const heading = M.d[cn].t
-                        ? l.move_linked_folder_to_shared_folder.replace('%1', M.d[cn].name).replace('%2', M.d[t].name)
-                        : l.move_linked_file_to_shared_folder.replace('%1', M.d[cn].name).replace('%2', M.d[t].name);
 
-                    return asyncMsgDialog(type, l[870], heading, l.shares_links_will_be_remove, async(yes) => {
+                    return asyncMsgDialog(type, l[870], l.shares_links_will_be_remove, l[6994], async(yes) => {
                         if (yes) {
                             return this.revokeShares(shared);
                         }

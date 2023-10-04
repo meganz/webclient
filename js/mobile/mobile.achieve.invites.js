@@ -25,17 +25,13 @@ mobile.achieve.invites = {
             return false;
         }
 
+        $('.mobile.main-block:not(hidden)').addClass('hidden');
+
         // Cache selector
         this.$page = $('.mobile.achievements-invite-friends-page');
 
         // Initialise functionality
         this.fetchAndDisplayData();
-
-        // Initialise back button to go back to the Achievements
-        mobile.initBackButton(this.$page, 'fm/account/achievements/');
-
-        // Initialise the top menu
-        topmenuUI();
 
         // Show the account page content
         this.$page.removeClass('hidden');

@@ -1,445 +1,537 @@
 /**
- * File upload functionality (currently incomplete)
+ * Code for the file upload overlay
  */
 mobile.uploadOverlay = {
 
-    /** Upload start time in milliseconds */
-    startTime: null,
+    container: null,
+    actions: null,
 
-    /** The jQuery selector for the create new folder overlay */
-    $overlay: null,
-
-    /** The jQuery selector for the cloud drive / file manager block */
-    $fileManagerBlock: null,
+    uploadTransfers: [],
+    completedTransfers: [],
+    erroredTransfers: [],
 
     /**
-     * Initialise the upload screen functionality
+     * Add upload file transfer to upload container overlay
+     * @param {Object} ul Upload transfer
+     * @returns {void}
      */
-    init: function() {
+    add: function(ul) {
         'use strict';
-        var self = this;
 
-        this.close();
-        this.$overlay = $('.mobile.upload-overlay').removeClass('see-all');
-        this.$fileManagerBlock = $('.mobile.file-manager-block');
-        this.$ttable = $('.mobile-transfer-table-wrapper', this.$overlay);
-        this.logger = new MegaLogger('mobileUploadOverlay', {}, ulmanager.logger);
-        this.doReRender = M.v.length ? false : M.currentdirid;
+        if (ul && ul.id) {
+            if (!this.container) {
+                this.container = mCreateElement('div', {'class': 'upload-file-container'});
+            }
+            if (!this.actions) {
+                this.actions = [
+                    {
+                        type: 'normal',
+                        text: l[6993],
+                        className: 'secondary pauseAll',
+                        onClick: this.pauseAll.bind(this, true)
+                    },
+                    {
+                        type: 'normal',
+                        text: l.transfers_resume_all,
+                        className: 'secondary resumeAll hidden',
+                        onClick: this.resumeAll.bind(this, true)
+                    }
+                ];
+            }
 
-        // Init functionality
-        mobile.uploadOverlay.initCloseOverlayButton();
-        mobile.initOverlayPopstateHandler(this.$overlay);
-
-        $('.ul-status-header span:first', this.$overlay).text(l[1155]);
-        $('.text-button.see-all', this.$overlay)
-            .rebind('click.see-all', function() {
-                self.$ttable.removeClass('hidden');
-                return false;
+            const id = `ul_${ul.id}`;
+            this.uploadTransfers[id] = new MegaMobileTransferBlock({
+                parentNode: this.container,
+                transfer: ul,
+                id: id,
+                callbacks: {
+                    cancel: this.cancel.bind(this)
+                }
             });
 
-        this._uploadAbortListener = mBroadcaster.addListener('upload:abort', function(id, res) {
-            var gid = ulmanager.getGID({id: id});
+            this.bindEvents(id);
+        }
 
-            self.logger.debug('upload:abort[%s]', gid, id, res);
+    },
 
-            if (!is_megadrop && ulmanager.isUploadActive(gid)) {
-                onIdle(self._dispatchNextUpload.bind(self));
-            }
+    /**
+     * Bind events
+     * @param {String} id Upload transfer id
+     * @returns {void}
+     */
+    bindEvents: function(id) {
+        'use strict';
+
+        this.uploadTransfers[id].pauseButton.on('tap.pauseTransfers', () => {
+            this.updateGeneralActions();
         });
 
-        this._clickHandler = function(ev) {
-            var target = ev.target;
-            var tr = target.closest('tr');
+        this.uploadTransfers[id].resumeButton.on('tap.resumeTransfers', () => {
+            this.updateGeneralActions();
+        });
+    },
 
-            if (tr && target.classList.contains('fm-icon')) {
+    /**
+     * Show upload container overlay
+     * @returns {void}
+     */
+    show: function() {
+        'use strict';
 
-                if (tr.classList.contains('transfer-completed')) {
-                    var h = tr.dataset.handle;
-                    if (h) {
-                        mobile.linkOverlay.show(h);
-                    }
-                }
-                else {
-                    var table = tr.closest('table');
-                    var gid = tr.id.substr(tr.id[0] === '$');
+        mega.ui.sheet.hide();
 
-                    $(tr).fadeOut(function() {
-                        ulmanager.abort(gid);
-                        $(this).remove();
+        mega.ui.overlay.show({
+            name: 'upload-overlay',
+            showClose: true,
+            title: l[1155],
+            subtitle: this.getProgress(),
+            contents: [this.container],
+            actions: this.actions,
+            actionOnBottom: true
+        });
+        mega.ui.overlay.titleNode.classList.add('centered');
 
-                        if (!table.querySelector('tr')) {
-                            self.close();
-                        }
+        const closeButton = mega.ui.overlay.domNode.querySelector('.close').component;
+        closeButton.rebind('tap.closeOverlay', () => {
+            this.confirmClose();
+        });
+    },
+
+    /**
+     * Init upload file transfer in upload container overlay
+     * @param {Object} ul Upload transfer
+     * @returns {void}
+     */
+    init: function(ul) {
+        'use strict';
+
+        const uploadTransferComponent = this.uploadTransfers[`ul_${ul.id}`];
+
+        if (uploadTransferComponent) {
+            // Init the upload transfer progress
+            uploadTransferComponent.updateTransfer(0);
+        }
+    },
+
+    /**
+     * Update upload file transfer in upload container overlay
+     * @param {Object} ul Upload transfer
+     * @param {Number} percentComplete Percent complete
+     * @returns {void}
+     */
+    update: function(ul, percentComplete) {
+        'use strict';
+
+        const uploadTransferComponent = this.uploadTransfers[`ul_${ul.id}`];
+
+        if (uploadTransferComponent) {
+            // Update the upload transfer progress
+            uploadTransferComponent.updateTransfer(percentComplete);
+        }
+        else {
+            this.reupdate(ul, percentComplete);
+        }
+    },
+
+    /**
+     * Re-Update upload file transfer in upload container overlay after solve an error
+     * @param {Object} ul Upload transfer
+     * @param {Number} percentComplete Percent complete
+     * @returns {void}
+     */
+    reupdate: function(ul, percentComplete) {
+        'use strict';
+
+        const erroredTransferComponent = this.erroredTransfers[`ul_${ul.id}`];
+        if (erroredTransferComponent) {
+            this.move(this.erroredTransfers, this.uploadTransfers, `ul_${ul.id}`, erroredTransferComponent);
+
+            this.updateHeaderAndButtons(true);
+
+            erroredTransferComponent.resetTransfer();
+
+            this.update(ul, percentComplete);
+        }
+    },
+
+    /**
+     * Finish upload file transfer in upload container overlay
+     * @param {Object} ul Upload transfer
+     * @returns {void}
+     */
+    finish: function(ul) {
+        'use strict';
+
+        const uploadTransferComponent = this.uploadTransfers[`ul_${ul.id}`];
+
+        if (uploadTransferComponent) {
+            // Finish the upload transfer
+            uploadTransferComponent.finishTransfer(ul.skipfile, true);
+
+            this.move(this.uploadTransfers, this.completedTransfers, `ul_${ul.id}`, uploadTransferComponent);
+
+            // Update subtitle with new progress
+            mega.ui.overlay.addSubTitle(this.getProgress());
+
+            this.updateGeneralActions();
+
+            this.updateHeaderAndButtons();
+        }
+    },
+
+    /**
+    * Update the header and buttons in upload container overlay based on the status of uploads
+    * @param {Boolean} init Initialize
+    * @returns {void}
+    */
+    updateHeaderAndButtons: function(init) {
+        'use strict';
+
+        if (Object.keys(this.uploadTransfers).length === 0) {
+            mega.ui.overlay.addTitle(l.upload_status_complete);
+            mega.ui.overlay.titleNode.classList.add('centered');
+
+            mega.ui.overlay.clearActions();
+            const uploadMoreButton = new MegaMobileButton({
+                parentNode: mega.ui.overlay.actionsNode,
+                componentClassname: 'secondary',
+                type: 'normal',
+                text: l.upload_more
+            });
+            uploadMoreButton.on('tap.moreUpload', () => {
+                this.moreFiles();
+            });
+        }
+        else if (init) {
+            mega.ui.overlay.addTitle(l[1155]);
+
+            mega.ui.overlay.clearActions();
+            if (this.actions) {
+                for (let i = this.actions.length; i--;) {
+                    const {
+                        type: type,
+                        text: text,
+                        className: className,
+                        onClick: onClick
+                    } = this.actions[i];
+
+                    const button = new MegaMobileButton({
+                        parentNode: mega.ui.overlay.actionsNode,
+                        type: type || 'normal',
+                        componentClassname: className || '',
+                        text: text
                     });
-                }
-            }
-        };
-        this.$ttable.get(0).addEventListener('click', this._clickHandler, true);
-    },
 
-    /**
-     * Initialise the handler for file selection
-     */
-    showUploadStarting: function(ul) {
-        'use strict';
-
-        if (d) {
-            this.logger.debug('showUploadStarting', ul.id, [ul]);
-        }
-
-        // Cache selectors
-        var $overlay = this.$overlay;
-        var $fileManagerBlock = this.$fileManagerBlock;
-        var $uploadAnotherFileButton = $overlay.find('.upload-another-file');
-        var $uploadProgressBlock = $overlay.find('.upload-progress');
-        var $uploadProgressText = $overlay.find('.upload-progress .text');
-        var $uploadProgressBar = $overlay.find('.upload-progress .bar');
-        var $uploadPercent = $overlay.find('.upload-percents');
-        var $uploadSpeed = $overlay.find('.upload-speed');
-
-        // Pop up upload dialog
-        $overlay.removeClass('hidden').addClass('overlay');
-
-        // Format the file size and get the file name
-        var fileSize = numOfBytes(ul.size);
-        var fileSizeFormatted = fileSize.size + ' ' + fileSize.unit;
-        var fileName = ul.name;
-
-        // Get file icon
-        var fileExt = fileext(fileName);
-        var fileIconName = ext[fileExt] ? ext[fileExt][0] : 'generic';
-        var fileIconPath = mobile.imagePath + fileIconName + '.png';
-
-        // Display in overlay
-        $('.filesize', $overlay).text(fileSizeFormatted);
-        $('.filename', $overlay).text(fileName);
-        $('.filetype-img', $overlay).attr('src', fileIconPath);
-
-        // Reset state of dialog from past uploads
-        $uploadAnotherFileButton.addClass('hidden').off('tap');
-        $uploadProgressBlock.removeClass('complete').off('tap');
-        $uploadProgressText.removeClass('starting-upload').text(l[6110]);
-        $uploadProgressBar.width('0');
-        $uploadPercent.text('');
-        $uploadSpeed.text('');
-
-        loadingDialog.hide();
-
-        // Set the start time
-        this.startTime = Date.now();
-
-        // Upload filename incase it changed during conflict resolution.
-        $('.filename', $overlay).text(ul.name);
-
-        // Show progress bar
-        $('body').addClass('uploading');
-
-        // Add a class to make the progress block text grey and show text Starting...
-        $uploadProgressText.addClass('starting-upload').text(l[7022] + '...');
-    },
-
-    /**
-     * Shows the upload progress in the overlay
-     * @param {Object} uploadData The file metadata
-     * @param {Number} percentComplete The percentage of the file uploaded so far
-     * @param {Number} bytesLoaded The number of bytes loaded so far
-     */
-    showUploadProgress: function(uploadData, percentComplete, bytesLoaded) {
-
-        'use strict';
-
-        // Cache selectors
-        var $overlay = this.$overlay;
-        var $uploadProgressText = $overlay.find('.upload-progress .text');
-        var $uploadProgressBar = $overlay.find('.upload-progress .bar');
-        var $uploadPercent = $overlay.find('.upload-percents');
-        var $uploadSpeed = $overlay.find('.upload-speed');
-
-        // Calculate the upload speed
-        var percentCompleteRounded = Math.round(percentComplete);
-        var currentTime = new Date().getTime();
-        var secondsElapsed = (currentTime - mobile.uploadOverlay.startTime) / 1000;
-        var bytesPerSecond = secondsElapsed ? bytesLoaded / secondsElapsed : 0;
-        var speed = numOfBytes(bytesPerSecond, 2, true);
-        var speedSizeRounded = parseInt(speed.size);
-        var speedText = speedSizeRounded + ' ' + speed.unit;
-
-        // Display the upload progress and speed
-        $uploadPercent.text(percentCompleteRounded + '%');
-        $uploadProgressBar.width(percentComplete + '%');
-        $uploadSpeed.text(speedText);
-
-        // Remove class to hide the Starting... text now that we have progress bar showing and show text Uploading...
-        if (percentComplete >= 1 && percentComplete < 99) {
-            $uploadProgressText.removeClass('starting-upload').text(l[6110]);
-        }
-
-        // If the upload is nearly complete e.g. 99/100%, change button text to Completing... which can take some time
-        else if (percentComplete >= 99) {
-            $uploadProgressText.removeClass('starting-upload').text(l[16508]);
-        }
-
-        delay('fm_tfsupdate', fm_tfsupdate, 700);
-    },
-
-    /**
-     * Show that the upload has completed and initialise some buttons to view the file or upload another file
-     * @param {Object} ul Upload instance
-     * @param {String} status Completion status
-     * @param {String} h Node handle, if upload succeed.
-     */
-    showUploadComplete: function(ul, status, h) {
-        'use strict';
-        var self = this;
-        var $overlay = self.$overlay;
-
-        if (d) {
-            this.logger.debug('showUploadComplete', ul.id, h, this.startTime, [ul]);
-        }
-        eventlog(99678, h ? 'OK' : lang === 'en' ? status : 'FAIL');
-
-        if (!this.startTime) {
-            console.assert(!ul.starttime);
-            M.ulstart(ul);
-        }
-        this.startTime = null;
-
-        if (h) {
-            var tr = ul.domElement || false;
-            console.assert(tr._elmStatus);
-
-            if (tr) {
-                tr.dataset.handle = h;
-
-                if (tr._elmStatus) {
-                    tr._elmStatus.textContent = l[1418];
+                    if (typeof onClick === 'function') {
+                        button.on('tap.overlayAction', onClick);
+                    }
                 }
             }
         }
+    },
 
-        // Change button text to full white, show as Complete hide the upload percentage and speed
-        $('.upload-progress .bar', $overlay).width('100%');
-        $('.upload-percents', $overlay).text('');
-        $('.upload-speed', $overlay).text('');
+    /**
+    * Let the user upload another file(s)
+    * @returns {void}
+    */
+    moreFiles: function() {
+        'use strict';
 
-        if (!is_megadrop && !this._dispatchNextUpload()) {
-            $('body').removeClass('uploading');
-            var $viewFileButton = $('.upload-progress', $overlay);
-            $('.text', $viewFileButton.addClass('complete')).removeClass('starting-upload').text(l[59]);
-            $('.ul-status-header span:first', $overlay).text(l[1418]);
-            $('.close-button span', $overlay).text(l[148]);
-            mobile.uploadOverlay.initUploadAnotherFileButton();
-            mobile.uploadOverlay.initGetLinkButton(M.d[h]);
+        // Abort ulmanager
+        ulmanager.abort(null);
+
+        // Undo previous pause mode
+        uldl_hold = false;
+
+        const fileInput = document.getElementById('fileselect1');
+
+        // Clear file input so change handler works again in Chrome
+        fileInput.value = '';
+
+        // Open the file picker
+        fileInput.click();
+    },
+
+    /**
+     * Handle error upload file transfer in upload container overlay
+     * @param {Object} ul Upload transfer
+     * @param {String} errorstr Error message
+     * @returns {void}
+     */
+    error: function(ul, errorstr) {
+        'use strict';
+
+        const uploadTransferComponent = this.uploadTransfers[`ul_${ul.id}`];
+
+        if (uploadTransferComponent) {
+            // Update the upload tranfer - ERROR
+            uploadTransferComponent.errorTransfer(errorstr);
+
+            this.move(this.uploadTransfers, this.erroredTransfers, `ul_${ul.id}`, uploadTransferComponent);
+
+            this.updateHeaderAndButtons();
         }
+    },
 
-        delay('mumobup-thumber', function() {
-            if (self.$overlay) {
-                var nodeMap = {};
-                var nodeList = [];
-                var overlay = self.$overlay.get(0);
-                var trs = overlay.querySelectorAll('tr.transfer-completed');
+    /**
+     * Cancel upload file transfer in upload container overlay
+     * @param {Object} ul Upload transfer
+     * @returns {void}
+     */
+    cancel: function(ul) {
+        'use strict';
 
-                self.logger.debug('%d completed uploads, requesting thumbnails...', trs.length);
+        const uploadTransferComponent = this.uploadTransfers[`ul_${ul.id}`];
 
-                for (var i = trs.length; i--;) {
-                    var n = M.d[trs[i].dataset.handle];
-                    if (n) {
-                        n.seen = true;
-                        nodeList.push(n);
-                        nodeMap[n.h] = trs[i].id;
-                        self.logger.debug('Want thumbnail for %s, %s', n.h, trs[i].id);
-                    }
-                }
+        if (uploadTransferComponent) {
+            ulmanager.abort(ul.id);
 
-                fm_thumbnails('standalone', nodeList, (n) => {
-                    const {h, fa} = n;
-
-                    if (d) {
-                        self.logger.debug('Thumbnail for %s may be ready...', h, nodeMap[h], thumbnails.has(fa));
-                    }
-
-                    if (thumbnails.has(fa) && nodeMap[h]) {
-                        const src = thumbnails.get(fa);
-                        let img = overlay.querySelector(`#${nodeMap[h]} img`);
-
-                        if (img) {
-                            img.src = src;
-                            // img.parentNode.classList.add('thumb');
-                        }
-
-                        if ((img = overlay.querySelector('.filetype-img'))
-                            && Object(img.nextElementSibling).textContent === n.name) {
-
-                            img.src = src;
-                        }
-                    }
-                });
+            if (M.tfsdomqueue[ul.id]) {
+                delete M.tfsdomqueue[ul.id];
             }
-        }, 900);
+
+            // Remove upload file transfer
+            this.remove(this.uploadTransfers, `ul_${ul.id}`);
+
+            // Update subtitle with new progress
+            mega.ui.overlay.addSubTitle(this.getProgress());
+
+            this.updateHeaderAndButtons();
+        }
     },
 
     /**
-     * Initialise the Get Link button to open the Get Link overlay
-     * @param {Object} node The file node
+     * Destroy upload file transfer object and array position
+     * @param {Array} transferArray Array of transfers
+     * @param {String} id Upload transfer id
+     * @returns {void}
      */
-    initGetLinkButton: function(node) {
+    remove: function(transferArray, id) {
         'use strict';
 
-        var $overlay = this.$overlay;
-        var $getLinkButton = $('.upload-progress', $overlay).removeClass('disabled');
+        transferArray[id].destroy();
+        delete transferArray[id];
+    },
 
-        if (!node) {
-            $getLinkButton.addClass('disabled');
-            return false;
+    /**
+     * Move upload file transfer object to another array
+     * @param {Array} originArray Origin array
+     * @param {Array} targetArray Target array
+     * @param {String} id Upload transfer id
+     * @param {Object} uploadTransferComponent Upload transfer component
+     * @returns {void}
+     */
+    move: function(originArray, targetArray, id, uploadTransferComponent) {
+        'use strict';
+
+        targetArray[id] = uploadTransferComponent;
+        delete originArray[id];
+    },
+
+    /**
+    * Pause all upload file transfers in upload container overlay
+    * @param {Boolean} manual Manual action
+    * @returns {void}
+    */
+    pauseAll: function(manual) {
+        'use strict';
+
+        for (const id in this.uploadTransfers) {
+            if (this.uploadTransfers.hasOwnProperty(id)) {
+                const uploadTransferComponent = this.uploadTransfers[id];
+                if (manual === true) {
+                    uploadTransferComponent.manualPause = true;
+                }
+                uploadTransferComponent.pauseTransfer();
+            }
         }
 
-        $getLinkButton.rebind('tap.gl', function() {
+        uldl_hold = true;
 
-            // Show the Get Link overlay
-            mobile.linkOverlay.show(node.h);
-
-            // Prevent double taps
-            return false;
-        });
+        // Show/hide general action buttons
+        if (manual === true) {
+            mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.hide();
+            mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.show();
+        }
     },
 
     /**
-     * Initialise the Upload Another File button to let the user upload another file
-     */
-    initUploadAnotherFileButton: function() {
-
+    * Resume all upload file transfers in upload container overlay
+    * @param {Boolean} manual Manual action
+    * @returns {void}
+    */
+    resumeAll: function(manual) {
         'use strict';
 
-        // Cache selectors
-        var $overlay = this.$overlay;
-        var $fileManager = this.$fileManagerBlock;
-        var $uploadAnotherFileButton = $overlay.find('.upload-another-file');
-        var $fileInput = $fileManager.find('.upload-select-file');
+        uldl_hold = false;
 
-        // Show and initialise the Upload Another File button
-        $uploadAnotherFileButton.removeClass('hidden').off('tap').on('tap', function() {
+        for (const id in this.uploadTransfers) {
+            if (this.uploadTransfers.hasOwnProperty(id)) {
+                const uploadTransferComponent = this.uploadTransfers[id];
+                if (manual === true || !uploadTransferComponent.manualPause) {
+                    uploadTransferComponent.manualPause = false;
+                    this.uploadTransfers[id].resumeTransfer();
+                }
+            }
+        }
 
-            // Clear the file input enabling the user to select the same file again if they so wanted.
-            $fileInput.val(null);
-
-            // Open the file picker
-            $fileInput.trigger('click');
-
-            // Initialise the behaviour for when the file is selected
-            mobile.uploadOverlay.init();
-
-            // Prevent double taps
-            return false;
-        });
+        // Show/hide general action buttons
+        if (manual === true) {
+            mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.show();
+            mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.hide();
+        }
     },
 
     /**
-     * Initialise the close button to close the overlay/dialog
-     */
-    initCloseOverlayButton: function() {
-
+    * Update general actions depending of individual states
+    * @returns {void}
+    */
+    updateGeneralActions: function() {
         'use strict';
 
-        var self = this;
-        var $overlay = this.$overlay;
-        var $closeIcon = $('.fm-dialog-close, .close-button', $overlay);
+        let pauseCont = 0;
+        let resumeCont = 0;
+        for (const id in this.uploadTransfers) {
+            if (this.uploadTransfers.hasOwnProperty(id)) {
+                const uploadTransferComponent = this.uploadTransfers[id];
+                if (uploadTransferComponent.pauseButton.visible === true) {
+                    pauseCont++;
+                }
+                else if (uploadTransferComponent.resumeButton.visible === true) {
+                    resumeCont++;
+                }
+            }
+        }
 
-        $('span', $closeIcon).text(l[1597]);
+        if (pauseCont === 0) {
+            mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.hide();
+            mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.show();
+        }
+        else if (resumeCont === 0) {
+            mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.show();
+            mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.hide();
+        }
+    },
 
-        $('.up.left', $overlay).rebind('tap.up', function() {
-            self.$ttable.addClass('hidden');
-            return false;
-        });
+    /**
+     * Show sheet to confirm close upload overlay
+     * @return {void}
+     */
+    confirmClose: function() {
+        'use strict';
 
-        // On tapping/clicking the Close icon
-        $closeIcon.off('tap').on('tap', function() {
-            self.close();
-            return false;
+        // Close if the upload is complete
+        if (Object.keys(this.uploadTransfers).length === 0) {
+            this.close();
+            return;
+        }
+
+        // Pause all upload file transfers
+        this.pauseAll();
+
+        // Show confirm close sheet
+        mega.ui.sheet.show({
+            name: 'mobile-upload-file-close',
+            type: 'modal',
+            showClose: true,
+            title: l[1585],
+            contents: l[7225],
+            actions: [
+                {
+                    type: 'normal',
+                    text: l.transfers_cancel_all_confirm,
+                    className: 'primary',
+                    onClick: this.close.bind(this)
+                }
+            ],
+            onClose: this.cancelClose.bind(this)
         });
     },
 
     /**
-     * Close upload overlay.
+     * Cancel close upload overlay
+     * @return {void}
+     */
+    cancelClose: function() {
+        'use strict';
+
+        // Hide confirm close sheet
+        mega.ui.sheet.hide();
+
+        // Resume all upload file transfers
+        this.resumeAll();
+    },
+
+    /**
+     * Close upload overlay
      * @return {void}
      */
     close: function() {
         'use strict';
 
-        var $overlay = $('.mobile.upload-overlay');
+        // Hide confirm close sheet
+        mega.ui.sheet.hide();
 
+        // Abort ulmanager
         ulmanager.abort(null);
 
-        // Close the upload overlay
-        $overlay.addClass('hidden').removeClass('overlay');
+        // Undo previous pause mode
+        uldl_hold = false;
 
-        if (this.$ttable) {
-            this.$ttable.get(0).removeEventListener('click', this._clickHandler, true);
-            this.$ttable.addClass('hidden');
-            delete this.$ttable;
+        // Remove all upload file transfers
+        for (const id in this.uploadTransfers) {
+            if (this.uploadTransfers.hasOwnProperty(id)) {
+                this.remove(this.uploadTransfers, id);
+            }
+        }
+        for (const id in this.completedTransfers) {
+            if (this.completedTransfers.hasOwnProperty(id)) {
+                this.remove(this.completedTransfers, id);
+            }
+        }
+        for (const id in this.erroredTransfers) {
+            if (this.erroredTransfers.hasOwnProperty(id)) {
+                this.remove(this.erroredTransfers, id);
+            }
         }
 
-        this.startTime = null;
-        this.uploading = false;
-        $('body').removeClass('uploading');
-        $('.mobile-transfer-table', $overlay).empty();
+        // Re-render current folder
+        M.openFolder(M.currentdirid, true);
 
-        if (this._uploadAbortListener) {
-            mBroadcaster.removeListener(this._uploadAbortListener);
-            delete this._uploadAbortListener;
-        }
-
-        if (this.doReRender) {
-            var target = this.doReRender;
-            delete this.doReRender;
-
-            onIdle(function() {
-                if (M.currentdirid === target) {
-                    M.openFolder(target, true).dump('mumobup');
-                }
-            });
-        }
+        // Hide upload file overlay
+        mega.ui.overlay.hide();
     },
 
     /**
-     * Dispatch next upload.
-     * @private
+     * Get progress
+     * @return {String} Uploaded transfers of total message
      */
-    _dispatchNextUpload: function() {
+    getProgress: function() {
         'use strict';
-        var tr = this.$overlay.get(0).querySelector('tr[id^="$ul_"]');
-        if (tr) {
-            tr.id = tr.id.substr(1);
-        }
-        return tr;
-    },
 
-    /**
-     * Test layout.
-     * @returns {undefined}
-     */
-    testLayout: function() {
-        'use strict';
-        var f = {name: 'pneumonoultramicroscopicsilicovolcanoconiosis.pdf', size: 3e7};
+        const total = Object.keys(this.uploadTransfers).length
+                            + Object.keys(this.completedTransfers).length
+                            + Object.keys(this.erroredTransfers).length;
 
-        this.init();
-        this.showUploadStarting(f);
+        const completed = Object.keys(this.completedTransfers).length;
 
-        for (var i = 8020; i-- > 8001;) {
-            M.addToTransferTable('ul_' + i, f);
+        if (completed === 0) {
+            return;
         }
 
-        loadingDialog.hide();
-        this.$ttable.removeClass('hidden');
+        return total === 1 ?
+            l.upload_one :
+            mega.icu.format(l.upload_total, completed)
+                .replace('%1', total);
     },
 
     /**
      * Mobile shims
      * @param {MegaData} ctx MegaData instance
-     * @returns {undefined}
+     * @return {void}
      */
     shim: function(ctx) {
         'use strict';
-        var self = this;
         /* eslint-disable no-useless-concat */
 
         if (is_megadrop) {
@@ -451,27 +543,27 @@ mobile.uploadOverlay = {
 
         const _ulProgress = ctx.ulprogress;
         Object.defineProperty(ctx, 'ul' + 'progress', {
-            value: function() {
-                var res = _ulProgress.apply(this, arguments);
-                self.showUploadProgress.apply(self, arguments);
+            value: function(ul, perc) {
+                const res = _ulProgress.apply(this, arguments);
+                mobile.uploadOverlay.update(ul, perc);
                 return res;
             }
         });
 
         const _ulStart = ctx.ulstart;
         Object.defineProperty(ctx, 'ul' + 'start', {
-            value: function() {
-                var res = _ulStart.apply(this, arguments);
-                self.showUploadStarting.apply(self, arguments);
+            value: function(ul) {
+                const res = _ulStart.apply(this, arguments);
+                mobile.uploadOverlay.init(ul);
                 return res;
             }
         });
 
         const _ulFinalize = ctx.ulfinalize;
         Object.defineProperty(ctx, 'ul' + 'finalize', {
-            value: function() {
-                var res = _ulFinalize.apply(this, arguments);
-                self.showUploadComplete.apply(self, arguments);
+            value: function(ul) {
+                const res = _ulFinalize.apply(this, arguments);
+                mobile.uploadOverlay.finish(ul);
                 return res;
             }
         });
@@ -480,17 +572,7 @@ mobile.uploadOverlay = {
             value: function() {
                 onIdle(() => {
                     if (ulmanager.isUploading) {
-                        var ul = ul_queue[0] || false;
-                        console.assert(ul.id);
-
-                        if (ul.id) {
-                            if (d) {
-                                self.logger.debug('Initializing upload(s)...', ul.id, [ul]);
-                            }
-
-                            self.showUploadStarting(ul);
-                            self.startTime = null;
-                        }
+                        mobile.uploadOverlay.show();
                     }
                 });
             }
@@ -498,27 +580,17 @@ mobile.uploadOverlay = {
 
         Object.defineProperty(ctx, 'addToTran' + 'sferTable', {
             value: function(gid, f) {
-                var template =
-                    '<tr id="$' + gid + '" class="transfer-queued transfer-upload"><td>' +
-                    '<div class="mobile fm-item file clear transfer-type upload">' +
-                    ' <div class="mobile fm-item-img">' +
-                    '  <img src="' + escapeHTML(mobile.imagePath + fileIcon(f) + '.png') + '"/>' +
-                    ' </div>' +
-                    ' <div class="mobile fm-icon right"></div>' +
-                    ' <div class="mobile fm-item-info">' +
-                    '  <div class="mobile fm-item-name">' + escapeHTML(f.name) + '</div>' +
-                    '  <div class="mobile fm-item-details">' +
-                    '   <span class="file-size uploaded-size transfer-size">' + bytesToSize(f.size) + '</span>,' +
-                    '   <span class="date transfer-status">' + escapeHTML(l[7227]) + '</span>' +
-                    '  </div></div></div></td></tr>';
-                $('.mobile-transfer-table', self.$overlay).safeAppend(template);
-
-                if (!self.uploading) {
-                    // loadingDialog.show();
-                    self.uploading = true;
-                    self._dispatchNextUpload();
-                }
+                mobile.uploadOverlay.add(f);
             }
         });
     }
 };
+
+window.addEventListener('popstate', () => {
+
+    'use strict';
+
+    if (mega.ui.overlay.name === 'upload-overlay' && mega.ui.overlay.visible) {
+        mobile.uploadOverlay.close();
+    }
+});

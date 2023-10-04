@@ -39,7 +39,6 @@
                 if (res === 0 || res === EEXIST) {
                     // Success.
                     parsepage(pages['unsub']);
-                    topmenuUI();
                     self.initSuccessPage();
                 } else if (res === EARGS) {
                     // Invalid Code.

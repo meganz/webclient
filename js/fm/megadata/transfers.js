@@ -1790,6 +1790,11 @@ function onUploadError(ul, errorstr, reason, xhr, isOverQuota) {
         ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hostname(ul.posturl));
     }
 
+    if (is_mobile) {
+        mobile.uploadOverlay.error(ul, errorstr);
+        return;
+    }
+
     tfsheadupdate(isOverQuota ? {o: `ul_${ul.id}`} : {e: `ul_${ul.id}`});
     mega.tpw.errorDownloadUpload(mega.tpw.UPLOAD, { id: ul.id }, errorstr, isOverQuota);
 

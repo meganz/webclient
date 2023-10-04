@@ -415,7 +415,7 @@
 
         delete $.dialog;
 
-        loadSubPage(is_mobile ? '/fm/account/email-and-pass' : '/fm/account/security');
+        loadSubPage(is_mobile ? '/fm/account/security/change-password' : '/fm/account/security');
     };
 
     PasswordReminderDialog.prototype.init = function() {
@@ -728,7 +728,9 @@
         if (is_mobile) {
             this.dialog.classList.add('overlay');
             if (page === 'fm/account') {
-                $('.mobile.my-account-page').addClass('hidden');
+                if (mobile.settingsHelper && mobile.settingsHelper.currentPage) {
+                    mobile.settingsHelper.currentPage.hide();
+                }
             }
         }
         else {
@@ -751,7 +753,9 @@
         if (is_mobile) {
             this.dialog.classList.remove('overlay');
             if (page === 'fm/account') {
-                $('.mobile.my-account-page').removeClass('hidden');
+                if (mobile.settingsHelper && mobile.settingsHelper.currentPage) {
+                    mobile.settingsHelper.currentPage.show();
+                }
             }
         }
 

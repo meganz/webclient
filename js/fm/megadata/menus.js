@@ -183,7 +183,7 @@ MegaData.prototype.menuItems = async function menuItems() {
 
     if (selNode && $.selected.length === 1) {
         if (selNode.t) {
-            if (M.currentdirid !== selNode.h) {
+            if (M.currentdirid !== selNode.h && !is_mobile) {
                 items['.open-item'] = 1;
             }
 
@@ -207,10 +207,14 @@ MegaData.prototype.menuItems = async function menuItems() {
                 else if (!exp && !shared.is(selNode.h)) {
 
                     if (mega.fileRequest.publicFolderExists(selNode.h)) {
-                        const fileRequestPageClass =
-                            M.currentrootid === 'file-requests'
-                                ? '.file-request-page'
-                                : ':not(.file-request-page)';
+                        let fileRequestPageClass = '';
+
+                        if (!is_mobile) {
+                            fileRequestPageClass =
+                                M.currentrootid === 'file-requests'
+                                    ? '.file-request-page'
+                                    : ':not(.file-request-page)';
+                        }
 
                         items[`.file-request-manage${fileRequestPageClass}`] = 1;
                         items[`.file-request-copy-link${fileRequestPageClass}`] = 1;
@@ -254,7 +258,7 @@ MegaData.prototype.menuItems = async function menuItems() {
             }
         }
 
-        if (M.currentCustomView || M.currentdirid.startsWith('search/')) {
+        if (M.currentCustomView || M.currentdirid && M.currentdirid.startsWith('search/')) {
             items['.open-cloud-item'] = 1;
             if (folderlink) {
                 items['.open-in-location'] = 1;
@@ -272,10 +276,26 @@ MegaData.prototype.menuItems = async function menuItems() {
                 items['.add-star-item'] = 1;
 
                 if (M.isFavourite(selNode.h)) {
-                    $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@', l[5872]);
+
+                    if (is_mobile) {
+
+                        const fav = mega.ui.contextMenu.getChild('.add-star-item');
+                        fav.text = l[5872];
+                        fav.icon = 'sprite-mobile-fm-mono icon-heart-broken-thin-outline';
+                    }
+                    else {
+                        $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@',
+                                                     l[5872]);
+                    }
+                }
+                else if (is_mobile) {
+
+                    const fav = mega.ui.contextMenu.getChild('.add-star-item');
+                    fav.text = l[5871];
+                    fav.icon = 'sprite-mobile-fm-mono icon-heart-thin-outline';
                 }
                 else {
-                    $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite"></i>@@', l[5871]);
+                    $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@', l[5872]);
                 }
             }
 
@@ -1135,12 +1155,18 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
     }
 
     // If there are multiple nodes with existing links selected, set text to 'Remove links', otherwise 'Remove link'
-    var removeLinkText = (numOfExistingPublicLinks > 1) ? l[8735] : l[6821];
+    const removeLinkText = numOfExistingPublicLinks > 1 ? l[8735] : l[6821];
 
     // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
-    var $contextMenu = $('.dropdown.body');
-    $contextMenu.find('.getlink-item span').text(getLinkText);
-    $contextMenu.find('.removelink-item span').text(removeLinkText);
+    if (is_mobile) {
+
+        mega.ui.contextMenu.getChild('.getlink-item').text = getLinkText;
+        mega.ui.contextMenu.getChild('.removelink-item').text = removeLinkText;
+    }
+    else {
+        document.querySelector('.dropdown.body .getlink-item span').textContent = getLinkText;
+        document.querySelector('.dropdown.body .removelink-item span').textContent = removeLinkText;
+    }
 };
 
 /**
@@ -1153,10 +1179,9 @@ MegaData.prototype.setContextMenuShareText = function() {
 
     const n = M.d[$.selected[0]] || false;
     const isS4Bucket = n.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(n) === 'bucket';
-    const shareItem = document.querySelector('.dropdown.body .sh4r1ng-item');
-    const removeItem = document.querySelector('.dropdown.body .removeshare-item');
     let getLinkText = M.currentrootid === M.InboxID
         || M.getNodeRoot($.selected[0]) === M.InboxID ? l.read_only_share : l[5631];
+    let getLinkIcon = 'sprite-mobile-fm-mono icon-share-thin-outline';
     let manageIcon = 'icon-folder-outgoing-share';
     let removeIcon = 'icon-folder-remove-share';
 
@@ -1169,11 +1194,24 @@ MegaData.prototype.setContextMenuShareText = function() {
     // If the node has shares or pending shares, set to 'Manage share', else, 'Share folder'
     if (n && M.getNodeShareUsers(n, 'EXP').length || M.ps[n]) {
         getLinkText = l.manage_share;
+        getLinkIcon = 'sprite-mobile-fm-mono icon-settings-thin-outline';
     }
 
-    shareItem.querySelector('span').textContent = getLinkText;
-    shareItem.querySelector('i').className = `sprite-fm-mono ${manageIcon}`;
-    removeItem.querySelector('i').className = `sprite-fm-mono ${removeIcon}`;
+    if (is_mobile) {
+
+        const shareBtn = mega.ui.contextMenu.getChild('.sh4r1ng-item');
+        shareBtn.text = getLinkText;
+        shareBtn.icon = getLinkIcon;
+    }
+    else {
+
+        const shareItem = document.querySelector('.dropdown.body .sh4r1ng-item');
+        const removeItem = document.querySelector('.dropdown.body .removeshare-item');
+
+        shareItem.querySelector('span').textContent = getLinkText;
+        shareItem.querySelector('i').className = `sprite-fm-mono ${manageIcon}`;
+        removeItem.querySelector('i').className = `sprite-fm-mono ${removeIcon}`;
+    }
 };
 
 /**

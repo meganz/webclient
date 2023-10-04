@@ -611,85 +611,47 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
 MegaData.prototype.showPaymentCardBanner = function(status) {
     'use strict';
 
-    if (is_mobile) {
-        mobile.alertBanner.close();
-    }
-    else {
-        $('.fm-notification-block.payment-card-status').removeClass('visible');
-    }
+    $('.fm-notification-block.payment-card-status').removeClass('visible');
 
     if (!status) {
         return;
     }
     if (status === 1) {
-
         mega.attr.get(u_handle, 'cardalmostexp', -2, true).always((res) => {
             if (res !== '1') {
+                const $banner = $('.fm-notification-block.payment-card-almost-expired').addClass('visible');
 
-                if (is_mobile) {
-                    const $banner = mobile.alertBanner.showWarning(l.payment_card_almost_exp);
-                    $banner.$alertBanner.rebind('tap', loadSubPage.bind(null, 'fm/account/paymentcard'));
+                $('i.close-banner', $banner).rebind('click', () => {
+                    $banner.removeClass('visible');
+                    mega.attr.set('cardalmostexp', '1', -2, true);
+                });
 
-                    $banner.$alertBannerCloseButton.rebind('tap', () => {
-                        mobile.alertBanner.close();
-                        mega.attr.set('cardalmostexp', '1', -2, true);
-                        return false;
-                    });
-                }
-                else {
-                    const $banner = $('.fm-notification-block.payment-card-almost-expired').addClass('visible');
-
-                    $('i.close-banner', $banner).rebind('click', () => {
-                        $banner.removeClass('visible');
-                        mega.attr.set('cardalmostexp', '1', -2, true);
-                    });
-
-                    $('a', $banner)
-                        // .rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
-                        .rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
-                }
-
+                $('a', $banner)
+                    .rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
             }
         });
     }
-
     else if (status === 2) {
+        const $banner = $('.fm-notification-block.payment-card-expired').addClass('visible');
 
-        if (is_mobile) {
-            const $banner = mobile.alertBanner.showError(l.payment_card_exp);
-            $banner.$alertBanner.rebind('tap', loadSubPage.bind(null, 'fm/account/paymentcard'));
+        $('i.close-banner', $banner).rebind('click', () => {
+            $banner.removeClass('visible');
+        });
 
-            mobile.messageOverlay.show(
-                l.payment_card_exp_title,
-                l.payment_card_exp_desc,
-                'sprite-fm-illustration img-dialog-payment-card-exp',
-                [l[148], l[707]])
-                .then(loadSubPage.bind(null, 'fm/account/paymentcard'));
-        }
+        $('a', $banner)
+            .rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
 
-        else {
-            const $banner = $('.fm-notification-block.payment-card-expired').addClass('visible');
+        const $dialog = $('.payment-reminder.payment-card-expired');
 
-            $('i.close-banner', $banner).rebind('click', () => {
-                $banner.removeClass('visible');
+        $('.close', $dialog).rebind('click', closeDialog);
+
+        $('.update-payment-card', $dialog)
+            .rebind('click', () => {
+                closeDialog();
+                loadSubPage('fm/account/plan/account-card-info');
             });
 
-            $('a', $banner)
-                .rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
-
-            const $dialog = $('.payment-reminder.payment-card-expired');
-
-            $('.close', $dialog).rebind('click', closeDialog);
-
-
-            $('.update-payment-card', $dialog)
-                .rebind('click', () => {
-                    closeDialog();
-                    loadSubPage('fm/account/plan/account-card-info');
-                });
-
-            M.safeShowDialog('expired-card-dialog', $dialog);
-        }
+        M.safeShowDialog('expired-card-dialog', $dialog);
     }
 };
 

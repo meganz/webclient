@@ -372,7 +372,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
         var moveToRubbish = function() {
             mLoadingSpinner.show('move-to-rubbish');
 
-            M.moveToRubbish(selectedNodes)
+            return M.moveToRubbish(selectedNodes)
                 .catch(tell)
                 .finally(() => {
                     mLoadingSpinner.hide('move-to-rubbish');
@@ -385,7 +385,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
         };
 
         if (skipDelWarning) {
-            moveToRubbish();
+            return moveToRubbish();
         }
         else {
             let note = l[7410];

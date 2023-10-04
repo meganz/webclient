@@ -1,0 +1,104 @@
+.mega-sheet .sheet {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 24px;
+    background: var(--mobile-surface-1);
+    border-radius: var(--mobile-border-radius-large) var(--mobile-border-radius-large) 0 0;
+    transform: translateY(100%);
+    transition: transform 0.2s ease-out;
+    max-height: calc(100% - 16px);
+}
+
+.mega-sheet .sheet > .close {
+    margin-bottom: 16px;
+}
+
+.mega-sheet .sheet > .actions {
+    margin-top: 16px;
+}
+
+.mega-sheet.active .sheet {
+    transform: translateY(0);
+}
+
+.mega-sheet.normal .main {
+    align-items: flex-start;
+    text-align: start;
+}
+
+.mega-sheet.modal-dialog .main {
+    align-items: center;
+    text-align: center;
+}
+
+.mega-sheet.modal-dialog-left.main {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.mega-sheet i.icon {
+    --icon-size: 80px;
+}
+
+.mega-sheet i.icon.success {
+    color: var(--mobile-support-success);
+}
+
+.mega-sheet i.icon.warning {
+    color: var(--mobile-support-warning);
+}
+
+.mega-sheet i.icon.error {
+    color: var(--mobile-support-error);
+}
+
+.mega-sheet i.icon.info {
+    color: var(--mobile-support-info);
+}
+
+.icon.loading {
+    animation: rotate 1.5s steps(8, end) infinite;
+}
+
+.mega-sheet.full-height .sheet {
+    height: calc(100% - 16px);
+}
+
+.mega-sheet .actions .button span {
+    font-weight: var(--mobile-font-weight-semibold);
+}
+
+.mega-sheet .image:empty,
+.mega-sheet .title:empty,
+.mega-sheet .content:empty,
+.mega-sheet .actions:empty {
+    display: none;
+}
+
+@media only screen and (min-width: 769px) {
+    .mega-sheet {
+        justify-content: center;
+    }
+
+    .mega-sheet .sheet {
+        border-radius: var(--mobile-border-radius-large);
+        max-width: 562px;
+        max-height: 95%;
+        margin: auto;
+        opacity: 0;
+        transform: none;
+        transition: opacity 0.2s ease-out;
+    }
+
+    .mega-sheet.active .sheet {
+        opacity: 1;
+    }
+
+    .mega-sheet .actions {
+        flex-flow: row wrap;
+        justify-content: center;
+    }
+}
+

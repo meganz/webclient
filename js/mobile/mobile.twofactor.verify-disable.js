@@ -27,9 +27,6 @@ mobile.twofactor.verifyDisable = {
         // Initialise verify button functionality
         this.initVerifyButton();
 
-        // Initialise back button to go back to the My Account page
-        mobile.initBackButton(this.$page, 'fm/account');
-
         // Show the account page content
         this.$page.removeClass('hidden');
 
@@ -53,8 +50,10 @@ mobile.twofactor.verifyDisable = {
         var $verifyButton = mobile.twofactor.verifyDisable.$page.find('.two-factor-verify-btn');
         var $warningText = mobile.twofactor.verifyDisable.$page.find('.warning-text-field');
 
+        $pinCodeInput.val('');
+
         // On Verify button click/tap
-        $verifyButton.off('tap').on('tap', function() {
+        $verifyButton.rebind('tap.verify', () => {
 
             // Get the Google Authenticator PIN code from the user
             var pinCode = $.trim($pinCodeInput.val());
@@ -69,7 +68,7 @@ mobile.twofactor.verifyDisable = {
 
                     // The Two-Factor has already been disabled
                     if (response === ENOENT) {
-                        mobile.messageOverlay.show(l[19217], l[19218], function() {
+                        mobile.messageOverlay.show(l[19217], l[19218], () => {
                             loadSubPage('fm/account/');
                         });
                     }
@@ -83,8 +82,12 @@ mobile.twofactor.verifyDisable = {
                         $pinCodeInput.trigger('focus');
                     }
                     else {
-                        // Render the Disabled page
-                        loadSubPage('twofactor/disabled');
+                        mobile.twofactor.verifyDisable.$page.addClass('hidden');
+
+                        $pinCodeInput.trigger('blur');
+
+                        mega.ui.toast.show(l[19211]);
+                        loadSubPage('fm/account/security');
                     }
                 }
             });

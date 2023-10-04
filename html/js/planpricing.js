@@ -73,7 +73,7 @@ lazy(pro, 'proplan2', () => {
         const $showBtnTxt = $('.pricing-plans-compare-table-txt', $showBtn);
 
         if (mega.flags.ab_uspct !== 'undefined') {
-            api_req({a: 'abta', c: 'ab_uspct'});
+            api.req({a: 'abta', c: 'ab_uspct'}).catch(dump);
         }
 
         if (mega.flags.ab_uspct) {
@@ -1020,6 +1020,13 @@ lazy(pro, 'proplan2', () => {
 
             await fetchPlansData();
             parsepage(pages.planpricing);
+
+            if (mega.ui.header) {
+                mega.ui.header.update();
+            }
+            if (mega.ui.alerts) {
+                mega.ui.alerts.hide();
+            }
 
             $page = $('.bottom-page.full-block', '.bottom-page.content.pricing-pg');
 

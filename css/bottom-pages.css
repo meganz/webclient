@@ -306,6 +306,9 @@ body.bottom-pages .fmholder {
 body.bottom-pages.mobile .fmholder {
     overflow: auto;
 }
+.mobile .fmholder .bottom-page.scroll-block {
+    max-width: 100vw;
+}
 html.gbot {
     overflow-y: scroll;
 }
@@ -401,6 +404,7 @@ html.gbot {
 }
 .fmholder, #fmholder {
     height: 100%;
+    width: 100%;
     background-color: var(--surface-main);
     background-image: none;
     overflow-x: hidden;

@@ -1,0 +1,107 @@
+/* Session container */
+.settings-history .session-list {
+    width: 100%;
+}
+
+/* Session history heading */
+.settings-history h3 {
+    font: var(--mobile-font-heading-h3);
+    color: var(--mobile-text-primary);
+    padding: 0 24px;
+    margin-top: 0;
+}
+
+/* Session slot containers */
+.mobile.session {
+    height: 140px;
+    width: 100%;
+    padding: 24px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    box-sizing: border-box;
+}
+.mobile.session.current {
+    background-color: var(--mobile-surface-2);
+}
+
+/* Full-width mobile buttons minus padding */
+.settings-history .action-buttons {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px 24px;
+    position: sticky;
+    bottom: -1px;
+    background: var(--mobile-page-background);
+}
+
+/* Limited size tablet mode buttons */
+@media only screen and (min-width: 1024px) {
+    .settings-history .action-buttons .button {
+        max-width: 328px;
+    }
+}
+.settings-history .action-buttons .button {
+    height: 48px;
+}
+.settings-history .action-buttons .button span {
+    font-weight: var(--mobile-font-weight-semibold);
+}
+
+/* Text styles */
+.mobile.session span {
+    display: block;
+    font: var(--mobile-font-caption-large-regular);
+    color: var(--mobile-text-secondary);
+}
+.mobile.session .heading span {
+    font: var(--mobile-font-copy-bold);
+    color: var(--mobile-text-primary);
+}
+
+/* Session action buttons (current, logout, expired) */
+.mobile.session .button.session-action-button,
+.mobile.session span.session-status {
+    font: var(--mobile-font-link-large-semibold);
+    padding: 0 24px;
+    white-space: nowrap;
+}
+
+/* Button */
+.mobile.session.active .button.session-action-button span {
+    color: var(--mobile-button-error);
+    text-decoration: underline;
+}
+
+/* Text */
+.mobile.session.current span.session-status {
+    color: var(--mobile-text-success);
+}
+.mobile.session.expired span.session-status {
+    color: var(--mobile-text-on-color-disabled);
+}
+
+/* Browser and action button heading for each session */
+.mobile.session .heading {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Icon and name display inline */
+.mobile.session .browser,
+.mobile.session .location {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+}
+.mobile.session img {
+    width: 16px;
+    border-radius: var(--mobile-border-radius-extra-small);
+    margin-inline-end: 5px;
+    -webkit-margin-end: 5px;
+}

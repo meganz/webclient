@@ -168,7 +168,18 @@ var redeem = {
                     title = message;
                     message = submessage;
                 }
-                return mobile.messageOverlay.show(title, message, icon, buttons).then(resolve).catch(reject);
+
+                const promise = mobile.messageOverlay.show(title, message, icon, buttons);
+
+                if (error) {
+                    // For warning dialog it is reversed on desktop
+                    promise.then(reject).catch(resolve);
+                }
+                else {
+                    promise.then(resolve).catch(reject);
+                }
+
+                return promise;
             }
 
             var type = error ? 'warninga' : 'confirmation';

@@ -13,10 +13,11 @@ lazy(mega, 'fileRequestCommon', () => {
     };
 
     const updateMobileNodeIcon = (nodeHandle) => {
-        const $node = $(`#${nodeHandle}`, '.mobile.file-manager-block');
-        const iconName = fileIcon(M.d[nodeHandle]);
+        const component = MegaMobileNode.getNodeComponentByHandle(nodeHandle);
 
-        $('.regular-folder', $node).attr('src',`${mobile.imagePath + iconName}.png`);
+        if (component) {
+            component.update('icon');
+        }
     };
 
     const addFileRequestIcon = (puHandlePublicHandle) => {

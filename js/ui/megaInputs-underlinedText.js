@@ -33,6 +33,9 @@
  *                    id="register-lastname-registerpage2"
  *                    placeholder="[$7345]"
  *                    maxlength="40" />`
+ * - Clear button - simple extension of adding clear button on right side of input
+ *      Class: `clearButton`
+ *      Example: `<input class="underlinedText clearButton"/>`
  */
 mega.ui.MegaInputs.prototype.underlinedText = function() {
 
@@ -74,7 +77,7 @@ mega.ui.MegaInputs.prototype.underlinedText._init = function() {
     // If it is already a megaInput, html preparation does not required anymore.
     if (!$input.hasClass('megaInputs')) {
 
-        const hasTitle = $input.attr('title') || $input.attr('placeholder');
+        const hasTitle = !$input.hasClass('no-title-top') && ($input.attr('title') || $input.attr('placeholder'));
         const wrapperClass = hasTitle ? 'title-ontop' : '';
 
         // Wrap it with another div for styling and animation
@@ -139,6 +142,11 @@ mega.ui.MegaInputs.prototype.underlinedText._bindEvent = function() {
 
     $input.rebind('focus.underlinedText', function() {
         $(this).parent().addClass('active');
+
+        if ($(this).hasClass('clearButton') && $(this).val()) {
+            const $clearBtn = $('.clear-input', $(this).parent());
+            $clearBtn.removeClass('hidden');
+        }
     });
 
     $input.rebind('blur.underlinedText change.underlinedText', function() {
@@ -272,22 +280,51 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
     var $input = this.$input;
     var $wrapper = this.$wrapper;
 
+    if ($input.hasClass('clearButton')) {
+
+        const icon = is_mobile ? 'sprite-mobile-fm-mono icon-x-thin-outline icon-size-16' :
+            'sprite-fm-mono icon-close-component';
+
+        $wrapper.safeAppend(`<i class="${icon} clear-input"></i>`);
+
+        const $clearBtn = $('.clear-input', $wrapper);
+
+        $clearBtn.rebind('click.clearInput', () => {
+            if ($input.hasClass('errored')) {
+                this.hideError();
+            }
+            this.setValue('');
+            $input.trigger('focus');
+        });
+
+        $input.rebind('keyup.clearInput input.clearInput change.clearInput', function() {
+            $clearBtn[this.value.length ? 'removeClass' : 'addClass']('hidden');
+        });
+
+        if (!$input.val()) {
+            $clearBtn.addClass('hidden');
+        }
+    }
+
     if (this.type === 'password') {
 
-        $wrapper.safeAppend('<i class="sprite-fm-mono icon-eye-reveal pass-visible"></i>');
+        const iconSprite = is_mobile ? 'sprite-mobile-fm-mono' : 'sprite-fm-mono';
+        const showTextIcon = is_mobile ? 'icon-eye-thin-outline' : 'icon-eye-reveal';
+        const hideTextIcon = is_mobile ? 'icon-eye-off-01-thin-outline' : 'icon-eye-hidden';
+
+        $wrapper.safeAppend(`<i class="${iconSprite} ${showTextIcon} pass-visible"></i>`);
 
         $('.pass-visible', $wrapper).rebind('click.togglePassV', function() {
 
-            if (this.classList.contains('icon-eye-reveal')) {
-
+            if (this.classList.contains(showTextIcon)) {
                 $input.attr('type', 'text');
-                this.classList.remove('icon-eye-reveal');
-                this.classList.add('icon-eye-hidden');
+                this.classList.remove(showTextIcon);
+                this.classList.add(hideTextIcon);
             }
             else {
                 $input.attr('type', 'password');
-                this.classList.add('icon-eye-reveal');
-                this.classList.remove('icon-eye-hidden');
+                this.classList.add(showTextIcon);
+                this.classList.remove(hideTextIcon);
             }
         });
     }
@@ -411,7 +448,6 @@ mega.ui.MegaInputs.prototype.underlinedText._extendedFunctions = function() {
             this.$input.prev().addClass('no-trans');
         }
 
-        this.hideError();
         mega.ui.MegaInputs.prototype.setValue.call(this, value);
 
         onIdle(function() {

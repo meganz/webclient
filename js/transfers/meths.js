@@ -103,17 +103,14 @@ mBroadcaster.once('startMega', function() {
                                     dlmanager.logger.info('Resuming transfers...', entries);
                                 }
 
-                                if (is_mobile) {
-                                    // We only resume a single download on mobile.
-                                    mobile.downloadOverlay.resumeDownload(entries[0]);
-                                } else {
-                                    M.addDownload(entries);
-                                }
+                                M.addDownload(entries);
                             };
 
                             if (is_mobile) {
-                                mobile.resumeTransfersOverlay.show(continueTransfers, cancelTransfers);
-                            } else {
+                                // We only resume a single download on mobile.
+                                mobile.downloadOverlay.resumeDownload(entries[0]);
+                            }
+                            else {
                                 var $dialog = $('.mega-dialog.resume-transfer');
 
                                 $('button.js-close, .cancel', $dialog).rebind('click', function() {

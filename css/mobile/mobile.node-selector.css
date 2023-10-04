@@ -1,0 +1,22 @@
+.selection-mode .mobile.fm-block .mega-footer,
+#fmholder:not(.selection-mode) .mobile.fm-block .selection-action-btn,
+.selection-mode .mobile.fm-block .open-context-menu {
+    display: none;
+}
+#fmholder.selection-mode.folder-mode .mega-node.file {
+    opacity: 0.5;
+    pointer-events: none;
+}
+.selection-mode .mobile.top-menu {
+    display: none;
+}
+.fm-selection-subheading {
+    margin: 0 24px 24px;
+    display: none;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.selection-mode .fm-selection-subheading {
+    display: block;
+    flex: 0 0 auto;
+}

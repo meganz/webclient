@@ -1,0 +1,339 @@
+/*
+Styling common to navigation elements (anchors and buttons)
+
+Style makeup:
+.nav-elem
+.nav-elem.button - Buttons <button>
+.nav-elem.link - Links <link>
+
+Types:
+.nav-elem.normal - default
+.nav-elem.icon-only
+.nav-elem.full-width
+
+Components:
+    .nav-elem > button/a > icon/span
+.nav-elem button/a - Semantic element
+.nav-elem .icon/i - Icon element
+.nav-elem span - Text element
+
+Implemented styles:
+.nav-elem.disabled,
+.nav-elem.disabled:active
+.nav-elem.primary
+.nav-elem.secondary
+.nav-elem.text-only
+.nav-elem.destructive
+.nav-elem.destructive-outline
+.nav-elem.outline
+
+ */
+
+/* Nav elem types */
+
+/* .nav-elem Semantic element */
+.nav-elem,
+.nav-elem button,
+.nav-elem a {
+    display: inline-flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    padding: 0 24px;
+    border: none;
+}
+
+.nav-elem > *:not(:last-child),
+.nav-elem button > *:not(:last-child),
+.nav-elem a > *:not(:last-child) {
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
+}
+
+/* Default type */
+.nav-elem,
+.nav-elem.normal {
+    height: 40px;
+    width: auto;
+    border-radius: 8px;
+    box-sizing: border-box;
+    text-decoration: none;
+    --icon-size: 22px;
+}
+
+.nav-elem.normal.block {
+    width: 100%;
+    max-width: 382px;
+}
+
+.nav-elem.normal.block .primary-text {
+    font-weight: var(--mobile-font-weight-semibold);
+}
+
+/* Only the icon */
+.nav-elem.icon-only {
+    width: auto;
+    height: auto;
+    border-radius: var(--mobile-border-radius-medium);
+    padding: 6px;
+    --icon-size: 24px;
+}
+.nav-elem.icon-only span {
+    /* Hide the text */
+    display: none;
+}
+
+.nav-elem.icon-only.block {
+    width: 40px;
+    height: 40px;
+    padding: 16px;
+}
+
+/* Full width of container */
+.nav-elem.full-width {
+    width: 100%;
+    height: 56px;
+    border-radius: 0;
+    display: flex;
+    justify-content: flex-start;
+    --icon-size: 24px;
+}
+
+.nav-elem.full-width > *:not(:last-child) {
+    margin-inline-end: 18px;
+    -webkit-margin-end: 18px;
+}
+
+/* Grey out icons */
+.nav-elem.disabled i,
+.nav-elem.disabled:active i,
+.nav-elem:not(.no-active):active i {
+    opacity: 0.5;
+}
+
+/*
+We are avoiding using :not(.disabled) by explicitly
+overwriting the .disabled:active case (which should be faster).
+ */
+
+/* Primary also serves as the default */
+
+/* Only enforce a default background for
+button-type elements.
+ */
+button.nav-elem,
+.nav-elem.primary {
+    color: var(--mobile-text-inverse);
+    background: var(--mobile-button-primary);
+}
+.nav-elem.disabled,
+.nav-elem.disabled:active,
+.nav-elem.primary.disabled,
+.nav-elem.primary.disabled:active {
+    background: var(--mobile-button-disabled);
+    color: var(--mobile-text-disabled);
+}
+.nav-elem:active,
+.nav-elem.primary:active {
+    background: var(--mobile-button-primary-pressed);
+    color: var(--mobile-text-inverse);
+}
+
+.nav-elem.secondary {
+    background: var(--mobile-button-secondary);
+    color: var(--mobile-text-primary);
+}
+.nav-elem.secondary.disabled,
+.nav-elem.secondary.disabled:active {
+    background: var(--mobile-button-secondary);
+    color: var(--mobile-text-disabled);
+}
+.nav-elem.secondary:active {
+    background: var(--mobile-button-secondary-pressed);
+    color: var(--mobile-text-primary);
+}
+
+.nav-elem.outline {
+    background: none;
+    border: solid 2px var(--mobile-button-outline);
+    color: var(--mobile-button-outline);
+}
+.nav-elem.outline.disabled,
+.nav-elem.outline.disabled:active {
+    background: none;
+    border: solid 2px var(--mobile-border-disabled);
+    color: var(--mobile-text-disabled);
+}
+.nav-elem.outline:active {
+    background: none;
+    border: solid 2px var(--mobile-button-primary-pressed);
+    color: var(--mobile-button-primary-pressed);
+}
+
+.nav-elem.destructive-outline {
+    background: none;
+    border: solid 2px var(--mobile-button-error);
+    color: var(--mobile-button-error);
+}
+.nav-elem.destructive-outline.disabled,
+.nav-elem.destructive-outline.disabled:active {
+    background: none;
+    border: solid 2px #FEA3B5; /* Temp */
+    color: #FEA3B5; /* Temp */
+}
+.nav-elem.destructive-outline:active {
+    background: #A11045; /* Temp */
+    color: var(--mobile-text-inverse);
+}
+
+.nav-elem.destructive {
+    background: var(--mobile-button-brand);
+    color: var(--mobile-text-on-color);
+}
+.nav-elem.destructive.disabled,
+.nav-elem.destructive.disabled:active {
+    background: #FEA3B5; /* Temp */
+    color: var(--mobile-text-disabled);
+}
+.nav-elem.destructive:active {
+    background: #A11045; /* Temp */
+    color: var(--mobile-text-inverse);
+}
+.nav-elem.no-active:active {
+    background: initial;
+    color: initial;
+}
+
+.nav-elem.text-only,
+.nav-elem.text-icon {
+    background: none;
+    color: var(--mobile-text-primary);
+    text-decoration: underline;
+}
+.nav-elem.text-only.no-deco {
+    text-decoration: none;
+}
+.nav-elem.full-width.text-icon,
+.nav-elem.full-width.text-only {
+    text-decoration: none;
+}
+.nav-elem.text-only .left-icon {
+    display: none;
+}
+.nav-elem.text-only.disabled,
+.nav-elem.text-only.disabled:active {
+    color: var(--mobile-text-disabled);
+    text-decoration: underline var(--mobile-text-disabled);
+}
+.nav-elem.text-only:not(.no-deco):active {
+    color: var(--mobile-button-secondary-pressed);
+    text-decoration: underline var(--mobile-button-secondary-pressed);
+}
+.nav-elem.text-icon.disabled,
+.nav-elem.text-icon.disabled:active {
+    color: var(--mobile-text-disabled);
+    text-decoration: underline var(--mobile-text-disabled);
+}
+.nav-elem.text-icon:active {
+    color: var(--mobile-button-primary-pressed);
+    text-decoration: underline var(--mobile-button-primary-pressed);
+}
+
+/* Disable tap events */
+.nav-elem.disabled,
+.nav-elem.loading {
+    pointer-events: none;
+    opacity: 1;
+}
+
+/* Style added for toast component */
+.nav-elem.action-link {
+    padding: 0;
+    background: none;
+    height: auto;
+    color: var(--mobile-link-primary);
+    font: var(--mobile-font-label-bold);
+    text-decoration: none;
+}
+.nav-elem.action-link.login-button {
+    color: var(--mobile-text-primary);
+    text-decoration: underline;
+}
+
+.nav-elem.action-link.toast {
+    color: var(--mobile-link-inverse);
+}
+.nav-elem.action-link.toast span {
+    font: var(--mobile-font-copy-semibold);
+}
+
+/* .nav-elem text */
+.nav-elem span {
+    color: inherit;
+    text-decoration: inherit;
+    font: var(--mobile-font-link-large-regular);
+}
+
+.nav-elem.semibold span {
+    font-weight: var(--mobile-font-weight-semibold);
+}
+
+.nav-elem i.icon-size-16 {
+    --icon-size: 16px;
+}
+.nav-elem i.icon-size-22 {
+    --icon-size: 22px;
+}
+.nav-elem i.icon-size-24 {
+    --icon-size: 24px;
+}
+.nav-elem i.icon-size-28 {
+    --icon-size: 28px;
+}
+.nav-elem i.icon-size-48 {
+    --icon-size: 48px;
+}
+.nav-elem i.icon-size-80 {
+    --icon-size: 80px;
+}
+
+.nav-elem i.left-icon {
+    width: var(--icon-size);
+    height: var(--icon-size);
+}
+
+.nav-elem .right-icon {
+    -webkit-margin-start: auto;
+    margin-inline-start: auto;
+    order: 100; /* Last in list */
+    --icon-size: 16px; /* Default size */
+}
+
+.nav-elem .left-icon {
+    order: -1; /* First in list */
+}
+
+.nav-elem i.loading {
+    animation-name: rotate;
+    animation-duration: 1000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    margin: auto; /* Justify in center */
+}
+
+.nav-elem .multi-text-box {
+    display: inline-flex;
+    flex-flow: column nowrap;
+    align-items: flex-start;
+}
+
+.nav-elem .multi-text-box > *:not(:last-child) {
+    margin-bottom: 4px;
+}
+
+.nav-elem .multi-text-box .sub-text {
+    color: var(--mobile-text-secondary);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+}

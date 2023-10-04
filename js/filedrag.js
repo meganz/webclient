@@ -564,7 +564,9 @@
         document.getElementsByTagName("body")[0].addEventListener("drop", fnHandler, false);
         document.getElementsByTagName("body")[0].addEventListener("dragstart", onDragStartHandler, false);
 
-        if (is_mobile && (ua.details.engine === 'Gecko' || is_ios && is_ios < 13)) {
+        if (is_mobile &&
+            (ua.details.engine === 'Gecko' && parseInt(ua.details.version) < 83
+            || is_ios && is_ios < 13)) {
             // https://bugzilla.mozilla.org/show_bug.cgi?id=1456557
             $('input[multiple]').removeAttr('multiple');
         }

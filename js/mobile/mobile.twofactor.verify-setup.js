@@ -27,9 +27,6 @@ mobile.twofactor.verifySetup = {
         // Initialise verify button functionality
         this.initVerifyButton();
 
-        // Initialise back button to go back to the 2FA setup page
-        mobile.initBackButton(this.$page, 'twofactor/setup');
-
         // Show the account page content
         this.$page.removeClass('hidden');
 
@@ -53,6 +50,8 @@ mobile.twofactor.verifySetup = {
         var $verifyButton = mobile.twofactor.verifySetup.$page.find('.two-factor-verify-btn');
         var $warningText = mobile.twofactor.verifySetup.$page.find('.warning-text-field');
 
+        $pinCode.val('');
+
         // On Verify button click/tap
         $verifyButton.off('tap').on('tap', function() {
 
@@ -65,9 +64,13 @@ mobile.twofactor.verifySetup = {
             api.send({a: 'mfas', mfa: pinCode})
                 .then(() => {
 
-                    // Render the Enabled page
-                    loadSubPage('twofactor/enabled');
+                    // Hide this page
+                    mobile.twofactor.verifySetup.$page.addClass('hidden');
 
+                    $pinCode.trigger('blur');
+
+                    mega.ui.toast.show(l[19206]);
+                    loadSubPage('fm/account/security');
                 })
                 .catch((ex) => {
 

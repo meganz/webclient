@@ -2,7 +2,7 @@
  * Functionality for the mobile payment card section
  */
 
-mobile.account.paymentCard = new function() {
+mobile.settings.account.paymentCard = new function() {
     'use strict';
     let $page;
 
@@ -43,6 +43,15 @@ mobile.account.paymentCard = new function() {
                     .then((res) => {
                         assert(typeof res === 'string');
                         addressDialog.processUtcResult({EUR: res, edit: true}, true);
+                        const $paymentOverlayHeader = $('.payment-stripe-dialog h1.heading');
+
+                        $('.payment-stripe-dialog .mega-header').removeClass('hidden');
+                        $paymentOverlayHeader.text(l.update_payment_card).removeClass('hidden');
+
+                        $('.payment-stripe-dialog .nav-navigation a').rebind('tap.back', () => {
+                            closeDialog();
+                            $paymentOverlayHeader.text('').addClass('hidden');
+                        });
                     })
                     .catch((ex) => {
                         msgDialog(
@@ -55,12 +64,6 @@ mobile.account.paymentCard = new function() {
                     })
                     .finally(() => loadingDialog.hide());
             });
-
-            // Initialise back button to go back to My Account page
-            mobile.initBackButton($page, 'fm/account/');
-
-            // Initialise the top menu
-            topmenuUI();
 
             // Show the account page content
             $page.removeClass('hidden');
@@ -89,7 +92,7 @@ mobile.account.paymentCard = new function() {
 
                 $page.addClass('hidden');
 
-                msgDialog('warninga', '', l.card_info_error, l.card_info_error_desc, () => {
+                msgDialog('warninga', l.card_info_error, l.card_info_error_desc, '', () => {
                     return loadSubPage('fm/account');
                 });
 

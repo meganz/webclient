@@ -1457,13 +1457,15 @@ MegaData.prototype.revertRubbishNodes = mutex('restore-nodes', function(resolve,
             }
         }
 
-        delay('openfolder', () => {
-            M.openFolder(selTarget[0])
-                .catch(dump)
-                .finally(() => {
-                    M.addSelectedNodes(nodes.length && nodes || selTarget[1], true);
-                });
-        }, 90);
+        if (!is_mobile) {
+            delay('openfolder', () => {
+                M.openFolder(selTarget[0])
+                    .catch(dump)
+                    .finally(() => {
+                        M.addSelectedNodes(nodes.length && nodes || selTarget[1], true);
+                    });
+            }, 90);
+        }
 
         return targets;
     };
@@ -1658,6 +1660,8 @@ MegaData.prototype.revokeShares = async function(handles) {
         return res;
     })();
 
+    let res = false;
+
     // delete pending outshares for the deleted nodes
     if (folders.length) {
         promises.push(mega.keyMgr.deletePendingOutShares(folders));
@@ -1689,12 +1693,14 @@ MegaData.prototype.revokeShares = async function(handles) {
             console.debug('revokeShares: awaiting for %s promises...', promises.length);
         }
 
-        await Promise.allSettled(promises);
+        res = await Promise.allSettled(promises);
     }
 
     if (d) {
         console.groupEnd();
     }
+
+    return res;
 };
 
 /**
@@ -2048,7 +2054,9 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
     "use strict";
 
     if (fminitialized) {
-        var n = M.d[handle] || false;
+
+        const n = M.d[handle] || false;
+
         var labelId = parseInt(value);
         var removeClasses = 'colour-label red orange yellow blue green grey purple';
         var color = '<div class="colour-label-ind %1"></div>';
@@ -2056,7 +2064,7 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
         var $treeElements = $(`#treea_${handle}`).add(`#treea_os_${handle}`).add(`#treea_pl_${handle}`);
 
         // Remove all colour label classes
-        var $item = $(`#${handle}`);
+        var $item = $(M.megaRender && M.megaRender.nodeMap[handle] || `#${handle}`);
         $item.removeClass(removeClasses);
         $('a', $item).removeClass(removeClasses);
         $('.label', $item).text('');
@@ -2070,8 +2078,8 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
 
             $item.addClass(colourClass);
             $('a', $item).addClass(colourClass);
-            $('.nw-fm-tree-iconwrap', $treeElements).safePrepend(color.replace('%1', M.getLabelClassFromId(labelId)))
-                .addClass('labeled');
+            $('.nw-fm-tree-iconwrap', $treeElements)
+                .safePrepend(color.replace('%1', M.getLabelClassFromId(labelId))).addClass('labeled');
             if (M.megaRender) {
                 $('.label', $item).text(M.megaRender.labelsColors[lblColor]);
             }
@@ -2101,18 +2109,14 @@ MegaData.prototype.labelDomUpdate = function(handle, value) {
                 .removeClass('disabled static');
         }
 
-        delay(`labelDomUpdate:${n.p}`, () => {
-            const {n} = M.sortmode || {};
-            if (n === 'label') {
-                // remember current scroll position and make user not losing it.
-                var $megaContainer = $('.megaListContainer:visible');
-                var currentScrollPosition = $megaContainer.prop('scrollTop');
+        const {n: dir} = M.sortmode || {};
 
-                M.openFolder(M.currentdirid, true).always(() => {
-                    $megaContainer.prop('scrollTop', currentScrollPosition);
-                }).then(reselect);
-            }
-        }, 50);
+        if (n.p === M.currentdirid && dir === 'label') {
+
+            const domNode = M.megaRender && M.megaRender.nodeMap[n.h] || document.getElementById(n.h);
+
+            this.updateDomNodePosition(n, domNode);
+        }
     }
 };
 
@@ -2344,8 +2348,10 @@ MegaData.prototype.initLabelFilter = function(nodelist) {
 MegaData.prototype.favouriteDomUpdate = function(node, favState) {
     'use strict';
     if (fminitialized) {
+
         delay(`fav.dom-update.${node.h}`, () => {
-            const domListNode = document.getElementById(node.h);
+
+            const domListNode = M.megaRender && M.megaRender.nodeMap[node.h] || document.getElementById(node.h);
 
             if (domListNode) {
                 const $gridView = $('.grid-status-icon', domListNode);
@@ -2362,7 +2368,37 @@ MegaData.prototype.favouriteDomUpdate = function(node, favState) {
                     $blockView.removeClass('icon-favourite-filled');
                 }
             }
+
+            const {n} = M.sortmode || {};
+
+            if (node.p === M.currentdirid && n === 'fav') {
+                this.updateDomNodePosition(node, domListNode);
+            }
         });
+    }
+};
+
+MegaData.prototype.updateDomNodePosition = function(node, domNode) {
+
+    'use strict';
+
+    this.sort();
+    const newindex = this.v.findIndex(n => n.h === node.h);
+
+    if (this.megaRender && this.megaRender.megaList) {
+        this.megaRender.megaList.repositionItem(node.h, newindex);
+    }
+    else if (domNode) {
+
+        const {parentNode} = domNode;
+
+        // item moved to last just using append
+        if (newindex === this.v.length) {
+            parentNode.appendChild(domNode);
+        }
+        else {
+            parentNode.insertBefore(domNode, parentNode.childNodes[newindex]);
+        }
     }
 };
 

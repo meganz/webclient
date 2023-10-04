@@ -1931,7 +1931,14 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 {
     var tag=document.createElement('meta');
     tag.name = "viewport";
-    tag.content = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0";
+    // To avoid auto-zoom on iOS and firefox browsers
+    // These browsers already support zoom
+    if (is_ios || ua.indexOf('firefox') > 0) {
+        tag.content = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0";
+    }
+    else {
+        tag.content = "width=device-width, initial-scale=1";
+    }
     document.getElementsByTagName('head')[0].appendChild(tag);
     var tag=document.createElement('meta');
     tag.name = "apple-mobile-web-app-capable";
@@ -2765,6 +2772,13 @@ else if (!browserUpdate) {
 
     jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
+
+    // Megalist
+    jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
+
+    // Search
+    jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
 
     if (!is_mobile) {
 
@@ -2791,7 +2805,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/empty-pages.css', n: 'empty_page_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
         jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
         jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
@@ -2811,7 +2824,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
         jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
-        jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
         jsl.push({f:'js/ui/dragselect.js', n: 'dargselect_js', j:1});
 
         // Gallery helpers
@@ -2850,7 +2862,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/recovery.css', n: 'recovery_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/affiliate-program.css', n: 'affiliate_program_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/backup-center.css', n: 'backup_center_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2912,43 +2923,74 @@ else if (!browserUpdate) {
 
     // Load files common to all mobile pages
     if (is_mobile) {
+
+        // Variables which can be used across all mobile stylesheets
+        jsl.push({f:'css/vars/mobile-theme.css', n: 'vars_mobile_theme_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile/mobile.dropdown.css', n: 'mobile_dropdown_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.overlay.css', n: 'mobile_overlay_css', j:2, w:1});
+        jsl.push({f:'css/mobile/mobile.sheet.css', n: 'mobile_sheet_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile/mobile.context.menu.css', n: 'mobile_context_menu_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile/mobile.checkbox.css', n: 'mobile_checkbox_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.radio.button.css', n: 'mobile_radio_button_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.toggle.button.css', n: 'mobile_toggle_button_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.footer.css', n: 'mobile_footer_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.header.css', n: 'mobile_header_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.top.menu.css', n: 'mobile_top_menu_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.msgdialog.css', n: 'mobile_msgdialog_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.rack.css', n: 'mobile_rack_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.toast.css', n: 'mobile_toast_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.rubbish-bin.css', n: 'mobile_rubbish_bin_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.banner.css', n: 'mobile_banner_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.node-selector.css', n: 'mobile_node_selector_css', j:2, w:5, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile/mobile.empty.state.css', n: 'mobile_empty_state_css', j:2, w:1});
+        jsl.push({f:'css/mobile/mobile.transfer.block.css', n: 'mobile_transfer_block_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.bottom.bar.css', n: 'mobile_bottom_bar_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.account.css', n: 'mobile_account_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.notifications.css', n: 'mobile_notifications_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.download.css', n: 'mobile_download_css', j:2,w:5,c:1,d:1,cache:1});
+
+        // Sprites
+        jsl.push({f:'css/sprites/mobile-fm-uni@uni.css', n: 'mobile_fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/sprites/mobile-fm-mono@mono.css', n: 'mobile_fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/sprites/mobile-fm-theme@dark.css', n: 'mobile_fm_dark_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/sprites/mobile-fm-theme@light.css', n: 'mobile_fm_light_css', j:2, w:30, c:1, d:1, cache:1});
+
         jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
         jsl.push({f:'html/mobile-add-contact-card.html', n: 'mobile-add-contact-card', j:0});
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-        jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.tappable.css', n: 'mobile_tappable_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.settings.css', n: 'mobile_settings_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.settings.history.css', n: 'mobile_settings_history_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.link-management.css', n: 'mobile_link_management_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile-help.css', n: 'mobile_help_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
-        jsl.push({f:'css/mobile-toast.css', n: 'mobile_toast_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/mobile-media-viewer.css', n: 'mobile_media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.node.css', n: 'mobile_node_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.sharednode.css', n: 'mobile_sharednode_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.tab.css', n: 'mobile_tab_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.public.link.css', n: 'mobile_public_linkcss', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.datepicker.css', n: 'mobile_datepicker_css', j: 2, w: 1});
+
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account_cancel_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.history.js', n: 'mobile_account_history_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.change-password.js', n: 'mobile_account_change_pass_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.change-email.js', n: 'mobile_account_change_email_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.file-management.js', n: 'mobile_account_file_management_js', j:1, w: 1});
+        jsl.push({f:'js/mobile/mobile.megaRender.js', n: 'mobile_mega_render_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.affiliate.js', n: 'mobile_affiliate_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.backup.js', n: 'mobile_backup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.cloud.context-menu.js', n: 'mobile_cloud_context_menu_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.cloud.sort.js', n: 'mobile_cloud_context_sort_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.create-folder-overlay.js', n: 'mobile_create_folder_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.decryption-password-overlay.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.delete-overlay.js', n: 'mobile_delete_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.download-overlay.js', n: 'mobile_download_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.node-name-control.js', n: 'mobile_node_name_control_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.key.decryption.js', n: 'mobile_mobile_dec_key_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.password.decryption.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.download.overlay.js', n: 'mobile_download_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.chatlink.js', n: 'mobile_chatlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.link-overlay.js', n: 'mobile_link_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.link-management.js', n: 'mobile_link_management_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.not-found-overlay.js', n: 'mobile_not_found_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.not-found.js', n: 'mobile_not_found_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.pro-signup-prompt.js', n: 'mobile_pro_signup_prompt_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.propay.js', n: 'mobile_propay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.recovery.js', n: 'mobile_rec_js', j: 1, w: 1});
@@ -2957,7 +2999,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.recovery.enter-key.js', n: 'mobile_rec_enter_key_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.recovery.change-password.js', n: 'mobile_rec_change_password_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.register.js', n: 'mobile_register_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.rename-overlay.js', n: 'mobile_rename_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.support.js', n: 'mobile_support_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
@@ -2966,24 +3007,67 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.twofactor.intro.js', n: 'mobile_twofactor_info_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.setup.js', n: 'mobile_twofactor_setup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-setup.js', n: 'mobile_twofactor_verify_setup_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.enabled.js', n: 'mobile_twofactor_enabled_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-disable.js', n: 'mobile_twofactor_verify_disable_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.disabled.js', n: 'mobile_twofactor_disabled_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.phone-input.js', n: 'mobile_sms_phone_input_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.verify-code.js', n: 'mobile_sms_verify_code_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.verify-success.js', n: 'mobile_sms_verify_success_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.achievement.js', n: 'mobile_sms_achievement', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.rubbish-bin-empty-overlay.js', n: 'mobile_rubbish_bin_empty_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbishbin.js', n: 'mobile_rubbishbin_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.alertbanner.js', n: 'mobile_alert_banner', j: 1 });
         jsl.push({f:'js/mobile/mobile.conflict-resolution-overlay.js', n: 'mobile_conflict_resolution_overlay_js', j: 1 });
-        jsl.push({f:'js/mobile/mobile.over-storage-quota-overlay.js', n: 'mobile_over_storage_quota_overlay_js', j: 1 });
-        jsl.push({f:'js/mobile/mobile.resume-transfers-overlay.js', n: 'mobile_resume_transfers_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.over-bandwidth-quota.js', n: 'mobile_over_bandwidth_quota_js', j: 1 });
+        jsl.push({f:'js/mobile/mobile.over-storage-quota.js', n: 'mobile_over_storage_quota_js', j: 1 });
         jsl.push({f:'html/mvoucherinfo.html', n: 'mvoucherinfo', j: 0, w: 1});
         jsl.push({f:'js/mobile/mobile.verify.js', n: 'mobile_verify_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.component.js', n: 'mobile_component_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.group.js', n: 'mobile_group_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.dropdown.js', n: 'mobile_component_dropdown_js', j:1, w:1});
+        jsl.push({f:'js/mobile/mobile.dropdown-items.js', n: 'mobile_dropdownitem_js', j:1, w:1});
+        jsl.push({f:'js/mobile/mobile.context.menu.js', n: 'mobile_context_menu_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.tappable.js', n: 'mobile_tappable_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.link.js', n: 'mobile_link_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.button.js', n: 'mobile_button_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.checkbox.js', n: 'mobile_checkbox_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.node.js', n: 'mobile_node_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.sharednode.js', n: 'mobile_sharednode_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.radio.button.js', n: 'mobile_radio_button_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.radio.group.js', n: 'mobile_radio_group_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.toggle.button.js', n: 'mobile_radio_button_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.footer.js', n: 'mobile_footer_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.top.menu.js', n: 'mobile_top_menu_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/appearance.js', n: 'mobile_settings_appearance_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/settingsHelper.js', n: 'mobile_settings_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/settings.js', n: 'mobile_settings_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/account.js', n: 'mobile_my_account_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/linksOptions.js', n: 'mobile_account_file_management_js', j:1, w: 1});
+        jsl.push({f:'js/mobile/settings/backupRecoveryKey.js', n: 'mobile_backup_recovery_key_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account_cancel_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.change-password.js', n: 'mobile_account_change_pass_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.change-email.js', n: 'mobile_account_change_email_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/support.js', n: 'mobile_settings_support_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/about.js', n: 'mobile_settings_about_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/privacyAndSecurity.js', n: 'mobile_privacy_security_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/history.js', n: 'mobile_session_history_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/termsPolicies.js', n: 'mobile_terms_policies_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.msgdialog.js', n: 'mobile_msgdialog_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.rack.slot.js', n: 'mobile_rack_slot_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.rack.js', n: 'mobile_rack_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.toast.js', n: 'mobile_toast_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.datepicker.js', n: 'mobile_datepicker_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.tab.js', n: 'mobile_tab_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.overlay.js', n: 'mobile_overlay_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.sheet.js', n: 'mobile_sheet_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.node-selector.js', n: 'mobile_node_selector_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.empty.state.js', n: 'mobile_empty_state_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.transfer.block.js', n: 'mobile_transfer_block_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.bottom.bar.js', n: 'mobile_bottom_bar_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.view.overlay.js', n: 'mobile_view_overlay_js', j: 1, w:1});
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j: 1, w: 3});
     }
 

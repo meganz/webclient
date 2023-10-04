@@ -111,7 +111,12 @@ var ulmanager = {
             return; // Disable quota dialog
         }
 
-        M.safeShowDialog('upload-overquota', function() {
+        if (is_mobile) {
+            mobile.overStorageQuota.show();
+            return;
+        }
+
+        M.safeShowDialog('upload-overquota', () => {
             // Hide loading dialog as from new text file
             loadingDialog.phide();
 
@@ -124,7 +129,7 @@ var ulmanager = {
             });
 
             $('button.js-close, .fm-dialog-close', $dialog).add($('.fm-dialog-overlay'))
-                .rebind('click.closeOverQuotaDialog', function() {
+                .rebind('click.closeOverQuotaDialog', () => {
 
                     ulmanager.ulHideOverStorageQuotaDialog();
                 });
@@ -134,10 +139,6 @@ var ulmanager = {
                 l[22673].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
                     .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
                 : l[19136]);
-
-            if (is_mobile) {
-                $('.upgrade-to-pro', $dialog).rebind('tap', () => loadSubPage('/pro'));
-            }
 
             // Load the membership plans
             dlmanager.setPlanPrices($dialog);
@@ -1843,7 +1844,7 @@ var ulQueue = new TransferQueue(function _workerUploader(task, done) {
         ulQueue.logger.info('worker_uploader', task, done);
     }
     task.run(done);
-}, 4, 'uploader');
+}, is_ios && isMediaSourceSupported() ? 1 : 4, 'uploader');
 
 ulQueue.poke = function(file, meth) {
     'use strict';

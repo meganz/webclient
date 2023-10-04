@@ -1,0 +1,29 @@
+.mega-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 16px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    transition: bottom 100ms linear;
+}
+
+.rtl .mega-footer {
+    left: 0;
+    right: auto;
+}
+
+.mega-footer .nav-elem.icon-only {
+    padding: 16px;
+}
+
+.general-actions .nav-elem {
+    padding: 0;
+}
+
+.general-actions .nav-elem span {
+    font: var(--mobile-font-link-large-regular);
+}

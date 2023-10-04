@@ -85,14 +85,14 @@
             let twoFactorPin = null;
 
             if (await twofactor.isEnabledForAccount()) {
-                mobile.account.changeEmail.$page.addClass('hidden');
+                mobile.settings.account.changeEmail.$page.addClass('hidden');
 
                 twoFactorPin = await mobile.twofactor.verifyAction.init();
 
                 mobile.twofactor.verifyAction.$page.addClass('hidden');
-                mobile.account.changeEmail.$page.removeClass('hidden');
+                mobile.settings.account.changeEmail.$page.removeClass('hidden');
             }
-            mobile.account.changeEmail.continueChangeEmail(newEmail, twoFactorPin);
+            mobile.settings.account.changeEmail.continueChangeEmail(newEmail, twoFactorPin);
         },
 
         /**
@@ -129,7 +129,7 @@
                         msgDialog('warninga', l[135], l[47]);
                     }
                     else {
-                        mobile.account.changeEmail._finishProcess();
+                        mobile.settings.account.changeEmail._finishProcess();
                         localStorage.new_email = newEmail;
                     }
                 }
@@ -140,9 +140,10 @@
             this.$step1.addClass('hidden');
             $('.fm-header', this.$page).addClass('hidden');
             $('button', this.$step2).rebind('click.accemail', () => {
+                this.$page.addClass('hidden');
                 loadSubPage('fm/account');
             });
             this.$step2.removeClass('hidden');
         },
     };
-})(mobile.account);
+})(mobile.settings.account);

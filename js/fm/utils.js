@@ -1465,7 +1465,7 @@ MegaUtils.prototype.getStorageState = async function(force) {
  */
 MegaUtils.prototype.getStorageQuota = async function() {
     'use strict';
-    const {result} = await api.req({a: 'uq', strg: 1, qc: 1});
+    const {result} = await api.req({a: 'uq', strg: 1, qc: 1}, {cache: -4});
 
     if (result.uslw === undefined) {
         result.uslw = 9000;

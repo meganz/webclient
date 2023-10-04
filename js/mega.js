@@ -1493,39 +1493,74 @@ scparser.$add('usc', function() {
 
 // Payment received
 scparser.$add('psts', function(a) {
+    'use strict';
 
-    if (!pfid && u_type) {
-        M.checkStorageQuota(2000);
+    onIdle(() => {
+        watchdog.notify('psts', (a.r === 's' && a.p) | 0);
+    });
+
+    if (fminitialized && !pfid) {
+        pro.processPaymentReceived(a);
     }
-    pro.processPaymentReceived(a);
+
+    this.sqac(a);
+});
+
+// Storage quota allowance changed.
+scparser.$add('sqac', (a) => {
+    'use strict';
+
+    if (d) {
+        console.info(a.a, [a]);
+    }
 
     if (ulmanager.ulOverStorageQuota) {
-        eventlog(99701);
-        onIdle(function() {
+        eventlog(99701, a.a, true);
+
+        delay('sqac:ul-resume', () => {
             ulmanager.ulResumeOverStorageQuotaState();
         });
     }
 
-    onIdle(function() {
-        dlmanager._onOverQuotaAttemptRetry();
-    });
+    if (dlmanager.isOverQuota) {
 
-    onIdle(function() {
-        watchdog.notify('psts', (a.r === 's' && a.p) | 0);
-    });
-
-    // If user is on FM, update account status with this packet.
-    if (fminitialized) {
-        onIdle(function() {
-            if (page.indexOf('fm/account') === 0) {
-                accountUI();
-            }
-            else {
-                M.accountData();
-            }
+        delay('sqac:dl-resume', () => {
+            dlmanager._onOverquotaDispatchRetry();
         });
+    }
 
-        M.storageQuotaCache = null;
+    // If a user is on FM, update the account status with this packet.
+    if (fminitialized) {
+
+        delay('sqac:ui-update', () => {
+
+            if (!pfid) {
+
+                if (page.indexOf('fm/account') === 0) {
+
+                    accountUI();
+                }
+                else if (page === 'fm/dashboard') {
+
+                    dashboardUI(true);
+                }
+                else {
+                    M.accountData();
+                }
+            }
+            M.storageQuotaCache = null;
+
+            if ($.topMenu) {
+
+                topMenu();
+            }
+            else if (!pfid) {
+
+                M.checkLeftStorageBlock();
+            }
+
+            M.checkStorageQuota(2e3);
+        });
     }
 });
 

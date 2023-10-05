@@ -35,11 +35,11 @@
 }
 
 .file-folder-view .no-access.no-access-folder {
-    background-image: url("/images/mobile/folder.png");
+    background-image: url("../../images/mobile/folder.png");
 }
 
 .file-folder-view .no-access.no-access-file {
-    background-image: url("/images/mobile/file.png");
+    background-image: url("../../images/mobile/file.png");
 }
 
 .file-folder-view .no-access.icon {

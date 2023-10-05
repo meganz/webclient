@@ -71,7 +71,7 @@ mBroadcaster.once('startMega', function() {
     if (is_mobile) {
 
         const usingMobPages = ['placeholder', 'change_email', 'register', 'key', 'support', 'keybackup',
-                               'disputenotice', 'download', 'reset', 'propay'];
+                               'disputenotice', 'download', 'reset', 'propay', 'login'];
 
         for (let i = usingMobPages.length; i--;) {
 

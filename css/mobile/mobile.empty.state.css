@@ -33,25 +33,25 @@
 }
 
 .mega-empty-states .image .icon.cloud-drive {
-    background-image: url("/images/mobile/cloud-drive.png");
+    background-image: url("../../images/mobile/cloud-drive.png");
 }
 
 .mega-empty-states .image .icon.folder {
-    background-image: url("/images/mobile/folder.png");
+    background-image: url("../../images/mobile/folder.png");
 }
 
 .mega-empty-states .image .icon.incoming-shares {
-    background-image: url("/images/mobile/incoming-shares.png");
+    background-image: url("../../images/mobile/incoming-shares.png");
 }
 
 .mega-empty-states .image .icon.outgoing-shares {
-    background-image: url("/images/mobile/outgoing-shares.png");
+    background-image: url("../../images/mobile/outgoing-shares.png");
 }
 
 .mega-empty-states .image .icon.shared-links {
-    background-image: url("/images/mobile/links.png");
+    background-image: url("../../images/mobile/links.png");
 }
 
 .mega-empty-states .image .icon.rubbish-bin {
-    background-image: url("/images/mobile/rubbish-bin.png");
+    background-image: url("../../images/mobile/rubbish-bin.png");
 }

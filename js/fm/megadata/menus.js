@@ -295,7 +295,7 @@ MegaData.prototype.menuItems = async function menuItems() {
                     fav.icon = 'sprite-mobile-fm-mono icon-heart-thin-outline';
                 }
                 else {
-                    $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@', l[5872]);
+                    $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite"></i>@@', l[5871]);
                 }
             }
 

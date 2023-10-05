@@ -345,8 +345,18 @@ function u_checklogin3a(res, ctx) {
                 }
                 else if ($.createanonuser === u_attr.u) {
                     delete $.createanonuser;
-                    M.importWelcomePDF().catch(dump);
-                    ctx.checkloginresult(ctx, r);
+
+                    if (pfid) {
+                        M.importWelcomePDF().catch(dump);
+                        ctx.checkloginresult(ctx, r);
+                    }
+                    else {
+                        M.importWelcomePDF()
+                            .catch(dump)
+                            .finally(() => {
+                                ctx.checkloginresult(ctx, r);
+                            });
+                    }
                 }
                 else {
                     ctx.checkloginresult(ctx, r);

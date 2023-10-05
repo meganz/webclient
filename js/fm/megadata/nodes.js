@@ -2980,7 +2980,7 @@ MegaData.prototype.getNodeRights = function(id) {
         return this.dynContentLoader[id].options.rights | 0;
     }
 
-    if (folderlink || !id || id.length !== 8) {
+    if (folderlink || !id || id.length !== 8 || id === 'policies') {
         return false;
     }
 

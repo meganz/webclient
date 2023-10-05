@@ -59,7 +59,7 @@ export default class ChatRouting {
         if (args[0] === 'chat') {
             args.shift();
         }
-        if (args[0].length > 8 && args[0].substring(0, 8) === 'contacts') {
+        if (args[0] && args[0].length > 8 && args[0].substring(0, 8) === 'contacts') {
             location = location.replace(args[0], 'contacts');
             args[0] = 'contacts';
         }

@@ -17,7 +17,7 @@ lazy(s4, 'policyProperties', () => {
             this.origSelected = Object.create(null);
             this.text = {
                 header: l.s4_add_users,
-                progress: l[8023],
+                progress: l.add,
             };
         }
 
@@ -127,7 +127,7 @@ lazy(s4, 'policyProperties', () => {
             this.origSelected = Object.create(null);
             this.text = {
                 header: l.s4_add_groups,
-                progress: l[8023],
+                progress: l.add,
             };
         }
 

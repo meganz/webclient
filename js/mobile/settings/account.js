@@ -308,7 +308,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
                             const {result: numOfSubscriptions} = await api.req({a: 'ccqns'}).catch(dump);
 
-                            if (numOfSubscriptions.result > 0) {
+                            if (numOfSubscriptions > 0) {
                                 mobile.settings.account.openSubConfirmOverlay();
                             }
 

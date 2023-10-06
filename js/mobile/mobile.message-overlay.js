@@ -28,7 +28,7 @@ mobile.messageOverlay = (() => {
                 actionButton.off('tap');
                 targetSheet.hide();
             }
-            targetSheet.off('close.mobileOverlay');
+            targetSheet.off('close.mobileSheet');
             targetSheet.clear();
 
             if (callbacks) {
@@ -161,10 +161,11 @@ mobile.messageOverlay = (() => {
          * as secondary "Failure/cancel" button. If array, i=0 is confirm, i>0 is cancel and index is passed.
          * @param {Boolean} [safeShow] Whether to use M.safeShowDialog or not, mainly for msgDialogs which in
          * desktop web are shown without this mechanism.
+         * @param {Boolean} [closeButton] Show close button or not. also use for background tap close.
          *
          * @returns {undefined}
          */
-        render: function(title, message, subMessage, callbacks, options, safeShow) {
+        render: function(title, message, subMessage, callbacks, options, safeShow, closeButton) {
             let dialogName;
             if (title) {
                 dialogName = title.toLowerCase().replace(/\s+/g, '');
@@ -178,7 +179,8 @@ mobile.messageOverlay = (() => {
 
                 targetSheet.clear();
                 targetSheet.type = 'modal';
-                targetSheet.showClose = true;
+                targetSheet.showClose = closeButton || false;
+                targetSheet.preventBgClosing = typeof closeButton === 'boolean' ? !closeButton : true;
 
                 buttonTemplate = {
                     parentNode: targetSheet.actionsNode,
@@ -223,7 +225,7 @@ mobile.messageOverlay = (() => {
                 }
 
                 // Bind to the sheet actions
-                targetSheet.on('close.mobileOverlay', closeHandler(callbacks, false));
+                targetSheet.on('close.mobileSheet', closeHandler(callbacks, false));
 
                 renderButtons(callbacks);
             };
@@ -231,6 +233,7 @@ mobile.messageOverlay = (() => {
             if (safeShow) {
                 M.safeShowDialog(`mobile-messageOverlay-${dialogName}`, () => {
                     _sheet();
+                    targetSheet.show();
                 });
             }
             else {
@@ -244,15 +247,18 @@ mobile.messageOverlay = (() => {
          *
          * @param {String} message The main message to be displayed
          * @param {String} [subMessage] An optional second message to be displayed after the first
-         * @param {Function} [onSuccess] An optional success callback to be run after they confirm OK
-         * @param {Function} [onFailure] An optional failure callback to be run after they click Close
          * @param {String} [icon] An optional class name to show an icon, empty-icon classes can be found in mobile.css
          * @param {String} [buttons] An optional second button in place of text-link close
          * @param {Function} [checkboxCallback] An optional function callback for a "Do not show again" checkbox
+         * @param {Boolean} [closeButton] Show close button or not. also use for background tap close.
+         * Note: for case that using .catch() on show, you have to set closeButton as true, in order to make it works
+         *       on the other hand if you have closeButton true or have 2 buttons which one of them cause fail,
+         *       you have to set catch to prevent exception.
+         *
          *
          * @returns {undefined}
          */
-        show: function(message, subMessage, icon, buttons, checkboxCallback) {
+        show: function(message, subMessage, icon, buttons, checkboxCallback, closeButton) {
 
             return new Promise((resolve, reject) => this.render(
                 '',
@@ -267,7 +273,8 @@ mobile.messageOverlay = (() => {
                     icon: icon,
                     buttons: buttons,
                 },
-                true
+                true,
+                closeButton
             ));
         }
     };

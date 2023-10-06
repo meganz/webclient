@@ -47,6 +47,11 @@ body.bottom-pages .fmholder {
     background: #F5F6F7;
 }
 
+.mobile .affiliate-redeem-page {
+    height: 100%;
+    overflow: auto;
+}
+
 .mobile.main-block.account-file-management-page .notification-setting-row {
     padding-left: 20px;
 }

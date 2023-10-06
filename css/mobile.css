@@ -9899,7 +9899,7 @@ Thank You dialog
 .chatlink-mobile-body p,
 .chatlink-mobile-body .members {
     font: var(--text-body1);
-    color: var(--text-color-black-low);
+    color: var(--text-color-low);
     text-align: center;
     max-width: 250px;
     margin: 16px auto;
@@ -10306,7 +10306,7 @@ code, c {
     padding: 0 40px;
 }
 .voucher-info-redeem .voucher-logo {
-    width: 340px;
+    width: 80%;
     height: 100px;
     margin-bottom: 26px;
     background-color: #EB4444;
@@ -10345,6 +10345,10 @@ code, c {
     text-align: center;
     padding-top: 6px;
     padding-bottom: 6px;
+}
+.voucher-info-redeem .mobile.voucher-block .plan-info-container {
+    display: flex;
+    align-items: center;
 }
 .voucher-info-redeem .plan-icon {
     height: 32px;
@@ -10428,10 +10432,6 @@ code, c {
 @media only screen and (max-width: 420px) {
     .voucher-info-redeem .mobile.voucher-block {
         padding: 0 24px;
-    }
-    .voucher-info-redeem .mobile.voucher-block .plan-info-container {
-        display: flex;
-        align-items: center;
     }
     .voucher-info-redeem .voucher-logo {
         width: 100%;

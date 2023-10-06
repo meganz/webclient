@@ -144,6 +144,7 @@
                 loadSubPage('fm/account');
             });
             this.$step2.removeClass('hidden');
+            this.$page.addClass('overlay-confirm');
         },
     };
 })(mobile.settings.account);

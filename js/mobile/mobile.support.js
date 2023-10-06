@@ -74,7 +74,7 @@ mobile.support = {
                     if (response === 0) {
 
                         // If they click OK on the confirm dialog, load the cloud drive
-                        mobile.messageOverlay.show(l[7882], l[7881], function() {
+                        mobile.messageOverlay.show(l[7882], l[7881]).then(() => {
                             loadSubPage('fm');
                         });
                     }

@@ -47,9 +47,19 @@ mobile.settings.account.changePassword = {
         var $passwordField = this.$page.find('.password-input');
         var $confirmPasswordField = this.$page.find('.password-confirm-input');
         var $updateButton = this.$page.find('.update-password-button');
+        var $inputs = $passwordField.add($confirmPasswordField);
 
-        $passwordField.val('');
+        $inputs.rebind('input', () => {
+
+            $passwordField.parent().removeClass('incorrect');
+            $confirmPasswordField.parent().removeClass('incorrect');
+        });
+
+        $passwordField.val('').trigger('input');
         $confirmPasswordField.val('');
+
+        $('i.pass-visible', $inputs).removeClass('icon-eye-hidden').addClass('icon-eye-reveal');
+        $inputs.attr({'type': 'password'});
 
         // Add click/tap handler to button
         $updateButton.rebind('tap', () => {
@@ -93,7 +103,7 @@ mobile.settings.account.changePassword = {
                     $verifyActionPage.addClass('hidden');
 
                     // Show 'Your password has been changed' message and load the account page on button click
-                    mobile.messageOverlay.show(l[725], null, () => loadSubPage('fm/account'));
+                    mobile.messageOverlay.show(l[725], null).then(() => loadSubPage('fm/account'));
                 })
                 .catch((ex) => {
                     $page.removeClass('hidden');
@@ -173,7 +183,7 @@ mobile.settings.account.changePassword = {
             $verifyActionPage.addClass('hidden');
 
             // Show 'Your password has been changed' message and load the account page on button click
-            mobile.messageOverlay.show(l[725], null, function() {
+            mobile.messageOverlay.show(l[725], null).then(() => {
                 $page.addClass('hidden');
                 loadSubPage('fm/account');
             });

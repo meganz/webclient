@@ -121,7 +121,7 @@ mobile.settings.account.cancel = {
                 delete localStorage.beingAccountCancellation;
 
                 // Show message that the cancellation link has expired and to try again
-                mobile.messageOverlay.show(l[6184], l[6185], '', function() {
+                mobile.messageOverlay.show(l[6184], l[6185], false, false, false, true).catch(() => {
                     loadSubPage('fm/account');
                 });
             }

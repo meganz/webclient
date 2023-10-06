@@ -247,7 +247,7 @@ class MegaMobileTopMenu extends MegaMobileComponent {
             return page;
         }
 
-        if (/notifications|about|support|file-management/.test(page) ||
+        if (/\/(notifications|about|support|file-management|settings)$/.test(page) ||
             page.includes('security') && !page.includes('change-password') && !page.includes('change-email')) {
             return '/fm/account/settings';
         }

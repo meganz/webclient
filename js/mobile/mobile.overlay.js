@@ -30,7 +30,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
             if (mega.ui.toast) {
                 mega.ui.toast.rack.removeClass('above-actions');
             }
-            this.trigger('close.mobileOverlay');
+            this.trigger('close');
         });
 
         subNode = document.createElement('div');

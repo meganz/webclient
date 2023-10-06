@@ -1246,8 +1246,6 @@ function closeDialog() {
 function closeMsg() {
     'use strict';
 
-    fm_hideoverlay();
-
     delete $.msgDialog;
     mBroadcaster.sendMessage('msgdialog-closed');
 }

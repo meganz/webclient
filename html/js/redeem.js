@@ -169,7 +169,7 @@ var redeem = {
                     message = submessage;
                 }
 
-                const promise = mobile.messageOverlay.show(title, message, icon, buttons);
+                const promise = mobile.messageOverlay.show(title, message, icon, buttons, false, true);
 
                 if (error) {
                     // For warning dialog it is reversed on desktop
@@ -873,7 +873,7 @@ var redeem = {
         }
         else {
             parsepage(pages['mvoucherinfo']);
-            infoFilling($);
+            infoFilling();
         }
     },
 

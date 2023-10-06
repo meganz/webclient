@@ -68,7 +68,7 @@ mobile.twofactor.verifyDisable = {
 
                     // The Two-Factor has already been disabled
                     if (response === ENOENT) {
-                        mobile.messageOverlay.show(l[19217], l[19218], () => {
+                        mobile.messageOverlay.show(l[19217], l[19218]).then(() => {
                             loadSubPage('fm/account/');
                         });
                     }

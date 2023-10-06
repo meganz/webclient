@@ -103,6 +103,14 @@
     color: var(--mobile-text-secondary);
 }
 
+.my-account-change-email-page.overlay-confirm {
+    position: absolute;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    z-index: 1100;
+}
+
 /** Developer Settings Page **/
 .bottom-page.developer-settings > *:not(.main-pad-block),
 .bottom-page.developer-settings > .mobile.fm-header {

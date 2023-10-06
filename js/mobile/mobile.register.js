@@ -390,7 +390,8 @@ mobile.register = {
     initCancelRegistrationButton: function($button) {
         'use strict';
         $button.off('tap').on('tap', function() {
-            mobile.messageOverlay.show(l[5710], false, mobile.register.abort, false, false, [l[79], l[78]]);
+            mobile.messageOverlay.show(l[5710], false, false, [l[78], l[79]])
+                .then((a0) => mobile.register.abort(a0)).catch(dump);
         });
     },
 
@@ -556,7 +557,7 @@ mobile.register.new = {
 
         // Show an error if the email is already in use
         else if (result === EEXIST) {
-            mobile.messageOverlay.show(l[7869], '', () => {
+            mobile.messageOverlay.show(l[7869], '').then(() => {
                 if (isEphemeral()) {
                     // Prevent the ephemeral session in mobile web if the email has been registered
                     u_logout(true);

@@ -1028,7 +1028,7 @@ var slideshowid;
 
         // Bind static events is viewer is not in slideshow mode to avoid unnecessary rebinds
         if (!slideshowplay) {
-            $overlay.removeClass('fullscreen browserscreen mouse-idle slideshow video pdf');
+            $overlay.removeClass('fullscreen browserscreen mouse-idle slideshow video pdf docx');
 
             // Bind keydown events
             $document.rebind('keydown.slideshow', function(e) {

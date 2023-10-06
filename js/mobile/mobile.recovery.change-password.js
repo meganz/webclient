@@ -196,7 +196,7 @@ mobile.recovery.changePassword = {
         security.resetKey(recoveryCode, recoveryKeyArray, recoveryEmail, newPassword)
             .then(() => {
                 // Show message that the password has been reset successfully
-                mobile.messageOverlay.show(l[1955], l[1981], function() {
+                mobile.messageOverlay.show(l[1955], l[1981]).then(() => {
 
                     // Pre-fill the email on the login page
                     mobile.signin.previousEmailUsed = recoveryEmail;
@@ -231,7 +231,7 @@ mobile.recovery.changePassword = {
             if (responseCode === 0) {
 
                 // Show message that the account has been parked successfully
-                mobile.messageOverlay.show(l[1975], l[1976], function() {
+                mobile.messageOverlay.show(l[1975], l[1976]).then(() => {
 
                     // Pre-fill the email on the login page
                     mobile.signin.previousEmailUsed = recoveryEmail;
@@ -257,7 +257,7 @@ mobile.recovery.changePassword = {
 
             // This recovery link has expired
             else if (responseCode === EEXPIRED || responseCode === ENOENT) {
-                mobile.messageOverlay.show(l[1966], l[1967], function() {
+                mobile.messageOverlay.show(l[1966], l[1967]).then(() => {
                     loadSubPage('login');
                 });
             }

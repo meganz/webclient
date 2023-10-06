@@ -240,7 +240,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             if (this.overlayAccount) {
 
-                api.req({a: 'maf', v: mega.achievem.RWDLVL}).then((res) => {
+                api.req({a: 'maf', v: mega.achievem.RWDLVL}).then(({result: res}) => {
                     if (typeof res === 'object') {
                         this.domNode.componentSelector('.achievement-btn').show();
                     }
@@ -306,7 +306,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                             // Check if there are any active subscriptions
                             // ccqns = Credit Card Query Number of Subscriptions
 
-                            const numOfSubscriptions = await api.req({a: 'ccqns'}).catch(dump);
+                            const {result: numOfSubscriptions} = await api.req({a: 'ccqns'}).catch(dump);
 
                             if (numOfSubscriptions.result > 0) {
                                 mobile.settings.account.openSubConfirmOverlay();
@@ -327,6 +327,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                 this.generateMenuItem(this.domNode, {
                     text: l[16115],
                     icon: 'sprite-mobile-fm-mono icon-user-x-thin-outline',
+                    componentClassname: 'delete-account hidden',
                     binding: () => {
                         eventlog(99844);
 
@@ -411,7 +412,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             'use strict';
 
             // Show dialog asking for confirmation and continue if they agree
-            mobile.messageOverlay.show(l[6181], confirmMessage, () => {
+            mobile.messageOverlay.show(l[6181], confirmMessage, false, false, false, true).then(() => {
 
                 loadingDialog.show();
 
@@ -434,11 +435,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                         mobile.settings.account.continueAccountCancelProcess($page, twoFactorPin || null);
                     })
                     .catch(tell);
-            }, () => {
-
-                // Close button callback to re-show the My Account page
-                $page.removeClass('hidden');
-            });
+            }).catch(dump);
         },
     },
 
@@ -466,7 +463,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             loadingDialog.show();
 
             // Make account cancellation request
-            api.req(request).then(result => {
+            api.req(request).then(({result}) => {
                 loadingDialog.hide();
 
                 // If something went wrong with the 2FA PIN
@@ -506,6 +503,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             const payCardBtn = this.domNode.componentSelector('.payment-card-btn');
             const cancelSubsBtn = this.domNode.componentSelector('.cancel-subscription');
+            const delAccountBtn = this.domNode.componentSelector('.delete-account');
 
             payCardBtn.hide();
             cancelSubsBtn.hide();
@@ -550,6 +548,10 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
                         cancelSubsBtn.show();
                     }
+                }
+
+                if (delAccountBtn) {
+                    delAccountBtn.show();
                 }
             });
         },

@@ -12,7 +12,7 @@ class MegaMobileSheet extends MegaMobileOverlay {
                     return false;
                 }
                 this.hide();
-                this.trigger('close.mobilesheet');
+                this.trigger('close');
             }
         });
     }
@@ -84,13 +84,6 @@ class MegaMobileSheet extends MegaMobileOverlay {
                 this.type = options.type || 'normal';
                 this.height = options.sheetHeight || 'auto';
                 this.preventBgClosing = options.preventBgClosing || false;
-
-                if (options.onClose) {
-                    this.on('close.mobilesheet', options.onClose);
-                }
-                else {
-                    this.off('close.mobilesheet');
-                }
             });
         }
         else {
@@ -100,7 +93,7 @@ class MegaMobileSheet extends MegaMobileOverlay {
             if (!this.height) {
                 this.height = 'auto';
             }
-            this.preventBgClosing = false;
+            this.preventBgClosing = this.preventBgClosing || false;
 
             super.show();
         }

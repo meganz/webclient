@@ -636,16 +636,14 @@ mobile.affiliate = {
                         mobile.messageOverlay.show(
                             l[23374],
                             l[23307],
-                            function() {
-
-                                affiliateRedemption.updateAccInfo();
-
-                                $('.redeem-button[data-step="4"]', self.$page).data('confirmUpdate', false);
-                            },
                             false,
-                            false,
-                            [l[79], l[78]]
-                        );
+                            [l[78], l[79]]
+                        ).then(() => {
+
+                            affiliateRedemption.updateAccInfo();
+
+                            $('.redeem-button[data-step="4"]', self.$page).data('confirmUpdate', false);
+                        }).catch(dump);
                     }
 
                     affiliateRedemption.processSteps().then(async res => {
@@ -662,18 +660,16 @@ mobile.affiliate = {
                                 mobile.messageOverlay.show(
                                     l[23374],
                                     l.referral_bitcoin_update,
-                                    () => {
-
-                                        affiliateRedemption.updateAccInfo();
-
-                                        $('.redeem-button[data-step="3"]', self.$page).data('confirmUpdate', false);
-
-                                        resolve();
-                                    },
-                                    resolve,
                                     false,
-                                    [l[79], l[78]]
-                                );
+                                    [l[78], l[79]]
+                                ).then(() => {
+
+                                    affiliateRedemption.updateAccInfo();
+
+                                    $('.redeem-button[data-step="3"]', self.$page).data('confirmUpdate', false);
+
+                                    resolve();
+                                }).catch(resolve);
                             });
                         }
 
@@ -685,12 +681,11 @@ mobile.affiliate = {
                                     l[24964],
                                     l[24965],
                                     false,
-                                    () => {
-                                        self.closeRedeemPage();
-                                        return false;
-                                    },
-                                    false,
-                                    [l[79], l[78]]);
+                                    [l[78], l[79]]
+                                ).catch(() => {
+                                    self.closeRedeemPage();
+                                    return false;
+                                });
                             }
 
                             currentStep++;

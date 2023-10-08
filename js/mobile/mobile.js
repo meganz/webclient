@@ -997,26 +997,6 @@ mega.tpw = {
     clearRows: function() {}
 };
 
-var nicknames = {
-    cache: {},
-    getNickname: function(user) {
-        'use strict';
-        if (typeof user === 'string') {
-            user = M.getUserByHandle(user);
-        }
-        if (user) {
-            // Set format to FirstName LastName (or just FirstName if the last name is not set)
-            return String(user.nickname || user.fullname || user.name || user.m).trim();
-        }
-
-        return '';
-    },
-    // eslint-disable-next-line no-empty-function
-    getNicknameAndName: function() {},
-    decryptAndCacheNicknames: function() {},
-    updateNicknamesFromActionPacket: function() {}
-};
-
 var notify = {
     init: function() {},
     async notifyFromActionPacket() {

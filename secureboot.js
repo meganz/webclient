@@ -2684,8 +2684,9 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/languageDialog.js', n: 'languageDialog_js', j:1,w:7});
     jsl.push({f:'css/jquery-ui.extra.css', n: 'jquery_ui_extra_css', j:2,w:5,c:1,d:1,cache:1});
 
+    jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
+
     if (!is_mobile) {
-        jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
         jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});

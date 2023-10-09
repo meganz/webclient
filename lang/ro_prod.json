@@ -3945,8 +3945,6 @@
     "move_folder_info": "Muta\u021bi acest folder din backup-uri \u00eentr-o alt\u0103 loca\u021bie din Unitatea cloud pentru a ob\u021bine acces complet la datele dvs. Acest folder nu va mai fi backupuit.",
     "move_folder_label": "Mut\u0103 folderul",
     "move_folders_to_bin": "{count, plural, one {Muta\u021bi \u201e%1\u201d la Co\u0219ul de gunoi?} few {Muta\u021bi # elemente \u00een Co\u0219ul de gunoi?} other {Muta\u021bi # de elemente \u00een Co\u0219ul de gunoi?}}",
-    "move_linked_file_to_shared_folder": "Mut\u0103 \u201e%1\u201d la \u201e%2\u201d?",
-    "move_linked_folder_to_shared_folder": "Mut\u0103 \u201e%1\u201d la \u201e%2\u201d?",
     "move_rubbish_files": "{count, plural, one {Sigur vrei s\u0103 mu\u021bi # fi\u0219ier \u00een Co\u0219ul de gunoi?} few {Sigur vrei s\u0103 mu\u021bi # fi\u0219iere \u00een Co\u0219ul de gunoi?} other {Sigur vrei s\u0103 mu\u021bi # de fi\u0219iere \u00een Co\u0219ul de gunoi?}}",
     "move_rubbish_folders": "{count, plural, one {Sigur vrei s\u0103 mu\u021bi # folder \u00een Co\u0219ul de gunoi?} few {Sigur vrei s\u0103 mu\u021bi # foldere \u00een Co\u0219ul de gunoi?} other {Sigur vrei s\u0103 mu\u021bi # de foldere \u00een Co\u0219ul de gunoi?}}",
     "move_rubbish_items": "{count, plural, one {Sigur vrei s\u0103 mu\u021bi # element \u00een Co\u0219ul de gunoi?} few {Sigur vrei s\u0103 mu\u021bi # elemente \u00een Co\u0219ul de gunoi?} other {Sigur vrei s\u0103 mu\u021bi # de elemente \u00een Co\u0219ul de gunoi?}}",

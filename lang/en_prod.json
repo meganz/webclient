@@ -3945,8 +3945,6 @@
     "move_folder_info": "Move this folder from backups to another location in your Cloud drive to get full access to your data. This folder will stop being backed up.",
     "move_folder_label": "Move folder",
     "move_folders_to_bin": "{count, plural, one {Move \u201c%1\u201d to Rubbish bin?} other {Move # items to the Rubbish bin?}}",
-    "move_linked_file_to_shared_folder": "Move \u201c%1\u201d to \u201c%2\u201d?",
-    "move_linked_folder_to_shared_folder": "Move \u201c%1\u201d to \u201c%2\u201d?",
     "move_rubbish_files": "{count, plural, one {Are you sure that you want to move # file to the Rubbish bin?} other {Are you sure that you want to move # files to the Rubbish bin?}}",
     "move_rubbish_folders": "{count, plural, one {Are you sure that you want to move # folder to the Rubbish bin?} other {Are you sure that you want to move # folders to the Rubbish bin?}}",
     "move_rubbish_items": "{count, plural, one {Are you sure that you want to move # item to the Rubbish bin?} other {Are you sure that you want to move # items to the Rubbish bin?}}",

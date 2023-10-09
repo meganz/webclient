@@ -3945,8 +3945,6 @@
     "move_folder_info": "Pindahkan folder ini dari cadangan ke lokasi lain di drive cloud anda untuk mendapatkan akses penuh ke data anda. Folder ini akan berhenti dicadangkan.",
     "move_folder_label": "Pindahkan folder",
     "move_folders_to_bin": "{count, plural, other {Pindahkan # item ke tempat sampah?}}",
-    "move_linked_file_to_shared_folder": "Pindahkan \u201c%1\u201d ke \u201c%2\u201d?",
-    "move_linked_folder_to_shared_folder": "Pindahkan \u201c%1\u201d ke \u201c%2\u201d?",
     "move_rubbish_files": "{count, plural, other {Apakah anda yakin ingin memindahkan # file ke Sampah?}}",
     "move_rubbish_folders": "{count, plural, other {Apakah anda yakin ingin memindahkan # folder ke Sampah?}}",
     "move_rubbish_items": "{count, plural, other {Apakah anda yakin ingin memindahkan # barang ke Sampah?}}",

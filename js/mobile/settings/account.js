@@ -242,14 +242,20 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
                 api.req({a: 'maf', v: mega.achievem.RWDLVL}).then(({result: res}) => {
                     if (typeof res === 'object') {
-                        this.domNode.componentSelector('.achievement-btn').show();
+                        const achievementBtn = this.domNode.componentSelector('.achievement-btn');
+                        if (achievementBtn) {
+                            achievementBtn.show();
+                        }
                     }
                 }).catch(dump);
             }
             else {
                 M.accountData(() => {
                     if (M.account.maf) {
-                        this.domNode.componentSelector('.achievement-btn').show();
+                        const achievementBtn = this.domNode.componentSelector('.achievement-btn');
+                        if (achievementBtn) {
+                            achievementBtn.show();
+                        }
                     }
                 });
             }
@@ -505,8 +511,12 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             const cancelSubsBtn = this.domNode.componentSelector('.cancel-subscription');
             const delAccountBtn = this.domNode.componentSelector('.delete-account');
 
-            payCardBtn.hide();
-            cancelSubsBtn.hide();
+            if (payCardBtn) {
+                payCardBtn.hide();
+            }
+            if (cancelSubsBtn) {
+                cancelSubsBtn.hide();
+            }
 
             if (M.storageQuotaCache) {
 

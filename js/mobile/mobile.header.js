@@ -332,13 +332,19 @@ class MegaMobileHeader extends MegaMobileComponent {
         const noTableView = isPublicLink() || isPublickLinkV2() || page.startsWith('businesssignup');
         const _hide = () => {
 
-            holderContainer.classList.add('no-tablet-layout');
+            const holderContainer = document.getElementById('holderContainer');
+            if (holderContainer) {
+                holderContainer.classList.add('no-tablet-layout');
+            }
             this.hide();
         };
 
         if (is_fm() || noTableView) {
 
-            holderContainer.classList[noTableView ? 'add' : 'remove']('no-tablet-layout');
+            const holderContainer = document.getElementById('holderContainer');
+            if (holderContainer) {
+                holderContainer.classList[noTableView ? 'add' : 'remove']('no-tablet-layout');
+            }
 
             const type = MegaMobileHeader.getType();
 
@@ -370,7 +376,7 @@ class MegaMobileHeader extends MegaMobileComponent {
 
         if (!mega.ui.header) {
             mega.ui.header = new MegaMobileHeader({
-                parentNode: holderContainer,
+                parentNode: document.getElementById('holderContainer'),
                 componentClassname: 'mega-header',
                 prepend: true
             });

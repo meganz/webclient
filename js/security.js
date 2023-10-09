@@ -257,7 +257,7 @@ var security = {
 
         saltBase64 = saltBase64 === undefined ? u_attr && u_attr.aas || '' : saltBase64;
         if (!saltBase64) {
-            return resolve(prepare_key_pw(password));
+            return prepare_key_pw(password);
         }
 
         // Convert the salt and password to byte arrays

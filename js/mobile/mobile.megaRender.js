@@ -137,7 +137,9 @@ class MobileMegaRender {
                     this.megaList.updateOptions(this.getMListOptions());
                 }
 
-                this.megaList.options.renderAdapter.createFiller();
+                if (typeof this.megaList.options.renderAdapter.createFiller === 'function') {
+                    this.megaList.options.renderAdapter.createFiller();
+                }
             }));
 
             $(window).trigger("resize.createFillerNode");
@@ -362,7 +364,9 @@ class MobileMegaRender {
         if (M.v.length) {
 
             onIdle(() => {
-                this.lastScrollTop = M.megaRender.megaList.listContainer.scrollTop;
+                if (M.megaRender.megaList && M.megaRender.megaList.listContainer) {
+                    this.lastScrollTop = M.megaRender.megaList.listContainer.scrollTop;
+                }
             });
         }
     }

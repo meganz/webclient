@@ -44,7 +44,10 @@ mobile.passwordDecryption = {
                 disabled: true
             });
 
-            startholder.append(this.pwdDecryption);
+            const startHolder = document.getElementById('startholder');
+            if (startHolder) {
+                startholder.append(this.pwdDecryption);
+            }
 
             // Initialise the Decrypt button
             this.initDecryptButton(dButton, dKeyInput);

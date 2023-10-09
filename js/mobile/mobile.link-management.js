@@ -64,15 +64,7 @@ mobile.linkManagement = {
 
             mega.ui.overlay.addContent(this.container);
 
-            this.bottomBar = this.createBottomBar();
-            this.bottomBarBtn = this.bottomBar.actions[0];
-            this.bottomBarBtn.rebind('touchend', () => {
-                if (this.copyLinkToClipboard) {
-                    navigator.clipboard.writeText(this.pwdProtectedLink || this.formatLink());
-                    mega.ui.toast.show(l.mobile_link_copied_toast_text, 4);
-                    this.copyLinkToClipboard = null; // reset
-                }
-            });
+            this.createBottomBar();
         };
 
         const mdList = mega.fileRequestCommon.storage.isDropExist(this.handle);
@@ -86,7 +78,7 @@ mobile.linkManagement = {
     },
 
     /**
-     * Creates and returns a bottom bar component for use on this overlay
+     * Creates and 'returns' a bottom bar component for use on this overlay
      * @returns {MegaMobileBottomBar} bottom bar component
      */
     createBottomBar: function() {
@@ -96,20 +88,20 @@ mobile.linkManagement = {
             [
                 ['copy-link', l.mobile_manage_link_copy_link_button, () => {
                     const link = this.pwdProtectedLink || this.formatLink();
+                    navigator.clipboard.writeText(link);
+                    mega.ui.toast.show(l.mobile_link_copied_toast_text, 4);
 
-                    // If the user taps 'Copy link' after entering a password that will cause
-                    // the link to change, then copy the link only after it has changed
                     if (this.passwordInput) {
                         const pwdInput = this.passwordInput.$input.val();
 
-                        if (pwdInput.length >= 3 && pwdInput !== this.currentPassword ||
-                            pwdInput.length < 3 && this.currentPassword) {
-                            return;
+                        // User has tapped the Copy link button after entering / clearing their password
+                        if (pwdInput && this.currentPassword !== pwdInput ||
+                            !pwdInput && this.currentPassword) {
+                            delay('pwd-focus', () => {
+                                this.passwordInput.$input.trigger('focus');
+                            }, 30);
                         }
                     }
-
-                    navigator.clipboard.writeText(link);
-                    mega.ui.toast.show(l.mobile_link_copied_toast_text, 4);
                 }]
             ]
         ];
@@ -350,10 +342,6 @@ mobile.linkManagement = {
 
         exportPassword.deriveKey(algorithm, linkInfo.saltBytes, this.currentPassword, (derivedKeyBytes) => {
             exportPassword.encrypt.encryptAndMakeLink(linkInfo, derivedKeyBytes);
-
-            if (this.copyLinkToClipboard) {
-                this.bottomBarBtn.trigger('touchend');
-            }
         });
     },
 
@@ -414,13 +402,12 @@ mobile.linkManagement = {
         // Validate the password if:
         // 1. Event is blur and e.relatedTarget doesn't exist
         // 2. User taps enter on their keyboard
-        // 3. User taps eye icon / copy link button / link to HC article
+        // 3. User taps eye icon or link to HC article
         this.passwordInput.$input.rebind('blur.passwordCheck keyup.passwordCheck change.passwordCheck', (e) => {
             const clickedAway = e.type === 'blur' && !e.relatedTarget;
             const enterTapped = e.which === 13;
-            const passwordInput = this.passwordInput.$input.val();
 
-            const relatedTargets = ['pass-visible', 'copy-link', 'hc-article'];
+            const relatedTargets = ['pass-visible', 'hc-article'];
             const relatedTargetsTapped = e.relatedTarget &&
                 relatedTargets.some(className => e.relatedTarget.classList.contains(className));
 
@@ -429,14 +416,7 @@ mobile.linkManagement = {
                     this.passwordInput.$wrapper.find('.clear-input').addClass('hidden');
                 }
 
-                this.copyLinkToClipboard = e.relatedTarget &&
-                    e.relatedTarget.classList.contains('copy-link') &&
-                    (passwordInput.length >= 3 && passwordInput !== this.currentPassword ||
-                    passwordInput.length < 3 && this.currentPassword);
-
-                if (!this.validatePassword() && this.copyLinkToClipboard) {
-                    this.bottomBarBtn.trigger('touchend');
-                }
+                this.validatePassword();
             }
         });
     },
@@ -570,7 +550,7 @@ mobile.linkManagement = {
             'nodesToProcess': [handle]
         });
 
-        const res = await exportLink[removeLink ? 'removeExportLink' : 'getExportLink']();
+        const res = await exportLink[removeLink ? 'removeExportLink' : 'getExportLink']().catch(dump);
 
         if (removeLink && res && res.length) {
             mega.ui.toast.show(l.mobile_link_removed_toast_text, 4);

@@ -927,8 +927,12 @@ mBroadcaster.once('startMega:mobile', function() {
     const holderContainer = mCreateElement('div', {'id': 'holderContainer',
                                                    'class': 'holder-container no-tablet-layout'});
 
-    pageholder.after(holderContainer);
-    holderContainer.append(startholder, fmholder);
+    const pageholder = document.getElementById('pageholder');
+    if (pageholder) {
+        pageholder.after(holderContainer);
+    }
+
+    holderContainer.append(document.getElementById('startholder'), document.getElementById('fmholder'));
 
     var setBodyClass = function() {
 

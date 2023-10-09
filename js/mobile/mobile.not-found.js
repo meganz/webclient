@@ -51,7 +51,10 @@ mobile.notFound = {
         subNode.textContent = title;
         wrapper.append(subNode, contentNode);
 
-        startholder.append(wrapper);
+        const startHolder = document.getElementById('startholder');
+        if (startHolder) {
+            startholder.append(wrapper);
+        }
 
         // Set System default theme or any previously selected
         mega.ui.setTheme();

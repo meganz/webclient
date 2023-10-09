@@ -136,11 +136,14 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             fmlist.classList.add('hidden');
         }
 
-        if (isLink) {
-            holderContainer.classList.add('fm-overlay-link');
-        }
-        else {
-            holderContainer.classList.add('fm-overlay-view');
+        const holderContainer = document.getElementById('holderContainer');
+        if (holderContainer) {
+            if (isLink) {
+                holderContainer.classList.add('fm-overlay-link');
+            }
+            else {
+                holderContainer.classList.add('fm-overlay-view');
+            }
         }
     }
 
@@ -160,7 +163,10 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             // make sure resize is triggered after hidden is gone for render megalist correctly
             $(window).trigger('resize');
         }
-        holderContainer.classList.remove('fm-overlay-view', 'fm-overlay-link');
+        const holderContainer = document.getElementById('holderContainer');
+        if (holderContainer) {
+            holderContainer.classList.remove('fm-overlay-view', 'fm-overlay-link');
+        }
 
         if (mobile.cloud.bottomBar) {
             mobile.cloud.bottomBar.show();
@@ -346,6 +352,10 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
     static init() {
         // Create and handle a specific overlay for file view
         // Note that this will be displayed inside the file-manager-block
+        const holderContainer = document.getElementById('holderContainer');
+        if (!holderContainer) {
+            return;
+        }
         mega.ui.viewerOverlay = new MegaMobileViewOverlay({
             parentNode: holderContainer.querySelector('.file-manager-block'),
             componentClassname: 'mega-overlay mega-overlay-view',

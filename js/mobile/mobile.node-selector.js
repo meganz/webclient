@@ -181,7 +181,7 @@ mobile.nodeSelector = {
 
         'use strict';
 
-        if (!event.state.nodeSelector) {
+        if (event.state && !event.state.nodeSelector) {
             mobile.nodeSelector.hide(false, true);
         }
     },

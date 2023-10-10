@@ -84,6 +84,13 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
         }
         i = escapeHTML(n.h);
         if (typeof dialog === 'undefined') {
+
+            // Clear folder link tree pane
+            if (!folderlink && rebuild
+                && (node = document.querySelector('.js-other-tree-panel .content-panel.cloud-drive ul'))) {
+                node.remove();
+            }
+
             if (rebuild || $('.content-panel.cloud-drive ul').length === 0) {
                 $(`${wrapperClass} .content-panel.cloud-drive .tree`)
                     .safeHTML(`<ul id="treesub_${i}"></ul>`);

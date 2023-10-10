@@ -3006,27 +3006,26 @@ body.de .mega-dialog.contact-picker-widget {
         position: relative;
     }
     .mega-dialog.fm-picker-dialog .user-card-email.small.note {
-        background: var(--surface-grey-1);
-        border-radius: 0 0 12px 12px;
         color: var(--text-color-high);
         font: var(--text-body2);
         padding: 8px 16px;
-        position: relative;
         text-align: center;
-        z-index: 123;
+        border-radius: 4px;
+        background: var(--surface-grey-1);
+        margin: 12px 0 0;
+        -webkit-margin-end: -8px;
+        margin-inline-end: -8px;
+        -webkit-margin-start: -58px;
+        margin-inline-start: -58px;
     }
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview,
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .contacts-info.body,
+    .mega-dialog.fm-picker-dialog .dropdown.contact-preview {
+        padding: 12px 20px;
+    }
     .mega-dialog.fm-picker-dialog .dropdown.contact-preview .user-card-data {
-        padding: 0;
+        padding-right: 0;
     }
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .user-card-wrap {
-        padding: 12px;
-    }
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .avatar-wrapper {
-        margin: 1px 0;
-        -webkit-margin-end: 8px;
-        margin-inline-end: 8px;
+    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .contacts-info.body {
+        padding: 0 8px;
     }
     .mega-dialog.fm-picker-dialog .summary-items.multi {
         cursor: pointer;

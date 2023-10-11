@@ -161,7 +161,7 @@ class ParticipantsListInner extends MegaRenderMixin {
         var scrollPositionY = this.props.scrollPositionY;
         var scrollHeight = this.props.scrollHeight;
 
-        const {FULL, OPERATOR, READONLY} = ChatRoom.MembersSet.PRIVILEGE_STATE;
+        const { OPERATOR, FULL, READONLY } = ChatRoom.MembersSet.PRIVILEGE_STATE;
 
         if (!room) {
             // destroyed
@@ -205,7 +205,7 @@ class ParticipantsListInner extends MegaRenderMixin {
         };
 
         for (var i = 0; i < contacts.length; i++) {
-            var contactHash = contacts[i];
+            const contactHash = contacts[i];
             if (!(contactHash in M.u)) {
                 continue;
             }
@@ -240,37 +240,54 @@ class ParticipantsListInner extends MegaRenderMixin {
 
                     dropdowns.push(
                         <DropdownsUI.DropdownItem
-                            key="privOperator" icon="sprite-fm-mono icon-admin-outline"
+                            key="privOperator"
+                            icon="sprite-fm-mono icon-admin-outline"
                             label={l[8875]}
-                            className={"tick-item " + (room.members[contactHash] === FULL ? "active" : "")}
+                            className={`
+                                tick-item
+                                ${room.members[contactHash] === OPERATOR ? 'active' : ''}
+                            `}
                             disabled={contactHash === u_handle}
-                            onClick={onSetPrivClicked.bind(this, contactHash, FULL)} />
+                            onClick={() => onSetPrivClicked(contactHash, OPERATOR)}
+                        />
                     );
 
                     dropdowns.push(
                         <DropdownsUI.DropdownItem
-                            key="privFullAcc" icon="sprite-fm-mono icon-chat"
-                            className={"tick-item " + (room.members[contactHash] === OPERATOR ? "active" : "")}
+                            key="privFullAcc"
+                            icon="sprite-fm-mono icon-chat"
+                            className={`
+                                tick-item
+                                ${room.members[contactHash] === FULL ? 'active' : ''}
+                            `}
                             disabled={contactHash === u_handle}
-                            label={l[8874]} onClick={onSetPrivClicked.bind(this, contactHash, OPERATOR)} />
+                            label={l[8874]}
+                            onClick={() => onSetPrivClicked(contactHash, FULL)}
+                        />
                     );
 
                     dropdowns.push(
                         <DropdownsUI.DropdownItem
-                            key="privReadOnly" icon="sprite-fm-mono icon-read-only"
-                            className={"tick-item " + (room.members[contactHash] === READONLY ? "active" : "")}
+                            key="privReadOnly"
+                            icon="sprite-fm-mono icon-read-only"
+                            className={`
+                                tick-item
+                                ${room.members[contactHash] === READONLY ? 'active' : ''}
+                            `}
                             disabled={contactHash === u_handle}
-                            label={l[8873]} onClick={onSetPrivClicked.bind(this, contactHash, READONLY)}/>
+                            label={l[8873]}
+                            onClick={() => onSetPrivClicked(contactHash, READONLY)}
+                        />
                     );
                 }
 
                 const baseClassName = 'sprite-fm-mono';
                 // other user privilege
                 switch (room.members[contactHash]) {
-                    case FULL:
+                    case OPERATOR:
                         dropdownIconClasses = `${baseClassName} icon-admin`;
                         break;
-                    case OPERATOR:
+                    case FULL:
                         dropdownIconClasses = `${baseClassName} icon-chat-filled`;
                         break;
                     case READONLY:

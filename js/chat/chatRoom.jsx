@@ -480,11 +480,11 @@ ChatRoom.MembersSet = function(chatRoom) {
 };
 
 ChatRoom.MembersSet.PRIVILEGE_STATE = {
-    'NOT_AVAILABLE': -5,
-    'FULL': 3,
-    'OPERATOR': 2,
-    'READONLY': 0,
-    'LEFT': -1
+    NOT_AVAILABLE: -5,
+    OPERATOR: 3,
+    FULL: 2,
+    READONLY: 0,
+    LEFT: -1
 };
 
 ChatRoom.encryptTopic = function(protocolHandler, newTopic, participants, isPublic = false) {
@@ -2324,12 +2324,8 @@ ChatRoom.prototype.isReadOnly = function() {
     );
 };
 ChatRoom.prototype.iAmOperator = function() {
-    return this.type === "private"
-        || this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL;
-};
-ChatRoom.prototype.iAmStandard = function() {
-    return this.type !== 'private'
-        && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
+    return this.type === 'private'
+        || this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
 };
 ChatRoom.prototype.iAmReadOnly = function() {
     return this.type !== 'private'

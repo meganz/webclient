@@ -441,9 +441,10 @@ def merge_language(main, branch):
             main[code][key] = data
     print("Completed.")
 
-def string_validation(new_strings):
+def string_validation(new_strings, en_strings):
     branch_name = subprocess.check_output(['git', 'symbolic-ref', '--short','-q','HEAD'], universal_newlines=True).strip()
     valid_strings = True
+    to_remove = []
     for key, data in new_strings.items():
         if 'string' not in data:
             print('ERROR: String with key {} has no string.'.format(key))
@@ -461,8 +462,34 @@ def string_validation(new_strings):
             print('ERROR: Developer comment for string with key {} does not start with a JIRA ticket id e.g: WEB-16334: Comment content'.format(key))
             valid_strings = False
         else:
-            new_strings[key]['string'] = sanitise_string(data['string'], True, False)
-            print('Accepted: String with key {} is valid.'.format(key))
+            sanitised = sanitise_string(data['string'], True, False)
+            should_add = True
+            if sanitised != "":
+                for en_key, en_data in en_strings.items():
+                    if en_data["string"] == sanitised:
+                        print("WARNING: A string with the same content as " + key + " already exists: " + en_key + " = " + sanitised)
+                        print("If the string has the same context consider using it instead.")
+                        # May find multiple strings so warn for all until the user rejects or there are no more to check.
+                        note = "Do you want to add a duplicate? (Y/N): "
+                        if sys.version_info.major == 2:
+                            user_input = raw_input(note)
+                        else:
+                            user_input = input(note)
+                        if user_input.lower()[0:1] == "y":
+                            should_add = True
+                        else:
+                            should_add = False
+                            break
+
+            if should_add:
+                new_strings[key]['string'] = sanitised
+                print('Accepted: String with key {} is valid.'.format(key))
+            else:
+                to_remove.append(key)
+    for key in to_remove:
+        new_strings.pop(key)
+    if valid_strings and len(new_strings) == 0:
+        valid_strings = False
     return valid_strings
 
 def validate_strings(key_value_pairs):
@@ -478,7 +505,7 @@ def validate_strings(key_value_pairs):
         sys.exit(1)
     return strings
 
-def get_update(filename):
+def get_update(filename, en_strings):
     new_strings = False
     try:
         new_file = open(filename, "r")
@@ -490,7 +517,7 @@ def get_update(filename):
 
     if new_strings:
         print("New string(s) file found! Checking validity...")
-        if not string_validation(new_strings):
+        if not string_validation(new_strings, en_strings):
             print("ERROR: Invalid new string(s).")
             sys.exit(1)
         else:
@@ -722,7 +749,15 @@ def main():
         except:
             print("Invalid language arguments")
             sys.exit(1)
-    elif args.update != None:
+
+    print("~ Export started ~")
+    print("Fetching Main Language Files...")
+    lang = download_languages(RESOURCE, languages)
+    if not lang:
+        print("Failed to fetch main language files.")
+        sys.exit(1)
+
+    if args.update != None:
         print("~ Import started ~")
         filepath = os.path.dirname(os.path.abspath(__file__)) + "/../lang/strings.json"
         if args.filepath != None:
@@ -730,7 +765,7 @@ def main():
         is_force = args.update == "force"
         is_override = args.update == "override_production"
 
-        new_strings = get_update(filepath)
+        new_strings = get_update(filepath, lang["en"])
         if new_strings:
             is_force = False
 
@@ -786,13 +821,6 @@ def main():
                 print("Completed")
         print("~ Import completed ~")
         print("")
-
-    print("~ Export started ~")
-    print("Fetching Main Language Files...")
-    lang = download_languages(RESOURCE, languages)
-    if not lang:
-        print("Failed to fetch main language files.")
-        sys.exit(1)
 
     print("")
     if not branch_resource_name:

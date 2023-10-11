@@ -482,23 +482,7 @@ lazy(s4, 'ui', () => {
             else {
                 this.selectedTab = null;
                 if (s4.ui.lastPathPart) {
-                    this.$pageBlock = $(`.s4-${subType}-info-content-block`, this.$contentBlocks);
-                    this.$contentBlocks.removeClass('hidden');
-                    this.$pageBlock.removeClass('hidden');
-                    $('.ui-selected', this.$pageBlock).removeClass('ui-selected active');
                     await this.renderSelected();
-                    this.renderSelectedList();
-                    $('.s4-tabs-bl .s4-tab-lnk', this.$pageBlock).rebind('click.s4tab', (e) => {
-                        const attr = e.target.dataset.table;
-                        $('.ui-selected', this.$pageBlock).removeClass('ui-selected active');
-                        $('.s4-tabs-bl .s4-tab-lnk', this.$pageBlock).removeClass('active');
-                        $(e.currentTarget).addClass('active');
-                        $('.s4-info-section', this.$pageBlock).addClass('hidden');
-                        $(`.${attr}`).removeClass('hidden');
-                        const tabName = attr.split('-');
-                        this.selectedTab = tabName.length > 2 ? [tabName[0], tabName[1]].join('-') : tabName[0];
-                        this.renderSelectedList(n);
-                    });
                 }
                 else {
                     const $emptyBlock = $(`div[class*=fm-empty-s4-${subType}]`, '.fm-main');
@@ -563,12 +547,34 @@ lazy(s4, 'ui', () => {
         async renderSelected() {
             const {containerID, subType} = M.currentCustomView;
             const kernelFn = ['policies'].includes(subType) ? subType : subType.slice(0, -1);
-            const selected = await this.getSelected(containerID, s4.ui.lastPathPart, kernelFn);
-            if (selected) {
-                $(`.js-${kernelFn}-name-value`, this.$pageBlock).text(selected.name);
-                $(`.js-${kernelFn}-arn-value span`, this.$pageBlock).text(selected.arn);
-                $(`.js-${kernelFn}-att-num-value`, this.$pageBlock).text(selected.cnt);
+            const selected = await this.getSelected(containerID, s4.ui.lastPathPart, kernelFn)
+                .catch(dump);
+
+            if (!selected) {
+                return M.openFolder(`${containerID}/${subType}`).catch(dump);
             }
+
+            this.$contentBlocks.removeClass('hidden');
+            this.$pageBlock = $(`.s4-${subType}-info-content-block`, this.$contentBlocks);
+            this.$pageBlock.removeClass('hidden');
+            $('.ui-selected', this.$pageBlock).removeClass('ui-selected active');
+            $(`.js-${kernelFn}-name-value`, this.$pageBlock).text(selected.name);
+            $(`.js-${kernelFn}-arn-value span`, this.$pageBlock).text(selected.arn);
+            $(`.js-${kernelFn}-att-num-value`, this.$pageBlock).text(selected.cnt);
+
+            this.renderSelectedList();
+
+            $('.s4-tabs-bl .s4-tab-lnk', this.$pageBlock).rebind('click.s4tab', (e) => {
+                const attr = e.target.dataset.table;
+                $('.ui-selected', this.$pageBlock).removeClass('ui-selected active');
+                $('.s4-tabs-bl .s4-tab-lnk', this.$pageBlock).removeClass('active');
+                $(e.currentTarget).addClass('active');
+                $('.s4-info-section', this.$pageBlock).addClass('hidden');
+                $(`.${attr}`).removeClass('hidden');
+                const tabName = attr.split('-');
+                this.selectedTab = tabName.length > 2 ? [tabName[0], tabName[1]].join('-') : tabName[0];
+                this.renderSelectedList();
+            });
         }
 
         renderSelectedList(n) {

@@ -16,7 +16,7 @@ lazy(s4, 'groups', () => {
             }
 
             if (!s4.kernel.isValidGroupName(name)) {
-                return l.s4_group_not_allowed_chars_error;
+                return l.s4_user_not_allowed_chars_error;
             }
         },
 

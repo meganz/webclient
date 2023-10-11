@@ -73,7 +73,8 @@
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
-.active-folder-link .nw-fm-tree-item .nw-fm-tree-folder {
+.active-folder-link .nw-fm-tree-item .nw-fm-tree-folder,
+.active-folder-link .nw-fm-tree-item .nw-fm-tree-icon-wrap {
     -webkit-margin-start: 28px;
     margin-inline-start: 28px;
 }

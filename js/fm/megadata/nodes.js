@@ -349,34 +349,28 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.prefixPath = '';
     }
     // Check whether the node is a bucket or a container
-    else if (node.s4 && node.t) {
+    else if ('utils' in s4 && node.s4 && node.t) {
         result.original = pathOrID.replace(/_/g, '/');
-        const s4path = s4.utils && s4.utils.getS4SubPath(result.original).reverse() || [0, pathOrID];
+        const s4path = s4.utils.getS4SubPath(result.original).reverse();
 
-        result.original = s4path[1] === s4path[2] ? `${s4path[1]}/` : result.original;
+        result.original = s4path[1] === s4path[2] ? `${s4path[1]}` : result.original;
         result.prefixTree = '';
         result.prefixPath = '';
         result.containerID = s4path[1];
         result.type = 's4';
 
-        if (s4path.length >= 3) {
-
-            result.nodeID = s4path[3] || s4path[2];
+        if (s4path.length > 2) {
+            result.nodeID = s4path[2];
             result.prefixPath = `${s4path[1]}/`;
             result.subType = ['keys', 'policies', 'users', 'groups'].includes(s4path[2]) ? s4path[2] : 'bucket';
-            if (s4path.length === 4) {
-                result.nodeID = s4path[2];
-            }
         }
         else if (s4path.length === 2 && node.p !== M.RootID) {
-
             result.containerID = node.p;
             result.nodeID = s4path[1];
             result.prefixPath = `${node.p}/`;
             result.subType = 'bucket';
         }
-        else {
-
+        else if (s4path.length === 2) {
             result.nodeID = s4path[1];
             result.subType = 'container';
         }
@@ -2683,6 +2677,7 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
 
         // check it need to clear node attribute
         if ($.clearCopyNodeAttr) {
+            delete n.s4;
             delete n.lbl;
             delete n.fav;
         }

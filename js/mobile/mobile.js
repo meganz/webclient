@@ -932,7 +932,7 @@ mBroadcaster.once('startMega:mobile', function() {
         pageholder.after(holderContainer);
     }
 
-    holderContainer.append(document.getElementById('startholder'), document.getElementById('fmholder'));
+    holderContainer.append(...document.getElementsByClassName('fmholder'));
 
     var setBodyClass = function() {
 
@@ -1053,7 +1053,7 @@ function accountUI() {
         return loadSubPage('start');
     }
 
-    const fmBlock = fmholder.querySelector('.file-manager-block');
+    const fmBlock = document.querySelector('#fmholder .file-manager-block');
     if (fmBlock) {
         fmBlock.classList.add('hidden');
     }
@@ -1313,48 +1313,6 @@ function sharedUInode(nodeHandle) {
         }
     }
 }
-
-dlmanager.showLimitedBandwidthDialog = function(res, callback, flags) {
-    'use strict';
-
-    loadingDialog.hide();
-    this.onLimitedBandwidth = function() {
-        if (callback) {
-            closeDialog();
-            Soon(callback);
-            callback = undefined;
-        }
-        delete this.onLimitedBandwidth;
-        return false;
-    };
-
-    flags = flags || this.lmtUserFlags;
-
-    if (d) {
-        this.lmtUserFlags = flags;
-    }
-
-    mobile.overBandwidthQuota.show(false);
-};
-dlmanager.showOverQuotaDialog = function DM_quotaDialog(dlTask, flags) {
-
-    'use strict';
-
-    flags = flags || this.lmtUserFlags;
-
-    if (d) {
-        this.lmtUserFlags = flags;
-    }
-
-    if (this.efq && !(flags & this.LMT_ISREGISTERED)) {
-        return this.showOverQuotaRegisterDialog(dlTask);
-    }
-    loadingDialog.hide();
-
-    this._setOverQuotaState(dlTask);
-
-    mobile.overBandwidthQuota.show(true);
-};
 
 /* eslint-disable strict, no-empty-function */
 

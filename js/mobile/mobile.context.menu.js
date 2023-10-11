@@ -321,6 +321,8 @@ mBroadcaster.once('boot_done', () => {
                     return false;
                 }
 
+                eventlog(99850);
+
                 // Display a sheet
                 mega.ui.sheet.show({
                     name: 'remove-link',

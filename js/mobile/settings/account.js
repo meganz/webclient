@@ -273,6 +273,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                     text:l[22682],
                     icon: 'sprite-mobile-fm-mono icon-users-thin-outline',
                     href: 'fm/refer',
+                    eventLog: 99845,
                 },
                 {
                     text: l[23262],
@@ -380,6 +381,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                 componentClassname: "mobile-log-out",
             });
             logout.on('tap', () => {
+                eventlog(99854, true);
                 mLogout();
                 return false;
             });

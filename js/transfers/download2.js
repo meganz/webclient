@@ -1862,6 +1862,10 @@ var dlmanager = {
                 closeDialog();
                 Soon(callback);
                 callback = $dialog = undefined;
+
+                if (is_mobile) {
+                    tryCatch(() => mobile.overBandwidthQuota.closeSheet())();
+                }
             }
             delete this.onLimitedBandwidth;
             return false;
@@ -1877,6 +1881,11 @@ var dlmanager = {
             // /* 04 */ flags = this.LMT_ISREGISTERED;
 
             this.lmtUserFlags = flags;
+        }
+
+        if (is_mobile) {
+            mobile.overBandwidthQuota.show(false);
+            return;
         }
 
         M.safeShowDialog('download-pre-warning', () => {
@@ -1919,6 +1928,11 @@ var dlmanager = {
 
         $(document).fullScreen(false);
         this._setOverQuotaState(dlTask);
+
+        if (is_mobile) {
+            mobile.overBandwidthQuota.show(true);
+            return;
+        }
 
         if ($dialog.is(':visible') && !$dialog.hasClass('uploads')) {
             this.logger.info('showOverQuotaDialog', 'visible already.');

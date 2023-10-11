@@ -108,6 +108,8 @@ mobile.settingsHelper = {
 
         if (this.domNode) {
 
+            const fmholder = document.getElementById('fmholder');
+
             // For case when popstate between folder link and fm and clear fmholder triggered
             if (!fmholder.contains(mobile.settingsHelper.parentNode)) {
                 fmholder.appendChild(mobile.settingsHelper.parentNode);

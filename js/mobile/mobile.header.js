@@ -330,6 +330,16 @@ class MegaMobileHeader extends MegaMobileComponent {
     update() {
 
         const noTableView = isPublicLink() || isPublickLinkV2() || page.startsWith('businesssignup');
+        const holderContainer = document.getElementById('holderContainer');
+
+        if (!holderContainer) {
+            if (d) {
+                console.error('something is wrong holder container not found');
+            }
+
+            return;
+        }
+
         const _hide = () => {
 
             const holderContainer = document.getElementById('holderContainer');
@@ -374,7 +384,9 @@ class MegaMobileHeader extends MegaMobileComponent {
     static init(update) {
         MegaMobileTopMenu.init();
 
-        if (!mega.ui.header) {
+        const holderContainer = document.getElementById('holderContainer');
+
+        if (!mega.ui.header && holderContainer) {
             mega.ui.header = new MegaMobileHeader({
                 parentNode: document.getElementById('holderContainer'),
                 componentClassname: 'mega-header',

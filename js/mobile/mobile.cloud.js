@@ -372,7 +372,7 @@ mobile.cloud = {
         }
 
         this.bottomBar = new MegaMobileBottomBar({
-            parentNode: fmholder,
+            parentNode: document.getElementById('fmholder'),
             actions: [[actions]]
         });
     }

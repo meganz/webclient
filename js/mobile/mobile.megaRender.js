@@ -288,6 +288,11 @@ class MobileMegaRender {
 
         delay('mobileMegaListScroll', () => {
 
+            // Seem user call destroy megalist while delay
+            if (!M.megaRender.megaList || !M.megaRender.megaList.listContainer) {
+                return;
+            }
+
             const {scrollTop} = M.megaRender.megaList.listContainer;
             const {lastScrollTop, touching} = this;
             const {style: headerStyle, classList: headerClass , originalHeight} = mega.ui.header.bottomBlock;

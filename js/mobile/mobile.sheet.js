@@ -103,6 +103,7 @@ class MegaMobileSheet extends MegaMobileOverlay {
         }
 
         const holderContainer = document.getElementById('holderContainer');
+
         if (holderContainer && !holderContainer.classList.contains('fm-overlay')) {
             holderContainer.classList.add('fm-overlay');
         }

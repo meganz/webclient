@@ -108,7 +108,7 @@ mobile.achieve = {
         'use strict';
 
         // Get achievement bonus information
-        var actualBonusesReceivedInfo = M.account.maf.r;
+        var actualBonusesReceivedInfo = M.account.maf && M.account.maf.r;
         var bonusRewardedInfo = mobile.achieve.getInfoAboutAwardedBonus(classNumber);
 
         // Check the bonus information is available

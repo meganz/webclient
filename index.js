@@ -1620,8 +1620,9 @@ function init_page() {
                     localStorage.removeItem('addContact');
                 });
         }
-    } else if (is_fm()) {
-        var id = false;
+    }
+    else if (is_fm()) {
+        let id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
             if (id.length < 5 && id !== 'chat') {
@@ -1631,13 +1632,6 @@ function init_page() {
 
         if (d) {
             console.log('Setting up fm...', id, pfid, fminitialized, M.currentdirid);
-        }
-
-        // Set System default theme or any previously selected
-        mega.ui.setTheme();
-
-        if (!id && fminitialized) {
-            id = M.RootID;
         }
 
         // FIXME
@@ -1659,9 +1653,13 @@ function init_page() {
             }
         }
 
-        if (localStorage.keycomplete) {
-            delete localStorage.keycomplete;
+        // Set System default theme or any previously selected
+        mega.ui.setTheme();
+
+        if (!id && fminitialized) {
+            id = M.RootID;
         }
+        delete localStorage.keycomplete;
 
         if (!fminitialized) {
             if (is_mobile) {

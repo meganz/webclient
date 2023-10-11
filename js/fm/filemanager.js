@@ -2389,8 +2389,21 @@ FileManager.prototype.initContextUI = function() {
     $(`${c}.managepuburl-item`)
         .rebind('click.managePA', () => s4.ui.showDialog(s4.objects.dialogs.access, M.d[$.selected[0]]));
 
+    if (mega.keyMgr.version) {
+
+        queueMicrotask(() => {
+
+            this.fireKeyMgrDependantActions().catch(dump);
+        });
+    }
+};
+
+FileManager.prototype.fireKeyMgrDependantActions = async function() {
+    'use strict';
+
     if (sessionStorage.folderLinkImport || $.onImportCopyNodes) {
-        onIdle(M.importFolderLinkNodes.bind(M, false));
+
+        await M.importFolderLinkNodes(false);
     }
 };
 

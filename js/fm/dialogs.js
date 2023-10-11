@@ -1440,7 +1440,10 @@
             }
         });
 
-        $('button.js-close, .dialog-cancel-button', $dialog).rebind('click', closeDialog);
+        $('button.js-close, .dialog-cancel-button', $dialog).rebind('click', () => {
+            delete $.onImportCopyNodes;
+            closeDialog();
+        });
 
         $('.fm-picker-dialog-button', $dialog).rebind('click', function _(ev) {
             section = $(this).attr('data-section');

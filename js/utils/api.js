@@ -294,7 +294,7 @@ class MEGAPIRequest {
     }
 
     abort() {
-        const queue = [...this.queue];
+        const queue = [...this.queue, ...this.inflight || []];
 
         if (d && !queue.length) {
             this.logger.warn('Aborting %s API channel...', this.idle ? 'idle' : 'busy', [this]);
@@ -310,7 +310,7 @@ class MEGAPIRequest {
             if (d) {
                 this.logger.warn('Rejecting API Request', payload);
             }
-            reject(new APIRequestError(EROLLEDBACK, tryCatch(structuredClone)(queue[i])));
+            reject(new APIRequestError(EROLLEDBACK, queue[i]));
         }
     }
 

@@ -1255,23 +1255,34 @@ scparser.$add('ua', (a) => {
     'use strict';
 
     if (Array.isArray(a.ua)) {
+        let gotCu255 = false;
         const {st, ua, u: usr, v = false} = a;
+
+        // public-folder allowed -- which ones we can parse under folder-links
+        const pfa = new Set(['*!fmconfig', '^!csp', '^!webtheme', '^!prd']);
 
         // triggered locally?
         const local = st === api.currst;
         const parse = (name) => !local && name !== '^!stbmp' || name === 'firstname' || name === 'lastname';
-        let gotCu255 = false;
 
         for (let idx = 0; idx < ua.length; ++idx) {
             const name = ua[idx];
             const version = v[idx];
             const ck = `${usr}_${name}`;
 
-            gotCu255 = gotCu255 || String(name).includes('Cu255');
-
-            if (local && version && !mega.attr._versions[ck]) {
-                mega.attr._versions[ck] = version;
+            if (local) {
+                if (version && !mega.attr._versions[ck]) {
+                    mega.attr._versions[ck] = version;
+                }
             }
+            else if (pfid && !pfa.has(name)) {
+                if (d) {
+                    console.info(`Ignoring ua-packet ${name}...`, JSON.stringify(a));
+                }
+                continue;
+            }
+
+            gotCu255 = gotCu255 || String(name).includes('Cu255');
 
             if (name === '+a') {
                 loadavatars.push(usr);
@@ -1287,7 +1298,7 @@ scparser.$add('ua', (a) => {
 
         // in case of business master
         // first, am i a master?
-        if (window.u_attr && Object(u_attr.b).m) {
+        if (!pfid && window.u_attr && Object(u_attr.b).m) {
 
             if (Object.hasOwnProperty.call(M.suba, usr) || u_attr.b.bu === usr) {
                 M.require('businessAcc_js', 'businessAccUI_js')

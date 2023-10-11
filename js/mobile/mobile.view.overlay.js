@@ -130,13 +130,14 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
 
         // Show view file overlay
         this.domNode.classList.add('active');
-        const fmlist = fmholder.querySelector('.file-manager-block .fm-list');
+        const fmlist = document.querySelector('#fmholder .file-manager-block .fm-list');
 
         if (fmlist) {
             fmlist.classList.add('hidden');
         }
 
         const holderContainer = document.getElementById('holderContainer');
+
         if (holderContainer) {
             if (isLink) {
                 holderContainer.classList.add('fm-overlay-link');
@@ -154,7 +155,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
     hide() {
         this.domNode.classList.remove('active');
 
-        const fmlist = fmholder.querySelector('.file-manager-block .fm-list');
+        const fmlist = document.querySelector('#fmholder .file-manager-block .fm-list');
 
         if (fmlist) {
 
@@ -163,7 +164,9 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             // make sure resize is triggered after hidden is gone for render megalist correctly
             $(window).trigger('resize');
         }
+
         const holderContainer = document.getElementById('holderContainer');
+
         if (holderContainer) {
             holderContainer.classList.remove('fm-overlay-view', 'fm-overlay-link');
         }
@@ -350,6 +353,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
     }
 
     static init() {
+
         // Create and handle a specific overlay for file view
         // Note that this will be displayed inside the file-manager-block
         const holderContainer = document.getElementById('holderContainer');
@@ -357,7 +361,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             return;
         }
         mega.ui.viewerOverlay = new MegaMobileViewOverlay({
-            parentNode: holderContainer.querySelector('.file-manager-block'),
+            parentNode: document.querySelector('.file-manager-block'),
             componentClassname: 'mega-overlay mega-overlay-view',
             wrapperClassname: 'overlay'
         });

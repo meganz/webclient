@@ -2682,9 +2682,6 @@ function topmenuUI() {
                     langDialog.show();
                 }
                 else if (className.indexOf('logout') > -1) {
-                    if (is_mobile) {
-                        eventlog(99854, true);
-                    }
                     mLogout();
                 }
                 else if (className.indexOf('transparency') > -1) {

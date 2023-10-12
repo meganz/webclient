@@ -2976,6 +2976,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.account.css', n: 'mobile_account_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.notifications.css', n: 'mobile_notifications_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.download.css', n: 'mobile_download_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.promo.banner.css', n: 'mobile_promo_banner_css', j:2,w:5,c:1,d:1,cache:1});
 
         // Sprites
         jsl.push({f:'css/sprites/mobile-fm-uni@uni.css', n: 'mobile_fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
@@ -3097,6 +3098,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.bottom.bar.js', n: 'mobile_bottom_bar_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.view.overlay.js', n: 'mobile_view_overlay_js', j: 1, w:1});
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j: 1, w: 3});
+        jsl.push({f:'js/mobile/mobile.promo.banner.js', n: 'mobile_promo_banner_js', j: 1, w:1});
     }
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});

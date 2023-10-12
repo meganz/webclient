@@ -248,6 +248,7 @@
     height: 32px;
     border-radius: 50px !important;
     min-height: 32px;
+    position: static;
 }
 
 .topbar .mini-search button i::before {

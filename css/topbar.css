@@ -8,6 +8,7 @@
     display: flex;
     background-color: var(--stroke-main);
     height: 48px;
+    padding: 0 16px;
 }
 
 .topbar .logo-wrapper {
@@ -33,16 +34,12 @@
     margin: 0;
     width: auto;
 }
-.topbar .fm-import-download-buttons {
-    margin-left: 16px;
-}
 .topbar .searcher-wrapper {
     flex-grow: 1;
     display: flex;
     justify-content: flex-start;
     align-items: flex-end;
-    -webkit-margin-start: 12px;
-    margin-inline-start: 12px;
+    padding: 0 4px;
 }
 .topbar-searcher {
     max-width: 480px;
@@ -68,7 +65,7 @@
     width: 480px;
     border-radius: 18px;
     position: absolute;
-    margin: 8px;
+    margin: 8px 0;
     z-index: 5;
 }
 .topbar-searcher i {
@@ -117,6 +114,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
+    margin: 0 -8px;
 }
 .dropdown-search.persist {
     display: flex !important;

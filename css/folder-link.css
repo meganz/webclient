@@ -37,8 +37,8 @@
 }
 .active-folder-link .fm-import-donwload-buttons {
     display: block;
-    -webkit-padding-start: 16px;
-    padding-inline-start: 16px;
+    -webkit-padding-end: 12px;
+    padding-inline-end: 12px;
 }
 .active-folder-link .merge-mega-button.download {
     position: relative;

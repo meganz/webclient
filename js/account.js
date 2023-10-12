@@ -520,6 +520,9 @@ function u_logout(logout) {
         mBroadcaster.sendMessage('logout');
     }
 
+    // Delete closed mobile app banner flag on log in
+    delete localStorage.closedMobileAppBanner;
+
     return promise;
 }
 

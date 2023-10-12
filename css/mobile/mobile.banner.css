@@ -27,6 +27,10 @@
     margin-inline-end: 8px;
     -webkit-margin-end: 8px;
 }
+.mega-component.advertisement > *:not(:last-child) {
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
+}
 
 /* Banner overarching types */
 .mega-component.banner,

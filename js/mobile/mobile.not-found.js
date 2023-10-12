@@ -127,5 +127,7 @@ mobile.notFound = {
         M.currentdirid = undefined;
 
         MegaMobileHeader.init(true);
+        MegaMobileBanner.init();
+        mobile.appBanner.updateBanner('');
     }
 };

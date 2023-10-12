@@ -37,7 +37,7 @@ mobile.achieve.invites = {
         this.$page.removeClass('hidden');
 
         // Add a server log
-        api_req({ a: 'log', e: 99674, m: 'Mobile web Invite Friends page accessed' });
+        eventlog(99674);
     },
 
     /**

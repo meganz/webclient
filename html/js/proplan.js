@@ -1563,8 +1563,27 @@ function completeProLogin(result) {
             const proNum = continuePlanNum === null ? pro.proplan2.selectedPlan ||
                 $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
 
-            // Load the Pro payment page (step 2) now that they have logged in
-            loadSubPage('propay_' + proNum);
+
+            loadingDialog.show();
+
+            // Load the Pro payment page (step 2) if the plan that the user is attempting
+            // to purchase has enough storage quota for their currently stored data.
+            M.getStorageQuota().then((storage) => {
+                closeDialog();
+                checkPlanStorage(storage.used, proNum).then((res) => {
+                    loadingDialog.hide();
+                    if (res) {
+                        loadSubPage(`propay_${proNum}`);
+                    }
+                    else {
+                        msgDialog('warninga', l[135],
+                                  l.warn_head_not_enough_storage, l.warn_body_not_enough_storage, () => {
+                                      loadSubPage('pro');
+                                      pro.proplan2.initPage();
+                                  });
+                    }
+                });
+            });
         }
     }
     else {
@@ -1582,6 +1601,19 @@ function completeProLogin(result) {
             $inputs.off('input.hideBothError');
         });
     }
+}
+
+async function checkPlanStorage(currentStored, planNum) {
+    'use strict';
+    return pro.loadMembershipPlans().then(() => {
+        const plan = pro.membershipPlans.find(plan => {
+            return plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === planNum;
+        });
+        if (!plan) {
+            return false;
+        }
+        return plan[pro.UTQA_RES_INDEX_STORAGE] * 1024 * 1024 * 1024 >= currentStored;
+    });
 }
 
 function showRegisterDialog(aPromise) {

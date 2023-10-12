@@ -1040,7 +1040,7 @@
             $sharedMe.removeClass('hidden');
         }
 
-        if (u_type && M.tree.s4 && ($.copyDialog || $.moveDialog || $.selectFolderDialog)) {
+        if ('kernel' in s4 && M.tree.s4 && ($.copyDialog || $.moveDialog || $.selectFolderDialog)) {
             $s4.removeClass('hidden');
         }
         else {
@@ -1440,7 +1440,10 @@
             }
         });
 
-        $('button.js-close, .dialog-cancel-button', $dialog).rebind('click', closeDialog);
+        $('button.js-close, .dialog-cancel-button', $dialog).rebind('click', () => {
+            delete $.onImportCopyNodes;
+            closeDialog();
+        });
 
         $('.fm-picker-dialog-button', $dialog).rebind('click', function _(ev) {
             section = $(this).attr('data-section');
@@ -1470,7 +1473,7 @@
             else if (section === 'cloud-drive' || section === 'folder-link') {
                 setDialogBreadcrumb(M.RootID);
             }
-            else if (section === 's4') {
+            else if (section === 's4' && 'utils' in s4) {
                 const cn = s4.utils.getContainersList();
 
                 // Select MEGA container handle if it's the only one
@@ -1648,7 +1651,7 @@
             const target = $.mcselected || (section === 'cloud-drive' ? M.RootID : M.RubbishID);
             const node = M.getNodeByHandle(target);
 
-            if (node.s4 && s4.kernel.getS4NodeType(node) === 'container') {
+            if ('kernel' in s4 && node.s4 && s4.kernel.getS4NodeType(node) === 'container') {
                 return s4.ui.showDialog(s4.buckets.dialogs.create, target, callback);
             }
 

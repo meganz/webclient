@@ -13,6 +13,7 @@ lazy(mega, 'keyMgr', () => {
 
     const pkPull = {
         lock: null,
+        dsLock: null,
         smbl: Symbol('fetch-pending-share-keys')
     };
     let sNodeUsers = Object.create(null);
@@ -29,7 +30,7 @@ lazy(mega, 'keyMgr', () => {
 
                 nodes.splice(i, 1);
             }
-            else if (debug && !String(n.k).startsWith(h)) {
+            else if (debug && !String(n.k).includes(`${h}:`)) {
 
                 debug.push(`Invalid key on ${h}/${n.h}, ${n.k}`);
             }
@@ -1174,19 +1175,35 @@ lazy(mega, 'keyMgr', () => {
 
         // try decrypting inshares based on the current key situation
         async decryptInShares() {
-            const promises = [];
-            const shares = Object.keys(u_sharekeys);
 
-            if (d) {
-                logger.debug(`Checking missing keys for... ${shares}`);
+            if (!pkPull.dsLock) {
+                pkPull.dsLock = mega.promise;
+
+                onIdle(() => {
+                    const {resolve} = pkPull.dsLock;
+
+                    const promises = [];
+                    const shares = Object.keys(u_sharekeys);
+
+                    if (d) {
+                        logger.warn(`Checking missing keys for... ${shares}`);
+                    }
+
+                    for (let i = shares.length; i--;) {
+
+                        promises.push(decryptShareKeys(shares[i]));
+                    }
+
+                    Promise.allSettled(promises)
+                        .then((res) => self.d && logger.info('decryptInShares', res))
+                        .finally(() => {
+                            pkPull.dsLock = false;
+                            resolve();
+                        });
+                });
             }
 
-            for (let i = shares.length; i--;) {
-
-                promises.push(decryptShareKeys(shares[i]));
-            }
-
-            return Promise.allSettled(promises).dump('decryptInShares');
+            return pkPull.dsLock;
         }
 
         // pending inshare keys (from this.pendinginshares)
@@ -1264,7 +1281,7 @@ lazy(mega, 'keyMgr', () => {
 
         // cache peer public keys required to decrypt pendinginshare
         // then, try to decrypt them and persist the remainder for retry later
-        async acceptPendingInShares(stub) {
+        async acceptPendingInShares(stub, hold) {
             const users = Object.create(null);
 
             // cache senders' public keys
@@ -1278,7 +1295,11 @@ lazy(mega, 'keyMgr', () => {
 
             const res = this.acceptPendingInShareCacheKeys(stub);
 
-            this.decryptInShares().catch(dump);
+            const ds = this.decryptInShares().catch(dump);
+            if (hold) {
+                await ds;
+            }
+
             return res;
         }
 
@@ -1289,12 +1310,11 @@ lazy(mega, 'keyMgr', () => {
             if (!this.version || pkPull.lock) {
                 logger.debug('Cannot fetch pending in-share keys atm.', this.version, this.pendingpullkey, pkPull.lock);
                 this.pendingpullkey = true;
-                return;
+                return pkPull.lock;
             }
-            pkPull.lock = true;
             this.pendingpullkey = false;
 
-            return this._fetchPendingInShareKeys(pkPull.smbl)
+            pkPull.lock = this._fetchPendingInShareKeys(pkPull.smbl)
                 .catch((ex) => {
                     if (ex !== ENOENT) {
 
@@ -1313,6 +1333,8 @@ lazy(mega, 'keyMgr', () => {
                         });
                     }
                 });
+
+            return pkPull.lock;
         }
 
         async _fetchPendingInShareKeys(auth) {
@@ -1326,7 +1348,7 @@ lazy(mega, 'keyMgr', () => {
             }
 
             // fetch pending inshare keys and add them to pendinginshares
-            const {result: res} = await api.req({a: 'pk'});
+            const {result: res} = await api.req({a: 'pk'}).catch(nop) || {};
 
             if (typeof res == 'object') {
                 if (d) {
@@ -1365,7 +1387,7 @@ lazy(mega, 'keyMgr', () => {
             }
 
             // decrypt trusted keys, store the remaining ones
-            await this.acceptPendingInShares(stub);
+            await this.acceptPendingInShares(stub, this.shouldWaitForMKCompletion);
 
             // we can now delete the fetched inshare keys from the queue
             // (if this operation fails, no problem, it's all idempotent)
@@ -1987,6 +2009,22 @@ lazy(mega, 'keyMgr', () => {
 
             return r;
         }
+
+        get didLoadFromAPI() {
+            return !mega.loadReport || mega.loadReport.mode === 2;
+        }
+
+        get gotHereFromAFolderLink() {
+            return folderlink === 0;
+        }
+
+        get shouldWaitForMKCompletion() {
+            Object.defineProperty(this, 'shouldWaitForMKCompletion', {
+                value: false,
+                configurable: true,
+            });
+            return this.didLoadFromAPI && this.gotHereFromAFolderLink;
+        }
     };
 });
 
@@ -2012,6 +2050,15 @@ mBroadcaster.addListener('fm:initialized', () => {
                     return mega.keyMgr.fetchPendingInShareKeys();
                 });
             }
+            else if (mega.keyMgr.shouldWaitForMKCompletion) {
+                // navigated from a folder-link, check for pending shares and missing keys.
+                seq.push(() => {
+                    if (d) {
+                        logger.warn('checking for pending shares and missing keys...');
+                    }
+                    return mega.keyMgr.acceptPendingInShares(null, true).catch(dump);
+                });
+            }
 
             seq.push(() => {
                 if (mega.keyMgr.pendingcommit) {
@@ -2021,6 +2068,16 @@ mBroadcaster.addListener('fm:initialized', () => {
                     return mega.keyMgr.commit();
                 }
             });
+
+            if (Object(self.M).fireKeyMgrDependantActions) {
+
+                seq.push(() => {
+                    if (d) {
+                        logger.debug('firing dependant actions...');
+                    }
+                    return M.fireKeyMgrDependantActions(v).catch(dump);
+                });
+            }
 
             logger.info('Dispatching sequential pending events...', v, seq.length);
 

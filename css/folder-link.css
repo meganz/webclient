@@ -37,6 +37,8 @@
 }
 .active-folder-link .fm-import-donwload-buttons {
     display: block;
+    -webkit-padding-end: 12px;
+    padding-inline-end: 12px;
 }
 .active-folder-link .merge-mega-button.download {
     position: relative;
@@ -73,7 +75,8 @@
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
-.active-folder-link .nw-fm-tree-item .nw-fm-tree-folder {
+.active-folder-link .nw-fm-tree-item .nw-fm-tree-folder,
+.active-folder-link .nw-fm-tree-item .nw-fm-tree-icon-wrap {
     -webkit-margin-start: 28px;
     margin-inline-start: 28px;
 }

@@ -525,52 +525,64 @@ var gettingsc;
 function getsc(force) {
     "use strict";
 
-    if (force) {
-        let timer = null;
-        gettingsc = true;
-        waitsc.stop();
+    if (!force) {
+        return Promise.resolve(EEXIST);
+    }
 
-        if (initialscfetch) {
+    let timer = null;
+    const {promise} = mega;
+    const done = (a0) => {
+        promise.resolve(a0);
+    };
 
-            (timer = tSleep(77)).then((res) => {
-                timer = null;
-                if (initialscfetch) {
-                    if (d) {
-                        if (res) {
-                            console.error(`Unexpected API response for w/sc request (${res.result})`, res);
-                        }
-                        else {
-                            console.error('w/sc connection is taking too long, aborting...');
-                        }
+    gettingsc = true;
+    waitsc.stop();
+
+    if (initialscfetch) {
+
+        (timer = tSleep(77)).then((res) => {
+            timer = null;
+            if (initialscfetch) {
+                if (d) {
+                    if (res) {
+                        console.error(`Unexpected API response for w/sc request (${res.result})`, res);
                     }
-                    return waitsc.recover();
+                    else {
+                        console.error('w/sc connection is taking too long, aborting...');
+                    }
                 }
-            }).catch(dump);
+                return waitsc.recover();
+            }
+        }).catch(dump).finally(done);
+    }
+
+    // retire existing channel that may still be completing the request
+    api.reset(5);
+
+    if (currsn) {
+        api.req(`sn=${currsn}`, 5)
+            .then((res) => timer && timer.expedite(res))
+            .catch(dump)
+            .finally(done);
+
+        if (window.loadingInitDialog.progress) {
+            window.loadingInitDialog.step3(loadfm.fromapi ? 40 : 1, 55);
         }
 
-        // retire existing channel that may still be completing the request
-        api.reset(5);
-
-        if (currsn) {
-            api.req(`sn=${currsn}`, 5)
-                .then((res) => timer && timer.expedite(res))
-                .catch(dump);
-
-            if (window.loadingInitDialog.progress) {
-                window.loadingInitDialog.step3(loadfm.fromapi ? 40 : 1, 55);
-            }
-
-            if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
-                mega.loadReport.scSent = Date.now();
-            }
-        }
-        else {
-            if (d) {
-                console.error('Get WSC is called but without SN, it\'s a bug... please trace');
-            }
-            eventlog(99737);
+        if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
+            mega.loadReport.scSent = Date.now();
         }
     }
+    else {
+        if (d) {
+            console.error('Get WSC is called but without SN, it\'s a bug... please trace');
+        }
+        eventlog(99737);
+
+        done(EFAILED); // hmm..
+    }
+
+    return promise;
 }
 
 function waitsc() {

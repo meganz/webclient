@@ -2905,7 +2905,7 @@ function closeDialog(ev) {
             delete $.saveToDialogPromise;
         }
 
-        if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button, .fm-dialog-close')) {
+        if (ev && $(ev.target).is('.fm-dialog-overlay, .fm-dialog-close')) {
             delete $.onImportCopyNodes;
         }
 

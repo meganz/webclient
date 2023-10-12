@@ -72,13 +72,13 @@ class MegaMobileFooter extends MegaMobileComponent {
     static init() {
         if (!mega.ui.footer) {
             mega.ui.footer = new MegaMobileFooter({
-                parentNode: fmholder.querySelector('.file-manager-block'),
+                parentNode: document.querySelector('#fmholder .file-manager-block'),
                 componentClassname: 'mega-footer hidden'
             });
         }
 
         if (!document.contains(mega.ui.footer.domNode)) {
-            const fmBlock = fmholder.querySelector('.file-manager-block');
+            const fmBlock = document.querySelector('#fmholder .file-manager-block');
             fmBlock.appendChild(mega.ui.footer.domNode);
         }
     }

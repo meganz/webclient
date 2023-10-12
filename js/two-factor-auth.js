@@ -320,9 +320,38 @@ twofactor.account = {
                 twofactor.verifyActionDialog.init()
                     .then((twoFactorPin) => {
                         // Disable 2FA
-                        return twofactor.account.disableTwoFactorAuthentication(twoFactorPin);
+                        loadingDialog.show();
+
+                        // Run Multi-Factor Auth Disable (mfad) request
+                        return api.send({a: 'mfad', mfa: twoFactorPin});
                     })
-                    .catch(tell);
+                    .then(() => {
+                        // Refresh the account 2FA status to show it's deactivated
+                        return twofactor.account.init();
+                    })
+                    .catch((ex) => {
+                        if (ex === EBLOCKED) {
+                            // dialog closed.
+                            return;
+                        }
+
+                        // The Two-Factor has already been disabled
+                        if (ex === ENOENT) {
+                            msgDialog('warninga', '', l.two_fa_already_off_title, l.two_fa_already_off_text, () => {
+                                // Refresh the account 2FA status
+                                twofactor.account.init();
+                            });
+                        }
+                        else if (ex < 0) {
+
+                            // If there was an error, show a message that the code was incorrect
+                            msgDialog('warninga', '', l.two_fa_cannot_disable_title, l.two_fa_cannot_disable_text);
+                        }
+                        else {
+                            tell(ex);
+                        }
+                    })
+                    .finally(() => loadingDialog.hide());
             }
             else {
                 // Setup 2FA
@@ -965,7 +994,7 @@ twofactor.verifyActionDialog = {
         const {reject} = this;
 
         if (reject) {
-            onIdle(() => reject(EINCOMPLETE));
+            onIdle(() => reject(EBLOCKED));
             delete this.reject;
         }
 

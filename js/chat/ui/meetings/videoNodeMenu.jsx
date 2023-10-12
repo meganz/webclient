@@ -77,9 +77,9 @@ export default class VideoNodeMenu extends MegaRenderMixin {
         const { call, userHandle } = stream;
 
         if (call && call.isPublic) {
-            const { FULL, OPERATOR } = ChatRoom.MembersSet.PRIVILEGE_STATE;
-            const currentUserModerator = chatRoom.members[u_handle] === FULL;
-            const targetUserModerator = chatRoom.members[userHandle] === FULL;
+            const { OPERATOR, FULL } = ChatRoom.MembersSet.PRIVILEGE_STATE;
+            const currentUserModerator = chatRoom.members[u_handle] === OPERATOR;
+            const targetUserModerator = chatRoom.members[userHandle] === OPERATOR;
 
             return (
                 currentUserModerator &&
@@ -88,7 +88,7 @@ export default class VideoNodeMenu extends MegaRenderMixin {
                         icon="sprite-fm-mono icon-admin"
                         onClick={() => {
                             ['alterUserPrivilege', 'onCallPrivilegeChange'].map(event =>
-                                chatRoom.trigger(event, [userHandle, targetUserModerator ? OPERATOR : FULL])
+                                chatRoom.trigger(event, [userHandle, targetUserModerator ? FULL : OPERATOR])
                             );
                         }}>
                         <span>

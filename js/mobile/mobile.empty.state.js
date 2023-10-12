@@ -35,13 +35,13 @@ class MegaMobileEmptyState extends MegaMobileOverlay {
     static init() {
         if (!mega.ui.emptyState) {
             mega.ui.emptyState = new MegaMobileEmptyState({
-                parentNode: fmholder.querySelector('.file-manager-block .mobile.fm-scrolling'),
+                parentNode: document.querySelector('#fmholder .file-manager-block .mobile.fm-scrolling'),
                 componentClassname: 'mega-empty-states',
                 wrapperClassname: 'empty-states'
             });
         }
         else if (!document.contains(mega.ui.emptyState.domNode)) {
-            const fmBlock = fmholder.querySelector('.file-manager-block .mobile.fm-scrolling');
+            const fmBlock = document.querySelector('#fmholder .file-manager-block .mobile.fm-scrolling');
             fmBlock.appendChild(mega.ui.emptyState.domNode);
         }
     }

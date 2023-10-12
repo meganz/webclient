@@ -96,6 +96,23 @@ pro.propay = {
             return;
         }
 
+        // If the user does has more stored than the current plan offers, go back to Pro page
+        // so they may select a plan that provides more storage space
+        const proceed = new Promise((resolve, reject) => {
+            M.getStorageQuota().then((storage) => {
+                checkPlanStorage(storage.used, pro.propay.planNum).then((res) => {
+                    if (res) {
+                        $purchaseButton.removeClass('disabled');
+                        resolve();
+                    }
+                    else {
+                        loadSubPage('pro');
+                        reject(new Error('Selected plan does not have enough storage space'));
+                    }
+                });
+            });
+        });
+
         // Update header text with plan
         $selectedPlanName.text(pro.propay.planName);
         let discountInfo = pro.propay.getDiscount();
@@ -148,8 +165,11 @@ pro.propay = {
             // Get the user's account balance
             voucherDialog.getLatestBalance(function() {
 
-                // Load payment providers and do the rest of the rendering
-                pro.propay.loadPaymentGatewayOptions();
+                // Load payment providers and do the rest of the rendering if the selected plan
+                // has enough storage. Otherwuse do not proceed with rendering the page.
+                proceed.then(pro.propay.loadPaymentGatewayOptions).catch((ex) => {
+                    console.error(ex);
+                });
             });
         });
     },

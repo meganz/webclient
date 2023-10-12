@@ -117,7 +117,7 @@ export default class StreamHead extends MegaRenderMixin {
         if (members) {
             const moderators = [];
             for (const [handle, role] of Object.entries(members)) {
-                if (role === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL) {
+                if (role === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR) {
                     moderators.push(M.getNameByHandle(handle));
                 }
             }

@@ -150,7 +150,7 @@ export default class Call extends MegaRenderMixin {
 
     static isModerator = (chatRoom, handle) => {
         if (chatRoom && handle) {
-            return chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL;
+            return chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
         }
         return false;
     };

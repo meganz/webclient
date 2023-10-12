@@ -102,12 +102,14 @@ class MegaMobileTopMenu extends MegaMobileComponent {
                 {
                     text: l[164],
                     icon: 'sprite-mobile-fm-mono icon-cloud-thin-outline',
-                    href: '/fm'
+                    href: '/fm',
+                    eventLog: 99901
                 },
                 {
                     text: l.shared_items,
                     icon: 'sprite-mobile-fm-mono icon-share-thin-outline',
-                    href: '/fm/shares'
+                    href: '/fm/shares',
+                    eventLog: 99902
                 },
                 {
                     text: l[167],
@@ -124,7 +126,8 @@ class MegaMobileTopMenu extends MegaMobileComponent {
                 {
                     text: l[823],
                     icon: 'sprite-mobile-fm-mono icon-settings-thin-outline',
-                    href: '/fm/account/settings'
+                    href: '/fm/account/settings',
+                    eventLog: 99903
                 }
             ];
         }
@@ -229,7 +232,10 @@ class MegaMobileTopMenu extends MegaMobileComponent {
     }
 
     static init() {
-        if (!mega.ui.topmenu) {
+
+        const holderContainer = document.getElementById('holderContainer');
+
+        if (!mega.ui.topmenu && holderContainer) {
             mega.ui.topmenu = new MegaMobileTopMenu({
                 parentNode: document.getElementById('holderContainer'),
                 componentClassname: 'mega-top-menu',

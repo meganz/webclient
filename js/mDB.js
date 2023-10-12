@@ -2056,6 +2056,11 @@ FMDB.prototype._bench = function(v, m) {
 FMDB.prototype.invalidate = promisify(function(resolve, reject, readop) {
     'use strict';
 
+    if (d) {
+        console.group(' *** invalidating fmdb *** ', this.crashed);
+        console.trace();
+    }
+
     if (this.crashed) {
         return resolve();
     }
@@ -2094,6 +2099,10 @@ FMDB.prototype.invalidate = promisify(function(resolve, reject, readop) {
 
         this.pending = [[]];
         mLoadingSpinner.hide('fmdb');
+
+        if (d) {
+            console.groupEnd();
+        }
     };
 });
 

@@ -108,6 +108,17 @@ function u_checklogin3a(res, ctx) {
     else {
         u_attr = res;
 
+        // u_attr = new Proxy(res, {
+        //     defineProperty(target, prop, descriptor) {
+        //         console.warn('def', prop);
+        //         return Reflect.defineProperty(target, prop, descriptor);
+        //     },
+        //     deleteProperty(target, prop) {
+        //         console.warn('del', prop);
+        //         return Reflect.deleteProperty(target, prop);
+        //     },
+        // });
+
         const exclude = new Set([
             'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup', 'mkt',
             'name', 'p', 'pf', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
@@ -137,6 +148,14 @@ function u_checklogin3a(res, ctx) {
         delete u_attr.u;
         Object.defineProperty(u_attr, 'u', {
             value: u_handle,
+            writable: false,
+            configurable: false
+        });
+
+        const {s4} = u_attr;
+        delete u_attr.s4;
+        Object.defineProperty(u_attr, 's4', {
+            value: !!s4,
             writable: false,
             configurable: false
         });
@@ -393,26 +412,29 @@ async function u_checklogin4(sid) {
     })();
 
     if (res >= 0) {
+        let held;
+
         if (window.n_h) {
             // set new sid under folder-links
             api_setfolder(n_h);
-            mega.config.sync()
-                .catch(dump)
-                .finally(() => getsc(true));
+            held = mega.config.sync().catch(dump).then(() => getsc(true).catch(dump));
 
             // hide ephemeral account warning
             if (typeof alarm !== 'undefined') {
                 alarm.hideAllWarningPopups();
             }
         }
+
         u_type = res;
         u_checked = true;
         onIdle(topmenuUI);
+
         if (typeof dlmanager === 'object') {
             dlmanager.setUserFlags();
             delay('overquota:retry', () => dlmanager._onOverQuotaAttemptRetry(sid));
         }
-        return res;
+
+        return held ? held.then(() => res) : res;
     }
 
     u_storage.sid = u_sid = undefined;

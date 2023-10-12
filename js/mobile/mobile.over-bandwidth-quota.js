@@ -68,6 +68,9 @@ mobile.overBandwidthQuota = {
             actions: this.sheetActions,
             onShow: () => {
                 eventlog(this.quotaExceeded ? 99648 : 99617);
+                if (!this.quotaExceeded && !u_wasloggedin()) {
+                    eventlog(99646);
+                }
             },
             onClose: () => {
                 this.closeSheet();
@@ -120,7 +123,7 @@ mobile.overBandwidthQuota = {
             text: this.quotaExceeded ? l.wait_for_free_tq_btn_text : l[6826],
             onClick: () => {
                 this.closeSheet();
-                if (!this.quotaExceeded) {
+                if (!this.quotaExceeded && typeof dlmanager.onLimitedBandwidth === 'function') {
                     // Resume the download if the user taps the limited quota dialog's 'Continue' button
                     dlmanager.onLimitedBandwidth();
                 }
@@ -139,6 +142,8 @@ mobile.overBandwidthQuota = {
             type: 'normal',
             text: primaryActionBtnText,
             onClick: () => {
+                // Quota pre-warning / exceeded upgrade / buy plan button tapped
+                eventlog(this.quotaExceeded ? 99640 : 99643);
                 this.closeSheet();
                 // Hide the download overlay
                 mega.ui.overlay.hide();

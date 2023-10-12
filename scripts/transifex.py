@@ -538,7 +538,7 @@ def has_locked_msgs(is_prod):
 
     print("Started checking for Locked strings in PROD in past 3 weeks ..... " + checkDateStr)
 
-    url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:prod&filter[tags][all]=*"
+    url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:prod&filter[tags][any]=*"
     url += "&filter[strings_date_modified][gte]=" + checkDateStr
 
     languages = get_languages()

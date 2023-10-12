@@ -904,12 +904,20 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                 waitsc.stop();
                 // XXX: using a batched-command for sml to forcefully flush any pending
                 //      API request, otherwise they could fail with a -15 (ESID) error.
-                return u_type !== false && api.req([{a: 'sml'}]);
+                // return u_type !== false && api.req([{a: 'sml'}]);
             })
             .catch(dump)
             .finally(() => {
                 step = 1;
-                finishLogout();
+                if (u_type || u_privk) {
+                    api.req([{ a: 'sml' }])
+                        .catch(dump)
+                        .finally(finishLogout);
+                }
+                else {
+                    finishLogout();
+                }
+
             });
     });
 };

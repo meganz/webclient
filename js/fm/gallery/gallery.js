@@ -1437,7 +1437,8 @@ class MegaGallery {
 
         if (!this.beforePageChangeListener) {
             this.beforePageChangeListener = mBroadcaster.addListener('beforepagechange', tpage => {
-                if (this.inPreview) {
+                const pageId = page.replace('fm/', '');
+                if (this.inPreview && pageId.length < 5 ? M.RootID === M.currentdirid : pageId === M.currentdirid) {
                     return;
                 }
 

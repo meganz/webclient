@@ -20,6 +20,8 @@ lazy(pro, 'proplan2', () => {
     let ProFlexiFound = false;
 
     const initTabHandlers = () => {
+
+        const $tableContainer = $('.pricing-pg.pricing-plans-compare-table-container', $page);
         const $tabs = $('.individual-team-tab-container .tabs-module-block', $page);
 
         const proDivsSelector = '.pricing-pg.pick-period-container, .pricing-pg.pro-plans-cards-container, ' +
@@ -40,11 +42,11 @@ lazy(pro, 'proplan2', () => {
         };
 
 
-        $tabs.rebind('click.pricing', function() {
+        const changeIndividualTeamTab = (target) => {
             $tabs.removeClass('selected');
-            this.classList.add('selected');
+            target.classList.add('selected');
 
-            const visibilityState = this.id === 'pr-individual-tab';
+            const visibilityState = target.id === 'pr-individual-tab';
 
             if ($businessPlans) {
                 $businessPlans.toggleClass('hidden', visibilityState);
@@ -62,10 +64,37 @@ lazy(pro, 'proplan2', () => {
             else {
                 setFooterBannerTxt(l.pr_business_started, l.pr_easily_add, l[24549]);
             }
+        };
 
-            const base = visibilityState ? 99862 : 99864;
-            delay('pricing.individual-team-tab', eventlog.bind(null, base + (is_mobile ? 1 : 0)));
+        $tabs.rebind('click.pricing', function() {
+            if (this.id === 'pr-individual-tab') {
+                delay('pricing.plan', eventlog.bind(null, is_mobile ? 99863 : 99862));
+            }
+            else {
+                delay('pricing.business', eventlog.bind(null, is_mobile ? 99865 : 99864));
+            }
+            changeIndividualTeamTab(this);
+        });
 
+        const idShift = is_mobile ? 0 : 1;
+
+        $('button.free', $tableContainer).rebind('click', () => {
+            loadSubPage('register');
+            delay('pricing.free' + 99880, eventlog.bind(null, 99880 + idShift));
+        });
+        $('button.pro', $tableContainer).rebind('click', () => {
+            changeIndividualTeamTab($('.individual-team-tab-container #pr-individual-tab', $page)[0]);
+            $('.pricing-pg.pro-plans-cards-container', $page)[0].scrollIntoView({behavior: 'smooth'});
+            delay('pricing.pro' + 99882, eventlog.bind(null, 99882 + idShift));
+        });
+        $('button.pro-flexi', $tableContainer).rebind('click', () => {
+            $('.pricing-pg.pricing-flexi-container', $page)[0].scrollIntoView({behavior: 'smooth'});
+            delay('pricing.pro-flexi' + 99884, eventlog.bind(null, 99884 + idShift));
+        });
+        $('button.pro-business', $tableContainer).rebind('click', () => {
+            changeIndividualTeamTab($('.individual-team-tab-container #pr-business-tab', $page)[0]);
+            $('.pricing-pg.pricing-business-plan-container', $page)[0].scrollIntoView({behavior: 'smooth'});
+            delay('pricing.pro-business' + 99886, eventlog.bind(null, is_mobile ? 99886 : 99904));
         });
     };
 
@@ -75,9 +104,24 @@ lazy(pro, 'proplan2', () => {
         const $dataTable = $('.pricing-plans-compare-table', $tableContainer);
         const $arrowIcon = $('i.chevron-down-icon', $showBtn);
         const $showBtnTxt = $('.pricing-plans-compare-table-txt', $showBtn);
+        const $buttons = $('.pricing-plans-compare-table-item button', $tableContainer);
+        const $buttonsNotFree = $('.pricing-plans-compare-table-item button:not(.free)', $tableContainer);
 
+        $('.pricing-plans-compare-table-item button', $tableContainer).addClass('hidden');
+
+        // If user has the flag ab_flag, add them to the experiment.
         if (mega.flags.ab_uspct !== 'undefined') {
-            api.req({a: 'abta', c: 'ab_uspct'}).catch(dump);
+            api.req({a: 'abta', c: 'ab_uspct'});
+        }
+        if ((typeof mega.flags.ab_ctasc !== 'undefined') && !is_mobile) {
+            api.send({a: 'abta', c: 'ab_ctasc'});
+        }
+
+        if (u_attr && mega.flags.ab_ctasc && !is_mobile) {
+            $buttonsNotFree.removeClass('hidden');
+        }
+        else if (mega.flags.ab_ctasc && !is_mobile) {
+            $buttons.removeClass('hidden');
         }
 
         if (mega.flags.ab_uspct) {

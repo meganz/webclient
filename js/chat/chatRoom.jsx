@@ -2716,8 +2716,18 @@ ChatRoom.prototype._exportChat = async function() {
     // Fetch messages into memory
     this.isScrollingToMessageId = true; // Stop detach from running while this is processing.
     while (this.messagesBuff.haveMoreHistory()) {
-        await this.messagesBuff.retrieveChatHistory(1000);
+        await this.messagesBuff.retrieveChatHistory(100);
     }
+    // Wait for potentially in progress fetch/decrypt operations.
+    await Promise.allSettled([
+        this.messagesBuff.isDecrypting || Promise.resolve(),
+        this.messagesBuff.$sharedFilesLoading || Promise.resolve(),
+        this.messagesBuff.$isDecryptingSharedFiles || Promise.resolve(),
+    ]);
+
+    do {
+        await this.messagesBuff.retrieveSharedFilesHistory(100);
+    } while (this.messagesBuff.haveMoreSharedFiles);
 
     // Check if the user wants the shared nodes if applicable
     let withMedia = !!M.v.length;

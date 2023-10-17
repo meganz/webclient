@@ -5500,8 +5500,12 @@ ChatRoom.prototype.exportToFile = function () {
 ChatRoom.prototype._exportChat = async function () {
   this.isScrollingToMessageId = true;
   while (this.messagesBuff.haveMoreHistory()) {
-    await this.messagesBuff.retrieveChatHistory(1000);
+    await this.messagesBuff.retrieveChatHistory(100);
   }
+  await Promise.allSettled([this.messagesBuff.isDecrypting || Promise.resolve(), this.messagesBuff.$sharedFilesLoading || Promise.resolve(), this.messagesBuff.$isDecryptingSharedFiles || Promise.resolve()]);
+  do {
+    await this.messagesBuff.retrieveSharedFilesHistory(100);
+  } while (this.messagesBuff.haveMoreSharedFiles);
   let withMedia = !!M.v.length;
   if (withMedia) {
     withMedia = await asyncMsgDialog(`*confirmation:!^${l.export_chat_media_dlg_conf}!${l.export_chat_media_dlg_rej}`, '', l.export_chat_media_dlg_title, l.export_chat_media_dlg_text);

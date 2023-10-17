@@ -131,6 +131,7 @@
     text-align: initial;
     transition: var(--transition-color), var(--transition-bg-color);
     white-space: nowrap;
+    width: auto;
 }
 .m-dropdown-item:hover,
 .m-dropdown-item.opened {
@@ -139,12 +140,9 @@
     color: var(--text-color-high);
 }
 .m-dropdown-item.contains-submenu.icon-arrow-right-after::after {
-    content: "\f284";
-    font-family: fm-mono, sans-serif;
-    line-height: 1;
-    font-size: var(--icon-size, 16px);
-    font-style: normal;
-    color: var(--icon-rest);
+    height: 16px;
+    width: 8px;
+    margin-inline-start: 8px;
 }
 .m-dropdown-item.contains-submenu.icon-arrow-right-after:hover::after,
 .m-dropdown-item.contains-submenu.icon-arrow-right-after.opened::after {

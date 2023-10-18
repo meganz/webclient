@@ -908,24 +908,18 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
 
         Promise.allSettled(promises)
             .then((res) => {
-                console.debug('logging out...', JSON.stringify(res));
+                if (self.d) {
+                    console.debug('logging out...', tryCatch(() => JSON.stringify(res), false)() || res);
+                }
                 waitsc.stop();
                 // XXX: using a batched-command for sml to forcefully flush any pending
                 //      API request, otherwise they could fail with a -15 (ESID) error.
-                // return u_type !== false && api.req([{a: 'sml'}]);
+                return u_type !== false && api.req([{a: 'sml'}]);
             })
             .catch(dump)
             .finally(() => {
                 step = 1;
-                if (u_type || u_privk) {
-                    api.req([{ a: 'sml' }])
-                        .catch(dump)
-                        .finally(finishLogout);
-                }
-                else {
-                    finishLogout();
-                }
-
+                finishLogout();
             });
     });
 };

@@ -329,7 +329,8 @@ class MegaMobileHeader extends MegaMobileComponent {
 
     update() {
 
-        const noTableView = isPublicLink() || isPublickLinkV2() || page.startsWith('businesssignup');
+        const noTabletView = isPublicLink() || isPublickLinkV2() || page.startsWith('businesssignup')
+            || page === 'keybackup';
         const holderContainer = document.getElementById('holderContainer');
 
         if (!holderContainer) {
@@ -349,11 +350,11 @@ class MegaMobileHeader extends MegaMobileComponent {
             this.hide();
         };
 
-        if (is_fm() || noTableView) {
+        if (is_fm() || noTabletView) {
 
             const holderContainer = document.getElementById('holderContainer');
             if (holderContainer) {
-                holderContainer.classList[noTableView ? 'add' : 'remove']('no-tablet-layout');
+                holderContainer.classList[noTabletView ? 'add' : 'remove']('no-tablet-layout');
             }
 
             const type = MegaMobileHeader.getType();
@@ -750,7 +751,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         if (M.currentdirid && M.currentrootid !== M.currentdirid) {
             iType = 1;
         }
-        if (page === 'fm/account') {
+        if (page === 'fm/account' || page === 'keybackup') {
             iType = 2;
         }
         if (page.startsWith('fm/account/') || page.startsWith('fm/refer')) {
@@ -830,6 +831,7 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/account/paymentcard': l.payment_card,
         'fm/account/about/terms-policies': l.mobile_settings_tos_title,
         'move': l.move_to,
-        'copy': l.copy_to
+        'copy': l.copy_to,
+        'keybackup': l[8839]
     });
 });

@@ -479,6 +479,7 @@ function u_logout(logout) {
         delete sessionStorage.signinorup;
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');
+        localStorage.removeItem('mInfinity');
 
         fminitialized = false;
         if ($.leftPaneResizable) {

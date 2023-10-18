@@ -76,7 +76,7 @@ class MMenuSelectItem extends MComponent {
 
         if (Array.isArray(children) && children.length) {
             this.children = children;
-            this.el.classList.add('contains-submenu', 'icon-arrow-right-after');
+            this.el.classList.add('contains-submenu', 'sprite-fm-mono-after', 'icon-arrow-right-after');
         }
 
         this.attachEvent('pointerenter', () => {

@@ -316,7 +316,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         else if (pfid && pfkey) {
 
             // If subfolder or file is specified, add it to the base folder handle and key
-            if (nodeHandle === undefined) {
+            if (nodeHandle === undefined || pfid === nodeHandle) {
                 // Otherwise return the base folder handle and key
                 return `#F!${  pfid  }!${  pfkey}`;
             }

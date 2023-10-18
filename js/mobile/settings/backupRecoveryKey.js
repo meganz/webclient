@@ -16,16 +16,7 @@ mobile.settings.backup = {
         mobile.settings.backup.showKey($page);
         mobile.settings.backup.initCopyKeyButton($page);
         mobile.settings.backup.initDownloadKeyButton($page);
-
-        // This is to handle the old export backup key, to remove when revamping backup key
-        $('.fm-header', $page).addClass('hidden');
-        $page.removeClass('logout-export');
-
-        if (page.startsWith('keybackup')) {
-            $('.fm-header', $page).removeClass('hidden');
-            $page.addClass('logout-export');
-            mobile.initBackButton($page, 'fm/account/');
-        }
+        MegaMobileHeader.init(true);
 
         // Show the page
         $page.removeClass('hidden');

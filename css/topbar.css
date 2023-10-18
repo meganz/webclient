@@ -48,6 +48,9 @@
     position: relative;
     z-index: 202;
 }
+.mega-lite-mode .topbar-searcher {
+    display: none;
+}
 .topbar-searcher form {
     align-items: center;
     display: flex;
@@ -220,6 +223,10 @@
     position: relative;
 }
 
+.mega-lite-mode .topbar .mini-search {
+    display: none;
+}
+
 .topbar .mini-search button {
     cursor: pointer;
     flex-shrink: 0;
@@ -248,6 +255,7 @@
     height: 32px;
     border-radius: 50px !important;
     min-height: 32px;
+    position: static;
 }
 
 .topbar .mini-search button i::before {
@@ -349,7 +357,9 @@
     height: 32px;
     position: relative;
 }
-
+.mega-lite-mode .topbar-links {
+    height: auto;
+}
 .topbar-links > .dropdown {
     align-items: center;
     display: flex;
@@ -467,7 +477,16 @@
     line-height: 0;
     position: relative;
 }
-
+.mega-lite-mode .topbar .dropdown .notification {
+    display: none;
+}
+.topbar .back-to-mega-button {
+    display: none;
+    margin-right: 20px;
+}
+.mega-lite-mode .topbar .back-to-mega-button {
+    display: inline-block;
+}
 .topbar .dropdown-content {
     display: none;
     position: absolute;

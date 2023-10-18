@@ -311,11 +311,25 @@
                 </div>
                 <div class="pricing-plans-compare-table hidden">
                     <!-- Header -->
-                    <div class="pricing-plans-compare-table-item light line">[$pr_account_type]</div>
-                    <div class="pricing-plans-compare-table-item x-bold line center">[$1150]</div>
-                    <div class="pricing-plans-compare-table-item x-bold line center">[$pr_pro_plans]</div>
-                    <div class="pricing-plans-compare-table-item x-bold line center">[$pro_flexi_name]</div>
-                    <div class="pricing-plans-compare-table-item x-bold line center">[$19530]</div>
+
+                    <div class="pricing-plans-compare-table-item light line plans-table-header">[$pr_account_type]</div>
+                    <div class="pricing-plans-compare-table-item plans-table-header free x-bold line center">
+                        [$1150]
+                        <button class="experiment-button hidden free">[$20556]</button>
+                    </div>
+                    <div class="pricing-plans-compare-table-item plans-table-header x-bold line center">
+                        [$pr_pro_plans]
+                        <button class="experiment-button hidden pro">[$pr_table_button_see_pro]</button>
+                    </div>
+                    <div class="pricing-plans-compare-table-item plans-table-header x-bold line center">
+                        [$pro_flexi_name]
+                        <button class="experiment-button hidden pro-flexi">[$pr_table_button_buy_flexi]</button>
+                    </div>
+                    <div class="pricing-plans-compare-table-item plans-table-header x-bold line center">
+                        [$19530]
+                        <button class="experiment-button hidden pro-business">[$buy_business]</button>
+                    </div>
+
                     <!-- End of Header -->
                     <!-- Core features sections -->
                     <div class="pricing-plans-compare-table-item header">[$pr_core_features]</div>
@@ -341,19 +355,19 @@
                     <!-- Sharing sections -->
                     <div class="pricing-plans-compare-table-item header">[$pr_sharing]</div>
 
-                    <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_secure_file]</div>
+                    <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_secure_file]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_secure_sharing]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item center bg-gr"><i class="grey-small-check-tick"></i></div>
 
-                    <div class="pricing-plans-compare-table-item bold rb">[$pr_pw_links]</div>
+                    <div class="pricing-plans-compare-table-item bold rb">[$pr_pw_links]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_links_password]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="minus-icon"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item center"><i class="grey-small-check-tick"></i></div>
 
-                    <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_link_expire]</div>
+                    <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_link_expire]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_links_expiry]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
@@ -368,13 +382,13 @@
                     <!-- Data Protection sections -->
                     <div class="pricing-plans-compare-table-item header">[$pr_data_protect]</div>
 
-                    <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_file_versioning]</div>
+                    <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_file_versioning]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_file_versioning]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_100_version]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_100_version]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_100_version]</div>
                     <div class="pricing-plans-compare-table-item center bg-gr">[$pr_100_version]</div>
 
-                    <div class="pricing-plans-compare-table-item bold rb">[$automatic_backups]</div>
+                    <div class="pricing-plans-compare-table-item bold rb">[$automatic_backups]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_automatic_backups]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
@@ -704,6 +718,25 @@
                     <div class="pricing-social-quote-name">
                         Cloudwards
                     </div>
+                </div>
+            </div>
+
+            <!-- FAQ section -->
+            <div class="pricing-pg faq-container">
+                <div class="faq-qa template hidden">
+                    <div class="faq-item-title">
+                        <div class="faq-question"></div>
+                        <i class="small-icon grey-medium-plus"></i>
+                    </div>
+                    <div class="faq-item-answer hidden">
+                        <div class="faq-answer-part"></div>
+                    </div>
+                </div>
+
+
+                <div class="faq">
+                    <div class="faq-title">[$pricing_page_faq_header]</div>
+                    <div class="faq-content"></div>
                 </div>
             </div>
 

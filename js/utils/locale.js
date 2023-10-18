@@ -1825,11 +1825,23 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a class="anchor-link" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
 
+    const megaLiteHelpCenterLink = 'https://help.mega.io/files-folders/view-move/mega-lite';
+    l.in_mega_lite_mode_banner = escapeHTML(l.in_mega_lite_mode_banner)
+        .replace('[A]', `<a class="clickurl" href="${megaLiteHelpCenterLink}" target="_blank">`)
+        .replace('[/A]', '</a>');
+
     l.blocked_rsn_terminated = escapeHTML(l.blocked_rsn_terminated)
         .replace('[A]', '<a href="https://mega.io/terms" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>')
         .replace('[BR]', '<br><br>');
     l.blocked_rsn_copyright = escapeHTML(l.blocked_rsn_copyright).replace('[BR]', '<br><br>');
+    const faqLink = 'https://help.mega.io/plans-storage/space-storage/transfer-quota';
+    l.pricing_page_faq_answer_1 = escapeHTML(l.pricing_page_faq_answer_1)
+        .replace('[A]', `<a href="${faqLink}" target="_blank" rel="noopener noreferrer">`)
+        .replace('[/A]', '</a>');
+    l.pricing_page_faq_answer_3 = escapeHTML(l.pricing_page_faq_answer_3)
+        .replace('[A]', `<a href="${faqLink}" target="_blank" rel="noopener noreferrer">`)
+        .replace('[/A]', '</a>');
 
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,

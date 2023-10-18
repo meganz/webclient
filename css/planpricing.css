@@ -683,6 +683,60 @@ i.pricing-i-icon {
     font: var(--text-copy-medium-pricing);
     color: var(--color-copy-secondary);
 }
+.pricing-pg.faq-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 104px;
+}
+.pricing-pg .faq {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.pricing-pg .faq-title {
+    font: var(--text-h3-pricing);
+    text-align: center;
+    padding: 64px 0 40px;
+}
+.pricing-pg .faq-content {
+    max-width: 500px;
+    margin: 0 20px;
+}
+.pricing-pg.faq-container .faq-qa {
+    border-bottom: 1px solid var(--surface-grey-2);
+}
+.pricing-pg.faq-container .faq-item-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    margin-top: 26px;
+    padding-bottom: 24px;
+    gap: 10%;
+}
+.pricing-pg.faq-container .faq-question {
+    font: var(--text-label-xl-pricing);
+
+}
+.pricing-pg.faq-container .faq-item-answer {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    font: var(--text-copy-medium-pricing);
+    margin-top: -14px;
+    margin-bottom: 24px;
+}
+.pricing-pg.faq-container .faq-item-answer a {
+    text-decoration: underline;
+}
+.pricing-pg.faq-container .faq-item-title i {
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+}
 .pricing-pg .pricing-get-started-container {
     background-color: var(--color-secondary-cobalt-900);
     width: 100vw;
@@ -722,6 +776,13 @@ i.pricing-i-icon {
     padding: 20px 16px;
     grid-column: span 1;
 }
+.pricing-plans-compare-table .pricing-plans-compare-table-item.pricing-plans-header-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+}
 .pricing-plans-compare-table .pricing-plans-compare-table-item span {
     font: var(--text-copy-medium-bold-pricing);
 }
@@ -753,7 +814,10 @@ i.pricing-i-icon {
     border-right: 1px solid var(--color-grey-150);
 }
 .pricing-plans-compare-table .pricing-plans-compare-table-item.center {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-between;
 }
 .pricing-plans-compare-table .pricing-plans-compare-table-item.bold {
     font: var(--text-copy-medium-bold-pricing);
@@ -939,6 +1003,32 @@ i.pricing-i-icon {
 }
 .pricing-pg .invisible {
     visibility: hidden;
+}
+.pricing-pg .pricing-plans-compare-table button {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-bg);
+    border: 2px solid var(--color-heading);
+    border-radius: 8px;
+    height: 48px;
+    width: max-content;
+    padding: 12px 24px;
+    cursor: pointer;
+    font: var(--text-button-pricing);
+    margin: 12px 0 8px;
+    color: var(--text-color-higher);
+}
+.pricing-pg .pricing-plans-compare-table button:hover {
+    background-color: var(--color-bg-surface-1);
+}
+.pricing-pg .pricing-plans-compare-table button.experiment-button.pro {
+    background-color: var(--color-primary-red-500);
+    border: none;
+    color: var(--color-grey-50);
+}
+.pricing-pg .pricing-plans-compare-table button.experiment-button.pro:hover {
+    background-color: var(--color-primary-red-600);
 }
 
 /* Responsiveness */
@@ -1301,6 +1391,9 @@ i.pricing-i-icon {
         .pricing-pg .pricing-pg.plans-cards-container .pricing-plan-card.long-currency2 > * {
             padding-left: 10px;
             padding-right: 10px;
+        }
+        .pricing-pg .pricing-plans-compare-table button {
+            display: flex;
         }
     }
 

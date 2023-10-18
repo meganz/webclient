@@ -20,6 +20,8 @@ lazy(pro, 'proplan2', () => {
     let ProFlexiFound = false;
 
     const initTabHandlers = () => {
+
+        const $tableContainer = $('.pricing-pg.pricing-plans-compare-table-container', $page);
         const $tabs = $('.individual-team-tab-container .tabs-module-block', $page);
 
         const proDivsSelector = '.pricing-pg.pick-period-container, .pricing-pg.pro-plans-cards-container, ' +
@@ -40,11 +42,11 @@ lazy(pro, 'proplan2', () => {
         };
 
 
-        $tabs.rebind('click.pricing', function() {
+        const changeIndividualTeamTab = (target) => {
             $tabs.removeClass('selected');
-            this.classList.add('selected');
+            target.classList.add('selected');
 
-            const visibilityState = this.id === 'pr-individual-tab';
+            const visibilityState = target.id === 'pr-individual-tab';
 
             if ($businessPlans) {
                 $businessPlans.toggleClass('hidden', visibilityState);
@@ -62,10 +64,37 @@ lazy(pro, 'proplan2', () => {
             else {
                 setFooterBannerTxt(l.pr_business_started, l.pr_easily_add, l[24549]);
             }
+        };
 
-            const base = visibilityState ? 99862 : 99864;
-            delay('pricing.individual-team-tab', eventlog.bind(null, base + (is_mobile ? 1 : 0)));
+        $tabs.rebind('click.pricing', function() {
+            if (this.id === 'pr-individual-tab') {
+                delay('pricing.plan', eventlog.bind(null, is_mobile ? 99863 : 99862));
+            }
+            else {
+                delay('pricing.business', eventlog.bind(null, is_mobile ? 99865 : 99864));
+            }
+            changeIndividualTeamTab(this);
+        });
 
+        const idShift = is_mobile ? 0 : 1;
+
+        $('button.free', $tableContainer).rebind('click', () => {
+            loadSubPage('register');
+            delay('pricing.free' + 99880, eventlog.bind(null, 99880 + idShift));
+        });
+        $('button.pro', $tableContainer).rebind('click', () => {
+            changeIndividualTeamTab($('.individual-team-tab-container #pr-individual-tab', $page)[0]);
+            $('.pricing-pg.pro-plans-cards-container', $page)[0].scrollIntoView({behavior: 'smooth'});
+            delay('pricing.pro' + 99882, eventlog.bind(null, 99882 + idShift));
+        });
+        $('button.pro-flexi', $tableContainer).rebind('click', () => {
+            $('.pricing-pg.pricing-flexi-container', $page)[0].scrollIntoView({behavior: 'smooth'});
+            delay('pricing.pro-flexi' + 99884, eventlog.bind(null, 99884 + idShift));
+        });
+        $('button.pro-business', $tableContainer).rebind('click', () => {
+            changeIndividualTeamTab($('.individual-team-tab-container #pr-business-tab', $page)[0]);
+            $('.pricing-pg.pricing-business-plan-container', $page)[0].scrollIntoView({behavior: 'smooth'});
+            delay('pricing.pro-business' + 99886, eventlog.bind(null, is_mobile ? 99886 : 99904));
         });
     };
 
@@ -75,9 +104,24 @@ lazy(pro, 'proplan2', () => {
         const $dataTable = $('.pricing-plans-compare-table', $tableContainer);
         const $arrowIcon = $('i.chevron-down-icon', $showBtn);
         const $showBtnTxt = $('.pricing-plans-compare-table-txt', $showBtn);
+        const $buttons = $('.pricing-plans-compare-table-item button', $tableContainer);
+        const $buttonsNotFree = $('.pricing-plans-compare-table-item button:not(.free)', $tableContainer);
 
+        $('.pricing-plans-compare-table-item button', $tableContainer).addClass('hidden');
+
+        // If user has the flag ab_flag, add them to the experiment.
         if (mega.flags.ab_uspct !== 'undefined') {
-            api.req({a: 'abta', c: 'ab_uspct'}).catch(dump);
+            api.req({a: 'abta', c: 'ab_uspct'});
+        }
+        if ((typeof mega.flags.ab_ctasc !== 'undefined') && !is_mobile) {
+            api.send({a: 'abta', c: 'ab_ctasc'});
+        }
+
+        if (u_attr && mega.flags.ab_ctasc && !is_mobile) {
+            $buttonsNotFree.removeClass('hidden');
+        }
+        else if (mega.flags.ab_ctasc && !is_mobile) {
+            $buttons.removeClass('hidden');
         }
 
         if (mega.flags.ab_uspct) {
@@ -517,6 +561,62 @@ lazy(pro, 'proplan2', () => {
 
     };
 
+    const initFaq = () => {
+
+        const $faqContainer = $('.pricing-pg.faq-container', $page);
+        const $faqItemTemplate = $('.faq-qa.template', $faqContainer);
+        const $faqContent = $('.faq-content', $faqContainer);
+
+        const faqQuestions = {
+            'faq1': {
+                question: l.pricing_page_faq_question_1,
+                answer: [l.pricing_page_faq_answer_1]
+            },
+            'faq2': {
+                question: l.pricing_page_faq_question_2,
+                answer: [l.pricing_page_faq_answer_2]
+            },
+            'faq3': {
+                question: l.pricing_page_faq_question_3,
+                answer: [l.pricing_page_faq_answer_3]
+            },
+            'faq4': {
+                question: l.pricing_page_faq_question_4,
+                answer: [l.pricing_page_faq_answer_4, l.pricing_page_faq_answer_4_2]
+            },
+            'faq5': {
+                question: l.pricing_page_faq_question_5,
+                answer: [l.pricing_page_faq_answer_5]
+            },
+            'faq6': {
+                question: l.pricing_page_faq_question_6,
+                answer: [l.pricing_page_faq_answer_6, l.pricing_page_faq_answer_6_2]
+            },
+        };
+
+        const $answerPartTemplate = $('.faq-answer-part', $faqItemTemplate).clone();
+
+        for (const faq in faqQuestions) {
+            const $faqItem = $faqItemTemplate.clone().removeClass('template hidden').addClass(faq);
+            $('.faq-question', $faqItem).text(faqQuestions[faq].question);
+            for (let i = 0; i < faqQuestions[faq].answer.length; i++) {
+                const $answerPart = $answerPartTemplate.clone().safeHTML(faqQuestions[faq].answer[i]);
+                $('.faq-item-answer', $faqItem).safeAppend($answerPart.prop('outerHTML'));
+            }
+
+            $faqContent.safeAppend($faqItem.prop('outerHTML'));
+
+            const $qaRebind = $(`.${faq}`, $faqContent);
+            $('.faq-item-title', $qaRebind).rebind('click.pricing', () => {
+                if (window.getSelection()) {
+                    window.getSelection().removeAllRanges();
+                }
+                $('.faq-item-answer', $qaRebind).toggleClass('hidden');
+                $('.faq-item-title i', $qaRebind).toggleClass(['minus-icon', 'grey-medium-plus', 'small-icon']);
+            });
+        }
+        $('.faq1 .faq-question', $faqContent).click();
+    };
 
     const initProFlexi = () => {
 
@@ -1092,6 +1192,7 @@ lazy(pro, 'proplan2', () => {
             initPeriodPickHandler();
             initPlansTabs();
             initSocial();
+            initFaq();
 
             loadingDialog.hide();
 

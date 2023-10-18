@@ -1507,6 +1507,16 @@ FileManager.prototype.initContextUI = function() {
 
             $this.addClass('opened');
         }
+
+        // If MEGA Lite mode and the selection contains a folder, hide the regular download option (only zip allowed),
+        // otherwise this throws an error about downloading an empty folder then downloads as a zip anyway.
+        if (mega.infinity && mega.lite.containsFolderInSelection($.selected)) {
+            $(c + '.download-standart-item').addClass('hidden');
+            return false;
+        }
+
+        // Make standard download option visible for files (and folders in regular mode)
+        $(c + '.download-standart-item').removeClass('hidden');
     });
 
     var safeMoveNodes = function() {
@@ -1525,6 +1535,12 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.download-item').rebind('click', function() {
         var c = this.className;
+
+        // If MEGA Lite mode and attempting to download a folder(s) by clicking on the Download item, disable the click
+        if (mega.infinity && mega.lite.containsFolderInSelection($.selected)) {
+            return false;
+        }
+
         if (c && (c.indexOf('contains-submenu') > -1 || c.indexOf('msync-found') > -1)) {
             M.addDownload($.selected);
         }

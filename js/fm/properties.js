@@ -131,6 +131,11 @@
             versioningFlag = true;
         }
 
+        // Hide versioning details temporarily, due to it not working correctly in MEGA Lite / Infinity
+        if (mega.infinity) {
+            versioningFlag = false;
+        }
+
         if ($.dialog === 'onboardingDialog') {
             closeDialog();
         }
@@ -339,6 +344,14 @@
             p.t19 = bytesToSize(vsize);
         }
 
+        /* If in MEGA Lite mode for folders, temporarily hide the Total Size and Contains info which isn't known */
+        if (mega.infinity && mega.lite.containsFolderInSelection($.selected)) {
+            $dialog.addClass('hide-size-and-contains');
+        }
+        else {
+            $dialog.removeClass('hide-size-and-contains');
+        }
+
         var vhtml = versioningFlag
             ?
             '<div class="properties-float-bl' + p.t12 + '"><span class="properties-small-gray">' + p.t13 + '</span>'
@@ -349,7 +362,7 @@
             + '<span class="propreties-dark-txt">' + p.t19 + '</span></div>'
             : '';
 
-        var singlenodeinfohtml  = '<div class="properties-float-bl' + p.t5 + '">'
+        var singlenodeinfohtml  = '<div class="properties-float-bl' + p.t5 + ' properties-contains">'
             + '<span class="properties-small-gray">' + p.t6 + '</span>'
             + '<span class="propreties-dark-txt t7">' + p.t7 + '</span></div>';
 
@@ -373,8 +386,8 @@
             +                    '<div class="breadcrumb-dropdown"></div>'
             +                '</div>'
             + '</div>'
-            + '<div class="properties-items"><div class="properties-float-bl"><span class="properties-small-gray">'
-            + p.t3 + '</span>'
+            + '<div class="properties-items"><div class="properties-float-bl properties-total-size">'
+            + '<span class="properties-small-gray">' + p.t3 + '</span>'
             + '<span class="propreties-dark-txt">' + p.t4 + '</span></div>'
             + vhtml
             + singlenodeinfohtml

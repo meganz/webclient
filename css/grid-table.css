@@ -358,7 +358,10 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table.fm.v-extras [megatype="extras"] {
     display: table-cell;
 }
-
+.mega-lite-mode .grid-table.fm.v-size [megatype="size"],
+.mega-lite-mode .grid-table.fm.v-versions [megatype="versions"] {
+    display: none;
+}
 .grid-table th:last-child::after {
     display: none;
 }
@@ -912,6 +915,11 @@ table.shared-with-me td {
     vertical-align: middle;
     height: 56px;
 }
+/* Hide the size column in MEGA Lite mode */
+.mega-lite-mode table.shared-with-me th:nth-child(4),
+.mega-lite-mode table.shared-with-me td:nth-child(4) {
+    display: none;
+}
 
 table.shared-with-me .avatar-wrapper {
     position: absolute;
@@ -1036,6 +1044,10 @@ table.out-shares .shared-folder-info-block .shared-folder-info {
     text-overflow: ellipsis;
     overflow: hidden;
 }
+/* Temporarily hide the size of folders in MEGA Lite mode as we don't know the contents */
+.mega-lite-mode table.out-shares .shared-folder-info-block .shared-folder-info {
+    display: none;
+}
 table.out-shares .fm-chat-users-wrapper.simpletip {
     display: inline-block;
     max-width: 100%;
@@ -1055,6 +1067,16 @@ table.out-shares .fm-chat-users {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+/* Temporary fix to icon placement in MEGA Lite mode because we don't know the folder size */
+.mega-lite-mode table.out-shares .medium-file-icon.folder-shared {
+    position: absolute;
+    top: 10px;
+}
+/* Temporary fix to hide the size column in MEGA Lite mode because we don't know the folder size */
+.mega-lite-mode table.out-shares th:nth-child(4),
+.mega-lite-mode table.out-shares td:nth-child(4) {
+    display: none;
 }
 
 /* ======================================== *\

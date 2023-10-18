@@ -399,7 +399,12 @@ function init_page() {
     // Rmove business class to affect the top header
     // Remove bottom-page class and old class
     // Remove pro class when user come back from pro page
-    document.body.classList.remove('business', 'bottom-pages', 'old', 'pro');
+    document.body.classList.remove('business', 'bottom-pages', 'old', 'pro', 'mega-lite-mode');
+
+    // Add class to hide/show various elements in MEGA Lite mode
+    if (mega.infinity) {
+        document.body.classList.add('mega-lite-mode');
+    }
 
     // Redirect url to extensions when it tries to go plugin or chrome or firefox
     if (page === 'plugin') {
@@ -1903,6 +1908,11 @@ function topbarUI(holderId) {
     }
     else {
         window.mega.ui.searchbar.init();
+    }
+
+    // Initialise the Back to MEGA button (only shown if in MEGA Lite mode)
+    if (mega.infinity) {
+        mega.lite.initBackToMegaButton();
     }
 
     $('.js-topbaravatar, .js-activity-status', topbar).rebind('click', function() {

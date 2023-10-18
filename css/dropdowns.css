@@ -130,6 +130,20 @@
     width: auto;
     z-index: 10;
 }
+.mega-lite-mode .dropdown.body .dropdown-item[megatype="size"] {
+    display: none;
+}
+/* Temporarily hide Versioning and Favourite options until we have a fix for MEGA Lite mode */
+.mega-lite-mode .dropdown.body .dropdown-item[megatype="versions"],
+.mega-lite-mode .dropdown.body .dropdown-item.properties-versions,
+.mega-lite-mode .dropdown.body .dropdown-item.clearprevious-versions,
+.mega-lite-mode .dropdown.body .dropdown-item.add-star-item {
+    display: none;
+}
+/* Temporarily hide Move item in context menu for files & folders which is nor working in MEGA Lite mode */
+.mega-lite-mode .dropdown.body .dropdown-item.move-item {
+    display: none;
+}
 .dropdown.body span.loading {
     line-height: 32px;
 }

@@ -301,6 +301,10 @@
     background-color: var(--stroke-grey-1);
     box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.1);
 }
+/* Temporarily hide settings sub title in left panel until fixed in MEGA Lite mode */
+.mega-lite-mode .content-panel .settings-button .sub-title[data-scrollto="file-version"] {
+    display: none;
+}
 .content-panel .settings-button .head-title i {
     --icon-size: 24px;
     transition: var(--transition-color);

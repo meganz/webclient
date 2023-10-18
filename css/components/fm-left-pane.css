@@ -11,6 +11,15 @@
     padding: 3px 0;
     text-overflow: ellipsis;
 }
+.fm-main .lp-header span.mega-lite-text {
+    display: none;
+}
+.mega-lite-mode .fm-main .lp-header .mega-lite-text {
+    display: inline;
+}
+.mega-lite-mode .fm-main .lp-header .drive-text {
+    display: none;
+}
 .lp-content-wrap {
     padding: 0 8px;
 }
@@ -107,6 +116,12 @@
 }
 .rtl .lp-myfiles .btn-myfiles.collapse i.icon-dropdown {
     transform: rotate(90deg);
+}
+/* Temporarily hide Recents, Backups and Favourites in the left panel in MEGA Lite mode */
+.mega-lite-mode .lp-myfiles .btn-myfiles.recents,
+.mega-lite-mode .lp-myfiles .btn-myfiles.backups,
+.mega-lite-mode .lp-myfiles .btn-myfiles.faves {
+    display: none;
 }
 .lp-myfiles .shared-panel {
     padding-top: 8px;

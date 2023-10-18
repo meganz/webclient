@@ -762,9 +762,10 @@
             </div>
 
             <!-- My Files Section Begin -->
-            <section class="js-lp-myfiles lp-myfiles" >
+            <section class="js-lp-myfiles lp-myfiles">
                 <div class="lp-header">
-                    <span>[$drive]</span>
+                    <span class="drive-text">[$drive]</span>
+                    <span class="mega-lite-text">[$mega_lite]</span>
                 </div>
                 <div class="content-area js-myfiles-panel">
 
@@ -1168,34 +1169,6 @@
         </div>
 
         <div class="fm-right-files-block">
-            <div class="fm-notification-block full">
-                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span>[$22667]</span>
-            </div>
-            <div class="fm-notification-block expired-business">
-
-            </div>
-            <div class="fm-notification-block almost-full">
-                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span>[$16316]</span>
-                <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
-            </div>
-            <div class="fm-notification-block grace-business">
-                <span>[$16316]</span>
-            </div>
-            <div class="fm-notification-block business-next-tier"></div>
-            <div class="fm-notification-block duplicated-items-found">
-                <span>[$22101]</span>
-                <a class="fix-me-btn">[$22102]</a>
-                <div class="fm-notification-close fix-me-close sprite-fm-mono icon-close-component"></div>
-            </div>
-            <div class="fm-notification-block payment-card-status payment-card-expired">
-                <div>[$payment_card_exp]</div>
-            </div>
-            <div class="fm-notification-block payment-card-status payment-card-almost-expired">
-                <div>[$payment_card_almost_exp]</div>
-            </div>
-
             <div class="onboarding-control-panel hidden">
                 <div class="onboarding-control-panel-content">
                     <button class="close js-close mega-button action icon" aria-label="[$148]">
@@ -1437,9 +1410,40 @@
                 </div>
             </div>
 
+            <div class="fm-notification-block mega-lite-mode-warning">
+                <i class="notification-block-icon sprite-fm-mono icon-lock"></i>
+                <span>[$in_mega_lite_mode_banner]</span>
+            </div>
             <div class="fm-notification-block unverified-share">
                 <i class="notification-block-icon sprite-fm-mono icon-info"></i>
                 <span></span>
+            </div>
+            <div class="fm-notification-block full">
+                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+                <span>[$22667]</span>
+            </div>
+            <div class="fm-notification-block expired-business">
+
+            </div>
+            <div class="fm-notification-block almost-full">
+                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+                <span>[$16316]</span>
+                <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
+            </div>
+            <div class="fm-notification-block grace-business">
+                <span>[$16316]</span>
+            </div>
+            <div class="fm-notification-block business-next-tier"></div>
+            <div class="fm-notification-block duplicated-items-found">
+                <span>[$22101]</span>
+                <a class="fix-me-btn">[$22102]</a>
+                <div class="fm-notification-close fix-me-close sprite-fm-mono icon-close-component"></div>
+            </div>
+            <div class="fm-notification-block payment-card-status payment-card-expired">
+                <div>[$payment_card_exp]</div>
+            </div>
+            <div class="fm-notification-block payment-card-status payment-card-almost-expired">
+                <div>[$payment_card_almost_exp]</div>
             </div>
 
             <!-- Users Management Header -->
@@ -3858,7 +3862,7 @@
                     </div>
                 </div>
                 <div class="fm-account-file-management fm-account-sections">
-                    <div class="account data-block file-version">
+                    <div class="account data-block file-version js-file-version-settings">
                         <div class="settings-left-block">
                             <div class="title-txt">[$19475]</div>
                         </div>
@@ -4994,7 +4998,7 @@
                                     </div>
                                 </div>
 
-                                <div class="account item-wrapper js-backups-el">
+                                <div class="account item-wrapper account-item-wrapper-backups js-backups-el">
                                     <div class="account pr-item backups">
                                         <div class="account progress-perc pr2"></div>
                                         <div class="account progress-size small backups">
@@ -5007,7 +5011,7 @@
                                     </div>
                                 </div>
 
-                                <div class="account item-wrapper">
+                                <div class="account item-wrapper account-item-wrapper-versions">
                                     <div class="account pr-item versions">
                                         <div class="account progress-perc pr3"></div>
                                         <div class="account progress-size small versions">
@@ -5196,7 +5200,7 @@
                                         0 MB
                                     </td>
                                 </tr>
-                                <tr class="account data-item js-backups-el">
+                                <tr class="account data-item account-data-item-backups js-backups-el">
                                     <td class="account">
                                         <i class="sprite-fm-mono icon-database"></i>
                                         <span class="backups pointer-c">[$restricted_folder_button]</span>
@@ -5220,7 +5224,7 @@
                                         -
                                     </td>
                                 </tr>
-                                <tr class="account data-item">
+                                <tr class="account data-item account-data-item-versions">
                                     <td class="account">
                                         <i class="sprite-fm-mono icon-versions-previous"></i>
                                         <span>[$16474]</span>

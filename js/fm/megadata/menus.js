@@ -541,6 +541,14 @@ MegaData.prototype.menuItems = async function menuItems() {
         delete items['.send-to-contact-item'];
     }
 
+    // If in MEGA Lite mode, temporarily hide any Download, Copy and Manage Share options while in the Shared area
+    if (mega.infinity && (M.currentrootid === 'shares' || M.currentrootid === 'out-shares')) {
+        delete items['.download-item'];
+        delete items['.copy-item'];
+        delete items['.sh4r1ng-item'];
+        delete items['.remove-item'];
+    }
+
     if (restrictedFolders || $.selected.length === 1
         && sourceRoot === M.InboxID) {
 

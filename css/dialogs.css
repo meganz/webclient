@@ -4346,6 +4346,11 @@ body.de .mega-dialog.contact-picker-widget {
         display: flex;
         flex-wrap: wrap;
     }
+    /* Temporarily hide the Total Size and Contains in the info/properties dialog */
+    .mega-lite-mode .mega-dialog.properties-dialog.hide-size-and-contains .properties-total-size,
+    .mega-lite-mode .mega-dialog.properties-dialog.hide-size-and-contains .properties-contains {
+        display: none;
+    }
     .mega-dialog.properties-dialog .properties-link-block {
         height: 70px;
         border-top: 2px solid #eeeeee;
@@ -11491,7 +11496,7 @@ body.de .mega-dialog.contact-picker-widget {
     border-radius: 4px;
     margin: 8px 0 0;
     padding: 1px 8px;
-} 
+}
 .mega-dialog.s4-object-access-dialog {
     width: 622px;
 }

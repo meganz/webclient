@@ -359,6 +359,8 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         var cdlogger = debug && localStorage.chatdLogger;
         const rad = sessionStorage.rad;
         const allowNullKeys = localStorage.allownullkeys;
+        const megaLiteMode = localStorage.mInfinity;
+        const testLargeNodes = localStorage.testLargeNodes;
 
         force = force || sessionStorage.fmAetherReload;
 
@@ -406,6 +408,12 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         }
         if (allowNullKeys) {
             localStorage.allownullkeys = 1;
+        }
+        if (megaLiteMode) {
+            localStorage.mInfinity = 1;
+        }
+        if (testLargeNodes) {
+            localStorage.testLargeNodes = 1;
         }
 
         if (force) {

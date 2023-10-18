@@ -1825,6 +1825,11 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a class="anchor-link" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
 
+    const megaLiteHelpCenterLink = 'https://help.mega.io/files-folders/view-move/mega-lite';
+    l.in_mega_lite_mode_banner = escapeHTML(l.in_mega_lite_mode_banner)
+        .replace('[A]', `<a class="clickurl" href="${megaLiteHelpCenterLink}" target="_blank">`)
+        .replace('[/A]', '</a>');
+
     l.blocked_rsn_terminated = escapeHTML(l.blocked_rsn_terminated)
         .replace('[A]', '<a href="https://mega.io/terms" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>')

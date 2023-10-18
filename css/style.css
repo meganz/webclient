@@ -2621,6 +2621,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     justify-content: center;
     margin: 6px 0;
 }
+.mega-lite-mode .nw-fm-left-icon.backup-center,
+.mega-lite-mode .nw-fm-left-icon.gallery {
+    display: none;
+}
 .nw-fm-left-icon.dashboard {
     height: 68px;
     display: flex;
@@ -2937,13 +2941,15 @@ body.loading .light-overlay {
     text-align: start;
     white-space: normal;
 }
-.fm-notification-block.visible {
+.fm-notification-block.visible,
+.mega-lite-mode .fm-notification-block.mega-lite-mode-warning {
     display: flex;
 }
 .fm-notification-block.almost-full,
 .fm-notification-block.payment-card-almost-expired,
 .fm-notification-block.grace-business,
-.fm-notification-block.unverified-share {
+.fm-notification-block.unverified-share,
+.fm-notification-block.mega-lite-mode-warning {
     background-color: var(--label-orange);
 }
 .fm-notification-block.business-next-tier {
@@ -5776,6 +5782,11 @@ span.orange {
     margin-inline-start: 4px;
     cursor: pointer;
 }
+/* Temporarily hide Versions and Backups in the dashboard bottom table for MEGA Lite mode until supported properly */
+.mega-lite-mode .account.data-table .account-data-item-versions,
+.mega-lite-mode .account.data-table .account-data-item-backups {
+	display: none;
+}
 .account.data-table i.versioning-settings:hover {
     --mask-color: var(--icon-active);
 }
@@ -5844,6 +5855,11 @@ span.orange {
 }
 .account.widget .medium.account.progress-list .item-wrapper {
     flex-shrink: 1;
+}
+/* Temporarily hide Versions and Backups from the Used Storage area on the dashboard until MEGA Lite supports it properly */
+.mega-lite-mode .account.widget .medium.account.progress-list .account-item-wrapper-versions,
+.mega-lite-mode .account.widget .medium.account.progress-list .account-item-wrapper-backups {
+    display: none;
 }
 .account.widget .medium.account.progress-list .item-wrapper .pr-item {
     width: max-content;
@@ -8977,6 +8993,11 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 .shared-details-buttons .mega-button,
 .bucket-details-buttons .mega-button {
     min-width: 20px;
+}
+/* If in MEGA Lite mode, temporarily hide any Download and Copy options while in the Shared area */
+.mega-lite-mode .shared-details-buttons .mega-button.fm-share-download,
+.mega-lite-mode .shared-details-buttons .mega-button.fm-share-copy {
+    display: none;
 }
 .files-grid-view.shared-folder-content, .fm-blocks-view.shared-folder-content {
     height: calc(100% - 128px);

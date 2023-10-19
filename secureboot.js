@@ -368,6 +368,9 @@ function getCleanSitePath(path) {
         if (path.mt) {
             window.uTagMT = path.mt;
         }
+        if (path.mct) {
+            window.uTagMCT = path.mct;
+        }
 
         if (path.next) {
             window.nextPage = b64decode(path.next);
@@ -4463,6 +4466,13 @@ mBroadcaster.once('startMega', function() {
 
         onIdle(function() {
             api.req({a: 'mrt', t: mt}).dump('uTagMT');
+        });
+    }
+
+    if (window.uTagMCT) {
+        onIdle(function() {
+            eventlog(99988, window.uTagMCT);
+            delete window.uTagMCT;
         });
     }
 

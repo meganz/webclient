@@ -70,15 +70,26 @@ class MegaMobileFooter extends MegaMobileComponent {
     }
 
     static init() {
+
+        const fmBlock = document.querySelector('#fmholder .file-manager-block');
+
+        if (!fmBlock) {
+
+            if (d) {
+                console.error('Something is wrong, file manager block seems missing');
+            }
+
+            return;
+        }
+
         if (!mega.ui.footer) {
             mega.ui.footer = new MegaMobileFooter({
-                parentNode: document.querySelector('#fmholder .file-manager-block'),
+                parentNode: fmBlock,
                 componentClassname: 'mega-footer hidden'
             });
         }
 
         if (!document.contains(mega.ui.footer.domNode)) {
-            const fmBlock = document.querySelector('#fmholder .file-manager-block');
             fmBlock.appendChild(mega.ui.footer.domNode);
         }
     }

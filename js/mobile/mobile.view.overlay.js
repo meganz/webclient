@@ -146,6 +146,8 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                 holderContainer.classList.add('fm-overlay-view');
             }
         }
+
+        mobile.appBanner.updateBanner(nodeHandle);
     }
 
     /**
@@ -173,6 +175,14 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
 
         if (mobile.cloud.bottomBar) {
             mobile.cloud.bottomBar.show();
+        }
+
+        if (folderlink) {
+            const bannerHandle = M.currentdirid === M.currentrootid ? pfid : M.currentdirid;
+            mobile.appBanner.updateBanner(bannerHandle);
+        }
+        else {
+            mobile.appBanner.hide();
         }
     }
 
@@ -371,6 +381,8 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                 mega.ui.viewerOverlay.hide();
             }
         };
+
+        mobile.appBanner.hide();
 
         window.removeEventListener('popstate', _hide);
         window.addEventListener('popstate', _hide);

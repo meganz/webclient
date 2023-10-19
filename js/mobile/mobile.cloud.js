@@ -22,8 +22,13 @@ mobile.cloud = {
         this.renderFoldersAndFiles();
 
         // If a public folder link
-        if (pfid && M.v.length) {
-            this.initFolderLinkBottomBar();
+        if (pfid) {
+            if (M.v.length) {
+                this.initFolderLinkBottomBar();
+            }
+
+            const bannerHandle = M.currentdirid === M.currentrootid ? pfid : M.currentdirid;
+            mobile.appBanner.updateBanner(bannerHandle);
         }
 
         // Initialise the footer component for Add Folder and Upload File functionality etc

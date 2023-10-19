@@ -174,6 +174,10 @@ var slideshowid;
 
             mBroadcaster.sendMessage(`slideshow:${dir}`, steps);
             slideshow(newShownHandle);
+
+            if (is_mobile) {
+                mobile.appBanner.updateBanner(newShownHandle);
+            }
         }
 
         slideshow_timereset();

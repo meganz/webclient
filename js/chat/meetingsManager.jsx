@@ -444,11 +444,6 @@ class MeetingsManager {
         if (meetingInfo.openInvite !== options.oi) {
             chatRoom.toggleOpenInvite();
         }
-
-        // Chat topic, scheduled meeting title
-        if (meetingInfo.topic !== topic) {
-            chatRoom.setRoomTitle(meetingInfo.topic, false);
-        }
     }
 
     cancelMeeting(scheduledMeeting, chatId) {

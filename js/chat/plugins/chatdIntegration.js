@@ -1887,6 +1887,13 @@ ChatdIntegration.prototype.updateScheduledMeeting = async function(options, sche
 
     options.f = sendInvite ? 0x01 : 0x00;
     if (!scheduledMeeting.isSameAsOpts(options)) {
+        let ct = scheduledMeeting.chatRoom.ct;
+        if (topic !== scheduledMeeting.chatRoom.getRoomTitle()) {
+            const { protocolHandler, type } = scheduledMeeting.chatRoom;
+            const participants = protocolHandler.getTrackedParticipants();
+            await ChatdIntegration._ensureKeysAreLoaded(undefined, participants);
+            ct = ChatRoom.encryptTopic(protocolHandler, topic, participants, type === 'public') || undefined;
+        }
         const res = await asyncApiReq({
             a: 'mcsmp',
             id: scheduledMeetingId,
@@ -1907,7 +1914,8 @@ ChatdIntegration.prototype.updateScheduledMeeting = async function(options, sche
                     ...recurring.end && { u: recurring.end / 1000 },
                     ...recurring.interval && { i: recurring.interval }
                 }
-            }
+            },
+            ct,
         }).catch(ex => {
             this.logger.error(
                 `Failed to update scheduled meeting ${scheduledMeetingId}, chatId: ${chatId}, error: ${ex}`

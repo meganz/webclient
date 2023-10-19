@@ -2669,7 +2669,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     opacity: 0.7;
     transition: opacity 200ms ease-in-out;
 }
-.rtl .nw-fm-left-icon {
+.rtl .nw-fm-left-icon:not(.transfers) {
     direction: rtl;
 }
 .nw-fm-left-icon:hover .nav-icon-label {

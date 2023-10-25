@@ -1810,7 +1810,8 @@ function init_page() {
         }
         else {
             // For regular webclient we replace the whole URL
-            window.location.replace('/login');
+            // and preserve search parameters as the replace will reload memory.
+            window.location.replace('/login' + locationSearchParams);
         }
     }
 

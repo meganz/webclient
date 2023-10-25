@@ -107,7 +107,7 @@ export default class ContactProfile extends MegaRenderMixin {
                             ${IS_VERIFIED ? '' : 'positive'}
                         `}
                         onClick={() => ContactsPanel[IS_VERIFIED ? 'resetCredentials' : 'verifyCredentials'](contact)}>
-                        {IS_VERIFIED ? l[742] : l[7692]}
+                        {IS_VERIFIED ? l[742] : l.verify_credentials}
                     </button>
                 </div>
             );

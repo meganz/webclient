@@ -2643,6 +2643,7 @@
                         </div>
                     </div>
                     <div class="share-dialog-access-title">[$23706]</div>
+                    <div class="mega-banner body warning-template contact-verify-notification"><span></span></div>
                     <div class="mega-banner body warning-template contact-verify-warning">[$undec_outshare_warning_banner]</div>
                     <div class="share-dialog-access-list"></div>
                     <button class="mega-button action share-dialog-access-add">
@@ -2709,13 +2710,13 @@
 
         <header>
             <div class="business-subuser-confirm"></div>
-            <h2 id="fingerprint-dialog-title">[$6783]</h2>
+            <h2 id="fingerprint-dialog-title">[$verify_credentials]</h2>
         </header>
 
         <section>
             <div class="content-block">
                 <p class="sub-title-txt">
-                    [$6779]
+                    [$contact_ver_dialog_content]
                 </p>
 
                 <div class="fingerprint-mid-info">
@@ -2734,7 +2735,7 @@
                     </div>
                 </div>
                 <div class="fingerprint-mid-txt">
-                    [$6781]
+                    [$contact_ver_dialog_banner]
                 </div>
                 <div class="fingerprint-bott-txt">
                     <div class="fingerprint-bott-header">
@@ -2753,7 +2754,7 @@
                     <span>[$1379]</span>
                 </button>
                 <button class="mega-button positive dialog-approve-button">
-                    <span>[$6777]</span>
+                    <span>[$mark_as_verified]</span>
                 </button>
             </div>
         </footer>
@@ -3047,7 +3048,7 @@
                     <div class="fingerprint selectable-txt"></div>
                 </div>
                 <div class="verifyCredentials hidden">
-                    <div class="title">[$7692]:</div>
+                    <div class="title">[$verify_credentials]:</div>
                     <div class="description">
                         [$7693]
                     </div>
@@ -5390,6 +5391,39 @@
                 <p class="reset-account">[$19840]</p>
                 <p class="skip-button">[$20190]</p>
             </aside>
+        </footer>
+    </div>
+
+    <!-- Dialog: contact-verification-dialog -->
+    <div class="mega-dialog dialog-template-graphic contact-verification-dialog hidden"
+         role="dialog"
+         aria-labelledby="cv-title"
+         aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <div class="graphic contact-verification-img"></div>
+            <h2 id="cv-title">[$contact_verification_dialog_title]</h2>
+        </header>
+
+        <section class="content">
+            <div class="content-block">
+                <p class="first-paragraph">[$contact_verification_dialog_content_1]</p>
+                &nbsp;
+                &nbsp;
+                <p class="second-paragraph">[$contact_verification_dialog_content_2]</p>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button positive dialog-approve-button">
+                    <span>[$contact_verification_dialog_button]</span>
+                </button>
+            </div>
         </footer>
     </div>
 

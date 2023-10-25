@@ -134,30 +134,38 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         return false;
     };
 
+    const cvHandler = (ev, element) => {
+        if (!element.hasClass('ui-selected')) {
+            element.parent().find(true).removeClass('ui-selected');
+            selectionManager.clear_selection();
+        }
+        element.addClass('ui-selected');
+        ev.preventDefault();
+        ev.stopPropagation(); // do not treat it as a regular click on the file
+        ev.currentTarget = element;
+
+        selectionManager.add_to_selection(element.attr('id'));
+        return fingerprintDialog(M.d[$.selected[0]].su);
+    };
+
     $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(ev) {
         return cmIconHandler.call(this, true, 'tr', ev);
     });
     $('.data-block-view .file-settings-icon').rebind('click', function(ev) {
         return cmIconHandler.call(this, false, 'a', ev);
     });
-
+    $('.grid-scrolling-table .fm-user-verification span').rebind('click.sharesui', function(ev) {
+        var target = $(this).closest('tr');
+        return cvHandler(ev, target);
+    });
+    $('.shared-blocks-view .fm-user-verification span').rebind('click.sharesui', function(ev) {
+        var target = $(this).closest('a');
+        return cvHandler(ev, target);
+    });
     if (M.currentrootid === 'file-requests') {
         mega.fileRequest.rebindListManageIcon({
             iconHandler: cmIconHandler
         });
-    }
-
-    const unverifiedShareBanner = document.querySelector('.fm-notification-block.unverified-share');
-
-    if (unverifiedShareBanner) {
-
-        unverifiedShareBanner.classList.remove('visible');
-
-        if (M.currentdirid === 'shares' && this.megaRender && this.megaRender.unverifiedShare) {
-
-            unverifiedShareBanner.querySelector('span').textContent = l.undec_share_warning_banner;
-            unverifiedShareBanner.classList.add('visible');
-        }
     }
 
     if (!u) {

@@ -368,6 +368,9 @@ function getCleanSitePath(path) {
         if (path.mt) {
             window.uTagMT = path.mt;
         }
+        if (path.mct) {
+            window.uTagMCT = path.mct;
+        }
 
         if (path.next) {
             window.nextPage = b64decode(path.next);
@@ -1996,12 +1999,6 @@ if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
 }
 
 if (is_ios) {
-    tmp = document.querySelector('meta[name="apple-itunes-app"]');
-    if (tmp) {
-        tmp.setAttribute('content',
-            'app-id=706857885, app-argument=mega://#' + page);
-    }
-
     // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
     // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
     tmp = ua.match(/(?:iphone|cpu) os (\d+)[\._](\d+)/);
@@ -2687,8 +2684,9 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/languageDialog.js', n: 'languageDialog_js', j:1,w:7});
     jsl.push({f:'css/jquery-ui.extra.css', n: 'jquery_ui_extra_css', j:2,w:5,c:1,d:1,cache:1});
 
+    jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
+
     if (!is_mobile) {
-        jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
         jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
@@ -3098,6 +3096,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.transfer.block.js', n: 'mobile_transfer_block_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.bottom.bar.js', n: 'mobile_bottom_bar_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.view.overlay.js', n: 'mobile_view_overlay_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.appbanner.js', n: 'mobile_app_banner_js', j: 1, w: 1});
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j: 1, w: 3});
         jsl.push({f:'js/mobile/mobile.promo.banner.js', n: 'mobile_promo_banner_js', j: 1, w:1});
     }
@@ -4468,6 +4467,13 @@ mBroadcaster.once('startMega', function() {
 
         onIdle(function() {
             api.req({a: 'mrt', t: mt}).dump('uTagMT');
+        });
+    }
+
+    if (window.uTagMCT) {
+        onIdle(function() {
+            eventlog(99988, window.uTagMCT);
+            delete window.uTagMCT;
         });
     }
 

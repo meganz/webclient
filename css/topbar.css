@@ -42,7 +42,8 @@
     padding: 0 4px;
 }
 .topbar-searcher {
-    max-width: 480px;
+    display: flex;
+    max-width: 800px;
     width: 100%;
     min-height: 40px;
     position: relative;
@@ -65,11 +66,11 @@
     justify-content: space-between;
     height: 32px;
     background: var(--surface-grey-6);
-    width: 480px;
     border-radius: 18px;
     position: absolute;
     margin: 8px 0;
     z-index: 5;
+    width: 100%;
 }
 .topbar-searcher i {
     --icon-size: 24px;
@@ -108,7 +109,7 @@
 }
 .dropdown-search {
     position: absolute;
-    width: 496px;
+    width: calc(100% + 16px);
     z-index: 4;
     background: var(--stroke-main);
     box-shadow: var(--dropdown-shadow);
@@ -127,13 +128,14 @@
     flex-direction: column;
     align-items: center;
     gap: 24px;
+    width: 100%;
 }
 .dropdown-section .dropdown-section-clear {
     color: var(--stroke-info)
 }
 .dropdown-section .dropdown-section-item {
     display: flex;
-    width: 496px;
+    width: 100%;
     flex-direction: column;
     align-items: flex-start;
     gap: 7px;
@@ -171,8 +173,28 @@
 .dropdown-section-body .dropdown-section-body-item:hover {
     background: var(--stroke-grey-2);
 }
+.dropdown-section-body .dropdown-recently-searched-item {
+    display: flex;
+}
+.dropdown-section-body .dropdown-recently-opened-item {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+}
+.dropdown-recently-opened-file {
+    display: flex;
+    align-items: center;
+}
+.dropdown-recently-opened-item-file-icon {
+    width: 24px;
+    height: 24px;
+}
+.dropdown-recently-opened-item-location {
+    text-align: center;
+}
+.dropdown-recently-opened-item-time {
+    text-align: right;
+}
 .dropdown-recently-searched-item .dropdown-recently-searched-item-text {
-    max-width: 430px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -182,7 +204,14 @@
     --mask-color: var(--icon-rest) !important;
 }
 .dropdown-item-file {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr;
+}
+.dropdown-recently-opened-item-filename,
+.dropdown-recently-opened-item-location {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .dropdown-item-text-medium {
     color: var(--text-color-medium);

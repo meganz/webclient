@@ -143,6 +143,14 @@
     display: inline-block;
 }
 
+.share-dialog-access-node.unverified-contact .access-node-contact-verify .contact-verify {
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--label-blue);
+    white-space: nowrap;
+    margin-inline-start: 16px;
+}
+
 .share-dialog-access-node .access-node-avatar {
     border-radius: 4px;
     display: inline-block;
@@ -235,12 +243,21 @@
     justify-content: center;
     margin: 6px 0 0;
     padding: 2px 8px;
-    text-align: center;
+    text-align: start;
     width: calc(100% - 48px);
 }
 
 .mega-dialog.share-dialog .mega-banner.contact-verify-warning {
     margin-bottom: 16px;
+}
+
+.mega-dialog.share-dialog .mega-banner.contact-verify-notification {
+    margin-bottom: 33px;
+}
+.mega-dialog.share-dialog .mega-banner.contact-verify-notification .contact-verification-settings {
+    display: inline-block;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 .mega-dialog.share-dialog .warning-template span {

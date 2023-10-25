@@ -559,6 +559,31 @@ MegaData.prototype.sortByInteraction = function(d) {
     this.sort();
 };
 
+MegaData.prototype.getSortByVerificationFn = function() {
+    'use strict';
+
+    return function(a, b, d) {
+        const a_verifyState = (u_authring.Ed25519[a.h] || {}).method
+                                >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
+        const b_verifyState = (u_authring.Ed25519[b.h] || {}).method
+                                >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
+        if (a_verifyState < b_verifyState) {
+            return -1 * Number(d);
+        }
+        else if (a_verifyState >= b_verifyState) {
+            return 1 * Number(d);
+        }
+    };
+};
+
+MegaData.prototype.getSortByVerification = function(d) {
+    'use strict';
+
+    this.sortfn = this.getSortByVerificationFn();
+    this.sortd = d;
+    this.sort();
+};
+
 MegaData.prototype.doSort = function(n, d) {
     "use strict";
     $('.grid-table thead .arrow').removeClass('asc desc');

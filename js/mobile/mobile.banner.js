@@ -448,7 +448,8 @@ class MegaMobileBanner extends MegaMobileComponent {
             icon: {
                 info: 'sprite-mobile-fm-mono icon-alert-circle-thin-outline',
                 warning: 'sprite-mobile-fm-mono icon-alert-circle-thin-outline',
-                error: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline'
+                error: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline',
+                advertisement: 'sprite-mobile-fm-uni icon-mega-logo-rounded-square'
             },
             show: function(title, message, ctaText, type, closeBtn, systemWide, clear) {
 
@@ -462,6 +463,7 @@ class MegaMobileBanner extends MegaMobileComponent {
                     this.actionButtonText = ctaText;
                     this.displayType = type;
                     this.icon = mobile.banner.icon[type];
+                    this.iconSize = type === 'advertisement' ? '48' : '';
                     this.closeButton = typeof closeBtn === 'undefined' ? true : closeBtn;
                     this.isSystemWide = typeof systemWide === 'undefined' ? true : systemWide;
                 });

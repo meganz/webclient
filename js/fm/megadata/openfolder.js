@@ -722,6 +722,7 @@
         }
         else if (id === 'shares') {
             id = 'shares';
+            M.onFileManagerReady(() => M.showContactVerificationDialog());
         }
         else if (id === 'out-shares') {
             id = 'out-shares';

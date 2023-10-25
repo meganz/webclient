@@ -2417,7 +2417,7 @@ FileManager.prototype.initContextUI = function() {
 FileManager.prototype.fireKeyMgrDependantActions = async function() {
     'use strict';
 
-    if (sessionStorage.folderLinkImport || $.onImportCopyNodes) {
+    if (sessionStorage.folderLinkImport || ($.onImportCopyNodes && !$.onImportCopyNodes.opSize)) {
 
         await M.importFolderLinkNodes(false);
     }

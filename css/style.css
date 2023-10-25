@@ -1959,6 +1959,10 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .shared-blocks-view .nw-contact-status {
     border: 0;
     margin: 21px 2px 0 12px;
+    float: none;
+    display: inline-block;
+    width: 5px;
+    height: 5px;
 }
 .nw-conversations-item .nw-contact-status, .fm-tree-panel .nw-contact-status {
     margin: 9px 0 0 14px;
@@ -2669,7 +2673,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     opacity: 0.7;
     transition: opacity 200ms ease-in-out;
 }
-.rtl .nw-fm-left-icon {
+.rtl .nw-fm-left-icon:not(.transfers) {
     direction: rtl;
 }
 .nw-fm-left-icon:hover .nav-icon-label {

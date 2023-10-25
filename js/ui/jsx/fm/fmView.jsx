@@ -172,6 +172,9 @@ export default class FMView extends MegaRenderMixin {
         else if (sortBy[0] === "interaction") {
             sortFunc = M.getSortByInteractionFn();
         }
+        else if (sortBy[0] === "verification") {
+            sortFunc = M.getSortByVerificationFn();
+        }
         else if (sortBy[0] === "email") {
             sortFunc = M.getSortByEmail();
         }

@@ -5,11 +5,11 @@ import FMView from "../../../ui/jsx/fm/fmView.jsx";
 import {ColumnContactName} from "../../../ui/jsx/fm/nodes/columns/columnContactName.jsx";
 import {ColumnContactStatus} from "../../../ui/jsx/fm/nodes/columns/columnContactStatus.jsx";
 import {ColumnContactLastInteraction} from "../../../ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx";
+import {ColumnContactVerifiedStatus} from "../../../ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx";
 import {ColumnContactButtons} from "../../../ui/jsx/fm/nodes/columns/columnContactButtons.jsx";
 
 export default class ContactList extends MegaRenderMixin {
     contextMenuRefs = [];
-
     state = {
         selected: [],
         searchValue: null,
@@ -147,6 +147,9 @@ export default class ContactList extends MegaRenderMixin {
                             ColumnContactStatus,
                             [ColumnContactLastInteraction, {
                                 interactions: this.state.interactions
+                            }],
+                            [ColumnContactVerifiedStatus, {
+                                contacts: this.props.contacts
                             }],
                             [ColumnContactButtons, {
                                 onContextMenuRef: (handle, node) => {

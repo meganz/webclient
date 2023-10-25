@@ -95,13 +95,18 @@ function addNewContact($addButton, cd) {
                 else {
                     cd = false;
                 }
-
+                if ($.dialog === 'share') {
+                    $folderName = $('.share-dialog-folder-name', '.mega-dialog.share-dialog').text();
+                }
                 if (cd) {
                     closeDialog();
                     $('.token-input-token-mega').remove();
                 }
 
                 loadingDialog.phide();
+                if ($folderName) {
+                    showToast('view', l.share_folder_toast.replace('%1', $folderName));
+                }
 
                 promise.resolve();
             });
@@ -1915,11 +1920,30 @@ function shareDialogContentCheck() {
     }
 
     const cvw = dc.querySelector('.contact-verify-warning');
+    const cvn = dc.querySelector('.contact-verify-notification');
 
     cvw.classList.add('hidden');
+    cvn.classList.add('hidden');
+
+    const cv = mega.keyMgr.getWarningValue('cv') !== false;
+
+    if (!cv && u_attr.since < 1697184000 && !mega.keyMgr.getWarningValue('cvb')) {
+        cvn.classList.remove('hidden');
+        // Set warning value for contact verificaiton banner
+        mega.keyMgr.setWarningValue('cvb', '1');
+        const cvnText = cvn.querySelector('span');
+        $(cvnText).safeHTML(
+            escapeHTML(l.contact_verification_notif_banner)
+                .replace(
+                    '[D]',
+                    '<div class="contact-verification-settings">'
+                )
+                .replace('[/D]', '</div>')
+        );
+    }
 
     // if any unverified contact
-    if (dc.querySelector('.unverified-contact')) {
+    if (cv && dc.querySelector('.unverified-contact')) {
         cvw.classList.remove('hidden');
     }
 }
@@ -1953,7 +1977,7 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
     else if (type === '2') {
         userName = l.contact_request_pending.replace('%1', userName);
     }
-    else {
+    else if (mega.keyMgr.getWarningValue('cv') === '1') {
         const ed = authring.getContactAuthenticated(id, 'Ed25519');
 
         if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
@@ -1967,12 +1991,9 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
                     <div class="access-node-username">
                         ${htmlentities(userName)}
                     </div>
-                    <div class="access-node-status ustatus ${id} ${presence}">
-                        <div class="nw-contact-status"></div>
-                    </div>
                 </div>
                 <div class="access-node-contact-verify">
-                    <button class="mega-button small">${l[1960]}</button>
+                    <div class='contact-verify'>${l.verify_credentials}</div>
                 </div>
                 <div class="access-node-permission-wrapper">
                     <button
@@ -2286,13 +2307,17 @@ function shareDialogAccessListBinds() {
         hideShareDialogPermMenu();
     });
 
-    $('.access-node-contact-verify button', $shareDialog).rebind('click', function() {
+    $('.access-node-contact-verify .contact-verify', $shareDialog).rebind('click', function() {
 
         const contact = this.closest('.unverified-contact');
 
         if (contact) {
             fingerprintDialog(this.closest('.unverified-contact').id);
         }
+    });
+
+    $('.contact-verification-settings', $shareDialog).rebind('click', () => {
+        M.openFolder('account/contact-chats/contact-verification-settings', true);
     });
 }
 
@@ -2524,7 +2549,7 @@ function renderShareDialogAccessList() {
     "use strict";
 
     const $shareDialog = $('.mega-dialog.share-dialog', '.mega-dialog-container');
-    const $warning = $('.mega-banner', $shareDialog).eq(1);
+    const $warning = $('.mega-banner', $shareDialog).eq(2);
     let readonly = false;
 
     // Remove all contacts from the access list
@@ -3638,10 +3663,13 @@ function sharedFolderUI() {
 
         $(rightPanelView).addClass('shared-folder-content');
 
-        const ed = authring.getContactAuthenticated(ownersHandle, 'Ed25519');
+        if (mega.keyMgr.getWarningValue('cv') === '1') {
+            const ed = authring.getContactAuthenticated(ownersHandle, 'Ed25519');
 
-        if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
-            $('.shared-details-block .shared-details-icon').addClass('sprite-fm-uni-after icon-warning-after');
+            if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
+                $('.shared-details-block .shared-details-icon')
+                    .addClass('sprite-fm-uni-after icon-warning-after');
+            }
         }
 
         if (M.d[M.currentdirid] !== nodeData || M.d[nodeData.p]) {
@@ -3732,9 +3760,9 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
 
     $dialog.toggleClass('e-modal', isAdminVerify === null);
     $dialog.toggleClass('admin-verify', isAdminVerify === true);
-    let titleTxt = l[6783];
-    let subTitleTxt = l[6779];
-    let approveBtnTxt = l[6777];
+    let titleTxt = l.verify_credentials;
+    let subTitleTxt = l.contact_ver_dialog_content;
+    let approveBtnTxt = l.mark_as_verified;
     let credentialsTitle = l[6780];
     let listenerToken = null;
     window.closeDlgMute = null;

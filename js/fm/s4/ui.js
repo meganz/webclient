@@ -247,10 +247,10 @@ lazy(s4, 'ui', () => {
                     }
                 }
                 else if (s4PublicAccess === 1) {
-                    s4PaoLabel = l[17601];
+                    s4PaoLabel = l.s4_enabled_obj_url;
                 }
                 else {
-                    s4PaoLabel = l[7070];
+                    s4PaoLabel = l.s4_disabled_obj_url;
                 }
 
                 // Set Public access

@@ -514,7 +514,7 @@ lazy(s4, 'keys', () => {
                 skNode.value = sk;
             }
             const enNode = row.querySelector('td.status span');
-            const enText = en ? l[17601] : l[7070];
+            const enText = en ? l.s4_enabled_key : l.s4_disabled_key;
             if (enNode.textContent !== enText) {
                 const enClassList = row.querySelector('td.status i').classList;
                 enClassList.remove(en ? 'icon-disabled-filled' : 'icon-active');

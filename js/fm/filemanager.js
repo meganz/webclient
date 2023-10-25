@@ -1510,7 +1510,7 @@ FileManager.prototype.initContextUI = function() {
 
         // If MEGA Lite mode and the selection contains a folder, hide the regular download option (only zip allowed),
         // otherwise this throws an error about downloading an empty folder then downloads as a zip anyway.
-        if (mega.infinity && mega.lite.containsFolderInSelection($.selected)) {
+        if (mega.lite && mega.lite.containsFolderInSelection($.selected)) {
             $(c + '.download-standart-item').addClass('hidden');
             return false;
         }
@@ -1537,7 +1537,7 @@ FileManager.prototype.initContextUI = function() {
         var c = this.className;
 
         // If MEGA Lite mode and attempting to download a folder(s) by clicking on the Download item, disable the click
-        if (mega.infinity && mega.lite.containsFolderInSelection($.selected)) {
+        if (mega.lite && mega.lite.containsFolderInSelection($.selected)) {
             return false;
         }
 

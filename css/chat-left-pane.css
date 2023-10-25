@@ -1033,13 +1033,13 @@ li.active .call-duration i {
 }
 .contacts-table th {
     position: relative;
-    width: 23%;
+    width: 18%;
 }
 .contacts-table th.name {
-    width: 31%;
+    width: 25%;
 }
 .contacts-table.requests-table th {
-    width: 20%;
+    width: 18%;
 }
 .contacts-table.requests-table th.contact-controls-container {
     width: 49%;
@@ -1080,6 +1080,29 @@ li.active .call-duration i {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    width: 100%;
+}
+.contacts-table thead th.verification span {
+    -webkit-padding-start: 16px;
+    padding-inline-start: 16px;
+}
+.contacts-verification-label-container {
+    display: flex;
+}
+.contacts-verification-icon {
+    margin: 0 8px;
+}
+.contacts-verification-icon-simpletip {
+    max-width: 280px !important;
+    text-align: center;
+}
+.verify-contact-link-container .verify-contact-link {
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--label-blue);
+    white-space: nowrap;
+}
+td.verification .contact-item {
     width: 100%;
 }
 

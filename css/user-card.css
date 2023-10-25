@@ -105,20 +105,23 @@ button.user-card-name:hover {
     --mask-color: var(--secondary-blue);
 }
 .user-card-verified, .verified .verified_icon {
-    width: 15px;
-    height: 15px;
+    width: 12px;
+    height: 12px;
     box-sizing: border-box;
-    background-color: white;
+    background-color: var(--secondary-blue);
     border-radius: 100%;
-    float: left;
-    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.1);
-    position: relative;
+    background-image: url("../images/mega/new-chat-sprite.png");
+    background-repeat: no-repeat;
+    background-position: -7px -1353px;
+    box-shadow: 0 0 0 2px var(--badge-border);
+    position: absolute;
+    display: block;
 }
 .small-rounded-avatar .user-card-verified, .verified .verified_icon {
     position: absolute;
     z-index: 10;
-    right: -5px;
-    top: -4px;
+    right: -3px;
+    top: -3px;
 }
 .short .small-rounded-avatar .user-card-verified {
     position: absolute;

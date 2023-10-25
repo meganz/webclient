@@ -608,6 +608,45 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
     });
 };
 
+/**
+ * Show the Contact Verification dialog
+ * @return {Object} contact verification dialog
+ */
+MegaData.prototype.showContactVerificationDialog = function() {
+    'use strict';
+
+    var $dialog = $('.mega-dialog.contact-verification-dialog');
+    $('button.js-close', $dialog).removeClass('hidden').rebind('click', closeDialog);
+
+    // Don't show to new user
+    if (u_attr.since > 1697184000 || mega.keyMgr.getWarningValue('cvd')
+        || mega.keyMgr.getWarningValue('cv') !== false) {
+        return;
+    }
+
+    // TODO: Implement this on mobile
+    if (!$dialog.length) {
+        if (d) {
+            console.debug('contact-verification-dialog not available...');
+        }
+        return;
+    }
+
+    M.safeShowDialog('contact-verification-dialog', () => {
+        // Set warning value for contact verificaiton dialog
+        mega.keyMgr.setWarningValue('cvd', '1');
+
+        // Automatically select all string when key is clicked.
+        $('.dialog-approve-button', $dialog).rebind('click.cv', () => {
+            $('.fm-account-contact-chats', accountUI.$contentBlock).removeClass('hidden');
+            closeDialog();
+            M.openFolder('account/contact-chats/contact-verification-settings', true);
+        });
+        return $dialog;
+    });
+};
+
+
 MegaData.prototype.showPaymentCardBanner = function(status) {
     'use strict';
 

@@ -4000,6 +4000,7 @@ accountUI.contactAndChat = {
         this.chatList.render();
         this.richURL.render();
         this.dnd.render();
+        this.contactVerification.render();
     },
 
     status: {
@@ -4426,6 +4427,27 @@ accountUI.contactAndChat = {
             });
         }
     },
+
+    contactVerification: {
+
+        render: function() {
+
+            'use strict';
+
+            const cv = mega.keyMgr.getWarningValue('cv') | 0;
+            const $sectionContainerChat = $('.fm-account-contact-chats', accountUI.$contentBlock);
+
+            accountUI.inputs.switch.init(
+                '#contact-verification-toggle',
+                $('#contact-verification-toggle', $sectionContainerChat).parent(),
+                cv,
+                val => {
+                    mega.keyMgr.setWarningValue('cv', !!val).catch(dump);
+                    showToast('settings', l[16168]);
+                }
+            );
+        }
+    }
 };
 
 accountUI.reseller = {

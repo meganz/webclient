@@ -966,20 +966,27 @@ table.shared-with-me .fm-chat-user-info .fm-chat-user {
     color: var(--text-color-high);
     margin-right: 20px;
     font: var(--text-body1);
-    display: block;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    display: flex;
+    align-items: center;
 }
 
 table.shared-with-me .fm-chat-user-info .nw-contact-status {
-    margin: 6px 6px 0 0;
+    margin: 12px;
 }
 
 table.shared-with-me .fm-chat-user-info .fm-chat-user-status {
     font: var(--text-body2);
     color: var(--text-color-low);
 }
+table.shared-with-me .fm-chat-user-info .fm-user-verification {
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--label-blue);
+}
+
 table.shared-with-me .shared-folder-size {
     font: var(--text-body2);
 }

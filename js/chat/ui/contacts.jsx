@@ -368,7 +368,6 @@ export class ContactVerified extends MegaRenderMixin {
                             user-card-verified
                             ${this.props.className || ''}
                         `}>
-                        <i className="sprite-fm-mono icon-check" />
                     </div>
                 );
             }
@@ -505,7 +504,7 @@ export class ContactFingerprint extends MegaRenderMixin {
             ) {
                 verifyButton = <Button
                     className="dropdown-verify active"
-                    label={l[7692]}
+                    label={l.verify_credentials}
                     icon="sprite-fm-mono icon-key"
                     onClick={() => {
                         closeDropdowns();
@@ -737,7 +736,6 @@ export class ContactCard extends ContactAwareComponent {
             userCard = <div className="user-card-data">
                 {usernameBlock}
                 <div className="user-card-status">
-                    <ContactPresence contact={contact} className={this.props.presenceClassName}/>
                     {this.props.isInCall ?
                         <div className="audio-call">
                             <i className="sprite-fm-mono icon-phone" />

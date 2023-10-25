@@ -72,9 +72,8 @@
                     '<td>' +
                         '<div class="fm-chat-user-info todo-star ustatus">' +
                             '<div class="todo-fm-chat-user-star"></div>' +
-                            '<div class="fm-chat-user"></div>' +
-                            '<div class="nw-contact-status"></div>' +
-                            '<div class="fm-chat-user-status"></div>' +
+                            '<div class="fm-chat-user"><span></span><div class="nw-contact-status"></div></div>' +
+                            '<div class="fm-user-verification"><span></span></div>' +
                             '<div class="clear"></div>' +
                         '</div>' +
                     '</td>' +
@@ -108,6 +107,7 @@
                 '<span class="shared-folder-info-block">' +
                     '<span class="shared-folder-name"></span>' +
                     '<span class="shared-folder-info"></span>' +
+                    '<div class="fm-user-verification"><span></span></div>' +
                 '</span>' +
             '</a>'
         ],
@@ -1218,13 +1218,7 @@
                         tmp.classList.add(aProperties.onlineStatus[1]);
                     }
 
-                    tmp = aTemplate.querySelector('.fm-chat-user-status');
-                    tmp.classList.add(aProperties.userHandle);
-                    if (aProperties.onlineStatus) {
-                        tmp.textContent = aProperties.onlineStatus[0];
-                    }
-
-                    aTemplate.querySelector('.fm-chat-user').textContent = aProperties.userName;
+                    aTemplate.querySelector('.fm-chat-user span').textContent = aProperties.userName;
                     aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
                     aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
 
@@ -1234,12 +1228,22 @@
 
                 }
 
-                const ed = aNode.su && authring.getContactAuthenticated(aNode.su, 'Ed25519');
+                const contactVerification = mega.keyMgr.getWarningValue('cv') | 0;
+                tmp = aTemplate.querySelector('.fm-user-verification span');
 
-                if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
+                if (contactVerification) {
+                    const ed = aNode.su && authring.getContactAuthenticated(aNode.su, 'Ed25519');
 
-                    this.unverifiedShare = (this.unverifiedShare || 0) + 1;
-                    aTemplate.classList.add('unverified-share');
+                    if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
+                        aTemplate.classList.add('unverified-share');
+                        this.unverifiedShare = (this.unverifiedShare || 0) + 1;
+                        tmp.textContent = l.verify_credentials;
+                    }
+
+                    aTemplate.classList.add('cv-on');
+                }
+                else {
+                    aTemplate.classList.remove('cv-on');
                 }
 
                 return aTemplate;

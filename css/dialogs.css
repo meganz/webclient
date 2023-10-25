@@ -4076,6 +4076,33 @@ body.de .mega-dialog.contact-picker-widget {
 
 /* end fingerprint-dialog */
 
+/* contact verification dialog */
+
+.mega-dialog.mega-dialog.contact-verification-dialog .contact-verification-img {
+    background: url('../images/mega/contact-verification.png') no-repeat;
+    background-size: contain;
+    height: 120px;
+    width: 120px;
+}
+
+.mega-dialog.contact-verification-dialog:not(.dialog-template-message) > header .graphic {
+    margin: unset;
+}
+
+.mega-dialog.contact-verification-dialog > header h2 {
+    text-align: start;
+}
+
+.mega-dialog.contact-verification-dialog p {
+    text-align: start;
+}
+
+.mega-dialog.dialog-template-graphic.contact-verification-dialog > footer .footer-container {
+    justify-content: flex-end;
+}
+
+/* end of contact verification dialog */
+
 /* loginrequired-dialog */
 
     .mega-dialog.loginrequired-dialog {
@@ -9313,7 +9340,6 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.affiliate-guide .step1 .cell .affiliate-guide-check-item {
         display: flex;
     }
-
     .mega-dialog.affiliate-guide .info {
         box-sizing: border-box;
         padding-bottom: 10px;

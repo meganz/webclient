@@ -232,6 +232,15 @@
     overflow: hidden;
     color: var(--text-color-medium);
 }
+.data-block-view .fm-user-verification {
+    display: block;
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--label-blue);
+}
+.data-block-view.cv-on .fm-user-verification {
+    height: 20px;
+}
 .data-block-view:hover .file-settings-icon,
 .data-block-view.ui-selected .file-settings-icon,
 .properties-name-block:hover .file-settings-icon {
@@ -319,7 +328,7 @@
     background-repeat: no-repeat;
     position: absolute;
     left: 50%;
-    top: 45%;
+    top: 40%;
     transform: translate(-50%, -50%);
 }
 .shared-blocks-view .data-block-view .block-view-file-type,

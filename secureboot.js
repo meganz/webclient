@@ -3054,7 +3054,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.over-bandwidth-quota.js', n: 'mobile_over_bandwidth_quota_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.over-storage-quota.js', n: 'mobile_over_storage_quota_js', j: 1 });
         jsl.push({f:'html/mvoucherinfo.html', n: 'mvoucherinfo', j: 0, w: 1});
-        jsl.push({f:'js/mobile/mobile.verify.js', n: 'mobile_verify_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.component.js', n: 'mobile_component_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.group.js', n: 'mobile_group_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.dropdown.js', n: 'mobile_component_dropdown_js', j:1, w:1});
@@ -3081,9 +3080,10 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account_cancel_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.change-password.js', n: 'mobile_account_change_pass_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.change-email.js', n: 'mobile_account_change_email_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/support.js', n: 'mobile_settings_support_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/about.js', n: 'mobile_settings_about_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/changeEmail.js', n: 'mobile_change_email_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/verifyEmail.js', n: 'mobile_verfiy_email_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/privacyAndSecurity.js', n: 'mobile_privacy_security_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/history.js', n: 'mobile_session_history_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});

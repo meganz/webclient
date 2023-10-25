@@ -148,7 +148,15 @@ var accountChangeEmail = {
 
                 // If they have already requested a confirmation link for that email address, show an error
                 else if (result === -12) {
-                    return msgDialog('warninga', l[135], l[7717]);
+                    msgDialog('error', l[135], l.resend_email_error,  mega.icu.format(l.resend_email_error_info, 2));
+                }
+
+                // If they have already requested the confirmation links twice in one hour, show an error
+                else if (result === -6) {
+                    msgDialog(
+                        'error', l[135], l.change_email_error,
+                        mega.icu.format(l.change_email_error_info, u_attr.b ? 10 : 2)
+                    );
                 }
 
                 // EACCESS, the email address is already in use or current user is invalid. (less likely).

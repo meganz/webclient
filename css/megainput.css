@@ -653,6 +653,13 @@
 .mobile.mega-input.box-style.error {
     border-color: var(--mobile-support-error);
 }
+.mobile.mega-input.box-style.readonly {
+    background: var(--mobile-button-disabled);
+    border-color: var(--mobile-border-disabled);
+}
+.mobile.mega-input.box-style.readonly input.megaInputs {
+    color: var(--mobile-text-disabled);
+}
 .mobile.mega-input.box-style input,
 .mobile.mega-input input::placeholder {
     font: var(--mobile-font-input-regular);

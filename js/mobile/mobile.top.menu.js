@@ -252,7 +252,9 @@ class MegaMobileTopMenu extends MegaMobileComponent {
         }
 
         if (/\/(notifications|about|support|file-management|settings)$/.test(page) ||
-            page.includes('security') && !page.includes('change-password') && !page.includes('change-email')) {
+            page.includes('security') && !page.includes('change-password')
+            && !page.includes('change-email') && !page.includes('verify')) {
+
             return '/fm/account/settings';
         }
         else if (page.startsWith('fm/account')) {

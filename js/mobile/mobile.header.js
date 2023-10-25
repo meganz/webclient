@@ -161,6 +161,10 @@ class MegaMobileHeader extends MegaMobileComponent {
 
                 if (typeof mobile.settingsHelper.currentPage !== 'undefined'){
                     mobile.settingsHelper.currentPage.hide();
+
+                    if (M.currentdirid.split('/').pop() === 'verify') {
+                        return loadSubPage('fm/account');
+                    }
                 }
 
                 // @todo: Refactor back button logic. `history.back` is incorrect here
@@ -805,6 +809,7 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/account/avatar': l[20164],
         'fm/account/security/change-password': l[23262],
         'fm/account/security/change-email': l[7743],
+        'fm/account/security/verify': l[7730],
         'fm/account/qr-code': l[17754],
         'fm/account/qr-code-settings': l.settings_account_qr_code_set,
         'fm/account/delete': l[16115],

@@ -34,8 +34,8 @@ body,
 
         /* font family */
 
-            --mobile-font-family-main: "Inter";
-            --mobile-font-family-heading: "Poppins";
+            --mobile-font-family-main: "Inter", sans-serif;
+            --mobile-font-family-heading: "Poppins", sans-serif;
 
 
         /* font weight */

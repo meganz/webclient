@@ -25,6 +25,10 @@ class MegaMobileSharedNode extends MegaMobileNode {
 
         permNode.append(icon, rights);
         this.domNode.append(permNode);
+
+        M.syncUsersFullname(this.userHandle).then(() => {
+            ownerNode.textContent = l.shared_by.replace('[X]', this.userName);
+        }).catch(dump);
     }
 
     get userHandle() {

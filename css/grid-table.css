@@ -434,6 +434,10 @@ table tr.ui-selected .grid-file-request-manage {
     width: calc(100% - 32px);
 }
 
+.mega-lite-mode .files-grid-view.fm.mega-lite-hidden {
+    display: none;
+}
+
 /* ======================================== *\
    Table : grid-table
 \* ======================================== */

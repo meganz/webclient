@@ -780,7 +780,6 @@ function formatCurrency(value, currency, display, noDecimals) {
     value = typeof value === 'string' ? parseFloat(value) : value;
     currency = currency || 'EUR';
     display = display || 'symbol';
-    noDecimals = noDecimals === true ? 0 : noDecimals;
 
     var displayNumber = false;
     var narrowSymbol = false;
@@ -808,7 +807,7 @@ function formatCurrency(value, currency, display, noDecimals) {
 
     if (noDecimals) {
         options.minimumFractionDigits = 0;
-        options.maximumFractionDigits = noDecimals;
+        options.maximumFractionDigits = noDecimals === true ? 0 : noDecimals;
     }
 
     var result = value.toLocaleString(locales, options);

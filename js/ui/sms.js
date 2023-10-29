@@ -307,11 +307,12 @@ sms.phoneInput = {
             const stripedPhNum = M.stripPhoneNumber(countryCallCode, phoneInputEntered);
             const formattedPhoneNumber = `+${countryCallCode}${stripedPhNum}`;
             const validateResult = M.validatePhoneNumber(phoneInputEntered, countryCallCode);
+            const checkOldNum = u_attr ? formattedPhoneNumber === u_attr.smsv : false;
 
             // If the fields are completed enable the button
             if ($countrySelect.length && $countrySelect.attr('data-country-iso-code').length > 1
                 && validateResult
-                && formattedPhoneNumber !== u_attr.smsv) {
+                && !checkOldNum) {
                 $sendButton.removeClass('disabled');
             }
             else {
@@ -388,7 +389,7 @@ sms.phoneInput = {
             var countryCode = $selectedOption.attr('data-country-iso-code');
 
             // Prepare request
-            var apiRequest = { a: 'smss', n: validatedFormattedPhoneNumber };
+            var apiRequest = {a: 'smss', n: validatedFormattedPhoneNumber};
 
             // Add debug mode to test reset of the phone number so can be re-used (staging API only)
             if (localStorage.smsDebugMode) {
@@ -441,7 +442,7 @@ sms.phoneInput = {
                 return false;
             }
 
-            if (u_attr.smsv === undefined) {
+            if (u_attr === undefined || u_attr.smsv === undefined) {
                 sendSMSToPhone();
             }
             else {
@@ -629,9 +630,8 @@ sms.verifyCode = {
                             // Set the message and phone number to show on the login page
                             login_txt = successMessage + ' ' + l[20392];
 
-                            // Log out the partially logged in account and
-                            u_logout(true);
-                            loadSubPage('login');
+                            // Log out the partially logged in account and reload page
+                            u_logout().then(() => location.reload());
                         });
                     }
                     else {

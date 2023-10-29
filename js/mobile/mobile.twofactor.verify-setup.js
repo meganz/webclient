@@ -21,6 +21,9 @@ mobile.twofactor.verifySetup = {
             return false;
         }
 
+        // Set setup step to navigate between the pages
+        mobile.twofactor.settings.setupStep = 2;
+
         // Cache selector
         this.$page = $('.mobile.two-factor-page.verify-setup-page');
 
@@ -77,7 +80,7 @@ mobile.twofactor.verifySetup = {
                     // The Two-Factor has already been setup
                     if (ex === EEXIST) {
                         mobile.messageOverlay.show(l[19219], l['2fa_already_enabled_mob']).then(() => {
-                            loadSubPage('fm/account/');
+                            loadSubPage('fm/account/security');
                         });
                     }
                     else {

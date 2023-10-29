@@ -1108,23 +1108,8 @@ function accountUI() {
     else if (subpath === 'security/backup-key') {
         mobile.settings.backup.init();
     }
-    else if (subpath.startsWith('security/two-factor-authentication')) {
-
-        if (subpath.includes('intro')) {
-            mobile.twofactor.intro.init();
-        }
-        else if (subpath.includes('verify-setup')) {
-            mobile.twofactor.verifySetup.init();
-        }
-        else if (subpath.includes('setup')) {
-            mobile.twofactor.setup.init();
-        }
-        else if (subpath.includes('verify-disable')) {
-            mobile.twofactor.verifyDisable.init();
-        }
-        else {
-            loadSubPage('fm/account/security/two-factor-authentication/intro','override');
-        }
+    else if (subpath === 'security/two-factor-authentication') {
+        mobile.twofactor.settings.init();
     }
     else if (subpath.startsWith('sms')) {
 

@@ -21,6 +21,9 @@ mobile.twofactor.intro = {
             return false;
         }
 
+        // Clear setup steps
+        mobile.twofactor.settings.setupStep = false;
+
         // Cache selector
         mobile.twofactor.intro.$page = $('.mobile.two-factor-page.intro-page');
 
@@ -46,7 +49,7 @@ mobile.twofactor.intro = {
             mobile.twofactor.intro.$page.addClass('hidden');
 
             // Render the Setup page
-            loadSubPage('fm/account/security/two-factor-authentication/setup');
+            mobile.twofactor.setup.init();
             return false;
         });
     },

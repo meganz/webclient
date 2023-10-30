@@ -2008,7 +2008,7 @@ lazy(self, 'api', () => {
          * @memberOf api
          */
         setFolderSID(h, sid) {
-            h = `n=${h}`;
+            h = `${self.pfcol ? 's' : 'n'}=${h}`;
 
             if (sid) {
                 this.notify('setsid', sid);

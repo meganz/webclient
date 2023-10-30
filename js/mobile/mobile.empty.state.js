@@ -18,7 +18,9 @@ class MegaMobileEmptyState extends MegaMobileOverlay {
     }
 
     hide(container) {
-        this.domNode.classList.add('hidden');
+        if (this.domNode) {
+            this.domNode.classList.add('hidden');
+        }
 
         if (container) {
             container.classList.remove('hidden');
@@ -35,13 +37,13 @@ class MegaMobileEmptyState extends MegaMobileOverlay {
     static init() {
         if (!mega.ui.emptyState) {
             mega.ui.emptyState = new MegaMobileEmptyState({
-                parentNode: document.querySelector('#fmholder .file-manager-block .mobile.fm-scrolling'),
+                parentNode: document.getElementById('file-manager-content-block'),
                 componentClassname: 'mega-empty-states',
                 wrapperClassname: 'empty-states'
             });
         }
         else if (!document.contains(mega.ui.emptyState.domNode)) {
-            const fmBlock = document.querySelector('#fmholder .file-manager-block .mobile.fm-scrolling');
+            const fmBlock = document.getElementById('file-manager-content-block');
             fmBlock.appendChild(mega.ui.emptyState.domNode);
         }
     }

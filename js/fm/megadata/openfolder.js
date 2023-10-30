@@ -726,7 +726,6 @@
         }
         else if (id === 'shares') {
             id = 'shares';
-            M.onFileManagerReady(() => M.showContactVerificationDialog());
         }
         else if (id === 'out-shares') {
             id = 'out-shares';
@@ -893,7 +892,11 @@
                 $.inSharesRebuild = Date.now();
 
                 queueMicrotask(() => {
-                    mega.keyMgr.decryptInShares().catch(dump);
+                    mega.keyMgr.decryptInShares()
+                        .then(() => {
+                            return this.showContactVerificationDialog();
+                        })
+                        .catch(dump);
                 });
                 M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
             }

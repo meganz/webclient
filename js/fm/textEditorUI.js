@@ -293,6 +293,11 @@ mega.textEditorUI = new function TextEditorUI() {
                             $('.text-editor-file-name span', $editorContainer).text(fileName);
                         }
 
+                        if (M.currentrootid !== M.RubbishID) {
+                            mega.ui.searchbar.recentlyOpened.files.delete(fileHandle);
+                            mega.ui.searchbar.recentlyOpened.addFile(fh, true);
+                        }
+
                         loadingDialog.hide();
                         if (cb && typeof cb === 'function') {
                             cb();
@@ -593,6 +598,9 @@ mega.textEditorUI = new function TextEditorUI() {
             fileName = fName;
             if (page !== 'download') {
                 eventlog(99807);
+                if (M.currentrootid !== M.RubbishID) {
+                    mega.ui.searchbar.recentlyOpened.addFile(handle, true);
+                }
             }
 
             const $getLink = $('.file-menu .get-link-f', $menuBar);

@@ -890,6 +890,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
             .rebind('dblclick', () => {
                 self.markSelected();
                 $.hideContextMenu();
+                // mega.ui.searchbar.recentlyOpened.addFile(node.h, false);
                 slideshow(node.h);
                 $.autoplay = node.h;
                 return false;
@@ -1248,7 +1249,10 @@ RecentsRender.prototype._getConfigShow = function() {
 RecentsRender.prototype._setConfigShow = function(val) {
     'use strict';
     mega.config.set('showRecents', val ? 1 : undefined);
-
+    if (!val) {
+        mega.ui.searchbar.recentlyOpened.clear();
+        mega.ui.searchbar.recentlySearched.clear();
+    }
     queueMicrotask(() => {
         this.checkStatusChange(1);
     });

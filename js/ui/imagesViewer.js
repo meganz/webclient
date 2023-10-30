@@ -954,6 +954,10 @@ var slideshowid;
             // then pushing fake states of history/hash
             if (page !== 'download' && (!history.state || history.state.view !== id)) {
                 pushHistoryState();
+
+                if (n.p && !folderlink && M.getNodeRoot(n.p) !== M.RubbishID) {
+                    onIdle(() => mega.ui.searchbar.recentlyOpened.addFile(id, false));
+                }
             }
             _hideCounter = !d && hideCounter;
         }

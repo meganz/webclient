@@ -13,11 +13,24 @@
     let showEmptyState;
 
     const recentlySearched = {
-        // Stores the recently searched terms
+        /**
+         * Recently searched terms
+         * @type {Set<string>}
+         */
         terms: new Set(),
-        // Only show 5 terms in the dropdown at a time
+
+        /**
+         * Number of search terms to show in view
+         * @type {number}
+         */
         numTermsInView: 5,
+
+        /**
+         * Maximum number of search terms to keep in persistent storage
+         * @type {number}
+         */
         maxStored: 20,
+
         /**
          * Saves current terms
          *
@@ -28,6 +41,7 @@
                 await M.setPersistentData(`${u_handle}!rs`, tlvstore.encrypt([...this.terms]));
             }
         },
+
         /**
          * Adds a search term to the list of search terms
          *
@@ -46,6 +60,7 @@
             this.save();
             this.update();
         },
+
         /**
          * Delete a search term from the list of search terms
          *
@@ -57,6 +72,7 @@
             this.save();
             this.update(true);
         },
+
         /**
          * Clears the list of search terms
          *
@@ -70,19 +86,32 @@
                 this.update(true);
             }
         },
+
         /**
          * Initializes/refreshes the `recentlySearched` object
          *
          * @return {undefined}
          */
         init: async function() {
-            M.getPersistentData(`${u_handle}!rs`).then((recentlySearched => {
-                this.terms = new Set(Object.values(tlvstore.decrypt(recentlySearched)));
-            })).catch(() => {
-                // empty state already exists, no need to initialize
-                this.save();
-            });
+            return this.refresh();
         },
+
+        /**
+         * Repopulates recently searched terms from persistent storage
+         *
+         * @return {(undefined|Promise)} Returns a promise if logged in and things were fetched, otherwise undefined
+         */
+        refresh: async function() {
+            if (this.terms.size === 0 && u_handle) {
+                return M.getPersistentData(`${u_handle}!rs`).then(recentlySearched => {
+                    this.terms = new Set(Object.values(tlvstore.decrypt(recentlySearched)));
+                }).catch(() => {
+                    // empty state already exists, no need to initialize
+                    this.save();
+                });
+            }
+        },
+
         /**
          * Updates the recently searched section view
          *
@@ -94,6 +123,147 @@
             renderUpdatedDropdown(hasDeletedOrCleared);
             delay('searchbar.addVisibilityListeners', () => addVisibilityListeners(), 1000);
         }
+    };
+
+    const recentlyOpened = {
+
+        /**
+         * Recently opened files
+         * @type {Map<string,object>}
+         */
+        files: new Map(),
+
+        /**
+         * Number of opened files to show in view
+         * @type {number}
+         */
+        numFilesInView: 5,
+
+        /**
+         * Maximum number of opened files to keep in persistent storage
+         * @type {number}
+         */
+        maxStored: 20,
+
+        /**
+         * Initializes/Repopulates recently opened files array
+         *
+         * @return {undefined}
+         */
+        init: function() {
+            this.refresh();
+        },
+
+        /**
+         * Adds to recently opened files by file handle
+         *
+         * @param {string} handle The file handle
+         * @param {boolean} isEditable Set to true for text files, false for other
+         *
+         * @return {undefined}
+         */
+        addFile: function(handle, isEditable) {
+
+            // If we are in a public folder, or if not logged in, do not add the file
+            if (folderlink || !u_handle) {
+                return;
+            }
+
+            // In some cases, when previewing files, the dropdown still remains, hide it
+            $dropdownSearch.addClass('hidden');
+
+            if (mega.config.get('showRecents') === 1) {
+
+                const newEntry = {h: handle, e: isEditable};
+
+                // Delete the entry first to push older entries to last position
+                this.files.delete(handle);
+                this.files.set(handle, newEntry);
+
+                // Check if we have exceeded the limit of stored files, remove first entry if we did
+                if (this.files.size > this.maxStored) {
+                    const [first_handle] = this.files.keys();
+                    this.files.delete(first_handle);
+                }
+
+                this.save();
+            }
+        },
+
+        /**
+         * Repopulates recently opened files array from persistent storage
+         *
+         * @return {(undefined|Promise)} Returns a promise if logged in and things were fetched, otherwise undefined
+         */
+        refresh: async function() {
+            if (!u_handle) {
+                return;
+            }
+            await M.getPersistentData(`${u_handle}!ro`).then(async(recentlyOpened) => {
+                this.files = new Map(JSON.parse(tlvstore.decrypt(recentlyOpened))
+                    .map((v) => {
+                        return [v.h, v];
+                    }));
+            }).catch(nop);
+            return this.fetchNodes();
+        },
+
+        /**
+         * Clears the list of search terms
+         *
+         * @return {undefined}
+         */
+        clear: async function() {
+            this.files = new Map();
+            await M.delPersistentData(`${u_handle}!ro`);
+        },
+
+        /**
+         * Saves the recently opened files Map in persistent storage
+         *
+         * @return {undefined}
+         */
+        save: function() {
+            if (!u_handle) {
+                return;
+            }
+            M.setPersistentData(`${u_handle}!ro`,
+                                tlvstore.encrypt(
+                                    JSON.stringify(
+                                        [...recentlyOpened.files.values()]
+                                    )
+                                )
+            );
+        },
+        /**
+         * Checks if any node is missing in memory, fetches them, deletes if not available anymore
+         *
+         * @return {(undefined|Promise)} Returns a Promise if not a public link & things fetched. Otherwise undefined.
+         */
+        fetchNodes: async function() {
+
+            // If we are in a public folder, we skip the node fetching
+            if (folderlink) {
+                return;
+            }
+
+            const toFetch = [...this.files.keys()].filter(h => !M.getNodeByHandle(h));
+            return dbfetch.acquire(toFetch).always(()=>{
+                let anyDeleted = false;
+                for (const h of this.files.keys()) {
+                    if (!M.getNodeByHandle(h)
+                        || M.getNodeRoot(h) === M.RubbishID
+                        || typeof h === 'undefined') {
+
+                        this.files.delete(h);
+                        anyDeleted = true;
+                    }
+                }
+                if (anyDeleted) {
+                    this.save();
+                }
+            });
+        },
     };
 
     /**
@@ -109,9 +279,9 @@
         refreshSearch(currentPage);
 
         recentlySearched.init();
+        recentlyOpened.init();
 
         showEmptyState = recentlySearched.terms.size !== 0;
-
 
         $('#main-search-fake-form, #mini-search-fake-form', $topbar).rebind('submit.searchsubmit', function(e) {
             e.preventDefault();
@@ -172,9 +342,10 @@
 
             // Dropdown trigger when clicking after dropdown has been hidden
             $fileSearch.rebind('click', () => {
-                renderUpdatedDropdown();
-                delay('searchbar.click', eventlog.bind(null, 99898));
-                $dropdownResults.addClass('hidden');
+                renderUpdatedDropdown().then(()=>{
+                    delay('searchbar.click', eventlog.bind(null, 99898));
+                    $dropdownResults.addClass('hidden');
+                });
             });
 
             // Show only results if there is user provides text in the input
@@ -275,7 +446,8 @@
 
         // Dropdown trigger on focus
         $fileSearch.rebind('focus', () => {
-            showEmptyState = recentlySearched.terms.size !== 0;
+            showEmptyState = recentlySearched.terms.size !== 0
+                && recentlyOpened.files.size !== 0;
             renderUpdatedDropdown();
         });
 
@@ -360,14 +532,26 @@
      * @param {boolean} hasDeletedOrCleared Set to true if after a delete or clear in `recentlySearched`
      * @return {undefined}
      */
-    function renderUpdatedDropdown(hasDeletedOrCleared = false) {
+    async function renderUpdatedDropdown(hasDeletedOrCleared = false) {
 
-        // If we have terms in memory, and the hide recents flag is on, the memory is cleared
-        if (mega.config.get('showRecents') !== 1 && recentlySearched.terms.size > 0) {
-            recentlySearched.clear(false);
+        if (folderlink) {
+            return;
         }
 
-        if (hasDeletedOrCleared && recentlySearched.terms.size === 0) {
+        await recentlySearched.refresh();
+        await recentlyOpened.refresh();
+
+
+        const hideRecents = mega.config.get('showRecents') !== 1;
+        const noRecentlySearched = recentlySearched.terms.size === 0;
+        const noRecentlyOpened = recentlyOpened.files.size === 0;
+        const noRecentActivity = noRecentlySearched && noRecentlyOpened;
+
+        clearRecentMemoryIfRequired(hideRecents, noRecentActivity);
+
+        // If we came from a delete/clear operation and there is no recent activity left to show,
+        // Set the show empty state flag
+        if (hasDeletedOrCleared && noRecentActivity) {
             showEmptyState = true;
         }
 
@@ -375,8 +559,7 @@
         $dropdownRecents = $dropdownRecents || $('.dropdown-recents', $dropdownSearch);
 
         // Hide dropdown if Hide Recents is on
-        if (mega.config.get('showRecents') !== 1
-            || (recentlySearched.terms.size === 0 && !showEmptyState)) {
+        if (hideRecents || noRecentActivity && !showEmptyState) {
             $dropdownSearch.addClass('hidden');
             return;
         }
@@ -384,21 +567,44 @@
         // If recent activity is turned off, render recents
         $dropdownSearch.removeClass('hidden');
 
-        // If recently searched terms AND recently opened files list is empty,
-        // Show empty state
-        if (recentlySearched.terms.size === 0) {
+        // If there is no recent activity and the empty state flag is set,
+        // show the empty state only
+        if (noRecentActivity && showEmptyState) {
             $dropdownEmptyState.removeClass('hidden');
             $dropdownRecents.addClass('hidden');
+            return;
         }
-        else {
-            // Show recents
-            $dropdownEmptyState.addClass('hidden');
-            $dropdownRecents.removeClass('hidden');
 
-            // Show recently searched only
-            renderRecentlySearchedItems();
+        if (noRecentActivity && !showEmptyState) {
+            $dropdownSearch.addClass('hidden');
+            return;
+        }
 
-            // TODO: Show recently opened only
+        // Show recents section
+        $dropdownEmptyState.addClass('hidden');
+        $dropdownRecents.removeClass('hidden');
+
+        // Show recently searched items
+        renderRecentlySearchedItems();
+
+        // Show recently opened files
+        renderRecentlyOpenedItems();
+    }
+
+    /**
+    * Clears the recent memory if required based on conditions.
+    *
+    * If the 'hideRecents' flag is active and there's recent activity, this function clears
+    * the memory of recent searches and recent opened files.
+    *
+    * @param {boolean} hideRecents - Flag indicating if recent items should be hidden. Fetch this before passing.
+    * @param {boolean} noRecentActivity - Flag indicating if there's no recent activity.
+    * @return {void}
+    */
+    function clearRecentMemoryIfRequired(hideRecents, noRecentActivity) {
+        if (hideRecents && !noRecentActivity) {
+            recentlySearched.clear(false);
+            recentlyOpened.clear();
         }
     }
 
@@ -426,7 +632,6 @@
             const $item = $itemTemplate.clone();
             $item.removeClass('dropdown-recently-searched-template hidden');
             $('.dropdown-recently-searched-item-text', $item).text(term);
-            // $('.dropdown-recently-searched-item-text', $item).text(term.replace("<", "&lt;").replace(">", "&gt;"));
             return $item.prop('outerHTML');
         };
 
@@ -457,13 +662,114 @@
             }
 
             // Otherwise, trigger the search again
-            delay('searchbar.click', eventlog.bind(null, 99899));
+            delay('recentlySearched.click', eventlog.bind(null, 99899));
             $dropdownSearch.unbind('blur');
             $fileSearch.val(itemText);
             $('#main-search-fake-form', $topbar).trigger('submit');
             $dropdownSearch.rebind('blur', () => {
                 $dropdownSearch.addClass('hidden');
             });
+        });
+    }
+
+    /**
+     * Populates the recently opened items section in the searchbar dropdown
+     *
+     * @return {undefined}
+     */
+    function renderRecentlyOpenedItems() {
+
+        $dropdownRecents = $('.dropdown-recents', $dropdownSearch);
+
+        const $dropdownRecentlyOpened = $('.dropdown-recently-opened-wrapper', $dropdownRecents);
+
+        if (recentlyOpened.files.size === 0) {
+            $dropdownRecentlyOpened.addClass('hidden');
+            return;
+        }
+
+        const $itemTemplate = $('.dropdown-recently-opened-template', $dropdownRecents);
+
+        $dropdownRecentlyOpened.removeClass('hidden');
+
+        const makeRecentlyOpenedFileItem = ({h: handle, e: editable}) => {
+
+            // TODO: FIX SHARED LOGIC + ASYNC CONVERT
+            const node = M.getNodeByHandle(handle);
+            const parentNode = M.getNodeByHandle(node.p);
+            const parentName = parentNode.h === M.RootID
+                ? l[1687]
+                : parentNode.name;
+            const thumbUri = thumbnails.get(node.fa);
+
+            const filename = node.name;
+            const iconClass = fileIcon(node);
+            const date = new Date(node.mtime * 1000);
+
+            const $item = $itemTemplate.clone();
+            const $icon = $('.transfer-filetype-icon', $item);
+
+            $item.removeClass('dropdown-recently-opened-template hidden');
+            $item.attr('data-id', handle);
+            $item.attr('data-editable', editable);
+
+            $icon.addClass(iconClass);
+            $('.dropdown-recently-opened-item-filename', $item).text(filename);
+            $('.dropdown-recently-opened-item-location', $item).text(parentName);
+            $('.dropdown-recently-opened-item-time', $item).text(date.toLocaleDateString());
+
+            if (thumbUri) {
+                const $imgNode = $('img', $icon);
+                $imgNode.attr('src', thumbUri);
+                $('.dropdown-recently-opened-item-file-icon', $item).addClass('thumb');
+            }
+
+            return $item.prop('outerHTML');
+        };
+
+        const $recentlyOpenedBody = $('.dropdown-recently-opened > .dropdown-section-body', $dropdownRecents);
+
+        $recentlyOpenedBody.empty();
+
+        const recentlyOpenedArr = [...recentlyOpened.files.values()];
+
+        for (let i = recentlyOpenedArr.length - 1, nb = 0;
+            i >= 0 && nb < recentlyOpened.numFilesInView;
+            i--, nb++) {
+            if (M.getNodeByHandle(recentlyOpenedArr[i].h)) {
+                const item = makeRecentlyOpenedFileItem(recentlyOpenedArr[i]);
+                $recentlyOpenedBody.safeAppend(item);
+            }
+        }
+
+        $fileSearch = $fileSearch || $('.js-filesearcher', $topbar);
+
+        // Onclick behavior for each item in recently opened files
+        // Clicking recently opened file - previews the file again
+        $('.dropdown-recently-opened-item', $dropdownRecents).rebind('click.recentlyOpenedItem', function() {
+
+            // Preview the file
+            delay('recentlyOpened.click', eventlog.bind(null, 99905));
+            $dropdownSearch.addClass('hidden');
+            const {id, editable} = $(this).data();
+
+            recentlyOpened.addFile(id, editable);
+
+            if (editable) {
+                loadingDialog.show('common', l[23130]);
+
+                mega.fileTextEditor.getFile(id).done(
+                    (data) => {
+                        loadingDialog.hide();
+                        mega.textEditorUI.setupEditor(M.d[id].name, data, id);
+                    }
+                ).fail(() => {
+                    loadingDialog.hide();
+                });
+            }
+            else {
+                slideshow(id);
+            }
         });
     }
 
@@ -495,6 +801,8 @@
     scope.mega.ui.searchbar = {
         init: initSearch,
         refresh: refreshSearch,
-        closeMiniSearch
+        closeMiniSearch,
+        recentlySearched,
+        recentlyOpened
     };
 })(window);

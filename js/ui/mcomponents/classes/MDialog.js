@@ -92,6 +92,10 @@ class MDialog extends MComponent {
         M.safeShowDialog('m-dialog', () => {
             this._show();
 
+            if (this.onMDialogShown) {
+                onIdle(() => this.onMDialogShown());
+            }
+
             return $(this.el).rebind('dialog-closed.mDialog', () => {
                 this.detachEl();
 

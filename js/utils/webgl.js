@@ -363,6 +363,12 @@ class MEGAImageElement {
                 res.format = 'BMP';
                 res.type = 'image/bmp';
                 break;
+            case 0xFF0A:
+                // JPEG-XL 'naked' codestream.
+                res.format = 'JXL';
+                res.type = 'image/jxl';
+                res.doesSupportAlpha = true;
+                break;
 
             default:
                 if (getUint32(20) === 0x68656963) {
@@ -378,6 +384,13 @@ class MEGAImageElement {
                 if (getUint32(8) === 0x57454250) {
                     res.format = 'WEBP';
                     res.type = 'image/webp';
+                    res.doesSupportAlpha = true;
+                    break;
+                }
+                if (getUint32(4) === 0x4A584C20) {
+                    // JPEG-XL ISOBMFF-based container.
+                    res.format = 'JXL';
+                    res.type = 'image/jxl';
                     res.doesSupportAlpha = true;
                     break;
                 }
@@ -1482,7 +1495,7 @@ class WebGLMEGAContext extends MEGACanvasElement {
     }
 
     restoreContext() {
-        if (this.gl.isContextLost() && this.glLoseExtension) {
+        if (this.glLoseExtension && this.gl && this.gl.isContextLost()) {
 
             this.glLoseExtension.restoreContext();
         }

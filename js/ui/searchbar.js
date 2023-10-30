@@ -505,7 +505,7 @@
         const $dropdownSearch = $('dropdown-search', $topbar);
 
         // Show the correct search bar
-        if (u_type !== false || pfid) {
+        if ((u_type !== false || pfid) && !pfcol) {
             const rex = /\/(?:account|dashboard|user-management|refer|devices|rewind)/;
             const isSearch = page.startsWith('fm/search');
 

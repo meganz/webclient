@@ -1786,6 +1786,10 @@ scparser.$add('aer', (data) => {
     }
     mega.sets.parseAer(data);
 });
+scparser.$add('ass', (data) => {
+    'use strict';
+    mega.sets.parseAss(data);
+});
 
 scparser.$notify = function(a) {
     // only show a notification if we did not trigger the action ourselves
@@ -2514,6 +2518,24 @@ async function fetchfm(sn) {
     // reason: tree_node must set up the workers as soon as the first node of a folder
     // link arrives, and this is how it knows that it is the first node.
     M.RootID = false;
+
+    if (window.pfcol) {
+        console.assert(!window.fmdb);
+        console.assert(loadfm.loading);
+        console.assert(!loadfm.loaded);
+
+        api.req({ a: 'aft', v: 2 }, 1)
+            .then(({ result: { e, n, s, sn } }) => {
+                const res = mega.sets.getPublicSetTree(s, e, n, sn);
+                loadfm_callback(res);
+            })
+            .catch((ex) => {
+                folderreqerr(false, ex);
+                dump(`Could not load collection... Error: ${ex}`);
+            });
+
+        return;
+    }
 
     if (!is_mobile) {
         // activate/prefetch attribute cache at this early stage
@@ -3499,7 +3521,7 @@ function processMCSM(mcsm, ignoreDB) {
 function folderreqerr(c, e) {
     'use strict';
 
-    var title = l[1043];
+    var title = (pfcol) ? l.album_broken_link_title : l[1043];
     var message = null;
 
     u_reset();
@@ -3527,8 +3549,17 @@ function folderreqerr(c, e) {
 
     if (!is_mobile) {
         if (parseInt(e) === EARGS) {
-            title = l[20198];
-            message = l[20199];
+            if (pfcol) {
+                title = l.album_broken_link_title;
+                message = l.album_broken_link_text;
+            }
+            else {
+                title = l[20198];
+                message = l[20199];
+            }
+        }
+        else if (pfcol) {
+            message = l.album_broken_link_text;
         }
         else if (!message) {
             message = l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>';
@@ -3705,7 +3736,7 @@ function loadfm_callback(res) {
         tryCatch(() => {
             const a = res.aesp;
 
-            if (a.s && a.s.length | a.e && a.e.length | a.p && a.p.length) {
+            if ((a.s && a.s.length) | (a.e && a.e.length) | (a.p && a.p.length)) {
 
                 mega.sets.resetDB(res.aesp);
             }
@@ -3776,6 +3807,10 @@ function loadfm_callback(res) {
             currsn = res.sn;
 
             window.loadingInitDialog.step3(35, 40);
+
+            if (window.pfcol) {
+                return loadfm_done(-0x800e0fff);
+            }
 
             // retrieve the initial batch of action packets, if any,
             // we'll then complete the process using loadfm_done()

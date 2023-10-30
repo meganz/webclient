@@ -26,7 +26,6 @@ class MCheckbox extends MComponent {
         }
 
         this.appendCss(classes);
-
         this.disabled = disabled === true;
     }
 
@@ -105,7 +104,7 @@ class MCheckbox extends MComponent {
         this.el.appendChild(this.checkDiv);
     }
 
-    prepareInput(id, name, checked) {
+    prepareInput(id, name, checked, lazy) {
         if (id) {
             this.inputEl.id = id;
         }
@@ -133,6 +132,7 @@ class MCheckbox extends MComponent {
             this.attachEvent(
                 'change',
                 (evt) => {
+
                     this.checked = evt.target.checked;
 
                     if (this._onChange) {

@@ -37,7 +37,7 @@ mega.metatags = new function() {
             if (d) {
                 console.error('A page without title. Please handle. Page: ' + page);
             }
-            api_req({ a: 'log', e: 99735, m: 'page without title: ' + page });
+            eventlog(99735, `page without title: ${String(page).split('#')[0]}`);
         }
 
         metaRobots = document.createElement('meta');
@@ -642,7 +642,7 @@ mega.metatags = new function() {
                 if (d) {
                     console.error('A page without Description. Please handle. Page: ' + page);
                 }
-                api_req({ a: 'log', e: 99736, m: 'page without desc: ' + page });
+                eventlog(99736, `page without desc: ${String(page).split('#')[0]}`);
             }
         }
 

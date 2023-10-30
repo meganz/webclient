@@ -26,7 +26,7 @@ class MMenuSelectItem extends MComponent {
 
         // This is a clickable item
         if (typeof selectFn === 'function') {
-            this.el.classList.add('m-dropdown-item');
+            this.el.classList.add('m-dropdown-item', 'border-radius-1');
 
             if (Array.isArray(additionalClasses) && additionalClasses.length) {
                 this.el.classList.add(...additionalClasses);
@@ -159,7 +159,7 @@ class MMenuSelectItem extends MComponent {
         const i = document.createElement('i');
         i.className = 'ml-3 mr-0 sprite-fm-mono icon-' + icon;
 
-        this.el.append(i);
+        this.el.appendChild(i);
     }
 
     remove() {

@@ -1325,12 +1325,98 @@ mega.gallery = {
     sections: {},
     secKeys: {},
     showEmpty: nop,
+    updateButtonsStates: nop,
+    removeDbActionCache: nop,
     emptyBlock: null,
     albumsRendered: false,
+    publicSet: Object.create(null),
     albums: {
         grid: null,
         store: {},
-        tree: null
+        tree: null,
+        disposeAll: nop,
+        initPublicAlbum: (parentNode) => {
+            const {at, e} = M.d[M.RootID];
+            const setAttr = tryCatch(() => tlvstore.decrypt(at, true, base64_to_a32(pfkey)))();
+
+            if (!setAttr) {
+                if (d) {
+                    console.error('Could not fetch public set data...', e, at);
+                }
+
+                loadSubPage('login');
+                return;
+            }
+
+            const setNodes = [];
+            const isCoverSpecified = !!setAttr.c;
+            let coverNode = null;
+
+            if (Array.isArray(e)) {
+                for (let i = 0; i < e.length; i++) {
+                    const {id, h} = e[i];
+                    const n = M.d[h];
+
+                    if (n) {
+                        setNodes.push(n);
+
+                        if (isCoverSpecified && !coverNode && id === setAttr.c) {
+                            coverNode = n;
+                        }
+                    }
+                }
+            }
+
+            const elCount = setNodes.length;
+
+            if (!coverNode && elCount) {
+                setNodes.sort((a, b) => M.sortByModTimeFn2()(a, b, -1));
+                coverNode = setNodes[0];
+            }
+
+            const coverContainer = document.createElement('div');
+            coverContainer.className = 'pcol-cover-container';
+
+            const coverImg = document.createElement('i');
+
+            if (elCount) {
+                coverImg.className = 'loading-album-img sprite-mobile-fm-uni mime-image-solid';
+
+                api_getfileattr(
+                    { [coverNode.h]: coverNode },
+                    0,
+                    async(ctx, key, ab) => {
+                        if (ab === 0xDEAD || !ab.byteLength) {
+                            dump('Cannot generate the cover...');
+                            return;
+                        }
+
+                        // const blob = await webgl.getDynamicThumbnail(ab, { ats: 1 }).catch(dump);
+                        const url = tryCatch(() => mObjectURL([ab], ab.type || 'image/jpeg'))();
+
+                        if (!url) {
+                            dump('Cannot generate the cover image...');
+                            return;
+                        }
+
+                        coverImg.classList.remove('cover-loading');
+                        coverImg.style.backgroundImage = `url(${url})`;
+                    }
+                );
+            }
+            else {
+                coverImg.className = 'empty-album-img';
+            }
+
+            const countTxt = document.createElement('p');
+            countTxt.className = 'album-count-txt';
+            countTxt.textContent = mega.icu.format(l.album_items_count, elCount);
+
+            coverContainer.appendChild(coverImg);
+            coverContainer.appendChild(countTxt);
+
+            parentNode.append(coverContainer);
+        }
     }
 };
 

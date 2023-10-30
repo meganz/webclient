@@ -325,8 +325,12 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         // Otherwise if a public folder
         else if (pfid && pfkey) {
 
+            // If it is a public collection/set
+            if (pfcol) {
+                return `collection/${pfid}#${pfkey}`;
+            }
             // If subfolder or file is specified, add it to the base folder handle and key
-            if (nodeHandle === undefined || pfid === nodeHandle) {
+            else if (nodeHandle === undefined || pfid === nodeHandle) {
                 // Otherwise return the base folder handle and key
                 return `#F!${  pfid  }!${  pfkey}`;
             }

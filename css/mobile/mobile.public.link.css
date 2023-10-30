@@ -24,22 +24,36 @@
     align-self: stretch;
 }
 
-.file-folder-view .no-content.folder-file {
+.file-folder-view .no-content.folder-file,
+.pcol-cover-container p.album-count-txt {
     text-align: center;
 }
 
-.file-folder-view .no-access {
+.file-folder-view .no-access,
+.pcol-cover-container i.empty-album-img,
+.pcol-cover-container i.loading-album-img {
     height: 96px;
     width: 96px;
     background-size: contain;
+    border-radius: 4px;
 }
 
-.file-folder-view .no-access.no-access-folder {
+.pcol-cover-container i.loading-album-img.cover-loading {
+    filter: grayscale(100%);
+    opacity: 0.3;
+}
+
+.file-folder-view .no-access.no-access-folder,
+.pcol-cover-container i.empty-album-img {
     background-image: url("../../images/mobile/folder.png");
 }
 
 .file-folder-view .no-access.no-access-file {
     background-image: url("../../images/mobile/file.png");
+}
+
+.file-folder-view .no-access.no-access-album {
+    background-image: url("../../images/mobile/album.png");
 }
 
 .file-folder-view .no-access.icon {

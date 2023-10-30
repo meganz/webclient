@@ -2105,26 +2105,33 @@ body.de .mega-dialog.contact-picker-widget {
         left: auto;
         right: 34px;
     }
-    .mega-dialog.export-links-dialog .keys-tip.left-arrow i {
+    .mega-dialog.export-links-dialog .keys-tip.left-arrow i,
+    .m-context-menu.keys-tip.left-arrow > i {
         top: 64px;
     }
-    .mega-dialog.export-links-dialog .illustration {
+    .mega-dialog.export-links-dialog .illustration,
+    .m-context-menu.keys-tip .illustration {
         width: 128px;
         --width: 128px;
         height: 92px;
         margin: 16px auto;
     }
-    .mega-dialog.export-links-dialog .keys-tip .tip-header {
+    .mega-dialog.export-links-dialog .keys-tip .tip-header,
+    .m-context-menu.keys-tip .tip-header {
         font: var(--text-h3);
         color: var(--text-color-high);
         margin-bottom: 8px;
     }
-    .mega-dialog.export-links-dialog .keys-tip .tip-text {
+    .mega-dialog.export-links-dialog .keys-tip .tip-text,
+    .m-context-menu.keys-tip .tip-text {
         padding: 0 0 8px;
     }
     .mega-dialog.export-links-dialog .keys-tip .tip-link,
-    .mega-dialog.export-links-dialog .keys-tip .tip-link:visited {
+    .mega-dialog.export-links-dialog .keys-tip .tip-link:visited,
+    .m-context-menu.keys-tip .tip-link,
+    .m-context-menu.keys-tip .tip-link:visited {
         font: var(--text-body2);
+        color: var(--text-color-info);
         cursor: pointer;
         position: relative;
     }
@@ -5571,6 +5578,20 @@ body.de .mega-dialog.contact-picker-widget {
         position: absolute;
         top: 5px;
         width: 24px;
+    }
+    .mega-dialog.dlkey-dialog .dlkey-err {
+        min-height: 24px;
+        position: relative;
+        background-color: var(--banner-background-error);
+        border: 1px solid var(--banner-border-error);
+        padding: 2px 12px;
+        width: 100%;
+        color: var(--banner-text-error);
+        font: var(--text-body1);
+        margin-top: 6px;
+        border-radius: 4px;
+        box-sizing: border-box;
+        z-index: 100;
     }
 
 /* end dlkey-dialog */
@@ -11949,3 +11970,13 @@ body.de .mega-dialog.contact-picker-widget {
 }
 
 /* File Request Dialog End */
+
+/* Public set decryption key dialog */
+.mega-dialog.pset-decr-dialog {
+    width: 480px;
+}
+.pset-decr-dialog h3 {
+    color: var(--text-color-high);
+    font: var(--text-h2);
+}
+/* Public set decryption key dialog end */

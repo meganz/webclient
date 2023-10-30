@@ -52,12 +52,12 @@ class MMenuSelect extends MContextMenu {
             // Creating a new section here
             if (!i || typeof click !== 'function') {
                 if (section) {
-                    section.append(document.createElement('hr'));
+                    section.appendChild(document.createElement('hr'));
                 }
 
                 section = document.createElement('div');
                 section.setAttribute('class', 'dropdown-section');
-                this.el.append(section);
+                this.el.appendChild(section);
             }
 
             const itemClasses = [];
@@ -87,7 +87,7 @@ class MMenuSelect extends MContextMenu {
                 this.selectedIndex = i;
             }
 
-            section.append(item.el);
+            section.appendChild(item.el);
         }
     }
 

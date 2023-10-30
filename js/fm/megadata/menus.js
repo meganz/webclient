@@ -1002,6 +1002,33 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             e.preventDefault();
             return false;
         }
+        else if (pfcol) {
+            const $menuCMI = $(menuCMI);
+            const albums = mega.gallery.albums;
+            const selections = Object.keys(albums.grid.timeline.selections);
+            const oneImageSelected = selections.length === 1 && !!mega.gallery.isImage(M.d[selections[0]]);
+            const hasImageSelected = selections.some((h) => !!mega.gallery.isImage(M.d[h]));
+            const slideshowItem = $menuCMI.filter('.play-slideshow');
+            const previewItem = $menuCMI.filter('.preview-item');
+            const playItem = $menuCMI.filter('.play-item');
+            const importItem = $menuCMI.filter('.import-item');
+            const onlyPlayableVideosSelected = selections.every((h) => {
+                const vid = mega.gallery.isVideo(M.d[h]);
+                return !!(vid && vid.isPreviewable && MediaAttribute.getMediaType(M.d[h]));
+            });
+
+            slideshowItem.toggleClass('hidden', !oneImageSelected);
+            previewItem.toggleClass('hidden', !hasImageSelected);
+            $menuCMI.filter('.properties-item').removeClass('hidden');
+            importItem.removeClass('hidden');
+
+            $.selected = selections;
+
+            $('span', playItem).text(l.album_play_video);
+            $('span', importItem).text(u_type ? l.context_menu_import : l.btn_imptomega);
+
+            playItem.toggleClass('hidden', !onlyPlayableVideosSelected);
+        }
         else if (currNodeClass
             && (currNodeClass.includes('data-block-view') || currNodeClass.includes('folder'))
             || String(id).length === 8) {

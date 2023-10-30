@@ -561,6 +561,10 @@
      * @private
      */
     var getActionButtonLabel = function() {
+        if ($.albumImport) {
+            return l.context_menu_import;
+        }
+
         if ($.mcImport) {
             return l[236]; // Import
         }
@@ -605,6 +609,10 @@
      * @private
      */
     var getDialogTitle = function() {
+        if ($.albumImport) {
+            return l.context_menu_import;
+        }
+
         if ($.mcImport) {
             return l[236]; // Import
         }
@@ -1033,7 +1041,7 @@
         }
 
         if (nodeRoot === M.RubbishID || $.copyToShare || $.selectFolderDialog
-            || !u_type || M.currentdirid === 'devices') {
+            || !u_type || M.currentdirid === 'devices' || $.albumImport) {
             $sharedMe.addClass('hidden');
         }
         else {
@@ -1442,6 +1450,7 @@
 
         $('button.js-close, .dialog-cancel-button', $dialog).rebind('click', () => {
             delete $.onImportCopyNodes;
+            delete $.albumImport;
             closeDialog();
         });
 
@@ -2019,6 +2028,10 @@
                         .then(() => doShare(target, [user]))
                         .catch(tell);
                 }
+                else if ($.albumImport) {
+                    // This is a set to be imported
+                    mega.sets.copyNodesAndSet(selectedNodes, $.mcselected).catch(tell);
+                }
                 else {
                     M.copyNodes(selectedNodes, $.mcselected).catch(tell);
                 }
@@ -2038,6 +2051,8 @@
             }
 
             delete $.onImportCopyNodes;
+            delete $.albumImport;
+
             return false;
         });
 

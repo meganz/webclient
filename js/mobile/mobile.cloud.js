@@ -1,5 +1,5 @@
 /**
- * Functionality for rendering the mobile file manager (cloud drive view) and public folder links
+ * Functionality for rendering the mobile file manager (cloud drive view) and public links
  */
 mobile.cloud = {
 
@@ -140,7 +140,10 @@ mobile.cloud = {
 
         'use strict';
 
-        if (M.v.length > 0) {
+        if (pfcol) {
+            mega.gallery.albums.initPublicAlbum($('.mobile.file-manager-block .fm-content .fm-list'));
+        }
+        else if (M.v.length > 0) {
             M.megaRender.renderLayout(update, M.v);
         }
         else {
@@ -367,7 +370,11 @@ mobile.cloud = {
         const downloadSupport = await MegaMobileViewOverlay.checkSupport(node);
         let actions = [];
 
-        if (downloadSupport) {
+        if (pfcol) {
+            actions = ['openapp-button', l.view_file_open_in_app,
+                       () => goToMobileApp(MegaMobileViewOverlay.getAppLink(node.h))];
+        }
+        else if (downloadSupport) {
             actions = ['download-button', l[864],
                        () => mobile.downloadOverlay.startDownload(node.h)];
         }

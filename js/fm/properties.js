@@ -147,7 +147,7 @@
             // node is not owned by current user on chat
             // (possible old shared file and no longer exist on cloud-drive, or shared by other user in the chat room),
             // don't display path
-            if (page === 'download' || M.chat && n.u !== u_handle || !n.h && !M.d[M.currentdirid]) {
+            if (page === 'download' || M.chat && n.u !== u_handle || !n.h && !M.d[M.currentdirid] || M.isAlbumsPage()) {
                 $('.properties-breadcrumb', $dialog).addClass('hidden');
             }
             else {

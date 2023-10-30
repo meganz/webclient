@@ -44,7 +44,7 @@ mobile.keyDecryption = {
 
             const subNode = document.createElement('div');
             subNode.className = 'decryption-msg';
-            subNode.textContent = removeHTML(`${l[7945]} ${l[7972]}`);
+            subNode.textContent = removeHTML((pfcol) ? l.album_decr_key_descr : `${l[7945]} ${l[7972]}`);
 
             this.domNode.append(title, subNode, dKey);
 
@@ -71,7 +71,10 @@ mobile.keyDecryption = {
 
                     let newHash = `${folderLink ? '/#F!' : '/#!'}${publicHandle}!${key}`;
 
-                    if (isPublickLinkV2(getSitePath())) {
+                    if (pfcol) {
+                        newHash = `/collection/${publicHandle}#${key}`;
+                    }
+                    else if (isPublickLinkV2(getSitePath())) {
                         newHash = `${folderLink ? '/folder/' : '/file/'}${publicHandle}#${key}${selector || ''}`;
                     }
 

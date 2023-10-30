@@ -130,6 +130,7 @@
                                     }
                                 }
                             }
+                            mega.ui.searchbar.files.delete(file._replaces);
                         }
                         if (isAddNode) {
                             result.push(file);

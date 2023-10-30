@@ -127,6 +127,11 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
             });
     };
 
+    // @TODO: Remove this bypass once the new download method public albums is implemented
+    if (pfcol) {
+        return webdl();
+    }
+
     if (!folderlink && (z || preview || !fmconfig.dlThroughMEGAsync)) {
         return webdl();
     }

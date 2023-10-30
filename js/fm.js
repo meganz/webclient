@@ -782,7 +782,13 @@ function initTreeScroll() {
 
     if (folderlink || M.currentTreeType !== 'cloud-drive') {
         treeClass = 'js-other-tree-panel';
-        $('.js-other-tree-panel .section-title', fmholder).text(folderlink ? l.folderlink_lp_title : l[24682]);
+
+        $('.js-other-tree-panel .section-title', fmholder)
+            .text(
+                folderlink
+                    ? (pfcol ? l.shared_album : l.folderlink_lp_title)
+                    : l[24682]
+            );
     }
 
     scrollBlock = document.getElementsByClassName(treeClass).item(0);
@@ -1034,7 +1040,7 @@ function FMShortcuts() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped === "a" && (e.ctrlKey || e.metaKey)) {
-            if (typeof selectionManager != 'undefined' && selectionManager && !M.gallery) {
+            if (typeof selectionManager != 'undefined' && selectionManager && !M.gallery && !M.isAlbumsPage()) {
                 selectionManager.select_all();
             }
             return false; // stop prop.
@@ -2932,6 +2938,7 @@ function closeDialog(ev) {
 
         if (ev && $(ev.target).is('.fm-dialog-overlay, .fm-dialog-close')) {
             delete $.onImportCopyNodes;
+            delete $.albumImport;
         }
 
         if ($.msgDialog) {

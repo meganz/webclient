@@ -525,7 +525,7 @@ var gettingsc;
 function getsc(force) {
     "use strict";
 
-    if (!force) {
+    if (!force || window.pfcol) {
         return Promise.resolve(EEXIST);
     }
 

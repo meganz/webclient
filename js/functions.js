@@ -959,13 +959,38 @@ async function mKeyDialog(ph, fl, keyr, selector) {
     var $input = $('input', $dialog);
 
     if (keyr) {
+        const dialog = $('.mega-dialog.dlkey-dialog');
+
+        $('.fm-dialog-new-folder-input', dialog).addClass('contains-error');
+        $('.dlkey-err', dialog).removeClass('hidden');
+        $('.instruction-message', dialog)
+            .text((pfcol) ? l.album_decr_key_descr : l[9048]);
+
+        if (pfcol) {
+            $('.dlkey-err', $dialog)[0].style.textAlign = 'center';
+            $input[0].placeholder = '';
+            if (document.body.classList.contains('theme-dark')) {
+                $('.fm-dialog-new-folder-input', $dialog)[0].style.background = "black";
+            }
+        }
+    }
+    else if (pfcol) {
         $('.mega-dialog.dlkey-dialog .instruction-message')
-            .text(l[9048]);
+            .safeHTML(l.album_decr_key_descr);
+        $input[0].placeholder = '';
+        if (document.body.classList.contains('theme-dark')) {
+            $('.fm-dialog-new-folder-input', $dialog)[0].style.background = "black";
+        }
     }
     else {
         $('.mega-dialog.dlkey-dialog input').val('');
         $('.mega-dialog.dlkey-dialog .instruction-message')
             .safeHTML(l[7945] + '<br/>' + l[7972]);
+    }
+
+    if (mega.gallery.albums) {
+        mega.gallery.albums.disposeAll();
+        mega.gallery.albumsRendered = false;
     }
 
     $('.new-download-buttons').addClass('hidden');
@@ -1012,9 +1037,7 @@ async function mKeyDialog(ph, fl, keyr, selector) {
     });
 
     $button.rebind('click.keydlg', function() {
-
         if ($(this).hasClass('active')) {
-
             // Trim the input from the user for whitespace, newlines etc on either end
             var key = $.trim($input.val());
 
@@ -1028,7 +1051,7 @@ async function mKeyDialog(ph, fl, keyr, selector) {
                 var currLink = getSitePath();
 
                 if (isPublickLinkV2(currLink)) {
-                    newHash = (fl ? '/folder/' : '/file/') + ph + '#' + key + (selector ? selector : '');
+                    newHash = `${(pfcol ? '/collection/' : fl ? '/folder/' : '/file/') + ph}#${key}${selector || ''}`;
                 }
 
                 if (getSitePath() !== newHash) {

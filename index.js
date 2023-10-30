@@ -8,6 +8,7 @@ var dlkey = false;
 var cn_url = false;
 var init_l = true;
 var pfkey = false;
+var pfcol = false;
 var pfid = false;
 var pfhandle = false;
 var n_h = false;
@@ -569,34 +570,34 @@ function init_page() {
     }
 
     var newLinkSelector = '';
-    if (page.substr(0, 7) === 'folder/') {
-        var phLen = page.indexOf('#');
-        var possibleS = -1;
+    if (page.startsWith('folder/') || page.startsWith('collection/')) {
+        const pos = page.indexOf('/') + 1;
+        let phLen = page.indexOf('#');
+        let possibleS = -1;
 
         if (phLen < 0) {
             phLen = page.length;
-            possibleS = page.indexOf('/f', 7);
+
+            possibleS = page.indexOf('/f', pos);
             if (possibleS > -1) {
                 phLen = possibleS;
             }
         }
 
-        pfid = page.substr(7, phLen - 7).replace(/[^\w-]+/g, "");
+        pfid = page.substr(pos, phLen - pos).replace(/[^\w-]+/g, "");
 
         // check if we have key
         pfkey = false;
         pfhandle = false;
+        pfcol = page.startsWith('collection/');
+
         if (page.length - phLen > 2) {
             if (possibleS === -1) {
                 phLen++;
             }
-
-            var linkRemaining = page.substr(phLen, page.length - phLen);
-
+            const [linkRemaining] = page.substr(phLen, page.length - phLen).split('?');
             var fileSelectorPlace = linkRemaining.indexOf('/file/');
-
             var folderSelectorPlace = linkRemaining.indexOf('/folder/');
-
             var selectorIsValid = false;
 
             if (fileSelectorPlace > -1 || folderSelectorPlace > -1) {
@@ -635,13 +636,18 @@ function init_page() {
                 }
             }
             pfkey = linkRemaining.substring(0, keyCutPlace).replace(/[^\w-]+/g, "") || false;
-
         }
 
         n_h = pfid;
         if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22 || pfid.length !== 8) {
             closeDialog();
-            eventlog(is_mobile ? 99631 : 99632, true);
+
+            const data = JSON.stringify([
+                1,
+                !oldPFKey | 0, !!flhashchange | 0, (pfkey !== oldPFKey) | 0,
+                pfkey.length | 0, pfid.length | 0, window[`preflight-folder-link-error:${pfid}`] | 0
+            ]);
+            eventlog(pfcol ? is_mobile ? 99911 : 99910 : is_mobile ? 99631 : 99632, data, true);
 
             if (pfid.length !== 8 || window['preflight-folder-link-error:' + pfid]) {
                 folderreqerr(false, window['preflight-folder-link-error:' + pfid] || EARGS);
@@ -676,6 +682,7 @@ function init_page() {
                 M.currentdirid = M.RootID = M.currentCustomView = undefined;
                 delete $.onImportCopyNodes;
                 delete $.mcImport;
+                delete $.albumImport;
             }
         }
 
@@ -687,6 +694,12 @@ function init_page() {
         }
     }
     else if (!flhashchange || page !== 'fm/transfers') {
+        if (pfcol) {
+            pfcol = false;
+            mega.gallery.albums.disposeAll();
+            mega.gallery.removeDbActionCache();
+            mega.gallery.albumsRendered = false;
+        }
         n_h = false;
         u_n = false;
         pfkey = false;
@@ -760,6 +773,7 @@ function init_page() {
         && (page !== 'cookie')
         && (page.indexOf('file/') === -1)
         && (page.indexOf('folder/') === -1)
+        && !page.startsWith('collection/')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -2275,6 +2289,10 @@ function topmenuUI() {
 
         if (is_fm()) {
             $menuRefreshItem.removeClass('hidden');
+        }
+
+        if (pfcol) {
+            $('.fm-import-to-cloudrive span', '.folder-link-btns-container').text(l.context_menu_import);
         }
 
         // If the chat is disabled, or the presence lib isn't loading,

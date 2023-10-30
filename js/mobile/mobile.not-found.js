@@ -110,11 +110,19 @@ mobile.notFound = {
             title = l[20199];
         }
         else if (pfid) {
-            // If a folder link show 'The folder you are trying to view is no longer available.'
+            // On public links show 'The link you are trying to view is no longer available.'
             folderlink = 1; // Trigger FM load home.
-            title = l.no_folder_access_title;
-            icon = 'no-access-folder';
-            contentNode.textContent = message || l.no_folder_access_msg;
+            icon = (pfcol) ? 'no-access-album' : 'no-access-folder' ;
+
+            if (pfcol) {
+                title = l.album_broken_link_title;
+                contentNode.textContent = message || l.album_broken_link_text;
+            }
+            else {
+                title = l.no_folder_access_title;
+                contentNode.textContent = message || l.no_folder_access_msg;
+            }
+
             _setCenterClass();
         }
 

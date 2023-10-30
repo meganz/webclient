@@ -10,6 +10,9 @@
     box-sizing: border-box;
     box-shadow: var(--dropdown-shadow);
 }
+.dropdown.body.m-context-menu {
+    z-index: 1150;
+}
 .rtl .dropdown.body {
     direction: rtl;
 }

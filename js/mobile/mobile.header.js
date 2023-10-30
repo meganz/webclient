@@ -225,28 +225,30 @@ class MegaMobileHeader extends MegaMobileComponent {
             mobile.createFolder.show();
         });
 
-        const filterButton = new MegaMobileButton({
-            parentNode: subNode,
-            type: 'icon',
-            componentClassname: 'text-icon filter',
-            icon: 'sprite-mobile-fm-mono icon-filter-thin-outline',
-            iconSize: 24
-        });
-        filterButton.on('tap.filter', () => {
-            MegaMobileHeader.showFilters.call(this);
-        });
-
-        this.closeButton = new MegaMobileButton({
-            parentNode: subNode,
-            type: 'icon',
-            componentClassname: 'text-icon close',
-            icon: 'sprite-mobile-fm-mono icon-x-thin-solid',
-            iconSize: 24
-        });
-
         const title = document.createElement('h1');
         title.className = 'heading';
         targetNode.appendChild(title);
+
+        if (!pfcol) {
+            const filterButton = new MegaMobileButton({
+                parentNode: subNode,
+                type: 'icon',
+                componentClassname: 'text-icon filter',
+                icon: 'sprite-mobile-fm-mono icon-filter-thin-outline',
+                iconSize: 24
+            });
+            filterButton.on('tap.filter', () => {
+                MegaMobileHeader.showFilters.call(this);
+            });
+
+            this.closeButton = new MegaMobileButton({
+                parentNode: subNode,
+                type: 'icon',
+                componentClassname: 'text-icon close',
+                icon: 'sprite-mobile-fm-mono icon-x-thin-solid',
+                iconSize: 24
+            });
+        }
 
         mBroadcaster.addListener('mega:openfolder', this.update.bind(this));
     }

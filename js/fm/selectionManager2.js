@@ -892,7 +892,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
 
         if (
-            !M.gallery
+            (!M.gallery || M.isAlbumsPage())
             && (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0)
         ) {
             $selectionBar.removeClass('hidden');
@@ -948,9 +948,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             return false;
         }
 
-        const isAlbums = M.isAlbumsPage();
+        const isAlbums = M.isAlbumsPage(2);
+
         const allButtons = selectionLinkWrapper.querySelectorAll(
-            isAlbums ? '.js-statusbarbtn' : '.js-statusbarbtn:not(.options)'
+            mega.gallery.albums.isPublic ? '.js-statusbarbtn:not(.options)' : '.js-statusbarbtn'
         );
 
         for (let i = allButtons.length; i--;) {
@@ -975,23 +976,23 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         const isMegaList = M.dyh ? M.dyh('is-mega-list') : true;
 
-        if (isAlbums) {
-            if (
-                mega.gallery.albums.grid
-                && mega.gallery.albums.grid.timeline
-                && Object.keys(mega.gallery.albums.grid.timeline.selections).length === 1
-            ) {
-                __showBtn('preview');
+        if (isAlbums && mega.gallery.albums.grid && mega.gallery.albums.grid.timeline) {
+            if (mega.gallery.albums.isPublic) {
+                const selections = Object.keys(mega.gallery.albums.grid.timeline.selections);
+
+                if (selections.length === 1 && mega.gallery.isPreviewable(M.d[selections[0]])) {
+                    __showBtn('preview');
+                }
             }
 
             __showBtn('download');
-            // __showBtn('sendto');
-            // __showBtn('link');
 
-            const albumId = M.currentdirid.replace('albums/', '');
+            if (!mega.gallery.albums.isPublic) {
+                const albumId = M.currentdirid.replace('albums/', '');
 
-            if (mega.gallery.albums.store[albumId] && !mega.gallery.albums.store[albumId].filterFn) {
-                __showBtn('delete-from-album');
+                if (mega.gallery.albums.store[albumId] && !mega.gallery.albums.store[albumId].filterFn) {
+                    __showBtn('delete-from-album');
+                }
             }
         }
         else if (isMegaList) {

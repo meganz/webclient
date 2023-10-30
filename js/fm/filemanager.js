@@ -1707,7 +1707,12 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
-        eventlog(99767);
+
+        if (pfcol) {
+            $.selected = Object.keys(mega.gallery.albums.grid.timeline.selections);
+        }
+
+        eventlog(pfcol ? 99832 : 99767);
         ASSERT(folderlink, 'Import needs to be used in folder links.');
 
         M.importFolderLinkNodes($.selected);
@@ -2404,6 +2409,21 @@ FileManager.prototype.initContextUI = function() {
 
     $(`${c}.managepuburl-item`)
         .rebind('click.managePA', () => s4.ui.showDialog(s4.objects.dialogs.access, M.d[$.selected[0]]));
+
+    if (window.pfcol) {
+        $(`${c}.play-slideshow, ${c}.preview-item, ${c}.play-item`).rebind('click', function() {
+            if (M.isInvalidUserStatus()) {
+                return;
+            }
+
+            closeDialog();
+            mega.gallery.playSlideshow(
+                mega.gallery.getAlbumIdFromPath(),
+                this.classList.contains('play-slideshow'),
+                this.classList.contains('play-item')
+            );
+        });
+    }
 
     if (mega.keyMgr.version) {
 
@@ -4368,8 +4388,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
                 });
 
                 $('.fm-import-to-cloudrive', $btnWrap).rebind('click', () => {
-
-                    eventlog(99765);
+                    eventlog(pfcol ? 99831 : 99765);
                     // Import the current folder, could be the root or sub folder
                     M.importFolderLinkNodes([M.RootID]);
                 });
@@ -4668,13 +4687,12 @@ FileManager.prototype.initStatusBarLinks = function() {
             fmremove();
         }
         else if (this.classList.contains('options')) {
-
             if (this.classList.contains('c-opened')) {
-
                 this.classList.remove('c-opened');
                 $.hideContextMenu();
                 return false;
             }
+
             M.contextMenuUI(e, 1);
             this.classList.add('c-opened');
         }
@@ -4756,42 +4774,12 @@ FileManager.prototype.initLeftPanel = function() {
         $('.js-lpbtn[data-link="s4"]').addClass('active');
     }
 
-    const galleryBtn = document.querySelector('.nw-fm-left-icon.gallery');
+    if (u_attr) {
+        const galleryBtn = document.querySelector('.nw-fm-left-icon.gallery');
 
-    if (galleryBtn && (!galleryBtn.dataset.locationPref || isGallery)) {
-        const galleryRoots = {
-            photos: true,
-            images: true,
-            videos: true
-        };
-
-        mega.gallery.prefs.init().then(({ getItem }) => {
-            const res = getItem('web.locationPref');
-
-            if (!res || typeof res !== 'object' || !elements[0].querySelector) {
-                return;
-            }
-
-            const keys = Object.keys(res);
-
-            for (let i = 0; i < keys.length; i++) {
-                const pathKey = keys[i];
-
-                if (!galleryRoots[pathKey]) {
-                    continue;
-                }
-
-                const btn = elements[0].querySelector(`.btn-galleries[data-link=${pathKey}]`);
-
-                if (btn) {
-                    btn.dataset.locationPref = res[pathKey];
-                }
-
-                if (pathKey === 'photos') {
-                    galleryBtn.dataset.locationPref = res[pathKey];
-                }
-            }
-        });
+        if (galleryBtn && (!galleryBtn.dataset.locationPref || isGallery)) {
+            mega.gallery.updateButtonsStates(elements, galleryBtn);
+        }
     }
 
     $('.js-lpbtn').rebind('click.openSubTab', function(e) {

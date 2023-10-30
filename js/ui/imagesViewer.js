@@ -387,10 +387,18 @@ var slideshowid;
             var root = M.getNodeRoot(n && n.h || false);
             var $getLinkBtn = $('.v-btn.getlink', $overlay);
 
-            if (!n || !n.p || root === 'shares' || root === M.RubbishID ||
-                (!folderlink && M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u &&
-                 M.getNodeRights(n.p) < 2)) {
-
+            if (!n
+                || !n.p
+                || root === 'shares'
+                || root === M.RubbishID
+                || (pfcol)
+                || (
+                    !folderlink
+                    && M.getNodeByHandle(n.h)
+                    && !M.getNodeByHandle(n.h).u
+                    && M.getNodeRights(n.p) < 2
+                )
+            ) {
                 $getLinkBtn.addClass('hidden');
             }
             else {
@@ -954,6 +962,10 @@ var slideshowid;
             // then pushing fake states of history/hash
             if (page !== 'download' && (!history.state || history.state.view !== id)) {
                 pushHistoryState();
+
+                if (n.p && !folderlink && M.getNodeRoot(n.p) !== M.RubbishID) {
+                    onIdle(() => mega.ui.searchbar.recentlyOpened.addFile(id, false));
+                }
             }
             _hideCounter = !d && hideCounter;
         }

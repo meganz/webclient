@@ -2977,8 +2977,9 @@ function logExportEvt(type, target) {
      *
      * @param {Array} nodesToProcess Array of strings, node ids
      * @param {*} [isEmbed] Whether we're opening the dialog with the embed-code tab focused.
+     * @param {Function} [openFn] Custom callback to invoke instead of the default one
      */
-    var initCopyrightsDialog = function(nodesToProcess, isEmbed) {
+    const initCopyrightsDialog = function(nodesToProcess, isEmbed, openFn) {
 
         if (M.isInvalidUserStatus()) {
             return;
@@ -2987,7 +2988,7 @@ function logExportEvt(type, target) {
         $.itemExportEmbed = isEmbed;
         $.itemExport = nodesToProcess;
 
-        var openGetLinkDialog = function() {
+        const openGetLinkDialog = openFn || (() => {
 
             var exportLink = new mega.Share.ExportLink({
                 'showExportLinkDialog': true,
@@ -2996,7 +2997,7 @@ function logExportEvt(type, target) {
             });
 
             exportLink.getExportLink();
-        };
+        });
 
         // If they've already agreed to the copyright warning (cws = copyright warning shown)
         if (fmconfig.cws || folderlink) {

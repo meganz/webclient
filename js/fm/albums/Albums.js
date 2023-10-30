@@ -3,12 +3,265 @@ lazy(mega.gallery, 'albums', () => {
 
     const scope = mega.gallery;
 
-    const userAlbumsEnabled = true;
-
     /**
      * Globally storing disposing callback for convenience
      */
-    let disposeKeyboardEvents = null;
+    scope.disposeKeyboardEvents = null;
+
+    /**
+     * This is a margin for the cell to render within the row
+     * @type {Number}
+     */
+    scope.cellMargin = 4;
+
+    /**
+     * Adding a loading icon to the cell
+     * @param {HTMLElement} el DOM Element to add the loading icon to
+     * @param {Boolean} isVideo Whether to attach loading icon as for a video or an image
+     * @returns {void}
+     */
+    scope.attachLoadingIcon = (el, isVideo = false) => {
+        if (!el.classList.contains('cover-loading')) {
+            el.classList.add('cover-loading');
+            const i = document.createElement('i');
+            i.className = `sprite-fm-mono ${ isVideo ? 'icon-videos video' : 'icon-images image' }`;
+            el.appendChild(i);
+        }
+    };
+
+    /**
+     * Removing the loading icon from the cell
+     * @param {HTMLElement} el DOM Element to remove the loading icon from
+     * @returns {void}
+     */
+    scope.detachLoadingIcon = (el) => {
+        if (el.classList.contains('cover-loading')) {
+            el.classList.remove('cover-loading');
+            const i = [...el.children].find(child => child.tagName === 'I');
+
+            if (i) {
+                el.removeChild(i);
+            }
+        }
+    };
+
+    /**
+     * Checking whether an event is being dispatched with Ctrl key in hold
+     * @param {Event} evt Event object to check
+     * @returns {Boolean}
+     */
+    scope.getCtrlKeyStatus = ({ ctrlKey, metaKey }) => metaKey || ctrlKey;
+
+    /**
+     * How many items can be selected at once when add to an album per batch
+     */
+    scope.maxSelectionsCount = 1500;
+
+    scope.getAlbumIdFromPath = () => {
+        if (M.currentdirid && M.currentdirid.startsWith('albums/')) {
+            return M.currentdirid.replace(/^albums\//, '');
+        }
+
+        if (pfcol) {
+            const albumIds = Object.keys(scope.albums.store);
+
+            for (let i = 0; i < albumIds.length; i++) {
+                const { filterFn, p, id } = scope.albums.store[albumIds[i]];
+
+                if (!filterFn && id && p && p.ph === pfid) {
+                    return id;
+                }
+            }
+        }
+
+        return '';
+    };
+
+    /**
+     * Reporting album content download event
+     * @returns {void}
+     */
+    scope.reportDownload = () => {
+        const onlySelection = scope.albums.grid.timeline && scope.albums.grid.timeline.selCount > 0;
+        eventlog((onlySelection) ? 99793 : 99792);
+    };
+
+    /**
+     * Checking whether an element is in select area, checking if at least two edges are within the area
+     * @param {HTMLElement} domEl Dom element
+     * @param {Number[]} area Coordinates of the selection
+     * @param {Number} containerPadding The left padding of the container
+     * @returns {Boolean}
+     */
+    scope.isInSelectArea = (domEl, [left, right, top, bottom], containerPadding = 0) => {
+        const offsetLeft = domEl.offsetLeft + containerPadding;
+        const offsetTop = domEl.offsetTop;
+        const rightEdge = offsetLeft + domEl.offsetWidth;
+        const bottomEdge = offsetTop + domEl.offsetHeight;
+
+        const fitVert = (offsetTop >= top && offsetTop <= bottom) || (bottomEdge >= top && bottomEdge <= bottom);
+        const fitHoriz = (offsetLeft <= right && offsetLeft >= left) || (rightEdge >= left && rightEdge <= right);
+
+        return (fitVert && (fitHoriz || offsetLeft < left && rightEdge > right))
+            || fitHoriz && offsetTop < top && bottomEdge > bottom && fitHoriz;
+    };
+
+    /**
+     * Re-initiating the events which are being paused due to dialogs
+     * @returns {void}
+     */
+    scope.reinitiateEvents = () => {
+        delay('render:album_events_reinitiate', () => {
+            if (scope.albums.grid && !$.dialog) {
+                if (M.isAlbumsPage(1)) {
+                    scope.albums.grid.attachKeyboardEvents();
+                }
+                else {
+                    const timelineEl = scope.albums.grid.el.querySelector('.album-timeline-main');
+
+                    if (timelineEl) {
+                        timelineEl.mComponent.attachKeyboardListener();
+
+                        if (timelineEl.mComponent.dragSelect) {
+                            timelineEl.mComponent.dragSelect.disabled = false;
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    let tmpMv = [];
+    let previewMvLength = 0;
+
+    /**
+     * Launching the slideshow right away (in fullscreen mode)
+     * @param {String} albumId Album ID
+     * @param {Boolean} useFullscreen Skipping videos and playing in the fullscreen
+     * @param {Boolean} autoplay Whether to start the slideshow right away or not
+     * @returns {void}
+     */
+    scope.playSlideshow = (albumId, useFullscreen, autoplay) => {
+        const album = scope.albums.store[albumId];
+
+        if (album && album.nodes.length > 0) {
+            const selHandles = (scope.albums.grid && scope.albums.grid.timeline)
+                ? Object.keys(scope.albums.grid.timeline.selections)
+                : [];
+            const firstNode = (selHandles.length)
+                ? album.nodes.find((n) => scope.albums.grid.timeline.selections[n.h] && scope.isPreviewable(n))
+                : album.nodes.find((n) => !scope.isVideo(n) && scope.isPreviewable(n));
+
+            if (!firstNode) {
+                console.warn('Could not find the first node for the slideshow...');
+                return;
+            }
+
+            if (autoplay) {
+                $.autoplay = firstNode.h;
+            }
+
+            tmpMv = M.v;
+            M.v = [...album.nodes];
+            previewMvLength = M.v.length;
+
+            slideshow(firstNode, false);
+
+            scope.albums.removeKeyboardListener();
+
+            delay('toggle:album_slideshow_on', () => {
+                if (useFullscreen) {
+                    const slideshowBtn = $('.v-btn.slideshow', 'footer');
+
+                    if (slideshowBtn) {
+                        slideshowBtn.click();
+                    }
+
+                    const fullscreenHandler = () => {
+                        if (!document.fullscreenElement) {
+                            $('.v-btn.close', 'section.media-viewer-container').click();
+                            window.removeEventListener('fullscreenchange', fullscreenHandler);
+                        }
+                    };
+
+                    window.addEventListener('fullscreenchange', fullscreenHandler);
+                }
+
+                const eventsToDisposeOnClose = [];
+                const selectModifiers = [
+                    '.media-viewer header nav.viewer-bars button.options',
+                    '.media-viewer header nav.viewer-bars button.send-to-chat'
+                ];
+                const modifySelection = () => {
+                    $.selected = [slideshow_handle()];
+                };
+
+                for (let i = 0; i < selectModifiers.length; i++) {
+                    eventsToDisposeOnClose.push(
+                        MComponent.listen(selectModifiers[i], 'click', modifySelection)
+                    );
+                }
+
+                mBroadcaster.once('slideshow:close', () => {
+                    M.v = tmpMv;
+
+                    // double click will mess _selCount, so we need to reset here
+                    if (scope.albums.grid && scope.albums.grid.timeline) {
+                        scope.albums.grid.timeline._selCount = selHandles.length;
+                        scope.albums.grid.timeline.adjustToBottomBar();
+                    }
+
+                    scope.reinitiateEvents();
+
+                    if (window.selectionManager.clearSlideshowSelections) {
+                        window.selectionManager.clearSlideshowSelections();
+                    }
+
+                    for (let i = 0; i < eventsToDisposeOnClose.length; i++) {
+                        eventsToDisposeOnClose[i]();
+                    }
+
+                    if (M.isAlbumsPage(1) || !selHandles.length) {
+                        window.selectionManager.hideSelectionBar();
+                    }
+                    else {
+                        window.selectionManager.showSelectionBar(
+                            mega.icu.format(l.album_selected_items_count, album.nodes.length)
+                                .replace('%1', selHandles.length)
+                        );
+                    }
+                });
+            });
+        }
+    };
+
+    /**
+     * Fetching all MegaNode handles from specified albums
+     * @param {String[]} albumIds ID of albums to fetch handles from
+     * @returns {String[]}
+     */
+    scope.getAlbumsHandles = (albumIds) => {
+        const handles = [];
+
+        if (
+            albumIds.length === 1
+            && albumIds[0] === scope.getAlbumIdFromPath()
+            && scope.albums.grid.timeline.selCount > 0
+        ) {
+            handles.push(...Object.keys(scope.albums.grid.timeline.selections));
+        }
+        else {
+            for (let i = 0; i < albumIds.length; i++) {
+                const album = scope.albums.store[albumIds[i]];
+
+                if (album && album.nodes && album.nodes.length) {
+                    handles.push(...album.nodes.map(({ h }) => h));
+                }
+            }
+        }
+
+        return handles;
+    };
 
     const timemarks = {
         albumCreateStarted: 0,
@@ -53,10 +306,10 @@ lazy(mega.gallery, 'albums', () => {
     const predefinedKeyLength = 3;
 
     /**
-     * This is a margin for the cell to render within the row
+     * The maximum number of buttons allowed without grouping to `More`
      * @type {Number}
      */
-    const cellMargin = 4;
+    const headerBtnLimit = 2;
 
     /**
      * This is the default name to be used when
@@ -71,15 +324,6 @@ lazy(mega.gallery, 'albums', () => {
     const maxLabelPropositions = 10000;
 
     /**
-     * How many items can be selected at once when add to an album per batch
-     */
-    const maxSelectionsCount = 1500;
-
-    const zoomSteps = [15, 10, 5, 3];
-
-    const defZoomStep = 2;
-
-    /**
      * The limit for number of albums on when to make the grid finer
      * @type {Number}
      */
@@ -90,26 +334,17 @@ lazy(mega.gallery, 'albums', () => {
      */
     const nameLenLimit = 40;
 
-    let globalZoomStep = defZoomStep;
-
     /**
      * Storing the name value for just created album
      * @type {String}
      */
     let pendingName = '';
 
-    let tmpMv = [];
-    let previewMvLength = 0;
-
-    /**
-     * Checking whether an event is being dispatched with Ctrl key in hold
-     * @param {Event} evt Event object to check
-     * @returns {Boolean}
-     */
-    const getCtrlKeyStatus = ({ ctrlKey, metaKey }) => metaKey || ctrlKey;
-
     const isMSync = () => window.useMegaSync === 2 || window.useMegaSync === 3;
 
+    /**
+     * @returns {String[]}
+     */
     const unwantedHandles = () => MegaGallery.handlesArrToObj([
         ...M.getTreeHandles(M.RubbishID),
         ...M.getTreeHandles('shares')
@@ -121,17 +356,6 @@ lazy(mega.gallery, 'albums', () => {
      * @returns {String}
      */
     const limitNameLength = name => (name.length > nameLenLimit) ? name.substring(0, nameLenLimit) + '...' : name;
-
-    const getAlbumIdFromPath = () => M.currentdirid.replace('albums/', '');
-
-    /**
-     * Reporting album content download event
-     * @returns {void}
-     */
-    const reportDownload = () => {
-        const onlySelection = scope.albums.grid.timeline && scope.albums.grid.timeline.selCount > 0;
-        eventlog((onlySelection) ? 99793 : 99792);
-    };
 
     const getAlbumsCount = () => Object.values(scope.albums.store).filter(({ filterFn }) => !filterFn).length;
 
@@ -213,65 +437,6 @@ lazy(mega.gallery, 'albums', () => {
         });
     };
 
-    /**
-     * Fetching all MegaNode handles from specified albums
-     * @param {String[]} albumIds ID of albums to fetch handles from
-     * @returns {String[]}
-     */
-    const getAlbumsHandles = (albumIds) => {
-        const handles = [];
-
-        if (
-            albumIds.length === 1
-            && M.currentdirid === 'albums/' + albumIds[0]
-            && scope.albums.grid.timeline.selCount > 0
-        ) {
-            handles.push(...Object.keys(scope.albums.grid.timeline.selections));
-        }
-        else {
-            for (let i = 0; i < albumIds.length; i++) {
-                const album = scope.albums.store[albumIds[i]];
-
-                if (album && album.nodes && album.nodes.length) {
-                    handles.push(...album.nodes.map(({ h }) => h));
-                }
-            }
-        }
-
-        return handles;
-    };
-
-    /**
-     * Adding a loading icon to the cell
-     * @param {HTMLElement} el DOM Element to add the loading icon to
-     * @param {Boolean} isVideo Whether to attach loading icon as for a video or an image
-     * @returns {void}
-     */
-    const attachLoadingIcon = (el, isVideo = false) => {
-        if (!el.classList.contains('cover-loading')) {
-            el.classList.add('cover-loading');
-            const i = document.createElement('i');
-            i.className = 'sprite-fm-mono ' + (isVideo ? 'icon-videos video' : 'icon-images image');
-            el.appendChild(i);
-        }
-    };
-
-    /**
-     * Removing the loading icon from the cell
-     * @param {HTMLElement} el DOM Element to remove the loading icon from
-     * @returns {void}
-     */
-    const detachLoadingIcon = (el) => {
-        if (el.classList.contains('cover-loading')) {
-            el.classList.remove('cover-loading');
-            const i = Array.from(el.children).find(child => child.tagName === 'I');
-
-            if (i) {
-                el.removeChild(i);
-            }
-        }
-    };
-
     const storeLastActiveTab = () => {
         const activeBtn = document.querySelector('.lp-content-wrap.library-panel > button.active');
 
@@ -300,7 +465,7 @@ lazy(mega.gallery, 'albums', () => {
 
         const content = document.createElement('div');
         content.className = 'flex flex-row items-center px-3 w-full';
-        content.append(textEl);
+        content.appendChild(textEl);
 
         return content;
     };
@@ -316,10 +481,10 @@ lazy(mega.gallery, 'albums', () => {
                 label: l[5928],
                 icon: 'download-standard',
                 click: () => {
-                    const handles = getAlbumsHandles(albumIds);
+                    const handles = scope.getAlbumsHandles(albumIds);
 
                     if (handles.length) {
-                        reportDownload();
+                        scope.reportDownload();
                         M.addDownload(handles);
                     }
                 }
@@ -328,10 +493,10 @@ lazy(mega.gallery, 'albums', () => {
                 label: l[864],
                 icon: 'download-zip',
                 click: () => {
-                    const handles = getAlbumsHandles(albumIds);
+                    const handles = scope.getAlbumsHandles(albumIds);
 
                     if (handles.length) {
-                        reportDownload();
+                        scope.reportDownload();
                         M.addDownload(
                             handles,
                             true,
@@ -354,47 +519,15 @@ lazy(mega.gallery, 'albums', () => {
             label: l.download_option,
             icon: 'download-small',
             click: () => {
-                const handles = getAlbumsHandles(albumIds);
+                const handles = scope.getAlbumsHandles(albumIds);
 
                 if (handles.length) {
-                    reportDownload();
+                    scope.reportDownload();
                     M.addDownload(handles);
                 }
             },
             children: (isMSync()) ? undefined : generateDownloadOptions(albumIds)
         };
-    };
-
-    /**
-     * Re-initiating the events which are being paused due to dialogs
-     * @returns {void}
-     */
-    const reinitiateEvents = () => {
-        delay('render:album_events_reinitiate', () => {
-            if (scope.albums.grid && !$.dialog) {
-                if (M.isAlbumsPage(1)) {
-                    scope.albums.grid.attachKeyboardEvents();
-                }
-                else {
-                    const timelineEl = scope.albums.grid.el.querySelector('.album-timeline-main');
-
-                    if (timelineEl) {
-                        timelineEl.mComponent.attachKeyboardListener();
-
-                        if (timelineEl.mComponent.dragSelect) {
-                            timelineEl.mComponent.dragSelect.disabled = false;
-                        }
-                    }
-                }
-            }
-        });
-    };
-
-    const fillAlbumTimelineCell = (el) => {
-        if (el.ref.isVideo) {
-            el.dataset.videoDuration = secondsToTimeShort(MediaAttribute(el.ref.node).data.playtime);
-            el.classList.add('show-video-duration');
-        }
     };
 
     const fillAlbumCell = (el) => {
@@ -406,11 +539,11 @@ lazy(mega.gallery, 'albums', () => {
         titleEl.className = 'album-label text-ellipsis';
         titleEl.setAttribute('title', el.album.label);
 
-        div.append(titleEl);
-        div.append(el.album.cellEl.countEl);
+        div.appendChild(titleEl);
+        div.appendChild(el.album.cellEl.countEl);
 
         el.album.cellEl.updatePlaceholders();
-        el.append(div);
+        el.appendChild(div);
     };
 
     /**
@@ -466,7 +599,7 @@ lazy(mega.gallery, 'albums', () => {
 
     /**
      * @param {String} name Album name to check against others
-     * @param {String} ignoreId Current Album ID
+     * @param {String} ignoreId Ignore specific id, ususally it's current Album ID
      * @returns {void}
      */
     const albumNameExists = (name, ignoreId) => Object
@@ -524,7 +657,7 @@ lazy(mega.gallery, 'albums', () => {
         const aIndex = aKeys.indexOf(albumId);
 
         if (aIndex === aKeys.length - 1) {
-            domContainer.append(domElement);
+            domContainer.appendChild(domElement);
         }
         else {
             domContainer.insertBefore(
@@ -577,7 +710,7 @@ lazy(mega.gallery, 'albums', () => {
                     grid.refresh();
                 });
             }
-            else if (M.currentdirid === 'albums/' + albumId) {
+            else if (albumId === scope.getAlbumIdFromPath()) {
                 if (grid.timeline) {
                     if (grid.timeline.selections[handle]) {
                         grid.timeline.deselectNode(M.d[handle]);
@@ -671,145 +804,6 @@ lazy(mega.gallery, 'albums', () => {
     };
 
     /**
-     * Checking whether the video is available to be previewed
-     * @param {MegaNode} n Node to check
-     * @returns {Boolean}
-     */
-    const isAllowedVideo = (n) => {
-        const data = mega.gallery.isGalleryVideo(n);
-        return !!data;
-    };
-
-    /**
-     * Launching the slideshow right away (in fullscreen mode)
-     * @param {String} albumId Album ID
-     * @param {Boolean} useFullscreen Skipping videos and playing in the fullscreen
-     * @returns {void}
-     */
-    const playSlideshow = (albumId, useFullscreen) => {
-        const album = scope.albums.store[albumId];
-
-        if (album && album.nodes.length > 0) {
-            let firstNode = (useFullscreen && album.nodes.find(n => !isAllowedVideo(n))) || album.nodes[0];
-            let selHandles = {};
-
-            if (scope.albums.grid && scope.albums.grid.timeline) {
-                selHandles = scope.albums.grid.timeline.selections;
-
-                if (Object.keys(selHandles).length) {
-                    for (let i = 0; i < album.nodes.length; i++) {
-                        if (selHandles[album.nodes[i].h]
-                            && (!useFullscreen || !isAllowedVideo(album.nodes[i]))) {
-                            firstNode = album.nodes[i];
-                            break;
-                        }
-                    }
-                }
-            }
-
-            tmpMv = M.v;
-            M.v = [...album.nodes];
-            previewMvLength = M.v.length;
-
-            slideshow(firstNode, false);
-
-            scope.albums.removeKeyboardListener();
-
-            delay('toggle:album_slideshow_on', () => {
-                if (useFullscreen) {
-                    const slideshowBtn = $('.v-btn.slideshow', 'footer');
-
-                    if (slideshowBtn) {
-                        slideshowBtn.click();
-                    }
-
-                    const fullscreenHandler = () => {
-                        if (!document.fullscreenElement) {
-                            $('.v-btn.close', 'section.media-viewer-container').click();
-                            window.removeEventListener('fullscreenchange', fullscreenHandler);
-                        }
-                    };
-
-                    window.addEventListener('fullscreenchange', fullscreenHandler);
-                }
-
-                const eventsToDisposeOnClose = [];
-                const selectModifiers = [
-                    '.media-viewer header nav.viewer-bars button.options',
-                    '.media-viewer header nav.viewer-bars button.send-to-chat'
-                ];
-                const modifySelection = () => {
-                    $.selected = [slideshow_handle()];
-                };
-
-                for (let i = 0; i < selectModifiers.length; i++) {
-                    eventsToDisposeOnClose.push(
-                        MComponent.listen(selectModifiers[i], 'click', modifySelection)
-                    );
-                }
-
-                mBroadcaster.once('slideshow:close', () => {
-                    M.v = tmpMv;
-                    const selCount = Object.keys(selHandles).length;
-
-                    // double click will mess _selCount, so we need to reset here
-                    if (scope.albums.grid && scope.albums.grid.timeline) {
-                        scope.albums.grid.timeline._selCount = selCount;
-                        scope.albums.grid.timeline.adjustToBottomBar();
-                    }
-
-                    reinitiateEvents();
-
-                    if (window.selectionManager.clearSlideshowSelections) {
-                        window.selectionManager.clearSlideshowSelections();
-                    }
-
-                    for (let i = 0; i < eventsToDisposeOnClose.length; i++) {
-                        eventsToDisposeOnClose[i]();
-                    }
-
-                    if (M.isAlbumsPage(1) || !selCount) {
-                        window.selectionManager.hideSelectionBar();
-                    }
-                    else {
-                        window.selectionManager.showSelectionBar(
-                            mega.icu.format(l.album_selected_items_count, album.nodes.length)
-                                .replace('%1', selCount)
-                        );
-                    }
-                });
-            });
-        }
-    };
-
-    /**
-     * Getting the month label for the node
-     * @param {MegaNode} node Node to fetch the label from
-     * @returns {String}
-     */
-    const getMonthLabel = ({ mtime, ts }) => GalleryNodeBlock.getTimeString(mtime || ts, 3);
-
-    /**
-     * Checking whether an element is in select area, checking if at least two edges are within the area
-     * @param {HTMLElement} domEl Dom element
-     * @param {Number[]} area Coordinates of the selection
-     * @param {Number} containerPadding The left padding of the container
-     * @returns {Boolean}
-     */
-    const isInSelectArea = (domEl, [left, right, top, bottom], containerPadding = 0) => {
-        const offsetLeft = domEl.offsetLeft + containerPadding;
-        const offsetTop = domEl.offsetTop;
-        const rightEdge = offsetLeft + domEl.offsetWidth;
-        const bottomEdge = offsetTop + domEl.offsetHeight;
-
-        const fitVert = (offsetTop >= top && offsetTop <= bottom) || (bottomEdge >= top && bottomEdge <= bottom);
-        const fitHoriz = (offsetLeft <= right && offsetLeft >= left) || (rightEdge >= left && rightEdge <= right);
-
-        return (fitVert && (fitHoriz || offsetLeft < left && rightEdge > right))
-            || fitHoriz && offsetTop < top && bottomEdge > bottom && fitHoriz;
-    };
-
-    /**
      * Checking which predefined active album is preceding the current one
      * @param {String} albumId Album ID
      * @param {String} elKey Which subelement to use as an active checker
@@ -838,7 +832,7 @@ lazy(mega.gallery, 'albums', () => {
     class AlbumsSelectionManager extends SelectionManager2_DOM {
         constructor(albumId, container, eventHandlers) {
             super(container, eventHandlers);
-            this.currentdirid = M.currentdirid;
+            this.currentdirid = `albums/${albumId}`;
             this._boundEvents = [];
             this.init();
             this.albumId = albumId;
@@ -850,7 +844,7 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         get items_per_row() {
-            return zoomSteps[this.timeline.zoomStep];
+            return scope.AlbumTimeline.zoomSteps[this.timeline.zoomStep];
         }
 
         clearSlideshowSelections() {
@@ -873,1274 +867,448 @@ lazy(mega.gallery, 'albums', () => {
         }
     }
 
-    class AlbumItemContextMenu extends MMenuSelect {
-        constructor() {
-            super();
-
-            const selections = Object.keys(scope.albums.grid.timeline.selections);
-            const albumId = getAlbumIdFromPath();
-            const album = scope.albums.store[albumId];
-            const options = [];
-            const isCoverChangeable = !album.filterFn
-                && selections.length === 1
-                && (!album.at.c || album.eIds[album.at.c] !== selections[0]);
-
-            const onlyImagesSelected = !selections.some((h) => isAllowedVideo(M.d[h]));
-
-            if (onlyImagesSelected) {
-                options.push({
-                    label: l.album_play_slideshow,
-                    icon: 'play-square',
-                    click: () => {
-                        playSlideshow(albumId, true);
-                    }
-                });
-            }
-
-            options.push(
-                {
-                    label: l.album_item_preview_label,
-                    icon: 'preview-reveal',
-                    click: () => {
-                        playSlideshow(albumId);
-                    }
-                },
-                {},
-                {
-                    label: l.album_download,
-                    icon: 'download-small',
-                    click: () => {
-                        if (M.currentdirid !== 'albums/' + albumId) {
-                            return;
-                        }
-
-                        const handles = getAlbumsHandles([albumId]);
-
-                        if (!handles.length) {
-                            return;
-                        }
-
-                        reportDownload();
-                        M.addDownload(handles);
-                    }
-                }
-            );
-
-            if (isCoverChangeable) {
-                options.push({
-                    label: l.set_as_album_cover,
-                    icon: 'images',
-                    click: () => {
-                        if (scope.albums.grid.timeline.selCount === 1) {
-                            scope.albums.updateAlbumCover(album, Object.keys(scope.albums.grid.timeline.selections)[0]);
-                        }
-                    }
-                });
-            }
-
-            if (!album.filterFn) {
-                options.push(
-                    {},
-                    {
-                        label: l.album_item_remove_label,
-                        icon: 'bin',
-                        click: () => {
-                            scope.albums.requestAlbumElementsRemoval();
-                        },
-                        classes: ['red']
-                    }
-                );
-            }
-
-            this.options = options;
-        }
-    }
-
-    class AlbumTimelineCell extends MComponent {
-        /**
-         * @param {Object.<String, any>} data Data for the cell
-         * @param {MegaNode} data.node Node to base on
-         * @param {Function} data.clickFn Single click handler
-         * @param {Function} data.dbclickFn Double click handler
-         * @param {Boolean} data.useMenu Whether to use context menu or skip it
-         */
-        constructor({ node, clickFn, dbclickFn, useMenu }) {
-            super();
-
-            this.el.ref = {
-                node,
-                isVideo: isAllowedVideo(node),
-                setThumb: (dataUrl) => {
-                    this.setThumb(dataUrl);
-                }
-            };
-
-            this.el.setAttribute('title', node.name);
-            this.el.setAttribute('id', node.h);
-
-            this._active = true;
-            this._selected = false;
-
-            this.attachEvents(clickFn, dbclickFn, useMenu);
-            attachLoadingIcon(this.el, this.el.ref.isVideo);
-        }
-
-        get isActive() {
-            return this._active;
-        }
-
-        /**
-         * Using this parameter to grey-out the cell when needed
-         * @param {Boolean} status Active status
-         * @returns {void}
-         */
-        set isActive(status) {
-            if (status) {
-                this.el.classList.remove('opacity-50');
-            }
-            else {
-                this.el.classList.add('opacity-50');
-            }
-        }
-
-        get isSelected() {
-            return this._selected;
-        }
-
-        /**
-         * @param {Boolean} status Selected status
-         * @returns {void}
-         */
-        set isSelected(status) {
-            if (status === this._selected) {
-                return;
-            }
-
-            if (status) {
-                this.el.classList.add('ui-selected');
-
-                const check = document.createElement('i');
-                check.className = 'sprite-fm-mono icon-check-circle icon-size-6';
-                this.el.append(check);
-                this._selected = true;
-
-                if (!this._active) {
-                    this.isActive = true;
-                }
-            }
-            else {
-                this.el.classList.remove('ui-selected');
-                this.el.removeChild(this.el.querySelector('i.icon-check-circle'));
-                this._selected = false;
-            }
-        }
-
-        buildElement() {
-            this.el = document.createElement('div');
-            this.el.className = 'album-timeline-cell cursor-pointer';
-        }
-
-        attachEvents(clickFn, dbclickFn, useMenu) {
-            if (clickFn) {
-                this.attachEvent('mouseup', (evt) => {
-                    if (evt.which === 3) {
-                        return false;
-                    }
-
-                    if (!evt.detail || evt.detail === 1) {
-                        clickFn(this, evt);
-                    }
-                    else if (evt.detail === 2) {
-                        dbclickFn(this, evt);
-                    }
-                });
-            }
-
-            if (useMenu) {
-                this.attachEvent(
-                    'contextmenu',
-                    (evt) => {
-                        const { pageX, pageY, target } = evt;
-
-                        if (!this.isSelected) {
-                            clickFn(this, evt);
-                        }
-
-                        const contextMenu = new AlbumItemContextMenu(target);
-                        contextMenu.show(pageX, pageY);
-                    }
-                );
-            }
-        }
-
-        applyMonthLabel(label) {
-            this.el.classList.add('show-date');
-            this.el.dataset.date = label;
-        }
-
-        removeMonthLabel() {
-            this.el.classList.remove('show-date');
-        }
-
-        setThumb(dataUrl) {
-            if (this.el.classList.contains('cover-loading')) {
-                this.el.style.backgroundImage = 'url(\'' + dataUrl + '\')';
-                this.el.style.backgroundColor = 'white';
-                detachLoadingIcon(this.el);
-            }
-        }
-    }
-
-    class AlbumTimeline extends MComponent {
-        /**
-         * The sorted list of nodes (newest at top) with the specific handler
-         * @param {Object.<String, any>} options Options object
-         * @param {Function} options.onSelectToggle Method is called when the cell status is changed
-         * @param {Function} options.onDoubleClick Method is called when the cell is double clicked
-         * @param {String} [options.containerClass] Additional classes for container
-         * @param {Number} [options.sidePadding] Use this correction, if container classes include x-axis padding
-         * @param {Boolean} [options.showMonthLabel] Whether to show month timestamps or not
-         * @param {Boolean} [options.interactiveCells] Whether cells should react to context menu and selections
-         * @param {Boolean} [options.selectionLimit] Whether a multiple selection is allowed or not
-         * @param {Boolean} [options.skipGlobalZoom] Whether to use global zoom or the locally created one
-         */
-        constructor({
-            onSelectToggle,
-            onDoubleClick,
-            containerClass,
-            sidePadding,
-            showMonthLabel,
-            interactiveCells,
-            selectionLimit,
-            skipGlobalZoom
-        }) {
-            super(null, false);
-
-            this.sidePadding = sidePadding || 0;
-
-            if (typeof containerClass === 'string') {
-                this.el.className = containerClass;
-            }
-
-            this.dynamicList = false;
-
-            this.rowIndexCache = {};
-            this.cellCache = {};
-            this.initialRender = true;
-
-            this.selections = {};
-            this.selectArea = null;
-            this.shiftSelectedIndexes = [];
-
-            this.onSelectToggle = onSelectToggle;
-            this.onDoubleClick = onDoubleClick;
-            this.showMonthLabel = showMonthLabel;
-            this.interactiveCells = interactiveCells;
-            this.skipGlobalZoom = skipGlobalZoom;
-            this.selectionLimit = selectionLimit || 0;
-
-            this._zoomStep = skipGlobalZoom ? defZoomStep : globalZoomStep;
-            this._limitReached = false;
-            this._selCount = 0;
-
-            this.attachEvents();
-        }
-
-        get selCount() {
-            return this._selCount;
-        }
-
-        get rowHeight() {
-            return this.cellSize + cellMargin * 2;
-        }
-
-        get zoomStep() {
-            return this._zoomStep;
-        }
-
-        get limitReached() {
-            return this._limitReached;
-        }
-
-        /**
-         * @param {Boolean} status Whether the limit is reached or not
-         */
-        set limitReached(status) {
-            this._limitReached = status;
-
-            delay('album_timeline:toggle_cell_activation', () => {
-                const selector = '.album-timeline-cell'
-                    + (this._limitReached ? ':not(.opacity-50)' : '.opacity-50')
-                    + ':not(.ui-selected)';
-
-
-                const cellsToToggle = this.el.querySelectorAll(selector);
-
-                if (cellsToToggle.length) {
-                    for (let i = 0; i < cellsToToggle.length; i++) {
-                        cellsToToggle[i].mComponent.isActive = !this._limitReached;
-                    }
-                }
-            }, 100);
-        }
-
-        /**
-         * @param {Number} step The zoom step index
-         * @returns {void}
-         */
-        set zoomStep(step) {
-            step = parseInt(step);
-
-            if (isNaN(step)) {
-                step = 0;
-            }
-
-            if (step >= zoomSteps.length || step < 0) {
-                return;
-            }
-
-            this._zoomStep = step;
-
-            if (!this.skipGlobalZoom) {
-                globalZoomStep = step;
-            }
-
-            if (this.dynamicList && this._nodes.length) {
-                this.nodes = this._nodes.map(({ list }) => list).flat();
-            }
-        }
-
-        /**
-         * @param {MegaNode[]} nodes The new list of nodes to use
-         * @returns {void}
-         */
-        set nodes(nodes) {
-            if (this.dynamicList) {
-                this.dynamicList.destroy();
-                this.dynamicList = null;
-            }
-
-            MComponent.resetSubElements(this, '_nodes', false);
-
-            if (!nodes.length) {
-                return;
-            }
-
-            this.setCellSize();
-
-            this.dynamicList = new MegaDynamicList(this.el, {
-                itemRenderFunction: this.renderRow.bind(this),
-                itemHeightCallback: () => this.rowHeight,
-                perfectScrollOptions: {
-                    handlers: ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
-                    minScrollbarLength: 50
-                }
-            });
-
-            const ids = [];
-            let lastIndex = 0;
-            let monthLabel = getMonthLabel(nodes[0]);
-            this.rowIndexCache[nodes[0].h] = 0;
-            this._nodes.push({
-                list: [nodes[0]],
-                monthLabel
-            });
-
-            for (let i = 1; i < nodes.length; i++) {
-                const node = nodes[i];
-                const lastEl = this._nodes[lastIndex];
-                const curLabel = getMonthLabel(node);
-
-                if (this.showMonthLabel && curLabel !== monthLabel) {
-                    ids.push(lastIndex.toString());
-                    monthLabel = curLabel;
-                    lastIndex++;
-
-                    this._nodes.push({
-                        list: [node],
-                        monthLabel
-                    });
-                }
-                else if (lastEl.list.length % zoomSteps[this.zoomStep] === 0) {
-                    ids.push(lastIndex.toString());
-                    lastIndex++;
-
-                    this._nodes.push({
-                        list: [node]
-                    });
-                }
-                else {
-                    lastEl.list.push(node);
-                }
-
-                this.rowIndexCache[node.h] = lastIndex;
-            }
-
-            if (!this.dynamicList.items[lastIndex]) {
-                ids.push(lastIndex.toString());
-            }
-
-            this.dynamicList.batchAdd(ids);
-            this.dynamicList.initialRender();
-
-            if (this.zoomControls) {
-                this.el.parentNode.prepend(this.zoomControls);
-            }
-
-            delay('album_timeline:set_nodes', () => {
-                this.dynamicList.options.onResize = this.onResize.bind(this);
-            });
-        }
-
-        clearSiblingSelections(ignoreHandle) {
-            const handles = Object.keys(this.selections);
-
-            for (let i = 0; i < handles.length; i++) {
-                if (handles[i] !== ignoreHandle) {
-                    this.deselectNode(M.d[handles[i]]);
-                }
-            }
-        }
-
-        attachEvents() {
-            this.onNodeClick = (cell, evt) => {
-                const { shiftKey } = evt;
-                const { el, isSelected } = cell;
-
-                if (this.selectionLimit === 1) {
-                    this.selectNode(el.ref.node);
-                    this.clearSiblingSelections(el.ref.node.h);
-                    return;
-                }
-
-                this.lastNavNode = el.ref.node;
-
-                if (shiftKey) {
-                    if (this.selectStartNode && this.selectStartNode.h !== el.ref.node.h) {
-                        this.selectElementsRange(this.selectStartNode, el.ref.node, true);
-                    }
-                    else {
-                        this.clearSiblingSelections(el.ref.node.h);
-                        this.selectStartNode = el.ref.node;
-                    }
-                }
-                else {
-                    if (isSelected) {
-                        this.deselectNode(el.ref.node);
-                        this.selectStartNode = null;
-                        this.lastNavNode = null;
-                    }
-                    else {
-                        this.selectNode(el.ref.node);
-                        this.selectStartNode = el.ref.node;
-                    }
-
-                    this.shiftSelectedIndexes = [];
-                }
-            };
-
-            this.onNodeDbClick = (cell, evt) => {
-                this.selectStartNode = cell.el.ref.node;
-                this.lastNavNode = null;
-
-                if (this.onDoubleClick) {
-                    this.onDoubleClick(cell, evt);
-                }
-            };
-
-            this.attachKeyboardListener();
-
-            if (this.selectionLimit !== 1) {
-                this.attachDragListener();
-            }
-        }
-
-        selectNonRenderedCells(posArr) {
-            for (let i = 0; i < this._nodes.length; i++) {
-                for (let j = 0; j < this._nodes[i].list.length; j++) {
-                    const isInArea = isInSelectArea(
-                        {
-                            offsetLeft: Math.floor(
-                                this.cellSize * j + cellMargin * (j * 2 + 1)
-                            ),
-                            offsetTop: Math.floor(
-                                this.dynamicList._offsets[i.toString()] + cellMargin
-                            ),
-                            offsetWidth: this.cellSize,
-                            offsetHeight: this.cellSize
-                        },
-                        posArr,
-                        this.sidePadding
-                    );
-
-                    if (isInArea) {
-                        this.selectNode(this._nodes[i].list[j]);
-                    }
-                    else {
-                        this.deselectNode(this._nodes[i].list[j]);
-                    }
-                }
-            }
-        }
-
-        selectRenderedCells(posArr) {
-            const keys = Object.keys(this.dynamicList._currentlyRendered);
-
-            if (keys.length) {
-                for (let i = 0; i < keys.length; i++) {
-                    const row = this.dynamicList._currentlyRendered[keys[i]];
-
-                    if (row.children && row.children.length) {
-                        for (let j = 0; j < row.children.length; j++) {
-                            if (isInSelectArea(row.children[j], posArr, this.sidePadding)) {
-                                this.selectNode(row.children[j].ref.node);
-                                this.lastNavNode = row.children[j].ref.node;
-                            }
-                            else {
-                                this.deselectNode(row.children[j].ref.node);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        attachDragListener() {
-            let initX = 0;
-            let initY = 0;
-
-            this.dragSelect = new mega.ui.dragSelect(
-                this.el,
-                {
-                    allowedClasses: ['MegaDynamicListItem'],
-                    onDragStart: (xPos, yPos) => {
-                        initX = xPos;
-                        initY = this.dynamicList.getScrollTop() + yPos;
-                    },
-                    onDragMove: (xPos, yPos) => {
-                        const posArr = [];
-
-                        yPos += this.dynamicList.getScrollTop();
-
-                        if (xPos > initX) {
-                            posArr.push(initX, xPos);
-                        }
-                        else {
-                            posArr.push(xPos, initX);
-                        }
-
-                        if (yPos > initY) {
-                            posArr.push(initY, yPos);
-                        }
-                        else {
-                            posArr.push(yPos, initY);
-                        }
-
-                        this.selectArea = posArr;
-
-                        if (this.dynamicList) {
-                            this.selectRenderedCells(posArr);
-
-                            delay('album_timeline:drag_select', () => {
-                                this.selectNonRenderedCells(posArr);
-                            }, 50);
-                        }
-                    },
-                    onDragEnd: (wasDragging, yCorrection, rect, { target }) => {
-                        if (!wasDragging
-                            && this.selCount
-                            && (target === this.el || target.classList.contains('MegaDynamicListItem'))) {
-                            this.clearSiblingSelections();
-                            this.selectArea = null;
-                            this.lastNavNode = null;
-                        }
-
-                        this.selectStartNode = null;
-                        this.shiftSelectedIndexes = [];
-                    },
-                    onScrollUp: () => {
-                        if (!this.limitReached) {
-                            this.dynamicList.scrollToYPosition(this.dynamicList.getScrollTop() - 20);
-                        }
-                    },
-                    onScrollDown: () => {
-                        if (!this.limitReached) {
-                            this.dynamicList.scrollToYPosition(this.dynamicList.getScrollTop() + 20);
-                        }
-                    },
-                    getScrollTop: () => this.dynamicList.getScrollTop()
-                }
-            );
-        }
-
-        resetLastNavNode(shiftKey) {
-            if (!this.lastNavNode) {
-                if (this.selectStartNode) {
-                    this.lastNavNode = this.selectStartNode;
-                    return;
-                }
-
-                const selections = Object.keys(this.selections);
-
-                if (selections.length) {
-                    this.lastNavNode = M.d[selections[selections.length - 1]];
-                }
-            }
-
-            if (shiftKey && !this.selectStartNode) {
-                this.selectStartNode = this.lastNavNode || this._nodes[0].list[0];
-            }
-        }
-
-        attachKeyboardListener() {
-            if (disposeKeyboardEvents) {
-                disposeKeyboardEvents();
-            }
-
-            disposeKeyboardEvents = MComponent.listen(document, 'keydown', (evt) => {
-                if (evt.target !== document.body) {
-                    return;
-                }
-
-                const { key, shiftKey } = evt;
-                const isCtrl = getCtrlKeyStatus(evt);
-
-                let rowIndex = -1;
-                let inRowIndex = -1;
-                let skipSelfSelect = false;
-
-                this.resetLastNavNode(shiftKey);
-
-                if (this.lastNavNode) {
-                    rowIndex = this.rowIndexCache[this.lastNavNode.h];
-
-                    inRowIndex = this._nodes[this.rowIndexCache[this.lastNavNode.h]].list
-                        .findIndex(({ h }) => h === this.lastNavNode.h);
-                }
-                else {
-                    rowIndex++;
-                }
-
-                const events = {
-                    ArrowLeft: () => {
-                        inRowIndex--;
-
-                        if (inRowIndex < 0) {
-                            rowIndex--;
-                            inRowIndex = zoomSteps[this.zoomStep] - 1;
-                        }
-
-                        if (rowIndex < 0 && !shiftKey && !isCtrl) {
-                            rowIndex = this._nodes.length - 1;
-                        }
-
-                        if (this._nodes[rowIndex] && inRowIndex >= this._nodes[rowIndex].list.length) {
-                            inRowIndex = this._nodes[rowIndex].list.length - 1;
-                        }
-                    },
-                    ArrowRight: () => {
-                        inRowIndex++;
-
-                        if (inRowIndex >= this._nodes[rowIndex].list.length) {
-                            rowIndex++;
-                            inRowIndex = 0;
-                        }
-
-                        if (rowIndex >= this._nodes.length && !shiftKey && !isCtrl) {
-                            rowIndex = 0;
-                        }
-                    },
-                    ArrowUp: () => {
-                        if (this.lastNavNode) {
-                            rowIndex--;
-                        }
-                        else {
-                            rowIndex = 0;
-                            inRowIndex = 0;
-                        }
-
-                        if (rowIndex < 0 && !shiftKey && !isCtrl) {
-                            rowIndex = this._nodes.length - 1;
-                        }
-
-                        if (!this._nodes[rowIndex]) {
-                            return true;
-                        }
-
-                        const perRow = this._nodes[rowIndex].list.length;
-
-                        if (inRowIndex >= perRow) {
-                            inRowIndex = perRow - 1;
-                        }
-
-                        if (this.selectionLimit > 1 && !this.limitReached) {
-                            const overLimit = this.selCount + perRow - this.selectionLimit;
-
-                            if (overLimit > 0) {
-                                inRowIndex += overLimit;
-
-                                if (inRowIndex >= perRow) {
-                                    rowIndex++;
-                                    inRowIndex = perRow - inRowIndex;
-                                }
-                            }
-                        }
-                    },
-                    ArrowDown: () => {
-                        if (this.lastNavNode) {
-                            rowIndex++;
-                        }
-                        else {
-                            rowIndex = 0;
-                            inRowIndex = 0;
-                        }
-
-                        if (rowIndex >= this._nodes.length && !shiftKey && !isCtrl) {
-                            rowIndex = 0;
-                        }
-
-                        if (!this._nodes[rowIndex]) {
-                            return true;
-                        }
-
-                        const perRow = this._nodes[rowIndex].list.length;
-
-                        if (this._nodes[rowIndex] && inRowIndex >= perRow) {
-                            inRowIndex = perRow - 1;
-                        }
-
-                        if (this.selectionLimit > 1 && !this.limitReached) {
-                            const overLimit = this.selCount + perRow - this.selectionLimit;
-
-                            if (overLimit > 0) {
-                                inRowIndex -= overLimit;
-                                if (inRowIndex < 0) {
-                                    rowIndex--;
-                                    inRowIndex = perRow + inRowIndex;
-                                }
-                            }
-                        }
-                    },
-                    a: () => {
-                        if (this.selectionLimit === 1) {
-                            return true;
-                        }
-
-                        for (let i = 0; i < this._nodes.length; i++) {
-                            for (let j = 0; j < this._nodes[i].list.length; j++) {
-                                this.selectNode(this._nodes[i].list[j]);
-                            }
-                        }
-
-                        this.lastNavNode = null;
-                        skipSelfSelect = true;
-                    },
-                    Escape: () => {
-                        if ($.dialog) {
-                            disposeKeyboardEvents();
-                            evt.preventDefault();
-                            evt.stopPropagation();
-                            closeDialog();
-                        }
-
-                        return true;
-                    },
-                    Enter: () => {
-                        evt.preventDefault();
-                        evt.stopPropagation();
-
-                        if ($.dialog) {
-                            disposeKeyboardEvents();
-                            return true;
-                        }
-
-                        if (!this.selCount) {
-                            return true;
-                        }
-
-                        if (this.selCount === 1) {
-                            playSlideshow(getAlbumIdFromPath());
-                        }
-                        else {
-                            reportDownload();
-                            M.addDownload(Object.keys(this.selections));
-                        }
-
-                        return true;
-                    }
-                };
-
-                if (!events[key]) {
-                    return;
-                }
-
-                if (isCtrl) {
-                    evt.preventDefault();
-                    evt.stopPropagation();
-                }
-
-                if (events[key]() === true
-                    || rowIndex < 0
-                    || rowIndex >= this._nodes.length
-                    || !this._nodes[rowIndex]
-                    || !this._nodes[rowIndex].list[inRowIndex]
-                ) {
-                    return true;
-                }
-
-                this.lastNavNode = this._nodes[rowIndex].list[inRowIndex];
-
-                if (skipSelfSelect || !this.cellCache[this.lastNavNode.h]) {
-                    return;
-                }
-
-                const { el } = this.cellCache[this.lastNavNode.h];
-
-                if (shiftKey) {
-                    this.selectElementsRange(this.selectStartNode, this.lastNavNode);
-                }
-                else if (!isCtrl || !el.mComponent.isSelected) {
-                    this.selectNode(this.lastNavNode);
-                }
-
-                this.scrollToSelectedRow(rowIndex);
-
-                if (!shiftKey && !isCtrl) {
-                    this.clearSiblingSelections(this.lastNavNode.h);
-                }
-            });
-        }
-
-        scrollToSelectedRow(rowIndex) {
-            const newOffsetTop = this.dynamicList._offsets[rowIndex];
-            const scrollTop = this.dynamicList.getScrollTop();
-
-            if (newOffsetTop < scrollTop) {
-                this.dynamicList.scrollToYPosition(newOffsetTop);
-            }
-            else {
-                const bottomOverflow = newOffsetTop
-                    + this.rowHeight
-                    + cellMargin
-                    - (scrollTop + this.el.clientHeight);
-
-                if (bottomOverflow > 0) {
-                    this.dynamicList.scrollToYPosition(scrollTop + bottomOverflow);
-                }
-            }
-        }
-
-        /**
-         * @param {Meganode} node Node to select
-         * @returns {void}
-         */
-        selectNode(node) {
-            if (this.limitReached) {
-                if (!this.limitTip) {
-                    this.addCountLimitTip();
-                }
-
-                return;
-            }
-
-            if (!this.selections[node.h]) {
-                this.selections[node.h] = true;
-
-                if (this.onSelectToggle) {
-                    this.onSelectToggle(node);
-                }
-
-                const cell = this.cellCache[node.h];
-
-                if (cell) {
-                    cell.isSelected = true;
-                }
-
-                this._selCount++;
-
-                if (
-                    this.selectionLimit > 1
-                    && this.selCount >= this.selectionLimit
-                ) {
-                    this.addCountLimitTip();
-                    this.limitReached = true;
-                }
-
-                this.adjustHeader();
-            }
-        }
-
-        /**
-         * @param {Meganode} node Node to deselect
-         * @returns {void}
-         */
-        deselectNode(node) {
-            if (this.selections[node.h]) {
-                delete this.selections[node.h];
-
-                if (this.onSelectToggle) {
-                    this.onSelectToggle(node);
-                }
-
-                const cell = this.cellCache[node.h];
-
-                if (cell) {
-                    cell.isSelected = false;
-                }
-
-                this.adjustToBottomBar();
-
-                this._selCount--;
-
-                if (
-                    this.limitReached
-                    && this.selCount < this.selectionLimit
-                ) {
-                    this.removeCountLimitTip();
-                    this.limitReached = false;
-                }
-
-                this.adjustHeader();
-            }
-        }
-
-        addCountLimitTip() {
-            if (this.limitTip) {
-                return;
-            }
-
-            this.limitTip = document.createElement('div');
-            this.limitTip.className = 'absolute bottom-0 right-0 w-full tooltip-popin timeline-tooltip';
-
-            const icon = document.createElement('i');
-            const message = document.createElement('span');
-            const button = document.createElement('button');
-            icon.className = 'sprite-fm-uni icon-hazard mr-4 icon-size-6';
-            message.className = 'flex-1';
-            message.textContent = mega.icu.format(l.album_items_limit, maxSelectionsCount);
-            button.textContent = l[81];
-
-            const flex = document.createElement('div');
-            flex.className = 'w-full flex flex-row items-center bg-surface-main rounded-2xl p-4';
-            flex.appendChild(icon);
-            flex.appendChild(message);
-            flex.appendChild(button);
-            this.limitTip.appendChild(flex);
-
-            this.attachEvent(
-                'click.hideSelectionLimit',
-                () => {
-                    this.removeCountLimitTip();
-                },
-                null,
-                button
-            );
-
-            this.el.parentNode.appendChild(this.limitTip);
-        }
-
-        removeCountLimitTip() {
-            if (this.limitTip) {
-                this.disposeEvent('click.hideSelectionLimit');
-                this.el.parentNode.removeChild(this.limitTip);
-                delete this.limitTip;
-            }
-        }
-
-        onResize() {
-            if (this.dynamicList) {
-                this.setCellSize();
-
-                const keys = Object.keys(this.dynamicList._currentlyRendered);
-
-                for (let i = 0; i < keys.length; i++) {
-                    this.dynamicList.itemChanged(keys[i]);
-                }
-            }
-        }
-
-        setCellSize() {
-            const gap = 8;
-
-            this.cellSize = (this.el.offsetWidth
-                - gap * zoomSteps[this.zoomStep] // Cell margins
-                - this.sidePadding * 2) // Horizontal padding
-                / zoomSteps[this.zoomStep]; // Columns
-        }
-
-        /**
-         * Preparing and caching the cell result for the future use
-         * @param {MegaNode} node Node to use for building the cell
-         * @returns {AlbumTimelineCell}
-         */
-        getCachedCell(node) {
-            if (!this.cellCache[node.h]) {
-                this.cellCache[node.h] = new AlbumTimelineCell({
-                    node,
-                    clickFn: this.onNodeClick,
-                    dbclickFn: this.onNodeDbClick,
-                    useMenu: this.interactiveCells
-                });
-            }
-
-            return this.cellCache[node.h];
-        }
-
-        renderRow(rowKey) {
-            const div = document.createElement('div');
-            div.className = 'flex flex-row';
-
-            const elements = [];
-
-            if (this._nodes[rowKey]) {
-                const sizePx = this.cellSize + 'px';
-                const { list, monthLabel } = this._nodes[rowKey];
-
-                for (let i = 0; i < list.length; i++) {
-                    const tCell = this.getCachedCell(list[i]);
-
-                    tCell.el.style.width = sizePx;
-                    tCell.el.style.height = sizePx;
-
-                    if (this.showMonthLabel && !i && monthLabel) {
-                        tCell.applyMonthLabel(monthLabel);
-                    }
-                    else {
-                        tCell.removeMonthLabel();
-                    }
-
-                    if (this.selections[list[i].h]) {
-                        tCell.isSelected = true;
-                    }
-
-                    tCell.isActive = !this.limitReached || tCell.isSelected;
-
-                    div.append(tCell.el);
-                    fillAlbumTimelineCell(tCell.el);
-
-                    tCell.el.ref.el = tCell.el;
-
-                    elements.push(tCell.el);
-                }
-            }
-
-            delay(`album_timeline:render_row_${rowKey}`, () => {
-                const toFetchAttributes = [];
-
-                for (let i = 0; i < elements.length; i++) {
-                    const element = elements[i];
-
-                    if (element.clientWidth && element.clientHeight) {
-                        toFetchAttributes.push(element.ref);
-                    }
-                }
-
-                if (toFetchAttributes.length) {
-                    MegaGallery.addThumbnails(toFetchAttributes);
-                }
-            });
-
-            return div;
-        }
-
-        /**
-         * Selecting all nodes in between
-         * @param {MegaNode} nodeA First node in the range
-         * @param {MegaNode} nodeB Last node in the range
-         * @param {Number} direction Selecting as 1 (from left to right) or -1 (from right to left)
-         * @returns {void}
-         */
-        selectElementsRange(nodeA, nodeB) {
-            const nodes = this._nodes.map(({ list }) => list).flat();
-            let indexA = false;
-            let indexB = false;
-            const newIndexes = [];
-
-            for (let i = 0; i < nodes.length; i++) {
-                const { h } = nodes[i];
-
-                if (h === nodeA.h) {
-                    indexA = i;
-
-                    if (nodeA.h === nodeB.h) {
-                        indexB = i;
-                    }
-                }
-                else if (h === nodeB.h) {
-                    indexB = i;
-                }
-
-                if (indexA !== false && indexB !== false) {
-                    break;
-                }
-            }
-
-            if (indexA > indexB) {
-                indexA += indexB;
-                indexB = indexA - indexB;
-                indexA -= indexB;
-            }
-
-            for (let i = indexA; i <= indexB; i++) {
-                this.selectNode(nodes[i]);
-                newIndexes.push(i);
-            }
-
-            for (let i = 0; i < this.shiftSelectedIndexes.length; i++) {
-                if (!newIndexes.includes(this.shiftSelectedIndexes[i])) {
-                    this.deselectNode(nodes[this.shiftSelectedIndexes[i]]);
-                }
-            }
-
-            this.shiftSelectedIndexes = newIndexes;
-        }
-
-        adjustHeader() {
-            delay('album_timeline:render_header', () => {
-                scope.albums.grid.header.update(M.currentdirid.replace(/albums\/?/i, ''), Object.keys(this.selections));
-            }, 100);
-        }
-
-        adjustToBottomBar() {
-            delay(
-                'album_timeline:adjusting_to_bottom_bar',
-                () => {
-                    if (this.interactiveCells) {
-                        this.el.style.height = (this.selCount) ? 'calc(100% - 65px)' : null;
-                        this.el.style.minHeight = (this.selCount) ? '280px' : null;
-                        this.resizeDynamicList();
-                        Ps.update(this.el);
-                    }
-                },
-                50
-            );
-        }
-
-        resizeDynamicList() {
-            if (this.dynamicList) {
-                const prevScrollTop = this.dynamicList.getScrollTop();
-
-                this.dynamicList.resized();
-                this.dynamicList.scrollToYPosition(prevScrollTop);
-            }
-        }
-
-        debouncedResize() {
-            delay(
-                'album_timeline:resize',
-                () => {
-                    this.resizeDynamicList();
-                },
-                100
-            );
-        }
-
-        setZoomControls() {
-            if (this.zoomControls) {
-                return;
-            }
-
-            this.zoomControls = document.createElement('div');
-            this.zoomControls.className = 'gallery-view-zoom-control';
-
-            const buttons = [
-                {
-                    tooltip: l[24927],
-                    classes: 'zoom-out',
-                    icon: 'icon-minimise',
-                    clickFn: () => {
-                        this.zoomStep--;
-                    },
-                    checkIfDisabled: () => this.zoomStep <= 0
-                },
-                {
-                    tooltip: l[24928],
-                    classes: 'zoom-in',
-                    icon: 'icon-add',
-                    clickFn: () => {
-                        this.zoomStep++;
-                    },
-                    checkIfDisabled: () => this.zoomStep >= zoomSteps.length - 1
-                }
-            ];
-
-            for (let i = 0; i < buttons.length; i++) {
-                const { icon, clickFn, tooltip, classes, checkIfDisabled } = buttons[i];
-
-                const btn = document.createElement('button');
-                btn.className = 'btn-icon simpletip ' + classes;
-                btn.dataset.simpletip = tooltip;
-                const iconEl = document.createElement('i');
-                iconEl.className = 'sprite-fm-mono ' + icon;
-                btn.append(iconEl);
-                btn.onclick = () => {
-                    clickFn();
-
-                    if (checkIfDisabled()) {
-                        btn.disabled = true;
-                        btn.classList.add('disabled');
-                    }
-
-                    const sibling = btn.nextElementSibling || btn.previousElementSibling;
-
-                    if (sibling && sibling.disabled) {
-                        sibling.disabled = false;
-                        sibling.classList.remove('disabled');
-                    }
-                };
-
-                this.zoomControls.append(btn);
-
-                if ((!i && !this.zoomStep)
-                    || (i === buttons.length - 1 && this.zoomStep === zoomSteps.length - 1)) {
-                    btn.disabled = true;
-                    btn.classList.add('disabled');
-                }
-            }
-
-            this.el.parentNode.prepend(this.zoomControls);
-        }
-
-        buildElement() {
-            this.el = document.createElement('div');
-        }
-
-        clear() {
-            this.selections = {};
-
-            if (this.dynamicList) {
-                this.dynamicList.destroy();
-                this.dynamicList = null;
-            }
-
-            if (this.zoomControls) {
-                if (this.el.parentNode) {
-                    this.el.parentNode.removeChild(this.zoomControls);
-                }
-
-                this.zoomControls = null;
-            }
-
-            if (this.dragSelect) {
-                this.dragSelect.dispose();
-            }
-
-            if (disposeKeyboardEvents) {
-                disposeKeyboardEvents();
-            }
-
-            if (this.el && this.el.parentNode) {
-                this.el.parentNode.removeChild(this.el);
-            }
-        }
-    }
-
     class TimelineDialog extends MDialog {
         hide() {
             if (this.timeline) {
                 this.timeline.clear();
                 delete this.timeline;
             }
+
+            super.hide();
+        }
+    }
+
+    class ToCopyInput extends MComponent {
+        constructor(isKey) {
+            super();
+
+            this.copyResponse = (isKey)
+                ? mega.icu.format(l.toast_copy_key, 1)
+                : mega.icu.format(l.toast_copy_link, 1);
+
+            const inputIcon = document.createElement('i');
+            inputIcon.className = `sprite-fm-mono ${isKey ? 'icon-key' : 'icon-link'}`;
+            this.wrap.prepend(inputIcon);
+        }
+
+        get value() {
+            return this.input.value;
+        }
+
+        set value(value) {
+            this.input.value = value;
+        }
+
+        buildElement() {
+            this.el = document.createElement('div');
+            this.el.className = 'item-link link flex-1';
+
+            this.wrap = document.createElement('div');
+            this.wrap.className = 'input-wrap';
+
+            this.input = document.createElement('input');
+            this.input.type = 'text';
+            this.input.readOnly = true;
+            this.copyBtn = new MButton(
+                l[63],
+                null,
+                () => {
+                    copyToClipboard(this.input.value, this.copyResponse);
+                },
+                'mega-button positive copy current'
+            );
+
+            this.wrap.appendChild(this.input);
+            this.el.appendChild(this.wrap);
+            this.el.appendChild(this.copyBtn.el);
+        }
+    }
+
+    class RemoveShareDialog extends MDialog {
+        constructor(albumIds) {
+            super({
+                ok: {
+                    label: albumIds.length > 1 ? l[8735] : l[6821],
+                    callback: () => {
+                        scope.albums.removeShare(albumIds);
+                    },
+                    classes: ['mega-button', 'branded-green']
+                },
+                cancel: {
+                    label: l[82]
+                },
+                dialogClasses: null,
+                leftIcon: 'sprite-fm-uni icon-question icon-size-16',
+                doNotShowCheckboxText: l.do_not_show_this_again
+            });
+
+            this.setContent(albumIds);
+            this.addConfirmationCheckbox(
+                () => mega.config.get('nowarnpl'),
+                (val) => {
+                    const currentVal = !!mega.config.get('nowarnpl');
+
+                    if (val !== currentVal) {
+                        mega.config.setn('nowarnpl', val ? 1 : undefined);
+                    }
+                }
+            );
+        }
+
+        setContent(albumIds) {
+            const p = document.createElement('p');
+            p.className = 'px-6';
+
+            p.textContent = mega.icu.format(l.plink_remove_dlg_text_album, albumIds.length);
+
+            this.slot = p;
+            this.title = mega.icu.format(l.plink_remove_dlg_title_album, albumIds.length);
+        }
+    }
+
+    const removeShareWithConfirmation = (albumIds) => {
+        if (mega.config.get('nowarnpl')) {
+            scope.albums.removeShare(albumIds);
+        }
+        else {
+            const dialog = new RemoveShareDialog(albumIds);
+            dialog.show();
+        }
+    };
+
+    class AlbumShareLinkBlock extends MComponent {
+        /**
+         * @param {HTMLElement} parent Parent DOM element
+         * @param {String} albumId Album id to build the data upon
+         * @param {Boolean} [amongOthers] Indicates if the link is in the list by itself or with others
+         * @param {Function?} [onRemoveClick] Callback to fire when the remove button is pressed
+         */
+        constructor(parent, albumId, amongOthers = false, onRemoveClick = null) {
+            super(parent);
+
+            this._separated = false;
+            this.amongOthers = amongOthers;
+            this.album = scope.albums.store[albumId];
+            this.onRemoveClick = onRemoveClick;
+        }
+
+        get linkString() {
+            return this.linkInput.value;
+        }
+
+        get keyString() {
+            return this.keyInput.value;
+        }
+
+        /**
+         * @param {Object.<String, any>} album Album to build link for
+         * @returns {void}
+         */
+        set album(album) {
+            this._album = album;
+
+            const { label, nodes } = this._album;
+
+            this.labelEl.textContent = label;
+            this.countEl.textContent = mega.icu.format(l.album_items_count, nodes.length);
+            this.updateInputValue();
+        }
+
+        /**
+         * @param {Boolean} status Whether the key should be separated or not
+         */
+        set keySeparated(status) {
+            if (this._separated === status) {
+                return;
+            }
+
+            this._separated = status;
+
+            if (status) {
+                if (this.keyInput) {
+                    return;
+                }
+
+                this.linkInput.el.classList.add('mr-4');
+                this.keyInput = new ToCopyInput(true);
+                this.keyInput.value = a32_to_base64(decrypt_key(u_k_aes, base64_to_a32(this._album.k)));
+                this.flexContainer.appendChild(this.keyInput.el);
+                this.updateInputValue();
+            }
+            else {
+                if (!this.keyInput) {
+                    return;
+                }
+
+                this.keyInput.detachEl();
+                delete this.keyInput;
+                this.linkInput.el.classList.remove('mr-4');
+                this.updateInputValue();
+            }
+        }
+
+        updateInputValue() {
+            const { p: { ph }, k } = this._album;
+
+            let value = `${getBaseUrl()}/collection/${ph}`;
+
+            if (!this._separated) {
+                value += `#${a32_to_base64(decrypt_key(u_k_aes, base64_to_a32(k)))}`;
+            }
+
+            this.linkInput.value = value;
+        }
+
+        buildElement() {
+            this.el = document.createElement('div');
+            this.el.className = 'bg-surface-main p-3 mt-2 border-radius-1';
+
+            const headerContainer = document.createElement('div');
+            headerContainer.className = 'relative';
+            const header = document.createElement('div');
+            header.className = 'flex flex-row items-center max-w-full w-min-content mb-2 pr-28';
+
+            const icon = document.createElement('i');
+            icon.className = 'sprite-fm-mono icon-album icon-blue icon-size-5 mx-2';
+
+            const separator = document.createElement('i');
+            separator.className = 'sprite-fm-mono icon-dot icon-size-3 mt-1 mx-1';
+
+            this.labelEl = document.createElement('div');
+            this.labelEl.className = 'flex-1 text-ellipsis';
+            this.countEl = document.createElement('span');
+            this.countEl.className = 'white-space-nowrap';
+
+            header.appendChild(icon);
+            header.appendChild(this.labelEl);
+            header.appendChild(separator);
+            header.appendChild(this.countEl);
+            headerContainer.appendChild(header);
+
+            this.flexContainer = document.createElement('div');
+            this.flexContainer.className = 'flex flex-row';
+
+            this.linkInput = new ToCopyInput();
+
+            this.flexContainer.appendChild(this.linkInput.el);
+            this.el.appendChild(headerContainer);
+            this.el.appendChild(this.flexContainer);
+        }
+
+        dispose() {
+            if (this.keyInput) {
+                this.keyInput.detachEl();
+                delete this.keyInput;
+            }
+
+            this.linkInput.detachEl();
+            delete this.linkInput;
+
+            this.detachEl();
+        }
+    }
+
+    class AlbumShareLinksList extends MComponent {
+        /**
+         * @param {String[]} albumIds Album ids to insert into the list
+         * @param {Function} onDismiss Callback to fire when the list is not needed anymore
+         */
+        constructor(albumIds, onDismiss) {
+            super();
+
+            if (Array.isArray(albumIds) && albumIds.length) {
+                this.albumIds = albumIds;
+            }
+
+            this.onDismiss = onDismiss;
+        }
+
+        /**
+         * @param {String} albumIds The array of album ids to build links for
+         */
+        set albumIds(albumIds) {
+            this.clearList();
+
+            const { store } = scope.albums;
+            const ids = albumIds.filter(id => store[id] && !store[id].filterFn);
+            this.isMultiple = ids.length > 1;
+
+            for (let i = 0; i < ids.length; i++) {
+                this._shares.push(new AlbumShareLinkBlock(
+                    this.el.firstElementChild,
+                    ids[i],
+                    this.isMultiple,
+                    () => {
+                        if (!this.isMultiple && typeof this.onDismiss === 'function') {
+                            this.onDismiss();
+                        }
+                    }
+                ));
+            }
+
+            this._keysSeparated = false;
+            this.updateCopyButtons();
+        }
+
+        /**
+         * @param {Boolean} status Either shares keys should be separated or not
+         */
+        set keysSeparated(status) {
+            this._keysSeparated = status;
+
+            for (let i = 0; i < this._shares.length; i++) {
+                this._shares[i].keySeparated = status;
+            }
+
+            this.updateCopyButtons();
+        }
+
+        updateCopyButtons() {
+            if (this.isMultiple) {
+                const label = this._keysSeparated ? l[23625] : l[20840];
+
+                if (!this.copyLinksBtn) {
+                    const container = document.createElement('div');
+                    container.className = 'flex flex-row justify-end pt-4 gap-4 px-12';
+
+                    this.copyLinksBtn = new MButton(
+                        label,
+                        null,
+                        () => {
+                            copyToClipboard(
+                                this._shares.map(s => s.linkString).join("\n"),
+                                mega.icu.format(l.toast_copy_link, this._shares.length)
+                            );
+                        },
+                        'mega-button positive copy current'
+                    );
+
+                    container.appendChild(this.copyLinksBtn.el);
+                    this.el.appendChild(container);
+                }
+                else if (label !== this.copyLinksBtn.label) {
+                    this.copyLinksBtn.label = label;
+                }
+
+                if (this._keysSeparated) {
+                    if (!this.copyLinksBtn.el.nextElementSibling) {
+                        this.copyKeysBtn = new MButton(
+                            l[23624],
+                            null,
+                            () => {
+                                copyToClipboard(
+                                    this._shares.map(s => s.keyString).join("\n"),
+                                    mega.icu.format(l.toast_copy_key, this._shares.length)
+                                );
+                            },
+                            'mega-button positive copy current'
+                        );
+
+                        this.copyLinksBtn.el.insertAdjacentElement('afterend', this.copyKeysBtn.el);
+                    }
+                }
+                else if (this.copyLinksBtn.el.nextElementSibling) {
+                    this.copyLinksBtn.el.parentNode.removeChild(this.copyLinksBtn.el.nextElementSibling);
+                }
+            }
+            else {
+                this.clearCopyButtons();
+            }
+        }
+
+        clearCopyButtons() {
+            if (this.copyLinksBtn) {
+                this.copyLinksBtn.detachEl();
+                delete this.copyLinksBtn;
+
+                if (this.copyKeysBtn) {
+                    this.copyKeysBtn.detachEl();
+                    delete this.copyKeysBtn;
+                }
+            }
+        }
+
+        buildElement() {
+            this.el = document.createElement('div');
+
+            const scrollable = document.createElement('div');
+            scrollable.className = 'max-h-100 px-12 overflow-y-hidden';
+
+            this.el.appendChild(scrollable);
+
+            delay('share_dialog:apply_scrollable', () => {
+                applyPs(scrollable);
+            }, 100);
+        }
+
+        clearList() {
+            if (Array.isArray(this._shares) && this._shares.length) {
+                for (let i = 0; i < this._shares.length; i++) {
+                    this._shares[i].dispose();
+                }
+            }
+
+            this._shares = [];
+            this.clearCopyButtons();
+        }
+    }
+
+    class AlbumShareDialog extends MDialog {
+        constructor(albumIds) {
+            super({
+                ok: false,
+                cancel: false,
+                dialogClasses: 'export-links-dialog'
+            });
+
+            this.setContent(albumIds);
+        }
+
+        setContent(albumIds) {
+            this.slot = document.createElement('div');
+            this.title = mega.icu.format(l.album_share_link, albumIds.length);
+
+            const divTop = document.createElement('div');
+            divTop.className = 'pb-6 pt-2 px-12 flex flex-row';
+            const divBottom = document.createElement('div');
+            divBottom.className = 'py-6 bg-surface-grey-1';
+
+            const checkbox = new MCheckbox({
+                label: mega.icu.format(l.album_share_link_checkbox_label, albumIds.length),
+                id: 'album-link-export',
+                checked: false
+            });
+
+            const hint = new MHint({
+                title: l[1028],
+                text: mega.icu.format(l.export_link_decrypt_tip, albumIds.length),
+                img: 'illustration sprite-fm-illustration img-dialog-decryption-key',
+                link: 'https://help.mega.io/files-folders/sharing/encrypted-links',
+                classes: 'icon-size-6 cursor-pointer mx-2'
+            });
+
+            this.list = new AlbumShareLinksList(
+                albumIds,
+                () => {
+                    this.hide();
+                }
+            );
+
+            checkbox.onChange = (checked) => {
+                this.list.keysSeparated = checked;
+            };
+
+            divTop.appendChild(checkbox.el);
+            divTop.appendChild(hint.el);
+            divBottom.appendChild(this.list.el);
+
+            this.slot.appendChild(divTop);
+            this.slot.appendChild(divBottom);
+        }
+
+        hide() {
+            this.list.clearList();
+            this.list.detachEl();
 
             super.hide();
         }
@@ -2168,7 +1336,7 @@ lazy(mega.gallery, 'albums', () => {
                                 for (let i = 0; i < nodes.length; i++) {
                                     existingHandles[nodes[i].h] = true;
 
-                                    if (mega.gallery.isGalleryVideo(nodes[i])) {
+                                    if (mega.gallery.isVideo(nodes[i])) {
                                         this.currentVideosCount++;
                                     }
                                     else {
@@ -2183,7 +1351,7 @@ lazy(mega.gallery, 'albums', () => {
                                         addedCount++;
                                         handlesToAdd.push({ h, o: (nodes.length + handlesToAdd.length + 1) * 1000 });
 
-                                        if (M.d[h] && mega.gallery.isGalleryVideo(M.d[h])) {
+                                        if (M.d[h] && mega.gallery.isVideo(M.d[h])) {
                                             this.videosCount++;
                                         }
                                         else {
@@ -2254,7 +1422,7 @@ lazy(mega.gallery, 'albums', () => {
 
                     timemarks.albumCreateNamed = 0;
                     timemarks.albumItemsSelectStarted = 0;
-                    reinitiateEvents();
+                    scope.reinitiateEvents();
                 }
             });
 
@@ -2290,8 +1458,7 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
 
-        show() {
-            super.show();
+        onMDialogShown() {
             document.activeElement.blur();
             this.updateSelectedCount(0);
 
@@ -2299,7 +1466,7 @@ lazy(mega.gallery, 'albums', () => {
                 scope.albums.grid.timeline.dragSelect.disabled = true;
             }
 
-            this.timeline = new AlbumTimeline({
+            this.timeline = new scope.AlbumTimeline({
                 onSelectToggle: () => {
                     delay(
                         'timeline:update_selected_count',
@@ -2313,7 +1480,7 @@ lazy(mega.gallery, 'albums', () => {
                 sidePadding: 8,
                 showMonthLabel: true,
                 skipGlobalZoom: true,
-                selectionLimit: maxSelectionsCount
+                selectionLimit: scope.maxSelectionsCount
             });
 
             const cameraTree = MegaGallery.getCameraHandles();
@@ -2328,12 +1495,12 @@ lazy(mega.gallery, 'albums', () => {
                 let isGalleryNode = false;
 
                 // Checking if it is a gallery node and if is located specifically in CU or in CD
-                if (mega.gallery.sections[mega.gallery.secKeys.cdphotos].filterFn(n, cameraTree)) {
+                if (scope.sections[scope.secKeys.cdphotos].filterFn(n, cameraTree)) {
                     galleryNodes.cd.push(n);
                     isGalleryNode = true;
                 }
 
-                else if (mega.gallery.sections[mega.gallery.secKeys.cuphotos].filterFn(n, cameraTree)) {
+                else if (scope.sections[scope.secKeys.cuphotos].filterFn(n, cameraTree)) {
                     galleryNodes.cu.push(n);
                     isGalleryNode = true;
                 }
@@ -2372,7 +1539,7 @@ lazy(mega.gallery, 'albums', () => {
                 ];
 
                 nav.activeTab = 0;
-                this.slot.append(nav.el);
+                this.slot.appendChild(nav.el);
             }
             else {
                 const div = document.createElement('div');
@@ -2381,10 +1548,10 @@ lazy(mega.gallery, 'albums', () => {
                     ? l.on_camera_uploads
                     : l.on_cloud_drive;
 
-                this.slot.append(div);
+                this.slot.appendChild(div);
             }
 
-            this.slot.append(this.timeline.el);
+            this.slot.appendChild(this.timeline.el);
 
             delay('render:album_timeline', () => {
                 if (this.timeline) {
@@ -2393,6 +1560,7 @@ lazy(mega.gallery, 'albums', () => {
             });
 
             timemarks.albumItemsSelectStarted = Date.now();
+            mBroadcaster.once('closedialog', scope.reinitiateEvents);
         }
     }
 
@@ -2414,7 +1582,7 @@ lazy(mega.gallery, 'albums', () => {
                 dialogClasses: 'album-items-dialog',
                 contentClasses: 'px-1',
                 onclose: () => {
-                    reinitiateEvents();
+                    scope.reinitiateEvents();
                 }
             });
 
@@ -2428,16 +1596,14 @@ lazy(mega.gallery, 'albums', () => {
             this.title = l.set_album_cover;
         }
 
-        show() {
-            super.show();
-
+        onMDialogShown() {
             let isLoaded = false;
 
             if (scope.albums.grid && scope.albums.grid.timeline && scope.albums.grid.timeline.dragSelect) {
                 scope.albums.grid.timeline.dragSelect.disabled = true;
             }
 
-            this.timeline = new AlbumTimeline({
+            this.timeline = new scope.AlbumTimeline({
                 onSelectToggle: () => {
                     delay('album:cover_update', () => {
                         if (this.timeline.selCount === 1 && isLoaded) {
@@ -2466,13 +1632,15 @@ lazy(mega.gallery, 'albums', () => {
                 );
             }
 
-            this.slot.append(this.timeline.el);
+            this.slot.appendChild(this.timeline.el);
 
             delay('render:album_timeline', () => {
                 if (this.timeline) {
                     this.timeline.nodes = nodes;
                 }
             });
+
+            mBroadcaster.once('closedialog', scope.reinitiateEvents);
 
             this.disable();
         }
@@ -2492,6 +1660,7 @@ lazy(mega.gallery, 'albums', () => {
                         let albumLabel = '';
 
                         const promises = [];
+                        const stats = { count: getAlbumsCount() };
 
                         for (let i = 0; i < albumIds.length; i++) {
                             const albumId = albumIds[i];
@@ -2513,6 +1682,17 @@ lazy(mega.gallery, 'albums', () => {
 
                             promises.push(
                                 mega.sets.remove(album.id)
+                                    .then((res) => {
+                                        delay(
+                                            'albums_stat_99916_' + album.id,
+                                            eventlog.bind(null, 99916, JSON.stringify({
+                                                elCount: album.nodes.length,
+                                                albumCount: --stats.count,
+                                            }))
+                                        );
+
+                                        return Promise.resolve(res);
+                                    })
                                     .catch(() => {
                                         console.error(`Could not remove album ${album.id}...`);
                                     })
@@ -2591,7 +1771,7 @@ lazy(mega.gallery, 'albums', () => {
     }
 
     class AlbumNameDialog extends MDialog {
-        constructor(albumId) {
+        constructor(albumId, okFn, closeFn) {
             super({
                 ok: {
                     label: albumId ? l.album_rename_btn_label : l.album_create_btn_label,
@@ -2602,7 +1782,10 @@ lazy(mega.gallery, 'albums', () => {
                         if (mega.sets && !err && !isDisabled) {
                             this.okBtn.loading = true;
 
-                            if (albumId) {
+                            if (okFn) {
+                                okFn(value);
+                            }
+                            else if (albumId) {
                                 mega.sets.updateAttrValue(
                                     {
                                         at: scope.albums.store[albumId].at,
@@ -2667,7 +1850,11 @@ lazy(mega.gallery, 'albums', () => {
                 dialogClasses: 'create-folder-dialog',
                 contentClasses: 'px-2',
                 onclose: () => {
-                    reinitiateEvents();
+                    scope.reinitiateEvents();
+
+                    if (closeFn) {
+                        queueMicrotask(closeFn);
+                    }
                 }
             });
 
@@ -2684,6 +1871,7 @@ lazy(mega.gallery, 'albums', () => {
             if (!albumId) {
                 timemarks.albumCreateStarted = Date.now();
             }
+            mBroadcaster.once('closedialog', scope.reinitiateEvents);
         }
 
         triggerInputSaveguard() {
@@ -2707,6 +1895,10 @@ lazy(mega.gallery, 'albums', () => {
             if (!err && !warn) {
                 this.clearHint();
             }
+        }
+
+        setNames(names) {
+            this.existingNames = names;
         }
 
         setContent(albumId) {
@@ -2739,9 +1931,9 @@ lazy(mega.gallery, 'albums', () => {
                 }
             }
 
-            div.append(inputIcon);
-            div.append(this.input);
-            this.slot.append(div);
+            div.appendChild(inputIcon);
+            div.appendChild(this.input);
+            this.slot.appendChild(div);
         }
 
         validateInput(albumId) {
@@ -2772,8 +1964,11 @@ lazy(mega.gallery, 'albums', () => {
                 case isSystemAlbumName(value):
                     validation.err = l.album_name_not_allowed;
                     break;
-                case albumNameExists(value, albumId):
+                case (this.existingNames && this.existingNames[value]) || albumNameExists(value, albumId):
                     validation.err = l.album_name_exists;
+                    break;
+                case pfcol && scope.takenNames && scope.takenNames[value]:
+                    validation.err = l.album_exists_in_account.replace('%s', value);
                     break;
                 default: break;
             }
@@ -2788,7 +1983,7 @@ lazy(mega.gallery, 'albums', () => {
         showHint(text, className) {
             if (!this.hint) {
                 this.hint = document.createElement('div');
-                this.slot.append(this.hint);
+                this.slot.appendChild(this.hint);
             }
 
             this.hint.className = className;
@@ -2798,6 +1993,7 @@ lazy(mega.gallery, 'albums', () => {
         showError(err) {
             this.input.classList.add('error');
             this.showHint(err, 'duplicated-input-warning');
+            $('.create-album-input-bl').addClass('duplicated');
         }
 
         showWarning(warn) {
@@ -2806,6 +2002,7 @@ lazy(mega.gallery, 'albums', () => {
 
         clearHint() {
             this.input.classList.remove('error');
+            $('.create-album-input-bl').removeClass('duplicated');
 
             if (this.hint) {
                 this.slot.removeChild(this.hint);
@@ -2813,8 +2010,7 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
 
-        show() {
-            super.show();
+        onMDialogShown() {
             this.triggerInputSaveguard();
 
             delay('focus:new_album_input', () => {
@@ -2829,6 +2025,20 @@ lazy(mega.gallery, 'albums', () => {
         }
     }
 
+    Object.defineProperty(AlbumNameDialog, 'prompt', {
+        value(albumId, names) {
+            return new Promise((resolve) => {
+                const dialog = new AlbumNameDialog(albumId, (name) => resolve(name), () => resolve(null));
+
+                if (names) {
+                    dialog.setNames(names);
+                }
+
+                dialog.show();
+            });
+        }
+    });
+
     class NoMediaForAlbums extends MEmptyPad {
         constructor() {
             super();
@@ -2836,9 +2046,9 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         setContents() {
-            this.el.append(MEmptyPad.createIcon('section-icon sprite-fm-theme icon-gallery-photos'));
-            this.el.append(MEmptyPad.createTxt(l.album_no_media, 'fm-empty-cloud-txt empty-albums-title'));
-            this.el.append(MEmptyPad.createTxt(l.empty_album_subtitle, 'fm-empty-description'));
+            this.el.appendChild(MEmptyPad.createIcon('section-icon sprite-fm-theme icon-gallery-photos'));
+            this.el.appendChild(MEmptyPad.createTxt(l.album_no_media, 'fm-empty-cloud-txt empty-albums-title'));
+            this.el.appendChild(MEmptyPad.createTxt(l.empty_album_subtitle, 'fm-empty-description'));
 
             this.appendOptions([
                 [l.empty_album_instruction_1, 'sprite-fm-mono icon-camera-uploads'],
@@ -2864,22 +2074,24 @@ lazy(mega.gallery, 'albums', () => {
             titleEl.className = 'fm-empty-cloud-txt empty-albums-title';
             titleEl.textContent = title;
 
-            this.el.append(icon);
-            this.el.append(titleEl);
+            this.el.appendChild(icon);
+            this.el.appendChild(titleEl);
 
-            if (userAlbumsEnabled) {
-                const button = new MButton(
-                    btnLabel,
-                    null,
-                    buttonFn,
-                    'mega-button large positive'
-                );
-                this.el.append(button.el);
+            if (!btnLabel) {
+                return;
             }
+
+            const button = new MButton(
+                btnLabel,
+                null,
+                buttonFn,
+                'mega-button large positive'
+            );
+            this.el.appendChild(button.el);
         }
     }
 
-    class MultipleAlbumContextMenu extends MMenuSelect {
+    class MultipleAlbumsContextMenu extends MMenuSelect {
         constructor(domCells) {
             super();
 
@@ -2887,6 +2099,8 @@ lazy(mega.gallery, 'albums', () => {
             const albums = [];
             let somePredefined = false;
             let someContainNodes = false;
+            let sharedCount = 0;
+            let allShared = true;
 
             for (let i = 0; i < domCells.length; i++) {
                 const { album } = domCells[i];
@@ -2899,7 +2113,75 @@ lazy(mega.gallery, 'albums', () => {
                     someContainNodes = true;
                 }
 
+                if (album.p) {
+                    sharedCount++;
+                }
+
+                if (allShared && !album.p) {
+                    allShared = false;
+                }
+
                 albums.push(album);
+            }
+
+            if (!somePredefined) {
+                if (allShared) {
+                    options.push(
+                        {
+                            label: l[17520],
+                            icon: 'link',
+                            click: () => {
+                                const albumIds = [];
+
+                                for (let i = 0; i < albums.length; i++) {
+                                    const { p, id } = albums[i];
+
+                                    if (p) {
+                                        albumIds.push(id);
+                                    }
+                                }
+
+                                const dialog = new AlbumShareDialog(albumIds);
+                                dialog.show();
+                            }
+                        }
+                    );
+                }
+                else {
+                    options.push({
+                        label: mega.icu.format(l.album_share_link, albums.length),
+                        icon: 'link',
+                        click: () => {
+                            scope.albums.addShare(albums.map(({ id }) => id));
+                        }
+                    });
+                }
+
+                if (sharedCount) {
+                    options.push({
+                        label: (sharedCount > 1) ? l[8735] : l[6821],
+                        icon: 'link-remove',
+                        click: () => {
+                            const albumIds = [];
+
+                            for (let i = 0; i < albums.length; i++) {
+                                const { p, id } = albums[i];
+
+                                if (p) {
+                                    albumIds.push(id);
+                                }
+                            }
+
+                            if (albumIds.length) {
+                                removeShareWithConfirmation(albumIds);
+                            }
+                        }
+                    });
+                }
+
+                if (someContainNodes) {
+                    options.push({});
+                }
             }
 
             if (someContainNodes) {
@@ -2907,92 +2189,12 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             if (!somePredefined) {
-                options.push({
-                    label: l.delete_album,
-                    click: () => {
-                        const dialog = new RemoveAlbumDialog(albums.map(({ id }) => id));
-                        dialog.show();
-                        this.hide();
-                    },
-                    icon: 'bin',
-                    classes: ['red']
-                });
-            }
-
-            this.options = options;
-        }
-    }
-
-    class AlbumContextMenu extends MMenuSelect {
-        constructor(albumId) {
-            super();
-
-            const options = [];
-            const album = scope.albums.store[albumId];
-            const isUserAlbum = !album.filterFn;
-
-            if (album.nodes.length && album.nodes.some(n => !isAllowedVideo(n))) {
-                options.push({
-                    label: l.album_play_slideshow,
-                    icon: 'play-square',
-                    click: () => {
-                        $.selected = [];
-                        playSlideshow(albumId, true);
-                    }
-                });
-            }
-
-            if (M.currentdirid !== `albums/${albumId}`) {
-                options.push({
-                    label: l.album_open,
-                    icon: 'preview-reveal',
-                    click: () => {
-                        M.openFolder(`albums/${albumId}`);
-                    }
-                });
-            }
-
-            if (isUserAlbum) {
                 options.push(
-                    {
-                        label: l.add_album_items,
-                        icon: 'add',
-                        click: () => {
-                            const dialog = new AlbumItemsDialog(albumId);
-                            dialog.show();
-                        }
-                    },
-                    {}
-                );
-
-                if (album.nodes.length) {
-                    options.push(
-                        generateDownloadMenuItem([albumId]),
-                        {
-                            label: l.set_album_cover,
-                            icon: 'images',
-                            click: () => {
-                                const dialog = new AlbumCoverDialog(albumId);
-                                dialog.show();
-                            }
-                        }
-                    );
-                }
-
-                options.push(
-                    {
-                        label: l.rename_album,
-                        click: () => {
-                            const dialog = new AlbumNameDialog(albumId);
-                            dialog.show();
-                        },
-                        icon: 'rename'
-                    },
                     {},
                     {
                         label: l.delete_album,
                         click: () => {
-                            const dialog = new RemoveAlbumDialog([albumId]);
+                            const dialog = new RemoveAlbumDialog(albums.map(({ id }) => id));
                             dialog.show();
                             this.hide();
                         },
@@ -3001,11 +2203,158 @@ lazy(mega.gallery, 'albums', () => {
                     }
                 );
             }
+
+            this.options = options;
+        }
+    }
+
+    class AlbumOptionsContextMenu extends MMenuSelect {
+        constructor(options) {
+            super();
+            this.options = options;
+        }
+    }
+
+    class AlbumContextMenu extends MMenuSelect {
+        constructor(albumId, isPublic) {
+            super();
+
+            const options = [];
+            const album = scope.albums.store[albumId];
+            const isUserAlbum = !album.filterFn;
+
+            if (album.nodes.length && album.nodes.some(n => !scope.isVideo(n))) {
+                options.push({
+                    label: l.album_play_slideshow,
+                    icon: 'play-square',
+                    click: () => {
+                        if (scope.albums.grid && scope.albums.grid.timeline) {
+                            scope.albums.grid.timeline.clearSiblingSelections();
+                        }
+
+                        $.selected = [];
+                        scope.playSlideshow(albumId, true);
+                    }
+                });
+            }
+
+            if (isPublic) {
+                if (album.nodes.length) {
+                    options.push(
+                        {},
+                        generateDownloadMenuItem([albumId]),
+                        {},
+                        {
+                            label: (u_type) ? l.context_menu_import : l.btn_imptomega,
+                            icon: (u_type) ? 'upload-to-cloud-drive' : 'mega-thin-outline',
+                            click: () => {
+                                eventlog(99831);
+                                M.importFolderLinkNodes([M.RootID]);
+                            }
+                        }
+                    );
+                }
+            }
             else {
-                options.push(
-                    {},
-                    generateDownloadMenuItem([albumId])
-                );
+                if (M.currentdirid !== `albums/${albumId}`) {
+                    options.push(
+                        {
+                            label: l.album_open,
+                            icon: 'preview-reveal',
+                            click: () => {
+                                M.openFolder(`albums/${albumId}`);
+                            }
+                        }
+                    );
+                }
+
+                if (isUserAlbum) {
+                    options.push(
+                        {},
+                        {
+                            label: l.add_album_items,
+                            icon: 'add',
+                            click: () => {
+                                const dialog = new AlbumItemsDialog(albumId);
+                                dialog.show();
+                            }
+                        },
+                        {}
+                    );
+
+                    if (album.p) {
+                        options.push(
+                            {
+                                label: l[6909],
+                                icon: 'link',
+                                click: () => {
+                                    const dialog = new AlbumShareDialog([albumId]);
+                                    dialog.show();
+                                }
+                            },
+                            {
+                                label: l[6821],
+                                icon: 'link-remove',
+                                click: () => {
+                                    removeShareWithConfirmation([albumId]);
+                                }
+                            }
+                        );
+                    }
+                    else {
+                        options.push({
+                            label: mega.icu.format(l.album_share_link, 1),
+                            icon: 'link',
+                            click: () => {
+                                scope.albums.addShare([albumId]);
+                            }
+                        });
+                    }
+
+                    options.push({});
+
+                    if (album.nodes.length) {
+                        options.push(
+                            generateDownloadMenuItem([albumId]),
+                            {
+                                label: l.set_album_cover,
+                                icon: 'images',
+                                click: () => {
+                                    const dialog = new AlbumCoverDialog(albumId);
+                                    dialog.show();
+                                }
+                            }
+                        );
+                    }
+
+                    options.push(
+                        {
+                            label: l.rename_album,
+                            click: () => {
+                                const dialog = new AlbumNameDialog(albumId);
+                                dialog.show();
+                            },
+                            icon: 'rename'
+                        },
+                        {},
+                        {
+                            label: l.delete_album,
+                            click: () => {
+                                const dialog = new RemoveAlbumDialog([albumId]);
+                                dialog.show();
+                                this.hide();
+                            },
+                            icon: 'bin',
+                            classes: ['red']
+                        }
+                    );
+                }
+                else {
+                    options.push(
+                        {},
+                        generateDownloadMenuItem([albumId])
+                    );
+                }
             }
 
             this.options = options;
@@ -3024,7 +2373,7 @@ lazy(mega.gallery, 'albums', () => {
             };
 
             this.attachEvent('click', (evt) => {
-                const resetSelections = !getCtrlKeyStatus(evt) && !evt.shiftKey;
+                const resetSelections = !scope.getCtrlKeyStatus(evt) && !evt.shiftKey;
                 scope.albums.grid.lastSelected = this.el;
 
                 this.selectCell(resetSelections);
@@ -3074,7 +2423,7 @@ lazy(mega.gallery, 'albums', () => {
                         const selectedCells = this.el.parentNode.querySelectorAll('.ui-selected');
 
                         const contextMenu = (selectedCells.length > 1)
-                            ? new MultipleAlbumContextMenu(selectedCells)
+                            ? new MultipleAlbumsContextMenu(selectedCells)
                             : new AlbumContextMenu(albumId);
 
                         if (contextMenu.options) {
@@ -3083,12 +2432,37 @@ lazy(mega.gallery, 'albums', () => {
                     }
                 }
             );
+
+            this.isShared = !!this.el.album.p;
+        }
+
+        get isShared() {
+            return !!this.shareIcon;
+        }
+
+        /**
+         * @param {Boolean} value Shared status
+         */
+        set isShared(value) {
+            if (value === this.isShared) {
+                return;
+            }
+
+            if (value) {
+                this.shareIcon = document.createElement('i');
+                this.shareIcon.className = 'sprite-fm-mono icon-link pointer-events-none icon-size-6';
+                this.el.appendChild(this.shareIcon);
+            }
+            else {
+                this.el.removeChild(this.shareIcon);
+                delete this.shareIcon;
+            }
         }
 
         buildElement() {
             this.el = document.createElement('div');
             this.el.className = 'albums-grid-cell flex flex-column justify-end cursor-pointer';
-            attachLoadingIcon(this.el);
+            scope.attachLoadingIcon(this.el);
         }
 
         selectCell(clearSiblingSelections) {
@@ -3114,7 +2488,7 @@ lazy(mega.gallery, 'albums', () => {
                 this.el.style.backgroundImage = 'url(\'' + dataUrl + '\')';
                 this.el.style.backgroundColor = 'white';
                 this.coverFa = fa;
-                detachLoadingIcon(this.el);
+                scope.detachLoadingIcon(this.el);
             }
         }
 
@@ -3163,7 +2537,7 @@ lazy(mega.gallery, 'albums', () => {
                 const icon = document.createElement('i');
                 icon.className = 'sprite-fm-mono icon-album';
 
-                placeholder.append(icon);
+                placeholder.appendChild(icon);
                 this.el.prepend(placeholder);
             }
         }
@@ -3202,7 +2576,7 @@ lazy(mega.gallery, 'albums', () => {
             this.el = document.createElement('div');
             this.el.className = 'albums-header flex flex-row items-center justify-between';
 
-            parent.append(this.el);
+            parent.appendChild(this.el);
             parent.classList.remove('hidden');
 
             this.setBreadcrumbs();
@@ -3220,24 +2594,27 @@ lazy(mega.gallery, 'albums', () => {
 
             if (albumId && scope.albums.store[albumId]) {
                 const div = document.createElement('div');
-                const btn = new MButton(
-                    '',
-                    'icon-next-arrow rot-180',
-                    () => {
-                        M.openFolder('albums');
-                    },
-                    'mega-button breadcrumb-btn action'
-                );
-
-                btn.el.title = l[822];
 
                 span.title = scope.albums.store[albumId].label;
                 span.textContent = span.title;
                 span.className = 'text-ellipsis ml-3 text-color-high';
 
-                div.append(btn.el);
-                this.breadcrumbs.append(div);
-                this.breadcrumbs.append(span);
+                if (!scope.albums.isPublic) {
+                    const btn = new MButton(
+                        '',
+                        'icon-next-arrow rot-180',
+                        () => {
+                            M.openFolder('albums');
+                        },
+                        'mega-button breadcrumb-btn action'
+                    );
+
+                    btn.el.title = l[822];
+                    div.appendChild(btn.el);
+                }
+
+                this.breadcrumbs.appendChild(div);
+                this.breadcrumbs.appendChild(span);
                 this.breadcrumbs.className = 'flex flex-row items-center text-ellipsis';
             }
             else {
@@ -3268,101 +2645,223 @@ lazy(mega.gallery, 'albums', () => {
 
         setSpecificAlbumButtons(albumId, handles) {
             const album = scope.albums.store[albumId];
+
+            if (!album) {
+                return;
+            }
+
             let nodesAvailable = false;
             let needSlideshow = false;
+            const buttons = [];
 
-            if (Array.isArray(handles) && handles.length) {
-                needSlideshow = true;
-                nodesAvailable = true;
-
-                for (let i = 0; i < handles.length; i++) {
-                    const n = M.d[handles[i]];
-
-                    if (!n) {
-                        continue;
-                    }
-
-                    if (isAllowedVideo(n)) {
-                        needSlideshow = false;
-                        break;
-                    }
+            if (scope.albums.isPublic) {
+                needSlideshow = album.nodes.some((h) => !!scope.isImage(M.d[h]));
+                if (album.nodes.length && needSlideshow) {
+                    buttons.push([
+                        l.album_play_slideshow,
+                        'play-square icon-blue',
+                        () => {
+                            scope.albums.grid.timeline.clearSiblingSelections();
+                            $.selected = [];
+                            scope.playSlideshow(albumId, true);
+                        },
+                        this.rightButtons
+                    ]);
                 }
             }
             else {
-                for (let i = 0; i < album.nodes.length; i++) {
-                    nodesAvailable = true;
-
-                    if (!isAllowedVideo(album.nodes[i])) {
+                const checkAlbumNodes = () => {
+                    if (Array.isArray(handles) && handles.length) {
                         needSlideshow = true;
-                    }
+                        nodesAvailable = true;
 
-                    if (nodesAvailable && needSlideshow) {
-                        break;
+                        for (let i = 0; i < handles.length; i++) {
+                            const n = M.d[handles[i]];
+
+                            if (!n) {
+                                continue;
+                            }
+
+                            if (scope.isVideo(n)) {
+                                needSlideshow = false;
+                                break;
+                            }
+                        }
                     }
+                    else {
+                        for (let i = 0; i < album.nodes.length; i++) {
+                            nodesAvailable = true;
+
+                            if (!scope.isVideo(album.nodes[i])) {
+                                needSlideshow = true;
+                            }
+
+                            if (nodesAvailable && needSlideshow) {
+                                break;
+                            }
+                        }
+                    }
+                };
+
+                checkAlbumNodes();
+
+                if (!album.filterFn) {
+                    buttons.push(
+                        [
+                            l.add_album_items,
+                            'add icon-green',
+                            () => {
+                                const dialog = new AlbumItemsDialog(albumId);
+                                dialog.show();
+                            },
+                            this.rightButtons,
+                            !M.v.length
+                        ],
+                        [
+                            album.p ? l[6909] : mega.icu.format(l.album_share_link, 1),
+                            'link icon-yellow',
+                            () => {
+                                if (album.p) {
+                                    const dialog = new AlbumShareDialog([albumId]);
+                                    dialog.show();
+                                }
+                                else {
+                                    scope.albums.addShare([albumId]);
+                                }
+                            },
+                            this.rightButtons,
+                            !M.v.length
+                        ]
+                    );
+                }
+
+                if (needSlideshow) {
+                    buttons.push([
+                        l.album_play_slideshow,
+                        'play-square icon-blue',
+                        () => {
+                            scope.playSlideshow(albumId, true);
+                        },
+                        this.rightButtons
+                    ]);
+                }
+
+                if (nodesAvailable) {
+                    buttons.push([
+                        l.album_download,
+                        'download-small icon-blue',
+                        (component) => {
+                            if (component) {
+                                const { x, bottom } = component.el.getBoundingClientRect();
+                                const menu = new DownloadContextMenu(albumId);
+
+                                menu.show(x, bottom + 4);
+                            }
+                            else {
+                                const handles = scope.getAlbumsHandles([albumId]);
+
+                                if (handles.length) {
+                                    scope.reportDownload();
+                                    M.addDownload(handles);
+                                }
+                            }
+                        },
+                        this.rightButtons,
+                        false,
+                        (isMSync()) ? undefined : generateDownloadOptions([albumId])
+                    ]);
+                }
+
+                if (album.p) {
+                    buttons.push([
+                        l[6821],
+                        'link-remove',
+                        () => {
+                            removeShareWithConfirmation([albumId]);
+                        },
+                        this.rightButtons
+                    ]);
+                }
+
+                if (!album.filterFn) {
+                    buttons.push(
+                        [
+                            l.rename_album,
+                            'rename',
+                            () => {
+                                const dialog = new AlbumNameDialog(albumId);
+                                dialog.show();
+                            },
+                            this.rightButtons
+                        ],
+                        [
+                            l.delete_album,
+                            'bin',
+                            () => {
+                                const dialog = new RemoveAlbumDialog([albumId]);
+                                dialog.show();
+                            },
+                            this.rightButtons,
+                            false,
+                            undefined,
+                            ['red']
+                        ]
+                    );
                 }
             }
 
-            if (needSlideshow) {
-                AlbumsGridHeader.attachButton(
-                    l.album_play_slideshow,
-                    'icon-play-square icon-blue',
-                    () => {
-                        playSlideshow(albumId, true);
-                    },
-                    this.rightButtons
-                );
+            for (let i = 0; i < headerBtnLimit; i++) {
+                if (buttons[i]) {
+                    AlbumsGridHeader.attachButton(...buttons[i]);
+                }
             }
 
-            if (album && !album.filterFn) {
-                AlbumsGridHeader.attachButton(
-                    l.add_album_items,
-                    'icon-add icon-green',
+            if (buttons.length > headerBtnLimit) {
+                const optionsBtn = AlbumsGridHeader.attachButton(
+                    l.album_options_more,
+                    'options',
                     () => {
-                        const dialog = new AlbumItemsDialog(albumId);
-                        dialog.show();
+                        const contextMenu = new AlbumOptionsContextMenu(
+                            buttons.slice(headerBtnLimit).map(([
+                                label,
+                                icon,
+                                click,
+                                parent,
+                                isDisabled,
+                                children,
+                                classes
+                            ]) => {
+                                return {
+                                    label,
+                                    click,
+                                    icon: icon.replace('icon-blue', ''),
+                                    children,
+                                    parent,
+                                    isDisabled,
+                                    classes
+                                };
+                            })
+                        );
+
+                        const { x, y, right, bottom } = optionsBtn.el.getBoundingClientRect();
+                        contextMenu.show(x, bottom + MContextMenu.offsetVert, right, y + MContextMenu.offsetVert);
                     },
                     this.rightButtons,
                     !M.v.length
                 );
             }
-
-            if (nodesAvailable) {
-                AlbumsGridHeader.attachButton(
-                    l.album_download,
-                    'icon-download-small icon-blue',
-                    ({ el }) => {
-                        if (isMSync()) {
-                            const handles = getAlbumsHandles([albumId]);
-
-                            if (handles.length) {
-                                reportDownload();
-                                M.addDownload(handles);
-                            }
-                        }
-                        else {
-                            const { x, bottom } = el.getBoundingClientRect();
-                            const menu = new DownloadContextMenu(albumId);
-
-                            menu.show(x, bottom + 4);
-                        }
-                    },
-                    this.rightButtons
-                );
-            }
         }
 
         setGlobalButtons() {
-            if (userAlbumsEnabled) {
-                AlbumsGridHeader.attachButton(
-                    l.new_album,
-                    'icon-add icon-green',
-                    () => {
-                        const dialog = new AlbumNameDialog();
-                        dialog.show();
-                    },
-                    this.rightButtons
-                );
-            }
+            AlbumsGridHeader.attachButton(
+                l.new_album,
+                'add icon-green',
+                () => {
+                    const dialog = new AlbumNameDialog();
+                    dialog.show();
+                },
+                this.rightButtons
+            );
         }
 
         update(albumId, handles) {
@@ -3382,7 +2881,7 @@ lazy(mega.gallery, 'albums', () => {
             else {
                 this.rightButtons = document.createElement('div');
                 this.rightButtons.className = 'flex flex-row';
-                this.el.append(this.rightButtons);
+                this.el.appendChild(this.rightButtons);
             }
 
             if (albumId) {
@@ -3397,13 +2896,13 @@ lazy(mega.gallery, 'albums', () => {
     AlbumsGridHeader.attachButton = (label, icon, clickFn, parent, isDisabled) => {
         const button = new MButton(
             label,
-            icon,
+            `icon-${icon}`,
             clickFn,
             'mega-button action ml-5'
         );
 
         if (parent) {
-            parent.append(button.el);
+            parent.appendChild(button.el);
         }
 
         if (isDisabled) {
@@ -3449,7 +2948,7 @@ lazy(mega.gallery, 'albums', () => {
                 }
             });
 
-            parent.append(this.el);
+            parent.appendChild(this.el);
         }
 
         setPendingCell(label) {
@@ -3462,9 +2961,9 @@ lazy(mega.gallery, 'albums', () => {
             const captionEl = document.createElement('div');
             captionEl.textContent = l.album_name_creating;
 
-            subdiv.append(labelEl);
-            subdiv.append(captionEl);
-            this.pendingCell.append(subdiv);
+            subdiv.appendChild(labelEl);
+            subdiv.appendChild(captionEl);
+            this.pendingCell.appendChild(subdiv);
 
             const firstUserAlbum = getFirstUserAlbum();
 
@@ -3472,7 +2971,7 @@ lazy(mega.gallery, 'albums', () => {
                 this.el.insertBefore(this.pendingCell, firstUserAlbum.cellEl.el);
             }
             else {
-                this.el.append(this.pendingCell);
+                this.el.appendChild(this.pendingCell);
             }
 
             this.updateGridState(
@@ -3499,7 +2998,11 @@ lazy(mega.gallery, 'albums', () => {
                 mvLength = tmpMv.length - (previewMvLength - M.v.length);
             }
 
-            if (mvLength) {
+            if (scope.albums.isPublic) {
+                this.updateGridState(0, false);
+                this.addEmptyBlock(new AlbumsEmpty(l.public_album_empty_title));
+            }
+            else if (mvLength) {
                 this.updateGridState(0, false);
 
                 this.addEmptyBlock(new AlbumsEmpty(
@@ -3535,7 +3038,7 @@ lazy(mega.gallery, 'albums', () => {
 
             let prevCount = 0;
 
-            this.timeline = new AlbumTimeline({
+            this.timeline = new scope.AlbumTimeline({
                 onSelectToggle: () => {
                     delay(
                         'timeline:update_selected_count',
@@ -3577,14 +3080,14 @@ lazy(mega.gallery, 'albums', () => {
                     this._selCount++;
 
                     delay('render:in_album_node_preview', () => {
-                        const isVideo = mega.gallery.isGalleryVideo(cell.el.ref.node);
+                        const isVideo = scope.isVideo(cell.el.ref.node);
 
                         if (isVideo && (!isVideo.isPreviewable || !MediaAttribute.getMediaType(cell.el.ref.node))) {
-                            reportDownload();
+                            scope.reportDownload();
                             M.addDownload([h]);
                         }
                         else {
-                            playSlideshow(albumId);
+                            scope.playSlideshow(albumId, false, !!isVideo);
                         }
                     });
                 },
@@ -3596,10 +3099,10 @@ lazy(mega.gallery, 'albums', () => {
             this.el.classList.add('album-content-grid');
             this.el.style.gridTemplateColumns = null;
             this.el.style.gridAutoRows = null;
-            this.el.append(this.timeline.el);
+            this.el.appendChild(this.timeline.el);
 
             delay('render:album_content_timeline', () => {
-                if (this.timeline && this.timeline.el && albumId === getAlbumIdFromPath()) {
+                if (this.timeline && this.timeline.el && albumId === scope.getAlbumIdFromPath()) {
                     window.selectionManager = new AlbumsSelectionManager(
                         albumId,
                         this.timeline.el
@@ -3617,7 +3120,7 @@ lazy(mega.gallery, 'albums', () => {
                 this.emptyBlock = emptyPad;
             }
 
-            this.el.append(this.emptyBlock.el);
+            this.el.appendChild(this.emptyBlock.el);
         }
 
         removeEmptyBlock() {
@@ -3726,7 +3229,7 @@ lazy(mega.gallery, 'albums', () => {
                     MegaGallery.addThumbnails([albumCell.el.album]);
                 }
                 else {
-                    detachLoadingIcon(albumCell.el);
+                    scope.detachLoadingIcon(albumCell.el);
                 }
             }
         }
@@ -3744,14 +3247,14 @@ lazy(mega.gallery, 'albums', () => {
                     if (albumCell.el.classList.contains('ui-selected')) {
                         albumCell.el.classList.remove('ui-selected');
                     }
-                    this.el.append(albumCell.el);
+                    this.el.appendChild(albumCell.el);
                     albumsCount++;
 
                     if (albumCell.el.album.node) {
                         thumbBlocks.push(albumCell.el.album);
                     }
                     else {
-                        detachLoadingIcon(albumCell.el);
+                        scope.detachLoadingIcon(albumCell.el);
                     }
                 }
             }
@@ -3782,7 +3285,7 @@ lazy(mega.gallery, 'albums', () => {
 
             const selectMatchingCells = () => {
                 for (let i = 0; i < albums.length; i++) {
-                    if (isInSelectArea(albums[i].cellEl.el, area)) {
+                    if (scope.isInSelectArea(albums[i].cellEl.el, area)) {
                         albums[i].cellEl.selectCell(false);
                     }
                     else {
@@ -3838,11 +3341,11 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         attachKeyboardEvents() {
-            if (disposeKeyboardEvents) {
-                disposeKeyboardEvents();
+            if (scope.disposeKeyboardEvents) {
+                scope.disposeKeyboardEvents();
             }
 
-            disposeKeyboardEvents = (() => {
+            scope.disposeKeyboardEvents = (() => {
                 const disposeKeydown = MComponent.listen(document, 'keydown', (evt) => {
                     if (evt.target !== document.body) {
                         return;
@@ -3855,7 +3358,7 @@ lazy(mega.gallery, 'albums', () => {
                     }
 
                     const { key, shiftKey } = evt;
-                    const isCtrl = getCtrlKeyStatus(evt);
+                    const isCtrl = scope.getCtrlKeyStatus(evt);
                     const lastSelIndex = (this.lastSelected)
                         ? albums.findIndex(({ cellEl }) => cellEl.el === this.lastSelected)
                         : -1;
@@ -3942,14 +3445,14 @@ lazy(mega.gallery, 'albums', () => {
 
                     const adjustScrollTop = () => {
                         if (albumCell.el.offsetTop < scope.albums.grid.el.scrollTop) {
-                            scope.albums.grid.el.scrollTop = albumCell.el.offsetTop - cellMargin * 3;
+                            scope.albums.grid.el.scrollTop = albumCell.el.offsetTop - scope.cellMargin * 3;
                         }
                         else {
                             const bottomOverlap = albumCell.el.offsetTop + albumCell.el.offsetHeight
                                 - (scope.albums.grid.el.scrollTop + scope.albums.grid.el.clientHeight);
 
                             if (bottomOverlap > 0) {
-                                scope.albums.grid.el.scrollTop += bottomOverlap + cellMargin * 3;
+                                scope.albums.grid.el.scrollTop += bottomOverlap + scope.cellMargin * 3;
                             }
                         }
                     };
@@ -4111,11 +3614,11 @@ lazy(mega.gallery, 'albums', () => {
             this.el.className = 'lp-content-wrap';
 
             this.treeList = document.createElement('div');
-            this.treeList.className = 'albums-tree-list';
+            this.treeList.className = 'albums-tree-list collapse';
 
-            this.el.append(this.treeList);
+            this.el.appendChild(this.treeList);
 
-            parent.append(this.el);
+            parent.appendChild(this.el);
             this.setHeader();
         }
 
@@ -4133,7 +3636,7 @@ lazy(mega.gallery, 'albums', () => {
                 this.treeList.insertBefore(this.pendingBtn.el, firstUserAlbum.button.el);
             }
             else {
-                this.treeList.append(this.pendingBtn.el);
+                this.treeList.appendChild(this.pendingBtn.el);
             }
         }
 
@@ -4166,11 +3669,6 @@ lazy(mega.gallery, 'albums', () => {
 
             this.headButton.isExpandable = checkIfExpandable();
             this.el.prepend(this.headButton.el);
-
-            // @TODO: Remove this bit once User albums are in place
-            if (!userAlbumsEnabled && !this.headButton.isExpandable) {
-                this.headButton.el.classList.add('hidden');
-            }
         }
 
         clear(removeAll) {
@@ -4230,11 +3728,11 @@ lazy(mega.gallery, 'albums', () => {
 
             if (album) {
                 if (!album.button) {
-                    album.button = AlbumsTree.createButton(albumId, album.label);
+                    album.button = AlbumsTree.createButton(albumId, album.label, !!album.p);
                 }
 
                 if (!album.filterFn || album.nodes) {
-                    this.treeList.append(album.button.el);
+                    this.treeList.appendChild(album.button.el);
                     this.headButton.isExpandable = true;
                 }
             }
@@ -4250,7 +3748,7 @@ lazy(mega.gallery, 'albums', () => {
 
             if (album) {
                 if (!album.button) {
-                    album.button = AlbumsTree.createButton(albumId, album.label);
+                    album.button = AlbumsTree.createButton(albumId, album.label, !!album.p);
                 }
 
                 const prevActiveSiblingAlbum = getPrevActivePredefinedAlbum(albumId, 'button');
@@ -4276,6 +3774,8 @@ lazy(mega.gallery, 'albums', () => {
             if (this.headButton) {
                 this.listExpanded = true;
                 this.headButton.el.classList.add('expansion-btn-open');
+                this.treeList.classList.remove('collapse');
+                this.adjustScrollBar();
             }
         }
 
@@ -4283,16 +3783,26 @@ lazy(mega.gallery, 'albums', () => {
             if (this.headButton) {
                 this.listExpanded = false;
                 this.headButton.el.classList.remove('expansion-btn-open');
+                this.treeList.classList.add('collapse');
+                this.adjustScrollBar();
             }
+        }
+
+        adjustScrollBar() {
+            delay('render:albums_sidebar', () => {
+                const sidebar = document.querySelector('.js-lp-gallery.lp-gallery .js-gallery-panel');
+                applyPs(sidebar);
+            });
         }
     }
 
     /**
      * @param {String} albumId Album ID
      * @param {String} label Button label
+     * @param {Boolean} isShared Whether the album is already shared or not
      * @returns {MSidebarButton}
      */
-    AlbumsTree.createButton = (albumId, label) => {
+    AlbumsTree.createButton = (albumId, label, isShared) => {
         const btn = new MSidebarButton(
             label,
             'icon-album',
@@ -4301,18 +3811,23 @@ lazy(mega.gallery, 'albums', () => {
 
                 const nextFolder = 'albums/' + albumId;
 
-                if (M.currentdirid !== nextFolder) {
+                if (!scope.albums.isPublic && M.currentdirid !== nextFolder) {
                     M.openFolder(nextFolder);
                 }
             },
             'subalbum-btn'
         );
 
+        btn.truncateOverflowText = true;
+        btn.isShared = isShared;
         btn.attachEvent(
             'contextmenu',
-            ({ pageX, pageY }) => {
-                const contextMenu = new AlbumContextMenu(albumId);
-                contextMenu.show(pageX, pageY);
+            (evt) => {
+                evt.preventDefault();
+                if (scope.albums.store[albumId].nodes.length) {
+                    const contextMenu = new AlbumContextMenu(albumId, scope.albums.isPublic);
+                    contextMenu.show(evt.pageX, evt.pageY);
+                }
             }
         );
 
@@ -4386,6 +3901,8 @@ lazy(mega.gallery, 'albums', () => {
                                 h: album.eIds[id]
                             };
                         });
+
+                        data.p = album.p;
                     }
 
                     this.createAlbumData(data, unwantedHandles());
@@ -4446,6 +3963,9 @@ lazy(mega.gallery, 'albums', () => {
                 }),
                 mega.sets.subscribe('aer', 'albums', (element) => {
                     this.removeUserAlbumItem(element);
+                }),
+                mega.sets.subscribe('ass', 'albums', (share) => {
+                    this.updateAlbumShare(share);
                 })
             ];
         }
@@ -4463,7 +3983,7 @@ lazy(mega.gallery, 'albums', () => {
                 const ignoreHandles = unwantedHandles();
 
                 for (let i = 0; i < fmNodes.length; i++) {
-                    if (!mega.gallery.isGalleryNode(fmNodes[i])) {
+                    if (!scope.isGalleryNode(fmNodes[i])) {
                         continue;
                     }
 
@@ -4478,7 +3998,76 @@ lazy(mega.gallery, 'albums', () => {
             return nodes;
         }
 
+        async initPublicAlbum() {
+            const albumData = {
+                ...M.d[M.RootID],
+                p: { ph: pfid }
+            };
+            const handles = M.c[M.RootID] ? Object.keys(M.c[M.RootID]) : [];
+
+            this.isPublic = true;
+
+            this.removeTree();
+            this.initTree(document.querySelector('.js-fm-left-panel .fm-other-tree-panel.js-other-tree-panel'));
+
+            this.createAlbumData(albumData, {}, true);
+
+            for (const id in this.store) {
+                if (Object.hasOwnProperty.call(this.store, id) && !this.store[id].filterFn && id !== albumData.id) {
+                    delete this.store[id];
+                }
+            }
+
+            MegaGallery.dbActionPassed = true;
+
+            const availableNodes = this.getAvailableNodes(handles);
+
+            if (availableNodes.length) {
+                sortInAlbumNodes(availableNodes);
+            }
+
+            await this.buildAlbumsList(availableNodes);
+
+            M.v = availableNodes;
+            const {id, button} = this.store[albumData.id];
+
+            insertAlbumElement(id, button.el, this.tree.treeList, 'button');
+            this.tree.focusAlbum(id);
+
+            this.showAlbum(albumData.id);
+
+            this.awaitingDbAction = false;
+            this.subscribeToSetsChanges();
+
+            const treePanel = $('section.fm-tree-panel', '.fm-main.default');
+
+            $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-right-header, .fm-empty-section').addClass('hidden');
+            $('.tree', treePanel).addClass('hidden');
+            $('.cloud-drive .lp-header span', treePanel).text(l.album_link);
+            $('button.btn-galleries', treePanel).addClass('pl-4');
+
+            if (handles.length) {
+                $('.fm-import-to-cloudrive span', '.folder-link-btns-container').text(
+                    (u_type)
+                        ? l.context_menu_import
+                        : l.btn_imptomega
+                );
+            }
+            else {
+                $('.folder-link-btns-container').addClass('hidden');
+            }
+
+            const rfBlock = $('.fm-right-files-block', '.fmholder');
+            rfBlock.removeClass('hidden');
+            $('.onboarding-control-panel', rfBlock).addClass('hidden');
+        }
+
+        /**
+         * @param {String[]} handles Node handles to work with
+         * @returns {void}
+         */
         init(handles) {
+            this.isPublic = false;
             const gallerySidebar = document.querySelector('.js-lp-gallery.lp-gallery .js-gallery-panel');
             const gallerySidebarWrap =
                 document.querySelector('.js-lp-gallery.lp-gallery .js-gallery-panel .lp-content-wrap-wrap');
@@ -4611,17 +4200,20 @@ lazy(mega.gallery, 'albums', () => {
          * @returns {Object[]}
          */
         async setUserAlbums() {
-            const sets = Object.values(await mega.sets.buildTmp());
             const albums = [];
 
-            if (!Array.isArray(sets) || !sets.length) {
-                return [];
-            }
+            if (!this.isPublic) {
+                const sets = Object.values(await mega.sets.buildTmp());
 
-            const ignoreHandles = unwantedHandles();
+                if (!Array.isArray(sets) || !sets.length) {
+                    return [];
+                }
 
-            for (let i = 0; i < sets.length; i++) {
-                albums.push(this.createAlbumData(sets[i], ignoreHandles));
+                const ignoreHandles = unwantedHandles();
+
+                for (let i = 0; i < sets.length; i++) {
+                    albums.push(this.createAlbumData(sets[i], ignoreHandles));
+                }
             }
 
             sortStore();
@@ -4637,51 +4229,60 @@ lazy(mega.gallery, 'albums', () => {
             return albums;
         }
 
+        /**
+         * @param {MegaNode} nodesArr Array of nodes to filter through
+         * @returns {void}
+         */
         async buildAlbumsList(nodesArr) {
             if (scope.albumsRendered) {
                 this.tree.renderAlbumButtons();
-                return;
             }
+            else {
+                if (this.tree && this.tree.treeList.children.length > 0) {
+                    this.tree.clear();
+                }
 
-            const albums = Object.values(this.store);
+                if (!this.isPublic) {
+                    const albums = Object.values(this.store);
 
-            for (let index = 0; index < albums.length; index++) {
-                const { id, filterFn } = albums[index];
+                    for (let index = 0; index < albums.length; index++) {
+                        const { id, filterFn } = albums[index];
 
-                if (!filterFn) {
-                    delete this.store[id];
+                        if (!filterFn) {
+                            delete this.store[id];
+                        }
+                    }
+
+                    this.setPredefinedAlbums(nodesArr);
+                }
+
+                await this.setUserAlbums();
+
+                scope.albumsRendered = true;
+
+                if (this.tree && this.tree.headButton) {
+                    this.tree.headButton.isExpandable = checkIfExpandable();
                 }
             }
 
-            if (this.tree && this.tree.treeList.children.length > 0) {
-                this.tree.clear();
+            if (this.isPublic) {
+                this.tree.headButton.el.classList.add('hidden');
             }
-
-            this.setPredefinedAlbums(nodesArr);
-            await this.setUserAlbums();
-
-            scope.albumsRendered = true;
-
-            if (this.tree) {
-                this.tree.headButton.isExpandable = checkIfExpandable();
-
-                // @TODO: Remove this bit once User albums are in place
-                if (!userAlbumsEnabled && !this.tree.headButton.isExpandable) {
-                    this.tree.headButton.el.classList.add('hidden');
-                }
-                else {
-                    this.tree.headButton.el.classList.remove('hidden');
-                }
+            else {
+                this.tree.headButton.el.classList.remove('hidden');
             }
         }
 
         /**
          * @param {Object.<String, any>} data Set data to process
          * @param {Object.<String, Boolean>} ignoreHandles Handles to ignore when add to the album
+         * @param {Boolean} [isPublic] Whether the specified key is encrypted
          * @returns {void}
          */
-        createAlbumData({ e, at, k, id, ts, cts }, ignoreHandles) {
-            const attr = mega.sets.decryptSetAttr(at, k);
+        createAlbumData({ e, at, k, id, ts, p, cts }, ignoreHandles, isPublic) {
+            const attr = (isPublic)
+                ? mega.sets.decryptPublicSetAttr(at, k)
+                : mega.sets.decryptSetAttr(at, k);
             const label = attr.n || l.unknown_album_name;
             const coverHandle = attr.c || '';
             let album = this.store[id];
@@ -4725,6 +4326,7 @@ lazy(mega.gallery, 'albums', () => {
                 album.node = node;
                 album.eHandles = eHandles;
                 album.eIds = eIds;
+                album.p = p;
             }
             else {
                 album = {
@@ -4734,17 +4336,54 @@ lazy(mega.gallery, 'albums', () => {
                     label,
                     nodes,
                     node,
-                    button: AlbumsTree.createButton(id, label),
+                    button: AlbumsTree.createButton(id, label, !!p),
                     ts,
                     cts,
                     eHandles,
-                    eIds
+                    eIds,
+                    p
                 };
 
                 this.store[id] = album;
             }
 
             return album;
+        }
+
+        /**
+         * Adding/removing share to an album
+         * @param {Object.<String, String|Number>} payload The share payload
+         * @returns {void}
+         */
+        updateAlbumShare({ ph, s, ts, r }) {
+            const album = this.store[s];
+
+            if (!album) {
+                return;
+            }
+
+            const removing = r === 1;
+
+            if (removing) {
+                if (album.p) {
+                    delete album.p;
+                }
+            }
+            else {
+                album.p = { ph, ts };
+            }
+
+            if (album.button) {
+                album.button.isShared = !removing;
+            }
+
+            if (s === scope.getAlbumIdFromPath() && this.grid && this.grid.header) {
+                this.grid.header.update(s);
+            }
+
+            if (album.cellEl) {
+                album.cellEl.isShared = !removing;
+            }
         }
 
         /**
@@ -4763,10 +4402,12 @@ lazy(mega.gallery, 'albums', () => {
                 insertAlbumElement(albumId, album.button.el, this.tree.treeList, 'button');
             }
             else {
-                this.tree.treeList.append(album.button.el);
+                this.tree.treeList.appendChild(album.button.el);
             }
 
-            this.tree.headButton.isExpandable = true;
+            if (this.tree.headButton) {
+                this.tree.headButton.isExpandable = true;
+            }
         }
 
         showAlbum(id) {
@@ -4785,11 +4426,11 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         removeKeyboardListener() {
-            if (disposeKeyboardEvents) {
-                disposeKeyboardEvents();
+            if (scope.disposeKeyboardEvents) {
+                scope.disposeKeyboardEvents();
             }
 
-            disposeKeyboardEvents = null;
+            scope.disposeKeyboardEvents = null;
         }
 
         disposeInteractions() {
@@ -4871,7 +4512,7 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             delay('album:clean_grid_and_tree', () => {
-                if (this.tree) {
+                if (this.tree && this.tree.headButton) {
                     this.tree.headButton.isExpandable = checkIfExpandable();
                 }
             });
@@ -4899,7 +4540,7 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
-            if (!mega.gallery.isGalleryNode(node)) {
+            if (!scope.isGalleryNode(node)) {
                 return;
             }
 
@@ -4944,7 +4585,7 @@ lazy(mega.gallery, 'albums', () => {
                 return;
             }
 
-            if (!mega.gallery.isGalleryNode(node)) {
+            if (!scope.isGalleryNode(node)) {
                 return;
             }
 
@@ -5035,7 +4676,7 @@ lazy(mega.gallery, 'albums', () => {
 
             debouncedAlbumCellUpdate(albumId, true);
 
-            if (M.currentdirid === 'albums/' + albumId && this.grid) {
+            if (albumId === scope.getAlbumIdFromPath() && this.grid) {
                 if (album.nodes.length === 1) {
                     this.grid.removeEmptyBlock();
                     this.grid.showAlbumContents(albumId);
@@ -5103,7 +4744,7 @@ lazy(mega.gallery, 'albums', () => {
 
                 if (Array.isArray(nodes)) {
                     for (let i = 0; i < nodes.length; i++) {
-                        if (!mega.gallery.isGalleryNode(nodes[i])) {
+                        if (!scope.isGalleryNode(nodes[i])) {
                             continue;
                         }
 
@@ -5147,10 +4788,31 @@ lazy(mega.gallery, 'albums', () => {
         removeElementsByHandles(handles) {
             loadingDialog.show('MegaAlbumsRemoveItems');
 
-            const album = scope.albums.store[getAlbumIdFromPath()];
+            const album = scope.albums.store[scope.getAlbumIdFromPath()];
+            const ids = [];
+            const handlesCache = {};
+            const statsObj = {
+                delImg: 0,
+                delVid: 0,
+                leftImg: 0,
+                leftVid: 0
+            };
+
+            for (let i = 0; i < handles.length; i++) {
+                ids.push(album.eHandles[handles[i]]);
+                handlesCache[handles[i]] = true;
+            }
+
+            // Building stats object for removed and left items
+            for (let i = 0; i < album.nodes.length; i++) {
+                statsObj[
+                    (handlesCache[album.nodes[i].h] ? 'del' : 'left')
+                    + (mega.gallery.isVideo(album.nodes[i]) ? 'Vid' : 'Img')
+                ]++;
+            }
 
             mega.sets.elements.bulkRemove(
-                handles.map((h) => album.eHandles[h]),
+                ids,
                 album.id
             ).then(() => {
                 const content = generateToastContent(
@@ -5163,6 +4825,11 @@ lazy(mega.gallery, 'albums', () => {
                     icons: ['sprite-fm-mono icon-bin text-color-medium'],
                     content
                 });
+
+                delay(
+                    'albums_stat_99917',
+                    eventlog.bind(null, 99917, JSON.stringify(statsObj))
+                );
             }).catch(() => {
                 console.error('Could not remove the album items...');
             }).finally(() => {
@@ -5171,13 +4838,13 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         previewSelectedElements() {
-            playSlideshow(getAlbumIdFromPath());
+            scope.playSlideshow(scope.getAlbumIdFromPath());
         }
 
         downloadSelectedElements() {
             if (this.grid && this.grid.timeline && this.grid.timeline.selCount) {
-                reportDownload();
-                M.addDownload(Object.keys(mega.gallery.albums.grid.timeline.selections));
+                scope.reportDownload();
+                M.addDownload(Object.keys(this.grid.timeline.selections));
             }
         }
 
@@ -5198,6 +4865,150 @@ lazy(mega.gallery, 'albums', () => {
                 .catch(dump)
                 .finally(() => {
                     loadingDialog.hide('MegaAlbumsUpdateCover');
+                });
+        }
+
+        async getUniqueSetName(setNode) {
+            const sets = Object.values(await mega.sets.buildTmp());
+            const names = Object.create(null);
+            const  { h, name } = setNode;
+
+            for (let i = 0; i < sets.length; i++) {
+                const { at, k } = sets[i];
+
+                tryCatch(() => {
+                    names[mega.sets.decryptSetAttr(at, k).n] = true;
+                })();
+            }
+
+            if (!names[name]) {
+                return name;
+            }
+
+            const album = Object.values(mega.gallery.albums.store).find(({ p }) => p && p.ph === h);
+            const newName = await AlbumNameDialog.prompt(album.id, names);
+
+            return (newName === null) ? null : newName || name;
+        }
+
+        /**
+         * @param {String[]} albumIds Album ids to add the share for
+         * @returns {void}
+         */
+        addShare(albumIds) {
+            mega.Share.initCopyrightsDialog(
+                [],
+                false,
+                async() => {
+                    delete $.itemExport;
+                    delete $.itemExportEmbed;
+                    loadingDialog.show('MegaAlbumsAddShare');
+
+                    const promises = [];
+                    const availableIds = [];
+
+                    const { getSetById, elements } = mega.sets;
+
+                    for (let i = 0; i < albumIds.length; i++) {
+                        const id = albumIds[i];
+                        const album = scope.albums.store[id];
+
+                        if (!album) {
+                            continue;
+                        }
+
+                        // Checking that all elements are good to be a part of share
+                        const s = await getSetById(id).catch((ex) => console.error(ex));
+
+                        availableIds.push(id);
+
+                        if (!album.p) {
+                            promises.push(mega.sets.addShare(id));
+                        }
+
+                        if (!s) {
+                            continue;
+                        }
+
+                        const elsToReset = {};
+                        const { e, k } = s;
+
+                        if (e && typeof e === 'object') {
+                            const minKeyLen = 43; // The length of 32b ByteArray in Base64 string
+
+                            for (const eId in e) {
+                                if (Object.hasOwnProperty.call(e, eId)) {
+                                    const { h, k, o, at, ts } = e[eId];
+
+                                    // Repairing the elements with old incorrect keys
+                                    if (k.length < minKeyLen || (!at && ts < 1695340800)) {
+                                        elsToReset[eId] = { h, o: o || 1500 };
+                                    }
+                                }
+                            }
+                        }
+
+                        const eIds = Object.keys(elsToReset);
+
+                        if (eIds.length) {
+                            elements.bulkRemove(eIds, id)
+                                .then(() => {
+                                    return elements.bulkAdd(Object.values(elsToReset), id, k);
+                                })
+                                .catch(dump);
+                        }
+                    }
+
+                    Promise.all(promises)
+                        .then((results) => {
+                            for (let i = 0; i < results.length; i++) {
+                                const p = results[i][1] || results[i];
+
+                                // In case there is a race, it is safer to assign ass result to albums directly
+                                if (!scope.albums.store[availableIds[i]].p) {
+                                    scope.albums.store[availableIds[i]].p = p;
+                                }
+                            }
+
+                            loadingDialog.hide('MegaAlbumsAddShare');
+                            const dialog = new AlbumShareDialog(availableIds);
+                            dialog.show();
+                        })
+                        .catch((ex) => {
+                            loadingDialog.hide('MegaAlbumsAddShare');
+                            dump(ex);
+                        });
+                }
+            );
+        }
+
+        /**
+         * @param {String} albumIds Album ids to remove the share from
+         * @returns {void}
+         */
+        removeShare(albumIds) {
+            loadingDialog.show('MegaAlbumsRemoveShare');
+
+            const idsToClear = [];
+
+            for (let i = 0; i < albumIds.length; i++) {
+                const id = albumIds[i];
+                const album = scope.albums.store[id];
+
+                if (album && album.p) {
+                    idsToClear.push(id);
+                }
+            }
+
+            if (!idsToClear.length) {
+                loadingDialog.hide('MegaAlbumsRemoveShare');
+                return;
+            }
+
+            Promise.all(idsToClear.map(id => mega.sets.removeShare(id)))
+                .catch(dump)
+                .finally(() => {
+                    loadingDialog.hide('MegaAlbumsRemoveShare');
                 });
         }
     }

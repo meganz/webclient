@@ -340,7 +340,7 @@
         }
         // Skip M.renderMain and clear folder nodes for sections without viewmode switchers
         else if (this.chat || !id ||
-            this.gallery ||
+            (this.gallery && (!is_mobile || !pfcol)) ||
             id.substr(0, 7) === 'account' ||
             id.substr(0, 7) === 'devices' ||
             id.substr(0, 9) === 'dashboard' ||
@@ -523,6 +523,10 @@
                     }
                 }
                 newHashLocation = 'folder/' + pfid + '#' + pfkey + target;
+
+                if (window.pfcol) {
+                    newHashLocation = newHashLocation.replace('folder/', 'collection/');
+                }
             }
             else {
                 if (this.currentdirid !== this.RootID) {
@@ -722,7 +726,6 @@
         }
         else if (id === 'shares') {
             id = 'shares';
-            M.onFileManagerReady(() => M.showContactVerificationDialog());
         }
         else if (id === 'out-shares') {
             id = 'out-shares';
@@ -764,7 +767,7 @@
 
             this.gallery = 2;
         }
-        else if (cv.type === 'gallery') {
+        else if (cv.type === 'gallery' || window.pfcol) {
 
             this.gallery = 1;
         }
@@ -889,7 +892,11 @@
                 $.inSharesRebuild = Date.now();
 
                 queueMicrotask(() => {
-                    mega.keyMgr.decryptInShares().catch(dump);
+                    mega.keyMgr.decryptInShares()
+                        .then(() => {
+                            return this.showContactVerificationDialog();
+                        })
+                        .catch(dump);
                 });
                 M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
             }

@@ -12401,6 +12401,23 @@ body.rtl .overlay-wrap {
     margin: 0;
 }
 
+.mobile .empty-states .title:has(h2:empty) {
+    display: none;
+}
+
+/* Public set on mobile */
+.mobile #mobile-key-decryption h2 {
+    margin-bottom: 1rem;
+}
+
+.mobile .pcol-cover-container p.album-count-txt {
+    color: var(--text-color-high);
+}
+
+.mobile .fm-list .pcol-cover-container > i {
+    margin: 0 auto;
+}
+
 .no-tablet-layout #startholder {
     grid-row: -1/-2;
     overflow-y: scroll;

@@ -390,28 +390,6 @@ mThumbHandler.add('WEBP', function WEBPThumbHandler(ab, cb) {
     });
 });
 
-mBroadcaster.once('startMega', function() {
-    'use strict';
-
-    var img = new Image();
-    img.onload = function() {
-        // This browser does natively support WebP
-        delete mThumbHandler.sup.WEBP;
-        is_image.def.WEBP = 1;
-
-        if (d) {
-            console.debug('Using build in WebP support...');
-        }
-    };
-    img.onerror = function() {
-        if (d) {
-            console.debug('This browser does not support WebP, we will use libwebp...', ua);
-        }
-    };
-    img.src = 'data:image/webp;base64,' +
-        'UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA';
-});
-
 mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
     'use strict';
 
@@ -506,25 +484,67 @@ if (!mega.chrome || (parseInt(String(navigator.appVersion).split('Chrome/').pop(
     delete mThumbHandler.sup.SVG;
 }
 
-mBroadcaster.once('startMega', function() {
+mBroadcaster.once('startMega', tryCatch(() => {
     'use strict';
+    const images = [
+        [
+            'JXL',
+            'image/jxl',
+            '/woAkAEAEogCAMAAPeESAAAVKqOMG7yc6/nyQ4fFtI3rDG21bWEJY7O9MEhIOIONi4LdHIrhMyApVJIA'
+        ],
+        [
+            'WEBP',
+            'image/webp',
+            'UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA'
+        ],
+        [
+            'AVIF',
+            'image/avif',
+            `AAAAHGZ0eXBtaWYxAAAAAG1pZjFhdmlmbWlhZgAAAPJtZXRhAAAAAAAAACtoZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAZ28tYXZp
+            ZiB2MAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAAARAAAEAAQAAAAABFgABAAAAGAAAAChpaW5mAAAAAAABAAAAGmluZmUCAAAAAAEAA
+            GF2MDFJbWFnZQAAAABnaXBycAAAAEhpcGNvAAAAFGlzcGUAAAAAAAAAAQAAAAEAAAAQcGFzcAAAAAEAAAABAAAADGF2MUOBAAwAAAAAEH
+            BpeGkAAAAAAwgICAAAABdpcG1hAAAAAAAAAAEAAQQBAoOEAAAAIG1kYXQSAAoFGAAOwCAyDR/wAABgBgAAAACsyvA=`
+        ],
+        [
+            'HEIC',
+            'image/heic',
+            `AAAAGGZ0eXBoZWljAAAAAGhlaWNtaWYxAAABvm1ldGEAAAAAAAAAImhkbHIAAAAAAAAAAHBpY3QAAAAAAAAAAAAAAAAAAAAAACRkaW5m
+            AAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAA5waXRtAAAAAAABAAAAOGlpbmYAAAAAAAIAAAAVaW5mZQIAAAAAAQAAaHZjMQAAA
+            AAVaW5mZQIAAAEAAgAARXhpZgAAAAAaaXJlZgAAAAAAAAAOY2RzYwACAAEAAQAAAOBpcHJwAAAAwGlwY28AAAATY29scm5jbHgAAgACAA
+            aAAAAAeGh2Y0MBAWAAAACwAAAAAAAe8AD8/fj4AAAPA6AAAQAXQAEMAf//AWAAAAMAsAAAAwAAAwAeLAmhAAEAIkIBAQFgAAADALAAAAM
+            AAAMAHqEickmcuSRKSXE3AgIGpAKiAAEAEUQBwGDAkwE6RERJEkSRJEqQAAAAFGlzcGUAAAAAAAAAAgAAAAIAAAAJaXJvdAAAAAAQcGl4
+            aQAAAAADCAgIAAAAGGlwbWEAAAAAAAAAAQABBYGCA4QFAAAALGlsb2MAAAAARAAAAgABAAAAAQAAAeYAAAASAAIAAAABAAAB5gAAAAAAA
+            AABbWRhdAAAAAAAAAAiAAAADiYBrcDmF9NIDoIkoml4`
+        ]
+    ];
+    const supported = [];
+    let count = images.length;
 
-    var img = new Image();
-    img.onload = function() {
-        if (this.naturalWidth === 1) {
-            if (d) {
-                console.info('This browser does support AVIF.');
+    const test = (name, mime, data) => {
+        const img = new Image();
+        const done = () => {
+            if (!--count && self.d) {
+                console.info(`This browser does support decoding ${supported} images.`);
             }
-            is_image.def.AVIF = 1;
-        }
+            img.onload = img.onerror = undefined;
+        };
+        img.onload = function() {
+            if (this.naturalWidth > 0) {
+                is_image.def[name] = 1;
+                delete mThumbHandler.sup[name];
+                supported.push(name);
+            }
+            done();
+        };
+        img.onerror = done;
+        img.src = `data:${mime};base64,${data.replace(/\s+/g, '')}`;
     };
 
-    img.src = 'data:image/avif;base64,AAAAHGZ0eXBtaWYxAAAAAG1pZjFhdmlmbWlhZgAAAPJtZXRhAAAAAAAAAC' +
-        'toZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAZ28tYXZpZiB2MAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAA' +
-        'ARAAAEAAQAAAAABFgABAAAAGAAAAChpaW5mAAAAAAABAAAAGmluZmUCAAAAAAEAAGF2MDFJbWFnZQAAAABnaXBy' +
-        'cAAAAEhpcGNvAAAAFGlzcGUAAAAAAAAAAQAAAAEAAAAQcGFzcAAAAAEAAAABAAAADGF2MUOBAAwAAAAAEHBpeGk' +
-        'AAAAAAwgICAAAABdpcG1hAAAAAAAAAAEAAQQBAoOEAAAAIG1kYXQSAAoFGAAOwCAyDR/wAABgBgAAAACsyvA=';
-});
+    for (let i = images.length; i--;) {
+
+        test(...images[i]);
+    }
+}));
 
 
 // ---------------------------------------------------------------------------------------------------------------

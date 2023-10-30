@@ -1458,8 +1458,7 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
 
-        show() {
-            super.show();
+        onMDialogShown() {
             document.activeElement.blur();
             this.updateSelectedCount(0);
 
@@ -1597,9 +1596,7 @@ lazy(mega.gallery, 'albums', () => {
             this.title = l.set_album_cover;
         }
 
-        show() {
-            super.show();
-
+        onMDialogShown() {
             let isLoaded = false;
 
             if (scope.albums.grid && scope.albums.grid.timeline && scope.albums.grid.timeline.dragSelect) {
@@ -2013,8 +2010,7 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
 
-        show() {
-            super.show();
+        onMDialogShown() {
             this.triggerInputSaveguard();
 
             delay('focus:new_album_input', () => {

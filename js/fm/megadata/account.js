@@ -616,19 +616,19 @@ MegaData.prototype.showContactVerificationDialog = function() {
     'use strict';
 
     var $dialog = $('.mega-dialog.contact-verification-dialog');
-    $('button.js-close', $dialog).removeClass('hidden').rebind('click', closeDialog);
-
-    // Don't show to new user
-    if (u_attr.since > 1697184000 || mega.keyMgr.getWarningValue('cvd')
-        || mega.keyMgr.getWarningValue('cv') !== false) {
-        return;
-    }
 
     // TODO: Implement this on mobile
     if (!$dialog.length) {
         if (d) {
             console.debug('contact-verification-dialog not available...');
         }
+        return;
+    }
+    $('button.js-close', $dialog).removeClass('hidden').rebind('click', closeDialog);
+
+    // Don't show to new user
+    if (u_attr.since > 1697184000 || mega.keyMgr.getWarningValue('cvd')
+        || mega.keyMgr.getWarningValue('cv') !== false) {
         return;
     }
 

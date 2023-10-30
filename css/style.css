@@ -9559,7 +9559,8 @@ div.token-input-dropdown-mega ul li.token-input-selected-dropdown-item-mega {
 .active .multiple-input {
     border-color: var(--stroke-info);
 }
-.error .multiple-input {
+.error .multiple-input,
+.fm-dialog-new-folder-input.contains-error {
     border-color: var(--stroke-error);
 }
 

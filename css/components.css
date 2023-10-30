@@ -115,7 +115,7 @@
     --mask-color: var(--stroke-main-inverted);
 }
 .btn-myfiles.active i:not(.icon-arrow-down),
-.btn-galleries.active i:not(.icon-arrow-down) {
+.btn-galleries.active i:not(.icon-arrow-down):not(.icon-link-small) {
     --mask-color: var(--secondary-blue);
 }
 .rtl .btn-myfiles i,
@@ -141,14 +141,18 @@
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
+.lp-gallery .btn-galleries span {
+    width: auto;
+}
 
 .btn-galleries.subalbum-btn::after {
     content: "";
     vertical-align: middle;
     position: sticky;
+    display: inline-block;
     right: -1px;
     background: var(--surface-tree-iconwrap);
-    padding: 7px 16px 7px 4px;
+    padding: 8px 16px 8px 4px;
 }
 
 .rtl .btn-galleries.subalbum-btn::after {

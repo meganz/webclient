@@ -8,12 +8,11 @@ class MDialog extends MComponent {
      * @param {String} [data.leftIcon] Classes for the side icon on the left
      * @param {Function} [onclose] Callback to trigger when the dialog is closed
      */
-    constructor({ ok, cancel, dialogClasses, contentClasses, leftIcon, onclose }) {
+    constructor({ ok, cancel, dialogClasses, contentClasses, leftIcon, onclose, doNotShowCheckboxText }) {
         super('section.mega-dialog-container:not(.common-container)', false);
 
         this._ok = ok;
         this._cancel = cancel;
-        this._dialogClasses = 'hidden' + (typeof dialogClasses === 'string' ? ' ' + dialogClasses : '');
         this._contentClasses = contentClasses;
 
         this._title = document.createElement('h3');
@@ -21,10 +20,14 @@ class MDialog extends MComponent {
 
         this.onclose = onclose;
 
+        this._doNotShowCheckboxText = doNotShowCheckboxText;
+
         if (leftIcon) {
             this.leftIcon = document.createElement('i');
             this.leftIcon.className = 'icon-left ' + leftIcon;
         }
+
+        this.appendCss(dialogClasses);
     }
 
     get slot() {
@@ -50,6 +53,16 @@ class MDialog extends MComponent {
     }
 
     /**
+     * @param {Function(any):boolean} getFn
+     * @param {Function(any):void} setFn
+     * @returns {void}
+     */
+    addConfirmationCheckbox(getFn, setFn) {
+        this._doNotShowGetFn = getFn;
+        this._doNotShowSetFn = setFn;
+    }
+
+    /**
      * Filling the text underneath the dialog
      * @param {String} text Text to fill with
      * @returns {void}
@@ -60,6 +73,7 @@ class MDialog extends MComponent {
 
     buildElement() {
         this.el = document.createElement('div');
+        this.el.className = 'mega-dialog m-dialog dialog-template-main';
     }
 
     triggerCancelAction() {
@@ -74,11 +88,29 @@ class MDialog extends MComponent {
     }
 
     show() {
+        // @todo FIXME use *unique* names per dialog
+        M.safeShowDialog('m-dialog', () => {
+            this._show();
+
+            return $(this.el).rebind('dialog-closed.mDialog', () => {
+                this.detachEl();
+
+                if (typeof this.onclose === 'function') {
+                    this.onclose();
+                }
+            });
+        });
+    }
+
+    _show() {
         this.setWrapper();
-        this.setButtons();
+
+        if (this._ok || this._cancel) {
+            this.setButtons();
+        }
 
         if (this._parent) {
-            this._parent.append(this.el);
+            this._parent.appendChild(this.el);
 
             const overlay = this._parent.querySelector('.fm-dialog-overlay');
             overlay.classList.add('m-dialog-overlay');
@@ -105,39 +137,43 @@ class MDialog extends MComponent {
         }
 
         if (this._slot) {
-            this._contentWrapper.append(this._slot);
+            this._contentWrapper.appendChild(this._slot);
         }
 
         if (this.leftIcon) {
             this.el.prepend(this.leftIcon);
             this.el.classList.add('with-icon');
             this._contentWrapper.classList.add('px-6');
+
+            if (this._aside) {
+                this._aside.classList.add('-ml-18');
+            }
         }
         else {
             this.el.classList.remove('with-icon');
             this._contentWrapper.classList.remove('px-6');
-        }
 
-        M.safeShowDialog('m-dialog', $(this.el));
-
-        $(this.el).rebind('dialog-closed.mDialog', () => {
-            this.detachEl();
-
-            if (typeof this.onclose === 'function') {
-                this.onclose();
+            if (this._aside) {
+                this._aside.classList.remove('-ml-18');
             }
-        });
+        }
     }
 
     hide(ignoreNewOnes = false) {
-        assert($.dialog === 'm-dialog');
-
         const nextDialog = this.el.nextElementSibling;
 
         if (!ignoreNewOnes && nextDialog && nextDialog.classList.contains('m-dialog')) {
             return; // No need to close this dialog, as it will be closed by the new opened one
         }
 
+        if (this._doNotShowCheckbox) {
+            this._doNotShowCheckbox.detachEl();
+
+            delete this._aside;
+            delete this._doNotShowCheckbox;
+        }
+
+        assert($.dialog === 'm-dialog');
         closeDialog();
     }
 
@@ -154,33 +190,23 @@ class MDialog extends MComponent {
     }
 
     setWrapper() {
-        let className = 'mega-dialog m-dialog dialog-template-main';
-
-        this.el = document.createElement('div');
-
-        if (typeof this._dialogClasses === 'string') {
-            className += ' ' + this._dialogClasses;
-        }
-
-        this.el.className = className;
-
         const closeBtn = document.createElement('button');
         closeBtn.className = 'close m-dialog-close';
-        this.el.append(closeBtn);
+        this.el.appendChild(closeBtn);
 
         const closeIcon = document.createElement('i');
         closeIcon.className = 'sprite-fm-mono icon-dialog-close';
-        closeBtn.append(closeIcon);
+        closeBtn.appendChild(closeIcon);
 
-        this.el.append(this._title);
+        this.el.appendChild(this._title);
 
         const content = document.createElement('section');
         content.className = 'content';
-        this.el.append(content);
+        this.el.appendChild(content);
 
         this._contentWrapper = document.createElement('div');
         this._contentWrapper.className = (typeof this._contentClasses === 'string') ? this._contentClasses : '';
-        content.append(this._contentWrapper);
+        content.appendChild(this._contentWrapper);
 
         this.attachEvent(
             'click.dialog.close',
@@ -196,12 +222,12 @@ class MDialog extends MComponent {
         const footer = document.createElement('footer');
         const footerContainer = document.createElement('div');
         footerContainer.className = 'p-6 flex justify-end items-center';
-        footer.append(footerContainer);
-        this.el.append(footer);
+        footer.appendChild(footerContainer);
+        this.el.appendChild(footer);
 
         this._actionTitle = document.createElement('div');
         this._actionTitle.className = 'flex flex-1';
-        footerContainer.append(this._actionTitle);
+        footerContainer.appendChild(this._actionTitle);
 
         if (this._cancel) {
             this.cancelBtn = new MButton(
@@ -213,7 +239,7 @@ class MDialog extends MComponent {
                 (this._cancel.classes) ? this._ok.classes.join(' ') : 'mega-button'
             );
 
-            footerContainer.append(this.cancelBtn.el);
+            footerContainer.appendChild(this.cancelBtn.el);
         }
 
         if (this._ok) {
@@ -231,13 +257,17 @@ class MDialog extends MComponent {
                     }
 
                     if (result !== false) {
+                        if (this._doNotShowCheckbox && this._doNotShowSetFn) {
+                            this._doNotShowSetFn(this._doNotShowCheckbox.checked);
+                        }
+
                         this.hide();
                     }
                 },
                 this._ok.classes ? this._ok.classes.join(' ') : 'mega-button positive'
             );
 
-            footerContainer.append(this.okBtn.el);
+            footerContainer.appendChild(this.okBtn.el);
 
             this.attachEvent(
                 'keyup.dialog.enter',
@@ -254,6 +284,20 @@ class MDialog extends MComponent {
                 null,
                 document
             );
+        }
+
+        if (this._doNotShowGetFn) {
+            this._aside = document.createElement('aside');
+            this._aside.className = 'align-start with-condition';
+
+            this._doNotShowCheckbox = new MCheckbox({
+                label: this._doNotShowCheckboxText || l[229],
+                id: 'do-not-show-again-confirmation',
+                checked: !!this._doNotShowGetFn && this._doNotShowGetFn()
+            });
+
+            this._aside.appendChild(this._doNotShowCheckbox.el);
+            footer.appendChild(this._aside);
         }
     }
 }

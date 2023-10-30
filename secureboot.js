@@ -399,7 +399,7 @@ function isPublickLinkV2(page) {
     'use strict';
     page = getCleanSitePath(page);
 
-    var types = {'file': 6, 'folder': 8, 'embed': 7};
+    var types = {file: 6, folder: 8, embed: 7, collection: 12};
     return page.length > types[page.split('/')[0]];
 }
 
@@ -2820,6 +2820,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/mcomponents/classes/MContextMenu.js', n: 'm_context_menu_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MDialog.js', n: 'm_dialog_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MEmptyPad.js', n: 'm_empty_pad_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MHint.js', n: 'm_hint_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MMenuSelect.js', n: 'm_menu_select_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MMenuSelectItem.js', n: 'm_menu_select_item_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MSidebarButton.js', n: 'm_sidebar_button_js', j:1});
@@ -2866,6 +2867,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/gallery/gallery.js', n: 'fm_gallery_js', j:1});
 
         jsl.push({f:'js/fm/albums/Albums.js', n: 'fm_albums_js', j:1});
+        jsl.push({f:'js/fm/albums/AlbumTimeline.js', n: 'fm_albums_timeline_js', j:1});
 
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
         jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
@@ -3349,6 +3351,7 @@ else if (!browserUpdate) {
         'file': ['download', 'download_js'],
         'F!': ['folderlink_css'],
         'folder': ['folderlink_css'],
+        'collection': ['folderlink_css'],
         'discountpromo': ['discountpromo', 'discountpromo_js', 'discountpromo_css'],
         's': ['discountpromo', 'discountpromo_js', 'discountpromo_css'], // Short URL for 'sale' e.g. /s/blackfriday
         'disputenotice': ['disputenotice', 'copyright_js'],

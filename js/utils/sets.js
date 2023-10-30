@@ -1,3 +1,4 @@
+/** @property mega.sets */
 lazy(mega, 'sets', () => {
     'use strict';
 
@@ -16,7 +17,8 @@ lazy(mega, 'sets', () => {
         asp: {},
         asr: {},
         aep: {},
-        aer: {}
+        aer: {},
+        ass: {}
     };
 
     /**
@@ -36,7 +38,11 @@ lazy(mega, 'sets', () => {
         }
     };
 
-    lazy(local, 'db', () => new MegaDexie('AESP', 'aesp', '', true, { s: '&id, cts, ts, u' }));
+    const setDb = () => {
+        lazy(local, 'db', () => new MegaDexie('AESP', 'aesp', '', true, { s: '&id, cts, ts, u' }));
+    };
+
+    setDb();
 
     /**
      * Runs the DB tasks in the transaction ensuring the consistency
@@ -158,14 +164,6 @@ lazy(mega, 'sets', () => {
     };
 
     /**
-     * Decrypting the User's private set attribute
-     * @param {String} attr Encrypted set's attribute
-     * @param {String} key Decryption key
-     * @returns {Object.<String, any>}
-     */
-    const decryptSetAttr = (attr, key) => tlvstore.decrypt(attr, true, decrypt_key(u_k_aes, base64_to_a32(key)));
-
-    /**
      * Getting all sets from the database and storing them into the memory for the future use
      * @returns {Object[]}
      */
@@ -189,31 +187,348 @@ lazy(mega, 'sets', () => {
     };
 
     /**
-     * Send a specific Set or Element command to API
+     * Send a specific Set or Element command to API (V3)
      * @param {String} a Action to send to API
      * @param {Object<String, String|Number>} options options to pass with the action
      * @returns {function(...[*]): Promise<void>}
      */
-    const sendReq = (a, options) => api.req({a, ...options}).then(({result}) => result);
+    const sendScReq = (a, options) => api.screq({ a, ...options }).then(({ result }) => result);
 
-    return {
-        decryptSetAttr,
-        buildTmp,
-        getElementsByIds: () => {
-            return [];
+    /**
+     * Send a specific Set or Element command to API (V2)
+     * @param {String} a Action to send to API
+     * @param {Object<String, String|Number>} options options to pass with the action
+     * @returns {function(...[*]): Promise<void>}
+     */
+    const sendReq = (a, options) => api.req({ a, ...options }).then(({ result }) => result);
+
+    /**
+     * @param {String} name Set name to add
+     * @param {Number} [ts] Indicates when the album was created
+     * @returns {function(...[*]): Promise<void>}
+     */
+    const add = async(name, ts) => {
+        const data = encryptSetAttr({ n: name || '', t: (ts || Date.now()).toString() });
+        const res = await sendScReq('asp', data);
+
+        res.k = data.k;
+        res.at = data.at;
+
+        return res;
+    };
+
+    /**
+     * @param {String} id Set id to retrieve
+     * @returns {Promise}
+     */
+    const getSetById = (id) => {
+        return local.db.s.get(id);
+    };
+
+    /**
+     * Decrypting the User's private set attribute
+     * @param {String} attr Encrypted set's attribute
+     * @param {String} key Decryption key
+     * @returns {Object.<String, any>}
+     */
+    const decryptSetAttr = (attr, key) => tlvstore.decrypt(attr, true, decrypt_key(u_k_aes, base64_to_a32(key)));
+
+    /**
+     * Decrypting the public set attribute
+     * @param {String} attr Encrypted set's attribute
+     * @param {String} key Public key
+     * @returns {Object.<String, any>}
+     */
+    const decryptPublicSetAttr = (attr, key) => tlvstore.decrypt(attr, true, base64_to_a32(key));
+
+    const elements = {
+        /**
+         * @param {String} h Node handle to assosiate with the set
+         * @param {String} setId Set id to add the element to
+         * @param {String} setKey Set key to use for encryption
+         * @returns {function(...[*]): Promise<void>}
+         */
+        add: (h, setId, setKey) => {
+            const n = M.d[h];
+
+            if (!n) {
+                throw new Error('Cannot find the node to add to the set...');
+            }
+
+            return sendScReq('aep', {
+                h,
+                s: setId,
+                k: ab_to_base64(
+                    asmCrypto.AES_CBC.encrypt(
+                        a32_to_ab(n.k),
+                        a32_to_ab(decrypt_key(u_k_aes, base64_to_a32(setKey))),
+                        false
+                    )
+                )
+            });
         },
         /**
-         * Getting the list of elements for the specific set
-         * @param {String} id Set id to get the tree for
+         * @param {String[]} handles Node handles to assosiate with the set
+         * @param {String} setId Set id to add elements to
+         * @param {String} setKey Set key to use for encryption
          * @returns {function(...[*]): Promise<void>}
          */
-        getTree: id => sendReq('aft', { id }),
+        bulkAdd: async(handles, setId, setKey) => {
+            const setPubKey = a32_to_ab(decrypt_key(u_k_aes, base64_to_a32(setKey)));
+            const e = [];
+            const savingEls = {};
+
+            for (let i = 0; i < handles.length; i++) {
+                const { h, o } = handles[i];
+                const n = M.d[h];
+
+                if (!n) {
+                    dump(`Node ${h} cannot be added to the set...`);
+                    continue;
+                }
+
+                const el = {
+                    h,
+                    o,
+                    k: ab_to_base64(
+                        asmCrypto.AES_CBC.encrypt(
+                            a32_to_ab(n.k),
+                            setPubKey,
+                            false
+                        )
+                    )
+                };
+
+                if (!savingEls[o]) {
+                    savingEls[o] = el;
+                    e.push(el);
+                }
+            }
+
+            const res = await sendScReq('aepb', { s: setId, e });
+
+            for (let i = 0; i < res.length; i++) {
+                if (!res[i] || !res[i].id) {
+                    continue;
+                }
+
+                const { id, o } = res[i];
+
+                if (savingEls[o]) {
+                    savingEls[o].id = id;
+                }
+            }
+
+            return Object.values(savingEls);
+        },
         /**
-         * @param {String} name Set name to add
-         * @param {Number} [ts] Indicates when the album was created
+         * @param {String} id Element id to remove
+         * @param {String} s Set id to remove from
          * @returns {function(...[*]): Promise<void>}
          */
-        add: (name, ts) => sendReq('asp', encryptSetAttr({ n: name || '', t: (ts || Date.now()).toString() })),
+        remove: (id, s) => sendReq('aer', { id, s }),
+        /**
+         * @param {String[]} ids Element ids to remove
+         * @param {String} s Set id to remove from
+         * @returns {function(...[*]): Promise<void>}
+         */
+        bulkRemove: (ids, s) => sendReq('aerb', { e: ids, s })
+    };
+
+    const copySetFromHandles = async(handles, albumName) => {
+        if (!Array.isArray(handles) || !handles.length) {
+            dump('Cannot create the set on empty nodes...');
+            return;
+        }
+        loadingDialog.show('SetImport');
+
+        await buildTmp();
+
+        const handlesToAdd = [];
+
+        for (let i = 0; i < handles.length; i++) {
+            const node = M.d[handles[i]];
+
+            if (!node) {
+                dump(`Cannot find node ${handles[i]} to be imported into set...`);
+            }
+            else if (!node.t) {
+                handlesToAdd.push({ h: handles[i], o: (i + 1) * 1000});
+            }
+        }
+
+        const payload = await add(albumName);
+        const { id, k } = payload;
+        const elArr = await elements.bulkAdd(handlesToAdd, id, k);
+
+        payload.e = {};
+
+        for (let i = 0; i < elArr.length; i++) {
+            const e = elArr[i];
+            e.s = id;
+
+            payload.e[e.id] = e;
+        }
+
+        local.tmpAesp.s[id] = payload;
+
+        if (isDBAvailable) {
+            local.db.s.put(payload);
+        }
+
+        loadingDialog.hide('SetImport');
+
+        toaster.main.show({
+            icons: ['sprite-fm-mono icon-check-circle text-color-medium'],
+            content: l.album_added.replace('%s', albumName)
+        });
+
+        return M.openFolder('albums');
+    };
+
+    /**
+     * Checking files and folders for duplicated names and returns either
+     * the same name if unique or hitting the length limit
+     * or a unique name with (1) suffix
+     * @param {String} name Name to check
+     * @param {String} target The handle of the enclosing folder to work with
+     * @returns {String}
+     */
+    const getUniqueFolderName = (name, target) => {
+        target = target || M.RootID;
+
+        name = M.getSafeName(name);
+        if (fileconflict.getNodeByName(target, name)) {
+            name = fileconflict.findNewName(name, target);
+        }
+
+        return name;
+    };
+
+    /**
+     * Processing $.onImportCopyNodes in a Folder link way but for a new set
+     * @param {String[]} selectedNodes File or Folder handles to import
+     * @param {String} targetHandle The handle of the target folder
+     * @returns {void}
+     */
+    const copyNodesAndSet = async(selectedNodes, targetHandle) => {
+        // Clearing out the database connection established in the previous session
+        mega.sets.reopenDb();
+
+        const tree = $.onImportCopyNodes;
+        const [albumNode] = tree;
+        const node = crypto_decryptnode({...albumNode});
+        let {name} = node;
+
+        if (name) {
+            name = await mega.gallery.albums.getUniqueSetName(node);
+
+            // The user discarded a new name
+            if (name === null) {
+                return;
+            }
+            const newName = getUniqueFolderName(name, targetHandle);
+
+            if (node.name !== newName) {
+                node.name = newName;
+                albumNode.a = ab_to_base64(crypto_makeattr(node));
+            }
+        }
+
+        if (albumNode.t > 1) {
+            // Mimicking its type to be created as a folder
+            albumNode.t = 1;
+        }
+
+        const handles = await M.copyNodes(selectedNodes, targetHandle, false, tree);
+
+        return copySetFromHandles(handles, name);
+    };
+
+    /**
+     * Mimicking the response from the API to get-tree (f) call
+     * @param {Object.<String, String|Number>} s Set data to convert to folder data
+     * @param {Object.<String, String|Number>[]} e Set elements
+     * @param {Object.<String, String|Number>[]} n Encrypted nodes associated with the elements
+     * @param {*} sn Sequence number to use for the integrity of the folder link procedure
+     * @returns {Object.<String, MegaNode[]|String>}
+     */
+    const getPublicSetTree = (s, e, n, sn) => {
+        assert(s && s.id, 'The set is either broken or not found...');
+
+        // pretend to be a normal root node.
+        s.t = 2;
+        s.h = pfid;
+        s.k = pfkey;
+        M.addNode(s);
+        crypto_setsharekey2(M.RootID, base64_to_a32(pfkey));
+        s.name = tlvstore.decrypt(s.at, true, u_sharekeys[M.RootID][0]).n;
+
+        // fake get-tree (f) response.
+        const res = { f: [], sn };
+
+        if (Array.isArray(e) && e.length) {
+            const psKeyAb = base64_to_ab(pfkey);
+
+            const decrNodeKey = tryCatch(
+                k => base64_to_a32(ab_to_base64(asmCrypto.AES_CBC.decrypt(base64_to_ab(k), psKeyAb, false)))
+            );
+
+            const tmpE = [];
+            const tmpN = {};
+
+            for (let i = 0; i < n.length; i++) {
+                tmpN[n[i].h] = n[i];
+            }
+
+            for (let i = 0; i < e.length; i++) {
+                const { h, k } = e[i];
+                const node = tmpN[h];
+
+                if (!node) {
+                    console.warn(`The Album element ${h} is not available anymore...`);
+                    continue;
+                }
+
+                const nodeKey = decrNodeKey(k);
+
+                tmpE.push(e[i]);
+                node.t = 0;
+                node.k = nodeKey;
+                node.a = node.at;
+                node.p = M.RootID;
+                M.addNode(node);
+
+                res.f.push(node);
+            }
+
+            s.e = tmpE;
+        }
+
+        return res;
+    };
+
+    return {
+        getPublicSetTree,
+        decryptSetAttr,
+        decryptPublicSetAttr,
+        buildTmp,
+        getSetById,
+        copyNodesAndSet,
+        add,
+        elements,
+        /**
+         * Sending the request to add share to an album
+         * @param {String} id Set id to share
+         * @returns {function(...[*]): Promise<void>}
+         */
+        addShare: (id) => sendScReq('ass', { id }),
+        /**
+         * Sending the request to remove share from an album
+         * @param {String} id Set id to drop the share for
+         * @returns {function(...[*]): Promise<void>}
+         */
+        removeShare: (id) => sendScReq('ass', { id, d: 1 }),
         /**
          * @param {String} set Set to update
          * @param {String} key Key for the set attribute
@@ -228,23 +543,24 @@ lazy(mega, 'sets', () => {
 
             at[key] = value;
 
-            return sendReq('asp', { id, at: encryptSetAttr(at, k).at });
+            return sendScReq('asp', { id, at: encryptSetAttr(at, k).at });
         },
         /**
          * @param {String} setId Set id to remove
          * @returns {void}
          */
-        remove: setId => sendReq('asr', { id: setId }),
+        remove: setId => sendScReq('asr', { id: setId }),
         /**
          * Clearing the existing local aesp database and applying the new data
          * @param {Object.<String, Object[]>} aesp New aesp data from the API
          * @returns {void}
          */
-        resetDB: async({ s, e }) => {
+        resetDB: async({ s, e, p }) => {
             const { tmpAesp, db } = local;
 
             tmpAesp.s = Object.create(null);
 
+            // Array of sets received
             if (s) {
                 for (let i = 0; i < s.length; i++) {
                     const set = Object.assign({}, s[i]);
@@ -255,12 +571,24 @@ lazy(mega, 'sets', () => {
                 tmpAesp.isCached = true;
             }
 
+            // Array of elements received
             if (e) {
                 for (let i = 0; i < e.length; i++) {
                     const el = e[i];
 
                     if (tmpAesp.s[el.s]) {
                         tmpAesp.s[el.s].e[el.id] = el;
+                    }
+                }
+            }
+
+            // Array of shares received
+            if (p) {
+                for (let i = 0; i < p.length; i++) {
+                    const { ph, ts, s: setId } = p[i];
+
+                    if (tmpAesp.s[setId]) {
+                        tmpAesp.s[setId].p = { ph, ts };
                     }
                 }
             }
@@ -273,6 +601,13 @@ lazy(mega, 'sets', () => {
                 await db.s.clear();
                 queueDbTask('ba', '', Object.values(tmpAesp.s));
             }
+        },
+        reopenDb: () => {
+            if (local.db && local.db._state.openComplete) {
+                local.db.close();
+            }
+
+            setDb();
         },
         subscribe: (key, id, handler) => {
             if (!subscribers[key][id]) {
@@ -289,8 +624,11 @@ lazy(mega, 'sets', () => {
             const { tmpAesp } = local;
             const { id, at, ts } = payload;
             const isExisting = tmpAesp.s[id];
-            const e = (tmpAesp.s[id] || {}).e || {};
+            const e = (isExisting) ? tmpAesp.s[id].e : {};
+            const p = (isExisting) ? tmpAesp.s[id].p : undefined;
+
             payload.e = e;
+            payload.p = p;
 
             tmpAesp.s[id] = payload;
 
@@ -314,6 +652,19 @@ lazy(mega, 'sets', () => {
             runSubscribedMethods('asr', payload);
             queueDbTask('d', id);
         },
+        parseAss: async(payload) => {
+            const { tmpAesp: { s } } = local;
+            const { ph, ts, r, s: setId } = payload;
+            const changes = (r === 1) ? undefined : { ph, ts };
+
+
+            if (s[setId]) {
+                s[setId].p = changes;
+            }
+
+            runSubscribedMethods('ass', payload);
+            queueDbTask('u', setId, { p: changes });
+        },
         parseAep: async(payload) => {
             const { tmpAesp: { s } } = local;
             const { id, s: setId } = payload;
@@ -336,103 +687,6 @@ lazy(mega, 'sets', () => {
 
             runSubscribedMethods('aer', payload);
             queueDbTask('u', setId, { [`e.${id}`]: undefined });
-        },
-        elements: {
-            /**
-             * @param {String} h Node handle to assosiate with the set
-             * @param {String} setId Set id to add the element to
-             * @param {String} setKey Set key to use for encryption
-             * @returns {function(...[*]): Promise<void>}
-             */
-            add: (h, setId, setKey) => {
-                const n = M.d[h];
-
-                if (!n) {
-                    throw new Error('Cannot find the node to add to the set...');
-                }
-
-                return sendReq('aep', {
-                    h,
-                    s: setId,
-                    k: ab_to_base64(
-                        asmCrypto.AES_CBC.encrypt(
-                            a32_to_ab(n.k),
-                            a32_to_ab(decrypt_key(u_k_aes, base64_to_a32(setKey))),
-                            false
-                        )
-                    )
-                });
-            },
-            /**
-             * @param {String[]} handles Node handles to assosiate with the set
-             * @param {String} setId Set id to add elements to
-             * @param {String} setKey Set key (encrypted) to use for element key encryption
-             * @returns {function(...[*]): Promise<void>}
-             */
-            bulkAdd: async(handles, setId, setKey) => {
-                const setPubKey = a32_to_ab(decrypt_key(u_k_aes, base64_to_a32(setKey)));
-                const e = [];
-                const savingEls = {};
-
-                for (let i = 0; i < handles.length; i++) {
-                    const { h, o } = handles[i];
-                    const n = M.d[h];
-
-                    if (!n) {
-                        dump(`Node ${h} cannot be added to the set...`);
-                        continue;
-                    }
-
-                    const el = {
-                        h,
-                        o,
-                        k: ab_to_base64(
-                            asmCrypto.AES_CBC.encrypt(
-                                a32_to_ab(n.k),
-                                setPubKey,
-                                false
-                            )
-                        )
-                    };
-
-                    savingEls[o] = el;
-                    e.push(el);
-                }
-
-                const res = await sendReq('aepb', { s: setId, e });
-
-                for (let i = 0; i < res.length; i++) {
-                    if (!res[i] || !res[i].id) {
-                        continue;
-                    }
-
-                    const { id, o } = res[i];
-
-                    if (savingEls[o]) {
-                        savingEls[o].id = id;
-                    }
-                }
-
-                return Object.values(savingEls);
-            },
-            /**
-             * @param {String} id Element id to remove
-             * @param {String} s Set id to remove from
-             * @returns {function(...[*]): Promise<void>}
-             */
-            remove: (id, s) => sendReq('aer', { id, s }),
-            /**
-             * @param {String[]} ids Element ids to remove
-             * @param {String} s Set id to remove from
-             * @returns {function(...[*]): Promise<void>}
-             */
-            bulkRemove: (ids, s) => sendReq(
-                'aerb',
-                {
-                    e: ids,
-                    s
-                }
-            )
         }
     };
 });

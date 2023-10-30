@@ -52,7 +52,10 @@ MegaMobileEmptyState.states = () => {
 
     let state;
 
-    if (folderlink) {
+    if (pfcol) {
+        state = 9;
+    }
+    else if (folderlink) {
         state = 8;
     }
     else {
@@ -131,6 +134,11 @@ MegaMobileEmptyState.states = () => {
         {
             title: l.folder_empty_title,
             contents: l.shared_folder_empty,
+            icon: 'folder'
+        },
+        {
+            title: '',
+            contents: mega.icu.format(l.album_items_count, 0),
             icon: 'folder'
         }
     ][state];

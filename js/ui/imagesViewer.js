@@ -387,10 +387,18 @@ var slideshowid;
             var root = M.getNodeRoot(n && n.h || false);
             var $getLinkBtn = $('.v-btn.getlink', $overlay);
 
-            if (!n || !n.p || root === 'shares' || root === M.RubbishID ||
-                (!folderlink && M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u &&
-                 M.getNodeRights(n.p) < 2)) {
-
+            if (!n
+                || !n.p
+                || root === 'shares'
+                || root === M.RubbishID
+                || (pfcol)
+                || (
+                    !folderlink
+                    && M.getNodeByHandle(n.h)
+                    && !M.getNodeByHandle(n.h).u
+                    && M.getNodeRights(n.p) < 2
+                )
+            ) {
                 $getLinkBtn.addClass('hidden');
             }
             else {

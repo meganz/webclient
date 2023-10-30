@@ -7,12 +7,12 @@ class GalleryNodeBlock {
 
         this.spanEl = document.createElement('span');
         this.spanEl.className = 'data-block-bg content-visibility-auto';
-        this.el.append(this.spanEl);
+        this.el.appendChild(this.spanEl);
 
         this.el.nodeBlock = this;
         this.isRendered = false;
 
-        this.isVideo = mega.gallery.isGalleryVideo(this.node);
+        this.isVideo = mega.gallery.isVideo(this.node);
     }
 
     setThumb(dataUrl) {
@@ -28,10 +28,10 @@ class GalleryNodeBlock {
         this.el.setAttribute('title', this.node.name);
 
         const spanMedia = document.createElement('span');
-        this.spanEl.append(spanMedia);
+        this.spanEl.appendChild(spanMedia);
         spanMedia.className = 'block-view-file-type file sprite-fm-mono';
         this.thumb = document.createElement('img');
-        spanMedia.append(this.thumb);
+        spanMedia.appendChild(this.thumb);
 
         if (this.isVideo) {
             spanMedia.classList.add('icon-videos', 'video');
@@ -39,11 +39,11 @@ class GalleryNodeBlock {
 
             const div = document.createElement('div');
             div.className = 'video-thumb-details';
-            this.spanEl.append(div);
+            this.spanEl.appendChild(div);
 
             const spanTime = document.createElement('span');
             spanTime.textContent = secondsToTimeShort(MediaAttribute(this.node).data.playtime);
-            div.append(spanTime);
+            div.appendChild(spanTime);
         }
         else {
             spanMedia.classList.add('icon-images', 'image');
@@ -51,7 +51,7 @@ class GalleryNodeBlock {
 
         const spanFav = document.createElement('span');
         spanFav.className = 'data-block-fav-icon sprite-fm-mono icon-favourite-filled';
-        this.spanEl.append(spanFav);
+        this.spanEl.appendChild(spanFav);
 
         if (mode === 'm' || mode === 'y') {
             this.el.dataset.ts = this.node.mtime || this.node.ts;
@@ -1613,7 +1613,7 @@ class MegaGallery {
         const iconBlock = document.createElement('i');
 
         iconBlock.classList.add('sprite-fm-mono', 'icon-arrow-right');
-        dateblock.append(iconBlock);
+        dateblock.appendChild(iconBlock);
         groupWrap.prepend(dateblock);
 
         if (group.r) {
@@ -1648,8 +1648,8 @@ class MegaGallery {
             bgimg.classList.add('gallery-block-bg');
             wrap.classList.add('gallery-block-bg-wrap');
 
-            wrap.append(bgimg);
-            contentBlock.append(wrap);
+            wrap.appendChild(bgimg);
+            contentBlock.appendChild(wrap);
         }
     }
 
@@ -2074,6 +2074,8 @@ class MegaMediaTypeGallery extends MegaGallery {
 
 mega.gallery = Object.create(null);
 mega.gallery.nodeUpdated = false;
+mega.gallery.albumsRendered = false;
+mega.gallery.publicSet = Object.create(null);
 mega.gallery.titleControl = null;
 mega.gallery.emptyBlock = null;
 mega.gallery.rootMode = {photos: 'a', images: 'a', videos: 'a'};
@@ -2112,6 +2114,30 @@ mega.gallery.secKeys = {
 };
 
 /**
+ * Checking if the file is even available for the gallery
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+mega.gallery.isGalleryNode = (n, ext) => {
+    'use strict';
+
+    ext = ext || fileext(n && n.name || n, true, true);
+    return mega.gallery.isImage(n, ext) || mega.gallery.isVideo(n);
+};
+
+/**
+ * Checking if the file is qualified to have a preview
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+mega.gallery.isPreviewable = (n, ext) => {
+    'use strict';
+    return is_image3(n, ext) || is_video(n);
+};
+
+/**
  * Same as is_image3(), additionally checking whether the node meet requirements for photo/media gallery.
  * @param {String|MegaNode|Object} n An ufs-node, or filename
  * @param {String} [ext] Optional filename extension
@@ -2125,24 +2151,11 @@ mega.gallery.isImage = (n, ext) => {
 };
 
 /**
- * Checking if the file is even available for the gallery
- * @param {String|MegaNode|Object} n An ufs-node, or filename
- * @param {String} [ext] Optional filename extension
- * @returns {Number|String|Function|Boolean}
- */
-mega.gallery.isGalleryNode = (n, ext) => {
-    'use strict';
-
-    ext = ext || fileext(n && n.name || n, true, true);
-    return mega.gallery.isImage(n, ext) || mega.gallery.isGalleryVideo(n);
-};
-
-/**
  * Checks whether the node is a video, plus checks if thumbnail is available
  * @param {Object} n ufs node
  * @returns {Object.<String, Number>|Boolean}
  */
-mega.gallery.isGalleryVideo = (n) => {
+mega.gallery.isVideo = (n) => {
     'use strict';
 
     if (!n || !n.fa || !n.fa.includes(':8*')) {
@@ -2529,6 +2542,56 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
     });
 };
 
+/**
+ * Clearing the check, so the next time the DB will be re-requested
+ */
+mega.gallery.removeDbActionCache = () => {
+    'use strict';
+    MegaGallery.dbActionPassed = false;
+};
+
+/**
+ * @param {HTMLCollection} elements The collection of the sidebar buttons
+ * @param {HTMLElement} galleryBtn The gallery button
+ * @returns {Promise<void>}
+ */
+mega.gallery.updateButtonsStates = async(elements, galleryBtn) => {
+    'use strict';
+
+    const galleryRoots = {
+        photos: true,
+        images: true,
+        videos: true
+    };
+    const { getItem } = await mega.gallery.prefs.init();
+
+    const res = getItem('web.locationPref');
+
+    if (!res || typeof res !== 'object' || !elements[0].querySelector) {
+        return;
+    }
+
+    const keys = Object.keys(res);
+
+    for (let i = 0; i < keys.length; i++) {
+        const pathKey = keys[i];
+
+        if (!galleryRoots[pathKey]) {
+            continue;
+        }
+
+        const btn = elements[0].querySelector(`.btn-galleries[data-link=${pathKey}]`);
+
+        if (btn) {
+            btn.dataset.locationPref = res[pathKey];
+        }
+
+        if (pathKey === 'photos') {
+            galleryBtn.dataset.locationPref = res[pathKey];
+        }
+    }
+};
+
 async function galleryUI(id) {
     'use strict';
 
@@ -2561,6 +2624,9 @@ async function galleryUI(id) {
     M.onTreeUIOpen(M.currentdirid);
 
     if (pfid) {
+        if (window.pfcol) {
+            return mega.gallery.albums.initPublicAlbum();
+        }
         id = !id || typeof id !== 'string' ? M.currentdirid : id;
     }
     else {
@@ -2590,7 +2656,7 @@ async function galleryUI(id) {
 
         gallery = mega.gallery.discovery;
     }
-    else {
+    else if (mega.gallery.sections[M.currentdirid]) {
         mega.gallery.titleControl.filterSection = M.currentdirid;
         mega.gallery.titleControl.title = mega.gallery.sections[M.currentdirid].title;
         mega.gallery.titleControl.icon = mega.gallery.sections[M.currentdirid].icon;
@@ -2859,7 +2925,7 @@ lazy(mega.gallery, 'sections', () => {
             icon: 'photos',
             root: 'photos',
             filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p)
-                && (mega.gallery.isImage(n) || mega.gallery.isGalleryVideo(n)),
+                && (mega.gallery.isImage(n) || mega.gallery.isVideo(n)),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdphotos]: {
@@ -2867,7 +2933,7 @@ lazy(mega.gallery, 'sections', () => {
             icon: 'photos',
             root: 'photos',
             filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p))
-                && (mega.gallery.isImage(n) || mega.gallery.isGalleryVideo(n)),
+                && (mega.gallery.isImage(n) || mega.gallery.isVideo(n)),
             title: l.gallery_from_cloud_drive
         },
         images: {
@@ -2895,28 +2961,28 @@ lazy(mega.gallery, 'sections', () => {
             path: 'videos',
             icon: 'videos',
             root: 'videos',
-            filterFn: n => mega.gallery.isGalleryVideo(n),
+            filterFn: n => mega.gallery.isVideo(n),
             title: l.gallery_all_locations
         },
         [mega.gallery.secKeys.cuvideos]: {
             path: mega.gallery.secKeys.cuvideos,
             icon: 'videos',
             root: 'videos',
-            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && mega.gallery.isGalleryVideo(n),
+            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && mega.gallery.isVideo(n),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdvideos]: {
             path: mega.gallery.secKeys.cdvideos,
             icon: 'videos',
             root: 'videos',
-            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && mega.gallery.isGalleryVideo(n),
+            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && mega.gallery.isVideo(n),
             title: l.gallery_from_cloud_drive
         },
         favourites: {
             path: 'favourites',
             icon: 'favourite-filled',
             root: 'favourites',
-            filterFn: n => mega.gallery.isImage(n) || mega.gallery.isGalleryVideo(n),
+            filterFn: n => mega.gallery.isImage(n) || mega.gallery.isVideo(n),
             title: l.gallery_favourites
         }
     };
@@ -3140,6 +3206,11 @@ lazy(mega.gallery, 'prefs', () => {
 
     const p = {
         init: async() => {
+            if (!u_attr) {
+                dump('Gallery preferences are disabled for guests...');
+                return;
+            }
+
             if (p.getItem) {
                 return p;
             }

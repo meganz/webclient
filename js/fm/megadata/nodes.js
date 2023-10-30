@@ -490,40 +490,42 @@ MegaData.prototype.addSelectedNodes = function(handles, clean) {
 
 /**
  * Checking if is the page is in Gallery section
- * @param {String} [path] Path to check or M.currentdirid
+ * @param {String} [path] Path to check or this.currentdirid
  * @returns {Boolean}
  */
 MegaData.prototype.isGalleryPage = function(path) {
     'use strict';
-    const customView = !path || path === M.currentdirid ? M.currentCustomView : M.isCustomView(path);
+    const customView = !path || path === this.currentdirid ? this.currentCustomView : this.isCustomView(path);
 
     return customView && customView.type === 'gallery';
 };
 
 /**
  * Checking if is the page is in Gallery section
- * @param {Number} [type] Type to check the page against: Any album (0), Albums main index (1), Specific album (2)
- * @param {String} [path] Path to check or M.currentdirid
+ * @param {Number} [type] Type to check the page against:
+ * 0 - Any album,
+ * 1 - Albums main index page
+ * 2 - A single album page (private or public)
+ * @param {String} [path] Path to check or this.currentdirid
  * @returns {Boolean}
  */
 MegaData.prototype.isAlbumsPage = function(type, path) {
     'use strict';
-    path = String(path || M.currentdirid);
-    const customView = path === M.currentdirid ? M.currentCustomView : M.isCustomView(path);
 
-    if (customView.type === 'albums') {
+    type |= 0;
 
-        switch (type | 0) {
-            case 0:
-                return true;
-            case 1:
-                return path === 'albums';
-            case 2:
-                return path.startsWith('albums/');
-        }
+    if (pfid && (!type || type === 2) && mega.gallery.albums && mega.gallery.albums.isPublic) {
+        return true;
     }
 
-    return false;
+    path = String(path || this.currentdirid);
+    const customView = path === this.currentdirid ? this.currentCustomView : this.isCustomView(path);
+
+    return customView.type === 'albums'
+        && !type
+        || (type === 1 && path === 'albums')
+        || (type === 2 && path.startsWith('albums/'))
+        || false;
 };
 
 /**
@@ -4463,6 +4465,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
  */
 MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes) {
     "use strict";
+    const {pfid, pfcol} = window;
 
     var _import = function(data) {
         M.onFileManagerReady(() => {
@@ -4472,6 +4475,13 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
                 $.selected = data[0];
                 $.onImportCopyNodes = data[1];
                 $.onImportCopyNodes.opSize = data[2];
+
+                // This is an album import dialog, entering $.albumImport mode
+                if (data[3] === '<pfcol>') {
+                    $.albumImport = true;
+                    mega.gallery.albumsRendered = false;
+                    MegaGallery.dbActionPassed = false;
+                }
 
                 if (d) {
                     console.log('Importing Nodes...', $.selected, $.onImportCopyNodes, data[2]);
@@ -4537,6 +4547,10 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
                         loadSubPage('fm');
                     };
 
+                    if (pfcol) {
+                        this.preparePublicSetImport(pfid, data);
+                    }
+
                     if (!sessionStorage.folderLinkImport || nodes.length > 6000) {
                         fallback();
                     }
@@ -4563,6 +4577,31 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
             delete $.clearCopyNodeAttr;
         });
     }
+};
+
+/**
+ * @param {String} pfid public-folder/link's ID to be used during the import
+ * @param {Array<(String|MegaNode[])>} data The array of selections and nodes to import
+ */
+MegaData.prototype.preparePublicSetImport = function(pfid, data) {
+    'use strict';
+    const [sel, nodes] = data;
+
+    if (sel[0] !== pfid) {
+        const n = M.d[pfid];
+        const nn = Object.create(null);
+
+        nn.t = 1;
+        nn.h = n.h;
+        nn.a = ab_to_base64(crypto_makeattr(n, nn));
+
+        for (let i = nodes.length; i--;) {
+            nodes[i].p = pfid;
+        }
+        nodes.unshift(nn);
+    }
+
+    data.push('<pfcol>');
 };
 
 /**

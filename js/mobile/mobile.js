@@ -345,6 +345,8 @@ var mobile = {
             }
         });
 
+        Object.defineProperty(ctx, 'checkLe' + 'ftStorageBlock', {value: nop});
+
         const tf = [
             "renderTree", "buildtree", "initTreePanelSorting",
             "treePanelType", "addTreeUI", "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen",

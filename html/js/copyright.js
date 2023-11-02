@@ -59,7 +59,7 @@ copyright.validateUrl = function(url) {
         }
     }
 
-    const match = path.match(/^[#/]*(file|folder|embed)[!#/]+([\w-]{8})\b/i);
+    const match = path.match(/^[#/]*(file|folder|embed|collection|album)[!#/]+([\w-]{8})\b/i);
     if (!match) {
         console.warn('Invalid url.', url);
         return null;
@@ -555,6 +555,10 @@ copyright.init_cndispute = function() {
                 country: $('.select.country select', '.dn-form').val(),
                 otherremarks: $('input.otherremarks', '.dn-form').val()
             };
+
+            if (['collection', 'album'].includes(handles[0])) {
+                requestParameters.collection = 1;
+            }
 
             api_req(requestParameters, {
                 callback: function(response) {

@@ -774,9 +774,6 @@ class MeetingsManager {
     if (meetingInfo.openInvite !== options.oi) {
       chatRoom.toggleOpenInvite();
     }
-    if (meetingInfo.topic !== topic) {
-      chatRoom.setRoomTitle(meetingInfo.topic, false);
-    }
   }
   cancelMeeting(scheduledMeeting, chatId) {
     return this.megaChat.plugins.chatdIntegration.cancelScheduledMeeting(scheduledMeeting, chatId);

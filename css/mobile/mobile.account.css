@@ -49,11 +49,13 @@
 .mega-mobile-settings.account .account-information h2 {
     font: var(--mobile-font-heading-h2);
     margin: 0;
+    line-break: anywhere;
 }
 
 .mega-mobile-settings.account .account-information span {
     font: var(--mobile-font-copy-regular);
     color: var(--mobile-text-primary);
+    line-break: anywhere;
 }
 
 .mega-mobile-settings.account .upgrade {

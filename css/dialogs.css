@@ -5420,6 +5420,75 @@ body.de .mega-dialog.contact-picker-widget {
 
 /* end credentials-warning-dialog */
 
+/* cancel-subscription-benefits */
+
+    .mega-dialog.cancel-subscription-benefits header {
+        padding: 24px 24px 12px;
+    }
+    .mega-dialog.cancel-subscription-benefits header h3 {
+        font: var(--text-h3);
+        text-align: left;
+    }
+    .mega-dialog.cancel-subscription-benefits .cancel-subscription-info {
+        margin-bottom: 20px;
+    }
+    .mega-dialog.cancel-subscription-benefits .cancel-subscription-benefits-content {
+        margin: 0 24px;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table {
+        border: 2px solid var(--surface-grey-2);
+        border-radius: 12px;
+        overflow: hidden;
+        color: var(--text-color-high);
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        background-color: var(--surface-grey-2);
+        padding: 0 24px;
+        height: 38px;
+        align-items: center;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        padding: 0 24px;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-header-content {
+        width: 100%;
+        display: flex;
+        font: var(--text-body1)
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-seperator {
+        border-top: 2px solid var(--surface-grey-2);
+        grid-column: 1 / 4;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-header-content.center {
+        justify-content: center;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-item {
+        display: flex;
+        align-items: center;
+        height: 32px;
+        font: var(--text-body2);
+        justify-content: center;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-item.title {
+        justify-content: flex-start;
+        font: var(--text-body2-bold)
+    }
+
+    .mega-dialog.cancel-subscription-benefits .features-table .center {
+        justify-self: center;
+    }
+    .mega-dialog.cancel-subscription-benefits footer {
+        padding: 43px 24px 24px;
+        display: flex;
+        align-items: flex-end;
+    }
+
+/* cancel-subscription-benefits end */
+
 /* cancel-subscription-st1 */
 
     .mega-dialog.cancel-subscription-st1 {

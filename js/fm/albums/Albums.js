@@ -1318,7 +1318,7 @@ lazy(mega.gallery, 'albums', () => {
         constructor(albumId, keepEnabled) {
             super({
                 ok: {
-                    label: l.add,
+                    label: l.album_done,
                     callback: () => {
                         const album = scope.albums.store[albumId];
                         this.confirmed = true;

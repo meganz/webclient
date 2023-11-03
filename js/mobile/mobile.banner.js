@@ -463,7 +463,7 @@ class MegaMobileBanner extends MegaMobileComponent {
                     this.actionButtonText = ctaText;
                     this.displayType = type;
                     this.icon = mobile.banner.icon[type];
-                    this.iconSize = type === 'advertisement' ? '48' : '';
+                    this.iconSize = type === 'advertisement' ? '48' : '24';
                     this.closeButton = typeof closeBtn === 'undefined' ? true : closeBtn;
                     this.isSystemWide = typeof systemWide === 'undefined' ? true : systemWide;
                 });

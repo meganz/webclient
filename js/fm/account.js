@@ -3455,7 +3455,7 @@ accountUI.fileManagement = {
             'use strict';
 
             // Temporarily hide versioning settings due to it not working correctly in MEGA Lite mode
-            if (mega.infinity) {
+            if (mega.lite) {
                 $('.js-file-version-settings', accountUI.$contentBlock).addClass('hidden');
                 return false;
             }

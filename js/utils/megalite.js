@@ -1,9 +1,19 @@
 /**
- * Functions for popping up a dialog to recommend MEGA Lite mode and other MEGA Lite related functionality.
- * Accesible externally via mega.lite.{functionName}
+ * Functions for popping up a dialog to recommend MEGA Lite mode and other related functionality.
+ * The MEGA Lite mode which has a bunch of visual changes for the user to show they are in this special mode and also
+ * hides various functionality which doesn't work. It is only available if the localStorage.megaLiteMode is on, or
+ * they are a Pro user AND have > 1.5M nodes AND their loading time is > 3 minutes.
+ * These functions are accesible externally via mega.lite.{functionName}
+ *
+ * @property {object|false} mega.lite
  */
 lazy(mega, 'lite', () => {
     'use strict';
+
+    // If the lite mode localStorage flag is not on, then all if (mega.lite) checks are false
+    if (!localStorage.megaLiteMode) {
+        return false;
+    }
 
     /** Timer to count how long the load is taking */
     let liteModeTimeoutId;
@@ -15,7 +25,8 @@ lazy(mega, 'lite', () => {
      */
     function recommendLiteMode() {
 
-        // Only Pro users can get the Lite mode and skip checking the remaining logic if already in Lite mode
+        // Only Pro users can get Lite mode and skip checking the remaining logic if already in Infinity or Lite mode
+        // NB: mega.infinity is the same mode but without any UI changes or options hidden (useful for future dev).
         if (!u_attr.p || mega.infinity) {
             return false;
         }
@@ -77,7 +88,7 @@ lazy(mega, 'lite', () => {
             if (res === false) {
 
                 // Flag to let us know we are in MEGA Lite mode
-                localStorage.mInfinity = '1';
+                localStorage.megaLiteMode = '1';
 
                 if (window.waitsc) {
                     // Stop the SC connection.
@@ -115,7 +126,7 @@ lazy(mega, 'lite', () => {
         $('.js-back-to-mega-button', topbarSelector).rebind('click.backtomega', () => {
 
             // Remove the local storage variable which triggers MEGA Lite mode to load
-            delete localStorage.mInfinity;
+            delete localStorage.megaLiteMode;
 
             // Store a log for statistics (User decided to go back to regular MEGA - Back to MEGA button)
             // Then reload the account back into regular MEGA

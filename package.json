@@ -66,9 +66,6 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.22.15",
-    "@types/react": "16.8.6",
-    "@typescript-eslint/eslint-plugin": "5.62.0",
-    "@typescript-eslint/parser": "5.62.0",
     "chai": "4.3.10",
     "eslint": "8.52.0",
     "eslint-plugin-compat": "4.2.0",
@@ -78,8 +75,8 @@
     "eslint-plugin-no-unsanitized": "4.0.2",
     "eslint-plugin-optimize-regex": "1.2.1",
     "eslint-plugin-react": "7.33.2",
-    "eslint-plugin-sonarjs": "0.21.0",
-    "eslint-plugin-unicorn": "48.0.1",
+    "eslint-plugin-sonarjs": "0.23.0",
+    "eslint-plugin-unicorn": "49.0.0",
     "htmlhint": "1.1.4",
     "jscpd": "3.5.10",
     "karma": "6.4.2",
@@ -93,14 +90,12 @@
     "karma-sinon": "1.0.5",
     "mocha": "10.2.0",
     "react-hot-loader": "4.13.1",
-    "sass": "1.69.4",
+    "sass": "1.69.5",
     "sass-loader": "13.3.2",
     "sinon": "15.0.3",
     "stylelint": "15.11.0",
     "stylelint-config-standard": "34.0.0",
     "stylelint-no-unsupported-browser-features": "7.0.0",
-    "ts-loader": "9.5.0",
-    "typescript": "5.2.2",
     "webpack-dev-server": "4.15.1"
   }
 }

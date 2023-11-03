@@ -162,6 +162,8 @@ mobile.uploadOverlay = {
     finish: function(ul) {
         'use strict';
 
+        eventlog(99678);
+
         const uploadTransferComponent = this.uploadTransfers[`ul_${ul.id}`];
 
         if (uploadTransferComponent) {

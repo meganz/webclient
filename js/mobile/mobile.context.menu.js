@@ -255,6 +255,8 @@ mBroadcaster.once('boot_done', () => {
                     return false;
                 }
 
+                eventlog(99915);
+
                 mobile.downloadOverlay.startDownload(nodeHandle);
             }
         },
@@ -432,6 +434,8 @@ mBroadcaster.once('boot_done', () => {
             subMenu: false,
             classNames: '',
             onClick: function(nodeHandle) {
+                eventlog(99914);
+
                 goToMobileApp(MegaMobileViewOverlay.getAppLink(nodeHandle));
             }
         },

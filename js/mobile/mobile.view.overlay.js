@@ -227,6 +227,8 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                 [
                     ['openapp-button', l.view_file_open_in_app, () => {
 
+                        eventlog(99912);
+
                         this.trigger('pauseStreamer');
                         goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
                     }]
@@ -236,10 +238,22 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         if (isLink) {
             return [
                 [
-                    ['download-button', l[58], () => {
+                    ['openapp-button', l.view_file_open_in_app, () => {
+
+                        eventlog(99912);
+
+                        this.trigger('pauseStreamer');
+                        goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
+                    }]
+                ],
+                [
+                    ['download-button', 'icon-download-thin', () => {
                         if (!validateUserAction()) {
                             return false;
                         }
+
+                        eventlog(99913);
+
                         this.trigger('pauseStreamer');
                         mobile.downloadOverlay.startDownload(this.nodeComponent.handle);
                         return false;
@@ -264,6 +278,9 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                         if (!validateUserAction()) {
                             return false;
                         }
+
+                        eventlog(99913);
+
                         this.trigger('pauseStreamer');
                         mobile.downloadOverlay.startDownload(this.nodeComponent.handle);
                         return false;
@@ -290,6 +307,9 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                     if (!validateUserAction()) {
                         return false;
                     }
+
+                    eventlog(99913);
+
                     this.trigger('pauseStreamer');
                     mobile.downloadOverlay.startDownload(this.nodeComponent.handle);
                     return false;

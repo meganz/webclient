@@ -17,7 +17,7 @@
     top: 0;
     transition: right 200ms ease-in-out, left 200ms ease-in-out, width 200ms ease-in-out, opacity 200ms ease-in-out;
     width: 256px;
-    z-index: 1120;
+    z-index: 1108;
 }
 
 .top-menu-popup.o-hidden {

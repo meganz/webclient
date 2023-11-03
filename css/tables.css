@@ -490,7 +490,7 @@
     position: sticky;   /* Shouldn't be changed as sticky isn't working on thead and tr on Chrome! */
     position: -webkit-sticky;
     top: 0;
-    z-index: 1112;
+    z-index: 1107;
 }
 .sticky-header-table-container.ps-container .ps-scrollbar-y-rail {
     margin: 36px 0 2px;

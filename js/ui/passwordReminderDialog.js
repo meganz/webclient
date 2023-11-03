@@ -398,6 +398,10 @@
 
         delete $.dialog;
 
+        if (is_mobile) {
+            eventlog(99853);
+        }
+
         loadSubPage('keybackup');
     };
 

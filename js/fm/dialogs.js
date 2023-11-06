@@ -2033,7 +2033,8 @@
                     mega.sets.copyNodesAndSet(selectedNodes, $.mcselected).catch(tell);
                 }
                 else {
-                    M.copyNodes(selectedNodes, $.mcselected).catch(tell);
+                    M.copyNodes(selectedNodes, $.mcselected)
+                        .catch((ex) => ex !== EBLOCKED && tell(ex));
                 }
             }
             else if (section === 'shared-with-me') {

@@ -92,10 +92,7 @@
         }
 
         // Save via mega.attr
-        this.savingPromise = this.save()
-            .finally(() => {
-                delete this.savingPromise;
-            });
+        return this.save(prop === 'lastLogin').catch(dump);
     };
 
     PasswordReminderAttribute.prototype.hasBeenMerged = function() {
@@ -114,13 +111,36 @@
         return vals.join(":");
     };
 
-    PasswordReminderAttribute.prototype.save = function() {
-        return new Promise((resolve, reject) => {
+    PasswordReminderAttribute.prototype.save = function(delayed) {
 
-            M.onFileManagerReady(() => {
-                mega.attr.set("prd", this.toString(), -2, true).then(resolve).catch(reject);
-            });
-        });
+        if (!this.savingPromise) {
+
+            const save = () => {
+                const data = this.toString();
+
+                return mega.attr.set2(null, 'prd', data, -2, true)
+                    .always(() => {
+                        if (data !== this.toString()) {
+
+                            return save();
+                        }
+                    })
+                    .finally(() => {
+                        delete this.savingPromise;
+                    });
+            };
+
+            if (delayed) {
+
+                this.savingPromise = tSleep(Math.max(delayed | 0, 3)).then(save);
+            }
+            else {
+
+                this.savingPromise = save();
+            }
+        }
+
+        return this.savingPromise;
     };
 
     PasswordReminderAttribute.prototype.loadFromAttribute = function() {

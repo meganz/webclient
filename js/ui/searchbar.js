@@ -165,12 +165,14 @@
         addFile: function(handle, isEditable) {
 
             // If we are in a public folder, or if not logged in, do not add the file
-            if (folderlink || !u_handle) {
+            if (is_mobile || folderlink || !u_handle) {
                 return;
             }
 
-            // In some cases, when previewing files, the dropdown still remains, hide it
-            $dropdownSearch.addClass('hidden');
+            // In some cases, when previewing files, the dropdown still remains, hide it, but check if its defined first
+            if ($dropdownSearch) {
+                $dropdownSearch.addClass('hidden');
+            }
 
             if (mega.config.get('showRecents') === 1) {
 

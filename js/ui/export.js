@@ -3000,7 +3000,7 @@ function logExportEvt(type, target) {
         });
 
         // If they've already agreed to the copyright warning (cws = copyright warning shown)
-        if (fmconfig.cws || folderlink) {
+        if (M.agreedToCopyrightWarning()) {
             // Go straight to Get Link dialog
             openGetLinkDialog();
             return false;

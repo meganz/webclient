@@ -4053,6 +4053,16 @@ div.checkboxOn {
 }
 /* End of Credit card billing address dialog */
 
+/* Copyright warning dialog */
+.copyright-warning-message {
+    display: flex;
+    flex-direction: column;
+}
+.copyright-warning-message > *:not(:last-child) {
+    margin-bottom: 16px;
+}
+/* End of Copyright warning dialog */
+
 /* OBQ sheet dialog */
 .obq-sheet-contents {
     display: flex;

@@ -856,12 +856,13 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
                     if (!n.t) {
                         nn.k = n.k;
                     }
+                    n.rr = src.p;
+
                     if (!(nn.a = createAttribute(n, nn))) {
 
                         console.warn(`Failed to create attribute for node ${n.h}, ignoring...`);
                         continue;
                     }
-                    n.rr = src.p;
 
                     // new node inherits handle, parent and type
                     nn.h = n.h;

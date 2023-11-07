@@ -157,7 +157,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
     hide() {
         this.domNode.classList.remove('active');
 
-        const fmlist = document.querySelector('#fmholder .file-manager-block .fm-list');
+        const fmlist = M.v.length > 0 && document.querySelector('#fmholder .file-manager-block .fm-list');
 
         if (fmlist) {
 

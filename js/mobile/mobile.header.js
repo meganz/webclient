@@ -345,31 +345,18 @@ class MegaMobileHeader extends MegaMobileComponent {
 
         const noTabletView = isPublicLink() || isPublickLinkV2() || page.startsWith('businesssignup')
             || page === 'keybackup';
-        const holderContainer = document.getElementById('holderContainer');
-
-        if (!holderContainer) {
-            if (d) {
-                console.error('something is wrong holder container not found');
-            }
-
-            return;
-        }
+        const mainPageLayout = document.getElementById('mainlayout');
 
         const _hide = () => {
 
-            const holderContainer = document.getElementById('holderContainer');
-            if (holderContainer) {
-                holderContainer.classList.add('no-tablet-layout');
-            }
+            const mainPageLayout = document.getElementById('mainlayout');
+            mainPageLayout.classList.add('no-tablet-layout');
             this.hide();
         };
 
         if (is_fm() || noTabletView) {
 
-            const holderContainer = document.getElementById('holderContainer');
-            if (holderContainer) {
-                holderContainer.classList[noTabletView ? 'add' : 'remove']('no-tablet-layout');
-            }
+            mainPageLayout.classList[noTabletView ? 'add' : 'remove']('no-tablet-layout');
 
             const type = MegaMobileHeader.getType();
 
@@ -399,11 +386,11 @@ class MegaMobileHeader extends MegaMobileComponent {
     static init(update) {
         MegaMobileTopMenu.init();
 
-        const holderContainer = document.getElementById('holderContainer');
+        const mainPageLayout = document.getElementById('mainlayout');
 
-        if (!mega.ui.header && holderContainer) {
+        if (!mega.ui.header && mainPageLayout) {
             mega.ui.header = new MegaMobileHeader({
-                parentNode: document.getElementById('holderContainer'),
+                parentNode: document.getElementById('mainlayout'),
                 componentClassname: 'mega-header',
                 prepend: true
             });

@@ -416,7 +416,7 @@ class MegaMobileBanner extends MegaMobileComponent {
 
         // Single alerts instant object
         mega.ui.alerts = new MegaMobileRack({
-            parentNode: document.getElementById('holderContainer'),
+            parentNode: document.getElementById('mainlayout'),
             componentClassname: 'banner-rack flow-up top',
             prependRack: true,
             childComponent: MegaMobileBanner,

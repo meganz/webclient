@@ -26,8 +26,7 @@ mobile.twofactor.settings = {
             return loadSubPage('login');
         }
 
-        document.querySelector('.holder-container .mobile.two-factor-page')
-            .classList.add('hidden');
+        document.querySelector('.main-layout .mobile.two-factor-page').classList.add('hidden');
 
         loadingDialog.show();
 

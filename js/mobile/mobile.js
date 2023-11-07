@@ -587,7 +587,7 @@ var mobile = {
 
         var $otherPages = $('#fmholder > div:not(.top-menu-popup)');
         var $excludes = $('.mobile.file-manager-block, .mobile.top-menu-popup, .mega-header, .mega-top-menu, '
-            + '.mobile-rack' , '#holderContainer');
+            + '.mobile-rack' , '#mainlayout');
 
         // If logged in
         if (typeof u_attr !== 'undefined') {
@@ -924,17 +924,6 @@ mBroadcaster.once('startMega:mobile', function() {
 
     // Add mobile class for adaptive features
     document.body.classList.add('mobile');
-
-    // holder container to have header, top menu, start/fm holder, banner,
-    const holderContainer = mCreateElement('div', {'id': 'holderContainer',
-                                                   'class': 'holder-container no-tablet-layout'});
-
-    const pageholder = document.getElementById('pageholder');
-    if (pageholder) {
-        pageholder.after(holderContainer);
-    }
-
-    holderContainer.append(...document.getElementsByClassName('fmholder'));
 
     var setBodyClass = function() {
 

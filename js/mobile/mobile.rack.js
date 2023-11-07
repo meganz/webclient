@@ -21,7 +21,7 @@ class MegaMobileRack extends MegaMobileComponent {
         super(options);
 
         // Move to top of list
-        if (options.prependRack && options.parentNode) {
+        if (options.prependRack) {
             options.parentNode.prepend(this.domNode);
         }
 

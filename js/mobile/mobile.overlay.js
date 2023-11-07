@@ -138,13 +138,8 @@ class MegaMobileOverlay extends MegaMobileComponent {
     hide() {
         this.domNode.classList.remove('active');
 
-        const holderContainer = document.getElementById('holderContainer');
-
-        if (holderContainer) {
-            holderContainer.classList.remove('fm-overlay');
-        }
-
-        document.getElementsByTagName('html')[0].classList.remove('overlayed');
+        document.getElementById('mainlayout').classList.remove('fm-overlay');
+        document.documentElement.classList.remove('overlayed');
     }
 
     clear() {

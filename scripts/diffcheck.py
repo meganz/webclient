@@ -467,12 +467,13 @@ def inspecthtml(file, ln, line, result):
     indent = ' ' * (len(file)+len(str(ln))+3)
 
     # check for hidden-less fm-dialogs
-    match = re.search(r'fm-dialog[\s"\']', line)
+    match = re.search(r'mega-dialog[\s"\']', line)
     if match and not re.search(r'hidden[\'"\s]', line):
         fatal += 1
-        result.append('{}:{}: {}\n{}^ Missing hidden class on fm-dialog.'.format(file, ln, line, indent))
-    if match and not re.search(r'=["\']fm-dialog', line):
-        result.append('{}:{}: {}\n{}^ for consistency, fm-dialog shall be placed as the first class.'.format(file, ln, line, indent))
+        result.append('{}:{}: {}\n{}^ Missing hidden class on mega-dialog.'.format(file, ln, line, indent))
+    if match and not re.search(r'=["\']mega-dialog', line):
+        msg = '{}:{}: {}\n{}^ for consistency, mega-dialog shall be placed as the first class.'
+        result.append(msg.format(file, ln, line, indent))
 
     # check for relative URLs without 'clickurl' class
     match = re.search(r'href\s*=\s*["\']?/', line)

@@ -3,10 +3,20 @@ lazy(mega, 'sets', () => {
     'use strict';
 
     /**
-     * This value is for caching isUsingLocalDB's result
+     * This value is for checking whether the DB has been already initialised
+     */
+    let isDbInitialised = false;
+
+    /**
+     * This value is for checking whether the DB can be queried
      * @type {Boolean}
      */
-    let isDBAvailable = false;
+    let isDbOperational = false;
+
+    /**
+     * A variable to store promise while the DB is being checked whether it is operational
+     */
+    let isDBChecking = null;
 
     /**
      * Storing all handlers from all subscribed sections
@@ -26,6 +36,11 @@ lazy(mega, 'sets', () => {
      */
     let dbQueue = [];
 
+    /**
+     * @type {Promise<void>|null}
+     */
+    let buildingTmp = null;
+
     const allowedAttrKeys = {
         n: true,
         c: true
@@ -38,11 +53,44 @@ lazy(mega, 'sets', () => {
         }
     };
 
-    const setDb = () => {
-        lazy(local, 'db', () => new MegaDexie('AESP', 'aesp', '', true, { s: '&id, cts, ts, u' }));
+    const checkDb = () => {
+        isDBChecking = new Promise((resolve) => {
+            if (isDbOperational) {
+                resolve(true);
+                return;
+            }
+
+            local.db.s.limit(1).toArray()
+                .then(() => {
+                    resolve(true);
+                })
+                .catch(() => {
+                    resolve(false);
+                })
+                .finally(() => {
+                    isDBChecking = null;
+                });
+        });
     };
 
-    setDb();
+    const setDb = () => {
+        if (isDbInitialised) {
+            return;
+        }
+
+        lazy(local, 'db', () => new MegaDexie('AESP', 'aesp', '', true, { s: '&id, cts, ts, u' }));
+        isDbInitialised = true;
+
+        checkDb();
+    };
+
+    const dbPrepare = async() => {
+        setDb();
+
+        if (isDBChecking) {
+            isDbOperational = await isDBChecking;
+        }
+    };
 
     /**
      * Runs the DB tasks in the transaction ensuring the consistency
@@ -51,8 +99,10 @@ lazy(mega, 'sets', () => {
      * @param {Object} data Data to add/update
      * @returns {void}
      */
-    const queueDbTask = (command, id, data) => {
-        if (!isDBAvailable) {
+    const queueDbTask = async(command, id, data) => {
+        await dbPrepare();
+
+        if (!isDbOperational) {
             return;
         }
 
@@ -103,22 +153,6 @@ lazy(mega, 'sets', () => {
         }, 500);
     };
 
-    let isDBChecking = new Promise((resolve) => {
-        local.db.s.limit(1).toArray()
-            .then(() => {
-                isDBAvailable = true;
-                resolve();
-            })
-            .catch(() => {
-                isDBAvailable = false;
-                resolve();
-            })
-            .finally(() => {
-                isDBChecking = null;
-                resolve();
-            });
-    });
-
     /**
      * Grouping the array by the unique id
      * @param {Object[]} array Array to convert
@@ -164,25 +198,51 @@ lazy(mega, 'sets', () => {
     };
 
     /**
+     * Wiping the cached values to re-render, in case something has been changed
+     * @returns {void}
+     */
+    const renderCleanup = () => {
+        if (!M.albums) {
+            mega.gallery.albumsRendered = false;
+            MegaGallery.dbactionPassed = false;
+        }
+    };
+
+    /**
      * Getting all sets from the database and storing them into the memory for the future use
      * @returns {Object[]}
      */
     const buildTmp = async() => {
+        await dbPrepare();
+
+        if (!isDbOperational) {
+            return {};
+        }
+
+        if (buildingTmp) {
+            await buildingTmp;
+        }
+
         const { tmpAesp, db } = local;
 
         if (tmpAesp.isCached) {
             return tmpAesp.s;
         }
 
-        if (isDBChecking) {
-            await isDBChecking;
-        }
+        buildingTmp = new Promise((resolve) => {
+            db.s.toArray()
+                .then((sets) => {
+                    tmpAesp.s = groupById(sets);
+                    tmpAesp.isCached = true;
+                })
+                .catch(dump)
+                .finally(() => {
+                    buildingTmp = null;
+                    resolve();
+                });
+        });
 
-        if (isDBAvailable) {
-            tmpAesp.s = groupById(await db.s.toArray());
-            tmpAesp.isCached = true;
-        }
-
+        await buildingTmp;
         return tmpAesp.s;
     };
 
@@ -221,7 +281,8 @@ lazy(mega, 'sets', () => {
      * @param {String} id Set id to retrieve
      * @returns {Promise}
      */
-    const getSetById = (id) => {
+    const getSetById = async(id) => {
+        await dbPrepare();
         return local.db.s.get(id);
     };
 
@@ -371,7 +432,9 @@ lazy(mega, 'sets', () => {
 
         local.tmpAesp.s[id] = payload;
 
-        if (isDBAvailable) {
+        await dbPrepare();
+
+        if (isDbOperational) {
             local.db.s.put(payload);
         }
 
@@ -411,9 +474,6 @@ lazy(mega, 'sets', () => {
      * @returns {void}
      */
     const copyNodesAndSet = async(selectedNodes, targetHandle) => {
-        // Clearing out the database connection established in the previous session
-        mega.sets.reopenDb();
-
         const tree = $.onImportCopyNodes;
         const [albumNode] = tree;
         const node = crypto_decryptnode({...albumNode});
@@ -558,7 +618,7 @@ lazy(mega, 'sets', () => {
          * @returns {void}
          */
         resetDB: async({ s, e, p }) => {
-            const { tmpAesp, db } = local;
+            const { tmpAesp } = local;
 
             tmpAesp.s = Object.create(null);
 
@@ -595,21 +655,12 @@ lazy(mega, 'sets', () => {
                 }
             }
 
-            if (isDBChecking) {
-                await isDBChecking;
-            }
+            await dbPrepare();
 
-            if (isDBAvailable) {
-                await db.s.clear();
+            if (isDbOperational && local.db) {
+                await local.db.s.clear();
                 queueDbTask('ba', '', Object.values(tmpAesp.s));
             }
-        },
-        reopenDb: () => {
-            if (local.db && local.db._state.openComplete) {
-                local.db.close();
-            }
-
-            setDb();
         },
         subscribe: (key, id, handler) => {
             if (!subscribers[key][id]) {
@@ -623,17 +674,20 @@ lazy(mega, 'sets', () => {
         parseAsp: async(payload) => {
             delete payload.a;
 
-            const { tmpAesp } = local;
+            await buildTmp();
+
+            const { tmpAesp: { s } } = local;
             const { id, at, ts } = payload;
-            const isExisting = tmpAesp.s[id];
-            const e = (isExisting) ? tmpAesp.s[id].e : {};
-            const p = (isExisting) ? tmpAesp.s[id].p : undefined;
+            const isExisting = s[id];
+            const e = (isExisting) ? s[id].e : {};
+            const p = (isExisting) ? s[id].p : undefined;
 
             payload.e = e;
             payload.p = p;
 
-            tmpAesp.s[id] = payload;
+            s[id] = payload;
 
+            renderCleanup();
             runSubscribedMethods('asp', payload);
 
             if (isExisting) { // The album is already stored, hence needs an update only
@@ -644,6 +698,8 @@ lazy(mega, 'sets', () => {
             }
         },
         parseAsr: async(payload) => {
+            await buildTmp();
+
             const { tmpAesp: { s } } = local;
             const { id } = payload;
 
@@ -651,40 +707,61 @@ lazy(mega, 'sets', () => {
                 delete s[id];
             }
 
+            renderCleanup();
             runSubscribedMethods('asr', payload);
             queueDbTask('d', id);
         },
         parseAss: async(payload) => {
+            await buildTmp();
+
             const { tmpAesp: { s } } = local;
             const { ph, ts, r, s: setId } = payload;
             const changes = (r === 1) ? undefined : { ph, ts };
 
+            renderCleanup();
 
             if (s[setId]) {
                 s[setId].p = changes;
+            }
+            else {
+                return; // The set must have been deleted already, nothing to update
             }
 
             runSubscribedMethods('ass', payload);
             queueDbTask('u', setId, { p: changes });
         },
         parseAep: async(payload) => {
+            await buildTmp();
+
             const { tmpAesp: { s } } = local;
             const { id, s: setId } = payload;
             delete payload.a;
 
+            renderCleanup();
+
             if (s[setId]) {
                 s[setId].e[id] = payload;
+            }
+            else {
+                return; // The set must have been deleted already, nothing to update
             }
 
             runSubscribedMethods('aep', payload);
             queueDbTask('u', setId, { [`e.${id}`]: payload });
         },
         parseAer: async(payload) => {
+            await buildTmp();
+
             const { tmpAesp: { s } } = local;
             const { id, s: setId } = payload;
 
+            renderCleanup();
+
             if (s[setId] && s[setId].e[id]) {
                 delete s[setId].e[id];
+            }
+            else {
+                return; // The set must have been deleted already, nothing to update
             }
 
             runSubscribedMethods('aer', payload);

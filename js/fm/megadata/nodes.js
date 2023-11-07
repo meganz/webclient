@@ -4593,6 +4593,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
  */
 MegaData.prototype.preparePublicSetImport = function(pfid, data) {
     'use strict';
+
     const [sel, nodes] = data;
 
     if (sel[0] !== pfid) {

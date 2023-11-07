@@ -203,38 +203,38 @@
 
 /* Tablet >= 769px */
 @media only screen and (min-width: 769px) {
-    .holder-container .mega-header .mobile-hide-tablet,
-    .holder-container:not(.no-tablet-layout) .mega-header .top-block,
-    .holder-container .mega-header .search-wrapper .js-btncloseSearch {
+    .main-layout .mega-header .mobile-hide-tablet,
+    .main-layout:not(.no-tablet-layout) .mega-header .top-block,
+    .main-layout .mega-header .search-wrapper .js-btncloseSearch {
         display: none;
     }
 
-    .holder-container:not(.no-tablet-layout) .mega-header .bottom-block .block {
+    .main-layout:not(.no-tablet-layout) .mega-header .bottom-block .block {
         flex-flow: row nowrap;
     }
 
-    .holder-container:not(.no-tablet-layout) .mega-header .bottom-block .block .nav-navigation {
+    .main-layout:not(.no-tablet-layout) .mega-header .bottom-block .block .nav-navigation {
         order: 0;
         margin-bottom: 0;
     }
 
-    .holder-container:not(.no-tablet-layout) .mega-header .bottom-block .block .heading {
+    .main-layout:not(.no-tablet-layout) .mega-header .bottom-block .block .heading {
         order: 1;
         margin-inline-end: 0;
         -webkit-margin-end: 0;
     }
 
-    .holder-container:not(.no-tablet-layout) .mega-header .bottom-block .block .nav-actions {
+    .main-layout:not(.no-tablet-layout) .mega-header .bottom-block .block .nav-actions {
         order: 2;
         margin-bottom: 0;
     }
 
-    .holder-container:not(.no-tablet-layout) .mega-header .bottom-block .back {
+    .main-layout:not(.no-tablet-layout) .mega-header .bottom-block .back {
         -webkit-padding-end: 16px;
         padding-inline-end: 16px;
     }
 
-    .holder-container .mega-header .search-wrapper {
+    .main-layout .mega-header .search-wrapper {
         width: 30%;
         padding: 2px 0;
         right: 72px;
@@ -243,17 +243,17 @@
         opacity: 1;
     }
 
-    .rtl .holder-container .mega-header .search-wrapper {
+    .rtl .main-layout .mega-header .search-wrapper {
         left: 72px;
         right: auto;
     }
 
-    .holder-container .mega-header .search-wrapper.visible {
+    .main-layout .mega-header .search-wrapper.visible {
         transition: none;
     }
 
     @supports (display: -webkit-box) {
-        .holder-container:not(.no-tablet-layout) .mega-header h1 {
+        .main-layout:not(.no-tablet-layout) .mega-header h1 {
             -webkit-line-clamp: 1;
         }
     }

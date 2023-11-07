@@ -14,7 +14,7 @@ mobile.cloud = {
         var $otherPages = $('> div:not(.hidden)', '#fmholder');
         var $excludes = $(
             '.mobile.file-manager-block, .mobile.top-menu-popup, .mega-header, .mega-top-menu, '
-            + '.mobile-rack', '#holderContainer');
+            + '.mobile-rack', '#mainlayout');
 
         // Render the file manager header, folders, files and footer
         this.fmEmptyState();

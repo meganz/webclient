@@ -112,10 +112,7 @@ mobile.keyDecryption = {
             }
         });
 
-        const startHolder = document.getElementById('startholder');
-        if (startHolder) {
-            startholder.append(this.domNode);
-        }
+        document.getElementById('startholder').append(this.domNode);
 
         // If the previous folder key was incorrect, show an error message for them to try again
         if (previousKeyIncorrect) {

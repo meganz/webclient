@@ -24,7 +24,7 @@ class MobileMegaRender {
 
         this.numInsertedDOMNodes = 0;
         this.nodeMap = Object.create(null);
-        this.container = document.querySelector('#fmholder .file-manager-block .fm-list');
+        this.container = document.getElementById('file-manager-list-container');
 
         if (this.container) {
             // grid view is not available for shared items page

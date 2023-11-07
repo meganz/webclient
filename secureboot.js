@@ -613,7 +613,7 @@ if (!browserUpdate) try
 
     // If dark mode flag is enabled, change styling
     if (localStorage.getItem('darkMode') === '1') {
-        document.getElementsByTagName('html')[0].classList.add('dark-mode');
+        document.documentElement.classList.add('dark-mode');
     }
 }
 catch(e) {

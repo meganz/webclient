@@ -312,7 +312,7 @@ mBroadcaster.once('boot_done', () => {
 
                 // Show share link overlay if the user has already agreed
                 // to the copyright warning (cws = copyright warning shown)
-                if (fmconfig.cws || folderlink) {
+                if (M.agreedToCopyrightWarning()) {
                     mobile.linkManagement.showOverlay(nodeHandle);
                 }
                 else {

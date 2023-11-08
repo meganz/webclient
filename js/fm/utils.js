@@ -2453,6 +2453,32 @@ MegaUtils.prototype.validatePhoneNumber = function(phoneNumber, countryCode) {
     return phoneNumber;
 };
 
+/**
+ * Tells whether the used does have to agree to the copyright warning before proceeding.
+ * @returns {Boolean} value.
+ */
+MegaUtils.prototype.agreedToCopyrightWarning = function() {
+    'use strict';
+
+    if (pfid) {
+        // No need under folder-links, copyright agents are retrieving links there
+        return true;
+    }
+
+    if (mega.config.get('cws') | 0) {
+        // They did.
+        return true;
+    }
+
+    if (Object.keys((this.su || !1).EXP || {}).length > 0) {
+        // rely on the presence of public-links.
+        mega.config.set('cws', 1);
+        return true;
+    }
+
+    return false;
+};
+
 MegaUtils.prototype.noSleep = async function(stop, title) {
     'use strict';
     // Based on https://github.com/richtr/NoSleep.js

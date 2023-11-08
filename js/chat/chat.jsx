@@ -395,6 +395,14 @@ Chat.prototype.init = promisify(function(resolve, reject) {
         .catch(reject);
 });
 
+Chat.prototype.showUpgradeDialog = function() {
+    return is_extension ?
+        // `An update is available`, `MEGA Chat has been upgraded and it will now only be supported in...`
+        msgDialog('warningb', l[1900], l[8841]) :
+        // `An update is available`, `MEGA Chat has been upgraded and requires a reload. Do you reload...`
+        msgDialog('confirmation', l[1900], l[8840], '', cb => cb && location.reload());
+};
+
 Chat.prototype._syncChats = function() {
     if (!this.is_initialized) {
         return;

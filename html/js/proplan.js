@@ -1605,6 +1605,11 @@ function completeProLogin(result) {
 
 async function checkPlanStorage(currentStored, planNum) {
     'use strict';
+
+    // If the user is purchasing a Pro Flexi account, they will be able to get extra storage
+    if (planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+        return true;
+    }
     return pro.loadMembershipPlans().then(() => {
         const plan = pro.membershipPlans.find(plan => {
             return plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === planNum;

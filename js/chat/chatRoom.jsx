@@ -2030,6 +2030,10 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
         return this.showMissingUnifiedKeyDialog();
     }
 
+    if (this.options.w) {
+        return megaChat.showUpgradeDialog();
+    }
+
     this.meetingsLoading = {
         title: l.joining /* `Joining` */,
         audio,
@@ -2118,6 +2122,10 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
 
     if (this.hasInvalidKeys()) {
         return this.showMissingUnifiedKeyDialog();
+    }
+
+    if (this.options.w) {
+        return megaChat.showUpgradeDialog();
     }
 
     this.meetingsLoading = {

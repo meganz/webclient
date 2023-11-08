@@ -340,7 +340,6 @@ lazy(mega, 'sets', () => {
             dump('Cannot create the set on empty nodes...');
             return;
         }
-        loadingDialog.show('SetImport');
 
         await buildTmp();
 
@@ -427,6 +426,7 @@ lazy(mega, 'sets', () => {
             if (name === null) {
                 return;
             }
+
             const newName = getUniqueFolderName(name, targetHandle);
 
             if (node.name !== newName) {
@@ -441,6 +441,8 @@ lazy(mega, 'sets', () => {
         }
 
         const handles = await M.copyNodes(selectedNodes, targetHandle, false, tree);
+
+        loadingDialog.show('SetImport');
 
         return copySetFromHandles(handles, name);
     };

@@ -833,7 +833,14 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
 
     if (tree.opSize) {
 
-        await this.checkGoingOverStorageQuota(tree.opSize);
+        await this.checkGoingOverStorageQuota(tree.opSize)
+            .catch((ex) => {
+                if (ex === EGOINGOVERQUOTA) {
+                    // don't show an additional dialog for this error
+                    throw EBLOCKED;
+                }
+                throw ex;
+            });
     }
     const createAttribute = tryCatch((n, nn) => ab_to_base64(crypto_makeattr(n, nn)));
 

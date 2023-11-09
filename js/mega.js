@@ -4113,7 +4113,10 @@ function fmviewmode(id, e)
     var viewmodes = {};
     if (typeof fmconfig.viewmodes !== 'undefined')
         viewmodes = fmconfig.viewmodes;
-    if (e)
+    if (e === 2) {
+        viewmodes[id] = 2;
+    }
+    else if (e)
         viewmodes[id] = 1;
     else
         viewmodes[id] = 0;

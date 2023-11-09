@@ -6,11 +6,7 @@ class GalleryEmptyDiscovery extends MEmptyPad {
 
     setContents() {
         this.el.append(MEmptyPad.createIcon('section-icon sprite-fm-theme icon-gallery-photos'));
-        this.el.append(MEmptyPad.createTxt(l.gallery_media_discovery, 'fm-empty-cloud-txt'));
-        this.el.append(MEmptyPad.createTxt(l.gallery_get_start, 'fm-empty-description'));
-
-        this.appendOptions([
-            [l.gallery_get_start_instruction_4, 'sprite-fm-mono icon-camera-uploads']
-        ]);
+        this.el.append(MEmptyPad.createTxt(l.gallery_no_photos, 'fm-empty-cloud-txt empty-md-title'));
+        this.el.append(MEmptyPad.createTxt(l.md_empty_descr, 'fm-empty-description empty-md-description'));
     }
 }

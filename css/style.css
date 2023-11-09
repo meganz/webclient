@@ -13892,7 +13892,3 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 .vertical-align-top {
     vertical-align: top;
 }
-
-.fm-main:not(.active-folder-link) .media-view {
-    display: none;
-}

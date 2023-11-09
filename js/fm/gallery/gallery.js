@@ -1169,6 +1169,9 @@ class MegaGallery {
 
     initDynamicList() {
         const container = document.querySelector('.gallery-view-scrolling');
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
 
         this.slideShowCloseLister = mBroadcaster.addListener('slideshow:close', () => {
             delay('galleryCloseSlideShow', () => {
@@ -1439,7 +1442,7 @@ class MegaGallery {
         if (!this.beforePageChangeListener) {
             this.beforePageChangeListener = mBroadcaster.addListener('beforepagechange', tpage => {
                 const pageId = page.replace('fm/', '');
-                if (this.inPreview && pageId.length < 5 ? M.RootID === M.currentdirid : pageId === M.currentdirid) {
+                if (this.inPreview && (pageId.length < 5 ? M.RootID === M.currentdirid : pageId === M.currentdirid)) {
                     return;
                 }
 
@@ -1507,7 +1510,7 @@ class MegaGallery {
             }
         });
 
-        if (!pfid && this.isDiscovery) {
+        if (!pfid && M.currentdirid.substr(0, 9) === 'discovery') {
             $('.gallery-close-discovery', '.gallery-tabs-bl')
                 .removeClass('hidden')
                 .rebind('click.exitDiscovery', () => {
@@ -2271,7 +2274,7 @@ mega.gallery.resetAll = () => {
 mega.gallery.showEmpty = (type) => {
     'use strict';
 
-    if (pfid) {
+    if (!M.c[M.currentdirid] || !Object.values(M.c[M.currentdirid]).length) {
         $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
         return;
     }
@@ -2334,7 +2337,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
     const { workerBranch } = MegaGallery;
 
     const isLocationCorrect = () => {
-        if (pfid || M.isGalleryPage() || M.isAlbumsPage()) {
+        if (pfid || M.isGalleryPage() || M.isAlbumsPage() || M.gallery) {
             return true;
         }
 
@@ -2624,11 +2627,12 @@ async function galleryUI(id) {
 
     M.onTreeUIOpen(M.currentdirid);
 
-    if (pfid) {
+    if (pfid || M.gallery && !M.isGalleryPage() && !M.isAlbumsPage()) {
         if (window.pfcol) {
             return mega.gallery.albums.initPublicAlbum();
         }
         id = !id || typeof id !== 'string' ? M.currentdirid : id;
+        $('.view-links', '.gallery-tabs-bl').removeClass('hidden');
     }
     else {
         $('.view-links', '.gallery-tabs-bl').addClass('hidden');
@@ -2772,7 +2776,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             if (!blocks[key]) {
                 return;
             }
-            const weAreOnGallery = pfid || M.isGalleryPage() || M.isAlbumsPage();
+            const weAreOnGallery = pfid || M.isGalleryPage() || M.isAlbumsPage() || M.gallery;
 
             if (d) {
                 console.assert(weAreOnGallery, `This should not be running!`);
@@ -3047,9 +3051,18 @@ lazy(mega.gallery, 'mdReporter', () => {
         sameRun(runId) {
             return runId === this.runId && document.visibilityState !== 'hidden';
         },
-        report(skipReset) {
-            if (!skipReset && this.runId) {
-                this.stop(); // Stopping the previously initialised reporter's run
+        /**
+         * @param {Boolean} isCarryOn Whether to carry on the paused session or not (e.g. when visibility changes)
+         * @returns {void}
+         */
+        report(isCarryOn) {
+            if (!isCarryOn) {
+                eventlog(99900);
+
+                // We need to stop the previously initialised reporter's run if any
+                if (this.runId) {
+                    this.stop();
+                }
             }
 
             this.runId = Date.now();

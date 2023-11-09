@@ -1430,6 +1430,11 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
 
     if (target) {
         target.classList.add('selected');
+        if ((fmconfig.uiviewmode | 0) && fmconfig.viewmode === 2 ||
+            typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined'
+            && fmconfig.viewmodes[id] === 2) {
+            target.classList.add('on-gallery');
+        }
     }
 
     if (!ignoreScroll) {

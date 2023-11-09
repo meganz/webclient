@@ -392,15 +392,6 @@ MegaData.prototype.menuItems = async function menuItems() {
         delete items['.open-in-location'];
     }
 
-    if (selNode.t && !folderlink && M.currentrootid !== M.RubbishID &&
-        M.currentrootid !== 'out-shares' && M.currentrootid !== 'shares' &&
-        M.currentrootid !== 'public-links' && M.currentdirid !== 'recents' &&
-        M.currentrootid !== 's4' &&
-        $.selected.length === 1 &&
-        (!M.isGalleryPage() || selNode.h !== M.currentCustomView.nodeID)) {
-        items['.open-gallery'] = 1;
-    }
-
     if ((sourceRoot === M.RootID
          || sourceRoot === 's4' || M.isDynPage(M.currentrootid)) && !folderlink) {
 
@@ -429,7 +420,6 @@ MegaData.prototype.menuItems = async function menuItems() {
             delete items['.play-item'];
             delete items['.preview-item'];
             delete items['.edit-file-item'];
-            delete items['.open-gallery'];
             delete items['.open-item'];
             items['.dispute-item'] = 1;
         }
@@ -531,7 +521,6 @@ MegaData.prototype.menuItems = async function menuItems() {
     if (M.currentdirid === 'file-requests') {
         delete items['.move-item'];
         delete items['.copy-item'];
-        delete items['.open-gallery'];
         delete items['.open-cloud-item'];
         delete items['.open-in-location'];
         delete items['.getlink-item'];

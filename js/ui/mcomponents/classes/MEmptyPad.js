@@ -6,7 +6,7 @@ class MEmptyPad extends MComponent {
 
     static createTxt(text, className) {
         const el = document.createElement('div');
-        el.setAttribute('class', className);
+        el.className = className;
         el.textContent = text;
 
         return el;

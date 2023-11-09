@@ -190,41 +190,20 @@ var emailchange = (function() {
             return;
         }
 
-        /**
-         * After we updated the user's data, we verify if they typed their password correctly or not.
-         */
-        function verifyUserPasswordCallback() {
+        $input = $input || $('#verify-password');
+        const password = $input.val();
 
-            $input = $input || $('#verify-password');
-            var password = $input.val();
-
-            $input.val('');
-
-            // Verify if a given password is the user's password.
-            // If everything is correct, we attempt to verify the email.
-            security.getDerivedEncryptionKey(password)
-                .then(function(derivedKey) {
-                    continueEmailVerification(derivedKey);
-                })
-                .catch(function(ex) {
-                    console.warn(ex);
-                    continueEmailVerification('');
-                });
-        }
-
+        $input.val('');
         $('.login-register-input.password').addClass('loading').removeClass('incorrect');
 
-        // User-Get
-        // Get the user information from the session. We call it here
-        // because we need to be sure we're always getting the latest user's
-        // password
-        api_req({ a: 'ug' }, {
-            callback: function(res) {
-
-                // Update the user's data and then verify their password
-                u_checklogin3a(res, { checkloginresult: verifyUserPasswordCallback });
-            }
-        });
+        security.verifyUserPassword(password)
+            .then((derivedKey) => {
+                continueEmailVerification(derivedKey);
+            })
+            .catch((ex) => {
+                console.warn(ex);
+                continueEmailVerification('');
+            });
     };
 
     return ns;

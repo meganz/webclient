@@ -189,7 +189,7 @@ mobile.messageOverlay = (() => {
                 };
                 confirmButton = {
                     ...buttonTemplate,
-                    text: l[81], // OK
+                    text: l.ok_button, // OK, got it!
                 };
                 buttons = [];
 

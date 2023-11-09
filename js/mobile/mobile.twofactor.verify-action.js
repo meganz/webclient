@@ -47,17 +47,15 @@ mobile.twofactor.verifyAction = {
         'use strict';
 
         // Cache selectors
-        var $pinCode = mobile.twofactor.verifyAction.$page.find('.two-factor-seed-input input');
-        var $verifyButton = mobile.twofactor.verifyAction.$page.find('.two-factor-verify-btn');
+        var $pinCodeInput = $('.two-factor-seed-input input', this.$page);
 
         // On Verify button click/tap
-        $verifyButton.off('tap').on('tap', function() {
-
-            // Get the Google Authenticator PIN code from the user
-            var pinCode = $.trim($pinCode.val());
+        $('.two-factor-verify-btn', this.$page).rebind('tap.verify', () => {
 
             // Send the PIN code to the callback
-            completeCallback(pinCode);
+            completeCallback($.trim($pinCodeInput.val()));
+            $pinCodeInput.val('');
+            this.$page.addClass('hidden');
 
             // Prevent double taps
             return false;

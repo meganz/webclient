@@ -1073,6 +1073,9 @@ function accountUI() {
     else if (subpath === 'security/change-email') {
         mobile.settings.account.changeEmail.init();
     }
+    else if (subpath.startsWith('security/verify')) {
+        mobile.settings.account.verifyEmail.init();
+    }
     else if (subpath === 'notifications') {
         mobile.settings.account.notifications.init();
     }

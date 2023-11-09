@@ -71,7 +71,7 @@ mBroadcaster.once('startMega', function() {
 
     if (is_mobile) {
 
-        const usingMobPages = ['placeholder', 'change_email', 'register', 'key', 'support', 'keybackup',
+        const usingMobPages = ['placeholder', 'register', 'key', 'support', 'keybackup',
                                'disputenotice', 'download', 'reset', 'propay', 'login'];
 
         for (let i = usingMobPages.length; i--;) {
@@ -831,11 +831,11 @@ function init_page() {
         window.location.replace('https://blog.mega.io');
     }
     else if (page.substr(0, 6) == 'verify') {
-        parsepage(pages.change_email);
         if (is_mobile) {
-            mobile.verify.init();
+            mobile.settings.account.verifyEmail.init();
         }
         else {
+            parsepage(pages.change_email);
             emailchange.main();
         }
     }

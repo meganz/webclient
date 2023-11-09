@@ -1243,7 +1243,7 @@ mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
     'use strict';
 
     var dups = M.checkForDuplication(id);
-    if (dups && (dups.files || dups.folders)) {
+    if (dups && (dups.files || dups.folders) && !M.gallery) {
         var $bar = $('.fm-notification-block.duplicated-items-found').addClass('visible');
 
         $('.fix-me-btn', $bar).rebind('click.df', function() {

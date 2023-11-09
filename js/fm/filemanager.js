@@ -790,7 +790,8 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
 
-        var viewValue = $(this).hasClass('listing-view') ? 0 : 1;
+        const viewIcon = $(this);
+        var viewValue = viewIcon.hasClass('media-view') ? 2 : viewIcon.hasClass('listing-view') ? 0 : 1;
 
         if (fmconfig.uiviewmode | 0) {
             mega.config.set('viewmode', viewValue);
@@ -803,9 +804,6 @@ FileManager.prototype.initFileManagerUI = function() {
         if (folderlink && String(M.currentdirid).startsWith('search')) {
             M.viewmode = viewValue;
             M.renderMain();
-        }
-        else if (folderlink && $(this).hasClass('media-view')) {
-            galleryUI();
         }
         else {
             M.openFolder(M.currentdirid, true).then(reselect.bind(null, 1));
@@ -1254,6 +1252,14 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
         if (M.previousdirid !== M.currentdirid && !refresh) {
             // do not retain selected nodes unless re-rendering the same view
             $.selected = [];
+        }
+        // or re-rendering the same view but previous view is media discovery view
+        else if (!M.gallery && !$('#gallery-view').hasClass('hidden')) {
+            for (let i = $.selected.length - 1; i >= 0; i--) {
+                if (!M.v.includes(M.d[$.selected[i]])) {
+                    $.selected.splice(i, 1);
+                }
+            }
         }
 
         /**
@@ -3459,7 +3465,8 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder,' +
         '.shared-blocks-view, .out-shared-blocks-view, .fm-empty-s4-bucket')
         .rebind('contextmenu.fm', function(e) {
-            if (page === "fm/links") { // Remove context menu option from filtered view
+            // Remove context menu option from filtered view and media discovery view
+            if (page === "fm/links" || M.gallery) {
                 return false;
             }
             $(this).find('.data-block-view').removeClass('ui-selected');
@@ -3705,7 +3712,8 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,.fm-empty-cloud,' +
         '.fm-empty-folder,.fm.shared-folder-content, .fm-empty-s4-bucket').rebind('contextmenu.fm', e => {
-        if (page === "fm/links" && page === "fm/faves") { // Remove context menu option from filtered view
+        // Remove context menu option from filtered view and media discovery view
+        if (page === "fm/links" && page === "fm/faves" || M.gallery) {
             return false;
         }
             $('.fm-blocks-view .data-block-view').removeClass('ui-selected');

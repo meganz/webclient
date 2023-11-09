@@ -333,6 +333,19 @@
         $('.fm-notification-block.duplicated-items-found').removeClass('visible');
         $('.fm-right-header .fm-breadcrumbs-wrapper').removeClass('hidden');
 
+        if (folderlink && !pfcol || id !== M.RootID && M.currentrootid === M.RootID) {
+            this.gallery = 0;
+            if ((fmconfig.uiviewmode | 0) && fmconfig.viewmode === 2 ||
+                typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined'
+                && fmconfig.viewmodes[id] === 2) {
+                this.gallery = 1;
+            }
+            $('.fm-files-view-icon').filter('.media-view').removeClass('hidden');
+        }
+        else {
+            $('.fm-files-view-icon').filter('.media-view').addClass('hidden');
+        }
+
         if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
@@ -441,6 +454,11 @@
                 }
             }
             this.viewmode = viewmode;
+
+            // Default to Thumbnail View When Media Discovery View Not Available
+            if (this.viewmode === 2) {
+                this.viewmode = 1;
+            }
 
             if (is_mobile) {
                 // Ignore sort modes set in desktop until that is supported in mobile...

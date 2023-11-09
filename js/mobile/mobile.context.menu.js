@@ -362,42 +362,49 @@ mBroadcaster.once('boot_done', () => {
             icon: 'sprite-mobile-fm-mono icon-link-off-02-thin-outline',
             subMenu: false,
             classNames: '',
-            onClick: function(nodeHandle) {
+            onClick: async function(nodeHandle) {
                 if (!validateUserAction()) {
                     return false;
                 }
 
                 eventlog(99850);
 
-                // Display a sheet
-                mega.ui.sheet.show({
-                    name: 'remove-link',
-                    type: 'modal',
-                    showClose: true,
-                    icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline warning-icon',
-                    title: l.mobile_remove_node_link_sheet_title,
-                    contents: [l.mobile_remove_node_link_sheet_msg],
-                    actions: [
-                        {
-                            type: 'normal',
-                            className: 'secondary',
-                            text: l.mobile_dont_remove_link_button,
-                            onClick: () => {
-                                mega.ui.sheet.hide();
+                if (mega.config.get('nowarnpl')) {
+                    loadingDialog.show();
+                    await mobile.linkManagement.manageLink(true, nodeHandle);
+                    loadingDialog.hide();
+                }
+                else {
+                    // Display a sheet
+                    mega.ui.sheet.show({
+                        name: 'remove-link',
+                        type: 'modal',
+                        showClose: true,
+                        icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline warning-icon',
+                        title: l.mobile_remove_node_link_sheet_title,
+                        contents: [l.mobile_remove_node_link_sheet_msg],
+                        actions: [
+                            {
+                                type: 'normal',
+                                className: 'secondary',
+                                text: l.mobile_dont_remove_link_button,
+                                onClick: () => {
+                                    mega.ui.sheet.hide();
+                                }
+                            },
+                            {
+                                type: 'normal',
+                                text: l.mobile_remove_link_button,
+                                onClick: async() => {
+                                    mega.ui.sheet.hide();
+                                    loadingDialog.show();
+                                    await mobile.linkManagement.manageLink(true, nodeHandle);
+                                    loadingDialog.hide();
+                                }
                             }
-                        },
-                        {
-                            type: 'normal',
-                            text: l.mobile_remove_link_button,
-                            onClick: async() => {
-                                mega.ui.sheet.hide();
-                                loadingDialog.show();
-                                await mobile.linkManagement.manageLink(true, nodeHandle);
-                                loadingDialog.hide();
-                            }
-                        }
-                    ]
-                });
+                        ]
+                    });
+                }
             }
         },
         '.file-request-create': {

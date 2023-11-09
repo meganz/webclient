@@ -130,21 +130,19 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
 
         // Show view file overlay
         this.domNode.classList.add('active');
-        const fmlist = document.querySelector('#fmholder .file-manager-block .fm-list');
+        const fmlist = document.getElementById('file-manager-list-container');
 
         if (fmlist) {
             fmlist.classList.add('hidden');
         }
 
-        const holderContainer = document.getElementById('holderContainer');
+        const mainPageLayout = document.getElementById('mainlayout');
 
-        if (holderContainer) {
-            if (isLink) {
-                holderContainer.classList.add('fm-overlay-link');
-            }
-            else {
-                holderContainer.classList.add('fm-overlay-view');
-            }
+        if (isLink) {
+            mainPageLayout.classList.add('fm-overlay-link');
+        }
+        else {
+            mainPageLayout.classList.add('fm-overlay-view');
         }
 
         mobile.appBanner.updateBanner(nodeHandle);
@@ -157,7 +155,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
     hide() {
         this.domNode.classList.remove('active');
 
-        const fmlist = document.querySelector('#fmholder .file-manager-block .fm-list');
+        const fmlist = M.v.length > 0 && document.getElementById('file-manager-list-container');
 
         if (fmlist) {
 
@@ -167,11 +165,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             $(window).trigger('resize');
         }
 
-        const holderContainer = document.getElementById('holderContainer');
-
-        if (holderContainer) {
-            holderContainer.classList.remove('fm-overlay-view', 'fm-overlay-link');
-        }
+        document.getElementById('mainlayout').classList.remove('fm-overlay-view', 'fm-overlay-link');
 
         if (mobile.cloud.bottomBar) {
             mobile.cloud.bottomBar.show();
@@ -227,6 +221,8 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                 [
                     ['openapp-button', l.view_file_open_in_app, () => {
 
+                        eventlog(99912);
+
                         this.trigger('pauseStreamer');
                         goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
                     }]
@@ -236,10 +232,22 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         if (isLink) {
             return [
                 [
-                    ['download-button', l[58], () => {
+                    ['openapp-button', l.view_file_open_in_app, () => {
+
+                        eventlog(99912);
+
+                        this.trigger('pauseStreamer');
+                        goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
+                    }]
+                ],
+                [
+                    ['download-button', 'icon-download-thin', () => {
                         if (!validateUserAction()) {
                             return false;
                         }
+
+                        eventlog(99913);
+
                         this.trigger('pauseStreamer');
                         mobile.downloadOverlay.startDownload(this.nodeComponent.handle);
                         return false;
@@ -264,6 +272,9 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                         if (!validateUserAction()) {
                             return false;
                         }
+
+                        eventlog(99913);
+
                         this.trigger('pauseStreamer');
                         mobile.downloadOverlay.startDownload(this.nodeComponent.handle);
                         return false;
@@ -290,6 +301,9 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                     if (!validateUserAction()) {
                         return false;
                     }
+
+                    eventlog(99913);
+
                     this.trigger('pauseStreamer');
                     mobile.downloadOverlay.startDownload(this.nodeComponent.handle);
                     return false;
@@ -370,10 +384,6 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
 
         // Create and handle a specific overlay for file view
         // Note that this will be displayed inside the file-manager-block
-        const holderContainer = document.getElementById('holderContainer');
-        if (!holderContainer) {
-            return;
-        }
         mega.ui.viewerOverlay = new MegaMobileViewOverlay({
             parentNode: document.querySelector('.file-manager-block'),
             componentClassname: 'mega-overlay mega-overlay-view',

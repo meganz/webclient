@@ -1318,7 +1318,7 @@ lazy(mega.gallery, 'albums', () => {
         constructor(albumId, keepEnabled) {
             super({
                 ok: {
-                    label: l.add,
+                    label: l.album_done,
                     callback: () => {
                         const album = scope.albums.store[albumId];
                         this.confirmed = true;
@@ -2028,7 +2028,14 @@ lazy(mega.gallery, 'albums', () => {
     Object.defineProperty(AlbumNameDialog, 'prompt', {
         value(albumId, names) {
             return new Promise((resolve) => {
-                const dialog = new AlbumNameDialog(albumId, (name) => resolve(name), () => resolve(null));
+                const dialog = new AlbumNameDialog(
+                    albumId,
+                    (name) => {
+                        dialog.hide();
+                        return resolve(name);
+                    },
+                    () => resolve(null)
+                );
 
                 if (names) {
                     dialog.setNames(names);

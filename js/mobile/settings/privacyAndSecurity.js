@@ -5,7 +5,7 @@ mobile.settings.privacyAndSecurity = Object.create(mobile.settingsHelper, {
      * @returns {boolean} True if cached, undefined otherwise.
      */
     init: {
-        value: async function() {
+        value: function() {
 
             'use strict';
 
@@ -15,11 +15,6 @@ mobile.settings.privacyAndSecurity = Object.create(mobile.settingsHelper, {
             else {
                 this.domNode = this.generatePage('settings-privacy-security');
             }
-
-            const isTwoFactorEnabled = await mobile.twofactor.isEnabledForAccount();
-            const twoFactorLink = isTwoFactorEnabled
-                ? 'fm/account/security/two-factor-authentication/verify-disable'
-                : 'fm/account/security/two-factor-authentication/intro';
 
             /* First Section */
             const menuItems1 = [
@@ -32,7 +27,7 @@ mobile.settings.privacyAndSecurity = Object.create(mobile.settingsHelper, {
                 {
                     text: l['2fa_menu'],
                     icon: 'sprite-mobile-fm-mono icon-shield-thin-outline',
-                    href: twoFactorLink,
+                    href: 'fm/account/security/two-factor-authentication',
                     eventLog: 99839
                 },
                 {

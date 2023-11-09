@@ -18,9 +18,7 @@ class MegaMobileEmptyState extends MegaMobileOverlay {
     }
 
     hide(container) {
-        if (this.domNode) {
-            this.domNode.classList.add('hidden');
-        }
+        this.domNode.classList.add('hidden');
 
         if (container) {
             container.classList.remove('hidden');

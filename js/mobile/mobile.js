@@ -587,7 +587,7 @@ var mobile = {
 
         var $otherPages = $('#fmholder > div:not(.top-menu-popup)');
         var $excludes = $('.mobile.file-manager-block, .mobile.top-menu-popup, .mega-header, .mega-top-menu, '
-            + '.mobile-rack' , '#holderContainer');
+            + '.mobile-rack' , '#mainlayout');
 
         // If logged in
         if (typeof u_attr !== 'undefined') {
@@ -925,17 +925,6 @@ mBroadcaster.once('startMega:mobile', function() {
     // Add mobile class for adaptive features
     document.body.classList.add('mobile');
 
-    // holder container to have header, top menu, start/fm holder, banner,
-    const holderContainer = mCreateElement('div', {'id': 'holderContainer',
-                                                   'class': 'holder-container no-tablet-layout'});
-
-    const pageholder = document.getElementById('pageholder');
-    if (pageholder) {
-        pageholder.after(holderContainer);
-    }
-
-    holderContainer.append(...document.getElementsByClassName('fmholder'));
-
     var setBodyClass = function() {
 
         if (mobile.orientation === 'landscape') {
@@ -1108,23 +1097,8 @@ function accountUI() {
     else if (subpath === 'security/backup-key') {
         mobile.settings.backup.init();
     }
-    else if (subpath.startsWith('security/two-factor-authentication')) {
-
-        if (subpath.includes('intro')) {
-            mobile.twofactor.intro.init();
-        }
-        else if (subpath.includes('verify-setup')) {
-            mobile.twofactor.verifySetup.init();
-        }
-        else if (subpath.includes('setup')) {
-            mobile.twofactor.setup.init();
-        }
-        else if (subpath.includes('verify-disable')) {
-            mobile.twofactor.verifyDisable.init();
-        }
-        else {
-            loadSubPage('fm/account/security/two-factor-authentication/intro','override');
-        }
+    else if (subpath === 'security/two-factor-authentication') {
+        mobile.twofactor.settings.init();
     }
     else if (subpath.startsWith('sms')) {
 

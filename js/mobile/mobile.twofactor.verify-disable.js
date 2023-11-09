@@ -21,6 +21,9 @@ mobile.twofactor.verifyDisable = {
             return false;
         }
 
+        // Clear setup steps
+        mobile.twofactor.settings.setupStep = false;
+
         // Cache selector
         this.$page = $('.mobile.two-factor-page.verify-disable-page');
 
@@ -69,7 +72,7 @@ mobile.twofactor.verifyDisable = {
                     // The Two-Factor has already been disabled
                     if (response === ENOENT) {
                         mobile.messageOverlay.show(l[19217], l[19218]).then(() => {
-                            loadSubPage('fm/account/');
+                            loadSubPage('fm/account/security');
                         });
                     }
                     else if (response < 0) {

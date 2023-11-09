@@ -402,8 +402,8 @@ function init_page() {
     // Remove pro class when user come back from pro page
     document.body.classList.remove('business', 'bottom-pages', 'old', 'pro', 'mega-lite-mode');
 
-    // Add class to hide/show various elements in MEGA Lite mode
-    if (mega.infinity) {
+    // Add mega-lite-mode class to hide/show various elements in MEGA Lite mode
+    if (mega.lite) {
         document.body.classList.add('mega-lite-mode');
     }
 
@@ -1518,6 +1518,17 @@ function init_page() {
         test(page.substr(4));
     }
 
+    // An URL to let users force load MEGA Lite mode (e.g. for users with large accounts and difficulty getting in,
+    // but are below the threshold that would normally prompt them to try MEGA Lite i.e. > 1.5 million nodes).
+    else if (page.substr(0, 12) === 'loadmegalite') {
+
+        localStorage.megaLiteMode = '1';
+
+        loadSubPage('login');
+
+        return location.reload();
+    }
+
     // New multi-discount handling with discount promotion page e.g.
     // /discountpromoJ2iPNEWqiTM-yhsuGkOToh or short sale URLs e.g. /s/blackfriday
     else if (page.substr(0, 13) === 'discountpromo' || page.substr(0, 2) === 's/') {
@@ -1926,7 +1937,7 @@ function topbarUI(holderId) {
     }
 
     // Initialise the Back to MEGA button (only shown if in MEGA Lite mode)
-    if (mega.infinity) {
+    if (mega.lite) {
         mega.lite.initBackToMegaButton();
     }
 

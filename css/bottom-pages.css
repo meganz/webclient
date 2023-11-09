@@ -402,7 +402,10 @@ html.gbot {
 .right-txt-align {
     text-align: right;
 }
-.fmholder, #fmholder {
+
+.fmholder,
+#fmholder,
+body:not(.loading) #mainlayout {
     height: 100%;
     width: 100%;
     background-color: var(--surface-main);

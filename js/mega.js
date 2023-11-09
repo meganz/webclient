@@ -2588,9 +2588,9 @@ async function fetchfm(sn) {
     if (fmdb && mega.infinity) {
         payload.inc = parseInt(localStorage.inclvl) | 1;
     }
-    else if (!pfid && 'lite' in mega) {
+    else if (!pfid && mega.lite) {
         // Decide whether to show MEGA Lite mode dialog or not
-        mega.lite.recommendLiteMode();
+        tryCatch(() => mega.lite.recommendLiteMode())();
     }
 
     return api.req(payload, options)
@@ -2598,7 +2598,7 @@ async function fetchfm(sn) {
             if (!mega.infinity) {
                 decWorkerPool.cleanup();
 
-                if (!pfid && 'lite' in mega) {
+                if (!pfid && mega.lite) {
                     mega.lite.abort();
                 }
             }
@@ -4113,7 +4113,10 @@ function fmviewmode(id, e)
     var viewmodes = {};
     if (typeof fmconfig.viewmodes !== 'undefined')
         viewmodes = fmconfig.viewmodes;
-    if (e)
+    if (e === 2) {
+        viewmodes[id] = 2;
+    }
+    else if (e)
         viewmodes[id] = 1;
     else
         viewmodes[id] = 0;

@@ -2100,6 +2100,7 @@ accountUI.plan = {
                 'use strict';
 
                 // Cache some selectors
+                this.$benefitsCancelDialog = $('.cancel-subscription-benefits');
                 this.$dialog = $('.cancel-subscription-st1');
                 this.$dialogSuccess = $('.cancel-subscription-st2');
                 this.$accountPageCancelButton = $('.btn-cancel-sub');
@@ -2146,8 +2147,18 @@ accountUI.plan = {
 
                 this.$options = this.$dialog.find('.label-wrap');
 
-                // Show the dialog
-                this.$dialog.removeClass('hidden');
+                // If the user has experiment flag, add them to experiment
+                if (typeof mega.flags.ab_dbbuc !== 'undefined') {
+                    api.req({'a': 'abta', c: 'ab_dbbuc'});
+                }
+
+                // Show benefits dialog before cancellation dialog if user has experiment flag
+                if (mega.flags.ab_dbbuc && !u_attr.pf && !u_attr.b) {
+                    this.displayBenefits();
+                }
+                else {
+                    this.$dialog.removeClass('hidden');
+                }
                 this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
                 // Init textarea scrolling
@@ -2186,6 +2197,85 @@ accountUI.plan = {
                 this.$cancelReason.removeClass('error');
                 this.$textarea.val('');
                 $('.cancel-option', this.$options).addClass('radioOff').removeClass('radioOn');
+            },
+
+            fillBenefits: async function($keepPlanBtn) {
+
+                'use strict';
+
+                const callback = async(data) => {
+                    let planDuration = data.scycle;
+                    let subscription = data.slevel;
+                    if (!planDuration || !subscription) {
+                        await api.req({a: 'uq', pro: u_attr.p}).then(res => {
+                            planDuration = res.result.scycle;
+                            subscription = res.result.slevel;
+                        });
+                    }
+
+                    // If plan duration is not an expected value, skip the benefits dialog
+                    if (planDuration !== '1 M' && planDuration !== '1 Y') {
+                        this.$dialog.removeClass('hidden');
+                        return;
+                    }
+
+                    const duration = planDuration === '1 Y' ? 12 : 1;
+
+                    const plan = pro.membershipPlans.find(plan =>
+                        (plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === subscription)
+                        && (plan[pro.UTQA_RES_INDEX_MONTHS] === duration));
+
+                    const proPlanName = pro.getProPlanName(subscription);
+                    const freeStorage = bytesToSize(20 * 1024 * 1024 * 1024, 0);
+                    const proStorage = bytesToSize(plan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
+                    const freeTransfer = l['1149'];
+                    const proTransfer = bytesToSize(plan[pro.UTQA_RES_INDEX_TRANSFER] * 1073741824, 0);
+                    const $cancelDialog = this.$benefitsCancelDialog;
+
+                    $('.pro-storage', $cancelDialog).text(proStorage);
+                    $('.free-storage', $cancelDialog).text(freeStorage);
+                    $('.pro-transfer', $cancelDialog).text(proTransfer);
+                    $('.free-transfer', $cancelDialog).text(freeTransfer);
+                    $('.plan-name', $cancelDialog).text(proPlanName);
+                    $('.rewind-free', $cancelDialog).text(mega.icu.format(l.days_chat_history_plural, 30));
+
+                    $('span', $keepPlanBtn)
+                        .text(l.cancel_pro_keep_current_plan.replace('%1', pro.getProPlanName(subscription)));
+
+                    $cancelDialog.removeClass('hidden');
+                };
+
+                M.accountData(callback);
+            },
+
+            displayBenefits: function() {
+
+                'use strict';
+
+                const {$benefitsCancelDialog, $dialog, $backgroundOverlay} = this;
+
+                const $closeBtn = $('.js-close', $benefitsCancelDialog);
+                const $continueBtn = $('.js-continue', $benefitsCancelDialog);
+                const $keepPlanBtn = $('.js-keep-plan', $benefitsCancelDialog);
+
+                const closeBenefits = () => {
+                    $benefitsCancelDialog.addClass('hidden');
+                    $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+                };
+
+                $closeBtn.rebind('click', closeBenefits);
+                $keepPlanBtn.rebind('click', closeBenefits);
+
+                $continueBtn.rebind('click', () => {
+                    $benefitsCancelDialog.addClass('hidden');
+                    $dialog.removeClass('hidden');
+                });
+                loadingDialog.show();
+                pro.loadMembershipPlans(() => {
+                    this.fillBenefits($keepPlanBtn).then(() => {
+                        loadingDialog.hide();
+                    });
+                });
             },
 
             /**
@@ -3365,7 +3455,7 @@ accountUI.fileManagement = {
             'use strict';
 
             // Temporarily hide versioning settings due to it not working correctly in MEGA Lite mode
-            if (mega.infinity) {
+            if (mega.lite) {
                 $('.js-file-version-settings', accountUI.$contentBlock).addClass('hidden');
                 return false;
             }

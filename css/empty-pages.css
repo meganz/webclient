@@ -42,6 +42,9 @@
     font: var(--text-h0);
     margin-top: 8px;
 }
+.fm-empty-cloud-txt.empty-md-title {
+    font-weight: bold;
+}
 .fm-empty-description {
     color: var(--text-color-medium);
     font: var(--text-body1);
@@ -69,6 +72,9 @@
     padding: 1px 20px 29px;
     font: var(--text-body1);
     color: var(--text-color-medium);
+}
+.fm-empty-description.empty-md-description {
+    max-width: 480px;
 }
 .fm-empty-options {
     display: flex;

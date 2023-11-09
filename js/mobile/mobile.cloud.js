@@ -14,7 +14,7 @@ mobile.cloud = {
         var $otherPages = $('> div:not(.hidden)', '#fmholder');
         var $excludes = $(
             '.mobile.file-manager-block, .mobile.top-menu-popup, .mega-header, .mega-top-menu, '
-            + '.mobile-rack', '#holderContainer');
+            + '.mobile-rack', '#mainlayout');
 
         // Render the file manager header, folders, files and footer
         this.fmEmptyState();
@@ -371,16 +371,22 @@ mobile.cloud = {
         let actions = [];
 
         if (pfcol) {
-            actions = ['openapp-button', l.view_file_open_in_app,
-                       () => goToMobileApp(MegaMobileViewOverlay.getAppLink(node.h))];
+            actions = ['openapp-button', l.view_file_open_in_app,() => {
+                eventlog(99912);
+                goToMobileApp(MegaMobileViewOverlay.getAppLink(node.h));
+            }];
         }
         else if (downloadSupport) {
-            actions = ['download-button', l[864],
-                       () => mobile.downloadOverlay.startDownload(node.h)];
+            actions = ['download-button', l[864], () => {
+                eventlog(99913);
+                mobile.downloadOverlay.startDownload(node.h);
+            }];
         }
         else {
-            actions = ['openapp-button', l.view_file_open_in_app,
-                       () => goToMobileApp(MegaMobileViewOverlay.getAppLink(node.h))];
+            actions = ['openapp-button', l.view_file_open_in_app, () => {
+                eventlog(99912);
+                goToMobileApp(MegaMobileViewOverlay.getAppLink(node.h));
+            }];
         }
 
         this.bottomBar = new MegaMobileBottomBar({

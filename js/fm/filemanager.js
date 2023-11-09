@@ -790,7 +790,8 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
 
-        var viewValue = $(this).hasClass('listing-view') ? 0 : 1;
+        const viewIcon = $(this);
+        var viewValue = viewIcon.hasClass('media-view') ? 2 : viewIcon.hasClass('listing-view') ? 0 : 1;
 
         if (fmconfig.uiviewmode | 0) {
             mega.config.set('viewmode', viewValue);
@@ -803,9 +804,6 @@ FileManager.prototype.initFileManagerUI = function() {
         if (folderlink && String(M.currentdirid).startsWith('search')) {
             M.viewmode = viewValue;
             M.renderMain();
-        }
-        else if (folderlink && $(this).hasClass('media-view')) {
-            galleryUI();
         }
         else {
             M.openFolder(M.currentdirid, true).then(reselect.bind(null, 1));
@@ -1255,6 +1253,14 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
             // do not retain selected nodes unless re-rendering the same view
             $.selected = [];
         }
+        // or re-rendering the same view but previous view is media discovery view
+        else if (!M.gallery && !$('#gallery-view').hasClass('hidden')) {
+            for (let i = $.selected.length - 1; i >= 0; i--) {
+                if (!M.v.includes(M.d[$.selected[i]])) {
+                    $.selected.splice(i, 1);
+                }
+            }
+        }
 
         /**
          * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
@@ -1510,7 +1516,7 @@ FileManager.prototype.initContextUI = function() {
 
         // If MEGA Lite mode and the selection contains a folder, hide the regular download option (only zip allowed),
         // otherwise this throws an error about downloading an empty folder then downloads as a zip anyway.
-        if (mega.infinity && mega.lite.containsFolderInSelection($.selected)) {
+        if (mega.lite && mega.lite.containsFolderInSelection($.selected)) {
             $(c + '.download-standart-item').addClass('hidden');
             return false;
         }
@@ -1537,7 +1543,7 @@ FileManager.prototype.initContextUI = function() {
         var c = this.className;
 
         // If MEGA Lite mode and attempting to download a folder(s) by clicking on the Download item, disable the click
-        if (mega.infinity && mega.lite.containsFolderInSelection($.selected)) {
+        if (mega.lite && mega.lite.containsFolderInSelection($.selected)) {
             return false;
         }
 
@@ -3459,7 +3465,8 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder,' +
         '.shared-blocks-view, .out-shared-blocks-view, .fm-empty-s4-bucket')
         .rebind('contextmenu.fm', function(e) {
-            if (page === "fm/links") { // Remove context menu option from filtered view
+            // Remove context menu option from filtered view and media discovery view
+            if (page === "fm/links" || M.gallery) {
                 return false;
             }
             $(this).find('.data-block-view').removeClass('ui-selected');
@@ -3705,7 +3712,8 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,.fm-empty-cloud,' +
         '.fm-empty-folder,.fm.shared-folder-content, .fm-empty-s4-bucket').rebind('contextmenu.fm', e => {
-        if (page === "fm/links" && page === "fm/faves") { // Remove context menu option from filtered view
+        // Remove context menu option from filtered view and media discovery view
+        if (page === "fm/links" && page === "fm/faves" || M.gallery) {
             return false;
         }
             $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
@@ -4484,7 +4492,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.gallery-view').addClass('hidden');
     }
 
-    if (M.previousdirid && M.isAlbumsPage(0, M.previousdirid)) {
+    if (M.previousdirid && M.isAlbumsPage(0, M.previousdirid)
+        || !$('#albums-view', $('.fm-right-files-block')).hasClass('hidden')) {
         if (M.isGalleryPage()) {
             mega.gallery.albums.disposeInteractions();
         }
@@ -4492,7 +4501,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             mega.gallery.albums.grid.clear();
         }
         else {
-            $('.albums-view', $('.fm-right-files-block')).addClass('hidden');
+            $('#albums-view', $('.fm-right-files-block')).addClass('hidden');
 
             if (mega.gallery.albums) {
                 mega.gallery.albums.disposeAll();

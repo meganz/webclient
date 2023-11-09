@@ -17,7 +17,7 @@ mobile.twofactor.verifyLogin = {
 
         // Check for the entered email, password and remember me checkbox setting, if it doesn't
         // exist then they may have refreshed the page, so go back to the Login page.
-        if (security.login.email === null && security.login.password) {
+        if (security.login.email === null && security.login.password || typeof u_attr !== 'undefined') {
             loadSubPage('login');
             return false;
         }

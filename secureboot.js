@@ -613,7 +613,7 @@ if (!browserUpdate) try
 
     // If dark mode flag is enabled, change styling
     if (localStorage.getItem('darkMode') === '1') {
-        document.getElementsByTagName('html')[0].classList.add('dark-mode');
+        document.documentElement.classList.add('dark-mode');
     }
 }
 catch(e) {
@@ -923,7 +923,12 @@ Object.defineProperty(mega, 'active', {
 
 /** @property mega.infinity */
 lazy(mega, 'infinity', function() {
-    return mega.flags.inf > 0 || !!localStorage.mInfinity;
+    if (is_livesite && localStorage.mInfinity) {
+        // @todo Remove in ~2 months.
+        delete localStorage.mInfinity;
+        localStorage.megaLiteMode = 1;
+    }
+    return mega.flags.inf > 0 || !!localStorage.mInfinity || !!localStorage.megaLiteMode;
 });
 
 /** @property mega.viewID */

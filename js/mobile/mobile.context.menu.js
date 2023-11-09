@@ -255,6 +255,8 @@ mBroadcaster.once('boot_done', () => {
                     return false;
                 }
 
+                eventlog(99915);
+
                 mobile.downloadOverlay.startDownload(nodeHandle);
             }
         },
@@ -308,7 +310,51 @@ mBroadcaster.once('boot_done', () => {
                     return false;
                 }
 
-                mobile.linkManagement.showOverlay(nodeHandle);
+                // Show share link overlay if the user has already agreed
+                // to the copyright warning (cws = copyright warning shown)
+                if (M.agreedToCopyrightWarning()) {
+                    mobile.linkManagement.showOverlay(nodeHandle);
+                }
+                else {
+                    // Otherwise show the copyright warning sheet first
+                    const contentsDiv = document.createElement('div');
+                    contentsDiv.className = 'copyright-warning-message';
+
+                    const warningPartOne = document.createElement('div');
+                    warningPartOne.textContent = l[7647];
+                    const warningPartTwo = document.createElement('div');
+                    warningPartTwo.textContent = l[7648];
+
+                    contentsDiv.append(warningPartOne, warningPartTwo);
+
+                    mega.ui.sheet.show({
+                        name: 'copyright-warning',
+                        type: 'modal',
+                        showClose: true,
+                        icon: 'sprite-mobile-fm-mono icon-copyright warning-icon',
+                        title: l[7696],
+                        contents: [contentsDiv],
+                        actions: [
+                            {
+                                type: 'normal',
+                                className: 'secondary',
+                                text: l[7646], // I disagree
+                                onClick: () => {
+                                    mega.ui.sheet.hide();
+                                }
+                            },
+                            {
+                                type: 'normal',
+                                text: l[7645], // I agree
+                                onClick: () => {
+                                    mega.ui.sheet.hide();
+                                    mega.config.set('cws', 1);
+                                    mobile.linkManagement.showOverlay(nodeHandle);
+                                }
+                            }
+                        ]
+                    });
+                }
             }
         },
         '.removelink-item': {
@@ -432,6 +478,8 @@ mBroadcaster.once('boot_done', () => {
             subMenu: false,
             classNames: '',
             onClick: function(nodeHandle) {
+                eventlog(99914);
+
                 goToMobileApp(MegaMobileViewOverlay.getAppLink(nodeHandle));
             }
         },

@@ -416,7 +416,7 @@ class MegaMobileBanner extends MegaMobileComponent {
 
         // Single alerts instant object
         mega.ui.alerts = new MegaMobileRack({
-            parentNode: document.getElementById('holderContainer'),
+            parentNode: document.getElementById('mainlayout'),
             componentClassname: 'banner-rack flow-up top',
             prependRack: true,
             childComponent: MegaMobileBanner,
@@ -463,7 +463,7 @@ class MegaMobileBanner extends MegaMobileComponent {
                     this.actionButtonText = ctaText;
                     this.displayType = type;
                     this.icon = mobile.banner.icon[type];
-                    this.iconSize = type === 'advertisement' ? '48' : '';
+                    this.iconSize = type === 'advertisement' ? '48' : '24';
                     this.closeButton = typeof closeBtn === 'undefined' ? true : closeBtn;
                     this.isSystemWide = typeof systemWide === 'undefined' ? true : systemWide;
                 });

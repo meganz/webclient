@@ -233,11 +233,9 @@ class MegaMobileTopMenu extends MegaMobileComponent {
 
     static init() {
 
-        const holderContainer = document.getElementById('holderContainer');
-
-        if (!mega.ui.topmenu && holderContainer) {
+        if (!mega.ui.topmenu) {
             mega.ui.topmenu = new MegaMobileTopMenu({
-                parentNode: document.getElementById('holderContainer'),
+                parentNode: document.getElementById('mainlayout'),
                 componentClassname: 'mega-top-menu',
                 prepend: true
             });

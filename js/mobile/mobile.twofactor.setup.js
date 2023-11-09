@@ -21,6 +21,9 @@ mobile.twofactor.setup = {
             return false;
         }
 
+        // Set setup step to navigate between the pages
+        mobile.twofactor.settings.setupStep = 1;
+
         // Cache selector
         this.$page = $('.mobile.two-factor-page.setup-page');
 
@@ -103,7 +106,7 @@ mobile.twofactor.setup = {
             mobile.twofactor.setup.$page.addClass('hidden');
 
             // Render the Verify Setup page
-            loadSubPage('fm/account/security/two-factor-authentication/verify-setup');
+            mobile.twofactor.verifySetup.init();
             return false;
         });
     },

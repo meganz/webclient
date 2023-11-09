@@ -163,6 +163,18 @@ class MegaMobileHeader extends MegaMobileComponent {
                     mobile.settingsHelper.currentPage.hide();
                 }
 
+                // @todo: Refactor back button logic. `history.back` is incorrect here
+                if (M.currentdirid === 'account/security') {
+                    return loadSubPage('fm/account/settings');
+                }
+                if (M.currentdirid === 'account/settings') {
+                    return loadSubPage('fm');
+                }
+
+                if (M.currentdirid.includes('two-factor-authentication')) {
+                    return mobile.twofactor.settings.previousPage();
+                }
+
                 history.back();
             }
             else {
@@ -333,31 +345,18 @@ class MegaMobileHeader extends MegaMobileComponent {
 
         const noTabletView = isPublicLink() || isPublickLinkV2() || page.startsWith('businesssignup')
             || page === 'keybackup';
-        const holderContainer = document.getElementById('holderContainer');
-
-        if (!holderContainer) {
-            if (d) {
-                console.error('something is wrong holder container not found');
-            }
-
-            return;
-        }
+        const mainPageLayout = document.getElementById('mainlayout');
 
         const _hide = () => {
 
-            const holderContainer = document.getElementById('holderContainer');
-            if (holderContainer) {
-                holderContainer.classList.add('no-tablet-layout');
-            }
+            const mainPageLayout = document.getElementById('mainlayout');
+            mainPageLayout.classList.add('no-tablet-layout');
             this.hide();
         };
 
         if (is_fm() || noTabletView) {
 
-            const holderContainer = document.getElementById('holderContainer');
-            if (holderContainer) {
-                holderContainer.classList[noTabletView ? 'add' : 'remove']('no-tablet-layout');
-            }
+            mainPageLayout.classList[noTabletView ? 'add' : 'remove']('no-tablet-layout');
 
             const type = MegaMobileHeader.getType();
 
@@ -387,11 +386,11 @@ class MegaMobileHeader extends MegaMobileComponent {
     static init(update) {
         MegaMobileTopMenu.init();
 
-        const holderContainer = document.getElementById('holderContainer');
+        const mainPageLayout = document.getElementById('mainlayout');
 
-        if (!mega.ui.header && holderContainer) {
+        if (!mega.ui.header && mainPageLayout) {
             mega.ui.header = new MegaMobileHeader({
-                parentNode: document.getElementById('holderContainer'),
+                parentNode: document.getElementById('mainlayout'),
                 componentClassname: 'mega-header',
                 prepend: true
             });
@@ -818,10 +817,7 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/refer/redeem': l[23403],
         'fm/account/security': l.mobile_settings_privacy_security_title,
         'fm/account/security/backup-key': l[8839],
-        'fm/account/security/two-factor-authentication/intro': l[19194],
-        'fm/account/security/two-factor-authentication/setup': l[19194],
-        'fm/account/security/two-factor-authentication/verify-setup': l[19194],
-        'fm/account/security/two-factor-authentication/verify-disable': l[19194],
+        'fm/account/security/two-factor-authentication': l[19194],
         'fm/account/security/session-history': l[429],
         'fm/account/settings': l[823],
         'fm/account/file-management': l[16159],

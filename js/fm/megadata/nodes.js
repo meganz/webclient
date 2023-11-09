@@ -833,7 +833,14 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
 
     if (tree.opSize) {
 
-        await this.checkGoingOverStorageQuota(tree.opSize);
+        await this.checkGoingOverStorageQuota(tree.opSize)
+            .catch((ex) => {
+                if (ex === EGOINGOVERQUOTA) {
+                    // don't show an additional dialog for this error
+                    throw EBLOCKED;
+                }
+                throw ex;
+            });
     }
     const createAttribute = tryCatch((n, nn) => ab_to_base64(crypto_makeattr(n, nn)));
 
@@ -856,12 +863,13 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
                     if (!n.t) {
                         nn.k = n.k;
                     }
+                    n.rr = src.p;
+
                     if (!(nn.a = createAttribute(n, nn))) {
 
                         console.warn(`Failed to create attribute for node ${n.h}, ignoring...`);
                         continue;
                     }
-                    n.rr = src.p;
 
                     // new node inherits handle, parent and type
                     nn.h = n.h;

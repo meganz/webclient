@@ -359,7 +359,7 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         var cdlogger = debug && localStorage.chatdLogger;
         const rad = sessionStorage.rad;
         const allowNullKeys = localStorage.allownullkeys;
-        const megaLiteMode = localStorage.mInfinity;
+        const megaLiteMode = localStorage.megaLiteMode;
         const testLargeNodes = localStorage.testLargeNodes;
 
         force = force || sessionStorage.fmAetherReload;
@@ -410,7 +410,7 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
             localStorage.allownullkeys = 1;
         }
         if (megaLiteMode) {
-            localStorage.mInfinity = 1;
+            localStorage.megaLiteMode = 1;
         }
         if (testLargeNodes) {
             localStorage.testLargeNodes = 1;
@@ -1243,7 +1243,7 @@ mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
     'use strict';
 
     var dups = M.checkForDuplication(id);
-    if (dups && (dups.files || dups.folders)) {
+    if (dups && (dups.files || dups.folders) && !M.gallery) {
         var $bar = $('.fm-notification-block.duplicated-items-found').addClass('visible');
 
         $('.fix-me-btn', $bar).rebind('click.df', function() {
@@ -2451,6 +2451,32 @@ MegaUtils.prototype.validatePhoneNumber = function(phoneNumber, countryCode) {
     }
 
     return phoneNumber;
+};
+
+/**
+ * Tells whether the used does have to agree to the copyright warning before proceeding.
+ * @returns {Boolean} value.
+ */
+MegaUtils.prototype.agreedToCopyrightWarning = function() {
+    'use strict';
+
+    if (pfid) {
+        // No need under folder-links, copyright agents are retrieving links there
+        return true;
+    }
+
+    if (mega.config.get('cws') | 0) {
+        // They did.
+        return true;
+    }
+
+    if (Object.keys((this.su || !1).EXP || {}).length > 0) {
+        // rely on the presence of public-links.
+        mega.config.set('cws', 1);
+        return true;
+    }
+
+    return false;
 };
 
 MegaUtils.prototype.noSleep = async function(stop, title) {

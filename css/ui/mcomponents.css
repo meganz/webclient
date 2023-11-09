@@ -359,12 +359,6 @@ i.text-color-medium {
 .border-radius-1 {
     border-radius: 4px;
 }
-.tooltip-popin {
-    animation: tooltippopin 0.2s ease;
-}
-.pointer-events-none {
-    pointer-events: none;
-}
 .white-space-nowrap {
     white-space: nowrap;
 }

@@ -1050,8 +1050,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
 
             // Temporarily hide download button for now in MEGA Lite mode (still accessible via zip in context menu)
-            if (M.getNodeRoot(M.currentdirid) !== M.RubbishID && (!mega.infinity ||
-                (mega.infinity && !mega.lite.containsFolderInSelection($.selected)))) {
+            if (M.getNodeRoot(M.currentdirid) !== M.RubbishID &&
+                (!mega.lite || !mega.lite.containsFolderInSelection($.selected))) {
                 __showBtn('download');
             }
 
@@ -1081,12 +1081,12 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
 
             // If in MEGA Lite mode, temporarily hide any download buttons in the Shared area
-            if (mega.infinity && M.currentrootid === 'shares') {
+            if (mega.lite && M.currentrootid === 'shares') {
                 __hideButton('download');
             }
 
             // If in MEGA Lite mode, temporarily hide the Bove to Rubbish Bin button in the outgoing shares area
-            if (mega.infinity && M.currentrootid === 'out-shares') {
+            if (mega.lite && M.currentrootid === 'out-shares') {
                 __hideButton('delete');
             }
         }

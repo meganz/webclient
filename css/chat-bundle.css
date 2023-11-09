@@ -1448,7 +1448,7 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
   padding: 2px 0 0 7px;
 }
 .float-video.minimized {
-  z-index: 1125;
+  z-index: 1109;
   width: 320px;
   height: 240px;
   bottom: 80px;

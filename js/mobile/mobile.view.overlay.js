@@ -136,13 +136,11 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             fmlist.classList.add('hidden');
         }
 
-        const mainPageLayout = document.getElementById('mainlayout');
-
         if (isLink) {
-            mainPageLayout.classList.add('fm-overlay-link');
+            mainlayout.classList.add('fm-overlay-link');
         }
         else {
-            mainPageLayout.classList.add('fm-overlay-view');
+            mainlayout.classList.add('fm-overlay-view');
         }
 
         mobile.appBanner.updateBanner(nodeHandle);
@@ -165,7 +163,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             $(window).trigger('resize');
         }
 
-        document.getElementById('mainlayout').classList.remove('fm-overlay-view', 'fm-overlay-link');
+        mainlayout.classList.remove('fm-overlay-view', 'fm-overlay-link');
 
         if (mobile.cloud.bottomBar) {
             mobile.cloud.bottomBar.show();

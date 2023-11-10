@@ -829,7 +829,8 @@ var mega = {
      * @param {String} userLang The current webclient user language code e.g. EN, NL etc
      * @returns {String} Returns the mapped language for mega.io (could be empty string for English or not supported)
      */
-    getMegaIoMappedLang(userLang) {
+    getMegaIoMappedLang: function(userLang) {
+        'use strict';
 
         // Webclient (mega.nz) to mega.io mappings
         var mappings = {
@@ -1890,10 +1891,12 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
  * @param {String} filename The file that failed to load
  */
 function siteLoadError(error, filename) {
-
     'use strict';
 
-    logStaticServerFailure(error, filename, staticpath);
+    if (filename !== 'mainlayout') {
+
+        logStaticServerFailure(error, filename, staticpath);
+    }
 
     var message = ['MEGA failed to load because '];
     if (location.host !== 'mega.nz') {

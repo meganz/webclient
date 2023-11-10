@@ -3799,7 +3799,7 @@ lazy(mega.gallery, 'albums', () => {
             'contextmenu',
             (evt) => {
                 evt.preventDefault();
-                if (scope.albums.store[albumId].nodes.length) {
+                if (!pfcol || scope.albums.store[albumId].nodes.length) {
                     const contextMenu = new AlbumContextMenu(albumId, scope.albums.isPublic);
                     contextMenu.show(evt.pageX, evt.pageY);
                 }

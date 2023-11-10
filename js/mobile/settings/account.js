@@ -274,6 +274,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                     icon: 'sprite-mobile-fm-mono icon-users-thin-outline',
                     href: 'fm/refer',
                     eventLog: 99845,
+                    componentClassname: 'hidden referrals-btn'
                 },
                 {
                     text: l[23262],
@@ -328,6 +329,13 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             for (const item of menuItems) {
                 this.generateMenuItem(this.domNode, item);
+            }
+
+            if (mega.flags.refpr) {
+                const referralsBtn = this.domNode.componentSelector('.referrals-btn');
+                if (referralsBtn) {
+                    referralsBtn.show();
+                }
             }
 
             if (u_attr && (!u_attr.b || u_attr.b.m)) {

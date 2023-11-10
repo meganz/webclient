@@ -760,6 +760,7 @@ label span.black {
     --icon-size: 32px;
     flex-shrink: 0;
     flex-grow: 0;
+    margin-top: 12px;
 }
 .notification-item .notification-icon i {
     display: none;

@@ -322,6 +322,11 @@ BusinessAccountUI.prototype.decodeFields = function(encodedUser, fields) {
  */
 BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView, quickWay) {
     "use strict";
+
+    if (!quickWay) {
+        this.URLchanger('');
+    }
+
     if (!this.business.isBusinessMasterAcc()) {
         return false;
     }
@@ -355,10 +360,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     $contentBlock.removeClass('hidden');
     $subAccountsView.removeClass('hidden').addClass('main-page');
     $emptyBlock.addClass('hidden');
-
-    if (!quickWay) {
-        this.URLchanger('');
-    }
 
     if (!Object.keys(currSubAccounts).length) { // no subs
         return this.viewLandingPage();
@@ -734,6 +735,12 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     }
     else {
         loadingDialog.phide();
+    }
+
+    // In MEGA Lite, on login and visiting the User Management page, the cloud drive is still showing, so hide it.
+    // NB: Not using the hidden class, because something else is continually re-rendering and removing it.
+    if (mega.lite) {
+        $('.files-grid-view.fm').addClass('mega-lite-hidden');
     }
 };
 

@@ -926,6 +926,11 @@
             }
         }
 
+        // In MEGA Lite mode, remove this temporary class
+        if (mega.lite) {
+            $('.files-grid-view.fm').removeClass('mega-lite-hidden');
+        }
+
         _openFolderCompletion.call(this, id = cv.original || id, isFirstOpen);
 
         onIdle(() => {

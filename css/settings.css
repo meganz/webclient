@@ -257,6 +257,10 @@
     padding-top: 0;
     max-height: 100px;
 }
+.settings-sub-section .subtitle-txt,
+.settings-sub-section .switch-label {
+    max-width: calc(100% - 48px);
+}
 .settings-sub-section.closed {
     padding: 0;
 }

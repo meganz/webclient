@@ -728,3 +728,40 @@
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
+
+.mobile.mega-input.strengthChecker.msg:not(.error) {
+    border-color: var(--stroke-mid-grey);
+}
+
+.mobile.mega-input.strengthChecker.msg.active:not(.error) {
+    border-color: var(--mobile-border-strong-selected);
+}
+
+.mobile.mega-input.strengthChecker.msg:not(.error) .message-container {
+    color: var(--mobile-text-secondary);
+}
+
+.mobile.mega-input.strengthChecker .account-pass-lines {
+    position: absolute;
+    top: 52px;
+    background: none;
+    width: 100%;
+}
+
+.mobile.mega-input.strengthChecker .message-container {
+    top: 60px;
+}
+
+.mobile.mega-input.strengthChecker:not(.error) .good1.message-container i,
+.mobile.mega-input.strengthChecker:not(.error) .good2.message-container i {
+    color: var(--mobile-support-error);
+}
+
+.mobile.mega-input.strengthChecker:not(.error) .good3.message-container i {
+    color: var(--mobile-support-warning);
+}
+
+.mobile.mega-input.strengthChecker:not(.error) .good4.message-container i,
+.mobile.mega-input.strengthChecker:not(.error) .good5.message-container i {
+    color: var(--mobile-support-success);
+}

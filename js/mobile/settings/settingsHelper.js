@@ -115,6 +115,8 @@ mobile.settingsHelper = {
                 fmholder.appendChild(mobile.settingsHelper.parentNode);
             }
 
+            document.body.scrollTo(0, 0);
+
             this.domNode.classList.remove('hidden');
             if (this.parentNode.classList.contains('hidden')) {
                 this.parentNode.classList.remove('hidden');

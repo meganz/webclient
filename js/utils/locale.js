@@ -1844,6 +1844,10 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.pricing_page_faq_answer_3 = escapeHTML(l.pricing_page_faq_answer_3)
         .replace('[A]', `<a href="${faqLink}" target="_blank" rel="noopener noreferrer">`)
         .replace('[/A]', '</a>');
+    const recoveryKeyLink = 'https://help.mega.io/accounts/password-management/recovery-key';
+    l.password_changed_more_info = escapeHTML(l.password_changed_more_info)
+        .replace('[A]', `<a class="anchor-link" href="${recoveryKeyLink}" target="_blank" rel="noopener noreferrer">`)
+        .replace('[/A]', '</a>');
 
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,

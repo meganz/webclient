@@ -155,6 +155,14 @@
     width: calc(100% - 48px);
 }
 
+/* Icon images styles */
+.overlay-wrap .image i.key {
+    background-image: url("../../images/mobile/key.png");
+    background-size: contain;
+    width: 96px;
+    height: 96px;
+}
+
 @media only screen and (orientation: landscape) and (max-height: 359px) {
     .overlay-wrap i.icon {
        display: none;

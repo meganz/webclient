@@ -660,43 +660,6 @@ var mobile = {
     },
 
     /**
-     * Enable the Password Change/Update button if the fields are complete and correct
-     * @param {Object} $page The jQuery selector for the current page
-     */
-    initPasswordFieldsKeyupEvent: function($page) {
-
-        'use strict';
-
-        var $passwordField = $page.find('.password-input');
-        var $confirmPasswordField = $page.find('.password-confirm-input');
-        var $button = $page.find('.update-password-button');
-        var $allFields = $passwordField.add($confirmPasswordField);
-
-        // Add keyup event to the input fields
-        $allFields.rebind('keyup.buttonenable', function(event) {
-
-            var password = $passwordField.val();
-            var confirmPassword = $confirmPasswordField.val();
-
-            // Change the button to red to enable it if they have entered something in all the fields
-            if (password.length > 0 && confirmPassword.length > 0) {
-
-                // Activate the button
-                $button.addClass('active');
-
-                // If the Enter key is pressed try updating
-                if (event.which === 13) {
-                    $button.trigger('tap');
-                }
-            }
-            else {
-                // Grey it out if they have not completed one of the fields
-                $button.removeClass('active');
-            }
-        });
-    },
-
-    /**
      * Load the ZXCVBN password strength estimator library
      * @param {Object} $page The jQuery selector for the current page
      */

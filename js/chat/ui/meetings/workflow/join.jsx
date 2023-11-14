@@ -22,7 +22,7 @@ export default class Join extends MegaRenderMixin {
         view: Join.VIEW.INITIAL,
         firstName: '',
         lastName: '',
-        previewAudio: false,
+        previewAudio: true,
         previewVideo: false,
         ephemeralDialog: false
     };
@@ -235,23 +235,29 @@ export default class Join extends MegaRenderMixin {
         );
     };
 
-    Card = ({ children }) =>
-        <div className="card">
-            <div className="card-body">
-                {children}
-                <div>
-                    <Link to="https://mega.io/chatandmeetings" target="_blank">
-                        {l.how_meetings_work /* `Learn more about MEGA Meetings` */}
-                    </Link>
+    Card = ({ children }) => {
+        const { previewAudio, previewVideo } = this.state;
+        return (
+            <div className="card">
+                <div className="card-body">
+                    {children}
+                    <div>
+                        <Link to="https://mega.io/chatandmeetings" target="_blank">
+                            {l.how_meetings_work /* `Learn more about MEGA Meetings` */}
+                        </Link>
+                    </div>
+                </div>
+                <div className="card-preview">
+                    <Preview
+                        audio={previewAudio}
+                        video={previewVideo}
+                        context={Join.NAMESPACE}
+                        onToggle={(audio, video) => this.setState({ previewAudio: audio, previewVideo: video })}
+                    />
                 </div>
             </div>
-            <div className="card-preview">
-                <Preview
-                    context={Join.NAMESPACE}
-                    onToggle={(audio, video) => this.setState({ previewAudio: audio, previewVideo: video })}
-                />
-            </div>
-        </div>;
+        );
+    };
 
     Field = ({ name, children }) => {
         return (
@@ -330,7 +336,7 @@ export default class Join extends MegaRenderMixin {
         </this.Card>;
 
     Unsupported = () =>
-        <div className="unsupported-container">
+        <div className="meetings-unsupported-container">
             <i className="sprite-fm-uni icon-error" />
             <div className="unsupported-info">
                 <h3>{l.heading_unsupported_browser}</h3>

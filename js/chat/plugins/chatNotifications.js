@@ -25,7 +25,7 @@ var ChatNotifications = function(megaChat, options) {
     self.notifications = new MegaNotifications(options);
     self._incomingDialogContainers = {};
 
-    const { SOUNDS } = megaChat.CONSTANTS;
+    const { SOUNDS } = megaChat;
 
     megaChat
         .rebind('onRoomInitialized.chatNotifications', function(e, megaRoom) {
@@ -205,7 +205,11 @@ var ChatNotifications = function(megaChat, options) {
         })
         .rebind('onIncomingCall.chatNotifications', (e, chatRoom, callId, userId, callManager) => {
 
-            if (!pushNotificationSettings.isAllowedForChatId(chatRoom.chatId) || is_chatlink) {
+            if (
+                !pushNotificationSettings.isAllowedForChatId(chatRoom.chatId) ||
+                is_chatlink ||
+                chatRoom.options.w && (is_eplusplus || megaChat.initialChatId)
+            ) {
                 return;
             }
 

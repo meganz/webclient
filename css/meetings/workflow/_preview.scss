@@ -5,7 +5,8 @@
     height: 100%;
     background: #333;
 
-    body.theme-dark & {
+    body.theme-dark &,
+    .theme-dark-forced & {
         background: #000;
     }
 

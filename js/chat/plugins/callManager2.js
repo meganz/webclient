@@ -487,7 +487,7 @@
         onBadNetwork(e) {
             this.chatRoom.trigger('onBadNetwork', e);
         }
-        onDisconnect(termCode, willReconnect, removeActive) {
+        onDisconnect(termCode, willReconnect) {
             if (willReconnect) {
                 this.chatRoom.megaChat.trigger('sfuConnClose');
             }
@@ -498,13 +498,33 @@
         onLocalMediaQueryError(type, err) {
             megaChat.trigger('onLocalMediaQueryError', { type, err });
         }
+        wrOnJoinAllowed() {
+            this.chatRoom.trigger('wrOnJoinAllowed', this.callId);
+            this.chatRoom.call.sfuClient.joinCall();
+        }
+        wrOnJoinNotAllowed() {
+            this.chatRoom.trigger('wrOnJoinNotAllowed', this.callId);
+        }
+        wrOnUsersEntered(users) {
+            this.chatRoom.trigger('wrOnUsersEntered', users);
+        }
+        wrOnUserLeft(user) {
+            this.chatRoom.trigger('wrOnUserLeft', user);
+        }
+        wrOnUserDump(users) {
+            this.chatRoom.trigger('wrOnUserDump', users);
+        }
+        onModeratorAdd(user) {
+            this.chatRoom.trigger('onModeratorAdd', user);
+        }
 // == end SfuClientIClientEventListener interface
         handleDisconnect(termCode) {
             this.isDisconnecting = true;
             this.chatRoom.trigger('onCallLeft', {
                 callId: this.callId,
                 chatId: this.chatRoom.chatId,
-                showCallFeedback: true
+                showCallFeedback: true,
+                termCode
             });
 
             if (termCode === SfuClient.TermCode.kTooManyParticipants) {
@@ -531,7 +551,7 @@
             }
 
             if (termCode === SfuClient.TermCode.kCallEndedByModerator) {
-                ion.sound.play(megaChat.CONSTANTS.SOUNDS.CALL_END);
+                ion.sound.play(megaChat.SOUNDS.CALL_END);
             }
         }
         get isPublic() {

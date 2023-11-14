@@ -1,4 +1,5 @@
 import ScheduleMetaChange from './ui/messages/scheduleMetaChange.jsx';
+import { MCO_FLAGS } from './chatRoom.jsx';
 
 class Occurrence {
     constructor(megaChat, occurrence) {
@@ -387,6 +388,7 @@ class MeetingsManager {
             createChatLink: meetingInfo.link,
             isMeeting: true,
             openInvite: meetingInfo.openInvite,
+            waitingRoom: meetingInfo.waitingRoom,
             scheduledMeeting: {
                 a: 'mcsmp',
                 s: meetingInfo.startDateTime / 1000,
@@ -440,8 +442,13 @@ class MeetingsManager {
             chatRoom.updatePublicHandle(!meetingInfo.link, meetingInfo.link);
         }
 
+        // Waiting room
+        if (meetingInfo.waitingRoom !== options[MCO_FLAGS.WAITING_ROOM]) {
+            chatRoom.toggleWaitingRoom();
+        }
+
         // Open invite
-        if (meetingInfo.openInvite !== options.oi) {
+        if (meetingInfo.openInvite !== options[MCO_FLAGS.OPEN_INVITE]) {
             chatRoom.toggleOpenInvite();
         }
     }

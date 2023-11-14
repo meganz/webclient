@@ -86,6 +86,15 @@
             margin-bottom: 0;
         }
 
+        &.with-sub-label {
+            flex-flow: wrap;
+
+            .sub-label {
+                width: 100%;
+                color: var(--text-color-medium);
+            }
+        }
+
         label,
         .schedule-label {
             cursor: pointer;
@@ -159,4 +168,26 @@
     width: 100%;
     height: 100%;
     z-index: 2010;
+}
+
+.schedule-dialog-banner {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-align: center;
+
+    &.warn {
+        color: var(--banner-text-warning);
+        border-color: var(--banner-border-warning);
+        background: var(--banner-background-warning);
+
+        a {
+            display: inline;
+            padding: 0 4px;
+            text-decoration: underline;
+            color: var(--banner-text-warning);
+        }
+    }
 }

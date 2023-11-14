@@ -45,7 +45,9 @@ class StreamControls extends MegaRenderMixin {
     handleMousedown = ({ target }) =>
         this.endContainerRef &&
         this.endContainerRef.current &&
-        this.endContainerRef.current.contains(target) ? null : this.setState({ endCallOptions: false });
+        this.endContainerRef.current.contains(target) ?
+            null :
+            this.isMounted() && this.setState({ endCallOptions: false });
 
     renderDebug = () => {
         return (

@@ -219,6 +219,9 @@
     margin: 0 0 0 26px;
     cursor: pointer;
 }
+.chat-topic-buttons .disabled .button {
+    cursor: default;
+}
 .chat-topic-buttons i {
     --icon-size: 24px;
     --mask-color: var(--secondary-blue);
@@ -246,6 +249,26 @@
 .chat-right-area .buttons-block .chat-right-head-txt {
     margin-bottom: 14px;
 }
+.chat-right-area .room-settings-banner {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    margin: 10px 0;
+    width: 100%;
+    overflow: hidden;
+    clear: both;
+    font: var(--text-body2);
+    color: var(--text-color-medium);
+}
+.chat-right-area .room-settings-banner i {
+    padding: 0 7px;
+    --icon-size: 22px;
+    --mask-color: var(--icon-rest);
+}
+.chat-right-area .room-settings-banner a {
+    color: var(--secondary-blue);
+    padding: 0 3px;
+}
 .chat-right-area .link-button {
     white-space: normal;
     margin: 2px 0;
@@ -263,7 +286,7 @@
 .chat-right-area .dropdown-item.link-button.light:not(.disabled):hover i {
     --mask-color: var(--icon-active);
 }
-.chat-right-area .link-button.open-invite-settings-button {
+.chat-right-area .link-button.room-settings-button {
     height: auto;
 }
 .chat-right-area .link-button .mega-switch {
@@ -275,11 +298,15 @@
     left: 6px;
     right: unset;
 }
+.chat-right-area .link-button.disabled .mega-switch,
+.chat-right-area .link-button.disabled .mega-feature-switch {
+    cursor: default;
+}
 .chat-right-area .link-button.push-settings-button {
     height: auto;
 }
 .chat-right-area .link-button.light.push-settings-button > span:first-of-type,
-.chat-right-area .link-button.light.open-invite-settings-button > span:first-of-type {
+.chat-right-area .link-button.light.room-settings-button > span:first-of-type {
     width: calc(100% - 100px);
 }
 .chat-right-area .link-button.push-settings-button span.label--green {
@@ -287,10 +314,9 @@
     margin: -10px 0 0 0;
     color: var(--text-color-medium);
 }
-.chat-right-area .link-button.open-invite-settings-button span.label--green {
+.chat-right-area .link-button.room-settings-button span.label--green {
     display: block;
-    padding-inline-start: 0;
-    -webkit-padding-start: 0;
+    padding-inline-start: 35px;
     line-height: 18px;
     color: var(--text-color-low);
 }

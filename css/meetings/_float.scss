@@ -255,6 +255,22 @@
             }
         }
 
+        .float-video-alert {
+            position: absolute;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            margin: auto;
+            padding: 0 8px;
+            width: calc(100% - 60px);
+            font: var(--text-body1);
+            text-align: center;
+            color: var(--text-color-high);
+            border-radius: 3px;
+            box-shadow: 0 0 0 1px var(--banner-border-info);
+            background: var(--banner-background-info);
+        }
+
         button {
             /* [...] */
 

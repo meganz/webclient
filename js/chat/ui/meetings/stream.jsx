@@ -7,7 +7,8 @@ import SidebarControls  from './sidebarControls.jsx';
 import StreamControls from './streamControls.jsx';
 import FloatingVideo from './float.jsx';
 import ParticipantsNotice from './participantsNotice.jsx';
-import ChatToaster from "../chatToaster";
+import ChatToaster from '../chatToaster.jsx';
+import Admit from './waitingRoom/admit.jsx';
 
 export const STREAM_ACTIONS = { ADD: 1, REMOVE: 2 };
 export const MAX_STREAMS = 19; // 19 + me -> 20
@@ -478,9 +479,9 @@ export default class Stream extends MegaRenderMixin {
     render() {
         const { hovered, overlayed } = this.state;
         const {
-            mode, call, chatRoom, minimized, peers, sidebar, forcedLocal, view, isOnHold, onCallMinimize,
-            onCallExpand, onStreamToggle, onModeChange, onChatToggle, onParticipantsToggle, onAudioClick, onVideoClick,
-            onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange
+            mode, call, chatRoom, minimized, peers, sidebar, forcedLocal, view, isOnHold, waitingRoomPeers,
+            onCallMinimize, onCallExpand, onStreamToggle, onModeChange, onChatToggle, onParticipantsToggle,
+            onAudioClick, onVideoClick, onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange
         } = this.props;
 
         return (
@@ -493,6 +494,15 @@ export default class Stream extends MegaRenderMixin {
                 `}
                 onMouseMove={this.handleMouseMove}
                 onMouseOut={this.handleMouseOut}>
+                {waitingRoomPeers && waitingRoomPeers.length ?
+                    <Admit
+                        chatRoom={chatRoom}
+                        call={call}
+                        peers={waitingRoomPeers}
+                    /> :
+                    null
+                }
+
                 <ChatToaster
                     showDualNotifications={true}
                     hidden={minimized}
@@ -507,6 +517,7 @@ export default class Stream extends MegaRenderMixin {
                         }
                     }}
                 />
+
                 {minimized ? null : (
                     <div className={`${NAMESPACE}-wrapper`}>
                         <StreamHead
@@ -545,6 +556,7 @@ export default class Stream extends MegaRenderMixin {
                         />
                     </div>
                 )}
+
                 <FloatingVideo
                     call={call}
                     peers={peers}
@@ -556,6 +568,7 @@ export default class Stream extends MegaRenderMixin {
                     sidebar={sidebar}
                     forcedLocal={forcedLocal}
                     wrapperRef={this.wrapperRef}
+                    waitingRoomPeers={waitingRoomPeers}
                     onAudioClick={onAudioClick}
                     onVideoClick={onVideoClick}
                     onCallEnd={onCallEnd}

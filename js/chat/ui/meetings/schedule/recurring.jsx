@@ -565,6 +565,7 @@ export class Edit extends MegaRenderMixin {
     datepickerRefs = [];
 
     interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
+    incomingCallListener = 'onIncomingCall.recurringEdit';
 
     state = {
         startDateTime: undefined,
@@ -581,8 +582,10 @@ export class Edit extends MegaRenderMixin {
 
         const { scheduledMeeting, occurrenceId } = this.props;
         this.occurrenceRef = scheduledMeeting.occurrences[occurrenceId];
-        this.state.startDateTime = this.occurrenceRef.start;
-        this.state.endDateTime = this.occurrenceRef.end;
+        if (this.occurrenceRef) {
+            this.state.startDateTime = this.occurrenceRef.start;
+            this.state.endDateTime = this.occurrenceRef.end;
+        }
     }
 
     onStartDateSelect = startDateTime => {
@@ -618,8 +621,8 @@ export class Edit extends MegaRenderMixin {
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        if (this.callDlgListener) {
-            megaChat.off(this.callDlgListener);
+        if (this.incomingCallListener) {
+            megaChat.off(this.incomingCallListener);
         }
         if ($.dialog === Schedule.dialogName) {
             closeDialog();
@@ -632,8 +635,8 @@ export class Edit extends MegaRenderMixin {
             if (!this.isMounted()) {
                 throw Error(`Edit dialog: component not mounted.`);
             }
-            this.callDlgListener = 'onIncomingCall.recurringedit';
-            megaChat.rebind(this.callDlgListener, ({ data }) => {
+
+            megaChat.rebind(this.incomingCallListener, ({ data }) => {
                 // If the incoming call dialog will show mark this as overlayed.
                 if (
                     this.isMounted()
@@ -642,8 +645,8 @@ export class Edit extends MegaRenderMixin {
                 ) {
                     this.setState({ overlayed: true, closeDialog: false });
                     // Clear when ringing stops.
-                    megaChat.plugins.callManager2.rebind('onRingingStopped.recurringedit', () => {
-                        megaChat.plugins.callManager2.off('onRingingStopped.recurringedit');
+                    megaChat.plugins.callManager2.rebind('onRingingStopped.recurringEdit', () => {
+                        megaChat.plugins.callManager2.off('onRingingStopped.recurringEdit');
                         this.setState({ overlayed: false });
                         fm_showoverlay();
                     });

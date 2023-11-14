@@ -139,8 +139,7 @@ var ChatdIntegration = function(megaChat) {
                 m: chatMode === strongvelope.CHAT_MODE.PUBLIC ? 1 : 0,
                 v: Chatd.VERSION,
                 i: reqi,
-                sr: opts.sr, // Speak request
-                w: opts.w, // Waiting room
+                w: opts.waitingRoom,
                 oi: opts.openInvite,
                 sm: opts.scheduledMeeting
             };
@@ -373,6 +372,7 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
             'ck',
             'mr',
             'callId',
+            'w',
         ];
         for (var i = 0; i < keys.length; i++) {
             if (typeof(ret[keys[i]]) !== 'undefined') {

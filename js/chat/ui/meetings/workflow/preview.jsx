@@ -15,12 +15,22 @@ class Preview extends MegaRenderMixin {
 
     videoRef = React.createRef();
     stream = null;
-    avatarMeta = null;
 
     state = {
         audio: false,
-        video: false
+        video: false,
+        avatarMeta: undefined
     };
+
+    constructor(props) {
+        super(props);
+        this.state.audio = this.props.audio || this.state.audio;
+        if (this.props.video) {
+            this.state.video = this.props.video;
+            this.startStream(Preview.STREAMS.VIDEO);
+            this.props.onToggle(this.state.audio, this.state.video);
+        }
+    }
 
     getTrackType = type => !type ? 'getTracks' : type === Preview.STREAMS.AUDIO ? 'getAudioTracks' : 'getVideoTracks';
 
@@ -43,12 +53,16 @@ class Preview extends MegaRenderMixin {
             .catch(ex => {
                 // Unable to start audio/video -> trigger media error, w/o enabling the control
                 const stream = type === Preview.STREAMS.AUDIO ? 'audio' : 'video';
-                this.setState(state => ({ [stream]: !state[stream] }), () => {
-                    megaChat.trigger('onLocalMediaError', {
-                        [type === Preview.STREAMS.AUDIO ? 'mic' : 'camera']: `${ex.name}: ${ex.message}`
-                    });
-                    console.error(`${ex.name}: ${ex.message}`);
-                });
+                return (
+                    this.isMounted &&
+                    this.setState(state => ({ [stream]: !state[stream] }), () => {
+                        megaChat.trigger('onLocalMediaError', {
+                            [type === Preview.STREAMS.AUDIO ? 'mic' : 'camera']: `${ex.name}: ${ex.message}`
+                        });
+                        console.error(`${ex.name}: ${ex.message}`);
+                    })
+                );
+
             });
     };
 
@@ -83,7 +97,7 @@ class Preview extends MegaRenderMixin {
         }
 
         if (is_chatlink) {
-            const { avatarUrl, color, shortName } = this.avatarMeta || {};
+            const { avatarUrl, color, shortName } = this.state.avatarMeta || {};
             return (
                 <div
                     className={`
@@ -106,16 +120,17 @@ class Preview extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
+
         if (this.props.onToggle) {
             this.props.onToggle(this.state.audio, this.state.video);
         }
-        this.toggleStream(Preview.STREAMS.AUDIO);
-        this.avatarMeta = is_chatlink ? generateAvatarMeta(u_handle) : null;
+
+        this.setState({ avatarMeta: is_chatlink ? generateAvatarMeta(u_handle) : undefined });
     }
 
     render() {
         const { NAMESPACE } = Preview;
-        const { hasToRenderPermissionsWarning, renderPermissionsWarning, resetError } = this.props;
+        const { hasToRenderPermissionsWarning, renderPermissionsWarning } = this.props;
         const { audio, video } = this.state;
         const SIMPLETIP_PROPS = { label: undefined, position: 'top', className: 'theme-dark-forced' };
 

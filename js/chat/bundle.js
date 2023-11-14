@@ -273,7 +273,10 @@ ChatRouting.gPageHandlers = {
 };
 // EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
 var scheduleMetaChange = __webpack_require__(97);
+// EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
+var chat_chatRoom = __webpack_require__(804);
 ;// CONCATENATED MODULE: ./js/chat/meetingsManager.jsx
+
 
 class Occurrence {
   constructor(megaChat, occurrence) {
@@ -719,6 +722,7 @@ class MeetingsManager {
       createChatLink: meetingInfo.link,
       isMeeting: true,
       openInvite: meetingInfo.openInvite,
+      waitingRoom: meetingInfo.waitingRoom,
       scheduledMeeting: {
         a: 'mcsmp',
         s: meetingInfo.startDateTime / 1000,
@@ -771,7 +775,10 @@ class MeetingsManager {
     if (!!meetingInfo.link !== !!publicLink) {
       chatRoom.updatePublicHandle(!meetingInfo.link, meetingInfo.link);
     }
-    if (meetingInfo.openInvite !== options.oi) {
+    if (meetingInfo.waitingRoom !== options[chat_chatRoom.MCO_FLAGS.WAITING_ROOM]) {
+      chatRoom.toggleWaitingRoom();
+    }
+    if (meetingInfo.openInvite !== options[chat_chatRoom.MCO_FLAGS.OPEN_INVITE]) {
       chatRoom.toggleOpenInvite();
     }
   }
@@ -1474,8 +1481,8 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (chatOnboarding_class = class 
   }
 }, ((0,applyDecoratedDescriptor.Z)(chatOnboarding_class.prototype, "checkAndShowStep", [_dec], Object.getOwnPropertyDescriptor(chatOnboarding_class.prototype, "checkAndShowStep"), chatOnboarding_class.prototype)), chatOnboarding_class));
 
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
-var call = __webpack_require__(755);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(942);
 ;// CONCATENATED MODULE: ./js/chat/chat.jsx
 
 
@@ -1520,24 +1527,22 @@ function Chat() {
   this._queuedChatRoomEvents = Object.create(null);
   this.handleToId = Object.create(null);
   this.publicChatKeys = Object.create(null);
-  this.CONSTANTS = {
-    SOUNDS: {
-      ALERT: 'alert_info_message',
-      ERROR: 'error_message',
-      INCOMING_MSG: 'incoming_chat_message',
-      INCOMING_CONTACT: 'incoming_contact_request',
-      INCOMING_FILE: 'incoming_file_transfer',
-      INCOMING_CALL: 'incoming_voice_video_call',
-      HANG_OUT: 'hang_out',
-      CALL_JOIN: 'user_join_call',
-      CALL_LEFT: 'user_left_call',
-      CALL_END: 'end_call',
-      RECONNECT: 'reconnecting'
-    }
+  this.SOUNDS = {
+    ALERT: 'alert_info_message',
+    ERROR: 'error_message',
+    INCOMING_MSG: 'incoming_chat_message',
+    INCOMING_CONTACT: 'incoming_contact_request',
+    INCOMING_FILE: 'incoming_file_transfer',
+    INCOMING_CALL: 'incoming_voice_video_call',
+    HANG_OUT: 'hang_out',
+    CALL_JOIN: 'user_join_call',
+    CALL_LEFT: 'user_left_call',
+    CALL_END: 'end_call',
+    CALL_JOIN_WAITING: 'user_join_waiting',
+    RECONNECT: 'reconnecting'
   };
   this.options = {
     'delaySendMessageIfRoomNotAvailableTimeout': 3000,
-    filePickerOptions: {},
     'plugins': {
       'chatdIntegration': ChatdIntegration,
       'callManager2': CallManager2,
@@ -1620,7 +1625,7 @@ function Chat() {
           body: l.notif_body_scheduled_starting
         }
       },
-      sounds: Object.values(this.CONSTANTS.SOUNDS)
+      sounds: Object.values(this.SOUNDS)
     },
     'chatStoreOptions': {
       'autoPurgeMaxMessagesPerRoom': 1024
@@ -3887,7 +3892,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
       self.trigger('onMembersUpdatedUI', eventData);
     }
   });
-  if (is_chatlink && !is_chatlink.callId) {
+  if (is_chatlink && !is_chatlink.callId && !this.options.w) {
     const unbind = () => {
       self.unbind('onMessagesHistoryDone.chatlinkAlreadyIn');
       self.unbind('onMembersUpdated.chatlinkAlreadyIn');
@@ -4977,9 +4982,6 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
   if (this.hasInvalidKeys()) {
     return this.showMissingUnifiedKeyDialog();
   }
-  if (this.options.w) {
-    return megaChat.showUpgradeDialog();
-  }
   this.meetingsLoading = {
     title: l.joining,
     audio,
@@ -5058,9 +5060,6 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
   }
   if (this.hasInvalidKeys()) {
     return this.showMissingUnifiedKeyDialog();
-  }
-  if (this.options.w) {
-    return megaChat.showUpgradeDialog();
   }
   this.meetingsLoading = {
     title: l.starting,
@@ -5221,6 +5220,9 @@ ChatRoom.prototype.iAmOperator = function () {
 };
 ChatRoom.prototype.iAmReadOnly = function () {
   return this.type !== 'private' && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
+};
+ChatRoom.prototype.iAmWaitingRoomPeer = function () {
+  return this.options.w && !this.iAmOperator();
 };
 ChatRoom.prototype.didInteraction = function (user_handle, ts) {
   var self = this;
@@ -5477,8 +5479,14 @@ ChatRoom.prototype.toggleOpenInvite = function () {
     [MCO_FLAGS.OPEN_INVITE]: Math.abs(this.options[MCO_FLAGS.OPEN_INVITE] - 1)
   });
 };
-ChatRoom.prototype.toggleWaitingRoom = function () {};
-ChatRoom.prototype.toggleSpeakRequest = function () {};
+ChatRoom.prototype.toggleWaitingRoom = function () {
+  if (this.type === 'private' || !this.iAmOperator()) {
+    return;
+  }
+  this.setMcoFlags({
+    [MCO_FLAGS.WAITING_ROOM]: Math.abs(this.options[MCO_FLAGS.WAITING_ROOM] - 1)
+  });
+};
 ChatRoom.prototype.exportToFile = function () {
   if (this.messagesBuff.messages.length === 0 || this.exportIo) {
     return;
@@ -6406,7 +6414,7 @@ Z: () => (ChatToaster)
 var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
 var _mixins1__ = __webpack_require__(503);
-var _meetings_call_jsx2__ = __webpack_require__(755);
+var _meetings_call_jsx2__ = __webpack_require__(942);
 var _ui_buttons3__ = __webpack_require__(204);
 
 
@@ -6913,7 +6921,7 @@ var typingArea = __webpack_require__(825);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 var buttons = __webpack_require__(204);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(261);
+var dropdowns = __webpack_require__(78);
 ;// CONCATENATED MODULE: ./js/chat/ui/composedTextArea.jsx
 
 
@@ -7043,7 +7051,7 @@ var _mixins1__ = __webpack_require__(503);
 var _ui_utils_jsx2__ = __webpack_require__(79);
 var _ui_perfectScrollbar_jsx3__ = __webpack_require__(285);
 var _ui_buttons_jsx4__ = __webpack_require__(204);
-var _ui_dropdowns_jsx5__ = __webpack_require__(261);
+var _ui_dropdowns_jsx5__ = __webpack_require__(78);
 var _contactsPanel_contactsPanel_jsx6__ = __webpack_require__(808);
 var _ui_modalDialogs7__ = __webpack_require__(182);
 
@@ -8648,9 +8656,9 @@ ColumnContactVerifiedStatus.verifiedLabel = external_React_default().createEleme
   className: "small-icon icons-sprite tiny-green-tick"
 }), l[6776]);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(261);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
-var call = __webpack_require__(755);
+var dropdowns = __webpack_require__(78);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(942);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
@@ -9803,7 +9811,7 @@ ContactsPanel.getUserFingerprint = handle => {
 
 /***/ }),
 
-/***/ 78:
+/***/ 21:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -10682,7 +10690,7 @@ function CustomRadioButton({
   })));
 }
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(261);
+var dropdowns = __webpack_require__(78);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 var ui_contacts = __webpack_require__(13);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
@@ -10757,7 +10765,7 @@ class Accordion extends mixins.wl {
 ;// CONCATENATED MODULE: ./js/chat/ui/participantsList.jsx
 
 
-var DropdownsUI = __webpack_require__(261);
+var DropdownsUI = __webpack_require__(78);
 var ContactsUI = __webpack_require__(13);
 var PerfectScrollbar = (__webpack_require__(285).F);
 class ParticipantsList extends mixins.wl {
@@ -11601,8 +11609,8 @@ PushSettingsDialog.options = {
   Infinity: l[22011]
 };
 PushSettingsDialog.default = pushSettingsDialog_class.options[pushSettingsDialog_class.options.length - 1];
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
-var call = __webpack_require__(755);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(942);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
 var historyPanel = __webpack_require__(192);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
@@ -11639,7 +11647,7 @@ class Loading extends mixins.wl {
     this.renderLoading = () => {
       return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("span", null, external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-video-call-filled"
-      })), external_React_default().createElement("h3", null, this.props.title || l.starting), external_React_default().createElement("div", {
+      })), external_React_default().createElement("h3", null, this.props.title || l[5533]), external_React_default().createElement("div", {
         className: "loading-container"
       }, external_React_default().createElement("div", {
         className: "loading-indication"
@@ -11728,7 +11736,7 @@ class Join extends mixins.wl {
       view: Join.VIEW.INITIAL,
       firstName: '',
       lastName: '',
-      previewAudio: false,
+      previewAudio: true,
       previewVideo: false,
       ephemeralDialog: false
     };
@@ -11875,22 +11883,30 @@ class Join extends mixins.wl {
     };
     this.Card = ({
       children
-    }) => external_React_default().createElement("div", {
-      className: "card"
-    }, external_React_default().createElement("div", {
-      className: "card-body"
-    }, children, external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
-      to: "https://mega.io/chatandmeetings",
-      target: "_blank"
-    }, l.how_meetings_work))), external_React_default().createElement("div", {
-      className: "card-preview"
-    }, external_React_default().createElement(preview.Z, {
-      context: Join.NAMESPACE,
-      onToggle: (audio, video) => this.setState({
-        previewAudio: audio,
-        previewVideo: video
-      })
-    })));
+    }) => {
+      const {
+        previewAudio,
+        previewVideo
+      } = this.state;
+      return external_React_default().createElement("div", {
+        className: "card"
+      }, external_React_default().createElement("div", {
+        className: "card-body"
+      }, children, external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
+        to: "https://mega.io/chatandmeetings",
+        target: "_blank"
+      }, l.how_meetings_work))), external_React_default().createElement("div", {
+        className: "card-preview"
+      }, external_React_default().createElement(preview.Z, {
+        audio: previewAudio,
+        video: previewVideo,
+        context: Join.NAMESPACE,
+        onToggle: (audio, video) => this.setState({
+          previewAudio: audio,
+          previewVideo: video
+        })
+      })));
+    };
     this.Field = ({
       name,
       children
@@ -11963,7 +11979,7 @@ class Join extends mixins.wl {
       }
     }, l.join_chat_button));
     this.Unsupported = () => external_React_default().createElement("div", {
-      className: "unsupported-container"
+      className: "meetings-unsupported-container"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-uni icon-error"
     }), external_React_default().createElement("div", {
@@ -12089,10 +12105,383 @@ Alert.TYPE = {
 var helpers = __webpack_require__(435);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/hostsObserver.jsx
 var hostsObserver = __webpack_require__(419);
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/waitingRoom/waitingRoom.jsx
+
+
+
+
+
+
+const waitingRoom_NAMESPACE = 'waiting-room';
+const VIEW = {
+  INTRO: 0,
+  ACCOUNT: 1,
+  GUEST: 2,
+  AWAIT: 3,
+  UNSUPPORTED: 4,
+  REDIRECT: 5
+};
+class WaitingRoom extends mixins.wl {
+  constructor(props) {
+    super(props);
+    this.redirectInterval = undefined;
+    this.state = {
+      view: VIEW.ACCOUNT,
+      call: false,
+      audio: false,
+      video: false,
+      firstName: '',
+      lastName: '',
+      countdown: 4,
+      loading: false
+    };
+    this.renderLeaveDialog = () => msgDialog(`confirmation:!^${l.wr_leave}!${l.wr_do_not_leave}`, null, l.wr_leave_confirmation, '', cb => cb && this.doLeave(), 1);
+    this.renderDeniedDialog = () => msgDialog('error', '', l.wr_denied, l.wr_denied_details, this.doLeave);
+    this.renderTimeoutDialog = () => msgDialog('error', '', l.wr_timeout, l.wr_timeout_details, this.doLeave);
+    this.renderWaitingRoomInfo = () => {
+      const {
+        chatRoom
+      } = this.props;
+      const {
+        nextOccurrenceStart,
+        nextOccurrenceEnd
+      } = chatRoom.scheduledMeeting || {};
+      return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.Cw, {
+        tag: "h2",
+        content: megaChat.html(chatRoom.topic)
+      }), external_React_default().createElement("div", {
+        className: `${waitingRoom_NAMESPACE}-schedule`
+      }, external_React_default().createElement("span", null, time2date(nextOccurrenceStart / 1000, 20)), external_React_default().createElement("span", null, toLocaleTime(nextOccurrenceStart), " - ", toLocaleTime(nextOccurrenceEnd))));
+    };
+    this.doLeave = () => this.setState({
+      view: VIEW.REDIRECT
+    }, () => {
+      tSleep(this.state.countdown).then(() => this.props.onWaitingRoomLeave());
+      this.redirectInterval = setInterval(() => this.setState(({
+        countdown
+      }) => ({
+        countdown: countdown > 0 ? countdown - 1 : 0
+      })), 1e3);
+      sessionStorage.removeItem('previewMedia');
+    });
+    this.setInitialView = () => {
+      if (u_type || is_eplusplus) {
+        var _this$props$chatRoom;
+        return (_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.iAmInRoom() ? VIEW.AWAIT : VIEW.ACCOUNT;
+      }
+      return VIEW.INTRO;
+    };
+    this.requestJoin = () => {
+      var _this$props$chatRoom2;
+      const {
+        audio,
+        video
+      } = this.state;
+      (_this$props$chatRoom2 = this.props.chatRoom) == null || _this$props$chatRoom2.joinCall(audio, video);
+    };
+    this.Field = ({
+      name,
+      children
+    }) => {
+      var _this$state$name;
+      return external_React_default().createElement("div", {
+        className: `
+                    mega-input
+                    title-ontop
+                    ${(_this$state$name = this.state[name]) != null && _this$state$name.length ? 'valued' : ''}
+                `
+      }, external_React_default().createElement("div", {
+        className: "mega-input-title"
+      }, children, external_React_default().createElement("span", {
+        className: "required-red"
+      }, "*")), external_React_default().createElement("input", {
+        type: "text",
+        name: name,
+        className: "titleTop required megaInputs",
+        placeholder: children,
+        value: this.state[name] || '',
+        onChange: ev => this.setState({
+          [name]: ev.target.value
+        })
+      }));
+    };
+    this.Card = ({
+      className,
+      children
+    }) => {
+      const {
+        audio,
+        video
+      } = this.state;
+      return external_React_default().createElement("div", {
+        className: `
+                    card
+                    ${className || ''}
+                 `
+      }, external_React_default().createElement("div", {
+        className: "card-body"
+      }, children), external_React_default().createElement("div", {
+        className: "card-preview"
+      }, external_React_default().createElement(preview.Z, {
+        audio: audio,
+        video: video,
+        onToggle: (audio, video) => {
+          this.setState({
+            audio,
+            video
+          }, () => {
+            sessionStorage.previewMedia = JSON.stringify({
+              audio,
+              video
+            });
+          });
+        }
+      })));
+    };
+    this.Head = ({
+      title
+    }) => {
+      var _this$props$chatRoom3;
+      const hasDarkMode = Object.values(document.body.classList).some(c => c === 'theme-dark' || c === 'theme-dark-forced');
+      return external_React_default().createElement("div", {
+        className: `${waitingRoom_NAMESPACE}-head`
+      }, external_React_default().createElement("div", {
+        className: `${waitingRoom_NAMESPACE}-logo`
+      }, external_React_default().createElement("i", {
+        className: `
+                        sprite-fm-illustration-wide
+                        ${hasDarkMode ? 'mega-logo-dark' : 'img-mega-logo-light'}
+                    `
+      })), external_React_default().createElement("h1", {
+        className: (megaChat.initialChatId || is_chatlink) && this.state.view !== VIEW.INTRO ? 'hidden' : ''
+      }, external_React_default().createElement(utils.dy, null, title || l.you_have_invitation.replace('%1', (_this$props$chatRoom3 = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom3.topic))));
+    };
+    this.Await = () => {
+      return external_React_default().createElement((external_React_default()).Fragment, null, megaChat.initialChatId ? external_React_default().createElement(this.Head, null) : null, external_React_default().createElement(this.Card, {
+        className: megaChat.initialChatId ? '' : 'fit-spacing'
+      }, this.renderWaitingRoomInfo(), external_React_default().createElement("div", {
+        className: `${waitingRoom_NAMESPACE}-message`
+      }, this.state.call ? l.wr_wait_to_admit : l.wr_wait_to_start), external_React_default().createElement(meetings_button.Z, {
+        icon: "sprite-fm-mono icon-log-out-thin-solid",
+        className: `${waitingRoom_NAMESPACE}-leave`,
+        onClick: () => this.renderLeaveDialog()
+      }, l.wr_leave)));
+    };
+    this.Account = () => {
+      const {
+        loading,
+        audio,
+        video
+      } = this.state;
+      return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(this.Head, null), external_React_default().createElement(this.Card, null, this.renderWaitingRoomInfo(), external_React_default().createElement(meetings_button.Z, {
+        className: `
+                           mega-button
+                           positive
+                           large
+                           ${loading ? 'disabled' : ''}
+                        `,
+        onClick: () => {
+          return loading ? null : this.setState({
+            loading: true
+          }, () => {
+            const {
+              chatRoom
+            } = this.props;
+            const {
+              chatId,
+              publicChatHandle,
+              publicChatKey
+            } = chatRoom;
+            if (chatRoom.iAmInRoom()) {
+              return megaChat.routing.reinitAndOpenExistingChat(chatId, publicChatHandle).then(() => {
+                megaChat.getChatById(chatId).joinCall(audio, video);
+              }).catch(ex => console.error(`Failed to open existing room and join call: ${ex}`));
+            }
+            megaChat.routing.reinitAndJoinPublicChat(chatId, publicChatHandle, publicChatKey).then(() => {
+              delete megaChat.initialPubChatHandle;
+            }).catch(ex => console.error(`Failed to join room: ${ex}`));
+          });
+        }
+      }, l.wr_ask_to_join), external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
+        to: "https://mega.io/chatandmeetings",
+        target: "_blank"
+      }, l.how_meetings_work))));
+    };
+    this.Redirect = () => external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(this.Head, {
+      title: l.wr_left_heading
+    }), external_React_default().createElement("h5", null, l.wr_left_countdown.replace('%1', this.state.countdown)));
+    this.Guest = () => {
+      const {
+        chatRoom
+      } = this.props;
+      const {
+        loading,
+        firstName,
+        lastName
+      } = this.state;
+      const isDisabled = !firstName.length || !lastName.length;
+      return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(this.Head, null), external_React_default().createElement(this.Card, null, this.renderWaitingRoomInfo(), external_React_default().createElement("div", {
+        className: "card-fields"
+      }, external_React_default().createElement(this.Field, {
+        name: "firstName"
+      }, l[1096]), external_React_default().createElement(this.Field, {
+        name: "lastName"
+      }, l[1097])), external_React_default().createElement(meetings_button.Z, {
+        className: `
+                            mega-button
+                            positive
+                            large
+                            ${isDisabled || loading ? 'disabled' : ''}
+                        `,
+        onClick: () => {
+          if (isDisabled || loading) {
+            return false;
+          }
+          return this.setState({
+            loading: true
+          }, () => {
+            u_eplusplus(this.state.firstName, this.state.lastName).then(() => {
+              return megaChat.routing.reinitAndJoinPublicChat(chatRoom.chatId, chatRoom.publicChatHandle, chatRoom.publicChatKey);
+            }).catch(ex => d && console.error(`E++ account failure: ${ex}`));
+          });
+        }
+      }, l.wr_ask_to_join), external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
+        to: "https://mega.io/chatandmeetings",
+        target: "_blank"
+      }, l.how_meetings_work))));
+    };
+    this.Intro = () => {
+      const {
+        chatRoom
+      } = this.props;
+      return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(this.Head, null), external_React_default().createElement("div", {
+        className: "join-meeting-content"
+      }, external_React_default().createElement(meetings_button.Z, {
+        className: "mega-button positive",
+        onClick: () => {
+          megaChat.loginOrRegisterBeforeJoining(chatRoom.publicChatHandle, false, true, undefined, () => this.setState({
+            view: VIEW.ACCOUNT
+          }));
+        }
+      }, l[171]), external_React_default().createElement(meetings_button.Z, {
+        className: "mega-button",
+        onClick: () => this.setState({
+          view: VIEW.GUEST
+        })
+      }, l.join_as_guest), external_React_default().createElement("p", null, external_React_default().createElement(utils.Cw, {
+        onClick: e => {
+          e.preventDefault();
+          megaChat.loginOrRegisterBeforeJoining(chatRoom.publicChatHandle, true, undefined, undefined, () => this.setState({
+            view: VIEW.ACCOUNT
+          }));
+        }
+      }, l[20635]))));
+    };
+    this.Unsupported = () => {
+      var _this$props$chatRoom4;
+      return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(this.Head, null), external_React_default().createElement("h1", null, l.you_have_invitation.replace('%1', (_this$props$chatRoom4 = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom4.topic)), external_React_default().createElement("div", {
+        className: "meetings-unsupported-container"
+      }, external_React_default().createElement("i", {
+        className: "sprite-fm-uni icon-error"
+      }), external_React_default().createElement("div", {
+        className: "unsupported-info"
+      }, external_React_default().createElement("h3", null, l.heading_unsupported_browser), external_React_default().createElement("h3", null, l.join_meeting_methods), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, l.join_via_link), external_React_default().createElement("li", null, external_React_default().createElement(utils.Cw, null, l.join_via_mobile.replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">').replace('[/A]', '</a>')))))));
+    };
+    this.renderView = view => {
+      switch (view) {
+        default:
+          return this.Await();
+        case VIEW.INTRO:
+          return this.Intro();
+        case VIEW.GUEST:
+          return this.Guest();
+        case VIEW.ACCOUNT:
+          return this.Account();
+        case VIEW.REDIRECT:
+          return this.Redirect();
+        case VIEW.UNSUPPORTED:
+          return this.Unsupported();
+      }
+    };
+    this.state.call = this.props.havePendingCall;
+    this.state.view = megaChat.hasSupportForCalls ? this.setInitialView() : VIEW.UNSUPPORTED;
+    if (sessionStorage.previewMedia) {
+      const {
+        audio,
+        video
+      } = JSON.parse(sessionStorage.previewMedia);
+      this.state.audio = audio;
+      this.state.video = video;
+      sessionStorage.removeItem('previewMedia');
+    }
+  }
+  componentWillReceiveProps(nextProps) {
+    if (this.props.havePendingCall !== nextProps.havePendingCall) {
+      this.setState({
+        call: nextProps.havePendingCall
+      }, () => this.state.view === VIEW.AWAIT && nextProps.havePendingCall && this.requestJoin());
+    }
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    clearInterval(this.redirectInterval);
+    this.props.chatRoom.unbind(`onCallLeft.${waitingRoom_NAMESPACE}`);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    const {
+      chatRoom
+    } = this.props;
+    const {
+      call,
+      view
+    } = this.state;
+    if (call && view === VIEW.AWAIT) {
+      this.requestJoin();
+    }
+    chatRoom.rebind(`onCallLeft.${waitingRoom_NAMESPACE}`, (ev, {
+      termCode
+    }) => {
+      if (termCode === SfuClient.TermCode.kKickedFromWaitingRoom) {
+        return this.renderDeniedDialog();
+      }
+      if (termCode === SfuClient.TermCode.kWaitingRoomAllowTimeout) {
+        return this.renderTimeoutDialog();
+      }
+    });
+    chatRoom.rebind(`onModeratorAdd.${waitingRoom_NAMESPACE}`, (ev, user) => {
+      if (user === u_handle) {
+        chatRoom.meetingsLoading = false;
+        this.requestJoin();
+      }
+    });
+  }
+  render() {
+    const {
+      view
+    } = this.state;
+    console.error('render ->', {
+      view
+    });
+    return external_React_default().createElement(utils.ZP.RenderTo, {
+      element: document.body
+    }, external_React_default().createElement("div", {
+      className: `
+                        ${waitingRoom_NAMESPACE}
+                        join-meeting
+                        ${view === VIEW.AWAIT ? `${waitingRoom_NAMESPACE}--await` : ''}
+                        ${view === VIEW.AWAIT && !megaChat.initialChatId ? 'theme-dark-forced' : ''}
+                        ${view === VIEW.REDIRECT ? `${waitingRoom_NAMESPACE}--redirect` : ''}
+                        ${megaChat.initialChatId || is_chatlink ? `${waitingRoom_NAMESPACE}--chatlink-landing` : ''}
+                    `
+    }, this.renderView(view)));
+  }
+}
 ;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
 var conversationpanel_dec, _dec2, _class4;
+
 
 
 
@@ -12234,6 +12623,7 @@ class StartMeetingNotification extends mixins.wl {
     const {
       chatRoom,
       offset,
+      onWaitingRoomJoin,
       onStartCall
     } = this.props;
     if (chatRoom.call || !megaChat.hasSupportForCalls) {
@@ -12244,7 +12634,12 @@ class StartMeetingNotification extends mixins.wl {
       style: {
         marginTop: offset
       },
-      onClick: () => onStartCall(call.ZP.TYPE.AUDIO)
+      onClick: () => {
+        if (chatRoom.options.w && !chatRoom.iAmOperator()) {
+          return onWaitingRoomJoin();
+        }
+        return onStartCall(call.ZP.TYPE.AUDIO);
+      }
     }, external_React_default().createElement("button", {
       className: "mega-button positive small"
     }, l.schedule_start_aot));
@@ -12276,7 +12671,9 @@ class JoinCallNotification extends mixins.wl {
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-phone"
     }), external_React_default().createElement(utils.Cw, {
-      onClick: () => (0,call.xt)(true, chatRoom).then(() => chatRoom.joinCall()).catch(ex => d && console.warn('Already in a call.', ex))
+      onClick: () => {
+        return (0,call.xt)(true, chatRoom).then(() => chatRoom.joinCall()).catch(ex => d && console.warn('Already in a call.', ex));
+      }
     }, (l[20460] || 'There is an active group call. [A]Join[/A]').replace('[A]', '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>')));
   }
 }
@@ -12458,6 +12855,39 @@ class ConversationRightArea extends mixins.wl {
         className: "sprite-fm-mono icon-disabled-filled"
       }), external_React_default().createElement("span", null, chatRoom.isMeeting ? l.meeting_leave : l[8633]));
     });
+    this.OptionsButton = ({
+      icon,
+      label,
+      secondLabel,
+      toggled,
+      disabled,
+      onClick
+    }) => {
+      const {
+        chatRoom
+      } = this.props;
+      const isDisabled = !chatRoom.iAmOperator() || disabled;
+      return external_React_default().createElement(buttons.z, {
+        className: `
+                    link-button
+                    light
+                    room-settings-button
+                `,
+        disabled: isDisabled,
+        icon: `
+                    sprite-fm-mono
+                    ${icon}
+                `,
+        label: label,
+        secondLabel: secondLabel,
+        secondLabelClass: "label--green",
+        toggle: {
+          enabled: toggled,
+          onClick: isDisabled ? null : onClick
+        },
+        onClick: isDisabled ? null : onClick
+      });
+    };
     this.handleCancelMeeting = () => {
       const {
         chatRoom
@@ -12488,6 +12918,19 @@ class ConversationRightArea extends mixins.wl {
   setRetention(chatRoom, retentionTime) {
     chatRoom.setRetention(retentionTime);
     $(document).trigger('closeDropdowns');
+  }
+  renderOptionsBanner() {
+    const {
+      chatRoom
+    } = this.props;
+    return !!chatRoom.options[MCO_FLAGS.WAITING_ROOM] && !!chatRoom.options[MCO_FLAGS.OPEN_INVITE] ? external_React_default().createElement("div", {
+      className: "room-settings-banner"
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-info"
+    }), external_React_default().createElement(utils.Cw, null, l.waiting_room_invite.replace('[A]', `<a
+                                href="${l.mega_help_host}/wp-admin/post.php?post=3005&action=edit"
+                                target="_blank"
+                                class="ulickurl">`).replace('[/A]', '</a>'))) : null;
   }
   renderPushSettingsButton() {
     const {
@@ -12551,8 +12994,7 @@ class ConversationRightArea extends mixins.wl {
       return null;
     }
     self._wasAppendedEvenOnce = true;
-    var startCallDisabled = isStartCallDisabled(room);
-    var startCallButtonClass = startCallDisabled ? " disabled" : "";
+    var startCallDisabled = isStartCallDisabled(room) || room.iAmWaitingRoomPeer();
     var startAudioCallButton;
     var startVideoCallButton;
     var isInCall = !!room.call;
@@ -12566,11 +13008,14 @@ class ConversationRightArea extends mixins.wl {
     }
     if (startAudioCallButton !== null) {
       startAudioCallButton = external_React_default().createElement("div", {
-        "data-simpletip": `${l.unsupported_browser_audio}`,
+        "data-simpletip": l.unsupported_browser_audio,
         "data-simpletipposition": "top",
         "data-simpletipoffset": "7",
-        className: `${megaChat.hasSupportForCalls ? '' : 'simpletip'}
-                        link-button light ${startCallButtonClass}`,
+        className: `
+                        link-button light
+                        ${megaChat.hasSupportForCalls ? '' : 'simpletip'}
+                        ${startCallDisabled ? 'disabled' : ''}
+                    `,
         onClick: () => onStartCall(call.ZP.TYPE.AUDIO)
       }, external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-phone"
@@ -12578,11 +13023,14 @@ class ConversationRightArea extends mixins.wl {
     }
     if (startVideoCallButton !== null) {
       startVideoCallButton = external_React_default().createElement("div", {
-        "data-simpletip": `${l.unsupported_browser_video}`,
+        "data-simpletip": l.unsupported_browser_video,
         "data-simpletipposition": "top",
         "data-simpletipoffset": "7",
-        className: `${megaChat.hasSupportForCalls ? '' : 'simpletip'}
-                        link-button light ${startCallButtonClass}`,
+        className: `
+                        link-button light
+                        ${megaChat.hasSupportForCalls ? '' : 'simpletip'}
+                        ${startCallDisabled ? 'disabled' : ''}
+                    `,
         onClick: () => onStartCall(call.ZP.TYPE.VIDEO)
       }, external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-video-call-filled"
@@ -12643,28 +13091,21 @@ class ConversationRightArea extends mixins.wl {
         }
       }, 1)
     });
-    const openInviteBtn = room.type !== 'private' && external_React_default().createElement("div", {
-      className: "open-invite-settings"
-    }, external_React_default().createElement(buttons.z, {
-      className: `
-                        link-button
-                        light
-                        open-invite-settings-button
-                    `,
-      disabled: !room.iAmOperator(),
-      icon: `
-                        sprite-fm-mono
-                        icon-user-filled
-                    `,
+    const waitingRoomButton = {
+      icon: 'icon-clock-user-thin-solid',
+      label: l.waiting_room,
+      secondLabel: l.waiting_room_info,
+      toggled: room.options[MCO_FLAGS.WAITING_ROOM],
+      disabled: room.havePendingCall(),
+      onClick: () => room.toggleWaitingRoom()
+    };
+    const openInviteButton = {
+      icon: 'icon-user-filled',
       label: room.isMeeting ? l.meeting_open_invite_label : l.chat_open_invite_label,
       secondLabel: l.open_invite_desc,
-      secondLabelClass: "label--green",
-      toggle: {
-        enabled: room.options[MCO_FLAGS.OPEN_INVITE],
-        onClick: () => room.toggleOpenInvite()
-      },
+      toggled: room.options[MCO_FLAGS.OPEN_INVITE],
       onClick: () => room.toggleOpenInvite()
-    }), AVseperator);
+    };
     let retentionTime = room.retentionTime ? secondsToDays(room.retentionTime) : 0;
     const ICON_ACTIVE = external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-check"
@@ -12755,7 +13196,7 @@ class ConversationRightArea extends mixins.wl {
       title: room.isMeeting ? l.meeting_participants : l.chat_participants,
       chatRoom: room,
       key: "participants"
-    }, participantsList) : null, room.type === 'public' && room.observers > 0 ? external_React_default().createElement("div", {
+    }, participantsList) : null, room.type === 'public' && room.observers > 0 && !room.options.w ? external_React_default().createElement("div", {
       className: "accordion-text observers"
     }, l[20466], external_React_default().createElement("span", {
       className: "observers-count"
@@ -12883,7 +13324,7 @@ class ConversationRightArea extends mixins.wl {
       onClick: () => {
         this.props.onAttachFromComputerClicked();
       }
-    })))), this.renderPushSettingsButton(), openInviteBtn, mega.es2020 && external_React_default().createElement(buttons.z, {
+    })))), this.renderPushSettingsButton(), room.type === 'private' ? null : external_React_default().createElement((external_React_default()).Fragment, null, room.scheduledMeeting && this.OptionsButton(waitingRoomButton), this.OptionsButton(openInviteButton), this.renderOptionsBanner(), AVseperator), mega.es2020 && external_React_default().createElement(buttons.z, {
       className: "link-button light export-chat-button",
       disabled: room.messagesBuff.messages.length === 0 || room.exportIo,
       onClick: () => {
@@ -13006,7 +13447,8 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       hasInvalidKeys: null,
       invalidKeysBanner: null,
       descriptionDialog: false,
-      occurrencesLoading: false
+      occurrencesLoading: false,
+      waitingRoom: false
     };
     const {
       chatRoom
@@ -13015,6 +13457,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     chatRoom.rebind(`openSendContactDialog.${this.getUniqueId()}`, () => this.openSendContactDialog());
     chatRoom.rebind(`openSchedDescDialog.${this.getUniqueId()}`, () => this.openSchedDescDialog());
     this.handleKeyDown = SoonFc(120, ev => this._handleKeyDown(ev));
+    this.state.waitingRoom = chatRoom.options.w && (chatRoom.isAnonymous() || megaChat.initialChatId || is_eplusplus);
   }
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
@@ -13066,7 +13509,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     const {
       chatRoom
     } = this.props;
-    if (isStartCallDisabled(chatRoom)) {
+    if (isStartCallDisabled(chatRoom) || chatRoom.iAmWaitingRoomPeer()) {
       return false;
     }
     return type === call.ZP.TYPE.AUDIO ? chatRoom.startAudioCall(scheduled) : chatRoom.startVideoCall(scheduled);
@@ -13089,78 +13532,105 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
   }
   componentDidMount() {
     super.componentDidMount();
-    var self = this;
-    self.$container = $('.conversation-panel', '#fmholder');
-    self.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', self.$container);
-    window.addEventListener('keydown', self.handleKeyDown);
-    self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function () {
-      self.callJustEnded = true;
+    const {
+      chatRoom
+    } = this.props;
+    this.$container = $('.conversation-panel', '#fmholder');
+    this.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', this.$container);
+    window.addEventListener('keydown', this.handleKeyDown);
+    chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', () => {
+      this.callJustEnded = true;
     });
-    self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function () {
-      self.props.chatRoom.scrolledToBottom = true;
-      if (self.messagesListScrollable) {
-        self.messagesListScrollable.scrollToBottom();
+    chatRoom.rebind('onSendMessage.scrollToBottom', () => {
+      chatRoom.scrolledToBottom = true;
+      if (this.messagesListScrollable) {
+        this.messagesListScrollable.scrollToBottom();
       }
     });
-    self.props.chatRoom.rebind('openSendFilesDialog.cpanel', function () {
-      self.setState({
-        'attachCloudDialog': true
+    chatRoom.rebind('openSendFilesDialog.cpanel', () => {
+      this.setState({
+        attachCloudDialog: true
       });
     });
-    self.props.chatRoom.rebind('showGetChatLinkDialog.ui', function () {
-      createTimeoutPromise(function () {
-        return self.props.chatRoom.topic && self.props.chatRoom.state === ChatRoom.STATE.READY;
-      }, 350, 15000).always(function () {
-        if (self.props.chatRoom.isCurrentlyActive) {
-          self.setState({
-            'chatLinkDialog': true
-          });
-        } else {
-          self.props.chatRoom.updatePublicHandle(false, true);
-        }
+    chatRoom.rebind('showGetChatLinkDialog.ui', () => {
+      createTimeoutPromise(() => chatRoom.topic && chatRoom.state === ChatRoom.STATE.READY, 350, 15000).always(() => {
+        return chatRoom.isCurrentlyActive ? this.setState({
+          chatLinkDialog: true
+        }) : chatRoom.updatePublicHandle(false, true);
       });
     });
-    if (self.props.chatRoom.type === "private") {
-      var otherContactHash = self.props.chatRoom.getParticipantsExceptMe()[0];
+    if (chatRoom.type === 'private') {
+      const otherContactHash = chatRoom.getParticipantsExceptMe()[0];
       if (otherContactHash in M.u) {
-        self._privateChangeListener = M.u[otherContactHash].addChangeListener(function () {
-          if (!self.isMounted()) {
+        this._privateChangeListener = M.u[otherContactHash].addChangeListener(() => {
+          if (!this.isMounted()) {
             return 0xDEAD;
           }
-          self.safeForceUpdate();
+          this.safeForceUpdate();
         });
       }
     }
-    self.eventuallyInit();
-    if (is_chatlink && !self.props.chatRoom.isMeeting) {
-      self.state.setNonLoggedInJoinChatDlgTrue = setTimeout(function () {
+    if (is_chatlink && !chatRoom.isMeeting) {
+      this.state.setNonLoggedInJoinChatDlgTrue = setTimeout(() => {
         M.safeShowDialog('chat-links-preview-desktop', () => {
-          if (self.isMounted()) {
-            self.setState({
-              'nonLoggedInJoinChatDialog': true
+          if (this.isMounted()) {
+            this.setState({
+              nonLoggedInJoinChatDialog: true
             });
           }
         });
       }, rand_range(5, 10) * 1000);
     }
-    if (is_chatlink && self.props.chatRoom.isMeeting && u_type !== false && u_type < 3) {
+    if (is_chatlink && chatRoom.isMeeting && u_type !== false && u_type < 3) {
       eventlog(99747, JSON.stringify([1, u_type | 0]), true);
     }
-    self.props.chatRoom._uiIsMounted = true;
-    self.props.chatRoom.$rConversationPanel = self;
-    self.props.chatRoom.trigger('onComponentDidMount');
-    ChatdIntegration._waitForProtocolHandler(this.props.chatRoom, () => {
+    chatRoom._uiIsMounted = true;
+    chatRoom.$rConversationPanel = this;
+    chatRoom.trigger('onComponentDidMount');
+    ChatdIntegration._waitForProtocolHandler(chatRoom, () => {
       if (this.isMounted()) {
-        const hasInvalidKeys = this.props.chatRoom.hasInvalidKeys();
+        const hasInvalidKeys = chatRoom.hasInvalidKeys();
         this.setState({
           hasInvalidKeys,
           invalidKeysBanner: hasInvalidKeys
         }, () => this.safeForceUpdate());
       }
     });
-    megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => this.isMounted() && this.setState({
-      occurrencesLoading: false
-    }));
+    this.eventuallyInit();
+    megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => {
+      return this.isMounted() && this.setState({
+        occurrencesLoading: false
+      });
+    });
+    chatRoom.rebind(`wrOnJoinNotAllowed.${this.getUniqueId()}`, () => {
+      return this.isMounted() && this.setState({
+        waitingRoom: true
+      });
+    });
+    chatRoom.rebind(`wrOnJoinAllowed.${this.getUniqueId()}`, () => {
+      return this.isMounted() && this.setState({
+        waitingRoom: false
+      });
+    });
+    if (chatRoom.options.w) {
+      chatRoom.rebind(`onMembersUpdated.${this.getUniqueId()}`, (ev, {
+        userId,
+        priv
+      }) => {
+        if (userId === u_handle && priv !== ChatRoom.MembersSet.PRIVILEGE_STATE.LEFT) {
+          chatRoom.unbind(`onMembersUpdated.${this.getUniqueId()}`);
+          if (is_chatlink) {
+            return megaChat.routing.reinitAndOpenExistingChat(chatRoom.chatId, chatRoom.publicChatHandle).then(chatRoom => chatRoom.havePendingCall() && priv === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR && chatRoom.joinCall()).catch(dump);
+          }
+          return this.state.waitingRoom && this.setState({
+            waitingRoom: priv !== ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR
+          });
+        }
+      });
+    }
+    this.pageChangeListener = mBroadcaster.addListener('beforepagechange', () => M.chat && this.state.waitingRoom && this.setState({
+      waitingRoom: false
+    }, () => this.safeForceUpdate()));
   }
   eventuallyInit() {
     var self = this;
@@ -13195,12 +13665,16 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         delete this._privateChangeListener;
       }
     }
+    mBroadcaster.removeListener(this.pageChangeListener);
     this.props.chatRoom.unbind("openAttachCloudDialog." + this.getUniqueId());
     this.props.chatRoom.unbind("openSendContactDialog." + this.getUniqueId());
     this.props.chatRoom.unbind(`openSchedDescDialog.${this.getUniqueId()}`);
     window.removeEventListener('keydown', self.handleKeyDown);
     $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
     $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
+    this.props.chatRoom.unbind(`wrOnJoinNotAllowed.${this.getUniqueId()}`);
+    this.props.chatRoom.unbind(`wrOnJoinAllowed.${this.getUniqueId()}`);
+    megaChat.unbind(`onIncomingCall.${this.getUniqueId()}`);
   }
   componentDidUpdate(prevProps, prevState) {
     var self = this;
@@ -13732,7 +14206,31 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         }
       });
     }
-    var startCallDisabled = isStartCallDisabled(room);
+    if (this.state.waitingRoom) {
+      return external_React_default().createElement(WaitingRoom, {
+        chatRoom: room,
+        havePendingCall: room.havePendingCall(),
+        onWaitingRoomLeave: () => {
+          var _room$call;
+          (_room$call = room.call) == null || _room$call.destroy();
+          if (is_eplusplus) {
+            room.leave(true);
+            return onIdle(M.logout);
+          }
+          return this.setState({
+            waitingRoom: false
+          }, () => {
+            onIdle(() => {
+              if (megaChat.initialChatId) {
+                megaChat.initialChatId = undefined;
+                loadSubPage(getLandingPage());
+              }
+            });
+          });
+        }
+      });
+    }
+    const startCallDisabled = isStartCallDisabled(room) || room.iAmWaitingRoomPeer();
     return external_React_default().createElement("div", {
       className: conversationPanelClasses,
       onMouseMove: () => self.onMouseMove(),
@@ -13888,18 +14386,20 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
           showHistoryRetentionDialog: true
         });
       },
-      onAddParticipantSelected: function (contactHashes) {
-        self.props.chatRoom.scrolledToBottom = true;
-        if (self.props.chatRoom.type == "private") {
-          var megaChat = self.props.chatRoom.megaChat;
-          loadingDialog.show();
-          megaChat.trigger('onNewGroupChatRequest', [self.props.chatRoom.getParticipantsExceptMe().concat(contactHashes), {
-            keyRotation: false,
-            topic: ''
-          }]);
-        } else {
-          self.props.chatRoom.trigger('onAddUserRequest', [contactHashes]);
+      onAddParticipantSelected: contactHashes => {
+        room.scrolledToBottom = true;
+        if (room.type === 'public') {
+          if (room.options.w && room.call) {
+            var _room$call$sfuClient;
+            (_room$call$sfuClient = room.call.sfuClient) == null || _room$call$sfuClient.wrAllowJoin(contactHashes);
+          }
+          return room.trigger('onAddUserRequest', [contactHashes]);
         }
+        loadingDialog.show();
+        megaChat.trigger('onNewGroupChatRequest', [[...room.getParticipantsExceptMe(), ...contactHashes], {
+          keyRotation: false,
+          topic: ''
+        }]);
       },
       onShowScheduledDescription: () => {
         if (room.scheduledMeeting) {
@@ -13930,7 +14430,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       icon: "sprite-fm-mono icon-info-filled",
       onClick: () => room.megaChat.toggleUIFlag('convPanelCollapse')
     }), external_React_default().createElement("div", {
-      "data-simpletip": `${l.unsupported_browser_video}`,
+      "data-simpletip": l.unsupported_browser_video,
       "data-simpletipposition": "top",
       "data-simpletipoffset": "5",
       className: `
@@ -13942,7 +14442,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       icon: "sprite-fm-mono icon-video-call-filled",
       onClick: () => startCallDisabled ? false : (0,call.xt)().then(() => this.startCall(call.ZP.TYPE.VIDEO)).catch(() => d && console.warn('Already in a call.'))
     })), external_React_default().createElement("div", {
-      "data-simpletip": `${l.unsupported_browser_audio}`,
+      "data-simpletip": l.unsupported_browser_audio,
       "data-simpletipposition": "top",
       "data-simpletipoffset": "5",
       className: `
@@ -13975,11 +14475,14 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         this.historyPanel = historyPanel;
       },
       onDeleteClicked: msg => this.handleDeleteDialog(msg)
-    })), !is_chatlink && room.state !== ChatRoom.STATE.LEFT && navigator.onLine && room.scheduledMeeting && !room.isArchived() && !startCallDisabled ? external_React_default().createElement(StartMeetingNotification, {
+    })), !is_chatlink && room.state !== ChatRoom.STATE.LEFT && navigator.onLine && room.scheduledMeeting && !room.isArchived() && !isStartCallDisabled(room) ? external_React_default().createElement(StartMeetingNotification, {
       chatRoom: room,
       offset: this.props.offset,
+      onWaitingRoomJoin: () => this.setState({
+        waitingRoom: true
+      }),
       onStartCall: mode => {
-        return startCallDisabled ? null : (0,call.xt)(true, room).then(() => this.startCall(mode, true)).catch(ex => d && console.warn(`Already in a call. ${ex}`));
+        return isStartCallDisabled(room) ? null : (0,call.xt)(true, room).then(() => this.startCall(mode, true)).catch(ex => d && console.warn(`Already in a call. ${ex}`));
       }
     }) : null, !is_chatlink && room.state !== ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ? external_React_default().createElement(JoinCallNotification, {
       chatRoom: room,
@@ -14218,8 +14721,8 @@ var external_React_ = __webpack_require__(363);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
 var mixins = __webpack_require__(503);
-// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 13 modules
-var conversationpanel = __webpack_require__(78);
+// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 14 modules
+var conversationpanel = __webpack_require__(21);
 // EXTERNAL MODULE: ./js/chat/ui/contactsPanel/contactsPanel.jsx + 20 modules
 var contactsPanel = __webpack_require__(808);
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
@@ -15601,6 +16104,7 @@ class Edit extends mixins.wl {
     this.occurrenceRef = null;
     this.datepickerRefs = [];
     this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
+    this.incomingCallListener = 'onIncomingCall.recurringEdit';
     this.state = {
       startDateTime: undefined,
       endDateTime: undefined,
@@ -15654,13 +16158,15 @@ class Edit extends mixins.wl {
       occurrenceId
     } = this.props;
     this.occurrenceRef = scheduledMeeting.occurrences[occurrenceId];
-    this.state.startDateTime = this.occurrenceRef.start;
-    this.state.endDateTime = this.occurrenceRef.end;
+    if (this.occurrenceRef) {
+      this.state.startDateTime = this.occurrenceRef.start;
+      this.state.endDateTime = this.occurrenceRef.end;
+    }
   }
   componentWillUnmount() {
     super.componentWillUnmount();
-    if (this.callDlgListener) {
-      megaChat.off(this.callDlgListener);
+    if (this.incomingCallListener) {
+      megaChat.off(this.incomingCallListener);
     }
     if ($.dialog === Schedule.dialogName) {
       closeDialog();
@@ -15672,8 +16178,7 @@ class Edit extends mixins.wl {
       if (!this.isMounted()) {
         throw Error(`Edit dialog: component not mounted.`);
       }
-      this.callDlgListener = 'onIncomingCall.recurringedit';
-      megaChat.rebind(this.callDlgListener, ({
+      megaChat.rebind(this.incomingCallListener, ({
         data
       }) => {
         if (this.isMounted() && !is_chatlink && pushNotificationSettings.isAllowedForChatId(data[0].chatId)) {
@@ -15681,8 +16186,8 @@ class Edit extends mixins.wl {
             overlayed: true,
             closeDialog: false
           });
-          megaChat.plugins.callManager2.rebind('onRingingStopped.recurringedit', () => {
-            megaChat.plugins.callManager2.off('onRingingStopped.recurringedit');
+          megaChat.plugins.callManager2.rebind('onRingingStopped.recurringEdit', () => {
+            megaChat.plugins.callManager2.off('onRingingStopped.recurringEdit');
             this.setState({
               overlayed: false
             });
@@ -15825,9 +16330,13 @@ class Edit extends mixins.wl {
     }));
   }
 }
+// EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
+var chat_chatRoom = __webpack_require__(804);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx
 
 var schedule_class;
+
+
 
 
 
@@ -15844,6 +16353,8 @@ class Schedule extends mixins.wl {
     this.scheduledMeetingRef = null;
     this.localStreamRef = '.float-video';
     this.datepickerRefs = [];
+    this.incomingCallListener = 'onIncomingCall.scheduleDialog';
+    this.ringingStoppedListener = 'onRingingStopped.scheduleDialog';
     this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
     this.nearestHalfHour = (0,helpers.Ny)();
     this.state = {
@@ -15855,7 +16366,8 @@ class Schedule extends mixins.wl {
       participants: [],
       link: false,
       sendInvite: false,
-      openInvite: true,
+      waitingRoom: false,
+      openInvite: false,
       description: '',
       closeDialog: false,
       isEdit: false,
@@ -15975,24 +16487,24 @@ class Schedule extends mixins.wl {
       });
     };
     this.handleSubmit = () => {
-      if (!this.state.topic) {
-        this.setState({
-          topicInvalid: true,
-          invalidTopicMsg: l.schedule_title_missing
+      if (this.state.topic) {
+        return this.setState({
+          isLoading: true
+        }, async () => {
+          const {
+            chatRoom,
+            onClose
+          } = this.props;
+          const params = [this.state, chatRoom];
+          await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](...params);
+          this.setState({
+            isLoading: false
+          }, () => onClose());
         });
-        return;
       }
-      this.setState({
-        isLoading: true
-      }, async () => {
-        const {
-          chatRoom,
-          onClose
-        } = this.props;
-        await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](this.state, chatRoom);
-        this.setState({
-          isLoading: false
-        }, () => onClose());
+      return this.setState({
+        topicInvalid: true,
+        invalidTopicMsg: l.schedule_title_missing
       });
     };
   }
@@ -16020,13 +16532,11 @@ class Schedule extends mixins.wl {
   }
   componentWillUnmount() {
     super.componentWillUnmount();
-    if (this.callDlgListener) {
-      megaChat.off(this.callDlgListener);
-    }
     if ($.dialog === Schedule.dialogName) {
       closeDialog();
     }
     [document, this.localStreamRef].map(el => $(el).unbind(`.${Schedule.NAMESPACE}`));
+    megaChat.off(this.incomingCallListener);
   }
   componentWillMount() {
     const {
@@ -16047,7 +16557,8 @@ class Schedule extends mixins.wl {
       this.state.link = !!publicLink;
       this.state.description = scheduledMeeting.description || '';
       this.state.sendInvite = scheduledMeeting.flags;
-      this.state.openInvite = options.oi;
+      this.state.waitingRoom = options[chat_chatRoom.MCO_FLAGS.WAITING_ROOM];
+      this.state.openInvite = options[chat_chatRoom.MCO_FLAGS.OPEN_INVITE];
       this.state.isEdit = true;
       this.scheduledMeetingRef = scheduledMeeting;
     }
@@ -16074,17 +16585,14 @@ class Schedule extends mixins.wl {
           return false;
         }
       });
-      this.callDlgListener = 'onIncomingCall.scheduledlg';
-      megaChat.rebind(this.callDlgListener, ({
-        data
-      }) => {
-        if (this.isMounted() && !is_chatlink && pushNotificationSettings.isAllowedForChatId(data[0].chatId)) {
+      megaChat.rebind(this.incomingCallListener, (e, chatRoom) => {
+        if (!is_chatlink && pushNotificationSettings.isAllowedForChatId(chatRoom.chatId)) {
           this.setState({
             overlayed: true,
             closeDialog: false
           });
-          megaChat.plugins.callManager2.rebind('onRingingStopped.scheduledlg', () => {
-            megaChat.plugins.callManager2.off('onRingingStopped.scheduledlg');
+          megaChat.plugins.callManager2.rebind(this.ringingStoppedListener, () => {
+            megaChat.plugins.callManager2.off(this.ringingStoppedListener);
             this.setState({
               overlayed: false
             });
@@ -16112,6 +16620,7 @@ class Schedule extends mixins.wl {
     }
   }
   render() {
+    var _this$props$chatRoom;
     const {
       topic,
       startDateTime,
@@ -16120,6 +16629,7 @@ class Schedule extends mixins.wl {
       participants,
       link,
       sendInvite,
+      waitingRoom,
       openInvite,
       description,
       closeDialog,
@@ -16131,24 +16641,15 @@ class Schedule extends mixins.wl {
       descriptionInvalid,
       overlayed
     } = this.state;
-    const {
-      callExpanded
-    } = this.props;
-    const dialogClasses = [];
-    if (closeDialog) {
-      dialogClasses.push('with-confirmation-dialog');
-    }
-    if (callExpanded || overlayed) {
-      dialogClasses.push('hidden');
-    }
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
       id: Schedule.NAMESPACE,
-      className: dialogClasses.join(' '),
+      className: `
+                    ${closeDialog ? 'with-confirmation-dialog' : ''}
+                    ${this.props.callExpanded || overlayed ? 'hidden' : ''}
+                `,
       dialogName: Schedule.dialogName,
       dialogType: "main",
-      onClose: () => {
-        return isDirty ? this.handleToggle('closeDialog') : this.props.onClose();
-      }
+      onClose: () => isDirty ? this.handleToggle('closeDialog') : this.props.onClose()
     }), external_React_default().createElement(Header, {
       chatRoom: isEdit && this.props.chatRoom
     }), external_React_default().createElement(perfectScrollbar.F, {
@@ -16275,12 +16776,29 @@ class Schedule extends mixins.wl {
       isLoading: isLoading,
       onToggle: this.handleToggle
     }), external_React_default().createElement(Checkbox, {
+      name: "waitingRoom",
+      className: (_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.havePendingCall() ? 'disabled' : '',
+      checked: waitingRoom,
+      label: l.waiting_room,
+      subLabel: l.waiting_room_info,
+      isLoading: isLoading,
+      onToggle: waitingRoom => {
+        var _this$props$chatRoom2;
+        return (_this$props$chatRoom2 = this.props.chatRoom) != null && _this$props$chatRoom2.havePendingCall() ? null : this.handleToggle(waitingRoom);
+      }
+    }), external_React_default().createElement(Checkbox, {
       name: "openInvite",
       checked: openInvite,
       label: l.open_invite_desc,
       isLoading: isLoading,
       onToggle: this.handleToggle
-    }), external_React_default().createElement(Textarea, {
+    }), waitingRoom && openInvite ? external_React_default().createElement(Row, null, external_React_default().createElement("div", {
+      className: "schedule-dialog-banner warn"
+    }, external_React_default().createElement(utils.Cw, null, l.waiting_room_invite.replace('[A]', `<a
+                                                href="${l.mega_help_host}/wp-admin/post.php?post=3005&action=edit"
+                                                target="_blank"
+                                                class="clickurl">
+                                            `).replace('[/A]', '</a>')))) : null, external_React_default().createElement(Textarea, {
       name: "description",
       invalid: descriptionInvalid,
       placeholder: l.schedule_description_input,
@@ -16294,7 +16812,7 @@ class Schedule extends mixins.wl {
       isEdit: isEdit,
       topic: topic,
       onSubmit: this.handleSubmit
-    }), !(overlayed || callExpanded) && closeDialog && external_React_default().createElement(CloseDialog, {
+    }), !(overlayed || this.props.callExpanded) && closeDialog && external_React_default().createElement(CloseDialog, {
       onToggle: this.handleToggle,
       onClose: this.props.onClose
     }));
@@ -16403,12 +16921,19 @@ const Input = ({
 };
 const Checkbox = ({
   name,
+  className,
   checked,
   label,
+  subLabel,
   isLoading,
   onToggle
 }) => {
-  return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("div", {
+  return external_React_default().createElement(Row, {
+    className: `
+                ${subLabel ? 'start-aligned' : ''}
+                ${className || ''}
+            `
+  }, external_React_default().createElement(Column, null, external_React_default().createElement("div", {
     className: `
                         checkdiv
                         ${checked ? 'checkboxOn' : 'checkboxOff'}
@@ -16418,11 +16943,15 @@ const Checkbox = ({
     className: isLoading ? 'disabled' : '',
     type: "checkbox",
     onChange: () => onToggle(name)
-  }))), external_React_default().createElement(Column, null, external_React_default().createElement("label", {
+  }))), external_React_default().createElement(Column, {
+    className: subLabel ? 'with-sub-label' : ''
+  }, external_React_default().createElement("label", {
     htmlFor: `${Schedule.NAMESPACE}-${name}`,
     className: isLoading ? 'disabled' : '',
     onClick: () => onToggle(name)
-  }, label)));
+  }, label), subLabel && external_React_default().createElement("div", {
+    className: "sub-label"
+  }, subLabel)));
 };
 const Switch = ({
   name,
@@ -16871,8 +17400,8 @@ window.StartGroupChatDialogUI = {
 const startGroupChatWizard = ({
   StartGroupChatWizard
 });
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
-var call = __webpack_require__(755);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(942);
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
 var chatToaster = __webpack_require__(142);
 ;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultTable.jsx
@@ -17636,7 +18165,7 @@ class Navigation extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(261);
+var dropdowns = __webpack_require__(78);
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/actions.jsx
 
 
@@ -19599,8 +20128,8 @@ class RetentionChange extends mixin.y {
     }, message.getMessageRetentionSummary())));
   }
 }
-// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 21 modules
-var call = __webpack_require__(755);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 22 modules
+var call = __webpack_require__(942);
 // EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
 var scheduleMetaChange = __webpack_require__(97);
 ;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
@@ -19700,11 +20229,12 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
       delay('chat-toast', this.initToast, 200);
     };
     this.initToast = () => {
+      var _this$messagesListScr;
       const {
         chatRoom
       } = this.props;
-      this.setState({
-        toast: !chatRoom.scrolledToBottom && !this.messagesListScrollable.isCloseToBottom(30)
+      return this.isMounted() && this.setState({
+        toast: !chatRoom.scrolledToBottom && !((_this$messagesListScr = this.messagesListScrollable) != null && _this$messagesListScr.isCloseToBottom != null && _this$messagesListScr.isCloseToBottom(30))
       }, () => this.state.toast ? null : chatRoom.trigger('onChatIsFocused'));
     };
     this.renderToast = () => {
@@ -20463,7 +20993,7 @@ const __WEBPACK_DEFAULT_EXPORT__ = (Button);
 
 /***/ }),
 
-/***/ 755:
+/***/ 942:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -20504,10 +21034,10 @@ class ModeSwitch extends mixins.wl {
     this.handleKeydown = ({
       keyCode
     }) => keyCode && keyCode === 27 && this.doClose();
-    this.doClose = () => this.setState({
+    this.doClose = () => this.isMounted() && this.setState({
       expanded: false
     });
-    this.doToggle = () => this.setState(state => ({
+    this.doToggle = () => this.isMounted() && this.setState(state => ({
       expanded: !state.expanded
     }));
     this.getModeIcon = mode => {
@@ -21533,7 +22063,7 @@ class StreamControls extends mixins.wl {
     });
     this.handleMousedown = ({
       target
-    }) => this.endContainerRef && this.endContainerRef.current && this.endContainerRef.current.contains(target) ? null : this.setState({
+    }) => this.endContainerRef && this.endContainerRef.current && this.endContainerRef.current.contains(target) ? null : this.isMounted() && this.setState({
       endCallOptions: false
     });
     this.renderDebug = () => {
@@ -21724,7 +22254,7 @@ class StreamControls extends mixins.wl {
 StreamControls.NAMESPACE = 'stream-controls';
 const streamControls = ((0,mixins.qC)(withMicObserver, permissionsObserver.Q)(StreamControls));
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(261);
+var dropdowns = __webpack_require__(78);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 var buttons = __webpack_require__(204);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/floatExtendedControls.jsx
@@ -22185,15 +22715,17 @@ class Stream extends mixins.wl {
   }
 }
 class Minimized extends mixins.wl {
-  constructor(...args) {
-    super(...args);
+  constructor(props) {
+    super(props);
     this.SIMPLETIP_PROPS = {
       position: 'top',
       offset: 5,
       className: 'theme-dark-forced'
     };
+    this.waitingPeersListener = undefined;
     this.state = {
-      unread: 0
+      unread: 0,
+      waitingRoomPeers: []
     };
     this.isActive = type => {
       return this.props.call.av & type;
@@ -22317,18 +22849,44 @@ class Minimized extends mixins.wl {
         onLeave: onCallEnd
       }));
     };
+    this.renderPeersWaiting = () => {
+      const {
+        waitingRoomPeers
+      } = this.state;
+      return external_React_default().createElement("div", {
+        className: `
+                    ${FloatingVideo.NAMESPACE}-alert
+                    theme-dark-forced
+                `,
+        onClick: this.props.onCallExpand
+      }, waitingRoomPeers.length > 1 ? l.wr_peers_waiting.replace('%1', waitingRoomPeers.length) : external_React_default().createElement(utils.Cw, {
+        tag: "span",
+        content: l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(waitingRoomPeers[0])))
+      }));
+    };
+    this.state.waitingRoomPeers = this.props.waitingRoomPeers || [];
   }
   componentDidMount() {
     super.componentDidMount();
     this.getUnread();
+    this.waitingPeersListener = mBroadcaster.addListener('meetings:peersWaiting', waitingRoomPeers => this.setState({
+      waitingRoomPeers
+    }, () => this.safeForceUpdate()));
   }
   componentWillUnmount() {
     super.componentWillUnmount();
     this.props.chatRoom.unbind(Minimized.UNREAD_EVENT);
+    if (this.waitingPeersListener) {
+      mBroadcaster.removeListener(this.waitingPeersListener);
+    }
   }
   render() {
     const {
-      unread
+      onCallExpand
+    } = this.props;
+    const {
+      unread,
+      waitingRoomPeers
     } = this.state;
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
       className: `${FloatingVideo.NAMESPACE}-overlay`
@@ -22341,9 +22899,9 @@ class Minimized extends mixins.wl {
       icon: "sprite-fm-mono icon-call-expand-mode",
       onClick: ev => {
         ev.stopPropagation();
-        this.props.onCallExpand();
+        onCallExpand();
       }
-    }), this.renderStreamControls()), unread ? external_React_default().createElement("div", {
+    }), this.renderStreamControls()), waitingRoomPeers && waitingRoomPeers.length ? this.renderPeersWaiting() : null, unread ? external_React_default().createElement("div", {
       className: `${FloatingVideo.NAMESPACE}-notifications`
     }, external_React_default().createElement(meetings_button.Z, {
       className: "mega-button round large chat-control",
@@ -22453,7 +23011,156 @@ class ParticipantsNotice extends mixins.wl {
 ParticipantsNotice.NAMESPACE = 'participants-notice';
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
 var chatToaster = __webpack_require__(142);
+// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
+var perfectScrollbar = __webpack_require__(285);
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/waitingRoom/admit.jsx
+
+
+
+
+
+
+const NAMESPACE = 'admit';
+class Admit extends mixins.wl {
+  constructor(...args) {
+    super(...args);
+    this.peersWaitingRef = external_React_default().createRef();
+    this.state = {
+      expanded: false
+    };
+    this.doAdmit = peers => {
+      var _this$props$call;
+      return (_this$props$call = this.props.call) == null || (_this$props$call = _this$props$call.sfuClient) == null ? void 0 : _this$props$call.wrAllowJoin([peers]);
+    };
+    this.doDeny = peers => {
+      var _this$props$call2;
+      return (_this$props$call2 = this.props.call) == null || (_this$props$call2 = _this$props$call2.sfuClient) == null ? void 0 : _this$props$call2.wrKickOut([peers]);
+    };
+    this.Icon = ({
+      icon,
+      label,
+      onClick
+    }) => external_React_default().createElement("i", {
+      className: `
+                sprite-fm-mono
+                simpletip
+                ${icon}
+            `,
+      "data-simpletip": label,
+      "data-simpletipposition": "top",
+      "data-simpletipoffset": "5",
+      "data-simpletip-class": "theme-dark-forced",
+      onClick: onClick
+    });
+    this.renderPeersList = () => {
+      const {
+        peers
+      } = this.props;
+      return external_React_default().createElement(perfectScrollbar.F, {
+        ref: this.peersWaitingRef,
+        options: {
+          'suppressScrollX': true
+        }
+      }, external_React_default().createElement("div", {
+        className: "peers-waiting"
+      }, peers.map(handle => {
+        return external_React_default().createElement("div", {
+          key: handle,
+          className: "peers-waiting-card"
+        }, external_React_default().createElement("div", {
+          className: "peer-avatar"
+        }, external_React_default().createElement(ui_contacts.Avatar, {
+          contact: M.u[handle]
+        })), external_React_default().createElement("div", {
+          className: "peer-name"
+        }, external_React_default().createElement(utils.dy, null, M.getNameByHandle(handle))), external_React_default().createElement("div", {
+          className: "peer-controls"
+        }, external_React_default().createElement(this.Icon, {
+          icon: "icon-close-component",
+          label: l.wr_deny,
+          onClick: () => this.doDeny(handle)
+        }), external_React_default().createElement(this.Icon, {
+          icon: "icon-check",
+          label: l.wr_admit,
+          onClick: () => this.doAdmit(handle)
+        })));
+      })));
+    };
+    this.renderMultiplePeersWaiting = () => {
+      const {
+        call,
+        peers
+      } = this.props;
+      const {
+        expanded
+      } = this.state;
+      if (peers && peers.length) {
+        return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
+          className: `${NAMESPACE}-head`
+        }, external_React_default().createElement("h3", null, l.wr_peers_waiting.replace('%1', peers.length)), expanded ? external_React_default().createElement(this.Icon, {
+          icon: "icon-arrow-up",
+          onClick: () => this.setState({
+            expanded: false
+          })
+        }) : null), expanded && external_React_default().createElement("div", {
+          className: `${NAMESPACE}-content`
+        }, this.renderPeersList()), external_React_default().createElement("div", {
+          className: `${NAMESPACE}-controls`
+        }, expanded ? null : external_React_default().createElement(meetings_button.Z, {
+          className: "mega-button theme-dark-forced",
+          onClick: () => this.setState({
+            expanded: true
+          })
+        }, external_React_default().createElement("span", null, l.wr_see_waiting)), external_React_default().createElement(meetings_button.Z, {
+          peers: peers,
+          className: "mega-button positive theme-dark-forced",
+          onClick: () => call.sfuClient.wrAllowJoin(peers)
+        }, external_React_default().createElement("span", null, l.wr_admit_all))));
+      }
+      return null;
+    };
+    this.renderSinglePeerWaiting = () => {
+      const {
+        peers
+      } = this.props;
+      const peer = peers[0];
+      if (peer) {
+        return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.Cw, {
+          tag: "h3",
+          content: l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(peer)))
+        }), external_React_default().createElement("div", {
+          className: `${NAMESPACE}-controls`
+        }, external_React_default().createElement(meetings_button.Z, {
+          className: "mega-button theme-dark-forced",
+          onClick: () => this.doDeny(peer)
+        }, external_React_default().createElement("span", null, l.wr_deny)), external_React_default().createElement(meetings_button.Z, {
+          className: "mega-button positive theme-dark-forced",
+          onClick: () => this.doAdmit(peer)
+        }, external_React_default().createElement("span", null, l.wr_admit))));
+      }
+      return null;
+    };
+  }
+  render() {
+    const {
+      chatRoom,
+      peers
+    } = this.props;
+    if (chatRoom.iAmOperator()) {
+      return external_React_default().createElement("div", {
+        className: `
+                        ${NAMESPACE}
+                        theme-dark-forced
+                    `
+      }, external_React_default().createElement("div", {
+        className: `${NAMESPACE}-wrapper`
+      }, peers && peers.length > 1 ? this.renderMultiplePeersWaiting() : this.renderSinglePeerWaiting()));
+    }
+    return null;
+  }
+}
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/stream.jsx
+
 
 
 
@@ -22469,7 +23176,7 @@ const STREAM_ACTIONS = {
   REMOVE: 2
 };
 const MAX_STREAMS = 19;
-const NAMESPACE = 'stream';
+const stream_NAMESPACE = 'stream';
 const MAX_STREAMS_PER_PAGE = 9;
 const PAGINATION = {
   PREV: -1,
@@ -22516,7 +23223,7 @@ class stream_Stream extends mixins.wl {
   }
   handleMouseOut() {
     if (this.state.hovered) {
-      this.delayProcID = delay(`${NAMESPACE}-hover`, () => {
+      this.delayProcID = delay(`${stream_NAMESPACE}-hover`, () => {
         if (this.isMounted()) {
           this.setState({
             hovered: false
@@ -22748,7 +23455,7 @@ class stream_Stream extends mixins.wl {
     const streamContainer = content => external_React_default().createElement("div", {
       ref: this.containerRef,
       className: `
-                    ${NAMESPACE}-container
+                    ${stream_NAMESPACE}-container
                     ${peers.length === 0 || !hasOtherParticipants ? 'with-notice' : ''}
                 `
     }, content);
@@ -22807,6 +23514,7 @@ class stream_Stream extends mixins.wl {
       forcedLocal,
       view,
       isOnHold,
+      waitingRoomPeers,
       onCallMinimize,
       onCallExpand,
       onStreamToggle,
@@ -22823,13 +23531,17 @@ class stream_Stream extends mixins.wl {
     return external_React_default().createElement("div", {
       ref: this.wrapperRef,
       className: `
-                    ${NAMESPACE}
+                    ${stream_NAMESPACE}
                     ${sidebar ? '' : 'full'}
                     ${hovered ? 'hovered' : ''}
                 `,
       onMouseMove: this.handleMouseMove,
       onMouseOut: this.handleMouseOut
-    }, external_React_default().createElement(chatToaster.Z, {
+    }, waitingRoomPeers && waitingRoomPeers.length ? external_React_default().createElement(Admit, {
+      chatRoom: chatRoom,
+      call: call,
+      peers: waitingRoomPeers
+    }) : null, external_React_default().createElement(chatToaster.Z, {
       showDualNotifications: true,
       hidden: minimized,
       onShownToast: t => {
@@ -22847,7 +23559,7 @@ class stream_Stream extends mixins.wl {
         }
       }
     }), minimized ? null : external_React_default().createElement("div", {
-      className: `${NAMESPACE}-wrapper`
+      className: `${stream_NAMESPACE}-wrapper`
     }, external_React_default().createElement(StreamHead, {
       disableCheckingVisibility: true,
       mode: mode,
@@ -22887,6 +23599,7 @@ class stream_Stream extends mixins.wl {
       sidebar: sidebar,
       forcedLocal: forcedLocal,
       wrapperRef: this.wrapperRef,
+      waitingRoomPeers: waitingRoomPeers,
       onAudioClick: onAudioClick,
       onVideoClick: onVideoClick,
       onCallEnd: onCallEnd,
@@ -22942,8 +23655,6 @@ class Collapse extends mixins.wl {
     }, badge)), expanded && children);
   }
 }
-// EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/participants.jsx
 
 
@@ -23367,10 +24078,15 @@ class Invite extends mixins.wl {
         selected
       } = this.state;
       const {
+        call,
         chatRoom,
         onClose
       } = this.props;
       if (selected.length > 0) {
+        if (chatRoom.options.w) {
+          var _call$sfuClient;
+          call == null || (_call$sfuClient = call.sfuClient) == null || _call$sfuClient.wrAllowJoin(selected);
+        }
         chatRoom == null || chatRoom.trigger('onAddUserRequest', [selected]);
         onClose == null || onClose();
       }
@@ -23622,8 +24338,8 @@ class Offline extends mixins.wl {
   }
 }
 Offline.NAMESPACE = 'reconnect-dialog';
-// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 13 modules
-var conversationpanel = __webpack_require__(78);
+// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 14 modules
+var conversationpanel = __webpack_require__(21);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/call.jsx
 
 
@@ -23634,6 +24350,7 @@ var conversationpanel = __webpack_require__(78);
 
 
 
+const call_NAMESPACE = 'meetings-call';
 const EXPANDED_FLAG = 'in-call';
 const inProgressAlert = (isJoin, chatRoom) => {
   return new Promise((resolve, reject) => {
@@ -23666,7 +24383,9 @@ const inProgressAlert = (isJoin, chatRoom) => {
 class Call extends mixins.wl {
   constructor(props) {
     super(props);
-    this.ephemeralAddListener = null;
+    this.ephemeralAddListener = undefined;
+    this.offlineDelayed = undefined;
+    this.callStartTimeout = undefined;
     this.state = {
       mode: undefined,
       view: Call.VIEW.PARTICIPANTS,
@@ -23677,13 +24396,19 @@ class Call extends mixins.wl {
       offline: false,
       ephemeralAccounts: [],
       everHadPeers: false,
+      waitingRoomPeers: [],
       guest: Call.isGuest()
     };
     this.handleRetryTimeout = () => {
-      if (this.props.call.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
+      var _call$sfuClient;
+      const {
+        call,
+        chatRoom
+      } = this.props;
+      if ((call == null || (_call$sfuClient = call.sfuClient) == null ? void 0 : _call$sfuClient.connState) === SfuClient.ConnState.kDisconnectedRetrying) {
         this.handleCallEnd();
-        this.props.chatRoom.trigger('onRetryTimeout');
-        ion.sound.play(SOUNDS.CALL_END);
+        chatRoom.trigger('onRetryTimeout');
+        ion.sound.play(megaChat.SOUNDS.CALL_END);
       }
     };
     this.handleCallOnline = () => {
@@ -23700,7 +24425,7 @@ class Call extends mixins.wl {
       const {
         chatRoom
       } = this.props;
-      chatRoom.rebind('onCallPeerLeft.callComp', () => {
+      chatRoom.rebind(`onCallPeerLeft.${call_NAMESPACE}`, () => {
         const {
           minimized,
           peers,
@@ -23714,7 +24439,7 @@ class Call extends mixins.wl {
           });
         }
       });
-      chatRoom.rebind('onCallPeerJoined.callComp', () => {
+      chatRoom.rebind(`onCallPeerJoined.${call_NAMESPACE}`, () => {
         const {
           minimized,
           peers,
@@ -23733,15 +24458,33 @@ class Call extends mixins.wl {
               everHadPeers: true
             });
           }
-          if (this.callStartTimeout) {
-            clearTimeout(this.callStartTimeout);
-            delete this.callStartTimeout;
-          }
+          clearTimeout(this.callStartTimeout);
         }
       });
-      chatRoom.rebind('onCallLeft.callComp', () => this.props.minimized && this.props.onCallEnd());
+      chatRoom.rebind(`onCallLeft.${call_NAMESPACE}`, () => this.props.minimized && this.props.onCallEnd());
+      chatRoom.rebind(`wrOnUsersEntered.${call_NAMESPACE}`, (ev, users) => Object.entries(users).forEach(([handle, host]) => {
+        return host || this.state.waitingRoomPeers.includes(handle) ? null : this.isMounted() && this.setState({
+          waitingRoomPeers: [...this.state.waitingRoomPeers, handle]
+        }, () => {
+          const {
+            waitingRoomPeers
+          } = this.state;
+          if (waitingRoomPeers && waitingRoomPeers.length === 1) {
+            ion.sound.play(megaChat.SOUNDS.CALL_JOIN_WAITING);
+          }
+          mBroadcaster.sendMessage('meetings:peersWaiting', waitingRoomPeers);
+        });
+      }));
+      chatRoom.rebind(`wrOnUserLeft.${call_NAMESPACE}`, (ev, user) => this.isMounted() && this.setState({
+        waitingRoomPeers: this.state.waitingRoomPeers.filter(h => h !== user)
+      }, () => mBroadcaster.sendMessage('meetings:peersWaiting', this.state.waitingRoomPeers)));
+      chatRoom.rebind(`wrOnUserDump.${call_NAMESPACE}`, (ev, users) => Object.entries(users).forEach(([handle, host]) => {
+        return host || this.state.waitingRoomPeers.includes(handle) ? null : this.isMounted() && this.setState({
+          waitingRoomPeers: [...this.state.waitingRoomPeers, handle]
+        });
+      }));
     };
-    this.unbindCallEvents = () => ['onCallPeerLeft.callComp', 'onCallPeerJoined.callComp', 'onCallLeft.callComp'].map(event => this.props.chatRoom.off(event));
+    this.unbindCallEvents = () => [`onCallPeerLeft.${call_NAMESPACE}`, `onCallPeerJoined.${call_NAMESPACE}`, `onCallLeft.${call_NAMESPACE}`, `wrOnUsersEntered.${call_NAMESPACE}`, `wrOnUserLeft.${call_NAMESPACE}`, `alterUserPrivilege.${call_NAMESPACE}`].map(event => this.props.chatRoom.off(event));
     this.handleCallMinimize = () => {
       const {
         call,
@@ -23754,6 +24497,7 @@ class Call extends mixins.wl {
         view
       } = this.state;
       const {
+        callToutId,
         stayOnEnd
       } = call;
       Call.STATE.PREVIOUS = mode !== Call.MODE.MINI ? {
@@ -23769,7 +24513,7 @@ class Call extends mixins.wl {
         call.setViewMode(Call.MODE.MINI);
       }) : (() => {
         onCallMinimize();
-        if (typeof call.callToutId !== 'undefined' && !stayOnEnd) {
+        if (typeof callToutId !== 'undefined' && !stayOnEnd) {
           onIdle(() => call.showTimeoutDialog());
         }
       })();
@@ -23889,6 +24633,10 @@ class Call extends mixins.wl {
     this.pCallTimer = null;
     this.state.mode = props.call.viewMode;
     this.state.sidebar = props.chatRoom.type === 'public';
+    const {
+      SOUNDS
+    } = megaChat;
+    [SOUNDS.RECONNECT, SOUNDS.CALL_END, SOUNDS.CALL_JOIN_WAITING].map(sound => ion.sound.preload(sound));
   }
   handleCallOffline() {
     if (!this.pCallTimer) {
@@ -23906,32 +24654,24 @@ class Call extends mixins.wl {
       willUnmount,
       chatRoom
     } = this.props;
-    if (willUnmount) {
-      willUnmount(minimized);
-    }
-    if (this.ephemeralAddListener) {
-      mBroadcaster.removeListener(this.ephemeralAddListener);
-    }
-    chatRoom.megaChat.off('sfuConnClose.call');
-    chatRoom.megaChat.off('sfuConnOpen.call');
-    this.unbindCallEvents();
-    if (this.callStartTimeout) {
-      clearTimeout(this.callStartTimeout);
-    }
-    delay.cancel('callOffline');
+    chatRoom.megaChat.off(`sfuConnClose.${call_NAMESPACE}`);
+    chatRoom.megaChat.off(`sfuConnOpen.${call_NAMESPACE}`);
+    mBroadcaster.removeListener(this.ephemeralAddListener);
     if (this.pageChangeListener) {
       mBroadcaster.removeListener(this.pageChangeListener);
     }
+    clearTimeout(this.callStartTimeout);
+    delay.cancel('callOffline');
+    this.unbindCallEvents();
+    willUnmount == null || willUnmount(minimized);
   }
   componentDidMount() {
     super.componentDidMount();
     const {
+      call,
       didMount,
       chatRoom
     } = this.props;
-    if (didMount) {
-      didMount();
-    }
     this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle => this.handleEphemeralAdd(handle));
     this.pageChangeListener = mBroadcaster.addListener('pagechange', () => {
       const currentRoom = megaChat.getCurrentRoom();
@@ -23939,34 +24679,30 @@ class Call extends mixins.wl {
         this.handleCallMinimize();
       }
     });
-    chatRoom.megaChat.rebind('sfuConnOpen.call', this.handleCallOnline);
-    chatRoom.megaChat.rebind('sfuConnClose.call', () => this.handleCallOffline());
-    this.bindCallEvents();
-    const {
-      SOUNDS
-    } = megaChat.CONSTANTS;
-    [SOUNDS.RECONNECT, SOUNDS.CALL_END].map(sound => ion.sound.preload(sound));
+    chatRoom.megaChat.rebind(`sfuConnOpen.${call_NAMESPACE}`, this.handleCallOnline);
+    chatRoom.megaChat.rebind(`sfuConnClose.${call_NAMESPACE}`, () => this.handleCallOffline());
     this.callStartTimeout = setTimeout(() => {
-      const {
-        call
-      } = this.props;
       if (!mega.config.get('callemptytout') && !call.hasOtherParticipant()) {
         call.left = true;
         call.initCallTimeout();
       }
-      delete this.callStartTimeout;
     }, 300000);
     setTimeout(() => {
+      var _call$peers;
+      return ((_call$peers = call.peers) == null ? void 0 : _call$peers.length) && !call.hasOtherParticipant() && this.setState({
+        everHadPeers: true
+      });
+    }, 2e3);
+    if (sessionStorage.previewMedia) {
       const {
-        call
-      } = this.props;
-      const peers = call.peers;
-      if (peers && peers.length && !call.hasOtherParticipant()) {
-        this.setState({
-          everHadPeers: true
-        });
-      }
-    }, 2000);
+        audio,
+        video
+      } = JSON.parse(sessionStorage.previewMedia);
+      sessionStorage.removeItem('previewMedia');
+      tSleep(2).then(() => audio && call.sfuClient.muteAudio()).then(() => video && call.sfuClient.muteCamera()).catch(dump);
+    }
+    this.bindCallEvents();
+    didMount == null || didMount();
   }
   render() {
     const {
@@ -23987,7 +24723,8 @@ class Call extends mixins.wl {
       ephemeralAccounts,
       guest,
       offline,
-      everHadPeers
+      everHadPeers,
+      waitingRoomPeers
     } = this.state;
     const {
       stayOnEnd
@@ -24003,6 +24740,7 @@ class Call extends mixins.wl {
       parent,
       stayOnEnd,
       everHadPeers,
+      waitingRoomPeers,
       hasOtherParticipants: call.hasOtherParticipant(),
       isOnHold: call.sfuClient.isOnHold(),
       onSpeakerChange: this.handleSpeakerChange,
@@ -24010,7 +24748,10 @@ class Call extends mixins.wl {
       onStayConfirm: this.handleStayConfirm
     };
     return external_React_default().createElement("div", {
-      className: `meetings-call ${minimized ? 'minimized' : ''}`
+      className: `
+                    ${call_NAMESPACE}
+                    ${minimized ? 'minimized' : ''}
+                `
     }, external_React_default().createElement(stream_Stream, (0,esm_extends.Z)({}, STREAM_PROPS, {
       minimized: minimized,
       ephemeralAccounts: ephemeralAccounts,
@@ -24037,6 +24778,7 @@ class Call extends mixins.wl {
       onDeleteMessage: onDeleteMessage
     })), invite && external_React_default().createElement(Invite, {
       contacts: M.u,
+      call: call,
       chatRoom: chatRoom,
       onClose: () => this.setState({
         invite: false
@@ -24617,7 +25359,7 @@ var _mixins1__ = __webpack_require__(503);
 var _contacts_jsx2__ = __webpack_require__(13);
 var _ui_modalDialogs_jsx3__ = __webpack_require__(182);
 var _button_jsx4__ = __webpack_require__(193);
-var _call_jsx5__ = __webpack_require__(755);
+var _call_jsx5__ = __webpack_require__(942);
 var _ui_utils_jsx6__ = __webpack_require__(79);
 
 
@@ -24789,7 +25531,7 @@ var react0__ = __webpack_require__(363);
 var react0 = __webpack_require__.n(react0__);
 var _mixins_js1__ = __webpack_require__(503);
 var _contacts_jsx2__ = __webpack_require__(13);
-var _call_jsx3__ = __webpack_require__(755);
+var _call_jsx3__ = __webpack_require__(942);
 var _button_jsx4__ = __webpack_require__(193);
 var _permissionsObserver5__ = __webpack_require__(209);
 
@@ -24799,14 +25541,14 @@ var _permissionsObserver5__ = __webpack_require__(209);
 
 
 class Preview extends _mixins_js1__.wl {
-  constructor(...args) {
-    super(...args);
+  constructor(props) {
+    super(props);
     this.videoRef = react0().createRef();
     this.stream = null;
-    this.avatarMeta = null;
     this.state = {
       audio: false,
-      video: false
+      video: false,
+      avatarMeta: undefined
     };
     this.getTrackType = type => !type ? 'getTracks' : type === Preview.STREAMS.AUDIO ? 'getAudioTracks' : 'getVideoTracks';
     this.startStream = type => {
@@ -24829,7 +25571,7 @@ class Preview extends _mixins_js1__.wl {
         }
       }).catch(ex => {
         const stream = type === Preview.STREAMS.AUDIO ? 'audio' : 'video';
-        this.setState(state => ({
+        return this.isMounted && this.setState(state => ({
           [stream]: !state[stream]
         }), () => {
           megaChat.trigger('onLocalMediaError', {
@@ -24874,7 +25616,7 @@ class Preview extends _mixins_js1__.wl {
           avatarUrl,
           color,
           shortName
-        } = this.avatarMeta || {};
+        } = this.state.avatarMeta || {};
         return react0().createElement("div", {
           className: `
                         avatar-wrapper
@@ -24889,6 +25631,12 @@ class Preview extends _mixins_js1__.wl {
         contact: M.u[u_handle]
       });
     };
+    this.state.audio = this.props.audio || this.state.audio;
+    if (this.props.video) {
+      this.state.video = this.props.video;
+      this.startStream(Preview.STREAMS.VIDEO);
+      this.props.onToggle(this.state.audio, this.state.video);
+    }
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -24899,8 +25647,9 @@ class Preview extends _mixins_js1__.wl {
     if (this.props.onToggle) {
       this.props.onToggle(this.state.audio, this.state.video);
     }
-    this.toggleStream(Preview.STREAMS.AUDIO);
-    this.avatarMeta = is_chatlink ? generateAvatarMeta(u_handle) : null;
+    this.setState({
+      avatarMeta: is_chatlink ? generateAvatarMeta(u_handle) : undefined
+    });
   }
   render() {
     const {
@@ -24908,8 +25657,7 @@ class Preview extends _mixins_js1__.wl {
     } = Preview;
     const {
       hasToRenderPermissionsWarning,
-      renderPermissionsWarning,
-      resetError
+      renderPermissionsWarning
     } = this.props;
     const {
       audio,
@@ -25385,7 +26133,7 @@ class Local extends AbstractGenericMessage {
   }
 }
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(261);
+var dropdowns = __webpack_require__(78);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 var buttons = __webpack_require__(204);
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/contact.jsx
@@ -28993,7 +29741,7 @@ class Button extends _chat_mixins1__.wl {
 
 /***/ }),
 
-/***/ 261:
+/***/ 78:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -29386,7 +30134,7 @@ var _chat_mixins0__ = __webpack_require__(503);
 
 var React = __webpack_require__(363);
 
-var DropdownsUI = __webpack_require__(261);
+var DropdownsUI = __webpack_require__(78);
 var PerfectScrollbar = (__webpack_require__(285).F);
 class DropdownEmojiSelector extends _chat_mixins0__.wl {
   constructor(props) {

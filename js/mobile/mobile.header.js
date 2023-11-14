@@ -349,18 +349,16 @@ class MegaMobileHeader extends MegaMobileComponent {
 
         const noTabletView = isPublicLink() || isPublickLinkV2() || page.startsWith('businesssignup')
             || page === 'keybackup';
-        const mainPageLayout = document.getElementById('mainlayout');
 
         const _hide = () => {
 
-            const mainPageLayout = document.getElementById('mainlayout');
-            mainPageLayout.classList.add('no-tablet-layout');
+            mainlayout.classList.add('no-tablet-layout');
             this.hide();
         };
 
         if (is_fm() || noTabletView) {
 
-            mainPageLayout.classList[noTabletView ? 'add' : 'remove']('no-tablet-layout');
+            mainlayout.classList[noTabletView ? 'add' : 'remove']('no-tablet-layout');
 
             const type = MegaMobileHeader.getType();
 
@@ -390,11 +388,9 @@ class MegaMobileHeader extends MegaMobileComponent {
     static init(update) {
         MegaMobileTopMenu.init();
 
-        const mainPageLayout = document.getElementById('mainlayout');
-
-        if (!mega.ui.header && mainPageLayout) {
+        if (!mega.ui.header) {
             mega.ui.header = new MegaMobileHeader({
-                parentNode: document.getElementById('mainlayout'),
+                parentNode: mainlayout,
                 componentClassname: 'mega-header',
                 prepend: true
             });

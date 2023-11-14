@@ -162,7 +162,7 @@ class MegaMobileHeader extends MegaMobileComponent {
                 if (typeof mobile.settingsHelper.currentPage !== 'undefined'){
                     mobile.settingsHelper.currentPage.hide();
 
-                    if (M.currentdirid.split('/').pop() === 'verify') {
+                    if (String(M.currentdirid).split('/').pop() === 'verify') {
                         return loadSubPage('fm/account');
                     }
                 }
@@ -175,7 +175,7 @@ class MegaMobileHeader extends MegaMobileComponent {
                     return loadSubPage('fm');
                 }
 
-                if (M.currentdirid.includes('two-factor-authentication')) {
+                if (String(M.currentdirid).includes('two-factor-authentication')) {
                     return mobile.twofactor.settings.previousPage();
                 }
 

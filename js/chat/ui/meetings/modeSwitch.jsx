@@ -20,9 +20,9 @@ export default class ModeSwitch extends MegaRenderMixin {
 
     handleKeydown = ({ keyCode }) => keyCode && keyCode === 27 /* ESC */ && this.doClose();
 
-    doClose = () => this.setState({ expanded: false });
+    doClose = () => this.isMounted() && this.setState({ expanded: false });
 
-    doToggle = () => this.setState(state => ({ expanded: !state.expanded }));
+    doToggle = () => this.isMounted() && this.setState(state => ({ expanded: !state.expanded }));
 
     getModeIcon = mode => {
         switch (mode) {

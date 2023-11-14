@@ -66,27 +66,23 @@ function Chat() {
     this.handleToId = Object.create(null);
     this.publicChatKeys = Object.create(null);
 
-    // @TODO when adding more constants consider extracting this elsewhere.
-    this.CONSTANTS = {
-        SOUNDS: {
-            ALERT: 'alert_info_message',
-            ERROR: 'error_message',
-            INCOMING_MSG: 'incoming_chat_message',
-            INCOMING_CONTACT: 'incoming_contact_request',
-            INCOMING_FILE: 'incoming_file_transfer',
-            INCOMING_CALL: 'incoming_voice_video_call',
-            HANG_OUT: 'hang_out',
-            CALL_JOIN: 'user_join_call',
-            CALL_LEFT: 'user_left_call',
-            CALL_END: 'end_call',
-            RECONNECT: 'reconnecting',
-        },
+    this.SOUNDS = {
+        ALERT: 'alert_info_message',
+        ERROR: 'error_message',
+        INCOMING_MSG: 'incoming_chat_message',
+        INCOMING_CONTACT: 'incoming_contact_request',
+        INCOMING_FILE: 'incoming_file_transfer',
+        INCOMING_CALL: 'incoming_voice_video_call',
+        HANG_OUT: 'hang_out',
+        CALL_JOIN: 'user_join_call',
+        CALL_LEFT: 'user_left_call',
+        CALL_END: 'end_call',
+        CALL_JOIN_WAITING: 'user_join_waiting',
+        RECONNECT: 'reconnecting'
     };
 
     this.options = {
         'delaySendMessageIfRoomNotAvailableTimeout': 3000,
-        filePickerOptions: {
-        },
         /**
          * Really simple plugin architecture
          *
@@ -188,7 +184,7 @@ function Chat() {
                     body: l.notif_body_scheduled_starting, /* `Meeting starts now` */
                 }
             },
-            sounds: Object.values(this.CONSTANTS.SOUNDS),
+            sounds: Object.values(this.SOUNDS),
         },
         'chatStoreOptions': {
             'autoPurgeMaxMessagesPerRoom': 1024

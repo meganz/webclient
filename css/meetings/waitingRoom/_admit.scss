@@ -1,0 +1,92 @@
+.admit {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 450px;
+    border-radius: 24px;
+    background: var(--surface-main);
+    box-shadow: var(--dialog-shadow);
+    z-index: 51;
+
+    &-wrapper {
+        padding: 24px;
+
+        h3 {
+            margin-top: 0;
+            color: var(--text-color-high);
+        }
+    }
+
+    &-head {
+        display: flex;
+        justify-content: space-between;
+
+        i {
+            margin-inline-end: 12px;
+            --icon-size: 28px;
+            --mask-color: var(--icon-rest);
+            cursor: pointer;
+
+            &:hover { --mask-color: var(--icon-active); }
+        }
+    }
+
+    &-content {
+        overflow: hidden;
+        margin: 0 0 18px;
+        border-top: 1px solid var(--stroke-grey-2);
+        border-bottom: 1px solid var(--stroke-grey-2);
+
+        .peers-waiting {
+            max-height: 190px;
+            font: var(--text-body1);
+            color: var(--text-color-high);
+
+            &-card {
+                display: flex;
+                align-items: center;
+                margin: 12px 12px 12px 0;
+
+                .peer-avatar {
+                    /* [...] */
+
+                    .avatar-wrapper {
+                        border-radius: 4px;
+                    }
+                }
+
+                .peer-name {
+                    margin-inline-start: 8px;
+                }
+
+                .peer-controls {
+                    display: flex;
+                    margin-inline-start: auto;
+
+                    i {
+                        display: inline-block;
+                        margin-inline-start: 8px;
+                        --icon-size: 28px;
+                        --mask-color: var(--icon-rest);
+                        cursor: pointer;
+
+                        &:hover { --mask-color: var(--icon-active); }
+                        &:active { --mask-color: var(--icon-rest); }
+                    }
+                }
+            }
+        }
+    }
+
+    &-controls {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
+
+        button {
+            margin-inline-start: 8px;
+        }
+    }
+}

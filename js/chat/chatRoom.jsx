@@ -307,12 +307,11 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
 
     // Handle chatd telling the client that the user is already in the room when visiting a chat link
-    if (is_chatlink && !is_chatlink.callId) {
+    if (is_chatlink && !is_chatlink.callId && !this.options.w) {
         const unbind = () => {
             self.unbind('onMessagesHistoryDone.chatlinkAlreadyIn');
             self.unbind('onMembersUpdated.chatlinkAlreadyIn');
         };
-
 
         self.rebind('onMembersUpdated.chatlinkAlreadyIn', (e, eventData) => {
             if (eventData.userId === u_handle && eventData.priv >= 0) {
@@ -2030,10 +2029,6 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
         return this.showMissingUnifiedKeyDialog();
     }
 
-    if (this.options.w) {
-        return megaChat.showUpgradeDialog();
-    }
-
     this.meetingsLoading = {
         title: l.joining /* `Joining` */,
         audio,
@@ -2122,10 +2117,6 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
 
     if (this.hasInvalidKeys()) {
         return this.showMissingUnifiedKeyDialog();
-    }
-
-    if (this.options.w) {
-        return megaChat.showUpgradeDialog();
     }
 
     this.meetingsLoading = {
@@ -2338,6 +2329,9 @@ ChatRoom.prototype.iAmOperator = function() {
 ChatRoom.prototype.iAmReadOnly = function() {
     return this.type !== 'private'
         && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
+};
+ChatRoom.prototype.iAmWaitingRoomPeer = function() {
+    return this.options.w && !this.iAmOperator();
 };
 
 /**
@@ -2674,19 +2668,10 @@ ChatRoom.prototype.toggleOpenInvite = function() {
 };
 
 ChatRoom.prototype.toggleWaitingRoom = function() {
-    // Not implemented yet.
-    // if (this.type === 'private' || !this.iAmOperator()) {
-    //     return;
-    // }
-    // this.setMcoFlags({ [MCO_FLAGS.WAITING_ROOM]: Math.abs(this.options[MCO_FLAGS.WAITING_ROOM] - 1) });
-};
-
-ChatRoom.prototype.toggleSpeakRequest = function() {
-    // Not implemented yet.
-    // if (this.type === 'private' || !this.iAmOperator()) {
-    //     return;
-    // }
-    // this.setMcoFlags({ [MCO_FLAGS.SPEAK_REQUEST]: Math.abs(this.options[MCO_FLAGS.SPEAK_REQUEST] - 1) });
+    if (this.type === 'private' || !this.iAmOperator()) {
+        return;
+    }
+    this.setMcoFlags({ [MCO_FLAGS.WAITING_ROOM]: Math.abs(this.options[MCO_FLAGS.WAITING_ROOM] - 1) });
 };
 
 ChatRoom.prototype.exportToFile = function() {

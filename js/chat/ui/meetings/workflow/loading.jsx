@@ -78,7 +78,7 @@ export default class Loading extends MegaRenderMixin {
                 <span>
                     <i className="sprite-fm-mono icon-video-call-filled" />
                 </span>
-                <h3>{this.props.title || l.starting /* `Starting` */}</h3>
+                <h3>{this.props.title || l[5533] /* `Loading` */}</h3>
                 <div className="loading-container">
                     <div className="loading-indication" />
                 </div>

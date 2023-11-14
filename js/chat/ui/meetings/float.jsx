@@ -1,13 +1,13 @@
 import React from 'react';
 import { compose, MegaRenderMixin } from '../../mixins';
-import utils from '../../../ui/utils.jsx';
+import utils, { ParsedHTML } from '../../../ui/utils.jsx';
 import Button from './button.jsx';
 import Call from './call.jsx';
 import { LocalVideoThumb, LocalVideoHiRes, PeerVideoHiRes } from './videoNode.jsx';
 import FloatExtendedControls from './floatExtendedControls.jsx';
-import { withMicObserver } from './micObserver';
-import { withPermissionsObserver } from './permissionsObserver';
-import { withHostsObserver } from './hostsObserver';
+import { withMicObserver } from './micObserver.jsx';
+import { withPermissionsObserver } from './permissionsObserver.jsx';
+import { withHostsObserver } from './hostsObserver.jsx';
 
 export default class FloatingVideo extends MegaRenderMixin {
     collapseListener = null;
@@ -479,10 +479,17 @@ class Minimized extends MegaRenderMixin {
     static UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
 
     SIMPLETIP_PROPS = { position: 'top', offset: 5, className: 'theme-dark-forced' };
+    waitingPeersListener = undefined;
 
     state = {
-        unread: 0
+        unread: 0,
+        waitingRoomPeers: []
     };
+
+    constructor(props) {
+        super(props);
+        this.state.waitingRoomPeers = this.props.waitingRoomPeers || [];
+    }
 
     isActive = type => {
         return this.props.call.av & type;
@@ -613,18 +620,50 @@ class Minimized extends MegaRenderMixin {
         );
     };
 
+    renderPeersWaiting = () => {
+        const { waitingRoomPeers } = this.state;
+
+        return (
+            <div
+                className={`
+                    ${FloatingVideo.NAMESPACE}-alert
+                    theme-dark-forced
+                `}
+                onClick={this.props.onCallExpand}>
+                {waitingRoomPeers.length > 1 ?
+                    l.wr_peers_waiting.replace('%1', waitingRoomPeers.length) :
+                    <ParsedHTML
+                        tag="span"
+                        content={
+                            l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(waitingRoomPeers[0])))
+                        }
+                    />
+                }
+            </div>
+        );
+    };
+
     componentDidMount() {
         super.componentDidMount();
         this.getUnread();
+        this.waitingPeersListener = mBroadcaster.addListener(
+            'meetings:peersWaiting',
+            waitingRoomPeers => this.setState({ waitingRoomPeers }, () => this.safeForceUpdate())
+        );
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
         this.props.chatRoom.unbind(Minimized.UNREAD_EVENT);
+        if (this.waitingPeersListener) {
+            mBroadcaster.removeListener(this.waitingPeersListener);
+        }
     }
 
     render() {
-        const { unread } = this.state;
+        const { onCallExpand } = this.props;
+        const { unread, waitingRoomPeers } = this.state;
+
         return (
             <>
                 <div className={`${FloatingVideo.NAMESPACE}-overlay`}>
@@ -634,11 +673,12 @@ class Minimized extends MegaRenderMixin {
                         icon="sprite-fm-mono icon-call-expand-mode"
                         onClick={ev => {
                             ev.stopPropagation();
-                            this.props.onCallExpand();
+                            onCallExpand();
                         }}
                     />
                     {this.renderStreamControls()}
                 </div>
+                {waitingRoomPeers && waitingRoomPeers.length ? this.renderPeersWaiting() : null}
                 {unread ?
                     <div className={`${FloatingVideo.NAMESPACE}-notifications`}>
                         <Button

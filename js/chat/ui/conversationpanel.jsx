@@ -23,6 +23,7 @@ import Join from "./meetings/workflow/join.jsx";
 import Alert from './meetings/workflow/alert.jsx';
 import { isSameDay, isToday, isTomorrow } from './meetings/schedule/helpers.jsx';
 import { withHostsObserver } from './meetings/hostsObserver.jsx';
+import WaitingRoom from './meetings/waitingRoom/waitingRoom.jsx';
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -167,7 +168,7 @@ class StartMeetingNotification extends MegaRenderMixin {
     }
 
     render() {
-        const { chatRoom, offset, onStartCall } = this.props;
+        const { chatRoom, offset, onWaitingRoomJoin, onStartCall } = this.props;
 
         if (chatRoom.call || !megaChat.hasSupportForCalls) {
             return null;
@@ -177,7 +178,12 @@ class StartMeetingNotification extends MegaRenderMixin {
             <div
                 className="in-call-notif neutral start"
                 style={{ marginTop: offset }}
-                onClick={() => onStartCall(Call.TYPE.AUDIO)}>
+                onClick={() => {
+                    if (chatRoom.options.w && !chatRoom.iAmOperator()) {
+                        return onWaitingRoomJoin();
+                    }
+                    return onStartCall(Call.TYPE.AUDIO);
+                }}>
                 <button className="mega-button positive small">{l.schedule_start_aot}</button>
             </div>
         );
@@ -207,11 +213,11 @@ export class JoinCallNotification extends MegaRenderMixin {
                 style={{ marginTop: offset }}>
                 <i className="sprite-fm-mono icon-phone"/>
                 <ParsedHTML
-                    onClick={() =>
-                        inProgressAlert(true, chatRoom)
+                    onClick={() => {
+                        return inProgressAlert(true, chatRoom)
                             .then(() => chatRoom.joinCall())
-                            .catch((ex) => d && console.warn('Already in a call.', ex))
-                    }>
+                            .catch((ex) => d && console.warn('Already in a call.', ex));
+                    }}>
                     {(l[20460] || 'There is an active group call. [A]Join[/A]')
                         .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
                         .replace('[/A]', '</button>')}
@@ -484,6 +490,53 @@ export class ConversationRightArea extends MegaRenderMixin {
         }
     );
 
+    OptionsButton = ({ icon, label, secondLabel, toggled, disabled, onClick }) => {
+        const { chatRoom } = this.props;
+        const isDisabled = !chatRoom.iAmOperator() || disabled;
+
+        return (
+            <Button
+                className={`
+                    link-button
+                    light
+                    room-settings-button
+                `}
+                disabled={isDisabled}
+                icon={`
+                    sprite-fm-mono
+                    ${icon}
+                `}
+                label={label}
+                secondLabel={secondLabel}
+                secondLabelClass="label--green"
+                toggle={{ enabled: toggled, onClick: isDisabled ? null : onClick }}
+                onClick={isDisabled ? null : onClick}
+            />
+        );
+    };
+
+    renderOptionsBanner() {
+        const { chatRoom } = this.props;
+
+        return !!chatRoom.options[MCO_FLAGS.WAITING_ROOM] && !!chatRoom.options[MCO_FLAGS.OPEN_INVITE] ?
+            <div className="room-settings-banner">
+                <i className="sprite-fm-mono icon-info"/>
+                <ParsedHTML>
+                    {l.waiting_room_invite
+                        .replace(
+                            '[A]',
+                            `<a
+                                href="${l.mega_help_host}/wp-admin/post.php?post=3005&action=edit"
+                                target="_blank"
+                                class="ulickurl">`
+                        )
+                        .replace('[/A]', '</a>')
+                    }
+                </ParsedHTML>
+            </div> :
+            null;
+    }
+
     handleCancelMeeting = () => {
         const { chatRoom } = this.props;
         const { scheduledMeeting, chatId } = chatRoom || {};
@@ -612,8 +665,7 @@ export class ConversationRightArea extends MegaRenderMixin {
         }
         self._wasAppendedEvenOnce = true;
 
-        var startCallDisabled = isStartCallDisabled(room);
-        var startCallButtonClass = startCallDisabled ? " disabled" : "";
+        var startCallDisabled = isStartCallDisabled(room) || room.iAmWaitingRoomPeer();
         var startAudioCallButton;
         var startVideoCallButton;
 
@@ -634,11 +686,17 @@ export class ConversationRightArea extends MegaRenderMixin {
         if (startAudioCallButton !== null) {
             startAudioCallButton =
                 <div
-                    data-simpletip={`${l.unsupported_browser_audio}`}
+                    data-simpletip={
+                        /* `Your browser doesn't support audio calls. Try a different browser.` */
+                        l.unsupported_browser_audio
+                    }
                     data-simpletipposition="top"
                     data-simpletipoffset="7"
-                    className={`${megaChat.hasSupportForCalls ? '' : 'simpletip'}
-                        link-button light ${startCallButtonClass}`}
+                    className={`
+                        link-button light
+                        ${megaChat.hasSupportForCalls ? '' : 'simpletip'}
+                        ${startCallDisabled ? 'disabled' : ''}
+                    `}
                     onClick={() => onStartCall(Call.TYPE.AUDIO)}>
                     <i className="sprite-fm-mono icon-phone" />
                     <span>{l[5896] /* `Start Audio Call` */}</span>
@@ -647,11 +705,17 @@ export class ConversationRightArea extends MegaRenderMixin {
         if (startVideoCallButton !== null) {
             startVideoCallButton =
                 <div
-                    data-simpletip={`${l.unsupported_browser_video}`}
+                    data-simpletip={
+                        /* `Your browser doesn't support video calls. Try a different browser.` */
+                        l.unsupported_browser_video
+                    }
                     data-simpletipposition="top"
                     data-simpletipoffset="7"
-                    className={`${megaChat.hasSupportForCalls ? '' : 'simpletip'}
-                        link-button light ${startCallButtonClass}`}
+                    className={`
+                        link-button light
+                        ${megaChat.hasSupportForCalls ? '' : 'simpletip'}
+                        ${startCallDisabled ? 'disabled' : ''}
+                    `}
                     onClick={() => onStartCall(Call.TYPE.VIDEO)}>
                     <i className="sprite-fm-mono icon-video-call-filled"/>
                     <span>{l[5897] /* `Start Video Call` */}</span>
@@ -742,34 +806,21 @@ export class ConversationRightArea extends MegaRenderMixin {
             >
             </Button>
         );
-
-        const openInviteBtn = room.type !== 'private' && (
-            <div className="open-invite-settings">
-                <Button
-                    className={`
-                        link-button
-                        light
-                        open-invite-settings-button
-                    `}
-                    disabled={!room.iAmOperator()}
-                    icon={`
-                        sprite-fm-mono
-                        icon-user-filled
-                    `}
-                    label={room.isMeeting
-                        ? l.meeting_open_invite_label /* `Meeting invitations` */
-                        : l.chat_open_invite_label /* `Chat invitations` */}
-                    secondLabel={l.open_invite_desc /* `Non-host can add participants to the chat` */}
-                    secondLabelClass="label--green"
-                    toggle={{
-                        enabled: room.options[MCO_FLAGS.OPEN_INVITE],
-                        onClick: () => room.toggleOpenInvite()
-                    }}
-                    onClick={() => room.toggleOpenInvite()}
-                />
-                {AVseperator}
-            </div>
-        );
+        const waitingRoomButton = {
+            icon: 'icon-clock-user-thin-solid',
+            label: l.waiting_room,
+            secondLabel: l.waiting_room_info,
+            toggled: room.options[MCO_FLAGS.WAITING_ROOM],
+            disabled: room.havePendingCall(),
+            onClick: () => room.toggleWaitingRoom()
+        };
+        const openInviteButton = {
+            icon: 'icon-user-filled',
+            label: room.isMeeting ? l.meeting_open_invite_label : l.chat_open_invite_label,
+            secondLabel: l.open_invite_desc,
+            toggled: room.options[MCO_FLAGS.OPEN_INVITE],
+            onClick: () => room.toggleOpenInvite()
+        };
 
         //
         // History Retention
@@ -893,7 +944,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 </AccordionPanel> :
                                 null
                             }
-                            {room.type === 'public' && room.observers > 0 ?
+                            {room.type === 'public' && room.observers > 0 && !room.options.w ?
                                 <div className="accordion-text observers">
                                     {l[20466] /* `Observers` */}
                                     <span className="observers-count">
@@ -1086,7 +1137,15 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         </>
                                     }
                                     {this.renderPushSettingsButton()}
-                                    {openInviteBtn}
+                                    {room.type === 'private' ?
+                                        null :
+                                        <>
+                                            {room.scheduledMeeting && this.OptionsButton(waitingRoomButton)}
+                                            {this.OptionsButton(openInviteButton)}
+                                            {this.renderOptionsBanner()}
+                                            {AVseperator}
+                                        </>
+                                    }
                                     {mega.es2020 && <Button
                                         className="link-button light export-chat-button"
                                         disabled={room.messagesBuff.messages.length === 0 || room.exportIo}
@@ -1251,7 +1310,8 @@ export class ConversationPanel extends MegaRenderMixin {
         hasInvalidKeys: null,
         invalidKeysBanner: null,
         descriptionDialog: false,
-        occurrencesLoading: false
+        occurrencesLoading: false,
+        waitingRoom: false
     };
 
     constructor(props) {
@@ -1263,6 +1323,10 @@ export class ConversationPanel extends MegaRenderMixin {
         chatRoom.rebind(`openSchedDescDialog.${this.getUniqueId()}`, () => this.openSchedDescDialog());
 
         this.handleKeyDown = SoonFc(120, (ev) => this._handleKeyDown(ev));
+
+        // Render the waiting room flow by default for chat links, E++ accounts
+        this.state.waitingRoom =
+            chatRoom.options.w && (chatRoom.isAnonymous() || megaChat.initialChatId || is_eplusplus);
     }
 
     customIsEventuallyVisible() {
@@ -1313,7 +1377,7 @@ export class ConversationPanel extends MegaRenderMixin {
     startCall(type, scheduled) {
         const { chatRoom } = this.props;
 
-        if (isStartCallDisabled(chatRoom)) {
+        if (isStartCallDisabled(chatRoom) || chatRoom.iAmWaitingRoomPeer()) {
             return false;
         }
 
@@ -1345,86 +1409,118 @@ export class ConversationPanel extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        var self = this;
-        self.$container = $('.conversation-panel', '#fmholder');
-        self.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', self.$container);
+        const { chatRoom } = this.props;
+        this.$container = $('.conversation-panel', '#fmholder');
+        this.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', this.$container);
 
-        window.addEventListener('keydown', self.handleKeyDown);
+        window.addEventListener('keydown', this.handleKeyDown);
 
-        self.props.chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', function () {
-            self.callJustEnded = true;
+        chatRoom.rebind('call-ended.jspHistory call-declined.jspHistory', () => {
+            this.callJustEnded = true;
         });
 
-        self.props.chatRoom.rebind('onSendMessage.scrollToBottom', function () {
-            self.props.chatRoom.scrolledToBottom = true;
-            if (self.messagesListScrollable) {
-                self.messagesListScrollable.scrollToBottom();
+        chatRoom.rebind('onSendMessage.scrollToBottom', () => {
+            chatRoom.scrolledToBottom = true;
+            if (this.messagesListScrollable) {
+                this.messagesListScrollable.scrollToBottom();
             }
         });
-        self.props.chatRoom.rebind('openSendFilesDialog.cpanel', function() {
-            self.setState({'attachCloudDialog': true});
+
+        chatRoom.rebind('openSendFilesDialog.cpanel', () => {
+            this.setState({ attachCloudDialog: true });
         });
-        self.props.chatRoom.rebind('showGetChatLinkDialog.ui', function () {
-            createTimeoutPromise(function() {
-                return self.props.chatRoom.topic && self.props.chatRoom.state === ChatRoom.STATE.READY;
-            }, 350, 15000)
-                .always(function() {
-                    if (self.props.chatRoom.isCurrentlyActive) {
-                        self.setState({
-                            'chatLinkDialog': true
-                        });
-                    }
-                    else {
-                        // not visible anymore, proceed w/ generating a link silently.
-                        self.props.chatRoom.updatePublicHandle(false, true);
-                    }
+
+        chatRoom.rebind('showGetChatLinkDialog.ui', () => {
+            createTimeoutPromise(() => chatRoom.topic && chatRoom.state === ChatRoom.STATE.READY, 350, 15000)
+                .always(() => {
+                    return chatRoom.isCurrentlyActive ?
+                        this.setState({ chatLinkDialog: true }) :
+                        chatRoom.updatePublicHandle(false, true);
                 });
         });
 
-        if (self.props.chatRoom.type === "private") {
-            var otherContactHash = self.props.chatRoom.getParticipantsExceptMe()[0];
+        if (chatRoom.type === 'private') {
+            const otherContactHash = chatRoom.getParticipantsExceptMe()[0];
             if (otherContactHash in M.u) {
-                self._privateChangeListener = M.u[otherContactHash].addChangeListener(function() {
-                    if (!self.isMounted()) {
+                this._privateChangeListener = M.u[otherContactHash].addChangeListener(() => {
+                    if (!this.isMounted()) {
                         // theoretical chance of leaking - M.u[...] removed before the listener is removed
                         return 0xDEAD;
                     }
-                    self.safeForceUpdate();
+                    this.safeForceUpdate();
                 });
             }
         }
 
-
-        self.eventuallyInit();
-        if (is_chatlink && !self.props.chatRoom.isMeeting) {
-            self.state.setNonLoggedInJoinChatDlgTrue = setTimeout(function() {
+        if (is_chatlink && !chatRoom.isMeeting) {
+            this.state.setNonLoggedInJoinChatDlgTrue = setTimeout(() => {
                 M.safeShowDialog('chat-links-preview-desktop', () => {
-                    if (self.isMounted()) {
+                    if (this.isMounted()) {
                         // may not be mounted in case of getting redirected to existing room to the fm -> chat ->
                         // chatroom
-                        self.setState({'nonLoggedInJoinChatDialog': true});
+                        this.setState({ nonLoggedInJoinChatDialog: true });
                     }
                 });
             }, rand_range(5, 10) * 1000);
         }
-        if (is_chatlink && self.props.chatRoom.isMeeting && u_type !== false && u_type < 3) {
+
+        if (is_chatlink && chatRoom.isMeeting && u_type !== false && u_type < 3) {
             eventlog(99747, JSON.stringify([1, u_type | 0]), true);
         }
-        self.props.chatRoom._uiIsMounted = true;
-        self.props.chatRoom.$rConversationPanel = self;
-        self.props.chatRoom.trigger('onComponentDidMount');
+        chatRoom._uiIsMounted = true;
+        chatRoom.$rConversationPanel = this;
+        chatRoom.trigger('onComponentDidMount');
 
-        ChatdIntegration._waitForProtocolHandler(this.props.chatRoom, () => {
+        ChatdIntegration._waitForProtocolHandler(chatRoom, () => {
             if (this.isMounted()) {
-                const hasInvalidKeys = this.props.chatRoom.hasInvalidKeys();
+                const hasInvalidKeys = chatRoom.hasInvalidKeys();
                 this.setState({ hasInvalidKeys, invalidKeysBanner: hasInvalidKeys }, () => this.safeForceUpdate());
             }
         });
 
+        this.eventuallyInit();
+
         // --
 
-        megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () =>
-            this.isMounted() && this.setState({ occurrencesLoading: false })
+        megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => {
+            return this.isMounted() && this.setState({ occurrencesLoading: false });
+        });
+
+        chatRoom.rebind(`wrOnJoinNotAllowed.${this.getUniqueId()}`, () => {
+            return this.isMounted() && this.setState({ waitingRoom: true });
+        });
+
+        chatRoom.rebind(`wrOnJoinAllowed.${this.getUniqueId()}`, () => {
+            return this.isMounted() && this.setState({ waitingRoom: false });
+        });
+
+        // Waiting room link where the current user is already a participant -> join the room automatically and mount
+        // the waiting room UI w/o going through the `Ask to join` workflow; hosts are bypassing the waiting room here.
+        if (chatRoom.options.w) {
+            chatRoom.rebind(`onMembersUpdated.${this.getUniqueId()}`, (ev, { userId, priv }) => {
+                if (userId === u_handle && priv !== ChatRoom.MembersSet.PRIVILEGE_STATE.LEFT) {
+                    chatRoom.unbind(`onMembersUpdated.${this.getUniqueId()}`);
+                    if (is_chatlink) {
+                        return megaChat.routing.reinitAndOpenExistingChat(chatRoom.chatId, chatRoom.publicChatHandle)
+                            .then(chatRoom =>
+                                chatRoom.havePendingCall() &&
+                                priv === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR &&
+                                chatRoom.joinCall()
+                            )
+                            .catch(dump);
+                    }
+                    return (
+                        this.state.waitingRoom &&
+                        this.setState({ waitingRoom: priv !== ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR })
+                    );
+                }
+            });
+        }
+
+        this.pageChangeListener = mBroadcaster.addListener('beforepagechange', () =>
+            M.chat &&
+            this.state.waitingRoom &&
+            this.setState({ waitingRoom: false }, () => this.safeForceUpdate())
         );
     }
 
@@ -1471,12 +1567,17 @@ export class ConversationPanel extends MegaRenderMixin {
             }
         }
 
+        mBroadcaster.removeListener(this.pageChangeListener);
+
         this.props.chatRoom.unbind("openAttachCloudDialog." + this.getUniqueId());
         this.props.chatRoom.unbind("openSendContactDialog." + this.getUniqueId());
         this.props.chatRoom.unbind(`openSchedDescDialog.${this.getUniqueId()}`);
         window.removeEventListener('keydown', self.handleKeyDown);
         $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
         $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
+        this.props.chatRoom.unbind(`wrOnJoinNotAllowed.${this.getUniqueId()}`);
+        this.props.chatRoom.unbind(`wrOnJoinAllowed.${this.getUniqueId()}`);
+        megaChat.unbind(`onIncomingCall.${this.getUniqueId()}`);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -2136,7 +2237,36 @@ export class ConversationPanel extends MegaRenderMixin {
             />;
         }
 
-        var startCallDisabled = isStartCallDisabled(room);
+        if (this.state.waitingRoom) {
+            return (
+                <WaitingRoom
+                    chatRoom={room}
+                    havePendingCall={room.havePendingCall()}
+                    onWaitingRoomLeave={() => {
+                        room.call?.destroy();
+
+                        if (is_eplusplus) {
+                            room.leave(true);
+                            return onIdle(M.logout);
+                        }
+
+                        return (
+                            this.setState({ waitingRoom: false }, () => {
+                                onIdle(() => {
+                                    if (megaChat.initialChatId) {
+                                        megaChat.initialChatId = undefined;
+                                        loadSubPage(getLandingPage());
+                                    }
+                                });
+                            })
+                        );
+                    }}
+                />
+            );
+        }
+
+        const startCallDisabled = isStartCallDisabled(room) || room.iAmWaitingRoomPeer();
+
         return (
             <div
                 className={conversationPanelClasses}
@@ -2318,31 +2448,26 @@ export class ConversationPanel extends MegaRenderMixin {
                         onHistoryRetentionConfig={function() {
                             self.setState({showHistoryRetentionDialog: true});
                         }}
-                        onAddParticipantSelected={function(contactHashes) {
-                            self.props.chatRoom.scrolledToBottom = true;
+                        onAddParticipantSelected={contactHashes => {
+                            room.scrolledToBottom = true;
 
-                            if (self.props.chatRoom.type == "private") {
-                                var megaChat = self.props.chatRoom.megaChat;
-                                const options = {
-                                    keyRotation: false,
-                                    topic: ''
-                                };
-
-                                loadingDialog.show();
-
-                                megaChat.trigger(
-                                    'onNewGroupChatRequest',
-                                    [
-                                        self.props.chatRoom.getParticipantsExceptMe().concat(
-                                            contactHashes
-                                        ),
-                                        options
-                                    ],
-                                );
+                            if (room.type === 'public') {
+                                // Waiting rooms -- allow the invited peer to join the call immediately without having
+                                // them go through the waiting room list.
+                                if (room.options.w && room.call) {
+                                    room.call.sfuClient?.wrAllowJoin(contactHashes);
+                                }
+                                return room.trigger('onAddUserRequest', [contactHashes]);
                             }
-                            else {
-                                self.props.chatRoom.trigger('onAddUserRequest', [contactHashes]);
-                            }
+
+                            loadingDialog.show();
+                            megaChat.trigger(
+                                'onNewGroupChatRequest',
+                                [
+                                    [...room.getParticipantsExceptMe(), ...contactHashes],
+                                    { keyRotation: false, topic: '' }
+                                ]
+                            );
                         }}
                         onShowScheduledDescription={() => {
                             if (room.scheduledMeeting) {
@@ -2383,8 +2508,13 @@ export class ConversationPanel extends MegaRenderMixin {
                                 className="right"
                                 disableCheckingVisibility={true}
                                 icon="sprite-fm-mono icon-info-filled"
-                                onClick={() => room.megaChat.toggleUIFlag('convPanelCollapse')} />
-                            <div data-simpletip={`${l.unsupported_browser_video}`}
+                                onClick={() => room.megaChat.toggleUIFlag('convPanelCollapse')}
+                            />
+                            <div
+                                data-simpletip={
+                                    /* `Your browser doesn't support video calls. Try a different browser.` */
+                                    l.unsupported_browser_video
+                                }
                                 data-simpletipposition="top"
                                 data-simpletipoffset="5"
                                 className={`
@@ -2403,7 +2533,11 @@ export class ConversationPanel extends MegaRenderMixin {
                                     }
                                 />
                             </div>
-                            <div data-simpletip={`${l.unsupported_browser_audio}`}
+                            <div
+                                data-simpletip={
+                                    /* `Your browser doesn't support audio calls. Try a different browser.` */
+                                    l.unsupported_browser_audio
+                                }
                                 data-simpletipposition="top"
                                 data-simpletipoffset="5"
                                 className={`
@@ -2469,12 +2603,13 @@ export class ConversationPanel extends MegaRenderMixin {
                             navigator.onLine &&
                             room.scheduledMeeting &&
                             !room.isArchived() &&
-                            !startCallDisabled ?
+                            !isStartCallDisabled(room) ?
                                 <StartMeetingNotification
                                     chatRoom={room}
                                     offset={this.props.offset}
+                                    onWaitingRoomJoin={() => this.setState({ waitingRoom: true })}
                                     onStartCall={mode => {
-                                        return startCallDisabled ?
+                                        return isStartCallDisabled(room) ?
                                             null :
                                             inProgressAlert(true, room)
                                                 .then(() => this.startCall(mode, true))
@@ -2489,7 +2624,10 @@ export class ConversationPanel extends MegaRenderMixin {
                             room.state !== ChatRoom.STATE.LEFT &&
                             (room.havePendingGroupCall() || room.havePendingCall()) &&
                             navigator.onLine ?
-                                <JoinCallNotification chatRoom={room} offset={this.props.offset} /> :
+                                <JoinCallNotification
+                                    chatRoom={room}
+                                    offset={this.props.offset}
+                                /> :
                                 null
                         }
 

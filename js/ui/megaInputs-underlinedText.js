@@ -153,6 +153,11 @@ mega.ui.MegaInputs.prototype.underlinedText._bindEvent = function() {
 
         var $this = $(this);
 
+        if ($this.hasClass('clearButton')) {
+            const $clearBtn = $('.clear-input', $this.parent());
+            $clearBtn.addClass('hidden');
+        }
+
         if ($this.val()) {
             $this.parent().addClass('valued');
         }
@@ -300,7 +305,7 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
 
         const $clearBtn = $('.clear-input', $wrapper);
 
-        $clearBtn.rebind('click.clearInput', () => {
+        $clearBtn.rebind('click.clearInput tap.clearInput', () => {
             if ($input.hasClass('errored')) {
                 this.hideError();
             }

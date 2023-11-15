@@ -1,0 +1,54 @@
+.cancel-subscription-survey {
+    padding: 0 24px;
+    max-width: 697px;
+}
+
+.cancel-subscription-survey > * {
+    font: var(--mobile-font-copy-regular);
+}
+
+.cancel-subscription-survey .cancel-sub-result {
+    color: var(--mobile-text-secondary);
+}
+
+.cancel-subscription-survey .cancel-sub-prompt {
+    margin: 16px 0;
+    font: var(--mobile-font-heading-h3);
+    color: var(--mobile-text-primary);
+}
+
+.cancel-subscription-survey .mega-component.banner {
+    max-width: 382px;
+}
+
+.cancel-subscription-survey .cancel-sub-buttons {
+    padding: 24px 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.cancel-subscription-survey .cancel-sub-buttons > * {
+    height: 48px;
+}
+.cancel-subscription-survey .cancel-sub-buttons > *:not(:last-child) {
+    margin-bottom: 16px;
+}
+
+.cancel-subscription-survey .mega-radio-button .radio-wrapper {
+    background: none;
+    border: 2px solid var(--mobile-selection-control);
+}
+
+.cancel-subscription-survey .mega-radio-button .radio-action {
+    flex: 1;
+}
+
+.cancel-subscription-survey .mobile.mega-input.box-style {
+    margin-bottom: 22px;
+}
+
+@media only screen and (min-width: 769px) {
+    .cancel-subscription-survey .mobile.mega-input.box-style {
+        margin-top: 16px;
+    }
+}

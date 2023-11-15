@@ -297,6 +297,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                     text: l.cancel_sub_btn_label,
                     icon: 'sprite-mobile-fm-mono icon-slash-circle-thin-outline',
                     componentClassname: 'hidden cancel-subscription',
+                    defaultRightIcon: true,
                     binding: async() => {
                         const gatewayId = M.account.sgwids.length > 0 ? M.account.sgwids[0] : null; // Gateway ID
 
@@ -317,7 +318,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                             const {result: numOfSubscriptions} = await api.req({a: 'ccqns'}).catch(dump);
 
                             if (numOfSubscriptions > 0) {
-                                mobile.settings.account.openSubConfirmOverlay();
+                                loadSubPage('fm/account/cancel');
                             }
 
                             // Hide the loading dialog after request completes
@@ -563,7 +564,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                     if (!u_attr.b) {
                         // Display the date their subscription will renew if known
                         if (renewTimestamp > 0) {
-                            cancelSubsBtn.subtext = l.renews_on_cancel_btn.replace('%1', time2date(renewTimestamp, 2));
+                            cancelSubsBtn.subtext = l.renews_on_cancel_btn.replace('%1', time2date(renewTimestamp, 1));
                         }
 
                         cancelSubsBtn.show();
@@ -575,58 +576,5 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                 }
             });
         },
-    },
-
-    /**
-     * Show an overlay asking the user if they are sure they want to cancel their subscription
-     * @param {String} $page The jQuery selector for the current page
-     *
-     * Note this is old overlay implementation on top of new one, and that is why it has jQuery. we will update it later
-     */
-    openSubConfirmOverlay: {
-        value: function() {
-            'use strict';
-
-            // Cache selectors
-            const $cancelSubscriptionOverlay = $('.mobile.cancel-subscription-overlay');
-            const $confirmButton = $('.confirm-ok-button', $cancelSubscriptionOverlay);
-            const $closeButton = $('.close-button', $cancelSubscriptionOverlay);
-
-            // Display the proper PRO plan icon
-            $('.plan-icon', $cancelSubscriptionOverlay).addClass(`pro${u_attr.p}`);
-
-            $cancelSubscriptionOverlay.removeClass('hidden');
-
-            // Add click/tap handler for the Confirm button to cancel their subscription
-            $confirmButton.rebind('tap.confirm', () => {
-
-                // Show a loading dialog while the data is fetched from the API
-                loadingDialog.show();
-
-                // Cancel the user's subscription/s (cccs = Credit Card Cancel Subscriptions, r = reason)
-                api.req({a: 'cccs', r: 'No reason (automated mobile web cancel subscription)'}).then(() => {
-                    M.account.stype = 'O';
-                    $('.mega-component[href="fm/account/paymentcard"]', this.domNode).addClass('hidden');
-                    $('i.icon-slash-circle-thin-outline', this.domNode).parent().addClass('hidden');
-                    $cancelSubscriptionOverlay.addClass('hidden');
-
-                    // Hide the loading dialog after request completes
-                    loadingDialog.hide();
-                    mobile.showToast(l[6999], 6);
-                    M.account.lastupdate = 0;
-                    mobile.settings.account.updateCallback();
-                });
-
-                // Prevent double taps
-                return false;
-            });
-
-            // On clicking/tapping the Close button
-            $closeButton.rebind('tap.close', () => {
-                // Hide the overlay
-                $cancelSubscriptionOverlay.addClass('hidden');
-                return false;
-            });
-        }
     }
 });

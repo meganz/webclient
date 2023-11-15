@@ -1093,6 +1093,9 @@ function accountUI() {
     else if (page === 'fm/account/plan') {
         loadSubPage('fm/account');
     }
+    else if (page === 'fm/account/cancel') {
+        mobile.settings.account.cancelSubscription.checkSubStatus();
+    }
     else {
         loadSubPage('fm/account/settings');
     }

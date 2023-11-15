@@ -357,7 +357,7 @@ class MegaMobileHeader extends MegaMobileComponent {
             this.hide();
         };
 
-        if (is_fm() || noTabletView) {
+        if (is_fm() || noTabletView || page === 'support') {
 
             mainlayout.classList[noTabletView ? 'add' : 'remove']('no-tablet-layout');
 
@@ -756,7 +756,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         if (page === 'fm/account' || page === 'keybackup') {
             iType = 2;
         }
-        if (page.startsWith('fm/account/') || page.startsWith('fm/refer')) {
+        if (page.startsWith('fm/account/') || page.startsWith('fm/refer') || page === 'support') {
             iType = 3;
         }
         if (mobile.nodeSelector.active) {
@@ -832,6 +832,7 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/account/about/terms-policies': l.mobile_settings_tos_title,
         'move': l.move_to,
         'copy': l.copy_to,
+        'support': l[516],
         'keybackup': l[8839]
     });
 });

@@ -201,6 +201,9 @@ var mobile = {
                         this.megaRender.destroy();
                     }
 
+                    // Clear startholder - temp. fix until startholder pages are revamped
+                    document.getElementById('startholder').textContent = '';
+
                     const render = mobile.nodeSelector.active ? MobileSelectionRender : MobileMegaRender;
 
                     this.megaRender = new render();

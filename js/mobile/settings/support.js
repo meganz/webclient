@@ -28,6 +28,12 @@ mobile.settings.support  = Object.create(mobile.settingsHelper, {
                     icon: 'sprite-mobile-fm-mono icon-phone-01-thin-outline',
                     href: 'contact',
                     rightIcon: null
+                },
+                {
+                    text: l[516],
+                    icon: 'sprite-mobile-fm-mono icon-message-circle-thin-outline',
+                    href: 'support',
+                    rightIcon: null
                 }
             ];
 

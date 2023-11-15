@@ -290,8 +290,11 @@ class MegaMobileTopMenu extends MegaMobileComponent {
 
         for (const item of this.domNode.querySelectorAll('.menu-item')) {
 
-            if (item.dataset.section === page || item.dataset.section === '/fm/shares' &&
-                (M.currentrootid === 'out-shares' || M.currentrootid === 'public-links')) {
+            const isASharesPage = item.dataset.section === '/fm/shares' &&
+                (M.currentrootid === 'out-shares' || M.currentrootid === 'public-links');
+            const isSupportPage = item.dataset.section === '/fm/account/settings' && page === 'support';
+
+            if (item.dataset.section === page || isASharesPage || isSupportPage) {
 
                 item.component.addClass('active');
                 if (item.dataset.section !== '/fm/account') {

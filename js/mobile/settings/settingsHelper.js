@@ -33,12 +33,20 @@ mobile.settingsHelper = {
     generateMenuItem: function(targetNode, opt) {
         'use strict';
 
+        let menuIcon = '';
+
+        if (opt.defaultRightIcon) {
+            menuIcon = 'sprite-mobile-fm-mono icon-chevron-right-thin-outline';
+        }
+        else if (!(opt.binding || opt.rightIcon === null)) {
+            menuIcon = opt.rightIcon || 'sprite-mobile-fm-mono icon-chevron-right-thin-outline';
+        }
+
         const props = {
             type: 'fullwidth',
             componentClassname: `text-icon ${opt.componentClassname || ''}`,
             iconSize: 24,
-            rightIcon: opt.binding || opt.rightIcon === null
-                ? '' : opt.rightIcon || 'sprite-mobile-fm-mono icon-chevron-right-thin-outline',
+            rightIcon: menuIcon,
             rightIconSize: 24,
             text: opt.text,
             subtext: opt.subtext,

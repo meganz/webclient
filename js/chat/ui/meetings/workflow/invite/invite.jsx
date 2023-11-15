@@ -97,9 +97,14 @@ export default class Invite extends MegaRenderMixin {
 
     handleAdd = () => {
         const { selected } = this.state;
-        const { chatRoom, onClose } = this.props;
+        const { call, chatRoom, onClose } = this.props;
 
         if (selected.length > 0) {
+            // Waiting rooms -- allow the invited peer to join the call immediately without having them go through
+            // the waiting room list.
+            if (chatRoom.options.w) {
+                call?.sfuClient?.wrAllowJoin(selected);
+            }
             chatRoom?.trigger('onAddUserRequest', [selected]);
             onClose?.();
         }

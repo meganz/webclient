@@ -153,6 +153,11 @@ mega.ui.MegaInputs.prototype.underlinedText._bindEvent = function() {
 
         var $this = $(this);
 
+        if ($this.hasClass('clearButton')) {
+            const $clearBtn = $('.clear-input', $this.parent());
+            $clearBtn.addClass('hidden');
+        }
+
         if ($this.val()) {
             $this.parent().addClass('valued');
         }
@@ -168,6 +173,23 @@ mega.ui.MegaInputs.prototype.underlinedText._bindEvent = function() {
     if (!$input.hasClass('strengthChecker')) {
         $input.rebind('input.underlinedText', function() {
             self.hideError();
+        });
+    }
+
+    if (is_mobile) {
+
+        $(window).rebind('resize.megaInputs', () => {
+
+            const $inputs = $('.megaInputs', '.mega-input.msg');
+
+            for (let i = $inputs.length; i--;) {
+
+                const megaInput = $($inputs[i]).data('MegaInputs');
+
+                if (megaInput) {
+                    self.underlinedText._botSpaceCalc.call(megaInput);
+                }
+            }
         });
     }
 };
@@ -211,21 +233,15 @@ mega.ui.MegaInputs.prototype.underlinedText._updateShowHideErrorAndMessage = fun
         else if (msg) {
             var $wrapper = this.$input.parent();
             var $msgContainer = $wrapper.find('.message-container');
-            var extraSpace = 9;
 
             if (fix) {
                 $wrapper.addClass('fix-msg');
                 this.fixMessage = msg;
-                extraSpace = 4;
             }
 
             $wrapper.addClass('msg');
             $msgContainer.safeHTML(msg);
-            if (this.origBotSpace === undefined) {
-                this.origBotSpace = this.origBotSpace || parseInt($wrapper.css('margin-bottom'));
-            }
-
-            $wrapper.css('margin-bottom', this.origBotSpace + $msgContainer.outerHeight() + extraSpace);
+            this.underlinedText._botSpaceCalc.call(this);
         }
     };
 
@@ -289,7 +305,7 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
 
         const $clearBtn = $('.clear-input', $wrapper);
 
-        $clearBtn.rebind('click.clearInput', () => {
+        $clearBtn.rebind('click.clearInput tap.clearInput', () => {
             if ($input.hasClass('errored')) {
                 this.hideError();
             }
@@ -353,9 +369,20 @@ mega.ui.MegaInputs.prototype.underlinedText._strengthChecker = function() {
         $wrapper.safeAppend('<div class="account password-status hidden"></div>');
 
         // Strength Bar
-        $wrapper.safeAppend('<div class="account-pass-lines">' +
-            '<div class="register-pass-status-line"></div>' +
-        '</div>');
+        if (is_mobile) {
+            $wrapper.safeAppend('<div class="account-pass-lines">' +
+                '<div class="register-pass-status-line1"></div>' +
+                '<div class="register-pass-status-line2"></div>' +
+                '<div class="register-pass-status-line3"></div>' +
+                '<div class="register-pass-status-line4"></div>' +
+                '<div class="register-pass-status-line5"></div>' +
+            '</div>');
+        }
+        else {
+            $wrapper.safeAppend('<div class="account-pass-lines">' +
+                '<div class="register-pass-status-line"></div>' +
+            '</div>');
+        }
 
         // Loading icon for zxcvbn.
         $wrapper.safeAppend('<div class="register-loading-icon">' +
@@ -377,15 +404,35 @@ mega.ui.MegaInputs.prototype.underlinedText._strengthChecker = function() {
 
                 var $passStatus = $wrapper.find('.password-status');
                 var $passStatusBar = $wrapper.find('.account-pass-lines');
+                var $messageContainer = $('.message-container', $wrapper);
 
-                $passStatus.add($passStatusBar).removeClass('good1 good2 good3 good4 good5 checked');
+                $passStatus
+                    .add($passStatusBar)
+                    .add($messageContainer)
+                    .removeClass('good1 good2 good3 good4 good5 checked');
 
                 var strength = classifyPassword($(this).val());
 
                 if (typeof strength === 'object') {
 
                     $passStatus.addClass(strength.className + ' checked').text(strength.string1);
-                    $input.data('MegaInputs').showMessage(strength.string2);
+                    if (is_mobile) {
+                        $messageContainer.addClass(strength.className);
+
+                        let alert = '<i class="alert sprite-mobile-fm-mono icon-info-thin-outline"></i>';
+                        if (strength.className === 'good3') {
+                            alert = '<i class="alert sprite-mobile-fm-mono icon-alert-circle-thin-outline"></i>';
+                        }
+                        else if (strength.className === 'good4' || strength.className === 'good5') {
+                            alert = '<i class="alert sprite-mobile-fm-mono icon-check-circle-thin-outline"></i>';
+                        }
+                        $input.data('MegaInputs').showMessage(
+                            `${alert} <span>${strength.string2}</span>`
+                        );
+                    }
+                    else {
+                        $input.data('MegaInputs').showMessage(strength.string2);
+                    }
 
                     $passStatusBar.addClass(strength.className);
                 }
@@ -409,6 +456,24 @@ mega.ui.MegaInputs.prototype.underlinedText._strengthChecker = function() {
         }
 
         $wrapper.addClass('strengthChecker');
+    }
+};
+
+mega.ui.MegaInputs.prototype.underlinedText._botSpaceCalc = function() {
+
+    'use strict';
+
+    var $wrapper = this.$input.parent();
+
+    if ($wrapper.hasClass('msg')) {
+        if (this.origBotSpace === undefined) {
+            this.origBotSpace = parseInt($wrapper.css('margin-bottom'));
+        }
+
+        $wrapper.css('margin-bottom',
+                     this.origBotSpace
+                     + $('.message-container', $wrapper).outerHeight()
+                     + ($wrapper.hasClass('fix-msg') ? 4 : 9));
     }
 };
 

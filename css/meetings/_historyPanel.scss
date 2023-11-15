@@ -3,15 +3,12 @@
 // --------------------------------------------------------------------
 
 &.chat-opened {
-    z-index: 120;
+    /* [...] */
 
     .sidebar-head {
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        background: var(--surface-main);
-        z-index: 2;
 
         body.rtl & {
             width: calc(100% - 32px);
@@ -19,7 +16,8 @@
     }
 
     .in-call {
-        /* [...] */
+        display: flex;
+        align-items: end;
 
         .message.body {
             padding: 3px 15px 0 10px;

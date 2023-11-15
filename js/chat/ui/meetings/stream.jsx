@@ -1,21 +1,47 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
-import Call from './call.jsx';
-import StreamHead from './streamHead.jsx';
+import { MODE } from './call.jsx';
 import { PeerVideoHiRes, LocalVideoHiRes } from './videoNode.jsx';
-import SidebarControls  from './sidebarControls.jsx';
-import StreamControls from './streamControls.jsx';
 import FloatingVideo from './float.jsx';
 import ParticipantsNotice from './participantsNotice.jsx';
-import ChatToaster from "../chatToaster";
-
-export const STREAM_ACTIONS = { ADD: 1, REMOVE: 2 };
-export const MAX_STREAMS = 19; // 19 + me -> 20
+import ChatToaster from "../chatToaster.jsx";
+import ParticipantsBlock from './participantsBlock.jsx';
+import VideoNodeMenu from './videoNodeMenu.jsx';
+import Button from './button.jsx';
+import { Emoji } from '../../../ui/utils.jsx';
+import StreamHead from './streamHead.jsx';
+import Admit from './waitingRoom/admit.jsx';
 
 const NAMESPACE = 'stream';
-const MAX_STREAMS_PER_PAGE = 9;
-const PAGINATION = { PREV: -1, NEXT: 1 };
-const MOUSE_OUT_DELAY = 2500;
+export const STREAM_ACTIONS = { ADD: 1, REMOVE: 2 };
+export const PAGINATION = { PREV: -1, NEXT: 1 };
+export const MAX_STREAMS = 99; // 99 + me -> 100
+export const STREAMS_PER_PAGE = { MIN: 9, MED: 21, MAX: 49 };
+
+/**
+ * chunkNodes
+ * @description Takes collection of streams and returns a new collection that contains separate groups of streams
+ * based on the passed chunk size. Used to construct the stream carousel.
+ * @param {Array|Peers} nodes collection of stream nodes
+ * @param {number} size the amount of chunks
+ * @see renderNodes
+ * @returns {Object|null}
+ */
+
+export const chunkNodes = (nodes, size) => {
+    if (nodes && nodes.length && size) {
+        const chunked = [];
+        let index = 0;
+
+        while (index < nodes.length) {
+            chunked.push({ id: index, nodes: nodes.slice(index, index + size) });
+            index += size;
+        }
+
+        return chunked;
+    }
+    return null;
+};
 
 export default class Stream extends MegaRenderMixin {
     wrapperRef = React.createRef();
@@ -27,23 +53,28 @@ export default class Stream extends MegaRenderMixin {
 
     lastRescaledCache = undefined;
 
-    delayProcID = null;
-
     state = {
         page: 0,
-        hovered: false,
         overlayed: false,
+        streamsPerPage: STREAMS_PER_PAGE.MED,
+        floatDetached: false
     };
 
-    constructor(props) {
-        super(props);
-        this.handleMouseMove = this.handleMouseMove.bind(this);
-        this.handleMouseOut = this.handleMouseOut.bind(this);
-    }
+    /**
+     * toggleFloatDetachment
+     * @description Toggles the `detached` state of the `FloatingVideo` component, e.g. the self view -- either detached
+     * from the stream nodes grid or part of it along with the rest of the stream nodes.
+     * @see FloatingVideo
+     * @returns {void}
+     */
+
+    toggleFloatDetachment = () => {
+        this.setState(state => ({ floatDetached: !state.floatDetached }));
+    };
 
     /**
      * movePage
-     * @description Moves the current page within the carousel. Invoked by clicking on the the left/right carousel
+     * @description Moves the current page within the carousel. Invoked by clicking on the left/right carousel
      * controls and automatically after reducing the amount of pages.
      * @param {PAGINATION} direction
      * @see renderNodes
@@ -52,46 +83,7 @@ export default class Stream extends MegaRenderMixin {
      */
 
     movePage(direction) {
-        let page = this.state.page + direction;
-        if (page < 0) {
-            page = 0;
-        }
-        else if (page > this.chunksLength - 1) {
-            page = this.chunksLength - 1;
-        }
-        this.setState({ page });
-    }
-
-    /**
-     * handleMouseMove
-     * @description Mouse move event handler -- sets the `hovered` state and removes the hover delay.
-     * @returns {void}
-     */
-
-    handleMouseMove() {
-        this.setState({ hovered: true });
-        if (this.delayProcID) {
-            delay.cancel(this.delayProcID);
-            this.delayProcID = null;
-        }
-    }
-
-    /**
-     * handleMouseOut
-     * @description Mouse out event handler -- removes the `hovered` state and adds delay listener.
-     * @returns {void}
-     */
-
-    handleMouseOut() {
-        if (this.state.hovered) {
-            this.delayProcID =
-                delay(`${NAMESPACE}-hover`, () => {
-                    if (this.isMounted()) {
-                        // when ending a call, the component may be unmounted on hover, because of the delay ^
-                        this.setState({hovered: false});
-                    }
-                }, MOUSE_OUT_DELAY);
-        }
+        return this.setState(state => ({ page: direction === PAGINATION.NEXT ? state.page + 1 : state.page - 1 }));
     }
 
     /**
@@ -103,6 +95,14 @@ export default class Stream extends MegaRenderMixin {
 
     getColumns(streamsCount) {
         switch (true) {
+            case streamsCount >= 43:
+                return 7;
+            case streamsCount >= 26:
+                return 6;
+            case streamsCount >= 17:
+                return 5;
+            case streamsCount >= 13:
+                return 4;
             case streamsCount === 1:
                 return 1;
             case streamsCount >= 7:
@@ -110,30 +110,6 @@ export default class Stream extends MegaRenderMixin {
             default:
                 return 2;
         }
-    }
-
-    /**
-     * chunkNodes
-     * @description Takes collection of streams and returns a new collection that contains separate groups of streams
-     * based on the passed chunk size. Used to construct the stream carousel.
-     * @param {Array|Peers} nodes collection of stream nodes
-     * @param {number} size the amount of chunks
-     * @see renderNodes
-     * @see MAX_STREAMS_PER_PAGE
-     * @returns {Array|null}
-     */
-
-    chunkNodes(nodes, size) {
-        if (nodes && nodes.length && size) {
-            const chunked = [];
-            let index = 0;
-            while (index < nodes.length) {
-                chunked.push(nodes.slice(index, index + size));
-                index += size;
-            }
-            return chunked;
-        }
-        return null;
     }
 
     /**
@@ -155,17 +131,20 @@ export default class Stream extends MegaRenderMixin {
             return;
         }
 
+        const { floatDetached, streamsPerPage, page } = this.state;
         const parentRef = container.parentNode;
         const parentStyle = getComputedStyle(parentRef);
         const extraVerticalMargin = parseInt(parentStyle.paddingTop) + parseInt(parentStyle.paddingBottom);
         let containerWidth = parentRef.offsetWidth;
         let containerHeight = parentRef.offsetHeight - extraVerticalMargin;
-        const streamsInUI = peers.length > MAX_STREAMS_PER_PAGE ? this.chunks[this.state.page] : peers;
+        const nodesPerPage = floatDetached ? streamsPerPage : streamsPerPage - 1;
+        const streamsInUI = peers.length > nodesPerPage ? Object.values(this.chunks)[page]?.nodes : peers;
 
         if (streamsInUI) {
-            const streamCountInUI = streamsInUI.length;
+            const streamCountInUI =
+                peers.length > nodesPerPage || floatDetached ? streamsInUI.length : streamsInUI.length + 1;
             let rows;
-            if (mode === Call.MODE.THUMBNAIL) {
+            if (mode === MODE.THUMBNAIL) {
                 columns = typeof columns === 'number' ? columns : this.getColumns(streamCountInUI);
                 rows = Math.ceil(streamCountInUI / columns);
             }
@@ -174,7 +153,7 @@ export default class Stream extends MegaRenderMixin {
                 columns = 1;
             }
 
-            const marginNode = 2;
+            const marginNode = 6;
             // Cannot take into account node margins for a correct aspect ratio
             containerWidth -= columns * marginNode * 2;
             containerHeight -= rows * marginNode * 2;
@@ -188,15 +167,10 @@ export default class Stream extends MegaRenderMixin {
 
             const nodeRefs = this.nodeRefs.flat();
             const nodeRefsLength = nodeRefs.length;
-            const viewMode = mode || Call.MODE.SPEAKER;
-
-            if (viewMode === Call.MODE.THUMBNAIL && columns !== 4 && (targetWidth < 160 || targetHeight < 120)) {
-                return this.scaleNodes(4);
-            }
+            const viewMode = mode || MODE.MAIN;
 
             let cache =
                 `${viewMode}:${targetWidth}:${targetHeight}:${nodeRefsLength}:${rows}:${streamCountInUI}:${columns}`;
-
             for (let i = 0; i < nodeRefsLength; i++) {
                 cache += `${nodeRefs[i].cacheKey}:`;
             }
@@ -223,8 +197,8 @@ export default class Stream extends MegaRenderMixin {
      * renderNodes
      * @description Renders the stream nodes in different form, based on the passed state -- i) `Thumbnail` mode, where
      * all stream nodes are rendered within the main grid or on multiple grid pages with carousel behavior, as well as
-     * ii) `Speaker` mode, where single stream node is rendered on full screen and the rest within the `Sidebar`.
-     * @see Call.MODE
+     * ii) `Main` mode, where single stream node is rendered on full screen and the rest within the `Sidebar`.
+     * @see MODE
      * @see StreamHead.render
      * @see ModeSwitch
      * @returns {JSX.Element|null|Array}
@@ -242,27 +216,33 @@ export default class Stream extends MegaRenderMixin {
             onSpeakerChange,
             onThumbnailDoubleClick
         } = this.props;
+        const { page, streamsPerPage, floatDetached } = this.state;
+        const filteredPeers = Object.values(peers).filter(p => p instanceof CallManager2.Peer);
+        const streaming =
+            [...filteredPeers.filter(p => p.isScreen), ...filteredPeers.filter(p => !p.videoMuted)];
+        const rest = filteredPeers.filter(p => !streaming.includes(p));
 
         //
         //  `Thumbnail Mode`
         // -------------------------------------------------------------------------
 
-        if (mode === Call.MODE.THUMBNAIL) {
+        if (mode === MODE.THUMBNAIL) {
 
             //
             // Default, i.e. videos aligned within single page grid.
             // ------------------------------------------------------
 
-            if (peers.length <= MAX_STREAMS_PER_PAGE) {
-                const $$STREAMS = [];
-                peers.forEach((peer, i) => {
+            const nodesPerPage = floatDetached ? streamsPerPage : streamsPerPage - 1;
+            if (peers.length <= nodesPerPage) {
+                const $$PEER = (peer, i) => {
                     const cacheKey = `${mode}_${peer.clientId}_${i}`;
-
-                    $$STREAMS.push(
+                    return (
                         <PeerVideoHiRes
+                            key={cacheKey}
                             mode={mode}
                             chatRoom={chatRoom}
                             menu={true}
+                            source={peer}
                             ephemeralAccounts={ephemeralAccounts}
                             onCallMinimize={onCallMinimize}
                             onSpeakerChange={onSpeakerChange}
@@ -271,8 +251,6 @@ export default class Stream extends MegaRenderMixin {
                                 e.stopPropagation();
                                 onThumbnailDoubleClick(videoNode);
                             }}
-                            key={cacheKey}
-                            source={peer}
                             didMount={ref => {
                                 this.nodeRefs.push({ clientId: peer.clientId, cacheKey, ref });
                                 this.scaleNodes(undefined, true);
@@ -281,80 +259,117 @@ export default class Stream extends MegaRenderMixin {
                                 this.nodeRefs = this.nodeRefs.filter(
                                     nodeRef => nodeRef.clientId !== peer.clientId
                                 );
-                            }}
-                        />
+                            }}>
+                            {this.renderNodeMenu(peer)}
+                        </PeerVideoHiRes>
                     );
-                });
-                return $$STREAMS;
+                };
+
+                return (
+                    floatDetached ?
+                        [...streaming, ...rest].map((p, i) => $$PEER(p, i)) :
+                        [
+                            ...streaming.map((p, i) => $$PEER(p, i)),
+                            <LocalVideoHiRes
+                                key={`${mode}_${u_handle}`}
+                                chatRoom={chatRoom}
+                                className="with-contain"
+                                didMount={ref => {
+                                    this.nodeRefs.push({ clientId: u_handle, cacheKey: `${mode}_${u_handle}`, ref });
+                                    this.scaleNodes(undefined, true);
+                                }}
+                                willUnmount={() => {
+                                    this.nodeRefs = this.nodeRefs.filter(nodeRef => nodeRef.clientId !== u_handle);
+                                }}>
+                                {this.renderNodeMenu()}
+                            </LocalVideoHiRes>,
+                            ...rest.map((p, i) => $$PEER(p, i))
+                        ]
+                );
             }
 
             //
             // Carousel behavior with variable amount of pages, incl. previous/next behavior.
             // ------------------------------------------------------------------------------
 
-            const { page } = this.state;
-            this.chunks = this.chunkNodes(peers, MAX_STREAMS_PER_PAGE);
-            this.chunksLength = this.chunks.length;
+            this.chunks = chunkNodes(
+                floatDetached ?
+                    [...streaming, ...rest] :
+                    [...streaming, Object.values(peers).find(p => !(p instanceof CallManager2.Peer)), ...rest],
+                streamsPerPage
+            );
+            this.chunksLength = Object.values(this.chunks).length;
 
             return (
                 <div className="carousel">
                     <div className="carousel-container">
-                        {this.chunks.map((chunk, i) => {
+                        {Object.values(this.chunks).map((chunk, i) => {
+                            const { id, nodes } = chunk;
                             return (
                                 <div
-                                    key={i}
+                                    key={id}
                                     className={`
                                         carousel-page
                                         ${i === page ? 'active' : ''}
                                     `}>
-                                    {chunk.map(peer =>
-                                        <PeerVideoHiRes
-                                            key={peer.clientId}
-                                            source={peer}
-                                            chatRoom={chatRoom}
-                                            menu={true}
-                                            ephemeralAccounts={ephemeralAccounts}
-                                            onCallMinimize={onCallMinimize}
-                                            onSpeakerChange={onSpeakerChange}
-                                            didMount={ref => {
-                                                if (!this.nodeRefs[i]) {
-                                                    this.nodeRefs[i] = [];
-                                                }
-                                                this.nodeRefs[i].push({ clientId: peer.clientId, ref });
-                                            }}
-                                            willUnmount={() => {
-                                                this.nodeRefs = this.nodeRefs.map(chunk =>
-                                                    chunk.filter(nodeRef => nodeRef.clientId !== peer.clientId)
-                                                );
-                                            }}
-                                        />
-                                    )}
+                                    {nodes.map(peer => {
+                                        if (peer instanceof CallManager2.Peer) {
+                                            return (
+                                                <PeerVideoHiRes
+                                                    key={peer.clientId}
+                                                    source={peer}
+                                                    chatRoom={chatRoom}
+                                                    ephemeralAccounts={ephemeralAccounts}
+                                                    onCallMinimize={onCallMinimize}
+                                                    onSpeakerChange={onSpeakerChange}
+                                                    didMount={ref => {
+                                                        if (!this.nodeRefs[i]) {
+                                                            this.nodeRefs[i] = [];
+                                                        }
+                                                        this.nodeRefs[i].push({ clientId: peer.clientId, ref });
+                                                        this.scaleNodes(undefined, true);
+                                                    }}
+                                                    willUnmount={() => {
+                                                        this.nodeRefs = this.nodeRefs.map(chunk =>
+                                                            chunk.filter(nodeRef => nodeRef.clientId !== peer.clientId)
+                                                        );
+                                                    }}>
+                                                    {this.renderNodeMenu(peer)}
+                                                </PeerVideoHiRes>
+                                            );
+                                        }
+
+                                        return (
+                                            <LocalVideoHiRes
+                                                key={`${mode}_${u_handle}`}
+                                                chatRoom={chatRoom}
+                                                className="with-contain"
+                                                didMount={ref => {
+                                                    if (!this.nodeRefs[i]) {
+                                                        this.nodeRefs[i] = [];
+                                                    }
+                                                    this.nodeRefs[i].push({ clientId: u_handle, ref });
+                                                    this.scaleNodes(undefined, true);
+                                                }}
+                                                willUnmount={() => {
+                                                    this.nodeRefs = this.nodeRefs.map(chunk =>
+                                                        chunk.filter(nodeRef => nodeRef.clientId !== u_handle)
+                                                    );
+                                                }}>
+                                                {this.renderNodeMenu()}
+                                            </LocalVideoHiRes>
+                                        );
+                                    })}
                                 </div>
                             );
                         })}
                     </div>
-                    {page !== 0 && (
-                        <button
-                            className="carousel-button-prev theme-dark-forced"
-                            onClick={() => this.movePage(PAGINATION.PREV)}>
-                            <i className="sprite-fm-mono icon-arrow-left-thin" />
-                            <div>{page + 1}/{this.chunksLength}</div>
-                        </button>
-                    )}
-                    {page < this.chunksLength - 1 && (
-                        <button
-                            className="carousel-button-next theme-dark-forced"
-                            onClick={() => this.movePage(PAGINATION.NEXT)}>
-                            <i className="sprite-fm-mono icon-arrow-right-thin" />
-                            <div>{page + 1}/{this.chunksLength}</div>
-                        </button>
-                    )}
                 </div>
             );
         }
 
         //
-        //  `Speaker Mode`
+        //  `Main mode`
         // -------------------------------------------------------------------------
 
         let source;
@@ -375,10 +390,63 @@ export default class Stream extends MegaRenderMixin {
                 key={source.clientId}
                 chatRoom={chatRoom}
                 source={source}
-                menu={true}
                 ephemeralAccounts={ephemeralAccounts}
-                onCallMinimize={onCallMinimize}
-            />
+                onCallMinimize={onCallMinimize}>
+                {this.renderNodeMenu(source)}
+            </VideoType>
+        );
+    }
+
+    /**
+     * renderNodeMenu
+     * @description Renders context menu for given stream node.
+     * @param {Peer} [peer]
+     * @see VideoNode
+     * @see VideoNodeMenu
+     * @return {JSX.Element}
+     */
+
+    renderNodeMenu(peer) {
+        const { call, chatRoom, ephemeralAccounts, onCallMinimize, onSpeakerChange } = this.props;
+
+        if (peer) {
+            return (
+                <VideoNodeMenu
+                    privilege={chatRoom.members[peer.userHandle]}
+                    chatRoom={chatRoom}
+                    stream={peer}
+                    ephemeralAccounts={ephemeralAccounts}
+                    onCallMinimize={onCallMinimize}
+                    onSpeakerChange={onSpeakerChange}
+                />
+            );
+        }
+
+        return (
+            <div className="node-menu theme-dark-forced">
+                <div className="node-menu-toggle">
+                    <Emoji>{M.getNameByHandle(u_handle)}</Emoji>
+                    <i className="sprite-fm-mono icon-side-menu"/>
+                </div>
+                <div className="node-menu-content">
+                    <ul>
+                        <li>
+                            <Button
+                                icon="sprite-fm-mono grid-main"
+                                onClick={() => onSpeakerChange(call.getLocalStream())}>
+                                <span>{l.display_in_main_view /* `Display in main view` */}</span>
+                            </Button>
+                        </li>
+                        <li>
+                            <Button
+                                icon="sprite-fm-mono grid-separate"
+                                onClick={this.toggleFloatDetachment}>
+                                <span>{l.separate_from_grid_button /* `Separate from grid` */}</span>
+                            </Button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         );
     }
 
@@ -413,15 +481,18 @@ export default class Stream extends MegaRenderMixin {
 
     renderStreamContainer() {
         const {
-            call, chatRoom, peers, stayOnEnd, everHadPeers, isOnHold, hasOtherParticipants,
+            call, chatRoom, peers, stayOnEnd, everHadPeers, isOnHold, mode, hasOtherParticipants,
             onInviteToggle, onStayConfirm, onCallEnd
         } = this.props;
         const streamContainer = content =>
             <div
                 ref={this.containerRef}
+                // TODO: clean-up the className assignments re: `floatDetached`
                 className={`
                     ${NAMESPACE}-container
                     ${peers.length === 0 || !hasOtherParticipants ? 'with-notice' : ''}
+                    ${peers.length === 1 && mode === MODE.THUMBNAIL && this.state.floatDetached ? 'single-stream' : ''}
+                    ${peers.length === 1 && mode === MODE.THUMBNAIL && !this.state.floatDetached ? 'dual-stream' : ''}
                 `}>
                 {content}
             </div>;
@@ -444,6 +515,25 @@ export default class Stream extends MegaRenderMixin {
         }
 
         return streamContainer(this.renderNodes());
+    }
+
+    renderToaster() {
+        return (
+            <ChatToaster
+                showDualNotifications={true}
+                hidden={this.props.minimized}
+                onShownToast={toast => {
+                    if (toast.options && toast.options.persistent) {
+                        this.setState({ overlayed: true });
+                    }
+                }}
+                onHideToast={toast => {
+                    if (this.state.overlayed && toast.options && toast.options.persistent) {
+                        this.setState({ overlayed: false });
+                    }
+                }}
+            />
+        );
     }
 
     specShouldComponentUpdate(nextProps) {
@@ -476,11 +566,11 @@ export default class Stream extends MegaRenderMixin {
     }
 
     render() {
-        const { hovered, overlayed } = this.state;
+        const { overlayed, page, streamsPerPage, floatDetached } = this.state;
         const {
-            mode, call, chatRoom, minimized, peers, sidebar, forcedLocal, view, isOnHold, onCallMinimize,
-            onCallExpand, onStreamToggle, onModeChange, onChatToggle, onParticipantsToggle, onAudioClick, onVideoClick,
-            onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange
+            mode, call, chatRoom, minimized, peers, sidebar, hovered, forcedLocal, view, isOnHold, waitingRoomPeers,
+            onCallMinimize, onCallExpand, onModeChange, onAudioClick, onVideoClick, onCallEnd, onScreenSharingClick,
+            onHoldClick, onSpeakerChange
         } = this.props;
 
         return (
@@ -490,77 +580,73 @@ export default class Stream extends MegaRenderMixin {
                     ${NAMESPACE}
                     ${sidebar ? '' : 'full'}
                     ${hovered ? 'hovered' : ''}
-                `}
-                onMouseMove={this.handleMouseMove}
-                onMouseOut={this.handleMouseOut}>
-                <ChatToaster
-                    showDualNotifications={true}
-                    hidden={minimized}
-                    onShownToast={t => {
-                        if (t.options && t.options.persistent) {
-                            this.setState({overlayed: true});
+                `}>
+                {waitingRoomPeers && waitingRoomPeers.length ?
+                    <Admit
+                        chatRoom={chatRoom}
+                        call={call}
+                        peers={waitingRoomPeers}
+                    /> :
+                    null
+                }
+
+                {this.renderToaster()}
+
+                {minimized ?
+                    null :
+                    <>
+                        <div
+                            className={`
+                                ${NAMESPACE}-wrapper
+                                ${mode === MODE.MAIN ? 'with-participants-block' : ''}
+                            `}>
+                            {isOnHold ? this.renderOnHold() : overlayed && <div className="call-overlay"/>}
+                            {this.renderStreamContainer()}
+                        </div>
+                        {mode === MODE.MAIN &&
+                            <ParticipantsBlock
+                                {...this.props}
+                                floatDetached={floatDetached}
+                                onSeparate={this.toggleFloatDetachment}
+                            />
                         }
-                    }}
-                    onHideToast={t => {
-                        if (this.state.overlayed && t.options && t.options.persistent) {
-                            this.setState({overlayed: false});
-                        }
-                    }}
-                />
-                {minimized ? null : (
-                    <div className={`${NAMESPACE}-wrapper`}>
                         <StreamHead
                             disableCheckingVisibility={true}
                             mode={mode}
+                            peers={peers}
+                            page={page}
+                            streamsPerPage={streamsPerPage}
+                            floatDetached={floatDetached}
+                            chunksLength={this.chunksLength}
                             call={call}
                             chatRoom={chatRoom}
                             onCallMinimize={onCallMinimize}
                             onModeChange={onModeChange}
+                            onStreamsPerPageChange={streamsPerPage => this.setState({ streamsPerPage })}
+                            onMovePage={direction => this.movePage(direction)}
                         />
+                    </>
+                }
 
-                        {isOnHold ? this.renderOnHold() : overlayed && <div className="call-overlay"/>}
-                        {this.renderStreamContainer()}
-
-                        <StreamControls
-                            call={call}
-                            minimized={minimized}
-                            peers={peers}
-                            chatRoom={chatRoom}
-                            onAudioClick={onAudioClick}
-                            onVideoClick={onVideoClick}
-                            onScreenSharingClick={onScreenSharingClick}
-                            onCallEnd={onCallEnd}
-                            onStreamToggle={onStreamToggle}
-                            onHoldClick={onHoldClick}
-                        />
-
-                        <SidebarControls
-                            chatRoom={chatRoom}
-                            npeers={peers.length}
-                            mode={mode}
-                            view={view}
-                            sidebar={sidebar}
-                            onChatToggle={onChatToggle}
-                            onParticipantsToggle={onParticipantsToggle}
-                        />
-                    </div>
-                )}
                 <FloatingVideo
                     call={call}
                     peers={peers}
                     mode={mode}
                     view={view}
+                    floatDetached={floatDetached}
                     isOnHold={isOnHold}
                     chatRoom={chatRoom}
                     minimized={minimized}
                     sidebar={sidebar}
                     forcedLocal={forcedLocal}
                     wrapperRef={this.wrapperRef}
+                    waitingRoomPeers={waitingRoomPeers}
                     onAudioClick={onAudioClick}
                     onVideoClick={onVideoClick}
                     onCallEnd={onCallEnd}
                     onScreenSharingClick={onScreenSharingClick}
                     onCallMinimize={onCallMinimize}
+                    onMoveIntoGrid={this.toggleFloatDetachment}
                     onCallExpand={async() => {
                         await onCallExpand();
                         this.scaleNodes(undefined, true);

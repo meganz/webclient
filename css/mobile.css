@@ -2507,19 +2507,19 @@ input[type='checkbox'] {
     width: calc(20% - 5px);
 }
 .good1 .register-pass-status-line1 {
-    background-color: #ff2a0b;
+    background-color: var(--mobile-support-error);
 }
 .good2 .register-pass-status-line1, .good2 .register-pass-status-line2 {
-    background-color: #ffc926;
+    background-color: var(--mobile-support-error);
 }
 .good3 .register-pass-status-line1, .good3 .register-pass-status-line2, .good3 .register-pass-status-line3 {
-    background-color: #7ab148;
+    background-color: var(--mobile-support-warning);
 }
 .good4 .register-pass-status-line1, .good4 .register-pass-status-line2, .good4 .register-pass-status-line3, .good4 .register-pass-status-line4 {
-    background-color: #7dd016;
+    background-color: var(--mobile-support-success);
 }
 .good5 .register-pass-status-line1, .good5 .register-pass-status-line2, .good5 .register-pass-status-line3, .good5 .register-pass-status-line4, .good5 .register-pass-status-line5 {
-    background-color: #1DA1E9;
+    background-color: var(--mobile-support-success);
 }
 /* Default checkbox */
 div.checkboxOff,
@@ -4917,22 +4917,6 @@ textarea.mobile.support-text-field {
 .mobile.file-manager-block:not(.grid-view) .mobile.fm-item.ui-selected {
     background-color: rgba(233,233,233,1);
 }
-/* Change password page */
-.mobile.my-account-change-password-page .body-text {
-    color: #818993;
-    font-size: 14px;
-    line-height: 24px;
-    margin: 20px 24px;
-}
-.mobile.my-account-change-password-page .signin-input {
-    margin: 0 24px 4px;
-    padding-top: 0;
-    display: flex;
-    align-items: center;
-}
-.mobile.my-account-change-password-page .update-password-button {
-    margin: 8px 24px;
-}
 
 /* Change email page */
 .mobile.my-account-change-email-page .body-text {
@@ -5668,26 +5652,6 @@ textarea.mobile.support-text-field {
 }
 
 /* Cancel subscription overlay */
-.mobile.cancel-subscription-overlay {
-    left: 0;
-    position: absolute;
-    top: 0;
-    z-index: 110;
-}
-.mobile.cancel-subscription-overlay .white-block {
-    width: 300px;
-}
-.mobile.cancel-subscription-overlay .plan-icon {
-    margin: 10px auto;
-}
-.mobile.cancel-subscription-overlay .mobile.dialog-information {
-    font-size: 15px;
-    line-height: 24px;
-    color: #555;
-    display: inline-block;
-    box-sizing: border-box;
-    white-space: normal;
-}
 .mobile.first-message {
     font-family: 'LatoWebBold';
     color: #495057;
@@ -5697,7 +5661,6 @@ textarea.mobile.support-text-field {
     text-align: center;
     text-overflow: ellipsis;
 }
-.mobile.second-message,
 .mobile.optional-second-message {
     color: #676D75;
     font-size: 14px;
@@ -5706,13 +5669,7 @@ textarea.mobile.support-text-field {
     text-align: center;
     word-break: break-word;
 }
-.mobile.cancel-subscription-overlay .buttons {
-    text-align: center;
-}
-.mobile.cancel-subscription-overlay .red-button {
-    border: 1px solid #ff4246;
-    font-size: 14px;
-}
+
 /* Video player Download page */
 .mobile.video .download.main-pad {
     width: 656px;
@@ -9247,7 +9204,8 @@ Thank You dialog
         padding: 0 20px;
         margin: 18px auto 0;
     }
-    .mobile.recovery-key-page .mobile.recovery-key-block, .two-factor-qr-block, .mobile.my-account-change-password-page .update-password {
+    .mobile.recovery-key-page .mobile.recovery-key-block,
+    .two-factor-qr-block {
         margin: 26px 38px 0 38px;
     }
     .mobile.verify-login-page .two-factor-qr-block {

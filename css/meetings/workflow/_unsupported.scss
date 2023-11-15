@@ -1,0 +1,45 @@
+.meetings-unsupported-container {
+  overflow: hidden;
+  position: relative;
+  margin: 60px auto;
+  width: 605px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.10);
+  border-radius: 30px;
+  background: var(--surface-main);
+
+  i {
+    float: left;
+    margin: 30px 0 0 37px;
+    --icon-size: 52px;
+  }
+
+  .unsupported-info {
+    float: left;
+    margin: 30px 0 25px 36px;
+
+    h3 {
+      font: var(--text-h3-bold);
+      color: var(--text-color-high);
+
+      &:first-child {
+        margin: 0 0 20px 0;
+        color: var(--secondary-red);
+      }
+
+      &:last-child {
+        margin: 0 0 10px 0;
+        color: var(--text-color-high);
+      }
+    }
+
+    ul {
+      padding: 0 0 0 18px;
+      color: var(--text-color-medium);
+
+      li {
+        /* [...] */
+      }
+    }
+  }
+}

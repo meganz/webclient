@@ -215,7 +215,7 @@ class ChatToastIntegration {
 
     constructor(megaChat) {
         const { chatd } = megaChat.plugins.chatdIntegration;
-        const { SOUNDS } = megaChat.CONSTANTS;
+        const { SOUNDS } = megaChat;
         if (chatd) {
             chatd.rebind('onOpen.cTI', () => {
                 if (!megaChat.allChatsHadInitialLoadedHistory() || !mega.active) {

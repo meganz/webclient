@@ -430,8 +430,12 @@ export default class HistoryPanel extends MegaRenderMixin {
 
     initToast = () => {
         const { chatRoom } = this.props;
-        this.setState({ toast: !chatRoom.scrolledToBottom && !this.messagesListScrollable.isCloseToBottom(30) }, () =>
-            this.state.toast ? null : chatRoom.trigger('onChatIsFocused')
+        return (
+            this.isMounted() &&
+            this.setState(
+                { toast: !chatRoom.scrolledToBottom && !this.messagesListScrollable?.isCloseToBottom?.(30) },
+                () => this.state.toast ? null : chatRoom.trigger('onChatIsFocused')
+            )
         );
     };
 

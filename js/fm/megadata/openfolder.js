@@ -329,9 +329,13 @@
             queueMicrotask(() => s4.ui.render());
         }
 
+        const $fmRightHeader = $('.fm-right-header', '.fm-right-files-block');
+        const $resultsCount = $('.fm-search-count', $fmRightHeader);
+
         $('.nw-fm-tree-item.opened').removeClass('opened');
         $('.fm-notification-block.duplicated-items-found').removeClass('visible');
-        $('.fm-right-header .fm-breadcrumbs-wrapper').removeClass('hidden');
+        $('.fm-breadcrumbs-wrapper', $fmRightHeader).removeClass('hidden');
+        $resultsCount.addClass('hidden');
 
         if (folderlink && !pfcol || id !== M.RootID && M.currentrootid === M.RootID) {
             this.gallery = 0;
@@ -410,7 +414,9 @@
             }
             else if (id.substr(0, 6) === 'search') {
                 this.filterBySearch(this.currentdirid);
-                $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
+                $('.fm-breadcrumbs-wrapper', $fmRightHeader).addClass('hidden');
+                $resultsCount.removeClass('hidden');
+                $resultsCount.text(mega.icu.format(l.search_results_count, M.v.length));
             }
             else if (this.currentCustomView) {
                 this.filterByParent(this.currentCustomView.nodeID);
@@ -918,6 +924,11 @@
                 });
                 M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
             }
+        }
+
+        // In MEGA Lite mode, remove this temporary class
+        if (mega.lite) {
+            $('.files-grid-view.fm').removeClass('mega-lite-hidden');
         }
 
         _openFolderCompletion.call(this, id = cv.original || id, isFirstOpen);

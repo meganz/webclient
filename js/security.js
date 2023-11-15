@@ -463,6 +463,21 @@ var security = {
     },
 
     /**
+     * Verify if a given password is the user's password.
+     * e.g., If everything is correct, we attempt to verify the email.
+     * @param {String} pwd user-entered password
+     * @returns {Promise<Boolean>}
+     */
+    async verifyUserPassword(pwd) {
+        'use strict';
+        const {u = false} = await M.getAccountDetails();
+
+        assert(u.length === 11 && window.u_attr && u_attr.u === u, l[19]);
+
+        return security.getDerivedEncryptionKey(pwd);
+    },
+
+    /**
      * Check whether the provided password is valid to decrypt a key.
      * @param {String|*} aPassword The password to test against.
      * @param {String|*} aMasterKey The encrypted master key.

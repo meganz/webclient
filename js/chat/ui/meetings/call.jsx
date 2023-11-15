@@ -1,13 +1,79 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
+import { MegaRenderMixin } from '../../mixins.js';
 import Stream, { STREAM_ACTIONS, MAX_STREAMS } from './stream.jsx';
 import Sidebar from './sidebar.jsx';
 import Invite from './workflow/invite/invite.jsx';
 import Ephemeral from './workflow/ephemeral.jsx';
 import Offline from './offline.jsx';
 import { allContactsInChat, excludedParticipants } from '../conversationpanel.jsx';
+import StreamControls from './streamControls';
+import SidebarControls from './sidebarControls';
 
+const NAMESPACE = 'meetings-call';
 export const EXPANDED_FLAG = 'in-call';
+const MOUSE_OUT_DELAY = 2500;
+
+/**
+ * MODE
+ * @description Describes the available call modes.
+ * @enum {number}
+ * @property {number} THUMBNAIL
+ * @property {number} MAIN
+ * @readonly
+ */
+
+export const MODE = {
+    THUMBNAIL: 1,
+    MAIN: 2,
+    MINI: 3
+};
+
+/**
+ * VIEW
+ * @description Describes the available view states.
+ * @enum {number}
+ * @property {number} DEFAULT
+ * @property {number} CHAT
+ * @property {number} PARTICIPANTS
+ * @readonly
+ */
+
+export const VIEW = {
+    DEFAULT: 0,
+    CHAT: 1,
+    PARTICIPANTS: 2
+};
+
+/**
+ * TYPE
+ * @description Describes the available call types.
+ * @type {{VIDEO: number, AUDIO: number}}
+ * @enum {number}
+ * @property {number} AUDIO
+ * @property {number} VIDEO
+ * @readonly
+ */
+
+export const TYPE = {
+    AUDIO: 1,
+    VIDEO: 2
+};
+
+/**
+ * isGuest
+ * @description Returns the true if the current user is a guest.
+ * @returns {boolean}
+ */
+
+export const isGuest = () => !u_type;
+
+/**
+ * inProgressAlert
+ * @description Renders conditionally message dialog if there is another active call currently. Attached to the
+ * audio/video call controls on various places across the UI.
+ * @returns {Promise}
+ */
+
 export const inProgressAlert = (isJoin, chatRoom) => {
     return new Promise((resolve, reject) => {
         if (megaChat.haveAnyActiveCall()) {
@@ -60,53 +126,13 @@ export const inProgressAlert = (isJoin, chatRoom) => {
 
 export default class Call extends MegaRenderMixin {
 
-    ephemeralAddListener = null;
+    ephemeralAddListener = undefined;
+    delayProcID = null;
+    pCallTimer = null;
+    offlineDelayed = undefined;
+    callStartTimeout = undefined;
 
-    /**
-     * TYPE
-     * @description Describes the available call types.
-     * @type {{VIDEO: number, AUDIO: number}}
-     * @enum {number}
-     * @property {number} AUDIO
-     * @property {number} VIDEO
-     * @readonly
-     */
-
-    static TYPE = {
-        AUDIO: 1,
-        VIDEO: 2
-    };
-
-    /**
-     * MODE
-     * @description Describes the available call modes.
-     * @enum {number}
-     * @property {number} THUMBNAIL
-     * @property {number} SPEAKER
-     * @readonly
-     */
-
-    static MODE = {
-        THUMBNAIL: 1,
-        SPEAKER: 2,
-        MINI: 3
-    };
-
-    /**
-     * VIEW
-     * @description Describes the available view states.
-     * @enum {number}
-     * @property {number} DEFAULT
-     * @property {number} CHAT
-     * @property {number} PARTICIPANTS
-     * @readonly
-     */
-
-    static VIEW = {
-        DEFAULT: 0,
-        CHAT: 1,
-        PARTICIPANTS: 2
-    };
+    flagMap = attribCache.bitMapsManager.exists('obv4') ? attribCache.bitMapsManager.get('obv4') : undefined;
 
     /**
      * STATE
@@ -121,24 +147,20 @@ export default class Call extends MegaRenderMixin {
 
     state = {
         mode: undefined,
-        view: Call.VIEW.PARTICIPANTS,
-        sidebar: true,
+        view: VIEW.PARTICIPANTS,
+        sidebar: false,
         forcedLocal: false,
+        hovered: false,
         invite: false,
         ephemeral: false,
         offline: false,
         ephemeralAccounts: [],
         everHadPeers: false,
-        guest: Call.isGuest()
+        guest: isGuest(),
+        waitingRoomPeers: [],
+        initialCallRinging: false,
+        onboarding: false
     };
-
-    /**
-     * isGuest
-     * @description Returns the true if the current user is a guest.
-     * @returns {boolean}
-     */
-
-    static isGuest = () => !u_type;
 
     /**
      * isModerator
@@ -180,9 +202,44 @@ export default class Call extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
-        this.pCallTimer = null;
+        const { SOUNDS } = megaChat;
+        [SOUNDS.RECONNECT, SOUNDS.CALL_END, SOUNDS.CALL_JOIN_WAITING].map(sound => ion.sound.preload(sound));
         this.state.mode = props.call.viewMode;
-        this.state.sidebar = props.chatRoom.type === 'public';
+        this.state.onboarding = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_UI);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleMouseOut = this.handleMouseOut.bind(this);
+    }
+
+    /**
+     * handleMouseMove
+     * @description Mouse move event handler -- sets the `hovered` state and removes the hover delay.
+     * @returns {void}
+     */
+
+    handleMouseMove() {
+        this.setState({ hovered: true });
+        if (this.delayProcID) {
+            delay.cancel(this.delayProcID);
+            this.delayProcID = null;
+        }
+    }
+
+    /**
+     * handleMouseOut
+     * @description Mouse out event handler -- removes the `hovered` state and adds delay listener.
+     * @returns {void}
+     */
+
+    handleMouseOut() {
+        if (this.state.hovered) {
+            this.delayProcID =
+                delay('meetings-call-hover', () => {
+                    if (this.isMounted()) {
+                        // when ending a call, the component may be unmounted on hover, because of the delay ^
+                        this.setState({ hovered: false });
+                    }
+                }, MOUSE_OUT_DELAY);
+        }
     }
 
     /**
@@ -193,10 +250,11 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleRetryTimeout = () => {
-        if (this.props.call.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
+        const { call, chatRoom } = this.props;
+        if (call?.sfuClient?.connState === SfuClient.ConnState.kDisconnectedRetrying) {
             this.handleCallEnd();
-            this.props.chatRoom.trigger('onRetryTimeout');
-            ion.sound.play(SOUNDS.CALL_END);
+            chatRoom.trigger('onRetryTimeout');
+            ion.sound.play(megaChat.SOUNDS.CALL_END);
         }
     };
 
@@ -245,38 +303,84 @@ export default class Call extends MegaRenderMixin {
 
     bindCallEvents = () => {
         const { chatRoom } = this.props;
-        chatRoom.rebind('onCallPeerLeft.callComp', () => {
+
+        chatRoom.rebind(`onCallPeerLeft.${NAMESPACE}`, () => {
             const { minimized, peers, call } = this.props;
             if (minimized) {
-                this.setState({ mode: peers.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI }, () => {
+                this.setState({ mode: peers.length === 0 ? MODE.THUMBNAIL : MODE.MINI }, () => {
                     call.setViewMode(this.state.mode);
                 });
             }
         });
-        chatRoom.rebind('onCallPeerJoined.callComp', () => {
+
+        chatRoom.rebind(`onCallPeerJoined.${NAMESPACE}`, () => {
             const { minimized, peers, call } = this.props;
+
             if (minimized) {
-                this.setState({ mode: peers.length === 0 ? Call.MODE.THUMBNAIL : Call.MODE.MINI }, () => {
+                this.setState({ mode: peers.length === 0 ? MODE.THUMBNAIL : MODE.MINI }, () => {
                     call.setViewMode(this.state.mode);
                 });
             }
+
             if (call.hasOtherParticipant()) {
                 if (!this.state.everHadPeers) {
-                    this.setState({everHadPeers: true});
+                    this.setState({ everHadPeers: true });
                 }
-                if (this.callStartTimeout) {
-                    clearTimeout(this.callStartTimeout);
-                    delete this.callStartTimeout;
-                }
+                clearTimeout(this.callStartTimeout);
             }
         });
-        chatRoom.rebind('onCallLeft.callComp', () => this.props.minimized && this.props.onCallEnd());
+
+        chatRoom.rebind(`onCallLeft.${NAMESPACE}`, () => this.props.minimized && this.props.onCallEnd());
+
+        // --
+
+        chatRoom.rebind(`wrOnUsersEntered.${NAMESPACE}`, (ev, users) =>
+            Object.entries(users).forEach(([handle, host]) => {
+                return host || this.state.waitingRoomPeers.includes(handle) ?
+                    null :
+                    // Add peer to the waiting room; play sound notification with the first peer that entered
+                    // the waiting queue.
+                    this.isMounted() &&
+                    this.setState(
+                        { waitingRoomPeers: [...this.state.waitingRoomPeers, handle] },
+                        () => {
+                            const { waitingRoomPeers } = this.state;
+                            if (waitingRoomPeers && waitingRoomPeers.length === 1) {
+                                ion.sound.play(megaChat.SOUNDS.CALL_JOIN_WAITING);
+                            }
+                            mBroadcaster.sendMessage('meetings:peersWaiting', waitingRoomPeers);
+                        }
+                    );
+            })
+        );
+
+        chatRoom.rebind(`wrOnUserLeft.${NAMESPACE}`, (ev, user) =>
+            this.isMounted() &&
+            this.setState(
+                { waitingRoomPeers: this.state.waitingRoomPeers.filter(h => h !== user) },
+                () => mBroadcaster.sendMessage('meetings:peersWaiting', this.state.waitingRoomPeers)
+            )
+        );
+
+        chatRoom.rebind(`wrOnUserDump.${NAMESPACE}`, (ev, users) =>
+            Object.entries(users).forEach(([handle, host]) => {
+                return host || this.state.waitingRoomPeers.includes(handle) ?
+                    null :
+                    this.isMounted() && this.setState({ waitingRoomPeers: [...this.state.waitingRoomPeers, handle] });
+            })
+        );
     };
 
     unbindCallEvents = () =>
-        ['onCallPeerLeft.callComp', 'onCallPeerJoined.callComp', 'onCallLeft.callComp'].map(event =>
-            this.props.chatRoom.off(event)
-        );
+        [
+            `onCallPeerLeft.${NAMESPACE}`,
+            `onCallPeerJoined.${NAMESPACE}`,
+            `onCallLeft.${NAMESPACE}`,
+            `wrOnUsersEntered.${NAMESPACE}`,
+            `wrOnUserLeft.${NAMESPACE}`,
+            `alterUserPrivilege.${NAMESPACE}`,
+        ]
+            .map(event => this.props.chatRoom.off(event));
 
     /**
      * handleCallMinimize
@@ -290,12 +394,12 @@ export default class Call extends MegaRenderMixin {
     handleCallMinimize = () => {
         const { call, peers, onCallMinimize } = this.props;
         const { mode, sidebar, view } = this.state;
-        const { stayOnEnd } = call;
+        const { callToutId, stayOnEnd } = call;
         // Cache previous state only when `Local` is not already minimized
-        Call.STATE.PREVIOUS = mode !== Call.MODE.MINI ? { mode, sidebar, view } : Call.STATE.PREVIOUS;
+        Call.STATE.PREVIOUS = mode !== MODE.MINI ? { mode, sidebar, view } : Call.STATE.PREVIOUS;
         const noPeers = () => {
             onCallMinimize();
-            if (typeof call.callToutId !== 'undefined' && !stayOnEnd) {
+            if (typeof callToutId !== 'undefined' && !stayOnEnd) {
                 onIdle(() => call.showTimeoutDialog());
             }
         };
@@ -303,9 +407,9 @@ export default class Call extends MegaRenderMixin {
         return (
             peers.length > 0 ?
                 // There are peers, i.e. other call participants -> render `Local` in `mini mode`
-                this.setState({ mode: Call.MODE.MINI, sidebar: false }, () => {
+                this.setState({ mode: MODE.MINI, sidebar: false }, () => {
                     onCallMinimize();
-                    call.setViewMode(Call.MODE.MINI);
+                    call.setViewMode(MODE.MINI);
                 }) :
                 // The call has one participant only (i.e. me) -> render `Local` in `self-view` mode
                 noPeers()
@@ -323,7 +427,7 @@ export default class Call extends MegaRenderMixin {
 
     handleCallExpand = async() => {
         return new Promise((resolve) => {
-            this.setState({...Call.STATE.PREVIOUS}, () => {
+            this.setState({ ...Call.STATE.PREVIOUS }, () => {
                 this.props.onCallExpand();
                 resolve();
             });
@@ -349,17 +453,17 @@ export default class Call extends MegaRenderMixin {
 
     /**
      * handleSpeakerChange
-     * @description Handles the selection of active speaker when in `Speaker Mode`.
-     * @param {Peer|VideoNode} VideoNode the selected stream to set as active
-     * @see Sidebar.renderSpeakerMode
+     * @description Handles the selection of active speaker when in `Main Mode`.
+     * @param {Peer|VideoNode} videoNode the selected stream to set as active
+     * @see ParticipantsBlock
      * @see Local.renderOptionsDialog
-     * @see VideoNode.Pin
+     * @see VideoNodeMenu.Pin
      * @returns {void}
      */
 
     handleSpeakerChange = videoNode => {
         if (videoNode) {
-            this.handleModeChange(Call.MODE.SPEAKER);
+            this.handleModeChange(MODE.MAIN);
             this.props.call.setForcedActiveStream(videoNode.clientId);
             this.setState({ forcedLocal: videoNode.isLocal });
         }
@@ -367,8 +471,8 @@ export default class Call extends MegaRenderMixin {
 
     /**
      * handleModeChange
-     * @description Sets the selected call mode (`Thumbnail`/`Speaker`).
-     * @see Call.MODE
+     * @description Sets the selected call mode (`Thumbnail`/`Main`).
+     * @see MODE
      * @see ModeSwitch
      * @param {MODE} mode flag indicating the selected call mode
      * @returns {void}
@@ -376,13 +480,7 @@ export default class Call extends MegaRenderMixin {
 
     handleModeChange = mode => {
         this.props.call.setViewMode(mode);
-        this.setState({
-            mode,
-            sidebar: true,
-            // Both `Thumbnail` and `Speaker` modes are rendered with the `Participants` view in the `Sidebar`
-            view: mode === Call.MODE.THUMBNAIL || mode === Call.MODE.SPEAKER ? Call.VIEW.PARTICIPANTS : this.state.view,
-            forcedLocal: false
-        });
+        this.setState({ mode, sidebar: false, forcedLocal: false });
     };
 
     /**
@@ -394,10 +492,10 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleChatToggle = () => {
-        if (this.state.sidebar && this.state.view === Call.VIEW.CHAT) {
+        if (this.state.sidebar && this.state.view === VIEW.CHAT) {
             return this.setState({ ...Call.STATE.DEFAULT });
         }
-        return this.setState({ sidebar: true, view: Call.VIEW.CHAT });
+        return this.setState({ sidebar: true, view: VIEW.CHAT });
     };
 
     /**
@@ -409,10 +507,10 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleParticipantsToggle = () => {
-        if (this.state.sidebar && this.state.view === Call.VIEW.CHAT) {
-            return this.setState({ sidebar: true, view: Call.VIEW.PARTICIPANTS });
+        if (this.state.sidebar && this.state.view === VIEW.CHAT) {
+            return this.setState({ sidebar: true, view: VIEW.PARTICIPANTS });
         }
-        return this.setState({ sidebar: !this.state.sidebar, view: Call.VIEW.PARTICIPANTS });
+        return this.setState({ sidebar: !this.state.sidebar, view: VIEW.PARTICIPANTS });
     };
 
     /**
@@ -527,74 +625,77 @@ export default class Call extends MegaRenderMixin {
     componentWillUnmount() {
         super.componentWillUnmount();
         const { minimized, willUnmount, chatRoom } = this.props;
-        if (willUnmount) {
-            willUnmount(minimized);
-        }
-        if (this.ephemeralAddListener) {
-            mBroadcaster.removeListener(this.ephemeralAddListener);
-        }
-        chatRoom.megaChat.off('sfuConnClose.call');
-        chatRoom.megaChat.off('sfuConnOpen.call');
-        this.unbindCallEvents();
-        if (this.callStartTimeout) {
-            clearTimeout(this.callStartTimeout);
-        }
-        delay.cancel('callOffline');
+
+        chatRoom.megaChat.off(`sfuConnClose.${NAMESPACE}`);
+        chatRoom.megaChat.off(`sfuConnOpen.${NAMESPACE}`);
+        mBroadcaster.removeListener(this.ephemeralAddListener);
         if (this.pageChangeListener) {
             mBroadcaster.removeListener(this.pageChangeListener);
         }
+
+        clearTimeout(this.callStartTimeout);
+        delay.cancel('callOffline');
+
+        this.unbindCallEvents();
+        willUnmount?.(minimized);
     }
 
     componentDidMount() {
         super.componentDidMount();
-        const { didMount, chatRoom } = this.props;
-        if (didMount) {
-            didMount();
-        }
-        this.ephemeralAddListener = mBroadcaster.addListener('meetings:ephemeralAdd', handle =>
-            this.handleEphemeralAdd(handle)
-        );
+        const { call, didMount, chatRoom } = this.props;
+
+        this.ephemeralAddListener =
+            mBroadcaster.addListener('meetings:ephemeralAdd', handle => this.handleEphemeralAdd(handle));
+
         this.pageChangeListener = mBroadcaster.addListener('pagechange', () => {
             const currentRoom = megaChat.getCurrentRoom();
             if (Call.isExpanded() && (!M.chat || currentRoom && currentRoom.chatId !== chatRoom.chatId)) {
                 this.handleCallMinimize();
             }
         });
-        chatRoom.megaChat.rebind('sfuConnOpen.call', this.handleCallOnline);
-        chatRoom.megaChat.rebind('sfuConnClose.call', () => this.handleCallOffline());
-        this.bindCallEvents();
-        const { SOUNDS } = megaChat.CONSTANTS;
-        [SOUNDS.RECONNECT, SOUNDS.CALL_END].map(sound => ion.sound.preload(sound));
+
+        chatRoom.megaChat.rebind(`sfuConnOpen.${NAMESPACE}`, this.handleCallOnline);
+        chatRoom.megaChat.rebind(`sfuConnClose.${NAMESPACE}`, () => this.handleCallOffline());
+
         this.callStartTimeout = setTimeout(() => {
-            const { call } = this.props;
-            if (
-                !mega.config.get('callemptytout')
-                && !call.hasOtherParticipant()
-            ) {
+            if (!mega.config.get('callemptytout') && !call.hasOtherParticipant()) {
                 call.left = true;
                 call.initCallTimeout();
             }
-            delete this.callStartTimeout;
-        }, 300 * 1000);
-        setTimeout(() => {
-            const { call } = this.props;
-            const peers = call.peers;
-            if (peers && peers.length && !call.hasOtherParticipant()) {
-                this.setState({everHadPeers: true});
-            }
-        }, 2000);
+        }, 6e4 * 5 /* 5 minutes */);
+
+        setTimeout(() =>
+            call.peers?.length && !call.hasOtherParticipant() && this.setState({ everHadPeers: true }), 2e3
+        );
+
+        if (sessionStorage.previewMedia) {
+            const { audio, video } = JSON.parse(sessionStorage.previewMedia);
+            sessionStorage.removeItem('previewMedia');
+            tSleep(2)
+                .then(() => audio && call.sfuClient.muteAudio())
+                .then(() => video && call.sfuClient.muteCamera())
+                .catch(dump);
+        }
+
+        this.bindCallEvents();
+        didMount?.();
+
+        // --
+
+        // TODO: proper namespacing
+        chatRoom.rebind('onCallState.callComp', (ev, { arg }) => this.setState({ initialCallRinging: arg }));
     }
 
     render() {
         const { minimized, peers, call, chatRoom, parent, onDeleteMessage } = this.props;
         const {
-            mode, view, sidebar, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
-            offline, everHadPeers
+            mode, view, sidebar, hovered, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
+            offline, onboarding, everHadPeers, initialCallRinging, waitingRoomPeers
         } = this.state;
         const { stayOnEnd } = call;
         const STREAM_PROPS = {
-            mode, peers, sidebar, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
-            everHadPeers,
+            mode, peers, sidebar, hovered, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
+            everHadPeers, waitingRoomPeers,
             hasOtherParticipants: call.hasOtherParticipant(),
             isOnHold: call.sfuClient.isOnHold(), onSpeakerChange: this.handleSpeakerChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm,
@@ -603,8 +704,15 @@ export default class Call extends MegaRenderMixin {
         //
         // `Call`
         // -------------------------------------------------------------------------
+
         return (
-            <div className={`meetings-call ${minimized ? 'minimized' : ''}`}>
+            <div
+                className={`
+                    meetings-call
+                    ${minimized ? 'minimized' : ''}
+                `}
+                onMouseMove={onboarding ? null : this.handleMouseMove}
+                onMouseOut={onboarding ? null : this.handleMouseOut}>
                 <Stream
                     {...STREAM_PROPS}
                     minimized={minimized}
@@ -620,35 +728,64 @@ export default class Call extends MegaRenderMixin {
                     onVideoClick={() => call.toggleVideo()}
                     onScreenSharingClick={this.handleScreenSharingToggle}
                     onHoldClick={this.handleHoldToggle}
-                    onThumbnailDoubleClick={(videoNode) => this.handleSpeakerChange(videoNode)}
+                    onThumbnailDoubleClick={videoNode => this.handleSpeakerChange(videoNode)}
                 />
 
-                {sidebar && (
+                {sidebar &&
                     <Sidebar
                         {...STREAM_PROPS}
                         guest={guest}
+                        initialCallRinging={initialCallRinging}
                         onGuestClose={() => this.setState({ guest: false })}
                         onSidebarClose={() => this.setState({ ...Call.STATE.DEFAULT })}
                         onDeleteMessage={onDeleteMessage}
                     />
-                )}
+                }
 
-                {invite && (
+                {minimized ?
+                    null :
+                    <>
+                        <StreamControls
+                            call={call}
+                            minimized={minimized}
+                            peers={peers}
+                            chatRoom={chatRoom}
+                            onAudioClick={() => call.toggleAudio()}
+                            onVideoClick={() => call.toggleVideo()}
+                            onScreenSharingClick={this.handleScreenSharingToggle}
+                            onCallEnd={this.handleCallEnd}
+                            onStreamToggle={this.handleStreamToggle}
+                            onHoldClick={this.handleHoldToggle}
+                        />
+                        <SidebarControls
+                            chatRoom={chatRoom}
+                            npeers={peers.length}
+                            mode={mode}
+                            view={view}
+                            sidebar={sidebar}
+                            onChatToggle={this.handleChatToggle}
+                            onParticipantsToggle={this.handleParticipantsToggle}
+                        />
+                    </>
+                }
+
+                {invite &&
                     <Invite
                         contacts={M.u}
+                        call={call}
                         chatRoom={chatRoom}
                         onClose={() => this.setState({ invite: false })}
                     />
-                )}
+                }
 
-                {ephemeral && (
+                {ephemeral &&
                     <Ephemeral
                         ephemeralAccounts={ephemeralAccounts}
                         onClose={() => this.setState({ ephemeral: false })}
                     />
-                )}
+                }
 
-                {offline && (
+                {offline &&
                     <Offline
                         onClose={() => {
                             if (offline) {
@@ -663,7 +800,40 @@ export default class Call extends MegaRenderMixin {
                             );
                         }}
                     />
-                )}
+                }
+
+                {onboarding &&
+                    <div className="meetings-call-onboarding">
+                        <div
+                            className="mega-dialog mega-onboarding-dialog dialog-template-message"
+                            id="ob-dialog"
+                            role="dialog"
+                            aria-labelledby="ob-dialog-title"
+                            aria-modal="true">
+                            <i className="sprite-fm-mono icon-tooltip-arrow tooltip-arrow top" id="ob-dialog-arrow" />
+                            <header>
+                                <div>
+                                    <h2 id="ob-dialog-title">{l.onboarding_call_title}</h2>
+                                    <p id="ob-dialog-text">{l.onboarding_call_body}</p>
+                                </div>
+                            </header>
+                            <footer>
+                                <div className="footer-container">
+                                    <button
+                                        className="mega-button js-next small theme-light-forced"
+                                        onClick={() => {
+                                            this.setState({ onboarding: false, hovered: false }, () => {
+                                                this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_UI, 1);
+                                                this.flagMap.safeCommit();
+                                            });
+                                        }}>
+                                        <span>{l.ok_button}</span>
+                                    </button>
+                                </div>
+                            </footer>
+                        </div>
+                    </div>
+                }
             </div>
         );
     }

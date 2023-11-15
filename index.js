@@ -68,10 +68,9 @@ mBroadcaster.once('startMega', function() {
         document.body.classList.add('rtl');
     }
 
-
     if (is_mobile) {
 
-        const usingMobPages = ['placeholder', 'change_email', 'register', 'key', 'support', 'keybackup',
+        const usingMobPages = ['placeholder', 'register', 'key', 'support', 'keybackup',
                                'disputenotice', 'download', 'reset', 'propay', 'login'];
 
         for (let i = usingMobPages.length; i--;) {
@@ -351,6 +350,14 @@ function init_page() {
 
     if (!window.M || is_megadrop) {
         return console.warn('Something went wrong, the initialization did not completed...');
+    }
+
+    if (mega.ensureAccessibility) {
+        if (mega.ensureAccessibility() !== 'accessible') {
+            console.error('Unable to ensure accessibility...');
+            return false;
+        }
+        delete mega.ensureAccessibility;
     }
 
     // If they are transferring from mega.co.nz
@@ -831,11 +838,11 @@ function init_page() {
         window.location.replace('https://blog.mega.io');
     }
     else if (page.substr(0, 6) == 'verify') {
-        parsepage(pages.change_email);
         if (is_mobile) {
-            mobile.verify.init();
+            mobile.settings.account.verifyEmail.init();
         }
         else {
+            parsepage(pages.change_email);
             emailchange.main();
         }
     }
@@ -3169,7 +3176,7 @@ window.addEventListener('beforeunload', () => {
     }
 
     if (megaChatIsReady && megaChat.activeCall) {
-        ion.sound.play(megaChat.CONSTANTS.SOUNDS.ALERT);
+        ion.sound.play(megaChat.SOUNDS.ALERT);
         return false;
     }
 
@@ -3262,6 +3269,30 @@ mBroadcaster.once('boot_done', () => {
                 writable: false
             });
         })();
+
+        Object.defineProperty(mega, 'ensureAccessibility', {
+            configurable: true,
+            value: tryCatch(() => {
+
+                if (!window.mainlayout) {
+                    delete window.mainlayout;
+                    Object.defineProperty(window, 'mainlayout', {
+                        value: document.getElementById('mainlayout')
+                    });
+                }
+                assert(window.mainlayout && mainlayout.nodeType > 0, l[8642]);
+                return 'accessible';
+            }, (ex) => {
+                window.onerror = null;
+                onIdle(() => siteLoadError(ex, 'mainlayout'));
+
+                const data = tryCatch(() =>
+                    [...document.body.children]
+                        .map(n => n.tagName + (n.id ? `#${n.id}` : `.${n.classList[0] || ''}`))
+                )();
+                eventlog(99930, String(data || 'N/A').slice(0, 380), true);
+            })
+        });
     }
 
     onIdle(() => {

@@ -22,7 +22,9 @@ export default class Loading extends MegaRenderMixin {
         super.componentDidMount();
         // Close dropdown elements, popups
         document.dispatchEvent(new Event('closeDropdowns'));
-        closeDialog?.();
+        if ($.dialog) {
+            closeDialog?.();
+        }
         notify?.closePopup();
         alarm?.hideAllWarningPopups();
         document.querySelectorAll('.js-dropdown-account').forEach(({ classList }) =>
@@ -78,7 +80,7 @@ export default class Loading extends MegaRenderMixin {
                 <span>
                     <i className="sprite-fm-mono icon-video-call-filled" />
                 </span>
-                <h3>{this.props.title || l.starting /* `Starting` */}</h3>
+                <h3>{this.props.title || l[5533] /* `Loading` */}</h3>
                 <div className="loading-container">
                     <div className="loading-indication" />
                 </div>

@@ -1,13 +1,13 @@
 import React from 'react';
 import { compose, MegaRenderMixin } from '../../mixins';
-import utils from '../../../ui/utils.jsx';
+import utils, { ParsedHTML } from '../../../ui/utils.jsx';
 import Button from './button.jsx';
-import Call from './call.jsx';
+import { MODE, VIEW } from './call.jsx';
 import { LocalVideoThumb, LocalVideoHiRes, PeerVideoHiRes } from './videoNode.jsx';
 import FloatExtendedControls from './floatExtendedControls.jsx';
-import { withMicObserver } from './micObserver';
-import { withPermissionsObserver } from './permissionsObserver';
-import { withHostsObserver } from './hostsObserver';
+import { withMicObserver } from './micObserver.jsx';
+import { withPermissionsObserver } from './permissionsObserver.jsx';
+import { withHostsObserver } from './hostsObserver.jsx';
 
 export default class FloatingVideo extends MegaRenderMixin {
     collapseListener = null;
@@ -53,7 +53,7 @@ export default class FloatingVideo extends MegaRenderMixin {
     }
 
     render() {
-        const { peers, minimized, call } = this.props;
+        const { peers, minimized, call, floatDetached } = this.props;
 
         // Only one call participant (i.e. me) -> render `FloatingVideo` only if the call is minimized or if
         // I am sharing screen
@@ -81,7 +81,7 @@ export default class FloatingVideo extends MegaRenderMixin {
             );
         }
 
-        return <Stream {...STREAM_PROPS} />;
+        return floatDetached ? <Stream {...STREAM_PROPS} /> : null;
     }
 }
 
@@ -150,14 +150,14 @@ class Stream extends MegaRenderMixin {
     /**
      * getStreamSource
      * @description Retrieves the stream source based on the current call mode.
-     * @see Call.MODE
+     * @see MODE
      * @see renderMiniMode
      * @see renderSelfView
      */
 
     getStreamSource = () => {
         const { call, mode, forcedLocal } = this.props;
-        return (mode === Call.MODE.MINI && !forcedLocal) ? call.getActiveStream() : call.getLocalStream();
+        return mode === MODE.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream();
     };
 
     unbindEvents = () => {
@@ -189,7 +189,7 @@ class Stream extends MegaRenderMixin {
                     return;
                 }
                 delete this.PREV_STATE.minimised;
-                return this.props.view === Call.VIEW.CHAT && this.props.onCallExpand();
+                return this.props.view === VIEW.CHAT && this.props.onCallExpand();
             });
         }
 
@@ -270,10 +270,11 @@ class Stream extends MegaRenderMixin {
             onScreenSharingClick,
             onSpeakerChange,
             onModeChange,
-            toggleCollapsedMode
+            toggleCollapsedMode,
+            onMoveIntoGrid
         } = this.props;
-        // `Speaker` mode and `forcedLocal` -> `Display in main view`, i.e. the local stream is in `Speaker` mode
-        const IS_SPEAKER_VIEW = mode === Call.MODE.SPEAKER && forcedLocal;
+        // `Main` mode and `forcedLocal` -> `Display in main view`, i.e. the local stream is in `Main` mode
+        const IS_SPEAKER_VIEW = mode === MODE.MAIN && forcedLocal;
         const { POSITION } = this.DRAGGABLE;
 
         return (
@@ -287,24 +288,16 @@ class Stream extends MegaRenderMixin {
                 <ul>
                     <li>
                         <Button
-                            icon="sprite-fm-mono icon-download-standard"
-                            onClick={() => this.setState({ options: false }, () => toggleCollapsedMode())}>
-                            <div>{l.collapse_self_video}</div>
-                        </Button>
-                    </li>
-                    <li>
-                        <Button
                             icon={`
                                 sprite-fm-mono
-                                ${IS_SPEAKER_VIEW ? 'icon-thumbnail-view' : 'icon-speaker-view'}
+                                ${IS_SPEAKER_VIEW ? 'grid-9' : 'grid-main'}
                             `}
                             onClick={() =>
                                 this.setState({ options: false }, () => {
                                     if (IS_SPEAKER_VIEW) {
-                                        return onModeChange(Call.MODE.THUMBNAIL);
+                                        return onModeChange(MODE.THUMBNAIL);
                                     }
                                     onSpeakerChange(call.getLocalStream());
-                                    toggleCollapsedMode();
                                 })
                             }>
                             <div>
@@ -312,6 +305,20 @@ class Stream extends MegaRenderMixin {
                                     l.switch_to_thumb_view /* `Switch to thumbnail view` */ :
                                     l.display_in_main_view /* `Display in main view` */}
                             </div>
+                        </Button>
+                    </li>
+                    <li>
+                        <Button
+                            icon="sprite-fm-mono icon-collapse-up"
+                            onClick={onMoveIntoGrid}>
+                            <div>{l.move_into_grid_button /* `Move into grid` */}</div>
+                        </Button>
+                    </li>
+                    <li>
+                        <Button
+                            icon="sprite-fm-mono icon-download-standard"
+                            onClick={() => this.setState({ options: false }, () => toggleCollapsedMode())}>
+                            <div>{l.collapse_self_video}</div>
                         </Button>
                     </li>
                 </ul>
@@ -419,7 +426,7 @@ class Stream extends MegaRenderMixin {
     render() {
         const { NAMESPACE, POSITION_MODIFIER } = FloatingVideo;
         const { mode, minimized, sidebar, ratioClass, collapsed, toggleCollapsedMode, onCallExpand } = this.props;
-        const IS_MINI_MODE = mode === Call.MODE.MINI;
+        const IS_MINI_MODE = mode === MODE.MINI;
         const IS_SELF_VIEW = !IS_MINI_MODE;
 
         if (collapsed) {
@@ -479,10 +486,17 @@ class Minimized extends MegaRenderMixin {
     static UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
 
     SIMPLETIP_PROPS = { position: 'top', offset: 5, className: 'theme-dark-forced' };
+    waitingPeersListener = undefined;
 
     state = {
-        unread: 0
+        unread: 0,
+        waitingRoomPeers: []
     };
+
+    constructor(props) {
+        super(props);
+        this.state.waitingRoomPeers = this.props.waitingRoomPeers || [];
+    }
 
     isActive = type => {
         return this.props.call.av & type;
@@ -613,18 +627,50 @@ class Minimized extends MegaRenderMixin {
         );
     };
 
+    renderPeersWaiting = () => {
+        const { waitingRoomPeers } = this.state;
+
+        return (
+            <div
+                className={`
+                    ${FloatingVideo.NAMESPACE}-alert
+                    theme-dark-forced
+                `}
+                onClick={this.props.onCallExpand}>
+                {waitingRoomPeers.length > 1 ?
+                    l.wr_peers_waiting.replace('%1', waitingRoomPeers.length) :
+                    <ParsedHTML
+                        tag="span"
+                        content={
+                            l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(waitingRoomPeers[0])))
+                        }
+                    />
+                }
+            </div>
+        );
+    };
+
     componentDidMount() {
         super.componentDidMount();
         this.getUnread();
+        this.waitingPeersListener = mBroadcaster.addListener(
+            'meetings:peersWaiting',
+            waitingRoomPeers => this.setState({ waitingRoomPeers }, () => this.safeForceUpdate())
+        );
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
         this.props.chatRoom.unbind(Minimized.UNREAD_EVENT);
+        if (this.waitingPeersListener) {
+            mBroadcaster.removeListener(this.waitingPeersListener);
+        }
     }
 
     render() {
-        const { unread } = this.state;
+        const { onCallExpand } = this.props;
+        const { unread, waitingRoomPeers } = this.state;
+
         return (
             <>
                 <div className={`${FloatingVideo.NAMESPACE}-overlay`}>
@@ -634,11 +680,12 @@ class Minimized extends MegaRenderMixin {
                         icon="sprite-fm-mono icon-call-expand-mode"
                         onClick={ev => {
                             ev.stopPropagation();
-                            this.props.onCallExpand();
+                            onCallExpand();
                         }}
                     />
                     {this.renderStreamControls()}
                 </div>
+                {waitingRoomPeers && waitingRoomPeers.length ? this.renderPeersWaiting() : null}
                 {unread ?
                     <div className={`${FloatingVideo.NAMESPACE}-notifications`}>
                         <Button

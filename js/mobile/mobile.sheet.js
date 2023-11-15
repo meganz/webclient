@@ -102,7 +102,7 @@ class MegaMobileSheet extends MegaMobileOverlay {
             mega.ui.overlay.domNode.classList.add('arrange-to-back');
         }
 
-        document.getElementById('mainlayout').classList.add('fm-overlay');
+        mainlayout.classList.add('fm-overlay');
         document.documentElement.classList.add('overlayed');
     }
 

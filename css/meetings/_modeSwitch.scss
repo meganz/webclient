@@ -39,7 +39,8 @@
         }
     }
 
-    &-menu {
+    &-menu,
+    &-settings {
         display: none;
         position: absolute;
         top: 100%;
@@ -63,6 +64,58 @@
                 border-radius: 4px;
                 background: var(--surface-grey-1);
                 opacity: 1;
+            }
+        }
+    }
+
+    &-settings {
+        display: block;
+        width: 400px;
+        right: 40px;
+        font: var(--text-body1);
+        color: var(--text-color-medium);
+
+        .settings-wrapper {
+            padding: 12px;
+
+            strong {
+                display: block;
+                padding: 0 0 4px 0;
+                color: var(--text-color-high);
+            }
+
+            small {
+                font: var(--text-body2);
+            }
+
+            .recurring-radio-buttons {
+                margin: 12px 0;
+
+                .radio-txt {
+                    padding: 6px 0 0 0;
+                    color: var(--text-color-high);
+                    cursor: pointer;
+                }
+
+                .radioOn,
+                .radioOff {
+                    margin: 7px 0;
+                    margin-inline-end: 12px;
+                }
+            }
+        }
+
+        .settings-close {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            width: 18px;
+            height: 18px;
+
+            i {
+                --icon-size: 22px;
+                --mask-color: var(--icon-rest);
+                cursor: pointer;
             }
         }
     }

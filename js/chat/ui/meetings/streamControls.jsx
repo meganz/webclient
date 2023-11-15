@@ -45,13 +45,22 @@ class StreamControls extends MegaRenderMixin {
     handleMousedown = ({ target }) =>
         this.endContainerRef &&
         this.endContainerRef.current &&
-        this.endContainerRef.current.contains(target) ? null : this.setState({ endCallOptions: false });
+        this.endContainerRef.current.contains(target) ?
+            null :
+            this.isMounted() && this.setState({ endCallOptions: false });
 
     renderDebug = () => {
         return (
             <div
                 className="stream-debug"
-                style={{ position: 'absolute', left: 25, bottom: 36 }}>
+                style={{
+                    position: 'absolute',
+                    left: 25,
+                    bottom: 36,
+                    display: 'flex',
+                    alignItems: 'center',
+                    color: 'tomato'
+                }}>
                 <Button
                     className="mega-button round small theme-dark-forced positive"
                     simpletip={{ ...this.SIMPLETIP, label: 'Add Stream' }}
@@ -64,6 +73,7 @@ class StreamControls extends MegaRenderMixin {
                     onClick={() => this.props.peers.length > 1 && this.props.onStreamToggle(STREAM_ACTIONS.REMOVE)}>
                     <span>{l[83]}</span>
                 </Button>
+                <span>{this.props.peers.length + 1}</span>
             </div>
         );
     };

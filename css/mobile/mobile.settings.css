@@ -20,6 +20,40 @@
     color: var(--mobile-text-primary);
 }
 
+/* Settings form */
+
+.mega-mobile-settings.default-form {
+    padding: 0 24px 24px;
+}
+
+.mega-overlay .mega-mobile-settings.default-form {
+    padding: 0;
+}
+
+.mega-overlay .mega-mobile-settings.default-form .form-title {
+    padding: 0 0 4px;
+}
+
+.mega-mobile-settings.default-form .mobile.mega-input.box-style {
+    margin: 12px 0;
+}
+
+.mega-mobile-settings.default-form .mobile.mega-input.title-ontop {
+    margin: 32px 0 12px;
+}
+
+.mega-mobile-settings.default-form .mobile.mega-input .message-container i {
+    margin-bottom: 2px;
+    margin-top: 2px;
+}
+
+.mega-mobile-settings.default-form .mobile.mega-input + .button {
+    height: 47px;
+    margin-top: 12px;
+}
+
+/* End of Settings  form */
+
 body.bottom-pages .fmholder {
     grid: initial;
 }
@@ -61,5 +95,4 @@ body.bottom-pages .fmholder {
     margin: 0 8px;
     vertical-align: middle;
 }
-
 

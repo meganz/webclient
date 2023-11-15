@@ -128,6 +128,7 @@
                 this.audioMuted = !(av & Av.Audio);
                 this.videoMuted = !(av & Av.Camera);
                 this.hasScreenAndCam = (av & Av.ScreenHiRes) && (av & Av.CameraLowRes);
+                this.isScreen = !!(av & Av.ScreenHiRes);
             }
             this.av = av;
             for (const cons of this.consumers) {
@@ -374,8 +375,8 @@
     }
 
     const CALL_VIEW_MODES = {
-        'GRID': 1,
-        'SPEAKER': 2,
+        'THUMBNAIL': 1,
+        'MAIN': 2,
         'MINI': 3
     };
 
@@ -397,7 +398,7 @@
             this.callId = callId;
             this.peers = new Peers(this);
             this.localPeerStream = new LocalPeerStream(this);
-            this.viewMode = CALL_VIEW_MODES.GRID;
+            this.viewMode = CALL_VIEW_MODES.THUMBNAIL;
             this.stayOnEnd = !!mega.config.get('callemptytout');
 
             chatRoom.meetingsLoading = l.joining;
@@ -487,7 +488,7 @@
         onBadNetwork(e) {
             this.chatRoom.trigger('onBadNetwork', e);
         }
-        onDisconnect(termCode, willReconnect, removeActive) {
+        onDisconnect(termCode, willReconnect) {
             if (willReconnect) {
                 this.chatRoom.megaChat.trigger('sfuConnClose');
             }
@@ -498,13 +499,33 @@
         onLocalMediaQueryError(type, err) {
             megaChat.trigger('onLocalMediaQueryError', { type, err });
         }
+        wrOnJoinAllowed() {
+            this.chatRoom.trigger('wrOnJoinAllowed', this.callId);
+            this.chatRoom.call.sfuClient.joinCall();
+        }
+        wrOnJoinNotAllowed() {
+            this.chatRoom.trigger('wrOnJoinNotAllowed', this.callId);
+        }
+        wrOnUsersEntered(users) {
+            this.chatRoom.trigger('wrOnUsersEntered', users);
+        }
+        wrOnUserLeft(user) {
+            this.chatRoom.trigger('wrOnUserLeft', user);
+        }
+        wrOnUserDump(users) {
+            this.chatRoom.trigger('wrOnUserDump', users);
+        }
+        onModeratorAdd(user) {
+            this.chatRoom.trigger('onModeratorAdd', user);
+        }
 // == end SfuClientIClientEventListener interface
         handleDisconnect(termCode) {
             this.isDisconnecting = true;
             this.chatRoom.trigger('onCallLeft', {
                 callId: this.callId,
                 chatId: this.chatRoom.chatId,
-                showCallFeedback: true
+                showCallFeedback: true,
+                termCode
             });
 
             if (termCode === SfuClient.TermCode.kTooManyParticipants) {
@@ -531,7 +552,7 @@
             }
 
             if (termCode === SfuClient.TermCode.kCallEndedByModerator) {
-                ion.sound.play(megaChat.CONSTANTS.SOUNDS.CALL_END);
+                ion.sound.play(megaChat.SOUNDS.CALL_END);
             }
         }
         get isPublic() {
@@ -545,11 +566,11 @@
                 activePeer.isActive = false;
             }
 
-            if (newMode === CALL_VIEW_MODES.GRID) {
+            if (newMode === CALL_VIEW_MODES.THUMBNAIL) {
                 this.forcedActiveStream = null;
             }
 
-            if (newMode === CALL_VIEW_MODES.SPEAKER || newMode === CALL_VIEW_MODES.MINI) {
+            if (newMode === CALL_VIEW_MODES.MAIN || newMode === CALL_VIEW_MODES.MINI) {
                 this.sfuClient.enableSpeakerDetector(true);
             }
             else {

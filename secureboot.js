@@ -829,7 +829,8 @@ var mega = {
      * @param {String} userLang The current webclient user language code e.g. EN, NL etc
      * @returns {String} Returns the mapped language for mega.io (could be empty string for English or not supported)
      */
-    getMegaIoMappedLang(userLang) {
+    getMegaIoMappedLang: function(userLang) {
+        'use strict';
 
         // Webclient (mega.nz) to mega.io mappings
         var mappings = {
@@ -1890,10 +1891,12 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
  * @param {String} filename The file that failed to load
  */
 function siteLoadError(error, filename) {
-
     'use strict';
 
-    logStaticServerFailure(error, filename, staticpath);
+    if (filename !== 'mainlayout') {
+
+        logStaticServerFailure(error, filename, staticpath);
+    }
 
     var message = ['MEGA failed to load because '];
     if (location.host !== 'mega.nz') {
@@ -2673,6 +2676,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs.js', n: 'megainputs_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs-underlinedText.js', n: 'megainputs_underlinedtext_js', j:1,w:1});
+    jsl.push({f:'js/ui/megaInputs-textArea.js', n: 'megainputs_textarea_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs-currencyField.js', n: 'megainputs_currencyfield_js', j:1, w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
     jsl.push({f:'html/developersettings.html', n: 'developersettings', j:0});
@@ -3005,6 +3009,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.tab.css', n: 'mobile_tab_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.public.link.css', n: 'mobile_public_linkcss', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.datepicker.css', n: 'mobile_datepicker_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.account.cancel-subscription.css', n: 'mobile_account_cancel_sub_css', j: 2, w: 1});
 
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
@@ -3054,7 +3059,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.over-bandwidth-quota.js', n: 'mobile_over_bandwidth_quota_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.over-storage-quota.js', n: 'mobile_over_storage_quota_js', j: 1 });
         jsl.push({f:'html/mvoucherinfo.html', n: 'mvoucherinfo', j: 0, w: 1});
-        jsl.push({f:'js/mobile/mobile.verify.js', n: 'mobile_verify_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.component.js', n: 'mobile_component_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.group.js', n: 'mobile_group_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.dropdown.js', n: 'mobile_component_dropdown_js', j:1, w:1});
@@ -3080,10 +3084,12 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/backupRecoveryKey.js', n: 'mobile_backup_recovery_key_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account_cancel_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.change-password.js', n: 'mobile_account_change_pass_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.change-email.js', n: 'mobile_account_change_email_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.cancel-subscription.js', n: 'mobile_account_cancel_sub_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/support.js', n: 'mobile_settings_support_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/about.js', n: 'mobile_settings_about_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/changePassword.js', n: 'mobile_change_password_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/changeEmail.js', n: 'mobile_change_email_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/verifyEmail.js', n: 'mobile_verfiy_email_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/privacyAndSecurity.js', n: 'mobile_privacy_security_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/history.js', n: 'mobile_session_history_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});

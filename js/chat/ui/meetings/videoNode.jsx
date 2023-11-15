@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import { Avatar } from '../contacts.jsx';
-import Call from './call.jsx';
+import Call, { MODE } from './call.jsx';
 import VideoNodeMenu from './videoNodeMenu.jsx';
 
 /** The class hiearachy of video components is the following:
@@ -32,19 +32,21 @@ class VideoNode extends MegaRenderMixin {
     nodeRef = React.createRef();
     contRef = React.createRef();
     statsHudRef = React.createRef();
-    /**
+
+    /*
         Methods and properties that descendants must implement:
         requestVideo();
         isThumb
         isLocal
         isDirect
     */
+
     constructor(props, source) {
         super(props);
         this.isVideo = true; // the source uses this to differentiate video widgets from other event subscribers
         this.source = source;
-        this.state = {};
     }
+
     componentDidMount() {
         super.componentDidMount();
         this.source.registerConsumer(this);
@@ -65,11 +67,13 @@ class VideoNode extends MegaRenderMixin {
         }
         this.requestVideo();
     }
+
     displayVideoElement(video, container) {
         this.attachVideoElemHandlers(video);
         // insert/replace the video in the DOM
         container.replaceChildren(video);
     }
+
     attachVideoElemHandlers(video) {
         if (video._snSetup) {
             return; // already done
@@ -90,6 +94,7 @@ class VideoNode extends MegaRenderMixin {
         };
         video._snSetup = true;
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         this.detachVideoElemHandlers();
@@ -98,6 +103,7 @@ class VideoNode extends MegaRenderMixin {
             this.props.willUnmount();
         }
     }
+
     detachVideoElemHandlers() {
         const video = this.contRef.current?.firstChild;
         if (!video || !video._snSetup) {
@@ -107,6 +113,7 @@ class VideoNode extends MegaRenderMixin {
         video.ondblclick = null;
         delete video._snSetup;
     }
+
     displayStats(stats) {
         const elem = this.statsHudRef.current;
         if (!elem) {
@@ -114,6 +121,7 @@ class VideoNode extends MegaRenderMixin {
         }
         elem.textContent = stats ? `${stats} (${this.ownVideo ? "cloned" : "ref"})` : "";
     }
+
     renderVideoDebugMode() {
         if (this.source.isFake) {
             return null;
@@ -134,6 +142,7 @@ class VideoNode extends MegaRenderMixin {
         }
         return <div ref={this.statsHudRef} className={className} title={title} />;
     }
+
     renderContent() {
         const source = this.source;
         if (source.isStreaming()) {
@@ -175,18 +184,17 @@ class VideoNode extends MegaRenderMixin {
         return (
             <>
                 {
-                    // If in `Speaker` mode and the participant is a moderator -- show icon in the top-right corner
-                    mode === Call.MODE.SPEAKER &&
+                    // If in `Main` mode and the participant is a moderator -- show icon in the top-right corner
+                    mode === MODE.MAIN &&
                     Call.isModerator(chatRoom, userHandle) &&
-                    this.getStatusIcon('icon-admin call-role-icon', l[8875] /* `Moderator` */)
+                    this.getStatusIcon('icon-admin-outline call-role-icon', l[8875] /* `Moderator` */)
                 }
                 <$$CONTAINER>
-                    {source.audioMuted ? this.getStatusIcon('icon-audio-off', l.muted /* `Muted` */) : null}
+                    {source.audioMuted ? this.getStatusIcon('icon-mic-off-thin-outline', l.muted /* `Muted` */) : null}
                     {sfuClient.haveBadNetwork ?
                         this.getStatusIcon('icon-weak-signal', l.poor_connection /* `Poor connection` */) : null}
-                    {(source.hasScreenAndCam && this.isThumb)
-                        ? this.getStatusIcon('icon-pc-linux', "Sharing screen") : null
-                    }
+                    {source.hasScreenAndCam && this.isThumb ?
+                        this.getStatusIcon('icon-pc-linux', 'Sharing screen') : null}
                 </$$CONTAINER>
             </>
         );
@@ -197,54 +205,39 @@ class VideoNode extends MegaRenderMixin {
             mode,
             minimized,
             chatRoom,
-            menu,
             simpletip,
-            ephemeralAccounts,
-            onClick,
-            onCallMinimize,
-            onSpeakerChange
+            className,
+            children,
+            onClick
         } = this.props;
-        // console.warn("render");
-        const call = chatRoom.call;
-        if (!call) {
+        const { nodeRef, source, isLocal, isLocalScreen } = this;
+
+        if (!chatRoom.call) {
             return null;
         }
-        const source = this.source;
-        let {className} = this.props;
-        if (this.isLocal && !this.isLocalScreen) {
-            className = className ? (`${className} local-stream-mirrored`) : ' local-stream-mirrored';
-        }
+
         return (
             <div
-                ref={this.nodeRef}
+                ref={nodeRef}
                 className={`
                     video-node
                     ${onClick ? 'clickable' : ''}
                     ${className || ''}
-                    ${this.state.loading ? 'loading' : ''}
+                    ${isLocal && !isLocalScreen ? ' local-stream-mirrored' : ''}
                     ${simpletip ? 'simpletip' : ''}
                 `}
                 data-simpletip={simpletip?.label}
                 data-simpletipposition={simpletip?.position}
                 data-simpletipoffset={simpletip?.offset}
                 data-simpletip-class={simpletip?.className}
-                onClick={() => onClick && onClick(source)}>
+                onClick={ev => onClick && onClick(source, ev)}>
                 {source && (
                     <>
-                        {menu && (
-                            <VideoNodeMenu
-                                privilege={chatRoom.members[source.userHandle]}
-                                chatRoom={chatRoom}
-                                stream={source}
-                                ephemeralAccounts={ephemeralAccounts}
-                                onCallMinimize={onCallMinimize}
-                                onSpeakerChange={onSpeakerChange}
-                            />
-                        )}
+                        {children || null}
                         <div className="video-node-content">
                             {CallManager2.Call.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null}
                             {this.renderContent()}
-                            { mode === Call.MODE.MINI || minimized ? null : this.renderStatus()}
+                            { mode === MODE.MINI || minimized ? null : this.renderStatus()}
                         </div>
                     </>
                 )}

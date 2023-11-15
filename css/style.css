@@ -760,6 +760,7 @@ label span.black {
     --icon-size: 32px;
     flex-shrink: 0;
     flex-grow: 0;
+    margin-top: 12px;
 }
 .notification-item .notification-icon i {
     display: none;
@@ -13863,6 +13864,14 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 }
 .pro-login-dialog.sign .login-checkbox {
     margin: 8px 11px 0 0;
+}
+.fm-search-count {
+    float: left;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding-inline-start: 28px;
+    -webkit-padding-start: 28px;
 }
 .fm-right-header {
     overflow: visible;

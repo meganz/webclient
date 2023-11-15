@@ -7,6 +7,8 @@ import Invite from './invite.jsx';
 import { getTimeIntervals, getNearestHalfHour, getUserTimezone, addMonths } from './helpers.jsx';
 import Recurring from './recurring.jsx';
 import { DateTime } from './datetime.jsx';
+import { MCO_FLAGS } from '../../../chatRoom.jsx';
+import { ParsedHTML } from '../../../../ui/utils';
 
 export class Schedule extends MegaRenderMixin {
     static NAMESPACE = 'schedule-dialog';
@@ -16,6 +18,9 @@ export class Schedule extends MegaRenderMixin {
     scheduledMeetingRef = null;
     localStreamRef = '.float-video';
     datepickerRefs = [];
+
+    incomingCallListener = 'onIncomingCall.scheduleDialog';
+    ringingStoppedListener = 'onRingingStopped.scheduleDialog';
 
     interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
     nearestHalfHour = getNearestHalfHour();
@@ -29,7 +34,8 @@ export class Schedule extends MegaRenderMixin {
         participants: [],
         link: false,
         sendInvite: false,
-        openInvite: true,
+        waitingRoom: false,
+        openInvite: false,
         description: '',
 
         closeDialog: false,
@@ -119,6 +125,12 @@ export class Schedule extends MegaRenderMixin {
         }
         this.handleChange('topic', value);
     };
+
+    /**
+     * onTextareaChange
+     * @param value
+     * [...] TODO: add documentation
+     */
 
     onTextareaChange = value => {
         const maxLength = 3000;
@@ -274,29 +286,32 @@ export class Schedule extends MegaRenderMixin {
      */
 
     handleSubmit = () => {
-        if (!this.state.topic) {
-            this.setState({
-                topicInvalid: true,
-                invalidTopicMsg: l.schedule_title_missing /* `Meeting name is required` */
-            });
-            return;
+        if (this.state.topic) {
+            return (
+                this.setState(
+                    { isLoading: true },
+                    async() => {
+                        const { chatRoom, onClose } = this.props;
+                        const params = [this.state, chatRoom];
+                        await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](...params);
+                        this.setState({ isLoading: false }, () => onClose());
+                    })
+            );
         }
-        this.setState({ isLoading: true }, async() => {
-            const { chatRoom, onClose } = this.props;
-            await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](this.state, chatRoom);
-            this.setState({ isLoading: false }, () => onClose());
-        });
+
+        /* `Meeting name is required` */
+        return this.setState({ topicInvalid: true, invalidTopicMsg: l.schedule_title_missing });
     };
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        if (this.callDlgListener) {
-            megaChat.off(this.callDlgListener);
-        }
+
         if ($.dialog === Schedule.dialogName) {
             closeDialog();
         }
+
         [document, this.localStreamRef].map(el => $(el).unbind(`.${Schedule.NAMESPACE}`));
+        megaChat.off(this.incomingCallListener);
     }
 
     componentWillMount() {
@@ -313,7 +328,8 @@ export class Schedule extends MegaRenderMixin {
             this.state.link = !!publicLink;
             this.state.description = scheduledMeeting.description || '';
             this.state.sendInvite = scheduledMeeting.flags;
-            this.state.openInvite = options.oi;
+            this.state.waitingRoom = options[MCO_FLAGS.WAITING_ROOM];
+            this.state.openInvite = options[MCO_FLAGS.OPEN_INVITE];
             this.state.isEdit = true;
 
             this.scheduledMeetingRef = scheduledMeeting;
@@ -351,18 +367,14 @@ export class Schedule extends MegaRenderMixin {
                 }
             });
 
-            this.callDlgListener = 'onIncomingCall.scheduledlg';
-            megaChat.rebind(this.callDlgListener, ({ data }) => {
-                // If the incoming call dialog will show mark this as overlayed.
-                if (
-                    this.isMounted()
-                    && !is_chatlink
-                    && pushNotificationSettings.isAllowedForChatId(data[0].chatId)
-                ) {
+            // Manually handle the stacking of dialogs when receiving incoming call -- mark `Schedule` as overlayed,
+            // if the incoming call dialog is shown
+            megaChat.rebind(this.incomingCallListener, (e, chatRoom) => {
+                if (!is_chatlink && pushNotificationSettings.isAllowedForChatId(chatRoom.chatId)) {
                     this.setState({ overlayed: true, closeDialog: false });
                     // Clear when ringing stops.
-                    megaChat.plugins.callManager2.rebind('onRingingStopped.scheduledlg', () => {
-                        megaChat.plugins.callManager2.off('onRingingStopped.scheduledlg');
+                    megaChat.plugins.callManager2.rebind(this.ringingStoppedListener, () => {
+                        megaChat.plugins.callManager2.off(this.ringingStoppedListener);
                         this.setState({ overlayed: false });
                         fm_showoverlay();
                     });
@@ -396,6 +408,7 @@ export class Schedule extends MegaRenderMixin {
             participants,
             link,
             sendInvite,
+            waitingRoom,
             openInvite,
             description,
             closeDialog,
@@ -407,26 +420,18 @@ export class Schedule extends MegaRenderMixin {
             descriptionInvalid,
             overlayed,
         } = this.state;
-        const { callExpanded } = this.props;
-
-        const dialogClasses = [];
-        if (closeDialog) {
-            dialogClasses.push('with-confirmation-dialog');
-        }
-        if (callExpanded || overlayed) {
-            dialogClasses.push('hidden');
-        }
 
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
                 id={Schedule.NAMESPACE}
-                className={dialogClasses.join(' ')}
+                className={`
+                    ${closeDialog ? 'with-confirmation-dialog' : ''}
+                    ${this.props.callExpanded || overlayed ? 'hidden' : ''}
+                `}
                 dialogName={Schedule.dialogName}
                 dialogType="main"
-                onClose={() => {
-                    return isDirty ? this.handleToggle('closeDialog') : this.props.onClose();
-                }}>
+                onClose={() => isDirty ? this.handleToggle('closeDialog') : this.props.onClose()}>
                 <Header
                     chatRoom={isEdit && this.props.chatRoom}
                 />
@@ -451,7 +456,7 @@ export class Schedule extends MegaRenderMixin {
 
                     <Row className="start-aligned">
                         <Column>
-                            <i className="sprite-fm-mono icon-recents-filled" />
+                            <i className="sprite-fm-mono icon-recents-filled"/>
                         </Column>
                         <div className="schedule-date-container">
                             <DateTime
@@ -577,12 +582,48 @@ export class Schedule extends MegaRenderMixin {
                     {/* --- */}
 
                     <Checkbox
+                        name="waitingRoom"
+                        className={this.props.chatRoom?.havePendingCall() ? 'disabled' : ''}
+                        checked={waitingRoom}
+                        label={l.waiting_room /* `Waiting room` */}
+                        subLabel={l.waiting_room_info /* `Only users admitted by the host can join the call.` */}
+                        isLoading={isLoading}
+                        onToggle={waitingRoom =>
+                            this.props.chatRoom?.havePendingCall() ? null : this.handleToggle(waitingRoom)
+                        }
+                    />
+
+                    {/* --- */}
+
+                    <Checkbox
                         name="openInvite"
                         checked={openInvite}
                         label={l.open_invite_desc /* `Allow non-hosts to add participants` */}
                         isLoading={isLoading}
                         onToggle={this.handleToggle}
                     />
+
+                    {/* --- */}
+
+                    {waitingRoom && openInvite ?
+                        <Row>
+                            <div className="schedule-dialog-banner warn">
+                                <ParsedHTML>
+                                    {l.waiting_room_invite
+                                        .replace(
+                                            '[A]',
+                                            `<a
+                                                href="${l.mega_help_host}/wp-admin/post.php?post=3005&action=edit"
+                                                target="_blank"
+                                                class="clickurl">
+                                            `
+                                        )
+                                        .replace('[/A]', '</a>')
+                                    }
+                                </ParsedHTML>
+                            </div>
+                        </Row> : null
+                    }
 
                     {/* --- */}
 
@@ -603,7 +644,7 @@ export class Schedule extends MegaRenderMixin {
                     onSubmit={this.handleSubmit}
                 />
 
-                {!(overlayed || callExpanded) && closeDialog &&
+                {!(overlayed || this.props.callExpanded) && closeDialog &&
                     <CloseDialog
                         onToggle={this.handleToggle}
                         onClose={this.props.onClose}
@@ -734,16 +775,22 @@ const Input = ({ name, placeholder, value, invalid, invalidMessage, autoFocus, i
 /**
  * Checkbox
  * @param name
+ * @param className
  * @param checked
  * @param label
+ * @param subLabel
  * @param onToggle
  * @param isLoading
  * @return {React.Element}
  */
 
-const Checkbox = ({ name, checked, label, isLoading, onToggle }) => {
+const Checkbox = ({ name, className, checked, label, subLabel, isLoading, onToggle }) => {
     return (
-        <Row>
+        <Row
+            className={`
+                ${subLabel ? 'start-aligned' : ''}
+                ${className || ''}
+            `}>
             <Column>
                 <div
                     className={`
@@ -758,13 +805,14 @@ const Checkbox = ({ name, checked, label, isLoading, onToggle }) => {
                     />
                 </div>
             </Column>
-            <Column>
+            <Column className={subLabel ? 'with-sub-label' : ''}>
                 <label
                     htmlFor={`${Schedule.NAMESPACE}-${name}`}
                     className={isLoading ? 'disabled' : ''}
                     onClick={() => onToggle(name)}>
                     {label}
                 </label>
+                {subLabel && <div className="sub-label">{subLabel}</div>}
             </Column>
         </Row>
     );

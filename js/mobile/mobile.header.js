@@ -161,6 +161,10 @@ class MegaMobileHeader extends MegaMobileComponent {
 
                 if (typeof mobile.settingsHelper.currentPage !== 'undefined'){
                     mobile.settingsHelper.currentPage.hide();
+
+                    if (String(M.currentdirid).split('/').pop() === 'verify') {
+                        return loadSubPage('fm/account');
+                    }
                 }
 
                 // @todo: Refactor back button logic. `history.back` is incorrect here
@@ -171,7 +175,7 @@ class MegaMobileHeader extends MegaMobileComponent {
                     return loadSubPage('fm');
                 }
 
-                if (M.currentdirid.includes('two-factor-authentication')) {
+                if (String(M.currentdirid).includes('two-factor-authentication')) {
                     return mobile.twofactor.settings.previousPage();
                 }
 
@@ -263,6 +267,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         }
 
         mBroadcaster.addListener('mega:openfolder', this.update.bind(this));
+        window.addEventListener('resize', this.resetBottomBlock.bind(this));
     }
 
     // Options: setter
@@ -345,18 +350,16 @@ class MegaMobileHeader extends MegaMobileComponent {
 
         const noTabletView = isPublicLink() || isPublickLinkV2() || page.startsWith('businesssignup')
             || page === 'keybackup';
-        const mainPageLayout = document.getElementById('mainlayout');
 
         const _hide = () => {
 
-            const mainPageLayout = document.getElementById('mainlayout');
-            mainPageLayout.classList.add('no-tablet-layout');
+            mainlayout.classList.add('no-tablet-layout');
             this.hide();
         };
 
-        if (is_fm() || noTabletView) {
+        if (is_fm() || noTabletView || page === 'support') {
 
-            mainPageLayout.classList[noTabletView ? 'add' : 'remove']('no-tablet-layout');
+            mainlayout.classList[noTabletView ? 'add' : 'remove']('no-tablet-layout');
 
             const type = MegaMobileHeader.getType();
 
@@ -386,11 +389,9 @@ class MegaMobileHeader extends MegaMobileComponent {
     static init(update) {
         MegaMobileTopMenu.init();
 
-        const mainPageLayout = document.getElementById('mainlayout');
-
-        if (!mega.ui.header && mainPageLayout) {
+        if (!mega.ui.header) {
             mega.ui.header = new MegaMobileHeader({
-                parentNode: document.getElementById('mainlayout'),
+                parentNode: mainlayout,
                 componentClassname: 'mega-header',
                 prepend: true
             });
@@ -755,7 +756,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         if (page === 'fm/account' || page === 'keybackup') {
             iType = 2;
         }
-        if (page.startsWith('fm/account/') || page.startsWith('fm/refer')) {
+        if (page.startsWith('fm/account/') || page.startsWith('fm/refer') || page === 'support') {
             iType = 3;
         }
         if (mobile.nodeSelector.active) {
@@ -805,6 +806,7 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/account/avatar': l[20164],
         'fm/account/security/change-password': l[23262],
         'fm/account/security/change-email': l[7743],
+        'fm/account/security/verify': l[7730],
         'fm/account/qr-code': l[17754],
         'fm/account/qr-code-settings': l.settings_account_qr_code_set,
         'fm/account/delete': l[16115],
@@ -830,6 +832,7 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/account/about/terms-policies': l.mobile_settings_tos_title,
         'move': l.move_to,
         'copy': l.copy_to,
+        'support': l[516],
         'keybackup': l[8839]
     });
 });

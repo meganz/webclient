@@ -137,6 +137,7 @@ button.bottom-info:hover {
 }
 .mobile.bottom-info.body {
     bottom: 0;
+    left: 0;
 }
 .mobile.bottom-info.column.text-column {
     padding: 0 24px 0 24px;

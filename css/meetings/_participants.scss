@@ -1,13 +1,56 @@
 .participants {
+    padding: 12px 0 0 0;
     height: calc(100% - 70px);
     color: var(--text-color-high);
 
+    &-nav {
+        overflow: hidden;
+        display: flex;
+        margin: 0 0 16px 0;
+        padding: 8px 16px 0 16px;
+        border-bottom: 1px solid var(--stroke-grey-2);
+        justify-content: space-around;
+
+        button {
+            float: left;
+            padding: 0 0 4px 0;
+            text-align: left;
+            border: 0;
+            font: var(--text-h3-bold);
+            color: var(--text-color-medium);
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            cursor: pointer;
+
+            &:hover,
+            &.active { border-bottom: 2px solid #6FD7FF; }
+            &.active { color: var(--secondary-white); }
+        }
+    }
+
     &-list {
-        height: calc(100% - 30px);
+        height: calc(100% - 70px);
 
         &.guest {
             overflow: hidden;
             height: calc(100% - 320px);
+        }
+
+        &.with-chat-participants {
+            /* [...] */
+
+            ul li { padding: 8px 0 0; }
+            .avatar-wrapper { margin: 12px 0 0; }
+        }
+
+        .call-control-all {
+            margin: 0 0 0 12px;
+
+            i {
+                --icon-size: 22px;
+                --mask-color: var(--secondary-green);
+                margin: 2px 6px 0 0;
+            }
         }
     }
 
@@ -17,6 +60,7 @@
 
         li {
             overflow: hidden;
+            display: flex;
             margin: 0 15px;
 
             .avatar-wrapper {
@@ -41,11 +85,9 @@
 
             .name {
                 overflow: hidden;
-                float: left;
-                padding-top: 9px;
+                width: calc(100% - 90px);
+                padding-top: 8px;
                 padding-inline-start: 10px;
-                -webkit-padding-start: 10px;
-                width: calc(100% - 100px);
 
                 body.rtl & {
                     float: right;
@@ -67,10 +109,14 @@
                         font: var(--text-body1);
                     }
 
+                    &.user-card-presence {
+                      margin: 7px 2px 0 5px;
+                    }
+
                     i {
                         display: block;
-                        margin: -3px 0 0 0;
-                        --icon-size: 24px;
+                        margin: 0;
+                        --icon-size: 18px;
                         --mask-color: var(--icon-rest);
                     }
 
@@ -80,11 +126,16 @@
                         margin: 0;
                     }
                 }
+
+                .call-state {
+                    clear: both;
+                    font: var(--text-body2);
+                    color: var(--text-color-low);
+                }
             }
 
             .status {
-                float: right;
-                margin: 5px 0 0 0;
+                margin: 5px 0 0 auto;
 
                 body.rtl & {
                     float: left;
@@ -92,15 +143,41 @@
 
                 i {
                     display: inline-block;
-                    margin-inline-start: 3px;
-                    -webkit-margin-start: 3px;
+                    margin-inline-start: 10px;
 
-                    --icon-size: 24px;
+                    --icon-size: 18px;
                     --mask-color: var(--icon-rest);
 
                     &.inactive { --mask-color: var(--secondary-red); }
                 }
             }
+
+            .call-control {
+                margin: 3px 0 0 auto;
+
+                button {
+                    margin: auto;
+                }
+            }
+        }
+    }
+
+    &-empty {
+        margin: 20px;
+        text-align: center;
+
+        h3 {
+            margin: 8px 0 0 0;
+        }
+
+        /* TODO: move to sprite sheet */
+        span.empty-check-icon {
+            display: block;
+            width: 84px;
+            height: 84px;
+            margin: 0 auto;
+            background: url('../images/mega/single-icons/check3d.svg') 0 0 no-repeat;
+            background-size: contain;
         }
     }
 

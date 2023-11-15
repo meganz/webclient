@@ -128,6 +128,7 @@
                 this.audioMuted = !(av & Av.Audio);
                 this.videoMuted = !(av & Av.Camera);
                 this.hasScreenAndCam = (av & Av.ScreenHiRes) && (av & Av.CameraLowRes);
+                this.isScreen = !!(av & Av.ScreenHiRes);
             }
             this.av = av;
             for (const cons of this.consumers) {
@@ -374,8 +375,8 @@
     }
 
     const CALL_VIEW_MODES = {
-        'GRID': 1,
-        'SPEAKER': 2,
+        'THUMBNAIL': 1,
+        'MAIN': 2,
         'MINI': 3
     };
 
@@ -397,7 +398,7 @@
             this.callId = callId;
             this.peers = new Peers(this);
             this.localPeerStream = new LocalPeerStream(this);
-            this.viewMode = CALL_VIEW_MODES.GRID;
+            this.viewMode = CALL_VIEW_MODES.THUMBNAIL;
             this.stayOnEnd = !!mega.config.get('callemptytout');
 
             chatRoom.meetingsLoading = l.joining;
@@ -565,11 +566,11 @@
                 activePeer.isActive = false;
             }
 
-            if (newMode === CALL_VIEW_MODES.GRID) {
+            if (newMode === CALL_VIEW_MODES.THUMBNAIL) {
                 this.forcedActiveStream = null;
             }
 
-            if (newMode === CALL_VIEW_MODES.SPEAKER || newMode === CALL_VIEW_MODES.MINI) {
+            if (newMode === CALL_VIEW_MODES.MAIN || newMode === CALL_VIEW_MODES.MINI) {
                 this.sfuClient.enableSpeakerDetector(true);
             }
             else {

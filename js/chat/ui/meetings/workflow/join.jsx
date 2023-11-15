@@ -277,6 +277,7 @@ export default class Join extends MegaRenderMixin {
                     className="titleTop required megaInputs"
                     placeholder={children}
                     value={this.state[name] || ''}
+                    maxLength={40}
                     onChange={ev => this.setState({ [name]: ev.target.value })}
                 />
             </div>

@@ -22,7 +22,9 @@ export default class Loading extends MegaRenderMixin {
         super.componentDidMount();
         // Close dropdown elements, popups
         document.dispatchEvent(new Event('closeDropdowns'));
-        closeDialog?.();
+        if ($.dialog) {
+            closeDialog?.();
+        }
         notify?.closePopup();
         alarm?.hideAllWarningPopups();
         document.querySelectorAll('.js-dropdown-account').forEach(({ classList }) =>

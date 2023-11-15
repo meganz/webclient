@@ -2087,6 +2087,18 @@ ChatRoom.prototype.rejectCall = function(callId) {
     return Promise.resolve();
 };
 
+ChatRoom.prototype.ringUser = function(userId, callId, callstate) {
+    assert(userId, 'Missing user handle.');
+    assert(callId, 'Missing chat handle.');
+    assert(this.type !== 'private', 'Unexpected chat type.');
+    const shard = this.chatd.shards[this.chatShard];
+    if (shard) {
+        api.req({ a: 'mcru', u: userId, cid: this.chatId })
+            .then(() => shard.ringUser(this.chatIdBin, base64urldecode(userId), base64urldecode(callId), callstate))
+            .catch(dump);
+    }
+};
+
 ChatRoom.prototype.endCallForAll = function(callId) {
     if (this.activeCallIds.length && this.type !== 'private') {
         callId = callId || this.activeCallIds.keys()[0];

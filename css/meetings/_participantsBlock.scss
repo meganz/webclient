@@ -1,0 +1,128 @@
+.stream-participants-block {
+    float: left;
+    display: flex;
+    align-items: center;
+    margin: -10px 0 0 0;
+    height: 100%;
+
+    .participants-container {
+        position: relative;
+        width: 252px;
+
+        .participants-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 8px;
+            width: 100%;
+
+            &.single-column { grid-template-columns: 1fr; }
+
+            .local-stream-node {
+                /* [...] */
+
+                &:hover .node-menu {
+                    display: block;
+                }
+
+                .node-menu {
+                    top: 8px;
+                    right: 6px;
+                    display: none;
+                    z-index: 21;
+
+                    &:hover .node-menu-content {
+                        display: block;
+                    }
+
+                    i {
+                        --icon-size: 16px;
+                    }
+
+                    &-toggle {
+                        padding: 3px;
+                        border-radius: 200px;
+                    }
+
+                    &-content {
+                        display: none;
+
+                        button {
+                            display: flex;
+                            align-items: center;
+
+                            span {
+                                padding: 0 0 0 10px;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* TODO: look into `.video-node` re: replicate and unify */
+            .video-node {
+                border: 0 none;
+                width: 100%;
+                height: 100%;
+                box-sizing: border-box;
+
+                &.active {
+                    border: 2px solid #6FD7FF;
+                }
+
+                .avatar-wrapper {
+                    width: 32px;
+                    height: 32px;
+                    font: var(--text-body1);
+                }
+
+                &-status {
+                    bottom: 6px;
+                    left: 6px;
+
+                    body.rtl & {
+                        left: unset;
+                        right: 5px;
+                    }
+
+                    span {
+                        width: 28px;
+                        height: 28px;
+                        margin: 0 2px 0 0;
+
+                        i { --icon-size: 14px; }
+                    }
+                }
+
+                .call-role-icon {
+                    padding: 5px;
+                    --icon-size: 18px;
+                    --mask-color: var(--secondary-white);
+                }
+
+                .loading-icon {
+                    width: 64px;
+                    height: 64px;
+                    margin-left: -32px;
+                    margin-top: -32px;
+                    filter: invert(0);
+                }
+            }
+        }
+
+        button.carousel-control {
+            margin: 14px 0 0 13px;
+            padding: 0;
+            background: transparent;
+            border: 0 none;
+            cursor: pointer;
+            z-index: 900;
+
+            i {
+                --mask-color: var(--icon-rest);
+                --icon-size: 44px;
+
+                &:hover { --mask-color: var(--icon-active); }
+            }
+        }
+    }
+}

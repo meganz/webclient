@@ -15,7 +15,7 @@ import { SharedFilesAccordionPanel } from './sharedFilesAccordionPanel.jsx';
 import { IncSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
 import { ChatlinkDialog } from './chatlinkDialog.jsx';
 import PushSettingsDialog from './pushSettingsDialog.jsx';
-import Call, { EXPANDED_FLAG, inProgressAlert } from './meetings/call.jsx';
+import Call, { EXPANDED_FLAG, TYPE, inProgressAlert, isGuest } from './meetings/call.jsx';
 import HistoryPanel from "./historyPanel.jsx";
 import ComposedTextArea from "./composedTextArea.jsx";
 import Loading from "./meetings/workflow/loading.jsx";
@@ -182,7 +182,7 @@ class StartMeetingNotification extends MegaRenderMixin {
                     if (chatRoom.options.w && !chatRoom.iAmOperator()) {
                         return onWaitingRoomJoin();
                     }
-                    return onStartCall(Call.TYPE.AUDIO);
+                    return onStartCall(TYPE.AUDIO);
                 }}>
                 <button className="mega-button positive small">{l.schedule_start_aot}</button>
             </div>
@@ -697,7 +697,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                         ${megaChat.hasSupportForCalls ? '' : 'simpletip'}
                         ${startCallDisabled ? 'disabled' : ''}
                     `}
-                    onClick={() => onStartCall(Call.TYPE.AUDIO)}>
+                    onClick={() => onStartCall(TYPE.AUDIO)}>
                     <i className="sprite-fm-mono icon-phone" />
                     <span>{l[5896] /* `Start Audio Call` */}</span>
                 </div>;
@@ -716,7 +716,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                         ${megaChat.hasSupportForCalls ? '' : 'simpletip'}
                         ${startCallDisabled ? 'disabled' : ''}
                     `}
-                    onClick={() => onStartCall(Call.TYPE.VIDEO)}>
+                    onClick={() => onStartCall(TYPE.VIDEO)}>
                     <i className="sprite-fm-mono icon-video-call-filled"/>
                     <span>{l[5897] /* `Start Video Call` */}</span>
                 </div>;
@@ -745,13 +745,13 @@ export class ConversationRightArea extends MegaRenderMixin {
         const renameButtonClass = `
             link-button
             light
-            ${Call.isGuest() || room.isReadOnly() || !room.iAmOperator() ? 'disabled' : ''}
+            ${isGuest() || room.isReadOnly() || !room.iAmOperator() ? 'disabled' : ''}
         `;
 
         const getChatLinkClass = `
             link-button
             light
-            ${Call.isGuest() || room.isReadOnly() ? 'disabled' : ''}
+            ${isGuest() || room.isReadOnly() ? 'disabled' : ''}
         `;
 
         let participantsList = null;
@@ -776,7 +776,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                 className="link-button light"
                 icon="sprite-fm-mono icon-add-small"
                 label={l[8007]}
-                disabled={Call.isGuest() || room.isReadOnly() || !(room.iAmOperator()
+                disabled={isGuest() || room.isReadOnly() || !(room.iAmOperator()
                     || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE])}
                 onClick={() =>
                     M.u.length > 1 ?
@@ -834,7 +834,7 @@ export class ConversationRightArea extends MegaRenderMixin {
             className="link-button light history-retention-btn"
             icon="sprite-fm-mono icon-recents-filled"
             label={l[23436]}
-            disabled={!room.iAmOperator() || room.isReadOnly() || Call.isGuest()}
+            disabled={!room.iAmOperator() || room.isReadOnly() || isGuest()}
             secondLabel={room.getRetentionLabel()}
             secondLabelClass="label--red"
             chatRoom={room}>
@@ -1381,7 +1381,7 @@ export class ConversationPanel extends MegaRenderMixin {
             return false;
         }
 
-        return type === Call.TYPE.AUDIO ? chatRoom.startAudioCall(scheduled) : chatRoom.startVideoCall(scheduled);
+        return type === TYPE.AUDIO ? chatRoom.startAudioCall(scheduled) : chatRoom.startVideoCall(scheduled);
     }
 
     renderUpcomingInfo() {
@@ -2291,7 +2291,9 @@ export class ConversationPanel extends MegaRenderMixin {
                             return this.state.callMinimized &&
                                 this.setState({ callMinimized: false }, () => {
                                     $.hideTopMenu();
-                                    closeDialog();
+                                    if ($.dialog) {
+                                        closeDialog();
+                                    }
                                     loadSubPage('fm/chat');
                                     room.show();
                                     this.toggleExpandedFlag();
@@ -2528,7 +2530,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                         startCallDisabled ?
                                             false :
                                             inProgressAlert()
-                                                .then(() => this.startCall(Call.TYPE.VIDEO))
+                                                .then(() => this.startCall(TYPE.VIDEO))
                                                 .catch(() => d && console.warn('Already in a call.'))
                                     }
                                 />
@@ -2551,7 +2553,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                         startCallDisabled ?
                                             false :
                                             inProgressAlert()
-                                                .then(() => this.startCall(Call.TYPE.AUDIO))
+                                                .then(() => this.startCall(TYPE.AUDIO))
                                                 .catch(() => d && console.warn('Already in a call.'))
                                     }
                                 />
@@ -2920,7 +2922,7 @@ export class EmptyConvPanel extends MegaRenderMixin {
 }
 
 function isStartCallDisabled(room) {
-    if (Call.isGuest()) {
+    if (isGuest()) {
         return true;
     }
     if (!megaChat.hasSupportForCalls) {

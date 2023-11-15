@@ -14,8 +14,10 @@
         padding: 24px;
 
         h3 {
+            overflow: hidden;
             margin-top: 0;
             color: var(--text-color-high);
+            text-overflow: ellipsis;
         }
     }
 
@@ -58,7 +60,9 @@
                 }
 
                 .peer-name {
+                    overflow: hidden;
                     margin-inline-start: 8px;
+                    text-overflow: ellipsis;
                 }
 
                 .peer-controls {

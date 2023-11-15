@@ -2,107 +2,71 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import ComposedTextArea from "../composedTextArea.jsx";
 import HistoryPanel from "../historyPanel.jsx";
-import Call from './call.jsx';
-import Collapse from './collapse.jsx';
+import Call, { VIEW } from './call.jsx';
 import Participants from './participants.jsx';
 import Button from './button.jsx';
-import { LocalVideoThumb, PeerVideoThumb } from './videoNode.jsx';
-import { PerfectScrollbar } from '../../../ui/perfectScrollbar';
 import Guest from './guest.jsx';
+
+const inviteAllowed = chatRoom => {
+    if (chatRoom) {
+        return (
+            chatRoom.type !== 'private' &&
+            Call.isModerator(chatRoom, u_handle) &&
+            !chatRoom.iAmReadOnly()
+        );
+    }
+    return false;
+};
 
 export default class Sidebar extends MegaRenderMixin {
     containerRef = React.createRef();
     historyPanel = null;
 
-    renderHead = () => {
-        const { call, view, chatRoom, onSidebarClose, onInviteToggle } = this.props;
+    renderHead = ({ title, children }) => {
         return (
             <div className="sidebar-head">
                 <Button
                     simpletip={{ label: l.close_sidebar /* `Close sidebar` */, className: 'theme-dark-forced' }}
                     className="mega-button action small left"
                     icon="icon-collapse-right"
-                    onClick={onSidebarClose}>
+                    onClick={this.props.onSidebarClose}>
                     <span>{l.close_sidebar /* `Close sidebar` */}</span>
                 </Button>
-                {view === Call.VIEW.CHAT && <h2>{l.chats /* `Chats` */}</h2>}
-                {view !== Call.VIEW.CHAT && (
-                    <>
-                        <h2>{l[16217] /* `Participants` */}</h2>
-                        {
-                            call.isPublic
-                            && !is_eplusplus
-                            && (
-                                chatRoom.type !== 'private'
-                                && chatRoom.options[MCO_FLAGS.OPEN_INVITE]
-                                && !chatRoom.iAmReadOnly()
-                                || Call.isModerator(chatRoom, u_handle))
-                            && (
-                            <Button
-                                className="mega-button round positive add"
-                                icon="icon-add"
-                                onClick={onInviteToggle}>
-                                <span>{l[8007] /* `Add participant` */}</span>
-                            </Button>
-                        )}
-                    </>
-                )}
+                <h2>{title}</h2>
+                {children || null}
             </div>
         );
     };
 
-    renderSpeakerMode = () => {
-        const { mode, call, peers, guest, chatRoom, forcedLocal, onSpeakerChange } = this.props;
-        const localStream = call.getLocalStream();
-        const SIMPLE_TIP = {className: 'theme-dark-forced'};
+    renderParticipantsView = () => {
+        const { call, peers, initialCallRinging, chatRoom, guest, onInviteToggle } = this.props;
+        const withInvite = inviteAllowed(chatRoom);
+        const $$HEAD =
+            this.renderHead({
+                title: l[16217] /* `Participants` */,
+                children:
+                    u_type && withInvite ?
+                        <Button
+                            className="mega-button round positive add"
+                            icon="icon-add"
+                            onClick={onInviteToggle}>
+                            <span>{l[8007] /* `Add participant` */}</span>
+                        </Button> :
+                        null
+            });
+
         return (
-            <div
-                className={`
-                    sidebar-streams-container
-                    ${guest ? 'guest' : ''}
-                `}>
-                <PerfectScrollbar options={{ 'suppressScrollX': true }}>
-                    <Collapse
-                        {...this.props}
-                        heading={l[16217] /* `Participants` */}
-                        badge={peers.length + 1}>
-                        <div className="sidebar-streams">
-                            <LocalVideoThumb
-                                mode={mode}
-                                chatRoom={chatRoom}
-                                source={localStream}
-                                simpletip={{...SIMPLE_TIP, label: l[8885]}}
-                                localAudioMuted={!(call.av & SfuClient.Av.Audio)}
-                                className={
-                                    (call.isSharingScreen() ? '' : 'local-stream-mirrored') + ' ' +
-                                    (forcedLocal ? 'active' : '')
-                                }
-                                onClick={() => {
-                                    mBroadcaster.sendMessage('meetings:collapse');
-                                    onSpeakerChange(localStream);
-                                }}
-                            />
-                            {peers.map((peer, index) => {
-                                return (
-                                    <PeerVideoThumb
-                                        key={index}
-                                        mode={mode}
-                                        chatRoom={chatRoom}
-                                        source={peer}
-                                        simpletip={{...SIMPLE_TIP, label: M.getNameByHandle(peer.userHandle)}}
-                                        className={
-                                            peer.isActive || peer.clientId === call.forcedActiveStream ?
-                                                'active' :
-                                                ''
-                                        }
-                                        onClick={onSpeakerChange}
-                                    />
-                                );
-                            })}
-                        </div>
-                    </Collapse>
-                </PerfectScrollbar>
-            </div>
+            <>
+                {$$HEAD}
+                <Participants
+                    call={call}
+                    peers={peers}
+                    initialCallRinging={initialCallRinging}
+                    chatRoom={chatRoom}
+                    guest={guest}
+                    withInvite={withInvite}
+                />
+            </>
         );
     };
 
@@ -110,6 +74,7 @@ export default class Sidebar extends MegaRenderMixin {
         const { chatRoom, onDeleteMessage } = this.props;
         return (
             <>
+                {this.renderHead({ title: l.chats /* `Chats` */ })}
                 <HistoryPanel
                     ref={ref => {
                         this.historyPanel = ref;
@@ -123,37 +88,25 @@ export default class Sidebar extends MegaRenderMixin {
         );
     };
 
-    renderParticipantsView = () => {
-        const { call, peers, guest, chatRoom } = this.props;
-        return (
-            <Participants
-                peers={peers}
-                call={call}
-                chatRoom={chatRoom}
-                guest={guest}
-            />
-        );
-    };
-
     render() {
-        const { mode, view, guest, onGuestClose } = this.props;
+        const { view, guest, onGuestClose } = this.props;
 
         //
         // `Sidebar`
         // -------------------------------------------------------------------------
 
         return (
-            <div
-                ref={this.containerRef}
-                className={`
-                    sidebar
-                    ${view === Call.VIEW.CHAT ? 'chat-opened' : 'theme-dark-forced'}
-                `}>
-                {this.renderHead()}
-                {view === Call.VIEW.PARTICIPANTS && mode === Call.MODE.SPEAKER && this.renderSpeakerMode()}
-                {view === Call.VIEW.CHAT && this.renderChatView()}
-                {view === Call.VIEW.PARTICIPANTS && mode === Call.MODE.THUMBNAIL && this.renderParticipantsView()}
-                {guest && view !== Call.VIEW.CHAT && <Guest onGuestClose={onGuestClose} />}
+            <div className="sidebar-wrapper theme-dark-forced">
+                <div
+                    ref={this.containerRef}
+                    className={`
+                        sidebar
+                        ${view === VIEW.CHAT ? 'chat-opened' : 'theme-dark-forced'}
+                    `}>
+                    {view === VIEW.PARTICIPANTS && this.renderParticipantsView()}
+                    {view === VIEW.CHAT && this.renderChatView()}
+                    {guest && view !== VIEW.CHAT && <Guest onGuestClose={onGuestClose} />}
+                </div>
             </div>
         );
     }

@@ -499,7 +499,7 @@ function base64DecodeToArr(str) {
 ;// CONCATENATED MODULE: ./adaptation.ts
 
 
-const adaptation_kLogTag = "sfuAdapt:";
+const kLogTag = "sfuAdapt:";
 class SvcDriver {
     constructor(client) {
         this.currRxQuality = 4; // start at half resolution, full fps
@@ -509,6 +509,7 @@ class SvcDriver {
         this.rxqSwitchSeqNo = 0;
         this.rxqUpSwitchHistory = new Array(SvcDriver.kMaxRxQualityIndex + 1);
         this.hasBadNetwork = false;
+        this.isCpuOverloaded = false;
         this.client = client;
     }
     async onStats() {
@@ -531,7 +532,7 @@ class SvcDriver {
         plost = this.fmaPlost = (this.fmaPlost * 2 + plost) / 3;
         do {
             if (window.dSfuAdapt) {
-                console.log(adaptation_kLogTag, "rtt:", rtt.toFixed(1), "rttLower:", this.rttLower.toFixed(1), "rttUpper:", this.rttUpper.toFixed(1), "plost:", plost.toFixed(1), "fmaPlost:", this.fmaPlost.toFixed(1), "plostLower", this.plostLower.toFixed(1), "plostUpper:", this.plostUpper.toFixed(1));
+                console.log(kLogTag, "rtt:", rtt.toFixed(1), "rttLower:", this.rttLower.toFixed(1), "rttUpper:", this.rttUpper.toFixed(1), "plost:", plost.toFixed(1), "fmaPlost:", this.fmaPlost.toFixed(1), "plostLower", this.plostLower.toFixed(1), "plostUpper:", this.plostUpper.toFixed(1));
             }
         } while (0);
         const tsNow = Date.now();
@@ -551,7 +552,7 @@ class SvcDriver {
             }
             do {
                 if (window.dSfuAdapt) {
-                    console.log(adaptation_kLogTag, "scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
+                    console.log(kLogTag, "scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
                 }
             } while (0);
         }
@@ -561,7 +562,7 @@ class SvcDriver {
         if (plost > this.plostUpper) {
             do {
                 if (window.d) {
-                    console.warn(adaptation_kLogTag, "Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
+                    console.warn(kLogTag, "Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
                 }
             } while (0);
             this.decRxQuality(plost >= SvcDriver.kPlostCap);
@@ -592,7 +593,7 @@ class SvcDriver {
             else if (stats.vtxdly > 2500) {
                 do {
                     if (window.d) {
-                        console.warn(adaptation_kLogTag, `scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
+                        console.warn(kLogTag, `scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
                     }
                 } while (0);
                 this.switchTxQuality(-1, "scr");
@@ -615,22 +616,23 @@ class SvcDriver {
         // handle "bad network" notification
         let txBad = !isNaN(stats.vtxdly) && (stats.vtxdly > 1500);
         if (adaptScrnTx) {
-            txBad = txBad || this.currTxQuality < 1;
+            txBad || (txBad = this.currTxQuality < 1);
         }
         else if (stats._vtxIsHiRes && stats.vtxh) {
             this.maVideoTxHeight = !isNaN(this.maVideoTxHeight) ? (this.maVideoTxHeight * 3 + stats.vtxh) / 4 : stats.vtxh;
-            txBad = txBad || (this.maVideoTxHeight < 200);
+            txBad || (txBad = this.maVideoTxHeight < 200);
         }
-        const rxBad = rtt > 1500 || plost > 30;
-        if (txBad || rxBad) {
-            if (!this.hasBadNetwork) {
-                this.hasBadNetwork = true;
-                this.client._fire("onBadNetwork", true);
-            }
+        const statFlags = stats.f;
+        const rxBad = (rtt > 1500) || (plost > 30);
+        const hasBadNet = (txBad || rxBad || (statFlags & 2 /* TxQualityLimit.kBandwidth */) !== 0);
+        if (hasBadNet !== this.hasBadNetwork) {
+            this.hasBadNetwork = hasBadNet;
+            this.client._fire("onBadNetwork", hasBadNet);
         }
-        else if (this.hasBadNetwork) {
-            this.hasBadNetwork = false;
-            this.client._fire("onBadNetwork", false);
+        const isCpuOverloaded = (statFlags & 1 /* TxQualityLimit.kCpu */) !== 0;
+        if (isCpuOverloaded !== this.isCpuOverloaded) {
+            this.isCpuOverloaded = isCpuOverloaded;
+            this.client._fire("onCpuOverload", isCpuOverloaded);
         }
     }
     setRttWindow(rtt) {
@@ -639,7 +641,7 @@ class SvcDriver {
         this.rttUpper = rtt + SvcDriver.kRttUpperHeadroom;
         do {
             if (window.d) {
-                console.warn(adaptation_kLogTag, "Rtt floor set to", rtt.toFixed(2));
+                console.warn(kLogTag, "Rtt floor set to", rtt.toFixed(2));
             }
         } while (0);
     }
@@ -680,14 +682,14 @@ class SvcDriver {
                 hist.tsValidTill = now + span;
                 do {
                     if (window.d) {
-                        console.warn(adaptation_kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: Marking rx quality switch up attempt as failed: critcal: ${!!critical}, for period: ${span}`);
+                        console.warn(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: Marking rx quality switch up attempt as failed: critcal: ${!!critical}, for period: ${span}`);
                     }
                 } while (0);
             }
             else {
                 do {
                     if (window.d) {
-                        console.warn(adaptation_kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: not marking as failed: areaMatch: ${hist.hiArea === this.rxTotalArea()}, timeMatch: ${Date.now() - hist.tsMonitorTill}`);
+                        console.warn(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: not marking as failed: areaMatch: ${hist.hiArea === this.rxTotalArea()}, timeMatch: ${Date.now() - hist.tsMonitorTill}`);
                     }
                 } while (0);
             }
@@ -712,7 +714,7 @@ class SvcDriver {
             if (histMatch && (hist.tsValidTill - now) >= 0) {
                 do {
                     if (window.d) {
-                        console.warn(adaptation_kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Not increasing rxQ, have failed recently`);
+                        console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Not increasing rxQ, have failed recently`);
                     }
                 } while (0);
                 return;
@@ -720,7 +722,7 @@ class SvcDriver {
             else {
                 do {
                     if (window.d) {
-                        console.warn(adaptation_kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: not failed(recently): upFails:${hist.upFails}, timeMatch: ${(hist.tsValidTill - now)}, kbpsMatch: ${kbpsMatch} (hist: ${hist.kbps}, curr: ${stats.rx}), rttMatch: ${rttMatch} (hist: ${hist.rtt.toFixed()}, curr: ${this.maRtt.toFixed()}), areaDiff: ${this.rxTotalArea() - hist.lowArea}`);
+                        console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: not failed(recently): upFails:${hist.upFails}, timeMatch: ${(hist.tsValidTill - now)}, kbpsMatch: ${kbpsMatch} (hist: ${hist.kbps}, curr: ${stats.rx}), rttMatch: ${rttMatch} (hist: ${hist.rtt.toFixed()}, curr: ${this.maRtt.toFixed()}), areaDiff: ${this.rxTotalArea() - hist.lowArea}`);
                     }
                 } while (0);
             }
@@ -731,7 +733,7 @@ class SvcDriver {
             hist.rtt = stats.rtt;
             do {
                 if (window.d) {
-                    console.warn(adaptation_kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Same up-fail parameters, preserving fail descriptor`);
+                    console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Same up-fail parameters, preserving fail descriptor`);
                 }
             } while (0);
         }
@@ -743,7 +745,7 @@ class SvcDriver {
             };
             do {
                 if (window.d) {
-                    console.warn(adaptation_kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Created new up-fail descriptor`);
+                    console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Created new up-fail descriptor`);
                 }
             } while (0);
         }
@@ -764,7 +766,7 @@ class SvcDriver {
         this.rxqSwitchSeqNo++;
         do {
             if (window.d) {
-                console.warn(adaptation_kLogTag, `Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: ${JSON.stringify(params)}`);
+                console.warn(kLogTag, `Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: ${JSON.stringify(params)}`);
             }
         } while (0);
         this.currRxQuality = newQ;
@@ -775,7 +777,7 @@ class SvcDriver {
             if (this.currRxQuality > 0) {
                 do {
                     if (window.d) {
-                        console.warn(adaptation_kLogTag, `Decreasing rxQ due to HIGH RTT of ${this.maRtt.toFixed()}, saving checkpoint`);
+                        console.warn(kLogTag, `Decreasing rxQ due to HIGH RTT of ${this.maRtt.toFixed()}, saving checkpoint`);
                     }
                 } while (0);
                 this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
@@ -793,7 +795,7 @@ class SvcDriver {
                 // rtt did not change
                 do {
                     if (window.d) {
-                        console.warn(adaptation_kLogTag, `Decreased rxQ by ${nSteps} steps: rtt didnt change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
+                        console.warn(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt didnt change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
                     }
                 } while (0);
                 this.setRttWindow(this.maRtt);
@@ -807,7 +809,7 @@ class SvcDriver {
                 // because of network conditions. Either way, we should further downgrade quality
                 do {
                     if (window.d) {
-                        console.warn(adaptation_kLogTag, `Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
+                        console.warn(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
                     }
                 } while (0);
                 this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
@@ -844,7 +846,7 @@ class SvcDriver {
                 ar = this.client.screenAspectRatio = res.width / res.height;
                 do {
                     if (window.d) {
-                        console.warn(adaptation_kLogTag, `Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
+                        console.warn(kLogTag, `Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
                     }
                 } while (0);
             }
@@ -852,7 +854,7 @@ class SvcDriver {
                 ar = 1.78;
                 do {
                     if (window.d) {
-                        console.warn(adaptation_kLogTag, "setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
+                        console.warn(kLogTag, "setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
                     }
                 } while (0);
             }
@@ -860,7 +862,7 @@ class SvcDriver {
         params.width = Math.round(params.height * ar);
         do {
             if (window.d) {
-                console.warn(adaptation_kLogTag, `Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)} (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`);
+                console.warn(kLogTag, `Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)} (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`);
             }
         } while (0);
         this.currTxQuality = newQ;
@@ -927,7 +929,6 @@ SvcDriver.TxQuality = [
     { minKbps: 1900, maxKbps: 4000, scr: { height: 1440, frameRate: 8 } } // 6
 ];
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
-/* harmony default export */ const adaptation = (SvcDriver);
 
 ;// CONCATENATED MODULE: ./recordingLogo.ts
 //export default const kLogoImageBlobUrl = "data:image/svg+xml,%3Csvg xml:space='preserve' width='362' height='361.39999' viewBox='0 0 362 361.39998' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23d9272e' d='M 180.7,0 C 80.9,0 0,80.9 0,180.7 c 0,99.8 80.9,180.7 180.7,180.7 99.8,0 180.7,-80.9 180.7,-180.7 C 361.4,80.9 280.5,0 180.7,0 Z m 93.8,244.6 c 0,3.1 -2.5,5.6 -5.6,5.6 h -23.6 c -3.1,0 -5.6,-2.5 -5.6,-5.6 v -72.7 c 0,-0.6 -0.7,-0.9 -1.2,-0.5 l -50,50 c -4.3,4.3 -11.4,4.3 -15.7,0 l -50,-50 c -0.4,-0.4 -1.2,-0.1 -1.2,0.5 v 72.7 c 0,3.1 -2.5,5.6 -5.6,5.6 H 92.4 c -3.1,0 -5.6,-2.5 -5.6,-5.6 V 116.8 c 0,-3.1 2.5,-5.6 5.6,-5.6 h 16.2 c 2.9,0 5.8,1.2 7.9,3.3 l 62.2,62.2 c 1.1,1.1 2.8,1.1 3.9,0 l 62.2,-62.2 c 2.1,-2.1 4.9,-3.3 7.9,-3.3 h 16.2 c 3.1,0 5.6,2.5 5.6,5.6 z' id='path2' /%3E%3C/svg%3E%0A";
@@ -937,6 +938,7 @@ const kLogoImageBlobUrl = "data:image/svg+xml,%3Csvg width='400' height='400' vi
 ;// CONCATENATED MODULE: ./recorder.ts
 
 
+const recorder_kLogTag = "callRec:";
 class RecorderFileSink {
     constructor() {
         this.file = null;
@@ -953,7 +955,7 @@ class RecorderFileSink {
         if (!this.output) {
             do {
                 if (window.d) {
-                    console.warn(kLogTag, "RecorderFileSink.onData: Not initialized");
+                    console.warn(recorder_kLogTag, "RecorderFileSink.onData: Not initialized");
                 }
             } while (0);
             return;
@@ -1071,7 +1073,7 @@ class CallRecorder {
         catch (ex) {
             do {
                 if (window.d) {
-                    console.warn(kLogTag, "Can't convert input video track to recording video resolution, video file may get broken:", ex.message);
+                    console.warn(recorder_kLogTag, "Can't convert input video track to recording video resolution, video file may get broken:", ex.message);
                 }
             } while (0);
         }
@@ -1102,7 +1104,7 @@ class CallRecorder {
         if (this.canvas) {
             do {
                 if (window.d) {
-                    console.warn(kLogTag, "switchToStaticVideo: Already in static video mode");
+                    console.warn(recorder_kLogTag, "switchToStaticVideo: Already in static video mode");
                 }
             } while (0);
             return;
@@ -1130,7 +1132,7 @@ class CallRecorder {
             if (period > 70) {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, "recorder: slow draw:", period);
+                        console.warn(recorder_kLogTag, "recorder: slow draw:", period);
                     }
                 } while (0);
             }
@@ -1138,7 +1140,7 @@ class CallRecorder {
         const staticVtrack = this.canvas.captureStream(20).getVideoTracks()[0];
         do {
             if (window.d) {
-                console.log(kLogTag, `static vtrack resolution: ${staticVtrack.getSettings().width}x${staticVtrack.getSettings().height}`);
+                console.log(recorder_kLogTag, `static vtrack resolution: ${staticVtrack.getSettings().width}x${staticVtrack.getSettings().height}`);
             }
         } while (0);
         return this.videoTx.replaceTrack(staticVtrack);
@@ -1155,7 +1157,7 @@ class CallRecorder {
         if (!this.videoRx) {
             do {
                 if (window.d) {
-                    console.warn(kLogTag, "CallRecorder.destroy: already destroyed");
+                    console.warn(recorder_kLogTag, "CallRecorder.destroy: already destroyed");
                 }
             } while (0);
             return;
@@ -1234,7 +1236,7 @@ class CallRecorder {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '507b653f22';
+const COMMIT_ID = '1966c788f5';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1350,7 +1352,7 @@ class SfuClient {
         this.numInputVideoTracks = options.numVideoSlots || SfuClient.kMaxVideoSlotsDefault;
         this.cryptoWorker = new Worker(SfuClient.kWorkerUrl);
         this.cryptoWorker.addEventListener("message", this.onCryptoWorkerEvent.bind(this));
-        this._svcDriver = new adaptation(this);
+        this._svcDriver = new SvcDriver(this);
         this._speakerDetector = new SpeakerDetector(this);
         this._statsRecorder = new StatsRecorder(this);
         this.micMuteMonitor = new MicMuteMonitor(this);
@@ -1904,6 +1906,11 @@ class SfuClient {
             }
         } while (0);
         if (this._connState !== ConnState.kCallJoining) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Call has ended meanwhile, aborting join");
+                }
+            } while (0);
             return;
         }
         this.keyEncryptIv = this.makeKeyEncryptIv();
@@ -1915,6 +1922,14 @@ class SfuClient {
         const sessSignedPubKey = await this.generateSessionKeyPair();
         this._speakerState = this.options.speak ? SpeakerState.kPending : SpeakerState.kNoSpeaker;
         await this._updateSentTracks(null); // at this point we are not sending anything: no key should be sent out
+        if (this._connState !== ConnState.kCallJoining) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Call has ended meanwhile, aborting join");
+                }
+            } while (0);
+            return;
+        }
         this.assert(this.sentAv === 0);
         let offerCmd = {
             a: "JOIN",
@@ -3066,9 +3081,13 @@ class SfuClient {
         this._fire("wrOnUserLeft", msg.user);
     }
     wrSetUserPermissions(users, allow) {
-        this.assert(this.waitingRoomUsers);
-        for (let userId of users) {
-            this.waitingRoomUsers.set(userId, allow);
+        if (this.waitingRoomUsers) {
+            // We don't have waitingRoomUsers only in open-invite mode, when we are not a moderator
+            // In that case, we don't receive the WR dump, so it's not initialized, but we do receive WR_USERS_ALLOW
+            // as an acknowledge for the permissions we have granted
+            for (const userId of users) {
+                this.waitingRoomUsers.set(userId, allow);
+            }
         }
         this._fire(allow ? "wrOnUsersAllow" : "wrOnUsersDeny", users);
     }
@@ -3243,11 +3262,10 @@ class SfuClient {
             stats.jtr = -1;
         }
         if (stats._pktRxTotal) {
-            stats.pl = stats.pl * 100 / stats._pktRxTotal; // truncate to single decimal
+            stats.pl = Math.round(stats.pl * 1000 / (stats._pktRxTotal + stats.pl)) / 10; // truncate to single decimal
         }
         else {
-            console.warn("No total packets, plost =", stats.pl);
-            stats.pl = 0;
+            stats.pl = -1;
         }
         this._statsRecorder.onStats(this.rtcStats);
         this._svcDriver.onStats();
@@ -3300,6 +3318,23 @@ class SfuClient {
                     rtcStats.vtxdly = pktSent
                         ? Math.round((stat.totalPacketSendDelay - prev.totalPacketSendDelay) * 1000 / pktSent)
                         : -1;
+                    let limitFlags;
+                    switch (stat.qualityLimitationReason) {
+                        case "none":
+                            limitFlags = 0;
+                            break;
+                        case "cpu":
+                            limitFlags = 1 /* TxQualityLimit.kCpu */;
+                            break;
+                        case "bandwidth":
+                            limitFlags = 2 /* TxQualityLimit.kBandwidth */;
+                            break;
+                        case "other":
+                        default:
+                            limitFlags = 4 /* TxQualityLimit.kOther */;
+                            break;
+                    }
+                    rtcStats.f = limitFlags;
                     txStat = stat;
                     //  LOGI("tag:", tag, "nacks:", stat.nackCount, "pli:", stat.pliCount, "fir", stat.firCount, "vtxh:", rtcStats.vtxh);
                 }
@@ -3506,7 +3541,7 @@ class Slot {
                                 commonStats.jtr = jtr;
                             }
                         }
-                        this.peer.audioPktLoss = recvd ? (plost * 100 / recvd) : 0;
+                        this.peer.audioPktLoss = recvd ? (plost * 100 / (recvd + plost)) : 0;
                     }
                     else { // video stats
                         if (commonStats.mrxw == null || commonStats.mrxw < stat.frameWidth) {
@@ -3517,7 +3552,7 @@ class Slot {
                         if (cbs.size) {
                             // more detailed stats for app
                             let info = {
-                                plost: recvd ? (plost * 100 / recvd) : 0,
+                                plost: recvd ? (plost * 100 / (recvd + plost)) : 0,
                                 nacktx: (stat.nackCount - prev.nackCount) / period,
                                 kbps: ((stat.bytesReceived - prev.bytesReceived) / 128) / period,
                                 keyfps: (stat.keyFramesDecoded - prev.keyFramesDecoded) / period
@@ -3622,7 +3657,7 @@ class VideoSlot extends Slot {
     }
     _onPlayerAttached(player) {
         if (player.gui.onRxStats) {
-            this.rxStatsCallbacks.set(this, player.gui.onRxStats.bind(player.gui));
+            this.rxStatsCallbacks.set(player, player.gui.onRxStats.bind(player.gui));
         }
     }
     /** Called by video players when they are detached */
@@ -4164,10 +4199,6 @@ class Peer {
         this._fire("onPeerSpeaker");
     }
     onAudioStart(mid) {
-        if (!this._isSpeaker) {
-            this.client.logError(`Peer.onStartSpeak: Peer ${this.cid} is not a speaker`);
-            return;
-        }
         // prepare track
         const slot = this.client.inAudioTracks.get(mid);
         if (!slot) {
@@ -4190,14 +4221,6 @@ class Peer {
         this._fire("onPeerNoSpeaker");
     }
     onAudioEnd() {
-        if (!this._isSpeaker) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, `Peer.onStopSpeak: Peer ${this.cid} is not a speaker`);
-                }
-            } while (0);
-            return;
-        }
         if (this.audioPlayer) {
             this.audioPlayer.destroy(); // audioPlayer must exist, but just in case
         }

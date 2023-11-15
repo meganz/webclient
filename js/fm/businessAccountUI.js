@@ -757,7 +757,7 @@ BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
         return l[7379]; // pending
     }
     else if (statusCode === 11) {
-        return l[7070]; // disabled
+        return l.sub_user_disabled; // disabled
     }
     else if (statusCode === 12) {
         return l[7376]; // deleted

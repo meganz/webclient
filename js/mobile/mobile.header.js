@@ -267,6 +267,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         }
 
         mBroadcaster.addListener('mega:openfolder', this.update.bind(this));
+        window.addEventListener('resize', this.resetBottomBlock.bind(this));
     }
 
     // Options: setter

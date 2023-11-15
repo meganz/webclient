@@ -360,8 +360,6 @@ class MobileMegaRender {
 
     handleresize() {
 
-        mega.ui.header.resetBottomBlock();
-
         if (mega.ui.footer && mega.ui.footer.visible) {
             mega.ui.footer.showButton();
         }

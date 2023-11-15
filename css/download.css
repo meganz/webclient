@@ -890,6 +890,11 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
     white-space: nowrap;
 }
 
+.download.info-block .file-details-wrapper .links-container a span {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
 /* File size block */
 .download.info-txt.small-txt .dark {
     color: var(--text-color-success);

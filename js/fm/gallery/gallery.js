@@ -2732,7 +2732,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         /**
          * The element width to fetch with relation to dpx
          */
-        const width = parseInt(nodeBlocks[i].el.clientWidth * (window.devicePixelRatio || 1));
+        const width = parseInt(nodeBlocks[i].el.clientWidth) | 0;
         const key = MegaGallery.getCacheKey(fa, width);
 
         // In case fa is not arrived yet, placing the node to the buffer

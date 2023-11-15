@@ -4,7 +4,6 @@
     &-head {
         overflow: hidden;
         margin: 0 15px;
-        border-bottom: 1px solid var(--stroke-grey-2);
         cursor: pointer;
 
         i {
@@ -35,17 +34,6 @@
             line-height: 16px;
             background: var(--secondary-blue);
             color: var(--secondary-white);
-        }
-    }
-
-    ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-
-        li {
-            padding: 8px 0;
-            border-bottom: 1px solid var(--stroke-grey-2);
         }
     }
 }

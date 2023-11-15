@@ -4,6 +4,8 @@ import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
 import Button from './button.jsx';
 import ModeSwitch from './modeSwitch.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
+import { PAGINATION } from './stream.jsx';
+import { MODE } from './call.jsx';
 
 export default class StreamHead extends MegaRenderMixin {
     delayProcID = null;
@@ -186,6 +188,38 @@ export default class StreamHead extends MegaRenderMixin {
         );
     };
 
+    Pagination = () => {
+        const { mode, peers, page, streamsPerPage, floatDetached, chunksLength, onMovePage } = this.props;
+
+        if (mode === MODE.THUMBNAIL && peers && peers.length > (floatDetached ? streamsPerPage : streamsPerPage - 1)) {
+            return (
+                <div className={`${StreamHead.NAMESPACE}-pagination`}>
+                    <Button
+                        className={`
+                            carousel-button-prev
+                            theme-dark-forced
+                            ${page !== 0 ? '' : 'disabled'}
+                        `}
+                        icon="sprite-fm-mono icon-arrow-left"
+                        onClick={() => page !== 0 && onMovePage(PAGINATION.PREV)}
+                    />
+                    <div>{page + 1}/{chunksLength}</div>
+                    <Button
+                        className={`
+                            carousel-button-next
+                            theme-dark-forced
+                            ${page < chunksLength - 1 ? '' : 'disabled'}
+                        `}
+                        icon="sprite-fm-mono icon-arrow-right"
+                        onClick={() => page < chunksLength - 1 && onMovePage(PAGINATION.NEXT)}
+                    />
+                </div>
+            );
+        }
+
+        return null;
+    };
+
     componentWillUnmount() {
         super.componentWillUnmount();
         clearInterval(this.durationInterval);
@@ -203,7 +237,7 @@ export default class StreamHead extends MegaRenderMixin {
     render() {
         const { NAMESPACE } = StreamHead;
         const { dialog } = this.state;
-        const { mode, chatRoom, onCallMinimize, onModeChange } = this.props;
+        const { mode, streamsPerPage, chatRoom, onStreamsPerPageChange, onCallMinimize, onModeChange } = this.props;
         const SIMPLETIP = { position: 'bottom', offset: 5, className: 'theme-dark-forced' };
 
         //
@@ -247,12 +281,18 @@ export default class StreamHead extends MegaRenderMixin {
                             )}
                         </div>
                     </div>
+                    <this.Pagination />
                     <div className={`${NAMESPACE}-controls`}>
-                        <ModeSwitch mode={mode} onModeChange={onModeChange} />
+                        <ModeSwitch
+                            mode={mode}
+                            streamsPerPage={streamsPerPage}
+                            onStreamsPerPageChange={onStreamsPerPageChange}
+                            onModeChange={onModeChange}
+                        />
                         <Button
                             className="head-control"
                             simpletip={{ ...SIMPLETIP, label: this.fullscreen ? l.exit_fullscreen : l[17803] }}
-                            icon={`${this.fullscreen ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'}`}
+                            icon={this.fullscreen ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'}
                             onClick={this.toggleFullscreen}>
                             <span>
                                 {this.fullscreen ?

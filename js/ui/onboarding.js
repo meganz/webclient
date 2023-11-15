@@ -22,6 +22,7 @@ window.OBV4_FLAGS = {
     CHAT_SCHEDULE_PAST: 'obmcsp',
     CHAT_FEEDBACK: 'obmcfb',
     CHAT_FEEDBACK_NEW: 'obmcfn',
+    CHAT_CALL_UI: 'obmcui',
     // New onboarding flags to be added at the end of this object. Don't change the order!!!!
 };
 

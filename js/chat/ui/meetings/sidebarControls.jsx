@@ -1,12 +1,12 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
-import Call from './call.jsx';
+import { VIEW } from './call.jsx';
 
 export default class SidebarControls extends MegaRenderMixin {
     render() {
         const { npeers, view, sidebar, chatRoom, onChatToggle, onParticipantsToggle } = this.props;
-        const SIMPLETIP = { position: 'left', offset: 5, className: 'theme-dark-forced' };
+        const SIMPLETIP = { position: 'top', offset: 5, className: 'theme-dark-forced' };
         const notifications = chatRoom.getUnreadCount();
 
         //
@@ -23,7 +23,7 @@ export default class SidebarControls extends MegaRenderMixin {
                                 theme-dark-forced
                                 round
                                 large
-                                ${sidebar && view === Call.VIEW.CHAT ? 'selected' : ''}
+                                ${sidebar && view === VIEW.CHAT ? 'selected' : ''}
                             `}
                             simpletip={{ ...SIMPLETIP, label: l.chats /* `Chats` */ }}
                             icon="icon-chat-filled"
@@ -40,7 +40,7 @@ export default class SidebarControls extends MegaRenderMixin {
                                 theme-dark-forced
                                 round
                                 large
-                                ${sidebar && view === Call.VIEW.PARTICIPANTS ? 'selected' : ''}
+                                ${sidebar && view === VIEW.PARTICIPANTS ? 'selected' : ''}
                             `}
                             simpletip={{ ...SIMPLETIP, label: l[16217] /* `Participants` */ }}
                             icon="icon-contacts"

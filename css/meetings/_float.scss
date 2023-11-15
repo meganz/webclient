@@ -1,13 +1,13 @@
 .float-video {
     position: fixed;
-    bottom: 24px;
+    bottom: 100px;
     right: 24px;
     width: 245px;
     height: 143px;
     border-radius: 24px;
     background: var(--surface-black);
     cursor: pointer;
-    z-index: 11;
+    z-index: 13;
 
     &.ratio-4-3 { width: 190px; }
     &.ratio-16-9 { width: 254px; }
@@ -129,8 +129,8 @@
 
                     i {
                         float: left;
-                        margin: 0 auto;
-                        --icon-size: 24px;
+                        margin: 4px 0 0 0;
+                        --icon-size: 18px;
                         --mask-color: var(--icon-rest);
                     }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
-import Call from './call.jsx';
+import { isGuest } from './call.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 
 export default class VideoNodeMenu extends MegaRenderMixin {
@@ -17,13 +17,13 @@ export default class VideoNodeMenu extends MegaRenderMixin {
     Contact() {
         const { stream, ephemeralAccounts, onCallMinimize } = this.props;
         const { userHandle } = stream;
-        const IS_GUEST = Call.isGuest() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
+        const IS_GUEST = isGuest() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
         const HAS_RELATIONSHIP = M.u[userHandle].c === 1;
 
         if (HAS_RELATIONSHIP) {
             return (
                 <Button
-                    icon="sprite-fm-mono icon-chat-filled"
+                    icon="sprite-fm-mono icon-chat"
                     onClick={() => {
                         onCallMinimize();
                         loadSubPage(`fm/chat/p/${userHandle}`);
@@ -63,7 +63,7 @@ export default class VideoNodeMenu extends MegaRenderMixin {
         if (onSpeakerChange) {
             return (
                 <Button
-                    icon="sprite-fm-mono icon-speaker-view"
+                    icon="sprite-fm-mono grid-main"
                     onClick={() => onSpeakerChange(stream)}>
                     <span>{l.display_in_main_view /* `Display in main view` */}</span>
                 </Button>
@@ -85,7 +85,7 @@ export default class VideoNodeMenu extends MegaRenderMixin {
                 currentUserModerator &&
                     <Button
                         targetUserModerator={targetUserModerator}
-                        icon="sprite-fm-mono icon-admin"
+                        icon="sprite-fm-mono icon-admin-outline"
                         onClick={() => {
                             ['alterUserPrivilege', 'onCallPrivilegeChange'].map(event =>
                                 chatRoom.trigger(event, [userHandle, targetUserModerator ? FULL : OPERATOR])

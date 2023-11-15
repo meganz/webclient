@@ -1,9 +1,9 @@
 import React from 'react';
 import { compose, MegaRenderMixin } from '../../../mixins.js';
 import { Avatar } from '../../contacts.jsx';
-import Call from '../call.jsx';
+import { isGuest } from '../call.jsx';
 import Button from '../button.jsx';
-import { withPermissionsObserver } from '../permissionsObserver';
+import { withPermissionsObserver } from '../permissionsObserver.jsx';
 
 class Preview extends MegaRenderMixin {
     static NAMESPACE = 'preview-meeting';
@@ -88,7 +88,7 @@ class Preview extends MegaRenderMixin {
     };
 
     renderAvatar = () => {
-        if (Call.isGuest()) {
+        if (isGuest()) {
             return (
                 <div className="avatar-guest">
                     <i className="sprite-fm-uni icon-owner" />

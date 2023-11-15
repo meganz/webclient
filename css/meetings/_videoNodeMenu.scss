@@ -56,7 +56,7 @@
             list-style: none;
 
             li {
-                margin: 0 0 4px 0;
+                margin: 0 0 6px 0;
                 border-radius: 4px;
 
                 button {
@@ -78,7 +78,8 @@
                     i {
                         display: block;
                         float: left;
-                        --icon-size: 24px;
+                        margin: 4px 0 0 0;
+                        --icon-size: 18px;
                         --mask-color: var(--icon-rest);
                     }
 

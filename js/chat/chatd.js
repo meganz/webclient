@@ -161,7 +161,8 @@ Chatd.Opcode = {
     'CALLSTATE': 53,
     'CALLEND': 54,
     'DELCALLREASON': 55,
-    'CALLREJECT': 58
+    'CALLREJECT': 58,
+    'RINGUSER': 59
 };
 
 // privilege levels
@@ -701,6 +702,11 @@ Chatd.Shard.prototype.sendCallReject = function(chatId, callId) {
     'use strict';
     this.cmd(Chatd.Opcode.CALLREJECT, chatId + callId, true);
 };
+Chatd.Shard.prototype.ringUser = function(chatId, userId, callId, callstate) {
+    'use strict';
+    this.cmd(Chatd.Opcode.RINGUSER, chatId + userId + callId + Chatd.pack32le(callstate), true);
+};
+
 Chatd.clientIdToString = function(data, offset) {
     return '0x' + Chatd.dumpToHex(data, offset ? offset : 0, 4, true);
 };
@@ -1008,6 +1014,13 @@ Chatd.cmdToString = function(cmd, tx) {
             result += ` chatId: ${chatId} callId: ${callId}`;
             return [result, 17];
         }
+        case Chatd.Opcode.RINGUSER:
+            result +=
+                ' chatId: ' + base64urlencode(cmd.substr(1, 8)) +
+                ' userId: ' + base64urlencode(cmd.substr(9, 8)) +
+                ' callId: ' + base64urlencode(cmd.substr(17, 8)) +
+                ' ringing: ' + cmd.charCodeAt(25);
+            return [result, 29];
         default:
             if (cmd.length > 64) {
                 result += ' ' + Chatd.dumpToHex(cmd, 1, 64) + '...';

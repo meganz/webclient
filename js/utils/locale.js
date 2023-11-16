@@ -1844,6 +1844,10 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.pricing_page_faq_answer_3 = escapeHTML(l.pricing_page_faq_answer_3)
         .replace('[A]', `<a href="${faqLink}" target="_blank" rel="noopener noreferrer">`)
         .replace('[/A]', '</a>');
+    const welcDialogURL = '/fm/account/plan/purchase-history';
+    l.welcome_dialog_active_check = escapeHTML(l.welcome_dialog_active_check)
+        .replace('[A]', `<a class="clickurl" href="${welcDialogURL}" target="_self" rel="noopener noreferrer">`)
+        .replace('[/A]', '</a>');
     const recoveryKeyLink = 'https://help.mega.io/accounts/password-management/recovery-key';
     l.password_changed_more_info = escapeHTML(l.password_changed_more_info)
         .replace('[A]', `<a class="anchor-link" href="${recoveryKeyLink}" target="_blank" rel="noopener noreferrer">`)

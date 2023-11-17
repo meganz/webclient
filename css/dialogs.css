@@ -9112,6 +9112,9 @@ body.de .mega-dialog.contact-picker-widget {
 
     /* end do not apply theme colours */
 
+.mega-dialog.voucher-info-redeem .s4-voucher-terms-label {
+    color: var(--text-color-high);
+}
 /* end voucher-info-redeem dialog */
 
 /* affiliate-request dialog */

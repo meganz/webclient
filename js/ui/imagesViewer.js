@@ -61,8 +61,12 @@ var slideshowid;
         const $overlay = $('.media-viewer-container');
         const $controls = $('.gallery-btn', $overlay);
         const $counter = $('header .counter', $overlay);
+        const $startButton = $('.v-btn.slideshow', $overlay);
         const forward = [];
         const backward = [];
+
+        let slideShowItemCount = window.dl_node ? 2 : 0;
+        const slideShowModeFilter = !slideShowItemCount && mega.slideshow.utils.filterNodes(undefined, true);
 
         let current;
         let pos = [];
@@ -86,6 +90,11 @@ var slideshowid;
                     current = i;
                 }
                 pos.push(i);
+
+                if (slideShowItemCount < 2 && slideShowModeFilter(list[i])) {
+
+                    ++slideShowItemCount;
+                }
             }
         }
 
@@ -113,11 +122,13 @@ var slideshowid;
             $counter.removeClass('hidden');
             $controls.removeClass('hidden');
 
+            $startButton.toggleClass('hidden', slideShowItemCount < 2);
             $counter.text(String(l.preview_counter || '').replace('%1', pos = n + 1).replace('%2', len));
         }
         else {
             $counter.addClass('hidden');
             $controls.addClass('hidden');
+            $startButton.addClass('hidden');
         }
 
         if (_hideCounter) {

@@ -309,6 +309,9 @@ export default class Join extends MegaRenderMixin {
                     if (firstName && lastName && firstName.length > 0 && lastName.length > 0) {
                         this.setState({'joining': true});
 
+                        if (this.props.chatRoom.scheduledMeeting) {
+                            delay('chat-event-sm-guest-join', () => eventlog(99929));
+                        }
                         this.props.onJoinGuestClick(
                             firstName,
                             lastName,

@@ -293,6 +293,12 @@ export class Schedule extends MegaRenderMixin {
                     async() => {
                         const { chatRoom, onClose } = this.props;
                         const params = [this.state, chatRoom];
+                        if (chatRoom) {
+                            delay('chat-event-sm-edit-meeting', () => eventlog(99923));
+                        }
+                        else {
+                            delay('chat-event-sm-button-create', () => eventlog(99922));
+                        }
                         await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](...params);
                         this.setState({ isLoading: false }, () => onClose());
                     })
@@ -527,7 +533,10 @@ export class Schedule extends MegaRenderMixin {
                         checked={recurring}
                         label={l.schedule_recurring_label /* `Recurring meeting` */}
                         isLoading={isLoading}
-                        onToggle={this.handleToggle}
+                        onToggle={prop => {
+                            this.handleToggle(prop);
+                            delay('chat-event-sm-recurring', () => eventlog(99919));
+                        }}
                     />
 
                     {recurring &&
@@ -566,7 +575,10 @@ export class Schedule extends MegaRenderMixin {
                         toggled={link}
                         label={l.schedule_link_label /* `Meeting link` */}
                         isLoading={isLoading}
-                        onToggle={this.handleToggle}
+                        onToggle={prop => {
+                            this.handleToggle(prop);
+                            delay('chat-event-sm-meeting-link', () => eventlog(99920));
+                        }}
                     />
 
                     {/* --- */}
@@ -576,7 +588,10 @@ export class Schedule extends MegaRenderMixin {
                         checked={sendInvite}
                         label={l.schedule_invite_label /* `Send calendar invite` */}
                         isLoading={isLoading}
-                        onToggle={this.handleToggle}
+                        onToggle={prop => {
+                            this.handleToggle(prop);
+                            delay('chat-event-sm-calendar-invite', () => eventlog(99921));
+                        }}
                     />
 
                     {/* --- */}

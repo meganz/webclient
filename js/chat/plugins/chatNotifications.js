@@ -399,6 +399,7 @@ var ChatNotifications = function(megaChat, options) {
             case chatNotifActions.CLICK: {
                 if (data && data.meetingId) {
                     megaChat.openScheduledMeeting(data.meetingId, true);
+                    delay('chat-event-sm-join-notification', () => eventlog(99926));
                 }
                 else if (d) {
                     megaChat.logger.warn('Invalid message action from service worker.', ev.data);
@@ -408,6 +409,7 @@ var ChatNotifications = function(megaChat, options) {
             case chatNotifActions.SCHED_STARTING_MSG: {
                 if (data && data.meetingId) {
                     megaChat.openScheduledMeeting(data.meetingId);
+                    delay('chat-event-sm-msg-notification', () => eventlog(99927));
                 }
                 else if (d) {
                     megaChat.logger.warn('Invalid service worker reply for SCHED_STARTING_MSG', ev.data);
@@ -417,6 +419,7 @@ var ChatNotifications = function(megaChat, options) {
             case chatNotifActions.SCHED_STARTING_JOIN: {
                 if (data && data.meetingId) {
                     megaChat.openScheduledMeeting(data.meetingId, true);
+                    delay('chat-event-sm-join-notification', () => eventlog(99926));
                 }
                 else if (d) {
                     megaChat.logger.warn('Invalid service worker reply for SCHED_STARTING_JOIN', ev.data);

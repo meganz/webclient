@@ -11979,6 +11979,9 @@ class Join extends mixins.wl {
           this.setState({
             'joining': true
           });
+          if (this.props.chatRoom.scheduledMeeting) {
+            delay('chat-event-sm-guest-join', () => eventlog(99929));
+          }
           this.props.onJoinGuestClick(firstName, lastName, previewAudio, previewVideo);
         }
       }
@@ -12151,7 +12154,12 @@ class WaitingRoom extends mixins.wl {
       countdown: 4,
       loading: false
     };
-    this.renderLeaveDialog = () => msgDialog(`confirmation:!^${l.wr_leave}!${l.wr_do_not_leave}`, null, l.wr_leave_confirmation, '', cb => cb && this.doLeave(), 1);
+    this.renderLeaveDialog = () => msgDialog(`confirmation:!^${l.wr_leave}!${l.wr_do_not_leave}`, null, l.wr_leave_confirmation, '', cb => {
+      if (cb) {
+        delay('chat-event-wr-leave', () => eventlog(99938));
+        this.doLeave();
+      }
+    }, 1);
     this.renderDeniedDialog = () => msgDialog('error', '', l.wr_denied, l.wr_denied_details, this.doLeave);
     this.renderTimeoutDialog = () => msgDialog('error', '', l.wr_timeout, l.wr_timeout_details, this.doLeave);
     this.renderWaitingRoomInfo = () => {
@@ -12463,6 +12471,7 @@ class WaitingRoom extends mixins.wl {
         return this.renderDeniedDialog();
       }
       if (termCode === SfuClient.TermCode.kWaitingRoomAllowTimeout) {
+        delay('chat-event-wr-timeout', () => eventlog(99939));
         return this.renderTimeoutDialog();
       }
     });
@@ -12915,7 +12924,12 @@ class ConversationRightArea extends mixins.wl {
           isRecurring,
           title
         } = scheduledMeeting;
-        const doConfirm = res => res && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, chatId);
+        const doConfirm = res => {
+          if (res) {
+            megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, chatId);
+            delay('chat-event-sm-cancel', () => eventlog(99925));
+          }
+        };
         if (isRecurring) {
           return chatRoom.hasUserMessages() ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', title), l.schedule_cancel_dialog_move_recurring, doConfirm, 1) : msgDialog(`confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', title), l.schedule_cancel_dialog_archive_recurring, doConfirm, 1);
         }
@@ -13111,14 +13125,22 @@ class ConversationRightArea extends mixins.wl {
       secondLabel: l.waiting_room_info,
       toggled: room.options[MCO_FLAGS.WAITING_ROOM],
       disabled: room.havePendingCall(),
-      onClick: () => room.toggleWaitingRoom()
+      onClick: () => {
+        room.toggleWaitingRoom();
+        delay('chat-event-wr-create-button', () => eventlog(99937));
+      }
     };
     const openInviteButton = {
       icon: 'icon-user-filled',
       label: room.isMeeting ? l.meeting_open_invite_label : l.chat_open_invite_label,
       secondLabel: l.open_invite_desc,
       toggled: room.options[MCO_FLAGS.OPEN_INVITE],
-      onClick: () => room.toggleOpenInvite()
+      onClick: () => {
+        room.toggleOpenInvite();
+        if (room.scheduledMeeting) {
+          delay('chat-event-sm-allow-non-hosts', () => eventlog(99928));
+        }
+      }
     };
     let retentionTime = room.retentionTime ? secondsToDays(room.retentionTime) : 0;
     const ICON_ACTIVE = external_React_default().createElement("i", {
@@ -13282,6 +13304,9 @@ class ConversationRightArea extends mixins.wl {
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
+        }
+        if (scheduledMeeting) {
+          delay('chat-event-sm-share-meeting-link', () => eventlog(99924));
         }
         this.props.onGetManageChatLinkClicked();
       }
@@ -16334,6 +16359,7 @@ class Edit extends mixins.wl {
           endDateTime
         } = this.state;
         if (startDateTime !== this.occurrenceRef.start || endDateTime !== this.occurrenceRef.end) {
+          delay('chat-event-sm-edit-meeting', () => eventlog(99923));
           this.occurrenceRef.update(startDateTime, endDateTime);
         }
         onClose();
@@ -16512,6 +16538,11 @@ class Schedule extends mixins.wl {
             onClose
           } = this.props;
           const params = [this.state, chatRoom];
+          if (chatRoom) {
+            delay('chat-event-sm-edit-meeting', () => eventlog(99923));
+          } else {
+            delay('chat-event-sm-button-create', () => eventlog(99922));
+          }
           await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](...params);
           this.setState({
             isLoading: false
@@ -16760,7 +16791,10 @@ class Schedule extends mixins.wl {
       checked: recurring,
       label: l.schedule_recurring_label,
       isLoading: isLoading,
-      onToggle: this.handleToggle
+      onToggle: prop => {
+        this.handleToggle(prop);
+        delay('chat-event-sm-recurring', () => eventlog(99919));
+      }
     }), recurring && external_React_default().createElement(Recurring, {
       chatRoom: this.props.chatRoom,
       startDateTime: startDateTime,
@@ -16784,13 +16818,19 @@ class Schedule extends mixins.wl {
       toggled: link,
       label: l.schedule_link_label,
       isLoading: isLoading,
-      onToggle: this.handleToggle
+      onToggle: prop => {
+        this.handleToggle(prop);
+        delay('chat-event-sm-meeting-link', () => eventlog(99920));
+      }
     }), external_React_default().createElement(Checkbox, {
       name: "sendInvite",
       checked: sendInvite,
       label: l.schedule_invite_label,
       isLoading: isLoading,
-      onToggle: this.handleToggle
+      onToggle: prop => {
+        this.handleToggle(prop);
+        delay('chat-event-sm-calendar-invite', () => eventlog(99921));
+      }
     }), external_React_default().createElement(Checkbox, {
       name: "waitingRoom",
       className: (_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.havePendingCall() ? 'disabled' : '',
@@ -19214,9 +19254,12 @@ class ConversationsApp extends mixins.wl {
       leftPaneWidth: leftPaneWidth,
       renderView: view => this.renderView(view),
       startMeeting: () => this.startMeeting(),
-      scheduleMeeting: () => this.setState({
-        scheduleMeetingDialog: true
-      }),
+      scheduleMeeting: () => {
+        this.setState({
+          scheduleMeetingDialog: true
+        });
+        delay(`chat-event-sm-button-main`, () => eventlog(99918));
+      },
       createGroupChat: () => this.setState({
         startGroupChatDialog: true
       })

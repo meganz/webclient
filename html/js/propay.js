@@ -1706,6 +1706,15 @@ pro.propay = {
     processUtcResults: function(utcResult, saleId) {
         'use strict';
 
+        // If the user is upgrading from free, set a flag to show the welcome dialog when the psts notification
+        // arrives. Set this flag if the user is in the experiment, regardless of which variation they are in.
+        // If the payment fails the welcome dialog will check if the user has a pro plan, and as such should still
+        // work as expected.
+        // Only set if user has not seen the welcome dialog before
+        if ((u_attr['^!welDlg'] !== '0') && (typeof mega.flags.ab_wdns !== 'undefined')){
+            mega.attr.set('welDlg', 1, -2, true);
+        }
+
         // Handle results for different payment providers
         switch (pro.lastPaymentProviderId) {
 

@@ -1922,7 +1922,8 @@
                     $tooltip.hide();
                 }
                 closeDialog();
-                M.safeMoveNodes($.mcselected).catch(dump);
+                mLoadingSpinner.show('safeMoveNodes');
+                M.safeMoveNodes($.mcselected).catch(dump).finally(() => mLoadingSpinner.hide('safeMoveNodes'));
                 return false;
             }
 

@@ -1185,6 +1185,8 @@ lazy(pro, 'proplan2', () => {
 
             $page = $('.bottom-page.full-block', '.bottom-page.content.pricing-pg');
 
+            delay('pricingpage.init', eventlog.bind(null, is_mobile ? 99936 : 99935));
+
             initPlansCards();
             fetchBusinessPlanInfo();
 

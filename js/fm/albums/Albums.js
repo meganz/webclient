@@ -1336,7 +1336,7 @@ lazy(mega.gallery, 'albums', () => {
                                 for (let i = 0; i < nodes.length; i++) {
                                     existingHandles[nodes[i].h] = true;
 
-                                    if (mega.gallery.isVideo(nodes[i])) {
+                                    if (scope.isVideo(nodes[i])) {
                                         this.currentVideosCount++;
                                     }
                                     else {
@@ -1351,7 +1351,7 @@ lazy(mega.gallery, 'albums', () => {
                                         addedCount++;
                                         handlesToAdd.push({ h, o: (nodes.length + handlesToAdd.length + 1) * 1000 });
 
-                                        if (M.d[h] && mega.gallery.isVideo(M.d[h])) {
+                                        if (M.d[h] && scope.isVideo(M.d[h])) {
                                             this.videosCount++;
                                         }
                                         else {
@@ -3521,6 +3521,7 @@ lazy(mega.gallery, 'albums', () => {
             else {
                 this.showAlbumContents(id);
                 this.header.update(id);
+                scope.reporter.report(false, 'Album');
             }
         }
 
@@ -4814,7 +4815,7 @@ lazy(mega.gallery, 'albums', () => {
             for (let i = 0; i < album.nodes.length; i++) {
                 statsObj[
                     (handlesCache[album.nodes[i].h] ? 'del' : 'left')
-                    + (mega.gallery.isVideo(album.nodes[i]) ? 'Vid' : 'Img')
+                    + (scope.isVideo(album.nodes[i]) ? 'Vid' : 'Img')
                 ]++;
             }
 
@@ -4892,7 +4893,7 @@ lazy(mega.gallery, 'albums', () => {
                 return name;
             }
 
-            const album = Object.values(mega.gallery.albums.store).find(({ p }) => p && p.ph === h);
+            const album = Object.values(scope.albums.store).find(({ p }) => p && p.ph === h);
             const newName = await AlbumNameDialog.prompt(album.id, names);
 
             return (newName === null) ? null : newName || name;

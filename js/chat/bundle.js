@@ -23886,6 +23886,10 @@ class Participants extends mixins.wl {
           ringingPeers: [...state.ringingPeers, handle]
         }), () => {
           chatRoom.ringUser(handle, call.callId, 1);
+          if (chatRoom.options.w) {
+            var _call$sfuClient;
+            call == null || (_call$sfuClient = call.sfuClient) == null || _call$sfuClient.wrAllowJoin([handle]);
+          }
           tSleep(40).then(() => {
             this.doHangUp(handle);
             return Object.keys(chatRoom.uniqueCallParts).includes(handle) ? null : this.setState(state => ({

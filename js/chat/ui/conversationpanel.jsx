@@ -543,7 +543,12 @@ export class ConversationRightArea extends MegaRenderMixin {
 
         if (scheduledMeeting) {
             const { isRecurring, title } = scheduledMeeting;
-            const doConfirm = res => res && megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, chatId);
+            const doConfirm = res => {
+                if (res) {
+                    megaChat.plugins.meetingsManager.cancelMeeting(scheduledMeeting, chatId);
+                    delay('chat-event-sm-cancel', () => eventlog(99925));
+                }
+            };
 
             if (isRecurring) {
                 return chatRoom.hasUserMessages() ?
@@ -812,14 +817,22 @@ export class ConversationRightArea extends MegaRenderMixin {
             secondLabel: l.waiting_room_info,
             toggled: room.options[MCO_FLAGS.WAITING_ROOM],
             disabled: room.havePendingCall(),
-            onClick: () => room.toggleWaitingRoom()
+            onClick: () => {
+                room.toggleWaitingRoom();
+                delay('chat-event-wr-create-button', () => eventlog(99937));
+            }
         };
         const openInviteButton = {
             icon: 'icon-user-filled',
             label: room.isMeeting ? l.meeting_open_invite_label : l.chat_open_invite_label,
             secondLabel: l.open_invite_desc,
             toggled: room.options[MCO_FLAGS.OPEN_INVITE],
-            onClick: () => room.toggleOpenInvite()
+            onClick: () => {
+                room.toggleOpenInvite();
+                if (room.scheduledMeeting) {
+                    delay('chat-event-sm-allow-non-hosts', () => eventlog(99928));
+                }
+            }
         };
 
         //
@@ -1045,6 +1058,9 @@ export class ConversationRightArea extends MegaRenderMixin {
                                             onClick={e => {
                                                 if ($(e.target).closest('.disabled').length > 0) {
                                                     return false;
+                                                }
+                                                if (scheduledMeeting) {
+                                                    delay('chat-event-sm-share-meeting-link', () => eventlog(99924));
                                                 }
                                                 this.props.onGetManageChatLinkClicked();
                                             }}>

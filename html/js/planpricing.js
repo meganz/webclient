@@ -109,12 +109,14 @@ lazy(pro, 'proplan2', () => {
 
         $('.pricing-plans-compare-table-item button', $tableContainer).addClass('hidden');
 
-        // If user has the flag ab_flag, add them to the experiment.
-        if (mega.flags.ab_uspct !== 'undefined') {
-            api.req({a: 'abta', c: 'ab_uspct'});
-        }
-        if ((typeof mega.flags.ab_ctasc !== 'undefined') && !is_mobile) {
-            api.send({a: 'abta', c: 'ab_ctasc'});
+        // If user is logged in and has the flag ab_flag, add them to the experiment.
+        if (u_attr) {
+            if (typeof mega.flags.ab_uspct !== 'undefined') {
+                api.req({a: 'abta', c: 'ab_uspct'}).catch(dump);
+            }
+            if ((typeof mega.flags.ab_ctasc !== 'undefined') && !is_mobile) {
+                api.send({a: 'abta', c: 'ab_ctasc'}).catch(dump);
+            }
         }
 
         if (u_attr && mega.flags.ab_ctasc && !is_mobile) {
@@ -961,8 +963,8 @@ lazy(pro, 'proplan2', () => {
         const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
         // For active experiments call the API to inform them that the user is relevant to the experiment
-        if (typeof mega.flags.ab_bbyd !== 'undefined') {
-            api.send({a: 'abta', c: 'ab_bbyd'});
+        if (u_attr && typeof mega.flags.ab_bbyd !== 'undefined') {
+            api.send({a: 'abta', c: 'ab_bbyd'}).catch(dump);
         }
         const defaultDuration = mega.flags.ab_bbyd ? 12 : 0;
         const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || defaultDuration;
@@ -1184,6 +1186,8 @@ lazy(pro, 'proplan2', () => {
             }
 
             $page = $('.bottom-page.full-block', '.bottom-page.content.pricing-pg');
+
+            delay('pricingpage.init', eventlog.bind(null, is_mobile ? 99936 : 99935));
 
             initPlansCards();
             fetchBusinessPlanInfo();

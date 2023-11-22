@@ -86,6 +86,9 @@ export default class Participants extends MegaRenderMixin {
                 state => ({ ringingPeers: [...state.ringingPeers, handle] }),
                 () => {
                     chatRoom.ringUser(handle, call.callId, 1);
+                    if (chatRoom.options.w) {
+                        call?.sfuClient?.wrAllowJoin([handle]);
+                    }
                     tSleep(40).then(() => {
                         this.doHangUp(handle);
                         return Object.keys(chatRoom.uniqueCallParts).includes(handle) ?

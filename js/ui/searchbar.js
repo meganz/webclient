@@ -13,6 +13,8 @@
     let showEmptyState;
 
     const recentlySearched = {
+
+        justSearched: false,
         /**
          * Recently searched terms
          * @type {Set<string>}
@@ -58,7 +60,6 @@
                 this.terms.delete(firstTerm);
             }
             this.save();
-            this.update();
         },
 
         /**
@@ -121,7 +122,7 @@
         update: function(hasDeletedOrCleared = false) {
             removeVisibilityListeners();
             renderUpdatedDropdown(hasDeletedOrCleared);
-            delay('searchbar.addVisibilityListeners', () => addVisibilityListeners(), 1000);
+            addVisibilityListeners();
         }
     };
 
@@ -297,6 +298,7 @@
             else if (val.length >= 2 || !asciionly(val)) {
                 M.fmSearchNodes(val).then(function() {
                     if (!pfid) {
+                        recentlySearched.justSearched = true;
                         if (mega.config.get('showRecents') === 1) {
                             recentlySearched.addTerm(val);
                         }
@@ -311,7 +313,9 @@
                         $dropdownSearch = $('.dropdown-search', $topbar);
                         $fileSearch = $('.js-filesearcher', $topbar);
                         $fileSearch.val(val);
-                        $('#main-search-fake-form .js-filesearcher', $topbar).trigger('focus');
+                        if (!recentlySearched.justSearched) {
+                            $('#main-search-fake-form .js-filesearcher', $topbar).trigger('focus');
+                        }
                         $('.js-btnclearSearch', $topbar).removeClass('hidden');
                         $dropdownSearch.addClass('hidden');
 

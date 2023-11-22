@@ -32,6 +32,9 @@ var notify = {
     /** Temp list of accepted contact requests */
     acceptedContactRequests: [],
 
+    // The welcome dialog has been shown this session
+    welcomeDialogShown: false,
+
     /**
      * Initialise the notifications system
      */
@@ -1307,6 +1310,25 @@ var notify = {
      */
     renderPayment: function($notificationHtml, notification) {
 
+        // If they have this attribute, then they signed up for the experiment from a
+        // free account after the experiment started
+        // Send the request to add them to the experiment if they have the experiment flag
+        // and signed up from free after the experiment started
+        if ((u_attr['^!welDlg'] === 1) && (typeof mega.flags.ab_wdns !== 'undefined')) {
+            api.req({'a': 'abta', c: 'ab_wdns'}).catch(dump);
+        }
+
+        if (!notification.seen
+                && !notify.welcomeDialogShown
+                && mega.flags.ab_wdns
+                && !(u_attr.pf || u_attr.b)
+                && (u_attr['^!welDlg'] | 0)) {
+
+            notify.createNewUserDialog(notification);
+            notify.welcomeDialogShown = true;
+            mega.attr.set('welDlg', 0, -2, true);
+        }
+
         var proLevel = notification.data.p;
         var proPlan = pro.getProPlanName(proLevel);
         var success = (notification.data.r === 's') ? true : false;
@@ -1329,6 +1351,76 @@ var notify = {
 
         return $notificationHtml;
     },
+
+    createNewUserDialog: tryCatch(() => {
+        'use strict';
+
+        const $dialog = $('.mega-dialog-container .upgrade-welcome-dialog');
+
+        M.accountData((account) => {
+
+            account.purchases.sort((a, b) => {
+                if (a[1] < b[1]) {
+                    return 1;
+                }
+                return -1;
+            });
+
+            const getPlansEndingAfterPurchase = () => {
+                let plansEndingAfterSubscription = 0;
+                account.purchases.forEach(purchase => {
+                    const days = purchase[6] === 1
+                        ? 32
+                        : purchase[6] === 12
+                            ? 367
+                            : purchase[6] * 31;
+                    const purchaseEnd = days * 86400 + purchase[1];
+
+                    if (((Date.now() / 1000) < purchaseEnd) && ((u_attr.p % 4) <= purchase[5])) {
+                        plansEndingAfterSubscription++;
+                    }
+                });
+                return plansEndingAfterSubscription;
+            };
+
+            // If a user is currently on a higher tier plan than their new plan, inform them that the new plan
+            // will be active after their current plan expires
+            if (account.purchases[0][5] !== u_attr.p) {
+                const currentPlan = pro.getProPlanName(u_attr.p);
+                const newPlan = pro.getProPlanName(account.purchases[0][5]);
+                const plansEndingAfterPurchase = getPlansEndingAfterPurchase();
+                const bodyText = plansEndingAfterPurchase < 2
+                    ? l.welcome_dialog_active_until
+                    : l.welcome_dialog_active_check;
+                msgDialog('warninga', '',
+                          l.welcome_dialog_thanks_for_sub.replace('%1', newPlan),
+                          bodyText
+                              .replace('%1', currentPlan)
+                              .replace('%3', time2date(account.suntil, 1))
+                              .replace('%2', newPlan));
+                return;
+            }
+
+            pro.loadMembershipPlans(() => {
+                const plan = pro.membershipPlans.find(currentPlan => {
+                    return currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === account.purchases[0][5]
+                        && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 1;
+                });
+
+                const transfer = plan[pro.UTQA_RES_INDEX_TRANSFER] * account.purchases[0][6] * 1024 * 1024 * 1024;
+                const storage = plan[pro.UTQA_RES_INDEX_STORAGE] *  1024 * 1024 * 1024;
+
+                $('header', $dialog).text(l.welcome_dialog_header.replace('%1', pro.getProPlanName(u_attr.p)));
+                $('.more-quota .info-text', $dialog).text(l.welcome_dialog_quota_details
+                    .replace('%1', bytesToSize(storage, 0))
+                    .replace('%2', bytesToSize(transfer, 0)));
+                $('button', $dialog).rebind('click', () => {
+                    closeDialog();
+                });
+                M.safeShowDialog('upgrade-welcome-dialog', $dialog);
+            });
+        });
+    }),
 
     /**
      * Process payment reminder notification to remind them their PRO plan is due for renewal.

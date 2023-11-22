@@ -1476,8 +1476,8 @@ class MegaGallery {
                 ) {
                     delete mega.gallery.discovery;
 
-                    if (mega.gallery.mdReporter.runId) {
-                        mega.gallery.mdReporter.stop();
+                    if (mega.gallery.reporter.runId) {
+                        mega.gallery.reporter.stop();
                     }
                 }
 
@@ -2644,7 +2644,7 @@ async function galleryUI(id) {
     // This is media discovery
     if (id) {
         if (!pfid) {
-            mega.gallery.mdReporter.report();
+            mega.gallery.reporter.report(false, 'MD');
         }
 
         if (!M.getNodeByHandle(id) || M.getNodeRoot(id) === M.RubbishID) {
@@ -2993,20 +2993,29 @@ lazy(mega.gallery, 'sections', () => {
     };
 });
 
-lazy(mega.gallery, 'mdReporter', () => {
+lazy(mega.gallery, 'reporter', () => {
     'use strict';
 
-    /**
-     * @type {Array}
-     * @property {Number} 0 Timeout
-     * @property {Number} 1 EventId
-     */
-    const marks = [
-        [10, 99753], // This timeout value is also being used for Fav reporter
-        [30, 99754],
-        [60, 99755],
-        [180, 99756]
-    ];
+    const intervals = {
+        MD: {
+            initEvt: 99900,
+            favEvt: 99757,
+            marks: [
+                [10, 99753], // This timeout value is also being used for Fav reporter
+                [30, 99754],
+                [60, 99755],
+                [180, 99756]
+            ]
+        },
+        Album: {
+            marks: [
+                [10, 99931],
+                [30, 99932],
+                [60, 99933],
+                [180, 99934]
+            ]
+        }
+    };
 
     /**
      * The number to qualify as a favourite
@@ -3015,7 +3024,6 @@ lazy(mega.gallery, 'mdReporter', () => {
     const timesOver = 3;
 
     const statsStorageKey = 'regularPageStats';
-    const mdPageKey = 'MD';
 
     /**
      * This one prevents events from sending same requests multiple times when leaving and coming back to the tab
@@ -3053,11 +3061,14 @@ lazy(mega.gallery, 'mdReporter', () => {
         },
         /**
          * @param {Boolean} isCarryOn Whether to carry on the paused session or not (e.g. when visibility changes)
+         * @param {String} pageKey The page key to use for the reporting
          * @returns {void}
          */
-        report(isCarryOn) {
-            if (!isCarryOn) {
-                eventlog(99900);
+        report(isCarryOn, pageKey) {
+            const { initEvt, marks, favEvt } = intervals[pageKey];
+
+            if (!isCarryOn && initEvt) {
+                eventlog(initEvt);
 
                 // We need to stop the previously initialised reporter's run if any
                 if (this.runId) {
@@ -3073,13 +3084,16 @@ lazy(mega.gallery, 'mdReporter', () => {
                 'visibilitychange',
                 () => {
                     if (document.visibilityState === 'visible' && this.runId === runId) {
-                        this.report(true);
+                        this.report(true, pageKey);
                     }
                 }
             );
 
-            sessionTimer = this.reportSessionMarks(marks[0][0], 0, runId);
-            favTimer = this.processSectionFavourite(runId);
+            sessionTimer = this.reportSessionMarks(marks[0][0], 0, runId, pageKey);
+
+            if (favEvt) {
+                favTimer = this.processSectionFavourite(runId, pageKey);
+            }
 
             mBroadcaster.once('pagechange', () => {
                 this.stop();
@@ -3090,10 +3104,11 @@ lazy(mega.gallery, 'mdReporter', () => {
          * @param {Number} timeout
          * @param {Number} diff Timeout to the next mark
          * @param {Number} runId Current report run id to check
+         * @param {String} pageKey The page key to use for the reporting
          */
-        reportSessionMarks(timeout, diff, runId) {
+        reportSessionMarks(timeout, diff, runId, pageKey) {
+            const { marks } = intervals[pageKey];
             const eventIndex = marks.findIndex(([to]) => to === timeout);
-
             const timer = tSleep(timeout - diff);
 
             timer.then(
@@ -3108,13 +3123,13 @@ lazy(mega.gallery, 'mdReporter', () => {
 
                         delay(
                             `gallery_stat_${marks[eventIndex][1]}`,
-                            eventlog.bind(null, marks[eventIndex][1], `Session mark: ${mdPageKey} | ${timeout}s`)
+                            eventlog.bind(null, marks[eventIndex][1], `Session mark: ${pageKey} | ${timeout}s`)
                         );
                     }
 
                     const nextIndex = eventIndex + 1;
                     if (marks[nextIndex]) {
-                        sessionTimer = this.reportSessionMarks(marks[nextIndex][0], timeout, runId);
+                        sessionTimer = this.reportSessionMarks(marks[nextIndex][0], timeout, runId, pageKey);
                     }
                     else {
                         sessionTimer = null;
@@ -3127,8 +3142,10 @@ lazy(mega.gallery, 'mdReporter', () => {
         /**
          * Report if user visited a specific section/page more than timesOver times
          * @param {Number} runId Current report run id to check
+         * @param {String} pageKey The page key to use for the reporting
          */
-        processSectionFavourite(runId) {
+        processSectionFavourite(runId, pageKey) {
+            const { marks, favEvt } = intervals[pageKey];
             const timer = tSleep(marks[0][0]);
 
             timer.then(() => {
@@ -3142,13 +3159,13 @@ lazy(mega.gallery, 'mdReporter', () => {
                         fmStats = [];
                     }
 
-                    let section = fmStats.find(({ name }) => name === mdPageKey);
+                    let section = fmStats.find(({ name }) => name === pageKey);
 
                     if (section) {
                         section.count++;
                     }
                     else {
-                        section = {name: mdPageKey, count: 1, reported: false};
+                        section = { name: pageKey, count: 1, reported: false };
                         fmStats.push(section);
                     }
 
@@ -3156,8 +3173,8 @@ lazy(mega.gallery, 'mdReporter', () => {
                         if (section.count >= timesOver) {
                             section.reported = true;
                             delay(
-                                'gallery_stat_99757',
-                                eventlog.bind(null, 99757, `${mdPageKey} has been visited ${section.count} times`)
+                                `gallery_stat_${favEvt}`,
+                                eventlog.bind(null, favEvt, `${pageKey} has been visited ${section.count} times`)
                             );
                         }
 

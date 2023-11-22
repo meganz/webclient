@@ -1559,6 +1559,9 @@ scparser.$add('sqac', (a) => {
                     M.accountData();
                 }
             }
+            if (u_attr) {
+                delete u_attr.tq;
+            }
             M.storageQuotaCache = null;
 
             if ($.topMenu) {
@@ -2588,7 +2591,8 @@ async function fetchfm(sn) {
     if (fmdb && mega.infinity) {
         payload.inc = parseInt(localStorage.inclvl) | 1;
     }
-    else if (!pfid && mega.lite) {
+    else if (!pfid) {
+
         // Decide whether to show MEGA Lite mode dialog or not
         tryCatch(() => mega.lite.recommendLiteMode())();
     }
@@ -2598,7 +2602,7 @@ async function fetchfm(sn) {
             if (!mega.infinity) {
                 decWorkerPool.cleanup();
 
-                if (!pfid && mega.lite) {
+                if (!pfid) {
                     mega.lite.abort();
                 }
             }

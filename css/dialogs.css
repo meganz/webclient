@@ -9112,6 +9112,9 @@ body.de .mega-dialog.contact-picker-widget {
 
     /* end do not apply theme colours */
 
+.mega-dialog.voucher-info-redeem .s4-voucher-terms-label {
+    color: var(--text-color-high);
+}
 /* end voucher-info-redeem dialog */
 
 /* affiliate-request dialog */
@@ -12094,3 +12097,83 @@ body.de .mega-dialog.contact-picker-widget {
     font: var(--text-h2);
 }
 /* Public set decryption key dialog end */
+
+/* Welcome dialog start */
+
+.mega-dialog.upgrade-welcome-dialog {
+    display: flex;
+    flex-direction: row;
+    color: var(--text-color-high);
+}
+.mega-dialog.upgrade-welcome-dialog header {
+    font: var(--text-h1-bold);
+    margin-bottom: 8px;
+}
+.mega-dialog.upgrade-welcome-dialog .thanks-text {
+    font : var(--text-body1);
+    color: var(--text-color-medium);
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 360px;
+    margin: 32px;
+    margin: 32px 9px 32px 32px;
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .welcome-dialog.content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .welcome-dialog.content .plan-info-header {
+    font: var(--text-h2-bold);
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .welcome-dialog.content-block {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    align-items: center;
+    gap: 16px;
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .content-block i {
+    --icon-size: 24px;
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .content-block .content-info {
+    display: flex;
+    flex-direction: column;
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .content-block .content-info .info-header {
+    font: var(--text-h3-bold);
+    color: var(--text-color-high);
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .content-block .content-info .info-text {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+}
+.mega-dialog.upgrade-welcome-dialog footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 24px;
+}
+.mega-dialog.upgrade-welcome-dialog footer button {
+    width: max-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-end;
+}
+.mega-dialog.upgrade-welcome-dialog .image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mega-dialog.upgrade-welcome-dialog .image {
+    background-image: url("../images/mega/dialog-welcome-image.png");
+    width: 221px;
+    height: 221px;
+    background-size: 221px;
+}
+
+/* Welcome dialog end */

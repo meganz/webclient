@@ -48,7 +48,12 @@ export default class WaitingRoom extends MegaRenderMixin {
             null,
             l.wr_leave_confirmation,
             '',
-            cb => cb && this.doLeave(),
+            cb => {
+                if (cb) {
+                    delay('chat-event-wr-leave', () => eventlog(99938));
+                    this.doLeave();
+                }
+            },
             1
         );
 
@@ -429,6 +434,7 @@ export default class WaitingRoom extends MegaRenderMixin {
                 return this.renderDeniedDialog();
             }
             if (termCode === SfuClient.TermCode.kWaitingRoomAllowTimeout) {
+                delay('chat-event-wr-timeout', () => eventlog(99939));
                 return this.renderTimeoutDialog();
             }
         });

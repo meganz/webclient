@@ -368,7 +368,10 @@ class ConversationsApp extends MegaRenderMixin {
                     leftPaneWidth={leftPaneWidth}
                     renderView={view => this.renderView(view)}
                     startMeeting={() => this.startMeeting()}
-                    scheduleMeeting={() => this.setState({ scheduleMeetingDialog: true })}
+                    scheduleMeeting={() => {
+                        this.setState({ scheduleMeetingDialog: true });
+                        delay(`chat-event-sm-button-main`, () => eventlog(99918));
+                    }}
                     createGroupChat={() => this.setState({ startGroupChatDialog: true })}
                 />
 

@@ -89,7 +89,12 @@ mobile.settings.account.changePassword = Object.create(mobile.settingsHelper, {
 
             // Pass the encrypted password to the API
             this.processChange(newPassword)
-                .then(() => {
+                .then((res) => {
+                    // Progress stopped
+                    if (res === false) {
+                        return false;
+                    }
+
                     // Load the account page
                     loadSubPage('fm/account');
 
@@ -141,10 +146,12 @@ mobile.settings.account.changePassword = Object.create(mobile.settingsHelper, {
         value: async function(newPassword) {
             'use strict';
 
+            const hasTwoFactor = await twofactor.isEnabledForAccount();
             let twoFactorPin = null;
 
-            if (await twofactor.isEnabledForAccount().catch(tell)) {
-                twoFactorPin = await mobile.twofactor.verifyAction.init();
+            if (hasTwoFactor &&
+                !(twoFactorPin = await mobile.settings.account.twofactorVerifyAction.init())) {
+                return false;
             }
             return this.continueChangePassword(newPassword, twoFactorPin);
         }

@@ -107,10 +107,12 @@ mobile.settings.account.changeEmail = Object.create(mobile.settingsHelper, {
         value: async function(newEmail) {
             'use strict';
 
+            const hasTwoFactor = await twofactor.isEnabledForAccount();
             let twoFactorPin = null;
 
-            if (await twofactor.isEnabledForAccount().catch(tell)) {
-                twoFactorPin = await mobile.twofactor.verifyAction.init();
+            if (hasTwoFactor &&
+                !(twoFactorPin = await mobile.settings.account.twofactorVerifyAction.init())) {
+                return false;
             }
             this.continueChangeEmail(newEmail, twoFactorPin);
         }

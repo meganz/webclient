@@ -714,7 +714,7 @@ var redeem = {
             }
 
             $greenBtn.removeClass('disabled');
-            $whiteBtn.removeAttr('bFail');
+            $whiteBtn.removeClass('disabled').removeAttr('bFail');
             $dlgTitle.removeClass('red');
 
             // If Business (NB: Pro Flexi also sets businessmonths property, so we need to be specific)
@@ -755,6 +755,34 @@ var redeem = {
                     voucherType = l.s4_beta_title;
                     titleText = l.account_voucher_month;
                     monthsOrYears = mega.voucher.businessmonths;
+                    const $termsCheck = $('.s4-voucher-terms-check', $dlg)
+                        .addClass('checkboxOff')
+                        .removeClass('hidden checkboxOn');
+                    const termsToggle = () => {
+                        if ($termsCheck.hasClass('checkboxOff')) {
+                            $termsCheck.addClass('checkboxOn').removeClass('checkboxOff');
+                            $greenBtn.removeClass('disabled');
+                            if (u_type !== 3) {
+                                $whiteBtn.removeClass('disabled');
+                            }
+                        }
+                        else {
+                            $termsCheck.addClass('checkboxOff').removeClass('checkboxOn');
+                            $greenBtn.addClass('disabled');
+                            if (u_type !== 3) {
+                                $whiteBtn.addClass('disabled');
+                            }
+                        }
+                    };
+                    $termsCheck.rebind('click.redeemterms', termsToggle);
+                    $('.s4-voucher-terms-label', $dlg).removeClass('hidden').rebind('click.redeemterms', termsToggle);
+                    $greenBtn.addClass('disabled');
+                    if (u_type !== 3) {
+                        $whiteBtn.addClass('disabled');
+                    }
+                }
+                else {
+                    $('.s4-voucher-terms-check, .s4-voucher-terms-label', $dlg).addClass('hidden');
                 }
 
                 $dlgTitle.text(mega.icu.format(titleText, monthsOrYears).replace('%1', voucherType));
@@ -956,8 +984,16 @@ var redeem = {
                 var b = v.promotional ? v.value : (v.balance + v.value);
                 var validPlanItem = v.item && v.item.al && v.item.s && v.item.t && v.item.m && v.item.p;
 
+                // If Temp S4 beta voucher
+                if (v.s4) {
+                    // 60TB each.
+                    v.storage = 61440;
+                    v.bandwidth = 61440;
+                    // Fake as pro-flexi level.
+                    v.proNum = redeem.getProFlexiPlan(v.plans).al;
+                }
                 // If Pro Flexi promotional voucher
-                if (v.promotional === redeem.PROMO_VOUCHER_PRO_FLEXI) {
+                else if (v.promotional === redeem.PROMO_VOUCHER_PRO_FLEXI) {
 
                     const plan = redeem.getProFlexiPlan(v.plans);
 

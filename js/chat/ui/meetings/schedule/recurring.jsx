@@ -764,6 +764,7 @@ export class Edit extends MegaRenderMixin {
                                 if (
                                     startDateTime !== this.occurrenceRef.start || endDateTime !== this.occurrenceRef.end
                                 ) {
+                                    delay('chat-event-sm-edit-meeting', () => eventlog(99923));
                                     this.occurrenceRef.update(startDateTime, endDateTime);
                                 }
                                 onClose();

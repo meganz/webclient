@@ -236,6 +236,31 @@ lazy(mega.gallery, 'albums', () => {
     };
 
     /**
+     * Checking if the provided nodes qualify for the slideshow action
+     * @param {MegaNodep[]} nodes Nodes to check against
+     * @returns {Boolean}
+     */
+    scope.nodesAllowSlideshow = (nodes) => {
+        if (nodes.length <= 1) {
+            return false;
+        }
+
+        let imgCount = 0;
+
+        for (let i = 0; i < nodes.length; i++) {
+            if (scope.isImage(nodes[i])) {
+                imgCount++;
+
+                if (imgCount > 1) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    };
+
+    /**
      * Fetching all MegaNode handles from specified albums
      * @param {String[]} albumIds ID of albums to fetch handles from
      * @returns {String[]}
@@ -2227,10 +2252,10 @@ lazy(mega.gallery, 'albums', () => {
             super();
 
             const options = [];
-            const album = scope.albums.store[albumId];
-            const isUserAlbum = !album.filterFn;
+            const { nodes, p, filterFn } = scope.albums.store[albumId];
+            const isUserAlbum = !filterFn;
 
-            if (album.nodes.length && album.nodes.some(n => !scope.isVideo(n))) {
+            if (scope.nodesAllowSlideshow(nodes)) {
                 options.push({
                     label: l.album_play_slideshow,
                     icon: 'play-square',
@@ -2246,7 +2271,7 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             if (isPublic) {
-                if (album.nodes.length) {
+                if (nodes.length) {
                     options.push(
                         {},
                         generateDownloadMenuItem([albumId]),
@@ -2289,7 +2314,7 @@ lazy(mega.gallery, 'albums', () => {
                         {}
                     );
 
-                    if (album.p) {
+                    if (p) {
                         options.push(
                             {
                                 label: l[6909],
@@ -2320,7 +2345,7 @@ lazy(mega.gallery, 'albums', () => {
 
                     options.push({});
 
-                    if (album.nodes.length) {
+                    if (nodes.length) {
                         options.push(
                             generateDownloadMenuItem([albumId]),
                             {
@@ -2650,20 +2675,19 @@ lazy(mega.gallery, 'albums', () => {
             span.textContent = span.title;
         }
 
-        setSpecificAlbumButtons(albumId, handles) {
-            const album = scope.albums.store[albumId];
-
-            if (!album) {
+        setSpecificAlbumButtons(albumId) {
+            if (!scope.albums.store[albumId]) {
                 return;
             }
 
-            let nodesAvailable = false;
-            let needSlideshow = false;
+            const { nodes, filterFn, p } = scope.albums.store[albumId];
+
+            const nodesAvailable = !!nodes.length;
             const buttons = [];
+            const needSlideshow = scope.nodesAllowSlideshow(nodes);
 
             if (scope.albums.isPublic) {
-                needSlideshow = album.nodes.some((h) => !!scope.isImage(M.d[h]));
-                if (album.nodes.length && needSlideshow) {
+                if (needSlideshow) {
                     buttons.push([
                         l.album_play_slideshow,
                         'play-square icon-blue',
@@ -2677,42 +2701,7 @@ lazy(mega.gallery, 'albums', () => {
                 }
             }
             else {
-                const checkAlbumNodes = () => {
-                    if (Array.isArray(handles) && handles.length) {
-                        needSlideshow = true;
-                        nodesAvailable = true;
-
-                        for (let i = 0; i < handles.length; i++) {
-                            const n = M.d[handles[i]];
-
-                            if (!n) {
-                                continue;
-                            }
-
-                            if (scope.isVideo(n)) {
-                                needSlideshow = false;
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        for (let i = 0; i < album.nodes.length; i++) {
-                            nodesAvailable = true;
-
-                            if (!scope.isVideo(album.nodes[i])) {
-                                needSlideshow = true;
-                            }
-
-                            if (nodesAvailable && needSlideshow) {
-                                break;
-                            }
-                        }
-                    }
-                };
-
-                checkAlbumNodes();
-
-                if (!album.filterFn) {
+                if (!filterFn) {
                     buttons.push(
                         [
                             l.add_album_items,
@@ -2725,10 +2714,10 @@ lazy(mega.gallery, 'albums', () => {
                             !M.v.length
                         ],
                         [
-                            album.p ? l[6909] : mega.icu.format(l.album_share_link, 1),
+                            p ? l[6909] : mega.icu.format(l.album_share_link, 1),
                             'link icon-yellow',
                             () => {
-                                if (album.p) {
+                                if (p) {
                                     const dialog = new AlbumShareDialog([albumId]);
                                     dialog.show();
                                 }
@@ -2779,7 +2768,7 @@ lazy(mega.gallery, 'albums', () => {
                     ]);
                 }
 
-                if (album.p) {
+                if (p) {
                     buttons.push([
                         l[6821],
                         'link-remove',
@@ -2790,7 +2779,7 @@ lazy(mega.gallery, 'albums', () => {
                     ]);
                 }
 
-                if (!album.filterFn) {
+                if (!filterFn) {
                     buttons.push(
                         [
                             l.rename_album,
@@ -2871,15 +2860,15 @@ lazy(mega.gallery, 'albums', () => {
             );
         }
 
-        update(albumId, handles) {
-            this.setRightControls(albumId, handles);
+        update(albumId) {
+            this.setRightControls(albumId);
             this.setBreadcrumbs(albumId);
 
             // Only 'Albums' section needs this. Otherwise the banner does not appear in albums
             $('.fm-right-files-block').addClass('visible-notification');
         }
 
-        setRightControls(albumId, handles) {
+        setRightControls(albumId) {
             if (this.rightButtons) {
                 while (this.rightButtons.firstChild) {
                     this.rightButtons.removeChild(this.rightButtons.firstChild);
@@ -2892,7 +2881,7 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             if (albumId) {
-                this.setSpecificAlbumButtons(albumId, handles);
+                this.setSpecificAlbumButtons(albumId);
             }
             else {
                 this.setGlobalButtons();

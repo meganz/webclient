@@ -1005,8 +1005,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                 const vid = mega.gallery.isVideo(M.d[h]);
                 return !!(vid && vid.isPreviewable && MediaAttribute.getMediaType(M.d[h]));
             });
+            const allowSlideshow = oneImageSelected
+                && mega.gallery.nodesAllowSlideshow(mega.gallery.albums.store[M.d[pfid].id].nodes);
 
-            slideshowItem.toggleClass('hidden', !oneImageSelected);
+            slideshowItem.toggleClass('hidden', !allowSlideshow);
             previewItem.toggleClass('hidden', !hasImageSelected);
             $menuCMI.filter('.properties-item').removeClass('hidden');
             importItem.removeClass('hidden');

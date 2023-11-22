@@ -158,6 +158,13 @@
 /* Icon images styles */
 .overlay-wrap .image i.key {
     background-image: url("../../images/mobile/key.png");
+}
+.overlay-wrap .image i.reload {
+    background-image: url("../../images/mobile/reload.png");
+}
+
+.overlay-wrap .image i.key,
+.overlay-wrap .image i.reload {
     background-size: contain;
     width: 96px;
     height: 96px;

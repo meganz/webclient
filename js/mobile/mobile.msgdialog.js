@@ -12,6 +12,30 @@
 function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
     'use strict';
 
+    if (msg === l[7713]) {
+
+        mega.ui.sheet.show({
+            name: 'reload-account',
+            type: 'modal',
+            showClose: true,
+            icon: 'reload',
+            title: l[23433],
+            contents: [l[7713]],
+            actions: [
+                {
+                    type: 'normal',
+                    text: l.reload_account_btn,
+                    onClick: () => {
+                        mega.ui.sheet.hide();
+                        callback(true);
+                    }
+                }
+            ]
+        });
+
+        return;
+    }
+
     const dialogType = type.split(':');
     var icon = '';
 

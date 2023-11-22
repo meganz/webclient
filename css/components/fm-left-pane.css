@@ -133,6 +133,39 @@
     display: flex;
     flex-direction: column;
 }
+.lp-storage-usage {
+    position: relative;
+}
+.lp-storage-usage .lp-storage-information-popup {
+    position: absolute;
+    display: none;
+    bottom: 120%;
+    width: 80%;
+    max-width: 185px;
+    background-color: var(--surface-grey-1-inverted);
+    border-radius: 6px;
+    padding: 8px 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: var(--text-color-high-inverted);
+}
+.lp-storage-usage .lp-storage-information-popup::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -11px;
+    margin: 0 auto;
+    width: 0;
+    height: 0;
+    border-top: 12px solid var(--surface-grey-1-inverted);
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+}
+.lp-storage-usage .lp-storage-information-popup.hovered {
+    display: flex;
+}
 .lp-storage-usage .storage-usage-panel.hidden {
     display: none;
 }
@@ -141,11 +174,15 @@
     justify-content: space-between;
     margin-bottom: 6px;
 }
+.lp-storage-usage .storage-usage-panel .title-block .plan-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
 .lp-storage-usage .storage-usage-panel .title-block .plan {
     color: var(--stroke-main-inverted);
     font: var(--text-body2);
     line-height: 18px;
-    margin-right: 16px;
     white-space: nowrap;
 }
 .lp-storage-usage .storage-usage-panel .storage-graph {

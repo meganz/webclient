@@ -739,7 +739,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
     // In MEGA Lite, on login and visiting the User Management page, the cloud drive is still showing, so hide it.
     // NB: Not using the hidden class, because something else is continually re-rendering and removing it.
-    if (mega.lite) {
+    if (mega.lite.inLiteMode) {
         $('.files-grid-view.fm').addClass('mega-lite-hidden');
     }
 };

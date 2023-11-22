@@ -132,7 +132,7 @@
         }
 
         // Hide versioning details temporarily, due to it not working correctly in MEGA Lite / Infinity
-        if (mega.lite) {
+        if (mega.lite.inLiteMode) {
             versioningFlag = false;
         }
 
@@ -345,7 +345,7 @@
         }
 
         /* If in MEGA Lite mode for folders, temporarily hide the Total Size and Contains info which isn't known */
-        if (mega.lite && mega.lite.containsFolderInSelection($.selected)) {
+        if (mega.lite.inLiteMode && mega.lite.containsFolderInSelection($.selected)) {
             $dialog.addClass('hide-size-and-contains');
         }
         else {

@@ -812,6 +812,7 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/account/delete': l[16115],
         'fm/account/plan': l[16166],
         'fm/account/notifications': l[862],
+        'fm/two-factor-confirmation': l[19194],
         'fm/refer': l[22682],
         'fm/refer/guide': l[22683],
         'fm/refer/history': l[22808],

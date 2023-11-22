@@ -3049,7 +3049,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.twofactor.verify-setup.js', n: 'mobile_twofactor_verify_setup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-disable.js', n: 'mobile_twofactor_verify_disable_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.phone-input.js', n: 'mobile_sms_phone_input_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.verify-code.js', n: 'mobile_sms_verify_code_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.verify-success.js', n: 'mobile_sms_verify_success_js', j: 1, w: 1});
@@ -3090,6 +3089,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/changePassword.js', n: 'mobile_change_password_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/changeEmail.js', n: 'mobile_change_email_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/verifyEmail.js', n: 'mobile_verfiy_email_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/twofactorVerifyAction.js', n: 'mobile_verfiy_action_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/privacyAndSecurity.js', n: 'mobile_privacy_security_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/history.js', n: 'mobile_session_history_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});

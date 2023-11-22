@@ -443,10 +443,14 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                         if (result) {
 
                             // Show the verify 2FA page to collect the user's PIN
-                            return mobile.twofactor.verifyAction.init();
+                            return mobile.settings.account.twofactorVerifyAction.init();
                         }
                     })
                     .then((twoFactorPin) => {
+
+                        if (twoFactorPin === false) {
+                            return false;
+                        }
 
                         // Complete the cancellation process
                         mobile.settings.account.continueAccountCancelProcess($page, twoFactorPin || null);
@@ -466,9 +470,6 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             'use strict';
 
-            // Cache selector
-            var $verifyActionPage = $('.mobile.two-factor-page.verify-action-page');
-
             // Prepare the request
             var request = {a: 'erm', m: u_attr.email, t: 21};
 
@@ -480,35 +481,32 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             loadingDialog.show();
 
             // Make account cancellation request
-            api.req(request).then(({result}) => {
-                loadingDialog.hide();
-
-                // If something went wrong with the 2FA PIN
-                if (result === EFAILED || result === EEXPIRED) {
-                    mobile.twofactor.verifyAction.showVerificationError();
-                }
-
-                // Check for incorrect email
-                else if (result === ENOENT) {
-                    $page.removeClass('hidden');
-                    $verifyActionPage.addClass('hidden');
-                    mobile.messageOverlay.show(l[1513], l[1946]);
-                }
-
-                // If successful, show a dialog saying they need to check their email
-                else if (result === 0) {
-                    $page.removeClass('hidden');
-                    $verifyActionPage.addClass('hidden');
-                    mobile.showEmailConfirmOverlay();
-                    $('#startholder').addClass('no-scroll');
-                }
-                else {
-                    // Oops, something went wrong
-                    $page.removeClass('hidden');
-                    $verifyActionPage.addClass('hidden');
-                    mobile.messageOverlay.show(l[135], l[200]);
-                }
-            });
+            api.req(request)
+                .then(({result}) => {
+                    // If successful, show a dialog saying they need to check their email
+                    if (result === 0) {
+                        $page.removeClass('hidden');
+                        mobile.showEmailConfirmOverlay();
+                        $('#startholder').addClass('no-scroll');
+                    }
+                })
+                .catch((ex) => {
+                    // If something went wrong with the 2FA PIN
+                    if (ex === EFAILED || ex === EEXPIRED) {
+                        msgDialog('warninga', l[135], l[19216]);
+                    }
+                    // Check for incorrect email
+                    else if (ex === ENOENT) {
+                        $page.removeClass('hidden');
+                        msgDialog('warninga', l[1513], l[1946]);
+                    }
+                    else {
+                        // Oops, something went wrong
+                        $page.removeClass('hidden');
+                        msgDialog('warninga', l[135], l[200]);
+                    }
+                })
+                .finally(() => loadingDialog.hide());
         }
     },
 

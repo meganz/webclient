@@ -1559,6 +1559,9 @@ scparser.$add('sqac', (a) => {
                     M.accountData();
                 }
             }
+            if (u_attr) {
+                delete u_attr.tq;
+            }
             M.storageQuotaCache = null;
 
             if ($.topMenu) {

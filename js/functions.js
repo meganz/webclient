@@ -293,7 +293,8 @@ function numOfBytes(bytes, precision, isSpd) {
     }
 
     var fn = isSpd ? bytesToSpeed : bytesToSize;
-    var parts = fn(bytes, precision).split(' ');
+    const formatted = fn(bytes, precision);
+    const parts = formatted.split(formatted.includes(' ') ? ' ' : '\u00A0');
 
     return { size: parts[0], unit: parts[1] || 'B' };
 }
@@ -384,8 +385,10 @@ function bytesToSize(bytes, precision, format) {
     else if (format && format !== 4) {
         return '<span>' + resultSize + '</span>' + resultUnit;
     }
+
+    // \u00A0 is a non-breaking space so that the size and unit will always remain on the same line
     else {
-        return resultSize + ' ' + resultUnit;
+        return resultSize + '\u00A0' + resultUnit;
     }
 }
 

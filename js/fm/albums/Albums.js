@@ -3892,12 +3892,17 @@ lazy(mega.gallery, 'albums', () => {
                     sortStore();
 
                     if (isExisting) {
-                        data.e = Object.keys(album.eIds).map((id) => {
-                            return {
+                        const ids = Object.keys(album.eIds);
+                        data.e = Object.create(null);
+
+                        for (let i = 0; i < ids.length; i++) {
+                            const id = ids[i];
+
+                            data.e[id] = {
                                 id,
                                 h: album.eIds[id]
                             };
-                        });
+                        }
 
                         data.p = album.p;
                     }

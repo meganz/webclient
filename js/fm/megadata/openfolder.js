@@ -616,6 +616,7 @@
         this.chat = false;
         this.search = false;
         this.recents = false;
+        this.albums = false;
 
         if (
             this.gallery
@@ -792,7 +793,7 @@
             this.gallery = 2;
         }
         else if (cv.type === 'gallery' || window.pfcol) {
-
+            this.albums = 1;
             this.gallery = 1;
         }
         else if (cv.type === 's4') {
@@ -819,6 +820,9 @@
                 loadSubPage('fm/chat/contacts');
             }
             return EAGAIN;
+        }
+        else if (id && id.startsWith('albums')) {
+            this.albums = true;
         }
         else if (id !== 'transfers') {
             if (id && id.substr(0, 9) === 'versions/') {

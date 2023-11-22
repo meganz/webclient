@@ -927,7 +927,7 @@
         }
 
         // In MEGA Lite mode, remove this temporary class
-        if (mega.lite) {
+        if (mega.lite.inLiteMode) {
             $('.files-grid-view.fm').removeClass('mega-lite-hidden');
         }
 

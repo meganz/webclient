@@ -410,7 +410,7 @@ function init_page() {
     document.body.classList.remove('business', 'bottom-pages', 'old', 'pro', 'mega-lite-mode');
 
     // Add mega-lite-mode class to hide/show various elements in MEGA Lite mode
-    if (mega.lite) {
+    if (mega.lite.inLiteMode) {
         document.body.classList.add('mega-lite-mode');
     }
 
@@ -1944,7 +1944,7 @@ function topbarUI(holderId) {
     }
 
     // Initialise the Back to MEGA button (only shown if in MEGA Lite mode)
-    if (mega.lite) {
+    if (mega.lite.inLiteMode) {
         mega.lite.initBackToMegaButton();
     }
 

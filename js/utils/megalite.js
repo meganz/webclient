@@ -2,25 +2,26 @@
  * Functions for popping up a dialog to recommend MEGA Lite mode and other related functionality.
  * The MEGA Lite mode which has a bunch of visual changes for the user to show they are in this special mode and also
  * hides various functionality which doesn't work. It is only available if the localStorage.megaLiteMode is on, or
- * they are a Pro user AND have > 1.5M nodes AND their loading time is > 3 minutes.
+ * they are a Pro user AND have more than x nodes (from API, if rwdnc flag set) AND their loading time is > x minutes.
  * These functions are accesible externally via mega.lite.{functionName}
  *
- * @property {object|false} mega.lite
+ * @property {object} mega.lite
  */
 lazy(mega, 'lite', () => {
     'use strict';
 
-    // If the lite mode localStorage flag is not on, then all if (mega.lite) checks are false
-    if (!localStorage.megaLiteMode) {
-        return false;
-    }
+    /** Max load time in milliseconds */
+    const maxLoadTimeInMs = localStorage.testLargeNodes ? 1000 : 1000 * 60 * 2;
+
+    /** Flag to let UI code know if the site is currently in Lite mode or not */
+    const inLiteMode = Boolean(localStorage.megaLiteMode);
 
     /** Timer to count how long the load is taking */
     let liteModeTimeoutId;
 
     /**
      * Recommend MEGA Lite mode (if applicable). For the dialog to be shown, they must be a PRO user
-     * AND they have over 1.5 million nodes AND also their load time takes over 3 minutes
+     * AND they have over x nodes AND also their load time takes over x minutes
      * @returns {undefined}
      */
     function recommendLiteMode() {
@@ -31,14 +32,11 @@ lazy(mega, 'lite', () => {
             return false;
         }
 
-        // Check if API flag exists which is turned on if the ufssizecache > 1.5M nodes for the
+        // Check if API flag rwdnc exists which is turned on if the ufssizecache > x nodes for the
         // current user. If so, give the user the option to use MEGA Lite or continue loading normally.
         if (mega.flags.rwdnc || localStorage.testLargeNodes === '1') {
 
-            // Set max load time to 3 minutes
-            const maxLoadTimeInMs = localStorage.testLargeNodes ? 1000 : 1000 * 60 * 3;
-
-            // Initiate a counter and if it runs over 3 minutes, clear the timer and show the Lite Mode dialog
+            // Initiate a counter and if it runs over the max load time, clear the timer and show the Lite Mode dialog
             liteModeTimeoutId = setTimeout(() => {
                 showLiteModeDialog();
             }, maxLoadTimeInMs);
@@ -159,6 +157,7 @@ lazy(mega, 'lite', () => {
 
     // Make public the following:
     return freeze({
+        inLiteMode,
         recommendLiteMode,
         initBackToMegaButton,
         containsFolderInSelection,

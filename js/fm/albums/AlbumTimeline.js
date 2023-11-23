@@ -27,7 +27,8 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             const selections = Object.keys(albums.grid.timeline.selections);
             const albumId = scope.getAlbumIdFromPath();
-            const { filterFn, at, eIds, nodes } = albums.store[albumId];
+            const album = albums.store[albumId];
+            const { filterFn, at, eIds, nodes } = album;
             const options = [];
             let selectionsPreviewable = false;
 

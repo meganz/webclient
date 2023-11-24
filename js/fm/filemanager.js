@@ -845,7 +845,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 $('.breadcrumb-dropdown').removeClass('active');
             }
         }
-
+        $('.dropdown-search').addClass('hidden');
         $('.nw-sorting-menu').addClass('hidden');
         $('.colour-sorting-menu').addClass('hidden');
         $('.nw-tree-panel-arrows').removeClass('active');

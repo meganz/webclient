@@ -332,58 +332,6 @@
             return false;
         });
 
-        /**
-         * Adds event listeners related to the dropdown component
-         *
-         * @return {undefined}
-         */
-        function addDropdownEventListeners() {
-
-            addVisibilityListeners();
-
-            $dropdownResults = $('.dropdown-results', $dropdownSearch);
-            $dropdownEmptyState = $('.dropdown-no-recents', $dropdownSearch);
-            $dropdownRecents = $('.dropdown-recents', $dropdownSearch);
-            $fileSearch = $('.js-filesearcher', $topbar);
-
-            // Dropdown trigger when clicking after dropdown has been hidden
-            $fileSearch.rebind('click', () => {
-                renderUpdatedDropdown().then(()=>{
-                    delay('searchbar.click', eventlog.bind(null, 99898));
-                    $dropdownResults.addClass('hidden');
-                });
-            });
-
-            // Show only results if there is user provides text in the input
-            $fileSearch.rebind('input', ({target}) => {
-                if (target.value.length > 0) {
-
-                    $dropdownSearch.removeClass('hidden');
-
-                    // Hide recents
-                    $('.dropdown-recents.dropdown-section').addClass('hidden');
-                    $dropdownEmptyState.addClass('hidden');
-
-                    // TODO: remove this line if including search results
-                    $dropdownSearch.addClass('hidden');
-
-                    // Show search results
-                    // $dropdownResultsSection.removeClass('hidden');
-                }
-                else {
-                    // Hide search results if input is blank
-                    $dropdownResults.addClass('hidden');
-
-                    renderUpdatedDropdown();
-                }
-            });
-
-            // Clear all - Recently searched terms
-            $('.js-dropdownClearRecentlySearched').rebind('click', () => {
-                recentlySearched.clear();
-            });
-        }
-
         $('.js-btnclearSearch', $topbar).rebind('click.searchclear', (e) => {
             e.preventDefault();
 
@@ -400,6 +348,8 @@
             if (window.page.includes('/search')) {
                 loadSubPage(window.page.slice(0, window.page.indexOf('/search')));
             }
+
+            $dropdownSearch = $('.dropdown-search', $topbar).addClass('hidden');
 
             return false;
         });
@@ -431,6 +381,58 @@
     }
 
     /**
+     * Adds event listeners related to the dropdown component
+     *
+     * @return {undefined}
+     */
+    function addDropdownEventListeners() {
+
+        addVisibilityListeners();
+
+        $dropdownResults = $('.dropdown-results', $dropdownSearch);
+        $dropdownEmptyState = $('.dropdown-no-recents', $dropdownSearch);
+        $dropdownRecents = $('.dropdown-recents', $dropdownSearch);
+        $fileSearch = $('.js-filesearcher', $topbar);
+
+        // Dropdown trigger when clicking after dropdown has been hidden
+        $fileSearch.rebind('click.searchbar', () => {
+            renderUpdatedDropdown().then(()=>{
+                delay('searchbar.click', eventlog.bind(null, 99898));
+                $dropdownResults.addClass('hidden');
+            });
+        });
+
+        // Show only results if there is user provides text in the input
+        $fileSearch.rebind('input.searchbar', ({target}) => {
+            if (target.value.length > 0) {
+
+                $dropdownSearch.removeClass('hidden');
+
+                // Hide recents
+                $('.dropdown-recents.dropdown-section', $dropdownSearch).addClass('hidden');
+                $dropdownEmptyState.addClass('hidden');
+
+                // TODO: remove this line if including search results
+                $dropdownSearch.addClass('hidden');
+
+                // Show search results
+                // $dropdownResultsSection.removeClass('hidden');
+            }
+            else {
+                // Hide search results if input is blank
+                $dropdownResults.addClass('hidden');
+
+                renderUpdatedDropdown();
+            }
+        });
+
+        // Clear all - Recently searched terms
+        $('.js-dropdownClearRecentlySearched', $topbar).rebind('click.rsClear', () => {
+            recentlySearched.clear();
+        });
+    }
+
+    /**
      * Remove dropdown visibility listeners
      *
      * @return {undefined}
@@ -458,7 +460,7 @@
         });
 
         // Dropdown trigger on defocus
-        $('.fmholder').rebind('click.searchbar', (event) => {
+        $('.fmholder').rebind('mousedown.searchbar', (event) => {
             const $target = $(event.target);
             if ($target.closest('.dropdown-search').length === 0
                 && $target.closest('.js-topbar-searcher').length === 0) {
@@ -508,7 +510,7 @@
     function showCorrectSearch(page) {
         const $miniSearch = $('.mini-search', $topbar);
         const $mainSearch = $('.searcher-wrapper .js-topbar-searcher', $topbar);
-        const $dropdownSearch = $('dropdown-search', $topbar);
+        const $dropdownSearch = $('.dropdown-search', $topbar);
 
         // Show the correct search bar
         if ((u_type !== false || pfid) && !pfcol) {
@@ -809,6 +811,7 @@
         refresh: refreshSearch,
         closeMiniSearch,
         recentlySearched,
-        recentlyOpened
+        recentlyOpened,
+        addDropdownEventListeners,
     };
 })(window);

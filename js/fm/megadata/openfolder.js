@@ -335,6 +335,7 @@
         $('.nw-fm-tree-item.opened').removeClass('opened');
         $('.fm-notification-block.duplicated-items-found').removeClass('visible');
         $('.fm-breadcrumbs-wrapper', $fmRightHeader).removeClass('hidden');
+        $('.column-settings.overlap').removeClass('hidden');
         $resultsCount.addClass('hidden');
 
         if (folderlink && !pfcol || id !== M.RootID && M.currentrootid === M.RootID) {
@@ -415,6 +416,7 @@
             else if (id.substr(0, 6) === 'search') {
                 this.filterBySearch(this.currentdirid);
                 $('.fm-breadcrumbs-wrapper', $fmRightHeader).addClass('hidden');
+                $('.column-settings.overlap').addClass('hidden');
                 $resultsCount.removeClass('hidden');
                 $resultsCount.text(mega.icu.format(l.search_results_count, M.v.length));
             }

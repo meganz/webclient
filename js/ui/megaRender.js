@@ -25,6 +25,9 @@
                     '<td megatype="timeMd" class="time md"></td>' +
                     '<td megatype="versions" class="hd-versions"></td>' +
                     '<td megatype="playtime" class="playtime"></td>' +
+                    '<td megatype="fileLoc" class="fileLoc">' +
+                        '<span class="grid-file-location"></span>' +
+                    '</td>' +
                     '<td megatype="extras" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                         '<span class="versioning-indicator">' +
@@ -184,6 +187,9 @@
                     '<td megatype="timeMd" class="time md"></td>' +
                     '<td megatype="versions" class="hd-versions"></td>' +
                     '<td megatype="playtime" class="playtime"></td>' +
+                    '<td megatype="fileLoc" class="fileLoc">' +
+                        '<span class="grid-file-location"></span>' +
+                    '</td>' +
                     '<td megatype="extras" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                         '<span class="versioning-indicator">' +
@@ -924,6 +930,16 @@
                         props.labelC = this.labelsColors[colourLabel];
                     }
                 }
+                if (aNode.su) {
+                    props.parentName = l[5542];
+                }
+                else if (aNode.p === M.RubbishID) {
+                    props.parentName = l[167];
+                }
+                else {
+                    const pHandle = M.getNodeByHandle(aNode.p);
+                    props.parentName = M.getNameByHandle(pHandle);
+                }
 
                 return props;
             },
@@ -1129,6 +1145,7 @@
                     aTemplate.querySelector('.type').textContent = aProperties.type;
                     aTemplate.querySelector('.time').textContent = aProperties.time;
                     aTemplate.querySelector('.time.md').textContent = aProperties.mTime;
+                    aTemplate.querySelector('.fileLoc span').textContent = aProperties.parentName;
                     aTemplate.querySelector('.label').textContent = aProperties.labelC || '';
 
                     tmp = aTemplate.querySelector('.tranfer-filetype-txt');

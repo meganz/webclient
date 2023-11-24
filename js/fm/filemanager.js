@@ -4397,7 +4397,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     this.currentTreeType = M.treePanelType();
 
-    $('.fm.fm-right-header, .fm-import-donwload-buttons, .gallery-tabs-bl', $fmholder).addClass('hidden');
+    $('.fm.fm-right-header, .fm-import-download-buttons, .gallery-tabs-bl', $fmholder).addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).off('click');
 
     $fmholder.removeClass('affiliate-program');
@@ -4432,7 +4432,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
             // Remove import and download buttons from the search result.
             if (!String(M.currentdirid).startsWith('search')) {
-                const $btnWrap = $('.fm-import-donwload-buttons', $fmholder).removeClass('hidden');
+                const $btnWrap = $('.fm-import-download-buttons', $fmholder).removeClass('hidden');
 
                 megasync.isInstalled((err, is) => {
 

@@ -340,6 +340,10 @@ html .theme-light-forced {
         --progress-bar-fill3: rgba(255, 165, 0, 1);
         --progress-bar-background: rgba(0, 0, 0, 0.2);
 
+    /* progress round */
+
+        --progress-round-fill: rgba(102, 102, 102, 1);
+
     /* scroll bar */
         --scroll-bar-background: rgba(0, 0, 0, 0.1);
         --scroll-bar-handle: rgba(0, 0, 0, 1);
@@ -566,6 +570,10 @@ html .theme-dark-forced {
         --progress-bar-fill2: rgba(255, 51, 58, 1);
         --progress-bar-fill3: rgba(255, 165, 0, 1);
         --progress-bar-background: rgba(255, 255, 255, 0.2);
+
+    /* progress */
+
+    --progress-fill: rgba(204, 204, 204, 1);
 
     /* scroll bar */
         --scroll-bar-background: rgba(0, 0, 0, 0.2);

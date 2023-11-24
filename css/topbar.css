@@ -34,12 +34,16 @@
     margin: 0;
     width: auto;
 }
+.topbar .fm-import-download-buttons {
+    margin-left: 16px;
+}
 .topbar .searcher-wrapper {
     flex-grow: 1;
     display: flex;
     justify-content: flex-start;
     align-items: flex-end;
-    padding: 0 4px;
+    -webkit-margin-start: 12px;
+    margin-inline-start: 12px;
 }
 .topbar-searcher {
     display: flex;
@@ -130,6 +134,31 @@
     gap: 24px;
     width: 100%;
 }
+.dropdown-search .dropdown-search-results .dropdown-search-results-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+}
+.dropdown-search .dropdown-search-results .dropdown-search-results-item-filename {
+    display: flex;
+    overflow: hidden;
+    margin-inline-start: 8px;
+}
+.dropdown-search .dropdown-search-results .dropdown-search-results-item-filename span {
+    white-space: pre;
+    opacity: 0.7;
+}
+.dropdown-search .dropdown-search-results .dropdown-search-results-item-filename .suffix {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dropdown-search .dropdown-search-results .dropdown-search-results-item-filename .txt-bold {
+    opacity: 1;
+}
+.dropdown-search-results-item-file-icon {
+    width: 22px;
+    height: 24px;
+    text-align: start;
+}
 .dropdown-section .dropdown-section-clear {
     color: var(--stroke-info)
 }
@@ -175,6 +204,9 @@
 .dropdown-section-body .dropdown-section-body-item:hover {
     background: var(--stroke-grey-2);
 }
+.dropdown-results .dropdown-section-body .dropdown-section-body-item:last-child:hover {
+    border-radius: 0 0 18px 18px;
+}
 .dropdown-section-body .dropdown-recently-searched-item {
     display: flex;
 }
@@ -209,6 +241,7 @@
 .dropdown-item-file {
     display: grid;
     grid-template-columns: auto 1fr;
+    align-items: center;
 }
 .dropdown-recently-opened-item-filename,
 .dropdown-recently-opened-item-location {
@@ -220,6 +253,7 @@
 }
 .dropdown-item-text-medium {
     color: var(--text-color-medium);
+    font: var(--text-body2);
 }
 .dropdown-no-recents {
     display: inline-flex;
@@ -248,6 +282,34 @@
     font-weight: 400;
     line-height: 30px;
 }
+.dropdown-search .search-loader {
+    display: flex;
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 48px;
+    height: 48px;
+    padding: 34px 0;
+    margin: auto;
+}
+.dropdown-search .search-loader::after {
+    content: "";
+    width: 30px;
+    height: 30px;
+    border: 5px solid #00c0a6;
+    border-top-color: var(--progress-round-fill);
+    border-radius: 50%;
+    animation: loading 0.75s ease infinite;
+} 
+
+@keyframes loading {
+from {
+    transform: rotate(0turn);
+}
+to {
+    transform: rotate(1turn);
+}
+      }
 /* mini search */
 
 .topbar .mini-search {

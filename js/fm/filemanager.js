@@ -19,6 +19,7 @@ function FileManager() {
     this.columnsWidth.cloud.playtime = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
     this.columnsWidth.cloud.accessCtrl = { max: 180, min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.fileLoc = { max: 180, min: 130, curr: 130, viewed: false };
 
     this.columnsWidth.makeNameColumnStatic = function() {
 
@@ -3619,10 +3620,46 @@ FileManager.prototype.addGridUI = function(refresh) {
             var storedColumnsPreferences = mega.config.get('fmColPrefs');
             if (storedColumnsPreferences !== undefined) {
                 var prefs = getFMColPrefs(storedColumnsPreferences);
+                const cgMenu = new Set(['fav', 'fname', 'size', 'type', 'timeAd', 'extras', 'accessCtrl', 'playtime']);
                 for (var colPref in prefs) {
                     if (Object.prototype.hasOwnProperty.call(prefs, colPref)) {
                         M.columnsWidth.cloud[colPref].viewed =
                             prefs[colPref] > 0;
+                    }
+                    if (cgMenu.has(colPref)) {
+                        M.columnsWidth.cloud[colPref].disabled = false;
+                    }
+                }
+            }
+            else {
+                // restore default columns (to show/hide columns)
+                const defaultColumnShow = new Set(['fav', 'fname', 'size', 'type', 'timeAd', 'extras', 'accessCtrl']);
+                const defaultColumnHidden = new Set(['label', 'timeMd', 'versions', 'playtime', 'fileLoc']);
+                for (const col in M.columnsWidth.cloud) {
+                    if (defaultColumnShow.has(col)) {
+                        M.columnsWidth.cloud[col].viewed = true;
+                        M.columnsWidth.cloud[col].disabled = false;
+                    }
+                    else if (defaultColumnHidden.has(col)) {
+                        M.columnsWidth.cloud[col].viewed = false;
+                        if (col === 'playtime') {
+                            M.columnsWidth.cloud[col].disabled = false;
+                        }
+                    }
+                }
+            }
+
+            if (String(M.currentdirid).startsWith('search')) {
+                // modified column to show for /search (Added link location dir)
+                const searchCol = new Set(['fav', 'fname', 'size', 'timeMd', 'fileLoc', 'extras']);
+                for (const col in M.columnsWidth.cloud) {
+                    if (searchCol.has(col)) {
+                        M.columnsWidth.cloud[col].viewed = true;
+                        M.columnsWidth.cloud[col].disabled = false;
+                    }
+                    else {
+                        M.columnsWidth.cloud[col].viewed = false;
+                        M.columnsWidth.cloud[col].disabled = true;
                     }
                 }
             }
@@ -3879,6 +3916,17 @@ FileManager.prototype.addGridUI = function(refresh) {
                 }
             }
         }
+    });
+
+    $('.grid-table .grid-file-location').rebind('click.fileLocation', (e) => {
+        const h = $(e.target).closest('tr').attr('id');
+        const node = M.getNodeByHandle(h);
+
+        // Incoming Shares section if shared folder doesn't have parent
+        const target = node.su && (!node.p || !M.d[node.p]) ? 'shares' : node.p;
+        M.openFolder(target).then(() => {
+            selectionManager.add_to_selection(node.h, true);
+        });
     });
 
     if (this.currentdirid === 'shares') {

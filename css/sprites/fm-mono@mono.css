@@ -333,6 +333,11 @@
   content: "\f2a8";
 }
 
+.sprite-fm-mono.icon-clock-rotate::before,
+.sprite-fm-mono-after.icon-clock-rotate-after::after {
+  content: "\f2a2";
+}
+
 .sprite-fm-mono.icon-clock-user-thin-solid::before,
 .sprite-fm-mono-after.icon-clock-user-thin-solid-after::after {
   content: "\f2a9";
@@ -1313,6 +1318,11 @@
 .sprite-fm-mono.icon-pin::before,
 .sprite-fm-mono-after.icon-pin-after::after {
   content: "\f368";
+}
+
+.sprite-fm-mono.icon-pin::before,
+.sprite-fm-mono-after.icon-pin-after::after {
+  content: "\f359";
 }
 
 .sprite-fm-mono.icon-plan-filled::before,

@@ -170,6 +170,9 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
 
     if (!u) {
 
+        // Re-add the searchbar dropdown event listeners
+        mega.ui.searchbar.addDropdownEventListeners();
+
         if (this.currentrootid === 'shares') {
             let savedUserSelection = null;
 

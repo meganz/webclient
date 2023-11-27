@@ -358,9 +358,12 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         var apipath = debug && localStorage.apipath;
         var cdlogger = debug && localStorage.chatdLogger;
         const rad = sessionStorage.rad;
-        const allowNullKeys = localStorage.allownullkeys;
-        const megaLiteMode = localStorage.megaLiteMode;
-        const testLargeNodes = localStorage.testLargeNodes;
+        const {
+            mInfinity,
+            megaLiteMode,
+            allownullkeys,
+            testLargeNodes
+        } = localStorage;
 
         force = force || sessionStorage.fmAetherReload;
 
@@ -406,8 +409,11 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         if (hashLogic) {
             localStorage.hashLogic = 1;
         }
-        if (allowNullKeys) {
+        if (allownullkeys) {
             localStorage.allownullkeys = 1;
+        }
+        if (mInfinity) {
+            localStorage.mInfinity = 1;
         }
         if (megaLiteMode) {
             localStorage.megaLiteMode = 1;
@@ -462,6 +468,16 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
 
             if (window.delay) {
                 delay.abort();
+            }
+
+            if (force === -0x7e080f) {
+                if (mega.infinity) {
+                    delete localStorage.mInfinity;
+                }
+                else {
+                    localStorage.mInfinity = 1;
+                }
+                delete localStorage.megaLiteMode;
             }
 
             if (window.fmdb) {

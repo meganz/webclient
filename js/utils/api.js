@@ -345,10 +345,7 @@ class MEGAPIRequest {
         const queue = this.inflight;
 
         this.logger.assert(!this.cancelled, 'dequeue: this channel is aborted.');
-        this.logger.assert(
-            responses.length === queue.length
-            || queue.length === 1 && queue[0].type === 'array' && queue[0].payload.length === responses.length,
-            'dequeue: unexpected response(s)');
+        this.logger.assert(this.validateRequestResponse(responses, queue), 'dequeue: unexpected response(s)');
 
         for (let i = 0; i < queue.length; ++i) {
             const data = queue[i];
@@ -360,7 +357,7 @@ class MEGAPIRequest {
                 return result;
             }
 
-            if (typeof result === 'number' && result < 0 || result instanceof APIRequestError) {
+            if (this.isRequestError(result)) {
 
                 reject(result);
             }
@@ -379,6 +376,23 @@ class MEGAPIRequest {
         }
     }
 
+    isRequestError(value) {
+        return typeof value === 'number' && value < 0 || value instanceof APIRequestError;
+    }
+
+    validateRequestResponse(responses, queue) {
+
+        if (responses.length !== queue.length) {
+
+            return queue.length === 1 && queue[0].type === 'array'
+                && (
+                    queue[0].payload.length === responses.length || responses[0] === EROLLEDBACK
+                );
+        }
+
+        return true;
+    }
+
     getRequestResponse(responses, index, payload, type) {
         let result = responses[index];
 
@@ -389,14 +403,25 @@ class MEGAPIRequest {
             result = new APIRequestError(result.err, result);
         }
 
-        if (type === 'array' && Number(result) === EROLLEDBACK) {
+        if (type === 'array') {
+            let rolledBack;
 
-            for (let i = responses.length; i--;) {
-                result = this.getRequestResponse(responses, i, payload);
+            for (index = responses.length; index--;) {
+                result = this.getRequestResponse(responses, index, payload);
 
-                if (Number(result) !== EROLLEDBACK) {
-                    break;
+                if (this.isRequestError(result)) {
+
+                    rolledBack = true;
+
+                    if (Number(result) !== EROLLEDBACK) {
+                        break;
+                    }
                 }
+            }
+
+            if (rolledBack) {
+
+                result = new APIRequestError(EROLLEDBACK, {index, result});
             }
         }
 
@@ -1184,6 +1209,8 @@ lazy(self, 'api', () => {
     const apixs = [];
     const inflight = new Map();
     const observers = new MapSet();
+    const seenTreeFetch = new Set();
+    const pendingTreeFetch = new Set();
     const logger = new MegaLogger(`api.xs${makeUUID().substr(-18)}`);
     const clone = ((clone) => (value) => clone(value))(window.Dexie && Dexie.deepClone || window.clone || echo);
     const cache = new LRULapse(12, 36, self.d > 0 && ((...args) => logger.debug('reply.cache flush', ...args)));
@@ -1568,18 +1595,47 @@ lazy(self, 'api', () => {
          */
         async tree(handles) {
 
-            if (!Array.isArray(handles)) {
-                handles = [handles];
+            if (Array.isArray(handles)) {
+
+                handles.forEach(pendingTreeFetch.add, pendingTreeFetch);
             }
-            handles = [...new Set(handles)];
+            else {
+                pendingTreeFetch.add(handles);
+            }
 
-            return lock('tree-fetch.lock', () => {
-                const payload =
-                    handles.filter((h) => !M.d[h] || M.d[h].t && !M.c[h])
-                        .map((n) => ({a: 'f', r: 1, inc: 1, n}));
+            return lock('tree-fetch.lock', async() => {
+                const pending = [...pendingTreeFetch];
+                pendingTreeFetch.clear();
 
-                if (payload.length) {
-                    return this.req(payload, 4);
+                // @todo ensure we won't store into "seen" a node we may need again (e.g. deleted/restored)
+
+                const payload = [];
+                for (let i = pending.length; i--;) {
+                    const n = pending[i];
+
+                    if (!seenTreeFetch.has(n) && (!M.d[n] || M.d[n].t && !M.c[n])) {
+
+                        seenTreeFetch.add(n);
+                        payload.push({a: 'f', r: 1, inc: 1, n});
+                    }
+                }
+
+                while (payload.length) {
+                    const res = await this.req(payload, 4).catch(echo);
+                    const val = Number(res);
+
+                    if (val === EROLLEDBACK) {
+                        if (self.d) {
+                            logger.warn('Rolling back command#%d/%d', res.index, payload.length, res.result);
+                        }
+                        payload.splice(res.index, 1);
+                    }
+                    else {
+                        if (val < 0) {
+                            throw val;
+                        }
+                        return res;
+                    }
                 }
             });
         },

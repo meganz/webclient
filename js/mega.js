@@ -4184,7 +4184,7 @@ function fm_thumbnails(mode, nodeList, callback)
         return pwd === M.currentdirid && (mode === 'standalone' || isVisible.dom(n));
     };
     isVisible.dom = M.megaRender
-        ? (n) => n.seen && M.megaRender.isDOMNodeVisible(n.h)
+        ? (n) => n.seen && M.megaRender && M.megaRender.isDOMNodeVisible(n.h)
         : (n) => elementIsVisible(document.getElementById(n.h));
 
     const setSrcAttribute = (n, uri) => {

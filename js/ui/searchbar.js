@@ -757,21 +757,7 @@
 
             recentlyOpened.addFile(id, editable);
 
-            if (editable) {
-                loadingDialog.show('common', l[23130]);
-
-                mega.fileTextEditor.getFile(id).done(
-                    (data) => {
-                        loadingDialog.hide();
-                        mega.textEditorUI.setupEditor(M.d[id].name, data, id);
-                    }
-                ).fail(() => {
-                    loadingDialog.hide();
-                });
-            }
-            else {
-                slideshow(id);
-            }
+            M.viewMediaFile(id);
         });
     }
 

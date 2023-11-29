@@ -1179,11 +1179,15 @@ lazy(mega, 'keyMgr', () => {
             if (!pkPull.dsLock) {
                 pkPull.dsLock = mega.promise;
 
+                let shares = mega.infinity && array.unique((await fmdb.get('s')).map(n => n.t || n.h));
+
                 onIdle(() => {
                     const {resolve} = pkPull.dsLock;
 
                     const promises = [];
-                    const shares = Object.keys(u_sharekeys);
+                    if (!shares.length) {
+                        shares = Object.keys(u_sharekeys);
+                    }
 
                     if (d) {
                         logger.warn(`Checking missing keys for... ${shares}`);

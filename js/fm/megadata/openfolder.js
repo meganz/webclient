@@ -915,6 +915,10 @@
             }
 
             if (handles.length) {
+                if (mega.infinity && !$.inSharesRebuild) {
+                    // @todo validate which nodes are legit to query here
+                    loadingDialog.show();
+                }
                 await dbfetch.geta(handles).catch(dump);
             }
 

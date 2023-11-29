@@ -2181,7 +2181,6 @@ function topmenuUI() {
         }
     }
 
-
     if (u_type === 3 && u_attr.fullname) {
         $('.user-name', $topHeader).text(u_attr.fullname).removeClass('hidden');
         $menuUsername.text(u_attr.fullname).removeClass('hidden');
@@ -2307,6 +2306,17 @@ function topmenuUI() {
 
         if (is_fm()) {
             $menuRefreshItem.removeClass('hidden');
+
+            if (self.d) {
+                $('.top-menu-item.infinity-item span', $topMenu)
+                    .text(`${mega.infinity ? l.leave : l[5906]} Infinity \u{1F343}`)
+                    .parent()
+                    .rebind('click', () => M.reload(-0x7e080f))
+                    .removeClass('hidden');
+            }
+            else {
+                $('.top-menu-item.infinity-item', $topMenu).addClass('hidden');
+            }
         }
 
         if (pfcol) {

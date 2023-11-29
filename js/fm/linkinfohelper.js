@@ -228,9 +228,14 @@ LinkInfoHelper.prototype.retrieve = async function() {
                     this.info.k = base64_to_a32(String(res.k.split(":")[1]).trim()).slice(0, 8);
                 }
                 if (this.info.k) {
-                    const actual_key = decrypt_key(new sjcl.cipher.aes(key), this.info.k);
-                    const decr_meta = dec_attr(base64_to_ab(this.info.at), actual_key);
-                    this.info.name = decr_meta.n && M.getSafeName(decr_meta.n) || this.info.name;
+                    const decr_meta = tryCatch(() => {
+                        const actual_key = decrypt_key(new sjcl.cipher.aes(key), this.info.k);
+                        return dec_attr(base64_to_ab(this.info.at), actual_key);
+                    }, false)();
+
+                    if (decr_meta) {
+                        this.info.name = decr_meta.n && M.getSafeName(decr_meta.n) || this.info.name;
+                    }
                 }
             })
             .catch(fail)

@@ -1357,7 +1357,7 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
         index = t.schema.primKey.keyPath;
     }
 
-    if (table === 'f' && index === 'h' && fminitialized && mega.infinity) {
+    if (table === 'f' && index === 'h' && mega.infinity) {
         p = [];
 
         if (anyof && (anyof[0] === 'p' || anyof[0] === 'h')) {

@@ -1011,6 +1011,7 @@ scparser.$add('t', function(a, scnodes) {
     }
 
     let i;
+    let share;
     const ufsc = new UFSSizeCache();
     let rootNode = scnodes.length && scnodes[0] || false;
 
@@ -1024,7 +1025,10 @@ scparser.$add('t', function(a, scnodes) {
                 scnodes[i].sk = scinshare.sk;
                 rootNode = scnodes[i];
 
-                if (M.d[rootNode.h]) {
+                // XXX: With Infinity, we may did retrieve the node API-side prior to parsing "t" ...
+                share = M.d[rootNode.h];
+
+                if (share) {
                     // save r/su/sk, we'll break next...
                     M.addNode(rootNode);
                 }
@@ -1036,7 +1040,7 @@ scparser.$add('t', function(a, scnodes) {
         }
         scinshare.h = false;
     }
-    if (M.d[rootNode.h]) {
+    if (share) {
         // skip repetitive notification of (share) nodes
         if (d) {
             console.debug('skipping repetitive notification of (share) nodes');
@@ -3764,6 +3768,9 @@ function loadfm_callback(res) {
 
     // If we have shares, and if a share is for this node, record it on the nodes share list
     if (res.s) {
+        if (d) {
+            console.info(`[f.s(${res.s.length})] %s`, res.s.map(n => `${n.h}*${n.u}`).sort());
+        }
         for (let i = res.s.length; i--;) {
             M.nodeShare(res.s[i].h, res.s[i]);
         }

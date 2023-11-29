@@ -355,7 +355,8 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table.fm.v-timeMd [megatype="timeMd"],
 .grid-table.fm.v-versions [megatype="versions"],
 .grid-table.fm.v-playtime [megatype="playtime"],
-.grid-table.fm.v-extras [megatype="extras"] {
+.grid-table.fm.v-extras [megatype="extras"],
+.grid-table.fm.v-fileLoc [megatype="fileLoc"] {
     display: table-cell;
 }
 .mega-lite-mode .grid-table.fm.v-size [megatype="size"],
@@ -634,6 +635,12 @@ table.grid-table tbody tr:not(.linked) .icon-link {
 
 table.grid-table tbody .linked .icon-link {
     display: inline-block;
+}
+
+table.grid-table tbody .grid-file-location {
+    cursor: pointer;
+    text-decoration: underline;
+    color: var(--secondary-blue);
 }
 
 /* ======================================== *\

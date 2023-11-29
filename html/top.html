@@ -17,7 +17,7 @@
         </button>
     </div>
 
-    <div class="fm-import-donwload-buttons hidden">
+    <div class="fm-import-download-buttons hidden">
         <div class="folder-link-btns-container">
             <div class="merge-mega-button download">
                 <button class="mega-button positive fm-download-as-zip">
@@ -129,27 +129,33 @@
                         <div class="dropdown-section-header">
                             <div class="dropdown-section-header-contents">
                                 <div class="dropdown-section-header-text">
-                                    <!-- Text: Results -->
+                                    [$searchbar_result_label]
                                 </div>
                             </div>
                         </div>
                         <!-- Every section has a body -->
                         <div class="dropdown-section-body">
-                                <!-- Search results - dynamically populated -->
+                                <!-- Suggestion search result - dynamically populated -->
                         </div>
-                        <!-- Template for search results item -->
-                        <a class="dropdown-search-results-item dropdown-section-body-item dropdown-search-results-template hidden">
+                        <!-- Template for search result item -->
+                        <a class="dropdown-search-results-item dropdown-section-body-item dropdown-search-results-item-template hidden">
                             <div class="dropdown-item-file dropdown-search-results-file">
                                 <div class="dropdown-search-results-item-file-icon">
-                                    <img>
+                                    <span class="transfer-filetype-icon">
+                                        <img>
+                                    </span>
                                 </div>
-                                <div class="dropdown-search-results-item-filename"></div>
+                                <div class="dropdown-search-results-item-filename">
+                                    <span class="prefix"></span>
+                                    <span class="txt-bold"></span>
+                                    <span class="suffix"></span>
+                                </div>
                             </div>
                             <div class="dropdown-search-results-item-location dropdown-item-text-medium"></div>
-                            <div class="dropdown-search-results-item-time dropdown-item-text-medium"></div>
                         </a>
                     </div>
                 </div>
+                <div class="search-loader hidden"></div>
             </div>
             <form autocomplete="disabled" id="main-search-fake-form">
                 <i class="search-icon sprite-fm-mono icon-preview-reveal"></i>
@@ -585,6 +591,10 @@
                 <div class="top-menu-item account">
                     <i class="sprite-fm-mono icon-settings"></i>
                     <span>[$823]</span>
+                </div>
+                <div class="top-menu-item infinity-item">
+                    <i class="sprite-fm-mono icon-admin-outline"></i>
+                    <span></span>
                 </div>
             </div>
 

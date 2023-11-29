@@ -212,13 +212,18 @@ lazy(mega, 'fileRequestCommon', () => {
                     puHandlePublicHandle
                 });
             }
+            let n = M.getNodeByHandle(puHandleNodeHandle);
 
-            if (!M.d[puHandleNodeHandle]) {
+            if (!n.name) {
                 await dbfetch.acquire(puHandleNodeHandle);
-                assert(M.d[puHandleNodeHandle] && M.d[puHandleNodeHandle].name, `${puHandleNodeHandle} not found.`);
+
+                if (!(n = M.getNodeByHandle(puHandleNodeHandle)).name) {
+
+                    throw new Error(`addPuHandle: ${puHandleNodeHandle} not found.`);
+                }
             }
 
-            const folderName = M.d[puHandleNodeHandle].name;
+            const {name} = n;
             const puHandleState = 2;
             let title = '';
             let description = '';
@@ -245,7 +250,7 @@ lazy(mega, 'fileRequestCommon', () => {
                     nodeHandle: puHandleNodeHandle,
                     title,
                     description,
-                    folderName,
+                    name,
                     state: puHandleState,
                     publicHandle: puHandlePublicHandle,
                     pagePublicHandle
@@ -856,7 +861,22 @@ lazy(mega, 'fileRequestCommon', () => {
                 promises.push(mega.fileRequestCommon.storage.addPuHandle(h, ph));
             }
 
-            return Promise.all(promises);
+            return Promise.allSettled(promises)
+                .then((res) => {
+                    if (d) {
+                        for (let i = res.length; i--;) {
+                            if (!res[i].reason) {
+                                res.splice(i, 1);
+                            }
+                        }
+
+                        if (res.length) {
+                            console.group('processUploadedPuHandles');
+                            res.map((ex) => logger.warn(ex.reason));
+                            console.groupEnd();
+                        }
+                    }
+                });
         }
 
         processPublicUploadPage(actionPacket) {

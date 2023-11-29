@@ -55,6 +55,10 @@
 #copyrights-dispute-bottom2 {
     margin-top: 8px;
 }
+.new-registration-checkbox.cn_check1,
+.new-registration-checkbox.cn_check2 {
+    display: flex;
+}
 .fmholder div.main-mid-pad.new-bottom-pages * {
     user-select: text !important;
     -webkit-user-select: text !important;
@@ -63,11 +67,11 @@
     padding: 48px 15px 46px 15px;
 }
 .copyrights-dispute-bottom .new-registration-checkbox .checkboxOn, .copyrights-dispute-bottom .new-registration-checkbox .checkboxOff {
-    margin: 2px 0 0 0;
+    margin: 5px 0 0;
 }
 .copyrights-dispute-bottom .new-registration-checkbox .radio-txt {
-    margin: -1px 0 0 35px;
-    padding: 0 0 0 0;
+    margin: -1px 0 0 10px;
+    padding: 0;
     float: none;
     text-indent: 0;
     display: block;

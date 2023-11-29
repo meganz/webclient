@@ -2193,7 +2193,7 @@ accountUI.plan = {
                 this.$selectReasonDialog.addClass('hidden');
                 this.$invalidDetailsDialog.addClass('hidden');
                 this.$textareaAndErrorDialog.addClass('hidden');
-                this.$dialog.removeClass('textbox-open');
+                this.$dialog.removeClass('textbox-open select-reason');
                 this.$cancelReason.removeClass('error');
                 this.$textarea.val('');
                 $('.cancel-option', this.$options).addClass('radioOff').removeClass('radioOn');

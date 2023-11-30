@@ -1011,9 +1011,9 @@ scparser.$add('t', function(a, scnodes) {
     }
 
     let i;
-    let share;
     const ufsc = new UFSSizeCache();
     let rootNode = scnodes.length && scnodes[0] || false;
+    let share = M.d[rootNode.h];
 
     // is this tree a new inshare with root scinshare.h? set share-relevant
     // attributes in its root node.

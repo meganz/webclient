@@ -1366,6 +1366,10 @@ var slideshowid;
                 }
             }
 
+            if (pfcol) {
+                tryCatch(() => eventlog(mega.gallery.isVideo(n) ? 99972 : 99973))();
+            }
+
             // TODO: adapt the above code to work on the downloads page if we need to download the original
             if (page === 'download') {
                 $('button.download-file').click();
@@ -1996,7 +2000,13 @@ var slideshowid;
             return;
         }
 
-        if (/^(?:audio|video)\//i.test(previews[id].type)) {
+        const isVideoStream = /^(?:audio|video)\//i.test(previews[id].type);
+
+        if (pfcol) {
+            eventlog(isVideoStream ? 99970 : 99971);
+        }
+
+        if (isVideoStream) {
             return slideshow_videostream(id, $overlay);
         }
 

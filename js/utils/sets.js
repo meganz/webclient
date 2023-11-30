@@ -471,13 +471,15 @@ lazy(mega, 'sets', () => {
      * Processing $.onImportCopyNodes in a Folder link way but for a new set
      * @param {String[]} selectedNodes File or Folder handles to import
      * @param {String} targetHandle The handle of the target folder
-     * @returns {void}
+     * @returns {Promise}
      */
     const copyNodesAndSet = async(selectedNodes, targetHandle) => {
         const tree = $.onImportCopyNodes;
         const [albumNode] = tree;
         const node = crypto_decryptnode({...albumNode});
         let {name} = node;
+
+        onIdle(() => eventlog(99969));
 
         if (name) {
             name = await mega.gallery.albums.getUniqueSetName(node);

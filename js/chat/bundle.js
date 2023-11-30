@@ -11455,6 +11455,21 @@ class ChatlinkDialog extends mixins.wl {
     });
     $('span', $copyButton).text(l[1990]);
   }
+  componentDidMount() {
+    super.componentDidMount();
+    M.safeShowDialog(ChatlinkDialog.NAMESPACE, () => {
+      if (!this.isMounted()) {
+        throw new Error(`${ChatlinkDialog.NAMESPACE} dialog: component not mounted.`);
+      }
+      return $(`#${ChatlinkDialog.NAMESPACE}`);
+    });
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if ($.dialog === ChatlinkDialog.NAMESPACE) {
+      closeDialog();
+    }
+  }
   render() {
     const {
       chatRoom
@@ -11469,6 +11484,7 @@ class ChatlinkDialog extends mixins.wl {
       onClick: this.onClose
     }, external_React_default().createElement("span", null, l[148]));
     return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+      id: ChatlinkDialog.NAMESPACE,
       title: chatRoom.iAmOperator() && !chatRoom.topic ? chatRoom.isMeeting ? l.rename_meeting : l[9080] : '',
       className: `
                     chat-rename-dialog
@@ -11557,6 +11573,7 @@ ChatlinkDialog.defaultProps = {
   requiresUpdateOnResize: true,
   disableCheckingVisibility: true
 };
+ChatlinkDialog.NAMESPACE = 'chat-link-dialog';
 ;// CONCATENATED MODULE: ./js/chat/ui/pushSettingsDialog.jsx
 
 var pushSettingsDialog_class;
@@ -13595,7 +13612,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       createTimeoutPromise(() => chatRoom.topic && chatRoom.state === ChatRoom.STATE.READY, 350, 15000).always(() => {
         return chatRoom.isCurrentlyActive ? this.setState({
           chatLinkDialog: true
-        }) : chatRoom.updatePublicHandle(false, true);
+        }, () => affiliateUI.registeredDialog.show()) : chatRoom.updatePublicHandle(false, true);
       });
     });
     if (chatRoom.type === 'private') {

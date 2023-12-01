@@ -863,11 +863,6 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                 if (is_extension) {
                     location.reload();
                 }
-                else if (is_mobile) {
-                    // Always go back to the Login page on logout on mobile
-                    loadSubPage('login');
-                    return location.reload();
-                }
 
                 var sitePath = getSitePath();
                 if (sitePath.includes('fm/search/')

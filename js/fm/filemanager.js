@@ -4532,7 +4532,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.out-shared-grid-view').addClass('hidden');
     }
 
-    if (id !== 'shared-with-me' && id !== 'out-shares') {
+    if (id !== 'shared-with-me' && id !== 'out-shares' || M.search) {
         $('.shares-tabs-bl').addClass('hidden');
     }
 

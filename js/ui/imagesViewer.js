@@ -868,7 +868,7 @@ var slideshowid;
     // eslint-disable-next-line complexity
     function slideshow(id, close, hideCounter, filteredNodeArr) {
         if (!close && M.isInvalidUserStatus()) {
-            return;
+            return false;
         }
 
         var $overlay = $('.media-viewer-container', 'body');

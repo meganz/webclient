@@ -20,6 +20,7 @@
     flex-shrink: 0;
     border-bottom: 1px solid var(--surface-main);
     min-width: 700px;
+    padding-left: 20px;
 }
 .gallery-tabs-bl .gallery-section-tabs {
     padding-top: 14px;

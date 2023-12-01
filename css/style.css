@@ -2939,7 +2939,7 @@ body.loading .light-overlay {
     display: none;
     flex-shrink: 0;
     font: var(--text-body1);
-    margin: 2px 24px;
+    margin: 8px 24px;
     overflow: hidden;
     padding: 4px 8px;
     position: relative;

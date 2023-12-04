@@ -12568,7 +12568,8 @@ class EndCallButton extends mixins.wl {
         onClick: () => hasHost(chatRoom.getCallParticipants()) ? onLeave() : confirmLeave({
           title: l.assign_host_leave_call,
           body: l.assign_host_leave_call_details,
-          cta: l.assign_host_button
+          cta: l.assign_host_button,
+          altCta: l.leave_anyway
         })
       });
     });
@@ -12631,7 +12632,8 @@ class EndCallButton extends mixins.wl {
           }, external_React_default().createElement(this.LeaveButton, {
             chatRoom: chatRoom,
             participants: chatRoom.getCallParticipants(),
-            onLeave: () => call.hangUp()
+            onLeave: () => call.hangUp(),
+            onConfirmDenied: () => call.hangUp()
           }), external_React_default().createElement(dropdowns.DropdownItem, {
             className: "link-button",
             icon: "sprite-fm-mono icon-contacts",
@@ -22253,7 +22255,8 @@ class Minimized extends mixins.wl {
             return hasHost(callParticipants) || callParticipants.length === 1 ? onLeave() : confirmLeave({
               title: l.assign_host_leave_call,
               body: l.assign_host_leave_call_details,
-              cta: l.assign_host_button
+              cta: l.assign_host_button,
+              altCta: l.leave_anyway
             });
           }
         }, external_React_default().createElement("span", null, l[5884]));
@@ -22316,7 +22319,8 @@ class Minimized extends mixins.wl {
       }), this.renderPermissionsWarning(Av.Screen)), external_React_default().createElement(LeaveButton, {
         chatRoom: chatRoom,
         participants: chatRoom.getCallParticipants(),
-        onLeave: onCallEnd
+        onLeave: onCallEnd,
+        onConfirmDenied: onCallEnd
       }));
     };
     this.renderPeersWaiting = () => {
@@ -24661,7 +24665,8 @@ class StreamControls extends mixins.wl {
         onClick: () => hasHost(chatRoom.getCallParticipants()) ? onLeave() : confirmLeave({
           title: l.assign_host_leave_call,
           body: l.assign_host_leave_call_details,
-          cta: l.assign_host_button
+          cta: l.assign_host_button,
+          altCta: l.leave_anyway
         })
       }, external_React_default().createElement("span", null, l.leave));
     });
@@ -24717,7 +24722,8 @@ class StreamControls extends mixins.wl {
       }, external_React_default().createElement(this.LeaveButton, {
         chatRoom: chatRoom,
         participants: chatRoom.getCallParticipants(),
-        onLeave: onCallEnd
+        onLeave: onCallEnd,
+        onConfirmDenied: onCallEnd
       }), external_React_default().createElement(meetings_button.Z, {
         className: `
                             mega-button
@@ -25605,9 +25611,17 @@ const withHostsObserver = Component => {
       this.confirmLeave = ({
         title,
         body,
-        cta
+        cta,
+        altCta
       }) => {
-        msgDialog(`confirmationa:!^${cta}!${l[82]}`, null, title, body, cb => cb && this.toggleDialog(), 1);
+        msgDialog(`confirmationa:!^${cta}!${altCta || l[82]}`, null, title, body, cb => {
+          if (cb) {
+            this.toggleDialog();
+          } else if (cb === false) {
+            var _this$props$onConfirm, _this$props;
+            (_this$props$onConfirm = (_this$props = this.props).onConfirmDenied) == null || _this$props$onConfirm.call(_this$props);
+          }
+        }, 1);
       };
     }
     render() {

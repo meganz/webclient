@@ -61,7 +61,8 @@ class EndCallButton extends MegaRenderMixin {
                             confirmLeave({
                                 title: l.assign_host_leave_call /* `Assign host to leave call` */,
                                 body: l.assign_host_leave_call_details /* `You're the only host on...` */,
-                                cta: l.assign_host_button /* `Assign host` */
+                                cta: l.assign_host_button /* `Assign host` */,
+                                altCta: l.leave_anyway /* `Leave anyway` */,
                             })
                     }
                 />
@@ -114,6 +115,7 @@ class EndCallButton extends MegaRenderMixin {
                                 chatRoom={chatRoom}
                                 participants={chatRoom.getCallParticipants()}
                                 onLeave={() => call.hangUp()}
+                                onConfirmDenied={() => call.hangUp()}
                             />
                             <DropdownItem
                                 className="link-button"
